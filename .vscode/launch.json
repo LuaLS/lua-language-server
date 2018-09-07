@@ -1,0 +1,25 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "测试",
+            "type": "lua",
+            "request": "launch",
+            "stopOnEntry": false,
+            "program": "${workspaceRoot}/test/main.lua",
+            "cwd": "${workspaceRoot}",
+            "env": {
+                "PATH": "${workspaceRoot}\\bin\\"
+            },
+            "luaRuntime": "5.3 32bit",
+            "luaexe": "${workspaceRoot}\\bin\\lua.exe",
+            "luadll": "${workspaceRoot}\\bin\\lua53.dll",
+            "path": "${workspaceRoot}/bin/?.lua",
+            "cpath": "${workspaceRoot}/bin/?.dll;",
+            "arg": [
+            ],
+            "consoleCoding": "utf8",
+            "sourceCoding": "utf8"
+        }
+    ]
+}

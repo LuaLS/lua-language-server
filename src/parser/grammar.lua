@@ -185,7 +185,7 @@ Float16     <-  ('.' X16*)? ([pP] [+-]? [1-9]? [0-9]*)?
 ]]
 
 grammar 'Name' [[
-Name        <-  Sp [a-zA-Z_] [a-zA-Z0-9_]*
+Name        <-  Sp ({} {[a-zA-Z_] [a-zA-Z0-9_]*}) -> Name
 ]]
 
 grammar 'Exp' [[
@@ -233,16 +233,20 @@ TableField  <-  NewIndex / NewField / Exp
 NewIndex    <-  BL Exp BR ASSIGN Exp
 NewField    <-  Name ASSIGN Exp
 
-Function    <-  FUNCTION PL ArgList? PR
+Function    <-  FUNCTION FuncName? PL ArgList? PR
                     (!END Action)*
                 END
+FuncName    <-  FuncPrefix (FuncSuffix)*
+FuncPrefix  <-  Name
+FuncSuffix  <-  DOT Name
+            /   COLON Name
 
 -- 纯占位，修改了 `relabel.lua` 使重复定义不抛错
 Action      <-  !. .
 ]]
 
 grammar 'Action' [[
-Action      <-  SEMICOLON / Do / Break / Return / Label / GoTo / If / For / While / Repeat / Set / Call
+Action      <-  SEMICOLON / Do / Break / Return / Label / GoTo / If / For / While / Repeat / Set / Local / Function / Call
 
 ExpList     <-  Exp (COMMA Exp)*
 
@@ -290,6 +294,9 @@ Repeat      <-  REPEAT
 
 Set         <-  LOCAL Name ASSIGN Exp
             /   Simple     ASSIGN Exp
+
+Local       <-  LOCAL Function
+            /   LOCAL (Sp {} Name) -> LocalVar
 
 Call        <-  Prefix (Suffix)*
 ]]

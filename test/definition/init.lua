@@ -12,6 +12,16 @@ local function test(script)
 end
 
 test [[
-local <!a!>
-<?a?> = 1
+local <!x!>
+<?x?> = 1
+]]
+
+test [[
+local <!x!> = 1
+<?x?> = 1
+]]
+
+test [[
+function <!x!> () end
+<?x?> = 1
 ]]

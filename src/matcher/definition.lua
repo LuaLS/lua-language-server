@@ -61,12 +61,15 @@ function defs.LocalSet(names)
     end
 end
 
-function defs.Function(func)
-    local names = func.name
-    if names and #names == 1 then
+function defs.FunctionDef(names)
+    if #names == 1 then
         scopeSet(names[1])
     end
-    return func
+    scopePush()
+end
+
+function defs.Function()
+    scopePop()
 end
 
 function defs.DoDef()

@@ -191,3 +191,32 @@ repeat
     local <!x!>
 until <?x?>
 ]]
+
+test [[
+local <!x!>
+function _()
+    local x
+end
+<?x?> = 1
+]]
+
+test [[
+local <!x!>
+return function ()
+    <?x?> = 1
+end
+]]
+
+test [[
+local <!x!>
+local x = function ()
+    <?x?> = 1
+end
+]]
+
+test [[
+local x
+local function <!x!> ()
+    <?x?> = 1
+end
+]]

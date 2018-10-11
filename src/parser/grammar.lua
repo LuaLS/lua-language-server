@@ -233,13 +233,10 @@ TableField  <-  NewIndex / NewField / Exp
 NewIndex    <-  BL Exp BR ASSIGN Exp
 NewField    <-  Name ASSIGN Exp
 
-Function    <-  {|
-                FUNCTION FuncName? PL ArgList? PR
-                    (!END Action)*
+Function    <-  (FUNCTION {| FuncName? |} PL ArgList? PR) -> FunctionDef
+                    (!END Action)*                  -> Function
                 END
-                |}
-            ->  Function
-FuncName    <-  {:name: {| Name (FuncSuffix)* |} :}
+FuncName    <-  Name (FuncSuffix)*
 FuncSuffix  <-  DOT Name
             /   COLON Name
 

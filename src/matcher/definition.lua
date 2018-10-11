@@ -66,11 +66,11 @@ return function (buf, pos_)
     parser.grammar(buf, 'Lua', defs)
 
     if not result then
-        return nil
+        return false, 'No word'
     end
     local name, start = result[1], result[2]
     if not start then
-        return nil
+        return false, 'No match'
     end
-    return start, start + #name - 1
+    return true, start, start + #name - 1
 end

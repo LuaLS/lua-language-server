@@ -6,7 +6,8 @@ local function test(script)
     local pos    = script:find('<?', 1, true) + 2
     local new_script = script:gsub('<[!?]', '  '):gsub('[!?]>', '  ')
 
-    local a, b = matcher.definition(new_script, pos)
+    local suc, a, b = matcher.definition(new_script, pos)
+    assert(suc)
     assert(a == start)
     assert(b == finish)
 end

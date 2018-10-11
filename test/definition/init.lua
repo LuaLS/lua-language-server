@@ -26,3 +26,68 @@ test [[
 function <!x!> () end
 <?x?> = 1
 ]]
+
+test [[
+local function <!x!> () end
+<?x?> = 1
+]]
+
+test [[
+local x
+local <!x!>
+<?x?> = 1
+]]
+
+test [[
+local <!x!>
+do
+    <?x?> = 1
+end
+]]
+
+test [[
+local <!x!>
+do
+    local x
+end
+<?x?> = 1
+]]
+
+test [[
+local <!x!>
+if <?x?> then
+    local x
+end
+]]
+
+test[[
+local <!x!>
+if x then
+    local x
+elseif <?x?> then
+    local x
+end
+]]
+
+test[[
+local <!x!>
+if x then
+    local x
+elseif x then
+    local x
+else
+    local x
+end
+<?x?> = 1
+]]
+
+test[[
+local <!x!>
+if x then
+    <?x?> = 1
+elseif x then
+    local x
+else
+    local x
+end
+]]

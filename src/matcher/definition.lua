@@ -20,13 +20,21 @@ end
 
 local function scopeGet(name)
     for i = #scopes, 1, -1 do
-        local scope = scopes[#scopes]
+        local scope = scopes[i]
         local p = scope[name]
         if p then
             return p
         end
     end
     return nil
+end
+
+local function scopePush()
+    scopes[#scopes+1] = {}
+end
+
+local function scopePop()
+    scopes[#scopes] = nil
 end
 
 local function checkDifinition(name, p)
@@ -56,6 +64,38 @@ function defs.Function(func)
         scopeSet(name[1], name[2])
     end
     return func
+end
+
+function defs.DoStart()
+    scopePush()
+end
+
+function defs.Do()
+    scopePop()
+end
+
+function defs.IfStart()
+    scopePush()
+end
+
+function defs.If()
+    scopePop()
+end
+
+function defs.ElseIfStart()
+    scopePush()
+end
+
+function defs.ElseIf()
+    scopePop()
+end
+
+function defs.ElseStart()
+    scopePush()
+end
+
+function defs.Else()
+    scopePop()
 end
 
 return function (buf, pos_)

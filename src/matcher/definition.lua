@@ -49,12 +49,16 @@ function defs.Name(p, str)
     return {str, p}
 end
 
-function defs.LocalVar(name)
-    scopeSet(name)
+function defs.LocalVar(names)
+    for _, name in ipairs(names) do
+        scopeSet(name)
+    end
 end
 
-function defs.LocalSet(name)
-    scopeSet(name)
+function defs.LocalSet(names)
+    for _, name in ipairs(names) do
+        scopeSet(name)
+    end
 end
 
 function defs.Function(func)
@@ -110,7 +114,7 @@ function defs.LoopStart(name, exp)
     return name
 end
 
-function defs.InList(...)
+function defs.NameList(...)
     return {...}
 end
 
@@ -122,6 +126,22 @@ function defs.InDef(names)
 end
 
 function defs.In()
+    scopePop()
+end
+
+function defs.WhileDef()
+    scopePush()
+end
+
+function defs.While()
+    scopePop()
+end
+
+function defs.RepeatDef()
+    scopePush()
+end
+
+function defs.Until()
     scopePop()
 end
 

@@ -251,6 +251,8 @@ grammar 'Action' [[
 Action      <-  SEMICOLON / Do / Break / Return / Label / GoTo / If / For / While / Repeat / Set / Local / Function / Call
 
 ExpList     <-  Exp (COMMA Exp)*
+NameList    <-  (Name (COMMA Name)*)        -> NameList
+SimpleList  <-  (Simple (COMMA Simple)*)    -> SimpleList
 
 Do          <-  DO                  -> DoDef
                     (!END Action)*  -> Do
@@ -284,26 +286,25 @@ LoopStart   <-  (Name ASSIGN Exp)                       -> LoopStart
 LoopFinish  <-  COMMA Exp
 LoopStep    <-  COMMA Exp
 
-In          <-  (FOR InList IN ExpList DO)  -> InDef
-                    (!END Action)*          -> In
-                END
-InList      <-  (Name (COMMA Name)*)        -> InList
-
-While       <-  WHILE Exp DO
-                    (!END Action)*
+In          <-  (FOR NameList IN ExpList DO)    -> InDef
+                    (!END Action)*              -> In
                 END
 
-Repeat      <-  REPEAT
-                    (!UNTIL Action)*
-                UNTIL Exp
+While       <-  (WHILE Exp DO)      -> WhileDef
+                    (!END Action)*  -> While
+                END
 
-Set         <-  (LOCAL !FUNCTION Name ASSIGN Exp)
+Repeat      <-  REPEAT                  -> RepeatDef
+                    (!UNTIL Action)*    -> Repeat
+                (UNTIL Exp)             -> Until
+
+Set         <-  (LOCAL !FUNCTION NameList ASSIGN ExpList)
             ->  LocalSet
-            /   Simple     ASSIGN Exp
+            /   SimpleList ASSIGN ExpList
 
 Local       <-  LOCAL Function
             ->  LocalFunction
-            /   LOCAL Name
+            /   LOCAL NameList
             ->  LocalVar
 
 Call        <-  Prefix (Suffix)*

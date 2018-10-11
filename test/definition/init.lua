@@ -18,7 +18,17 @@ local <!x!>
 ]]
 
 test [[
+local z, y, <!x!>
+<?x?> = 1
+]]
+
+test [[
 local <!x!> = 1
+<?x?> = 1
+]]
+
+test [[
+local z, y, <!x!> = 1
 <?x?> = 1
 ]]
 
@@ -131,4 +141,53 @@ local x
 for z, y, <!x!> in x do
     <?x?> = 1
 end
+]]
+
+test [[
+local <!x!>
+while <?x?> do
+end
+]]
+
+test [[
+local <!x!>
+while x do
+    <?x?> = 1
+end
+]]
+
+test [[
+local <!x!>
+while x do
+    local x
+end
+<?x?> = 1
+]]
+
+test [[
+local <!x!>
+repeat
+    <?x?> = 1
+until true
+]]
+
+test [[
+local <!x!>
+repeat
+    local x
+until true
+<?x?> = 1
+]]
+
+test [[
+local <!x!>
+repeat
+until <?x?>
+]]
+
+test [[
+local x
+repeat
+    local <!x!>
+until <?x?>
 ]]

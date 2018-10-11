@@ -60,7 +60,7 @@ if <?x?> then
 end
 ]]
 
-test[[
+test [[
 local <!x!>
 if x then
     local x
@@ -69,7 +69,7 @@ elseif <?x?> then
 end
 ]]
 
-test[[
+test [[
 local <!x!>
 if x then
     local x
@@ -81,7 +81,7 @@ end
 <?x?> = 1
 ]]
 
-test[[
+test [[
 local <!x!>
 if x then
     <?x?> = 1
@@ -89,5 +89,46 @@ elseif x then
     local x
 else
     local x
+end
+]]
+
+test [[
+local <!x!>
+for x = 1, 10 do
+end
+<?x?> = 1
+]]
+
+test [[
+local x
+for <!x!> = 1, 10 do
+    <?x?> = 1
+end
+]]
+
+test [[
+local <!x!>
+for x in x do
+end
+<?x?> = 1
+]]
+
+test [[
+local <!x!>
+for x in <?x?> do
+end
+]]
+
+test [[
+local x
+for <!x!> in x do
+    <?x?> = 1
+end
+]]
+
+test [[
+local x
+for z, y, <!x!> in x do
+    <?x?> = 1
 end
 ]]

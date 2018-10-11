@@ -13,9 +13,9 @@ local function scopeInit()
     scopes = {{}}
 end
 
-local function scopeSet(name, p)
+local function scopeSet(name)
     local scope = scopes[#scopes]
-    scope[name] = p
+    scope[name[1]] = name[2]
 end
 
 local function scopeGet(name)
@@ -50,23 +50,22 @@ function defs.Name(p, str)
 end
 
 function defs.LocalVar(name)
-    scopeSet(name[1], name[2])
+    scopeSet(name)
 end
 
 function defs.LocalSet(name)
-    scopeSet(name[1], name[2])
+    scopeSet(name)
 end
 
 function defs.Function(func)
     local names = func.name
     if names and #names == 1 then
-        local name = names[1]
-        scopeSet(name[1], name[2])
+        scopeSet(names[1])
     end
     return func
 end
 
-function defs.DoStart()
+function defs.DoDef()
     scopePush()
 end
 
@@ -74,7 +73,7 @@ function defs.Do()
     scopePop()
 end
 
-function defs.IfStart()
+function defs.IfDef()
     scopePush()
 end
 
@@ -82,7 +81,7 @@ function defs.If()
     scopePop()
 end
 
-function defs.ElseIfStart()
+function defs.ElseIfDef()
     scopePush()
 end
 
@@ -90,11 +89,39 @@ function defs.ElseIf()
     scopePop()
 end
 
-function defs.ElseStart()
+function defs.ElseDef()
     scopePush()
 end
 
 function defs.Else()
+    scopePop()
+end
+
+function defs.LoopDef(name)
+    scopePush()
+    scopeSet(name)
+end
+
+function defs.Loop()
+    scopePop()
+end
+
+function defs.LoopStart(name, exp)
+    return name
+end
+
+function defs.InList(...)
+    return {...}
+end
+
+function defs.InDef(names)
+    scopePush()
+    for _, name in ipairs(names) do
+        scopeSet(name)
+    end
+end
+
+function defs.In()
     scopePop()
 end
 

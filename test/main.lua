@@ -1,11 +1,11 @@
 require 'filesystem'
 ROOT = fs.current_path()
-package.path = package.path .. ';' .. (ROOT / 'src' / '?.lua'):string()
-                            .. ';' .. (ROOT / 'src' / '?' / 'init.lua'):string()
-                            .. ';' .. (ROOT / 'test' / '?.lua'):string()
-                            .. ';' .. (ROOT / 'test' / '?' / 'init.lua'):string()
+package.path = (ROOT / 'src' / '?.lua'):string()
+     .. ';' .. (ROOT / 'src' / '?' / 'init.lua'):string()
+     .. ';' .. (ROOT / 'test' / '?.lua'):string()
+     .. ';' .. (ROOT / 'test' / '?' / 'init.lua'):string()
 
-local log = require 'log'
+log = require 'log'
 log.init(ROOT, ROOT / 'log' / 'test.log')
 log.debug('测试开始')
 

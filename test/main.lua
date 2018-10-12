@@ -11,6 +11,8 @@ log.debug('测试开始')
 
 require 'utility'
 require 'global_protect'
+local dbg = require 'debugger'
+dbg:io 'listen:0.0.0.0:546858'
 
 local function main()
     local function test(name)

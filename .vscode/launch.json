@@ -20,6 +20,16 @@
             ],
             "consoleCoding": "utf8",
             "sourceCoding": "utf8"
-        }
+        },
+        {
+            "name": "附加",
+            "type": "lua",
+            "request": "attach",
+            "stopOnEntry": true,
+            "sourceCoding": "utf8",
+            "consoleCoding": "utf8",
+            "ip": "localhost",
+            "port": 546858
+        },
     ]
 }

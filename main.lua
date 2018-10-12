@@ -9,6 +9,7 @@ log.info('Lua 语言服务启动，路径为：', ROOT)
 
 local dbg = require 'debugger'
 dbg:io 'listen:0.0.0.0:546858'
+dbg:start()
 
 require 'utility'
 require 'global_protect'

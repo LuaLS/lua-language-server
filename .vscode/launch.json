@@ -29,7 +29,13 @@
             "sourceCoding": "utf8",
             "consoleCoding": "utf8",
             "ip": "localhost",
-            "port": 546858
+            "port": 546858,
+            "sourceMaps": [
+                [
+                    "C:\\Users\\sunyi\\.vscode\\extensions\\sumneko.lua-lsp\\server",
+                    "${workspaceFolder}"
+                ]
+            ]
         },
     ]
 }

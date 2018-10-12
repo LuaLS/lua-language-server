@@ -1,10 +1,14 @@
-root = arg[0] .. '\\..\\..'
-package.path = package.path .. ';' .. root .. '\\src\\?.lua'
-                            .. ';' .. root .. '\\src\\?\\init.lua'
-                            .. ';' .. root .. '\\test\\?.lua'
-                            .. ';' .. root .. '\\test\\?\\init.lua'
-
 require 'filesystem'
+ROOT = fs.current_path()
+package.path = package.path .. ';' .. (ROOT / 'src' / '?.lua'):string()
+                            .. ';' .. (ROOT / 'src' / '?' / 'init.lua'):string()
+                            .. ';' .. (ROOT / 'test' / '?.lua'):string()
+                            .. ';' .. (ROOT / 'test' / '?' / 'init.lua'):string()
+
+local log = require 'log'
+log.init(ROOT, ROOT / 'log' / 'test.log')
+log.debug('测试开始')
+
 require 'utility'
 require 'global_protect'
 
@@ -22,3 +26,5 @@ local function main()
 end
 
 main()
+
+log.debug('测试完成')

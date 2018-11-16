@@ -1,5 +1,6 @@
 local lpeg = require 'lpeglabel'
 local save_sort
+local table_pack = table.pack
 
 local P = lpeg.P
 local S = lpeg.S
@@ -49,6 +50,15 @@ local hashmt = {
         rawset(self, i, k)
         rawset(self, k, v)
     end,
+    __debugger_extand = function (self)
+        local list = {}
+        for k, v in pairs(self) do
+            k = tostring(k)
+            list[#list+1] = k
+            list[k] = v
+        end
+        return list
+    end,
 }
 
 local tointeger = math.tointeger
@@ -56,9 +66,12 @@ local tonumber = tonumber
 local setmetatable = setmetatable
 local rawset = rawset
 local function HashTable(patt)
-    return Ct(patt) / function (hash)
+    return C(patt) / function (_, ...)
+        local hash = table_pack(...)
+        local n = hash.n
+        hash.n = nil
         if save_sort then
-            local max = #hash // 2
+            local max = n // 2
             for i = 1, max do
                 local key, value = hash[2*i-1], hash[2*i]
                 hash[key] = value
@@ -70,13 +83,13 @@ local function HashTable(patt)
             end
             return setmetatable(hash, hashmt)
         else
-            local max = #hash // 2
+            local max = n // 2
             for i = 1, max do
                 local a = 2*i-1
                 local b = 2*i
                 local key, value = hash[a], hash[b]
                 hash[key] = value
-                hash[a] =nil
+                hash[a] = nil
                 hash[b] = nil
             end
             return hash

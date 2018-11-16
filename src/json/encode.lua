@@ -1,8 +1,10 @@
+
 local rep = string.rep
 local format = string.format
 local gsub = string.gsub
 local sub = string.sub
 local sort = table.sort
+local find = string.find
 local tostring = tostring
 local getmetatable = debug.getmetatable
 local type = type
@@ -84,6 +86,11 @@ local function encode(data, key)
 			index=index+1;lines[index] = tabs[n] .. ']'
 		end
 	elseif tp == 'number' then
+		data = tostring(data)
+		-- 判断 inf -inf -nan(ind) 1.#INF -1.#INF -1.#IND
+		if find(data, '%a') then
+			data = '0'
+		end
 		if key then
 			index=index+1;lines[index] = tabs[n] .. '"' .. gsub(key, '[\\\r\n\t"]', esc_map) .. '" : ' .. data
 		else

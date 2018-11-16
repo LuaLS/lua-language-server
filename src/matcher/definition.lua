@@ -4,6 +4,7 @@ local pos
 local defs = {}
 local scopes
 local result
+local namePos
 
 local function getResult(name, p)
     result = {name, p}
@@ -44,9 +45,13 @@ local function checkDifinition(name, p)
     getResult(name, scopeGet(name))
 end
 
-function defs.Name(p, str)
-    checkDifinition(str, p)
-    return {str, p}
+function defs.NamePos(p)
+    namePos = p
+end
+
+function defs.Name(str)
+    checkDifinition(str, namePos)
+    return {str, namePos}
 end
 
 function defs.LocalVar(names)

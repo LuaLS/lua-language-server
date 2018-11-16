@@ -185,7 +185,7 @@ Float16     <-  ('.' X16*)? ([pP] [+-]? [1-9]? [0-9]*)?
 ]]
 
 grammar 'Name' [[
-Name        <-  Sp ({} {[a-zA-Z_] [a-zA-Z0-9_]*}) -> Name
+Name        <-  Sp {} -> NamePos {[a-zA-Z_] [a-zA-Z0-9_]*} -> Name
 ]]
 
 grammar 'Exp' [[

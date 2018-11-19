@@ -118,6 +118,17 @@ function mt:loadText(uri)
     return obj.text
 end
 
+function mt:removeText(uri, version)
+    local obj = self._file[uri]
+    if not obj then
+        return
+    end
+    if obj.version >= version then
+        return
+    end
+    self._file[uri] = nil
+end
+
 function mt:start(method)
     self._method = method
     while true do

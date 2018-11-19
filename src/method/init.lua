@@ -8,5 +8,6 @@ init 'initialize'
 init 'textDocument/definition'
 init 'textDocument/didOpen'
 init 'textDocument/didChange'
+init 'textDocument/didClose'
 
 return method

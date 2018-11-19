@@ -1,16 +1,7 @@
 local sleep = require 'ffi.sleep'
 local ext   = require 'process.ext'
 local lsp   = require 'lsp'
-
-local Method = {}
-
-function Method.initialize()
-    return {
-        capabilities = {
-            definitionProvider = true,
-        }
-    }
-end
+local Method= require 'method'
 
 local function listen(self, input, output)
     if input then
@@ -40,9 +31,14 @@ local function listen(self, input, output)
     session:start(function (method, params)
         local f = Method[method]
         if f then
-            return f(params)
+            local suc, res = pcall(f, session, params)
+            if suc then
+                return res
+            else
+                return nil, '发生运行时错误：' .. res
+            end
         end
-        return nil
+        return nil, '没有注册方法：' .. method
     end)
 end
 

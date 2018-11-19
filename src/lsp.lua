@@ -1,5 +1,5 @@
-local json = require 'json'
-local Method = require 'lsp.method'
+local json   = require 'json'
+local parser = require 'parser'
 
 local ErrorCodes = {
 	-- Defined by JSON RPC
@@ -22,15 +22,15 @@ mt.__index = mt
 
 mt._input = nil
 mt._output = nil
-mt._inited = false
 mt._method = nil
+mt._file = nil
 
 function mt:_callback(method, params)
     local f = self._method
     if f then
         return f(method, params)
     end
-    return nil
+    return nil, '没有注册method'
 end
 
 function mt:_send(data)
@@ -56,15 +56,11 @@ function mt:_readAsContent(header)
         log.error('错误的协议：', buf)
         return
     end
-    log.debug(table.dump(res))
     local id     = res.id
     local method = res.method
     local params = res.params
-    local f = Method[method]
-    if not f then
-        return
-    end
-    local response, err = f(self, params)
+    log.debug('收到协议：', method)
+    local response, err = self:_callback(method, params)
     if response then
         self:_send {
             id = id,
@@ -74,15 +70,15 @@ function mt:_readAsContent(header)
             method = 'window/showMessage',
             params = {
                 type = 3,
-                message = 'hello loli',
+                message = method,
             }
         }
-    else
+    elseif id then
         self:_send {
             id = id,
             error = {
                 code = ErrorCodes.UnknownErrorCode,
-                message = err,
+                message = err or ('没有回应：' .. method),
             },
         }
     end
@@ -103,11 +99,34 @@ function mt:read(mode)
     return self._input(mode)
 end
 
+function mt:saveText(url, version, text)
+    local obj = lsp._file[url]
+    if obj then
+        if obj.version >= version then
+            return
+        end
+        obj.version = version
+        obj.lines = parser.split(text)
+    else
+        lsp._file[url] = {
+            version = version,
+            text = parser.split(text),
+        }
+    end
+end
+
+function mt:loadText(url)
+    local obj = lsp._file[url]
+    if not obj then
+        return nil
+    end
+    return table.concat(obj.text, '\r\n')
+end
+
 function mt:start(method)
     self._method = method
     while true do
         local header = self:read 'l'
-        log.debug('header:', header)
         if not header then
             return
         end
@@ -127,5 +146,7 @@ function mt:stop()
 end
 
 return function ()
-    return setmetatable({}, mt)
+    return setmetatable({
+        _file = {},
+    }, mt)
 end

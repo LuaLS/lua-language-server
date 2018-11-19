@@ -13,7 +13,7 @@ local function scopeInit()
     scopes = {{}}
 end
 
-local function scopeSet(obj)
+local function scopeDef(obj)
     local scope = scopes[#scopes]
     local name = obj[1]
     scope[name] = obj
@@ -28,6 +28,14 @@ local function scopeGet(name)
         end
     end
     return nil
+end
+
+local function scopeSet(obj)
+    local name = obj[1]
+    if not scopeGet(name) then
+        local scope = scopes[#scopes]
+        scope[name] = obj
+    end
 end
 
 local function scopePush()
@@ -51,7 +59,7 @@ end
 
 function defs.Name(str)
     checkDifinition(str, namePos)
-    return {str, namePos}
+    return {str, namePos, type = 'name'}
 end
 
 function defs.DOTSPos(p)
@@ -60,7 +68,7 @@ end
 
 function defs.DOTS(str)
     checkDifinition(str, namePos)
-    return {str, namePos}
+    return {str, namePos, type = 'name'}
 end
 
 function defs.COLONPos(p)
@@ -74,44 +82,87 @@ end
 
 function defs.LocalVar(names)
     for _, name in ipairs(names) do
-        scopeSet(name)
+        scopeDef(name)
     end
 end
 
 function defs.LocalSet(names)
     for _, name in ipairs(names) do
-        scopeSet(name)
+        scopeDef(name)
     end
+end
+
+function defs.Set(simples)
+    for _, simple in ipairs(simples) do
+        if simple.type == 'simple' and #simple == 1 then
+            local obj = simple[1]
+            local name = obj[1]
+            scopeSet(obj)
+        end
+    end
+end
+
+function defs.Simple(...)
+    return { type = 'simple', ... }
 end
 
 function defs.ArgList(...)
     if ... == '' then
         return DUMMY_TABLE
     end
-    return {...}
+    return { type = 'list', ... }
 end
 
 function defs.FuncName(...)
     if ... == '' then
         return DUMMY_TABLE
     end
-    return {...}
+    return { type = 'simple', ... }
 end
 
-function defs.FunctionDef(names, args)
-    if #names == 1 then
-        scopeSet(names[1])
+function defs.FunctionDef(simple, args)
+    if #simple == 1 then
+        scopeSet(simple[1])
     end
     scopePush()
     -- 判断隐藏的局部变量self
-    if #names > 0 then
-        local name = names[#names]
+    if #simple > 0 then
+        local name = simple[#simple]
         if name.colon then
-            scopeSet {'self', name.colon, name.colon}
+            scopeDef {'self', name.colon, name.colon, type = 'name'}
         end
     end
     for _, arg in ipairs(args) do
-        scopeSet(arg)
+        if arg.type == 'simple' and #arg == 1 then
+            local name = arg[1]
+            scopeDef(name)
+        end
+        if arg.type == 'name' then
+            scopeDef(arg)
+        end
+    end
+end
+
+function defs.FunctionLoc(simple, args)
+    if #simple == 1 then
+        scopeDef(simple[1])
+    end
+    scopePush()
+    -- 判断隐藏的局部变量self
+    if #simple > 0 then
+        local name = simple[#simple]
+        if name.colon then
+            scopeDef {'self', name.colon, name.colon, type = 'name'}
+        end
+    end
+    for _, arg in ipairs(args) do
+        if arg.type == 'simple' and #arg == 1 then
+            local name = arg[1]
+            scopeDef(name)
+        end
+        if arg.type == 'name' then
+            scopeDef(arg)
+        end
     end
 end
 
@@ -153,7 +204,7 @@ end
 
 function defs.LoopDef(name)
     scopePush()
-    scopeSet(name)
+    scopeDef(name)
 end
 
 function defs.Loop()
@@ -165,13 +216,17 @@ function defs.LoopStart(name, exp)
 end
 
 function defs.NameList(...)
-    return {...}
+    return { type = 'list', ... }
+end
+
+function defs.SimpleList(...)
+    return { type = 'list', ... }
 end
 
 function defs.InDef(names)
     scopePush()
     for _, name in ipairs(names) do
-        scopeSet(name)
+        scopeDef(name)
     end
 end
 

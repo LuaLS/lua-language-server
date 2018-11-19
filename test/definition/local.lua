@@ -19,16 +19,6 @@ local z, y, <!x!> = 1
 ]]
 
 TEST [[
-function <!x!> () end
-<?x?> = 1
-]]
-
-TEST [[
-local function <!x!> () end
-<?x?> = 1
-]]
-
-TEST [[
 local x
 local <!x!>
 <?x?> = 1
@@ -196,13 +186,6 @@ end
 TEST [[
 local <!x!>
 local x = function ()
-    <?x?> = 1
-end
-]]
-
-TEST [[
-local x
-local function <!x!> ()
     <?x?> = 1
 end
 ]]

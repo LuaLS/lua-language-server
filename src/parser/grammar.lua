@@ -215,7 +215,8 @@ ExpUnit     <-  Nil
             /   Function
             /   Simple
 
-Simple      <-  Prefix (Suffix)*
+Simple      <-  (Prefix (Suffix)*)
+            ->  Simple
 Prefix      <-  PL Exp PR
             /   Name
 ColonName   <-  (COLON Name)
@@ -239,8 +240,12 @@ TableField  <-  NewIndex / NewField / Exp
 NewIndex    <-  BL Exp BR ASSIGN Exp
 NewField    <-  Name ASSIGN Exp
 
-Function    <-  (FUNCTION FuncName PL ArgList PR)   -> FunctionDef
-                    (!END Action)*                          -> Function
+Function    <-  FunctionLoc / FunctionDef
+FunctionLoc <-  (LOCAL FUNCTION FuncName PL ArgList PR) -> FunctionLoc
+                    (!END Action)*                      -> Function
+                END
+FunctionDef <-  (FUNCTION FuncName PL ArgList PR) -> FunctionDef
+                    (!END Action)*                -> Function
                 END
 FuncName    <-  (Name (FuncSuffix)*)?
             ->  FuncName
@@ -252,7 +257,7 @@ Action      <-  !. .
 ]]
 
 grammar 'Action' [[
-Action      <-  SEMICOLON / Do / Break / Return / Label / GoTo / If / For / While / Repeat / Set / Local / Function / Call
+Action      <-  SEMICOLON / Do / Break / Return / Label / GoTo / If / For / While / Repeat / Function / Set / Local / Call
 
 ExpList     <-  Exp (COMMA Exp)*
 NameList    <-  (Name (COMMA Name)*)        -> NameList
@@ -302,13 +307,12 @@ Repeat      <-  REPEAT                  -> RepeatDef
                     (!UNTIL Action)*    -> Repeat
                 (UNTIL Exp)             -> Until
 
-Set         <-  (LOCAL !FUNCTION NameList ASSIGN ExpList)
+Set         <-  (LOCAL NameList ASSIGN ExpList)
             ->  LocalSet
-            /   SimpleList ASSIGN ExpList
+            /   (SimpleList ASSIGN ExpList)
+            ->  Set
 
-Local       <-  LOCAL Function
-            ->  LocalFunction
-            /   LOCAL NameList
+Local       <-  LOCAL NameList
             ->  LocalVar
 
 Call        <-  Prefix (Suffix)*

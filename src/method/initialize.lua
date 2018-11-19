@@ -1,6 +1,5 @@
 return function (lsp, data)
     lsp._inited = true
-
     return {
         capabilities = {
             -- 支持“转到定义”

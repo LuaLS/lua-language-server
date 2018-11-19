@@ -1,6 +1,6 @@
 TEST [[
-local function x (<!x!>)
-    <?x?> = 1
+local function xx (<!xx!>)
+    <?xx?> = 1
 end
 ]]
 

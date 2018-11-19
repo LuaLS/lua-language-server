@@ -14,6 +14,9 @@ function TEST(script)
     assert(b == finish)
 end
 
+require 'definition.set'
 require 'definition.local'
 require 'definition.arg'
+require 'definition.function'
+--require 'definition.table'
 require 'definition.bug'

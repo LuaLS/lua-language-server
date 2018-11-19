@@ -264,7 +264,7 @@ Do          <-  DO                  -> DoDef
 
 Break       <-  BREAK
 
-Return      <-  RETURN ExpList?
+Return      <-  RETURN !END ExpList?
 
 Label       <-  LABEL Name LABEL
 

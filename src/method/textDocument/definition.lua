@@ -12,6 +12,11 @@ return function (lsp, params)
     local pos = parser.calcline.position_utf8(text, params.position.line + 1, params.position.character + 1)
     local suc, start, finish = matcher.definition(text, pos)
     if not suc then
+        if finish then
+            log.debug(start, uri)
+            finish.lua = nil
+            log.debug(table.dump(finish))
+        end
         return {}
     end
 

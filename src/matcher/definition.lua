@@ -200,7 +200,10 @@ return function (buf, pos_)
     result = nil
     scopeInit()
 
-    parser.grammar(buf, 'Lua', defs)
+    local suc, err = parser.grammar(buf, 'Lua', defs)
+    if not suc then
+        return false, '语法错误', err
+    end
 
     if not result then
         return false, 'No word'

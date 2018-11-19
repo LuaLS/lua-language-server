@@ -147,7 +147,8 @@ TL          <-  Sp '{'
 TR          <-  Sp '}'
 COMMA       <-  Sp ','
 SEMICOLON   <-  Sp ';'
-DOTS        <-  Sp '...'
+DOTS        <-  Sp {} -> DOTSPos
+                '...' -> DOTS
 DOT         <-  Sp '.'
 COLON       <-  Sp ':'
 LABEL       <-  Sp '::'
@@ -185,7 +186,8 @@ Float16     <-  ('.' X16*)? ([pP] [+-]? [1-9]? [0-9]*)?
 ]]
 
 grammar 'Name' [[
-Name        <-  Sp {} -> NamePos {[a-zA-Z_] [a-zA-Z0-9_]*} -> Name
+Name        <-  Sp {} -> NamePos
+                {[a-zA-Z_] [a-zA-Z0-9_]*} -> Name
 ]]
 
 grammar 'Exp' [[
@@ -222,7 +224,7 @@ Suffix      <-  DOT Name
             /   BL Exp BR
             /   PL ArgList? PR
 
-ArgList     <-  Arg (COMMA Arg)*
+ArgList     <-  (Arg (COMMA Arg)*)
 Arg         <-  DOTS
             /   Exp
 
@@ -233,7 +235,7 @@ TableField  <-  NewIndex / NewField / Exp
 NewIndex    <-  BL Exp BR ASSIGN Exp
 NewField    <-  Name ASSIGN Exp
 
-Function    <-  (FUNCTION {| FuncName? |} PL ArgList? PR)   -> FunctionDef
+Function    <-  (FUNCTION {| FuncName? |} PL {| ArgList? |} PR)   -> FunctionDef
                     (!END Action)*                          -> Function
                 END
 FuncName    <-  Name (FuncSuffix)*

@@ -54,6 +54,15 @@ function defs.Name(str)
     return {str, namePos}
 end
 
+function defs.DOTSPos(p)
+    namePos = p
+end
+
+function defs.DOTS(str)
+    checkDifinition(str, namePos)
+    return {str, namePos}
+end
+
 function defs.LocalVar(names)
     for _, name in ipairs(names) do
         scopeSet(name)
@@ -66,9 +75,12 @@ function defs.LocalSet(names)
     end
 end
 
-function defs.FunctionDef(names)
+function defs.FunctionDef(names, args)
     if #names == 1 then
         scopeSet(names[1])
+    end
+    for _, arg in ipairs(args) do
+        scopeSet(arg)
     end
     scopePush()
 end

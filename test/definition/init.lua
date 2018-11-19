@@ -16,3 +16,4 @@ end
 
 require 'definition.local'
 require 'definition.arg'
+require 'definition.bug'

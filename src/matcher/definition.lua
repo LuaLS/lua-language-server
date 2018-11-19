@@ -79,10 +79,10 @@ function defs.FunctionDef(names, args)
     if #names == 1 then
         scopeSet(names[1])
     end
+    scopePush()
     for _, arg in ipairs(args) do
         scopeSet(arg)
     end
-    scopePush()
 end
 
 function defs.Function()

@@ -7,13 +7,34 @@ local NL = (m.P'\r\n' + m.S'\r\n') * m.Cp() / function (pos)
     fl = pos
 end
 local ROWCOL = (NL + m.P(1))^0
-
 local function rowcol(str, n)
     row = 1
     fl = 1
     ROWCOL:match(str:sub(1, n))
     local col = n - fl + 1
     return row, col
+end
+
+local function position(str, _row, _col)
+    local cur = 1
+    local row = 1
+    while true do
+        if row == _row then
+            return cur + _col - 1
+        elseif row > _row then
+            return cur - 1
+        end
+        local pos = str:find('[\r\n]', cur)
+        if not pos then
+            return #str
+        end
+        row = row + 1
+        if str:sub(pos, pos+1) == '\r\n' then
+            cur = pos + 2
+        else
+            cur = pos + 1
+        end
+    end
 end
 
 local NL = m.P'\r\n' + m.S'\r\n'
@@ -37,4 +58,5 @@ end
 return {
     rowcol = rowcol,
     line = line,
+    position = position,
 }

@@ -26,14 +26,13 @@ local function listen(self, input, output)
     end)
     session:setOutput(function (buf)
         io.write(buf)
-        log.debug(buf)
     end)
     session:start(function (method, params)
         local f = Method[method]
         if f then
-            local suc, res = pcall(f, session, params)
+            local suc, res, res2 = pcall(f, session, params)
             if suc then
-                return res
+                return res, res2
             else
                 return nil, '发生运行时错误：' .. res
             end
@@ -43,7 +42,6 @@ local function listen(self, input, output)
 end
 
 local mt = {
-    definition = require 'service.definition',
     listen     = listen,
 }
 mt.__index = mt

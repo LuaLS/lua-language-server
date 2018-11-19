@@ -1,4 +1,6 @@
 return function (lsp, params)
-    lsp:saveText(params.url, params.version, arams.text)
+    local doc = params.textDocument
+    log.debug('打开文件：', doc.uri)
+    lsp:saveText(doc.uri, doc.version, doc.text)
     return true
 end

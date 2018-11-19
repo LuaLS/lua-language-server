@@ -59,7 +59,6 @@ function mt:_readAsContent(header)
     local id     = res.id
     local method = res.method
     local params = res.params
-    log.debug('收到协议：', method)
     local response, err = self:_callback(method, params)
     if response then
         self:_send {
@@ -99,8 +98,8 @@ function mt:read(mode)
     return self._input(mode)
 end
 
-function mt:saveText(url, version, text)
-    local obj = lsp._file[url]
+function mt:saveText(uri, version, text)
+    local obj = self._file[uri]
     if obj then
         if obj.version >= version then
             return
@@ -108,15 +107,15 @@ function mt:saveText(url, version, text)
         obj.version = version
         obj.text = text
     else
-        lsp._file[url] = {
+        self._file[uri] = {
             version = version,
             text = text,
         }
     end
 end
 
-function mt:loadText(url)
-    local obj = lsp._file[url]
+function mt:loadText(uri)
+    local obj = self._file[uri]
     if not obj then
         return nil
     end

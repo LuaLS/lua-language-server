@@ -8,14 +8,14 @@ return function (lsp, params)
         return nil, '找不到文件：' .. uri
     end
     -- lua是从1开始的，因此都要+1
-    local pos = parser.calcline.position(text, params.position.line + 1, params.position.character + 1)
+    local pos = parser.calcline.position_utf8(text, params.position.line + 1, params.position.character + 1)
     local suc, start, finish = matcher.definition(text, pos)
     if not suc then
         return {}
     end
 
-    local start_row,  start_col  = parser.calcline.rowcol(text, start)
-    local finish_row, finish_col = parser.calcline.rowcol(text, finish)
+    local start_row,  start_col  = parser.calcline.rowcol_utf8(text, start)
+    local finish_row, finish_col = parser.calcline.rowcol_utf8(text, finish)
 
     local response = {
         uri = uri,

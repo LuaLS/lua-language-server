@@ -38,8 +38,9 @@ function mt:_send(data)
     if not f then
         return
     end
+    data.jsonrpc = '2.0'
     local content = json.encode(data)
-    local buf = ('Content-Length: %d\r\n\r\n%s'):format(#content + 2, content)
+    local buf = ('Content-Length: %d\r\n\r\n%s'):format(#content, content)
     f(buf)
 end
 
@@ -49,7 +50,7 @@ function mt:_readAsContent(header)
         log.error('错误的协议头：', header)
         return
     end
-    local buf = self:read(len)
+    local buf = self:read(len+2)
     local suc, res = pcall(json.decode, buf)
     if not suc then
         log.error('错误的协议：', buf)
@@ -65,12 +66,19 @@ function mt:_readAsContent(header)
     end
     local response, err = f(self, params)
     if response then
-        self._send {
+        self:_send {
             id = id,
             result = response,
         }
+        self:_send {
+            method = 'window/showMessage',
+            params = {
+                type = 3,
+                message = 'hello loli',
+            }
+        }
     else
-        self._send {
+        self:_send {
             id = id,
             error = {
                 code = ErrorCodes.UnknownErrorCode,
@@ -98,7 +106,8 @@ end
 function mt:start(method)
     self._method = method
     while true do
-        local header = self:read 'L'
+        local header = self:read 'l'
+        log.debug('header:', header)
         if not header then
             return
         end

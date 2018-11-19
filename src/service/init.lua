@@ -26,8 +26,8 @@ local function listen(self, input, output)
         io.output(io.open(output:string(), 'wb'))
     else
         ext.set_filemode(io.stdout, 'b')
-        io.stdout:setvbuf 'no'
     end
+    io.output():setvbuf 'no'
 
     local session = lsp()
     session:setInput(function (mode)

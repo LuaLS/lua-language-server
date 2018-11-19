@@ -59,10 +59,7 @@ function mt:_readAsContent(header)
     local id     = res.id
     local method = res.method
     local params = res.params
-    log.debug(('执行任务[%s]，ID[%s]'):format(method, id))
-    local clock = os.clock()
     local response, err = self:_callback(method, params)
-    log.debug(('任务[%s]执行完毕，耗时[%.3f]秒，ID[%s]'):format(method, os.clock() - clock, id))
     if response then
         self:_send {
             id = id,

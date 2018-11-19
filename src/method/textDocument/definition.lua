@@ -7,6 +7,7 @@ return function (lsp, params)
     if not text then
         return nil, '找不到文件：' .. uri
     end
+    local start_clock = os.clock()
     -- lua是从1开始的，因此都要+1
     local pos = parser.calcline.position_utf8(text, params.position.line + 1, params.position.character + 1)
     local suc, start, finish = matcher.definition(text, pos)
@@ -30,5 +31,10 @@ return function (lsp, params)
             },
         },
     }
+    local passed_clock = os.clock() - start_clock
+    if passed_clock >= 0.01 then
+        log.warn(('[转到定义]耗时[%.3f]秒，文件大小[%s]字节'):format(passed_clock, #text))
+    end
+
     return response
 end

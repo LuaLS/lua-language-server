@@ -1,5 +1,16 @@
 local sleep = require 'ffi.sleep'
 local ext   = require 'process.ext'
+local lsp   = require 'lsp'
+
+local Method = {}
+
+function Method.initialize()
+    return {
+        capabilities = {
+            definitionProvider = true,
+        }
+    }
+end
 
 local function listen(self, input, output)
     if input then
@@ -18,9 +29,21 @@ local function listen(self, input, output)
         io.stdout:setvbuf 'no'
     end
 
-    for line in io.input():lines 'L' do
-        log.debug('标准输入:\n', line)
-    end
+    local session = lsp()
+    session:setInput(function (mode)
+        return io.read(mode)
+    end)
+    session:setOutput(function (buf)
+        io.write(buf)
+        log.debug(buf)
+    end)
+    session:start(function (method, params)
+        local f = Method[method]
+        if f then
+            return f(params)
+        end
+        return nil
+    end)
 end
 
 local mt = {

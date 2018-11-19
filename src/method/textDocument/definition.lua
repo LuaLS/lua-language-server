@@ -2,7 +2,6 @@ local parser = require 'parser'
 local matcher = require 'matcher'
 
 return function (lsp, params)
-    log.debug(table.dump(params))
     local uri = params.textDocument.uri
     local text = lsp:loadText(uri)
     if not text then

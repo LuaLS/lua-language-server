@@ -65,13 +65,6 @@ function mt:_readAsContent(header)
             id = id,
             result = response,
         }
-        self:_send {
-            method = 'window/showMessage',
-            params = {
-                type = 3,
-                message = method,
-            }
-        }
     elseif id then
         self:_send {
             id = id,

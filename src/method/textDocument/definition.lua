@@ -11,7 +11,7 @@ return function (lsp, params)
     local pos = parser.calcline.position(text, params.position.line + 1, params.position.character + 1)
     local suc, start, finish = matcher.definition(text, pos)
     if not suc then
-        return nil, start
+        return {}
     end
 
     local start_row,  start_col  = parser.calcline.rowcol(text, start)

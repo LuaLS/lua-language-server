@@ -6,6 +6,8 @@ local scopes
 local result
 local namePos
 
+local DUMMY_TABLE = {}
+
 local function getResult(name, p)
     result = {name, p}
 end
@@ -73,6 +75,20 @@ function defs.LocalSet(names)
     for _, name in ipairs(names) do
         scopeSet(name)
     end
+end
+
+function defs.ArgList(...)
+    if ... == '' then
+        return DUMMY_TABLE
+    end
+    return {...}
+end
+
+function defs.FuncName(...)
+    if ... == '' then
+        return DUMMY_TABLE
+    end
+    return {...}
 end
 
 function defs.FunctionDef(names, args)

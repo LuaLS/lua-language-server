@@ -224,7 +224,8 @@ Suffix      <-  DOT Name
             /   BL Exp BR
             /   PL ArgList? PR
 
-ArgList     <-  (Arg (COMMA Arg)*)
+ArgList     <-  (Arg (COMMA Arg)*)?
+            ->  ArgList
 Arg         <-  DOTS
             /   Exp
 
@@ -235,10 +236,11 @@ TableField  <-  NewIndex / NewField / Exp
 NewIndex    <-  BL Exp BR ASSIGN Exp
 NewField    <-  Name ASSIGN Exp
 
-Function    <-  (FUNCTION {| FuncName? |} PL {| ArgList? |} PR)   -> FunctionDef
+Function    <-  (FUNCTION FuncName PL ArgList PR)   -> FunctionDef
                     (!END Action)*                          -> Function
                 END
-FuncName    <-  Name (FuncSuffix)*
+FuncName    <-  (Name (FuncSuffix)*)?
+            ->  FuncName
 FuncSuffix  <-  DOT Name
             /   COLON Name
 

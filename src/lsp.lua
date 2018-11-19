@@ -106,11 +106,11 @@ function mt:saveText(url, version, text)
             return
         end
         obj.version = version
-        obj.lines = parser.split(text)
+        obj.text = text
     else
         lsp._file[url] = {
             version = version,
-            text = parser.split(text),
+            text = text,
         }
     end
 end
@@ -120,7 +120,7 @@ function mt:loadText(url)
     if not obj then
         return nil
     end
-    return table.concat(obj.text, '\r\n')
+    return obj.text
 end
 
 function mt:start(method)

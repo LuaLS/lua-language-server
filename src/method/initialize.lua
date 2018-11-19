@@ -9,8 +9,8 @@ return function (lsp, data)
             textDocumentSync = {
                 -- 打开关闭文本时通知
                 openClose = true,
-                -- 文本改变时增量通知
-                change = 2,
+                -- 文本改变时完全通知 TODO 支持差量更新（2）
+                change = 1,
             }
         }
     }

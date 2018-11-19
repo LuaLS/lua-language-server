@@ -27,7 +27,8 @@ return function (lsp, params)
             },
             ['end'] = {
                 line = finish_row - 1,
-                character = finish_col - 1,
+                -- 这里不用-1，因为前端期待的是匹配完成后的位置
+                character = finish_col,
             },
         },
     }

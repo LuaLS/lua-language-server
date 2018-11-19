@@ -5,28 +5,26 @@ local defs = {}
 local scopes
 local result
 local namePos
+local colonPos
 
 local DUMMY_TABLE = {}
-
-local function getResult(name, p)
-    result = {name, p}
-end
 
 local function scopeInit()
     scopes = {{}}
 end
 
-local function scopeSet(name)
+local function scopeSet(obj)
     local scope = scopes[#scopes]
-    scope[name[1]] = name[2]
+    local name = obj[1]
+    scope[name] = obj
 end
 
 local function scopeGet(name)
     for i = #scopes, 1, -1 do
         local scope = scopes[i]
-        local p = scope[name]
-        if p then
-            return p
+        local obj = scope[name]
+        if obj then
+            return obj
         end
     end
     return nil
@@ -44,7 +42,7 @@ local function checkDifinition(name, p)
     if pos < p or pos > p + #name then
         return
     end
-    getResult(name, scopeGet(name))
+    result = scopeGet(name)
 end
 
 function defs.NamePos(p)
@@ -63,6 +61,15 @@ end
 function defs.DOTS(str)
     checkDifinition(str, namePos)
     return {str, namePos}
+end
+
+function defs.COLONPos(p)
+    colonPos = p
+end
+
+function defs.ColonName(name)
+    name.colon = colonPos
+    return name
 end
 
 function defs.LocalVar(names)
@@ -96,6 +103,13 @@ function defs.FunctionDef(names, args)
         scopeSet(names[1])
     end
     scopePush()
+    -- 判断隐藏的局部变量self
+    if #names > 0 then
+        local name = names[#names]
+        if name.colon then
+            scopeSet {'self', name.colon, name.colon}
+        end
+    end
     for _, arg in ipairs(args) do
         scopeSet(arg)
     end
@@ -191,9 +205,12 @@ return function (buf, pos_)
     if not result then
         return false, 'No word'
     end
-    local name, start = result[1], result[2]
+    local name, start, finish = result[1], result[2], result[3]
     if not start then
         return false, 'No match'
     end
-    return true, start, start + #name - 1
+    if not finish then
+        finish = start + #name - 1
+    end
+    return true, start, finish
 end

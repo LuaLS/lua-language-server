@@ -150,7 +150,8 @@ SEMICOLON   <-  Sp ';'
 DOTS        <-  Sp {} -> DOTSPos
                 '...' -> DOTS
 DOT         <-  Sp '.'
-COLON       <-  Sp ':'
+COLON       <-  Sp {} -> COLONPos
+                ':'   -> COLON
 LABEL       <-  Sp '::'
 ASSIGN      <-  Sp '='
 ]]
@@ -217,8 +218,10 @@ ExpUnit     <-  Nil
 Simple      <-  Prefix (Suffix)*
 Prefix      <-  PL Exp PR
             /   Name
+ColonName   <-  (COLON Name)
+            ->  ColonName
 Suffix      <-  DOT Name
-            /   COLON Name
+            /   ColonName
             /   Table
             /   String
             /   BL Exp BR
@@ -242,7 +245,7 @@ Function    <-  (FUNCTION FuncName PL ArgList PR)   -> FunctionDef
 FuncName    <-  (Name (FuncSuffix)*)?
             ->  FuncName
 FuncSuffix  <-  DOT Name
-            /   COLON Name
+            /   ColonName
 
 -- 纯占位，修改了 `relabel.lua` 使重复定义不抛错
 Action      <-  !. .

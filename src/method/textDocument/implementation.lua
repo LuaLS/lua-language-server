@@ -10,12 +10,12 @@ return function (lsp, params)
     local start_clock = os.clock()
     -- lua是从1开始的，因此都要+1
     local pos = parser.calcline.position_utf8(text, params.position.line + 1, params.position.character + 1)
-    local suc, results = matcher.implementation(text, pos)
+    local suc, results, info = matcher.implementation(text, pos)
     if not suc then
-        if finish then
-            log.debug(start, uri)
-            finish.lua = nil
-            log.debug(table.dump(finish))
+        if info then
+            log.debug(results, uri)
+            info.lua = nil
+            log.debug(table.dump(info))
         end
         return {}
     end

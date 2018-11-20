@@ -79,6 +79,8 @@ function mt:_readAsContent(header)
     if not response then
         log.error(err or ('没有回应：' .. method))
     end
+    -- 运行时不清理垃圾，在回复前端之后清理垃圾
+    collectgarbage()
 end
 
 function mt:setInput(input)

@@ -28,8 +28,8 @@
 		"postinstall": "cd client && npm install && cd .."
 	},
 	"devDependencies": {
-		"@types/mocha": "^5.2.0",
-		"@types/node": "^8.0.0",
+		"@types/mocha": "^5.2.5",
+		"@types/node": "^8.10.38",
 		"typescript": "2.8.3"
 	}
 }

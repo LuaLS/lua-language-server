@@ -4,6 +4,8 @@ return function (lsp, data)
         capabilities = {
             -- 支持“转到定义”
             definitionProvider = true,
+            -- 支持“转到实现”
+            --implementationProvider = true,
             -- 文本同步方式
             textDocumentSync = {
                 -- 打开关闭文本时通知

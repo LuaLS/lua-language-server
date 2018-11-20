@@ -28,6 +28,11 @@ local function listen(self, input, output)
         io.write(buf)
     end)
     session:start(function (method, params)
+        local optional
+        if method:sub(1, 2) == '$/' then
+            method = method:sub(3)
+            optional = true
+        end
         local f = Method[method]
         if f then
             local suc, res, res2 = pcall(f, session, params)
@@ -37,7 +42,11 @@ local function listen(self, input, output)
                 return nil, '发生运行时错误：' .. res
             end
         end
-        return nil, '没有注册方法：' .. method
+        if optional then
+            return false
+        else
+            return nil, '没有注册方法：' .. method
+        end
     end)
 end
 

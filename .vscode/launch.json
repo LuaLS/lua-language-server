@@ -1,41 +1,41 @@
+// A launch configuration that compiles the extension and then opens it inside a new window
 {
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "测试",
-            "type": "lua",
-            "request": "launch",
-            "stopOnEntry": false,
-            "program": "${workspaceRoot}/test/main.lua",
-            "cwd": "${workspaceRoot}",
-            "env": {
-                "PATH": "${workspaceRoot}\\bin\\"
-            },
-            "luaRuntime": "5.3 32bit",
-            "luaexe": "${workspaceRoot}\\bin\\lua.exe",
-            "luadll": "${workspaceRoot}\\bin\\lua53.dll",
-            "path": "${workspaceRoot}/bin/?.lua",
-            "cpath": "${workspaceRoot}/bin/?.dll;",
-            "arg": [
-            ],
-            "consoleCoding": "utf8",
-            "sourceCoding": "utf8"
-        },
-        {
-            "name": "附加",
-            "type": "lua",
-            "request": "attach",
-            "stopOnEntry": true,
-            "sourceCoding": "utf8",
-            "consoleCoding": "utf8",
-            "ip": "localhost",
-            "port": 546858,
-            "sourceMaps": [
-                [
-                    "C:\\Users\\sunyi\\.vscode\\extensions\\sumneko.lua-lsp\\server",
-                    "${workspaceFolder}"
-                ]
-            ]
-        },
-    ]
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"type": "extensionHost",
+			"request": "launch",
+			"name": "Launch Client",
+			"runtimeExecutable": "${execPath}",
+			"args": ["--extensionDevelopmentPath=${workspaceRoot}"],
+			"outFiles": ["${workspaceRoot}/client/out/**/*.js"],
+			"preLaunchTask": "npm: watch:client"
+		},
+		{
+			"type": "node",
+			"request": "attach",
+			"name": "Attach to Server",
+			"port": 6009,
+			"restart": true,
+			"outFiles": ["${workspaceRoot}/server/out/**/*.js"]
+		},
+		{
+			"name": "Language Server E2E Test",
+			"type": "extensionHost",
+			"request": "launch",
+			"runtimeExecutable": "${execPath}",
+			"args": [
+				"--extensionDevelopmentPath=${workspaceRoot}",
+				"--extensionTestsPath=${workspaceRoot}/client/out/test",
+				"${workspaceRoot}/client/testFixture"
+			],
+			"outFiles": ["${workspaceRoot}/client/out/test/**/*.js"]
+		}
+	],
+	"compounds": [
+		{
+			"name": "Client + Server",
+			"configurations": ["Launch Client", "Attach to Server"]
+		}
+	]
 }

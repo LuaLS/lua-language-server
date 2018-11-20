@@ -13,9 +13,6 @@ dbg:start()
 
 require 'utility'
 require 'global_protect'
-
-collectgarbage 'stop'
-
 local service = require 'service'
 local session = service()
 

@@ -6,6 +6,7 @@ local scopes
 local result
 local namePos
 local colonPos
+local maybeCount
 
 local DUMMY_TABLE = {}
 
@@ -22,6 +23,14 @@ end
 local function logicGet()
     local scope = scopes[#scopes-1]
     return scope and scope.logicId
+end
+
+local function maybePush()
+    maybeCount = maybeCount + 1
+end
+
+local function maybePop()
+    maybeCount = maybeCount - 1
 end
 
 local function scopeInit()
@@ -61,6 +70,7 @@ end
 local function globalSet(obj)
     obj.logicId = logicGet()
     obj.scopeId = #scopes
+    obj.maybeId = maybeCount
     local name = obj[1]
     for i = #scopes, 1, -1 do
         local scope = scopes[i]
@@ -97,6 +107,9 @@ local function checkImplementation(name, p)
                 goto CONTINUE
             end
             result[#result+1] = {start, finish}
+            if obj.maybeId and obj.maybeId > maybeCount then
+                goto CONTINUE
+            end
             do break end
             ::CONTINUE::
         end
@@ -232,6 +245,7 @@ end
 
 function defs.IfDef()
     logicPush()
+    maybePush()
     scopePush()
 end
 
@@ -259,15 +273,18 @@ end
 
 function defs.EndIf()
     logicFlush()
+    maybePop()
 end
 
 function defs.LoopDef(name)
+    maybePush()
     scopePush()
     scopeSet(name)
 end
 
 function defs.Loop()
     scopePop()
+    maybePop()
 end
 
 function defs.LoopStart(name, exp)
@@ -283,6 +300,7 @@ function defs.SimpleList(...)
 end
 
 function defs.InDef(names)
+    maybePush()
     scopePush()
     for _, name in ipairs(names) do
         scopeSet(name)
@@ -291,27 +309,33 @@ end
 
 function defs.In()
     scopePop()
+    maybePop()
 end
 
 function defs.WhileDef()
+    maybePush()
     scopePush()
 end
 
 function defs.While()
     scopePop()
+    maybePop()
 end
 
 function defs.RepeatDef()
+    maybePush()
     scopePush()
 end
 
 function defs.Until()
     scopePop()
+    maybePop()
 end
 
 return function (buf, pos_)
     pos = pos_
     result = nil
+    maybeCount = 0
     scopeInit()
 
     local suc, err = parser.grammar(buf, 'Lua', defs)

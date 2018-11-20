@@ -205,7 +205,7 @@ ExpAdds     <-  ExpMuls    (Adds   ExpMuls)*
 ExpMuls     <-  ExpUnary   (Muls   ExpUnary)*
 ExpUnary    <-             (Unary  ExpPower)
             /                      ExpPower
-ExpPower    <-  ExpUnit    (POWER  ExpUnit)*
+ExpPower    <-  ExpUnit    (POWER  ExpUnary)*
 ExpUnit     <-  Nil
             /   Boolean
             /   String

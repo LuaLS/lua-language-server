@@ -67,12 +67,14 @@ local function checkImplementation(name, p)
     local list = scopeGet(name)
     if list then
         result = {}
-        for i, obj in ipairs(list) do
+        for i = #list, 1, -1 do
+            local obj = list[i]
             local name, start, finish = obj[1], obj[2], obj[3]
             if not finish then
                 finish = start + #name - 1
             end
-            result[i] = {start, finish}
+            result[#result+1] = {start, finish}
+            break
         end
     else
         result = false

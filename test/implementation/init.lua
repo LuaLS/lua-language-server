@@ -20,7 +20,7 @@ local function founded(targets, results)
     while true do
         local target = table.remove(targets)
         if not target then
-            return true
+            break
         end
         for i, result in ipairs(results) do
             if target[1] == result[1] and target[2] == result[2] then
@@ -30,6 +30,11 @@ local function founded(targets, results)
         end
         do return false end
         ::CONTINUE::
+    end
+    if #results == 0 then
+        return true
+    else
+        return false
     end
 end
 
@@ -47,5 +52,6 @@ require 'implementation.set'
 require 'implementation.local'
 require 'implementation.arg'
 require 'implementation.function'
+require 'implementation.if'
 --require 'implementation.table'
 require 'implementation.bug'

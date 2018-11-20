@@ -74,6 +74,9 @@ function mt:_readAsContent(header)
             },
         }
     end
+    if not response then
+        log.error(err or ('没有回应：' .. method))
+    end
 end
 
 function mt:setInput(input)

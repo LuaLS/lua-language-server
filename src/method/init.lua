@@ -5,6 +5,8 @@ local function init(name)
 end
 
 init 'initialize'
+init 'initialized'
+init 'shutdown'
 init 'textDocument/definition'
 init 'textDocument/didOpen'
 init 'textDocument/didChange'

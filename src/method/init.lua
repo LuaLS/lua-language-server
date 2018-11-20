@@ -4,6 +4,7 @@ local function init(name)
     method[name] = require('method.' .. name:gsub('/', '.'))
 end
 
+init 'exit'
 init 'initialize'
 init 'initialized'
 init 'shutdown'

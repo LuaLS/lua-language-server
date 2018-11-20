@@ -60,19 +60,21 @@ function mt:_readAsContent(header)
     local method = res.method
     local params = res.params
     local response, err = self:_callback(method, params)
-    if response then
-        self:_send {
-            id = id,
-            result = response,
-        }
-    elseif id then
-        self:_send {
-            id = id,
-            error = {
-                code = ErrorCodes.UnknownErrorCode,
-                message = err or ('没有回应：' .. method),
-            },
-        }
+    if id then
+        if response then
+            self:_send {
+                id = id,
+                result = response,
+            }
+        else
+            self:_send {
+                id = id,
+                error = {
+                    code = ErrorCodes.UnknownErrorCode,
+                    message = err or ('没有回应：' .. method),
+                },
+            }
+        end
     end
     if not response then
         log.error(err or ('没有回应：' .. method))

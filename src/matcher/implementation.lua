@@ -16,9 +16,9 @@ end
 local function scopeGet(name)
     for i = #scopes, 1, -1 do
         local scope = scopes[i]
-        local obj = scope[name]
-        if obj then
-            return obj
+        local list = scope[name]
+        if list then
+            return list
         end
     end
     return nil
@@ -27,21 +27,26 @@ end
 local function scopeSet(obj)
     local name = obj[1]
     local scope = scopes[#scopes]
-    scope[name] = obj
+    local list = scope[name]
+    if list then
+        list[#list+1] = obj
+    else
+        scope[name] = {obj}
+    end
 end
 
 local function globalSet(obj)
     local name = obj[1]
     for i = #scopes, 1, -1 do
         local scope = scopes[i]
-        local old = scope[name]
-        if old then
-            scope[name] = obj
+        local list = scope[name]
+        if list then
+            list[#list+1] = obj
             return
         end
     end
     local scope = scopes[1]
-    scope[name] = obj
+    scope[name] = {obj}
 end
 
 local function scopePush()
@@ -53,10 +58,25 @@ local function scopePop()
 end
 
 local function checkImplementation(name, p)
+    if result ~= nil then
+        return
+    end
     if pos < p or pos > p + #name then
         return
     end
-    result = scopeGet(name)
+    local list = scopeGet(name)
+    if list then
+        result = {}
+        for i, obj in ipairs(list) do
+            local name, start, finish = obj[1], obj[2], obj[3]
+            if not finish then
+                finish = start + #name - 1
+            end
+            result[i] = {start, finish}
+        end
+    else
+        result = false
+    end
 end
 
 function defs.NamePos(p)
@@ -269,12 +289,5 @@ return function (buf, pos_)
     if not result then
         return false, 'No word'
     end
-    local name, start, finish = result[1], result[2], result[3]
-    if not start then
-        return false, 'No match'
-    end
-    if not finish then
-        finish = start + #name - 1
-    end
-    return true, start, finish
+    return true, result
 end

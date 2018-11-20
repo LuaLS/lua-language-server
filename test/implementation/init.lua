@@ -2,16 +2,45 @@ local matcher = require 'matcher'
 
 rawset(_G, 'TEST', true)
 
+local function catch_target(script)
+    local list = {}
+    local cur = 1
+    while true do
+        local start, finish  = script:find('<!.-!>', cur)
+        if not start then
+            break
+        end
+        list[#list+1] = { start + 2, finish - 2 }
+        cur = finish + 1
+    end
+    return list
+end
+
+local function founded(targets, results)
+    while true do
+        local target = table.remove(targets)
+        if not target then
+            return true
+        end
+        for i, result in ipairs(results) do
+            if target[1] == result[1] and target[2] == result[2] then
+                table.remove(results, i)
+                goto CONTINUE
+            end
+        end
+        do return false end
+        ::CONTINUE::
+    end
+end
+
 function TEST(script)
-    local start  = script:find('<!', 1, true) + 2
-    local finish = script:find('!>', 1, true) - 1
+    local target = catch_target(script)
     local pos    = script:find('<?', 1, true) + 2
     local new_script = script:gsub('<[!?]', '  '):gsub('[!?]>', '  ')
 
-    local suc, a, b = matcher.implementation(new_script, pos)
+    local suc, result = matcher.implementation(new_script, pos)
     assert(suc)
-    assert(a == start)
-    assert(b == finish)
+    assert(founded(target, result))
 end
 
 require 'implementation.set'

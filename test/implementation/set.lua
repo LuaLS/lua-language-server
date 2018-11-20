@@ -4,10 +4,11 @@ TEST [[
 ]]
 
 TEST [[
+global = 1
 do
-    <!global!> = 1
+    <!global!> = 2
 end
-<?global?> = 1
+<?global?> = 3
 ]]
 
 TEST [[
@@ -21,9 +22,9 @@ end
 TEST [[
 x = 1
 do
-    local <!x!> = 1
+    local x = 1
     do
-        x = 2
+        <!x!> = 2
     end
     <?x?> = 1
 end

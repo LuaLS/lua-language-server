@@ -7,6 +7,7 @@ end
 init 'initialize'
 init 'initialized'
 init 'shutdown'
+init 'textDocument/implementation'
 init 'textDocument/definition'
 init 'textDocument/didOpen'
 init 'textDocument/didChange'

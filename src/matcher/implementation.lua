@@ -9,6 +9,21 @@ local colonPos
 
 local DUMMY_TABLE = {}
 
+local function logicPush()
+    local scope = scopes[#scopes]
+    scope.logicId = (scope.logicId or 0) + 1
+end
+
+local function logicFlush()
+    local scope = scopes[#scopes]
+    scope.logicId = nil
+end
+
+local function logicGet()
+    local scope = scopes[#scopes-1]
+    return scope and scope.logicId
+end
+
 local function scopeInit()
     scopes = {{}}
 end
@@ -35,7 +50,17 @@ local function scopeSet(obj)
     end
 end
 
+local function scopePush()
+    scopes[#scopes+1] = {}
+end
+
+local function scopePop()
+    scopes[#scopes] = nil
+end
+
 local function globalSet(obj)
+    obj.logicId = logicGet()
+    obj.scopeId = #scopes
     local name = obj[1]
     for i = #scopes, 1, -1 do
         local scope = scopes[i]
@@ -49,14 +74,6 @@ local function globalSet(obj)
     scope[name] = {obj}
 end
 
-local function scopePush()
-    scopes[#scopes+1] = {}
-end
-
-local function scopePop()
-    scopes[#scopes] = nil
-end
-
 local function checkImplementation(name, p)
     if result ~= nil then
         return
@@ -66,6 +83,8 @@ local function checkImplementation(name, p)
     end
     local list = scopeGet(name)
     if list then
+        local logicId = logicGet()
+        local scopeId = #scopes
         result = {}
         for i = #list, 1, -1 do
             local obj = list[i]
@@ -73,8 +92,13 @@ local function checkImplementation(name, p)
             if not finish then
                 finish = start + #name - 1
             end
+            -- 跳过同层的逻辑分支
+            if logicId and scopeId == obj.scopeId and logicId ~= obj.logicId then
+                goto CONTINUE
+            end
             result[#result+1] = {start, finish}
-            break
+            do break end
+            ::CONTINUE::
         end
     else
         result = false
@@ -207,6 +231,7 @@ function defs.Do()
 end
 
 function defs.IfDef()
+    logicPush()
     scopePush()
 end
 
@@ -215,6 +240,7 @@ function defs.If()
 end
 
 function defs.ElseIfDef()
+    logicPush()
     scopePush()
 end
 
@@ -223,11 +249,16 @@ function defs.ElseIf()
 end
 
 function defs.ElseDef()
+    logicPush()
     scopePush()
 end
 
 function defs.Else()
     scopePop()
+end
+
+function defs.EndIf()
+    logicFlush()
 end
 
 function defs.LoopDef(name)

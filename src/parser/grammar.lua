@@ -279,6 +279,7 @@ If          <-  IfPart
                 ElseIfPart*
                 ElsePart?
                 END
+            ->  EndIf
 IfPart      <-  (IF Exp THEN)                       -> IfDef
                     (!ELSEIF !ELSE !END Action)*    -> If
 ElseIfPart  <-  (ELSEIF Exp THEN)                   -> ElseIfDef

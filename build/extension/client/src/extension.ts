@@ -30,7 +30,7 @@ export function activate(context: ExtensionContext) {
 		],
 		options: {
 			cwd: context.asAbsolutePath(
-				path.join('server', 'bin')
+				path.join('server')
 			),
 		}
 	};

@@ -3,34 +3,31 @@ local parser = require 'parser'
 local pos
 local defs = {}
 local scopes
+local logics
 local result
 local namePos
 local colonPos
-local maybeCount
 
 local DUMMY_TABLE = {}
 
 local function logicPush()
-    local scope = scopes[#scopes]
-    scope.logicId = (scope.logicId or 0) + 1
+    logics[#logics+1] = 0
 end
 
-local function logicFlush()
-    local scope = scopes[#scopes]
-    scope.logicId = nil
+local function logicPop()
+    logics[#logics] = nil
+end
+
+local function logicAdd()
+    logics[#logics] = logics[#logics] + 1
 end
 
 local function logicGet()
-    local scope = scopes[#scopes-1]
-    return scope and scope.logicId
-end
-
-local function maybePush()
-    maybeCount = maybeCount + 1
-end
-
-local function maybePop()
-    maybeCount = maybeCount - 1
+    local list = {}
+    for i = 1, #logics do
+        list[i] = logics[i]
+    end
+    return list
 end
 
 local function scopeInit()
@@ -49,6 +46,7 @@ local function scopeGet(name)
 end
 
 local function scopeSet(obj)
+    obj.logic = logicGet()
     local name = obj[1]
     local scope = scopes[#scopes]
     local list = scope[name]
@@ -68,9 +66,7 @@ local function scopePop()
 end
 
 local function globalSet(obj)
-    obj.logicId = logicGet()
-    obj.scopeId = #scopes
-    obj.maybeId = maybeCount
+    obj.logic = logicGet()
     local name = obj[1]
     for i = #scopes, 1, -1 do
         local scope = scopes[i]
@@ -84,6 +80,36 @@ local function globalSet(obj)
     scope[name] = {obj}
 end
 
+local function sameLogic(cur, target)
+    for i = 1, #cur do
+        if target[i] == nil then
+            break
+        end
+        if cur[i] ~= target[i] then
+            return false
+        end
+    end
+    return true
+end
+
+local function mustCovered(results, target)
+    for _, result in ipairs(results) do
+        local logic = result.logic
+        if #logic == #target then
+            local isSame = true
+            for i = 1, #logic do
+                if logic[i] ~= target[i] then
+                    isSame = false
+                end
+            end
+            if isSame then
+                return true
+            end
+        end
+    end
+    return false
+end
+
 local function checkImplementation(name, p)
     if result ~= nil then
         return
@@ -93,8 +119,7 @@ local function checkImplementation(name, p)
     end
     local list = scopeGet(name)
     if list then
-        local logicId = logicGet()
-        local scopeId = #scopes
+        local logic = logicGet()
         result = {}
         for i = #list, 1, -1 do
             local obj = list[i]
@@ -102,15 +127,19 @@ local function checkImplementation(name, p)
             if not finish then
                 finish = start + #name - 1
             end
-            -- 跳过同层的逻辑分支
-            if logicId and scopeId == obj.scopeId and logicId ~= obj.logicId then
+            -- 如果不在同一个分支里，则跳过
+            if not sameLogic(logic, obj.logic) then
                 goto CONTINUE
             end
-            result[#result+1] = {start, finish}
-            if obj.maybeId and obj.maybeId > maybeCount then
+            -- 如果该分支已经有确定值，则跳过
+            if mustCovered(result, obj.logic) then
                 goto CONTINUE
             end
-            do break end
+            result[#result+1] = {start, finish, logic = obj.logic}
+            -- 如果分支长度比自己小，则一定是确信值，不用再继续找了
+            if #obj.logic <= #logic then
+                break
+            end
             ::CONTINUE::
         end
     else
@@ -245,7 +274,6 @@ end
 
 function defs.IfDef()
     logicPush()
-    maybePush()
     scopePush()
 end
 
@@ -254,7 +282,7 @@ function defs.If()
 end
 
 function defs.ElseIfDef()
-    logicPush()
+    logicAdd()
     scopePush()
 end
 
@@ -263,7 +291,7 @@ function defs.ElseIf()
 end
 
 function defs.ElseDef()
-    logicPush()
+    logicAdd()
     scopePush()
 end
 
@@ -272,19 +300,18 @@ function defs.Else()
 end
 
 function defs.EndIf()
-    logicFlush()
-    maybePop()
+    logicPop()
 end
 
 function defs.LoopDef(name)
-    maybePush()
+    logicPush()
     scopePush()
     scopeSet(name)
 end
 
 function defs.Loop()
     scopePop()
-    maybePop()
+    logicPop()
 end
 
 function defs.LoopStart(name, exp)
@@ -300,7 +327,7 @@ function defs.SimpleList(...)
 end
 
 function defs.InDef(names)
-    maybePush()
+    logicPush()
     scopePush()
     for _, name in ipairs(names) do
         scopeSet(name)
@@ -309,33 +336,33 @@ end
 
 function defs.In()
     scopePop()
-    maybePop()
+    logicPop()
 end
 
 function defs.WhileDef()
-    maybePush()
+    logicPush()
     scopePush()
 end
 
 function defs.While()
     scopePop()
-    maybePop()
+    logicPop()
 end
 
 function defs.RepeatDef()
-    maybePush()
+    logicPush()
     scopePush()
 end
 
 function defs.Until()
     scopePop()
-    maybePop()
+    logicPop()
 end
 
 return function (buf, pos_)
     pos = pos_
     result = nil
-    maybeCount = 0
+    logics = {}
     scopeInit()
 
     local suc, err = parser.grammar(buf, 'Lua', defs)

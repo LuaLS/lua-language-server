@@ -47,11 +47,11 @@ end
 ]]
 
 TEST [[
-local <!x!>
-if x then
-    local x
-elseif <?x?> then
-    local x
+local <!x2!>
+if x2 then
+    local x2
+elseif <?x2?> then
+    local x2
 end
 ]]
 

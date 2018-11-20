@@ -69,10 +69,10 @@ end
 ]]
 
 TEST [[
-x = 1
+x3 = 1
 repeat
-    <!x!> = 1
-until <?x?> == 1
+    <!x3!> = 1
+until <?x3?> == 1
 ]]
 
 TEST [[
@@ -81,4 +81,26 @@ repeat
     <!x!> = 1
 until 1
 <?x?> = 1
+]]
+
+TEST [[
+<!x!> = 1
+while 1 do
+    x = 1
+    <!x!> = 1
+end
+<?x?> = 1
+]]
+
+TEST [[
+<!x!> = 1
+if 1 then
+    if 1 then
+        x = 1
+    end
+else
+    if 1 then
+        <?x?> = 1
+    end
+end
 ]]

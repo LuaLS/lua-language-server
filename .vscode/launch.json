@@ -3,6 +3,36 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
+			"name": "测试",
+			"type": "lua",
+			"request": "launch",
+			"stopOnEntry": false,
+			"program": "${workspaceRoot}/server/test/main.lua",
+			"cwd": "${workspaceRoot}/server",
+			"env": {
+				"PATH": "${workspaceRoot}\\server\\bin\\"
+			},
+			"luaRuntime": "5.3 32bit",
+			"luaexe": "${workspaceRoot}\\server\\bin\\lua.exe",
+			"luadll": "${workspaceRoot}\\server\\bin\\lua53.dll",
+			"path": "${workspaceRoot}/server/bin/?.lua",
+			"cpath": "${workspaceRoot}/server/bin/?.dll;",
+			"arg": [
+			],
+			"consoleCoding": "utf8",
+			"sourceCoding": "utf8"
+		},
+		{
+			"name": "附加",
+			"type": "lua",
+			"request": "attach",
+			"stopOnEntry": true,
+			"sourceCoding": "utf8",
+			"consoleCoding": "utf8",
+			"ip": "localhost",
+			"port": 546858
+		},
+		{
 			"type": "extensionHost",
 			"request": "launch",
 			"name": "Launch Client",

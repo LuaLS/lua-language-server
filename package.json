@@ -20,16 +20,42 @@
 		"onLanguage:lua"
 	],
 	"main": "./client/out/extension",
+	"contributes": {
+		"configuration": {
+			"type": "object",
+			"title": "Example configuration",
+			"properties": {
+				"languageServerExample.maxNumberOfProblems": {
+					"scope": "resource",
+					"type": "number",
+					"default": 100,
+					"description": "Controls the maximum number of problems produced by the server."
+				},
+				"languageServerExample.trace.server": {
+					"scope": "window",
+					"type": "string",
+					"enum": [
+						"off",
+						"messages",
+						"verbose"
+					],
+					"default": "off",
+					"description": "Traces the communication between VS Code and the language server."
+				}
+			}
+		}
+	},
 	"scripts": {
 		"vscode:prepublish": "cd client && npm run update-vscode && cd .. && npm run compile",
-		"compile:client": "tsc -p ./client/tsconfig.json",
-		"watch:client": "tsc -w -p ./client/tsconfig.json",
-		"compile": "npm run compile:client",
-		"postinstall": "cd client && npm install && cd .."
+		"compile": "tsc -b",
+		"watch": "tsc -b -w",
+		"postinstall": "cd client && npm install && cd ..",
+		"test": "sh ./scripts/e2e.sh"
 	},
 	"devDependencies": {
-		"@types/mocha": "^5.2.5",
-		"@types/node": "^8.10.38",
-		"typescript": "2.8.3"
+		"@types/mocha": "^5.2.0",
+		"@types/node": "^8.0.0",
+		"tslint": "^5.11.0",
+		"typescript": "^3.1.3"
 	}
 }

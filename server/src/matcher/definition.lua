@@ -5,6 +5,7 @@ local defs = {}
 local scopes
 local result
 local namePos
+local nameFinishPos
 local colonPos
 
 local DUMMY_TABLE = {}
@@ -100,8 +101,10 @@ end
 
 local function checkName(obj)
     local name = obj[1]
-    local p = obj[2]
-    if pos < p or pos > p + #name then
+    local start = obj[2]
+    local str = obj.string or name
+    local finish = obj[3] or (start + #str)
+    if pos < start or pos > finish then
         return
     end
     result = {
@@ -118,8 +121,10 @@ local function checkSimple(simple)
         local obj = simple[i]
         if obj.type == 'name' then
             local name = obj[1]
-            local p = obj[2]
-            if pos >= p and pos <= p + #name then
+            local start = obj[2]
+            local str = obj.string or name
+            local finish = obj[3] or (start + #str)
+            if pos >= start and pos <= finish then
                 result = {
                     type = 'simple',
                     table = scopeGetSimple(simple, i-1),
@@ -135,8 +140,39 @@ function defs.NamePos(p)
 end
 
 function defs.Name(str)
-    local obj = {str, namePos, type = 'name'}
+    local obj = {'STRING|' .. str, namePos, string = str, type = 'name'}
     checkName(obj)
+    return obj
+end
+
+function defs.TRUE(p)
+    local obj = {'true', p, type = 'name'}
+    return obj
+end
+
+function defs.FALSE(p)
+    local obj = {'false', p, type = 'name'}
+    return obj
+end
+
+function defs.NumberPos(p)
+    namePos = p
+end
+
+function defs.Number(str)
+    local dump = ('%q'):format(tonumber(str))
+    local obj = {'NUMBER|' .. dump, namePos, string = str, type = 'name'}
+    return obj
+end
+
+function defs.String(start, str, finish)
+    local obj = {
+        'STRING|' .. str,
+        start,
+        finish-1,
+        string = str,
+        type = 'name'
+    }
     return obj
 end
 
@@ -144,8 +180,8 @@ function defs.DOTSPos(p)
     namePos = p
 end
 
-function defs.DOTS(str)
-    local obj = {str, namePos, type = 'name'}
+function defs.DOTS()
+    local obj = {'...', namePos, type = 'name'}
     checkName(obj)
     return obj
 end
@@ -206,7 +242,13 @@ function defs.FunctionDef(simple, args)
     if #simple > 0 then
         local name = simple[#simple]
         if name.colon then
-            scopeLocal {'self', name.colon, name.colon, type = 'name'}
+            scopeLocal {
+                'STRING|self',
+                name.colon,
+                name.colon,
+                string = 'self',
+                type = 'name'
+            }
         end
     end
     for _, arg in ipairs(args) do
@@ -229,7 +271,13 @@ function defs.FunctionLoc(simple, args)
     if #simple > 0 then
         local name = simple[#simple]
         if name.colon then
-            scopeLocal {'self', name.colon, name.colon, type = 'name'}
+            scopeLocal {
+                'STRING|self',
+                name.colon,
+                name.colon,
+                string = 'self',
+                type = 'name'
+            }
         end
     end
     for _, arg in ipairs(args) do
@@ -341,12 +389,12 @@ local function parseResult(callback)
         return
     end
     
-    local name, start, finish = obj[1], obj[2], obj[3]
+    local str, start, finish = (obj.string or obj[1]), obj[2], obj[3]
     if not start then
         return
     end
     if not finish then
-        finish = start + #name - 1
+        finish = start + #str - 1
     end
     callback(start, finish)
 end

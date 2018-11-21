@@ -76,7 +76,8 @@ DO          <-  Sp 'do'       Cut
 ELSE        <-  Sp 'else'     Cut
 ELSEIF      <-  Sp 'elseif'   Cut
 END         <-  Sp 'end'      Cut
-FALSE       <-  Sp 'false'    Cut
+FALSE       <-  Sp {}         -> FALSE
+                'false'       Cut
 FOR         <-  Sp 'for'      Cut
 FUNCTION    <-  Sp 'function' Cut
 GOTO        <-  Sp 'goto'     Cut
@@ -89,7 +90,8 @@ OR          <-  Sp 'or'       Cut
 REPEAT      <-  Sp 'repeat'   Cut
 RETURN      <-  Sp 'return'   Cut
 THEN        <-  Sp 'then'     Cut
-TRUE        <-  Sp 'true'     Cut
+TRUE        <-  Sp {}         -> TRUE
+                'true'        Cut
 UNTIL       <-  Sp 'until'    Cut
 WHILE       <-  Sp 'while'    Cut
 
@@ -166,15 +168,17 @@ Boolean     <-  TRUE
 ]]
 
 grammar 'String' [[
-String      <-  Sp StringDef
-StringDef   <-  '"' (Esc / !%nl !'"' .)* '"'
-            /   "'" (Esc / !%nl !"'" .)* "'"
-            /   '[' {:eq: '='* :} '[' StringClose
-StringClose <-  ']' =eq ']' / . StringClose
+String      <-  Sp ({} StringDef {})
+            ->  String
+StringDef   <-  '"' {(Esc / !%nl !'"' .)*} '"'
+            /   "'" {(Esc / !%nl !"'" .)*} "'"
+            /   '[' {:eq: '='* :} '[' {(!StringClose .)*} StringClose
+StringClose <-  ']' =eq ']'
 ]]
 
 grammar 'Number' [[
-Number      <-  Sp NumberDef
+Number      <-  Sp {}     -> NumberPos
+                NumberDef -> Number
 NumberDef   <-  Number16 / Number10
 
 Number10    <-  Integer10 Float10
@@ -233,7 +237,9 @@ ArgList     <-  (Arg (COMMA Arg)*)?
 Arg         <-  DOTS
             /   Exp
 
-Table       <-  TL TableFields? TR
+Table       <-  TL
+                    TableFields?
+                TR
 TableFields <-  TableField (TableSep TableField)* TableSep?
 TableSep    <-  COMMA / SEMICOLON
 TableField  <-  NewIndex / NewField / Exp

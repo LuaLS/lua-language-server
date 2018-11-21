@@ -316,7 +316,8 @@ Set         <-  (LOCAL NameList ASSIGN ExpList)
 Local       <-  LOCAL NameList
             ->  LocalVar
 
-Call        <-  Prefix (Suffix)*
+Call        <-  Simple
+            ->  Call
 ]]
 
 grammar 'Lua' [[

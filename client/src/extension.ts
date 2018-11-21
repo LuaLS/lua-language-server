@@ -27,18 +27,44 @@ export function activate(context: ExtensionContext) {
 	// If the extension is launched in debug mode then the debug server options are used
 	// Otherwise the run options are used
 	let serverOptions: ServerOptions = {
-		run: { module: serverModule, transport: TransportKind.ipc },
+		run: {
+			command: context.asAbsolutePath(
+				path.join('server', 'bin', 'lua.exe')
+			),
+			args: [
+				'-E',
+				context.asAbsolutePath(
+					path.join('server', 'main.lua')
+				)
+			],
+			options: {
+				cwd: context.asAbsolutePath(
+					path.join('server')
+				),
+			}
+		},
 		debug: {
-			module: serverModule,
-			transport: TransportKind.ipc,
-			options: debugOptions
+			command: context.asAbsolutePath(
+				path.join('server', 'bin', 'lua.exe')
+			),
+			args: [
+				'-E',
+				context.asAbsolutePath(
+					path.join('server', 'main.lua')
+				)
+			],
+			options: {
+				cwd: context.asAbsolutePath(
+					path.join('server')
+				),
+			}
 		}
 	};
 
 	// Options to control the language client
 	let clientOptions: LanguageClientOptions = {
 		// Register the server for plain text documents
-		documentSelector: [{ scheme: 'file', language: 'plaintext' }],
+		documentSelector: [{ scheme: 'file', language: 'lua' }],
 		synchronize: {
 			// Notify the server about file changes to '.clientrc files contained in the workspace
 			fileEvents: workspace.createFileSystemWatcher('**/.clientrc')

@@ -13,7 +13,7 @@ local function scopeInit()
     scopes = {{}}
 end
 
-local function scopeDef(obj)
+local function scopeLocal(obj)
     local scope = scopes[#scopes]
     local name = obj[1]
     scope[name] = obj
@@ -32,18 +32,62 @@ end
 
 local function scopeSet(obj)
     local name = obj[1]
-    local scope = scopes[#scopes]
-    if not scope[name] then
-        scope[name] = obj
-    end
-end
-
-local function globalSet(obj)
-    local name = obj[1]
     if not scopeGet(name) then
         local scope = scopes[1]
         scope[name] = obj
     end
+end
+
+local function scopeGetTable(parent, name)
+    if not parent then
+        return nil
+    end
+    if not parent.child then
+        return nil
+    end
+    if not parent.child[name] then
+        return nil
+    end
+    return parent.child[name]
+end
+
+local function scopeSetTable(parent, obj)
+    if not parent then
+        return
+    end
+    local name = obj[1]
+    if not parent.child then
+        parent.child = {}
+    end
+    if not parent.child[name] then
+        parent.child[name] = obj
+    end
+end
+
+local function scopeSetSimple(simple)
+    if simple.type ~= 'simple' then
+        return
+    end
+    scopeSet(simple[1])
+    local tbl = scopeGet(simple[1][1])
+    for i = 2, #simple - 1 do
+        tbl = scopeGetTable(tbl, simple[i][1])
+    end
+    scopeSetTable(tbl, simple[#simple])
+end
+
+local function scopeGetSimple(simple, index)
+    if simple.type ~= 'simple' then
+        return
+    end
+    if not index then
+        index = #simple
+    end
+    local tbl = scopeGet(simple[1][1])
+    for i = 2, index do
+        tbl = scopeGetTable(tbl, simple[i][1])
+    end
+    return tbl
 end
 
 local function scopePush()
@@ -54,11 +98,36 @@ local function scopePop()
     scopes[#scopes] = nil
 end
 
-local function checkDifinition(name, p)
+local function checkName(obj)
+    local name = obj[1]
+    local p = obj[2]
     if pos < p or pos > p + #name then
         return
     end
-    result = scopeGet(name)
+    result = {
+        type = 'name',
+        object = scopeGet(name),
+    }
+end
+
+local function checkSimple(simple)
+    if simple.type ~= 'simple' then
+        return
+    end
+    for i = 2, #simple do
+        local obj = simple[i]
+        if obj.type == 'name' then
+            local name = obj[1]
+            local p = obj[2]
+            if pos >= p and pos <= p + #name then
+                result = {
+                    type = 'simple',
+                    table = scopeGetSimple(simple, i-1),
+                    name = name,
+                }
+            end
+        end
+    end
 end
 
 function defs.NamePos(p)
@@ -66,8 +135,9 @@ function defs.NamePos(p)
 end
 
 function defs.Name(str)
-    checkDifinition(str, namePos)
-    return {str, namePos, type = 'name'}
+    local obj = {str, namePos, type = 'name'}
+    checkName(obj)
+    return obj
 end
 
 function defs.DOTSPos(p)
@@ -75,8 +145,9 @@ function defs.DOTSPos(p)
 end
 
 function defs.DOTS(str)
-    checkDifinition(str, namePos)
-    return {str, namePos, type = 'name'}
+    local obj = {str, namePos, type = 'name'}
+    checkName(obj)
+    return obj
 end
 
 function defs.COLONPos(p)
@@ -90,28 +161,28 @@ end
 
 function defs.LocalVar(names)
     for _, name in ipairs(names) do
-        scopeDef(name)
+        scopeLocal(name)
     end
 end
 
 function defs.LocalSet(names)
     for _, name in ipairs(names) do
-        scopeDef(name)
+        scopeLocal(name)
     end
 end
 
 function defs.Set(simples)
     for _, simple in ipairs(simples) do
-        if simple.type == 'simple' and #simple == 1 then
-            local obj = simple[1]
-            local name = obj[1]
-            globalSet(obj)
+        if simple.type == 'simple' then
+            scopeSetSimple(simple)
         end
     end
 end
 
 function defs.Simple(...)
-    return { type = 'simple', ... }
+    local simple = { type = 'simple', ... }
+    checkSimple(simple)
+    return simple
 end
 
 function defs.ArgList(...)
@@ -129,47 +200,45 @@ function defs.FuncName(...)
 end
 
 function defs.FunctionDef(simple, args)
-    if #simple == 1 then
-        globalSet(simple[1])
-    end
+    scopeSetSimple(simple)
     scopePush()
     -- 判断隐藏的局部变量self
     if #simple > 0 then
         local name = simple[#simple]
         if name.colon then
-            scopeDef {'self', name.colon, name.colon, type = 'name'}
+            scopeLocal {'self', name.colon, name.colon, type = 'name'}
         end
     end
     for _, arg in ipairs(args) do
         if arg.type == 'simple' and #arg == 1 then
             local name = arg[1]
-            scopeDef(name)
+            scopeLocal(name)
         end
         if arg.type == 'name' then
-            scopeDef(arg)
+            scopeLocal(arg)
         end
     end
 end
 
 function defs.FunctionLoc(simple, args)
     if #simple == 1 then
-        scopeDef(simple[1])
+        scopeLocal(simple[1])
     end
     scopePush()
     -- 判断隐藏的局部变量self
     if #simple > 0 then
         local name = simple[#simple]
         if name.colon then
-            scopeDef {'self', name.colon, name.colon, type = 'name'}
+            scopeLocal {'self', name.colon, name.colon, type = 'name'}
         end
     end
     for _, arg in ipairs(args) do
         if arg.type == 'simple' and #arg == 1 then
             local name = arg[1]
-            scopeDef(name)
+            scopeLocal(name)
         end
         if arg.type == 'name' then
-            scopeDef(arg)
+            scopeLocal(arg)
         end
     end
 end
@@ -212,7 +281,7 @@ end
 
 function defs.LoopDef(name)
     scopePush()
-    scopeDef(name)
+    scopeLocal(name)
 end
 
 function defs.Loop()
@@ -234,7 +303,7 @@ end
 function defs.InDef(names)
     scopePush()
     for _, name in ipairs(names) do
-        scopeDef(name)
+        scopeLocal(name)
     end
 end
 
@@ -258,6 +327,30 @@ function defs.Until()
     scopePop()
 end
 
+local function parseResult(callback)
+    local obj
+    if result.type == 'name' then
+        obj = result.object
+    elseif result.type == 'simple' then
+        local tbl = result.table
+        local name = result.name
+        obj = scopeGetTable(tbl, name)
+    end
+
+    if not obj then
+        return
+    end
+    
+    local name, start, finish = obj[1], obj[2], obj[3]
+    if not start then
+        return
+    end
+    if not finish then
+        finish = start + #name - 1
+    end
+    callback(start, finish)
+end
+
 return function (buf, pos_)
     pos = pos_
     result = nil
@@ -271,12 +364,15 @@ return function (buf, pos_)
     if not result then
         return false, 'No word'
     end
-    local name, start, finish = result[1], result[2], result[3]
-    if not start then
+
+    local list = {}
+    parseResult(function (start, finish)
+        list[#list+1] = {start, finish}
+    end)
+
+    if #list == 0 then
         return false, 'No match'
     end
-    if not finish then
-        finish = start + #name - 1
-    end
-    return true, start, finish
+
+    return true, list[1][1], list[1][2]
 end

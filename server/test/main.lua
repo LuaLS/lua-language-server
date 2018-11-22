@@ -1,4 +1,4 @@
-require 'filesystem'
+local fs = require 'bee.filesystem'
 ROOT = fs.current_path()
 package.path = (ROOT / 'src' / '?.lua'):string()
      .. ';' .. (ROOT / 'src' / '?' / 'init.lua'):string()

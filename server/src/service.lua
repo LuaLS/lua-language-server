@@ -1,7 +1,8 @@
-local sleep = require 'ffi.sleep'
-local ext   = require 'process.ext'
-local lsp   = require 'lsp'
-local Method= require 'method'
+local sleep      = require 'ffi.sleep'
+local subprocess = require 'bee.subprocess'
+local lsp        = require 'lsp'
+local Method     = require 'method'
+local fs         = require 'bee.filesystem'
 
 local function listen(self, input, output)
     if input then
@@ -9,14 +10,14 @@ local function listen(self, input, output)
         fs.create_directories(input:parent_path())
         io.input(io.open(input:string(), 'rb'))
     else
-        ext.set_filemode(io.stdin, 'b')
+        subprocess.filemode(io.stdin, 'b')
     end
     if output then
         log.info('指定输出文件，路径为：', output)
         fs.create_directories(output:parent_path())
         io.output(io.open(output:string(), 'wb'))
     else
-        ext.set_filemode(io.stdout, 'b')
+        subprocess.filemode(io.stdout, 'b')
     end
     io.output():setvbuf 'no'
 

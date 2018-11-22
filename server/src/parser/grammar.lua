@@ -84,7 +84,8 @@ GOTO        <-  Sp 'goto'     Cut
 IF          <-  Sp 'if'       Cut
 IN          <-  Sp 'in'       Cut
 LOCAL       <-  Sp 'local'    Cut
-NIL         <-  Sp 'nil'      Cut
+NIL         <-  Sp {}         -> NIL
+                'nil'         Cut
 NOT         <-  Sp 'not'      Cut
 OR          <-  Sp 'or'       Cut
 REPEAT      <-  Sp 'repeat'   Cut
@@ -95,7 +96,7 @@ TRUE        <-  Sp {}         -> TRUE
 UNTIL       <-  Sp 'until'    Cut
 WHILE       <-  Sp 'while'    Cut
 
-Esc         <-  '\' EChar
+Esc         <-  '\' {EChar}
 EChar       <-  'a' -> ea
             /   'b' -> eb
             /   'f' -> ef
@@ -170,9 +171,9 @@ Boolean     <-  TRUE
 grammar 'String' [[
 String      <-  Sp ({} StringDef {})
             ->  String
-StringDef   <-  '"' {(Esc / !%nl !'"' .)*} '"'
-            /   "'" {(Esc / !%nl !"'" .)*} "'"
-            /   '[' {:eq: '='* :} '[' {(!StringClose .)*} StringClose
+StringDef   <-  '"' {(Esc / !%nl !'"' .)*} -> ShortString '"'
+            /   "'" {(Esc / !%nl !"'" .)*} -> ShortString "'"
+            /   '[' {:eq: '='* :} '[' {(!StringClose .)*} -> LongString StringClose
 StringClose <-  ']' =eq ']'
 ]]
 
@@ -237,13 +238,13 @@ ArgList     <-  (Arg (COMMA Arg)*)?
 Arg         <-  DOTS
             /   Exp
 
-Table       <-  TL
-                    TableFields?
-                TR
+Table       <-  (TL TableFields? TR)
+            ->  Table
 TableFields <-  TableField (TableSep TableField)* TableSep?
 TableSep    <-  COMMA / SEMICOLON
 TableField  <-  NewIndex / NewField / Exp
-NewIndex    <-  BL Exp BR ASSIGN Exp
+NewIndex    <-  (BL Exp BR ASSIGN Exp)
+            ->  NewIndex
 NewField    <-  Name ASSIGN Exp
 
 Function    <-  FunctionLoc / FunctionDef

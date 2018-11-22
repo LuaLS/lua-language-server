@@ -46,6 +46,6 @@ t[<?"method"?>]()
 
 TEST [[
 local t
-t[<!"method"!>] = 1
-t[<?[==[method]==]?>]()
+t[<!"longString"!>] = 1
+t[<?[==[longString]==]?>]()
 ]]

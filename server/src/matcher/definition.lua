@@ -165,7 +165,7 @@ function defs.Number(str)
     return obj
 end
 
-function defs.String(start, str, finish)
+function defs.String(start, str, finish, ...)
     local obj = {
         'STRING|' .. str,
         start,
@@ -176,6 +176,14 @@ function defs.String(start, str, finish)
     return obj
 end
 
+function defs.ShortString(str)
+    return str
+end
+
+function defs.LongString(str)
+    return str
+end
+
 function defs.DOTSPos(p)
     namePos = p
 end
@@ -184,6 +192,10 @@ function defs.DOTS()
     local obj = {'...', namePos, type = 'name'}
     checkName(obj)
     return obj
+end
+
+function defs.Table(...)
+
 end
 
 function defs.COLONPos(p)

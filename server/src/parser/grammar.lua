@@ -96,7 +96,7 @@ TRUE        <-  Sp {}         -> TRUE
 UNTIL       <-  Sp 'until'    Cut
 WHILE       <-  Sp 'while'    Cut
 
-Esc         <-  '\' {EChar}
+Esc         <-  '\' EChar
 EChar       <-  'a' -> ea
             /   'b' -> eb
             /   'f' -> ef

@@ -8,9 +8,14 @@ return function (lsp, params)
         return nil, '找不到文件：' .. uri
     end
     local start_clock = os.clock()
+    local ast, err = parser:ast(text)
+    local lines    = parser:lines(text)
+    if not ast then
+        return nil, err
+    end
     -- lua是从1开始的，因此都要+1
-    local pos = parser.calcline.position_utf8(text, params.position.line + 1, params.position.character + 1)
-    local suc, start, finish = matcher.definition(text, pos)
+    local position = lines:position(params.position.line + 1, params.position.character + 1)
+    local suc, start, finish = matcher.definition(ast, position, 'utf8')
     if not suc then
         if finish then
             log.debug(start, uri)
@@ -20,8 +25,8 @@ return function (lsp, params)
         return {}
     end
 
-    local start_row,  start_col  = parser.calcline.rowcol_utf8(text, start)
-    local finish_row, finish_col = parser.calcline.rowcol_utf8(text, finish)
+    local start_row,  start_col  = lines:rowcol(start,  'utf8')
+    local finish_row, finish_col = lines:rowcol(finish, 'utf8')
 
     local response = {
         uri = uri,

@@ -35,7 +35,7 @@ end
 
 function mt:searchCall(call)
     for _, exp in ipairs(call) do
-        searchExp(exp)
+        self:searchExp(exp)
     end
     return nil
 end
@@ -47,15 +47,12 @@ function mt:searchSimple(simple)
         local tp = obj.type
         if     tp == 'call' then
             self:searchCall(obj)
-        elseif tp == ':' then
-            self:markLocal(obj)
         else
             if obj.index then
                 self:searchExp(obj)
             end
         end
     end
-    return nil
 end
 
 function mt:searchBinary(exp)
@@ -94,6 +91,16 @@ function mt:searchReturn(action)
     end
 end
 
+function mt:markSimple(simple)
+    for i = 2, #simple do
+        local obj = simple[i]
+        local tp  = obj.type
+        if tp == ':' then
+            self:createLocal('self', obj)
+        end
+    end
+end
+
 function mt:markSet(simple)
     if simple.type == 'name' then
         local str = simple[1]
@@ -114,6 +121,7 @@ function mt:markSet(simple)
         self:checkName(simple)
     else
         self:searchSimple(simple)
+        self:markSimple(simple)
     end
 end
 
@@ -233,6 +241,7 @@ end
 
 function mt:searchFunction(func)
     self.env:push()
+    self.env:cut 'dots'
     if func.name then
         self:markSet(func.name)
     end
@@ -270,6 +279,8 @@ function mt:searchAction(action)
         self:markSets(action)
     elseif tp == 'local' then
         self:markLocals(action)
+    elseif tp == 'simple' then
+        self:searchSimple(action)
     elseif tp == 'if' then
         self:searchIfs(action)
     elseif tp == 'loop' then

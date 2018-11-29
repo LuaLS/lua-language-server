@@ -3,7 +3,7 @@ return function (lsp, data)
     return {
         capabilities = {
             -- 支持“转到定义”
-            --definitionProvider = true,
+            definitionProvider = true,
             -- 支持“转到实现”
             --implementationProvider = true,
             -- 文本同步方式

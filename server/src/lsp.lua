@@ -121,11 +121,13 @@ function mt:_buildTextCache()
     耗时：[%.3f]秒\n\z
     数量：[%d]\n\z
     总大小：[%.3f]kb\n\z
-    速度：[%.3f]kb/s'):format(
+    速度：[%.3f]kb/s\n\z
+    内存：[%.3f]kb'):format(
         passed,
         #list,
         size / 1000,
-        size / passed / 1000
+        size / passed / 1000,
+        collectgarbage 'count'
     ))
 end
 
@@ -174,15 +176,15 @@ end
 function mt:compileText(uri)
     local obj = self._file[uri]
     if not obj then
-        return
+        return nil
     end
     if not self._need_compile[uri] then
-        return
+        return nil
     end
     self._need_compile[uri] = nil
     local ast, err = parser:ast(obj.text)
     if not ast then
-        log.error(err[1].err)
+        return nil
     end
     obj.ast   = ast
     obj.lines = parser:lines(obj.text)

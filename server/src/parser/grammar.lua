@@ -388,7 +388,7 @@ LocalFunction
 ]]
 
 grammar 'Lua' [[
-Lua         <-  (Sp Action)* Sp
+Lua         <-  (Sp Action)* -> Lua Sp
 ]]
 
 return function (lua, mode, parser_)

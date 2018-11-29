@@ -368,6 +368,9 @@ local defs = {
         obj[max-1] = nil
         return obj
     end,
+    Lua = function (...)
+        return {...}
+    end,
 }
 
 return function (self, lua, mode)

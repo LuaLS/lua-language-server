@@ -22,8 +22,33 @@ local function listen(self, input, output)
     io.output():setvbuf 'no'
 
     local session = lsp()
+    local cache = ''
     session:setInput(function (mode)
-        return io.read(mode)
+        local num = subprocess.peek(io.input())
+        if num > 0 then
+            cache = cache .. io.read(num)
+        end
+        if type(mode) == 'number' then
+            if #cache < mode then
+                return nil
+            end
+            local res = cache:sub(1, mode)
+            cache = cache:sub(mode + 1)
+            return res
+        elseif mode == 'l' then
+            local pos = cache:find '[\r\n]'
+            if not pos then
+                return nil
+            end
+            local res = cache:sub(1, pos - 1)
+            if cache:sub(pos, pos + 1) == '\r\n' then
+                cache = cache:sub(pos + 2)
+            else
+                cache = cache:sub(pos + 1)
+            end
+            return res
+        end
+        return nil
     end)
     session:setOutput(function (buf)
         io.write(buf)

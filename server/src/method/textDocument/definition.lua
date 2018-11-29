@@ -2,12 +2,12 @@ local parser = require 'parser'
 local matcher = require 'matcher'
 
 return function (lsp, params)
+    local start_clock = os.clock()
     local uri = params.textDocument.uri
     local ast, lines = lsp:loadText(uri)
     if not ast then
         return nil, '找不到文件：' .. uri
     end
-    local start_clock = os.clock()
     -- lua是从1开始的，因此都要+1
     local position = lines:position(params.position.line + 1, params.position.character + 1)
     local suc, start, finish = matcher.definition(ast, position, 'utf8')
@@ -39,7 +39,7 @@ return function (lsp, params)
     }
     local passed_clock = os.clock() - start_clock
     if passed_clock >= 0.01 then
-        log.warn(('[转到定义]耗时[%.3f]秒，文件大小[%s]字节'):format(passed_clock, #text))
+        log.warn(('[转到定义]耗时[%.3f]秒，文件大小[%s]字节'):format(passed_clock, #lines.buf))
     end
 
     return response

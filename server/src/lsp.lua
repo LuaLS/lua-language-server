@@ -44,13 +44,29 @@ function mt:_send(data)
     f(buf)
 end
 
-function mt:_readAsContent(header)
+function mt:_readProtoHead()
+    local header = self:read 'l'
+    if not header then
+        return
+    end
+    if header:sub(1, #'Content-Length') == 'Content-Length' then
+        return header
+    elseif header:sub(1, #'Content-Type') == 'Content-Type' then
+    else
+        log.error('错误的协议头：', header)
+    end
+end
+
+function mt:_readProtoContent(header)
     local len = tonumber(header:match('%d+'))
     if not len then
         log.error('错误的协议头：', header)
         return
     end
     local buf = self:read(len+2)
+    if not buf then
+        return
+    end
     local suc, res = pcall(json.decode, buf)
     if not suc then
         log.error('错误的协议：', buf)
@@ -79,8 +95,38 @@ function mt:_readAsContent(header)
     if not response then
         log.error(err or ('没有回应：' .. method))
     end
-    -- 运行时不清理垃圾，在回复前端之后清理垃圾
-    collectgarbage()
+    return true
+end
+
+function mt:_buildTextCache()
+    if not next(self._need_compile) then
+        return
+    end
+    local list = {}
+    for uri in pairs(self._need_compile) do
+        list[#list+1] = uri
+    end
+
+    local size = 0
+    local clock = os.clock()
+    for _, uri in ipairs(list) do
+        local obj = self:compileText(uri)
+        if obj then
+            size = size + #obj.text
+        end
+    end
+    local passed = os.clock() - clock
+    log.debug(('\n\z
+    语法树缓存完成\n\z
+    耗时：[%.3f]秒\n\z
+    数量：[%d]\n\z
+    总大小：[%.3f]kb\n\z
+    速度：[%.3f]kb/s'):format(
+        passed,
+        #list,
+        size / 1000,
+        size / passed / 1000
+    ))
 end
 
 function mt:setInput(input)
@@ -139,6 +185,7 @@ function mt:compileText(uri)
     end
     obj.ast   = ast
     obj.lines = parser:lines(obj.text)
+    return obj
 end
 
 function mt:removeText(uri)
@@ -150,15 +197,23 @@ function mt:setMethod(method)
 end
 
 function mt:runStep()
-    local header = self:read 'l'
-    if not header then
+    if not self._header then
+        -- 如果没有协议头，则尝试读一条协议头
+        self._header = self:_readProtoHead()
+    end
+    if self._header then
+        -- 如果有协议头，则读取协议内容
+        local suc = self:_readProtoContent(self._header)
+        if suc then
+            -- 协议内容读取成功后重置
+            self._header = nil
+            self._idle_clock = 0
+        end
         return
     end
-    if header:sub(1, #'Content-Length') == 'Content-Length' then
-        self:_readAsContent(header)
-    elseif header:sub(1, #'Content-Type') == 'Content-Type' then
-    else
-        log.error('错误的协议头：', header)
+    self._idle_clock = self._idle_clock + 1
+    if self._idle_clock == 1000 then
+        self:_buildTextCache()
     end
 end
 
@@ -171,5 +226,7 @@ return function ()
     return setmetatable({
         _file = {},
         _need_compile = {},
+        _header = nil,
+        _idle_clock = 0,
     }, mt)
 end

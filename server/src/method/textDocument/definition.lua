@@ -3,16 +3,11 @@ local matcher = require 'matcher'
 
 return function (lsp, params)
     local uri = params.textDocument.uri
-    local text = lsp:loadText(uri)
-    if not text then
+    local ast, lines = lsp:loadText(uri)
+    if not ast then
         return nil, '找不到文件：' .. uri
     end
     local start_clock = os.clock()
-    local ast, err = parser:ast(text)
-    local lines    = parser:lines(text)
-    if not ast then
-        return nil, err
-    end
     -- lua是从1开始的，因此都要+1
     local position = lines:position(params.position.line + 1, params.position.character + 1)
     local suc, start, finish = matcher.definition(ast, position, 'utf8')

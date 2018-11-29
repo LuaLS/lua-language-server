@@ -111,6 +111,7 @@ function mt:saveText(uri, version, text)
             version = version,
             text = text,
         }
+        self._need_compile[uri] = true
     end
 end
 
@@ -119,28 +120,46 @@ function mt:loadText(uri)
     if not obj then
         return nil
     end
-    return obj.text
+    self:compileText(uri)
+    return obj.ast, obj.lines
+end
+
+function mt:compileText(uri)
+    local obj = self._file[uri]
+    if not obj then
+        return
+    end
+    if not self._need_compile[uri] then
+        return
+    end
+    self._need_compile[uri] = nil
+    local ast, err = parser:ast(obj.text)
+    if not ast then
+        log.error(err[1].err)
+    end
+    obj.ast   = ast
+    obj.lines = parser:lines(obj.text)
 end
 
 function mt:removeText(uri)
     self._file[uri] = nil
 end
 
-function mt:start(method)
+function mt:setMethod(method)
     self._method = method
-    while true do
-        local header = self:read 'l'
-        if not header then
-            return
-        end
-        if header:sub(1, #'Content-Length') == 'Content-Length' then
-            self:_readAsContent(header)
-        elseif header:sub(1, #'Content-Type') == 'Content-Type' then
-        else
-            log.error('错误的协议头：', header)
-        end
+end
+
+function mt:runStep()
+    local header = self:read 'l'
+    if not header then
+        return
     end
-    return true
+    if header:sub(1, #'Content-Length') == 'Content-Length' then
+        self:_readAsContent(header)
+    elseif header:sub(1, #'Content-Type') == 'Content-Type' then
+    else
+        log.error('错误的协议头：', header)
+    end
 end
 
 function mt:stop()
@@ -151,5 +170,6 @@ end
 return function ()
     return setmetatable({
         _file = {},
+        _need_compile = {},
     }, mt)
 end

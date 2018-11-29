@@ -28,7 +28,7 @@ local function listen(self, input, output)
     session:setOutput(function (buf)
         io.write(buf)
     end)
-    session:start(function (method, params)
+    session:setMethod(function (method, params)
         local optional
         if method:sub(1, 2) == '$/' then
             method = method:sub(3)
@@ -49,6 +49,11 @@ local function listen(self, input, output)
             return nil, '没有注册方法：' .. method
         end
     end)
+
+    while true do
+        session:runStep()
+        sleep(1)
+    end
 end
 
 local mt = {

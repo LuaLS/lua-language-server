@@ -152,6 +152,7 @@ function mt:saveText(uri, version, text)
         end
         obj.version = version
         obj.text = text
+        self._need_compile[uri] = true
     else
         self._file[uri] = {
             version = version,
@@ -190,6 +191,7 @@ end
 
 function mt:removeText(uri)
     self._file[uri] = nil
+    self._need_compile[uri] = nil
 end
 
 function mt:setMethod(method)

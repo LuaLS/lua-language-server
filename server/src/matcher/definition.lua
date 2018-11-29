@@ -3,7 +3,7 @@ local mt = {}
 mt.__index = mt
 
 function mt:isContainPos(obj)
-    return obj.start <= self.pos and obj.finish >= self.pos
+    return obj.start <= self.pos and obj.finish + 1 >= self.pos
 end
 
 function mt:checkName(name)

@@ -1,4 +1,5 @@
 local matcher = require 'matcher'
+local parser  = require 'parser'
 
 rawset(_G, 'TEST', true)
 
@@ -42,8 +43,9 @@ function TEST(script)
     local target = catch_target(script)
     local pos    = script:find('<?', 1, true) + 2
     local new_script = script:gsub('<[!?]', '  '):gsub('[!?]>', '  ')
-
-    local suc, result = matcher.implementation(new_script, pos)
+    local ast, err = parser:ast(new_script)
+    assert(ast)
+    local suc, result = matcher.implementation(ast, pos)
     assert(suc)
     assert(founded(target, result))
 end

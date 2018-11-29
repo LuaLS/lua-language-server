@@ -21,7 +21,7 @@ local function main()
     end
 
     test 'definition'
-    test 'implementation'
+    --test 'implementation'
 
     print('测试完成')
 end

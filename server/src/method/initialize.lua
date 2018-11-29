@@ -3,9 +3,9 @@ return function (lsp, data)
     return {
         capabilities = {
             -- 支持“转到定义”
-            definitionProvider = true,
+            --definitionProvider = true,
             -- 支持“转到实现”
-            implementationProvider = true,
+            --implementationProvider = true,
             -- 文本同步方式
             textDocumentSync = {
                 -- 打开关闭文本时通知

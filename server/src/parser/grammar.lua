@@ -2,9 +2,35 @@ local re = require 'parser.relabel'
 local m = require 'lpeglabel'
 local calcline = require 'parser.calcline'
 
+
 local scriptBuf = ''
 local compiled = {}
 local parser
+
+local RESERVED = {
+    ['and']      = true,
+    ['break']    = true,
+    ['do']       = true,
+    ['else']     = true,
+    ['elseif']   = true,
+    ['end']      = true,
+    ['false']    = true,
+    ['for']      = true,
+    ['function'] = true,
+    ['goto']     = true,
+    ['if']       = true,
+    ['in']       = true,
+    ['local']    = true,
+    ['nil']      = true,
+    ['not']      = true,
+    ['or']       = true,
+    ['repeat']   = true,
+    ['return']   = true,
+    ['then']     = true,
+    ['true']     = true,
+    ['until']    = true,
+    ['while']    = true,
+}
 
 local defs = setmetatable({}, {__index = function (self, key)
     self[key] = function (...)
@@ -29,6 +55,16 @@ defs.en = '\n'
 defs.er = '\r'
 defs.et = '\t'
 defs.ev = '\v'
+defs.NotReserved = function (_, _, str)
+    if RESERVED[str] then
+        return false
+    end
+    return true, str
+end
+
+defs.first = function (first, ...)
+    return first
+end
 local eof = re.compile '!. / %{SYNTAX_ERROR}'
 
 local function grammar(tag)
@@ -70,33 +106,31 @@ grammar 'Common' [[
 Cut         <-  ![a-zA-Z0-9_]
 X16         <-  [a-fA-F0-9]
 
-AND         <-  Sp 'and'      Cut
+AND         <-  Sp {'and'}    Cut
 BREAK       <-  Sp 'break'    Cut
 DO          <-  Sp 'do'       Cut
 ELSE        <-  Sp 'else'     Cut
 ELSEIF      <-  Sp 'elseif'   Cut
 END         <-  Sp 'end'      Cut
-FALSE       <-  Sp {}         -> FALSE
-                'false'       Cut
+FALSE       <-  Sp 'false'    Cut
 FOR         <-  Sp 'for'      Cut
 FUNCTION    <-  Sp 'function' Cut
 GOTO        <-  Sp 'goto'     Cut
 IF          <-  Sp 'if'       Cut
 IN          <-  Sp 'in'       Cut
 LOCAL       <-  Sp 'local'    Cut
-NIL         <-  Sp {}         -> NIL
-                'nil'         Cut
-NOT         <-  Sp 'not'      Cut
-OR          <-  Sp 'or'       Cut
+NIL         <-  Sp 'nil'      Cut
+NOT         <-  Sp {'not'}    Cut
+OR          <-  Sp {'or'}     Cut
 REPEAT      <-  Sp 'repeat'   Cut
 RETURN      <-  Sp 'return'   Cut
 THEN        <-  Sp 'then'     Cut
-TRUE        <-  Sp {}         -> TRUE
-                'true'        Cut
+TRUE        <-  Sp 'true'     Cut
 UNTIL       <-  Sp 'until'    Cut
 WHILE       <-  Sp 'while'    Cut
 
-Esc         <-  '\' EChar
+Esc         <-  '\' -> ''
+                EChar
 EChar       <-  'a' -> ea
             /   'b' -> eb
             /   'f' -> ef
@@ -108,39 +142,39 @@ EChar       <-  'a' -> ea
             /   '"'
             /   "'"
             /   %nl
-            /   'z' (%nl / %s)* -> ''
-            /   'x' X16 X16
-            /   [0-9] [0-9]? [0-9]?
-            /   'u{' X16^+1^-6 '}'
+            /   ('z' (%nl / %s)*)     -> ''
+            /   ('x' {X16 X16})       -> Char16
+            /   ([0-9] [0-9]? [0-9]?) -> Char10
+            /   ('u{' {X16^+1^-6} '}')-> CharUtf8
 
-Comp        <-  Sp CompList
+Comp        <-  Sp {CompList}
 CompList    <-  '<='
             /   '>='
             /   '<'
             /   '>'
             /   '~='
             /   '=='
-BOR         <-  Sp '|'
-BXOR        <-  Sp '~'
-BAND        <-  Sp '&'
-Bshift      <-  Sp BshiftList
+BOR         <-  Sp {'|'}
+BXOR        <-  Sp {'~'}
+BAND        <-  Sp {'&'}
+Bshift      <-  Sp {BshiftList}
 BshiftList  <-  '<<'
             /   '>>'
-Concat      <-  Sp '..'
-Adds        <-  Sp AddsList
+Concat      <-  Sp {'..'}
+Adds        <-  Sp {AddsList}
 AddsList    <-  '+'
             /   '-'
-Muls        <-  Sp MulsList
+Muls        <-  Sp {MulsList}
 MulsList    <-  '*'
             /   '//'
             /   '/'
             /   '%'
-Unary       <-  Sp UnaryList
+Unary       <-  Sp {UnaryList}
 UnaryList   <-  'not'
             /   '#'
             /   '-'
             /   '~'
-POWER       <-  Sp '^'
+POWER       <-  Sp {'^'}
 
 PL          <-  Sp '('
 PR          <-  Sp ')'
@@ -150,36 +184,33 @@ TL          <-  Sp '{'
 TR          <-  Sp '}'
 COMMA       <-  Sp ','
 SEMICOLON   <-  Sp ';'
-DOTS        <-  Sp {} -> DOTSPos
-                '...' -> DOTS
+DOTS        <-  Sp ({} '...') -> DOTS
 DOT         <-  Sp '.'
-COLON       <-  Sp {} -> COLONPos
-                ':'   -> COLON
+COLON       <-  Sp ({} ':') -> COLON
 LABEL       <-  Sp '::'
 ASSIGN      <-  Sp '='
 ]]
 
 grammar 'Nil' [[
-Nil         <-  NIL
+Nil         <-  Sp ({} -> Nil) NIL
 ]]
 
 grammar 'Boolean' [[
-Boolean     <-  TRUE
-            /   FALSE
+Boolean     <-  Sp ({} -> True)  TRUE
+            /   Sp ({} -> False) FALSE
 ]]
 
 grammar 'String' [[
 String      <-  Sp ({} StringDef {})
             ->  String
-StringDef   <-  '"' {(Esc / !%nl !'"' .)*} -> ShortString '"'
-            /   "'" {(Esc / !%nl !"'" .)*} -> ShortString "'"
-            /   '[' {:eq: '='* :} '[' {(!StringClose .)*} -> LongString StringClose
+StringDef   <-  '"' {~(Esc / !%nl !'"' .)*~} -> first '"'
+            /   "'" {~(Esc / !%nl !"'" .)*~} -> first "'"
+            /   '[' {:eq: '='* :} '[' {(!StringClose .)*} -> first StringClose
 StringClose <-  ']' =eq ']'
 ]]
 
 grammar 'Number' [[
-Number      <-  Sp {}     -> NumberPos
-                NumberDef -> Number
+Number      <-  Sp ({} {NumberDef} {}) -> Number
 NumberDef   <-  Number16 / Number10
 
 Number10    <-  Integer10 Float10
@@ -192,25 +223,27 @@ Float16     <-  ('.' X16*)? ([pP] [+-]? [1-9]? [0-9]*)?
 ]]
 
 grammar 'Name' [[
-Name        <-  Sp {} -> NamePos
-                {[a-zA-Z_] [a-zA-Z0-9_]*} -> Name
+Name        <-  Sp ({} NameBody {})
+            ->  Name
+NameBody    <-  ([a-zA-Z_] [a-zA-Z0-9_]*)
+            =>  NotReserved
 ]]
 
 grammar 'Exp' [[
 Exp         <-  ExpOr
-ExpOr       <-  ExpAnd     (OR     ExpAnd)*
-ExpAnd      <-  ExpCompare (AND    ExpCompare)*
-ExpCompare  <-  ExpBor     (Comp   ExpBor)*
-ExpBor      <-  ExpBxor    (BOR    ExpBxor)*
-ExpBxor     <-  ExpBand    (BXOR   ExpBand)*
-ExpBand     <-  ExpBshift  (BAND   ExpBshift)*
-ExpBshift   <-  ExpConcat  (Bshift ExpConcat)*
-ExpConcat   <-  ExpAdds    (Concat ExpAdds)*
-ExpAdds     <-  ExpMuls    (Adds   ExpMuls)*
-ExpMuls     <-  ExpUnary   (Muls   ExpUnary)*
-ExpUnary    <-             (Unary  ExpPower)
-            /                      ExpPower
-ExpPower    <-  ExpUnit    (POWER  ExpUnary)*
+ExpOr       <-  (ExpAnd     (OR     ExpAnd)*)     -> Binary
+ExpAnd      <-  (ExpCompare (AND    ExpCompare)*) -> Binary
+ExpCompare  <-  (ExpBor     (Comp   ExpBor)*)     -> Binary
+ExpBor      <-  (ExpBxor    (BOR    ExpBxor)*)    -> Binary
+ExpBxor     <-  (ExpBand    (BXOR   ExpBand)*)    -> Binary
+ExpBand     <-  (ExpBshift  (BAND   ExpBshift)*)  -> Binary
+ExpBshift   <-  (ExpConcat  (Bshift ExpConcat)*)  -> Binary
+ExpConcat   <-  (ExpAdds    (Concat ExpConcat)*)  -> Binary
+ExpAdds     <-  (ExpMuls    (Adds   ExpMuls)*)    -> Binary
+ExpMuls     <-  (ExpUnary   (Muls   ExpUnary)*)   -> Binary
+ExpUnary    <-  (           (Unary+ ExpPower))    -> Unary
+            /                       ExpPower
+ExpPower    <-  (ExpUnit    (POWER  ExpUnary)*)   -> Binary
 ExpUnit     <-  Nil
             /   Boolean
             /   String
@@ -224,107 +257,134 @@ Simple      <-  (Prefix (Suffix)*)
             ->  Simple
 Prefix      <-  PL Exp PR
             /   Name
-ColonName   <-  (COLON Name)
-            ->  ColonName
 Suffix      <-  DOT Name
-            /   ColonName
+            /   COLON Name
             /   Table
             /   String
-            /   BL Exp BR
-            /   PL ArgList? PR
+            /   BL Exp -> Index BR
+            /   PL (ExpList -> Call) PR
 
+ExpList     <-  (Exp (COMMA Exp)*)?
+            ->  List
+NameList    <-  (Name (COMMA Name)*)?
+            ->  List
 ArgList     <-  (Arg (COMMA Arg)*)?
-            ->  ArgList
+            ->  List
 Arg         <-  DOTS
-            /   Exp
+            /   Name
 
-Table       <-  (TL TableFields? TR)
+Table       <-  Sp ({} TL TableFields TR {})
             ->  Table
-TableFields <-  TableField (TableSep TableField)* TableSep?
+TableFields <-  (TableField (TableSep TableField)* TableSep?)?
+            ->  TableFields
 TableSep    <-  COMMA / SEMICOLON
 TableField  <-  NewIndex / NewField / Exp
 NewIndex    <-  (BL Exp BR ASSIGN Exp)
             ->  NewIndex
-NewField    <-  Name ASSIGN Exp
+NewField    <-  (Name ASSIGN Exp)
+            ->  NewField
 
-Function    <-  FunctionLoc / FunctionDef
-FunctionLoc <-  (LOCAL FUNCTION FuncName PL ArgList PR) -> FunctionLoc
-                    (!END Action)*                      -> Function
+Function    <-  Sp ({} FunctionBody {})
+            ->  Function
+FunctionBody<-  FUNCTION FuncName PL ArgList PR
+                    Action*
                 END
-FunctionDef <-  (FUNCTION FuncName PL ArgList PR) -> FunctionDef
-                    (!END Action)*                -> Function
-                END
-FuncName    <-  (Name (FuncSuffix)*)?
-            ->  FuncName
+FuncName    <-  (Name? (FuncSuffix)*)
+            ->  Simple
 FuncSuffix  <-  DOT Name
-            /   ColonName
+            /   COLON Name
 
 -- 纯占位，修改了 `relabel.lua` 使重复定义不抛错
-Action      <-  !. .
+Action      <-  !END .
 ]]
 
 grammar 'Action' [[
-Action      <-  SEMICOLON / Do / Break / Return / Label / GoTo / If / For / While / Repeat / Function / Set / Local / Call
+Action      <-  SEMICOLON
+            /   Do
+            /   Break
+            /   Return
+            /   Label
+            /   GoTo
+            /   If
+            /   For
+            /   While
+            /   Repeat
+            /   Function
+            /   LocalFunction
+            /   Local
+            /   Set
+            /   Call
 
-ExpList     <-  Exp (COMMA Exp)*
-NameList    <-  (Name (COMMA Name)*)        -> NameList
-SimpleList  <-  (Simple (COMMA Simple)*)    -> SimpleList
+SimpleList  <-  (Simple (COMMA Simple)*)
+            ->  List
 
-Do          <-  DO                  -> DoDef
-                    (!END Action)*  -> Do
-                END
+Do          <-  Sp ({} DO DoBody END {})
+            ->  Do
+DoBody      <-  Action*
+            ->  DoBody
 
 Break       <-  BREAK
+            ->  Break
 
-Return      <-  RETURN !END ExpList?
+Return      <-  RETURN ExpList?
+            ->  Return
 
-Label       <-  LABEL Name LABEL
+Label       <-  LABEL Name -> Label LABEL
 
-GoTo        <-  GOTO Name
+GoTo        <-  GOTO Name -> GoTo
 
-If          <-  IfPart
-                ElseIfPart*
-                ElsePart?
+If          <-  Sp ({} IfBody {})
+            ->  If
+IfBody      <-  (IfPart     -> IfBlock)
+                (ElseIfPart -> ElseIfBlock)*
+                (ElsePart   -> ElseBlock)?
                 END
-            ->  EndIf
-IfPart      <-  (IF Exp THEN)                       -> IfDef
-                    (!ELSEIF !ELSE !END Action)*    -> If
-ElseIfPart  <-  (ELSEIF Exp THEN)                   -> ElseIfDef
-                    (!ELSE !ELSEIF !END Action)*    -> ElseIf
-ElsePart    <-  ELSE                                -> ElseDef
-                    (!END Action)*                  -> Else
+IfPart      <-  IF Exp THEN
+                    Action*
+ElseIfPart  <-  ELSEIF Exp THEN
+                    Action*
+ElsePart    <-  ELSE
+                    Action*
 
 For         <-  Loop / In
 
-Loop        <-  (FOR LoopStart LoopFinish LoopStep? DO) -> LoopDef
-                    (!END Action)*                      -> Loop
+Loop        <-  Sp ({} LoopBody {})
+            ->  Loop
+LoopBody    <-  (FOR LoopStart LoopFinish LoopStep? DO) -> LoopDef
+                    Action*
                 END
-LoopStart   <-  (Name ASSIGN Exp)                       -> LoopStart
+LoopStart   <-  Name ASSIGN Exp
 LoopFinish  <-  COMMA Exp
 LoopStep    <-  COMMA Exp
 
-In          <-  (FOR NameList IN ExpList DO)    -> InDef
-                    (!END Action)*              -> In
+In          <-  Sp ({} InBody {})
+            ->  In
+InBody      <-  FOR NameList IN ExpList DO
+                    Action*
                 END
 
-While       <-  (WHILE Exp DO)      -> WhileDef
-                    (!END Action)*  -> While
+While       <-  Sp ({} WhileBody {})
+            ->  While
+WhileBody   <-  WHILE Exp DO
+                    Action*
                 END
 
-Repeat      <-  REPEAT                  -> RepeatDef
-                    (!UNTIL Action)*    -> Repeat
-                (UNTIL Exp)             -> Until
+Repeat      <-  Sp ({} RepeatBody {})
+            ->  Repeat
+RepeatBody  <-  REPEAT
+                    Action*
+                UNTIL Exp
 
-Set         <-  (LOCAL NameList ASSIGN ExpList)
-            ->  LocalSet
-            /   (SimpleList ASSIGN ExpList)
+Local       <-  (LOCAL NameList (ASSIGN ExpList)?)
+            ->  Local
+Set         <-  (SimpleList ASSIGN ExpList)
             ->  Set
 
-Local       <-  LOCAL NameList
-            ->  LocalVar
-
 Call        <-  Simple
-            ->  Call
+
+LocalFunction
+            <-  Sp ({} LOCAL FunctionBody {})
+            ->  LocalFunction
 ]]
 
 grammar 'Lua' [[
@@ -333,7 +393,7 @@ Lua         <-  (Sp Action)* Sp
 
 return function (lua, mode, parser_)
     parser = parser_ or {}
-    mode = mode or 'lua'
+    mode = mode or 'Lua'
     local r, e, pos = compiled[mode]:match(lua)
     if not r then
         local err = errorpos(lua, pos, e)

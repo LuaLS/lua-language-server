@@ -1,4 +1,5 @@
 local matcher = require 'matcher'
+local parser  = require 'parser'
 
 rawset(_G, 'TEST', true)
 
@@ -7,8 +8,10 @@ function TEST(script)
     local finish = script:find('!>', 1, true) - 1
     local pos    = script:find('<?', 1, true) + 2
     local new_script = script:gsub('<[!?]', '  '):gsub('[!?]>', '  ')
+    local ast, err = parser:ast(new_script)
+    assert(ast)
 
-    local suc, a, b = matcher.definition(new_script, pos)
+    local suc, a, b = matcher.definition(ast, pos)
     assert(suc)
     assert(a == start)
     assert(b == finish)

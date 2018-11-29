@@ -1,3 +1,8 @@
+local setmetatable = setmetatable
+local pairs = pairs
+local type = type
+local table_sort = table.sort
+
 return function (root)
     local env = {root}
     local is_table = {}
@@ -10,11 +15,11 @@ return function (root)
     root._cut = {}
 
     local mt = { _env = env }
-    function mt:add()
-        table.insert(env, { _next = env[#env], _cut = {} })
+    function mt:push()
+        env[#env+1] = { _next = env[#env], _cut = {} }
     end
-    function mt:remove()
-        table.remove(env)
+    function mt:pop()
+        env[#env] = nil
     end
     function mt:cut(key)
         env[#env]._cut[key] = true
@@ -122,7 +127,7 @@ return function (root)
                 break
             end
         end
-        table.sort(keys)
+        table_sort(keys)
         local i = 0
         return function ()
             i = i + 1

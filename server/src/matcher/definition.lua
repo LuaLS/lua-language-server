@@ -9,7 +9,11 @@ end
 function mt:checkName(name)
     if self:isContainPos(name) then
         local str = name[1]
-        self.result = self.env.var[str] or self.env.var._ENV[str]
+        local var = self.env.var[str] or self.env.var._ENV[str]
+        self.result = {
+            type = 'var',
+            var  = var,
+        }
         self.stop = true
         return self.result
     else
@@ -84,31 +88,20 @@ function mt:searchExp(exp)
     elseif tp == '...' then
         result = self:checkDots(exp)
     elseif tp == 'function' then
+        self:searchFunction(exp)
     elseif tp == 'table' then
     end
     return result
 end
 
 function mt:searchReturn(action)
-    local exps = action[1]
-    if not exps then
-        return nil
-    end
-    for _, exp in ipairs(exps) do
+    for _, exp in ipairs(action) do
         local result = self:searchExp(exp)
         if result then
             return result
         end
     end
     return nil
-end
-
-function mt:checkThenSearchActionsIn(actions)
-    if self:isContainPos(actions) then
-        return self:searchActionsIn(actions)
-    else
-        return nil
-    end
 end
 
 function mt:markSet(simple)
@@ -143,58 +136,165 @@ function mt:createLocal(str, type, source)
     }
 end
 
-function mt:markLocal(simple)
-    if simple.type == 'name' then
-        local str = simple[1]
+function mt:markLocal(name)
+    if name.type == 'name' then
+        local str = name[1]
         -- 创建一个局部变量
-        self:createLocal(str, 'local', simple)
-        self:checkName(simple)
+        self:createLocal(str, 'local', name)
+        self:checkName(name)
+    elseif name.type == '...' then
+        self.env.dots = name
+    end
+end
+
+function mt:forList(list, callback)
+    if list.type == 'list' then
+        for i = 1, #list do
+            callback(list[i])
+        end
     else
-        slef:searchSimple(simple)
+        callback(list)
     end
 end
 
 function mt:markSets(action)
-    local simples = action[1]
-    if simples.type == 'list' then
-        for _, simple in ipairs(simples) do
-            self:markSet(simple)
-        end
-    else
-        self:markSet(simples)
-    end
+    local keys = action[1]
+    local values = action[2]
+    -- 要先计算赋值
+    self:forList(values, function (value)
+        self:searchExp(value)
+    end)
+    self:forList(keys, function (key)
+        self:markSet(key)
+    end)
 end
 
 function mt:markLocals(action)
-    local simples = action[1]
-    if simple.type == 'list' then
-        for _, simple in ipairs(simples) do
-            self:markLocal(simple)
-        end
-    else
-        self:markLocal(simples)
+    local keys = action[1]
+    local values = action[2]
+    -- 要先计算赋值
+    if values then
+        self:forList(values, function (value)
+            self:searchExp(value)
+        end)
     end
+    self:forList(keys, function (key)
+        self:markLocal(key)
+    end)
+end
+
+function mt:searchIfs(action)
+    for _, block in ipairs(action) do
+        self.env:push()
+        if block.filter then
+            self:searchExp(block.filter)
+        end
+        self:searchActions(block)
+        self.env:pop()
+    end
+end
+
+function mt:searchLoop(action)
+    self.env:push()
+    self:markLocal(action.arg)
+    self:searchExp(action.min)
+    self:searchExp(action.max)
+    if action.step then
+        self:searchExp(action.step)
+    end
+    self:searchActions(action)
+    self.env:pop()
+end
+
+function mt:searchIn(action)
+    self:forList(action.exp, function (exp)
+        self:searchExp(exp)
+    end)
+    self.env:push()
+    self:forList(action.arg, function (arg)
+        self:markLocal(arg)
+    end)
+    self:searchActions(action)
+    self.env:pop()
+end
+
+function mt:searchDo(action)
+    self.env:push()
+    self:searchActions(action)
+    self.env:pop()
+end
+
+function mt:searchWhile(action)
+    self:searchExp(action.filter)
+    self.env:push()
+    self:searchActions(action)
+    self.env:pop()
+end
+
+function mt:searchRepeat(action)
+    self.env:push()
+    self:searchActions(action)
+    self:searchExp(action.filter)
+    self.env:pop()
+end
+
+function mt:searchFunction(func)
+    self.env:push()
+    if func.name then
+        self:markSet(func.name)
+    end
+    if func.arg then
+        self:forList(func.arg, function (arg)
+            self:markLocal(arg)
+        end)
+    end
+    self:searchActions(func)
+    self.env:pop()
+end
+
+function mt:searchLocalFunction(func)
+    self:markSet(func.name)
+    self.env:push()
+    if func.arg then
+        self:forList(func.arg, function (arg)
+            self:markLocal(arg)
+        end)
+    end
+    self:searchActions(func)
+    self.env:pop()
 end
 
 function mt:searchAction(action)
     local tp = action.type
-    local result
     if     tp == 'do' then
-        result = self:checkThenSearchActionsIn(action)
+        self:searchDo(action)
     elseif tp == 'break' then
     elseif tp == 'return' then
-        result = self:searchReturn(action)
+        self:searchReturn(action)
     elseif tp == 'label' then
     elseif tp == 'goto' then
     elseif tp == 'set' then
         self:markSets(action)
     elseif tp == 'local' then
         self:markLocals(action)
+    elseif tp == 'if' then
+        self:searchIfs(action)
+    elseif tp == 'loop' then
+        self:searchLoop(action)
+    elseif tp == 'in' then
+        self:searchIn(action)
+    elseif tp == 'while' then
+        self:searchWhile(action)
+    elseif tp == 'repeat' then
+        self:searchRepeat(action)
+    elseif tp == 'function' then
+        self:searchFunction(action)
+    elseif tp == 'localfunction' then
+        self:searchLocalFunction(action)
     end
-    return result
 end
 
-function mt:searchActionsIn(actions)
+function mt:searchActions(actions)
     for _, action in ipairs(actions) do
         self:searchAction(action)
         if self.stop then
@@ -204,18 +304,26 @@ function mt:searchActionsIn(actions)
     return nil
 end
 
+local function parseResult(result)
+    local tp = result.type
+    if tp == 'var' then
+        local first = result.var[1]
+        local source = first.source
+        return true, source.start, source.finish
+    end
+end
+
 return function (ast, pos)
     local searcher = setmetatable({
         pos = pos,
         env = env {var = {}, usable = {}, label = {}},
     }, mt)
     searcher.env.var._ENV = {}
-    searcher:searchActionsIn(ast)
+    searcher:searchActions(ast)
 
     if not searcher.result then
         return false
     end
 
-    local source = searcher.result[1].source
-    return true, source.start, source.finish
+    return parseResult(searcher.result)
 end

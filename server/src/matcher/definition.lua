@@ -10,53 +10,49 @@ function mt:checkName(name)
     if self:isContainPos(name) then
         local str = name[1]
         local var = self.env.var[str] or self.env.var._ENV[str]
-        self.result = {
-            type = 'var',
-            var  = var,
-        }
-        self.stop = true
-        return self.result
-    else
-        return nil
+        if var then
+            self.result = {
+                type = 'var',
+                var  = var,
+            }
+            self.stop = true
+        end
     end
 end
 
 function mt:checkDots(dots)
     if self:isContainPos(dots) then
-        return self.env.dots
-    else
-        return nil
+        local dots = self.env.dots
+        if dots then
+            self.result = {
+                type = 'dots',
+                dots = dots,
+            }
+            self.stop = true
+        end
     end
 end
 
 function mt:searchCall(call)
     for _, exp in ipairs(call) do
-        local result = searchExp(exp)
-        if result then
-            return result
-        end
+        searchExp(exp)
     end
     return nil
 end
 
 function mt:searchSimple(simple)
-    local result = self:checkName(simple[1])
-    if result then
-        return result
-    end
+    self:checkName(simple[1])
     for i = 2, #simple do
         local obj = simple[i]
         local tp = obj.type
         if     tp == 'call' then
-            result = self:searchCall(obj)
+            self:searchCall(obj)
         elseif tp == ':' then
+            self:markLocal(obj)
         else
             if obj.index then
-                result = self:searchExp(obj)
+                self:searchExp(obj)
             end
-        end
-        if result then
-            return result
         end
     end
     return nil
@@ -72,36 +68,30 @@ end
 
 function mt:searchExp(exp)
     local tp = exp.type
-    local result
     if     tp == 'nil' then
     elseif tp == 'string' then
     elseif tp == 'boolean' then
     elseif tp == 'number' then
     elseif tp == 'name' then
-        result = self:checkName(exp)
+        self:checkName(exp)
     elseif tp == 'simple' then
-        result = self:searchSimple(exp)
+        self:searchSimple(exp)
     elseif tp == 'binary' then
-        result = self:searchBinary(exp)
+        self:searchBinary(exp)
     elseif tp == 'unary' then
-        result = self:searchUnary(exp)
+        self:searchUnary(exp)
     elseif tp == '...' then
-        result = self:checkDots(exp)
+        self:checkDots(exp)
     elseif tp == 'function' then
         self:searchFunction(exp)
     elseif tp == 'table' then
     end
-    return result
 end
 
 function mt:searchReturn(action)
     for _, exp in ipairs(action) do
-        local result = self:searchExp(exp)
-        if result then
-            return result
-        end
+        self:searchExp(exp)
     end
-    return nil
 end
 
 function mt:markSet(simple)
@@ -127,11 +117,11 @@ function mt:markSet(simple)
     end
 end
 
-function mt:createLocal(str, type, source)
+function mt:createLocal(str, source)
     local var = {}
     self.env.var[str] = var
     var[1] = {
-        type   = type,
+        type   = 'local',
         source = source,
     }
 end
@@ -140,10 +130,13 @@ function mt:markLocal(name)
     if name.type == 'name' then
         local str = name[1]
         -- 创建一个局部变量
-        self:createLocal(str, 'local', name)
+        self:createLocal(str, name)
         self:checkName(name)
     elseif name.type == '...' then
         self.env.dots = name
+    elseif name.type == ':' then
+        -- 创建一个局部变量
+        self:createLocal('self', name)
     end
 end
 
@@ -253,7 +246,7 @@ function mt:searchFunction(func)
 end
 
 function mt:searchLocalFunction(func)
-    self:markSet(func.name)
+    self:markLocal(func.name)
     self.env:push()
     if func.arg then
         self:forList(func.arg, function (arg)
@@ -306,10 +299,13 @@ end
 
 local function parseResult(result)
     local tp = result.type
-    if tp == 'var' then
+    if     tp == 'var' then
         local first = result.var[1]
         local source = first.source
         return true, source.start, source.finish
+    elseif tp == 'dots' then
+        local dots = result.dots
+        return true, dots.start, dots.finish
     end
 end
 

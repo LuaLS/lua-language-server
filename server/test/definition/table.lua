@@ -88,3 +88,9 @@ t {
     _ = <?t?>.x
 }
 ]]
+
+TEST[[
+local t
+t.<?after?>()
+t.<!after!> = a
+]]

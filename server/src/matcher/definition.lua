@@ -65,10 +65,10 @@ function mt:getField(parent, key, source)
     if parent == nil or key == nil then
         return nil
     end
-    if not parent.childs then
-        return nil
+    local var
+    if parent.childs then
+        var = parent.childs[key]
     end
-    local var = parent.childs[key]
     if not var then
         var = self:addField(parent, key, source)
     end
@@ -100,7 +100,6 @@ function mt:checkDots(dots)
                 type = 'dots',
                 dots = dots,
             }
-            self.stop = true
         end
     end
 end
@@ -403,9 +402,6 @@ end
 function mt:searchActions(actions)
     for _, action in ipairs(actions) do
         self:searchAction(action)
-        if self.stop then
-            return self.result
-        end
     end
     return nil
 end

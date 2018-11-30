@@ -1,13 +1,13 @@
 TEST [[
 <!x!> = 1
-<?x?> = 1
+<?x?>()
 ]]
 
 TEST [[
 do
     <!global!> = 1
 end
-<?global?> = 1
+<?global?>()
 ]]
 
 TEST [[
@@ -15,7 +15,7 @@ TEST [[
 do
     local x = 1
 end
-<?x?> = 1
+<?x?>()
 ]]
 
 TEST [[
@@ -25,6 +25,6 @@ do
     do
         x = 2
     end
-    <?x?> = 1
+    <?x?>()
 end
 ]]

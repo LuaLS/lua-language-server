@@ -10,12 +10,12 @@ end
 TEST [[
 function _(<!x!>)
     do return end
-    <?x?> = 1
+    <?x?>()
 end
 ]]
 
 TEST [[
-function a<!:!>b()
+function <!a!>:b()
     a:b()
     <?self?>()
 end

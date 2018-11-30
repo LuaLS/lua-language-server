@@ -6,13 +6,16 @@ function mt:isContainPos(obj)
     return obj.start <= self.pos and obj.finish + 1 >= self.pos
 end
 
-function mt:getVar(key)
+function mt:getVar(key, source)
     if key == nil then
         return nil
     end
-    return 
-        self.env.var[key] or
-        self:getField(self.env.var._ENV, key) -- 这里不需要用getVar来递归获取_ENV
+    local var = self.env.var[key]
+             or self:getField(self.env.var._ENV, key, source) -- 这里不需要用getVar来递归获取_ENV
+    if not var then
+        var = self:addField(self:getVar '_ENV', key, source)
+    end
+    return var
 end
 
 function mt:addVarInfo(var, info)
@@ -24,51 +27,49 @@ function mt:createLocal(key, source)
     if key == nil then
         return nil
     end
-    local var = self:addVarInfo({}, {
-        type   = 'local',
+    local var = {
+        type = 'local',
         source = source,
-    })
+    }
     self.env.var[key] = var
     return var
 end
 
-function mt:createGlobal(key, source)
-    if key == nil then
-        return nil
-    end
-    local info = {
-        type   = 'global',
-        source = source,
-    }
-    local var = self:addField(self:getVar '_ENV', key, info)
-    return var
+function mt:bindLocal(key, other_key, source)
+    self.env.var[key] = self:getVar(other_key, source)
 end
 
-function mt:addField(parent, key, info)
+function mt:addField(parent, key, source)
     if parent == nil or key == nil then
         return nil
     end
-    assert(info)
+    assert(source)
     if not parent.childs then
         parent.childs = {}
     end
     local var = parent.childs[key]
     if not var then
-        var = {}
+        var = {
+            type = 'field',
+            source = source,
+        }
         parent.childs[key] = var
     end
-    self:addVarInfo(var, info)
     return var
 end
 
-function mt:getField(parent, key)
+function mt:getField(parent, key, source)
     if parent == nil or key == nil then
         return nil
     end
     if not parent.childs then
         return nil
     end
-    return parent.childs[key]
+    local var = parent.childs[key]
+    if not var then
+        var = self:addField(parent, key, source)
+    end
+    return var
 end
 
 function mt:checkVar(var, source)
@@ -84,7 +85,7 @@ function mt:checkVar(var, source)
 end
 
 function mt:checkName(name)
-    local var = self:getVar(name[1])
+    local var = self:getVar(name[1], name)
     self:checkVar(var, name)
 end
 
@@ -110,24 +111,26 @@ end
 
 function mt:searchSimple(simple)
     local name = simple[1]
-    local var = self:getVar(name[1]) or self:createGlobal(name[1], name)
+    local var = self:getVar(name[1], name)
     self:checkVar(var, name)
     for i = 2, #simple do
         local obj = simple[i]
         local tp = obj.type
         if     tp == 'call' then
+            var = nil
             self:searchCall(obj)
+        elseif tp == ':' then
         elseif tp == 'name' then
             if obj.index then
                 var = nil
                 self:searchExp(obj)
             else
-                var = self:getField(var, obj[1])
+                var = self:getField(var, obj[1], obj)
                 self:checkVar(var, obj)
             end
         else
             if obj.index then
-                var = self:getField(var, obj[1])
+                var = self:getField(var, obj[1], obj)
                 self:checkVar(var, obj)
             else
                 var = nil
@@ -185,27 +188,21 @@ end
 
 function mt:markSimple(simple)
     local name = simple[1]
-    local var = self:getVar(name[1]) or self:createGlobal(name[1], name)
+    local var = self:getVar(name[1], name)
     for i = 2, #simple do
         local obj = simple[i]
         local tp  = obj.type
         if     tp == ':' then
-            self:createLocal('self', obj)
+            self:bindLocal('self', simple[i-1][1], simple[i-1])
         elseif tp == 'name' then
             if not obj.index then
-                var = self:addField(var, obj[1], {
-                    type   = 'field',
-                    source = obj,
-                })
+                var = self:addField(var, obj[1], obj)
             else
                 var = nil
             end
         else
             if obj.index then
-                var = self:addField(var, obj[1], {
-                    type   = 'field',
-                    source = obj,
-                })
+                var = self:addField(var, obj[1], obj)
             else
                 var = nil
             end
@@ -215,7 +212,7 @@ end
 
 function mt:markSet(simple)
     if simple.type == 'name' then
-        local var = self:getVar(simple[1]) or self:createGlobal(simple[1], simple)
+        local var = self:getVar(simple[1], simple)
         self:addVarInfo(var, {
             type   = 'set',
             source = simple,
@@ -399,15 +396,40 @@ function mt:searchActions(actions)
 end
 
 local function parseResult(result)
+    local results = {}
     local tp = result.type
     if     tp == 'var' then
-        local first = result.var[1]
-        local source = first.source
-        return true, source.start, source.finish
+        local var = result.var
+        if var.type == 'local' then
+            local source = var.source
+            if not source then
+                return false
+            end
+            results[1] = {source.start, source.finish}
+        elseif var.type == 'field' then
+            local source = var.source
+            if not source then
+                return false
+            end
+            if #var == 0 then
+                results[1] = {source.start, source.finish}
+            else
+                for i, info in ipairs(var) do
+                    if info.type == 'set' then
+                        results[i] = {info.source.start, info.source.finish}
+                    end
+                end
+            end
+        else
+            error('unknow var.type:' .. var.type)
+        end
     elseif tp == 'dots' then
         local dots = result.dots
-        return true, dots.start, dots.finish
+        results[1] = {dots.start, dots.finish}
+    else
+        error('unknow result.type:' .. result.type)
     end
+    return true, results
 end
 
 return function (ast, pos)

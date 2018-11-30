@@ -1,18 +1,18 @@
 
 TEST [[
 function <!x!> () end
-<?x?> = 1
+<?x?>()
 ]]
     
 TEST [[
 local function <!x!> () end
-<?x?> = 1
+<?x?>()
 ]]
 
 TEST [[
 local x
 local function <!x!> ()
-    <?x?> = 1
+    <?x?>()
 end
 ]]
 
@@ -20,5 +20,5 @@ TEST [[
 local <!x!>
 function x()
 end
-<?x?> = 1
+<?x?>()
 ]]

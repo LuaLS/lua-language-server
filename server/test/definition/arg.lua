@@ -1,6 +1,6 @@
 TEST [[
 local function xx (<!xx!>)
-    <?xx?> = 1
+    <?xx?>()
 end
 ]]
 
@@ -11,13 +11,13 @@ end
 ]]
 
 TEST [[
-function mt<!:!>x()
-    <?self?> = 1
+function <!mt!>:x()
+    <?self?>()
 end
 ]]
 
 TEST [[
 function mt:x(<!self!>)
-    <?self?> = 1
+    <?self?>()
 end
 ]]

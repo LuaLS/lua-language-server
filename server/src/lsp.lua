@@ -211,12 +211,11 @@ function mt:runStep()
         if suc then
             -- 协议内容读取成功后重置
             self._header = nil
-            self._idle_clock = 0
+            self._idle_clock = os.clock()
         end
         return
     end
-    self._idle_clock = self._idle_clock + 1
-    if self._idle_clock == 1000 then
+    if os.clock() - self._idle_clock >= 1 then
         self:_buildTextCache()
     end
 end
@@ -231,6 +230,6 @@ return function ()
         _file = {},
         _need_compile = {},
         _header = nil,
-        _idle_clock = 0,
+        _idle_clock = os.clock(),
     }, mt)
 end

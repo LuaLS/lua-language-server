@@ -6,58 +6,86 @@ function mt:isContainPos(obj)
     return obj.start <= self.pos and obj.finish + 1 >= self.pos
 end
 
-function mt:getVar(str)
+function mt:getVar(key)
+    if key == nil then
+        return nil
+    end
     return 
-    self.env.var[str] or
-    self:getField(self.env.var._ENV, str) -- 这里不需要用getVar来递归获取_ENV
+        self.env.var[key] or
+        self:getField(self.env.var._ENV, key) -- 这里不需要用getVar来递归获取_ENV
 end
 
-function mt:createLocal(str, source)
-    local var = {}
-    var[1] = {
-        type   = 'local',
-        source = source,
-    }
-    self.env.var[str] = var
+function mt:addVarInfo(var, info)
+    var[#var+1] = info
     return var
 end
 
-function mt:createGlobal(str, source)
-    local var = {}
-    var[1] = {
+function mt:createLocal(key, source)
+    if key == nil then
+        return nil
+    end
+    local var = self:addVarInfo({}, {
+        type   = 'local',
+        source = source,
+    })
+    self.env.var[key] = var
+    return var
+end
+
+function mt:createGlobal(key, source)
+    if key == nil then
+        return nil
+    end
+    local info = {
         type   = 'global',
         source = source,
     }
-    self:addField(self:getVar '_ENV', str, var)
+    local var = self:addField(self:getVar '_ENV', key, info)
     return var
 end
 
-function mt:addField(parent, str, var)
+function mt:addField(parent, key, info)
+    if parent == nil or key == nil then
+        return nil
+    end
+    assert(info)
     if not parent.childs then
         parent.childs = {}
     end
-    parent.childs[str] = var
+    local var = parent.childs[key]
+    if not var then
+        var = {}
+        parent.childs[key] = var
+    end
+    self:addVarInfo(var, info)
     return var
 end
 
-function mt:getField(parent, str)
+function mt:getField(parent, key)
+    if parent == nil or key == nil then
+        return nil
+    end
     if not parent.childs then
         return nil
     end
-    return parent.childs[str]
+    return parent.childs[key]
+end
+
+function mt:checkVar(var, source)
+    if not source then
+        return
+    end
+    if self:isContainPos(source) then
+        self.result = {
+            type = 'var',
+            var  = var,
+        }
+    end
 end
 
 function mt:checkName(name)
-    if self:isContainPos(name) then
-        local var = self:getVar(name[1])
-        if var then
-            self.result = {
-                type = 'var',
-                var  = var,
-            }
-            self.stop = true
-        end
-    end
+    local var = self:getVar(name[1])
+    self:checkVar(var, name)
 end
 
 function mt:checkDots(dots)
@@ -81,15 +109,27 @@ function mt:searchCall(call)
 end
 
 function mt:searchSimple(simple)
-    self:checkName(simple[1])
+    local name = simple[1]
+    local var = self:getVar(name[1]) or self:createGlobal(name[1], name)
+    self:checkVar(var, name)
     for i = 2, #simple do
         local obj = simple[i]
         local tp = obj.type
         if     tp == 'call' then
             self:searchCall(obj)
+        elseif tp == 'name' then
+            if not obj.index then
+                var = self:getField(var, obj[1])
+                self:checkVar(var, obj)
+            else
+                var = nil
+            end
         else
             if obj.index then
+                var = self:getField(var, obj[1])
                 self:searchExp(obj)
+            else
+                var = nil
             end
         end
     end
@@ -144,11 +184,17 @@ end
 
 function mt:markSimple(simple)
     local name = simple[1]
+    local var = self:getVar(name[1]) or self:createGlobal(name[1], name)
     for i = 2, #simple do
         local obj = simple[i]
         local tp  = obj.type
-        if tp == ':' then
+        if     tp == ':' then
             self:createLocal('self', obj)
+        elseif tp == 'name' then
+            var = self:addField(var, obj[1], {
+                type   = 'field',
+                source = obj,
+            })
         end
     end
 end
@@ -156,12 +202,11 @@ end
 function mt:markSet(simple)
     if simple.type == 'name' then
         local var = self:getVar(simple[1]) or self:createGlobal(simple[1], simple)
-        -- 插入赋值信息
-        var[#var+1] = {
+        self:addVarInfo(var, {
             type   = 'set',
             source = simple,
-        }
-        self:checkName(simple)
+        })
+        self:checkVar(var, simple)
     else
         self:searchSimple(simple)
         self:markSimple(simple)
@@ -172,8 +217,8 @@ function mt:markLocal(name)
     if name.type == 'name' then
         local str = name[1]
         -- 创建一个局部变量
-        self:createLocal(str, name)
-        self:checkName(name)
+        local var = self:createLocal(str, name)
+        self:checkVar(var, name)
     elseif name.type == '...' then
         self.env.dots = name
     elseif name.type == ':' then

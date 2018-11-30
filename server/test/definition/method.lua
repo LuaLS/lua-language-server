@@ -39,3 +39,51 @@ end
 local obj = setmetatable({}, mt)
 obj:<?method1?>()
 ]]
+
+TEST [[
+local mt
+mt.__index = mt
+function mt:<!method1!>()
+end
+
+local obj = setmetatable(1, mt)
+obj:<?method1?>()
+]]
+
+TEST [[
+local mt
+function mt:<!method1!>()
+end
+
+local obj = setmetatable(1, { __index = mt })
+obj:<?method1?>()
+]]
+
+TEST [[
+local mt
+local api
+function mt:<!method1!>()
+end
+
+setmetatable(api, { __index = mt })
+api:<?method1?>()
+]]
+
+TEST [[
+local mt
+function mt:x()
+    self.<?init?>()
+end
+
+local obj = setmetatable({}, { __index = mt })
+obj.<!init!> = 1
+]]
+
+TEST [[
+local mt
+function mt:x()
+    self.<?init?>()
+end
+
+local obj = setmetatable({ <!init!> = 1 }, { __index = mt })
+]]

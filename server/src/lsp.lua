@@ -115,9 +115,7 @@ function mt:_buildTextCache()
     local clock = os.clock()
     for _, uri in ipairs(list) do
         local obj = self:compileText(uri)
-        if obj then
-            size = size + #obj.text
-        end
+        size = size + #obj.text
     end
     local passed = os.clock() - clock
     log.debug(('\n\z
@@ -186,11 +184,7 @@ function mt:compileText(uri)
         return nil
     end
     self._need_compile[uri] = nil
-    local ast, err = parser:ast(obj.text)
-    if not ast then
-        return nil
-    end
-    obj.ast   = ast
+    obj.ast   = parser:ast(obj.text)
     obj.lines = parser:lines(obj.text)
     return obj
 end

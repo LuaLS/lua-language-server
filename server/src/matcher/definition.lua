@@ -29,20 +29,19 @@ function mt:addVarInfo(var, info)
     return var
 end
 
-function mt:createLocal(key, source)
+function mt:createLocal(key, source, var)
     if key == nil then
         return nil
     end
-    local var = {
-        type = 'local',
-        source = source,
-    }
+    if not var then
+        var = {
+            type = 'local',
+            source = source,
+            childs = {},
+        }
+    end
     self.env.var[key] = var
     return var
-end
-
-function mt:setMeta(var, meta_var)
-    var.meta = meta_var
 end
 
 function mt:addField(parent, key, source)
@@ -50,14 +49,12 @@ function mt:addField(parent, key, source)
         return nil
     end
     assert(source)
-    if not parent.childs then
-        parent.childs = {}
-    end
     local var = parent.childs[key]
     if not var then
         var = {
             type = 'field',
             source = source,
+            childs = {},
         }
         parent.childs[key] = var
     end
@@ -121,10 +118,14 @@ function mt:searchCall(call, simple, i)
         if metatable then
             local index = self:getField(metatable, '__index')
             if obj then
-                obj.meta = index
+                self:setTable(obj, index)
+                return obj
+            else
+                return index
             end
+        else
+            return obj
         end
-        return obj
     end
     return nil
 end
@@ -174,6 +175,7 @@ end
 function mt:searchTable(exp)
     local tbl = {
         type = 'table',
+        childs = {},
     }
     for _, obj in ipairs(exp) do
         if obj.type == 'pair' then
@@ -226,9 +228,6 @@ function mt:setTable(var, tbl)
     if not var or not tbl then
         return
     end
-    if tbl.type ~= 'table' then
-        return
-    end
     var.childs = tbl.childs
 end
 
@@ -239,9 +238,7 @@ function mt:markSimple(simple)
         local obj = simple[i]
         local tp  = obj.type
         if     tp == ':' then
-            local var = self:createLocal('self', simple[i-1])
-            local meta_var = self:getVar(simple[i-1][1])
-            self:setMeta(var, meta_var)
+            var = self:createLocal('self', simple[i-1], self:getVar(simple[i-1][1]))
         elseif tp == 'name' then
             if not obj.index then
                 var = self:addField(var, obj[1], obj)
@@ -268,6 +265,7 @@ function mt:markSimple(simple)
             end
         end
     end
+    return var
 end
 
 function mt:markSet(simple, tbl)
@@ -281,7 +279,8 @@ function mt:markSet(simple, tbl)
         self:setTable(var, tbl)
     else
         self:searchSimple(simple)
-        self:markSimple(simple)
+        local var = self:markSimple(simple)
+        self:setTable(var, tbl)
     end
 end
 

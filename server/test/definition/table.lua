@@ -94,3 +94,10 @@ local t
 t.<?after?>()
 t.<!after!> = a
 ]]
+
+TEST[[
+local t = {
+    <!x!> = 1,
+}
+t.<?x?>()
+]]

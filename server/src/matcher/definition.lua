@@ -63,6 +63,16 @@ function mt:searchUnary(exp)
     return self:searchExp(exp[1])
 end
 
+function mt:searchTable(exp)
+    for _, obj in ipairs(exp) do
+        if obj.type == 'pair' then
+            self:searchExp(obj[2])
+        else
+            self:searchExp(obj)
+        end
+    end
+end
+
 function mt:searchExp(exp)
     local tp = exp.type
     if     tp == 'nil' then
@@ -82,6 +92,7 @@ function mt:searchExp(exp)
     elseif tp == 'function' then
         self:searchFunction(exp)
     elseif tp == 'table' then
+        self:searchTable(exp)
     end
 end
 

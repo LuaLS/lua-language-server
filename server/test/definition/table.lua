@@ -1,4 +1,11 @@
 TEST [[
+local <!t!>
+a = {
+    <?t?>
+}
+]]
+
+TEST [[
 local t
 t.<!x!> = 1
 t.<?x?> = 1

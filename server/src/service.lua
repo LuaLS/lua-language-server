@@ -19,6 +19,8 @@ local function listen(self, input, output)
     else
         subprocess.filemode(io.stdout, 'b')
     end
+    io.input():setvbuf 'no'
+    io.output():setvbuf 'no'
 
     local session = lsp()
     local cache = ''
@@ -51,7 +53,6 @@ local function listen(self, input, output)
     end)
     session:setOutput(function (buf)
         io.write(buf)
-        io.flush()
     end)
     session:setMethod(function (method, params)
         local optional

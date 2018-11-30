@@ -6,7 +6,7 @@ return function (lsp, params)
     local uri = params.textDocument.uri
     local ast, lines = lsp:loadText(uri)
     if not ast then
-        return nil, '找不到文件：' .. uri
+        return {}
     end
     -- lua是从1开始的，因此都要+1
     local position = lines:position(params.position.line + 1, params.position.character + 1, 'utf8')

@@ -402,6 +402,7 @@ end
 function mt:searchFunction(func)
     self.env:push()
     self.env:cut 'dots'
+    self.env.label = {}
     if func.name then
         self:markSet(func.name)
     end
@@ -422,6 +423,26 @@ function mt:searchLocalFunction(func)
     self.env:pop()
 end
 
+function mt:markLabel(label)
+    local str = label[1]
+    if not self.env.label[str] then
+        self.env.label[str] = {
+            type = 'label',
+        }
+    end
+    table.insert(self.env.label[str], label)
+end
+
+function mt:searchGoTo(obj)
+    local str = obj[1]
+    if not self.env.label[str] then
+        self.env.label[str] = {
+            type = 'label',
+        }
+    end
+    self.result = self.env.label[str]
+end
+
 function mt:searchAction(action)
     local tp = action.type
     if     tp == 'do' then
@@ -430,7 +451,9 @@ function mt:searchAction(action)
     elseif tp == 'return' then
         self:searchReturn(action)
     elseif tp == 'label' then
+        self:markLabel(action)
     elseif tp == 'goto' then
+        self:searchGoTo(action)
     elseif tp == 'set' then
         self:markSets(action)
     elseif tp == 'local' then
@@ -487,6 +510,10 @@ local function parseResult(result)
     elseif tp == 'dots' then
         local dots = result.dots
         results[1] = {dots.start, dots.finish}
+    elseif tp == 'label' then
+        for i, label in ipairs(result) do
+            results[i] = {label.start, label.finish}
+        end
     else
         error('unknow result.type:' .. result.type)
     end
@@ -496,8 +523,9 @@ end
 return function (ast, pos)
     local searcher = setmetatable({
         pos = pos,
-        env = env {var = {}, usable = {}, label = {}},
+        env = env {var = {}, usable = {}},
     }, mt)
+    searcher.env.label = {}
     searcher:createLocal('_ENV')
     searcher:searchActions(ast)
 

@@ -183,6 +183,9 @@ function mt:markLocal(name)
 end
 
 function mt:forList(list, callback)
+    if not list then
+        return
+    end
     if list.type == 'list' then
         for i = 1, #list do
             callback(list[i])
@@ -208,11 +211,9 @@ function mt:markLocals(action)
     local keys = action[1]
     local values = action[2]
     -- 要先计算赋值
-    if values then
-        self:forList(values, function (value)
-            self:searchExp(value)
-        end)
-    end
+    self:forList(values, function (value)
+        self:searchExp(value)
+    end)
     self:forList(keys, function (key)
         self:markLocal(key)
     end)
@@ -279,11 +280,9 @@ function mt:searchFunction(func)
     if func.name then
         self:markSet(func.name)
     end
-    if func.arg then
-        self:forList(func.arg, function (arg)
-            self:markLocal(arg)
-        end)
-    end
+    self:forList(func.arg, function (arg)
+        self:markLocal(arg)
+    end)
     self:searchActions(func)
     self.env:pop()
 end
@@ -291,11 +290,9 @@ end
 function mt:searchLocalFunction(func)
     self:markLocal(func.name)
     self.env:push()
-    if func.arg then
-        self:forList(func.arg, function (arg)
-            self:markLocal(arg)
-        end)
-    end
+    self:forList(func.arg, function (arg)
+        self:markLocal(arg)
+    end)
     self:searchActions(func)
     self.env:pop()
 end

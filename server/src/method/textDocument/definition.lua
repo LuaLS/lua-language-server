@@ -9,8 +9,8 @@ return function (lsp, params)
         return nil, '找不到文件：' .. uri
     end
     -- lua是从1开始的，因此都要+1
-    local position = lines:position(params.position.line + 1, params.position.character + 1)
-    local suc, results = matcher.definition(ast, position, 'utf8')
+    local position = lines:position(params.position.line + 1, params.position.character + 1, 'utf8')
+    local suc, results = matcher.definition(ast, position)
     if not suc then
         return {}
     end

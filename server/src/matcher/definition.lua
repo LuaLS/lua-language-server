@@ -118,7 +118,7 @@ function mt:searchCall(call, simple, i)
         if metatable then
             local index = self:getField(metatable, '__index')
             if obj then
-                self:setTable(obj, index)
+                self:setTable(obj, index, 'copy')
                 return obj
             else
                 return index
@@ -224,9 +224,19 @@ function mt:searchReturn(action)
     end
 end
 
-function mt:setTable(var, tbl)
+function mt:setTable(var, tbl, mode)
     if not var or not tbl then
         return
+    end
+    if mode == 'copy' then
+        for k, v in pairs(var.childs) do
+            if tbl.childs[k] then
+                for i, info in ipairs(v) do
+                    table.insert(tbl.childs[k], 1, info)
+                end
+            end
+            tbl.childs[k] = v
+        end
     end
     var.childs = tbl.childs
 end

@@ -127,7 +127,7 @@ function mt:searchSimple(simple)
         else
             if obj.index then
                 var = self:getField(var, obj[1])
-                self:searchExp(obj)
+                self:checkVar(var, obj)
             else
                 var = nil
             end
@@ -191,10 +191,23 @@ function mt:markSimple(simple)
         if     tp == ':' then
             self:createLocal('self', obj)
         elseif tp == 'name' then
-            var = self:addField(var, obj[1], {
-                type   = 'field',
-                source = obj,
-            })
+            if not obj.index then
+                var = self:addField(var, obj[1], {
+                    type   = 'field',
+                    source = obj,
+                })
+            else
+                var = nil
+            end
+        else
+            if obj.index then
+                var = self:addField(var, obj[1], {
+                    type   = 'field',
+                    source = obj,
+                })
+            else
+                var = nil
+            end
         end
     end
 end

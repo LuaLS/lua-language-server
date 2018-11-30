@@ -15,6 +15,9 @@ function mt:getVar(key, source)
     if not var then
         var = self:addField(self:getVar '_ENV', key, source)
     end
+    while var and var.meta do
+        var = var.meta
+    end
     return var
 end
 
@@ -38,8 +41,8 @@ function mt:createLocal(key, source)
     return var
 end
 
-function mt:bindLocal(key, other_key, source)
-    self.env.var[key] = self:getVar(other_key, source)
+function mt:setMeta(var, meta_var)
+    var.meta = meta_var
 end
 
 function mt:addField(parent, key, source)
@@ -218,7 +221,9 @@ function mt:markSimple(simple)
         local obj = simple[i]
         local tp  = obj.type
         if     tp == ':' then
-            self:bindLocal('self', simple[i-1][1], simple[i-1])
+            local var = self:createLocal('self', simple[i-1])
+            local meta_var = self:getVar(simple[i-1][1])
+            self:setMeta(var, meta_var)
         elseif tp == 'name' then
             if not obj.index then
                 var = self:addField(var, obj[1], obj)

@@ -132,8 +132,12 @@ function mt:searchSimple(simple)
             end
         else
             if obj.index then
-                var = self:getField(var, obj[1], obj)
-                self:checkVar(var, obj)
+                if obj.type == 'string' or obj.type == 'number' or obj.type == 'boolean' then
+                    var = self:getField(var, obj[1], obj)
+                    self:checkVar(var, obj)
+                else
+                    self:searchExp(obj)
+                end
             else
                 var = nil
             end

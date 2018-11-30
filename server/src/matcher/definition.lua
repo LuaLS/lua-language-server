@@ -15,7 +15,7 @@ function mt:getVar(key, source)
     if not var then
         var = self:addField(self:getVar '_ENV', key, source)
     end
-    while var and var.meta do
+    if var and var.meta then
         var = var.meta
     end
     return var
@@ -72,7 +72,7 @@ function mt:getField(parent, key, source)
     if parent.childs then
         var = parent.childs[key]
     end
-    if not var then
+    if not var and source then
         var = self:addField(parent, key, source)
     end
     return var
@@ -93,6 +93,7 @@ end
 function mt:checkName(name)
     local var = self:getVar(name[1], name)
     self:checkVar(var, name)
+    return var
 end
 
 function mt:checkDots(dots)
@@ -107,9 +108,23 @@ function mt:checkDots(dots)
     end
 end
 
-function mt:searchCall(call)
-    for _, exp in ipairs(call) do
-        self:searchExp(exp)
+function mt:searchCall(call, simple, i)
+    local results = {}
+    for i, exp in ipairs(call) do
+        results[i] = self:searchExp(exp)
+    end
+    
+    -- 特殊处理 setmetatable
+    if i == 2 and simple[1][1] == 'setmetatable' then
+        local obj = results[1]
+        local metatable = results[2]
+        if metatable then
+            local index = self:getField(metatable, '__index')
+            if obj then
+                obj.meta = index
+            end
+        end
+        return obj
     end
     return nil
 end
@@ -122,8 +137,7 @@ function mt:searchSimple(simple)
         local obj = simple[i]
         local tp = obj.type
         if     tp == 'call' then
-            var = nil
-            self:searchCall(obj)
+            var = self:searchCall(obj, simple, i)
         elseif tp == ':' then
         elseif tp == 'name' then
             if obj.index then
@@ -146,6 +160,7 @@ function mt:searchSimple(simple)
             end
         end
     end
+    return var
 end
 
 function mt:searchBinary(exp)
@@ -157,11 +172,19 @@ function mt:searchUnary(exp)
 end
 
 function mt:searchTable(exp)
-    local tbl = {}
+    local tbl = {
+        type = 'table',
+    }
     for _, obj in ipairs(exp) do
         if obj.type == 'pair' then
-            local res = self:searchExp(obj[2])
-            self:markField(tbl, obj[1], res)
+            local key, value = obj[1], obj[2]
+            local res = self:searchExp(value)
+            local var = self:addField(tbl, key[1], key)
+            self:setTable(var, res)
+            self:addVarInfo(var, {
+                type   = 'set',
+                source = key,
+            })
         else
             self:searchExp(obj)
         end
@@ -176,9 +199,9 @@ function mt:searchExp(exp)
     elseif tp == 'boolean' then
     elseif tp == 'number' then
     elseif tp == 'name' then
-        self:checkName(exp)
+        return self:checkName(exp)
     elseif tp == 'simple' then
-        self:searchSimple(exp)
+        return self:searchSimple(exp)
     elseif tp == 'binary' then
         self:searchBinary(exp)
     elseif tp == 'unary' then
@@ -199,19 +222,14 @@ function mt:searchReturn(action)
     end
 end
 
-function mt:addChild(var, child)
-    if not var or not child then
+function mt:setTable(var, tbl)
+    if not var or not tbl then
         return
     end
-    for str, info in pairs(child) do
-        local obj, grandson = info[1], info[2]
-        local child_var = self:addField(var, str, obj)
-        self:addVarInfo(child_var, {
-            type   = 'set',
-            source = obj,
-        })
-        self:addChild(child_var, grandson)
+    if tbl.type ~= 'table' then
+        return
     end
+    var.childs = tbl.childs
 end
 
 function mt:markSimple(simple)
@@ -252,22 +270,7 @@ function mt:markSimple(simple)
     end
 end
 
-function mt:markField(parent, obj, child)
-    local tp = obj.type
-    if tp == 'name' then
-        if not obj.index then
-            parent[obj[1]] = {obj, child}
-        end
-    else
-        if obj.index then
-            if obj.type == 'string' or obj.type == 'number' or obj.type == 'boolean' then
-                parent[obj[1]] = {obj, child}
-            end
-        end
-    end
-end
-
-function mt:markSet(simple, child)
+function mt:markSet(simple, tbl)
     if simple.type == 'name' then
         local var = self:getVar(simple[1], simple)
         self:addVarInfo(var, {
@@ -275,20 +278,20 @@ function mt:markSet(simple, child)
             source = simple,
         })
         self:checkVar(var, simple)
-        self:addChild(var, child)
+        self:setTable(var, tbl)
     else
         self:searchSimple(simple)
         self:markSimple(simple)
     end
 end
 
-function mt:markLocal(name, child)
+function mt:markLocal(name, tbl)
     if name.type == 'name' then
         local str = name[1]
         -- 创建一个局部变量
         local var = self:createLocal(str, name)
         self:checkVar(var, name)
-        self:addChild(var, child)
+        self:setTable(var, tbl)
     elseif name.type == '...' then
         self.env.dots = name
     elseif name.type == ':' then

@@ -97,7 +97,7 @@ t.<!after!> = a
 
 TEST[[
 local t = {
-    <!x!> = 1,
+    <!insert!> = 1,
 }
-t.<?x?>()
+t.<?insert?>()
 ]]

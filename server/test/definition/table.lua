@@ -56,3 +56,21 @@ local t
 t[<!"longString"!>] = 1
 t[<?[==[longString]==]?>]()
 ]]
+
+TEST [[
+local t
+t.<!x!> = 1
+t[<?'x'?>]()
+]]
+
+TEST [[
+local t
+t.<!a!>.b = 1
+t.<?a?>.b()
+]]
+
+TEST [[
+local t
+local <!x!>
+t[<?x?>]()
+]]

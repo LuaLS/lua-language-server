@@ -72,7 +72,7 @@ function mt:getField(parent, key)
 end
 
 function mt:checkVar(var, source)
-    if not source then
+    if not var or not source then
         return
     end
     if self:isContainPos(source) then
@@ -118,11 +118,12 @@ function mt:searchSimple(simple)
         if     tp == 'call' then
             self:searchCall(obj)
         elseif tp == 'name' then
-            if not obj.index then
+            if obj.index then
+                var = nil
+                self:searchExp(obj)
+            else
                 var = self:getField(var, obj[1])
                 self:checkVar(var, obj)
-            else
-                var = nil
             end
         else
             if obj.index then

@@ -74,3 +74,17 @@ local t
 local <!x!>
 t[<?x?>]()
 ]]
+
+TEST[[
+local <!t!>
+local _ = {
+    _ = <?t?>
+}
+]]
+
+TEST[[
+local <!t!>
+t {
+    _ = <?t?>.x
+}
+]]

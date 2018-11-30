@@ -259,8 +259,8 @@ Prefix      <-  PL Exp PR
             /   Name
 Suffix      <-  DOT Name
             /   COLON Name
-            /   Table
-            /   String
+            /   Table -> Call
+            /   String -> Call
             /   BL Exp -> Index BR
             /   PL (ExpList -> Call) PR
 

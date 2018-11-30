@@ -92,7 +92,7 @@ function mt:_readProtoContent(header)
             }
         end
     end
-    if not response then
+    if response == nil then
         log.error(err or ('没有回应：' .. method))
     end
     return true

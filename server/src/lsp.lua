@@ -75,6 +75,7 @@ function mt:_readProtoContent(header)
     local id     = res.id
     local method = res.method
     local params = res.params
+    log.debug('recive', id)
     local response, err = self:_callback(method, params)
     if id then
         if response then
@@ -91,6 +92,7 @@ function mt:_readProtoContent(header)
                 },
             }
         end
+        log.debug('send', id)
     end
     if response == nil then
         log.error(err or ('没有回应：' .. method))

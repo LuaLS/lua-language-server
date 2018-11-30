@@ -47,8 +47,12 @@ function TEST(script)
     assert(ast)
 
     local suc, result = matcher.definition(ast, pos)
-    assert(suc)
-    assert(founded(target, result))
+    if suc then
+        assert(suc)
+        assert(founded(target, result))
+    else
+        assert(#target == 0)
+    end
 end
 
 require 'definition.set'

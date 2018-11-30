@@ -19,6 +19,9 @@ function mt:getVar(key, source)
 end
 
 function mt:addVarInfo(var, info)
+    if not var then
+        return nil
+    end
     var[#var+1] = info
     return var
 end
@@ -197,12 +200,24 @@ function mt:markSimple(simple)
         elseif tp == 'name' then
             if not obj.index then
                 var = self:addField(var, obj[1], obj)
+                if i == #simple then
+                    self:addVarInfo(var, {
+                        type   = 'set',
+                        source = obj,
+                    })
+                end
             else
                 var = nil
             end
         else
             if obj.index then
                 var = self:addField(var, obj[1], obj)
+                if i == #simple then
+                    self:addVarInfo(var, {
+                        type   = 'set',
+                        source = obj,
+                    })
+                end
             else
                 var = nil
             end
@@ -407,17 +422,12 @@ local function parseResult(result)
             end
             results[1] = {source.start, source.finish}
         elseif var.type == 'field' then
-            local source = var.source
-            if not source then
+            if #var == 0 then
                 return false
             end
-            if #var == 0 then
-                results[1] = {source.start, source.finish}
-            else
-                for i, info in ipairs(var) do
-                    if info.type == 'set' then
-                        results[i] = {info.source.start, info.source.finish}
-                    end
+            for i, info in ipairs(var) do
+                if info.type == 'set' then
+                    results[i] = {info.source.start, info.source.finish}
                 end
             end
         else

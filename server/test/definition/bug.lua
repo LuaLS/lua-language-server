@@ -15,7 +15,8 @@ end
 ]]
 
 TEST [[
-function <!a!>:b()
+local <!a!>
+function a:b()
     a:b()
     <?self?>()
 end

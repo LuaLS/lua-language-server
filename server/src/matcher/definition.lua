@@ -6,10 +6,50 @@ function mt:isContainPos(obj)
     return obj.start <= self.pos and obj.finish + 1 >= self.pos
 end
 
+function mt:getVar(str)
+    return 
+    self.env.var[str] or
+    self:getField(self.env.var._ENV, str) -- 这里不需要用getVar来递归获取_ENV
+end
+
+function mt:createLocal(str, source)
+    local var = {}
+    var[1] = {
+        type   = 'local',
+        source = source,
+    }
+    self.env.var[str] = var
+    return var
+end
+
+function mt:createGlobal(str, source)
+    local var = {}
+    var[1] = {
+        type   = 'global',
+        source = source,
+    }
+    self:addField(self:getVar '_ENV', str, var)
+    return var
+end
+
+function mt:addField(parent, str, var)
+    if not parent.childs then
+        parent.childs = {}
+    end
+    parent.childs[str] = var
+    return var
+end
+
+function mt:getField(parent, str)
+    if not parent.childs then
+        return nil
+    end
+    return parent.childs[str]
+end
+
 function mt:checkName(name)
     if self:isContainPos(name) then
-        local str = name[1]
-        local var = self.env.var[str] or self.env.var._ENV[str]
+        local var = self:getVar(name[1])
         if var then
             self.result = {
                 type = 'var',
@@ -103,6 +143,7 @@ function mt:searchReturn(action)
 end
 
 function mt:markSimple(simple)
+    local name = simple[1]
     for i = 2, #simple do
         local obj = simple[i]
         local tp  = obj.type
@@ -114,16 +155,7 @@ end
 
 function mt:markSet(simple)
     if simple.type == 'name' then
-        local str = simple[1]
-        local var = self.env.var[str] -- 是否是一个局部变量？
-        if not var then
-            var = self.env.var._ENV[str] -- 是否是一个全局变量？
-            if not var then
-                -- 创建一个全局变量
-                var = {}
-                self.env.var._ENV[str] = var
-            end
-        end
+        local var = self:getVar(simple[1]) or self:createGlobal(simple[1], simple)
         -- 插入赋值信息
         var[#var+1] = {
             type   = 'set',
@@ -134,15 +166,6 @@ function mt:markSet(simple)
         self:searchSimple(simple)
         self:markSimple(simple)
     end
-end
-
-function mt:createLocal(str, source)
-    local var = {}
-    self.env.var[str] = var
-    var[1] = {
-        type   = 'local',
-        source = source,
-    }
 end
 
 function mt:markLocal(name)
@@ -336,7 +359,7 @@ return function (ast, pos)
         pos = pos,
         env = env {var = {}, usable = {}, label = {}},
     }, mt)
-    searcher.env.var._ENV = {}
+    searcher:createLocal('_ENV')
     searcher:searchActions(ast)
 
     if not searcher.result then

@@ -12,9 +12,9 @@
 			"env": {
 				"PATH": "${workspaceRoot}\\server\\bin\\"
 			},
-			"luaRuntime": "5.3 32bit",
+			"luaRuntime": "5.4 32bit",
 			"luaexe": "${workspaceRoot}\\server\\bin\\lua.exe",
-			"luadll": "${workspaceRoot}\\server\\bin\\lua53.dll",
+			"luadll": "${workspaceRoot}\\server\\bin\\lua54.dll",
 			"path": "${workspaceRoot}/server/bin/?.lua",
 			"cpath": "${workspaceRoot}/server/bin/?.dll;",
 			"arg": [
@@ -31,6 +31,23 @@
 			"consoleCoding": "utf8",
 			"ip": "localhost",
 			"port": 546858
+		},
+		{
+			"name": "编译",
+			"type": "lua",
+			"request": "launch",
+			"stopOnEntry": false,
+			"program": "${workspaceRoot}/server/compile.lua",
+			"cwd": "${workspaceRoot}/server",
+			"luaRuntime": "5.4 32bit",
+			"luaexe": "${workspaceRoot}/server/bee.lua/make/luamake/lua.exe",
+			"luadll": "${workspaceRoot}/server/bee.lua/make/luamake/lua54.dll",
+			"path": "${workspaceRoot}/server/bee.lua/make/luamake/?.lua",
+			"cpath": "${workspaceRoot}/server/bee.lua/make/luamake/?.dll;",
+			"arg": [
+			],
+			"consoleCoding": "utf8",
+			"sourceCoding": "utf8"
 		},
 		{
 			"type": "extensionHost",

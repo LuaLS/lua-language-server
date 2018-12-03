@@ -76,6 +76,7 @@ function mt:addField(parent, key, source)
     if not var then
         var = self:createVar('field', key, source)
         parent.childs[key] = var
+        var.parent = parent
     end
     return var
 end
@@ -121,7 +122,7 @@ function mt:searchCall(call, simple, i)
         if metatable then
             local index = self:getField(metatable, '__index')
             if obj then
-                self:setTable(obj, index, 'copy')
+                self:setMeta(obj, index)
                 return obj
             else
                 return index
@@ -233,17 +234,15 @@ function mt:setTable(var, tbl, mode)
     if not var or not tbl then
         return
     end
-    if mode == 'copy' then
-        for k, v in pairs(var.childs) do
-            if tbl.childs[k] then
-                for i, info in ipairs(v) do
-                    table.insert(tbl.childs[k], 1, info)
-                end
-            end
-            tbl.childs[k] = v
-        end
-    end
     var.childs = tbl.childs
+end
+
+function mt:setMeta(var, meta)
+    if not var or not meta then
+        return
+    end
+    var.childs.meta = meta
+    meta.childs.meta = var
 end
 
 function mt:markSimple(simple)

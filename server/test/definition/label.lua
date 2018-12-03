@@ -21,3 +21,9 @@ do
 end
 ::<!LABEL!>::
 ]]
+
+TEST [[
+::<!LABEL!>::
+goto <?LABEL?>
+::<!LABEL!>::
+]]

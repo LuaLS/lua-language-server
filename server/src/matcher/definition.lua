@@ -21,12 +21,43 @@ function mt:getVar(key, source)
     return var
 end
 
-function mt:addVarInfo(var, info)
-    if not var then
+function mt:addInfo(obj, type, source)
+    if not obj then
         return nil
     end
-    var[#var+1] = info
+    obj[#obj+1] = {
+        type = type,
+        source = source,
+    }
+    return obj
+end
+
+function mt:createVar(type, key, source)
+    local var = {
+        type = type,
+        key = key,
+        source = source,
+        childs = {},
+    }
+    self.results.vars[#self.results.vars+1] = var
     return var
+end
+
+function mt:createLabel(key)
+    local lbl = {
+        key = key,
+        type = 'label',
+    }
+    self.results.labels[#self.results.labels+1] = lbl
+    return lbl
+end
+
+function mt:createDots()
+    local dots = {
+        type = 'dots',
+    }
+    self.results.dots[#self.results.dots+1] = dots
+    return dots
 end
 
 function mt:createLocal(key, source, var)
@@ -34,11 +65,7 @@ function mt:createLocal(key, source, var)
         return nil
     end
     if not var then
-        var = {
-            type = 'local',
-            source = source,
-            childs = {},
-        }
+        var = self:createVar('local', key, source)
     end
     self.env.var[key] = var
     return var
@@ -51,11 +78,7 @@ function mt:addField(parent, key, source)
     assert(source)
     local var = parent.childs[key]
     if not var then
-        var = {
-            type = 'field',
-            source = source,
-            childs = {},
-        }
+        var = self:createVar('field', key, source)
         parent.childs[key] = var
     end
     return var
@@ -75,34 +98,18 @@ function mt:getField(parent, key, source)
     return var
 end
 
-function mt:checkVar(var, source)
-    if not var or not source then
-        return
-    end
-    if self:isContainPos(source) then
-        self.result = {
-            type = 'var',
-            var  = var,
-        }
-    end
-end
-
 function mt:checkName(name)
     local var = self:getVar(name[1], name)
-    self:checkVar(var, name)
+    self:addInfo(var, 'get', name)
     return var
 end
 
-function mt:checkDots(dots)
-    if self:isContainPos(dots) then
-        local dots = self.env.dots
-        if dots then
-            self.result = {
-                type = 'dots',
-                dots = dots,
-            }
-        end
+function mt:checkDots(source)
+    local dots = self.env.dots
+    if not dots then
+        return
     end
+    self:addInfo(dots, 'get', source)
 end
 
 function mt:searchCall(call, simple, i)
@@ -135,30 +142,34 @@ function mt:searchSimple(simple)
     local var
     if name.type == 'name' then
         var = self:getVar(name[1], name)
-        self:checkVar(var, name)
     end
     self:searchExp(simple[1])
     for i = 2, #simple do
         local obj = simple[i]
         local tp = obj.type
-        self:searchExp(obj)
         if     tp == 'call' then
             var = self:searchCall(obj, simple, i)
         elseif tp == ':' then
         elseif tp == 'name' then
             if obj.index then
+                self:checkName(obj)
                 var = nil
             else
                 var = self:getField(var, obj[1], obj)
-                self:checkVar(var, obj)
+                if i ~= #simple then
+                    self:addInfo(var, 'get', obj)
+                end
             end
         else
             if obj.index then
                 if obj.type == 'string' or obj.type == 'number' or obj.type == 'boolean' then
                     var = self:getField(var, obj[1], obj)
-                    self:checkVar(var, obj)
+                    if i ~= #simple then
+                        self:addInfo(var, 'get', obj)
+                    end
                 end
             else
+                self:searchExp(obj)
                 var = nil
             end
         end
@@ -186,10 +197,7 @@ function mt:searchTable(exp)
             local res = self:searchExp(value)
             local var = self:addField(tbl, key[1], key)
             self:setTable(var, res)
-            self:addVarInfo(var, {
-                type   = 'set',
-                source = key,
-            })
+            self:addInfo(var, 'set', key)
         else
             self:searchExp(obj)
         end
@@ -256,10 +264,7 @@ function mt:markSimple(simple)
             if not obj.index then
                 var = self:addField(var, obj[1], obj)
                 if i == #simple then
-                    self:addVarInfo(var, {
-                        type   = 'set',
-                        source = obj,
-                    })
+                    self:addInfo(var, 'set', obj)
                 end
             else
                 var = nil
@@ -268,10 +273,7 @@ function mt:markSimple(simple)
             if obj.index then
                 var = self:addField(var, obj[1], obj)
                 if i == #simple then
-                    self:addVarInfo(var, {
-                        type   = 'set',
-                        source = obj,
-                    })
+                    self:addInfo(var, 'set', obj)
                 end
             else
                 var = nil
@@ -284,11 +286,7 @@ end
 function mt:markSet(simple, tbl)
     if simple.type == 'name' then
         local var = self:getVar(simple[1], simple)
-        self:addVarInfo(var, {
-            type   = 'set',
-            source = simple,
-        })
-        self:checkVar(var, simple)
+        self:addInfo(var, 'set', simple)
         self:setTable(var, tbl)
     else
         self:searchSimple(simple)
@@ -302,10 +300,11 @@ function mt:markLocal(name, tbl)
         local str = name[1]
         -- 创建一个局部变量
         local var = self:createLocal(str, name)
-        self:checkVar(var, name)
         self:setTable(var, tbl)
     elseif name.type == '...' then
-        self.env.dots = name
+        local dots = self:createDots()
+        self:addInfo(dots, 'local', name)
+        self.env.dots = dots
     elseif name.type == ':' then
         -- 创建一个局部变量
         self:createLocal('self', name)
@@ -441,21 +440,17 @@ end
 function mt:markLabel(label)
     local str = label[1]
     if not self.env.label[str] then
-        self.env.label[str] = {
-            type = 'label',
-        }
+        self.env.label[str] = self:createLabel(str)
     end
-    table.insert(self.env.label[str], label)
+    self:addInfo(self.env.label[str], 'set', label)
 end
 
 function mt:searchGoTo(obj)
     local str = obj[1]
     if not self.env.label[str] then
-        self.env.label[str] = {
-            type = 'label',
-        }
+        self.env.label[str] = self:createLabel(str)
     end
-    self.result = self.env.label[str]
+    self:addInfo(self.env.label[str], 'goto', obj)
 end
 
 function mt:searchAction(action)
@@ -499,6 +494,43 @@ function mt:searchActions(actions)
     return nil
 end
 
+function mt:definition()
+    for _, var in ipairs(self.results.vars) do
+        for _, info in ipairs(var) do
+            if self:isContainPos(info.source) then
+                self.result = {
+                    type = 'var',
+                    var = var,
+                }
+                return
+            end
+        end
+    end
+    for _, dots in ipairs(self.results.dots) do
+        for _, info in ipairs(dots) do
+            if self:isContainPos(info.source) then
+                self.result = {
+                    type = 'dots',
+                    dots = dots,
+                }
+                return
+            end
+        end
+    end
+    for _, label in ipairs(self.results.labels) do
+        for _, info in ipairs(label) do
+            if self:isContainPos(info.source) then
+                self.result = {
+                    type = 'label',
+                    label = label,
+                }
+                return
+            end
+        end
+    end
+    log.error('no found')
+end
+
 local function parseResult(result)
     local results = {}
     local tp = result.type
@@ -511,12 +543,9 @@ local function parseResult(result)
             end
             results[1] = {source.start, source.finish}
         elseif var.type == 'field' then
-            if #var == 0 then
-                return false
-            end
-            for i, info in ipairs(var) do
+            for _, info in ipairs(var) do
                 if info.type == 'set' then
-                    results[i] = {info.source.start, info.source.finish}
+                    results[#results+1] = {info.source.start, info.source.finish}
                 end
             end
         else
@@ -524,10 +553,17 @@ local function parseResult(result)
         end
     elseif tp == 'dots' then
         local dots = result.dots
-        results[1] = {dots.start, dots.finish}
+        for _, info in ipairs(dots) do
+            if info.type == 'local' then
+                results[#results+1] = {info.source.start, info.source.finish}
+            end
+        end
     elseif tp == 'label' then
-        for i, label in ipairs(result) do
-            results[i] = {label.start, label.finish}
+        local label = result.label
+        for _, info in ipairs(label) do
+            if info.type == 'set' then
+                results[#results+1] = {info.source.start, info.source.finish}
+            end
         end
     else
         error('unknow result.type:' .. result.type)
@@ -538,11 +574,21 @@ end
 return function (ast, pos)
     local searcher = setmetatable({
         pos = pos,
-        env = env {var = {}, usable = {}},
+        env = env {
+            var = {},
+            usable = {}
+        },
+        results = {
+            labels = {},
+            vars = {},
+            dots = {},
+        }
     }, mt)
     searcher.env.label = {}
     searcher:createLocal('_ENV')
     searcher:searchActions(ast)
+
+    searcher:definition()
 
     if not searcher.result then
         return false

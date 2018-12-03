@@ -1,5 +1,5 @@
-local sleep      = require 'ffi.sleep'
 local subprocess = require 'bee.subprocess'
+local thread     = require 'bee.thread'
 local lsp        = require 'lsp'
 local Method     = require 'method'
 local fs         = require 'bee.filesystem'
@@ -78,7 +78,7 @@ local function listen(self, input, output)
 
     while true do
         session:runStep()
-        sleep(1)
+        thread.sleep(0.001)
     end
 end
 

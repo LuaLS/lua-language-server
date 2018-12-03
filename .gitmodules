@@ -1,0 +1,3 @@
+[submodule "server/bee.lua"]
+	path = server/bee.lua
+	url = https://github.com/actboy168/bee.lua

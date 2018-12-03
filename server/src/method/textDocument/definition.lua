@@ -5,7 +5,7 @@ return function (lsp, params)
     local start_clock = os.clock()
     local uri = params.textDocument.uri
     local results, lines = lsp:loadText(uri)
-    if not ast then
+    if not results then
         return {}
     end
     -- lua是从1开始的，因此都要+1

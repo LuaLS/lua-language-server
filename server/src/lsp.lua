@@ -1,5 +1,6 @@
-local json   = require 'json'
-local parser = require 'parser'
+local json    = require 'json'
+local parser  = require 'parser'
+local matcher = require 'matcher'
 
 local ErrorCodes = {
 	-- Defined by JSON RPC
@@ -168,7 +169,7 @@ function mt:loadText(uri)
         return nil
     end
     self:compileText(uri)
-    return obj.ast, obj.lines
+    return obj.results, obj.lines
 end
 
 function mt:compileText(uri)
@@ -180,8 +181,9 @@ function mt:compileText(uri)
         return nil
     end
     self._need_compile[uri] = nil
-    obj.ast   = parser:ast(obj.text)
-    obj.lines = parser:lines(obj.text)
+    local ast = parser:ast(obj.text)
+    obj.results = matcher.compile(ast)
+    obj.lines   = parser:lines(obj.text)
     return obj
 end
 

@@ -491,6 +491,9 @@ function mt:searchActions(actions)
 end
 
 return function (ast)
+    if not ast then
+        return nil
+    end
     local searcher = setmetatable({
         env = env {
             var = {},

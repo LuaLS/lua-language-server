@@ -498,37 +498,34 @@ function mt:definition()
     for _, var in ipairs(self.results.vars) do
         for _, info in ipairs(var) do
             if self:isContainPos(info.source) then
-                self.result = {
+                return {
                     type = 'var',
                     var = var,
                 }
-                return
             end
         end
     end
     for _, dots in ipairs(self.results.dots) do
         for _, info in ipairs(dots) do
             if self:isContainPos(info.source) then
-                self.result = {
+                return {
                     type = 'dots',
                     dots = dots,
                 }
-                return
             end
         end
     end
     for _, label in ipairs(self.results.labels) do
         for _, info in ipairs(label) do
             if self:isContainPos(info.source) then
-                self.result = {
+                return {
                     type = 'label',
                     label = label,
                 }
-                return
             end
         end
     end
-    log.error('no found')
+    return nil
 end
 
 local function parseResult(result)
@@ -588,11 +585,11 @@ return function (ast, pos)
     searcher:createLocal('_ENV')
     searcher:searchActions(ast)
 
-    searcher:definition()
+    local result = searcher:definition()
 
-    if not searcher.result then
+    if not result then
         return false
     end
 
-    return parseResult(searcher.result)
+    return parseResult(result)
 end

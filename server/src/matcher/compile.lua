@@ -157,12 +157,10 @@ function mt:searchSimple(simple)
                 end
             end
         else
-            if obj.index then
-                if obj.type == 'string' or obj.type == 'number' or obj.type == 'boolean' then
-                    var = self:getField(var, obj[1], obj)
-                    if i ~= #simple then
-                        self:addInfo(var, 'get', obj)
-                    end
+            if obj.index and (obj.type == 'string' or obj.type == 'number' or obj.type == 'boolean') then
+                var = self:getField(var, obj[1], obj)
+                if i ~= #simple then
+                    self:addInfo(var, 'get', obj)
                 end
             else
                 self:searchExp(obj)
@@ -266,7 +264,7 @@ function mt:markSimple(simple)
                 var = nil
             end
         else
-            if obj.index then
+            if obj.index and (obj.type == 'string' or obj.type == 'number' or obj.type == 'boolean') then
                 var = self:addField(var, obj[1], obj)
                 if i == #simple then
                     self:addInfo(var, 'set', obj)

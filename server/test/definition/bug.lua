@@ -39,3 +39,7 @@ TEST [[
 local <!args!>
 io.load(root / <?args?>.source / 'API' / path)
 ]]
+
+TEST [[
+obj[#<?obj?>+1] = {}
+]]

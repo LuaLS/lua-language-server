@@ -132,6 +132,9 @@ end
 
 function mt:searchSimple(simple)
     local name = simple[1]
+    if name.type ~= 'name' then
+        return
+    end
     local var = self:getVar(name[1], name)
     self:checkVar(var, name)
     for i = 2, #simple do

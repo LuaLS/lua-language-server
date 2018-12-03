@@ -137,16 +137,17 @@ function mt:searchSimple(simple)
         var = self:getVar(name[1], name)
         self:checkVar(var, name)
     end
+    self:searchExp(simple[1])
     for i = 2, #simple do
         local obj = simple[i]
         local tp = obj.type
+        self:searchExp(obj)
         if     tp == 'call' then
             var = self:searchCall(obj, simple, i)
         elseif tp == ':' then
         elseif tp == 'name' then
             if obj.index then
                 var = nil
-                self:searchExp(obj)
             else
                 var = self:getField(var, obj[1], obj)
                 self:checkVar(var, obj)
@@ -156,8 +157,6 @@ function mt:searchSimple(simple)
                 if obj.type == 'string' or obj.type == 'number' or obj.type == 'boolean' then
                     var = self:getField(var, obj[1], obj)
                     self:checkVar(var, obj)
-                else
-                    self:searchExp(obj)
                 end
             else
                 var = nil

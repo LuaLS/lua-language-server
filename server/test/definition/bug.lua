@@ -29,3 +29,8 @@ function _(...)
     end
 end
 ]]
+
+TEST [[
+local <!a!>
+(<?a?> / b)()
+]]

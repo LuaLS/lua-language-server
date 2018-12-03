@@ -50,7 +50,6 @@ function mt:_readProtoHead()
         return
     end
     if header:sub(1, #'Content-Length') == 'Content-Length' then
-        log.debug('read proto header')
         return header
     elseif header:sub(1, #'Content-Type') == 'Content-Type' then
     else
@@ -68,7 +67,6 @@ function mt:_readProtoContent(header)
     if not buf then
         return
     end
-    log.debug('read proto content')
     local suc, res = pcall(json.decode, buf)
     if not suc then
         log.error('错误的协议：', buf)
@@ -77,7 +75,6 @@ function mt:_readProtoContent(header)
     local id     = res.id
     local method = res.method
     local params = res.params
-    log.debug('recive', id)
     local response, err = self:_callback(method, params)
     if id then
         if response then
@@ -94,7 +91,6 @@ function mt:_readProtoContent(header)
                 },
             }
         end
-        log.debug('send', id)
     end
     if response == nil then
         log.error(err or ('没有回应：' .. method))

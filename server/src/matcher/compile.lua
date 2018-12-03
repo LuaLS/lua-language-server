@@ -153,16 +153,12 @@ function mt:searchSimple(simple)
                 var = nil
             else
                 var = self:getField(var, obj[1], obj)
-                if i ~= #simple then
-                    self:addInfo(var, 'get', obj)
-                end
+                self:addInfo(var, 'get', obj)
             end
         else
             if obj.index and (obj.type == 'string' or obj.type == 'number' or obj.type == 'boolean') then
                 var = self:getField(var, obj[1], obj)
-                if i ~= #simple then
-                    self:addInfo(var, 'get', obj)
-                end
+                self:addInfo(var, 'get', obj)
             else
                 self:searchExp(obj)
                 var = nil
@@ -178,7 +174,7 @@ function mt:searchBinary(exp)
 end
 
 function mt:searchUnary(exp)
-    return self:searchExp(exp[1])
+    self:searchExp(exp[1])
 end
 
 function mt:searchTable(exp)
@@ -247,28 +243,42 @@ end
 
 function mt:markSimple(simple)
     local name = simple[1]
-    local var = self:getVar(name[1], name)
+    local var
+    if name.type == 'name' then
+        var = self:getVar(name[1], name)
+    end
+    self:searchExp(simple[1])
     for i = 2, #simple do
         local obj = simple[i]
         local tp  = obj.type
-        if     tp == ':' then
+        if     tp == 'call' then
+            var = self:searchCall(obj, simple, i)
+        elseif tp == ':' then
             var = self:createLocal('self', simple[i-1], self:getVar(simple[i-1][1]))
         elseif tp == 'name' then
-            if not obj.index then
-                var = self:addField(var, obj[1], obj)
-                if i == #simple then
-                    self:addInfo(var, 'set', obj)
-                end
-            else
+            if obj.index then
+                self:checkName(obj)
                 var = nil
+            else
+                if i == #simple then
+                    var = self:addField(var, obj[1], obj)
+                    self:addInfo(var, 'set', obj)
+                else
+                    var = self:getField(var, obj[1], obj)
+                    self:addInfo(var, 'get', obj)
+                end
             end
         else
             if obj.index and (obj.type == 'string' or obj.type == 'number' or obj.type == 'boolean') then
-                var = self:addField(var, obj[1], obj)
                 if i == #simple then
+                    var = self:addField(var, obj[1], obj)
                     self:addInfo(var, 'set', obj)
+                else
+                    var = self:getField(var, obj[1], obj)
+                    self:addInfo(var, 'get', obj)
                 end
             else
+                self:searchExp(obj)
                 var = nil
             end
         end
@@ -282,7 +292,6 @@ function mt:markSet(simple, tbl)
         self:addInfo(var, 'set', simple)
         self:setTable(var, tbl)
     else
-        self:searchSimple(simple)
         local var = self:markSimple(simple)
         self:setTable(var, tbl)
     end

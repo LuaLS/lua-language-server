@@ -43,3 +43,12 @@ io.load(root / <?args?>.source / 'API' / path)
 TEST [[
 obj[#<?obj?>+1] = {}
 ]]
+
+TEST [[
+self = {
+    results = {
+        <!labels!> = {},
+    }
+}
+self[self.results.<?labels?>] = lbl
+]]

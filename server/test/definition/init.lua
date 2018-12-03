@@ -41,7 +41,9 @@ end
 
 function TEST(script)
     local target = catch_target(script)
-    local pos    = script:find('<?', 1, true) + 2
+    local start  = script:find('<?', 1, true)
+    local finish = script:find('?>', 1, true)
+    local pos = (start + finish) // 2 + 1
     local new_script = script:gsub('<[!?]', '  '):gsub('[!?]>', '  ')
     local ast, err = parser:ast(new_script)
     assert(ast)

@@ -4,20 +4,20 @@ local matcher = require 'matcher'
 return function (lsp, params)
     local start_clock = os.clock()
     local uri = params.textDocument.uri
-    local ast, lines = lsp:loadText(uri)
+    local results, lines = lsp:loadText(uri)
     if not ast then
         return {}
     end
     -- lua是从1开始的，因此都要+1
     local position = lines:position(params.position.line + 1, params.position.character + 1, 'utf8')
-    local suc, results = matcher.definition(ast, position)
-    if not suc then
+    local positions = matcher.definition(results, position)
+    if not positions then
         return {}
     end
 
     local locations = {}
-    for i, result in ipairs(results) do
-        local start, finish = result[1], result[2]
+    for i, position in ipairs(positions) do
+        local start, finish = position[1], position[2]
         local start_row,  start_col  = lines:rowcol(start,  'utf8')
         local finish_row, finish_col = lines:rowcol(finish, 'utf8')
         locations[i] = {

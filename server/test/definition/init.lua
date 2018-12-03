@@ -45,10 +45,11 @@ function TEST(script)
     local new_script = script:gsub('<[!?]', '  '):gsub('[!?]>', '  ')
     local ast, err = parser:ast(new_script)
     assert(ast)
+    local results = matcher.compile(ast)
+    assert(results)
 
-    local suc, result = matcher.definition(ast, pos)
-    if suc then
-        assert(suc)
+    local result = matcher.definition(results, pos)
+    if result then
         assert(founded(target, result))
     else
         assert(#target == 0)

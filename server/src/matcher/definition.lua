@@ -167,7 +167,8 @@ function mt:searchSimple(simple)
 end
 
 function mt:searchBinary(exp)
-    return self:searchExp(exp[1]) or self:searchExp(exp[2])
+    self:searchExp(exp[1])
+    self:searchExp(exp[2])
 end
 
 function mt:searchUnary(exp)

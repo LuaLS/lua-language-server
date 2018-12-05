@@ -430,7 +430,9 @@ function mt:searchFunction(func)
 end
 
 function mt:searchLocalFunction(func)
-    self:markLocal(func.name)
+    if func.name then
+        self:markLocal(func.name)
+    end
     self.env:push()
     self:forList(func.arg, function (arg)
         self:markLocal(arg)

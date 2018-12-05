@@ -232,6 +232,9 @@ function mt:setTable(var, tbl, mode)
         return
     end
     var.childs = tbl.childs
+    for _, child in pairs(tbl.childs) do
+        child.parent = var
+    end
 end
 
 function mt:setMeta(var, meta)

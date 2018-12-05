@@ -8,6 +8,8 @@ return function (lsp, data)
             implementationProvider = true,
             -- 支持“查找引用”
             referencesProvider = true,
+            -- 支持“重命名”
+            renameProvider = true,
             -- 文本同步方式
             textDocumentSync = {
                 -- 打开关闭文本时通知

@@ -1,59 +1,64 @@
 local subprocess = require 'bee.subprocess'
-local Method     = require 'method'
+local method     = require 'method'
 local fs         = require 'bee.filesystem'
 local thread     = require 'thread'
 local json       = require 'json'
 local parser     = require 'parser'
 local matcher    = require 'matcher'
 
-
 local ErrorCodes = {
-	-- Defined by JSON RPC
-	ParseError           = -32700,
-	InvalidRequest       = -32600,
-	MethodNotFound       = -32601,
-	InvalidParams        = -32602,
-	InternalError        = -32603,
-	serverErrorStart     = -32099,
-	serverErrorEnd       = -32000,
-	ServerNotInitialized = -32002,
-	UnknownErrorCode     = -32001,
+    -- Defined by JSON RPC
+    ParseError           = -32700,
+    InvalidRequest       = -32600,
+    MethodNotFound       = -32601,
+    InvalidParams        = -32602,
+    InternalError        = -32603,
+    serverErrorStart     = -32099,
+    serverErrorEnd       = -32000,
+    ServerNotInitialized = -32002,
+    UnknownErrorCode     = -32001,
 
-	-- Defined by the protocol.
-	RequestCancelled     = -32800,
+    -- Defined by the protocol.
+    RequestCancelled     = -32800,
 }
 
 local mt = {}
 mt.__index = mt
-mt._input = nil
-mt._output = nil
-mt._method = nil
-mt._file = nil
 
-function mt:_callback(method, params)
-    local f = self._method
-    if f then
-        return f(method, params)
+function mt:_callMethod(name, params)
+    local optional
+    if name:sub(1, 2) == '$/' then
+        name = name:sub(3)
+        optional = true
     end
-    return nil, '没有注册method'
+    local f = method[name]
+    if f then
+        local suc, res, res2 = pcall(f, self, params)
+        if suc then
+            return res, res2
+        else
+            return nil, '发生运行时错误：' .. res
+        end
+    end
+    if optional then
+        return false
+    else
+        return nil, '没有注册方法：' .. name
+    end
 end
 
 function mt:_send(data)
-    local f = self._output
-    if not f then
-        return
-    end
     data.jsonrpc = '2.0'
     local content = json.encode(data)
     local buf = ('Content-Length: %d\r\n\r\n%s'):format(#content, content)
-    f(buf)
+    io.write(buf)
 end
 
 function mt:_doProto(proto)
     local id     = proto.id
     local method = proto.method
     local params = proto.params
-    local response, err = self:_callback(method, params)
+    local response, err = self:_callMethod(method, params)
     if id then
         if response then
             self:_send {
@@ -104,14 +109,6 @@ function mt:_buildTextCache()
         size / passed / 1000,
         collectgarbage 'count'
     ))
-end
-
-function mt:setInput(input)
-    self._input = input
-end
-
-function mt:setOutput(output)
-    self._output = output
 end
 
 function mt:read(mode)
@@ -168,15 +165,10 @@ function mt:removeText(uri)
     self._need_compile[uri] = nil
 end
 
-function mt:setMethod(method)
-    self._method = method
-end
-
-function mt:runStep()
-    local proto = self._input()
+function mt:on_tick()
+    local proto = thread.proto()
     if proto then
         -- 协议内容读取成功后重置
-        self._header = nil
         self._idle_clock = os.clock()
         self:_doProto(proto)
         return
@@ -184,11 +176,6 @@ function mt:runStep()
     if os.clock() - self._idle_clock >= 1 then
         self:_buildTextCache()
     end
-end
-
-function mt:stop()
-    self._input = nil
-    self._output = nil
 end
 
 function mt:listen()
@@ -199,37 +186,9 @@ function mt:listen()
 
     thread.require 'proto'
 
-    self:setInput(function ()
-        return thread.proto()
-    end)
-    self:setOutput(function (buf)
-        io.write(buf)
-    end)
-    self:setMethod(function (method, params)
-        local optional
-        if method:sub(1, 2) == '$/' then
-            method = method:sub(3)
-            optional = true
-        end
-        local f = Method[method]
-        if f then
-            local suc, res, res2 = pcall(f, self, params)
-            if suc then
-                return res, res2
-            else
-                return nil, '发生运行时错误：' .. res
-            end
-        end
-        if optional then
-            return false
-        else
-            return nil, '没有注册方法：' .. method
-        end
-    end)
-
     while true do
         thread.on_tick()
-        self:runStep()
+        self:on_tick()
         thread.sleep(0.001)
     end
 end
@@ -238,7 +197,6 @@ return function ()
     local session = setmetatable({
         _file = {},
         _need_compile = {},
-        _header = nil,
         _idle_clock = os.clock(),
     }, mt)
     return session

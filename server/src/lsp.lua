@@ -45,37 +45,10 @@ function mt:_send(data)
     f(buf)
 end
 
-function mt:_readProtoHead()
-    local header = self:read 'l'
-    if not header then
-        return
-    end
-    if header:sub(1, #'Content-Length') == 'Content-Length' then
-        return header
-    elseif header:sub(1, #'Content-Type') == 'Content-Type' then
-    else
-        log.error('错误的协议头：', header)
-    end
-end
-
-function mt:_readProtoContent(header)
-    local len = tonumber(header:match('%d+'))
-    if not len then
-        log.error('错误的协议头：', header)
-        return true
-    end
-    local buf = self:read(len+2)
-    if not buf then
-        return
-    end
-    local suc, res = pcall(json.decode, buf)
-    if not suc then
-        log.error('错误的协议：', buf)
-        return true
-    end
-    local id     = res.id
-    local method = res.method
-    local params = res.params
+function mt:_doProto(proto)
+    local id     = proto.id
+    local method = proto.method
+    local params = proto.params
     local response, err = self:_callback(method, params)
     if id then
         if response then
@@ -96,7 +69,6 @@ function mt:_readProtoContent(header)
     if response == nil then
         log.error(err or ('没有回应：' .. method))
     end
-    return true
 end
 
 function mt:_buildTextCache()
@@ -197,18 +169,12 @@ function mt:setMethod(method)
 end
 
 function mt:runStep()
-    if not self._header then
-        -- 如果没有协议头，则尝试读一条协议头
-        self._header = self:_readProtoHead()
-    end
-    if self._header then
-        -- 如果有协议头，则读取协议内容
-        local suc = self:_readProtoContent(self._header)
-        if suc then
-            -- 协议内容读取成功后重置
-            self._header = nil
-            self._idle_clock = os.clock()
-        end
+    local proto = self._input()
+    if proto then
+        -- 协议内容读取成功后重置
+        self._header = nil
+        self._idle_clock = os.clock()
+        self:_doProto(proto)
         return
     end
     if os.clock() - self._idle_clock >= 1 then

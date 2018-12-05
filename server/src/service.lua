@@ -1,55 +1,20 @@
 local subprocess = require 'bee.subprocess'
-local thread     = require 'bee.thread'
 local lsp        = require 'lsp'
 local Method     = require 'method'
 local fs         = require 'bee.filesystem'
+local thread     = require 'thread'
 
-local function listen(self, input, output)
-    if input then
-        log.info('指定输入文件，路径为：', input)
-        fs.create_directories(input:parent_path())
-        io.input(io.open(input:string(), 'rb'))
-    else
-        subprocess.filemode(io.stdin, 'b')
-    end
-    if output then
-        log.info('指定输出文件，路径为：', output)
-        fs.create_directories(output:parent_path())
-        io.output(io.open(output:string(), 'wb'))
-    else
-        subprocess.filemode(io.stdout, 'b')
-    end
-    io.input():setvbuf 'no'
-    io.output():setvbuf 'no'
+local function listen(self)
+    subprocess.filemode(io.stdin, 'b')
+    subprocess.filemode(io.stdout, 'b')
+    io.stdin:setvbuf 'no'
+    io.stdout:setvbuf 'no'
+
+    thread.require 'proto'
 
     local session = lsp()
-    local cache = ''
-    session:setInput(function (mode)
-        local num = subprocess.peek(io.input())
-        if num > 0 then
-            cache = cache .. io.read(num)
-        end
-        if type(mode) == 'number' then
-            if #cache < mode then
-                return nil
-            end
-            local res = cache:sub(1, mode)
-            cache = cache:sub(mode + 1)
-            return res
-        elseif mode == 'l' then
-            local pos = cache:find '[\r\n]'
-            if not pos then
-                return nil
-            end
-            local res = cache:sub(1, pos - 1)
-            if cache:sub(pos, pos + 1) == '\r\n' then
-                cache = cache:sub(pos + 2)
-            else
-                cache = cache:sub(pos + 1)
-            end
-            return res
-        end
-        return nil
+    session:setInput(function ()
+        return thread.proto()
     end)
     session:setOutput(function (buf)
         io.write(buf)
@@ -77,6 +42,7 @@ local function listen(self, input, output)
     end)
 
     while true do
+        thread.on_tick()
         session:runStep()
         thread.sleep(0.001)
     end

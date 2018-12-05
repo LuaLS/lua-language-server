@@ -62,6 +62,7 @@ function mt:createLocal(key, source, var)
     end
     if not var then
         var = self:createVar('local', key, source)
+        self:addInfo(var, 'local', source)
     end
     self.env.var[key] = var
     return var
@@ -514,7 +515,7 @@ return function (ast)
         }
     }, mt)
     searcher.env.label = {}
-    searcher:createLocal('_ENV')
+    searcher:createLocal('_ENV', { start = -1, finish = -1 })
     searcher:searchActions(ast)
 
     return searcher.results

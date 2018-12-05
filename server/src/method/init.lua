@@ -13,5 +13,6 @@ init 'textDocument/definition'
 init 'textDocument/didOpen'
 init 'textDocument/didChange'
 init 'textDocument/didClose'
+init 'textDocument/references'
 
 return method

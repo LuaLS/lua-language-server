@@ -57,45 +57,35 @@ local function tryMeta(var)
     return nil
 end
 
-local function parseResult(result)
+local function parseResult(result, declarat)
     local positions = {}
     local tp = result.type
     if     tp == 'var' then
         local var = result.var
-        if var.type == 'local' then
-            for _, info in ipairs(var) do
-                if info.type == 'local' then
+        for _, info in ipairs(var) do
+            if declarat or info.type == 'get' then
+                positions[#positions+1] = {info.source.start, info.source.finish}
+            end
+        end
+        local metavar = tryMeta(var)
+        if metavar then
+            for _, info in ipairs(metavar) do
+                if declarat or info.type == 'get' then
                     positions[#positions+1] = {info.source.start, info.source.finish}
                 end
             end
-        elseif var.type == 'field' then
-            for _, info in ipairs(var) do
-                if info.type == 'set' then
-                    positions[#positions+1] = {info.source.start, info.source.finish}
-                end
-            end
-            local metavar = tryMeta(var)
-            if metavar then
-                for _, info in ipairs(metavar) do
-                    if info.type == 'set' then
-                        positions[#positions+1] = {info.source.start, info.source.finish}
-                    end
-                end
-            end
-        else
-            error('unknow var.type:' .. var.type)
         end
     elseif tp == 'dots' then
         local dots = result.dots
         for _, info in ipairs(dots) do
-            if info.type == 'local' then
+            if declarat or info.type == 'get' then
                 positions[#positions+1] = {info.source.start, info.source.finish}
             end
         end
     elseif tp == 'label' then
         local label = result.label
         for _, info in ipairs(label) do
-            if info.type == 'set' then
+            if declarat or info.type == 'goto' then
                 positions[#positions+1] = {info.source.start, info.source.finish}
             end
         end
@@ -105,11 +95,11 @@ local function parseResult(result)
     return positions
 end
 
-return function (results, pos)
+return function (results, pos, declarat)
     local result = findResult(results, pos)
     if not result then
         return nil
     end
-    local positions = parseResult(result)
+    local positions = parseResult(result, declarat)
     return positions
 end

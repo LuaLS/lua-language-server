@@ -1,4 +1,5 @@
 local findResult = require 'matcher.find_result'
+local parser = require 'parser'
 
 local function tryMeta(var)
     local keys = {}
@@ -20,7 +21,7 @@ local function tryMeta(var)
     return nil
 end
 
-local function parseResult(result)
+local function parseResult(result, newName)
     local positions = {}
     local tp = result.type
     if     tp == 'var' then
@@ -28,6 +29,15 @@ local function parseResult(result)
         local key = result.info.source[1]
         if var.disable_rename and key == 'self' then
             return positions
+        end
+        if result.info.source.index then
+            if not parser.grammar(newName, 'Exp') then
+                return positions
+            end
+        else
+            if not parser.grammar(newName, 'Name') then
+                return positions
+            end
         end
         for _, info in ipairs(var) do
             if info.source[1] == key then
@@ -51,11 +61,11 @@ local function parseResult(result)
     return positions
 end
 
-return function (results, pos)
+return function (results, pos, newName)
     local result = findResult(results, pos)
     if not result then
         return nil
     end
-    local positions = parseResult(result)
+    local positions = parseResult(result, newName)
     return positions
 end

@@ -2,7 +2,6 @@ local parser = require 'parser'
 local matcher = require 'matcher'
 
 return function (lsp, params)
-    local start_clock = os.clock()
     local uri = params.textDocument.uri
     local newName = params.newName
     local results, lines = lsp:loadText(uri)
@@ -42,10 +41,6 @@ return function (lsp, params)
             [uri] = TextEdit,
         },
     }
-    local passed_clock = os.clock() - start_clock
-    if passed_clock >= 0.01 then
-        log.warn(('[Find References] takes [%.3f] sec, size [%s] bits.'):format(passed_clock, #lines.buf))
-    end
 
     return response
 end

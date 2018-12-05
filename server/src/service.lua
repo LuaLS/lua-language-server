@@ -33,7 +33,12 @@ function mt:_callMethod(name, params)
     end
     local f = method[name]
     if f then
+        local clock = os.clock()
         local suc, res, res2 = pcall(f, self, params)
+        local passed = os.clock() - clock
+        if passed > 0.01 then
+            log.debug(('Task [%s] takes [%.3f] sec.'):format(name, passed))
+        end
         if suc then
             return res, res2
         else

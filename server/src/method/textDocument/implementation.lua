@@ -2,29 +2,24 @@ local parser = require 'parser'
 local matcher = require 'matcher'
 
 return function (lsp, params)
-    local uri = params.textDocument.uri
-    local text = lsp:loadText(uri)
-    if not text then
-        return nil, 'Cannot find file: ' .. uri
-    end
     local start_clock = os.clock()
+    local uri = params.textDocument.uri
+    local results, lines = lsp:loadText(uri)
+    if not results then
+        return {}
+    end
     -- lua是从1开始的，因此都要+1
-    local pos = parser.calcline.position_utf8(text, params.position.line + 1, params.position.character + 1)
-    local suc, results, info = matcher.implementation(text, pos)
-    if not suc then
-        if info then
-            log.debug(results, uri)
-            info.lua = nil
-            log.debug(table.dump(info))
-        end
+    local position = lines:position(params.position.line + 1, params.position.character + 1, 'utf8')
+    local positions = matcher.implementation(results, position)
+    if not positions then
         return {}
     end
 
     local locations = {}
-    for i, result in ipairs(results) do
-        local start, finish = result[1], result[2]
-        local start_row,  start_col  = parser.calcline.rowcol_utf8(text, start)
-        local finish_row, finish_col = parser.calcline.rowcol_utf8(text, finish)
+    for i, position in ipairs(positions) do
+        local start, finish = position[1], position[2]
+        local start_row,  start_col  = lines:rowcol(start,  'utf8')
+        local finish_row, finish_col = lines:rowcol(finish, 'utf8')
         locations[i] = {
             uri = uri,
             range = {
@@ -44,7 +39,7 @@ return function (lsp, params)
     local response = locations
     local passed_clock = os.clock() - start_clock
     if passed_clock >= 0.01 then
-        log.warn(('[Goto Implementation] takes [%.3f] sec, size [%s] bits.'):format(passed_clock, #text))
+        log.warn(('[Goto Implementation] takes [%.3f] sec, size [%s] bits.'):format(passed_clock, #lines.buf))
     end
 
     return response

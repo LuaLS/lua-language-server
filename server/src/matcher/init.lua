@@ -1,6 +1,7 @@
 local api = {
-    definition  = require 'matcher.definition',
-    compile     = require 'matcher.compile',
+    definition     = require 'matcher.definition',
+    implementation = require 'matcher.implementation',
+    compile        = require 'matcher.compile',
 }
 
 return api

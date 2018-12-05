@@ -100,7 +100,7 @@ local function parseResult(result)
             end
         end
     else
-        error('unknow result.type:' .. result.type)
+        error('Unknow result type:' .. result.type)
     end
     return positions
 end

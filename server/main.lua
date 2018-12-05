@@ -5,7 +5,7 @@ package.path = (ROOT / 'src' / '?.lua'):string()
 
 log = require 'log'
 log.init(ROOT, ROOT / 'log' / 'test.log')
-log.info('Lua 语言服务启动，路径为：', ROOT)
+log.info('Lua Lsp startup, root: ', ROOT)
 
 local dbg = require 'debugger'
 dbg:io 'listen:0.0.0.0:546858'

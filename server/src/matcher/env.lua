@@ -83,7 +83,7 @@ return function (root)
                     o[key][k] = v
                 end
             else
-                error(('[env.%s]是表，赋值也需要是表：[%s]'):format(key, value))
+                error(('[env.%s] should be table, got [%s]'):format(key, value))
             end
         else
             o[key] = value

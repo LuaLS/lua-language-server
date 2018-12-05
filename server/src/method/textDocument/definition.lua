@@ -39,7 +39,7 @@ return function (lsp, params)
     local response = locations
     local passed_clock = os.clock() - start_clock
     if passed_clock >= 0.01 then
-        log.warn(('[转到定义]耗时[%.3f]秒，文件大小[%s]字节'):format(passed_clock, #lines.buf))
+        log.warn(('[Goto Definition] takes [%.3f] sec, size [%s] bits.'):format(passed_clock, #lines.buf))
     end
 
     return response

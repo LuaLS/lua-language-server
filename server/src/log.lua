@@ -53,7 +53,7 @@ local function push_log(level, ...)
     log.file:write(buf)
     log.size = log.size + #buf
     if log.size > log.max_size then
-        log.file:write('[日志过大]')
+        log.file:write('[REACH MAX SIZE]')
     end
     return str
 end

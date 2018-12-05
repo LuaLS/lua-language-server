@@ -5,7 +5,7 @@ return function (lsp, params)
     local uri = params.textDocument.uri
     local text = lsp:loadText(uri)
     if not text then
-        return nil, '找不到文件：' .. uri
+        return nil, 'Cannot find file: ' .. uri
     end
     local start_clock = os.clock()
     -- lua是从1开始的，因此都要+1
@@ -44,7 +44,7 @@ return function (lsp, params)
     local response = locations
     local passed_clock = os.clock() - start_clock
     if passed_clock >= 0.01 then
-        log.warn(('[转到实现]耗时[%.3f]秒，文件大小[%s]字节'):format(passed_clock, #text))
+        log.warn(('[Goto Implementation] takes [%.3f] sec, size [%s] bits.'):format(passed_clock, #text))
     end
 
     return response

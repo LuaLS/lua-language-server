@@ -14,14 +14,14 @@ local KEY = {}
 
 function table.dump(tbl)
     if type(tbl) ~= 'table' then
-        error('必须是表')
+        error('Must be a table')
     end
     local table_mark = {}
     local lines = {}
     lines[#lines+1] = '{'
     local function unpack(tbl, tab)
         if table_mark[tbl] then
-            error('不能循环引用')
+            error('Cyclic references are not allowed.')
         end
         table_mark[tbl] = true
         local keys = {}
@@ -35,7 +35,7 @@ function table.dump(tbl)
             elseif math_type(key) == 'integer' then
                 KEY[key] = ('[%d]'):format(key)
             else
-                error('必须使用字符串或整数作为键')
+                error('Key must be `string` or `integer`')
             end
             keys[#keys+1] = key
         end
@@ -52,7 +52,7 @@ function table.dump(tbl)
             elseif tp == 'string' or tp == 'number' or tp == 'boolean' then
                 lines[#lines+1] = ('%s%s = %q,'):format(TAB[tab+1], KEY[key], value)
             else
-                error(('不支持的值类型[%s]'):format(tp))
+                error(('Unsupport value type: [%s]'):format(tp))
             end
         end
     end

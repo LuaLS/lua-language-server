@@ -23,7 +23,7 @@ local function readProtoHeader()
     elseif header:sub(1, #'Content-Type') == 'Content-Type' then
         return nil
     else
-        log.error('错误的协议头：', header)
+        log.error('Proto header error:', header)
         return nil
     end
 end
@@ -31,7 +31,7 @@ end
 local function readProtoContent(header)
     local len = tonumber(header:match('%d+'))
     if not len then
-        log.error('错误的协议头：', header)
+        log.error('Proto header error:', header)
         return nil
     end
     local buf = io.read(len+2)
@@ -40,7 +40,7 @@ local function readProtoContent(header)
     end
     local suc, res = pcall(json.decode, buf)
     if not suc then
-        log.error('错误的协议：', buf)
+        log.error('Proto error:', buf)
         return nil
     end
     return res

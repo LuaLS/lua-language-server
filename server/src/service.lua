@@ -37,13 +37,13 @@ function mt:_callMethod(name, params)
         if suc then
             return res, res2
         else
-            return nil, '发生运行时错误：' .. res
+            return nil, 'Runtime error: ' .. res
         end
     end
     if optional then
         return false
     else
-        return nil, '没有注册方法：' .. name
+        return nil, 'Undefined method: ' .. name
     end
 end
 
@@ -70,13 +70,13 @@ function mt:_doProto(proto)
                 id = id,
                 error = {
                     code = ErrorCodes.UnknownErrorCode,
-                    message = err or ('没有回应：' .. method),
+                    message = err or ('Lack of response: ' .. method),
                 },
             }
         end
     end
     if response == nil then
-        log.error(err or ('没有回应：' .. method))
+        log.error(err or ('Lack of response: ' .. method))
     end
 end
 
@@ -97,12 +97,12 @@ function mt:_buildTextCache()
     end
     local passed = os.clock() - clock
     log.debug(('\n\z
-    语法树缓存完成\n\z
-    耗时：[%.3f]秒\n\z
-    数量：[%d]\n\z
-    总大小：[%.3f]kb\n\z
-    速度：[%.3f]kb/s\n\z
-    内存：[%.3f]kb'):format(
+    Cache completion\n\z
+    Cost:  [%.3f]秒\n\z
+    Num:   [%d]\n\z
+    Size:  [%.3f]kb\n\z
+    Speed：[%.3f]kb/s\n\z
+    Mem：  [%.3f]kb'):format(
         passed,
         #list,
         size / 1000,
@@ -168,7 +168,6 @@ end
 function mt:on_tick()
     local proto = thread.proto()
     if proto then
-        -- 协议内容读取成功后重置
         self._idle_clock = os.clock()
         self:_doProto(proto)
         return

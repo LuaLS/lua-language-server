@@ -23,9 +23,12 @@ end
 local function parseResult(result)
     local positions = {}
     local tp = result.type
-    local key = result.info.source[1]
     if     tp == 'var' then
         local var = result.var
+        local key = result.info.source[1]
+        if var.disable_rename and key == 'self' then
+            return positions
+        end
         for _, info in ipairs(var) do
             if info.source[1] == key then
                 positions[#positions+1] = {info.source.start, info.source.finish}
@@ -34,17 +37,13 @@ local function parseResult(result)
         local metavar = tryMeta(var)
         if metavar then
             for _, info in ipairs(metavar) do
-                if info.source[1] == key then
-                    positions[#positions+1] = {info.source.start, info.source.finish}
-                end
+                positions[#positions+1] = {info.source.start, info.source.finish}
             end
         end
     elseif tp == 'label' then
         local label = result.label
         for _, info in ipairs(label) do
-            if info.source[1] == key then
-                positions[#positions+1] = {info.source.start, info.source.finish}
-            end
+            positions[#positions+1] = {info.source.start, info.source.finish}
         end
     else
         error('Unknow result type:' .. result.type)

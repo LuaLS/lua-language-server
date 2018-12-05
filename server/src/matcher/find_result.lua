@@ -9,6 +9,7 @@ return function (results, pos)
                 return {
                     type = 'var',
                     var = var,
+                    info = info,
                 }
             end
         end
@@ -19,6 +20,7 @@ return function (results, pos)
                 return {
                     type = 'dots',
                     dots = dots,
+                    info = info,
                 }
             end
         end
@@ -29,6 +31,7 @@ return function (results, pos)
                 return {
                     type = 'label',
                     label = label,
+                    info = info,
                 }
             end
         end

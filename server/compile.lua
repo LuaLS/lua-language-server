@@ -15,7 +15,7 @@ local function compileRelease()
 end
 
 local function copyFile()
-    local source = root / 'bee.lua' / 'bin' / 'x86' / 'Release'
+    local source = root / 'bee.lua' / 'bin' / 'msvc_x86_Release'
     local target = root / 'bin'
     for _, name in ipairs {'bee.dll', 'lua.exe', 'lua54.dll'} do
         fs.copy_file(source / name, target / name, true)

@@ -39,6 +39,9 @@ local function searchUndefinedGlobal(results, callback)
         then
             goto NEXT_VAR
         end
+        if not var.key:find '%l' then
+            goto NEXT_VAR
+        end
         for _, info in ipairs(var) do
             if info.type == 'set' then
                 goto NEXT_VAR

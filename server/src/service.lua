@@ -34,21 +34,27 @@ function mt:_callMethod(name, params)
     local f = method[name]
     if f then
         local clock = os.clock()
-        local suc, res, res2 = pcall(f, self, params)
+        local suc, res = xpcall(f, log.error, self, params)
         local passed = os.clock() - clock
         if passed > 0.01 then
             log.debug(('Task [%s] takes [%.3f]sec.'):format(name, passed))
         end
         if suc then
-            return res, res2
+            return res
         else
-            return nil, 'Runtime error: ' .. res
+            return nil, {
+                code = ErrorCodes.InternalError,
+                message = res,
+            }
         end
     end
     if optional then
-        return false
+        return nil
     else
-        return nil, 'Undefined method: ' .. name
+        return nil, {
+            code = ErrorCodes.MethodNotFound,
+            message = 'MethodNotFound',
+        }
     end
 end
 
@@ -64,18 +70,50 @@ function mt:_doProto(proto)
     local method = proto.method
     local params = proto.params
     local response, err = self:_callMethod(method, params)
+    if not id then
+        return
+    end
     local proto  = json.table()
     proto.id     = id
-    proto.result = response
+    if err then
+        proto.error = err
+    else
+        proto.result = response
+    end
     self:_send(proto)
 end
 
+function mt:_doDiagnostic()
+    if not next(self._needDiagnostics) then
+        return
+    end
+    local copy = {}
+    for uri, data in pairs(self._needDiagnostics) do
+        copy[uri] = data
+        self._needDiagnostics[uri] = nil
+    end
+    for uri, data in pairs(copy) do
+        local ast     = data.ast
+        local results = data.results
+        local suc, res = xpcall(matcher.diagnostics, log.error, ast, results)
+        if suc then
+            self:_send {
+                method = 'textDocument/publishDiagnostics',
+                params = {
+                    uri = uri,
+                    diagnostics = res,
+                },
+            }
+        end
+    end
+end
+
 function mt:_buildTextCache()
-    if not next(self._need_compile) then
+    if not next(self._needCompile) then
         return
     end
     local list = {}
-    for uri in pairs(self._need_compile) do
+    for uri in pairs(self._needCompile) do
         list[#list+1] = uri
     end
 
@@ -123,13 +161,13 @@ function mt:saveText(uri, version, text)
         end
         obj.version = version
         obj.text = text
-        self._need_compile[uri] = true
+        self._needCompile[uri] = true
     else
         self._file[uri] = {
             version = version,
             text = text,
         }
-        self._need_compile[uri] = true
+        self._needCompile[uri] = true
     end
 end
 
@@ -147,30 +185,41 @@ function mt:compileText(uri)
     if not obj then
         return nil
     end
-    if not self._need_compile[uri] then
+    if not self._needCompile[uri] then
         return nil
     end
-    self._need_compile[uri] = nil
-    local ast = parser:ast(obj.text)
+    self._needCompile[uri] = nil
+    local ast   = parser:ast(obj.text)
     obj.results = matcher.compile(ast)
-    obj.lines   = parser:lines(obj.text)
+    if not obj.results then
+        return obj
+    end
+    obj.lines       = parser:lines(obj.text)
+
+    self._needDiagnostics[uri] = {
+        ast     = ast,
+        results = obj.results,
+    }
+
     return obj
 end
 
 function mt:removeText(uri)
     self._file[uri] = nil
-    self._need_compile[uri] = nil
+    self._needCompile[uri] = nil
 end
 
 function mt:on_tick()
     local proto = thread.proto()
     if proto then
-        self._idle_clock = os.clock()
+        self._idleClock = os.clock()
         self:_doProto(proto)
         return
     end
-    if os.clock() - self._idle_clock >= 1 then
+    if os.clock() - self._idleClock >= 0.2 then
+        self._idleClock = os.clock()
         self:_buildTextCache()
+        self:_doDiagnostic()
     end
 end
 
@@ -192,8 +241,9 @@ end
 return function ()
     local session = setmetatable({
         _file = {},
-        _need_compile = {},
-        _idle_clock = os.clock(),
+        _needCompile = {},
+        _needDiagnostics = {},
+        _idleClock = os.clock(),
     }, mt)
     return session
 end

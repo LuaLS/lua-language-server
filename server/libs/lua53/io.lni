@@ -1,0 +1,5 @@
+[default]
+type = 'function'
+
+[io]
+type = 'table'

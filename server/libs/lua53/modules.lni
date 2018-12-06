@@ -1,0 +1,7 @@
+[default]
+type = 'function'
+
+[require]
+
+[package]
+type = 'table'

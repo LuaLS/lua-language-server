@@ -9,7 +9,7 @@ local function getLibs()
     for path in io.scan(ROOT / 'libs') do
         local buf = io.load(path)
         if buf then
-            lni.classics(buf, path:string(), {Libs})
+            xpcall(lni.classics, log.error, buf, path:string(), {Libs})
         end
     end
     return Libs

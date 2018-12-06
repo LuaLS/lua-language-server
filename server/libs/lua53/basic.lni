@@ -1,0 +1,65 @@
+[default]
+type = 'function'
+
+[assert]
+
+[collectgarbage]
+
+[dofile]
+
+[error]
+
+[_G]
+type = 'table'
+
+[getmetatable]
+
+[ipairs]
+[[.args]]
+name = 't'
+type = 'table'
+[[.returns]]
+name = 'iterator'
+type = 'function'
+[[.returns]]
+name = 't'
+type = 'table'
+[[.returns]]
+name = 'i'
+type = 'number'
+default = '0'
+
+[load]
+
+[loadfile]
+
+[next]
+
+[pairs]
+
+[pcall]
+
+[print]
+
+[rawequal]
+
+[rawget]
+
+[rawlen]
+
+[rawset]
+
+[select]
+
+[setmetatable]
+
+[tonumber]
+
+[tostring]
+
+[type]
+
+[_VERSION]
+type = 'string'
+
+[xpcall]

@@ -1,0 +1,5 @@
+[default]
+type = 'function'
+
+[utf8]
+type = 'table'

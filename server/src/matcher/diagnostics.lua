@@ -31,6 +31,9 @@ local function searchUndefinedGlobal(results, callback)
         then
             goto NEXT_VAR
         end
+        if var.key == 'log' then
+            goto NEXT_VAR
+        end
         if not var.key:find '%l' then
             goto NEXT_VAR
         end

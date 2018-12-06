@@ -64,25 +64,10 @@ function mt:_doProto(proto)
     local method = proto.method
     local params = proto.params
     local response, err = self:_callMethod(method, params)
-    if id then
-        if response then
-            self:_send {
-                id = id,
-                result = response,
-            }
-        else
-            self:_send {
-                id = id,
-                error = {
-                    code = ErrorCodes.UnknownErrorCode,
-                    message = err or ('Lack of response: ' .. method),
-                },
-            }
-        end
-    end
-    if response == nil then
-        log.error(err or ('Lack of response: ' .. method))
-    end
+    local proto  = json.table()
+    proto.id     = id
+    proto.result = response
+    self:_send(proto)
 end
 
 function mt:_buildTextCache()

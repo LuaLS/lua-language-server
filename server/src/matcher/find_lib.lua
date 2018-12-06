@@ -5,11 +5,20 @@ local function getLibs()
     if Libs then
         return Libs
     end
+    local language = require 'language'
     Libs = {}
     for path in io.scan(ROOT / 'libs') do
-        local buf = io.load(path)
-        if buf then
-            xpcall(lni.classics, log.error, buf, path:string(), {Libs})
+        if path:extension():string() == '.lni' then
+            local buf = io.load(path)
+            if buf then
+                local suc = xpcall(lni.classics, log.error, buf, path:string(), {Libs})
+                if suc then
+                    local locale = io.load(path:parent_path() / (path:stem():string() .. '.' .. language))
+                    if locale then
+                        xpcall(lni.classics, log.error, locale, path:string(), {Libs})
+                    end
+                end
+            end
         end
     end
     return Libs

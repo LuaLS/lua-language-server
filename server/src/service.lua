@@ -66,20 +66,20 @@ end
 
 function mt:_doProto(proto)
     local id     = proto.id
-    local method = proto.method
+    local name   = proto.method
     local params = proto.params
-    local response, err = self:_callMethod(method, params)
+    local response, err = self:_callMethod(name, params)
     if not id then
         return
     end
-    local proto  = json.table()
-    proto.id     = id
+    local container = table.container()
+    container.id    = id
     if err then
-        proto.error = err
+        container.error = err
     else
-        proto.result = response
+        container.result = response
     end
-    self:_send(proto)
+    self:_send(container)
 end
 
 function mt:_doDiagnostic()
@@ -95,11 +95,11 @@ function mt:_doDiagnostic()
         self._needDiagnostics[uri] = nil
     end
     for uri, data in pairs(copy) do
-        local method  = 'textDocument/publishDiagnostics'
-        local res = self:_callMethod(method, data)
+        local name = 'textDocument/publishDiagnostics'
+        local res  = self:_callMethod(name, data)
         if res then
             self:_send {
-                method = method,
+                method = name,
                 params = {
                     uri = uri,
                     diagnostics = res,

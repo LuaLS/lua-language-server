@@ -13,7 +13,7 @@ local function getLibs()
     if Libs then
         return Libs
     end
-    Libs = {}
+    Libs = table.container()
     for path in io.scan(ROOT / 'libs') do
         local buf = io.load(path)
         if buf then
@@ -22,7 +22,7 @@ local function getLibs()
     end
 
     local language = require 'language'
-    local locale = {}
+    local locale = table.container()
     for path in io.scan(ROOT / 'locale' / language / 'libs') do
         local buf = io.load(path)
         if buf then

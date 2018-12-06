@@ -2,8 +2,46 @@
 type = 'function'
 
 [assert]
+[[.args]]
+name = 'v'
+[[.args]]
+name = 'message'
+[[.returns]]
 
 [collectgarbage]
+[[.args]]
+name = 'opt'
+type = 'string'
+optional = 'after'
+[[.args]]
+name = 'arg'
+type = 'number'
+optional = 'self'
+[[.returns]]
+[[.enums]]
+name = 'opt'
+enum = 'collect'
+[[.enums]]
+name = 'opt'
+enum = 'stop'
+[[.enums]]
+name = 'opt'
+enum = 'restart'
+[[.enums]]
+name = 'opt'
+enum = 'count'
+[[.enums]]
+name = 'opt'
+enum = 'step'
+[[.enums]]
+name = 'opt'
+enum = 'setpause'
+[[.enums]]
+name = 'opt'
+enum = 'setstepmul'
+[[.enums]]
+name = 'opt'
+enum = 'isrunning'
 
 [dofile]
 

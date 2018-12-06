@@ -8,7 +8,13 @@ local function utf8_len(buf, start, finish)
     return 1 + utf8_len(buf, start, pos-1) + utf8_len(buf, pos+1, finish)
 end
 
-local function Line(pos, str, ...)
+local function Line(start, line, finish)
+    line.start  = start
+    line.finish = finish - 1
+    return line
+end
+
+local function Space(...)
     local line = {...}
     local sp = 0
     local tab = 0
@@ -20,19 +26,18 @@ local function Line(pos, str, ...)
         end
         line[i] = nil
     end
-    line[1] = pos
-    line[2] = sp
-    line[3] = tab
+    line.sp  = sp
+    line.tab = tab
     return line
 end
 
 local parser = m.P{
 'Lines',
 Lines   = m.Ct(m.V'Line'^0 * m.V'LastLine'),
-Line    = m.Cp() * m.C(m.V'Indent' * (1 - m.V'Nl')^0 * m.V'Nl') / Line,
-LastLine= m.Cp() * m.C(m.V'Indent' * (1 - m.V'Nl')^0) / Line,
+Line    = m.Cp() * m.V'Indent' * (1 - m.V'Nl')^0 * m.Cp() * m.V'Nl' / Line,
+LastLine= m.Cp() * m.V'Indent' * (1 - m.V'Nl')^0 * m.Cp() / Line,
 Nl      = m.P'\r\n' + m.S'\r\n',
-Indent  = m.C(m.S' \t')^0,
+Indent  = m.C(m.S' \t')^0 / Space,
 }
 
 local mt = {}
@@ -51,10 +56,10 @@ function mt:position(row, col, code)
     end
     local line = self[row]
     local next_line = self[row+1]
-    local start = line[1]
+    local start = line.start
     local finish
     if next_line then
-        finish = next_line[1] - 1
+        finish = next_line.start - 1
     else
         finish = #self.buf + 1
     end
@@ -77,7 +82,7 @@ function mt:rowcol(pos, code)
         return 1, 1
     end
     if pos > #self.buf + 1 then
-        local start = self[#self][1]
+        local start = self[#self].start
         if code == 'utf8' then
             return #self, utf8_len(self.buf, start) + 1
         else
@@ -88,11 +93,11 @@ function mt:rowcol(pos, code)
     local max = #self
     for _ = 1, 100 do
         local row = (max - min) // 2 + min
-        local start = self[row][1]
+        local start = self[row].start
         if pos < start then
             max = row
         elseif pos > start then
-            local next_start = self[row + 1][1]
+            local next_start = self[row + 1].start
             if pos < next_start then
                 if code == 'utf8' then
                     return row, utf8_len(self.buf, start, pos)
@@ -109,6 +114,18 @@ function mt:rowcol(pos, code)
         end
     end
     error('rowcol failed!')
+end
+
+function mt:line(i)
+    local start, finish = self:range(i)
+    return self.buf:sub(start, finish)
+end
+
+function mt:range(i)
+    if i < 1 or i > #self then
+        return 0, 0
+    end
+    return self[i].start, self[i].finish
 end
 
 return function (self, buf)

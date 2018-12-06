@@ -72,6 +72,26 @@ local function searchUnusedLabel(results, callback)
     end
 end
 
+local function serachSpaces(lines, callback)
+    for i = 1, #lines do
+        local line = lines:line(i)
+
+        if line:find '^[ \t]+$' then
+            local start, finish = lines:range(i)
+            callback(start, finish, 'Line with spaces only') -- LOCALE
+            goto NEXT_LINE
+        end
+
+        local pos = line:find '[ \t]+$'
+        if pos then
+            local start, finish = lines:range(i)
+            callback(start + pos - 1, finish, 'Line with postspace') -- LOCALE
+            goto NEXT_LINE
+        end
+        ::NEXT_LINE::
+    end
+end
+
 return function (ast, results, lines)
     local datas = {}
     -- 搜索未使用的局部变量
@@ -102,6 +122,15 @@ return function (ast, results, lines)
             level   = 'Warning',
             code    = code,
             message = 'Unused label', -- LOCALE
+        }
+    end)
+    -- 所搜只有空格与制表符的行，以及后置了空格的行
+    serachSpaces(lines, function (start, finish, message)
+        datas[#datas+1] = {
+            start   = start,
+            finish  = finish,
+            level   = 'Warning',
+            message = message,
         }
     end)
     return datas

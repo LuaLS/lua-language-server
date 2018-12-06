@@ -1,3 +1,3 @@
-return function (lsp)
+return function ()
     return true
 end

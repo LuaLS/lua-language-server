@@ -1,4 +1,4 @@
-return function (lsp, data)
+return function (lsp)
     lsp._inited = true
     return {
         capabilities = {

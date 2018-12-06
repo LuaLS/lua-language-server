@@ -227,7 +227,7 @@ function mt:searchReturn(action)
     end
 end
 
-function mt:setTable(var, tbl, mode)
+function mt:setTable(var, tbl)
     if not var or not tbl then
         return
     end

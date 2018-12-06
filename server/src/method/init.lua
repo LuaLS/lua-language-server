@@ -14,6 +14,7 @@ init 'textDocument/didChange'
 init 'textDocument/didClose'
 init 'textDocument/hover'
 init 'textDocument/implementation'
+init 'textDocument/publishDiagnostics'
 init 'textDocument/rename'
 init 'textDocument/references'
 

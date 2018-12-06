@@ -1,4 +1,3 @@
-local parser = require 'parser'
 local matcher = require 'matcher'
 
 return function (lsp, params)

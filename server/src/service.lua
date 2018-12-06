@@ -1,6 +1,5 @@
 local subprocess = require 'bee.subprocess'
 local method     = require 'method'
-local fs         = require 'bee.filesystem'
 local thread     = require 'thread'
 local json       = require 'json'
 local parser     = require 'parser'
@@ -96,17 +95,17 @@ function mt:_doDiagnostic()
         self._needDiagnostics[uri] = nil
     end
     for uri, data in pairs(copy) do
-        local ast     = data.ast
-        local results = data.results
-        local suc, res = xpcall(matcher.diagnostics, log.error, ast, results)
-        if suc then
+        local method  = 'textDocument/publishDiagnostics'
+        local res = self:_callMethod(method, data)
+        if res then
             self:_send {
-                method = 'textDocument/publishDiagnostics',
+                method = method,
                 params = {
                     uri = uri,
                     diagnostics = res,
                 },
             }
+            log.debug('publishDiagnostics', uri)
         end
     end
     local passed = os.clock() - clock
@@ -210,6 +209,7 @@ function mt:compileText(uri)
     self._needDiagnostics[uri] = {
         ast     = ast,
         results = obj.results,
+        lines   = obj.lines,
     }
 
     return obj

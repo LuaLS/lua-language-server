@@ -1,49 +1,45 @@
-local DiagnosticSeverity = {
-    Error       = 1,
-    Warning     = 2,
-    Information = 3,
-    Hint        = 4,
-}
-
 --[[
-/**
- * Represents a related message and source code location for a diagnostic. This should be
- * used to point to code locations that cause or related to a diagnostics, e.g when duplicating
- * a symbol in a scope.
- */
-export interface DiagnosticRelatedInformation {
-    /**
-     * The location of this related diagnostic information.
-     */
-    location: Location;
-
-    /**
-     * The message of this related diagnostic information.
-     */
-    message: string;
+data = {
+    start = 1,
+    finish = 1,
+    level = 'Error' or 'Warning' or 'Information' or 'Hint',
+    code = '',
+    message = '',
 }
 ]]--
 
-return function (ast, results)
-    local diagnostics = {}
+local function searchUnusedLocals(results, callback)
+    for _, var in ipairs(results.vars) do
+        if var.type ~= 'local' then
+            goto NEXT_VAR
+        end
+        if var.key == 'self'
+        or var.key == '_'
+        or var.key == '_ENV'
+        then
+            goto NEXT_VAR
+        end
+        for _, info in ipairs(var) do
+            if info.type == 'get' then
+                goto NEXT_VAR
+            end
+        end
+        callback(var.source.start, var.source.finish, var.key)
+        ::NEXT_VAR::
+    end
+end
 
-    diagnostics[1] = {
-        range = {
-            start = {
-                line = 0,
-                character = 0,
-            },
-            ['end'] = {
-                line = 0,
-                character = 10,
-            },
-        },
-        severity = DiagnosticSeverity.Warning,
-        code = 'I am code',
-        source = 'I am source',
-        message = 'I am message',
-        relatedInformation = nil,
-    }
-
-    return diagnostics
+return function (ast, results, lines)
+    local datas = {}
+    -- 搜索未使用的局部变量
+    searchUnusedLocals(results, function (start, finish, code)
+        datas[#datas+1] = {
+            start   = start,
+            finish  = finish,
+            level   = 'Warning',
+            code    = code,
+            message = 'Unused local', -- LOCALE
+        }
+    end)
+    return datas
 end

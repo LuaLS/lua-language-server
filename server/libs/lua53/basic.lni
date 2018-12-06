@@ -15,12 +15,13 @@ type = 'string'
 optional = 'after'
 [[.args]]
 name = 'arg'
-type = 'number'
+type = 'integer'
 optional = 'self'
 [[.returns]]
 [[.enums]]
 name = 'opt'
 enum = 'collect'
+default = true
 [[.enums]]
 name = 'opt'
 enum = 'stop'
@@ -44,11 +45,130 @@ name = 'opt'
 enum = 'isrunning'
 
 [dofile]
+[[.args]]
+name = 'filename'
+type = 'string'
+optional = 'self'
+[[.returns]]
 
 [error]
+[[.args]]
+name = 'message'
+[[.args]]
+name = 'level'
+type = 'integer'
+optional = 'self'
 
 [_G]
 type = 'table'
+[[.fields]]
+field = '_G'
+type  = 'table'
+[[.fields]]
+field = '_VERSION'
+type  = 'string'
+[[.fields]]
+field = 'arg'
+type  = 'table'
+[[.fields]]
+field = 'assert'
+type  = 'function'
+[[.fields]]
+field = 'collectgarbage'
+type  = 'function'
+[[.fields]]
+field = 'coroutine'
+type  = 'table'
+[[.fields]]
+field = 'debug'
+type  = 'table'
+[[.fields]]
+field = 'dofile'
+type  = 'function'
+[[.fields]]
+field = 'error'
+type  = 'function'
+[[.fields]]
+field = 'fs'
+type  = 'table'
+[[.fields]]
+field = 'getmetatable'
+type  = 'function'
+[[.fields]]
+field = 'io'
+type  = 'table'
+[[.fields]]
+field = 'ipairs'
+type  = 'function'
+[[.fields]]
+field = 'load'
+type  = 'function'
+[[.fields]]
+field = 'loadfile'
+type  = 'function'
+[[.fields]]
+field = 'math'
+type  = 'table'
+[[.fields]]
+field = 'next'
+type  = 'function'
+[[.fields]]
+field = 'os'
+type  = 'table'
+[[.fields]]
+field = 'package'
+type  = 'table'
+[[.fields]]
+field = 'pairs'
+type  = 'function'
+[[.fields]]
+field = 'pcall'
+type  = 'function'
+[[.fields]]
+field = 'print'
+type  = 'function'
+[[.fields]]
+field = 'rawequal'
+type  = 'function'
+[[.fields]]
+field = 'rawget'
+type  = 'function'
+[[.fields]]
+field = 'rawlen'
+type  = 'function'
+[[.fields]]
+field = 'rawset'
+type  = 'function'
+[[.fields]]
+field = 'require'
+type  = 'function'
+[[.fields]]
+field = 'select'
+type  = 'function'
+[[.fields]]
+field = 'setmetatable'
+type  = 'function'
+[[.fields]]
+field = 'string'
+type  = 'table'
+[[.fields]]
+field = 'table'
+type  = 'table'
+[[.fields]]
+field = 'tonumber'
+type  = 'function'
+[[.fields]]
+field = 'tostring'
+type  = 'function'
+[[.fields]]
+field = 'type'
+type  = 'function'
+[[.fields]]
+field = 'utf8'
+type  = 'table'
+[[.fields]]
+field = 'xpcall'
+type  = 'function'
 
 [getmetatable]
 

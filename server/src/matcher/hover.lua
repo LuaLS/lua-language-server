@@ -98,7 +98,11 @@ local function buildEnum(lib)
     for name, enums in pairs(container) do
         strs[#strs+1] = ('\n%s:%s'):format(name, enums.type or '')
         for _, enum in ipairs(enums) do
-            strs[#strs+1] = '\n  | '
+            if enum.default then
+                strs[#strs+1] = '\n  -> '
+            else
+                strs[#strs+1] = '\n   | '
+            end
             strs[#strs+1] = ('%q: %s'):format(enum.enum, enum.description or '')
         end
     end
@@ -110,6 +114,25 @@ local function buildFunctionHover(lib, name)
     local enum = buildEnum(lib)
     local tip = lib.description or ''
     return ('```lua\n%s%s\n```\n%s'):format(title, enum, tip)
+end
+
+local function buildField(lib)
+    if not lib.fields then
+        return ''
+    end
+    local strs = {}
+    for _, field in ipairs(lib.fields) do
+        strs[#strs+1] = '\n  | '
+        strs[#strs+1] = ('%s:%s: %s'):format(field.field, field.type, field.description or '')
+    end
+    return table.concat(strs)
+end
+
+local function buildTableHover(lib, name)
+    local title = ('table %s'):format(name)
+    local field = buildField(lib)
+    local tip = lib.description or ''
+    return ('```lua\n%s%s```\n%s'):format(title, field, tip)
 end
 
 return function (results, pos)
@@ -130,8 +153,7 @@ return function (results, pos)
     if lib.type == 'function' then
         return buildFunctionHover(lib, name)
     elseif lib.type == 'table' then
-        local tip = lib.description or ''
-        return ('%s'):format(tip)
+        return buildTableHover(lib, name)
     elseif lib.type == 'string' then
         return lib.description
     end

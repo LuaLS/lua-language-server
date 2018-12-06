@@ -49,6 +49,7 @@ local function createInfo(data, lines)
         severity = DiagnosticSeverity[data.level],
         code     = data.code,
         message  = data.message,
+        relatedInformation = data.relatedInformation,
     }
     return diagnostic
 end
@@ -64,7 +65,7 @@ return function (lsp, params)
         -- 返回空表以清空之前的结果
         return {}
     end
-    
+
     local diagnostics = {}
     for i, data in ipairs(datas) do
         diagnostics[i] = createInfo(data, lines)

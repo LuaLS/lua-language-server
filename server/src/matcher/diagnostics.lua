@@ -92,9 +92,23 @@ local function serachSpaces(lines, callback)
     end
 end
 
+local function searchRedefinition(results, callback)
+    for _, var in ipairs(results.vars) do
+        if var.type ~= 'local' then
+            goto NEXT_VAR
+        end
+        local shadow = var.redefinition
+        if not shadow then
+            goto NEXT_VAR
+        end
+        callback(var.source.start, var.source.finish, var.key)
+        ::NEXT_VAR::
+    end
+end
+
 return function (ast, results, lines)
     local datas = {}
-    -- 搜索未使用的局部变量
+    -- 未使用的局部变量
     searchUnusedLocals(results, function (start, finish, code)
         datas[#datas+1] = {
             start   = start,
@@ -104,7 +118,7 @@ return function (ast, results, lines)
             message = 'Unused local', -- LOCALE
         }
     end)
-    -- 搜索读取未定义全局变量
+    -- 读取未定义全局变量
     searchUndefinedGlobal(results, function (start, finish, code)
         datas[#datas+1] = {
             start   = start,
@@ -114,7 +128,7 @@ return function (ast, results, lines)
             message = 'Undefined global', -- LOCALE
         }
     end)
-    -- 搜索未使用的Label
+    -- 未使用的Label
     searchUnusedLabel(results, function (start, finish, code)
         datas[#datas+1] = {
             start   = start,
@@ -124,13 +138,23 @@ return function (ast, results, lines)
             message = 'Unused label', -- LOCALE
         }
     end)
-    -- 所搜只有空格与制表符的行，以及后置了空格的行
+    -- 只有空格与制表符的行，以及后置空格
     serachSpaces(lines, function (start, finish, message)
         datas[#datas+1] = {
             start   = start,
             finish  = finish,
             level   = 'Warning',
             message = message,
+        }
+    end)
+    -- 重定义局部变量
+    searchRedefinition(results, function (start, finish, code)
+        datas[#datas+1] = {
+            start   = start,
+            finish  = finish,
+            level   = 'Warning',
+            code    = code,
+            message = 'Redefined local',
         }
     end)
     return datas

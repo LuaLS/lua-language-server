@@ -64,6 +64,7 @@ function mt:createLocal(key, source, var)
         var = self:createVar('local', key, source)
         self:addInfo(var, 'local', source)
     end
+    var.redefinition = self.env.var[key]
     self.env.var[key] = var
     return var
 end

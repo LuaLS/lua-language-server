@@ -44,10 +44,9 @@ end
 
 local function createInfo(data, lines)
     local diagnostic = {
-        source   = 'Lsp',
+        source   = 'LSP',
         range    = getRange(data.start, data.finish, lines),
         severity = DiagnosticSeverity[data.level],
-        code     = data.code,
         message  = data.message,
         relatedInformation = data.relatedInformation,
     }

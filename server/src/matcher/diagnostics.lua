@@ -109,33 +109,30 @@ end
 return function (ast, results, lines)
     local datas = {}
     -- 未使用的局部变量
-    searchUnusedLocals(results, function (start, finish, code)
+    searchUnusedLocals(results, function (start, finish, key)
         datas[#datas+1] = {
             start   = start,
             finish  = finish,
             level   = 'Warning',
-            code    = code,
-            message = 'Unused local', -- LOCALE
+            message = ('Unused local `%s`'):format(key), -- LOCALE
         }
     end)
     -- 读取未定义全局变量
-    searchUndefinedGlobal(results, function (start, finish, code)
+    searchUndefinedGlobal(results, function (start, finish, key)
         datas[#datas+1] = {
             start   = start,
             finish  = finish,
             level   = 'Warning',
-            code    = code,
-            message = 'Undefined global', -- LOCALE
+            message = ('Undefined global `%s`'):format(key), -- LOCALE
         }
     end)
     -- 未使用的Label
-    searchUnusedLabel(results, function (start, finish, code)
+    searchUnusedLabel(results, function (start, finish, key)
         datas[#datas+1] = {
             start   = start,
             finish  = finish,
             level   = 'Warning',
-            code    = code,
-            message = 'Unused label', -- LOCALE
+            message = ('Unused label `%s`'):format(key), -- LOCALE
         }
     end)
     -- 只有空格与制表符的行，以及后置空格
@@ -148,13 +145,12 @@ return function (ast, results, lines)
         }
     end)
     -- 重定义局部变量
-    searchRedefinition(results, function (start, finish, code)
+    searchRedefinition(results, function (start, finish, key)
         datas[#datas+1] = {
             start   = start,
             finish  = finish,
             level   = 'Warning',
-            code    = code,
-            message = 'Redefined local',
+            message = ('Redefined local `%s`'):format(key),
         }
     end)
     return datas

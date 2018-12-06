@@ -87,8 +87,11 @@ function mt:_doDiagnostic()
     if not next(self._needDiagnostics) then
         return
     end
+    local clock = os.clock()
+    local count = 0
     local copy = {}
     for uri, data in pairs(self._needDiagnostics) do
+        count = count + 1
         copy[uri] = data
         self._needDiagnostics[uri] = nil
     end
@@ -106,6 +109,14 @@ function mt:_doDiagnostic()
             }
         end
     end
+    local passed = os.clock() - clock
+    log.debug(('\n\z
+    Diagnostics completion\n\z
+    Cost:  [%.3f]sec\n\z
+    Num:   [%d]'):format(
+        passed,
+        count
+    ))
 end
 
 function mt:_buildTextCache()

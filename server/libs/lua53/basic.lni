@@ -27,7 +27,7 @@ type = 'table'
 [[.returns]]
 name = 'i'
 type = 'number'
-default = '0'
+default = 0
 
 [load]
 

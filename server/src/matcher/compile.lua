@@ -116,7 +116,7 @@ function mt:searchCall(call, simple, i)
     for i, exp in ipairs(call) do
         results[i] = self:searchExp(exp)
     end
-    
+
     -- 特殊处理 setmetatable
     if i == 2 and simple[1][1] == 'setmetatable' then
         local obj = results[1]

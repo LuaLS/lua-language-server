@@ -96,6 +96,11 @@ local function searchRedefinition(results, callback)
         if var.type ~= 'local' then
             goto NEXT_VAR
         end
+        if var.key == '_'
+        or var.key == '_ENV'
+        then
+            goto NEXT_VAR
+        end
         local shadow = var.redefinition
         if not shadow then
             goto NEXT_VAR

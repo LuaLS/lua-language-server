@@ -103,7 +103,7 @@ local function buildEnum(lib)
             else
                 strs[#strs+1] = '\n   | '
             end
-            strs[#strs+1] = ('%q: %s'):format(enum.enum, enum.description or '')
+            strs[#strs+1] = ('%q -- %s'):format(enum.enum, enum.description or '')
         end
     end
     return table.concat(strs)
@@ -113,7 +113,15 @@ local function buildFunctionHover(lib, name)
     local title = ('function %s(%s)%s'):format(name, buildArgs(lib), buildReturns(lib))
     local enum = buildEnum(lib)
     local tip = lib.description or ''
-    return ('```lua\n%s%s\n```\n%s'):format(title, enum, tip)
+    return ([[
+```lua
+%s
+```
+%s
+```lua
+%s
+```
+]]):format(title, tip, enum)
 end
 
 local function buildField(lib)
@@ -122,8 +130,7 @@ local function buildField(lib)
     end
     local strs = {}
     for _, field in ipairs(lib.fields) do
-        strs[#strs+1] = '\n  | '
-        strs[#strs+1] = ('%s:%s: %s'):format(field.field, field.type, field.description or '')
+        strs[#strs+1] = ('\n%s:%s -- %s'):format(field.field, field.type, field.description or '')
     end
     return table.concat(strs)
 end
@@ -132,7 +139,15 @@ local function buildTableHover(lib, name)
     local title = ('table %s'):format(name)
     local field = buildField(lib)
     local tip = lib.description or ''
-    return ('```lua\n%s%s```\n%s'):format(title, field, tip)
+    return ([[
+```lua
+%s
+```
+%s
+```lua
+%s
+```
+]]):format(title, tip, field)
 end
 
 return function (results, pos)

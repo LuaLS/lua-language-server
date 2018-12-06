@@ -1,12 +1,25 @@
 [assert]
 
 [collectgarbage]
+[[.enums]]
+enum = 'collect'
+description = 'performs a full garbage-collection cycle. This is the default option.'
+[[.enums]]
+enum = 'isrunning'
+description = 'returns a boolean that tells whether the collector is running (i.e., not stopped).'
+[[.enums]]
+enum = 'count'
+description = 'returns the total memory in use by Lua in Kbytes. The value has a fractional part, so that it multiplied by 1024 gives the exact number of bytes in use by Lua (except for overflows).'
 
 [dofile]
 
 [error]
 
 [_G]
+description = 'A global variable (not a function) that holds the global environment'
+[[.fields]]
+field = '_G'
+description = 'A global variable (not a function) that holds the global environment'
 
 [getmetatable]
 

@@ -13,11 +13,12 @@ local function buildArgs(lib)
         if i > 1 then
             strs[#strs+1] = ', '
         end
-        strs[#strs+1] = rtn.name or ('arg' .. tostring(i))
-        strs[#strs+1] = ':'
-        strs[#strs+1] = rtn.type or 'any'
+        strs[#strs+1] = ('%s:%s'):format(
+            rtn.name or ('arg' .. tostring(i)),
+            (rtn.type or 'any')
+        )
         if rtn.default then
-            strs[#strs+1] = (':%q'):format(rtn.default)
+            strs[#strs+1] = ('(%q)'):format(rtn.default)
         end
         if rtn.optional then
             strs[#strs+1] = ']'
@@ -38,11 +39,12 @@ local function buildReturns(lib)
         if i > 1 then
             strs[#strs+1] = ', '
         end
-        strs[#strs+1] = rtn.name or ('res' .. tostring(i))
-        strs[#strs+1] = ':'
-        strs[#strs+1] = rtn.type or 'any'
+        strs[#strs+1] = ('%s:%s'):format(
+            rtn.name or ('res' .. tostring(i)),
+            (rtn.type or 'any')
+        )
         if rtn.default then
-            strs[#strs+1] = (':%q'):format(rtn.default)
+            strs[#strs+1] = ('(%q)'):format(rtn.default)
         end
         if rtn.optional then
             strs[#strs+1] = ']'
@@ -52,9 +54,9 @@ local function buildReturns(lib)
 end
 
 local function buildFunctionHover(lib, name)
-    local title = ('```lua\n%s(%s)%s\n```'):format(name, buildArgs(lib), buildReturns(lib))
+    local title = ('function %s(%s)%s'):format(name, buildArgs(lib), buildReturns(lib))
     local tip = lib.description or ''
-    return ('%s\n\n%s'):format(title, tip)
+    return ('```lua\n%s\n```\n%s'):format(title, tip)
 end
 
 return function (results, pos)

@@ -1,12 +1,4 @@
---[[
-data = {
-    start = 1,
-    finish = 1,
-    level = 'Error' or 'Warning' or 'Information' or 'Hint',
-    code = '',
-    message = '',
-}
-]]--
+local findLib = require 'matcher.find_lib'
 
 local function searchUnusedLocals(results, callback)
     for _, var in ipairs(results.vars) do
@@ -40,6 +32,10 @@ local function searchUndefinedGlobal(results, callback)
             goto NEXT_VAR
         end
         if not var.key:find '%l' then
+            goto NEXT_VAR
+        end
+        local lib = findLib(var)
+        if lib then
             goto NEXT_VAR
         end
         for _, info in ipairs(var) do

@@ -53,6 +53,22 @@ local function searchUndefinedGlobal(results, callback)
     end
 end
 
+local function searchUnusedLabel(results, callback)
+    for _, label in ipairs(results.labels) do
+        for _, info in ipairs(label) do
+            if info.type == 'goto' then
+                goto NEXT_LABEL
+            end
+        end
+        for _, info in ipairs(label) do
+            if info.type == 'set' then
+                callback(info.source.start, info.source.finish, label.key)
+            end
+        end
+        ::NEXT_LABEL::
+    end
+end
+
 return function (ast, results, lines)
     local datas = {}
     -- 搜索未使用的局部变量
@@ -73,6 +89,16 @@ return function (ast, results, lines)
             level   = 'Warning',
             code    = code,
             message = 'Undefined global', -- LOCALE
+        }
+    end)
+    -- 搜索未使用的Label
+    searchUnusedLabel(results, function (start, finish, code)
+        datas[#datas+1] = {
+            start   = start,
+            finish  = finish,
+            level   = 'Warning',
+            code    = code,
+            message = 'Unused label', -- LOCALE
         }
     end)
     return datas

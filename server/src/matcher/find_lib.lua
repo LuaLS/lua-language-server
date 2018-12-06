@@ -1,31 +1,42 @@
 local lni = require 'lni'
 
+local function mergeLocale(libs, locale)
+    for name, obj in pairs(locale) do
+        if libs[name] then
+            libs[name].description = obj.description
+        end
+    end
+end
+
 local Libs
 local function getLibs()
     if Libs then
         return Libs
     end
-    local language = require 'language'
     Libs = {}
     for path in io.scan(ROOT / 'libs') do
-        if path:extension():string() == '.lni' then
-            local buf = io.load(path)
-            if buf then
-                local suc = xpcall(lni.classics, log.error, buf, path:string(), {Libs})
-                if suc then
-                    local locale = io.load(path:parent_path() / (path:stem():string() .. '.' .. language))
-                    if locale then
-                        xpcall(lni.classics, log.error, locale, path:string(), {Libs})
-                    end
-                end
-            end
+        local buf = io.load(path)
+        if buf then
+            xpcall(lni.classics, log.error, buf, path:string(), {Libs})
         end
     end
+
+    local language = require 'language'
+    local locale = {}
+    for path in io.scan(ROOT / 'locale' / language / 'libs') do
+        local buf = io.load(path)
+        if buf then
+            xpcall(lni.classics, log.error, buf, path:string(), {locale})
+        end
+    end
+
+    mergeLocale(Libs, locale)
+
     return Libs
 end
 
 return function (var)
     local key = var.key
     local libs = getLibs()
-    return libs[key]
+    return libs[key], key
 end

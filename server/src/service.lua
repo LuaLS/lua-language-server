@@ -37,7 +37,7 @@ function mt:_callMethod(name, params)
         local suc, res, res2 = pcall(f, self, params)
         local passed = os.clock() - clock
         if passed > 0.01 then
-            log.debug(('Task [%s] takes [%.3f] sec.'):format(name, passed))
+            log.debug(('Task [%s] takes [%.3f]sec.'):format(name, passed))
         end
         if suc then
             return res, res2
@@ -86,18 +86,25 @@ function mt:_buildTextCache()
         size = size + #obj.text
     end
     local passed = os.clock() - clock
+
+    local sum = 0
+    for _ in pairs(self._file) do
+        sum = sum + 1
+    end
     log.debug(('\n\z
     Cache completion\n\z
-    Cost:  [%.3f] sec\n\z
+    Cost:  [%.3f]sec\n\z
     Num:   [%d]\n\z
     Size:  [%.3f]kb\n\z
     Speed：[%.3f]kb/s\n\z
-    Mem：  [%.3f]kb'):format(
+    Mem：  [%.3f]kb\n\z
+    Sum:   [%d]'):format(
         passed,
         #list,
         size / 1000,
         size / passed / 1000,
-        collectgarbage 'count'
+        collectgarbage 'count',
+        sum
     ))
 end
 

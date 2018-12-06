@@ -47,7 +47,9 @@ local function parseResult(result, newName)
         local metavar = tryMeta(var)
         if metavar then
             for _, info in ipairs(metavar) do
-                positions[#positions+1] = {info.source.start, info.source.finish}
+                if info.source[1] == key then
+                    positions[#positions+1] = {info.source.start, info.source.finish}
+                end
             end
         end
     elseif tp == 'label' then

@@ -27,7 +27,7 @@ local function parseResult(result, newName)
     if     tp == 'var' then
         local var = result.var
         local key = result.info.source[1]
-        if var.disable_rename and key == 'self' then
+        if var.disableRename and key == 'self' then
             return positions
         end
         if result.info.source.index then

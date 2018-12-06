@@ -2,6 +2,8 @@ return function (lsp, data)
     lsp._inited = true
     return {
         capabilities = {
+            -- 支持“悬浮”
+            hoverProvider = true,
             -- 支持“转到定义”
             definitionProvider = true,
             -- 支持“转到实现”

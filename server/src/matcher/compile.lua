@@ -259,7 +259,7 @@ function mt:markSimple(simple)
             var = self:searchCall(obj, simple, i)
         elseif tp == ':' then
             var = self:createLocal('self', simple[i-1], self:getVar(simple[i-1][1]))
-            var.disable_rename = true
+            var.disableRename = true
         elseif tp == 'name' then
             if obj.index then
                 self:checkName(obj)

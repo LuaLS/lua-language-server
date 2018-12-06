@@ -88,7 +88,7 @@ function mt:_buildTextCache()
     local passed = os.clock() - clock
     log.debug(('\n\z
     Cache completion\n\z
-    Cost:  [%.3f]秒\n\z
+    Cost:  [%.3f] sec\n\z
     Num:   [%d]\n\z
     Size:  [%.3f]kb\n\z
     Speed：[%.3f]kb/s\n\z

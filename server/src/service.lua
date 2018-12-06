@@ -105,7 +105,6 @@ function mt:_doDiagnostic()
                     diagnostics = res,
                 },
             }
-            log.debug('publishDiagnostics', uri)
         end
     end
     local passed = os.clock() - clock

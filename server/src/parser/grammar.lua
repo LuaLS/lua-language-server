@@ -189,6 +189,8 @@ DOT         <-  Sp '.'
 COLON       <-  Sp ({} ':') -> COLON
 LABEL       <-  Sp '::'
 ASSIGN      <-  Sp '='
+
+TOCLOSE     <-  Sp '*toclose'
 ]]
 
 grammar 'Nil' [[
@@ -375,7 +377,7 @@ RepeatBody  <-  REPEAT
                     Action*
                 UNTIL Exp
 
-Local       <-  (LOCAL NameList (ASSIGN ExpList)?)
+Local       <-  (LOCAL TOCLOSE? NameList (ASSIGN ExpList)?)
             ->  Local
 Set         <-  (SimpleList ASSIGN ExpList)
             ->  Set

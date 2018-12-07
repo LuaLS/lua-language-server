@@ -261,10 +261,10 @@ Prefix      <-  PL Exp PR
             /   Name
 Suffix      <-  DOT Name
             /   COLON Name
-            /   Table -> Call
-            /   String -> Call
+            /   Sp ({} Table {}) -> Call
+            /   Sp ({} String {}) -> Call
             /   BL Exp -> Index BR
-            /   PL (ExpList -> Call) PR
+            /   Sp ({} PL ExpList PR {}) -> Call
 
 ExpList     <-  (Exp (COMMA Exp)*)?
             ->  List

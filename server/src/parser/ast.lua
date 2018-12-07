@@ -85,18 +85,24 @@ local defs = {
         exp.index = true
         return exp
     end,
-    Call = function (arg)
+    Call = function (start, arg, finish)
         if arg == nil then
             return {
-                type = 'call'
+                type = 'call',
+                start = start,
+                finish = finish - 1,
             }
         end
         if arg.type == 'list' then
             arg.type = 'call'
+            arg.start = start
+            arg.finish = finish - 1
             return arg
         end
         local obj = {
             type = 'call',
+            start = start,
+            finish = finish - 1,
             [1]  = arg,
         }
         return obj

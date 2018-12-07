@@ -60,6 +60,7 @@ function mt:createLib(name)
     local lib = {
         name = name,
         type = 'lib',
+        childs = {},
     }
     return lib
 end

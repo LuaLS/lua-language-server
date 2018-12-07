@@ -1,6 +1,3 @@
-[default]
-type = 'function'
-
 [table]
 type = 'table'
 [[.source]]
@@ -8,3 +5,24 @@ type = 'global'
 [[.source]]
 type = 'library'
 name = 'table'
+
+[default]
+type = 'function'
+[[.parent]]
+type = 'global'
+name = 'table'
+[[.parent]]
+type = 'library'
+name = 'table'
+
+[insert]
+[[.args]]
+name = 'list'
+type = 'table'
+[[.args]]
+name = 'pos'
+type = 'integer'
+optional = 'self'
+[[.args]]
+name = 'value'
+type = 'any'

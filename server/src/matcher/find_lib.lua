@@ -109,19 +109,14 @@ local function isGlobal(var)
     return var.parent.key == '_ENV' or var.parent.key == '_G'
 end
 
-local function checkLibAsGlobal(var, name)
-    local value = var.value or var
+local function checkSourceAsGlobal(value, name)
     if value.key == name and isGlobal(value) then
         return name
     end
     return nil
 end
 
-local function checkLibAsLibrary(var, name)
-    local value = var.value
-    if not value then
-        return nil
-    end
+local function checkSourceAsLibrary(value, name)
     if value.type ~= 'lib' then
         return nil
     end
@@ -131,20 +126,64 @@ local function checkLibAsLibrary(var, name)
     return nil
 end
 
-local function checkLib(var, name, lib)
+local function checkSource(value, name, lib)
     if not lib.source then
-        return checkLibAsGlobal(var, name)
+        return checkSourceAsGlobal(value, name)
     end
     for _, source in ipairs(lib.source) do
         if source.type == 'global' then
-            local fullkey = checkLibAsGlobal(var, name)
-            if fullkey then
-                return fullkey
+            local fullKey = checkSourceAsGlobal(value, name)
+            if fullKey then
+                return fullKey
             end
         elseif source.type == 'library' then
-            local fullkey = checkLibAsLibrary(var, name)
-            if fullkey then
-                return fullkey
+            local fullKey = checkSourceAsLibrary(value, name)
+            if fullKey then
+                return fullKey
+            end
+        end
+    end
+    return nil
+end
+
+local function checkParentAsGlobal(parentValue, name, parent)
+    local parentName = checkSourceAsGlobal(parentValue, parent.name)
+    if not parentName then
+        return nil
+    end
+    return ('%s.%s'):format(parentName, name)
+end
+
+local function checkParentAsLibrary(parentValue, name, parent)
+    local parentName = checkSourceAsLibrary(parentValue, parent.name)
+    if not parentName then
+        return nil
+    end
+    return ('%s.%s'):format(parentName, name)
+end
+
+local function checkParent(value, name, lib)
+    if not lib.parent then
+        return nil
+    end
+    if name ~= value.key then
+        return nil
+    end
+    local parentValue = value.parent
+    if not parentValue then
+        return nil
+    end
+    parentValue = parentValue.value or parentValue
+    for _, parent in ipairs(lib.parent) do
+        if parent.type == 'global' then
+            local fullKey = checkParentAsGlobal(parentValue, name, parent)
+            if fullKey then
+                return fullKey
+            end
+        elseif parent.type == 'library' then
+            local fullKey = checkParentAsLibrary(parentValue, name, parent)
+            if fullKey then
+                return fullKey
             end
         end
     end
@@ -152,10 +191,12 @@ local function checkLib(var, name, lib)
 end
 
 local function findLib(var, libs)
+    local value = var.value or var
     for name, lib in pairs(libs) do
-        local fullkey = checkLib(var, name, lib)
-        if fullkey then
-            return lib, fullkey
+        local fullKey = checkSource(value, name, lib)
+                     or checkParent(value, name, lib)
+        if fullKey then
+            return lib, fullKey
         end
     end
     return nil, nil
@@ -163,6 +204,6 @@ end
 
 return function (var)
     local libs = getLibs()
-    local lib, fullkey = findLib(var, libs)
-    return lib, fullkey
+    local lib, fullKey = findLib(var, libs)
+    return lib, fullKey
 end

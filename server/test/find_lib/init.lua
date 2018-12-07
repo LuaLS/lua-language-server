@@ -55,3 +55,26 @@ local rq = require
 local lib = 'table'
 local <?xx?> = rq(lib)
 ]]
+
+TEST 'table.insert' [[
+table.<?insert?>()
+]]
+
+TEST 'table.insert' [[
+local t = table
+t.<?insert?>()
+]]
+
+TEST 'table.insert' [[
+local insert = table.insert
+<?insert?>()
+]]
+
+TEST 'table.insert' [[
+local t = require 'table'
+t.<?insert?>()
+]]
+
+TEST 'table.insert' [[
+require 'table'.<?insert?>()
+]]

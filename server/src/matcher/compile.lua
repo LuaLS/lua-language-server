@@ -97,6 +97,27 @@ function mt:getField(parent, key, source)
     return var
 end
 
+function mt:isGlobal(var)
+    if var.type ~= 'field' then
+        return false
+    end
+    if not var.parent then
+        return false
+    end
+    return var.parent.key == '_ENV' or var.parent.key == '_G'
+end
+
+function mt:getApi(func)
+    if not func then
+        return nil
+    end
+    func = func.value or func
+    if self:isGlobal(func) then
+        return func.key
+    end
+    return nil
+end
+
 function mt:checkName(name)
     local var = self:getVar(name[1], name)
     self:addInfo(var, 'get', name)
@@ -109,17 +130,6 @@ function mt:checkDots(source)
         return
     end
     self:addInfo(dots, 'get', source)
-end
-
-function mt:getApi(func)
-    if not func then
-        return nil
-    end
-    func = func.value or func
-    if func.type == 'field' and func.parent.key == '_ENV' then
-        return func.key
-    end
-    return nil
 end
 
 function mt:searchCall(call, func)

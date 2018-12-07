@@ -99,14 +99,23 @@ local function getLibs()
     return Libs
 end
 
-local function checkLibAsGlobal(var, name, lib)
+local function isGlobal(var)
+    if var.type ~= 'field' then
+        return false
+    end
+    if not var.parent then
+        return false
+    end
+    return var.parent.key == '_ENV' or var.parent.key == '_G'
+end
+
+local function checkLibAsGlobal(var, name)
     -- 检查是否是全局变量
     local value = var.value or var
-    if value.type == 'field' and value.parent.key == '_ENV' then
-        if value.key == name then
-            return name
-        end
+    if value.key == name and isGlobal(value) then
+        return name
     end
+    return nil
 end
 
 local function checkLib(var, name, lib)

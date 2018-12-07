@@ -58,6 +58,17 @@ local function mergeLibs(target, libs)
     end
 end
 
+local function loadLocale(language, relative)
+    local localePath = ROOT / 'locale' / language / relative
+    local localeBuf = io.load(localePath)
+    if localeBuf then
+        local locale = table.container()
+        xpcall(lni.classics, log.error, localeBuf, localePath:string(), {locale})
+        return locale
+    end
+    return nil
+end
+
 local Libs
 local function getLibs()
     if Libs then
@@ -78,21 +89,19 @@ local function getLibs()
     })
     for path in io.scan(ROOT / 'libs') do
         local libs
-        local locale
         local buf = io.load(path)
         if buf then
             libs = table.container()
             xpcall(lni.classics, log.error, buf, path:string(), {libs})
         end
         local relative = fs.relative(path, ROOT)
-        local localePath = ROOT / 'locale' / language / relative
-        local localeBuf = io.load(localePath)
-        if localeBuf then
-            locale = table.container()
-            xpcall(lni.classics, log.error, localeBuf, localePath:string(), {locale})
-        end
 
+        local locale = loadLocale('enUS', relative)
         mergeLocale(libs, locale)
+        if language ~= 'enUS' then
+            locale = loadLocale(language, relative)
+            mergeLocale(libs, locale)
+        end
         mergeLibs(Libs, libs)
     end
 

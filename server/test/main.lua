@@ -21,6 +21,7 @@ local function main()
     end
 
     test 'definition'
+    test 'find_lib'
 
     print('测试完成')
 end

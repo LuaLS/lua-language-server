@@ -3,3 +3,8 @@ type = 'function'
 
 [table]
 type = 'table'
+[[.source]]
+type = 'global'
+[[.source]]
+type = 'library'
+name = 'table'

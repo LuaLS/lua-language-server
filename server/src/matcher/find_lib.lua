@@ -122,6 +122,15 @@ local function checkLib(var, name, lib)
     if not lib.source then
         return checkLibAsGlobal(var, name)
     end
+    for _, source in ipairs(lib.source) do
+        if source.type == 'global' then
+            local fullkey = checkLibAsGlobal(var, name)
+            if fullkey then
+                return fullkey
+            end
+        end
+    end
+    return nil
 end
 
 local function findLib(var, libs)
@@ -136,6 +145,6 @@ end
 
 return function (var)
     local libs = getLibs()
-    local lib, key = findLib(var, libs)
-    return lib, key
+    local lib, fullkey = findLib(var, libs)
+    return lib, fullkey
 end

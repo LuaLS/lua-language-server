@@ -184,7 +184,7 @@ name = 't'
 type = 'table'
 [[.returns]]
 name = 'i'
-type = 'number'
+type = 'integer'
 default = 0
 
 [load]

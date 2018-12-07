@@ -20,7 +20,7 @@ local function buildArgs(lib)
             strs[#strs+1] = ', '
         end
         if arg.name then
-            strs[#strs+1] = ('%s:'):format(arg.name)
+            strs[#strs+1] = ('%s: '):format(arg.name)
         end
         strs[#strs+1] = arg.type or 'any'
         if arg.default then
@@ -55,7 +55,7 @@ local function buildReturns(lib)
             strs[#strs+1] = ', '
         end
         if rtn.name then
-            strs[#strs+1] = ('%s:'):format(rtn.name)
+            strs[#strs+1] = ('%s: '):format(rtn.name)
         end
         strs[#strs+1] = rtn.type or 'any'
         if rtn.default then
@@ -98,7 +98,7 @@ local function buildEnum(lib)
     end
     local strs = {}
     for name, enums in pairs(container) do
-        strs[#strs+1] = ('\n%s:%s'):format(name, enums.type or '')
+        strs[#strs+1] = ('\n%s: %s'):format(name, enums.type or '')
         for _, enum in ipairs(enums) do
             if enum.default then
                 strs[#strs+1] = '\n  -> '
@@ -132,7 +132,7 @@ local function buildField(lib)
     end
     local strs = {}
     for _, field in ipairs(lib.fields) do
-        strs[#strs+1] = ('\n%s:%s -- %s'):format(field.field, field.type, field.description or '')
+        strs[#strs+1] = ('\n%s: %s -- %s'):format(field.field, field.type, field.description or '')
     end
     return table.concat(strs)
 end

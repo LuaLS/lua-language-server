@@ -174,7 +174,7 @@ return function (ast, results, lines, uri)
             start   = start,
             finish  = finish,
             level   = 'Warning',
-            message = ('Redefined local `%s`'):format(key),
+            message = ('Redefined local `%s`'):format(key), -- LOCALE
             related = related,
         }
     end)
@@ -184,7 +184,7 @@ return function (ast, results, lines, uri)
             start   = start,
             finish  = finish,
             level   = 'Warning',
-            message = 'Parsed as function call for the previous line. It may be necessary to add a `;` before.',
+            message = 'Parsed as function call for the previous line. It may be necessary to add a `;` before.', -- LOCALE
         }
     end)
     return datas

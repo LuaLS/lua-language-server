@@ -194,6 +194,9 @@ function mt:searchSimple(simple)
     if name.type == 'name' then
         var = self:getVar(name[1], name)
     end
+    if name.type == 'string' then
+        var = self:getString(name)
+    end
     self:searchExp(simple[1])
     for i = 2, #simple do
         local obj = simple[i]
@@ -209,14 +212,12 @@ function mt:searchSimple(simple)
                 var = self:getField(var, obj[1], obj)
                 self:addInfo(var, 'get', obj)
             end
+        elseif obj.index and (obj.type == 'string' or obj.type == 'number' or obj.type == 'boolean') then
+            var = self:getField(var, obj[1], obj)
+            self:addInfo(var, 'get', obj)
         else
-            if obj.index and (obj.type == 'string' or obj.type == 'number' or obj.type == 'boolean') then
-                var = self:getField(var, obj[1], obj)
-                self:addInfo(var, 'get', obj)
-            else
-                self:searchExp(obj)
-                var = nil
-            end
+            self:searchExp(obj)
+            var = nil
         end
     end
     return var
@@ -254,6 +255,7 @@ function mt:getString(exp)
     return {
         type = 'string',
         string = exp[1],
+        childs = {},
     }
 end
 
@@ -315,6 +317,9 @@ function mt:markSimple(simple)
     if name.type == 'name' then
         var = self:getVar(name[1], name)
     end
+    if name.type == 'string' then
+        var = self:getString(name)
+    end
     self:searchExp(simple[1])
     for i = 2, #simple do
         local obj = simple[i]
@@ -337,19 +342,17 @@ function mt:markSimple(simple)
                     self:addInfo(var, 'get', obj)
                 end
             end
-        else
-            if obj.index and (obj.type == 'string' or obj.type == 'number' or obj.type == 'boolean') then
-                if i == #simple then
-                    var = self:addField(var, obj[1], obj)
-                    self:addInfo(var, 'set', obj)
-                else
-                    var = self:getField(var, obj[1], obj)
-                    self:addInfo(var, 'get', obj)
-                end
+        elseif obj.index and (obj.type == 'string' or obj.type == 'number' or obj.type == 'boolean') then
+            if i == #simple then
+                var = self:addField(var, obj[1], obj)
+                self:addInfo(var, 'set', obj)
             else
-                self:searchExp(obj)
-                var = nil
+                var = self:getField(var, obj[1], obj)
+                self:addInfo(var, 'get', obj)
             end
+        else
+            self:searchExp(obj)
+            var = nil
         end
     end
     return var

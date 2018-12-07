@@ -81,5 +81,18 @@ require 'table'.<?insert?>()
 
 TEST '*string:sub' [[
 local str = 'xxx'
+str.<?sub?> = 1
+]]
+
+TEST '*string:sub' [[
+local str = 'xxx'
 str:<?sub?>(1, 1)
+]]
+
+TEST '*string:sub' [[
+('xxx').<?sub?> = 1
+]]
+
+TEST '*string:sub' [[
+('xxx'):<?sub?>()
 ]]

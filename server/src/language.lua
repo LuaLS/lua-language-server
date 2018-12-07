@@ -14,8 +14,7 @@ local function osLanguage()
     return ''
 end
 
-local function init()
-    local id = osLanguage()
+local function getLanguage(id)
     local support = supportLanguage()
     -- 检查是否支持语言
     if support[id] then
@@ -29,6 +28,14 @@ local function init()
     end
     -- 使用英文
     return 'enUS'
+end
+
+local function init()
+    local id = osLanguage()
+    local language = getLanguage(id)
+    log.info(('Os language:   %s'):format(id))
+    log.info(('Used language: %s'):format(language))
+    return language
 end
 
 return init()

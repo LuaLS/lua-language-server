@@ -99,11 +99,18 @@ local function getLibs()
     return Libs
 end
 
+local function checkLib(var, lib)
+    return var.key
+end
+
 local function findLib(var, libs)
     local key = var.key
     for name, lib in pairs(libs) do
         if name == key then
-            return lib, key
+            local fullkey = checkLib(var, lib)
+            if fullkey then
+                return lib, fullkey
+            end
         end
     end
     return nil, nil

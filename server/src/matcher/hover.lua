@@ -1,6 +1,8 @@
 local findResult = require 'matcher.find_result'
 local findLib    = require 'matcher.find_lib'
 
+local Cache = {}
+
 local function buildArgs(lib)
     if not lib.args then
         return ''
@@ -165,11 +167,17 @@ return function (results, pos)
         return nil
     end
 
-    if lib.type == 'function' then
-        return buildFunctionHover(lib, name)
-    elseif lib.type == 'table' then
-        return buildTableHover(lib, name)
-    elseif lib.type == 'string' then
-        return lib.description
+    if not Cache[lib] then
+        if lib.type == 'function' then
+            Cache[lib] = buildFunctionHover(lib, name) or ''
+        elseif lib.type == 'table' then
+            Cache[lib] = buildTableHover(lib, name) or ''
+        elseif lib.type == 'string' then
+            Cache[lib] = lib.description or ''
+        else
+            Cache[lib] = ''
+        end
     end
+
+    return Cache[lib]
 end

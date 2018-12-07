@@ -99,18 +99,27 @@ local function getLibs()
     return Libs
 end
 
-local function checkLib(var, lib)
-    return var.key
+local function checkLibAsGlobal(var, name, lib)
+    -- 检查是否是全局变量
+    local value = var.value or var
+    if value.type == 'field' and value.parent.key == '_ENV' then
+        if value.key == name then
+            return name
+        end
+    end
+end
+
+local function checkLib(var, name, lib)
+    if not lib.source then
+        return checkLibAsGlobal(var, name)
+    end
 end
 
 local function findLib(var, libs)
-    local key = var.key
     for name, lib in pairs(libs) do
-        if name == key then
-            local fullkey = checkLib(var, lib)
-            if fullkey then
-                return lib, fullkey
-            end
+        local fullkey = checkLib(var, name, lib)
+        if fullkey then
+            return lib, fullkey
         end
     end
     return nil, nil

@@ -100,3 +100,14 @@ local obj = setmetatable({
     }
 }, { __index = mt })
 ]]
+
+TEST [[
+local sm = setmetatable
+local mt
+mt.__index = mt
+function mt:<!method1!>()
+end
+
+local obj = sm({}, mt)
+obj:<?method1?>()
+]]

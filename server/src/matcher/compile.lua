@@ -111,14 +111,26 @@ function mt:checkDots(source)
     self:addInfo(dots, 'get', source)
 end
 
-function mt:searchCall(call, simple, i)
+function mt:getApi(func)
+    if not func then
+        return nil
+    end
+    func = func.value or func
+    if func.type == 'field' and func.parent.key == '_ENV' then
+        return func.key
+    end
+    return nil
+end
+
+function mt:searchCall(call, func)
     local results = {}
     for i, exp in ipairs(call) do
         results[i] = self:searchExp(exp)
     end
 
-    -- 特殊处理 setmetatable
-    if i == 2 and simple[1][1] == 'setmetatable' then
+    local api = self:getApi(func)
+
+    if api == 'setmetatable' then
         local obj = results[1]
         local metatable = results[2]
         if metatable then
@@ -147,7 +159,7 @@ function mt:searchSimple(simple)
         local obj = simple[i]
         local tp = obj.type
         if     tp == 'call' then
-            var = self:searchCall(obj, simple, i)
+            var = self:searchCall(obj, var)
         elseif tp == ':' then
         elseif tp == 'name' then
             if obj.index then
@@ -189,7 +201,7 @@ function mt:searchTable(exp)
             local key, value = obj[1], obj[2]
             local res = self:searchExp(value)
             local var = self:addField(tbl, key[1], key)
-            self:setTable(var, res)
+            self:setValue(var, res)
             self:addInfo(var, 'set', key)
         else
             self:searchExp(obj)
@@ -228,12 +240,13 @@ function mt:searchReturn(action)
     end
 end
 
-function mt:setTable(var, tbl)
-    if not var or not tbl then
+function mt:setValue(var, value)
+    if not var or not value then
         return
     end
-    var.childs = tbl.childs
-    for _, child in pairs(tbl.childs) do
+    var.childs = value.childs
+    var.value  = value.value or value
+    for _, child in pairs(value.childs) do
         child.parent = var
     end
 end
@@ -257,7 +270,7 @@ function mt:markSimple(simple)
         local obj = simple[i]
         local tp  = obj.type
         if     tp == 'call' then
-            var = self:searchCall(obj, simple, i)
+            var = self:searchCall(obj, var)
         elseif tp == ':' then
             var = self:createLocal('self', simple[i-1], self:getVar(simple[i-1][1]))
             var.disableRename = true
@@ -292,23 +305,23 @@ function mt:markSimple(simple)
     return var
 end
 
-function mt:markSet(simple, tbl)
+function mt:markSet(simple, value)
     if simple.type == 'name' then
         local var = self:getVar(simple[1], simple)
         self:addInfo(var, 'set', simple)
-        self:setTable(var, tbl)
+        self:setValue(var, value)
     else
         local var = self:markSimple(simple)
-        self:setTable(var, tbl)
+        self:setValue(var, value)
     end
 end
 
-function mt:markLocal(name, tbl)
+function mt:markLocal(name, value)
     if name.type == 'name' then
         local str = name[1]
         -- 创建一个局部变量
         local var = self:createLocal(str, name)
-        self:setTable(var, tbl)
+        self:setValue(var, value)
     elseif name.type == '...' then
         local dots = self:createDots()
         self:addInfo(dots, 'local', name)

@@ -169,10 +169,17 @@ function mt:fixCallAsRequire(results)
     return self:createLib(libname.string)
 end
 
-function mt:searchCall(call, func)
+function mt:searchCall(call, func, lastobj)
     local results = {}
     for i, exp in ipairs(call) do
         results[i] = self:searchExp(exp)
+    end
+
+    if lastobj then
+        table.insert(self.results.calls, {
+            call    = call,
+            lastobj = lastobj,
+        })
     end
 
     local api = self:getApi(func)
@@ -202,7 +209,7 @@ function mt:searchSimple(simple)
         local obj = simple[i]
         local tp = obj.type
         if     tp == 'call' then
-            var = self:searchCall(obj, var)
+            var = self:searchCall(obj, var, simple[i-1])
         elseif tp == ':' then
         elseif tp == 'name' then
             if obj.index then
@@ -325,7 +332,7 @@ function mt:markSimple(simple)
         local obj = simple[i]
         local tp  = obj.type
         if     tp == 'call' then
-            var = self:searchCall(obj, var)
+            var = self:searchCall(obj, var, simple[i-1])
         elseif tp == ':' then
             var = self:createLocal('self', simple[i-1], self:getVar(simple[i-1][1]))
             var.disableRename = true
@@ -583,6 +590,7 @@ return function (ast)
             labels = {},
             vars = {},
             dots = {},
+            calls = {},
         }
     }, mt)
     searcher.env.label = {}

@@ -54,8 +54,8 @@ local function createInfo(data, lines)
         for i, info in ipairs(data.related) do
             local message = info.message
             if not message then
-                local start_line  = lines:rowcol(info.start)
-                local finish_line = lines:rowcol(info.finish)
+                local start_line  = lines:rowcol(info.start, 'utf8')
+                local finish_line = lines:rowcol(info.finish, 'utf8')
                 local chars = {}
                 for n = start_line, finish_line do
                     chars[#chars+1] = lines:line(n)

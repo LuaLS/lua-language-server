@@ -116,6 +116,20 @@ local function searchRedefinition(results, uri, callback)
     end
 end
 
+local function searchNewLineCall(results, lines, callback)
+    for _, call in ipairs(results.calls) do
+        if not call.lastobj.start then
+            goto NEXT_CALL
+        end
+        local callline = lines:rowcol(call.call.start, 'utf8')
+        local lastline = lines:rowcol(call.lastobj.start, 'utf8')
+        if callline > lastline then
+            callback(call.call.start, call.call.finish)
+        end
+        ::NEXT_CALL::
+    end
+end
+
 return function (ast, results, lines, uri)
     local datas = {}
     -- 未使用的局部变量
@@ -162,6 +176,15 @@ return function (ast, results, lines, uri)
             level   = 'Warning',
             message = ('Redefined local `%s`'):format(key),
             related = related,
+        }
+    end)
+    -- 以括号开始的一行（可能被误解析为了上一行的call）
+    searchNewLineCall(results, lines, function (start, finish)
+        datas[#datas+1] = {
+            start   = start,
+            finish  = finish,
+            level   = 'Warning',
+            message = 'Parsed as function call for the previous line. It may be necessary to add a `;` before.',
         }
     end)
     return datas

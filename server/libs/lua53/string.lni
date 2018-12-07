@@ -1,5 +1,34 @@
-[default]
-type = 'function'
-
 [string]
 type = 'table'
+[[.source]]
+type = 'global'
+[[.source]]
+type = 'library'
+name = 'string'
+
+[default]
+type = 'function'
+[[.parent]]
+type = 'global'
+name = 'string'
+[[.parent]]
+type = 'library'
+name = 'string'
+[[.parent]]
+type = 'object'
+name = 'string'
+
+[sub]
+[[.args]]
+name = 's'
+type = 'string'
+[[.args]]
+name = 'i'
+type = 'integer'
+[[.args]]
+name = 'j'
+type = 'integer'
+optional = 'self'
+default = -1
+[[.returns]]
+type = 'string'

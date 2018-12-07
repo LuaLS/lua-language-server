@@ -2,21 +2,29 @@ local findResult = require 'matcher.find_result'
 local findLib    = require 'matcher.find_lib'
 
 local Cache = {}
+local OoCache = {}
 
-local function buildArgs(lib)
+local function buildArgs(lib, oo)
     if not lib.args then
         return ''
     end
+    local start
+    if oo then
+        start = 2
+    else
+        start = 1
+    end
     local strs = {}
-    for i, arg in ipairs(lib.args) do
+    for i = start, #lib.args do
+        local arg = lib.args[i]
         if arg.optional then
-            if i > 1 then
+            if i > start then
                 strs[#strs+1] = ' ['
             else
                 strs[#strs+1] = '['
             end
         end
-        if i > 1 then
+        if i > start then
             strs[#strs+1] = ', '
         end
         if arg.name then
@@ -111,8 +119,8 @@ local function buildEnum(lib)
     return table.concat(strs)
 end
 
-local function buildFunctionHover(lib, name)
-    local title = ('function %s(%s)%s'):format(name, buildArgs(lib), buildReturns(lib))
+local function buildFunctionHover(lib, fullKey, oo)
+    local title = ('function %s(%s)%s'):format(fullKey, buildArgs(lib, oo), buildReturns(lib))
     local enum = buildEnum(lib)
     local tip = lib.description or ''
     return ([[
@@ -137,8 +145,8 @@ local function buildField(lib)
     return table.concat(strs)
 end
 
-local function buildTableHover(lib, name)
-    local title = ('table %s'):format(name)
+local function buildTableHover(lib, fullKey)
+    local title = ('table %s'):format(fullKey)
     local field = buildField(lib)
     local tip = lib.description or ''
     return ([[
@@ -162,22 +170,24 @@ return function (results, pos)
         return nil
     end
     local var = result.var
-    local lib, name = findLib(var)
+    local lib, fullKey, oo = findLib(var)
     if not lib then
         return nil
     end
 
-    if not Cache[lib] then
+    local cache = oo and OoCache or Cache
+
+    if not cache[lib] then
         if lib.type == 'function' then
-            Cache[lib] = buildFunctionHover(lib, name) or ''
+            cache[lib] = buildFunctionHover(lib, fullKey, oo) or ''
         elseif lib.type == 'table' then
-            Cache[lib] = buildTableHover(lib, name) or ''
+            cache[lib] = buildTableHover(lib, fullKey) or ''
         elseif lib.type == 'string' then
-            Cache[lib] = lib.description or ''
+            cache[lib] = lib.description or ''
         else
-            Cache[lib] = ''
+            cache[lib] = ''
         end
     end
 
-    return Cache[lib]
+    return cache[lib]
 end

@@ -78,3 +78,8 @@ t.<?insert?>()
 TEST 'table.insert' [[
 require 'table'.<?insert?>()
 ]]
+
+TEST '*string:sub' [[
+local str = 'xxx'
+str:<?sub?>(1, 1)
+]]

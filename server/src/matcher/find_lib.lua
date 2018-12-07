@@ -160,7 +160,7 @@ local function checkParentAsGlobal(parentValue, name, parent)
     if not parentName then
         return nil
     end
-    return ('%s.%s'):format(parentName, name)
+    return ('%s.%s'):format(parent.name, name)
 end
 
 local function checkParentAsLibrary(parentValue, name, parent)
@@ -168,7 +168,14 @@ local function checkParentAsLibrary(parentValue, name, parent)
     if not parentName then
         return nil
     end
-    return ('%s.%s'):format(parentName, name)
+    return ('%s.%s'):format(parent.name, name)
+end
+
+local function checkParentAsObject(parentValue, name, parent)
+    if parentValue.type ~= parent.name then
+        return nil
+    end
+    return ('*%s:%s'):format(parent.name, name)
 end
 
 local function checkParent(value, name, lib)
@@ -187,12 +194,17 @@ local function checkParent(value, name, lib)
         if parent.type == 'global' then
             local fullKey = checkParentAsGlobal(parentValue, name, parent)
             if fullKey then
-                return fullKey
+                return fullKey, false
             end
         elseif parent.type == 'library' then
             local fullKey = checkParentAsLibrary(parentValue, name, parent)
             if fullKey then
-                return fullKey
+                return fullKey, false
+            end
+        elseif parent.type == 'object' then
+            local fullKey = checkParentAsObject(parentValue, name, parent)
+            if fullKey then
+                return fullKey, true
             end
         end
     end
@@ -203,16 +215,19 @@ local function findLib(var, libs)
     local value = var.value or var
     for name, lib in pairs(libs) do
         local fullKey = checkSource(value, name, lib)
-                     or checkParent(value, name, lib)
         if fullKey then
-            return lib, fullKey
+            return lib, fullKey, false
+        end
+        local fullKey, oo = checkParent(value, name, lib)
+        if fullKey then
+            return lib, fullKey, oo
         end
     end
-    return nil, nil
+    return nil, nil, nil
 end
 
 return function (var)
     local libs = getLibs()
-    local lib, fullKey = findLib(var, libs)
-    return lib, fullKey
+    local lib, fullKey, oo = findLib(var, libs)
+    return lib, fullKey, oo
 end

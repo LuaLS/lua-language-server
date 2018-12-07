@@ -1,0 +1,21 @@
+[filesystem]
+type = 'table'
+[[.source]]
+type = 'library'
+name = 'bee.filesystem'
+
+[default]
+type = 'function'
+[[.parent]]
+type = 'library'
+name = 'bee.filesystem'
+nick = 'fs'
+
+[current_path]
+[[.args]]
+name = 'new_path'
+type = '*filesystem'
+optional = 'self'
+[[.returns]]
+type = '*filesystem'
+optional = 'self'

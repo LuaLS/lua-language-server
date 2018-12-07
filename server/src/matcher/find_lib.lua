@@ -118,35 +118,35 @@ local function isGlobal(var)
     return var.parent.key == '_ENV' or var.parent.key == '_G'
 end
 
-local function checkSourceAsGlobal(value, name)
+local function checkSourceAsGlobal(value, name, showname)
     if value.key == name and isGlobal(value) then
-        return name
+        return showname or name
     end
     return nil
 end
 
-local function checkSourceAsLibrary(value, name)
+local function checkSourceAsLibrary(value, name, showname)
     if value.type ~= 'lib' then
         return nil
     end
     if value.name == name then
-        return name
+        return showname or name
     end
     return nil
 end
 
-local function checkSource(value, name, lib)
+local function checkSource(value, libname, lib)
     if not lib.source then
-        return checkSourceAsGlobal(value, name)
+        return checkSourceAsGlobal(value, libname)
     end
     for _, source in ipairs(lib.source) do
         if source.type == 'global' then
-            local fullKey = checkSourceAsGlobal(value, name)
+            local fullKey = checkSourceAsGlobal(value, source.name or libname, source.nick or libname)
             if fullKey then
                 return fullKey
             end
         elseif source.type == 'library' then
-            local fullKey = checkSourceAsLibrary(value, name)
+            local fullKey = checkSourceAsLibrary(value, source.name or libname, source.nick or libname)
             if fullKey then
                 return fullKey
             end
@@ -156,19 +156,19 @@ local function checkSource(value, name, lib)
 end
 
 local function checkParentAsGlobal(parentValue, name, parent)
-    local parentName = checkSourceAsGlobal(parentValue, parent.name)
+    local parentName = checkSourceAsGlobal(parentValue, parent.name, parent.nick)
     if not parentName then
         return nil
     end
-    return ('%s.%s'):format(parent.name, name)
+    return ('%s.%s'):format(parentName, name)
 end
 
 local function checkParentAsLibrary(parentValue, name, parent)
-    local parentName = checkSourceAsLibrary(parentValue, parent.name)
+    local parentName = checkSourceAsLibrary(parentValue, parent.name, parent.nick)
     if not parentName then
         return nil
     end
-    return ('%s.%s'):format(parent.name, name)
+    return ('%s.%s'):format(parentName, name)
 end
 
 local function checkParentAsObject(parentValue, name, parent)
@@ -213,12 +213,12 @@ end
 
 local function findLib(var, libs)
     local value = var.value or var
-    for name, lib in pairs(libs) do
-        local fullKey = checkSource(value, name, lib)
+    for libname, lib in pairs(libs) do
+        local fullKey = checkSource(value, libname, lib)
         if fullKey then
             return lib, fullKey, false
         end
-        local fullKey, oo = checkParent(value, name, lib)
+        local fullKey, oo = checkParent(value, libname, lib)
         if fullKey then
             return lib, fullKey, oo
         end

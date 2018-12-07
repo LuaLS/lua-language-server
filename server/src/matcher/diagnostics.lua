@@ -91,7 +91,7 @@ local function serachSpaces(lines, callback)
     end
 end
 
-local function searchRedefinition(results, callback)
+local function searchRedefinition(results, uri, callback)
     for _, var in ipairs(results.vars) do
         if var.type ~= 'local' then
             goto NEXT_VAR
@@ -105,12 +105,18 @@ local function searchRedefinition(results, callback)
         if not shadow then
             goto NEXT_VAR
         end
-        callback(var.source.start, var.source.finish, var.key)
+        callback(var.source.start, var.source.finish, var.key, {
+            {
+                start  = shadow.source.start,
+                finish = shadow.source.finish,
+                uri = uri,
+            }
+        })
         ::NEXT_VAR::
     end
 end
 
-return function (ast, results, lines)
+return function (ast, results, lines, uri)
     local datas = {}
     -- 未使用的局部变量
     searchUnusedLocals(results, function (start, finish, key)
@@ -149,12 +155,13 @@ return function (ast, results, lines)
         }
     end)
     -- 重定义局部变量
-    searchRedefinition(results, function (start, finish, key)
+    searchRedefinition(results, uri, function (start, finish, key, related)
         datas[#datas+1] = {
             start   = start,
             finish  = finish,
             level   = 'Warning',
             message = ('Redefined local `%s`'):format(key),
+            related = related,
         }
     end)
     return datas

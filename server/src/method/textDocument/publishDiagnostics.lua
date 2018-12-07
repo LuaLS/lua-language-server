@@ -48,8 +48,30 @@ local function createInfo(data, lines)
         range    = getRange(data.start, data.finish, lines),
         severity = DiagnosticSeverity[data.level],
         message  = data.message,
-        relatedInformation = data.relatedInformation,
     }
+    if data.related then
+        local related = {}
+        for i, info in ipairs(data.related) do
+            local message = info.message
+            if not message then
+                local start_line  = lines:rowcol(info.start)
+                local finish_line = lines:rowcol(info.finish)
+                local chars = {}
+                for n = start_line, finish_line do
+                    chars[#chars+1] = lines:line(n)
+                end
+                message = table.concat(chars, '\n')
+            end
+            related[i] = {
+                message = message,
+                location = {
+                    uri = info.uri,
+                    range = getRange(info.start, info.finish, lines),
+                }
+            }
+        end
+        diagnostic.relatedInformation = related
+    end
     return diagnostic
 end
 
@@ -57,8 +79,9 @@ return function (lsp, params)
     local results = params.results
     local ast     = params.ast
     local lines   = params.lines
+    local uri     = params.uri
 
-    local datas   = matcher.diagnostics(ast, results, lines)
+    local datas   = matcher.diagnostics(ast, results, lines, uri)
 
     if not datas then
         -- 返回空表以清空之前的结果

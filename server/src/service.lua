@@ -209,6 +209,7 @@ function mt:compileText(uri)
         ast     = ast,
         results = obj.results,
         lines   = obj.lines,
+        uri     = uri,
     }
 
     return obj

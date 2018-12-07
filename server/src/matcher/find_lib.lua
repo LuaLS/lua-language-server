@@ -1,4 +1,5 @@
 local lni = require 'lni'
+local fs = require 'bee.filesystem'
 
 local function mergeEnum(lib, locale)
     if not lib or not locale then
@@ -35,6 +36,9 @@ local function mergeField(lib, locale)
 end
 
 local function mergeLocale(libs, locale)
+    if not libs or not locale then
+        return
+    end
     for name in pairs(locale) do
         if libs[name] then
             libs[name].description = locale[name].description
@@ -44,35 +48,69 @@ local function mergeLocale(libs, locale)
     end
 end
 
+local function mergeLibs(target, libs)
+    if not libs then
+        return
+    end
+    for name, lib in pairs(libs) do
+        target.names[#target.names+1] = name
+        target.libs[#target.libs+1] = lib
+    end
+end
+
 local Libs
 local function getLibs()
     if Libs then
         return Libs
     end
-    Libs = table.container()
-    for path in io.scan(ROOT / 'libs') do
-        local buf = io.load(path)
-        if buf then
-            xpcall(lni.classics, log.error, buf, path:string(), {Libs})
-        end
-    end
-
     local language = require 'language'
-    local locale = table.container()
-    for path in io.scan(ROOT / 'locale' / language / 'libs') do
+    Libs = setmetatable({
+        names = {},
+        libs = {},
+    }, {
+        __pairs = function (self)
+            local i = 0
+            return function ()
+                i = i + 1
+                return self.names[i], self.libs[i]
+            end
+        end,
+    })
+    for path in io.scan(ROOT / 'libs') do
+        local libs
+        local locale
         local buf = io.load(path)
         if buf then
-            xpcall(lni.classics, log.error, buf, path:string(), {locale})
+            libs = table.container()
+            xpcall(lni.classics, log.error, buf, path:string(), {libs})
         end
-    end
+        local relative = fs.relative(path, ROOT)
+        local localePath = ROOT / 'locale' / language / relative
+        local localeBuf = io.load(localePath)
+        if localeBuf then
+            locale = table.container()
+            xpcall(lni.classics, log.error, localeBuf, localePath:string(), {locale})
+        end
 
-    mergeLocale(Libs, locale)
+        mergeLocale(libs, locale)
+        mergeLibs(Libs, libs)
+    end
 
     return Libs
 end
 
-return function (var)
+local function findLib(var, libs)
     local key = var.key
+    for name, lib in pairs(libs) do
+        if name == key then
+            return lib, key
+        end
+    end
+    return nil, nil
+end
+
+return function (var)
     local libs = getLibs()
-    return libs[key], key
+    local lib, key = findLib(var, libs)
+    return lib, key
 end

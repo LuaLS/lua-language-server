@@ -1,6 +1,14 @@
-local support = {
-    'enUS',
-}
+local fs = require 'bee.filesystem'
+
+local function supportLanguage()
+    local list = {}
+    for path in (ROOT / 'locale'):list_directory() do
+        if fs.is_directory(path) then
+            list[#list+1] = path:filename():string()
+        end
+    end
+    return list
+end
 
 local function osLanguage()
     return ''
@@ -8,6 +16,7 @@ end
 
 local function init()
     local id = osLanguage()
+    local support = supportLanguage()
     -- 检查是否支持语言
     if support[id] then
         return id
@@ -18,8 +27,8 @@ local function init()
             return lang
         end
     end
-    -- 使用第一个语言
-    return support[1]
+    -- 使用英文
+    return 'enUS'
 end
 
 return init()

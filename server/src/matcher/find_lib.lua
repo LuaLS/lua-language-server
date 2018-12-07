@@ -96,9 +96,9 @@ local function getLibs()
         end
         local relative = fs.relative(path, ROOT)
 
-        local locale = loadLocale('enUS', relative)
+        local locale = loadLocale('en-US', relative)
         mergeLocale(libs, locale)
-        if language ~= 'enUS' then
+        if language ~= 'en-US' then
             locale = loadLocale(language, relative)
             mergeLocale(libs, locale)
         end

@@ -4,14 +4,14 @@ local function supportLanguage()
     local list = {}
     for path in (ROOT / 'locale'):list_directory() do
         if fs.is_directory(path) then
-            list[#list+1] = path:filename():string()
+            list[#list+1] = path:filename():string():lower()
         end
     end
     return list
 end
 
 local function osLanguage()
-    return ''
+    return LANG:lower()
 end
 
 local function getLanguage(id)
@@ -33,8 +33,8 @@ end
 local function init()
     local id = osLanguage()
     local language = getLanguage(id)
-    log.info(('Os language:   %s'):format(id))
-    log.info(('Used language: %s'):format(language))
+    log.info(('VSC language: %s'):format(id))
+    log.info(('LSP language: %s'):format(language))
     return language
 end
 

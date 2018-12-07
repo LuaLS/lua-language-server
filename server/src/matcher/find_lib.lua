@@ -110,9 +110,22 @@ local function isGlobal(var)
 end
 
 local function checkLibAsGlobal(var, name)
-    -- 检查是否是全局变量
     local value = var.value or var
     if value.key == name and isGlobal(value) then
+        return name
+    end
+    return nil
+end
+
+local function checkLibAsLibrary(var, name)
+    local value = var.value
+    if not value then
+        return nil
+    end
+    if value.type ~= 'lib' then
+        return nil
+    end
+    if value.name == name then
         return name
     end
     return nil
@@ -125,6 +138,11 @@ local function checkLib(var, name, lib)
     for _, source in ipairs(lib.source) do
         if source.type == 'global' then
             local fullkey = checkLibAsGlobal(var, name)
+            if fullkey then
+                return fullkey
+            end
+        elseif source.type == 'library' then
+            local fullkey = checkLibAsLibrary(var, name)
             if fullkey then
                 return fullkey
             end

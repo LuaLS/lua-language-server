@@ -49,3 +49,9 @@ TEST 'table' [[
 TEST 'table' [[
 local <?xx?> = require 'table'
 ]]
+
+TEST 'table' [[
+local rq = require
+local lib = 'table'
+local <?xx?> = rq(lib)
+]]

@@ -56,6 +56,14 @@ function mt:createDots()
     return dots
 end
 
+function mt:createLib(name)
+    local lib = {
+        name = name,
+        type = 'lib',
+    }
+    return lib
+end
+
 function mt:createLocal(key, source, var)
     if key == nil then
         return nil
@@ -132,6 +140,34 @@ function mt:checkDots(source)
     self:addInfo(dots, 'get', source)
 end
 
+function mt:fixCallAsSetMetaTable(results)
+    local obj = results[1]
+    local metatable = results[2]
+    if metatable then
+        local index = self:getField(metatable, '__index')
+        if obj then
+            self:setMeta(obj, index)
+            return obj
+        else
+            return index
+        end
+    else
+        return obj
+    end
+end
+
+function mt:fixCallAsRequire(results)
+    local libname = results[1]
+    if not libname then
+        return
+    end
+    libname = libname.value or libname
+    if libname.type ~= 'string' then
+        return
+    end
+    return self:createLib(libname.string)
+end
+
 function mt:searchCall(call, func)
     local results = {}
     for i, exp in ipairs(call) do
@@ -141,20 +177,13 @@ function mt:searchCall(call, func)
     local api = self:getApi(func)
 
     if api == 'setmetatable' then
-        local obj = results[1]
-        local metatable = results[2]
-        if metatable then
-            local index = self:getField(metatable, '__index')
-            if obj then
-                self:setMeta(obj, index)
-                return obj
-            else
-                return index
-            end
-        else
-            return obj
-        end
+        return self:fixCallAsSetMetaTable(results)
     end
+
+    if api == 'require' then
+        return self:fixCallAsRequire(results)
+    end
+
     return nil
 end
 
@@ -220,10 +249,18 @@ function mt:searchTable(exp)
     return tbl
 end
 
+function mt:getString(exp)
+    return {
+        type = 'string',
+        string = exp[1],
+    }
+end
+
 function mt:searchExp(exp)
     local tp = exp.type
     if     tp == 'nil' then
     elseif tp == 'string' then
+        return self:getString(exp)
     elseif tp == 'boolean' then
     elseif tp == 'number' then
     elseif tp == 'name' then
@@ -254,10 +291,12 @@ function mt:setValue(var, value)
     if not var or not value then
         return
     end
-    var.childs = value.childs
     var.value  = value.value or value
-    for _, child in pairs(value.childs) do
-        child.parent = var
+    if value.childs then
+        var.childs = value.childs
+        for _, child in pairs(value.childs) do
+            child.parent = var
+        end
     end
 end
 

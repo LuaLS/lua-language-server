@@ -179,9 +179,6 @@ local function checkParentAsObject(parentValue, name, parent)
 end
 
 local function checkParent(value, name, lib)
-    if not lib.parent then
-        return nil
-    end
     if name ~= value.key then
         return nil
     end
@@ -214,13 +211,16 @@ end
 local function findLib(var, libs)
     local value = var.value or var
     for libname, lib in pairs(libs) do
-        local fullKey = checkSource(value, libname, lib)
-        if fullKey then
-            return lib, fullKey, false
-        end
-        local fullKey, oo = checkParent(value, libname, lib)
-        if fullKey then
-            return lib, fullKey, oo
+        if lib.parent then
+            local fullKey, oo = checkParent(value, libname, lib)
+            if fullKey then
+                return lib, fullKey, oo
+            end
+        else
+            local fullKey = checkSource(value, libname, lib)
+            if fullKey then
+                return lib, fullKey, false
+            end
         end
     end
     return nil, nil, nil

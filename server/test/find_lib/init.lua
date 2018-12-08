@@ -21,7 +21,6 @@ function TEST(fullkey)
         local var = result.var
         assert(var)
         local _, name = findLib(var)
-        assert(name)
         assert(name == fullkey)
     end
 end
@@ -101,4 +100,8 @@ TEST 'fs.current_path' [[
 local filesystem = require 'bee.filesystem'
 
 ROOT = filesystem.<?current_path?>()
+]]
+
+TEST(nil)[[
+print(<?insert?>)
 ]]

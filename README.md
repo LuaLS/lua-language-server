@@ -1,1 +1,1 @@
-# vscode-lua-lsp
+# vscode-lua-language-server

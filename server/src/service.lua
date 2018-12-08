@@ -203,7 +203,7 @@ function mt:compileText(uri)
     if not obj.results then
         return obj
     end
-    obj.lines       = parser:lines(obj.text)
+    obj.lines = parser:lines(obj.text, 'utf8')
 
     self._needDiagnostics[uri] = {
         ast     = ast,

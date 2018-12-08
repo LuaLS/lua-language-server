@@ -27,8 +27,8 @@ export interface DiagnosticRelatedInformation {
 ]]--
 
 local function getRange(start, finish, lines)
-    local start_row,  start_col  = lines:rowcol(start,  'utf8')
-    local finish_row, finish_col = lines:rowcol(finish, 'utf8')
+    local start_row,  start_col  = lines:rowcol(start)
+    local finish_row, finish_col = lines:rowcol(finish)
     return {
         start = {
             line = start_row - 1,
@@ -54,8 +54,8 @@ local function createInfo(data, lines)
         for i, info in ipairs(data.related) do
             local message = info.message
             if not message then
-                local start_line  = lines:rowcol(info.start, 'utf8')
-                local finish_line = lines:rowcol(info.finish, 'utf8')
+                local start_line  = lines:rowcol(info.start)
+                local finish_line = lines:rowcol(info.finish)
                 local chars = {}
                 for n = start_line, finish_line do
                     chars[#chars+1] = lines:line(n)

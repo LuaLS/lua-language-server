@@ -142,12 +142,13 @@ function mt:set_code(code)
     self.code = code
 end
 
-return function (self, buf)
+return function (self, buf, code)
     local lines, err = parser:match(buf)
     if not lines then
         return nil, err
     end
     lines.buf = buf
+    lines.code = code
 
     return setmetatable(lines, mt)
 end

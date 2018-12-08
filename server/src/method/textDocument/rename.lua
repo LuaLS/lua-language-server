@@ -8,7 +8,7 @@ return function (lsp, params)
         return {}
     end
     -- lua是从1开始的，因此都要+1
-    local position = lines:position(params.position.line + 1, params.position.character + 1, 'utf8')
+    local position = lines:position(params.position.line + 1, params.position.character + 1)
     local positions = matcher.rename(results, position, newName)
     if not positions then
         return {}
@@ -17,8 +17,8 @@ return function (lsp, params)
     local TextEdit = {}
     for i, position in ipairs(positions) do
         local start, finish = position[1], position[2]
-        local start_row,  start_col  = lines:rowcol(start,  'utf8')
-        local finish_row, finish_col = lines:rowcol(finish, 'utf8')
+        local start_row,  start_col  = lines:rowcol(start)
+        local finish_row, finish_col = lines:rowcol(finish)
         TextEdit[i] = {
             newText = newName,
             range = {

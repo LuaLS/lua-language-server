@@ -127,8 +127,8 @@ local function searchNewLineCall(results, lines, callback)
         if not call.lastobj.start then
             goto NEXT_CALL
         end
-        local callline = lines:rowcol(call.call.start, 'utf8')
-        local lastline = lines:rowcol(call.lastobj.start, 'utf8')
+        local callline = lines:rowcol(call.call.start)
+        local lastline = lines:rowcol(call.lastobj.start)
         if callline > lastline then
             callback(call.call.start, call.call.finish)
         end

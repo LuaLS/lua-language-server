@@ -71,8 +71,8 @@ export function activate(context: ExtensionContext) {
 
 	// Create the language client and start the client.
 	client = new LanguageClient(
-		'sumneko.lua-lsp',
-		'sumneko.lua-lsp',
+		'Lua Language Server',
+		'Lua Language Client',
 		serverOptions,
 		clientOptions
 	);

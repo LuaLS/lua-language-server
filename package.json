@@ -1,6 +1,6 @@
 {
-	"name": "lua-language-server",
-	"description": "Lua Language Server",
+	"name": "Lua Language Server",
+	"description": "Lua Language Server For VSCode",
 	"author": "sumneko",
 	"license": "MIT",
 	"version": "0.0.1",

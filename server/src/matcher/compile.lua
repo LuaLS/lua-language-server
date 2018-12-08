@@ -8,7 +8,7 @@ function mt:getVar(key, source)
     end
     local var = self.env.var[key]
              or self:getField(self.env.var._ENV, key, source) -- 这里不需要用getVar来递归获取_ENV
-    if not var then
+    if not var and source then
         var = self:addField(self:getVar '_ENV', key, source)
     end
     if var and var.meta then

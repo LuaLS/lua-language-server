@@ -223,15 +223,10 @@ end
 function mt:on_tick()
     local proto = thread.proto()
     if proto then
-        self._idleClock = os.clock()
         self:_doProto(proto)
-        return
     end
-    if os.clock() - self._idleClock >= 0.2 then
-        self._idleClock = os.clock()
-        self:_buildTextCache()
-        self:_doDiagnostic()
-    end
+    self:_buildTextCache()
+    self:_doDiagnostic()
 end
 
 function mt:listen()
@@ -254,7 +249,6 @@ return function ()
         _file = {},
         _needCompile = {},
         _needDiagnostics = {},
-        _idleClock = os.clock(),
     }, mt)
     return session
 end

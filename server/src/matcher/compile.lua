@@ -586,10 +586,7 @@ function mt:searchActions(actions)
     return nil
 end
 
-return function (ast)
-    if not ast then
-        return nil
-    end
+local function compile(ast)
     local searcher = setmetatable({
         env = env {
             var = {},
@@ -607,4 +604,15 @@ return function (ast)
     searcher:searchActions(ast)
 
     return searcher.results
+end
+
+return function (ast)
+    if not ast then
+        return nil
+    end
+    local suc, res = xpcall(compile, log.error, ast)
+    if not suc then
+        return nil
+    end
+    return res
 end

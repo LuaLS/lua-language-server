@@ -101,17 +101,23 @@ local function searchRedefinition(results, uri, callback)
         then
             goto NEXT_VAR
         end
-        local shadow = var.redefinition
+        local shadow = var.shadow
         if not shadow then
             goto NEXT_VAR
         end
-        callback(var.source.start, var.source.finish, var.key, {
-            {
-                start  = shadow.source.start,
-                finish = shadow.source.finish,
-                uri = uri,
+        -- 如果多次重定义，则不再警告
+        if #shadow >= 4 then
+            goto NEXT_VAR
+        end
+        local related = {}
+        for i = 1, #shadow do
+            related[i] = {
+                start  = shadow[i].source.start,
+                finish = shadow[i].source.finish,
+                uri    = uri,
             }
-        })
+        end
+        callback(var.source.start, var.source.finish, var.key, related)
         ::NEXT_VAR::
     end
 end

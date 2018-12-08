@@ -73,7 +73,16 @@ function mt:createLocal(key, source, var)
         var = self:createVar('local', key, source)
         self:addInfo(var, 'local', source)
     end
-    var.redefinition = self.env.var[key]
+    local old = self.env.var[key]
+    if old then
+        local shadow = old.shadow
+        if not shadow then
+            shadow = { old }
+            old.shadow = shadow
+        end
+        var.shadow = shadow
+        shadow[#shadow+1] = var
+    end
     self.env.var[key] = var
     return var
 end

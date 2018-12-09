@@ -3,6 +3,7 @@ type = 'table'
 [[.source]]
 type = 'library'
 name = 'bee.filesystem'
+nick = 'bee::filesystem'
 
 [default]
 type = 'function'
@@ -14,8 +15,8 @@ nick = 'fs'
 [current_path]
 [[.args]]
 name = 'new_path'
-type = '*filesystem'
+type = '*bee::filesystem'
 optional = 'self'
 [[.returns]]
-type = '*filesystem'
+type = '*bee::filesystem'
 optional = 'self'

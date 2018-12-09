@@ -1,5 +1,34 @@
-[default]
-type = 'function'
-
 [io]
 type = 'table'
+[[.source]]
+type = 'global'
+[[.source]]
+type = 'library'
+name = 'io'
+
+[default]
+type = 'function'
+[[.parent]]
+type = 'global'
+name = 'io'
+[[.parent]]
+type = 'library'
+name = 'io'
+
+[stdin]
+type = '*FILE*'
+
+[close]
+[[.parent]]
+type = 'global'
+name = 'table'
+[[.parent]]
+type = 'library'
+name = 'table'
+[[.parent]]
+type = 'object'
+name = '*FILE*'
+[[.args]]
+type = '*FILE*'
+name = 'file'
+optional = 'self'

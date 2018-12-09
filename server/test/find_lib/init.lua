@@ -92,7 +92,7 @@ TEST '*string:sub' [[
 ('xxx').<?sub?> = 1
 ]]
 
-TEST 'filesystem' [[
+TEST 'bee::filesystem' [[
 local <?fs?> = require 'bee.filesystem'
 ]]
 

@@ -271,6 +271,7 @@ function mt:getString(exp)
     return {
         type = 'string',
         string = exp[1],
+        valuetype = 'string',
         childs = {},
     }
 end
@@ -310,7 +311,7 @@ function mt:setValue(var, value)
     if not var or not value then
         return
     end
-    var.value  = value.value or value
+    var.value = value.value or value
     if value.childs then
         var.childs = value.childs
         for _, child in pairs(value.childs) do

@@ -106,7 +106,7 @@ local function searchRedefinition(results, uri, callback)
             goto NEXT_VAR
         end
         -- 如果多次重定义，则不再警告
-        if #shadow >= 4 then
+        if #shadow >= 3 then
             goto NEXT_VAR
         end
         local related = {}

@@ -22,6 +22,32 @@ function mt:createTable(source)
         type   = 'table',
         source = source or DefaultSource,
     }
+    if not source then
+        return tbl
+    end
+    local n = 0
+    for _, obj in ipairs(source) do
+        if obj.type == 'pair' then
+            local value = self:getExp(obj[2])
+            local key   = obj[1]
+            if key.index then
+                local index = self:getIndex(key)
+                local field = self:createField(tbl, index, key)
+                self:setValue(field, value)
+            else
+                if key.type == 'name' then
+                    local index = key[1]
+                    local field = self:createField(tbl, index, key)
+                    self:setValue(field, value)
+                end
+            end
+        else
+            local value = self:getExp(obj[1])
+            n = n + 1
+            local field = self:createField(tbl, n)
+            self:setValue(field, value)
+        end
+    end
     return tbl
 end
 
@@ -61,29 +87,72 @@ function mt:getField(pValue, name, source)
     return field
 end
 
-function mt:createFunction(source)
+function mt:createFunction(exp)
     local func = {
-        type   = 'function',
-        source = source or DefaultSource,
+        type = 'function',
+        args = {},
     }
+
+    if exp then
+        self:forList(exp.args, function (arg)
+            func.args[#func.args+1] = self:createLocal(arg[1], arg)
+        end)
+    end
+
+    self.func.func = func
+    self.results.funcs[#self.results.funcs+1] = func
+    self.newFuncs[#self.newFuncs+1] = func
     return func
 end
 
+function mt:forList(list, callback)
+    if not list then
+        return
+    end
+    if list.type == 'list' then
+        for i = 1, #list do
+            callback(list[i])
+        end
+    else
+        callback(list)
+    end
+end
+
+function mt:call(func, values)
+    if func.hasRuned then
+        return self:getFunctionReturns(func)
+    end
+    func.hasRuned = true
+    self.func:push()
+    self.scope:push()
+    self.func:cut 'labels'
+
+    local n = 0
+    self:forList(func.arg, function (arg)
+        n = n + 1
+        local var = self:createLocal(arg[1], arg)
+        self:setValue(var, values[n])
+    end)
+
+    self:doActions(func)
+
+    self.func:pop()
+    self.scope:pop()
+    return self:getFunctionReturns(func)
+end
+
+function mt:getCurrentFunction()
+    return self.func.func
+end
+
 function mt:setFunctionReturn(index, value)
-    local func = self.func.func
+    local func = self:getCurrentFunction()
     if not func.returns then
         func.returns = {
             type = 'list',
         }
     end
     func.returns[index] = value
-end
-
-function mt:setFunctionArg(func, index, value)
-    if not func.args then
-        func.args = {}
-    end
-    func.args[index] = value
 end
 
 function mt:getFunctionReturns(func)
@@ -156,51 +225,55 @@ function mt:setLib(obj, lib)
     end
 end
 
-function mt:call(func, args)
-    for i, arg in ipairs(args) do
-        self:setFunctionArg(func, i, self:getExp(arg))
-    end
-    return self:getFunctionReturns(func)
-end
-
 function mt:getName(name, source)
     local var = self.scope.locals[name]
              or self:getField(self.scope.locals._ENV, name, source)
     return var
 end
 
+function mt:getIndex(obj)
+    local tp = obj.type
+    if tp == 'name' then
+        local var = self:getVar(obj[1])
+        return self:getValue(var)
+    elseif (tp == 'string' or tp == 'number' or tp == 'boolean') then
+        return obj[1]
+    else
+        return self:getExp(obj)
+    end
+end
+
 function mt:getSimple(simple)
     local value = self:getExp(simple[1])
     local field
+    local object
     for i = 2, #simple do
         local obj = simple[i]
         local tp  = obj.type
 
         if     tp == 'call' then
+            local args = {}
+            if object then
+                args[1] = object
+            end
+            for _, arg in ipairs(obj) do
+                args[#args+1] = self:getExp(arg)
+            end
             -- 函数的返回值一定是list
-            value = self:call(value, obj)
+            value = self:call(value, args)
             if i < #simple then
                 value = value[1]
             end
         elseif obj.index then
-            if tp == 'name' then
-                local var = self:getVar(obj[1])
-                field = self:getField(value, self:getValue(var), obj)
-            elseif (tp == 'string' or tp == 'number' or tp == 'boolean') then
-                field = self:getField(value, obj[1], obj)
-            else
-                local eValue = self:getExp(obj)
-                field = self:getField(value, eValue, obj)
-            end
+            local index = self:getIndex(obj)
+            field = self:getField(value, index, obj)
             value = self:getValue(field)
         else
             if tp == 'name' then
                 field = self:getField(value, obj[1])
                 value = self:getValue(field)
             elseif tp == ':' then
-                if field then
-                    field.oo = true
-                end
+                object = value
             end
         end
     end
@@ -285,6 +358,10 @@ function mt:getExp(exp)
         return self:getUnary(exp)
     elseif tp == '...' then
         return self:getDots(exp)
+    elseif tp == 'function' then
+        return self:createFunction(exp)
+    elseif tp == 'table' then
+        return self:createTable(exp)
     end
     return nil
 end
@@ -321,8 +398,11 @@ end
 function mt:createEnvironment()
     -- 整个文件是一个函数
     self.func.func = self:createFunction()
-    -- 所有脚本都有个隐藏的上值`_ENV`
+    -- 隐藏的上值`_ENV`
     local parent = self:createLocal('_ENV')
+    -- 隐藏的参数`...`
+    self:createLocal('...')
+
     local pValue = self:setValue(parent, self:createTable())
     -- 设置全局变量
     for name, info in pairs(library.global) do
@@ -352,7 +432,9 @@ local function compile(ast)
             locals = {},
             fields = {},
             labels = {},
-        }
+            funcs  = {},
+        },
+        newFuncs = {},
     }, mt)
 
     -- 创建初始环境
@@ -360,6 +442,15 @@ local function compile(ast)
 
     -- 执行代码
     vm:doActions(ast)
+
+    -- 把所有没跑过的函数跑一遍（可能会创建新的函数，需要一直跑到没有新的函数为止）
+    while true do
+        local func = table.remove(vm.newFuncs, 1)
+        if not func then
+            break
+        end
+        vm:call(func)
+    end
 
     return vm.results
 end

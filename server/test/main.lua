@@ -27,6 +27,7 @@ local function main()
     test 'type_inference'
     test 'definition'
     test 'find_lib'
+    test 'vm'
 
     print('测试完成')
 end

@@ -9,6 +9,7 @@ local api = {
     typeInference  = require 'matcher.type_inference',
     findResult     = require 'matcher.find_result',
     findLib        = require 'matcher.find_lib',
+    vm             = require 'matcher.vm',
 }
 
 return api

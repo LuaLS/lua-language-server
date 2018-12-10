@@ -179,7 +179,7 @@ return function (ast, results, lines, uri)
         datas[#datas+1] = {
             start   = start,
             finish  = finish,
-            level   = 'Warning',
+            level   = 'Information',
             message = ('Redefined local `%s`'):format(key), -- LOCALE
             related = related,
         }

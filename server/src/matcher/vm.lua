@@ -17,6 +17,23 @@ function mt:createLocal(key, source)
     return loc
 end
 
+function mt:addInfo(obj, type, source)
+    obj[#obj+1] = {
+        type = type,
+        source = source,
+    }
+    return obj
+end
+
+function mt:createDots(source)
+    local dots = {
+        type = 'dots',
+        source = source or DefaultSource,
+    }
+    self.func.dots = dots
+    return dots
+end
+
 function mt:createTable(source)
     local tbl = {
         type   = 'table',
@@ -42,7 +59,7 @@ function mt:createTable(source)
                 end
             end
         else
-            local value = self:getExp(obj[1])
+            local value = self:getExp(obj)
             n = n + 1
             local field = self:createField(tbl, n)
             self:setValue(field, value)
@@ -52,8 +69,8 @@ function mt:createTable(source)
 end
 
 function mt:setValue(var, value)
-    assert(value.type ~= 'list')
-    var.value = value
+    assert(not value or value.type ~= 'list')
+    var.value = value or self:createNil(var)
     return value
 end
 
@@ -91,11 +108,23 @@ function mt:createFunction(exp)
     local func = {
         type = 'function',
         args = {},
+        returns = {
+            type = 'list',
+        },
     }
 
     if exp then
+        local stop
         self:forList(exp.args, function (arg)
-            func.args[#func.args+1] = self:createLocal(arg[1], arg)
+            if stop then
+                return
+            end
+            if arg.type == 'name' then
+                func.args[#func.args+1] = self:createLocal(arg[1], arg)
+            elseif arg.type == '...' then
+                func.args[#func.args+1] = self:createDots(arg)
+                stop = true
+            end
         end)
     end
 
@@ -119,20 +148,32 @@ function mt:forList(list, callback)
 end
 
 function mt:call(func, values)
-    if func.hasRuned then
+    if func.used then
         return self:getFunctionReturns(func)
     end
-    func.hasRuned = true
+    func.used = true
     self.func:push()
     self.scope:push()
     self.func:cut 'labels'
+    self.func:cut 'dots'
 
-    local n = 0
-    self:forList(func.arg, function (arg)
-        n = n + 1
-        local var = self:createLocal(arg[1], arg)
-        self:setValue(var, values[n])
-    end)
+    for i = 1, #func.args do
+        local var = func.arg[i]
+        if var then
+            if var.type == 'dots' then
+                local list = {
+                    type = 'list',
+                }
+                for n = i, #values do
+                    list[n-i+1] = values[n]
+                end
+                self:setValue(var, list)
+                break
+            else
+                self:setValue(var, values[i])
+            end
+        end
+    end
 
     self:doActions(func)
 
@@ -147,11 +188,6 @@ end
 
 function mt:setFunctionReturn(index, value)
     local func = self:getCurrentFunction()
-    if not func.returns then
-        func.returns = {
-            type = 'list',
-        }
-    end
     func.returns[index] = value
 end
 
@@ -234,7 +270,7 @@ end
 function mt:getIndex(obj)
     local tp = obj.type
     if tp == 'name' then
-        local var = self:getVar(obj[1])
+        local var = self:getName(obj[1])
         return self:getValue(var)
     elseif (tp == 'string' or tp == 'number' or tp == 'boolean') then
         return obj[1]
@@ -312,7 +348,7 @@ function mt:getBinary(exp)
         or op == '^'
         or op == '%'
     then
-        return self:craeteNumber()
+        return self:createNumber()
     end
     return nil
 end
@@ -334,6 +370,9 @@ function mt:getUnary(exp)
 end
 
 function mt:getDots()
+    if not self.func.dots then
+        self:createDots()
+    end
     return self.func.dots
 end
 
@@ -348,7 +387,8 @@ function mt:getExp(exp)
     elseif tp == 'number' then
         return self:createNumber(exp[1], exp)
     elseif tp == 'name' then
-        local var = self:getVar(exp[1], exp)
+        local var = self:getName(exp[1], exp)
+        self:addInfo(var, 'get', exp)
         return self:getValue(var)
     elseif tp == 'simple' then
         return self:getSimple(exp)
@@ -357,7 +397,9 @@ function mt:getExp(exp)
     elseif tp == 'unary' then
         return self:getUnary(exp)
     elseif tp == '...' then
-        return self:getDots(exp)
+        local var = self:getDots()
+        self:addInfo(var, 'get', exp)
+        return self:getValue(var)
     elseif tp == 'function' then
         return self:createFunction(exp)
     elseif tp == 'table' then
@@ -379,6 +421,19 @@ function mt:doReturn(action)
     end
 end
 
+function mt:createLabel(action)
+    local name = action[1]
+    if not self.func.labels[name] then
+        local label = {
+            type = 'label',
+            key = name,
+        }
+        self.func.labels[name] = label
+        self.results.labels[#self.results.labels+1] = label
+    end
+    self:addInfo(self.func.labels[name], 'set', action)
+end
+
 function mt:doAction(action)
     local tp = action.type
     if     tp == 'do' then
@@ -386,6 +441,8 @@ function mt:doAction(action)
     elseif tp == 'break' then
     elseif tp == 'return' then
         self:doReturn(action)
+    elseif tp == 'label' then
+        self:createLabel(action)
     end
 end
 
@@ -401,7 +458,7 @@ function mt:createEnvironment()
     -- 隐藏的上值`_ENV`
     local parent = self:createLocal('_ENV')
     -- 隐藏的参数`...`
-    self:createLocal('...')
+    self:createDots()
 
     local pValue = self:setValue(parent, self:createTable())
     -- 设置全局变量

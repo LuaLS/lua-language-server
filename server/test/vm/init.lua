@@ -19,3 +19,41 @@ end
 TEST [[
 return nil, 1, true, 'xx'
 ]]
+
+TEST [[
+return a
+]]
+
+TEST [[
+retrun a.b:c()[1][name]
+]]
+
+TEST [[
+return 1 + 1
+]]
+
+TEST [[
+return -1
+]]
+
+TEST [[
+return ...
+]]
+
+TEST [[
+return function (a, b, ...)
+end
+]]
+
+TEST [[
+return {
+    a = 1,
+    b = {
+        c = d,
+        e = f,
+    },
+    g,
+    h,
+    1,
+}
+]]

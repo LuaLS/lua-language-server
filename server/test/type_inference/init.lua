@@ -70,6 +70,42 @@ local <?t?>
 t = {}
 ]]
 
+TEST 'function' [[
+<?x?>()
+]]
+
 TEST 'table' [[
 <?t?>.x = 1
+]]
+
+TEST 'boolean' [[
+<?x?> = not y
+]]
+
+TEST 'integer' [[
+<?x?> = #y
+]]
+
+TEST 'number' [[
+<?x?> = - y
+]]
+
+TEST 'integer' [[
+<?x?> = ~ y
+]]
+
+TEST 'boolean' [[
+<?x?> = a and b
+]]
+
+TEST 'integer' [[
+<?x?> = a << b
+]]
+
+TEST 'string' [[
+<?x?> = a .. b
+]]
+
+TEST 'number' [[
+<?x?> = a + b
 ]]

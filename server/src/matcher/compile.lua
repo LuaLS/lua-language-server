@@ -242,12 +242,20 @@ function mt:searchSimple(simple)
 end
 
 function mt:searchBinary(exp)
-    self:searchExp(exp[1])
-    self:searchExp(exp[2])
+    return {
+        type = 'binary',
+        op   = exp.op,
+        [1]  = self:searchExp(exp[1]),
+        [2]  = self:searchExp(exp[2]),
+    }
 end
 
 function mt:searchUnary(exp)
-    self:searchExp(exp[1])
+    return {
+        type = 'unary',
+        op   = exp.op,
+        [1]  = self:searchExp(exp[1]),
+    }
 end
 
 function mt:searchTable(exp)
@@ -309,9 +317,9 @@ function mt:searchExp(exp)
     elseif tp == 'simple' then
         return self:searchSimple(exp)
     elseif tp == 'binary' then
-        self:searchBinary(exp)
+        return self:searchBinary(exp)
     elseif tp == 'unary' then
-        self:searchUnary(exp)
+        return self:searchUnary(exp)
     elseif tp == '...' then
         self:checkDots(exp)
     elseif tp == 'function' then

@@ -26,3 +26,11 @@ end
 TEST 'string' [[
 local <?var?> = '111'
 ]]
+
+TEST 'boolean' [[
+local <?var?> = true
+]]
+
+TEST 'number' [[
+local <?var?> = 1
+]]

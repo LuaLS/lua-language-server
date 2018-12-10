@@ -46,7 +46,7 @@ mt.__index = mt
 function mt:<!method1!>()
 end
 
-local obj = setmetatable(1, mt)
+local obj = setmetatable({}, mt)
 obj:<?method1?>()
 ]]
 
@@ -55,7 +55,7 @@ local mt
 function mt:<!method1!>()
 end
 
-local obj = setmetatable(1, { __index = mt })
+local obj = setmetatable({}, { __index = mt })
 obj:<?method1?>()
 ]]
 

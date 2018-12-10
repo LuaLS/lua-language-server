@@ -278,13 +278,31 @@ function mt:getString(exp)
     }
 end
 
+function mt:getBoolean(exp)
+    return {
+        type = 'boolean',
+        boolean = exp[1],
+        valuetype = 'boolean',
+    }
+end
+
+function mt:getNumber(exp)
+    return {
+        type = 'number',
+        number = exp[1],
+        valuetype = 'number',
+    }
+end
+
 function mt:searchExp(exp)
     local tp = exp.type
     if     tp == 'nil' then
     elseif tp == 'string' then
         return self:getString(exp)
     elseif tp == 'boolean' then
+        return self:getBoolean(exp)
     elseif tp == 'number' then
+        return self:getNumber(exp)
     elseif tp == 'name' then
         return self:checkName(exp)
     elseif tp == 'simple' then

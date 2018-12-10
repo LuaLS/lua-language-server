@@ -143,7 +143,7 @@ return function (ast, results, lines, uri)
         datas[#datas+1] = {
             start   = start,
             finish  = finish,
-            level   = 'Warning',
+            level   = 'Information',
             message = ('Unused local `%s`'):format(key), -- LOCALE
         }
     end)
@@ -161,7 +161,7 @@ return function (ast, results, lines, uri)
         datas[#datas+1] = {
             start   = start,
             finish  = finish,
-            level   = 'Warning',
+            level   = 'Information',
             message = ('Unused label `%s`'):format(key), -- LOCALE
         }
     end)
@@ -170,7 +170,7 @@ return function (ast, results, lines, uri)
         datas[#datas+1] = {
             start   = start,
             finish  = finish,
-            level   = 'Warning',
+            level   = 'Information',
             message = message,
         }
     end)

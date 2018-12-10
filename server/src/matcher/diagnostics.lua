@@ -1,4 +1,4 @@
-local findLibFull = require 'matcher.find_lib_full'
+local findLib = require 'matcher.find_lib'
 
 local function searchUnusedLocals(results, callback)
     for _, var in ipairs(results.vars) do
@@ -37,7 +37,7 @@ local function searchUndefinedGlobal(results, callback)
         if not var.key:find '%l' then
             goto NEXT_VAR
         end
-        local lib = findLibFull(var)
+        local lib = findLib(var)
         if lib then
             goto NEXT_VAR
         end

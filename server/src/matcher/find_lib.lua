@@ -28,6 +28,9 @@ local function checkSourceAsLibrary(value, name, showname)
 end
 
 local function checkSource(value, libname, lib)
+    if not lib then
+        return
+    end
     if not lib.source then
         return checkSourceAsGlobal(value, libname)
     end
@@ -102,16 +105,39 @@ end
 
 local function findLib(var)
     local value = var.value or var
-    for libname, lib in pairs(libs) do
-        if lib.parent then
+    for libname, info in pairs(libs.global) do
+        local fullKey = checkSource(value, libname, info.lib)
+        if fullKey then
+            return info.lib, fullKey, false
+        end
+        for libname, lib in pairs(info.child) do
             local fullKey, oo = checkParent(value, libname, lib)
             if fullKey then
                 return lib, fullKey, oo
             end
-        else
-            local fullKey = checkSource(value, libname, lib)
+        end
+    end
+    for libname, info in pairs(libs.library) do
+        local fullKey = checkSource(value, libname, info.lib)
+        if fullKey then
+            return info.lib, fullKey, false
+        end
+        for libname, lib in pairs(info.child) do
+            local fullKey, oo = checkParent(value, libname, lib)
             if fullKey then
-                return lib, fullKey, false
+                return lib, fullKey, oo
+            end
+        end
+    end
+    for libname, info in pairs(libs.object) do
+        local fullKey = checkSource(value, libname, info.lib)
+        if fullKey then
+            return info.lib, fullKey, false
+        end
+        for libname, lib in pairs(info.child) do
+            local fullKey, oo = checkParent(value, libname, lib)
+            if fullKey then
+                return lib, fullKey, oo
             end
         end
     end

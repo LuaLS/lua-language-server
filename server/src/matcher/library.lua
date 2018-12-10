@@ -48,13 +48,58 @@ local function mergeLocale(libs, locale)
     end
 end
 
-local function mergeLibs(target, libs)
+local function mergeSource(alllibs, name, lib)
+    if not lib.source then
+        alllibs.global[name] = { lib = lib, child = {} }
+        return
+    end
+    for _, source in ipairs(lib.source) do
+        local sourceName = source.name or name
+        if source.type == 'global' then
+            alllibs.global[sourceName] = { lib = lib, child = {} }
+        elseif source.type == 'library' then
+            alllibs.library[sourceName] = { lib = lib, child = {} }
+        elseif source.type == 'object' then
+            alllibs.object[sourceName] = { lib = lib, child = {} }
+        end
+    end
+end
+
+local function insert(tbl, name, key, value)
+    if not name or not key then
+        return
+    end
+    if not tbl[name] then
+        tbl[name] = {}
+    end
+    if not tbl[name].child then
+        tbl[name].child = {}
+    end
+    tbl[name].child[key] = value
+end
+
+local function mergeParent(alllibs, name, lib)
+    for _, parent in ipairs(lib.parent) do
+        if parent.type == 'global' then
+            insert(alllibs.global,  parent.name, name, lib)
+        elseif parent.type == 'library' then
+            insert(alllibs.library, parent.name, name, lib)
+        elseif parent.type == 'object' then
+            insert(alllibs.object,  parent.name, name, lib)
+        end
+    end
+end
+
+local function mergeLibs(alllibs, libs)
     if not libs then
         return
     end
     for name, lib in pairs(libs) do
-        target.names[#target.names+1] = name
-        target.libs[#target.libs+1] = lib
+        if lib.parent then
+            mergeParent(alllibs, name, lib)
+        else
+            mergeSource(alllibs, name, lib)
+        end
     end
 end
 
@@ -71,18 +116,11 @@ end
 
 local function init()
     local language = require 'language'
-    local alllibs = setmetatable({
-        names = {},
-        libs = {},
-    }, {
-        __pairs = function (self)
-            local i = 0
-            return function ()
-                i = i + 1
-                return self.names[i], self.libs[i]
-            end
-        end,
-    })
+    local alllibs = {
+        global  = table.container(),
+        library = table.container(),
+        object  = table.container(),
+    }
     for path in io.scan(ROOT / 'libs') do
         local libs
         local buf = io.load(path)

@@ -68,3 +68,11 @@ goto NEXT
 TEST [[
 a, b, c = 1, 2, ...
 ]]
+
+TEST [[
+local a, b, c = 1, 2, ...
+]]
+
+TEST [[
+xx(a, b, 2, 3, ...)
+]]

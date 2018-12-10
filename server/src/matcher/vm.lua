@@ -107,7 +107,6 @@ end
 function mt:createFunction(exp)
     local func = {
         type = 'function',
-        args = {},
         returns = {
             type = 'list',
         },
@@ -118,6 +117,9 @@ function mt:createFunction(exp)
         self:forList(exp.args, function (arg)
             if stop then
                 return
+            end
+            if not func.args then
+                func.args = {}
             end
             if arg.type == 'name' then
                 func.args[#func.args+1] = self:createLocal(arg[1], arg)
@@ -157,20 +159,22 @@ function mt:call(func, values)
     self.func:cut 'labels'
     self.func:cut 'dots'
 
-    for i = 1, #func.args do
-        local var = func.arg[i]
-        if var then
-            if var.type == 'dots' then
-                local list = {
-                    type = 'list',
-                }
-                for n = i, #values do
-                    list[n-i+1] = values[n]
+    if func.args then
+        for i = 1, #func.args do
+            local var = func.arg[i]
+            if var then
+                if var.type == 'dots' then
+                    local list = {
+                        type = 'list',
+                    }
+                    for n = i, #values do
+                        list[n-i+1] = values[n]
+                    end
+                    self:setValue(var, list)
+                    break
+                else
+                    self:setValue(var, values[i])
                 end
-                self:setValue(var, list)
-                break
-            else
-                self:setValue(var, values[i])
             end
         end
     end
@@ -282,7 +286,7 @@ end
 
 function mt:unpackList(list)
     local res = {}
-    if list.type == 'list' then
+    if list.type == 'list' or list.type == 'call' then
         for i, exp in ipairs(list) do
             local value = self:getExp(exp)
             if value.type == 'list' then
@@ -490,6 +494,21 @@ function mt:doSet(action)
     end)
 end
 
+function mt:doLocal(action)
+    local values
+    if action[2] then
+        values = self:unpackList(action[2])
+    end
+    self:forList(action[1], function (key)
+        local var = self:createLocal(key[1], key)
+        if values then
+            local value = table.remove(values, 1)
+            self:setValue(var, value)
+            self:addInfo(var, 'set', key)
+        end
+    end)
+end
+
 function mt:doAction(action)
     local tp = action.type
     if     tp == 'do' then
@@ -505,6 +524,10 @@ function mt:doAction(action)
         self:addInfo(label, 'goto', action)
     elseif tp == 'set' then
         self:doSet(action)
+    elseif tp == 'local' then
+        self:doLocal(action)
+    elseif tp == 'simple' then
+        self:getSimple(action, 'value')
     end
 end
 

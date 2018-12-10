@@ -26,22 +26,19 @@ function mt:createTable(source)
 end
 
 function mt:setValue(var, value)
+    assert(value.type ~= 'list')
     var.value = value
     return value
 end
 
 function mt:getValue(var)
+    if not var.value then
+        var.value = self:createNil()
+    end
     return var.value
 end
 
-function mt:addField(value, name, field)
-    if not value.child then
-        value.child = {}
-    end
-    value.child[name] = field
-end
-
-function mt:createField(parent, name, source)
+function mt:createField(pValue, name, source)
     local field = {
         type   = 'field',
         key    = name,
@@ -49,18 +46,17 @@ function mt:createField(parent, name, source)
     }
     self.results.fields[#self.results.fields+1] = field
 
-    local value =  self:getValue(parent)
-                or self:setValue(parent, self:createTable(source))
-    self:addField(value, name, field)
+    if not pValue.child then
+        pValue.child = {}
+    end
+    pValue.child[name] = field
 
     return field
 end
 
-function mt:getField(parent, name, source)
-    local value =  self:getValue(parent)
-                or self:setValue(parent, self:createTable(source))
-    local field =  (value.child and value.child[name])
-                or self:createField(parent, name, source)
+function mt:getField(pValue, name, source)
+    local field =  (pValue.child and pValue.child[name])
+                or self:createField(pValue, name, source)
 
     return field
 end
@@ -76,9 +72,28 @@ end
 function mt:setFunctionReturn(index, value)
     local func = self.func.func
     if not func.returns then
-        func.returns = {}
+        func.returns = {
+            type = 'list',
+        }
     end
     func.returns[index] = value
+end
+
+function mt:setFunctionArg(func, index, value)
+    if not func.args then
+        func.args = {}
+    end
+    func.args[index] = value
+end
+
+function mt:getFunctionReturns(func)
+    if not func.returns then
+        func.returns = {
+            type = 'list',
+            [1] = self:createNil(),
+        }
+    end
+    return func.returns
 end
 
 function mt:createString(str, source)
@@ -141,10 +156,55 @@ function mt:setLib(obj, lib)
     end
 end
 
+function mt:call(func, args)
+    for i, arg in ipairs(args) do
+        self:setFunctionArg(func, i, self:getExp(arg))
+    end
+    return self:getFunctionReturns(func)
+end
+
 function mt:getName(name, source)
     local var = self.scope.locals[name]
              or self:getField(self.scope.locals._ENV, name, source)
     return var
+end
+
+function mt:getSimple(simple)
+    local value = self:getExp(simple[1])
+    local field
+    for i = 2, #simple do
+        local obj = simple[i]
+        local tp  = obj.type
+
+        if     tp == 'call' then
+            -- 函数的返回值一定是list
+            value = self:call(value, obj)
+            if i < #simple then
+                value = value[1]
+            end
+        elseif obj.index then
+            if tp == 'name' then
+                local var = self:getVar(obj[1])
+                field = self:getField(value, self:getValue(var), obj)
+            elseif (tp == 'string' or tp == 'number' or tp == 'boolean') then
+                field = self:getField(value, obj[1], obj)
+            else
+                local eValue = self:getExp(obj)
+                field = self:getField(value, eValue, obj)
+            end
+            value = self:getValue(field)
+        else
+            if tp == 'name' then
+                field = self:getField(value, obj[1])
+                value = self:getValue(field)
+            elseif tp == ':' then
+                if field then
+                    field.oo = true
+                end
+            end
+        end
+    end
+    return value, field
 end
 
 function mt:getBinary(exp)
@@ -200,6 +260,10 @@ function mt:getUnary(exp)
     return nil
 end
 
+function mt:getDots()
+    return self.func.dots
+end
+
 function mt:getExp(exp)
     local tp = exp.type
     if     tp == 'nil' then
@@ -213,11 +277,14 @@ function mt:getExp(exp)
     elseif tp == 'name' then
         local var = self:getVar(exp[1], exp)
         return self:getValue(var)
+    elseif tp == 'simple' then
+        return self:getSimple(exp)
     elseif tp == 'binary' then
         return self:getBinary(exp)
     elseif tp == 'unary' then
         return self:getUnary(exp)
     elseif tp == '...' then
+        return self:getDots(exp)
     end
     return nil
 end
@@ -256,15 +323,17 @@ function mt:createEnvironment()
     self.func.func = self:createFunction()
     -- 所有脚本都有个隐藏的上值`_ENV`
     local parent = self:createLocal('_ENV')
+    local pValue = self:setValue(parent, self:createTable())
     -- 设置全局变量
     for name, info in pairs(library.global) do
-        local field = self:createField(parent, name)
+        local field = self:createField(pValue, name)
         if info.lib then
             self:setLib(field, info.lib)
         end
         if info.child then
+            local fValue = self:getValue(field)
             for fname, flib in pairs(info.child) do
-                local ffield = self:createField(field, fname)
+                local ffield = self:createField(fValue, fname)
                 self:setLib(ffield, flib)
             end
         end

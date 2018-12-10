@@ -1,16 +1,27 @@
+local library = require 'matcher.library'
+
 local mt = {}
 mt.__index = mt
+
+function mt:isGlobal(var)
+    if var.type ~= 'field' then
+        return false
+    end
+    if not var.parent then
+        return false
+    end
+    return var.parent.key == '_ENV' or var.parent.key == '_G'
+end
 
 function mt:setType(obj, type)
     if not obj then
         return
     end
     if not obj.group then
-        obj.group = {
-            type = type,
-        }
+        obj.group = {}
     end
     obj.valuetype = type
+    obj.group.type = type
 end
 
 function mt:getType(obj)
@@ -73,18 +84,20 @@ function mt:getBinaryType(obj)
 end
 
 function mt:searchGroup(group)
-    if not group then
-        return
-    end
     if group.type ~= nil then
         return
     end
+    group.type = false
+    -- 1. 搜索确定类型
     for obj in pairs(group) do
         if obj.valuetype then
             group.type = obj.valuetype
-            return
         end
     end
+    if group.type then
+        return
+    end
+    -- 2. 推测运算结果
     for obj in pairs(group) do
         -- TODO 搜索metatable
         if obj.type == 'unary' then
@@ -101,22 +114,39 @@ function mt:searchGroup(group)
             end
         end
     end
-    group.type = false
 end
 
 function mt:searchVar(var)
-    if var.valuetype then
-        return
-    end
     if self.lock[var] then
         return
+    end
+    if not var.group then
+        var.group = {}
+        var.group[var] = var
     end
     self.lock[var] = true
     self:searchGroup(var.group)
     self.lock[var] = nil
-    if not self:getType(var) and next(var.childs) then
-        self:setType(var, 'table')
-        return
+
+    if not self:getType(var) then
+        -- 1. 检查全局lib
+        if self:isGlobal(var) then
+            local lib = library:get('global', var.key)
+            if lib then
+                var.lib = lib
+                if lib.type then
+                    self:setType(var, lib.type)
+                    self:searchVar(var)
+                    return
+                end
+            end
+        end
+        -- 2. 检查索引
+        if next(var.childs) then
+            self:setType(var, 'table')
+            self:searchVar(var)
+            return
+        end
     end
 end
 
@@ -127,8 +157,9 @@ function mt:searchVars(vars)
 end
 
 function mt:searchCall(call)
-    if not self:getType(call.func) then
+    if call.func and not self:getType(call.func) then
         self:setType(call.func, 'function')
+        self:searchVar(call.func)
     end
 end
 

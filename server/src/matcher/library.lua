@@ -139,6 +139,18 @@ local function init()
         mergeLibs(alllibs, libs)
     end
 
+    function alllibs:get(type, parent, child)
+        local info = self[type] and self[type][parent]
+        if not info then
+            return nil
+        end
+        if child then
+            return info.child[child]
+        else
+            return info.lib
+        end
+    end
+
     return alllibs
 end
 

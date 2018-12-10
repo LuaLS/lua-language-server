@@ -1,4 +1,4 @@
-local libs = require 'matcher.library'
+local library = require 'matcher.library'
 
 local function isGlobal(var)
     if var.type ~= 'field' then
@@ -105,7 +105,7 @@ end
 
 local function findLib(var)
     local value = var.value or var
-    for libname, info in pairs(libs.global) do
+    for libname, info in pairs(library.global) do
         local fullKey = checkSource(value, libname, info.lib)
         if fullKey then
             return info.lib, fullKey, false
@@ -117,7 +117,7 @@ local function findLib(var)
             end
         end
     end
-    for libname, info in pairs(libs.library) do
+    for libname, info in pairs(library.library) do
         local fullKey = checkSource(value, libname, info.lib)
         if fullKey then
             return info.lib, fullKey, false
@@ -129,7 +129,7 @@ local function findLib(var)
             end
         end
     end
-    for libname, info in pairs(libs.object) do
+    for libname, info in pairs(library.object) do
         local fullKey = checkSource(value, libname, info.lib)
         if fullKey then
             return info.lib, fullKey, false

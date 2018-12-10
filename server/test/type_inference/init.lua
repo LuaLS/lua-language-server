@@ -109,3 +109,7 @@ TEST 'string' [[
 TEST 'number' [[
 <?x?> = a + b
 ]]
+
+TEST 'table' [[
+<?table?>()
+]]

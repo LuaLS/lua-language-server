@@ -76,3 +76,41 @@ local a, b, c = 1, 2, ...
 TEST [[
 xx(a, b, 2, 3, ...)
 ]]
+
+TEST [[
+if a then
+elseif b then
+elseif c then
+else
+end
+]]
+
+TEST [[
+for i = 1, 10, 1 do
+end
+]]
+
+TEST [[
+for a, b, c in pairs(t) do
+end
+]]
+
+TEST [[
+while true do
+end
+]]
+
+TEST [[
+repeat
+until true
+]]
+
+TEST [[
+function xx:yy(a, b, c, ...)
+end
+]]
+
+TEST [[
+local function xx(a, b, c, ...)
+end
+]]

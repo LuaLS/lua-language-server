@@ -104,7 +104,7 @@ function mt:getField(pValue, name, source)
     return field
 end
 
-function mt:createFunction(exp)
+function mt:createFunction(exp, object)
     local func = {
         type = 'function',
         returns = {
@@ -128,6 +128,12 @@ function mt:createFunction(exp)
                 stop = true
             end
         end)
+    end
+    if object then
+        if not func.args then
+            func.args = {}
+        end
+        table.insert(func.args, 1, object)
     end
 
     self.func.func = func
@@ -160,20 +166,27 @@ function mt:call(func, values)
     self.func:cut 'dots'
 
     if func.args then
-        for i = 1, #func.args do
-            local var = func.arg[i]
+        for i, var in ipairs(func.args) do
             if var then
                 if var.type == 'dots' then
                     local list = {
                         type = 'list',
                     }
-                    for n = i, #values do
-                        list[n-i+1] = values[n]
+                    if values then
+                        for n = i, #values do
+                            list[n-i+1] = values[n]
+                        end
+                        self:setValue(var, list)
+                    else
+                        self:setValue(var, nil)
                     end
-                    self:setValue(var, list)
                     break
                 else
-                    self:setValue(var, values[i])
+                    if values then
+                        self:setValue(var, values[i])
+                    else
+                        self:setValue(var, nil)
+                    end
                 end
             end
         end
@@ -509,6 +522,92 @@ function mt:doLocal(action)
     end)
 end
 
+function mt:doIf(action)
+    for _, block in ipairs(action) do
+        self.scope:push()
+        if block.filter then
+            self:getExp(block.filter)
+        end
+
+        self:doActions(block)
+
+        self.scope:pop()
+    end
+end
+
+function mt:doLoop(action)
+    self.scope:push()
+
+    local min = self:getExp(action.min)
+    self:getExp(action.max)
+    if action.step then
+        self:getExp(action.step)
+    end
+
+    local arg = self:createLocal(action.arg[1], action.arg)
+    self:setValue(arg, min)
+    self:addInfo(arg, 'set', arg)
+
+    self:doActions(action)
+
+    self.scope:pop()
+end
+
+function mt:doIn(action)
+    self.scope:push()
+
+    local values = self:unpackList(action.exp)
+    self:forList(action.arg, function (arg)
+        local var = self:createLocal(arg[1], arg)
+        self:setValue(var, table.remove(values, 1))
+        self:addInfo(var, 'set', arg)
+    end)
+
+    self:doActions(action)
+
+    self.scope:pop()
+end
+
+function mt:doWhile(action)
+    self.scope:push()
+
+    self:getExp(action.filter)
+
+    self:doActions(action)
+
+    self.scope:pop()
+end
+
+function mt:doRepeat(action)
+    self.scope:push()
+
+    self:doActions(action)
+    self:getExp(action.filter)
+
+    self.scope:pop()
+end
+
+function mt:doFunction(action)
+    local name = action.name
+    local var, object
+    if name.type == 'simple' then
+        var, object = self:getSimple(name, 'field')
+    else
+        var = self:getName(name[1], name)
+    end
+    local func = self:createFunction(action, object)
+    self:setValue(var, func)
+    self:addInfo(var, 'set', action.name)
+end
+
+function mt:doLocalFunction(action)
+    local name = action.name
+    local var = self:createLocal(name[1], name)
+    local func = self:createFunction(action)
+    self:setValue(var, func)
+    self:addInfo(var, 'set', action.name)
+end
+
 function mt:doAction(action)
     local tp = action.type
     if     tp == 'do' then
@@ -528,6 +627,20 @@ function mt:doAction(action)
         self:doLocal(action)
     elseif tp == 'simple' then
         self:getSimple(action, 'value')
+    elseif tp == 'if' then
+        self:doIf(action)
+    elseif tp == 'loop' then
+        self:doLoop(action)
+    elseif tp == 'in' then
+        self:doIn(action)
+    elseif tp == 'while' then
+        self:doWhile(action)
+    elseif tp == 'repeat' then
+        self:doRepeat(action)
+    elseif tp == 'function' then
+        self:doFunction(action)
+    elseif tp == 'localfunction' then
+        self:doLocalFunction(action)
     end
 end
 

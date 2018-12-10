@@ -187,7 +187,9 @@ function mt:searchCall(call, func, lastobj)
     if lastobj then
         table.insert(self.results.calls, {
             call    = call,
+            func    = func,
             lastobj = lastobj,
+            results = results,
         })
     end
 
@@ -312,6 +314,18 @@ function mt:setValue(var, value)
         return
     end
     var.value = value.value or value
+    local group = var.group or value.group
+    if not group then
+        group = {}
+    end
+    if not group[var] then
+        var.group = group
+        group[var] = group
+    end
+    if not group[value] then
+        value.group = group
+        group[value] = group
+    end
     if value.childs then
         var.childs = value.childs
         for _, child in pairs(value.childs) do

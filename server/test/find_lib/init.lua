@@ -1,7 +1,5 @@
 local matcher    = require 'matcher'
 local parser     = require 'parser'
-local findResult = require 'matcher.find_result'
-local findLib    = require 'matcher.find_lib'
 
 rawset(_G, 'TEST', true)
 
@@ -15,12 +13,12 @@ function TEST(fullkey)
         assert(ast)
         local results = matcher.compile(ast)
         assert(results)
-        local result = findResult(results, pos)
+        local result = matcher.findResult(results, pos)
         assert(result)
         assert(result.type == 'var')
         local var = result.var
         assert(var)
-        local _, name = findLib(var)
+        local _, name = matcher.findLib(var)
         assert(name == fullkey)
     end
 end

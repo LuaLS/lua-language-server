@@ -49,6 +49,7 @@ function TEST(script)
     assert(ast)
     local results = matcher.compile(ast)
     assert(results)
+    matcher.typeInference(results)
 
     local result = matcher.definition(results, pos)
     if result then

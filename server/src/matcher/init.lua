@@ -6,6 +6,9 @@ local api = {
     hover          = require 'matcher.hover',
     diagnostics    = require 'matcher.diagnostics',
     compile        = require 'matcher.compile',
+    typeInference  = require 'matcher.type_inference',
+    findResult     = require 'matcher.find_result',
+    findLib        = require 'matcher.find_lib',
 }
 
 return api

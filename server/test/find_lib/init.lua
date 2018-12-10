@@ -18,7 +18,7 @@ function TEST(fullkey)
         assert(result.type == 'var')
         local var = result.var
         assert(var)
-        local _, name = matcher.findLib(var)
+        local _, name = matcher.findLibFull(var)
         assert(name == fullkey)
     end
 end

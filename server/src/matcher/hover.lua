@@ -1,5 +1,5 @@
-local findResult = require 'matcher.find_result'
-local findLib    = require 'matcher.find_lib'
+local findResult  = require 'matcher.find_result'
+local findLibFull = require 'matcher.find_lib_full'
 
 local Cache = {}
 local OoCache = {}
@@ -170,7 +170,7 @@ return function (results, pos)
         return nil
     end
     local var = result.var
-    local lib, fullKey, oo = findLib(var)
+    local lib, fullKey, oo = findLibFull(var)
     if not lib then
         return nil
     end

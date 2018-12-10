@@ -8,7 +8,7 @@ local api = {
     compile        = require 'matcher.compile',
     typeInference  = require 'matcher.type_inference',
     findResult     = require 'matcher.find_result',
-    findLib        = require 'matcher.find_lib',
+    findLibFull    = require 'matcher.find_lib_full',
 }
 
 return api

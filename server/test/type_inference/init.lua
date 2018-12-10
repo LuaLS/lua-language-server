@@ -34,3 +34,42 @@ local <?var?> = true
 TEST 'number' [[
 local <?var?> = 1
 ]]
+
+TEST 'string' [[
+local var = '111'
+t.<?x?> = var
+]]
+
+TEST 'string' [[
+local <?var?>
+var = '111'
+]]
+
+TEST 'function' [[
+function <?xx?>()
+end
+]]
+
+TEST 'function' [[
+local function <?xx?>()
+end
+]]
+
+TEST 'function' [[
+local <?xx?>
+xx = function ()
+end
+]]
+
+TEST 'table' [[
+local <?t?> = {}
+]]
+
+TEST 'table' [[
+local <?t?>
+t = {}
+]]
+
+TEST 'table' [[
+<?t?>.x = 1
+]]

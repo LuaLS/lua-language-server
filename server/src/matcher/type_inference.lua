@@ -24,6 +24,13 @@ function mt:searchVar(var)
     if self.lock[var] then
         return
     end
+    if not var.group and next(var.childs) then
+        var.valuetype = 'table'
+        var.group = {
+            type = 'table',
+        }
+        return
+    end
     self.lock[var] = true
     self:searchGroup(var.group)
     self.lock[var] = nil

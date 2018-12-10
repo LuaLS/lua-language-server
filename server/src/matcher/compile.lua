@@ -253,6 +253,7 @@ end
 function mt:searchTable(exp)
     local tbl = {
         type = 'table',
+        valuetype = 'table',
         childs = {},
     }
     for _, obj in ipairs(exp) do
@@ -314,7 +315,7 @@ function mt:searchExp(exp)
     elseif tp == '...' then
         self:checkDots(exp)
     elseif tp == 'function' then
-        self:searchFunction(exp)
+        return self:searchFunction(exp)
     elseif tp == 'table' then
         return self:searchTable(exp)
     end
@@ -338,11 +339,11 @@ function mt:setValue(var, value)
     end
     if not group[var] then
         var.group = group
-        group[var] = group
+        group[var] = var
     end
     if not group[value] then
         value.group = group
-        group[value] = group
+        group[value] = value
     end
     if value.childs then
         var.childs = value.childs
@@ -412,9 +413,11 @@ function mt:markSet(simple, value)
         local var = self:getVar(simple[1], simple)
         self:addInfo(var, 'set', simple)
         self:setValue(var, value)
+        return var
     else
         local var = self:markSimple(simple)
         self:setValue(var, value)
+        return var
     end
 end
 
@@ -424,13 +427,16 @@ function mt:markLocal(name, value)
         -- 创建一个局部变量
         local var = self:createLocal(str, name)
         self:setValue(var, value)
+        return var
     elseif name.type == '...' then
         local dots = self:createDots()
         self:addInfo(dots, 'local', name)
         self.env.dots = dots
+        return dots
     elseif name.type == ':' then
         -- 创建一个局部变量
-        self:createLocal('self', name)
+        local var = self:createLocal('self', name)
+        return var
     end
 end
 
@@ -537,29 +543,47 @@ function mt:searchRepeat(action)
 end
 
 function mt:searchFunction(func)
+    local obj = {
+        type = 'function',
+        valuetype = 'function',
+        args = {},
+        actions = {},
+    }
     self.env:push()
     self.env:cut 'dots'
     self.env.label = {}
     if func.name then
-        self:markSet(func.name)
+        obj.name = self:markSet(func.name, obj)
     end
     self:forList(func.arg, function (arg)
-        self:markLocal(arg)
+        obj.args[#obj.args+1] = self:markLocal(arg)
     end)
-    self:searchActions(func)
+    for _, action in ipairs(func) do
+        obj.actions[#obj.actions+1] = self:searchAction(action)
+    end
     self.env:pop()
+    return obj
 end
 
 function mt:searchLocalFunction(func)
+    local obj = {
+        type = 'function',
+        valuetype = 'function',
+        args = {},
+        actions = {},
+    }
     if func.name then
-        self:markLocal(func.name)
+        obj.name = self:markLocal(func.name, obj)
     end
     self.env:push()
     self:forList(func.arg, function (arg)
-        self:markLocal(arg)
+        obj.args[#obj.args+1] = self:markLocal(arg)
     end)
-    self:searchActions(func)
+    for _, action in ipairs(func) do
+        obj.actions[#obj.actions+1] = self:searchAction(action)
+    end
     self.env:pop()
+    return obj
 end
 
 function mt:markLabel(label)

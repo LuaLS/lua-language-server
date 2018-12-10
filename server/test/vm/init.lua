@@ -25,7 +25,7 @@ return a
 ]]
 
 TEST [[
-retrun a.b:c()[1][name]
+retrun a.b:c(1, 2, ...)[1][name]
 ]]
 
 TEST [[
@@ -56,4 +56,15 @@ return {
     h,
     1,
 }
+]]
+
+TEST [[
+::LABEL::
+goto LABEL
+goto NEXT
+::NEXT::
+]]
+
+TEST [[
+a, b, c = 1, 2, ...
 ]]

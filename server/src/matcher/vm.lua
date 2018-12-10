@@ -271,6 +271,7 @@ function mt:getIndex(obj)
     local tp = obj.type
     if tp == 'name' then
         local var = self:getName(obj[1])
+        self:addInfo(var, 'get', obj)
         return self:getValue(var)
     elseif (tp == 'string' or tp == 'number' or tp == 'boolean') then
         return obj[1]
@@ -279,7 +280,37 @@ function mt:getIndex(obj)
     end
 end
 
-function mt:getSimple(simple)
+function mt:unpackList(list)
+    local res = {}
+    if list.type == 'list' then
+        for i, exp in ipairs(list) do
+            local value = self:getExp(exp)
+            if value.type == 'list' then
+                if i == #list then
+                    for _, v in ipairs(value) do
+                        res[#res+1] = v
+                    end
+                else
+                    res[#res+1] = value[1]
+                end
+            else
+                res[#res+1] = value
+            end
+        end
+    else
+        local value = self:getExp(list)
+        if value.type == 'list' then
+            for i, v in ipairs(value) do
+                res[i] = v
+            end
+        else
+            res[1] = value
+        end
+    end
+    return res
+end
+
+function mt:getSimple(simple, mode)
     local value = self:getExp(simple[1])
     local field
     local object
@@ -288,12 +319,9 @@ function mt:getSimple(simple)
         local tp  = obj.type
 
         if     tp == 'call' then
-            local args = {}
+            local args = self:unpackList(obj)
             if object then
-                args[1] = object
-            end
-            for _, arg in ipairs(obj) do
-                args[#args+1] = self:getExp(arg)
+                table.insert(args, 1, object)
             end
             -- 函数的返回值一定是list
             value = self:call(value, args)
@@ -303,17 +331,28 @@ function mt:getSimple(simple)
         elseif obj.index then
             local index = self:getIndex(obj)
             field = self:getField(value, index, obj)
+            if mode == 'value' or i < #simple then
+                self:addInfo(field, 'get', obj)
+            end
             value = self:getValue(field)
         else
             if tp == 'name' then
                 field = self:getField(value, obj[1])
+                if mode == 'value' or i < #simple then
+                    self:addInfo(field, 'get', obj)
+                end
                 value = self:getValue(field)
             elseif tp == ':' then
                 object = value
             end
         end
     end
-    return value, field
+    if mode == 'value' then
+        return value, object
+    elseif mode == 'field' then
+        return field, object
+    end
+    error('Unknow simple mode: ' .. mode)
 end
 
 function mt:getBinary(exp)
@@ -391,7 +430,7 @@ function mt:getExp(exp)
         self:addInfo(var, 'get', exp)
         return self:getValue(var)
     elseif tp == 'simple' then
-        return self:getSimple(exp)
+        return self:getSimple(exp, 'value')
     elseif tp == 'binary' then
         return self:getBinary(exp)
     elseif tp == 'unary' then
@@ -405,7 +444,7 @@ function mt:getExp(exp)
     elseif tp == 'table' then
         return self:createTable(exp)
     end
-    return nil
+    error('Unkown exp type: ' .. tostring(tp))
 end
 
 function mt:doDo(action)
@@ -431,7 +470,24 @@ function mt:createLabel(action)
         self.func.labels[name] = label
         self.results.labels[#self.results.labels+1] = label
     end
-    self:addInfo(self.func.labels[name], 'set', action)
+    return self.func.labels[name]
+end
+
+function mt:doSet(action)
+    -- 要先计算值
+    local values = self:unpackList(action[2])
+    self:forList(action[1], function (key)
+        local value = table.remove(values, 1)
+        if key.type == 'name' then
+            local var = self:getName(key[1], key)
+            self:setValue(var, value)
+            self:addInfo(var, 'set', key)
+        elseif key.type == 'simple' then
+            local field = self:getSimple(key, 'field')
+            self:setValue(field, value)
+            self:addInfo(field, 'set', key)
+        end
+    end)
 end
 
 function mt:doAction(action)
@@ -442,7 +498,13 @@ function mt:doAction(action)
     elseif tp == 'return' then
         self:doReturn(action)
     elseif tp == 'label' then
-        self:createLabel(action)
+        local label = self:createLabel(action)
+        self:addInfo(label, 'set', action)
+    elseif tp == 'goto' then
+        local label = self:createLabel(action)
+        self:addInfo(label, 'goto', action)
+    elseif tp == 'set' then
+        self:doSet(action)
     end
 end
 

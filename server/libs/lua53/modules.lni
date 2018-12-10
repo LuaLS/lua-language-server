@@ -2,6 +2,7 @@
 type = 'function'
 
 [require]
+special = 'require'
 
 [package]
 type = 'table'

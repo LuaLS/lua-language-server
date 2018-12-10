@@ -210,6 +210,7 @@ default = 0
 [select]
 
 [setmetatable]
+special = 'setmetatable'
 
 [tonumber]
 

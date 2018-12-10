@@ -157,9 +157,11 @@ function mt:searchVars(vars)
 end
 
 function mt:searchCall(call)
-    if call.func and not self:getType(call.func) then
-        self:setType(call.func, 'function')
-        self:searchVar(call.func)
+    if call.func then
+        if not self:getType(call.func) then
+            self:setType(call.func, 'function')
+            self:searchVar(call.func)
+        end
     end
 end
 

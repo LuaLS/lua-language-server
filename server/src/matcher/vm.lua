@@ -12,8 +12,11 @@ function mt:createLocal(key, source)
         key = key,
         source = source or DefaultSource,
     }
-    self.results.locals[#self.results.locals+1] = loc
     self.scope.locals[key] = loc
+    self.results.locals[#self.results.locals+1] = loc
+
+    local value = self:createValue('nil', source)
+    self:setValue(loc, value)
     self:addInfo(loc, 'local', source)
     return loc
 end
@@ -38,11 +41,8 @@ function mt:createDots(source)
     return dots
 end
 
-function mt:createTable(source)
-    local tbl = {
-        type   = 'table',
-        source = source or DefaultSource,
-    }
+function mt:buildTable(source)
+    local tbl = self:createValue('table', source)
     if not source then
         return tbl
     end
@@ -56,20 +56,22 @@ function mt:createTable(source)
                 local field = self:createField(tbl, index, key)
                 if value.type == 'list' then
                     self:setValue(field, value[1])
+                    self:addInfo(field, 'set', key)
                 else
                     self:setValue(field, value)
+                    self:addInfo(field, 'set', key)
                 end
-                self:addInfo(field, 'set', key)
             else
                 if key.type == 'name' then
                     local index = key[1]
                     local field = self:createField(tbl, index, key)
                     if value.type == 'list' then
                         self:setValue(field, value[1])
+                        self:addInfo(field, 'set', key)
                     else
                         self:setValue(field, value)
+                        self:addInfo(field, 'set', key)
                     end
-                    self:addInfo(field, 'set', key)
                 end
             end
         else
@@ -112,7 +114,7 @@ end
 
 function mt:setValue(var, value)
     assert(not value or value.type ~= 'list')
-    value = value or self:createNil(var)
+    value = value or self:createValue('nil', var)
     if var.value then
         if var.value.type == 'nil' then
             -- 允许覆盖nil
@@ -120,6 +122,7 @@ function mt:setValue(var, value)
                 self:coverValue(var.value, value)
             end
         end
+        value = var.value
     else
         var.value = value
     end
@@ -128,7 +131,7 @@ end
 
 function mt:getValue(var)
     if not var.value then
-        var.value = self:createNil()
+        var.value = self:createValue('nil')
     end
     return var.value
 end
@@ -140,6 +143,7 @@ function mt:createField(pValue, name, source)
         key    = name,
         source = source or DefaultSource,
     }
+
     self.results.fields[#self.results.fields+1] = field
 
     if not pValue.child then
@@ -157,14 +161,12 @@ function mt:getField(pValue, name, source)
     return field
 end
 
-function mt:createFunction(exp, object)
-    local func = {
-        type = 'function',
-        returns = {
-            type = 'list',
-        },
-        args = {},
+function mt:buildFunction(exp, object)
+    local func = self:createValue('function')
+    func.returns = {
+        type = 'list',
     }
+    func.args = {}
 
     if not exp then
         return func
@@ -200,7 +202,6 @@ function mt:createFunction(exp, object)
 
     self.chunk.func = func
     self.results.funcs[#self.results.funcs+1] = func
-    self.newFuncs[#self.newFuncs+1] = func
 
     self.chunk:pop()
     self.scope:pop()
@@ -253,6 +254,7 @@ end
 function mt:callSetMetaTable(values)
     values[1].metatable = values[2]
     self:setFunctionReturn(self:getCurrentFunction(), 1, values[1])
+    self.metas[#self.metas+1] = values[1]
 end
 
 function mt:call(func, values)
@@ -273,63 +275,26 @@ function mt:getCurrentFunction()
 end
 
 function mt:setFunctionReturn(func, index, value)
-    func.returns[index] = value or self:createNil()
+    func.returns[index] = value or self:createValue('nil')
 end
 
 function mt:getFunctionReturns(func)
     if not func.returns then
         func.returns = {
             type = 'list',
-            [1] = self:createNil(),
+            [1] = self:createValue('nil'),
         }
     end
     return func.returns
 end
 
-function mt:createString(str, source)
-    return {
-        type   = 'string',
+function mt:createValue(type, source, v)
+    local value = {
+        type = type,
         source = source or DefaultSource,
-        value  = str,
+        value = v,
     }
-end
-
-function mt:createBoolean(bool, source)
-    return {
-        type   = 'boolean',
-        source = source or DefaultSource,
-        value  = bool or false,
-    }
-end
-
-function mt:createNumber(num, source)
-    return {
-        type   = 'number',
-        source = source or DefaultSource,
-        value  = num or 0.0,
-    }
-end
-
-function mt:createInteger(int, source)
-    return {
-        type   = 'integer',
-        source = source or DefaultSource,
-        value  = int or 0,
-    }
-end
-
-function mt:createNil(source)
-    return {
-        type   = 'nil',
-        source = source or DefaultSource,
-    }
-end
-
-function mt:createCustom(tp, source)
-    return {
-        type = tp,
-        source = source or DefaultSource,
-    }
+    return value
 end
 
 function mt:getLibValue(lib)
@@ -339,9 +304,9 @@ function mt:getLibValue(lib)
     end
     local value
     if     tp == 'table' then
-        value = self:createTable()
+        value = self:buildTable()
     elseif tp == 'function' then
-        value = self:createFunction()
+        value = self:buildFunction()
         if lib.returns then
             for i, rtn in ipairs(lib.returns) do
                 self:setFunctionReturn(value, i, self:getLibValue(rtn))
@@ -350,22 +315,22 @@ function mt:getLibValue(lib)
         if lib.args then
             local values = {}
             for i, arg in ipairs(lib.args) do
-                values[i] = self:getLibValue(arg) or self:createNil()
+                values[i] = self:getLibValue(arg) or self:createValue('nil')
             end
             self:setFunctionArgs(value, values)
         end
     elseif tp == 'string' then
-        value = self:createString(lib.value)
+        value = self:createValue('string', nil, lib.value)
     elseif tp == 'boolean' then
-        value = self:createBoolean(lib.value)
+        value = self:createValue('boolean', nil, lib.value)
     elseif tp == 'number' then
-        value = self:createNumber(lib.value)
+        value = self:createValue('number', nil, lib.value)
     elseif tp == 'integer' then
-        value = self:createInteger(lib.value)
+        value = self:createValue('integer', nil, lib.value)
     elseif tp == 'nil' then
-        value = self:createNil()
+        value = self:createValue('nil')
     else
-        value = self:createCustom(tp)
+        value = self:createValue(tp)
     end
     return value
 end
@@ -380,8 +345,9 @@ function mt:getIndex(obj)
     local tp = obj.type
     if tp == 'name' then
         local var = self:getName(obj[1])
+        local value = self:getValue(var)
         self:addInfo(var, 'get', obj)
-        return self:getValue(var)
+        return value
     elseif (tp == 'string' or tp == 'number' or tp == 'boolean') then
         return obj[1]
     else
@@ -425,7 +391,7 @@ function mt:getSimple(simple, mode)
     if simple[1].type == 'name' then
         field = self:getName(simple[1][1])
     else
-        field = self:createNil(simple[1])
+        field = self:createValue('nil', simple[1])
     end
     local object
     for i = 2, #simple do
@@ -440,24 +406,24 @@ function mt:getSimple(simple, mode)
             -- 函数的返回值一定是list
             value = self:call(value, args)
             if i < #simple then
-                value = value[1] or self:createNil()
+                value = value[1] or self:createValue('nil')
             end
         elseif obj.index then
             local index = self:getIndex(obj)
             field = self:getField(value, index, obj)
+            value = self:getValue(field)
             if mode == 'value' or i < #simple then
                 if obj.start then
                     self:addInfo(field, 'get', obj)
                 end
             end
-            value = self:getValue(field)
         else
             if tp == 'name' then
                 field = self:getField(value, obj[1], obj)
+                value = self:getValue(field)
                 if mode == 'value' or i < #simple then
                     self:addInfo(field, 'get', obj)
                 end
-                value = self:getValue(field)
             elseif tp == ':' then
                 object = field
             end
@@ -485,7 +451,7 @@ function mt:getBinary(exp)
         or op == '~='
         or op == '=='
     then
-        return self:createBoolean()
+        return self:createValue('boolean')
     elseif op == '|'
         or op == '~'
         or op == '&'
@@ -493,9 +459,9 @@ function mt:getBinary(exp)
         or op == '>>'
         or op == '//'
     then
-        return self:createInteger()
+        return self:createValue('integer')
     elseif op == '..' then
-        return self:createString()
+        return self:createValue('string')
     elseif op == '+'
         or op == '-'
         or op == '*'
@@ -503,7 +469,7 @@ function mt:getBinary(exp)
         or op == '^'
         or op == '%'
     then
-        return self:createNumber()
+        return self:createValue('number')
     end
     return nil
 end
@@ -513,13 +479,13 @@ function mt:getUnary(exp)
     local op = exp.op
     -- TODO 搜索元方法
     if     op == 'not' then
-        return self:createBoolean()
+        return self:createValue('boolean')
     elseif op == '#' then
-        return self:createInteger()
+        return self:createValue('integer')
     elseif op == '-' then
-        return self:createNumber()
+        return self:createValue('number')
     elseif op == '~' then
-        return self:createInteger()
+        return self:createValue('integer')
     end
     return nil
 end
@@ -534,17 +500,18 @@ end
 function mt:getExp(exp)
     local tp = exp.type
     if     tp == 'nil' then
-        return self:createNil(exp)
+        return self:createValue('nil', exp)
     elseif tp == 'string' then
-        return self:createString(exp[1], exp)
+        return self:createValue('string', exp, exp[1])
     elseif tp == 'boolean' then
-        return self:createBoolean(exp[1], exp)
+        return self:createValue('boolean', exp, exp[1])
     elseif tp == 'number' then
-        return self:createNumber(exp[1], exp)
+        return self:createValue('number', exp, exp[1])
     elseif tp == 'name' then
         local var = self:getName(exp[1], exp)
+        local value = self:getValue(var)
         self:addInfo(var, 'get', exp)
-        return self:getValue(var)
+        return value
     elseif tp == 'simple' then
         return self:getSimple(exp, 'value')
     elseif tp == 'binary' then
@@ -552,13 +519,15 @@ function mt:getExp(exp)
     elseif tp == 'unary' then
         return self:getUnary(exp)
     elseif tp == '...' then
+        -- TODO 传递不定参数
         local var = self:getDots()
+        local value = self:getValue(var)
         self:addInfo(var, 'get', exp)
-        return self:getValue(var)
+        return value
     elseif tp == 'function' then
-        return self:createFunction(exp)
+        return self:buildFunction(exp)
     elseif tp == 'table' then
-        return self:createTable(exp)
+        return self:buildTable(exp)
     end
     error('Unkown exp type: ' .. tostring(tp))
 end
@@ -590,6 +559,9 @@ function mt:createLabel(action)
 end
 
 function mt:doSet(action)
+    if not action[2] then
+        return
+    end
     -- 要先计算值
     local values = self:unpackList(action[2])
     self:forList(action[1], function (key)
@@ -617,8 +589,7 @@ function mt:doLocal(action)
     self:forList(action[1], function (key)
         local var = self:createLocal(key[1], key)
         if values then
-            local value = table.remove(values, 1)
-            self:setValue(var, value)
+            self:setValue(var, table.remove(values, 1))
             self:addInfo(var, 'set', key)
         end
     end)
@@ -705,21 +676,25 @@ end
 function mt:doFunction(action)
     local name = action.name
     local var, object
+    local source
     if name.type == 'simple' then
         var, object = self:getSimple(name, 'field')
-        self:addInfo(var, 'set', name[#name])
+        source = name[#name]
     else
         var = self:getName(name[1], name)
-        self:addInfo(var, 'set', name)
+        source = name
     end
-    local func = self:createFunction(action, object)
+    local func = self:buildFunction(action, object)
     self:setValue(var, func)
+    if source.start then
+        self:addInfo(var, 'set', source)
+    end
 end
 
 function mt:doLocalFunction(action)
     local name = action.name
     local var = self:createLocal(name[1], name)
-    local func = self:createFunction(action)
+    local func = self:buildFunction(action)
     self:setValue(var, func)
     self:addInfo(var, 'set', name)
 end
@@ -768,13 +743,13 @@ end
 
 function mt:createEnvironment()
     -- 整个文件是一个函数
-    self.chunk.func = self:createFunction()
+    self.chunk.func = self:buildFunction()
     -- 隐藏的上值`_ENV`
     local parent = self:createLocal('_ENV')
     -- 隐藏的参数`...`
     self:createDots()
 
-    local pValue = self:setValue(parent, self:createTable())
+    local pValue = self:setValue(parent, self:buildTable())
     -- 设置全局变量
     for name, info in pairs(library.global) do
         local field = self:createField(pValue, name)
@@ -795,6 +770,41 @@ function mt:createEnvironment()
     end
 end
 
+function mt:mergeChild(a, b)
+    if not a.child and not b.child then
+        return
+    end
+    local child = a.child or {}
+    a.child = nil
+    b.child = nil
+    for k, v in pairs(b.child or {}) do
+        if child[k] then
+            self:coverValue(v, child[k])
+        else
+            child[k] = v
+        end
+    end
+    a.child = child
+    b.child = child
+end
+
+function mt:checkMetaIndex(value, meta)
+    local index = self:getField(meta, '__index')
+    if not index then
+        return
+    end
+    local indexValue = self:getValue(index)
+    -- TODO 支持function
+    self:mergeChild(value, indexValue)
+end
+
+function mt:checkMeta()
+    for _, value in ipairs(self.metas) do
+        local meta = value.metatable
+        self:checkMetaIndex(value, meta)
+    end
+end
+
 local function compile(ast)
     local vm = setmetatable({
         scope   = env {
@@ -809,7 +819,7 @@ local function compile(ast)
             labels = {},
             funcs  = {},
         },
-        newFuncs = {},
+        metas = {},
     }, mt)
 
     -- 创建初始环境
@@ -817,6 +827,9 @@ local function compile(ast)
 
     -- 执行代码
     vm:doActions(ast)
+
+    -- 后处理meta
+    vm:checkMeta()
 
     return vm
 end

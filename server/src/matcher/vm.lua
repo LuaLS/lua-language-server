@@ -664,12 +664,13 @@ function mt:doFunction(action)
     local var, object
     if name.type == 'simple' then
         var, object = self:getSimple(name, 'field')
+        self:addInfo(var, 'set', name[#name])
     else
         var = self:getName(name[1], name)
+        self:addInfo(var, 'set', name)
     end
     local func = self:createFunction(action, object)
     self:setValue(var, func)
-    self:addInfo(var, 'set', var.source)
 end
 
 function mt:doLocalFunction(action)

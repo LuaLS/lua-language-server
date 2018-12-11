@@ -23,41 +23,28 @@ end
 local function parseResult(result)
     local positions = {}
     local tp = result.type
-    if     tp == 'var' then
-        local var = result.var
-        if var.type == 'local' then
-            for _, info in ipairs(var) do
-                if info.type == 'local' then
-                    positions[#positions+1] = {info.source.start, info.source.finish}
-                end
-            end
-        elseif var.type == 'field' then
-            for _, info in ipairs(var) do
-                if info.type == 'set' then
-                    positions[#positions+1] = {info.source.start, info.source.finish}
-                end
-            end
-            local metavar = tryMeta(var)
-            if metavar then
-                for _, info in ipairs(metavar) do
-                    if info.type == 'set' then
-                        positions[#positions+1] = {info.source.start, info.source.finish}
-                    end
-                end
-            end
-        else
-            error('unknow var.type:' .. var.type)
-        end
-    elseif tp == 'dots' then
-        local dots = result.dots
-        for _, info in ipairs(dots) do
+    if     tp == 'local' then
+        for _, info in ipairs(result.object) do
             if info.type == 'local' then
                 positions[#positions+1] = {info.source.start, info.source.finish}
             end
         end
+    elseif tp == 'field' then
+        for _, info in ipairs(result.object) do
+            if info.type == 'set' then
+                positions[#positions+1] = {info.source.start, info.source.finish}
+            end
+        end
+        --local metavar = tryMeta(var)
+        --if metavar then
+        --    for _, info in ipairs(metavar) do
+        --        if info.type == 'set' then
+        --            positions[#positions+1] = {info.source.start, --info.source.finish}
+        --        end
+        --    end
+        --end
     elseif tp == 'label' then
-        local label = result.label
-        for _, info in ipairs(label) do
+        for _, info in ipairs(result.object) do
             if info.type == 'set' then
                 positions[#positions+1] = {info.source.start, info.source.finish}
             end

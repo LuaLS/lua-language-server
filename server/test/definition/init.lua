@@ -47,7 +47,7 @@ function TEST(script)
     local new_script = script:gsub('<[!?]', '  '):gsub('[!?]>', '  ')
     local ast = parser:ast(new_script)
     assert(ast)
-    local results = matcher.compile(ast)
+    local results = matcher.vm(ast)
     assert(results)
 
     local result = matcher.definition(results, pos)

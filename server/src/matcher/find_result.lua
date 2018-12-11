@@ -2,39 +2,22 @@ local function isContainPos(obj, pos)
     return obj.start <= pos and obj.finish + 1 >= pos
 end
 
+local function findIn(name, group, pos)
+    for _, obj in ipairs(group) do
+        for _, info in ipairs(obj) do
+            if isContainPos(info.source, pos) then
+                return {
+                    type   = name,
+                    object = obj,
+                    info   = info,
+                }
+            end
+        end
+    end
+end
+
 return function (results, pos)
-    for _, var in ipairs(results.vars) do
-        for _, info in ipairs(var) do
-            if isContainPos(info.source, pos) then
-                return {
-                    type = 'var',
-                    var = var,
-                    info = info,
-                }
-            end
-        end
-    end
-    for _, dots in ipairs(results.dots) do
-        for _, info in ipairs(dots) do
-            if isContainPos(info.source, pos) then
-                return {
-                    type = 'dots',
-                    dots = dots,
-                    info = info,
-                }
-            end
-        end
-    end
-    for _, label in ipairs(results.labels) do
-        for _, info in ipairs(label) do
-            if isContainPos(info.source, pos) then
-                return {
-                    type = 'label',
-                    label = label,
-                    info = info,
-                }
-            end
-        end
-    end
-    return nil
+    return findIn('local', results.locals, pos)
+        or findIn('field', results.fields, pos)
+        or findIn('label', results.labels, pos)
 end

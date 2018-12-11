@@ -14,13 +14,17 @@ function mt:createLocal(key, source)
     }
     self.results.locals[#self.results.locals+1] = loc
     self.scope.locals[key] = loc
+    self:addInfo(loc, 'local', source)
     return loc
 end
 
 function mt:addInfo(obj, type, source)
+    if source and not source.start then
+        error('Miss start')
+    end
     obj[#obj+1] = {
         type = type,
-        source = source,
+        source = source or DefaultSource,
     }
     return obj
 end
@@ -155,7 +159,7 @@ function mt:createFunction(exp, object)
         end
     end)
     if object then
-        local var = self:createLocal('self', object)
+        local var = self:createLocal('self', object.source)
         table.insert(func.args, 1, var)
     end
 
@@ -592,7 +596,7 @@ function mt:doLoop(action)
 
     local arg = self:createLocal(action.arg[1], action.arg)
     self:setValue(arg, min)
-    self:addInfo(arg, 'set', arg)
+    self:addInfo(arg, 'set', action.arg)
 
     self:doActions(action)
 
@@ -656,7 +660,7 @@ function mt:doFunction(action)
     end
     local func = self:createFunction(action, object)
     self:setValue(var, func)
-    self:addInfo(var, 'set', action.name)
+    self:addInfo(var, 'set', var.source)
 end
 
 function mt:doLocalFunction(action)
@@ -664,7 +668,7 @@ function mt:doLocalFunction(action)
     local var = self:createLocal(name[1], name)
     local func = self:createFunction(action)
     self:setValue(var, func)
-    self:addInfo(var, 'set', action.name)
+    self:addInfo(var, 'set', name)
 end
 
 function mt:doAction(action)

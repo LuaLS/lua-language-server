@@ -186,7 +186,7 @@ function mt:loadText(uri)
         return nil
     end
     self:compileText(uri)
-    return obj.results, obj.lines
+    return obj.vm, obj.lines
 end
 
 function mt:compileText(uri)
@@ -198,18 +198,19 @@ function mt:compileText(uri)
         return nil
     end
     self._needCompile[uri] = nil
-    local ast   = parser:ast(obj.text)
+    local ast = parser:ast(obj.text)
+
     obj.vm = matcher.vm(ast)
-    if not obj.vm then
+    obj.lines = parser:lines(obj.text, 'utf8')
+    if obj.vm then
         return obj
     end
-    obj.lines = parser:lines(obj.text, 'utf8')
 
     self._needDiagnostics[uri] = {
-        ast     = ast,
-        vm      = obj.vm,
-        lines   = obj.lines,
-        uri     = uri,
+        ast   = ast,
+        vm    = obj.vm,
+        lines = obj.lines,
+        uri   = uri,
     }
 
     return obj
@@ -226,7 +227,7 @@ function mt:on_tick()
         self:_doProto(proto)
     end
     self:_buildTextCache()
-    self:_doDiagnostic()
+    --self:_doDiagnostic()
 end
 
 function mt:listen()

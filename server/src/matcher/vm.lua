@@ -440,7 +440,7 @@ function mt:getSimple(simple, mode)
             -- 函数的返回值一定是list
             value = self:call(value, args)
             if i < #simple then
-                value = value[1]
+                value = value[1] or self:createNil()
             end
         elseif obj.index then
             local index = self:getIndex(obj)

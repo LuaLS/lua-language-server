@@ -76,12 +76,12 @@ local function createInfo(data, lines)
 end
 
 return function (lsp, params)
-    local results = params.results
-    local ast     = params.ast
-    local lines   = params.lines
-    local uri     = params.uri
+    local vm     = params.vm
+    local ast    = params.ast
+    local lines  = params.lines
+    local uri    = params.uri
 
-    local datas   = matcher.diagnostics(ast, results, lines, uri)
+    local datas   = matcher.diagnostics(ast, vm.results, lines, uri)
 
     if not datas then
         -- 返回空表以清空之前的结果

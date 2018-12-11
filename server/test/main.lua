@@ -24,7 +24,7 @@ local function main()
     end
 
     test 'compile'
-    test 'type_inference'
+    --test 'type_inference'
     test 'definition'
     test 'find_lib'
     test 'vm'

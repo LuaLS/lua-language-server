@@ -30,7 +30,7 @@ function mt:createDots(source)
         type = 'dots',
         source = source or DefaultSource,
     }
-    self.func.dots = dots
+    self.chunk.dots = dots
     return dots
 end
 
@@ -112,33 +112,40 @@ function mt:createFunction(exp, object)
         },
     }
 
-    if exp then
-        local stop
-        self:forList(exp.args, function (arg)
-            if stop then
-                return
-            end
-            if not func.args then
-                func.args = {}
-            end
-            if arg.type == 'name' then
-                func.args[#func.args+1] = self:createLocal(arg[1], arg)
-            elseif arg.type == '...' then
-                func.args[#func.args+1] = self:createDots(arg)
-                stop = true
-            end
-        end)
-    end
-    if object then
-        if not func.args then
-            func.args = {}
-        end
-        table.insert(func.args, 1, object)
+    if not exp then
+        return func
     end
 
-    self.func.func = func
+    self.scope:push()
+    self.chunk:push()
+    self.chunk:cut 'dots'
+    self.chunk:cut 'labels'
+
+    local stop
+    self:forList(exp.args, function (arg)
+        if stop then
+            return
+        end
+        if arg.type == 'name' then
+            self:createLocal(arg[1], arg)
+        elseif arg.type == '...' then
+            self:createDots(arg)
+            stop = true
+        end
+    end)
+    if object then
+        self:createLocal('self', object)
+    end
+
+    self:doActions(exp)
+
+    self.chunk.func = func
     self.results.funcs[#self.results.funcs+1] = func
     self.newFuncs[#self.newFuncs+1] = func
+
+    self.chunk:pop()
+    self.scope:pop()
+
     return func
 end
 
@@ -159,11 +166,8 @@ function mt:call(func, values)
     if func.used then
         return self:getFunctionReturns(func)
     end
+
     func.used = true
-    self.func:push()
-    self.scope:push()
-    self.func:cut 'labels'
-    self.func:cut 'dots'
 
     if func.args then
         for i, var in ipairs(func.args) do
@@ -192,15 +196,11 @@ function mt:call(func, values)
         end
     end
 
-    self:doActions(func)
-
-    self.func:pop()
-    self.scope:pop()
     return self:getFunctionReturns(func)
 end
 
 function mt:getCurrentFunction()
-    return self.func.func
+    return self.chunk.func
 end
 
 function mt:setFunctionReturn(index, value)
@@ -426,10 +426,10 @@ function mt:getUnary(exp)
 end
 
 function mt:getDots()
-    if not self.func.dots then
+    if not self.chunk.dots then
         self:createDots()
     end
-    return self.func.dots
+    return self.chunk.dots
 end
 
 function mt:getExp(exp)
@@ -479,15 +479,15 @@ end
 
 function mt:createLabel(action)
     local name = action[1]
-    if not self.func.labels[name] then
+    if not self.chunk.labels[name] then
         local label = {
             type = 'label',
             key = name,
         }
-        self.func.labels[name] = label
+        self.chunk.labels[name] = label
         self.results.labels[#self.results.labels+1] = label
     end
-    return self.func.labels[name]
+    return self.chunk.labels[name]
 end
 
 function mt:doSet(action)
@@ -652,7 +652,7 @@ end
 
 function mt:createEnvironment()
     -- 整个文件是一个函数
-    self.func.func = self:createFunction()
+    self.chunk.func = self:createFunction()
     -- 隐藏的上值`_ENV`
     local parent = self:createLocal('_ENV')
     -- 隐藏的参数`...`
@@ -680,7 +680,7 @@ local function compile(ast)
         scope   = env {
             locals = {},
         },
-        func    = env {
+        chunk   = env {
             labels = {},
         },
         results = {
@@ -697,15 +697,6 @@ local function compile(ast)
 
     -- 执行代码
     vm:doActions(ast)
-
-    -- 把所有没跑过的函数跑一遍（可能会创建新的函数，需要一直跑到没有新的函数为止）
-    while true do
-        local func = table.remove(vm.newFuncs, 1)
-        if not func then
-            break
-        end
-        vm:call(func)
-    end
 
     return vm.results
 end

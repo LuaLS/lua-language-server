@@ -114,3 +114,12 @@ TEST [[
 local function xx(a, b, c, ...)
 end
 ]]
+
+TEST [[
+local v = 1
+local function xx()
+    print(v)
+end
+local v = 2
+xx()
+]]

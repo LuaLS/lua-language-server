@@ -129,3 +129,5 @@ end
 local v = 2
 xx()
 ]]
+
+TEST(io.load(ROOT / 'src' / 'matcher' / 'vm.lua'))

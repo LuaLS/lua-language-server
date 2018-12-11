@@ -52,3 +52,11 @@ self = {
 }
 self[self.results.<?labels?>] = lbl
 ]]
+
+TEST [[
+local mt = {}
+function mt:<!x!>()
+end
+mt:x()
+mt:<?x?>()
+]]

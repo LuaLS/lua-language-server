@@ -88,6 +88,9 @@ function mt:buildTable(source)
 end
 
 function mt:mergeValue(a, b, mark)
+    if a == b then
+        return
+    end
     if not mark then
         mark = {}
     end
@@ -106,6 +109,9 @@ function mt:mergeValue(a, b, mark)
 end
 
 function mt:mergeField(a, b, mark)
+    if a == b then
+        return
+    end
     if not mark then
         mark = {}
     end
@@ -120,6 +126,9 @@ function mt:mergeField(a, b, mark)
 end
 
 function mt:mergeChild(a, b, mark)
+    if a == b then
+        return
+    end
     if not a.child and not b.child then
         return
     end

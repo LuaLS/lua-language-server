@@ -203,6 +203,26 @@ default = 0
 [next]
 
 [pairs]
+[[.args]]
+name = 't'
+type = 'table'
+[[.returns]]
+name = 'next'
+type = 'function'
+returns = {
+    1 = {
+        name = 'key',
+    },
+    2 = {
+        name = 'object',
+    },
+}
+[[.returns]]
+name = 't'
+type = 'table'
+[[.returns]]
+name = 'nil'
+type = 'nil'
 
 [pcall]
 

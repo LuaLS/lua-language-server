@@ -316,6 +316,8 @@ function mt:getLibValue(lib)
         value = self:createNumber(lib.value)
     elseif tp == 'integer' then
         value = self:createInteger(lib.value)
+    elseif tp == 'nil' then
+        value = self:createNil()
     else
         value = self:createCustom(tp)
     end
@@ -600,7 +602,20 @@ end
 function mt:doIn(action)
     self.scope:push()
 
-    local values = self:unpackList(action.exp)
+    local func
+    local list = {
+        type = 'list'
+    }
+    if action.exp.type == 'list' then
+        func = self:getExp(action.exp[1])
+        for i = 2, #action.exp do
+            list[i-1] = action.exp[i]
+        end
+    else
+        func = self:getExp(action.exp)
+    end
+    local args = self:unpackList(list)
+    local values = self:call(func, args)
     self:forList(action.arg, function (arg)
         local var = self:createLocal(arg[1], arg)
         self:setValue(var, table.remove(values, 1))

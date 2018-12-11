@@ -16,8 +16,6 @@ function mt:createLocal(key, source, value)
     self.results.locals[#self.results.locals+1] = loc
 
     self:addInfo(loc, 'local', source)
-
-    local value = value or self:createValue('nil', source)
     self:setValue(loc, value, source)
     return loc
 end
@@ -89,35 +87,58 @@ function mt:buildTable(source)
     return tbl
 end
 
-function mt:coverValue(target, source)
-    local child = target.child
-    for k in pairs(target) do
-        target[k] = nil
+function mt:mergeValue(a, b, mark)
+    if not mark then
+        mark = {}
     end
-    for k, v in pairs(source) do
-        target[k] = v
+    if mark[a] or mark[b] then
+        return
     end
-    if child then
-        if not target.child then
-            target.child = {}
+    mark[a] = true
+    mark[b] = true
+    for i, info in ipairs(a) do
+        a[i] = nil
+        b[#b+1] = info
+    end
+    self:mergeChild(a, b, mark)
+    for k in pairs(a) do
+        a[k] = nil
+    end
+    for k, v in pairs(b) do
+        a[k] = v
+    end
+end
+
+function mt:mergeChild(a, b, mark)
+    if not a.child and not b.child then
+        return
+    end
+    if not mark then
+        mark = {}
+    end
+    local child = a.child or {}
+    local other = b.child or {}
+    a.child = nil
+    b.child = nil
+    for k, v in pairs(other) do
+        if child[k] then
+            self:mergeValue(v.value, child[k].value, mark)
+        else
+            child[k] = v
         end
-        for k, v in pairs(child) do
-            if target.child[k] == nil then
-                target.child[k] = v
-            end
-        end
     end
+    a.child = child
+    b.child = child
 end
 
 function mt:setValue(var, value, source)
     assert(not value or value.type ~= 'list')
-    value = value or self:createValue('nil', var)
+    value = value or self:createValue('nil', source)
     if var.value then
-        if var.value.type == 'nil' then
-            -- 允许覆盖nil
-            if value.type ~= 'nil' then
-                self:coverValue(var.value, value)
-            end
+        if value.type == 'nil' then
+            self:mergeChild(var.value, value)
+        else
+            self:mergeValue(var.value, value)
         end
         value = var.value
     else
@@ -125,6 +146,7 @@ function mt:setValue(var, value, source)
     end
     if source and source.start then
         self:addInfo(var, 'set', source)
+        self:addInfo(value, 'set', source)
     end
     return value
 end
@@ -250,17 +272,28 @@ function mt:setFunctionArgs(func, values)
     end
 end
 
-function mt:callSetMetaTable(values)
-    values[1].metatable = values[2]
-    self:setFunctionReturn(self:getCurrentFunction(), 1, values[1])
-    self.metas[#self.metas+1] = values[1]
+function mt:checkMetaIndex(value, meta)
+    local index = self:getField(meta, '__index')
+    if not index then
+        return
+    end
+    local indexValue = self:getValue(index)
+    -- TODO 支持function
+    self:mergeChild(value, indexValue)
+end
+
+function mt:callSetMetaTable(func, values)
+    self:setFunctionReturn(func, 1, values[1])
+
+    -- 检查 __index
+    self:checkMetaIndex(values[1], values[2])
 end
 
 function mt:call(func, values)
     local lib = func.lib
     if lib and lib.special then
         if lib.special == 'setmetatable' then
-            self:callSetMetaTable(values)
+            self:callSetMetaTable(func, values)
         end
     end
 
@@ -585,7 +618,7 @@ function mt:doLocal(action)
         if values then
             value = table.remove(values, 1)
         end
-        local var = self:createLocal(key[1], key, value)
+        self:createLocal(key[1], key, value)
     end)
 end
 
@@ -742,7 +775,7 @@ function mt:createEnvironment()
         local field = self:createField(pValue, name)
         if info.lib then
             local value = self:getLibValue(info.lib)
-            self:setValue(field, value)
+            value = self:setValue(field, value)
             value.lib = info.lib
         end
         if info.child then
@@ -750,45 +783,10 @@ function mt:createEnvironment()
             for fname, flib in pairs(info.child) do
                 local ffield = self:createField(fValue, fname)
                 local value = self:getLibValue(flib)
-                self:setValue(ffield, value)
+                value = self:setValue(ffield, value)
                 value.lib = flib
             end
         end
-    end
-end
-
-function mt:mergeChild(a, b)
-    if not a.child and not b.child then
-        return
-    end
-    local child = a.child or {}
-    a.child = nil
-    b.child = nil
-    for k, v in pairs(b.child or {}) do
-        if child[k] then
-            self:coverValue(v, child[k])
-        else
-            child[k] = v
-        end
-    end
-    a.child = child
-    b.child = child
-end
-
-function mt:checkMetaIndex(value, meta)
-    local index = self:getField(meta, '__index')
-    if not index then
-        return
-    end
-    local indexValue = self:getValue(index)
-    -- TODO 支持function
-    self:mergeChild(value, indexValue)
-end
-
-function mt:checkMeta()
-    for _, value in ipairs(self.metas) do
-        local meta = value.metatable
-        self:checkMetaIndex(value, meta)
     end
 end
 
@@ -806,7 +804,6 @@ local function compile(ast)
             labels = {},
             funcs  = {},
         },
-        metas = {},
     }, mt)
 
     -- 创建初始环境
@@ -814,9 +811,6 @@ local function compile(ast)
 
     -- 执行代码
     vm:doActions(ast)
-
-    -- 后处理meta
-    vm:checkMeta()
 
     return vm
 end

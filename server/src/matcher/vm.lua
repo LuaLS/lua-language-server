@@ -68,9 +68,27 @@ function mt:createTable(source)
     return tbl
 end
 
+function mt:coverValue(target, source)
+    for k in pairs(target) do
+        target[k] = nil
+    end
+    for k, v in pairs(source) do
+        target[k] = v
+    end
+end
+
 function mt:setValue(var, value)
     assert(not value or value.type ~= 'list')
-    var.value = value or self:createNil(var)
+    if var.value then
+        if var.value.type == 'nil' then
+            -- 允许覆盖nil
+            if value.type ~= 'nil' then
+                self:coverValue(var.value, value)
+            end
+        end
+    else
+        var.value = value or self:createNil(var)
+    end
     return value
 end
 
@@ -110,6 +128,7 @@ function mt:createFunction(exp, object)
         returns = {
             type = 'list',
         },
+        args = {},
     }
 
     if not exp then
@@ -127,14 +146,17 @@ function mt:createFunction(exp, object)
             return
         end
         if arg.type == 'name' then
-            self:createLocal(arg[1], arg)
+            local var = self:createLocal(arg[1], arg)
+            func.args[#func.args+1] = var
         elseif arg.type == '...' then
-            self:createDots(arg)
+            local dots = self:createDots(arg)
+            func.args[#func.args+1] = dots
             stop = true
         end
     end)
     if object then
-        self:createLocal('self', object)
+        local var = self:createLocal('self', object)
+        table.insert(func.args, 1, var)
     end
 
     self:doActions(exp)
@@ -166,31 +188,32 @@ function mt:call(func, values)
     if func.used then
         return self:getFunctionReturns(func)
     end
-
     func.used = true
 
-    if func.args then
-        for i, var in ipairs(func.args) do
-            if var then
-                if var.type == 'dots' then
-                    local list = {
-                        type = 'list',
-                    }
-                    if values then
-                        for n = i, #values do
-                            list[n-i+1] = values[n]
-                        end
-                        self:setValue(var, list)
-                    else
-                        self:setValue(var, nil)
+    if not func.args then
+        return self:getFunctionReturns(func)
+    end
+
+    for i, var in ipairs(func.args) do
+        if var then
+            if var.type == 'dots' then
+                local list = {
+                    type = 'list',
+                }
+                if values then
+                    for n = i, #values do
+                        list[n-i+1] = values[n]
                     end
-                    break
+                    self:setValue(var, list)
                 else
-                    if values then
-                        self:setValue(var, values[i])
-                    else
-                        self:setValue(var, nil)
-                    end
+                    self:setValue(var, nil)
+                end
+                break
+            else
+                if values then
+                    self:setValue(var, values[i])
+                else
+                    self:setValue(var, nil)
                 end
             end
         end
@@ -203,9 +226,8 @@ function mt:getCurrentFunction()
     return self.chunk.func
 end
 
-function mt:setFunctionReturn(index, value)
-    local func = self:getCurrentFunction()
-    func.returns[index] = value
+function mt:setFunctionReturn(func, index, value)
+    func.returns[index] = value or self:createNil()
 end
 
 function mt:getFunctionReturns(func)
@@ -257,25 +279,47 @@ function mt:createNil(source)
     }
 end
 
-function mt:setLib(obj, lib)
-    obj.lib = lib
+function mt:createCustom(tp, source)
+    return {
+        type = tp,
+        source = source or DefaultSource,
+    }
+end
+
+function mt:getLibValue(lib)
     local tp = lib.type
     if not tp then
         return
     end
+    local value
     if     tp == 'table' then
-        self:setValue(obj, self:createTable())
+        value = self:createTable()
     elseif tp == 'function' then
-        self:setValue(obj, self:createFunction()) -- TODO
+        value = self:createFunction()
+        if lib.returns then
+            for i, rtn in ipairs(lib.returns) do
+                self:setFunctionReturn(value, i, self:getLibValue(rtn))
+            end
+        end
+        if lib.args then
+            local values = {}
+            for i, arg in ipairs(lib.args) do
+                values[i] = self:getLibValue(arg) or self:createNil()
+            end
+            self:call(value, values)
+        end
     elseif tp == 'string' then
-        self:setValue(obj, self:createString(lib.value))
+        value = self:createString(lib.value)
     elseif tp == 'boolean' then
-        self:setValue(obj, self:createBoolean(lib.value))
+        value = self:createBoolean(lib.value)
     elseif tp == 'number' then
-        self:setValue(obj, self:createNumber(lib.value))
+        value = self:createNumber(lib.value)
     elseif tp == 'integer' then
-        self:setValue(obj, self:createInteger(lib.value))
+        value = self:createInteger(lib.value)
+    else
+        value = self:createCustom(tp)
     end
+    return value
 end
 
 function mt:getName(name, source)
@@ -473,7 +517,7 @@ end
 function mt:doReturn(action)
     for i, exp in ipairs(action) do
         local value = self:getExp(exp)
-        self:setFunctionReturn(i, value)
+        self:setFunctionReturn(self:getCurrentFunction(), i, value)
     end
 end
 
@@ -663,13 +707,17 @@ function mt:createEnvironment()
     for name, info in pairs(library.global) do
         local field = self:createField(pValue, name)
         if info.lib then
-            self:setLib(field, info.lib)
+            local value = self:getLibValue(info.lib)
+            self:setValue(field, value)
+            value.lib = info.lib
         end
         if info.child then
             local fValue = self:getValue(field)
             for fname, flib in pairs(info.child) do
                 local ffield = self:createField(fValue, fname)
-                self:setLib(ffield, flib)
+                local value = self:getLibValue(flib)
+                self:setValue(ffield, value)
+                value.lib = flib
             end
         end
     end

@@ -16,7 +16,7 @@ type = 'library'
 name = 'io'
 
 [stdin]
-type = '*FILE*'
+type = 'FILE*'
 
 [close]
 [[.parent]]
@@ -27,8 +27,8 @@ type = 'library'
 name = 'table'
 [[.parent]]
 type = 'object'
-name = '*FILE*'
+name = 'FILE*'
 [[.args]]
-type = '*FILE*'
+type = 'FILE*'
 name = 'file'
 optional = 'self'

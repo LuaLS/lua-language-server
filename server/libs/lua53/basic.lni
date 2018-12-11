@@ -179,6 +179,15 @@ type = 'table'
 [[.returns]]
 name = 'iterator'
 type = 'function'
+returns = {
+    1 = {
+        name = 'i',
+        type = 'integer',
+    },
+    2 = {
+        name = 'object',
+    },
+}
 [[.returns]]
 name = 't'
 type = 'table'

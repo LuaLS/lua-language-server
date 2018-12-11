@@ -15,8 +15,8 @@ nick = 'fs'
 [current_path]
 [[.args]]
 name = 'new_path'
-type = '*bee::filesystem'
+type = 'bee::filesystem'
 optional = 'self'
 [[.returns]]
-type = '*bee::filesystem'
+type = 'bee::filesystem'
 optional = 'self'

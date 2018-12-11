@@ -442,7 +442,7 @@ function mt:getSimple(simple, mode)
         if     tp == 'call' then
             local args = self:unpackList(obj)
             if object then
-                table.insert(args, 1, object)
+                table.insert(args, 1, self:getValue(object))
             end
             -- 函数的返回值一定是list
             value = self:call(value, args)

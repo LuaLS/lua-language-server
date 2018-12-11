@@ -2,13 +2,13 @@ local matcher = require 'matcher'
 
 return function (lsp, params)
     local uri = params.textDocument.uri
-    local results, lines = lsp:loadText(uri)
-    if not results then
+    local vm, lines = lsp:loadText(uri)
+    if not vm then
         return {}
     end
     -- lua是从1开始的，因此都要+1
     local position = lines:position(params.position.line + 1, params.position.character + 1)
-    local positions = matcher.definition(results, position)
+    local positions = matcher.definition(vm, position)
     if not positions then
         return {}
     end

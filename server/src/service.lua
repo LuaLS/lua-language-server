@@ -199,15 +199,15 @@ function mt:compileText(uri)
     end
     self._needCompile[uri] = nil
     local ast   = parser:ast(obj.text)
-    obj.results = matcher.compile(ast)
-    if not obj.results then
+    obj.vm = matcher.vm(ast)
+    if not obj.vm then
         return obj
     end
     obj.lines = parser:lines(obj.text, 'utf8')
 
     self._needDiagnostics[uri] = {
         ast     = ast,
-        results = obj.results,
+        vm      = obj.vm,
         lines   = obj.lines,
         uri     = uri,
     }

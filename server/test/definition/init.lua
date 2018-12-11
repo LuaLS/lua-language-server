@@ -47,10 +47,10 @@ function TEST(script)
     local new_script = script:gsub('<[!?]', '  '):gsub('[!?]>', '  ')
     local ast = parser:ast(new_script)
     assert(ast)
-    local results = matcher.vm(ast)
-    assert(results)
+    local vm = matcher.vm(ast)
+    assert(vm)
 
-    local result = matcher.definition(results, pos)
+    local result = matcher.definition(vm, pos)
     if result then
         assert(founded(target, result))
     else

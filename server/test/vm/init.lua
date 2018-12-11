@@ -6,7 +6,9 @@ rawset(_G, 'TEST', true)
 function TEST(script)
     local ast = parser:ast(script)
     assert(ast)
-    local results = matcher.vm(ast)
+    local vm = matcher.vm(ast)
+    assert(vm)
+    local results = vm.results
     assert(results)
 end
 
@@ -71,6 +73,10 @@ a, b, c = 1, 2, ...
 
 TEST [[
 local a, b, c = 1, 2, ...
+]]
+
+TEST [[
+a[#a+1] = 1
 ]]
 
 TEST [[

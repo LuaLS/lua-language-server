@@ -145,7 +145,7 @@ function mt:createFunction(exp, object)
     self.chunk:cut 'labels'
 
     local stop
-    self:forList(exp.args, function (arg)
+    self:forList(exp.arg, function (arg)
         if stop then
             return
         end

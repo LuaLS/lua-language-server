@@ -3,7 +3,7 @@ TEST [[
 function <!x!> () end
 <?x?>()
 ]]
-    
+
 TEST [[
 local function <!x!> () end
 <?x?>()

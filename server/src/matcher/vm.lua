@@ -55,11 +55,13 @@ function mt:createTable(source)
                 local index = self:getIndex(key)
                 local field = self:createField(tbl, index, key)
                 self:setValue(field, value)
+                self:addInfo(field, 'set', key)
             else
                 if key.type == 'name' then
                     local index = key[1]
                     local field = self:createField(tbl, index, key)
                     self:setValue(field, value)
+                    self:addInfo(field, 'set', key)
                 end
             end
         else
@@ -144,6 +146,12 @@ function mt:createFunction(exp, object)
     self.chunk:cut 'dots'
     self.chunk:cut 'labels'
 
+    if object then
+        local var = self:createLocal('self', object.source)
+        self:setValue(var, self:getValue(object))
+        func.args[1] = var
+    end
+
     local stop
     self:forList(exp.arg, function (arg)
         if stop then
@@ -158,10 +166,6 @@ function mt:createFunction(exp, object)
             stop = true
         end
     end)
-    if object then
-        local var = self:createLocal('self', object.source)
-        table.insert(func.args, 1, var)
-    end
 
     self:doActions(exp)
 
@@ -380,6 +384,11 @@ end
 function mt:getSimple(simple, mode)
     local value = self:getExp(simple[1])
     local field
+    if simple[1].type == 'name' then
+        field = self:getName(simple[1][1])
+    else
+        field = self:createNil(simple[1])
+    end
     local object
     for i = 2, #simple do
         local obj = simple[i]
@@ -404,13 +413,13 @@ function mt:getSimple(simple, mode)
             value = self:getValue(field)
         else
             if tp == 'name' then
-                field = self:getField(value, obj[1])
+                field = self:getField(value, obj[1], obj)
                 if mode == 'value' or i < #simple then
                     self:addInfo(field, 'get', obj)
                 end
                 value = self:getValue(field)
             elseif tp == ':' then
-                object = value
+                object = field
             end
         end
     end
@@ -552,7 +561,7 @@ function mt:doSet(action)
         elseif key.type == 'simple' then
             local field = self:getSimple(key, 'field')
             self:setValue(field, value)
-            self:addInfo(field, 'set', key)
+            self:addInfo(field, 'set', key[#key])
         end
     end)
 end

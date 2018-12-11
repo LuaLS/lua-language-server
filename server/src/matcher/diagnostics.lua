@@ -136,8 +136,9 @@ local function searchNewLineCall(results, lines, callback)
     end
 end
 
-return function (ast, results, lines, uri)
+return function (vm, lines, uri)
     local datas = {}
+    local results = vm.results
     -- 未使用的局部变量
     searchUnusedLocals(results, function (start, finish, key)
         datas[#datas+1] = {

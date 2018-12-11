@@ -207,7 +207,6 @@ function mt:compileText(uri)
     end
 
     self._needDiagnostics[uri] = {
-        ast   = ast,
         vm    = obj.vm,
         lines = obj.lines,
         uri   = uri,
@@ -227,7 +226,7 @@ function mt:on_tick()
         self:_doProto(proto)
     end
     self:_buildTextCache()
-    --self:_doDiagnostic()
+    self:_doDiagnostic()
 end
 
 function mt:listen()

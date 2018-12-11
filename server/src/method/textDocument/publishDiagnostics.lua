@@ -77,11 +77,10 @@ end
 
 return function (lsp, params)
     local vm     = params.vm
-    local ast    = params.ast
     local lines  = params.lines
     local uri    = params.uri
 
-    local datas   = matcher.diagnostics(ast, vm.results, lines, uri)
+    local datas   = matcher.diagnostics(vm, lines, uri)
 
     if not datas then
         -- 返回空表以清空之前的结果

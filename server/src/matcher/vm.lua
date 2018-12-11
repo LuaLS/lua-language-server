@@ -15,6 +15,8 @@ function mt:createLocal(key, source, value)
     self.scope.locals[key] = loc
     self.results.locals[#self.results.locals+1] = loc
 
+    self:addInfo(loc, 'local', source)
+
     local value = value or self:createValue('nil', source)
     self:setValue(loc, value, source)
     return loc

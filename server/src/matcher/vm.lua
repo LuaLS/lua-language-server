@@ -633,19 +633,17 @@ end
 
 function mt:doIf(action)
     for _, block in ipairs(action) do
-        self.scope:push()
         if block.filter then
             self:getExp(block.filter)
         end
 
+        self.scope:push()
         self:doActions(block)
-
         self.scope:pop()
     end
 end
 
 function mt:doLoop(action)
-    self.scope:push()
 
     local min = self:getExp(action.min)
     self:getExp(action.max)
@@ -653,16 +651,13 @@ function mt:doLoop(action)
         self:getExp(action.step)
     end
 
-    local arg = self:createLocal(action.arg[1], action.arg, min)
-
+    self.scope:push()
+    self:createLocal(action.arg[1], action.arg, min)
     self:doActions(action)
-
     self.scope:pop()
 end
 
 function mt:doIn(action)
-    self.scope:push()
-
     local func
     local list = {
         type = 'list'
@@ -675,6 +670,8 @@ function mt:doIn(action)
     else
         func = self:getExp(action.exp)
     end
+
+    self.scope:push()
     local args = self:unpackList(list)
     local values = self:call(func, args)
     self:forList(action.arg, function (arg)
@@ -688,21 +685,18 @@ function mt:doIn(action)
 end
 
 function mt:doWhile(action)
-    self.scope:push()
 
     self:getExp(action.filter)
 
+    self.scope:push()
     self:doActions(action)
-
     self.scope:pop()
 end
 
 function mt:doRepeat(action)
     self.scope:push()
-
     self:doActions(action)
     self:getExp(action.filter)
-
     self.scope:pop()
 end
 

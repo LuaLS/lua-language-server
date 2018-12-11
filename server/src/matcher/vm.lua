@@ -6,7 +6,7 @@ local DefaultSource = { start = 0, finish = 0 }
 local mt = {}
 mt.__index = mt
 
-function mt:createLocal(key, source)
+function mt:createLocal(key, source, value)
     local loc = {
         type = 'local',
         key = key,
@@ -15,9 +15,8 @@ function mt:createLocal(key, source)
     self.scope.locals[key] = loc
     self.results.locals[#self.results.locals+1] = loc
 
-    local value = self:createValue('nil', source)
-    self:setValue(loc, value)
-    self:addInfo(loc, 'local', source)
+    local value = value or self:createValue('nil', source)
+    self:setValue(loc, value, source)
     return loc
 end
 
@@ -55,22 +54,18 @@ function mt:buildTable(source)
                 local index = self:getIndex(key)
                 local field = self:createField(tbl, index, key)
                 if value.type == 'list' then
-                    self:setValue(field, value[1])
-                    self:addInfo(field, 'set', key)
+                    self:setValue(field, value[1], key)
                 else
-                    self:setValue(field, value)
-                    self:addInfo(field, 'set', key)
+                    self:setValue(field, value, key)
                 end
             else
                 if key.type == 'name' then
                     local index = key[1]
                     local field = self:createField(tbl, index, key)
                     if value.type == 'list' then
-                        self:setValue(field, value[1])
-                        self:addInfo(field, 'set', key)
+                        self:setValue(field, value[1], key)
                     else
-                        self:setValue(field, value)
-                        self:addInfo(field, 'set', key)
+                        self:setValue(field, value, key)
                     end
                 end
             end
@@ -112,7 +107,7 @@ function mt:coverValue(target, source)
     end
 end
 
-function mt:setValue(var, value)
+function mt:setValue(var, value, source)
     assert(not value or value.type ~= 'list')
     value = value or self:createValue('nil', var)
     if var.value then
@@ -125,6 +120,9 @@ function mt:setValue(var, value)
         value = var.value
     else
         var.value = value
+    end
+    if source and source.start then
+        self:addInfo(var, 'set', source)
     end
     return value
 end
@@ -178,8 +176,7 @@ function mt:buildFunction(exp, object)
     self.chunk:cut 'labels'
 
     if object then
-        local var = self:createLocal('self', object.source)
-        self:setValue(var, self:getValue(object))
+        local var = self:createLocal('self', object.source, self:getValue(object))
         func.args[1] = var
     end
 
@@ -568,15 +565,10 @@ function mt:doSet(action)
         local value = table.remove(values, 1)
         if key.type == 'name' then
             local var = self:getName(key[1], key)
-            self:setValue(var, value)
-            self:addInfo(var, 'set', key)
+            self:setValue(var, value, key)
         elseif key.type == 'simple' then
             local field = self:getSimple(key, 'field')
-            self:setValue(field, value)
-            local source = key[#key]
-            if source.start then
-                self:addInfo(field, 'set', source)
-            end
+            self:setValue(field, value, key[#key])
         end
     end)
 end
@@ -587,11 +579,11 @@ function mt:doLocal(action)
         values = self:unpackList(action[2])
     end
     self:forList(action[1], function (key)
-        local var = self:createLocal(key[1], key)
+        local value
         if values then
-            self:setValue(var, table.remove(values, 1))
-            self:addInfo(var, 'set', key)
+            value = table.remove(values, 1)
         end
+        local var = self:createLocal(key[1], key, value)
     end)
 end
 
@@ -617,9 +609,7 @@ function mt:doLoop(action)
         self:getExp(action.step)
     end
 
-    local arg = self:createLocal(action.arg[1], action.arg)
-    self:setValue(arg, min)
-    self:addInfo(arg, 'set', action.arg)
+    local arg = self:createLocal(action.arg[1], action.arg, min)
 
     self:doActions(action)
 
@@ -644,9 +634,8 @@ function mt:doIn(action)
     local args = self:unpackList(list)
     local values = self:call(func, args)
     self:forList(action.arg, function (arg)
-        local var = self:createLocal(arg[1], arg)
-        self:setValue(var, table.remove(values, 1))
-        self:addInfo(var, 'set', arg)
+        local value = table.remove(values, 1)
+        local var = self:createLocal(arg[1], arg, value)
     end)
 
     self:doActions(action)
@@ -685,18 +674,14 @@ function mt:doFunction(action)
         source = name
     end
     local func = self:buildFunction(action, object)
-    self:setValue(var, func)
-    if source.start then
-        self:addInfo(var, 'set', source)
-    end
+    self:setValue(var, func, source)
 end
 
 function mt:doLocalFunction(action)
     local name = action.name
     local var = self:createLocal(name[1], name)
     local func = self:buildFunction(action)
-    self:setValue(var, func)
-    self:addInfo(var, 'set', name)
+    self:setValue(var, func, name)
 end
 
 function mt:doAction(action)

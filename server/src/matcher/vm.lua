@@ -96,10 +96,6 @@ function mt:mergeValue(a, b, mark)
     end
     mark[a] = true
     mark[b] = true
-    for i, info in ipairs(a) do
-        a[i] = nil
-        b[#b+1] = info
-    end
     self:mergeChild(a, b, mark)
     for k in pairs(a) do
         a[k] = nil
@@ -107,6 +103,20 @@ function mt:mergeValue(a, b, mark)
     for k, v in pairs(b) do
         a[k] = v
     end
+end
+
+function mt:mergeField(a, b, mark)
+    if not mark then
+        mark = {}
+    end
+    for i, info in ipairs(a) do
+        a[i] = nil
+        b[#b+1] = info
+    end
+    for i, v in ipairs(b) do
+        a[i] = v
+    end
+    self:mergeValue(a.value, b.value, mark)
 end
 
 function mt:mergeChild(a, b, mark)
@@ -122,7 +132,7 @@ function mt:mergeChild(a, b, mark)
     b.child = nil
     for k, v in pairs(other) do
         if child[k] then
-            self:mergeValue(v.value, child[k].value, mark)
+            self:mergeField(v, child[k], mark)
         else
             child[k] = v
         end
@@ -146,7 +156,6 @@ function mt:setValue(var, value, source)
     end
     if source and source.start then
         self:addInfo(var, 'set', source)
-        self:addInfo(value, 'set', source)
     end
     return value
 end

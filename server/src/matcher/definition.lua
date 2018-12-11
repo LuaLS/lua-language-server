@@ -10,19 +10,9 @@ local function parseResult(result)
             end
         end
     elseif tp == 'field' then
-        local mark = {}
         for _, info in ipairs(result.object) do
-            if info.type == 'set' and not mark[info.source] then
-                mark[info.source] = true
+            if info.type == 'set' then
                 positions[#positions+1] = {info.source.start, info.source.finish}
-            end
-        end
-        if result.object.value then
-            for _, info in ipairs(result.object.value) do
-                if info.type == 'set' and not mark[info.source] then
-                    mark[info.source] = true
-                    positions[#positions+1] = {info.source.start, info.source.finish}
-                end
             end
         end
     elseif tp == 'label' then

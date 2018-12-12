@@ -181,7 +181,9 @@ function mt:mergeChild(a, b, mark)
 end
 
 function mt:setValue(var, value, source)
-    assert(not value or value.type ~= 'list')
+    if value and value.type == 'list' then
+        error('Cant set value list')
+    end
     value = value or self:createValue('nil', source)
     if var.value then
         if value.type == 'nil' then
@@ -207,14 +209,14 @@ function mt:getValue(var)
 end
 
 function mt:createField(pValue, name, source)
-    assert(pValue.type ~= 'local' and pValue.type ~= 'field')
+    if pValue.type == 'local' or pValue.type == 'field' then
+        error('Only value can create field')
+    end
     local field = {
         type   = 'field',
         key    = name,
         source = source or DefaultSource,
     }
-
-    self.results.fields[#self.results.fields+1] = field
 
     if not pValue.child then
         pValue.child = {}
@@ -914,7 +916,6 @@ local function compile(ast)
         },
         results = {
             locals = {},
-            fields = {},
             labels = {},
             funcs  = {},
             calls  = {},

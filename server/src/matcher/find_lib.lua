@@ -1,150 +1,29 @@
-local library = require 'matcher.library'
-
-local function isGlobal(var)
-    if var.type ~= 'field' then
-        return false
-    end
-    if not var.parent then
-        return false
-    end
-    return var.parent.key == '_ENV' or var.parent.key == '_G'
-end
-
-local function checkSourceAsGlobal(value, name, showname)
-    if value.key == name and isGlobal(value) then
-        return showname or name
-    end
-    return nil
-end
-
-local function checkSourceAsLibrary(value, name, showname)
-    if value.type ~= 'lib' then
-        return nil
-    end
-    if value.name == name then
-        return showname or name
-    end
-    return nil
-end
-
-local function checkSource(value, libname, lib)
-    if not lib then
-        return
-    end
-    if not lib.source then
-        return checkSourceAsGlobal(value, libname)
-    end
-    for _, source in ipairs(lib.source) do
-        if source.type == 'global' then
-            local fullKey = checkSourceAsGlobal(value, source.name or libname, source.nick or libname)
-            if fullKey then
-                return fullKey
-            end
-        elseif source.type == 'library' then
-            local fullKey = checkSourceAsLibrary(value, source.name or libname, source.nick or libname)
-            if fullKey then
-                return fullKey
-            end
-        end
-    end
-    return nil
-end
-
-local function checkParentAsGlobal(parentValue, name, parent)
-    local parentName = checkSourceAsGlobal(parentValue, parent.name, parent.nick)
-    if not parentName then
-        return nil
-    end
-    return ('%s.%s'):format(parentName, name)
-end
-
-local function checkParentAsLibrary(parentValue, name, parent)
-    local parentName = checkSourceAsLibrary(parentValue, parent.name, parent.nick)
-    if not parentName then
-        return nil
-    end
-    return ('%s.%s'):format(parentName, name)
-end
-
-local function checkParentAsObject(parentValue, name, parent)
-    if parentValue.type ~= parent.name then
-        return nil
-    end
-    return ('*%s:%s'):format(parent.name, name)
-end
-
-local function checkParent(value, name, lib)
-    if name ~= value.key then
-        return nil
-    end
-    local parentValue = value.parent
-    if not parentValue then
-        return nil
-    end
-    parentValue = parentValue.value or parentValue
-    for _, parent in ipairs(lib.parent) do
-        if parent.type == 'global' then
-            local fullKey = checkParentAsGlobal(parentValue, name, parent)
-            if fullKey then
-                return fullKey, false
-            end
-        elseif parent.type == 'library' then
-            local fullKey = checkParentAsLibrary(parentValue, name, parent)
-            if fullKey then
-                return fullKey, false
-            end
-        elseif parent.type == 'object' then
-            local fullKey = checkParentAsObject(parentValue, name, parent)
-            if fullKey then
-                return fullKey, true
-            end
-        end
-    end
-    return nil
-end
-
 local function findLib(var)
     local value = var.value
-    if value.lib then
-        return value.lib, value.lib.name, false
+    local lib = value.lib
+    if not lib then
+        return nil
     end
-    for libname, info in pairs(library.global) do
-        local fullKey = checkSource(value, libname, info.lib)
-        if fullKey then
-            return info.lib, fullKey, false
-        end
-        for libname, lib in pairs(info.child) do
-            local fullKey, oo = checkParent(value, libname, lib)
-            if fullKey then
-                return lib, fullKey, oo
+    if lib.parent then
+        local res
+        for _, parent in ipairs(lib.parent) do
+            if parent.type == value.parentType then
+                res = parent
             end
         end
+        if not res then
+            res = lib.parent[1]
+        end
+        if res.type == 'object' then
+            local fullKey = ('*%s:%s'):format(res.nick or res.name, lib.name)
+            return lib, fullKey, true
+        else
+            local fullKey = ('%s.%s'):format(res.nick or res.name, lib.name)
+            return lib, fullKey, false
+        end
+    else
+        return lib, lib.name, false
     end
-    for libname, info in pairs(library.library) do
-        local fullKey = checkSource(value, libname, info.lib)
-        if fullKey then
-            return info.lib, fullKey, false
-        end
-        for libname, lib in pairs(info.child) do
-            local fullKey, oo = checkParent(value, libname, lib)
-            if fullKey then
-                return lib, fullKey, oo
-            end
-        end
-    end
-    for libname, info in pairs(library.object) do
-        local fullKey = checkSource(value, libname, info.lib)
-        if fullKey then
-            return info.lib, fullKey, false
-        end
-        for libname, lib in pairs(info.child) do
-            local fullKey, oo = checkParent(value, libname, lib)
-            if fullKey then
-                return lib, fullKey, oo
-            end
-        end
-    end
-    return nil, nil, nil
 end
 
 return function (var)

@@ -217,9 +217,6 @@ end
 
 function mt:buildFunction(exp, object)
     local func = self:createValue('function')
-    func.returns = {
-        type = 'list',
-    }
     func.args = {}
 
     if not exp then
@@ -336,7 +333,7 @@ function mt:callRequire(func, values)
     if type(str) == 'string' then
         local lib = library.library[str]
         if lib then
-            local value = self:getLibValue(lib)
+            local value = self:getLibValue(lib, 'library')
             self:setFunctionReturn(func, 1, value)
             return
         end
@@ -364,6 +361,12 @@ function mt:getCurrentFunction()
 end
 
 function mt:setFunctionReturn(func, index, value)
+    if not func.returns then
+        func.returns = {
+            type = 'list',
+            [1] = self:createValue('nil'),
+        }
+    end
     func.returns[index] = value or self:createValue('nil')
 end
 
@@ -386,36 +389,41 @@ function mt:createValue(type, source, v)
     return value
 end
 
-function mt:getLibValue(lib)
+function mt:getLibValue(lib, parentType, v)
     if self.libraryValue[lib] then
         return self.libraryValue[lib]
     end
     local tp = lib.type
     local value
     if     tp == 'table' then
-        value = self:buildTable()
+        value = self:createValue('table')
     elseif tp == 'function' then
-        value = self:buildFunction()
+        value = self:createValue('function')
         if lib.returns then
             for i, rtn in ipairs(lib.returns) do
-                self:setFunctionReturn(value, i, self:getLibValue(rtn))
+                self:setFunctionReturn(value, i, self:getLibValue(rtn, parentType))
             end
         end
         if lib.args then
+            value.args = {}
             local values = {}
+            self.scope:push()
             for i, arg in ipairs(lib.args) do
-                values[i] = self:getLibValue(arg) or self:createValue('nil')
+                value.args[#value.args+1] = self:createLocal(arg.name)
+
+                values[i] = self:getLibValue(arg, parentType) or self:createValue('nil')
             end
+            self.scope:pop()
             self:setFunctionArgs(value, values)
         end
     elseif tp == 'string' then
-        value = self:createValue('string', nil, lib.value)
+        value = self:createValue('string', nil, v or lib.value)
     elseif tp == 'boolean' then
-        value = self:createValue('boolean', nil, lib.value)
+        value = self:createValue('boolean', nil, v or lib.value)
     elseif tp == 'number' then
-        value = self:createValue('number', nil, lib.value)
+        value = self:createValue('number', nil, v or lib.value)
     elseif tp == 'integer' then
-        value = self:createValue('integer', nil, lib.value)
+        value = self:createValue('integer', nil, v or lib.value)
     elseif tp == 'nil' then
         value = self:createValue('nil')
     else
@@ -423,11 +431,12 @@ function mt:getLibValue(lib)
     end
     self.libraryValue[lib] = value
     value.lib = lib
+    value.parentType = parentType
 
     if lib.child then
         for fName, fLib in pairs(lib.child) do
             local fField = self:createField(value, fName)
-            local fValue = self:getLibValue(fLib)
+            local fValue = self:getLibValue(fLib, parentType)
             self:setValue(fField, fValue)
         end
     end
@@ -739,7 +748,7 @@ function mt:doIn(action)
     local values = self:call(func, args)
     self:forList(action.arg, function (arg)
         local value = table.remove(values, 1)
-        local var = self:createLocal(arg[1], arg, value)
+        self:createLocal(arg[1], arg, value)
     end)
 
     self:doActions(action)
@@ -832,20 +841,22 @@ function mt:createEnvironment()
     self.chunk.func = self:buildFunction()
     -- 隐藏的上值`_ENV`
     local parent = self:createLocal('_ENV')
+    local envValue = self:setValue(parent, self:buildTable())
+    -- _ENV 有个特殊标记
+    envValue.ENV = true
     -- 隐藏的参数`...`
     self:createDots()
 
-    local pValue = self:setValue(parent, self:buildTable())
     -- 设置全局变量
     for name, lib in pairs(library.global) do
-        local field = self:createField(pValue, name)
-        local value = self:getLibValue(lib)
+        local field = self:createField(envValue, name)
+        local value = self:getLibValue(lib, 'global')
         value = self:setValue(field, value)
     end
 
     -- 设置 _G 等于 _ENV
-    local g = self:getField(pValue, '_G')
-    self:setValue(g, pValue)
+    local g = self:getField(envValue, '_G')
+    self:setValue(g, envValue)
 end
 
 local function compile(ast)

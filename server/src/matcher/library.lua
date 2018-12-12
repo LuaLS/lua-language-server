@@ -71,6 +71,7 @@ local function insert(tbl, name, key, value)
     end
     if not tbl[name] then
         tbl[name] = {
+            type = name,
             name = name,
             child = {},
         }

@@ -1,5 +1,3 @@
-local findLib = require 'matcher.find_lib'
-
 local function searchUnusedLocals(results, callback)
     for _, var in ipairs(results.locals) do
         if var.key == 'self'
@@ -11,6 +9,11 @@ local function searchUnusedLocals(results, callback)
         for _, info in ipairs(var) do
             if info.type == 'get' then
                 goto NEXT_VAR
+            end
+            if info.type == 'local' then
+                if info.source.start == 0 then
+                    goto NEXT_VAR
+                end
             end
         end
         callback(var.source.start, var.source.finish, var.key)

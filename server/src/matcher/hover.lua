@@ -160,17 +160,13 @@ local function buildTableHover(lib, fullKey)
 ]]):format(title, tip, field)
 end
 
-return function (results, pos)
-    local result = findResult(results, pos)
+return function (vm, pos)
+    local result = findResult(vm.results, pos)
     if not result then
         return nil
     end
 
-    if result.type ~= 'var' then
-        return nil
-    end
-    local var = result.var
-    local lib, fullKey, oo = findLib(var)
+    local lib, fullKey, oo = findLib(result.object)
     if not lib then
         return nil
     end

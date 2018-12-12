@@ -104,7 +104,10 @@ local function checkParent(value, name, lib)
 end
 
 local function findLib(var)
-    local value = var.value or var
+    local value = var.value
+    if value.lib then
+        return value.lib, value.lib.name, false
+    end
     for libname, info in pairs(library.global) do
         local fullKey = checkSource(value, libname, info.lib)
         if fullKey then

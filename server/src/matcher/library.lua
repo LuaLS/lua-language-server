@@ -50,17 +50,17 @@ end
 
 local function mergeSource(alllibs, name, lib)
     if not lib.source then
-        alllibs.global[name] = { lib = lib, child = {} }
+        alllibs.global[name] = lib
         return
     end
     for _, source in ipairs(lib.source) do
         local sourceName = source.name or name
         if source.type == 'global' then
-            alllibs.global[sourceName] = { lib = lib, child = {} }
+            alllibs.global[sourceName] = lib
         elseif source.type == 'library' then
-            alllibs.library[sourceName] = { lib = lib, child = {} }
+            alllibs.library[sourceName] = lib
         elseif source.type == 'object' then
-            alllibs.object[sourceName] = { lib = lib, child = {} }
+            alllibs.object[sourceName] = lib
         end
     end
 end
@@ -70,10 +70,10 @@ local function insert(tbl, name, key, value)
         return
     end
     if not tbl[name] then
-        tbl[name] = {}
-    end
-    if not tbl[name].child then
-        tbl[name].child = {}
+        tbl[name] = {
+            name = name,
+            child = {},
+        }
     end
     tbl[name].child[key] = value
 end
@@ -114,6 +114,13 @@ local function loadLocale(language, relative)
     return nil
 end
 
+local function fix(libs)
+    for name, lib in pairs(libs) do
+        lib.name = name
+        lib.child = {}
+    end
+end
+
 local function init()
     local language = require 'language'
     local alllibs = {
@@ -127,6 +134,7 @@ local function init()
         if buf then
             libs = table.container()
             xpcall(lni.classics, log.error, buf, path:string(), {libs})
+            fix(libs)
         end
         local relative = fs.relative(path, ROOT)
 
@@ -137,18 +145,6 @@ local function init()
             mergeLocale(libs, locale)
         end
         mergeLibs(alllibs, libs)
-    end
-
-    function alllibs:get(type, parent, child)
-        local info = self[type] and self[type][parent]
-        if not info then
-            return nil
-        end
-        if child then
-            return info.child[child]
-        else
-            return info.lib
-        end
     end
 
     return alllibs

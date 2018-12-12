@@ -316,10 +316,32 @@ function mt:checkMetaIndex(value, meta)
 end
 
 function mt:callSetMetaTable(func, values)
+    if not values[1] then
+        values[1] = self:createValue('nil')
+    end
+    if not values[2] then
+        values[2] = self:createValue('nil')
+    end
     self:setFunctionReturn(func, 1, values[1])
 
     -- 检查 __index
     self:checkMetaIndex(values[1], values[2])
+end
+
+function mt:callRequire(func, values)
+    if not values[1] then
+        values[1] = self:createValue('nil')
+    end
+    local str = values[1].value
+    if type(str) == 'string' then
+        local lib = library.library[str]
+        if lib then
+            local value = self:getLibValue(lib)
+            self:setFunctionReturn(func, 1, value)
+            return
+        end
+    end
+    self:setFunctionReturn(func, 1, nil)
 end
 
 function mt:call(func, values)
@@ -327,6 +349,8 @@ function mt:call(func, values)
     if lib and lib.special then
         if lib.special == 'setmetatable' then
             self:callSetMetaTable(func, values)
+        elseif lib.special == 'require' then
+            self:callRequire(func, values)
         end
     end
 
@@ -363,10 +387,10 @@ function mt:createValue(type, source, v)
 end
 
 function mt:getLibValue(lib)
-    local tp = lib.type
-    if not tp then
-        return
+    if self.libraryValue[lib] then
+        return self.libraryValue[lib]
     end
+    local tp = lib.type
     local value
     if     tp == 'table' then
         value = self:buildTable()
@@ -397,6 +421,17 @@ function mt:getLibValue(lib)
     else
         value = self:createValue(tp)
     end
+    self.libraryValue[lib] = value
+    value.lib = lib
+
+    if lib.child then
+        for fName, fLib in pairs(lib.child) do
+            local fField = self:createField(value, fName)
+            local fValue = self:getLibValue(fLib)
+            self:setValue(fField, fValue)
+        end
+    end
+
     return value
 end
 
@@ -802,22 +837,10 @@ function mt:createEnvironment()
 
     local pValue = self:setValue(parent, self:buildTable())
     -- 设置全局变量
-    for name, info in pairs(library.global) do
+    for name, lib in pairs(library.global) do
         local field = self:createField(pValue, name)
-        if info.lib then
-            local value = self:getLibValue(info.lib)
-            value = self:setValue(field, value)
-            value.lib = info.lib
-        end
-        if info.child then
-            local fValue = self:getValue(field)
-            for fname, flib in pairs(info.child) do
-                local ffield = self:createField(fValue, fname)
-                local value = self:getLibValue(flib)
-                value = self:setValue(ffield, value)
-                value.lib = flib
-            end
-        end
+        local value = self:getLibValue(lib)
+        value = self:setValue(field, value)
     end
 
     -- 设置 _G 等于 _ENV
@@ -840,6 +863,7 @@ local function compile(ast)
             funcs  = {},
             calls  = {},
         },
+        libraryValue = {},
     }, mt)
 
     -- 创建初始环境

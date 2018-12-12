@@ -11,14 +11,10 @@ function TEST(fullkey)
         local new_script = script:gsub('<[!?]', '  '):gsub('[!?]>', '  ')
         local ast = parser:ast(new_script)
         assert(ast)
-        local results = matcher.compile(ast)
-        assert(results)
-        local result = matcher.findResult(results, pos)
-        assert(result)
-        assert(result.type == 'var')
-        local var = result.var
-        assert(var)
-        local _, name = matcher.findLib(var)
+        local vm = matcher.vm(ast)
+        assert(vm)
+        local result = matcher.findResult(vm.results, pos)
+        local _, name = matcher.findLib(result.object)
         assert(name == fullkey)
     end
 end

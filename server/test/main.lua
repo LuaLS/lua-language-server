@@ -27,7 +27,7 @@ local function main()
     --test 'type_inference'
     test 'definition'
     test 'diagnostics'
-    --test 'find_lib'
+    test 'find_lib'
 
     print('测试完成')
 end

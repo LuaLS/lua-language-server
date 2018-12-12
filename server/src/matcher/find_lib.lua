@@ -22,7 +22,19 @@ local function findLib(var)
             return lib, fullKey, false
         end
     else
-        return lib, lib.name, false
+        local res
+        if not lib.source then
+            return lib, lib.nick or lib.name, false
+        end
+        for _, source in ipairs(lib.source) do
+            if source.type == value.parentType then
+                res = source
+            end
+        end
+        if not res then
+            return lib, lib.nick or lib.name, false
+        end
+        return lib, res.nick or res.name or lib.nick or lib.name, false
     end
 end
 

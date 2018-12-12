@@ -386,7 +386,32 @@ function mt:createValue(type, source, v)
         source = source or DefaultSource,
         value = v,
     }
+    local lib = library.object[type]
+    if lib then
+        self:getLibChild(value, lib, 'object')
+    end
     return value
+end
+
+function mt:getLibChild(value, lib, parentType)
+    if lib.child then
+        if self.libraryChild[lib] then
+            value.child = self.libraryChild[lib]
+            return
+        end
+        self.libraryChild[lib] = {}
+        for fName, fLib in pairs(lib.child) do
+            local fField = self:createField(value, fName)
+            local fValue = self:getLibValue(fLib, parentType)
+            self:setValue(fField, fValue)
+        end
+        if value.child then
+            for k, v in pairs(value.child) do
+                self.libraryChild[lib][k] = v
+            end
+        end
+        value.child = self.libraryChild[lib]
+    end
 end
 
 function mt:getLibValue(lib, parentType, v)
@@ -433,13 +458,7 @@ function mt:getLibValue(lib, parentType, v)
     value.lib = lib
     value.parentType = parentType
 
-    if lib.child then
-        for fName, fLib in pairs(lib.child) do
-            local fField = self:createField(value, fName)
-            local fValue = self:getLibValue(fLib, parentType)
-            self:setValue(fField, fValue)
-        end
-    end
+    self:getLibChild(value, lib, parentType)
 
     return value
 end
@@ -875,6 +894,7 @@ local function compile(ast)
             calls  = {},
         },
         libraryValue = {},
+        libraryChild = {},
     }, mt)
 
     -- 创建初始环境

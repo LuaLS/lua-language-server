@@ -4,27 +4,34 @@ local matcher = require 'matcher'
 rawset(_G, 'TEST', true)
 
 function TEST(script)
-    local start  = script:find('<?', 1, true)
-    local finish = script:find('?>', 1, true)
-    local pos = (start + finish) // 2 + 1
-    local new_script = script:gsub('<[!?]', '  '):gsub('[!?]>', '  ')
-    local ast = parser:ast(new_script)
-    local vm = matcher.vm(ast)
-    assert(vm)
-    local result = matcher.hover(vm, pos)
-    assert(result)
+    return function (expect)
+        local start  = script:find('<?', 1, true)
+        local finish = script:find('?>', 1, true)
+        local pos = (start + finish) // 2 + 1
+        local new_script = script:gsub('<[!?]', '  '):gsub('[!?]>', '  ')
+        local ast = parser:ast(new_script)
+        local vm = matcher.vm(ast)
+        assert(vm)
+        local result = matcher.hover(vm, pos)
+        assert(result)
+        expect = expect:gsub('^[\r\n]*(.-)[\r\n]*$', '%1')
+        result = result:gsub('```lua', ''):gsub('```', ''):gsub('^[\r\n]*(.-)[\r\n]*$', '%1')
+        assert(expect == result)
+    end
 end
 
 TEST [[
 local function <?x?>(a, b)
 end
 ]]
+"function x(a: any, b: any)"
 
 TEST [[
 local function x(a, b)
 end
 <?x?>()
 ]]
+"function x(a: any, b: any)"
 
 TEST [[
 local mt = {}
@@ -37,6 +44,10 @@ end
 local obj = setmetatable({}, mt)
 
 obj:<?init?>(1, '测试')
+]]
+[[
+function mt:init(a: number, b: string, c: any)
+  -> table
 ]]
 
 TEST [[
@@ -52,6 +63,10 @@ local obj = setmetatable({}, mt)
 obj:init(1, '测试')
 obj.<?init?>(obj, 1, '测试')
 ]]
+[[
+function mt.init(self: table, a: number, b: string, c: any)
+  -> table
+]]
 
 TEST [[
 function obj.xxx()
@@ -59,7 +74,31 @@ end
 
 obj.<?xxx?>()
 ]]
+"function obj.xxx()"
 
 TEST [[
 obj.<?xxx?>()
 ]]
+"function obj.xxx()"
+
+TEST [[
+local <?x?> = 1
+]]
+"local: number"
+
+TEST [[
+<?x?> = 1
+]]
+"global: number"
+
+TEST [[
+local t = {}
+t.<?x?> = 1
+]]
+"local field: number"
+
+TEST [[
+t = {}
+t.<?x?> = 1
+]]
+"global field: number"

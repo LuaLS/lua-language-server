@@ -539,9 +539,14 @@ function mt:getLibValue(lib, parentType, v)
 end
 
 function mt:getName(name, source)
-    local var = self.scope.locals[name]
-             or self:getField(self:getValue(self.scope.locals._ENV), name, source)
-    return var
+    local loc = self.scope.locals[name]
+    if loc then
+        return loc
+    end
+    local ENV = self.scope.locals._ENV
+    local global = self:getField(self:getValue(ENV), name, source)
+    global.parent = ENV
+    return global
 end
 
 function mt:getIndex(obj)

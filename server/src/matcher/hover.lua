@@ -270,9 +270,41 @@ local function buildValueFunctionHover(result, source)
 ]]):format(title)
 end
 
+local function buildValueSimpleHover(result, source)
+    local type = result.value.type
+    if type == 'nil' then
+        type = 'any'
+    end
+    local resType = result.type
+    if resType == 'field' then
+        local field = result
+        local stack = 0
+        while field.parent do
+            field = field.parent
+            stack = stack + 1
+        end
+        if field.value.ENV then
+            if stack > 1 then
+                resType = 'global field'
+            else
+                resType = 'global'
+            end
+        else
+            resType = 'local field'
+        end
+    end
+    return ([[
+```lua
+%s: %s
+```
+]]):format(resType, type)
+end
+
 local function getValueHover(result, source)
     if result.value.type == 'function' then
         return buildValueFunctionHover(result, source)
+    else
+        return buildValueSimpleHover(result, source)
     end
 end
 

@@ -178,8 +178,102 @@ local function getLibHover(lib, fullKey, oo)
     return cache[lib]
 end
 
+local function buildValueName(result, source)
+    local func = result.value
+    local declarat = func.declarat or source
+    if declarat then
+        local key
+        if declarat.type == 'name' then
+            key = declarat[1]
+        elseif declarat.type == 'string' then
+            key = ('%q'):format(declarat[1])
+        elseif declarat.type == 'number' or declarat.type == 'boolean' then
+            key = tostring(declarat[1])
+        else
+            key = '?'
+        end
+        if source.object then
+            return declarat.parentName .. ':' .. key
+        else
+            if declarat.parentName then
+                if declarat.index then
+                    return declarat.parentName .. '[' .. key .. ']'
+                else
+                    return declarat.parentName .. '.' .. key
+                end
+            else
+                return key
+            end
+        end
+    end
+    return result.key or ''
+end
+
+local function buildValueArgs(result)
+    local func = result.value
+    local names = {}
+    local values = {}
+    if func.args then
+        for i, arg in ipairs(func.args) do
+            if arg.type == '...' then
+                names[i] = '...'
+            else
+                names[i] = arg.key
+            end
+        end
+    end
+    if func.argValues then
+        for i, value in ipairs(func.argValues) do
+            values[i] = value.type
+            if values[i] == 'nil' then
+                values[i] = 'any'
+            end
+        end
+    end
+    local strs = {}
+    for i = 1, math.max(#names, #values) do
+        local name = names[i] or '?'
+        local value = values[i] or 'any'
+        strs[i] = name .. ': ' .. value
+    end
+    return table.concat(strs, ', ')
+end
+
+local function buildValueReturns(result)
+    local func = result.value
+    if not func.hasReturn then
+        return ''
+    end
+    local strs = {}
+    for i, rtn in ipairs(func.returns) do
+        strs[i] = rtn.type
+        if strs[i] == 'nil' then
+            strs[i] = 'any'
+        end
+    end
+    return '\n  -> ' .. table.concat(strs, ', ')
+end
+
+local function buildValueFunctionHover(result, source)
+    local name = buildValueName(result, source)
+    local args = buildValueArgs(result)
+    local returns = buildValueReturns(result)
+    local title = ('function %s(%s)%s'):format(name, args, returns)
+    return ([[
+```lua
+%s
+```
+]]):format(title)
+end
+
+local function getValueHover(result, source)
+    if result.value.type == 'function' then
+        return buildValueFunctionHover(result, source)
+    end
+end
+
 return function (vm, pos)
-    local result = findResult(vm, pos)
+    local result, source = findResult(vm, pos)
     if not result then
         return nil
     end
@@ -188,5 +282,9 @@ return function (vm, pos)
     if lib then
         local hover = getLibHover(lib, fullKey, oo)
         return hover
+    end
+
+    if result.value then
+        return getValueHover(result, source)
     end
 end

@@ -197,6 +197,9 @@ function mt:setValue(var, value, source)
     end
     if source and source.start then
         self:addInfo(var, 'set', source)
+        if not value.declarat then
+            value.declarat = source
+        end
     end
     return value
 end
@@ -333,7 +336,9 @@ function mt:getFunctionArg(func, i)
         func.argValues = {}
     end
     if not func.argValues[i] then
-        func.argValues[i] = self:createValue('nil')
+        for n = #func.argValues+1, i do
+            func.argValues[n] = self:createValue('nil')
+        end
     end
     return func.argValues[i]
 end
@@ -410,6 +415,7 @@ function mt:getCurrentFunction()
 end
 
 function mt:setFunctionReturn(func, index, value)
+    func.hasReturn = true
     if not func.returns then
         func.returns = {
             type = 'list',
@@ -438,7 +444,9 @@ function mt:getFunctionReturns(func, i)
     end
     if i then
         if not func.returns[i] then
-            func.returns[i] = self:createValue('nil')
+            for n = #func.returns+1, i do
+                func.returns[n] = self:createValue('nil')
+            end
         end
         return func.returns[i]
     else
@@ -583,10 +591,13 @@ end
 function mt:getSimple(simple, mode)
     local value = self:getExp(simple[1])
     local field
+    local parentName
     if simple[1].type == 'name' then
         field = self:getName(simple[1][1])
+        parentName = field.key
     else
         field = self:createValue('nil', simple[1])
+        parentName = '?'
     end
     local object
     for i = 2, #simple do
@@ -607,6 +618,7 @@ function mt:getSimple(simple, mode)
                 call = obj,
                 lastobj = simple[i-1],
             }
+            parentName = parentName .. '(...)'
         elseif obj.index then
             local index = self:getIndex(obj)
             field = self:getField(value, index, obj)
@@ -616,6 +628,16 @@ function mt:getSimple(simple, mode)
                     self:addInfo(field, 'get', obj)
                 end
             end
+            obj.object = object
+
+            obj.parentName = parentName
+            if obj.type == 'string' then
+                parentName = ('%s[%q]'):format(parentName, index)
+            elseif obj.type == 'number' or obj.type == 'boolean' then
+                parentName = ('%s[%s]'):format(parentName, index)
+            else
+                parentName = ('%s[?]'):format(parentName)
+            end
         else
             if tp == 'name' then
                 field = self:getField(value, obj[1], obj)
@@ -623,6 +645,9 @@ function mt:getSimple(simple, mode)
                 if mode == 'value' or i < #simple then
                     self:addInfo(field, 'get', obj)
                 end
+                obj.object = object
+                obj.parentName = parentName
+                parentName = parentName .. '.' .. field.key
             elseif tp == ':' then
                 object = field
             end

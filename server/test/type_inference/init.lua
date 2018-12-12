@@ -127,3 +127,10 @@ local function x()
 end
 <?y?> = x()
 ]]
+
+TEST 'number' [[
+local function x(a)
+    return <?a?>
+end
+x(1)
+]]

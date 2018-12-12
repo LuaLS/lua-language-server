@@ -28,6 +28,7 @@ local function main()
     test 'diagnostics'
     test 'type_inference'
     test 'find_lib'
+    test 'hover'
 
     print('测试完成')
 end

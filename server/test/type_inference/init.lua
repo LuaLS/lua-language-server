@@ -108,3 +108,22 @@ TEST 'number' [[
 TEST 'table' [[
 <?table?>()
 ]]
+
+TEST 'string' [[
+<?x?> = _VERSION
+]]
+
+TEST 'function' [[
+<?x?> = _VERSION.sub
+]]
+
+TEST 'table' [[
+<?x?> = setmetatable({})
+]]
+
+TEST 'number' [[
+local function x()
+    return 1
+end
+<?y?> = x()
+]]

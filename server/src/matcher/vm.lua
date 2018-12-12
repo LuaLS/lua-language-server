@@ -222,6 +222,7 @@ function mt:createField(pValue, name, source)
         pValue.child = {}
     end
     pValue.child[name] = field
+    self:inference(pValue, 'table')
 
     return field
 end
@@ -267,9 +268,9 @@ function mt:buildFunction(exp, object)
         end
     end)
 
+    self.chunk.func = func
     self:doActions(exp)
 
-    self.chunk.func = func
     self.results.funcs[#self.results.funcs+1] = func
 
     self.chunk:pop()
@@ -316,7 +317,7 @@ function mt:updateFunctionArgs(func)
     end
 end
 
-function mt:setFunctionArgs(func, values)
+function mt:setFunctionArg(func, values)
     if not func.argValues then
         func.argValues = {}
     end
@@ -325,6 +326,16 @@ function mt:setFunctionArgs(func, values)
     end
 
     self:updateFunctionArgs(func)
+end
+
+function mt:getFunctionArg(func, i)
+    if not func.argValues then
+        func.argValues = {}
+    end
+    if not func.argValues[i] then
+        func.argValues[i] = self:createValue('nil')
+    end
+    return func.argValues[i]
 end
 
 function mt:checkMetaIndex(value, meta)
@@ -369,15 +380,27 @@ end
 function mt:call(func, values)
     self:inference(func, 'function')
     local lib = func.lib
-    if lib and lib.special then
-        if lib.special == 'setmetatable' then
-            self:callSetMetaTable(func, values)
-        elseif lib.special == 'require' then
-            self:callRequire(func, values)
+    if lib then
+        if lib.args then
+            for i, arg in ipairs(lib.args) do
+                self:inference(self:getFunctionArg(func, i), arg.type)
+            end
+        end
+        if lib.returns then
+            for i, rtn in ipairs(lib.returns) do
+                self:inference(self:getFunctionReturns(func, i), rtn.type)
+            end
+        end
+        if lib.special then
+            if lib.special == 'setmetatable' then
+                self:callSetMetaTable(func, values)
+            elseif lib.special == 'require' then
+                self:callRequire(func, values)
+            end
         end
     end
 
-    self:setFunctionArgs(func, values)
+    self:setFunctionArg(func, values)
 
     return self:getFunctionReturns(func)
 end
@@ -393,17 +416,34 @@ function mt:setFunctionReturn(func, index, value)
             [1] = self:createValue('nil'),
         }
     end
-    func.returns[index] = value or self:createValue('nil')
+    if value then
+        if value.type == 'list' then
+            for i, v in ipairs(value) do
+                func.returns[index+i-1] = v
+            end
+        else
+            func.returns[index] = value
+        end
+    else
+        func.returns[index] = self:createValue('nil')
+    end
 end
 
-function mt:getFunctionReturns(func)
+function mt:getFunctionReturns(func, i)
     if not func.returns then
         func.returns = {
             type = 'list',
             [1] = self:createValue('nil'),
         }
     end
-    return func.returns
+    if i then
+        if not func.returns[i] then
+            func.returns[i] = self:createValue('nil')
+        end
+        return func.returns[i]
+    else
+        return func.returns
+    end
 end
 
 function mt:inference(value, type)
@@ -466,7 +506,7 @@ function mt:getLibValue(lib, parentType, v)
             for i, arg in ipairs(lib.args) do
                 values[i] = self:getLibValue(arg, parentType) or self:createValue('nil')
             end
-            self:setFunctionArgs(value, values)
+            self:setFunctionArg(value, values)
         end
     elseif tp == 'string' then
         value = self:createValue('string', nil, v or lib.value)

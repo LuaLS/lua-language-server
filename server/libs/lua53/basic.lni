@@ -240,6 +240,14 @@ type = 'nil'
 
 [setmetatable]
 special = 'setmetatable'
+[[.args]]
+name = 'table'
+type = 'table'
+[[.args]]
+name = 'metatable'
+type = 'table'
+[[.returns]]
+type = 'table'
 
 [tonumber]
 

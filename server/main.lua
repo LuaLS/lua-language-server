@@ -11,7 +11,7 @@ log.init(ROOT, ROOT / 'log' / 'test.log')
 log.info('Lua Lsp startup, root: ', ROOT)
 
 local dbg = require 'debugger'
-dbg:io 'listen:0.0.0.0:546858'
+dbg:io 'listen:127.0.0.1:11411'
 dbg:start()
 
 require 'utility'

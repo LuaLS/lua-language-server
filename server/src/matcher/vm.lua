@@ -800,6 +800,10 @@ function mt:createEnvironment()
             end
         end
     end
+
+    -- 设置 _G 等于 _ENV
+    local g = self:getField(pValue, '_G')
+    self:setValue(g, pValue)
 end
 
 local function compile(ast)

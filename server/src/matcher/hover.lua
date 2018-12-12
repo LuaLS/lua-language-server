@@ -314,13 +314,15 @@ return function (vm, pos)
         return nil
     end
 
+    if not result.value then
+        return
+    end
+
     local lib, fullKey, oo = findLib(result)
     if lib then
         local hover = getLibHover(lib, fullKey, oo)
         return hover
     end
 
-    if result.value then
-        return getValueHover(result, source)
-    end
+    return getValueHover(result, source)
 end

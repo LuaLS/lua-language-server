@@ -12,6 +12,20 @@ function mt:createLocal(key, source, value)
         key = key,
         source = source or DefaultSource,
     }
+
+    local shadow = self.scope.locals[key]
+    if shadow then
+        local group
+        if shadow.shadow then
+            group = shadow.shadow
+        else
+            group = { shadow }
+            shadow.shadow = group
+        end
+        group[#group+1] = loc
+        loc.shadow = group
+    end
+
     self.scope.locals[key] = loc
     self.results.locals[#self.results.locals+1] = loc
 
@@ -458,6 +472,10 @@ function mt:getSimple(simple, mode)
             if i < #simple then
                 value = value[1] or self:createValue('nil')
             end
+            self.results.calls[#self.results.calls+1] = {
+                call = obj,
+                lastobj = simple[i-1],
+            }
         elseif obj.index then
             local index = self:getIndex(obj)
             field = self:getField(value, index, obj)
@@ -819,6 +837,7 @@ local function compile(ast)
             fields = {},
             labels = {},
             funcs  = {},
+            calls  = {},
         },
     }, mt)
 

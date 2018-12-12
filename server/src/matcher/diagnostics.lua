@@ -1,10 +1,7 @@
 local findLib = require 'matcher.find_lib'
 
 local function searchUnusedLocals(results, callback)
-    for _, var in ipairs(results.vars) do
-        if var.type ~= 'local' then
-            goto NEXT_VAR
-        end
+    for _, var in ipairs(results.locals) do
         if var.key == 'self'
         or var.key == '_'
         or var.key == '_ENV'
@@ -22,33 +19,27 @@ local function searchUnusedLocals(results, callback)
 end
 
 local function searchUndefinedGlobal(results, callback)
-    for _, var in ipairs(results.vars) do
-        if var.type ~= 'field' then
+    local env = results.locals[1]
+    for index, field in pairs(env.value.child) do
+        if field.value.lib then
             goto NEXT_VAR
         end
-        if  var.parent.key ~= '_ENV'
-        and var.parent.key ~= '_G'
-        then
-            goto NEXT_VAR
+        if type(index) == 'string' then
+            if index:lower() == 'log' then
+                goto NEXT_VAR
+            end
+            if not index:find '%l' then
+                goto NEXT_VAR
+            end
         end
-        if var.key:lower() == 'log' then
-            goto NEXT_VAR
-        end
-        if not var.key:find '%l' then
-            goto NEXT_VAR
-        end
-        local lib = findLib(var)
-        if lib then
-            goto NEXT_VAR
-        end
-        for _, info in ipairs(var) do
+        for _, info in ipairs(field) do
             if info.type == 'set' then
                 goto NEXT_VAR
             end
         end
-        for _, info in ipairs(var) do
+        for _, info in ipairs(field) do
             if info.type == 'get' then
-                callback(info.source.start, info.source.finish, var.key)
+                callback(info.source.start, info.source.finish, tostring(index))
             end
         end
         ::NEXT_VAR::
@@ -92,10 +83,7 @@ local function serachSpaces(lines, callback)
 end
 
 local function searchRedefinition(results, uri, callback)
-    for _, var in ipairs(results.vars) do
-        if var.type ~= 'local' then
-            goto NEXT_VAR
-        end
+    for _, var in ipairs(results.locals) do
         if var.key == '_'
         or var.key == '_ENV'
         then

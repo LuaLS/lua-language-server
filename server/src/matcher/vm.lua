@@ -585,6 +585,11 @@ function mt:unpackList(list)
             res[1] = value
         end
     end
+    for _, v in ipairs(res) do
+        if v.type == 'list' then
+            error('Unpack list')
+        end
+    end
     return res
 end
 
@@ -600,6 +605,7 @@ function mt:getSimple(simple, mode)
         parentName = '?'
     end
     local object
+    local lastField = field
     for i = 2, #simple do
         local obj = simple[i]
         local tp  = obj.type
@@ -616,7 +622,8 @@ function mt:getSimple(simple, mode)
             end
             self.results.calls[#self.results.calls+1] = {
                 call = obj,
-                lastobj = simple[i-1],
+                lastObj = simple[i-1],
+                nextObj = simple[i+1],
             }
             parentName = parentName .. '(...)'
         elseif obj.index then
@@ -628,8 +635,9 @@ function mt:getSimple(simple, mode)
                     self:addInfo(field, 'get', obj)
                 end
             end
+            field.parent = lastField
+            lastField = field
             obj.object = object
-
             obj.parentName = parentName
             if obj.type == 'string' then
                 parentName = ('%s[%q]'):format(parentName, index)
@@ -645,6 +653,8 @@ function mt:getSimple(simple, mode)
                 if mode == 'value' or i < #simple then
                     self:addInfo(field, 'get', obj)
                 end
+                field.parent = lastField
+                lastField = field
                 obj.object = object
                 obj.parentName = parentName
                 parentName = parentName .. '.' .. field.key

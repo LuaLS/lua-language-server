@@ -115,11 +115,14 @@ end
 
 local function searchNewLineCall(results, lines, callback)
     for _, call in ipairs(results.calls) do
-        if not call.lastobj.start then
+        if not call.nextObj then
+            goto NEXT_CALL
+        end
+        if not call.lastObj.start then
             goto NEXT_CALL
         end
         local callline = lines:rowcol(call.call.start)
-        local lastline = lines:rowcol(call.lastobj.start)
+        local lastline = lines:rowcol(call.lastObj.finish)
         if callline > lastline then
             callback(call.call.start, call.call.finish)
         end

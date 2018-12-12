@@ -114,3 +114,8 @@ TEST [[
 print(_G)
 <!('string')!>:sub(1, 1)
 ]]
+
+TEST [[
+print(_G)
+('string')
+]]

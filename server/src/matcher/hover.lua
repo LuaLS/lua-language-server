@@ -160,17 +160,7 @@ local function buildTableHover(lib, fullKey)
 ]]):format(title, tip, field)
 end
 
-return function (vm, pos)
-    local result = findResult(vm.results, pos)
-    if not result then
-        return nil
-    end
-
-    local lib, fullKey, oo = findLib(result.object)
-    if not lib then
-        return nil
-    end
-
+local function getLibHover(lib, fullKey, oo)
     local cache = oo and OoCache or Cache
 
     if not cache[lib] then
@@ -186,4 +176,17 @@ return function (vm, pos)
     end
 
     return cache[lib]
+end
+
+return function (vm, pos)
+    local result = findResult(vm, pos)
+    if not result then
+        return nil
+    end
+
+    local lib, fullKey, oo = findLib(result)
+    if lib then
+        local hover = getLibHover(lib, fullKey, oo)
+        return hover
+    end
 end

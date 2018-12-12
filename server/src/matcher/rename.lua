@@ -1,16 +1,15 @@
 local findResult = require 'matcher.find_result'
 local parser = require 'parser'
 
-local function parseResult(result, newName)
+local function parseResult(result, source, newName)
     local positions = {}
     local tp = result.type
     if tp == 'local' or tp == 'field' then
-        local var = result.object
-        local key = result.info.source[1]
-        if var.disableRename then
+        local key = source[1]
+        if result.disableRename then
             return positions
         end
-        if result.info.source.index then
+        if source.index then
             if not parser.grammar(newName, 'Exp') then
                 return positions
             end
@@ -20,7 +19,7 @@ local function parseResult(result, newName)
             end
         end
         local mark = {}
-        for _, info in ipairs(var) do
+        for _, info in ipairs(result) do
             if not mark[info.source] then
                 mark[info.source] = info
                 if info.source[1] == key then
@@ -43,10 +42,10 @@ local function parseResult(result, newName)
 end
 
 return function (vm, pos, newName)
-    local result = findResult(vm.results, pos)
+    local result, source = findResult(vm, pos)
     if not result then
         return nil
     end
-    local positions = parseResult(result, newName)
+    local positions = parseResult(result, source, newName)
     return positions
 end

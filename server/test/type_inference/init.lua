@@ -12,8 +12,9 @@ function TEST(res)
         local ast = parser:ast(new_script)
         local vm = matcher.vm(ast)
         assert(vm)
-        local result = matcher.findResult(vm.results, pos)
+        local result = matcher.findResult(vm, pos)
         assert(result)
+        assert(res == result.value.type)
     end
 end
 

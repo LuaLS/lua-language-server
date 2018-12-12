@@ -42,6 +42,22 @@ function mt:addInfo(obj, type, source)
         type = type,
         source = source or DefaultSource,
     }
+    if source then
+        local other = self.results.sources[source]
+        if other then
+            if other.type == 'multi-source' then
+                other[#other+1] = obj
+            else
+                other = {
+                    type = 'multi-source',
+                    [1] = other,
+                    [2] = obj,
+                }
+            end
+        else
+            self.results.sources[source] = obj
+        end
+    end
     return obj
 end
 
@@ -349,6 +365,7 @@ function mt:callRequire(func, values)
 end
 
 function mt:call(func, values)
+    self:inference(func, 'function')
     local lib = func.lib
     if lib and lib.special then
         if lib.special == 'setmetatable' then
@@ -385,6 +402,12 @@ function mt:getFunctionReturns(func)
         }
     end
     return func.returns
+end
+
+function mt:inference(value, type)
+    if value.type == 'nil' then
+        value.type = type
+    end
 end
 
 function mt:createValue(type, source, v)
@@ -895,6 +918,7 @@ local function compile(ast)
             labels = {},
             funcs  = {},
             calls  = {},
+            sources= {},
         },
         libraryValue = {},
         libraryChild = {},

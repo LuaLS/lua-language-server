@@ -13,8 +13,8 @@ function TEST(fullkey)
         assert(ast)
         local vm = matcher.vm(ast)
         assert(vm)
-        local result = matcher.findResult(vm.results, pos)
-        local _, name = matcher.findLib(result.object)
+        local result = matcher.findResult(vm, pos)
+        local _, name = matcher.findLib(result)
         assert(name == fullkey)
     end
 end

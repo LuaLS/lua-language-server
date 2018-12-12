@@ -362,6 +362,7 @@ function mt:callSetMetaTable(func, values)
     end
     self:setFunctionReturn(func, 1, values[1])
 
+    values[1].metatable = values[2]
     -- 检查 __index
     self:checkMetaIndex(values[1], values[2])
 end

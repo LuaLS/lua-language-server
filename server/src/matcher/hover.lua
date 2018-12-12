@@ -270,11 +270,60 @@ local function buildValueFunctionHover(result, source)
 ]]):format(title)
 end
 
-local function buildValueSimpleHover(result, source)
-    local type = result.value.type
-    if type == 'nil' then
-        type = 'any'
+local function findClass(result)
+    -- 根据部分字段尝试找出自定义类型
+    local metatable = result.value.metatable
+    if not metatable or not metatable.child then
+        return nil
     end
+    -- 查找meta表的 __name 字段
+    local name = metatable.child['__name']
+    -- 值必须是字符串
+    if name and name.value and type(name.value.value) == 'string' then
+        return '*' .. name.value.value
+    end
+    -- 查找meta表 __index 里的字段
+    local index = metatable.child['__index']
+    if index and index.value and index.value.child then
+        for key, field in pairs(index.value.child) do
+            -- 键值类型必须均为字符串
+            if type(key) ~= 'string' then
+                goto CONTINUE
+            end
+            if not field.value or type(field.value.value) ~= 'string' then
+                goto CONTINUE
+            end
+            local lKey = key:lower()
+            if lKey == 'type' or lKey == 'name' or lKey == 'class' then
+                -- 必须只有过一次赋值
+                local hasSet = false
+                for _, info in ipairs(field) do
+                    if info.type == 'set' then
+                        if hasSet then
+                            goto CONTINUE
+                        end
+                        hasSet = true
+                    end
+                end
+                return '*' .. field.value.value
+            end
+            ::CONTINUE::
+        end
+    end
+    return nil
+end
+
+local function buildValueSimpleHover(result, source)
+    local valueType = result.value.type
+    if valueType == 'nil' then
+        valueType = 'any'
+    end
+
+    local class = findClass(result)
+    if class then
+        valueType = class
+    end
+
     local resType = result.type
     if resType == 'field' then
         local field = result
@@ -297,7 +346,7 @@ local function buildValueSimpleHover(result, source)
 ```lua
 %s: %s
 ```
-]]):format(resType, type)
+]]):format(resType, valueType)
 end
 
 local function getValueHover(result, source)

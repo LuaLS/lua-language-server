@@ -102,3 +102,38 @@ t = {}
 t.<?x?> = 1
 ]]
 "global field: number"
+
+TEST [[
+local mt = {}
+mt.__name = 'class'
+
+local <?obj?> = setmetatable({}, mt)
+]]
+"local: *class"
+
+TEST [[
+local mt = {}
+mt.name = 'class'
+mt.__index = mt
+
+local <?obj?> = setmetatable({}, mt)
+]]
+"local: *class"
+
+TEST [[
+local mt = {}
+mt.TYPE = 'class'
+mt.__index = mt
+
+local <?obj?> = setmetatable({}, mt)
+]]
+"local: *class"
+
+TEST [[
+local mt = {}
+mt.Class = 'class'
+mt.__index = mt
+
+local <?obj?> = setmetatable({}, mt)
+]]
+"local: *class"

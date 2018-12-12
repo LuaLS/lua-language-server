@@ -273,33 +273,40 @@ function mt:forList(list, callback)
     end
 end
 
-function mt:setFunctionArgs(func, values)
+function mt:updateFunctionArgs(func)
+    if not func.argValues then
+        return
+    end
     if not func.args then
         return
     end
 
+    local values = func.argValues
     for i, var in ipairs(func.args) do
         if var.type == 'dots' then
             local list = {
                 type = 'list',
             }
-            if values then
-                for n = i, #values do
-                    list[n-i+1] = values[n]
-                end
-                self:setValue(var, list)
-            else
-                self:setValue(var, nil)
+            for n = i, #values do
+                list[n-i+1] = values[n]
             end
+            self:setValue(var, list)
             break
         else
-            if values then
-                self:setValue(var, values[i])
-            else
-                self:setValue(var, nil)
-            end
+            self:setValue(var, values[i])
         end
     end
+end
+
+function mt:setFunctionArgs(func, values)
+    if not func.argValues then
+        func.argValues = {}
+    end
+    for i = 1, #values do
+        func.argValues[i] = values[i]
+    end
+
+    self:updateFunctionArgs(func)
 end
 
 function mt:checkMetaIndex(value, meta)
@@ -430,15 +437,10 @@ function mt:getLibValue(lib, parentType, v)
             end
         end
         if lib.args then
-            value.args = {}
             local values = {}
-            self.scope:push()
             for i, arg in ipairs(lib.args) do
-                value.args[#value.args+1] = self:createLocal(arg.name)
-
                 values[i] = self:getLibValue(arg, parentType) or self:createValue('nil')
             end
-            self.scope:pop()
             self:setFunctionArgs(value, values)
         end
     elseif tp == 'string' then

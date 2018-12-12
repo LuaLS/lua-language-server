@@ -202,7 +202,7 @@ function mt:compileText(uri)
 
     obj.vm = matcher.vm(ast)
     obj.lines = parser:lines(obj.text, 'utf8')
-    if obj.vm then
+    if not obj.vm then
         return obj
     end
 

@@ -99,3 +99,7 @@ ROOT = filesystem.<?current_path?>()
 TEST(nil)[[
 print(<?insert?>)
 ]]
+
+TEST '_G' [[
+local x = <?_G?>
+]]

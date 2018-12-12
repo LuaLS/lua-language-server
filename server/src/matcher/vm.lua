@@ -873,9 +873,10 @@ function mt:createEnvironment()
         value = self:setValue(field, value)
     end
 
-    -- 设置 _G 等于 _ENV
+    -- 设置 _G 使用 _ENV 的child
     local g = self:getField(envValue, '_G')
-    self:setValue(g, envValue)
+    local gValue = self:getValue(g)
+    gValue.child = envValue.child
 end
 
 local function compile(ast)

@@ -233,6 +233,7 @@ function mt:buildFunction(exp, object)
 
     if object then
         local var = self:createLocal('self', object.source, self:getValue(object))
+        var.disableRename = true
         func.args[1] = var
     end
 

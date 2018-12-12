@@ -5,7 +5,6 @@ local api = {
     rename         = require 'matcher.rename',
     hover          = require 'matcher.hover',
     diagnostics    = require 'matcher.diagnostics',
-    compile        = require 'matcher.compile',
     findResult     = require 'matcher.find_result',
     findLib        = require 'matcher.find_lib',
     vm             = require 'matcher.vm',

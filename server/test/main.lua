@@ -24,9 +24,9 @@ local function main()
     end
 
     test 'vm'
-    --test 'type_inference'
     test 'definition'
     test 'diagnostics'
+    test 'type_inference'
     test 'find_lib'
 
     print('测试完成')

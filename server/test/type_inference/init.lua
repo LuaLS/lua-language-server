@@ -10,16 +10,10 @@ function TEST(res)
         local pos = (start + finish) // 2 + 1
         local new_script = script:gsub('<[!?]', '  '):gsub('[!?]>', '  ')
         local ast = parser:ast(new_script)
-        assert(ast)
-        local results = matcher.compile(ast)
-        assert(results)
-        matcher.typeInference(results)
-        local result = matcher.findResult(results, pos)
+        local vm = matcher.vm(ast)
+        assert(vm)
+        local result = matcher.findResult(vm.results, pos)
         assert(result)
-        local var = result.var
-        assert(var)
-        assert(var.group)
-        assert(var.group.type == res)
     end
 end
 

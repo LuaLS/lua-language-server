@@ -209,7 +209,7 @@ local function buildValueName(result, source)
     return result.key or ''
 end
 
-local function buildValueArgs(result)
+local function buildValueArgs(result, source)
     local func = result.value
     local names = {}
     local values = {}
@@ -231,10 +231,14 @@ local function buildValueArgs(result)
         end
     end
     local strs = {}
-    for i = 1, math.max(#names, #values) do
+    local start = 1
+    if source.object then
+        start = 2
+    end
+    for i = start, math.max(#names, #values) do
         local name = names[i] or '?'
         local value = values[i] or 'any'
-        strs[i] = name .. ': ' .. value
+        strs[#strs+1] = name .. ': ' .. value
     end
     return table.concat(strs, ', ')
 end
@@ -256,7 +260,7 @@ end
 
 local function buildValueFunctionHover(result, source)
     local name = buildValueName(result, source)
-    local args = buildValueArgs(result)
+    local args = buildValueArgs(result, source)
     local returns = buildValueReturns(result)
     local title = ('function %s(%s)%s'):format(name, args, returns)
     return ([[

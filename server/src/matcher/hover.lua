@@ -171,7 +171,7 @@ local function getLibHover(lib, fullKey, oo)
         elseif lib.type == 'string' then
             cache[lib] = lib.description or ''
         else
-            cache[lib] = ''
+            cache[lib] = '*' .. lib.type
         end
     end
 

@@ -137,3 +137,9 @@ mt.__index = mt
 local <?obj?> = setmetatable({}, mt)
 ]]
 "local: *class"
+
+TEST[[
+local fs = require 'bee.filesystem'
+local <?root?> = fs.current_path()
+]]
+"*bee::filesystem"

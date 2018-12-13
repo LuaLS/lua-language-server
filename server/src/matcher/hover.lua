@@ -176,9 +176,6 @@ local function buildValueArgs(result, source)
     if func.argValues then
         for i, value in ipairs(func.argValues) do
             values[i] = value.type
-            if values[i] == 'nil' then
-                values[i] = 'any'
-            end
         end
     end
     local strs = {}
@@ -202,9 +199,6 @@ local function buildValueReturns(result)
     local strs = {}
     for i, rtn in ipairs(func.returns) do
         strs[i] = rtn.type
-        if strs[i] == 'nil' then
-            strs[i] = 'any'
-        end
     end
     return '\n  -> ' .. table.concat(strs, ', ')
 end
@@ -279,10 +273,6 @@ local function findClass(result)
 end
 
 local function getValueHover(name, valueType, result, source, lib)
-    if valueType == 'nil' then
-        valueType = 'any'
-    end
-
     if not lib then
         local class = findClass(result)
         if class then

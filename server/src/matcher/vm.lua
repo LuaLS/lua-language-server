@@ -184,9 +184,9 @@ function mt:setValue(var, value, source)
     if value and value.type == 'list' then
         error('Cant set value list')
     end
-    value = value or self:createValue('nil', source)
+    value = value or self:createValue('any', source)
     if var.value then
-        if value.type == 'nil' then
+        if value.type == 'any' then
             self:mergeChild(var.value, value)
         else
             self:mergeValue(var.value, value)
@@ -206,7 +206,7 @@ end
 
 function mt:getValue(var)
     if not var.value then
-        var.value = self:createValue('nil')
+        var.value = self:createValue('any')
     end
     return var.value
 end
@@ -337,7 +337,7 @@ function mt:getFunctionArg(func, i)
     end
     if not func.argValues[i] then
         for n = #func.argValues+1, i do
-            func.argValues[n] = self:createValue('nil')
+            func.argValues[n] = self:createValue('any')
         end
     end
     return func.argValues[i]
@@ -355,10 +355,10 @@ end
 
 function mt:callSetMetaTable(func, values)
     if not values[1] then
-        values[1] = self:createValue('nil')
+        values[1] = self:createValue('any')
     end
     if not values[2] then
-        values[2] = self:createValue('nil')
+        values[2] = self:createValue('any')
     end
     self:setFunctionReturn(func, 1, values[1])
 
@@ -369,7 +369,7 @@ end
 
 function mt:callRequire(func, values)
     if not values[1] then
-        values[1] = self:createValue('nil')
+        values[1] = self:createValue('any')
     end
     local str = values[1].value
     if type(str) == 'string' then
@@ -420,7 +420,7 @@ function mt:setFunctionReturn(func, index, value)
     if not func.returns then
         func.returns = {
             type = 'list',
-            [1] = self:createValue('nil'),
+            [1] = self:createValue('any'),
         }
     end
     if value then
@@ -432,7 +432,7 @@ function mt:setFunctionReturn(func, index, value)
             func.returns[index] = value
         end
     else
-        func.returns[index] = self:createValue('nil')
+        func.returns[index] = self:createValue('any')
     end
 end
 
@@ -440,13 +440,13 @@ function mt:getFunctionReturns(func, i)
     if not func.returns then
         func.returns = {
             type = 'list',
-            [1] = self:createValue('nil'),
+            [1] = self:createValue('any'),
         }
     end
     if i then
         if not func.returns[i] then
             for n = #func.returns+1, i do
-                func.returns[n] = self:createValue('nil')
+                func.returns[n] = self:createValue('any')
             end
         end
         return func.returns[i]
@@ -456,7 +456,7 @@ function mt:getFunctionReturns(func, i)
 end
 
 function mt:inference(value, type)
-    if value.type == 'nil' then
+    if value.type == 'any' then
         value.type = type
     end
 end
@@ -513,7 +513,7 @@ function mt:getLibValue(lib, parentType, v)
         if lib.args then
             local values = {}
             for i, arg in ipairs(lib.args) do
-                values[i] = self:getLibValue(arg, parentType) or self:createValue('nil')
+                values[i] = self:getLibValue(arg, parentType) or self:createValue('any')
             end
             self:setFunctionArg(value, values)
         end
@@ -607,7 +607,7 @@ function mt:getSimple(simple, mode)
         field = self:getName(simple[1][1])
         parentName = field.key
     else
-        field = self:createValue('nil', simple[1])
+        field = self:createValue('any', simple[1])
         parentName = '?'
     end
     local object
@@ -624,7 +624,7 @@ function mt:getSimple(simple, mode)
             -- 函数的返回值一定是list
             value = self:call(value, args)
             if i < #simple then
-                value = value[1] or self:createValue('nil')
+                value = value[1] or self:createValue('any')
             end
             self.results.calls[#self.results.calls+1] = {
                 call = obj,

@@ -28,7 +28,8 @@ local function searchUndefinedGlobal(results, callback)
             goto NEXT_VAR
         end
         if type(index) == 'string' then
-            if index:lower() == 'log' then
+            local lIndex = index:lower()
+            if lIndex == 'log' or lIndex == 'arg' then
                 goto NEXT_VAR
             end
             if not index:find '%l' then

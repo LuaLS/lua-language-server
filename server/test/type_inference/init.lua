@@ -89,8 +89,20 @@ TEST 'integer' [[
 <?x?> = ~ y
 ]]
 
-TEST 'boolean' [[
+TEST 'number' [[
+local a = true
+local b = 1
 <?x?> = a and b
+]]
+
+TEST 'number' [[
+local a = false
+local b = 1
+<?x?> = a or b
+]]
+
+TEST 'boolean' [[
+<?x?> = a == b
 ]]
 
 TEST 'integer' [[

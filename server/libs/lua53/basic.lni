@@ -257,5 +257,6 @@ type = 'table'
 
 [_VERSION]
 type = 'string'
+value = 'Lua5.3'
 
 [xpcall]

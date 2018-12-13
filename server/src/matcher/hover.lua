@@ -1,10 +1,20 @@
 local findResult = require 'matcher.find_result'
 local findLib    = require 'matcher.find_lib'
 
-local Cache = {}
-local OoCache = {}
+local OriginTypes = {
+    ['any']      = true,
+    ['nil']      = true,
+    ['integer']  = true,
+    ['number']   = true,
+    ['boolean']  = true,
+    ['string']   = true,
+    ['thread']   = true,
+    ['userdata'] = true,
+    ['table']    = true,
+    ['function'] = true,
+}
 
-local function buildArgs(lib, oo)
+local function buildLibArgs(lib, oo)
     if not lib.args then
         return ''
     end
@@ -46,7 +56,7 @@ local function buildArgs(lib, oo)
     return table.concat(strs)
 end
 
-local function buildReturns(lib)
+local function buildLibReturns(lib)
     if not lib.returns then
         return ''
     end
@@ -119,21 +129,6 @@ local function buildEnum(lib)
     return table.concat(strs)
 end
 
-local function buildFunctionHover(lib, fullKey, oo)
-    local title = ('function %s(%s)%s'):format(fullKey, buildArgs(lib, oo), buildReturns(lib))
-    local enum = buildEnum(lib)
-    local tip = lib.description or ''
-    return ([[
-```lua
-%s
-```
-%s
-```lua
-%s
-```
-]]):format(title, tip, enum)
-end
-
 local function buildField(lib)
     if not lib.fields then
         return ''
@@ -158,24 +153,6 @@ local function buildTableHover(lib, fullKey)
 %s
 ```
 ]]):format(title, tip, field)
-end
-
-local function getLibHover(lib, fullKey, oo)
-    local cache = oo and OoCache or Cache
-
-    if not cache[lib] then
-        if lib.type == 'function' then
-            cache[lib] = buildFunctionHover(lib, fullKey, oo) or ''
-        elseif lib.type == 'table' then
-            cache[lib] = buildTableHover(lib, fullKey) or ''
-        elseif lib.type == 'string' then
-            cache[lib] = lib.description or ''
-        else
-            cache[lib] = '*' .. lib.type
-        end
-    end
-
-    return cache[lib]
 end
 
 local function buildValueName(result, source)
@@ -258,16 +235,30 @@ local function buildValueReturns(result)
     return '\n  -> ' .. table.concat(strs, ', ')
 end
 
-local function buildValueFunctionHover(result, source)
-    local name = buildValueName(result, source)
-    local args = buildValueArgs(result, source)
-    local returns = buildValueReturns(result)
+local function getFunctionHover(name, result, source, lib, oo)
+    local args = ''
+    local returns
+    local enum = ''
+    local tip = ''
+    if lib then
+        args = buildLibArgs(lib, oo)
+        returns = buildLibReturns(lib)
+        enum = buildEnum(lib)
+        tip = lib.description or ''
+    else
+        args = buildValueArgs(result, source)
+        returns = buildValueReturns(result)
+    end
     local title = ('function %s(%s)%s'):format(name, args, returns)
     return ([[
 ```lua
 %s
 ```
-]]):format(title)
+%s
+```lua
+%s
+```
+]]):format(title, tip, enum)
 end
 
 local function findClass(result)
@@ -280,7 +271,7 @@ local function findClass(result)
     local name = metatable.child['__name']
     -- 值必须是字符串
     if name and name.value and type(name.value.value) == 'string' then
-        return '*' .. name.value.value
+        return name.value.value
     end
     -- 查找meta表 __index 里的字段
     local index = metatable.child['__index']
@@ -305,7 +296,7 @@ local function findClass(result)
                         hasSet = true
                     end
                 end
-                return '*' .. field.value.value
+                return field.value.value
             end
             ::CONTINUE::
         end
@@ -313,29 +304,40 @@ local function findClass(result)
     return nil
 end
 
-local function buildValueSimpleHover(result, source)
-    local valueType = result.value.type
+local function getValueHover(name, valueType, result, source, lib)
     if valueType == 'nil' then
         valueType = 'any'
     end
 
-    local class = findClass(result)
-    if class then
-        valueType = class
+    if not lib then
+        local class = findClass(result)
+        if class then
+            valueType = class
+        end
+    end
+
+    if not OriginTypes[valueType] then
+        valueType = '*' .. valueType
+    end
+
+    local value
+    if lib then
+        value = lib.value
+    else
+        value = result.value.value
+    end
+
+    local text
+    if value == nil then
+        text = ('%s %s'):format(valueType, name)
+    else
+        text = ('%s %s = %s'):format(valueType, name, value)
     end
     return ([[
 ```lua
 %s
 ```
-]]):format(valueType)
-end
-
-local function getValueHover(result, source)
-    if result.value.type == 'function' then
-        return buildValueFunctionHover(result, source)
-    else
-        return buildValueSimpleHover(result, source)
-    end
+]]):format(text)
 end
 
 return function (vm, pos)
@@ -349,10 +351,11 @@ return function (vm, pos)
     end
 
     local lib, fullKey, oo = findLib(result)
-    if lib then
-        local hover = getLibHover(lib, fullKey, oo)
-        return hover
+    local valueType = lib and lib.type or result.value.type
+    local name = fullKey or buildValueName(result, source)
+    if valueType == 'function' then
+        return getFunctionHover(name, result, source, lib, oo)
+    else
+        return getValueHover(name, valueType, result, source, lib)
     end
-
-    return getValueHover(result, source)
 end

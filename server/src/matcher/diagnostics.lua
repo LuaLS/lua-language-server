@@ -36,6 +36,9 @@ local function searchUndefinedGlobal(results, callback)
                 goto NEXT_VAR
             end
         end
+        if #field >= 3 then
+            goto NEXT_VAR
+        end
         for _, info in ipairs(field) do
             if info.type == 'set' then
                 goto NEXT_VAR

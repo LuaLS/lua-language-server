@@ -23,6 +23,7 @@ end
 
 local function copyFiles(out)
     return function (dirs)
+        local count = 0
         local function copy(relative, mode)
             local source = EXTENSION / relative
             local target = out / relative
@@ -40,10 +41,12 @@ local function copyFiles(out)
                 end
             else
                 fs.copy_file(source, target)
+                count = count + 1
             end
         end
 
         copy(fs.path '', dirs)
+        return count
     end
 end
 
@@ -58,7 +61,12 @@ local function runTest(root)
         stderr = true,
     }
     while true do
-        print(lua.stdout:read 'l')
+        local out = lua.stdout:read 'l'
+        if out then
+            print(out)
+        else
+            break
+        end
     end
     lua:wait()
     local err = lua.stderr:read 'a'
@@ -69,24 +77,22 @@ end
 
 local function removeFiles(out)
     return function (dirs)
-        if not fs.exists(out) then
-            return
-        end
-
         local function remove(relative, mode)
             local target = out / relative
-            assert(fs.exists(target))
+            if not fs.exists(target) then
+                return
+            end
             if fs.is_directory(target) then
                 if mode == true then
                     for path in target:list_directory() do
                         remove(relative / path:filename(), true)
                     end
+                    fs.remove(target)
                 else
                     for name, v in pairs(mode) do
                         remove(relative / name, v)
                     end
                 end
-                fs.remove(target)
             else
                 fs.remove(target)
             end
@@ -105,7 +111,7 @@ print('清理目录...')
 removeFiles(out)(true)
 
 print('开始复制文件...')
-copyFiles(out) {
+local count = copyFiles(out) {
     ['client'] = {
         ['node_modules']      = true,
         ['out']               = true,
@@ -126,6 +132,7 @@ copyFiles(out) {
     ['README.md']         = true,
     ['tsconfig.json']     = true,
 }
+print(('复制了[%d]个文件'):format(count))
 
 print('开始测试...')
 runTest(out / 'server')

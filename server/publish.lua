@@ -137,11 +137,14 @@ print(('复制了[%d]个文件'):format(count))
 print('开始测试...')
 runTest(out / 'server')
 
-print('删除测试文件...')
+print('删除多余文件...')
 removeFiles(out) {
     ['server'] = {
         ['log']  = true,
         ['test'] = true,
+        ['bin']  = {
+            ['debugger.dll'] = true,
+        },
     },
 }
 

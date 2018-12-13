@@ -9,10 +9,20 @@ package.path = (ROOT / 'src' / '?.lua'):string()
 require 'utility'
 local json = require 'json'
 
-local function loadVersion()
+local function loadPackage()
     local buf = io.load(EXTENSION / 'package.json')
     local package = json.decode(buf)
-    return package.version
+    return package.version, package.scripts.postinstall
+end
+
+local function updateNodeModules(postinstall)
+    local current = fs.current_path()
+    fs.current_path(EXTENSION)
+    local cmd = io.popen(postinstall)
+    for line in cmd:lines 'l' do
+        print(line)
+    end
+    fs.current_path(current)
 end
 
 local function createDirectory(version)
@@ -28,6 +38,7 @@ local function copyFiles(out)
             local source = EXTENSION / relative
             local target = out / relative
             if not fs.exists(source) then
+                error('文件不存在: ' .. tostring(source))
                 return
             end
             if fs.is_directory(source) then
@@ -62,13 +73,8 @@ local function runTest(root)
         stdout = true,
         stderr = true,
     }
-    while true do
-        local out = lua.stdout:read 'l'
-        if out then
-            print(out)
-        else
-            break
-        end
+    for line in lua.stdout:lines 'l' do
+        print(line)
     end
     lua:wait()
     local err = lua.stderr:read 'a'
@@ -104,10 +110,13 @@ local function removeFiles(out)
     end
 end
 
-local version = loadVersion()
+local version, postinstall = loadPackage()
 print('版本号为：' .. version)
 
 local out = createDirectory(version)
+
+print('更新NodeModules...')
+updateNodeModules(postinstall)
 
 print('清理目录...')
 removeFiles(out)(true)

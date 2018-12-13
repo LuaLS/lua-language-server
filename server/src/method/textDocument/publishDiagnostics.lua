@@ -44,7 +44,7 @@ end
 
 local function createInfo(data, lines)
     local diagnostic = {
-        source   = 'LSP',
+        source   = 'Lua Language Server',
         range    = getRange(data.start, data.finish, lines),
         severity = DiagnosticSeverity[data.level],
         message  = data.message,

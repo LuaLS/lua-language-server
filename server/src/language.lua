@@ -34,7 +34,7 @@ local function init()
     local id = osLanguage()
     local language = getLanguage(id)
     log.info(('VSC language: %s'):format(id))
-    log.info(('LSP language: %s'):format(language))
+    log.info(('LS  language: %s'):format(language))
     return language
 end
 

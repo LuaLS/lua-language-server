@@ -12,7 +12,6 @@
 			"env": {
 				"PATH": "${workspaceRoot}\\server\\bin\\"
 			},
-			"luaRuntime": "5.4 32bit",
 			"luaexe": "${workspaceRoot}\\server\\bin\\lua.exe",
 			"luadll": "${workspaceRoot}\\server\\bin\\lua54.dll",
 			"path": "${workspaceRoot}/server/bin/?.lua",
@@ -39,11 +38,26 @@
 			"stopOnEntry": false,
 			"program": "${workspaceRoot}/server/compile.lua",
 			"cwd": "${workspaceRoot}/server",
-			"luaRuntime": "5.4 32bit",
 			"luaexe": "${workspaceRoot}/server/bee.lua/make/luamake.exe",
 			"luadll": "${workspaceRoot}/server/bee.lua/make/lua54.dll",
 			"path": "${workspaceRoot}/server/bee.lua/make/?.lua",
 			"cpath": "${workspaceRoot}/server/bee.lua/make/?.dll;",
+			"arg": [
+			],
+			"consoleCoding": "utf8",
+			"sourceCoding": "utf8"
+		},
+		{
+			"name": "发布",
+			"type": "lua",
+			"request": "launch",
+			"stopOnEntry": false,
+			"program": "${workspaceRoot}/server/publish.lua",
+			"cwd": "${workspaceRoot}/server",
+			"luaexe": "${workspaceRoot}\\server\\bin\\lua.exe",
+			"luadll": "${workspaceRoot}\\server\\bin\\lua54.dll",
+			"path": "${workspaceRoot}/server/bin/?.lua",
+			"cpath": "${workspaceRoot}/server/bin/?.dll;",
 			"arg": [
 			],
 			"consoleCoding": "utf8",

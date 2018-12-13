@@ -677,14 +677,34 @@ function mt:getSimple(simple, mode)
     error('Unknow simple mode: ' .. mode)
 end
 
+function mt:isTrue(v)
+    if v.type == 'nil' then
+        return false
+    end
+    if v.type == 'boolean' and not v.value then
+        return false
+    end
+    return true
+end
+
 function mt:getBinary(exp)
     local v1 = self:getExp(exp[1])
     local v2 = self:getExp(exp[2])
     local op = exp.op
     -- TODO 搜索元方法
-    if     op == 'or'
-        or op == 'and'
-        or op == '<='
+    if     op == 'or' then
+        if self:isTrue(v1) then
+            return v1
+        else
+            return v2
+        end
+    elseif op == 'and' then
+        if self:isTrue(v1) then
+            return v2
+        else
+            return v1
+        end
+    elseif op == '<='
         or op == '>='
         or op == '<'
         or op == '>'

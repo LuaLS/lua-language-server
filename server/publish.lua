@@ -15,9 +15,9 @@ local function loadPackage()
     return package.version, package.scripts.postinstall
 end
 
-local function updateNodeModules(postinstall)
+local function updateNodeModules(out, postinstall)
     local current = fs.current_path()
-    fs.current_path(EXTENSION)
+    fs.current_path(out)
     local cmd = io.popen(postinstall)
     for line in cmd:lines 'l' do
         print(line)
@@ -31,11 +31,11 @@ local function createDirectory(version)
     return out
 end
 
-local function copyFiles(out)
+local function copyFiles(root, out)
     return function (dirs)
         local count = 0
         local function copy(relative, mode)
-            local source = EXTENSION / relative
+            local source = root / relative
             local target = out / relative
             if not fs.exists(source) then
                 error('文件不存在: ' .. tostring(source))
@@ -115,16 +115,12 @@ print('版本号为：' .. version)
 
 local out = createDirectory(version)
 
-print('更新NodeModules...')
-updateNodeModules(postinstall)
-
 print('清理目录...')
 removeFiles(out)(true)
 
 print('开始复制文件...')
-local count = copyFiles(out) {
+local count = copyFiles(EXTENSION , out) {
     ['client'] = {
-        ['node_modules']      = true,
         ['out']               = true,
         ['package-lock.json'] = true,
         ['package.json']      = true,
@@ -145,6 +141,10 @@ local count = copyFiles(out) {
 }
 print(('复制了[%d]个文件'):format(count))
 
+
+print('更新NodeModules...')
+updateNodeModules(out, postinstall)
+
 print('开始测试...')
 runTest(out / 'server')
 
@@ -158,5 +158,9 @@ removeFiles(out) {
         },
     },
 }
+
+print('复制到发布目录...')
+local count = copyFiles(out, EXTENSION / 'publish' / 'lua-language-server')(true)
+print(('复制了[%d]个文件'):format(count))
 
 print('完成')

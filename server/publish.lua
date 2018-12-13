@@ -159,8 +159,12 @@ removeFiles(out) {
     },
 }
 
+local path = EXTENSION / 'publish' / 'lua-language-server'
+print('清理发布目录...')
+removeFiles(path)(true)
+
 print('复制到发布目录...')
-local count = copyFiles(out, EXTENSION / 'publish' / 'lua-language-server')(true)
+local count = copyFiles(out, path)(true)
 print(('复制了[%d]个文件'):format(count))
 
 print('完成')

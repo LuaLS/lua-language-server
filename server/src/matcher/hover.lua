@@ -129,32 +129,6 @@ local function buildEnum(lib)
     return table.concat(strs)
 end
 
-local function buildField(lib)
-    if not lib.fields then
-        return ''
-    end
-    local strs = {}
-    for _, field in ipairs(lib.fields) do
-        strs[#strs+1] = ('\n%s: %s -- %s'):format(field.field, field.type, field.description or '')
-    end
-    return table.concat(strs)
-end
-
-local function buildTableHover(lib, fullKey)
-    local title = ('table %s'):format(fullKey)
-    local field = buildField(lib)
-    local tip = lib.description or ''
-    return ([[
-```lua
-%s
-```
-%s
-```lua
-%s
-```
-]]):format(title, tip, field)
-end
-
 local function buildValueName(result, source)
     local func = result.value
     local declarat = func.declarat or source

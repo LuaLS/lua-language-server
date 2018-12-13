@@ -150,3 +150,11 @@ x(1)
 TEST 'table' [[
 setmetatable(<?b?>)
 ]]
+
+TEST 'number' [[
+local function x(a)
+    _ = a + 1
+end
+local b
+x(<?b?>)
+]]

@@ -240,6 +240,7 @@ end
 function mt:buildFunction(exp, object)
     local func = self:createValue('function')
     func.args = {}
+    func.argValues = {}
 
     if not exp then
         return func
@@ -264,6 +265,7 @@ function mt:buildFunction(exp, object)
         if arg.type == 'name' then
             local var = self:createLocal(arg[1], arg)
             func.args[#func.args+1] = var
+            func.argValues[#func.args] = self:getValue(var)
         elseif arg.type == '...' then
             local dots = self:createDots(arg)
             func.args[#func.args+1] = dots
@@ -712,7 +714,11 @@ function mt:getBinary(exp)
         or op == '>='
         or op == '<'
         or op == '>'
-        or op == '~='
+    then
+        self:inference(v1, 'number')
+        self:inference(v2, 'number')
+        return self:createValue('boolean')
+    elseif op == '~='
         or op == '=='
     then
         return self:createValue('boolean')
@@ -723,8 +729,12 @@ function mt:getBinary(exp)
         or op == '>>'
         or op == '//'
     then
+        self:inference(v1, 'integer')
+        self:inference(v2, 'integer')
         return self:createValue('integer')
     elseif op == '..' then
+        self:inference(v1, 'string')
+        self:inference(v2, 'string')
         return self:createValue('string')
     elseif op == '+'
         or op == '-'
@@ -733,6 +743,8 @@ function mt:getBinary(exp)
         or op == '^'
         or op == '%'
     then
+        self:inference(v1, 'number')
+        self:inference(v2, 'number')
         return self:createValue('number')
     end
     return nil
@@ -745,10 +757,13 @@ function mt:getUnary(exp)
     if     op == 'not' then
         return self:createValue('boolean')
     elseif op == '#' then
+        self:inference(v1, 'table')
         return self:createValue('integer')
     elseif op == '-' then
+        self:inference(v1, 'number')
         return self:createValue('number')
     elseif op == '~' then
+        self:inference(v1, 'integer')
         return self:createValue('integer')
     end
     return nil

@@ -323,30 +323,11 @@ local function buildValueSimpleHover(result, source)
     if class then
         valueType = class
     end
-
-    local resType = result.type
-    if resType == 'field' then
-        local field = result
-        local stack = 0
-        while field.parent do
-            field = field.parent
-            stack = stack + 1
-        end
-        if field.value.ENV then
-            if stack > 1 then
-                resType = 'global field'
-            else
-                resType = 'global'
-            end
-        else
-            resType = 'local field'
-        end
-    end
     return ([[
 ```lua
-%s: %s
+%s
 ```
-]]):format(resType, valueType)
+]]):format(valueType)
 end
 
 local function getValueHover(result, source)

@@ -84,24 +84,24 @@ obj.<?xxx?>()
 TEST [[
 local <?x?> = 1
 ]]
-"local: number"
+"number"
 
 TEST [[
 <?x?> = 1
 ]]
-"global: number"
+"number"
 
 TEST [[
 local t = {}
 t.<?x?> = 1
 ]]
-"local field: number"
+"number"
 
 TEST [[
 t = {}
 t.<?x?> = 1
 ]]
-"global field: number"
+"number"
 
 TEST [[
 local mt = {}
@@ -109,7 +109,7 @@ mt.__name = 'class'
 
 local <?obj?> = setmetatable({}, mt)
 ]]
-"local: *class"
+"*class"
 
 TEST [[
 local mt = {}
@@ -118,7 +118,7 @@ mt.__index = mt
 
 local <?obj?> = setmetatable({}, mt)
 ]]
-"local: *class"
+"*class"
 
 TEST [[
 local mt = {}
@@ -127,7 +127,7 @@ mt.__index = mt
 
 local <?obj?> = setmetatable({}, mt)
 ]]
-"local: *class"
+"*class"
 
 TEST [[
 local mt = {}
@@ -136,7 +136,7 @@ mt.__index = mt
 
 local <?obj?> = setmetatable({}, mt)
 ]]
-"local: *class"
+"*class"
 
 TEST[[
 local fs = require 'bee.filesystem'

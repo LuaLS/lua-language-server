@@ -325,7 +325,11 @@ function mt:setFunctionArg(func, values)
         func.argValues = {}
     end
     for i = 1, #values do
-        func.argValues[i] = values[i]
+        if not func.argValues[i] then
+            func.argValues[i] = values[i]
+        end
+        self:inference(values[i], func.argValues[i].type)
+        self:inference(func.argValues[i], values[i].type)
     end
 
     self:updateFunctionArgs(func)

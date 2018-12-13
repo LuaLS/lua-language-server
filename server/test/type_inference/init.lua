@@ -146,3 +146,7 @@ local function x(a)
 end
 x(1)
 ]]
+
+TEST 'table' [[
+setmetatable(<?b?>)
+]]

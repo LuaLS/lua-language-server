@@ -10,6 +10,6 @@
 - [x] Diagnostics
 - [x] Rename
 - [x] Parameter Prompt
-- [] Syntax check
-- [] Auto Completion
-- [] Intelligent
+- [ ] Syntax check
+- [ ] Auto Completion
+- [ ] Intelligent

@@ -143,3 +143,8 @@ local fs = require 'bee.filesystem'
 local <?root?> = fs.current_path()
 ]]
 "*bee::filesystem root"
+
+TEST[[
+('xx'):<?yy?>()
+]]
+"function *string:yy()"

@@ -641,14 +641,13 @@ function mt:getSimple(simple, mode)
         elseif obj.index then
             local index = self:getIndex(obj)
             field = self:getField(value, index, obj)
+            field.parentValue = value
             value = self:getValue(field)
             if mode == 'value' or i < #simple then
                 if obj.start then
                     self:addInfo(field, 'get', obj)
                 end
             end
-            field.parent = lastField
-            lastField = field
             obj.object = object
             obj.parentName = parentName
             if obj.type == 'string' then
@@ -661,6 +660,7 @@ function mt:getSimple(simple, mode)
         else
             if tp == 'name' then
                 field = self:getField(value, obj[1], obj)
+                field.parentValue = value
                 value = self:getValue(field)
                 if mode == 'value' or i < #simple then
                     self:addInfo(field, 'get', obj)

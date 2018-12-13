@@ -143,14 +143,23 @@ local function buildValueName(result, source)
         else
             key = '?'
         end
+
+        local parentName = declarat.parentName
+        if parentName == '?' then
+            local parentType = result.parentValue and result.parentValue.type
+            if parentType == 'table' then
+            else
+                parentName = '*' .. parentType
+            end
+        end
         if source.object then
-            return declarat.parentName .. ':' .. key
+            return parentName .. ':' .. key
         else
-            if declarat.parentName then
+            if parentName then
                 if declarat.index then
-                    return declarat.parentName .. '[' .. key .. ']'
+                    return parentName .. '[' .. key .. ']'
                 else
-                    return declarat.parentName .. '.' .. key
+                    return parentName .. '.' .. key
                 end
             else
                 return key

@@ -27,7 +27,9 @@ local function copyFiles(out)
         local function copy(relative, mode)
             local source = EXTENSION / relative
             local target = out / relative
-            assert(fs.exists(source))
+            if not fs.exists(source) then
+                return
+            end
             if fs.is_directory(source) then
                 fs.create_directory(target)
                 if mode == true then

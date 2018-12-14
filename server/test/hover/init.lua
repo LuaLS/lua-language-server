@@ -148,3 +148,8 @@ TEST[[
 ('xx'):<?yy?>()
 ]]
 "function *string:yy()"
+
+TEST [[
+local <?v?> = collectgarbage()
+]]
+"nil v"

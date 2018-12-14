@@ -324,7 +324,7 @@ return function (vm, pos)
     end
 
     local lib, fullKey, oo = findLib(result)
-    local valueType = lib and lib.type or result.value.type
+    local valueType = lib and lib.type or result.value.type or 'nil'
     local name = fullKey or buildValueName(result, source)
     if valueType == 'function' then
         return getFunctionHover(name, result, source, lib, oo)

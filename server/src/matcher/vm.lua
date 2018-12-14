@@ -78,7 +78,7 @@ function mt:buildTable(source)
         return tbl
     end
     local n = 0
-    for _, obj in ipairs(source) do
+    for index, obj in ipairs(source) do
         if obj.type == 'pair' then
             local value = self:getExp(obj[2])
             local key   = obj[1]
@@ -102,13 +102,24 @@ function mt:buildTable(source)
                 end
             end
         else
-            local value = self:getExp(obj)
+            local value
+            if obj.type == '...' then
+                value = { type = 'list' }
+                self:unpackDots(value, 1)
+            else
+                value = self:getExp(obj)
+            end
             if value.type == 'list' then
-                for i, v in ipairs(value) do
-                    local field = self:createField(tbl, n + i)
-                    self:setValue(field, v)
+                if index == #source then
+                    for i, v in ipairs(value) do
+                        local field = self:createField(tbl, n + i)
+                        self:setValue(field, v)
+                    end
+                else
+                    n = n + 1
+                    local field = self:createField(tbl, n)
+                    self:setValue(field, value[1])
                 end
-                break
             else
                 n = n + 1
                 local field = self:createField(tbl, n)

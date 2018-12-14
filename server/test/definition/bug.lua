@@ -60,3 +60,20 @@ end
 mt:x()
 mt:<?x?>()
 ]]
+
+TEST [[
+local function func(<!a!>)
+    x = {
+        xx(),
+        <?a?>,
+    }
+end
+]]
+
+TEST [[
+local <!x!>
+local t = {
+    ...,
+    <?x?>,
+}
+]]

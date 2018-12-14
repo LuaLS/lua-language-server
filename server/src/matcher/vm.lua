@@ -61,10 +61,12 @@ function mt:addInfo(obj, type, source)
     return obj
 end
 
-function mt:createDots(source)
+function mt:createDots(index, source)
     local dots = {
         type = 'dots',
         source = source or DefaultSource,
+        func = self:getCurrentFunction(),
+        index = index,
     }
     self.chunk.dots = dots
     return dots
@@ -267,8 +269,7 @@ function mt:buildFunction(exp, object)
             func.args[#func.args+1] = var
             func.argValues[#func.args] = self:getValue(var)
         elseif arg.type == '...' then
-            local dots = self:createDots(arg)
-            func.args[#func.args+1] = dots
+            self:createDots(#func.args+1, arg)
             stop = true
         end
     end)
@@ -771,7 +772,7 @@ end
 
 function mt:getDots()
     if not self.chunk.dots then
-        self:createDots()
+        self:createDots(1)
     end
     return self.chunk.dots
 end
@@ -1011,7 +1012,7 @@ function mt:createEnvironment()
     -- _ENV 有个特殊标记
     envValue.ENV = true
     -- 隐藏的参数`...`
-    self:createDots()
+    self:createDots(1)
 
     -- 设置全局变量
     for name, lib in pairs(library.global) do

@@ -1,5 +1,86 @@
-[default]
-type = 'function'
-
 [coroutine]
 type = 'table'
+[[.source]]
+type = 'global'
+[[.source]]
+type = 'library'
+name = 'coroutine'
+
+[default]
+type = 'function'
+[[.parent]]
+type = 'global'
+name = 'coroutine'
+[[.parent]]
+type = 'library'
+name = 'coroutine'
+
+[create]
+[[.args]]
+name = 'f'
+type = 'function'
+[[.returns]]
+name = 'coroutine'
+type = 'thread'
+
+[isyieldable]
+[[.returns]]
+type = 'boolean'
+
+[resume]
+[[.args]]
+name = 'co'
+type = 'thread'
+[[.args]]
+name = 'val1'
+optional = 'after'
+[[.args]]
+type = '...'
+[[.returns]]
+name = 'success'
+type = 'boolean'
+[[.returns]]
+name = 'result'
+[[.returns]]
+type = '...'
+
+[running]
+[[.returns]]
+name = 'running_co'
+type = 'thread'
+[[.returns]]
+name = 'is_main'
+type = 'boolean'
+
+[status]
+[[.args]]
+name = 'co'
+type = 'thread'
+[[.returns]]
+name = 'status'
+type = 'string'
+[[.enums]]
+name = 'status'
+enum = 'running'
+[[.enums]]
+name = 'status'
+enum = 'suspended'
+[[.enums]]
+name = 'status'
+enum = 'normal'
+[[.enums]]
+name = 'status'
+enum = 'dead'
+
+[wrap]
+[[.args]]
+name = 'f'
+type = 'function'
+[[.returns]]
+type = '...'
+
+[yield]
+[[.args]]
+type = '...'
+[[.returns]]
+type = '...'

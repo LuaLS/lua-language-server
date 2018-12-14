@@ -102,13 +102,7 @@ function mt:buildTable(source)
                 end
             end
         else
-            local value
-            if obj.type == '...' then
-                value = { type = 'list' }
-                self:unpackDots(value, 1)
-            else
-                value = self:getExp(obj)
-            end
+            local value = self:getExp(obj)
             if value.type == 'list' then
                 if index == #source then
                     for i, v in ipairs(value) do
@@ -852,6 +846,10 @@ function mt:getExp(exp)
         return self:buildFunction(exp)
     elseif tp == 'table' then
         return self:buildTable(exp)
+    elseif tp == '...' then
+        local value = { type = 'list' }
+        self:unpackDots(value)
+        return value
     end
     error('Unkown exp type: ' .. tostring(tp))
 end
@@ -864,15 +862,13 @@ end
 
 function mt:doReturn(action)
     for i, exp in ipairs(action) do
-        if exp.type == '...' then
-            local values = {}
-            self:unpackDots(values)
-            for x, v in ipairs(values) do
+        local value = self:getExp(exp)
+        if value.type == 'list' then
+            for x, v in ipairs(value) do
                 self:setFunctionReturn(self:getCurrentFunction(), i + x - 1, v)
             end
             break
         else
-            local value = self:getExp(exp)
             self:setFunctionReturn(self:getCurrentFunction(), i, value)
         end
     end

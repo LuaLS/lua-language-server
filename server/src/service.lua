@@ -41,7 +41,7 @@ function mt:_callMethod(name, params)
         if suc then
             return res
         else
-            log.dbueg(('Task [%s] failed, params: %s'):format(
+            log.debug(('Task [%s] failed, params: %s'):format(
                 name, table.dump(params)
             ))
             return nil, {
@@ -230,17 +230,13 @@ function mt:on_tick()
         for _ in pairs(self._file) do
             count = count + 1
         end
-        local last_mem = collectgarbage 'count'
-        collectgarbage()
         local mem = collectgarbage 'count'
         log.debug(('\n\z
-        Collectgarbage\n\z
+        State\n\z
         Mem:   [%.3f]kb\n\z
-        Cache: [%d]\n\z
-        GC:    [%.3f]kb'):format(
+        Cache: [%d]'):format(
             mem,
-            count,
-            last_mem - mem
+            count
         ))
     end
 end
@@ -261,7 +257,6 @@ function mt:listen()
 end
 
 return function ()
-    collectgarbage 'stop'
     local session = setmetatable({
         _file = {},
         _needCompile = {},

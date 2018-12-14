@@ -7,7 +7,7 @@ package.path = (ROOT / 'src' / '?.lua'):string()
      .. ';' .. (ROOT / 'src' / '?' / 'init.lua'):string()
 
 log = require 'log'
-log.init(ROOT, ROOT / 'log' / 'test.log')
+log.init(ROOT, ROOT / 'log' / 'service.log')
 log.info('Lua Lsp startup, root: ', ROOT)
 
 local function tryDebugger()

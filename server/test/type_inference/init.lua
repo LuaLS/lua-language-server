@@ -165,3 +165,10 @@ local function x(a, ...)
 end
 x(nil, 'xx', 1, true)
 ]]
+
+TEST 'number' [[
+local function x(a, ...)
+    return true, 'ss', ...
+end
+local _, _, _, <?b?>, _ = x(nil, true, 1, 'yy')
+]]

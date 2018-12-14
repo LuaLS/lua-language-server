@@ -108,13 +108,15 @@ function mt:_doDiagnostic()
         end
     end
     local passed = os.clock() - clock
-    log.debug(('\n\z
-    Diagnostics completion\n\z
-    Cost:  [%.3f]sec\n\z
-    Num:   [%d]'):format(
-        passed,
-        count
-    ))
+    if passed > 0.01 then
+        log.debug(('\n\z
+        Diagnostics completion\n\z
+        Cost:  [%.3f]sec\n\z
+        Num:   [%d]'):format(
+            passed,
+            count
+        ))
+    end
 end
 
 function mt:_buildTextCache()
@@ -133,26 +135,17 @@ function mt:_buildTextCache()
         size = size + #obj.text
     end
     local passed = os.clock() - clock
-
-    local sum = 0
-    for _ in pairs(self._file) do
-        sum = sum + 1
+    if passed > 0.01 then
+        log.debug(('\n\z
+        Cache completion\n\z
+        Cost:  [%.3f]sec\n\z
+        Num:   [%d]\n\z
+        Size:  [%.3f]kb'):format(
+            passed,
+            #list,
+            size / 1000
+        ))
     end
-    log.debug(('\n\z
-    Cache completion\n\z
-    Cost:  [%.3f]sec\n\z
-    Num:   [%d]\n\z
-    Size:  [%.3f]kb\n\z
-    Speed：[%.3f]kb/s\n\z
-    Mem：  [%.3f]kb\n\z
-    Sum:   [%d]'):format(
-        passed,
-        #list,
-        size / 1000,
-        size / passed / 1000,
-        collectgarbage 'count',
-        sum
-    ))
 end
 
 function mt:read(mode)
@@ -227,6 +220,26 @@ function mt:on_tick()
     end
     self:_buildTextCache()
     self:_doDiagnostic()
+
+    if os.clock() - self._clock >= 60 then
+        self._clock = os.clock()
+        local count = 0
+        for _ in pairs(self._file) do
+            count = count + 1
+        end
+        local last_mem = collectgarbage 'count'
+        collectgarbage()
+        local mem = collectgarbage 'count'
+        log.debug(('\n\z
+        collectgarbage\n\z
+        Mem:   [%.3f]kb\n\z
+        Cache: [%d]\n\z
+        GC:    [%.3f]kb'):format(
+            mem,
+            count,
+            last_mem - mem
+        ))
+    end
 end
 
 function mt:listen()
@@ -245,10 +258,12 @@ function mt:listen()
 end
 
 return function ()
+    collectgarbage 'stop'
     local session = setmetatable({
         _file = {},
         _needCompile = {},
         _needDiagnostics = {},
+        _clock = -100,
     }, mt)
     return session
 end

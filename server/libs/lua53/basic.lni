@@ -63,6 +63,11 @@ optional = 'self'
 type = 'table'
 
 [getmetatable]
+[[.args]]
+name = 'object'
+[[.returns]]
+name = 'metatable'
+type = 'table'
 
 [ipairs]
 [[.args]]
@@ -89,6 +94,35 @@ type = 'integer'
 default = 0
 
 [load]
+[[.args]]
+name = 'chunk'
+type = {'string', 'function'}
+[[.args]]
+name = 'chunkname'
+type = 'string'
+optional = 'after'
+[[.args]]
+name = 'mode'
+type = 'string'
+optional = 'after'
+[[.args]]
+name = 'env'
+type = 'table'
+optional = 'self'
+[[.returns]]
+type = 'function'
+[[.returns]]
+name = 'error_message'
+type = 'string'
+[[.enums]]
+name = 'mode'
+enum = 'b'
+[[.enums]]
+name = 'mode'
+enum = 't'
+[[.enums]]
+name = 'mode'
+enum = 'bt'
 
 [loadfile]
 

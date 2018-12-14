@@ -486,13 +486,16 @@ function mt:inference(value, type)
     end
 end
 
-function mt:createValue(type, source, v)
+function mt:createValue(tp, source, v)
+    if type(tp) == 'table' then
+        tp = tp[1]
+    end
     local value = {
-        type = type,
+        type = tp,
         source = source or DefaultSource,
         value = v,
     }
-    local lib = library.object[type]
+    local lib = library.object[tp]
     if lib then
         self:getLibChild(value, lib, 'object')
     end

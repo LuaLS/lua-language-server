@@ -40,7 +40,11 @@ local function buildLibArgs(lib, oo)
         if arg.name then
             strs[#strs+1] = ('%s: '):format(arg.name)
         end
-        strs[#strs+1] = arg.type or 'any'
+        if type(arg.type) == 'table' then
+            strs[#strs+1] = table.concat(arg.type, '/')
+        else
+            strs[#strs+1] = arg.type or 'any'
+        end
         if arg.default then
             strs[#strs+1] = ('(%q)'):format(arg.default)
         end

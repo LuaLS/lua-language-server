@@ -14,8 +14,8 @@ function TEST(script)
         assert(vm)
         local result = matcher.hover(vm, pos)
         assert(result)
-        expect = expect:gsub('^[\r\n]*(.-)[\r\n]*$', '%1')
-        result = result:gsub('```lua', ''):gsub('```', ''):gsub('^[\r\n]*(.-)[\r\n]*$', '%1')
+        expect = expect:gsub('^[\r\n]*(.-)[\r\n]*$', '%1'):gsub('\r\n', '\n')
+        result = result:gsub('```lua[\r\n]*', ''):gsub('[\r\n]*```', ''):gsub('^[\r\n]*(.-)[\r\n]*$', '%1'):gsub('\r\n', '\n')
         assert(expect == result)
     end
 end
@@ -155,7 +155,20 @@ local <?v?> = collectgarbage()
 "nil v"
 
 TEST [[
-local <!type!>
+local type
 w2l:get_default()[<?type?>]
 ]]
 "any type"
+
+TEST [[
+<?load?>()
+]]
+[=[
+function load(chunk: string/function [, chunkname: string [, mode: string [, env: table]]])
+  -> function, error_message: string
+
+mode: string
+   | "b" -- 
+   | "t" -- 
+   | "bt" -- 
+]=]

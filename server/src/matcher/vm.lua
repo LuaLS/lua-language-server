@@ -445,7 +445,6 @@ function mt:setFunctionReturn(func, index, value)
     if not func.returns then
         func.returns = {
             type = 'list',
-            [1] = self:createValue('any'),
         }
     end
     if value then
@@ -465,7 +464,6 @@ function mt:getFunctionReturns(func, i)
     if not func.returns then
         func.returns = {
             type = 'list',
-            [1] = self:createValue('any'),
         }
     end
     if i then

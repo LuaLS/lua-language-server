@@ -125,8 +125,44 @@ name = 'mode'
 enum = 'bt'
 
 [loadfile]
+[[.args]]
+name = 'filename'
+type = 'string'
+optional = 'after'
+[[.args]]
+name = 'mode'
+type = 'string'
+optional = 'after'
+[[.args]]
+name = 'env'
+type = 'table'
+optional = 'self'
+[[.returns]]
+type = 'function'
+[[.returns]]
+name = 'error_message'
+type = 'string'
+[[.enums]]
+name = 'mode'
+enum = 'b'
+[[.enums]]
+name = 'mode'
+enum = 't'
+[[.enums]]
+name = 'mode'
+enum = 'bt'
 
 [next]
+[[.args]]
+name = 'table'
+type = 'table'
+[[.args]]
+name = 'index'
+optional = 'self'
+[[.returns]]
+name = 'key'
+[[.returns]]
+name = 'value'
 
 [pairs]
 [[.args]]
@@ -140,17 +176,31 @@ returns = {
         name = 'key',
     },
     2 = {
-        name = 'object',
+        name = 'value',
     },
 }
 [[.returns]]
 name = 't'
 type = 'table'
 [[.returns]]
-name = 'nil'
 type = 'nil'
 
 [pcall]
+[[.args]]
+name = 'f'
+type = 'function'
+[[.args]]
+name = 'arg1'
+optional = 'after'
+[[.args]]
+type = '...'
+[[.returns]]
+name = 'success'
+type = 'boolean'
+[[.returns]]
+name = 'result'
+[[.returns]]
+type = '...'
 
 [print]
 

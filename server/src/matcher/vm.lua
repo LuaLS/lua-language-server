@@ -414,12 +414,12 @@ function mt:call(func, values)
     if lib then
         if lib.args then
             for i, arg in ipairs(lib.args) do
-                self:inference(self:getFunctionArg(func, i), arg.type)
+                self:inference(self:getFunctionArg(func, i), arg.type or 'any')
             end
         end
         if lib.returns then
             for i, rtn in ipairs(lib.returns) do
-                self:inference(self:getFunctionReturns(func, i), rtn.type)
+                self:inference(self:getFunctionReturns(func, i), rtn.type or 'any')
             end
         end
         if lib.special then
@@ -461,6 +461,9 @@ function mt:setFunctionReturn(func, index, value)
 end
 
 function mt:getFunctionReturns(func, i)
+    if func.maxReturns and i and func.maxReturns < i then
+        return self:createValue('nil')
+    end
     if not func.returns then
         func.returns = {
             type = 'list',
@@ -532,9 +535,18 @@ function mt:getLibValue(lib, parentType, v)
     elseif tp == 'function' then
         value = self:createValue('function')
         if lib.returns then
+            local dots
             for i, rtn in ipairs(lib.returns) do
                 self:setFunctionReturn(value, i, self:getLibValue(rtn, parentType))
+                if rtn.type == '...' then
+                    dots = true
+                end
             end
+            if not dots then
+                value.maxReturns = #lib.returns
+            end
+        else
+            value.maxReturns = 0
         end
         if lib.args then
             local values = {}

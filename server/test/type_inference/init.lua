@@ -177,3 +177,7 @@ TEST 'integer' [[
 for <?i?> in ipairs(t) do
 end
 ]]
+
+TEST 'any' [[
+local <?x?> = next()
+]]

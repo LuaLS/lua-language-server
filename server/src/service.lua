@@ -231,7 +231,7 @@ function mt:on_tick()
         collectgarbage()
         local mem = collectgarbage 'count'
         log.debug(('\n\z
-        collectgarbage\n\z
+        Collectgarbage\n\z
         Mem:   [%.3f]kb\n\z
         Cache: [%d]\n\z
         GC:    [%.3f]kb'):format(

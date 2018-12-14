@@ -158,3 +158,10 @@ end
 local b
 x(<?b?>)
 ]]
+
+TEST 'number' [[
+local function x(a, ...)
+    local _, <?b?>, _ = ...
+end
+x(nil, 'xx', 1, true)
+]]

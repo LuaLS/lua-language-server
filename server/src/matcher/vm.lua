@@ -252,6 +252,7 @@ function mt:buildFunction(exp, object)
     self.chunk:push()
     self.chunk:cut 'dots'
     self.chunk:cut 'labels'
+    self.chunk.func = func
 
     if object then
         local var = self:createLocal('self', object.source, self:getValue(object))
@@ -274,7 +275,6 @@ function mt:buildFunction(exp, object)
         end
     end)
 
-    self.chunk.func = func
     self:doActions(exp)
 
     self.results.funcs[#self.results.funcs+1] = func
@@ -296,6 +296,16 @@ function mt:forList(list, callback)
     else
         callback(list)
     end
+end
+
+function mt:countList(list)
+    if not list then
+        return 0
+    end
+    if list.type == 'list' then
+        return #list
+    end
+    return 1
 end
 
 function mt:updateFunctionArgs(func)
@@ -571,10 +581,34 @@ function mt:getIndex(obj)
     end
 end
 
-function mt:unpackList(list)
+-- expect表示遇到 ... 时，期待的返回数量
+function mt:unpackDots(res, expect)
+    local dots = self:getDots(1)
+    local func = dots.func
+    local start = dots.index
+    if expect then
+        local finish = start + expect - 1
+        for i = start, finish do
+            res[#res+1] = self:getFunctionArg(func, i)
+        end
+    else
+        if not func.argValues then
+            return
+        end
+        for i = start, #func.argValues do
+            res[#res+1] = func.argValues[i]
+        end
+    end
+end
+
+function mt:unpackList(list, expect)
     local res = {}
     if list.type == 'list' or list.type == 'call' then
         for i, exp in ipairs(list) do
+            if exp.type == '...' then
+                self:unpackDots(res, expect)
+                break
+            end
             local value = self:getExp(exp)
             if value.type == 'list' then
                 if i == #list then
@@ -588,6 +622,8 @@ function mt:unpackList(list)
                 res[#res+1] = value
             end
         end
+    elseif list.type == '...' then
+        self:unpackDots(res, expect)
     else
         local value = self:getExp(list)
         if value.type == 'list' then
@@ -798,12 +834,6 @@ function mt:getExp(exp)
         return self:getBinary(exp)
     elseif tp == 'unary' then
         return self:getUnary(exp)
-    elseif tp == '...' then
-        -- TODO 传递不定参数
-        local var = self:getDots()
-        local value = self:getValue(var)
-        self:addInfo(var, 'get', exp)
-        return value
     elseif tp == 'function' then
         return self:buildFunction(exp)
     elseif tp == 'table' then
@@ -820,8 +850,17 @@ end
 
 function mt:doReturn(action)
     for i, exp in ipairs(action) do
-        local value = self:getExp(exp)
-        self:setFunctionReturn(self:getCurrentFunction(), i, value)
+        if exp.type == '...' then
+            local values = {}
+            self:unpackDots(values)
+            for x, v in ipairs(values) do
+                self:setFunctionReturn(self:getCurrentFunction(), i + x - 1, v)
+            end
+            break
+        else
+            local value = self:getExp(exp)
+            self:setFunctionReturn(self:getCurrentFunction(), i, value)
+        end
     end
 end
 
@@ -842,8 +881,9 @@ function mt:doSet(action)
     if not action[2] then
         return
     end
+    local n = self:countList(action[1])
     -- 要先计算值
-    local values = self:unpackList(action[2])
+    local values = self:unpackList(action[2], n)
     self:forList(action[1], function (key)
         local value = table.remove(values, 1)
         if key.type == 'name' then
@@ -857,9 +897,10 @@ function mt:doSet(action)
 end
 
 function mt:doLocal(action)
+    local n = self:countList(action[1])
     local values
     if action[2] then
-        values = self:unpackList(action[2])
+        values = self:unpackList(action[2], n)
     end
     self:forList(action[1], function (key)
         local value

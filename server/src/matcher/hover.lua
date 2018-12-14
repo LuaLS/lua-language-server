@@ -101,7 +101,7 @@ local function buildEnum(lib)
     end
     local container = table.container()
     for _, enum in ipairs(lib.enums) do
-        if not enum.name or not enum.enum then
+        if not enum.name or (not enum.enum and not enum.code) then
             goto NEXT_ENUM
         end
         if not container[enum.name] then
@@ -114,20 +114,41 @@ local function buildEnum(lib)
                     end
                 end
             end
+            if lib.returns then
+                for _, rtn in ipairs(lib.returns) do
+                    if rtn.name == enum.name then
+                        container[enum.name].type = rtn.type
+                        break
+                    end
+                end
+            end
         end
         table.insert(container[enum.name], enum)
         ::NEXT_ENUM::
     end
     local strs = {}
     for name, enums in pairs(container) do
-        strs[#strs+1] = ('\n%s: %s'):format(name, enums.type or '')
+        local tp
+        if type(enums.type) == 'table' then
+            tp = table.concat(enums.type, '/')
+        else
+            tp = enums.type
+        end
+        strs[#strs+1] = ('\n%s: %s'):format(name, tp or 'any')
         for _, enum in ipairs(enums) do
             if enum.default then
                 strs[#strs+1] = '\n  -> '
             else
                 strs[#strs+1] = '\n   | '
             end
-            strs[#strs+1] = ('%q -- %s'):format(enum.enum, enum.description or '')
+            if enum.code then
+                strs[#strs+1] = tostring(enum.code)
+            else
+                strs[#strs+1] = ('%q'):format(enum.enum)
+            end
+            if enum.description then
+                strs[#strs+1] = ' -- ' .. enum.description
+            end
         end
     end
     return table.concat(strs)

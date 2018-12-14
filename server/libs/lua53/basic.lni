@@ -203,16 +203,58 @@ name = 'result'
 type = '...'
 
 [print]
+[[.args]]
+type = '...'
 
 [rawequal]
+[[.args]]
+name = 'v1'
+[[.args]]
+name = 'v2'
+[[.returns]]
+type = 'boolean'
 
 [rawget]
+[[.args]]
+name = 'table'
+type = 'table'
+[[.args]]
+name = 'index'
+[[.returns]]
 
 [rawlen]
+[[.args]]
+name = 'v'
+type = {'table', 'string'}
+[[.returns]]
+name = 'len'
+type = 'integer'
 
 [rawset]
+[[.args]]
+name = 'table'
+type = 'table'
+[[.args]]
+name = 'index'
+[[.args]]
+name = 'value'
+[[.returns]]
+name = 'table'
+type = 'table'
 
 [select]
+[[.args]]
+name = 'index'
+type = {'string', 'integer'}
+[[.args]]
+type = '...'
+[[.returns]]
+[[.enums]]
+name = 'index'
+enum = '#'
+[[.enums]]
+name = 'index'
+code = 'integer'
 
 [setmetatable]
 special = 'setmetatable'
@@ -226,13 +268,73 @@ type = 'table'
 type = 'table'
 
 [tonumber]
+[[.args]]
+name = 'e'
+type = {'string', 'number'}
+[[.args]]
+name = 'base'
+type = 'integer'
+optional = 'self'
+[[.returns]]
+type = 'number'
 
 [tostring]
+[[.args]]
+name = 'v'
+[[.returns]]
+type = 'string'
 
 [type]
+[[.args]]
+name = 'v'
+[[.returns]]
+name = 'type'
+type = 'string'
+[[.enums]]
+name = 'type'
+enum = 'nil'
+[[.enums]]
+name = 'type'
+enum = 'number'
+[[.enums]]
+name = 'type'
+enum = 'string'
+[[.enums]]
+name = 'type'
+enum = 'boolean'
+[[.enums]]
+name = 'type'
+enum = 'table'
+[[.enums]]
+name = 'type'
+enum = 'function'
+[[.enums]]
+name = 'type'
+enum = 'thread'
+[[.enums]]
+name = 'type'
+enum = 'userdata'
 
 [_VERSION]
 type = 'string'
 value = 'Lua5.3'
 
 [xpcall]
+[[.args]]
+name = 'f'
+type = 'function'
+[[.args]]
+name = 'msgh'
+type = 'function'
+[[.args]]
+name = 'arg1'
+optional = 'after'
+[[.args]]
+type = '...'
+[[.returns]]
+name = 'success'
+type = 'boolean'
+[[.returns]]
+name = 'result'
+[[.returns]]
+type = '...'

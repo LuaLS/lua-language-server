@@ -168,7 +168,7 @@ function load(chunk: string/function [, chunkname: string [, mode: string [, env
   -> function, error_message: string
 
 mode: string
-   | "b" -- 
-   | "t" -- 
-   | "bt" -- 
+   | "b"
+   | "t"
+   | "bt"
 ]=]

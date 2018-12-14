@@ -145,6 +145,11 @@ local function buildValueName(result, source)
         end
 
         local parentName = declarat.parentName
+
+        if not parentName then
+            return result.key or ''
+        end
+
         if parentName == '?' then
             local parentType = result.parentValue and result.parentValue.type
             if parentType == 'table' then

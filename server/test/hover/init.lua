@@ -153,3 +153,9 @@ TEST [[
 local <?v?> = collectgarbage()
 ]]
 "nil v"
+
+TEST [[
+local <!type!>
+w2l:get_default()[<?type?>]
+]]
+"any type"

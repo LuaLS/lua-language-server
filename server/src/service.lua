@@ -41,6 +41,9 @@ function mt:_callMethod(name, params)
         if suc then
             return res
         else
+            log.dbueg(('Task [%s] failed, params: %s'):format(
+                name, table.dump(params)
+            ))
             return nil, {
                 code = ErrorCodes.InternalError,
                 message = res,

@@ -553,7 +553,7 @@ function mt:getLibValue(lib, parentType, v)
     elseif tp == 'nil' then
         value = self:createValue('nil')
     else
-        value = self:createValue(tp)
+        value = self:createValue(tp or 'any')
     end
     self.libraryValue[lib] = value
     value.lib = lib
@@ -610,7 +610,9 @@ function mt:unpackDots(res, expect)
 end
 
 function mt:unpackList(list, expect)
-    local res = {}
+    local res = {
+        type = 'list',
+    }
     if list.type == 'list' or list.type == 'call' then
         for i, exp in ipairs(list) do
             if exp.type == '...' then
@@ -948,21 +950,10 @@ function mt:doLoop(action)
 end
 
 function mt:doIn(action)
-    local func
-    local list = {
-        type = 'list'
-    }
-    if action.exp.type == 'list' then
-        func = self:getExp(action.exp[1])
-        for i = 2, #action.exp do
-            list[i-1] = action.exp[i]
-        end
-    else
-        func = self:getExp(action.exp)
-    end
+    local args = self:unpackList(action.exp)
 
     self.scope:push()
-    local args = self:unpackList(list)
+    local func = table.remove(args, 1) or self:createValue('any')
     local values = self:call(func, args)
     self:forList(action.arg, function (arg)
         local value = table.remove(values, 1)

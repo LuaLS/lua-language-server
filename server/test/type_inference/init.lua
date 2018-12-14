@@ -172,3 +172,8 @@ local function x(a, ...)
 end
 local _, _, _, <?b?>, _ = x(nil, true, 1, 'yy')
 ]]
+
+TEST 'integer' [[
+for <?i?> in ipairs(t) do
+end
+]]

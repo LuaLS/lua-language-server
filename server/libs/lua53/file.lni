@@ -1,4 +1,3 @@
-
 <default>
 type = 'function'
 [[.parent]]
@@ -6,10 +5,12 @@ type = 'object'
 name = 'FILE*'
 
 [close]
+[[.args]]
+type = 'FILE*'
 [[.returns]]
 name = 'suc'
 type = 'boolean'
-default = 'true'
+default = true
 optional = 'after'
 [[.returns]]
 name = 'type'
@@ -24,12 +25,15 @@ type = 'type'
 enum = 'signal'
 
 [flush]
+[[.args]]
+type = 'FILE*'
 
 [lines]
 [[.args]]
+type = 'FILE*'
+[[.args]]
 name = 'mode'
 type = '...'
-default = 'l'
 [[.returns]]
 type = 'function'
 returns = {
@@ -43,16 +47,11 @@ name = 'mode'
 enum = 'n'
 [[.enums]]
 name = 'mode'
-enum = 'n'
-[[.enums]]
-name = 'mode'
-enum = 'i'
-[[.enums]]
-name = 'mode'
 enum = 'a'
 [[.enums]]
 name = 'mode'
 enum = 'l'
+default = true
 [[.enums]]
 name = 'mode'
 enum = 'L'
@@ -62,26 +61,24 @@ code = 'number'
 
 [read]
 [[.args]]
+type = 'FILE*'
+[[.args]]
 name = 'mode'
 type = '...'
-default = 'l'
 [[.returns]]
 type = {'string', 'number'}
+[[.returns]]
+type = '...'
 [[.enums]]
 name = 'mode'
 enum = 'n'
-[[.enums]]
-name = 'mode'
-enum = 'n'
-[[.enums]]
-name = 'mode'
-enum = 'i'
 [[.enums]]
 name = 'mode'
 enum = 'a'
 [[.enums]]
 name = 'mode'
 enum = 'l'
+default = true
 [[.enums]]
 name = 'mode'
 enum = 'L'
@@ -91,9 +88,10 @@ code = 'number'
 
 [seek]
 [[.args]]
+type = 'FILE*'
+[[.args]]
 name = 'whence'
 type = 'string'
-default = 'cur'
 optional = 'after'
 [[.args]]
 name = 'offset'
@@ -113,11 +111,14 @@ enum = 'set'
 [[.enums]]
 name = 'whence'
 enum = 'cur'
+default = true
 [[.enums]]
 name = 'whence'
 enum = 'end'
 
 [setvbuf]
+[[.args]]
+type = 'FILE*'
 [[.args]]
 name = 'mode'
 type = 'string'
@@ -135,6 +136,8 @@ name = 'mode'
 enum = 'line'
 
 [write]
+[[.args]]
+type = 'FILE*'
 [[.args]]
 type = '...'
 [[.returns]]

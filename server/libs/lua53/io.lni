@@ -149,6 +149,8 @@ name = 'mode'
 type = '...'
 [[.returns]]
 type = {'string', 'number'}
+[[.returns]]
+type = '...'
 [[.enums]]
 name = 'mode'
 enum = 'n'

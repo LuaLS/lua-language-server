@@ -88,7 +88,7 @@ enum = 'w'
 description = 'Write data to this program by `file`.'
 
 [read]
-description = 'Reads the file file, according to the given formats, which specify what to read.'
+description = 'Reads the `file`, according to the given formats, which specify what to read.'
 [[.enums]]
 name = 'mode'
 enum = 'n'

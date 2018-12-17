@@ -1,1 +1,36 @@
-[coroutine]
+[create]
+description = 'Creates a new coroutine.'
+
+[isyieldable]
+description = 'Returns true when the running coroutine can yield.'
+
+[resume]
+description = 'Starts or continues the execution of coroutine co.'
+
+[running]
+description = 'Returns the running coroutine plus a boolean, true when the running coroutine is the main one.'
+
+[status]
+description = 'Returns the status of coroutine co.'
+[[.enums]]
+name = 'status'
+enum = 'running'
+description = 'Is running.'
+[[.enums]]
+name = 'status'
+enum = 'suspended'
+description = 'Is suspended or not started.'
+[[.enums]]
+name = 'status'
+enum = 'normal'
+description = 'Is active but not running.'
+[[.enums]]
+name = 'status'
+enum = 'dead'
+description = 'Has finished or stopped with an error.'
+
+[wrap]
+description = 'Creates a new coroutine.'
+
+[yield]
+description = 'Suspends the execution of the calling coroutine.'

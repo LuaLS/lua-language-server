@@ -1,5 +1,220 @@
-[default]
-type = 'function'
-
 [debug]
 type = 'table'
+[[.source]]
+type = 'global'
+[[.source]]
+type = 'library'
+name = 'debug'
+
+[default]
+type = 'function'
+[[.parent]]
+type = 'global'
+name = 'debug'
+[[.parent]]
+type = 'library'
+name = 'debug'
+
+["debug.debug"]
+name = 'debug'
+
+[gethook]
+[[.args]]
+type = 'thread'
+optional = 'self'
+[[.returns]]
+name = 'hook'
+type = 'function'
+[[.returns]]
+name = 'mask'
+type = 'string'
+[[.returns]]
+name = 'count'
+type = 'integer'
+
+[getinfo]
+[[.args]]
+type = 'thread'
+optional = 'self'
+[[.args]]
+name = 'f'
+type = {'integer', 'function'}
+[[.args]]
+name = 'what'
+type = 'string'
+optional = 'self'
+[[.returns]]
+name = 'info'
+type = 'table'
+[[.enums]]
+name = 'what'
+enum = 'n'
+[[.enums]]
+name = 'what'
+enum = 'S'
+[[.enums]]
+name = 'what'
+enum = 'l'
+[[.enums]]
+name = 'what'
+enum = 't'
+[[.enums]]
+name = 'what'
+enum = 'u'
+[[.enums]]
+name = 'what'
+enum = 'f'
+[[.enums]]
+name = 'what'
+enum = 'L'
+
+[getlocal]
+[[.args]]
+type = 'thread'
+optional = 'self'
+[[.args]]
+name = 'f'
+type = {'integer', 'function'}
+[[.args]]
+name = 'local'
+type = 'integer'
+
+[getmetatable]
+[[.args]]
+name = 'value'
+[[.returns]]
+name = 'metatable'
+type = 'table'
+
+[getregistry]
+[[.returns]]
+type = 'table'
+
+[getupvalue]
+[[.args]]
+name = 'f'
+type = 'function'
+[[.args]]
+name = 'up'
+type = 'integer'
+[[.returns]]
+name = 'name'
+type = 'string'
+[[.returns]]
+name = 'value'
+
+[getuservalue]
+[[.args]]
+name = 'u'
+type = 'userdata'
+[[.returns]]
+
+[sethook]
+[[.args]]
+type = 'thread'
+optional = 'self'
+[[.args]]
+name = 'hook'
+type = 'function'
+[[.args]]
+name = 'mask'
+type = 'string'
+[[.args]]
+name = 'count'
+type = 'integer'
+optional = 'self'
+[[.enums]]
+name = 'mask'
+enum = 'c'
+[[.enums]]
+name = 'mask'
+enum = 'r'
+[[.enums]]
+name = 'mask'
+enum = 'l'
+
+[setlocal]
+[[.args]]
+type = 'thread'
+optional = 'self'
+[[.args]]
+name = 'level'
+type = 'integer'
+[[.args]]
+name = 'local'
+type = 'integer'
+[[.args]]
+name = 'value'
+[[.returns]]
+name = 'name'
+type = 'string'
+
+[setmetatable]
+[[.args]]
+name = 'value'
+[[.args]]
+type = 'table'
+[[.returns]]
+name = 'value'
+
+[setupvalue]
+[[.args]]
+name = 'f'
+type = 'function'
+[[.args]]
+name = 'up'
+type = 'integer'
+[[.args]]
+name = 'value'
+[[.returns]]
+name = 'name'
+type = 'string'
+
+[setuservalue]
+[[.args]]
+name = 'udata'
+type = 'userdata'
+[[.args]]
+name = 'value'
+[[.returns]]
+name = 'udata'
+type = 'userdata'
+
+[traceback]
+[[.args]]
+type = 'thread'
+optional = 'self'
+[[.args]]
+name = 'message'
+optional = 'after'
+[[.args]]
+name = 'level'
+optional = 'self'
+default = 1
+[[.returns]]
+name = 'message'
+
+[upvalueid]
+[[.args]]
+name = 'f'
+type = 'function'
+[[.args]]
+name = 'n'
+type = 'integer'
+[[.returns]]
+name = 'id'
+type = 'userdata'
+
+[upvaluejoin]
+[[.args]]
+name = 'f1'
+type = 'function'
+[[.args]]
+name = 'n1'
+type = 'integer'
+[[.args]]
+name = 'f2'
+type = 'function'
+[[.args]]
+name = 'n2'
+type = 'integer'

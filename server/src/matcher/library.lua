@@ -117,7 +117,7 @@ end
 
 local function fix(libs)
     for name, lib in pairs(libs) do
-        lib.name = name
+        lib.name = lib.name or name
         lib.child = {}
     end
 end

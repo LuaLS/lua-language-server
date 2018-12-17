@@ -79,7 +79,11 @@ local function buildLibReturns(lib)
         if rtn.name then
             strs[#strs+1] = ('%s: '):format(rtn.name)
         end
-        strs[#strs+1] = rtn.type or 'any'
+        if type(rtn.type) == 'table' then
+            strs[#strs+1] = table.concat(rtn.type, '/')
+        else
+            strs[#strs+1] = rtn.type or 'any'
+        end
         if rtn.default then
             strs[#strs+1] = ('(%q)'):format(rtn.default)
         end

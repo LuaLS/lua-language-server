@@ -32,7 +32,7 @@ optional = 'self'
 [[.returns]]
 name = 'suc'
 type = 'boolean'
-default = 'true'
+default = true
 optional = 'after'
 [[.returns]]
 name = 'type'
@@ -55,6 +55,7 @@ type = {'string', 'FILE*'}
 optional = 'self'
 [[.returns]]
 type = 'FILE*'
+optional = 'self'
 
 [lines]
 [[.args]]
@@ -64,7 +65,6 @@ optional = 'after'
 [[.args]]
 name = 'mode'
 type = '...'
-default = 'l'
 [[.returns]]
 type = 'function'
 returns = {
@@ -78,16 +78,11 @@ name = 'mode'
 enum = 'n'
 [[.enums]]
 name = 'mode'
-enum = 'n'
-[[.enums]]
-name = 'mode'
-enum = 'i'
-[[.enums]]
-name = 'mode'
 enum = 'a'
 [[.enums]]
 name = 'mode'
 enum = 'l'
+default = true
 [[.enums]]
 name = 'mode'
 enum = 'L'
@@ -109,6 +104,7 @@ type = 'FILE*'
 [[.enums]]
 name = 'mode'
 enum = 'r'
+default = true
 [[.enums]]
 name = 'mode'
 enum = 'w'
@@ -136,9 +132,13 @@ name = 'mode'
 type = 'string'
 optional = 'self'
 default = 'r'
+[[.returns]]
+name = 'file'
+type = 'FILE*'
 [[.enums]]
 name = 'mode'
 enum = 'r'
+default = true
 [[.enums]]
 name = 'mode'
 enum = 'w'
@@ -147,7 +147,6 @@ enum = 'w'
 [[.args]]
 name = 'mode'
 type = '...'
-default = 'l'
 [[.returns]]
 type = {'string', 'number'}
 [[.enums]]
@@ -155,16 +154,11 @@ name = 'mode'
 enum = 'n'
 [[.enums]]
 name = 'mode'
-enum = 'n'
-[[.enums]]
-name = 'mode'
-enum = 'i'
-[[.enums]]
-name = 'mode'
 enum = 'a'
 [[.enums]]
 name = 'mode'
 enum = 'l'
+default = true
 [[.enums]]
 name = 'mode'
 enum = 'L'

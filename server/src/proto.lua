@@ -14,6 +14,7 @@ local log = setmetatable({}, {__index = function (self, level)
             buf   = buf,
         })
     end
+    return self[level]
 end})
 
 local function readProtoHeader()

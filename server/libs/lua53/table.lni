@@ -65,6 +65,9 @@ type = 'integer'
 name = 'a2'
 type = 'table'
 optional = 'self'
+[[.returns]]
+name = 'a2'
+type = 'table'
 
 [pack]
 [[.args]]

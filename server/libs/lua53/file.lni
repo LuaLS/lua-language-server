@@ -1,34 +1,11 @@
-[io]
-type = 'table'
-[[.source]]
-type = 'global'
-[[.source]]
-type = 'library'
-name = 'io'
 
 <default>
 type = 'function'
 [[.parent]]
-type = 'global'
-name = 'io'
-[[.parent]]
-type = 'library'
-name = 'io'
-
-[stdin]
-type = 'FILE*'
-
-[stdout]
-type = 'FILE*'
-
-[stderr]
-type = 'FILE*'
+type = 'object'
+name = 'FILE*'
 
 [close]
-[[.args]]
-name = 'file'
-type = 'FILE*'
-optional = 'self'
 [[.returns]]
 name = 'suc'
 type = 'boolean'
@@ -48,19 +25,7 @@ enum = 'signal'
 
 [flush]
 
-[input]
-[[.args]]
-name = 'file'
-type = {'string', 'FILE*'}
-optional = 'self'
-[[.returns]]
-type = 'FILE*'
-
 [lines]
-[[.args]]
-name = 'filename'
-type = 'string'
-optional = 'after'
 [[.args]]
 name = 'mode'
 type = '...'
@@ -95,54 +60,6 @@ enum = 'L'
 name = 'mode'
 code = 'number'
 
-[open]
-[[.args]]
-name = 'filename'
-type = 'string'
-[[.args]]
-name = 'mode'
-type = 'string'
-optional = 'self'
-default = 'r'
-[[.returns]]
-type = 'FILE*'
-[[.enums]]
-name = 'mode'
-enum = 'r'
-[[.enums]]
-name = 'mode'
-enum = 'w'
-[[.enums]]
-name = 'mode'
-enum = 'a'
-[[.enums]]
-name = 'mode'
-enum = 'r+'
-[[.enums]]
-name = 'mode'
-enum = 'w+'
-[[.enums]]
-name = 'mode'
-enum = 'a+'
-
-[output:input]
-
-[popen]
-[[.args]]
-name = 'prog'
-type = 'string'
-[[.args]]
-name = 'mode'
-type = 'string'
-optional = 'self'
-default = 'r'
-[[.enums]]
-name = 'mode'
-enum = 'r'
-[[.enums]]
-name = 'mode'
-enum = 'w'
-
 [read]
 [[.args]]
 name = 'mode'
@@ -172,26 +89,50 @@ enum = 'L'
 name = 'mode'
 code = 'number'
 
-[tmpfile]
-[[.returns]]
-type = 'FILE*'
-
-[type]
+[seek]
 [[.args]]
-name = 'obj'
-type = 'FILE*'
-[[.returns]]
-name = 'type'
+name = 'whence'
 type = 'string'
+default = 'cur'
+optional = 'after'
+[[.args]]
+name = 'offset'
+type = 'integer'
+default = 0
+optional = 'self'
+[[.returns]]
+name = 'offset'
+type = 'integer'
+[[.returns]]
+name = 'errmsg'
+type = 'string'
+optional = 'self'
 [[.enums]]
-name = 'type'
-enum = 'file'
+name = 'whence'
+enum = 'set'
 [[.enums]]
-name = 'type'
-enum = 'closed file'
+name = 'whence'
+enum = 'cur'
 [[.enums]]
-name = 'type'
-code = 'nil'
+name = 'whence'
+enum = 'end'
+
+[setvbuf]
+[[.args]]
+name = 'mode'
+type = 'string'
+[[.args]]
+name = 'size'
+type = 'integer'
+[[.enums]]
+name = 'mode'
+enum = 'no'
+[[.enums]]
+name = 'mode'
+enum = 'full'
+[[.enums]]
+name = 'mode'
+enum = 'line'
 
 [write]
 [[.args]]

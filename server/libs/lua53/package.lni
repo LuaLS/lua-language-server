@@ -1,0 +1,60 @@
+[package]
+type = 'table'
+[[.source]]
+type = 'global'
+[[.source]]
+type = 'library'
+name = 'package'
+
+<default>
+type = 'function'
+[[.parent]]
+type = 'global'
+name = 'package'
+[[.parent]]
+type = 'library'
+name = 'package'
+
+[config]
+type = 'string'
+
+[cpath]
+type = 'string'
+
+[loaded]
+type = 'table'
+
+[loadlib]
+[[.args]]
+name = 'libname'
+type = 'string'
+[[.args]]
+name = 'funcname'
+type = 'string'
+[[.returns]]
+
+[path]
+type = 'string'
+
+[preload]
+type = 'table'
+
+[searchers]
+type = 'table'
+
+[searchpath]
+[[.args]]
+name = 'name'
+type = 'string'
+[[.args]]
+name = 'path'
+type = 'string'
+[[.args]]
+name = 'sep'
+type = 'string'
+optional = 'after'
+default = '.'
+[[.args]]
+name = 'rep'
+type = 'string'
+optional = 'self'

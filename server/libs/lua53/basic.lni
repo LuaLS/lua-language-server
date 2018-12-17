@@ -338,3 +338,10 @@ type = 'boolean'
 name = 'result'
 [[.returns]]
 type = '...'
+
+[require]
+special = 'require'
+[[.args]]
+name = 'modname'
+type = 'string'
+[[.returns]]

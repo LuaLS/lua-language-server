@@ -1,5 +1,151 @@
-<default>
-type = 'function'
-
 [os]
 type = 'table'
+[[.source]]
+type = 'global'
+[[.source]]
+type = 'library'
+name = 'os'
+
+<default>
+type = 'function'
+[[.parent]]
+type = 'global'
+name = 'os'
+[[.parent]]
+type = 'library'
+name = 'os'
+
+[clock]
+[[.returns]]
+type = 'number'
+
+[data]
+[[.args]]
+name = 'format'
+type = 'string'
+optional = 'after'
+[[.args]]
+name = 'time'
+type = 'integer'
+optional = 'self'
+[[.returns]]
+type = 'string'
+
+[difftime]
+[[.args]]
+name = 't2'
+type = 'integer'
+[[.args]]
+name = 't1'
+type = 'integer'
+[[.returns]]
+type = 'integer'
+
+[execute]
+[[.args]]
+name = 'command'
+type = 'string'
+optional = 'self'
+[[.returns]]
+name = 'suc'
+type = 'boolean'
+default = 'true'
+optional = 'after'
+[[.returns]]
+name = 'type'
+type = 'string'
+[[.returns]]
+name = 'code'
+[[.enums]]
+type = 'type'
+enum = 'exit'
+[[.enums]]
+type = 'type'
+enum = 'signal'
+
+[exit]
+[[.args]]
+name = 'code'
+type = {'boolean', 'integer'}
+optional = 'after'
+default = true
+[[.args]]
+name = 'close'
+type = 'boolean'
+optional = 'self'
+
+[getenv]
+[[.args]]
+name = 'varname'
+type = 'string'
+[[.returns]]
+type = 'string'
+
+[remove]
+[[.args]]
+name = 'filename'
+type = 'string'
+[[.returns]]
+name = 'suc'
+type = 'boolean'
+[[.returns]]
+name = 'errmsg'
+type = 'string'
+optional = 'self'
+
+[rename]
+[[.args]]
+name = 'oldname'
+type = 'string'
+[[.args]]
+name = 'newname'
+type = 'string'
+[[.returns]]
+name = 'suc'
+type = 'boolean'
+[[.returns]]
+name = 'errmsg'
+type = 'string'
+optional = 'self'
+
+[setlocale]
+[[.args]]
+name = 'locale'
+type = 'string'
+[[.args]]
+name = 'category'
+type = 'string'
+optional = 'self'
+default = 'all'
+[[.returns]]
+name = 'locale'
+type = 'string'
+[[.enums]]
+name = 'category'
+enum = 'all'
+[[.enums]]
+name = 'category'
+enum = 'collate'
+[[.enums]]
+name = 'category'
+enum = 'ctype'
+[[.enums]]
+name = 'category'
+enum = 'monetary'
+[[.enums]]
+name = 'category'
+enum = 'numeric'
+[[.enums]]
+name = 'category'
+enum = 'time'
+
+[time]
+[[.args]]
+type = 'table'
+optional = 'self'
+[[.returns]]
+type = 'integer'
+
+[tmpname]
+[[.returns]]
+type = 'string'

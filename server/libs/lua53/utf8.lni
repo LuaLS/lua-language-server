@@ -1,5 +1,96 @@
-<default>
-type = 'function'
-
 [utf8]
 type = 'table'
+[[.source]]
+type = 'global'
+[[.source]]
+type = 'library'
+name = 'utf8'
+
+<default>
+type = 'function'
+[[.parent]]
+type = 'global'
+name = 'utf8'
+[[.parent]]
+type = 'library'
+name = 'utf8'
+
+[char]
+[[.args]]
+name = 'code'
+type = 'integer'
+[[.args]]
+type = '...'
+[[.returns]]
+type = 'string'
+
+[charpattern]
+type = 'string'
+value = [=[[\0-\x7F\xC2-\xF4][\x80-\xBF]*]=]
+
+[codes]
+[[.args]]
+type = 'string'
+[[.returns]]
+type = 'function'
+returns = {
+    1 = {
+        name = 'p',
+        type = 'integer',
+    },
+    2 = {
+        name = 'c',
+        type = 'integer',
+    }
+}
+
+[codepoint]
+[[.args]]
+type = 'string'
+[[.args]]
+name = 'i'
+type = 'integer'
+optional = 'after'
+default = 1
+[[.args]]
+name = 'j'
+type = 'integer'
+optional = 'self'
+[[.returns]]
+name = 'code'
+type = 'integer'
+[[.returns]]
+type = '...'
+
+[len]
+[[.args]]
+type = 'string'
+[[.args]]
+name = 'i'
+type = 'integer'
+optional = 'after'
+default = 1
+[[.args]]
+name = 'j'
+type = 'integer'
+optional = 'self'
+default = -1
+[[.returns]]
+type = 'integer'
+[[.returns]]
+name = 'errpos'
+type = 'integer'
+optional = 'self'
+
+[offset]
+[[.args]]
+type = 'string'
+[[.args]]
+name = 'n'
+type = 'integer'
+[[.args]]
+name = 'i'
+type = 'integer'
+[[.returns]]
+name = 'p'
+type = 'integer'

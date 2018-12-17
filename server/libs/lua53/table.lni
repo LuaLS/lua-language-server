@@ -15,6 +15,27 @@ name = 'table'
 type = 'library'
 name = 'table'
 
+[concat]
+[[.args]]
+name = 'list'
+type = 'table'
+[[.args]]
+name = 'sep'
+type = 'string'
+optional = 'after'
+default = ''
+[[.args]]
+name = 'i'
+type = 'integer'
+optional = 'after'
+default = 1
+[[.args]]
+name = 'j'
+type = 'integer'
+optional = 'self'
+[[.returns]]
+type = 'string'
+
 [insert]
 [[.args]]
 name = 'list'
@@ -26,3 +47,60 @@ optional = 'self'
 [[.args]]
 name = 'value'
 type = 'any'
+
+[move]
+[[.args]]
+name = 'a1'
+type = 'table'
+[[.args]]
+name = 'f'
+type = 'integer'
+[[.args]]
+name = 'e'
+type = 'integer'
+[[.args]]
+name = 't'
+type = 'integer'
+[[.args]]
+name = 'a2'
+type = 'table'
+optional = 'self'
+
+[pack]
+[[.args]]
+type = '...'
+[[.returns]]
+type = 'table'
+
+[remove]
+[[.args]]
+name = 'list'
+type = 'table'
+[[.args]]
+name = 'pos'
+type = 'integer'
+optional = 'self'
+[[.returns]]
+
+[sort]
+[[.args]]
+name = 'list'
+type = 'table'
+[[.args]]
+name = 'comp'
+type = 'function'
+optional = 'self'
+
+[unpack]
+[[.args]]
+name = 'list'
+type = 'table'
+[[.args]]
+name = 'i'
+type = 'integer'
+optional = 'after'
+type = 1
+[[.args]]
+name = 'j'
+type = 'integer'
+optional = 'self'

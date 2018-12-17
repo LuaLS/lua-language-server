@@ -65,6 +65,14 @@ local function mergeSource(alllibs, name, lib)
     end
 end
 
+local function copy(t)
+    local new = {}
+    for k, v in pairs(t) do
+        new[k] = v
+    end
+    return new
+end
+
 local function insert(tbl, name, key, value)
     if not name or not key then
         return
@@ -76,7 +84,7 @@ local function insert(tbl, name, key, value)
             child = {},
         }
     end
-    tbl[name].child[key] = value
+    tbl[name].child[key] = copy(value)
 end
 
 local function mergeParent(alllibs, name, lib)

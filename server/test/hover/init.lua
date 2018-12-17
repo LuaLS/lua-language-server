@@ -172,3 +172,11 @@ mode: string
    | "t"
    | "bt"
 ]=]
+
+TEST [[
+string.<?lower?>()
+]]
+[[
+function string.lower(string)
+  -> string
+]]

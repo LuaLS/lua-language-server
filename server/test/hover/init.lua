@@ -179,4 +179,5 @@ string.<?lower?>()
 [[
 function string.lower(string)
   -> string
+Returns a copy of this string with all uppercase letters changed to lowercase.
 ]]

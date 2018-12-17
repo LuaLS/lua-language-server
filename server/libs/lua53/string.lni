@@ -70,6 +70,7 @@ default = 1
 [[.args]]
 name = 'plain'
 type = 'boolean'
+optional = 'self'
 [[.returns]]
 name = 'start'
 type = 'integer'
@@ -77,6 +78,7 @@ type = 'integer'
 name = 'end'
 type = 'integer'
 [[.returns]]
+name = 'captured'
 type = '...'
 
 [format]
@@ -146,6 +148,7 @@ type = 'integer'
 optional = 'self'
 default = 1
 [[.returns]]
+name = 'captured'
 type = 'string'
 
 [pack]
@@ -216,6 +219,7 @@ type = 'string'
 name = 'pos'
 type = 'integer'
 optional = 'self'
+default = 1
 [[.returns]]
 type = '...'
 [[.returns]]

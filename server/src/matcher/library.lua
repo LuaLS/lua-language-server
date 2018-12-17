@@ -95,11 +95,11 @@ local function mergeLibs(alllibs, libs)
     if not libs then
         return
     end
-    for name, lib in pairs(libs) do
+    for _, lib in pairs(libs) do
         if lib.parent then
-            mergeParent(alllibs, name, lib)
+            mergeParent(alllibs, lib.name, lib)
         else
-            mergeSource(alllibs, name, lib)
+            mergeSource(alllibs, lib.name, lib)
         end
     end
 end

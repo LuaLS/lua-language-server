@@ -26,7 +26,7 @@ type = 'string'
 
 [charpattern]
 type = 'string'
-value = [=[[\0-\x7F\xC2-\xF4][\x80-\xBF]*]=]
+code = [=['[\0-\x7F\xC2-\xF4][\x80-\xBF]*']=]
 
 [codes]
 [[.args]]

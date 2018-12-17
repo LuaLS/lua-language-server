@@ -330,10 +330,10 @@ local function getValueHover(name, valueType, result, source, lib)
     local value
     local tip
     if lib then
-        value = lib.value
+        value = lib.code or (lib.value and ('%q'):format(lib.value))
         tip = lib.description or ''
     else
-        value = result.value.value
+        value = result.value.value and ('%q'):format(result.value.value)
         tip = ''
     end
 
@@ -341,7 +341,7 @@ local function getValueHover(name, valueType, result, source, lib)
     if value == nil then
         text = ('%s %s'):format(valueType, name)
     else
-        text = ('%s %s = %q'):format(valueType, name, value)
+        text = ('%s %s = %s'):format(valueType, name, value)
     end
     return ([[
 ```lua

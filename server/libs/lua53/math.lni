@@ -1,5 +1,214 @@
-<default>
-type = 'function'
-
 [math]
 type = 'table'
+[[.source]]
+type = 'global'
+[[.source]]
+type = 'library'
+name = 'math'
+
+<default>
+type = 'function'
+[[.parent]]
+type = 'global'
+name = 'math'
+[[.parent]]
+type = 'library'
+name = 'math'
+
+[abs]
+[[.args]]
+name = 'x'
+type = 'number'
+[[.returns]]
+type = 'number'
+
+[acos]
+[[.args]]
+name = 'x'
+type = 'number'
+[[.returns]]
+type = 'number'
+
+[atan]
+[[.args]]
+name = 'y'
+type = 'number'
+[[.args]]
+name = 'x'
+type = 'number'
+optional = 'self'
+default = 1
+[[.returns]]
+type = 'number'
+
+[ceil]
+[[.args]]
+name = 'x'
+type = 'number'
+[[.returns]]
+type = 'integer'
+
+[cos]
+[[.args]]
+name = 'x'
+type = 'number'
+[[.returns]]
+type = 'number'
+
+[deg]
+[[.args]]
+name = 'x'
+type = 'number'
+[[.returns]]
+type = 'number'
+
+[exp]
+[[.args]]
+name = 'x'
+type = 'number'
+[[.returns]]
+type = 'number'
+
+[floor]
+[[.args]]
+name = 'x'
+type = 'number'
+[[.returns]]
+type = 'integer'
+
+[fmod]
+[[.args]]
+name = 'x'
+type = 'number'
+[[.returns]]
+type = 'number'
+
+[huge]
+type = 'number'
+
+[log]
+[[.args]]
+name = 'x'
+type = 'number'
+[[.args]]
+name = 'base'
+type = 'number'
+optional = 'self'
+default = 'e'
+[[.returns]]
+type = 'number'
+
+[max]
+[[.args]]
+name = 'x'
+type = 'number'
+[[.args]]
+type = '...'
+[[.returns]]
+type = 'number'
+
+[maxinteger]
+type = 'integer'
+
+[min]
+[[.args]]
+name = 'x'
+type = 'number'
+[[.args]]
+type = '...'
+[[.returns]]
+type = 'number'
+
+[mininteger]
+type = 'integer'
+
+[modf]
+[[.args]]
+name = 'x'
+type = 'number'
+[[.returns]]
+type = 'integer'
+[[.returns]]
+type = 'number'
+
+[pi]
+type = 'number'
+
+[rad]
+[[.args]]
+name = 'x'
+type = 'number'
+[[.returns]]
+type = 'number'
+
+[random]
+[[.args]]
+name = 'm'
+type = 'integer'
+optional = 'after'
+[[.args]]
+name = 'n'
+type = 'integer'
+optional = 'self'
+[[.returns]]
+type = 'number'
+
+[randomseed]
+[[.args]]
+name = 'x'
+type = 'integer'
+
+[sin]
+[[.args]]
+name = 'x'
+type = 'number'
+[[.returns]]
+type = 'number'
+
+[sqrt]
+[[.args]]
+name = 'x'
+type = 'number'
+[[.returns]]
+type = 'number'
+
+[tan]
+[[.args]]
+name = 'x'
+type = 'number'
+[[.returns]]
+type = 'number'
+
+[tointeger]
+[[.args]]
+name = 'x'
+type = 'number'
+[[.returns]]
+type = 'integer'
+
+[type]
+[[.args]]
+name = 'x'
+type = 'number'
+[[.returns]]
+name = 'type'
+type = 'string'
+[[.enums]]
+name = 'type'
+enum = 'integer'
+[[.enums]]
+name = 'type'
+enum = 'float'
+[[.enums]]
+name = 'type'
+code = 'nil'
+
+[ult]
+[[.args]]
+name = 'm'
+type = 'integer'
+[[.args]]
+name = 'n'
+type = 'integer'
+[[.returns]]
+type = 'boolean'

@@ -18,9 +18,181 @@ name = 'string'
 type = 'object'
 name = 'string'
 
+[byte]
+[[.args]]
+type = 'string'
+[[.args]]
+name = 'i'
+type = 'integer'
+optional = 'after'
+default = 1
+[[.args]]
+name = 'j'
+type = 'integer'
+optional = 'self'
+[[.returns]]
+type = 'integer'
+[[.returns]]
+type = '...'
+
+[char]
+[[.args]]
+name = 'byte'
+type = 'integer'
+[[.args]]
+type = '...'
+[[.returns]]
+type = 'string'
+[[.returns]]
+type = '...'
+
+[dump]
+[[.args]]
+type = 'function'
+[[.args]]
+name = 'strip'
+type = 'boolean'
+[[.returns]]
+name = 'binary'
+type = 'string'
+
+[find]
+[[.args]]
+type = 'string'
+[[.args]]
+name = 'pattern'
+type = 'string'
+[[.args]]
+name = 'init'
+type = 'integer'
+optional = 'after'
+default = 1
+[[.args]]
+name = 'plain'
+type = 'boolean'
+[[.returns]]
+name = 'start'
+type = 'integer'
+[[.returns]]
+name = 'end'
+type = 'integer'
+[[.returns]]
+type = '...'
+
+[format]
+[[.args]]
+type = 'string'
+[[.args]]
+type = '...'
+[[.returns]]
+type = 'string'
+
+[gmatch]
+[[.args]]
+type = 'string'
+[[.args]]
+name = 'pattern'
+type = 'string'
+[[.returns]]
+type = 'function'
+returns = {
+    1 = {
+        type = 'string'
+    },
+    2 = {
+        type = '...'
+    },
+}
+
+[gsub]
+[[.args]]
+type = 'string'
+[[.args]]
+name = 'pattern'
+type = 'string'
+[[.args]]
+name = 'repl'
+type = {'string', 'table', 'function'}
+[[.args]]
+name = 'n'
+type = 'integer'
+[[.returns]]
+type = 'string'
+[[.returns]]
+name = 'count'
+type = 'integer'
+
+[len]
+[[.args]]
+type = 'string'
+[[.returns]]
+type = 'integer'
+
+[lower]
+[[.args]]
+type = 'string'
+[[.returns]]
+type = 'string'
+
+[match]
+[[.args]]
+type = 'string'
+[[.args]]
+name = 'pattern'
+type = 'string'
+[[.args]]
+name = 'init'
+type = 'integer'
+optional = 'self'
+default = 1
+[[.returns]]
+type = 'string'
+
+[pack]
+[[.args]]
+name = 'fmt'
+type = 'string'
+[[.args]]
+name = 'v1'
+type = 'string'
+[[.args]]
+name = 'v2'
+type = 'string'
+[[.args]]
+type = '...'
+[[.returns]]
+name = 'binary'
+type = 'string'
+
+[packsize]
+[[.args]]
+name = 'fmt'
+type = 'string'
+[[.returns]]
+type = 'integer'
+
+[rep]
+[[.args]]
+type = 'string'
+[[.args]]
+name = n
+type = 'integer'
+[[.args]]
+name = 'sep'
+type = 'string'
+optional = 'self'
+default = ''
+[[.returns]]
+type = 'string'
+
+[reverse]
+[[.args]]
+type = 'string'
+[[.returns]]
+type = 'string'
+
 [sub]
 [[.args]]
-name = 's'
 type = 'string'
 [[.args]]
 name = 'i'
@@ -30,5 +202,28 @@ name = 'j'
 type = 'integer'
 optional = 'self'
 default = -1
+[[.returns]]
+type = 'string'
+
+[unpack]
+[[.args]]
+name = 'fmt'
+type = 'string'
+[[.args]]
+name = 's'
+type = 'string'
+[[.args]]
+name = 'pos'
+type = 'integer'
+optional = 'self'
+[[.returns]]
+type = '...'
+[[.returns]]
+name = 'offset'
+type = 'integer'
+
+[upper]
+[[.args]]
+type = 'string'
 [[.returns]]
 type = 'string'

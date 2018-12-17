@@ -1,60 +1,150 @@
 [assert]
+description = 'Calls error if the value of its argument is false.'
 
 [collectgarbage]
 [[.enums]]
+name = 'opt'
 enum = 'collect'
-description = 'performs a full garbage-collection cycle. This is the default option.'
+description = 'Performs a full garbage-collection cycle.'
 [[.enums]]
-enum = 'isrunning'
-description = 'returns a boolean that tells whether the collector is running (i.e., not stopped).'
+name = 'opt'
+enum = 'stop'
+description = 'Stops automatic execution.'
 [[.enums]]
+name = 'opt'
+enum = 'restart'
+description = 'Restarts automatic execution.'
+[[.enums]]
+name = 'opt'
 enum = 'count'
-description = 'returns the total memory in use by Lua in Kbytes. The value has a fractional part, so that it multiplied by 1024 gives the exact number of bytes in use by Lua (except for overflows).'
+description = 'Returns the total memory in Kbytes.'
+[[.enums]]
+name = 'opt'
+enum = 'step'
+description = 'Performs a garbage-collection step.'
+[[.enums]]
+name = 'opt'
+enum = 'setpause'
+description = 'Set pause.'
+[[.enums]]
+name = 'opt'
+enum = 'setstepmul'
+description = 'Set step multiplier.'
+[[.enums]]
+name = 'opt'
+enum = 'isrunning'
+description = 'Returns whether the collector is running.'
 
 [dofile]
+description = 'Opens the named file and executes its contents as a Lua chunk.'
 
 [error]
+description = 'Terminates the last protected function called and returns message as the error object.'
 
 [_G]
-description = 'A global variable (not a function) that holds the global environment'
-[[.fields]]
-field = '_G'
-description = 'A global variable (not a function) that holds the global environment'
+description = 'Holds the global environment.'
 
 [getmetatable]
+description = 'Returns the metatable of the given object.'
 
 [ipairs]
+description = [[
+----------------
+```lua
+for i, v in ipairs(t) do
+    body
+end
+```
+]]
 
 [load]
+description = 'Loads a chunk.'
+[[.enums]]
+name = 'mode'
+enum = 'b'
+description = 'Only binary chunks.'
+[[.enums]]
+name = 'mode'
+enum = 't'
+description = 'Only text chunks.'
+[[.enums]]
+name = 'mode'
+enum = 'bt'
+description = 'Both binary and text.'
 
 [loadfile]
+description = 'Loads a chunk from file.'
+[[.enums]]
+name = 'mode'
+enum = 'b'
+description = 'Only binary chunks.'
+[[.enums]]
+name = 'mode'
+enum = 't'
+description = 'Only text chunks.'
+[[.enums]]
+name = 'mode'
+enum = 'bt'
+description = 'Both binary and text.'
 
 [next]
+description = 'Returns the next index of the table and its associated value.'
 
 [pairs]
+description = [[
+----------------
+```lua
+for k, v in pairs(t) do
+    body
+end
+```
+]]
 
 [pcall]
+description = 'Calls function with the given arguments in protected mode.'
 
 [print]
+description = 'Receives any number of arguments and prints their values to stdout.'
 
 [rawequal]
+description = 'Checks whether v1 is equal to v2.'
 
 [rawget]
+description = 'Gets the real value of table[index].'
 
 [rawlen]
+description = 'Returns the length of the object v.'
 
 [rawset]
+description = 'Sets the real value of table[index] to value.'
 
 [select]
+[[.enums]]
+name = 'index'
+enum = '#'
+description = 'Returns the total number of extra arguments.'
+[[.enums]]
+name = 'index'
+code = 'integer'
+description = 'Returns all arguments after number index.'
 
 [setmetatable]
+description = 'Sets the metatable for the given table.'
 
 [tonumber]
+description = 'Tries to convert its argument to a number.'
 
 [tostring]
+description = 'Receives a value of any type and converts it to a string in a human-readable format.'
 
 [type]
+description = 'Returns the type of its only argument, coded as a string.'
 
 [_VERSION]
+description = 'Running Lua version.'
 
 [xpcall]
+description = 'Calls function f with the given arguments in protected mode with a new message handler.'
+
+[require]
+description = 'Loads the given module.'

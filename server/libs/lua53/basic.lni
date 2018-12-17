@@ -123,6 +123,7 @@ enum = 't'
 [[.enums]]
 name = 'mode'
 enum = 'bt'
+default = true
 
 [loadfile]
 [[.args]]
@@ -151,6 +152,7 @@ enum = 't'
 [[.enums]]
 name = 'mode'
 enum = 'bt'
+default = true
 
 [next]
 [[.args]]

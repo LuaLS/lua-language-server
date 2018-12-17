@@ -10,10 +10,16 @@ local function mergeEnum(lib, locale)
         if enum.enum then
             pack[enum.enum] = enum
         end
+        if enum.code then
+            pack[enum.code] = enum
+        end
     end
     for _, enum in ipairs(locale) do
         if pack[enum.enum] then
             pack[enum.enum].description = enum.description
+        end
+        if pack[enum.code] then
+            pack[enum.code].description = enum.description
         end
     end
 end

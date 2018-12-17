@@ -166,11 +166,11 @@ TEST [[
 [=[
 function load(chunk: string/function [, chunkname: string [, mode: string [, env: table]]])
   -> function, error_message: string
-
+Loads a chunk.
 mode: string
-   | "b"
-   | "t"
-   | "bt"
+   | "b" -- Only binary chunks.
+   | "t" -- Only text chunks.
+  -> "bt" -- Both binary and text.
 ]=]
 
 TEST [[

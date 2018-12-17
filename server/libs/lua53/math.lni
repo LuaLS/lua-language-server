@@ -29,6 +29,13 @@ type = 'number'
 [[.returns]]
 type = 'number'
 
+[asin]
+[[.args]]
+name = 'x'
+type = 'number'
+[[.returns]]
+type = 'number'
+
 [atan]
 [[.args]]
 name = 'y'

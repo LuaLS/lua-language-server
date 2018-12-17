@@ -440,6 +440,20 @@ function mt:getCurrentFunction()
     return self.chunk.func
 end
 
+function mt:mergeFunctionReturn(func, index, value)
+    if not func.returns[index] then
+        func.returns[index] = value
+        return
+    end
+    if value.type == 'nil' then
+        return
+    end
+    if value == 'any' and func.returns[index] ~= 'nil' then
+        return
+    end
+    func.returns[index] = value
+end
+
 function mt:setFunctionReturn(func, index, value)
     func.hasReturn = true
     if not func.returns then
@@ -450,13 +464,13 @@ function mt:setFunctionReturn(func, index, value)
     if value then
         if value.type == 'list' then
             for i, v in ipairs(value) do
-                func.returns[index+i-1] = v
+                self:mergeFunctionReturn(func, index+i-1, v)
             end
         else
-            func.returns[index] = value
+            self:mergeFunctionReturn(func, index, value)
         end
     else
-        func.returns[index] = self:createValue('any')
+        self:mergeFunctionReturn(func, index, self:createValue('any'))
     end
 end
 
@@ -482,7 +496,7 @@ function mt:getFunctionReturns(func, i)
 end
 
 function mt:inference(value, type)
-    if value.type == 'any' then
+    if value.type == 'any' and type ~= 'nil' then
         value.type = type
     end
 end

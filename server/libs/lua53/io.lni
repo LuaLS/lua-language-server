@@ -6,7 +6,7 @@ type = 'global'
 type = 'library'
 name = 'io'
 
-[default]
+<default>
 type = 'function'
 [[.parent]]
 type = 'global'

@@ -5,7 +5,7 @@ type = 'library'
 name = 'bee.filesystem'
 nick = 'bee::filesystem'
 
-[default]
+<default>
 type = 'function'
 [[.parent]]
 type = 'library'

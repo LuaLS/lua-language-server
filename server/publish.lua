@@ -143,7 +143,7 @@ print(('复制了[%d]个文件'):format(count))
 
 
 print('更新NodeModules...')
-updateNodeModules(out, postinstall)
+updateNodeModules(out, 'cd client && npm install && cd ..')
 
 print('开始测试...')
 runTest(out / 'server')

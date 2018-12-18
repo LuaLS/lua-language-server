@@ -5,7 +5,7 @@
 	"author": "sumneko",
 	"license": "MIT",
 	"icon": "images/logo.png",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/sumneko/vscode-lua-language-server"
@@ -24,7 +24,6 @@
 	"scripts": {
 		"vscode:prepublish": "cd client && npm run update-vscode && cd ..",
 		"compile": "tsc -b",
-		"watch": "tsc -b -w",
-		"postinstall": "cd client && npm install && cd .."
+		"watch": "tsc -b -w"
 	}
 }

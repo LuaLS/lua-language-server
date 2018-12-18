@@ -50,7 +50,6 @@ function mt:_callMethod(name, params)
             }
         end
     end
-    log.debug(name)
     if optional then
         return nil
     else

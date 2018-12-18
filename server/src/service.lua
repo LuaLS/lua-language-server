@@ -93,13 +93,10 @@ function mt:_doDiagnostic()
         local name = 'textDocument/publishDiagnostics'
         local res  = self:_callMethod(name, data)
         if res then
-            rpc:notify {
-                method = name,
-                params = {
-                    uri = uri,
-                    diagnostics = res,
-                },
-            }
+            rpc:notify(name, {
+                uri = uri,
+                diagnostics = res,
+            })
         end
     end
     local passed = os.clock() - clock

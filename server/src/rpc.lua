@@ -5,18 +5,26 @@ local TIMEOUT = 1.0
 local ID = 0
 local BUF = {}
 
-local function notify(self, data)
-    data.jsonrpc = '2.0'
-    local content = json.encode(data)
+local function notify(self, method, params)
+    local pack = {
+        jsonrpc = '2.0',
+        method = method,
+        params = params,
+    }
+    local content = json.encode(pack)
     local buf = ('Content-Length: %d\r\n\r\n%s'):format(#content, content)
     io.write(buf)
 end
 
-local function request(self, data, callback)
+local function request(self, method, params, callback)
     ID = ID + 1
-    data.jsonrpc = '2.0'
-    data.id = ID
-    local content = json.encode(data)
+    local pack = {
+        jsonrpc = '2.0',
+        id = ID,
+        method = method,
+        params = params,
+    }
+    local content = json.encode(pack)
     local buf = ('Content-Length: %d\r\n\r\n%s'):format(#content, content)
     BUF[ID] = {
         callback = callback,
@@ -36,8 +44,8 @@ end
 local function recieve(self, proto)
     local id = proto.id
     local data = BUF[id]
-    log.warn('Recieve id not found: ', table.dump(proto))
     if not data then
+        log.warn('Recieve id not found: ', table.dump(proto))
         return
     end
     BUF[id] = nil

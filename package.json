@@ -4,6 +4,7 @@
 	"description": "Lua Language Server for VSCode",
 	"author": "sumneko",
 	"license": "MIT",
+	"icon": "images/logo.png",
 	"version": "0.0.1",
 	"repository": {
 		"type": "git",

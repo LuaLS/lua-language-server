@@ -126,3 +126,8 @@ local function x(a, b)
 end
 x(1, 2, <!3!>)
 ]]
+
+TEST [[
+instanceName = 1
+instance = _G[instanceName]
+]]

@@ -27,14 +27,15 @@ local function searchUndefinedGlobal(results, callback)
         if field.value.lib then
             goto NEXT_VAR
         end
-        if type(index) == 'string' then
-            local lIndex = index:lower()
-            if lIndex == 'log' or lIndex == 'arg' then
-                goto NEXT_VAR
-            end
-            if not index:find '%l' then
-                goto NEXT_VAR
-            end
+        if type(index) ~= 'string' then
+            goto NEXT_VAR
+        end
+        local lIndex = index:lower()
+        if lIndex == 'log' or lIndex == 'arg' then
+            goto NEXT_VAR
+        end
+        if not index:find '%l' then
+            goto NEXT_VAR
         end
         if #field >= 3 then
             goto NEXT_VAR

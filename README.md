@@ -13,7 +13,7 @@
 - [x] Rename
 - [ ] Support Dirty Script
 - [ ] Syntax Check
-- [ ] Parameter Prompt
+- [ ] Signature Help
 - [ ] Intelligent
 - [ ] Auto Completion
 

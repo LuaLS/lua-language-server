@@ -11,7 +11,7 @@ local function compileRelease()
         Configuration = 'Release',
         Platform = 'x86'
     }
-    msvc:compile('build', root / 'bee.lua' / 'project' / 'bee.sln', property)
+    msvc:compile('build', root / 'bee.lua' / 'bee.sln', property)
 end
 
 local function copyFile()

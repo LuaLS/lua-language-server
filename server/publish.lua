@@ -26,7 +26,7 @@ local function updateNodeModules(out, postinstall)
 end
 
 local function createDirectory(version)
-    local out = EXTENSION / 'publish' / version / 'lua-language-server'
+    local out = EXTENSION / 'publish' / version
     fs.create_directories(out)
     return out
 end

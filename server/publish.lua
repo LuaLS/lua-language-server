@@ -12,7 +12,7 @@ local json = require 'json'
 local function loadPackage()
     local buf = io.load(EXTENSION / 'package.json')
     local package = json.decode(buf)
-    return package.version, package.scripts.postinstall
+    return package.version
 end
 
 local function updateNodeModules(out, postinstall)
@@ -109,7 +109,7 @@ local function removeFiles(out)
     end
 end
 
-local version, postinstall = loadPackage()
+local version = loadPackage()
 print('版本号为：' .. version)
 
 local out = createDirectory(version)

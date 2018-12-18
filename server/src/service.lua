@@ -1,7 +1,7 @@
 local subprocess = require 'bee.subprocess'
 local method     = require 'method'
 local thread     = require 'thread'
-local json       = require 'json'
+local rpc        = require 'rpc'
 local parser     = require 'parser'
 local matcher    = require 'matcher'
 
@@ -60,13 +60,6 @@ function mt:_callMethod(name, params)
     end
 end
 
-function mt:_send(data)
-    data.jsonrpc = '2.0'
-    local content = json.encode(data)
-    local buf = ('Content-Length: %d\r\n\r\n%s'):format(#content, content)
-    io.write(buf)
-end
-
 function mt:_doProto(proto)
     local id     = proto.id
     local name   = proto.method
@@ -76,13 +69,12 @@ function mt:_doProto(proto)
         return
     end
     local container = table.container()
-    container.id    = id
     if err then
         container.error = err
     else
         container.result = response
     end
-    self:_send(container)
+    rpc:response(id, container)
 end
 
 function mt:_doDiagnostic()
@@ -101,7 +93,7 @@ function mt:_doDiagnostic()
         local name = 'textDocument/publishDiagnostics'
         local res  = self:_callMethod(name, data)
         if res then
-            self:_send {
+            rpc:notify {
                 method = name,
                 params = {
                     uri = uri,
@@ -219,7 +211,13 @@ end
 function mt:on_tick()
     local proto = thread.proto()
     if proto then
-        self:_doProto(proto)
+        if proto.method then
+            self:_doProto(proto)
+        elseif proto.result or proto.error then
+            rpc:recieve(proto)
+        else
+            log.warn('Unknow proto type.')
+        end
     end
     self:_buildTextCache()
     self:_doDiagnostic()

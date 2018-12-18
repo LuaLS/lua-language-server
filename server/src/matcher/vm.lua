@@ -1075,6 +1075,7 @@ end
 function mt:createEnvironment()
     -- 整个文件是一个函数
     self.chunk.func = self:buildFunction()
+    self.results.main = self.chunk.func
     -- 隐藏的上值`_ENV`
     local parent = self:createLocal('_ENV')
     local envValue = self:setValue(parent, self:buildTable())
@@ -1110,6 +1111,7 @@ local function compile(ast)
             funcs  = {},
             calls  = {},
             sources= {},
+            main   = nil,
         },
         libraryValue = {},
         libraryChild = {},

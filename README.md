@@ -16,6 +16,7 @@
 - [ ] Signature Help
 - [ ] Intelligent
 - [ ] Auto Completion
+- [ ] Multi Workspace
 
 ### Locale
 

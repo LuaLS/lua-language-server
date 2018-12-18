@@ -50,6 +50,7 @@ function mt:_callMethod(name, params)
             }
         end
     end
+    log.debug(name)
     if optional then
         return nil
     else
@@ -210,10 +211,8 @@ function mt:on_tick()
     if proto then
         if proto.method then
             self:_doProto(proto)
-        elseif proto.result or proto.error then
-            rpc:recieve(proto)
         else
-            log.warn('Unknow proto type.')
+            rpc:recieve(proto)
         end
     end
     self:_buildTextCache()

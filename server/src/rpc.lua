@@ -53,11 +53,11 @@ local function recieve(self, proto)
         log.warn('Recieve timeout: ', table.dump(proto.error))
         return
     end
-    if proto.result then
-        data.callback(proto.result)
-    else
+    if proto.error then
         log.warn('Recieve: ', table.dump(proto.error))
+        return
     end
+    data.callback(proto.result)
 end
 
 return {

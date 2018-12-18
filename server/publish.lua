@@ -38,7 +38,6 @@ local function copyFiles(root, out)
             local source = root / relative
             local target = out / relative
             if not fs.exists(source) then
-                error('文件不存在: ' .. tostring(source))
                 return
             end
             if fs.is_directory(source) then

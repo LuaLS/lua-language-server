@@ -209,11 +209,7 @@ local function buildValueArgs(result, source)
     local values = {}
     if func.args then
         for i, arg in ipairs(func.args) do
-            if arg.type == '...' then
-                names[i] = '...'
-            else
-                names[i] = arg.key
-            end
+            names[i] = arg.key
         end
     end
     if func.argValues then
@@ -226,10 +222,23 @@ local function buildValueArgs(result, source)
     if source.object then
         start = 2
     end
-    for i = start, math.max(#names, #values) do
-        local name = names[i] or '?'
+    local max
+    if func.built then
+        max = #names
+    else
+        max = math.max(#names, #values)
+    end
+    for i = start, max do
+        local name = names[i]
         local value = values[i] or 'any'
-        strs[#strs+1] = name .. ': ' .. value
+        if name then
+            strs[#strs+1] = name .. ': ' .. value
+        else
+            strs[#strs+1] = value
+        end
+    end
+    if func.hasDots then
+        strs[#strs+1] = '...'
     end
     return table.concat(strs, ', ')
 end

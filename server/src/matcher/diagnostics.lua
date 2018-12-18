@@ -137,6 +137,9 @@ end
 
 local function searchRedundantParameters(results, callback)
     for _, call in ipairs(results.calls) do
+        if not call.func.built then
+            goto NEXT_CALL
+        end
         if call.func.hasDots then
             goto NEXT_CALL
         end

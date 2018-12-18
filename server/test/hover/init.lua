@@ -181,3 +181,13 @@ function string.lower(string)
   -> string
 Returns a copy of this string with all uppercase letters changed to lowercase.
 ]]
+
+TEST [[
+local function x(a, ...)
+end
+
+<?x?>(1, 2, 3, 4, 5, 6, 7)
+]]
+[[
+function x(a: number, ...)
+]]

@@ -253,6 +253,8 @@ function mt:buildFunction(exp, object)
         return func
     end
 
+    func.built = true
+
     self.scope:push()
     self.chunk:push()
     self.chunk:cut 'dots'

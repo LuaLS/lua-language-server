@@ -276,6 +276,7 @@ function mt:buildFunction(exp, object)
             func.argValues[#func.args] = self:getValue(var)
         elseif arg.type == '...' then
             self:createDots(#func.args+1, arg)
+            func.hasDots = true
             for _ = 1, 10 do
                 func.argValues[#func.argValues+1] = self:createValue('any', arg)
             end
@@ -701,15 +702,17 @@ function mt:getSimple(simple, mode)
             if object then
                 table.insert(args, 1, self:getValue(object))
             end
+            local func = value
             -- 函数的返回值一定是list
-            value = self:call(value, args)
+            value = self:call(func, args)
             if i < #simple then
                 value = value[1] or self:createValue('any')
             end
             self.results.calls[#self.results.calls+1] = {
-                call = obj,
+                args = obj,
                 lastObj = simple[i-1],
                 nextObj = simple[i+1],
+                func = func,
             }
             parentName = parentName .. '(...)'
         elseif obj.index then

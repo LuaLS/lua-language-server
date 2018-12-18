@@ -125,10 +125,28 @@ local function searchNewLineCall(results, lines, callback)
         if not call.lastObj.start then
             goto NEXT_CALL
         end
-        local callline = lines:rowcol(call.call.start)
+        local callline = lines:rowcol(call.args.start)
         local lastline = lines:rowcol(call.lastObj.finish)
         if callline > lastline then
-            callback(call.call.start, call.call.finish)
+            callback(call.args.start, call.args.finish)
+        end
+        ::NEXT_CALL::
+    end
+end
+
+local function searchRedundantParameters(results, callback)
+    for _, call in ipairs(results.calls) do
+        if call.func.hasDots then
+            goto NEXT_CALL
+        end
+        if not call.func.args then
+            return
+        end
+        local max = #call.func.args
+        local passed = #call.args
+        for i = max + 1, passed do
+            local source = call.args[i]
+            callback(source.start, source.finish, max, passed)
         end
         ::NEXT_CALL::
     end
@@ -190,6 +208,15 @@ return function (vm, lines, uri)
             finish  = finish,
             level   = 'Warning',
             message = 'Parsed as function call for the previous line. It may be necessary to add a `;` before.', -- LOCALE
+        }
+    end)
+    -- 调用函数时的参数数量是否超过函数的接收数量
+    searchRedundantParameters(results, function (start, finish, max, passed)
+        datas[#datas+1] = {
+            start   = start,
+            finish  = finish,
+            level   = 'Warning',
+            message = ('The function takes only %d parameters, but you pass %d.'):format(max, passed), -- LOCALE
         }
     end)
     return datas

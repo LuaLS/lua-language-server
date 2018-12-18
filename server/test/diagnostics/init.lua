@@ -119,3 +119,10 @@ TEST [[
 print(_G)
 ('string')
 ]]
+
+TEST [[
+local function x(a, b)
+    return a, b
+end
+x(1, 2, <!3!>)
+]]

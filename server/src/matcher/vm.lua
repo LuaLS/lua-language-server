@@ -11,10 +11,12 @@ function mt:createLocal(key, source, value)
         type = 'local',
         key = key,
         source = source or DefaultSource,
+        close = self.scope.block.finish,
     }
 
     local shadow = self.scope.locals[key]
     if shadow then
+        shadow.close = source and (source.start-1)
         local group
         if shadow.shadow then
             group = shadow.shadow
@@ -32,6 +34,18 @@ function mt:createLocal(key, source, value)
     self:addInfo(loc, 'local', source)
     self:setValue(loc, value, source)
     return loc
+end
+
+function mt:scopePush(block)
+    if not block.start then
+        error('Scope push without start!')
+    end
+    self.scope:push()
+    self.scope.block = block
+end
+
+function mt:scopePop()
+    self.scope:pop()
 end
 
 function mt:addInfo(obj, type, source)
@@ -255,7 +269,7 @@ function mt:buildFunction(exp, object)
 
     func.built = true
 
-    self.scope:push()
+    self:scopePush(exp)
     self.chunk:push()
     self.chunk:cut 'dots'
     self.chunk:cut 'labels'
@@ -291,7 +305,7 @@ function mt:buildFunction(exp, object)
     self.results.funcs[#self.results.funcs+1] = func
 
     self.chunk:pop()
-    self.scope:pop()
+    self:scopePop()
 
     return func
 end
@@ -889,9 +903,9 @@ function mt:getExp(exp)
 end
 
 function mt:doDo(action)
-    self.scope:push()
+    self:scopePush(action)
     self:doActions(action)
-    self.scope:pop()
+    self:scopePop()
 end
 
 function mt:doReturn(action)
@@ -961,9 +975,9 @@ function mt:doIf(action)
             self:getExp(block.filter)
         end
 
-        self.scope:push()
+        self:scopePush(block)
         self:doActions(block)
-        self.scope:pop()
+        self:scopePop()
     end
 end
 
@@ -975,16 +989,16 @@ function mt:doLoop(action)
         self:getExp(action.step)
     end
 
-    self.scope:push()
+    self:scopePush(action)
     self:createLocal(action.arg[1], action.arg, min)
     self:doActions(action)
-    self.scope:pop()
+    self:scopePop()
 end
 
 function mt:doIn(action)
     local args = self:unpackList(action.exp)
 
-    self.scope:push()
+    self:scopePush(action)
     local func = table.remove(args, 1) or self:createValue('any')
     local values = self:call(func, args)
     self:forList(action.arg, function (arg)
@@ -994,23 +1008,23 @@ function mt:doIn(action)
 
     self:doActions(action)
 
-    self.scope:pop()
+    self:scopePop()
 end
 
 function mt:doWhile(action)
 
     self:getExp(action.filter)
 
-    self.scope:push()
+    self:scopePush(action)
     self:doActions(action)
-    self.scope:pop()
+    self:scopePop()
 end
 
 function mt:doRepeat(action)
-    self.scope:push()
+    self:scopePush(action)
     self:doActions(action)
     self:getExp(action.filter)
-    self.scope:pop()
+    self:scopePop()
 end
 
 function mt:doFunction(action)
@@ -1081,6 +1095,7 @@ function mt:doActions(actions)
 end
 
 function mt:createEnvironment()
+    self.scope.block = { start = 0, finish = math.maxinteger }
     -- 整个文件是一个函数
     self.chunk.func = self:buildFunction()
     self.results.main = self.chunk.func

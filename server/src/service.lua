@@ -41,8 +41,10 @@ function mt:_callMethod(name, params)
         if suc then
             return res
         else
+            local suc, res = pcall(table.dump, params)
+            local dump = suc and res or 'Cyclic table'
             log.debug(('Task [%s] failed, params: %s'):format(
-                name, table.dump(params)
+                name, dump
             ))
             return nil, {
                 code = ErrorCodes.InternalError,

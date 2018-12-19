@@ -150,7 +150,11 @@ local function searchRedundantParameters(results, callback)
         local passed = #call.args
         for i = max + 1, passed do
             local source = call.args[i]
-            callback(source.start, source.finish, max, passed)
+            if source.start then
+                callback(source.start, source.finish, max, passed)
+            else
+                log.error('No start: ', table.dump(source))
+            end
         end
         ::NEXT_CALL::
     end

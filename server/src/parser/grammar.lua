@@ -339,15 +339,14 @@ If          <-  Sp ({} IfBody {})
             ->  If
 IfBody      <-  (IfPart     -> IfBlock)
                 (ElseIfPart -> ElseIfBlock)*
-                ElsePart?
+                (ElsePart   -> ElseBlock)?
                 END
 IfPart      <-  IF Exp THEN
-                    Action*
+                    {} Action* {}
 ElseIfPart  <-  ELSEIF Exp THEN
-                    Action*
+                    {} Action* {}
 ElsePart    <-  ELSE
-                    Action*
-            ->  ElseBlock
+                    {} Action* {}
 
 For         <-  Loop / In
 

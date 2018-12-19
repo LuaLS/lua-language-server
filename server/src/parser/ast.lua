@@ -290,25 +290,37 @@ local defs = {
         name.type = 'goto'
         return name
     end,
-    IfBlock = function (exp, ...)
-        return {
+    IfBlock = function (exp, start, ...)
+        local obj = {
             filter = exp,
+            start  = start,
             ...
         }
+        local max = #obj
+        obj.finish = obj[max]
+        obj[max]   = nil
+        return obj
     end,
-    ElseIfBlock = function (exp, ...)
-        return {
+    ElseIfBlock = function (exp, start, ...)
+        local obj = {
             filter = exp,
+            start  = start,
             ...
         }
+        local max = #obj
+        obj.finish = obj[max]
+        obj[max]   = nil
+        return obj
     end,
-    ElseBlock = function (...)
-        if ... == '' then
-            return {}
-        end
-        return {
+    ElseBlock = function (start, ...)
+        local obj = {
+            start  = start,
             ...
         }
+        local max = #obj
+        obj.finish = obj[max]
+        obj[max]   = nil
+        return obj
     end,
     If = function (start, ...)
         local obj = {

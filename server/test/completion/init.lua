@@ -29,7 +29,12 @@ local CompletionItemKind = {
     TypeParameter = 25,
 }
 
+local EXISTS = {}
+
 local function eq(a, b)
+    if a == EXISTS and b ~= nil then
+        return true
+    end
     local tp1, tp2 = type(a), type(b)
     if tp1 ~= tp2 then
         return false
@@ -136,6 +141,7 @@ a@
     {
         label = 'assert',
         kind = CompletionItemKind.Function,
+        documentation = EXISTS,
     }
 }
 
@@ -162,5 +168,20 @@ z@
         label = 'zabc',
         kind = CompletionItemKind.Variable,
         detail = 'zabc = 1',
+    }
+}
+
+TEST [[
+local mt = {}
+function mt:get(a, b)
+    return 1
+end
+mt:g@
+]]
+{
+    {
+        label = 'get',
+        kind = CompletionItemKind.Method,
+        documentation = EXISTS,
     }
 }

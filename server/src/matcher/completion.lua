@@ -1,4 +1,5 @@
 local findResult = require 'matcher.find_result'
+local hover = require 'matcher.hover'
 
 local CompletionItemKind = {
     Text = 1,
@@ -111,25 +112,38 @@ local function searchLocals(vm, pos, name, callback)
 end
 
 local function searchFields(name, parent, callback)
+    if not parent then
+        return
+    end
     for key, field in pairs(parent.value.child) do
         if type(key) ~= 'string' then
             goto CONTINUE
         end
-        if matchKey(name, key ) then
+        if matchKey(name, key) then
             callback(field)
         end
         ::CONTINUE::
     end
 end
 
-local function getValueKind(value, default)
-    if value.type == 'function' then
-        return CompletionItemKind.Function
+local function getKind(var, default)
+    local value = var.value
+    if default == CompletionItemKind.Variable then
+        if value.type == 'function' then
+            return CompletionItemKind.Function
+        end
     end
     if default == CompletionItemKind.Field then
         local tp = type(value.value)
         if tp == 'number' or tp == 'integer' or tp == 'string' then
             return CompletionItemKind.Enum
+        end
+        if value.type == 'function' then
+            if var.parent and var.parent.value and var.parent.value.ENV ~= true then
+                return CompletionItemKind.Method
+            else
+                return CompletionItemKind.Function
+            end
         end
     end
     return default
@@ -143,61 +157,75 @@ local function getDetail(var)
     return nil
 end
 
+local function getDocument(var, source)
+    if var.value.type == 'function' then
+        return {
+            kind = 'markdown',
+            value = hover(var, source),
+        }
+    end
+    return nil
+end
+
 return function (vm, pos)
-    local result = findResult(vm, pos)
+    local result, source = findResult(vm, pos)
     if not result then
         return nil
     end
     local list = {}
     local mark = {}
     if result.type == 'local' then
-        searchLocals(vm, pos, result.key, function (loc)
-            if mark[loc.key] then
+        searchLocals(vm, pos, result.key, function (var)
+            if mark[var.key] then
                 return
             end
-            mark[loc.key] = true
+            mark[var.key] = true
             list[#list+1] = {
-                label = loc.key,
-                kind = getValueKind(loc.value, CompletionItemKind.Variable),
-                detail = getDetail(loc),
+                label = var.key,
+                kind = getKind(var, CompletionItemKind.Variable),
+                detail = getDetail(var),
+                documentation = getDocument(var, source),
             }
         end)
         -- 也尝试搜索全局变量
-        searchFields(result.key, vm.results.locals[1], function (field)
-            if mark[field.key] then
+        searchFields(result.key, vm.results.locals[1], function (var)
+            if mark[var.key] then
                 return
             end
-            mark[field.key] = true
+            mark[var.key] = true
             list[#list+1] = {
-                label = field.key,
-                kind = getValueKind(field.value, CompletionItemKind.Field),
-                detail = getDetail(field),
+                label = var.key,
+                kind = getKind(var, CompletionItemKind.Field),
+                detail = getDetail(var),
+                documentation = getDocument(var, source),
             }
         end)
     elseif result.type == 'field' then
         if result.parent and result.parent.value and result.parent.value.ENV == true then
             -- 全局变量也搜索是不是local
-            searchLocals(vm, pos, result.key, function (loc)
-                if mark[loc.key] then
+            searchLocals(vm, pos, result.key, function (var)
+                if mark[var.key] then
                     return
                 end
-                mark[loc.key] = true
+                mark[var.key] = true
                 list[#list+1] = {
-                    label = loc.key,
-                    kind = getValueKind(loc.value, CompletionItemKind.Variable),
-                    detail = getDetail(loc),
+                    label = var.key,
+                    kind = getKind(var, CompletionItemKind.Variable),
+                    detail = getDetail(var),
+                    documentation = getDocument(var, source),
                 }
             end)
         end
-        searchFields(result.key, result.parent, function (field)
-            if mark[field.key] then
+        searchFields(result.key, result.parent, function (var)
+            if mark[var.key] then
                 return
             end
-            mark[field.key] = true
+            mark[var.key] = true
             list[#list+1] = {
-                label = field.key,
-                kind = getValueKind(field.value, CompletionItemKind.Field),
-                detail = getDetail(field),
+                label = var.key,
+                kind = getKind(var, CompletionItemKind.Field),
+                detail = getDetail(var),
+                documentation = getDocument(var, source),
             }
         end)
     end

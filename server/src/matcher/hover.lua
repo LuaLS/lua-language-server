@@ -360,7 +360,7 @@ local function getValueHover(name, valueType, result, source, lib)
 ]]):format(text, tip)
 end
 
-return function (vm, result, source)
+return function (result, source)
     if not result.value then
         return
     end

@@ -12,8 +12,14 @@ return function (lsp, params)
     if not items then
         return nil
     end
+    if #items == 0 then
+        return nil
+    end
     for i, item in ipairs(items) do
         item.sortText = ('%04d'):format(i)
+    end
+    if items[5] then
+    items[5].preselect = true
     end
     local response = {
         isIncomplete = false,

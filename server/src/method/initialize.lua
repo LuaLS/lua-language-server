@@ -22,6 +22,7 @@ return function (lsp)
             -- 自动完成
             completionProvider = {
                 resolveProvider = false,
+                triggerCharacters = { '.', ':' },
             },
             -- 工作目录
             workspace = {

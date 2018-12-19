@@ -33,6 +33,9 @@ local function matchKey(me, other)
     if me == other then
         return false
     end
+    if me == '' then
+        return true
+    end
     if #me > #other then
         return false
     end

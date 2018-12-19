@@ -195,3 +195,20 @@ loc@
         kind = CompletionItemKind.Keyword,
     }
 }
+
+TEST [[
+t.a = {}
+t.b = {}
+t.@
+]]
+{
+    {
+        label = 'a',
+        kind = CompletionItemKind.Field,
+    },
+    {
+        label = 'b',
+        kind = CompletionItemKind.Field,
+    },
+}
+

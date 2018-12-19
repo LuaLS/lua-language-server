@@ -69,6 +69,14 @@ local defs = {
             [1]    = str,
         }
     end,
+    DirtyName = function (pos)
+        return {
+            type   = 'name',
+            start  = pos,
+            finish = pos,
+            [1]    = ''
+        }
+    end,
     Simple = function (first, ...)
         if ... then
             local obj = {

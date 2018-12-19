@@ -185,8 +185,8 @@ TR          <-  Sp '}'
 COMMA       <-  Sp ','
 SEMICOLON   <-  Sp ';'
 DOTS        <-  Sp ({} '...') -> DOTS
-DOT         <-  Sp '.'
-COLON       <-  Sp ({} ':') -> COLON
+DOT         <-  Sp '.' !'.'
+COLON       <-  Sp ({} ':' !':') -> COLON
 LABEL       <-  Sp '::'
 ASSIGN      <-  Sp '='
 
@@ -229,6 +229,8 @@ Name        <-  Sp ({} NameBody {})
             ->  Name
 NameBody    <-  ([a-zA-Z_] [a-zA-Z0-9_]*)
             =>  NotReserved
+MustName    <-  Name
+            /   {} -> DirtyName
 ]]
 
 grammar 'Exp' [[
@@ -259,8 +261,8 @@ Simple      <-  (Prefix (Suffix)*)
             ->  Simple
 Prefix      <-  PL Exp PR
             /   Name
-Suffix      <-  DOT Name
-            /   COLON Name
+Suffix      <-  DOT MustName
+            /   COLON MustName
             /   Sp ({} Table {}) -> Call
             /   Sp ({} String {}) -> Call
             /   BL Exp -> Index BR
@@ -268,12 +270,15 @@ Suffix      <-  DOT Name
 
 ExpList     <-  (Exp (COMMA Exp)*)?
             ->  List
-NameList    <-  (Name (COMMA Name)*)?
+NameList    <-  (Name (COMMA MustName)*)?
             ->  List
-ArgList     <-  (Arg (COMMA Arg)*)?
+ArgList     <-  (FirstArg (COMMA AfterArg)*)?
             ->  List
-Arg         <-  DOTS
+FirstArg    <-  DOTS
             /   Name
+AfterArg    <-  DOTS
+            /   MustName
+
 
 Table       <-  Sp ({} TL TableFields TR {})
             ->  Table
@@ -283,7 +288,7 @@ TableSep    <-  COMMA / SEMICOLON
 TableField  <-  NewIndex / NewField / Exp
 NewIndex    <-  (BL Exp BR ASSIGN Exp)
             ->  NewIndex
-NewField    <-  (Name ASSIGN Exp)
+NewField    <-  (MustName ASSIGN Exp)
             ->  NewField
 
 Function    <-  Sp ({} FunctionBody {})
@@ -293,8 +298,8 @@ FunctionBody<-  FUNCTION FuncName PL ArgList PR
                 END
 FuncName    <-  (Name? (FuncSuffix)*)
             ->  Simple
-FuncSuffix  <-  DOT Name
-            /   COLON Name
+FuncSuffix  <-  DOT MustName
+            /   COLON MustName
 
 -- 纯占位，修改了 `relabel.lua` 使重复定义不抛错
 Action      <-  !END .
@@ -331,9 +336,9 @@ Break       <-  BREAK
 Return      <-  RETURN ExpList?
             ->  Return
 
-Label       <-  LABEL Name -> Label LABEL
+Label       <-  LABEL MustName -> Label LABEL
 
-GoTo        <-  GOTO Name -> GoTo
+GoTo        <-  GOTO MustName -> GoTo
 
 If          <-  Sp ({} IfBody {})
             ->  If
@@ -355,7 +360,7 @@ Loop        <-  Sp ({} LoopBody {})
 LoopBody    <-  (FOR LoopStart LoopFinish LoopStep? DO) -> LoopDef
                     Action*
                 END
-LoopStart   <-  Name ASSIGN Exp
+LoopStart   <-  MustName ASSIGN Exp
 LoopFinish  <-  COMMA Exp
 LoopStep    <-  COMMA Exp
 

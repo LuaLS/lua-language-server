@@ -206,8 +206,11 @@ function mt:removeText(uri)
 end
 
 function mt:on_tick()
-    local proto = thread.proto()
-    if proto then
+    while true do
+        local proto = thread.proto()
+        if not proto then
+            return
+        end
         if proto.method then
             self:_doProto(proto)
         else

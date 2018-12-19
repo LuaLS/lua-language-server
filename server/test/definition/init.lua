@@ -18,25 +18,19 @@ local function catch_target(script)
 end
 
 local function founded(targets, results)
-    while true do
-        local target = table.remove(targets)
-        if not target then
-            break
-        end
-        for i, result in ipairs(results) do
+    if #targets ~= #results then
+        return false
+    end
+    for _, target in ipairs(targets) do
+        for _, result in ipairs(results) do
             if target[1] == result[1] and target[2] == result[2] then
-                table.remove(results, i)
-                goto CONTINUE
+                goto NEXT
             end
         end
         do return false end
-        ::CONTINUE::
+        ::NEXT::
     end
-    if #results == 0 then
-        return true
-    else
-        return false
-    end
+    return true
 end
 
 function TEST(script)

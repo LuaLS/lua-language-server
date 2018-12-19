@@ -149,8 +149,13 @@ return function (vm, pos)
         return nil
     end
     local list = {}
+    local mark = {}
     if result.type == 'local' then
         searchLocals(vm, pos, result.key, function (loc)
+            if mark[loc.key] then
+                return
+            end
+            mark[loc.key] = true
             list[#list+1] = {
                 label = loc.key,
                 kind = getValueKind(loc.value, CompletionItemKind.Variable),
@@ -159,6 +164,10 @@ return function (vm, pos)
         end)
         -- 也尝试搜索全局变量
         searchFields(result.key, vm.results.locals[1], function (field)
+            if mark[field.key] then
+                return
+            end
+            mark[field.key] = true
             list[#list+1] = {
                 label = field.key,
                 kind = getValueKind(field.value, CompletionItemKind.Field),
@@ -169,6 +178,10 @@ return function (vm, pos)
         if result.parent.value and result.parent.value.ENV == true then
             -- 全局变量也搜索是不是local
             searchLocals(vm, pos, result.key, function (loc)
+                if mark[loc.key] then
+                    return
+                end
+                mark[loc.key] = true
                 list[#list+1] = {
                     label = loc.key,
                     kind = getValueKind(loc.value, CompletionItemKind.Variable),
@@ -177,6 +190,10 @@ return function (vm, pos)
             end)
         end
         searchFields(result.key, result.parent, function (field)
+            if mark[field.key] then
+                return
+            end
+            mark[field.key] = true
             list[#list+1] = {
                 label = field.key,
                 kind = getValueKind(field.value, CompletionItemKind.Field),

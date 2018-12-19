@@ -5,14 +5,22 @@
 	"author": "sumneko",
 	"icon": "images/logo.png",
 	"license": "MIT",
-	"version": "0.0.8",
+	"version": "0.0.9",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/sumneko/vscode-lua-language-server"
 	},
 	"publisher": "sumneko",
-	"categories": [],
-	"keywords": [],
+	"categories": [
+		"Linters",
+		"Programming Languages"
+	],
+	"keywords": [
+		"lua",
+		"language",
+		"server",
+		"definition"
+	],
 	"engines": {
 		"vscode": "^1.23.0"
 	},

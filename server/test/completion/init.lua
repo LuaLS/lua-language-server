@@ -135,7 +135,7 @@ zac@
 }
 
 TEST [[
-a@
+as@
 ]]
 {
     {
@@ -183,5 +183,15 @@ mt:g@
         label = 'get',
         kind = CompletionItemKind.Method,
         documentation = EXISTS,
+    }
+}
+
+TEST [[
+loc@
+]]
+{
+    {
+        label = 'local',
+        kind = CompletionItemKind.Keyword,
     }
 }

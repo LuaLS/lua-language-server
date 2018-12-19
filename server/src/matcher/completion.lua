@@ -126,6 +126,15 @@ local function searchFields(name, parent, callback)
     end
 end
 
+local KEYS = {'and', 'break', 'do', 'else', 'elseif', 'end', 'false', 'for', 'function', 'goto', 'if', 'in', 'local', 'nil', 'not', 'or', 'repeat', 'return', 'then', 'true', 'until', 'while', 'toclose'}
+local function searchKeyWords(name, callback)
+    for _, key in ipairs(KEYS) do
+        if matchKey(name, key) then
+            callback(key)
+        end
+    end
+end
+
 local function getKind(var, default)
     local value = var.value
     if default == CompletionItemKind.Variable then
@@ -174,6 +183,9 @@ local function searchAsGlobal(vm, pos, result, callback)
     searchFields(result.key, vm.results.locals[1], function (var)
         callback(var, CompletionItemKind.Field)
     end)
+    searchKeyWords(result.key, function (name)
+        callback(name, CompletionItemKind.Keyword)
+    end)
 end
 
 local function searchAsSuffix(result, callback)
@@ -191,16 +203,29 @@ return function (vm, pos)
     local list = {}
     local mark = {}
     local function callback(var, defualt)
-        if mark[var.key] then
+        local key
+        if type(var) == 'string' then
+            key = var
+        else
+            key = var.key
+        end
+        if mark[key] then
             return
         end
-        mark[var.key] = true
-        list[#list+1] = {
-            label = var.key,
-            kind = getKind(var, defualt),
-            detail = getDetail(var),
-            documentation = getDocument(var, source),
-        }
+        mark[key] = true
+        if var == key then
+            list[#list+1] = {
+                label = key,
+                kind = defualt,
+            }
+        else
+            list[#list+1] = {
+                label = var.key,
+                kind = getKind(var, defualt),
+                detail = getDetail(var),
+                documentation = getDocument(var, source),
+            }
+        end
     end
 
     if result.type == 'local' then

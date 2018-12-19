@@ -167,67 +167,50 @@ local function getDocument(var, source)
     return nil
 end
 
+local function searchAsGlobal(vm, pos, result, callback)
+    searchLocals(vm, pos, result.key, function (var)
+        callback(var, CompletionItemKind.Variable)
+    end)
+    searchFields(result.key, vm.results.locals[1], function (var)
+        callback(var, CompletionItemKind.Field)
+    end)
+end
+
+local function searchAsSuffix(result, callback)
+    searchFields(result.key, result.parent, function (var)
+        callback(var, CompletionItemKind.Field)
+    end)
+end
+
 return function (vm, pos)
     local result, source = findResult(vm, pos)
     if not result then
         return nil
     end
+
     local list = {}
     local mark = {}
+    local function callback(var, defualt)
+        if mark[var.key] then
+            return
+        end
+        mark[var.key] = true
+        list[#list+1] = {
+            label = var.key,
+            kind = getKind(var, defualt),
+            detail = getDetail(var),
+            documentation = getDocument(var, source),
+        }
+    end
+
     if result.type == 'local' then
-        searchLocals(vm, pos, result.key, function (var)
-            if mark[var.key] then
-                return
-            end
-            mark[var.key] = true
-            list[#list+1] = {
-                label = var.key,
-                kind = getKind(var, CompletionItemKind.Variable),
-                detail = getDetail(var),
-                documentation = getDocument(var, source),
-            }
-        end)
-        -- 也尝试搜索全局变量
-        searchFields(result.key, vm.results.locals[1], function (var)
-            if mark[var.key] then
-                return
-            end
-            mark[var.key] = true
-            list[#list+1] = {
-                label = var.key,
-                kind = getKind(var, CompletionItemKind.Field),
-                detail = getDetail(var),
-                documentation = getDocument(var, source),
-            }
-        end)
+        searchAsGlobal(vm, pos, result, callback)
     elseif result.type == 'field' then
         if result.parent and result.parent.value and result.parent.value.ENV == true then
-            -- 全局变量也搜索是不是local
-            searchLocals(vm, pos, result.key, function (var)
-                if mark[var.key] then
-                    return
-                end
-                mark[var.key] = true
-                list[#list+1] = {
-                    label = var.key,
-                    kind = getKind(var, CompletionItemKind.Variable),
-                    detail = getDetail(var),
-                    documentation = getDocument(var, source),
-                }
-            end)
+            searchAsGlobal(vm, pos, result, callback)
+        else
+            searchAsSuffix(result, callback)
         end
-        searchFields(result.key, result.parent, function (var)
-            if mark[var.key] then
-                return
-            end
-            mark[var.key] = true
-            list[#list+1] = {
-                label = var.key,
-                kind = getKind(var, CompletionItemKind.Field),
-                detail = getDetail(var),
-                documentation = getDocument(var, source),
-            }
-        end)
     end
     return list
 end

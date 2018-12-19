@@ -20,9 +20,9 @@ return function (lsp)
                 change = 1,
             },
             -- 自动完成
-            --completionProvider = {
-            --    resolveProvider = false,
-            --},
+            completionProvider = {
+                resolveProvider = false,
+            },
             -- 工作目录
             workspace = {
                 workspaceFolders = {

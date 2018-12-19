@@ -71,10 +71,14 @@ local defs = {
     end,
     Simple = function (first, ...)
         if ... then
-            return {
+            local obj = {
                 type = 'simple',
+                start = first.start,
                 first, ...,
             }
+            local last = obj[#obj]
+            obj.finish = last.finish
+            return obj
         elseif first == '' then
             return nil
         else

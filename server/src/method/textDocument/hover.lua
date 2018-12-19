@@ -8,7 +8,13 @@ return function (lsp, params)
     end
     -- lua是从1开始的，因此都要+1
     local position = lines:position(params.position.line + 1, params.position.character + 1)
-    local text = matcher.hover(vm, position)
+
+    local result, source = matcher.findResult(vm, position)
+    if not result then
+        return nil
+    end
+
+    local text = matcher.hover(vm, result, source)
     if not text then
         return nil
     end

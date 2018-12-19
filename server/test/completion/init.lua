@@ -237,3 +237,22 @@ t:@
         documentation = EXISTS,
     }
 }
+
+TEST [[
+local t = {
+    a = {},
+}
+t.@
+xxx()
+]]
+{
+    {
+        label = 'a',
+        kind = CompletionItemKind.Field,
+    },
+    {
+        label = 'xxx',
+        kind = CompletionItemKind.Method,
+        documentation = EXISTS,
+    },
+}

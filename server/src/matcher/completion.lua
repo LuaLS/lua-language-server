@@ -218,7 +218,7 @@ local function searchAsSuffix(result, callback)
 end
 
 return function (vm, pos)
-    local result, source = findResult(vm, pos)
+    local result, source = findResult(vm, pos, true)
     if not result then
         return nil
     end

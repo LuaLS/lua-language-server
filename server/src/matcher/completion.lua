@@ -115,7 +115,7 @@ local function searchLocals(vm, pos, name, callback)
 end
 
 local function searchFields(name, parent, callback)
-    if not parent then
+    if not parent or not parent.value or not parent.value.child then
         return
     end
     for key, field in pairs(parent.value.child) do
@@ -163,8 +163,23 @@ end
 
 local function getDetail(var)
     local tp = type(var.value.value)
-    if tp == 'boolean' or tp == 'number' or tp == 'integer' or tp == 'string' then
-        return ('%s = %q'):format(var.key, var.value.value)
+    if tp == 'boolean' then
+        return ('= %q'):format(var.value.value)
+    elseif tp == 'number' then
+        if math.type(var.value.value) == 'integer' then
+            return ('= %q'):format(var.value.value)
+        else
+            local str = ('= %.10f'):format(var.value.value)
+            local dot = str:find('.', 1, true)
+            local suffix = str:find('[0]+$', dot+2)
+            if suffix then
+                return str:sub(1, suffix-1)
+            else
+                return str
+            end
+        end
+    elseif tp == 'string' then
+        return ('= %q'):format(var.value.value)
     end
     return nil
 end

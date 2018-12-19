@@ -155,7 +155,7 @@ t.a@
     {
         label = 'abc',
         kind = CompletionItemKind.Enum,
-        detail = 'abc = 1',
+        detail = '= 1',
     }
 }
 
@@ -167,7 +167,19 @@ z@
     {
         label = 'zabc',
         kind = CompletionItemKind.Variable,
-        detail = 'zabc = 1',
+        detail = '= 1',
+    }
+}
+
+TEST [[
+local zabc = 1.0
+z@
+]]
+{
+    {
+        label = 'zabc',
+        kind = CompletionItemKind.Variable,
+        detail = '= 1.0',
     }
 }
 
@@ -211,4 +223,3 @@ t.@
         kind = CompletionItemKind.Field,
     },
 }
-

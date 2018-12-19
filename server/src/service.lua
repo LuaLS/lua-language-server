@@ -209,7 +209,7 @@ function mt:on_tick()
     while true do
         local proto = thread.proto()
         if not proto then
-            return
+            break
         end
         if proto.method then
             self:_doProto(proto)

@@ -1053,6 +1053,7 @@ function mt:doAction(action)
     elseif tp == 'local' then
         self:doLocal(action)
     elseif tp == 'simple' then
+        -- call
         self:getSimple(action, 'value')
     elseif tp == 'if' then
         self:doIf(action)
@@ -1068,6 +1069,8 @@ function mt:doAction(action)
         self:doFunction(action)
     elseif tp == 'localfunction' then
         self:doLocalFunction(action)
+    else
+        self:getExp(action)
     end
 end
 

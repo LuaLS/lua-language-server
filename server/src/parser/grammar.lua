@@ -229,8 +229,8 @@ Name        <-  Sp ({} NameBody {})
             ->  Name
 NameBody    <-  ([a-zA-Z_] [a-zA-Z0-9_]*)
             =>  NotReserved
-MustName    <-  Name
-            /   {} -> DirtyName
+MustName    <-  Name / DirtyName
+DirtyName   <-  {} -> DirtyName
 ]]
 
 grammar 'Exp' [[
@@ -268,11 +268,17 @@ Suffix      <-  DOT MustName
             /   BL Exp -> Index BR
             /   Sp ({} PL ExpList PR {}) -> Call
 
-ExpList     <-  (Exp (COMMA Exp)*)?
+DirtyExp    <-  Exp / DirtyName
+ExpList     <-  (COMMA DirtyExp)+
+            ->  List
+            /   (Exp (COMMA DirtyExp)*)?
             ->  List
 NameList    <-  (Name (COMMA MustName)*)?
             ->  List
-ArgList     <-  (FirstArg (COMMA AfterArg)*)?
+
+ArgList     <-  (COMMA AfterArg)+
+            ->  List
+            /   (FirstArg (COMMA AfterArg)*)?
             ->  List
 FirstArg    <-  DOTS
             /   Name
@@ -282,20 +288,21 @@ AfterArg    <-  DOTS
 
 Table       <-  Sp ({} TL TableFields TR {})
             ->  Table
-TableFields <-  (TableField (TableSep TableField)* TableSep?)?
+TableFields <-  TableSep (TableSep? TableField)+ TableSep?
+            /   (TableField (TableSep? TableField)* TableSep?)?
             ->  TableFields
 TableSep    <-  COMMA / SEMICOLON
 TableField  <-  NewIndex / NewField / Exp
-NewIndex    <-  (BL Exp BR ASSIGN Exp)
+NewIndex    <-  (BL DirtyExp BR ASSIGN DirtyExp)
             ->  NewIndex
-NewField    <-  (MustName ASSIGN Exp)
+NewField    <-  (MustName ASSIGN DirtyExp)
             ->  NewField
 
 Function    <-  Sp ({} FunctionBody {})
             ->  Function
 FunctionBody<-  FUNCTION FuncName PL ArgList PR
                     Action*
-                END
+                END?
 FuncName    <-  (Name? (FuncSuffix)*)
             ->  Simple
 FuncSuffix  <-  DOT MustName
@@ -321,11 +328,12 @@ Action      <-  SEMICOLON
             /   Local
             /   Set
             /   Call
+            /   Exp
 
 SimpleList  <-  (Simple (COMMA Simple)*)
             ->  List
 
-Do          <-  Sp ({} DO DoBody END {})
+Do          <-  Sp ({} DO DoBody END? {})
             ->  Do
 DoBody      <-  Action*
             ->  DoBody
@@ -342,14 +350,25 @@ GoTo        <-  GOTO MustName -> GoTo
 
 If          <-  Sp ({} IfBody {})
             ->  If
-IfBody      <-  (IfPart     -> IfBlock)
+IfHead      <-  (IfPart     -> IfBlock)
+            /   (ElseIfPart -> ElseIfBlock)
+            /   (ElsePart   -> ElseBlock)
+IfBody      <-  IfHead
                 (ElseIfPart -> ElseIfBlock)*
                 (ElsePart   -> ElseBlock)?
-                END
+                END?
 IfPart      <-  IF Exp THEN
-                    {} Action* {}
+                    {} (!ELSEIF !ELSE Action)* {}
+            /   IF (Exp / DirtyName) THEN
+                    {} (!ELSEIF !ELSE Action)* {}
+            /   IF (Exp / DirtyName)
+                    {}         {}
 ElseIfPart  <-  ELSEIF Exp THEN
-                    {} Action* {}
+                    {} (!ELSE !ELSEIF Action)* {}
+            /   ELSEIF (Exp / DirtyName) THEN
+                    {} (!ELSE !ELSEIF Action)* {}
+            /   ELSEIF (Exp / DirtyName) THEN
+                    {}         {}
 ElsePart    <-  ELSE
                     {} Action* {}
 
@@ -359,7 +378,7 @@ Loop        <-  Sp ({} LoopBody {})
             ->  Loop
 LoopBody    <-  (FOR LoopStart LoopFinish LoopStep? DO) -> LoopDef
                     Action*
-                END
+                END?
 LoopStart   <-  MustName ASSIGN Exp
 LoopFinish  <-  COMMA Exp
 LoopStep    <-  COMMA Exp
@@ -368,13 +387,13 @@ In          <-  Sp ({} InBody {})
             ->  In
 InBody      <-  FOR NameList IN ExpList DO
                     Action*
-                END
+                END?
 
 While       <-  Sp ({} WhileBody {})
             ->  While
 WhileBody   <-  WHILE Exp DO
                     Action*
-                END
+                END?
 
 Repeat      <-  Sp ({} RepeatBody {})
             ->  Repeat
@@ -400,8 +419,8 @@ Lua         <-  (Sp Action)* -> Lua Sp
 
 return function (lua, mode, parser_)
     parser = parser_ or {}
-    mode = mode or 'Lua'
-    local r, e, pos = compiled[mode]:match(lua)
+    local gram = compiled[mode] or compiled['Lua']
+    local r, e, pos = gram:match(lua)
     if not r then
         local err = errorpos(lua, pos, e)
         return nil, err

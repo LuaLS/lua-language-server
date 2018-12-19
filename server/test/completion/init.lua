@@ -223,3 +223,17 @@ t.@
         kind = CompletionItemKind.Field,
     },
 }
+
+TEST [[
+t.a = {}
+function t:b()
+end
+t:@
+]]
+{
+    {
+        label = 'b',
+        kind = CompletionItemKind.Method,
+        documentation = EXISTS,
+    }
+}

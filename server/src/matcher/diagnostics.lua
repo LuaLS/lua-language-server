@@ -224,7 +224,7 @@ return function (vm, lines, uri)
             start   = start,
             finish  = finish,
             level   = 'Warning',
-            message = ('The function takes only %d parameters, but you pass %d.'):format(max, passed), -- LOCALE
+            message = ('The function takes only %d parameters, but you passed %d.'):format(max, passed), -- LOCALE
         }
     end)
     return datas

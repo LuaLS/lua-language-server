@@ -114,13 +114,18 @@ local function searchLocals(vm, pos, name, callback)
     end
 end
 
-local function searchFields(name, parent, callback)
+local function searchFields(name, parent, object, callback)
     if not parent or not parent.value or not parent.value.child then
         return
     end
     for key, field in pairs(parent.value.child) do
         if type(key) ~= 'string' then
             goto CONTINUE
+        end
+        if object then
+            if not field.value or field.value.type ~= 'function' then
+                goto CONTINUE
+            end
         end
         if matchKey(name, key) then
             callback(field)
@@ -198,7 +203,7 @@ local function searchAsGlobal(vm, pos, result, callback)
     searchLocals(vm, pos, result.key, function (var)
         callback(var, CompletionItemKind.Variable)
     end)
-    searchFields(result.key, vm.results.locals[1], function (var)
+    searchFields(result.key, vm.results.locals[1], nil, function (var)
         callback(var, CompletionItemKind.Field)
     end)
     searchKeyWords(result.key, function (name)
@@ -207,7 +212,7 @@ local function searchAsGlobal(vm, pos, result, callback)
 end
 
 local function searchAsSuffix(result, callback)
-    searchFields(result.key, result.parent, function (var)
+    searchFields(result.key, result.parent, result.source.object, function (var)
         callback(var, CompletionItemKind.Field)
     end)
 end

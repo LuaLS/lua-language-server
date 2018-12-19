@@ -22,7 +22,7 @@ return function (lsp, params)
     items[5].preselect = true
     end
     local response = {
-        isIncomplete = false,
+        isIncomplete = true,
         items = items,
     }
     return response

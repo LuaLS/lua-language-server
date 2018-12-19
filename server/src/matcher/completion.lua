@@ -84,13 +84,13 @@ local function matchKey(me, other)
             end
             return false
         end
-        -- 5. 找到下一个可用的字，如果超出长度则失败
+        -- 5. 找到下一个可用的字，如果超出长度就算成功
         ::NEXT::
         repeat
             cur = cur + 1
         until not used[cur]
         if cur > #lOther then
-            return false
+            break
         end
     end
     return true
@@ -103,8 +103,20 @@ local function searchLocals(vm, pos, name, callback)
         end
         if loc.source.start <= pos and loc.close >= pos then
             if matchKey(name, loc.key) then
-                callback(loc.key)
+                callback(loc)
             end
+        end
+        ::CONTINUE::
+    end
+end
+
+local function searchFields(name, parent, callback)
+    for key, field in pairs(parent.value.child) do
+        if type(key) ~= 'string' then
+            goto CONTINUE
+        end
+        if matchKey(name, key ) then
+            callback(field)
         end
         ::CONTINUE::
     end
@@ -116,12 +128,34 @@ return function (vm, pos)
         return nil
     end
     local list = {}
-    local source = result.source
-    if source.type == 'name' then
-        searchLocals(vm, pos, result.key, function (label)
+    if result.type == 'local' then
+        searchLocals(vm, pos, result.key, function (loc)
             list[#list+1] = {
-                label = label,
+                label = loc.key,
                 kind = CompletionItemKind.Variable,
+            }
+        end)
+        -- 也尝试搜索全局变量
+        searchFields(result.key, vm.results.locals[1], function (field)
+            list[#list+1] = {
+                label = field.key,
+                kind = CompletionItemKind.Field,
+            }
+        end)
+    elseif result.type == 'field' then
+        if result.parent.value.ENV == true then
+            -- 全局变量也搜索是不是local
+            searchLocals(vm, pos, result.key, function (loc)
+                list[#list+1] = {
+                    label = loc.key,
+                    kind = CompletionItemKind.Variable,
+                }
+            end)
+        end
+        searchFields(result.key, result.parent, function (field)
+            list[#list+1] = {
+                label = field.key,
+                kind = CompletionItemKind.Field,
             }
         end)
     end

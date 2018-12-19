@@ -68,36 +68,63 @@ function TEST(script)
 end
 
 TEST [[
-local abcde
-a@
+local zabcde
+za@
 ]]
 {
     {
-        label = 'abcde',
+        label = 'zabcde',
         kind = CompletionItemKind.Variable,
     }
 }
 
 TEST [[
-local abcdefg
-local abcde
-abcde@
+local zabcdefg
+local zabcde
+zabcde@
 ]]
 {
     {
-        label = 'abcdefg',
+        label = 'zabcdefg',
         kind = CompletionItemKind.Variable,
     }
 }
 
 TEST [[
-local abcdefg
-a@
-local abcde
+local zabcdefg
+za@
+local zabcde
 ]]
 {
     {
-        label = 'abcdefg',
+        label = 'zabcdefg',
         kind = CompletionItemKind.Variable,
     }
+}
+
+TEST [[
+local zabcde
+zace@
+]]
+{
+    {
+        label = 'zabcde',
+        kind = CompletionItemKind.Variable,
+    }
+}
+
+TEST [[
+ZABC
+local zabc
+zac@
+]]
+{
+    {
+        label = 'zabc',
+        kind = CompletionItemKind.Variable,
+    },
+    {
+        label = 'ZABC',
+        kind = CompletionItemKind.Field,
+    },
 }

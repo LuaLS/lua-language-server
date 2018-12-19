@@ -11,11 +11,11 @@
 - [x] Hover
 - [x] Diagnostics
 - [x] Rename
+- [x] Auto Completion
 - [ ] Support Dirty Script
 - [ ] Syntax Check
 - [ ] Signature Help
 - [ ] Intelligent
-- [ ] Auto Completion
 - [ ] Multi Workspace
 
 ### Locale

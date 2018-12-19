@@ -3,6 +3,38 @@ local library = require 'matcher.library'
 
 local DefaultSource = { start = 0, finish = 0 }
 
+-- 根据赋值顺序决定遍历顺序的表
+local function orderTable()
+    local t = {}
+    local list = {}
+    local mark = {}
+    return setmetatable(t, {
+        __newindex = function (self, k, v)
+            if not mark[k] then
+                mark[k] = true
+                list[#list+1] = k
+            end
+            rawset(self, k, v)
+        end,
+        __pairs = function (self)
+            local i = 0
+            return function ()
+                while true do
+                    i = i + 1
+                    local k = list[i]
+                    if not k then
+                        return nil, nil
+                    end
+                    local v = t[k]
+                    if v ~= nil then
+                        return k, v
+                    end
+                end
+            end
+        end,
+    })
+end
+
 local mt = {}
 mt.__index = mt
 
@@ -186,8 +218,8 @@ function mt:mergeChild(a, b, mark)
     if not mark then
         mark = {}
     end
-    local child = a.child or {}
-    local other = b.child or {}
+    local child = a.child or orderTable()
+    local other = b.child or orderTable()
     a.child = nil
     b.child = nil
     for k, v in pairs(other) do
@@ -243,7 +275,7 @@ function mt:createField(pValue, name, source)
     }
 
     if not pValue.child then
-        pValue.child = {}
+        pValue.child = orderTable()
     end
     pValue.child[name] = field
     self:inference(pValue, 'table')

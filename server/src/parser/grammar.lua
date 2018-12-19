@@ -339,7 +339,7 @@ If          <-  Sp ({} IfBody {})
             ->  If
 IfBody      <-  (IfPart     -> IfBlock)
                 (ElseIfPart -> ElseIfBlock)*
-                (ElsePart   -> ElseBlock)?
+                ElsePart?
                 END
 IfPart      <-  IF Exp THEN
                     Action*
@@ -347,6 +347,7 @@ ElseIfPart  <-  ELSEIF Exp THEN
                     Action*
 ElsePart    <-  ELSE
                     Action*
+            ->  ElseBlock
 
 For         <-  Loop / In
 

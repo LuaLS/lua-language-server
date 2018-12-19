@@ -303,6 +303,9 @@ local defs = {
         }
     end,
     ElseBlock = function (...)
+        if ... == '' then
+            return {}
+        end
         return {
             ...
         }
@@ -375,6 +378,9 @@ local defs = {
         return obj
     end,
     Lua = function (...)
+        if ... == '' then
+            return {}
+        end
         return {...}
     end,
 }

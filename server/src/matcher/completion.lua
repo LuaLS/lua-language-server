@@ -175,7 +175,7 @@ return function (vm, pos)
             }
         end)
     elseif result.type == 'field' then
-        if result.parent.value and result.parent.value.ENV == true then
+        if result.parent and result.parent.value and result.parent.value.ENV == true then
             -- 全局变量也搜索是不是local
             searchLocals(vm, pos, result.key, function (loc)
                 if mark[loc.key] then

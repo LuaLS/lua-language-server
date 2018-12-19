@@ -7,6 +7,7 @@ local api = {
     diagnostics    = require 'matcher.diagnostics',
     findResult     = require 'matcher.find_result',
     findLib        = require 'matcher.find_lib',
+    completion     = require 'matcher.completion',
     vm             = require 'matcher.vm',
 }
 

@@ -31,6 +31,7 @@ local function main()
     test 'type_inference'
     test 'find_lib'
     test 'hover'
+    test 'completion'
 
     print('测试完成')
 end

@@ -122,6 +122,27 @@ local function searchFields(name, parent, callback)
     end
 end
 
+local function getValueKind(value, default)
+    if value.type == 'function' then
+        return CompletionItemKind.Function
+    end
+    if default == CompletionItemKind.Field then
+        local tp = type(value.value)
+        if tp == 'number' or tp == 'integer' or tp == 'string' then
+            return CompletionItemKind.Enum
+        end
+    end
+    return default
+end
+
+local function getDetail(var)
+    local tp = type(var.value.value)
+    if tp == 'boolean' or tp == 'number' or tp == 'integer' or tp == 'string' then
+        return ('%s = %q'):format(var.key, var.value.value)
+    end
+    return nil
+end
+
 return function (vm, pos)
     local result = findResult(vm, pos)
     if not result then
@@ -132,14 +153,16 @@ return function (vm, pos)
         searchLocals(vm, pos, result.key, function (loc)
             list[#list+1] = {
                 label = loc.key,
-                kind = CompletionItemKind.Variable,
+                kind = getValueKind(loc.value, CompletionItemKind.Variable),
+                detail = getDetail(loc),
             }
         end)
         -- 也尝试搜索全局变量
         searchFields(result.key, vm.results.locals[1], function (field)
             list[#list+1] = {
                 label = field.key,
-                kind = CompletionItemKind.Field,
+                kind = getValueKind(field.value, CompletionItemKind.Field),
+                detail = getDetail(field),
             }
         end)
     elseif result.type == 'field' then
@@ -148,14 +171,16 @@ return function (vm, pos)
             searchLocals(vm, pos, result.key, function (loc)
                 list[#list+1] = {
                     label = loc.key,
-                    kind = CompletionItemKind.Variable,
+                    kind = getValueKind(loc.value, CompletionItemKind.Variable),
+                    detail = getDetail(loc),
                 }
             end)
         end
         searchFields(result.key, result.parent, function (field)
             list[#list+1] = {
                 label = field.key,
-                kind = CompletionItemKind.Field,
+                kind = getValueKind(field.value, CompletionItemKind.Field),
+                detail = getDetail(field),
             }
         end)
     end

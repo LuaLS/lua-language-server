@@ -128,3 +128,39 @@ zac@
         kind = CompletionItemKind.Field,
     },
 }
+
+TEST [[
+a@
+]]
+{
+    {
+        label = 'assert',
+        kind = CompletionItemKind.Function,
+    }
+}
+
+TEST [[
+local t = {
+    abc = 1,
+}
+t.a@
+]]
+{
+    {
+        label = 'abc',
+        kind = CompletionItemKind.Enum,
+        detail = 'abc = 1',
+    }
+}
+
+TEST [[
+local zabc = 1
+z@
+]]
+{
+    {
+        label = 'zabc',
+        kind = CompletionItemKind.Variable,
+        detail = 'zabc = 1',
+    }
+}

@@ -9,6 +9,9 @@ return function (lsp, params)
     -- lua是从1开始的，因此都要+1
     local position = lines:position(params.position.line + 1, params.position.character + 1)
     local items = matcher.completion(vm, position)
+    for i, item in ipairs(items) do
+        item.sortText = ('%04d'):format(i)
+    end
     local response = {
         isIncomplete = false,
         items = items,

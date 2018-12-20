@@ -1,21 +1,16 @@
-local thread   = require 'bee.thread'
-local json     = require 'json'
-local response = thread.channel 'response'
+local thread = require 'bee.thread'
+local json   = require 'json'
+local proto  = thread.channel 'proto'
+local errlog = thread.channel 'errlog'
 
-local log = setmetatable({}, {__index = function (self, level)
-    self[level] = function (...)
-        local t = table.pack(...)
-        for i = 1, t.n do
-            t[i] = tostring(t[i])
-        end
-        local buf = table.concat(t, '\t')
-        response:push('log', {
-            level = level,
-            buf   = buf,
-        })
+local function pushError(...)
+    local t = table.pack(...)
+    for i = 1, t.n do
+        t[i] = tostring(t[i])
     end
-    return self[level]
-end})
+    local buf = table.concat(t, '\t')
+    errlog:push(buf)
+end
 
 local function readProtoHeader()
     local header = io.read 'l'
@@ -24,7 +19,7 @@ local function readProtoHeader()
     elseif header:sub(1, #'Content-Type') == 'Content-Type' then
         return nil
     else
-        log.error('Proto header error:', header)
+        pushError('Proto header error:', header)
         return nil
     end
 end
@@ -32,7 +27,7 @@ end
 local function readProtoContent(header)
     local len = tonumber(header:match('%d+'))
     if not len then
-        log.error('Proto header error:', header)
+        pushError('Proto header error:', header)
         return nil
     end
     local buf = io.read(len+2)
@@ -41,7 +36,7 @@ local function readProtoContent(header)
     end
     local suc, res = pcall(json.decode, buf)
     if not suc then
-        log.error('Proto error:', buf)
+        pushError('Proto error:', buf)
         return nil
     end
     return res
@@ -56,7 +51,7 @@ local function readProto()
     if not data then
         return
     end
-    response:push('proto', data)
+    proto:push(data)
 end
 
 while true do

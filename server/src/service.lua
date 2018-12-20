@@ -1,9 +1,12 @@
 local subprocess = require 'bee.subprocess'
 local method     = require 'method'
-local thread     = require 'thread'
+local thread     = require 'bee.thread'
+local async      = require 'async'
 local rpc        = require 'rpc'
 local parser     = require 'parser'
 local matcher    = require 'matcher'
+
+thread.newchannel 'proto'
 
 local ErrorCodes = {
     -- Defined by JSON RPC
@@ -214,10 +217,10 @@ function mt:removeText(uri)
     self._needCompile[uri] = nil
 end
 
-function mt:on_tick()
+function mt:onTick()
     while true do
-        local proto = thread.proto()
-        if not proto then
+        local ok, proto = self._proto:pop()
+        if not ok then
             break
         end
         if proto.method then
@@ -252,11 +255,15 @@ function mt:listen()
     io.stdin:setvbuf 'no'
     io.stdout:setvbuf 'no'
 
-    thread.require 'proto'
+    self._proto = thread.channel 'proto'
+
+    async.call(function ()
+        require 'proto'
+    end)
 
     while true do
-        thread.on_tick()
-        self:on_tick()
+        async.onTick()
+        self:onTick()
         thread.sleep(0.001)
     end
 end

@@ -2,7 +2,7 @@ local function isContainPos(obj, pos)
     if obj.start <= pos and obj.finish + 1 >= pos then
         return true
     end
-    return false, pos - (obj.finish + 1)
+    return false
 end
 
 local function findAtPos(results, pos)
@@ -45,10 +45,8 @@ local function findClosePos(results, pos)
         if sources.type == 'multi-source' then
             for _, source in ipairs(source) do
                 if source.type ~= 'simple' then
-                    local inside, dis = isContainPos(source, pos)
-                    if inside then
-                        return object, source
-                    elseif dis > 0 and dis < curDis then
+                    local dis = pos - source.finish
+                    if dis > 0 and dis < curDis then
                         curDis = dis
                         parent = object
                     end
@@ -57,10 +55,8 @@ local function findClosePos(results, pos)
         else
             local source = sources
             if source.type ~= 'simple' then
-                local inside, dis = isContainPos(source, pos)
-                if inside then
-                    return object, source
-                elseif dis > 0 and dis < curDis then
+                local dis = pos - source.finish
+                if dis > 0 and dis < curDis then
                     curDis = dis
                     parent = object
                 end
@@ -89,7 +85,12 @@ end
 return function (vm, pos, close)
     local results = vm.results
     if close then
-        return findClosePos(results, pos)
+        local obj, source = findAtPos(results, pos)
+        if obj then
+            return obj, source
+        else
+            return findClosePos(results, pos)
+        end
     else
         return findAtPos(results, pos)
     end

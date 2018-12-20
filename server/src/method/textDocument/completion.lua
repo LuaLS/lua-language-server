@@ -18,9 +18,6 @@ return function (lsp, params)
     for i, item in ipairs(items) do
         item.sortText = ('%04d'):format(i)
     end
-    if items[5] then
-    items[5].preselect = true
-    end
     local response = {
         isIncomplete = true,
         items = items,

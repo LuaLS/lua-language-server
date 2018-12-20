@@ -37,13 +37,13 @@ end
 
 local function deepCopy(t, mark, new)
     mark = mark or {}
-    new = new or {}
+    new = new or orderTable()
     for k, v in pairs(t) do
         if type(v) == 'table' then
             if mark[v] then
                 new[k] = mark[v]
             else
-                mark[v] = {}
+                mark[v] = orderTable()
                 new[k] = deepCopy(v, mark, mark[v])
             end
         else
@@ -1183,6 +1183,7 @@ function mt:mergeRequire(value, destVM)
         mainValue = deepCopy(main.returns[1])
     end
     self:mergeValue(value, mainValue)
+    value.uri = destVM.uri
 end
 
 function mt:loadRequires()

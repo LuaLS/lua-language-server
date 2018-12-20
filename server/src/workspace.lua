@@ -30,10 +30,11 @@ local function uriEncode(path)
     while true do
         local name = cur:filename():string()
         if name == '' then
-            name = cur:string()
+            -- 盘符，去掉一个斜杠
+            name = cur:string():sub(1, -2)
         end
         name = name:gsub([=[[^%w%-%_%.%~]]=], function (char)
-            return ('%02X'):format(string.byte(char))
+            return ('%%%02X'):format(string.byte(char))
         end)
         table.insert(names, 1, name)
         if cur == cur:parent_path() then

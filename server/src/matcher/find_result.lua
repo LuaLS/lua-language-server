@@ -9,7 +9,7 @@ local function findAtPos(results, pos)
     local res = {}
     for sources, object in pairs(results.sources) do
         if sources.type == 'multi-source' then
-            for _, source in ipairs(source) do
+            for _, source in ipairs(sources) do
                 if source.type ~= 'simple' and isContainPos(source, pos) then
                     res[#res+1] = {
                         object = object,
@@ -43,7 +43,7 @@ local function findClosePos(results, pos)
     local parent = nil
     for sources, object in pairs(results.sources) do
         if sources.type == 'multi-source' then
-            for _, source in ipairs(source) do
+            for _, source in ipairs(sources) do
                 if source.type ~= 'simple' then
                     local dis = pos - source.finish
                     if dis > 0 and dis < curDis then

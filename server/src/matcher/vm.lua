@@ -476,7 +476,7 @@ function mt:callRequire(func, values)
     end
     local requireValue = self:createValue('boolean', nil, true)
     self:setFunctionReturn(func, 1, requireValue)
-    self.requires[requireValue] = str
+    self.requires[requireValue] = values[1]
 end
 
 function mt:call(func, values)
@@ -1176,17 +1176,28 @@ function mt:createEnvironment()
     gValue.child = envValue.child
 end
 
-function mt:mergeRequire(value, destVM)
+function mt:mergeRequire(value, strValue, destVM)
     -- 取出对方的主函数
     local main = destVM.results.main
     -- 获取主函数返回值，注意不能修改对方的环境
     local mainValue
     if not main.returns then
-        mainValue = self:createValue('nil')
+        mainValue = self:createValue('nil', nil, {
+            type   = 'name',
+            start  = 0,
+            finish = 0,
+            [1]    = '',
+            uri    = destVM.uri,
+        })
     else
         mainValue = deepCopy(main.returns[1])
     end
     self:mergeValue(value, mainValue)
+
+    -- 支持 require 'xxx' 的转到定义
+    local strSource = strValue.source
+    self.results.sources[strSource] = strValue
+    strValue.uri = destVM.uri
 end
 
 function mt:loadRequires()
@@ -1198,14 +1209,15 @@ function mt:loadRequires()
         self.requires[k] = nil
         copy[k] = v
     end
-    for value, str in pairs(copy) do
+    for value, strValue in pairs(copy) do
+        local str = strValue.value
         if type(str) == 'string' then
             local uri = self.lsp.workspace:searchPath(str)
             -- 如果循环require，这里会返回nil
             -- 会当场编译VM
             local destVM = self.lsp:loadVM(uri)
             if destVM then
-                self:mergeRequire(value, destVM)
+                self:mergeRequire(value, strValue, destVM)
             end
         end
     end
@@ -1215,13 +1227,14 @@ function mt:tryLoadRequires()
     if not self.lsp or not self.lsp.workspace then
         return
     end
-    for value, str in pairs(self.requires) do
+    for value, strValue in pairs(self.requires) do
+        local str = strValue.value
         if type(str) == 'string' then
             local uri = self.lsp.workspace:searchPath(str)
             -- 如果取不到VM（不编译），则做个标记，之后再取一次
             local destVM = self.lsp:getVM(uri)
             if destVM then
-                self:mergeRequire(value, destVM)
+                self:mergeRequire(value, strValue, destVM)
                 self.requires[value] = nil
             else
                 self.lsp:needRequires(self.uri)

@@ -64,6 +64,13 @@ local function parseResult(vm, result)
                 }
             end
         end
+    elseif tp == 'string' then
+        -- require 'XXX' 专用
+        positions[#positions+1] = {
+            0,
+            0,
+            result.uri,
+        }
     end
     return positions
 end

@@ -21,7 +21,7 @@ return function (lsp)
                     watchers = {
                         {
                             globPattern = '**/*.lua',
-                            kind = 1 | 2 | 4, -- Create | Change | Delete
+                            kind = 1 | 4, -- Create | Change | Delete
                         },
                     },
                 },

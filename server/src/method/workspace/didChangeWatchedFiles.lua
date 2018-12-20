@@ -8,6 +8,7 @@ return function (lsp, params)
     if not lsp.workspace then
         return
     end
+    local needReset
     for _, change in ipairs(params.changes) do
         if change.type == FileChangeType.Created then
             lsp.workspace:addFile(change.uri)
@@ -16,7 +17,12 @@ return function (lsp, params)
             -- 删除文件后，清除该文件的诊断
             lsp:clearDiagnostics(change.uri)
         end
+        if lsp:isOpen(change.uri) then
+            needReset = true
+        end
     end
     -- 发生任何文件变化后，重新计算当前的打开文件
-    lsp.workspace:reset()
+    if needReset then
+        lsp.workspace:reset()
+    end
 end

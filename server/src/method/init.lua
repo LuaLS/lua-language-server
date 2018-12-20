@@ -18,5 +18,7 @@ init 'textDocument/implementation'
 init 'textDocument/publishDiagnostics'
 init 'textDocument/rename'
 init 'textDocument/references'
+init 'workspace/didChangeWatchedFiles'
+init 'workspace/didChangeWorkspaceFolders'
 
 return method

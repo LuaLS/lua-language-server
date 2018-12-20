@@ -113,6 +113,13 @@ function mt:_doDiagnostic()
     end
 end
 
+function mt:clearDiagnostics(uri)
+    rpc:notify('textDocument/publishDiagnostics', {
+        uri = uri,
+        diagnostics = {},
+    })
+end
+
 function mt:_buildTextCache()
     if not next(self._needCompile) then
         return

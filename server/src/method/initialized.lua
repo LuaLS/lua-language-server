@@ -2,11 +2,18 @@ local rpc = require 'rpc'
 local workspace = require 'workspace'
 
 return function (lsp)
-    lsp.workspace = workspace()
+    rpc:request('workspace/workspaceFolders', nil, function (folders)
+        if folders then
+            local folder = folders[1]
+            if folder then
+                lsp.workspace = workspace(folder.name, folder.uri)
+            end
+        end
+    end)
     -- 必须动态注册的事件：
     rpc:request('client/registerCapability', {
         registrations = {
-            -- 监事文件变化
+            -- 监视文件变化
             {
                 id = '0',
                 method = 'workspace/didChangeWatchedFiles',
@@ -14,7 +21,7 @@ return function (lsp)
                     watchers = {
                         {
                             globPattern = '**/*.lua',
-                            kind = 1 | 2 | 4, -- Create | Delete
+                            kind = 1 | 2 | 4, -- Create | Change | Delete
                         },
                     },
                 },

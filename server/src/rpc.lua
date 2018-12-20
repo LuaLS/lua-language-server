@@ -33,6 +33,22 @@ local function request(self, method, params, callback)
     io.write(buf)
 end
 
+local function requestWait(self, method, params, callback)
+    ID = ID + 1
+    local pack = {
+        jsonrpc = '2.0',
+        id = ID,
+        method = method,
+        params = params,
+    }
+    local content = json.encode(pack)
+    local buf = ('Content-Length: %d\r\n\r\n%s'):format(#content, content)
+    BUF[ID] = {
+        callback = callback,
+    }
+    io.write(buf)
+end
+
 local function response(self, id, data)
     data.jsonrpc = '2.0'
     data.id = id
@@ -49,7 +65,7 @@ local function recieve(self, proto)
         return
     end
     BUF[id] = nil
-    if os.clock() > data.timeout then
+    if data.timeout and os.clock() > data.timeout then
         log.warn('Recieve timeout: ', table.dump(proto.error))
         return
     end
@@ -61,8 +77,9 @@ local function recieve(self, proto)
 end
 
 return {
-    notify   = notify,
-    request  = request,
-    response = response,
-    recieve  = recieve,
+    notify      = notify,
+    request     = request,
+    requestWait = requestWait,
+    response    = response,
+    recieve     = recieve,
 }

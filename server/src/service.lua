@@ -239,16 +239,30 @@ function mt:compileVM(uri)
     self._needCompile[uri] = nil
     local ast = parser:ast(obj.text)
 
-    obj.vm = matcher.vm(ast, self)
+    obj.vm = matcher.vm(ast, self, uri)
     obj.lines = parser:lines(obj.text, 'utf8')
     if not obj.vm then
         return obj
     end
 
     self._needDiagnostics[uri] = true
-    self._needRequire[uri] = true
 
     return obj
+end
+
+function mt:getVM(uri)
+    local obj = self._file[uri]
+    if not obj then
+        return nil
+    end
+    if self._needCompile[uri] then
+        return nil
+    end
+    return obj.vm
+end
+
+function mt:needRequires(uri)
+    self._needRequire[uri] = true
 end
 
 function mt:_loadRequires()

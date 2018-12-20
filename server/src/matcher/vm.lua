@@ -474,10 +474,7 @@ function mt:callRequire(func, values)
     end
     local requireValue = self:createValue('boolean', nil, true)
     self:setFunctionReturn(func, 1, requireValue)
-    self.requires[#self.requires+1] = {
-        str = str,
-        value = requireValue,
-    }
+    self.requires[requireValue] = str
 end
 
 function mt:call(func, values)
@@ -1188,22 +1185,44 @@ function mt:mergeRequire(value, destVM)
     self:mergeValue(value, mainValue)
 end
 
-function mt:loadRequires(lsp)
-    for _, req in ipairs(self.requires) do
-        local str = req.str
+function mt:loadRequires()
+    if not self.lsp or not self.lsp.workspace then
+        return
+    end
+    for value, str in ipairs(self.requires) do
+        self.requires[value] = nil
         if type(str) == 'string' then
             local uri = lsp.workspace:searchPath(str)
             -- 如果循环require，这里会返回nil
+            -- 会当场编译VM
             local destVM = lsp:loadVM(uri)
             if destVM then
-                self:mergeRequire(req.value, destVM)
+                self:mergeRequire(value, destVM)
             end
         end
     end
-    self.requires = {}
 end
 
-local function compile(ast, lsp)
+function mt:tryLoadRequires()
+    if not self.lsp or not self.lsp.workspace then
+        return
+    end
+    for value, str in ipairs(self.requires) do
+        self.requires[value] = nil
+        if type(str) == 'string' then
+            local uri = lsp.workspace:searchPath(str)
+            -- 如果取不到VM，则做个标记，之后再取一次
+            local destVM = lsp:getVM(uri)
+            if destVM then
+                self:mergeRequire(value, destVM)
+            else
+                self.lsp:needRequires(self.uri)
+            end
+        end
+    end
+end
+
+local function compile(ast, lsp, uri)
     local vm = setmetatable({
         scope   = env {
             locals = {},
@@ -1223,6 +1242,7 @@ local function compile(ast, lsp)
         libraryChild = {},
         requires     = {},
         lsp          = lsp,
+        uri          = uri,
     }, mt)
 
     -- 创建初始环境
@@ -1231,14 +1251,17 @@ local function compile(ast, lsp)
     -- 执行代码
     vm:doActions(ast)
 
+    -- 合并
+    vm:loadRequires()
+
     return vm
 end
 
-return function (ast, lsp)
+return function (ast, lsp, uri)
     if not ast then
         return nil
     end
-    local suc, res = xpcall(compile, log.error, ast, lsp)
+    local suc, res = xpcall(compile, log.error, ast, lsp, uri)
     if not suc then
         return nil
     end

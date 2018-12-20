@@ -964,6 +964,7 @@ end
 function mt:doReturn(action)
     for i, exp in ipairs(action) do
         local value = self:getExp(exp)
+        self:addInfo(value, 'return', exp)
         if value.type == 'list' then
             for x, v in ipairs(value) do
                 self:setFunctionReturn(self:getCurrentFunction(), i + x - 1, v)

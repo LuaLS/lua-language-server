@@ -12,10 +12,10 @@
 - [x] Diagnostics
 - [x] Rename
 - [x] Auto Completion
+- [x] Intelligent
 - [ ] Support Dirty Script
 - [ ] Syntax Check
 - [ ] Signature Help
-- [ ] Intelligent
 - [ ] Multi Workspace
 
 ### Locale

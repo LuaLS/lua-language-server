@@ -15,11 +15,12 @@ return function (lsp, params)
 
     local locations = {}
     for i, position in ipairs(positions) do
-        local start, finish, valueUri = position[1], position[2], position[3]
-        local start_row,  start_col  = lines:rowcol(start)
-        local finish_row, finish_col = lines:rowcol(finish)
+        local start, finish, valueUri = position[1], position[2], (position[3] or uri)
+        local _, valueLines = lsp:loadVM(valueUri)
+        local start_row,  start_col  = valueLines:rowcol(start)
+        local finish_row, finish_col = valueLines:rowcol(finish)
         locations[i] = {
-            uri =  valueUri or uri,
+            uri =  valueUri,
             range = {
                 start = {
                     line = start_row - 1,

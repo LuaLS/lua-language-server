@@ -309,7 +309,7 @@ function mt:getField(pValue, name, source)
 end
 
 function mt:buildFunction(exp, object)
-    local func = self:createValue('function')
+    local func = self:createValue('function', exp)
     func.args = {}
     func.argValues = {}
 

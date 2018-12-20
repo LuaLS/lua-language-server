@@ -20,14 +20,11 @@ local response = thread.channel(%q)
 local errlog   = thread.channel 'errlog'
 
 local function task()
-    local dump, upvalues = request:bpop()
-    local f, err = load(dump, '=request', 'b')
+    local dump, env = request:bpop()
+    local f, err = load(dump, '=task', 't', env or _ENV)
     if not f then
         errlog:push(err)
         return
-    end
-    for i, value in ipairs(upvalues) do
-        debug.setupvalue(f, i+1, value)
     end
     local results = table.pack(pcall(f))
     local ok = table.remove(results, 1)
@@ -53,27 +50,16 @@ end
     }
 end
 
-local function call(func, callback)
+local function call(dump, env, callback)
     local task = table.remove(idlePool)
     if not task then
         task = createTask()
     end
-    local upvalues = {}
-    local upId = 2 -- 跳过第一个上值 _ENV
-    while true do
-        local k, v = debug.getupvalue(func, upId)
-        if not k then
-            break
-        end
-        upvalues[#upvalues+1] = v
-        upId = upId + 1
-    end
-    local dump = string.dump(func)
     runningList[task.id] = {
         task     = task,
         callback = callback,
     }
-    task.request:push(dump, upvalues)
+    task.request:push(dump, env)
 end
 
 local function onTick()

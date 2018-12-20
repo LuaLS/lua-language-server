@@ -257,9 +257,7 @@ function mt:listen()
 
     self._proto = thread.channel 'proto'
 
-    async.call(function ()
-        require 'proto'
-    end)
+    async.call([[require 'proto']])
 
     while true do
         async.onTick()

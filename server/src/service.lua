@@ -197,7 +197,7 @@ function mt:compileText(uri)
     self._needCompile[uri] = nil
     local ast = parser:ast(obj.text)
 
-    obj.vm = matcher.vm(ast)
+    obj.vm = matcher.vm(ast, self)
     obj.lines = parser:lines(obj.text, 'utf8')
     if not obj.vm then
         return obj

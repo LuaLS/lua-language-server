@@ -454,7 +454,12 @@ function mt:callRequire(func, values)
             return
         end
     end
-    self:setFunctionReturn(func, 1, nil)
+    local requireValue = self:createValue('boolean', nil, true)
+    self:setFunctionReturn(func, 1, requireValue)
+    self.requires[#self.requires+1] = {
+        str = str,
+        value = requireValue,
+    }
 end
 
 function mt:call(func, values)
@@ -1152,7 +1157,23 @@ function mt:createEnvironment()
     gValue.child = envValue.child
 end
 
-local function compile(ast)
+function mt:loadRequires()
+    if not self.lsp or not self.lsp.workspace then
+        return
+    end
+    for _, req in ipairs(self.requires) do
+        local str = req.str
+        if type(str) == 'string' then
+            local uri = self.lsp.workspace:searchPath(str)
+            -- 如果循环require，这里会返回nil
+            local destVM = self.lsp:loadText(uri)
+            if destVM then
+            end
+        end
+    end
+end
+
+local function compile(ast, lsp)
     local vm = setmetatable({
         scope   = env {
             locals = {},
@@ -1170,6 +1191,8 @@ local function compile(ast)
         },
         libraryValue = {},
         libraryChild = {},
+        requires     = {},
+        lsp          = lsp,
     }, mt)
 
     -- 创建初始环境
@@ -1178,14 +1201,17 @@ local function compile(ast)
     -- 执行代码
     vm:doActions(ast)
 
+    -- 合并requires
+    vm:loadRequires()
+
     return vm
 end
 
-return function (ast)
+return function (ast, lsp)
     if not ast then
         return nil
     end
-    local suc, res = xpcall(compile, log.error, ast)
+    local suc, res = xpcall(compile, log.error, ast, lsp)
     if not suc then
         return nil
     end

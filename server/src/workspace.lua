@@ -64,26 +64,51 @@ function mt:init(rootUri)
     }, function (list)
         log.info(('Found [%d] files'):format(#list))
         for _, filename in ipairs(list) do
-            local uri = uriEncode(fs.path(filename))
-            self.files[uri] = true
+            local path = fs.absolute(fs.path(filename))
+            local name = path:string():lower()
+            self.files[name] = uriEncode(path)
         end
     end)
 end
 
 function mt:addFile(uri)
     if uri:sub(-4) == '.lua' then
-        self.files[uri] = true
+        local name = uriDecode(uri):string():lower()
+        self.files[name] = uri
     end
 end
 
 function mt:removeFile(uri)
-    self.files[uri] = nil
+    local name = uriDecode(uri):string():lower()
+    self.files[name] = nil
+end
+
+function mt:searchPath(str)
+    str = str:gsub('%.', '/')
+    local searchers = {}
+    for i, luapath in ipairs(self.luapath) do
+        searchers[i] = luapath:gsub('%?', str):lower()
+    end
+    local results = {}
+    for filename, uri in pairs(self.files) do
+        for _, searcher in ipairs(searchers) do
+            if filename:sub(-#searcher) == searcher then
+                results[#results+1] = uri
+            end
+        end
+    end
+    return results[1]
 end
 
 return function (name, uri)
     local workspace = setmetatable({
         name = name,
         files = {},
+        luapath = {
+            '?.lua',
+            '?/init.lua',
+            '?/?.lua',
+        },
     }, mt)
     workspace:init(uri)
     return workspace

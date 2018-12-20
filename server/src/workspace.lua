@@ -60,7 +60,7 @@ end
 
 function mt:addFile(uri)
     if uri:sub(-4) == '.lua' then
-        self.files[path] = true
+        self.files[uri] = true
     end
 end
 

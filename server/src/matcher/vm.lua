@@ -1189,13 +1189,13 @@ function mt:loadRequires()
     if not self.lsp or not self.lsp.workspace then
         return
     end
-    for value, str in ipairs(self.requires) do
+    for value, str in pairs(self.requires) do
         self.requires[value] = nil
         if type(str) == 'string' then
-            local uri = lsp.workspace:searchPath(str)
+            local uri = self.lsp.workspace:searchPath(str)
             -- 如果循环require，这里会返回nil
             -- 会当场编译VM
-            local destVM = lsp:loadVM(uri)
+            local destVM = self.lsp:loadVM(uri)
             if destVM then
                 self:mergeRequire(value, destVM)
             end
@@ -1207,14 +1207,14 @@ function mt:tryLoadRequires()
     if not self.lsp or not self.lsp.workspace then
         return
     end
-    for value, str in ipairs(self.requires) do
-        self.requires[value] = nil
+    for value, str in pairs(self.requires) do
         if type(str) == 'string' then
-            local uri = lsp.workspace:searchPath(str)
-            -- 如果取不到VM，则做个标记，之后再取一次
-            local destVM = lsp:getVM(uri)
+            local uri = self.lsp.workspace:searchPath(str)
+            -- 如果取不到VM（不编译），则做个标记，之后再取一次
+            local destVM = self.lsp:getVM(uri)
             if destVM then
                 self:mergeRequire(value, destVM)
+                self.requires[value] = nil
             else
                 self.lsp:needRequires(self.uri)
             end
@@ -1252,7 +1252,7 @@ local function compile(ast, lsp, uri)
     vm:doActions(ast)
 
     -- 合并
-    vm:loadRequires()
+    vm:tryLoadRequires()
 
     return vm
 end

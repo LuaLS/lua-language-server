@@ -280,7 +280,7 @@ function mt:_loadRequires()
     for uri in pairs(copy) do
         local obj = self._file[uri]
         if obj then
-            obj.vm:loadRequires(self)
+            obj.vm:loadRequires()
             self._needDiagnostics[uri] = true
         end
     end

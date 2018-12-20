@@ -201,6 +201,10 @@ function mt:close(uri)
     self._opening[uri] = nil
 end
 
+function mt:isOpen(uri)
+    return self._opening[uri] == true
+end
+
 function mt:reCompile()
     for uri in pairs(self._opening) do
         self._needCompile[uri] = true

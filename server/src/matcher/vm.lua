@@ -578,6 +578,7 @@ function mt:createValue(tp, source, v)
         type = tp,
         source = source or DefaultSource,
         value = v,
+        uri = self.uri,
     }
     local lib = library.object[tp]
     if lib then
@@ -1183,7 +1184,6 @@ function mt:mergeRequire(value, destVM)
         mainValue = deepCopy(main.returns[1])
     end
     self:mergeValue(value, mainValue)
-    value.uri = destVM.uri
 end
 
 function mt:loadRequires()

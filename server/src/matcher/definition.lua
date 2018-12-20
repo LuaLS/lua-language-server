@@ -4,7 +4,7 @@ local function parseResult(vm, result)
     local positions = {}
     local tp = result.type
     if     tp == 'local' then
-        if result.value.uri and result.value.uri ~= vm.uri then
+        if result.value.uri ~= vm.uri then
             positions[#positions+1] = {
                 result.value.source.start,
                 result.value.source.finish,
@@ -18,7 +18,7 @@ local function parseResult(vm, result)
             end
         end
     elseif tp == 'field' then
-        if result.value.uri and result.value.uri ~= vm.uri then
+        if result.value.uri ~= vm.uri then
             positions[#positions+1] = {
                 result.value.source.start,
                 result.value.source.finish,

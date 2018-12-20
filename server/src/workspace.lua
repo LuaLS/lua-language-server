@@ -15,7 +15,8 @@ local function uriDecode(uri)
         log.error('uri decode failed: ', uri)
         return nil
     end
-    local path = fs.path(names[1])
+    -- 盘符后面加个斜杠
+    local path = fs.path(names[1] .. '\\')
     for i = 2, #names do
         path = path / names[i]
     end

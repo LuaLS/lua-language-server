@@ -18,4 +18,5 @@ return function (lsp, params)
         end
     end
     -- 发生任何文件变化后，重新计算当前的打开文件
+    lsp.workspace:reset()
 end

@@ -135,7 +135,7 @@ function mt:_buildTextCache()
     local size = 0
     local clock = os.clock()
     for _, uri in ipairs(list) do
-        local obj = self:compileText(uri)
+        local obj = self:compileVM(uri)
         size = size + #obj.text
     end
     local passed = os.clock() - clock
@@ -177,16 +177,32 @@ function mt:saveText(uri, version, text)
     end
 end
 
-function mt:loadText(uri)
+function mt:readText(uri, path)
+    local obj = self._file[uri]
+    if obj then
+        return
+    end
+    local text = io.load(path)
+    if not text then
+        return
+    end
+    self._file[uri] = {
+        version = -1,
+        text = text,
+    }
+    self._needCompile[uri] = true
+end
+
+function mt:loadVM(uri)
     local obj = self._file[uri]
     if not obj then
         return nil
     end
-    self:compileText(uri)
+    self:compileVM(uri)
     return obj.vm, obj.lines
 end
 
-function mt:compileText(uri)
+function mt:compileVM(uri)
     local obj = self._file[uri]
     if not obj then
         return nil

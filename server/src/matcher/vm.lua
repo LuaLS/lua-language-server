@@ -1166,7 +1166,7 @@ function mt:loadRequires()
         if type(str) == 'string' then
             local uri = self.lsp.workspace:searchPath(str)
             -- 如果循环require，这里会返回nil
-            local destVM = self.lsp:loadText(uri)
+            local destVM = self.lsp:loadVM(uri)
             if destVM then
             end
         end

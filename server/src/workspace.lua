@@ -84,26 +84,35 @@ function mt:removeFile(uri)
 end
 
 function mt:searchPath(str)
+    if self.loaded[str] then
+        return self.loaded[str]
+    end
     str = str:gsub('%.', '/')
     local searchers = {}
     for i, luapath in ipairs(self.luapath) do
         searchers[i] = luapath:gsub('%?', str):lower()
     end
-    local results = {}
     for filename, uri in pairs(self.files) do
         for _, searcher in ipairs(searchers) do
             if filename:sub(-#searcher) == searcher then
-                results[#results+1] = uri
+                self.loaded[str] = uri
+                return uri
             end
         end
     end
-    return results[1]
+    return nil
 end
 
-return function (name, uri)
+function mt:reset()
+    self.laoded = {}
+end
+
+return function (lsp, name, uri)
     local workspace = setmetatable({
+        lsp = lsp,
         name = name,
         files = {},
+        loaded = {},
         luapath = {
             '?.lua',
             '?/init.lua',

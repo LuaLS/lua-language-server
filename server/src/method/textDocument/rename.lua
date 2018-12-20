@@ -3,7 +3,7 @@ local matcher = require 'matcher'
 return function (lsp, params)
     local uri = params.textDocument.uri
     local newName = params.newName
-    local vm, lines = lsp:loadText(uri)
+    local vm, lines = lsp:loadVM(uri)
     if not vm then
         return {}
     end

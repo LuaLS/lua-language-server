@@ -6,7 +6,7 @@ return function (lsp)
         if folders then
             local folder = folders[1]
             if folder then
-                lsp.workspace = workspace(folder.name, folder.uri)
+                lsp.workspace = workspace(lsp, folder.name, folder.uri)
             end
         end
     end)

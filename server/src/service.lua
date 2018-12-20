@@ -193,6 +193,20 @@ function mt:readText(uri, path)
     self._needCompile[uri] = true
 end
 
+function mt:open(uri)
+    self._opening[uri] = true
+end
+
+function mt:close(uri)
+    self._opening[uri] = nil
+end
+
+function mt:reCompile()
+    for uri in pairs(self._opening) do
+        self._needCompile[uri] = true
+    end
+end
+
 function mt:loadVM(uri)
     local obj = self._file[uri]
     if not obj then
@@ -287,6 +301,7 @@ return function ()
         _file = {},
         _needCompile = {},
         _needDiagnostics = {},
+        _opening = {},
         _clock = -100,
     }, mt)
     return session

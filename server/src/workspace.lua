@@ -72,6 +72,7 @@ function mt:init(rootUri)
             local name = path:string():lower()
             self.files[name] = uriEncode(path)
         end
+        self:reset()
     end)
 end
 
@@ -110,6 +111,7 @@ end
 
 function mt:reset()
     self.laoded = {}
+    self.lsp:reCompile()
 end
 
 return function (lsp, name, uri)

@@ -1,4 +1,5 @@
 local fs = require 'bee.filesystem'
+local async = require 'async'
 
 local function uriDecode(uri)
     if uri:sub(1, 8) ~= 'file:///' then
@@ -48,15 +49,25 @@ function mt:init(rootUri)
         return
     end
     log.info('Workspace inited, root: ', self.root)
-    local count = 0
-    for path in io.scan(self.root) do
-        if path:extension():string() == '.lua' then
-            local uri = uriEncode(path)
-            self.files[uri] = true
-            count = count + 1
+    async.call([[
+        require 'utility'
+        local fs = require 'bee.filesystem'
+        local list = {}
+        for path in io.scan(fs.path(ROOT)) do
+            if path:extension():string() == '.lua' then
+                list[#list+1] = path:string()
+            end
         end
-    end
-    log.info(('Found [%d] files'):format(count))
+        return list
+    ]], {
+        ROOT = self.root:string()
+    }, function (list)
+        log.info(('Found [%d] files'):format(#list))
+        for _, filename in ipairs(list) do
+            local uri = uriEncode(fs.path(filename))
+            self.files[uri] = true
+        end
+    end)
 end
 
 function mt:addFile(uri)

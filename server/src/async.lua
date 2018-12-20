@@ -21,7 +21,12 @@ local errlog   = thread.channel 'errlog'
 
 local function task()
     local dump, env = request:bpop()
-    local f, err = load(dump, '=task', 't', env or _ENV)
+    if env then
+        setmetatable(env, { __index = _ENV })
+    else
+        env = _ENV
+    end
+    local f, err = load(dump, '=task', 't', env)
     if not f then
         errlog:push(err)
         return

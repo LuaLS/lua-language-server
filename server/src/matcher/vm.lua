@@ -35,6 +35,24 @@ local function orderTable()
     })
 end
 
+local function deepCopy(t, mark, new)
+    mark = mark or {}
+    new = new or {}
+    for k, v in pairs(t) do
+        if type(v) == 'table' then
+            if mark[v] then
+                new[k] = mark[v]
+            else
+                mark[v] = {}
+                new[k] = deepCopy(v, mark, mark[v])
+            end
+        else
+            new[k] = v
+        end
+    end
+    return new
+end
+
 local mt = {}
 mt.__index = mt
 
@@ -1157,6 +1175,19 @@ function mt:createEnvironment()
     gValue.child = envValue.child
 end
 
+function mt:mergeRequire(value, destVM)
+    -- 取出对方的主函数
+    local main = destVM.results.main
+    -- 获取主函数返回值，注意不能修改对方的环境
+    local mainValue
+    if not main.returns then
+        mainValue = self:createValue('nil')
+    else
+        mainValue = deepCopy(main.returns[1])
+    end
+    self:mergeValue(value, mainValue)
+end
+
 function mt:loadRequires()
     if not self.lsp or not self.lsp.workspace then
         return
@@ -1168,6 +1199,7 @@ function mt:loadRequires()
             -- 如果循环require，这里会返回nil
             local destVM = self.lsp:loadVM(uri)
             if destVM then
+                self:mergeRequire(req.value, destVM)
             end
         end
     end

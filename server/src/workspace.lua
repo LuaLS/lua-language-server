@@ -53,6 +53,10 @@ function mt:init(rootUri)
         require 'utility'
         local fs = require 'bee.filesystem'
         local list = {}
+        local ignore = {
+            ['.git'] = true,
+            ['node_modules'] = true,
+        }
         for path in io.scan(fs.path(ROOT)) do
             if path:extension():string() == '.lua' then
                 list[#list+1] = path:string()
@@ -96,6 +100,7 @@ function mt:searchPath(str)
         for _, searcher in ipairs(searchers) do
             if filename:sub(-#searcher) == searcher then
                 self.loaded[str] = uri
+                self.lsp:readText(uri, fs.path(filename))
                 return uri
             end
         end

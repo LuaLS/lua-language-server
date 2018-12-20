@@ -143,7 +143,7 @@ function io.save(file_path, content)
     end
 end
 
-function io.scan(path)
+function io.scan(path, ignore)
     local result = {path}
     local i = 0
     return function ()
@@ -153,8 +153,11 @@ function io.scan(path)
             return nil
         end
         if fs.is_directory(current) then
-            for path in current:list_directory() do
-                result[#result+1] = path
+            local dirName = current:filename():string():lower()
+            if not ignore or not ignore[dirName] then
+                for path in current:list_directory() do
+                    result[#result+1] = path
+                end
             end
         end
         return current

@@ -115,3 +115,9 @@ end
 local v = 2
 xx()
 ]]
+
+TEST [[
+return {
+    1, 2, 3
+}
+]]

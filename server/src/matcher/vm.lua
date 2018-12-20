@@ -1087,12 +1087,14 @@ function mt:doFunction(action)
     local name = action.name
     local var, object
     local source
-    if name.type == 'simple' then
-        var, object = self:getSimple(name, 'field')
-        source = name[#name]
-    else
-        var = self:getName(name[1], name)
-        source = name
+    if name then
+        if name.type == 'simple' then
+            var, object = self:getSimple(name, 'field')
+            source = name[#name]
+        else
+            var = self:getName(name[1], name)
+            source = name
+        end
     end
     local func = self:buildFunction(action, object)
     self:setValue(var, func, source)
@@ -1100,9 +1102,19 @@ end
 
 function mt:doLocalFunction(action)
     local name = action.name
-    local var = self:createLocal(name[1], name)
-    local func = self:buildFunction(action)
-    self:setValue(var, func, name)
+    local var, object
+    local source
+    if name then
+        if name.type == 'simple' then
+            var, object = self:getSimple(name, 'field')
+            source = name[#name]
+        else
+            var = self:createLocal(name[1], name)
+            source = name
+        end
+    end
+    local func = self:buildFunction(action, object)
+    self:setValue(var, func, source)
 end
 
 function mt:doAction(action)

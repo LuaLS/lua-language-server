@@ -107,6 +107,7 @@ function mt:addInfo(obj, type, source)
         source = source or DefaultSource,
     }
     if source then
+        source.uri = self.uri
         local other = self.results.sources[source]
         if other then
             if other.type == 'multi-source' then
@@ -578,7 +579,6 @@ function mt:createValue(tp, source, v)
         type = tp,
         source = source or DefaultSource,
         value = v,
-        uri = self.uri,
     }
     local lib = library.object[tp]
     if lib then

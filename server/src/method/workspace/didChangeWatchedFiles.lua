@@ -17,11 +17,11 @@ return function (lsp, params)
             -- 删除文件后，清除该文件的诊断
             lsp:clearDiagnostics(change.uri)
         end
-        if lsp:isOpen(change.uri) then
+        if lsp:getVM(change.uri) then
             needReset = true
         end
     end
-    -- 发生任何文件变化后，重新计算当前的打开文件
+    -- 缓存过的文件发生变化后，重新计算
     if needReset then
         lsp.workspace:reset()
     end

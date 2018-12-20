@@ -6,21 +6,36 @@ local function isContainPos(obj, pos)
 end
 
 local function findAtPos(results, pos)
+    local res = {}
     for sources, object in pairs(results.sources) do
         if sources.type == 'multi-source' then
             for _, source in ipairs(source) do
                 if source.type ~= 'simple' and isContainPos(source, pos) then
-                    return object, source
+                    res[#res+1] = {
+                        object = object,
+                        source = source,
+                        range = source.finish - source.start,
+                    }
                 end
             end
         else
             local source = sources
             if source.type ~= 'simple' and isContainPos(source, pos) then
-                return object, source
+                res[#res+1] = {
+                    object = object,
+                    source = source,
+                    range = source.finish - source.start,
+                }
             end
         end
     end
-    return nil
+    if #res == 0 then
+        return nil
+    end
+    table.sort(res, function (a, b)
+        return a.range < b.range
+    end)
+    return res[1].object, res[1].source
 end
 
 local function findClosePos(results, pos)

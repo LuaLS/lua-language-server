@@ -130,10 +130,12 @@ local defs = {
         for i = 2, #args, 2 do
             op, e2 = args[i], args[i+1]
             e1 = {
-                type = 'binary',
-                op = op,
-                [1]  = e1,
-                [2]  = e2,
+                type   = 'binary',
+                op     = op,
+                start  = e1.start,
+                finish = e2.finish,
+                [1]    = e1,
+                [2]    = e2,
             }
         end
         return e1
@@ -148,9 +150,11 @@ local defs = {
         for i = #args - 1, 1, -1 do
             op = args[i]
             e1 = {
-                type = 'unary',
-                op = op,
-                [1]  = e1,
+                type   = 'unary',
+                op     = op,
+                start  = e1.start,
+                finish = e1.finish,
+                [1]    = e1,
             }
         end
         return e1

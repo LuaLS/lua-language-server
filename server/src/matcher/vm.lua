@@ -1189,8 +1189,12 @@ function mt:loadRequires()
     if not self.lsp or not self.lsp.workspace then
         return
     end
-    for value, str in pairs(self.requires) do
-        self.requires[value] = nil
+    local copy = {}
+    for k, v in pairs(self.requires) do
+        self.requires[k] = nil
+        copy[k] = v
+    end
+    for value, str in pairs(copy) do
         if type(str) == 'string' then
             local uri = self.lsp.workspace:searchPath(str)
             -- 如果循环require，这里会返回nil

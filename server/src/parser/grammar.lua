@@ -190,6 +190,8 @@ COLON       <-  Sp ({} ':' !':') -> COLON
 LABEL       <-  Sp '::'
 ASSIGN      <-  Sp '='
 
+Nothing     <-  {} -> Nothing
+
 TOCLOSE     <-  Sp '*toclose'
 ]]
 
@@ -273,7 +275,9 @@ ExpList     <-  (COMMA DirtyExp)+
             ->  List
             /   (Exp (COMMA DirtyExp)*)?
             ->  List
-NameList    <-  (Name (COMMA MustName)*)?
+NameList    <-  (COMMA MustName)+
+            ->  List
+            /   (Name (COMMA MustName)*)?
             ->  List
 
 ArgList     <-  (COMMA AfterArg)+
@@ -301,6 +305,12 @@ NewField    <-  (MustName ASSIGN DirtyExp)
 Function    <-  Sp ({} FunctionBody {})
             ->  Function
 FunctionBody<-  FUNCTION FuncName PL ArgList PR
+                    Action*
+                END?
+            /   FUNCTION FuncName PL ArgList PR?
+                    Action*
+                END?
+            /   FUNCTION FuncName Nothing
                     Action*
                 END?
 FuncName    <-  (Name? (FuncSuffix)*)
@@ -359,33 +369,37 @@ IfBody      <-  IfHead
                 END?
 IfPart      <-  IF Exp THEN
                     {} (!ELSEIF !ELSE Action)* {}
-            /   IF (Exp / DirtyName) THEN
+            /   IF DirtyExp THEN
                     {} (!ELSEIF !ELSE Action)* {}
-            /   IF (Exp / DirtyName)
+            /   IF DirtyExp
                     {}         {}
 ElseIfPart  <-  ELSEIF Exp THEN
                     {} (!ELSE !ELSEIF Action)* {}
-            /   ELSEIF (Exp / DirtyName) THEN
+            /   ELSEIF DirtyExp THEN
                     {} (!ELSE !ELSEIF Action)* {}
-            /   ELSEIF (Exp / DirtyName) THEN
+            /   ELSEIF DirtyExp THEN
                     {}         {}
 ElsePart    <-  ELSE
                     {} Action* {}
 
 For         <-  Loop / In
+            /   FOR
 
 Loop        <-  Sp ({} LoopBody {})
             ->  Loop
-LoopBody    <-  (FOR LoopStart LoopFinish LoopStep? DO) -> LoopDef
+LoopBody    <-  FOR LoopStart LoopFinish LoopStep DO?
                     Action*
                 END?
-LoopStart   <-  MustName ASSIGN Exp
-LoopFinish  <-  COMMA Exp
-LoopStep    <-  COMMA Exp
+LoopStart   <-  MustName ASSIGN DirtyExp
+LoopFinish  <-  COMMA? Exp
+            /   COMMA? DirtyName
+LoopStep    <-  COMMA  DirtyExp
+            /   COMMA? Exp
+            /   Nothing
 
 In          <-  Sp ({} InBody {})
             ->  In
-InBody      <-  FOR NameList IN ExpList DO
+InBody      <-  FOR NameList IN? ExpList DO?
                     Action*
                 END?
 

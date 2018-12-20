@@ -247,6 +247,9 @@ local defs = {
             return first
         end
     end,
+    Nothing = function ()
+        return nil
+    end,
     Set = function (keys, values)
         return {
             type = 'set',
@@ -348,9 +351,6 @@ local defs = {
         obj.finish = obj[max] - 1
         obj[max]   = nil
         return obj
-    end,
-    LoopDef = function (arg, min, max, step)
-        return arg, min, max, step
     end,
     Loop = function (start, arg, min, max, step, ...)
         local obj = {

@@ -28,8 +28,12 @@ local function uriEncode(path)
     local names = {}
     local cur = fs.absolute(path)
     while true do
-        local name = cur:filename():string():gsub([=[[^%w%-%_%.%~]]=], function (char)
-            return '%' .. string.byte(char)
+        local name = cur:filename():string()
+        if name == '' then
+            name = cur:string()
+        end
+        name = name:gsub([=[[^%w%-%_%.%~]]=], function (char)
+            return ('%02X'):format(string.byte(char))
         end)
         table.insert(names, 1, name)
         if cur == cur:parent_path() then

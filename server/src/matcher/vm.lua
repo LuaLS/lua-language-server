@@ -1097,7 +1097,9 @@ function mt:doFunction(action)
         end
     end
     local func = self:buildFunction(action, object)
-    self:setValue(var, func, source)
+    if var then
+        self:setValue(var, func, source)
+    end
 end
 
 function mt:doLocalFunction(action)
@@ -1114,7 +1116,9 @@ function mt:doLocalFunction(action)
         end
     end
     local func = self:buildFunction(action, object)
-    self:setValue(var, func, source)
+    if var then
+        self:setValue(var, func, source)
+    end
 end
 
 function mt:doAction(action)

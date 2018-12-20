@@ -269,6 +269,7 @@ function mt:setValue(var, value, source)
     end
     if source and source.start then
         self:addInfo(var, 'set', source)
+        self:addInfo(value, 'set', source)
         if not value.declarat then
             value.declarat = source
         end

@@ -5,8 +5,9 @@ local function parseResult(vm, result)
     local tp = result.type
     if     tp == 'local' then
         if result.value.uri ~= vm.uri then
-            for _, info in ipairs(result) do
-                if info.type == 'set' then
+            -- 跨越文件时，遍历的是值的绑定信息
+            for _, info in ipairs(result.value) do
+                if info.type == 'set'then
                     positions[#positions+1] = {
                         info.source.start,
                         info.source.finish,
@@ -14,16 +15,27 @@ local function parseResult(vm, result)
                     }
                 end
             end
+            if #positions == 0 then
+                for _, info in ipairs(result.value) do
+                    if info.type == 'return'then
+                        positions[#positions+1] = {
+                            info.source.start,
+                            info.source.finish,
+                            info.source.uri,
+                        }
+                    end
+                end
+            end
         else
-          for _, info in ipairs(result) do
-              if info.type == 'local' then
-                  positions[#positions+1] = {
-                    info.source.start,
-                    info.source.finish,
-                    info.source.uri,
-                }
-              end
-          end
+            for _, info in ipairs(result) do
+                if info.type == 'local' then
+                    positions[#positions+1] = {
+                        info.source.start,
+                        info.source.finish,
+                        info.source.uri,
+                    }
+                end
+            end
         end
     elseif tp == 'field' then
         for _, info in ipairs(result) do

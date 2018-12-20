@@ -89,19 +89,27 @@ function mt:_doDiagnostic()
     local clock = os.clock()
     local count = 0
     local copy = {}
-    for uri, data in pairs(self._needDiagnostics) do
-        count = count + 1
-        copy[uri] = data
+    for uri in pairs(self._needDiagnostics) do
         self._needDiagnostics[uri] = nil
+        count = count + 1
+        copy[uri] = true
     end
-    for uri, data in pairs(copy) do
-        local name = 'textDocument/publishDiagnostics'
-        local res  = self:_callMethod(name, data)
-        if res then
-            rpc:notify(name, {
-                uri = uri,
-                diagnostics = res,
-            })
+    for uri in pairs(copy) do
+        local obj = self._file[uri]
+        if obj then
+            local data = {
+                uri   = uri,
+                vm    = obj.vm,
+                lines = obj.lines,
+            }
+            local name = 'textDocument/publishDiagnostics'
+            local res  = self:_callMethod(name, data)
+            if res then
+                rpc:notify(name, {
+                    uri = uri,
+                    diagnostics = res,
+                })
+            end
         end
     end
     local passed = os.clock() - clock
@@ -237,18 +245,35 @@ function mt:compileVM(uri)
         return obj
     end
 
-    self._needDiagnostics[uri] = {
-        vm    = obj.vm,
-        lines = obj.lines,
-        uri   = uri,
-    }
+    self._needDiagnostics[uri] = true
+    self._needRequire[uri] = true
 
     return obj
 end
 
+function mt:_loadRequires()
+    if not self.workspace then
+        return
+    end
+    if not next(self._needRequire) then
+        return
+    end
+    local copy = {}
+    for uri in pairs(self._needRequire) do
+        self._needRequire[uri] = nil
+        copy[uri] = true
+    end
+    for uri in pairs(copy) do
+        local obj = self._file[uri]
+        if obj then
+            obj.vm:loadRequires(self)
+            self._needDiagnostics[uri] = true
+        end
+    end
+end
+
 function mt:removeText(uri)
     self._file[uri] = nil
-    self._needCompile[uri] = nil
 end
 
 function mt:onTick()
@@ -265,6 +290,7 @@ function mt:onTick()
     end
     self:_buildTextCache()
     self:_doDiagnostic()
+    self:_loadRequires()
 
     if os.clock() - self._clock >= 600 then
         self._clock = os.clock()
@@ -304,6 +330,7 @@ return function ()
     local session = setmetatable({
         _file = {},
         _needCompile = {},
+        _needRequire = {},
         _needDiagnostics = {},
         _opening = {},
         _clock = -100,

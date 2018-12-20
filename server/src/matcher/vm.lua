@@ -1188,21 +1188,19 @@ function mt:mergeRequire(value, destVM)
     self:mergeValue(value, mainValue)
 end
 
-function mt:loadRequires()
-    if not self.lsp or not self.lsp.workspace then
-        return
-    end
+function mt:loadRequires(lsp)
     for _, req in ipairs(self.requires) do
         local str = req.str
         if type(str) == 'string' then
-            local uri = self.lsp.workspace:searchPath(str)
+            local uri = lsp.workspace:searchPath(str)
             -- 如果循环require，这里会返回nil
-            local destVM = self.lsp:loadVM(uri)
+            local destVM = lsp:loadVM(uri)
             if destVM then
                 self:mergeRequire(req.value, destVM)
             end
         end
     end
+    self.requires = {}
 end
 
 local function compile(ast, lsp)
@@ -1232,9 +1230,6 @@ local function compile(ast, lsp)
 
     -- 执行代码
     vm:doActions(ast)
-
-    -- 合并requires
-    vm:loadRequires()
 
     return vm
 end

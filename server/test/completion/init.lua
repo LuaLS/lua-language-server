@@ -256,3 +256,5 @@ xxx()
         documentation = EXISTS,
     },
 }
+
+--TEST 'local s = "a:@"' (nil) TODO

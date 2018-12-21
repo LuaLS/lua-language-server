@@ -46,7 +46,10 @@ return function (vm, pos)
 
     local hovers = {}
     for _, call in ipairs(calls) do
-        hovers[#hovers+1] = hover(call.var, call.source, nil, call.select)
+        local hvr = hover(call.var, call.source, nil, call.select)
+        if hvr.argLabel then
+            hovers[#hovers+1] = hvr
+        end
     end
 
     if #hovers == 0 then

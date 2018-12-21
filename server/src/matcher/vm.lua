@@ -991,11 +991,17 @@ function mt:doReturn(action)
     for i, exp in ipairs(action) do
         local value = self:getExp(exp)
         if value.type == 'list' then
-            for x, v in ipairs(value) do
+            if i == #action then
+                for x, v in ipairs(value) do
+                    self:addInfo(v, 'return', exp)
+                    self:setFunctionReturn(self:getCurrentFunction(), i + x - 1, v)
+                end
+                break
+            else
+                local v = value[1] or self:createValue('nil', exp)
                 self:addInfo(v, 'return', exp)
-                self:setFunctionReturn(self:getCurrentFunction(), i + x - 1, v)
+                self:setFunctionReturn(self:getCurrentFunction(), i, v)
             end
-            break
         else
             self:addInfo(value, 'return', exp)
             self:setFunctionReturn(self:getCurrentFunction(), i, value)

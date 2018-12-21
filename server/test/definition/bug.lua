@@ -77,3 +77,9 @@ local t = {
     <?x?>,
 }
 ]]
+
+TEST [[
+local a
+local <!b!>
+return f(), <?b?>
+]]

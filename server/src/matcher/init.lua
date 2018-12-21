@@ -8,6 +8,7 @@ local api = {
     findResult     = require 'matcher.find_result',
     findLib        = require 'matcher.find_lib',
     completion     = require 'matcher.completion',
+    signature      = require 'matcher.signature',
     vm             = require 'matcher.vm',
 }
 

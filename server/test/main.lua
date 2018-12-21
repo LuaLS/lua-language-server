@@ -32,6 +32,7 @@ local function main()
     test 'find_lib'
     test 'hover'
     test 'completion'
+    test 'signature'
 
     print('测试完成')
 end

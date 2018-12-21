@@ -12,6 +12,10 @@ return function (lsp)
             referencesProvider = true,
             -- 支持“重命名”
             renameProvider = true,
+            -- 支持“签名帮助”
+            signatureHelpProvider = {
+                triggerCharacters = { '(', ',' },
+            },
             -- 文本同步方式
             textDocumentSync = {
                 -- 打开关闭文本时通知

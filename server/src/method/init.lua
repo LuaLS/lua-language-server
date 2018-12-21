@@ -18,6 +18,7 @@ init 'textDocument/implementation'
 init 'textDocument/publishDiagnostics'
 init 'textDocument/rename'
 init 'textDocument/references'
+init 'textDocument/signatureHelp'
 init 'workspace/didChangeWatchedFiles'
 init 'workspace/didChangeWorkspaceFolders'
 

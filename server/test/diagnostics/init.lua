@@ -143,6 +143,10 @@ instanceName = 1
 instance = _G[instanceName]
 ]]
 
+TEST [[
+(''):sub(1, 2)
+]]
+
 -- TODO
 --TEST [=[
 --return [[   

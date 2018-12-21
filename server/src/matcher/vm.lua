@@ -38,6 +38,16 @@ end
 local mt = {}
 mt.__index = mt
 
+function mt:createDummyVar(source, value)
+    local loc = {
+        type = 'local',
+        key = '',
+        source = source or DefaultSource,
+    }
+    self:setValue(loc, value, source)
+    return loc
+end
+
 function mt:createLocal(key, source, value)
     local loc = {
         type = 'local',
@@ -784,11 +794,11 @@ function mt:getSimple(simple, mode)
         parentName = field.key
     elseif tp == 'string' or tp == 'number' or tp == 'nil' or tp == 'boolean' then
         local v = self:createValue(tp, simple[1], simple[1][1])
-        field = self:createLocal('', simple[1], v)
+        field = self:createDummyVar(simple[1], v)
         parentName = '*' .. tp
     else
         local v = self:createValue('any', simple[1])
-        field = self:createLocal('', simple[1], v)
+        field = self:createDummyVar(simple[1], v)
         parentName = '?'
     end
     local object

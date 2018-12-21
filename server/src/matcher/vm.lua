@@ -1253,7 +1253,7 @@ function mt:mergeRequire(value, strValue, destVM)
     -- 获取主函数返回值，注意不能修改对方的环境
     local mainValue
     if not main.returns then
-        mainValue = self:createValue('nil', nil, {
+        mainValue = self:createValue('nil', {
             type   = 'name',
             start  = 0,
             finish = 0,

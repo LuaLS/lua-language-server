@@ -14,10 +14,20 @@ return function (lsp, params)
         return nil
     end
 
-    local text = matcher.hover(result, source, lsp)
-    if not text then
+    local results = matcher.hover(result, source, lsp)
+    if not results then
         return nil
     end
+
+    local text = ([[
+```lua
+%s
+```
+%s
+```lua
+%s
+```
+]]):format(results[1], results[2], results[3] or '')
 
     local response = {
         contents = {

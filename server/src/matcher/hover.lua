@@ -13,7 +13,7 @@ local OriginTypes = {
     ['function'] = true,
 }
 
-local function buildLibArgs(lib, oo)
+local function buildLibArgs(lib, oo, select)
     if not lib.args then
         return ''
     end
@@ -259,30 +259,22 @@ local function buildValueReturns(result)
     return '\n  -> ' .. table.concat(strs, ', ')
 end
 
-local function getFunctionHover(name, result, source, lib, oo)
+local function getFunctionHover(name, result, source, lib, oo, select)
     local args = ''
     local returns
     local enum = ''
     local tip = ''
     if lib then
-        args = buildLibArgs(lib, oo)
+        args = buildLibArgs(lib, oo, select)
         returns = buildLibReturns(lib)
         enum = buildEnum(lib)
         tip = lib.description or ''
     else
-        args = buildValueArgs(result, source)
+        args = buildValueArgs(result, source, select)
         returns = buildValueReturns(result)
     end
     local title = ('function %s(%s)%s'):format(name, args, returns)
-    return ([[
-```lua
-%s
-```
-%s
-```lua
-%s
-```
-]]):format(title, tip, enum)
+    return { title, tip, enum }
 end
 
 local function findClass(result)
@@ -356,12 +348,7 @@ local function getValueHover(name, valueType, result, source, lib)
     else
         text = ('%s %s = %s'):format(valueType, name, value)
     end
-    return ([[
-```lua
-%s
-```
-%s
-]]):format(text, tip)
+    return { text, tip }
 end
 
 local function getStringHover(result, lsp)
@@ -375,7 +362,7 @@ local function getStringHover(result, lsp)
     return ('[%s](%s)'):format(path:string(), result.uri)
 end
 
-return function (result, source, lsp)
+return function (result, source, lsp, select)
     if not result.value then
         return
     end
@@ -388,7 +375,7 @@ return function (result, source, lsp)
     local valueType = lib and lib.type or result.value.type or 'nil'
     local name = fullKey or buildValueName(result, source)
     if valueType == 'function' then
-        return getFunctionHover(name, result, source, lib, oo)
+        return getFunctionHover(name, result, source, lib, oo, select)
     else
         return getValueHover(name, valueType, result, source, lib)
     end

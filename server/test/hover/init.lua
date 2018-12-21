@@ -13,10 +13,10 @@ function TEST(script)
         local vm = matcher.vm(ast)
         assert(vm)
         local result, source = matcher.findResult(vm, pos)
-        local result = matcher.hover(result, source)
+        local results = matcher.hover(result, source)
         assert(result)
         expect = expect:gsub('^[\r\n]*(.-)[\r\n]*$', '%1'):gsub('\r\n', '\n')
-        result = result:gsub('```lua[\r\n]*', ''):gsub('[\r\n]*```', ''):gsub('^[\r\n]*(.-)[\r\n]*$', '%1'):gsub('\r\n', '\n')
+        local result = results[1]:gsub('^[\r\n]*(.-)[\r\n]*$', '%1'):gsub('\r\n', '\n')
         assert(expect == result)
     end
 end
@@ -167,11 +167,6 @@ TEST [[
 [=[
 function load(chunk: string/function [, chunkname: string [, mode: string [, env: table]]])
   -> function, error_message: string
-Loads a chunk.
-mode: string
-   | "b" -- Only binary chunks.
-   | "t" -- Only text chunks.
-  -> "bt" -- Both binary and text.
 ]=]
 
 TEST [[
@@ -180,7 +175,6 @@ string.<?lower?>()
 [[
 function string.lower(string)
   -> string
-Returns a copy of this string with all uppercase letters changed to lowercase.
 ]]
 
 TEST [[

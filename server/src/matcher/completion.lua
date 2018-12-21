@@ -217,10 +217,57 @@ local function searchAsSuffix(result, callback)
     end)
 end
 
+local function findClosePos(vm, pos)
+    local curDis = math.maxinteger
+    local parent = nil
+    for sources, object in pairs(vm.results.sources) do
+        if sources.type == 'multi-source' then
+            for _, source in ipairs(sources) do
+                if source.type ~= 'simple' then
+                    local dis = pos - source.finish
+                    if dis > 0 and dis < curDis then
+                        curDis = dis
+                        parent = object
+                    end
+                end
+            end
+        else
+            local source = sources
+            if source.type ~= 'simple' then
+                local dis = pos - source.finish
+                if dis > 0 and dis < curDis then
+                    curDis = dis
+                    parent = object
+                end
+            end
+        end
+    end
+    if parent then
+        -- 造个假的 DirtyName
+        local source = {
+            type = 'name',
+            start = pos,
+            finish = pos,
+            [1]    = '',
+        }
+        local result = {
+            type = 'field',
+            parent = parent,
+            key = '',
+            source = source,
+        }
+        return result, source
+    end
+    return nil
+end
+
 return function (vm, pos)
-    local result, source = findResult(vm, pos, true)
+    local result, source = findResult(vm, pos)
     if not result then
-        return nil
+        result, source = findClosePos(vm, pos)
+        if not result then
+            return nil
+        end
     end
 
     local list = {}

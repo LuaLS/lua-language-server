@@ -117,7 +117,10 @@ function mt:findPath(baseUri, searchers)
     for filename, uri in pairs(self.files) do
         for _, searcher in ipairs(searchers) do
             if filename:sub(-#searcher) == searcher then
-                results[#results+1] = uri
+                local sep = filename:sub(-#searcher-1, -#searcher-1)
+                if sep == '/' or sep == '\\' then
+                    results[#results+1] = uri
+                end
             end
         end
     end

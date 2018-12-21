@@ -192,3 +192,15 @@ end
 [[
 function x(a: number, ...)
 ]]
+
+TEST [[
+local function x()
+    return y()
+end
+
+<?x?>()
+]]
+[[
+function x()
+  -> any
+]]

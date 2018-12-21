@@ -252,6 +252,9 @@ local function buildValueReturns(result)
     for i, rtn in ipairs(func.returns) do
         strs[i] = rtn.type
     end
+    if #strs == 0 then
+        strs[1] = 'any'
+    end
     return '\n  -> ' .. table.concat(strs, ', ')
 end
 

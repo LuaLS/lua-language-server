@@ -307,5 +307,8 @@ return function (vm, pos)
             searchAsSuffix(result, callback)
         end
     end
+    if #list == 0 then
+        return nil
+    end
     return list
 end

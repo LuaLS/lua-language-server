@@ -67,8 +67,12 @@ function TEST(script)
         local vm = matcher.vm(ast)
         assert(vm)
         local result = matcher.completion(vm, pos)
-        assert(result)
-        assert(eq(expect, result))
+        if expect then
+            assert(result)
+            assert(eq(expect, result))
+        else
+            assert(result == nil)
+        end
     end
 end
 
@@ -256,5 +260,10 @@ xxx()
         documentation = EXISTS,
     },
 }
+
+TEST [[
+(''):@
+]]
+(EXISTS)
 
 --TEST 'local s = "a:@"' (nil) TODO

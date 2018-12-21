@@ -778,11 +778,17 @@ function mt:getSimple(simple, mode)
     local value = self:getExp(simple[1])
     local field
     local parentName
-    if simple[1].type == 'name' then
+    local tp = simple[1].type
+    if tp == 'name' then
         field = self:getName(simple[1][1])
         parentName = field.key
+    elseif tp == 'string' or tp == 'number' or tp == 'nil' or tp == 'boolean' then
+        local v = self:createValue(tp, simple[1], simple[1][1])
+        field = self:createLocal('', simple[1], v)
+        parentName = '*' .. tp
     else
-        field = self:createValue('any', simple[1])
+        local v = self:createValue('any', simple[1])
+        field = self:createLocal('', simple[1], v)
         parentName = '?'
     end
     local object

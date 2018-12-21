@@ -38,29 +38,16 @@ local function findDirtyCall(vm, pos)
     return results
 end
 
-local function parseCall(call)
-    local results = hover(call.var, call.source, nil, call.select)
-    return results[1], results[2]
-end
-
 return function (vm, pos)
     local calls = findDirtyCall(vm, pos)
     if #calls == 0 then
         return nil
     end
 
-    local results = {}
+    local hovers = {}
     for i, call in ipairs(calls) do
-        local label, description = parseCall(call)
-        results[i] = {
-            label = label,
-            description = description,
-            arg = {
-                label = 'a',
-                description = '参数说明',
-            }
-        }
+        hovers[i] = hover(call.var, call.source, nil, call.select)
     end
 
-    return results
+    return hovers
 end

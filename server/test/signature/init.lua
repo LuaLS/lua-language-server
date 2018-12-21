@@ -10,13 +10,13 @@ function TEST(script)
         local ast = parser:ast(new_script)
         local vm = matcher.vm(ast)
         assert(vm)
-        local results = matcher.signature(vm, pos)
-        assert(results)
-        local result = results[#results]
+        local hovers = matcher.signature(vm, pos)
+        assert(hovers)
+        local hover = hovers[#hovers]
 
-        local label = result.label:gsub('^[\r\n]*(.-)[\r\n]*$', '%1'):gsub('\r\n', '\n')
+        local label = hover.label:gsub('^[\r\n]*(.-)[\r\n]*$', '%1'):gsub('\r\n', '\n')
         expect.label = expect.label:gsub('^[\r\n]*(.-)[\r\n]*$', '%1'):gsub('\r\n', '\n')
-        local arg = result.arg.label
+        local arg = hover.argLabel
 
         assert(expect.label == label)
         assert(expect.arg == arg)

@@ -13,11 +13,11 @@ function TEST(script)
         local vm = matcher.vm(ast)
         assert(vm)
         local result, source = matcher.findResult(vm, pos)
-        local results = matcher.hover(result, source)
-        assert(result)
+        local hover = matcher.hover(result, source)
+        assert(hover)
         expect = expect:gsub('^[\r\n]*(.-)[\r\n]*$', '%1'):gsub('\r\n', '\n')
-        local result = results[1]:gsub('^[\r\n]*(.-)[\r\n]*$', '%1'):gsub('\r\n', '\n')
-        assert(expect == result)
+        local label = hover.label:gsub('^[\r\n]*(.-)[\r\n]*$', '%1'):gsub('\r\n', '\n')
+        assert(expect == label)
     end
 end
 

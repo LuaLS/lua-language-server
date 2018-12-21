@@ -20,6 +20,9 @@ local function buildLibArgs(lib, oo, select)
     local start
     if oo then
         start = 2
+        if select then
+            select = select + 1
+        end
     else
         start = 1
     end
@@ -231,6 +234,9 @@ local function buildValueArgs(result, source, select)
     local start = 1
     if source.object then
         start = 2
+        if select then
+            select = select + 1
+        end
     end
     local max
     if func.built then

@@ -44,3 +44,25 @@ x(@)
     label = "function x(a: any, b: any)",
     arg = 'a: any'
 }
+
+TEST [[
+function mt:f(a)
+end
+
+mt:f(@
+]]
+{
+    label = 'function mt:f(a: any)',
+    arg = 'a: any'
+}
+
+TEST [[
+(''):sub(@
+]]
+{
+    label = [[
+function *string:sub(i: integer [, j: integer(-1)])
+  -> string
+]],
+    arg = 'i: integer'
+}

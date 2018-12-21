@@ -10,18 +10,21 @@ end
 local function findArgCount(args, pos)
     for i, arg in ipairs(args) do
         if isContainPos(arg, pos) then
-            return i
+            return i, arg
         end
     end
-    return #args + 1
+    return #args + 1, nil
 end
 
--- 找出范围包含pos的，且有dirty标记的call
-local function findDirtyCall(vm, pos)
+-- 找出范围包含pos的call
+local function findCall(vm, pos)
     local results = {}
     for _, call in ipairs(vm.results.calls) do
         if isContainPos(call.args, pos) then
-            local n = findArgCount(call.args, pos)
+            local n, arg = findArgCount(call.args, pos)
+            if arg and arg.type == 'string' then
+                return nil
+            end
             results[#results+1] = {
                 func = call.func,
                 var = vm.results.sources[call.lastObj],
@@ -39,8 +42,8 @@ local function findDirtyCall(vm, pos)
 end
 
 return function (vm, pos)
-    local calls = findDirtyCall(vm, pos)
-    if #calls == 0 then
+    local calls = findCall(vm, pos)
+    if not calls or #calls == 0 then
         return nil
     end
 

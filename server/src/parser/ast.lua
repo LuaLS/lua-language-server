@@ -119,6 +119,10 @@ local defs = {
         }
         return obj
     end,
+    DirtyCall = function (obj)
+        obj.dirty = true
+        return obj
+    end,
     Binary = function (...)
         local e1, op = ...
         if not op then

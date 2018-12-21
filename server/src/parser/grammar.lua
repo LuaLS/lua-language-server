@@ -207,8 +207,8 @@ Boolean     <-  Sp ({} -> True)  TRUE
 grammar 'String' [[
 String      <-  Sp ({} StringDef {})
             ->  String
-StringDef   <-  '"' {~(Esc / !%nl !'"' .)*~} -> first '"'
-            /   "'" {~(Esc / !%nl !"'" .)*~} -> first "'"
+StringDef   <-  '"' {~(Esc / !%nl !'"' .)*~} -> first (%nl / '"'?)
+            /   "'" {~(Esc / !%nl !"'" .)*~} -> first (%nl / "'"?)
             /   '[' {:eq: '='* :} '[' {(!StringClose .)*} -> first StringClose
 StringClose <-  ']' =eq ']'
 ]]
@@ -268,7 +268,7 @@ Suffix      <-  DOT MustName
             /   Sp ({} Table {}) -> Call
             /   Sp ({} String {}) -> Call
             /   BL Exp -> Index BR
-            /   Sp ({} PL ExpList PR {}) -> Call
+            /   Sp ({} PL ExpList PR? {}) -> Call
 
 DirtyExp    <-  Exp / DirtyName
 ExpList     <-  (COMMA DirtyExp)+
@@ -290,7 +290,7 @@ AfterArg    <-  DOTS
             /   MustName
 
 
-Table       <-  Sp ({} TL TableFields TR {})
+Table       <-  Sp ({} TL TableFields TR? {})
             ->  Table
 TableFields <-  TableSep (TableSep? TableField)+ TableSep?
             /   (TableField (TableSep? TableField)* TableSep?)?

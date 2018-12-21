@@ -70,12 +70,31 @@ local function searchUnusedLabel(results, callback)
     end
 end
 
-local function serachSpaces(lines, callback)
+local function isContainPos(obj, start, finish)
+    if obj.start <= start and obj.finish + 1 >= finish then
+        return true
+    end
+    return false
+end
+
+local function isInString(vm, start, finish)
+    for _, source in ipairs(vm.results.strings) do
+        if isContainPos(source, start, finish) then
+            return true
+        end
+    end
+    return false
+end
+
+local function searchSpaces(vm, lines, callback)
     for i = 1, #lines do
         local line = lines:line(i)
 
         if line:find '^[ \t]+$' then
             local start, finish = lines:range(i)
+            if isInString(vm, start, finish) then
+                goto NEXT_LINE
+            end
             callback(start, finish, 'Line with spaces only') -- LOCALE
             goto NEXT_LINE
         end
@@ -83,7 +102,11 @@ local function serachSpaces(lines, callback)
         local pos = line:find '[ \t]+$'
         if pos then
             local start, finish = lines:range(i)
-            callback(start + pos - 1, finish, 'Line with postspace') -- LOCALE
+            start = start + pos - 1
+            if isInString(vm, start, finish) then
+                goto NEXT_LINE
+            end
+            callback(start, finish, 'Line with postspace') -- LOCALE
             goto NEXT_LINE
         end
         ::NEXT_LINE::
@@ -198,7 +221,7 @@ return function (vm, lines, uri)
         }
     end)
     -- 只有空格与制表符的行，以及后置空格
-    serachSpaces(lines, function (start, finish, message)
+    searchSpaces(vm, lines, function (start, finish, message)
         datas[#datas+1] = {
             start   = start,
             finish  = finish,

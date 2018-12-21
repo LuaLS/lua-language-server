@@ -1,6 +1,4 @@
 local findResult = require 'matcher.find_result'
-local rpc = require 'rpc'
-
 
 local function parseResultAcrossUri(positions, vm, result)
     -- 跨越文件时，遍历的是值的绑定信息

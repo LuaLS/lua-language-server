@@ -1,4 +1,7 @@
 local function findLib(var)
+    if var.type ~= 'local' and var.type ~= 'field' then
+        return nil
+    end
     local value = var.value
     local lib = value.lib
     if not lib then

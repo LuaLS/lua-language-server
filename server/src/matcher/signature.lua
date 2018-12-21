@@ -25,13 +25,16 @@ local function findCall(vm, pos)
             if arg and arg.type == 'string' then
                 return nil
             end
-            results[#results+1] = {
-                func = call.func,
-                var = vm.results.sources[call.lastObj],
-                source = call.lastObj,
-                select = n,
-                args = call.args,
-            }
+            local var = vm.results.sources[call.lastObj]
+            if var then
+                results[#results+1] = {
+                    func = call.func,
+                    var = var,
+                    source = call.lastObj,
+                    select = n,
+                    args = call.args,
+                }
+            end
         end
     end
     -- 可能处于 'func1(func2(' 的嵌套中，因此距离越远的函数层级越低

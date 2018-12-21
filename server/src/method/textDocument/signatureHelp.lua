@@ -34,7 +34,5 @@ return function (lsp, params)
         activeSignature = #signatures - 1,
     }
 
-    log.debug(table.dump(response))
-
     return response
 end

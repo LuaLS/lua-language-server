@@ -91,6 +91,7 @@ local function serachSpaces(lines, callback)
 end
 
 local function searchRedefinition(results, uri, callback)
+    local used = {}
     for _, var in ipairs(results.locals) do
         if var.key == '_'
         or var.key == '_ENV'
@@ -101,8 +102,12 @@ local function searchRedefinition(results, uri, callback)
         if not shadow then
             goto NEXT_VAR
         end
+        if used[shadow] then
+            goto NEXT_VAR
+        end
+        used[shadow] = true
         -- 如果多次重定义，则不再警告
-        if #shadow >= 3 then
+        if #shadow >= 4 then
             goto NEXT_VAR
         end
         local related = {}
@@ -113,7 +118,9 @@ local function searchRedefinition(results, uri, callback)
                 uri    = uri,
             }
         end
-        callback(var.source.start, var.source.finish, var.key, related)
+        for i = 2, #shadow do
+            callback(shadow[i].source.start, shadow[i].source.finish, shadow[i].key, related)
+        end
         ::NEXT_VAR::
     end
 end

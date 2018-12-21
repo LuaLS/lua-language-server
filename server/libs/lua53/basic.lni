@@ -45,6 +45,7 @@ name = 'opt'
 enum = 'isrunning'
 
 [dofile]
+special = 'dofile'
 [[.args]]
 name = 'filename'
 type = 'string'
@@ -126,6 +127,7 @@ enum = 'bt'
 default = true
 
 [loadfile]
+special = 'loadfile'
 [[.args]]
 name = 'filename'
 type = 'string'

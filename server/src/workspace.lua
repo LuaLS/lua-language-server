@@ -112,16 +112,7 @@ function mt:removeFile(uri)
     self.files[name] = nil
 end
 
-function mt:searchPath(baseUri, str)
-    if self.loaded[str] then
-        return self.loaded[str]
-    end
-    str = str:gsub('%.', '/')
-    local searchers = {}
-    for i, luapath in ipairs(self.luapath) do
-        searchers[i] = luapath:gsub('%?', str):lower()
-    end
-
+function mt:findPath(baseUri, searchers)
     local results = {}
     for filename, uri in pairs(self.files) do
         for _, searcher in ipairs(searchers) do
@@ -143,13 +134,44 @@ function mt:searchPath(baseUri, str)
         end)
         uri = results[1]
     end
-    self.loaded[str] = uri
     self.lsp:readText(uri, uriDecode(uri))
     return uri
 end
 
+function mt:searchPath(baseUri, str)
+    if self.searched[str] then
+        return self.searched[str]
+    end
+    str = str:gsub('%.', '/')
+    local searchers = {}
+    for i, luapath in ipairs(self.luapath) do
+        searchers[i] = luapath:gsub('%?', str):lower()
+    end
+
+    local uri = self:findPath(baseUri, searchers)
+    if uri then
+        self.searched[str] = uri
+    end
+    return uri
+end
+
+function mt:loadPath(baseUri, str)
+    if self.loaded[str] then
+        return self.loaded[str]
+    end
+
+    local searchers = { str }
+
+    local uri = self:findPath(baseUri, searchers)
+    if uri then
+        self.loaded[str] = uri
+    end
+    return uri
+end
+
 function mt:reset()
-    self.laoded = {}
+    self.searched = {}
+    self.loaded = {}
     self.lsp:reCompile()
 end
 
@@ -158,6 +180,7 @@ return function (lsp, name, uri)
         lsp = lsp,
         name = name,
         files = {},
+        searched = {},
         loaded = {},
         luapath = {
             '?.lua',

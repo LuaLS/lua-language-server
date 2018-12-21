@@ -20,7 +20,7 @@ end
 local function findDirtyCall(vm, pos)
     local results = {}
     for _, call in ipairs(vm.results.calls) do
-        if call.args.dirty and isContainPos(call.args, pos) then
+        if isContainPos(call.args, pos) then
             local n = findArgCount(call.args, pos)
             results[#results+1] = {
                 func = call.func,
@@ -45,8 +45,12 @@ return function (vm, pos)
     end
 
     local hovers = {}
-    for i, call in ipairs(calls) do
-        hovers[i] = hover(call.var, call.source, nil, call.select)
+    for _, call in ipairs(calls) do
+        hovers[#hovers+1] = hover(call.var, call.source, nil, call.select)
+    end
+
+    if #hovers == 0 then
+        return nil
     end
 
     return hovers

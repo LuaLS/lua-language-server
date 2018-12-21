@@ -268,8 +268,7 @@ Suffix      <-  DOT MustName
             /   Sp ({} Table {}) -> Call
             /   Sp ({} String {}) -> Call
             /   BL Exp -> Index BR
-            /   Sp ({} PL ExpList PR {}) -> Call
-            /   Sp ({} PL ExpList    {}) -> Call -> DirtyCall
+            /   Sp ({} PL ExpList PR? {}) -> Call
 
 DirtyExp    <-  Exp / DirtyName
 ExpList     <-  (COMMA DirtyExp)+

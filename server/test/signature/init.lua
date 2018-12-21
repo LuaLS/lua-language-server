@@ -33,3 +33,14 @@ x(@
     label = "function x(a: any, b: any)",
     arg = 'a: any'
 }
+
+TEST [[
+local function x(a, b)
+end
+
+x(@)
+]]
+{
+    label = "function x(a: any, b: any)",
+    arg = 'a: any'
+}

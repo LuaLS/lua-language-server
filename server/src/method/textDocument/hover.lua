@@ -14,7 +14,7 @@ return function (lsp, params)
         return nil
     end
 
-    local text = matcher.hover(result, source)
+    local text = matcher.hover(result, source, lsp)
     if not text then
         return nil
     end

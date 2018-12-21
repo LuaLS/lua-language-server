@@ -364,9 +364,24 @@ local function getValueHover(name, valueType, result, source, lib)
 ]]):format(text, tip)
 end
 
-return function (result, source)
+local function getStringHover(result, lsp)
+    if not result.uri then
+        return nil
+    end
+    if not lsp or not lsp.workspace then
+        return nil
+    end
+    local path = lsp.workspace:relativePathByUri(result.uri)
+    return ('[%s](%s)'):format(path:string(), result.uri)
+end
+
+return function (result, source, lsp)
     if not result.value then
         return
+    end
+
+    if result.type == 'string' then
+        return getStringHover(result, lsp)
     end
 
     local lib, fullKey, oo = findLib(result)

@@ -175,6 +175,12 @@ function mt:reset()
     self.lsp:reCompile()
 end
 
+function mt:relativePathByUri(uri)
+    local path = uriDecode(uri)
+    local relate = fs.relative(path, self.root)
+    return relate
+end
+
 return function (lsp, name, uri)
     local workspace = setmetatable({
         lsp = lsp,

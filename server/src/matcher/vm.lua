@@ -243,7 +243,7 @@ function mt:mergeChild(a, b, mark)
     b.child = nil
     for k, v in pairs(other) do
         if child[k] then
-            self:mergeField(v, child[k], mark)
+            self:mergeField(child[k], v, mark)
         else
             child[k] = v
         end

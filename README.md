@@ -13,9 +13,9 @@
 - [x] Rename
 - [x] Auto Completion
 - [x] Intelligent
+- [x] Signature Help
 - [ ] Support Dirty Script
 - [ ] Syntax Check
-- [ ] Signature Help
 - [ ] Multi Workspace
 
 ### Locale

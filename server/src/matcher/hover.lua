@@ -1,4 +1,3 @@
-local findResult = require 'matcher.find_result'
 local findLib    = require 'matcher.find_lib'
 
 local OriginTypes = {
@@ -249,8 +248,10 @@ local function buildValueReturns(result)
         return ''
     end
     local strs = {}
-    for i, rtn in ipairs(func.returns) do
-        strs[i] = rtn.type
+    if func.returns then
+        for i, rtn in ipairs(func.returns) do
+            strs[i] = rtn.type
+        end
     end
     if #strs == 0 then
         strs[1] = 'any'

@@ -189,6 +189,18 @@ function mt:buildTable(source)
     return tbl
 end
 
+function mt:coverValue(a, b)
+    if a == b then
+        return
+    end
+    for k in pairs(a) do
+        a[k] = nil
+    end
+    for k, v in pairs(b) do
+        a[k] = v
+    end
+end
+
 function mt:mergeValue(a, b, mark)
     if a == b then
         return
@@ -1249,9 +1261,9 @@ function mt:mergeRequire(value, strValue, destVM)
             uri    = destVM.uri,
         })
     else
-        mainValue = deepCopy(main.returns[1])
+        mainValue = main.returns[1]
     end
-    self:mergeValue(value, mainValue)
+    self:coverValue(value, mainValue)
 
     -- 支持 require 'xxx' 的转到定义
     local strSource = strValue.source
@@ -1263,8 +1275,8 @@ function mt:mergeLoadFile(value, strValue, destVM)
     -- 取出对方的主函数
     local main = destVM.results.main
     -- loadfile 的返回值就是对方的主函数
-    local mainValue = deepCopy(main)
-    self:mergeValue(value, mainValue)
+    local mainValue = main
+    self:coverValue(value, mainValue)
 
     -- 支持 loadfile 'xxx.lua' 的转到定义
     local strSource = strValue.source

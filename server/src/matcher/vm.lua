@@ -35,24 +35,6 @@ local function orderTable()
     })
 end
 
-local function deepCopy(t, mark, new)
-    mark = mark or {}
-    new = new or orderTable()
-    for k, v in pairs(t) do
-        if type(v) == 'table' then
-            if mark[v] then
-                new[k] = mark[v]
-            else
-                mark[v] = orderTable()
-                new[k] = deepCopy(v, mark, mark[v])
-            end
-        else
-            new[k] = v
-        end
-    end
-    return new
-end
-
 local mt = {}
 mt.__index = mt
 
@@ -187,18 +169,6 @@ function mt:buildTable(source)
         end
     end
     return tbl
-end
-
-function mt:coverValue(a, b)
-    if a == b then
-        return
-    end
-    for k in pairs(a) do
-        a[k] = nil
-    end
-    for k, v in pairs(b) do
-        a[k] = v
-    end
 end
 
 function mt:mergeValue(a, b, mark)
@@ -1263,7 +1233,7 @@ function mt:mergeRequire(value, strValue, destVM)
     else
         mainValue = main.returns[1]
     end
-    self:coverValue(value, mainValue)
+    self:mergeValue(value, mainValue)
 
     -- 支持 require 'xxx' 的转到定义
     local strSource = strValue.source
@@ -1276,7 +1246,7 @@ function mt:mergeLoadFile(value, strValue, destVM)
     local main = destVM.results.main
     -- loadfile 的返回值就是对方的主函数
     local mainValue = main
-    self:coverValue(value, mainValue)
+    self:mergeValue(value, mainValue)
 
     -- 支持 loadfile 'xxx.lua' 的转到定义
     local strSource = strValue.source

@@ -261,11 +261,30 @@ local function findClosePos(vm, pos)
     return nil
 end
 
+local function isContainPos(obj, pos)
+    if obj.start <= pos and obj.finish + 1 >= pos then
+        return true
+    end
+    return false
+end
+
+local function isInString(vm, pos)
+    for _, source in ipairs(vm.results.strings) do
+        if isContainPos(source, pos) then
+            return true
+        end
+    end
+    return false
+end
+
 return function (vm, pos)
     local result, source = findResult(vm, pos)
     if not result then
         result, source = findClosePos(vm, pos)
         if not result then
+            return nil
+        end
+        if isInString(vm, pos) then
             return nil
         end
     end

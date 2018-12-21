@@ -968,6 +968,7 @@ function mt:getExp(exp)
     if     tp == 'nil' then
         return self:createValue('nil', exp)
     elseif tp == 'string' then
+        self.results.strings[#self.results.strings+1] = exp
         return self:createValue('string', exp, exp[1])
     elseif tp == 'boolean' then
         return self:createValue('boolean', exp, exp[1])
@@ -1364,6 +1365,7 @@ local function compile(ast, lsp, uri)
             funcs  = {},
             calls  = {},
             sources= {},
+            strings= {},
             main   = nil,
         },
         libraryValue = {},

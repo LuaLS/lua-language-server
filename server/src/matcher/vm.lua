@@ -1228,7 +1228,7 @@ function mt:loadRequires()
     for value, strValue in pairs(copy) do
         local str = strValue.value
         if type(str) == 'string' then
-            local uri = self.lsp.workspace:searchPath(str)
+            local uri = self.lsp.workspace:searchPath(self.uri, str)
             -- 如果循环require，这里会返回nil
             -- 会当场编译VM
             local destVM = self.lsp:loadVM(uri)
@@ -1246,7 +1246,7 @@ function mt:tryLoadRequires()
     for value, strValue in pairs(self.requires) do
         local str = strValue.value
         if type(str) == 'string' then
-            local uri = self.lsp.workspace:searchPath(str)
+            local uri = self.lsp.workspace:searchPath(self.uri, str)
             -- 如果取不到VM（不编译），则做个标记，之后再取一次
             local destVM = self.lsp:getVM(uri)
             if destVM then

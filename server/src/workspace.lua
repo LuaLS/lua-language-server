@@ -45,6 +45,25 @@ local function uriEncode(path)
     return 'file:///' .. table.concat(names, '/')
 end
 
+local function split(str, sep)
+    local t = {}
+    for s in str:gmatch('[^' .. sep .. ']+') do
+        t[#t+1] = s
+    end
+    return t
+end
+
+local function similarity(a, b)
+    local ta = split(a, '/\\')
+    local tb = split(b, '/\\')
+    for i = 1, #ta do
+        if ta[i] ~= tb[i] then
+            return i - 1
+        end
+    end
+    return #ta
+end
+
 local mt = {}
 mt.__index = mt
 
@@ -93,7 +112,7 @@ function mt:removeFile(uri)
     self.files[name] = nil
 end
 
-function mt:searchPath(str)
+function mt:searchPath(baseUri, str)
     if self.loaded[str] then
         return self.loaded[str]
     end
@@ -102,16 +121,31 @@ function mt:searchPath(str)
     for i, luapath in ipairs(self.luapath) do
         searchers[i] = luapath:gsub('%?', str):lower()
     end
+
+    local results = {}
     for filename, uri in pairs(self.files) do
         for _, searcher in ipairs(searchers) do
             if filename:sub(-#searcher) == searcher then
-                self.loaded[str] = uri
-                self.lsp:readText(uri, fs.path(filename))
-                return uri
+                results[#results+1] = uri
             end
         end
     end
-    return nil
+
+    if #results == 0 then
+        return nil
+    end
+    local uri
+    if #results == 1 then
+        uri = results[1]
+    else
+        table.sort(results, function (a, b)
+            return similarity(a, baseUri) > similarity(b, baseUri)
+        end)
+        uri = results[1]
+    end
+    self.loaded[str] = uri
+    self.lsp:readText(uri, uriDecode(uri))
+    return uri
 end
 
 function mt:reset()

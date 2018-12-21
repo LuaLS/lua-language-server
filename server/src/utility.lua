@@ -20,14 +20,14 @@ local KEY = {}
 
 function table.dump(tbl)
     if type(tbl) ~= 'table' then
-        error('Must be a table')
+        return ('%q'):format(tbl)
     end
     local table_mark = {}
     local lines = {}
     lines[#lines+1] = '{'
     local function unpack(tbl, tab)
         if table_mark[tbl] then
-            error('Cyclic references are not allowed.')
+            return '<Circle Table>'
         end
         table_mark[tbl] = true
         local keys = {}
@@ -41,7 +41,7 @@ function table.dump(tbl)
             elseif math_type(key) == 'integer' then
                 KEY[key] = ('[%d]'):format(key)
             else
-                error('Key must be `string` or `integer`')
+                KEY[key] = ('<%s>'):format(key)
             end
             keys[#keys+1] = key
         end
@@ -58,7 +58,7 @@ function table.dump(tbl)
             elseif tp == 'string' or tp == 'number' or tp == 'boolean' then
                 lines[#lines+1] = ('%s%s = %q,'):format(TAB[tab+1], KEY[key], value)
             else
-                error(('Unsupport value type: [%s]'):format(tp))
+                lines[#lines+1] = ('%s%s = <%s>,'):format(TAB[tab+1], KEY[key], value)
             end
         end
     end

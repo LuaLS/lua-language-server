@@ -11,15 +11,18 @@ function TEST(script)
         local vm = matcher.vm(ast)
         assert(vm)
         local hovers = matcher.signature(vm, pos)
-        assert(hovers)
-        local hover = hovers[#hovers]
+        if hovers then
+            local hover = hovers[#hovers]
 
-        local label = hover.label:gsub('^[\r\n]*(.-)[\r\n]*$', '%1'):gsub('\r\n', '\n')
-        expect.label = expect.label:gsub('^[\r\n]*(.-)[\r\n]*$', '%1'):gsub('\r\n', '\n')
-        local arg = hover.argLabel
+            local label = hover.label:gsub('^[\r\n]*(.-)[\r\n]*$', '%1'):gsub('\r\n', '\n')
+            expect.label = expect.label:gsub('^[\r\n]*(.-)[\r\n]*$', '%1'):gsub('\r\n', '\n')
+            local arg = hover.argLabel
 
-        assert(expect.label == label)
-        assert(expect.arg == arg)
+            assert(expect.label == label)
+            assert(expect.arg == arg)
+        else
+            assert(expect == nil)
+        end
     end
 end
 
@@ -66,3 +69,8 @@ function *string:sub(i: integer [, j: integer(-1)])
 ]],
     arg = 'i: integer'
 }
+
+TEST [[
+(''):sub(1)@
+]]
+(nil)

@@ -14,8 +14,8 @@ return function (lsp, params)
         return nil
     end
 
-    local results = matcher.hover(result, source, lsp)
-    if not results then
+    local hover = matcher.hover(result, source, lsp)
+    if not hover then
         return nil
     end
 
@@ -27,7 +27,7 @@ return function (lsp, params)
 ```lua
 %s
 ```
-]]):format(results[1], results[2], results[3] or '')
+]]):format(hover.label, hover.description, hover.enum or '')
 
     local response = {
         contents = {

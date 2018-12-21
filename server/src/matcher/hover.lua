@@ -24,6 +24,7 @@ local function buildLibArgs(lib, oo, select)
         start = 1
     end
     local strs = {}
+    local argLabel
     for i = start, #lib.args do
         local arg = lib.args[i]
         if arg.optional then
@@ -36,19 +37,28 @@ local function buildLibArgs(lib, oo, select)
         if i > start then
             strs[#strs+1] = ', '
         end
+
+        local argStr = {}
         if arg.name then
-            strs[#strs+1] = ('%s: '):format(arg.name)
+            argStr[#argStr+1] = ('%s: '):format(arg.name)
         end
         if type(arg.type) == 'table' then
-            strs[#strs+1] = table.concat(arg.type, '/')
+            argStr[#argStr+1] = table.concat(arg.type, '/')
         else
-            strs[#strs+1] = arg.type or 'any'
+            argStr[#argStr+1] = arg.type or 'any'
         end
         if arg.default then
-            strs[#strs+1] = ('(%q)'):format(arg.default)
+            argStr[#argStr+1] = ('(%q)'):format(arg.default)
+        end
+
+        for _, str in ipairs(argStr) do
+            strs[#strs+1] = str
         end
         if arg.optional == 'self' then
             strs[#strs+1] = ']'
+        end
+        if i == select then
+            argLabel = table.concat(argStr)
         end
     end
     for _, arg in ipairs(lib.args) do
@@ -56,7 +66,7 @@ local function buildLibArgs(lib, oo, select)
             strs[#strs+1] = ']'
         end
     end
-    return table.concat(strs)
+    return table.concat(strs), argLabel
 end
 
 local function buildLibReturns(lib)
@@ -202,7 +212,7 @@ local function buildValueName(result, source)
     return result.key or ''
 end
 
-local function buildValueArgs(result, source)
+local function buildValueArgs(result, source, select)
     local func = result.value
     local names = {}
     local values = {}
@@ -217,6 +227,7 @@ local function buildValueArgs(result, source)
         end
     end
     local strs = {}
+    local argLabel
     local start = 1
     if source.object then
         start = 2
@@ -235,11 +246,14 @@ local function buildValueArgs(result, source)
         else
             strs[#strs+1] = value
         end
+        if i == select then
+            argLabel = strs[#strs]
+        end
     end
     if func.hasDots then
         strs[#strs+1] = '...'
     end
-    return table.concat(strs, ', ')
+    return table.concat(strs, ', '), argLabel
 end
 
 local function buildValueReturns(result)
@@ -264,17 +278,23 @@ local function getFunctionHover(name, result, source, lib, oo, select)
     local returns
     local enum = ''
     local tip = ''
+    local argLabel
     if lib then
-        args = buildLibArgs(lib, oo, select)
+        args, argLabel = buildLibArgs(lib, oo, select)
         returns = buildLibReturns(lib)
         enum = buildEnum(lib)
         tip = lib.description or ''
     else
-        args = buildValueArgs(result, source, select)
+        args, argLabel = buildValueArgs(result, source, select)
         returns = buildValueReturns(result)
     end
     local title = ('function %s(%s)%s'):format(name, args, returns)
-    return { title, tip, enum }
+    return {
+        label = title,
+        description = tip,
+        enum = enum,
+        argLabel = argLabel,
+    }
 end
 
 local function findClass(result)
@@ -348,7 +368,10 @@ local function getValueHover(name, valueType, result, source, lib)
     else
         text = ('%s %s = %s'):format(valueType, name, value)
     end
-    return { text, tip }
+    return {
+        label = text,
+        description = tip,
+    }
 end
 
 local function getStringHover(result, lsp)

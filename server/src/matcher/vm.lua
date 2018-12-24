@@ -508,6 +508,9 @@ function mt:tryRequireOne(strValue, mode)
         elseif mode == 'dofile' then
             uri = self.lsp.workspace:loadPath(self.uri, str)
         end
+        if not uri then
+            return nil
+        end
         -- 如果取不到VM（不编译），则做个标记，之后再取一次
         local destVM = self.lsp:getVM(uri)
         if destVM then

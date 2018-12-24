@@ -455,6 +455,77 @@ function mt:callSetMetaTable(func, values)
     self:checkMetaIndex(values[1], values[2])
 end
 
+function mt:getRequire(strValue, destVM)
+    -- 取出对方的主函数
+    local main = destVM.results.main
+    -- 获取主函数返回值，注意不能修改对方的环境
+    local mainValue
+    if main.returns then
+        mainValue = main.returns[1]
+    else
+        mainValue = self:createValue('boolean', {
+            type   = 'name',
+            start  = 0,
+            finish = 0,
+            [1]    = '',
+            uri    = destVM.uri,
+        }, true)
+    end
+
+    -- 支持 require 'xxx' 的转到定义
+    local strSource = strValue.source
+    self.results.sources[strSource] = strValue
+    strValue.uri = destVM.uri
+
+    return mainValue
+end
+
+function mt:getLoadFile(strValue, destVM)
+    -- 取出对方的主函数
+    local main = destVM.results.main
+    -- loadfile 的返回值就是对方的主函数
+    local mainValue = main
+
+    -- 支持 loadfile 'xxx.lua' 的转到定义
+    local strSource = strValue.source
+    self.results.sources[strSource] = strValue
+    strValue.uri = destVM.uri
+
+    return mainValue
+end
+
+function mt:tryRequireOne(strValue, mode)
+    if not self.lsp or not self.lsp.workspace then
+        return nil
+    end
+    local str = strValue.value
+    if type(str) == 'string' then
+        local uri
+        if mode == 'require' then
+            uri = self.lsp.workspace:searchPath(self.uri, str)
+        elseif mode == 'loadfile' then
+            uri = self.lsp.workspace:loadPath(self.uri, str)
+        elseif mode == 'dofile' then
+            uri = self.lsp.workspace:loadPath(self.uri, str)
+        end
+        -- 如果取不到VM（不编译），则做个标记，之后再取一次
+        local destVM = self.lsp:getVM(uri)
+        if destVM then
+            if mode == 'require' then
+                return self:getRequire(strValue, destVM)
+            elseif mode == 'loadfile' then
+                return self:getLoadFile(strValue, destVM)
+            elseif mode == 'dofile' then
+                return self:getRequire(strValue, destVM)
+            end
+        else
+            self.lsp:needCompile(uri)
+            self.lsp:needCompile(self.uri)
+        end
+    end
+    return nil
+end
+
 function mt:callRequire(func, values)
     if not values[1] then
         values[1] = self:createValue('any')
@@ -469,12 +540,8 @@ function mt:callRequire(func, values)
         self:setFunctionReturn(func, 1, value)
         return
     else
-        local requireValue = self:createValue('boolean', nil, true)
+        local requireValue = self:tryRequireOne(values[1], 'require') or self:createValue('boolean')
         self:setFunctionReturn(func, 1, requireValue)
-        self.requires[requireValue] = {
-            mode = 'require',
-            str = values[1],
-        }
     end
 end
 
@@ -486,12 +553,8 @@ function mt:callLoadFile(func, values)
     if type(str) ~= 'string' then
         return
     end
-    local requireValue = self:buildFunction()
+    local requireValue = self:tryRequireOne(values[1], 'loadfile')
     self:setFunctionReturn(func, 1, requireValue)
-    self.requires[requireValue] = {
-        mode = 'loadfile',
-        str = values[1],
-    }
 end
 
 function mt:callDoFile(func, values)
@@ -502,12 +565,8 @@ function mt:callDoFile(func, values)
     if type(str) ~= 'string' then
         return
     end
-    local requireValue = self:createValue('any')
+    local requireValue = self:tryRequireOne(values[1], 'dofile')
     self:setFunctionReturn(func, 1, requireValue)
-    self.requires[requireValue] = {
-        mode = 'dofile',
-        str = values[1],
-    }
 end
 
 function mt:call(func, values)
@@ -1242,117 +1301,6 @@ function mt:createEnvironment()
     gValue.child = envValue.child
 end
 
-function mt:mergeRequire(value, strValue, destVM)
-    -- 取出对方的主函数
-    local main = destVM.results.main
-    -- 获取主函数返回值，注意不能修改对方的环境
-    local mainValue
-    if not main.returns then
-        mainValue = self:createValue('nil', {
-            type   = 'name',
-            start  = 0,
-            finish = 0,
-            [1]    = '',
-            uri    = destVM.uri,
-        })
-    else
-        mainValue = main.returns[1]
-    end
-    self:mergeValue(value, mainValue)
-
-    -- 支持 require 'xxx' 的转到定义
-    local strSource = strValue.source
-    self.results.sources[strSource] = strValue
-    strValue.uri = destVM.uri
-end
-
-function mt:mergeLoadFile(value, strValue, destVM)
-    -- 取出对方的主函数
-    local main = destVM.results.main
-    -- loadfile 的返回值就是对方的主函数
-    local mainValue = main
-    self:mergeValue(value, mainValue)
-
-    -- 支持 loadfile 'xxx.lua' 的转到定义
-    local strSource = strValue.source
-    self.results.sources[strSource] = strValue
-    strValue.uri = destVM.uri
-end
-
-function mt:loadRequires()
-    if not self.lsp or not self.lsp.workspace then
-        return
-    end
-    local copy = {}
-    for k, v in pairs(self.requires) do
-        self.requires[k] = nil
-        copy[k] = v
-    end
-    for value, data in pairs(copy) do
-        local strValue = data.str
-        local mode = data.mode
-        local str = strValue.value
-        if type(str) == 'string' then
-            local uri
-            if mode == 'require' then
-                uri = self.lsp.workspace:searchPath(self.uri, str)
-            elseif mode == 'loadfile' then
-                uri = self.lsp.workspace:loadPath(self.uri, str)
-            elseif mode == 'dofile' then
-                uri = self.lsp.workspace:loadPath(self.uri, str)
-            elseif mode == '' then
-            end
-            -- 如果循环require，这里会返回nil
-            -- 会当场编译VM
-            local destVM = self.lsp:loadVM(uri)
-            if destVM then
-                if mode == 'require' then
-                    self:mergeRequire(value, strValue, destVM)
-                elseif mode == 'loadfile' then
-                    self:mergeLoadFile(value, strValue, destVM)
-                elseif mode == 'dofile' then
-                    self:mergeRequire(value, strValue, destVM)
-                end
-            end
-        end
-    end
-end
-
-function mt:tryLoadRequires()
-    if not self.lsp or not self.lsp.workspace then
-        return
-    end
-    for value, data in pairs(self.requires) do
-        local strValue = data.str
-        local mode = data.mode
-        local str = strValue.value
-        if type(str) == 'string' then
-            local uri
-            if mode == 'require' then
-                uri = self.lsp.workspace:searchPath(self.uri, str)
-            elseif mode == 'loadfile' then
-                uri = self.lsp.workspace:loadPath(self.uri, str)
-            elseif mode == 'dofile' then
-                uri = self.lsp.workspace:loadPath(self.uri, str)
-            end
-            -- 如果取不到VM（不编译），则做个标记，之后再取一次
-            local destVM = self.lsp:getVM(uri)
-            if destVM then
-                if mode == 'require' then
-                    self:mergeRequire(value, strValue, destVM)
-                elseif mode == 'loadfile' then
-                    self:mergeLoadFile(value, strValue, destVM)
-                elseif mode == 'dofile' then
-                    self:mergeRequire(value, strValue, destVM)
-                end
-                self.requires[value] = nil
-            else
-                self.lsp:needRequires(self.uri)
-            end
-        end
-    end
-end
-
 local function compile(ast, lsp, uri)
     local vm = setmetatable({
         scope   = env {
@@ -1372,7 +1320,6 @@ local function compile(ast, lsp, uri)
         },
         libraryValue = {},
         libraryChild = {},
-        requires     = {},
         lsp          = lsp,
         uri          = uri,
     }, mt)
@@ -1382,9 +1329,6 @@ local function compile(ast, lsp, uri)
 
     -- 执行代码
     vm:doActions(ast)
-
-    -- 合并
-    vm:tryLoadRequires()
 
     return vm
 end

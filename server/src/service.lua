@@ -131,13 +131,13 @@ function mt:clearDiagnostics(uri)
     })
 end
 
-function mt:_buildTextCache()
+function mt:compileAll()
     if not next(self._needCompile) then
         return
     end
     local list = {}
-    for uri in pairs(self._needCompile) do
-        list[#list+1] = uri
+    for i, uri in ipairs(self._needCompile) do
+        list[i] = uri
     end
 
     local size = 0
@@ -167,6 +167,14 @@ function mt:read(mode)
     return self._input(mode)
 end
 
+function mt:needCompile(uri)
+    if self._needCompile[uri] then
+        return
+    end
+    self._needCompile[uri] = true
+    self._needCompile[#self._needCompile+1] = uri
+end
+
 function mt:saveText(uri, version, text)
     local obj = self._file[uri]
     if obj then
@@ -175,13 +183,13 @@ function mt:saveText(uri, version, text)
         end
         obj.version = version
         obj.text = text
-        self._needCompile[uri] = true
+        self:needCompile(uri)
     else
         self._file[uri] = {
             version = version,
             text = text,
         }
-        self._needCompile[uri] = true
+        self:needCompile(uri)
     end
 end
 
@@ -198,7 +206,7 @@ function mt:readText(uri, path)
         version = -1,
         text = text,
     }
-    self._needCompile[uri] = true
+    self:needCompile(uri)
 end
 
 function mt:open(uri)
@@ -215,7 +223,7 @@ end
 
 function mt:reCompile()
     for uri in pairs(self._opening) do
-        self._needCompile[uri] = true
+        self:needCompile(uri)
     end
 end
 
@@ -237,6 +245,11 @@ function mt:compileVM(uri)
         return nil
     end
     self._needCompile[uri] = nil
+    for i, u in ipairs(self._needCompile) do
+        if u == uri then
+            table.remove(self._needCompile, i)
+        end
+    end
     local ast = parser:ast(obj.text)
 
     obj.vm = matcher.vm(ast, self, uri)
@@ -261,31 +274,6 @@ function mt:getVM(uri)
     return obj.vm
 end
 
-function mt:needRequires(uri)
-    self._needRequire[uri] = true
-end
-
-function mt:_loadRequires()
-    if not self.workspace then
-        return
-    end
-    if not next(self._needRequire) then
-        return
-    end
-    local copy = {}
-    for uri in pairs(self._needRequire) do
-        self._needRequire[uri] = nil
-        copy[uri] = true
-    end
-    for uri in pairs(copy) do
-        local obj = self._file[uri]
-        if obj then
-            obj.vm:loadRequires()
-            self._needDiagnostics[uri] = true
-        end
-    end
-end
-
 function mt:removeText(uri)
     self._file[uri] = nil
 end
@@ -302,9 +290,8 @@ function mt:onTick()
             rpc:recieve(proto)
         end
     end
-    self:_buildTextCache()
+    self:compileAll()
     self:_doDiagnostic()
-    self:_loadRequires()
 
     if os.clock() - self._clock >= 600 then
         self._clock = os.clock()
@@ -344,7 +331,6 @@ return function ()
     local session = setmetatable({
         _file = {},
         _needCompile = {},
-        _needRequire = {},
         _needDiagnostics = {},
         _opening = {},
         _clock = -100,

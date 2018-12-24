@@ -135,3 +135,31 @@ TEST {
         label = 'function (a: any, b: any)',
     }
 }
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            local mt = {}
+            mt.__index = mt
+
+            function mt:add(a, b)
+            end
+            
+            return function ()
+                return setmetatable({}, mt)
+            end
+        ]],
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            local m = require 'a'
+            local obj = m()
+            obj:<?add?>()
+        ]]
+    },
+    hover = {
+        label = 'function mt:add(a: any, b: any)'
+    },
+}

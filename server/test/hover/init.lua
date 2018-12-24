@@ -198,3 +198,21 @@ end
 function x()
   -> any
 ]]
+
+TEST [[
+local mt = {}
+mt.__index = mt
+
+function mt:add(a, b)
+end
+
+local function init()
+    return setmetatable({}, mt)
+end
+
+local t = init()
+t:<?add?>()
+]]
+[[
+function mt:add(a: any, b: any)
+]]

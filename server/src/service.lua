@@ -248,13 +248,13 @@ function mt:compileVM(uri)
     for i, u in ipairs(self._needCompile) do
         if u == uri then
             table.remove(self._needCompile, i)
+            break
         end
     end
     local ast = parser:ast(obj.text)
 
     obj.vm = matcher.vm(ast, self, uri)
     obj.lines = parser:lines(obj.text, 'utf8')
-    log.debug('Compile', uri)
     if not obj.vm then
         return obj
     end

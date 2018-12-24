@@ -114,6 +114,11 @@ function mt:addInfo(obj, type, source)
         else
             self.results.sources[source] = obj
         end
+        if type == 'set' or type == 'return' then
+            if not obj.declarat then
+                obj.declarat = source
+            end
+        end
     end
     return obj
 end
@@ -262,9 +267,6 @@ function mt:setValue(var, value, source)
     if source and source.start then
         self:addInfo(var, 'set', source)
         self:addInfo(value, 'set', source)
-        if not value.declarat then
-            value.declarat = source
-        end
     end
     return value
 end

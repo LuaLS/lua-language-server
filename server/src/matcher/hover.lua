@@ -182,13 +182,13 @@ local function buildValueName(result, source)
         elseif declarat.type == 'number' or declarat.type == 'boolean' then
             key = tostring(declarat[1])
         else
-            key = '?'
+            key = ''
         end
 
         local parentName = declarat.parentName
 
         if not parentName then
-            return result.key or ''
+            return key or ''
         end
 
         if parentName == '?' then
@@ -282,14 +282,14 @@ end
 local function getFunctionHover(name, result, source, lib, oo, select)
     local args = ''
     local returns
-    local enum = ''
-    local tip = ''
+    local enum
+    local tip
     local argLabel
     if lib then
         args, argLabel = buildLibArgs(lib, oo, select)
         returns = buildLibReturns(lib)
         enum = buildEnum(lib)
-        tip = lib.description or ''
+        tip = lib.description
     else
         args, argLabel = buildValueArgs(result, source, select)
         returns = buildValueReturns(result)
@@ -362,10 +362,9 @@ local function getValueHover(name, valueType, result, source, lib)
     local tip
     if lib then
         value = lib.code or (lib.value and ('%q'):format(lib.value))
-        tip = lib.description or ''
+        tip = lib.description
     else
         value = result.value.value and ('%q'):format(result.value.value)
-        tip = ''
     end
 
     local text
@@ -389,7 +388,6 @@ local function getStringHover(result, lsp)
     end
     local path = lsp.workspace:relativePathByUri(result.uri)
     return {
-        label = '',
         description = ('[%s](%s)'):format(path:string(), result.uri),
     }
 end

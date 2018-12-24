@@ -88,7 +88,47 @@ TEST {
         content = 'require <?"a"?>',
     },
     hover = {
-        label = '',
         description = [[[a.lua](file:///C%3A/Users/sunyi/.vscode/extensions/sumneko.lua-language-server/server/a.lua)]],
+    }
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            local function f(a, b)
+            end
+            return f
+        ]],
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            local x = require 'a'
+            <?x?>()
+        ]]
+    },
+    hover = {
+        label = 'function f(a: any, b: any)',
+    }
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            return function (a, b)
+            end
+        ]],
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            local f = require 'a'
+            <?f?>()
+        ]]
+    },
+    hover = {
+        label = 'function (a: any, b: any)',
     }
 }

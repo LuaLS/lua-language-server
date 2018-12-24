@@ -27,7 +27,7 @@ return function (lsp, params)
 ```lua
 %s
 ```
-]]):format(hover.label, hover.description, hover.enum or '')
+]]):format(hover.label or '', hover.description or '', hover.enum or '')
 
     local response = {
         contents = {

@@ -143,7 +143,7 @@ end
 
 function mt:compileLuaPath()
     for i, luapath in ipairs(self.luapath) do
-        self.compiledpath[i] = '^' .. luapath:gsub('%?', '(.-)'):gsub('%.', '%%.') .. '$'
+        self.compiledpath[i] = '^' .. luapath:gsub('%.', '%%.'):gsub('%?', '(.-)') .. '$'
     end
 end
 
@@ -155,13 +155,14 @@ function mt:convertPathAsRequire(filename, start)
             if not list then
                 list = {}
             end
-            list[#list+1] = str
+            list[#list+1] = str:gsub('/', '.')
         end
     end
     return list
 end
 
-function mt:matchPath(baseUri, str)
+function mt:matchPath(str)
+    str = str:lower()
     local first = str:match '[^%.]+'
     if not first then
         return nil
@@ -169,7 +170,7 @@ function mt:matchPath(baseUri, str)
     local rootLen = #self.root:string()
     local results = {}
     for filename in pairs(self.files) do
-        local start = filename:find('/' .. first, true, rootLen + 1)
+        local start = filename:find('/' .. first, rootLen + 1, true)
         if start then
             local list = self:convertPathAsRequire(filename, start + 1)
             if list then
@@ -182,6 +183,10 @@ function mt:matchPath(baseUri, str)
             end
         end
     end
+    if #results == 0 then
+        return nil
+    end
+    table.sort(results)
     return results
 end
 

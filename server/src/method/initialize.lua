@@ -1,3 +1,12 @@
+local function allWords()
+    local str = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+    local list = {}
+    for c in str:gmatch '.' do
+        list[#list+1] = c
+    end
+    return table.unpack(list)
+end
+
 return function (lsp)
     lsp._inited = true
     return {
@@ -26,7 +35,7 @@ return function (lsp)
             -- 自动完成
             completionProvider = {
                 resolveProvider = false,
-                triggerCharacters = { '.', ':' },
+                triggerCharacters = { '.', ':', allWords() },
             },
             -- 工作目录
             workspace = {

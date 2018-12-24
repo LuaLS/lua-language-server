@@ -1,4 +1,4 @@
-local service = require 'service'
+local service = require 'server'
 local workspace = require 'workspace'
 local fs = require 'bee.filesystem'
 local matcher = require 'matcher'
@@ -125,6 +125,24 @@ TEST {
         },
         {
             label = 'abcde',
+            kind = CompletionItemKind.Module,
+        },
+    }
+}
+
+TEST {
+    {
+        path = 'abc.lua',
+        content = '',
+    },
+    {
+        path = 'test.lua',
+        content = 'require "A@"',
+        main = true,
+    },
+    completion = {
+        {
+            label = 'abc',
             kind = CompletionItemKind.Module,
         },
     }

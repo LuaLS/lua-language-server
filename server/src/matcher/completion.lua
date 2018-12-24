@@ -217,6 +217,25 @@ local function searchAsSuffix(result, callback)
     end)
 end
 
+local function searchAsArg(vm, inCall, inString, callback)
+    local special = inCall.func.lib and inCall.func.lib.special
+    if not special then
+        return
+    end
+    if special == 'require' then
+        if not vm.lsp or not vm.lsp.workspace then
+            return
+        end
+        local results = vm.lsp.workspace:matchPath(inString[1])
+        if not results then
+            return
+        end
+        for _, v in ipairs(results) do
+            callback(v, CompletionItemKind.Module)
+        end
+    end
+end
+
 local function findClosePos(vm, pos)
     local curDis = math.maxinteger
     local parent = nil
@@ -268,13 +287,13 @@ local function isContainPos(obj, pos)
     return false
 end
 
-local function isInString(vm, pos)
+local function getString(vm, pos)
     for _, source in ipairs(vm.results.strings) do
         if isContainPos(source, pos) then
-            return true
+            return source
         end
     end
-    return false
+    return nil
 end
 
 local function findArgCount(args, pos)
@@ -319,14 +338,14 @@ end
 
 return function (vm, pos)
     local result, source = findResult(vm, pos)
-    local inCall
+    local inCall, inString
     if not result then
         result, source = findClosePos(vm, pos)
         if not result then
             return nil
         end
-        if isInString(vm, pos) then
-            do return nil end
+        inString = getString(vm, pos)
+        if inString then
             local calls = findCall(vm, pos)
             if not calls then
                 return nil
@@ -364,7 +383,7 @@ return function (vm, pos)
     end
 
     if inCall then
-        searchAsArg(vm, pos, result, callback)
+        searchAsArg(vm, inCall, inString, callback)
     else
         if result.type == 'local' then
             searchAsGlobal(vm, pos, result, callback)

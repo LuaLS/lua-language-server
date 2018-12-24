@@ -161,9 +161,9 @@ function mt:convertPathAsRequire(filename, start)
     return list
 end
 
-function mt:matchPath(str)
-    str = str:lower()
-    local first = str:match '[^%.]+'
+function mt:matchPath(input)
+    input = input:lower()
+    local first = input:match '[^%.]+'
     if not first then
         return nil
     end
@@ -175,7 +175,7 @@ function mt:matchPath(str)
             local list = self:convertPathAsRequire(filename, start + 1)
             if list then
                 for _, str in ipairs(list) do
-                    if not results[str] then
+                    if not results[str] and #str >= #input then
                         results[str] = true
                         results[#results+1] = str
                     end

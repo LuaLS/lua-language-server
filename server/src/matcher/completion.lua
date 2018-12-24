@@ -231,7 +231,9 @@ local function searchAsArg(vm, inCall, inString, callback)
             return
         end
         for _, v in ipairs(results) do
-            callback(v, CompletionItemKind.Module)
+            if v ~= inString[1] then
+                callback(v, CompletionItemKind.Module)
+            end
         end
     end
 end
@@ -344,14 +346,15 @@ return function (vm, pos)
         if not result then
             return nil
         end
-        inString = getString(vm, pos)
-        if inString then
-            local calls = findCall(vm, pos)
-            if not calls then
-                return nil
-            end
-            inCall = calls[#calls]
+    end
+
+    inString = getString(vm, pos)
+    if inString then
+        local calls = findCall(vm, pos)
+        if not calls then
+            return nil
         end
+        inCall = calls[#calls]
     end
 
     local list = {}

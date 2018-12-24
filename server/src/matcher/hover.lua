@@ -388,7 +388,10 @@ local function getStringHover(result, lsp)
         return nil
     end
     local path = lsp.workspace:relativePathByUri(result.uri)
-    return ('[%s](%s)'):format(path:string(), result.uri)
+    return {
+        label = '',
+        description = ('[%s](%s)'):format(path:string(), result.uri),
+    }
 end
 
 return function (result, source, lsp, select)

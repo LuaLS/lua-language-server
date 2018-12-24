@@ -254,11 +254,33 @@ function mt:compileVM(uri)
 
     obj.vm = matcher.vm(ast, self, uri)
     obj.lines = parser:lines(obj.text, 'utf8')
+    log.debug('Compile', uri)
     if not obj.vm then
         return obj
     end
 
     self._needDiagnostics[uri] = true
+    if obj.child then
+        for child in pairs(obj.child) do
+            obj.child[child] = nil
+            self:needCompile(child)
+        end
+        obj.child = nil
+    end
+
+    if obj.parent then
+        local hasParent
+        for parent in pairs(obj.parent) do
+            if self:getVM(parent) then
+                obj.parent[parent] = nil
+            else
+                hasParent = true
+            end
+        end
+        if not hasParent then
+            obj.parent = nil
+        end
+    end
 
     return obj
 end
@@ -272,6 +294,25 @@ function mt:getVM(uri)
         return nil
     end
     return obj.vm
+end
+
+function mt:compileChain(child, parent)
+    local parentObj = self._file[parent]
+    local childObj = self._file[child]
+
+    if not parentObj or not childObj then
+        return
+    end
+
+    if not parentObj.child then
+        parentObj.child = {}
+    end
+    parentObj.child[child] = true
+
+    if not childObj.parent then
+        childObj.parent = {}
+    end
+    childObj.parent[parent] = true
 end
 
 function mt:removeText(uri)

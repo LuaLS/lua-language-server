@@ -522,8 +522,7 @@ function mt:tryRequireOne(strValue, mode)
                 return self:getRequire(strValue, destVM)
             end
         else
-            self.lsp:needCompile(uri)
-            self.lsp:needCompile(self.uri)
+            self.lsp:compileChain(self.uri, uri)
         end
     end
     return nil

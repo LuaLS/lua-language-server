@@ -216,3 +216,8 @@ t:<?add?>()
 [[
 function mt:add(a: any, b: any)
 ]]
+
+TEST [[
+local <?t?> = - 1000
+]]
+[[number t = -1000]]

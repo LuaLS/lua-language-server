@@ -978,14 +978,29 @@ function mt:getBinary(exp)
         or op == '&'
         or op == '<<'
         or op == '>>'
-        or op == '//'
     then
         self:inference(v1, 'integer')
         self:inference(v2, 'integer')
+        if math.type(v1.value) == 'integer' and math.type(v2.value) == 'integer' then
+            if op == '|' then
+                return self:createValue('integer', v1.value | v2.value)
+            elseif op == '~' then
+                return self:createValue('integer', v1.value ~ v2.value)
+            elseif op == '&' then
+                return self:createValue('integer', v1.value &v2.value)
+            elseif op == '<<' then
+                return self:createValue('integer', v1.value << v2.value)
+            elseif op == '>>' then
+                return self:createValue('integer', v1.value >> v2.value)
+            end
+        end
         return self:createValue('integer')
     elseif op == '..' then
         self:inference(v1, 'string')
         self:inference(v2, 'string')
+        if type(v1.value) == 'string' and type(v2.value) == 'string' then
+            return self:createValue('string', nil, v1.value .. v2.value)
+        end
         return self:createValue('string')
     elseif op == '+'
         or op == '-'
@@ -993,9 +1008,27 @@ function mt:getBinary(exp)
         or op == '/'
         or op == '^'
         or op == '%'
+        or op == '//'
     then
         self:inference(v1, 'number')
         self:inference(v2, 'number')
+        if type(v1.value) == 'number' and type(v2.value) == 'number' then
+            if op == '+' then
+                return self:createValue('number', nil, v1.value + v2.value)
+            elseif op == '-' then
+                return self:createValue('number', nil, v1.value - v2.value)
+            elseif op == '*' then
+                return self:createValue('number', nil, v1.value * v2.value)
+            elseif op == '/' then
+                return self:createValue('number', nil, v1.value / v2.value)
+            elseif op == '^' then
+                return self:createValue('number', nil, v1.value ^ v2.value)
+            elseif op == '%' then
+                return self:createValue('number', nil, v1.value % v2.value)
+            elseif op == '//' then
+                return self:createValue('number', nil, v1.value // v2.value)
+            end
+        end
         return self:createValue('number')
     end
     return nil
@@ -1009,12 +1042,21 @@ function mt:getUnary(exp)
         return self:createValue('boolean')
     elseif op == '#' then
         self:inference(v1, 'table')
+        if type(v1.value) == 'string' then
+            return self:createValue('integer', nil, #v1.value)
+        end
         return self:createValue('integer')
     elseif op == '-' then
         self:inference(v1, 'number')
+        if type(v1.value) == 'number' then
+            return self:createValue('number', nil, -v1.value)
+        end
         return self:createValue('number')
     elseif op == '~' then
         self:inference(v1, 'integer')
+        if math.type(v1.value) == 'integer' then
+            return self:createValue('integer', nil, ~v1.value)
+        end
         return self:createValue('integer')
     end
     return nil

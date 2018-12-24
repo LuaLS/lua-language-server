@@ -102,17 +102,6 @@ print(x)
 ]]
 
 TEST [[
-local x
-print(x)
-local x
-print(x)
-local x
-print(x)
-local x
-print(x)
-]]
-
-TEST [[
 local _
 print(_)
 local _

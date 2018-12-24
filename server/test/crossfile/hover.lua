@@ -75,6 +75,9 @@ function TEST(data)
     local result, source = matcher.findResult(sourceVM, sourcePos)
     local hover = matcher.hover(result, source, lsp)
     assert(hover)
+    if data.hover.description then
+        data.hover.description = data.hover.description:gsub('%$ROOT%$', ws:uriEncode(ROOT):gsub('%%', '%%%%'))
+    end
     assert(eq(hover, data.hover))
 end
 
@@ -88,7 +91,7 @@ TEST {
         content = 'require <?"a"?>',
     },
     hover = {
-        description = [[[a.lua](file:///C%3A/Users/sunyi/.vscode/extensions/sumneko.lua-language-server/server/a.lua)]],
+        description = [[[a.lua]($ROOT$/a.lua)]],
     }
 }
 

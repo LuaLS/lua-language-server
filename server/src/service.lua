@@ -96,7 +96,7 @@ function mt:_doDiagnostic()
     end
     for uri in pairs(copy) do
         local obj = self._file[uri]
-        if obj then
+        if obj and obj.vm then
             local data = {
                 uri   = uri,
                 vm    = obj.vm,

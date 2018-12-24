@@ -141,6 +141,50 @@ function mt:findPath(baseUri, searchers)
     return uri
 end
 
+function mt:compileLuaPath()
+    for i, luapath in ipairs(self.luapath) do
+        self.compiledpath[i] = '^' .. luapath:gsub('%?', '(.-)'):gsub('%.', '%%.') .. '$'
+    end
+end
+
+function mt:convertPathAsRequire(filename, start)
+    local list
+    for _, luapath in ipairs(self.compiledpath) do
+        local str = filename:match(luapath, start)
+        if str then
+            if not list then
+                list = {}
+            end
+            list[#list+1] = str
+        end
+    end
+    return list
+end
+
+function mt:matchPath(baseUri, str)
+    local first = str:match '[^%.]+'
+    if not first then
+        return nil
+    end
+    local rootLen = #self.root:string()
+    local results = {}
+    for filename in pairs(self.files) do
+        local start = filename:find('/' .. first, true, rootLen + 1)
+        if start then
+            local list = self:convertPathAsRequire(filename, start + 1)
+            if list then
+                for _, str in ipairs(list) do
+                    if not results[str] then
+                        results[str] = true
+                        results[#results+1] = str
+                    end
+                end
+            end
+        end
+    end
+    return results
+end
+
 function mt:searchPath(baseUri, str)
     if self.searched[str] then
         return self.searched[str]
@@ -196,6 +240,8 @@ return function (lsp, name)
             '?/init.lua',
             '?/?.lua',
         },
+        compiledpath = {}
     }, mt)
+    workspace:compileLuaPath()
     return workspace
 end

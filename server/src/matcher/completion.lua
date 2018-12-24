@@ -277,15 +277,61 @@ local function isInString(vm, pos)
     return false
 end
 
+local function findArgCount(args, pos)
+    for i, arg in ipairs(args) do
+        if isContainPos(arg, pos) then
+            return i, arg
+        end
+    end
+    return #args + 1, nil
+end
+
+-- 找出范围包含pos的call
+local function findCall(vm, pos)
+    local results = {}
+    for _, call in ipairs(vm.results.calls) do
+        if isContainPos(call.args, pos) then
+            local n, arg = findArgCount(call.args, pos)
+            if arg and arg.type ~= 'string' then
+                return nil
+            end
+            local var = vm.results.sources[call.lastObj]
+            if var then
+                results[#results+1] = {
+                    func = call.func,
+                    var = var,
+                    source = call.lastObj,
+                    select = n,
+                    args = call.args,
+                }
+            end
+        end
+    end
+    if #results == 0 then
+        return nil
+    end
+    -- 可能处于 'func1(func2(' 的嵌套中，因此距离越远的函数层级越低
+    table.sort(results, function (a, b)
+        return a.args.start < b.args.start
+    end)
+    return results
+end
+
 return function (vm, pos)
     local result, source = findResult(vm, pos)
+    local inCall
     if not result then
         result, source = findClosePos(vm, pos)
         if not result then
             return nil
         end
         if isInString(vm, pos) then
-            return nil
+            do return nil end
+            local calls = findCall(vm, pos)
+            if not calls then
+                return nil
+            end
+            inCall = calls[#calls]
         end
     end
 
@@ -317,13 +363,17 @@ return function (vm, pos)
         end
     end
 
-    if result.type == 'local' then
-        searchAsGlobal(vm, pos, result, callback)
-    elseif result.type == 'field' then
-        if result.parent and result.parent.value and result.parent.value.ENV == true then
+    if inCall then
+        searchAsArg(vm, pos, result, callback)
+    else
+        if result.type == 'local' then
             searchAsGlobal(vm, pos, result, callback)
-        else
-            searchAsSuffix(result, callback)
+        elseif result.type == 'field' then
+            if result.parent and result.parent.value and result.parent.value.ENV == true then
+                searchAsGlobal(vm, pos, result, callback)
+            else
+                searchAsSuffix(result, callback)
+            end
         end
     end
     if #list == 0 then

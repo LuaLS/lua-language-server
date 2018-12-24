@@ -196,9 +196,14 @@ function mt:mergeValue(a, b, mark)
     if mark[a] or mark[b] then
         return
     end
+    if a.uri ~= self.uri then
+        return
+    end
     mark[a] = true
     mark[b] = true
-    self:mergeChild(a, b, mark)
+    if b.uri == self.uri then
+        self:mergeChild(a, b, mark)
+    end
     for k in pairs(a) do
         a[k] = nil
     end

@@ -809,6 +809,9 @@ function mt:unpackList(list, expect)
     local res = {
         type = 'list',
     }
+    if not list then
+        return res
+    end
     if list.type == 'list' or list.type == 'call' then
         for i, exp in ipairs(list) do
             if exp.type == '...' then

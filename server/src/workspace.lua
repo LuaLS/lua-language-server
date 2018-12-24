@@ -1,50 +1,6 @@
 local fs = require 'bee.filesystem'
 local async = require 'async'
 
-local function uriDecode(uri)
-    if uri:sub(1, 8) ~= 'file:///' then
-        log.error('uri decode failed: ', uri)
-        return nil
-    end
-    local names = {}
-    for name in uri:sub(9):gmatch '[^%/]+' do
-        names[#names+1] = name:gsub('%%([0-9a-fA-F][0-9a-fA-F])', function (hex)
-            return string.char(tonumber(hex, 16))
-        end)
-    end
-    if #names == 0 then
-        log.error('uri decode failed: ', uri)
-        return nil
-    end
-    -- 盘符后面加个斜杠
-    local path = fs.path(names[1] .. '\\')
-    for i = 2, #names do
-        path = path / names[i]
-    end
-    return fs.absolute(path)
-end
-
-local function uriEncode(path)
-    local names = {}
-    local cur = fs.absolute(path)
-    while true do
-        local name = cur:filename():string()
-        if name == '' then
-            -- 盘符，去掉一个斜杠
-            name = cur:string():sub(1, -2)
-        end
-        name = name:gsub([=[[^%w%-%_%.%~]]=], function (char)
-            return ('%%%02X'):format(string.byte(char))
-        end)
-        table.insert(names, 1, name)
-        if cur == cur:parent_path() then
-            break
-        end
-        cur = cur:parent_path()
-    end
-    return 'file:///' .. table.concat(names, '/')
-end
-
 local function split(str, sep)
     local t = {}
     for s in str:gmatch('[^' .. sep .. ']+') do
@@ -67,8 +23,52 @@ end
 local mt = {}
 mt.__index = mt
 
+function mt:uriDecode(uri)
+    if uri:sub(1, 8) ~= 'file:///' then
+        log.error('uri decode failed: ', uri)
+        return nil
+    end
+    local names = {}
+    for name in uri:sub(9):gmatch '[^%/]+' do
+        names[#names+1] = name:gsub('%%([0-9a-fA-F][0-9a-fA-F])', function (hex)
+            return string.char(tonumber(hex, 16))
+        end)
+    end
+    if #names == 0 then
+        log.error('uri decode failed: ', uri)
+        return nil
+    end
+    -- 盘符后面加个斜杠
+    local path = fs.path(names[1] .. '\\')
+    for i = 2, #names do
+        path = path / names[i]
+    end
+    return fs.absolute(path)
+end
+
+function mt:uriEncode(path)
+    local names = {}
+    local cur = fs.absolute(path)
+    while true do
+        local name = cur:filename():string()
+        if name == '' then
+            -- 盘符，去掉一个斜杠
+            name = cur:string():sub(1, -2)
+        end
+        name = name:gsub([=[[^%w%-%_%.%~]]=], function (char)
+            return ('%%%02X'):format(string.byte(char))
+        end)
+        table.insert(names, 1, name)
+        if cur == cur:parent_path() then
+            break
+        end
+        cur = cur:parent_path()
+    end
+    return 'file:///' .. table.concat(names, '/')
+end
+
 function mt:init(rootUri)
-    self.root = uriDecode(rootUri)
+    self.root = self:uriDecode(rootUri)
     if not self.root then
         return
     end
@@ -94,7 +94,7 @@ function mt:init(rootUri)
         for _, filename in ipairs(list) do
             local path = fs.absolute(fs.path(filename))
             local name = path:string():lower()
-            self.files[name] = uriEncode(path)
+            self.files[name] = self:uriEncode(path)
         end
         self:reset()
     end)
@@ -102,13 +102,13 @@ end
 
 function mt:addFile(uri)
     if uri:sub(-4) == '.lua' then
-        local name = uriDecode(uri):string():lower()
+        local name = self:uriDecode(uri):string():lower()
         self.files[name] = uri
     end
 end
 
 function mt:removeFile(uri)
-    local name = uriDecode(uri):string():lower()
+    local name = self:uriDecode(uri):string():lower()
     self.files[name] = nil
 end
 
@@ -137,7 +137,7 @@ function mt:findPath(baseUri, searchers)
         end)
         uri = results[1]
     end
-    self.lsp:readText(uri, uriDecode(uri))
+    self.lsp:readText(uri, self:uriDecode(uri))
     return uri
 end
 
@@ -179,12 +179,12 @@ function mt:reset()
 end
 
 function mt:relativePathByUri(uri)
-    local path = uriDecode(uri)
+    local path = self:uriDecode(uri)
     local relate = fs.relative(path, self.root)
     return relate
 end
 
-return function (lsp, name, uri)
+return function (lsp, name)
     local workspace = setmetatable({
         lsp = lsp,
         name = name,
@@ -197,6 +197,5 @@ return function (lsp, name, uri)
             '?/?.lua',
         },
     }, mt)
-    workspace:init(uri)
     return workspace
 end

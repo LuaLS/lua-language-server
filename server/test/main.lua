@@ -33,6 +33,7 @@ local function main()
     test 'hover'
     test 'completion'
     test 'signature'
+    test 'crossfile'
 
     print('测试完成')
 end

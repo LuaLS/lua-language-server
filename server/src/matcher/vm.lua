@@ -239,19 +239,35 @@ function mt:mergeChild(a, b, mark)
     if not mark then
         mark = {}
     end
-    local child = a.child or orderTable()
-    local other = b.child or orderTable()
-    a.child = nil
-    b.child = nil
-    for k, v in pairs(other) do
-        if child[k] then
-            self:mergeField(child[k], v, mark)
-        else
+    if a.uri ~= self.uri then
+        return
+    end
+    if b.uri == self.uri then
+        local child = a.child or orderTable()
+        local other = b.child or orderTable()
+        a.child = nil
+        b.child = nil
+        for k, v in pairs(other) do
+            if child[k] then
+                self:mergeField(child[k], v, mark)
+            else
+                child[k] = v
+            end
+        end
+        a.child = child
+        b.child = child
+    else
+        local child = a.child or orderTable()
+        local other = b.child
+        if not other then
+            return
+        end
+        a.child = nil
+        for k, v in pairs(other) do
             child[k] = v
         end
+        a.child = child
     end
-    a.child = child
-    b.child = child
 end
 
 function mt:setValue(var, value, source)

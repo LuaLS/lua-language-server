@@ -401,6 +401,10 @@ return function (result, source, lsp, select)
         return getStringHover(result, lsp)
     end
 
+    if result.type ~= 'local' or result.type ~= 'field' then
+        return
+    end
+
     local lib, fullKey, oo = findLib(result)
     local valueType = lib and lib.type or result.value.type or 'nil'
     local name = fullKey or buildValueName(result, source)

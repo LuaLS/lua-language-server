@@ -161,33 +161,50 @@ function mt:convertPathAsRequire(filename, start)
     return list
 end
 
-function mt:matchPath(input)
+function mt:matchPath(baseUri, input)
     input = input:lower()
     local first = input:match '[^%.]+'
     if not first then
         return nil
     end
+    local baseName = self:uriDecode(baseUri):string():lower()
     local rootLen = #self.root:string()
-    local results = {}
+    local map = {}
     for filename in pairs(self.files) do
         local start = filename:find('/' .. first, rootLen + 1, true)
         if start then
             local list = self:convertPathAsRequire(filename, start + 1)
             if list then
                 for _, str in ipairs(list) do
-                    if not results[str] and #str >= #input then
-                        results[str] = true
-                        results[#results+1] = str
+                    if #str >= #input then
+                        if not map[str]
+                            or similarity(filename, baseName) > similarity(map[str], baseName)
+                        then
+                            map[str] = filename
+                        end
                     end
                 end
             end
         end
     end
-    if #results == 0 then
+
+    local list = {}
+    for str in pairs(map) do
+        list[#list+1] = str
+    end
+    if #list == 0 then
         return nil
     end
-    table.sort(results)
-    return results
+    table.sort(list, function (a, b)
+        local sa = similarity(map[a], baseName)
+        local sb = similarity(map[b], baseName)
+        if sa == sb then
+            return a < b
+        else
+            return sa > sb
+        end
+    end)
+    return list
 end
 
 function mt:searchPath(baseUri, str)

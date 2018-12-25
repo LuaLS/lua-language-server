@@ -191,3 +191,29 @@ TEST {
         },
     }
 }
+
+TEST {
+    {
+        path = 'x000.lua',
+        content = '',
+    },
+    {
+        path = 'abc/x111.lua',
+        content = '',
+    },
+    {
+        path = 'abc/test.lua',
+        content = 'require "x@"',
+        main = true,
+    },
+    completion = {
+        {
+            label = 'x111',
+            kind = CompletionItemKind.Module,
+        },
+        {
+            label = 'x000',
+            kind = CompletionItemKind.Module,
+        },
+    }
+}

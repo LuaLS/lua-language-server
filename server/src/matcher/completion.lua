@@ -226,7 +226,7 @@ local function searchAsArg(vm, inCall, inString, callback)
         if not vm.lsp or not vm.lsp.workspace then
             return
         end
-        local results = vm.lsp.workspace:matchPath(inString[1])
+        local results = vm.lsp.workspace:matchPath(vm.uri, inString[1])
         if not results then
             return
         end

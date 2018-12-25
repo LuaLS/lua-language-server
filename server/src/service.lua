@@ -172,7 +172,7 @@ function mt:needCompile(uri)
         return
     end
     self._needCompile[uri] = true
-    self._needCompile[#self._needCompile+1] = uri
+    table.insert(self._needCompile, 1, uri)
 end
 
 function mt:saveText(uri, version, text)
@@ -301,6 +301,9 @@ function mt:compileChain(child, parent)
     local childObj = self._file[child]
 
     if not parentObj or not childObj then
+        return
+    end
+    if parentObj == childObj then
         return
     end
 

@@ -263,7 +263,7 @@ local function findClosePos(vm, pos)
             end
         end
     end
-    if parent.type ~= 'local' and parent.type ~= 'field' then
+    if parent and parent.type ~= 'local' and parent.type ~= 'field' then
         parent = nil
     end
     if parent then

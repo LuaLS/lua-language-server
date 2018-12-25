@@ -401,7 +401,7 @@ return function (result, source, lsp, select)
         return getStringHover(result, lsp)
     end
 
-    if result.type ~= 'local' or result.type ~= 'field' then
+    if result.type ~= 'local' and result.type ~= 'field' then
         return
     end
 

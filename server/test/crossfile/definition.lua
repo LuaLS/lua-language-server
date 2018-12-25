@@ -132,3 +132,18 @@ TEST {
         ]],
     },
 }
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            return <!a():b():c()!>
+        ]],
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            local <?t?> = require 'a'
+        ]],
+    },
+}

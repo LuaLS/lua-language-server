@@ -22,6 +22,12 @@ local function parseResultAcrossUri(positions, vm, result)
             end
         end
     end
+    if #positions == 0 then
+        positions[#positions+1] = {
+            0, 0,
+            result.value.uri,
+        }
+    end
 end
 
 local function parseResult(vm, result)

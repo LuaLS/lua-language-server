@@ -504,13 +504,8 @@ function mt:getRequire(strValue, destVM)
     if main.returns then
         mainValue = readOnly(main.returns[1])
     else
-        mainValue = self:createValue('boolean', {
-            type   = 'name',
-            start  = 0,
-            finish = 0,
-            [1]    = '',
-            uri    = destVM.uri,
-        }, true)
+        mainValue = self:createValue('boolean', nil, true)
+        mainValue.uri = destVM.uri
     end
 
     -- 支持 require 'xxx' 的转到定义
@@ -1158,6 +1153,9 @@ function mt:doReturn(action)
         local value = self:getExp(exp)
         if value.type == 'list' then
             if i == #action then
+                if #value == 0 then
+                    value[1] = self:createValue('any', exp)
+                end
                 for x, v in ipairs(value) do
                     self:addInfo(v, 'return', exp)
                     self:setFunctionReturn(self:getCurrentFunction(), i + x - 1, v)

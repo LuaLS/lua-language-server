@@ -42,9 +42,8 @@ local function readOnly(t)
             if type(v) == 'table' then
                 v = readOnly(v)
             end
+            self[k] = v
             return v
-        end,
-        __newindex = function (self, k, v)
         end,
         __len = function (self)
             return #t

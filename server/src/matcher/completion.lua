@@ -263,6 +263,9 @@ local function findClosePos(vm, pos)
             end
         end
     end
+    if parent.type ~= 'local' and parent.type ~= 'field' then
+        parent = nil
+    end
     if parent then
         -- 造个假的 DirtyName
         local source = {

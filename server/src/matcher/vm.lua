@@ -35,6 +35,24 @@ local function orderTable()
     })
 end
 
+local function readOnly(t)
+    return setmetatable({}, {
+        __index = function (self, k)
+            local v = t[k]
+            if type(v) == 'table' then
+                v = readOnly(v)
+            end
+            return v
+        end,
+        __newindex = function (self, k, v)
+        end,
+        __len = function (self)
+            return #t
+        end,
+        __source = t,
+    })
+end
+
 local mt = {}
 mt.__index = mt
 
@@ -426,6 +444,9 @@ function mt:updateFunctionArgs(func)
 end
 
 function mt:setFunctionArg(func, values)
+    if func.uri ~= self.uri then
+        return
+    end
     if not func.argValues then
         func.argValues = {}
     end
@@ -482,7 +503,7 @@ function mt:getRequire(strValue, destVM)
     -- 获取主函数返回值，注意不能修改对方的环境
     local mainValue
     if main.returns then
-        mainValue = main.returns[1]
+        mainValue = readOnly(main.returns[1])
     else
         mainValue = self:createValue('boolean', {
             type   = 'name',
@@ -505,7 +526,7 @@ function mt:getLoadFile(strValue, destVM)
     -- 取出对方的主函数
     local main = destVM.results.main
     -- loadfile 的返回值就是对方的主函数
-    local mainValue = main
+    local mainValue = readOnly(main)
 
     -- 支持 loadfile 'xxx.lua' 的转到定义
     local strSource = strValue.source

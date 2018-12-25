@@ -549,6 +549,7 @@ function mt:tryRequireOne(strValue, mode)
         end
         -- 如果取不到VM（不编译），则做个标记，之后再取一次
         local destVM = self.lsp:getVM(uri)
+        self.lsp:compileChain(self.uri, uri)
         if destVM then
             if mode == 'require' then
                 return self:getRequire(strValue, destVM)
@@ -557,8 +558,6 @@ function mt:tryRequireOne(strValue, mode)
             elseif mode == 'dofile' then
                 return self:getRequire(strValue, destVM)
             end
-        else
-            self.lsp:compileChain(self.uri, uri)
         end
     end
     return nil

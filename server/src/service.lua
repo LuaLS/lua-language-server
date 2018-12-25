@@ -143,9 +143,14 @@ function mt:compileAll()
     local size = 0
     local clock = os.clock()
     for _, uri in ipairs(list) do
+        self._compiled[uri] = true
         local obj = self:compileVM(uri)
-        size = size + #obj.text
+        if obj then
+            size = size + #obj.text
+        end
     end
+    self._compiled = {}
+
     local passed = os.clock() - clock
     if passed > 0.1 then
         log.debug(('\n\z
@@ -169,6 +174,9 @@ end
 
 function mt:needCompile(uri)
     if self._needCompile[uri] then
+        return
+    end
+    if self._compiled[uri] then
         return
     end
     self._needCompile[uri] = true
@@ -253,6 +261,15 @@ function mt:compileVM(uri)
     end
     local ast = parser:ast(obj.text)
 
+    -- 编译前清除节点信息
+    if obj.parent then
+        for pUri in pairs(obj.parent) do
+            local parent = self._file[pUri]
+            if parent and parent.child then
+                parent.child[uri] = nil
+            end
+        end
+    end
     obj.vm = matcher.vm(ast, self, uri)
     obj.lines = parser:lines(obj.text, 'utf8')
     if not obj.vm then
@@ -261,24 +278,13 @@ function mt:compileVM(uri)
 
     self._needDiagnostics[uri] = true
     if obj.child then
+        local list = {}
         for child in pairs(obj.child) do
-            obj.child[child] = nil
+            list[#list+1] = child
+        end
+        table.sort(list)
+        for _, child in ipairs(list) do
             self:needCompile(child)
-        end
-        obj.child = nil
-    end
-
-    if obj.parent then
-        local hasParent
-        for parent in pairs(obj.parent) do
-            if self:getVM(parent) then
-                obj.parent[parent] = nil
-            else
-                hasParent = true
-            end
-        end
-        if not hasParent then
-            obj.parent = nil
         end
     end
 
@@ -288,9 +294,6 @@ end
 function mt:getVM(uri)
     local obj = self._file[uri]
     if not obj then
-        return nil
-    end
-    if self._needCompile[uri] then
         return nil
     end
     return obj.vm
@@ -376,8 +379,10 @@ return function ()
         _file = {},
         _needCompile = {},
         _needDiagnostics = {},
+        _compiled = {},
         _opening = {},
         _clock = -100,
+        _version = 0,
     }, mt)
     return session
 end

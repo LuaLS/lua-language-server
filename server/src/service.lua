@@ -143,13 +143,11 @@ function mt:compileAll()
     local size = 0
     local clock = os.clock()
     for _, uri in ipairs(list) do
-        self._compiled[uri] = true
         local obj = self:compileVM(uri)
         if obj then
             size = size + #obj.text
         end
     end
-    self._compiled = {}
 
     local passed = os.clock() - clock
     if passed > 0.1 then
@@ -172,14 +170,17 @@ function mt:read(mode)
     return self._input(mode)
 end
 
-function mt:needCompile(uri)
+function mt:needCompile(uri, compiled)
     if self._needCompile[uri] then
         return
     end
-    if self._compiled[uri] then
+    if not compiled then
+        compiled = {}
+    end
+    if compiled[uri] then
         return
     end
-    self._needCompile[uri] = true
+    self._needCompile[uri] = compiled
     table.insert(self._needCompile, 1, uri)
 end
 
@@ -230,8 +231,9 @@ function mt:isOpen(uri)
 end
 
 function mt:reCompile()
+    local compiled = {}
     for uri in pairs(self._opening) do
-        self:needCompile(uri)
+        self:needCompile(uri, compiled)
     end
 end
 
@@ -252,7 +254,11 @@ function mt:compileVM(uri)
     if not self._needCompile[uri] then
         return nil
     end
-    self._needCompile[uri] = nil
+    local compiled = self._needCompile[uri]
+    if compiled then
+        compiled[uri] = true
+        self._needCompile[uri] = nil
+    end
     for i, u in ipairs(self._needCompile) do
         if u == uri then
             table.remove(self._needCompile, i)
@@ -278,13 +284,16 @@ function mt:compileVM(uri)
 
     self._needDiagnostics[uri] = true
     if obj.child then
+        if not compiled then
+            compiled = {}
+        end
         local list = {}
         for child in pairs(obj.child) do
             list[#list+1] = child
         end
         table.sort(list)
         for _, child in ipairs(list) do
-            self:needCompile(child)
+            self:needCompile(child, compiled)
         end
     end
 
@@ -379,7 +388,6 @@ return function ()
         _file = {},
         _needCompile = {},
         _needDiagnostics = {},
-        _compiled = {},
         _opening = {},
         _clock = -100,
         _version = 0,

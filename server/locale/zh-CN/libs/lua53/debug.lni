@@ -1,0 +1,87 @@
+["debug.debug"]
+description = '进入一个用户交互模式，运行用户输入的每个字符串。'
+
+[gethook]
+description = '返回三个表示线程钩子设置的值： 当前钩子函数，当前钩子掩码，当前钩子计数 。'
+
+[getinfo]
+description = '返回关于一个函数信息的表。'
+[[.enums]]
+name = 'what'
+enum = 'n'
+description = '`name` 和 `namewhat`'
+[[.enums]]
+name = 'what'
+enum = 'S'
+description = '`source`，`short_src`，`linedefined`，`lastlinedefined`，和 `what`'
+[[.enums]]
+name = 'what'
+enum = 'l'
+description = '`currentline`'
+[[.enums]]
+name = 'what'
+enum = 't'
+description = '`istailcall`'
+[[.enums]]
+name = 'what'
+enum = 'u'
+description = '`nups`，`nparams`，和`isvararg`'
+[[.enums]]
+name = 'what'
+enum = 'f'
+description = '`func`'
+[[.enums]]
+name = 'what'
+enum = 'L'
+description = '`activelines`'
+
+[getlocal]
+description = '返回在栈的 `f` 层处函数的索引为 `local` 的局部变量 的名字和值。'
+
+[getmetatable]
+description = '返回给定 `value` 的元表。'
+
+[getregistry]
+description = '返回注册表。'
+
+[getupvalue]
+description = '返回函数 `f` 的第 `up` 个上值的名字和值。'
+
+[getuservalue]
+description = '返回关联在 `u` 上的 `Lua` 值。'
+
+[sethook]
+description = '将一个函数作为钩子函数设入。'
+[[.enums]]
+name = 'mask'
+enum = 'c'
+description = '每当 Lua 调用一个函数时，调用钩子。'
+[[.enums]]
+name = 'mask'
+enum = 'r'
+description = '每当 Lua 从一个函数内返回时，调用钩子。'
+[[.enums]]
+name = 'mask'
+enum = 'l'
+description = '每当 Lua 进入新的一行时，调用钩子。'
+
+[setlocal]
+description = '将 `value` 赋给 栈上第 `level` 层函数的第 `local` 个局部变量。'
+
+[setmetatable]
+description = '将 `value` 的元表设为 `table` （可以是 `nil`）。'
+
+[setupvalue]
+description = '将 `value` 设为函数 `f` 的第 `up` 个上值。'
+
+[setuservalue]
+description = '将 `value` 设为 `udata` 的关联值。'
+
+[traceback]
+description = '返回调用栈的栈回溯信息。 字符串可选项 `message` 被添加在栈回溯信息的开头。'
+
+[upvalueid]
+description = '返回指定函数第 `n` 个上值的唯一标识符（一个轻量用户数据）。'
+
+[upvaluejoin]
+description = '让 Lua 闭包 `f1` 的第 `n1` 个上值 引用 `Lua` 闭包 `f2` 的第 `n2` 个上值。'

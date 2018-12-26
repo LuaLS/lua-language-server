@@ -12,3 +12,5 @@ MWS_NOT_SUPPORT       = '{} 目前还不支持多工作目录，我可能需要�
 MWS_RESTART           = '重启'
 MWS_NOT_COMPLETE      = '工作目录还没有准备好，你可以稍后再试一下...'
 MWS_COMPLETE          = '工作目录准备好了，你可以再试一下了...'
+
+PARSER_CRASH          = '语法解析崩溃了！遗言：{}'

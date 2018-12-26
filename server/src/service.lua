@@ -275,7 +275,17 @@ function mt:compileVM(uri)
             break
         end
     end
-    local ast = parser:ast(obj.text)
+    local ast, err = parser:ast(obj.text)
+    if not ast then
+        if type(err) == 'string' then
+            local message = lang.script('PARSER_CRASH', err)
+            log.debug(message)
+            rpc:notify('window/showMessage', {
+                type = 3,
+                message = lang.script('PARSER_CRASH', err:match 'grammar%.lua%:%d+%:(.+)'),
+            })
+        end
+    end
 
     -- 编译前清除节点信息
     if obj.parent then

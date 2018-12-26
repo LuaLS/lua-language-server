@@ -414,9 +414,12 @@ local defs = {
 }
 
 return function (self, lua, mode)
-    local gram, err = self.grammar(lua, mode, defs)
-    if not gram then
+    local suc, res, err = pcall(self.grammar, lua, mode, defs)
+    if not suc then
+        return nil, res
+    end
+    if not res then
         return nil, err
     end
-    return gram
+    return res
 end

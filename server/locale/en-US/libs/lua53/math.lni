@@ -50,7 +50,7 @@ description = 'An integer with the minimum value for an integer.'
 description = 'Returns the integral part of `x` and the fractional part of `x`.'
 
 [pi]
-description = 'The value of `π`.'
+description = 'The value of *π*.'
 
 [rad]
 description = 'Converts the angle `x` from degrees to radians.'

@@ -232,10 +232,24 @@ local function searchAsArg(vm, inCall, inString, callback)
         end
         for _, v in ipairs(results) do
             if v ~= inString[1] then
-                callback(v, CompletionItemKind.Module)
+                callback(v, CompletionItemKind.File)
             end
         end
     end
+end
+
+local function searchAsIndex(vm, pos, result, callback)
+    searchLocals(vm, pos, result.key, function (var)
+        callback(var, CompletionItemKind.Variable)
+    end)
+    for _, index in ipairs(vm.results.indexs) do
+        if matchKey(result.key, index) then
+            callback(index, CompletionItemKind.Property)
+        end
+    end
+    searchFields(result.key, vm.results.locals[1], nil, function (var)
+        callback(var, CompletionItemKind.Field)
+    end)
 end
 
 local function findClosePos(vm, pos)
@@ -394,7 +408,9 @@ return function (vm, pos)
         if result.type == 'local' then
             searchAsGlobal(vm, pos, result, callback)
         elseif result.type == 'field' then
-            if result.parent and result.parent.value and result.parent.value.ENV == true then
+            if result.isIndex then
+                searchAsIndex(vm, pos, result, callback)
+            elseif result.parent and result.parent.value and result.parent.value.ENV == true then
                 searchAsGlobal(vm, pos, result, callback)
             else
                 searchAsSuffix(result, callback)

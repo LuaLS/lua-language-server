@@ -117,15 +117,15 @@ TEST {
     completion = {
         {
             label = 'abc',
-            kind = CompletionItemKind.Module,
+            kind = CompletionItemKind.File,
         },
         {
             label = 'abc.aaa',
-            kind = CompletionItemKind.Module,
+            kind = CompletionItemKind.File,
         },
         {
             label = 'abcde',
-            kind = CompletionItemKind.Module,
+            kind = CompletionItemKind.File,
         },
     }
 }
@@ -143,7 +143,7 @@ TEST {
     completion = {
         {
             label = 'abc',
-            kind = CompletionItemKind.Module,
+            kind = CompletionItemKind.File,
         },
     }
 }
@@ -165,7 +165,7 @@ TEST {
     completion = {
         {
             label = 'abc.init',
-            kind = CompletionItemKind.Module,
+            kind = CompletionItemKind.File,
         },
     }
 }
@@ -187,7 +187,7 @@ TEST {
     completion = {
         {
             label = 'abc.init',
-            kind = CompletionItemKind.Module,
+            kind = CompletionItemKind.File,
         },
     }
 }
@@ -209,11 +209,11 @@ TEST {
     completion = {
         {
             label = 'x111',
-            kind = CompletionItemKind.Module,
+            kind = CompletionItemKind.File,
         },
         {
             label = 'x000',
-            kind = CompletionItemKind.Module,
+            kind = CompletionItemKind.File,
         },
     }
 }

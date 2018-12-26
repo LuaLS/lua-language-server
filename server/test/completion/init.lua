@@ -267,3 +267,33 @@ TEST [[
 (EXISTS)
 
 TEST 'local s = "a:@"' (nil)
+
+TEST [[
+local xxxx = {
+    xxyy = 1,
+    xxzz = 2,
+}
+
+local t = {
+    x@
+}
+]]
+{
+    {
+        label = 'xxxx',
+        kind = CompletionItemKind.Variable,
+    },
+    {
+        label = 'xxyy',
+        kind = CompletionItemKind.Property,
+    },
+    {
+        label = 'xxzz',
+        kind = CompletionItemKind.Property,
+    },
+    {
+        label = 'xpcall',
+        kind = CompletionItemKind.Function,
+        documentation = EXISTS,
+    }
+}

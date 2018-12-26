@@ -70,6 +70,14 @@ local function readOnly(t)
     })
 end
 
+local function insertOnce(tbl, key)
+    if tbl[key] then
+        return
+    end
+    tbl[key] = true
+    tbl[#tbl+1] = key
+end
+
 local mt = {}
 mt.__index = mt
 
@@ -190,7 +198,9 @@ function mt:buildTable(source)
             else
                 if key.type == 'name' then
                     local index = key[1]
+                    insertOnce(self.results.indexs, index)
                     local field = self:createField(tbl, index, key)
+                    field.isIndex = true
                     if value.type == 'list' then
                         self:setValue(field, value[1], key)
                     else
@@ -215,6 +225,13 @@ function mt:buildTable(source)
                 n = n + 1
                 local field = self:createField(tbl, n)
                 self:setValue(field, value)
+            end
+            -- 处理写了一半的 key = value，把name类的数组元素视为哈希键
+            if obj.type == 'name' then
+                local field = self.results.sources[obj]
+                if field then
+                    field.isIndex = true
+                end
             end
         end
     end
@@ -1426,6 +1443,7 @@ local function compile(ast, lsp, uri)
             calls  = {},
             sources= {},
             strings= {},
+            indexs = {},
             main   = nil,
         },
         libraryValue = {},

@@ -7,7 +7,7 @@
 - [x] Goto Definition
 - [x] Goto Implementation
 - [x] Find References
-- [x] Type Inference
+- [x] Rough Type Inference
 - [x] Hover
 - [x] Diagnostics
 - [x] Rename
@@ -18,6 +18,7 @@
 - [ ] Syntax Check
 - [ ] Multi Workspace
 - [ ] Type Format
+- [ ] Accurate Type Inference
 
 ### Locale
 

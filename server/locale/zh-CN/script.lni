@@ -1,0 +1,9 @@
+<root>
+DIAG_LINE_ONLY_SPACE  = '只有空格的空行。'
+DIAG_LINE_POST_SPACE  = '后置空格。'
+DIAG_UNUSED_LOCAL     = '未使用的局部变量 `{}`。'
+DIAG_UNDEFINED_GLOBAL = '未定义的全局变量 `{}`。'
+DIAG_UNUSED_LABEL     = '未使用的标签 `{}`。'
+DIAG_REDEFINED_LOCAL  = '重定义局部变量 `{}`。'
+DIAG_PREVIOUS_CALL    = '解析为了上一行的函数调用。你可能需要在前面加一个 `;`。'
+DIAG_OVER_MAX_ARGS    = '函数只接收 {:d} 个参数，但你传了 {:d} 个。'

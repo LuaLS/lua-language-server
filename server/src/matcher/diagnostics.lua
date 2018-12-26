@@ -94,7 +94,7 @@ local function searchSpaces(vm, lines, callback)
             if isInString(vm, start, finish) then
                 goto NEXT_LINE
             end
-            callback(start, finish, 'Line with spaces only') -- LOCALE
+            callback(start, finish, lang.script.DIAG_LINE_ONLY_SPACE)
             goto NEXT_LINE
         end
 
@@ -105,7 +105,7 @@ local function searchSpaces(vm, lines, callback)
             if isInString(vm, start, finish) then
                 goto NEXT_LINE
             end
-            callback(start, finish, 'Line with postspace') -- LOCALE
+            callback(start, finish, lang.script.DIAG_LINE_POST_SPACE)
             goto NEXT_LINE
         end
         ::NEXT_LINE::
@@ -198,7 +198,7 @@ return function (vm, lines, uri)
             start   = start,
             finish  = finish,
             level   = 'Information',
-            message = ('Unused local `%s`'):format(key), -- LOCALE
+            message = lang.script('DIAG_UNUSED_LOCAL', key),
         }
     end)
     -- 读取未定义全局变量
@@ -207,7 +207,7 @@ return function (vm, lines, uri)
             start   = start,
             finish  = finish,
             level   = 'Warning',
-            message = ('Undefined global `%s`'):format(key), -- LOCALE
+            message = lang.script('DIAG_UNDEFINED_GLOBAL', key),
         }
     end)
     -- 未使用的Label
@@ -216,7 +216,7 @@ return function (vm, lines, uri)
             start   = start,
             finish  = finish,
             level   = 'Information',
-            message = ('Unused label `%s`'):format(key), -- LOCALE
+            message = lang.script('DIAG_UNUSED_LABEL', key)
         }
     end)
     -- 只有空格与制表符的行，以及后置空格
@@ -234,7 +234,7 @@ return function (vm, lines, uri)
             start   = start,
             finish  = finish,
             level   = 'Information',
-            message = ('Redefined local `%s`'):format(key), -- LOCALE
+            message = lang.script('DIAG_REDEFINED_LOCAL', key),
             related = related,
         }
     end)
@@ -244,7 +244,7 @@ return function (vm, lines, uri)
             start   = start,
             finish  = finish,
             level   = 'Warning',
-            message = 'Parsed as function call for the previous line. It may be necessary to add a `;` before.', -- LOCALE
+            message = lang.script.DIAG_PREVIOUS_CALL,
         }
     end)
     -- 调用函数时的参数数量是否超过函数的接收数量
@@ -253,7 +253,7 @@ return function (vm, lines, uri)
             start   = start,
             finish  = finish,
             level   = 'Warning',
-            message = ('The function takes only %d parameters, but you passed %d.'):format(max, passed), -- LOCALE
+            message = lang.script('DIAG_OVER_MAX_ARGS', max, passed),
         }
     end)
     return datas

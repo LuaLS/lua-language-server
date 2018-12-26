@@ -61,12 +61,12 @@ local function loadLang(name, language)
             local str = self[key]
             local index = 0
             local args = {...}
-            str:gsub('%{(.-)%}', function (pat)
+            return str:gsub('%{(.-)%}', function (pat)
                 local id, fmt
                 local pos = pat:find(':', 1, true)
                 if pos then
                     id = pat:sub(1, pos-1)
-                    fmg = pat:sub(pos+1)
+                    fmt = pat:sub(pos+1)
                 else
                     id = pat
                     fmt = 's'

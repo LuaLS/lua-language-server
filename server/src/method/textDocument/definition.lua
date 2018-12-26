@@ -4,13 +4,17 @@ return function (lsp, params)
     local uri = params.textDocument.uri
     local vm, lines = lsp:loadVM(uri)
     if not vm then
-        return {}
+        return nil
     end
     -- lua是从1开始的，因此都要+1
     local position = lines:position(params.position.line + 1, params.position.character + 1)
-    local positions = matcher.definition(vm, position)
+    local result = matcher.findResult(vm, position)
+    if not result then
+        return nil
+    end
+    local positions = matcher.definition(vm, result)
     if not positions then
-        return {}
+        return nil
     end
 
     local locations = {}

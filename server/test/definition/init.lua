@@ -44,9 +44,10 @@ function TEST(script)
     local vm = matcher.vm(ast)
     assert(vm)
 
-    local result = matcher.definition(vm, pos)
-    if result then
-        assert(founded(target, result))
+    local result = matcher.findResult(vm, pos)
+    local positions = matcher.definition(vm, result)
+    if positions then
+        assert(founded(target, positions))
     else
         assert(#target == 0)
     end

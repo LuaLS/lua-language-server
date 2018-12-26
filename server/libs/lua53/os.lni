@@ -116,13 +116,13 @@ type = 'string'
 name = 'category'
 type = 'string'
 optional = 'self'
-default = 'all'
 [[.returns]]
 name = 'locale'
 type = 'string'
 [[.enums]]
 name = 'category'
 enum = 'all'
+default = true
 [[.enums]]
 name = 'category'
 enum = 'collate'

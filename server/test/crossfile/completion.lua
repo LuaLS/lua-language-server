@@ -217,3 +217,41 @@ TEST {
         },
     }
 }
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            return {
+                a = 1,
+                b = 2,
+                c = 3,
+            }
+        ]]
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            local t = require 'a'
+            t.@
+        ]],
+        main = true,
+    },
+    completion = {
+        {
+            label = 'a',
+            kind = CompletionItemKind.Enum,
+            detail = '= 1',
+        },
+        {
+            label = 'b',
+            kind = CompletionItemKind.Enum,
+            detail = '= 2',
+        },
+        {
+            label = 'c',
+            kind = CompletionItemKind.Enum,
+            detail = '= 3',
+        },
+    }
+}

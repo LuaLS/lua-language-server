@@ -36,8 +36,12 @@ local function orderTable()
 end
 
 local function readOnly(t)
+    local keys
     return setmetatable({}, {
         __index = function (self, k)
+            if k == nil then
+                return nil
+            end
             local v = t[k]
             if type(v) == 'table' then
                 v = readOnly(v)
@@ -47,6 +51,20 @@ local function readOnly(t)
         end,
         __len = function (self)
             return #t
+        end,
+        __pairs = function (self)
+            if not keys then
+                keys = {}
+                for k in pairs(t) do
+                    keys[#keys+1] = k
+                end
+            end
+            local i = 0
+            return function ()
+                i = i + 1
+                local k = keys[i]
+                return k, self[k]
+            end
         end,
         __source = t,
     })
@@ -218,9 +236,7 @@ function mt:mergeValue(a, b, mark)
     end
     mark[a] = true
     mark[b] = true
-    if b.uri == self.uri then
-        self:mergeChild(a, b, mark)
-    end
+    self:mergeChild(a, b, mark)
     for k in pairs(a) do
         a[k] = nil
     end

@@ -107,16 +107,16 @@ description = 'Calls function with the given arguments in protected mode.'
 description = 'Receives any number of arguments and prints their values to stdout.'
 
 [rawequal]
-description = 'Checks whether v1 is equal to v2.'
+description = 'Checks whether v1 is equal to v2, without invoking the `__eq` metamethod.'
 
 [rawget]
-description = 'Gets the real value of table[index].'
+description = 'Gets the real value of `table[index]`, without invoking the `__index` metamethod.'
 
 [rawlen]
-description = 'Returns the length of the object v.'
+description = 'Returns the length of the object `v`, without invoking the `__len` metamethod.'
 
 [rawset]
-description = 'Sets the real value of table[index] to value.'
+description = 'Sets the real value of `table[index]` to `value`, without invoking the `__newindex` metamethod.'
 
 [select]
 [[.enums]]
@@ -126,7 +126,7 @@ description = 'Returns the total number of extra arguments.'
 [[.enums]]
 name = 'index'
 code = 'integer'
-description = 'Returns all arguments after number index.'
+description = 'Returns all arguments after number `index`.'
 
 [setmetatable]
 description = 'Sets the metatable for the given table.'

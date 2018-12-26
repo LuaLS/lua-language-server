@@ -371,3 +371,8 @@ collectgarbage('@')
         documentation = EXISTS,
     },
 }
+
+TEST [[
+collectgarbage(@)
+]]
+(EXISTS)

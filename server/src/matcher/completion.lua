@@ -386,22 +386,20 @@ end
 
 return function (vm, pos)
     local result, source = findResult(vm, pos)
-    local inCall, inString
     if not result then
+        isClose = true
         result, source = findClosePos(vm, pos)
         if not result then
             return nil
         end
     end
 
-    inString = getString(vm, pos)
-    if inString then
-        local calls = findCall(vm, pos)
-        if not calls then
-            return nil
-        end
+    local inCall
+    local calls = findCall(vm, pos)
+    if calls then
         inCall = calls[#calls]
     end
+    local inString = getString(vm, pos)
 
     local list = {}
     local mark = {}
@@ -435,7 +433,9 @@ return function (vm, pos)
 
     if inCall then
         searchInArg(vm, inCall, inString, callback)
-    else
+    end
+
+    if result and not inString then
         if result.type == 'local' then
             if source.isArg then
                 searchAsArg(vm, pos, result, callback)

@@ -1,3 +1,5 @@
+local lang = require 'language'
+
 local function searchUnusedLocals(results, callback)
     for _, var in ipairs(results.locals) do
         if var.key == 'self'

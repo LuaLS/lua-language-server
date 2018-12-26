@@ -23,3 +23,7 @@
 
 - [x] en-US
 - [ ] zh-CN
+
+Please [help me][git] improve the quality of `en-US`.
+
+[git]: https://github.com/sumneko/vscode-lua-language-server

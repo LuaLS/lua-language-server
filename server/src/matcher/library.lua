@@ -137,7 +137,8 @@ local function fix(libs)
 end
 
 local function init()
-    local language = require 'language'
+    local lang = require 'language'
+    local id = lang.id
     local alllibs = {
         global  = table.container(),
         library = table.container(),
@@ -155,8 +156,8 @@ local function init()
 
         local locale = loadLocale('en-US', relative)
         mergeLocale(libs, locale)
-        if language ~= 'en-US' then
-            locale = loadLocale(language, relative)
+        if id ~= 'en-US' then
+            locale = loadLocale(id, relative)
             mergeLocale(libs, locale)
         end
         mergeLibs(alllibs, libs)

@@ -1,4 +1,5 @@
 local fs = require 'bee.filesystem'
+local lni = require 'lni'
 
 local function supportLanguage()
     local list = {}
@@ -30,12 +31,78 @@ local function getLanguage(id)
     return 'enUS'
 end
 
+local function loadFileByLanguage(name, language)
+    local path = ROOT / 'locale' / language / (name .. '.lni')
+    local buf = io.load(path)
+    if not buf then
+        return {}
+    end
+    local suc, tbl = xpcall(lni.classics, log.error, buf, path:string())
+    if not suc then
+        return {}
+    end
+    return tbl
+end
+
+local function loadLang(name, language)
+    local tbl = loadFileByLanguage(name, 'en-US')
+    if language ~= 'en-US' then
+        local other = loadFileByLanguage(name, language)
+        for k, v in pairs(other) do
+            tbl[k] = v
+        end
+    end
+    return setmetatable(tbl, {
+        __index = function (self, key)
+            self[key] = key
+            return key
+        end,
+        __call = function (self, key, ...)
+            local str = self[key]
+            local index = 0
+            str:gsub('%{(.-)%}', function (pat)
+                local id, fmt
+                local pos = pat:find(':', 1, true)
+                if pos then
+                    id = pat:sub(1, pos-1)
+                    fmg = pat:sub(pos+1)
+                else
+                    id = pat
+                    fmt = 's'
+                end
+                id = tonumber(id)
+                if not id then
+                    index = index + 1
+                    id = index
+                end
+                local v = select(id, ...)
+                local suc, res = pcall(string.format, '%'..fmt, v)
+                if suc then
+                    return res
+                else
+                    -- 这里不能使用翻译，以免死循环
+                    log.warn(('[%s][%s-%s]{%s} formated error.'):format(
+                        language, name, key, pat
+                    ))
+                    return nil
+                end
+            end)
+        end,
+    })
+end
+
 local function init()
     local id = osLanguage()
     local language = getLanguage(id)
     log.info(('VSC language: %s'):format(id))
     log.info(('LS  language: %s'):format(language))
-    return language
+    return setmetatable({ id = language }, {
+        __index = function (self, name)
+            local tbl = loadLang(name, language)
+            self[name] = tbl
+            return tbl
+        end,
+    })
 end
 
 return init()

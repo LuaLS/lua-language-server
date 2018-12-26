@@ -60,6 +60,7 @@ local function loadLang(name, language)
         __call = function (self, key, ...)
             local str = self[key]
             local index = 0
+            local args = {...}
             str:gsub('%{(.-)%}', function (pat)
                 local id, fmt
                 local pos = pat:find(':', 1, true)
@@ -75,7 +76,7 @@ local function loadLang(name, language)
                     index = index + 1
                     id = index
                 end
-                local v = select(id, ...)
+                local v = args[id]
                 local suc, res = pcall(string.format, '%'..fmt, v)
                 if suc then
                     return res

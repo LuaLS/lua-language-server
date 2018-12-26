@@ -17,6 +17,7 @@
 - [ ] Support Dirty Script
 - [ ] Syntax Check
 - [ ] Multi Workspace
+- [ ] Type Format
 
 ### Locale
 

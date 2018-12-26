@@ -36,7 +36,7 @@ function mt:_callMethod(name, params)
     local f = method[name]
     if f then
         local clock = os.clock()
-        local suc, res = xpcall(f, log.error, self, params)
+        local suc, res = xpcall(f, debug.traceback, self, params)
         local passed = os.clock() - clock
         if passed > 0.1 then
             log.debug(('Task [%s] takes [%.3f]sec.'):format(name, passed))
@@ -44,14 +44,15 @@ function mt:_callMethod(name, params)
         if suc then
             return res
         else
-            local suc, res = pcall(table.dump, params)
-            local dump = suc and res or 'Cyclic table'
+            local ok, r = pcall(table.dump, params)
+            local dump = ok and r or 'Cyclic table'
             log.debug(('Task [%s] failed, params: %s'):format(
                 name, dump
             ))
+            log.debug(res)
             return nil, {
                 code = ErrorCodes.InternalError,
-                message = res,
+                message = r .. '\n' .. res,
             }
         end
     end

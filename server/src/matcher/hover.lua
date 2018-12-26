@@ -406,7 +406,14 @@ return function (result, source, lsp, select)
     end
 
     local lib, fullKey, oo = findLib(result)
-    local valueType = lib and lib.type or result.value.type or 'nil'
+    local valueType = lib and lib.type
+    if valueType then
+        if type(valueType) == 'table' then
+            valueType = valueType[1]
+        end
+    else
+        valueType = result.value.type or 'nil'
+    end
     local name = fullKey or buildValueName(result, source)
     if valueType == 'function' then
         return getFunctionHover(name, result, source, lib, oo, select)

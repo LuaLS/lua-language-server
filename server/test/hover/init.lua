@@ -221,3 +221,9 @@ TEST [[
 local <?t?> = - 1000
 ]]
 [[number t = -1000]]
+
+TEST [[
+for <?c?> in io.lines() do
+end
+]]
+[[string c]]

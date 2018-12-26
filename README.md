@@ -22,7 +22,7 @@
 ### Locale
 
 - [x] en-US
-- [ ] zh-CN
+- [x] zh-CN
 
 Please [help me][git] improve the quality of `en-US`.
 

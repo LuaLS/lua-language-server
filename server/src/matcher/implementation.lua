@@ -1,5 +1,3 @@
-local findResult = require 'matcher.find_result'
-
 local function parseResultAcrossUri(positions, vm, result)
     -- 跨越文件时，遍历的是值的绑定信息
     for _, info in ipairs(result.value) do
@@ -75,8 +73,7 @@ local function parseResult(vm, result)
     return positions
 end
 
-return function (vm, pos)
-    local result = findResult(vm, pos)
+return function (vm, result)
     if not result then
         return nil
     end

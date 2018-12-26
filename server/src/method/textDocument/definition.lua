@@ -1,5 +1,18 @@
 local matcher = require 'matcher'
 
+local function checkWorkSpaceComplete(lsp, result)
+    if result.value then
+        if not result.value.isRequire then
+            return
+        end
+    else
+        if not result.isRequire then
+            return
+        end
+    end
+    lsp:checkWorkSpaceComplete()
+end
+
 return function (lsp, params)
     local uri = params.textDocument.uri
     local vm, lines = lsp:loadVM(uri)
@@ -12,6 +25,9 @@ return function (lsp, params)
     if not result then
         return nil
     end
+
+    checkWorkSpaceComplete(lsp, result)
+
     local positions = matcher.definition(vm, result)
     if not positions then
         return nil

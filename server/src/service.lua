@@ -5,6 +5,7 @@ local async      = require 'async'
 local rpc        = require 'rpc'
 local parser     = require 'parser'
 local matcher    = require 'matcher'
+local lang       = require 'language'
 
 thread.newchannel 'proto'
 
@@ -236,6 +237,14 @@ function mt:reCompile()
     for uri in pairs(self._opening) do
         self:needCompile(uri, compiled)
     end
+
+    if self._needShowComplete then
+        self._needShowComplete = nil
+        rpc:notify('window/showMessage', {
+            type = 3,
+            message = lang.script.MWS_COMPLETE,
+        })
+    end
 end
 
 function mt:loadVM(uri)
@@ -333,6 +342,21 @@ end
 
 function mt:removeText(uri)
     self._file[uri] = nil
+end
+
+function mt:checkWorkSpaceComplete()
+    if self._hasCheckedWorkSpaceComplete then
+        return
+    end
+    self._hasCheckedWorkSpaceComplete = true
+    if self.workspace:isComplete() then
+        return
+    end
+    self._needShowComplete = true
+    rpc:notify('window/showMessage', {
+        type = 3,
+        message = lang.script.MWS_NOT_COMPLETE,
+    })
 end
 
 function mt:onTick()

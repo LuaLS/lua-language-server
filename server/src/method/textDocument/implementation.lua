@@ -1,16 +1,36 @@
 local matcher = require 'matcher'
 
+local function checkWorkSpaceComplete(lsp, result)
+    if result.value then
+        if not result.value.isRequire then
+            return
+        end
+    else
+        if not result.isRequire then
+            return
+        end
+    end
+    lsp:checkWorkSpaceComplete()
+end
+
 return function (lsp, params)
     local uri = params.textDocument.uri
     local vm, lines = lsp:loadVM(uri)
     if not vm then
-        return {}
+        return nil
     end
     -- lua是从1开始的，因此都要+1
     local position = lines:position(params.position.line + 1, params.position.character + 1)
-    local positions = matcher.implementation(vm, position)
+    local result = matcher.findResult(vm, position)
+    if not result then
+        return nil
+    end
+
+    checkWorkSpaceComplete(lsp, result)
+
+    local positions = matcher.implementation(vm, result)
     if not positions then
-        return {}
+        return nil
     end
 
     local locations = {}

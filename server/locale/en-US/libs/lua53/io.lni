@@ -47,7 +47,7 @@ code = 'number'
 description = 'Reads a string with up to this number of bytes.'
 
 [open]
-description = 'Opens a file, in the mode specified in the string mode.'
+description = 'Opens a file, in the mode specified in the string `mode`.'
 [[.enums]]
 name = 'mode'
 enum = 'r'
@@ -114,7 +114,7 @@ description = 'Reads a string with up to this number of bytes.'
 description = 'In case of success, returns a handle for a temporary file.'
 
 [type]
-description = 'Checks whether obj is a valid file handle.'
+description = 'Checks whether `obj` is a valid file handle.'
 [[.enums]]
 name = 'type'
 enum = 'file'

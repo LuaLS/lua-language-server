@@ -24,8 +24,8 @@
 - [x] en-US
 - [x] zh-CN
 
-Please [help me][git] improve the quality of `en-US`.
+Please [help me][en-US] improve the quality of `en-US`.
 
 API描述的中文翻译来自[云风](https://cloudwu.github.io/lua53doc/manual.html)。
 
-[git]: https://github.com/sumneko/vscode-lua-language-server
+[en-US]: https://github.com/sumneko/vscode-lua-language-server/tree/master/server/locale/en-US

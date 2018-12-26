@@ -325,3 +325,49 @@ end
         kind = CompletionItemKind.Variable,
     },
 }
+
+TEST [[
+collectgarbage('@')
+]]
+{
+    {
+        label = 'collect',
+        kind = CompletionItemKind.EnumMember,
+        documentation = EXISTS,
+    },
+    {
+        label = 'stop',
+        kind = CompletionItemKind.EnumMember,
+        documentation = EXISTS,
+    },
+    {
+        label = 'restart',
+        kind = CompletionItemKind.EnumMember,
+        documentation = EXISTS,
+    },
+    {
+        label = 'count',
+        kind = CompletionItemKind.EnumMember,
+        documentation = EXISTS,
+    },
+    {
+        label = 'step',
+        kind = CompletionItemKind.EnumMember,
+        documentation = EXISTS,
+    },
+    {
+        label = 'setpause',
+        kind = CompletionItemKind.EnumMember,
+        documentation = EXISTS,
+    },
+    {
+        label = 'setstepmul',
+        kind = CompletionItemKind.EnumMember,
+        documentation = EXISTS,
+    },
+    {
+        label = 'isrunning',
+        kind = CompletionItemKind.EnumMember,
+        documentation = EXISTS,
+    },
+}

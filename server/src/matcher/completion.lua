@@ -235,11 +235,13 @@ local function searchAsSuffix(result, callback)
 end
 
 local function searchInArg(vm, inCall, inString, callback)
-    local special = inCall.func.lib and inCall.func.lib.special
-    if not special then
+    local lib = inCall.func.lib
+    if not lib then
         return
     end
-    if special == 'require' then
+
+    -- require列举出可以引用到的文件
+    if lib.special == 'require' then
         if not vm.lsp or not vm.lsp.workspace then
             return
         end
@@ -250,6 +252,16 @@ local function searchInArg(vm, inCall, inString, callback)
         for _, v in ipairs(results) do
             if v ~= inString[1] then
                 callback(v, CompletionItemKind.File)
+            end
+        end
+    end
+
+    -- 其他库函数，根据参数位置找枚举值
+    if lib.args and lib.enums then
+        local name = lib.args[inCall.select].name
+        for _, enum in ipairs(lib.enums) do
+            if enum.name == name and enum.enum then
+                callback(enum.enum, CompletionItemKind.EnumMember, nil, enum.description)
             end
         end
     end
@@ -393,7 +405,7 @@ return function (vm, pos)
 
     local list = {}
     local mark = {}
-    local function callback(var, defualt)
+    local function callback(var, defualt, detail, documentation)
         local key
         if type(var) == 'string' then
             key = var
@@ -408,13 +420,15 @@ return function (vm, pos)
             list[#list+1] = {
                 label = key,
                 kind = defualt,
+                detail = detail,
+                documentation = documentation,
             }
         else
             list[#list+1] = {
                 label = var.key,
                 kind = getKind(var, defualt),
-                detail = getDetail(var),
-                documentation = getDocument(var, source),
+                detail = detail or getDetail(var),
+                documentation = documentation or getDocument(var, source),
             }
         end
     end

@@ -16,10 +16,14 @@ local function mergeEnum(lib, locale)
     end
     for _, enum in ipairs(locale) do
         if pack[enum.enum] then
-            pack[enum.enum].description = enum.description
+            if enum.description then
+                pack[enum.enum].description = enum.description
+            end
         end
         if pack[enum.code] then
-            pack[enum.code].description = enum.description
+            if enum.description then
+                pack[enum.code].description = enum.description
+            end
         end
     end
 end
@@ -36,7 +40,9 @@ local function mergeField(lib, locale)
     end
     for _, field in ipairs(locale) do
         if pack[field.field] then
-            pack[field.field].description = field.description
+            if field.description then
+                pack[field.field].description = field.description
+            end
         end
     end
 end
@@ -47,7 +53,9 @@ local function mergeLocale(libs, locale)
     end
     for name in pairs(locale) do
         if libs[name] then
-            libs[name].description = locale[name].description
+            if locale[name].description then
+                libs[name].description = locale[name].description
+            end
             mergeEnum(libs[name].enums, locale[name].enums)
             mergeField(libs[name].fields, locale[name].fields)
         end

@@ -5,6 +5,7 @@ local function searchUnusedLocals(results, callback)
         if var.key == 'self'
         or var.key == '_'
         or var.key == '_ENV'
+        or var.key == ''
         then
             goto NEXT_VAR
         end
@@ -33,7 +34,7 @@ local function searchUndefinedGlobal(results, callback)
             goto NEXT_VAR
         end
         local lIndex = index:lower()
-        if lIndex == 'log' or lIndex == 'arg' then
+        if lIndex == 'log' or lIndex == 'arg' or lIndex == '' then
             goto NEXT_VAR
         end
         if not index:find '%l' then
@@ -117,6 +118,7 @@ local function searchRedefinition(results, uri, callback)
     for _, var in ipairs(results.locals) do
         if var.key == '_'
         or var.key == '_ENV'
+        or var.key == ''
         then
             goto NEXT_VAR
         end

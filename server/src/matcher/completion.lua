@@ -217,6 +217,9 @@ local function searchAsArg(vm, pos, result, callback)
 end
 
 local function searchAsGlobal(vm, pos, result, callback)
+    if result.key == '' then
+        return
+    end
     searchLocals(vm, pos, result.key, function (var)
         callback(var, CompletionItemKind.Variable)
     end)
@@ -258,10 +261,15 @@ local function searchInArg(vm, inCall, inString, callback)
 
     -- 其他库函数，根据参数位置找枚举值
     if lib.args and lib.enums then
-        local name = lib.args[inCall.select].name
+        local arg = lib.args[inCall.select]
+        local name = arg and arg.name
         for _, enum in ipairs(lib.enums) do
             if enum.name == name and enum.enum then
-                callback(enum.enum, CompletionItemKind.EnumMember, nil, enum.description)
+                if inString then
+                    callback(enum.enum, CompletionItemKind.EnumMember, nil, enum.description)
+                else
+                    callback(('%q'):format(enum.enum), CompletionItemKind.EnumMember, nil, enum.description)
+                end
             end
         end
     end
@@ -347,10 +355,10 @@ end
 local function findArgCount(args, pos)
     for i, arg in ipairs(args) do
         if isContainPos(arg, pos) then
-            return i, arg
+            return i
         end
     end
-    return #args + 1, nil
+    return #args + 1
 end
 
 -- 找出范围包含pos的call
@@ -358,10 +366,7 @@ local function findCall(vm, pos)
     local results = {}
     for _, call in ipairs(vm.results.calls) do
         if isContainPos(call.args, pos) then
-            local n, arg = findArgCount(call.args, pos)
-            if arg and arg.type ~= 'string' then
-                return nil
-            end
+            local n = findArgCount(call.args, pos)
             local var = vm.results.sources[call.lastObj]
             if var then
                 results[#results+1] = {
@@ -387,7 +392,6 @@ end
 return function (vm, pos)
     local result, source = findResult(vm, pos)
     if not result then
-        isClose = true
         result, source = findClosePos(vm, pos)
         if not result then
             return nil

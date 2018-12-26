@@ -1,5 +1,5 @@
 local function allWords()
-    local str = [[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.:('"[]]
+    local str = [[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.:('"[, ]]
     local list = {}
     for c in str:gmatch '.' do
         list[#list+1] = c

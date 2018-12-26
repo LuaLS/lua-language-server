@@ -376,3 +376,29 @@ TEST [[
 collectgarbage(@)
 ]]
 (EXISTS)
+
+TEST [[
+io.read(@)
+]]
+{
+    {
+        label = '"n"',
+        kind = CompletionItemKind.EnumMember,
+        documentation = EXISTS,
+    },
+    {
+        label = '"a"',
+        kind = CompletionItemKind.EnumMember,
+        documentation = EXISTS,
+    },
+    {
+        label = '"l"',
+        kind = CompletionItemKind.EnumMember,
+        documentation = EXISTS,
+    },
+    {
+        label = '"L"',
+        kind = CompletionItemKind.EnumMember,
+        documentation = EXISTS,
+    },
+}

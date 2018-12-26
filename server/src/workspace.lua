@@ -97,7 +97,12 @@ function mt:init(rootUri)
             self.files[name] = self:uriEncode(path)
         end
         self:reset()
+        self._complete = true
     end)
+end
+
+function mt:isComplete()
+    return not not self._complete
 end
 
 function mt:addFile(uri)

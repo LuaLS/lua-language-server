@@ -508,11 +508,6 @@ function mt:getRequire(strValue, destVM)
         mainValue.uri = destVM.uri
     end
 
-    -- 支持 require 'xxx' 的转到定义
-    local strSource = strValue.source
-    self.results.sources[strSource] = strValue
-    strValue.uri = destVM.uri
-
     return mainValue
 end
 
@@ -521,11 +516,6 @@ function mt:getLoadFile(strValue, destVM)
     local main = destVM.results.main
     -- loadfile 的返回值就是对方的主函数
     local mainValue = readOnly(main)
-
-    -- 支持 loadfile 'xxx.lua' 的转到定义
-    local strSource = strValue.source
-    self.results.sources[strSource] = strValue
-    strValue.uri = destVM.uri
 
     return mainValue
 end
@@ -536,6 +526,11 @@ function mt:tryRequireOne(strValue, mode)
     end
     local str = strValue.value
     if type(str) == 'string' then
+        -- 支持 require 'xxx' 的转到定义
+        local strSource = strValue.source
+        self.results.sources[strSource] = strValue
+        strValue.isRequire = true
+
         local uri
         if mode == 'require' then
             uri = self.lsp.workspace:searchPath(self.uri, str)
@@ -547,6 +542,8 @@ function mt:tryRequireOne(strValue, mode)
         if not uri then
             return nil
         end
+
+        strValue.uri = uri
         -- 如果取不到VM（不编译），则做个标记，之后再取一次
         local destVM = self.lsp:getVM(uri)
         self.lsp:compileChain(self.uri, uri)
@@ -577,7 +574,11 @@ function mt:callRequire(func, values)
         self:setFunctionReturn(func, 1, value)
         return
     else
-        local requireValue = self:tryRequireOne(values[1], 'require') or self:createValue('boolean')
+        local requireValue = self:tryRequireOne(values[1], 'require')
+        if not requireValue then
+            requireValue = self:createValue('boolean')
+            requireValue.isRequire = true
+        end
         self:setFunctionReturn(func, 1, requireValue)
     end
 end
@@ -591,6 +592,10 @@ function mt:callLoadFile(func, values)
         return
     end
     local requireValue = self:tryRequireOne(values[1], 'loadfile')
+    if not requireValue then
+        requireValue = self:createValue('any')
+        requireValue.isRequire = true
+    end
     self:setFunctionReturn(func, 1, requireValue)
 end
 
@@ -603,6 +608,10 @@ function mt:callDoFile(func, values)
         return
     end
     local requireValue = self:tryRequireOne(values[1], 'dofile')
+    if not requireValue then
+        requireValue = self:createValue('any')
+        requireValue.isRequire = true
+    end
     self:setFunctionReturn(func, 1, requireValue)
 end
 

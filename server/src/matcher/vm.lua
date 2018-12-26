@@ -99,6 +99,10 @@ function mt:createLocal(key, source, value)
         close = self.scope.block.finish,
     }
 
+    if source then
+        source.isLocal = true
+    end
+
     local shadow = self.scope.locals[key]
     if shadow then
         shadow.close = source and (source.start-1)
@@ -118,6 +122,14 @@ function mt:createLocal(key, source, value)
 
     self:addInfo(loc, 'local', source)
     self:setValue(loc, value, source)
+    return loc
+end
+
+function mt:createArg(key, source, value)
+    local loc = self:createLocal(key, source, value)
+    if source then
+        source.isArg = true
+    end
     return loc
 end
 
@@ -200,7 +212,7 @@ function mt:buildTable(source)
                     local index = key[1]
                     insertOnce(self.results.indexs, index)
                     local field = self:createField(tbl, index, key)
-                    field.isIndex = true
+                    key.isIndex = true
                     if value.type == 'list' then
                         self:setValue(field, value[1], key)
                     else
@@ -228,10 +240,7 @@ function mt:buildTable(source)
             end
             -- 处理写了一半的 key = value，把name类的数组元素视为哈希键
             if obj.type == 'name' then
-                local field = self.results.sources[obj]
-                if field then
-                    field.isIndex = true
-                end
+                obj.isIndex = true
             end
         end
     end
@@ -393,7 +402,7 @@ function mt:buildFunction(exp, object)
     self.chunk.func = func
 
     if object then
-        local var = self:createLocal('self', object.source, self:getValue(object))
+        local var = self:createArg('self', object.source, self:getValue(object))
         var.disableRename = true
         func.args[1] = var
     end
@@ -404,7 +413,8 @@ function mt:buildFunction(exp, object)
             return
         end
         if arg.type == 'name' then
-            local var = self:createLocal(arg[1], arg)
+            local var = self:createArg(arg[1], arg)
+            arg.isArg = true
             func.args[#func.args+1] = var
             func.argValues[#func.args] = self:getValue(var)
         elseif arg.type == '...' then

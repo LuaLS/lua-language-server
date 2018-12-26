@@ -199,6 +199,23 @@ local function getDocument(var, source)
     return nil
 end
 
+local function searchAsLocal(vm, pos, result, callback)
+    searchFields(result.key, vm.results.locals[1], nil, function (var)
+        callback(var, CompletionItemKind.Variable)
+    end)
+
+    -- 支持 local function
+    if matchKey(result.key, 'function') then
+        callback('function', CompletionItemKind.Keyword)
+    end
+end
+
+local function searchAsArg(vm, pos, result, callback)
+    searchFields(result.key, vm.results.locals[1], nil, function (var)
+        callback(var, CompletionItemKind.Variable)
+    end)
+end
+
 local function searchAsGlobal(vm, pos, result, callback)
     searchLocals(vm, pos, result.key, function (var)
         callback(var, CompletionItemKind.Variable)
@@ -217,7 +234,7 @@ local function searchAsSuffix(result, callback)
     end)
 end
 
-local function searchAsArg(vm, inCall, inString, callback)
+local function searchInArg(vm, inCall, inString, callback)
     local special = inCall.func.lib and inCall.func.lib.special
     if not special then
         return
@@ -403,12 +420,18 @@ return function (vm, pos)
     end
 
     if inCall then
-        searchAsArg(vm, inCall, inString, callback)
+        searchInArg(vm, inCall, inString, callback)
     else
         if result.type == 'local' then
-            searchAsGlobal(vm, pos, result, callback)
+            if source.isArg then
+                searchAsArg(vm, pos, result, callback)
+            elseif source.isLocal then
+                searchAsLocal(vm, pos, result, callback)
+            else
+                searchAsGlobal(vm, pos, result, callback)
+            end
         elseif result.type == 'field' then
-            if result.isIndex then
+            if source.isIndex then
                 searchAsIndex(vm, pos, result, callback)
             elseif result.parent and result.parent.value and result.parent.value.ENV == true then
                 searchAsGlobal(vm, pos, result, callback)

@@ -297,3 +297,31 @@ local t = {
         documentation = EXISTS,
     }
 }
+
+TEST [[
+local faa
+local f@
+print(fff)
+]]
+{
+    {
+        label = 'fff',
+        kind = CompletionItemKind.Variable,
+    },
+    {
+        label = 'function',
+        kind = CompletionItemKind.Keyword,
+    }
+}
+
+TEST [[
+local function f(f@)
+    print(fff)
+end
+]]
+{
+    {
+        label = 'fff',
+        kind = CompletionItemKind.Variable,
+    },
+}

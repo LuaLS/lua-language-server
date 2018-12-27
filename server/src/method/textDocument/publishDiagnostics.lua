@@ -75,16 +75,38 @@ local function createInfo(data, lines)
     return diagnostic
 end
 
+local function buildError(err, lines)
+    local diagnostic = {
+        source   = 'Lua Language Server',
+        message = 'Error',
+    }
+    if err.level == 'error' then
+        diagnostic.severity = DiagnosticSeverity.Error
+    else
+        diagnostic.severity = DiagnosticSeverity.Warning
+    end
+    local range = getRange(err.pos, err.pos, lines)
+    range['end'].character = 9999
+    diagnostic.range = range
+    return diagnostic
+end
+
 return function (lsp, params)
     local vm     = params.vm
     local lines  = params.lines
     local uri    = params.uri
+    local errs   = lsp:getAstErrors(uri)
 
     local diagnostics = {}
     if vm then
         local datas = matcher.diagnostics(vm, lines, uri)
         for _, data in ipairs(datas) do
             diagnostics[#diagnostics+1] = createInfo(data, lines)
+        end
+    end
+    if errs then
+        for _, err in ipairs(errs) do
+            diagnostics[#diagnostics+1] = buildError(err, lines)
         end
     end
 

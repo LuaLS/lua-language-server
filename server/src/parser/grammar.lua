@@ -79,14 +79,10 @@ local labels = {
 }
 
 local function errorpos(lua, pos, err)
-    local row, col = calcline.rowcol(lua, pos)
-    local str = calcline.line(lua, row)
     return {
         lua = lua,
-        line = row,
-        pos = col,
+        pos = pos,
         err = err,
-        code = str,
         level = 'error',
     }
 end

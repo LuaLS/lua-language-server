@@ -23,7 +23,6 @@ return function (lsp, params)
     end
     -- lua是从1开始的，因此都要+1
     local position = lines:position(params.position.line + 1, params.position.character + 1)
-    log.debug(table.dump(params.position))
     local items = matcher.completion(vm, position)
     if not items then
         return nil
@@ -43,6 +42,5 @@ return function (lsp, params)
         isIncomplete = true,
         items = items,
     }
-    log.debug(table.dump(response))
     return response
 end

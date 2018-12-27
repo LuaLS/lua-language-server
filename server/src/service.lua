@@ -98,7 +98,7 @@ function mt:_doDiagnostic()
     end
     for uri in pairs(copy) do
         local obj = self._file[uri]
-        if obj and obj.vm then
+        if obj then
             local data = {
                 uri   = uri,
                 vm    = obj.vm,
@@ -273,7 +273,7 @@ end
 
 function mt:compileAst(obj)
     local ast, err = parser:ast(obj.text)
-    obj.astErr = nil
+    obj.astErr = err
     if not ast then
         if type(err) == 'string' then
             local message = lang.script('PARSER_CRASH', err)
@@ -282,8 +282,6 @@ function mt:compileAst(obj)
                 type = 3,
                 message = lang.script('PARSER_CRASH', err:match 'grammar%.lua%:%d+%:(.+)'),
             })
-        else
-            obj.astErr = err
         end
     end
     return ast
@@ -349,6 +347,14 @@ function mt:getVM(uri)
         return nil
     end
     return obj.vm
+end
+
+function mt:getAstErrors(uri)
+    local obj = self._file[uri]
+    if not obj then
+        return nil
+    end
+    return obj.astErr
 end
 
 function mt:compileChain(child, parent)

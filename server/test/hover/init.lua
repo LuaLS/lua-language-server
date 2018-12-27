@@ -235,3 +235,16 @@ end
 local <?n?> = f()
 ]]
 [[any n]]
+
+TEST [[
+local <?n?> = table.unpack(t)
+]]
+[[any n]]
+
+TEST [[
+local <?n?>
+table.pack(n)
+]]
+[[
+any n
+]]

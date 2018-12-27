@@ -664,12 +664,20 @@ function mt:call(func, values)
     if lib then
         if lib.args then
             for i, arg in ipairs(lib.args) do
-                self:inference(self:getFunctionArg(func, i), arg.type or 'any')
+                if arg.type == '...' then
+                    self:inference(self:getFunctionArg(func, i), 'any')
+                else
+                    self:inference(self:getFunctionArg(func, i), arg.type or 'any')
+                end
             end
         end
         if lib.returns then
             for i, rtn in ipairs(lib.returns) do
-                self:inference(self:getFunctionReturns(func, i), rtn.type or 'any')
+                if rtn.type == '...' then
+                    self:inference(self:getFunctionReturns(func, i), 'any')
+                else
+                    self:inference(self:getFunctionReturns(func, i), rtn.type or 'any')
+                end
             end
         end
         if lib.special then
@@ -750,12 +758,19 @@ function mt:getFunctionReturns(func, i)
 end
 
 function mt:inference(value, type)
+    if type == '...' then
+        error('Value type cant be ...')
+    end
     if value.type == 'any' and type ~= 'nil' then
         value.type = type
     end
 end
 
 function mt:createValue(tp, source, v)
+    if tp == '...' then
+        error('Value type cant be ...')
+    end
+    -- TODO lib里的多类型
     if type(tp) == 'table' then
         tp = tp[1]
     end
@@ -834,6 +849,8 @@ function mt:getLibValue(lib, parentType, v)
         value = self:createValue('integer', nil, v or lib.value)
     elseif tp == 'nil' then
         value = self:createValue('nil')
+    elseif tp == '...' then
+        value = self:createValue('any')
     else
         value = self:createValue(tp or 'any')
     end

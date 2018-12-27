@@ -313,26 +313,26 @@ local function findClosePos(vm, pos)
             found(object, sources)
         end
     end
-    if parent and parent.type ~= 'local' and parent.type ~= 'field' then
-        parent = nil
+    if not parent then
+        return nil
     end
-    if parent then
-        -- 造个假的 DirtyName
-        local source = {
-            type = 'name',
-            start = pos,
-            finish = pos,
-            [1]    = '',
-        }
-        local result = {
-            type = 'field',
-            parent = parent,
-            key = '',
-            source = source,
-        }
-        return result, source
+    if parent.type ~= 'local' and parent.type ~= 'field' then
+        return nil
     end
-    return nil
+    -- 造个假的 DirtyName
+    local source = {
+        type = 'name',
+        start = pos,
+        finish = pos,
+        [1]    = '',
+    }
+    local result = {
+        type = 'field',
+        parent = parent,
+        key = '',
+        source = source,
+    }
+    return result, source
 end
 
 local function isContainPos(obj, pos)
@@ -443,20 +443,22 @@ end
 
 return function (vm, pos)
     local result, source = findResult(vm, pos)
-    local closeResult, closeSource = findClosePos(vm, pos)
+    if not result then
+        result, source = findClosePos(vm, pos)
+    end
 
-    if not result and not closeResult then
+    if not result then
         return nil
     end
 
-    local list, callback = makeList(source or closeSource)
+    local list, callback = makeList(source)
     local inCall = findCall(vm, pos)
     local inString = findString(vm, pos)
     if inCall then
         searchInArg(vm, inCall, inString, callback)
     end
     if not inString then
-        searchInResult(result or closeResult, source or closeSource, vm, pos, callback)
+        searchInResult(result, source, vm, pos, callback)
     end
     if #list == 0 then
         return nil

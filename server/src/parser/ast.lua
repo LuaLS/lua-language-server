@@ -141,18 +141,15 @@ local defs = {
         return e1
     end,
     Unary = function (...)
-        local e1, op = ...
-        if not op then
-            return e1
-        end
         local args = {...}
         local e1 = args[#args]
-        for i = #args - 1, 1, -1 do
-            op = args[i]
+        for i = #args - 1, 1, -2 do
+            local start = args[i-1]
+            local op = args[i]
             e1 = {
                 type   = 'unary',
                 op     = op,
-                start  = e1.start,
+                start  = start,
                 finish = e1.finish,
                 [1]    = e1,
             }

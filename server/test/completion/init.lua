@@ -410,11 +410,11 @@ end
 (nil)
 
 TEST [[
-list[#@]
+self.results.list[#@]
 ]]
 {
     {
-        label = 'list+1',
+        label = 'self.results.list+1',
         kind = CompletionItemKind.Snippet,
     }
 }

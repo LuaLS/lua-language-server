@@ -5,7 +5,7 @@ local function isContainPos(obj, pos)
     return false
 end
 
-local function findAtPos(results, pos)
+local function findAtPos(results, pos, level)
     local res = {}
     for sources, object in pairs(results.sources) do
         if sources.type == 'multi-source' then
@@ -35,9 +35,13 @@ local function findAtPos(results, pos)
     table.sort(res, function (a, b)
         return a.range < b.range
     end)
-    return res[1].object, res[1].source
+    local data = res[level or 1]
+    if not data then
+        return nil
+    end
+    return data.object, data.source
 end
 
-return function (vm, pos)
-    return findAtPos(vm.results, pos)
+return function (vm, pos, level)
+    return findAtPos(vm.results, pos, level)
 end

@@ -120,7 +120,7 @@ IF          <-  Sp 'if'       Cut
 IN          <-  Sp 'in'       Cut
 LOCAL       <-  Sp 'local'    Cut
 NIL         <-  Sp 'nil'      Cut
-NOT         <-  Sp 'not'    Cut
+NOT         <-  Sp 'not'      Cut
 OR          <-  Sp {'or'}     Cut
 REPEAT      <-  Sp 'repeat'   Cut
 RETURN      <-  Sp 'return'   Cut
@@ -169,7 +169,7 @@ MulsList    <-  '*'
             /   '//'
             /   '/'
             /   '%'
-Unary       <-  Sp {UnaryList}
+Unary       <-  Sp {} {UnaryList}
 UnaryList   <-  NOT
             /   '#'
             /   '-'

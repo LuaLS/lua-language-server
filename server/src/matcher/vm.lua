@@ -1005,6 +1005,8 @@ function mt:getSimple(simple, mode)
                     self:addInfo(field, 'get', obj)
                 end
             end
+            field.parent = lastField
+            lastField = field
             obj.object = object
             obj.parentName = parentName
             if obj.type == 'string' then

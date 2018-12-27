@@ -441,6 +441,30 @@ local function searchInResult(result, source, vm, pos, callback)
     end
 end
 
+local function searchSpecial(vm, pos, callback)
+    -- 尝试 #
+    local result, source = findResult(vm, pos, 2)
+    if source and source.op == '#' and source.index then
+        local name = {}
+        local var = result
+        while true do
+            var = var.parent
+            if not var then
+                break
+            end
+            if var.value and var.value.ENV then
+                break
+            end
+            local key = var.key
+            if type(key) ~= 'string' or key == '' then
+                return
+            end
+            table.insert(name, 1, key)
+        end
+        callback(table.concat(name, '.') .. '+1', CompletionItemKind.Snippet)
+    end
+end
+
 return function (vm, pos)
     local result, source = findResult(vm, pos)
     if not result then
@@ -459,6 +483,9 @@ return function (vm, pos)
     end
     if not inString then
         searchInResult(result, source, vm, pos, callback)
+    end
+    if #list == 0 and result.key == '' then
+        searchSpecial(vm, pos, callback)
     end
     if #list == 0 then
         return nil

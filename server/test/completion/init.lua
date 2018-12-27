@@ -416,6 +416,11 @@ self.results.list[#@]
     {
         label = 'self.results.list+1',
         kind = CompletionItemKind.Snippet,
+        textEdit = {
+            start = 20,
+            finish = 21,
+            newText = 'self.results.list+1] = ',
+        },
     }
 }
 
@@ -426,6 +431,11 @@ fff[#ff@]
     {
         label = 'fff+1',
         kind = CompletionItemKind.Snippet,
+        textEdit = {
+            start = 6,
+            finish = 8,
+            newText = 'fff+1] = ',
+        },
     },
     {
         label = 'fff',

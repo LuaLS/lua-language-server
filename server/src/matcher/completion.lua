@@ -269,9 +269,13 @@ local function searchInArg(vm, inCall, inString, callback)
         for _, enum in ipairs(lib.enums) do
             if enum.name == name and enum.enum then
                 if inString then
-                    callback(enum.enum, CompletionItemKind.EnumMember, nil, enum.description)
+                    callback(enum.enum, CompletionItemKind.EnumMember, {
+                        documentation = enum.description
+                    })
                 else
-                    callback(('%q'):format(enum.enum), CompletionItemKind.EnumMember, nil, enum.description)
+                    callback(('%q'):format(enum.enum), CompletionItemKind.EnumMember, {
+                        documentation = enum.description
+                    })
                 end
             end
         end
@@ -391,7 +395,7 @@ end
 local function makeList(source)
     local list = {}
     local mark = {}
-    local function callback(var, defualt, detail, documentation)
+    local function callback(var, defualt, data)
         local key
         if type(var) == 'string' then
             key = var
@@ -402,20 +406,16 @@ local function makeList(source)
             return
         end
         mark[key] = true
+        data = data or {}
+        list[#list+1] = data
         if var == key then
-            list[#list+1] = {
-                label = key,
-                kind = defualt,
-                detail = detail,
-                documentation = documentation,
-            }
+            data.label = var
+            data.kind = defualt
         else
-            list[#list+1] = {
-                label = var.key,
-                kind = getKind(var, defualt),
-                detail = detail or getDetail(var),
-                documentation = documentation or getDocument(var, source),
-            }
+            data.label = var.key
+            data.kind = getKind(var, defualt)
+            data.detail = data.detail or getDetail(var)
+            data.documentation = data.documentation or getDocument(var, source)
         end
     end
     return list, callback
@@ -461,7 +461,15 @@ local function searchSpecial(vm, pos, callback)
             end
             table.insert(name, 1, key)
         end
-        callback(table.concat(name, '.') .. '+1', CompletionItemKind.Snippet)
+        local label = table.concat(name, '.') .. '+1'
+        -- TODO 把index实例化才能拿到正确的位置
+        callback(label, CompletionItemKind.Snippet, {
+            textEdit = {
+                start = source.start + 1,
+                finish = source.finish + 1,
+                newText = ('%s] = '):format(label),
+            }
+        })
     end
 end
 

@@ -183,8 +183,10 @@ local function buildValueName(result, source)
             key = tostring(declarat[1])
         elseif func.type == 'function' then
             key = ''
-        else
+        elseif type(result.key) == 'string' then
             key = result.key
+        else
+            key = ''
         end
 
         local parentName = declarat.parentName

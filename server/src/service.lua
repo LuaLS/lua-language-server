@@ -256,14 +256,7 @@ function mt:loadVM(uri)
     return obj.vm, obj.lines
 end
 
-function mt:compileVM(uri)
-    local obj = self._file[uri]
-    if not obj then
-        return nil
-    end
-    if not self._needCompile[uri] then
-        return nil
-    end
+function mt:_markCompiled(uri)
     local compiled = self._needCompile[uri]
     if compiled then
         compiled[uri] = true
@@ -275,6 +268,10 @@ function mt:compileVM(uri)
             break
         end
     end
+    return compiled
+end
+
+function mt:compileAst(obj)
     local ast, err = parser:ast(obj.text)
     if not ast then
         if type(err) == 'string' then
@@ -284,10 +281,14 @@ function mt:compileVM(uri)
                 type = 3,
                 message = lang.script('PARSER_CRASH', err:match 'grammar%.lua%:%d+%:(.+)'),
             })
+        else
+            obj.astErr = err
         end
     end
+    return ast
+end
 
-    -- 编译前清除节点信息
+function mt:_clearChainNode(obj, uri)
     if obj.parent then
         for pUri in pairs(obj.parent) do
             local parent = self._file[pUri]
@@ -296,26 +297,47 @@ function mt:compileVM(uri)
             end
         end
     end
+end
+
+function mt:_compileChain(obj, compiled)
+    if not obj.child then
+        return
+    end
+    if not compiled then
+        compiled = {}
+    end
+    local list = {}
+    for child in pairs(obj.child) do
+        list[#list+1] = child
+    end
+    table.sort(list)
+    for _, child in ipairs(list) do
+        self:needCompile(child, compiled)
+    end
+end
+
+function mt:compileVM(uri)
+    local obj = self._file[uri]
+    if not obj then
+        return nil
+    end
+    if not self._needCompile[uri] then
+        return nil
+    end
+
+    local compiled = self:_markCompiled(uri)
+    local ast = self:compileAst(obj)
+    self:_clearChainNode(obj, uri)
+
     obj.vm = matcher.vm(ast, self, uri)
     obj.lines = parser:lines(obj.text, 'utf8')
     if not obj.vm then
         return obj
     end
 
+    self:_compileChain(obj, compiled)
+
     self._needDiagnostics[uri] = true
-    if obj.child then
-        if not compiled then
-            compiled = {}
-        end
-        local list = {}
-        for child in pairs(obj.child) do
-            list[#list+1] = child
-        end
-        table.sort(list)
-        for _, child in ipairs(list) do
-            self:needCompile(child, compiled)
-        end
-    end
 
     return obj
 end

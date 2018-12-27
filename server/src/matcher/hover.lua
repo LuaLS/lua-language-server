@@ -348,6 +348,40 @@ local function findClass(result)
     return nil
 end
 
+local function unpackTable(result)
+    local child = result.value and result.value.child
+    if not child then
+        return '{}'
+    end
+    local lines = {'{'}
+    for key, field in pairs(child) do
+        local kType = type(key)
+        if kType == 'table' then
+            key = ('[*%s]'):format(key.type)
+        else
+            if kType ~= 'string' then
+                key = ('[%s]'):format(key)
+            end
+        end
+
+        local value = field.value
+        if not value then
+            lines[#lines+1] = ('    %s: %s,'):format(key, 'any')
+            goto CONTINUE
+        end
+
+        local vType = type(value.value)
+        if vType == 'boolean' or vType == 'integer' or vType == 'number' or vType == 'string' then
+            lines[#lines+1] = ('    %s: %s = %q,'):format(key, value.type, value.value)
+        else
+            lines[#lines+1] = ('    %s: %s,'):format(key, value.type)
+        end
+        ::CONTINUE::
+    end
+    lines[#lines+1] = '}'
+    return table.concat(lines, '\r\n')
+end
+
 local function getValueHover(name, valueType, result, source, lib)
     if not lib then
         local class = findClass(result)
@@ -377,10 +411,14 @@ local function getValueHover(name, valueType, result, source, lib)
     end
 
     local text
-    if value == nil then
-        text = ('%s %s: %s'):format(tp, name, valueType)
+    if valueType == 'table' then
+        text = ('%s %s: %s'):format(tp, name, unpackTable(result))
     else
-        text = ('%s %s: %s = %s'):format(tp, name, valueType, value)
+        if value == nil then
+            text = ('%s %s: %s'):format(tp, name, valueType)
+        else
+            text = ('%s %s: %s = %s'):format(tp, name, valueType, value)
+        end
     end
     return {
         label = text,

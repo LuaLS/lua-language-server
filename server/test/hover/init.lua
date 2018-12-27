@@ -257,3 +257,39 @@ TEST [[
 (<?'xxx'?>):sub()
 ]]
 (nil)
+
+TEST [[
+local <?t?> = {
+    a = 1,
+    b = 2,
+    c = 3,
+}
+]]
+[[
+local t: {
+    a: number = 1,
+    b: number = 2,
+    c: number = 3,
+}
+]]
+
+TEST [[
+local <?t?> = {
+    a = 1,
+    [1] = 2,
+    [true] = 3,
+    [5.5] = 4,
+    [{}] = 5,
+    [function () end] = 6,
+}
+]]
+[[
+local t: {
+    a: number = 1,
+    [1]: number = 2,
+    [true]: number = 3,
+    [5.5]: number = 4,
+    [*table]: number = 5,
+    [*function]: number = 6,
+}
+]]

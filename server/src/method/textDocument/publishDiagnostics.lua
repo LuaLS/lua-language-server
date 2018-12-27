@@ -47,7 +47,7 @@ local function createInfo(data, lines)
     local diagnostic = {
         source   = 'Lua Language Server',
         range    = getRange(data.start, data.finish, lines),
-        severity = DiagnosticSeverity[data.level],
+        severity = data.level,
         message  = data.message,
     }
     if data.related then

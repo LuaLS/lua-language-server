@@ -1,5 +1,12 @@
 local lang = require 'language'
 
+local DiagnosticSeverity = {
+    Error       = 1,
+    Warning     = 2,
+    Information = 3,
+    Hint        = 4,
+}
+
 local function searchUnusedLocals(results, callback)
     for _, var in ipairs(results.locals) do
         if var.key == 'self'
@@ -199,7 +206,7 @@ return function (vm, lines, uri)
         datas[#datas+1] = {
             start   = start,
             finish  = finish,
-            level   = 'Information',
+            level   = DiagnosticSeverity.Information,
             message = lang.script('DIAG_UNUSED_LOCAL', key),
         }
     end)
@@ -208,7 +215,7 @@ return function (vm, lines, uri)
         datas[#datas+1] = {
             start   = start,
             finish  = finish,
-            level   = 'Warning',
+            level   = DiagnosticSeverity.Warning,
             message = lang.script('DIAG_UNDEFINED_GLOBAL', key),
         }
     end)
@@ -217,7 +224,7 @@ return function (vm, lines, uri)
         datas[#datas+1] = {
             start   = start,
             finish  = finish,
-            level   = 'Information',
+            level   =DiagnosticSeverity.Information,
             message = lang.script('DIAG_UNUSED_LABEL', key)
         }
     end)
@@ -226,7 +233,7 @@ return function (vm, lines, uri)
         datas[#datas+1] = {
             start   = start,
             finish  = finish,
-            level   = 'Information',
+            level   = DiagnosticSeverity.Information,
             message = message,
         }
     end)
@@ -235,7 +242,7 @@ return function (vm, lines, uri)
         datas[#datas+1] = {
             start   = start,
             finish  = finish,
-            level   = 'Information',
+            level   = DiagnosticSeverity.Information,
             message = lang.script('DIAG_REDEFINED_LOCAL', key),
             related = related,
         }
@@ -245,7 +252,7 @@ return function (vm, lines, uri)
         datas[#datas+1] = {
             start   = start,
             finish  = finish,
-            level   = 'Warning',
+            level   = DiagnosticSeverity.Information,
             message = lang.script.DIAG_PREVIOUS_CALL,
         }
     end)
@@ -254,7 +261,7 @@ return function (vm, lines, uri)
         datas[#datas+1] = {
             start   = start,
             finish  = finish,
-            level   = 'Warning',
+            level   = DiagnosticSeverity.Warning,
             message = lang.script('DIAG_OVER_MAX_ARGS', max, passed),
         }
     end)

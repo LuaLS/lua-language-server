@@ -181,8 +181,10 @@ local function buildValueName(result, source)
             key = ('%q'):format(declarat[1])
         elseif declarat.type == 'number' or declarat.type == 'boolean' then
             key = tostring(declarat[1])
-        else
+        elseif func.type == 'function' then
             key = ''
+        else
+            key = result.key
         end
 
         local parentName = declarat.parentName

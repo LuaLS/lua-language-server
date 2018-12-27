@@ -227,3 +227,11 @@ for <?c?> in io.lines() do
 end
 ]]
 [[string c]]
+
+TEST [[
+local function f()
+    return ...
+end
+local <?n?> = f()
+]]
+[[any n]]

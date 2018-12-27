@@ -1,4 +1,5 @@
 local matcher = require 'matcher'
+local lang = require 'language'
 
 local DiagnosticSeverity = {
     Error       = 1,
@@ -78,15 +79,25 @@ end
 local function buildError(err, lines)
     local diagnostic = {
         source   = 'Lua Language Server',
-        message = 'Error',
+        message = lang.script.PARSER_IN_DEVELOPMENT,
     }
     if err.level == 'error' then
         diagnostic.severity = DiagnosticSeverity.Error
     else
         diagnostic.severity = DiagnosticSeverity.Warning
     end
-    local range = getRange(err.pos, err.pos, lines)
-    range['end'].character = 9999
+    local row, col = lines:rowcol(err.pos)
+    local _, max = lines:range(row)
+    local range = {
+        start = {
+            line = row - 1,
+            character = col - 1,
+        },
+        ['end'] = {
+            line = row - 1,
+            character = max,
+        },
+    }
     diagnostic.range = range
     return diagnostic
 end

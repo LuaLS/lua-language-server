@@ -403,12 +403,18 @@ io.read(@)
     },
 }
 
---TEST [[
---list[#@]
---]]
---{
---    {
---        label = 'list+1',
---        kind = CompletionItemKind.Snippet,
---    }
---}
+TEST [[
+local function f(a, @)
+end
+]]
+(nil)
+
+TEST [[
+list[#@]
+]]
+{
+    {
+        label = 'list+1',
+        kind = CompletionItemKind.Snippet,
+    }
+}

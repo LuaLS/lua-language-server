@@ -212,6 +212,9 @@ end
 
 local function searchAsArg(vm, pos, result, callback)
     searchFields(result.key, vm.results.locals[1], nil, function (var)
+        if var.value.lib then
+            return
+        end
         callback(var, CompletionItemKind.Variable)
     end)
 end
@@ -292,26 +295,22 @@ end
 local function findClosePos(vm, pos)
     local curDis = math.maxinteger
     local parent = nil
+    local function found(object, source)
+        local dis = pos - source.finish
+        if dis > 1 and dis < curDis then
+            curDis = dis
+            parent = object
+        end
+    end
     for sources, object in pairs(vm.results.sources) do
         if sources.type == 'multi-source' then
             for _, source in ipairs(sources) do
                 if source.type ~= 'simple' then
-                    local dis = pos - source.finish
-                    if dis > 0 and dis < curDis then
-                        curDis = dis
-                        parent = object
-                    end
+                    found(object, source)
                 end
             end
         else
-            local source = sources
-            if source.type ~= 'simple' then
-                local dis = pos - source.finish
-                if dis > 0 and dis < curDis then
-                    curDis = dis
-                    parent = object
-                end
-            end
+            found(object, sources)
         end
     end
     if parent and parent.type ~= 'local' and parent.type ~= 'field' then
@@ -343,7 +342,7 @@ local function isContainPos(obj, pos)
     return false
 end
 
-local function getString(vm, pos)
+local function findString(vm, pos)
     for _, source in ipairs(vm.results.strings) do
         if isContainPos(source, pos) then
             return source
@@ -386,7 +385,7 @@ local function findCall(vm, pos)
     table.sort(results, function (a, b)
         return a.args.start < b.args.start
     end)
-    return results
+    return results[#results]
 end
 
 local function makeList(source)
@@ -422,6 +421,26 @@ local function makeList(source)
     return list, callback
 end
 
+local function searchInResult(result, source, vm, pos, callback)
+    if result.type == 'local' then
+        if source.isArg then
+            searchAsArg(vm, pos, result, callback)
+        elseif source.isLocal then
+            searchAsLocal(vm, pos, result, callback)
+        else
+            searchAsGlobal(vm, pos, result, callback)
+        end
+    elseif result.type == 'field' then
+        if source.isIndex then
+            searchAsIndex(vm, pos, result, callback)
+        elseif result.parent and result.parent.value and result.parent.value.ENV == true then
+            searchAsGlobal(vm, pos, result, callback)
+        else
+            searchAsSuffix(result, callback)
+        end
+    end
+end
+
 return function (vm, pos)
     local result, source = findResult(vm, pos)
     local closeResult, closeSource = findClosePos(vm, pos)
@@ -430,41 +449,14 @@ return function (vm, pos)
         return nil
     end
 
-    local inCall
-    local calls = findCall(vm, pos)
-    if calls then
-        inCall = calls[#calls]
-    end
-    local inString = getString(vm, pos)
-
     local list, callback = makeList(source or closeSource)
-
+    local inCall = findCall(vm, pos)
+    local inString = findString(vm, pos)
     if inCall then
         searchInArg(vm, inCall, inString, callback)
     end
-
     if not inString then
-        if not result then
-            result = closeResult
-            source = closeSource
-        end
-        if result.type == 'local' then
-            if source.isArg then
-                searchAsArg(vm, pos, result, callback)
-            elseif source.isLocal then
-                searchAsLocal(vm, pos, result, callback)
-            else
-                searchAsGlobal(vm, pos, result, callback)
-            end
-        elseif result.type == 'field' then
-            if source.isIndex then
-                searchAsIndex(vm, pos, result, callback)
-            elseif result.parent and result.parent.value and result.parent.value.ENV == true then
-                searchAsGlobal(vm, pos, result, callback)
-            else
-                searchAsSuffix(result, callback)
-            end
-        end
+        searchInResult(result or closeResult, source or closeSource, vm, pos, callback)
     end
     if #list == 0 then
         return nil

@@ -14,10 +14,14 @@ function TEST(script)
         assert(vm)
         local result, source = matcher.findResult(vm, pos)
         local hover = matcher.hover(result, source)
-        assert(hover)
-        expect = expect:gsub('^[\r\n]*(.-)[\r\n]*$', '%1'):gsub('\r\n', '\n')
-        local label = hover.label:gsub('^[\r\n]*(.-)[\r\n]*$', '%1'):gsub('\r\n', '\n')
-        assert(expect == label)
+        if expect then
+            assert(hover)
+            expect = expect:gsub('^[\r\n]*(.-)[\r\n]*$', '%1'):gsub('\r\n', '\n')
+            local label = hover.label:gsub('^[\r\n]*(.-)[\r\n]*$', '%1'):gsub('\r\n', '\n')
+            assert(expect == label)
+        else
+            assert(hover == nil)
+        end
     end
 end
 
@@ -248,3 +252,8 @@ table.pack(n)
 [[
 any n
 ]]
+
+TEST [[
+(<?'xxx'?>):sub()
+]]
+(nil)

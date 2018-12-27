@@ -399,6 +399,10 @@ return function (result, source, lsp, select)
         return
     end
 
+    if result.key == '' then
+        return
+    end
+
     if result.type == 'string' then
         return getStringHover(result, lsp)
     end

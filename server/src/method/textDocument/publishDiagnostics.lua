@@ -80,16 +80,12 @@ return function (lsp, params)
     local lines  = params.lines
     local uri    = params.uri
 
-    local datas   = matcher.diagnostics(vm, lines, uri)
-
-    if not datas then
-        -- 返回空表以清空之前的结果
-        return {}
-    end
-
     local diagnostics = {}
-    for i, data in ipairs(datas) do
-        diagnostics[i] = createInfo(data, lines)
+    if vm then
+        local datas = matcher.diagnostics(vm, lines, uri)
+        for _, data in ipairs(datas) do
+            diagnostics[#diagnostics+1] = createInfo(data, lines)
+        end
     end
 
     return diagnostics

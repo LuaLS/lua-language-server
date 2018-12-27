@@ -419,7 +419,7 @@ return function (self, lua, mode)
         return nil, res
     end
     if not res then
-        return nil, err
+        return nil, {err}
     end
     return res
 end

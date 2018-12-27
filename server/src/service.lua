@@ -273,6 +273,7 @@ end
 
 function mt:compileAst(obj)
     local ast, err = parser:ast(obj.text)
+    obj.astErr = nil
     if not ast then
         if type(err) == 'string' then
             local message = lang.script('PARSER_CRASH', err)
@@ -331,13 +332,13 @@ function mt:compileVM(uri)
 
     obj.vm = matcher.vm(ast, self, uri)
     obj.lines = parser:lines(obj.text, 'utf8')
+
+    self._needDiagnostics[uri] = true
     if not obj.vm then
         return obj
     end
 
     self:_compileChain(obj, compiled)
-
-    self._needDiagnostics[uri] = true
 
     return obj
 end

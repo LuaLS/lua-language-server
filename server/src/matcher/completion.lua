@@ -481,11 +481,9 @@ return function (vm, pos)
     if inCall then
         searchInArg(vm, inCall, inString, callback)
     end
+    searchSpecial(vm, pos, callback)
     if not inString then
         searchInResult(result, source, vm, pos, callback)
-    end
-    if #list == 0 and result.key == '' then
-        searchSpecial(vm, pos, callback)
     end
     if #list == 0 then
         return nil

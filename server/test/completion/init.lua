@@ -418,3 +418,17 @@ self.results.list[#@]
         kind = CompletionItemKind.Snippet,
     }
 }
+
+TEST [[
+fff[#ff@]
+]]
+{
+    {
+        label = 'fff+1',
+        kind = CompletionItemKind.Snippet,
+    },
+    {
+        label = 'fff',
+        kind = CompletionItemKind.Field,
+    }
+}

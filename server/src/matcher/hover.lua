@@ -369,11 +369,18 @@ local function getValueHover(name, valueType, result, source, lib)
         value = result.value.value and ('%q'):format(result.value.value)
     end
 
+    local tp = result.type
+    if tp == 'field' then
+        if result.parent.value.ENV then
+            tp = 'global'
+        end
+    end
+
     local text
     if value == nil then
-        text = ('%s %s'):format(valueType, name)
+        text = ('%s %s: %s'):format(tp, name, valueType)
     else
-        text = ('%s %s = %s'):format(valueType, name, value)
+        text = ('%s %s: %s = %s'):format(tp, name, valueType, value)
     end
     return {
         label = text,

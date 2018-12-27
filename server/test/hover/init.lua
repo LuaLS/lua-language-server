@@ -89,24 +89,24 @@ obj.<?xxx?>()
 TEST [[
 local <?x?> = 1
 ]]
-"number x = 1"
+"local x: number = 1"
 
 TEST [[
 <?x?> = 1
 ]]
-"number x = 1"
+"global x: number = 1"
 
 TEST [[
 local t = {}
 t.<?x?> = 1
 ]]
-"number t.x = 1"
+"field t.x: number = 1"
 
 TEST [[
 t = {}
 t.<?x?> = 1
 ]]
-"number t.x = 1"
+"field t.x: number = 1"
 
 TEST [[
 local mt = {}
@@ -114,7 +114,7 @@ mt.__name = 'class'
 
 local <?obj?> = setmetatable({}, mt)
 ]]
-"*class obj"
+"local obj: *class"
 
 TEST [[
 local mt = {}
@@ -123,7 +123,7 @@ mt.__index = mt
 
 local <?obj?> = setmetatable({}, mt)
 ]]
-"*class obj"
+"local obj: *class"
 
 TEST [[
 local mt = {}
@@ -132,7 +132,7 @@ mt.__index = mt
 
 local <?obj?> = setmetatable({}, mt)
 ]]
-"*class obj"
+"local obj: *class"
 
 TEST [[
 local mt = {}
@@ -141,13 +141,13 @@ mt.__index = mt
 
 local <?obj?> = setmetatable({}, mt)
 ]]
-"*class obj"
+"local obj: *class"
 
 TEST[[
 local fs = require 'bee.filesystem'
 local <?root?> = fs.current_path()
 ]]
-"*bee::filesystem root"
+"local root: *bee::filesystem"
 
 TEST[[
 ('xx'):<?yy?>()
@@ -157,13 +157,13 @@ TEST[[
 TEST [[
 local <?v?> = collectgarbage()
 ]]
-"any v"
+"local v: any"
 
 TEST [[
 local type
 w2l:get_default()[<?type?>]
 ]]
-"any type"
+"local type: any"
 
 TEST [[
 <?load?>()
@@ -224,13 +224,13 @@ function mt:add(a: any, b: any)
 TEST [[
 local <?t?> = - 1000
 ]]
-[[number t = -1000]]
+[[local t: number = -1000]]
 
 TEST [[
 for <?c?> in io.lines() do
 end
 ]]
-[[string c]]
+[[local c: string]]
 
 TEST [[
 local function f()
@@ -238,19 +238,19 @@ local function f()
 end
 local <?n?> = f()
 ]]
-[[any n]]
+[[local n: any]]
 
 TEST [[
 local <?n?> = table.unpack(t)
 ]]
-[[any n]]
+[[local n: any]]
 
 TEST [[
 local <?n?>
 table.pack(n)
 ]]
 [[
-any n
+local n: any
 ]]
 
 TEST [[

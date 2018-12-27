@@ -111,3 +111,31 @@ end
 local obj = sm({}, mt)
 obj:<?method1?>()
 ]]
+
+-- TODO 更换 meta__index 的实现
+-- 表和__index之间不共享child
+-- 编译完成后进行后处理，如果某个field只有读取操作，则将值链接到meta表中
+
+--TEST [[
+--local mt = {}
+--function mt:<!x!>()
+--end
+--
+--local obj = setmetatable({}, {__index = mt})
+--function obj:x()
+--end
+--
+--mt:<?x?>()
+--]]
+--
+--TEST [[
+--local mt = {}
+--function mt:x()
+--end
+--
+--local obj = setmetatable({}, {__index = mt})
+--function obj:<!x!>()
+--end
+--
+--obj:<?x?>()
+--]]

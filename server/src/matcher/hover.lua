@@ -405,7 +405,7 @@ local function getValueHover(name, valueType, result, source, lib)
 
     local tp = result.type
     if tp == 'field' then
-        if result.parent.value.ENV then
+        if result.parent and result.parent.value and result.parent.value.ENV then
             tp = 'global'
         end
     end

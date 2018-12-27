@@ -389,22 +389,7 @@ local function findCall(vm, pos)
     return results
 end
 
-return function (vm, pos)
-    local result, source = findResult(vm, pos)
-    if not result then
-        result, source = findClosePos(vm, pos)
-        if not result then
-            return nil
-        end
-    end
-
-    local inCall
-    local calls = findCall(vm, pos)
-    if calls then
-        inCall = calls[#calls]
-    end
-    local inString = getString(vm, pos)
-
+local function makeList(source)
     local list = {}
     local mark = {}
     local function callback(var, defualt, detail, documentation)
@@ -434,12 +419,35 @@ return function (vm, pos)
             }
         end
     end
+    return list, callback
+end
+
+return function (vm, pos)
+    local result, source = findResult(vm, pos)
+    local closeResult, closeSource = findClosePos(vm, pos)
+
+    if not result and not closeResult then
+        return nil
+    end
+
+    local inCall
+    local calls = findCall(vm, pos)
+    if calls then
+        inCall = calls[#calls]
+    end
+    local inString = getString(vm, pos)
+
+    local list, callback = makeList(source or closeSource)
 
     if inCall then
         searchInArg(vm, inCall, inString, callback)
     end
 
-    if result and not inString then
+    if not inString then
+        if not result then
+            result = closeResult
+            source = closeSource
+        end
         if result.type == 'local' then
             if source.isArg then
                 searchAsArg(vm, pos, result, callback)

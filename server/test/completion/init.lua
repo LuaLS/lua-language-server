@@ -402,3 +402,13 @@ io.read(@)
         documentation = EXISTS,
     },
 }
+
+--TEST [[
+--list[#@]
+--]]
+--{
+--    {
+--        label = 'list+1',
+--        kind = CompletionItemKind.Snippet,
+--    }
+--}

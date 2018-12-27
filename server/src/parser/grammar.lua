@@ -247,8 +247,9 @@ ExpBshift   <-  (ExpConcat  (Bshift ExpConcat)*)  -> Binary
 ExpConcat   <-  (ExpAdds    (Concat ExpConcat)*)  -> Binary
 ExpAdds     <-  (ExpMuls    (Adds   ExpMuls)*)    -> Binary
 ExpMuls     <-  (ExpUnary   (Muls   ExpUnary)*)   -> Binary
-ExpUnary    <-  (           (Unary+ ExpPower))    -> Unary
-            /                       ExpPower
+ExpUnary    <-  (           (Unary+ (ExpPower / DirtyName)))
+            ->  Unary
+            /   ExpPower
 ExpPower    <-  (ExpUnit    (POWER  ExpUnary)*)   -> Binary
 ExpUnit     <-  Nil
             /   Boolean
@@ -267,7 +268,7 @@ Suffix      <-  DOT MustName
             /   COLON MustName
             /   Sp ({} Table {}) -> Call
             /   Sp ({} String {}) -> Call
-            /   BL Exp -> Index BR
+            /   BL DirtyExp -> Index BR?
             /   Sp ({} PL ExpList (PR / Sp) {}) -> Call
 
 DirtyExp    <-  Exp / DirtyName
@@ -377,7 +378,7 @@ ElseIfPart  <-  ELSEIF Exp THEN
                     {} (!ELSE !ELSEIF Action)* {}
             /   ELSEIF DirtyExp THEN
                     {} (!ELSE !ELSEIF Action)* {}
-            /   ELSEIF DirtyExp THEN
+            /   ELSEIF DirtyExp
                     {}         {}
 ElsePart    <-  ELSE
                     {} Action* {}

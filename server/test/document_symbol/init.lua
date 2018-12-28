@@ -148,7 +148,7 @@ end
     [1] = {
         name = 'mt:add',
         detail = 'function mt:add()',
-        kind = SymbolKind.Method,
+        kind = SymbolKind.Field,
         range = {1, 21},
         selectionRange = {13, 15},
     }

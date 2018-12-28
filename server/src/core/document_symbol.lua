@@ -58,7 +58,7 @@ local function buildFunction(vm, func)
         range = { math.min(source.start, declarat.start), source.finish }
         selectionRange = { declarat.start, declarat.finish }
         if var.parent and var.parent.value and not var.parent.value.ENV then
-            kind = SymbolKind.Method
+            kind = SymbolKind.Field
         end
     else
         range = { source.start, source.finish }

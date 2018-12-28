@@ -30,7 +30,7 @@ local SymbolKind = {
     TypeParameter = 26,
 }
 
-local function buildFunc(vm, func)
+local function buildFunction(vm, func)
     local source = func.source
     local declarat = func.declarat
     local name
@@ -75,10 +75,23 @@ local function buildFunc(vm, func)
     }
 end
 
+local function buildChunk(vm, chunk)
+    local symbol = buildFunction(vm, chunk.func)
+    local childs = {}
+    for i, child in vm.chunk:childs(chunk) do
+        childs[i] = buildChunk(vm, child)
+    end
+    if #childs ~= 0 then
+        symbol.children = childs
+    end
+    return symbol
+end
+
 return function (vm)
     local symbols = {}
-    for _, func in ipairs(vm.results.funcs) do
-        symbols[#symbols+1] = buildFunc(vm, func)
+
+    for i, chunk in vm.chunk:childs() do
+        symbols[i] = buildChunk(vm, chunk)
     end
 
     return symbols

@@ -154,45 +154,45 @@ end
     }
 }
 
---TEST [[
---function A()
---    function A1()
---    end
---    function A2()
---    end
---end
---function B()
---end
---]]
---{
---    [1] = {
---        name = 'A',
---        detail = 'function A()',
---        kind = SymbolKind.Function,
---        range = {1, 68},
---        selectionRange = {10, 10},
---        children = {
---            [1] = {
---                name = 'A1',
---                detail = 'function A1()',
---                kind = SymbolKind.Function,
---                range = {18, 38},
---                selectionRange = {27, 28},
---            },
---            [2] = {
---                name = 'A2',
---                detail = 'function A2()',
---                kind = SymbolKind.Function,
---                range = {44, 64},
---                selectionRange = {53, 54},
---            },
---        },
---    },
---    [2] = {
---        name = 'B',
---        detail = 'function B()',
---        kind = SymbolKind.Function,
---        range = {70, 85},
---        selectionRange = {79, 79},
---    },
---}
+TEST [[
+function A()
+    function A1()
+    end
+    function A2()
+    end
+end
+function B()
+end
+]]
+{
+    [1] = {
+        name = 'A',
+        detail = 'function A()',
+        kind = SymbolKind.Function,
+        range = {1, 68},
+        selectionRange = {10, 10},
+        children = {
+            [1] = {
+                name = 'A1',
+                detail = 'function A1()',
+                kind = SymbolKind.Function,
+                range = {18, 38},
+                selectionRange = {27, 28},
+            },
+            [2] = {
+                name = 'A2',
+                detail = 'function A2()',
+                kind = SymbolKind.Function,
+                range = {44, 64},
+                selectionRange = {53, 54},
+            },
+        },
+    },
+    [2] = {
+        name = 'B',
+        detail = 'function B()',
+        kind = SymbolKind.Function,
+        range = {70, 85},
+        selectionRange = {79, 79},
+    },
+}

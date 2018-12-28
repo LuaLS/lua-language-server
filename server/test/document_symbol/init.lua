@@ -84,16 +84,16 @@ end
     }
 }
 
-TEST [[
-return function ()
-end
-]]
-{
-    [1] = {
-        name = '',
-        detail = 'function f()',
-        kind = SymbolKind.Function,
-        range = {8, 22},
-        selectionRange = {8, 8},
-    }
-}
+--TEST [[
+--return function ()
+--end
+--]]
+--{
+--    [1] = {
+--        name = '',
+--        detail = 'function f()',
+--        kind = SymbolKind.Function,
+--        range = {8, 22},
+--        selectionRange = {8, 8},
+--    }
+--}

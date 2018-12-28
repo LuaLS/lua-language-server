@@ -194,6 +194,50 @@ TEST {
 
 TEST {
     {
+        path = 'abc.lua',
+        content = '',
+    },
+    {
+        path = 'abc/init.lua',
+        content = '',
+    },
+    {
+        path = 'test.lua',
+        content = 'require "abc.i@"',
+        main = true,
+    },
+    completion = {
+        {
+            label = 'abc.init',
+            kind = CompletionItemKind.File,
+        },
+    }
+}
+
+TEST {
+    {
+        path = 'core/core.lua',
+        content = '',
+    },
+    {
+        path = 'core/xxx.lua',
+        content = '',
+    },
+    {
+        path = 'test.lua',
+        content = 'require "core.co@"',
+        main = true,
+    },
+    completion = {
+        {
+            label = 'core.core',
+            kind = CompletionItemKind.File,
+        },
+    }
+}
+
+TEST {
+    {
         path = 'x000.lua',
         content = '',
     },

@@ -181,7 +181,7 @@ function mt:matchPath(baseUri, input)
             local list = self:convertPathAsRequire(filename, start + 1)
             if list then
                 for _, str in ipairs(list) do
-                    if #str >= #input then
+                    if #str >= #input and str:sub(1, #input) == input then
                         if not map[str]
                             or similarity(filename, baseName) > similarity(map[str], baseName)
                         then

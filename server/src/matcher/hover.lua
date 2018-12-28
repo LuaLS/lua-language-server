@@ -468,9 +468,15 @@ return function (result, source, lsp, select)
         valueType = result.value.type or 'nil'
     end
     local name = fullKey or buildValueName(result, source)
+    local hover
     if valueType == 'function' then
-        return getFunctionHover(name, result, source, lib, oo, select)
+        hover = getFunctionHover(name, result, source, lib, oo, select)
     else
-        return getValueHover(name, valueType, result, source, lib)
+        hover = getValueHover(name, valueType, result, source, lib)
     end
+    if not hover then
+        return
+    end
+    hover.name = name
+    return hover
 end

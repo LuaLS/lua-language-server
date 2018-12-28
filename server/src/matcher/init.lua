@@ -9,6 +9,7 @@ local api = {
     findLib        = require 'matcher.find_lib',
     completion     = require 'matcher.completion',
     signature      = require 'matcher.signature',
+    documentSymbol = require 'matcher.document_symbol',
     vm             = require 'matcher.vm',
 }
 

@@ -1,4 +1,4 @@
-local matcher    = require 'matcher'
+local core    = require 'core'
 local parser     = require 'parser'
 
 rawset(_G, 'TEST', true)
@@ -11,10 +11,10 @@ function TEST(fullkey)
         local new_script = script:gsub('<[!?]', '  '):gsub('[!?]>', '  ')
         local ast = parser:ast(new_script)
         assert(ast)
-        local vm = matcher.vm(ast)
+        local vm = core.vm(ast)
         assert(vm)
-        local result = matcher.findResult(vm, pos)
-        local _, name = matcher.findLib(result)
+        local result = core.findResult(vm, pos)
+        local _, name = core.findLib(result)
         assert(name == fullkey)
     end
 end

@@ -1,4 +1,4 @@
-local matcher = require 'matcher'
+local core = require 'core'
 
 local function posToRange(lines, start, finish)
     local start_row,  start_col  = lines:rowcol(start)
@@ -33,7 +33,7 @@ return function (lsp, params)
         return nil
     end
 
-    local symbols = matcher.documentSymbol(vm)
+    local symbols = core.documentSymbol(vm)
 
     for _, symbol in ipairs(symbols) do
         convertRange(lines, symbol)

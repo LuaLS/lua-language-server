@@ -1,5 +1,5 @@
 local parser = require 'parser'
-local matcher = require 'matcher'
+local core = require 'core'
 
 rawset(_G, 'TEST', true)
 
@@ -10,9 +10,9 @@ function TEST(res)
         local pos = (start + finish) // 2 + 1
         local new_script = script:gsub('<[!?]', '  '):gsub('[!?]>', '  ')
         local ast = parser:ast(new_script)
-        local vm = matcher.vm(ast)
+        local vm = core.vm(ast)
         assert(vm)
-        local result = matcher.findResult(vm, pos)
+        local result = core.findResult(vm, pos)
         assert(result)
         assert(res == result.value.type)
     end

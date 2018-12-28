@@ -1,4 +1,4 @@
-local matcher = require 'matcher'
+local core = require 'core'
 local parser  = require 'parser'
 
 rawset(_G, 'TEST', true)
@@ -41,9 +41,9 @@ function TEST(script)
     local ast = parser:ast(new_script)
     assert(ast)
     local lines = parser:lines(new_script)
-    local vm = matcher.vm(ast)
+    local vm = core.vm(ast)
     assert(vm)
-    local datas = matcher.diagnostics(vm, lines, 'test')
+    local datas = core.diagnostics(vm, lines, 'test')
     local results = {}
     for i, data in ipairs(datas) do
         results[i] = { data.start, data.finish }

@@ -1,7 +1,7 @@
 local service = require 'service'
 local workspace = require 'workspace'
 local fs = require 'bee.filesystem'
-local matcher = require 'matcher'
+local core = require 'core'
 
 rawset(_G, 'TEST', true)
 
@@ -48,8 +48,8 @@ function TEST(data)
     local sourceVM = lsp:getVM(sourceUri)
     assert(sourceVM)
     local sourcePos = (sourceList[1][1] + sourceList[1][2]) // 2
-    local result = matcher.findResult(sourceVM, sourcePos)
-    local positions = matcher.definition(sourceVM, result)
+    local result = core.findResult(sourceVM, sourcePos)
+    local positions = core.definition(sourceVM, result)
     assert(positions and positions[1])
     local start, finish, valueUri = positions[1][1], positions[1][2], positions[1][3]
     assert(valueUri == targetUri)

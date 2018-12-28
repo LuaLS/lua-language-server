@@ -4,7 +4,7 @@ local thread     = require 'bee.thread'
 local async      = require 'async'
 local rpc        = require 'rpc'
 local parser     = require 'parser'
-local matcher    = require 'matcher'
+local core    = require 'core'
 local lang       = require 'language'
 
 thread.newchannel 'proto'
@@ -328,7 +328,7 @@ function mt:compileVM(uri)
     local ast = self:compileAst(obj)
     self:_clearChainNode(obj, uri)
 
-    obj.vm = matcher.vm(ast, self, uri)
+    obj.vm = core.vm(ast, self, uri)
     obj.lines = parser:lines(obj.text, 'utf8')
 
     self._needDiagnostics[uri] = true

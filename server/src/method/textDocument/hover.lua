@@ -1,4 +1,4 @@
-local matcher = require 'matcher'
+local core = require 'core'
 
 return function (lsp, params)
     local uri = params.textDocument.uri
@@ -9,12 +9,12 @@ return function (lsp, params)
     -- lua是从1开始的，因此都要+1
     local position = lines:position(params.position.line + 1, params.position.character + 1)
 
-    local result, source = matcher.findResult(vm, position)
+    local result, source = core.findResult(vm, position)
     if not result then
         return nil
     end
 
-    local hover = matcher.hover(result, source, lsp)
+    local hover = core.hover(result, source, lsp)
     if not hover then
         return nil
     end

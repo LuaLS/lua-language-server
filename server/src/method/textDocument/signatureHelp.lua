@@ -1,4 +1,4 @@
-local matcher = require 'matcher'
+local core = require 'core'
 
 return function (lsp, params)
     local uri = params.textDocument.uri
@@ -8,7 +8,7 @@ return function (lsp, params)
     end
     -- lua是从1开始的，因此都要+1
     local position = lines:position(params.position.line + 1, params.position.character + 1)
-    local hovers = matcher.signature(vm, position)
+    local hovers = core.signature(vm, position)
     if not hovers then
         return
     end

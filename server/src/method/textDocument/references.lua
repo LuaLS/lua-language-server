@@ -1,4 +1,4 @@
-local matcher = require 'matcher'
+local core = require 'core'
 
 return function (lsp, params)
     local uri = params.textDocument.uri
@@ -9,7 +9,7 @@ return function (lsp, params)
     end
     -- lua是从1开始的，因此都要+1
     local position = lines:position(params.position.line + 1, params.position.character + 1)
-    local positions = matcher.references(vm, position, declarat)
+    local positions = core.references(vm, position, declarat)
     if not positions then
         return {}
     end

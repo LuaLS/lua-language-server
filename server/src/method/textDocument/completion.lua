@@ -1,4 +1,4 @@
-local matcher = require 'matcher'
+local core = require 'core'
 
 local function posToRange(lines, start, finish)
     local start_row,  start_col  = lines:rowcol(start)
@@ -23,7 +23,7 @@ return function (lsp, params)
     end
     -- lua是从1开始的，因此都要+1
     local position = lines:position(params.position.line + 1, params.position.character + 1)
-    local items = matcher.completion(vm, position)
+    local items = core.completion(vm, position)
     if not items then
         return nil
     end

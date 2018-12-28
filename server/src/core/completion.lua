@@ -1,5 +1,5 @@
-local findResult = require 'matcher.find_result'
-local hover = require 'matcher.hover'
+local findResult = require 'core.find_result'
+local hover = require 'core.hover'
 
 local CompletionItemKind = {
     Text = 1,

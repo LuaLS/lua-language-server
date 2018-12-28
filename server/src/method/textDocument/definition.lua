@@ -1,4 +1,4 @@
-local matcher = require 'matcher'
+local core = require 'core'
 
 local function checkWorkSpaceComplete(lsp, result)
     if result.type ~= 'field' and result.type ~= 'local' then
@@ -24,14 +24,14 @@ return function (lsp, params)
     end
     -- lua是从1开始的，因此都要+1
     local position = lines:position(params.position.line + 1, params.position.character + 1)
-    local result = matcher.findResult(vm, position)
+    local result = core.findResult(vm, position)
     if not result then
         return nil
     end
 
     checkWorkSpaceComplete(lsp, result)
 
-    local positions = matcher.definition(vm, result)
+    local positions = core.definition(vm, result)
     if not positions then
         return nil
     end

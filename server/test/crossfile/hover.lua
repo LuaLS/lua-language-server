@@ -1,7 +1,7 @@
 local service = require 'service'
 local workspace = require 'workspace'
 local fs = require 'bee.filesystem'
-local matcher = require 'matcher'
+local core = require 'core'
 
 rawset(_G, 'TEST', true)
 
@@ -72,8 +72,8 @@ function TEST(data)
     local sourceVM = lsp:loadVM(sourceUri)
     assert(sourceVM)
     local sourcePos = (sourceList[1][1] + sourceList[1][2]) // 2
-    local result, source = matcher.findResult(sourceVM, sourcePos)
-    local hover = matcher.hover(result, source, lsp)
+    local result, source = core.findResult(sourceVM, sourcePos)
+    local hover = core.hover(result, source, lsp)
     assert(hover)
     if data.hover.description then
         data.hover.description = data.hover.description:gsub('%$ROOT%$', ws:uriEncode(ROOT):gsub('%%', '%%%%'))

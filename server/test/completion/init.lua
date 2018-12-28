@@ -1,4 +1,4 @@
-local matcher = require 'matcher'
+local core = require 'core'
 local parser  = require 'parser'
 
 local CompletionItemKind = {
@@ -64,9 +64,9 @@ function TEST(script)
         local pos = script:find('@', 1, true)
         local new_script = script:gsub('@', ' ')
         local ast = parser:ast(new_script)
-        local vm = matcher.vm(ast)
+        local vm = core.vm(ast)
         assert(vm)
-        local result = matcher.completion(vm, pos)
+        local result = core.completion(vm, pos)
         if expect then
             assert(result)
             assert(eq(expect, result))

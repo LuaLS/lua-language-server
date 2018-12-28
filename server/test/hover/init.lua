@@ -1,5 +1,5 @@
 local parser = require 'parser'
-local matcher = require 'matcher'
+local core = require 'core'
 
 rawset(_G, 'TEST', true)
 
@@ -10,10 +10,10 @@ function TEST(script)
         local pos = (start + finish) // 2 + 1
         local new_script = script:gsub('<[!?]', '  '):gsub('[!?]>', '  ')
         local ast = parser:ast(new_script)
-        local vm = matcher.vm(ast)
+        local vm = core.vm(ast)
         assert(vm)
-        local result, source = matcher.findResult(vm, pos)
-        local hover = matcher.hover(result, source)
+        local result, source = core.findResult(vm, pos)
+        local hover = core.hover(result, source)
         if expect then
             assert(hover)
             expect = expect:gsub('^[\r\n]*(.-)[\r\n]*$', '%1'):gsub('\r\n', '\n')

@@ -1,4 +1,4 @@
-local findLib    = require 'matcher.find_lib'
+local findLib    = require 'core.find_lib'
 
 local OriginTypes = {
     ['any']      = true,
@@ -219,8 +219,7 @@ local function buildValueName(result, source)
     return result.key or ''
 end
 
-local function buildValueArgs(result, source, select)
-    local func = result.value
+local function buildValueArgs(func, source, select)
     local names = {}
     local values = {}
     if func.args then
@@ -266,8 +265,7 @@ local function buildValueArgs(result, source, select)
     return table.concat(strs, ', '), argLabel
 end
 
-local function buildValueReturns(result)
-    local func = result.value
+local function buildValueReturns(func)
     if not func.hasReturn then
         return ''
     end
@@ -283,7 +281,7 @@ local function buildValueReturns(result)
     return '\n  -> ' .. table.concat(strs, ', ')
 end
 
-local function getFunctionHover(name, result, source, lib, oo, select)
+local function getFunctionHover(name, func, source, lib, oo, select)
     local args = ''
     local returns
     local enum
@@ -295,8 +293,8 @@ local function getFunctionHover(name, result, source, lib, oo, select)
         enum = buildEnum(lib)
         tip = lib.description
     else
-        args, argLabel = buildValueArgs(result, source, select)
-        returns = buildValueReturns(result)
+        args, argLabel = buildValueArgs(func, source, select)
+        returns = buildValueReturns(func)
     end
     local title = ('function %s(%s)%s'):format(name, args, returns)
     return {
@@ -470,7 +468,7 @@ return function (result, source, lsp, select)
     local name = fullKey or buildValueName(result, source)
     local hover
     if valueType == 'function' then
-        hover = getFunctionHover(name, result, source, lib, oo, select)
+        hover = getFunctionHover(name, result.value, source, lib, oo, select)
     else
         hover = getValueHover(name, valueType, result, source, lib)
     end

@@ -1,7 +1,7 @@
 local service = require 'service'
 local workspace = require 'workspace'
 local fs = require 'bee.filesystem'
-local matcher = require 'matcher'
+local core = require 'core'
 
 rawset(_G, 'TEST', true)
 
@@ -86,7 +86,7 @@ function TEST(data)
 
     local vm = lsp:loadVM(mainUri)
     assert(vm)
-    local result = matcher.completion(vm, pos)
+    local result = core.completion(vm, pos)
     local expect = data.completion
     if expect then
         assert(result)

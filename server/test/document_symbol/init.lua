@@ -1,5 +1,5 @@
 local parser = require 'parser'
-local matcher = require 'matcher'
+local core = require 'core'
 
 local SymbolKind = {
     File = 1,
@@ -63,9 +63,9 @@ end
 function TEST(script)
     return function (expect)
         local ast = parser:ast(script)
-        local vm = matcher.vm(ast)
+        local vm = core.vm(ast)
         assert(vm)
-        local result = matcher.documentSymbol(vm)
+        local result = core.documentSymbol(vm)
         assert(eq(expect, result))
     end
 end
@@ -81,5 +81,19 @@ end
         kind = SymbolKind.Function,
         range = {1, 22},
         selectionRange = {16, 16},
+    }
+}
+
+TEST [[
+return function ()
+end
+]]
+{
+    [1] = {
+        name = '',
+        detail = 'function f()',
+        kind = SymbolKind.Function,
+        range = {8, 22},
+        selectionRange = {8, 8},
     }
 }

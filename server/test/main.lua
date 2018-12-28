@@ -23,7 +23,7 @@ local function main()
         print(('测试[%s]用时[%.3f]'):format(name, os.clock() - clock))
     end
 
-    test 'matcher'
+    test 'core'
 
     test 'vm'
     test 'definition'

@@ -1,4 +1,4 @@
-local matcher = require 'matcher'
+local core = require 'core'
 local lang = require 'language'
 
 local DiagnosticSeverity = {
@@ -110,7 +110,7 @@ return function (lsp, params)
 
     local diagnostics = {}
     if vm then
-        local datas = matcher.diagnostics(vm, lines, uri)
+        local datas = core.diagnostics(vm, lines, uri)
         for _, data in ipairs(datas) do
             diagnostics[#diagnostics+1] = createInfo(data, lines)
         end

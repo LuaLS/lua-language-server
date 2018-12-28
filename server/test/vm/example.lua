@@ -1,1 +1,1 @@
-TEST(io.load(ROOT / 'src' / 'matcher' / 'vm.lua'))
+TEST(io.load(ROOT / 'src' / 'core' / 'vm.lua'))

@@ -1,4 +1,4 @@
-local findResult = require 'matcher.find_result'
+local findResult = require 'core.find_result'
 
 local function parseResult(result, declarat)
     local positions = {}

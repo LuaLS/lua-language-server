@@ -1,4 +1,4 @@
-local findResult = require 'matcher.find_result'
+local findResult = require 'core.find_result'
 local parser = require 'parser'
 
 local function parseResult(result, source, newName)

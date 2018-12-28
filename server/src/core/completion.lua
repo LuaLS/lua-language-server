@@ -258,13 +258,10 @@ local function searchInArg(vm, inCall, inString, callback)
         for _, v in ipairs(results) do
             if v ~= inString[1] then
                 local sep = inString[1]:find('[^%w_][%w_]-$')
-                local insertText
                 if sep then
-                    --v = v:sub(sep+1)
+                    v = v:sub(sep+1)
                 end
-                callback(v, CompletionItemKind.File, {
-                    insertText = insertText,
-                })
+                callback(v, CompletionItemKind.File)
             end
         end
     end

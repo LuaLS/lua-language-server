@@ -186,7 +186,7 @@ TEST {
     },
     completion = {
         {
-            label = 'abc.init',
+            label = 'init',
             kind = CompletionItemKind.File,
         },
     }
@@ -208,7 +208,7 @@ TEST {
     },
     completion = {
         {
-            label = 'abc.init',
+            label = 'init',
             kind = CompletionItemKind.File,
         },
     }
@@ -230,7 +230,7 @@ TEST {
     },
     completion = {
         {
-            label = 'core.core',
+            label = 'core',
             kind = CompletionItemKind.File,
         },
     }

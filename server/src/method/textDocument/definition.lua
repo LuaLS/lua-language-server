@@ -1,6 +1,9 @@
 local matcher = require 'matcher'
 
 local function checkWorkSpaceComplete(lsp, result)
+    if result.type ~= 'field' and result.type ~= 'local' then
+        return
+    end
     if result.value then
         if not result.value.isRequire then
             return

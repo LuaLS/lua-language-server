@@ -281,26 +281,26 @@ local function buildValueReturns(func)
     return '\n  -> ' .. table.concat(strs, ', ')
 end
 
-local function getFunctionHover(name, func, source, lib, oo, select)
-    local args = ''
-    local returns
-    local enum
-    local tip
-    local argLabel
-    if lib then
-        args, argLabel = buildLibArgs(lib, oo, select)
-        returns = buildLibReturns(lib)
-        enum = buildEnum(lib)
-        tip = lib.description
-    else
-        args, argLabel = buildValueArgs(func, source, select)
-        returns = buildValueReturns(func)
-    end
+local function getFunctionHoverAsLib(name, lib, oo, select)
+    local args, argLabel = buildLibArgs(lib, oo, select)
+    local returns = buildLibReturns(lib)
+    local enum = buildEnum(lib)
+    local tip = lib.description
     local title = ('function %s(%s)%s'):format(name, args, returns)
     return {
         label = title,
         description = tip,
         enum = enum,
+        argLabel = argLabel,
+    }
+end
+
+local function getFunctionHover(name, func, source, select)
+    local args, argLabel = buildValueArgs(func, source, select)
+    local returns = buildValueReturns(func)
+    local title = ('function %s(%s)%s'):format(name, args, returns)
+    return {
+        label = title,
         argLabel = argLabel,
     }
 end
@@ -468,7 +468,11 @@ return function (result, source, lsp, select)
     local name = fullKey or buildValueName(result, source)
     local hover
     if valueType == 'function' then
-        hover = getFunctionHover(name, result.value, source, lib, oo, select)
+        if lib then
+            hover = getFunctionHoverAsLib(name, lib, oo, select)
+        else
+            hover = getFunctionHover(name, result.value, source, select)
+        end
     else
         hover = getValueHover(name, valueType, result, source, lib)
     end

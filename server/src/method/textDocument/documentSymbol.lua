@@ -1,4 +1,5 @@
 local core = require 'core'
+local lang = require 'language'
 
 local function posToRange(lines, start, finish)
     local start_row,  start_col  = lines:rowcol(start)
@@ -18,6 +19,9 @@ end
 local function convertRange(lines, symbol)
     symbol.range = posToRange(lines, symbol.range[1], symbol.range[2])
     symbol.selectionRange = posToRange(lines, symbol.selectionRange[1], symbol.selectionRange[2])
+    if symbol.name == '' then
+        symbol.name = lang.script.SYMBOL_ANONYMOUS
+    end
 
     if symbol.children then
         for _, child in ipairs(symbol.children) do

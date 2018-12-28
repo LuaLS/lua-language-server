@@ -15,3 +15,5 @@ MWS_COMPLETE          = 'Workspace is complete now. You may try again...'
 
 PARSER_CRASH          = 'Parser crashed! Last words:{}'
 PARSER_IN_DEVELOPMENT = 'Syntax check is still in TODO...'
+
+SYMBOL_ANONYMOUS      = '<Anonymous>'

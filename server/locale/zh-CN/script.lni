@@ -15,3 +15,5 @@ MWS_COMPLETE          = '工作目录准备好了，你可以再试一下了...'
 
 PARSER_CRASH          = '语法解析崩溃了！遗言：{}'
 PARSER_IN_DEVELOPMENT = '语法检查还在TODO列表里...'
+
+SYMBOL_ANONYMOUS      = '<匿名函数>'

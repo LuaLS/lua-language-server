@@ -20,6 +20,8 @@
 - [ ] Type Format
 - [ ] Accurate Type Inference
 - [ ] Document Symbols
+- [ ] Search Globals
+- [ ] Find All References
 
 ### Locale
 

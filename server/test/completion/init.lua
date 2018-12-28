@@ -62,7 +62,7 @@ rawset(_G, 'TEST', true)
 function TEST(script)
     return function (expect)
         local pos = script:find('@', 1, true)
-        local new_script = script:gsub('@', '')
+        local new_script = script:gsub('@', ' ')
         local ast = parser:ast(new_script)
         local vm = matcher.vm(ast)
         assert(vm)
@@ -433,7 +433,7 @@ fff[#ff@]
         kind = CompletionItemKind.Snippet,
         textEdit = {
             start = 6,
-            finish = 8,
+            finish = 9,
             newText = 'fff+1] = ',
         },
     },

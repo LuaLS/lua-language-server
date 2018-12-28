@@ -10,7 +10,7 @@ local function posToRange(lines, start, finish)
         },
         ['end'] = {
             line = finish_row - 1,
-            character = finish_col - 1,
+            character = finish_col,
         },
     }
 end

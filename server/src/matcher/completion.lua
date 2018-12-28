@@ -444,7 +444,9 @@ end
 local function searchSpecial(vm, pos, callback)
     -- 尝试 #
     local result, source = findResult(vm, pos, 2)
-    if source and source.op == '#' and source.index then
+    if source and source.type == 'index'
+        and result.source and result.source.op == '#'
+    then
         local name = {}
         local var = result
         while true do
@@ -462,11 +464,10 @@ local function searchSpecial(vm, pos, callback)
             table.insert(name, 1, key)
         end
         local label = table.concat(name, '.') .. '+1'
-        -- TODO 把index实例化才能拿到正确的位置
         callback(label, CompletionItemKind.Snippet, {
             textEdit = {
-                start = source.start + 1,
-                finish = source.finish + 1,
+                start = result.source.start + 1,
+                finish = source.finish,
                 newText = ('%s] = '):format(label),
             }
         })

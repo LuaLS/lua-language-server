@@ -127,7 +127,7 @@ local function searchFields(name, parent, object, callback)
                 goto CONTINUE
             end
         end
-        if matchKey(name, key) then
+        if type(name) == 'string' and matchKey(name, key) then
             callback(field)
         end
         ::CONTINUE::

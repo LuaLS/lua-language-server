@@ -112,16 +112,44 @@ end
     }
 }
 
---TEST [[
---local f = function ()
---end
---]]
---{
---    [1] = {
---        name = 'f',
---        detail = 'function f()',
---        kind = SymbolKind.Function,
---        range = {11, 25},
---        selectionRange = {11, 11},
---    }
---}
+TEST [[
+f = function ()
+end
+]]
+{
+    [1] = {
+        name = 'f',
+        detail = 'function f()',
+        kind = SymbolKind.Function,
+        range = {1, 19},
+        selectionRange = {1, 1},
+    }
+}
+
+TEST [[
+local f = function ()
+end
+]]
+{
+    [1] = {
+        name = 'f',
+        detail = 'function f()',
+        kind = SymbolKind.Function,
+        range = {7, 25},
+        selectionRange = {7, 7},
+    }
+}
+
+TEST [[
+function mt:add()
+end
+]]
+{
+    [1] = {
+        name = 'mt:add',
+        detail = 'function mt:add()',
+        kind = SymbolKind.Method,
+        range = {1, 21},
+        selectionRange = {13, 15},
+    }
+}

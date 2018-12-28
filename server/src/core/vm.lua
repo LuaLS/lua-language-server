@@ -334,6 +334,10 @@ function mt:setValue(var, value, source)
         error('Cant set value list')
     end
     value = value or self:createValue('any', source)
+    if source and source.start then
+        self:addInfo(var, 'set', source)
+        self:addInfo(value, 'set', source)
+    end
     if var.value then
         if value.type == 'any' then
             self:mergeChild(var.value, value)
@@ -343,10 +347,6 @@ function mt:setValue(var, value, source)
         value = var.value
     else
         var.value = value
-    end
-    if source and source.start then
-        self:addInfo(var, 'set', source)
-        self:addInfo(value, 'set', source)
     end
     return value
 end

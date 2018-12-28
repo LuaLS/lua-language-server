@@ -32,33 +32,45 @@ local SymbolKind = {
 
 local function buildFunc(vm, func, nextFunction, nextFinish)
     local source = func.source
+    local declarat = func.declarat
     local name
-    if source.name then
-        local var = vm.results.sources[source.name]
-        if var then
-            name = hoverName(var, source.name)
+    local var
+    if declarat then
+        if declarat.type == 'function' then
+            var = vm.results.sources[declarat.name]
         else
-            name = ''
+            var = vm.results.sources[declarat]
         end
+    end
+    if var then
+        name = hoverName(var, declarat)
     else
         name = ''
     end
-    local hover = hoverFunction(name, func)
+    local hover = hoverFunction(name, func, declarat and declarat.object)
     if not hover then
         return
     end
     local selectionRange
-    if source.name then
-        selectionRange = { source.name.start, source.name.finish }
+    local range
+    local kind = SymbolKind.Function
+    if var then
+        range = { math.min(source.start, declarat.start), source.finish }
+        selectionRange = { declarat.start, declarat.finish }
+        if var.parent and var.parent.value and not var.parent.value.ENV then
+            kind = SymbolKind.Method
+        end
     else
+        range = { source.start, source.finish }
         selectionRange = { source.start, source.start }
     end
+
     return {
         name = name,
         -- 前端不支持多行
         detail = hover.label:gsub('[\r\n]', ''),
-        kind = SymbolKind.Function,
-        range = { source.start, source.finish },
+        kind = kind,
+        range = range,
         selectionRange = selectionRange,
     }
 end

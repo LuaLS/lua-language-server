@@ -30,7 +30,7 @@ local SymbolKind = {
     TypeParameter = 26,
 }
 
-local function buildFunc(vm, func, nextFunction, nextFinish)
+local function buildFunc(vm, func)
     local source = func.source
     local declarat = func.declarat
     local name
@@ -76,28 +76,9 @@ local function buildFunc(vm, func, nextFunction, nextFinish)
 end
 
 return function (vm)
-    local i = 0
-    local function nextFunction()
-        i = i + 1
-        local func = vm.results.funcs[i]
-        return func
-    end
-
-    local function nextFinish()
-        local func = vm.results.funcs[i+1]
-        if not func then
-            return 0
-        end
-        return func.source.finish
-    end
-
     local symbols = {}
-    while true do
-        local func = nextFunction()
-        if not func then
-            break
-        end
-        symbols[#symbols+1] = buildFunc(vm, func, nextFunction, nextFinish)
+    for _, func in ipairs(vm.results.funcs) do
+        symbols[#symbols+1] = buildFunc(vm, func)
     end
 
     return symbols

@@ -113,6 +113,7 @@ TEST {
     },
     hover = {
         label = 'function f(a: any, b: any)',
+        name = 'f',
     }
 }
 
@@ -133,6 +134,7 @@ TEST {
     },
     hover = {
         label = 'function (a: any, b: any)',
+        name = '',
     }
 }
 
@@ -160,6 +162,7 @@ TEST {
         ]]
     },
     hover = {
-        label = 'function mt:add(a: any, b: any)'
+        label = 'function mt:add(a: any, b: any)',
+        name = 'mt:add',
     },
 }

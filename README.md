@@ -19,6 +19,7 @@
 - [ ] Multi Workspace
 - [ ] Type Format
 - [ ] Accurate Type Inference
+- [ ] Document Symbols
 
 ### Locale
 

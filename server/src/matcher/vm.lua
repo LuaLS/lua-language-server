@@ -995,23 +995,22 @@ function mt:getSimple(simple, mode)
                 func = func,
             }
             parentName = parentName .. '(...)'
-        elseif obj.index then
-            local index = self:getIndex(obj)
-            field = self:getField(value, index, obj)
+        elseif tp == 'index' then
+            local child = obj[1]
+            local index = self:getIndex(child)
+            field = self:getField(value, index, child)
             field.parentValue = value
             value = self:getValue(field)
             if mode == 'value' or i < #simple then
-                if obj.start then
-                    self:addInfo(field, 'get', obj)
-                end
+                self:addInfo(field, 'get', obj)
             end
             field.parent = lastField
             lastField = field
             obj.object = object
             obj.parentName = parentName
-            if obj.type == 'string' then
+            if obj[1].type == 'string' then
                 parentName = ('%s[%q]'):format(parentName, index)
-            elseif obj.type == 'number' or obj.type == 'boolean' then
+            elseif obj[1].type == 'number' or obj[1].type == 'boolean' then
                 parentName = ('%s[%s]'):format(parentName, index)
             else
                 parentName = ('%s[?]'):format(parentName)

@@ -93,9 +93,13 @@ local defs = {
             return first
         end
     end,
-    Index = function (exp)
-        exp.index = true
-        return exp
+    Index = function (start, exp, finish)
+        return {
+            type = 'index',
+            start = start,
+            finish = finish - 1,
+            [1] = exp,
+        }
     end,
     Call = function (start, arg, finish)
         if arg == nil then

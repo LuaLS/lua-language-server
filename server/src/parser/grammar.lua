@@ -264,7 +264,7 @@ Suffix      <-  DOT MustName
             /   COLON MustName
             /   Sp ({} Table {}) -> Call
             /   Sp ({} String {}) -> Call
-            /   BL DirtyExp -> Index BR?
+            /   Sp ({} BL DirtyExp (BR / Sp) {}) -> Index
             /   Sp ({} PL ExpList (PR / Sp) {}) -> Call
 
 DirtyExp    <-  Exp / DirtyName

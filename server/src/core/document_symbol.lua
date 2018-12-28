@@ -1,4 +1,5 @@
-local hover = require 'core.hover'
+local hoverFunction = require 'core.hover_function'
+local hoverName = require 'core.hover_name'
 
 local SymbolKind = {
     File = 1,
@@ -31,21 +32,34 @@ local SymbolKind = {
 
 local function buildFunc(vm, func, nextFunction, nextFinish)
     local source = func.source
-    local var = vm.results.sources[source.name] or vm.results.sources[source]
-    if not var then
+    local name
+    if source.name then
+        local var = vm.results.sources[source.name]
+        if var then
+            name = hoverName(var, source.name)
+        else
+            name = ''
+        end
+    else
+        name = ''
+    end
+    local hover = hoverFunction(name, func)
+    if not hover then
         return
     end
-    local hvr = hover(var, source.name or source)
-    if not hvr then
-        return
+    local selectionRange
+    if source.name then
+        selectionRange = { source.name.start, source.name.finish }
+    else
+        selectionRange = { source.start, source.start }
     end
     return {
-        name = hvr.name,
+        name = name,
         -- 前端不支持多行
-        detail = hvr.label:gsub('[\r\n]', ''),
+        detail = hover.label:gsub('[\r\n]', ''),
         kind = SymbolKind.Function,
         range = { source.start, source.finish },
-        selectionRange = { source.name.start, source.name.finish },
+        selectionRange = selectionRange,
     }
 end
 

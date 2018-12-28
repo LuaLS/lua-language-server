@@ -1,4 +1,4 @@
-local function buildValueArgs(func, source, select)
+local function buildValueArgs(func, oo, select)
     local names = {}
     local values = {}
     if func.args then
@@ -14,7 +14,7 @@ local function buildValueArgs(func, source, select)
     local strs = {}
     local argLabel
     local start = 1
-    if source.object then
+    if oo then
         start = 2
         if select then
             select = select + 1
@@ -60,8 +60,8 @@ local function buildValueReturns(func)
     return '\n  -> ' .. table.concat(strs, ', ')
 end
 
-return function (name, func, source, select)
-    local args, argLabel = buildValueArgs(func, source, select)
+return function (name, func, oo, select)
+    local args, argLabel = buildValueArgs(func, oo, select)
     local returns = buildValueReturns(func)
     local title = ('function %s(%s)%s'):format(name, args, returns)
     return {

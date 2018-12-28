@@ -84,16 +84,44 @@ end
     }
 }
 
+TEST [[
+function f()
+end
+]]
+{
+    [1] = {
+        name = 'f',
+        detail = 'function f()',
+        kind = SymbolKind.Function,
+        range = {1, 16},
+        selectionRange = {10, 10},
+    }
+}
+
+TEST [[
+return function ()
+end
+]]
+{
+    [1] = {
+        name = '',
+        detail = 'function ()',
+        kind = SymbolKind.Function,
+        range = {8, 22},
+        selectionRange = {8, 8},
+    }
+}
+
 --TEST [[
---return function ()
+--local f = function ()
 --end
 --]]
 --{
 --    [1] = {
---        name = '',
+--        name = 'f',
 --        detail = 'function f()',
 --        kind = SymbolKind.Function,
---        range = {8, 22},
---        selectionRange = {8, 8},
+--        range = {11, 25},
+--        selectionRange = {11, 11},
 --    }
 --}

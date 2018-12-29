@@ -61,9 +61,6 @@ defs.NotReserved = function (_, _, str)
     return true, str
 end
 
-defs.first = function (first, ...)
-    return first
-end
 local eof = re.compile '!. / %{SYNTAX_ERROR}'
 
 local function grammar(tag)
@@ -94,7 +91,8 @@ Sps <-  (Comment / %nl / %s)+
 ]]
 
 grammar 'Common' [[
-Cut         <-  ![a-zA-Z0-9_]
+Word        <-  [a-zA-Z0-9_]
+Cut         <-  !Word
 X16         <-  [a-fA-F0-9]
 
 AND         <-  Sp {'and'}    Cut
@@ -133,10 +131,16 @@ EChar       <-  'a' -> ea
             /   '"'
             /   "'"
             /   %nl
-            /   ('z' (%nl / %s)*)     -> ''
-            /   ('x' {X16 X16})       -> Char16
-            /   ([0-9] [0-9]? [0-9]?) -> Char10
-            /   ('u{' {X16^+1^-6} '}')-> CharUtf8
+            /   ('z' (%nl / %s)*)       -> ''
+            /   ('x' {X16 X16})         -> Char16
+            /   ([0-9] [0-9]? [0-9]?)   -> Char10
+            /   ('u{' {} {X16*} '}')
+            ->  CharUtf8
+            -- 错误处理
+            /   'x' {}                  -> MissEscX
+            /   'u' !'{' {}             -> MissTL
+            /   'u{' X16* !'}' {}       -> MissTR
+            /   {}                      -> ErrEsc
 
 Comp        <-  Sp {CompList}
 CompList    <-  '<='
@@ -198,23 +202,41 @@ Boolean     <-  Sp ({} -> True)  TRUE
 grammar 'String' [[
 String      <-  Sp ({} StringDef {})
             ->  String
-StringDef   <-  '"' {~(Esc / !%nl !'"' .)*~} -> first (%nl / '"'?)
-            /   "'" {~(Esc / !%nl !"'" .)*~} -> first (%nl / "'"?)
-            /   '[' {:eq: '='* :} '[' {(!StringClose .)*} -> first StringClose
+StringDef   <-  '"'
+                {~(Esc / !%nl !'"' .)*~} -> 1
+                ('"' / {} -> MissQuote1)
+            /   "'"
+                {~(Esc / !%nl !"'" .)*~} -> 1
+                ("'" / {} -> MissQuote2)
+            /   ('[' {} {:eq: '='* :} {} '['
+                {(!StringClose .)*} -> 1
+                (StringClose / {}))
+            ->  LongString
 StringClose <-  ']' =eq ']'
 ]]
 
 grammar 'Number' [[
 Number      <-  Sp ({} {NumberDef} {}) -> Number
+                ErrNumber?
 NumberDef   <-  Number16 / Number10
+ErrNumber   <-  ({} {([0-9a-zA-Z] / '.')+} {})
+            ->  UnknownSymbol
 
-Number10    <-  Integer10 Float10
-Integer10   <-  '0' / [1-9] [0-9]*
-Float10     <-  ('.' [0-9]*)? ([eE] [+-]? [1-9]? [0-9]*)?
+Number10    <-  Float10 Float10Exp?
+            /   Integer10 Float10? Float10Exp?
+Integer10   <-  '0' / [1-9] [0-9]* '.'? [0-9]*
+Float10     <-  '.' [0-9]+
+Float10Exp  <-  [eE] [+-]? [1-9] [0-9]*
+            /   ({} [eE] [+-]? {}) -> MissExponent
 
-Number16    <-  Integer16 Float16
-Integer16   <-  '0' [xX] X16*
-Float16     <-  ('.' X16*)? ([pP] [+-]? [1-9]? [0-9]*)?
+Number16    <-  '0' [xX] Float16 Float16Exp?
+            /   '0' [xX] Integer16 Float16? Float16Exp?
+Integer16   <-  X16+ '.'? X16*
+            /   ({} {Word*}) -> MustX16
+Float16     <-  '.' X16+
+            /   '.' ({} {Word*}) -> MustX16
+Float16Exp  <-  [pP] [+-]? [1-9] [0-9]*
+            /   ({} [pP] [+-]? {}) -> MissExponent
 ]]
 
 grammar 'Name' [[
@@ -425,7 +447,8 @@ LocalFunction
 ]]
 
 grammar 'Lua' [[
-Lua         <-  Action* -> Lua Sp
+Lua         <-  Head? Action* -> Lua Sp
+Head        <-  '#' (!%nl .)*
 ]]
 
 return function (lua, mode, parser_)

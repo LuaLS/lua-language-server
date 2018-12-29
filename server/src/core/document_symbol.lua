@@ -75,24 +75,43 @@ local function buildFunction(vm, func)
     }
 end
 
-local function buildChunk(vm, chunk)
-    local symbol = buildFunction(vm, chunk.func)
-    local childs = {}
-    for i, child in vm.chunk:childs(chunk) do
-        childs[i] = buildChunk(vm, child)
+local function packChild(symbols, finish)
+    local t
+    while true do
+        local symbol = symbols[#symbols]
+        if not symbol then
+            break
+        end
+        if symbol.range[1] > finish then
+            break
+        end
+        symbols[#symbols] = nil
+        symbol.children = packChild(symbols, symbol.range[2])
+        if not t then
+            t = {}
+        end
+        t[#t+1] = symbol
     end
-    if #childs ~= 0 then
-        symbol.children = childs
-    end
-    return symbol
+    return t
+end
+
+local function packSymbols(symbols)
+    -- 按照start位置反向排序
+    table.sort(symbols, function (a, b)
+        return a.range[1] > b.range[1]
+    end)
+    -- 处理嵌套
+    return packChild(symbols, math.maxinteger)
 end
 
 return function (vm)
     local symbols = {}
 
-    for i, chunk in vm.chunk:childs() do
-        symbols[i] = buildChunk(vm, chunk)
+    for i, func in ipairs(vm.results.funcs) do
+        symbols[i] = buildFunction(vm, func)
     end
+
+    symbols = packSymbols(symbols)
 
     return symbols
 end

@@ -16,28 +16,13 @@ return function (root)
 
     local mt = { _env = env }
     function mt:push()
-        local current = env[#env]
-        if not current._child then
-            current._child = {}
-        end
-        local new = { _next = env[#env], _cut = {} }
-        current._child[#current._child+1] = new
-        env[#env+1] = new
+        env[#env+1] = { _next = env[#env], _cut = {} }
     end
     function mt:pop()
         env[#env] = nil
     end
     function mt:cut(key)
         env[#env]._cut[key] = true
-    end
-    function mt:childs(obj)
-        if not obj then
-            obj = env[#env]
-        end
-        if not obj._child then
-            return function () end
-        end
-        return ipairs(obj._child)
     end
     function mt:__index(key)
         local origin = env[#env]
@@ -114,7 +99,7 @@ return function (root)
                 cuted[key] = true
             end
             for key, value in pairs(o) do
-                if key == '_cut' or key == '_next' or key == '_child' then
+                if key == '_cut' or key == '_next' then
                     goto CONTINUE
                 end
                 if cuted[key] then

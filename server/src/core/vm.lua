@@ -119,7 +119,6 @@ function mt:createLocal(key, source, value)
 
     self.scope.locals[key] = loc
     self.results.locals[#self.results.locals+1] = loc
-    self.chunk.locals[#self.chunk.locals+1] = loc
 
     self:addInfo(loc, 'local', source)
     self:setValue(loc, value, source)
@@ -401,7 +400,6 @@ function mt:buildFunction(exp, object)
     self.chunk:cut 'dots'
     self.chunk:cut 'labels'
     self.chunk.func = func
-    self.chunk.locals = {}
 
     if object then
         local var = self:createArg('self', object.source, self:getValue(object))
@@ -1436,7 +1434,6 @@ function mt:createEnvironment()
     self.scope.block = { start = 0, finish = math.maxinteger }
     -- 整个文件是一个函数
     self.chunk.func = self:buildFunction()
-    self.chunk.locals = {}
     self.results.main = self.chunk.func
     -- 隐藏的上值`_ENV`
     local parent = self:createLocal('_ENV')

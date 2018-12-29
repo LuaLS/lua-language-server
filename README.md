@@ -14,12 +14,12 @@
 - [x] Auto Completion
 - [x] Intelligent
 - [x] Signature Help
+- [x] Document Symbols
 - [ ] Support Dirty Script
 - [ ] Syntax Check
 - [ ] Multi Workspace
 - [ ] Type Format
 - [ ] Accurate Type Inference
-- [ ] Document Symbols
 - [ ] Search Globals
 - [ ] Find All References
 

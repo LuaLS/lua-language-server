@@ -231,7 +231,7 @@ local y = true
                 name = 'y',
                 detail = 'local y: {}',
                 kind = SymbolKind.Variable,
-                range = {60, 60},
+                range = {60, 65},
                 selectionRange = {60, 60},
             },
         },
@@ -243,4 +243,44 @@ local y = true
         range = {77, 77},
         selectionRange = {77, 77},
     },
+}
+
+TEST [[
+local t = {
+    a = 1,
+    b = 2,
+    c = 3,
+}
+]]
+{
+    [1] = {
+        name = 't',
+        detail = EXISTS,
+        kind = SymbolKind.Variable,
+        range = {7, 46},
+        selectionRange = {7, 7},
+        children = {
+            [1] = {
+                name = 'a',
+                detail = 'field a: number = 1',
+                kind = SymbolKind.Struct,
+                range = {17, 17},
+                selectionRange = {17, 17},
+            },
+            [2] = {
+                name = 'b',
+                detail = 'field b: number = 2',
+                kind = SymbolKind.Struct,
+                range = {28, 28},
+                selectionRange = {28, 28},
+            },
+            [3] = {
+                name = 'c',
+                detail = 'field c: number = 3',
+                kind = SymbolKind.Struct,
+                range = {39, 39},
+                selectionRange = {39, 39},
+            },
+        }
+    }
 }

@@ -76,27 +76,56 @@ local function buildFunction(vm, func)
     }
 end
 
-local function buildLocal(vm, loc)
-    if loc.source.start == 0 then
+local function isLocalTable(var)
+    if not var.value or var.value.type ~= 'table' then
+        return false
+    end
+    if var.value.source.start == 0 then
+        return false
+    end
+    if var.source == var.value.declarat then
+        return true
+    end
+    return false
+end
+
+local function buildVar(vm, var)
+    if var.source.start == 0 then
         return nil
     end
-    if loc.value and loc.value.type == 'function' then
+    if var.value and var.value.type == 'function' then
         return nil
     end
-    if loc.hide then
+    if var.hide then
         return nil
     end
-    if loc.key == '_' then
+    local key = var.key
+    if key == '_' then
         return nil
     end
-    local range = { loc.source.start, loc.source.finish }
-    local hvr = hover(loc, loc.source)
+    if type(key) ~= 'string' then
+        key = ('[%s]'):format(key)
+    end
+    local range
+    if isLocalTable(var) then
+        range = { var.source.start, var.value.source.finish }
+    else
+        range = { var.source.start, var.source.finish }
+    end
+    local hvr = hover(var, var.source)
+    local kind
+    if var.source.isIndex then
+        kind = SymbolKind.Struct
+    else
+        kind = SymbolKind.Variable
+    end
     return {
-        name = loc.key,
-        detail = hvr.label,
-        kind = SymbolKind.Variable,
+        name = key,
+        -- 前端不支持多行
+        detail = hvr.label:gsub('[\r\n]', ''),
+        kind = kind,
         range = range,
-        selectionRange = range,
+        selectionRange = { var.source.start, var.source.finish },
     }
 end
 
@@ -136,7 +165,10 @@ return function (vm)
         symbols[#symbols+1] = buildFunction(vm, func)
     end
     for _, loc in ipairs(vm.results.locals) do
-        symbols[#symbols+1] = buildLocal(vm, loc)
+        symbols[#symbols+1] = buildVar(vm, loc)
+    end
+    for _, index in ipairs(vm.results.indexs) do
+        symbols[#symbols+1] = buildVar(vm, index)
     end
 
     local packedSymbols = packSymbols(symbols)

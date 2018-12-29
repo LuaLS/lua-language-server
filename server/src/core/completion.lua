@@ -291,8 +291,8 @@ local function searchAsIndex(vm, pos, result, callback)
         callback(var, CompletionItemKind.Variable)
     end)
     for _, index in ipairs(vm.results.indexs) do
-        if matchKey(result.key, index) then
-            callback(index, CompletionItemKind.Property)
+        if matchKey(result.key, index.key) then
+            callback(index.key, CompletionItemKind.Property)
         end
     end
     searchFields(result.key, vm.results.locals[1], nil, function (var)

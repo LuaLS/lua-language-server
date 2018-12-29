@@ -70,14 +70,6 @@ local function readOnly(t)
     })
 end
 
-local function insertOnce(tbl, key)
-    if tbl[key] then
-        return
-    end
-    tbl[key] = true
-    tbl[#tbl+1] = key
-end
-
 local mt = {}
 mt.__index = mt
 
@@ -209,9 +201,8 @@ function mt:buildTable(source)
                 end
             else
                 if key.type == 'name' then
-                    local index = key[1]
-                    insertOnce(self.results.indexs, index)
-                    local field = self:createField(tbl, index, key)
+                    local field = self:createField(tbl, key[1], key)
+                    self.results.indexs[#self.results.indexs+1] = field
                     key.isIndex = true
                     if value.type == 'list' then
                         self:setValue(field, value[1], key)

@@ -6,7 +6,7 @@ local function parseResult(result, source, newName)
     local tp = result.type
     if tp == 'local' or tp == 'field' then
         local key = source[1]
-        if result.disableRename then
+        if result.hide then
             return positions
         end
         if source.index then

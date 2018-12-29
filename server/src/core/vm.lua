@@ -403,7 +403,7 @@ function mt:buildFunction(exp, object)
 
     if object then
         local var = self:createArg('self', object.source, self:getValue(object))
-        var.disableRename = true
+        var.hide = true
         func.args[1] = var
     end
 
@@ -1437,6 +1437,7 @@ function mt:createEnvironment()
     self.results.main = self.chunk.func
     -- 隐藏的上值`_ENV`
     local parent = self:createLocal('_ENV')
+    parent.hide = true
     local envValue = self:setValue(parent, self:buildTable())
     -- _ENV 有个特殊标记
     envValue.ENV = true

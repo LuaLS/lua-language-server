@@ -151,15 +151,6 @@ end
         kind = SymbolKind.Field,
         range = {1, 21},
         selectionRange = {13, 15},
-        children = {
-            [1] = {
-                name = 'self',
-                detail = EXISTS,
-                kind = SymbolKind.Variable,
-                range = {10, 11},
-                selectionRange = {10, 11},
-            }
-        }
     }
 }
 

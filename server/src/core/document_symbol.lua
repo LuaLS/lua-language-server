@@ -1,5 +1,6 @@
 local hoverFunction = require 'core.hover_function'
 local hoverName = require 'core.hover_name'
+local hover = require 'core.hover'
 
 local SymbolKind = {
     File = 1,
@@ -47,8 +48,8 @@ local function buildFunction(vm, func)
     else
         name = ''
     end
-    local hover = hoverFunction(name, func, declarat and declarat.object)
-    if not hover then
+    local hvr = hoverFunction(name, func, declarat and declarat.object)
+    if not hvr then
         return
     end
     local selectionRange
@@ -68,10 +69,28 @@ local function buildFunction(vm, func)
     return {
         name = name,
         -- 前端不支持多行
-        detail = hover.label:gsub('[\r\n]', ''),
+        detail = hvr.label:gsub('[\r\n]', ''),
         kind = kind,
         range = range,
         selectionRange = selectionRange,
+    }
+end
+
+local function buildLocal(vm, loc)
+    if loc.source.start == 0 then
+        return nil
+    end
+    if loc.value and loc.value.type == 'function' then
+        return nil
+    end
+    local range = { loc.source.start, loc.source.finish }
+    local hvr = hover(loc, loc.source)
+    return {
+        name = loc.key,
+        detail = hvr.label,
+        kind = SymbolKind.Variable,
+        range = range,
+        selectionRange = range,
     }
 end
 
@@ -107,11 +126,14 @@ end
 return function (vm)
     local symbols = {}
 
-    for i, func in ipairs(vm.results.funcs) do
-        symbols[i] = buildFunction(vm, func)
+    for _, func in ipairs(vm.results.funcs) do
+        symbols[#symbols+1] = buildFunction(vm, func)
+    end
+    for _, loc in ipairs(vm.results.locals) do
+        symbols[#symbols+1] = buildLocal(vm, loc)
     end
 
-    symbols = packSymbols(symbols)
+    local packedSymbols = packSymbols(symbols)
 
-    return symbols
+    return packedSymbols
 end

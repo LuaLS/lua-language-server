@@ -263,7 +263,7 @@ local function unpackTable(result)
     return table.concat(lines, '\r\n')
 end
 
-local function getValueHover(name, valueType, result, source, lib)
+local function getValueHover(name, valueType, result, lib)
     if not lib then
         local class = findClass(result)
         if class then
@@ -355,7 +355,7 @@ return function (result, source, lsp, select)
             hover = getFunctionHover(name, result.value, source.object, select)
         end
     else
-        hover = getValueHover(name, valueType, result, source, lib)
+        hover = getValueHover(name, valueType, result, lib)
     end
     if not hover then
         return

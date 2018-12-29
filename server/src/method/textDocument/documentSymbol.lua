@@ -38,6 +38,9 @@ return function (lsp, params)
     end
 
     local symbols = core.documentSymbol(vm)
+    if not symbols then
+        return nil
+    end
 
     for _, symbol in ipairs(symbols) do
         convertRange(lines, symbol)

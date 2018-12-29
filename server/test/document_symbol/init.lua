@@ -151,6 +151,15 @@ end
         kind = SymbolKind.Field,
         range = {1, 21},
         selectionRange = {13, 15},
+        children = {
+            [1] = {
+                name = 'self',
+                detail = EXISTS,
+                kind = SymbolKind.Variable,
+                range = {10, 11},
+                selectionRange = {10, 11},
+            }
+        }
     }
 }
 
@@ -194,5 +203,53 @@ end
         kind = SymbolKind.Function,
         range = {70, 85},
         selectionRange = {79, 79},
+    },
+}
+
+TEST [[
+local x = 1
+local function f()
+    local x = 'x'
+    local y = {}
+end
+local y = true
+]]
+{
+    [1] = {
+        name = 'x',
+        detail = 'local x: number = 1',
+        kind = SymbolKind.Variable,
+        range = {7, 7},
+        selectionRange = {7, 7},
+    },
+    [2] = {
+        name = 'f',
+        detail = 'function f()',
+        kind = SymbolKind.Function,
+        range = {13, 69},
+        selectionRange = {28, 28},
+        children = {
+            [1] = {
+                name = 'x',
+                detail = 'local x: string = "x"',
+                kind = SymbolKind.Variable,
+                range = {42, 42},
+                selectionRange = {42, 42},
+            },
+            [2] = {
+                name = 'y',
+                detail = 'local y: {}',
+                kind = SymbolKind.Variable,
+                range = {60, 60},
+                selectionRange = {60, 60},
+            },
+        },
+    },
+    [3] = {
+        name = 'y',
+        detail = 'local y: boolean = true',
+        kind = SymbolKind.Variable,
+        range = {77, 77},
+        selectionRange = {77, 77},
     },
 }

@@ -44,6 +44,47 @@ local function loadFileByLanguage(name, language)
     return tbl
 end
 
+local function formatAsArray(str, ...)
+    local index = 0
+    local args = {...}
+    return str:gsub('%{(.-)%}', function (pat)
+        local id, fmt
+        local pos = pat:find(':', 1, true)
+        if pos then
+            id = pat:sub(1, pos-1)
+            fmt = pat:sub(pos+1)
+        else
+            id = pat
+            fmt = 's'
+        end
+        id = tonumber(id)
+        if not id then
+            index = index + 1
+            id = index
+        end
+        return ('%'..fmt):format(args[id])
+    end)
+end
+
+local function formatAsTable(str, ...)
+    local args = ...
+    return str:gsub('%{(.-)%}', function (pat)
+        local id, fmt
+        local pos = pat:find(':', 1, true)
+        if pos then
+            id = pat:sub(1, pos-1)
+            fmt = pat:sub(pos+1)
+        else
+            id = pat
+            fmt = 's'
+        end
+        if not id then
+            return
+        end
+        return ('%'..fmt):format(args[id])
+    end)
+end
+
 local function loadLang(name, language)
     local tbl = loadFileByLanguage(name, 'en-US')
     if language ~= 'en-US' then
@@ -59,35 +100,21 @@ local function loadLang(name, language)
         end,
         __call = function (self, key, ...)
             local str = self[key]
-            local index = 0
-            local args = {...}
-            return str:gsub('%{(.-)%}', function (pat)
-                local id, fmt
-                local pos = pat:find(':', 1, true)
-                if pos then
-                    id = pat:sub(1, pos-1)
-                    fmt = pat:sub(pos+1)
-                else
-                    id = pat
-                    fmt = 's'
-                end
-                id = tonumber(id)
-                if not id then
-                    index = index + 1
-                    id = index
-                end
-                local v = args[id]
-                local suc, res = pcall(string.format, '%'..fmt, v)
-                if suc then
-                    return res
-                else
-                    -- 这里不能使用翻译，以免死循环
-                    log.warn(('[%s][%s-%s]{%s} formated error.'):format(
-                        language, name, key, pat
-                    ))
-                    return nil
-                end
-            end)
+            local suc, res
+            if type(...) == 'table' then
+                suc, res = pcall(formatAsTable, str, ...)
+            else
+                suc, res = pcall(formatAsArray, str, ...)
+            end
+            if suc then
+                return res
+            else
+                -- 这里不能使用翻译，以免死循环
+                log.warn(('[%s][%s-%s] formated error: %s'):format(
+                    language, name, key, str
+                ))
+                return str
+            end
         end,
     })
 end

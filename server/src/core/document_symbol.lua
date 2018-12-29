@@ -50,7 +50,7 @@ local function buildFunction(vm, func)
     end
     local hvr = hoverFunction(name, func, declarat and declarat.object)
     if not hvr then
-        return
+        return nil
     end
     local selectionRange
     local range
@@ -113,6 +113,9 @@ local function buildVar(vm, var)
         range = { var.source.start, var.source.finish }
     end
     local hvr = hover(var, var.source)
+    if not hvr then
+        return nil
+    end
     local kind
     if var.source.isIndex then
         kind = SymbolKind.Class

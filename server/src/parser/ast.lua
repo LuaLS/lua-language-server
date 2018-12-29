@@ -4,6 +4,7 @@ local utf8_char = utf8.char
 
 local Errs
 local function pushError(err)
+    err.level = 'error'
     Errs[#Errs+1] = err
 end
 
@@ -72,20 +73,6 @@ local defs = {
             start  = start,
             finish = finish - 1,
             [1]    = str,
-        }
-    end,
-    DirtyName = function (pos)
-        pushError {
-            type = 'MISS_NAME',
-            start = pos,
-            finish = pos,
-            level = 'error',
-        }
-        return {
-            type   = 'name',
-            start  = pos,
-            finish = pos,
-            [1]    = ''
         }
     end,
     Simple = function (first, ...)
@@ -422,6 +409,31 @@ local defs = {
             return {}
         end
         return {...}
+    end,
+
+    -- 捕获错误
+    UnknownSymbol = function (start, symbol, finish)
+        pushError {
+            type = 'UNKNOWN_SYMBOL',
+            start = start,
+            finish = finish - 1,
+            info = {
+                symbol = symbol,
+            }
+        }
+    end,
+    DirtyName = function (pos)
+        pushError {
+            type = 'MISS_NAME',
+            start = pos,
+            finish = pos,
+        }
+        return {
+            type   = 'name',
+            start  = pos,
+            finish = pos,
+            [1]    = ''
+        }
     end,
 }
 

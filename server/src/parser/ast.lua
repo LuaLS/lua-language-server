@@ -2,6 +2,11 @@ local tonumber = tonumber
 local string_char = string.char
 local utf8_char = utf8.char
 
+local Errs
+local function pushError(err)
+    Errs[#Errs+1] = err
+end
+
 local defs = {
     Nil = function (pos)
         return {
@@ -415,12 +420,14 @@ local defs = {
 }
 
 return function (self, lua, mode)
+    Errs = {}
     local suc, res, err = pcall(self.grammar, lua, mode, defs)
     if not suc then
         return nil, res
     end
     if not res then
-        return nil, {err}
+        pushError(err)
+        return nil, Errs
     end
     return res
 end

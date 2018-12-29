@@ -1,6 +1,5 @@
 local re = require 'parser.relabel'
 local m = require 'lpeglabel'
-local calcline = require 'parser.calcline'
 
 
 local scriptBuf = ''
@@ -74,14 +73,10 @@ local function grammar(tag)
     end
 end
 
-local labels = {
-
-}
-
-local function errorpos(lua, pos, err)
+local function errorpos(pos, err)
     return {
-        lua = lua,
-        pos = pos,
+        type = 'UNKNOWN',
+        start = pos,
         err = err,
         level = 'error',
     }
@@ -431,9 +426,9 @@ Lua         <-  (Sp Action)* -> Lua Sp
 return function (lua, mode, parser_)
     parser = parser_ or {}
     local gram = compiled[mode] or compiled['Lua']
-    local r, e, pos = gram:match(lua)
+    local r, _, pos = gram:match(lua)
     if not r then
-        local err = errorpos(lua, pos, e)
+        local err = errorpos(pos)
         return nil, err
     end
 

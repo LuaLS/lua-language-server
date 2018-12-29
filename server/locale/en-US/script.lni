@@ -14,6 +14,6 @@ MWS_NOT_COMPLETE      = 'Workspace is not complete yet. You may try again later.
 MWS_COMPLETE          = 'Workspace is complete now. You may try again...'
 
 PARSER_CRASH          = 'Parser crashed! Last words:{}'
-PARSER_IN_DEVELOPMENT = 'Syntax check is still in TODO...'
+PARSER_UNKNOWN        = 'Unknown syntax error...'
 
 SYMBOL_ANONYMOUS      = '<Anonymous>'

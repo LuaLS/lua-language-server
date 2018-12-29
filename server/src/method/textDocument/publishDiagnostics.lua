@@ -79,23 +79,30 @@ end
 local function buildError(err, lines)
     local diagnostic = {
         source   = 'Lua Language Server',
-        message = lang.script.PARSER_IN_DEVELOPMENT,
+        message = lang.script('PARSER_'..err.type, err.info)
     }
     if err.level == 'error' then
         diagnostic.severity = DiagnosticSeverity.Error
     else
         diagnostic.severity = DiagnosticSeverity.Warning
     end
-    local row, col = lines:rowcol(err.pos)
-    local _, max = lines:range(row)
+    local startrow, startcol = lines:rowcol(err.start)
+    local endrow, endcol
+    if err.finish then
+        endrow, endcol = lines:rowcol(err.finish)
+    else
+        endrow = startrow
+        local _, max = lines:range(endrow)
+        endcol = max
+    end
     local range = {
         start = {
-            line = row - 1,
-            character = col - 1,
+            line = startrow - 1,
+            character = startcol - 1,
         },
         ['end'] = {
-            line = row - 1,
-            character = max,
+            line = endrow - 1,
+            character = endcol,
         },
     }
     diagnostic.range = range

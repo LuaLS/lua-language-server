@@ -115,7 +115,7 @@ local function buildVar(vm, var)
     local hvr = hover(var, var.source)
     local kind
     if var.source.isIndex then
-        kind = SymbolKind.Struct
+        kind = SymbolKind.Class
     else
         kind = SymbolKind.Variable
     end

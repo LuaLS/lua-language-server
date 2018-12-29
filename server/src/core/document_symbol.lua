@@ -129,7 +129,7 @@ local function buildVar(vm, var)
     }
 end
 
-local function packChild(symbols, finish)
+local function packChild(symbols, finish, kind)
     local t
     while true do
         local symbol = symbols[#symbols]
@@ -140,11 +140,14 @@ local function packChild(symbols, finish)
             break
         end
         symbols[#symbols] = nil
-        symbol.children = packChild(symbols, symbol.range[2])
+        symbol.children = packChild(symbols, symbol.range[2], symbol.kind)
         if not t then
             t = {}
         end
-        t[#t+1] = symbol
+        if symbol.kind == SymbolKind.Class and kind ~= SymbolKind.Variable then
+        else
+            t[#t+1] = symbol
+        end
     end
     return t
 end
@@ -155,7 +158,7 @@ local function packSymbols(symbols)
         return a.range[1] > b.range[1]
     end)
     -- 处理嵌套
-    return packChild(symbols, math.maxinteger)
+    return packChild(symbols, math.maxinteger, SymbolKind.Function)
 end
 
 return function (vm)

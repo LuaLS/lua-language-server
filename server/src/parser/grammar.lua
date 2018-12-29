@@ -269,7 +269,9 @@ ExpList     <-  (COMMA DirtyExp)+
             ->  List
 NameList    <-  (COMMA MustName)+
             ->  List
-            /   (Name (COMMA MustName)*)?
+            /   (Name (COMMA MustName)*)
+            ->  List
+            /   DirtyName
             ->  List
 
 ArgList     <-  (COMMA AfterArg)+

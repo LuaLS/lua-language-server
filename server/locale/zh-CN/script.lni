@@ -15,5 +15,6 @@ MWS_COMPLETE          = '工作目录准备好了，你可以再试一下了...'
 
 PARSER_CRASH          = '语法解析崩溃了！遗言：{}'
 PARSER_UNKNOWN        = '未知语法错误...'
+PARSER_MISS_NAME      = '需要一个名字'
 
 SYMBOL_ANONYMOUS      = '<匿名函数>'

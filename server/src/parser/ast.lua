@@ -75,6 +75,12 @@ local defs = {
         }
     end,
     DirtyName = function (pos)
+        pushError {
+            type = 'MISS_NAME',
+            start = pos,
+            finish = pos,
+            level = 'error',
+        }
         return {
             type   = 'name',
             start  = pos,
@@ -429,5 +435,5 @@ return function (self, lua, mode)
         pushError(err)
         return nil, Errs
     end
-    return res
+    return res, Errs
 end

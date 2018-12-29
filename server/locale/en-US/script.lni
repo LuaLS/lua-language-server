@@ -15,5 +15,6 @@ MWS_COMPLETE          = 'Workspace is complete now. You may try again...'
 
 PARSER_CRASH          = 'Parser crashed! Last words:{}'
 PARSER_UNKNOWN        = 'Unknown syntax error...'
+PARSER_MISS_NAME      = '<name> expected'
 
 SYMBOL_ANONYMOUS      = '<Anonymous>'

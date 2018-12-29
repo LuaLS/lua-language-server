@@ -86,6 +86,9 @@ local function buildLocal(vm, loc)
     if loc.hide then
         return nil
     end
+    if loc.key == '_' then
+        return nil
+    end
     local range = { loc.source.start, loc.source.finish }
     local hvr = hover(loc, loc.source)
     return {

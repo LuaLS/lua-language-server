@@ -326,14 +326,13 @@ TableFields <-  TableField
                 (TableAfterF)+
                 LastTableSep?
 TableAfterF <-  TableSep !TR TableField
-            /   DirtyInTable
+            /   Sp ({} {(!TR !COMMA !SEMICOLON !Word !BL .)+})
+            ->  UnknownSymbol
 TableSep    <-  COMMA / SEMICOLON
             /   {}
             ->  MissTableSep
 LastTableSep<-  COMMA / SEMICOLON
-TableField  <-  DirtyInTable? (NewIndex / NewField / Exp)
-DirtyInTable<-  Sp ({} {(!TR !COMMA !SEMICOLON !Word !BL !PL !TL !DOTS .)+})
-            ->  UnknownSymbol
+TableField  <-  NewIndex / NewField / Exp
 NewIndex    <-  (BL DirtyExp DirtyBR DirtyAssign DirtyExp)
             ->  NewIndex
 NewField    <-  (MustName ASSIGN DirtyExp)

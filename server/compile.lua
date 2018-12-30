@@ -17,8 +17,16 @@ end
 local function copyFile()
     local source = root / 'bee.lua' / 'bin' / 'msvc_x86_Release'
     local target = root / 'bin'
-    for _, name in ipairs {'bee.dll', 'lua.exe', 'lua54.dll'} do
-        fs.copy_file(source / name, target / name, true)
+    for _, name in ipairs {
+        'bee.dll',
+        {'lua.exe', 'lua-language-server.exe'},
+        'lua54.dll',
+    } do
+        if type(name) == 'string' then
+            fs.copy_file(source / name, target / name, true)
+        else
+            fs.copy_file(source / name[1], target / name[2], true)
+        end
     end
 end
 

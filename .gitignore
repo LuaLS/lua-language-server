@@ -1,5 +1,6 @@
 node_modules
-client/server
+/client/server
 .vscode-test
 /server/log
 /publish
+!*.exe

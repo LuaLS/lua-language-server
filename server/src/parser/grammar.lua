@@ -54,6 +54,7 @@ defs.en = '\n'
 defs.er = '\r'
 defs.et = '\t'
 defs.ev = '\v'
+defs['nil'] = m.Cp() / function () return nil end
 defs.NotReserved = function (_, _, str)
     if RESERVED[str] then
         return false
@@ -94,6 +95,7 @@ grammar 'Common' [[
 Word        <-  [a-zA-Z0-9_]
 Cut         <-  !Word
 X16         <-  [a-fA-F0-9]
+Rest        <-  (!%nl .)*
 
 AND         <-  Sp {'and'}    Cut
 BREAK       <-  Sp 'break'    Cut
@@ -134,12 +136,11 @@ EChar       <-  'a' -> ea
             /   ('z' (%nl / %s)*)       -> ''
             /   ('x' {X16 X16})         -> Char16
             /   ([0-9] [0-9]? [0-9]?)   -> Char10
-            /   ('u{' {} {X16*} '}')
-            ->  CharUtf8
+            /   ('u{' {} {Word*} '}')   -> CharUtf8
             -- 错误处理
             /   'x' {}                  -> MissEscX
             /   'u' !'{' {}             -> MissTL
-            /   'u{' X16* !'}' {}       -> MissTR
+            /   'u{' Word* !'}' {}      -> MissTR
             /   {}                      -> ErrEsc
 
 Comp        <-  Sp {CompList}
@@ -188,6 +189,11 @@ ASSIGN      <-  Sp '='
 Nothing     <-  {} -> Nothing
 
 TOCLOSE     <-  Sp '*toclose'
+
+DirtyAssign <-  ASSIGN / {} -> MissAssign
+DirtyBR     <-  BR / {} -> MissBR
+DirtyTR     <-  TR / {} -> MissTR
+DirtyPR     <-  TR / {} -> MissPR
 ]]
 
 grammar 'Nil' [[
@@ -219,7 +225,7 @@ grammar 'Number' [[
 Number      <-  Sp ({} {NumberDef} {}) -> Number
                 ErrNumber?
 NumberDef   <-  Number16 / Number10
-ErrNumber   <-  ({} {([0-9a-zA-Z] / '.')+} {})
+ErrNumber   <-  ({} {([0-9a-zA-Z] / '.')+})
             ->  UnknownSymbol
 
 Number10    <-  Float10 Float10Exp?
@@ -249,7 +255,7 @@ DirtyName   <-  {} -> DirtyName
 ]]
 
 grammar 'Exp' [[
-Exp         <-  ExpOr
+Exp         <-  Sp ExpOr
 ExpOr       <-  (ExpAnd     (OR     ExpAnd)*)     -> Binary
 ExpAnd      <-  (ExpCompare (AND    ExpCompare)*) -> Binary
 ExpCompare  <-  (ExpBor     (Comp   ExpBor)*)     -> Binary
@@ -284,7 +290,8 @@ Suffix      <-  DOT MustName
             /   Sp ({} BL DirtyExp (BR / Sp) {}) -> Index
             /   Sp ({} PL ExpList (PR / Sp) {}) -> Call
 
-DirtyExp    <-  Exp / DirtyName
+DirtyExp    <-  Exp
+            /   {} -> DirtyExp
 ExpList     <-  (COMMA DirtyExp)+
             ->  List
             /   (Exp (COMMA DirtyExp)*)?
@@ -306,14 +313,28 @@ AfterArg    <-  DOTS
             /   MustName
 
 
-Table       <-  Sp ({} TL TableFields TR? {})
+Table       <-  ({} TL TR {})
             ->  Table
-TableFields <-  TableSep (TableSep? TableField)+ TableSep?
-            /   (TableField (TableSep? TableField)* TableSep?)?
-            ->  TableFields
+            /   ({} TL TableFields DirtyTR {})
+            ->  Table
+            /   ({} TL DirtyTR {})
+            ->  Table
+TableFields <-  TableField
+                (TableAfterF)*
+                LastTableSep?
+            /   DirtyExp
+                (TableAfterF)+
+                LastTableSep?
+TableAfterF <-  TableSep !TR TableField
+            /   DirtyInTable
 TableSep    <-  COMMA / SEMICOLON
-TableField  <-  NewIndex / NewField / Exp
-NewIndex    <-  (BL DirtyExp BR ASSIGN DirtyExp)
+            /   {}
+            ->  MissTableSep
+LastTableSep<-  COMMA / SEMICOLON
+TableField  <-  DirtyInTable? (NewIndex / NewField / Exp)
+DirtyInTable<-  Sp ({} {(!TR !COMMA !SEMICOLON !Word !BL !PL !TL !DOTS .)+})
+            ->  UnknownSymbol
+NewIndex    <-  (BL DirtyExp DirtyBR DirtyAssign DirtyExp)
             ->  NewIndex
 NewField    <-  (MustName ASSIGN DirtyExp)
             ->  NewField
@@ -356,7 +377,7 @@ CrtAction   <-  SEMICOLON
             /   Set
             /   Call
             /   Exp
-UnkAction   <-  ({} {. (!Sps !CrtAction .)*} {})
+UnkAction   <-  ({} {. (!Sps !CrtAction .)*})
             ->  UnknownSymbol
 
 SimpleList  <-  (Simple (COMMA Simple)*)

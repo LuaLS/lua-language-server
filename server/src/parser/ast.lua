@@ -4,7 +4,13 @@ local utf8_char = utf8.char
 
 local Errs
 local function pushError(err)
-    err.level = 'error'
+    local last = Errs[#Errs]
+    if last then
+        if last.start <= err.start and last.finish >= err.finish then
+            return
+        end
+    end
+    err.level = err.level or 'error'
     Errs[#Errs+1] = err
 end
 
@@ -83,6 +89,15 @@ local defs = {
         end
         local v = tonumber(char, 16)
         if not v then
+            for i = 1, #char do
+                if not tonumber(char:sub(i, i), 16) then
+                    pushError {
+                        type = 'MUST_X16',
+                        start = pos + i - 1,
+                        finish = pos + i - 1,
+                    }
+                end
+            end
             return ''
         end
         if v < 0 or v > 0x10ffff then
@@ -238,28 +253,17 @@ local defs = {
         obj[max]   = nil
         return obj
     end,
-    Table = function (start, table, finish)
-        if table then
-            table.start  = start
-            table.finish = finish - 1
-        else
-            table = {
-                type   = 'table',
-                start  = start,
-                finish = finish - 1,
-            }
-        end
+    Table = function (start, ...)
+        local table = {
+            type   = 'table',
+            start  = start,
+            ...,
+        }
+        local max = #table
+        local finish = table[max]
+        table.finish = finish - 1
+        table[max] = nil
         return table
-    end,
-    TableFields = function (...)
-        if ... == '' then
-            return nil
-        else
-            return {
-                type = 'table',
-                ...,
-            }
-        end
     end,
     NewField = function (key, value)
         return {
@@ -452,11 +456,11 @@ local defs = {
     end,
 
     -- 捕获错误
-    UnknownSymbol = function (start, symbol, finish)
+    UnknownSymbol = function (start, symbol)
         pushError {
             type = 'UNKNOWN_SYMBOL',
             start = start,
-            finish = finish - 1,
+            finish = start + #symbol - 1,
             info = {
                 symbol = symbol,
             }
@@ -465,6 +469,19 @@ local defs = {
     DirtyName = function (pos)
         pushError {
             type = 'MISS_NAME',
+            start = pos,
+            finish = pos,
+        }
+        return {
+            type   = 'name',
+            start  = pos,
+            finish = pos,
+            [1]    = ''
+        }
+    end,
+    DirtyExp = function (pos)
+        pushError {
+            type = 'MISS_EXP',
             start = pos,
             finish = pos,
         }
@@ -529,6 +546,26 @@ local defs = {
             }
         }
     end,
+    MissBR = function (pos)
+        pushError {
+            type = 'MISS_SYMBOL',
+            start = pos,
+            finish = pos,
+            info = {
+                symbol = ']',
+            }
+        }
+    end,
+    MissPR = function (pos)
+        pushError {
+            type = 'MISS_SYMBOL',
+            start = pos,
+            finish = pos,
+            info = {
+                symbol = ')',
+            }
+        }
+    end,
     ErrEsc = function (pos)
         pushError {
             type = 'ERR_ESC',
@@ -541,6 +578,26 @@ local defs = {
             type = 'MUST_X16',
             start = pos,
             finish = math.max(pos + #str - 1, pos),
+        }
+    end,
+    MissAssign = function (pos)
+        pushError {
+            type = 'MISS_SYMBOL',
+            start = pos,
+            finish = pos,
+            info = {
+                symbol = '=',
+            }
+        }
+    end,
+    MissTableSep = function (pos)
+        pushError {
+            type = 'MISS_SYMBOL',
+            start = pos,
+            finish = pos,
+            info = {
+                symbol = ','
+            }
         }
     end,
 }

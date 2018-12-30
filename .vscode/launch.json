@@ -12,7 +12,7 @@
 			"env": {
 				"PATH": "${workspaceRoot}\\server\\bin\\"
 			},
-			"luaexe": "${workspaceRoot}\\server\\bin\\lua.exe",
+			"luaexe": "${workspaceRoot}\\server\\bin\\lua-language-server.exe",
 			"luadll": "${workspaceRoot}\\server\\bin\\lua54.dll",
 			"path": "${workspaceRoot}/server/bin/?.lua",
 			"cpath": "${workspaceRoot}/server/bin/?.dll;",
@@ -54,7 +54,7 @@
 			"stopOnEntry": false,
 			"program": "${workspaceRoot}/server/publish.lua",
 			"cwd": "${workspaceRoot}/server",
-			"luaexe": "${workspaceRoot}\\server\\bin\\lua.exe",
+			"luaexe": "${workspaceRoot}\\server\\bin\\lua-language-server.exe",
 			"luadll": "${workspaceRoot}\\server\\bin\\lua54.dll",
 			"path": "${workspaceRoot}/server/bin/?.lua",
 			"cpath": "${workspaceRoot}/server/bin/?.dll;",

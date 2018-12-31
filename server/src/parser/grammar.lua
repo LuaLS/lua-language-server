@@ -313,25 +313,12 @@ AfterArg    <-  DOTS
             /   MustName
 
 
-Table       <-  ({} TL TR {})
+Table       <-  Sp ({} TL TableFields DirtyTR {})
             ->  Table
-            /   ({} TL TableFields DirtyTR {})
-            ->  Table
-            /   ({} TL DirtyTR {})
-            ->  Table
-TableFields <-  TableField
-                (TableAfterF)*
-                LastTableSep?
-            /   DirtyExp
-                (TableAfterF)+
-                LastTableSep?
-TableAfterF <-  TableSep !TR TableField
-            /   Sp ({} {(!TR !COMMA !SEMICOLON !Word !BL .)+})
+TableFields <-  (TableSep {} / TableField / DirtyField)*
+DirtyField  <-  Sp ({} {(!TR !COMMA !SEMICOLON !Word !BL .)+})
             ->  UnknownSymbol
 TableSep    <-  COMMA / SEMICOLON
-            /   {}
-            ->  MissTableSep
-LastTableSep<-  COMMA / SEMICOLON
 TableField  <-  NewIndex / NewField / Exp
 NewIndex    <-  (BL DirtyExp DirtyBR DirtyAssign DirtyExp)
             ->  NewIndex

@@ -258,20 +258,51 @@ local defs = {
         return obj
     end,
     Table = function (start, ...)
+        local args = {...}
+        local max = #args
+        local finish = args[max] - 1
         local table = {
             type   = 'table',
             start  = start,
-            ...,
+            finish = finish
         }
-        local max = #table
-        local finish = table[max]
-        table.finish = finish - 1
-        table[max] = nil
+        start = start + 1
+        local wantField = true
+        for i = 1, max-1 do
+            local arg = args[i]
+            local isField = type(arg) == 'table'
+            if wantField and not isField then
+                pushError {
+                    type = 'MISS_EXP',
+                    start = start,
+                    finish = arg - 1,
+                }
+            elseif not wantField and isField then
+                pushError {
+                    type = 'MISS_SYMBOL',
+                    start = start,
+                    finish = arg.start-1,
+                    info = {
+                        symbol = ',',
+                    }
+                }
+            end
+            if isField then
+                table[#table+1] = arg
+                wantField = false
+                start = arg.finish + 1
+            else
+                wantField = true
+                start = arg
+            end
+        end
         return table
     end,
     NewField = function (key, value)
         return {
             type = 'pair',
+            start = key.start,
+            finish = value.finish,
             key, value,
         }
     end,
@@ -279,6 +310,8 @@ local defs = {
         key.index = true
         return {
             type = 'pair',
+            start = key.start,
+            finish = value.finish,
             key, value,
         }
     end,

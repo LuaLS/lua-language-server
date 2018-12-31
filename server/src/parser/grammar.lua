@@ -61,6 +61,7 @@ defs.NotReserved = function (_, _, str)
     end
     return true, str
 end
+defs.np = m.Cp() / function (n) return n+1 end
 
 local eof = re.compile '!. / %{SYNTAX_ERROR}'
 
@@ -192,9 +193,9 @@ Nothing     <-  {} -> Nothing
 TOCLOSE     <-  Sp '*toclose'
 
 DirtyAssign <-  ASSIGN / {} -> MissAssign
-DirtyBR     <-  BR / {} -> MissBR
-DirtyTR     <-  TR / {} -> MissTR
-DirtyPR     <-  PR / {} -> MissPR
+DirtyBR     <-  BR {} / {} -> MissBR
+DirtyTR     <-  TR {} / {} -> MissTR
+DirtyPR     <-  PR {} / {} -> MissPR
 ]]
 
 grammar 'Nil' [[
@@ -289,7 +290,7 @@ Suffix      <-  DOT MustName
             /   Sp ({} Table {}) -> Call
             /   Sp ({} String {}) -> Call
             /   Sp ({} BL DirtyExp (BR / Sp) {}) -> Index
-            /   Sp ({} PL CallArgList DirtyPR {}) -> Call
+            /   Sp ({} PL CallArgList DirtyPR) -> Call
 
 DirtyExp    <-  Exp
             /   {} -> DirtyExp
@@ -319,14 +320,14 @@ AfterArg    <-  DOTS
             /   MustName
 
 
-Table       <-  Sp ({} TL TableFields? DirtyTR {})
+Table       <-  Sp ({} TL TableFields? DirtyTR)
             ->  Table
 TableFields <-  (TableSep {} / TableField / DirtyField)+
 DirtyField  <-  Sp ({} {(!TR !BL !COMMA !SEMICOLON !Word .)+})
             ->  UnknownSymbol
 TableSep    <-  COMMA / SEMICOLON
 TableField  <-  NewIndex / NewField / Exp
-NewIndex    <-  (BL DirtyExp DirtyBR DirtyAssign DirtyExp)
+NewIndex    <-  Sp ({} BL DirtyExp DirtyBR DirtyAssign DirtyExp)
             ->  NewIndex
 NewField    <-  (MustName ASSIGN DirtyExp)
             ->  NewField

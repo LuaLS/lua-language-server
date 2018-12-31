@@ -306,7 +306,7 @@ local defs = {
             key, value,
         }
     end,
-    NewIndex = function (key, value)
+    NewIndex = function (start, key, finish, value)
         key.index = true
         return {
             type = 'pair',
@@ -639,6 +639,7 @@ local defs = {
                 symbol = '}',
             }
         }
+        return pos + 1
     end,
     MissBR = function (pos)
         pushError {
@@ -649,6 +650,7 @@ local defs = {
                 symbol = ']',
             }
         }
+        return pos + 1
     end,
     MissPR = function (pos)
         pushError {
@@ -659,6 +661,7 @@ local defs = {
                 symbol = ')',
             }
         }
+        return pos + 1
     end,
     ErrEsc = function (pos)
         pushError {

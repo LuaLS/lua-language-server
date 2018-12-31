@@ -5,7 +5,7 @@ rawset(_G, 'TEST', true)
 
 function TEST(script)
     return function (expect)
-        local pos = script:find('@', 1, true) + 1
+        local pos = script:find('@', 1, true)
         local new_script = script:gsub('@', '')
         local ast = parser:ast(new_script)
         local vm = core.vm(ast)

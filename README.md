@@ -15,7 +15,7 @@
 - [x] Intelligent
 - [x] Signature Help
 - [x] Document Symbols
-- [ ] Support Dirty Script
+- [x] Support Dirty Script
 - [ ] Syntax Check
 - [ ] Multi Workspace
 - [ ] Type Format

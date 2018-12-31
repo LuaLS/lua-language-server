@@ -75,6 +75,7 @@ local function errorpos(pos, err)
     return {
         type = 'UNKNOWN',
         start = pos,
+        finish = pos,
         err = err,
     }
 end
@@ -193,7 +194,7 @@ TOCLOSE     <-  Sp '*toclose'
 DirtyAssign <-  ASSIGN / {} -> MissAssign
 DirtyBR     <-  BR / {} -> MissBR
 DirtyTR     <-  TR / {} -> MissTR
-DirtyPR     <-  TR / {} -> MissPR
+DirtyPR     <-  PR / {} -> MissPR
 ]]
 
 grammar 'Nil' [[
@@ -288,14 +289,13 @@ Suffix      <-  DOT MustName
             /   Sp ({} Table {}) -> Call
             /   Sp ({} String {}) -> Call
             /   Sp ({} BL DirtyExp (BR / Sp) {}) -> Index
-            /   Sp ({} PL ExpList (PR / Sp) {}) -> Call
+            /   Sp ({} PL ExpList DirtyPR {}) -> Call
 
 DirtyExp    <-  Exp
             /   {} -> DirtyExp
-ExpList     <-  (COMMA DirtyExp)+
-            ->  List
-            /   (Exp (COMMA DirtyExp)*)?
-            ->  List
+ExpList     <-  Sp ({} (!%nl (COMMA {} / Exp))+ {})
+            ->  ExpList
+            /   %nil
 NameList    <-  (COMMA MustName)+
             ->  List
             /   (Name (COMMA MustName)*)

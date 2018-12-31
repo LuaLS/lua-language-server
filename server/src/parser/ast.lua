@@ -1,9 +1,13 @@
 local tonumber = tonumber
 local string_char = string.char
 local utf8_char = utf8.char
+local type = type
 
 local Errs
 local function pushError(err)
+    if err.finish < err.start then
+        err.finish = err.start
+    end
     local last = Errs[#Errs]
     if last then
         if last.start <= err.start and last.finish >= err.finish then
@@ -288,6 +292,59 @@ local defs = {
             return nil
         else
             return first
+        end
+    end,
+    ExpList = function (start, ...)
+        local args = {...}
+        local max = #args
+        local finish = args[max] - 1
+        local exps = {
+            type = 'list',
+            start = start,
+            finish = finish,
+        }
+        local wantExp = true
+        for i = 1, max-1 do
+            local arg = args[i]
+            local isExp = type(arg) == 'table'
+            if wantExp and not isExp then
+                pushError {
+                    type = 'MISS_EXP',
+                    start = start,
+                    finish = arg - 1,
+                }
+            elseif not wantExp and isExp then
+                pushError {
+                    type = 'MISS_SYMBOL',
+                    start = start,
+                    finish = arg.start-1,
+                    info = {
+                        symbol = ',',
+                    }
+                }
+            end
+            if isExp then
+                exps[#exps+1] = arg
+                wantExp = false
+                start = arg.finish + 1
+            else
+                wantExp = true
+                start = arg
+            end
+        end
+        if wantExp then
+            pushError {
+                type = 'MISS_EXP',
+                start = start,
+                finish = finish,
+            }
+        end
+        if #exps == 0 then
+            return nil
+        elseif #exps == 1 then
+            return exps[1]
+        else
+            return exps
         end
     end,
     Nothing = function ()
@@ -577,7 +634,7 @@ local defs = {
         pushError {
             type = 'MUST_X16',
             start = pos,
-            finish = math.max(pos + #str - 1, pos),
+            finish = pos + #str - 1,
         }
     end,
     MissAssign = function (pos)

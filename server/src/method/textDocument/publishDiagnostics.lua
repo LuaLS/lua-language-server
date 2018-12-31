@@ -87,11 +87,8 @@ local function buildError(err, lines)
         diagnostic.severity = DiagnosticSeverity.Warning
     end
     local startrow, startcol = lines:rowcol(err.start)
-    local endrow, endcol
-    if err.finish then
-        endrow, endcol = lines:rowcol(err.finish)
-    else
-        endrow = startrow
+    local endrow, endcol = lines:rowcol(err.finish)
+    if err.type == 'UNKNOWN' then
         local _, max = lines:range(endrow)
         endcol = max
     end

@@ -289,13 +289,19 @@ Suffix      <-  DOT MustName
             /   Sp ({} Table {}) -> Call
             /   Sp ({} String {}) -> Call
             /   Sp ({} BL DirtyExp (BR / Sp) {}) -> Index
-            /   Sp ({} PL ExpList DirtyPR {}) -> Call
+            /   Sp ({} PL CallArgList DirtyPR {}) -> Call
 
 DirtyExp    <-  Exp
             /   {} -> DirtyExp
-ExpList     <-  Sp ({} (!%nl (COMMA {} / Exp))+ {})
-            ->  ExpList
+ExpList     <-  (COMMA Exp)+
+            ->  List
+            /   (Exp (COMMA Exp)*)
+            ->  List
+CallArgList <-  Sp ({} (COMMA {} / Exp / DirtyCallArg)+ {})
+            ->  CallArgList
             /   %nil
+DirtyCallArg<-  Sp ({} {(!PR !PL !COMMA !Word .)+})
+            ->  UnknownSymbol
 NameList    <-  (COMMA MustName)+
             ->  List
             /   (Name (COMMA MustName)*)
@@ -313,10 +319,10 @@ AfterArg    <-  DOTS
             /   MustName
 
 
-Table       <-  Sp ({} TL TableFields DirtyTR {})
+Table       <-  Sp ({} TL TableFields? DirtyTR {})
             ->  Table
-TableFields <-  (TableSep {} / TableField / DirtyField)*
-DirtyField  <-  Sp ({} {(!TR !COMMA !SEMICOLON !Word !BL .)+})
+TableFields <-  (TableSep {} / TableField / DirtyField)+
+DirtyField  <-  Sp ({} {(!TR !BL !COMMA !SEMICOLON !Word .)+})
             ->  UnknownSymbol
 TableSep    <-  COMMA / SEMICOLON
 TableField  <-  NewIndex / NewField / Exp
@@ -343,6 +349,7 @@ FuncSuffix  <-  DOT MustName
 
 -- 纯占位，修改了 `relabel.lua` 使重复定义不抛错
 Action      <-  !END .
+Set         <-  END
 ]]
 
 grammar 'Action' [[
@@ -443,7 +450,7 @@ RepeatBody  <-  REPEAT
 
 Local       <-  (LOCAL TOCLOSE? NameList (ASSIGN ExpList)?)
             ->  Local
-Set         <-  (SimpleList ASSIGN ExpList)
+Set         <-  (SimpleList ASSIGN ExpList?)
             ->  Set
 
 Call        <-  Simple

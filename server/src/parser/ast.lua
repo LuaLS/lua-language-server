@@ -317,17 +317,21 @@ local defs = {
     end,
     List = function (first, second, ...)
         if second then
-            return {
+            local list = {
                 type = 'list',
+                start = first.start,
                 first, second, ...
             }
+            local last = list[#list]
+            list.finish = last.finish
+            return list
         elseif first == '' then
             return nil
         else
             return first
         end
     end,
-    ExpList = function (start, ...)
+    CallArgList = function (start, ...)
         local args = {...}
         local max = #args
         local finish = args[max] - 1

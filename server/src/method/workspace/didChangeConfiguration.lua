@@ -11,5 +11,6 @@ return function (lsp)
         },
     }, function (configs)
         config:setConfig(configs[1])
+        lsp:reCompile()
     end)
 end

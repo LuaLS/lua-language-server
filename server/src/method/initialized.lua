@@ -21,7 +21,8 @@ return function (lsp)
             },
         },
     }, function (configs)
-        confgi:setConfig(configs[1])
+        config:setConfig(configs[1])
+        lsp:reCompile()
     end)
     -- 必须动态注册的事件：
     rpc:request('client/registerCapability', {

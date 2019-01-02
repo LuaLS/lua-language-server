@@ -14,7 +14,7 @@ local function Str2Hash(sep)
         for s in v:gmatch('[^'..sep..']+') do
             t[s] = true
         end
-        return t
+        return true, t
     end
 end
 
@@ -41,12 +41,12 @@ local function init()
     end
 end
 
-local function setConfig(config)
+local function setConfig(self, config)
     pcall(function ()
         for c, t in pairs(config) do
             for k, v in pairs(t) do
-                local f = Template[c][k]
-                local suc, v = f(v)
+                local info = Template[c][k]
+                local suc, v = info[2](v)
                 if suc then
                     Config[c][k] = v
                 end

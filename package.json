@@ -33,19 +33,19 @@
 			"type": "object",
 			"title": "Lua",
 			"properties": {
-				"LuaLanguageServer.diagnostics.postSpcae": {
+				"Lua.diagnostics.postSpcae": {
 					"scope": "resource",
 					"type": "boolean",
 					"default": true,
 					"description": "Check post spaces.\n检查后置空格。"
 				},
-				"LuaLanguageServer.diagnostics.spaceOnlyLine": {
+				"Lua.diagnostics.spaceOnlyLine": {
 					"scope": "resource",
 					"type": "boolean",
 					"default": true,
 					"description": "Check space-only lines.\n检查只有空格的行。"
 				},
-				"LuaLanguageServer.diagnostics.globals": {
+				"Lua.diagnostics.globals": {
 					"scope": "resource",
 					"type": "array",
 					"items": {

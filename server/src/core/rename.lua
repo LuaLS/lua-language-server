@@ -35,8 +35,6 @@ local function parseResult(result, source, newName)
         for _, info in ipairs(label) do
             positions[#positions+1] = {info.source.start, info.source.finish}
         end
-    else
-        error('Unknow result type:' .. result.type)
     end
     return positions
 end

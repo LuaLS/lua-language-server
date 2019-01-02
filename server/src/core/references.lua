@@ -21,9 +21,6 @@ local function parseResult(result, declarat)
                 positions[#positions+1] = {info.source.start, info.source.finish}
             end
         end
-    elseif tp == 'string' then
-    else
-        error('Unknow result type:' .. result.type)
     end
     return positions
 end

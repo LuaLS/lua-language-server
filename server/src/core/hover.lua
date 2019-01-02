@@ -271,6 +271,10 @@ local function getValueHover(name, valueType, result, lib)
         end
     end
 
+    if type(valueType) == 'table' then
+        valueType = valueType[1]
+    end
+
     if not OriginTypes[valueType] then
         valueType = '*' .. valueType
     end

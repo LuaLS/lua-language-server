@@ -86,7 +86,7 @@ end
 TEST {
     {
         path = 'a.lua',
-        content = '',
+        content = 'return function () end',
     },
     {
         path = 'b.lua',

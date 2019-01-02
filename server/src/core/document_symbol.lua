@@ -93,7 +93,7 @@ local function buildVar(vm, var)
     if var.source.start == 0 then
         return nil
     end
-    if var.value and var.value.type == 'function' then
+    if var.value and var.value.type == 'function' and var.value.uri == vm.uri then
         return nil
     end
     if var.hide then

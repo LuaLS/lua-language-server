@@ -20,6 +20,7 @@ init 'textDocument/publishDiagnostics'
 init 'textDocument/rename'
 init 'textDocument/references'
 init 'textDocument/signatureHelp'
+init 'workspace/didChangeConfiguration'
 init 'workspace/didChangeWatchedFiles'
 init 'workspace/didChangeWorkspaceFolders'
 

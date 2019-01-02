@@ -1,4 +1,5 @@
 local lang = require 'language'
+local config = require 'config'
 
 local DiagnosticSeverity = {
     Error       = 1,
@@ -38,6 +39,9 @@ local function searchUndefinedGlobal(results, callback)
             goto NEXT_VAR
         end
         if type(index) ~= 'string' then
+            goto NEXT_VAR
+        end
+        if config.config.diagnostics.globals[index] then
             goto NEXT_VAR
         end
         local lIndex = index:lower()
@@ -97,25 +101,30 @@ local function searchSpaces(vm, lines, callback)
     for i = 1, #lines do
         local line = lines:line(i)
 
-        if line:find '^[ \t]+$' then
-            local start, finish = lines:range(i)
-            if isInString(vm, start, finish) then
+        if config.config.diagnostics.spaceOnlyLine then
+            if line:find '^[ \t]+$' then
+                local start, finish = lines:range(i)
+                if isInString(vm, start, finish) then
+                    goto NEXT_LINE
+                end
+                callback(start, finish, lang.script.DIAG_LINE_ONLY_SPACE)
                 goto NEXT_LINE
             end
-            callback(start, finish, lang.script.DIAG_LINE_ONLY_SPACE)
-            goto NEXT_LINE
         end
 
-        local pos = line:find '[ \t]+$'
-        if pos then
-            local start, finish = lines:range(i)
-            start = start + pos - 1
-            if isInString(vm, start, finish) then
+        if config.config.diagnostics.postSpcae then
+            local pos = line:find '[ \t]+$'
+            if pos then
+                local start, finish = lines:range(i)
+                start = start + pos - 1
+                if isInString(vm, start, finish) then
+                    goto NEXT_LINE
+                end
+                callback(start, finish, lang.script.DIAG_LINE_POST_SPACE)
                 goto NEXT_LINE
             end
-            callback(start, finish, lang.script.DIAG_LINE_POST_SPACE)
-            goto NEXT_LINE
         end
+
         ::NEXT_LINE::
     end
 end

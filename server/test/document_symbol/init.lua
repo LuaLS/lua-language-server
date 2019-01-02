@@ -284,3 +284,38 @@ local t = {
         }
     }
 }
+
+TEST [[
+local t = {
+    a = {
+        b = 1,
+    }
+}
+]]
+{
+    [1] = {
+        name = 't',
+        detail = EXISTS,
+        kind = SymbolKind.Variable,
+        range = {7, 44},
+        selectionRange = {7, 7},
+        children = {
+            [1] = {
+                name = 'a',
+                detail = EXISTS,
+                kind = SymbolKind.Class,
+                range = {17, 42},
+                selectionRange = {17, 17},
+                children = {
+                    [1] = {
+                        name = 'b',
+                        detail = EXISTS,
+                        kind = SymbolKind.Class,
+                        range = {31, 31},
+                        selectionRange = {31, 31},
+                    }
+                }
+            },
+        }
+    }
+}

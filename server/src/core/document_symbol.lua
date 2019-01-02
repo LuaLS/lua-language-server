@@ -144,11 +144,11 @@ local function packChild(symbols, finish, kind)
         end
         symbols[#symbols] = nil
         symbol.children = packChild(symbols, symbol.range[2], symbol.kind)
-        if not t then
-            t = {}
-        end
-        if symbol.kind == SymbolKind.Class and kind ~= SymbolKind.Variable then
+        if symbol.kind == SymbolKind.Class and kind == SymbolKind.Function then
         else
+            if not t then
+                t = {}
+            end
             t[#t+1] = symbol
         end
     end

@@ -1294,7 +1294,7 @@ end
 
 function mt:doLoop(action)
 
-    local min = self:getExp(action.min)
+    local min = self:unpackList(action.min)[1]
     self:getExp(action.max)
     if action.step then
         self:getExp(action.step)

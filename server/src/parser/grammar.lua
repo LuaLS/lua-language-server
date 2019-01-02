@@ -323,7 +323,7 @@ Table       <-  Sp ({} TL TableFields? DirtyTR)
 TableFields <-  (TableSep {} / TableField)+
 TableSep    <-  COMMA / SEMICOLON
 TableField  <-  NewIndex / NewField / Exp
-NewIndex    <-  Sp ({} BL DirtyExp DirtyBR DirtyAssign DirtyExp)
+NewIndex    <-  Sp ({} BL !BL !ASSIGN DirtyExp DirtyBR DirtyAssign DirtyExp)
             ->  NewIndex
 NewField    <-  (MustName ASSIGN DirtyExp)
             ->  NewField

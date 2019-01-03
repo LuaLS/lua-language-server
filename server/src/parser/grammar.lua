@@ -367,7 +367,9 @@ CrtAction   <-  SEMICOLON
             /   Set
             /   Call
             /   Exp
-UnkAction   <-  ({} {. (!Sps !CrtAction .)*})
+UnkAction   <-  ({} {Word+})
+            ->  UnknownSymbol
+            /   ({} {. (!Sps !CrtAction .)*})
             ->  UnknownSymbol
 
 SimpleList  <-  (Simple (COMMA Simple)*)

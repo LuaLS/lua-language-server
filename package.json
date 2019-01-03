@@ -50,6 +50,12 @@
 					"type": "array",
 					"items": "string",
 					"description": "Defined global variables.\n已定义的全局变量。"
+				},
+				"Lua.workspace.ignoreDir": {
+					"scope": "resource",
+					"type": "array",
+					"items": "string",
+					"description": "Ignored directories.\n忽略的目录。"
 				}
 			}
 		}

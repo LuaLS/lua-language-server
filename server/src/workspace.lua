@@ -1,5 +1,6 @@
 local fs = require 'bee.filesystem'
 local async = require 'async'
+local config = require 'config'
 
 local function split(str, sep)
     local t = {}
@@ -91,10 +92,26 @@ function mt:init(rootUri)
         ROOT = self.root:string()
     }, function (list)
         log.info(('Found [%d] files'):format(#list))
+        local ignored = {}
+        for name in pairs(config.config.workspace.ignoreDir) do
+            local path = fs.absolute(self.root / name)
+            local str = path:string():lower()
+            ignored[#ignored+1] = str
+            log.debug(str)
+        end
         for _, filename in ipairs(list) do
             local path = fs.absolute(fs.path(filename))
             local name = path:string():lower()
-            self.files[name] = self:uriEncode(path)
+            local ok = true
+            for _, ignore in ipairs(ignored) do
+                if name:sub(1, #ignore) == ignore then
+                    ok = false
+                    break
+                end
+            end
+            if ok then
+                self.files[name] = self:uriEncode(path)
+            end
         end
         self:reset()
         self._complete = true

@@ -32,6 +32,9 @@ local Template = {
         postSpcae     = {true, Boolean},
         spaceOnlyLine = {true, Boolean},
         globals       = {{},   Str2Hash ';'},
+    },
+    workspace = {
+        ignoreDir     = {{},   Str2Hash ';'}
     }
 }
 

@@ -97,7 +97,6 @@ function mt:init(rootUri)
             local path = fs.absolute(self.root / name)
             local str = path:string():lower()
             ignored[#ignored+1] = str
-            log.debug(str)
         end
         for _, filename in ipairs(list) do
             local path = fs.absolute(fs.path(filename))
@@ -247,6 +246,7 @@ function mt:searchPath(baseUri, str)
 end
 
 function mt:loadPath(baseUri, str)
+    str = fs.relative(fs.absolute(self.root / str), self.root):string():lower()
     if self.loaded[str] then
         return self.loaded[str]
     end

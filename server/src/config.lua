@@ -7,14 +7,23 @@ end
 
 local function Str2Hash(sep)
     return function (v)
-        if type(v) ~= 'string' then
-            return false
+        if type(v) == 'string' then
+            local t = {}
+            for s in v:gmatch('[^'..sep..']+') do
+                t[s] = true
+            end
+            return true, t
         end
-        local t = {}
-        for s in v:gmatch('[^'..sep..']+') do
-            t[s] = true
+        if type(v) == 'table' then
+            local t = {}
+            for _, s in ipairs(v) do
+                if type(s) == 'string' then
+                    t[s] = true
+                end
+            end
+            return true, t
         end
-        return true, t
+        return false
     end
 end
 

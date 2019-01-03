@@ -47,8 +47,9 @@
 				},
 				"Lua.diagnostics.globals": {
 					"scope": "resource",
-					"type": "string",
-					"description": "Defined global variables.Split by `;`.\n已定义的全局变量。使用`;`分割。"
+					"type": "array",
+					"items": "string",
+					"description": "Defined global variables.\n已定义的全局变量。"
 				}
 			}
 		}

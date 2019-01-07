@@ -83,14 +83,6 @@ local defs = {
             }
             return ''
         end
-        if #char > 6 then
-            pushError {
-                type = 'UTF8_LARGE',
-                start = pos-3,
-                finish = pos+#char,
-            }
-            return ''
-        end
         local v = tonumber(char, 16)
         if not v then
             for i = 1, #char do

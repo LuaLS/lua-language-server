@@ -1118,13 +1118,19 @@ function mt:getBinary(exp)
             elseif op == '*' then
                 return self:createValue('number', nil, v1.value * v2.value)
             elseif op == '/' then
-                return self:createValue('number', nil, v1.value / v2.value)
+                if v2.value ~= 0 then
+                    return self:createValue('number', nil, v1.value / v2.value)
+                end
             elseif op == '^' then
                 return self:createValue('number', nil, v1.value ^ v2.value)
             elseif op == '%' then
-                return self:createValue('number', nil, v1.value % v2.value)
+                if v2.value ~= 0 then
+                    return self:createValue('number', nil, v1.value % v2.value)
+                end
             elseif op == '//' then
-                return self:createValue('number', nil, v1.value // v2.value)
+                if v2.value ~= 0 then
+                    return self:createValue('number', nil, v1.value // v2.value)
+                end
             end
         end
         return self:createValue('number')

@@ -695,6 +695,7 @@ local defs = {
 }
 
 return function (self, lua, mode)
+    
     Errs = {}
     local suc, res, err = pcall(self.grammar, lua, mode, defs)
     if not suc then

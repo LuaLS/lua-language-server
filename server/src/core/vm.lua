@@ -332,8 +332,10 @@ function mt:setValue(var, value, source)
     if var.value then
         if value.type == 'any' then
             self:mergeChild(var.value, value)
-        else
+        elseif value.type == 'nil' then
             self:mergeValue(var.value, value)
+        elseif var.value.uri == self.uri then
+            var.value = value
         end
         value = var.value
     else

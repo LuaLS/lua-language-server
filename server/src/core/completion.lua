@@ -248,7 +248,7 @@ local function searchInArg(vm, inCall, inString, callback)
 
     -- require列举出可以引用到的文件
     if lib.special == 'require' then
-        if not vm.lsp or not vm.lsp.workspace then
+        if not vm.lsp or not vm.lsp.workspace or not inString then
             return
         end
         local results = vm.lsp.workspace:matchPath(vm.uri, inString[1])

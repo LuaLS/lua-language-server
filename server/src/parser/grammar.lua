@@ -61,6 +61,12 @@ defs.NotReserved = function (_, _, str)
     end
     return true, str
 end
+defs.Reserved = function (_, _, str)
+    if RESERVED[str] then
+        return true
+    end
+    return false
+end
 defs.np = m.Cp() / function (n) return n+1 end
 
 local eof = re.compile '!. / %{SYNTAX_ERROR}'
@@ -250,8 +256,9 @@ Float16Exp  <-  [pP] [+-]? [0-9]+
 grammar 'Name' [[
 Name        <-  Sp ({} NameBody {})
             ->  Name
-NameBody    <-  ([a-zA-Z_] [a-zA-Z0-9_]*)
-            =>  NotReserved
+NameBody    <-  {[a-zA-Z_] [a-zA-Z0-9_]*}
+FreeName    <-  Sp ({} NameBody=>NotReserved {})
+            ->  Name
 MustName    <-  Name / DirtyName
 DirtyName   <-  {} -> DirtyName
 ]]
@@ -284,7 +291,7 @@ ExpUnit     <-  Nil
 Simple      <-  (Prefix (Suffix)*)
             ->  Simple
 Prefix      <-  PL Exp PR
-            /   Name
+            /   FreeName
 Suffix      <-  DOT Name?
             /   COLON Name?
             /   Sp ({} Table {}) -> Call

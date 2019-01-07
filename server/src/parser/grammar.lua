@@ -159,7 +159,7 @@ CompList    <-  '<='
             /   '~='
             /   '=='
 BOR         <-  Sp {'|'}
-BXOR        <-  Sp {'~'}
+BXOR        <-  Sp {'~'} !'='
 BAND        <-  Sp {'&'}
 Bshift      <-  Sp {BshiftList}
 BshiftList  <-  '<<'
@@ -177,7 +177,7 @@ Unary       <-  Sp {} {UnaryList}
 UnaryList   <-  NOT
             /   '#'
             /   '-'
-            /   '~'
+            /   '~' !'='
 POWER       <-  Sp {'^'}
 
 PL          <-  Sp '('
@@ -201,7 +201,10 @@ TOCLOSE     <-  Sp '*toclose'
 DirtyAssign <-  ASSIGN / {} -> MissAssign
 DirtyBR     <-  BR {} / {} -> MissBR
 DirtyTR     <-  TR {} / {} -> MissTR
-DirtyPR     <-  PR {} / {} -> MissPR
+DirtyPR     <-  PR {} / {} -> DirtyPR
+DirtyLabel  <-  LABEL / {} -> MissLabel
+MaybePR     <-  PR    / {} -> MissPR
+MaybeEnd    <-  END   / {} -> MissEnd
 ]]
 
 grammar 'Nil' [[
@@ -265,20 +268,33 @@ DirtyName   <-  {} -> DirtyName
 
 grammar 'Exp' [[
 Exp         <-  Sp ExpOr
-ExpOr       <-  (ExpAnd     (OR     ExpAnd)*)     -> Binary
-ExpAnd      <-  (ExpCompare (AND    ExpCompare)*) -> Binary
-ExpCompare  <-  (ExpBor     (Comp   ExpBor)*)     -> Binary
-ExpBor      <-  (ExpBxor    (BOR    ExpBxor)*)    -> Binary
-ExpBxor     <-  (ExpBand    (BXOR   ExpBand)*)    -> Binary
-ExpBand     <-  (ExpBshift  (BAND   ExpBshift)*)  -> Binary
-ExpBshift   <-  (ExpConcat  (Bshift ExpConcat)*)  -> Binary
-ExpConcat   <-  (ExpAdds    (Concat ExpConcat)*)  -> Binary
-ExpAdds     <-  (ExpMuls    (Adds   ExpMuls)*)    -> Binary
-ExpMuls     <-  (ExpUnary   (Muls   ExpUnary)*)   -> Binary
-ExpUnary    <-  (           (Unary+ (ExpPower / DirtyName)))
-            ->  Unary
+ExpOr       <-  (ExpAnd     SuffixOr*)     -> Binary
+ExpAnd      <-  (ExpCompare SuffixAnd*)    -> Binary
+ExpCompare  <-  (ExpBor     SuffixComp*)   -> Binary
+ExpBor      <-  (ExpBxor    SuffixBor*)    -> Binary
+ExpBxor     <-  (ExpBand    SuffixBxor*)   -> Binary
+ExpBand     <-  (ExpBshift  SuffixBand*)   -> Binary
+ExpBshift   <-  (ExpConcat  SuffixBshift*) -> Binary
+ExpConcat   <-  (ExpAdds    SuffixConcat*) -> Binary
+ExpAdds     <-  (ExpMuls    SuffixAdds*)   -> Binary
+ExpMuls     <-  (ExpUnary   SuffixMuls*)   -> Binary
+ExpUnary    <-  (           SuffixUnary)   -> Unary
             /   ExpPower
-ExpPower    <-  (ExpUnit    (POWER  ExpUnary)*)   -> Binary
+ExpPower    <-  (ExpUnit    SuffixPower*)  -> Binary
+
+SuffixOr    <-  OR     (ExpAnd     / {} -> DirtyExp)
+SuffixAnd   <-  AND    (ExpCompare / {} -> DirtyExp)
+SuffixComp  <-  Comp   (ExpBor     / {} -> DirtyExp)
+SuffixBor   <-  BOR    (ExpBxor    / {} -> DirtyExp)
+SuffixBxor  <-  BXOR   (ExpBand    / {} -> DirtyExp)
+SuffixBand  <-  BAND   (ExpBshift  / {} -> DirtyExp)
+SuffixBshift<-  Bshift (ExpConcat  / {} -> DirtyExp)
+SuffixConcat<-  Concat (ExpConcat  / {} -> DirtyExp)
+SuffixAdds  <-  Adds   (ExpMuls    / {} -> DirtyExp)
+SuffixMuls  <-  Muls   (ExpUnary   / {} -> DirtyExp)
+SuffixUnary <-  Unary+ (ExpPower   / {} -> DirtyExp)
+SuffixPower <-  POWER  (ExpUnary   / {} -> DirtyExp)
+
 ExpUnit     <-  Nil
             /   Boolean
             /   String
@@ -288,42 +304,35 @@ ExpUnit     <-  Nil
             /   Function
             /   Simple
 
-Simple      <-  (Prefix (Suffix)*)
+Simple      <-  (Prefix (Sp Suffix)*)
             ->  Simple
-Prefix      <-  PL Exp PR
+Prefix      <-  Sp ({} PL DirtyExp DirtyPR)
+            ->  Prefix
             /   FreeName
-Suffix      <-  DOT Name?
-            /   COLON Name?
-            /   Sp ({} Table {}) -> Call
-            /   Sp ({} String {}) -> Call
-            /   Sp ({} BL DirtyExp (BR / Sp) {}) -> Index
-            /   Sp ({} PL CallArgList DirtyPR) -> Call
+Suffix      <-  DOT   Name / DOT   {} -> MissField
+            /   Method (!PL {} -> MissPL)?
+            /   ({} Table {}) -> Call
+            /   ({} String {}) -> Call
+            /   ({} BL DirtyExp DirtyBR) -> Index
+            /   ({} PL CallArgList DirtyPR) -> Call
+Method      <-  COLON Name / COLON {} -> MissMethod
 
 DirtyExp    <-  Exp
             /   {} -> DirtyExp
-ExpList     <-  (COMMA Exp)+
+MaybeExp    <-  Exp / MissExp
+MissExp     <-  {} -> MissExp
+ExpList     <-  Sp (MaybeExp (COMMA (MaybeExp))*)
             ->  List
-            /   (Exp (COMMA Exp)*)
+MustExpList <-  Sp (Exp      (COMMA (MaybeExp))*)
             ->  List
 CallArgList <-  Sp ({} (COMMA {} / Exp)+ {})
             ->  CallArgList
             /   %nil
-NameList    <-  (COMMA MustName)+
-            ->  List
-            /   (Name (COMMA MustName)*)
-            ->  List
-            /   DirtyName
+NameList    <-  (MustName (COMMA MustName)*)
             ->  List
 
-ArgList     <-  (COMMA AfterArg)+
-            ->  List
-            /   (FirstArg (COMMA AfterArg)*)?
-            ->  List
-FirstArg    <-  DOTS
-            /   Name
-AfterArg    <-  DOTS
-            /   MustName
-
+ArgList     <-  (DOTS / Name / Sp {} COMMA)*
+            ->  ArgList
 
 Table       <-  Sp ({} TL TableFields? DirtyTR)
             ->  Table
@@ -337,19 +346,11 @@ NewField    <-  (MustName ASSIGN DirtyExp)
 
 Function    <-  Sp ({} FunctionBody {})
             ->  Function
-FunctionBody<-  FUNCTION FuncName PL ArgList PR
+FuncArg     <-  PL ArgList MaybePR
+            /   {} -> MissPL Nothing
+FunctionBody<-  FUNCTION FuncArg
                     (!END Action)*
-                END?
-            /   FUNCTION FuncName PL ArgList PR?
-                    (!END Action)*
-                END?
-            /   FUNCTION FuncName Nothing
-                    (!END Action)*
-                END?
-FuncName    <-  (Name? (FuncSuffix)*)
-            ->  Simple
-FuncSuffix  <-  DOT MustName
-            /   COLON MustName
+                MaybeEnd
 
 -- 纯占位，修改了 `relabel.lua` 使重复定义不抛错
 Action      <-  !END .
@@ -368,7 +369,7 @@ CrtAction   <-  Semicolon
             /   For
             /   While
             /   Repeat
-            /   Function
+            /   NamedFunction
             /   LocalFunction
             /   Local
             /   Set
@@ -384,7 +385,7 @@ Semicolon   <-  SEMICOLON
 SimpleList  <-  (Simple (COMMA Simple)*)
             ->  List
 
-Do          <-  Sp ({} DO DoBody END? {})
+Do          <-  Sp ({} DO DoBody MaybeEnd {})
             ->  Do
 DoBody      <-  (!END Action)*
             ->  DoBody
@@ -392,10 +393,10 @@ DoBody      <-  (!END Action)*
 Break       <-  BREAK
             ->  Break
 
-Return      <-  RETURN ExpList?
+Return      <-  RETURN MustExpList?
             ->  Return
 
-Label       <-  LABEL MustName -> Label LABEL
+Label       <-  LABEL MustName -> Label DirtyLabel
 
 GoTo        <-  GOTO MustName -> GoTo
 
@@ -407,7 +408,7 @@ IfHead      <-  (IfPart     -> IfBlock)
 IfBody      <-  IfHead
                 (ElseIfPart -> ElseIfBlock)*
                 (ElsePart   -> ElseBlock)?
-                END?
+                MaybeEnd
 IfPart      <-  IF Exp THEN
                     {} (!ELSEIF !ELSE !END Action)* {}
             /   IF DirtyExp THEN
@@ -430,7 +431,7 @@ Loop        <-  Sp ({} LoopBody {})
             ->  Loop
 LoopBody    <-  FOR LoopStart LoopFinish LoopStep DO?
                     (!END Action)*
-                END?
+                MaybeEnd
 LoopStart   <-  MustName ASSIGN DirtyExp
 LoopFinish  <-  COMMA? Exp
             /   COMMA? DirtyName
@@ -442,13 +443,13 @@ In          <-  Sp ({} InBody {})
             ->  In
 InBody      <-  FOR NameList IN? ExpList DO?
                     (!END Action)*
-                END?
+                MaybeEnd
 
 While       <-  Sp ({} WhileBody {})
             ->  While
 WhileBody   <-  WHILE Exp DO
                     (!END Action)*
-                END?
+                MaybeEnd
 
 Repeat      <-  Sp ({} RepeatBody {})
             ->  Repeat
@@ -464,8 +465,19 @@ Set         <-  (SimpleList ASSIGN ExpList?)
 Call        <-  Simple
 
 LocalFunction
-            <-  Sp ({} LOCAL FunctionBody {})
+            <-  Sp ({} LOCAL FunctionNamedBody {})
             ->  LocalFunction
+
+NamedFunction
+            <-  Sp ({} FunctionNamedBody {})
+            ->  NamedFunction
+FunctionNamedBody
+            <-  FUNCTION FuncName FuncArg
+                    (!END Action)*
+                MaybeEnd
+FuncName    <-  (MustName (DOT MustName)* FuncMethod?)
+            ->  Simple
+FuncMethod  <-  COLON Name / COLON {} -> MissMethod
 ]]
 
 grammar 'Lua' [[

@@ -18,6 +18,31 @@ local function pushError(err)
     Errs[#Errs+1] = err
 end
 
+local RESERVED = {
+    ['and']      = true,
+    ['break']    = true,
+    ['do']       = true,
+    ['else']     = true,
+    ['elseif']   = true,
+    ['end']      = true,
+    ['false']    = true,
+    ['for']      = true,
+    ['function'] = true,
+    ['goto']     = true,
+    ['if']       = true,
+    ['in']       = true,
+    ['local']    = true,
+    ['nil']      = true,
+    ['not']      = true,
+    ['or']       = true,
+    ['repeat']   = true,
+    ['return']   = true,
+    ['then']     = true,
+    ['true']     = true,
+    ['until']    = true,
+    ['while']    = true,
+}
+
 local defs = {
     Nil = function (pos)
         return {
@@ -119,6 +144,13 @@ local defs = {
         }
     end,
     Name = function (start, str, finish)
+        if RESERVED[str] then
+            pushError {
+                type = 'KEYWORD',
+                start = start,
+                finish = finish - 1,
+            }
+        end
         return {
             type   = 'name',
             start  = start,
@@ -141,6 +173,9 @@ local defs = {
         else
             return first
         end
+    end,
+    Prefix = function (start, exp, finish)
+        return exp
     end,
     Index = function (start, exp, finish)
         return {
@@ -230,7 +265,19 @@ local defs = {
             finish = start,
         }
     end,
-    Function = function (start, name, arg, ...)
+    Function = function (start, arg, ...)
+        local obj = {
+            type  = 'function',
+            start = start,
+            arg   = arg,
+            ...
+        }
+        local max = #obj
+        obj.finish = obj[max] - 1
+        obj[max]   = nil
+        return obj
+    end,
+    NamedFunction = function (start, name, arg, ...)
         local obj = {
             type  = 'function',
             start = start,
@@ -330,6 +377,72 @@ local defs = {
             return first
         end
     end,
+    ArgList = function (...)
+        if ... == '' then
+            return nil
+        end
+        local args = table.pack(...)
+        local list = {}
+        local max = args.n
+        args.n = nil
+        local wantName = true
+        for i = 1, max do
+            local obj = args[i]
+            if type(obj) == 'number' then
+                if wantName then
+                    pushError {
+                        type = 'MISS_NAME',
+                        start = obj,
+                        finish = obj,
+                    }
+                end
+                wantName = true
+            else
+                if not wantName then
+                    pushError {
+                        type = 'MISS_SYMBOL',
+                        start = obj.start-1,
+                        finish = obj.start-1,
+                        info = {
+                            symbol = ',',
+                        }
+                    }
+                end
+                wantName = false
+                list[#list+1] = obj
+                if obj.type == '...' then
+                    if i < max then
+                        local a = args[i+1]
+                        local b = args[max]
+                        pushError {
+                            type = 'ARGS_AFTER_DOTS',
+                            start = type(a) == 'number' and a or a.start,
+                            finish = type(b) == 'number' and b or b.finish,
+                        }
+                    end
+                    break
+                end
+            end
+        end
+        if wantName then
+            local last = args[max]
+            pushError {
+                type = 'MISS_NAME',
+                start = last+1,
+                finish = last+1,
+            }
+        end
+        if #list == 0 then
+            return nil
+        elseif #list == 1 then
+            return list[1]
+        else
+            list.type = 'list'
+            list.start = list[1].start
+            list.finish = list[#list].finish
+            return list
+        end
+    end,
     CallArgList = function (start, ...)
         local args = {...}
         local max = #args
@@ -385,6 +498,9 @@ local defs = {
     end,
     Nothing = function ()
         return nil
+    end,
+    None = function()
+        return
     end,
     Skip = function ()
         return false
@@ -588,6 +704,13 @@ local defs = {
             [1]    = ''
         }
     end,
+    MissExp = function (pos)
+        pushError {
+            type = 'MISS_EXP',
+            start = pos,
+            finish = pos,
+        }
+    end,
     MissExponent = function (start, finish)
         pushError {
             type = 'MISS_EXPONENT',
@@ -654,7 +777,17 @@ local defs = {
         }
         return pos + 1
     end,
-    MissPR = function (pos)
+    MissPL = function (pos)
+        pushError {
+            type = 'MISS_SYMBOL',
+            start = pos,
+            finish = pos,
+            info = {
+                symbol = '(',
+            }
+        }
+    end,
+    DirtyPR = function (pos)
         pushError {
             type = 'MISS_SYMBOL',
             start = pos,
@@ -664,6 +797,16 @@ local defs = {
             }
         }
         return pos + 1
+    end,
+    MissPR = function (pos)
+        pushError {
+            type = 'MISS_SYMBOL',
+            start = pos,
+            finish = pos,
+            info = {
+                symbol = ')',
+            }
+        }
     end,
     ErrEsc = function (pos)
         pushError {
@@ -696,6 +839,40 @@ local defs = {
             finish = pos,
             info = {
                 symbol = ','
+            }
+        }
+    end,
+    MissField = function (pos)
+        pushError {
+            type = 'MISS_FIELD',
+            start = pos,
+            finish = pos,
+        }
+    end,
+    MissMethod = function (pos)
+        pushError {
+            type = 'MISS_METHOD',
+            start = pos,
+            finish = pos,
+        }
+    end,
+    MissLabel = function (pos)
+        pushError {
+            type = 'MISS_SYMBOL',
+            start = pos,
+            finish = pos,
+            info = {
+                symbol = '::',
+            }
+        }
+    end,
+    MissEnd = function (pos)
+        pushError {
+            type = 'MISS_SYMBOL',
+            start = pos,
+            finish = pos,
+            info = {
+                symbol = 'end',
             }
         }
     end,

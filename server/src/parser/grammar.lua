@@ -183,7 +183,7 @@ TR          <-  Sp '}'
 COMMA       <-  Sp ','
 SEMICOLON   <-  Sp ';'
 DOTS        <-  Sp ({} '...') -> DOTS
-DOT         <-  Sp '.' !'.'
+DOT         <-  Sp ({} '.' !'.') -> DOT
 COLON       <-  Sp ({} ':' !':') -> COLON
 LABEL       <-  Sp '::'
 ASSIGN      <-  Sp '='
@@ -285,8 +285,8 @@ Simple      <-  (Prefix (Suffix)*)
             ->  Simple
 Prefix      <-  PL Exp PR
             /   Name
-Suffix      <-  DOT MustName
-            /   COLON MustName
+Suffix      <-  DOT Name?
+            /   COLON Name?
             /   Sp ({} Table {}) -> Call
             /   Sp ({} String {}) -> Call
             /   Sp ({} BL DirtyExp (BR / Sp) {}) -> Index

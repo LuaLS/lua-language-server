@@ -1008,22 +1008,23 @@ function mt:getSimple(simple, mode)
             else
                 parentName = ('%s[?]'):format(parentName)
             end
-        else
-            if tp == 'name' then
-                field = self:getField(value, obj[1], obj)
-                field.parentValue = value
-                value = self:getValue(field)
-                if mode == 'value' or i < #simple then
-                    self:addInfo(field, 'get', obj)
-                end
-                field.parent = lastField
-                lastField = field
-                obj.object = object
-                obj.parentName = parentName
-                parentName = parentName .. '.' .. field.key
-            elseif tp == ':' then
-                object = field
+        elseif tp == 'name' then
+            field = self:getField(value, obj[1], obj)
+            field.parentValue = value
+            value = self:getValue(field)
+            if mode == 'value' or i < #simple then
+                self:addInfo(field, 'get', obj)
             end
+            field.parent = lastField
+            lastField = field
+            obj.object = object
+            obj.parentName = parentName
+            parentName = parentName .. '.' .. field.key
+        elseif tp == ':' then
+            object = field
+            field.source.colon = obj
+        elseif tp == '.' then
+            field.source.dot = obj
         end
     end
     if mode == 'value' then

@@ -223,6 +223,13 @@ local defs = {
             finish = start,
         }
     end,
+    DOT = function (start)
+        return {
+            type   = '.',
+            start  = start,
+            finish = start,
+        }
+    end,
     Function = function (start, name, arg, ...)
         local obj = {
             type  = 'function',
@@ -695,7 +702,6 @@ local defs = {
 }
 
 return function (self, lua, mode)
-    
     Errs = {}
     local suc, res, err = pcall(self.grammar, lua, mode, defs)
     if not suc then

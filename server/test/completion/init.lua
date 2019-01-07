@@ -442,3 +442,41 @@ fff[#ff@]
         kind = CompletionItemKind.Field,
     }
 }
+
+do return end
+
+TEST [[
+local t = {
+    a = 1,
+}
+
+t .    @
+]]
+(EXISTS)
+
+TEST [[
+local t = {
+    a = 1,
+}
+
+t .    @ b
+]]
+(EXISTS)
+
+TEST [[
+local t = {
+    a = 1,
+}
+
+t @
+]]
+(nil)
+
+TEST [[
+local t = {
+    a = 1,
+}
+
+t @.
+]]
+(nil)

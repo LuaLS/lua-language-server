@@ -334,6 +334,7 @@ local function findClosePos(vm, pos)
         type = 'name',
         start = pos,
         finish = pos,
+        object = parent.source.colon and parent,
         [1]    = '',
     }
     local result = {

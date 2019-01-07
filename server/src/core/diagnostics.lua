@@ -48,7 +48,7 @@ local function searchUndefinedGlobal(results, callback)
         if lIndex == 'log' or lIndex == 'arg' or lIndex == '' then
             goto NEXT_VAR
         end
-        if not index:find '%l' then
+        if index:find '^_*%u' then
             goto NEXT_VAR
         end
         for _, info in ipairs(field) do

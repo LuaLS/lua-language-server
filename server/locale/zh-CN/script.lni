@@ -15,7 +15,7 @@ MWS_COMPLETE            = '工作目录准备好了，你可以再试一下了..
 
 PARSER_CRASH            = '语法解析崩溃了！遗言：{}'
 PARSER_UNKNOWN          = '未知语法错误...'
-PARSER_MISS_NAME        = '需要一个名字'
+PARSER_MISS_NAME        = '缺少名称'
 PARSER_UNKNOWN_SYMBOL   = '未知符号`{symbol}`'
 PARSER_MISS_SYMBOL      = '缺少符号`{symbol}`'
 PARSER_MISS_ESC_X       = '必须是2个16进制字符'
@@ -26,5 +26,9 @@ PARSER_ERR_ESC          = '错误的转义符'
 PARSER_MUST_X16         = '必须是16进制字符'
 PARSER_MISS_EXPONENT    = '缺少指数部分'
 PARSER_MISS_EXP         = '缺少表达式'
+PARSER_MISS_FIELD       = '缺少域名'
+PARSER_MISS_METHOD      = '缺少方法名'
+PARSER_ARGS_AFTER_DOTS  = '`...`必须是最后一个参数'
+PARSER_KEYWORD          = '关键字无法作为名称'
 
 SYMBOL_ANONYMOUS        = '<匿名函数>'

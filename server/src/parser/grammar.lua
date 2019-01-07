@@ -75,8 +75,8 @@ end
 local function errorpos(pos, err)
     return {
         type = 'UNKNOWN',
-        start = pos,
-        finish = pos,
+        start = pos or 0,
+        finish = pos or 0,
         err = err,
     }
 end
@@ -351,7 +351,7 @@ Set         <-  END
 
 grammar 'Action' [[
 Action      <-  Sp (CrtAction / UnkAction)
-CrtAction   <-  SEMICOLON
+CrtAction   <-  Semicolon
             /   Do
             /   Break
             /   Return
@@ -372,6 +372,8 @@ UnkAction   <-  ({} {Word+})
             /   ({} {. (!Sps !CrtAction .)*})
             ->  UnknownSymbol
 
+Semicolon   <-  SEMICOLON
+            ->  Skip
 SimpleList  <-  (Simple (COMMA Simple)*)
             ->  List
 

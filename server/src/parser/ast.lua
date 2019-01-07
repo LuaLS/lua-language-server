@@ -379,6 +379,9 @@ local defs = {
     Nothing = function ()
         return nil
     end,
+    Skip = function ()
+        return false
+    end,
     Set = function (keys, values)
         return {
             type = 'set',

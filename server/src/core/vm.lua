@@ -1383,6 +1383,10 @@ function mt:doLocalFunction(action)
 end
 
 function mt:doAction(action)
+    if not action then
+        -- Skip
+        return
+    end
     local tp = action.type
     if     tp == 'do' then
         self:doDo(action)

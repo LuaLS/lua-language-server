@@ -320,6 +320,22 @@ local t = {
     }
 }
 
+TEST[[
+local function g()
+end
+
+g = 1
+]]{
+    [1] = {
+        name = 'g',
+        detail = 'function g()',
+        kind = SymbolKind.Function,
+        range = {1, 22},
+        selectionRange = {16, 16},
+        children = EXISTS,
+    }
+}
+
 -- 临时
 local fs = require 'bee.filesystem'
 local function testIfExit(path)

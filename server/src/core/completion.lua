@@ -190,6 +190,9 @@ local function getDetail(var)
 end
 
 local function getDocument(var, source)
+    if not source then
+        return nil
+    end
     if var.value.type == 'function' then
         return {
             kind = 'markdown',
@@ -305,11 +308,13 @@ end
 local function findClosePos(vm, pos)
     local curDis = math.maxinteger
     local parent = nil
+    local inputSource = nil
     local function found(object, source)
         local dis = pos - source.finish
         if dis > 1 and dis < curDis then
             curDis = dis
             parent = object
+            inputSource = source
         end
     end
     for sources, object in pairs(vm.results.sources) do
@@ -329,12 +334,19 @@ local function findClosePos(vm, pos)
     if parent.type ~= 'local' and parent.type ~= 'field' then
         return nil
     end
+    local sep = inputSource.dot or inputSource.colon
+    if not sep then
+        return nil
+    end
+    if sep.finish > pos then
+        return nil
+    end
     -- 造个假的 DirtyName
     local source = {
         type = 'name',
         start = pos,
         finish = pos,
-        object = parent.source.colon and parent,
+        object = sep.type == ':' and parent,
         [1]    = '',
     }
     local result = {
@@ -399,8 +411,7 @@ local function findCall(vm, pos)
     return results[#results]
 end
 
-local function makeList(source)
-    local list = {}
+local function makeList(list, source)
     local mark = {}
     local function callback(var, defualt, data)
         local key
@@ -425,7 +436,7 @@ local function makeList(source)
             data.documentation = data.documentation or getDocument(var, source)
         end
     end
-    return list, callback
+    return callback
 end
 
 local function searchInResult(result, source, vm, pos, callback)
@@ -482,16 +493,8 @@ local function searchSpecial(vm, pos, callback)
 end
 
 return function (vm, pos)
-    local result, source = findResult(vm, pos)
-    if not result then
-        result, source = findClosePos(vm, pos)
-    end
-
-    if not result then
-        return nil
-    end
-
-    local list, callback = makeList(source)
+    local list = {}
+    local callback = makeList(list)
     local inCall = findCall(vm, pos)
     local inString = findString(vm, pos)
     if inCall then
@@ -499,7 +502,14 @@ return function (vm, pos)
     end
     searchSpecial(vm, pos, callback)
     if not inString then
-        searchInResult(result, source, vm, pos, callback)
+        local result, source = findResult(vm, pos)
+        if not result then
+            result, source = findClosePos(vm, pos)
+        end
+        if result then
+            callback = makeList(list, source)
+            searchInResult(result, source, vm, pos, callback)
+        end
     end
     if #list == 0 then
         return nil

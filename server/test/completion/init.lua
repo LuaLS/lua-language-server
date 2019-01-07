@@ -443,8 +443,6 @@ fff[#ff@]
     }
 }
 
-do return end
-
 TEST [[
 local t = {
     a = 1,

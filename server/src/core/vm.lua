@@ -1022,9 +1022,9 @@ function mt:getSimple(simple, mode)
             parentName = parentName .. '.' .. field.key
         elseif tp == ':' then
             object = field
-            field.source.colon = obj
+            simple[i-1].colon = obj
         elseif tp == '.' then
-            field.source.dot = obj
+            simple[i-1].dot = obj
         end
     end
     if mode == 'value' then

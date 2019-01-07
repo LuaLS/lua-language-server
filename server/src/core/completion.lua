@@ -257,11 +257,13 @@ local function searchInArg(vm, inCall, inString, callback)
         end
         for _, v in ipairs(results) do
             if v ~= inString[1] then
-                local sep = inString[1]:find('[^%w_][%w_]-$')
-                if sep then
-                    v = v:sub(sep+1)
-                end
-                callback(v, CompletionItemKind.File)
+                callback(v, CompletionItemKind.File, {
+                    textEdit = {
+                        start = inString.start+1,
+                        finish = inString.finish-1,
+                        newText = ('%q'):format(v):sub(2, -2),
+                    }
+                })
             end
         end
     end

@@ -118,14 +118,17 @@ TEST {
         {
             label = 'abc',
             kind = CompletionItemKind.File,
+            textEdit = EXISTS,
         },
         {
             label = 'abc.aaa',
             kind = CompletionItemKind.File,
+            textEdit = EXISTS,
         },
         {
             label = 'abcde',
             kind = CompletionItemKind.File,
+            textEdit = EXISTS,
         },
     }
 }
@@ -144,6 +147,7 @@ TEST {
         {
             label = 'abc',
             kind = CompletionItemKind.File,
+            textEdit = EXISTS,
         },
     }
 }
@@ -166,6 +170,7 @@ TEST {
         {
             label = 'abc.init',
             kind = CompletionItemKind.File,
+            textEdit = EXISTS,
         },
     }
 }
@@ -186,8 +191,9 @@ TEST {
     },
     completion = {
         {
-            label = 'init',
+            label = 'abc.init',
             kind = CompletionItemKind.File,
+            textEdit = EXISTS,
         },
     }
 }
@@ -208,8 +214,9 @@ TEST {
     },
     completion = {
         {
-            label = 'init',
+            label = 'abc.init',
             kind = CompletionItemKind.File,
+            textEdit = EXISTS,
         },
     }
 }
@@ -230,8 +237,9 @@ TEST {
     },
     completion = {
         {
-            label = 'core',
+            label = 'core.core',
             kind = CompletionItemKind.File,
+            textEdit = EXISTS,
         },
     }
 }
@@ -254,10 +262,12 @@ TEST {
         {
             label = 'x111',
             kind = CompletionItemKind.File,
+            textEdit = EXISTS,
         },
         {
             label = 'x000',
             kind = CompletionItemKind.File,
+            textEdit = EXISTS,
         },
     }
 }

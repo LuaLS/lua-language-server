@@ -153,12 +153,29 @@ function mt:compileAll()
 
     local passed = os.clock() - clock
     if passed > 0.1 then
+        local astCost = 0
+        local vmCost = 0
+        local lineCost = 0
+        for _, uri in ipairs(list) do
+            local obj = self._file[uri]
+            if obj and obj.astCost and obj.vmCost and obj.lineCost then
+                astCost  = astCost  + obj.astCost
+                vmCost   = vmCost   + obj.vmCost
+                lineCost = lineCost + obj.lineCost
+            end
+        end
         log.debug(('\n\z
         Cache completion\n\z
         Cost:  [%.3f]sec\n\z
+        Ast:   [%.3f]sec\n\z
+        VM:    [%.3f]sec\n\z
+        Line:  [%.3f]sec\n\z
         Num:   [%d]\n\z
         Size:  [%.3f]kb'):format(
             passed,
+            astCost,
+            vmCost,
+            lineCost,
             #list,
             size / 1000
         ))
@@ -325,11 +342,18 @@ function mt:compileVM(uri)
     end
 
     local compiled = self:_markCompiled(uri)
+    local clock = os.clock()
     local ast = self:compileAst(obj)
+    obj.astCost = os.clock() - clock
     self:_clearChainNode(obj, uri)
 
+    local clock = os.clock()
     obj.vm = core.vm(ast, self, uri)
+    obj.vmCost = os.clock() - clock
+
+    local clock = os.clock()
     obj.lines = parser:lines(obj.text, 'utf8')
+    obj.lineCost = os.clock() - clock
 
     self._needDiagnostics[uri] = true
     if not obj.vm then

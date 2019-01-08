@@ -76,7 +76,7 @@ local function createInfo(data, lines)
     return diagnostic
 end
 
-local function buildError(err, lines)
+local function buildError(err, lines, uri)
     local diagnostic = {
         source  = lang.script.DIAG_SYNTAX_CHECK,
         message = lang.script('PARSER_'..err.type, err.info)
@@ -103,6 +103,26 @@ local function buildError(err, lines)
         },
     }
     diagnostic.range = range
+
+    local related = err.info and err.info.related
+    if related then
+        local start_line  = lines:rowcol(related[1])
+        local finish_line = lines:rowcol(related[2])
+        local chars = {}
+        for n = start_line, finish_line do
+            chars[#chars+1] = lines:line(n)
+        end
+        local message = table.concat(chars, '\n')
+        diagnostic.relatedInformation = {
+            {
+                message = message,
+                location = {
+                    uri = uri,
+                    range = getRange(related[1], related[2], lines),
+                }
+            }
+        }
+    end
     return diagnostic
 end
 
@@ -121,7 +141,7 @@ return function (lsp, params)
     end
     if errs then
         for _, err in ipairs(errs) do
-            diagnostics[#diagnostics+1] = buildError(err, lines)
+            diagnostics[#diagnostics+1] = buildError(err, lines, uri)
         end
     end
 

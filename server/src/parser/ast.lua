@@ -4,6 +4,7 @@ local utf8_char = utf8.char
 local type = type
 
 local Errs
+local State
 local function pushError(err)
     if err.finish < err.start then
         err.finish = err.start
@@ -67,6 +68,18 @@ local defs = {
             [1]    = false,
         }
     end,
+    LongComment = function (beforeEq, afterEq, missPos)
+        if missPos then
+            pushError {
+                type   = 'MISS_SYMBOL',
+                start  = missPos,
+                finish = missPos,
+                info   = {
+                    symbol = ']' .. ('='):rep(afterEq-beforeEq) .. ']'
+                }
+            }
+        end
+    end,
     String = function (start, str, finish)
         return {
             type   = 'string',
@@ -91,7 +104,6 @@ local defs = {
     Char10 = function (char)
         char = tonumber(char)
         if not char or char < 0 or char > 255 then
-            -- TODO 记录错误
             return ''
         end
         return string_char(char)
@@ -136,12 +148,27 @@ local defs = {
         return utf8_char(v)
     end,
     Number = function (start, number, finish)
-        return {
-            type   = 'number',
-            start  = start,
-            finish = finish - 1,
-            [1]    = tonumber(number),
-        }
+        local n = tonumber(number)
+        if n then
+            return {
+                type   = 'number',
+                start  = start,
+                finish = finish - 1,
+                [1]    = n,
+            }
+        else
+            pushError {
+                type   = 'MALFORMED_NUMBER',
+                start  = start,
+                finish = finish - 1,
+            }
+            return {
+                type   = 'number',
+                start  = start,
+                finish = finish - 1,
+                [1]    = 0,
+            }
+        end
     end,
     Name = function (start, str, finish)
         if RESERVED[str] then
@@ -534,10 +561,25 @@ local defs = {
         action.finish = finish - 1
         return action
     end,
-    Break = function ()
-        return {
-            type = 'break',
-        }
+    Break = function (finish)
+        if State.Break > 0 then
+            return {
+                type = 'break',
+            }
+        else
+            pushError {
+                type = 'BREAK_OUTSIDE',
+                start = finish - #'break',
+                finish = finish - 1,
+            }
+            return false
+        end
+    end,
+    BreakStart = function ()
+        State.Break = State.Break + 1
+    end,
+    BreakEnd = function ()
+        State.Break = State.Break - 1
     end,
     Return = function (exp)
         if exp == nil or exp == '' then
@@ -558,11 +600,53 @@ local defs = {
     end,
     Label = function (name)
         name.type = 'label'
+        local labels = State.Label[#State.Label]
+        local str = name[1]
+        if labels[str] then
+            pushError {
+                type = 'REDEFINE_LABEL',
+                start = name.start,
+                finish = name.finish,
+                info = {
+                    label = str,
+                    related = {labels[str].start, labels[str].finish},
+                }
+            }
+        else
+            labels[str] = name
+        end
         return name
     end,
     GoTo = function (name)
         name.type = 'goto'
+        local labels = State.Label[#State.Label]
+        labels[#labels+1] = name
         return name
+    end,
+    -- TODO 这里的检查不完整，但是完整的检查比较复杂，开销比较高
+    -- 不能jump到另一个局部变量的作用域
+    -- 函数会切断goto与label
+    -- 不能从block外jump到block内，但是可以从block内jump到block外
+    LabelStart = function ()
+        State.Label[#State.Label+1] = {}
+    end,
+    LabelEnd = function ()
+        local labels = State.Label[#State.Label]
+        State.Label[#State.Label] = nil
+        for i = 1, #labels do
+            local name = labels[i]
+            local str = name[1]
+            if not labels[str] then
+                pushError {
+                    type = 'NO_VISIBLE_LABEL',
+                    start = name.start,
+                    finish = name.finish,
+                    info = {
+                        label = str,
+                    }
+                }
+            end
+        end
     end,
     IfBlock = function (exp, start, ...)
         local obj = {
@@ -876,10 +960,87 @@ local defs = {
             }
         }
     end,
+    MissDo = function (pos)
+        pushError {
+            type = 'MISS_SYMBOL',
+            start = pos,
+            finish = pos,
+            info = {
+                symbol = 'do',
+            }
+        }
+    end,
+    MissComma = function (pos)
+        pushError {
+            type = 'MISS_SYMBOL',
+            start = pos,
+            finish = pos,
+            info = {
+                symbol = ',',
+            }
+        }
+    end,
+    MissIn = function (pos)
+        pushError {
+            type = 'MISS_SYMBOL',
+            start = pos,
+            finish = pos,
+            info = {
+                symbol = 'in',
+            }
+        }
+    end,
+    MissUntil = function (pos)
+        pushError {
+            type = 'MISS_SYMBOL',
+            start = pos,
+            finish = pos,
+            info = {
+                symbol = 'until',
+            }
+        }
+    end,
+    MissThen = function (pos)
+        pushError {
+            type = 'MISS_SYMBOL',
+            start = pos,
+            finish = pos,
+            info = {
+                symbol = 'then',
+            }
+        }
+    end,
+    ExpInAction = function (start, exp, finish)
+        pushError {
+            type = 'EXP_IN_ACTION',
+            start = start,
+            finish = finish - 1,
+        }
+        return exp
+    end,
+    ActionAfterReturn = function (start, ...)
+        if not start or start == '' then
+            return
+        end
+        local actions = table.pack(...)
+        local max = actions.n
+        local finish = actions[max]
+        actions[max] = nil
+        pushError {
+            type = 'ACTION_AFTER_RETURN',
+            start = start,
+            finish = finish - 1,
+        }
+        return table.unpack(actions)
+    end,
 }
 
 return function (self, lua, mode)
     Errs = {}
+    State= {
+        Break = 0,
+        Label = {{}},
+    }
     local suc, res, err = pcall(self.grammar, lua, mode, defs)
     if not suc then
         return nil, res

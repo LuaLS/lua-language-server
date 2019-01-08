@@ -89,8 +89,11 @@ end
 
 grammar 'Comment' [[
 Comment         <-  '--' (LongComment / ShortComment)
-LongComment     <-  '[' {:eq: '='* :} '[' CommentClose
-CommentClose    <-  ']' =eq ']' / . CommentClose
+LongComment     <-  ('[' {} {:eq: '='* :} {} '[' 
+                    (!CommentClose .)*
+                    (CommentClose / {}))
+                ->  LongComment
+CommentClose    <-  ']' =eq ']'
 ShortComment    <-  (!%nl .)*
 ]]
 
@@ -198,13 +201,17 @@ Nothing     <-  {} -> Nothing
 
 TOCLOSE     <-  Sp '*toclose'
 
-DirtyAssign <-  ASSIGN / {} -> MissAssign
-DirtyBR     <-  BR {} / {} -> MissBR
-DirtyTR     <-  TR {} / {} -> MissTR
-DirtyPR     <-  PR {} / {} -> DirtyPR
-DirtyLabel  <-  LABEL / {} -> MissLabel
-MaybePR     <-  PR    / {} -> MissPR
-MaybeEnd    <-  END   / {} -> MissEnd
+DirtyBR     <-  BR {}  / {} -> MissBR
+DirtyTR     <-  TR {}  / {} -> MissTR
+DirtyPR     <-  PR {}  / {} -> DirtyPR
+DirtyLabel  <-  LABEL  / {} -> MissLabel
+NeedPR      <-  PR     / {} -> MissPR
+NeedEnd     <-  END    / {} -> MissEnd
+NeedDo      <-  DO     / {} -> MissDo
+NeedAssign  <-  ASSIGN / {} -> MissAssign
+NeedComma   <-  COMMA  / {} -> MissComma
+NeedIn      <-  IN     / {} -> MissIn
+NeedUntil   <-  UNTIL  / {} -> MissUntil
 ]]
 
 grammar 'Nil' [[
@@ -241,14 +248,14 @@ ErrNumber   <-  ({} {([0-9a-zA-Z] / '.')+})
 
 Number10    <-  Float10 Float10Exp?
             /   Integer10 Float10? Float10Exp?
-Integer10   <-  [0-9]+ '.'? [0-9]*
+Integer10   <-  [0-9]+ ('.' [0-9]*)?
 Float10     <-  '.' [0-9]+
 Float10Exp  <-  [eE] [+-]? [0-9]+
             /   ({} [eE] [+-]? {}) -> MissExponent
 
 Number16    <-  '0' [xX] Float16 Float16Exp?
             /   '0' [xX] Integer16 Float16? Float16Exp?
-Integer16   <-  X16+ '.'? X16*
+Integer16   <-  X16+ ('.' X16*)?
             /   ({} {Word*}) -> MustX16
 Float16     <-  '.' X16+
             /   '.' ({} {Word*}) -> MustX16
@@ -339,18 +346,23 @@ Table       <-  Sp ({} TL TableFields? DirtyTR)
 TableFields <-  (TableSep {} / TableField)+
 TableSep    <-  COMMA / SEMICOLON
 TableField  <-  NewIndex / NewField / Exp
-NewIndex    <-  Sp ({} BL !BL !ASSIGN DirtyExp DirtyBR DirtyAssign DirtyExp)
+NewIndex    <-  Sp ({} BL !BL !ASSIGN DirtyExp DirtyBR NeedAssign DirtyExp)
             ->  NewIndex
 NewField    <-  (MustName ASSIGN DirtyExp)
             ->  NewField
 
 Function    <-  Sp ({} FunctionBody {})
             ->  Function
-FuncArg     <-  PL ArgList MaybePR
+FuncArg     <-  PL ArgList NeedPR
             /   {} -> MissPL Nothing
 FunctionBody<-  FUNCTION FuncArg
+                    LabelStart
                     (!END Action)*
-                MaybeEnd
+                    LabelEnd
+                NeedEnd
+
+LabelStart  <-  {} -> LabelStart
+LabelEnd    <-  {} -> LabelEnd
 
 -- 纯占位，修改了 `relabel.lua` 使重复定义不抛错
 Action      <-  !END .
@@ -374,27 +386,32 @@ CrtAction   <-  Semicolon
             /   Local
             /   Set
             /   Call
-            /   Exp
+            /   ExpInAction
 UnkAction   <-  ({} {Word+})
             ->  UnknownSymbol
             /   ({} {. (!Sps !CrtAction .)*})
             ->  UnknownSymbol
+ExpInAction <-  Sp ({} Exp {})
+            ->  ExpInAction
 
 Semicolon   <-  SEMICOLON
             ->  Skip
 SimpleList  <-  (Simple (COMMA Simple)*)
             ->  List
 
-Do          <-  Sp ({} DO DoBody MaybeEnd {})
+Do          <-  Sp ({} DO DoBody NeedEnd {})
             ->  Do
 DoBody      <-  (!END Action)*
             ->  DoBody
 
-Break       <-  BREAK
-            ->  Break
+Break       <-  BREAK {} -> Break
+BreakStart  <-  {} -> BreakStart
+BreakEnd    <-  {} -> BreakEnd
 
 Return      <-  RETURN MustExpList?
             ->  Return
+                (Sp {} (!END !UNTIL !ELSEIF !ELSE Action)+ {})?
+            ->  ActionAfterReturn
 
 Label       <-  LABEL MustName -> Label DirtyLabel
 
@@ -408,18 +425,14 @@ IfHead      <-  (IfPart     -> IfBlock)
 IfBody      <-  IfHead
                 (ElseIfPart -> ElseIfBlock)*
                 (ElsePart   -> ElseBlock)?
-                MaybeEnd
-IfPart      <-  IF Exp THEN
+                NeedEnd
+IfPart      <-  IF DirtyExp THEN
                     {} (!ELSEIF !ELSE !END Action)* {}
-            /   IF DirtyExp THEN
-                    {} (!ELSEIF !ELSE !END Action)* {}
-            /   IF DirtyExp
-                    {}         {}
-ElseIfPart  <-  ELSEIF Exp THEN
+            /   IF DirtyExp {}->MissThen
+                    {}        {}
+ElseIfPart  <-  ELSEIF DirtyExp THEN
                     {} (!ELSE !ELSEIF !END Action)* {}
-            /   ELSEIF DirtyExp THEN
-                    {} (!ELSE !ELSEIF !END Action)* {}
-            /   ELSEIF DirtyExp
+            /   ELSEIF DirtyExp {}->MissThen
                     {}         {}
 ElsePart    <-  ELSE
                     {} (!END Action)* {}
@@ -429,33 +442,42 @@ For         <-  Loop / In
 
 Loop        <-  Sp ({} LoopBody {})
             ->  Loop
-LoopBody    <-  FOR LoopStart LoopFinish LoopStep DO?
+LoopBody    <-  FOR LoopStart LoopFinish LoopStep NeedDo
+                    BreakStart
                     (!END Action)*
-                MaybeEnd
+                    BreakEnd
+                NeedEnd
 LoopStart   <-  MustName ASSIGN DirtyExp
-LoopFinish  <-  COMMA? Exp
-            /   COMMA? DirtyName
-LoopStep    <-  COMMA  DirtyExp
-            /   COMMA? Exp
+LoopFinish  <-  NeedComma DirtyExp
+LoopStep    <-  COMMA DirtyExp
+            /   NeedComma Exp
             /   Nothing
 
 In          <-  Sp ({} InBody {})
             ->  In
-InBody      <-  FOR NameList IN? ExpList DO?
+InBody      <-  FOR InNameList NeedIn ExpList NeedDo
+                    BreakStart
                     (!END Action)*
-                MaybeEnd
+                    BreakEnd
+                NeedEnd
+InNameList  <-  &IN DirtyName
+            /   NameList
 
 While       <-  Sp ({} WhileBody {})
             ->  While
-WhileBody   <-  WHILE Exp DO
+WhileBody   <-  WHILE DirtyExp NeedDo
+                    BreakStart
                     (!END Action)*
-                MaybeEnd
+                    BreakEnd
+                NeedEnd
 
 Repeat      <-  Sp ({} RepeatBody {})
             ->  Repeat
 RepeatBody  <-  REPEAT
+                    BreakStart
                     (!UNTIL Action)*
-                UNTIL Exp
+                    BreakEnd
+                NeedUntil DirtyExp
 
 Local       <-  (LOCAL TOCLOSE? NameList (ASSIGN ExpList)?)
             ->  Local
@@ -473,15 +495,21 @@ NamedFunction
             ->  NamedFunction
 FunctionNamedBody
             <-  FUNCTION FuncName FuncArg
+                    LabelStart
                     (!END Action)*
-                MaybeEnd
+                    LabelEnd
+                NeedEnd
 FuncName    <-  (MustName (DOT MustName)* FuncMethod?)
             ->  Simple
 FuncMethod  <-  COLON Name / COLON {} -> MissMethod
 ]]
 
 grammar 'Lua' [[
-Lua         <-  Head? Action* -> Lua Sp
+Lua         <-  Head?
+                LabelStart
+                Action* -> Lua
+                LabelEnd
+                Sp
 Head        <-  '#' (!%nl .)*
 ]]
 

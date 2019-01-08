@@ -16,7 +16,7 @@
 - [x] Signature Help
 - [x] Document Symbols
 - [x] Support Dirty Script
-- [ ] Syntax Check
+- [x] Syntax Check
 - [ ] Multi Workspace
 - [ ] Type Format
 - [ ] Accurate Type Inference

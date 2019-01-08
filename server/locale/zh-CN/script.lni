@@ -7,6 +7,8 @@ DIAG_UNUSED_LABEL       = '未使用的标签 `{}`。'
 DIAG_REDEFINED_LOCAL    = '重定义局部变量 `{}`。'
 DIAG_PREVIOUS_CALL      = '解析为了上一行的函数调用。你可能需要在前面加一个 `;`。'
 DIAG_OVER_MAX_ARGS      = '函数只接收 {:d} 个参数，但你传了 {:d} 个。'
+DIAG_DIAGNOSTICS        = '诊断'
+DIAG_SYNTAX_CHECK       = '语法检查'
 
 MWS_NOT_SUPPORT         = '{} 目前还不支持多工作目录，我可能需要重启才能支持新的工作目录...'
 MWS_RESTART             = '重启'

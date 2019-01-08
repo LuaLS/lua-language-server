@@ -45,7 +45,7 @@ end
 
 local function createInfo(data, lines)
     local diagnostic = {
-        source   = 'Lua Language Server',
+        source   = 'Diagnostics',
         range    = getRange(data.start, data.finish, lines),
         severity = data.level,
         message  = data.message,
@@ -78,7 +78,7 @@ end
 
 local function buildError(err, lines)
     local diagnostic = {
-        source   = 'Lua Language Server',
+        source   = 'Syntax Check',
         message = lang.script('PARSER_'..err.type, err.info)
     }
     if err.level == 'error' then

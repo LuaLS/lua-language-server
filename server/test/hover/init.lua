@@ -293,3 +293,12 @@ local t: {
     [*function]: number = 6,
 }
 ]]
+
+TEST[[
+local x = 1
+local y = x
+print(<?y?>)
+]]
+[[
+local y: number = 1
+]]

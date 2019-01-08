@@ -5,6 +5,7 @@ local type = type
 
 local Errs
 local State
+local Defs
 local function pushError(err)
     if err.finish < err.start then
         err.finish = err.start
@@ -44,7 +45,157 @@ local RESERVED = {
     ['while']    = true,
 }
 
-local defs = {
+local Exp
+
+local function expSplit(list, start, finish, level)
+    if start == finish then
+        return list[start]
+    end
+    local info = Exp[level]
+    if not info then
+        return
+    end
+    local func = info[1]
+    return func(list, start, finish, level)
+end
+
+local function binaryForward(list, start, finish, level)
+    local info = Exp[level]
+    for i = finish-1, start+2, -1 do
+        local op = list[i]
+        if info[op] then
+            local e1 = expSplit(list, start, i-2, level)
+            if not e1 then
+                goto CONTINUE
+            end
+            local e2 = expSplit(list, i+1, finish, level+1)
+            if not e2 then
+                e2 = Defs.DirtyExp(#op + list[i-1])
+            end
+            return {
+                type   = 'binary',
+                op     = op,
+                start  = e1.start,
+                finish = e2.finish,
+                [1]    = e1,
+                [2]    = e2,
+            }
+        end
+        ::CONTINUE::
+    end
+    return expSplit(list, start, finish, level+1)
+end
+
+local function binaryBackward(list, start, finish, level)
+    local info = Exp[level]
+    for i = start+2, finish-1 do
+        local op = list[i]
+        if info[op] then
+            local e1 = expSplit(list, start, i-2, level+1)
+            if not e1 then
+                goto CONTINUE
+            end
+            local e2 = expSplit(list, i+1, finish, level)
+            if not e2 then
+                e2 = Defs.DirtyExp(#op + list[i-1])
+            end
+            return {
+                type   = 'binary',
+                op     = op,
+                start  = e1.start,
+                finish = e2.finish,
+                [1]    = e1,
+                [2]    = e2,
+            }
+        end
+        ::CONTINUE::
+    end
+    return expSplit(list, start, finish, level+1)
+end
+
+local function unary(list, start, finish, level)
+    local info = Exp[level]
+    local op = list[start+1]
+    if info[op] then
+        local e1 = expSplit(list, start+2, finish, level)
+        if e1 then
+            return {
+                type   = 'unary',
+                op     = op,
+                start  = list[start],
+                finish = e1.finish,
+                [1]    = e1,
+            }
+        end
+    end
+    return expSplit(list, start, finish, level+1)
+end
+
+Exp = {
+    {
+        ['or'] = true,
+        binaryForward,
+    },
+    {
+        ['and'] = true,
+        binaryForward,
+    },
+    {
+        ['<='] = true,
+        ['>='] = true,
+        ['<']  = true,
+        ['>']  = true,
+        ['~='] = true,
+        ['=='] = true,
+        binaryForward,
+    },
+    {
+        ['|'] = true,
+        binaryForward,
+    },
+    {
+        ['~'] = true,
+        binaryForward,
+    },
+    {
+        ['&'] = true,
+        binaryForward,
+    },
+    {
+        ['<<'] = true,
+        ['>>'] = true,
+        binaryForward,
+    },
+    {
+        ['..'] = true,
+        binaryBackward,
+    },
+    {
+        ['+'] = true,
+        ['-'] = true,
+        binaryForward,
+    },
+    {
+        ['*']  = true,
+        ['//'] = true,
+        ['/']  = true,
+        ['%']  = true,
+        binaryForward,
+    },
+    {
+        ['^'] = true,
+        binaryBackward,
+    },
+    {
+        ['not'] = true,
+        ['#']   = true,
+        ['~']   = true,
+        ['-']   = true,
+        unary,
+    },
+}
+
+Defs = {
     Nil = function (pos)
         return {
             type   = 'nil',
@@ -201,6 +352,13 @@ local defs = {
             return first
         end
     end,
+    Exp = function (first, ...)
+        if not ... then
+            return first
+        end
+        local list = {first, ...}
+        return expSplit(list, 1, #list, 1)
+    end,
     Prefix = function (start, exp, finish)
         return exp
     end,
@@ -233,43 +391,6 @@ local defs = {
             [1]  = arg,
         }
         return obj
-    end,
-    Binary = function (...)
-        local e1, op = ...
-        if not op then
-            return e1
-        end
-        local args = {...}
-        local e1 = args[1]
-        local e2
-        for i = 2, #args, 2 do
-            op, e2 = args[i], args[i+1]
-            e1 = {
-                type   = 'binary',
-                op     = op,
-                start  = e1.start,
-                finish = e2.finish,
-                [1]    = e1,
-                [2]    = e2,
-            }
-        end
-        return e1
-    end,
-    Unary = function (...)
-        local args = {...}
-        local e1 = args[#args]
-        for i = #args - 1, 1, -2 do
-            local start = args[i-1]
-            local op = args[i]
-            e1 = {
-                type   = 'unary',
-                op     = op,
-                start  = start,
-                finish = e1.finish,
-                [1]    = e1,
-            }
-        end
-        return e1
     end,
     DOTS = function (start)
         return {
@@ -1041,7 +1162,7 @@ return function (self, lua, mode)
         Break = 0,
         Label = {{}},
     }
-    local suc, res, err = pcall(self.grammar, lua, mode, defs)
+    local suc, res, err = pcall(self.grammar, lua, mode, Defs)
     if not suc then
         return nil, res
     end

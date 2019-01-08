@@ -183,6 +183,19 @@ UnaryList   <-  NOT
             /   '~' !'='
 POWER       <-  Sp {'^'}
 
+Op          <-  {} {'or'} Cut
+            /   {} {'and'} Cut
+            /   {} {'<=' / '>=' / '<'!'<' / '>'!'>' / '~=' / '=='}
+            /   {} {'|'}
+            /   {} {'~'}
+            /   {} {'&'}
+            /   {} {'<<' / '>>'}
+            /   {} {'..'} !'.'
+            /   {} {'+' / '-'}
+            /   {} {'*' / '//' / '/' / '%'}
+            /   {} {'not' Cut / '#'}
+            /   {} {'^'}
+
 PL          <-  Sp '('
 PR          <-  Sp ')'
 BL          <-  Sp '['
@@ -274,34 +287,9 @@ DirtyName   <-  {} -> DirtyName
 ]]
 
 grammar 'Exp' [[
-Exp         <-  Sp ExpOr
-ExpOr       <-  (ExpAnd     SuffixOr*)     -> Binary
-ExpAnd      <-  (ExpCompare SuffixAnd*)    -> Binary
-ExpCompare  <-  (ExpBor     SuffixComp*)   -> Binary
-ExpBor      <-  (ExpBxor    SuffixBor*)    -> Binary
-ExpBxor     <-  (ExpBand    SuffixBxor*)   -> Binary
-ExpBand     <-  (ExpBshift  SuffixBand*)   -> Binary
-ExpBshift   <-  (ExpConcat  SuffixBshift*) -> Binary
-ExpConcat   <-  (ExpAdds    SuffixConcat*) -> Binary
-ExpAdds     <-  (ExpMuls    SuffixAdds*)   -> Binary
-ExpMuls     <-  (ExpUnary   SuffixMuls*)   -> Binary
-ExpUnary    <-  (           SuffixUnary)   -> Unary
-            /   ExpPower
-ExpPower    <-  (ExpUnit    SuffixPower*)  -> Binary
-
-SuffixOr    <-  OR     (ExpAnd     / {} -> DirtyExp)
-SuffixAnd   <-  AND    (ExpCompare / {} -> DirtyExp)
-SuffixComp  <-  Comp   (ExpBor     / {} -> DirtyExp)
-SuffixBor   <-  BOR    (ExpBxor    / {} -> DirtyExp)
-SuffixBxor  <-  BXOR   (ExpBand    / {} -> DirtyExp)
-SuffixBand  <-  BAND   (ExpBshift  / {} -> DirtyExp)
-SuffixBshift<-  Bshift (ExpConcat  / {} -> DirtyExp)
-SuffixConcat<-  Concat (ExpConcat  / {} -> DirtyExp)
-SuffixAdds  <-  Adds   (ExpMuls    / {} -> DirtyExp)
-SuffixMuls  <-  Muls   (ExpUnary   / {} -> DirtyExp)
-SuffixUnary <-  Unary+ (ExpPower   / {} -> DirtyExp)
-SuffixPower <-  POWER  (ExpUnary   / {} -> DirtyExp)
-
+Exp         <-  ((Sp (Op / ExpUnit Sp Op))+ (Sp ExpUnit / {}->DirtyExp))
+            ->  Exp
+            /   Sp ExpUnit
 ExpUnit     <-  Nil
             /   Boolean
             /   String
@@ -317,12 +305,17 @@ Prefix      <-  Sp ({} PL DirtyExp DirtyPR)
             ->  Prefix
             /   FreeName
 Suffix      <-  DOT   Name / DOT   {} -> MissField
-            /   Method (!PL {} -> MissPL)?
+            /   Method (!(Sp CallStart) {} -> MissPL)?
             /   ({} Table {}) -> Call
             /   ({} String {}) -> Call
             /   ({} BL DirtyExp DirtyBR) -> Index
             /   ({} PL CallArgList DirtyPR) -> Call
 Method      <-  COLON Name / COLON {} -> MissMethod
+CallStart   <-  PL
+            /   TL
+            /   '"'
+            /   "'"
+            /   '[' '='* '['
 
 DirtyExp    <-  Exp
             /   {} -> DirtyExp

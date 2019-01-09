@@ -402,8 +402,9 @@ BreakStart  <-  {} -> BreakStart
 BreakEnd    <-  {} -> BreakEnd
 
 Return      <-  RETURN MustExpList?
-            ->  Return
-                (Sp {} (!END !UNTIL !ELSEIF !ELSE Action)+ {})?
+            ->  Return (Semicolon / ActionAfterReturn)*
+ActionAfterReturn
+            <-  (Sp {} (!END !UNTIL !ELSEIF !ELSE Action)+ {})
             ->  ActionAfterReturn
 
 Label       <-  LABEL MustName -> Label DirtyLabel

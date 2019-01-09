@@ -12,7 +12,7 @@
 - [x] Diagnostics
 - [x] Rename
 - [x] Auto Completion
-- [x] Intelligent
+- [x] IntelliSense
 - [x] Signature Help
 - [x] Document Symbols
 - [x] Support Dirty Script

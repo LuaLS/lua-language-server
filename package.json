@@ -16,10 +16,10 @@
 		"Programming Languages"
 	],
 	"keywords": [
-		"lua",
-		"language",
-		"server",
-		"definition"
+		"Lua",
+		"LSP",
+		"GoTo Definition",
+		"IntelliSense"
 	],
 	"engines": {
 		"vscode": "^1.23.0"

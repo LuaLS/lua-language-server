@@ -5,7 +5,6 @@ local type = type
 
 local Errs
 local State
-local Defs
 local function pushError(err)
     if err.finish < err.start then
         err.finish = err.start
@@ -70,7 +69,7 @@ local function binaryForward(list, start, finish, level)
             end
             local e2 = expSplit(list, i+1, finish, level+1)
             if not e2 then
-                e2 = Defs.DirtyExp(#op + list[i-1])
+                goto CONTINUE
             end
             return {
                 type   = 'binary',
@@ -97,7 +96,7 @@ local function binaryBackward(list, start, finish, level)
             end
             local e2 = expSplit(list, i+1, finish, level)
             if not e2 then
-                e2 = Defs.DirtyExp(#op + list[i-1])
+                goto CONTINUE
             end
             return {
                 type   = 'binary',
@@ -195,7 +194,7 @@ Exp = {
     },
 }
 
-Defs = {
+local Defs = {
     Nil = function (pos)
         return {
             type   = 'nil',

@@ -479,6 +479,7 @@ Set         <-  (SimpleList ASSIGN ExpList?)
             ->  Set
 
 Call        <-  Simple
+            ->  SimpleCall
 
 LocalFunction
             <-  Sp ({} LOCAL FunctionNamedBody {})

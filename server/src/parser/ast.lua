@@ -351,6 +351,34 @@ local Defs = {
             return first
         end
     end,
+    SimpleCall = function (simple)
+        if not simple then
+            return nil
+        end
+        if simple.type ~= 'simple' then
+            pushError {
+                type   = 'EXP_IN_ACTION',
+                start  = simple.start,
+                finish = simple.finish,
+            }
+            return simple
+        end
+        local last = simple[#simple]
+        if last.type == 'call' then
+            return simple
+        end
+        local colon = simple[#simple-1]
+        if colon and colon.type == ':' then
+            -- 型如 `obj:method`，将错误让给MISS_SYMBOL
+            return simple
+        end
+        pushError {
+            type   = 'EXP_IN_ACTION',
+            start  = simple[1].start,
+            finish = last.finish,
+        }
+        return simple
+    end,
     Exp = function (first, ...)
         if not ... then
             return first

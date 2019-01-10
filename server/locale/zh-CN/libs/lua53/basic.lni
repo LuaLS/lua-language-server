@@ -1,3 +1,6 @@
+[arg]
+description = '独立版Lua的启动参数。'
+
 [assert]
 description = '如果其参数 `v` 的值为假，它就调用 `error`。'
 

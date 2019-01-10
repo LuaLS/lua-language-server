@@ -1,6 +1,9 @@
 <default>
 type = 'function'
 
+[arg]
+type = 'table'
+
 [assert]
 [[.args]]
 name = 'v'

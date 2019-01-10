@@ -45,7 +45,7 @@ local function searchUndefinedGlobal(results, callback)
             goto NEXT_VAR
         end
         local lIndex = index:lower()
-        if lIndex == 'log' or lIndex == 'arg' or lIndex == '' then
+        if lIndex == 'log' or lIndex == '' then
             goto NEXT_VAR
         end
         if index:find '^_*%u' then

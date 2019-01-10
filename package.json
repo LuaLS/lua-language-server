@@ -33,17 +33,11 @@
 			"type": "object",
 			"title": "Lua",
 			"properties": {
-				"Lua.diagnostics.postSpcae": {
+				"Lua.diagnostics.disable": {
 					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Check post spaces.\n检查后置空格。"
-				},
-				"Lua.diagnostics.spaceOnlyLine": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "Check space-only lines.\n检查只有空格的行。"
+					"type": "array",
+					"items": "string",
+					"description": "Disabled diagnostic (Use code in hover brackets).\n禁用的诊断（使用浮框括号内的代码）。"
 				},
 				"Lua.diagnostics.globals": {
 					"scope": "resource",

@@ -49,6 +49,7 @@ local function createInfo(data, lines)
         range    = getRange(data.start, data.finish, lines),
         severity = data.level,
         message  = data.message,
+        code     = data.code,
     }
     if data.related then
         local related = {}

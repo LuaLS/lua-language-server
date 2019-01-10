@@ -29,9 +29,8 @@ end
 
 local Template = {
     diagnostics = {
-        postSpcae     = {true, Boolean},
-        spaceOnlyLine = {true, Boolean},
         globals       = {{},   Str2Hash ';'},
+        disable       = {{},   Str2Hash ';'},
     },
     workspace = {
         ignoreDir     = {{},   Str2Hash ';'}

@@ -101,28 +101,24 @@ local function searchSpaces(vm, lines, callback)
     for i = 1, #lines do
         local line = lines:line(i)
 
-        if config.config.diagnostics.spaceOnlyLine then
-            if line:find '^[ \t]+$' then
-                local start, finish = lines:range(i)
-                if isInString(vm, start, finish) then
-                    goto NEXT_LINE
-                end
-                callback(start, finish, lang.script.DIAG_LINE_ONLY_SPACE)
+        if line:find '^[ \t]+$' then
+            local start, finish = lines:range(i)
+            if isInString(vm, start, finish) then
                 goto NEXT_LINE
             end
+            callback(start, finish, lang.script.DIAG_LINE_ONLY_SPACE)
+            goto NEXT_LINE
         end
 
-        if config.config.diagnostics.postSpcae then
-            local pos = line:find '[ \t]+$'
-            if pos then
-                local start, finish = lines:range(i)
-                start = start + pos - 1
-                if isInString(vm, start, finish) then
-                    goto NEXT_LINE
-                end
-                callback(start, finish, lang.script.DIAG_LINE_POST_SPACE)
+        local pos = line:find '[ \t]+$'
+        if pos then
+            local start, finish = lines:range(i)
+            start = start + pos - 1
+            if isInString(vm, start, finish) then
                 goto NEXT_LINE
             end
+            callback(start, finish, lang.script.DIAG_LINE_POST_SPACE)
+            goto NEXT_LINE
         end
 
         ::NEXT_LINE::
@@ -211,68 +207,89 @@ return function (vm, lines, uri)
     local datas = {}
     local results = vm.results
     -- 未使用的局部变量
-    searchUnusedLocals(results, function (start, finish, key)
-        datas[#datas+1] = {
-            start   = start,
-            finish  = finish,
-            level   = DiagnosticSeverity.Information,
-            message = lang.script('DIAG_UNUSED_LOCAL', key),
-        }
-    end)
+    if not config.config.diagnostics.disable['unused-local'] then
+        searchUnusedLocals(results, function (start, finish, key)
+            datas[#datas+1] = {
+                code    = 'unused-local',
+                start   = start,
+                finish  = finish,
+                level   = DiagnosticSeverity.Information,
+                message = lang.script('DIAG_UNUSED_LOCAL', key),
+            }
+        end)
+    end
     -- 读取未定义全局变量
-    searchUndefinedGlobal(results, function (start, finish, key)
-        datas[#datas+1] = {
-            start   = start,
-            finish  = finish,
-            level   = DiagnosticSeverity.Warning,
-            message = lang.script('DIAG_UNDEFINED_GLOBAL', key),
-        }
-    end)
+    if not config.config.diagnostics.disable['undefined-global'] then
+        searchUndefinedGlobal(results, function (start, finish, key)
+            datas[#datas+1] = {
+                code    = 'undefined-global',
+                start   = start,
+                finish  = finish,
+                level   = DiagnosticSeverity.Warning,
+                message = lang.script('DIAG_UNDEFINED_GLOBAL', key),
+            }
+        end)
+    end
     -- 未使用的Label
-    searchUnusedLabel(results, function (start, finish, key)
-        datas[#datas+1] = {
-            start   = start,
-            finish  = finish,
-            level   =DiagnosticSeverity.Information,
-            message = lang.script('DIAG_UNUSED_LABEL', key)
-        }
-    end)
+    if not config.config.diagnostics.disable['unused-label'] then
+        searchUnusedLabel(results, function (start, finish, key)
+            datas[#datas+1] = {
+                code    = 'unused-label',
+                start   = start,
+                finish  = finish,
+                level   =DiagnosticSeverity.Information,
+                message = lang.script('DIAG_UNUSED_LABEL', key)
+            }
+        end)
+    end
     -- 只有空格与制表符的行，以及后置空格
-    searchSpaces(vm, lines, function (start, finish, message)
-        datas[#datas+1] = {
-            start   = start,
-            finish  = finish,
-            level   = DiagnosticSeverity.Information,
-            message = message,
-        }
-    end)
+    if not config.config.diagnostics.disable['trailing-space'] then
+        searchSpaces(vm, lines, function (start, finish, message)
+            datas[#datas+1] = {
+                code    = 'trailing-space',
+                start   = start,
+                finish  = finish,
+                level   = DiagnosticSeverity.Information,
+                message = message,
+            }
+        end)
+    end
     -- 重定义局部变量
-    searchRedefinition(results, uri, function (start, finish, key, related)
-        datas[#datas+1] = {
-            start   = start,
-            finish  = finish,
-            level   = DiagnosticSeverity.Information,
-            message = lang.script('DIAG_REDEFINED_LOCAL', key),
-            related = related,
-        }
-    end)
+    if not config.config.diagnostics.disable['redefined-local'] then
+        searchRedefinition(results, uri, function (start, finish, key, related)
+            datas[#datas+1] = {
+                code    = 'redefined-local',
+                start   = start,
+                finish  = finish,
+                level   = DiagnosticSeverity.Information,
+                message = lang.script('DIAG_REDEFINED_LOCAL', key),
+                related = related,
+            }
+        end)
+    end
     -- 以括号开始的一行（可能被误解析为了上一行的call）
-    searchNewLineCall(results, lines, function (start, finish)
-        datas[#datas+1] = {
-            start   = start,
-            finish  = finish,
-            level   = DiagnosticSeverity.Information,
-            message = lang.script.DIAG_PREVIOUS_CALL,
-        }
-    end)
+    if not config.config.diagnostics.disable['newline-call'] then
+        searchNewLineCall(results, lines, function (start, finish)
+            datas[#datas+1] = {
+                code    = 'newline-call',
+                start   = start,
+                finish  = finish,
+                level   = DiagnosticSeverity.Information,
+                message = lang.script.DIAG_PREVIOUS_CALL,
+            }
+        end)
+    end
     -- 调用函数时的参数数量是否超过函数的接收数量
-    searchRedundantParameters(results, function (start, finish, max, passed)
-        datas[#datas+1] = {
-            start   = start,
-            finish  = finish,
-            level   = DiagnosticSeverity.Warning,
-            message = lang.script('DIAG_OVER_MAX_ARGS', max, passed),
-        }
-    end)
+    if not config.config.diagnostics.disable['remainder-parameters'] then
+        searchRedundantParameters(results, function (start, finish, max, passed)
+            datas[#datas+1] = {
+                code    = 'remainder-parameters',
+                start   = start,
+                finish  = finish,
+                level   = DiagnosticSeverity.Warning,
+                message = lang.script('DIAG_OVER_MAX_ARGS', max, passed),
+            }
+        end)
+    end
     return datas
 end

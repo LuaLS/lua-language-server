@@ -1491,6 +1491,11 @@ local function compile(ast, lsp, uri)
     -- 执行代码
     vm:doActions(ast)
 
+    vm.scope = nil
+    vm.chunk = nil
+    vm.libraryValue = nil
+    vm.libraryChild = nil
+
     return vm
 end
 

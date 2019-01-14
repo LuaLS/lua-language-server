@@ -213,7 +213,7 @@ return function (vm, lines, uri)
                 code    = 'unused-local',
                 start   = start,
                 finish  = finish,
-                level   = DiagnosticSeverity.Information,
+                level   = DiagnosticSeverity.Hint,
                 message = lang.script('DIAG_UNUSED_LOCAL', key),
             }
         end)
@@ -225,7 +225,7 @@ return function (vm, lines, uri)
                 code    = 'undefined-global',
                 start   = start,
                 finish  = finish,
-                level   = DiagnosticSeverity.Warning,
+                level   = DiagnosticSeverity.Information,
                 message = lang.script('DIAG_UNDEFINED_GLOBAL', key),
             }
         end)
@@ -237,7 +237,7 @@ return function (vm, lines, uri)
                 code    = 'unused-label',
                 start   = start,
                 finish  = finish,
-                level   =DiagnosticSeverity.Information,
+                level   =DiagnosticSeverity.Hint,
                 message = lang.script('DIAG_UNUSED_LABEL', key)
             }
         end)
@@ -249,7 +249,7 @@ return function (vm, lines, uri)
                 code    = 'trailing-space',
                 start   = start,
                 finish  = finish,
-                level   = DiagnosticSeverity.Information,
+                level   = DiagnosticSeverity.Hint,
                 message = message,
             }
         end)
@@ -261,7 +261,7 @@ return function (vm, lines, uri)
                 code    = 'redefined-local',
                 start   = start,
                 finish  = finish,
-                level   = DiagnosticSeverity.Information,
+                level   = DiagnosticSeverity.Hint,
                 message = lang.script('DIAG_REDEFINED_LOCAL', key),
                 related = related,
             }
@@ -274,7 +274,7 @@ return function (vm, lines, uri)
                 code    = 'newline-call',
                 start   = start,
                 finish  = finish,
-                level   = DiagnosticSeverity.Information,
+                level   = DiagnosticSeverity.Hint,
                 message = lang.script.DIAG_PREVIOUS_CALL,
             }
         end)
@@ -286,7 +286,7 @@ return function (vm, lines, uri)
                 code    = 'remainder-parameters',
                 start   = start,
                 finish  = finish,
-                level   = DiagnosticSeverity.Warning,
+                level   = DiagnosticSeverity.Information,
                 message = lang.script('DIAG_OVER_MAX_ARGS', max, passed),
             }
         end)

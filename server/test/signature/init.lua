@@ -49,6 +49,28 @@ x(@)
 }
 
 TEST [[
+local function x(a, b)
+end
+
+x(xxx@)
+]]
+{
+    label = "function x(a: any, b: any)",
+    arg = 'a: any'
+}
+
+TEST [[
+local function x(a, b)
+end
+
+x(xxx, @)
+]]
+{
+    label = "function x(a: any, b: any)",
+    arg = 'b: any'
+}
+
+TEST [[
 function mt:f(a)
 end
 

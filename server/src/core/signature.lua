@@ -7,9 +7,16 @@ local function isContainPos(obj, pos)
     return false
 end
 
+local function isContainArgPos(obj, pos)
+    if obj.start <= pos and obj.finish+1 >= pos then
+        return true
+    end
+    return false
+end
+
 local function findArgCount(args, pos)
     for i, arg in ipairs(args) do
-        if isContainPos(arg, pos) then
+        if isContainArgPos(arg, pos) then
             return i, arg
         end
     end

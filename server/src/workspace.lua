@@ -74,6 +74,9 @@ function mt:init(rootUri)
         return
     end
     log.info('Workspace inited, root: ', self.root)
+    local logPath = ROOT / 'log' / (rootUri:gsub('[/:]+', '_') .. '.log')
+    log.info('Log path: ', logPath)
+    log.init(ROOT, logPath)
     async.call([[
         require 'utility'
         local fs = require 'bee.filesystem'

@@ -81,6 +81,8 @@ end
 function log.init(root, path)
     log.path = path:string()
     log.prefix_len = #root:string() + 3
+    log.file = nil
+    log.size = 0
     if not fs.exists(path:parent_path()) then
         fs.create_directories(path:parent_path())
     end

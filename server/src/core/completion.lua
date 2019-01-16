@@ -465,6 +465,9 @@ local function searchAllWords(result, vm, callback)
     if result.key == '' then
         return
     end
+    if not result.key then
+        return
+    end
     for source in pairs(vm.results.sources) do
         if source.type == 'name' then
             if result.key ~= source[1] and matchKey(result.key, source[1]) then

@@ -243,7 +243,6 @@ function mt:removeText(uri)
         return
     end
     obj.version = -1
-    self:clearDiagnostics(uri)
 end
 
 function mt:open(uri)

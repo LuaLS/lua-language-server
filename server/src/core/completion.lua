@@ -31,7 +31,7 @@ local CompletionItemKind = {
 
 local function matchKey(me, other)
     if me == other then
-        return false
+        return true
     end
     if me == '' then
         return true
@@ -425,16 +425,18 @@ local function makeList(list, source)
         end
         mark[key] = true
         data = data or {}
-        list[#list+1] = data
         if var == key then
             data.label = var
             data.kind = defualt
-        else
+        elseif var.source ~= source then
             data.label = var.key
             data.kind = getKind(var, defualt)
             data.detail = data.detail or getDetail(var)
             data.documentation = data.documentation or getDocument(var, source)
+        else
+            return
         end
+        list[#list+1] = data
     end
     return callback
 end
@@ -492,6 +494,27 @@ local function searchSpecial(vm, pos, callback)
     end
 end
 
+local function clearList(list, source)
+    local key = source[1]
+    -- 如果只有一个结果且是自己，则不显示
+    if #list == 1 then
+        if list[1].label == key then
+            list[1] = nil
+        end
+        return
+    end
+    -- 如果有多个结果，则将完全符合的放到最前面
+    if #list > 1 then
+        for i, v in ipairs(list) do
+            if v.label == key then
+                table.remove(list, i)
+                table.insert(list, 1, v)
+                return
+            end
+        end
+    end
+end
+
 return function (vm, pos)
     local list = {}
     local callback = makeList(list)
@@ -509,6 +532,7 @@ return function (vm, pos)
         if result then
             callback = makeList(list, source)
             searchInResult(result, source, vm, pos, callback)
+            clearList(list, source)
         end
     end
     if #list == 0 then

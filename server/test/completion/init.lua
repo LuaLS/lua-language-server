@@ -94,6 +94,10 @@ zabcde@
 ]]
 {
     {
+        label = 'zabcde',
+        kind = CompletionItemKind.Variable,
+    },
+    {
         label = 'zabcdefg',
         kind = CompletionItemKind.Variable,
     }
@@ -478,3 +482,26 @@ local t = {
 t @.
 ]]
 (nil)
+
+TEST [[
+local xxxx
+xxxx@
+]]
+(nil)
+
+TEST [[
+local xxxx
+local XXXX
+xxxx@
+]]
+
+{
+    {
+        label = 'xxxx',
+        kind = CompletionItemKind.Variable,
+    },
+    {
+        label = 'XXXX',
+        kind = CompletionItemKind.Variable,
+    }
+}

@@ -237,6 +237,15 @@ function mt:readText(uri, path)
     self:needCompile(uri)
 end
 
+function mt:removeText(uri)
+    local obj = self._file[uri]
+    if obj then
+        return
+    end
+    obj.version = -1
+    self:clearDiagnostics(uri)
+end
+
 function mt:open(uri)
     self._opening[uri] = true
 end
@@ -401,10 +410,6 @@ function mt:compileChain(child, parent)
         childObj.parent = {}
     end
     childObj.parent[parent] = true
-end
-
-function mt:removeText(uri)
-    self._file[uri] = nil
 end
 
 function mt:checkWorkSpaceComplete()

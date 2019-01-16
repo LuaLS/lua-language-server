@@ -206,9 +206,6 @@ end
 function mt:saveText(uri, version, text)
     local obj = self._file[uri]
     if obj then
-        if obj.version >= version then
-            return
-        end
         obj.version = version
         obj.text = text
         self:needCompile(uri)

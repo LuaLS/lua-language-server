@@ -45,7 +45,7 @@ function TEST(script)
     assert(vm)
 
     local result = core.findResult(vm, pos)
-    local positions = core.definition(vm, result)
+    local positions = core.definition(vm, result, nil)
     if positions then
         assert(founded(target, positions))
     else

@@ -28,7 +28,7 @@ return function (lsp, params)
 
     checkWorkSpaceComplete(lsp, result)
 
-    local positions = core.implementation(vm, result)
+    local positions = core.implementation(vm, result, lsp)
     if not positions then
         return nil
     end

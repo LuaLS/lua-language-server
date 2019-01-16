@@ -461,6 +461,19 @@ local function searchInResult(result, source, vm, pos, callback)
     end
 end
 
+local function searchAllWords(result, vm, callback)
+    if result.key == '' then
+        return
+    end
+    for source in pairs(vm.results.sources) do
+        if source.type == 'name' then
+            if result.key ~= source[1] and matchKey(result.key, source[1]) then
+                callback(source[1], CompletionItemKind.Text)
+            end
+        end
+    end
+end
+
 local function searchSpecial(vm, pos, callback)
     -- 尝试 #
     local result, source = findResult(vm, pos, 2)
@@ -532,6 +545,7 @@ return function (vm, pos)
         if result then
             callback = makeList(list, source)
             searchInResult(result, source, vm, pos, callback)
+            searchAllWords(result, vm, callback)
             clearList(list, source)
         end
     end

@@ -112,7 +112,11 @@ local zabcde
     {
         label = 'zabcdefg',
         kind = CompletionItemKind.Variable,
-    }
+    },
+    {
+        label = 'zabcde',
+        kind = CompletionItemKind.Text,
+    },
 }
 
 TEST [[
@@ -315,7 +319,11 @@ print(fff)
     {
         label = 'function',
         kind = CompletionItemKind.Keyword,
-    }
+    },
+    {
+        label = 'faa',
+        kind = CompletionItemKind.Text,
+    },
 }
 
 TEST [[
@@ -494,7 +502,6 @@ local xxxx
 local XXXX
 xxxx@
 ]]
-
 {
     {
         label = 'xxxx',
@@ -504,4 +511,17 @@ xxxx@
         label = 'XXXX',
         kind = CompletionItemKind.Variable,
     }
+}
+
+TEST [[
+local t = {
+    xxxxx = 1,
+}
+xx@
+]]
+{
+    {
+        label = 'xxxxx',
+        kind = CompletionItemKind.Text,
+    },
 }

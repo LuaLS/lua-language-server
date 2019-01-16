@@ -19,7 +19,8 @@ function TEST(script)
             local arg = hover.argLabel
 
             assert(expect.label == label)
-            assert(expect.arg == arg)
+            assert(expect.arg[1] == arg[1])
+            assert(expect.arg[2] == arg[2])
         else
             assert(expect == nil)
         end
@@ -34,7 +35,7 @@ x(@
 ]]
 {
     label = "function x(a: any, b: any)",
-    arg = 'a: any'
+    arg = {12, 17},
 }
 
 TEST [[
@@ -45,7 +46,7 @@ x(@)
 ]]
 {
     label = "function x(a: any, b: any)",
-    arg = 'a: any'
+    arg = {12, 17},
 }
 
 TEST [[
@@ -56,7 +57,7 @@ x(xxx@)
 ]]
 {
     label = "function x(a: any, b: any)",
-    arg = 'a: any'
+    arg = {12, 17},
 }
 
 TEST [[
@@ -67,7 +68,7 @@ x(xxx, @)
 ]]
 {
     label = "function x(a: any, b: any)",
-    arg = 'b: any'
+    arg = {20, 25},
 }
 
 TEST [[
@@ -78,7 +79,7 @@ mt:f(@
 ]]
 {
     label = 'function mt:f(a: any)',
-    arg = 'a: any'
+    arg = {15, 20},
 }
 
 TEST [[
@@ -89,7 +90,7 @@ TEST [[
 function *string:sub(i: integer [, j: integer(-1)])
   -> string
 ]],
-    arg = 'i: integer'
+    arg = {22, 31},
 }
 
 TEST [[

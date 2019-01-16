@@ -29,7 +29,6 @@ local function buildLibArgs(lib, oo, select)
         start = 1
     end
     local strs = {}
-    local argLabel
     for i = start, #lib.args do
         local arg = lib.args[i]
         if arg.optional then
@@ -44,6 +43,9 @@ local function buildLibArgs(lib, oo, select)
         end
 
         local argStr = {}
+        if i == select then
+            argStr[#argStr+1] = '@ARG'
+        end
         if arg.name then
             argStr[#argStr+1] = ('%s: '):format(arg.name)
         end
@@ -55,6 +57,9 @@ local function buildLibArgs(lib, oo, select)
         if arg.default then
             argStr[#argStr+1] = ('(%q)'):format(arg.default)
         end
+        if i == select then
+            argStr[#argStr+1] = '@ARG'
+        end
 
         for _, str in ipairs(argStr) do
             strs[#strs+1] = str
@@ -62,16 +67,29 @@ local function buildLibArgs(lib, oo, select)
         if arg.optional == 'self' then
             strs[#strs+1] = ']'
         end
-        if i == select then
-            argLabel = table.concat(argStr)
-        end
     end
     for _, arg in ipairs(lib.args) do
         if arg.optional == 'after' then
             strs[#strs+1] = ']'
         end
     end
-    return table.concat(strs), argLabel
+    local text = table.concat(strs)
+    local argLabel = {}
+    for i = 1, 2 do
+        local pos = text:find('@ARG', 1, true)
+        if pos then
+            if i == 1 then
+                argLabel[i] = pos
+            else
+                argLabel[i] = pos - 1
+            end
+            text = text:sub(1, pos-1) .. text:sub(pos+4)
+        end
+    end
+    if #argLabel == 0 then
+        argLabel = nil
+    end
+    return text, argLabel
 end
 
 local function buildLibReturns(lib)
@@ -177,7 +195,12 @@ local function getFunctionHoverAsLib(name, lib, oo, select)
     local returns = buildLibReturns(lib)
     local enum = buildEnum(lib)
     local tip = lib.description
+    local headLen = #('function %s('):format(name)
     local title = ('function %s(%s)%s'):format(name, args, returns)
+    if argLabel then
+        argLabel[1] = argLabel[1] + headLen
+        argLabel[2] = argLabel[2] + headLen
+    end
     return {
         label = title,
         description = tip,

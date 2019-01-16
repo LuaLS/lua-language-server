@@ -23,7 +23,10 @@ return function (lsp, params)
             },
             parameters = {
                 {
-                    label = hover.argLabel,
+                    label = {
+                        hover.argLabel[1] - 1,
+                        hover.argLabel[2],
+                    },
                 },
             },
         }

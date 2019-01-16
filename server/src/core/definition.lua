@@ -28,6 +28,34 @@ local function parseResultAcrossUri(positions, vm, result)
     end
 end
 
+local function findFieldBySource(positions, source, obj, result)
+    if source.type == 'name' and source[1] == result.key then
+        if obj.type == 'field' then
+            for _, info in ipairs(obj) do
+                if info.type == 'set' and info.source == source then
+                    positions[#positions+1] = {
+                        source.start,
+                        source.finish,
+                        source.uri,
+                    }
+                end
+            end
+        end
+    end
+end
+
+local function findFieldByName(positions, vm, result)
+    for source, obj in pairs(vm.results.sources) do
+        if source.type == 'multi-source' then
+            for i = 1, #obj do
+                findFieldBySource(positions, source, obj[i], result)
+            end
+        else
+            findFieldBySource(positions, source, obj, result)
+        end
+    end
+end
+
 local function parseResult(vm, result)
     local positions = {}
     local tp = result.type
@@ -57,6 +85,9 @@ local function parseResult(vm, result)
                         info.source.uri,
                     }
                 end
+            end
+            if #positions == 0 then
+                findFieldByName(positions, vm, result)
             end
         end
     elseif tp == 'label' then

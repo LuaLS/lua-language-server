@@ -134,6 +134,9 @@ local function searchRedefinition(results, uri, callback)
         then
             goto NEXT_VAR
         end
+        if var.hide then
+            goto NEXT_VAR
+        end
         local shadow = var.shadow
         if not shadow then
             goto NEXT_VAR

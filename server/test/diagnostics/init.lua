@@ -142,3 +142,11 @@ return [[
    
 ]]
 ]=]
+
+TEST [[
+local mt, x
+function mt:m()
+    function x:m()
+    end
+end
+]]

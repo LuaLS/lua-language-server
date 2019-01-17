@@ -525,3 +525,14 @@ xx@
         kind = CompletionItemKind.Text,
     },
 }
+
+TEST [[
+local index
+tbl[ind@]
+]]
+{
+    {
+        label = 'index',
+        kind = CompletionItemKind.Variable,
+    },
+}

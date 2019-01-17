@@ -114,7 +114,7 @@ local function searchLocals(vm, pos, name, callback)
     end
 end
 
-local function searchFields(name, parent, object, callback)
+local function searchFields(name, source, parent, object, callback)
     if not parent or not parent.value or not parent.value.child then
         return
     end
@@ -126,6 +126,9 @@ local function searchFields(name, parent, object, callback)
             if not field.value or field.value.type ~= 'function' then
                 goto CONTINUE
             end
+        end
+        if field.source == source then
+            goto CONTINUE
         end
         if type(name) == 'string' and matchKey(name, key) then
             callback(field)
@@ -203,7 +206,7 @@ local function getDocument(var, source)
 end
 
 local function searchAsLocal(vm, pos, result, callback)
-    searchFields(result.key, vm.results.locals[1], nil, function (var)
+    searchFields(result.key, result.source, vm.results.locals[1], nil, function (var)
         callback(var, CompletionItemKind.Variable)
     end)
 
@@ -214,7 +217,7 @@ local function searchAsLocal(vm, pos, result, callback)
 end
 
 local function searchAsArg(vm, pos, result, callback)
-    searchFields(result.key, vm.results.locals[1], nil, function (var)
+    searchFields(result.key, result.source, vm.results.locals[1], nil, function (var)
         if var.value.lib then
             return
         end
@@ -229,7 +232,7 @@ local function searchAsGlobal(vm, pos, result, callback)
     searchLocals(vm, pos, result.key, function (var)
         callback(var, CompletionItemKind.Variable)
     end)
-    searchFields(result.key, vm.results.locals[1], nil, function (var)
+    searchFields(result.key, result.source, vm.results.locals[1], nil, function (var)
         callback(var, CompletionItemKind.Field)
     end)
     searchKeyWords(result.key, function (name)
@@ -238,7 +241,7 @@ local function searchAsGlobal(vm, pos, result, callback)
 end
 
 local function searchAsSuffix(result, callback)
-    searchFields(result.key, result.parent, result.source.object, function (var)
+    searchFields(result.key, result.source, result.parent, result.source.object, function (var)
         callback(var, CompletionItemKind.Field)
     end)
 end
@@ -300,7 +303,7 @@ local function searchAsIndex(vm, pos, result, callback)
             callback(index.key, CompletionItemKind.Property)
         end
     end
-    searchFields(result.key, vm.results.locals[1], nil, function (var)
+    searchFields(result.key, result.source, vm.results.locals[1], nil, function (var)
         callback(var, CompletionItemKind.Field)
     end)
 end

@@ -301,6 +301,14 @@ function mt:getVM(uri)
     return obj.vm, obj.lines, obj.text
 end
 
+function mt:getText(uri)
+    local obj = self._file[uri]
+    if not obj then
+        return nil
+    end
+    return obj.text
+end
+
 function mt:getAstErrors(uri)
     local obj = self._file[uri]
     if not obj then

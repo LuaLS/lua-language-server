@@ -547,7 +547,7 @@ local function clearList(list, source)
     end
 end
 
-return function (vm, pos, buf)
+return function (vm, pos, word)
     local list = {}
     local callback = makeList(list)
     local inCall = findCall(vm, pos)
@@ -567,8 +567,8 @@ return function (vm, pos, buf)
             searchAllWords(result.key, vm, callback)
             clearList(list, source)
         else
-            if buf then
-                searchAllWords(buf:sub(pos-1, pos-1), vm, callback)
+            if word then
+                searchAllWords(word, vm, callback)
             end
         end
     end

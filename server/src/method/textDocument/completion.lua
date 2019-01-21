@@ -17,48 +17,60 @@ local function posToRange(lines, start, finish)
 end
 
 local function findStartPos(pos, buf)
-    local res = pos
     for i = pos-1, 1, -1 do
         local c = buf:sub(i, i)
         if c:find '%a' then
-            res = i
+            goto CONTINUE
         end
         if c == '.' or c == ':' then
-            break
+            return nil
+        end
+        do return i + 1 end
+        ::CONTINUE::
+    end
+    return 1
+end
+
+local function findWord(position, text)
+    for i = position-1, 1, -1 do
+        local c = text:sub(i, i)
+        if not c:find '%w' then
+            return text:sub(i+1, position)
         end
     end
-    return res
+    return text:sub(1, position)
 end
 
 return function (lsp, params)
     local uri = params.textDocument.uri
-    local vm, lines, buf = lsp:getVM(uri)
-    if not vm then
-        vm, lines, buf = lsp:loadVM(uri)
-        if not vm then
-            return nil
-        end
+    local text = lsp:getText(uri)
+    if not text then
+        return nil
     end
+
+    local lines = parser:lines(text, 'utf8')
     -- lua是从1开始的，因此都要+1
     local position = lines:position(params.position.line + 1, params.position.character + 1)
+    local word = findWord(position, text)
+    local startPos = findStartPos(position, text)
 
-    local startPos = findStartPos(position, buf)
-    if not startPos then
-        vm, lines, buf = lsp:loadVM(uri)
+    local vm = lsp:getVM(uri)
+    if not vm or not startPos then
+        vm = lsp:loadVM(uri)
         if not vm then
             return nil
         end
     end
+    startPos = startPos or position
 
-    local items = core.completion(vm, startPos or position, buf)
+    local items = core.completion(vm, startPos, word)
     if not items or #items == 0 then
-        vm, lines, buf = lsp:loadVM(uri)
+        vm = lsp:loadVM(uri)
         if not vm then
             return nil
         end
-        position = lines:position(params.position.line + 1, params.position.character + 1)
-        startPos = findStartPos(position, buf)
-        items = core.completion(vm, startPos or position, buf)
+        startPos = startPos or position
+        items = core.completion(vm, startPos, word)
         if not items or #items == 0 then
             return nil
         end
@@ -71,6 +83,7 @@ return function (lsp, params)
             item.textEdit.finish = nil
         end
     end
+
     local response = {
         isIncomplete = false,
         items = items,

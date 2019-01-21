@@ -385,11 +385,12 @@ function mt:_doCompileTask()
         if not suc then
             break
         end
-        if coroutine.status(self._compileTask) == 'dead' then
+        if coroutine.status(self._compileTask) == 'suspended' then
+            self:_loadProto()
+        else
             self._compileTask = nil
-            break
+            return
         end
-        self:_loadProto()
     end
 end
 

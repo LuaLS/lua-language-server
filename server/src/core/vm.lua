@@ -1436,6 +1436,9 @@ end
 function mt:doActions(actions)
     for _, action in ipairs(actions) do
         self:doAction(action)
+        if coroutine.isyieldable() then
+            coroutine.yield()
+        end
     end
 end
 

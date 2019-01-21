@@ -242,21 +242,9 @@ function mt:removeText(uri)
     obj.version = -1
 end
 
-function mt:open(uri)
-    self._opening[uri] = true
-end
-
-function mt:close(uri)
-    self._opening[uri] = nil
-end
-
-function mt:isOpen(uri)
-    return self._opening[uri] == true
-end
-
 function mt:reCompile()
     local compiled = {}
-    for uri in pairs(self._opening) do
+    for uri in pairs(self._file) do
         self:needCompile(uri, compiled)
     end
 
@@ -477,7 +465,6 @@ return function ()
         _file = {},
         _needCompile = {},
         _needDiagnostics = {},
-        _opening = {},
         _clock = -100,
         _version = 0,
     }, mt)

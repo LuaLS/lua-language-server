@@ -230,6 +230,9 @@ function mt:doDiagnostics(func, code, callback)
         data.finish = finish
         self.datas[#self.datas+1] = data
     end)
+    if coroutine.isyieldable() then
+        coroutine.yield()
+    end
 end
 
 return function (vm, lines, uri)

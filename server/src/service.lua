@@ -257,6 +257,8 @@ function mt:compileVM(uri)
     obj.lines = parser:lines(obj.text, 'utf8')
     obj.lineCost = os.clock() - clock
 
+    self._needDiagnostics[uri] = true
+
     if not obj.vm then
         return obj
     end
@@ -267,6 +269,10 @@ function mt:compileVM(uri)
 end
 
 function mt:doDiagnostics(uri)
+    if not self._needDiagnostics[uri] then
+        return
+    end
+    self._needDiagnostics[uri] = nil
     local name = 'textDocument/publishDiagnostics'
     local vm, lines = self:getVM(uri)
     if not vm then
@@ -341,13 +347,15 @@ function mt:checkWorkSpaceComplete()
 end
 
 function mt:_createCompileTask()
-    local uri = self._needCompile[1]
-    if not uri then
-        return nil
-    end
     self._compileTask = coroutine.create(function ()
-        self:compileVM(uri)
-        self:doDiagnostics(uri)
+        local uri = self._needCompile[1]
+        if uri then
+            self:compileVM(uri)
+        end
+        local uri = next(self._needDiagnostics)
+        if uri then
+            self:doDiagnostics(uri)
+        end
     end)
 end
 
@@ -428,6 +436,7 @@ return function ()
     local session = setmetatable({
         _file = {},
         _needCompile = {},
+        _needDiagnostics = {},
         _clock = -100,
         _version = 0,
     }, mt)

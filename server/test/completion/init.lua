@@ -57,6 +57,31 @@ local function eq(a, b)
     return a == b
 end
 
+local function findStartPos(pos, buf)
+    local res = nil
+    for i = pos-1, 1, -1 do
+        local c = buf:sub(i, i)
+        if c:find '%a' then
+            res = i
+        else
+            break
+        end
+    end
+    return res
+end
+
+local function findWord(position, text)
+    local word = text
+    for i = position-1, 1, -1 do
+        local c = text:sub(i, i)
+        if not c:find '%w' then
+            word = text:sub(i+1, position)
+            break
+        end
+    end
+    return word:match('^(%w*)')
+end
+
 rawset(_G, 'TEST', true)
 
 function TEST(script)
@@ -66,7 +91,9 @@ function TEST(script)
         local ast = parser:ast(new_script)
         local vm = core.vm(ast)
         assert(vm)
-        local result = core.completion(vm, pos)
+        local word = findWord(pos, new_script)
+        local startPos = findStartPos(pos, new_script) or pos
+        local result = core.completion(vm, startPos, word)
         if expect then
             assert(result)
             assert(eq(expect, result))

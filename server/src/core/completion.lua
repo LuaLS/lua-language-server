@@ -218,19 +218,19 @@ local function getDocument(var, source)
     return nil
 end
 
-local function searchAsLocal(vm, pos, result, callback)
-    searchFields(result.key, result.source, vm.results.locals[1], nil, function (var)
+local function searchAsLocal(vm, word, pos, result, callback)
+    searchFields(word, result.source, vm.results.locals[1], nil, function (var)
         callback(var, CompletionItemKind.Variable)
     end)
 
     -- 支持 local function
-    if matchKey(result.key, 'function') then
+    if matchKey(word, 'function') then
         callback('function', CompletionItemKind.Keyword)
     end
 end
 
-local function searchAsArg(vm, pos, result, callback)
-    searchFields(result.key, result.source, vm.results.locals[1], nil, function (var)
+local function searchAsArg(vm, word, pos, result, callback)
+    searchFields(word, result.source, vm.results.locals[1], nil, function (var)
         if var.value.lib then
             return
         end
@@ -238,23 +238,23 @@ local function searchAsArg(vm, pos, result, callback)
     end)
 end
 
-local function searchAsGlobal(vm, pos, result, callback)
-    if result.key == '' then
+local function searchAsGlobal(vm, word, pos, result, callback)
+    if word == '' or word == nil then
         return
     end
-    searchLocals(vm, pos, result.key, function (var)
+    searchLocals(vm, pos, word, function (var)
         callback(var, CompletionItemKind.Variable)
     end)
-    searchFields(result.key, result.source, vm.results.locals[1], nil, function (var)
+    searchFields(word, result.source, vm.results.locals[1], nil, function (var)
         callback(var, CompletionItemKind.Field)
     end)
-    searchKeyWords(result.key, function (name)
+    searchKeyWords(word, function (name)
         callback(name, CompletionItemKind.Keyword)
     end)
 end
 
-local function searchAsSuffix(result, callback)
-    searchFields(result.key, result.source, result.parent, result.source.object, function (var)
+local function searchAsSuffix(result, word, callback)
+    searchFields(word, result.source, result.parent, result.source.object, function (var)
         callback(var, CompletionItemKind.Field)
     end)
 end
@@ -307,16 +307,16 @@ local function searchInArg(vm, inCall, inString, callback)
     end
 end
 
-local function searchAsIndex(vm, pos, result, callback)
-    searchLocals(vm, pos, result.key, function (var)
+local function searchAsIndex(vm, word, pos, result, callback)
+    searchLocals(vm, pos, word, function (var)
         callback(var, CompletionItemKind.Variable)
     end)
     for _, index in ipairs(vm.results.indexs) do
-        if matchKey(result.key, index.key) then
+        if matchKey(word, index.key) then
             callback(index.key, CompletionItemKind.Property)
         end
     end
-    searchFields(result.key, result.source, vm.results.locals[1], nil, function (var)
+    searchFields(word, result.source, vm.results.locals[1], nil, function (var)
         callback(var, CompletionItemKind.Field)
     end)
 end
@@ -381,9 +381,10 @@ local function isContainPos(obj, pos)
     return false
 end
 
-local function findString(vm, pos)
+local function findString(vm, word, pos)
+    local finishPos = pos + #word - 1
     for _, source in ipairs(vm.results.strings) do
-        if isContainPos(source, pos) then
+        if isContainPos(source, finishPos) then
             return source
         end
     end
@@ -400,11 +401,12 @@ local function findArgCount(args, pos)
 end
 
 -- 找出范围包含pos的call
-local function findCall(vm, pos)
+local function findCall(vm, word, pos)
+    local finishPos = pos + #word - 1
     local results = {}
     for _, call in ipairs(vm.results.calls) do
-        if isContainPos(call.args, pos) then
-            local n = findArgCount(call.args, pos)
+        if isContainPos(call.args, finishPos) then
+            local n = findArgCount(call.args, finishPos)
             local var = vm.results.sources[call.lastObj]
             if var then
                 results[#results+1] = {
@@ -457,22 +459,22 @@ local function makeList(list, source)
     return callback
 end
 
-local function searchInResult(result, source, vm, pos, callback)
+local function searchInResult(result, word, source, vm, pos, callback)
     if result.type == 'local' then
         if source.isArg then
-            searchAsArg(vm, pos, result, callback)
+            searchAsArg(vm, word, pos, result, callback)
         elseif source.isLocal then
-            searchAsLocal(vm, pos, result, callback)
+            searchAsLocal(vm, word, pos, result, callback)
         else
-            searchAsGlobal(vm, pos, result, callback)
+            searchAsGlobal(vm, word, pos, result, callback)
         end
     elseif result.type == 'field' then
         if source.isIndex then
-            searchAsIndex(vm, pos, result, callback)
+            searchAsIndex(vm, word, pos, result, callback)
         elseif result.parent and result.parent.value and result.parent.value.ENV == true then
-            searchAsGlobal(vm, pos, result, callback)
+            searchAsGlobal(vm, word, pos, result, callback)
         else
-            searchAsSuffix(result, callback)
+            searchAsSuffix(result, word, callback)
         end
     end
 end
@@ -560,8 +562,8 @@ end
 return function (vm, pos, word)
     local list = {}
     local callback = makeList(list)
-    local inCall = findCall(vm, pos)
-    local inString = findString(vm, pos)
+    local inCall = findCall(vm, word, pos)
+    local inString = findString(vm, word, pos)
     if inCall then
         searchInArg(vm, inCall, inString, callback)
     end
@@ -573,13 +575,11 @@ return function (vm, pos, word)
         end
         if isValidResult(result) then
             callback = makeList(list, source)
-            searchInResult(result, source, vm, pos, callback)
+            searchInResult(result, word, source, vm, pos, callback)
             searchAllWords(result.key, vm, callback)
             clearList(list, source)
         else
-            if word then
-                searchAllWords(word, vm, callback)
-            end
+            searchAllWords(word, vm, callback)
         end
     end
     if #list == 0 then

@@ -30,13 +30,15 @@ local function findStartPos(pos, buf)
 end
 
 local function findWord(position, text)
+    local word = text
     for i = position-1, 1, -1 do
         local c = text:sub(i, i)
         if not c:find '%w' then
-            return text:sub(i+1, position)
+            word = text:sub(i+1, position)
+            break
         end
     end
-    return text:sub(1, position)
+    return word:match('^(%w*)')
 end
 
 return function (lsp, params)

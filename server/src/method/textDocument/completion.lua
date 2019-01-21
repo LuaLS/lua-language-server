@@ -17,18 +17,16 @@ local function posToRange(lines, start, finish)
 end
 
 local function findStartPos(pos, buf)
+    local res = nil
     for i = pos-1, 1, -1 do
         local c = buf:sub(i, i)
         if c:find '%a' then
-            goto CONTINUE
+            res = i
+        else
+            break
         end
-        if c == '.' or c == ':' then
-            return nil
-        end
-        do return i + 1 end
-        ::CONTINUE::
     end
-    return 1
+    return res
 end
 
 local function findWord(position, text)

@@ -17,18 +17,17 @@ local function posToRange(lines, start, finish)
 end
 
 local function findStartPos(pos, buf)
+    local res = pos
     for i = pos-1, 1, -1 do
         local c = buf:sub(i, i)
         if c:find '%a' then
-            goto CONTINUE
+            res = i
         end
-        if c == '.' then
-            return nil
+        if c == '.' or c == ':' then
+            break
         end
-        do return i + 1 end
-        ::CONTINUE::
     end
-    return pos
+    return res
 end
 
 return function (lsp, params)

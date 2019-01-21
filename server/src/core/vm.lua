@@ -2,6 +2,7 @@ local env = require 'core.env'
 local library = require 'core.library'
 
 local DefaultSource = { start = 0, finish = 0 }
+local GlobalChild
 
 -- 根据赋值顺序决定遍历顺序的表
 local function orderTable()
@@ -36,7 +37,6 @@ local function orderTable()
 end
 
 local function readOnly(t)
-    local keys
     return setmetatable({}, {
         __index = function (self, k)
             if k == nil then
@@ -53,9 +53,14 @@ local function readOnly(t)
             return #t
         end,
         __pairs = function (self)
-            if not keys then
-                keys = {}
-                for k in pairs(t) do
+            local keys = {}
+            local mark = {}
+            for k in next, self do
+                keys[#keys+1] = k
+            end
+            for k in pairs(t) do
+                if not mark[k] then
+                    mark[k] = true
                     keys[#keys+1] = k
                 end
             end
@@ -1449,11 +1454,15 @@ function mt:createEnvironment()
     self:createDots(1)
 
     -- 设置全局变量
-    for name, lib in pairs(library.global) do
-        local field = self:createField(envValue, name)
-        local value = self:getLibValue(lib, 'global')
-        value = self:setValue(field, value)
+    if not GlobalChild then
+        for name, lib in pairs(library.global) do
+            local field = self:createField(envValue, name)
+            local value = self:getLibValue(lib, 'global')
+            value = self:setValue(field, value)
+        end
+        GlobalChild = envValue.child
     end
+    envValue.child = readOnly(GlobalChild)
 
     -- 设置 _G 使用 _ENV 的child
     local g = self:getField(envValue, '_G')

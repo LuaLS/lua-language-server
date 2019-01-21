@@ -37,8 +37,8 @@ API描述的中文翻译来自[云风](https://cloudwu.github.io/lua53doc/manual
 
 ### library
 
-You can add your library at [here][libs] by `Pull Requests`. Attention, `source.type` should be `library`, this will not increase the burden of language services.
+You can add your library at [here][libs] by `Pull Requests`.
 
-你可以通过`Pull Requests`在[这里][libs]添加自己的函数库。注意，`source.type`必须设置为`library`，这样不会增加语言服务的负担。
+你可以通过`Pull Requests`在[这里][libs]添加自己的函数库。
 
 [libs]: https://github.com/sumneko/vscode-lua-language-server/tree/master/server/libs

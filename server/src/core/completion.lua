@@ -197,9 +197,22 @@ local function getDocument(var, source)
         return nil
     end
     if var.value.type == 'function' then
+        local hvr = hover(var, source)
+        if not hvr then
+            return nil
+        end
+        local text = ([[
+```lua
+%s
+```
+%s
+```lua
+%s
+```
+]]):format(hvr.label or '', hvr.description or '', hvr.enum or '')
         return {
             kind = 'markdown',
-            value = hover(var, source),
+            value = text,
         }
     end
     return nil

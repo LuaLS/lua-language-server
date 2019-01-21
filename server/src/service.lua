@@ -263,7 +263,7 @@ function mt:loadVM(uri)
         return nil
     end
     self:compileVM(uri)
-    return obj.vm, obj.lines
+    return obj.vm, obj.lines, obj.text
 end
 
 function mt:_markCompiled(uri)
@@ -363,7 +363,7 @@ function mt:getVM(uri)
     if not obj then
         return nil
     end
-    return obj.vm
+    return obj.vm, obj.lines, obj.text
 end
 
 function mt:getAstErrors(uri)

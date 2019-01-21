@@ -247,7 +247,7 @@ t:@
         label = 'b',
         kind = CompletionItemKind.Method,
         documentation = EXISTS,
-    }
+    },
 }
 
 TEST [[
@@ -433,7 +433,7 @@ self.results.list[#@]
             finish = 21,
             newText = 'self.results.list+1] = ',
         },
-    }
+    },
 }
 
 TEST [[

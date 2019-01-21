@@ -464,16 +464,16 @@ local function searchInResult(result, source, vm, pos, callback)
     end
 end
 
-local function searchAllWords(result, vm, callback)
-    if result.key == '' then
+local function searchAllWords(text, vm, callback)
+    if text == '' then
         return
     end
-    if type(result.key) ~= 'string' then
+    if type(text) ~= 'string' then
         return
     end
     for source in pairs(vm.results.sources) do
         if source.type == 'name' then
-            if result.key ~= source[1] and matchKey(result.key, source[1]) then
+            if text ~= source[1] and matchKey(text, source[1]) then
                 callback(source[1], CompletionItemKind.Text)
             end
         end
@@ -534,7 +534,7 @@ local function clearList(list, source)
     end
 end
 
-return function (vm, pos)
+return function (vm, pos, buf)
     local list = {}
     local callback = makeList(list)
     local inCall = findCall(vm, pos)
@@ -551,8 +551,12 @@ return function (vm, pos)
         if result then
             callback = makeList(list, source)
             searchInResult(result, source, vm, pos, callback)
-            searchAllWords(result, vm, callback)
+            searchAllWords(result.key, vm, callback)
             clearList(list, source)
+        else
+            if buf then
+                searchAllWords(buf:sub(pos-1, pos-1), vm, callback)
+            end
         end
     end
     if #list == 0 then

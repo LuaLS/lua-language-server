@@ -68,6 +68,7 @@ function TEST(data)
     ws.root = ROOT
 
     local mainUri
+    local mainBuf
     local pos
     for _, info in ipairs(data) do
         local uri = ws:uriEncode(fs.path(info.path))
@@ -76,6 +77,7 @@ function TEST(data)
             pos = script:find('@', 1, true)
             script = script:gsub('@', '')
             mainUri = uri
+            mainBuf = script
         end
         lsp:saveText(uri, 1, script)
         ws:addFile(uri)

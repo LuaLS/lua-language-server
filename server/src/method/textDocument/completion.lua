@@ -1,4 +1,5 @@
 local core = require 'core'
+local parser = require 'parser'
 
 local function posToRange(lines, start, finish)
     local start_row,  start_col  = lines:rowcol(start)
@@ -15,20 +16,53 @@ local function posToRange(lines, start, finish)
     }
 end
 
+local function findStartPos(pos, buf)
+    for i = pos-1, 1, -1 do
+        local c = buf:sub(i, i)
+        if c:find '%a' then
+            goto CONTINUE
+        end
+        if c == '.' then
+            return nil
+        end
+        do return i + 1 end
+        ::CONTINUE::
+    end
+    return pos
+end
+
 return function (lsp, params)
     local uri = params.textDocument.uri
-    local vm, lines = lsp:loadVM(uri)
+    local vm, lines, buf = lsp:getVM(uri)
     if not vm then
-        return nil
+        vm, lines, buf = lsp:loadVM(uri)
+        if not vm then
+            return nil
+        end
     end
     -- lua是从1开始的，因此都要+1
     local position = lines:position(params.position.line + 1, params.position.character + 1)
-    local items = core.completion(vm, position)
-    if not items then
-        return nil
+
+    local startPos = findStartPos(position, buf)
+    if not startPos then
+        vm, lines, buf = lsp:loadVM(uri)
+        if not vm then
+            return nil
+        end
     end
-    if #items == 0 then
-        return nil
+
+    local items = core.completion(vm, startPos or position, buf)
+    if not items or #items == 0 then
+        vm, lines, buf = lsp:loadVM(uri)
+        if not vm then
+            return nil
+        end
+        position = lines:position(params.position.line + 1, params.position.character + 1)
+        startPos = findStartPos(position, buf)
+        items = core.completion(vm, startPos or position, buf)
+        if not items or #items == 0 then
+            return nil
+        end
     end
     for i, item in ipairs(items) do
         item.sortText = ('%04d'):format(i)

@@ -8,7 +8,11 @@ local DiagnosticSeverity = {
     Hint        = 4,
 }
 
-local function searchUnusedLocals(results, callback)
+local mt = {}
+mt.__index = mt
+
+function mt:searchUnusedLocals(callback)
+    local results = self.results
     for _, var in ipairs(results.locals) do
         if var.key == 'self'
         or var.key == '_'
@@ -32,7 +36,8 @@ local function searchUnusedLocals(results, callback)
     end
 end
 
-local function searchUndefinedGlobal(results, callback)
+function mt:searchUndefinedGlobal(callback)
+    local results = self.results
     local env = results.locals[1]
     for index, field in pairs(env.value.child) do
         if field.value.lib then
@@ -65,7 +70,8 @@ local function searchUndefinedGlobal(results, callback)
     end
 end
 
-local function searchUnusedLabel(results, callback)
+function mt:searchUnusedLabel(callback)
+    local results = self.results
     for _, label in ipairs(results.labels) do
         for _, info in ipairs(label) do
             if info.type == 'goto' then
@@ -97,7 +103,9 @@ local function isInString(vm, start, finish)
     return false
 end
 
-local function searchSpaces(vm, lines, callback)
+function mt:searchSpaces(callback)
+    local vm = self.vm
+    local lines = self.lines
     for i = 1, #lines do
         local line = lines:line(i)
 
@@ -125,7 +133,9 @@ local function searchSpaces(vm, lines, callback)
     end
 end
 
-local function searchRedefinition(results, uri, callback)
+function mt:searchRedefinition(callback)
+    local results = self.results
+    local uri = self.uri
     local used = {}
     for _, var in ipairs(results.locals) do
         if var.key == '_'
@@ -164,7 +174,9 @@ local function searchRedefinition(results, uri, callback)
     end
 end
 
-local function searchNewLineCall(results, lines, callback)
+function mt:searchNewLineCall(callback)
+    local results = self.results
+    local lines = self.lines
     for _, call in ipairs(results.calls) do
         if not call.nextObj then
             goto NEXT_CALL
@@ -181,7 +193,8 @@ local function searchNewLineCall(results, lines, callback)
     end
 end
 
-local function searchRedundantParameters(results, callback)
+function mt:searchRedundantParameters(callback)
+    local results = self.results
     for _, call in ipairs(results.calls) do
         if not call.func.built then
             goto NEXT_CALL
@@ -206,93 +219,77 @@ local function searchRedundantParameters(results, callback)
     end
 end
 
+function mt:doDiagnostics(func, code, callback)
+    if config.config.diagnostics.disable[code] then
+        return
+    end
+    self[func](self, function (start, finish, ...)
+        local data = callback(...)
+        data.code   = code
+        data.start  = start
+        data.finish = finish
+        self.datas[#self.datas+1] = data
+    end)
+end
+
 return function (vm, lines, uri)
-    local datas = {}
-    local results = vm.results
+    local session = setmetatable({
+        vm = vm,
+        results = vm.results,
+        lines = lines,
+        uri = uri,
+        datas = {},
+    }, mt)
+
     -- 未使用的局部变量
-    if not config.config.diagnostics.disable['unused-local'] then
-        searchUnusedLocals(results, function (start, finish, key)
-            datas[#datas+1] = {
-                code    = 'unused-local',
-                start   = start,
-                finish  = finish,
-                level   = DiagnosticSeverity.Information,
-                message = lang.script('DIAG_UNUSED_LOCAL', key),
-            }
-        end)
-    end
+    session:doDiagnostics('searchUnusedLocals', 'unused-local', function (key)
+        return {
+            level   = DiagnosticSeverity.Information,
+            message = lang.script('DIAG_UNUSED_LOCAL', key),
+        }
+    end)
     -- 读取未定义全局变量
-    if not config.config.diagnostics.disable['undefined-global'] then
-        searchUndefinedGlobal(results, function (start, finish, key)
-            datas[#datas+1] = {
-                code    = 'undefined-global',
-                start   = start,
-                finish  = finish,
-                level   = DiagnosticSeverity.Warning,
-                message = lang.script('DIAG_UNDEFINED_GLOBAL', key),
-            }
-        end)
-    end
+    session:doDiagnostics('searchUndefinedGlobal', 'undefined-global', function (key)
+        return {
+            level   = DiagnosticSeverity.Warning,
+            message = lang.script('DIAG_UNDEFINED_GLOBAL', key),
+        }
+    end)
     -- 未使用的Label
-    if not config.config.diagnostics.disable['unused-label'] then
-        searchUnusedLabel(results, function (start, finish, key)
-            datas[#datas+1] = {
-                code    = 'unused-label',
-                start   = start,
-                finish  = finish,
-                level   =DiagnosticSeverity.Information,
-                message = lang.script('DIAG_UNUSED_LABEL', key)
-            }
-        end)
-    end
+    session:doDiagnostics('searchUnusedLabel', 'unused-label', function (key)
+        return {
+            level   =DiagnosticSeverity.Information,
+            message = lang.script('DIAG_UNUSED_LABEL', key)
+        }
+    end)
     -- 只有空格与制表符的行，以及后置空格
-    if not config.config.diagnostics.disable['trailing-space'] then
-        searchSpaces(vm, lines, function (start, finish, message)
-            datas[#datas+1] = {
-                code    = 'trailing-space',
-                start   = start,
-                finish  = finish,
-                level   = DiagnosticSeverity.Information,
-                message = message,
-            }
-        end)
-    end
+    session:doDiagnostics('searchSpaces', 'trailing-space', function (message)
+        return {
+            level   = DiagnosticSeverity.Information,
+            message = message,
+        }
+    end)
     -- 重定义局部变量
-    if not config.config.diagnostics.disable['redefined-local'] then
-        searchRedefinition(results, uri, function (start, finish, key, related)
-            datas[#datas+1] = {
-                code    = 'redefined-local',
-                start   = start,
-                finish  = finish,
-                level   = DiagnosticSeverity.Information,
-                message = lang.script('DIAG_REDEFINED_LOCAL', key),
-                related = related,
-            }
-        end)
-    end
+    session:doDiagnostics('searchRedefinition', 'redefined-local', function (key, related)
+        return {
+            level   = DiagnosticSeverity.Information,
+            message = lang.script('DIAG_REDEFINED_LOCAL', key),
+            related = related,
+        }
+    end)
     -- 以括号开始的一行（可能被误解析为了上一行的call）
-    if not config.config.diagnostics.disable['newline-call'] then
-        searchNewLineCall(results, lines, function (start, finish)
-            datas[#datas+1] = {
-                code    = 'newline-call',
-                start   = start,
-                finish  = finish,
-                level   = DiagnosticSeverity.Information,
-                message = lang.script.DIAG_PREVIOUS_CALL,
-            }
-        end)
-    end
+    session:doDiagnostics('searchNewLineCall', 'newline-call', function ()
+        return {
+            level   = DiagnosticSeverity.Information,
+            message = lang.script.DIAG_PREVIOUS_CALL,
+        }
+    end)
     -- 调用函数时的参数数量是否超过函数的接收数量
-    if not config.config.diagnostics.disable['remainder-parameters'] then
-        searchRedundantParameters(results, function (start, finish, max, passed)
-            datas[#datas+1] = {
-                code    = 'remainder-parameters',
-                start   = start,
-                finish  = finish,
-                level   = DiagnosticSeverity.Warning,
-                message = lang.script('DIAG_OVER_MAX_ARGS', max, passed),
-            }
-        end)
-    end
-    return datas
+    session:doDiagnostics('searchRedundantParameters', 'remainder-parameters', function (max, passed)
+        return {
+            level   = DiagnosticSeverity.Warning,
+            message = lang.script('DIAG_OVER_MAX_ARGS', max, passed),
+        }
+    end)
+    return session.datas
 end

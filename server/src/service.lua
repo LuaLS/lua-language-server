@@ -133,55 +133,6 @@ function mt:clearDiagnostics(uri)
     })
 end
 
-function mt:compileAll()
-    if not next(self._needCompile) then
-        return
-    end
-    local list = {}
-    for i, uri in ipairs(self._needCompile) do
-        list[i] = uri
-    end
-
-    local size = 0
-    local clock = os.clock()
-    for _, uri in ipairs(list) do
-        local obj = self:compileVM(uri)
-        if obj then
-            size = size + #obj.text
-        end
-    end
-
-    local passed = os.clock() - clock
-    if passed > 0.1 then
-        local astCost = 0
-        local vmCost = 0
-        local lineCost = 0
-        for _, uri in ipairs(list) do
-            local obj = self._file[uri]
-            if obj and obj.astCost and obj.vmCost and obj.lineCost then
-                astCost  = astCost  + obj.astCost
-                vmCost   = vmCost   + obj.vmCost
-                lineCost = lineCost + obj.lineCost
-            end
-        end
-        log.debug(('\n\z
-        Cache completion\n\z
-        Cost:  [%.3f]sec\n\z
-        Ast:   [%.3f]sec\n\z
-        VM:    [%.3f]sec\n\z
-        Line:  [%.3f]sec\n\z
-        Num:   [%d]\n\z
-        Size:  [%.3f]kb'):format(
-            passed,
-            astCost,
-            vmCost,
-            lineCost,
-            #list,
-            size / 1000
-        ))
-    end
-end
-
 function mt:read(mode)
     if not self._input then
         return nil
@@ -411,7 +362,38 @@ function mt:checkWorkSpaceComplete()
     })
 end
 
-function mt:onTick()
+function mt:_createCompileTask()
+    local uri = self._needCompile[1]
+    if not uri then
+        return nil
+    end
+    self._compileTask = coroutine.create(function ()
+        self:compileVM(uri)
+        self:_doDiagnostic()
+    end)
+end
+
+function mt:_doCompileTask()
+    if not self._compileTask then
+        self:_createCompileTask()
+    end
+    if not self._compileTask then
+        return
+    end
+    while true do
+        local suc, res = coroutine.resume(self._compileTask)
+        if not suc then
+            break
+        end
+        if coroutine.status(self._compileTask) == 'dead' then
+            self._compileTask = nil
+            break
+        end
+        self:_loadProto()
+    end
+end
+
+function mt:_loadProto()
     while true do
         local ok, proto = self._proto:pop()
         if not ok then
@@ -423,8 +405,11 @@ function mt:onTick()
             rpc:recieve(proto)
         end
     end
-    self:compileAll()
-    self:_doDiagnostic()
+end
+
+function mt:onTick()
+    self:_loadProto()
+    self:_doCompileTask()
 
     if os.clock() - self._clock >= 600 then
         self._clock = os.clock()

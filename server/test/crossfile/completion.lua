@@ -83,8 +83,9 @@ function TEST(data)
         ws:addFile(uri)
     end
 
-    lsp:compileAll()
-    lsp:compileAll()
+    while lsp._needCompile[1] do
+        lsp:compileVM(lsp._needCompile[1])
+    end
 
     local vm = lsp:loadVM(mainUri)
     assert(vm)

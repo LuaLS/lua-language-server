@@ -74,8 +74,9 @@ function TEST(data)
     ws:addFile(sourceUri)
     lsp:saveText(targetUri, 1, data[1].content)
     ws:addFile(targetUri)
-    lsp:compileAll()
-    lsp:compileAll()
+    while lsp._needCompile[1] do
+        lsp:compileVM(lsp._needCompile[1])
+    end
 
     local sourceVM = lsp:getVM(sourceUri)
     assert(sourceVM)

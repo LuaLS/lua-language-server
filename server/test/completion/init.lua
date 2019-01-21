@@ -74,12 +74,12 @@ local function findWord(position, text)
     local word = text
     for i = position-1, 1, -1 do
         local c = text:sub(i, i)
-        if not c:find '%w' then
+        if not c:find '[%w_]' then
             word = text:sub(i+1, position)
             break
         end
     end
-    return word:match('^(%w*)')
+    return word:match('^([%w_]*)')
 end
 
 rawset(_G, 'TEST', true)

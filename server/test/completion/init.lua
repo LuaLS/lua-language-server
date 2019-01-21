@@ -536,3 +536,27 @@ tbl[ind@]
         kind = CompletionItemKind.Variable,
     },
 }
+
+TEST [[
+return function ()
+    local t = {
+        a = {},
+        b = {},
+    }
+    t.@
+end
+]]
+{
+    {
+        label = 'a',
+        kind = CompletionItemKind.Field,
+    },
+    {
+        label = 'b',
+        kind = CompletionItemKind.Field,
+    },
+    {
+        label = 'end',
+        kind = CompletionItemKind.Field,
+    },
+}

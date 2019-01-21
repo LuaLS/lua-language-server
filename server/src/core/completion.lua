@@ -547,6 +547,16 @@ local function clearList(list, source)
     end
 end
 
+local function isValidResult(result)
+    if not result then
+        return false
+    end
+    if result.type == 'local' or result.type == 'field' then
+        return true
+    end
+    return false
+end
+
 return function (vm, pos, word)
     local list = {}
     local callback = makeList(list)
@@ -558,10 +568,10 @@ return function (vm, pos, word)
     searchSpecial(vm, pos, callback)
     if not inString then
         local result, source = findResult(vm, pos)
-        if not result then
+        if not isValidResult(result) then
             result, source = findClosePos(vm, pos)
         end
-        if result then
+        if isValidResult(result) then
             callback = makeList(list, source)
             searchInResult(result, source, vm, pos, callback)
             searchAllWords(result.key, vm, callback)

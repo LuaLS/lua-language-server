@@ -5,12 +5,16 @@ local function isContainPos(obj, pos)
     return false
 end
 
+local function isValidSource(source)
+    return source.type ~= 'simple'
+end
+
 local function findAtPos(results, pos, level)
     local res = {}
     for sources, object in pairs(results.sources) do
         if sources.type == 'multi-source' then
             for _, source in ipairs(sources) do
-                if source.type ~= 'simple' and isContainPos(source, pos) then
+                if isValidSource(source) and isContainPos(source, pos) then
                     res[#res+1] = {
                         object = object,
                         source = source,
@@ -20,7 +24,7 @@ local function findAtPos(results, pos, level)
             end
         else
             local source = sources
-            if source.type ~= 'simple' and isContainPos(source, pos) then
+            if isValidSource(source) and isContainPos(source, pos) then
                 res[#res+1] = {
                     object = object,
                     source = source,

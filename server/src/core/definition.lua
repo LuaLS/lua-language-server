@@ -75,6 +75,9 @@ end
 
 local function parseResult(vm, result, lsp)
     local positions = {}
+    if result.value.lib then
+        return positions
+    end
     local tp = result.type
     if     tp == 'local' then
         if result.value.uri ~= vm.uri then

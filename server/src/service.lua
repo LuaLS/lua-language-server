@@ -84,48 +84,6 @@ function mt:_doProto(proto)
     rpc:response(id, container)
 end
 
-function mt:_doDiagnostic()
-    if not next(self._needDiagnostics) then
-        return
-    end
-    local clock = os.clock()
-    local count = 0
-    local copy = {}
-    for uri in pairs(self._needDiagnostics) do
-        self._needDiagnostics[uri] = nil
-        count = count + 1
-        copy[uri] = true
-    end
-    for uri in pairs(copy) do
-        local obj = self._file[uri]
-        if obj then
-            local data = {
-                uri   = uri,
-                vm    = obj.vm,
-                lines = obj.lines,
-            }
-            local name = 'textDocument/publishDiagnostics'
-            local res  = self:_callMethod(name, data)
-            if res then
-                rpc:notify(name, {
-                    uri = uri,
-                    diagnostics = res,
-                })
-            end
-        end
-    end
-    local passed = os.clock() - clock
-    if passed > 0.1 then
-        log.debug(('\n\z
-        Diagnostics completion\n\z
-        Cost:  [%.3f]sec\n\z
-        Num:   [%d]'):format(
-            passed,
-            count
-        ))
-    end
-end
-
 function mt:clearDiagnostics(uri)
     rpc:notify('textDocument/publishDiagnostics', {
         uri = uri,
@@ -299,7 +257,6 @@ function mt:compileVM(uri)
     obj.lines = parser:lines(obj.text, 'utf8')
     obj.lineCost = os.clock() - clock
 
-    self._needDiagnostics[uri] = true
     if not obj.vm then
         return obj
     end
@@ -307,6 +264,27 @@ function mt:compileVM(uri)
     self:_compileChain(obj, compiled)
 
     return obj
+end
+
+function mt:doDiagnostics(uri)
+    local name = 'textDocument/publishDiagnostics'
+    local vm, lines = self:getVM(uri)
+    if not vm then
+        self:clearDiagnostics(uri)
+        return
+    end
+    local data = {
+        uri   = uri,
+        vm    = vm,
+        lines = lines,
+    }
+    local res  = self:_callMethod(name, data)
+    if res then
+        rpc:notify(name, {
+            uri = uri,
+            diagnostics = res,
+        })
+    end
 end
 
 function mt:getVM(uri)
@@ -369,7 +347,7 @@ function mt:_createCompileTask()
     end
     self._compileTask = coroutine.create(function ()
         self:compileVM(uri)
-        self:_doDiagnostic()
+        self:doDiagnostics(uri)
     end)
 end
 
@@ -450,7 +428,6 @@ return function ()
     local session = setmetatable({
         _file = {},
         _needCompile = {},
-        _needDiagnostics = {},
         _clock = -100,
         _version = 0,
     }, mt)

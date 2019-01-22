@@ -156,6 +156,7 @@ function mt:readText(uri, path)
     end
     local text = io.load(path)
     if not text then
+        log.debug('无法找到文件：', path)
         return
     end
     self._file[uri] = {
@@ -175,9 +176,12 @@ end
 
 function mt:reCompile()
     local compiled = {}
+    local n = 0
     for uri in pairs(self._file) do
         self:needCompile(uri, compiled)
+        n = n + 1
     end
+    log.debug('reCompile:', n)
 
     if self._needShowComplete then
         self._needShowComplete = nil

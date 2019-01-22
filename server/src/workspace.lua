@@ -99,6 +99,7 @@ function mt:init(rootUri)
             if ok then
                 local uri = self:uriEncode(path)
                 self.files[name] = uri
+                self.lsp:readText(uri, path)
             end
         end
         self:reset()

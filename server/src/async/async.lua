@@ -78,7 +78,7 @@ local function callback(id, running)
             end
             -- TODO 封装成对象
             local suc, destroy = xpcall(running.callback, log.error, result)
-            if suc and destroy then
+            if not suc or destroy then
                 RunningList[id] = nil
                 IdlePool[#IdlePool+1] = running.task
                 break

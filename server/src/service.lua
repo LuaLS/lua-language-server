@@ -125,6 +125,30 @@ function mt:saveText(uri, version, text)
     end
 end
 
+function mt:open(uri, version, text)
+    self:saveText(uri, version, text)
+    local obj = self._file[uri]
+    if obj then
+        obj._openByClient = true
+    end
+end
+
+function mt:close(uri)
+    local obj = self._file[uri]
+    if obj then
+        obj._openByClient = false
+    end
+end
+
+function mt:isOpen(uri)
+    local obj = self._file[uri]
+    if obj and obj._openByClient then
+        return true
+    else
+        return false
+    end
+end
+
 function mt:readText(uri, path)
     local obj = self._file[uri]
     if obj then

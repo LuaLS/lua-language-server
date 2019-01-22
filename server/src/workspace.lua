@@ -97,7 +97,8 @@ function mt:init(rootUri)
                 end
             end
             if ok then
-                self.files[name] = self:uriEncode(path)
+                local uri = self:uriEncode(path)
+                self.files[name] = uri
             end
         end
         self:reset()

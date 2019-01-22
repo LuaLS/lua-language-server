@@ -1,3 +1,3 @@
 {
-    "Lua.workspace.ignoreDir": ["publish"]
+    "Lua.workspace.ignoreDir": ["publish", "bee.lua"]
 }

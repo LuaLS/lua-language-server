@@ -7,8 +7,6 @@ local parser     = require 'parser'
 local core    = require 'core'
 local lang       = require 'language'
 
-thread.newchannel 'proto'
-
 local ErrorCodes = {
     -- Defined by JSON RPC
     ParseError           = -32700,
@@ -432,9 +430,8 @@ function mt:listen()
     io.stdin:setvbuf 'no'
     io.stdout:setvbuf 'no'
 
-    self._proto = thread.channel 'proto'
-
-    async.call([[require 'async.proto']])
+    local _, out = async.run 'proto'
+    self._proto = out
 
     while true do
         async.onTick()

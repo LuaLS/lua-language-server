@@ -1,7 +1,4 @@
-local thread = require 'bee.thread'
 local json   = require 'json'
-local proto  = thread.channel 'proto'
-local errlog = thread.channel 'errlog'
 
 local function pushError(...)
     local t = table.pack(...)
@@ -9,7 +6,7 @@ local function pushError(...)
         t[i] = tostring(t[i])
     end
     local buf = table.concat(t, '\t')
-    errlog:push(buf)
+    ERR:push(buf)
 end
 
 local function readProtoHeader()
@@ -51,7 +48,7 @@ local function readProto()
     if not data then
         return
     end
-    proto:push(data)
+    OUT:push(data)
 end
 
 while true do

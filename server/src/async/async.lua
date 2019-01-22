@@ -20,30 +20,26 @@ local response = thread.channel(%q)
 local errlog   = thread.channel 'errlog'
 
 local function task()
-    local dump, env = request:bpop()
-    if env then
-        setmetatable(env, { __index = _ENV })
-    else
-        env = _ENV
-    end
+    local dump, arg = request:bpop()
+    local env = setmetatable({
+        IN  = request,
+        OUT = response,
+        ERR = errlog,
+    }, { __index = _ENV })
     local f, err = load(dump, '=task', 't', env)
     if not f then
         errlog:push(err)
         return
     end
-    local results = table.pack(pcall(f))
-    local ok = table.remove(results, 1)
-    if not ok then
-        local err = table.remove(results, 1)
-        errlog:push(err)
-        return
-    end
-    results.n = results.n - 1
-    response:push(results)
+    local result = f(arg)
+    response:push(result)
 end
 
 while true do
-    task()
+    local ok, result = xpcall(task, debug.traceback)
+    if not ok then
+        errlog:push(result)
+    end
 end
 ]]):format(package.cpath, package.path, requestName, responseName)
     log.debug('Create thread, id: ', id)
@@ -55,7 +51,11 @@ end
     }
 end
 
-local function call(dump, env, callback)
+local function run(name, arg, callback)
+    local dump = io.load(ROOT / 'src' / 'async' / (name .. '.lua'))
+    if not dump then
+        error(('找不到[%s]'):format(name))
+    end
     local task = table.remove(idlePool)
     if not task then
         task = createTask()
@@ -64,7 +64,9 @@ local function call(dump, env, callback)
         task     = task,
         callback = callback,
     }
-    task.request:push(dump, env)
+    task.request:push(dump, arg)
+    -- TODO 线程回收后禁止外部再使用通道
+    return task.request, task.response
 end
 
 local function onTick()
@@ -73,17 +75,18 @@ local function onTick()
         log.error(msg)
     end
     for id, running in pairs(runningList) do
-        local ok, results = running.task.response:pop()
-        if ok then
-            runningList[id] = nil
-            idlePool[#idlePool+1] = running.task
-            xpcall(running.callback, log.debug, table.unpack(results))
+        if running.callback then
+            local ok, result = running.task.response:pop()
+            if ok then
+                runningList[id] = nil
+                idlePool[#idlePool+1] = running.task
+                xpcall(running.callback, log.error, result)
+            end
         end
     end
 end
 
 return {
-    onTick  = onTick,
-    call    = call,
-    require = require,
+    onTick = onTick,
+    run    = run,
 }

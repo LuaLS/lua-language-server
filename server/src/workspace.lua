@@ -77,23 +77,8 @@ function mt:init(rootUri)
     local logPath = ROOT / 'log' / (rootUri:gsub('[/:]+', '_') .. '.log')
     log.info('Log path: ', logPath)
     log.init(ROOT, logPath)
-    async.call([[
-        require 'utility'
-        local fs = require 'bee.filesystem'
-        local list = {}
-        local ignore = {
-            ['.git'] = true,
-            ['node_modules'] = true,
-        }
-        for path in io.scan(fs.path(ROOT)) do
-            if path:extension():string() == '.lua' then
-                list[#list+1] = path:string()
-            end
-        end
-        return list
-    ]], {
-        ROOT = self.root:string()
-    }, function (list)
+
+    async.run('scanfiles', self.root:string(), function (list)
         log.info(('Found [%d] files'):format(#list))
         local ignored = {}
         for name in pairs(config.config.workspace.ignoreDir) do

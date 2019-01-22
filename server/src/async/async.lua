@@ -83,6 +83,7 @@ local function onTick()
 end
 
 return {
-    onTick = onTick,
-    call   = call,
+    onTick  = onTick,
+    call    = call,
+    require = require,
 }

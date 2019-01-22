@@ -14,11 +14,13 @@ mt.__index = mt
 function mt:searchUnusedLocals(callback)
     local results = self.results
     for _, var in ipairs(results.locals) do
-        if var.key == 'self'
-        or var.key == '_'
+        if var.key == '_'
         or var.key == '_ENV'
         or var.key == ''
         then
+            goto NEXT_VAR
+        end
+        if var.hide then
             goto NEXT_VAR
         end
         for _, info in ipairs(var) do

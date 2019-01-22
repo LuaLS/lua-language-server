@@ -2,7 +2,7 @@ local rpc = require 'rpc'
 local workspace = require 'workspace'
 local config = require 'config'
 
-return function (lsp)
+local function initAfterConfig(lsp)
     -- 请求工作目录
     rpc:request('workspace/workspaceFolders', nil, function (folders)
         if folders then
@@ -12,17 +12,6 @@ return function (lsp)
                 lsp.workspace:init(folder.uri)
             end
         end
-    end)
-    -- 请求配置
-    rpc:request('workspace/configuration', {
-        items = {
-            {
-                section = 'Lua',
-            },
-        },
-    }, function (configs)
-        config:setConfig(configs[1])
-        lsp:reCompile()
     end)
     -- 必须动态注册的事件：
     rpc:request('client/registerCapability', {
@@ -48,6 +37,20 @@ return function (lsp)
         }
     }, function ()
         log.debug('client/registerCapability Success!')
+    end)
+end
+
+return function (lsp)
+    -- 请求配置
+    rpc:request('workspace/configuration', {
+        items = {
+            {
+                section = 'Lua',
+            },
+        },
+    }, function (configs)
+        config:setConfig(configs[1])
+        initAfterConfig(lsp)
     end)
     return true
 end

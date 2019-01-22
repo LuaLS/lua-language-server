@@ -3,4 +3,5 @@ node_modules
 .vscode-test
 /server/log
 /publish
+/build/
 !*.exe

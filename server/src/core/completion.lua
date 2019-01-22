@@ -47,13 +47,11 @@ local function matchKey(me, other)
     if lMe == lOther:sub(1, #lMe) then
         return true
     end
-    local used = {
-        [1] = true,
-    }
-    local cur = 2
+    local used = {}
+    local cur = 1
     local lookup
     local researched
-    for i = 2, #lMe do
+    for i = 1, #lMe do
         local c = lMe:sub(i, i)
         -- 1. 看当前字符是否匹配
         if c == lOther:sub(cur, cur) then
@@ -80,7 +78,7 @@ local function matchKey(me, other)
             return false
         else
             researched = true
-            for j = 2, cur - 2 do
+            for j = 1, cur - 2 do
                 if c == lOther:sub(j, j) then
                     used[j] = true
                     goto NEXT
@@ -88,13 +86,13 @@ local function matchKey(me, other)
             end
             return false
         end
-        -- 5. 找到下一个可用的字，如果超出长度就算成功
+        -- 5. 找到下一个可用的字，如果超出长度且把自己所有字都用尽就算成功
         ::NEXT::
         repeat
             cur = cur + 1
         until not used[cur]
         if cur > #lOther then
-            break
+            return i == #lMe
         end
     end
     return true

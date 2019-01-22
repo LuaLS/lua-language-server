@@ -2,16 +2,17 @@ local args = ...
 
 require 'utility'
 local fs = require 'bee.filesystem'
-local ignore = {
-    ['.git'] = true,
-    ['node_modules'] = true,
-}
+local ignore = { '.git', 'node_modules' }
 
+local root = fs.absolute(fs.path(args.root))
 for name in pairs(args.ignore) do
-    ignore[name] = true
+    ignore[#ignore+1] = name
+end
+for i, name in ipairs(ignore) do
+    ignore[i] = root / name
 end
 
-for path in io.scan(fs.path(args.root), ignore) do
+for path in io.scan(root, ignore) do
     if path:extension():string() == '.lua' then
         local buf = io.load(path)
         if buf then

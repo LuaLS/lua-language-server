@@ -146,6 +146,28 @@ end
 function io.scan(path, ignore)
     local result = {path}
     local i = 0
+    local absolute
+    if ignore then
+        absolute = {}
+        for _, name in ipairs(ignore) do
+            local absoluteName = fs.path(name):string():lower()
+            absolute[#absolute+1] = absoluteName
+        end
+    end
+
+    local function isIgnored(path)
+        if not absolute then
+            return false
+        end
+        local target = path:string():lower()
+        for _, name in ipairs(absolute) do
+            if target == name then
+                return true
+            end
+        end
+        return false
+    end
+
     return function ()
         i = i + 1
         local current = result[i]
@@ -153,8 +175,7 @@ function io.scan(path, ignore)
             return nil
         end
         if fs.is_directory(current) then
-            local dirName = current:filename():string():lower()
-            if not ignore or not ignore[dirName] then
+            if not isIgnored(current) then
                 for path in current:list_directory() do
                     result[#result+1] = path
                 end

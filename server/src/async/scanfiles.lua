@@ -7,7 +7,7 @@ local ignore = {
     ['node_modules'] = true,
 }
 
-for _, name in pairs(args.ignore) do
+for name in pairs(args.ignore) do
     ignore[name] = true
 end
 

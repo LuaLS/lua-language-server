@@ -78,14 +78,9 @@ function mt:init(rootUri)
     log.info('Log path: ', logPath)
     log.init(ROOT, logPath)
 
-    local ignore = {}
-    for name in pairs(config.config.workspace.ignoreDir) do
-        ignore[#ignore+1] = name
-    end
-
     async.run('scanfiles', {
         root = self.root:string(),
-        ignore = ignore,
+        ignore = config.config.workspace.ignoreDir,
     }, function (file)
         if file == 'ok' then
             self:reset()

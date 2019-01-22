@@ -102,6 +102,7 @@ function mt:init(rootUri)
         end
         self:reset()
         self._complete = true
+        return true
     end)
 end
 

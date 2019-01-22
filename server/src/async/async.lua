@@ -1,12 +1,12 @@
 local thread = require 'bee.thread'
 local errlog = thread.channel 'errlog'
-local taskId = 0
-local idlePool = {}
-local runningList = {}
+local TaskId = 0
+local IdlePool = {}
+local RunningList = {}
 
 local function createTask()
-    taskId = taskId + 1
-    local id = taskId
+    TaskId = TaskId + 1
+    local id = TaskId
     local requestName  = 'request'  .. tostring(id)
     local responseName = 'response' .. tostring(id)
     thread.newchannel(requestName)
@@ -56,11 +56,11 @@ local function run(name, arg, callback)
     if not dump then
         error(('找不到[%s]'):format(name))
     end
-    local task = table.remove(idlePool)
+    local task = table.remove(IdlePool)
     if not task then
         task = createTask()
     end
-    runningList[task.id] = {
+    RunningList[task.id] = {
         task     = task,
         callback = callback,
     }
@@ -69,20 +69,31 @@ local function run(name, arg, callback)
     return task.request, task.response
 end
 
+local function callback(id, running)
+    if running.callback then
+        while true do
+            local ok, result = running.task.response:pop()
+            if not ok then
+                break
+            end
+            -- TODO 封装成对象
+            local suc, destroy = xpcall(running.callback, log.error, result)
+            if suc and destroy then
+                RunningList[id] = nil
+                IdlePool[#IdlePool+1] = running.task
+                break
+            end
+        end
+    end
+end
+
 local function onTick()
     local ok, msg = errlog:pop()
     if ok then
         log.error(msg)
     end
-    for id, running in pairs(runningList) do
-        if running.callback then
-            local ok, result = running.task.response:pop()
-            if ok then
-                runningList[id] = nil
-                idlePool[#idlePool+1] = running.task
-                xpcall(running.callback, log.error, result)
-            end
-        end
+    for id, running in pairs(RunningList) do
+        callback(id, running)
     end
 end
 

@@ -78,14 +78,15 @@ function mt:init(rootUri)
     log.info('Log path: ', logPath)
     log.init(ROOT, logPath)
 
-    local ignored = {}
+    local ignore = {}
     for name in pairs(config.config.workspace.ignoreDir) do
-        local path = fs.absolute(self.root / name)
-        local str = path:string():lower()
-        ignored[#ignored+1] = str
+        ignore[#ignore+1] = name
     end
 
-    async.run('scanfiles', self.root:string(), function (file)
+    async.run('scanfiles', {
+        root = self.root:string(),
+        ignore = ignore,
+    }, function (file)
         if file == 'ok' then
             self:reset()
             self._complete = true
@@ -93,12 +94,6 @@ function mt:init(rootUri)
         end
         local path = fs.path(file.path)
         local name = path:string():lower()
-        for _, ignore in ipairs(ignored) do
-            if name:sub(1, #ignore) == ignore then
-                ok = false
-                return
-            end
-        end
         local uri = self:uriEncode(path)
         self.files[name] = uri
         self.lsp:readText(uri, path, file.buf)

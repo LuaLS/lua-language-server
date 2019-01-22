@@ -83,10 +83,13 @@ local function isLocalTable(var)
     if var.value.source.start == 0 then
         return false
     end
-    if var.source == var.value.declarat then
-        return true
+    if var.source ~= var.value.declarat then
+        return false
     end
-    return false
+    if var.value.source.finish < var.source.finish then
+        return false
+    end
+    return true
 end
 
 local function buildVar(vm, var)

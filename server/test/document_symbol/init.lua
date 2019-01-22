@@ -336,6 +336,30 @@ g = 1
     }
 }
 
+TEST[[
+function f(...)
+    local x = ...
+    print(x.a)
+end
+]]{
+    [1] = {
+        name = 'f',
+        detail = 'function f(...)',
+        kind = SymbolKind.Function,
+        range = {1, 52},
+        selectionRange = {10, 10},
+        children = {
+            [1] = {
+                name = 'x',
+                detail = EXISTS,
+                kind = SymbolKind.Variable,
+                range = {27, 27},
+                selectionRange = {27, 27},
+            }
+        }
+    },
+}
+
 -- 临时
 local fs = require 'bee.filesystem'
 local function testIfExit(path)

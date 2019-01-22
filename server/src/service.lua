@@ -150,12 +150,12 @@ function mt:isOpen(uri)
     end
 end
 
-function mt:readText(uri, path)
+function mt:readText(uri, path, buf)
     local obj = self._file[uri]
     if obj then
         return
     end
-    local text = io.load(path)
+    local text = buf or io.load(path)
     if not text then
         log.debug('无法找到文件：', path)
         return

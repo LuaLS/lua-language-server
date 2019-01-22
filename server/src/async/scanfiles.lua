@@ -10,8 +10,14 @@ local ignore = {
 
 for path in io.scan(fs.path(root), ignore) do
     if path:extension():string() == '.lua' then
-        list[#list+1] = path:string()
+        local buf = io.load(path)
+        if buf then
+            OUT:push {
+                path = fs.absolute(path):string(),
+                buf = buf,
+            }
+        end
     end
 end
 
-OUT:push(list)
+OUT:push 'ok'

@@ -78,33 +78,30 @@ function mt:init(rootUri)
     log.info('Log path: ', logPath)
     log.init(ROOT, logPath)
 
-    async.run('scanfiles', self.root:string(), function (list)
-        log.info(('Found [%d] files'):format(#list))
-        local ignored = {}
-        for name in pairs(config.config.workspace.ignoreDir) do
-            local path = fs.absolute(self.root / name)
-            local str = path:string():lower()
-            ignored[#ignored+1] = str
+    local ignored = {}
+    for name in pairs(config.config.workspace.ignoreDir) do
+        local path = fs.absolute(self.root / name)
+        local str = path:string():lower()
+        ignored[#ignored+1] = str
+    end
+
+    async.run('scanfiles', self.root:string(), function (file)
+        if file == 'ok' then
+            self:reset()
+            self._complete = true
+            return true
         end
-        for _, filename in ipairs(list) do
-            local path = fs.absolute(fs.path(filename))
-            local name = path:string():lower()
-            local ok = true
-            for _, ignore in ipairs(ignored) do
-                if name:sub(1, #ignore) == ignore then
-                    ok = false
-                    break
-                end
-            end
-            if ok then
-                local uri = self:uriEncode(path)
-                self.files[name] = uri
-                self.lsp:readText(uri, path)
+        local path = fs.path(file.path)
+        local name = path:string():lower()
+        for _, ignore in ipairs(ignored) do
+            if name:sub(1, #ignore) == ignore then
+                ok = false
+                return
             end
         end
-        self:reset()
-        self._complete = true
-        return true
+        local uri = self:uriEncode(path)
+        self.files[name] = uri
+        self.lsp:readText(uri, path, file.buf)
     end)
 end
 

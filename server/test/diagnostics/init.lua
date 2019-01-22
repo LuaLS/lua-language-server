@@ -150,3 +150,9 @@ function mt:m()
     end
 end
 ]]
+
+TEST [[
+local function f(<!self!>)
+end
+f()
+]]

@@ -87,6 +87,7 @@ function mt:clearDiagnostics(uri)
         uri = uri,
         diagnostics = {},
     })
+    log.debug('清除诊断：', uri)
 end
 
 function mt:read(mode)
@@ -167,11 +168,9 @@ function mt:readText(uri, path)
 end
 
 function mt:removeText(uri)
-    local obj = self._file[uri]
-    if obj then
-        return
-    end
-    obj.version = -1
+    self._file[uri] = nil
+    -- 删除文件后，清除该文件的诊断
+    self:clearDiagnostics(uri)
 end
 
 function mt:reCompile()

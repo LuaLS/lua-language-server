@@ -14,8 +14,6 @@ return function (lsp, params)
             lsp.workspace:addFile(change.uri)
         elseif change.type == FileChangeType.Deleted then
             lsp.workspace:removeFile(change.uri)
-            -- 删除文件后，清除该文件的诊断
-            lsp:clearDiagnostics(change.uri)
         end
         if lsp:getVM(change.uri) then
             needReset = true

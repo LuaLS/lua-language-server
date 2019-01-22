@@ -114,14 +114,17 @@ end
 
 function mt:addFile(uri)
     if uri:sub(-4) == '.lua' then
-        local name = self:uriDecode(uri):string():lower()
+        local path = self:uriDecode(uri)
+        local name = path:string():lower()
         self.files[name] = uri
+        self.lsp:readText(uri, path)
     end
 end
 
 function mt:removeFile(uri)
     local name = self:uriDecode(uri):string():lower()
     self.files[name] = nil
+    self.lsp:removeText(uri)
 end
 
 function mt:findPath(baseUri, searchers)

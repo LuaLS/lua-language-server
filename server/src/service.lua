@@ -355,6 +355,9 @@ function mt:checkWorkSpaceComplete()
 end
 
 function mt:_createCompileTask()
+    if not self._needCompile[1] and not next(self._needDiagnostics) then
+        return
+    end
     self._compileTask = coroutine.create(function ()
         local uri = self._needCompile[1]
         if uri then

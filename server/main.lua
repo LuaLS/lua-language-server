@@ -11,6 +11,7 @@ collectgarbage('generational')
 log = require 'log'
 log.init(ROOT, ROOT / 'log' / 'service.log')
 log.info('Lua Lsp startup, root: ', ROOT)
+ac = {}
 
 local function tryDebugger()
      local dbg = require 'debugger'

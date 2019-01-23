@@ -6,6 +6,7 @@ local rpc        = require 'rpc'
 local parser     = require 'parser'
 local core       = require 'core'
 local lang       = require 'language'
+local updateTimer = require 'timer'
 
 local ErrorCodes = {
     -- Defined by JSON RPC
@@ -65,6 +66,16 @@ function mt:_callMethod(name, params)
     end
 end
 
+function mt:responseProto(id, response, err)
+    local container = table.container()
+    if err then
+        container.error = err
+    else
+        container.result = response
+    end
+    rpc:response(id, container)
+end
+
 function mt:_doProto(proto)
     local id     = proto.id
     local name   = proto.method
@@ -73,13 +84,13 @@ function mt:_doProto(proto)
     if not id then
         return
     end
-    local container = table.container()
-    if err then
-        container.error = err
+    if type(response) == 'function' then
+        return function (final)
+            self:responseProto(id, final)
+        end
     else
-        container.result = response
+        self:responseProto(id, response, err)
     end
-    rpc:response(id, container)
 end
 
 function mt:clearDiagnostics(uri)
@@ -109,6 +120,14 @@ function mt:needCompile(uri, compiled)
     end
     self._needCompile[uri] = compiled
     table.insert(self._needCompile, 1, uri)
+end
+
+function mt:isWaitingCompile()
+    if self._needCompile[1] then
+        return true
+    else
+        return false
+    end
 end
 
 function mt:saveText(uri, version, text)
@@ -404,7 +423,7 @@ function mt:checkWorkSpaceComplete()
 end
 
 function mt:_createCompileTask()
-    if not self._needCompile[1] and not next(self._needDiagnostics) then
+    if not self:isWaitingCompile() and not next(self._needDiagnostics) then
         return
     end
     self._compileTask = coroutine.create(function ()
@@ -484,9 +503,14 @@ function mt:listen()
     local _, out = async.run 'proto'
     self._proto = out
 
+    local clock = os.clock()
     while true do
         async.onTick()
         self:onTick()
+
+        local delta = os.clock() - clock
+        clock = os.clock()
+        updateTimer(delta)
         thread.sleep(0.001)
     end
 end

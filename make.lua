@@ -14,9 +14,9 @@ lm:executable 'rcedit' {
         '_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING'
     },
     flags = {
-        '/wd"C4477"',
-        '/wd"C4244"',
-        '/wd"C4267"',
+        '/wd4477',
+        '/wd4244',
+        '/wd4267',
     }
 }
 

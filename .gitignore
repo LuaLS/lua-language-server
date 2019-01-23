@@ -2,6 +2,7 @@ node_modules
 /client/server
 .vscode-test
 /server/log
+/server/bin
 /publish
 /build/
 !*.exe

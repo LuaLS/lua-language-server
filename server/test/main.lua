@@ -11,6 +11,7 @@ package.path = (ROOT / 'src' / '?.lua'):string()
 log = require 'log'
 log.init(ROOT, ROOT / 'log' / 'test.log')
 log.debug('测试开始')
+ac = {}
 
 require 'utility'
 require 'global_protect'

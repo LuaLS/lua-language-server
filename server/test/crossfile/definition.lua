@@ -197,3 +197,18 @@ TEST {
         ]],
     }
 }
+
+TEST {
+    {
+        path = 'b.lua',
+        content = [[
+            print(<?global?>)
+        ]],
+    },
+    {
+        path = 'a.lua',
+        content = [[
+            <!global!> = 1
+        ]],
+    },
+}

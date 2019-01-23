@@ -25,7 +25,6 @@ function mt:markGet(uri, k)
 end
 
 function mt:compileVM(uri, vm)
-    self:clearGlobal(uri)
     local seted = {}
     for k, v in next, vm.env.child do
         local get, set

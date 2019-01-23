@@ -293,6 +293,7 @@ function mt:compileVM(uri)
     local ast = self:compileAst(obj)
     obj.astCost = os.clock() - clock
     self:_clearChainNode(obj, uri)
+    self._global:clearGlobal(uri)
 
     local clock = os.clock()
     obj.vm = core.vm(ast, self, uri)
@@ -336,6 +337,8 @@ function mt:doDiagnostics(uri)
             uri = uri,
             diagnostics = res,
         })
+    else
+        self:clearDiagnostics(uri)
     end
 end
 

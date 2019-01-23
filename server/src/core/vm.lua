@@ -371,7 +371,6 @@ function mt:createField(pValue, name, source)
     end
     pValue.child[name] = field
     self:inference(pValue, 'table')
-
     return field
 end
 

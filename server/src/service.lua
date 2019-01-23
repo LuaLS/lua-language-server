@@ -338,10 +338,10 @@ function mt:doDiagnostics(uri)
     if not self._needDiagnostics[uri] then
         return
     end
-    self._needDiagnostics[uri] = nil
     local name = 'textDocument/publishDiagnostics'
     local vm, lines = self:getVM(uri)
     if not vm then
+        self._needDiagnostics[uri] = nil
         self:clearDiagnostics(uri)
         return
     end
@@ -351,6 +351,7 @@ function mt:doDiagnostics(uri)
         lines = lines,
     }
     local res  = self:_callMethod(name, data)
+    self._needDiagnostics[uri] = nil
     if res then
         rpc:notify(name, {
             uri = uri,

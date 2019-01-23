@@ -4,7 +4,7 @@ local thread     = require 'bee.thread'
 local async      = require 'async'
 local rpc        = require 'rpc'
 local parser     = require 'parser'
-local core    = require 'core'
+local core       = require 'core'
 local lang       = require 'language'
 
 local ErrorCodes = {
@@ -121,6 +121,7 @@ function mt:saveText(uri, version, text)
         self._file[uri] = {
             version = version,
             text = text,
+            uri = uri,
         }
         self:needCompile(uri)
     end
@@ -171,6 +172,8 @@ function mt:removeText(uri)
     self._file[uri] = nil
     -- 删除文件后，清除该文件的诊断
     self:clearDiagnostics(uri)
+    -- 清除全局变量
+    self._global:clearGlobal(uri)
 end
 
 function mt:reCompile()
@@ -259,6 +262,19 @@ function mt:_compileChain(obj, compiled)
     end
 end
 
+function mt:_compileGlobal(obj, compiled)
+    self._global:compileVM(obj.uri, obj.vm)
+end
+
+function mt:getGlobal(key)
+    local tp = type(key)
+    if tp == 'string' or tp == 'number' or tp == 'boolean' then
+        return self._global:getGlobal(key)
+    else
+        return nil
+    end
+end
+
 function mt:compileVM(uri)
     local obj = self._file[uri]
     if not obj then
@@ -289,6 +305,7 @@ function mt:compileVM(uri)
     end
 
     self:_compileChain(obj, compiled)
+    self:_compileGlobal(obj, compiled)
 
     return obj
 end
@@ -474,6 +491,7 @@ return function ()
         _needDiagnostics = {},
         _clock = -100,
         _version = 0,
+        _global = core.global(),
     }, mt)
     return session
 end

@@ -377,8 +377,17 @@ end
 
 function mt:getField(pValue, name, source)
     local field =  (pValue.child and pValue.child[name])
-                or self:createField(pValue, name, source)
-
+    if not field and pValue.ENV then
+        if self.lsp then
+            local g = self.lsp:getGlobal(name)
+            if g then
+                field = readOnly(g)
+            end
+        end
+    end
+    if not field then
+        field = self:createField(pValue, name, source)
+    end
     return field
 end
 
@@ -1471,6 +1480,7 @@ function mt:createEnvironment()
     local g = self:getField(envValue, '_G')
     local gValue = self:getValue(g)
     gValue.child = envValue.child
+    self.env = envValue
 end
 
 local function compile(ast, lsp, uri)

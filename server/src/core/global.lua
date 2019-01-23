@@ -26,6 +26,7 @@ end
 
 function mt:compileVM(uri, vm)
     self:clearGlobal(uri)
+    local seted = {}
     for k, v in next, vm.env.child do
         local get, set
         for _, info in ipairs(v) do
@@ -37,10 +38,24 @@ function mt:compileVM(uri, vm)
         end
         if set then
             self:markSet(uri, k, v)
+            seted[#seted+1] = k
         elseif get then
             self:markGet(uri, k)
         end
     end
+
+    local needReCompile = {}
+    for otherUri, gets in pairs(self.get) do
+        for _, key in ipairs(seted) do
+            if gets[key] ~= nil then
+                needReCompile[#needReCompile+1] = otherUri
+                goto CONTINUE
+            end
+        end
+        ::CONTINUE::
+    end
+
+    return needReCompile
 end
 
 function mt:getGlobal(key)

@@ -183,17 +183,17 @@ TEST {
     }
 }
 
---TEST {
---    {
---        path = 'a.lua',
---        content = [[
---            <!global!> = 1
---        ]],
---    },
---    {
---        path = 'b.lua',
---        content = [[
---            print(<?global?>)
---        ]],
---    }
---}
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            <!global!> = 1
+        ]],
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            print(<?global?>)
+        ]],
+    }
+}

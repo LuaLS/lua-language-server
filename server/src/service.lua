@@ -264,7 +264,10 @@ function mt:_compileChain(obj, compiled)
 end
 
 function mt:_compileGlobal(obj, compiled)
-    self._global:compileVM(obj.uri, obj.vm)
+    local needReCompile = self._global:compileVM(obj.uri, obj.vm)
+    for _, uri in ipairs(needReCompile) do
+        self:needCompile(uri, compiled)
+    end
 end
 
 function mt:getGlobal(key)

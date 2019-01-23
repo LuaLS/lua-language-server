@@ -1,13 +1,23 @@
 local lm = require 'luamake'
 
-lm.rootdir = '3rd/lni'
 lm:lua_library 'lni' {
-    sources = "src/*.cpp"
+    sources = '3rd/lni/src/*.cpp'
 }
 
-lm.rootdir = '3rd/lpeglabel'
 lm:lua_library 'lpeglabel' {
-    sources = "*.c"
+    sources = '3rd/lpeglabel/*.c'
+}
+
+lm:executable 'rcedit' {
+    sources = '3rd/rcedit/src/*.cc',
+    defines = {
+        '_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING'
+    },
+    flags = {
+        '/wd"C4477"',
+        '/wd"C4244"',
+        '/wd"C4267"',
+    }
 }
 
 lm:build 'bee' {
@@ -17,8 +27,9 @@ lm:build 'bee' {
 lm:build 'install' {
     '$luamake', 'lua', 'make/install.lua',
     deps = {
-        "lni",
-        "lpeglabel",
-        "bee",
+        'lni',
+        'lpeglabel',
+        'bee',
+        'rcedit'
     }
 }

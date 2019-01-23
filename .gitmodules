@@ -1,6 +1,3 @@
-[submodule "server/bee.lua"]
-	path = server/bee.lua
-	url = https://github.com/actboy168/bee.lua
 [submodule "3rd/luamake"]
 	path = 3rd/luamake
 	url = https://github.com/actboy168/luamake

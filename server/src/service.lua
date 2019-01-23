@@ -164,6 +164,7 @@ function mt:readText(uri, path, buf)
     self._file[uri] = {
         version = -1,
         text = text,
+        uri = uri,
     }
     self:needCompile(uri)
 end

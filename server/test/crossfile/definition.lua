@@ -22,26 +22,40 @@ local function catch_target(script, sep)
     return new_script, list
 end
 
-function TEST(data)
+function TEST(datas)
     local lsp = service()
     local ws = workspace(lsp, 'test')
     lsp.workspace = ws
 
-    local targetScript, targetList = catch_target(data[1].content, '!')
-    local targetUri = ws:uriEncode(fs.path(data[1].path))
-    if data[1].target then
-        targetList = data[1].target
-    else
-        targetList = targetList[1]
+    local compiled = {}
+    local targetList, targetUri, sourceList, sourceUri
+
+    for i, data in ipairs(datas) do
+        local uri = ws:uriEncode(fs.path(data.path))
+        local new, list = catch_target(data.content, '!')
+        if new ~= data.content or data.target then
+            if data.target then
+                targetList = data.target
+            else
+                targetList = list[1]
+            end
+            targetUri = uri
+            lsp:saveText(uri, 1, new)
+            goto CONTINUE
+        end
+        new, list = catch_target(data.content, '?')
+        if new ~= data.content then
+            compiled[i] = new
+            sourceList = list
+            sourceUri = uri
+            lsp:saveText(uri, 1, new)
+            goto CONTINUE
+        end
+        lsp:saveText(uri, 1, data.content)
+        ::CONTINUE::
+        ws:addFile(uri)
     end
 
-    local sourceScript, sourceList = catch_target(data[2].content, '?')
-    local sourceUri = ws:uriEncode(fs.path(data[2].path))
-
-    lsp:saveText(sourceUri, 1, sourceScript)
-    ws:addFile(sourceUri)
-    lsp:saveText(targetUri, 1, targetScript)
-    ws:addFile(targetUri)
     while lsp._needCompile[1] do
         lsp:compileVM(lsp._needCompile[1])
     end
@@ -168,3 +182,18 @@ TEST {
         ]]
     }
 }
+
+--TEST {
+--    {
+--        path = 'a.lua',
+--        content = [[
+--            <!global!> = 1
+--        ]],
+--    },
+--    {
+--        path = 'b.lua',
+--        content = [[
+--            print(<?global?>)
+--        ]],
+--    }
+--}

@@ -217,6 +217,7 @@ TEST {
     {
         path = 'a.lua',
         content = [[
+            x = {}
             x.<!global!> = 1
         ]],
     },
@@ -225,5 +226,26 @@ TEST {
         content = [[
             print(x.<?global?>)
         ]],
+    },
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            x.<!global!> = 1
+        ]],
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            print(x.<?global?>)
+        ]],
+    },
+    {
+        path = 'c.lua',
+        content = [[
+            x = {}
+        ]]
     }
 }

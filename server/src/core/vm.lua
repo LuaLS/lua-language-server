@@ -379,10 +379,7 @@ function mt:getField(pValue, name, source)
     local field =  (pValue.child and pValue.child[name])
     if not field and pValue.ENV then
         if self.lsp then
-            local g = self.lsp:getGlobal(name)
-            if g then
-                field = readOnly(g)
-            end
+            field = self.lsp:getGlobal(name)
         end
     end
     if not field then
@@ -1293,7 +1290,10 @@ function mt:doSet(action)
             local var = self:getName(key[1], key)
             self:setValue(var, value, key)
             if self:isGlobal(var) then
-                self.results.globals[key[1]] = var
+                self.results.globals[#self.results.globals+1] = {
+                    type = 'global',
+                    global = var,
+                }
             end
         elseif key.type == 'simple' then
             local field = self:getSimple(key, 'field')
@@ -1301,7 +1301,10 @@ function mt:doSet(action)
             local var = field
             repeat
                 if self:isGlobal(var) then
-                    self.results.globals[var.key] = var
+                    self.results.globals[#self.results.globals+1] = {
+                        type = 'field',
+                        global = var,
+                    }
                     break
                 end
                 var = var.parent

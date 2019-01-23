@@ -26,19 +26,22 @@ end
 
 function mt:compileVM(uri, vm)
     local seted = {}
-    for k, v in pairs(vm.results.globals) do
-        seted[k] = true
-        self:markSet(uri, k, v)
+    local fixed = {}
+    for _, data in ipairs(vm.results.globals) do
+        local key = data.global.key
+        fixed[key] = true
+        if data.type == 'global' then
+            seted[key] = true
+            self:markSet(uri, key, data.global)
+        end
     end
     for k in next, vm.env.child do
-        if not seted[k] then
-            self:markGet(uri, k)
-        end
+        self:markGet(uri, k)
     end
 
     local needReCompile = {}
     for otherUri, gets in pairs(self.get) do
-        for key in pairs(seted) do
+        for key in pairs(fixed) do
             if gets[key] ~= nil then
                 needReCompile[#needReCompile+1] = otherUri
                 goto CONTINUE

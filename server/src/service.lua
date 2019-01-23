@@ -288,7 +288,6 @@ function mt:compileVM(uri)
         return nil
     end
 
-    local compiled = self:_markCompiled(uri)
     local clock = os.clock()
     local ast = self:compileAst(obj)
     obj.astCost = os.clock() - clock
@@ -303,6 +302,7 @@ function mt:compileVM(uri)
     obj.lines = parser:lines(obj.text, 'utf8')
     obj.lineCost = os.clock() - clock
 
+    local compiled = self:_markCompiled(uri)
     self._needDiagnostics[uri] = true
 
     if not obj.vm then

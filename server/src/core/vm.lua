@@ -391,6 +391,17 @@ function mt:getField(pValue, name, source)
     return field
 end
 
+function mt:isGlobal(field)
+    if field.type ~= 'field' then
+        return false
+    end
+    if field.parent.value.ENV then
+        return true
+    else
+        return false
+    end
+end
+
 function mt:buildFunction(exp, object)
     local func = self:createValue('function', exp)
     func.args = {}
@@ -1281,9 +1292,20 @@ function mt:doSet(action)
         if key.type == 'name' then
             local var = self:getName(key[1], key)
             self:setValue(var, value, key)
+            if self:isGlobal(var) then
+                self.results.globals[key[1]] = var
+            end
         elseif key.type == 'simple' then
             local field = self:getSimple(key, 'field')
             self:setValue(field, value, key[#key])
+            local var = field
+            repeat
+                if self:isGlobal(var) then
+                    self.results.globals[var.key] = var
+                    break
+                end
+                var = var.parent
+            until not var
         end
     end)
 end
@@ -1499,6 +1521,7 @@ local function compile(ast, lsp, uri)
             sources= {},
             strings= {},
             indexs = {},
+            globals= {},
             main   = nil,
         },
         libraryValue = {},

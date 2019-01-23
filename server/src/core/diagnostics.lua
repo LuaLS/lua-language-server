@@ -52,10 +52,7 @@ function mt:searchUndefinedGlobal(callback)
             goto NEXT_VAR
         end
         local lIndex = index:lower()
-        if lIndex == 'log' or lIndex == '' then
-            goto NEXT_VAR
-        end
-        if index:find '^_*%u' then
+        if lIndex == '' then
             goto NEXT_VAR
         end
         for _, info in ipairs(field) do

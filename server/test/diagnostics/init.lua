@@ -64,9 +64,9 @@ local <!x!>
 
 TEST [[
 print(<!x!>)
-print(log)
-print(X)
-print(Log)
+print(<!log!>)
+print(<!X!>)
+print(<!Log!>)
 print(_VERSION)
 print(<!y!>)
 print(z)

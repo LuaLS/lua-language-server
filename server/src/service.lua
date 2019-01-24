@@ -309,23 +309,33 @@ function mt:compileVM(uri)
 
     local clock = os.clock()
     local ast = self:compileAst(obj)
+    local version = obj._version
     obj.astCost = os.clock() - clock
     self:_clearChainNode(obj, uri)
     self._global:clearGlobal(uri)
 
     local clock = os.clock()
-    obj.vm = core.vm(ast, self, uri)
+    local vm = core.vm(ast, self, uri)
+    local compiled
+    if version ~= obj._version then
+        return nil
+    end
+    if self._needCompile[uri] then
+        compiled = self:_markCompiled(uri)
+    else
+        return nil
+    end
+    obj.vm = vm
     obj.vmCost = os.clock() - clock
 
     local clock = os.clock()
     obj.lines = parser:lines(obj.text, 'utf8')
     obj.lineCost = os.clock() - clock
 
-    local compiled = self:_markCompiled(uri)
     self._needDiagnostics[uri] = true
 
     if not obj.vm then
-        return obj
+        return nil
     end
 
     self:_compileChain(obj, compiled)
@@ -339,19 +349,27 @@ function mt:doDiagnostics(uri)
         return
     end
     local name = 'textDocument/publishDiagnostics'
-    local vm, lines = self:getVM(uri)
-    if not vm then
+    local obj = self._file[uri]
+    if not obj or not obj.vm then
         self._needDiagnostics[uri] = nil
         self:clearDiagnostics(uri)
         return
     end
     local data = {
         uri   = uri,
-        vm    = vm,
-        lines = lines,
+        vm    = obj.vm,
+        lines = obj.lines,
+        version = obj.version,
     }
     local res  = self:_callMethod(name, data)
-    self._needDiagnostics[uri] = nil
+    if obj.version ~= data.version then
+        return nil
+    end
+    if self._needDiagnostics[uri] then
+        self._needDiagnostics[uri] = nil
+    else
+        return
+    end
     if res then
         rpc:notify(name, {
             uri = uri,

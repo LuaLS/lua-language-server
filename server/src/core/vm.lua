@@ -1,5 +1,6 @@
 local env = require 'core.env'
 local library = require 'core.library'
+local createValue = require 'core.value'
 
 local DefaultSource = { start = 0, finish = 0 }
 local GlobalChild
@@ -781,19 +782,7 @@ function mt:inference(value, type)
 end
 
 function mt:createValue(tp, source, v)
-    if tp == '...' then
-        error('Value type cant be ...')
-    end
-    -- TODO lib里的多类型
-    if type(tp) == 'table' then
-        tp = tp[1]
-    end
-    local value = {
-        type = tp,
-        source = source or DefaultSource,
-        value = v,
-        uri = self.uri,
-    }
+    local value = createValue(tp, self.uri, source, v)
     local lib = library.object[tp]
     if lib then
         self:getLibChild(value, lib, 'object')

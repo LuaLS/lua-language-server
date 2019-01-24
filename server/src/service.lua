@@ -204,14 +204,6 @@ function mt:reCompile()
         n = n + 1
     end
     log.debug('reCompile:', n)
-
-    if self._needShowComplete then
-        self._needShowComplete = nil
-        rpc:notify('window/showMessage', {
-            type = 3,
-            message = lang.script.MWS_COMPLETE,
-        })
-    end
 end
 
 function mt:loadVM(uri)
@@ -444,6 +436,13 @@ end
 
 function mt:_createCompileTask()
     if not self:isWaitingCompile() and not next(self._needDiagnostics) then
+        if self._needShowComplete then
+            self._needShowComplete = nil
+            rpc:notify('window/showMessage', {
+                type = 3,
+                message = lang.script.MWS_COMPLETE,
+            })
+        end
         return
     end
     self._compileTask = coroutine.create(function ()

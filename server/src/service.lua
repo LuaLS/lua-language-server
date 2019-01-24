@@ -309,7 +309,7 @@ function mt:compileVM(uri)
 
     local clock = os.clock()
     local ast = self:compileAst(obj)
-    local version = obj._version
+    local version = obj.version
     obj.astCost = os.clock() - clock
     self:_clearChainNode(obj, uri)
     self._global:clearGlobal(uri)
@@ -317,7 +317,7 @@ function mt:compileVM(uri)
     local clock = os.clock()
     local vm = core.vm(ast, self, uri)
     local compiled
-    if version ~= obj._version then
+    if version ~= obj.version then
         return nil
     end
     if self._needCompile[uri] then
@@ -327,6 +327,7 @@ function mt:compileVM(uri)
     end
     obj.vm = vm
     obj.vmCost = os.clock() - clock
+    obj.vmVersion = version
 
     local clock = os.clock()
     obj.lines = parser:lines(obj.text, 'utf8')
@@ -359,11 +360,11 @@ function mt:doDiagnostics(uri)
         uri   = uri,
         vm    = obj.vm,
         lines = obj.lines,
-        version = obj.version,
+        version = obj.vmVersion,
     }
     local res  = self:_callMethod(name, data)
     if obj.version ~= data.version then
-        return nil
+        return
     end
     if self._needDiagnostics[uri] then
         self._needDiagnostics[uri] = nil

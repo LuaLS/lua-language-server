@@ -21,7 +21,8 @@ lm:executable 'rcedit' {
 }
 
 lm:build 'bee' {
-    '$luamake', '-C', '3rd/bee.lua'
+    '$luamake', '-C', '3rd/bee.lua',
+    pool = 'console'
 }
 
 lm:build 'install' {

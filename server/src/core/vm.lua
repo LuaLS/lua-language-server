@@ -333,7 +333,7 @@ function mt:setValue(var, value, source)
     value = value or self:createValue('any', source)
     if source and source.start then
         self:addInfo(var, 'set', source)
-        self:addInfo(value, 'set', source)
+        value:addInfo('set', source)
     end
     if var.value then
         if value.type == 'any' then
@@ -762,11 +762,9 @@ function mt:getLibChild(value, lib, parentType)
             local fValue = self:getLibValue(fLib, parentType)
             self:setValue(fField, fValue)
         end
-        if value.child then
-            for k, v in pairs(value.child) do
-                self.libraryChild[lib][k] = v
-            end
-        end
+        value:eachField(function (k, v)
+            self.libraryChild[lib][k] = v
+        end)
         value.child = self.libraryChild[lib]
     end
 end
@@ -1205,17 +1203,17 @@ function mt:doReturn(action)
                     value[1] = self:createValue('any', exp)
                 end
                 for x, v in ipairs(value) do
-                    self:addInfo(v, 'return', exp)
+                    v:addInfo('return', exp)
                     self:setFunctionReturn(self:getCurrentFunction(), i + x - 1, v)
                 end
                 break
             else
                 local v = value[1] or self:createValue('nil', exp)
-                self:addInfo(v, 'return', exp)
+                v:addInfo('return', exp)
                 self:setFunctionReturn(self:getCurrentFunction(), i, v)
             end
         else
-            self:addInfo(value, 'return', exp)
+            value:addInfo('return', exp)
             self:setFunctionReturn(self:getCurrentFunction(), i, value)
         end
     end

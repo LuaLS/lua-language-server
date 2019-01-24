@@ -79,6 +79,35 @@ function mt:eachField(callback)
     end
 end
 
+function mt:addInfo(tp, source)
+    if source and not source.start then
+        error('Miss start: ' .. table.dump(source))
+    end
+    if not self._info then
+        self._info = {}
+    end
+    local uri = source and source.uri or ''
+    if not self._info[uri] then
+        self._info[uri] = {}
+    end
+    self._info[uri][#self._info[uri]+1] = {
+        type = tp,
+        source = source or DefaultSource,
+    }
+    return self
+end
+
+function mt:eachInfo(callback)
+    if not self._info then
+        return
+    end
+    for _, infos in pairs(self._info) do
+        for i = 1, #infos do
+            callback(infos[i])
+        end
+    end
+end
+
 return function (tp, source, value)
     if tp == '...' then
         error('Value type cant be ...')

@@ -751,15 +751,15 @@ local Defs = {
         local labels = State.Label[#State.Label]
         local str = name[1]
         if labels[str] then
-            pushError {
-                type = 'REDEFINE_LABEL',
-                start = name.start,
-                finish = name.finish,
-                info = {
-                    label = str,
-                    related = {labels[str].start, labels[str].finish},
-                }
-            }
+            --pushError {
+            --    type = 'REDEFINE_LABEL',
+            --    start = name.start,
+            --    finish = name.finish,
+            --    info = {
+            --        label = str,
+            --        related = {labels[str].start, labels[str].finish},
+            --    }
+            --}
         else
             labels[str] = name
         end

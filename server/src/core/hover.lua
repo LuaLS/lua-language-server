@@ -218,8 +218,8 @@ local function findClass(result)
     -- 查找meta表的 __name 字段
     local name = metatable:rawGetField('__name')
     -- 值必须是字符串
-    if name and name.value and type(name.value.value) == 'string' then
-        return name.value.value
+    if name and name.value and type(name.value:getValue()) == 'string' then
+        return name.value:getValue()
     end
     -- 查找meta表 __index 里的字段
     local index = metatable:rawGetField('__index')
@@ -229,7 +229,7 @@ local function findClass(result)
             if type(key) ~= 'string' then
                 goto CONTINUE
             end
-            if not field.value or type(field.value.value) ~= 'string' then
+            if not field.value or type(field.value:getValue()) ~= 'string' then
                 goto CONTINUE
             end
             local lKey = key:lower()
@@ -244,7 +244,7 @@ local function findClass(result)
                         hasSet = true
                     end
                 end
-                return field.value.value
+                return field.value:getValue()
             end
             ::CONTINUE::
         end)
@@ -274,11 +274,11 @@ local function unpackTable(result)
             goto CONTINUE
         end
 
-        local vType = type(value.value)
+        local vType = type(value:getValue())
         if vType == 'boolean' or vType == 'integer' or vType == 'number' or vType == 'string' then
-            lines[#lines+1] = ('    %s: %s = %q,'):format(key, value.type, value.value)
+            lines[#lines+1] = ('    %s: %s = %q,'):format(key, value:getType(), value:getValue())
         else
-            lines[#lines+1] = ('    %s: %s,'):format(key, value.type)
+            lines[#lines+1] = ('    %s: %s,'):format(key, value:getType())
         end
         ::CONTINUE::
     end
@@ -308,7 +308,7 @@ local function getValueHover(name, valueType, result, lib)
         value = lib.code or (lib.value and ('%q'):format(lib.value))
         tip = lib.description
     else
-        value = result.value.value and ('%q'):format(result.value.value)
+        value = result.value:getValue() and ('%q'):format(result.value:getValue())
     end
 
     local tp = result.type
@@ -371,7 +371,7 @@ return function (result, source, lsp, select)
             valueType = valueType[1]
         end
     else
-        valueType = result.value.type or 'nil'
+        valueType = result.value:getType() or 'nil'
     end
     local name = fullKey or buildValueName(result, source)
     local hover

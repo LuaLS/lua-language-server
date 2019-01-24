@@ -14,7 +14,7 @@ function TEST(res)
         assert(vm)
         local result = core.findResult(vm, pos)
         assert(result)
-        assert(res == result.value.type)
+        assert(res == result.value:getType())
     end
 end
 

@@ -336,9 +336,9 @@ function mt:setValue(var, value, source)
         value:addInfo('set', source)
     end
     if var.value then
-        if value.type == 'any' then
+        if value:getType() == 'any' then
             self:mergeChild(var.value, value)
-        elseif value.type == 'nil' then
+        elseif value:getType() == 'nil' then
             self:mergeValue(var.value, value)
         elseif var.value.uri == self.uri then
             var.value = value
@@ -480,8 +480,8 @@ function mt:setFunctionArg(func, values)
         if not func.argValues[i] then
             func.argValues[i] = values[i]
         end
-        values[i]:inference(func.argValues[i].type)
-        func.argValues[i]:inference(values[i].type)
+        values[i]:inference(func.argValues[i]:getType())
+        func.argValues[i]:inference(values[i]:getType())
     end
 
     self:updateFunctionArgs(func)
@@ -691,10 +691,10 @@ function mt:mergeFunctionReturn(func, index, value)
         func.returns[index] = value
         return
     end
-    if value.type == 'nil' then
+    if value:getType() == 'nil' then
         return
     end
-    if value == 'any' and func.returns[index] ~= 'nil' then
+    if value:getType() == 'any' and func.returns[index] ~= 'nil' then
         return
     end
     func.returns[index] = value
@@ -1004,10 +1004,10 @@ function mt:getSimple(simple, mode)
 end
 
 function mt:isTrue(v)
-    if v.type == 'nil' then
+    if v:getType() == 'nil' then
         return false
     end
-    if v.type == 'boolean' and not v.value then
+    if v:getType() == 'boolean' and not v:getValue() then
         return false
     end
     return true

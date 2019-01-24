@@ -3,18 +3,27 @@ local DefaultSource = { start = 0, finish = 0 }
 local mt = {}
 mt.__index = mt
 mt.type = 'value'
+mt._type = 'any'
 
 function mt:setValue(source, value)
-    self.value = value
+    self._value = value
+end
+
+function mt:getValue()
+    return self._value
 end
 
 function mt:inference(tp)
     if tp == '...' then
         error('Value type cant be ...')
     end
-    if self.type == 'any' and tp ~= 'nil' then
-        self.type = tp
+    if self._type == 'any' and tp ~= 'nil' then
+        self._type = tp
     end
+end
+
+function mt:getType()
+    return self._type
 end
 
 function mt:createField(name, source)
@@ -54,6 +63,7 @@ function mt:rawGetField(name, source)
             end
         end
     end
+    return field
 end
 
 function mt:getField(name, source)
@@ -118,6 +128,7 @@ return function (tp, source, value)
     end
     local self = setmetatable({
         source = source or DefaultSource,
+        _type = tp,
     }, mt)
     if value ~= nil then
         self:setValue(source, value)

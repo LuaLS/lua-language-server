@@ -77,7 +77,7 @@ local function buildFunction(vm, func)
 end
 
 local function isLocalTable(var)
-    if not var.value or var.value.type ~= 'table' then
+    if not var.value or var.value:getType() ~= 'table' then
         return false
     end
     if var.value.source.start == 0 then
@@ -96,7 +96,7 @@ local function buildVar(vm, var)
     if var.source.start == 0 then
         return nil
     end
-    if var.value and var.value.type == 'function' and var.value.uri == vm.uri then
+    if var.value and var.value:getType() == 'function' and var.value.uri == vm.uri then
         return nil
     end
     if var.hide then

@@ -8,7 +8,7 @@ local function buildValueArgs(func, oo, select)
     end
     if func.argValues then
         for i, value in ipairs(func.argValues) do
-            values[i] = value.type
+            values[i] = value:getType()
         end
     end
     local strs = {}

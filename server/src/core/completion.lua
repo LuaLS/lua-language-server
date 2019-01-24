@@ -121,7 +121,7 @@ local function searchFields(name, source, parent, object, callback)
             goto CONTINUE
         end
         if object then
-            if not field.value or field.value.type ~= 'function' then
+            if not field.value or field.value:getType() ~= 'function' then
                 goto CONTINUE
             end
         end
@@ -147,16 +147,16 @@ end
 local function getKind(var, default)
     local value = var.value
     if default == CompletionItemKind.Variable then
-        if value.type == 'function' then
+        if value:getType() == 'function' then
             return CompletionItemKind.Function
         end
     end
     if default == CompletionItemKind.Field then
-        local tp = type(value.value)
+        local tp = type(value:getValue())
         if tp == 'number' or tp == 'integer' or tp == 'string' then
             return CompletionItemKind.Enum
         end
-        if value.type == 'function' then
+        if value:getType() == 'function' then
             if var.parent and var.parent.value and var.parent.value.ENV ~= true then
                 return CompletionItemKind.Method
             else
@@ -168,14 +168,14 @@ local function getKind(var, default)
 end
 
 local function getDetail(var)
-    local tp = type(var.value.value)
+    local tp = type(var.value:getValue())
     if tp == 'boolean' then
-        return ('= %q'):format(var.value.value)
+        return ('= %q'):format(var.value:getValue())
     elseif tp == 'number' then
-        if math.type(var.value.value) == 'integer' then
-            return ('= %q'):format(var.value.value)
+        if math.type(var.value:getValue()) == 'integer' then
+            return ('= %q'):format(var.value:getValue())
         else
-            local str = ('= %.10f'):format(var.value.value)
+            local str = ('= %.10f'):format(var.value:getValue())
             local dot = str:find('.', 1, true)
             local suffix = str:find('[0]+$', dot+2)
             if suffix then
@@ -185,7 +185,7 @@ local function getDetail(var)
             end
         end
     elseif tp == 'string' then
-        return ('= %q'):format(var.value.value)
+        return ('= %q'):format(var.value:getValue())
     end
     return nil
 end
@@ -194,7 +194,7 @@ local function getDocument(var, source)
     if not source then
         return nil
     end
-    if var.value.type == 'function' then
+    if var.value:getType() == 'function' then
         local hvr = hover(var, source)
         if not hvr then
             return nil

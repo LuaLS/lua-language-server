@@ -113,10 +113,10 @@ local function searchLocals(vm, pos, name, callback)
 end
 
 local function searchFields(name, source, parent, object, callback)
-    if not parent or not parent.value or not parent.value.child then
+    if not parent or not parent.value then
         return
     end
-    for key, field in pairs(parent.value.child) do
+    parent.value:eachField(function (key, field)
         if type(key) ~= 'string' then
             goto CONTINUE
         end
@@ -132,7 +132,7 @@ local function searchFields(name, source, parent, object, callback)
             callback(field)
         end
         ::CONTINUE::
-    end
+    end)
 end
 
 local KEYS = {'and', 'break', 'do', 'else', 'elseif', 'end', 'false', 'for', 'function', 'goto', 'if', 'in', 'local', 'nil', 'not', 'or', 'repeat', 'return', 'then', 'true', 'until', 'while', 'toclose'}

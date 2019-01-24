@@ -212,19 +212,19 @@ end
 local function findClass(result)
     -- 根据部分字段尝试找出自定义类型
     local metatable = result.value.metatable
-    if not metatable or not metatable.child then
+    if not metatable then
         return nil
     end
     -- 查找meta表的 __name 字段
-    local name = metatable.child['__name']
+    local name = metatable:rawGetField('__name')
     -- 值必须是字符串
     if name and name.value and type(name.value.value) == 'string' then
         return name.value.value
     end
     -- 查找meta表 __index 里的字段
-    local index = metatable.child['__index']
-    if index and index.value and index.value.child then
-        for key, field in pairs(index.value.child) do
+    local index = metatable:rawGetField('__index')
+    if index and index.value then
+        index.value:eachField(function (key, field)
             -- 键值类型必须均为字符串
             if type(key) ~= 'string' then
                 goto CONTINUE
@@ -247,7 +247,7 @@ local function findClass(result)
                 return field.value.value
             end
             ::CONTINUE::
-        end
+        end)
     end
     return nil
 end

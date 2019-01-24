@@ -41,7 +41,7 @@ end
 function mt:searchUndefinedGlobal(callback)
     local results = self.results
     local env = results.locals[1]
-    for index, field in pairs(env.value.child) do
+    env.value:eachField(function (index, field)
         if field.value.lib then
             goto NEXT_VAR
         end
@@ -66,7 +66,7 @@ function mt:searchUndefinedGlobal(callback)
             end
         end
         ::NEXT_VAR::
-    end
+    end)
 end
 
 function mt:searchUnusedLabel(callback)

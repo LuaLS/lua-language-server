@@ -401,11 +401,11 @@ Break       <-  BREAK {} -> Break
 BreakStart  <-  {} -> BreakStart
 BreakEnd    <-  {} -> BreakEnd
 
-Return      <-  RETURN MustExpList?
-            ->  Return (Semicolon / ActionAfterReturn)*
-ActionAfterReturn
-            <-  (Sp {} (!END !UNTIL !ELSEIF !ELSE Action)+ {})
-            ->  ActionAfterReturn
+Return      <-  (ReturnBody Semicolon* AfterReturn?)
+            ->  AfterReturn
+ReturnBody  <-  Sp ({} RETURN MustExpList? {})
+            ->  Return
+AfterReturn <-  Sp !END !UNTIL !ELSEIF !ELSE Action
 
 Label       <-  LABEL MustName -> Label DirtyLabel
 

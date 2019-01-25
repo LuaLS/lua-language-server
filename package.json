@@ -50,6 +50,12 @@
 					"type": "array",
 					"items": "string",
 					"description": "Ignored directories.\n忽略的目录。"
+				},
+				"Lua.workspace.ignoreSubmodules": {
+					"scope": "resource",
+					"type": "boolean",
+					"default": true,
+					"description": "Ignore submodules.\n忽略子模块。"
 				}
 			}
 		}

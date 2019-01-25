@@ -29,11 +29,12 @@ end
 
 local Template = {
     diagnostics = {
-        globals       = {{},   Str2Hash ';'},
-        disable       = {{},   Str2Hash ';'},
+        globals         = {{},   Str2Hash ';'},
+        disable         = {{},   Str2Hash ';'},
     },
     workspace = {
-        ignoreDir     = {{},   Str2Hash ';'}
+        ignoreDir       = {{},   Str2Hash ';'},
+        ignoreSubmodules= {true, Boolean},
     }
 }
 

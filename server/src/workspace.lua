@@ -78,9 +78,23 @@ function mt:init(rootUri)
     log.info('Log path: ', logPath)
     log.init(ROOT, logPath)
 
+    local ignored = {}
+    for path in pairs(config.config.workspace.ignoreDir) do
+        ignored[path] = true
+    end
+    if config.config.workspace.ignoreSubmodules then
+        local buf = io.load(ROOT:parent_path() / '.gitmodules')
+        if buf then
+            for path in buf:gmatch('path = ([^\r\n]+)') do
+                log.debug('忽略子模块：', path)
+                ignored[path] = true
+            end
+        end
+    end
+
     async.run('scanfiles', {
         root = self.root:string(),
-        ignore = config.config.workspace.ignoreDir,
+        ignore = ignored,
     }, function (file)
         if file == 'ok' then
             self:reset()

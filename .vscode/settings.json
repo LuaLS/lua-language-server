@@ -1,7 +1,10 @@
 {
     "Lua.workspace.ignoreDir": [
-        "publish",
-        "3rd"
+        "publish"
     ],
-    "Lua.diagnostics.globals": ["TEST", "ERR", "OUT"]
+    "Lua.diagnostics.globals": [
+        "TEST",
+        "ERR",
+        "OUT"
+    ]
 }

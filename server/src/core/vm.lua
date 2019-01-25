@@ -283,7 +283,7 @@ function mt:mergeField(a, b, mark)
     for i, v in ipairs(b) do
         a[i] = v
     end
-    self:mergeValue(a.value, b.value, mark)
+    self:mergeValue(a:getValue(), b:getValue(), mark)
 end
 
 function mt:mergeChild(a, b, mark)
@@ -362,7 +362,7 @@ function mt:isGlobal(field)
     if field.type ~= 'field' then
         return false
     end
-    if field.parent.value and field.parent.value.ENV then
+    if field.parent.value and field.parent.value.GLOBAL then
         return true
     else
         return false
@@ -552,7 +552,7 @@ function mt:tryRequireOne(strValue, mode)
     if not self.lsp or not self.lsp.workspace then
         return nil
     end
-    local str = strValue.value
+    local str = strValue:getValue()
     if type(str) == 'string' then
         -- 支持 require 'xxx' 的转到定义
         local strSource = strValue.source
@@ -592,7 +592,7 @@ function mt:callRequire(func, values)
     if not values[1] then
         values[1] = self:createValue('any')
     end
-    local str = values[1].value
+    local str = values[1]:getValue()
     if type(str) ~= 'string' then
         return
     end
@@ -615,7 +615,7 @@ function mt:callLoadFile(func, values)
     if not values[1] then
         values[1] = self:createValue('any')
     end
-    local str = values[1].value
+    local str = values[1]:getValue()
     if type(str) ~= 'string' then
         return
     end
@@ -631,7 +631,7 @@ function mt:callDoFile(func, values)
     if not values[1] then
         values[1] = self:createValue('any')
     end
-    local str = values[1].value
+    local str = values[1]:getValue()
     if type(str) ~= 'string' then
         return
     end
@@ -1057,25 +1057,25 @@ function mt:getBinary(exp)
     then
         v1:inference('integer')
         v2:inference('integer')
-        if math.type(v1.value) == 'integer' and math.type(v2.value) == 'integer' then
+        if math.type(v1:getValue()) == 'integer' and math.type(v2:getValue()) == 'integer' then
             if op == '|' then
-                return self:createValue('integer', v1.value | v2.value)
+                return self:createValue('integer', v1:getValue() | v2:getValue())
             elseif op == '~' then
-                return self:createValue('integer', v1.value ~ v2.value)
+                return self:createValue('integer', v1:getValue() ~ v2:getValue())
             elseif op == '&' then
-                return self:createValue('integer', v1.value &v2.value)
+                return self:createValue('integer', v1:getValue() &v2:getValue())
             elseif op == '<<' then
-                return self:createValue('integer', v1.value << v2.value)
+                return self:createValue('integer', v1:getValue() << v2:getValue())
             elseif op == '>>' then
-                return self:createValue('integer', v1.value >> v2.value)
+                return self:createValue('integer', v1:getValue() >> v2:getValue())
             end
         end
         return self:createValue('integer')
     elseif op == '..' then
         v1:inference('string')
         v2:inference('string')
-        if type(v1.value) == 'string' and type(v2.value) == 'string' then
-            return self:createValue('string', nil, v1.value .. v2.value)
+        if type(v1:getValue()) == 'string' and type(v2:getValue()) == 'string' then
+            return self:createValue('string', nil, v1:getValue() .. v2:getValue())
         end
         return self:createValue('string')
     elseif op == '+'
@@ -1088,26 +1088,26 @@ function mt:getBinary(exp)
     then
         v1:inference('number')
         v2:inference('number')
-        if type(v1.value) == 'number' and type(v2.value) == 'number' then
+        if type(v1:getValue()) == 'number' and type(v2:getValue()) == 'number' then
             if op == '+' then
-                return self:createValue('number', nil, v1.value + v2.value)
+                return self:createValue('number', nil, v1:getValue() + v2:getValue())
             elseif op == '-' then
-                return self:createValue('number', nil, v1.value - v2.value)
+                return self:createValue('number', nil, v1:getValue() - v2:getValue())
             elseif op == '*' then
-                return self:createValue('number', nil, v1.value * v2.value)
+                return self:createValue('number', nil, v1:getValue() * v2:getValue())
             elseif op == '/' then
-                if v2.value ~= 0 then
-                    return self:createValue('number', nil, v1.value / v2.value)
+                if v2:getValue() ~= 0 then
+                    return self:createValue('number', nil, v1:getValue() / v2:getValue())
                 end
             elseif op == '^' then
-                return self:createValue('number', nil, v1.value ^ v2.value)
+                return self:createValue('number', nil, v1:getValue() ^ v2:getValue())
             elseif op == '%' then
-                if v2.value ~= 0 then
-                    return self:createValue('number', nil, v1.value % v2.value)
+                if v2:getValue() ~= 0 then
+                    return self:createValue('number', nil, v1:getValue() % v2:getValue())
                 end
             elseif op == '//' then
-                if v2.value ~= 0 then
-                    return self:createValue('number', nil, v1.value // v2.value)
+                if v2:getValue() ~= 0 then
+                    return self:createValue('number', nil, v1:getValue() // v2:getValue())
                 end
             end
         end
@@ -1118,26 +1118,27 @@ end
 
 function mt:getUnary(exp)
     local v1 = self:getExp(exp[1])
+    v1 = self:selectList(v1, 1)
     local op = exp.op
     -- TODO 搜索元方法
     if     op == 'not' then
         return self:createValue('boolean')
     elseif op == '#' then
         v1:inference('table')
-        if type(v1.value) == 'string' then
-            return self:createValue('integer', nil, #v1.value)
+        if type(v1:getValue()) == 'string' then
+            return self:createValue('integer', nil, #v1:getValue())
         end
         return self:createValue('integer')
     elseif op == '-' then
         v1:inference('number')
-        if type(v1.value) == 'number' then
-            return self:createValue('number', nil, -v1.value)
+        if type(v1:getValue()) == 'number' then
+            return self:createValue('number', nil, -v1:getValue())
         end
         return self:createValue('number')
     elseif op == '~' then
         v1:inference('integer')
-        if math.type(v1.value) == 'integer' then
-            return self:createValue('integer', nil, ~v1.value)
+        if math.type(v1:getValue()) == 'integer' then
+            return self:createValue('integer', nil, ~v1:getValue())
         end
         return self:createValue('integer')
     end

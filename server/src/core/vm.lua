@@ -1459,7 +1459,11 @@ function mt:doActions(actions)
     for _, action in ipairs(actions) do
         self:doAction(action)
         if coroutine.isyieldable() then
-            coroutine.yield()
+            if self.lsp:isNeedCompile(self.uri) then
+                coroutine.yield()
+            else
+                coroutine.yield('stop')
+            end
         end
     end
 end

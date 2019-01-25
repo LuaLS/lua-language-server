@@ -122,6 +122,10 @@ function mt:needCompile(uri, compiled)
     table.insert(self._needCompile, 1, uri)
 end
 
+function mt:isNeedCompile(uri)
+    return self._needCompile[uri]
+end
+
 function mt:isWaitingCompile()
     if self._needCompile[1] then
         return true
@@ -467,7 +471,12 @@ function mt:_doCompileTask()
     while true do
         local suc, res = coroutine.resume(self._compileTask)
         if not suc then
-            break
+            self._compileTask = nil
+            return
+        end
+        if res == 'stop' then
+            self._compileTask = nil
+            return
         end
         if coroutine.status(self._compileTask) == 'suspended' then
             self:_loadProto()

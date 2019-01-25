@@ -332,7 +332,7 @@ function mt:setValue(var, value, source)
     if value and value.type == 'list' then
         error('Cant set value list')
     end
-    value = value or self:createValue('nil', source)
+    value = value or self:createValue('any', source)
     if source and source.start then
         self:addInfo(var, 'set', source, value)
         value:addInfo('set', source, var)

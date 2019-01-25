@@ -3,7 +3,7 @@ local library = require 'core.library'
 local createValue = require 'core.value'
 
 local DefaultSource = { start = 0, finish = 0 }
-local GlobalChild
+local GlobalValue
 
 -- 根据赋值顺序决定遍历顺序的表
 local function orderTable()
@@ -1435,36 +1435,35 @@ function mt:doActions(actions)
     end
 end
 
+function mt:getGlobalValue()
+    if GlobalValue then
+        return GlobalValue
+    end
+    GlobalValue = self:createValue('table')
+    GlobalValue.GLOBAL = true
+    for name, lib in pairs(library.global) do
+        local field = GlobalValue:createField(name)
+        local value = self:getLibValue(lib, 'global')
+        self:setValue(field, value)
+    end
+    return GlobalValue
+end
+
 function mt:createEnvironment()
     self.scope.block = { start = 0, finish = math.maxinteger }
     -- 整个文件是一个函数
     self.chunk.func = self:buildFunction()
     self.results.main = self.chunk.func
     -- 隐藏的上值`_ENV`
-    local parent = self:createLocal('_ENV')
-    parent.hide = true
-    local envValue = self:setValue(parent, self:buildTable())
-    -- _ENV 有个特殊标记
-    envValue.ENV = true
+    local evnField = self:createLocal('_ENV')
+    evnField.hide = true
     -- 隐藏的参数`...`
     self:createDots(1)
-
-    -- 设置全局变量
-    if not GlobalChild then
-        for name, lib in pairs(library.global) do
-            local field = envValue:createField(name)
-            local value = self:getLibValue(lib, 'global')
-            value = self:setValue(field, value)
-        end
-        GlobalChild = envValue.child
-    end
-    envValue.child = readOnly(GlobalChild)
-
-    -- 设置 _G 使用 _ENV 的child
-    local g = envValue:getField('_G')
-    local gValue = self:getValue(g)
-    gValue.child = envValue.child
-    self.env = envValue
+    -- 全局变量`_G`
+    local globalValue = self:getGlobalValue()
+    -- 使用_G初始化_ENV
+    self:setValue(evnField, globalValue)
+    self.env = globalValue
 end
 
 local function compile(ast, lsp, uri)

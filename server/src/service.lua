@@ -193,6 +193,9 @@ function mt:readText(uri, path, buf)
 end
 
 function mt:removeText(uri)
+    if not self._file[uri] then
+        return
+    end
     self:saveText(uri, -1, '')
     self:compileVM(uri)
     self._file[uri] = nil

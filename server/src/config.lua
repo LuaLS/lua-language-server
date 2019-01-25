@@ -35,6 +35,7 @@ local Template = {
     workspace = {
         ignoreDir       = {{},   Str2Hash ';'},
         ignoreSubmodules= {true, Boolean},
+        useGitIgnore    = {true, Boolean},
     }
 }
 

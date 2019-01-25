@@ -56,6 +56,12 @@
 					"type": "boolean",
 					"default": true,
 					"description": "Ignore submodules.\n忽略子模块。"
+				},
+				"Lua.workspace.useGitIgnore": {
+					"scope": "resource",
+					"type": "boolean",
+					"default": true,
+					"description": "Ignore files list in .gitignore.\n忽略.gitignore中列举的文件。"
 				}
 			}
 		}

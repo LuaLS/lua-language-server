@@ -91,7 +91,7 @@ function mt:init(rootUri)
             end
         end
     end
-    if true then
+    if config.config.workspace.useGitIgnore then
         local buf = io.load(self.root / '.gitignore')
         if buf then
             for line in buf:gmatch '[^\r\n]+' do

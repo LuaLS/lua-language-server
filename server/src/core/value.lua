@@ -66,6 +66,17 @@ function mt:rawGetField(name, source)
     return field
 end
 
+function mt:getChild()
+    if not self._child then
+        self._child = {}
+    end
+    return self._child
+end
+
+function mt:setChild(child)
+    self._child = child
+end
+
 function mt:getField(name, source)
     local field = self:rawGetField(name, source)
     if not field then

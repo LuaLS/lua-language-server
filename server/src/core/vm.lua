@@ -4,6 +4,8 @@ local createValue = require 'core.value'
 
 local DefaultSource = { start = 0, finish = 0 }
 local GlobalValue
+local LibraryValue = {}
+local LibraryChild = {}
 
 -- 根据赋值顺序决定遍历顺序的表
 local function orderTable()
@@ -752,26 +754,23 @@ end
 
 function mt:getLibChild(value, lib, parentType)
     if lib.child then
-        if self.libraryChild[lib] then
-            value.child = self.libraryChild[lib]
+        if LibraryChild[lib] then
+            value:setChild(LibraryChild[lib])
             return
         end
-        self.libraryChild[lib] = {}
+        -- 要先声明缓存，以免死循环
+        LibraryChild[lib] = value:getChild()
         for fName, fLib in pairs(lib.child) do
             local fField = value:createField(fName)
             local fValue = self:getLibValue(fLib, parentType)
             self:setValue(fField, fValue)
         end
-        value:eachField(function (k, v)
-            self.libraryChild[lib][k] = v
-        end)
-        value.child = self.libraryChild[lib]
     end
 end
 
 function mt:getLibValue(lib, parentType, v)
-    if self.libraryValue[lib] then
-        return self.libraryValue[lib]
+    if LibraryValue[lib] then
+        return LibraryValue[lib]
     end
     local tp = lib.type
     local value
@@ -815,7 +814,7 @@ function mt:getLibValue(lib, parentType, v)
     else
         value = self:createValue(tp or 'any')
     end
-    self.libraryValue[lib] = value
+    LibraryValue[lib] = value
     value.lib = lib
     value.parentType = parentType
 
@@ -1485,8 +1484,6 @@ local function compile(ast, lsp, uri)
             globals= {},
             main   = nil,
         },
-        libraryValue = {},
-        libraryChild = {},
         lsp          = lsp,
         uri          = uri,
     }, mt)
@@ -1499,8 +1496,6 @@ local function compile(ast, lsp, uri)
 
     vm.scope = nil
     vm.chunk = nil
-    vm.libraryValue = nil
-    vm.libraryChild = nil
 
     return vm
 end

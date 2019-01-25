@@ -359,7 +359,71 @@ function mt:isGlobal(field)
     end
 end
 
+function mt:callLeftFuncions()
+    for _, func in ipairs(self.results.funcs) do
+        if func.built and not func.runed then
+            self:runFunction(func)
+        end
+    end
+end
+
+function mt:runFunction(func)
+    func.runed = (func.runed or 0) + 1
+    if func.runed > 1 then
+        --return
+    end
+    self:scopePush(func.built)
+    self.chunk:push()
+    self.chunk:cut 'dots'
+    self.chunk:cut 'labels'
+    self.chunk:cut 'locals'
+    self.chunk.func = func
+
+    for name, loc in pairs(func.upvalues) do
+        self.scope.locals[name] = loc
+    end
+
+    local index = 0
+    if func.object then
+        local var = self:createArg('self', func.object.source, self:getValue(func.object))
+        var.hide = true
+        self:setValue(var, func.argValues[1] or self:createValue('nil'))
+        index = 1
+        func.args[index] = var
+    end
+
+    local stop
+    self:forList(func.built.arg, function (arg)
+        if stop then
+            return
+        end
+        index = index + 1
+        if arg.type == 'name' then
+            local var = self:createArg(arg[1], arg)
+            arg.isArg = true
+            self:setValue(var, func.argValues[index] or self:createValue('nil'))
+            func.args[index] = var
+        elseif arg.type == '...' then
+            local dots = self:createDots(index, arg)
+            for i = index, #func.argValues do
+                dots[#dots+1] = func.argValues[i]
+            end
+            func.hasDots = true
+            stop = true
+        end
+    end)
+
+    self:doActions(func.built)
+
+    self.chunk:pop()
+    self:scopePop()
+end
+
 function mt:buildFunction(exp, object)
+    if exp and exp.func then
+        return exp.func
+    end
+
     local func = self:createValue('function', exp)
     func.args = {}
     func.argValues = {}
@@ -368,46 +432,15 @@ function mt:buildFunction(exp, object)
         return func
     end
 
-    func.built = true
-
-    self:scopePush(exp)
-    self.chunk:push()
-    self.chunk:cut 'dots'
-    self.chunk:cut 'labels'
-    self.chunk.func = func
-
-    if object then
-        local var = self:createArg('self', object.source, self:getValue(object))
-        var.hide = true
-        func.args[1] = var
+    func.built = exp
+    func.upvalues = {}
+    func.object = object
+    exp.func = func
+    for name, loc in pairs(self.scope.locals) do
+        func.upvalues[name] = loc
     end
 
-    local stop
-    self:forList(exp.arg, function (arg)
-        if stop then
-            return
-        end
-        if arg.type == 'name' then
-            local var = self:createArg(arg[1], arg)
-            arg.isArg = true
-            func.args[#func.args+1] = var
-            func.argValues[#func.args] = self:getValue(var)
-        elseif arg.type == '...' then
-            self:createDots(#func.args+1, arg)
-            func.hasDots = true
-            for _ = 1, 10 do
-                func.argValues[#func.argValues+1] = self:createValue('any', arg)
-            end
-            stop = true
-        end
-    end)
-
-    self:doActions(exp)
-
     self.results.funcs[#self.results.funcs+1] = func
-
-    self.chunk:pop()
-    self:scopePop()
 
     return func
 end
@@ -435,31 +468,6 @@ function mt:countList(list)
     return 1
 end
 
-function mt:updateFunctionArgs(func)
-    if not func.argValues then
-        return
-    end
-    if not func.args then
-        return
-    end
-
-    local values = func.argValues
-    for i, var in ipairs(func.args) do
-        if var.type == 'dots' then
-            local list = {
-                type = 'list',
-            }
-            for n = i, #values do
-                list[n-i+1] = values[n]
-            end
-            self:setValue(var, list)
-            break
-        else
-            self:setValue(var, values[i])
-        end
-    end
-end
-
 function mt:setFunctionArg(func, values)
     if func.uri ~= self.uri then
         return
@@ -468,24 +476,13 @@ function mt:setFunctionArg(func, values)
         func.argValues = {}
     end
     for i = 1, #values do
-        if not func.argValues[i] then
-            func.argValues[i] = values[i]
-        end
-        values[i]:inference(func.argValues[i]:getType())
-        func.argValues[i]:inference(values[i]:getType())
+        func.argValues[i] = values[i]
     end
-
-    self:updateFunctionArgs(func)
 end
 
 function mt:getFunctionArg(func, i)
     if not func.argValues then
         func.argValues = {}
-    end
-    if not func.argValues[i] then
-        for n = #func.argValues+1, i do
-            func.argValues[n] = self:createValue('any')
-        end
     end
     return func.argValues[i]
 end
@@ -633,17 +630,13 @@ function mt:callDoFile(func, values)
     self:setFunctionReturn(func, 1, requireValue)
 end
 
-function mt:call(func, values)
+function mt:call(func, values, source)
     func:inference('function')
     local lib = func.lib
     if lib then
         if lib.args then
             for i, arg in ipairs(lib.args) do
-                if arg.type == '...' then
-                    self:getFunctionArg(func, i):inference('any')
-                else
-                    self:getFunctionArg(func, i):inference(arg.type or 'any')
-                end
+                -- TODO 反向推测调用参数的类型
             end
         end
         if lib.returns then
@@ -668,7 +661,11 @@ function mt:call(func, values)
         end
     end
 
-    self:setFunctionArg(func, values)
+    if not source.hasRuned and func.built then
+        source.hasRuned = true
+        self:setFunctionArg(func, values)
+        self:runFunction(func)
+    end
 
     return self:getFunctionReturns(func)
 end
@@ -786,7 +783,7 @@ function mt:getLibValue(lib, parentType, v)
             for i, arg in ipairs(lib.args) do
                 values[i] = self:getLibValue(arg, parentType) or self:createValue('any')
             end
-            self:setFunctionArg(value, values)
+            -- TODO 确定参数类型
         end
     elseif tp == 'string' then
         value = self:createValue('string', nil, v or lib.value)
@@ -933,7 +930,7 @@ function mt:getSimple(simple, mode)
             end
             local func = value
             -- 函数的返回值一定是list
-            value = self:call(func, args)
+            value = self:call(func, args, obj)
             if i < #simple then
                 value = value[1] or self:createValue('any')
             end
@@ -1303,7 +1300,7 @@ function mt:doIn(action)
 
     self:scopePush(action)
     local func = table.remove(args, 1) or self:createValue('any')
-    local values = self:call(func, args)
+    local values = self:call(func, args, action)
     self:forList(action.arg, function (arg)
         local value = table.remove(values, 1)
         self:createLocal(arg[1], arg, value)
@@ -1486,6 +1483,9 @@ local function compile(ast, lsp, uri)
 
     -- 执行代码
     vm:doActions(ast)
+
+    -- 检查所有没有调用过的函数，调用一遍
+    vm:callLeftFuncions()
 
     vm.scope = nil
     vm.chunk = nil

@@ -3,9 +3,8 @@ local DefaultSource = { start = 0, finish = 0 }
 local mt = {}
 mt.__index = mt
 mt.type = 'value'
-mt._type = 'any'
 
-function mt:setValue(source, value)
+function mt:setValue(value)
     self._value = value
 end
 
@@ -13,17 +12,34 @@ function mt:getValue()
     return self._value
 end
 
-function mt:inference(tp)
+function mt:inference(tp, rate)
     if tp == '...' then
         error('Value type cant be ...')
     end
-    if self._type == 'any' and tp ~= 'nil' then
-        self._type = tp
+    if not tp or tp == 'any' then
+        return
+    end
+    if not self._type then
+        self._type = {}
+    end
+    if not self._type[tp] or rate > self._type[tp] then
+        self._type[tp] = rate
     end
 end
 
 function mt:getType()
-    return self._type
+    if not self._type then
+        return 'nil'
+    end
+    local mRate = 0.0
+    local mType
+    for tp, rate in pairs(self._type) do
+        if rate > mRate then
+            mRate = rate
+            mType = tp
+        end
+    end
+    return mType or 'any'
 end
 
 function mt:createField(name, source)
@@ -42,7 +58,7 @@ function mt:createField(name, source)
     end
     self._child[uri][name] = field
 
-    self:inference('table')
+    self:inference('table', 0.5)
 
     return field
 end
@@ -135,15 +151,18 @@ return function (tp, source, value)
         error('Value type cant be ...')
     end
     -- TODO lib里的多类型
-    if type(tp) == 'table' then
-        tp = tp[1]
-    end
     local self = setmetatable({
         source = source or DefaultSource,
-        _type = tp,
     }, mt)
     if value ~= nil then
-        self:setValue(source, value)
+        self:setValue(value)
+    end
+    if type(tp) == 'table' then
+        for i = 1, #tp do
+            self:inference(tp[i], 0.9)
+        end
+    else
+        self:inference(tp, 1.0)
     end
     return self
 end

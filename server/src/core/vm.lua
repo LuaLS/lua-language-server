@@ -631,20 +631,23 @@ function mt:callDoFile(func, values)
 end
 
 function mt:call(func, values, source)
-    func:inference('function')
+    func:inference('function', 0.9)
     local lib = func.lib
     if lib then
         if lib.args then
             for i, arg in ipairs(lib.args) do
-                -- TODO 反向推测调用参数的类型
+                local value = values[i]
+                if value and arg.type ~= '...' then
+                    value:inference(arg.type, 1.0)
+                end
             end
         end
         if lib.returns then
             for i, rtn in ipairs(lib.returns) do
                 if rtn.type == '...' then
-                    self:getFunctionReturns(func, i):inference('any')
+                    self:getFunctionReturns(func, i):inference('any', 0.0)
                 else
-                    self:getFunctionReturns(func, i):inference(rtn.type or 'any')
+                    self:getFunctionReturns(func, i):inference(rtn.type or 'any', 1.0)
                 end
             end
         end
@@ -1029,8 +1032,10 @@ function mt:getBinary(exp)
         or op == '<'
         or op == '>'
     then
-        v1:inference('number')
-        v2:inference('number')
+        v1:inference('number', 0.9)
+        v2:inference('number', 0.9)
+        v1:inference('string', 0.1)
+        v2:inference('string', 0.1)
         return self:createValue('boolean')
     elseif op == '~='
         or op == '=='
@@ -1042,8 +1047,12 @@ function mt:getBinary(exp)
         or op == '<<'
         or op == '>>'
     then
-        v1:inference('integer')
-        v2:inference('integer')
+        v1:inference('integer', 0.9)
+        v2:inference('integer', 0.9)
+        v1:inference('number', 0.9)
+        v2:inference('number', 0.9)
+        v1:inference('string', 0.1)
+        v2:inference('string', 0.1)
         if math.type(v1:getValue()) == 'integer' and math.type(v2:getValue()) == 'integer' then
             if op == '|' then
                 return self:createValue('integer', v1:getValue() | v2:getValue())
@@ -1059,8 +1068,10 @@ function mt:getBinary(exp)
         end
         return self:createValue('integer')
     elseif op == '..' then
-        v1:inference('string')
-        v2:inference('string')
+        v1:inference('string', 0.9)
+        v2:inference('string', 0.9)
+        v1:inference('number', 0.1)
+        v2:inference('number', 0.1)
         if type(v1:getValue()) == 'string' and type(v2:getValue()) == 'string' then
             return self:createValue('string', nil, v1:getValue() .. v2:getValue())
         end
@@ -1073,8 +1084,8 @@ function mt:getBinary(exp)
         or op == '%'
         or op == '//'
     then
-        v1:inference('number')
-        v2:inference('number')
+        v1:inference('number', 0.9)
+        v2:inference('number', 0.9)
         if type(v1:getValue()) == 'number' and type(v2:getValue()) == 'number' then
             if op == '+' then
                 return self:createValue('number', nil, v1:getValue() + v2:getValue())
@@ -1111,19 +1122,20 @@ function mt:getUnary(exp)
     if     op == 'not' then
         return self:createValue('boolean')
     elseif op == '#' then
-        v1:inference('table')
+        v1:inference('table', 0.9)
+        v1:inference('string', 0.9)
         if type(v1:getValue()) == 'string' then
             return self:createValue('integer', nil, #v1:getValue())
         end
         return self:createValue('integer')
     elseif op == '-' then
-        v1:inference('number')
+        v1:inference('number', 0.9)
         if type(v1:getValue()) == 'number' then
             return self:createValue('number', nil, -v1:getValue())
         end
         return self:createValue('number')
     elseif op == '~' then
-        v1:inference('integer')
+        v1:inference('integer', 0.9)
         if math.type(v1:getValue()) == 'integer' then
             return self:createValue('integer', nil, ~v1:getValue())
         end

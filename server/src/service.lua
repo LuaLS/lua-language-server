@@ -193,11 +193,12 @@ function mt:readText(uri, path, buf)
 end
 
 function mt:removeText(uri)
+    if not self._file[uri] then
+        return
+    end
+    self:saveText(uri, -1, '')
+    self:compileVM(uri)
     self._file[uri] = nil
-    -- 删除文件后，清除该文件的诊断
-    self:clearDiagnostics(uri)
-    -- 清除全局变量
-    self._global:clearGlobal(uri)
 end
 
 function mt:reCompile()

@@ -729,17 +729,24 @@ local Defs = {
     BreakEnd = function ()
         State.Break = State.Break - 1
     end,
-    Return = function (exp)
-        if exp == nil or exp == '' then
+    Return = function (start, exp, finish)
+        if not finish then
+            finish = exp
             exp = {
-                type = 'return'
+                type = 'return',
+                start = start,
+                finish = finish - 1,
             }
         else
             if exp.type == 'list' then
                 exp.type = 'return'
+                exp.start = start
+                exp.finish = finish - 1
             else
                 exp = {
                     type = 'return',
+                    start = start,
+                    finish = finish - 1,
                     [1] = exp,
                 }
             end
@@ -1166,20 +1173,20 @@ local Defs = {
         }
         return exp
     end,
-    ActionAfterReturn = function (start, ...)
-        if not start or start == '' then
-            return
+    AfterReturn = function (rtn, ...)
+        if not ... then
+            return rtn
         end
-        local actions = table.pack(...)
-        local max = actions.n
-        local finish = actions[max]
-        actions[max] = nil
+        local action = select(-1, ...)
+        if not action then
+            return rtn
+        end
         pushError {
             type = 'ACTION_AFTER_RETURN',
-            start = start,
-            finish = finish - 1,
+            start = rtn.start,
+            finish = rtn.finish,
         }
-        return table.unpack(actions)
+        return rtn, action
     end,
 }
 

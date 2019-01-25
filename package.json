@@ -5,7 +5,7 @@
 	"author": "sumneko",
 	"icon": "images/logo.png",
 	"license": "MIT",
-	"version": "0.4.8",
+	"version": "0.4.9",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/sumneko/lua-language-server"
@@ -50,6 +50,18 @@
 					"type": "array",
 					"items": "string",
 					"description": "Ignored directories.\n忽略的目录。"
+				},
+				"Lua.workspace.ignoreSubmodules": {
+					"scope": "resource",
+					"type": "boolean",
+					"default": true,
+					"description": "Ignore submodules.\n忽略子模块。"
+				},
+				"Lua.workspace.useGitIgnore": {
+					"scope": "resource",
+					"type": "boolean",
+					"default": true,
+					"description": "Ignore files list in .gitignore.\n忽略.gitignore中列举的文件。"
 				}
 			}
 		}

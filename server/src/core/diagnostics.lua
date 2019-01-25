@@ -260,14 +260,14 @@ return function (vm, lines, uri)
     -- 未使用的Label
     session:doDiagnostics('searchUnusedLabel', 'unused-label', function (key)
         return {
-            level   =DiagnosticSeverity.Information,
+            level   =DiagnosticSeverity.Hint,
             message = lang.script('DIAG_UNUSED_LABEL', key)
         }
     end)
     -- 只有空格与制表符的行，以及后置空格
     session:doDiagnostics('searchSpaces', 'trailing-space', function (message)
         return {
-            level   = DiagnosticSeverity.Information,
+            level   = DiagnosticSeverity.Hint,
             message = message,
         }
     end)
@@ -289,7 +289,7 @@ return function (vm, lines, uri)
     -- 调用函数时的参数数量是否超过函数的接收数量
     session:doDiagnostics('searchRedundantParameters', 'remainder-parameters', function (max, passed)
         return {
-            level   = DiagnosticSeverity.Warning,
+            level   = DiagnosticSeverity.Information,
             message = lang.script('DIAG_OVER_MAX_ARGS', max, passed),
         }
     end)

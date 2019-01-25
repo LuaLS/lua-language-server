@@ -199,7 +199,7 @@ function mt:buildTable(source)
             local key   = obj[1]
             if key.index then
                 local index = self:getIndex(key)
-                local field = tbl:createField(index, key)
+                local field = self:createField(tbl, index, key)
                 if value.type == 'list' then
                     self:setValue(field, value[1], key)
                 else
@@ -207,7 +207,7 @@ function mt:buildTable(source)
                 end
             else
                 if key.type == 'name' then
-                    local field = tbl:createField(key[1], key)
+                    local field = self:createField(tbl, key[1], key)
                     self.results.indexs[#self.results.indexs+1] = field
                     key.isIndex = true
                     if value.type == 'list' then
@@ -222,17 +222,17 @@ function mt:buildTable(source)
             if value.type == 'list' then
                 if index == #source then
                     for i, v in ipairs(value) do
-                        local field = tbl:createField(n + i)
+                        local field = self:createField(tbl, n + i)
                         self:setValue(field, v)
                     end
                 else
                     n = n + 1
-                    local field = tbl:createField(n)
+                    local field = self:createField(tbl, n)
                     self:setValue(field, value[1])
                 end
             else
                 n = n + 1
-                local field = tbl:createField(n)
+                local field = self:createField(tbl, n)
                 self:setValue(field, value)
             end
             -- 处理写了一半的 key = value，把name类的数组元素视为哈希键
@@ -333,12 +333,12 @@ function mt:setValue(var, value, source)
     value = value or self:createValue('any', source)
     if source and source.start then
         self:addInfo(var, 'set', source)
-        value:addInfo('set', source)
+        self:addInfo(value, 'set', source)
     end
     if var.value then
-        if value:getType() == 'any' then
+        if value.type == 'any' then
             self:mergeChild(var.value, value)
-        elseif value:getType() == 'nil' then
+        elseif value.type == 'nil' then
             self:mergeValue(var.value, value)
         elseif var.value.uri == self.uri then
             var.value = value
@@ -357,11 +357,42 @@ function mt:getValue(var)
     return var.value
 end
 
+function mt:createField(pValue, name, source)
+    if pValue.type == 'local' or pValue.type == 'field' then
+        error('Only value can create field')
+    end
+    local field = {
+        type   = 'field',
+        key    = name,
+        source = source or DefaultSource,
+    }
+
+    if not pValue.child then
+        pValue.child = orderTable()
+    end
+    pValue.child[name] = field
+    self:inference(pValue, 'table')
+    return field
+end
+
+function mt:getField(pValue, name, source)
+    local field =  (pValue.child and pValue.child[name])
+    if not field and pValue.ENV then
+        if self.lsp then
+            field = self.lsp:getGlobal(name)
+        end
+    end
+    if not field then
+        field = self:createField(pValue, name, source)
+    end
+    return field
+end
+
 function mt:isGlobal(field)
     if field.type ~= 'field' then
         return false
     end
-    if field.parent.value and field.parent.value.ENV then
+    if field.parent.value.ENV then
         return true
     else
         return false
@@ -480,8 +511,8 @@ function mt:setFunctionArg(func, values)
         if not func.argValues[i] then
             func.argValues[i] = values[i]
         end
-        values[i]:inference(func.argValues[i]:getType())
-        func.argValues[i]:inference(values[i]:getType())
+        self:inference(values[i], func.argValues[i].type)
+        self:inference(func.argValues[i], values[i].type)
     end
 
     self:updateFunctionArgs(func)
@@ -500,7 +531,7 @@ function mt:getFunctionArg(func, i)
 end
 
 function mt:checkMetaIndex(value, meta)
-    local index = meta:getField('__index')
+    local index = self:getField(meta, '__index')
     if not index then
         return
     end
@@ -643,24 +674,24 @@ function mt:callDoFile(func, values)
 end
 
 function mt:call(func, values)
-    func:inference('function')
+    self:inference(func, 'function')
     local lib = func.lib
     if lib then
         if lib.args then
             for i, arg in ipairs(lib.args) do
                 if arg.type == '...' then
-                    self:getFunctionArg(func, i):inference('any')
+                    self:inference(self:getFunctionArg(func, i), 'any')
                 else
-                    self:getFunctionArg(func, i):inference(arg.type or 'any')
+                    self:inference(self:getFunctionArg(func, i), arg.type or 'any')
                 end
             end
         end
         if lib.returns then
             for i, rtn in ipairs(lib.returns) do
                 if rtn.type == '...' then
-                    self:getFunctionReturns(func, i):inference('any')
+                    self:inference(self:getFunctionReturns(func, i), 'any')
                 else
-                    self:getFunctionReturns(func, i):inference(rtn.type or 'any')
+                    self:inference(self:getFunctionReturns(func, i), rtn.type or 'any')
                 end
             end
         end
@@ -691,10 +722,10 @@ function mt:mergeFunctionReturn(func, index, value)
         func.returns[index] = value
         return
     end
-    if value:getType() == 'nil' then
+    if value.type == 'nil' then
         return
     end
-    if value:getType() == 'any' and func.returns[index] ~= 'nil' then
+    if value == 'any' and func.returns[index] ~= 'nil' then
         return
     end
     func.returns[index] = value
@@ -741,8 +772,17 @@ function mt:getFunctionReturns(func, i)
     end
 end
 
+function mt:inference(value, type)
+    if type == '...' then
+        error('Value type cant be ...')
+    end
+    if value.type == 'any' and type ~= 'nil' then
+        value.type = type
+    end
+end
+
 function mt:createValue(tp, source, v)
-    local value = createValue(tp, source, v)
+    local value = createValue(tp, self.uri, source, v)
     local lib = library.object[tp]
     if lib then
         self:getLibChild(value, lib, 'object')
@@ -758,13 +798,15 @@ function mt:getLibChild(value, lib, parentType)
         end
         self.libraryChild[lib] = {}
         for fName, fLib in pairs(lib.child) do
-            local fField = value:createField(fName)
+            local fField = self:createField(value, fName)
             local fValue = self:getLibValue(fLib, parentType)
             self:setValue(fField, fValue)
         end
-        value:eachField(function (k, v)
-            self.libraryChild[lib][k] = v
-        end)
+        if value.child then
+            for k, v in pairs(value.child) do
+                self.libraryChild[lib][k] = v
+            end
+        end
         value.child = self.libraryChild[lib]
     end
 end
@@ -830,7 +872,7 @@ function mt:getName(name, source)
         return loc
     end
     local ENV = self.scope.locals._ENV
-    local global = self:getValue(ENV):getField(name, source)
+    local global = self:getField(self:getValue(ENV), name, source)
     global.parent = ENV
     return global
 end
@@ -959,7 +1001,7 @@ function mt:getSimple(simple, mode)
         elseif tp == 'index' then
             local child = obj[1]
             local index = self:getIndex(child)
-            field = value:getField(index, child)
+            field = self:getField(value, index, child)
             field.parentValue = value
             value = self:getValue(field)
             if mode == 'value' or i < #simple then
@@ -977,7 +1019,7 @@ function mt:getSimple(simple, mode)
                 parentName = ('%s[?]'):format(parentName)
             end
         elseif tp == 'name' then
-            field = value:getField(obj[1], obj)
+            field = self:getField(value, obj[1], obj)
             field.parentValue = value
             value = self:getValue(field)
             if mode == 'value' or i < #simple then
@@ -1004,27 +1046,18 @@ function mt:getSimple(simple, mode)
 end
 
 function mt:isTrue(v)
-    if v:getType() == 'nil' then
+    if v.type == 'nil' then
         return false
     end
-    if v:getType() == 'boolean' and not v:getValue() then
+    if v.type == 'boolean' and not v.value then
         return false
     end
     return true
 end
 
-function mt:selectList(list, n)
-    if list.type ~= 'list' then
-        return list
-    end
-    return list[n] or self:createValue('nil')
-end
-
 function mt:getBinary(exp)
     local v1 = self:getExp(exp[1])
     local v2 = self:getExp(exp[2])
-    v1 = self:selectList(v1, 1)
-    v2 = self:selectList(v2, 1)
     local op = exp.op
     -- TODO 搜索元方法
     if     op == 'or' then
@@ -1044,8 +1077,8 @@ function mt:getBinary(exp)
         or op == '<'
         or op == '>'
     then
-        v1:inference('number')
-        v2:inference('number')
+        self:inference(v1, 'number')
+        self:inference(v2, 'number')
         return self:createValue('boolean')
     elseif op == '~='
         or op == '=='
@@ -1057,8 +1090,8 @@ function mt:getBinary(exp)
         or op == '<<'
         or op == '>>'
     then
-        v1:inference('integer')
-        v2:inference('integer')
+        self:inference(v1, 'integer')
+        self:inference(v2, 'integer')
         if math.type(v1.value) == 'integer' and math.type(v2.value) == 'integer' then
             if op == '|' then
                 return self:createValue('integer', v1.value | v2.value)
@@ -1074,8 +1107,8 @@ function mt:getBinary(exp)
         end
         return self:createValue('integer')
     elseif op == '..' then
-        v1:inference('string')
-        v2:inference('string')
+        self:inference(v1, 'string')
+        self:inference(v2, 'string')
         if type(v1.value) == 'string' and type(v2.value) == 'string' then
             return self:createValue('string', nil, v1.value .. v2.value)
         end
@@ -1088,8 +1121,8 @@ function mt:getBinary(exp)
         or op == '%'
         or op == '//'
     then
-        v1:inference('number')
-        v2:inference('number')
+        self:inference(v1, 'number')
+        self:inference(v2, 'number')
         if type(v1.value) == 'number' and type(v2.value) == 'number' then
             if op == '+' then
                 return self:createValue('number', nil, v1.value + v2.value)
@@ -1125,19 +1158,19 @@ function mt:getUnary(exp)
     if     op == 'not' then
         return self:createValue('boolean')
     elseif op == '#' then
-        v1:inference('table')
+        self:inference(v1, 'table')
         if type(v1.value) == 'string' then
             return self:createValue('integer', nil, #v1.value)
         end
         return self:createValue('integer')
     elseif op == '-' then
-        v1:inference('number')
+        self:inference(v1, 'number')
         if type(v1.value) == 'number' then
             return self:createValue('number', nil, -v1.value)
         end
         return self:createValue('number')
     elseif op == '~' then
-        v1:inference('integer')
+        self:inference(v1, 'integer')
         if math.type(v1.value) == 'integer' then
             return self:createValue('integer', nil, ~v1.value)
         end
@@ -1203,17 +1236,17 @@ function mt:doReturn(action)
                     value[1] = self:createValue('any', exp)
                 end
                 for x, v in ipairs(value) do
-                    v:addInfo('return', exp)
+                    self:addInfo(v, 'return', exp)
                     self:setFunctionReturn(self:getCurrentFunction(), i + x - 1, v)
                 end
                 break
             else
                 local v = value[1] or self:createValue('nil', exp)
-                v:addInfo('return', exp)
+                self:addInfo(v, 'return', exp)
                 self:setFunctionReturn(self:getCurrentFunction(), i, v)
             end
         else
-            value:addInfo('return', exp)
+            self:addInfo(value, 'return', exp)
             self:setFunctionReturn(self:getCurrentFunction(), i, value)
         end
     end
@@ -1426,11 +1459,7 @@ function mt:doActions(actions)
     for _, action in ipairs(actions) do
         self:doAction(action)
         if coroutine.isyieldable() then
-            if self.lsp:isNeedCompile(self.uri) then
-                coroutine.yield()
-            else
-                coroutine.yield('stop')
-            end
+            coroutine.yield()
         end
     end
 end
@@ -1452,7 +1481,7 @@ function mt:createEnvironment()
     -- 设置全局变量
     if not GlobalChild then
         for name, lib in pairs(library.global) do
-            local field = envValue:createField(name)
+            local field = self:createField(envValue, name)
             local value = self:getLibValue(lib, 'global')
             value = self:setValue(field, value)
         end
@@ -1461,7 +1490,7 @@ function mt:createEnvironment()
     envValue.child = readOnly(GlobalChild)
 
     -- 设置 _G 使用 _ENV 的child
-    local g = envValue:getField('_G')
+    local g = self:getField(envValue, '_G')
     local gValue = self:getValue(g)
     gValue.child = envValue.child
     self.env = envValue

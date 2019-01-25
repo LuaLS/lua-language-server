@@ -83,11 +83,19 @@ function mt:init(rootUri)
         ignored[path] = true
     end
     if config.config.workspace.ignoreSubmodules then
-        local buf = io.load(ROOT:parent_path() / '.gitmodules')
+        local buf = io.load(self.root / '.gitmodules')
         if buf then
             for path in buf:gmatch('path = ([^\r\n]+)') do
                 log.debug('忽略子模块：', path)
                 ignored[path] = true
+            end
+        end
+    end
+    if true then
+        local buf = io.load(self.root / '.gitignore')
+        if buf then
+            for line in buf:gmatch '[^\r\n]+' do
+                ignored[line] = true
             end
         end
     end

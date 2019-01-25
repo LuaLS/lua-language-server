@@ -3,7 +3,6 @@ local library = require 'core.library'
 local createValue = require 'core.value'
 
 local DefaultSource = { start = 0, finish = 0 }
-local GlobalValue
 local LibraryValue = {}
 local LibraryChild = {}
 
@@ -1435,17 +1434,20 @@ function mt:doActions(actions)
 end
 
 function mt:getGlobalValue()
-    if GlobalValue then
-        return GlobalValue
+    if self.lsp and self.lsp.globalValue then
+        return self.lsp.globalValue
     end
-    GlobalValue = self:createValue('table')
-    GlobalValue.GLOBAL = true
+    local globalValue = self:createValue('table')
+    globalValue.GLOBAL = true
     for name, lib in pairs(library.global) do
-        local field = GlobalValue:createField(name)
+        local field = globalValue:createField(name)
         local value = self:getLibValue(lib, 'global')
         self:setValue(field, value)
     end
-    return GlobalValue
+    if self.lsp then
+        self.lsp.globalValue = globalValue
+    end
+    return globalValue
 end
 
 function mt:createEnvironment()

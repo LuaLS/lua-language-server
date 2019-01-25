@@ -144,13 +144,14 @@ function mt:scopePop()
     self.scope:pop()
 end
 
-function mt:addInfo(obj, type, source)
+function mt:addInfo(obj, type, source, value)
     if source and not source.start then
         error('Miss start: ' .. table.dump(source))
     end
     obj[#obj+1] = {
         type = type,
         source = source or DefaultSource,
+        value = value,
     }
     if source then
         source.uri = self.uri
@@ -331,23 +332,12 @@ function mt:setValue(var, value, source)
     if value and value.type == 'list' then
         error('Cant set value list')
     end
-    value = value or self:createValue('any', source)
+    value = value or self:createValue('nil', source)
     if source and source.start then
-        self:addInfo(var, 'set', source)
-        value:addInfo('set', source)
+        self:addInfo(var, 'set', source, value)
+        value:addInfo('set', source, var)
     end
-    if var.value then
-        if value:getType() == 'any' then
-            self:mergeChild(var.value, value)
-        elseif value:getType() == 'nil' then
-            self:mergeValue(var.value, value)
-        elseif var.value.uri == self.uri then
-            var.value = value
-        end
-        value = var.value
-    else
-        var.value = value
-    end
+    var.value = value
     return value
 end
 

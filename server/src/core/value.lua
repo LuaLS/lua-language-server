@@ -100,7 +100,7 @@ function mt:eachField(callback)
     end
 end
 
-function mt:addInfo(tp, source)
+function mt:addInfo(tp, source, var)
     if source and not source.start then
         error('Miss start: ' .. table.dump(source))
     end
@@ -114,6 +114,7 @@ function mt:addInfo(tp, source)
     self._info[uri][#self._info[uri]+1] = {
         type = tp,
         source = source or DefaultSource,
+        var = var,
     }
     return self
 end

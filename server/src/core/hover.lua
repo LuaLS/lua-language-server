@@ -210,21 +210,16 @@ local function getFunctionHoverAsLib(name, lib, oo, select)
 end
 
 local function findClass(result)
-    -- 根据部分字段尝试找出自定义类型
-    local metatable = result.value.metatable
-    if not metatable then
-        return nil
-    end
     -- 查找meta表的 __name 字段
-    local name = metatable:rawGetField('__name')
+    local name = result.value:getMeta('__name', result.source)
     -- 值必须是字符串
     if name and name.value and type(name.value:getValue()) == 'string' then
         return name.value:getValue()
     end
     -- 查找meta表 __index 里的字段
-    local index = metatable:rawGetField('__index')
+    local index = result.value:getMeta('__index', result.source)
     if index and index.value then
-        index.value:eachField(function (key, field)
+        return index.value:eachField(function (key, field)
             -- 键值类型必须均为字符串
             if type(key) ~= 'string' then
                 goto CONTINUE
@@ -313,7 +308,7 @@ local function getValueHover(name, valueType, result, lib)
 
     local tp = result.type
     if tp == 'field' then
-        if result.parent and result.parent.value and result.parent.value.ENV then
+        if result.parent and result.parent.value and result.parent.value.GLOBAL then
             tp = 'global'
         end
     end

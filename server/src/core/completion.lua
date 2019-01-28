@@ -157,7 +157,7 @@ local function getKind(var, default)
             return CompletionItemKind.Enum
         end
         if value:getType() == 'function' then
-            if var.parent and var.parent.value and var.parent.value.ENV ~= true then
+            if var.parent and var.parent.value and var.parent.value.GLOBAL ~= true then
                 return CompletionItemKind.Method
             else
                 return CompletionItemKind.Function
@@ -469,7 +469,7 @@ local function searchInResult(result, word, source, vm, pos, callback)
     elseif result.type == 'field' then
         if source.isIndex then
             searchAsIndex(vm, word, pos, result, callback)
-        elseif result.parent and result.parent.value and result.parent.value.ENV == true then
+        elseif result.parent and result.parent.value and result.parent.value.GLOBAL == true then
             searchAsGlobal(vm, word, pos, result, callback)
         else
             searchAsSuffix(result, word, callback)
@@ -506,7 +506,7 @@ local function searchSpecial(vm, pos, callback)
             if not var then
                 break
             end
-            if var.value and var.value.ENV then
+            if var.value and var.value.GLOBAL then
                 break
             end
             local key = var.key

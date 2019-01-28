@@ -178,6 +178,6 @@ for <?i?> in ipairs(t) do
 end
 ]]
 
-TEST 'nil' [[
+TEST 'any' [[
 local <?x?> = next()
 ]]

@@ -16,8 +16,11 @@ function mt:inference(tp, rate)
     if tp == '...' then
         error('Value type cant be ...')
     end
-    if not tp or tp == 'any' then
-        return
+    if not tp then
+        tp = 'nil'
+    end
+    if tp == 'any' then
+        rate = 0.0
     end
     if not self._type then
         self._type = {}
@@ -91,7 +94,7 @@ function mt:rawGetField(name, source)
     return nil
 end
 
-function mt:_getMeta(name, source)
+function mt:getMeta(name, source)
     if not self._meta then
         return nil
     end
@@ -125,7 +128,7 @@ end
 function mt:getField(name, source, stack)
     local field = self:rawGetField(name, source)
     if not field then
-        local indexMeta = self:_getMeta('__index', source)
+        local indexMeta = self:getMeta('__index', source)
         if not indexMeta then
             return nil
         end
@@ -143,17 +146,21 @@ end
 
 function mt:eachField(callback)
     if not self._child then
-        return
+        return nil
     end
     local mark = {}
     for _, childs in pairs(self._child) do
         for name, field in pairs(childs) do
             if not mark[name] then
                 mark[name] = true
-                callback(name, field)
+                local res = callback(name, field)
+                if res ~= nil then
+                    return res
+                end
             end
         end
     end
+    return nil
 end
 
 function mt:getDeclarat()

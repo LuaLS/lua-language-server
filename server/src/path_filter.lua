@@ -1,6 +1,6 @@
 local m = require 'lpeglabel'
 
-local m_cut  = m.S'/\\'
+local m_cut  = m.S'\\'
 local m_path = (1-m_cut)^1
 
 local function match_any(p, pass)
@@ -20,16 +20,17 @@ local function compile_format(fmt)
 end
 
 local function compile_exp(exp)
-    if exp:sub(1, 1) == '/' then
+    exp = exp:gsub('/', '\\')
+    if exp:sub(1, 1) == '\\' then
         exp = exp:sub(2)
     else
-        exp = '**/' .. exp
+        exp = '**\\' .. exp
     end
-    if exp:sub(-1) == '/' then
+    if exp:sub(-1) == '\\' then
         exp = exp:sub(1, -2)
     end
     local function next(cur)
-        local pos, fn = exp:find('[/\\]+', cur)
+        local pos, fn = exp:find('[\\]+', cur)
         if not pos then
             return compile_format(exp:sub(cur))
         end

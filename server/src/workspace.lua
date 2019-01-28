@@ -78,9 +78,7 @@ function mt:init(rootUri)
     log.info('Log path: ', logPath)
     log.init(ROOT, logPath)
 
-    local ignored = {
-        ['.git'] = true,
-    }
+    local ignored = {'.git'}
     for path in pairs(config.config.workspace.ignoreDir) do
         ignored[#ignored+1] = path
     end

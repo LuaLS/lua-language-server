@@ -84,7 +84,9 @@ obj.<?xxx?>()
 TEST [[
 obj.<?xxx?>()
 ]]
-"function obj.xxx()"
+[[function obj.xxx()
+  -> any
+]]
 
 TEST [[
 local <?x?> = 1
@@ -152,7 +154,8 @@ local <?root?> = fs.current_path()
 TEST[[
 ('xx'):<?yy?>()
 ]]
-"function *string:yy()"
+[[function *string:yy()
+  -> any]]
 
 TEST [[
 local <?v?> = collectgarbage()

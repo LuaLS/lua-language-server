@@ -154,7 +154,6 @@ function mt:addInfo(obj, type, source, value)
         value = value,
     }
     if source then
-        source.uri = self.uri
         local other = self.results.sources[source]
         if other then
             if other.type == 'multi-source' then
@@ -194,6 +193,7 @@ function mt:buildTable(source)
         if obj.type == 'pair' then
             local value = self:getExp(obj[2])
             local key   = obj[1]
+            key.uri = self.uri
             if key.index then
                 local index = self:getIndex(key)
                 local field = tbl:createField(index, key)
@@ -499,7 +499,7 @@ function mt:getRequire(strValue, destVM)
     -- 获取主函数返回值，注意不能修改对方的环境
     local mainValue
     if main.returns then
-        mainValue = readOnly(main.returns[1])
+        mainValue = self:selectList(main.returns, 1)
     else
         mainValue = self:createValue('boolean', nil, true)
         mainValue.uri = destVM.uri
@@ -512,7 +512,7 @@ function mt:getLoadFile(strValue, destVM)
     -- 取出对方的主函数
     local main = destVM.results.main
     -- loadfile 的返回值就是对方的主函数
-    local mainValue = readOnly(main)
+    local mainValue = main
 
     return mainValue
 end
@@ -644,6 +644,10 @@ function mt:call(func, values, source)
                 self:callDoFile(func, values)
             end
         end
+    else
+        if not func.built then
+            self:setFunctionReturn(func, 1, self:createValue('any', source))
+        end
     end
 
     if not source.hasRuned and func.built then
@@ -659,20 +663,6 @@ function mt:getCurrentFunction()
     return self.chunk.func
 end
 
-function mt:mergeFunctionReturn(func, index, value)
-    if not func.returns[index] then
-        func.returns[index] = value
-        return
-    end
-    if value:getType() == 'nil' then
-        return
-    end
-    if value:getType() == 'any' and func.returns[index] ~= 'nil' then
-        return
-    end
-    func.returns[index] = value
-end
-
 function mt:setFunctionReturn(func, index, value)
     func.hasReturn = true
     if not func.returns then
@@ -683,13 +673,13 @@ function mt:setFunctionReturn(func, index, value)
     if value then
         if value.type == 'list' then
             for i, v in ipairs(value) do
-                self:mergeFunctionReturn(func, index+i-1, v)
+                func.returns[index+i-1] = v
             end
         else
-            self:mergeFunctionReturn(func, index, value)
+            func.returns[index] = value
         end
     else
-        self:mergeFunctionReturn(func, index, self:createValue('any'))
+        func.returns[index] = self:createValue('any', func.source)
     end
 end
 
@@ -808,8 +798,9 @@ end
 
 function mt:getIndex(obj)
     local tp = obj.type
+    obj.uri = self.uri
     if tp == 'name' then
-        local var = self:getName(obj[1])
+        local var = self:getName(obj[1], obj)
         local value = self:getValue(var)
         self:addInfo(var, 'get', obj)
         return value
@@ -891,8 +882,9 @@ function mt:getSimple(simple, mode)
     local field
     local parentName
     local tp = simple[1].type
+    simple[1].uri = self.uri
     if tp == 'name' then
-        field = self:getName(simple[1][1])
+        field = self:getName(simple[1][1], simple[1])
         parentName = field.key
     elseif tp == 'string' or tp == 'number' or tp == 'nil' or tp == 'boolean' then
         local v = self:createValue(tp, simple[1], simple[1][1])
@@ -908,6 +900,7 @@ function mt:getSimple(simple, mode)
     for i = 2, #simple do
         local obj = simple[i]
         local tp  = obj.type
+        obj.uri = self.uri
 
         if     tp == 'call' then
             local args = self:unpackList(obj)
@@ -918,7 +911,7 @@ function mt:getSimple(simple, mode)
             -- 函数的返回值一定是list
             value = self:call(func, args, obj)
             if i < #simple then
-                value = value[1] or self:createValue('any')
+                value = value[1] or self:createValue('any', obj)
             end
             self.results.calls[#self.results.calls+1] = {
                 args = obj,
@@ -1135,6 +1128,7 @@ function mt:getDots()
 end
 
 function mt:getExp(exp)
+    exp.uri = self.uri
     local tp = exp.type
     if     tp == 'nil' then
         return self:createValue('nil', exp)
@@ -1260,6 +1254,7 @@ function mt:doLocal(action)
         if values then
             value = table.remove(values, 1)
         end
+        key.uri = self.uri
         self:createLocal(key[1], key, value)
     end)
 end
@@ -1365,6 +1360,7 @@ function mt:doAction(action)
         -- Skip
         return
     end
+    action.uri = self.uri
     local tp = action.type
     if     tp == 'do' then
         self:doDo(action)

@@ -346,7 +346,13 @@ local function getStringHover(result, lsp)
     }
 end
 
-return function (result, source, lsp, select)
+local function hoverAsValue(result, source, lsp, select)
+    if result:getType() == 'string' then
+        return getStringHover(result, lsp)
+    end
+end
+
+local function hoverAsVar(result, source, lsp, select)
     if not result.value then
         return
     end
@@ -355,9 +361,6 @@ return function (result, source, lsp, select)
         return
     end
 
-    if result.type == 'string' then
-        return getStringHover(result, lsp)
-    end
 
     if result.type ~= 'local' and result.type ~= 'field' then
         return
@@ -388,4 +391,12 @@ return function (result, source, lsp, select)
     end
     hover.name = name
     return hover
+end
+
+return function (result, source, lsp, select)
+    if result.type == 'value' then
+        return hoverAsValue(result, source, lsp, select)
+    else
+        return hoverAsVar(result, source, lsp, select)
+    end
 end

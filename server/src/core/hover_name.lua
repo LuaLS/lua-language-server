@@ -16,7 +16,7 @@ return function (result, source)
         key = ('%q'):format(declarat[1])
     elseif declarat.type == 'number' or declarat.type == 'boolean' then
         key = tostring(declarat[1])
-    elseif func.type == 'function' then
+    elseif func:getType() == 'function' then
         key = ''
     elseif type(result.key) == 'string' then
         key = result.key

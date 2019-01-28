@@ -164,14 +164,31 @@ function mt:eachField(callback)
 end
 
 function mt:getDeclarat()
-    return self:eachInfo(function (info)
-        if info.type == 'local'
-        or info.type == 'set'
-        or info.type == 'return'
-        then
+    local declarat = self:eachInfo(function (info)
+        if info.type == 'local' then
             return info.source
         end
     end)
+    if declarat then
+        return declarat
+    end
+    local declarat = self:eachInfo(function (info)
+        if info.type == 'return' then
+            return info.source
+        end
+    end)
+    if declarat then
+        return declarat
+    end
+    local declarat = self:eachInfo(function (info)
+        if info.type == 'set' then
+            return info.source
+        end
+    end)
+    if declarat then
+        return declarat
+    end
+    return nil
 end
 
 function mt:addInfo(tp, source, var)

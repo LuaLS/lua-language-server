@@ -42,6 +42,14 @@ function mt:getType()
     return mType or 'any'
 end
 
+function mt:setMetaTable(metatable, source)
+    if not self._meta then
+        self._meta = {}
+    end
+    local uri = source and source.uri or ''
+    self._meta[uri] = metatable
+end
+
 function mt:createField(name, source)
     local field = {
         type   = 'field',
@@ -65,21 +73,42 @@ end
 
 function mt:rawGetField(name, source)
     local uri = source and source.uri or ''
-    local field
-    if self._child then
-        if self._child[uri] then
-            field = self._child[uri][name]
-        end
-        if not field then
-            for _, childs in pairs(self._child) do
-                field = childs[name]
-                if field then
-                    break
-                end
-            end
+    if not self._child then
+        return nil
+    end
+    if self._child[uri] then
+        local field = self._child[uri][name]
+        if field then
+            return field
         end
     end
-    return field
+    for _, childs in pairs(self._child) do
+        local field = childs[name]
+        if field then
+            return field
+        end
+    end
+    return nil
+end
+
+function mt:_getMeta(name, source)
+    if not self._meta then
+        return nil
+    end
+    local uri = source and source.uri or ''
+    if self._meta[uri] then
+        local meta = self._meta[uri]:rawGetField(name, source)
+        if meta then
+            return meta
+        end
+    end
+    for _, indexValue in pairs(self._meta) do
+        local meta = indexValue:rawGetField(name, source)
+        if meta then
+            return meta
+        end
+    end
+    return nil
 end
 
 function mt:getChild()
@@ -93,10 +122,21 @@ function mt:setChild(child)
     self._child = child
 end
 
-function mt:getField(name, source)
+function mt:getField(name, source, stack)
     local field = self:rawGetField(name, source)
     if not field then
-        field = self:createField(name, source)
+        local indexMeta = self:_getMeta('__index', source)
+        if not indexMeta then
+            return nil
+        end
+        if not stack then
+            stack = 0
+        end
+        stack = stack + 1
+        if stack > 10 then
+            return nil
+        end
+        return indexMeta.value:getField(name, source, stack)
     end
     return field
 end
@@ -114,6 +154,17 @@ function mt:eachField(callback)
             end
         end
     end
+end
+
+function mt:getDeclarat()
+    return self:eachInfo(function (info)
+        if info.type == 'local'
+        or info.type == 'set'
+        or info.type == 'return'
+        then
+            return info.source
+        end
+    end)
 end
 
 function mt:addInfo(tp, source, var)
@@ -137,13 +188,17 @@ end
 
 function mt:eachInfo(callback)
     if not self._info then
-        return
+        return nil
     end
     for _, infos in pairs(self._info) do
         for i = 1, #infos do
-            callback(infos[i])
+            local res = callback(infos[i])
+            if res ~= nil then
+                return res
+            end
         end
     end
+    return nil
 end
 
 return function (tp, source, value)

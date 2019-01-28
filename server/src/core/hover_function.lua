@@ -75,7 +75,7 @@ local function buildValueReturns(func)
     local strs = {}
     if func.returns then
         for i, rtn in ipairs(func.returns) do
-            strs[i] = rtn.type
+            strs[i] = rtn:getType()
         end
     end
     if #strs == 0 then

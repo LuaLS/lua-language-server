@@ -1,8 +1,8 @@
 return function (result, source)
     local func = result.value
     local declarat
-    if func.type == 'function' then
-        declarat = func.declarat or source
+    if func:getType() == 'function' then
+        declarat = func:getDeclarat() or source
     else
         declarat = source
     end

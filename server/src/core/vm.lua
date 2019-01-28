@@ -487,17 +487,7 @@ function mt:getFunctionArg(func, i)
     return func.argValues[i]
 end
 
-function mt:checkMetaIndex(value, meta)
-    local index = meta:getField('__index')
-    if not index then
-        return
-    end
-    local indexValue = self:getValue(index)
-    -- TODO 支持function
-    self:mergeChild(value, indexValue)
-end
-
-function mt:callSetMetaTable(func, values)
+function mt:callSetMetaTable(func, values, source)
     if not values[1] then
         values[1] = self:createValue('any')
     end
@@ -505,10 +495,7 @@ function mt:callSetMetaTable(func, values)
         values[2] = self:createValue('any')
     end
     self:setFunctionReturn(func, 1, values[1])
-
-    values[1].metatable = values[2]
-    -- 检查 __index
-    self:checkMetaIndex(values[1], values[2])
+    values[1]:setMetaTable(values[2], source)
 end
 
 function mt:getRequire(strValue, destVM)
@@ -653,7 +640,7 @@ function mt:call(func, values, source)
         end
         if lib.special then
             if lib.special == 'setmetatable' then
-                self:callSetMetaTable(func, values)
+                self:callSetMetaTable(func, values, source)
             elseif lib.special == 'require' then
                 self:callRequire(func, values)
             elseif lib.special == 'loadfile' then
@@ -818,7 +805,8 @@ function mt:getName(name, source)
         return loc
     end
     local ENV = self.scope.locals._ENV
-    local global = self:getValue(ENV):getField(name, source)
+    local ENVValue = self:getValue(ENV)
+    local global = ENVValue:getField(name, source) or ENVValue:createField(name, source)
     global.parent = ENV
     return global
 end
@@ -947,7 +935,7 @@ function mt:getSimple(simple, mode)
         elseif tp == 'index' then
             local child = obj[1]
             local index = self:getIndex(child)
-            field = value:getField(index, child)
+            field = value:getField(index, child) or value:createField(index, child)
             field.parentValue = value
             value = self:getValue(field)
             if mode == 'value' or i < #simple then
@@ -965,7 +953,7 @@ function mt:getSimple(simple, mode)
                 parentName = ('%s[?]'):format(parentName)
             end
         elseif tp == 'name' then
-            field = value:getField(obj[1], obj)
+            field = value:getField(obj[1], obj) or value:createField(obj[1], obj)
             field.parentValue = value
             value = self:getValue(field)
             if mode == 'value' or i < #simple then

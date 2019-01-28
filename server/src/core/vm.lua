@@ -1038,15 +1038,15 @@ function mt:getBinary(exp)
         v2:inference('string', 0.1)
         if math.type(v1:getValue()) == 'integer' and math.type(v2:getValue()) == 'integer' then
             if op == '|' then
-                return self:createValue('integer', v1:getValue() | v2:getValue())
+                return self:createValue('integer', exp, v1:getValue() | v2:getValue())
             elseif op == '~' then
-                return self:createValue('integer', v1:getValue() ~ v2:getValue())
+                return self:createValue('integer', exp, v1:getValue() ~ v2:getValue())
             elseif op == '&' then
-                return self:createValue('integer', v1:getValue() &v2:getValue())
+                return self:createValue('integer', exp, v1:getValue() &v2:getValue())
             elseif op == '<<' then
-                return self:createValue('integer', v1:getValue() << v2:getValue())
+                return self:createValue('integer', exp, v1:getValue() << v2:getValue())
             elseif op == '>>' then
-                return self:createValue('integer', v1:getValue() >> v2:getValue())
+                return self:createValue('integer', exp, v1:getValue() >> v2:getValue())
             end
         end
         return self:createValue('integer')
@@ -1071,24 +1071,24 @@ function mt:getBinary(exp)
         v2:inference('number', 0.9)
         if type(v1:getValue()) == 'number' and type(v2:getValue()) == 'number' then
             if op == '+' then
-                return self:createValue('number', nil, v1:getValue() + v2:getValue())
+                return self:createValue('number', exp, v1:getValue() + v2:getValue())
             elseif op == '-' then
-                return self:createValue('number', nil, v1:getValue() - v2:getValue())
+                return self:createValue('number', exp, v1:getValue() - v2:getValue())
             elseif op == '*' then
-                return self:createValue('number', nil, v1:getValue() * v2:getValue())
+                return self:createValue('number', exp, v1:getValue() * v2:getValue())
             elseif op == '/' then
                 if v2:getValue() ~= 0 then
-                    return self:createValue('number', nil, v1:getValue() / v2:getValue())
+                    return self:createValue('number', exp, v1:getValue() / v2:getValue())
                 end
             elseif op == '^' then
-                return self:createValue('number', nil, v1:getValue() ^ v2:getValue())
+                return self:createValue('number', exp, v1:getValue() ^ v2:getValue())
             elseif op == '%' then
                 if v2:getValue() ~= 0 then
-                    return self:createValue('number', nil, v1:getValue() % v2:getValue())
+                    return self:createValue('number', exp, v1:getValue() % v2:getValue())
                 end
             elseif op == '//' then
                 if v2:getValue() ~= 0 then
-                    return self:createValue('number', nil, v1:getValue() // v2:getValue())
+                    return self:createValue('number', exp, v1:getValue() // v2:getValue())
                 end
             end
         end
@@ -1108,19 +1108,19 @@ function mt:getUnary(exp)
         v1:inference('table', 0.9)
         v1:inference('string', 0.9)
         if type(v1:getValue()) == 'string' then
-            return self:createValue('integer', nil, #v1:getValue())
+            return self:createValue('integer', exp, #v1:getValue())
         end
         return self:createValue('integer')
     elseif op == '-' then
         v1:inference('number', 0.9)
         if type(v1:getValue()) == 'number' then
-            return self:createValue('number', nil, -v1:getValue())
+            return self:createValue('number', exp, -v1:getValue())
         end
         return self:createValue('number')
     elseif op == '~' then
         v1:inference('integer', 0.9)
         if math.type(v1:getValue()) == 'integer' then
-            return self:createValue('integer', nil, ~v1:getValue())
+            return self:createValue('integer', exp, ~v1:getValue())
         end
         return self:createValue('integer')
     end

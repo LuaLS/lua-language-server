@@ -215,6 +215,7 @@ return function (tp, source, value)
     -- TODO lib里的多类型
     local self = setmetatable({
         source = source or DefaultSource,
+        uri = source and source.uri,
     }, mt)
     if value ~= nil then
         self:setValue(value)

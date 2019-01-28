@@ -72,7 +72,7 @@ local function findFieldCrossUriByName(positions, vm, result, lsp)
     end
 end
 
-local function parseResult(vm, result, lsp)
+local function parseResultAsVar(vm, result, lsp)
     local positions = {}
     local tp = result.type
     if     tp == 'local' then
@@ -122,12 +122,19 @@ local function parseResult(vm, result, lsp)
                 }
             end
         end
-    elseif tp == 'string' then
+    end
+    return positions
+end
+
+local function parseResultAsValue(vm, value, lsp)
+    local tp = value:getType()
+    local positions = {}
+    if tp == 'string' then
         -- require 'XXX' 专用
         positions[#positions+1] = {
             0,
             0,
-            result.uri,
+            value.uri,
         }
     end
     return positions
@@ -137,6 +144,9 @@ return function (vm, result, lsp)
     if not result then
         return nil
     end
-    local positions = parseResult(vm, result, lsp)
-    return positions
+    if result.type == 'value' then
+        return parseResultAsValue(vm, result, lsp)
+    else
+        return parseResultAsVar(vm, result, lsp)
+    end
 end

@@ -25,6 +25,9 @@ local function compile_exp(exp)
     else
         exp = '**/' .. exp
     end
+    if exp:sub(-1) == '/' then
+        exp = exp:sub(1, -2)
+    end
     local function next(cur)
         local pos, fn = exp:find('[/\\]+', cur)
         if not pos then

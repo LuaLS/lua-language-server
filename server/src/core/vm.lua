@@ -338,7 +338,7 @@ end
 
 function mt:getValue(var)
     if not var.value then
-        var.value = self:createValue('any')
+        var.value = self:createValue('any', var.source)
     end
     return var.value
 end

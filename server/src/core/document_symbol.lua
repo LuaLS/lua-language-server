@@ -33,7 +33,7 @@ local SymbolKind = {
 
 local function buildFunction(vm, func)
     local source = func.source
-    local declarat = func.declarat
+    local declarat = func:getDeclarat()
     local name
     local var
     if declarat then
@@ -83,7 +83,7 @@ local function isLocalTable(var)
     if var.value.source.start == 0 then
         return false
     end
-    if var.source ~= var.value.declarat then
+    if var.source ~= var.value:getDeclarat() then
         return false
     end
     if var.value.source.finish < var.source.finish then

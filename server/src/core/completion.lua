@@ -112,10 +112,28 @@ local function searchLocals(vm, pos, name, callback)
     end
 end
 
+local function sortPairs(t)
+    local keys = {}
+    for k in pairs(t) do
+        keys[#keys+1] = k
+    end
+    table.sort(keys)
+    local i = 0
+    return function ()
+        i = i + 1
+        local k = keys[i]
+        return k, t[k]
+    end
+end
+
 local function searchFields(name, source, parent, object, callback)
     if not parent or not parent.value then
         return
     end
+    if type(name) ~= 'string' then
+        return
+    end
+    local map = {}
     parent.value:eachField(function (key, field)
         if type(key) ~= 'string' then
             goto CONTINUE
@@ -128,11 +146,14 @@ local function searchFields(name, source, parent, object, callback)
         if field.source == source then
             goto CONTINUE
         end
-        if type(name) == 'string' and matchKey(name, key) then
-            callback(field)
+        if matchKey(name, key) then
+            map[key] = field
         end
         ::CONTINUE::
     end)
+    for _, field in sortPairs(map) do
+        callback(field)
+    end
 end
 
 local KEYS = {'and', 'break', 'do', 'else', 'elseif', 'end', 'false', 'for', 'function', 'goto', 'if', 'in', 'local', 'nil', 'not', 'or', 'repeat', 'return', 'then', 'true', 'until', 'while', 'toclose'}

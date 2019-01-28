@@ -169,11 +169,6 @@ function mt:addInfo(obj, type, source, value)
         else
             self.results.sources[source] = obj
         end
-        if type == 'set' or type == 'return' then
-            if not obj.declarat then
-                obj.declarat = source
-            end
-        end
     end
     return obj
 end
@@ -919,7 +914,7 @@ function mt:getSimple(simple, mode)
             if object then
                 table.insert(args, 1, self:getValue(object))
             end
-            local func = value
+            local func = self:selectList(value, 1)
             -- 函数的返回值一定是list
             value = self:call(func, args, obj)
             if i < #simple then

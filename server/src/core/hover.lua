@@ -248,35 +248,39 @@ local function findClass(result)
 end
 
 local function unpackTable(result)
-    local child = result.value and result.value.child
-    if not child then
-        return '{}'
-    end
-    local lines = {'{'}
-    for key, field in pairs(child) do
+    local lines = {}
+    result.value:eachField(function (key, field)
         local kType = type(key)
         if kType == 'table' then
-            key = ('[*%s]'):format(key.type)
-        else
-            if kType ~= 'string' then
-                key = ('[%s]'):format(key)
-            end
+            key = ('[*%s]'):format(key:getType())
+        elseif math.type(key) == 'integer' then
+            key = ('[%03d]'):format(key)
+        elseif kType ~= 'string' then
+            key = ('[%s]'):format(key)
         end
 
         local value = field.value
         if not value then
-            lines[#lines+1] = ('    %s: %s,'):format(key, 'any')
+            local str = ('    %s: %s,'):format(key, 'any')
+            lines[#lines+1] = str
             goto CONTINUE
         end
 
         local vType = type(value:getValue())
         if vType == 'boolean' or vType == 'integer' or vType == 'number' or vType == 'string' then
-            lines[#lines+1] = ('    %s: %s = %q,'):format(key, value:getType(), value:getValue())
+            local str = ('    %s: %s = %q,'):format(key, value:getType(), value:getValue())
+            lines[#lines+1] = str
         else
-            lines[#lines+1] = ('    %s: %s,'):format(key, value:getType())
+            local str = ('    %s: %s,'):format(key, value:getType())
+            lines[#lines+1] = str
         end
         ::CONTINUE::
+    end)
+    if #lines == 0 then
+        return '{}'
     end
+    table.sort(lines)
+    table.insert(lines, 1, '{')
     lines[#lines+1] = '}'
     return table.concat(lines, '\r\n')
 end

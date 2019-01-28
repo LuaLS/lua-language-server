@@ -285,12 +285,12 @@ local <?t?> = {
 ]]
 [[
 local t: {
-    a: number = 1,
-    [1]: number = 2,
-    [true]: number = 3,
-    [5.5]: number = 4,
-    [*table]: number = 5,
     [*function]: number = 6,
+    [*table]: number = 5,
+    [001]: number = 2,
+    [5.5]: number = 4,
+    [true]: number = 3,
+    a: number = 1,
 }
 ]]
 

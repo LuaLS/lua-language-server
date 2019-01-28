@@ -72,12 +72,12 @@ end
 local function callback(id, running)
     if running.callback then
         while true do
-            local ok, result = running.task.response:pop()
-            if not ok then
+            local results = table.pack(running.task.response:pop())
+            if not results[1] then
                 break
             end
             -- TODO 封装成对象
-            local suc, destroy = xpcall(running.callback, log.error, result)
+            local suc, destroy = xpcall(running.callback, log.error, table.unpack(results, 2))
             if not suc or destroy then
                 RunningList[id] = nil
                 IdlePool[#IdlePool+1] = running.task

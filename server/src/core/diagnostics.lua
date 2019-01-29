@@ -47,6 +47,9 @@ function mt:searchUndefinedGlobal(callback)
         if field.value.lib then
             goto NEXT_VAR
         end
+        if field.source.uri ~= self.vm.uri then
+            goto NEXT_VAR
+        end
         if type(index) ~= 'string' then
             goto NEXT_VAR
         end
@@ -56,7 +59,7 @@ function mt:searchUndefinedGlobal(callback)
         if index == '' then
             goto NEXT_VAR
         end
-        local ok = self.vm:eachInfo(field, function (info)
+        local ok = field.value:eachInfo(function (info)
             if info.type == 'set' then
                 return true
             end

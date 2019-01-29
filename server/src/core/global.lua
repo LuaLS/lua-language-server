@@ -1,71 +1,50 @@
 local mt = {}
 mt.__index = mt
 
+function mt:compileVM(uri)
+    if not self.set[uri] and not self.get[uri] then
+        return
+    end
+end
+
+function mt:markSet(uri)
+    self.set[uri] = true
+end
+
+function mt:markGet(uri)
+    self.get[uri] = true
+end
+
 function mt:clearGlobal(uri)
     self.get[uri] = nil
+    if not self.set[uri] then
+        return
+    end
     self.set[uri] = nil
-end
-
-function mt:markSet(uri, k, v)
-    local sets = self.set[uri]
-    if not sets then
-        sets = {}
-        self.set[uri] = sets
+    local globalValue = self.lsp.globalValue
+    if not globalValue then
+        return
     end
-    sets[k] = v
+    globalValue:removeUri(uri)
 end
 
-function mt:markGet(uri, k)
-    local gets = self.get[uri]
-    if not gets then
-        gets = {}
-        self.get[uri] = gets
+function mt:getAllUris()
+    local uris = {}
+    for uri in pairs(self.set) do
+        uris[#uris+1] = uri
     end
-    gets[k] = true
-end
-
-function mt:compileVM(uri, vm)
-    local seted = {}
-    local fixed = {}
-    for _, data in ipairs(vm.results.globals) do
-        local key = data.global.key
-        fixed[key] = true
-        if data.type == 'global' then
-            seted[key] = true
-            self:markSet(uri, key, data.global)
+    for uri in pairs(self.get) do
+        if not self.set[uri] then
+            uris[#uris+1] = uri
         end
     end
-    for k in next, vm.env.child do
-        self:markGet(uri, k)
-    end
-
-    local needReCompile = {}
-    for otherUri, gets in pairs(self.get) do
-        for key in pairs(fixed) do
-            if gets[key] ~= nil then
-                needReCompile[#needReCompile+1] = otherUri
-                goto CONTINUE
-            end
-        end
-        ::CONTINUE::
-    end
-
-    return needReCompile
+    return uris
 end
 
-function mt:getGlobal(key)
-    for _, sets in pairs(self.set) do
-        local v = sets[key]
-        if v ~= nil then
-            return v
-        end
-    end
-    return nil
-end
-
-return function ()
+return function (lsp)
     return setmetatable({
         get = {},
         set = {},
+        lsp = lsp,
     }, mt)
 end

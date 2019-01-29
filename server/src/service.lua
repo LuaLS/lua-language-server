@@ -279,19 +279,18 @@ function mt:_compileChain(obj, compiled)
     end
 end
 
-function mt:_compileGlobal(obj, compiled)
-    local needReCompile = self._global:compileVM(obj.uri, obj.vm)
-    for _, uri in ipairs(needReCompile) do
+function mt:_compileGlobal(compiled)
+    local uris = self.global:getAllUris()
+    for _, uri in ipairs(uris) do
         self:needCompile(uri, compiled)
     end
 end
 
-function mt:getGlobal(key)
-    local tp = type(key)
-    if tp == 'string' or tp == 'number' or tp == 'boolean' then
-        return self._global:getGlobal(key)
-    else
-        return nil
+function mt:_clearGlobal(uri, compiled)
+    self.global:clearGlobal(uri)
+    local uris = self.global:getAllUris()
+    for _, uri in ipairs(uris) do
+        self:needCompile(uri, compiled)
     end
 end
 
@@ -300,7 +299,8 @@ function mt:compileVM(uri)
     if not obj then
         return nil
     end
-    if not self._needCompile[uri] then
+    local compiled = self._needCompile[uri]
+    if not compiled then
         return nil
     end
 
@@ -309,11 +309,10 @@ function mt:compileVM(uri)
     local version = obj.version
     obj.astCost = os.clock() - clock
     self:_clearChainNode(obj, uri)
-    --self._global:clearGlobal(uri)
+    self:_clearGlobal(uri, compiled)
 
     local clock = os.clock()
     local vm = core.vm(ast, self, uri)
-    local compiled
     if version ~= obj.version then
         return nil
     end
@@ -337,7 +336,7 @@ function mt:compileVM(uri)
     end
 
     self:_compileChain(obj, compiled)
-    --self:_compileGlobal(obj, compiled)
+    self:_compileGlobal(compiled)
 
     return obj
 end
@@ -551,7 +550,7 @@ return function ()
         _needDiagnostics = {},
         _clock = -100,
         _version = 0,
-        _global = core.global(),
     }, mt)
+    session.global = core.global(session)
     return session
 end

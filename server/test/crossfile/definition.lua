@@ -182,7 +182,7 @@ TEST {
         ]]
     }
 }
-do return end
+
 TEST {
     {
         path = 'a.lua',

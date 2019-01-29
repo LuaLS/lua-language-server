@@ -163,6 +163,18 @@ function mt:eachField(callback)
     return nil
 end
 
+function mt:removeUri(uri)
+    if not self._child then
+        return
+    end
+    self._child[uri] = nil
+    self:eachField(function (field)
+        if field.value then
+            field.value:removeUri(uri)
+        end
+    end)
+end
+
 function mt:getDeclarat()
     local declarat = self:eachInfo(function (info)
         if info.type == 'local' then

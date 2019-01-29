@@ -710,9 +710,47 @@ function mt:getName(name, source)
     source.uri = self.uri
     local ENV = self.scope.locals._ENV
     local ENVValue = self:getValue(ENV)
-    local global = ENVValue:getField(name, source) or ENVValue:createField(name, source)
-    global.parent = ENV
-    return global
+    local global = ENVValue:getField(name, source)
+    if global then
+        global.parent = ENV
+        if self.lsp and self:isGlobal(global) then
+            self.lsp.global:markGet(self.uri)
+        end
+        return global
+    else
+        global = ENVValue:createField(name, source)
+        global.parent = ENV
+        if self.lsp and self:isGlobal(global) then
+            self.lsp.global:markGet(self.uri)
+        end
+        return global
+    end
+end
+
+function mt:setName(name, source, value)
+    source.uri = self.uri
+    local loc = self.scope.locals[name]
+    if loc then
+        self:setValue(loc, value, source)
+        return
+    end
+    local ENV = self.scope.locals._ENV
+    local ENVValue = self:getValue(ENV)
+    local global = ENVValue:getField(name, source)
+    if global then
+        global.parent = ENV
+        if self.lsp and self:isGlobal(global) then
+            self.lsp.global:markSet(self.uri)
+        end
+        self:setValue(global, value, source)
+    else
+        global = ENVValue:createField(name, source)
+        global.parent = ENV
+        if self.lsp and self:isGlobal(global) then
+            self.lsp.global:markSet(self.uri)
+        end
+        self:setValue(global, value, source)
+    end
 end
 
 function mt:getIndex(obj)
@@ -1144,24 +1182,17 @@ function mt:doSet(action)
     self:forList(action[1], function (key)
         local value = table.remove(values, 1)
         if key.type == 'name' then
-            local var = self:getName(key[1], key)
-            self:setValue(var, value, key)
-            if self:isGlobal(var) then
-                self.results.globals[#self.results.globals+1] = {
-                    type = 'global',
-                    global = var,
-                }
-            end
+            self:setName(key[1], key, value)
         elseif key.type == 'simple' then
             local field = self:getSimple(key, 'field')
             self:setValue(field, value, key[#key])
+            if not self.lsp then
+                return
+            end
             local var = field
             repeat
                 if self:isGlobal(var) then
-                    self.results.globals[#self.results.globals+1] = {
-                        type = 'field',
-                        global = var,
-                    }
+                    self.lsp.global:markSet(self.uri)
                     break
                 end
                 var = var.parent
@@ -1389,7 +1420,6 @@ local function compile(ast, lsp, uri)
             sources= {},
             strings= {},
             indexs = {},
-            globals= {},
             main   = nil,
         },
         lsp          = lsp,

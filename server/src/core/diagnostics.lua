@@ -23,15 +23,18 @@ function mt:searchUnusedLocals(callback)
         if var.hide then
             goto NEXT_VAR
         end
-        for _, info in ipairs(var) do
+        local ok = self.vm:eachInfo(var, function (info)
             if info.type == 'get' then
-                goto NEXT_VAR
+                return true
             end
             if info.type == 'local' then
                 if info.source.start == 0 then
-                    goto NEXT_VAR
+                    return true
                 end
             end
+        end)
+        if ok then
+            goto NEXT_VAR
         end
         callback(var.source.start, var.source.finish, var.key)
         ::NEXT_VAR::
@@ -39,9 +42,8 @@ function mt:searchUnusedLocals(callback)
 end
 
 function mt:searchUndefinedGlobal(callback)
-    local results = self.results
-    local env = results.locals[1]
-    env.value:eachField(function (index, field)
+    local globalValue = self.vm.lsp.globalValue
+    globalValue:eachField(function (index, field)
         if field.value.lib then
             goto NEXT_VAR
         end
@@ -51,20 +53,22 @@ function mt:searchUndefinedGlobal(callback)
         if config.config.diagnostics.globals[index] then
             goto NEXT_VAR
         end
-        local lIndex = index:lower()
-        if lIndex == '' then
+        if index == '' then
             goto NEXT_VAR
         end
-        for _, info in ipairs(field) do
+        local ok = self.vm:eachInfo(field, function (info)
             if info.type == 'set' then
-                goto NEXT_VAR
+                return true
             end
+        end)
+        if ok then
+            goto NEXT_VAR
         end
-        for _, info in ipairs(field) do
+        self.vm:eachInfo(field, function (info)
             if info.type == 'get' then
                 callback(info.source.start, info.source.finish, tostring(index))
             end
-        end
+        end)
         ::NEXT_VAR::
     end)
 end
@@ -72,16 +76,19 @@ end
 function mt:searchUnusedLabel(callback)
     local results = self.results
     for _, label in ipairs(results.labels) do
-        for _, info in ipairs(label) do
+        local ok = self.vm:eachInfo(label, function (info)
             if info.type == 'goto' then
-                goto NEXT_LABEL
+                return true
             end
+        end)
+        if ok then
+            goto NEXT_LABEL
         end
-        for _, info in ipairs(label) do
+        self.vm:eachInfo(label, function (info)
             if info.type == 'set' then
                 callback(info.source.start, info.source.finish, label.key)
             end
-        end
+        end)
         ::NEXT_LABEL::
     end
 end

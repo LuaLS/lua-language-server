@@ -1,5 +1,6 @@
 local core = require 'core'
 local parser  = require 'parser'
+local service = require 'service'
 
 rawset(_G, 'TEST', true)
 
@@ -38,10 +39,11 @@ end
 
 function TEST(script)
     local new_script, target = catch_target(script)
+    local lsp = service()
     local ast = parser:ast(new_script)
     assert(ast)
     local lines = parser:lines(new_script)
-    local vm = core.vm(ast)
+    local vm = core.vm(ast, lsp)
     assert(vm)
     local datas = core.diagnostics(vm, lines, 'test')
     local results = {}

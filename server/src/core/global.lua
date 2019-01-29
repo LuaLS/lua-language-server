@@ -8,10 +8,16 @@ function mt:compileVM(uri)
 end
 
 function mt:markSet(uri)
+    if not uri then
+        return
+    end
     self.set[uri] = true
 end
 
 function mt:markGet(uri)
+    if not uri then
+        return
+    end
     self.get[uri] = true
 end
 

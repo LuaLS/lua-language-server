@@ -176,29 +176,28 @@ function mt:removeUri(uri)
 end
 
 function mt:getDeclarat()
-    local declarat = self:eachInfo(function (info)
+    if not self._info then
+        return nil
+    end
+    local uri = self.uri or ''
+    local infos = self._info[uri]
+    if not infos then
+        return nil
+    end
+    for _, info in ipairs(infos) do
         if info.type == 'local' then
             return info.source
         end
-    end)
-    if declarat then
-        return declarat
     end
-    local declarat = self:eachInfo(function (info)
+    for _, info in ipairs(infos) do
         if info.type == 'return' then
             return info.source
         end
-    end)
-    if declarat then
-        return declarat
     end
-    local declarat = self:eachInfo(function (info)
+    for _, info in ipairs(infos) do
         if info.type == 'set' then
             return info.source
         end
-    end)
-    if declarat then
-        return declarat
     end
     return nil
 end

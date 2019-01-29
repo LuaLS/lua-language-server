@@ -38,7 +38,7 @@ local function buildFunction(vm, func)
     local var
     if declarat then
         if declarat.type == 'function' then
-            var = declarat.name.bind
+            var = declarat.name and declarat.name.bind
         else
             var = declarat.bind
         end

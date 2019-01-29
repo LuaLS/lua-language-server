@@ -943,14 +943,12 @@ function mt:getSimple(simple, mode)
             obj.indexName = parentName
             local index = self:getIndex(child)
             if mode == 'value' or i < #simple then
-                field = self:getField(value, index, child) or self:createField(value, index, child)
-                field.parentValue = value
-                value = self:getValue(field)
+                local indexField = self:getField(value, index, child) or self:createField(value, index, child)
+                value = self:getValue(indexField)
                 self:addInfo(field, 'get', obj)
             else
-                field = self:createField(value, index, child)
-                field.parentValue = value
-                value = self:getValue(field)
+                local indexField = self:createField(value, index, child)
+                value = self:getValue(indexField)
             end
             if obj[1].type == 'string' then
                 parentName = ('%s[%q]'):format(parentName, index)

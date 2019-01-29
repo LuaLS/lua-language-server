@@ -103,6 +103,9 @@ local function searchLocals(vm, pos, name, callback)
         if loc.source.start == 0 then
             goto CONTINUE
         end
+        if not loc.close then
+            log.debug('Miss loc close', table.dump(loc))
+        end
         if loc.source.start <= pos and loc.close >= pos then
             if matchKey(name, loc.key) then
                 callback(loc)

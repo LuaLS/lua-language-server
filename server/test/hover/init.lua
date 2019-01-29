@@ -305,3 +305,21 @@ print(<?y?>)
 [[
 local y: number = 1
 ]]
+
+TEST[[
+local function get_warnings(warnings)
+    local error = nil
+    local level = 'on'
+    for _, warn in ipairs(warnings) do
+        if warn == 'error' then
+            <?error?> = true
+        else
+            level = warn
+        end
+    end
+    return {error = error, level = level}
+end
+]]
+[[
+local error: boolean = true
+]]

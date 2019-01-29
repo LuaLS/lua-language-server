@@ -102,6 +102,7 @@ end
 
 function mt:createLocal(key, source, value)
     if source and source.bind then
+        self.scope.locals[key] = source.bind
         return source.bind
     end
     local loc = {

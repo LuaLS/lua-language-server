@@ -14,10 +14,13 @@ local function findAtPos(results, pos, level)
     for _, source in ipairs(results.sources) do
         if isValidSource(source) and isContainPos(source, pos) then
             res[#res+1] = {
-                object = source.object,
+                object = source.bind,
                 source = source,
                 range = source.finish - source.start,
             }
+            if not source.bind then
+                error('Miss source object')
+            end
         end
     end
     if #res == 0 then

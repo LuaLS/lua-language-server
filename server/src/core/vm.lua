@@ -91,8 +91,8 @@ function mt:createDummyVar(source, value)
 end
 
 function mt:createLocal(key, source, value)
-    if source and source.object then
-        return source.object
+    if source and source.bind then
+        return source.bind
     end
     local loc = {
         type = 'local',
@@ -102,7 +102,7 @@ function mt:createLocal(key, source, value)
     }
 
     if source then
-        source.object = loc
+        source.bind = loc
         self.results.sources[#self.results.sources+1] = source
         source.isLocal = true
     end
@@ -135,12 +135,12 @@ function mt:createLocal(key, source, value)
 end
 
 function mt:createField(value, index, source)
-    if source and source.object then
-        return source.object
+    if source and source.bind then
+        return source.bind
     end
     local field = value:createField(index, source)
     if source then
-        source.object = field
+        source.bind = field
         self.results.sources[#self.results.sources+1] = source
     end
     return field
@@ -152,7 +152,7 @@ function mt:getField(value, index, source)
         return nil
     end
     if source then
-        source.object = field
+        source.bind = field
         self.results.sources[#self.results.sources+1] = source
     end
     return field
@@ -744,9 +744,12 @@ function mt:getLibValue(lib, parentType, v)
 end
 
 function mt:getName(name, source)
+    if source and source.bind then
+        return source.bind
+    end
     local loc = self.scope.locals[name]
     if loc then
-        source.object = loc
+        source.bind = loc
         self.results.sources[#self.results.sources+1] = source
         return loc
     end
@@ -774,7 +777,7 @@ function mt:setName(name, source, value)
     source.uri = self.uri
     local loc = self.scope.locals[name]
     if loc then
-        source.object = loc
+        source.bind = loc
         self.results.sources[#self.results.sources+1] = source
         self:setValue(loc, value, source)
         return
@@ -1205,8 +1208,11 @@ function mt:doReturn(action)
     end
 end
 
-function mt:createLabel(action)
-    local name = action[1]
+function mt:createLabel(source)
+    if source.bind then
+        return source.bind
+    end
+    local name = source[1]
     if not self.chunk.labels[name] then
         local label = {
             type = 'label',
@@ -1215,6 +1221,8 @@ function mt:createLabel(action)
         self.chunk.labels[name] = label
         self.results.labels[#self.results.labels+1] = label
     end
+    source.bind = self.chunk.labels[name]
+    self.results.sources[#self.results.sources+1] = source
     return self.chunk.labels[name]
 end
 

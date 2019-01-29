@@ -1,6 +1,6 @@
 local function findFieldBySource(positions, source, vm, result)
     if source.type == 'name' and source[1] == result.key then
-        local obj = source.object
+        local obj = source.bind
         if obj.type == 'field' then
             vm:eachInfo(obj, function (info)
                 if info.type == 'set' and info.source == source then
@@ -72,13 +72,15 @@ local function parseResultAsVar(vm, result, lsp)
     local positions = {}
     local tp = result.type
     if     tp == 'local' then
+        if result.link then
+            result = result.link
+        end
         if result.value.lib then
             return positions
         end
         if result.value.uri ~= vm.uri then
             parseResultAcrossUri(positions, vm, result)
-        elseif result.link then
-            result = result.link
+        else
             vm:eachInfo(result, function (info)
                 if info.type == 'local' then
                     positions[#positions+1] = {

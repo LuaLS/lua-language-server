@@ -91,6 +91,9 @@ function mt:createDummyVar(source, value)
 end
 
 function mt:createLocal(key, source, value)
+    if self.results.sources[source] then
+        return self.results.sources[source]
+    end
     local loc = {
         type = 'local',
         key = key,
@@ -99,6 +102,7 @@ function mt:createLocal(key, source, value)
     }
 
     if source then
+        self.results.sources[source] = loc
         source.isLocal = true
     end
 
@@ -119,9 +123,33 @@ function mt:createLocal(key, source, value)
     self.scope.locals[key] = loc
     self.results.locals[#self.results.locals+1] = loc
 
-    self:addInfo(loc, 'local', source)
+    if source then
+        self:addInfo(loc, 'local', source, value)
+    end
     self:setValue(loc, value, source)
     return loc
+end
+
+function mt:createField(value, index, source)
+    if self.results.sources[source] then
+        return self.results.sources[source]
+    end
+    local field = value:createField(index, source)
+    if source then
+        self.results.sources[source] = field
+    end
+    return field
+end
+
+function mt:getField(value, index, source)
+    local field = value:getField(index, source)
+    if not field then
+        return nil
+    end
+    if source then
+        self.results.sources[source] = field
+    end
+    return field
 end
 
 function mt:createArg(key, source, value)
@@ -144,32 +172,25 @@ function mt:scopePop()
     self.scope:pop()
 end
 
-function mt:addInfo(obj, type, source, value)
-    if source and not source.start then
+function mt:addInfo(var, type, source, value)
+    if not source then
+        error('Miss source')
+    end
+    if not source.start then
         error('Miss start: ' .. table.dump(source))
     end
-    obj[#obj+1] = {
+    if var.type ~= 'local' and var.type ~= 'field' and var.type ~= 'label' then
+        error('Must be local, field or label: ' .. table.dump(var))
+    end
+    local info = {
         type = type,
         source = source or DefaultSource,
         value = value,
     }
-    if source then
-        local other = self.results.sources[source]
-        if other then
-            if other.type == 'multi-source' then
-                other[#other+1] = obj
-            else
-                other = {
-                    type = 'multi-source',
-                    [1] = other,
-                    [2] = obj,
-                }
-            end
-        else
-            self.results.sources[source] = obj
-        end
+    if not self.results.infos[var] then
+        self.results.infos[var] = {}
     end
-    return obj
+    self.results.infos[var][#self.results.infos[var]+1] = info
 end
 
 function mt:createDots(index, source)
@@ -196,7 +217,7 @@ function mt:buildTable(source)
             key.uri = self.uri
             if key.index then
                 local index = self:getIndex(key)
-                local field = tbl:createField(index, key)
+                local field = self:createField(tbl, index, key)
                 if value.type == 'list' then
                     self:setValue(field, value[1], key)
                 else
@@ -204,7 +225,7 @@ function mt:buildTable(source)
                 end
             else
                 if key.type == 'name' then
-                    local field = tbl:createField(key[1], key)
+                    local field = self:createField(tbl, key[1], key)
                     self.results.indexs[#self.results.indexs+1] = field
                     key.isIndex = true
                     if value.type == 'list' then
@@ -219,17 +240,17 @@ function mt:buildTable(source)
             if value.type == 'list' then
                 if index == #source then
                     for i, v in ipairs(value) do
-                        local field = tbl:createField(n + i)
+                        local field = self:createField(tbl, n + i)
                         self:setValue(field, v)
                     end
                 else
                     n = n + 1
-                    local field = tbl:createField(n)
+                    local field = self:createField(tbl, n)
                     self:setValue(field, value[1])
                 end
             else
                 n = n + 1
-                local field = tbl:createField(n)
+                local field = self:createField(tbl, n)
                 self:setValue(field, value)
             end
             -- 处理写了一半的 key = value，把name类的数组元素视为哈希键
@@ -640,7 +661,7 @@ function mt:getLibChild(value, lib, parentType)
         -- 要先声明缓存，以免死循环
         LibraryChild[lib] = value:getChild()
         for fName, fLib in pairs(lib.child) do
-            local fField = value:createField(fName)
+            local fField = self:createField(value, fName)
             local fValue = self:getLibValue(fLib, parentType)
             self:setValue(fField, fValue)
         end
@@ -710,7 +731,7 @@ function mt:getName(name, source)
     source.uri = self.uri
     local ENV = self.scope.locals._ENV
     local ENVValue = self:getValue(ENV)
-    local global = ENVValue:getField(name, source)
+    local global = self:getField(ENVValue, name, source)
     if global then
         global.parent = ENV
         if self.lsp and self:isGlobal(global) then
@@ -718,7 +739,7 @@ function mt:getName(name, source)
         end
         return global
     else
-        global = ENVValue:createField(name, source)
+        global = self:createField(ENVValue, name, source)
         global.parent = ENV
         if self.lsp and self:isGlobal(global) then
             self.lsp.global:markGet(self.uri)
@@ -736,7 +757,7 @@ function mt:setName(name, source, value)
     end
     local ENV = self.scope.locals._ENV
     local ENVValue = self:getValue(ENV)
-    local global = ENVValue:getField(name, source)
+    local global = self:getField(ENVValue, name, source)
     if global then
         global.parent = ENV
         if self.lsp and self:isGlobal(global) then
@@ -744,7 +765,7 @@ function mt:setName(name, source, value)
         end
         self:setValue(global, value, source)
     else
-        global = ENVValue:createField(name, source)
+        global = self:createField(ENVValue, name, source)
         global.parent = ENV
         if self.lsp and self:isGlobal(global) then
             self.lsp.global:markSet(self.uri)
@@ -881,12 +902,12 @@ function mt:getSimple(simple, mode)
             local child = obj[1]
             local index = self:getIndex(child)
             if mode == 'value' or i < #simple then
-                field = value:getField(index, child) or value:createField(index, child)
+                field = self:getField(value, index, child) or self:createField(value, index, child)
                 field.parentValue = value
                 value = self:getValue(field)
                 self:addInfo(field, 'get', obj)
             else
-                field = value:createField(index, child)
+                field = self:createField(value, index, child)
                 field.parentValue = value
                 value = self:getValue(field)
             end
@@ -903,12 +924,12 @@ function mt:getSimple(simple, mode)
             end
         elseif tp == 'name' then
             if mode == 'value' or i < #simple then
-                field = value:getField(obj[1], obj) or value:createField(obj[1], obj)
+                field = self:getField(value, obj[1], obj) or self:createField(value, obj[1], obj)
                 field.parentValue = value
                 value = self:getValue(field)
                 self:addInfo(field, 'get', obj)
             else
-                field = value:createField(obj[1], obj)
+                field = self:createField(value, obj[1], obj)
                 field.parentValue = value
                 value = self:getValue(field)
             end
@@ -1377,7 +1398,7 @@ function mt:getGlobalValue()
     local globalValue = self:createValue('table')
     globalValue.GLOBAL = true
     for name, lib in pairs(library.global) do
-        local field = globalValue:createField(name)
+        local field = self:createField(globalValue, name)
         local value = self:getLibValue(lib, 'global')
         self:setValue(field, value)
     end
@@ -1420,6 +1441,7 @@ local function compile(ast, lsp, uri)
             sources= {},
             strings= {},
             indexs = {},
+            infos  = {},
             main   = nil,
         },
         lsp          = lsp,

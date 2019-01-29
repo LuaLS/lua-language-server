@@ -707,6 +707,7 @@ function mt:getName(name, source)
     if loc then
         return loc
     end
+    source.uri = self.uri
     local ENV = self.scope.locals._ENV
     local ENVValue = self:getValue(ENV)
     local global = ENVValue:getField(name, source) or ENVValue:createField(name, source)
@@ -841,11 +842,15 @@ function mt:getSimple(simple, mode)
         elseif tp == 'index' then
             local child = obj[1]
             local index = self:getIndex(child)
-            field = value:getField(index, child) or value:createField(index, child)
-            field.parentValue = value
-            value = self:getValue(field)
             if mode == 'value' or i < #simple then
+                field = value:getField(index, child) or value:createField(index, child)
+                field.parentValue = value
+                value = self:getValue(field)
                 self:addInfo(field, 'get', obj)
+            else
+                field = value:createField(index, child)
+                field.parentValue = value
+                value = self:getValue(field)
             end
             field.parent = lastField
             lastField = field
@@ -859,11 +864,15 @@ function mt:getSimple(simple, mode)
                 parentName = ('%s[?]'):format(parentName)
             end
         elseif tp == 'name' then
-            field = value:getField(obj[1], obj) or value:createField(obj[1], obj)
-            field.parentValue = value
-            value = self:getValue(field)
             if mode == 'value' or i < #simple then
+                field = value:getField(obj[1], obj) or value:createField(obj[1], obj)
+                field.parentValue = value
+                value = self:getValue(field)
                 self:addInfo(field, 'get', obj)
+            else
+                field = value:createField(obj[1], obj)
+                field.parentValue = value
+                value = self:getValue(field)
             end
             field.parent = lastField
             lastField = field

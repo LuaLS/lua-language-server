@@ -81,11 +81,21 @@ local mt = {}
 mt.__index = mt
 
 function mt:createDummyVar(source, value)
+    if source and source.bind then
+        return source.bind
+    end
     local loc = {
         type = 'local',
         key = '',
         source = source or DefaultSource,
     }
+
+    if source then
+        source.bind = loc
+        self.results.sources[#self.results.sources+1] = source
+        source.isLocal = true
+    end
+
     self:setValue(loc, value, source)
     return loc
 end
@@ -338,7 +348,7 @@ function mt:runFunction(func)
 
     local index = 0
     if func.object then
-        local var = self:createArg('self', func.object.colon, self:getValue(func.object))
+        local var = self:createArg('self', func.colon, self:getValue(func.object))
         var.hide = true
         var.link = func.object
         self:setValue(var, func.argValues[1] or self:createValue('nil'))
@@ -354,7 +364,6 @@ function mt:runFunction(func)
         index = index + 1
         if arg.type == 'name' then
             local var = self:createArg(arg[1], arg)
-            arg.isArg = true
             self:setValue(var, func.argValues[index] or self:createValue('nil'))
             func.args[index] = var
         elseif arg.type == '...' then
@@ -373,7 +382,7 @@ function mt:runFunction(func)
     self:scopePop()
 end
 
-function mt:buildFunction(exp, object)
+function mt:buildFunction(exp, object, colon)
     if exp and exp.func then
         return exp.func
     end
@@ -389,6 +398,7 @@ function mt:buildFunction(exp, object)
     func.built = exp
     func.upvalues = {}
     func.object = object
+    func.colon = colon
     exp.func = func
     for name, loc in pairs(self.scope.locals) do
         func.upvalues[name] = loc
@@ -484,7 +494,7 @@ function mt:tryRequireOne(strValue, mode)
     if type(str) == 'string' then
         -- 支持 require 'xxx' 的转到定义
         local strSource = strValue.source
-        strSource.object = strValue
+        strSource.bind = strValue
         self.results.sources[#self.results.sources+1] = strSource
         strValue.isRequire = true
 
@@ -902,6 +912,7 @@ function mt:getSimple(simple, mode)
         parentName = '?'
     end
     local object
+    local colon
     local lastField = field
     for i = 2, #simple do
         local obj = simple[i]
@@ -928,6 +939,8 @@ function mt:getSimple(simple, mode)
             parentName = parentName .. '(...)'
         elseif tp == 'index' then
             local child = obj[1]
+            child.indexSource = obj
+            obj.indexName = parentName
             local index = self:getIndex(child)
             if mode == 'value' or i < #simple then
                 field = self:getField(value, index, child) or self:createField(value, index, child)
@@ -939,10 +952,6 @@ function mt:getSimple(simple, mode)
                 field.parentValue = value
                 value = self:getValue(field)
             end
-            field.parent = lastField
-            lastField = field
-            obj.object = object
-            obj.parentName = parentName
             if obj[1].type == 'string' then
                 parentName = ('%s[%q]'):format(parentName, index)
             elseif obj[1].type == 'number' or obj[1].type == 'boolean' then
@@ -968,8 +977,8 @@ function mt:getSimple(simple, mode)
             parentName = parentName .. '.' .. field.key
         elseif tp == ':' then
             object = field
-            object.colon = obj
             simple[i-1].colon = obj
+            colon = colon
         elseif tp == '.' then
             simple[i-1].dot = obj
         end
@@ -977,7 +986,7 @@ function mt:getSimple(simple, mode)
     if mode == 'value' then
         return value, object
     elseif mode == 'field' then
-        return field, object
+        return field, object, colon
     end
     error('Unknow simple mode: ' .. mode)
 end
@@ -1332,18 +1341,18 @@ end
 
 function mt:doFunction(action)
     local name = action.name
-    local var, object
+    local var, object, colon
     local source
     if name then
         if name.type == 'simple' then
-            var, object = self:getSimple(name, 'field')
+            var, object, colon = self:getSimple(name, 'field')
             source = name[#name]
         else
             var = self:getName(name[1], name)
             source = name
         end
     end
-    local func = self:buildFunction(action, object)
+    local func = self:buildFunction(action, object, colon)
     if var then
         self:setValue(var, func, source)
     end

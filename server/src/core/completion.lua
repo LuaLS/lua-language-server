@@ -472,6 +472,9 @@ end
 
 local function searchInResult(result, word, source, vm, pos, callback)
     if result.type == 'local' then
+        if result.link then
+            result = result.link
+        end
         if source.isArg then
             searchAsArg(vm, word, pos, result, callback)
         elseif source.isLocal then
@@ -509,30 +512,13 @@ end
 local function searchSpecial(vm, pos, callback)
     -- 尝试 #
     local result, source = findResult(vm, pos, 2)
-    if source and source.type == 'index'
-        and result.source and result.source.op == '#'
+    if source and source.indexSource and result.source.op == '#'
     then
-        local name = {}
-        local var = result
-        while true do
-            var = var.parent
-            if not var then
-                break
-            end
-            if var.value and var.value.GLOBAL then
-                break
-            end
-            local key = var.key
-            if type(key) ~= 'string' or key == '' then
-                return
-            end
-            table.insert(name, 1, key)
-        end
-        local label = table.concat(name, '.') .. '+1'
+        local label = source.indexSource.indexName .. '+1'
         callback(label, CompletionItemKind.Snippet, {
             textEdit = {
-                start = result.source.start + 1,
-                finish = source.finish,
+                start = source.start + 1,
+                finish = source.indexSource.finish,
                 newText = ('%s] = '):format(label),
             }
         })

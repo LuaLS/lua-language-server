@@ -511,14 +511,15 @@ end
 
 local function searchSpecial(vm, pos, callback)
     -- 尝试 #
-    local result, source = findResult(vm, pos, 2)
-    if source and source.indexSource and result.source.op == '#'
+    local var = findResult(vm, pos)
+    local _, source = findResult(vm, pos, 2)
+    if source and source.indexName and source[1].op == '#'
     then
-        local label = source.indexSource.indexName .. '+1'
+        local label = source.indexName .. '+1'
         callback(label, CompletionItemKind.Snippet, {
             textEdit = {
-                start = source.start + 1,
-                finish = source.indexSource.finish,
+                start = var.source.start,
+                finish = source.finish,
                 newText = ('%s] = '):format(label),
             }
         })

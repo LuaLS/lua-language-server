@@ -24,7 +24,7 @@ local function push_log(level, ...)
     for i = 1, t.n do
         t[i] = tostring(t[i])
     end
-    local str = table.concat(t, '\t')
+    local str = table.concat(t, '\t', 1, t.n)
     if level == 'error' then
         str = str .. '\n' .. debug.traceback(nil, 3)
     end

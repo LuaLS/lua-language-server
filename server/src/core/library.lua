@@ -144,6 +144,24 @@ local function fix(libs)
     end
 end
 
+local function scan(path)
+    local result = {path}
+    local i = 0
+    return function ()
+        i = i + 1
+        local current = result[i]
+        if not current then
+            return nil
+        end
+        if fs.is_directory(current) then
+            for path in current:list_directory() do
+                result[#result+1] = path
+            end
+        end
+        return current
+    end
+end
+
 local function init()
     local lang = require 'language'
     local id = lang.id
@@ -152,7 +170,7 @@ local function init()
         library = table.container(),
         object  = table.container(),
     }
-    for path in io.scan(ROOT / 'libs') do
+    for path in scan(ROOT / 'libs') do
         local libs
         local buf = io.load(path)
         if buf then

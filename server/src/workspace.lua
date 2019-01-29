@@ -78,16 +78,16 @@ function mt:init(rootUri)
     log.info('Log path: ', logPath)
     log.init(ROOT, logPath)
 
-    local ignored = {}
+    local ignored = {'.git'}
     for path in pairs(config.config.workspace.ignoreDir) do
-        ignored[path] = true
+        ignored[#ignored+1] = path
     end
     if config.config.workspace.ignoreSubmodules then
         local buf = io.load(self.root / '.gitmodules')
         if buf then
             for path in buf:gmatch('path = ([^\r\n]+)') do
                 log.debug('忽略子模块：', path)
-                ignored[path] = true
+                ignored[#ignored+1] = path
             end
         end
     end
@@ -95,25 +95,31 @@ function mt:init(rootUri)
         local buf = io.load(self.root / '.gitignore')
         if buf then
             for line in buf:gmatch '[^\r\n]+' do
-                ignored[line] = true
+                ignored[#ignored+1] = line
             end
         end
     end
 
+    log.debug('忽略文件：\r\n' .. table.concat(ignored, '\r\n'))
+
     async.run('scanfiles', {
         root = self.root:string(),
-        ignore = ignored,
-    }, function (file)
-        if file == 'ok' then
+        ignored = ignored,
+    }, function (mode, ...)
+        if mode == 'ok' then
             self:reset()
             self._complete = true
             return true
+        elseif mode == 'log' then
+            log.debug(...)
+        elseif mode == 'file' then
+            local file = ...
+            local path = fs.path(file.path)
+            local name = path:string():lower()
+            local uri = self:uriEncode(path)
+            self.files[name] = uri
+            self.lsp:readText(uri, path, file.buf)
         end
-        local path = fs.path(file.path)
-        local name = path:string():lower()
-        local uri = self:uriEncode(path)
-        self.files[name] = uri
-        self.lsp:readText(uri, path, file.buf)
     end)
 end
 

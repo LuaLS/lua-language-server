@@ -352,16 +352,8 @@ local function findClosePos(vm, pos)
             inputSource = source
         end
     end
-    for sources, object in pairs(vm.results.sources) do
-        if sources.type == 'multi-source' then
-            for _, source in ipairs(sources) do
-                if source.type ~= 'simple' then
-                    found(object, source)
-                end
-            end
-        else
-            found(object, sources)
-        end
+    for _, source in ipairs(vm.results.sources) do
+        found(source.bind, source)
     end
     if not parent then
         return nil
@@ -426,7 +418,7 @@ local function findCall(vm, word, pos)
     for _, call in ipairs(vm.results.calls) do
         if isContainPos(call.args, finishPos) then
             local n = findArgCount(call.args, finishPos)
-            local var = vm.results.sources[call.lastObj]
+            local var = call.lastObj.bind
             if var then
                 results[#results+1] = {
                     func = call.func,
@@ -505,7 +497,7 @@ local function searchAllWords(text, vm, callback)
     if type(text) ~= 'string' then
         return
     end
-    for source in pairs(vm.results.sources) do
+    for _, source in ipairs(vm.results.sources) do
         if source.type == 'name' then
             if text ~= source[1] and matchKey(text, source[1]) then
                 callback(source[1], CompletionItemKind.Text)

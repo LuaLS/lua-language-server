@@ -16,7 +16,7 @@ local function findFieldBySource(positions, source, vm, result)
 end
 
 local function findFieldByName(positions, vm, result)
-    for _, source in pairs(vm.results.sources) do
+    for _, source in ipairs(vm.results.sources) do
         findFieldBySource(positions, source, vm, result)
     end
 end

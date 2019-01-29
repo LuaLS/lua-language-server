@@ -394,6 +394,9 @@ local function hoverAsVar(result, source, lsp, select)
 end
 
 return function (result, source, lsp, select)
+    if not result then
+        return nil
+    end
     if result.type == 'value' then
         return hoverAsValue(result, source, lsp, select)
     else

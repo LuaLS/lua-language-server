@@ -32,7 +32,7 @@ local function findCall(vm, pos)
             if arg and arg.type == 'string' then
                 return nil
             end
-            local var = vm.results.sources[call.lastObj]
+            local var = call.lastObj.bind
             if var then
                 results[#results+1] = {
                     func = call.func,

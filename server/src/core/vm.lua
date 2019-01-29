@@ -485,6 +485,7 @@ function mt:tryRequireOne(strValue, mode)
         -- 支持 require 'xxx' 的转到定义
         local strSource = strValue.source
         strSource.object = strValue
+        self.results.sources[#self.results.sources+1] = strSource
         strValue.isRequire = true
 
         local uri

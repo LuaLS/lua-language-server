@@ -91,8 +91,8 @@ function mt:createDummyVar(source, value)
 end
 
 function mt:createLocal(key, source, value)
-    if self.results.sources[source] then
-        return self.results.sources[source]
+    if source and source.object then
+        return source.object
     end
     local loc = {
         type = 'local',
@@ -102,7 +102,8 @@ function mt:createLocal(key, source, value)
     }
 
     if source then
-        self.results.sources[source] = loc
+        source.object = loc
+        self.results.sources[#self.results.sources+1] = source
         source.isLocal = true
     end
 
@@ -125,18 +126,22 @@ function mt:createLocal(key, source, value)
 
     if source then
         self:addInfo(loc, 'local', source, value)
+        if value then
+            value:addInfo('local', source, loc)
+        end
     end
     self:setValue(loc, value, source)
     return loc
 end
 
 function mt:createField(value, index, source)
-    if self.results.sources[source] then
-        return self.results.sources[source]
+    if source and source.object then
+        return source.object
     end
     local field = value:createField(index, source)
     if source then
-        self.results.sources[source] = field
+        source.object = field
+        self.results.sources[#self.results.sources+1] = source
     end
     return field
 end
@@ -147,7 +152,8 @@ function mt:getField(value, index, source)
         return nil
     end
     if source then
-        self.results.sources[source] = field
+        source.object = field
+        self.results.sources[#self.results.sources+1] = source
     end
     return field
 end
@@ -191,6 +197,19 @@ function mt:addInfo(var, type, source, value)
         self.results.infos[var] = {}
     end
     self.results.infos[var][#self.results.infos[var]+1] = info
+end
+
+function mt:eachInfo(var, callback)
+    if not self.results.infos[var] then
+        return nil
+    end
+    for _, info in ipairs(self.results.infos[var]) do
+        local res = callback(info)
+        if res ~= nil then
+            return res
+        end
+    end
+    return nil
 end
 
 function mt:createDots(index, source)
@@ -319,8 +338,9 @@ function mt:runFunction(func)
 
     local index = 0
     if func.object then
-        local var = self:createArg('self', func.object.source, self:getValue(func.object))
+        local var = self:createArg('self', func.object.colon, self:getValue(func.object))
         var.hide = true
+        var.link = func.object
         self:setValue(var, func.argValues[1] or self:createValue('nil'))
         index = 1
         func.args[index] = var
@@ -464,7 +484,7 @@ function mt:tryRequireOne(strValue, mode)
     if type(str) == 'string' then
         -- 支持 require 'xxx' 的转到定义
         local strSource = strValue.source
-        self.results.sources[strSource] = strValue
+        strSource.object = strValue
         strValue.isRequire = true
 
         local uri
@@ -726,6 +746,8 @@ end
 function mt:getName(name, source)
     local loc = self.scope.locals[name]
     if loc then
+        source.object = loc
+        self.results.sources[#self.results.sources+1] = source
         return loc
     end
     source.uri = self.uri
@@ -752,6 +774,8 @@ function mt:setName(name, source, value)
     source.uri = self.uri
     local loc = self.scope.locals[name]
     if loc then
+        source.object = loc
+        self.results.sources[#self.results.sources+1] = source
         self:setValue(loc, value, source)
         return
     end
@@ -940,6 +964,7 @@ function mt:getSimple(simple, mode)
             parentName = parentName .. '.' .. field.key
         elseif tp == ':' then
             object = field
+            object.colon = obj
             simple[i-1].colon = obj
         elseif tp == '.' then
             simple[i-1].dot = obj
@@ -1438,10 +1463,10 @@ local function compile(ast, lsp, uri)
             labels = {},
             funcs  = {},
             calls  = {},
-            sources= {},
             strings= {},
             indexs = {},
             infos  = {},
+            sources= {},
             main   = nil,
         },
         lsp          = lsp,

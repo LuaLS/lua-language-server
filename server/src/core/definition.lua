@@ -1,7 +1,8 @@
-local function findFieldBySource(positions, source, obj, result)
+local function findFieldBySource(positions, source, vm, result)
     if source.type == 'name' and source[1] == result.key then
+        local obj = source.object
         if obj.type == 'field' then
-            for _, info in ipairs(obj) do
+            vm:eachInfo(obj, function (info)
                 if info.type == 'set' and info.source == source then
                     positions[#positions+1] = {
                         source.start,
@@ -9,20 +10,14 @@ local function findFieldBySource(positions, source, obj, result)
                         source.uri,
                     }
                 end
-            end
+            end)
         end
     end
 end
 
 local function findFieldByName(positions, vm, result)
-    for source, obj in pairs(vm.results.sources) do
-        if source.type == 'multi-source' then
-            for i = 1, #obj do
-                findFieldBySource(positions, source, obj[i], result)
-            end
-        else
-            findFieldBySource(positions, source, obj, result)
-        end
+    for _, source in pairs(vm.results.sources) do
+        findFieldBySource(positions, source, vm, result)
     end
 end
 
@@ -82,8 +77,9 @@ local function parseResultAsVar(vm, result, lsp)
         end
         if result.value.uri ~= vm.uri then
             parseResultAcrossUri(positions, vm, result)
-        else
-            for _, info in ipairs(result) do
+        elseif result.link then
+            result = result.link
+            vm:eachInfo(result, function (info)
                 if info.type == 'local' then
                     positions[#positions+1] = {
                         info.source.start,
@@ -91,7 +87,7 @@ local function parseResultAsVar(vm, result, lsp)
                         info.source.uri,
                     }
                 end
-            end
+            end)
         end
     elseif tp == 'field' then
         if result.value.lib then
@@ -100,7 +96,7 @@ local function parseResultAsVar(vm, result, lsp)
         if result.value.uri ~= vm.uri then
             parseResultAcrossUri(positions, vm, result)
         else
-            for _, info in ipairs(result) do
+            vm:eachInfo(result, function (info)
                 if info.type == 'set' then
                     positions[#positions+1] = {
                         info.source.start,
@@ -108,21 +104,21 @@ local function parseResultAsVar(vm, result, lsp)
                         info.source.uri,
                     }
                 end
-            end
+            end)
             if #positions == 0 then
                 findFieldByName(positions, vm, result)
                 findFieldCrossUriByName(positions, vm, result, lsp)
             end
         end
     elseif tp == 'label' then
-        for _, info in ipairs(result) do
+        vm:eachInfo(result, function (info)
             if info.type == 'set' then
                 positions[#positions+1] = {
                     info.source.start,
                     info.source.finish,
                 }
             end
-        end
+        end)
     end
     return positions
 end

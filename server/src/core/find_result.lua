@@ -11,26 +11,13 @@ end
 
 local function findAtPos(results, pos, level)
     local res = {}
-    for sources, object in pairs(results.sources) do
-        if sources.type == 'multi-source' then
-            for _, source in ipairs(sources) do
-                if isValidSource(source) and isContainPos(source, pos) then
-                    res[#res+1] = {
-                        object = object,
-                        source = source,
-                        range = source.finish - source.start,
-                    }
-                end
-            end
-        else
-            local source = sources
-            if isValidSource(source) and isContainPos(source, pos) then
-                res[#res+1] = {
-                    object = object,
-                    source = source,
-                    range = source.finish - source.start,
-                }
-            end
+    for _, source in ipairs(results.sources) do
+        if isValidSource(source) and isContainPos(source, pos) then
+            res[#res+1] = {
+                object = source.object,
+                source = source,
+                range = source.finish - source.start,
+            }
         end
     end
     if #res == 0 then

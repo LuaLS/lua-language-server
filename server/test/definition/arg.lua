@@ -9,6 +9,7 @@ local <!mt!>
 function mt:x()
     <?self?>()
 end
+mt:x()
 ]]
 
 TEST [[

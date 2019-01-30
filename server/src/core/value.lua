@@ -25,9 +25,8 @@ function mt:inference(tp, rate)
     if not self._type then
         self._type = {}
     end
-    if not self._type[tp] or rate > self._type[tp] then
-        self._type[tp] = rate
-    end
+    local current = self._type[tp] or 0.0
+    self._type[tp] = current + (1 - current) * rate
 end
 
 function mt:getType()

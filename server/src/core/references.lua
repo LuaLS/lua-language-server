@@ -4,7 +4,7 @@ local function parseResult(vm, result, declarat)
     local positions = {}
     local tp = result.type
     if     tp == 'local' then
-        vm:eachInfo(result, function (info)
+        result.value:eachInfo(function (info)
             if info.source.uri == '' or not info.source.uri then
                 return
             end
@@ -13,7 +13,7 @@ local function parseResult(vm, result, declarat)
             end
         end)
     elseif tp == 'field' then
-        vm:eachInfo(result, function (info)
+        result.value:eachInfo(function (info)
             if info.source.uri == '' or not info.source.uri then
                 return
             end

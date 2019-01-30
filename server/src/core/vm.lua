@@ -48,6 +48,7 @@ function mt:createLocal(key, source, value)
         source.bind = loc
         self.results.sources[#self.results.sources+1] = source
         source.isLocal = true
+        source.uri = self.uri
     end
 
     local shadow = self.scope.locals[key]
@@ -756,6 +757,7 @@ function mt:getIndex(obj)
         local var = self:getName(obj[1], obj)
         local value = self:getValue(var)
         self:addInfo(var, 'get', obj)
+        value:addInfo('get', obj)
         return value
     elseif (tp == 'string' or tp == 'number' or tp == 'boolean') then
         return obj[1]
@@ -887,6 +889,7 @@ function mt:getSimple(simple, mode)
                 field.parentValue = value
                 value = self:getValue(field)
                 self:addInfo(field, 'get', obj)
+                value:addInfo('get', obj)
             else
                 field = self:createField(value, index, obj)
                 field.parentValue = value
@@ -908,6 +911,7 @@ function mt:getSimple(simple, mode)
                 field.parentValue = value
                 value = self:getValue(field)
                 self:addInfo(field, 'get', obj)
+                value:addInfo('get', obj)
             else
                 field = self:createField(value, obj[1], obj)
                 field.parentValue = value
@@ -1114,6 +1118,7 @@ function mt:getExp(exp)
         local var = self:getName(exp[1], exp)
         local value = self:getValue(var)
         self:addInfo(var, 'get', exp)
+        value:addInfo('get', exp)
         return value
     elseif tp == 'simple' then
         return self:getSimple(exp, 'value')

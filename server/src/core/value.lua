@@ -19,7 +19,7 @@ function mt:inference(tp, rate)
     if not tp then
         tp = 'nil'
     end
-    if tp == 'any' then
+    if tp == 'any' or tp == 'nil' then
         rate = 0.0
     end
     if not self._type then

@@ -919,13 +919,15 @@ function mt:getSimple(simple, mode)
         local obj = simple[i]
         local tp  = obj.type
         obj.uri = self.uri
+        value = self:selectList(value, 1)
 
         if     tp == 'call' then
+            value:inference('function', 0.9)
             local args = self:unpackList(obj)
             if object then
                 table.insert(args, 1, self:getValue(object))
             end
-            local func = self:selectList(value, 1)
+            local func = value
             -- 函数的返回值一定是list
             value = self:call(func, args, obj)
             if i < #simple then
@@ -939,6 +941,8 @@ function mt:getSimple(simple, mode)
             }
             parentName = parentName .. '(...)'
         elseif tp == 'index' then
+            value:inference('table', 0.8)
+            value:inference('string', 0.2)
             local child = obj[1]
             obj.indexName = parentName
             local index = self:getIndex(child)
@@ -961,6 +965,8 @@ function mt:getSimple(simple, mode)
                 parentName = ('%s[?]'):format(parentName)
             end
         elseif tp == 'name' then
+            value:inference('table', 0.8)
+            value:inference('string', 0.2)
             if mode == 'value' or i < #simple then
                 field = self:getField(value, obj[1], obj) or self:createField(value, obj[1], obj)
                 field.parentValue = value
@@ -977,10 +983,14 @@ function mt:getSimple(simple, mode)
             obj.parentName = parentName
             parentName = parentName .. '.' .. field.key
         elseif tp == ':' then
+            value:inference('table', 0.8)
+            value:inference('string', 0.2)
             object = field
             simple[i-1].colon = obj
             colon = colon
         elseif tp == '.' then
+            value:inference('table', 0.8)
+            value:inference('string', 0.2)
             simple[i-1].dot = obj
         end
     end

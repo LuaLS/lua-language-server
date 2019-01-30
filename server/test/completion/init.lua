@@ -61,7 +61,7 @@ local function findStartPos(pos, buf)
     local res = nil
     for i = pos-1, 1, -1 do
         local c = buf:sub(i, i)
-        if c:find '%a' then
+        if c:find '[%w_]' then
             res = i
         else
             break
@@ -452,10 +452,29 @@ self.results.list[#@]
         label = 'self.results.list+1',
         kind = CompletionItemKind.Snippet,
         textEdit = {
-            start = 20,
+            start = 18,
             finish = 21,
-            newText = 'self.results.list+1] = ',
+            newText = '[#self.results.list+1] = ',
         },
+    },
+}
+
+TEST [[
+self.results.list[#self.re@]
+]]
+{
+    {
+        label = 'self.results.list+1',
+        kind = CompletionItemKind.Snippet,
+        textEdit = {
+            start = 18,
+            finish = 28,
+            newText = '[#self.results.list+1] = ',
+        },
+    },
+    {
+        label = 'results',
+        kind = CompletionItemKind.Field,
     },
 }
 
@@ -467,9 +486,9 @@ fff[#ff@]
         label = 'fff+1',
         kind = CompletionItemKind.Snippet,
         textEdit = {
-            start = 6,
+            start = 4,
             finish = 9,
-            newText = 'fff+1] = ',
+            newText = '[#fff+1] = ',
         },
     },
     {

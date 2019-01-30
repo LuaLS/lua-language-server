@@ -129,7 +129,7 @@ local function sortPairs(t)
     end
 end
 
-local function searchFields(name, parent, callback)
+local function searchFields(name, parent, source, callback)
     if not parent or not parent.value then
         return
     end
@@ -139,6 +139,9 @@ local function searchFields(name, parent, callback)
     local map = {}
     parent.value:eachField(function (key, field)
         if type(key) ~= 'string' then
+            goto CONTINUE
+        end
+        if source.object and field.value:getType() ~= 'function' then
             goto CONTINUE
         end
         if matchKey(name, key) then
@@ -232,8 +235,8 @@ local function getDocument(var, source)
     return nil
 end
 
-local function searchAsLocal(vm, word, pos, result, callback)
-    searchFields(word, vm.results.locals[1], nil, function (var)
+local function searchAsLocal(vm, word, pos, result, source, callback)
+    searchFields(word, vm.results.locals[1], source, function (var)
         callback(var, CompletionItemKind.Variable)
     end)
 
@@ -243,8 +246,8 @@ local function searchAsLocal(vm, word, pos, result, callback)
     end
 end
 
-local function searchAsArg(vm, word, pos, result, callback)
-    searchFields(word, vm.results.locals[1], function (var)
+local function searchAsArg(vm, word, pos, result, source, callback)
+    searchFields(word, vm.results.locals[1], source, function (var)
         if var.value.lib then
             return
         end
@@ -252,14 +255,14 @@ local function searchAsArg(vm, word, pos, result, callback)
     end)
 end
 
-local function searchAsGlobal(vm, word, pos, result, callback)
+local function searchAsGlobal(vm, word, pos, result, source, callback)
     if word == '' or word == nil then
         return
     end
     searchLocals(vm, pos, word, function (var)
         callback(var, CompletionItemKind.Variable)
     end)
-    searchFields(word, vm.results.locals[1], function (var)
+    searchFields(word, vm.results.locals[1], source, function (var)
         callback(var, CompletionItemKind.Field)
     end)
     searchKeyWords(word, function (name)
@@ -267,8 +270,8 @@ local function searchAsGlobal(vm, word, pos, result, callback)
     end)
 end
 
-local function searchAsSuffix(result, word, callback)
-    searchFields(word, result.parent, function (var)
+local function searchAsSuffix(result, source, word, callback)
+    searchFields(word, result.parent, source, function (var)
         callback(var, CompletionItemKind.Field)
     end)
 end
@@ -321,7 +324,7 @@ local function searchInArg(vm, inCall, inString, callback)
     end
 end
 
-local function searchAsIndex(vm, word, pos, result, callback)
+local function searchAsIndex(vm, word, pos, result, source, callback)
     searchLocals(vm, pos, word, function (var)
         callback(var, CompletionItemKind.Variable)
     end)
@@ -330,7 +333,7 @@ local function searchAsIndex(vm, word, pos, result, callback)
             callback(index.key, CompletionItemKind.Property)
         end
     end
-    searchFields(word, vm.results.locals[1], function (var)
+    searchFields(word, vm.results.locals[1], source, function (var)
         callback(var, CompletionItemKind.Field)
     end)
 end
@@ -470,19 +473,19 @@ local function searchInResult(result, word, source, vm, pos, callback)
             result = result.link
         end
         if source.isArg then
-            searchAsArg(vm, word, pos, result, callback)
+            searchAsArg(vm, word, pos, result, source, callback)
         elseif source.isLocal then
-            searchAsLocal(vm, word, pos, result, callback)
+            searchAsLocal(vm, word, pos, result, source, callback)
         else
-            searchAsGlobal(vm, word, pos, result, callback)
+            searchAsGlobal(vm, word, pos, result, source, callback)
         end
     elseif result.type == 'field' then
         if source.isIndex then
-            searchAsIndex(vm, word, pos, result, callback)
+            searchAsIndex(vm, word, pos, result, source, callback)
         elseif result.parent and result.parent.value and result.parent.value.GLOBAL == true then
-            searchAsGlobal(vm, word, pos, result, callback)
+            searchAsGlobal(vm, word, pos, result, source, callback)
         else
-            searchAsSuffix(result, word, callback)
+            searchAsSuffix(result, source, word, callback)
         end
     end
 end
@@ -505,16 +508,15 @@ end
 
 local function searchSpecial(vm, pos, callback)
     -- 尝试 #
-    local var = findResult(vm, pos)
     local _, source = findResult(vm, pos, 2)
     if source and source.indexName and source[1].op == '#'
     then
         local label = source.indexName .. '+1'
         callback(label, CompletionItemKind.Snippet, {
             textEdit = {
-                start = var.source.start,
+                start = source.start,
                 finish = source.finish,
-                newText = ('%s] = '):format(label),
+                newText = ('[#%s] = '):format(label),
             }
         })
     end

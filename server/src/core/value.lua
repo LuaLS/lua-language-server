@@ -126,21 +126,21 @@ function mt:setChild(child)
     self._child = child
 end
 
-function mt:getField(name, source, stack)
+function mt:getField(name, source, mark)
     local field = self:rawGetField(name, source)
     if not field then
         local indexMeta = self:getMeta('__index', source)
         if not indexMeta then
             return nil
         end
-        if not stack then
-            stack = 0
+        if not mark then
+            mark = {}
         end
-        stack = stack + 1
-        if stack > 10 then
+        if mark[indexMeta] then
             return nil
         end
-        return indexMeta.value:getField(name, source, stack)
+        mark[indexMeta] = true
+        return indexMeta.value:getField(name, source, mark)
     end
     return field
 end
@@ -158,7 +158,7 @@ function mt:rawEachField(callback)
     return nil
 end
 
-function mt:eachField(callback, stack)
+function mt:eachField(callback, stack, mark)
     local res = self:rawEachField(callback)
     if res ~= nil then
         return res
@@ -167,14 +167,14 @@ function mt:eachField(callback, stack)
     if not indexMeta then
         return nil
     end
-    if not stack then
-        stack = 0
+    if not mark then
+        mark = {}
     end
-    stack = stack + 1
-    if stack > 10 then
+    if mark[indexMeta] then
         return nil
     end
-    return indexMeta.value:eachField(callback, stack)
+    mark[indexMeta] = true
+    return indexMeta.value:eachField(callback, stack, mark)
 end
 
 function mt:removeUri(uri)

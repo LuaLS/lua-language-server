@@ -235,6 +235,9 @@ function mt:_markCompiled(uri, compiled)
     if newCompiled == compiled then
         return compiled
     end
+    if not compiled then
+        compiled = {}
+    end
     for k, v in pairs(newCompiled) do
         compiled[k] = v
     end
@@ -303,6 +306,7 @@ end
 function mt:compileVM(uri)
     local obj = self._file[uri]
     if not obj then
+        self:_markCompiled(uri)
         return nil
     end
     local compiled = self._needCompile[uri]

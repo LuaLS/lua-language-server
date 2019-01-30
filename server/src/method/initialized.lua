@@ -2,7 +2,7 @@ local rpc = require 'rpc'
 local workspace = require 'workspace'
 local config = require 'config'
 
-local function initAfterConfig(lsp)
+local function initAfterConfig(lsp) 
     -- 请求工作目录
     rpc:request('workspace/workspaceFolders', nil, function (folders)
         if folders then

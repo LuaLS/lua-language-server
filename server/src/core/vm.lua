@@ -12,7 +12,7 @@ function mt:getDefaultSource()
     return {
         start = 0,
         finish = 0,
-        uri = self.uri,
+        uri = self.chunk.func.uri,
     }
 end
 
@@ -52,7 +52,7 @@ function mt:createLocal(key, source, value)
         source.bind = loc
         self.results.sources[#self.results.sources+1] = source
         source.isLocal = true
-        source.uri = self.uri
+        source.uri = self.chunk.func.uri
     end
 
     local shadow = self.scope.locals[key]
@@ -93,6 +93,13 @@ function mt:createField(value, index, source)
         source.bind = field
         self.results.sources[#self.results.sources+1] = source
     end
+    if value.GLOBAL then
+        field.GLOBAL = true
+    end
+    if self.lsp and self:isGlobal(field) then
+        self.lsp.global:markSet(self.chunk.func.uri)
+    end
+
     return field
 end
 
@@ -105,6 +112,13 @@ function mt:getField(value, index, source)
         source.bind = field
         self.results.sources[#self.results.sources+1] = source
     end
+    if value.GLOBAL then
+        field.GLOBAL = true
+    end
+    if self.lsp and self:isGlobal(field) then
+        self.lsp.global:markGet(self.chunk.func.uri)
+    end
+
     return field
 end
 
@@ -183,7 +197,7 @@ function mt:buildTable(source)
         if obj.type == 'pair' then
             local value = self:getExp(obj[2])
             local key   = obj[1]
-            key.uri = self.uri
+            key.uri = self.chunk.func.uri
             if key.index then
                 local index = self:getIndex(key)
                 local field = self:createField(tbl, index, key)
@@ -251,14 +265,7 @@ function mt:getValue(var, source)
 end
 
 function mt:isGlobal(field)
-    if field.type ~= 'field' then
-        return false
-    end
-    if field.parent.value and field.parent.value.GLOBAL then
-        return true
-    else
-        return false
-    end
+    return field.GLOBAL == true
 end
 
 function mt:callLeftFuncions()
@@ -340,6 +347,7 @@ function mt:buildFunction(exp, object, colon)
     func.upvalues = {}
     func.object = object
     func.colon = colon
+    func.uri = exp.uri
     exp.func = func
     for name, loc in pairs(self.scope.locals) do
         func.upvalues[name] = loc
@@ -374,9 +382,6 @@ function mt:countList(list)
 end
 
 function mt:setFunctionArg(func, values)
-    if func.uri ~= self.uri then
-        return
-    end
     if not func.argValues then
         func.argValues = {}
     end
@@ -441,11 +446,11 @@ function mt:tryRequireOne(strValue, mode)
 
         local uri
         if mode == 'require' then
-            uri = self.lsp.workspace:searchPath(self.uri, str)
+            uri = self.lsp.workspace:searchPath(self.chunk.func.uri, str)
         elseif mode == 'loadfile' then
-            uri = self.lsp.workspace:loadPath(self.uri, str)
+            uri = self.lsp.workspace:loadPath(self.chunk.func.uri, str)
         elseif mode == 'dofile' then
-            uri = self.lsp.workspace:loadPath(self.uri, str)
+            uri = self.lsp.workspace:loadPath(self.chunk.func.uri, str)
         end
         if not uri then
             return nil
@@ -454,7 +459,7 @@ function mt:tryRequireOne(strValue, mode)
         strValue.uri = uri
         -- 如果取不到VM（不编译），则做个标记，之后再取一次
         local destVM = self.lsp:getVM(uri)
-        self.lsp:compileChain(self.uri, uri)
+        self.lsp:compileChain(self.chunk.func.uri, uri)
         if destVM then
             if mode == 'require' then
                 return self:getRequire(strValue, destVM)
@@ -705,28 +710,22 @@ function mt:getName(name, source)
         self.results.sources[#self.results.sources+1] = source
         return loc
     end
-    source.uri = self.uri
+    source.uri = self.chunk.func.uri
     local ENV = self.scope.locals._ENV
     local ENVValue = self:getValue(ENV, source)
     local global = self:getField(ENVValue, name, source)
     if global then
         global.parent = ENV
-        if self.lsp and self:isGlobal(global) then
-            self.lsp.global:markGet(self.uri)
-        end
         return global
     else
         global = self:createField(ENVValue, name, source)
         global.parent = ENV
-        if self.lsp and self:isGlobal(global) then
-            self.lsp.global:markGet(self.uri)
-        end
         return global
     end
 end
 
 function mt:setName(name, source, value)
-    source.uri = self.uri
+    source.uri = self.chunk.func.uri
     local loc = self.scope.locals[name]
     if loc then
         source.bind = loc
@@ -739,23 +738,17 @@ function mt:setName(name, source, value)
     local global = self:getField(ENVValue, name, source)
     if global then
         global.parent = ENV
-        if self.lsp and self:isGlobal(global) then
-            self.lsp.global:markSet(self.uri)
-        end
         self:setValue(global, value, source)
     else
         global = self:createField(ENVValue, name, source)
         global.parent = ENV
-        if self.lsp and self:isGlobal(global) then
-            self.lsp.global:markSet(self.uri)
-        end
         self:setValue(global, value, source)
     end
 end
 
 function mt:getIndex(obj)
     local tp = obj.type
-    obj.uri = self.uri
+    obj.uri = self.chunk.func.uri
     if tp == 'name' then
         local var = self:getName(obj[1], obj)
         local value = self:getValue(var, obj)
@@ -840,7 +833,7 @@ function mt:getSimple(simple, mode)
     local field
     local parentName
     local tp = simple[1].type
-    simple[1].uri = self.uri
+    simple[1].uri = self.chunk.func.uri
     if tp == 'name' then
         field = self:getName(simple[1][1], simple[1])
         parentName = field.key
@@ -859,7 +852,7 @@ function mt:getSimple(simple, mode)
     for i = 2, #simple do
         local obj = simple[i]
         local tp  = obj.type
-        obj.uri = self.uri
+        obj.uri = self.chunk.func.uri
         value = self:selectList(value, 1)
 
         if     tp == 'call' then
@@ -1106,7 +1099,7 @@ function mt:getDots()
 end
 
 function mt:getExp(exp)
-    exp.uri = self.uri
+    exp.uri = self.chunk.func.uri
     local tp = exp.type
     if     tp == 'nil' then
         return self:createValue('nil', exp)
@@ -1205,17 +1198,6 @@ function mt:doSet(action)
         elseif key.type == 'simple' then
             local field = self:getSimple(key, 'field')
             self:setValue(field, value, key[#key])
-            if not self.lsp then
-                return
-            end
-            local var = field
-            repeat
-                if self:isGlobal(var) then
-                    self.lsp.global:markSet(self.uri)
-                    break
-                end
-                var = var.parent
-            until not var
         end
     end)
 end
@@ -1231,7 +1213,7 @@ function mt:doLocal(action)
         if values then
             value = table.remove(values, 1)
         end
-        key.uri = self.uri
+        key.uri = self.chunk.func.uri
         self:createLocal(key[1], key, value)
     end)
 end
@@ -1334,7 +1316,7 @@ function mt:doAction(action)
         -- Skip
         return
     end
-    action.uri = self.uri
+    action.uri = self.chunk.func.uri
     local tp = action.type
     if     tp == 'do' then
         self:doDo(action)
@@ -1407,6 +1389,7 @@ function mt:createEnvironment()
     self.scope.block = { start = 0, finish = math.maxinteger }
     -- 整个文件是一个函数
     self.chunk.func = self:buildFunction()
+    self.chunk.func.uri = self.uri
     self.results.main = self.chunk.func
     -- 隐藏的上值`_ENV`
     local evnField = self:createLocal('_ENV')

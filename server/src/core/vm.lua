@@ -2,9 +2,12 @@ local env = require 'core.env'
 local library = require 'core.library'
 local createValue = require 'core.value'
 
-local DefaultSource = { start = 0, finish = 0 }
 local LibraryValue = {}
 local LibraryChild = {}
+
+local function getDefaultSource()
+    return { start = 0, finish = 0 }
+end
 
 -- 根据赋值顺序决定遍历顺序的表
 local function orderTable()
@@ -108,7 +111,7 @@ function mt:createLocal(key, source, value)
     local loc = {
         type = 'local',
         key = key,
-        source = source or DefaultSource,
+        source = source or getDefaultSource(),
         close = self.scope.block.finish,
     }
 
@@ -201,7 +204,7 @@ function mt:addInfo(var, type, source, value)
     end
     local info = {
         type = type,
-        source = source or DefaultSource,
+        source = source or getDefaultSource(),
         value = value,
     }
     if not self.results.infos[var] then
@@ -226,7 +229,7 @@ end
 function mt:createDots(index, source)
     local dots = {
         type = 'dots',
-        source = source or DefaultSource,
+        source = source or getDefaultSource(),
         func = self:getCurrentFunction(),
         index = index,
     }

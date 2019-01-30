@@ -233,7 +233,7 @@ function mt:getDeclarat()
     return nil
 end
 
-function mt:addInfo(tp, source, var)
+function mt:addInfo(tp, source)
     if source and not source.start then
         error('Miss start: ' .. table.dump(source))
     end
@@ -247,7 +247,6 @@ function mt:addInfo(tp, source, var)
     self._info[uri][#self._info[uri]+1] = {
         type = tp,
         source = source or getDefaultSource(),
-        var = var,
     }
     return self
 end

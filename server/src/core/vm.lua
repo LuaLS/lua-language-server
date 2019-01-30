@@ -72,7 +72,7 @@ function mt:createLocal(key, source, value)
     if source then
         self:addInfo(loc, 'local', source, value)
         if value then
-            value:addInfo('local', source, loc)
+            value:addInfo('local', source)
         end
     end
     self:setValue(loc, value, source)
@@ -233,7 +233,7 @@ function mt:setValue(var, value, source)
     value = value or self:createValue('any', source)
     if source and source.start then
         self:addInfo(var, 'set', source, value)
-        value:addInfo('set', source, var)
+        value:addInfo('set', source)
     end
     var.value = value
     return value
@@ -1313,7 +1313,7 @@ function mt:doLocalFunction(action)
         else
             local loc = self:createLocal(name[1], name)
             local func = self:buildFunction(action)
-            func:addInfo('local', name, loc)
+            func:addInfo('local', name)
             self:setValue(loc, func, name[#name])
         end
     end

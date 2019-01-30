@@ -174,7 +174,7 @@ function mt:isOpen(uri)
     end
 end
 
-function mt:readText(uri, path, buf)
+function mt:readText(uri, path, buf, compiled)
     local obj = self._file[uri]
     if obj then
         return
@@ -189,7 +189,7 @@ function mt:readText(uri, path, buf)
         text = text,
         uri = uri,
     }
-    self:needCompile(uri)
+    self:needCompile(uri, compiled)
 end
 
 function mt:removeText(uri)
@@ -220,10 +220,10 @@ function mt:loadVM(uri)
     return obj.vm, obj.lines, obj.text
 end
 
-function mt:_markCompiled(uri)
-    local compiled = self._needCompile[uri]
-    if compiled then
-        compiled[uri] = true
+function mt:_markCompiled(uri, compiled)
+    local newCompiled = self._needCompile[uri]
+    if newCompiled then
+        newCompiled[uri] = true
         self._needCompile[uri] = nil
     end
     for i, u in ipairs(self._needCompile) do
@@ -231,6 +231,12 @@ function mt:_markCompiled(uri)
             table.remove(self._needCompile, i)
             break
         end
+    end
+    if newCompiled == compiled then
+        return compiled
+    end
+    for k, v in pairs(newCompiled) do
+        compiled[k] = v
     end
     return compiled
 end
@@ -317,7 +323,7 @@ function mt:compileVM(uri)
         return nil
     end
     if self._needCompile[uri] then
-        compiled = self:_markCompiled(uri)
+        self:_markCompiled(uri, compiled)
     else
         return nil
     end
@@ -331,6 +337,9 @@ function mt:compileVM(uri)
 
     self._needDiagnostics[uri] = true
 
+    if obj.vmCost > 0.1 then
+        log.debug(('Compile VM[%s] takes: %.3f sec'):format(uri, obj.vmCost))
+    end
     if not obj.vm then
         return nil
     end

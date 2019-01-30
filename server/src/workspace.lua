@@ -102,6 +102,7 @@ function mt:init(rootUri)
 
     log.debug('忽略文件：\r\n' .. table.concat(ignored, '\r\n'))
 
+    local compiled = {}
     async.run('scanfiles', {
         root = self.root:string(),
         ignored = ignored,
@@ -118,7 +119,7 @@ function mt:init(rootUri)
             local name = path:string():lower()
             local uri = self:uriEncode(path)
             self.files[name] = uri
-            self.lsp:readText(uri, path, file.buf)
+            self.lsp:readText(uri, path, file.buf, compiled)
         end
     end)
 end

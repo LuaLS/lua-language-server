@@ -20,6 +20,7 @@ function mt:createDummyVar(source, value)
         type = 'local',
         key = '',
         source = source or getDefaultSource(),
+        close = self.scope.block.finish,
     }
 
     if source then
@@ -43,6 +44,9 @@ function mt:createLocal(key, source, value)
         source = source or getDefaultSource(),
         close = self.scope.block.finish,
     }
+    if not loc.close then
+        error('Miss close')
+    end
 
     if source then
         source.bind = loc

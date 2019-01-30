@@ -307,19 +307,16 @@ local y: number = 1
 ]]
 
 TEST[[
-local function get_warnings(warnings)
-    local error = nil
-    local level = 'on'
-    for _, warn in ipairs(warnings) do
-        if warn == 'error' then
-            <?error?> = true
-        else
-            level = warn
-        end
-    end
-    return {error = error, level = level}
-end
+local mt = {}
+mt.a = 1
+mt.b = 2
+mt.c = 3
+local <?obj?> = setmetatable({}, {__index = mt})
 ]]
 [[
-local error: boolean = true
+local obj: {
+    a: number = 1,
+    b: number = 2,
+    c: number = 3,
+}
 ]]

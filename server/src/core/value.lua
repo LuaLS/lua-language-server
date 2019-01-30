@@ -1,4 +1,6 @@
-local DefaultSource = { start = 0, finish = 0 }
+local function getDefaultSource()
+    return { start = 0, finish = 0 }
+end
 
 local mt = {}
 mt.__index = mt
@@ -62,7 +64,7 @@ function mt:createField(name, source)
     local field = {
         type   = 'field',
         key    = name,
-        source = source or DefaultSource,
+        source = source or getDefaultSource(),
     }
 
     if not self._child then
@@ -149,11 +151,13 @@ function mt:getField(name, source, stack)
     return field
 end
 
-function mt:rawEachField(callback)
+function mt:rawEachField(callback, mark)
     if not self._child then
         return nil
     end
-    local mark = {}
+    if not mark then
+        mark = {}
+    end
     for _, childs in pairs(self._child) do
         for name, field in pairs(childs) do
             if not mark[name] then
@@ -168,8 +172,26 @@ function mt:rawEachField(callback)
     return nil
 end
 
-function mt:eachField(callback)
-    return self:rawEachField(callback)
+function mt:eachField(callback, mark, stack)
+    if not mark then
+        mark = {}
+    end
+    local res = self:rawEachField(callback, mark)
+    if res ~= nil then
+        return res
+    end
+    local indexMeta = self:getMeta('__index')
+    if not indexMeta then
+        return nil
+    end
+    if not stack then
+        stack = 0
+    end
+    stack = stack + 1
+    if stack > 10 then
+        return nil
+    end
+    return indexMeta.value:eachField(callback, mark, stack)
 end
 
 function mt:removeUri(uri)
@@ -224,7 +246,7 @@ function mt:addInfo(tp, source, var)
     end
     self._info[uri][#self._info[uri]+1] = {
         type = tp,
-        source = source or DefaultSource,
+        source = source or getDefaultSource(),
         var = var,
     }
     return self
@@ -251,7 +273,7 @@ return function (tp, source, value)
     end
     -- TODO lib里的多类型
     local self = setmetatable({
-        source = source or DefaultSource,
+        source = source or getDefaultSource(),
         uri = source and source.uri,
     }, mt)
     if value ~= nil then

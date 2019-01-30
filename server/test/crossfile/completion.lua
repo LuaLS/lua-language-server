@@ -228,7 +228,7 @@ TEST {
     }
 }
 
-TEST {
+TEST { 
     {
         path = 'abc.lua',
         content = '',

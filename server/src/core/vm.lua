@@ -20,7 +20,6 @@ function mt:createDummyVar(source, value)
         type = 'local',
         key = '',
         source = source or getDefaultSource(),
-        close = self.scope.block.finish,
     }
 
     if source then
@@ -44,9 +43,6 @@ function mt:createLocal(key, source, value)
         source = source or getDefaultSource(),
         close = self.scope.block.finish,
     }
-    if not loc.close then
-        error('Miss close')
-    end
 
     if source then
         source.bind = loc
@@ -56,7 +52,9 @@ function mt:createLocal(key, source, value)
 
     local shadow = self.scope.locals[key]
     if shadow then
-        shadow.close = source and (source.start-1)
+        if source then
+            shadow.close = source.start - 1
+        end
         local group
         if shadow.shadow then
             group = shadow.shadow

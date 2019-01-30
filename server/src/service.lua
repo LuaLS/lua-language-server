@@ -250,7 +250,7 @@ function mt:compileAst(obj)
             log.debug(message)
             rpc:notify('window/showMessage', {
                 type = 3,
-                message = lang.script('PARSER_CRASH', err:match 'grammar%.lua%:%d+%:(.+)'),
+                message = lang.script('PARSER_CRASH', err:match 'grammar%.lua%:%d+%:(.+)' or err),
             })
         end
     end

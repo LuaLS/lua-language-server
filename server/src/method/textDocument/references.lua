@@ -35,7 +35,6 @@ return function (lsp, params)
             }
         }
     end
-    log.debug(table.dump(locations))
 
     local response = locations
 

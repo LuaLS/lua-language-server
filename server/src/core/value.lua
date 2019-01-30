@@ -145,7 +145,7 @@ function mt:getField(name, source, stack)
     return field
 end
 
-function mt:rawEachField(callback, mark)
+function mt:rawEachField(callback)
     if not self._child then
         return nil
     end
@@ -158,11 +158,8 @@ function mt:rawEachField(callback, mark)
     return nil
 end
 
-function mt:eachField(callback, mark, stack)
-    if not mark then
-        mark = {}
-    end
-    local res = self:rawEachField(callback, mark)
+function mt:eachField(callback, stack)
+    local res = self:rawEachField(callback)
     if res ~= nil then
         return res
     end
@@ -177,7 +174,7 @@ function mt:eachField(callback, mark, stack)
     if stack > 10 then
         return nil
     end
-    return indexMeta.value:eachField(callback, mark, stack)
+    return indexMeta.value:eachField(callback, stack)
 end
 
 function mt:removeUri(uri)

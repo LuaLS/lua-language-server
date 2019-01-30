@@ -262,6 +262,9 @@ local function unpackTable(result)
         local value = field.value
         if not value then
             local str = ('    %s: %s,'):format(key, 'any')
+            if str == '    [*any]: any,' then
+                goto CONTINUE
+            end
             lines[#lines+1] = str
             goto CONTINUE
         end
@@ -272,6 +275,9 @@ local function unpackTable(result)
             lines[#lines+1] = str
         else
             local str = ('    %s: %s,'):format(key, value:getType())
+            if str == '    [*any]: any,' then
+                goto CONTINUE
+            end
             lines[#lines+1] = str
         end
         ::CONTINUE::

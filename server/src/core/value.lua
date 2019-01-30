@@ -195,15 +195,20 @@ function mt:eachField(callback, mark, stack)
 end
 
 function mt:removeUri(uri)
-    if not self._child then
-        return
+    if self._child then
+        self._child[uri] = nil
+        self:rawEachField(function (field)
+            if field.value then
+                field.value:removeUri(uri)
+            end
+        end)
     end
-    self._child[uri] = nil
-    self:rawEachField(function (field)
-        if field.value then
-            field.value:removeUri(uri)
-        end
-    end)
+    if self._info then
+        self._info[uri] = nil
+    end
+    if self._meta then
+        self._meta[uri] = nil
+    end
 end
 
 function mt:getDeclarat()

@@ -25,7 +25,6 @@ local function main()
     end
 
     test 'core'
-
     test 'vm'
     test 'definition'
     test 'diagnostics'

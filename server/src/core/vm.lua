@@ -286,7 +286,9 @@ function mt:runFunction(func)
         local var = self:createArg('self', func.colon, self:getValue(func.object))
         var.hide = true
         var.link = func.object
-        self:setValue(var, func.argValues[1] or self:createValue('nil'))
+        if func.argValues[1] then
+            self:setValue(var, func.argValues[1])
+        end
         index = 1
         func.args[index] = var
     end

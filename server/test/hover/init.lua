@@ -320,3 +320,15 @@ local obj: {
     c: number = 3,
 }
 ]]
+
+TEST[[
+local mt = {}
+mt.__index = {}
+
+function mt:test(a, b)
+    self:<?test?>()
+end
+]]
+[[
+function mt:test(a: any, b: any)
+]]

@@ -197,10 +197,8 @@ end
 function mt:removeUri(uri)
     if self._child then
         self._child[uri] = nil
-        self:rawEachField(function (field)
-            if field.value then
-                field.value:removeUri(uri)
-            end
+        self:rawEachField(function (key, field)
+            field.value:removeUri(uri)
         end)
     end
     if self._info then

@@ -1,26 +1,32 @@
 local findResult = require 'core.find_result'
 
-local function parseResult(result, declarat)
+local function parseResult(vm, result, declarat)
     local positions = {}
     local tp = result.type
     if     tp == 'local' then
-        for _, info in ipairs(result) do
-            if declarat or info.type == 'get' then
-                positions[#positions+1] = {info.source.start, info.source.finish}
+        vm:eachInfo(result, function (info)
+            if info.source.uri == '' or not info.source.uri then
+                return
             end
-        end
+            if declarat or info.type == 'get' then
+                positions[#positions+1] = {info.source.start, info.source.finish, info.source.uri}
+            end
+        end)
     elseif tp == 'field' then
-        for _, info in ipairs(result) do
+        vm:eachInfo(result, function (info)
+            if info.source.uri == '' or not info.source.uri then
+                return
+            end
             if declarat or info.type == 'get' then
-                positions[#positions+1] = {info.source.start, info.source.finish}
+                positions[#positions+1] = {info.source.start, info.source.finish, info.source.uri}
             end
-        end
+        end)
     elseif tp == 'label' then
-        for _, info in ipairs(result) do
+        vm:eachInfo(result, function (info)
             if declarat or info.type == 'goto' then
-                positions[#positions+1] = {info.source.start, info.source.finish}
+                positions[#positions+1] = {info.source.start, info.source.finish, info.source.uri}
             end
-        end
+        end)
     end
     return positions
 end
@@ -30,6 +36,6 @@ return function (vm, pos, declarat)
     if not result then
         return nil
     end
-    local positions = parseResult(result, declarat)
+    local positions = parseResult(vm, result, declarat)
     return positions
 end

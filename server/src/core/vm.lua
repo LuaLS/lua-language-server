@@ -9,77 +9,6 @@ local function getDefaultSource()
     return { start = 0, finish = 0 }
 end
 
--- 根据赋值顺序决定遍历顺序的表
-local function orderTable()
-    local t = {}
-    local list = {}
-    local mark = {}
-    return setmetatable(t, {
-        __newindex = function (self, k, v)
-            if not mark[k] then
-                mark[k] = true
-                list[#list+1] = k
-            end
-            rawset(self, k, v)
-        end,
-        __pairs = function (self)
-            local i = 0
-            return function ()
-                while true do
-                    i = i + 1
-                    local k = list[i]
-                    if not k then
-                        return nil, nil
-                    end
-                    local v = t[k]
-                    if v ~= nil then
-                        return k, v
-                    end
-                end
-            end
-        end,
-    })
-end
-
-local function readOnly(t)
-    return setmetatable({}, {
-        __index = function (self, k)
-            if k == nil then
-                return nil
-            end
-            local v = t[k]
-            if type(v) == 'table' then
-                v = readOnly(v)
-            end
-            self[k] = v
-            return v
-        end,
-        __len = function (self)
-            return #t
-        end,
-        __pairs = function (self)
-            local keys = {}
-            local mark = {}
-            for k in next, self do
-                keys[#keys+1] = k
-            end
-            for k in pairs(t) do
-                if not mark[k] then
-                    mark[k] = true
-                    keys[#keys+1] = k
-                end
-            end
-            local i = 0
-            return function ()
-                i = i + 1
-                local k = keys[i]
-                return k, self[k]
-            end
-        end,
-        __source = t,
-    })
-end
-
 local mt = {}
 mt.__index = mt
 
@@ -90,7 +19,7 @@ function mt:createDummyVar(source, value)
     local loc = {
         type = 'local',
         key = '',
-        source = source or DefaultSource,
+        source = source or getDefaultSource(),
     }
 
     if source then

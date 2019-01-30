@@ -129,7 +129,7 @@ local function sortPairs(t)
     end
 end
 
-local function searchFields(name, source, parent, object, callback)
+local function searchFields(name, parent, callback)
     if not parent or not parent.value then
         return
     end
@@ -139,14 +139,6 @@ local function searchFields(name, source, parent, object, callback)
     local map = {}
     parent.value:eachField(function (key, field)
         if type(key) ~= 'string' then
-            goto CONTINUE
-        end
-        if object then
-            if not field.value or field.value:getType() ~= 'function' then
-                goto CONTINUE
-            end
-        end
-        if field.source == source then
             goto CONTINUE
         end
         if matchKey(name, key) then
@@ -241,7 +233,7 @@ local function getDocument(var, source)
 end
 
 local function searchAsLocal(vm, word, pos, result, callback)
-    searchFields(word, result.source, vm.results.locals[1], nil, function (var)
+    searchFields(word, vm.results.locals[1], nil, function (var)
         callback(var, CompletionItemKind.Variable)
     end)
 
@@ -252,7 +244,7 @@ local function searchAsLocal(vm, word, pos, result, callback)
 end
 
 local function searchAsArg(vm, word, pos, result, callback)
-    searchFields(word, result.source, vm.results.locals[1], nil, function (var)
+    searchFields(word, vm.results.locals[1], function (var)
         if var.value.lib then
             return
         end
@@ -267,7 +259,7 @@ local function searchAsGlobal(vm, word, pos, result, callback)
     searchLocals(vm, pos, word, function (var)
         callback(var, CompletionItemKind.Variable)
     end)
-    searchFields(word, result.source, vm.results.locals[1], nil, function (var)
+    searchFields(word, vm.results.locals[1], function (var)
         callback(var, CompletionItemKind.Field)
     end)
     searchKeyWords(word, function (name)
@@ -276,7 +268,7 @@ local function searchAsGlobal(vm, word, pos, result, callback)
 end
 
 local function searchAsSuffix(result, word, callback)
-    searchFields(word, result.source, result.parent, result.source.object, function (var)
+    searchFields(word, result.parent, function (var)
         callback(var, CompletionItemKind.Field)
     end)
 end
@@ -338,7 +330,7 @@ local function searchAsIndex(vm, word, pos, result, callback)
             callback(index.key, CompletionItemKind.Property)
         end
     end
-    searchFields(word, result.source, vm.results.locals[1], nil, function (var)
+    searchFields(word, vm.results.locals[1], function (var)
         callback(var, CompletionItemKind.Field)
     end)
 end
@@ -383,7 +375,6 @@ local function findClosePos(vm, pos)
         type = 'field',
         parent = parent,
         key = '',
-        source = source,
     }
     return result, source
 end
@@ -531,21 +522,11 @@ end
 
 local function clearList(list, source)
     local key = source[1]
-    -- 如果只有一个结果且是自己，则不显示
-    if #list == 1 then
-        if list[1].label == key then
-            list[1] = nil
-        end
-        return
-    end
-    -- 如果有多个结果，则将完全符合的放到最前面
-    if #list > 1 then
-        for i, v in ipairs(list) do
-            if v.label == key then
-                table.remove(list, i)
-                table.insert(list, 1, v)
-                return
-            end
+    -- 清除自己
+    for i, v in ipairs(list) do
+        if v.label == key then
+            table.remove(list, i)
+            return
         end
     end
 end

@@ -22,11 +22,8 @@ function mt:markGet(uri)
 end
 
 function mt:clearGlobal(uri)
-    self.get[uri] = nil
-    if not self.set[uri] then
-        return
-    end
     self.set[uri] = nil
+    self.get[uri] = nil
     local globalValue = self.lsp.globalValue
     if not globalValue then
         return

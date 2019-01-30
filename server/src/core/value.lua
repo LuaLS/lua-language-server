@@ -64,17 +64,16 @@ function mt:createField(name, source)
     local field = {
         type   = 'field',
         key    = name,
-        source = source or getDefaultSource(),
+        uris   = {},
     }
 
     if not self._child then
         self._child = {}
     end
+    self._child[name] = field
+
     local uri = source and source.uri or ''
-    if not self._child[uri] then
-        self._child[uri] = {}
-    end
-    self._child[uri][name] = field
+    field.uris[uri] = true
 
     self:inference('table', 0.5)
 
@@ -82,23 +81,18 @@ function mt:createField(name, source)
 end
 
 function mt:rawGetField(name, source)
-    local uri = source and source.uri or ''
     if not self._child then
         return nil
     end
-    if self._child[uri] then
-        local field = self._child[uri][name]
-        if field then
-            return field
-        end
+    local field = self._child[name]
+    if not field then
+        return nil
     end
-    for _, childs in pairs(self._child) do
-        local field = childs[name]
-        if field then
-            return field
-        end
-    end
-    return nil
+
+    local uri = source and source.uri or ''
+    field.uris[uri] = true
+
+    return field
 end
 
 function mt:getMeta(name, source)
@@ -155,18 +149,10 @@ function mt:rawEachField(callback, mark)
     if not self._child then
         return nil
     end
-    if not mark then
-        mark = {}
-    end
-    for _, childs in pairs(self._child) do
-        for name, field in pairs(childs) do
-            if not mark[name] then
-                mark[name] = true
-                local res = callback(name, field)
-                if res ~= nil then
-                    return res
-                end
-            end
+    for name, field in pairs(self._child) do
+        local res = callback(name, field)
+        if res ~= nil then
+            return res
         end
     end
     return nil
@@ -196,10 +182,12 @@ end
 
 function mt:removeUri(uri)
     if self._child then
-        self._child[uri] = nil
-        self:rawEachField(function (key, field)
-            field.value:removeUri(uri)
-        end)
+        for name, field in pairs(self._child) do
+            field.uris[uri] = nil
+            if not next(field.uris) then
+                self._child[name] = nil
+            end
+        end
     end
     if self._info then
         self._info[uri] = nil
@@ -276,7 +264,7 @@ return function (tp, source, value)
     -- TODO lib里的多类型
     local self = setmetatable({
         source = source or getDefaultSource(),
-        uri = source and source.uri,
+        uri = source and source.uri or '',
     }, mt)
     if value ~= nil then
         self:setValue(value)

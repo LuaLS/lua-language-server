@@ -121,10 +121,6 @@ zabcde@
 ]]
 {
     {
-        label = 'zabcde',
-        kind = CompletionItemKind.Variable,
-    },
-    {
         label = 'zabcdefg',
         kind = CompletionItemKind.Variable,
     }

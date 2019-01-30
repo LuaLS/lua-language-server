@@ -47,7 +47,7 @@ function mt:searchUndefinedGlobal(callback)
         if field.value.lib then
             goto NEXT_VAR
         end
-        if field.source.uri ~= self.vm.uri then
+        if not field.uris[self.vm.uri] then
             goto NEXT_VAR
         end
         if type(index) ~= 'string' then

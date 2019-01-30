@@ -5,12 +5,16 @@ local createValue = require 'core.value'
 local LibraryValue = {}
 local LibraryChild = {}
 
-local function getDefaultSource()
-    return { start = 0, finish = 0 }
-end
-
 local mt = {}
 mt.__index = mt
+
+function mt:getDefaultSource()
+    return {
+        start = 0,
+        finish = 0,
+        uri = self.uri,
+    }
+end
 
 function mt:createDummyVar(source, value)
     if source and source.bind then
@@ -19,7 +23,7 @@ function mt:createDummyVar(source, value)
     local loc = {
         type = 'local',
         key = '',
-        source = source or getDefaultSource(),
+        source = source or self:getDefaultSource(),
     }
 
     if source then
@@ -40,7 +44,7 @@ function mt:createLocal(key, source, value)
     local loc = {
         type = 'local',
         key = key,
-        source = source or getDefaultSource(),
+        source = source or self:getDefaultSource(),
         close = self.scope.block.finish,
     }
 
@@ -136,7 +140,7 @@ function mt:addInfo(var, type, source, value)
     end
     local info = {
         type = type,
-        source = source or getDefaultSource(),
+        source = source or self:getDefaultSource(),
         value = value,
     }
     if not self.results.infos[var] then
@@ -161,7 +165,7 @@ end
 function mt:createDots(index, source)
     local dots = {
         type = 'dots',
-        source = source or getDefaultSource(),
+        source = source or self:getDefaultSource(),
         func = self:getCurrentFunction(),
         index = index,
     }
@@ -1437,7 +1441,7 @@ local function compile(ast, lsp, uri)
             main   = nil,
         },
         lsp          = lsp,
-        uri          = uri,
+        uri          = uri or '',
     }, mt)
 
     -- 创建初始环境

@@ -184,7 +184,9 @@ function mt:removeUri(uri)
     if self._child then
         for name, field in pairs(self._child) do
             field.uris[uri] = nil
-            if not next(field.uris) then
+            if next(field.uris) then
+                field.value:removeUri(uri)
+            else
                 self._child[name] = nil
             end
         end

@@ -13,6 +13,12 @@ function mt:getValue()
 end
 
 function mt:inference(tp, rate)
+    if type(tp) == 'table' then
+        for _, ctp in ipairs(tp) do
+            self:inference(ctp, rate)
+        end
+        return
+    end
     if tp == '...' then
         error('Value type cant be ...')
     end
@@ -143,7 +149,7 @@ function mt:getField(name, source, stack)
     return field
 end
 
-function mt:eachField(callback)
+function mt:rawEachField(callback)
     if not self._child then
         return nil
     end
@@ -162,12 +168,16 @@ function mt:eachField(callback)
     return nil
 end
 
+function mt:eachField(callback)
+    return self:rawEachField(callback)
+end
+
 function mt:removeUri(uri)
     if not self._child then
         return
     end
     self._child[uri] = nil
-    self:eachField(function (field)
+    self:rawEachField(function (field)
         if field.value then
             field.value:removeUri(uri)
         end

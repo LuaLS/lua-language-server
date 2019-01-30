@@ -158,3 +158,11 @@ local function f(<!self!>)
 end
 f()
 ]]
+
+TEST [[
+local function f(var)
+    print(var)
+end
+local var
+f(var)
+]]

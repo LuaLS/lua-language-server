@@ -288,6 +288,7 @@ function mt:runFunction(func)
     self.chunk:cut 'locals'
     self.chunk.func = func
 
+    self.scope:cut 'locals'
     for name, loc in pairs(func.upvalues) do
         self.scope.locals[name] = loc
     end

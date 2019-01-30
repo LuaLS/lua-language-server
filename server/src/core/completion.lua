@@ -328,9 +328,12 @@ local function searchAsIndex(vm, word, pos, result, source, callback)
     searchLocals(vm, pos, word, function (var)
         callback(var, CompletionItemKind.Variable)
     end)
-    for _, index in ipairs(vm.results.indexs) do
-        if matchKey(word, index.key) then
-            callback(index.key, CompletionItemKind.Property)
+    for _, source in ipairs(vm.results.sources) do
+        if source.isIndex then
+            local index = source.bind
+            if matchKey(word, index.key) then
+                callback(index.key, CompletionItemKind.Property)
+            end
         end
     end
     searchFields(word, vm.results.locals[1], source, function (var)

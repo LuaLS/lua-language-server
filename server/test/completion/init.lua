@@ -546,10 +546,6 @@ xxxx@
 ]]
 {
     {
-        label = 'xxxx',
-        kind = CompletionItemKind.Variable,
-    },
-    {
         label = 'XXXX',
         kind = CompletionItemKind.Variable,
     }

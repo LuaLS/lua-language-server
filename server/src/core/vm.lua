@@ -195,7 +195,6 @@ function mt:buildTable(source)
             else
                 if key.type == 'name' then
                     local field = self:createField(tbl, key[1], key)
-                    self.results.indexs[#self.results.indexs+1] = field
                     key.isIndex = true
                     if value.type == 'list' then
                         self:setValue(field, value[1], key)
@@ -1435,7 +1434,6 @@ local function compile(ast, lsp, uri)
             funcs  = {},
             calls  = {},
             strings= {},
-            indexs = {},
             infos  = {},
             sources= {},
             main   = nil,

@@ -76,24 +76,24 @@ local function buildFunction(vm, func)
     }
 end
 
-local function isLocalTable(var)
+local function isLocalTable(var, source)
     if not var.value or var.value:getType() ~= 'table' then
         return false
     end
     if var.value.source.start == 0 then
         return false
     end
-    if var.source ~= var.value:getDeclarat() then
+    if source ~= var.value:getDeclarat() then
         return false
     end
-    if var.value.source.finish < var.source.finish then
+    if var.value.source.finish < source.finish then
         return false
     end
     return true
 end
 
-local function buildVar(vm, var)
-    if var.source.start == 0 then
+local function buildVar(vm, var, source)
+    if source.start == 0 then
         return nil
     end
     if var.value and var.value:getType() == 'function' and var.value.uri == vm.uri then
@@ -110,17 +110,17 @@ local function buildVar(vm, var)
         key = ('[%s]'):format(key)
     end
     local range
-    if isLocalTable(var) then
-        range = { var.source.start, var.value.source.finish }
+    if isLocalTable(var, source) then
+        range = { source.start, var.value.source.finish }
     else
-        range = { var.source.start, var.source.finish }
+        range = { source.start, source.finish }
     end
-    local hvr = hover(var, var.source)
+    local hvr = hover(var, source)
     if not hvr then
         return nil
     end
     local kind
-    if var.source.isIndex then
+    if source.isIndex then
         kind = SymbolKind.Class
     else
         kind = SymbolKind.Variable
@@ -131,7 +131,7 @@ local function buildVar(vm, var)
         detail = hvr.label:gsub('[\r\n]', ''),
         kind = kind,
         range = range,
-        selectionRange = { var.source.start, var.source.finish },
+        selectionRange = { source.start, source.finish },
     }
 end
 
@@ -173,11 +173,12 @@ return function (vm)
     for _, func in ipairs(vm.results.funcs) do
         symbols[#symbols+1] = buildFunction(vm, func)
     end
-    for _, loc in ipairs(vm.results.locals) do
-        symbols[#symbols+1] = buildVar(vm, loc)
-    end
-    for _, index in ipairs(vm.results.indexs) do
-        symbols[#symbols+1] = buildVar(vm, index)
+    for _, source in ipairs(vm.results.sources) do
+        if source.bind then
+            if source.isLocal or source.isIndex then
+                symbols[#symbols+1] = buildVar(vm, source.bind, source)
+            end
+        end
     end
 
     local packedSymbols = packSymbols(symbols)

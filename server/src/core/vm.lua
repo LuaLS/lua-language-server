@@ -243,9 +243,9 @@ function mt:setValue(var, value, source)
     return value
 end
 
-function mt:getValue(var)
+function mt:getValue(var, source)
     if not var.value then
-        var.value = self:createValue('any', var.source)
+        var.value = self:createValue('any', source or self:getDefaultSource())
     end
     return var.value
 end
@@ -287,7 +287,7 @@ function mt:runFunction(func)
 
     local index = 0
     if func.object then
-        local var = self:createArg('self', func.colon, self:getValue(func.object))
+        local var = self:createArg('self', func.colon, self:getValue(func.object, func.colon))
         var.hide = true
         var.link = func.object
         if func.argValues[1] then
@@ -707,7 +707,7 @@ function mt:getName(name, source)
     end
     source.uri = self.uri
     local ENV = self.scope.locals._ENV
-    local ENVValue = self:getValue(ENV)
+    local ENVValue = self:getValue(ENV, source)
     local global = self:getField(ENVValue, name, source)
     if global then
         global.parent = ENV
@@ -735,7 +735,7 @@ function mt:setName(name, source, value)
         return
     end
     local ENV = self.scope.locals._ENV
-    local ENVValue = self:getValue(ENV)
+    local ENVValue = self:getValue(ENV, source)
     local global = self:getField(ENVValue, name, source)
     if global then
         global.parent = ENV
@@ -758,7 +758,7 @@ function mt:getIndex(obj)
     obj.uri = self.uri
     if tp == 'name' then
         local var = self:getName(obj[1], obj)
-        local value = self:getValue(var)
+        local value = self:getValue(var, obj)
         self:addInfo(var, 'get', obj)
         value:addInfo('get', obj)
         return value
@@ -866,7 +866,7 @@ function mt:getSimple(simple, mode)
             value:inference('function', 0.9)
             local args = self:unpackList(obj)
             if object then
-                table.insert(args, 1, self:getValue(object))
+                table.insert(args, 1, self:getValue(object, obj))
             end
             local func = value
             -- 函数的返回值一定是list
@@ -890,13 +890,13 @@ function mt:getSimple(simple, mode)
             if mode == 'value' or i < #simple then
                 field = self:getField(value, index, obj) or self:createField(value, index, obj)
                 field.parentValue = value
-                value = self:getValue(field)
+                value = self:getValue(field, obj)
                 self:addInfo(field, 'get', obj)
                 value:addInfo('get', obj)
             else
                 field = self:createField(value, index, obj)
                 field.parentValue = value
-                value = self:getValue(field)
+                value = self:getValue(field, obj)
             end
             field.parent = lastField
             if obj[1].type == 'string' then
@@ -912,13 +912,13 @@ function mt:getSimple(simple, mode)
             if mode == 'value' or i < #simple then
                 field = self:getField(value, obj[1], obj) or self:createField(value, obj[1], obj)
                 field.parentValue = value
-                value = self:getValue(field)
+                value = self:getValue(field, obj)
                 self:addInfo(field, 'get', obj)
                 value:addInfo('get', obj)
             else
                 field = self:createField(value, obj[1], obj)
                 field.parentValue = value
-                value = self:getValue(field)
+                value = self:getValue(field, obj)
             end
             field.parent = lastField
             lastField = field
@@ -1119,7 +1119,7 @@ function mt:getExp(exp)
         return self:createValue('number', exp, exp[1])
     elseif tp == 'name' then
         local var = self:getName(exp[1], exp)
-        local value = self:getValue(var)
+        local value = self:getValue(var, exp)
         self:addInfo(var, 'get', exp)
         value:addInfo('get', exp)
         return value

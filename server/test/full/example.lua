@@ -1,6 +1,6 @@
 local fs = require 'bee.filesystem'
 
-TEST(io.load(ROOT / 'src' / 'core' / 'vm.lua'))
+TEST(io.load(ROOT / 'src' / 'vm' / 'vm.lua'))
 
 -- 临时
 local function testIfExit(path)

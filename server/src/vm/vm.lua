@@ -227,67 +227,18 @@ function mt:isGlobal(field)
     return field.GLOBAL == true
 end
 
-function mt:callLeftFuncions()
-    for _, func in ipairs(self.results.funcs) do
-        if func.built and not func.runed then
-            self:runFunction(func)
-        end
-    end
-end
-
 function mt:runFunction(func)
-    func.runed = (func.runed or 0) + 1
-    if func.runed > 1 then
-        --return
-    end
-    self:scopePush(func.built)
-    self.chunk:push()
-    self.chunk:cut 'dots'
-    self.chunk:cut 'labels'
-    self.chunk:cut 'locals'
-    self.chunk.func = func
+    func:run()
 
-    self.scope:cut 'locals'
-    for name, loc in pairs(func.upvalues) do
-        self.scope.locals[name] = loc
+    if not func.source then
+        return
     end
 
-    local index = 0
-    if func.object then
-        local var = self:createArg('self', func.colon, self:getValue(func.object, func.colon))
-        var.hide = true
-        var.link = func.object
-        if func.argValues[1] then
-            self:setValue(var, func.argValues[1])
-        end
-        index = 1
-        func.args[index] = var
-    end
+    local originFunction = self:getCurrentFunction()
 
-    local stop
-    self:forList(func.built.arg, function (arg)
-        if stop then
-            return
-        end
-        index = index + 1
-        if arg.type == 'name' then
-            local var = self:createArg(arg[1], arg)
-            self:setValue(var, func.argValues[index] or self:createValue('nil'))
-            func.args[index] = var
-        elseif arg.type == '...' then
-            local dots = self:createDots(index, arg)
-            for i = index, #func.argValues do
-                dots[#dots+1] = func.argValues[i]
-            end
-            func.hasDots = true
-            stop = true
-        end
-    end)
+    self:doActions(func.source)
 
-    self:doActions(func.built)
-
-    self.chunk:pop()
-    self:scopePop()
+    self:setCurrentFunction(originFunction)
 end
 
 function mt:buildFunction(exp, object, colon)
@@ -1202,7 +1153,6 @@ function mt:doAction(action)
         -- Skip
         return
     end
-    action.uri = self.chunk.func.uri
     local tp = action.type
     if     tp == 'do' then
         self:doDo(action)
@@ -1264,12 +1214,32 @@ function mt:createFunction(source)
     return value
 end
 
-function mt:setCurrentFunction(func)
-    self.currentFunction = func
+function mt:callLeftFuncions()
+    for _, func in ipairs(self.funcs) do
+        if not func:hasRuned() then
+            self:runFunction(func)
+        end
+    end
+end
+
+function mt:setCurrentFunction(value)
+    self.currentFunction = value:getFunction()
+end
+
+function mt:getCurrentFunction()
+    return self.currentFunction
 end
 
 function mt:saveLocal(name, loc)
     self.currentFunction:saveLocal(name, loc)
+end
+
+function mt:loadLocal(name)
+    return self.currentFunction:loadLocal(name)
+end
+
+function mt:eachLocal(callback)
+    return self.currentFunction:eachLocal(callback)
 end
 
 function mt:getUri()
@@ -1337,6 +1307,7 @@ local function compile(ast, lsp, uri)
 
     -- 创建初始环境
     ast.uri = vm.uri
+    vm:instantSource(ast)
     vm:createEnvironment(ast)
 
     -- 检查所有没有调用过的函数，调用一遍

@@ -19,12 +19,12 @@ function buildLibValue(lib)
         value = createValue('table')
     elseif tp == 'function' then
         value = createValue('function')
-        local func = createFunction(getDefaultSource())
+        local func = createFunction()
         value:setFunction(func)
         if lib.returns then
             for i, rtn in ipairs(lib.returns) do
                 if rtn.type == '...' then
-                    func:returnDots(i, buildLibValue(rtn))
+                    func:returnDots(i)
                 else
                     func:setReturn(i, buildLibValue(rtn))
                 end
@@ -40,8 +40,6 @@ function buildLibValue(lib)
         value = createValue('integer')
     elseif tp == 'nil' then
         value = createValue('nil')
-    elseif tp == '...' then
-        value = createValue('any')
     else
         value = createValue(tp or 'any')
     end

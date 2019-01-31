@@ -13,6 +13,10 @@ function mt:setUri(uri)
     self._uri = uri
 end
 
+function mt:getUri()
+    return self._uri
+end
+
 return function (source)
     return setmetatable(source, mt)
 end

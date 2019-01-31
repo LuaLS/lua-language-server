@@ -205,6 +205,10 @@ function mt:setFunction(func)
     self:setType('function', 1.0)
 end
 
+function mt:getFunction()
+    return self._func
+end
+
 function mt:setLib(lib)
     self._lib = lib
 end

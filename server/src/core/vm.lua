@@ -99,6 +99,7 @@ function mt:createField(value, index, source)
     if self.lsp and self:isGlobal(field) then
         self.lsp.global:markSet(self.chunk.func.uri)
     end
+    field.parentValue = value
 
     return field
 end
@@ -253,6 +254,9 @@ function mt:setValue(var, value, source)
         self:addInfo(var, 'set', source, value)
         value:addInfo('set', source)
     end
+    if var.GLOBAL then
+        value.GLOBAL = true
+    end
     var.value = value
     return value
 end
@@ -260,6 +264,9 @@ end
 function mt:getValue(var, source)
     if not var.value then
         var.value = self:createValue('any', source or self:getDefaultSource())
+        if var.GLOBAL then
+            var.value.GLOBAL = true
+        end
     end
     return var.value
 end
@@ -854,6 +861,7 @@ function mt:getSimple(simple, mode)
         local obj = simple[i]
         local tp  = obj.type
         obj.uri = self.chunk.func.uri
+        obj.isSuffix = true
         value = self:selectList(value, 1)
 
         if     tp == 'call' then
@@ -883,13 +891,11 @@ function mt:getSimple(simple, mode)
             local index = self:getIndex(child)
             if mode == 'value' or i < #simple then
                 field = self:getField(value, index, obj) or self:createField(value, index, obj)
-                field.parentValue = value
                 value = self:getValue(field, obj)
                 self:addInfo(field, 'get', obj)
                 value:addInfo('get', obj)
             else
                 field = self:createField(value, index, obj)
-                field.parentValue = value
                 value = self:getValue(field, obj)
             end
             field.parent = lastField
@@ -905,13 +911,11 @@ function mt:getSimple(simple, mode)
             value:inference('string', 0.2)
             if mode == 'value' or i < #simple then
                 field = self:getField(value, obj[1], obj) or self:createField(value, obj[1], obj)
-                field.parentValue = value
                 value = self:getValue(field, obj)
                 self:addInfo(field, 'get', obj)
                 value:addInfo('get', obj)
             else
                 field = self:createField(value, obj[1], obj)
-                field.parentValue = value
                 value = self:getValue(field, obj)
             end
             field.parent = lastField

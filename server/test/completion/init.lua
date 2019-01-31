@@ -287,7 +287,7 @@ xxx()
     },
     {
         label = 'xxx',
-        kind = CompletionItemKind.Method,
+        kind = CompletionItemKind.Function,
         documentation = EXISTS,
     },
 }

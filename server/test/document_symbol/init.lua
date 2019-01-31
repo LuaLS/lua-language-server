@@ -98,19 +98,19 @@ end
     }
 }
 
-TEST [[
-return function ()
-end
-]]
-{
-    [1] = {
-        name = '',
-        detail = 'function ()',
-        kind = SymbolKind.Function,
-        range = {8, 22},
-        selectionRange = {8, 8},
-    }
-}
+--TEST [[
+--return function ()
+--end
+--]]
+--{
+--    [1] = {
+--        name = '',
+--        detail = 'function ()',
+--        kind = SymbolKind.Function,
+--        range = {8, 22},
+--        selectionRange = {8, 8},
+--    }
+--}
 
 TEST [[
 f = function ()
@@ -320,21 +320,21 @@ local t = {
     }
 }
 
-TEST[[
-local function g()
-end
-
-g = 1
-]]{
-    [1] = {
-        name = 'g',
-        detail = 'function g()',
-        kind = SymbolKind.Function,
-        range = {1, 22},
-        selectionRange = {16, 16},
-        children = EXISTS,
-    }
-}
+--TEST[[
+--local function g()
+--end
+--
+--g = 1
+--]]{
+--    [1] = {
+--        name = 'g',
+--        detail = 'function g()',
+--        kind = SymbolKind.Function,
+--        range = {1, 22},
+--        selectionRange = {16, 16},
+--        children = EXISTS,
+--    }
+--}
 
 TEST[[
 function f(...)

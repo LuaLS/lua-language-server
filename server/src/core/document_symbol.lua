@@ -31,39 +31,21 @@ local SymbolKind = {
     TypeParameter = 26,
 }
 
-local function buildFunction(vm, func)
-    local source = func.source
-    local declarat = func:getDeclarat()
-    local name
-    local var
-    if declarat then
-        if declarat.type == 'function' then
-            var = declarat.name and declarat.name.bind
-        else
-            var = declarat.bind
-        end
+local function buildFunction(vm, var, source)
+    local func = var.value
+    if func.source.start == 0 then
+        return nil
     end
-    if var then
-        name = hoverName(var, declarat)
-    else
-        name = ''
-    end
-    local hvr = hoverFunction(name, func, declarat and declarat.object)
+    local name = hoverName(var, source)
+    local hvr = hoverFunction(name, func, source.object)
     if not hvr then
         return nil
     end
-    local selectionRange
-    local range
+    local selectionRange = { source.start, source.finish }
+    local range = { math.min(source.start, func.source.start), func.source.finish }
     local kind = SymbolKind.Function
-    if var then
-        range = { math.min(source.start, declarat.start), source.finish }
-        selectionRange = { declarat.start, declarat.finish }
-        if var.parent and var.parent.value and not var.parent.value.GLOBAL then
-            kind = SymbolKind.Field
-        end
-    else
-        range = { source.start, source.finish }
-        selectionRange = { source.start, source.start }
+    if source.isSuffix then
+        kind = SymbolKind.Field
     end
 
     return {
@@ -96,7 +78,10 @@ local function buildVar(vm, var, source)
     if source.start == 0 then
         return nil
     end
-    if var.value and var.value:getType() == 'function' and var.value.uri == vm.uri then
+    if var.value:getType() == 'function' then
+        return buildFunction(vm, var, source)
+    end
+    if not source.isLocal and not source.isIndex then
         return nil
     end
     if var.hide then
@@ -170,14 +155,9 @@ end
 return function (vm)
     local symbols = {}
 
-    for _, func in ipairs(vm.results.funcs) do
-        symbols[#symbols+1] = buildFunction(vm, func)
-    end
     for _, source in ipairs(vm.results.sources) do
         if source.bind then
-            if source.isLocal or source.isIndex then
-                symbols[#symbols+1] = buildVar(vm, source.bind, source)
-            end
+            symbols[#symbols+1] = buildVar(vm, source.bind, source)
         end
     end
 

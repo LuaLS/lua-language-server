@@ -29,6 +29,9 @@ function table.dump(tbl)
         if table_mark[tbl] then
             return '<Circle Table>'
         end
+        if tab > 10 then
+            return '<Deep Table>'
+        end
         table_mark[tbl] = true
         local keys = {}
         for key in pairs(tbl) do

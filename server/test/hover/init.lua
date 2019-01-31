@@ -108,7 +108,7 @@ TEST [[
 t = {}
 t.<?x?> = 1
 ]]
-"field t.x: number = 1"
+"global t.x: number = 1"
 
 TEST [[
 local mt = {}

@@ -129,15 +129,15 @@ local function sortPairs(t)
     end
 end
 
-local function searchFields(name, parent, source, callback)
-    if not parent or not parent.value then
+local function searchFields(name, parentValue, source, callback)
+    if not parentValue then
         return
     end
     if type(name) ~= 'string' then
         return
     end
     local map = {}
-    parent.value:eachField(function (key, field)
+    parentValue:eachField(function (key, field)
         if type(key) ~= 'string' then
             goto CONTINUE
         end
@@ -176,7 +176,7 @@ local function getKind(var, default)
             return CompletionItemKind.Enum
         end
         if value:getType() == 'function' then
-            if var.parent and var.parent.value and var.parent.value.GLOBAL ~= true then
+            if value.object then
                 return CompletionItemKind.Method
             else
                 return CompletionItemKind.Function
@@ -236,7 +236,7 @@ local function getDocument(var, source)
 end
 
 local function searchAsLocal(vm, word, pos, result, source, callback)
-    searchFields(word, vm.results.locals[1], source, function (var)
+    searchFields(word, vm.env, source, function (var)
         callback(var, CompletionItemKind.Variable)
     end)
 
@@ -247,7 +247,7 @@ local function searchAsLocal(vm, word, pos, result, source, callback)
 end
 
 local function searchAsArg(vm, word, pos, result, source, callback)
-    searchFields(word, vm.results.locals[1], source, function (var)
+    searchFields(word, vm.env, source, function (var)
         if var.value.lib then
             return
         end
@@ -262,7 +262,7 @@ local function searchAsGlobal(vm, word, pos, result, source, callback)
     searchLocals(vm, pos, word, function (var)
         callback(var, CompletionItemKind.Variable)
     end)
-    searchFields(word, vm.results.locals[1], source, function (var)
+    searchFields(word, result.parentValue, source, function (var)
         callback(var, CompletionItemKind.Field)
     end)
     searchKeyWords(word, function (name)
@@ -271,7 +271,7 @@ local function searchAsGlobal(vm, word, pos, result, source, callback)
 end
 
 local function searchAsSuffix(result, source, word, callback)
-    searchFields(word, result.parent, source, function (var)
+    searchFields(word, result.parentValue, source, function (var)
         callback(var, CompletionItemKind.Field)
     end)
 end
@@ -336,7 +336,7 @@ local function searchAsIndex(vm, word, pos, result, source, callback)
             end
         end
     end
-    searchFields(word, vm.results.locals[1], source, function (var)
+    searchFields(word, result.parentValue, source, function (var)
         callback(var, CompletionItemKind.Field)
     end)
 end
@@ -375,11 +375,13 @@ local function findClosePos(vm, pos)
         start = pos,
         finish = pos,
         object = sep.type == ':' and parent,
+        isSuffix = true,
         [1]    = '',
     }
     local result = {
         type = 'field',
         parent = parent,
+        parentValue = parent.value,
         key = '',
     }
     return result, source
@@ -485,10 +487,10 @@ local function searchInResult(result, word, source, vm, pos, callback)
     elseif result.type == 'field' then
         if source.isIndex then
             searchAsIndex(vm, word, pos, result, source, callback)
-        elseif result.parent and result.parent.value and result.parent.value.GLOBAL == true then
-            searchAsGlobal(vm, word, pos, result, source, callback)
-        else
+        elseif source.isSuffix then
             searchAsSuffix(result, source, word, callback)
+        else
+            searchAsGlobal(vm, word, pos, result, source, callback)
         end
     end
 end

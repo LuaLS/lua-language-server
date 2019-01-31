@@ -318,7 +318,7 @@ local function getValueHover(name, valueType, result, lib)
 
     local tp = result.type
     if tp == 'field' then
-        if result.parent and result.parent.value and result.parent.value.GLOBAL then
+        if result.GLOBAL then
             tp = 'global'
         end
     end

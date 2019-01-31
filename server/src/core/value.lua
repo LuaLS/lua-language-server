@@ -34,9 +34,6 @@ function mt:setType(tp, rate)
     if tp == 'any' or tp == 'nil' then
         rate = 0.0
     end
-    if not self._type then
-        self._type = {}
-    end
     local current = self._type[tp] or 0.0
     self._type[tp] = current + (1 - current) * rate
 end
@@ -169,31 +166,29 @@ function mt:mergeValue(value)
             self._child[k] = v
         end
     end
+    if value._meta then
+        self._meta = value._meta
+    end
+    for _, info in ipairs(value) do
+        self[#self+1] = info
+    end
 end
 
 function mt:addInfo(tp, source)
     if source and not source.start then
         error('Miss start: ' .. table.dump(source))
     end
-    if not self._info then
-        self._info = {}
-    end
-    self._info[#self._info+1] = {
+    self[#self] = {
         type = tp,
         source = source or getDefaultSource(),
     }
 end
 
 function mt:eachInfo(callback)
-    if not self._info then
-        return nil
-    end
-    for _, infos in pairs(self._info) do
-        for i = 1, #infos do
-            local res = callback(infos[i])
-            if res ~= nil then
-                return res
-            end
+    for _, info in ipairs(self) do
+        local res = callback(info)
+        if res ~= nil then
+            return res
         end
     end
     return nil
@@ -203,10 +198,10 @@ return function (tp, source, v)
     if tp == '...' then
         error('Value type cant be ...')
     end
-    -- TODO lib里的多类型
     local self = setmetatable({
         source = source or getDefaultSource(),
         _value = v,
+        _type = {},
     }, mt)
     if type(tp) == 'table' then
         for i = 1, #tp do

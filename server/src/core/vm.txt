@@ -1,0 +1,52 @@
+source -- ast生成的对象，是唯一对象
+{
+    start:      integer,    -- source的开始位置，所有的活动source都应该由这个值，0表示是个马甲source
+    finish:     integer,    -- source的结束位置
+    bindLocal:  local,      -- 绑定的local
+    bindField:  field,      -- 绑定的field
+    bindValue:  value,      -- 绑定的value
+    block:      block,      -- 所在的代码块
+    uri:        string,     -- source所在的文件
+
+    isIndex:    boolean,    -- 是否作为构造表时的显性key
+    isSuffix:   boolean,    -- 是否作为simple的后缀
+    parent:     source,     -- 作为simple后缀时的父source
+}
+
+block -- ast生成的对象，是唯一对象
+{
+    start:      integer,    -- block开始的位置，0表示主文件
+    finish:     integer,    -- block结束的位置
+}
+
+local
+{
+    name:       string,     -- 局部变量一定有一个名字
+    source:     source,     -- 声明该局部变量的source
+    value:      value,      -- 当前的value
+
+    setValue(value),        -- 设置value
+    getValue(value),        -- 读取value
+    addInfo(tp, source),
+    eachInfo(function(info)),
+}
+
+value
+{
+    source:     source,     -- 创建该值使用的source
+
+    setType(type, rate),
+    getType(),
+    setChild(index, value),
+    getChild(index),
+    eachChild(function (value)),
+    rawSet(index, value),
+    rawGet(index),
+    setMetaTable(value),
+    getMetaMethod(name),
+    eachChild(function (value)),
+    rawEach(function (value)),
+    mergeValue(value),
+    addInfo(tp, source),
+    eachInfo(function (info)),
+}

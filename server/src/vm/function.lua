@@ -5,32 +5,67 @@ local mt = {}
 mt.__index = mt
 mt.type = 'function'
 mt._runed = 0
+mt._top = 0
 
 function mt:getUri()
     return self.source.uri
 end
 
+function mt:push()
+    self._top = self._top + 1
+    self.locals[self._top] = {}
+end
+
+function mt:pop()
+    self._top = self._top - 1
+end
+
 function mt:saveLocal(name, loc)
-    self.locals[name] = loc
+    self.locals[self._top][name] = loc
 end
 
 function mt:loadLocal(name)
-    local loc = self.locals[name]
-    if loc then
-        return loc
-    end
-    loc = self.upvalues(name)
-    if loc then
-        return loc
+    for i = self._top, 1, -1 do
+        local locals = self.locals[i]
+        local loc = locals[name]
+        if loc then
+            return loc
+        end
     end
     return nil
 end
 
 function mt:eachLocal(callback)
-    for name, loc in pairs(self.locals) do
-        local res = callback(name, loc)
-        if res ~= nil then
-            return res
+    local mark = {}
+    for i = self._top, 1, -1 do
+        local locals = self.locals[i]
+        for name, loc in pairs(locals) do
+            if not mark[name] then
+                mark[name] = true
+                local res = callback(name, loc)
+                if res ~= nil then
+                    return res
+                end
+            end
+        end
+    end
+    return nil
+end
+
+function mt:saveLabel(label)
+    if not self._label then
+        self._label = {}
+    end
+    self._label[#self._label+1] = label
+end
+
+function mt:loadLabel(name)
+    if not self._label then
+        return nil
+    end
+    for _, label in ipairs(self._label) do
+        if label:getName() == name then
+            return label
         end
     end
     return nil
@@ -72,36 +107,32 @@ function mt:run()
     --    func.args[index] = var
     --end
 
-    local stop
-    self:forList(func.built.arg, function (arg)
-        if stop then
-            return
-        end
-        index = index + 1
-        if arg.type == 'name' then
-            local var = self:createArg(arg[1], arg)
-            self:setValue(var, func.argValues[index] or self:createValue('nil'))
-            func.args[index] = var
-        elseif arg.type == '...' then
-            local dots = self:createDots(index, arg)
-            for i = index, #func.argValues do
-                dots[#dots+1] = func.argValues[i]
-            end
-            func.hasDots = true
-            stop = true
-        end
-    end)
-end
-
-function mt:saveUpvalues(name, loc)
-    self.upvalues[name] = loc
+    --local stop
+    --self:forList(func.built.arg, function (arg)
+    --    if stop then
+    --        return
+    --    end
+    --    index = index + 1
+    --    if arg.type == 'name' then
+    --        local var = self:createArg(arg[1], arg)
+    --        self:setValue(var, func.argValues[index] or self:createValue--('nil'))
+    --        func.args[index] = var
+    --    elseif arg.type == '...' then
+    --        local dots = self:createDots(index, arg)
+    --        for i = index, #func.argValues do
+    --            dots[#dots+1] = func.argValues[i]
+    --        end
+    --        func.hasDots = true
+    --        stop = true
+    --    end
+    --end)
 end
 
 return function (source)
     local self = setmetatable({
         source = source,
         locals = {},
-        upvalues = {},
     }, mt)
+    self:push()
     return self
 end

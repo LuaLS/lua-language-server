@@ -1,9 +1,11 @@
 local library = require 'core.library'
 local createValue = require 'vm.value'
 local createLocal = require 'vm.local'
+local createLabel = require 'vm.label'
 local createFunction = require 'vm.function'
 local instantSource = require 'vm.source'
 local buildGlobal = require 'vm.global'
+local createMulti = require 'vm.multi'
 
 local mt = {}
 mt.__index = mt
@@ -83,16 +85,12 @@ function mt:createArg(key, source, value)
     return loc
 end
 
-function mt:scopePush(block)
-    if not block.start then
-        error('Scope push without start!')
-    end
-    self.scope:push()
-    self.scope.block = block
+function mt:scopePush()
+    self.currentFunction:push()
 end
 
 function mt:scopePop()
-    self.scope:pop()
+    self.currentFunction:pop()
 end
 
 function mt:addInfo(var, type, source, value)
@@ -967,8 +965,18 @@ function mt:getExp(exp)
         local value = { type = 'list' }
         self:unpackDots(value)
         return value
+    elseif tp == 'list' then
+        return self:getMultiByList(exp)
     end
     error('Unkown exp type: ' .. tostring(tp))
+end
+
+function mt:getMultiByList(list)
+    local multi = createMulti()
+    for _, exp in ipairs(list) do
+        multi:push(self:getExp(exp))
+    end
+    return multi
 end
 
 function mt:doDo(action)
@@ -978,64 +986,76 @@ function mt:doDo(action)
 end
 
 function mt:doReturn(action)
-    self:getCurrentFunction().hasReturn = true
-    for i, exp in ipairs(action) do
-        local value = self:getExp(exp)
-        if value.type == 'list' then
-            if i == #action then
-                if #value == 0 then
-                    value[1] = self:createValue('any', exp)
-                end
-                for x, v in ipairs(value) do
-                    v:addInfo('return', exp)
-                    self:setFunctionReturn(self:getCurrentFunction(), i + x - 1, v)
-                end
-                break
-            else
-                local v = value[1] or self:createValue('nil', exp)
-                v:addInfo('return', exp)
-                self:setFunctionReturn(self:getCurrentFunction(), i, v)
-            end
-        else
-            value:addInfo('return', exp)
-            self:setFunctionReturn(self:getCurrentFunction(), i, value)
-        end
+    if #action == 0 then
+        return
+    end
+    local value = self:getExp(action[2])
+    local func = self:getCurrentFunction()
+    if value.type == 'multi' then
+        value:eachValue(function (i, v)
+            func:setReturn(i, v)
+        end)
+    else
+        func:setReturn(1, value)
     end
 end
 
-function mt:createLabel(source)
-    if source.bind then
-        return source.bind
-    end
+function mt:doLabel(source)
     local name = source[1]
-    if not self.chunk.labels[name] then
-        local label = {
-            type = 'label',
-            key = name,
-        }
-        self.chunk.labels[name] = label
-        self.results.labels[#self.results.labels+1] = label
+    self:createLabel(name, source)
+end
+
+function mt:createLabel(name, source)
+    local label = self:bindLabel(source)
+    if label then
+        self:saveLabel(label)
+        return label
     end
-    source.bind = self.chunk.labels[name]
-    self.results.sources[#self.results.sources+1] = source
-    return self.chunk.labels[name]
+
+    label = createLabel(name, source)
+    self:saveLabel(label)
+    self:bindLabel(source, label)
+    return label
+end
+
+function mt:doGoTo(source)
+    local name = source[1]
+    local label = self:loadLabel(name)
+    if not label then
+        label = self:createLabel(name, source)
+    end
+end
+
+function mt:setOne(var, value)
+    if not value then
+        value = createValue('nil')
+    end
+    self:instantSource(var)
+    if var.type == 'name' then
+    else
+    end
 end
 
 function mt:doSet(action)
     if not action[2] then
         return
     end
-    local n = self:countList(action[1])
     -- 要先计算值
-    local values = self:unpackList(action[2], n)
-    self:forList(action[1], function (key)
-        local value = table.remove(values, 1)
-        if key.type == 'name' then
-            self:setName(key[1], key, value)
-        elseif key.type == 'simple' then
-            local field = self:getSimple(key, 'field')
-            self:setValue(field, value, key[#key])
-        end
+    local vars = action[1]
+    local exps = action[2]
+    local value = self:getExp(exps)
+    local values = {}
+    if value.type == 'multi' then
+        value:eachValue(function (i, v)
+            values[i] = v
+        end)
+    else
+        values[1] = value
+    end
+    local i = 0
+    self:forList(vars, function (var)
+        i = i + 1
+        self:setOne(var, values[i])
     end)
 end
 
@@ -1160,11 +1180,9 @@ function mt:doAction(action)
     elseif tp == 'return' then
         self:doReturn(action)
     elseif tp == 'label' then
-        local label = self:createLabel(action)
-        self:addInfo(label, 'set', action)
+        self:doLabel(action)
     elseif tp == 'goto' then
-        local label = self:createLabel(action)
-        self:addInfo(label, 'goto', action)
+        self:doGoTo(action)
     elseif tp == 'set' then
         self:doSet(action)
     elseif tp == 'local' then
@@ -1242,12 +1260,21 @@ function mt:eachLocal(callback)
     return self.currentFunction:eachLocal(callback)
 end
 
+function mt:saveLabel(label)
+    self.currentFunction:saveLabel(label)
+end
+
+function mt:loadLabel(name)
+    return self.currentFunction:loadLocal(name)
+end
+
 function mt:getUri()
     return self.currentFunction:getUri()
 end
 
 function mt:instantSource(source)
     if instantSource(source) then
+        source:setUri(self:getUri())
         self.sources[#self.sources+1] = source
     end
 end
@@ -1259,14 +1286,22 @@ function mt:bindLocal(source, loc)
     self:instantSource(source)
     if loc then
         source:bindLocal(loc)
-        source:setUri(self:getUri())
     else
         return source:bindLocal()
     end
 end
 
+function mt:bindLabel(source, label)
+    self:instantSource(source)
+    if label then
+        source:bindLabel(label)
+    else
+        return source:bindLabel()
+    end
+end
+
 function mt:createLocal(key, source, value)
-    local loc =  self:bindLocal(source)
+    local loc = self:bindLocal(source)
     if loc then
         self:saveLocal(key, loc)
         return loc
@@ -1296,8 +1331,6 @@ end
 
 local function compile(ast, lsp, uri)
     local vm = setmetatable({
-        strings= {},
-        sources= {},
         funcs  = {},
         main   = nil,
         env    = nil,

@@ -1,5 +1,9 @@
 local function getDefaultSource()
-    return { start = 0, finish = 0 }
+    return {
+        start = 0,
+        finish = 0,
+        uri = '',
+    }
 end
 
 local mt = {}
@@ -14,7 +18,7 @@ function mt:getValue()
     return self._value
 end
 
-function mt:inference(tp, rate)
+function mt:setType(tp, rate)
     if type(tp) == 'table' then
         for _, ctp in ipairs(tp) do
             self:inference(ctp, rate)
@@ -52,175 +56,119 @@ function mt:getType()
     return mType or 'any'
 end
 
-function mt:setMetaTable(metatable, source)
-    if not self._meta then
-        self._meta = {}
-    end
-    local uri = source and source.uri or ''
-    self._meta[uri] = metatable
-end
-
-function mt:createField(name, source)
-    local field = {
-        type   = 'field',
-        key    = name,
-        uris   = {},
-    }
-
+function mt:rawSet(index, value)
     if not self._child then
         self._child = {}
     end
-    self._child[name] = field
-
-    local uri = source and source.uri or ''
-    field.uris[uri] = true
-
-    self:inference('table', 0.5)
-
-    return field
+    if self._child[index] then
+        self._child[index]:mergeValue(value)
+    else
+        self._child[index] = value
+    end
 end
 
-function mt:rawGetField(name, source)
+function mt:rawGet(index)
     if not self._child then
         return nil
     end
-    local field = self._child[name]
-    if not field then
-        return nil
-    end
-
-    local uri = source and source.uri or ''
-    field.uris[uri] = true
-
-    return field
+    return self._child[index]
 end
 
-function mt:getMeta(name, source)
-    if not self._meta then
-        return nil
-    end
-    local uri = source and source.uri or ''
-    if self._meta[uri] then
-        local meta = self._meta[uri]:rawGetField(name, source)
-        if meta then
-            return meta
-        end
-    end
-    for _, indexValue in pairs(self._meta) do
-        local meta = indexValue:rawGetField(name, source)
-        if meta then
-            return meta
-        end
-    end
-    return nil
+function mt:setChild(index, value)
+    self:rawSet(index, value)
 end
 
-function mt:getChild()
-    if not self._child then
-        self._child = {}
+function mt:getChild(index, mark)
+    local value = self:rawGet(index)
+    if value then
+        return value
     end
-    return self._child
-end
-
-function mt:setChild(child)
-    self._child = child
-end
-
-function mt:getField(name, source, mark)
-    local field = self:rawGetField(name, source)
-    if not field then
-        local indexMeta = self:getMeta('__index', source)
-        if not indexMeta then
-            return nil
-        end
-        if not mark then
-            mark = {}
-        end
-        if mark[indexMeta] then
-            return nil
-        end
-        mark[indexMeta] = true
-        return indexMeta.value:getField(name, source, mark)
-    end
-    return field
-end
-
-function mt:rawEachField(callback)
-    if not self._child then
-        return nil
-    end
-    for name, field in pairs(self._child) do
-        local res = callback(name, field)
-        if res ~= nil then
-            return res
-        end
-    end
-    return nil
-end
-
-function mt:eachField(callback, stack, mark)
-    local res = self:rawEachField(callback)
-    if res ~= nil then
-        return res
-    end
-    local indexMeta = self:getMeta('__index')
-    if not indexMeta then
+    local method = self:getMetaMethod('__index')
+    if not method then
         return nil
     end
     if not mark then
         mark = {}
     end
-    if mark[indexMeta] then
+    if mark[method] then
         return nil
     end
-    mark[indexMeta] = true
-    return indexMeta.value:eachField(callback, stack, mark)
+    mark[method] = true
+    return method:getChild(index, mark)
 end
 
-function mt:removeUri(uri)
-    if self._child then
-        for name, field in pairs(self._child) do
-            field.uris[uri] = nil
-            if next(field.uris) then
-                field.value:removeUri(uri)
-            else
-                self._child[name] = nil
+function mt:setMetaTable(metatable)
+    self._meta = metatable
+end
+
+function mt:getMetaTable()
+    return self._meta
+end
+
+function mt:getMetaMethod(name)
+    local meta = self:getMetaTable()
+    if not meta then
+        return nil
+    end
+    return meta:rawGet(name)
+end
+
+function mt:rawEach(callback, foundIndex)
+    if not self._child then
+        return nil
+    end
+    for index, value in pairs(self._child) do
+        if foundIndex then
+            if foundIndex[index] then
+                goto CONTINUE
             end
+            foundIndex[index] = true
         end
-    end
-    if self._info then
-        self._info[uri] = nil
-    end
-    if self._meta then
-        self._meta[uri] = nil
-    end
-end
-
-function mt:getDeclarat()
-    if not self._info then
-        return nil
-    end
-    local uri = self.uri or ''
-    local infos = self._info[uri]
-    if not infos then
-        return nil
-    end
-    for _, info in ipairs(infos) do
-        if info.type == 'local' then
-            return info.source
+        local res = callback(index, value)
+        if res ~= nil then
+            return res
         end
-    end
-    for _, info in ipairs(infos) do
-        if info.type == 'return' then
-            return info.source
-        end
-    end
-    for _, info in ipairs(infos) do
-        if info.type == 'set' then
-            return info.source
-        end
+        ::CONTINUE::
     end
     return nil
+end
+
+function mt:eachChild(callback, mark, foundIndex)
+    if not foundIndex then
+        foundIndex = {}
+    end
+    local res = self:rawEach(callback, foundIndex)
+    if res ~= nil then
+        return res
+    end
+    local method = self:getMetaMethod('__index')
+    if not method then
+        return nil
+    end
+    if not mark then
+        mark = {}
+    end
+    if mark[method] then
+        return nil
+    end
+    mark[method] = true
+    return method:eachChild(callback, mark, foundIndex)
+end
+
+function mt:mergeValue(value)
+    if value._type then
+        for tp, rate in pairs(value._type) do
+            self:setType(tp, rate)
+        end
+    end
+    if value._child then
+        if not self._child then
+            self._child = {}
+        end
+        for k, v in pairs(value._child) do
+            self._child[k] = v
+        end
+    end
 end
 
 function mt:addInfo(tp, source)
@@ -230,15 +178,10 @@ function mt:addInfo(tp, source)
     if not self._info then
         self._info = {}
     end
-    local uri = source and source.uri or ''
-    if not self._info[uri] then
-        self._info[uri] = {}
-    end
-    self._info[uri][#self._info[uri]+1] = {
+    self._info[#self._info+1] = {
         type = tp,
         source = source or getDefaultSource(),
     }
-    return self
 end
 
 function mt:eachInfo(callback)
@@ -256,24 +199,21 @@ function mt:eachInfo(callback)
     return nil
 end
 
-return function (tp, source, value)
+return function (tp, source, v)
     if tp == '...' then
         error('Value type cant be ...')
     end
     -- TODO lib里的多类型
     local self = setmetatable({
         source = source or getDefaultSource(),
-        uri = source and source.uri or '',
+        _value = v,
     }, mt)
-    if value ~= nil then
-        self:setValue(value)
-    end
     if type(tp) == 'table' then
         for i = 1, #tp do
-            self:inference(tp[i], 0.9)
+            self:setType(tp[i], 1.0 / #tp)
         end
     else
-        self:inference(tp, 1.0)
+        self:setType(tp, 1.0)
     end
     return self
 end

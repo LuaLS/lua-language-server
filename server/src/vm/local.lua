@@ -35,7 +35,24 @@ function mt:eachInfo(callback)
     end
 end
 
+function mt:setFlag(name, v)
+    if not self._flag then
+        self._flag = {}
+    end
+    self._flag[name] = v
+end
+
+function mt:getFlag(name)
+    if not self._flag then
+        return nil
+    end
+    return self._flag[name]
+end
+
 return function (name, source, value)
+    if not value then
+        error('Local must has a value')
+    end
     local self = setmetatable({
         name = name,
         source = source or getDefaultSource(),

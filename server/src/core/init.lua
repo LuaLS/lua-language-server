@@ -11,7 +11,6 @@ local api = {
     signature      = require 'core.signature',
     documentSymbol = require 'core.document_symbol',
     global         = require 'core.global',
-    vm             = require 'core.vm',
 }
 
 return api

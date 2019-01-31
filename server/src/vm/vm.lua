@@ -1,9 +1,9 @@
-local env = require 'core.env'
 local library = require 'core.library'
-local createValue = require 'core.value'
-
-local LibraryValue = {}
-local LibraryChild = {}
+local createValue = require 'vm.value'
+local createLocal = require 'vm.local'
+local createFunction = require 'vm.function'
+local instantSource = require 'vm.source'
+local buildGlobal = require 'vm.global'
 
 local mt = {}
 mt.__index = mt
@@ -12,7 +12,7 @@ function mt:getDefaultSource()
     return {
         start = 0,
         finish = 0,
-        uri = self.chunk.func.uri,
+        uri = self:getUri(),
     }
 end
 
@@ -32,54 +32,6 @@ function mt:createDummyVar(source, value)
         source.isLocal = true
     end
 
-    self:setValue(loc, value, source)
-    return loc
-end
-
-function mt:createLocal(key, source, value)
-    if source and source.bind then
-        self.scope.locals[key] = source.bind
-        return source.bind
-    end
-    local loc = {
-        type = 'local',
-        key = key,
-        source = source or self:getDefaultSource(),
-        close = self.scope.block.finish,
-    }
-
-    if source then
-        source.bind = loc
-        self.results.sources[#self.results.sources+1] = source
-        source.isLocal = true
-        source.uri = self.chunk.func.uri
-    end
-
-    local shadow = self.scope.locals[key]
-    if shadow then
-        if source then
-            shadow.close = source.start - 1
-        end
-        local group
-        if shadow.shadow then
-            group = shadow.shadow
-        else
-            group = { shadow }
-            shadow.shadow = group
-        end
-        group[#group+1] = loc
-        loc.shadow = group
-    end
-
-    self.scope.locals[key] = loc
-    self.results.locals[#self.results.locals+1] = loc
-
-    if source then
-        self:addInfo(loc, 'local', source, value)
-        if value then
-            value:addInfo('local', source)
-        end
-    end
     self:setValue(loc, value, source)
     return loc
 end
@@ -634,77 +586,6 @@ function mt:createValue(tp, source, v)
     if lib then
         self:getLibChild(value, lib, 'object')
     end
-    return value
-end
-
-function mt:getLibChild(value, lib, parentType)
-    if lib.child then
-        if LibraryChild[lib] then
-            value:setChild(LibraryChild[lib])
-            return
-        end
-        -- 要先声明缓存，以免死循环
-        LibraryChild[lib] = value:getChild()
-        for fName, fLib in pairs(lib.child) do
-            local fField = self:createField(value, fName)
-            local fValue = self:getLibValue(fLib, parentType)
-            self:setValue(fField, fValue)
-        end
-    end
-end
-
-function mt:getLibValue(lib, parentType, v)
-    if LibraryValue[lib] then
-        return LibraryValue[lib]
-    end
-    local tp = lib.type
-    local value
-    if     tp == 'table' then
-        value = self:createValue('table')
-    elseif tp == 'function' then
-        value = self:createValue('function')
-        if lib.returns then
-            local dots
-            for i, rtn in ipairs(lib.returns) do
-                self:setFunctionReturn(value, i, self:getLibValue(rtn, parentType))
-                if rtn.type == '...' then
-                    dots = true
-                end
-            end
-            if not dots then
-                value.maxReturns = #lib.returns
-            end
-        else
-            value.maxReturns = 0
-        end
-        if lib.args then
-            local values = {}
-            for i, arg in ipairs(lib.args) do
-                values[i] = self:getLibValue(arg, parentType) or self:createValue('any')
-            end
-            -- TODO 确定参数类型
-        end
-    elseif tp == 'string' then
-        value = self:createValue('string', nil, v or lib.value)
-    elseif tp == 'boolean' then
-        value = self:createValue('boolean', nil, v or lib.value)
-    elseif tp == 'number' then
-        value = self:createValue('number', nil, v or lib.value)
-    elseif tp == 'integer' then
-        value = self:createValue('integer', nil, v or lib.value)
-    elseif tp == 'nil' then
-        value = self:createValue('nil')
-    elseif tp == '...' then
-        value = self:createValue('any')
-    else
-        value = self:createValue(tp or 'any')
-    end
-    LibraryValue[lib] = value
-    value.lib = lib
-    value.parentType = parentType
-
-    self:getLibChild(value, lib, parentType)
-
     return value
 end
 
@@ -1373,68 +1254,90 @@ function mt:doActions(actions)
     end
 end
 
-function mt:getGlobalValue()
-    if self.lsp and self.lsp.globalValue then
-        return self.lsp.globalValue
+function mt:createFunction(source)
+    local value = createValue('function', source)
+    local func = createFunction(source)
+    value:setFunction(func)
+    if source:getUri() == self.uri then
+        self.funcs[#self.funcs+1] = func
     end
-    local globalValue = self:createValue('table')
-    globalValue.GLOBAL = true
-    for name, lib in pairs(library.global) do
-        local field = self:createField(globalValue, name)
-        local value = self:getLibValue(lib, 'global')
-        self:setValue(field, value)
-    end
-    if self.lsp then
-        self.lsp.globalValue = globalValue
-    end
-    return globalValue
+    return value
 end
 
-function mt:createEnvironment()
-    self.scope.block = { start = 0, finish = math.maxinteger }
+function mt:setCurrentFunction(func)
+    self.currentFunction = func
+end
+
+function mt:saveLocal(name, loc)
+    self.currentFunction:saveLocal(name, loc)
+end
+
+function mt:getUri()
+    return self.currentFunction:getUri()
+end
+
+function mt:instantSource(source)
+    if instantSource(source) then
+        self.sources[#self.sources+1] = source
+    end
+end
+
+function mt:bindLocal(source, loc)
+    if not source then
+        return
+    end
+    self:instantSource(source)
+    if loc then
+        source:bindLocal(loc)
+        source:setUri(self:getUri())
+    else
+        return source:bindLocal()
+    end
+end
+
+function mt:createLocal(key, source, value)
+    local loc =  self:bindLocal(source)
+    if loc then
+        self:saveLocal(key, loc)
+        return loc
+    end
+
+    if not value then
+        value = createValue('nil', self:getDefaultSource())
+    end
+
+    loc = createLocal(key, source, value)
+    self:saveLocal(key, loc)
+    self:bindLocal(source, loc)
+    return loc
+end
+
+function mt:createEnvironment(ast)
     -- 整个文件是一个函数
-    self.chunk.func = self:buildFunction()
-    self.chunk.func.uri = self.uri
-    self.results.main = self.chunk.func
-    -- 隐藏的上值`_ENV`
-    local evnField = self:createLocal('_ENV')
-    evnField.hide = true
-    -- 隐藏的参数`...`
-    self:createDots(1)
+    self.main = self:createFunction(ast)
+    self:setCurrentFunction(self.main)
     -- 全局变量`_G`
-    local globalValue = self:getGlobalValue()
-    -- 使用_G初始化_ENV
-    self:setValue(evnField, globalValue)
-    self.env = globalValue
+    local global = buildGlobal(self.lsp)
+    -- 隐藏的上值`_ENV`
+    local env = self:createLocal('_ENV', nil, global)
+    env:setFlag('hide', true)
+    self.env = env
 end
 
 local function compile(ast, lsp, uri)
     local vm = setmetatable({
-        scope   = env {
-            locals = {},
-        },
-        chunk   = env {
-            labels = {},
-        },
-        results = {
-            locals = {},
-            labels = {},
-            funcs  = {},
-            calls  = {},
-            strings= {},
-            infos  = {},
-            sources= {},
-            main   = nil,
-        },
-        lsp          = lsp,
-        uri          = uri or '',
+        strings= {},
+        sources= {},
+        funcs  = {},
+        main   = nil,
+        env    = nil,
+        lsp    = lsp,
+        uri    = uri or '',
     }, mt)
 
     -- 创建初始环境
-    vm:createEnvironment()
-
-    -- 执行代码
-    vm:doActions(ast)
+    ast.uri = vm.uri
+    vm:createEnvironment(ast)
 
     -- 检查所有没有调用过的函数，调用一遍
     vm:callLeftFuncions()

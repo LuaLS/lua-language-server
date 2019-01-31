@@ -21,7 +21,7 @@ end
 function mt:setType(tp, rate)
     if type(tp) == 'table' then
         for _, ctp in ipairs(tp) do
-            self:inference(ctp, rate)
+            self:setType(ctp, rate)
         end
         return
     end
@@ -166,11 +166,17 @@ function mt:mergeValue(value)
             self._child[k] = v
         end
     end
+    for _, info in ipairs(value) do
+        self[#self+1] = info
+    end
     if value._meta then
         self._meta = value._meta
     end
-    for _, info in ipairs(value) do
-        self[#self+1] = info
+    if value._func then
+        self._func = value._func
+    end
+    if value._lib then
+        self._lib = value._lib
     end
 end
 
@@ -194,13 +200,25 @@ function mt:eachInfo(callback)
     return nil
 end
 
-return function (tp, source, v)
+function mt:setFunction(func)
+    self._func = func
+    self:setType('function', 1.0)
+end
+
+function mt:setLib(lib)
+    self._lib = lib
+end
+
+function mt:getLib()
+    return self._lib
+end
+
+return function (tp, source)
     if tp == '...' then
         error('Value type cant be ...')
     end
     local self = setmetatable({
         source = source or getDefaultSource(),
-        _value = v,
         _type = {},
     }, mt)
     if type(tp) == 'table' then

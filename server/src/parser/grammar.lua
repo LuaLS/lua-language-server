@@ -198,7 +198,7 @@ UnaryOp     <-  {} {'not' Cut / '#' / '~' / '-'}
 
 PL          <-  Sp '('
 PR          <-  Sp ')'
-BL          <-  Sp '['
+BL          <-  Sp '[' !'[' !'='
 BR          <-  Sp ']'
 TL          <-  Sp '{'
 TR          <-  Sp '}'
@@ -339,7 +339,7 @@ Table       <-  Sp ({} TL TableFields? DirtyTR)
 TableFields <-  (TableSep {} / TableField)+
 TableSep    <-  COMMA / SEMICOLON
 TableField  <-  NewIndex / NewField / Exp
-NewIndex    <-  Sp ({} BL !BL !ASSIGN DirtyExp DirtyBR NeedAssign DirtyExp)
+NewIndex    <-  Sp ({} BL DirtyExp DirtyBR NeedAssign DirtyExp)
             ->  NewIndex
 NewField    <-  (MustName ASSIGN DirtyExp)
             ->  NewField

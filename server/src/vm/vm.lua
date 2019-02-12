@@ -38,45 +38,6 @@ function mt:createDummyVar(source, value)
     return loc
 end
 
-function mt:createField(value, index, source)
-    if source and source.bind then
-        return source.bind
-    end
-    local field = value:createField(index, source)
-    if source then
-        source.bind = field
-        self.results.sources[#self.results.sources+1] = source
-    end
-    if value.GLOBAL then
-        field.GLOBAL = true
-    end
-    if self.lsp and self:isGlobal(field) then
-        self.lsp.global:markSet(self.chunk.func.uri)
-    end
-    field.parentValue = value
-
-    return field
-end
-
-function mt:getField(value, index, source)
-    local field = value:getField(index, source)
-    if not field then
-        return nil
-    end
-    if source then
-        source.bind = field
-        self.results.sources[#self.results.sources+1] = source
-    end
-    if value.GLOBAL then
-        field.GLOBAL = true
-    end
-    if self.lsp and self:isGlobal(field) then
-        self.lsp.global:markGet(self.chunk.func.uri)
-    end
-
-    return field
-end
-
 function mt:createArg(key, source, value)
     local loc = self:createLocal(key, source, value)
     if source then
@@ -484,10 +445,6 @@ function mt:call(func, values, source)
     return self:getFunctionReturns(func)
 end
 
-function mt:getCurrentFunction()
-    return self.chunk.func
-end
-
 function mt:setFunctionReturn(func, index, value)
     func.hasReturn = true
     if not func.returns then
@@ -539,49 +496,36 @@ function mt:createValue(tp, source, v)
 end
 
 function mt:getName(name, source)
-    if source and source.bind then
-        return source.bind
+    if source then
+        self:instantSource(source)
+        if source:bindLocal() then
+            return source:bindLocal()
+        end
     end
-    local loc = self.scope.locals[name]
+    local loc = self:loadLocal(name)
     if loc then
-        source.bind = loc
-        self.results.sources[#self.results.sources+1] = source
+        source:bindLocal(loc)
         return loc
     end
-    source.uri = self.chunk.func.uri
-    local ENV = self.scope.locals._ENV
-    local ENVValue = self:getValue(ENV, source)
-    local global = self:getField(ENVValue, name, source)
+    local ENV = self:loadLocal('_ENV')
+    local ENVValue = ENV:getValue()
+    local global = ENVValue:getChild(name)
     if global then
-        global.parent = ENV
-        return global
-    else
-        global = self:createField(ENVValue, name, source)
-        global.parent = ENV
         return global
     end
 end
 
 function mt:setName(name, source, value)
-    source.uri = self.chunk.func.uri
-    local loc = self.scope.locals[name]
+    self:instantSource(source)
+    local loc = self:loadLocal(name)
     if loc then
-        source.bind = loc
-        self.results.sources[#self.results.sources+1] = source
-        self:setValue(loc, value, source)
+        source:bindLocal(loc)
+        loc:setValue(value)
         return
     end
-    local ENV = self.scope.locals._ENV
-    local ENVValue = self:getValue(ENV, source)
-    local global = self:getField(ENVValue, name, source)
-    if global then
-        global.parent = ENV
-        self:setValue(global, value, source)
-    else
-        global = self:createField(ENVValue, name, source)
-        global.parent = ENV
-        self:setValue(global, value, source)
-    end
+    local ENV = self:loadLocal('_ENV')
+    local ENVValue = ENV:getValue()
+    ENVValue:setChild(name, value)
 end
 
 function mt:getIndex(obj)
@@ -664,6 +608,14 @@ function mt:unpackList(list, expect)
         end
     end
     return res
+end
+
+function mt:getFirstInMulti(multi)
+    if multi.type == 'multi' then
+        return multi[1]
+    else
+        return multi
+    end
 end
 
 function mt:getSimple(simple, mode)
@@ -934,7 +886,7 @@ function mt:getDots()
 end
 
 function mt:getExp(exp)
-    exp.uri = self.chunk.func.uri
+    self:instantSource(exp)
     local tp = exp.type
     if     tp == 'nil' then
         return self:createValue('nil', exp)
@@ -989,7 +941,7 @@ function mt:doReturn(action)
     if #action == 0 then
         return
     end
-    local value = self:getExp(action[2])
+    local value = self:getExp(action[1])
     local func = self:getCurrentFunction()
     if value.type == 'multi' then
         value:eachValue(function (i, v)
@@ -1060,17 +1012,27 @@ function mt:doSet(action)
 end
 
 function mt:doLocal(action)
-    local n = self:countList(action[1])
+    local vars = action[1]
+    local exps = action[2]
     local values
-    if action[2] then
-        values = self:unpackList(action[2], n)
+    if exps then
+        local value = self:getExp(exps)
+        values = {}
+        if value.type == 'multi' then
+            value:eachValue(function (i, v)
+                values[i] = v
+            end)
+        else
+            values[1] = value
+        end
     end
-    self:forList(action[1], function (key)
+    local i = 0
+    self:forList(vars, function (key)
+        i = i + 1
         local value
         if values then
-            value = table.remove(values, 1)
+            value = values[i]
         end
-        key.uri = self.chunk.func.uri
         self:createLocal(key[1], key, value)
     end)
 end
@@ -1089,7 +1051,7 @@ end
 
 function mt:doLoop(action)
 
-    local min = self:unpackList(action.min)[1]
+    local min = self:getFirstInMulti(self:getExp(action.min))
     self:getExp(action.max)
     if action.step then
         self:getExp(action.step)
@@ -1240,8 +1202,8 @@ function mt:callLeftFuncions()
     end
 end
 
-function mt:setCurrentFunction(value)
-    self.currentFunction = value:getFunction()
+function mt:setCurrentFunction(func)
+    self.currentFunction = func
 end
 
 function mt:getCurrentFunction()
@@ -1269,7 +1231,7 @@ function mt:loadLabel(name)
 end
 
 function mt:getUri()
-    return self.currentFunction:getUri()
+    return self.currentFunction and self.currentFunction:getUri() or self.uri
 end
 
 function mt:instantSource(source)
@@ -1320,7 +1282,7 @@ end
 function mt:createEnvironment(ast)
     -- 整个文件是一个函数
     self.main = self:createFunction(ast)
-    self:setCurrentFunction(self.main)
+    self:setCurrentFunction(self.main:getFunction())
     -- 全局变量`_G`
     local global = buildGlobal(self.lsp)
     -- 隐藏的上值`_ENV`
@@ -1331,11 +1293,12 @@ end
 
 local function compile(ast, lsp, uri)
     local vm = setmetatable({
-        funcs  = {},
-        main   = nil,
-        env    = nil,
-        lsp    = lsp,
-        uri    = uri or '',
+        funcs   = {},
+        sources = {},
+        main    = nil,
+        env     = nil,
+        lsp     = lsp,
+        uri     = uri or '',
     }, mt)
 
     -- 创建初始环境

@@ -19,61 +19,12 @@ function mt:getDefaultSource()
     }
 end
 
-function mt:createDummyVar(source, value)
-    if source and source.bind then
-        return source.bind
-    end
-    local loc = {
-        type = 'local',
-        key = '',
-        source = source or self:getDefaultSource(),
-    }
-
-    if source then
-        source.bind = loc
-        self.results.sources[#self.results.sources+1] = source
-        source.isLocal = true
-    end
-
-    self:setValue(loc, value, source)
-    return loc
-end
-
-function mt:createArg(key, source, value)
-    local loc = self:createLocal(key, source, value)
-    if source then
-        source.isArg = true
-    end
-    return loc
-end
-
 function mt:scopePush()
     self.currentFunction:push()
 end
 
 function mt:scopePop()
     self.currentFunction:pop()
-end
-
-function mt:addInfo(var, type, source, value)
-    if not source then
-        error('Miss source')
-    end
-    if not source.start then
-        error('Miss start: ' .. table.dump(source))
-    end
-    if var.type ~= 'local' and var.type ~= 'field' and var.type ~= 'label' then
-        error('Must be local, field or label: ' .. table.dump(var))
-    end
-    local info = {
-        type = type,
-        source = source or self:getDefaultSource(),
-        value = value,
-    }
-    if not self.results.infos[var] then
-        self.results.infos[var] = {}
-    end
-    self.results.infos[var][#self.results.infos[var]+1] = info
 end
 
 function mt:eachInfo(var, callback)
@@ -124,7 +75,7 @@ function mt:buildTable(source)
             local value = self:getExp(obj)
             if value.type == 'multi' then
                 if index == #source then
-                    value:eachValue(function (v)
+                    value:eachValue(function (_, v)
                         n = n + 1
                         tbl:setChild(n, v)
                     end)
@@ -143,36 +94,6 @@ function mt:buildTable(source)
         end
     end
     return tbl
-end
-
-function mt:setValue(var, value, source)
-    if value and value.type == 'list' then
-        error('Cant set value list')
-    end
-    value = value or self:createValue('any', source)
-    if source and source.start then
-        self:addInfo(var, 'set', source, value)
-        value:addInfo('set', source)
-    end
-    if var.GLOBAL then
-        value.GLOBAL = true
-    end
-    var.value = value
-    return value
-end
-
-function mt:getValue(var, source)
-    if not var.value then
-        var.value = self:createValue('any', source or self:getDefaultSource())
-        if var.GLOBAL then
-            var.value.GLOBAL = true
-        end
-    end
-    return var.value
-end
-
-function mt:isGlobal(field)
-    return field.GLOBAL == true
 end
 
 function mt:runFunction(func)
@@ -229,38 +150,6 @@ function mt:forList(list, callback)
     end
 end
 
-function mt:countList(list)
-    if not list then
-        return 0
-    end
-    if list.type == 'list' then
-        return #list
-    end
-    return 1
-end
-
-function mt:setFunctionArg(func, values)
-    if not func.argValues then
-        func.argValues = {}
-    end
-    for i = 1, #values do
-        func.argValues[i] = values[i]
-    end
-    if func.dots then
-        local dotsIndex = #func.args
-        for i = dotsIndex, #values do
-            func.dots:set(i - dotsIndex + 1, values[i])
-        end
-    end
-end
-
-function mt:getFunctionArg(func, i)
-    if not func.argValues then
-        func.argValues = {}
-    end
-    return func.argValues[i]
-end
-
 function mt:callSetMetaTable(func, values, source)
     if not values[1] then
         values[1] = self:createValue('any')
@@ -268,7 +157,7 @@ function mt:callSetMetaTable(func, values, source)
     if not values[2] then
         values[2] = self:createValue('any')
     end
-    self:setFunctionReturn(func, 1, values[1])
+    func:setReturn(1, values[1])
     values[1]:setMetaTable(values[2], source)
 end
 
@@ -348,7 +237,7 @@ function mt:callRequire(func, values)
     local lib = library.library[str]
     if lib then
         local value = self:getLibValue(lib, 'library')
-        self:setFunctionReturn(func, 1, value)
+        func:setReturn(1, value)
         return
     else
         local requireValue = self:tryRequireOne(values[1], 'require')
@@ -356,7 +245,7 @@ function mt:callRequire(func, values)
             requireValue = self:createValue('boolean')
             requireValue.isRequire = true
         end
-        self:setFunctionReturn(func, 1, requireValue)
+        func:setReturn(1, requireValue)
     end
 end
 
@@ -373,7 +262,7 @@ function mt:callLoadFile(func, values)
         requireValue = self:createValue('any')
         requireValue.isRequire = true
     end
-    self:setFunctionReturn(func, 1, requireValue)
+    func:setReturn(1, requireValue)
 end
 
 function mt:callDoFile(func, values)
@@ -389,11 +278,15 @@ function mt:callDoFile(func, values)
         requireValue = self:createValue('any')
         requireValue.isRequire = true
     end
-    self:setFunctionReturn(func, 1, requireValue)
+    func:setReturn(1, requireValue)
 end
 
-function mt:call(func, values, source)
-    local lib = func.lib
+function mt:call(value, values, source)
+    local lib = value.lib
+    local func = value:getFunction()
+    if not func then
+        return
+    end
     if lib then
         if lib.args then
             for i, arg in ipairs(lib.args) do
@@ -406,9 +299,9 @@ function mt:call(func, values, source)
         if lib.returns then
             for i, rtn in ipairs(lib.returns) do
                 if rtn.type == '...' then
-                    self:getFunctionReturns(func, i):setType('any', 0.0)
+                    func:getReturn(i):setType('any', 0.0)
                 else
-                    self:getFunctionReturns(func, i):setType(rtn.type or 'any', 1.0)
+                    func:getReturn(i):setType(rtn.type or 'any', 1.0)
                 end
             end
         end
@@ -425,43 +318,17 @@ function mt:call(func, values, source)
         end
     else
         if not func.built then
-            self:setFunctionReturn(func, 1, self:createValue('any', source))
+            func:setReturn(1, self:createValue('any', source))
         end
     end
 
     if not source.hasRuned and func.built then
         source.hasRuned = true
-        self:setFunctionArg(func, values)
-        self:runFunction(func)
+        func:setArgs(values)
+        self:runFunction(value)
     end
 
-    return self:getFunctionReturns(func)
-end
-
-function mt:setFunctionReturn(func, index, value)
-    func.hasReturn = true
-    if not func.returns then
-        func.returns = createMulti()
-    end
-    if value then
-        func.returns[index] = value
-    else
-        func.returns[index] = self:createValue('any', func.source)
-    end
-end
-
-function mt:getFunctionReturns(func, i)
-    if func.maxReturns and i and func.maxReturns < i then
-        return self:createValue('nil')
-    end
-    if not func.returns then
-        func.returns = createMulti()
-    end
-    if i then
-        return func.returns:get(i)
-    else
-        return func.returns
-    end
+    return func:getReturn()
 end
 
 function mt:createValue(tp, source)
@@ -528,14 +395,12 @@ end
 function mt:unpackDots(res, expect)
     local dots = self:loadDots(expect)
     for _, v in ipairs(dots) do
-        res[#res+1] = v
+        res:push(v)
     end
 end
 
 function mt:unpackList(list, expect)
-    local res = {
-        type = 'list',
-    }
+    local res = createMulti()
     if not list then
         return res
     end
@@ -546,33 +411,28 @@ function mt:unpackList(list, expect)
                 break
             end
             local value = self:getExp(exp)
-            if value.type == 'list' then
+            if value.type == 'multi' then
                 if i == #list then
-                    for _, v in ipairs(value) do
-                        res[#res+1] = v
-                    end
+                    value:eachValue(function (_, v)
+                        res:push(v)
+                    end)
                 else
-                    res[#res+1] = value[1]
+                    res:push(self:getFirstInMulti(value))
                 end
             else
-                res[#res+1] = value
+                res:push(value)
             end
         end
     elseif list.type == '...' then
         self:unpackDots(res, expect)
     else
         local value = self:getExp(list)
-        if value.type == 'list' then
-            for i, v in ipairs(value) do
-                res[i] = v
-            end
+        if value.type == 'multi' then
+            value:eachValue(function (_, v)
+                res:push(v)
+            end)
         else
-            res[1] = value
-        end
-    end
-    for _, v in ipairs(res) do
-        if v.type == 'list' then
-            error('Unpack list')
+            res:push(value)
         end
     end
     return res
@@ -607,7 +467,7 @@ function mt:getSimple(simple, max)
             if object then
                 table.insert(args, 1, object)
             end
-            value = self:call(func, args, source)
+            value = self:call(func, args, source) or createValue('any')
         elseif source.type == 'index' then
             local child = source[1]
             local index = self:getIndex(child)
@@ -956,8 +816,8 @@ function mt:doIn(action)
     local args = self:unpackList(action.exp)
 
     self:scopePush(action)
-    local func = table.remove(args, 1) or self:createValue('any')
-    local values = self:call(func, args, action)
+    local func = table.remove(args, 1) or createValue('any')
+    local values = self:call(func, args, action) or createMulti()
     self:forList(action.arg, function (arg)
         local value = table.remove(values, 1)
         self:createLocal(arg[1], arg, value)

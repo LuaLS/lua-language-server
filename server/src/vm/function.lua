@@ -1,5 +1,6 @@
-local env = require 'vm.env'
 local createDots = require 'vm.dots'
+local createMulti = require 'vm.multi'
+local createValue = require 'vm.value'
 
 local mt = {}
 mt.__index = mt
@@ -72,10 +73,29 @@ function mt:loadLabel(name)
 end
 
 function mt:setReturn(index, value)
+    self.hasReturn = true
     if not self.returns then
-        self.returns = {}
+        self.returns = createMulti()
     end
-    self.returns[index] = value
+    if value then
+        self.returns[index] = value
+    else
+        self.returns[index] = createValue('any', self.source)
+    end
+end
+
+function mt:getReturn(index)
+    if self.maxReturns and index and self.maxReturns < index then
+        return createValue('nil')
+    end
+    if not self.returns then
+        self.returns = createMulti()
+    end
+    if index then
+        return self.returns:get(index)
+    else
+        return self.returns
+    end
 end
 
 function mt:returnDots(index)
@@ -90,10 +110,6 @@ function mt:loadDots(expect)
         self._dots = createDots()
     end
     return self._dots:get(expect)
-end
-
-function mt:saveUpvalue(name, loc)
-    self.upvalues[name] = loc
 end
 
 function mt:setObject(object)
@@ -145,6 +161,21 @@ function mt:run()
     --        stop = true
     --    end
     --end)
+end
+
+function mt:setArgs(values)
+    if not self.argValues then
+        self.argValues = {}
+    end
+    for i = 1, #values do
+        self.argValues[i] = values[i]
+    end
+    if self.dots then
+        local dotsIndex = #self.args
+        for i = dotsIndex, #values do
+            self.dots:set(i - dotsIndex + 1, values[i])
+        end
+    end
 end
 
 return function (source)

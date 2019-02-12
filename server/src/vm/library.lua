@@ -1,16 +1,10 @@
 local createValue = require 'vm.value'
 local createFunction = require 'vm.function'
 
+local CHILD_CACHE = {}
+
 local buildLibValue
 local buildLibChild
-
-local function getDefaultSource()
-    return {
-        start = 0,
-        finish = 0,
-        uri = '',
-    }
-end
 
 function buildLibValue(lib)
     local tp = lib.type
@@ -53,6 +47,19 @@ function buildLibValue(lib)
     end
 
     return value
+end
+
+function buildLibChild(lib)
+    if CHILD_CACHE[lib] then
+        return CHILD_CACHE[lib]
+    end
+    local child = {}
+    for fName, fLib in pairs(lib.child) do
+        local fValue = buildLibValue(fLib)
+        child[fName] = fValue
+    end
+    CHILD_CACHE[lib] = child
+    return child
 end
 
 return {

@@ -6,6 +6,7 @@ local createFunction = require 'vm.function'
 local instantSource = require 'vm.source'
 local buildGlobal = require 'vm.global'
 local createMulti = require 'vm.multi'
+local libraryBuilder = require 'vm.library'
 
 local mt = {}
 mt.__index = mt
@@ -277,7 +278,7 @@ function mt:getRequire(strValue, destVM)
     -- 获取主函数返回值，注意不能修改对方的环境
     local mainValue
     if main.returns then
-        mainValue = self:selectList(main.returns, 1)
+        mainValue = self:getFirstInMulti(main.returns)
     else
         mainValue = self:createValue('boolean', nil, true)
         mainValue.uri = destVM.uri
@@ -467,7 +468,10 @@ function mt:createValue(tp, source)
     local value = createValue(tp, source)
     local lib = library.object[tp]
     if lib then
-        self:getLibChild(value, lib, 'object')
+        local child = libraryBuilder.child(lib)
+        for k, v in pairs(child) do
+            value:setChild(k, v)
+        end
     end
     return value
 end
@@ -628,18 +632,11 @@ function mt:isTrue(v)
     return true
 end
 
-function mt:selectList(list, n)
-    if list.type ~= 'list' then
-        return list
-    end
-    return list[n] or self:createValue('nil')
-end
-
 function mt:getBinary(exp)
     local v1 = self:getExp(exp[1])
     local v2 = self:getExp(exp[2])
-    v1 = self:selectList(v1, 1)
-    v2 = self:selectList(v2, 1)
+    v1 = self:getFirstInMulti(v1)
+    v2 = self:getFirstInMulti(v2)
     local op = exp.op
     -- TODO 搜索元方法
     if     op == 'or' then
@@ -743,7 +740,7 @@ end
 
 function mt:getUnary(exp)
     local v1 = self:getExp(exp[1])
-    v1 = self:selectList(v1, 1)
+    v1 = self:getFirstInMulti(v1)
     local op = exp.op
     -- TODO 搜索元方法
     if     op == 'not' then

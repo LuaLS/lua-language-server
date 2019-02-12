@@ -1,5 +1,6 @@
 local core = require 'core'
 local parser  = require 'parser'
+local buildVM = require 'vm'
 
 rawset(_G, 'TEST', true)
 
@@ -41,7 +42,7 @@ function TEST(script)
     local new_script = script:gsub('<[!?]', '  '):gsub('[!?]>', '  ')
     local ast = parser:ast(new_script)
     assert(ast)
-    local vm = core.vm(ast)
+    local vm = buildVM(ast)
     assert(vm)
 
     local result = core.findResult(vm, pos)

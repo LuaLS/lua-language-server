@@ -107,45 +107,33 @@ function mt:buildTable(source)
     local n = 0
     for index, obj in ipairs(source) do
         if obj.type == 'pair' then
-            local value = self:getExp(obj[2])
+            local value = self:getFirstInMulti(self:getExp(obj[2]))
             local key   = obj[1]
-            key.uri = self.chunk.func.uri
+            self:instantSource(key)
             if key.index then
                 local index = self:getIndex(key)
-                local field = self:createField(tbl, index, key)
-                if value.type == 'list' then
-                    self:setValue(field, value[1], key)
-                else
-                    self:setValue(field, value, key)
-                end
+                tbl:setChild(index, value)
             else
                 if key.type == 'name' then
-                    local field = self:createField(tbl, key[1], key)
                     key.isIndex = true
-                    if value.type == 'list' then
-                        self:setValue(field, value[1], key)
-                    else
-                        self:setValue(field, value, key)
-                    end
+                    tbl:setChild(key[1], value)
                 end
             end
         else
             local value = self:getExp(obj)
-            if value.type == 'list' then
+            if value.type == 'multi' then
                 if index == #source then
-                    for i, v in ipairs(value) do
-                        local field = self:createField(tbl, n + i)
-                        self:setValue(field, v)
-                    end
+                    value:eachValue(function (v)
+                        n = n + 1
+                        tbl:setChild(n, v)
+                    end)
                 else
                     n = n + 1
-                    local field = self:createField(tbl, n)
-                    self:setValue(field, value[1])
+                    tbl:setChild(n, self:getFirstInMulti(value))
                 end
             else
                 n = n + 1
-                local field = self:createField(tbl, n)
-                self:setValue(field, value)
+                tbl:setChild(n, value)
             end
             -- 处理写了一半的 key = value，把name类的数组元素视为哈希键
             if obj.type == 'name' then
@@ -594,113 +582,6 @@ function mt:getFirstInMulti(multi)
     end
 end
 
-function mt:getSimple(simple, mode)
-    local value = self:getExp(simple[1])
-    local field
-    local parentName
-    local tp = simple[1].type
-    simple[1].uri = self.chunk.func.uri
-    if tp == 'name' then
-        field = self:getName(simple[1][1], simple[1])
-        parentName = field.key
-    elseif tp == 'string' or tp == 'number' or tp == 'nil' or tp == 'boolean' then
-        local v = self:createValue(tp, simple[1], simple[1][1])
-        field = self:createDummyVar(simple[1], v)
-        parentName = '*' .. tp
-    else
-        local v = self:createValue('any', simple[1])
-        field = self:createDummyVar(simple[1], v)
-        parentName = '?'
-    end
-    local object
-    local colon
-    local lastField = field
-    for i = 2, #simple do
-        local obj = simple[i]
-        local tp  = obj.type
-        obj.uri = self.chunk.func.uri
-        obj.isSuffix = true
-        value = self:selectList(value, 1)
-
-        if     tp == 'call' then
-            value:setType('function', 0.9)
-            local args = self:unpackList(obj)
-            if object then
-                table.insert(args, 1, self:getValue(object, obj))
-            end
-            local func = value
-            -- 函数的返回值一定是list
-            value = self:call(func, args, obj)
-            if i < #simple then
-                value = value[1] or self:createValue('any', obj)
-            end
-            self.results.calls[#self.results.calls+1] = {
-                args = obj,
-                lastObj = simple[i-1],
-                nextObj = simple[i+1],
-                func = func,
-            }
-            parentName = parentName .. '(...)'
-        elseif tp == 'index' then
-            value:setType('table', 0.8)
-            value:setType('string', 0.2)
-            local child = obj[1]
-            obj.indexName = parentName
-            local index = self:getIndex(child)
-            if mode == 'value' or i < #simple then
-                field = self:getField(value, index, obj) or self:createField(value, index, obj)
-                value = self:getValue(field, obj)
-                self:addInfo(field, 'get', obj)
-                value:addInfo('get', obj)
-            else
-                field = self:createField(value, index, obj)
-                value = self:getValue(field, obj)
-            end
-            field.parent = lastField
-            if obj[1].type == 'string' then
-                parentName = ('%s[%q]'):format(parentName, index)
-            elseif obj[1].type == 'number' or obj[1].type == 'boolean' then
-                parentName = ('%s[%s]'):format(parentName, index)
-            else
-                parentName = ('%s[?]'):format(parentName)
-            end
-        elseif tp == 'name' then
-            value:setType('table', 0.8)
-            value:setType('string', 0.2)
-            if mode == 'value' or i < #simple then
-                field = self:getField(value, obj[1], obj) or self:createField(value, obj[1], obj)
-                value = self:getValue(field, obj)
-                self:addInfo(field, 'get', obj)
-                value:addInfo('get', obj)
-            else
-                field = self:createField(value, obj[1], obj)
-                value = self:getValue(field, obj)
-            end
-            field.parent = lastField
-            lastField = field
-            obj.object = object
-            obj.parentName = parentName
-            parentName = parentName .. '.' .. field.key
-        elseif tp == ':' then
-            value:setType('table', 0.8)
-            value:setType('string', 0.2)
-            object = field
-            simple[i-1].colon = obj
-            colon = colon
-        elseif tp == '.' then
-            value:setType('table', 0.8)
-            value:setType('string', 0.2)
-            simple[i-1].dot = obj
-        end
-    end
-    if mode == 'value' then
-        return value, object
-    elseif mode == 'field' then
-        return field, object, colon
-    end
-    error('Unknow simple mode: ' .. mode)
-end
-
 function mt:getSimple(simple, max)
     local first = simple[1]
     self:instantSource(first)
@@ -708,7 +589,7 @@ function mt:getSimple(simple, max)
     if not max then
         max = #simple
     elseif max < 0 then
-        max = #simple + 1 - max
+        max = #simple + 1 + max
     end
     local object
     for i = 2, max do
@@ -896,7 +777,6 @@ function mt:getExp(exp)
     if     tp == 'nil' then
         return self:createValue('nil', exp)
     elseif tp == 'string' then
-        self.results.strings[#self.results.strings+1] = exp
         return self:createValue('string', exp, exp[1])
     elseif tp == 'boolean' then
         return self:createValue('boolean', exp, exp[1])
@@ -906,7 +786,7 @@ function mt:getExp(exp)
         local value = self:getName(exp[1], exp)
         return value
     elseif tp == 'simple' then
-        return self:getSimple(exp, 'value')
+        return self:getSimple(exp)
     elseif tp == 'binary' then
         return self:getBinary(exp)
     elseif tp == 'unary' then
@@ -1108,36 +988,40 @@ function mt:doRepeat(action)
 end
 
 function mt:doFunction(action)
+    self:instantSource(action)
     local name = action.name
-    local var, object, colon
-    local source
     if name then
         if name.type == 'simple' then
-            var, object, colon = self:getSimple(name, 'field')
-            source = name[#name]
+            local parent = self:getSimple(name, -2)
+            if name[#name-1].type == ':' then
+                local func = self:buildFunction(action, parent, name[#name-1])
+                local index = self:getIndex(name[#name])
+                parent:setChild(index, func)
+            else
+                local func = self:buildFunction(action)
+                local index = self:getIndex(name[#name])
+                parent:setChild(index, func)
+            end
         else
-            var = self:getName(name[1], name)
-            source = name
+            local func = self:buildFunction(action)
+            self:setName(name[1], action, func)
         end
-    end
-    local func = self:buildFunction(action, object, colon)
-    if var then
-        self:setValue(var, func, source)
+    else
+        self:buildFunction(action)
     end
 end
 
 function mt:doLocalFunction(action)
+    self:instantSource(action)
     local name = action.name
     if name then
         if name.type == 'simple' then
-            local var, object = self:getSimple(name, 'field')
-            local func = self:buildFunction(action, object)
-            self:setValue(var, func, name[#name])
+            self:buildFunction(action)
         else
             local loc = self:createLocal(name[1], name)
             local func = self:buildFunction(action)
             func:addInfo('local', name)
-            self:setValue(loc, func, name[#name])
+            loc:setValue(func)
         end
     end
 end

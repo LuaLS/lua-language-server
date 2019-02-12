@@ -194,38 +194,37 @@ function mt:runFunction(func)
     end
 
     local originFunction = self:getCurrentFunction()
+    self:setCurrentFunction(func)
+    func:push()
 
     self:doActions(func.source)
 
+    func:pop()
     self:setCurrentFunction(originFunction)
 end
 
 function mt:buildFunction(exp, object, colon)
-    if exp and exp.func then
-        return exp.func
+    if exp and exp:bindFunction() then
+        return exp:bindFunction()
     end
 
-    local func = self:createValue('function', exp)
-    func.args = {}
-    func.argValues = {}
+    local value = self:createFunction(exp)
 
     if not exp then
-        return func
+        return value
     end
 
-    func.built = exp
-    func.upvalues = {}
-    func.object = object
-    func.colon = colon
-    func.uri = exp.uri
-    exp.func = func
-    for name, loc in pairs(self.scope.locals) do
-        func.upvalues[name] = loc
-    end
+    exp:bindFunction(value)
+    local func = value:getFunction()
 
-    self.results.funcs[#self.results.funcs+1] = func
+    self:eachLocal(function (name, loc)
+        func:saveLocal(name, loc)
+    end)
 
-    return func
+    func:setObject(object)
+    func:setColon(colon)
+
+    return value
 end
 
 function mt:forList(list, callback)
@@ -476,8 +475,8 @@ function mt:getFunctionReturns(func, i)
     end
 end
 
-function mt:createValue(tp, source, v)
-    local value = createValue(tp, source, v)
+function mt:createValue(tp, source)
+    local value = createValue(tp, source)
     local lib = library.object[tp]
     if lib then
         self:getLibChild(value, lib, 'object')

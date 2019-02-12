@@ -92,6 +92,18 @@ function mt:loadDots(expect)
     return self._dots:get(expect)
 end
 
+function mt:saveUpvalue(name, loc)
+    self.upvalues[name] = loc
+end
+
+function mt:setObject(object)
+    self._object = object
+end
+
+function mt:setColon(colon)
+    self._colon = colon
+end
+
 function mt:hasRuned()
     return self._runed > 0
 end

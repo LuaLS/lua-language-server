@@ -18,6 +18,14 @@ function mt:bindLabel(label)
     end
 end
 
+function mt:bindFunction(func)
+    if func then
+        self._bindFunction = func
+    else
+        return self._bindFunction
+    end
+end
+
 function mt:setUri(uri)
     self._uri = uri
 end

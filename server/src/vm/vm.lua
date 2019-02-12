@@ -258,6 +258,12 @@ function mt:setFunctionArg(func, values)
     for i = 1, #values do
         func.argValues[i] = values[i]
     end
+    if func.dots then
+        local dotsIndex = #func.args
+        for i = dotsIndex, #values do
+            func.dots:set(i - dotsIndex + 1, values[i])
+        end
+    end
 end
 
 function mt:getFunctionArg(func, i)
@@ -399,23 +405,22 @@ function mt:callDoFile(func, values)
 end
 
 function mt:call(func, values, source)
-    func:inference('function', 0.9)
     local lib = func.lib
     if lib then
         if lib.args then
             for i, arg in ipairs(lib.args) do
                 local value = values[i]
                 if value and arg.type ~= '...' then
-                    value:inference(arg.type, 1.0)
+                    value:setType(arg.type, 1.0)
                 end
             end
         end
         if lib.returns then
             for i, rtn in ipairs(lib.returns) do
                 if rtn.type == '...' then
-                    self:getFunctionReturns(func, i):inference('any', 0.0)
+                    self:getFunctionReturns(func, i):setType('any', 0.0)
                 else
-                    self:getFunctionReturns(func, i):inference(rtn.type or 'any', 1.0)
+                    self:getFunctionReturns(func, i):setType(rtn.type or 'any', 1.0)
                 end
             end
         end
@@ -448,18 +453,10 @@ end
 function mt:setFunctionReturn(func, index, value)
     func.hasReturn = true
     if not func.returns then
-        func.returns = {
-            type = 'list',
-        }
+        func.returns = createMulti()
     end
     if value then
-        if value.type == 'list' then
-            for i, v in ipairs(value) do
-                func.returns[index+i-1] = v
-            end
-        else
-            func.returns[index] = value
-        end
+        func.returns[index] = value
     else
         func.returns[index] = self:createValue('any', func.source)
     end
@@ -470,17 +467,10 @@ function mt:getFunctionReturns(func, i)
         return self:createValue('nil')
     end
     if not func.returns then
-        func.returns = {
-            type = 'list',
-        }
+        func.returns = createMulti()
     end
     if i then
-        if not func.returns[i] then
-            for n = #func.returns+1, i do
-                func.returns[n] = self:createValue('any')
-            end
-        end
-        return func.returns[i]
+        return func.returns:get(i)
     else
         return func.returns
     end
@@ -505,12 +495,15 @@ function mt:getName(name, source)
     local loc = self:loadLocal(name)
     if loc then
         source:bindLocal(loc)
-        return loc
+        return loc:getValue()
     end
     local ENV = self:loadLocal('_ENV')
     local ENVValue = ENV:getValue()
     local global = ENVValue:getChild(name)
     if global then
+        return global
+    else
+        global = self:createValue('any')
         return global
     end
 end
@@ -528,39 +521,23 @@ function mt:setName(name, source, value)
     ENVValue:setChild(name, value)
 end
 
-function mt:getIndex(obj)
-    local tp = obj.type
-    obj.uri = self.chunk.func.uri
-    if tp == 'name' then
-        local var = self:getName(obj[1], obj)
-        local value = self:getValue(var, obj)
-        self:addInfo(var, 'get', obj)
-        value:addInfo('get', obj)
+function mt:getIndex(source)
+    self:instantSource(source)
+    if source.type == 'name' then
+        local value = self:getName(source[1], source)
         return value
-    elseif (tp == 'string' or tp == 'number' or tp == 'boolean') then
-        return obj[1]
+    elseif source.type == 'string' or source.type == 'number' or source.type == 'boolean' then
+        return source[1]
     else
-        return self:getExp(obj)
+        return self:getExp(source)
     end
 end
 
 -- expect表示遇到 ... 时，期待的返回数量
 function mt:unpackDots(res, expect)
-    local dots = self:getDots(1)
-    local func = dots.func
-    local start = dots.index
-    if expect then
-        local finish = start + expect - 1
-        for i = start, finish do
-            res[#res+1] = self:getFunctionArg(func, i)
-        end
-    else
-        if not func.argValues then
-            return
-        end
-        for i = start, #func.argValues do
-            res[#res+1] = func.argValues[i]
-        end
+    local dots = self:loadDots(expect)
+    for _, v in ipairs(dots) do
+        res[#res+1] = v
     end
 end
 
@@ -647,7 +624,7 @@ function mt:getSimple(simple, mode)
         value = self:selectList(value, 1)
 
         if     tp == 'call' then
-            value:inference('function', 0.9)
+            value:setType('function', 0.9)
             local args = self:unpackList(obj)
             if object then
                 table.insert(args, 1, self:getValue(object, obj))
@@ -666,8 +643,8 @@ function mt:getSimple(simple, mode)
             }
             parentName = parentName .. '(...)'
         elseif tp == 'index' then
-            value:inference('table', 0.8)
-            value:inference('string', 0.2)
+            value:setType('table', 0.8)
+            value:setType('string', 0.2)
             local child = obj[1]
             obj.indexName = parentName
             local index = self:getIndex(child)
@@ -689,8 +666,8 @@ function mt:getSimple(simple, mode)
                 parentName = ('%s[?]'):format(parentName)
             end
         elseif tp == 'name' then
-            value:inference('table', 0.8)
-            value:inference('string', 0.2)
+            value:setType('table', 0.8)
+            value:setType('string', 0.2)
             if mode == 'value' or i < #simple then
                 field = self:getField(value, obj[1], obj) or self:createField(value, obj[1], obj)
                 value = self:getValue(field, obj)
@@ -706,14 +683,14 @@ function mt:getSimple(simple, mode)
             obj.parentName = parentName
             parentName = parentName .. '.' .. field.key
         elseif tp == ':' then
-            value:inference('table', 0.8)
-            value:inference('string', 0.2)
+            value:setType('table', 0.8)
+            value:setType('string', 0.2)
             object = field
             simple[i-1].colon = obj
             colon = colon
         elseif tp == '.' then
-            value:inference('table', 0.8)
-            value:inference('string', 0.2)
+            value:setType('table', 0.8)
+            value:setType('string', 0.2)
             simple[i-1].dot = obj
         end
     end
@@ -723,6 +700,42 @@ function mt:getSimple(simple, mode)
         return field, object, colon
     end
     error('Unknow simple mode: ' .. mode)
+end
+
+function mt:getSimple(simple, max)
+    local first = simple[1]
+    self:instantSource(first)
+    local value = self:getExp(first)
+    if not max then
+        max = #simple
+    elseif max < 0 then
+        max = #simple + 1 - max
+    end
+    local object
+    for i = 2, max do
+        local source = simple[i]
+        self:instantSource(source)
+        value = self:getFirstInMulti(value)
+
+        if source.type == 'call' then
+            local args = self:unpackList(source)
+            local func = value
+            if object then
+                table.insert(args, 1, object)
+            end
+            value = self:call(func, args, source)
+        elseif source.type == 'index' then
+            local child = source[1]
+            local index = self:getIndex(child)
+            value = value:getChild(index) or createValue('any')
+        elseif source.type == 'name' then
+            value = value:getChild(source[1]) or createValue('any')
+        elseif source.type == ':' then
+            object = value
+        elseif source.type == '.' then
+        end
+    end
+    return value
 end
 
 function mt:isTrue(v)
@@ -766,10 +779,10 @@ function mt:getBinary(exp)
         or op == '<'
         or op == '>'
     then
-        v1:inference('number', 0.9)
-        v2:inference('number', 0.9)
-        v1:inference('string', 0.1)
-        v2:inference('string', 0.1)
+        v1:setType('number', 0.9)
+        v2:setType('number', 0.9)
+        v1:setType('string', 0.1)
+        v2:setType('string', 0.1)
         return self:createValue('boolean')
     elseif op == '~='
         or op == '=='
@@ -781,12 +794,12 @@ function mt:getBinary(exp)
         or op == '<<'
         or op == '>>'
     then
-        v1:inference('integer', 0.9)
-        v2:inference('integer', 0.9)
-        v1:inference('number', 0.9)
-        v2:inference('number', 0.9)
-        v1:inference('string', 0.1)
-        v2:inference('string', 0.1)
+        v1:setType('integer', 0.9)
+        v2:setType('integer', 0.9)
+        v1:setType('number', 0.9)
+        v2:setType('number', 0.9)
+        v1:setType('string', 0.1)
+        v2:setType('string', 0.1)
         if math.type(v1:getValue()) == 'integer' and math.type(v2:getValue()) == 'integer' then
             if op == '|' then
                 return self:createValue('integer', exp, v1:getValue() | v2:getValue())
@@ -802,10 +815,10 @@ function mt:getBinary(exp)
         end
         return self:createValue('integer')
     elseif op == '..' then
-        v1:inference('string', 0.9)
-        v2:inference('string', 0.9)
-        v1:inference('number', 0.1)
-        v2:inference('number', 0.1)
+        v1:setType('string', 0.9)
+        v2:setType('string', 0.9)
+        v1:setType('number', 0.1)
+        v2:setType('number', 0.1)
         if type(v1:getValue()) == 'string' and type(v2:getValue()) == 'string' then
             return self:createValue('string', nil, v1:getValue() .. v2:getValue())
         end
@@ -818,8 +831,8 @@ function mt:getBinary(exp)
         or op == '%'
         or op == '//'
     then
-        v1:inference('number', 0.9)
-        v2:inference('number', 0.9)
+        v1:setType('number', 0.9)
+        v2:setType('number', 0.9)
         if type(v1:getValue()) == 'number' and type(v2:getValue()) == 'number' then
             if op == '+' then
                 return self:createValue('number', exp, v1:getValue() + v2:getValue())
@@ -856,33 +869,26 @@ function mt:getUnary(exp)
     if     op == 'not' then
         return self:createValue('boolean')
     elseif op == '#' then
-        v1:inference('table', 0.9)
-        v1:inference('string', 0.9)
+        v1:setType('table', 0.9)
+        v1:setType('string', 0.9)
         if type(v1:getValue()) == 'string' then
             return self:createValue('integer', exp, #v1:getValue())
         end
         return self:createValue('integer')
     elseif op == '-' then
-        v1:inference('number', 0.9)
+        v1:setType('number', 0.9)
         if type(v1:getValue()) == 'number' then
             return self:createValue('number', exp, -v1:getValue())
         end
         return self:createValue('number')
     elseif op == '~' then
-        v1:inference('integer', 0.9)
+        v1:setType('integer', 0.9)
         if math.type(v1:getValue()) == 'integer' then
             return self:createValue('integer', exp, ~v1:getValue())
         end
         return self:createValue('integer')
     end
     return nil
-end
-
-function mt:getDots()
-    if not self.chunk.dots then
-        self:createDots(1)
-    end
-    return self.chunk.dots
 end
 
 function mt:getExp(exp)
@@ -898,10 +904,7 @@ function mt:getExp(exp)
     elseif tp == 'number' then
         return self:createValue('number', exp, exp[1])
     elseif tp == 'name' then
-        local var = self:getName(exp[1], exp)
-        local value = self:getValue(var, exp)
-        self:addInfo(var, 'get', exp)
-        value:addInfo('get', exp)
+        local value = self:getName(exp[1], exp)
         return value
     elseif tp == 'simple' then
         return self:getSimple(exp, 'value')
@@ -984,7 +987,17 @@ function mt:setOne(var, value)
     end
     self:instantSource(var)
     if var.type == 'name' then
-    else
+        self:setName(var[1], var, value)
+    elseif var.type == 'simple' then
+        local parent = self:getSimple(var, -2)
+        local key = var[#var]
+        if key.type == 'index' then
+            local index = self:getIndex(key[1])
+            parent:setChild(index, value)
+        elseif key.type == 'name' then
+            local index = key[1]
+            parent:setChild(index, value)
+        end
     end
 end
 
@@ -1151,7 +1164,7 @@ function mt:doAction(action)
         self:doLocal(action)
     elseif tp == 'simple' then
         -- call
-        self:getSimple(action, 'value')
+        self:getSimple(action)
     elseif tp == 'if' then
         self:doIf(action)
     elseif tp == 'loop' then
@@ -1228,6 +1241,10 @@ end
 
 function mt:loadLabel(name)
     return self.currentFunction:loadLocal(name)
+end
+
+function mt:loadDots(expect)
+    return self.currentFunction:loadDots(expect)
 end
 
 function mt:getUri()

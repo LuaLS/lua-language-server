@@ -8,6 +8,20 @@ function mt:push(value)
     self[#self+1] = value
 end
 
+function mt:get(index)
+    for n = #self+1, index do
+        self[n] = createValue('any')
+    end
+    return self[index]
+end
+
+function mt:set(index, value)
+    for n = #self+1, index-1 do
+        self[n] = createValue('any')
+    end
+    self[index] = value
+end
+
 function mt:first()
     local value = self[1]
     if not value then

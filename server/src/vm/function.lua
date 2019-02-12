@@ -85,6 +85,13 @@ function mt:returnDots(index)
     self.returns[index] = createDots()
 end
 
+function mt:loadDots(expect)
+    if not self._dots then
+        self._dots = createDots()
+    end
+    return self._dots:get(expect)
+end
+
 function mt:hasRuned()
     return self._runed > 0
 end

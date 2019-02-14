@@ -13,6 +13,22 @@ local function trim_src(src)
     return src
 end
 
+local function init_log_file()
+    if not log.file then
+        log.file = io.open(log.path, 'w')
+        if not log.file then
+            return
+        end
+        log.file:write('')
+        log.file:close()
+        log.file = io.open(log.path, 'ab')
+        if not log.file then
+            return
+        end
+        log.file:setvbuf 'no'
+    end
+end
+
 local function push_log(level, ...)
     if not log.path then
         return
@@ -28,18 +44,9 @@ local function push_log(level, ...)
     if level == 'error' then
         str = str .. '\n' .. debug.traceback(nil, 3)
     end
+    init_log_file()
     if not log.file then
-        log.file = io.open(log.path, 'w')
-        if not log.file then
-            return
-        end
-        log.file:write('')
-        log.file:close()
-        log.file = io.open(log.path, 'ab')
-        if not log.file then
-            return
-        end
-        log.file:setvbuf 'no'
+        return
     end
     local sec, ms = math.modf(log.start_time + os.clock())
     local timestr = os.date('%Y-%m-%d %H:%M:%S', sec)
@@ -79,12 +86,28 @@ function log.error(...)
 end
 
 function log.init(root, path)
+    local lastBuf
+    if log.file then
+        log.file:close()
+        log.file = nil
+        local file = io.open(log.path, 'rb')
+        if file then
+            lastBuf = file:read 'a'
+            file:close()
+        end
+    end
     log.path = path:string()
     log.prefix_len = #root:string() + 3
-    log.file = nil
     log.size = 0
     if not fs.exists(path:parent_path()) then
         fs.create_directories(path:parent_path())
+    end
+    if lastBuf then
+        init_log_file()
+        if log.file then
+            log.file:write(lastBuf)
+            log.size = log.size + #lastBuf
+        end
     end
 end
 

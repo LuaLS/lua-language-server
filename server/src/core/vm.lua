@@ -836,9 +836,13 @@ function mt:getLibValue(lib, parentType, v)
             value.maxReturns = 0
         end
         if lib.args then
+            value.args = lib.args
             local values = {}
             for i, arg in ipairs(lib.args) do
                 values[i] = self:getLibValue(arg, parentType) or self:createValue('any')
+                if arg.type == '...' then
+                    value.hasDots = true
+                end
             end
             self:setFunctionArg(value, values)
         end

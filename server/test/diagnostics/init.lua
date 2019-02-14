@@ -156,3 +156,15 @@ local function f(<!self!>)
 end
 f()
 ]]
+
+TEST [[
+local function f(a, b)
+    return a, b
+end
+f(1, 2, <!3!>)
+]]
+
+TEST [[
+next({}, 1, <!2!>)
+print(1, 2, 3, 4, 5)
+]]

@@ -199,7 +199,7 @@ function mt:searchRedundantParameters(callback)
             goto NEXT_CALL
         end
         if not call.func.args then
-            return
+            goto NEXT_CALL
         end
         local max = #call.func.args
         local passed = #call.args

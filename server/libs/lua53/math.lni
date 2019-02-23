@@ -87,6 +87,9 @@ type = 'integer'
 [[.args]]
 name = 'x'
 type = 'number'
+[[.args]]
+name = 'y'
+type = 'number'
 [[.returns]]
 type = 'number'
 

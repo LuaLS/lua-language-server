@@ -360,6 +360,7 @@ function mt:getName(name, source)
         return global
     else
         global = self:createValue('any')
+        ENVValue:setChild(name, global)
         return global
     end
 end
@@ -723,12 +724,13 @@ function mt:setOne(var, value)
         value = createValue('nil')
     end
     self:instantSource(var)
-    var:bindValue(value, 'set')
     if var.type == 'name' then
         self:setName(var[1], var, value)
+        var:bindValue(value, 'set')
     elseif var.type == 'simple' then
         local parent = self:getSimple(var, -2)
         local key = var[#var]
+        self:instantSource(key)
         if key.type == 'index' then
             local index = self:getIndex(key[1])
             parent:setChild(index, value)
@@ -736,6 +738,7 @@ function mt:setOne(var, value)
             local index = key[1]
             parent:setChild(index, value)
         end
+        key:bindValue(value, 'set')
     end
 end
 

@@ -26,6 +26,15 @@ function mt:bindFunction(func)
     end
 end
 
+function mt:bindValue(value, action)
+    if value then
+        self._bindValue = value
+        value:addInfo(action, self)
+    else
+        return self._bindValue
+    end
+end
+
 function mt:setUri(uri)
     self._uri = uri
 end

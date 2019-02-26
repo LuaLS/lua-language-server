@@ -1,4 +1,4 @@
-local findResult = require 'core.find_result'
+local findSource = require 'core.find_source'
 local parser = require 'parser'
 
 local function parseResult(result, source, newName)
@@ -40,7 +40,7 @@ local function parseResult(result, source, newName)
 end
 
 return function (vm, pos, newName)
-    local result, source = findResult(vm, pos)
+    local result, source = findSource(vm, pos)
     if not result then
         return nil
     end

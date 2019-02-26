@@ -184,7 +184,7 @@ function mt:addInfo(tp, source)
     if source and not source.start then
         error('Miss start: ' .. table.dump(source))
     end
-    self[#self] = {
+    self[#self+1] = {
         type = tp,
         source = source or getDefaultSource(),
     }

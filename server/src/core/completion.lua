@@ -1,4 +1,4 @@
-local findResult = require 'core.find_result'
+local findSource = require 'core.find_source'
 local hover = require 'core.hover'
 
 local CompletionItemKind = {
@@ -513,7 +513,7 @@ end
 
 local function searchSpecial(vm, pos, callback)
     -- 尝试 #
-    local _, source = findResult(vm, pos, 2)
+    local _, source = findSource(vm, pos, 2)
     if source and source.indexName and source[1].op == '#'
     then
         local label = source.indexName .. '+1'
@@ -558,7 +558,7 @@ return function (vm, pos, word)
     end
     searchSpecial(vm, pos, callback)
     if not inString then
-        local result, source = findResult(vm, pos)
+        local result, source = findSource(vm, pos)
         if not isValidResult(result) then
             result, source = findClosePos(vm, pos)
         end

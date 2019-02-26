@@ -12,7 +12,7 @@ function TEST(res)
         local ast = parser:ast(new_script)
         local vm = core.vm(ast)
         assert(vm)
-        local result = core.findResult(vm, pos)
+        local result = core.findSource(vm, pos)
         assert(result)
         assert(res == result.value:getType())
     end

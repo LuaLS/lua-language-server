@@ -13,7 +13,7 @@ function TEST(fullkey)
         assert(ast)
         local vm = core.vm(ast)
         assert(vm)
-        local result = core.findResult(vm, pos)
+        local result = core.findSource(vm, pos)
         local _, name = core.findLib(result)
         assert(name == fullkey)
     end

@@ -1,4 +1,4 @@
-local findResult = require 'core.find_result'
+local findSource = require 'core.find_source'
 
 local function parseResult(vm, result, declarat, callback)
     local tp = result.type
@@ -46,7 +46,7 @@ local function parseResult(vm, result, declarat, callback)
 end
 
 return function (vm, pos, declarat)
-    local result = findResult(vm, pos)
+    local result = findSource(vm, pos)
     if not result then
         return nil
     end

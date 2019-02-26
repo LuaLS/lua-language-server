@@ -4,8 +4,18 @@ local mt = {}
 mt.__index = mt
 mt.type = 'multi'
 
-function mt:push(value)
-    self[#self+1] = value
+function mt:push(value, isLast)
+    if value.type == 'list' then
+        if isLast then
+            for _, v in ipairs(value) do
+                self[#self+1] = v
+            end
+        else
+            self[#self+1] = value[1]
+        end
+    else
+        self[#self+1] = value
+    end
 end
 
 function mt:get(index)

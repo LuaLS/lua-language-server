@@ -72,7 +72,7 @@ function TEST(data)
     local sourceVM = lsp:loadVM(sourceUri)
     assert(sourceVM)
     local sourcePos = (sourceList[1][1] + sourceList[1][2]) // 2
-    local result, source = core.findResult(sourceVM, sourcePos)
+    local result, source = core.findSource(sourceVM, sourcePos)
     local hover = core.hover(result, source, lsp)
     assert(hover)
     if data.hover.description then

@@ -12,7 +12,7 @@ function TEST(script)
         local ast = parser:ast(new_script)
         local vm = core.vm(ast)
         assert(vm)
-        local result, source = core.findResult(vm, pos)
+        local result, source = core.findSource(vm, pos)
         local hover = core.hover(result, source)
         if expect then
             assert(hover)

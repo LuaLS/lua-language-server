@@ -45,8 +45,8 @@ function TEST(script)
     local vm = buildVM(ast)
     assert(vm)
 
-    local result = core.findResult(vm, pos)
-    local positions = core.definition(vm, result, nil)
+    local source = core.findSource(vm, pos)
+    local positions = core.definition(vm, source, nil)
     if positions then
         assert(founded(target, positions))
     else

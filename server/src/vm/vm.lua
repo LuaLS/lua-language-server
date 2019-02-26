@@ -450,6 +450,7 @@ function mt:getSimple(simple, max)
     local first = simple[1]
     self:instantSource(first)
     local value = self:getExp(first)
+    first:bindValue(value, 'get')
     if not max then
         max = #simple
     elseif max < 0 then
@@ -472,8 +473,10 @@ function mt:getSimple(simple, max)
             local child = source[1]
             local index = self:getIndex(child)
             value = value:getChild(index) or createValue('any')
+            source:bindValue(value, 'get')
         elseif source.type == 'name' then
             value = value:getChild(source[1]) or createValue('any')
+            source:bindValue(value, 'get')
         elseif source.type == ':' then
             object = value
         elseif source.type == '.' then
@@ -664,8 +667,8 @@ end
 
 function mt:getMultiByList(list)
     local multi = createMulti()
-    for _, exp in ipairs(list) do
-        multi:push(self:getExp(exp))
+    for i, exp in ipairs(list) do
+        multi:push(self:getExp(exp), i == #list)
     end
     return multi
 end
@@ -722,6 +725,7 @@ function mt:setOne(var, value)
         value = createValue('nil')
     end
     self:instantSource(var)
+    var:bindValue(value, 'set')
     if var.type == 'name' then
         self:setName(var[1], var, value)
     elseif var.type == 'simple' then

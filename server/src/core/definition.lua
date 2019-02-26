@@ -125,27 +125,15 @@ local function parseResultAsVar(vm, result, lsp)
     return positions
 end
 
-local function parseResultAsValue(vm, value, lsp)
-    local tp = value:getType()
-    local positions = {}
-    if tp == 'string' then
-        -- require 'XXX' 专用
-        positions[#positions+1] = {
-            0,
-            0,
-            value.uri,
-        }
-    end
-    return positions
+local function parseValue(vm, value, lsp)
+
 end
 
-return function (vm, result, lsp)
-    if not result then
+return function (vm, source, lsp)
+    if not source then
         return nil
     end
-    if result.type == 'value' then
-        return parseResultAsValue(vm, result, lsp)
-    else
-        return parseResultAsVar(vm, result, lsp)
+    if source:bindValue() then
+        return parseValue(vm, source:bindValue(), lsp)
     end
 end

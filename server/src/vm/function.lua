@@ -132,9 +132,17 @@ function mt:run()
     end
 
     -- 第一次运行函数时，创建函数的参数
-    if self._runed == 1 then
-        self:createArgs()
+    if self._runed ~= 1 then
+        return
     end
+
+    -- 如果是面向对象形式的函数，创建隐藏的参数self
+    if self._object then
+        self:saveLocal('self', self._object)
+    end
+
+    -- 显性声明的参数
+    self:createArgs()
 
     --local index = 0
     --if func.object then

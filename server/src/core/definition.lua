@@ -126,7 +126,16 @@ local function parseResultAsVar(vm, result, lsp)
 end
 
 local function parseValue(vm, value, lsp)
-
+    local positions = {}
+    value:eachInfo(function (info)
+        if info.type == 'set' then
+            positions[#positions+1] = {
+                info.source.start,
+                info.source.finish,
+            }
+        end
+    end)
+    return positions
 end
 
 return function (vm, source, lsp)

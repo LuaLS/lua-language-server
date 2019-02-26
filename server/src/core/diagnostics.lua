@@ -205,14 +205,11 @@ end
 function mt:searchRedundantParameters(callback)
     local results = self.results
     for _, call in ipairs(results.calls) do
-        if not call.func.built then
-            goto NEXT_CALL
-        end
         if call.func.hasDots then
             goto NEXT_CALL
         end
         if not call.func.args then
-            return
+            goto NEXT_CALL
         end
         local max = #call.func.args
         local passed = #call.args

@@ -1,6 +1,7 @@
 local createDots = require 'vm.dots'
 local createMulti = require 'vm.multi'
 local createValue = require 'vm.value'
+local createLocal = require 'vm.local'
 
 local mt = {}
 mt.__index = mt
@@ -130,6 +131,11 @@ function mt:run()
         return
     end
 
+    -- 第一次运行函数时，创建函数的参数
+    if self._runed == 1 then
+        self:createArgs()
+    end
+
     --local index = 0
     --if func.object then
     --    local var = self:createArg('self', func.colon, self:getValue--(func.object, func.colon))
@@ -175,6 +181,31 @@ function mt:setArgs(values)
         for i = dotsIndex, #values do
             self.dots:set(i - dotsIndex + 1, values[i])
         end
+    end
+end
+
+function mt:createArg(arg)
+    if arg.type == 'name' then
+        local loc = createLocal(arg[1], arg, createValue('any', arg))
+        self:saveLocal(arg[1], loc)
+    elseif arg.type == '...' then
+    end
+end
+
+function mt:createArgs()
+    if not self.source then
+        return
+    end
+    local args = self.source.arg
+    if not args then
+        return
+    end
+    if args.type == 'list' then
+        for _, arg in ipairs(args) do
+            self:createArg(arg)
+        end
+    else
+        self:createArg(args)
     end
 end
 

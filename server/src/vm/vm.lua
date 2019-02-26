@@ -379,7 +379,6 @@ function mt:setName(name, source, value)
 end
 
 function mt:getIndex(source)
-    self:instantSource(source)
     if source.type == 'name' then
         local value = self:getName(source[1], source)
         return value

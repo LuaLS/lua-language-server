@@ -90,12 +90,6 @@ t {
 ]]
 
 TEST[[
-local t
-t.<?after?>()
-t.<!after!> = a
-]]
-
-TEST[[
 local t = {
     <!insert!> = 1,
 }

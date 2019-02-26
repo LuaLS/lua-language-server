@@ -167,15 +167,9 @@ function mt:mergeValue(value)
             self._child[k] = v
         end
     end
-    if value._info then
-        if not self._info then
-            self._info = {}
-        end
-        for _, info in ipairs(value._info) do
-            self._info[#self._info+1] = info
-        end
+    for _, info in ipairs(value) do
+        self[#self+1] = info
     end
-    value._info = self._info
     if value._meta then
         self._meta = value._meta
     end
@@ -191,20 +185,14 @@ function mt:addInfo(tp, source)
     if source and not source.start then
         error('Miss start: ' .. table.dump(source))
     end
-    if not self._info then
-        self._info = {}
-    end
-    self._info[#self._info+1] = {
+    self[#self+1] = {
         type = tp,
         source = source or getDefaultSource(),
     }
 end
 
 function mt:eachInfo(callback)
-    if not self._info then
-        return
-    end
-    for _, info in ipairs(self._info) do
+    for _, info in ipairs(self) do
         local res = callback(info)
         if res ~= nil then
             return res

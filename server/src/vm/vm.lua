@@ -854,8 +854,10 @@ function mt:doFunction(action)
             local parent = self:getSimple(name, -2)
             if name[#name-1].type == ':' then
                 local value = self:buildFunction(action)
-                local index = self:getIndex(name[#name])
+                local source = name[#name]
+                local index = self:getIndex(source)
                 parent:setChild(index, value)
+                source:bindValue(value, 'set')
 
                 local func = value:getFunction()
                 if #name == 3 then
@@ -871,12 +873,15 @@ function mt:doFunction(action)
                 end
             else
                 local value = self:buildFunction(action)
-                local index = self:getIndex(name[#name])
+                local source = name[#name]
+                local index = self:getIndex(source)
                 parent:setChild(index, value)
+                source:bindValue(value, 'set')
             end
         else
             local value = self:buildFunction(action)
-            self:setName(name[1], action, value)
+            self:setName(name[1], name, value)
+            name:bindValue(value, 'set')
         end
     else
         self:buildFunction(action)

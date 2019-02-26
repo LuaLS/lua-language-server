@@ -125,6 +125,15 @@ local function parseResultAsVar(vm, result, lsp)
     return positions
 end
 
+local function parseLocal(vm, loc, lsp)
+    local positions = {}
+    positions[#positions+1] = {
+        loc.source.start,
+        loc.source.finish,
+    }
+    return positions
+end
+
 local function parseValue(vm, value, lsp)
     local positions = {}
     value:eachInfo(function (info)
@@ -141,6 +150,9 @@ end
 return function (vm, source, lsp)
     if not source then
         return nil
+    end
+    if source:bindLocal() then
+        return parseLocal(vm, source:bindLocal(), lsp)
     end
     if source:bindValue() then
         return parseValue(vm, source:bindValue(), lsp)

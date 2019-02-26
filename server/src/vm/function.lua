@@ -23,6 +23,9 @@ function mt:pop()
 end
 
 function mt:saveLocal(name, loc)
+    if loc.type ~= 'local' then
+        error('saveLocal必须是local')
+    end
     self.locals[self._top][name] = loc
 end
 
@@ -113,12 +116,9 @@ function mt:loadDots(expect)
     return self._dots:get(expect)
 end
 
-function mt:setObject(object)
-    self._object = object
-end
-
-function mt:setColon(colon)
-    self._colon = colon
+function mt:setObject(value, source)
+    self._objectValue = value
+    self._objectSource = source
 end
 
 function mt:hasRuned()
@@ -137,44 +137,13 @@ function mt:run()
     end
 
     -- 如果是面向对象形式的函数，创建隐藏的参数self
-    if self._object then
-        self:saveLocal('self', self._object)
+    if self._objectSource then
+        local loc = createLocal('self', self._objectSource, self._objectValue)
+        self:saveLocal('self', loc)
     end
 
     -- 显性声明的参数
     self:createArgs()
-
-    --local index = 0
-    --if func.object then
-    --    local var = self:createArg('self', func.colon, self:getValue--(func.object, func.colon))
-    --    var.hide = true
-    --    var.link = func.object
-    --    if func.argValues[1] then
-    --        self:setValue(var, func.argValues[1])
-    --    end
-    --    index = 1
-    --    func.args[index] = var
-    --end
-
-    --local stop
-    --self:forList(func.built.arg, function (arg)
-    --    if stop then
-    --        return
-    --    end
-    --    index = index + 1
-    --    if arg.type == 'name' then
-    --        local var = self:createArg(arg[1], arg)
-    --        self:setValue(var, func.argValues[index] or self:createValue--('nil'))
-    --        func.args[index] = var
-    --    elseif arg.type == '...' then
-    --        local dots = self:createDots(index, arg)
-    --        for i = index, #func.argValues do
-    --            dots[#dots+1] = func.argValues[i]
-    --        end
-    --        func.hasDots = true
-    --        stop = true
-    --    end
-    --end)
 end
 
 function mt:setArgs(values)

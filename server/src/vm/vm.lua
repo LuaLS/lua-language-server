@@ -113,7 +113,7 @@ function mt:runFunction(func)
     self:setCurrentFunction(originFunction)
 end
 
-function mt:buildFunction(exp, object, colon)
+function mt:buildFunction(exp)
     if exp and exp:bindFunction() then
         return exp:bindFunction()
     end
@@ -130,9 +130,6 @@ function mt:buildFunction(exp, object, colon)
     self:eachLocal(function (name, loc)
         func:saveLocal(name, loc)
     end)
-
-    func:setObject(object)
-    func:setColon(colon)
 
     return value
 end
@@ -347,7 +344,8 @@ function mt:getName(name, source)
     if source then
         self:instantSource(source)
         if source:bindLocal() then
-            return source:bindLocal()
+            local loc = source:bindLocal()
+            return loc:getValue()
         end
     end
     local loc = self:loadLocal(name)
@@ -855,17 +853,30 @@ function mt:doFunction(action)
         if name.type == 'simple' then
             local parent = self:getSimple(name, -2)
             if name[#name-1].type == ':' then
-                local func = self:buildFunction(action, parent, name[#name-1])
+                local value = self:buildFunction(action)
                 local index = self:getIndex(name[#name])
-                parent:setChild(index, func)
+                parent:setChild(index, value)
+
+                local func = value:getFunction()
+                if #name == 3 then
+                    -- function x:b()
+                    local loc = self:loadLocal(name[1][1])
+                    if loc then
+                        func:setObject(parent, loc.source)
+                    else
+                        func:setObject(parent, name[#name-2])
+                    end
+                else
+                    func:setObject(parent, name[#name-2])
+                end
             else
-                local func = self:buildFunction(action)
+                local value = self:buildFunction(action)
                 local index = self:getIndex(name[#name])
-                parent:setChild(index, func)
+                parent:setChild(index, value)
             end
         else
-            local func = self:buildFunction(action)
-            self:setName(name[1], action, func)
+            local value = self:buildFunction(action)
+            self:setName(name[1], action, value)
         end
     else
         self:buildFunction(action)

@@ -396,7 +396,7 @@ function mt:unpackList(list, expect)
     if not list then
         return res
     end
-    if list.type == 'list' or list.type == 'call' then
+    if list.type == 'list' or list.type == 'call' or list.type == 'return' then
         for i, exp in ipairs(list) do
             if exp.type == '...' then
                 self:unpackDots(res, expect)
@@ -675,15 +675,13 @@ function mt:doReturn(action)
     if #action == 0 then
         return
     end
-    local value = self:getExp(action[1])
+    local values = self:unpackList(action)
     local func = self:getCurrentFunction()
-    if value.type == 'multi' then
-        value:eachValue(function (i, v)
-            func:setReturn(i, v)
-        end)
-    else
-        func:setReturn(1, value)
-    end
+    local n = 0
+    values:eachValue(function (value)
+        n = n + 1
+        func:setReturn(n, value)
+    end)
 end
 
 function mt:doLabel(source)

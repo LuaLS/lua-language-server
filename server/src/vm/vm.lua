@@ -851,8 +851,14 @@ function mt:doFunction(action)
             if name[#name-1].type == ':' then
                 local value = self:buildFunction(action)
                 local source = name[#name]
-                local index = self:getIndex(source)
-                parent:setChild(index, value)
+                self:instantSource(source)
+                if source.type == 'index' then
+                    local index = self:getIndex(source[1])
+                    parent:setChild(index, value)
+                elseif source.type == 'name' then
+                    local index = source[1]
+                    parent:setChild(index, value)
+                end
                 source:bindValue(value, 'set')
 
                 local func = value:getFunction()
@@ -870,8 +876,14 @@ function mt:doFunction(action)
             else
                 local value = self:buildFunction(action)
                 local source = name[#name]
-                local index = self:getIndex(source)
-                parent:setChild(index, value)
+                self:instantSource(source)
+                if source.type == 'index' then
+                    local index = self:getIndex(source[1])
+                    parent:setChild(index, value)
+                elseif source.type == 'name' then
+                    local index = source[1]
+                    parent:setChild(index, value)
+                end
                 source:bindValue(value, 'set')
             end
         else

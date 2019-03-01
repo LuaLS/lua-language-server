@@ -688,10 +688,15 @@ end
 
 function mt:doLabel(source)
     local name = source[1]
-    self:createLabel(name, source)
+    local label = self:loadLabel(name)
+    if label then
+        self:bindLabel(source, label, 'set')
+    else
+        label = self:createLabel(name, source, 'set')
+    end
 end
 
-function mt:createLabel(name, source)
+function mt:createLabel(name, source, action)
     local label = self:bindLabel(source)
     if label then
         self:saveLabel(label)
@@ -700,15 +705,17 @@ function mt:createLabel(name, source)
 
     label = createLabel(name, source)
     self:saveLabel(label)
-    self:bindLabel(source, label)
+    self:bindLabel(source, label, action)
     return label
 end
 
 function mt:doGoTo(source)
     local name = source[1]
     local label = self:loadLabel(name)
-    if not label then
-        label = self:createLabel(name, source)
+    if label then
+        self:bindLabel(source, label, 'get')
+    else
+        label = self:createLabel(name, source, 'get')
     end
 end
 
@@ -1008,7 +1015,7 @@ function mt:saveLabel(label)
 end
 
 function mt:loadLabel(name)
-    return self.currentFunction:loadLocal(name)
+    return self.currentFunction:loadLabel(name)
 end
 
 function mt:loadDots(expect)
@@ -1038,10 +1045,10 @@ function mt:bindLocal(source, loc)
     end
 end
 
-function mt:bindLabel(source, label)
+function mt:bindLabel(source, label, action)
     self:instantSource(source)
     if label then
-        source:bindLabel(label)
+        source:bindLabel(label, action)
     else
         return source:bindLabel()
     end

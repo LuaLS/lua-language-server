@@ -10,9 +10,11 @@ function mt:bindLocal(loc)
     end
 end
 
-function mt:bindLabel(label)
+function mt:bindLabel(label, action)
     if label then
         self._bindLabel = label
+        self._action = action
+        label:addInfo(action, self)
     else
         return self._bindLabel
     end

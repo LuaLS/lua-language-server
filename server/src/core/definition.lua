@@ -176,6 +176,22 @@ local function parseValueSimily(vm, source, lsp)
     return positions
 end
 
+local function parseLabel(vm, label, lsp)
+    local positions = {}
+    label:eachInfo(function (info)
+        if info.type == 'set' then
+            positions[#positions+1] = {
+                info.source.start,
+                info.source.finish,
+            }
+        end
+    end)
+    if #positions == 0 then
+        return nil
+    end
+    return positions
+end
+
 return function (vm, source, lsp)
     if not source then
         return nil
@@ -186,5 +202,8 @@ return function (vm, source, lsp)
     if source:bindValue() then
         return parseValue(vm, source:bindValue(), lsp)
             or parseValueSimily(vm, source, lsp)
+    end
+    if source:bindLabel() then
+        return parseLabel(vm, source:bindLabel(), lsp)
     end
 end

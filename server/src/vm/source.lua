@@ -2,9 +2,11 @@ local mt = {}
 mt.__index = mt
 mt._hasInstant = true
 
-function mt:bindLocal(loc)
+function mt:bindLocal(loc, action)
     if loc then
         self._bindLocal = loc
+        self._action = action
+        loc:addInfo(action, self)
     else
         return self._bindLocal
     end
@@ -48,6 +50,24 @@ end
 
 function mt:getUri()
     return self._uri
+end
+
+function mt:setFlag(name, v)
+    if not self._flag then
+        self._flag = {}
+    end
+    self._flag[name] = v
+end
+
+function mt:getFlag(name)
+    if not self._flag then
+        return nil
+    end
+    return self._flag[name]
+end
+
+function mt:getName()
+    return self[1]
 end
 
 return function (source)

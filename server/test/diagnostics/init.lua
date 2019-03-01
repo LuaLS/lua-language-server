@@ -1,4 +1,5 @@
 local core = require 'core'
+local buildVM = require 'vm'
 local parser  = require 'parser'
 local service = require 'service'
 
@@ -43,7 +44,7 @@ function TEST(script)
     local ast = parser:ast(new_script)
     assert(ast)
     local lines = parser:lines(new_script)
-    local vm = core.vm(ast, lsp)
+    local vm = buildVM(ast, lsp)
     assert(vm)
     local datas = core.diagnostics(vm, lines, 'test')
     local results = {}
@@ -71,7 +72,7 @@ print(<!X!>)
 print(<!Log!>)
 print(_VERSION)
 print(<!y!>)
-print(z)
+print(<!z!>)
 z = 1
 ]]
 
@@ -150,6 +151,12 @@ local mt, x
 function mt:m()
     function x:m()
     end
+end
+]]
+
+TEST [[
+local mt = {}
+function mt:f()
 end
 ]]
 

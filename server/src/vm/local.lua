@@ -31,7 +31,10 @@ end
 
 function mt:eachInfo(callback)
     for _, info in ipairs(self) do
-        callback(info)
+        local res = callback(info)
+        if res ~= nil then
+            return res
+        end
     end
 end
 
@@ -47,6 +50,10 @@ function mt:getFlag(name)
         return nil
     end
     return self._flag[name]
+end
+
+function mt:getName()
+    return self.name
 end
 
 return function (name, source, value)

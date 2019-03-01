@@ -12,67 +12,65 @@ local mt = {}
 mt.__index = mt
 
 function mt:searchUnusedLocals(callback)
-    local results = self.results
-    for _, var in ipairs(results.locals) do
-        if var.key == '_'
-        or var.key == '_ENV'
-        or var.key == ''
-        then
-            goto NEXT_VAR
+    self.vm:eachSource(function (source)
+        local loc = source:bindLocal()
+        if not loc then
+            return
         end
-        if var.hide then
-            goto NEXT_VAR
+        local name = loc:getName()
+        if name == '_' or name == '_ENV' or name == '' then
+            return
         end
-        local ok = self.vm:eachInfo(var, function (info)
+        if source:action() ~= 'local' then
+            return
+        end
+        if loc:getFlag 'hide' then
+            return
+        end
+        local used = loc:eachInfo(function (info)
             if info.type == 'get' then
                 return true
             end
-            if info.type == 'local' then
-                if info.source.start == 0 then
-                    return true
-                end
-            end
         end)
-        if ok then
-            goto NEXT_VAR
+        if not used then
+            callback(source.start, source.finish, name)
         end
-        callback(var.source.start, var.source.finish, var.key)
-        ::NEXT_VAR::
-    end
+    end)
 end
 
 function mt:searchUndefinedGlobal(callback)
-    local globalValue = self.vm.lsp.globalValue
-    globalValue:eachField(function (index, field)
-        if field.value.lib then
-            goto NEXT_VAR
+    self.vm:eachSource(function (source)
+        if not source:getFlag 'global' then
+            return
         end
-        if not field.uris[self.vm.uri] then
-            goto NEXT_VAR
+        local value = source:bindValue()
+        if not value then
+            return
         end
-        if type(index) ~= 'string' then
-            goto NEXT_VAR
+        if source:action() ~= 'get' then
+            return
         end
-        if config.config.diagnostics.globals[index] then
-            goto NEXT_VAR
+        if value:getLib() then
+            return
         end
-        if index == '' then
-            goto NEXT_VAR
+        local name = source:getName()
+        if name == '' then
+            return
         end
-        local ok = field.value:eachInfo(function (info)
+        if type(name) ~= 'string' then
+            return
+        end
+        if config.config.diagnostics.globals[name] then
+            return
+        end
+        local defined = value:eachInfo(function (info)
             if info.type == 'set' then
                 return true
             end
         end)
-        if ok then
-            goto NEXT_VAR
+        if not defined then
+            callback(source.start, source.finish, name)
         end
-        self.vm:eachInfo(field, function (info)
-            if info.type == 'get' then
-                callback(info.source.start, info.source.finish, tostring(index))
-            end
-        end)
-        ::NEXT_VAR::
     end)
 end
 
@@ -229,7 +227,7 @@ function mt:doDiagnostics(func, code, callback)
     if config.config.diagnostics.disable[code] then
         return
     end
-    self[func](self, function (start, finish, ...)
+    func(self, function (start, finish, ...)
         local data = callback(...)
         data.code   = code
         data.start  = start
@@ -244,61 +242,60 @@ end
 return function (vm, lines, uri)
     local session = setmetatable({
         vm = vm,
-        results = vm.results,
         lines = lines,
         uri = uri,
         datas = {},
     }, mt)
 
     -- 未使用的局部变量
-    session:doDiagnostics('searchUnusedLocals', 'unused-local', function (key)
+    session:doDiagnostics(session.searchUnusedLocals, 'unused-local', function (key)
         return {
             level   = DiagnosticSeverity.Information,
             message = lang.script('DIAG_UNUSED_LOCAL', key),
         }
     end)
     -- 读取未定义全局变量
-    session:doDiagnostics('searchUndefinedGlobal', 'undefined-global', function (key)
+    session:doDiagnostics(session.searchUndefinedGlobal, 'undefined-global', function (key)
         return {
             level   = DiagnosticSeverity.Warning,
             message = lang.script('DIAG_UNDEFINED_GLOBAL', key),
         }
     end)
     -- 未使用的Label
-    session:doDiagnostics('searchUnusedLabel', 'unused-label', function (key)
-        return {
-            level   =DiagnosticSeverity.Hint,
-            message = lang.script('DIAG_UNUSED_LABEL', key)
-        }
-    end)
+    --session:doDiagnostics(session.searchUnusedLabel, 'unused-label', function --(key)
+    --    return {
+    --        level   =DiagnosticSeverity.Hint,
+    --        message = lang.script('DIAG_UNUSED_LABEL', key)
+    --    }
+    --end)
     -- 只有空格与制表符的行，以及后置空格
-    session:doDiagnostics('searchSpaces', 'trailing-space', function (message)
-        return {
-            level   = DiagnosticSeverity.Hint,
-            message = message,
-        }
-    end)
+    --session:doDiagnostics(session.searchSpaces, 'trailing-space', function --(message)
+    --    return {
+    --        level   = DiagnosticSeverity.Hint,
+    --        message = message,
+    --    }
+    --end)
     -- 重定义局部变量
-    session:doDiagnostics('searchRedefinition', 'redefined-local', function (key, related)
-        return {
-            level   = DiagnosticSeverity.Information,
-            message = lang.script('DIAG_REDEFINED_LOCAL', key),
-            related = related,
-        }
-    end)
+    --session:doDiagnostics(session.searchRedefinition, 'redefined-local', --function (key, related)
+    --    return {
+    --        level   = DiagnosticSeverity.Information,
+    --        message = lang.script('DIAG_REDEFINED_LOCAL', key),
+    --        related = related,
+    --    }
+    --end)
     -- 以括号开始的一行（可能被误解析为了上一行的call）
-    session:doDiagnostics('searchNewLineCall', 'newline-call', function ()
-        return {
-            level   = DiagnosticSeverity.Information,
-            message = lang.script.DIAG_PREVIOUS_CALL,
-        }
-    end)
+    --session:doDiagnostics(session.searchNewLineCall, 'newline-call', function ()
+    --    return {
+    --        level   = DiagnosticSeverity.Information,
+    --        message = lang.script.DIAG_PREVIOUS_CALL,
+    --    }
+    --end)
     -- 调用函数时的参数数量是否超过函数的接收数量
-    session:doDiagnostics('searchRedundantParameters', 'remainder-parameters', function (max, passed)
-        return {
-            level   = DiagnosticSeverity.Information,
-            message = lang.script('DIAG_OVER_MAX_ARGS', max, passed),
-        }
-    end)
+    --session:doDiagnostics(session.searchRedundantParameters, --'remainder-parameters', function (max, passed)
+    --    return {
+    --        level   = DiagnosticSeverity.Information,
+    --        message = lang.script('DIAG_OVER_MAX_ARGS', max, passed),
+    --    }
+    --end)
     return session.datas
 end

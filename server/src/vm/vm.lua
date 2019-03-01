@@ -350,12 +350,18 @@ function mt:getName(name, source)
     end
     local loc = self:loadLocal(name)
     if loc then
-        source:bindLocal(loc)
+        source:bindLocal(loc, 'get')
         return loc:getValue()
     end
+    local global = source:bindValue()
+    if global then
+        return global
+    end
+    source:setFlag('global', true)
     local ENV = self:loadLocal('_ENV')
     local ENVValue = ENV:getValue()
-    local global = ENVValue:getChild(name) or ENVValue:setChild(name, createValue('any', source))
+    global = ENVValue:getChild(name) or ENVValue:setChild(name, createValue('any', source))
+    source:bindValue(global, 'get')
     return global
 end
 
@@ -363,10 +369,16 @@ function mt:setName(name, source, value)
     self:instantSource(source)
     local loc = self:loadLocal(name)
     if loc then
-        source:bindLocal(loc)
+        source:bindLocal(loc, 'set')
         loc:setValue(value)
         return
     end
+    local global = source:bindValue()
+    if global then
+        return global
+    end
+    source:setFlag('global', true)
+    source:bindValue(global, 'set')
     local ENV = self:loadLocal('_ENV')
     local ENVValue = ENV:getValue()
     ENVValue:setChild(name, value)
@@ -1031,13 +1043,13 @@ function mt:instantSource(source)
     end
 end
 
-function mt:bindLocal(source, loc)
+function mt:bindLocal(source, loc, action)
     if not source then
         return
     end
     self:instantSource(source)
     if loc then
-        source:bindLocal(loc)
+        source:bindLocal(loc, action)
     else
         return source:bindLocal()
     end
@@ -1065,7 +1077,7 @@ function mt:createLocal(key, source, value)
 
     loc = createLocal(key, source, value)
     self:saveLocal(key, loc)
-    self:bindLocal(source, loc)
+    self:bindLocal(source, loc, 'local')
     return loc
 end
 
@@ -1079,6 +1091,13 @@ function mt:createEnvironment(ast)
     local env = self:createLocal('_ENV', nil, global)
     env:setFlag('hide', true)
     self.env = env
+end
+
+function mt:eachSource(callback)
+    local sources = self.sources
+    for i = 1, #sources do
+        callback(sources[i])
+    end
 end
 
 local function compile(ast, lsp, uri)
@@ -1098,9 +1117,6 @@ local function compile(ast, lsp, uri)
 
     -- 检查所有没有调用过的函数，调用一遍
     vm:callLeftFuncions()
-
-    vm.scope = nil
-    vm.chunk = nil
 
     return vm
 end

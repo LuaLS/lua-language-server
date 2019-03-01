@@ -62,6 +62,7 @@ function mt:buildTable(source)
             local value = self:getFirstInMulti(self:getExp(obj[2]))
             local key   = obj[1]
             self:instantSource(key)
+            key:bindValue(value, 'set')
             if key.index then
                 local index = self:getIndex(key)
                 tbl:setChild(index, value)
@@ -89,7 +90,6 @@ function mt:buildTable(source)
             end
             -- 处理写了一半的 key = value，把name类的数组元素视为哈希键
             if obj.type == 'name' then
-                obj.isIndex = true
             end
         end
     end

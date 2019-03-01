@@ -75,23 +75,23 @@ function mt:searchUndefinedGlobal(callback)
 end
 
 function mt:searchUnusedLabel(callback)
-    local results = self.results
-    for _, label in ipairs(results.labels) do
-        local ok = self.vm:eachInfo(label, function (info)
-            if info.type == 'goto' then
+    self.vm:eachSource(function (source)
+        local label = source:bindLabel()
+        if not label then
+            return
+        end
+        if source:action() ~= 'set' then
+            return
+        end
+        local used = label:eachInfo(function (info)
+            if info.type == 'get' then
                 return true
             end
         end)
-        if ok then
-            goto NEXT_LABEL
+        if not used then
+            callback(source.start, source.finish, label:getName())
         end
-        self.vm:eachInfo(label, function (info)
-            if info.type == 'set' then
-                callback(info.source.start, info.source.finish, label.key)
-            end
-        end)
-        ::NEXT_LABEL::
-    end
+    end)
 end
 
 local function isContainPos(obj, start, finish)
@@ -262,12 +262,12 @@ return function (vm, lines, uri)
         }
     end)
     -- 未使用的Label
-    --session:doDiagnostics(session.searchUnusedLabel, 'unused-label', function --(key)
-    --    return {
-    --        level   =DiagnosticSeverity.Hint,
-    --        message = lang.script('DIAG_UNUSED_LABEL', key)
-    --    }
-    --end)
+    session:doDiagnostics(session.searchUnusedLabel, 'unused-label', function (key)
+        return {
+            level   =DiagnosticSeverity.Hint,
+            message = lang.script('DIAG_UNUSED_LABEL', key)
+        }
+    end)
     -- 只有空格与制表符的行，以及后置空格
     --session:doDiagnostics(session.searchSpaces, 'trailing-space', function --(message)
     --    return {

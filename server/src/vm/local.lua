@@ -56,6 +56,19 @@ function mt:getName()
     return self.name
 end
 
+function mt:shadow(old)
+    if not old then
+        return self._shadow
+    end
+    local group = old._shadow
+    if not group then
+        group = {}
+        group[#group+1] = old
+    end
+    group[#group+1] = self
+    self._shadow = group
+end
+
 return function (name, source, value)
     if not value then
         error('Local must has a value')

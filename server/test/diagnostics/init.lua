@@ -115,7 +115,7 @@ print(_)
 local _
 print(_)
 local _ENV
-print(_ENV)
+<!print!>(_ENV) -- 由于重定义了_ENV，因此print变为了未定义全局变量
 ]]
 
 TEST [[

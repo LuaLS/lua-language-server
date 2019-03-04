@@ -141,30 +141,27 @@ function mt:searchSpaces(callback)
 end
 
 function mt:searchRedefinition(callback)
-    local results = self.results
-    local uri = self.uri
     local used = {}
-    for _, var in ipairs(results.locals) do
-        if var.key == '_'
-        or var.key == '_ENV'
-        or var.key == ''
-        then
-            goto NEXT_VAR
+    local uri = self.uri
+    self.vm:eachSource(function (source)
+        local loc = source:bindLocal()
+        if not loc then
+            return
         end
-        if var.hide then
-            goto NEXT_VAR
-        end
-        local shadow = var.shadow
+        local shadow = loc:shadow()
         if not shadow then
-            goto NEXT_VAR
+            return
         end
         if used[shadow] then
-            goto NEXT_VAR
+            return
         end
         used[shadow] = true
-        -- 如果多次重定义，则不再警告
-        if #shadow >= 4 then
-            goto NEXT_VAR
+        if loc:getFlag 'hide' then
+            return
+        end
+        local name = loc:getName()
+        if name == '_' or name == '_ENV' or name == '' then
+            return
         end
         local related = {}
         for i = 1, #shadow do
@@ -175,10 +172,9 @@ function mt:searchRedefinition(callback)
             }
         end
         for i = 2, #shadow do
-            callback(shadow[i].source.start, shadow[i].source.finish, shadow[i].key, related)
+            callback(shadow[i].source.start, shadow[i].source.finish, name, related)
         end
-        ::NEXT_VAR::
-    end
+    end)
 end
 
 function mt:searchNewLineCall(callback)
@@ -278,7 +274,7 @@ return function (vm, lines, uri)
     -- 重定义局部变量
     session:doDiagnostics(session.searchRedefinition, 'redefined-local', function (key, related)
         return {
-            level   = DiagnosticSeverity.Information,
+            level   = DiagnosticSeverity.Hint,
             message = lang.script('DIAG_REDEFINED_LOCAL', key),
             related = related,
         }

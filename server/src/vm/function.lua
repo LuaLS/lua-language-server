@@ -26,6 +26,10 @@ function mt:saveLocal(name, loc)
     if loc.type ~= 'local' then
         error('saveLocal必须是local')
     end
+    local old = self:loadLocal(name)
+    if old then
+        loc:shadow(old)
+    end
     self.locals[self._top][name] = loc
 end
 

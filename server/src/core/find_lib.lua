@@ -1,9 +1,5 @@
-local function findLib(var)
-    if var.type ~= 'local' and var.type ~= 'field' then
-        return nil
-    end
-    local value = var.value
-    local lib = value.lib
+local function findLib(value)
+    local lib = value:getLib()
     if not lib then
         return nil
     end
@@ -41,7 +37,10 @@ local function findLib(var)
     end
 end
 
-return function (var)
-    local lib, fullKey, oo = findLib(var)
-    return lib, fullKey, oo
+return function (source)
+    if source:bindValue() then
+        local lib, fullKey, oo = findLib(source:bindValue())
+        return lib, fullKey, oo
+    end
+    return nil
 end

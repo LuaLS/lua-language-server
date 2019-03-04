@@ -180,7 +180,7 @@ function mt:tryRequireOne(strValue, mode)
     if not self.lsp or not self.lsp.workspace then
         return nil
     end
-    local str = strValue:getValue()
+    local str = strValue:getLiteral()
     if type(str) == 'string' then
         -- 支持 require 'xxx' 的转到定义
         local strSource = strValue.source
@@ -221,13 +221,13 @@ function mt:callRequire(func, values)
     if not values[1] then
         values[1] = self:createValue('any')
     end
-    local str = values[1]:getValue()
+    local str = values[1]:getLiteral()
     if type(str) ~= 'string' then
         return
     end
     local lib = library.library[str]
     if lib then
-        local value = self:getLibValue(lib, 'library')
+        local value = libraryBuilder.value(lib)
         func:setReturn(1, value)
         return
     else
@@ -244,7 +244,7 @@ function mt:callLoadFile(func, values)
     if not values[1] then
         values[1] = self:createValue('any')
     end
-    local str = values[1]:getValue()
+    local str = values[1]:getLiteral()
     if type(str) ~= 'string' then
         return
     end
@@ -260,7 +260,7 @@ function mt:callDoFile(func, values)
     if not values[1] then
         values[1] = self:createValue('any')
     end
-    local str = values[1]:getValue()
+    local str = values[1]:getLiteral()
     if type(str) ~= 'string' then
         return
     end
@@ -529,17 +529,17 @@ function mt:getBinary(exp)
         v2:setType('number', 0.5)
         v1:setType('string', 0.1)
         v2:setType('string', 0.1)
-        if math.type(v1:getValue()) == 'integer' and math.type(v2:getValue()) == 'integer' then
+        if math.type(v1:getLiteral()) == 'integer' and math.type(v2:getLiteral()) == 'integer' then
             if op == '|' then
-                return self:createValue('integer', exp, v1:getValue() | v2:getValue())
+                return self:createValue('integer', exp, v1:getLiteral() | v2:getLiteral())
             elseif op == '~' then
-                return self:createValue('integer', exp, v1:getValue() ~ v2:getValue())
+                return self:createValue('integer', exp, v1:getLiteral() ~ v2:getLiteral())
             elseif op == '&' then
-                return self:createValue('integer', exp, v1:getValue() &v2:getValue())
+                return self:createValue('integer', exp, v1:getLiteral() &v2:getLiteral())
             elseif op == '<<' then
-                return self:createValue('integer', exp, v1:getValue() << v2:getValue())
+                return self:createValue('integer', exp, v1:getLiteral() << v2:getLiteral())
             elseif op == '>>' then
-                return self:createValue('integer', exp, v1:getValue() >> v2:getValue())
+                return self:createValue('integer', exp, v1:getLiteral() >> v2:getLiteral())
             end
         end
         return self:createValue('integer')
@@ -548,8 +548,8 @@ function mt:getBinary(exp)
         v2:setType('string', 0.5)
         v1:setType('number', 0.1)
         v2:setType('number', 0.1)
-        if type(v1:getValue()) == 'string' and type(v2:getValue()) == 'string' then
-            return self:createValue('string', nil, v1:getValue() .. v2:getValue())
+        if type(v1:getLiteral()) == 'string' and type(v2:getLiteral()) == 'string' then
+            return self:createValue('string', nil, v1:getLiteral() .. v2:getLiteral())
         end
         return self:createValue('string')
     elseif op == '+'
@@ -562,26 +562,26 @@ function mt:getBinary(exp)
     then
         v1:setType('number', 0.5)
         v2:setType('number', 0.5)
-        if type(v1:getValue()) == 'number' and type(v2:getValue()) == 'number' then
+        if type(v1:getLiteral()) == 'number' and type(v2:getLiteral()) == 'number' then
             if op == '+' then
-                return self:createValue('number', exp, v1:getValue() + v2:getValue())
+                return self:createValue('number', exp, v1:getLiteral() + v2:getLiteral())
             elseif op == '-' then
-                return self:createValue('number', exp, v1:getValue() - v2:getValue())
+                return self:createValue('number', exp, v1:getLiteral() - v2:getLiteral())
             elseif op == '*' then
-                return self:createValue('number', exp, v1:getValue() * v2:getValue())
+                return self:createValue('number', exp, v1:getLiteral() * v2:getLiteral())
             elseif op == '/' then
-                if v2:getValue() ~= 0 then
-                    return self:createValue('number', exp, v1:getValue() / v2:getValue())
+                if v2:getLiteral() ~= 0 then
+                    return self:createValue('number', exp, v1:getLiteral() / v2:getLiteral())
                 end
             elseif op == '^' then
-                return self:createValue('number', exp, v1:getValue() ^ v2:getValue())
+                return self:createValue('number', exp, v1:getLiteral() ^ v2:getLiteral())
             elseif op == '%' then
-                if v2:getValue() ~= 0 then
-                    return self:createValue('number', exp, v1:getValue() % v2:getValue())
+                if v2:getLiteral() ~= 0 then
+                    return self:createValue('number', exp, v1:getLiteral() % v2:getLiteral())
                 end
             elseif op == '//' then
-                if v2:getValue() ~= 0 then
-                    return self:createValue('number', exp, v1:getValue() // v2:getValue())
+                if v2:getLiteral() ~= 0 then
+                    return self:createValue('number', exp, v1:getLiteral() // v2:getLiteral())
                 end
             end
         end
@@ -600,20 +600,20 @@ function mt:getUnary(exp)
     elseif op == '#' then
         v1:setType('table', 0.5)
         v1:setType('string', 0.5)
-        if type(v1:getValue()) == 'string' then
-            return self:createValue('integer', exp, #v1:getValue())
+        if type(v1:getLiteral()) == 'string' then
+            return self:createValue('integer', exp, #v1:getLiteral())
         end
         return self:createValue('integer')
     elseif op == '-' then
         v1:setType('number', 0.5)
-        if type(v1:getValue()) == 'number' then
-            return self:createValue('number', exp, -v1:getValue())
+        if type(v1:getLiteral()) == 'number' then
+            return self:createValue('number', exp, -v1:getLiteral())
         end
         return self:createValue('number')
     elseif op == '~' then
         v1:setType('integer', 0.5)
-        if math.type(v1:getValue()) == 'integer' then
-            return self:createValue('integer', exp, ~v1:getValue())
+        if math.type(v1:getLiteral()) == 'integer' then
+            return self:createValue('integer', exp, ~v1:getLiteral())
         end
         return self:createValue('integer')
     end

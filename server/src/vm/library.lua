@@ -15,6 +15,11 @@ function buildLibValue(lib)
         value = createValue('function')
         local func = createFunction()
         value:setFunction(func)
+        if lib.args then
+            for _, arg in ipairs(lib.args) do
+                func:createLibArg(arg)
+            end
+        end
         if lib.returns then
             for i, rtn in ipairs(lib.returns) do
                 if rtn.type == '...' then

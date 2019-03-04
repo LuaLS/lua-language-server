@@ -167,8 +167,14 @@ function mt:mergeValue(value)
             self._child[k] = v
         end
     end
+    local hasSource = {}
+    for _, info in ipairs(self) do
+        hasSource[info.source] = true
+    end
     for _, info in ipairs(value) do
-        self[#self+1] = info
+        if not hasSource[info.source] then
+            self[#self+1] = info
+        end
     end
     if value._meta then
         self._meta = value._meta

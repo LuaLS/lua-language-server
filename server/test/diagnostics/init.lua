@@ -183,7 +183,39 @@ TEST [[
 local function f(a, b)
     return a, b
 end
-f(1, 2, <!3!>)
+f(1, 2, <!3!>, <!4!>)
+]]
+
+TEST [[
+local mt = {}
+function mt:f(a, b)
+    return a, b
+end
+mt.f(1, 2, 3, <!4!>)
+]]
+
+
+TEST [[
+local mt = {}
+function mt.f(a, b)
+    return a, b
+end
+mt:f(1, <!2!>, <!3!>, <!4!>)
+]]
+
+TEST [[
+local mt = {}
+function mt:f(a, b)
+    return a, b
+end
+mt:f(1, 2, <!3!>, <!4!>)
+]]
+
+TEST [[
+local function f(a, b, ...)
+    return a, b
+end
+f(1, 2, 3, 4)
 ]]
 
 TEST [[

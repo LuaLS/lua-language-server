@@ -200,26 +200,29 @@ function mt:searchNewLineCall(callback)
 end
 
 function mt:searchRedundantParameters(callback)
-    local results = self.results
-    for _, call in ipairs(results.calls) do
-        if call.func.hasDots then
-            goto NEXT_CALL
+    self.vm:eachSource(function (source)
+        local call, args = source:bindCall()
+        if not call then
+            return
         end
-        if not call.func.args then
-            goto NEXT_CALL
+        local func = call:getFunction()
+        if not func then
+            return
         end
-        local max = #call.func.args
-        local passed = #call.args
+        -- 参数中有 ... ，不用再检查了
+        if func:hasDots() then
+            return
+        end
+        local max = #func.args
+        if func:getObject() then
+            max = max + 1
+        end
+        local passed = #args
         for i = max + 1, passed do
-            local source = call.args[i]
-            if source.start then
-                callback(source.start, source.finish, max, passed)
-            else
-                log.error('No start: ', table.dump(source))
-            end
+            local extra = args[i]
+            callback(extra.source.start, extra.source.finish, max, passed)
         end
-        ::NEXT_CALL::
-    end
+    end)
 end
 
 function mt:doDiagnostics(func, code, callback)
@@ -290,11 +293,11 @@ return function (vm, lines, uri)
         }
     end)
     -- 调用函数时的参数数量是否超过函数的接收数量
-    --session:doDiagnostics(session.searchRedundantParameters, --'remainder-parameters', function (max, passed)
-    --    return {
-    --        level   = DiagnosticSeverity.Information,
-    --        message = lang.script('DIAG_OVER_MAX_ARGS', max, passed),
-    --    }
-    --end)
+    session:doDiagnostics(session.searchRedundantParameters, 'remainder-parameters', function (max, passed)
+        return {
+            level   = DiagnosticSeverity.Information,
+            message = lang.script('DIAG_OVER_MAX_ARGS', max, passed),
+        }
+    end)
     return session.datas
 end

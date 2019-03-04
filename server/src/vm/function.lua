@@ -125,6 +125,10 @@ function mt:setObject(value, source)
     self._objectSource = source
 end
 
+function mt:getObject()
+    return self._objectValue, self._objectSource
+end
+
 function mt:hasRuned()
     return self._runed > 0
 end
@@ -133,6 +137,10 @@ function mt:run()
     self._runed = self._runed + 1
     if not self.source then
         return
+    end
+
+    if self._runed > 1 then
+        --return
     end
 
     -- 第一次运行函数时，创建函数的参数
@@ -157,20 +165,31 @@ function mt:setArgs(values)
     for i = 1, #values do
         self.argValues[i] = values[i]
     end
-    if self.dots then
-        local dotsIndex = #self.args
-        for i = dotsIndex, #values do
-            self.dots:set(i - dotsIndex + 1, values[i])
-        end
-    end
 end
 
 function mt:createArg(arg)
     if arg.type == 'name' then
         local loc = createLocal(arg[1], arg, createValue('any', arg))
         self:saveLocal(arg[1], loc)
+        self.args[#self.args+1] = loc
     elseif arg.type == '...' then
+        self._dots = createDots()
     end
+end
+
+function mt:createLibArg(arg)
+    if arg.type == '...' then
+        self._dots = createDots()
+    else
+        local name = arg.name or '_'
+        local loc = createLocal(name, nil, createValue('any'))
+        self:saveLocal(name, loc)
+        self.args[#self.args+1] = loc
+    end
+end
+
+function mt:hasDots()
+    return self._dots ~= nil
 end
 
 function mt:createArgs()
@@ -194,6 +213,7 @@ return function (source)
     local self = setmetatable({
         source = source,
         locals = {},
+        args = {},
     }, mt)
     self:push()
     return self

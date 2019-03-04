@@ -40,6 +40,15 @@ function mt:bindValue(value, action)
     end
 end
 
+function mt:bindCall(func, args)
+    if func then
+        self._bindCall = func
+        self._bindCallArgs = args
+    else
+        return self._bindCall, self._bindCallArgs
+    end
+end
+
 function mt:action()
     return self._action
 end

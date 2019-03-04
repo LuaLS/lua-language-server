@@ -314,15 +314,15 @@ function mt:call(value, values, source)
             end
         end
     else
-        if not func.built then
+        if not func.source then
             func:setReturn(1, self:createValue('any', source))
         end
     end
 
-    if not source.hasRuned and func.built then
+    if not source.hasRuned and func.source then
         source.hasRuned = true
         func:setArgs(values)
-        self:runFunction(value)
+        self:runFunction(func)
     end
 
     return func:getReturn()
@@ -473,6 +473,7 @@ function mt:getSimple(simple, max)
             if object then
                 table.insert(args, 1, object)
             end
+            source:bindCall(func, args)
             value = self:call(func, args, source) or createValue('any')
         elseif source.type == 'index' then
             local child = source[1]
@@ -503,8 +504,8 @@ end
 function mt:getBinary(exp)
     local v1 = self:getExp(exp[1])
     local v2 = self:getExp(exp[2])
-    v1 = self:getFirstInMulti(v1)
-    v2 = self:getFirstInMulti(v2)
+    v1 = self:getFirstInMulti(v1) or createValue('nil', exp[1])
+    v2 = self:getFirstInMulti(v2) or createValue('nil', exp[2])
     local op = exp.op
     -- TODO 搜索元方法
     if     op == 'or' then
@@ -690,9 +691,7 @@ function mt:doReturn(action)
     end
     local values = self:unpackList(action)
     local func = self:getCurrentFunction()
-    local n = 0
-    values:eachValue(function (value)
-        n = n + 1
+    values:eachValue(function (n, value)
         func:setReturn(n, value)
     end)
 end
@@ -1128,7 +1127,7 @@ return function (ast, lsp, uri)
     end
     local suc, res = xpcall(compile, log.error, ast, lsp, uri)
     if not suc then
-        return nil
+        return nil, res
     end
     return res
 end

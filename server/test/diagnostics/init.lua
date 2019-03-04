@@ -89,6 +89,11 @@ x = 1<!  !>
 ]]
 
 TEST [[
+x = [=[  
+    ]=]
+]]
+
+TEST [[
 local x
 print(x)
 local <!x!>

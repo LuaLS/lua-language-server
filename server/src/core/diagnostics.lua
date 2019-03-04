@@ -102,8 +102,8 @@ local function isContainPos(obj, start, finish)
 end
 
 local function isInString(vm, start, finish)
-    for _, source in ipairs(vm.results.strings) do
-        if isContainPos(source, start, finish) then
+    for _, source in ipairs(vm.sources) do
+        if source:getType() == 'string' and isContainPos(source, start, finish) then
             return true
         end
     end
@@ -269,20 +269,20 @@ return function (vm, lines, uri)
         }
     end)
     -- 只有空格与制表符的行，以及后置空格
-    --session:doDiagnostics(session.searchSpaces, 'trailing-space', function --(message)
-    --    return {
-    --        level   = DiagnosticSeverity.Hint,
-    --        message = message,
-    --    }
-    --end)
+    session:doDiagnostics(session.searchSpaces, 'trailing-space', function (message)
+        return {
+            level   = DiagnosticSeverity.Hint,
+            message = message,
+        }
+    end)
     -- 重定义局部变量
-    --session:doDiagnostics(session.searchRedefinition, 'redefined-local', --function (key, related)
-    --    return {
-    --        level   = DiagnosticSeverity.Information,
-    --        message = lang.script('DIAG_REDEFINED_LOCAL', key),
-    --        related = related,
-    --    }
-    --end)
+    session:doDiagnostics(session.searchRedefinition, 'redefined-local', function (key, related)
+        return {
+            level   = DiagnosticSeverity.Information,
+            message = lang.script('DIAG_REDEFINED_LOCAL', key),
+            related = related,
+        }
+    end)
     -- 以括号开始的一行（可能被误解析为了上一行的call）
     --session:doDiagnostics(session.searchNewLineCall, 'newline-call', function ()
     --    return {

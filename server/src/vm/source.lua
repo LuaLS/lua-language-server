@@ -70,6 +70,10 @@ function mt:getName()
     return self[1]
 end
 
+function mt:getType()
+    return self.type
+end
+
 return function (source)
     if source._hasInstant then
         return false

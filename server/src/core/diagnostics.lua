@@ -103,7 +103,7 @@ end
 
 local function isInString(vm, start, finish)
     for _, source in ipairs(vm.sources) do
-        if source:getType() == 'string' and isContainPos(source, start, finish) then
+        if source.type == 'string' and isContainPos(source, start, finish) then
             return true
         end
     end
@@ -178,22 +178,25 @@ function mt:searchRedefinition(callback)
 end
 
 function mt:searchNewLineCall(callback)
-    local results = self.results
     local lines = self.lines
-    for _, call in ipairs(results.calls) do
-        if not call.nextObj then
-            goto NEXT_CALL
+    self.vm:eachSource(function (source)
+        if source.type ~= 'simple' then
+            return
         end
-        if not call.lastObj.start then
-            goto NEXT_CALL
+        for i = 1, #source - 1 do
+            local callSource = source[i]
+            local funcSource = source[i-1]
+            if callSource.type ~= 'call' then
+                goto CONTINUE
+            end
+            local callLine = lines:rowcol(callSource.start)
+            local funcLine = lines:rowcol(funcSource.finish)
+            if callLine > funcLine then
+                callback(callSource.start, callSource.finish)
+            end
+            :: CONTINUE ::
         end
-        local callline = lines:rowcol(call.args.start)
-        local lastline = lines:rowcol(call.lastObj.finish)
-        if callline > lastline then
-            callback(call.args.start, call.args.finish)
-        end
-        ::NEXT_CALL::
-    end
+    end)
 end
 
 function mt:searchRedundantParameters(callback)
@@ -280,12 +283,12 @@ return function (vm, lines, uri)
         }
     end)
     -- 以括号开始的一行（可能被误解析为了上一行的call）
-    --session:doDiagnostics(session.searchNewLineCall, 'newline-call', function ()
-    --    return {
-    --        level   = DiagnosticSeverity.Information,
-    --        message = lang.script.DIAG_PREVIOUS_CALL,
-    --    }
-    --end)
+    session:doDiagnostics(session.searchNewLineCall, 'newline-call', function ()
+        return {
+            level   = DiagnosticSeverity.Information,
+            message = lang.script.DIAG_PREVIOUS_CALL,
+        }
+    end)
     -- 调用函数时的参数数量是否超过函数的接收数量
     --session:doDiagnostics(session.searchRedundantParameters, --'remainder-parameters', function (max, passed)
     --    return {

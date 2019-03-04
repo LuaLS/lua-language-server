@@ -451,6 +451,7 @@ function mt:getFirstInMulti(multi)
 end
 
 function mt:getSimple(simple, max)
+    self:instantSource(simple)
     local first = simple[1]
     self:instantSource(first)
     local value = self:getExp(first)

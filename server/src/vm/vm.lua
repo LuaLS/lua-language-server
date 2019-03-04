@@ -333,8 +333,8 @@ function mt:call(value, values, source)
     return func:getReturn()
 end
 
-function mt:createValue(tp, source)
-    local value = createValue(tp, source)
+function mt:createValue(tp, source, literal)
+    local value = createValue(tp, source, literal)
     local lib = library.object[tp]
     if lib then
         local child = libraryBuilder.child(lib)
@@ -374,8 +374,8 @@ function mt:setName(name, source, value)
     self:instantSource(source)
     local loc = self:loadLocal(name)
     if loc then
-        source:bindLocal(loc, 'set')
         loc:setValue(value)
+        source:bindLocal(loc, 'set')
         return
     end
     local global = source:bindValue()
@@ -500,7 +500,7 @@ function mt:isTrue(v)
     if v:getType() == 'nil' then
         return false
     end
-    if v:getType() == 'boolean' and not v:getValue() then
+    if v:getType() == 'boolean' and not v:getLiteral() then
         return false
     end
     return true
@@ -530,8 +530,8 @@ function mt:getBinary(exp)
         or op == '<'
         or op == '>'
     then
-        v1:setType('number', 0.9)
-        v2:setType('number', 0.9)
+        v1:setType('number', 0.5)
+        v2:setType('number', 0.5)
         v1:setType('string', 0.1)
         v2:setType('string', 0.1)
         return self:createValue('boolean')
@@ -545,10 +545,10 @@ function mt:getBinary(exp)
         or op == '<<'
         or op == '>>'
     then
-        v1:setType('integer', 0.9)
-        v2:setType('integer', 0.9)
-        v1:setType('number', 0.9)
-        v2:setType('number', 0.9)
+        v1:setType('integer', 0.5)
+        v2:setType('integer', 0.5)
+        v1:setType('number', 0.5)
+        v2:setType('number', 0.5)
         v1:setType('string', 0.1)
         v2:setType('string', 0.1)
         if math.type(v1:getValue()) == 'integer' and math.type(v2:getValue()) == 'integer' then
@@ -566,8 +566,8 @@ function mt:getBinary(exp)
         end
         return self:createValue('integer')
     elseif op == '..' then
-        v1:setType('string', 0.9)
-        v2:setType('string', 0.9)
+        v1:setType('string', 0.5)
+        v2:setType('string', 0.5)
         v1:setType('number', 0.1)
         v2:setType('number', 0.1)
         if type(v1:getValue()) == 'string' and type(v2:getValue()) == 'string' then
@@ -582,8 +582,8 @@ function mt:getBinary(exp)
         or op == '%'
         or op == '//'
     then
-        v1:setType('number', 0.9)
-        v2:setType('number', 0.9)
+        v1:setType('number', 0.5)
+        v2:setType('number', 0.5)
         if type(v1:getValue()) == 'number' and type(v2:getValue()) == 'number' then
             if op == '+' then
                 return self:createValue('number', exp, v1:getValue() + v2:getValue())
@@ -620,20 +620,20 @@ function mt:getUnary(exp)
     if     op == 'not' then
         return self:createValue('boolean')
     elseif op == '#' then
-        v1:setType('table', 0.9)
-        v1:setType('string', 0.9)
+        v1:setType('table', 0.5)
+        v1:setType('string', 0.5)
         if type(v1:getValue()) == 'string' then
             return self:createValue('integer', exp, #v1:getValue())
         end
         return self:createValue('integer')
     elseif op == '-' then
-        v1:setType('number', 0.9)
+        v1:setType('number', 0.5)
         if type(v1:getValue()) == 'number' then
             return self:createValue('number', exp, -v1:getValue())
         end
         return self:createValue('number')
     elseif op == '~' then
-        v1:setType('integer', 0.9)
+        v1:setType('integer', 0.5)
         if math.type(v1:getValue()) == 'integer' then
             return self:createValue('integer', exp, ~v1:getValue())
         end

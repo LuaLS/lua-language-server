@@ -72,11 +72,13 @@ function mt:rawGet(index)
 end
 
 function mt:setChild(index, value)
+    self:setType('table', 0.5)
     self:rawSet(index, value)
     return value
 end
 
 function mt:getChild(index, mark)
+    self:setType('table', 0.5)
     local value = self:rawGet(index)
     if value then
         return value
@@ -213,6 +215,7 @@ function mt:setFunction(func)
 end
 
 function mt:getFunction()
+    self:setType('function', 0.5)
     return self._func
 end
 
@@ -224,13 +227,18 @@ function mt:getLib()
     return self._lib
 end
 
-return function (tp, source)
+function mt:getLiteral()
+    return self._literal
+end
+
+return function (tp, source, literal)
     if tp == '...' then
         error('Value type cant be ...')
     end
     local self = setmetatable({
         source = source or getDefaultSource(),
         _type = {},
+        _literal = literal,
     }, mt)
     if type(tp) == 'table' then
         for i = 1, #tp do

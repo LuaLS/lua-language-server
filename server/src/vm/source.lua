@@ -5,6 +5,7 @@ mt._hasInstant = true
 function mt:bindLocal(loc, action)
     if loc then
         self._bindLocal = loc
+        self._bindValue = loc:getValue()
         self._action = action
         loc:addInfo(action, self)
     else

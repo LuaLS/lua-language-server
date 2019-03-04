@@ -335,13 +335,6 @@ end
 
 function mt:createValue(tp, source, literal)
     local value = createValue(tp, source, literal)
-    local lib = library.object[tp]
-    if lib then
-        local child = libraryBuilder.child(lib)
-        for k, v in pairs(child) do
-            value:setChild(k, v)
-        end
-    end
     return value
 end
 

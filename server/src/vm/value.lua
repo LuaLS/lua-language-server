@@ -1,3 +1,6 @@
+local libraryBuilder = require 'vm.library'
+local library = require 'core.library'
+
 local function getDefaultSource()
     return {
         start = 0,
@@ -77,6 +80,15 @@ function mt:setChild(index, value)
     return value
 end
 
+function mt:getLibChild(index)
+    local tp = self:getType()
+    local lib = library.object[tp]
+    if lib then
+        local childs = libraryBuilder.child(lib)
+        return childs[index]
+    end
+end
+
 function mt:getChild(index, mark)
     self:setType('table', 0.5)
     local value = self:rawGet(index)
@@ -85,7 +97,7 @@ function mt:getChild(index, mark)
     end
     local method = self:getMetaMethod('__index')
     if not method then
-        return nil
+        return self:getLibChild(index)
     end
     if not mark then
         mark = {}

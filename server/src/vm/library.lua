@@ -1,5 +1,5 @@
-local createValue = require 'vm.value'
-local createFunction = require 'vm.function'
+local createValue
+local createFunction
 
 local CHILD_CACHE = {}
 
@@ -7,6 +7,10 @@ local buildLibValue
 local buildLibChild
 
 function buildLibValue(lib)
+    if not createValue then
+        createValue = require 'vm.value'
+        createFunction = require 'vm.function'
+    end
     local tp = lib.type
     local value
     if     tp == 'table' then
@@ -55,6 +59,10 @@ function buildLibValue(lib)
 end
 
 function buildLibChild(lib)
+    if not createValue then
+        createValue = require 'vm.value'
+        createFunction = require 'vm.function'
+    end
     if CHILD_CACHE[lib] then
         return CHILD_CACHE[lib]
     end

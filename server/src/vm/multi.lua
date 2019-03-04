@@ -64,6 +64,12 @@ function mt:eachValue(callback)
     end
 end
 
+function mt:merge(other)
+    other:eachValue(function (_, value)
+        self:push(value)
+    end)
+end
+
 return function ()
     local self = setmetatable({}, mt)
     return self

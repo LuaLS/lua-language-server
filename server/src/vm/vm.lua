@@ -40,17 +40,6 @@ function mt:eachInfo(var, callback)
     return nil
 end
 
-function mt:createDots(index, source)
-    local dots = {
-        type = 'dots',
-        source = source or self:getDefaultSource(),
-        func = self:getCurrentFunction(),
-        index = index,
-    }
-    self.chunk.dots = dots
-    return dots
-end
-
 function mt:buildTable(source)
     local tbl = self:createValue('table', source)
     if not source then
@@ -283,51 +272,55 @@ function mt:callDoFile(func, values)
     func:setReturn(1, requireValue)
 end
 
+function mt:callLibrary(func, values, source, lib)
+    if lib.args then
+        for i, arg in ipairs(lib.args) do
+            local value = values[i]
+            if value and arg.type ~= '...' then
+                value:setType(arg.type, 1.0)
+            end
+        end
+    end
+    if lib.returns then
+        for i, rtn in ipairs(lib.returns) do
+            if rtn.type == '...' then
+                --func:getReturn(i):setType('any', 0.0)
+            else
+                func:getReturn(i):setType(rtn.type or 'any', 1.0)
+            end
+        end
+    end
+    if lib.special then
+        if lib.special == 'setmetatable' then
+            self:callSetMetaTable(func, values, source)
+        elseif lib.special == 'require' then
+            self:callRequire(func, values)
+        elseif lib.special == 'loadfile' then
+            self:callLoadFile(func, values)
+        elseif lib.special == 'dofile' then
+            self:callDoFile(func, values)
+        end
+    end
+end
+
 function mt:call(value, values, source)
-    local lib = value.lib
+    local lib = value:getLib()
     local func = value:getFunction()
     if not func then
         return
     end
     if lib then
-        if lib.args then
-            for i, arg in ipairs(lib.args) do
-                local value = values[i]
-                if value and arg.type ~= '...' then
-                    value:setType(arg.type, 1.0)
-                end
-            end
-        end
-        if lib.returns then
-            for i, rtn in ipairs(lib.returns) do
-                if rtn.type == '...' then
-                    func:getReturn(i):setType('any', 0.0)
-                else
-                    func:getReturn(i):setType(rtn.type or 'any', 1.0)
-                end
-            end
-        end
-        if lib.special then
-            if lib.special == 'setmetatable' then
-                self:callSetMetaTable(func, values, source)
-            elseif lib.special == 'require' then
-                self:callRequire(func, values)
-            elseif lib.special == 'loadfile' then
-                self:callLoadFile(func, values)
-            elseif lib.special == 'dofile' then
-                self:callDoFile(func, values)
-            end
-        end
+        self:callLibrary(func, values, source, lib)
     else
-        if not func.source then
+        if func.source then
+            if not source:getFlag 'called' then
+                source:setFlag('called', true)
+                func:setArgs(values)
+                self:runFunction(func)
+            end
+        else
             func:setReturn(1, self:createValue('any', source))
         end
-    end
-
-    if not source.hasRuned and func.source then
-        source.hasRuned = true
-        func:setArgs(values)
-        self:runFunction(func)
     end
 
     return func:getReturn()
@@ -393,15 +386,7 @@ function mt:getIndex(source)
     end
 end
 
--- expect表示遇到 ... 时，期待的返回数量
-function mt:unpackDots(res, expect)
-    local dots = self:loadDots(expect)
-    for _, v in ipairs(dots) do
-        res:push(v)
-    end
-end
-
-function mt:unpackList(list, expect)
+function mt:unpackList(list)
     local res = createMulti()
     if not list then
         return res
@@ -409,7 +394,7 @@ function mt:unpackList(list, expect)
     if list.type == 'list' or list.type == 'call' or list.type == 'return' then
         for i, exp in ipairs(list) do
             if exp.type == '...' then
-                self:unpackDots(res, expect)
+                res:merge(self:loadDots())
                 break
             end
             local value = self:getExp(exp)
@@ -426,7 +411,7 @@ function mt:unpackList(list, expect)
             end
         end
     elseif list.type == '...' then
-        self:unpackDots(res, expect)
+        res:merge(self:loadDots())
     else
         local value = self:getExp(list)
         if value.type == 'multi' then
@@ -463,7 +448,7 @@ function mt:getSimple(simple, max)
     for i = 2, max do
         local source = simple[i]
         self:instantSource(source)
-        value = self:getFirstInMulti(value)
+        value = self:getFirstInMulti(value) or createValue('nil')
 
         if source.type == 'call' then
             local args = self:unpackList(source)
@@ -660,9 +645,7 @@ function mt:getExp(exp)
     elseif tp == 'table' then
         return self:buildTable(exp)
     elseif tp == '...' then
-        local value = { type = 'list' }
-        self:unpackDots(value)
-        return value
+        return self:loadDots()
     elseif tp == 'list' then
         return self:getMultiByList(exp)
     end
@@ -1026,8 +1009,8 @@ function mt:loadLabel(name)
     return self.currentFunction:loadLabel(name)
 end
 
-function mt:loadDots(expect)
-    return self.currentFunction:loadDots(expect)
+function mt:loadDots()
+    return self.currentFunction:loadDots()
 end
 
 function mt:getUri()

@@ -1,4 +1,3 @@
-local createDots = require 'vm.dots'
 local createMulti = require 'vm.multi'
 local createValue = require 'vm.value'
 local createLocal = require 'vm.local'
@@ -100,7 +99,7 @@ function mt:getReturn(index)
         self.returns = createMulti()
     end
     if index then
-        return self.returns:get(index)
+        return self.returns:get(index) or createValue('nil')
     else
         return self.returns
     end
@@ -108,16 +107,16 @@ end
 
 function mt:returnDots(index)
     if not self.returns then
-        self.returns = {}
+        self.returns = createMulti()
     end
-    self.returns[index] = createDots()
+    self.returns[index] = createMulti()
 end
 
-function mt:loadDots(expect)
+function mt:loadDots()
     if not self._dots then
-        self._dots = createDots()
+        self._dots = createMulti()
     end
-    return self._dots:get(expect)
+    return self._dots
 end
 
 function mt:setObject(value, source)
@@ -159,27 +158,29 @@ function mt:run()
 end
 
 function mt:setArgs(values)
-    if not self.argValues then
-        self.argValues = {}
-    end
+    self.argValues = {}
     for i = 1, #values do
         self.argValues[i] = values[i]
     end
 end
 
-function mt:createArg(arg)
+function mt:createArg(arg, values)
     if arg.type == 'name' then
-        local loc = createLocal(arg[1], arg, createValue('any', arg))
+        local value = table.remove(values, 1) or createValue('nil', arg)
+        local loc = createLocal(arg[1], arg, value)
         self:saveLocal(arg[1], loc)
         self.args[#self.args+1] = loc
     elseif arg.type == '...' then
-        self._dots = createDots()
+        self._dots = createMulti(values)
+        for i = 1, #values do
+            self._dots:set(i, values[i])
+        end
     end
 end
 
 function mt:createLibArg(arg)
     if arg.type == '...' then
-        self._dots = createDots()
+        self._dots = createMulti()
     else
         local name = arg.name or '_'
         local loc = createLocal(name, nil, createValue('any'))
@@ -200,12 +201,14 @@ function mt:createArgs()
     if not args then
         return
     end
+    local values = self.argValues or {}
+    self.argValues = nil
     if args.type == 'list' then
         for _, arg in ipairs(args) do
-            self:createArg(arg)
+            self:createArg(arg, values)
         end
     else
-        self:createArg(args)
+        self:createArg(args, values)
     end
 end
 

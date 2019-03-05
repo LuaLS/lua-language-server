@@ -1,9 +1,9 @@
 [filesystem]
 type = 'table'
+nick = 'bee::filesystem'
 [[.source]]
 type = 'library'
 name = 'bee.filesystem'
-nick = 'bee::filesystem'
 
 <default>
 type = 'function'

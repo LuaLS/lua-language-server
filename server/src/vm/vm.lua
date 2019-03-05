@@ -456,6 +456,7 @@ function mt:getSimple(simple, max)
             if object then
                 table.insert(args, 1, object)
             end
+            object = nil
             source:bindCall(func, args)
             value = self:call(func, args, source) or createValue('any')
         elseif source.type == 'index' then
@@ -464,6 +465,8 @@ function mt:getSimple(simple, max)
             value = value:getChild(index) or value:setChild(index, createValue('any', source))
             source:bindValue(value, 'get')
         elseif source.type == 'name' then
+            source:setFlag('parent', value)
+            source:setFlag('object', object)
             value = value:getChild(source[1]) or value:setChild(source[1], createValue('any', source))
             source:bindValue(value, 'get')
         elseif source.type == ':' then

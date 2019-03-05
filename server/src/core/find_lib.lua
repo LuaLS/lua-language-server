@@ -1,45 +1,50 @@
-local function findLib(value)
+local function getParentName(lib, isObject)
+    for _, parent in ipairs(lib.parent) do
+        if isObject then
+            if parent.type == 'object' then
+                return parent.nick or parent.name
+            end
+        else
+            if parent.type ~= 'object' then
+                return parent.nick or parent.name
+            end
+        end
+    end
+    return ''
+end
+
+local function findLib(source)
+    local value = source:bindValue()
     local lib = value:getLib()
     if not lib then
         return nil
     end
     if lib.parent then
-        local res
-        for _, parent in ipairs(lib.parent) do
-            if parent.type == value.parentType then
-                res = parent
-            end
-        end
-        if not res then
-            res = lib.parent[1]
-        end
-        if res.type == 'object' then
-            local fullKey = ('*%s:%s'):format(res.nick or res.name, lib.name)
+        if source:getFlag 'object' then
+            -- *string:sub
+            local fullKey = ('*%s:%s'):format(getParentName(lib, true), lib.name)
             return lib, fullKey, true
         else
-            local fullKey = ('%s.%s'):format(res.nick or res.name, lib.name)
-            return lib, fullKey, false
-        end
-    else
-        local res
-        if not lib.source then
-            return lib, lib.nick or lib.name, false
-        end
-        for _, source in ipairs(lib.source) do
-            if source.type == value.parentType then
-                res = source
+            local parentValue = source:getFlag 'parent'
+            if parentValue and parentValue:getType() == 'string' then
+                -- *string.sub
+                local fullKey = ('*%s.%s'):format(getParentName(lib, false), lib.name)
+                return lib, fullKey, false
+            else
+                -- string.sub
+                local fullKey = ('%s.%s'):format(getParentName(lib, false), lib.name)
+                return lib, fullKey, false
             end
         end
-        if not res then
-            return lib, lib.nick or lib.name, false
-        end
-        return lib, res.nick or res.name or lib.nick or lib.name, false
+    else
+        local name = lib.nick or lib.name
+        return lib, name, false
     end
 end
 
 return function (source)
     if source:bindValue() then
-        local lib, fullKey, oo = findLib(source:bindValue())
+        local lib, fullKey, oo = findLib(source)
         return lib, fullKey, oo
     end
     return nil

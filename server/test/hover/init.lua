@@ -285,16 +285,34 @@ local <?t?> = {
     [5.5] = 4,
     [{}] = 5,
     [function () end] = 6,
+    ["b"] = 7,
+    ["012"] = 8,
 }
 ]]
 [[
 local t: {
+    ["012"]: number = 8,
     [*function]: number = 6,
     [*table]: number = 5,
     [001]: number = 2,
     [5.5]: number = 4,
     [true]: number = 3,
     a: number = 1,
+    b: number = 7,
+}
+]]
+
+TEST [[
+local <?t?> = {}
+t[#t+1] = 1
+t[#t+1] = 1
+
+local any = collectgarbage()
+t[any] = any
+]]
+[[
+local t: {
+    [*number]: number = 1,
 }
 ]]
 

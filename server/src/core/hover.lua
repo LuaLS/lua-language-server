@@ -267,7 +267,13 @@ local function unpackTable(value)
             key = ('[*%s]'):format(key:getType())
         elseif math.type(key) == 'integer' then
             key = ('[%03d]'):format(key)
-        elseif kType ~= 'string' then
+        elseif kType == 'string' then
+            if key:find '^%d' or key:find '[^%w_]' then
+                key = ('[%q]'):format(key)
+            end
+        elseif key == '' then
+            key = '[*any]'
+        else
             key = ('[%s]'):format(key)
         end
 
@@ -277,9 +283,9 @@ local function unpackTable(value)
             or vType == 'number'
             or vType == 'string'
         then
-            lines[#lines+1] = ('%s: %s = %q,'):format(key, child:getType(), child:getLiteral())
+            lines[#lines+1] = ('%s: %s = %q'):format(key, child:getType(), child:getLiteral())
         else
-            lines[#lines+1] = ('%s: %s,'):format(key, child:getType())
+            lines[#lines+1] = ('%s: %s'):format(key, child:getType())
         end
     end)
     if #lines == 0 then
@@ -297,7 +303,7 @@ local function unpackTable(value)
         if line == '[*any]: any' then
             goto CONTINUE
         end
-        cleaned[#cleaned+1] = '    ' .. line
+        cleaned[#cleaned+1] = '    ' .. line .. ','
         :: CONTINUE ::
     end
 

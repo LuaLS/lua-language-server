@@ -18,6 +18,22 @@ return function (source)
         key = ('%q'):format(declarat[1])
     elseif declarat.type == 'number' or declarat.type == 'boolean' then
         key = tostring(declarat[1])
+    elseif declarat.type == 'simple' then
+        local chars = {}
+        for i, obj in ipairs(declarat) do
+            if obj.type == 'name' then
+                chars[i] = obj[1]
+            elseif obj.type == 'index' then
+                chars[i] = '[?]'
+            elseif obj.type == 'call' then
+                chars[i] = '(?)'
+            elseif obj.type == ':' then
+                chars[i] = ':'
+            elseif obj.type == '.' then
+                chars[i] = '.'
+            end
+        end
+        key = table.concat(chars)
     else
         key = ''
     end

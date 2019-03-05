@@ -158,7 +158,9 @@ function mt:run()
 end
 
 function mt:setArgs(values)
-    self.argValues = {}
+    for i = 1, #self.argValues do
+        self.argValues[i] = nil
+    end
     for i = 1, #values do
         self.argValues[i] = values[i]
     end
@@ -171,7 +173,7 @@ function mt:createArg(arg, values)
         self:saveLocal(arg[1], loc)
         self.args[#self.args+1] = loc
     elseif arg.type == '...' then
-        self._dots = createMulti(values)
+        self._dots = createMulti()
         for i = 1, #values do
             self._dots:set(i, values[i])
         end
@@ -201,8 +203,10 @@ function mt:createArgs()
     if not args then
         return
     end
-    local values = self.argValues or {}
-    self.argValues = nil
+    local values = {}
+    for i, value in ipairs(self.argValues) do
+        values[i] = value
+    end
     if args.type == 'list' then
         for _, arg in ipairs(args) do
             self:createArg(arg, values)
@@ -231,6 +235,7 @@ return function (source)
         source = source,
         locals = {},
         args = {},
+        argValues = {},
     }, mt)
     self:push()
     return self

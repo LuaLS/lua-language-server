@@ -1,9 +1,12 @@
 local function buildValueArgs(func, object, select)
     local names = {}
     local values = {}
+    if func:getObject() then
+        names[#names+1] = 'self'
+    end
     if func.args then
-        for i, arg in ipairs(func.args) do
-            names[i] = arg:getName()
+        for _, arg in ipairs(func.args) do
+            names[#names+1] = arg:getName()
         end
     end
     if func.argValues then

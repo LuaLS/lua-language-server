@@ -434,7 +434,6 @@ function mt:buildFunction(exp, object)
             func.argValues[#func.args] = self:getValue(var)
         elseif arg.type == '...' then
             self:createDots(#func.args+1, arg)
-            func.hasDots = true
             for _ = 1, 10 do
                 func.argValues[#func.argValues+1] = self:createValue('any', arg)
             end

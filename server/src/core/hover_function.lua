@@ -1,9 +1,9 @@
-local function buildValueArgs(func, oo, select)
+local function buildValueArgs(func, object, select)
     local names = {}
     local values = {}
     if func.args then
         for i, arg in ipairs(func.args) do
-            names[i] = arg.key
+            names[i] = arg:getName()
         end
     end
     if func.argValues then
@@ -13,7 +13,7 @@ local function buildValueArgs(func, oo, select)
     end
     local strs = {}
     local start = 1
-    if oo then
+    if object then
         start = 2
         if select then
             select = select + 1
@@ -43,7 +43,7 @@ local function buildValueArgs(func, oo, select)
             strs[#strs+1] = '@ARG'
         end
     end
-    if func.hasDots then
+    if func:hasDots() then
         if max > 0 then
             strs[#strs+1] = ', '
         end
@@ -84,8 +84,8 @@ local function buildValueReturns(func)
     return '\n  -> ' .. table.concat(strs, ', ')
 end
 
-return function (name, func, oo, select)
-    local args, argLabel = buildValueArgs(func, oo, select)
+return function (name, func, object, select)
+    local args, argLabel = buildValueArgs(func, object, select)
     local returns = buildValueReturns(func)
     local headLen = #('function %s('):format(name)
     local title = ('function %s(%s)%s'):format(name, args, returns)

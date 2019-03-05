@@ -352,10 +352,25 @@ local function getStringHover(result, lsp)
     }
 end
 
-local function hoverAsValue(result, source, lsp, select)
-    if result:getType() == 'string' then
-        return getStringHover(result, lsp)
+local function hoverAsValue(source, lsp, select)
+    local lib, fullkey, isObject = findLib(source)
+    local value = source:bindValue()
+    local name = fullkey or buildValueName(source)
+
+    local hover
+    if value:getType() == 'function' then
+        if lib then
+        else
+            hover = getFunctionHover(name, value:getFunction(), source:getFlag 'object', select)
+        end
+    else
     end
+
+    if not hover then
+        return nil
+    end
+    hover.name = name
+    return hover
 end
 
 local function hoverAsVar(result, source, lsp, select)
@@ -399,13 +414,11 @@ local function hoverAsVar(result, source, lsp, select)
     return hover
 end
 
-return function (result, source, lsp, select)
-    if not result then
+return function (source, lsp, select)
+    if not source then
         return nil
     end
-    if result.type == 'value' then
-        return hoverAsValue(result, source, lsp, select)
-    else
-        return hoverAsVar(result, source, lsp, select)
+    if source:bindValue() then
+        return hoverAsValue(source, lsp, select)
     end
 end

@@ -212,6 +212,20 @@ function mt:createArgs()
     end
 end
 
+function mt:setFlag(name, v)
+    if not self._flag then
+        self._flag = {}
+    end
+    self._flag[name] = v
+end
+
+function mt:getFlag(name)
+    if not self._flag then
+        return nil
+    end
+    return self._flag[name]
+end
+
 return function (source)
     local self = setmetatable({
         source = source,

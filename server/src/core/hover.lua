@@ -15,12 +15,12 @@ local OriginTypes = {
     ['function'] = true,
 }
 
-local function buildLibArgs(lib, oo, select)
+local function buildLibArgs(lib, object, select)
     if not lib.args then
         return ''
     end
     local start
-    if oo then
+    if object then
         start = 2
         if select then
             select = select + 1
@@ -190,8 +190,8 @@ local function buildEnum(lib)
     return table.concat(strs)
 end
 
-local function getFunctionHoverAsLib(name, lib, oo, select)
-    local args, argLabel = buildLibArgs(lib, oo, select)
+local function getFunctionHoverAsLib(name, lib, object, select)
+    local args, argLabel = buildLibArgs(lib, object, select)
     local returns = buildLibReturns(lib)
     local enum = buildEnum(lib)
     local tip = lib.description
@@ -259,9 +259,9 @@ local function findClass(value)
     end)
 end
 
-local function unpackTable(result)
+local function unpackTable(value)
     local lines = {}
-    result.value:eachField(function (key, field)
+    value:eachChild(function (key, child)
         local kType = type(key)
         if kType == 'table' then
             key = ('[*%s]'):format(key:getType())
@@ -271,36 +271,40 @@ local function unpackTable(result)
             key = ('[%s]'):format(key)
         end
 
-        local value = field.value
-        if not value then
-            local str = ('    %s: %s,'):format(key, 'any')
-            if str == '    [*any]: any,' then
-                goto CONTINUE
-            end
-            lines[#lines+1] = str
-            goto CONTINUE
-        end
-
-        local vType = type(value:getValue())
-        if vType == 'boolean' or vType == 'integer' or vType == 'number' or vType == 'string' then
-            local str = ('    %s: %s = %q,'):format(key, value:getType(), value:getValue())
-            lines[#lines+1] = str
+        local vType = type(child:getLiteral())
+        if     vType == 'boolean'
+            or vType == 'integer'
+            or vType == 'number'
+            or vType == 'string'
+        then
+            lines[#lines+1] = ('%s: %s = %q,'):format(key, child:getType(), child:getLiteral())
         else
-            local str = ('    %s: %s,'):format(key, value:getType())
-            if str == '    [*any]: any,' then
-                goto CONTINUE
-            end
-            lines[#lines+1] = str
+            lines[#lines+1] = ('%s: %s,'):format(key, child:getType())
         end
-        ::CONTINUE::
     end)
     if #lines == 0 then
         return '{}'
     end
-    table.sort(lines)
-    table.insert(lines, 1, '{')
-    lines[#lines+1] = '}'
-    return table.concat(lines, '\r\n')
+
+    -- 整理一下表
+    local cleaned = {}
+    local used = {}
+    for _, line in ipairs(lines) do
+        if used[line] then
+            goto CONTINUE
+        end
+        used[line] = true
+        if line == '[*any]: any' then
+            goto CONTINUE
+        end
+        cleaned[#cleaned+1] = '    ' .. line
+        :: CONTINUE ::
+    end
+
+    table.sort(cleaned)
+    table.insert(cleaned, 1, '{')
+    cleaned[#cleaned+1] = '}'
+    return table.concat(cleaned, '\r\n')
 end
 
 local function getValueHover(source, name, value, lib)
@@ -320,8 +324,8 @@ local function getValueHover(source, name, value, lib)
     local tip
     local literal
     if lib then
-        --value = lib.code or (lib.value and ('%q'):format(lib.value))
-        --tip = lib.description
+        value = lib.code or (lib.value and ('%q'):format(lib.value))
+        tip = lib.description
     else
         literal = value:getLiteral() and ('%q'):format(value:getLiteral())
     end
@@ -378,9 +382,11 @@ local function hoverAsValue(source, lsp, select)
 
     local hover
     if value:getType() == 'function' then
+        local object = source:get 'object'
         if lib then
+            hover = getFunctionHoverAsLib(name, lib, object, select)
         else
-            hover = getFunctionHover(name, value:getFunction(), source:get 'object', select)
+            hover = getFunctionHover(name, value:getFunction(), object, select)
         end
     else
         hover = getValueHover(source, name, value, lib)
@@ -393,37 +399,12 @@ local function hoverAsValue(source, lsp, select)
     return hover
 end
 
-local function hoverAsVar(result, source, lsp, select)
-    local lib, fullKey = findLib(result)
-    local valueType = lib and lib.type
-    if valueType then
-        if type(valueType) == 'table' then
-            valueType = valueType[1]
-        end
-    else
-        valueType = result.value:getType() or 'nil'
-    end
-    local name = fullKey or buildValueName(result, source)
-    local hover
-    if valueType == 'function' then
-        if lib then
-            hover = getFunctionHoverAsLib(name, lib, oo, select)
-        else
-            hover = getFunctionHover(name, result.value, source.object, select)
-        end
-    else
-        hover = getValueHover(name, valueType, result, lib)
-    end
-    if not hover then
-        return
-    end
-    hover.name = name
-    return hover
-end
-
 return function (source, lsp, select)
     if not source then
         return nil
+    end
+    if source.type ~= 'name' then
+        return
     end
     if source:bindValue() then
         return hoverAsValue(source, lsp, select)

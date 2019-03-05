@@ -26,7 +26,7 @@ local function buildValueArgs(func, object, select)
         end
     end
     local max
-    if func.built then
+    if func.source then
         max = #names
     else
         max = math.max(#names, #values)

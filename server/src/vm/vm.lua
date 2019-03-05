@@ -306,6 +306,7 @@ end
 function mt:call(value, values, source)
     local lib = value:getLib()
     local func = value:getFunction()
+    value:setType('function', 0.5)
     if not func then
         return
     end
@@ -972,6 +973,7 @@ function mt:createFunction(source)
     local value = createValue('function', source)
     local func = createFunction(source)
     value:setFunction(func)
+    value:setType('function', 1.0)
     if source:getUri() == self.uri then
         self.funcs[#self.funcs+1] = func
     end

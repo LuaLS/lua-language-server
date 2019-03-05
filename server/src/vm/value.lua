@@ -223,11 +223,9 @@ end
 
 function mt:setFunction(func)
     self._func = func
-    self:setType('function', 1.0)
 end
 
 function mt:getFunction()
-    self:setType('function', 0.5)
     return self._func
 end
 

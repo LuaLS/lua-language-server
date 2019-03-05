@@ -26,6 +26,8 @@ return function (source)
                 chars[i] = ':'
             elseif obj.type == '.' then
                 chars[i] = '.'
+            else
+                chars[i] = '*' .. obj.type
             end
             if obj == declarat then
                 break
@@ -51,6 +53,8 @@ return function (source)
                 chars[i] = ':'
             elseif obj.type == '.' then
                 chars[i] = '.'
+            else
+                chars[i] = '*' .. obj.type
             end
         end
         -- 这里有个特殊处理

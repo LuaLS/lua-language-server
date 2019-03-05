@@ -731,7 +731,7 @@ function mt:mergeFunctionReturn(func, index, value)
 end
 
 function mt:setFunctionReturn(func, index, value)
-    func.hasReturn = true
+    func:set('hasReturn', true)
     if not func.returns then
         func.returns = {
             type = 'list',
@@ -1226,7 +1226,7 @@ function mt:doDo(action)
 end
 
 function mt:doReturn(action)
-    self:getCurrentFunction().hasReturn = true
+    self:getCurrentFunction():set('hasReturn', true)
     for i, exp in ipairs(action) do
         local value = self:getExp(exp)
         if value.type == 'list' then

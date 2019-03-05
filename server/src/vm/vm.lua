@@ -313,8 +313,8 @@ function mt:call(value, values, source)
         self:callLibrary(func, values, source, lib)
     else
         if func.source then
-            if not source:getFlag 'called' then
-                source:setFlag('called', true)
+            if not source:get 'called' then
+                source:set('called', true)
                 func:setArgs(values)
                 self:runFunction(func)
             end
@@ -348,7 +348,7 @@ function mt:getName(name, source)
     if global then
         return global
     end
-    source:setFlag('global', true)
+    source:set('global', true)
     local ENV = self:loadLocal('_ENV')
     local ENVValue = ENV:getValue()
     global = ENVValue:getChild(name) or ENVValue:setChild(name, createValue('any', source))
@@ -368,7 +368,7 @@ function mt:setName(name, source, value)
     if global then
         return global
     end
-    source:setFlag('global', true)
+    source:set('global', true)
     source:bindValue(global, 'set')
     local ENV = self:loadLocal('_ENV')
     local ENVValue = ENV:getValue()
@@ -448,6 +448,7 @@ function mt:getSimple(simple, max)
     for i = 2, max do
         local source = simple[i]
         self:instantSource(source)
+        source:set('simple', simple)
         value = self:getFirstInMulti(value) or createValue('nil')
 
         if source.type == 'call' then
@@ -465,8 +466,8 @@ function mt:getSimple(simple, max)
             value = value:getChild(index) or value:setChild(index, createValue('any', source))
             source:bindValue(value, 'get')
         elseif source.type == 'name' then
-            source:setFlag('parent', value)
-            source:setFlag('object', object)
+            source:set('parent', value)
+            source:set('object', object)
             value = value:getChild(source[1]) or value:setChild(source[1], createValue('any', source))
             source:bindValue(value, 'get')
         elseif source.type == ':' then
@@ -725,6 +726,7 @@ function mt:setOne(var, value)
         local parent = self:getSimple(var, -2)
         local key = var[#var]
         self:instantSource(key)
+        key:set('simple', var)
         if key.type == 'index' then
             local index = self:getIndex(key[1])
             parent:setChild(index, value)
@@ -1073,7 +1075,7 @@ function mt:createEnvironment(ast)
     local global = buildGlobal(self.lsp)
     -- 隐藏的上值`_ENV`
     local env = self:createLocal('_ENV', nil, global)
-    env:setFlag('hide', true)
+    env:set('hide', true)
     self.env = env
 end
 

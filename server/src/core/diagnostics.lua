@@ -24,7 +24,7 @@ function mt:searchUnusedLocals(callback)
         if source:action() ~= 'local' then
             return
         end
-        if loc:getFlag 'hide' then
+        if loc:get 'hide' then
             return
         end
         local used = loc:eachInfo(function (info)
@@ -40,7 +40,7 @@ end
 
 function mt:searchUndefinedGlobal(callback)
     self.vm:eachSource(function (source)
-        if not source:getFlag 'global' then
+        if not source:get 'global' then
             return
         end
         local value = source:bindValue()
@@ -156,7 +156,7 @@ function mt:searchRedefinition(callback)
             return
         end
         used[shadow] = true
-        if loc:getFlag 'hide' then
+        if loc:get 'hide' then
             return
         end
         local name = loc:getName()

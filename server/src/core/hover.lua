@@ -209,42 +209,54 @@ local function getFunctionHoverAsLib(name, lib, oo, select)
     }
 end
 
-local function findClass(result)
-    -- 查找meta表的 __name 字段
-    local name = result.value:getMeta('__name', result.source)
-    -- 值必须是字符串
-    if name and name.value and type(name.value:getValue()) == 'string' then
-        return name.value:getValue()
+local function findClass(value)
+    -- 检查对象元表
+    local metaValue = value:getMetaTable()
+    if not metaValue then
+        return nil
     end
-    -- 查找meta表 __index 里的字段
-    local index = result.value:getMeta('__index', result.source)
-    if index and index.value then
-        return index.value:eachField(function (key, field)
-            -- 键值类型必须均为字符串
-            if type(key) ~= 'string' then
-                goto CONTINUE
-            end
-            if not field.value or type(field.value:getValue()) ~= 'string' then
-                goto CONTINUE
-            end
-            local lKey = key:lower()
-            if lKey == 'type' or lKey == 'name' or lKey == 'class' then
-                -- 必须只有过一次赋值
-                local hasSet = false
-                for _, info in ipairs(field) do
-                    if info.type == 'set' then
-                        if hasSet then
-                            goto CONTINUE
-                        end
+    -- 检查元表中的 __name
+    local metaName = metaValue:rawGet('__name')
+    if metaName and type(metaName:getLiteral()) == 'string' then
+        return metaName:getLiteral()
+    end
+    -- 检查元表的 __index
+    local indexValue = metaValue:rawGet('__index')
+    if not indexValue then
+        return nil
+    end
+    -- 查找index方法中的以下字段: type name class
+    -- 允许多重继承
+    return indexValue:eachChild(function (k, v)
+        -- 键值类型必须均为字符串
+        if type(k) ~= 'string' then
+            return
+        end
+        if type(v:getLiteral()) ~= 'string' then
+            return
+        end
+        local lKey = k:lower()
+        if     lKey == 'type'
+            or lKey == 'name'
+            or lKey == 'class'
+        then
+            -- 必须只有过一次赋值
+            local hasSet = false
+            local ok = v:eachInfo(function (info)
+                if info.type == 'set' then
+                    if hasSet then
+                        return false
+                    else
                         hasSet = true
                     end
                 end
-                return field.value:getValue()
+            end)
+            if ok == false then
+                return false
             end
-            ::CONTINUE::
-        end)
-    end
-    return nil
+            return v:getLiteral()
+        end
+    end)
 end
 
 local function unpackTable(result)
@@ -291,46 +303,53 @@ local function unpackTable(result)
     return table.concat(lines, '\r\n')
 end
 
-local function getValueHover(name, valueType, result, lib)
+local function getValueHover(source, name, value, lib)
+    local valueType = value:getType()
+
     if not lib then
-        local class = findClass(result)
+        local class = findClass(value)
         if class then
             valueType = class
         end
-    end
-
-    if type(valueType) == 'table' then
-        valueType = valueType[1]
     end
 
     if not OriginTypes[valueType] then
         valueType = '*' .. valueType
     end
 
-    local value
     local tip
+    local literal
     if lib then
-        value = lib.code or (lib.value and ('%q'):format(lib.value))
-        tip = lib.description
+        --value = lib.code or (lib.value and ('%q'):format(lib.value))
+        --tip = lib.description
     else
-        value = result.value:getValue() and ('%q'):format(result.value:getValue())
+        literal = value:getLiteral() and ('%q'):format(value:getLiteral())
     end
 
-    local tp = result.type
-    if tp == 'field' then
-        if result.GLOBAL then
+    local tp
+    if source:bindLocal() then
+        tp = 'local'
+    elseif source:get 'global' then
+        tp = 'global'
+    elseif source:get 'simple' then
+        local simple = source:get 'simple'
+        if simple[1]:get 'global' then
             tp = 'global'
+        else
+            tp = 'field'
         end
+    else
+        tp = 'field'
     end
 
     local text
     if valueType == 'table' then
-        text = ('%s %s: %s'):format(tp, name, unpackTable(result))
+        text = ('%s %s: %s'):format(tp, name, unpackTable(value))
     else
-        if value == nil then
+        if literal == nil then
             text = ('%s %s: %s'):format(tp, name, valueType)
         else
-            text = ('%s %s: %s = %s'):format(tp, name, valueType, value)
+            text = ('%s %s: %s = %s'):format(tp, name, valueType, literal)
         end
     end
     return {
@@ -353,7 +372,7 @@ local function getStringHover(result, lsp)
 end
 
 local function hoverAsValue(source, lsp, select)
-    local lib, fullkey, isObject = findLib(source)
+    local lib, fullkey = findLib(source)
     local value = source:bindValue()
     local name = fullkey or buildValueName(source)
 
@@ -361,9 +380,10 @@ local function hoverAsValue(source, lsp, select)
     if value:getType() == 'function' then
         if lib then
         else
-            hover = getFunctionHover(name, value:getFunction(), source:getFlag 'object', select)
+            hover = getFunctionHover(name, value:getFunction(), source:get 'object', select)
         end
     else
+        hover = getValueHover(source, name, value, lib)
     end
 
     if not hover then
@@ -374,20 +394,7 @@ local function hoverAsValue(source, lsp, select)
 end
 
 local function hoverAsVar(result, source, lsp, select)
-    if not result.value then
-        return
-    end
-
-    if result.key == '' then
-        return
-    end
-
-
-    if result.type ~= 'local' and result.type ~= 'field' then
-        return
-    end
-
-    local lib, fullKey, oo = findLib(result)
+    local lib, fullKey = findLib(result)
     local valueType = lib and lib.type
     if valueType then
         if type(valueType) == 'table' then

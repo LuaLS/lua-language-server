@@ -1,4 +1,7 @@
 local function buildValueArgs(func, object, select)
+    if not func then
+        return '', nil
+    end
     local names = {}
     local values = {}
     if func:getObject() then
@@ -72,7 +75,10 @@ local function buildValueArgs(func, object, select)
 end
 
 local function buildValueReturns(func)
-    if not func.hasReturn then
+    if not func then
+        return '\n  -> any'
+    end
+    if not func:get 'hasReturn' then
         return ''
     end
     local strs = {}

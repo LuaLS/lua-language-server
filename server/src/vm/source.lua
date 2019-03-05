@@ -62,14 +62,14 @@ function mt:getUri()
     return self._uri
 end
 
-function mt:setFlag(name, v)
+function mt:set(name, v)
     if not self._flag then
         self._flag = {}
     end
     self._flag[name] = v
 end
 
-function mt:getFlag(name)
+function mt:get(name)
     if not self._flag then
         return nil
     end

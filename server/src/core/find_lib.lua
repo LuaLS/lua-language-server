@@ -20,32 +20,32 @@ local function findLib(source)
         return nil
     end
     if lib.parent then
-        if source:getFlag 'object' then
+        if source:get 'object' then
             -- *string:sub
             local fullKey = ('*%s:%s'):format(getParentName(lib, true), lib.name)
-            return lib, fullKey, true
+            return lib, fullKey
         else
-            local parentValue = source:getFlag 'parent'
+            local parentValue = source:get 'parent'
             if parentValue and parentValue:getType() == 'string' then
                 -- *string.sub
                 local fullKey = ('*%s.%s'):format(getParentName(lib, false), lib.name)
-                return lib, fullKey, false
+                return lib, fullKey
             else
                 -- string.sub
                 local fullKey = ('%s.%s'):format(getParentName(lib, false), lib.name)
-                return lib, fullKey, false
+                return lib, fullKey
             end
         end
     else
         local name = lib.nick or lib.name
-        return lib, name, false
+        return lib, name
     end
 end
 
 return function (source)
     if source:bindValue() then
-        local lib, fullKey, oo = findLib(source)
-        return lib, fullKey, oo
+        local lib, fullKey = findLib(source)
+        return lib, fullKey
     end
     return nil
 end

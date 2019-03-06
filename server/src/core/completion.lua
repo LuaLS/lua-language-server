@@ -1,5 +1,6 @@
 local findSource = require 'core.find_source'
-local hover = require 'core.hover'
+local getFunctionHover = require 'core.hover.function'
+local getFunctionHoverAsLib = require 'core.hover.lib_function'
 
 local CompletionItemKind = {
     Text = 1,
@@ -98,6 +99,86 @@ local function matchKey(me, other)
     return true
 end
 
+local function getDucumentation(name, value)
+    if value:getType() == 'function' then
+        local lib = value:getLib()
+        local hover
+        if lib then
+            hover = getFunctionHoverAsLib(name, lib)
+        else
+            hover = getFunctionHover(name, value:getFunction())
+        end
+        if not hover then
+            return nil
+        end
+        local text = ([[
+```lua
+%s
+```
+%s
+```lua
+%s
+```
+]]):format(hover.label or '', hover.description or '', hover.enum or '')
+        return {
+            kind = 'markdown',
+            value = text,
+        }
+    end
+    return nil
+end
+
+local function getDetail(value)
+    local literal = value:getLiteral()
+    local tp = type(literal)
+    if tp == 'boolean' then
+        return ('= %q'):format(literal)
+    elseif tp == 'string' then
+        return ('= %q'):format(literal)
+    elseif tp == 'number' then
+        if math.type(literal) == 'integer' then
+            return ('= %q'):format(literal)
+        else
+            local str = ('= %.16f'):format(literal)
+            local dot = str:find('.', 1, true)
+            local suffix = str:find('[0]+$', dot + 2)
+            if suffix then
+                return str:sub(1, suffix - 1)
+            else
+                return str
+            end
+        end
+    end
+    return nil
+end
+
+local function getKind(cata, value)
+    if value:getType() == 'function' then
+        local func = value:getFunction()
+        if func:getObject() then
+            return CompletionItemKind.Method
+        else
+            return CompletionItemKind.Function
+        end
+    end
+    if cata == 'field' then
+        local literal = value:getLiteral()
+        local tp = type(literal)
+        if tp == 'number' or tp == 'integer' or tp == 'string' then
+            return CompletionItemKind.Enum
+        end
+    end
+    return nil
+end
+
+local function getValueData(cata, name, value)
+    return {
+        documentation = getDucumentation(name, value),
+        detail = getDetail(value),
+        kind = getKind(cata, value),
+    }
+end
+
 local function searchLocals(vm, source, word, callback)
     for _, src in ipairs(vm.sources) do
         local loc = src:bindLocal()
@@ -109,9 +190,23 @@ local function searchLocals(vm, source, word, callback)
             and loc:close() >= source.finish
             and matchKey(word, loc:getName())
         then
-            callback(loc:getName(), src, CompletionItemKind.Variable)
+            callback(loc:getName(), src, CompletionItemKind.Variable, getValueData('local', loc:getName(), loc:getValue()))
         end
         :: CONTINUE ::
+    end
+end
+
+local function sortPairs(t)
+    local keys = {}
+    for k in pairs(t) do
+        keys[#keys+1] = k
+    end
+    table.sort(keys)
+    local i = 0
+    return function ()
+        i = i + 1
+        local k = keys[i]
+        return k, t[k]
     end
 end
 
@@ -129,13 +224,12 @@ local function searchFields(vm, source, word, callback)
             goto CONTINUE
         end
         if matchKey(word, k) then
-            map[#map+1] = k
+            map[k] = v
         end
         :: CONTINUE ::
     end)
-    table.sort(map)
-    for _, k in ipairs(map) do
-        callback(k, nil, CompletionItemKind.Field)
+    for k, v in sortPairs(map) do
+        callback(k, nil, CompletionItemKind.Field, getValueData('field', k, v))
     end
 end
 
@@ -147,6 +241,10 @@ local function searchAsGlobal(vm, source, word, callback)
     searchFields(vm, source, word, callback)
 end
 
+local function searchAsSuffix(vm, source, word, callback)
+    searchFields(vm, source, word, callback)
+end
+
 local function searchSource(vm, source, word, callback)
     if source:get 'global' then
         searchAsGlobal(vm, source, word, callback)
@@ -155,6 +253,9 @@ local function searchSource(vm, source, word, callback)
     if source:bindLocal() then
         searchAsGlobal(vm, source, word, callback)
         return
+    end
+    if source:get 'simple' then
+        searchAsSuffix(vm, source, word, callback)
     end
 end
 
@@ -188,8 +289,12 @@ local function makeList(source, word)
         if not data then
             data = {}
         end
-        data.label = name
-        data.kind = kind
+        if not data.label then
+            data.label = name
+        end
+        if not data.kind then
+            data.kind = kind
+        end
         list[#list+1] = data
     end, list
 end

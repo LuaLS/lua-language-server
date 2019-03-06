@@ -1,5 +1,5 @@
-local hoverFunction = require 'core.hover_function'
-local hoverName = require 'core.hover_name'
+local hoverFunction = require 'core.hover.function'
+local hoverName = require 'core.hover.name'
 local hover = require 'core.hover'
 
 local SymbolKind = {

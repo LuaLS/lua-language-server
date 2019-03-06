@@ -182,20 +182,6 @@ ass@
 }
 
 TEST [[
-local t = {
-    abc = 1,
-}
-t.a@
-]]
-{
-    {
-        label = 'abc',
-        kind = CompletionItemKind.Enum,
-        detail = '= 1',
-    }
-}
-
-TEST [[
 local zabc = 1
 z@
 ]]
@@ -216,6 +202,20 @@ z@
         label = 'zabc',
         kind = CompletionItemKind.Variable,
         detail = '= 1.0',
+    }
+}
+
+TEST [[
+local t = {
+    abc = 1,
+}
+t.a@
+]]
+{
+    {
+        label = 'abc',
+        kind = CompletionItemKind.Enum,
+        detail = '= 1',
     }
 }
 

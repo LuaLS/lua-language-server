@@ -115,24 +115,70 @@ local function searchLocals(vm, source, word, callback)
     end
 end
 
+local function searchFields(vm, source, word, callback)
+    local parent = source:get 'parent'
+    if not parent then
+        return
+    end
+    local map = {}
+    parent:eachChild(function (k, v)
+        if type(k) ~= 'string' then
+            goto CONTINUE
+        end
+        if source:get 'object' and v:getType() ~= 'function' then
+            goto CONTINUE
+        end
+        if matchKey(word, k) then
+            map[#map+1] = k
+        end
+        :: CONTINUE ::
+    end)
+    table.sort(map)
+    for _, k in ipairs(map) do
+        callback(k, nil, CompletionItemKind.Field)
+    end
+end
+
 local function searchAsGlobal(vm, source, word, callback)
-    if word == '' or word == nil then
+    if word == '' then
         return
     end
     searchLocals(vm, source, word, callback)
+    searchFields(vm, source, word, callback)
 end
 
 local function searchSource(vm, source, word, callback)
     if source:get 'global' then
         searchAsGlobal(vm, source, word, callback)
+        return
+    end
+    if source:bindLocal() then
+        searchAsGlobal(vm, source, word, callback)
+        return
     end
 end
 
-local function makeList(source)
+local function searchAllWords(vm, source, word, callback)
+    if word == '' then
+        return
+    end
+    for _, src in ipairs(vm.sources) do
+        if      src.type == 'name'
+            and matchKey(word, src[1])
+        then
+            callback(src[1], src, CompletionItemKind.Text)
+        end
+    end
+end
+
+local function makeList(source, word)
     local list = {}
     local mark = {}
     return function (name, src, kind, data)
         if src == source then
+            return
+        end
+        if word == name then
             return
         end
         if mark[name] then
@@ -153,8 +199,9 @@ return function (vm, pos, word)
     if not source then
         return nil
     end
-    local callback, list = makeList(source)
+    local callback, list = makeList(source, word)
     searchSource(vm, source, word, callback)
+    searchAllWords(vm, source, word, callback)
 
     if #list == 0 then
         return nil

@@ -349,11 +349,12 @@ function mt:getName(name, source)
     if global then
         return global
     end
-    source:set('global', true)
     local ENV = self:loadLocal('_ENV')
     local ENVValue = ENV:getValue()
     global = ENVValue:getChild(name) or ENVValue:setChild(name, createValue('any', source))
     source:bindValue(global, 'get')
+    source:set('global', true)
+    source:set('parent', ENVValue)
     return global
 end
 
@@ -369,11 +370,12 @@ function mt:setName(name, source, value)
     if global then
         return global
     end
-    source:set('global', true)
     source:bindValue(global, 'set')
     local ENV = self:loadLocal('_ENV')
     local ENVValue = ENV:getValue()
     ENVValue:setChild(name, value)
+    source:set('global', true)
+    source:set('parentValue', ENVValue)
 end
 
 function mt:getIndex(source)
@@ -462,6 +464,7 @@ function mt:getSimple(simple, max)
             source:bindCall(func, args)
             value = self:call(func, args, source) or createValue('any')
         elseif source.type == 'index' then
+            source:set('parent', value)
             local child = source[1]
             local index = self:getIndex(child)
             value = value:getChild(index) or value:setChild(index, createValue('any', source))
@@ -728,6 +731,7 @@ function mt:setOne(var, value)
         local key = var[#var]
         self:instantSource(key)
         key:set('simple', var)
+        key:set('parent', value)
         if key.type == 'index' then
             local index = self:getIndex(key[1])
             parent:setChild(index, value)

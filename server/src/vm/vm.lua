@@ -476,7 +476,10 @@ function mt:getSimple(simple, max)
             source:bindValue(value, 'get')
         elseif source.type == ':' then
             object = value
+            source:set('parent', value)
+            source:set('object', object)
         elseif source.type == '.' then
+            source:set('parent', value)
         end
     end
     return value
@@ -860,6 +863,7 @@ function mt:doFunction(action)
                 local value = self:buildFunction(action)
                 local source = name[#name]
                 self:instantSource(source)
+                source:set('object', parent)
                 if source.type == 'index' then
                     local index = self:getIndex(source[1])
                     parent:setChild(index, value)

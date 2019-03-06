@@ -68,6 +68,20 @@ local function findStartPos(pos, buf)
             break
         end
     end
+    if not res then
+        for i = pos-1, 1, -1 do
+            local c = buf:sub(i, i)
+            if c:find '[%.%:]' then
+                res = i
+            elseif c:find '[%s%c]' then
+            else
+                break
+            end
+        end
+    end
+    if not res then
+        return pos
+    end
     return res
 end
 
@@ -93,7 +107,7 @@ function TEST(script)
         local vm = buildVM(ast)
         assert(vm)
         local word = findWord(pos, new_script)
-        local startPos = findStartPos(pos, new_script) or pos
+        local startPos = findStartPos(pos, new_script)
         local result = core.completion(vm, startPos, word)
         if expect then
             assert(result)
@@ -248,6 +262,22 @@ TEST [[
 t.a = {}
 t.b = {}
 t.@
+]]
+{
+    {
+        label = 'a',
+        kind = CompletionItemKind.Field,
+    },
+    {
+        label = 'b',
+        kind = CompletionItemKind.Field,
+    },
+}
+
+TEST [[
+t.a = {}
+t.b = {}
+t.   @
 ]]
 {
     {

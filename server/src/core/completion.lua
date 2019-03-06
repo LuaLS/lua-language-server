@@ -155,7 +155,7 @@ end
 local function getKind(cata, value)
     if value:getType() == 'function' then
         local func = value:getFunction()
-        if func:getObject() then
+        if func and func:getObject() then
             return CompletionItemKind.Method
         else
             return CompletionItemKind.Function
@@ -233,12 +233,22 @@ local function searchFields(vm, source, word, callback)
     end
 end
 
+local KEYS = {'and', 'break', 'do', 'else', 'elseif', 'end', 'false', 'for', 'function', 'goto', 'if', 'in', 'local', 'nil', 'not', 'or', 'repeat', 'return', 'then', 'true', 'until', 'while', 'toclose'}
+local function searchKeyWords(vm, source, word, callback)
+    for _, key in ipairs(KEYS) do
+        if matchKey(word, key) then
+            callback(key, nil, CompletionItemKind.Keyword)
+        end
+    end
+end
+
 local function searchAsGlobal(vm, source, word, callback)
     if word == '' then
         return
     end
     searchLocals(vm, source, word, callback)
     searchFields(vm, source, word, callback)
+    searchKeyWords(vm, source, word, callback)
 end
 
 local function searchAsSuffix(vm, source, word, callback)

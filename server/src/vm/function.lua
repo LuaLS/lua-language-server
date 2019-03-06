@@ -12,12 +12,18 @@ function mt:getUri()
     return self.source.uri
 end
 
-function mt:push()
+function mt:push(source)
     self._top = self._top + 1
     self.locals[self._top] = {}
+    self.blocks[self._top] = source
 end
 
 function mt:pop()
+    local closedBlock = self.blocks[self._top]
+    local closedLocals = self.locals[self._top]
+    for _, loc in pairs(closedLocals) do
+        loc:close(closedBlock.finish)
+    end
     self._top = self._top - 1
 end
 
@@ -234,9 +240,10 @@ return function (source)
     local self = setmetatable({
         source = source,
         locals = {},
+        blocks = {},
         args = {},
         argValues = {},
     }, mt)
-    self:push()
+    self:push(source)
     return self
 end

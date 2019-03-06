@@ -9,6 +9,7 @@ end
 local mt = {}
 mt.__index = mt
 mt.type = 'local'
+mt._close = math.maxinteger
 
 function mt:setValue(value)
     if self.value then
@@ -67,6 +68,15 @@ function mt:shadow(old)
     end
     group[#group+1] = self
     self._shadow = group
+    old:close(self.source.start - 1)
+end
+
+function mt:close(pos)
+    if pos then
+        self._close = pos
+    else
+        return self._close
+    end
 end
 
 return function (name, source, value)

@@ -19,8 +19,8 @@ function mt:getDefaultSource()
     }
 end
 
-function mt:scopePush()
-    self.currentFunction:push()
+function mt:scopePush(source)
+    self.currentFunction:push(source)
 end
 
 function mt:scopePop()
@@ -99,7 +99,7 @@ function mt:runFunction(func)
 
     local originFunction = self:getCurrentFunction()
     self:setCurrentFunction(func)
-    func:push()
+    func:push(func.source)
 
     self:doActions(func.source)
 

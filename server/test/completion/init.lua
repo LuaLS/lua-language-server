@@ -1,5 +1,6 @@
 local core = require 'core'
 local parser  = require 'parser'
+local buildVM = require 'vm'
 
 local CompletionItemKind = {
     Text = 1,
@@ -89,7 +90,7 @@ function TEST(script)
         local pos = script:find('@', 1, true)
         local new_script = script:gsub('@', ' ')
         local ast = parser:ast(new_script)
-        local vm = core.vm(ast)
+        local vm = buildVM(ast)
         assert(vm)
         local word = findWord(pos, new_script)
         local startPos = findStartPos(pos, new_script) or pos

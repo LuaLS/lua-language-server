@@ -89,6 +89,17 @@ function mt:getLibChild(index)
     end
 end
 
+function mt:eachLibChild(callback)
+    local tp = self:getType()
+    local lib = library.object[tp]
+    if lib then
+        local childs = libraryBuilder.child(lib)
+        for k, v in pairs(childs) do
+            callback(k, v)
+        end
+    end
+end
+
 function mt:getChild(index, mark)
     self:setType('table', 0.5)
     local value = self:rawGet(index)
@@ -155,7 +166,7 @@ function mt:eachChild(callback, mark, foundIndex)
     end
     local method = self:getMetaMethod('__index')
     if not method then
-        return nil
+        return self:eachLibChild(callback)
     end
     if not mark then
         mark = {}

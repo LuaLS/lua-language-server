@@ -266,6 +266,7 @@ local function searchSource(vm, source, word, callback)
     end
     if source:get 'simple' then
         searchAsSuffix(vm, source, word, callback)
+        return
     end
 end
 

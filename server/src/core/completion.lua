@@ -402,6 +402,60 @@ local function searchAllWords(vm, source, word, callback)
     end
 end
 
+local function searchSpecial(vm, source, word, callback, pos)
+    -- 尝试 XXX[#XXX+1]
+    -- 1. 搜索 []
+    local index
+    for _, src in ipairs(vm.sources) do
+        if      src.type == 'index'
+            and src.start <= pos
+            and src.finish >= pos
+        then
+            index = src
+            break
+        end
+    end
+    if not index then
+        return nil
+    end
+    -- 2. [] 内部只能有一个 #
+    local inside = index[1]
+    if not inside then
+        return nil
+    end
+    if inside.op ~= '#' then
+        return nil
+    end
+    -- 3. [] 左侧必须是纯 name 构成的 simple ,且index 是 simple 的最后一项
+    local simple = index:get 'simple'
+    if not simple then
+        return nil
+    end
+    if simple[#simple] ~= index then
+        return nil
+    end
+    local chars = {}
+    for i = 1, #simple - 1 do
+        local src = simple[i]
+        if src.type == 'name' then
+            chars[#chars+1] = src[1]
+        elseif src.type == '.' then
+            chars[#chars+1] = '.'
+        else
+            return nil
+        end
+    end
+    -- 4. 创建代码片段
+    local label = table.concat(chars) .. '+1'
+    callback(label, nil, CompletionItemKind.Snippet, {
+        textEdit = {
+            start = index.start,
+            finish = index.finish,
+            newText = ('[#%s] = '):format(label),
+        },
+    })
+end
+
 local function makeList(source, word)
     local list = {}
     local mark = {}
@@ -435,6 +489,7 @@ return function (vm, pos, word)
         return nil
     end
     local callback, list = makeList(source, word)
+    searchSpecial(vm, source, word, callback, pos)
     searchCallArg(vm, source, word, callback, pos)
     searchSource(vm, source, word, callback)
     searchAllWords(vm, source, word, callback)

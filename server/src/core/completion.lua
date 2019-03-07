@@ -233,6 +233,32 @@ local function searchFields(vm, source, word, callback)
     end
 end
 
+local function searchIndex(vm, source, word, callback)
+    for _, src in ipairs(vm.sources) do
+        if src:get 'table index' then
+            if matchKey(word, src[1]) then
+                callback(src[1], src, CompletionItemKind.Property)
+            end
+        end
+    end
+end
+
+local function searchCloseGlobal(vm, source, word, callback)
+    local loc = source:bindLocal()
+    local close = loc:close()
+    -- 因为闭包的关系落在局部变量finish到close范围内的source一定能访问到该局部变量
+    for _, src in ipairs(vm.sources) do
+        if      src:get 'global'
+            and src.start >= source.finish
+            and src.finish <= close
+        then
+            if matchKey(word, src[1]) then
+                callback(src[1], src, CompletionItemKind.Variable)
+            end
+        end
+    end
+end
+
 local KEYS = {'and', 'break', 'do', 'else', 'elseif', 'end', 'false', 'for', 'function', 'goto', 'if', 'in', 'local', 'nil', 'not', 'or', 'repeat', 'return', 'then', 'true', 'until', 'while', 'toclose'}
 local function searchKeyWords(vm, source, word, callback)
     for _, key in ipairs(KEYS) do
@@ -255,9 +281,32 @@ local function searchAsSuffix(vm, source, word, callback)
     searchFields(vm, source, word, callback)
 end
 
+local function searchAsIndex(vm, source, word, callback)
+    searchLocals(vm, source, word, callback)
+    searchIndex(vm, source, word, callback)
+    searchFields(vm, source, word, callback)
+end
+
+local function searchAsLocal(vm, source, word, callback)
+    searchCloseGlobal(vm, source, word, callback)
+
+    -- 特殊支持 local function
+    if matchKey(word, 'function') then
+        callback('function', nil, CompletionItemKind.Keyword)
+    end
+end
+
 local function searchSource(vm, source, word, callback)
+    if source:get 'table index' then
+        searchAsIndex(vm, source, word, callback)
+        return
+    end
     if source:get 'global' then
         searchAsGlobal(vm, source, word, callback)
+        return
+    end
+    if source:action() == 'local' then
+        searchAsLocal(vm, source, word, callback)
         return
     end
     if source:bindLocal() then

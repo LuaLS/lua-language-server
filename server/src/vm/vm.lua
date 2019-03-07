@@ -57,7 +57,7 @@ function mt:buildTable(source)
                 tbl:setChild(index, value)
             else
                 if key.type == 'name' then
-                    key.isIndex = true
+                    key:set('table index', true)
                     tbl:setChild(key[1], value)
                 end
             end
@@ -79,6 +79,7 @@ function mt:buildTable(source)
             end
             -- 处理写了一半的 key = value，把name类的数组元素视为哈希键
             if obj.type == 'name' then
+                obj:set('table index', true)
             end
         end
     end

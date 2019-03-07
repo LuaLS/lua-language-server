@@ -361,6 +361,7 @@ local t = {
 }
 
 TEST [[
+print(ff2)
 local faa
 local f@
 print(fff)
@@ -373,6 +374,10 @@ print(fff)
     {
         label = 'function',
         kind = CompletionItemKind.Keyword,
+    },
+    {
+        label = 'ff2',
+        kind = CompletionItemKind.Text,
     },
     {
         label = 'faa',

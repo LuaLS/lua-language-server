@@ -352,9 +352,9 @@ local function searchCallArg(vm, source, word, callback, pos)
         return
     end
 
-    local select = 1
+    local select = #args + 1
     for i, arg in ipairs(args) do
-        if arg.start <= pos and arg.finish >= pos then
+        if arg.start <= pos and arg.finish >= pos - 1 then
             select = i
             break
         end

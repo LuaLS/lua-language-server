@@ -6,9 +6,6 @@ local function buildLibArgs(lib, object, select)
     local start
     if object then
         start = 2
-        if select then
-            select = select + 1
-        end
     else
         start = 1
     end

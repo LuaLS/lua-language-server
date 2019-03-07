@@ -467,7 +467,7 @@ function mt:getSimple(simple, max)
             local func = value
             if object then
                 table.insert(values, 1, object)
-                table.insert(args, 1, simple[i-1])
+                table.insert(args, 1, simple[i-3])
             end
             object = nil
             source:bindCall(func, args)

@@ -1,5 +1,6 @@
 local parser = require 'parser'
 local core = require 'core'
+local buildVM = require 'vm'
 
 rawset(_G, 'TEST', true)
 
@@ -8,7 +9,7 @@ function TEST(script)
         local pos = script:find('@', 1, true)
         local new_script = script:gsub('@', '')
         local ast = parser:ast(new_script)
-        local vm = core.vm(ast)
+        local vm = buildVM(ast)
         assert(vm)
         local hovers = core.signature(vm, pos)
         if hovers then

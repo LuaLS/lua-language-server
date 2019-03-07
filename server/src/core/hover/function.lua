@@ -21,9 +21,6 @@ local function buildValueArgs(func, object, select)
     local start = 1
     if object then
         start = 2
-        if select then
-            select = select + 1
-        end
     end
     local max
     if func.source then

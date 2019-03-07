@@ -13,14 +13,6 @@ local mt = {}
 mt.__index = mt
 mt.type = 'value'
 
-function mt:setValue(value)
-    self._value = value
-end
-
-function mt:getValue()
-    return self._value
-end
-
 function mt:setType(tp, rate)
     if type(tp) == 'table' then
         for _, ctp in ipairs(tp) do

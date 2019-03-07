@@ -138,7 +138,7 @@ function mt:hasRuned()
     return self._runed > 0
 end
 
-function mt:run()
+function mt:run(vm)
     self._runed = self._runed + 1
     if not self.source then
         return
@@ -160,7 +160,7 @@ function mt:run()
     end
 
     -- 显性声明的参数
-    self:createArgs()
+    self:createArgs(vm)
 end
 
 function mt:setArgs(values)
@@ -172,7 +172,9 @@ function mt:setArgs(values)
     end
 end
 
-function mt:createArg(arg, values)
+function mt:createArg(vm, arg, values)
+    vm:instantSource(arg)
+    arg:set('arg', true)
     if arg.type == 'name' then
         local value = table.remove(values, 1) or createValue('nil', arg)
         local loc = createLocal(arg[1], arg, value)
@@ -201,7 +203,7 @@ function mt:hasDots()
     return self._dots ~= nil
 end
 
-function mt:createArgs()
+function mt:createArgs(vm)
     if not self.source then
         return
     end
@@ -215,10 +217,10 @@ function mt:createArgs()
     end
     if args.type == 'list' then
         for _, arg in ipairs(args) do
-            self:createArg(arg, values)
+            self:createArg(vm, arg, values)
         end
     else
-        self:createArg(args, values)
+        self:createArg(vm, args, values)
     end
 end
 

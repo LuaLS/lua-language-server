@@ -405,41 +405,81 @@ collectgarbage('@')
         label = 'collect',
         kind = CompletionItemKind.EnumMember,
         documentation = EXISTS,
+        textEdit = {
+            start = 16,
+            finish = 18,
+            newText = '"collect"',
+        },
     },
     {
         label = 'stop',
         kind = CompletionItemKind.EnumMember,
         documentation = EXISTS,
+        textEdit = {
+            start = 16,
+            finish = 18,
+            newText = '"stop"',
+        },
     },
     {
         label = 'restart',
         kind = CompletionItemKind.EnumMember,
         documentation = EXISTS,
+        textEdit = {
+            start = 16,
+            finish = 18,
+            newText = '"restart"',
+        },
     },
     {
         label = 'count',
         kind = CompletionItemKind.EnumMember,
         documentation = EXISTS,
+        textEdit = {
+            start = 16,
+            finish = 18,
+            newText = '"count"',
+        },
     },
     {
         label = 'step',
         kind = CompletionItemKind.EnumMember,
         documentation = EXISTS,
+        textEdit = {
+            start = 16,
+            finish = 18,
+            newText = '"step"',
+        },
     },
     {
         label = 'setpause',
         kind = CompletionItemKind.EnumMember,
         documentation = EXISTS,
+        textEdit = {
+            start = 16,
+            finish = 18,
+            newText = '"setpause"',
+        },
     },
     {
         label = 'setstepmul',
         kind = CompletionItemKind.EnumMember,
         documentation = EXISTS,
+        textEdit = {
+            start = 16,
+            finish = 18,
+            newText = '"setstepmul"',
+        },
     },
     {
         label = 'isrunning',
         kind = CompletionItemKind.EnumMember,
         documentation = EXISTS,
+        textEdit = {
+            start = 16,
+            finish = 18,
+            newText = '"isrunning"',
+        },
     },
 }
 

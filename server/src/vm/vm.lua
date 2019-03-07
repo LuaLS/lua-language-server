@@ -87,7 +87,7 @@ function mt:buildTable(source)
 end
 
 function mt:runFunction(func)
-    func:run()
+    func:run(self)
 
     if not func.source then
         return
@@ -391,42 +391,49 @@ function mt:getIndex(source)
 end
 
 function mt:unpackList(list)
-    local res = createMulti()
+    local values = createMulti()
+    local exps = createMulti()
     if not list then
-        return res
+        return values
     end
     if list.type == 'list' or list.type == 'call' or list.type == 'return' then
         for i, exp in ipairs(list) do
+            self:instantSource(exp)
+            exps:push(exp)
             if exp.type == '...' then
-                res:merge(self:loadDots())
+                values:merge(self:loadDots())
                 break
             end
             local value = self:getExp(exp)
             if value.type == 'multi' then
                 if i == #list then
                     value:eachValue(function (_, v)
-                        res:push(v)
+                        values:push(v)
                     end)
                 else
-                    res:push(self:getFirstInMulti(value))
+                    values:push(self:getFirstInMulti(value))
                 end
             else
-                res:push(value)
+                values:push(value)
             end
         end
     elseif list.type == '...' then
-        res:merge(self:loadDots())
+        self:instantSource(list)
+        exps:push(list)
+        values:merge(self:loadDots())
     else
+        self:instantSource(list)
+        exps:push(list)
         local value = self:getExp(list)
         if value.type == 'multi' then
             value:eachValue(function (_, v)
-                res:push(v)
+                values:push(v)
             end)
         else
-            res:push(value)
+            values:push(value)
         end
     end
-    return res
+    return values, exps
 end
 
 function mt:getFirstInMulti(multi)
@@ -456,14 +463,15 @@ function mt:getSimple(simple, max)
         value = self:getFirstInMulti(value) or createValue('nil')
 
         if source.type == 'call' then
-            local args = self:unpackList(source)
+            local values, args = self:unpackList(source)
             local func = value
             if object then
-                table.insert(args, 1, object)
+                table.insert(values, 1, object)
+                table.insert(args, 1, simple[i-1])
             end
             object = nil
             source:bindCall(func, args)
-            value = self:call(func, args, source) or createValue('any')
+            value = self:call(func, values, source) or createValue('any')
         elseif source.type == 'index' then
             source:set('parent', value)
             local child = source[1]

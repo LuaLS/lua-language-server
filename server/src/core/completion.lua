@@ -246,7 +246,7 @@ end
 local function searchCloseGlobal(vm, source, word, callback)
     local loc = source:bindLocal()
     local close = loc:close()
-    -- 因为闭包的关系落在局部变量finish到close范围内的source一定能访问到该局部变量
+    -- 因为闭包的关系落在局部变量finish到close范围内的全局变量一定能访问到该局部变量
     for _, src in ipairs(vm.sources) do
         if      src:get 'global'
             and src.start >= source.finish
@@ -296,9 +296,17 @@ local function searchAsLocal(vm, source, word, callback)
     end
 end
 
+local function searchAsArg(vm, source, word, callback)
+    searchCloseGlobal(vm, source, word, callback)
+end
+
 local function searchSource(vm, source, word, callback)
     if source:get 'table index' then
         searchAsIndex(vm, source, word, callback)
+        return
+    end
+    if source:get 'arg' then
+        searchAsArg(vm, source, word, callback)
         return
     end
     if source:get 'global' then
@@ -316,6 +324,68 @@ local function searchSource(vm, source, word, callback)
     if source:get 'simple' then
         searchAsSuffix(vm, source, word, callback)
         return
+    end
+end
+
+local function searchCallArg(vm, source, word, callback, pos)
+    local results = {}
+    for _, src in ipairs(vm.sources) do
+        if      src.type == 'call' 
+            and src.start <= pos
+            and src.finish >= pos
+        then
+            results[#results+1] = src
+        end
+    end
+    if #results == 0 then
+        return nil
+    end
+    -- 可能处于 'func1(func2(' 的嵌套中，将最近的call放到最前面
+    table.sort(results, function (a, b)
+        return a.start > b.start
+    end)
+    local call = results[1]
+    local func, args = call:bindCall()
+
+    local lib = func:getLib()
+    if not lib then
+        return
+    end
+
+    local select = 1
+    for i, arg in ipairs(args) do
+        if arg.start <= pos and arg.finish >= pos then
+            select = i
+            break
+        end
+    end
+
+    -- 根据参数位置找枚举值
+    if lib.args and lib.enums then
+        local arg = lib.args[select]
+        local name = arg and arg.name
+        for _, enum in ipairs(lib.enums) do
+            if enum.name == name and enum.enum then
+                if matchKey(word, enum.enum) then
+                    local label, textEdit
+                    if source.type ~= arg.type then
+                        label = ('%q'):format(enum.enum)
+                    end
+                    if source.type ~= 'call' then
+                        textEdit = {
+                            start = source.start,
+                            finish = source.finish,
+                            newText = ('%q'):format(enum.enum),
+                        }
+                    end
+                    callback(enum.enum, nil, CompletionItemKind.EnumMember, {
+                        label = label,
+                        documentation = enum.description,
+                        textEdit = textEdit,
+                    })
+                end
+            end
+        end
     end
 end
 
@@ -365,6 +435,7 @@ return function (vm, pos, word)
         return nil
     end
     local callback, list = makeList(source, word)
+    searchCallArg(vm, source, word, callback, pos)
     searchSource(vm, source, word, callback)
     searchAllWords(vm, source, word, callback)
 

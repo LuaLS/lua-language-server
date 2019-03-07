@@ -220,7 +220,7 @@ function mt:searchRedundantParameters(callback)
         local passed = #args
         for i = max + 1, passed do
             local extra = args[i]
-            callback(extra.source.start, extra.source.finish, max, passed)
+            callback(extra.start, extra.finish, max, passed)
         end
     end)
 end

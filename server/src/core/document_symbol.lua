@@ -84,7 +84,7 @@ local function buildSet(source, callback)
         return
     end
     local kind
-    if value:getType() == 'function' then
+    if value:getFunction() then
         local func = value:getFunction()
         if func:getObject() then
             kind = SymbolKind.Field

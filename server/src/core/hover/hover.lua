@@ -137,7 +137,7 @@ local function getValueHover(source, name, value, lib)
     local tip
     local literal
     if lib then
-        value = lib.code or (lib.value and ('%q'):format(lib.value))
+        literal = lib.code or (lib.value and ('%q'):format(lib.value))
         tip = lib.description
     else
         literal = value:getLiteral() and ('%q'):format(value:getLiteral())

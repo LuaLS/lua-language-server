@@ -311,6 +311,7 @@ function mt:call(value, values, source)
     if not func then
         return
     end
+    self:instantSource(source)
     if lib then
         self:callLibrary(func, values, source, lib)
     else
@@ -437,8 +438,11 @@ function mt:unpackList(list)
 end
 
 function mt:getFirstInMulti(multi)
+    if not multi then
+        return multi
+    end
     if multi.type == 'multi' then
-        return multi[1]
+        return self:getFirstInMulti(multi[1])
     else
         return multi
     end
@@ -449,6 +453,7 @@ function mt:getSimple(simple, max)
     local first = simple[1]
     self:instantSource(first)
     local value = self:getExp(first)
+    value = self:getFirstInMulti(value) or createValue('nil')
     first:bindValue(value, 'get')
     if not max then
         max = #simple

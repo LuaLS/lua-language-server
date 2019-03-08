@@ -1,5 +1,8 @@
 return function (source)
     local value = source:bindValue()
+    if not value then
+        return ''
+    end
     local func = value:getFunction()
     local declarat
     if func then

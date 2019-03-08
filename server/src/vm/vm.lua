@@ -690,6 +690,7 @@ function mt:doReturn(action)
     if #action == 0 then
         return
     end
+    self:instantSource(action)
     local values = self:unpackList(action)
     local func = self:getCurrentFunction()
     values:eachValue(function (n, value)
@@ -928,6 +929,7 @@ function mt:doLocalFunction(action)
             local func = self:buildFunction(action)
             func:addInfo('local', name)
             loc:setValue(func)
+            loc:setInitValue(func)
         end
     end
 end
@@ -987,7 +989,7 @@ function mt:doActions(actions)
 end
 
 function mt:createFunction(source)
-    local value = createValue('function', source)
+    local value = self:createValue('function', source)
     local func = createFunction(source)
     value:setFunction(func)
     value:setType('function', 1.0)

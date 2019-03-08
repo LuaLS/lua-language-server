@@ -23,6 +23,14 @@ function mt:getValue()
     return self.value
 end
 
+function mt:setInitValue(value)
+    self.initValue = value
+end
+
+function mt:getInitValue()
+    return self.initValue
+end
+
 function mt:addInfo(tp, source)
     self[#self+1] = {
         type = tp,
@@ -87,6 +95,7 @@ return function (name, source, value)
         name = name,
         source = source or getDefaultSource(),
         value = value,
+        initValue = value,
     }, mt)
     return self
 end

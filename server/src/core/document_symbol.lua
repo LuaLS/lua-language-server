@@ -31,93 +31,134 @@ local SymbolKind = {
     TypeParameter = 26,
 }
 
-local function buildFunction(vm, var, source)
-    local func = var.value
-    if func.source.start == 0 then
-        return nil
-    end
-    local name = hoverName(var, source)
-    local hvr = hoverFunction(name, func, source.object)
+local function buildLocal(source, callback)
+    local loc = source:bindLocal()
+    local value = loc:getInitValue()
+    local hvr = hover(source)
     if not hvr then
-        return nil
-    end
-    local selectionRange = { source.start, source.finish }
-    local range = { math.min(source.start, func.source.start), func.source.finish }
-    local kind = SymbolKind.Function
-    if source.isSuffix then
-        kind = SymbolKind.Field
-    end
-
-    return {
-        name = name,
-        -- 前端不支持多行
-        detail = hvr.label:gsub('[\r\n]', ''),
-        kind = kind,
-        range = range,
-        selectionRange = selectionRange,
-    }
-end
-
-local function isLocalTable(var, source)
-    if not var.value or var.value:getType() ~= 'table' then
-        return false
-    end
-    if var.value.source.start == 0 then
-        return false
-    end
-    if source ~= var.value:getDeclarat() then
-        return false
-    end
-    if var.value.source.finish < source.finish then
-        return false
-    end
-    return true
-end
-
-local function buildVar(vm, var, source)
-    if source.start == 0 then
-        return nil
-    end
-    if var.value:getType() == 'function' then
-        return buildFunction(vm, var, source)
-    end
-    if not source.isLocal and not source.isIndex then
-        return nil
-    end
-    if var.hide then
-        return nil
-    end
-    local key = var.key
-    if key == '_' then
-        return nil
-    end
-    if type(key) ~= 'string' then
-        key = ('[%s]'):format(key)
-    end
-    local range
-    if isLocalTable(var, source) then
-        range = { source.start, var.value.source.finish }
-    else
-        range = { source.start, source.finish }
-    end
-    local hvr = hover(var, source)
-    if not hvr then
-        return nil
+        return
     end
     local kind
-    if source.isIndex then
+    if value:getType() == 'function' then
+        kind = SymbolKind.Function
+    elseif source:get 'table index' then
         kind = SymbolKind.Class
     else
         kind = SymbolKind.Variable
     end
-    return {
-        name = key,
+    local valueSource = value.source
+    if valueSource.start == 0 then
+        valueSource = source
+    end
+    -- 由于范围不允许交叉，为了支持 local x, y, z = 1, 2, 3 的形式
+    -- 范围只能限定在变量上
+    -- 而 local function xx() 的形式范围会包含整个 function
+    if source.start > valueSource.start then
+        callback {
+            name = hvr.name,
+            detail = hvr.label:gsub('[\r\n]', ''),
+            kind = kind,
+            range = { valueSource.start, valueSource.finish },
+            selectionRange = { source.start, source.finish },
+            valueRange = { valueSource.start, valueSource.finish },
+        }
+    else
+        callback {
+            name = hvr.name,
+            detail = hvr.label:gsub('[\r\n]', ''),
+            kind = kind,
+            range = { source.start, source.finish },
+            selectionRange = { source.start, source.finish },
+            valueRange = { valueSource.start, valueSource.finish },
+        }
+    end
+end
+
+local function buildSet(source, callback)
+    if source:bindLocal() then
+        return
+    end
+    local value = source:bindValue()
+    local hvr = hover(source)
+    if not hvr then
+        return
+    end
+    local kind
+    if value:getType() == 'function' then
+        local func = value:getFunction()
+        if func:getObject() then
+            kind = SymbolKind.Field
+        else
+            kind = SymbolKind.Function
+        end
+    elseif source:get 'table index' then
+        kind = SymbolKind.Class
+    else
+        kind = SymbolKind.Object
+    end
+    local valueSource = value.source
+    -- 由于范围不允许交叉，为了支持 x, y, z = 1, 2, 3 的形式
+    -- 范围只能限定在变量上
+    -- 而 function xx() 的形式范围会包含整个 function
+    if source.start > valueSource.start then
+        callback {
+            name = hvr.name,
+            -- 前端不支持多行
+            detail = hvr.label:gsub('[\r\n]', ''),
+            kind = kind,
+            range = { valueSource.start, valueSource.finish },
+            selectionRange = { source.start, source.finish },
+            valueRange = { valueSource.start, valueSource.finish },
+        }
+    else
+        callback {
+            name = hvr.name,
+            -- 前端不支持多行
+            detail = hvr.label:gsub('[\r\n]', ''),
+            kind = kind,
+            range = { source.start, source.finish },
+            selectionRange = { source.start, source.finish },
+            valueRange = { valueSource.start, valueSource.finish },
+        }
+    end
+end
+
+local function buildReturn(source, callback)
+    local value = source:bindFunction()
+    if not value then
+        return
+    end
+    local hvr = hoverFunction('', value:getFunction())
+    if not hvr then
+        return
+    end
+    local kind = SymbolKind.Function
+    callback {
+        name = '',
         -- 前端不支持多行
         detail = hvr.label:gsub('[\r\n]', ''),
         kind = kind,
-        range = range,
-        selectionRange = { source.start, source.finish },
+        range = { source.start, source.finish },
+        selectionRange = { source.start, source.start },
+        valueRange = { source.start, source.finish },
     }
+end
+
+local function buildSource(source, callback)
+    if source:action() == 'local' then
+        buildLocal(source, callback)
+        return
+    end
+    if source:action() == 'set' then
+        buildSet(source, callback)
+        return
+    end
+    if source.type == 'return' then
+        for _, src in ipairs(source) do
+            buildReturn(src, callback)
+        end
+        return
+    end
 end
 
 local function packChild(symbols, finish, kind)
@@ -127,11 +168,11 @@ local function packChild(symbols, finish, kind)
         if not symbol then
             break
         end
-        if symbol.range[1] > finish then
+        if symbol.valueRange[1] > finish then
             break
         end
         symbols[#symbols] = nil
-        symbol.children = packChild(symbols, symbol.range[2], symbol.kind)
+        symbol.children = packChild(symbols, symbol.valueRange[2], symbol.kind)
         if symbol.kind == SymbolKind.Class and kind == SymbolKind.Function then
         else
             if not t then
@@ -146,7 +187,7 @@ end
 local function packSymbols(symbols)
     -- 按照start位置反向排序
     table.sort(symbols, function (a, b)
-        return a.range[1] > b.range[1]
+        return a.valueRange[1] > b.valueRange[1]
     end)
     -- 处理嵌套
     return packChild(symbols, math.maxinteger, SymbolKind.Function)
@@ -155,10 +196,10 @@ end
 return function (vm)
     local symbols = {}
 
-    for _, source in ipairs(vm.results.sources) do
-        if source.bind then
-            symbols[#symbols+1] = buildVar(vm, source.bind, source)
-        end
+    for _, source in ipairs(vm.sources) do
+        buildSource(source, function (data)
+            symbols[#symbols+1] = data
+        end)
     end
 
     local packedSymbols = packSymbols(symbols)

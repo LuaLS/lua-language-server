@@ -170,6 +170,7 @@ function mt:eachChild(callback, mark, foundIndex)
     return method:eachChild(callback, mark, foundIndex)
 end
 
+local hasSource = {}
 function mt:mergeValue(value)
     if value._type then
         for tp, rate in pairs(value._type) do
@@ -184,7 +185,6 @@ function mt:mergeValue(value)
             self._child[k] = v
         end
     end
-    local hasSource = {}
     for _, info in ipairs(self) do
         hasSource[info.source] = true
     end
@@ -192,6 +192,9 @@ function mt:mergeValue(value)
         if not hasSource[info.source] then
             self[#self+1] = info
         end
+    end
+    for k in pairs(hasSource) do
+        hasSource[k] = nil
     end
     if value._meta then
         self._meta = value._meta

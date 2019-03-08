@@ -28,3 +28,13 @@ do
     <?x?>()
 end
 ]]
+
+TEST [[
+<!x!> = 1
+if y then
+    <!x!> = 2
+else
+    <!x!> = 3
+end
+print(<?x?>)
+]]

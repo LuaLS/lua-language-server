@@ -372,9 +372,9 @@ function mt:setName(name, source, value)
     if global then
         return global
     end
-    source:bindValue(global, 'set')
     local ENV = self:loadLocal('_ENV')
     local ENVValue = ENV:getValue()
+    source:bindValue(value, 'set')
     ENVValue:setChild(name, value)
     source:set('global', true)
     source:set('parentValue', ENVValue)
@@ -743,7 +743,6 @@ function mt:setOne(var, value)
     self:instantSource(var)
     if var.type == 'name' then
         self:setName(var[1], var, value)
-        var:bindValue(value, 'set')
     elseif var.type == 'simple' then
         local parent = self:getSimple(var, -2)
         local key = var[#var]
@@ -916,7 +915,6 @@ function mt:doFunction(action)
         else
             local value = self:buildFunction(action)
             self:setName(name[1], name, value)
-            name:bindValue(value, 'set')
         end
     else
         self:buildFunction(action)

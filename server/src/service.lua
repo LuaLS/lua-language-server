@@ -6,7 +6,8 @@ local rpc        = require 'rpc'
 local parser     = require 'parser'
 local core       = require 'core'
 local lang       = require 'language'
-local updateTimer = require 'timer'
+local updateTimer= require 'timer'
+local buildVM    = require 'vm'
 
 local ErrorCodes = {
     -- Defined by JSON RPC
@@ -322,7 +323,7 @@ function mt:compileVM(uri)
     self:_clearGlobal(uri, compiled)
 
     local clock = os.clock()
-    local vm = core.vm(ast, self, uri)
+    local vm = buildVM(ast, self, uri)
     if version ~= obj.version then
         return nil
     end

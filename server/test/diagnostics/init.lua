@@ -72,7 +72,7 @@ print(<!X!>)
 print(<!Log!>)
 print(_VERSION)
 print(<!y!>)
-print(<!z!>)
+print(z)
 z = 1
 ]]
 

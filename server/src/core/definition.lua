@@ -37,6 +37,7 @@ local function parseValueCrossFile(vm, source, lsp)
     if #positions > 0 then
         return positions
     end
+
     value:eachInfo(function (info)
         if info.type == 'set' and info.source.uri == value.uri  then
             positions[#positions+1] = {
@@ -49,6 +50,20 @@ local function parseValueCrossFile(vm, source, lsp)
     if #positions > 0 then
         return positions
     end
+
+    value:eachInfo(function (info)
+        if info.type == 'return' and info.source.uri == value.uri then
+            positions[#positions+1] = {
+                info.source.start,
+                info.source.finish,
+                value.uri,
+            }
+        end
+    end)
+    if #positions > 0 then
+        return positions
+    end
+
     local destVM = lsp:getVM(value.uri)
     if not destVM then
         positions[#positions+1] = {
@@ -68,17 +83,6 @@ local function parseValueCrossFile(vm, source, lsp)
         return positions
     end
 
-    local main = destVM.main
-    local mainValue = main:getFunction()
-    local mainSource = mainValue.source
-    local returnSource = mainSource[#mainSource]
-    if returnSource.type == 'return' then
-        positions[#positions+1] = {
-            returnSource[1].start,
-            returnSource[1].finish,
-            value.uri,
-        }
-    end
     return positions
 end
 

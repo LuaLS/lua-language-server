@@ -696,7 +696,8 @@ function mt:doReturn(action)
     local func = self:getCurrentFunction()
     values:eachValue(function (n, value)
         value.uri = self:getUri()
-        func:setReturn(n, value, action[n])
+        func:setReturn(n, value)
+        value:addInfo('return', action[n])
     end)
 end
 

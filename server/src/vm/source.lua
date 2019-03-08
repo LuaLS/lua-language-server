@@ -55,11 +55,11 @@ function mt:action()
 end
 
 function mt:setUri(uri)
-    self._uri = uri
+    self.uri = uri
 end
 
 function mt:getUri()
-    return self._uri
+    return self.uri
 end
 
 function mt:set(name, v)

@@ -320,7 +320,7 @@ function mt:compileVM(uri)
     local version = obj.version
     obj.astCost = os.clock() - clock
     self:_clearChainNode(obj, uri)
-    self:_clearGlobal(uri, compiled)
+    --self:_clearGlobal(uri, compiled)
 
     local clock = os.clock()
     local vm = buildVM(ast, self, uri)
@@ -350,7 +350,7 @@ function mt:compileVM(uri)
     end
 
     self:_compileChain(obj, compiled)
-    self:_compileGlobal(compiled)
+    --self:_compileGlobal(compiled)
 
     return obj
 end

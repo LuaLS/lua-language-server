@@ -155,13 +155,11 @@ end
 
 function mt:getRequire(strValue, destVM)
     -- 取出对方的主函数
-    local main = destVM.results.main
+    local main = destVM.main
     -- 获取主函数返回值，注意不能修改对方的环境
-    local mainValue
-    if main.returns then
-        mainValue = self:getFirstInMulti(main.returns)
-    else
-        mainValue = self:createValue('boolean', nil, true)
+    local mainValue = main:getFunction():getReturn(1)
+    if not mainValue then
+        mainValue = self:createValue('any', nil)
         mainValue.uri = destVM.uri
     end
 
@@ -170,7 +168,7 @@ end
 
 function mt:getLoadFile(strValue, destVM)
     -- 取出对方的主函数
-    local main = destVM.results.main
+    local main = destVM.main
     -- loadfile 的返回值就是对方的主函数
     local mainValue = main
 
@@ -185,26 +183,23 @@ function mt:tryRequireOne(strValue, mode)
     if type(str) == 'string' then
         -- 支持 require 'xxx' 的转到定义
         local strSource = strValue.source
-        strSource.bind = strValue
-        self.results.sources[#self.results.sources+1] = strSource
-        strValue.isRequire = true
-
+        self:instantSource(strSource)
         local uri
         if mode == 'require' then
-            uri = self.lsp.workspace:searchPath(self.chunk.func.uri, str)
+            uri = self.lsp.workspace:searchPath(self:getUri(), str)
         elseif mode == 'loadfile' then
-            uri = self.lsp.workspace:loadPath(self.chunk.func.uri, str)
+            uri = self.lsp.workspace:loadPath(self:getUri(), str)
         elseif mode == 'dofile' then
-            uri = self.lsp.workspace:loadPath(self.chunk.func.uri, str)
+            uri = self.lsp.workspace:loadPath(self:getUri(), str)
         end
         if not uri then
             return nil
         end
 
-        strValue.uri = uri
+        strSource:set('target uri', uri)
         -- 如果取不到VM（不编译），则做个标记，之后再取一次
         local destVM = self.lsp:getVM(uri)
-        self.lsp:compileChain(self.chunk.func.uri, uri)
+        self.lsp:compileChain(self:getUri(), uri)
         if destVM then
             if mode == 'require' then
                 return self:getRequire(strValue, destVM)
@@ -331,6 +326,7 @@ end
 
 function mt:createValue(tp, source, literal)
     local value = createValue(tp, source, literal)
+    value.uri = self:getUri()
     return value
 end
 
@@ -699,7 +695,8 @@ function mt:doReturn(action)
     local values = self:unpackList(action)
     local func = self:getCurrentFunction()
     values:eachValue(function (n, value)
-        func:setReturn(n, value)
+        value.uri = self:getUri()
+        func:setReturn(n, value, action[n])
     end)
 end
 
@@ -1088,6 +1085,7 @@ function mt:createLocal(key, source, value)
     loc = createLocal(key, source, value)
     self:saveLocal(key, loc)
     self:bindLocal(source, loc, 'local')
+    value:addInfo('local', source)
     return loc
 end
 

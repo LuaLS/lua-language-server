@@ -12,6 +12,7 @@ end
 local mt = {}
 mt.__index = mt
 mt.type = 'value'
+mt.uri = ''
 
 function mt:setType(tp, rate)
     if type(tp) == 'table' then

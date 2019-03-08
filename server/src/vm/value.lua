@@ -14,6 +14,25 @@ mt.__index = mt
 mt.type = 'value'
 mt.uri = ''
 
+local function create (tp, source, literal)
+    if tp == '...' then
+        error('Value type cant be ...')
+    end
+    local self = setmetatable({
+        source = source or getDefaultSource(),
+        _type = {},
+        _literal = literal,
+    }, mt)
+    if type(tp) == 'table' then
+        for i = 1, #tp do
+            self:setType(tp[i], 1.0 / #tp)
+        end
+    else
+        self:setType(tp, 1.0)
+    end
+    return self
+end
+
 function mt:setType(tp, rate)
     if type(tp) == 'table' then
         for _, ctp in ipairs(tp) do
@@ -93,7 +112,7 @@ function mt:eachLibChild(callback)
     end
 end
 
-function mt:getChild(index, mark)
+function mt:getChild(index, source, mark)
     self:setType('table', 0.5)
     local value = self:rawGet(index)
     if value then
@@ -101,16 +120,26 @@ function mt:getChild(index, mark)
     end
     local method = self:getMetaMethod('__index')
     if not method then
-        return self:getLibChild(index)
+        local v = self:getLibChild(index)
+        if v then
+            return v
+        end
+        v = create('any', source)
+        self:setChild(index, v)
+        v.uri = self.uri
+        return v
     end
     if not mark then
         mark = {}
     end
     if mark[method] then
-        return nil
+        local v = create('any', source)
+        self:setChild(index, v)
+        v.uri = self.uri
+        return v
     end
     mark[method] = true
-    return method:getChild(index, mark)
+    return method:getChild(index, source, mark)
 end
 
 function mt:setMetaTable(metatable)
@@ -248,21 +277,4 @@ function mt:getLiteral()
     return self._literal
 end
 
-return function (tp, source, literal)
-    if tp == '...' then
-        error('Value type cant be ...')
-    end
-    local self = setmetatable({
-        source = source or getDefaultSource(),
-        _type = {},
-        _literal = literal,
-    }, mt)
-    if type(tp) == 'table' then
-        for i = 1, #tp do
-            self:setType(tp[i], 1.0 / #tp)
-        end
-    else
-        self:setType(tp, 1.0)
-    end
-    return self
-end
+return create

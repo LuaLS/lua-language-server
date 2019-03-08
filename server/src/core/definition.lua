@@ -1,4 +1,28 @@
-local function parseValueCrossFile(vm, value, lsp)
+local function parseValueSimily(vm, source, lsp)
+    local key = source[1]
+    if not key then
+        return nil
+    end
+    local positions = {}
+    for _, other in ipairs(vm.sources) do
+        if other == source then
+            break
+        end
+        if other[1] == key and not other:bindLocal() and other:bindValue() and other:action() == 'set' then
+            positions[#positions+1] = {
+                other.start,
+                other.finish,
+            }
+        end
+    end
+    if #positions == 0 then
+        return nil
+    end
+    return positions
+end
+
+local function parseValueCrossFile(vm, source, lsp)
+    local value = source:bindValue()
     local positions = {}
     value:eachInfo(function (info)
         if info.type == 'local' and info.source.uri == value.uri then
@@ -32,6 +56,18 @@ local function parseValueCrossFile(vm, value, lsp)
         }
         return positions
     end
+
+    local result = parseValueSimily(destVM, source, lsp)
+    if result then
+        for _, position in ipairs(result) do
+            positions[#positions+1] = position
+            position[3] = value.uri
+        end
+    end
+    if #positions > 0 then
+        return positions
+    end
+
     local main = destVM.main
     local mainValue = main:getFunction()
     local mainSource = mainValue.source
@@ -46,10 +82,11 @@ local function parseValueCrossFile(vm, value, lsp)
     return positions
 end
 
-local function parseLocal(vm, loc, lsp)
-    local value = loc:getValue()
+local function parseLocal(vm, source, lsp)
+    local loc = source:bindLocal()
+    local value = source:bindValue()
     if value.uri ~= vm.uri then
-        return parseValueCrossFile(vm, value, lsp)
+        return parseValueCrossFile(vm, source, lsp)
     end
     local positions = {}
     positions[#positions+1] = {
@@ -62,9 +99,10 @@ local function parseLocal(vm, loc, lsp)
     return positions
 end
 
-local function parseValue(vm, value, lsp)
+local function parseValue(vm, source, lsp)
+    local value = source:bindValue()
     if value.uri ~= vm.uri then
-        return parseValueCrossFile(vm, value, lsp)
+        return parseValueCrossFile(vm, source, lsp)
     end
     local positions = {}
     value:eachInfo(function (info)
@@ -75,29 +113,6 @@ local function parseValue(vm, value, lsp)
             }
         end
     end)
-    if #positions == 0 then
-        return nil
-    end
-    return positions
-end
-
-local function parseValueSimily(vm, source, lsp)
-    local key = source[1]
-    if not key then
-        return nil
-    end
-    local positions = {}
-    for _, other in ipairs(vm.sources) do
-        if other == source then
-            break
-        end
-        if other[1] == key and not other:bindLocal() and other:bindValue() and other:action() == 'set' then
-            positions[#positions+1] = {
-                other.start,
-                other.finish,
-            }
-        end
-    end
     if #positions == 0 then
         return nil
     end
@@ -134,10 +149,10 @@ return function (vm, source, lsp)
         return nil
     end
     if source:bindLocal() then
-        return parseLocal(vm, source:bindLocal(), lsp)
+        return parseLocal(vm, source, lsp)
     end
     if source:bindValue() then
-        return parseValue(vm, source:bindValue(), lsp)
+        return parseValue(vm, source, lsp)
             or parseValueSimily(vm, source, lsp)
     end
     if source:bindLabel() then

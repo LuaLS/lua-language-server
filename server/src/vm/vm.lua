@@ -349,7 +349,7 @@ function mt:getName(name, source)
     end
     local ENV = self:loadLocal('_ENV')
     local ENVValue = ENV:getValue()
-    global = ENVValue:getChild(name) or ENVValue:setChild(name, createValue('any', source))
+    global = ENVValue:getChild(name, source)
     source:bindValue(global, 'get')
     source:set('global', true)
     source:set('parent', ENVValue)
@@ -477,12 +477,12 @@ function mt:getSimple(simple, max)
             source:set('parent', value)
             local child = source[1]
             local index = self:getIndex(child)
-            value = value:getChild(index) or value:setChild(index, createValue('any', source))
+            value = value:getChild(index, source)
             source:bindValue(value, 'get')
         elseif source.type == 'name' then
             source:set('parent', value)
             source:set('object', object)
-            value = value:getChild(source[1]) or value:setChild(source[1], createValue('any', source))
+            value = value:getChild(source[1], source)
             source:bindValue(value, 'get')
         elseif source.type == ':' then
             object = value

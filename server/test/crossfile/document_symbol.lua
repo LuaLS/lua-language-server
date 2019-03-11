@@ -102,15 +102,17 @@ local t = {
             name = 't',
             detail = EXISTS,
             kind = SymbolKind.Variable,
-            range = {7, 34},
+            range = {7, 7},
             selectionRange = {7, 7},
+            valueRange = {11, 34},
             children = {
                 [1] = {
                     name = 'x',
                     detail = EXISTS,
-                    kind = SymbolKind.Class,
+                    kind = SymbolKind.Function,
                     range = {17, 17},
                     selectionRange = {17, 17},
+                    valueRange = {17, 17},
                 },
             }
         }

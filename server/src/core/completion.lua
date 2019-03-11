@@ -327,6 +327,28 @@ local function searchSource(vm, source, word, callback)
     end
 end
 
+local function searchInRequire(vm, select, source, callback)
+    if select ~= 1 then
+        return
+    end
+    if not vm.lsp or not vm.lsp.workspace then
+        return
+    end
+    if source.type ~= 'string' then
+        return
+    end
+    local list = vm.lsp.workspace:matchPath(vm.uri, source[1])
+    for _, str in ipairs(list) do
+        callback(str, nil, CompletionItemKind.File, {
+            textEdit = {
+                start = source.start,
+                finish = source.finish,
+                newText = ('%q'):format(str),
+            }
+        })
+    end
+end
+
 local function searchCallArg(vm, source, word, callback, pos)
     local results = {}
     for _, src in ipairs(vm.sources) do
@@ -386,6 +408,11 @@ local function searchCallArg(vm, source, word, callback, pos)
                 end
             end
         end
+    end
+
+    -- 搜索特殊函数
+    if lib.special == 'require' then
+        searchInRequire(vm, select, source, callback)
     end
 end
 

@@ -54,10 +54,12 @@ function mt:buildTable(source)
             key:bindValue(value, 'set')
             if key.index then
                 local index = self:getIndex(key)
+                tbl:addInfo('set child', key, index)
                 tbl:setChild(index, value)
             else
                 if key.type == 'name' then
                     key:set('table index', true)
+                    tbl:addInfo('set child', key, key[1])
                     tbl:setChild(key[1], value)
                 end
             end
@@ -67,14 +69,17 @@ function mt:buildTable(source)
                 if index == #source then
                     value:eachValue(function (_, v)
                         n = n + 1
+                        tbl:addInfo('set child', obj, n)
                         tbl:setChild(n, v)
                     end)
                 else
                     n = n + 1
+                    tbl:addInfo('set child', obj, n)
                     tbl:setChild(n, self:getFirstInMulti(value))
                 end
             else
                 n = n + 1
+                tbl:addInfo('set child', obj, n)
                 tbl:setChild(n, value)
             end
             -- 处理写了一半的 key = value，把name类的数组元素视为哈希键
@@ -349,6 +354,7 @@ function mt:getName(name, source)
     end
     local ENV = self:loadLocal('_ENV')
     local ENVValue = ENV:getValue()
+    ENVValue:addInfo('get child', source, name)
     global = ENVValue:getChild(name, source)
     source:bindValue(global, 'get')
     source:set('global', true)
@@ -371,6 +377,7 @@ function mt:setName(name, source, value)
     local ENV = self:loadLocal('_ENV')
     local ENVValue = ENV:getValue()
     source:bindValue(value, 'set')
+    ENVValue:addInfo('set child', source, name)
     ENVValue:setChild(name, value)
     source:set('global', true)
     source:set('parentValue', ENVValue)
@@ -379,6 +386,7 @@ end
 function mt:getIndex(source)
     if source.type == 'name' then
         local value = self:getName(source[1], source)
+        source:set('in index', true)
         return value
     elseif source.type == 'string' or source.type == 'number' or source.type == 'boolean' then
         return source[1]
@@ -477,11 +485,13 @@ function mt:getSimple(simple, max)
             source:set('parent', value)
             local child = source[1]
             local index = self:getIndex(child)
+            value:addInfo('get child', source, index)
             value = value:getChild(index, source)
             source:bindValue(value, 'get')
         elseif source.type == 'name' then
             source:set('parent', value)
             source:set('object', object)
+            value:addInfo('get child', source, source[1])
             value = value:getChild(source[1], source)
             source:bindValue(value, 'get')
         elseif source.type == ':' then
@@ -746,12 +756,14 @@ function mt:setOne(var, value)
         local key = var[#var]
         self:instantSource(key)
         key:set('simple', var)
-        key:set('parent', value)
+        key:set('parent', parent)
         if key.type == 'index' then
             local index = self:getIndex(key[1])
+            parent:addInfo('set child', key[1], index)
             parent:setChild(index, value)
         elseif key.type == 'name' then
             local index = key[1]
+            parent:addInfo('set child', key, index)
             parent:setChild(index, value)
         end
         key:bindValue(value, 'set')
@@ -878,9 +890,11 @@ function mt:doFunction(action)
                 source:set('object', parent)
                 if source.type == 'index' then
                     local index = self:getIndex(source[1])
+                    parent:addInfo('set child', source[1], index)
                     parent:setChild(index, value)
                 elseif source.type == 'name' then
                     local index = source[1]
+                    parent:addInfo('set child', source, index)
                     parent:setChild(index, value)
                 end
                 source:bindValue(value, 'set')
@@ -903,9 +917,11 @@ function mt:doFunction(action)
                 self:instantSource(source)
                 if source.type == 'index' then
                     local index = self:getIndex(source[1])
+                    parent:addInfo('set child', source[1], index)
                     parent:setChild(index, value)
                 elseif source.type == 'name' then
                     local index = source[1]
+                    parent:addInfo('set child', source, index)
                     parent:setChild(index, value)
                 end
                 source:bindValue(value, 'set')

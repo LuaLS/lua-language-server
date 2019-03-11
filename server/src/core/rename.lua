@@ -1,15 +1,23 @@
 local findSource = require 'core.find_source'
 local parser = require 'parser'
 
-local function parseResult(result, source, newName)
+local function parseResult(source, newName)
     local positions = {}
-    local tp = result.type
-    if tp == 'local' or tp == 'field' then
-        local key = source[1]
-        if result.hide then
-            return positions
+    if source:bindLabel() then
+        if not parser.grammar(newName, 'Name') then
+            return nil
         end
-        if source.index then
+        source:bindLabel():eachInfo(function (info)
+            positions[#positions+1] = {info.source.start, info.source.finish}
+        end)
+        return positions
+    end
+    if source:bindLocal() then
+        local loc = source:bindLocal()
+        if loc:get 'hide' then
+            return nil
+        end
+        if source:get 'in index' then
             if not parser.grammar(newName, 'Exp') then
                 return positions
             end
@@ -19,31 +27,46 @@ local function parseResult(result, source, newName)
             end
         end
         local mark = {}
-        for _, info in ipairs(result) do
+        loc:eachInfo(function (info)
             if not mark[info.source] then
                 mark[info.source] = info
-                if info.source[1] == key then
-                    positions[#positions+1] = {info.source.start, info.source.finish}
-                end
+                positions[#positions+1] = {info.source.start, info.source.finish}
+            end
+        end)
+        return positions
+    end
+    if source:bindValue() then
+        if source:get 'in index' then
+            if not parser.grammar(newName, 'Exp') then
+                return positions
+            end
+        else
+            if not parser.grammar(newName, 'Name') then
+                return positions
             end
         end
-    elseif tp == 'label' then
-        if not parser.grammar(newName, 'Name') then
-            return positions
-        end
-        local label = result.label
-        for _, info in ipairs(label) do
-            positions[#positions+1] = {info.source.start, info.source.finish}
-        end
+        local parent = source:get 'parent'
+        local mark = {}
+        parent:eachInfo(function (info)
+            if not mark[info.source] then
+                mark[info.source] = info
+                if info.type == 'get child' or info.type == 'set child' then
+                    if info[1] == source[1] then
+                        positions[#positions+1] = {info.source.start, info.source.finish}
+                    end
+                end
+            end
+        end)
+        return positions
     end
-    return positions
+    return nil
 end
 
 return function (vm, pos, newName)
-    local result, source = findSource(vm, pos)
-    if not result then
+    local source = findSource(vm, pos)
+    if not source then
         return nil
     end
-    local positions = parseResult(result, source, newName)
+    local positions = parseResult(source, newName)
     return positions
 end

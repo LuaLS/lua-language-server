@@ -28,6 +28,7 @@ local function main()
     test 'full'
     test 'definition'
     test 'rename'
+    test 'references'
     test 'diagnostics'
     test 'type_inference'
     test 'find_lib'

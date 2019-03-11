@@ -1,66 +1,62 @@
 local findSource = require 'core.find_source'
 
-local function parseResult(vm, result, declarat, callback)
-    local tp = result.type
-    if     tp == 'local' then
-        vm:eachInfo(result, function (info)
-            if info.source.uri == '' or not info.source.uri then
-                return
-            end
+local function parseResult(vm, source, declarat, callback)
+    if source:bindLabel() then
+        source:bindLabel():eachInfo(function (info)
             if declarat or info.type == 'get' then
                 callback(info.source)
             end
         end)
-        result.value:eachInfo(function (info)
-            if info.source.uri == '' or not info.source.uri then
-                return
-            end
+        return
+    end
+    if source:bindLocal() then
+        local loc = source:bindLocal()
+        loc:eachInfo(function (info)
             if declarat or info.type == 'get' then
                 callback(info.source)
             end
         end)
-    elseif tp == 'field' then
-        vm:eachInfo(result, function (info)
-            if info.source.uri == '' or not info.source.uri then
-                return
-            end
+        loc:getValue():eachInfo(function (info)
             if declarat or info.type == 'get' then
                 callback(info.source)
             end
         end)
-        result.value:eachInfo(function (info)
-            if info.source.uri == '' or not info.source.uri then
-                return
-            end
+        return
+    end
+    if source:bindValue() then
+        source:bindValue():eachInfo(function (info)
             if declarat or info.type == 'get' then
                 callback(info.source)
             end
         end)
-    elseif tp == 'label' then
-        vm:eachInfo(result, function (info)
-            if declarat or info.type == 'goto' then
-                callback(info.source)
+        local parent = source:get 'parent'
+        parent:eachInfo(function (info)
+            if info[1] == source[1] then
+                if (declarat and info.type == 'set child') or info.type == 'get child' then
+                    callback(info.source)
+                end
             end
         end)
+        return
     end
 end
 
 return function (vm, pos, declarat)
-    local result = findSource(vm, pos)
-    if not result then
+    local source = findSource(vm, pos)
+    if not source then
         return nil
     end
     local positions = {}
     local mark = {}
-    parseResult(vm, result, declarat, function (source)
-        if mark[source] then
+    parseResult(vm, source, declarat, function (src)
+        if mark[src] then
             return
         end
-        mark[source] = true
+        mark[src] = true
         positions[#positions+1] = {
-            source.start,
-            source.finish,
-            source.uri,
+            src.start,
+            src.finish,
+            src.uri,
         }
     end)
     return positions

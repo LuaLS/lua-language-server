@@ -72,8 +72,8 @@ function TEST(data)
     local sourceVM = lsp:loadVM(sourceUri)
     assert(sourceVM)
     local sourcePos = (sourceList[1][1] + sourceList[1][2]) // 2
-    local result, source = core.findSource(sourceVM, sourcePos)
-    local hover = core.hover(result, source, lsp)
+    local source = core.findSource(sourceVM, sourcePos)
+    local hover = core.hover(source, lsp)
     assert(hover)
     if data.hover.description then
         data.hover.description = data.hover.description:gsub('%$ROOT%$', ws:uriEncode(ROOT):gsub('%%', '%%%%'))

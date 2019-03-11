@@ -175,19 +175,6 @@ local function getValueHover(source, name, value, lib)
     }
 end
 
-local function getStringHover(result, lsp)
-    if not result.uri then
-        return nil
-    end
-    if not lsp or not lsp.workspace then
-        return nil
-    end
-    local path = lsp.workspace:relativePathByUri(result.uri)
-    return {
-        description = ('[%s](%s)'):format(path:string(), result.uri),
-    }
-end
-
 local function hoverAsValue(source, lsp, select)
     local lib, fullkey = findLib(source)
     local value = source:bindValue()
@@ -212,14 +199,26 @@ local function hoverAsValue(source, lsp, select)
     return hover
 end
 
+local function hoverAsTargetUri(source, lsp)
+    local uri = source:get 'target uri'
+    if not lsp or not lsp.workspace then
+        return nil
+    end
+    local path = lsp.workspace:relativePathByUri(uri)
+    return {
+        description = ('[%s](%s)'):format(path:string(), uri),
+    }
+end
+
 return function (source, lsp, select)
     if not source then
         return nil
     end
-    if source.type ~= 'name' then
-        return
+    if source:get 'target uri' then
+        return hoverAsTargetUri(source, lsp)
     end
-    if source:bindValue() then
+    if source.type == 'name' and source:bindValue() then
         return hoverAsValue(source, lsp, select)
     end
+    return nil
 end

@@ -235,6 +235,9 @@ function mt:mergeValue(value)
     if value._lib then
         self._lib = value._lib
     end
+    if value.uri then
+        self.uri = value.uri
+    end
 end
 
 function mt:addInfo(tp, source, ...)

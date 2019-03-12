@@ -34,7 +34,7 @@ return function (lsp, params)
 
     local response = {
         signatures = signatures,
-        activeSignature = #signatures - 1,
+        activeSignature = 0,
     }
 
     return response

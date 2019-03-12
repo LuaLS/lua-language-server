@@ -426,3 +426,4 @@ local function testIfExit(path)
     end
 end
 testIfExit[[D:\Github\lua\testes\coroutine.lua]]
+testIfExit[[D:\Github\War3-lua-map\scripts\game\init.lua]]

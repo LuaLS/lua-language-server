@@ -24,11 +24,6 @@ end
 function mt:clearGlobal(uri)
     self.set[uri] = nil
     self.get[uri] = nil
-    local globalValue = self.lsp.globalValue
-    if not globalValue then
-        return
-    end
-    globalValue:removeUri(uri)
 end
 
 function mt:getAllUris()
@@ -42,6 +37,10 @@ function mt:getAllUris()
         end
     end
     return uris
+end
+
+function mt:hasSetGlobal(uri)
+    return self.set[uri] ~= nil
 end
 
 return function (lsp)

@@ -365,6 +365,11 @@ function mt:getName(name, source)
     source:bindValue(global, 'get')
     source:set('global', true)
     source:set('parent', ENVValue)
+    if not global:getLib() then
+        if self.lsp then
+            self.lsp.global:markGet(self:getUri())
+        end
+    end
     return global
 end
 
@@ -387,6 +392,9 @@ function mt:setName(name, source, value)
     ENVValue:setChild(name, value)
     source:set('global', true)
     source:set('parentValue', ENVValue)
+    if self.lsp then
+        self.lsp.global:markSet(self:getUri())
+    end
 end
 
 function mt:getIndex(source)

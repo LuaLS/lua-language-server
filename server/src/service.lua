@@ -296,12 +296,12 @@ function mt:_compileGlobal(compiled)
     end
 end
 
-function mt:_clearGlobal(uri, compiled)
+function mt:_clearGlobal(uri)
     self.global:clearGlobal(uri)
-    local uris = self.global:getAllUris()
-    for _, uri in ipairs(uris) do
-        self:needCompile(uri, compiled)
-    end
+end
+
+function mt:_hasSetGlobal(uri)
+    return self.global:hasSetGlobal(uri)
 end
 
 function mt:compileVM(uri)
@@ -320,7 +320,7 @@ function mt:compileVM(uri)
     local version = obj.version
     obj.astCost = os.clock() - clock
     self:_clearChainNode(obj, uri)
-    --self:_clearGlobal(uri, compiled)
+    self:_clearGlobal(uri)
 
     local clock = os.clock()
     local vm = buildVM(ast, self, uri)
@@ -350,7 +350,9 @@ function mt:compileVM(uri)
     end
 
     self:_compileChain(obj, compiled)
-    --self:_compileGlobal(compiled)
+    if self:_hasSetGlobal(uri) then
+        self:_compileGlobal(compiled)
+    end
 
     return obj
 end

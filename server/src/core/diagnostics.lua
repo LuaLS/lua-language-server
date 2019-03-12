@@ -249,7 +249,7 @@ return function (vm, lines, uri)
     -- 未使用的局部变量
     session:doDiagnostics(session.searchUnusedLocals, 'unused-local', function (key)
         return {
-            level   = DiagnosticSeverity.Information,
+            level   = DiagnosticSeverity.Hint,
             message = lang.script('DIAG_UNUSED_LOCAL', key),
         }
     end)

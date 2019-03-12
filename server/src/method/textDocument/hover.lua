@@ -9,12 +9,12 @@ return function (lsp, params)
     -- lua是从1开始的，因此都要+1
     local position = lines:position(params.position.line + 1, params.position.character + 1)
 
-    local result, source = core.findSource(vm, position)
-    if not result then
+    local source = core.findSource(vm, position)
+    if not source then
         return nil
     end
 
-    local hover = core.hover(result, source, lsp)
+    local hover = core.hover(source, lsp)
     if not hover then
         return nil
     end

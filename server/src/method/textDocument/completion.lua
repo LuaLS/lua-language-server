@@ -20,11 +20,25 @@ local function findStartPos(pos, buf)
     local res = nil
     for i = pos-1, 1, -1 do
         local c = buf:sub(i, i)
-        if c:find '%a' then
+        if c:find '[%w_]' then
             res = i
         else
             break
         end
+    end
+    if not res then
+        for i = pos-1, 1, -1 do
+            local c = buf:sub(i, i)
+            if c:find '[%.%:]' then
+                res = i
+            elseif c:find '[%s%c]' then
+            else
+                break
+            end
+        end
+    end
+    if not res then
+        return pos
     end
     return res
 end

@@ -1,17 +1,11 @@
 local core = require 'core'
 
-local function checkWorkSpaceComplete(lsp, result)
-    if result.type ~= 'field' and result.type ~= 'local' then
+local function checkWorkSpaceComplete(lsp, source)
+    if not source:bindValue() then
         return
     end
-    if result.value then
-        if not result.value.isRequire then
-            return
-        end
-    else
-        if not result.isRequire then
-            return
-        end
+    if not source:bindValue():get 'cross file' then
+        return
     end
     lsp:checkWorkSpaceComplete()
 end
@@ -24,14 +18,14 @@ return function (lsp, params)
     end
     -- lua是从1开始的，因此都要+1
     local position = lines:position(params.position.line + 1, params.position.character + 1)
-    local result = core.findSource(vm, position)
-    if not result then
+    local source = core.findSource(vm, position)
+    if not source then
         return nil
     end
 
-    checkWorkSpaceComplete(lsp, result)
+    checkWorkSpaceComplete(lsp, source)
 
-    local positions = core.definition(vm, result, lsp)
+    local positions = core.definition(vm, source, lsp)
     if not positions then
         return nil
     end

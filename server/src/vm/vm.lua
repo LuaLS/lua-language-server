@@ -241,7 +241,7 @@ function mt:callRequire(func, values)
         local requireValue = self:tryRequireOne(values[1], 'require')
         if not requireValue then
             requireValue = self:createValue('boolean')
-            requireValue.isRequire = true
+            requireValue:set('cross file', true)
         end
         func:setReturn(1, requireValue)
     end
@@ -258,7 +258,7 @@ function mt:callLoadFile(func, values)
     local requireValue = self:tryRequireOne(values[1], 'loadfile')
     if not requireValue then
         requireValue = self:createValue('any')
-        requireValue.isRequire = true
+        requireValue:set('cross file', true)
     end
     func:setReturn(1, requireValue)
 end

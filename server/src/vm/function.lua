@@ -138,14 +138,14 @@ function mt:hasRuned()
     return self._runed > 0
 end
 
+function mt:needSkip()
+    return self._runed > 1
+end
+
 function mt:run(vm)
     self._runed = self._runed + 1
     if not self.source then
         return
-    end
-
-    if self._runed > 1 then
-        --return
     end
 
     -- 第一次运行函数时，创建函数的参数
@@ -160,6 +160,10 @@ function mt:run(vm)
 
         -- 显性声明的参数
         self:createArgs(vm)
+    end
+
+    if self:needSkip() then
+        return
     end
 
     -- 向局部变量中填充参数

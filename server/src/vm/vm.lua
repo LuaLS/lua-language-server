@@ -98,6 +98,10 @@ function mt:runFunction(func)
         return
     end
 
+    if func:needSkip() then
+        return
+    end
+
     -- 暂时使用这种方式激活参数的source
     for _, arg in ipairs(func.args) do
         if arg.source ~= func:getObject() then

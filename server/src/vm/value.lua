@@ -202,6 +202,9 @@ function mt:eachChild(callback, mark, foundIndex)
 end
 
 function mt:mergeValue(value)
+    if self == value then
+        return
+    end
     if value._type then
         for tp, rate in pairs(value._type) do
             self:setType(tp, rate)

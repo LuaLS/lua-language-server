@@ -53,10 +53,17 @@ return function (vm, pos, declarat)
             return
         end
         mark[src] = true
+        if src.start == 0 then
+            return
+        end
+        local uri = src.uri
+        if uri == '' then
+            uri = nil
+        end
         positions[#positions+1] = {
             src.start,
             src.finish,
-            src.uri,
+            uri,
         }
     end)
     return positions

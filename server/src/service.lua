@@ -332,6 +332,9 @@ function mt:compileVM(uri)
     else
         return nil
     end
+    if obj.vm then
+        obj.vm:remove()
+    end
     obj.vm = vm
     obj.vmCost = os.clock() - clock
     obj.vmVersion = version

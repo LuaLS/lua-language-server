@@ -12,7 +12,7 @@ local mt = {}
 mt.__index = mt
 
 function mt:getDefaultSource()
-    return {
+    return self:instantSource {
         start = 0,
         finish = 0,
         uri = self:getUri(),
@@ -25,19 +25,6 @@ end
 
 function mt:scopePop()
     self.currentFunction:pop()
-end
-
-function mt:eachInfo(var, callback)
-    if not self.results.infos[var] then
-        return nil
-    end
-    for _, info in ipairs(self.results.infos[var]) do
-        local res = callback(info)
-        if res ~= nil then
-            return res
-        end
-    end
-    return nil
 end
 
 function mt:buildTable(source)
@@ -723,7 +710,7 @@ function mt:doReturn(action)
     values:eachValue(function (n, value)
         value.uri = self:getUri()
         func:setReturn(n, value)
-        value:addInfo('return', action[n])
+        value:addInfo('return', action[n] or value.source)
     end)
 end
 
@@ -1077,10 +1064,11 @@ function mt:getUri()
 end
 
 function mt:instantSource(source)
-    if instantSource(source) then
+    if instantSource(self, source) then
         source:setUri(self:getUri())
         self.sources[#self.sources+1] = source
     end
+    return source
 end
 
 function mt:bindLocal(source, loc, action)
@@ -1118,7 +1106,7 @@ function mt:createLocal(key, source, value)
     loc = createLocal(key, source, value)
     self:saveLocal(key, loc)
     self:bindLocal(source, loc, 'local')
-    value:addInfo('local', source)
+    value:addInfo('local', source or self:getDefaultSource())
     return loc
 end
 
@@ -1139,6 +1127,10 @@ function mt:eachSource(callback)
     for i = 1, #sources do
         callback(sources[i])
     end
+end
+
+function mt:remove()
+    self._removed = true
 end
 
 local function compile(ast, lsp, uri)

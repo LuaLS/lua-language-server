@@ -72,7 +72,7 @@ local function buildLocal(vm, source, callback)
         valueSource = source
     end
     local name = hvr.name
-    if vm.uri ~= value.uri and name == '' then
+    if name == '' then
         name = tostring(source[1] or '')
     end
     -- 由于范围不允许交叉，为了支持 local x, y, z = 1, 2, 3 的形式
@@ -126,7 +126,7 @@ local function buildSet(vm, source, callback)
         valueSource = source
     end
     local name = hvr.name
-    if vm.uri ~= value.uri and name == '' then
+    if name == '' then
         name = tostring(source[1] or '')
     end
     -- 由于范围不允许交叉，为了支持 x, y, z = 1, 2, 3 的形式

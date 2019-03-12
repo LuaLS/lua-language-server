@@ -246,9 +246,12 @@ function mt:addInfo(tp, source, ...)
     if self._info[source] then
         return
     end
+    if not source then
+        return
+    end
     local info = {
         type = tp,
-        source = source or getDefaultSource(),
+        source = source,
         ...
     }
     self._info[#self._info+1] = info

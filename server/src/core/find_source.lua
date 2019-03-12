@@ -6,7 +6,7 @@ local function isContainPos(obj, pos)
 end
 
 local function isValidSource(source)
-    return source.start ~= nil
+    return source.start ~= nil and source.start ~= 0
 end
 
 local function findAtPos(sources, pos, level)

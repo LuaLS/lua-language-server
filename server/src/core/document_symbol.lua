@@ -98,7 +98,7 @@ local function buildSet(vm, source, callback)
     elseif source:get 'table index' then
         kind = SymbolKind.Class
     else
-        kind = SymbolKind.Object
+        return
     end
     local valueSource = value.source
     if valueSource.start == 0 or value.uri ~= vm.uri then

@@ -338,6 +338,9 @@ local function searchInRequire(vm, select, source, callback)
         return
     end
     local list = vm.lsp.workspace:matchPath(vm.uri, source[1])
+    if not list then
+        return
+    end
     for _, str in ipairs(list) do
         callback(str, nil, CompletionItemKind.File, {
             textEdit = {
@@ -418,6 +421,9 @@ end
 
 local function searchAllWords(vm, source, word, callback)
     if word == '' then
+        return
+    end
+    if source.type == 'string' then
         return
     end
     for _, src in ipairs(vm.sources) do

@@ -674,3 +674,10 @@ end
         kind = CompletionItemKind.Field,
     },
 }
+
+TEST [[
+local ast = 1
+local t = 'as@'
+local ask = 1
+]]
+(nil)

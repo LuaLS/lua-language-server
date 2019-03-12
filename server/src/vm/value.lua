@@ -22,6 +22,7 @@ local function create (tp, source, literal)
         source = source or getDefaultSource(),
         _type = {},
         _literal = literal,
+        _info = {},
     }, mt)
     if type(tp) == 'table' then
         for i = 1, #tp do
@@ -200,7 +201,6 @@ function mt:eachChild(callback, mark, foundIndex)
     return method:eachChild(callback, mark, foundIndex)
 end
 
-local hasSource = {}
 function mt:mergeValue(value)
     if value._type then
         for tp, rate in pairs(value._type) do
@@ -216,16 +216,11 @@ function mt:mergeValue(value)
             self._child[k] = v
         end
     end
-    for _, info in ipairs(self) do
-        hasSource[info.source] = true
-    end
-    for _, info in ipairs(value) do
-        if not hasSource[info.source] then
-            self[#self+1] = info
+    for _, info in ipairs(value._info) do
+        if not self._info[info.source] then
+            self._info[#self._info+1] = info
+            self._info[info.source] = true
         end
-    end
-    for k in pairs(hasSource) do
-        hasSource[k] = nil
     end
     if value._meta then
         self._meta = value._meta
@@ -245,15 +240,20 @@ function mt:addInfo(tp, source, ...)
     if source and not source.start then
         error('Miss start: ' .. table.dump(source))
     end
-    self[#self+1] = {
+    if self._info[source] then
+        return
+    end
+    local info = {
         type = tp,
         source = source or getDefaultSource(),
         ...
     }
+    self._info[#self._info+1] = info
+    self._info[info.source] = true
 end
 
 function mt:eachInfo(callback)
-    for _, info in ipairs(self) do
+    for _, info in ipairs(self._info) do
         local res = callback(info)
         if res ~= nil then
             return res

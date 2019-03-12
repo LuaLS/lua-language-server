@@ -1137,8 +1137,16 @@ function mt:eachSource(callback)
     end
 end
 
+function mt:isRemoved()
+    return self._removed == true
+end
+
 function mt:remove()
     self._removed = true
+    for value in pairs(self._subscribted) do
+        self._subscribted[value] = nil
+        value:cleanInfo()
+    end
 end
 
 local function compile(ast, lsp, uri)
@@ -1149,6 +1157,7 @@ local function compile(ast, lsp, uri)
         env     = nil,
         lsp     = lsp,
         uri     = uri or '',
+        _subscribted = {},
     }, mt)
 
     -- 创建初始环境

@@ -66,15 +66,15 @@ function mt:setVM()
     self.vm = vm
 end
 
+function mt:subscribe(value)
+    if self.uri == value.uri then
+        return
+    end
+    self.vm._subscribted[value] = true
+end
+
 function mt:isRemoved()
-    if not self.vm then
-        return true
-    end
-    if self.vm._removed then
-        self.vm = nil
-        return true
-    end
-    return false
+    return self.vm:isRemoved()
 end
 
 function mt:set(name, v)

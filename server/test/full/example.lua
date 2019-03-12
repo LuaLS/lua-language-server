@@ -13,4 +13,4 @@ local function testIfExit(path)
         print('基准测试耗时：', os.clock() - clock)
     end
 end
-testIfExit(ROOT / 'test' / 'example' / 'vm.lua')
+testIfExit(ROOT / 'test' / 'example' / 'vm.txt')

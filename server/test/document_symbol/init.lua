@@ -61,6 +61,19 @@ local function eq(a, b)
     return a == b
 end
 
+local function checkArcoss(symbols)
+    local lastFinish = 0
+    for _, symbol in ipairs(symbols) do
+        assert(symbol.range[1] <= symbol.selectionRange[1])
+        assert(symbol.range[2] >= symbol.selectionRange[2])
+        assert(symbol.range[2] > lastFinish)
+        lastFinish = symbol.range[2]
+        if symbol.children then
+            checkArcoss(symbol.children)
+        end
+    end
+end
+
 function TEST(script)
     return function (expect)
         local ast = parser:ast(script)
@@ -68,6 +81,7 @@ function TEST(script)
         assert(vm)
         local result = core.documentSymbol(vm)
         assert(eq(expect, result))
+        checkArcoss(result)
     end
 end
 

@@ -57,7 +57,7 @@ local function buildLocal(vm, source, callback)
     -- 由于范围不允许交叉，为了支持 local x, y, z = 1, 2, 3 的形式
     -- 范围只能限定在变量上
     -- 而 local function xx() 的形式范围会包含整个 function
-    if source.start > valueSource.start then
+    if source.start > valueSource.start and source.finish < valueSource.finish then
         callback {
             name = name,
             detail = hvr.label:gsub('[\r\n]', ''),
@@ -111,7 +111,7 @@ local function buildSet(vm, source, callback)
     -- 由于范围不允许交叉，为了支持 x, y, z = 1, 2, 3 的形式
     -- 范围只能限定在变量上
     -- 而 function xx() 的形式范围会包含整个 function
-    if source.start > valueSource.start then
+    if source.start > valueSource.start and source.finish < valueSource.finish then
         callback {
             name = name,
             -- 前端不支持多行

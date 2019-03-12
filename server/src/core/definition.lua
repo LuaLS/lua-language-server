@@ -6,14 +6,20 @@ local function parseValueSimily(vm, source, lsp)
     local positions = {}
     for _, other in ipairs(vm.sources) do
         if other == source then
-            break
+            goto CONTINUE
         end
-        if other[1] == key and not other:bindLocal() and other:bindValue() and other:action() == 'set' then
+        if      other[1] == key
+            and not other:bindLocal()
+            and other:bindValue()
+            and other:action() == 'set'
+            and source:bindValue() ~= other:bindValue()
+        then
             positions[#positions+1] = {
                 other.start,
                 other.finish,
             }
         end
+        :: CONTINUE ::
     end
     if #positions == 0 then
         return nil

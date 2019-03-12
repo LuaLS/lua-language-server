@@ -171,4 +171,9 @@ return function (vm, source, lsp)
     if source:get 'target uri' then
         return jumpUri(vm, source, lsp)
     end
+    if source:get 'in index' then
+        source = source:get 'in index'
+        return parseValue(vm, source, lsp)
+            or parseValueSimily(vm, source, lsp)
+    end
 end

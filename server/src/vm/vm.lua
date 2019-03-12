@@ -40,7 +40,7 @@ function mt:buildTable(source)
             self:instantSource(key)
             key:bindValue(value, 'set')
             if key.index then
-                local index = self:getIndex(key)
+                local index = self:getIndex(obj)
                 key:set('parent', tbl)
                 tbl:addInfo('set child', key, index)
                 tbl:setChild(index, value)
@@ -387,14 +387,17 @@ function mt:setName(name, source, value)
 end
 
 function mt:getIndex(source)
-    if source.type == 'name' then
-        local value = self:getName(source[1], source)
-        source:set('in index', true)
+    local child = source[1]
+    if child.type == 'name' then
+        local value = self:getName(child[1], child)
+        child:set('in index', source)
         return value
-    elseif source.type == 'string' or source.type == 'number' or source.type == 'boolean' then
-        return source[1]
+    elseif child.type == 'string' or child.type == 'number' or child.type == 'boolean' then
+        self:instantSource(child)
+        child:set('in index', source)
+        return child[1]
     else
-        return self:getExp(source)
+        return self:getExp(child)
     end
 end
 
@@ -485,9 +488,9 @@ function mt:getSimple(simple, max)
             source:bindCall(func, args)
             value = self:call(func, values, source) or createValue('any')
         elseif source.type == 'index' then
-            source:set('parent', value)
             local child = source[1]
-            local index = self:getIndex(child)
+            local index = self:getIndex(source)
+            child:set('parent', value)
             value:addInfo('get child', source, index)
             value = value:getChild(index, source)
             source:bindValue(value, 'get')
@@ -710,7 +713,11 @@ function mt:doReturn(action)
     values:eachValue(function (n, value)
         value.uri = self:getUri()
         func:setReturn(n, value)
-        value:addInfo('return', action[n] or value.source)
+        local source = action[n] or value.source
+        if source.start == 0 then
+            source = self:getDefaultSource()
+        end
+        value:addInfo('return', source)
     end)
 end
 
@@ -759,13 +766,14 @@ function mt:setOne(var, value)
         local key = var[#var]
         self:instantSource(key)
         key:set('simple', var)
-        key:set('parent', parent)
         if key.type == 'index' then
-            local index = self:getIndex(key[1])
+            local index = self:getIndex(key)
+            key[1]:set('parent', parent)
             parent:addInfo('set child', key[1], index)
             parent:setChild(index, value)
         elseif key.type == 'name' then
             local index = key[1]
+            key:set('parent', parent)
             parent:addInfo('set child', key, index)
             parent:setChild(index, value)
         end
@@ -892,7 +900,7 @@ function mt:doFunction(action)
                 self:instantSource(source)
                 source:set('object', parent)
                 if source.type == 'index' then
-                    local index = self:getIndex(source[1])
+                    local index = self:getIndex(source)
                     parent:addInfo('set child', source[1], index)
                     parent:setChild(index, value)
                 elseif source.type == 'name' then
@@ -919,7 +927,7 @@ function mt:doFunction(action)
                 local source = name[#name]
                 self:instantSource(source)
                 if source.type == 'index' then
-                    local index = self:getIndex(source[1])
+                    local index = self:getIndex(source)
                     parent:addInfo('set child', source[1], index)
                     parent:setChild(index, value)
                 elseif source.type == 'name' then

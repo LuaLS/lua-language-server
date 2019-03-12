@@ -23,6 +23,7 @@ local function create (tp, source, literal)
         _type = {},
         _literal = literal,
         _info = {},
+        _infoCheck = 10,
     }, mt)
     if type(tp) == 'table' then
         for i = 1, #tp do
@@ -246,7 +247,7 @@ function mt:addInfo(tp, source, ...)
     if self._info[source] then
         return
     end
-    if not source then
+    if not source or not source.isRemoved then
         return
     end
     local info = {
@@ -256,6 +257,22 @@ function mt:addInfo(tp, source, ...)
     }
     self._info[#self._info+1] = info
     self._info[info.source] = true
+
+    -- 清除无效的info
+    --if #self._info > self._infoCheck then
+    --    for i = #self._info, 1, -1 do
+    --        local info = self._info[i]
+    --        local src = info.source
+    --        if src:isRemoved() then
+    --            table.remove(self._info, i)
+    --            self._info[src] = nil
+    --        end
+    --    end
+    --    self._infoCheck = #self._info * 2
+    --    if self._infoCheck < 10 then
+    --        self._infoCheck = 10
+    --    end
+    --end
 end
 
 function mt:eachInfo(callback)

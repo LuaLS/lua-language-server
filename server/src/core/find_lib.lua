@@ -47,5 +47,10 @@ return function (source)
         local lib, fullKey = findLib(source)
         return lib, fullKey
     end
+    if source:get 'in index' then
+        source = source:get 'in index'
+        local lib, fullKey = findLib(source)
+        return lib, fullKey
+    end
     return nil
 end

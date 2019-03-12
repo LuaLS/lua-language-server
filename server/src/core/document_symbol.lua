@@ -31,6 +31,27 @@ local SymbolKind = {
     TypeParameter = 26,
 }
 
+local function isFirstSet(source, value)
+    if source:action() ~= 'set' then
+        return false
+    end
+    local firstSet = value:eachInfo(function (info)
+        if info.type == 'set' then
+            return info
+        end
+    end)
+    if not firstSet then
+        return false
+    end
+    if firstSet.type ~= 'set' then
+        return false
+    end
+    if firstSet.source ~= source then
+        return false
+    end
+    return true
+end
+
 local function buildLocal(vm, source, callback)
     local loc = source:bindLocal()
     local value = loc:getInitValue()
@@ -98,7 +119,7 @@ local function buildSet(vm, source, callback)
     elseif source:get 'table index' then
         kind = SymbolKind.Class
     else
-        return
+        kind = SymbolKind.Property
     end
     local valueSource = value.source
     if valueSource.start == 0 or value.uri ~= vm.uri then
@@ -121,7 +142,7 @@ local function buildSet(vm, source, callback)
             selectionRange = { source.start, source.finish },
             valueRange = { valueSource.start, valueSource.finish },
         }
-    else
+    elseif isFirstSet(source, value) then
         callback {
             name = name,
             -- 前端不支持多行
@@ -130,6 +151,16 @@ local function buildSet(vm, source, callback)
             range = { source.start, source.finish },
             selectionRange = { source.start, source.finish },
             valueRange = { valueSource.start, valueSource.finish },
+        }
+    else
+        callback {
+            name = name,
+            -- 前端不支持多行
+            detail = hvr.label:gsub('[\r\n]', ''),
+            kind = kind,
+            range = { source.start, source.finish },
+            selectionRange = { source.start, source.finish },
+            valueRange = { source.start, source.finish },
         }
     end
 end

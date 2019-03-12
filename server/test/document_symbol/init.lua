@@ -227,7 +227,7 @@ local x = 1
 local function f()
     local x = 'x'
     local y = {}
-    z = 1
+    --= 1
 end
 local y = true
 local z
@@ -265,14 +265,14 @@ local z
                 selectionRange = {60, 60},
                 valueRange = {64, 65},
             },
-            [3] = {
-                name = 'z',
-                detail = 'global z: number = 1',
-                kind = SymbolKind.Object,
-                range = {71, 71},
-                selectionRange = {71, 71},
-                valueRange = {75, 75},
-            },
+            --[3] = {
+            --    name = 'z',
+            --    detail = 'global z: number = 1',
+            --    kind = SymbolKind.Object,
+            --    range = {71, 71},
+            --    selectionRange = {71, 71},
+            --    valueRange = {75, 75},
+            --},
         },
     },
     [3] = {

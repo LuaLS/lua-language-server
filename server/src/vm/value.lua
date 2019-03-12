@@ -285,4 +285,18 @@ function mt:getLiteral()
     return self._literal
 end
 
+function mt:set(name, v)
+    if not self._flag then
+        self._flag = {}
+    end
+    self._flag[name] = v
+end
+
+function mt:get(name)
+    if not self._flag then
+        return nil
+    end
+    return self._flag[name]
+end
+
 return create

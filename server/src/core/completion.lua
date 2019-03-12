@@ -344,9 +344,11 @@ local function searchInRequire(vm, select, source, callback)
     for _, str in ipairs(list) do
         callback(str, nil, CompletionItemKind.File, {
             textEdit = {
-                start = source.start,
-                finish = source.finish,
-                newText = ('%q'):format(str),
+                -- TODO 坑爹自动完成的字符串里面不能包含符号
+                -- 这里长字符串会出问题，不过暂时先这样吧
+                start = source.start + 1,
+                finish = source.finish - 1,
+                newText = str,
             }
         })
     end

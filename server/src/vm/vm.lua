@@ -54,10 +54,12 @@ function mt:buildTable(source)
             key:bindValue(value, 'set')
             if key.index then
                 local index = self:getIndex(key)
+                key:set('parent', tbl)
                 tbl:addInfo('set child', key, index)
                 tbl:setChild(index, value)
             else
                 if key.type == 'name' then
+                    key:set('parent', tbl)
                     key:set('table index', true)
                     tbl:addInfo('set child', key, key[1])
                     tbl:setChild(key[1], value)

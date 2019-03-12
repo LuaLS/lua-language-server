@@ -71,3 +71,10 @@ local a = 1
 local <!a!> = 1
 <?a?> = <?a?>
 ]]
+
+TEST [[
+local t = {
+    <?a?> = 1
+}
+print(t.<!a!>)
+]]

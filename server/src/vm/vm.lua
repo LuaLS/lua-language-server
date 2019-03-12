@@ -100,7 +100,9 @@ function mt:runFunction(func)
 
     -- 暂时使用这种方式激活参数的source
     for _, arg in ipairs(func.args) do
-        self:bindLocal(arg.source, arg, 'local')
+        if arg.source ~= func:getObject() then
+            self:bindLocal(arg.source, arg, 'local')
+        end
     end
 
     local originFunction = self:getCurrentFunction()

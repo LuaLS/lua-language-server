@@ -4,9 +4,6 @@ local function buildValueArgs(func, object, select)
     end
     local names = {}
     local values = {}
-    if func:getObject() then
-        names[#names+1] = 'self'
-    end
     if func.args then
         for _, arg in ipairs(func.args) do
             names[#names+1] = arg:getName()

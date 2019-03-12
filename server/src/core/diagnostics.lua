@@ -214,9 +214,6 @@ function mt:searchRedundantParameters(callback)
             return
         end
         local max = #func.args
-        if func:getObject() then
-            max = max + 1
-        end
         local passed = #args
         for i = max + 1, passed do
             local extra = args[i]

@@ -207,6 +207,7 @@ function mt:mergeValue(value)
             self:setType(tp, rate)
         end
     end
+    value._type = self._type
     if value._child then
         if not self._child then
             self._child = {}

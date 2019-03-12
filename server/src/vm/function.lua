@@ -131,7 +131,7 @@ function mt:setObject(value, source)
 end
 
 function mt:getObject()
-    return self._objectValue, self._objectSource
+    return self._objectSource, self._objectValue
 end
 
 function mt:hasRuned()
@@ -149,18 +149,29 @@ function mt:run(vm)
     end
 
     -- 第一次运行函数时，创建函数的参数
-    if self._runed ~= 1 then
-        return
+    if self._runed == 1 then
+        -- 如果是面向对象形式的函数，创建隐藏的参数self
+        if self._objectSource then
+            local loc = createLocal('self', self._objectSource, self._objectValue)
+            loc:set('hide', true)
+            self:saveLocal('self', loc)
+            self.args[#self.args+1] = loc
+        end
+
+        -- 显性声明的参数
+        self:createArgs(vm)
     end
 
-    -- 如果是面向对象形式的函数，创建隐藏的参数self
-    if self._objectSource then
-        local loc = createLocal('self', self._objectSource, self._objectValue)
-        self:saveLocal('self', loc)
+    -- 向局部变量中填充参数
+    for i, loc in ipairs(self.args) do
+        loc:setValue(self.argValues[i] or createValue('nil', arg))
     end
-
-    -- 显性声明的参数
-    self:createArgs(vm)
+    if self._dots then
+        self._dots = createMulti()
+        for i = #self.args + 1, #self.argValues do
+            self._dots:push(self.argValues[i])
+        end
+    end
 end
 
 function mt:setArgs(values)
@@ -172,19 +183,15 @@ function mt:setArgs(values)
     end
 end
 
-function mt:createArg(vm, arg, values)
+function mt:createArg(vm, arg)
     vm:instantSource(arg)
     arg:set('arg', true)
     if arg.type == 'name' then
-        local value = table.remove(values, 1) or createValue('nil', arg)
-        local loc = createLocal(arg[1], arg, value)
+        local loc = createLocal(arg[1], arg, createValue('nil', arg))
         self:saveLocal(arg[1], loc)
         self.args[#self.args+1] = loc
     elseif arg.type == '...' then
         self._dots = createMulti()
-        for i = 1, #values do
-            self._dots:set(i, values[i])
-        end
     end
 end
 
@@ -211,16 +218,12 @@ function mt:createArgs(vm)
     if not args then
         return
     end
-    local values = {}
-    for i, value in ipairs(self.argValues) do
-        values[i] = value
-    end
     if args.type == 'list' then
         for _, arg in ipairs(args) do
-            self:createArg(vm, arg, values)
+            self:createArg(vm, arg)
         end
     else
-        self:createArg(vm, args, values)
+        self:createArg(vm, args)
     end
 end
 

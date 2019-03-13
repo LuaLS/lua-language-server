@@ -249,9 +249,6 @@ function mt:addInfo(tp, source, ...)
     if not source then
         return
     end
-    if source.uri ~= self.uri then
-        return
-    end
     Sort = Sort + 1
     local info = {
         type = tp,

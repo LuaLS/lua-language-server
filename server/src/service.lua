@@ -25,6 +25,8 @@ local ErrorCodes = {
     RequestCancelled     = -32800,
 }
 
+local CachedVM = setmetatable({}, {__mode = 'kv'})
+
 local mt = {}
 mt.__index = mt
 
@@ -335,6 +337,7 @@ function mt:compileVM(uri)
     if obj.vm then
         obj.vm:remove()
     end
+    CachedVM[vm] = true
     obj.vm = vm
     obj.vmCost = os.clock() - clock
     obj.vmVersion = version
@@ -534,13 +537,26 @@ function mt:onTick()
         for _ in pairs(self._file) do
             count = count + 1
         end
+        local alive = 0
+        local dead = 0
+        for vm in pairs(CachedVM) do
+            if vm:isRemoved() then
+                dead = dead + 1
+            else
+                alive = alive + 1
+            end
+        end
         local mem = collectgarbage 'count'
         log.debug(('\n\z
         State\n\z
-        Mem:   [%.3f]kb\n\z
-        Cache: [%d]'):format(
+        Mem:      [%.3f]kb\n\z
+        CachedVM: [%d]\n\z
+        AlivedVM: [%d]\n\z
+        DeadVM:   [%d]'):format(
             mem,
-            count
+            count,
+            alive,
+            dead
         ))
     end
 end

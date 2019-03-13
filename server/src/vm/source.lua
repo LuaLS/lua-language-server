@@ -62,14 +62,6 @@ function mt:getUri()
     return self.uri
 end
 
-function mt:setVM()
-    self.vm = vm
-end
-
-function mt:isRemoved()
-    return self.vm:isRemoved()
-end
-
 function mt:set(name, v)
     if not self._flag then
         self._flag = {}
@@ -92,7 +84,6 @@ return function (vm, source)
     if source._hasInstant then
         return false
     end
-    source.vm = vm
     setmetatable(source, mt)
     return true
 end

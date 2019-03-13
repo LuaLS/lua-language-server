@@ -1166,22 +1166,6 @@ local function compile(ast, lsp, uri)
     return vm
 end
 
--- TODO 测试代码
-local CachedVM = setmetatable({}, {__mode = 'kv'})
-
-local function checkCachedVM(vm)
-    CachedVM[vm] = true
-    local total = 0
-    local alive = 0
-    for vm in pairs(CachedVM) do
-        total = total + 1
-        if not vm:isRemoved() then
-            alive =alive + 1
-        end
-    end
-    log.debug(('持有的VM：%d/%d'):format(alive, total))
-end
-
 return function (ast, lsp, uri)
     if not ast then
         return nil
@@ -1190,6 +1174,5 @@ return function (ast, lsp, uri)
     if not suc then
         return nil, res
     end
-    checkCachedVM(res)
     return res
 end

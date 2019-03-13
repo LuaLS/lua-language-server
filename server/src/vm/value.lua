@@ -9,6 +9,9 @@ local function getDefaultSource()
     }
 end
 
+local weakMt = { __mode = 'k' }
+local Sort = 0
+
 local mt = {}
 mt.__index = mt
 mt.type = 'value'
@@ -22,7 +25,7 @@ local function create (tp, source, literal)
         source = source or getDefaultSource(),
         _type = {},
         _literal = literal,
-        _info = {},
+        _info = setmetatable({}, weakMt),
     }, mt)
     if type(tp) == 'table' then
         for i = 1, #tp do
@@ -219,13 +222,8 @@ function mt:mergeValue(value)
             self._child[k] = v
         end
     end
-    for _, info in ipairs(value._info) do
-        if not self._info[info.source] then
-            self._info[#self._info+1] = info
-            self._info[info.source] = true
-
-            info.source:subscribe(self)
-        end
+    for source, info in pairs(value._info) do
+        self._info[source] = info
     end
     if value._meta then
         self._meta = value._meta
@@ -248,39 +246,37 @@ function mt:addInfo(tp, source, ...)
     if self._info[source] then
         return
     end
-    if not source or not source.subscribe then
+    if not source then
         return
     end
+    if source.uri ~= self.uri then
+        return
+    end
+    Sort = Sort + 1
     local info = {
         type = tp,
         source = source,
+        _sort = Sort,
         ...
     }
-    self._info[#self._info+1] = info
-    self._info[info.source] = true
-
-    source:subscribe(self)
+    self._info[source] = info
 end
 
 function mt:eachInfo(callback)
-    for _, info in ipairs(self._info) do
-        local res = callback(info)
+    local list = {}
+    for _, info in pairs(self._info) do
+        list[#list+1] = info
+    end
+    table.sort(list, function (a, b)
+        return a._sort < b._sort
+    end)
+    for i = 1, #list do
+        local res = callback(list[i])
         if res ~= nil then
             return res
         end
     end
     return nil
-end
-
-function mt:cleanInfo()
-    for i = #self._info, 1, -1 do
-        local info = self._info[i]
-        local source = info.source
-        if source:isRemoved() then
-            self._info[source] = nil
-            table.remove(self._info, i)
-        end
-    end
 end
 
 function mt:setFunction(func)

@@ -65,7 +65,7 @@ local function buildLocal(vm, source, callback)
         kind = SymbolKind.Variable
     end
     local valueSource = value:getSource()
-    if valueSource.start == 0 or value.uri ~= vm.uri then
+    if not valueSource or valueSource.start == 0 or value.uri ~= vm.uri then
         valueSource = source
     end
     local name = hvr.name
@@ -119,7 +119,7 @@ local function buildSet(vm, source, callback)
         kind = SymbolKind.Property
     end
     local valueSource = value:getSource()
-    if valueSource.start == 0 or value.uri ~= vm.uri then
+    if not valueSource or valueSource.start == 0 or value.uri ~= vm.uri then
         valueSource = source
     end
     local name = hvr.name

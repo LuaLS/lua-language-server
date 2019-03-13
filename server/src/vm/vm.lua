@@ -185,6 +185,9 @@ function mt:tryRequireOne(strValue, mode)
     if type(str) == 'string' then
         -- 支持 require 'xxx' 的转到定义
         local strSource = strValue:getSource()
+        if not strSource then
+            return nil
+        end
         self:instantSource(strSource)
         local uri
         if mode == 'require' then
@@ -716,7 +719,7 @@ function mt:doReturn(action)
         value.uri = self:getUri()
         func:setReturn(n, value)
         local source = action[n] or value:getSource()
-        if source.start == 0 then
+        if not source or source.start == 0 then
             source = self:getDefaultSource()
         end
         value:addInfo('return', source)
@@ -1077,7 +1080,7 @@ function mt:instantSource(source)
     if sourceMgr.instant(source) then
         source:setUri(self:getUri())
         self.sources[#self.sources+1] = source
-        CachedSource[source] = true
+        --CachedSource[source] = true
     end
     return source
 end
@@ -1183,14 +1186,14 @@ return function (ast, lsp, uri)
     if not suc then
         return nil, res
     end
-    local total = 0
-    local alive = 0
-    for source in pairs(CachedSource) do
-        if not source:isDead() then
-            alive = alive + 1
-        end
-        total = total + 1
-    end
-    log.debug(('CachedSource: %d/%d'):format(alive, total))
+    --local total = 0
+    --local alive = 0
+    --for source in pairs(CachedSource) do
+    --    if not source:isDead() then
+    --        alive = alive + 1
+    --    end
+    --    total = total + 1
+    --end
+    --log.debug(('CachedSource: %d/%d'):format(alive, total))
     return res
 end

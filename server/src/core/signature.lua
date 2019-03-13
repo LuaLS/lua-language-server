@@ -24,6 +24,9 @@ local function findCall(vm, pos)
 end
 
 local function getSelect(args, pos)
+    if not args then
+        return 1
+    end
     for i, arg in ipairs(args) do
         if arg.start <= pos and arg.finish >= pos - 1 then
             return i

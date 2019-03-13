@@ -80,6 +80,10 @@ function mt:getName()
     return self[1]
 end
 
+function mt:isDead()
+    return self._dead
+end
+
 return function (vm, source)
     if source._hasInstant then
         return false

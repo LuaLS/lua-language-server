@@ -16,6 +16,8 @@ local mt = {}
 mt.__index = mt
 mt.type = 'value'
 mt.uri = ''
+mt._infoCount = 0
+mt._infoLimit = 10
 
 local function create (tp, source, literal)
     if tp == '...' then
@@ -25,7 +27,7 @@ local function create (tp, source, literal)
         source = source or getDefaultSource(),
         _type = {},
         _literal = literal,
-        _info = setmetatable({}, weakMt),
+        _info = {},
     }, mt)
     if type(tp) == 'table' then
         for i = 1, #tp do
@@ -87,7 +89,11 @@ function mt:rawGet(index)
     if not self._child then
         return nil
     end
-    return self._child[index]
+    local child = self._child[index]
+    if not child then
+        return nil
+    end
+    return child
 end
 
 function mt:setChild(index, value)
@@ -222,8 +228,15 @@ function mt:mergeValue(value)
             self._child[k] = v
         end
     end
+
     for source, info in pairs(value._info) do
-        self._info[source] = info
+        if source:isDead() then
+            value._info[source] = nil
+            value._infoCount = value._infoCount - 1
+        else
+            self._infoCount = self._infoCount + 1
+            self._info[source] = info
+        end
     end
     if value._meta then
         self._meta = value._meta
@@ -246,7 +259,7 @@ function mt:addInfo(tp, source, ...)
     if self._info[source] then
         return
     end
-    if not source then
+    if not source or not source._hasInstant then
         return
     end
     Sort = Sort + 1
@@ -257,12 +270,31 @@ function mt:addInfo(tp, source, ...)
         ...
     }
     self._info[source] = info
+    self._infoCount = self._infoCount + 1
+
+    if self._infoCount > self._infoLimit then
+        for src in pairs(self._info) do
+            if src:isDead() then
+                self._info[src] = nil
+                self._infoCount = self._infoCount - 1
+            end
+        end
+        self._infoLimit = self._infoCount * 2
+        if self._infoLimit < 10 then
+            self._infoLimit = 10
+        end
+    end
 end
 
 function mt:eachInfo(callback)
     local list = {}
-    for _, info in pairs(self._info) do
-        list[#list+1] = info
+    for source, info in pairs(self._info) do
+        if source:isDead() then
+            self._info[source] = nil
+            self._infoCount = self._infoCount - 1
+        else
+            list[#list+1] = info
+        end
     end
     table.sort(list, function (a, b)
         return a._sort < b._sort

@@ -16,24 +16,24 @@ local function parseResult(vm, source, declarat, callback)
                 callback(info.source)
             end
         end)
-        loc:getValue():eachInfo(function (info)
+        loc:getValue():eachInfo(function (info, src)
             if declarat or info.type == 'get' then
-                callback(info.source)
+                callback(src)
             end
         end)
         return
     end
     if source:bindValue() then
-        source:bindValue():eachInfo(function (info)
+        source:bindValue():eachInfo(function (info, src)
             if declarat or info.type == 'get' then
-                callback(info.source)
+                callback(src)
             end
         end)
         local parent = source:get 'parent'
-        parent:eachInfo(function (info)
+        parent:eachInfo(function (info, src)
             if info[1] == source[1] then
                 if (declarat and info.type == 'set child') or info.type == 'get child' then
-                    callback(info.source)
+                    callback(src)
                 end
             end
         end)

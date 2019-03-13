@@ -1,5 +1,6 @@
 local libraryBuilder = require 'vm.library'
 local library = require 'core.library'
+local sourceMgr = require 'vm.source'
 
 local function getDefaultSource()
     return {
@@ -229,13 +230,14 @@ function mt:mergeValue(value)
         end
     end
 
-    for source, info in pairs(value._info) do
-        if source:isDead() then
-            value._info[source] = nil
-            value._infoCount = value._infoCount - 1
-        else
+    for srcId, info in pairs(value._info) do
+        local src = sourceMgr.list[srcId]
+        if src then
             self._infoCount = self._infoCount + 1
-            self._info[source] = info
+            self._info[srcId] = info
+        else
+            value._info[srcId] = nil
+            value._infoCount = value._infoCount - 1
         end
     end
     if value._meta then
@@ -253,29 +255,34 @@ function mt:mergeValue(value)
 end
 
 function mt:addInfo(tp, source, ...)
-    if source and not source.start then
-        error('Miss start: ' .. table.dump(source))
-    end
-    if self._info[source] then
+    if not source then
         return
     end
-    if not source or not source._hasInstant then
+    if not source.start then
+        error('Miss start: ' .. table.dump(source))
+    end
+    local id = source.id
+    if not id then
+        error('Not instanted source')
+    end
+    if self._info[id] then
         return
     end
     Sort = Sort + 1
     local info = {
         type = tp,
-        source = source,
+        source = id,
         _sort = Sort,
         ...
     }
-    self._info[source] = info
+    self._info[id] = info
     self._infoCount = self._infoCount + 1
 
     if self._infoCount > self._infoLimit then
-        for src in pairs(self._info) do
-            if src:isDead() then
-                self._info[src] = nil
+        for srcId in pairs(self._info) do
+            local src = sourceMgr.list[srcId]
+            if not src then
+                self._info[srcId] = nil
                 self._infoCount = self._infoCount - 1
             end
         end
@@ -288,19 +295,21 @@ end
 
 function mt:eachInfo(callback)
     local list = {}
-    for source, info in pairs(self._info) do
-        if source:isDead() then
-            self._info[source] = nil
-            self._infoCount = self._infoCount - 1
-        else
+    for srcId, info in pairs(self._info) do
+        local src = sourceMgr.list[srcId]
+        if src then
             list[#list+1] = info
+        else
+            self._info[srcId] = nil
+            self._infoCount = self._infoCount - 1
         end
     end
     table.sort(list, function (a, b)
         return a._sort < b._sort
     end)
     for i = 1, #list do
-        local res = callback(list[i])
+        local info = list[i]
+        local res = callback(info, sourceMgr.list[info.source])
         if res ~= nil then
             return res
         end

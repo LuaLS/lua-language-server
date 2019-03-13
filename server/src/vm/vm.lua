@@ -3,7 +3,7 @@ local createValue = require 'vm.value'
 local createLocal = require 'vm.local'
 local createLabel = require 'vm.label'
 local createFunction = require 'vm.function'
-local instantSource = require 'vm.source'
+local sourceMgr = require 'vm.source'
 local buildGlobal = require 'vm.global'
 local createMulti = require 'vm.multi'
 local libraryBuilder = require 'vm.library'
@@ -1074,7 +1074,7 @@ function mt:getUri()
 end
 
 function mt:instantSource(source)
-    if instantSource(self, source) then
+    if sourceMgr.instant(self, source) then
         source:setUri(self:getUri())
         self.sources[#self.sources+1] = source
         CachedSource[source] = true

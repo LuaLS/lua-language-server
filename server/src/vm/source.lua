@@ -1,6 +1,8 @@
 local mt = {}
 mt.__index = mt
-mt._hasInstant = true
+
+local Id = 0
+local List = {}
 
 function mt:bindLocal(loc, action)
     if loc then
@@ -87,16 +89,25 @@ function mt:kill()
     self._bindCall = nil
     self._bindFunction = nil
     self._bindCallArgs = nil
+    List[self.id] = nil
 end
 
 function mt:isDead()
     return self._dead
 end
 
-return function (vm, source)
-    if source._hasInstant then
+local function instant(vm, source)
+    if source.id then
         return false
     end
+    Id = Id + 1
+    source.id = Id
+    List[Id] = source
     setmetatable(source, mt)
     return true
 end
+
+return {
+    instant = instant,
+    list = List,
+}

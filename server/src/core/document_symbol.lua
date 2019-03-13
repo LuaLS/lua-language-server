@@ -35,18 +35,15 @@ local function isFirstSet(source, value)
     if source:action() ~= 'set' then
         return false
     end
-    local firstSet = value:eachInfo(function (info)
+    local firstSrc = value:eachInfo(function (info, src)
         if info.type == 'set' then
-            return info
+            return src
         end
     end)
-    if not firstSet then
+    if not firstSrc then
         return false
     end
-    if firstSet.type ~= 'set' then
-        return false
-    end
-    if firstSet.source ~= source then
+    if firstSrc ~= source then
         return false
     end
     return true

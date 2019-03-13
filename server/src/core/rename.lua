@@ -47,12 +47,12 @@ local function parseResult(source, newName)
         end
         local parent = source:get 'parent'
         local mark = {}
-        parent:eachInfo(function (info)
-            if not mark[info.source] then
-                mark[info.source] = info
+        parent:eachInfo(function (info, src)
+            if not mark[src] then
+                mark[src] = info
                 if info.type == 'get child' or info.type == 'set child' then
                     if info[1] == source[1] then
-                        positions[#positions+1] = {info.source.start, info.source.finish}
+                        positions[#positions+1] = {src.start, src.finish}
                     end
                 end
             end

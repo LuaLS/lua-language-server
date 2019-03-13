@@ -12,10 +12,10 @@ return function (source)
     end
     if not declarat then
         -- 如果声明者没有给名字，则找一个合适的名字
-        local name = value:eachInfo(function (info)
+        local name = value:eachInfo(function (info, src)
             if info.type == 'local' or info.type == 'set' or info.type == 'return' then
-                if info.source.type == 'name' and info.source.uri == value.uri then
-                    return info.source[1]
+                if src.type == 'name' and src.uri == value.uri then
+                    return src[1]
                 end
             end
         end)

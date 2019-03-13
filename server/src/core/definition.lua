@@ -30,11 +30,11 @@ end
 local function parseValueCrossFile(vm, source, lsp)
     local value = source:bindValue()
     local positions = {}
-    value:eachInfo(function (info)
-        if info.type == 'local' and info.source.uri == value.uri then
+    value:eachInfo(function (info, src)
+        if info.type == 'local' and src.uri == value.uri then
             positions[#positions+1] = {
-                info.source.start,
-                info.source.finish,
+                src.start,
+                src.finish,
                 value.uri,
             }
             return true
@@ -44,11 +44,11 @@ local function parseValueCrossFile(vm, source, lsp)
         return positions
     end
 
-    value:eachInfo(function (info)
-        if info.type == 'set' and info.source.uri == value.uri  then
+    value:eachInfo(function (info, src)
+        if info.type == 'set' and src.uri == value.uri  then
             positions[#positions+1] = {
-                info.source.start,
-                info.source.finish,
+                src.start,
+                src.finish,
                 value.uri,
             }
         end
@@ -57,11 +57,11 @@ local function parseValueCrossFile(vm, source, lsp)
         return positions
     end
 
-    value:eachInfo(function (info)
-        if info.type == 'return' and info.source.uri == value.uri then
+    value:eachInfo(function (info, src)
+        if info.type == 'return' and src.uri == value.uri then
             positions[#positions+1] = {
-                info.source.start,
-                info.source.finish,
+                src.start,
+                src.finish,
                 value.uri,
             }
         end
@@ -115,11 +115,11 @@ local function parseValue(vm, source, lsp)
         return parseValueCrossFile(vm, source, lsp)
     end
     local positions = {}
-    value:eachInfo(function (info)
+    value:eachInfo(function (info, src)
         if info.type == 'set' then
             positions[#positions+1] = {
-                info.source.start,
-                info.source.finish,
+                src.start,
+                src.finish,
             }
         end
     end)

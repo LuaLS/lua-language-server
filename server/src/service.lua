@@ -351,7 +351,7 @@ function mt:compileVM(uri)
 
     self._needDiagnostics[uri] = true
 
-    if obj.vmCost > 0.1 then
+    if obj.vmCost > 0.2 then
         log.debug(('Compile VM[%s] takes: %.3f sec'):format(uri, obj.vmCost))
     end
     if not obj.vm then

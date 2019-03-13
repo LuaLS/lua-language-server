@@ -80,6 +80,15 @@ function mt:getName()
     return self[1]
 end
 
+function mt:kill()
+    self._dead = true
+    self._bindLocal = nil
+    self._bindValue = nil
+    self._bindCall = nil
+    self._bindFunction = nil
+    self._bindCallArgs = nil
+end
+
 function mt:isDead()
     return self._dead
 end

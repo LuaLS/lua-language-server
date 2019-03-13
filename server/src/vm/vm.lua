@@ -1150,7 +1150,7 @@ function mt:remove()
     end
     self._removed = true
     for _, source in ipairs(self.sources) do
-        source._dead = true
+        source:kill()
     end
 end
 

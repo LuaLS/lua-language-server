@@ -85,11 +85,6 @@ end
 
 function mt:kill()
     self._dead = true
-    self._bindLocal = nil
-    self._bindValue = nil
-    self._bindCall = nil
-    self._bindFunction = nil
-    self._bindCallArgs = nil
     List[self.id] = nil
 end
 

@@ -121,7 +121,7 @@ function mt:returnDots(index)
     if not self.returns then
         self.returns = createMulti()
     end
-    self.returns[index] = createMulti()
+    --self.returns[index] = createMulti()
 end
 
 function mt:loadDots()

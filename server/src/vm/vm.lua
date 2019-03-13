@@ -8,7 +8,8 @@ local buildGlobal = require 'vm.global'
 local createMulti = require 'vm.multi'
 local libraryBuilder = require 'vm.library'
 
-local CachedSource = setmetatable({}, { __mode = 'kv' })
+-- TODO source测试
+rawset(_G, 'CachedSource', setmetatable({}, { __mode = 'kv' }))
 
 local mt = {}
 mt.__index = mt
@@ -1080,7 +1081,7 @@ function mt:instantSource(source)
     if sourceMgr.instant(source) then
         source:setUri(self:getUri())
         self.sources[#self.sources+1] = source
-        --CachedSource[source] = true
+        CachedSource[source] = true
     end
     return source
 end
@@ -1186,14 +1187,5 @@ return function (ast, lsp, uri)
     if not suc then
         return nil, res
     end
-    --local total = 0
-    --local alive = 0
-    --for source in pairs(CachedSource) do
-    --    if not source:isDead() then
-    --        alive = alive + 1
-    --    end
-    --    total = total + 1
-    --end
-    --log.debug(('CachedSource: %d/%d'):format(alive, total))
     return res
 end

@@ -561,6 +561,17 @@ function mt:onTick()
             alive,
             dead
         ))
+
+        --TODO source测试
+        local total = 0
+        local alive = 0
+        for source in pairs(CachedSource) do
+            if not source:isDead() then
+                alive = alive + 1
+            end
+            total = total + 1
+        end
+        log.debug(('CachedSource: %d/%d'):format(alive, total))
     end
 end
 

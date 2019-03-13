@@ -220,6 +220,9 @@ function mt:loadVM(uri)
         return nil
     end
     self:compileVM(uri)
+    if obj.vm then
+        self._lastLoadedVM = uri
+    end
     return obj.vm, obj.lines, obj.text
 end
 
@@ -472,17 +475,14 @@ function mt:_createCompileTask()
         return
     end
     self._compileTask = coroutine.create(function ()
+        self:doDiagnostics(self._lastLoadedVM)
         local uri = self._needCompile[1]
         if uri then
             self:compileVM(uri)
         end
-        if self._needDiagnostics[uri] then
+        uri = next(self._needDiagnostics)
+        if uri then
             self:doDiagnostics(uri)
-        else
-            uri = next(self._needDiagnostics)
-            if uri then
-                self:doDiagnostics(uri)
-            end
         end
     end)
 end

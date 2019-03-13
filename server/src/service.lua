@@ -52,7 +52,7 @@ function mt:_callMethod(name, params)
             log.debug(('Task [%s] failed, params: %s'):format(
                 name, dump
             ))
-            log.debug(res)
+            log.error(res)
             return nil, {
                 code = ErrorCodes.InternalError,
                 message = r .. '\n' .. res,

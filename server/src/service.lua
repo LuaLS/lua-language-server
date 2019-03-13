@@ -41,7 +41,7 @@ function mt:_callMethod(name, params)
         local clock = os.clock()
         local suc, res = xpcall(f, debug.traceback, self, params)
         local passed = os.clock() - clock
-        if passed > 0.1 then
+        if passed > 0.2 then
             log.debug(('Task [%s] takes [%.3f]sec.'):format(name, passed))
         end
         if suc then
@@ -531,7 +531,7 @@ function mt:onTick()
     self:_loadProto()
     self:_doCompileTask()
 
-    if os.clock() - self._clock >= 600 then
+    if os.clock() - self._clock >= 60 then
         self._clock = os.clock()
         local count = 0
         for _ in pairs(self._file) do

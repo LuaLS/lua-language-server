@@ -340,7 +340,9 @@ function mt:compileVM(uri)
     if obj.vm then
         obj.vm:remove()
     end
-    CachedVM[vm] = true
+    if vm then
+        CachedVM[vm] = true
+    end
     obj.vm = vm
     obj.vmCost = os.clock() - clock
     obj.vmVersion = version

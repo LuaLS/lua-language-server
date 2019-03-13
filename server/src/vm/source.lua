@@ -1,5 +1,6 @@
 local mt = {}
 mt.__index = mt
+mt.uri = ''
 
 local Id = 0
 local List = {}
@@ -96,7 +97,7 @@ function mt:isDead()
     return self._dead
 end
 
-local function instant(vm, source)
+local function instant(source)
     if source.id then
         return false
     end
@@ -107,7 +108,17 @@ local function instant(vm, source)
     return true
 end
 
+local function dummy()
+    local src = {
+        start = 0,
+        finish = 0,
+    }
+    instant(src)
+    return src
+end
+
 return {
     instant = instant,
     list = List,
+    dummy = dummy,
 }

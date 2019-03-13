@@ -5,8 +5,8 @@ return function (source)
     end
     local func = value:getFunction()
     local declarat
-    if func and func.source then
-        declarat = func.source.name
+    if func and func:getSource() then
+        declarat = func:getSource().name
     else
         declarat = source
     end

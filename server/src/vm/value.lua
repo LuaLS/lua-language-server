@@ -2,15 +2,6 @@ local libraryBuilder = require 'vm.library'
 local library = require 'core.library'
 local sourceMgr = require 'vm.source'
 
-local function getDefaultSource()
-    return {
-        start = 0,
-        finish = 0,
-        uri = '',
-    }
-end
-
-local weakMt = { __mode = 'k' }
 local Sort = 0
 
 local mt = {}
@@ -24,8 +15,15 @@ local function create (tp, source, literal)
     if tp == '...' then
         error('Value type cant be ...')
     end
+    if not source then
+        error('No source')
+    end
+    local id = source.id
+    if not id then
+        error('Not instanted source')
+    end
     local self = setmetatable({
-        source = source or getDefaultSource(),
+        source = id,
         _type = {},
         _literal = literal,
         _info = {},
@@ -349,6 +347,10 @@ function mt:get(name)
         return nil
     end
     return self._flag[name]
+end
+
+function mt:getSource()
+    return sourceMgr.list[self.source]
 end
 
 return create

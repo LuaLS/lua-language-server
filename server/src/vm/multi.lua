@@ -1,4 +1,5 @@
 local createValue = require 'vm.value'
+local sourceMgr = require 'vm.source'
 
 local mt = {}
 mt.__index = mt
@@ -20,14 +21,14 @@ end
 
 function mt:get(index)
     for n = #self+1, index do
-        self[n] = createValue('any')
+        self[n] = createValue('any', sourceMgr.dummy())
     end
     return self[index]
 end
 
 function mt:set(index, value)
     for n = #self+1, index-1 do
-        self[n] = createValue('any')
+        self[n] = createValue('any', sourceMgr.dummy())
     end
     self[index] = value
 end
@@ -35,7 +36,7 @@ end
 function mt:first()
     local value = self[1]
     if not value then
-        return createValue('nil')
+        return createValue('nil', sourceMgr.dummy())
     end
     if value.type == 'multi' then
         return value:first()

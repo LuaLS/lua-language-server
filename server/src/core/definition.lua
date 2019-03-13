@@ -100,8 +100,8 @@ local function parseLocal(vm, source, lsp)
     end
     local positions = {}
     positions[#positions+1] = {
-        loc.source.start,
-        loc.source.finish,
+        loc:getSource().start,
+        loc:getSource().finish,
     }
     if #positions == 0 then
         return nil
@@ -131,11 +131,11 @@ end
 
 local function parseLabel(vm, label, lsp)
     local positions = {}
-    label:eachInfo(function (info)
+    label:eachInfo(function (info, src)
         if info.type == 'set' then
             positions[#positions+1] = {
-                info.source.start,
-                info.source.finish,
+                src.start,
+                src.finish,
             }
         end
     end)

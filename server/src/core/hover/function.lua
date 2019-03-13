@@ -20,7 +20,7 @@ local function buildValueArgs(func, object, select)
         start = 2
     end
     local max
-    if func.source then
+    if func:getSource() then
         max = #names
     else
         max = math.max(#names, #values)

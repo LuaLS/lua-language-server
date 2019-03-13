@@ -85,7 +85,7 @@ end
 function mt:runFunction(func)
     func:run(self)
 
-    if not func.source then
+    if not func:getSource() then
         return
     end
 
@@ -95,16 +95,16 @@ function mt:runFunction(func)
 
     -- 暂时使用这种方式激活参数的source
     for _, arg in ipairs(func.args) do
-        if arg.source ~= func:getObject() then
-            self:bindLocal(arg.source, arg, 'local')
+        if arg:getSource() ~= func:getObject() then
+            self:bindLocal(arg:getSource(), arg, 'local')
         end
     end
 
     local originFunction = self:getCurrentFunction()
     self:setCurrentFunction(func)
-    func:push(func.source)
+    func:push(func:getSource())
 
-    self:doActions(func.source)
+    self:doActions(func:getSource())
 
     func:pop()
     self:setCurrentFunction(originFunction)
@@ -146,13 +146,13 @@ end
 
 function mt:callSetMetaTable(func, values, source)
     if not values[1] then
-        values[1] = self:createValue('any')
+        values[1] = self:createValue('any', self:getDefaultSource())
     end
     if not values[2] then
-        values[2] = self:createValue('any')
+        values[2] = self:createValue('any', self:getDefaultSource())
     end
     func:setReturn(1, values[1])
-    values[1]:setMetaTable(values[2], source)
+    values[1]:setMetaTable(values[2])
 end
 
 function mt:getRequire(strValue, destVM)
@@ -161,7 +161,7 @@ function mt:getRequire(strValue, destVM)
     -- 获取主函数返回值，注意不能修改对方的环境
     local mainValue = main:getFunction():getReturn(1)
     if not mainValue then
-        mainValue = self:createValue('any', nil)
+        mainValue = self:createValue('any', self:getDefaultSource())
         mainValue.uri = destVM.uri
     end
 
@@ -184,7 +184,7 @@ function mt:tryRequireOne(strValue, mode)
     local str = strValue:getLiteral()
     if type(str) == 'string' then
         -- 支持 require 'xxx' 的转到定义
-        local strSource = strValue.source
+        local strSource = strValue:getSource()
         self:instantSource(strSource)
         local uri
         if mode == 'require' then
@@ -217,7 +217,7 @@ end
 
 function mt:callRequire(func, values)
     if not values[1] then
-        values[1] = self:createValue('any')
+        values[1] = self:createValue('any', self:getDefaultSource())
     end
     local str = values[1]:getLiteral()
     if type(str) ~= 'string' then
@@ -231,7 +231,7 @@ function mt:callRequire(func, values)
     else
         local requireValue = self:tryRequireOne(values[1], 'require')
         if not requireValue then
-            requireValue = self:createValue('boolean')
+            requireValue = self:createValue('boolean', self:getDefaultSource())
             requireValue:set('cross file', true)
         end
         func:setReturn(1, requireValue)
@@ -240,7 +240,7 @@ end
 
 function mt:callLoadFile(func, values)
     if not values[1] then
-        values[1] = self:createValue('any')
+        values[1] = self:createValue('any', self:getDefaultSource())
     end
     local str = values[1]:getLiteral()
     if type(str) ~= 'string' then
@@ -248,7 +248,7 @@ function mt:callLoadFile(func, values)
     end
     local requireValue = self:tryRequireOne(values[1], 'loadfile')
     if not requireValue then
-        requireValue = self:createValue('any')
+        requireValue = self:createValue('any', self:getDefaultSource())
         requireValue:set('cross file', true)
     end
     func:setReturn(1, requireValue)
@@ -256,7 +256,7 @@ end
 
 function mt:callDoFile(func, values)
     if not values[1] then
-        values[1] = self:createValue('any')
+        values[1] = self:createValue('any', self:getDefaultSource())
     end
     local str = values[1]:getLiteral()
     if type(str) ~= 'string' then
@@ -264,7 +264,7 @@ function mt:callDoFile(func, values)
     end
     local requireValue = self:tryRequireOne(values[1], 'dofile')
     if not requireValue then
-        requireValue = self:createValue('any')
+        requireValue = self:createValue('any', self:getDefaultSource())
         requireValue.isRequire = true
     end
     func:setReturn(1, requireValue)
@@ -312,7 +312,7 @@ function mt:call(value, values, source)
     if lib then
         self:callLibrary(func, values, source, lib)
     else
-        if func.source then
+        if func:getSource() then
             if not source:get 'called' then
                 source:set('called', true)
                 func:setArgs(values)
@@ -465,7 +465,7 @@ function mt:getSimple(simple, max)
     local first = simple[1]
     self:instantSource(first)
     local value = self:getExp(first)
-    value = self:getFirstInMulti(value) or createValue('nil')
+    value = self:getFirstInMulti(value) or createValue('nil', self:getDefaultSource())
     first:bindValue(value, 'get')
     if not max then
         max = #simple
@@ -477,7 +477,7 @@ function mt:getSimple(simple, max)
         local source = simple[i]
         self:instantSource(source)
         source:set('simple', simple)
-        value = self:getFirstInMulti(value) or createValue('nil')
+        value = self:getFirstInMulti(value) or createValue('nil', self:getDefaultSource())
 
         if source.type == 'call' then
             local values, args = self:unpackList(source)
@@ -488,7 +488,7 @@ function mt:getSimple(simple, max)
             end
             object = nil
             source:bindCall(func, args)
-            value = self:call(func, values, source) or createValue('any')
+            value = self:call(func, values, source) or createValue('any', self:getDefaultSource())
         elseif source.type == 'index' then
             local child = source[1]
             local index = self:getIndex(source)
@@ -551,11 +551,11 @@ function mt:getBinary(exp)
         v2:setType('number', 0.5)
         v1:setType('string', 0.1)
         v2:setType('string', 0.1)
-        return self:createValue('boolean')
+        return self:createValue('boolean', self:getDefaultSource())
     elseif op == '~='
         or op == '=='
     then
-        return self:createValue('boolean')
+        return self:createValue('boolean', self:getDefaultSource())
     elseif op == '|'
         or op == '~'
         or op == '&'
@@ -581,16 +581,16 @@ function mt:getBinary(exp)
                 return self:createValue('integer', exp, v1:getLiteral() >> v2:getLiteral())
             end
         end
-        return self:createValue('integer')
+        return self:createValue('integer', self:getDefaultSource())
     elseif op == '..' then
         v1:setType('string', 0.5)
         v2:setType('string', 0.5)
         v1:setType('number', 0.1)
         v2:setType('number', 0.1)
         if type(v1:getLiteral()) == 'string' and type(v2:getLiteral()) == 'string' then
-            return self:createValue('string', nil, v1:getLiteral() .. v2:getLiteral())
+            return self:createValue('string', self:getDefaultSource(), v1:getLiteral() .. v2:getLiteral())
         end
-        return self:createValue('string')
+        return self:createValue('string', self:getDefaultSource())
     elseif op == '+'
         or op == '-'
         or op == '*'
@@ -624,7 +624,7 @@ function mt:getBinary(exp)
                 end
             end
         end
-        return self:createValue('number')
+        return self:createValue('number', self:getDefaultSource())
     end
     return nil
 end
@@ -635,26 +635,26 @@ function mt:getUnary(exp)
     local op = exp.op
     -- TODO 搜索元方法
     if     op == 'not' then
-        return self:createValue('boolean')
+        return self:createValue('boolean', self:getDefaultSource())
     elseif op == '#' then
         v1:setType('table', 0.5)
         v1:setType('string', 0.5)
         if type(v1:getLiteral()) == 'string' then
             return self:createValue('integer', exp, #v1:getLiteral())
         end
-        return self:createValue('integer')
+        return self:createValue('integer', self:getDefaultSource())
     elseif op == '-' then
         v1:setType('number', 0.5)
         if type(v1:getLiteral()) == 'number' then
             return self:createValue('number', exp, -v1:getLiteral())
         end
-        return self:createValue('number')
+        return self:createValue('number', self:getDefaultSource())
     elseif op == '~' then
         v1:setType('integer', 0.5)
         if math.type(v1:getLiteral()) == 'integer' then
             return self:createValue('integer', exp, ~v1:getLiteral())
         end
-        return self:createValue('integer')
+        return self:createValue('integer', self:getDefaultSource())
     end
     return nil
 end
@@ -715,7 +715,7 @@ function mt:doReturn(action)
     values:eachValue(function (n, value)
         value.uri = self:getUri()
         func:setReturn(n, value)
-        local source = action[n] or value.source
+        local source = action[n] or value:getSource()
         if source.start == 0 then
             source = self:getDefaultSource()
         end
@@ -758,7 +758,7 @@ end
 
 function mt:setOne(var, value)
     if not value then
-        value = createValue('nil')
+        value = createValue('nil', self:getDefaultSource())
     end
     self:instantSource(var)
     if var.type == 'name' then
@@ -862,7 +862,7 @@ function mt:doIn(action)
     local args = self:unpackList(action.exp)
 
     self:scopePush(action)
-    local func = table.remove(args, 1) or createValue('any')
+    local func = table.remove(args, 1) or createValue('any', self:getDefaultSource())
     local values = self:call(func, args, action) or createMulti()
     self:forList(action.arg, function (arg)
         local value = table.remove(values, 1)
@@ -917,7 +917,7 @@ function mt:doFunction(action)
                     -- function x:b()
                     local loc = self:loadLocal(name[1][1])
                     if loc then
-                        func:setObject(parent, loc.source)
+                        func:setObject(parent, loc:getSource())
                     else
                         func:setObject(parent, name[#name-2])
                     end
@@ -1074,7 +1074,7 @@ function mt:getUri()
 end
 
 function mt:instantSource(source)
-    if sourceMgr.instant(self, source) then
+    if sourceMgr.instant(source) then
         source:setUri(self:getUri())
         self.sources[#self.sources+1] = source
         CachedSource[source] = true
@@ -1128,7 +1128,7 @@ function mt:createEnvironment(ast)
     -- 全局变量`_G`
     local global = buildGlobal(self.lsp)
     -- 隐藏的上值`_ENV`
-    local env = self:createLocal('_ENV', nil, global)
+    local env = self:createLocal('_ENV', sourceMgr.dummy(), global)
     env:set('hide', true)
     self.env = env
 end

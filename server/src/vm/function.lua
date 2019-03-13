@@ -1,6 +1,7 @@
 local createMulti = require 'vm.multi'
 local createValue = require 'vm.value'
 local createLocal = require 'vm.local'
+local sourceMgr = require 'vm.source'
 
 local mt = {}
 mt.__index = mt
@@ -8,21 +9,26 @@ mt.type = 'function'
 mt._runed = 0
 mt._top = 0
 
+function mt:getSource()
+    return sourceMgr.list[self.source]
+end
+
 function mt:getUri()
-    return self.source.uri
+    local source = self:getSource()
+    return source and source.uri or ''
 end
 
 function mt:push(source)
     self._top = self._top + 1
     self.locals[self._top] = {}
-    self.blocks[self._top] = source
+    self.finishs[self._top] = source and source.finish or math.maxinteger
 end
 
 function mt:pop()
-    local closedBlock = self.blocks[self._top]
+    local closed = self.finishs[self._top]
     local closedLocals = self.locals[self._top]
     for _, loc in pairs(closedLocals) do
-        loc:close(closedBlock.finish)
+        loc:close(closed)
     end
     self._top = self._top - 1
 end
@@ -93,19 +99,19 @@ function mt:setReturn(index, value)
     if value then
         self.returns[index] = value
     else
-        self.returns[index] = createValue('any', self.source)
+        self.returns[index] = createValue('any', self:getSource() or sourceMgr.dummy())
     end
 end
 
 function mt:getReturn(index)
     if self.maxReturns and index and self.maxReturns < index then
-        return createValue('nil')
+        return createValue('nil', sourceMgr.dummy())
     end
     if not self.returns then
         self.returns = createMulti()
     end
     if index then
-        return self.returns:get(index) or createValue('nil')
+        return self.returns:get(index) or createValue('nil', sourceMgr.dummy())
     else
         return self.returns
     end
@@ -144,7 +150,7 @@ end
 
 function mt:run(vm)
     self._runed = self._runed + 1
-    if not self.source then
+    if not self:getSource() then
         return
     end
 
@@ -168,7 +174,7 @@ function mt:run(vm)
 
     -- 向局部变量中填充参数
     for i, loc in ipairs(self.args) do
-        loc:setValue(self.argValues[i] or createValue('nil', arg))
+        loc:setValue(self.argValues[i] or createValue('nil', sourceMgr.dummy()))
     end
     if self._dots then
         self._dots = createMulti()
@@ -204,7 +210,7 @@ function mt:createLibArg(arg)
         self._dots = createMulti()
     else
         local name = arg.name or '_'
-        local loc = createLocal(name, nil, createValue('any'))
+        local loc = createLocal(name, sourceMgr.dummy(), createValue('any', sourceMgr.dummy()))
         self:saveLocal(name, loc)
         self.args[#self.args+1] = loc
     end
@@ -215,10 +221,10 @@ function mt:hasDots()
 end
 
 function mt:createArgs(vm)
-    if not self.source then
+    if not self:getSource() then
         return
     end
-    local args = self.source.arg
+    local args = self:getSource().arg
     if not args then
         return
     end
@@ -245,11 +251,22 @@ function mt:get(name)
     return self._flag[name]
 end
 
+function mt:getSource()
+    return sourceMgr.list[self.source]
+end
+
 return function (source)
+    local id
+    if source then
+        id = source.id
+        if not id then
+            error('Not instanted source')
+        end
+    end
     local self = setmetatable({
-        source = source,
+        source = id,
         locals = {},
-        blocks = {},
+        finishs = {},
         args = {},
         argValues = {},
     }, mt)

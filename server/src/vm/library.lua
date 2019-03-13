@@ -1,3 +1,5 @@
+local sourceMgr = require 'vm.source'
+
 local createValue
 local createFunction
 
@@ -14,9 +16,9 @@ function buildLibValue(lib)
     local tp = lib.type
     local value
     if     tp == 'table' then
-        value = createValue('table')
+        value = createValue('table', sourceMgr.dummy())
     elseif tp == 'function' then
-        value = createValue('function')
+        value = createValue('function', sourceMgr.dummy())
         local func = createFunction()
         value:setFunction(func)
         if lib.args then
@@ -34,17 +36,17 @@ function buildLibValue(lib)
             end
         end
     elseif tp == 'string' then
-        value = createValue('string')
+        value = createValue('string', sourceMgr.dummy())
     elseif tp == 'boolean' then
-        value = createValue('boolean')
+        value = createValue('boolean', sourceMgr.dummy())
     elseif tp == 'number' then
-        value = createValue('number')
+        value = createValue('number', sourceMgr.dummy())
     elseif tp == 'integer' then
-        value = createValue('integer')
+        value = createValue('integer', sourceMgr.dummy())
     elseif tp == 'nil' then
-        value = createValue('nil')
+        value = createValue('nil', sourceMgr.dummy())
     else
-        value = createValue(tp or 'any')
+        value = createValue(tp or 'any', sourceMgr.dummy())
     end
     value:setLib(lib)
 

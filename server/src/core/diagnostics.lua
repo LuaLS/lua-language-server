@@ -166,13 +166,13 @@ function mt:searchRedefinition(callback)
         local related = {}
         for i = 1, #shadow do
             related[i] = {
-                start  = shadow[i].source.start,
-                finish = shadow[i].source.finish,
+                start  = shadow[i]:getSource().start,
+                finish = shadow[i]:getSource().finish,
                 uri    = uri,
             }
         end
         for i = 2, #shadow do
-            callback(shadow[i].source.start, shadow[i].source.finish, name, related)
+            callback(shadow[i]:getSource().start, shadow[i]:getSource().finish, name, related)
         end
     end)
 end

@@ -7,8 +7,8 @@ local function parseResult(source, newName)
         if not parser.grammar(newName, 'Name') then
             return nil
         end
-        source:bindLabel():eachInfo(function (info)
-            positions[#positions+1] = {info.source.start, info.source.finish}
+        source:bindLabel():eachInfo(function (info, src)
+            positions[#positions+1] = { src.start, src.finish }
         end)
         return positions
     end
@@ -27,10 +27,10 @@ local function parseResult(source, newName)
             end
         end
         local mark = {}
-        loc:eachInfo(function (info)
-            if not mark[info.source] then
-                mark[info.source] = info
-                positions[#positions+1] = {info.source.start, info.source.finish}
+        loc:eachInfo(function (info, src)
+            if not mark[src] then
+                mark[src] = info
+                positions[#positions+1] = { src.start, src.finish }
             end
         end)
         return positions

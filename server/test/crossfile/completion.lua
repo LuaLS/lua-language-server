@@ -350,6 +350,12 @@ TEST {
     {
         path = 'a.lua',
         content = [[
+            abcd = print
+        ]]
+    },
+    {
+        path = 'a.lua',
+        content = [[
             abcdef = 1
         ]]
     },

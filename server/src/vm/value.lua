@@ -38,13 +38,13 @@ local function create (tp, source, literal)
     return self
 end
 
-local function isDeadGlobalChild(value)
-    if value._lib then
-        return false
-    end
-    for srcId in pairs(value._info) do
+local function isDeadGlobalChild(value, index)
+    for srcId, info in pairs(value._info) do
         local src = sourceMgr.list[srcId]
-        if src then
+        if  src
+            and (info.type == 'set child' or info.type == 'get child')
+            and info[1] == index
+        then
             return false
         end
     end
@@ -106,7 +106,7 @@ function mt:rawGet(index)
         return nil
     end
     if self:get '_G' then
-        if isDeadGlobalChild(child) then
+        if isDeadGlobalChild(self, index) then
             self._child[index] = nil
             return nil
         end
@@ -201,7 +201,7 @@ function mt:rawEach(callback, foundIndex)
             end
             foundIndex[index] = true
         end
-        if self:get '_G' and isDeadGlobalChild(value) then
+        if self:get '_G' and isDeadGlobalChild(self, index) then
             self._child[index] = nil
             goto CONTINUE
         end

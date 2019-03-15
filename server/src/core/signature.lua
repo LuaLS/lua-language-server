@@ -2,6 +2,7 @@ local getFunctionHover = require 'core.hover.function'
 local getFunctionHoverAsLib = require 'core.hover.lib_function'
 local findLib = require 'core.find_lib'
 local buildValueName = require 'core.hover.name'
+local findSource = require 'core.find_source'
 
 local function findCall(vm, pos)
     local results = {}
@@ -64,6 +65,10 @@ local function getHover(call, pos)
 end
 
 return function (vm, pos)
+    local source = findSource(vm, pos)
+    if source.type == 'string' then
+        return
+    end
     local calls = findCall(vm, pos)
     if not calls or #calls == 0 then
         return nil

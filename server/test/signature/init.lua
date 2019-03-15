@@ -98,3 +98,11 @@ TEST [[
 (''):sub(1)@
 ]]
 (nil)
+
+TEST [[
+local function f(a, b, c)
+end
+
+f(1, 'string@')
+]]
+(nil)

@@ -48,6 +48,9 @@ end
 
 local function getHover(call, pos)
     local func, args = call:bindCall()
+    if not func then
+        return
+    end
     local select = getSelect(args, pos)
     local source = getFunctionSource(call)
     local object = source:get 'object'

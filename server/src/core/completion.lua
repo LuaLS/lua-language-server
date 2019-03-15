@@ -373,6 +373,9 @@ local function searchCallArg(vm, source, word, callback, pos)
     end)
     local call = results[1]
     local func, args = call:bindCall()
+    if not func then
+        return
+    end
 
     local lib = func:getLib()
     if not lib then

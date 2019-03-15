@@ -109,6 +109,9 @@ end
 
 function mt:shadow(old)
     if not old then
+        if not self._shadow then
+            return nil
+        end
         for i = #self._shadow, 1, -1 do
             local loc = self._shadow[i]
             if not loc:getSource() then

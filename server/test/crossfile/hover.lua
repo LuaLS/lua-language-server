@@ -63,10 +63,10 @@ function TEST(data)
     local sourceUri = ws:uriEncode(fs.path(data[2].path))
 
     lsp:saveText(targetUri, 1, targetScript)
-    lsp:saveText(sourceUri, 1, sourceScript)
     ws:addFile(targetUri)
-    ws:addFile(sourceUri)
     lsp:compileVM(targetUri)
+    lsp:saveText(sourceUri, 1, sourceScript)
+    ws:addFile(sourceUri)
     lsp:compileVM(sourceUri)
 
     local sourceVM = lsp:loadVM(sourceUri)
@@ -77,6 +77,9 @@ function TEST(data)
     assert(hover)
     if data.hover.description then
         data.hover.description = data.hover.description:gsub('%$ROOT%$', ws:uriEncode(ROOT):gsub('%%', '%%%%'))
+    end
+    if hover.label then
+        hover.label = hover.label:gsub('\r\n', '\n')
     end
     assert(eq(hover, data.hover))
 end
@@ -164,5 +167,54 @@ TEST {
     hover = {
         label = 'function mt:add(a: any, b: any)',
         name = 'mt:add',
+    },
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            t = {
+                [{}] = 1,
+            }
+        ]],
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            <?t?>[{}] = 2
+        ]]
+    },
+    hover = {
+        label = [[
+global t: {
+    [*table]: number = 1,
+    [*table]: number = 2,
+}]],
+        name = 't',
+    },
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            t = {
+                [{}] = 1,
+            }
+        ]],
+    },
+    {
+        path = 'a.lua',
+        content = [[
+            <?t?>[{}] = 2
+        ]]
+    },
+    hover = {
+        label = [[
+global t: {
+    [*table]: number = 2,
+}]],
+        name = 't',
     },
 }

@@ -38,7 +38,7 @@ local function create (tp, source, literal)
     return self
 end
 
-local function isDeadGlobalChild(value, index)
+local function isDeadChild(value, index)
     for srcId, info in pairs(value._info) do
         local src = sourceMgr.list[srcId]
         if  src
@@ -105,11 +105,9 @@ function mt:rawGet(index)
     if not child then
         return nil
     end
-    if self:get '_G' then
-        if isDeadGlobalChild(self, index) then
-            self._child[index] = nil
-            return nil
-        end
+    if isDeadChild(self, index) then
+        self._child[index] = nil
+        return nil
     end
     return child
 end
@@ -202,7 +200,7 @@ function mt:rawEach(callback, foundIndex)
             end
             foundIndex[index] = true
         end
-        if self:get '_G' and isDeadGlobalChild(self, index) then
+        if isDeadChild(self, index) then
             self._child[index] = nil
             goto CONTINUE
         end

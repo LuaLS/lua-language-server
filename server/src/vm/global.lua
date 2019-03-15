@@ -12,7 +12,6 @@ return function (lsp)
         end
 
         global = t._G
-        global:set('_G', true)
         for k, v in pairs(t) do
             global:setChild(k, v)
             global:addInfo('set child', sourceMgr.dummy(), k)

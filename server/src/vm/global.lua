@@ -6,21 +6,18 @@ local sourceMgr = require 'vm.source'
 return function (lsp)
     local global = lsp and lsp.globalValue
     if not global then
-        global = createValue('table', sourceMgr.dummy())
+        local t = {}
         for name, lib in pairs(library.global) do
-            if not global:rawGet(name) then
-                local value = libraryBuilder.value(lib)
-                global:rawSet(name, value)
-            end
+            t[name] = libraryBuilder.value(lib)
         end
 
-        local _G = global:getChild '_G'
-        global:eachChild(function (k, v)
-            _G:setChild(k, v)
-        end)
+        global = t._G
+        for k, v in pairs(t) do
+            global:setChild(k, v)
+        end
     end
     if lsp then
         lsp.globalValue = global
     end
-    return global:rawGet('_G')
+    return global
 end

@@ -151,6 +151,10 @@ function mt:getChild(index, source, mark)
     return method:getChild(index, source, mark)
 end
 
+function mt:bindChild(other)
+    self._child = other._child
+end
+
 function mt:setMetaTable(metatable)
     self._meta = metatable
 end

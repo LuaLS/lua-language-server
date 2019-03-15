@@ -119,12 +119,12 @@ local _ENV
 ]]
 
 TEST [[
-print(_G)
+print()
 <!('string')!>:sub(1, 1)
 ]]
 
 TEST [[
-print(_G)
+print()
 ('string')
 ]]
 

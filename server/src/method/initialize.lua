@@ -22,7 +22,7 @@ return function (lsp)
             -- 支持“重命名”
             renameProvider = true,
             -- 支持“大纲”
-            documentSymbolProvider = true,
+            --documentSymbolProvider = true,
             -- 支持“签名帮助”
             signatureHelpProvider = {
                 triggerCharacters = { '(', ',' },

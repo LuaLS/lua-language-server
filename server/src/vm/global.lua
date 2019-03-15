@@ -13,9 +13,14 @@ return function (lsp)
                 global:rawSet(name, value)
             end
         end
+
+        local _G = global:getChild '_G'
+        global:eachChild(function (k, v)
+            _G:setChild(k, v)
+        end)
     end
     if lsp then
         lsp.globalValue = global
     end
-    return global
+    return global:rawGet('_G')
 end

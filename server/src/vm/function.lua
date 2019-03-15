@@ -145,7 +145,7 @@ function mt:hasRuned()
 end
 
 function mt:needSkip()
-    return self._runed > 1
+    return self._runed > 3
 end
 
 function mt:run(vm)

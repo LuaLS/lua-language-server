@@ -109,6 +109,12 @@ end
 
 function mt:shadow(old)
     if not old then
+        for i = #self._shadow, 1, -1 do
+            local loc = self._shadow[i]
+            if not loc:getSource() then
+                table.remove(self._shadow, i)
+            end
+        end
         return self._shadow
     end
     local group = old._shadow

@@ -78,3 +78,10 @@ local t = {
 }
 print(t.<!a!>)
 ]]
+
+TEST [[
+local <!mt!> = {}
+function <!mt!>:a()
+    <?self?>:remove()
+end
+]]

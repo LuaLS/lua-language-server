@@ -6,7 +6,7 @@ LANG = LANG or 'en-US'
 package.path = (ROOT / 'src' / '?.lua'):string()
      .. ';' .. (ROOT / 'src' / '?' / 'init.lua'):string()
 
---collectgarbage('generational')
+collectgarbage('generational')
 
 log = require 'log'
 log.init(ROOT, ROOT / 'log' / 'service.log')

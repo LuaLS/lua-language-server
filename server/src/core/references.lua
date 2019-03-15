@@ -3,7 +3,7 @@ local findSource = require 'core.find_source'
 local function parseResult(vm, source, declarat, callback)
     if source:bindLabel() then
         source:bindLabel():eachInfo(function (info, src)
-            if declarat or info.type == 'get' then
+            if (declarat and info.type == 'set') or info.type == 'get' then
                 callback(src)
             end
         end)
@@ -12,12 +12,12 @@ local function parseResult(vm, source, declarat, callback)
     if source:bindLocal() then
         local loc = source:bindLocal()
         loc:eachInfo(function (info, src)
-            if declarat or info.type == 'get' then
+            if (declarat and info.type == 'set') or info.type == 'get' then
                 callback(src)
             end
         end)
         loc:getValue():eachInfo(function (info, src)
-            if declarat or info.type == 'get' then
+            if (declarat and (info.type == 'set' or info.type == 'local')) or info.type == 'get' then
                 callback(src)
             end
         end)
@@ -25,7 +25,7 @@ local function parseResult(vm, source, declarat, callback)
     end
     if source:bindValue() then
         source:bindValue():eachInfo(function (info, src)
-            if declarat or info.type == 'get' then
+            if (declarat and (info.type == 'set' or info.type == 'local')) or info.type == 'get' then
                 callback(src)
             end
         end)

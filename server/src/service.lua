@@ -534,7 +534,6 @@ function mt:onTick()
     self:_doCompileTask()
 
     if os.clock() - self._clock >= 60 then
-        collectgarbage()
         self._clock = os.clock()
         local count = 0
         for _ in pairs(self._file) do

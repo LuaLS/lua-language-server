@@ -38,6 +38,19 @@ local function create (tp, source, literal)
     return self
 end
 
+local function isDeadGlobalChild(value)
+    if value._lib then
+        return false
+    end
+    for srcId in pairs(value._info) do
+        local src = sourceMgr.list[srcId]
+        if src then
+            return false
+        end
+    end
+    return true
+end
+
 function mt:setType(tp, rate)
     if type(tp) == 'table' then
         for _, ctp in ipairs(tp) do
@@ -91,6 +104,12 @@ function mt:rawGet(index)
     local child = self._child[index]
     if not child then
         return nil
+    end
+    if self:get '_G' then
+        if isDeadGlobalChild(child) then
+            self._child[index] = nil
+            return nil
+        end
     end
     return child
 end
@@ -181,6 +200,10 @@ function mt:rawEach(callback, foundIndex)
                 goto CONTINUE
             end
             foundIndex[index] = true
+        end
+        if self:get '_G' and isDeadGlobalChild(value) then
+            self._child[index] = nil
+            goto CONTINUE
         end
         local res = callback(index, value)
         if res ~= nil then

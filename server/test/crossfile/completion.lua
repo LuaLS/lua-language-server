@@ -106,10 +106,10 @@ function TEST(data)
         end
         lsp:saveText(uri, 1, script)
         ws:addFile(uri)
-    end
 
-    while lsp._needCompile[1] do
-        lsp:compileVM(lsp._needCompile[1])
+        while lsp._needCompile[1] do
+            lsp:compileVM(lsp._needCompile[1])
+        end
     end
 
     local vm = lsp:loadVM(mainUri)
@@ -336,6 +336,35 @@ TEST {
             label = 'c',
             kind = CompletionItemKind.Enum,
             detail = '= 3',
+        },
+    }
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            abc = 1
+        ]]
+    },
+    {
+        path = 'a.lua',
+        content = [[
+            abcdef = 1
+        ]]
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            ab@
+        ]],
+        main = true,
+    },
+    completion = {
+        {
+            label = 'abcdef',
+            kind = CompletionItemKind.Enum,
+            detail = '= 1',
         },
     }
 }

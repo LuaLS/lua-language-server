@@ -374,3 +374,38 @@ TEST {
         },
     }
 }
+
+TEST {
+    {
+        path = 'init.lua',
+        content = [[
+            setmetatable(_G, {__index = {}})
+        ]]
+    },
+    {
+        path = 'a.lua',
+        content = [[
+            print(abc)
+        ]]
+    },
+    {
+        path = 'a.lua',
+        content = [[
+            abcdef = 1
+        ]]
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            ab@
+        ]],
+        main = true,
+    },
+    completion = {
+        {
+            label = 'abcdef',
+            kind = CompletionItemKind.Enum,
+            detail = '= 1',
+        },
+    }
+}

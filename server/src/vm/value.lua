@@ -140,7 +140,17 @@ function mt:eachLibChild(callback)
     end
 end
 
-function mt:getChild(index, source, mark)
+function mt:getChild(index, source)
+    local value = self:_getChild(index)
+    if not value then
+        value = create('any', source)
+        self:setChild(index, value)
+        value.uri = self.uri
+    end
+    return value
+end
+
+function mt:_getChild(index, source, mark)
     self:setType('table', 0.5)
     local value = self:rawGet(index)
     if value then
@@ -149,25 +159,16 @@ function mt:getChild(index, source, mark)
     local method = self:getMetaMethod('__index')
     if not method then
         local v = self:getLibChild(index)
-        if v then
-            return v
-        end
-        v = create('any', source)
-        self:setChild(index, v)
-        v.uri = self.uri
         return v
     end
     if not mark then
         mark = {}
     end
     if mark[method] then
-        local v = create('any', source)
-        self:setChild(index, v)
-        v.uri = self.uri
-        return v
+        return nil
     end
     mark[method] = true
-    return method:getChild(index, source, mark)
+    return method:_getChild(index, source, mark)
 end
 
 function mt:bindChild(other)

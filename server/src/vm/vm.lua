@@ -9,7 +9,7 @@ local createMulti = require 'vm.multi'
 local libraryBuilder = require 'vm.library'
 
 -- TODO source测试
-rawset(_G, 'CachedSource', setmetatable({}, { __mode = 'kv' }))
+--rawset(_G, 'CachedSource', setmetatable({}, { __mode = 'kv' }))
 
 local mt = {}
 mt.__index = mt
@@ -1084,7 +1084,7 @@ function mt:instantSource(source)
     if sourceMgr.instant(source) then
         source:setUri(self:getUri())
         self.sources[#self.sources+1] = source
-        CachedSource[source] = true
+        --CachedSource[source] = true
     end
     return source
 end

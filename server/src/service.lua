@@ -484,10 +484,11 @@ function mt:_createCompileTask()
         local uri = self._needCompile[1]
         if uri then
             self:compileVM(uri)
-        end
-        uri = next(self._needDiagnostics)
-        if uri then
-            self:doDiagnostics(uri)
+        else
+            uri = next(self._needDiagnostics)
+            if uri then
+                self:doDiagnostics(uri)
+            end
         end
     end)
 end

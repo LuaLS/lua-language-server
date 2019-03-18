@@ -40,36 +40,26 @@ return function (lsp, params)
         timerCache[uri] = nil
     end
 
-    local vm, lines = lsp:loadVM(uri)
-    if not vm then
-        return nil
-    end
-
     return function (response)
-        local co = coroutine.create(function ()
-            return core.documentSymbol(vm)
-        end)
-        timerCache[uri] = ac.loop(0.001, function (t)
-            local suc, res = coroutine.resume(co)
-            if not suc then
-                t:remove()
-                error(res)
-                return
-            end
-            if coroutine.status(co) == 'suspended' then
+        timerCache[uri] = ac.loop(0.1, function (t)
+            local vm, lines = lsp:getVM(uri)
+            if not vm then
                 return
             end
 
             t:remove()
-            if not res then
+
+            local symbols = core.documentSymbol(vm)
+            if not symbols then
                 response(nil)
+                return
             end
 
-            for _, symbol in ipairs(res) do
+            for _, symbol in ipairs(symbols) do
                 convertRange(lines, symbol)
             end
 
-            response(res)
+            response(symbols)
         end)
     end
 end

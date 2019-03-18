@@ -11,6 +11,7 @@ local function parseResult(vm, source, declarat, callback)
     end
     if source:bindLocal() then
         local loc = source:bindLocal()
+        callback(loc:getSource())
         loc:eachInfo(function (info, src)
             if (declarat and info.type == 'set') or info.type == 'get' then
                 callback(src)

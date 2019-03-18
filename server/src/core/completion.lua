@@ -487,9 +487,9 @@ local function searchSpecial(vm, source, word, callback, pos)
     local label = table.concat(chars) .. '+1'
     callback(label, nil, CompletionItemKind.Snippet, {
         textEdit = {
-            start = index.start,
+            start = inside.start + 1,
             finish = index.finish,
-            newText = ('[#%s] = '):format(label),
+            newText = ('%s] = '):format(label),
         },
     })
 end

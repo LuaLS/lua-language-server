@@ -528,9 +528,9 @@ self.results.list[#@]
         label = 'self.results.list+1',
         kind = CompletionItemKind.Snippet,
         textEdit = {
-            start = 18,
+            start = 20,
             finish = 21,
-            newText = '[#self.results.list+1] = ',
+            newText = 'self.results.list+1] = ',
         },
     },
 }
@@ -543,9 +543,9 @@ self.results.list[#self.re@]
         label = 'self.results.list+1',
         kind = CompletionItemKind.Snippet,
         textEdit = {
-            start = 18,
+            start = 20,
             finish = 28,
-            newText = '[#self.results.list+1] = ',
+            newText = 'self.results.list+1] = ',
         },
     },
     {
@@ -562,9 +562,9 @@ fff[#ff@]
         label = 'fff+1',
         kind = CompletionItemKind.Snippet,
         textEdit = {
-            start = 4,
+            start = 6,
             finish = 9,
-            newText = '[#fff+1] = ',
+            newText = 'fff+1] = ',
         },
     },
     {

@@ -330,6 +330,9 @@ TEST [[
 
 TEST 'local s = "a:@"' (nil)
 
+TEST 'debug.@'
+(EXISTS)
+
 TEST [[
 local xxxx = {
     xxyy = 1,

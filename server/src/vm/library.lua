@@ -54,6 +54,7 @@ function buildLibValue(lib)
         for fName, fLib in pairs(lib.child) do
             local fValue = buildLibValue(fLib)
             value:rawSet(fName, fValue)
+            value:addInfo('set child', sourceMgr.dummy(), fName)
         end
     end
 

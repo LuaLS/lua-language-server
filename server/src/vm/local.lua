@@ -21,14 +21,6 @@ function mt:getValue()
     return self.value
 end
 
-function mt:setInitValue(value)
-    self.initValue = value
-end
-
-function mt:getInitValue()
-    return self.initValue
-end
-
 function mt:addInfo(tp, source)
     if not source then
         error('No source')
@@ -157,7 +149,6 @@ return function (name, source, value)
         name = name,
         source = id,
         value = value,
-        initValue = value,
         _info = {},
     }, mt)
     return self

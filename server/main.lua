@@ -7,6 +7,7 @@ package.path = (ROOT / 'src' / '?.lua'):string()
      .. ';' .. (ROOT / 'src' / '?' / 'init.lua'):string()
 
 --collectgarbage('generational')
+collectgarbage("setpause", 100)
 
 log = require 'log'
 log.init(ROOT, ROOT / 'log' / 'service.log')

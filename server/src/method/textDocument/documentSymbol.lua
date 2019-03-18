@@ -1,6 +1,8 @@
 local core = require 'core'
 local lang = require 'language'
 
+local timerCache = {}
+
 local function posToRange(lines, start, finish)
     local start_row,  start_col  = lines:rowcol(start)
     local finish_row, finish_col = lines:rowcol(finish)
@@ -32,19 +34,29 @@ end
 
 return function (lsp, params)
     local uri = params.textDocument.uri
+
+    if timerCache[uri] then
+        timerCache[uri]:remove()
+        timerCache[uri] = nil
+    end
+
     local vm, lines = lsp:loadVM(uri)
     if not vm then
         return nil
     end
 
-    local symbols = core.documentSymbol(vm)
-    if not symbols then
-        return nil
-    end
+    return function (response)
+        timerCache[uri] = ac.wait(0.5, function ()
+            local symbols = core.documentSymbol(vm)
+            if not symbols then
+                return nil
+            end
 
-    for _, symbol in ipairs(symbols) do
-        convertRange(lines, symbol)
-    end
+            for _, symbol in ipairs(symbols) do
+                convertRange(lines, symbol)
+            end
 
-    return symbols
+            response(symbols)
+        end)
+    end
 end

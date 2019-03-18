@@ -170,7 +170,7 @@ end
         detail = 'function mt:add()',
         kind = SymbolKind.Field,
         range = {1, 21},
-        selectionRange = {13, 15},
+        selectionRange = {10, 15},
         valueRange = {1, 21},
     }
 }
@@ -285,7 +285,7 @@ local z
     },
     [4] = {
         name = 'z',
-        detail = 'local z: any',
+        detail = '',
         kind = SymbolKind.Variable,
         range = {102, 102},
         selectionRange = {102, 102},
@@ -411,9 +411,36 @@ end
                 kind = SymbolKind.Variable,
                 range = {27, 27},
                 selectionRange = {27, 27},
-                valueRange = {27, 27},
+                valueRange = {31, 33},
             }
         }
+    },
+}
+
+TEST [[
+local t = {
+    a = 1,
+    b = 2,
+}
+
+local v = t
+]]{
+    [1] = {
+        name = 't',
+        detail = EXISTS,
+        kind = SymbolKind.Variable,
+        range = {7, 7},
+        selectionRange = {7, 7},
+        valueRange = {11, 35},
+        children = EXISTS,
+    },
+    [2] = {
+        name = 'v',
+        detail = EXISTS,
+        kind = SymbolKind.Variable,
+        range = {44, 44},
+        selectionRange = {44, 44},
+        valueRange = {48, 48},
     },
 }
 

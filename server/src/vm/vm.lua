@@ -40,6 +40,7 @@ function mt:buildTable(source)
         if obj.type == 'pair' then
             local value = self:getFirstInMulti(self:getExp(obj[2]))
             local key   = obj[1]
+            self:instantSource(obj)
             self:instantSource(key)
             key:bindValue(value, 'set')
             if key.index then
@@ -794,6 +795,7 @@ function mt:doSet(action)
     if not action[2] then
         return
     end
+    self:instantSource(action)
     -- 要先计算值
     local vars = action[1]
     local exps = action[2]
@@ -814,6 +816,7 @@ function mt:doSet(action)
 end
 
 function mt:doLocal(action)
+    self:instantSource(action)
     local vars = action[1]
     local exps = action[2]
     local values
@@ -966,7 +969,6 @@ function mt:doLocalFunction(action)
             local func = self:buildFunction(action)
             func:addInfo('local', name)
             loc:setValue(func)
-            loc:setInitValue(func)
         end
     end
 end

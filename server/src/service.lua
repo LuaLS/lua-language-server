@@ -91,9 +91,9 @@ function mt:_doProto(proto)
         return
     end
     if type(response) == 'function' then
-        return function (final)
+        response(function (final)
             self:responseProto(id, final)
-        end
+        end)
     else
         self:responseProto(id, response, err)
     end

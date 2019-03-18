@@ -109,10 +109,10 @@ local t = {
                 [1] = {
                     name = 'x',
                     detail = EXISTS,
-                    kind = SymbolKind.Function,
+                    kind = SymbolKind.Class,
                     range = {17, 17},
                     selectionRange = {17, 17},
-                    valueRange = {17, 17},
+                    valueRange = {21, 31},
                 },
             }
         }

@@ -220,5 +220,11 @@ return function (source, lsp, select)
     if source.type == 'name' and source:bindValue() then
         return hoverAsValue(source, lsp, select)
     end
+    if source.type == 'simple' then
+        source = source[#source]
+        if source.type == 'name' and source:bindValue() then
+            return hoverAsValue(source, lsp, select)
+        end
+    end
     return nil
 end

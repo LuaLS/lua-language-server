@@ -39,6 +39,10 @@ local function create (tp, source, literal)
 end
 
 local function isDeadChild(value, index)
+    local child = value._child[index]
+    if not child:getSource() then
+        return true
+    end
     for srcId, info in pairs(value._info) do
         local src = sourceMgr.list[srcId]
         if  src

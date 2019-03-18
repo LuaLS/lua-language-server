@@ -668,6 +668,13 @@ function mt:getUnary(exp)
 end
 
 function mt:getExp(exp)
+    if coroutine.isyieldable() then
+        if self.lsp:isNeedCompile(self.uri) then
+            coroutine.yield()
+        else
+            coroutine.yield('stop')
+        end
+    end
     self:instantSource(exp)
     local tp = exp.type
     if     tp == 'nil' then
@@ -978,6 +985,13 @@ function mt:doAction(action)
         -- Skip
         return
     end
+    if coroutine.isyieldable() then
+        if self.lsp:isNeedCompile(self.uri) then
+            coroutine.yield()
+        else
+            coroutine.yield('stop')
+        end
+    end
     local tp = action.type
     if     tp == 'do' then
         self:doDo(action)
@@ -1017,13 +1031,6 @@ end
 function mt:doActions(actions)
     for _, action in ipairs(actions) do
         self:doAction(action)
-        if coroutine.isyieldable() then
-            if self.lsp:isNeedCompile(self.uri) then
-                coroutine.yield()
-            else
-                coroutine.yield('stop')
-            end
-        end
     end
 end
 

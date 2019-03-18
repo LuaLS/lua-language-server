@@ -228,6 +228,9 @@ local function packChild(symbols, finish, kind)
             t = {}
         end
         t[#t+1] = symbol
+        if coroutine.isyieldable() then
+            coroutine.yield()
+        end
     end
     return t
 end
@@ -249,6 +252,9 @@ return function (vm)
         buildSource(vm, source, used, function (data)
             symbols[#symbols+1] = data
         end)
+        if coroutine.isyieldable() then
+            coroutine.yield()
+        end
     end
 
     local packedSymbols = packSymbols(symbols)

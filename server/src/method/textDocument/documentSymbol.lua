@@ -46,17 +46,30 @@ return function (lsp, params)
     end
 
     return function (response)
-        timerCache[uri] = ac.wait(0.5, function ()
-            local symbols = core.documentSymbol(vm)
-            if not symbols then
-                return nil
+        local co = coroutine.create(function ()
+            return core.documentSymbol(vm)
+        end)
+        timerCache[uri] = ac.loop(0.001, function (t)
+            local suc, res = coroutine.resume(co)
+            if not suc then
+                t:remove()
+                error(res)
+                return
+            end
+            if coroutine.status(co) == 'suspended' then
+                return
             end
 
-            for _, symbol in ipairs(symbols) do
+            t:remove()
+            if not res then
+                response(nil)
+            end
+
+            for _, symbol in ipairs(res) do
                 convertRange(lines, symbol)
             end
 
-            response(symbols)
+            response(res)
         end)
     end
 end

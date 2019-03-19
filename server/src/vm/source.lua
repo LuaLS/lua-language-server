@@ -4,6 +4,7 @@ mt.uri = ''
 
 local Id = 0
 local List = {}
+local Watch = setmetatable({}, {__mode = 'k'})
 
 function mt:bindLocal(loc, action)
     if loc then
@@ -99,6 +100,7 @@ local function instant(source)
     Id = Id + 1
     source.id = Id
     List[Id] = source
+    Watch[source] = Id
     setmetatable(source, mt)
     return true
 end
@@ -115,5 +117,6 @@ end
 return {
     instant = instant,
     list = List,
+    watch = Watch,
     dummy = dummy,
 }

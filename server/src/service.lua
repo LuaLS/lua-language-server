@@ -8,6 +8,7 @@ local core       = require 'core'
 local lang       = require 'language'
 local updateTimer= require 'timer'
 local buildVM    = require 'vm'
+local source     = require 'vm.source'
 
 local ErrorCodes = {
     -- Defined by JSON RPC
@@ -533,49 +534,56 @@ function mt:_loadProto()
     end
 end
 
+function mt:_testMemory()
+    if os.clock() - self._clock < 60 then
+        return
+    end
+    self._clock = os.clock()
+    local cachedVM = 0
+    for _ in pairs(self._file) do
+        cachedVM = cachedVM + 1
+    end
+    local aliveVM = 0
+    local deadVM = 0
+    for vm in pairs(CachedVM) do
+        if vm:isRemoved() then
+            deadVM = deadVM + 1
+        else
+            aliveVM = aliveVM + 1
+        end
+    end
+
+    local alivedSource = 0
+    local deadSource = 0
+    for _, id in pairs(source.watch) do
+        if source.list[id] then
+            alivedSource = alivedSource + 1
+        else
+            deadSource = deadSource + 1
+        end
+    end
+    local mem = collectgarbage 'count'
+    log.debug(('\n\z
+    State\n\z
+    Mem:      [%.3f]kb\n\z
+    CachedVM: [%d]\n\z
+    AlivedVM: [%d]\n\z
+    DeadVM:   [%d]\n\z
+    AlivedSrc:[%d]\n\z
+    DeadSrc:  [%d]'):format(
+        mem,
+        cachedVM,
+        aliveVM,
+        deadVM,
+        alivedSource,
+        deadSource
+    ))
+end
+
 function mt:onTick()
     self:_loadProto()
     self:_doCompileTask()
-
-    if os.clock() - self._clock >= 60 then
-        self._clock = os.clock()
-        local count = 0
-        for _ in pairs(self._file) do
-            count = count + 1
-        end
-        local alive = 0
-        local dead = 0
-        for vm in pairs(CachedVM) do
-            if vm:isRemoved() then
-                dead = dead + 1
-            else
-                alive = alive + 1
-            end
-        end
-        local mem = collectgarbage 'count'
-        log.debug(('\n\z
-        State\n\z
-        Mem:      [%.3f]kb\n\z
-        CachedVM: [%d]\n\z
-        AlivedVM: [%d]\n\z
-        DeadVM:   [%d]'):format(
-            mem,
-            count,
-            alive,
-            dead
-        ))
-
-        --TODO source测试
-        --local total = 0
-        --local alive = 0
-        --for source in pairs(CachedSource) do
-        --    if not source:isDead() then
-        --        alive = alive + 1
-        --    end
-        --    total = total + 1
-        --end
-        --log.debug(('CachedSource: %d/%d'):format(alive, total))
-    end
+    self:_testMemory()
 end
 
 function mt:listen()

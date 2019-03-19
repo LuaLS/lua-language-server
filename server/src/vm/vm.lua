@@ -46,13 +46,13 @@ function mt:buildTable(source)
             if key.index then
                 local index = self:getIndex(obj)
                 key:set('parent', tbl)
-                tbl:addInfo('set child', key, index)
+                tbl:addInfo('set child', key, index, value)
                 tbl:setChild(index, value)
             else
                 if key.type == 'name' then
                     key:set('parent', tbl)
                     key:set('table index', true)
-                    tbl:addInfo('set child', key, key[1])
+                    tbl:addInfo('set child', key, key[1], value)
                     tbl:setChild(key[1], value)
                 end
             end
@@ -62,17 +62,18 @@ function mt:buildTable(source)
                 if index == #source then
                     value:eachValue(function (_, v)
                         n = n + 1
-                        tbl:addInfo('set child', obj, n)
+                        tbl:addInfo('set child', obj, n, v)
                         tbl:setChild(n, v)
                     end)
                 else
                     n = n + 1
-                    tbl:addInfo('set child', obj, n)
-                    tbl:setChild(n, self:getFirstInMulti(value))
+                    local v = self:getFirstInMulti(value)
+                    tbl:addInfo('set child', obj, n, v)
+                    tbl:setChild(n, v)
                 end
             else
                 n = n + 1
-                tbl:addInfo('set child', obj, n)
+                tbl:addInfo('set child', obj, n, value)
                 tbl:setChild(n, value)
             end
             -- 处理写了一半的 key = value，把name类的数组元素视为哈希键
@@ -387,7 +388,7 @@ function mt:setName(name, source, value)
     local ENV = self:loadLocal('_ENV')
     local ENVValue = ENV:getValue()
     source:bindValue(value, 'set')
-    ENVValue:addInfo('set child', source, name)
+    ENVValue:addInfo('set child', source, name, value)
     ENVValue:setChild(name, value)
     source:set('global', true)
     source:set('parentValue', ENVValue)
@@ -786,12 +787,12 @@ function mt:setOne(var, value)
         if key.type == 'index' then
             local index = self:getIndex(key)
             key[1]:set('parent', parent)
-            parent:addInfo('set child', key[1], index)
+            parent:addInfo('set child', key[1], index, value)
             parent:setChild(index, value)
         elseif key.type == 'name' then
             local index = key[1]
             key:set('parent', parent)
-            parent:addInfo('set child', key, index)
+            parent:addInfo('set child', key, index, value)
             parent:setChild(index, value)
         end
         key:bindValue(value, 'set')
@@ -921,11 +922,11 @@ function mt:doFunction(action)
                 source:set('object', parent)
                 if source.type == 'index' then
                     local index = self:getIndex(source)
-                    parent:addInfo('set child', source[1], index)
+                    parent:addInfo('set child', source[1], index, value)
                     parent:setChild(index, value)
                 elseif source.type == 'name' then
                     local index = source[1]
-                    parent:addInfo('set child', source, index)
+                    parent:addInfo('set child', source, index, value)
                     parent:setChild(index, value)
                 end
                 source:bindValue(value, 'set')
@@ -948,11 +949,11 @@ function mt:doFunction(action)
                 self:instantSource(source)
                 if source.type == 'index' then
                     local index = self:getIndex(source)
-                    parent:addInfo('set child', source[1], index)
+                    parent:addInfo('set child', source[1], index, value)
                     parent:setChild(index, value)
                 elseif source.type == 'name' then
                     local index = source[1]
-                    parent:addInfo('set child', source, index)
+                    parent:addInfo('set child', source, index, value)
                     parent:setChild(index, value)
                 end
                 source:bindValue(value, 'set')

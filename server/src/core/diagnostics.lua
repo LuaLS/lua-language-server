@@ -39,38 +39,40 @@ function mt:searchUnusedLocals(callback)
 end
 
 function mt:searchUndefinedGlobal(callback)
+    local definedGlobal = {}
+    local definedValue = {}
+    for name in pairs(config.config.diagnostics.globals) do
+        definedGlobal[name] = true
+    end
+    local envValue = self.vm.env:getValue()
+    envValue:eachInfo(function (info)
+        if info.type == 'set child' then
+            local value = info[2]
+            definedValue[value] = true
+        end
+    end)
     self.vm:eachSource(function (source)
         if not source:get 'global' then
-            return
-        end
-        local value = source:bindValue()
-        if not value then
-            return
-        end
-        if source:action() ~= 'get' then
-            return
-        end
-        if value:getLib() then
             return
         end
         local name = source:getName()
         if name == '' then
             return
         end
+        if definedGlobal[name] then
+            return
+        end
+        local value = source:bindValue()
+        if not value then
+            return
+        end
+        if definedValue[value] then
+            return
+        end
         if type(name) ~= 'string' then
             return
         end
-        if config.config.diagnostics.globals[name] then
-            return
-        end
-        local defined = value:eachInfo(function (info)
-            if info.type == 'set' then
-                return true
-            end
-        end)
-        if not defined then
-            callback(source.start, source.finish, name)
-        end
+        callback(source.start, source.finish, name)
     end)
 end
 

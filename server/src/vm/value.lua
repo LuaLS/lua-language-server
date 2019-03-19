@@ -266,15 +266,27 @@ function mt:mergeValue(value)
     --end
     --value._child = self._child
 
-    for srcId, info in pairs(value._info) do
-        local src = sourceMgr.list[srcId]
-        if src then
-            self._infoCount = self._infoCount + 1
-            self._info[srcId] = info
+    if self._infoCount > value._infoCount then
+        for srcId, info in pairs(value._info) do
+            local src = sourceMgr.list[srcId]
+            if src and not self._info[srcId] then
+                self._infoCount = self._infoCount + 1
+                self._info[srcId] = info
+            end
         end
+        value._info = self._info
+        value._infoCount = self._infoCount
+    else
+        for srcId, info in pairs(self._info) do
+            local src = sourceMgr.list[srcId]
+            if src and not value._info[srcId] then
+                value._infoCount = value._infoCount + 1
+                value._info[srcId] = info
+            end
+        end
+        self._info = value._info
+        self._infoCount = value._infoCount
     end
-    value._info = self._info
-    value._infoCount = self._infoCount
 
     if value._meta then
         self._meta = value._meta

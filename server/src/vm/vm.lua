@@ -911,6 +911,7 @@ function mt:doFunction(action)
     self:instantSource(action)
     local name = action.name
     if name then
+        self:instantSource(name)
         if name.type == 'simple' then
             local parent = self:getSimple(name, -2)
             if name[#name-1].type == ':' then
@@ -969,8 +970,9 @@ function mt:doLocalFunction(action)
     self:instantSource(action)
     local name = action.name
     if name then
+        self:instantSource(name)
         if name.type == 'simple' then
-            self:buildFunction(action)
+            self:doFunction(action)
         else
             local loc = self:createLocal(name[1], name)
             local func = self:buildFunction(action)

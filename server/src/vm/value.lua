@@ -97,13 +97,13 @@ function mt:rawSet(index, value, source)
     end
     if self._child[index] then
         self._child[index]:mergeValue(value)
-        self._child[index] = value
+        --self._child[index] = value
     else
         self._child[index] = value
     end
-    self:addInfo('set child', source, index, value)
+    self:addInfo('set child', source, index, self._child[index])
     if self._global then
-        value:markGlobal()
+        self._child[index]:markGlobal()
     end
 end
 
@@ -266,26 +266,12 @@ function mt:mergeValue(value)
     --end
     --value._child = self._child
 
-    if self._infoCount > value._infoCount then
-        for srcId, info in pairs(value._info) do
-            local src = sourceMgr.list[srcId]
-            if src and not self._info[srcId] then
-                self._infoCount = self._infoCount + 1
-                self._info[srcId] = info
-            end
+    for srcId, info in pairs(value._info) do
+        local src = sourceMgr.list[srcId]
+        if src and not self._info[srcId] then
+            self._infoCount = self._infoCount + 1
+            self._info[srcId] = info
         end
-        value._info = self._info
-        value._infoCount = self._infoCount
-    else
-        for srcId, info in pairs(self._info) do
-            local src = sourceMgr.list[srcId]
-            if src and not value._info[srcId] then
-                value._infoCount = value._infoCount + 1
-                value._info[srcId] = info
-            end
-        end
-        self._info = value._info
-        self._infoCount = value._infoCount
     end
 
     if value._meta then

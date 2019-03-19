@@ -86,15 +86,17 @@ function mt:getType()
     return mType or 'any'
 end
 
-function mt:rawSet(index, value)
+function mt:rawSet(index, value, source)
     if not self._child then
         self._child = {}
     end
     if self._child[index] then
         self._child[index]:mergeValue(value)
+        self._child[index] = value
     else
         self._child[index] = value
     end
+    self:addInfo('set child', source, index, value)
 end
 
 function mt:rawGet(index)
@@ -112,9 +114,9 @@ function mt:rawGet(index)
     return child
 end
 
-function mt:setChild(index, value)
+function mt:setChild(index, value, source)
     self:setType('table', 0.5)
-    self:rawSet(index, value)
+    self:rawSet(index, value, source)
     return value
 end
 
@@ -254,17 +256,18 @@ function mt:mergeValue(value)
             self._child[k] = v
         end
     end
+    value._child = self._child
 
     for srcId, info in pairs(value._info) do
         local src = sourceMgr.list[srcId]
         if src then
             self._infoCount = self._infoCount + 1
             self._info[srcId] = info
-        else
-            value._info[srcId] = nil
-            value._infoCount = value._infoCount - 1
         end
     end
+    value._info = self._info
+    value._infoCount = self._infoCount
+
     if value._meta then
         self._meta = value._meta
     end

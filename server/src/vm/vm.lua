@@ -156,9 +156,11 @@ end
 function mt:getRequire(strValue, destVM)
     -- 取出对方的主函数
     local main = destVM.main
-    -- 获取主函数返回值，注意不能修改对方的环境
+    -- 获取主函数返回值
     local mainValue = main:getFunction():getReturn(1)
-    if not mainValue then
+    if mainValue then
+        mainValue:markGlobal()
+    else
         mainValue = self:createValue('any', self:getDefaultSource())
         mainValue.uri = destVM.uri
     end
@@ -171,6 +173,7 @@ function mt:getLoadFile(strValue, destVM)
     local main = destVM.main
     -- loadfile 的返回值就是对方的主函数
     local mainValue = main
+    mainValue:markGlobal()
 
     return mainValue
 end

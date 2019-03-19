@@ -40,6 +40,10 @@ local function create (tp, source, literal)
 end
 
 local function isDeadChild(value, index)
+    -- 非全局值不会出现dead child
+    if not value._global then
+        return false
+    end
     for srcId, info in pairs(value._info) do
         local src = sourceMgr.list[srcId]
         if  src
@@ -310,15 +314,19 @@ function mt:addInfo(tp, source, ...)
     self._info[id] = info
     self._infoCount = self._infoCount + 1
 
-    if self._infoCount > self._infoLimit then
+    -- 只有全局值需要压缩info
+    if self._global and self._infoCount > self._infoLimit then
+        local count = 0
         for srcId in pairs(self._info) do
             local src = sourceMgr.list[srcId]
-            if not src then
+            if src then
+                count = count + 1
+            else
                 self._info[srcId] = nil
-                self._infoCount = self._infoCount - 1
             end
         end
-        self._infoLimit = self._infoCount * 2
+        self._infoCount = count
+        self._infoLimit = count * 2
         if self._infoLimit < 10 then
             self._infoLimit = 10
         end

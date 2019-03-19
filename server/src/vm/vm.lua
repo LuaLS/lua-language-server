@@ -914,6 +914,7 @@ function mt:doFunction(action)
                 local value = self:buildFunction(action)
                 local source = name[#name]
                 self:instantSource(source)
+                source:set('parent', parent)
                 source:set('object', parent)
                 if source.type == 'index' then
                     local index = self:getIndex(source)

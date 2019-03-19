@@ -10,6 +10,7 @@ mt.type = 'value'
 mt.uri = ''
 mt._infoCount = 0
 mt._infoLimit = 10
+mt._global = false
 
 local function create (tp, source, literal)
     if tp == '...' then
@@ -97,6 +98,9 @@ function mt:rawSet(index, value, source)
         self._child[index] = value
     end
     self:addInfo('set child', source, index, value)
+    if self._global then
+        value:markGlobal()
+    end
 end
 
 function mt:rawGet(index)
@@ -248,15 +252,15 @@ function mt:mergeValue(value)
         end
     end
     value._type = self._type
-    if value._child then
-        if not self._child then
-            self._child = {}
-        end
-        for k, v in pairs(value._child) do
-            self._child[k] = v
-        end
-    end
-    value._child = self._child
+    --if value._child then
+    --    if not self._child then
+    --        self._child = {}
+    --    end
+    --    for k, v in pairs(value._child) do
+    --        self._child[k] = v
+    --    end
+    --end
+    --value._child = self._child
 
     for srcId, info in pairs(value._info) do
         local src = sourceMgr.list[srcId]
@@ -381,6 +385,20 @@ end
 
 function mt:getSource()
     return sourceMgr.list[self.source]
+end
+
+function mt:markGlobal()
+    if self._global then
+        return
+    end
+    self._global = true
+    self:rawEach(function (index, value)
+        value:markGlobal()
+    end)
+end
+
+function mt:isGlobal()
+    return self._global
 end
 
 return create

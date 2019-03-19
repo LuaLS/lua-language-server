@@ -40,15 +40,14 @@ end
 
 function mt:searchUndefinedGlobal(callback)
     local definedGlobal = {}
-    local definedValue = {}
     for name in pairs(config.config.diagnostics.globals) do
         definedGlobal[name] = true
     end
     local envValue = self.vm.env:getValue()
     envValue:eachInfo(function (info)
         if info.type == 'set child' then
-            local value = info[2]
-            definedValue[value] = true
+            local name = info[1]
+            definedGlobal[name] = true
         end
     end)
     self.vm:eachSource(function (source)
@@ -59,14 +58,24 @@ function mt:searchUndefinedGlobal(callback)
         if name == '' then
             return
         end
-        if definedGlobal[name] then
-            return
-        end
         local value = source:bindValue()
         if not value then
             return
         end
-        if definedValue[value] then
+        if not value:isGlobal() then
+            -- 上文重载了 _ENV 的情况
+            local ok = value:eachInfo(function (info)
+                if info.type == 'set' then
+                    return true
+                end
+            end)
+            if ok then
+                return
+            end
+            callback(source.start, source.finish, name)
+            return
+        end
+        if definedGlobal[name] then
             return
         end
         if type(name) ~= 'string' then

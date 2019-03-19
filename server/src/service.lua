@@ -540,8 +540,12 @@ function mt:_testMemory()
     end
     self._clock = os.clock()
     local cachedVM = 0
-    for _ in pairs(self._file) do
-        cachedVM = cachedVM + 1
+    local cachedSource = 0
+    for _, obj in pairs(self._file) do
+        if obj.vm then
+            cachedVM = cachedVM + 1
+            cachedSource = cachedSource + #obj.vm.sources
+        end
     end
     local aliveVM = 0
     local deadVM = 0
@@ -569,12 +573,14 @@ function mt:_testMemory()
     CachedVM: [%d]\n\z
     AlivedVM: [%d]\n\z
     DeadVM:   [%d]\n\z
+    CachedSrc:[%d]\n\z
     AlivedSrc:[%d]\n\z
     DeadSrc:  [%d]'):format(
         mem,
         cachedVM,
         aliveVM,
         deadVM,
+        cachedSource,
         alivedSource,
         deadSource
     ))

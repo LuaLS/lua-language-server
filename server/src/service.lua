@@ -333,19 +333,25 @@ function mt:compileVM(uri)
 
     local clock = os.clock()
     local vm = buildVM(ast, self, uri)
+    if vm then
+        CachedVM[vm] = true
+    end
     if version ~= obj.version then
+        if vm then
+            vm:remove()
+        end
         return nil
     end
     if self._needCompile[uri] then
         self:_markCompiled(uri, compiled)
     else
+        if vm then
+            vm:remove()
+        end
         return nil
     end
     if obj.vm then
         obj.vm:remove()
-    end
-    if vm then
-        CachedVM[vm] = true
     end
     obj.vm = vm
     obj.vmCost = os.clock() - clock

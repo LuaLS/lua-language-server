@@ -168,25 +168,6 @@ TEST {
     {
         path = 'a.lua',
         content = [[
-            local x = {
-                <!a!> = 1,
-            }
-            return b
-        ]],
-    },
-    {
-        path = 'b.lua',
-        content = [[
-            local t = require 'a'
-            t.<?a?>()
-        ]]
-    }
-}
-
-TEST {
-    {
-        path = 'a.lua',
-        content = [[
             <!global!> = 1
         ]],
     },

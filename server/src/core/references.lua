@@ -30,7 +30,9 @@ local function parseResult(vm, source, declarat, callback)
                 callback(src)
             end
         end)
-        local parent = source:get 'parent'
+    end
+    local parent = source:get 'parent'
+    if parent then
         parent:eachInfo(function (info, src)
             if info[1] == source[1] then
                 if (declarat and info.type == 'set child') or info.type == 'get child' then
@@ -38,7 +40,6 @@ local function parseResult(vm, source, declarat, callback)
                 end
             end
         end)
-        return
     end
 end
 

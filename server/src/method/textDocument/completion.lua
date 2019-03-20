@@ -99,7 +99,7 @@ return function (lsp, params)
     end
 
     local response = {
-        isIncomplete = false,
+        isIncomplete = true,
         items = items,
     }
     return response

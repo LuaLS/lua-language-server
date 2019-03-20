@@ -95,7 +95,7 @@ end
 local function parseLocal(vm, source, lsp)
     local loc = source:bindLocal()
     local value = source:bindValue()
-    if value.uri ~= '' and value.uri ~= vm.uri then
+    if value.uri ~= vm.uri then
         return parseValueCrossFile(vm, source, lsp)
     end
     local positions = {}
@@ -111,19 +111,45 @@ local function parseLocal(vm, source, lsp)
 end
 
 local function parseValue(vm, source, lsp)
-    local value = source:bindValue()
-    if value.uri ~= '' and value.uri ~= vm.uri then
-        return parseValueCrossFile(vm, source, lsp)
-    end
     local positions = {}
-    value:eachInfo(function (info, src)
-        if info.type == 'set' then
-            positions[#positions+1] = {
-                src.start,
-                src.finish,
-            }
+    local mark = {}
+
+    local function callback(src)
+        if mark[src] then
+            return
         end
-    end)
+        mark[src] = true
+        if src.start == 0 then
+            return
+        end
+        local uri = src.uri
+        if uri == '' then
+            uri = nil
+        end
+        positions[#positions+1] = {
+            src.start,
+            src.finish,
+            uri,
+        }
+    end
+
+    if source:bindValue() then
+        source:bindValue():eachInfo(function (info, src)
+            if info.type == 'set' or info.type == 'local' then
+                callback(src)
+            end
+        end)
+    end
+    local parent = source:get 'parent'
+    if parent then
+        parent:eachInfo(function (info, src)
+            if info[1] == source[1] then
+                if info.type == 'set child' then
+                    callback(src)
+                end
+            end
+        end)
+    end
     if #positions == 0 then
         return nil
     end
@@ -173,7 +199,6 @@ return function (vm, source, lsp)
         return jumpUri(vm, source, lsp)
     end
     if source:get 'in index' then
-        source = source:get 'in index'
         return parseValue(vm, source, lsp)
             or parseValueSimily(vm, source, lsp)
     end

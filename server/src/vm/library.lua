@@ -23,7 +23,7 @@ function buildLibValue(lib)
         value:setFunction(func)
         if lib.args then
             for _, arg in ipairs(lib.args) do
-                func:createLibArg(arg)
+                func:createLibArg(arg, sourceMgr.dummy())
             end
         end
         if lib.returns then

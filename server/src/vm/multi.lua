@@ -4,39 +4,40 @@ local sourceMgr = require 'vm.source'
 local mt = {}
 mt.__index = mt
 mt.type = 'multi'
+mt.len = 0
 
 function mt:push(value, isLast)
     if value.type == 'list' then
         if isLast then
             for _, v in ipairs(value) do
-                self[#self+1] = v
+                self.len = self.len + 1
+                self[self.len] = v
             end
         else
-            self[#self+1] = value[1]
+            self.len = self.len + 1
+            self[self.len] = value[1]
         end
     else
-        self[#self+1] = value
+        self.len = self.len + 1
+        self[self.len] = value
     end
 end
 
 function mt:get(index)
-    for n = #self+1, index do
-        self[n] = createValue('any', sourceMgr.dummy())
+    if index > self.len then
+        self.len = index
     end
     return self[index]
 end
 
 function mt:set(index, value)
-    for n = #self+1, index-1 do
-        self[n] = createValue('any', sourceMgr.dummy())
-    end
     self[index] = value
 end
 
 function mt:first()
     local value = self[1]
     if not value then
-        return createValue('nil', sourceMgr.dummy())
+        return nil
     end
     if value.type == 'multi' then
         return value:first()
@@ -49,7 +50,7 @@ function mt:eachValue(callback)
     local i = 0
     for n, value in ipairs(self) do
         if value.type == 'multi' then
-            if n == #self then
+            if n == self.len then
                 value:eachValue(function (_, nvalue)
                     i = i + 1
                     callback(i, nvalue)

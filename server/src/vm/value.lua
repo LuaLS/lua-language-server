@@ -250,6 +250,9 @@ function mt:mergeValue(value)
     if self == value then
         return
     end
+    if not value then
+        return
+    end
     if value._type then
         for tp, rate in pairs(value._type) do
             self:setType(tp, rate)

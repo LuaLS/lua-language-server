@@ -109,10 +109,7 @@ local function instant(source)
 end
 
 local function dummy()
-    local src = {
-        start = 0,
-        finish = 0,
-    }
+    local src = {}
     instant(src)
     return src
 end

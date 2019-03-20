@@ -98,20 +98,18 @@ function mt:setReturn(index, value)
     end
     if value then
         self.returns[index] = value
-    else
-        self.returns[index] = createValue('any', self:getSource() or sourceMgr.dummy())
     end
 end
 
 function mt:getReturn(index)
     if self.maxReturns and index and self.maxReturns < index then
-        return createValue('nil', sourceMgr.dummy())
+        return nil
     end
     if not self.returns then
         self.returns = createMulti()
     end
     if index then
-        return self.returns:get(index) or createValue('nil', sourceMgr.dummy())
+        return self.returns:get(index)
     else
         return self.returns
     end
@@ -174,7 +172,7 @@ function mt:run(vm)
 
     -- 向局部变量中填充参数
     for i, loc in ipairs(self.args) do
-        loc:setValue(self.argValues[i] or createValue('nil', sourceMgr.dummy()))
+        loc:setValue(self.argValues[i])
     end
     if self._dots then
         self._dots = createMulti()
@@ -205,12 +203,12 @@ function mt:createArg(vm, arg)
     end
 end
 
-function mt:createLibArg(arg)
+function mt:createLibArg(arg, source)
     if arg.type == '...' then
         self._dots = createMulti()
     else
         local name = arg.name or '_'
-        local loc = createLocal(name, sourceMgr.dummy(), createValue('any', sourceMgr.dummy()))
+        local loc = createLocal(name, source, createValue('any', source))
         self:saveLocal(name, loc)
         self.args[#self.args+1] = loc
     end

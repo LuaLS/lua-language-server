@@ -291,7 +291,10 @@ function mt:callLibrary(func, values, source, lib)
                 if rtn.type == 'boolean' or rtn.type == 'number' or rtn.type == 'integer' or rtn.type == 'string' then
                     func:setReturn(i, self:createValue(rtn.type, self:getDefaultSource()))
                 end
-                func:getReturn(i):setType(rtn.type or 'any', 1.0)
+                local value = func:getReturn(i)
+                if value then
+                    value:setType(rtn.type or 'any', 1.0)
+                end
             end
         end
     end

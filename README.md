@@ -7,7 +7,7 @@
 - [x] Goto Definition
 - [x] Goto Implementation
 - [x] Find References
-- [x] Rough Type Inference
+- [x] Type Inference
 - [x] Hover
 - [x] Diagnostics
 - [x] Rename
@@ -17,11 +17,10 @@
 - [x] Document Symbols
 - [x] Support Dirty Script
 - [x] Syntax Check
+- [x] Search Globals
+- [x] Find All References
 - [ ] Multi Workspace
 - [ ] Type Format
-- [ ] Accurate Type Inference
-- [ ] Search Globals
-- [ ] Find All References
 - [ ] Code Action
 
 ### Locale

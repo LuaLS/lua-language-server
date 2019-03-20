@@ -124,6 +124,9 @@ end
 
 function mt:close(pos)
     if pos then
+        if pos <= 0 then
+            pos = math.maxinteger
+        end
         self._close = pos
     else
         return self._close

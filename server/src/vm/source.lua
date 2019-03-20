@@ -1,6 +1,9 @@
 local mt = {}
 mt.__index = mt
 mt.uri = ''
+mt.start = 0
+mt.finish = 0
+mt.id = 0
 
 local Id = 0
 local List = {}

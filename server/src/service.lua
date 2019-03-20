@@ -216,6 +216,7 @@ function mt:reCompile()
         n = n + 1
     end
     log.debug('reCompile:', n)
+    self:_testMemory()
 end
 
 function mt:loadVM(uri)
@@ -541,10 +542,6 @@ function mt:_loadProto()
 end
 
 function mt:_testMemory()
-    if os.clock() - self._clock < 60 then
-        return
-    end
-    self._clock = os.clock()
     local cachedVM = 0
     local cachedSource = 0
     for _, obj in pairs(self._file) do
@@ -565,7 +562,7 @@ function mt:_testMemory()
 
     local alivedSource = 0
     local deadSource = 0
-    for _, id in pairs(source.watch) do
+    for src, id in pairs(source.watch) do
         if source.list[id] then
             alivedSource = alivedSource + 1
         else
@@ -595,7 +592,10 @@ end
 function mt:onTick()
     self:_loadProto()
     self:_doCompileTask()
-    self:_testMemory()
+    if os.clock() - self._clock >= 60 then
+        self._clock = os.clock()
+        self:_testMemory()
+    end
 end
 
 function mt:listen()

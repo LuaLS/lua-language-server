@@ -1138,7 +1138,7 @@ function mt:createEnvironment(ast)
     -- 全局变量`_G`
     local global = buildGlobal(self.lsp)
     -- 隐藏的上值`_ENV`
-    local env = self:createLocal('_ENV', sourceMgr.dummy(), global)
+    local env = self:createLocal('_ENV', self:getDefaultSource(), global)
     env:set('hide', true)
     self.env = env
 end

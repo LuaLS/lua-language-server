@@ -111,7 +111,6 @@ end
 local function dummy()
     local src = {}
     instant(src)
-    log.debug('临时source', debug.traceback())
     return src
 end
 

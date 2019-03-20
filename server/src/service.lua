@@ -592,7 +592,7 @@ end
 function mt:onTick()
     self:_loadProto()
     self:_doCompileTask()
-    if os.clock() - self._clock >= 60 then
+    if os.clock() - self._clock >= 10 then
         self._clock = os.clock()
         self:_testMemory()
     end

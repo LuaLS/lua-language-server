@@ -4,11 +4,15 @@ local createValue
 local createFunction
 
 local CHILD_CACHE = {}
+local VALUE_CACHE = {}
 
 local buildLibValue
 local buildLibChild
 
 function buildLibValue(lib)
+    if VALUE_CACHE[lib] then
+        return VALUE_CACHE[lib]
+    end
     if not createValue then
         createValue = require 'vm.value'
         createFunction = require 'vm.function'
@@ -49,6 +53,7 @@ function buildLibValue(lib)
         value = createValue(tp or 'any', sourceMgr.dummy())
     end
     value:setLib(lib)
+    VALUE_CACHE[lib] = value
 
     if lib.child then
         for fName, fLib in pairs(lib.child) do
@@ -78,7 +83,13 @@ function buildLibChild(lib)
     return child
 end
 
+local function clearCache()
+    CHILD_CACHE = {}
+    VALUE_CACHE = {}
+end
+
 return {
     value = buildLibValue,
     child = buildLibChild,
+    clear = clearCache,
 }

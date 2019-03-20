@@ -6,6 +6,7 @@ local sourceMgr = require 'vm.source'
 return function (lsp)
     local global = lsp and lsp.globalValue
     if not global then
+        libraryBuilder.clear()
         local t = {}
         for name, lib in pairs(library.global) do
             t[name] = libraryBuilder.value(lib)

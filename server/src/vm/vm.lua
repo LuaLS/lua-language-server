@@ -408,7 +408,8 @@ function mt:getIndex(source)
         child:set('in index', source)
         return child[1]
     else
-        return self:getExp(child)
+        local index = self:getExp(child)
+        return self:getFirstInMulti(index)
     end
 end
 

@@ -525,7 +525,7 @@ local function makeList(source, word)
 end
 
 return function (vm, pos, word)
-    local source = findSource(vm, pos)
+    local source = findSource(vm, pos) or findSource(vm, pos-1)
     if not source then
         return nil
     end

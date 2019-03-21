@@ -1,5 +1,5 @@
 local function isContainPos(obj, pos)
-    if obj.start <= pos and obj.finish + 1 >= pos then
+    if obj.start <= pos and obj.finish >= pos then
         return true
     end
     return false

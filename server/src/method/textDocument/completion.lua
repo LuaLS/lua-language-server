@@ -64,7 +64,7 @@ return function (lsp, params)
 
     local lines = parser:lines(text, 'utf8')
     -- lua是从1开始的，因此都要+1
-    local position = lines:position(params.position.line + 1, params.position.character + 1)
+    local position = lines:positionAsChar(params.position.line + 1, params.position.character)
     local word = findWord(position, text)
     local startPos = findStartPos(position, text)
 

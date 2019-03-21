@@ -68,8 +68,8 @@ local function getHover(call, pos)
 end
 
 return function (vm, pos)
-    local source = findSource(vm, pos)
-    if source.type == 'string' then
+    local source = findSource(vm, pos) or findSource(vm, pos-1)
+    if not source or source.type == 'string' then
         return
     end
     local calls = findCall(vm, pos)

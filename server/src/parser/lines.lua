@@ -78,6 +78,38 @@ function mt:position(row, col, code)
     return pos
 end
 
+local function isCharByte(byte)
+    -- [0-9]
+    if byte >= 48 and byte <= 57 then
+        return true
+    end
+    -- [A-Z]
+    if byte >= 65 and byte <= 90 then
+        return true
+    end
+    -- [a-z]
+    if byte >= 97 and byte <= 122 then
+        return true
+    end
+    -- <utf8>
+    if byte >= 128 then
+        return true
+    end
+    return false
+end
+
+function mt:positionAsChar(row, col, code)
+    local pos = self:position(row, col+1, code)
+    if isCharByte(self.buf:byte(pos, pos)) then
+        return pos
+    elseif isCharByte(self.buf:byte(pos+1, pos+1)) then
+        return pos + 1
+    elseif isCharByte(self.buf:byte(pos-1, pos-1)) then
+        return pos - 1
+    end
+    return pos
+end
+
 function mt:rowcol(pos, code)
     if pos < 1 then
         return 1, 1

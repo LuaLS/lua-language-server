@@ -224,6 +224,9 @@ function mt:loadVM(uri)
     if not obj then
         return nil
     end
+    if uri ~= self._lastLoadedVM then
+        self:needCompile(uri)
+    end
     self:compileVM(uri)
     if obj.vm then
         self._lastLoadedVM = uri

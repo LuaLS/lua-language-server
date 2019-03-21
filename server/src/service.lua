@@ -491,7 +491,7 @@ function mt:_createCompileTask()
         self:doDiagnostics(self._lastLoadedVM)
         local uri = self._needCompile[1]
         if uri then
-            self:compileVM(uri)
+            pcall(function () self:compileVM(uri) end)
         else
             uri = next(self._needDiagnostics)
             if uri then

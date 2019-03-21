@@ -18,7 +18,7 @@ return function (lsp, params)
     local locations = {}
     for i, position in ipairs(positions) do
         local start, finish, valueUri = position[1], position[2], (position[3] or uri)
-        local _, valueLines = lsp:loadVM(valueUri)
+        local _, valueLines = lsp:getVM(valueUri)
         if valueLines then
             local start_row,  start_col  = valueLines:rowcol(start)
             local finish_row, finish_col = valueLines:rowcol(finish)

@@ -7,7 +7,7 @@ mt.type = 'multi'
 mt.len = 0
 
 function mt:push(value, isLast)
-    if value.type == 'list' then
+    if value and value.type == 'list' then
         if isLast then
             for _, v in ipairs(value) do
                 self.len = self.len + 1

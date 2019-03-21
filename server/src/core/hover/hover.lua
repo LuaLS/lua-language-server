@@ -71,7 +71,7 @@ local function unpackTable(value)
     value:eachChild(function (key, child)
         local kType = type(key)
         if kType == 'table' then
-            key = ('[*%s]'):format(child:getType())
+            key = ('[*%s]'):format(key:getType())
         elseif math.type(key) == 'integer' then
             key = ('[%03d]'):format(key)
         elseif kType == 'string' then

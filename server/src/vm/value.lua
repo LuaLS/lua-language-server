@@ -124,6 +124,10 @@ end
 
 function mt:setChild(index, value, source)
     self:setType('table', 0.5)
+    -- TODO 临时检测
+    if type(index) == 'table' and index.type ~= 'value' then
+        error('child index must be a value', table.dump(index))
+    end
     self:rawSet(index, value, source)
     return value
 end

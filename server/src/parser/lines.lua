@@ -79,6 +79,9 @@ function mt:position(row, col, code)
 end
 
 local function isCharByte(byte)
+    if not byte then
+        return false
+    end
     -- [0-9]
     if byte >= 48 and byte <= 57 then
         return true

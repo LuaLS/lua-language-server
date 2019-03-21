@@ -333,7 +333,7 @@ function mt:compileVM(uri)
     self:_clearGlobal(uri)
 
     local clock = os.clock()
-    local vm = buildVM(ast, self, uri)
+    local vm, err = buildVM(ast, self, uri)
     if vm then
         CachedVM[vm] = true
     end
@@ -368,7 +368,7 @@ function mt:compileVM(uri)
         log.debug(('Compile VM[%s] takes: %.3f sec'):format(uri, obj.vmCost))
     end
     if not obj.vm then
-        return nil
+        error(err)
     end
 
     self:_compileChain(obj, compiled)

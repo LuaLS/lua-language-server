@@ -40,19 +40,16 @@ function TEST(datas)
                 targetList = list[1]
             end
             targetUri = uri
-            lsp:saveText(uri, 1, new)
-            goto CONTINUE
+            data.content = new
         end
         new, list = catch_target(data.content, '?')
         if new ~= data.content then
             compiled[i] = new
             sourceList = list
             sourceUri = uri
-            lsp:saveText(uri, 1, new)
-            goto CONTINUE
+            data.content = new
         end
         lsp:saveText(uri, 1, data.content)
-        ::CONTINUE::
         ws:addFile(uri)
     end
 
@@ -229,4 +226,23 @@ TEST {
             x = {}
         ]]
     }
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            return function (<!arg!>)
+                print(<?arg?>)
+            end
+        ]],
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            local f = require 'a'
+            local v = 1
+            f(v)
+        ]],
+    },
 }

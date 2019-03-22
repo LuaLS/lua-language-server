@@ -592,10 +592,10 @@ function mt:_testMemory()
     ))
 
     -- 内存过高时暴力结束服务释放内存
-    if mem > 1500000 then
+    if mem > 1300000 then
         collectgarbage()
         mem = collectgarbage 'count'
-        if mem > 1500000 then
+        if mem > 1300000 then
             rpc:requestWait('window/showMessageRequest', {
                 type = 3,
                 message = lang.script('DEBUG_MEMORY_LEAK', '[Lua]'),

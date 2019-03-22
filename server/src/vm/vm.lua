@@ -230,6 +230,7 @@ function mt:callRequire(func, values)
     local lib = library.library[str]
     if lib then
         local value = libraryBuilder.value(lib)
+        value:markGlobal()
         func:setReturn(1, value)
         return
     else

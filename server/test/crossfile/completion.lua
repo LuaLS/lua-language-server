@@ -409,3 +409,21 @@ TEST {
         },
     }
 }
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            local japi = require 'jass.japi'
+            japi.xxxaaaaxxxx
+        ]]
+    },
+    {
+        path = 'a.lua',
+        content = [[
+            local japi = require 'jass.japi'
+            japi.xxxaaaax@
+        ]],
+        main = true,
+    },
+}

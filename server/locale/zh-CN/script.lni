@@ -39,3 +39,6 @@ PARSER_NO_VISIBLE_LABEL = '标签`{label}`不可见。'
 PARSER_REDEFINE_LABEL   = '标签`{label}`重复定义。'
 
 SYMBOL_ANONYMOUS        = '<匿名函数>'
+
+DEBUG_MEMORY_LEAK       = '{} 很抱歉发生了严重的内存泄漏，语言服务即将重启。'
+DEBUG_RESTART_NOW       = '立即重启'

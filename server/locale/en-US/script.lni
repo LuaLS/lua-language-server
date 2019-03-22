@@ -39,3 +39,6 @@ PARSER_NO_VISIBLE_LABEL = 'No visible label `{label}` .'
 PARSER_REDEFINE_LABEL   = 'Label `{label}` already defined.'
 
 SYMBOL_ANONYMOUS        = '<Anonymous>'
+
+DEBUG_MEMORY_LEAK       = "{} I'm sorry for the serious memory leak. The language service will be restarted soon."
+DEBUG_RESTART_NOW       = 'Restart now'

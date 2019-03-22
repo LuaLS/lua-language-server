@@ -14,4 +14,7 @@ return function ()
     }, function ()
         os.exit(true)
     end)
+    ac.wait(5, function ()
+        os.exit(true)
+    end)
 end

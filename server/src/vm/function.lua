@@ -196,7 +196,6 @@ function mt:createArg(vm, arg)
     arg:set('arg', true)
     if arg.type == 'name' then
         local loc = createLocal(arg[1], arg, createValue('nil', arg))
-        loc:set('arg', arg)
         self:saveLocal(arg[1], loc)
         self.args[#self.args+1] = loc
     elseif arg.type == '...' then

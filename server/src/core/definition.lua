@@ -95,11 +95,12 @@ end
 local function parseLocal(vm, source, lsp)
     local positions = {}
     local loc = source:bindLocal()
-    if loc:get 'arg' then
+    local locSource = loc:getSource()
+    if locSource:get 'arg' then
         positions[#positions+1] = {
-            loc:get 'arg'.start,
-            loc:get 'arg'.finish,
-            loc:get 'arg':getUri(),
+            locSource.start,
+            locSource.finish,
+            locSource:getUri(),
         }
         return positions
     end
@@ -108,9 +109,9 @@ local function parseLocal(vm, source, lsp)
         return parseValueCrossFile(vm, source, lsp)
     end
     positions[#positions+1] = {
-        loc:getSource().start,
-        loc:getSource().finish,
-        loc:getSource():getUri(),
+        locSource.start,
+        locSource.finish,
+        locSource:getUri(),
     }
     if #positions == 0 then
         return nil

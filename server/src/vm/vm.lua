@@ -534,6 +534,7 @@ function mt:isTrue(v)
 end
 
 function mt:getBinary(exp)
+    self:instantSource(exp)
     local v1 = self:getExp(exp[1])
     local v2 = self:getExp(exp[2])
     v1 = self:getFirstInMulti(v1) or createValue('nil', exp[1])
@@ -561,11 +562,11 @@ function mt:getBinary(exp)
         v2:setType('number', 0.5)
         v1:setType('string', 0.1)
         v2:setType('string', 0.1)
-        return self:createValue('boolean', self:getDefaultSource())
+        return self:createValue('boolean', exp)
     elseif op == '~='
         or op == '=='
     then
-        return self:createValue('boolean', self:getDefaultSource())
+        return self:createValue('boolean', exp)
     elseif op == '|'
         or op == '~'
         or op == '&'
@@ -591,16 +592,16 @@ function mt:getBinary(exp)
                 return self:createValue('integer', exp, v1:getLiteral() >> v2:getLiteral())
             end
         end
-        return self:createValue('integer', self:getDefaultSource())
+        return self:createValue('integer', exp)
     elseif op == '..' then
         v1:setType('string', 0.5)
         v2:setType('string', 0.5)
         v1:setType('number', 0.1)
         v2:setType('number', 0.1)
         if type(v1:getLiteral()) == 'string' and type(v2:getLiteral()) == 'string' then
-            return self:createValue('string', self:getDefaultSource(), v1:getLiteral() .. v2:getLiteral())
+            return self:createValue('string', exp, v1:getLiteral() .. v2:getLiteral())
         end
-        return self:createValue('string', self:getDefaultSource())
+        return self:createValue('string', exp)
     elseif op == '+'
         or op == '-'
         or op == '*'
@@ -634,37 +635,38 @@ function mt:getBinary(exp)
                 end
             end
         end
-        return self:createValue('number', self:getDefaultSource())
+        return self:createValue('number', exp)
     end
     return nil
 end
 
 function mt:getUnary(exp)
+    self:instantSource(exp)
     local v1 = self:getExp(exp[1])
-    v1 = self:getFirstInMulti(v1)
+    v1 = self:getFirstInMulti(v1) or self:createValue('nil', exp[1])
     local op = exp.op
     -- TODO 搜索元方法
     if     op == 'not' then
-        return self:createValue('boolean', self:getDefaultSource())
+        return self:createValue('boolean', exp)
     elseif op == '#' then
         v1:setType('table', 0.5)
         v1:setType('string', 0.5)
         if type(v1:getLiteral()) == 'string' then
             return self:createValue('integer', exp, #v1:getLiteral())
         end
-        return self:createValue('integer', self:getDefaultSource())
+        return self:createValue('integer', exp)
     elseif op == '-' then
         v1:setType('number', 0.5)
         if type(v1:getLiteral()) == 'number' then
             return self:createValue('number', exp, -v1:getLiteral())
         end
-        return self:createValue('number', self:getDefaultSource())
+        return self:createValue('number', exp)
     elseif op == '~' then
         v1:setType('integer', 0.5)
         if math.type(v1:getLiteral()) == 'integer' then
             return self:createValue('integer', exp, ~v1:getLiteral())
         end
-        return self:createValue('integer', self:getDefaultSource())
+        return self:createValue('integer', exp)
     end
     return nil
 end

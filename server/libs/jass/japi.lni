@@ -423,13 +423,13 @@ type = "string"
 
 [EXBlendButtonIcon]
 [[.args]]
-name = "newArt"
+name = "mask"
 type = "string"
 [[.args]]
 name = "image"
 type = "string"
 [[.args]]
-name = "mask"
+name = "newArt"
 type = "string"
 
 [EXSetUnitArrayString]

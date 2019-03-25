@@ -146,6 +146,7 @@ function mt:saveText(uri, version, text)
     if obj then
         obj.version = version
         obj.text = text
+        obj.oldText = text
         self:needCompile(uri)
     else
         self._file[uri] = {
@@ -332,6 +333,8 @@ function mt:compileVM(uri)
     local ast = self:compileAst(obj)
     local version = obj.version
     obj.astCost = os.clock() - clock
+    obj.oldText = nil
+
     self:_clearChainNode(obj, uri)
     self:_clearGlobal(uri)
 
@@ -431,7 +434,7 @@ function mt:getText(uri)
     if not obj then
         return nil
     end
-    return obj.text
+    return obj.text, obj.oldText
 end
 
 function mt:getAstErrors(uri)

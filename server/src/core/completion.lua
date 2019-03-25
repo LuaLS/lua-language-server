@@ -524,10 +524,16 @@ local function makeList(source, word)
     end, list
 end
 
-return function (vm, pos, word)
+return function (vm, pos, word, oldText)
     local source = findSource(vm, pos) or findSource(vm, pos-1)
     if not source then
         return nil
+    end
+    if oldText then
+        local oldWord = oldText:sub(source.start, source.finish)
+        if word:sub(1, #oldWord) ~= oldWord then
+            return nil
+        end
     end
     local callback, list = makeList(source, word)
     searchSpecial(vm, source, word, callback, pos)

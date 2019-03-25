@@ -57,7 +57,7 @@ end
 
 return function (lsp, params)
     local uri = params.textDocument.uri
-    local text = lsp:getText(uri)
+    local text, oldText = lsp:getText(uri)
     if not text then
         return nil
     end
@@ -77,7 +77,7 @@ return function (lsp, params)
     end
     startPos = startPos or position
 
-    local items = core.completion(vm, startPos, word)
+    local items = core.completion(vm, startPos, word, oldText)
     if not items or #items == 0 then
         vm = lsp:loadVM(uri)
         if not vm then

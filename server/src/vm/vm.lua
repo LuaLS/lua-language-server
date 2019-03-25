@@ -392,7 +392,7 @@ function mt:setName(name, source, value)
     source:bindValue(value, 'set')
     ENVValue:setChild(name, value, source)
     source:set('global', true)
-    source:set('parentValue', ENVValue)
+    source:set('parent', ENVValue)
     if self.lsp then
         self.lsp.global:markSet(self:getUri())
     end

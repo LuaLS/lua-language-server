@@ -204,6 +204,19 @@ function mt:rawEach(callback, foundIndex)
     if not self._child then
         return nil
     end
+    local alived
+    -- 非全局值不会出现dead child
+    if self._global then
+        alived = {}
+        for srcId, info in pairs(self._info) do
+            local src = sourceMgr.list[srcId]
+            if  src
+                and (info.type == 'set child' or info.type == 'get child')
+            then
+                alived[info[1]] = true
+            end
+        end
+    end
     for index, value in pairs(self._child) do
         if foundIndex then
             if foundIndex[index] then
@@ -211,7 +224,7 @@ function mt:rawEach(callback, foundIndex)
             end
             foundIndex[index] = true
         end
-        if isDeadChild(self, index) then
+        if alived and not alived[index] then
             self._child[index] = nil
             goto CONTINUE
         end

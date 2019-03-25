@@ -684,3 +684,17 @@ local t = 'as@'
 local ask = 1
 ]]
 (nil)
+
+TEST [[
+local add
+
+function f(a@)
+    local _ = add
+end
+]]
+{
+    {
+        label = 'add',
+        kind = CompletionItemKind.Variable,
+    },
+}

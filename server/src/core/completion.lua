@@ -250,8 +250,9 @@ local function searchCloseGlobal(vm, source, word, callback)
     end
     local close = loc:close()
     -- 因为闭包的关系落在局部变量finish到close范围内的全局变量一定能访问到该局部变量
+
     for _, src in ipairs(vm.sources) do
-        if      src:get 'global'
+        if      (src:get 'global' or src:bindLocal())
             and src.start >= source.finish
             and src.finish <= close
         then

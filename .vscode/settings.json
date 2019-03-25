@@ -2,6 +2,7 @@
     "Lua.diagnostics.globals": [
         "TEST",
         "ERR",
-        "OUT"
+        "OUT",
+        "IN"
     ]
 }

@@ -42,6 +42,11 @@ for _, name in ipairs(args.ignored) do
 end
 local filter = path_filter(ignore)
 for path in scan(fs.path(args.root), filter) do
+    local ok, msg = IN:pop()
+    if ok and msg == 'stop' then
+        OUT:push 'stop'
+        return
+    end
     if path:extension():string() == '.lua' then
         local buf = io.load(path)
         if buf then

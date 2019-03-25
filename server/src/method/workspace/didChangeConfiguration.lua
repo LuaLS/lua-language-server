@@ -29,6 +29,18 @@ local function eq(a, b)
     return a == b
 end
 
+local function copyTable(a)
+    local t = {}
+    for k, v in pairs(a) do
+        if type(v) == 'table' then
+            t[k] = copyTable(v)
+        else
+            t[k] = v
+        end
+    end
+    return t
+end
+
 return function (lsp)
     -- 请求配置
     rpc:request('workspace/configuration', {
@@ -38,7 +50,16 @@ return function (lsp)
             },
         },
     }, function (configs)
+        local oldConfig = copyTable(config.config)
         config:setConfig(configs[1])
-        lsp:reCompile()
+        local newConfig = config.config
+        if not eq(oldConfig.diagnostics, newConfig.diagnostics) then
+            log.debug('reDiagnostic')
+            lsp:reDiagnostic()
+        end
+        if not eq(oldConfig.workspace, newConfig.workspace) then
+            lsp:ClearAllFiles()
+            lsp.workspace:scanFiles()
+        end
     end)
 end

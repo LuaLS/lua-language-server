@@ -57,6 +57,9 @@ function mt:_callMethod(name, params)
                 name, dump
             ))
             log.error(res)
+            if res:find 'not enough memory' then
+                self:restartDueToMemoryLeak()
+            end
             return nil, {
                 code = ErrorCodes.InternalError,
                 message = r .. '\n' .. res,
@@ -105,7 +108,7 @@ function mt:clearDiagnostics(uri)
         uri = uri,
         diagnostics = {},
     })
-    log.debug('清除诊断：', uri)
+    self._needDiagnostics[uri] = nil
 end
 
 function mt:read(mode)
@@ -218,6 +221,19 @@ function mt:reCompile()
     end
     log.debug('reCompile:', n)
     self:_testMemory()
+end
+
+function mt:reDiagnostic()
+    for uri in pairs(self._file) do
+        self._needDiagnostics[uri] = true
+    end
+end
+
+function mt:ClearAllFiles()
+    for uri in pairs(self._file) do
+        self:clearDiagnostics(uri)
+        self:removeText(uri)
+    end
 end
 
 function mt:loadVM(uri)
@@ -547,6 +563,23 @@ function mt:_loadProto()
     end
 end
 
+function mt:restartDueToMemoryLeak()
+    rpc:requestWait('window/showMessageRequest', {
+        type = 3,
+        message = lang.script('DEBUG_MEMORY_LEAK', '[Lua]'),
+        actions = {
+            {
+                title = lang.script.DEBUG_RESTART_NOW,
+            }
+        }
+    }, function ()
+        os.exit(true)
+    end)
+    ac.wait(5, function ()
+        os.exit(true)
+    end)
+end
+
 function mt:_testMemory()
     local cachedVM = 0
     local cachedSource = 0
@@ -593,28 +626,6 @@ function mt:_testMemory()
         alivedSource,
         deadSource
     ))
-
-    -- 内存过高时暴力结束服务释放内存
-    if mem > 1300000 then
-        collectgarbage()
-        mem = collectgarbage 'count'
-        if mem > 1300000 then
-            rpc:requestWait('window/showMessageRequest', {
-                type = 3,
-                message = lang.script('DEBUG_MEMORY_LEAK', '[Lua]'),
-                actions = {
-                    {
-                        title = lang.script.DEBUG_RESTART_NOW,
-                    }
-                }
-            }, function ()
-                os.exit(true)
-            end)
-            ac.wait(5, function ()
-                os.exit(true)
-            end)
-        end
-    end
 end
 
 function mt:onTick()

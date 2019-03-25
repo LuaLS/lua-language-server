@@ -68,15 +68,14 @@ function mt:uriEncode(path)
     return 'file:///' .. table.concat(names, '/')
 end
 
-function mt:init(rootUri)
-    self.root = self:uriDecode(rootUri)
-    if not self.root then
-        return
+function mt:scanFiles()
+    if self._scanRequest then
+        log.info('中断上次扫描文件任务')
+        self._scanRequest:push('stop')
+        self._scanRequest = nil
+        self._complete = false
+        self:reset()
     end
-    log.info('Workspace inited, root: ', self.root)
-    local logPath = ROOT / 'log' / (rootUri:gsub('[/:]+', '_') .. '.log')
-    log.info('Log path: ', logPath)
-    log.init(ROOT, logPath)
 
     local ignored = {'.git'}
     for path in pairs(config.config.workspace.ignoreDir) do
@@ -86,7 +85,7 @@ function mt:init(rootUri)
         local buf = io.load(self.root / '.gitmodules')
         if buf then
             for path in buf:gmatch('path = ([^\r\n]+)') do
-                log.debug('忽略子模块：', path)
+                log.info('忽略子模块：', path)
                 ignored[#ignored+1] = path
             end
         end
@@ -100,16 +99,18 @@ function mt:init(rootUri)
         end
     end
 
-    log.debug('忽略文件：\r\n' .. table.concat(ignored, '\r\n'))
-
+    log.info('忽略文件：\r\n' .. table.concat(ignored, '\r\n'))
+    log.info('开始扫描文件任务')
     local compiled = {}
-    async.run('scanfiles', {
+    self._scanRequest = async.run('scanfiles', {
         root = self.root:string(),
         ignored = ignored,
     }, function (mode, ...)
         if mode == 'ok' then
-            self:reset()
+            log.info('扫描文件任务完成')
             self._complete = true
+            self._scanRequest = nil
+            self:reset()
             return true
         elseif mode == 'log' then
             log.debug(...)
@@ -120,8 +121,24 @@ function mt:init(rootUri)
             local uri = self:uriEncode(path)
             self.files[name] = uri
             self.lsp:readText(uri, path, file.buf, compiled)
+        elseif mode == 'stop' then
+            log.info('扫描文件任务中断')
+            return false
         end
     end)
+end
+
+function mt:init(rootUri)
+    self.root = self:uriDecode(rootUri)
+    if not self.root then
+        return
+    end
+    log.info('Workspace inited, root: ', self.root)
+    local logPath = ROOT / 'log' / (rootUri:gsub('[/:]+', '_') .. '.log')
+    log.info('Log path: ', logPath)
+    log.init(ROOT, logPath)
+
+    self:scanFiles()
 end
 
 function mt:isComplete()

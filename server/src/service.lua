@@ -145,11 +145,12 @@ function mt:isWaitingCompile()
 end
 
 function mt:saveText(uri, version, text)
+    self._lastLoadedVM = nil
     local obj = self._file[uri]
     if obj then
         obj.version = version
+        obj.oldText = obj.text
         obj.text = text
-        obj.oldText = text
         self:needCompile(uri)
     else
         self._file[uri] = {
@@ -159,6 +160,17 @@ function mt:saveText(uri, version, text)
         }
         self:needCompile(uri)
     end
+end
+
+function mt:isDeadText(uri)
+    local obj = self._file[uri]
+    if not obj then
+        return true
+    end
+    if obj.version == -1 then
+        return true
+    end
+    return false
 end
 
 function mt:open(uri, version, text)
@@ -196,7 +208,7 @@ function mt:readText(uri, path, buf, compiled)
         return
     end
     self._file[uri] = {
-        version = -1,
+        version = 0,
         text = text,
         uri = uri,
     }
@@ -231,8 +243,8 @@ end
 
 function mt:ClearAllFiles()
     for uri in pairs(self._file) do
-        self:clearDiagnostics(uri)
         self:removeText(uri)
+        self:clearDiagnostics(uri)
     end
 end
 
@@ -359,6 +371,12 @@ function mt:compileVM(uri)
     if vm then
         CachedVM[vm] = true
     end
+    if self:isDeadText(uri) then
+        if vm then
+            vm:remove()
+        end
+        return nil
+    end
     if version ~= obj.version then
         if vm then
             vm:remove()
@@ -419,6 +437,9 @@ function mt:doDiagnostics(uri)
         version = obj.vmVersion,
     }
     local res  = self:_callMethod(name, data)
+    if self:isDeadText(uri) then
+        return
+    end
     if obj.version ~= data.version then
         return
     end
@@ -428,6 +449,7 @@ function mt:doDiagnostics(uri)
         return
     end
     if res then
+        log.debug('诊断：', uri, obj.version)
         rpc:notify(name, {
             uri = uri,
             diagnostics = res,

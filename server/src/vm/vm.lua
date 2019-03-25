@@ -926,9 +926,11 @@ function mt:doFunction(action)
                 if source.type == 'index' then
                     local index = self:getIndex(source)
                     parent:setChild(index, value, source[1])
+                    parent:addInfo('set child', source, index)
                 elseif source.type == 'name' then
                     local index = source[1]
                     parent:setChild(index, value, source)
+                    parent:addInfo('set child', source, index)
                 end
                 source:bindValue(value, 'set')
 
@@ -948,12 +950,15 @@ function mt:doFunction(action)
                 local value = self:buildFunction(action)
                 local source = name[#name]
                 self:instantSource(source)
+                source:set('parent', parent)
                 if source.type == 'index' then
                     local index = self:getIndex(source)
                     parent:setChild(index, value, source[1])
+                    parent:addInfo('set child', source, index)
                 elseif source.type == 'name' then
                     local index = source[1]
                     parent:setChild(index, value, source)
+                    parent:addInfo('set child', source, index)
                 end
                 source:bindValue(value, 'set')
             end

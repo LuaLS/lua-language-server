@@ -85,3 +85,12 @@ function <!mt!>:a()
     <?self?>:remove()
 end
 ]]
+
+TEST [[
+local function f()
+    return <?function ()
+    end?>
+end
+
+local <!f2!> = f()
+]]

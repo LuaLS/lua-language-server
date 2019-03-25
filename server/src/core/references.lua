@@ -24,6 +24,16 @@ local function parseResult(vm, source, declarat, callback)
         end)
         return
     end
+    if source:bindFunction() then
+        if declarat then
+            callback(source:bindFunction():getSource())
+        end
+        source:bindFunction():eachInfo(function (info, src)
+            if (declarat and (info.type == 'set' or info.type == 'local')) or info.type == 'get' then
+                callback(src)
+            end
+        end)
+    end
     if source:bindValue() then
         source:bindValue():eachInfo(function (info, src)
             if (declarat and (info.type == 'set' or info.type == 'local')) or info.type == 'get' then

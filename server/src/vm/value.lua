@@ -315,6 +315,9 @@ function mt:addInfo(tp, source, ...)
     if not id then
         error('Not instanted source')
     end
+    if not tp then
+        error('Miss info type')
+    end
     if self._info[id] then
         return
     end

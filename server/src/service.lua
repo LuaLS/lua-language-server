@@ -120,7 +120,7 @@ function mt:read(mode)
     return self._input(mode)
 end
 
-function mt:needCompile(uri, compiled)
+function mt:needCompile(uri, compiled, mode)
     if self._needCompile[uri] then
         return
     end
@@ -131,7 +131,11 @@ function mt:needCompile(uri, compiled)
         return
     end
     self._needCompile[uri] = compiled
-    table.insert(self._needCompile, 1, uri)
+    if mode == 'child' then
+        table.insert(self._needCompile, uri)
+    else
+        table.insert(self._needCompile, 1, uri)
+    end
 end
 
 function mt:isNeedCompile(uri)
@@ -322,12 +326,12 @@ function mt:_compileChain(obj, compiled)
     end
     if obj.child then
         for uri in pairs(obj.child) do
-            self:needCompile(uri, compiled)
+            self:needCompile(uri, compiled, 'child')
         end
     end
     if obj.parent then
         for uri in pairs(obj.parent) do
-            self:needCompile(uri, compiled)
+            self:needCompile(uri, compiled, 'parent')
         end
     end
 end
@@ -335,7 +339,7 @@ end
 function mt:_compileGlobal(compiled)
     local uris = self.global:getAllUris()
     for _, uri in ipairs(uris) do
-        self:needCompile(uri, compiled)
+        self:needCompile(uri, compiled, 'global')
     end
 end
 

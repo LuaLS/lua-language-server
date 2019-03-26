@@ -1,12 +1,6 @@
 local mt = {}
 mt.__index = mt
 
-function mt:compileVM(uri)
-    if not self.set[uri] and not self.get[uri] then
-        return
-    end
-end
-
 function mt:markSet(uri)
     if not uri then
         return

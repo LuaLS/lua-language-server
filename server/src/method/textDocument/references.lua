@@ -23,6 +23,7 @@ return function (lsp, params)
                 return
             end
             t:remove()
+            LastTask = nil
             vm, lines = lsp:getVM(uri)
 
             local positions = core.references(vm, position, declarat)

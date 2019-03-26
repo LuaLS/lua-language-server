@@ -153,31 +153,6 @@ function mt:callSetMetaTable(func, values, source)
     values[1]:setMetaTable(values[2])
 end
 
-function mt:getRequire(strValue, destVM)
-    -- 取出对方的主函数
-    local main = destVM.main
-    -- 获取主函数返回值
-    local mainValue = main:getFunction():getReturn(1)
-    if mainValue then
-        mainValue:markGlobal()
-    else
-        mainValue = self:createValue('any', self:getDefaultSource())
-        mainValue.uri = destVM.uri
-    end
-
-    return mainValue
-end
-
-function mt:getLoadFile(strValue, destVM)
-    -- 取出对方的主函数
-    local main = destVM.main
-    -- loadfile 的返回值就是对方的主函数
-    local mainValue = main
-    mainValue:markGlobal()
-
-    return mainValue
-end
-
 function mt:tryRequireOne(strValue, mode)
     if not self.lsp or not self.lsp.workspace then
         return nil
@@ -203,18 +178,8 @@ function mt:tryRequireOne(strValue, mode)
         end
 
         strSource:set('target uri', uri)
-        -- 如果取不到VM（不编译），则做个标记，之后再取一次
-        local destVM = self.lsp:getVM(uri)
         self.lsp:compileChain(self:getUri(), uri)
-        if destVM then
-            if mode == 'require' then
-                return self:getRequire(strValue, destVM)
-            elseif mode == 'loadfile' then
-                return self:getLoadFile(strValue, destVM)
-            elseif mode == 'dofile' then
-                return self:getRequire(strValue, destVM)
-            end
-        end
+        return self.lsp.chain:get(uri)
     end
     return nil
 end
@@ -236,7 +201,7 @@ function mt:callRequire(func, values)
     else
         local requireValue = self:tryRequireOne(values[1], 'require')
         if not requireValue then
-            requireValue = self:createValue('boolean', self:getDefaultSource())
+            requireValue = self:createValue('any', self:getDefaultSource())
             requireValue:set('cross file', true)
         end
         func:setReturn(1, requireValue)
@@ -330,7 +295,7 @@ function mt:call(value, values, source)
                 self:runFunction(func)
             end
         else
-            func:setReturn(1, self:createValue('any', source))
+            func:mergeReturn(1, self:createValue('any', source))
         end
     end
 
@@ -734,7 +699,7 @@ function mt:doReturn(action)
     local func = self:getCurrentFunction()
     values:eachValue(function (n, value)
         value.uri = self:getUri()
-        func:setReturn(n, value)
+        func:mergeReturn(n, value)
         local source = action[n] or value:getSource()
         if not source or source.start == 0 then
             source = self:getDefaultSource()
@@ -1147,6 +1112,9 @@ function mt:createEnvironment(ast)
     -- 整个文件是一个函数
     self.main = self:createFunction(ast)
     self:setCurrentFunction(self.main:getFunction())
+    if self.lsp then
+        self.main:getFunction():mergeReturn(1, self.lsp.chain:get(self.uri))
+    end
     -- 全局变量`_G`
     local global = buildGlobal(self.lsp)
     -- 隐藏的上值`_ENV`

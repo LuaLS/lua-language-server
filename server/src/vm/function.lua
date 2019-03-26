@@ -101,6 +101,20 @@ function mt:setReturn(index, value)
     end
 end
 
+function mt:mergeReturn(index, value)
+    self:set('hasReturn', true)
+    if not self.returns then
+        self.returns = createMulti()
+    end
+    if value then
+        if self.returns[index] then
+            self.returns[index]:mergeValue(value)
+        else
+            self.returns[index] = value
+        end
+    end
+end
+
 function mt:getReturn(index)
     if self.maxReturns and index and self.maxReturns < index then
         return nil

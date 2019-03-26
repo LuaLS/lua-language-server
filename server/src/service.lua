@@ -11,6 +11,7 @@ local buildVM    = require 'vm'
 local sourceMgr  = require 'vm.source'
 local localMgr   = require 'vm.local'
 local valueMgr   = require 'vm.value'
+local chainMgr   = require 'vm.chain'
 
 local ErrorCodes = {
     -- Defined by JSON RPC
@@ -708,5 +709,6 @@ return function ()
         _version = 0,
     }, mt)
     session.global = core.global(session)
+    session.chain  = chainMgr()
     return session
 end

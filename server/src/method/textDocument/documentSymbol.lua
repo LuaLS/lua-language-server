@@ -48,6 +48,7 @@ return function (lsp, params)
             end
 
             t:remove()
+            timerCache[uri] = nil
 
             local symbols = core.documentSymbol(vm)
             if not symbols then

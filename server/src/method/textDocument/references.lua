@@ -1,4 +1,5 @@
 local core = require 'core'
+local LastTask
 
 return function (lsp, params)
     local uri = params.textDocument.uri
@@ -8,15 +9,21 @@ return function (lsp, params)
         return nil
     end
 
+    if LastTask then
+        LastTask:remove()
+        LastTask = nil
+    end
+
     -- lua是从1开始的，因此都要+1
     local position = lines:positionAsChar(params.position.line + 1, params.position.character)
 
     return function (response)
-        ac.timer(0.1, 100, function (t)
+        LastTask = ac.timer(0.1, 100, function (t)
             if lsp:isWaitingCompile() then
                 return
             end
             t:remove()
+            vm, lines = lsp:getVM(uri)
 
             local positions = core.references(vm, position, declarat)
             if not positions then

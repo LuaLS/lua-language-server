@@ -317,19 +317,18 @@ function mt:_clearChainNode(obj, uri)
 end
 
 function mt:_compileChain(obj, compiled)
-    if not obj.child then
-        return
-    end
     if not compiled then
         compiled = {}
     end
-    local list = {}
-    for child in pairs(obj.child) do
-        list[#list+1] = child
+    if obj.child then
+        for uri in pairs(obj.child) do
+            self:needCompile(uri, compiled)
+        end
     end
-    table.sort(list)
-    for _, child in ipairs(list) do
-        self:needCompile(child, compiled)
+    if obj.parent then
+        for uri in pairs(obj.parent) do
+            self:needCompile(uri, compiled)
+        end
     end
 end
 

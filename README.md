@@ -2,6 +2,11 @@
 
 [![Build status](https://ci.appveyor.com/api/projects/status/0tng1g72fssvu9rr/branch/master?svg=true)](https://ci.appveyor.com/project/sumneko/vscode-lua-language-server/branch/master)
 
+### Notice
+I'm fighting against memory leaks in the current version. If the memory footprint is too high, please end the process of language service manually. VSCode will automatically restart the language service. Sorry for the inconvenience.
+
+我正在与目前版本的内存泄漏做斗争，如果内存占用过高，请手动结束语言服务的进程，VSCode会自动重启语言服务。给您带来的不便敬请谅解。
+
 ### Feature
 
 - [x] Goto Definition

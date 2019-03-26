@@ -1180,6 +1180,7 @@ local function compile(ast, lsp, uri)
     local vm = setmetatable({
         funcs   = {},
         sources = {},
+        require = {},
         main    = nil,
         env     = nil,
         lsp     = lsp,

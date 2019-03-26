@@ -274,15 +274,16 @@ function mt:mergeValue(value)
         end
     end
     value._type = self._type
-    --if value._child then
-    --    if not self._child then
-    --        self._child = {}
-    --    end
-    --    for k, v in pairs(value._child) do
-    --        self._child[k] = v
-    --    end
-    --end
-    --value._child = self._child
+
+    if value._child then
+        if not self._child then
+            self._child = {}
+        end
+        for k, v in pairs(value._child) do
+            self._child[k] = v
+        end
+    end
+    value._child = self._child
 
     for srcId, info in pairs(value._info) do
         local src = sourceMgr.list[srcId]
@@ -291,6 +292,8 @@ function mt:mergeValue(value)
             self._info[srcId] = info
         end
     end
+    value._infoCount = self._infoCount
+    value._info = self._info
 
     if value._meta then
         self._meta = value._meta

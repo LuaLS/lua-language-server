@@ -99,6 +99,11 @@ function TEST(data)
     end
 
     local vm = lsp:loadVM(mainUri)
+
+    while lsp._needCompile[1] do
+        lsp:compileVM(lsp._needCompile[1])
+    end
+
     assert(vm)
     local result = core.references(vm, pos, true)
     if expect then
@@ -121,6 +126,52 @@ TEST {
         path = 'a.lua',
         content = [[
             local <?f?> = require 'lib'
+        ]],
+    },
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            local <!f!> = require 'lib'
+        ]],
+    },
+    {
+        path = 'lib.lua',
+        content = [[
+            return <?function ()
+            end?>
+        ]],
+    },
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            <!ROOT!> = 1
+        ]],
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            print(<?ROOT?>)
+        ]],
+    },
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            <?ROOT?> = 1
+        ]],
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            print(<!ROOT!>)
         ]],
     },
 }

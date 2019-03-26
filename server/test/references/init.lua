@@ -94,3 +94,9 @@ end
 
 local <!f2!> = f()
 ]]
+
+TEST [[
+table.<!dump!>()
+function table.<?dump?>()
+end
+]]

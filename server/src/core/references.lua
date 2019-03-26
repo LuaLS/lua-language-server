@@ -18,7 +18,7 @@ local function parseResult(vm, source, declarat, callback)
             end
         end)
         loc:getValue():eachInfo(function (info, src)
-            if (declarat and (info.type == 'set' or info.type == 'local')) or info.type == 'get' then
+            if (declarat and (info.type == 'set' or info.type == 'local' or info.type == 'return')) or info.type == 'get' then
                 callback(src)
             end
         end)

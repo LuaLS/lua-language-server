@@ -8,7 +8,9 @@ local core       = require 'core'
 local lang       = require 'language'
 local updateTimer= require 'timer'
 local buildVM    = require 'vm'
-local source     = require 'vm.source'
+local sourceMgr  = require 'vm.source'
+local localMgr   = require 'vm.local'
+local valueMgr   = require 'vm.value'
 
 local ErrorCodes = {
     -- Defined by JSON RPC
@@ -622,13 +624,24 @@ function mt:_testMemory()
 
     local alivedSource = 0
     local deadSource = 0
-    for src, id in pairs(source.watch) do
-        if source.list[id] then
+    for _, id in pairs(sourceMgr.watch) do
+        if sourceMgr.list[id] then
             alivedSource = alivedSource + 1
         else
             deadSource = deadSource + 1
         end
     end
+
+    local totalLocal = 0
+    for _ in pairs(localMgr.watch) do
+        totalLocal = totalLocal + 1
+    end
+
+    local totalValue = 0
+    for _ in pairs(valueMgr.watch) do
+        totalValue = totalValue + 1
+    end
+
     local mem = collectgarbage 'count'
     log.debug(('\n\z
     State\n\z
@@ -638,14 +651,18 @@ function mt:_testMemory()
     DeadVM:   [%d]\n\z
     CachedSrc:[%d]\n\z
     AlivedSrc:[%d]\n\z
-    DeadSrc:  [%d]'):format(
+    DeadSrc:  [%d]\n\z
+    TotalLoc: [%d]\n\z
+    TotalVal: [%d]'):format(
         mem,
         cachedVM,
         aliveVM,
         deadVM,
         cachedSource,
         alivedSource,
-        deadSource
+        deadSource,
+        totalLocal,
+        totalValue
     ))
 end
 

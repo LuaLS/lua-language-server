@@ -1,4 +1,3 @@
-local createValue = require 'vm.value'
 local library = require 'core.library'
 local libraryBuilder = require 'vm.library'
 local sourceMgr = require 'vm.source'

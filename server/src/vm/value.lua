@@ -3,6 +3,7 @@ local library = require 'core.library'
 local sourceMgr = require 'vm.source'
 
 local Sort = 0
+local Watch = setmetatable({}, {__mode = 'kv'})
 
 local mt = {}
 mt.__index = mt
@@ -36,6 +37,7 @@ local function create (tp, source, literal)
     else
         self:setType(tp, 1.0)
     end
+    Watch[self] = true
     return self
 end
 
@@ -426,4 +428,7 @@ function mt:isGlobal()
     return self._global
 end
 
-return create
+return {
+    create = create,
+    watch = Watch,
+}

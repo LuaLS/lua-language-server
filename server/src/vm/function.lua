@@ -1,6 +1,6 @@
 local createMulti = require 'vm.multi'
-local createValue = require 'vm.value'
-local createLocal = require 'vm.local'
+local valueMgr = require 'vm.value'
+local localMgr = require 'vm.local'
 local sourceMgr = require 'vm.source'
 
 local mt = {}
@@ -156,7 +156,7 @@ function mt:run(vm)
     if self._runed == 1 then
         -- 如果是面向对象形式的函数，创建隐藏的参数self
         if self._objectSource then
-            local loc = createLocal('self', self._objectSource, self._objectValue)
+            local loc = localMgr.create('self', self._objectSource, self._objectValue)
             loc:set('hide', true)
             self:saveLocal('self', loc)
             self.args[#self.args+1] = loc
@@ -195,7 +195,7 @@ function mt:createArg(vm, arg)
     vm:instantSource(arg)
     arg:set('arg', true)
     if arg.type == 'name' then
-        local loc = createLocal(arg[1], arg, createValue('nil', arg))
+        local loc = localMgr.create(arg[1], arg, valueMgr.create('nil', arg))
         self:saveLocal(arg[1], loc)
         self.args[#self.args+1] = loc
     elseif arg.type == '...' then
@@ -208,7 +208,7 @@ function mt:createLibArg(arg, source)
         self._dots = createMulti()
     else
         local name = arg.name or '_'
-        local loc = createLocal(name, source, createValue('any', source))
+        local loc = localMgr.create(name, source, valueMgr.create('any', source))
         self:saveLocal(name, loc)
         self.args[#self.args+1] = loc
     end

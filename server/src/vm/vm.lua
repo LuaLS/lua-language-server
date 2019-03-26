@@ -1,6 +1,6 @@
 local library = require 'core.library'
-local createValue = require 'vm.value'
-local createLocal = require 'vm.local'
+local valueMgr = require 'vm.value'
+local localMgr = require 'vm.local'
 local createLabel = require 'vm.label'
 local createFunction = require 'vm.function'
 local sourceMgr = require 'vm.source'
@@ -338,7 +338,7 @@ function mt:call(value, values, source)
 end
 
 function mt:createValue(tp, source, literal)
-    local value = createValue(tp, source, literal)
+    local value = valueMgr.create(tp, source, literal)
     value.uri = self:getUri()
     return value
 end
@@ -476,7 +476,7 @@ function mt:getSimple(simple, max)
     local first = simple[1]
     self:instantSource(first)
     local value = self:getExp(first)
-    value = self:getFirstInMulti(value) or createValue('nil', self:getDefaultSource())
+    value = self:getFirstInMulti(value) or valueMgr.create('nil', self:getDefaultSource())
     first:bindValue(value, 'get')
     if not max then
         max = #simple
@@ -488,7 +488,7 @@ function mt:getSimple(simple, max)
         local source = simple[i]
         self:instantSource(source)
         source:set('simple', simple)
-        value = self:getFirstInMulti(value) or createValue('nil', self:getDefaultSource())
+        value = self:getFirstInMulti(value) or valueMgr.create('nil', self:getDefaultSource())
 
         if source.type == 'call' then
             local values, args = self:unpackList(source)
@@ -499,7 +499,7 @@ function mt:getSimple(simple, max)
             end
             object = nil
             source:bindCall(func, args)
-            value = self:call(func, values, source) or createValue('any', self:getDefaultSource())
+            value = self:call(func, values, source) or valueMgr.create('any', self:getDefaultSource())
         elseif source.type == 'index' then
             local child = source[1]
             local index = self:getIndex(source)
@@ -538,8 +538,8 @@ function mt:getBinary(exp)
     self:instantSource(exp)
     local v1 = self:getExp(exp[1])
     local v2 = self:getExp(exp[2])
-    v1 = self:getFirstInMulti(v1) or createValue('nil', exp[1])
-    v2 = self:getFirstInMulti(v2) or createValue('nil', exp[2])
+    v1 = self:getFirstInMulti(v1) or valueMgr.create('nil', exp[1])
+    v2 = self:getFirstInMulti(v2) or valueMgr.create('nil', exp[2])
     local op = exp.op
     -- TODO 搜索元方法
     if     op == 'or' then
@@ -778,7 +778,7 @@ end
 
 function mt:setOne(var, value)
     if not value then
-        value = createValue('nil', self:getDefaultSource())
+        value = valueMgr.create('nil', self:getDefaultSource())
     end
     self:instantSource(var)
     if var.type == 'name' then
@@ -882,7 +882,7 @@ function mt:doIn(action)
     local args = self:unpackList(action.exp)
 
     self:scopePush(action)
-    local func = table.remove(args, 1) or createValue('any', self:getDefaultSource())
+    local func = table.remove(args, 1) or valueMgr.create('any', self:getDefaultSource())
     local values = self:call(func, args, action) or createMulti()
     self:forList(action.arg, function (arg)
         local value = table.remove(values, 1)
@@ -1133,10 +1133,10 @@ function mt:createLocal(key, source, value)
     end
 
     if not value then
-        value = createValue('nil', self:getDefaultSource())
+        value = valueMgr.create('nil', self:getDefaultSource())
     end
 
-    loc = createLocal(key, source, value)
+    loc = localMgr.create(key, source, value)
     self:saveLocal(key, loc)
     self:bindLocal(source, loc, 'local')
     value:addInfo('local', source or self:getDefaultSource())

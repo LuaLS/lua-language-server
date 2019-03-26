@@ -1,6 +1,7 @@
 local sourceMgr = require 'vm.source'
 
 local Sort = 0
+local Watch = setmetatable({}, {__mode = 'kv'})
 
 local mt = {}
 mt.__index = mt
@@ -137,7 +138,7 @@ function mt:getSource()
     return sourceMgr.list[self.source]
 end
 
-return function (name, source, value)
+local function create(name, source, value)
     if not value then
         error('Local must has a value')
     end
@@ -154,5 +155,11 @@ return function (name, source, value)
         value = value,
         _info = {},
     }, mt)
+    Watch[self] = true
     return self
 end
+
+return {
+    create = create,
+    watch = Watch,
+}

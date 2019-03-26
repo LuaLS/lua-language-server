@@ -1,6 +1,3 @@
-local createValue = require 'vm.value'
-local sourceMgr = require 'vm.source'
-
 local mt = {}
 mt.__index = mt
 mt.type = 'multi'

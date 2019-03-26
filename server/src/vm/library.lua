@@ -1,6 +1,6 @@
 local sourceMgr = require 'vm.source'
 
-local createValue
+local valueMgr
 local createFunction
 
 local CHILD_CACHE = {}
@@ -13,16 +13,16 @@ function buildLibValue(lib)
     if VALUE_CACHE[lib] then
         return VALUE_CACHE[lib]
     end
-    if not createValue then
-        createValue = require 'vm.value'
+    if not valueMgr then
+        valueMgr = require 'vm.value'
         createFunction = require 'vm.function'
     end
     local tp = lib.type
     local value
     if     tp == 'table' then
-        value = createValue('table', sourceMgr.dummy())
+        value = valueMgr.create('table', sourceMgr.dummy())
     elseif tp == 'function' then
-        value = createValue('function', sourceMgr.dummy())
+        value = valueMgr.create('function', sourceMgr.dummy())
         local func = createFunction()
         value:setFunction(func)
         if lib.args then
@@ -40,17 +40,17 @@ function buildLibValue(lib)
             end
         end
     elseif tp == 'string' then
-        value = createValue('string', sourceMgr.dummy())
+        value = valueMgr.create('string', sourceMgr.dummy())
     elseif tp == 'boolean' then
-        value = createValue('boolean', sourceMgr.dummy())
+        value = valueMgr.create('boolean', sourceMgr.dummy())
     elseif tp == 'number' then
-        value = createValue('number', sourceMgr.dummy())
+        value = valueMgr.create('number', sourceMgr.dummy())
     elseif tp == 'integer' then
-        value = createValue('integer', sourceMgr.dummy())
+        value = valueMgr.create('integer', sourceMgr.dummy())
     elseif tp == 'nil' then
-        value = createValue('nil', sourceMgr.dummy())
+        value = valueMgr.create('nil', sourceMgr.dummy())
     else
-        value = createValue(tp or 'any', sourceMgr.dummy())
+        value = valueMgr.create(tp or 'any', sourceMgr.dummy())
     end
     value:setLib(lib)
     VALUE_CACHE[lib] = value
@@ -67,8 +67,8 @@ function buildLibValue(lib)
 end
 
 function buildLibChild(lib)
-    if not createValue then
-        createValue = require 'vm.value'
+    if not valueMgr then
+        valueMgr = require 'vm.value'
         createFunction = require 'vm.function'
     end
     if CHILD_CACHE[lib] then

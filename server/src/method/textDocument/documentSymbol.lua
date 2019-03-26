@@ -44,6 +44,11 @@ return function (lsp, params)
         timerCache[uri] = ac.loop(0.1, function (t)
             local vm, lines = lsp:getVM(uri)
             if not vm then
+                if not lsp:isWaitingCompile() then
+                    t:remove()
+                    timerCache[uri] = nil
+                    response(nil)
+                end
                 return
             end
 

@@ -270,12 +270,12 @@ function mt:getSource()
 end
 
 local function create(source)
-    local id
-    if source then
-        id = source.id
-        if not id then
-            error('Not instanted source')
-        end
+    if not source then
+        error('Function need source')
+    end
+    local id = source.id
+    if not id then
+        error('Not instanted source')
     end
     local self = setmetatable({
         source = id,

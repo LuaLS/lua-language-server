@@ -22,8 +22,9 @@ function buildLibValue(lib)
     if     tp == 'table' then
         value = valueMgr.create('table', sourceMgr.dummy())
     elseif tp == 'function' then
-        value = valueMgr.create('function', sourceMgr.dummy())
-        local func = functionMgr.create()
+        local dummySource = sourceMgr.dummy()
+        value = valueMgr.create('function', dummySource)
+        local func = functionMgr.create(dummySource)
         value:setFunction(func)
         if lib.args then
             for _, arg in ipairs(lib.args) do

@@ -385,6 +385,9 @@ end
 
 function mt:getFunction()
     local func = self._func
+    if not func then
+        return nil
+    end
     if not func:getSource() then
         self._func = nil
     end

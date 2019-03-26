@@ -384,6 +384,10 @@ function mt:setFunction(func)
 end
 
 function mt:getFunction()
+    local func = self._func
+    if not func:getSource() then
+        self._func = nil
+    end
     return self._func
 end
 

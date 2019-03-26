@@ -3,6 +3,8 @@ local valueMgr = require 'vm.value'
 local localMgr = require 'vm.local'
 local sourceMgr = require 'vm.source'
 
+local Watch = setmetatable({}, {__mode = 'kv'})
+
 local mt = {}
 mt.__index = mt
 mt.type = 'function'
@@ -267,7 +269,7 @@ function mt:getSource()
     return sourceMgr.list[self.source]
 end
 
-return function (source)
+local function create(source)
     local id
     if source then
         id = source.id
@@ -283,5 +285,11 @@ return function (source)
         argValues = {},
     }, mt)
     self:push(source)
+    Watch[self] = true
     return self
 end
+
+return {
+    create = create,
+    watch = Watch,
+}

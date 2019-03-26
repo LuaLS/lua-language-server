@@ -12,6 +12,7 @@ local sourceMgr  = require 'vm.source'
 local localMgr   = require 'vm.local'
 local valueMgr   = require 'vm.value'
 local chainMgr   = require 'vm.chain'
+local functionMgr= require 'vm.function'
 
 local ErrorCodes = {
     -- Defined by JSON RPC
@@ -646,6 +647,11 @@ function mt:_testMemory()
         totalValue = totalValue + 1
     end
 
+    local totalFunction = 0
+    for _ in pairs(functionMgr.watch) do
+        totalFunction = totalFunction + 1
+    end
+
     local mem = collectgarbage 'count'
     log.debug(('\n\z
     State\n\z
@@ -657,7 +663,8 @@ function mt:_testMemory()
     AlivedSrc:[%d]\n\z
     DeadSrc:  [%d]\n\z
     TotalLoc: [%d]\n\z
-    TotalVal: [%d]'):format(
+    TotalVal: [%d]\n\z
+    TotalFunc:[%d]\n\z'):format(
         mem,
         cachedVM,
         aliveVM,
@@ -666,7 +673,8 @@ function mt:_testMemory()
         alivedSource,
         deadSource,
         totalLocal,
-        totalValue
+        totalValue,
+        totalFunction
     ))
 end
 

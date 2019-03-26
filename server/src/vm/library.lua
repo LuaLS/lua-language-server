@@ -1,7 +1,7 @@
 local sourceMgr = require 'vm.source'
 
 local valueMgr
-local createFunction
+local functionMgr
 
 local CHILD_CACHE = {}
 local VALUE_CACHE = {}
@@ -15,7 +15,7 @@ function buildLibValue(lib)
     end
     if not valueMgr then
         valueMgr = require 'vm.value'
-        createFunction = require 'vm.function'
+        functionMgr = require 'vm.function'
     end
     local tp = lib.type
     local value
@@ -23,7 +23,7 @@ function buildLibValue(lib)
         value = valueMgr.create('table', sourceMgr.dummy())
     elseif tp == 'function' then
         value = valueMgr.create('function', sourceMgr.dummy())
-        local func = createFunction()
+        local func = functionMgr.create()
         value:setFunction(func)
         if lib.args then
             for _, arg in ipairs(lib.args) do
@@ -69,7 +69,7 @@ end
 function buildLibChild(lib)
     if not valueMgr then
         valueMgr = require 'vm.value'
-        createFunction = require 'vm.function'
+        functionMgr = require 'vm.function'
     end
     if CHILD_CACHE[lib] then
         return CHILD_CACHE[lib]

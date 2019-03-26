@@ -2,7 +2,7 @@ local library = require 'core.library'
 local valueMgr = require 'vm.value'
 local localMgr = require 'vm.local'
 local createLabel = require 'vm.label'
-local createFunction = require 'vm.function'
+local functionMgr = require 'vm.function'
 local sourceMgr = require 'vm.source'
 local buildGlobal = require 'vm.global'
 local createMulti = require 'vm.multi'
@@ -1008,7 +1008,7 @@ end
 
 function mt:createFunction(source)
     local value = self:createValue('function', source)
-    local func = createFunction(source)
+    local func = functionMgr.create(source)
     value:setFunction(func)
     value:setType('function', 1.0)
     if source:getUri() == self.uri then

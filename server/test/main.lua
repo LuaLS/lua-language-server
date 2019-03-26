@@ -25,7 +25,6 @@ local function main()
     end
 
     test 'core'
-    test 'full'
     test 'definition'
     test 'rename'
     test 'references'
@@ -37,6 +36,7 @@ local function main()
     test 'signature'
     test 'document_symbol'
     test 'crossfile'
+    test 'full'
 
     print('测试完成')
 end

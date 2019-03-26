@@ -18,7 +18,7 @@ return function (lsp, params)
     local position = lines:positionAsChar(params.position.line + 1, params.position.character)
 
     return function (response)
-        LastTask = ac.timer(0.1, 100, function (t)
+        LastTask = ac.loop(0.1, function (t)
             if lsp:isWaitingCompile() then
                 return
             end

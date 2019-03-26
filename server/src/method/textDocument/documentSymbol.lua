@@ -41,7 +41,7 @@ return function (lsp, params)
     end
 
     return function (response)
-        timerCache[uri] = ac.timer(0.1, 10, function (t)
+        timerCache[uri] = ac.loop(0.1, function (t)
             local vm, lines = lsp:getVM(uri)
             if not vm then
                 return

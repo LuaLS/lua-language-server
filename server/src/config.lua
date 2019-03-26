@@ -65,7 +65,7 @@ local function setConfig(self, config)
                 end
             end
         end
-        log.debug('配置更新：', table.dump(Config))
+        log.debug('Config update: ', table.dump(Config))
     end)
 end
 

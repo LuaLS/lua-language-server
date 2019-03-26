@@ -204,7 +204,7 @@ function mt:readText(uri, path, buf, compiled)
     end
     local text = buf or io.load(path)
     if not text then
-        log.debug('无法找到文件：', path)
+        log.debug('No file: ', path)
         return
     end
     self._file[uri] = {
@@ -449,7 +449,6 @@ function mt:doDiagnostics(uri)
         return
     end
     if res then
-        log.debug('诊断：', uri, obj.version)
         rpc:notify(name, {
             uri = uri,
             diagnostics = res,

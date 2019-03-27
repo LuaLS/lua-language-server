@@ -29,6 +29,7 @@ end
 function mt:pop()
     local closed = self.finishs[self._top]
     local closedLocals = self.locals[self._top]
+    self.locals[self._top] = nil
     for _, loc in pairs(closedLocals) do
         loc:close(closed)
     end

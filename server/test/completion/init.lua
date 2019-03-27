@@ -583,6 +583,11 @@ local _ = fff.kkk[#@]
     {
         label = 'fff.kkk',
         kind = CompletionItemKind.Snippet,
+        textEdit = {
+            start = 20,
+            finish = 21,
+            newText = 'fff.kkk]',
+        },
     },
 }
 

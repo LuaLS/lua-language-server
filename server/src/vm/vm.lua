@@ -637,14 +637,6 @@ function mt:getUnary(exp)
 end
 
 function mt:getExp(exp)
-    if coroutine.isyieldable() then
-        if self.lsp:isNeedCompile(self.uri) then
-            coroutine.yield()
-        else
-            self:remove()
-            coroutine.yield('stop')
-        end
-    end
     self:instantSource(exp)
     local tp = exp.type
     if     tp == 'nil' then
@@ -1129,6 +1121,9 @@ function mt:createEnvironment(ast)
 end
 
 function mt:eachSource(callback)
+    if self._removed then
+        return
+    end
     local sources = self.sources
     for i = 1, #sources do
         callback(sources[i])

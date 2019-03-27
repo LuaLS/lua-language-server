@@ -3,6 +3,8 @@ local valueMgr = require 'vm.value'
 local localMgr = require 'vm.local'
 local sourceMgr = require 'vm.source'
 
+local Id = 0
+local List = {}
 local Watch = setmetatable({}, {__mode = 'kv'})
 
 local mt = {}
@@ -296,7 +298,11 @@ function mt:getSource()
 end
 
 function mt:kill()
+    if self._removed then
+        return
+    end
     self._removed = true
+    List[self.id] = nil
 end
 
 local function create(source)
@@ -307,19 +313,23 @@ local function create(source)
     if not id then
         error('Not instanted source')
     end
+    Id = Id + 1
     local self = setmetatable({
         source = id,
+        id = id,
         locals = {},
         finishs = {},
         args = {},
         argValues = {},
     }, mt)
     self:push(source)
-    Watch[self] = true
+    Watch[self] = id
+    List[id] = self
     return self
 end
 
 return {
     create = create,
     watch = Watch,
+    list = List,
 }

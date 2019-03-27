@@ -389,6 +389,9 @@ function mt:getFunction()
     if not func then
         return nil
     end
+    if func._removed then
+        return nil
+    end
     if not func:getSource() then
         self._func = nil
     end

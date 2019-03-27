@@ -245,7 +245,11 @@ function mt:doDiagnostics(func, code, callback)
         self.datas[#self.datas+1] = data
     end)
     if coroutine.isyieldable() then
-        coroutine.yield()
+        if self.vm:isRemoved() then
+            coroutine.yield('stop')
+        else
+            coroutine.yield()
+        end
     end
 end
 

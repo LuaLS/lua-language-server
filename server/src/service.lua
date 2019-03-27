@@ -432,7 +432,7 @@ function mt:doDiagnostics(uri)
     end
     local name = 'textDocument/publishDiagnostics'
     local obj = self._file[uri]
-    if not obj or not obj.vm then
+    if not obj or not obj.vm or obj.vm:isRemoved() then
         self._needDiagnostics[uri] = nil
         self:clearDiagnostics(uri)
         return
@@ -611,10 +611,12 @@ end
 function mt:_testMemory()
     local cachedVM = 0
     local cachedSource = 0
+    local cachedFunction = 0
     for _, obj in pairs(self._file) do
-        if obj.vm then
+        if obj.vm and not obj.vm:isRemoved() then
             cachedVM = cachedVM + 1
             cachedSource = cachedSource + #obj.vm.sources
+            cachedFunction = cachedFunction + #obj.vm.funcs
         end
     end
     local aliveVM = 0
@@ -648,33 +650,51 @@ function mt:_testMemory()
     end
 
     local totalFunction = 0
-    for _ in pairs(functionMgr.watch) do
-        totalFunction = totalFunction + 1
+    local alivedFunction = 0
+    local deadFunction = 0
+    for _, id in pairs(functionMgr.watch) do
+        if functionMgr.list[id] then
+            alivedFunction = alivedFunction + 1
+        else
+            deadFunction = deadFunction + 1
+        end
     end
 
     local mem = collectgarbage 'count'
     log.debug(('\n\z
     State\n\z
-    Mem:      [%.3f]kb\n\z
-    CachedVM: [%d]\n\z
-    AlivedVM: [%d]\n\z
-    DeadVM:   [%d]\n\z
-    CachedSrc:[%d]\n\z
-    AlivedSrc:[%d]\n\z
-    DeadSrc:  [%d]\n\z
-    TotalLoc: [%d]\n\z
-    TotalVal: [%d]\n\z
-    TotalFunc:[%d]\n\z'):format(
+    Mem:       [%.3f]kb\n\z
+                   \n\z
+    CachedVM:  [%d]\n\z
+    AlivedVM:  [%d]\n\z
+    DeadVM:    [%d]\n\z
+                   \n\z
+    CachedSrc: [%d]\n\z
+    AlivedSrc: [%d]\n\z
+    DeadSrc:   [%d]\n\z
+                   \n\z
+    CachedFunc:[%d]\n\z
+    AlivedFunc:[%d]\n\z
+    DeadFunc:  [%d]\n\z
+                   \n\z
+    TotalLoc:  [%d]\n\z
+    TotalVal:  [%d]\n\z'):format(
         mem,
+
         cachedVM,
         aliveVM,
         deadVM,
+
         cachedSource,
         alivedSource,
         deadSource,
+
+        cachedFunction,
+        alivedFunction,
+        deadFunction,
+
         totalLocal,
-        totalValue,
-        totalFunction
+        totalValue
     ))
 end
 

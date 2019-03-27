@@ -18,7 +18,6 @@ function mt:getDefaultSource()
     return self:instantSource {
         start = 0,
         finish = 0,
-        uri = self:getUri(),
     }
 end
 
@@ -642,6 +641,7 @@ function mt:getExp(exp)
         if self.lsp:isNeedCompile(self.uri) then
             coroutine.yield()
         else
+            self:remove()
             coroutine.yield('stop')
         end
     end
@@ -961,6 +961,7 @@ function mt:doAction(action)
         if self.lsp:isNeedCompile(self.uri) then
             coroutine.yield()
         else
+            self:remove()
             coroutine.yield('stop')
         end
     end
@@ -1062,6 +1063,10 @@ function mt:getUri()
 end
 
 function mt:instantSource(source)
+    if self:isRemoved() then
+        error('dead vm')
+        return nil
+    end
     if sourceMgr.instant(source) then
         source:setUri(self:getUri())
         self.sources[#self.sources+1] = source
@@ -1142,6 +1147,7 @@ function mt:remove()
     for _, source in ipairs(self.sources) do
         source:kill()
     end
+    self.sources = nil
 end
 
 local function compile(ast, lsp, uri)

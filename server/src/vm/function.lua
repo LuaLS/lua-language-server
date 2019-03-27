@@ -173,7 +173,7 @@ function mt:run(vm)
     if self._runed == 1 then
         -- 如果是面向对象形式的函数，创建隐藏的参数self
         if self._objectSource then
-            local loc = localMgr.create('self', self._objectSource, self._objectValue)
+            local loc = localMgr.create('self', vm:instantSource(self._objectSource), self._objectValue)
             loc:set('hide', true)
             self:saveLocal('self', loc)
             self.args[#self.args+1] = loc

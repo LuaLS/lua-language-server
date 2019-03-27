@@ -488,14 +488,25 @@ local function searchSpecial(vm, source, word, callback, pos)
         end
     end
     -- 4. 创建代码片段
-    local label = table.concat(chars) .. '+1'
-    callback(label, nil, CompletionItemKind.Snippet, {
-        textEdit = {
-            start = inside.start + 1,
-            finish = index.finish,
-            newText = ('%s] = '):format(label),
-        },
-    })
+    if simple:get 'as action' then
+        local label = table.concat(chars) .. '+1'
+        callback(label, nil, CompletionItemKind.Snippet, {
+            textEdit = {
+                start = inside.start + 1,
+                finish = index.finish,
+                newText = ('%s] = '):format(label),
+            },
+        })
+    else
+        local label = table.concat(chars)
+        callback(label, nil, CompletionItemKind.Snippet, {
+            textEdit = {
+                start = inside.start + 1,
+                finish = index.finish,
+                newText = ('%s]'):format(label),
+            },
+        })
+    end
 end
 
 local function makeList(source, word)

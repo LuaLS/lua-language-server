@@ -974,6 +974,7 @@ function mt:doAction(action)
     elseif tp == 'simple' then
         -- call
         self:getSimple(action)
+        action:set('as action', true)
     elseif tp == 'if' then
         self:doIf(action)
     elseif tp == 'loop' then
@@ -990,6 +991,7 @@ function mt:doAction(action)
         self:doLocalFunction(action)
     else
         self:getExp(action)
+        action:set('as action', true)
     end
 end
 

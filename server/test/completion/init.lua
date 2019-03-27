@@ -577,6 +577,16 @@ fff[#ff@]
 }
 
 TEST [[
+local _ = fff.kkk[#@]
+]]
+{
+    {
+        label = 'fff.kkk',
+        kind = CompletionItemKind.Snippet,
+    },
+}
+
+TEST [[
 local t = {
     a = 1,
 }

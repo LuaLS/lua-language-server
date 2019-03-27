@@ -1,4 +1,4 @@
-local sourceMgr = require 'vm.source'
+local listMgr = require 'vm.list'
 
 local Sort = 0
 local Watch = setmetatable({}, {__mode = 'kv'})
@@ -44,7 +44,7 @@ end
 function mt:eachInfo(callback)
     local list = {}
     for srcId, info in pairs(self._info) do
-        local src = sourceMgr.list[srcId]
+        local src = listMgr.get(srcId)
         if src then
             list[#list+1] = info
         else
@@ -56,7 +56,7 @@ function mt:eachInfo(callback)
     end)
     for i = 1, #list do
         local info = list[i]
-        local res = callback(info, sourceMgr.list[info.source])
+        local res = callback(info, listMgr.get(info.source))
         if res ~= nil then
             return res
         end
@@ -117,7 +117,7 @@ function mt:close(pos)
 end
 
 function mt:getSource()
-    return sourceMgr.list[self.source]
+    return listMgr.get(self.source)
 end
 
 local function create(name, source, value)

@@ -2,9 +2,8 @@ local createMulti = require 'vm.multi'
 local valueMgr = require 'vm.value'
 local localMgr = require 'vm.local'
 local sourceMgr = require 'vm.source'
+local listMgr = require 'vm.list'
 
-local Id = 0
-local List = {}
 local Watch = setmetatable({}, {__mode = 'kv'})
 
 local mt = {}
@@ -14,7 +13,7 @@ mt._runed = 0
 mt._top = 0
 
 function mt:getSource()
-    return sourceMgr.list[self.source]
+    return listMgr.get(self.source)
 end
 
 function mt:getUri()
@@ -294,7 +293,7 @@ function mt:getSource()
     if self._removed then
         return nil
     end
-    return sourceMgr.list[self.source]
+    return listMgr.get(self.source)
 end
 
 function mt:kill()
@@ -302,7 +301,7 @@ function mt:kill()
         return
     end
     self._removed = true
-    List[self.id] = nil
+    listMgr.clear(self.id)
 end
 
 local function create(source)
@@ -313,23 +312,22 @@ local function create(source)
     if not id then
         error('Not instanted source')
     end
-    Id = Id + 1
     local self = setmetatable({
         source = id,
-        id = id,
         locals = {},
         finishs = {},
         args = {},
         argValues = {},
     }, mt)
     self:push(source)
+
+    local id = listMgr.add(self)
+    self.id = id
     Watch[self] = id
-    List[id] = self
     return self
 end
 
 return {
     create = create,
     watch = Watch,
-    list = List,
 }

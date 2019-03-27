@@ -1,6 +1,6 @@
 local libraryBuilder = require 'vm.library'
 local library = require 'core.library'
-local sourceMgr = require 'vm.source'
+local listMgr = require 'vm.list'
 
 local Sort = 0
 local Watch = setmetatable({}, {__mode = 'kv'})
@@ -45,7 +45,7 @@ local function isDeadChild(value, index)
         return false
     end
     for srcId, info in pairs(value._info) do
-        local src = sourceMgr.list[srcId]
+        local src = listMgr.get(srcId)
         if  src
             and (info.type == 'set child' or info.type == 'get child')
             and info[1] == index
@@ -207,7 +207,7 @@ function mt:rawEach(callback, foundIndex)
         local infos = self._info
         local count = 0
         for srcId, info in pairs(infos) do
-            local src = sourceMgr.list[srcId]
+            local src = listMgr.get(srcId)
             if  src
                 and (info.type == 'set child' or info.type == 'get child')
             then
@@ -288,7 +288,7 @@ function mt:mergeValue(value)
 
     local infos = self._info
     for srcId, info in pairs(value._info) do
-        local src = sourceMgr.list[srcId]
+        local src = listMgr.get(srcId)
         if src and not infos[srcId] then
             infos[srcId] = info
             infos._count = (infos._count or 0) + 1
@@ -342,7 +342,7 @@ function mt:addInfo(tp, source, ...)
     if self._global and infos._count > (infos._limit or 10) then
         local count = 0
         for srcId in pairs(infos) do
-            local src = sourceMgr.list[srcId]
+            local src = listMgr.get(srcId)
             if src then
                 count = count + 1
             else
@@ -358,7 +358,7 @@ function mt:eachInfo(callback)
     local infos = self._info
     local list = {}
     for srcId, info in pairs(infos) do
-        local src = sourceMgr.list[srcId]
+        local src = listMgr.get(srcId)
         if src then
             list[#list+1] = info
         else
@@ -372,7 +372,7 @@ function mt:eachInfo(callback)
     end)
     for i = 1, #list do
         local info = list[i]
-        local res = callback(info, sourceMgr.list[info.source])
+        local res = callback(info, listMgr.get(info.source))
         if res ~= nil then
             return res
         end
@@ -381,11 +381,12 @@ function mt:eachInfo(callback)
 end
 
 function mt:setFunction(func)
-    self._func = func
+    self._func = func.id
 end
 
 function mt:getFunction()
-    local func = self._func
+    local id = self._func
+    local func = listMgr.get(id)
     if not func then
         return nil
     end
@@ -393,9 +394,10 @@ function mt:getFunction()
         return nil
     end
     if not func:getSource() then
-        self._func = nil
+        func = nil
+        listMgr.clear(id)
     end
-    return self._func
+    return func
 end
 
 function mt:setLib(lib)
@@ -425,7 +427,7 @@ function mt:get(name)
 end
 
 function mt:getSource()
-    return sourceMgr.list[self.source]
+    return listMgr.get(self.source)
 end
 
 function mt:markGlobal()

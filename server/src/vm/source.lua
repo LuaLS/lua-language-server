@@ -1,3 +1,5 @@
+local listMgr = require 'vm.list'
+
 local mt = {}
 mt.__index = mt
 mt.uri = ''
@@ -5,8 +7,6 @@ mt.start = 0
 mt.finish = 0
 mt.id = 0
 
-local Id = 0
-local List = {}
 local Watch = setmetatable({}, {__mode = 'k'})
 
 function mt:bindLocal(loc, action)
@@ -89,7 +89,7 @@ end
 
 function mt:kill()
     self._dead = true
-    List[self.id] = nil
+    listMgr.clear(self.id)
 end
 
 function mt:isDead()
@@ -100,10 +100,9 @@ local function instant(source)
     if source.id then
         return false
     end
-    Id = Id + 1
-    source.id = Id
-    List[Id] = source
-    Watch[source] = Id
+    local id = listMgr.add(source)
+    source.id = id
+    Watch[source] = id
     setmetatable(source, mt)
     return true
 end
@@ -116,7 +115,6 @@ end
 
 return {
     instant = instant,
-    list = List,
     watch = Watch,
     dummy = dummy,
 }

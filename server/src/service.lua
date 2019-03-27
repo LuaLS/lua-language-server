@@ -13,6 +13,7 @@ local localMgr   = require 'vm.local'
 local valueMgr   = require 'vm.value'
 local chainMgr   = require 'vm.chain'
 local functionMgr= require 'vm.function'
+local listMgr    = require 'vm.list'
 
 local ErrorCodes = {
     -- Defined by JSON RPC
@@ -153,7 +154,7 @@ function mt:isWaitingCompile()
 end
 
 function mt:saveText(uri, version, text)
-    self._lastLoadedVM = nil
+    self._lastLoadedVM = uri
     local obj = self._file[uri]
     if obj then
         obj.version = version
@@ -632,7 +633,7 @@ function mt:_testMemory()
     local alivedSource = 0
     local deadSource = 0
     for _, id in pairs(sourceMgr.watch) do
-        if sourceMgr.list[id] then
+        if listMgr.get(id) then
             alivedSource = alivedSource + 1
         else
             deadSource = deadSource + 1
@@ -653,7 +654,7 @@ function mt:_testMemory()
     local alivedFunction = 0
     local deadFunction = 0
     for _, id in pairs(functionMgr.watch) do
-        if functionMgr.list[id] then
+        if listMgr.get(id) then
             alivedFunction = alivedFunction + 1
         else
             deadFunction = deadFunction + 1
@@ -664,19 +665,19 @@ function mt:_testMemory()
     log.debug(('\n\z
     State\n\z
     Mem:       [%.3f]kb\n\z
-                   \n\z
+-------------------\n\z
     CachedVM:  [%d]\n\z
     AlivedVM:  [%d]\n\z
     DeadVM:    [%d]\n\z
-                   \n\z
+-------------------\n\z
     CachedSrc: [%d]\n\z
     AlivedSrc: [%d]\n\z
     DeadSrc:   [%d]\n\z
-                   \n\z
+-------------------\n\z
     CachedFunc:[%d]\n\z
     AlivedFunc:[%d]\n\z
     DeadFunc:  [%d]\n\z
-                   \n\z
+-------------------\n\z
     TotalLoc:  [%d]\n\z
     TotalVal:  [%d]\n\z'):format(
         mem,

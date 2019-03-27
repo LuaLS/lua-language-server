@@ -63,6 +63,12 @@ local function founded(targets, results)
     return true
 end
 
+local function compileAll(lsp)
+    while lsp._needCompile[1] do
+        lsp:compileVM(lsp._needCompile[1])
+    end
+end
+
 function TEST(data)
     local lsp = service()
     local ws = workspace(lsp, 'test')
@@ -72,6 +78,10 @@ function TEST(data)
     local mainUri
     local pos
     local expect = {}
+    for _, info in ipairs(data) do
+        local uri = ws:uriEncode(fs.path(info.path))
+        ws:addFile(uri)
+    end
     for _, info in ipairs(data) do
         local uri = ws:uriEncode(fs.path(info.path))
         local script = info.content
@@ -91,18 +101,12 @@ function TEST(data)
         end
         local newScript = script:gsub('<[!?]', '  '):gsub('[!?]>', '  ')
         lsp:saveText(uri, 1, newScript)
-        ws:addFile(uri)
-    end
-
-    while lsp._needCompile[1] do
-        lsp:compileVM(lsp._needCompile[1])
+        compileAll(lsp)
     end
 
     local vm = lsp:loadVM(mainUri)
 
-    while lsp._needCompile[1] do
-        lsp:compileVM(lsp._needCompile[1])
-    end
+    compileAll(lsp)
 
     assert(vm)
     local result = core.references(vm, pos, true)
@@ -172,6 +176,39 @@ TEST {
         path = 'b.lua',
         content = [[
             print(<!ROOT!>)
+        ]],
+    },
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            return <?function () end?>
+        ]],
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            local t = require 'a'
+        ]],
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            local t = require 'a'
+        ]],
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            local t = require 'a'
+        ]],
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            local <!t!> = require 'a'
         ]],
     },
 }

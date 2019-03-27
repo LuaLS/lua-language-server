@@ -1150,15 +1150,7 @@ function mt:remove()
     self.sources = nil
 end
 
-local function compile(ast, lsp, uri)
-    local vm = setmetatable({
-        funcs   = {},
-        sources = {},
-        main    = nil,
-        env     = nil,
-        lsp     = lsp,
-        uri     = uri or '',
-    }, mt)
+local function compile(vm, ast, lsp, uri)
 
     -- 创建初始环境
     ast.uri = vm.uri
@@ -1175,8 +1167,17 @@ return function (ast, lsp, uri)
     if not ast then
         return nil
     end
-    local suc, res = xpcall(compile, log.error, ast, lsp, uri)
+    local vm = setmetatable({
+        funcs   = {},
+        sources = {},
+        main    = nil,
+        env     = nil,
+        lsp     = lsp,
+        uri     = uri or '',
+    }, mt)
+    local suc, res = xpcall(compile, log.error, vm, ast, lsp, uri)
     if not suc then
+        vm:remove()
         return nil, res
     end
     return res

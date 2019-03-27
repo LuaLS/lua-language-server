@@ -21,6 +21,9 @@ function mt:getUri()
 end
 
 function mt:push(source)
+    if self._removed then
+        return
+    end
     self._top = self._top + 1
     self.locals[self._top] = {}
     self.finishs[self._top] = source and source.finish or math.maxinteger
@@ -37,6 +40,9 @@ function mt:pop()
 end
 
 function mt:saveLocal(name, loc)
+    if self._removed then
+        return
+    end
     if loc.type ~= 'local' then
         error('saveLocal必须是local')
     end
@@ -76,6 +82,9 @@ function mt:eachLocal(callback)
 end
 
 function mt:saveLabel(label)
+    if self._removed then
+        return
+    end
     if not self._label then
         self._label = {}
     end
@@ -95,6 +104,9 @@ function mt:loadLabel(name)
 end
 
 function mt:setReturn(index, value)
+    if self._removed then
+        return
+    end
     self:set('hasReturn', true)
     if not self.returns then
         self.returns = createMulti()
@@ -105,6 +117,9 @@ function mt:setReturn(index, value)
 end
 
 function mt:mergeReturn(index, value)
+    if self._removed then
+        return
+    end
     self:set('hasReturn', true)
     if not self.returns then
         self.returns = createMulti()
@@ -119,6 +134,9 @@ function mt:mergeReturn(index, value)
 end
 
 function mt:getReturn(index)
+    if self._removed then
+        return nil
+    end
     if self.maxReturns and index and self.maxReturns < index then
         return nil
     end
@@ -164,10 +182,14 @@ function mt:needSkip()
 end
 
 function mt:run(vm)
-    self._runed = self._runed + 1
+    if self._removed then
+        return
+    end
     if not self:getSource() then
         return
     end
+
+    self._runed = self._runed + 1
 
     -- 第一次运行函数时，创建函数的参数
     if self._runed == 1 then
@@ -267,7 +289,14 @@ function mt:get(name)
 end
 
 function mt:getSource()
+    if self._removed then
+        return nil
+    end
     return sourceMgr.list[self.source]
+end
+
+function mt:kill()
+    self._removed = true
 end
 
 local function create(source)

@@ -1148,6 +1148,10 @@ function mt:remove()
         source:kill()
     end
     self.sources = nil
+    for _, func in ipairs(self.funcs) do
+        func:kill()
+    end
+    self.funcs = nil
 end
 
 local function compile(vm, ast, lsp, uri)

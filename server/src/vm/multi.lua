@@ -21,9 +21,6 @@ function mt:push(value, isLast)
 end
 
 function mt:get(index)
-    if index > self.len then
-        self.len = index
-    end
     return self[index]
 end
 

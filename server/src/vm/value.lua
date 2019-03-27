@@ -359,9 +359,9 @@ function mt:eachInfo(callback)
             list[#list+1] = info
         else
             self._info[srcId] = nil
-            self._infoCount = self._infoCount - 1
         end
     end
+    self._infoCount = #list
     table.sort(list, function (a, b)
         return a._sort < b._sort
     end)

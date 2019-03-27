@@ -9,8 +9,6 @@ local mt = {}
 mt.__index = mt
 mt.type = 'value'
 mt.uri = ''
-mt._infoCount = 0
-mt._infoLimit = 10
 mt._global = false
 
 local function create (tp, source, literal)
@@ -206,14 +204,21 @@ function mt:rawEach(callback, foundIndex)
     -- 非全局值不会出现dead child
     if self._global then
         alived = {}
-        for srcId, info in pairs(self._info) do
+        local infos = self._info
+        local count = 0
+        for srcId, info in pairs(infos) do
             local src = sourceMgr.list[srcId]
             if  src
                 and (info.type == 'set child' or info.type == 'get child')
             then
                 alived[info[1]] = true
+                count = count + 1
+            else
+                infos[srcId] = nil
             end
         end
+        infos._count = count
+        infos._limit = count + 10
     end
     for index, value in pairs(self._child) do
         if foundIndex then
@@ -281,15 +286,15 @@ function mt:mergeValue(value)
     end
     value._child = self._child
 
+    local infos = self._info
     for srcId, info in pairs(value._info) do
         local src = sourceMgr.list[srcId]
-        if src and not self._info[srcId] then
-            self._infoCount = self._infoCount + 1
-            self._info[srcId] = info
+        if src and not infos[srcId] then
+            infos[srcId] = info
+            infos._count = (infos._count or 0) + 1
         end
     end
-    value._infoCount = self._infoCount
-    value._info = self._info
+    value._info = infos
 
     if value._meta then
         self._meta = value._meta
@@ -319,7 +324,9 @@ function mt:addInfo(tp, source, ...)
     if not tp then
         error('Miss info type')
     end
-    if self._info[id] then
+
+    local infos = self._info
+    if infos[id] then
         return
     end
     Sort = Sort + 1
@@ -329,39 +336,37 @@ function mt:addInfo(tp, source, ...)
         _sort = Sort,
         ...
     }
-    self._info[id] = info
-    self._infoCount = self._infoCount + 1
-
+    infos[id] = info
+    infos._count = (infos._count or 0) + 1
     -- 只有全局值需要压缩info
-    if self._global and self._infoCount > self._infoLimit then
+    if self._global and infos._count > (infos._limit or 10) then
         local count = 0
-        for srcId in pairs(self._info) do
+        for srcId in pairs(infos) do
             local src = sourceMgr.list[srcId]
             if src then
                 count = count + 1
             else
-                self._info[srcId] = nil
+                infos[srcId] = nil
             end
         end
-        self._infoCount = count
-        self._infoLimit = count * 2
-        if self._infoLimit < 10 then
-            self._infoLimit = 10
-        end
+        infos._count = count
+        infos._limit = count + 10
     end
 end
 
 function mt:eachInfo(callback)
+    local infos = self._info
     local list = {}
-    for srcId, info in pairs(self._info) do
+    for srcId, info in pairs(infos) do
         local src = sourceMgr.list[srcId]
         if src then
             list[#list+1] = info
         else
-            self._info[srcId] = nil
+            infos[srcId] = nil
         end
     end
-    self._infoCount = #list
+    infos._count = #list
+    infos._limit = infos._count + 10
     table.sort(list, function (a, b)
         return a._sort < b._sort
     end)

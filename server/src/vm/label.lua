@@ -5,8 +5,6 @@ local Sort = 0
 local mt = {}
 mt.__index = mt
 mt.type = 'label'
-mt._infoCount = 0
-mt._infoLimit = 10
 
 function mt:getName()
     return self.name
@@ -31,21 +29,6 @@ function mt:addInfo(tp, source)
     }
 
     self._info[id] = info
-    self._infoCount = self._infoCount + 1
-
-    if self._infoCount > self._infoLimit then
-        for srcId in pairs(self._info) do
-            local src = sourceMgr.list[srcId]
-            if not src then
-                self._info[srcId] = nil
-                self._infoCount = self._infoCount - 1
-            end
-        end
-        self._infoLimit = self._infoCount * 2
-        if self._infoLimit < 10 then
-            self._infoLimit = 10
-        end
-    end
 end
 
 function mt:eachInfo(callback)
@@ -56,7 +39,6 @@ function mt:eachInfo(callback)
             list[#list+1] = info
         else
             self._info[srcId] = nil
-            self._infoCount = self._infoCount - 1
         end
     end
     table.sort(list, function (a, b)

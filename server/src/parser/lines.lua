@@ -102,13 +102,11 @@ local function isCharByte(byte)
 end
 
 function mt:positionAsChar(row, col, code)
-    local pos = self:position(row, col+1, code)
+    local pos = self:position(row, col, code)
     if isCharByte(self.buf:byte(pos, pos)) then
         return pos
     elseif isCharByte(self.buf:byte(pos+1, pos+1)) then
         return pos + 1
-    elseif isCharByte(self.buf:byte(pos-1, pos-1)) then
-        return pos - 1
     end
     return pos
 end

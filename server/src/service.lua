@@ -249,7 +249,7 @@ function mt:reDiagnostic()
     end
 end
 
-function mt:ClearAllFiles()
+function mt:clearAllFiles()
     for uri in pairs(self._file) do
         self:removeText(uri)
         self:clearDiagnostics(uri)

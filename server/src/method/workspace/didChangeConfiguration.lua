@@ -58,7 +58,7 @@ return function (lsp)
             lsp:reDiagnostic()
         end
         if not eq(oldConfig.workspace, newConfig.workspace) then
-            lsp:ClearAllFiles()
+            lsp:clearAllFiles()
             lsp.workspace:scanFiles()
         end
     end)

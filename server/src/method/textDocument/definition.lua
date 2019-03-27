@@ -10,12 +10,13 @@ local function checkWorkSpaceComplete(lsp, source)
     lsp:checkWorkSpaceComplete()
 end
 
-return function (lsp, params)
+local function findResult(lsp, params)
     local uri = params.textDocument.uri
     local vm, lines = lsp:loadVM(uri)
     if not vm then
         return nil
     end
+
     -- lua是从1开始的，因此都要+1
     local position = lines:positionAsChar(params.position.line + 1, params.position.character)
     local source = core.findSource(vm, position)
@@ -54,7 +55,33 @@ return function (lsp, params)
         end
     end
 
-    local response = locations
+    if #locations == 0 then
+        return nil
+    end
 
-    return response
+    return locations
+end
+
+local LastTask
+
+return function (lsp, params)
+    if LastTask then
+        LastTask:remove()
+        LastTask = nil
+    end
+    local result = findResult(lsp, params)
+    if result then
+        return result
+    end
+    return function (response)
+        LastTask = ac.loop(0.1, function ()
+            if lsp:isWaitingCompile() then
+                return
+            end
+            LastTask:remove()
+            LastTask = nil
+            local result = findResult(lsp, params)
+            response(result)
+        end)
+    end
 end

@@ -27,6 +27,7 @@ I'm fighting against memory leaks in the current version. If the memory footprin
 - [ ] Multi Workspace
 - [ ] Type Format
 - [ ] Code Action
+- [ ] Highlight
 
 ### Locale
 

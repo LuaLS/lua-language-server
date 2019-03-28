@@ -106,7 +106,7 @@ function mt:searchUnusedLabel(callback)
 end
 
 local function isContainPos(obj, start, finish)
-    if obj.start <= start and obj.finish + 1 >= finish then
+    if obj.start <= start and obj.finish >= finish then
         return true
     end
     return false

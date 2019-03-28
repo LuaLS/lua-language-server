@@ -43,6 +43,7 @@ return function (lsp)
                 commands = {
                     'config',
                     'removeSpace',
+                    'solve',
                 },
             },
         }

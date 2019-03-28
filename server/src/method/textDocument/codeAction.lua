@@ -60,6 +60,44 @@ local function solveTrailingSpace(lsp, uri, data, callback)
     }
 end
 
+local function solveNewlineCall(lsp, uri, data, callback)
+    callback {
+        title = '添加 `;`',
+        kind = 'quickfix',
+        edit = {
+            changes = {
+                [uri] = {
+                    {
+                        range = {
+                            start = data.range.start,
+                            ['end'] = data.range.start,
+                        },
+                        newText = ';',
+                    }
+                }
+            }
+        }
+    }
+end
+
+local function solveAmbiguity1(lsp, uri, data, callback)
+    callback {
+        title = '添加括号',
+        kind = 'quickfix',
+        command = {
+            title = '添加括号',
+            command = 'solve',
+            arguments = {
+                {
+                    name = 'ambiguity-1',
+                    uri = uri,
+                    range = data.range,
+                }
+            }
+        },
+    }
+end
+
 local function solveDiagnostic(lsp, uri, data, callback)
     if data.code then
         disableDiagnostic(lsp, uri, data, callback)
@@ -69,6 +107,12 @@ local function solveDiagnostic(lsp, uri, data, callback)
     end
     if data.code == 'trailing-space' then
         solveTrailingSpace(lsp, uri, data, callback)
+    end
+    if data.code == 'newline-call' then
+        solveNewlineCall(lsp, uri, data, callback)
+    end
+    if data.code == 'ambiguity-1' then
+        solveAmbiguity1(lsp, uri, data, callback)
     end
 end
 

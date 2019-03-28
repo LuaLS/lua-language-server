@@ -1128,7 +1128,10 @@ function mt:eachSource(callback)
     end
     local sources = self.sources
     for i = 1, #sources do
-        callback(sources[i])
+        local res = callback(sources[i])
+        if res ~= nil then
+            return res
+        end
     end
 end
 

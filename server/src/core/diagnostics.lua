@@ -329,7 +329,7 @@ return function (vm, lines, uri)
     -- x or 0 + 1
     session:doDiagnostics(session.searchAmbiguity1, 'ambiguity-1', function (op, num)
         return {
-            level   = DiagnosticSeverity.Information,
+            level   = DiagnosticSeverity.Warning,
             message = lang.script('DIAG_AMBIGUITY_1', op, num),
         }
     end)

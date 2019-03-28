@@ -118,6 +118,54 @@ function command.removeSpace(lsp, data)
     })
 end
 
+function command.solve(lsp, data)
+    local uri = data.uri
+    local vm, lines = lsp:getVM(uri)
+    if not vm then
+        return
+    end
+
+    local start = lines:position(data.range.start.line + 1, data.range.start.character + 1)
+    local finish = lines:position(data.range['end'].line + 1, data.range['end'].character)
+
+    local source = vm:eachSource(function (source)
+        if source.op ~= 'or' then
+            return
+        end
+        local exp = source[2]
+        if exp.op ~= '+' and exp.op ~= '-' then
+            return
+        end
+        if exp[1][1] == 0 and exp[2].type == 'number' then
+            if source.start == start and source.finish == finish then
+                return source
+            end
+        end
+    end)
+
+    if not source then
+        return
+    end
+
+    rpc:request('workspace/applyEdit', {
+        label = '添加括号',
+        edit = {
+            changes = {
+                [uri] = {
+                    {
+                        range = posToRange(lines, source.start, source.start - 1),
+                        newText = '(',
+                    },
+                    {
+                        range = posToRange(lines, source[2][1].finish + 1, source[2][1].finish),
+                        newText = ')',
+                    },
+                }
+            }
+        },
+    })
+end
+
 return function (lsp, params)
     local name = params.command
     if not command[name] then

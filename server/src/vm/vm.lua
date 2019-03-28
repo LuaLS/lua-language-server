@@ -742,6 +742,7 @@ function mt:setOne(var, value)
         self:setName(var[1], var, value)
     elseif var.type == 'simple' then
         local parent = self:getSimple(var, -2)
+        parent = self:getFirstInMulti(parent)
         local key = var[#var]
         self:instantSource(key)
         key:set('simple', var)

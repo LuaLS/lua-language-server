@@ -7,6 +7,7 @@ DIAG_UNUSED_LABEL       = 'Unused label `{}`.'
 DIAG_REDEFINED_LOCAL    = 'Redefined local `{}`.'
 DIAG_PREVIOUS_CALL      = 'Parsed as function call for the previous line. It may be necessary to add a `;` before.'
 DIAG_OVER_MAX_ARGS      = 'The function takes only {:d} parameters, but you passed {:d}.'
+DIAG_AMBIGUITY_1        = 'Compute `0 {op} {num}` first. You may need to add a bracket.'
 DIAG_DIAGNOSTICS        = 'Diagnostics'
 DIAG_SYNTAX_CHECK       = 'Syntax Check'
 

@@ -233,6 +233,21 @@ function mt:searchRedundantParameters(callback)
     end)
 end
 
+function mt:searchAmbiguity1(callback)
+    self.vm:eachSource(function (source)
+        if source.op ~= 'or' then
+            return
+        end
+        local exp = source[2]
+        if exp.op ~= '+' and exp.op ~= '-' then
+            return
+        end
+        if exp[1][1] == 0 and exp[2].type == 'number' then
+            callback(source.start, source.finish, exp.op, exp[2][1])
+        end
+    end)
+end
+
 function mt:doDiagnostics(func, code, callback)
     if config.config.diagnostics.disable[code] then
         return
@@ -309,6 +324,13 @@ return function (vm, lines, uri)
         return {
             level   = DiagnosticSeverity.Information,
             message = lang.script('DIAG_OVER_MAX_ARGS', max, passed),
+        }
+    end)
+    -- x or 0 + 1
+    session:doDiagnostics(session.searchAmbiguity1, 'ambiguity-1', function (op, num)
+        return {
+            level   = DiagnosticSeverity.Information,
+            message = lang.script('DIAG_AMBIGUITY_1', op, num),
         }
     end)
     return session.datas

@@ -725,7 +725,11 @@ function mt:listen()
 
         local delta = os.clock() - clock
         clock = os.clock()
-        updateTimer(delta)
+        local suc, err = xpcall(updateTimer, log.error, delta)
+        if not suc then
+            io.stderr:write(err)
+            io.stderr:flush()
+        end
         thread.sleep(0.001)
     end
 end

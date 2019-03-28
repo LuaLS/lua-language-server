@@ -35,7 +35,7 @@ local function parseResult(source, newName)
         end)
         return positions
     end
-    if source:bindValue() then
+    if source:bindValue() and source:get 'parent' then
         if source:get 'in index' then
             if not parser.grammar(newName, 'Exp') then
                 return positions

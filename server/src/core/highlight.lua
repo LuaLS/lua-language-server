@@ -26,7 +26,7 @@ local function parseResult(source)
         end)
         return positions
     end
-    if source:bindValue() then
+    if source:bindValue() and source:get 'parent' then
         local parent = source:get 'parent'
         local mark = {}
         parent:eachInfo(function (info, src)

@@ -720,6 +720,7 @@ function mt:listen()
 
     local clock = os.clock()
     while true do
+        local startClock = os.clock()
         async.onTick()
         self:onTick()
 
@@ -730,7 +731,13 @@ function mt:listen()
             io.stderr:write(err)
             io.stderr:flush()
         end
-        thread.sleep(0.001)
+
+        local passedClock = os.clock() - startClock
+        if passedClock > 0.1 then
+            thread.sleep(0.0)
+        else
+            thread.sleep(0.001)
+        end
     end
 end
 

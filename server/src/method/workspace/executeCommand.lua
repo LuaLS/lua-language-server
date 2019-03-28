@@ -57,7 +57,7 @@ function command.config(lsp, data)
         fs.create_directories(vscodePath)
     end
 
-    local setting = json.decode(settingBuf, true) or {}
+    local setting = json.decode(settingBuf or '', true) or {}
     local key = 'Lua.' .. table.concat(data.key, '.')
     local attr = setting[key]
 

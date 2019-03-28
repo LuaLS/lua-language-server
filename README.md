@@ -19,9 +19,9 @@
 - [x] Syntax Check
 - [x] Search Globals
 - [x] Highlight
+- [x] Code Action
 - [ ] Multi Workspace
 - [ ] Type Format
-- [ ] Code Action
 
 ### Locale
 

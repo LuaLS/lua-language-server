@@ -610,6 +610,7 @@ function mt:restartDueToMemoryLeak()
 end
 
 function mt:_testMemory()
+    collectgarbage()
     local cachedVM = 0
     local cachedSource = 0
     local cachedFunction = 0

@@ -11,7 +11,7 @@ I'm fighting against memory leaks in the current version. If the memory footprin
 
 - [x] Goto Definition
 - [x] Goto Implementation
-- [x] Find References
+- [x] Find All References
 - [x] Type Inference
 - [x] Hover
 - [x] Diagnostics
@@ -23,11 +23,10 @@ I'm fighting against memory leaks in the current version. If the memory footprin
 - [x] Support Dirty Script
 - [x] Syntax Check
 - [x] Search Globals
-- [x] Find All References
+- [x] Highlight
 - [ ] Multi Workspace
 - [ ] Type Format
 - [ ] Code Action
-- [ ] Highlight
 
 ### Locale
 

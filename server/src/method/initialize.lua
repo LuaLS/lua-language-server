@@ -17,7 +17,7 @@ return function (lsp)
             referencesProvider = true,
             renameProvider = true,
             documentSymbolProvider = true,
-            --documentHighlightProvider = true,
+            documentHighlightProvider = true,
             signatureHelpProvider = {
                 triggerCharacters = { '(', ',' },
             },

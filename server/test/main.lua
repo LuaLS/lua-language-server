@@ -27,6 +27,7 @@ local function main()
     test 'core'
     test 'definition'
     test 'rename'
+    test 'highlight'
     test 'references'
     test 'diagnostics'
     test 'type_inference'

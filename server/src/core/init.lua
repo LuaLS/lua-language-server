@@ -11,6 +11,7 @@ local api = {
     signature      = require 'core.signature',
     documentSymbol = require 'core.document_symbol',
     global         = require 'core.global',
+    highlight      = require 'core.highlight',
 }
 
 return api

@@ -1,9 +1,11 @@
+local lang = require 'language'
+
 local function disableDiagnostic(lsp, uri, data, callback)
     callback {
-        title = ('禁用诊断(%s)'):format(data.code),
+        title = lang.script('ACTION_DISABLE_DIAG', data.code),
         kind = 'quickfix',
         command = {
-            title = '禁用诊断',
+            title = lang.script.COMMAND_DISABLE_DIAG,
             command = 'config',
             arguments = {
                 {
@@ -28,10 +30,10 @@ local function solveUndefinedGlobal(lsp, uri, data, callback)
         return
     end
     callback {
-        title = ('标记 `%s` 为已定义的全局变量'):format(name),
+        title = lang.script('ACTION_MARK_GLOBAL', name),
         kind = 'quickfix',
         command = {
-            title = '标记全局变量',
+            title = lang.script.COMMAND_MARK_GLOBAL,
             command = 'config',
             arguments = {
                 {
@@ -46,10 +48,10 @@ end
 
 local function solveTrailingSpace(lsp, uri, data, callback)
     callback {
-        title = '清除所有后置空格',
+        title = lang.script.ACTION_REMOVE_SPACE,
         kind = 'quickfix',
         command = {
-            title = '清除所有后置空格',
+            title = lang.script.COMMAND_REMOVE_SPACE,
             command = 'removeSpace',
             arguments = {
                 {
@@ -62,7 +64,7 @@ end
 
 local function solveNewlineCall(lsp, uri, data, callback)
     callback {
-        title = '添加 `;`',
+        title = lang.script.ACTION_ADD_SEMICOLON,
         kind = 'quickfix',
         edit = {
             changes = {
@@ -82,10 +84,10 @@ end
 
 local function solveAmbiguity1(lsp, uri, data, callback)
     callback {
-        title = '添加括号',
+        title = lang.script.ACTION_ADD_BRACKETS,
         kind = 'quickfix',
         command = {
-            title = '添加括号',
+            title = lang.script.COMMAND_ADD_BRACKETS,
             command = 'solve',
             arguments = {
                 {

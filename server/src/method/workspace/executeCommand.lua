@@ -2,6 +2,7 @@ local fs = require 'bee.filesystem'
 local json = require 'json'
 local config = require 'config'
 local rpc = require 'rpc'
+local lang = require 'language'
 
 local command = {}
 
@@ -109,7 +110,7 @@ function command.removeSpace(lsp, data)
     end
 
     rpc:request('workspace/applyEdit', {
-        label = '清除所有后置空格',
+        label = lang.script.COMMAND_REMOVE_SPACE,
         edit = {
             changes = {
                 [uri] = textEdit,
@@ -148,7 +149,7 @@ function command.solve(lsp, data)
     end
 
     rpc:request('workspace/applyEdit', {
-        label = '添加括号',
+        label = lang.script.COMMAND_ADD_BRACKETS,
         edit = {
             changes = {
                 [uri] = {

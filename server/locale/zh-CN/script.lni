@@ -41,5 +41,16 @@ PARSER_REDEFINE_LABEL   = '标签`{label}`重复定义。'
 
 SYMBOL_ANONYMOUS        = '<匿名函数>'
 
+ACTION_DISABLE_DIAG     = '禁用诊断({})'
+ACTION_MARK_GLOBAL      = '标记 `{}` 为已定义的全局变量'
+ACTION_REMOVE_SPACE     = '清除所有后置空格'
+ACTION_ADD_SEMICOLON    = '添加 `;`'
+ACTION_ADD_BRACKETS     = '添加括号'
+
+COMMAND_DISABLE_DIAG    = '禁用诊断'
+COMMAND_MARK_GLOBAL     = '标记全局变量'
+COMMAND_REMOVE_SPACE    = '清除所有后置空格'
+COMMAND_ADD_BRACKETS    = '添加括号'
+
 DEBUG_MEMORY_LEAK       = '{} 很抱歉发生了严重的内存泄漏，语言服务即将重启。'
 DEBUG_RESTART_NOW       = '立即重启'

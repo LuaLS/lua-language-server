@@ -167,6 +167,9 @@ local function buildFunction(vm, source, used, callback)
     end
     local name = getName(source.name)
     local func = value:getFunction()
+    if not func then
+        return
+    end
     local hvr = hoverFunction(name, func, func:getObject())
     if not hvr then
         return

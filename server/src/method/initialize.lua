@@ -41,7 +41,8 @@ return function (lsp)
             },
             executeCommandProvider = {
                 commands = {
-                    'config'
+                    'config',
+                    'removeSpace',
                 },
             },
         }

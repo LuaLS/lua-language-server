@@ -30,7 +30,7 @@ local function parseResult(source)
         local parent = source:get 'parent'
         local mark = {}
         parent:eachInfo(function (info, src)
-            if not mark[src] then
+            if not mark[src] and source.uri == src.uri then
                 mark[src] = info
                 if info.type == 'get child' or info.type == 'set child' then
                     if info[1] == source[1] then

@@ -99,8 +99,8 @@ local function solveAmbiguity1(lsp, uri, data, callback)
 end
 
 local function solveDiagnostic(lsp, uri, data, callback)
-    if data.code then
-        disableDiagnostic(lsp, uri, data, callback)
+    if not data.code then
+        return
     end
     if data.code == 'undefined-global' then
         solveUndefinedGlobal(lsp, uri, data, callback)
@@ -114,6 +114,7 @@ local function solveDiagnostic(lsp, uri, data, callback)
     if data.code == 'ambiguity-1' then
         solveAmbiguity1(lsp, uri, data, callback)
     end
+    disableDiagnostic(lsp, uri, data, callback)
 end
 
 return function (lsp, params)

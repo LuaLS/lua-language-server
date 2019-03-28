@@ -1,5 +1,4 @@
 return function (lsp, params)
-    log.debug(table.dump(params))
     local uri = params.textDocument.uri
     local result = {}
 
@@ -13,16 +12,16 @@ return function (lsp, params)
                     title = '测试',
                     command = 'config',
                     arguments = {
-                        key = {'diagnostics', 'disable'},
-                        action = 'add',
-                        value = data.code,
+                        {
+                            key = {'diagnostics', 'disable'},
+                            action = 'add',
+                            value = data.code,
+                        }
                     }
                 }
             }
         end
     end
-
-    log.debug(table.dump(result))
 
     if #result == 0 then
         return nil

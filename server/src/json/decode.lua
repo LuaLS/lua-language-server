@@ -119,10 +119,12 @@ local Token = P
 
 return function (str, save_sort_)
     save_sort = save_sort_
-    local table, pos = Token:match(str)
-    if not pos or pos <= #str then
-        pos = pos or 1
-        error(('没匹配完[%s]\n%s'):format(pos, str:sub(pos, pos+100)))
+    local table, res, pos = Token:match(str)
+    if not table then
+        if not pos or pos <= #str then
+            pos = pos or 1
+            error(('没匹配完[%s][%s]\n%s'):format(pos, res, str:sub(pos, pos+100)))
+        end
     end
     return table
 end

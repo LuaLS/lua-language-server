@@ -39,6 +39,11 @@ return function (lsp)
                     changeNotifications = true,
                 }
             },
+            executeCommandProvider = {
+                commands = {
+                    'config'
+                },
+            },
         }
     }
 end

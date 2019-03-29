@@ -1,6 +1,7 @@
 local lang = require 'language'
 local config = require 'config'
 local library = require 'core.library'
+local buildGlobal = require 'vm.global'
 
 local DiagnosticSeverity = {
     Error       = 1,
@@ -44,6 +45,13 @@ function mt:searchUndefinedGlobal(callback)
     for name in pairs(config.config.diagnostics.globals) do
         definedGlobal[name] = true
     end
+    local envValue = buildGlobal(self.vm.lsp)
+    envValue:eachInfo(function (info)
+        if info.type == 'set child' then
+            local name = info[1]
+            definedGlobal[name] = true
+        end
+    end)
     self.vm:eachSource(function (source)
         if not source:get 'global' then
             return
@@ -56,22 +64,23 @@ function mt:searchUndefinedGlobal(callback)
         if not value then
             return
         end
+        if not value:isGlobal() then
+            -- 上文重载了 _ENV 的情况
+            local ok = value:eachInfo(function (info)
+                if info.type == 'set' then
+                    return true
+                end
+            end)
+            if ok then
+                return
+            end
+            callback(source.start, source.finish, name)
+            return
+        end
         if definedGlobal[name] then
             return
         end
-        local parent = source:get 'parent'
-        if not parent then
-            return
-        end
-        local ok = parent:eachInfo(function (info, src)
-            if info.type == 'set child' and info[1] == name then
-                return true
-            end
-            if src == source then
-                return false
-            end
-        end)
-        if ok then
+        if type(name) ~= 'string' then
             return
         end
         callback(source.start, source.finish, name)

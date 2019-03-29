@@ -612,7 +612,7 @@ end
 function mt:_testMemory()
     local clock = os.clock()
     collectgarbage()
-    log.debug('collectgarbage: ', os.clock() - clock)
+    log.debug('collectgarbage: ', ('%.3f'):format(os.clock() - clock))
 
     local clock = os.clock()
     local cachedVM = 0
@@ -702,7 +702,7 @@ function mt:_testMemory()
         totalLocal,
         totalValue
     ))
-    log.debug('test memory: ', os.clock() - clock)
+    log.debug('test memory: ', ('%.3f'):format(os.clock() - clock))
 end
 
 function mt:onTick()

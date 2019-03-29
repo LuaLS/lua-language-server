@@ -136,6 +136,7 @@ function mt:getLibChild(index)
         local childs = libraryBuilder.child(lib)
         return childs[index]
     end
+    return nil
 end
 
 function mt:eachLibChild(callback)
@@ -149,30 +150,23 @@ function mt:eachLibChild(callback)
     end
 end
 
-local function finishGetChild(self, index, source, mark)
-    self:setType('table', 0.5)
-    local value = self:rawGet(index)
-    if value then
-        return value
-    end
-    local method = self:getMetaMethod('__index')
-    if not method then
-        local v = self:getLibChild(index)
-        return v
-    end
-    if not mark then
-        mark = {}
-    end
-    if mark[method] then
-        return nil
-    end
-    mark[method] = true
-
-    return finishGetChild(method, index, source, mark)
-end
-
 function mt:getChild(index, source)
-    local value = finishGetChild(self, index)
+    self:setType('table', 0.5)
+    local parent = self
+    local value
+    -- 最多检查3层 __index
+    for _ = 1, 3 do
+        value = parent:rawGet(index)
+        if value then
+            break
+        end
+        local method = parent:getMetaMethod('__index')
+        if not method then
+            value = parent:getLibChild(index)
+            break
+        end
+        parent = method
+    end
     if not value then
         value = create('any', source)
         self:setChild(index, value)

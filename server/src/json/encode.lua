@@ -34,16 +34,16 @@ local function encode(data, key)
 		if not data[1] and next(data) then
 			-- 认为这个是哈希表
 			if key then
-				index=index+1;lines[index] = tabs[n] .. '"' .. gsub(key, '[\\\r\n\t"]', esc_map) .. '": {\n'
+				index=index+1;lines[index] = tabs[n] .. '"' .. gsub(key, '[\\\r\n\t"]', esc_map) .. '": {\r\n'
 			else
-				index=index+1;lines[index] = tabs[n] .. '{\n'
+				index=index+1;lines[index] = tabs[n] .. '{\r\n'
 			end
 			local meta = getmetatable(data)
 			local sep
 			if meta and meta.__pairs then
 				for k, v in meta.__pairs(data), data do
 					if encode(v, k) then
-						index=index+1;lines[index] = ',\n'
+						index=index+1;lines[index] = ',\r\n'
 						sep = true
 					end
 				end
@@ -57,31 +57,31 @@ local function encode(data, key)
 				for j = 1, i do
 					local k = list[j]
 					if encode(data[k], k) then
-						index=index+1;lines[index] = ',\n'
+						index=index+1;lines[index] = ',\r\n'
 						sep = true
 					end
 				end
 			end
 			if sep then
-				lines[index] = '\n'
+				lines[index] = '\r\n'
 			end
 			index=index+1;lines[index] = tabs[n] .. '}'
 		else
 			-- 认为这个是数组
 			if key then
-				index=index+1;lines[index] = tabs[n] .. '"' .. gsub(key, '[\\\r\n\t"]', esc_map) .. '": [\n'
+				index=index+1;lines[index] = tabs[n] .. '"' .. gsub(key, '[\\\r\n\t"]', esc_map) .. '": [\r\n'
 			else
-				index=index+1;lines[index] = tabs[n] .. '[\n'
+				index=index+1;lines[index] = tabs[n] .. '[\r\n'
 			end
 			local sep
 			for k, v in pairs(data) do
 				if encode(v) then
-					index=index+1;lines[index] = ',\n'
+					index=index+1;lines[index] = ',\r\n'
 					sep = true
 				end
 			end
 			if sep then
-				lines[index] = '\n'
+				lines[index] = '\r\n'
 			end
 			index=index+1;lines[index] = tabs[n] .. ']'
 		end

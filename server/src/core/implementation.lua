@@ -4,9 +4,9 @@ local function parseValueSimily(vm, source, lsp)
         return nil
     end
     local positions = {}
-    for _, other in ipairs(vm.sources) do
+    vm:eachSource(function (other)
         if other == source then
-            goto CONTINUE
+            return
         end
         if      other[1] == key
             and not other:bindLocal()
@@ -19,8 +19,7 @@ local function parseValueSimily(vm, source, lsp)
                 other.finish,
             }
         end
-        :: CONTINUE ::
-    end
+    end)
     if #positions == 0 then
         return nil
     end

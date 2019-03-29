@@ -4,7 +4,7 @@ local function parseValueSimily(vm, source, lsp)
         return nil
     end
     local positions = {}
-    for _, other in ipairs(vm.sources) do
+    vm:eachSource(function (other)
         if other == source then
             goto CONTINUE
         end
@@ -20,7 +20,7 @@ local function parseValueSimily(vm, source, lsp)
             }
         end
         :: CONTINUE ::
-    end
+    end)
     if #positions == 0 then
         return nil
     end

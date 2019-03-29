@@ -6,14 +6,14 @@ local findSource = require 'core.find_source'
 
 local function findCall(vm, pos)
     local results = {}
-    for _, src in ipairs(vm.sources) do
-        if      src.type == 'call' 
+    vm:eachSource(function (src)
+        if      src.type == 'call'
             and src.start <= pos
             and src.finish >= pos
         then
             results[#results+1] = src
         end
-    end
+    end)
     if #results == 0 then
         return nil
     end

@@ -248,11 +248,11 @@ return function (vm)
     local symbols = {}
     local used = {}
 
-    for _, source in ipairs(vm.sources) do
+    vm:eachSource(function (source)
         buildSource(vm, source, used, function (data)
             symbols[#symbols+1] = data
         end)
-    end
+    end)
 
     local packedSymbols = packSymbols(symbols)
 

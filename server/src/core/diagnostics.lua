@@ -114,12 +114,11 @@ local function isContainPos(obj, start, finish)
 end
 
 local function isInString(vm, start, finish)
-    for _, source in ipairs(vm.sources) do
+    return vm:eachSource(function (source)
         if source.type == 'string' and isContainPos(source, start, finish) then
             return true
         end
-    end
-    return false
+    end)
 end
 
 function mt:searchSpaces(callback)

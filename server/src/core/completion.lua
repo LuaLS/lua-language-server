@@ -180,10 +180,10 @@ local function getValueData(cata, name, value)
 end
 
 local function searchLocals(vm, source, word, callback)
-    for _, src in ipairs(vm.sources) do
+    vm:eachSource(function (src)
         local loc = src:bindLocal()
         if not loc then
-            goto CONTINUE
+            return
         end
 
         if      src.start <= source.start
@@ -192,8 +192,7 @@ local function searchLocals(vm, source, word, callback)
         then
             callback(loc:getName(), src, CompletionItemKind.Variable, getValueData('local', loc:getName(), loc:getValue()))
         end
-        :: CONTINUE ::
-    end
+    end)
 end
 
 local function sortPairs(t)
@@ -234,13 +233,13 @@ local function searchFields(vm, source, word, callback)
 end
 
 local function searchIndex(vm, source, word, callback)
-    for _, src in ipairs(vm.sources) do
+    vm:eachSource(function (src)
         if src:get 'table index' then
             if matchKey(word, src[1]) then
                 callback(src[1], src, CompletionItemKind.Property)
             end
         end
-    end
+    end)
 end
 
 local function searchCloseGlobal(vm, source, word, callback)
@@ -251,7 +250,7 @@ local function searchCloseGlobal(vm, source, word, callback)
     local close = loc:close()
     -- 因为闭包的关系落在局部变量finish到close范围内的全局变量一定能访问到该局部变量
 
-    for _, src in ipairs(vm.sources) do
+    vm:eachSource(function (src)
         if      (src:get 'global' or src:bindLocal())
             and src.start >= source.finish
             and src.finish <= close
@@ -260,7 +259,7 @@ local function searchCloseGlobal(vm, source, word, callback)
                 callback(src[1], src, CompletionItemKind.Variable)
             end
         end
-    end
+    end)
 end
 
 local KEYS = {'and', 'break', 'do', 'else', 'elseif', 'end', 'false', 'for', 'function', 'goto', 'if', 'in', 'local', 'nil', 'not', 'or', 'repeat', 'return', 'then', 'true', 'until', 'while', 'toclose'}
@@ -361,14 +360,14 @@ end
 
 local function searchCallArg(vm, source, word, callback, pos)
     local results = {}
-    for _, src in ipairs(vm.sources) do
+    vm:eachSource(function (src)
         if      src.type == 'call'
             and src.start <= pos
             and src.finish >= pos
         then
             results[#results+1] = src
         end
-    end
+    end)
     if #results == 0 then
         return nil
     end
@@ -436,28 +435,28 @@ local function searchAllWords(vm, source, word, callback)
     if source.type == 'string' then
         return
     end
-    for _, src in ipairs(vm.sources) do
+    vm:eachSource(function (src)
         if      src.type == 'name'
             and matchKey(word, src[1])
         then
             callback(src[1], src, CompletionItemKind.Text)
         end
-    end
+    end)
 end
 
 local function searchSpecial(vm, source, word, callback, pos)
     -- 尝试 XXX[#XXX+1]
     -- 1. 搜索 []
     local index
-    for _, src in ipairs(vm.sources) do
+    vm:eachSource(function (src)
         if      src.type == 'index'
             and src.start <= pos
             and src.finish >= pos
         then
             index = src
-            break
+            return true
         end
-    end
+    end)
     if not index then
         return nil
     end

@@ -43,5 +43,16 @@ PARSER_REDEFINE_LABEL   = 'Label `{label}` already defined.'
 
 SYMBOL_ANONYMOUS        = '<Anonymous>'
 
+ACTION_DISABLE_DIAG     = 'Disable diagnostics ({})'
+ACTION_MARK_GLOBAL      = 'Mark `{}` as defined global'
+ACTION_REMOVE_SPACE     = 'Clear all postemptive spaces'
+ACTION_ADD_SEMICOLON    = 'Add `;`'
+ACTION_ADD_BRACKETS     = 'Add brackets'
+
+COMMAND_DISABLE_DIAG    = 'Disable diagnostics'
+COMMAND_MARK_GLOBAL     = 'Mark defined global'
+COMMAND_REMOVE_SPACE    = 'Clear all postemptive spaces'
+COMMAND_ADD_BRACKETS    = 'Add brackets'
+
 DEBUG_MEMORY_LEAK       = "{} I'm sorry for the serious memory leak. The language service will be restarted soon."
 DEBUG_RESTART_NOW       = 'Restart now'

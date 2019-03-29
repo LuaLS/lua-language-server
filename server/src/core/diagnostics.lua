@@ -365,7 +365,7 @@ return function (vm, lines, uri)
     session:doDiagnostics(session.searchLowercaseGlobal, 'lowercase-global', function ()
         return {
             level   = DiagnosticSeverity.Information,
-            message = '首字母小写的全局变量',
+            message = lang.script.DIAG_LOWERCASE_GLOBAL,
         }
     end)
     return session.datas

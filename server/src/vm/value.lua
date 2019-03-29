@@ -191,7 +191,7 @@ function mt:getMetaMethod(name)
     return meta:rawGet(name)
 end
 
-function mt:rawEach(callback, foundIndex)
+function mt:rawEach(callback, mark)
     if not self._child then
         return nil
     end
@@ -216,11 +216,11 @@ function mt:rawEach(callback, foundIndex)
         infos._limit = count + 10
     end
     for index, value in pairs(self._child) do
-        if foundIndex then
-            if foundIndex[index] then
+        if mark then
+            if mark[index] then
                 goto CONTINUE
             end
-            foundIndex[index] = true
+            mark[index] = true
         end
         if alived and not alived[index] then
             self._child[index] = nil
@@ -235,26 +235,21 @@ function mt:rawEach(callback, foundIndex)
     return nil
 end
 
-function mt:eachChild(callback, mark, foundIndex)
-    if not foundIndex then
-        foundIndex = {}
+function mt:eachChild(callback)
+    local mark = {}
+    local parent = self
+    -- 最多检查3层 __index
+    for _ = 1, 3 do
+        local res = parent:rawEach(callback, mark)
+        if res ~= nil then
+            return res
+        end
+        local method = parent:getMetaMethod('__index')
+        if not method then
+            return parent:eachLibChild(callback)
+        end
+        parent = method
     end
-    local res = self:rawEach(callback, foundIndex)
-    if res ~= nil then
-        return res
-    end
-    local method = self:getMetaMethod('__index')
-    if not method then
-        return self:eachLibChild(callback)
-    end
-    if not mark then
-        mark = {}
-    end
-    if mark[method] then
-        return nil
-    end
-    mark[method] = true
-    return method:eachChild(callback, mark, foundIndex)
 end
 
 function mt:mergeType(value)

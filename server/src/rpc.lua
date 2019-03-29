@@ -75,7 +75,9 @@ local function recieve(self, proto)
         log.warn('Recieve: ', table.dump(proto.error))
         return
     end
-    data.callback(proto.result)
+    if data.callback then
+        data.callback(proto.result)
+    end
 end
 
 return {

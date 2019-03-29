@@ -89,7 +89,7 @@ local function parseValueCrossFile(vm, source, lsp)
         return positions
     end
 
-    return positions
+    return nil
 end
 
 local function parseLocal(vm, source, lsp)
@@ -106,7 +106,10 @@ local function parseLocal(vm, source, lsp)
     end
     local value = source:bindValue()
     if value and value.uri ~= '' and value.uri ~= vm.uri then
-        return parseValueCrossFile(vm, source, lsp)
+        local positions = parseValueCrossFile(vm, source, lsp)
+        if #positions > 0 then
+            return positions
+        end
     end
     positions[#positions+1] = {
         locSource.start,

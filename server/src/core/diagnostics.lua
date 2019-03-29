@@ -60,21 +60,11 @@ function mt:searchUndefinedGlobal(callback)
         if name == '' then
             return
         end
-        local value = source:bindValue()
-        if not value then
+        local parent = source:get 'parent'
+        if not parent then
             return
         end
-        if not value:isGlobal() then
-            -- 上文重载了 _ENV 的情况
-            local ok = value:eachInfo(function (info)
-                if info.type == 'set' then
-                    return true
-                end
-            end)
-            if ok then
-                return
-            end
-            callback(source.start, source.finish, name)
+        if not parent:get 'ENV' then
             return
         end
         if definedGlobal[name] then
@@ -296,6 +286,32 @@ function mt:doDiagnostics(func, code, callback)
     end
 end
 
+function mt:searchUndefinedEnvChild(callback)
+    self.vm:eachSource(function (source)
+        if not source:get 'global' then
+            return
+        end
+        local name = source:getName()
+        if name == '' then
+            return
+        end
+        local parent = source:get 'parent'
+        if parent:get 'ENV' then
+            return
+        end
+        local ok = parent:eachInfo(function (info)
+            if info.type == 'set child' and info[1] == name then
+                return true
+            end
+        end)
+        if ok then
+            return
+        end
+        callback(source.start, source.finish, name)
+        return
+    end)
+end
+
 return function (vm, lines, uri)
     local session = setmetatable({
         vm = vm,
@@ -315,7 +331,7 @@ return function (vm, lines, uri)
     session:doDiagnostics(session.searchUndefinedGlobal, 'undefined-global', function (key)
         return {
             level   = DiagnosticSeverity.Warning,
-            message = lang.script('DIAG_UNDEFINED_GLOBAL', key),
+            message = lang.script('DIAG_UNDEF_GLOBAL', key),
         }
     end)
     -- 未使用的Label
@@ -366,6 +382,13 @@ return function (vm, lines, uri)
         return {
             level   = DiagnosticSeverity.Information,
             message = lang.script.DIAG_LOWERCASE_GLOBAL,
+        }
+    end)
+    -- 未定义的变量（重载了 `_ENV`）
+    session:doDiagnostics(session.searchUndefinedEnvChild, 'undefined-env-child', function (key)
+        return {
+            level   = DiagnosticSeverity.Information,
+            message = lang.script('DIAG_UNDEF_ENV_CHILD', key),
         }
     end)
     return session.datas

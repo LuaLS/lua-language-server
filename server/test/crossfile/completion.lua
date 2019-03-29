@@ -298,15 +298,15 @@ TEST {
     },
     completion = {
         {
-            label = 'x111',
-            kind = CompletionItemKind.File,
-            documentation = 'abc/x111.lua',
-            textEdit = EXISTS,
-        },
-        {
             label = 'x000',
             kind = CompletionItemKind.File,
             documentation = 'x000.lua',
+            textEdit = EXISTS,
+        },
+        {
+            label = 'x111',
+            kind = CompletionItemKind.File,
+            documentation = 'abc/x111.lua',
             textEdit = EXISTS,
         },
     }

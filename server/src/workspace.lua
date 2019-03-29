@@ -225,10 +225,18 @@ function mt:matchPath(baseUri, input)
             if list then
                 for _, str in ipairs(list) do
                     if #str >= #input and str:sub(1, #input) == input then
-                        if not map[str]
-                            or similarity(filename, baseName) > similarity(map[str], baseName)
-                        then
+                        if not map[str] then
                             map[str] = filename
+                        else
+                            local s1 = similarity(filename, baseName)
+                            local s2 = similarity(map[str], baseName)
+                            if s1 > s2 then
+                                map[str] = filename
+                            elseif s1 == s2 then
+                                if filename < map[str] then
+                                    map[str] = filename
+                                end
+                            end
                         end
                     end
                 end

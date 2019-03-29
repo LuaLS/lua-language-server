@@ -72,7 +72,7 @@ print(<!X!>)
 print(<!Log!>)
 print(_VERSION)
 print(<!y!>)
-print(Z)
+print(<!Z!>)
 Z = 1
 ]]
 
@@ -116,6 +116,11 @@ local _
 print(_)
 local _ENV
 <!print!>(_ENV) -- 由于重定义了_ENV，因此print变为了未定义全局变量
+]]
+
+TEST [[
+print(1)
+_ENV = nil
 ]]
 
 TEST [[

@@ -148,16 +148,19 @@ TEST {
         {
             label = 'abc',
             kind = CompletionItemKind.File,
+            documentation = 'abc.lua',
             textEdit = EXISTS,
         },
         {
             label = 'abc.aaa',
             kind = CompletionItemKind.File,
+            documentation = 'abc/aaa.lua',
             textEdit = EXISTS,
         },
         {
             label = 'abcde',
             kind = CompletionItemKind.File,
+            documentation = 'xxx/abcde.lua',
             textEdit = EXISTS,
         },
     }
@@ -177,6 +180,7 @@ TEST {
         {
             label = 'abc',
             kind = CompletionItemKind.File,
+            documentation = 'abc.lua',
             textEdit = EXISTS,
         },
     }
@@ -200,6 +204,7 @@ TEST {
         {
             label = 'abc.init',
             kind = CompletionItemKind.File,
+            documentation = 'abc/init.lua',
             textEdit = EXISTS,
         },
     }
@@ -223,6 +228,7 @@ TEST {
         {
             label = 'abc.init',
             kind = CompletionItemKind.File,
+            documentation = 'abc/init.lua',
             textEdit = EXISTS,
         },
     }
@@ -246,6 +252,7 @@ TEST {
         {
             label = 'abc.init',
             kind = CompletionItemKind.File,
+            documentation = 'abc/init.lua',
             textEdit = EXISTS,
         },
     }
@@ -269,6 +276,7 @@ TEST {
         {
             label = 'core.core',
             kind = CompletionItemKind.File,
+            documentation = 'core/core.lua',
             textEdit = EXISTS,
         },
     }
@@ -292,11 +300,13 @@ TEST {
         {
             label = 'x111',
             kind = CompletionItemKind.File,
+            documentation = 'abc/x111.lua',
             textEdit = EXISTS,
         },
         {
             label = 'x000',
             kind = CompletionItemKind.File,
+            documentation = 'x000.lua',
             textEdit = EXISTS,
         },
     }

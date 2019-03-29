@@ -239,6 +239,7 @@ function mt:matchPath(baseUri, input)
     local list = {}
     for str in pairs(map) do
         list[#list+1] = str
+        map[str] = map[str]:sub(rootLen + 2)
     end
     if #list == 0 then
         return nil
@@ -252,7 +253,7 @@ function mt:matchPath(baseUri, input)
             return sa > sb
         end
     end)
-    return list
+    return list, map
 end
 
 function mt:searchPath(baseUri, str)

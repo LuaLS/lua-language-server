@@ -341,12 +341,13 @@ local function searchInRequire(vm, select, source, callback)
     if source.type ~= 'string' then
         return
     end
-    local list = vm.lsp.workspace:matchPath(vm.uri, source[1])
+    local list, map = vm.lsp.workspace:matchPath(vm.uri, source[1])
     if not list then
         return
     end
     for _, str in ipairs(list) do
         callback(str, nil, CompletionItemKind.File, {
+            documentation = map[str],
             textEdit = {
                 -- TODO 坑爹自动完成的字符串里面不能包含符号
                 -- 这里长字符串会出问题，不过暂时先这样吧
@@ -361,7 +362,7 @@ end
 local function searchCallArg(vm, source, word, callback, pos)
     local results = {}
     for _, src in ipairs(vm.sources) do
-        if      src.type == 'call' 
+        if      src.type == 'call'
             and src.start <= pos
             and src.finish >= pos
         then

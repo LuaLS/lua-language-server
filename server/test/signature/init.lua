@@ -13,6 +13,7 @@ function TEST(script)
         assert(vm)
         local hovers = core.signature(vm, pos)
         if hovers then
+            assert(expect)
             local hover = hovers[#hovers]
 
             local label = hover.label:gsub('^[\r\n]*(.-)[\r\n]*$', '%1'):gsub('\r\n', '\n')
@@ -104,5 +105,15 @@ local function f(a, b, c)
 end
 
 f(1, 'string@')
+]]
+(nil)
+
+TEST [[
+pcall(function () @ end)
+]]
+(nil)
+
+TEST [[
+table.unpack {@}
 ]]
 (nil)

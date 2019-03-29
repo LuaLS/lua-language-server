@@ -67,6 +67,22 @@ local function getHover(call, pos)
     end
 end
 
+local function isInFunctionOrTable(call, pos)
+    local func, args = call:bindCall()
+    if not func then
+        return false
+    end
+    local select = getSelect(args, pos)
+    local arg = args[select]
+    if not arg then
+        return false
+    end
+    if arg.type == 'function' or arg.type == 'table' then
+        return true
+    end
+    return false
+end
+
 return function (vm, pos)
     local source = findSource(vm, pos) or findSource(vm, pos-1)
     if not source or source.type == 'string' then
@@ -74,6 +90,11 @@ return function (vm, pos)
     end
     local calls = findCall(vm, pos)
     if not calls or #calls == 0 then
+        return nil
+    end
+
+    local nearCall = calls[1]
+    if isInFunctionOrTable(nearCall, pos) then
         return nil
     end
 

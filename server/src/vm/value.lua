@@ -96,8 +96,9 @@ function mt:rawSet(index, value, source)
         self._child = {}
     end
     if self._child[index] then
-        self._child[index]:mergeValue(value)
-        --self._child[index] = value
+        --self._child[index]:mergeValue(value)
+        self._child[index]:mergeType(value)
+        self._child[index] = value
     else
         self._child[index] = value
     end
@@ -260,6 +261,21 @@ function mt:eachChild(callback, mark, foundIndex)
     end
     mark[method] = true
     return method:eachChild(callback, mark, foundIndex)
+end
+
+function mt:mergeType(value)
+    if self == value then
+        return
+    end
+    if not value then
+        return
+    end
+    if value._type then
+        for tp, rate in pairs(value._type) do
+            self:setType(tp, rate)
+        end
+    end
+    value._type = self._type
 end
 
 function mt:mergeValue(value)

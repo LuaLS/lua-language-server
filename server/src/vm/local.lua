@@ -9,11 +9,17 @@ mt.type = 'local'
 mt._close = math.maxinteger
 
 function mt:setValue(value)
+    if not value then
+        return
+    end
     if self.value then
-        self.value:mergeValue(value)
+        --self.value:mergeValue(value)
+        self.value:mergeType(value)
+        self.value = value
     else
         self.value = value
     end
+    return value
 end
 
 function mt:getValue()

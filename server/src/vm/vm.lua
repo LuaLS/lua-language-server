@@ -941,6 +941,7 @@ function mt:doLocalFunction(action)
             local func = self:buildFunction(action)
             func:addInfo('local', name)
             loc:setValue(func)
+            name:bindValue(func, 'local')
         end
     end
 end
@@ -1098,13 +1099,13 @@ function mt:createLocal(key, source, value)
     end
 
     if not value then
-        value = valueMgr.create('nil', self:getDefaultSource())
+        value = self:createValue('nil', source)
     end
 
     loc = localMgr.create(key, source, value)
     self:saveLocal(key, loc)
     self:bindLocal(source, loc, 'local')
-    value:addInfo('local', source or self:getDefaultSource())
+    value:addInfo('local', source)
     return loc
 end
 

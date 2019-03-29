@@ -281,6 +281,9 @@ function mt:mergeValue(value)
     end
     value._type = self._type
 
+    -- TODO: 这里有一处泄漏：value 的 child 只在 eachChild 与 rawEach 时清理
+    -- 而 child 的 key 有可能是对象，反复合并会导致 child 越来越大
+    -- 目前只有 function:mergeReturn 会调用 mergeValue ，因此表现不明显
     if value._child then
         if not self._child then
             self._child = {}

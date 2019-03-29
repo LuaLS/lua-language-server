@@ -2,7 +2,7 @@
 
 [![Build status](https://ci.appveyor.com/api/projects/status/0tng1g72fssvu9rr/branch/master?svg=true)](https://ci.appveyor.com/project/sumneko/vscode-lua-language-server/branch/master)
 
-### Feature
+## Feature
 
 - [x] Goto Definition
 - [x] Goto Implementation
@@ -23,7 +23,7 @@
 - [ ] Multi Workspace
 - [ ] Type Format
 
-### Locale
+## Locale
 
 - [x] en-US
 - [x] zh-CN
@@ -34,37 +34,37 @@ API描述的中文翻译来自[云风](https://cloudwu.github.io/lua53doc/manual
 
 [en-US]: https://github.com/sumneko/vscode-lua-language-server/tree/master/server/locale/en-US
 
-### preview
+## preview
 
-* Goto Definition
+### Goto Definition
 
-![avatar](https://github.com/sumneko/lua-language-server/blob/master/images/Goto%20Definition.gif?raw=true)
+![avatar](https://github.com/sumneko/lua-language-server/blob/master/images/Goto%20Definition.gif)
 
-* Find All References
+### Find All References
 
-![avatar](https://github.com/sumneko/lua-language-server/blob/master/images/Find%20All%20References.gif?raw=true)
+![avatar](https://github.com/sumneko/lua-language-server/blob/master/images/Find%20All%20References.gif)
 
-* Hover
+### Hover
 
-![avatar](https://github.com/sumneko/lua-language-server/blob/master/images/Hover.gif?raw=true)
+![avatar](https://github.com/sumneko/lua-language-server/blob/master/images/Hover.gif)
 
-* Diagnostics
+### Diagnostics
 
-![avatar](https://github.com/sumneko/lua-language-server/blob/master/images/Diagnostics.gif?raw=true)
+![avatar](https://github.com/sumneko/lua-language-server/blob/master/images/Diagnostics.gif)
 
-* Rename
+### Rename
 
-![avatar](https://github.com/sumneko/lua-language-server/blob/master/images/Rename.gif?raw=true)
+![avatar](https://github.com/sumneko/lua-language-server/blob/master/images/Rename.gif)
 
-* Auto Completion
+### Auto Completion
 
-![avatar](https://github.com/sumneko/lua-language-server/blob/master/images/Auto%20Completion.gif?raw=true)
+![avatar](https://github.com/sumneko/lua-language-server/blob/master/images/Auto%20Completion.gif)
 
-* Signature Help
+### Signature Help
 
-![avatar](https://github.com/sumneko/lua-language-server/blob/master/images/Signature%20Help.gif?raw=true)
+![avatar](https://github.com/sumneko/lua-language-server/blob/master/images/Signature%20Help.gif)
 
-### library
+## library
 
 You can add your library at [here][libs] by `Pull Requests`.
 

@@ -610,7 +610,11 @@ function mt:restartDueToMemoryLeak()
 end
 
 function mt:_testMemory()
+    local clock = os.clock()
     collectgarbage()
+    log.debug('collectgarbage: ', os.clock() - clock)
+
+    local clock = os.clock()
     local cachedVM = 0
     local cachedSource = 0
     local cachedFunction = 0
@@ -698,6 +702,7 @@ function mt:_testMemory()
         totalLocal,
         totalValue
     ))
+    log.debug('test memory: ', os.clock() - clock)
 end
 
 function mt:onTick()

@@ -1,10 +1,9 @@
 {
-	"Lua.diagnostics.globals" : [
-		"TEST",
-		"ERR",
-		"OUT",
-		"IN",
-		"log",
-		"ac"
-	]
+    "Lua.diagnostics.globals": [
+        "ERR",
+        "OUT",
+        "IN",
+        "log",
+        "ac"
+    ]
 }

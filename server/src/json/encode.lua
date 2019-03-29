@@ -27,14 +27,14 @@ local esc_map = {
 local function encode(data, key)
 	n = n + 1
 	if not tabs[n] then
-		tabs[n] = rep('\t', n)
+		tabs[n] = rep('    ', n)
 	end
 	local tp = type(data)
 	if tp == 'table' then
 		if not data[1] and next(data) then
 			-- 认为这个是哈希表
 			if key then
-				index=index+1;lines[index] = tabs[n] .. '"' .. gsub(key, '[\\\r\n\t"]', esc_map) .. '" : {\n'
+				index=index+1;lines[index] = tabs[n] .. '"' .. gsub(key, '[\\\r\n\t"]', esc_map) .. '": {\n'
 			else
 				index=index+1;lines[index] = tabs[n] .. '{\n'
 			end
@@ -69,7 +69,7 @@ local function encode(data, key)
 		else
 			-- 认为这个是数组
 			if key then
-				index=index+1;lines[index] = tabs[n] .. '"' .. gsub(key, '[\\\r\n\t"]', esc_map) .. '" : [\n'
+				index=index+1;lines[index] = tabs[n] .. '"' .. gsub(key, '[\\\r\n\t"]', esc_map) .. '": [\n'
 			else
 				index=index+1;lines[index] = tabs[n] .. '[\n'
 			end
@@ -92,26 +92,26 @@ local function encode(data, key)
 			data = '0'
 		end
 		if key then
-			index=index+1;lines[index] = tabs[n] .. '"' .. gsub(key, '[\\\r\n\t"]', esc_map) .. '" : ' .. data
+			index=index+1;lines[index] = tabs[n] .. '"' .. gsub(key, '[\\\r\n\t"]', esc_map) .. '": ' .. data
 		else
 			index=index+1;lines[index] = tabs[n] .. data
 		end
 	elseif tp == 'boolean' then
 		if key then
-			index=index+1;lines[index] = tabs[n] .. '"' .. gsub(key, '[\\\r\n\t"]', esc_map) .. '" : ' .. tostring(data)
+			index=index+1;lines[index] = tabs[n] .. '"' .. gsub(key, '[\\\r\n\t"]', esc_map) .. '": ' .. tostring(data)
 		else
 			index=index+1;lines[index] = tabs[n] .. tostring(data)
 		end
 	elseif tp == 'nil' then
 		if key then
-			index=index+1;lines[index] = tabs[n] .. '"' .. gsub(key, '[\\\r\n\t"]', esc_map) .. '" : null'
+			index=index+1;lines[index] = tabs[n] .. '"' .. gsub(key, '[\\\r\n\t"]', esc_map) .. '": null'
 		else
 			index=index+1;lines[index] = tabs[n] .. 'null'
 		end
 	elseif tp == 'string' then
 		local str = gsub(data, '[\\\r\n\t"]', esc_map)
 		if key then
-			index=index+1;lines[index] = tabs[n] .. '"' .. gsub(key, '[\\\r\n\t"]', esc_map) .. '" : "' .. str .. '"'
+			index=index+1;lines[index] = tabs[n] .. '"' .. gsub(key, '[\\\r\n\t"]', esc_map) .. '": "' .. str .. '"'
 		else
 			index=index+1;lines[index] = tabs[n] .. '"' .. str .. '"'
 		end

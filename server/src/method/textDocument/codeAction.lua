@@ -18,11 +18,7 @@ local function disableDiagnostic(lsp, uri, data, callback)
     }
 end
 
-local function solveUndefinedGlobal(lsp, uri, data, callback)
-    local vm, lines, text = lsp:getVM(uri)
-    if not vm then
-        return
-    end
+local function addGlobal(lines, text, data, callback)
     local start = lines:position(data.range.start.line + 1, data.range.start.character + 1)
     local finish = lines:position(data.range['end'].line + 1, data.range['end'].character)
     local name = text:sub(start, finish)
@@ -44,6 +40,22 @@ local function solveUndefinedGlobal(lsp, uri, data, callback)
             }
         },
     }
+end
+
+local function solveUndefinedGlobal(lsp, uri, data, callback)
+    local vm, lines, text = lsp:getVM(uri)
+    if not vm then
+        return
+    end
+    addGlobal(lines, text, data, callback)
+end
+
+local function solveLowercaseGlobal(lsp, uri, data, callback)
+    local vm, lines, text = lsp:getVM(uri)
+    if not vm then
+        return
+    end
+    addGlobal(lines, text, data, callback)
 end
 
 local function solveTrailingSpace(lsp, uri, data, callback)
@@ -115,6 +127,9 @@ local function solveDiagnostic(lsp, uri, data, callback)
     end
     if data.code == 'ambiguity-1' then
         solveAmbiguity1(lsp, uri, data, callback)
+    end
+    if data.code == 'lowercase-global' then
+        solveLowercaseGlobal(lsp, uri, data, callback)
     end
     disableDiagnostic(lsp, uri, data, callback)
 end

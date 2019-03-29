@@ -149,7 +149,6 @@ local function parseValue(vm, source, lsp)
         source:bindValue():eachInfo(function (info, src)
             if info.type == 'set' or info.type == 'local' or info.type == 'return' then
                 callback(src)
-                return true
             end
         end)
     end

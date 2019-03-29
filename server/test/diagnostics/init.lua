@@ -72,8 +72,8 @@ print(<!X!>)
 print(<!Log!>)
 print(_VERSION)
 print(<!y!>)
-print(z)
-z = 1
+print(Z)
+Z = 1
 ]]
 
 TEST [[
@@ -85,11 +85,11 @@ TEST [[
 ]]
 
 TEST [[
-x = 1<!  !>
+X = 1<!  !>
 ]]
 
 TEST [[
-x = [=[  
+X = [=[  
     ]=]
 ]]
 
@@ -136,8 +136,8 @@ x(1, 2, <!3!>)
 ]]
 
 TEST [[
-instanceName = 1
-instance = _G[instanceName]
+InstanceName = 1
+Instance = _G[InstanceName]
 ]]
 
 TEST [[
@@ -229,4 +229,10 @@ tostring = function () end
 tostring(<!1!>)
 tostring = realTostring
 tostring(1)
+]]
+
+TEST [[
+<!aa!> = 1
+tostring = 1
+ROOT = 1
 ]]

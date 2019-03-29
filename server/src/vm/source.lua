@@ -2,7 +2,7 @@ local listMgr = require 'vm.list'
 
 local mt = {}
 mt.__index = mt
-mt.uri = ''
+mt.uri = '@dummy'
 mt.start = 0
 mt.finish = 0
 mt.id = 0

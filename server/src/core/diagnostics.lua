@@ -1,5 +1,6 @@
 local lang = require 'language'
 local config = require 'config'
+local library = require 'core.library'
 
 local DiagnosticSeverity = {
     Error       = 1,
@@ -248,6 +249,33 @@ function mt:searchAmbiguity1(callback)
     end)
 end
 
+function mt:searchLowercaseGlobal(callback)
+    local definedGlobal = {}
+    for name in pairs(config.config.diagnostics.globals) do
+        definedGlobal[name] = true
+    end
+    for name in pairs(library.global) do
+        definedGlobal[name] = true
+    end
+    local uri = self.vm.uri
+    local envValue = self.vm.env:getValue()
+    envValue:eachInfo(function (info, src)
+        if info.type == 'set child' and src.uri == uri then
+            local name = info[1]
+            if definedGlobal[name] then
+                return
+            end
+            local first = name:match '%w'
+            if not first then
+                return
+            end
+            if first:match '%l' then
+                callback(src.start, src.finish)
+            end
+        end
+    end)
+end
+
 function mt:doDiagnostics(func, code, callback)
     if config.config.diagnostics.disable[code] then
         return
@@ -331,6 +359,13 @@ return function (vm, lines, uri)
         return {
             level   = DiagnosticSeverity.Warning,
             message = lang.script('DIAG_AMBIGUITY_1', op, num),
+        }
+    end)
+    -- 不允许定义首字母小写的全局变量（很可能是拼错或者漏删）
+    session:doDiagnostics(session.searchLowercaseGlobal, 'lowercase-global', function ()
+        return {
+            level   = DiagnosticSeverity.Information,
+            message = '首字母小写的全局变量',
         }
     end)
     return session.datas

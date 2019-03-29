@@ -34,7 +34,7 @@ API描述的中文翻译来自[云风](https://cloudwu.github.io/lua53doc/manual
 
 [en-US]: https://github.com/sumneko/vscode-lua-language-server/tree/master/server/locale/en-US
 
-### review
+### preview
 
 * Goto Definition
 

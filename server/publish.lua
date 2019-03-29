@@ -133,7 +133,9 @@ local count = copyFiles(EXTENSION , out) {
         ['test']     = true,
         ['main.lua'] = true,
     },
-    ['images']            = true,
+    ['images'] = {
+        ['logo.png'] = true,
+    },
     ['package-lock.json'] = true,
     ['package.json']      = true,
     ['README.md']         = true,

@@ -64,7 +64,10 @@ function command.config(lsp, data)
         if attr == nil then
             attr = {}
         elseif type(attr) == 'string' then
-            attr = {attr}
+            attr = {}
+            for str in attr:gmatch '[^;]+' do
+                attr[#attr+1] = str
+            end
         elseif type(attr) == 'table' then
         else
             return

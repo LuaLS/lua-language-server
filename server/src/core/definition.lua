@@ -107,7 +107,7 @@ local function parseLocal(vm, source, lsp)
     local value = source:bindValue()
     if value and value.uri ~= '' and value.uri ~= vm.uri then
         local positions = parseValueCrossFile(vm, source, lsp)
-        if #positions > 0 then
+        if positions and #positions > 0 then
             return positions
         end
     end

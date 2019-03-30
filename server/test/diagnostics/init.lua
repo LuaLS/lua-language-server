@@ -241,3 +241,8 @@ TEST [[
 tostring = 1
 ROOT = 1
 ]]
+
+TEST [[
+local f = load('')
+f(1, 2, 3)
+]]

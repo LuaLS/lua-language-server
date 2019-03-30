@@ -80,6 +80,16 @@ type = 'table'
 [[.returns]]
 name = 'iterator'
 type = 'function'
+args = {
+    1 = {
+        name = 'table',
+        type = 'table',
+    },
+    2 = {
+        name = 'i',
+        type = 'integer',
+    }
+}
 returns = {
     1 = {
         name = 'i',
@@ -115,6 +125,11 @@ type = 'table'
 optional = 'self'
 [[.returns]]
 type = 'function'
+args = {
+    1 = {
+        type = '...'
+    },
+}
 [[.returns]]
 name = 'error_message'
 type = 'string'
@@ -145,6 +160,11 @@ type = 'table'
 optional = 'self'
 [[.returns]]
 type = 'function'
+args = {
+    1 = {
+        type = '...'
+    },
+}
 [[.returns]]
 name = 'error_message'
 type = 'string'
@@ -178,6 +198,16 @@ type = 'table'
 [[.returns]]
 name = 'next'
 type = 'function'
+args = {
+    1 = {
+        name = 'table',
+        type = 'table',
+    },
+    2 = {
+        name = 'index',
+        optional = 'self',
+    },
+}
 returns = {
     1 = {
         name = 'key',

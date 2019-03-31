@@ -1,4 +1,3 @@
-<root>
 DIAG_LINE_ONLY_SPACE    = 'Line with spaces only.'
 DIAG_LINE_POST_SPACE    = 'Line with postspace.'
 DIAG_UNUSED_LOCAL       = 'Unused local `{}`.'

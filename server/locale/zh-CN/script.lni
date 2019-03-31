@@ -1,4 +1,3 @@
-<root>
 DIAG_LINE_ONLY_SPACE    = '只有空格的空行。'
 DIAG_LINE_POST_SPACE    = '后置空格。'
 DIAG_UNUSED_LOCAL       = '未使用的局部变量 `{}`。'

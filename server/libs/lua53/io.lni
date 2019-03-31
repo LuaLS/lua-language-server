@@ -8,12 +8,16 @@ name = 'io'
 
 <default>
 type = 'function'
-[[.parent]]
-type = 'global'
-name = 'io'
-``````````
-type = 'library'
-name = 'io'
+parent = {
+    1 = {
+        type = 'global',
+        name = 'io',
+    },
+    2 = {
+        type = 'library',
+        name = 'io',
+    }
+}
 
 [stdin]
 type = 'FILE*'

@@ -16,7 +16,7 @@ ac = {}
 require 'utility'
 require 'global_protect'
 
-    local function convertLni()
+local function convertLni()
     local function scan(path, callback)
         if fs.is_directory(path) then
             for child in path:list_directory() do

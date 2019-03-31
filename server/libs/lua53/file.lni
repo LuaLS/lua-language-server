@@ -1,8 +1,11 @@
 <default>
 type = 'function'
-[[.parent]]
-type = 'object'
-name = 'FILE*'
+parent = {
+    1 = {
+        type = 'object',
+        name = 'FILE*',
+    },
+}
 
 [close]
 [[.args]]

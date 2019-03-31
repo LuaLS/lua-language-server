@@ -8,12 +8,16 @@ name = 'package'
 
 <default>
 type = 'function'
-[[.parent]]
-type = 'global'
-name = 'package'
-``````````
-type = 'library'
-name = 'package'
+parent = {
+    1 = {
+        type = 'global',
+        name = 'package',
+    },
+    2 = {
+        type = 'library',
+        name = 'package',
+    }
+}
 
 [config]
 type = 'string'

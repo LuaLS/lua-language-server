@@ -7,10 +7,14 @@ nick = 'japi'
 
 <default>
 type = 'function'
-[[.parent]]
-type = 'library'
-name = 'jass.japi'
-nick = 'japi'
+parent = {
+    1 = {
+        type = 'library',
+        name = 'jass.japi',
+        nick = 'japi',
+    },
+}
+
 [EXGetUnitAbility]
 [[.args]]
 name = "u"

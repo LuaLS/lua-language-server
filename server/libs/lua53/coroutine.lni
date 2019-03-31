@@ -8,12 +8,16 @@ name = 'coroutine'
 
 <default>
 type = 'function'
-[[.parent]]
-type = 'global'
-name = 'coroutine'
-``````````
-type = 'library'
-name = 'coroutine'
+parent = {
+    1 = {
+        type = 'global',
+        name = 'coroutine',
+    },
+    2 = {
+        type = 'library',
+        name = 'coroutine',
+    }
+}
 
 [create]
 [[.args]]

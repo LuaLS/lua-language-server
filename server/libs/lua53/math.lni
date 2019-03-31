@@ -8,12 +8,16 @@ name = 'math'
 
 <default>
 type = 'function'
-[[.parent]]
-type = 'global'
-name = 'math'
-``````````
-type = 'library'
-name = 'math'
+parent = {
+    1 = {
+        type = 'global',
+        name = 'math',
+    },
+    2 = {
+        type = 'library',
+        name = 'math',
+    }
+}
 
 [abs]
 [[.args]]

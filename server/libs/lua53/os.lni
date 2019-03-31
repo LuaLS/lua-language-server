@@ -8,12 +8,16 @@ name = 'os'
 
 <default>
 type = 'function'
-[[.parent]]
-type = 'global'
-name = 'os'
-``````````
-type = 'library'
-name = 'os'
+parent = {
+    1 = {
+        type = 'global',
+        name = 'os',
+    },
+    2 = {
+        type = 'library',
+        name = 'os',
+    }
+}
 
 [clock]
 [[.returns]]

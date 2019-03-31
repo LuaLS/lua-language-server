@@ -8,15 +8,20 @@ name = 'string'
 
 <default>
 type = 'function'
-[[.parent]]
-type = 'global'
-name = 'string'
-``````````
-type = 'library'
-name = 'string'
-``````````
-type = 'object'
-name = 'string'
+parent = {
+    1 = {
+        type = 'global',
+        name = 'string',
+    },
+    2 = {
+        type = 'library',
+        name = 'string',
+    },
+    3 = {
+        type = 'object',
+        name = 'string',
+    }
+}
 
 [byte]
 [[.args]]

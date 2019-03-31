@@ -8,12 +8,16 @@ name = 'utf8'
 
 <default>
 type = 'function'
-[[.parent]]
-type = 'global'
-name = 'utf8'
-``````````
-type = 'library'
-name = 'utf8'
+parent = {
+    1 = {
+        type = 'global',
+        name = 'utf8',
+    },
+    2 = {
+        type = 'library',
+        name = 'utf8',
+    }
+}
 
 [char]
 [[.args]]

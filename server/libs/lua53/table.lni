@@ -8,12 +8,16 @@ name = 'table'
 
 <default>
 type = 'function'
-[[.parent]]
-type = 'global'
-name = 'table'
-``````````
-type = 'library'
-name = 'table'
+parent = {
+    1 = {
+        type = 'global',
+        name = 'table',
+    },
+    2 = {
+        type = 'library',
+        name = 'table',
+    }
+}
 
 [concat]
 [[.args]]

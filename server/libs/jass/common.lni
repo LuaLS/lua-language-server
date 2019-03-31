@@ -7,10 +7,13 @@ nick = 'jass'
 
 <default>
 type = 'function'
-[[.parent]]
-type = 'library'
-name = 'jass.common'
-nick = 'jass'
+parent = {
+    1 = {
+        type = 'library',
+        name = 'jass.common',
+        nick = 'jass',
+    },
+}
 
 [ConvertRace]
 [[.args]]

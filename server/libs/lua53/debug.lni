@@ -8,12 +8,16 @@ name = 'debug'
 
 <default>
 type = 'function'
-[[.parent]]
-type = 'global'
-name = 'debug'
-``````````
-type = 'library'
-name = 'debug'
+parent = {
+    1 = {
+        type = 'global',
+        name = 'debug',
+    },
+    2 = {
+        type = 'library',
+        name = 'debug',
+    }
+}
 
 ["debug.debug"]
 name = 'debug'

@@ -2,7 +2,7 @@
 type = 'table'
 [[.source]]
 type = 'global'
-[[.source]]
+``````````
 type = 'library'
 name = 'utf8'
 
@@ -11,7 +11,7 @@ type = 'function'
 [[.parent]]
 type = 'global'
 name = 'utf8'
-[[.parent]]
+``````````
 type = 'library'
 name = 'utf8'
 
@@ -19,7 +19,7 @@ name = 'utf8'
 [[.args]]
 name = 'code'
 type = 'integer'
-[[.args]]
+``````````
 type = '...'
 [[.returns]]
 type = 'string'
@@ -47,37 +47,37 @@ returns = {
 [codepoint]
 [[.args]]
 type = 'string'
-[[.args]]
+``````````
 name = 'i'
 type = 'integer'
 optional = 'after'
 default = 1
-[[.args]]
+``````````
 name = 'j'
 type = 'integer'
 optional = 'self'
 [[.returns]]
 name = 'code'
 type = 'integer'
-[[.returns]]
+``````````
 type = '...'
 
 [len]
 [[.args]]
 type = 'string'
-[[.args]]
+``````````
 name = 'i'
 type = 'integer'
 optional = 'after'
 default = 1
-[[.args]]
+``````````
 name = 'j'
 type = 'integer'
 optional = 'self'
 default = -1
 [[.returns]]
 type = 'integer'
-[[.returns]]
+``````````
 name = 'errpos'
 type = 'integer'
 optional = 'self'
@@ -85,10 +85,10 @@ optional = 'self'
 [offset]
 [[.args]]
 type = 'string'
-[[.args]]
+``````````
 name = 'n'
 type = 'integer'
-[[.args]]
+``````````
 name = 'i'
 type = 'integer'
 [[.returns]]

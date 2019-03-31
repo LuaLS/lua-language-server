@@ -29,19 +29,19 @@ end
 name = 'mode'
 enum = 'n'
 description = '读取一个数字，根据 Lua 的转换文法返回浮点数或整数。'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'a'
 description = '从当前位置开始读取整个文件。'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'l'
 description = '读取一行并忽略行结束标记。'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'L'
 description = '读取一行并保留行结束标记。'
-[[.enums]]
+``````````
 name = 'mode'
 code = 'number'
 description = '读取一个不超过这个数量字节数的字符串。'
@@ -52,23 +52,23 @@ description = '用字符串 `mode` 指定的模式打开一个文件。'
 name = 'mode'
 enum = 'r'
 description = '读模式。'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'w'
 description = '写模式。'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'a'
 description = '追加模式。'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'r+'
 description = '更新模式，所有之前的数据都保留。'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'w+'
 description = '更新模式，所有之前的数据都删除。'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'a+'
 description = '追加更新模式，所有之前的数据都保留，只允许在文件尾部做写入。'
@@ -82,7 +82,7 @@ description = '用一个分离进程开启程序 `prog` 。'
 name = 'mode'
 enum = 'r'
 description = '从这个程序中读取数据。'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'w'
 description = '向这个程序写入输入。'
@@ -93,19 +93,19 @@ description = '读文件 `file`， 指定的格式决定了要读什么。'
 name = 'mode'
 enum = 'n'
 description = '读取一个数字，根据 Lua 的转换文法返回浮点数或整数。'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'a'
 description = '从当前位置开始读取整个文件。'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'l'
 description = '读取一行并忽略行结束标记。'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'L'
 description = '读取一行并保留行结束标记。'
-[[.enums]]
+``````````
 name = 'mode'
 code = 'number'
 description = '读取一个不超过这个数量字节数的字符串。'
@@ -119,11 +119,11 @@ description = '检查 `obj` 是否是合法的文件句柄。'
 name = 'type'
 enum = 'file'
 description = '是一个打开的文件句柄。'
-[[.enums]]
+``````````
 name = 'type'
 enum = 'closed file'
 description = '是一个关闭的文件句柄。'
-[[.enums]]
+``````````
 name = 'type'
 code = 'nil'
 description = '不是文件句柄。'

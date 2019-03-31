@@ -9,31 +9,31 @@ description = 'Calls error if the value of its argument is false.'
 name = 'opt'
 enum = 'collect'
 description = 'Performs a full garbage-collection cycle.'
-[[.enums]]
+``````````
 name = 'opt'
 enum = 'stop'
 description = 'Stops automatic execution.'
-[[.enums]]
+``````````
 name = 'opt'
 enum = 'restart'
 description = 'Restarts automatic execution.'
-[[.enums]]
+``````````
 name = 'opt'
 enum = 'count'
 description = 'Returns the total memory in Kbytes.'
-[[.enums]]
+``````````
 name = 'opt'
 enum = 'step'
 description = 'Performs a garbage-collection step.'
-[[.enums]]
+``````````
 name = 'opt'
 enum = 'setpause'
 description = 'Set pause.'
-[[.enums]]
+``````````
 name = 'opt'
 enum = 'setstepmul'
 description = 'Set step multiplier.'
-[[.enums]]
+``````````
 name = 'opt'
 enum = 'isrunning'
 description = 'Returns whether the collector is running.'
@@ -66,11 +66,11 @@ description = 'Loads a chunk.'
 name = 'mode'
 enum = 'b'
 description = 'Only binary chunks.'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 't'
 description = 'Only text chunks.'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'bt'
 description = 'Both binary and text.'
@@ -81,11 +81,11 @@ description = 'Loads a chunk from file.'
 name = 'mode'
 enum = 'b'
 description = 'Only binary chunks.'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 't'
 description = 'Only text chunks.'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'bt'
 description = 'Both binary and text.'
@@ -126,7 +126,7 @@ description = 'Sets the real value of `table[index]` to `value`, without invokin
 name = 'index'
 enum = '#'
 description = 'Returns the total number of extra arguments.'
-[[.enums]]
+``````````
 name = 'index'
 code = 'integer'
 description = 'Returns all arguments after number `index`.'

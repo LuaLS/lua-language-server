@@ -131,7 +131,7 @@ local function loadLocale(language, relative)
     local localeBuf = io.load(localePath)
     if localeBuf then
         local locale = table.container()
-        xpcall(lni.classics, log.error, localeBuf, localePath:string(), {locale})
+        xpcall(lni, log.error, localeBuf, localePath:string(), {locale})
         return locale
     end
     return nil
@@ -175,7 +175,7 @@ local function init()
         local buf = io.load(path)
         if buf then
             libs = table.container()
-            xpcall(lni.classics, log.error, buf, path:string(), {libs})
+            xpcall(lni, log.error, buf, path:string(), {libs})
             fix(libs)
         end
         local relative = fs.relative(path, ROOT)

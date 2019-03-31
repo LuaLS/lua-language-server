@@ -429,7 +429,7 @@ type = "number"
 [[.args]]
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "x"
 type = "number"
 [[.returns]]
@@ -446,7 +446,7 @@ type = "number"
 [[.args]]
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "power"
 type = "number"
 [[.returns]]
@@ -484,10 +484,10 @@ type = "string"
 [[.args]]
 name = "r"
 type = "number"
-[[.args]]
+``````````
 name = "width"
 type = "integer"
-[[.args]]
+``````````
 name = "precision"
 type = "integer"
 [[.returns]]
@@ -518,10 +518,10 @@ type = "integer"
 [[.args]]
 name = "source"
 type = "string"
-[[.args]]
+``````````
 name = "start"
 type = "integer"
-[[.args]]
+``````````
 name = "end"
 type = "integer"
 [[.returns]]
@@ -538,7 +538,7 @@ type = "integer"
 [[.args]]
 name = "source"
 type = "string"
-[[.args]]
+``````````
 name = "upper"
 type = "boolean"
 [[.returns]]
@@ -589,10 +589,10 @@ type = "integer"
 [[.args]]
 name = "whichStartLoc"
 type = "integer"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
 
@@ -600,7 +600,7 @@ type = "number"
 [[.args]]
 name = "whichStartLoc"
 type = "integer"
-[[.args]]
+``````````
 name = "whichLocation"
 type = "location"
 
@@ -608,7 +608,7 @@ type = "location"
 [[.args]]
 name = "whichStartLoc"
 type = "integer"
-[[.args]]
+``````````
 name = "prioSlotCount"
 type = "integer"
 
@@ -616,13 +616,13 @@ type = "integer"
 [[.args]]
 name = "whichStartLoc"
 type = "integer"
-[[.args]]
+``````````
 name = "prioSlotIndex"
 type = "integer"
-[[.args]]
+``````````
 name = "otherStartLocIndex"
 type = "integer"
-[[.args]]
+``````````
 name = "priority"
 type = "startlocprio"
 
@@ -630,7 +630,7 @@ type = "startlocprio"
 [[.args]]
 name = "whichStartLoc"
 type = "integer"
-[[.args]]
+``````````
 name = "prioSlotIndex"
 type = "integer"
 [[.returns]]
@@ -640,7 +640,7 @@ type = "integer"
 [[.args]]
 name = "whichStartLoc"
 type = "integer"
-[[.args]]
+``````````
 name = "prioSlotIndex"
 type = "integer"
 [[.returns]]
@@ -650,7 +650,7 @@ type = "startlocprio"
 [[.args]]
 name = "whichGameType"
 type = "gametype"
-[[.args]]
+``````````
 name = "value"
 type = "boolean"
 
@@ -658,7 +658,7 @@ type = "boolean"
 [[.args]]
 name = "whichMapFlag"
 type = "mapflag"
-[[.args]]
+``````````
 name = "value"
 type = "boolean"
 
@@ -758,7 +758,7 @@ type = "location"
 [[.args]]
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "whichTeam"
 type = "integer"
 
@@ -766,7 +766,7 @@ type = "integer"
 [[.args]]
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "startLocIndex"
 type = "integer"
 
@@ -774,7 +774,7 @@ type = "integer"
 [[.args]]
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "startLocIndex"
 type = "integer"
 
@@ -782,7 +782,7 @@ type = "integer"
 [[.args]]
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "color"
 type = "playercolor"
 
@@ -790,13 +790,13 @@ type = "playercolor"
 [[.args]]
 name = "sourcePlayer"
 type = "player"
-[[.args]]
+``````````
 name = "otherPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "whichAllianceSetting"
 type = "alliancetype"
-[[.args]]
+``````````
 name = "value"
 type = "boolean"
 
@@ -804,13 +804,13 @@ type = "boolean"
 [[.args]]
 name = "sourcePlayer"
 type = "player"
-[[.args]]
+``````````
 name = "otherPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "whichResource"
 type = "playerstate"
-[[.args]]
+``````````
 name = "rate"
 type = "integer"
 
@@ -818,7 +818,7 @@ type = "integer"
 [[.args]]
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "whichRacePreference"
 type = "racepreference"
 
@@ -826,7 +826,7 @@ type = "racepreference"
 [[.args]]
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "value"
 type = "boolean"
 
@@ -834,7 +834,7 @@ type = "boolean"
 [[.args]]
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "controlType"
 type = "mapcontrol"
 
@@ -842,7 +842,7 @@ type = "mapcontrol"
 [[.args]]
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "name"
 type = "string"
 
@@ -850,7 +850,7 @@ type = "string"
 [[.args]]
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "flag"
 type = "boolean"
 
@@ -900,10 +900,10 @@ type = "playerslotstate"
 [[.args]]
 name = "sourcePlayer"
 type = "player"
-[[.args]]
+``````````
 name = "otherPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "whichResource"
 type = "playerstate"
 [[.returns]]
@@ -913,7 +913,7 @@ type = "integer"
 [[.args]]
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "pref"
 type = "racepreference"
 [[.returns]]
@@ -939,13 +939,13 @@ type = "timer"
 [[.args]]
 name = "whichTimer"
 type = "timer"
-[[.args]]
+``````````
 name = "timeout"
 type = "number"
-[[.args]]
+``````````
 name = "periodic"
 type = "boolean"
-[[.args]]
+``````````
 name = "handlerFunc"
 type = "code"
 
@@ -997,7 +997,7 @@ type = "group"
 [[.args]]
 name = "whichGroup"
 type = "group"
-[[.args]]
+``````````
 name = "whichUnit"
 type = "unit"
 
@@ -1005,7 +1005,7 @@ type = "unit"
 [[.args]]
 name = "whichGroup"
 type = "group"
-[[.args]]
+``````````
 name = "whichUnit"
 type = "unit"
 
@@ -1018,10 +1018,10 @@ type = "group"
 [[.args]]
 name = "whichGroup"
 type = "group"
-[[.args]]
+``````````
 name = "unitname"
 type = "string"
-[[.args]]
+``````````
 name = "filter"
 type = "boolexpr"
 
@@ -1029,10 +1029,10 @@ type = "boolexpr"
 [[.args]]
 name = "whichGroup"
 type = "group"
-[[.args]]
+``````````
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "filter"
 type = "boolexpr"
 
@@ -1040,13 +1040,13 @@ type = "boolexpr"
 [[.args]]
 name = "whichGroup"
 type = "group"
-[[.args]]
+``````````
 name = "unitname"
 type = "string"
-[[.args]]
+``````````
 name = "filter"
 type = "boolexpr"
-[[.args]]
+``````````
 name = "countLimit"
 type = "integer"
 
@@ -1054,10 +1054,10 @@ type = "integer"
 [[.args]]
 name = "whichGroup"
 type = "group"
-[[.args]]
+``````````
 name = "r"
 type = "rect"
-[[.args]]
+``````````
 name = "filter"
 type = "boolexpr"
 
@@ -1065,13 +1065,13 @@ type = "boolexpr"
 [[.args]]
 name = "whichGroup"
 type = "group"
-[[.args]]
+``````````
 name = "r"
 type = "rect"
-[[.args]]
+``````````
 name = "filter"
 type = "boolexpr"
-[[.args]]
+``````````
 name = "countLimit"
 type = "integer"
 
@@ -1079,16 +1079,16 @@ type = "integer"
 [[.args]]
 name = "whichGroup"
 type = "group"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "radius"
 type = "number"
-[[.args]]
+``````````
 name = "filter"
 type = "boolexpr"
 
@@ -1096,13 +1096,13 @@ type = "boolexpr"
 [[.args]]
 name = "whichGroup"
 type = "group"
-[[.args]]
+``````````
 name = "whichLocation"
 type = "location"
-[[.args]]
+``````````
 name = "radius"
 type = "number"
-[[.args]]
+``````````
 name = "filter"
 type = "boolexpr"
 
@@ -1110,19 +1110,19 @@ type = "boolexpr"
 [[.args]]
 name = "whichGroup"
 type = "group"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "radius"
 type = "number"
-[[.args]]
+``````````
 name = "filter"
 type = "boolexpr"
-[[.args]]
+``````````
 name = "countLimit"
 type = "integer"
 
@@ -1130,16 +1130,16 @@ type = "integer"
 [[.args]]
 name = "whichGroup"
 type = "group"
-[[.args]]
+``````````
 name = "whichLocation"
 type = "location"
-[[.args]]
+``````````
 name = "radius"
 type = "number"
-[[.args]]
+``````````
 name = "filter"
 type = "boolexpr"
-[[.args]]
+``````````
 name = "countLimit"
 type = "integer"
 
@@ -1147,10 +1147,10 @@ type = "integer"
 [[.args]]
 name = "whichGroup"
 type = "group"
-[[.args]]
+``````````
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "filter"
 type = "boolexpr"
 
@@ -1158,7 +1158,7 @@ type = "boolexpr"
 [[.args]]
 name = "whichGroup"
 type = "group"
-[[.args]]
+``````````
 name = "order"
 type = "string"
 [[.returns]]
@@ -1168,7 +1168,7 @@ type = "boolean"
 [[.args]]
 name = "whichGroup"
 type = "group"
-[[.args]]
+``````````
 name = "order"
 type = "integer"
 [[.returns]]
@@ -1178,13 +1178,13 @@ type = "boolean"
 [[.args]]
 name = "whichGroup"
 type = "group"
-[[.args]]
+``````````
 name = "order"
 type = "string"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
 [[.returns]]
@@ -1194,10 +1194,10 @@ type = "boolean"
 [[.args]]
 name = "whichGroup"
 type = "group"
-[[.args]]
+``````````
 name = "order"
 type = "string"
-[[.args]]
+``````````
 name = "whichLocation"
 type = "location"
 [[.returns]]
@@ -1207,13 +1207,13 @@ type = "boolean"
 [[.args]]
 name = "whichGroup"
 type = "group"
-[[.args]]
+``````````
 name = "order"
 type = "integer"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
 [[.returns]]
@@ -1223,10 +1223,10 @@ type = "boolean"
 [[.args]]
 name = "whichGroup"
 type = "group"
-[[.args]]
+``````````
 name = "order"
 type = "integer"
-[[.args]]
+``````````
 name = "whichLocation"
 type = "location"
 [[.returns]]
@@ -1236,10 +1236,10 @@ type = "boolean"
 [[.args]]
 name = "whichGroup"
 type = "group"
-[[.args]]
+``````````
 name = "order"
 type = "string"
-[[.args]]
+``````````
 name = "targetWidget"
 type = "widget"
 [[.returns]]
@@ -1249,10 +1249,10 @@ type = "boolean"
 [[.args]]
 name = "whichGroup"
 type = "group"
-[[.args]]
+``````````
 name = "order"
 type = "integer"
-[[.args]]
+``````````
 name = "targetWidget"
 type = "widget"
 [[.returns]]
@@ -1262,7 +1262,7 @@ type = "boolean"
 [[.args]]
 name = "whichGroup"
 type = "group"
-[[.args]]
+``````````
 name = "callback"
 type = "code"
 
@@ -1286,7 +1286,7 @@ type = "force"
 [[.args]]
 name = "whichForce"
 type = "force"
-[[.args]]
+``````````
 name = "whichPlayer"
 type = "player"
 
@@ -1294,7 +1294,7 @@ type = "player"
 [[.args]]
 name = "whichForce"
 type = "force"
-[[.args]]
+``````````
 name = "whichPlayer"
 type = "player"
 
@@ -1307,7 +1307,7 @@ type = "force"
 [[.args]]
 name = "whichForce"
 type = "force"
-[[.args]]
+``````````
 name = "filter"
 type = "boolexpr"
 
@@ -1315,10 +1315,10 @@ type = "boolexpr"
 [[.args]]
 name = "whichForce"
 type = "force"
-[[.args]]
+``````````
 name = "filter"
 type = "boolexpr"
-[[.args]]
+``````````
 name = "countLimit"
 type = "integer"
 
@@ -1326,10 +1326,10 @@ type = "integer"
 [[.args]]
 name = "whichForce"
 type = "force"
-[[.args]]
+``````````
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "filter"
 type = "boolexpr"
 
@@ -1337,10 +1337,10 @@ type = "boolexpr"
 [[.args]]
 name = "whichForce"
 type = "force"
-[[.args]]
+``````````
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "filter"
 type = "boolexpr"
 
@@ -1348,7 +1348,7 @@ type = "boolexpr"
 [[.args]]
 name = "whichForce"
 type = "force"
-[[.args]]
+``````````
 name = "callback"
 type = "code"
 
@@ -1356,13 +1356,13 @@ type = "code"
 [[.args]]
 name = "minx"
 type = "number"
-[[.args]]
+``````````
 name = "miny"
 type = "number"
-[[.args]]
+``````````
 name = "maxx"
 type = "number"
-[[.args]]
+``````````
 name = "maxy"
 type = "number"
 [[.returns]]
@@ -1372,7 +1372,7 @@ type = "rect"
 [[.args]]
 name = "min"
 type = "location"
-[[.args]]
+``````````
 name = "max"
 type = "location"
 [[.returns]]
@@ -1387,16 +1387,16 @@ type = "rect"
 [[.args]]
 name = "whichRect"
 type = "rect"
-[[.args]]
+``````````
 name = "minx"
 type = "number"
-[[.args]]
+``````````
 name = "miny"
 type = "number"
-[[.args]]
+``````````
 name = "maxx"
 type = "number"
-[[.args]]
+``````````
 name = "maxy"
 type = "number"
 
@@ -1404,10 +1404,10 @@ type = "number"
 [[.args]]
 name = "whichRect"
 type = "rect"
-[[.args]]
+``````````
 name = "min"
 type = "location"
-[[.args]]
+``````````
 name = "max"
 type = "location"
 
@@ -1415,10 +1415,10 @@ type = "location"
 [[.args]]
 name = "whichRect"
 type = "rect"
-[[.args]]
+``````````
 name = "newCenterX"
 type = "number"
-[[.args]]
+``````````
 name = "newCenterY"
 type = "number"
 
@@ -1426,7 +1426,7 @@ type = "number"
 [[.args]]
 name = "whichRect"
 type = "rect"
-[[.args]]
+``````````
 name = "newCenterLoc"
 type = "location"
 
@@ -1485,7 +1485,7 @@ type = "region"
 [[.args]]
 name = "whichRegion"
 type = "region"
-[[.args]]
+``````````
 name = "r"
 type = "rect"
 
@@ -1493,7 +1493,7 @@ type = "rect"
 [[.args]]
 name = "whichRegion"
 type = "region"
-[[.args]]
+``````````
 name = "r"
 type = "rect"
 
@@ -1501,10 +1501,10 @@ type = "rect"
 [[.args]]
 name = "whichRegion"
 type = "region"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
 
@@ -1512,7 +1512,7 @@ type = "number"
 [[.args]]
 name = "whichRegion"
 type = "region"
-[[.args]]
+``````````
 name = "whichLocation"
 type = "location"
 
@@ -1520,10 +1520,10 @@ type = "location"
 [[.args]]
 name = "whichRegion"
 type = "region"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
 
@@ -1531,7 +1531,7 @@ type = "number"
 [[.args]]
 name = "whichRegion"
 type = "region"
-[[.args]]
+``````````
 name = "whichLocation"
 type = "location"
 
@@ -1539,7 +1539,7 @@ type = "location"
 [[.args]]
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
 [[.returns]]
@@ -1554,10 +1554,10 @@ type = "location"
 [[.args]]
 name = "whichLocation"
 type = "location"
-[[.args]]
+``````````
 name = "newX"
 type = "number"
-[[.args]]
+``````````
 name = "newY"
 type = "number"
 
@@ -1586,7 +1586,7 @@ type = "number"
 [[.args]]
 name = "whichRegion"
 type = "region"
-[[.args]]
+``````````
 name = "whichUnit"
 type = "unit"
 [[.returns]]
@@ -1596,10 +1596,10 @@ type = "boolean"
 [[.args]]
 name = "whichRegion"
 type = "region"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
 [[.returns]]
@@ -1609,7 +1609,7 @@ type = "boolean"
 [[.args]]
 name = "whichRegion"
 type = "region"
-[[.args]]
+``````````
 name = "whichLocation"
 type = "location"
 [[.returns]]
@@ -1654,7 +1654,7 @@ type = "boolean"
 [[.args]]
 name = "whichTrigger"
 type = "trigger"
-[[.args]]
+``````````
 name = "flag"
 type = "boolean"
 
@@ -1728,7 +1728,7 @@ type = "string"
 [[.args]]
 name = "operandA"
 type = "boolexpr"
-[[.args]]
+``````````
 name = "operandB"
 type = "boolexpr"
 [[.returns]]
@@ -1738,7 +1738,7 @@ type = "boolexpr"
 [[.args]]
 name = "operandA"
 type = "boolexpr"
-[[.args]]
+``````````
 name = "operandB"
 type = "boolexpr"
 [[.returns]]
@@ -1784,13 +1784,13 @@ type = "boolexpr"
 [[.args]]
 name = "whichTrigger"
 type = "trigger"
-[[.args]]
+``````````
 name = "varName"
 type = "string"
-[[.args]]
+``````````
 name = "opcode"
 type = "limitop"
-[[.args]]
+``````````
 name = "limitval"
 type = "number"
 [[.returns]]
@@ -1800,10 +1800,10 @@ type = "event"
 [[.args]]
 name = "whichTrigger"
 type = "trigger"
-[[.args]]
+``````````
 name = "timeout"
 type = "number"
-[[.args]]
+``````````
 name = "periodic"
 type = "boolean"
 [[.returns]]
@@ -1813,7 +1813,7 @@ type = "event"
 [[.args]]
 name = "whichTrigger"
 type = "trigger"
-[[.args]]
+``````````
 name = "t"
 type = "timer"
 [[.returns]]
@@ -1823,13 +1823,13 @@ type = "event"
 [[.args]]
 name = "whichTrigger"
 type = "trigger"
-[[.args]]
+``````````
 name = "whichState"
 type = "gamestate"
-[[.args]]
+``````````
 name = "opcode"
 type = "limitop"
-[[.args]]
+``````````
 name = "limitval"
 type = "number"
 [[.returns]]
@@ -1839,7 +1839,7 @@ type = "event"
 [[.args]]
 name = "whichTrigger"
 type = "trigger"
-[[.args]]
+``````````
 name = "whichDialog"
 type = "dialog"
 [[.returns]]
@@ -1849,7 +1849,7 @@ type = "event"
 [[.args]]
 name = "whichTrigger"
 type = "trigger"
-[[.args]]
+``````````
 name = "whichButton"
 type = "button"
 [[.returns]]
@@ -1863,7 +1863,7 @@ type = "gamestate"
 [[.args]]
 name = "whichTrigger"
 type = "trigger"
-[[.args]]
+``````````
 name = "whichGameEvent"
 type = "gameevent"
 [[.returns]]
@@ -1877,10 +1877,10 @@ type = "player"
 [[.args]]
 name = "whichTrigger"
 type = "trigger"
-[[.args]]
+``````````
 name = "whichRegion"
 type = "region"
-[[.args]]
+``````````
 name = "filter"
 type = "boolexpr"
 [[.returns]]
@@ -1898,10 +1898,10 @@ type = "unit"
 [[.args]]
 name = "whichTrigger"
 type = "trigger"
-[[.args]]
+``````````
 name = "whichRegion"
 type = "region"
-[[.args]]
+``````````
 name = "filter"
 type = "boolexpr"
 [[.returns]]
@@ -1915,7 +1915,7 @@ type = "unit"
 [[.args]]
 name = "whichTrigger"
 type = "trigger"
-[[.args]]
+``````````
 name = "t"
 type = "trackable"
 [[.returns]]
@@ -1925,7 +1925,7 @@ type = "event"
 [[.args]]
 name = "whichTrigger"
 type = "trigger"
-[[.args]]
+``````````
 name = "t"
 type = "trackable"
 [[.returns]]
@@ -1970,10 +1970,10 @@ type = "string"
 [[.args]]
 name = "whichTrigger"
 type = "trigger"
-[[.args]]
+``````````
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "whichPlayerEvent"
 type = "playerevent"
 [[.returns]]
@@ -1987,13 +1987,13 @@ type = "player"
 [[.args]]
 name = "whichTrigger"
 type = "trigger"
-[[.args]]
+``````````
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "whichPlayerUnitEvent"
 type = "playerunitevent"
-[[.args]]
+``````````
 name = "filter"
 type = "boolexpr"
 [[.returns]]
@@ -2199,10 +2199,10 @@ type = "unit"
 [[.args]]
 name = "whichTrigger"
 type = "trigger"
-[[.args]]
+``````````
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "whichAlliance"
 type = "alliancetype"
 [[.returns]]
@@ -2212,16 +2212,16 @@ type = "event"
 [[.args]]
 name = "whichTrigger"
 type = "trigger"
-[[.args]]
+``````````
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "whichState"
 type = "playerstate"
-[[.args]]
+``````````
 name = "opcode"
 type = "limitop"
-[[.args]]
+``````````
 name = "limitval"
 type = "number"
 [[.returns]]
@@ -2235,13 +2235,13 @@ type = "playerstate"
 [[.args]]
 name = "whichTrigger"
 type = "trigger"
-[[.args]]
+``````````
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "chatMessageToDetect"
 type = "string"
-[[.args]]
+``````````
 name = "exactMatchOnly"
 type = "boolean"
 [[.returns]]
@@ -2259,7 +2259,7 @@ type = "string"
 [[.args]]
 name = "whichTrigger"
 type = "trigger"
-[[.args]]
+``````````
 name = "whichWidget"
 type = "widget"
 [[.returns]]
@@ -2273,16 +2273,16 @@ type = "unit"
 [[.args]]
 name = "whichTrigger"
 type = "trigger"
-[[.args]]
+``````````
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "whichState"
 type = "unitstate"
-[[.args]]
+``````````
 name = "opcode"
 type = "limitop"
-[[.args]]
+``````````
 name = "limitval"
 type = "number"
 [[.returns]]
@@ -2296,10 +2296,10 @@ type = "unitstate"
 [[.args]]
 name = "whichTrigger"
 type = "trigger"
-[[.args]]
+``````````
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "whichEvent"
 type = "unitevent"
 [[.returns]]
@@ -2321,13 +2321,13 @@ type = "player"
 [[.args]]
 name = "whichTrigger"
 type = "trigger"
-[[.args]]
+``````````
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "whichEvent"
 type = "unitevent"
-[[.args]]
+``````````
 name = "filter"
 type = "boolexpr"
 [[.returns]]
@@ -2341,13 +2341,13 @@ type = "unit"
 [[.args]]
 name = "whichTrigger"
 type = "trigger"
-[[.args]]
+``````````
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "range"
 type = "number"
-[[.args]]
+``````````
 name = "filter"
 type = "boolexpr"
 [[.returns]]
@@ -2357,7 +2357,7 @@ type = "event"
 [[.args]]
 name = "whichTrigger"
 type = "trigger"
-[[.args]]
+``````````
 name = "condition"
 type = "boolexpr"
 [[.returns]]
@@ -2367,7 +2367,7 @@ type = "triggercondition"
 [[.args]]
 name = "whichTrigger"
 type = "trigger"
-[[.args]]
+``````````
 name = "whichCondition"
 type = "triggercondition"
 
@@ -2380,7 +2380,7 @@ type = "trigger"
 [[.args]]
 name = "whichTrigger"
 type = "trigger"
-[[.args]]
+``````````
 name = "actionFunc"
 type = "code"
 [[.returns]]
@@ -2390,7 +2390,7 @@ type = "triggeraction"
 [[.args]]
 name = "whichTrigger"
 type = "trigger"
-[[.args]]
+``````````
 name = "whichAction"
 type = "triggeraction"
 
@@ -2408,7 +2408,7 @@ type = "number"
 [[.args]]
 name = "s"
 type = "sound"
-[[.args]]
+``````````
 name = "offset"
 type = "number"
 
@@ -2444,7 +2444,7 @@ type = "number"
 [[.args]]
 name = "whichWidget"
 type = "widget"
-[[.args]]
+``````````
 name = "newLife"
 type = "number"
 
@@ -2470,19 +2470,19 @@ type = "widget"
 [[.args]]
 name = "objectid"
 type = "integer"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "face"
 type = "number"
-[[.args]]
+``````````
 name = "scale"
 type = "number"
-[[.args]]
+``````````
 name = "variation"
 type = "integer"
 [[.returns]]
@@ -2492,22 +2492,22 @@ type = "destructable"
 [[.args]]
 name = "objectid"
 type = "integer"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "z"
 type = "number"
-[[.args]]
+``````````
 name = "face"
 type = "number"
-[[.args]]
+``````````
 name = "scale"
 type = "number"
-[[.args]]
+``````````
 name = "variation"
 type = "integer"
 [[.returns]]
@@ -2517,19 +2517,19 @@ type = "destructable"
 [[.args]]
 name = "objectid"
 type = "integer"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "face"
 type = "number"
-[[.args]]
+``````````
 name = "scale"
 type = "number"
-[[.args]]
+``````````
 name = "variation"
 type = "integer"
 [[.returns]]
@@ -2539,22 +2539,22 @@ type = "destructable"
 [[.args]]
 name = "objectid"
 type = "integer"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "z"
 type = "number"
-[[.args]]
+``````````
 name = "face"
 type = "number"
-[[.args]]
+``````````
 name = "scale"
 type = "number"
-[[.args]]
+``````````
 name = "variation"
 type = "integer"
 [[.returns]]
@@ -2574,7 +2574,7 @@ type = "destructable"
 [[.args]]
 name = "d"
 type = "destructable"
-[[.args]]
+``````````
 name = "flag"
 type = "boolean"
 
@@ -2589,10 +2589,10 @@ type = "boolean"
 [[.args]]
 name = "r"
 type = "rect"
-[[.args]]
+``````````
 name = "filter"
 type = "boolexpr"
-[[.args]]
+``````````
 name = "actionFunc"
 type = "code"
 
@@ -2621,7 +2621,7 @@ type = "number"
 [[.args]]
 name = "d"
 type = "destructable"
-[[.args]]
+``````````
 name = "life"
 type = "number"
 
@@ -2636,7 +2636,7 @@ type = "number"
 [[.args]]
 name = "d"
 type = "destructable"
-[[.args]]
+``````````
 name = "max"
 type = "number"
 
@@ -2651,10 +2651,10 @@ type = "number"
 [[.args]]
 name = "d"
 type = "destructable"
-[[.args]]
+``````````
 name = "life"
 type = "number"
-[[.args]]
+``````````
 name = "birth"
 type = "boolean"
 
@@ -2662,7 +2662,7 @@ type = "boolean"
 [[.args]]
 name = "d"
 type = "destructable"
-[[.args]]
+``````````
 name = "whichAnimation"
 type = "string"
 
@@ -2670,7 +2670,7 @@ type = "string"
 [[.args]]
 name = "d"
 type = "destructable"
-[[.args]]
+``````````
 name = "whichAnimation"
 type = "string"
 
@@ -2678,7 +2678,7 @@ type = "string"
 [[.args]]
 name = "d"
 type = "destructable"
-[[.args]]
+``````````
 name = "speedFactor"
 type = "number"
 
@@ -2686,7 +2686,7 @@ type = "number"
 [[.args]]
 name = "d"
 type = "destructable"
-[[.args]]
+``````````
 name = "flag"
 type = "boolean"
 
@@ -2701,7 +2701,7 @@ type = "number"
 [[.args]]
 name = "d"
 type = "destructable"
-[[.args]]
+``````````
 name = "height"
 type = "number"
 
@@ -2720,10 +2720,10 @@ type = "destructable"
 [[.args]]
 name = "itemid"
 type = "integer"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
 [[.returns]]
@@ -2766,10 +2766,10 @@ type = "number"
 [[.args]]
 name = "i"
 type = "item"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
 
@@ -2777,7 +2777,7 @@ type = "number"
 [[.args]]
 name = "whichItem"
 type = "item"
-[[.args]]
+``````````
 name = "flag"
 type = "boolean"
 
@@ -2785,7 +2785,7 @@ type = "boolean"
 [[.args]]
 name = "i"
 type = "item"
-[[.args]]
+``````````
 name = "flag"
 type = "boolean"
 
@@ -2793,7 +2793,7 @@ type = "boolean"
 [[.args]]
 name = "i"
 type = "item"
-[[.args]]
+``````````
 name = "flag"
 type = "boolean"
 
@@ -2801,10 +2801,10 @@ type = "boolean"
 [[.args]]
 name = "whichItem"
 type = "item"
-[[.args]]
+``````````
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "changeColor"
 type = "boolean"
 
@@ -2812,7 +2812,7 @@ type = "boolean"
 [[.args]]
 name = "whichItem"
 type = "item"
-[[.args]]
+``````````
 name = "flag"
 type = "boolean"
 
@@ -2827,7 +2827,7 @@ type = "boolean"
 [[.args]]
 name = "whichItem"
 type = "item"
-[[.args]]
+``````````
 name = "show"
 type = "boolean"
 
@@ -2891,10 +2891,10 @@ type = "boolean"
 [[.args]]
 name = "r"
 type = "rect"
-[[.args]]
+``````````
 name = "filter"
 type = "boolexpr"
-[[.args]]
+``````````
 name = "actionFunc"
 type = "code"
 
@@ -2916,7 +2916,7 @@ type = "itemtype"
 [[.args]]
 name = "whichItem"
 type = "item"
-[[.args]]
+``````````
 name = "unitId"
 type = "integer"
 
@@ -2938,7 +2938,7 @@ type = "integer"
 [[.args]]
 name = "whichItem"
 type = "item"
-[[.args]]
+``````````
 name = "charges"
 type = "integer"
 
@@ -2953,7 +2953,7 @@ type = "integer"
 [[.args]]
 name = "whichItem"
 type = "item"
-[[.args]]
+``````````
 name = "data"
 type = "integer"
 
@@ -2961,16 +2961,16 @@ type = "integer"
 [[.args]]
 name = "id"
 type = "player"
-[[.args]]
+``````````
 name = "unitid"
 type = "integer"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "face"
 type = "number"
 [[.returns]]
@@ -2980,16 +2980,16 @@ type = "unit"
 [[.args]]
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "unitname"
 type = "string"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "face"
 type = "number"
 [[.returns]]
@@ -2999,13 +2999,13 @@ type = "unit"
 [[.args]]
 name = "id"
 type = "player"
-[[.args]]
+``````````
 name = "unitid"
 type = "integer"
-[[.args]]
+``````````
 name = "whichLocation"
 type = "location"
-[[.args]]
+``````````
 name = "face"
 type = "number"
 [[.returns]]
@@ -3015,13 +3015,13 @@ type = "unit"
 [[.args]]
 name = "id"
 type = "player"
-[[.args]]
+``````````
 name = "unitname"
 type = "string"
-[[.args]]
+``````````
 name = "whichLocation"
 type = "location"
-[[.args]]
+``````````
 name = "face"
 type = "number"
 [[.returns]]
@@ -3031,16 +3031,16 @@ type = "unit"
 [[.args]]
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "unitid"
 type = "integer"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "face"
 type = "number"
 [[.returns]]
@@ -3060,7 +3060,7 @@ type = "unit"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "show"
 type = "boolean"
 
@@ -3068,10 +3068,10 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "whichUnitState"
 type = "unitstate"
-[[.args]]
+``````````
 name = "newVal"
 type = "number"
 
@@ -3079,7 +3079,7 @@ type = "number"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "newX"
 type = "number"
 
@@ -3087,7 +3087,7 @@ type = "number"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "newY"
 type = "number"
 
@@ -3095,10 +3095,10 @@ type = "number"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "newX"
 type = "number"
-[[.args]]
+``````````
 name = "newY"
 type = "number"
 
@@ -3106,7 +3106,7 @@ type = "number"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "whichLocation"
 type = "location"
 
@@ -3114,7 +3114,7 @@ type = "location"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "facingAngle"
 type = "number"
 
@@ -3122,10 +3122,10 @@ type = "number"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "facingAngle"
 type = "number"
-[[.args]]
+``````````
 name = "duration"
 type = "number"
 
@@ -3133,7 +3133,7 @@ type = "number"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "newSpeed"
 type = "number"
 
@@ -3141,10 +3141,10 @@ type = "number"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "newHeight"
 type = "number"
-[[.args]]
+``````````
 name = "rate"
 type = "number"
 
@@ -3152,7 +3152,7 @@ type = "number"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "newTurnSpeed"
 type = "number"
 
@@ -3160,7 +3160,7 @@ type = "number"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "newPropWindowAngle"
 type = "number"
 
@@ -3168,7 +3168,7 @@ type = "number"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "newAcquireRange"
 type = "number"
 
@@ -3176,7 +3176,7 @@ type = "number"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "creepGuard"
 type = "boolean"
 
@@ -3240,10 +3240,10 @@ type = "number"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "changeColor"
 type = "boolean"
 
@@ -3251,7 +3251,7 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "whichColor"
 type = "playercolor"
 
@@ -3259,13 +3259,13 @@ type = "playercolor"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "scaleX"
 type = "number"
-[[.args]]
+``````````
 name = "scaleY"
 type = "number"
-[[.args]]
+``````````
 name = "scaleZ"
 type = "number"
 
@@ -3273,7 +3273,7 @@ type = "number"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "timeScale"
 type = "number"
 
@@ -3281,7 +3281,7 @@ type = "number"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "blendTime"
 type = "number"
 
@@ -3289,16 +3289,16 @@ type = "number"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "red"
 type = "integer"
-[[.args]]
+``````````
 name = "green"
 type = "integer"
-[[.args]]
+``````````
 name = "blue"
 type = "integer"
-[[.args]]
+``````````
 name = "alpha"
 type = "integer"
 
@@ -3306,7 +3306,7 @@ type = "integer"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "whichAnimation"
 type = "string"
 
@@ -3314,7 +3314,7 @@ type = "string"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "whichAnimation"
 type = "string"
 
@@ -3322,7 +3322,7 @@ type = "string"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "whichAnimation"
 type = "integer"
 
@@ -3330,10 +3330,10 @@ type = "integer"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "whichAnimation"
 type = "string"
-[[.args]]
+``````````
 name = "rarity"
 type = "raritycontrol"
 
@@ -3341,10 +3341,10 @@ type = "raritycontrol"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "animProperties"
 type = "string"
-[[.args]]
+``````````
 name = "add"
 type = "boolean"
 
@@ -3352,19 +3352,19 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "whichBone"
 type = "string"
-[[.args]]
+``````````
 name = "lookAtTarget"
 type = "unit"
-[[.args]]
+``````````
 name = "offsetX"
 type = "number"
-[[.args]]
+``````````
 name = "offsetY"
 type = "number"
-[[.args]]
+``````````
 name = "offsetZ"
 type = "number"
 
@@ -3377,10 +3377,10 @@ type = "unit"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "byWhichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "flag"
 type = "boolean"
 
@@ -3388,7 +3388,7 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "range"
 type = "number"
 
@@ -3396,10 +3396,10 @@ type = "number"
 [[.args]]
 name = "whichHero"
 type = "unit"
-[[.args]]
+``````````
 name = "newStr"
 type = "integer"
-[[.args]]
+``````````
 name = "permanent"
 type = "boolean"
 
@@ -3407,10 +3407,10 @@ type = "boolean"
 [[.args]]
 name = "whichHero"
 type = "unit"
-[[.args]]
+``````````
 name = "newAgi"
 type = "integer"
-[[.args]]
+``````````
 name = "permanent"
 type = "boolean"
 
@@ -3418,10 +3418,10 @@ type = "boolean"
 [[.args]]
 name = "whichHero"
 type = "unit"
-[[.args]]
+``````````
 name = "newInt"
 type = "integer"
-[[.args]]
+``````````
 name = "permanent"
 type = "boolean"
 
@@ -3429,7 +3429,7 @@ type = "boolean"
 [[.args]]
 name = "whichHero"
 type = "unit"
-[[.args]]
+``````````
 name = "includeBonuses"
 type = "boolean"
 [[.returns]]
@@ -3439,7 +3439,7 @@ type = "integer"
 [[.args]]
 name = "whichHero"
 type = "unit"
-[[.args]]
+``````````
 name = "includeBonuses"
 type = "boolean"
 [[.returns]]
@@ -3449,7 +3449,7 @@ type = "integer"
 [[.args]]
 name = "whichHero"
 type = "unit"
-[[.args]]
+``````````
 name = "includeBonuses"
 type = "boolean"
 [[.returns]]
@@ -3459,7 +3459,7 @@ type = "integer"
 [[.args]]
 name = "whichHero"
 type = "unit"
-[[.args]]
+``````````
 name = "howManyLevels"
 type = "integer"
 [[.returns]]
@@ -3476,10 +3476,10 @@ type = "integer"
 [[.args]]
 name = "whichHero"
 type = "unit"
-[[.args]]
+``````````
 name = "newXpVal"
 type = "integer"
-[[.args]]
+``````````
 name = "showEyeCandy"
 type = "boolean"
 
@@ -3494,7 +3494,7 @@ type = "integer"
 [[.args]]
 name = "whichHero"
 type = "unit"
-[[.args]]
+``````````
 name = "skillPointDelta"
 type = "integer"
 [[.returns]]
@@ -3504,10 +3504,10 @@ type = "boolean"
 [[.args]]
 name = "whichHero"
 type = "unit"
-[[.args]]
+``````````
 name = "xpToAdd"
 type = "integer"
-[[.args]]
+``````````
 name = "showEyeCandy"
 type = "boolean"
 
@@ -3515,10 +3515,10 @@ type = "boolean"
 [[.args]]
 name = "whichHero"
 type = "unit"
-[[.args]]
+``````````
 name = "level"
 type = "integer"
-[[.args]]
+``````````
 name = "showEyeCandy"
 type = "boolean"
 
@@ -3547,7 +3547,7 @@ type = "string"
 [[.args]]
 name = "whichHero"
 type = "unit"
-[[.args]]
+``````````
 name = "flag"
 type = "boolean"
 
@@ -3562,7 +3562,7 @@ type = "boolean"
 [[.args]]
 name = "whichHero"
 type = "unit"
-[[.args]]
+``````````
 name = "abilcode"
 type = "integer"
 
@@ -3570,7 +3570,7 @@ type = "integer"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "abilcode"
 type = "integer"
 [[.returns]]
@@ -3580,7 +3580,7 @@ type = "integer"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "abilcode"
 type = "integer"
 [[.returns]]
@@ -3590,7 +3590,7 @@ type = "integer"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "abilcode"
 type = "integer"
 [[.returns]]
@@ -3600,10 +3600,10 @@ type = "integer"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "abilcode"
 type = "integer"
-[[.args]]
+``````````
 name = "level"
 type = "integer"
 [[.returns]]
@@ -3613,13 +3613,13 @@ type = "integer"
 [[.args]]
 name = "whichHero"
 type = "unit"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "doEyecandy"
 type = "boolean"
 [[.returns]]
@@ -3629,10 +3629,10 @@ type = "boolean"
 [[.args]]
 name = "whichHero"
 type = "unit"
-[[.args]]
+``````````
 name = "loc"
 type = "location"
-[[.args]]
+``````````
 name = "doEyecandy"
 type = "boolean"
 [[.returns]]
@@ -3642,7 +3642,7 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "exploded"
 type = "boolean"
 
@@ -3650,7 +3650,7 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "flag"
 type = "boolean"
 
@@ -3658,7 +3658,7 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "flag"
 type = "boolean"
 
@@ -3673,7 +3673,7 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "flag"
 type = "boolean"
 
@@ -3683,7 +3683,7 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "flag"
 type = "boolean"
 
@@ -3705,7 +3705,7 @@ type = "integer"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "whichItem"
 type = "item"
 [[.returns]]
@@ -3715,7 +3715,7 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "itemId"
 type = "integer"
 [[.returns]]
@@ -3725,10 +3725,10 @@ type = "item"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "itemId"
 type = "integer"
-[[.args]]
+``````````
 name = "itemSlot"
 type = "integer"
 [[.returns]]
@@ -3738,7 +3738,7 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "whichItem"
 type = "item"
 
@@ -3746,7 +3746,7 @@ type = "item"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "itemSlot"
 type = "integer"
 [[.returns]]
@@ -3756,7 +3756,7 @@ type = "item"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "whichItem"
 type = "item"
 [[.returns]]
@@ -3766,7 +3766,7 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "itemSlot"
 type = "integer"
 [[.returns]]
@@ -3783,13 +3783,13 @@ type = "integer"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "whichItem"
 type = "item"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
 [[.returns]]
@@ -3799,10 +3799,10 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "whichItem"
 type = "item"
-[[.args]]
+``````````
 name = "slot"
 type = "integer"
 [[.returns]]
@@ -3812,10 +3812,10 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "whichItem"
 type = "item"
-[[.args]]
+``````````
 name = "target"
 type = "widget"
 [[.returns]]
@@ -3825,7 +3825,7 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "whichItem"
 type = "item"
 [[.returns]]
@@ -3835,13 +3835,13 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "whichItem"
 type = "item"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
 [[.returns]]
@@ -3851,10 +3851,10 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "whichItem"
 type = "item"
-[[.args]]
+``````````
 name = "target"
 type = "widget"
 [[.returns]]
@@ -3906,7 +3906,7 @@ type = "number"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "whichUnitState"
 type = "unitstate"
 [[.returns]]
@@ -3972,7 +3972,7 @@ type = "integer"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "useFood"
 type = "boolean"
 
@@ -4001,7 +4001,7 @@ type = "destructable"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "whichGroup"
 type = "group"
 [[.returns]]
@@ -4011,7 +4011,7 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "whichForce"
 type = "force"
 [[.returns]]
@@ -4021,7 +4021,7 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "whichPlayer"
 type = "player"
 [[.returns]]
@@ -4031,7 +4031,7 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "whichPlayer"
 type = "player"
 [[.returns]]
@@ -4041,7 +4041,7 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "whichPlayer"
 type = "player"
 [[.returns]]
@@ -4051,7 +4051,7 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "whichPlayer"
 type = "player"
 [[.returns]]
@@ -4061,7 +4061,7 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "whichPlayer"
 type = "player"
 [[.returns]]
@@ -4071,7 +4071,7 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "whichPlayer"
 type = "player"
 [[.returns]]
@@ -4081,7 +4081,7 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "whichPlayer"
 type = "player"
 [[.returns]]
@@ -4091,7 +4091,7 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "whichPlayer"
 type = "player"
 [[.returns]]
@@ -4101,7 +4101,7 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "whichPlayer"
 type = "player"
 [[.returns]]
@@ -4111,7 +4111,7 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "whichRace"
 type = "race"
 [[.returns]]
@@ -4121,7 +4121,7 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "whichUnitType"
 type = "unittype"
 [[.returns]]
@@ -4131,7 +4131,7 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "whichSpecifiedUnit"
 type = "unit"
 [[.returns]]
@@ -4141,10 +4141,10 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "otherUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "distance"
 type = "number"
 [[.returns]]
@@ -4154,13 +4154,13 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "distance"
 type = "number"
 [[.returns]]
@@ -4170,10 +4170,10 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "whichLocation"
 type = "location"
-[[.args]]
+``````````
 name = "distance"
 type = "number"
 [[.returns]]
@@ -4197,7 +4197,7 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "whichTransport"
 type = "unit"
 [[.returns]]
@@ -4221,7 +4221,7 @@ type = "boolean"
 [[.args]]
 name = "unitId"
 type = "integer"
-[[.args]]
+``````````
 name = "whichUnitType"
 type = "unittype"
 [[.returns]]
@@ -4231,10 +4231,10 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "share"
 type = "boolean"
 
@@ -4242,7 +4242,7 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "suspend"
 type = "boolean"
 
@@ -4250,7 +4250,7 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "whichUnitType"
 type = "unittype"
 [[.returns]]
@@ -4260,7 +4260,7 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "whichUnitType"
 type = "unittype"
 [[.returns]]
@@ -4270,7 +4270,7 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "abilityId"
 type = "integer"
 [[.returns]]
@@ -4280,7 +4280,7 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "abilityId"
 type = "integer"
 [[.returns]]
@@ -4290,10 +4290,10 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "permanent"
 type = "boolean"
-[[.args]]
+``````````
 name = "abilityId"
 type = "integer"
 [[.returns]]
@@ -4303,10 +4303,10 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "removePositive"
 type = "boolean"
-[[.args]]
+``````````
 name = "removeNegative"
 type = "boolean"
 
@@ -4314,25 +4314,25 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "removePositive"
 type = "boolean"
-[[.args]]
+``````````
 name = "removeNegative"
 type = "boolean"
-[[.args]]
+``````````
 name = "magic"
 type = "boolean"
-[[.args]]
+``````````
 name = "physical"
 type = "boolean"
-[[.args]]
+``````````
 name = "timedLife"
 type = "boolean"
-[[.args]]
+``````````
 name = "aura"
 type = "boolean"
-[[.args]]
+``````````
 name = "autoDispel"
 type = "boolean"
 
@@ -4340,25 +4340,25 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "removePositive"
 type = "boolean"
-[[.args]]
+``````````
 name = "removeNegative"
 type = "boolean"
-[[.args]]
+``````````
 name = "magic"
 type = "boolean"
-[[.args]]
+``````````
 name = "physical"
 type = "boolean"
-[[.args]]
+``````````
 name = "timedLife"
 type = "boolean"
-[[.args]]
+``````````
 name = "aura"
 type = "boolean"
-[[.args]]
+``````````
 name = "autoDispel"
 type = "boolean"
 [[.returns]]
@@ -4368,25 +4368,25 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "removePositive"
 type = "boolean"
-[[.args]]
+``````````
 name = "removeNegative"
 type = "boolean"
-[[.args]]
+``````````
 name = "magic"
 type = "boolean"
-[[.args]]
+``````````
 name = "physical"
 type = "boolean"
-[[.args]]
+``````````
 name = "timedLife"
 type = "boolean"
-[[.args]]
+``````````
 name = "aura"
 type = "boolean"
-[[.args]]
+``````````
 name = "autoDispel"
 type = "boolean"
 [[.returns]]
@@ -4396,7 +4396,7 @@ type = "integer"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "add"
 type = "boolean"
 
@@ -4411,7 +4411,7 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "add"
 type = "boolean"
 
@@ -4438,10 +4438,10 @@ type = "unit"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "buffId"
 type = "integer"
-[[.args]]
+``````````
 name = "duration"
 type = "number"
 
@@ -4449,7 +4449,7 @@ type = "number"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "flag"
 type = "boolean"
 [[.returns]]
@@ -4471,7 +4471,7 @@ type = "unit"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "constructionPercentage"
 type = "integer"
 
@@ -4479,7 +4479,7 @@ type = "integer"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "upgradePercentage"
 type = "integer"
 
@@ -4487,7 +4487,7 @@ type = "integer"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "flag"
 type = "boolean"
 
@@ -4495,7 +4495,7 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "flag"
 type = "boolean"
 
@@ -4503,34 +4503,34 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "delay"
 type = "number"
-[[.args]]
+``````````
 name = "radius"
 type = "number"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "amount"
 type = "number"
-[[.args]]
+``````````
 name = "attack"
 type = "boolean"
-[[.args]]
+``````````
 name = "ranged"
 type = "boolean"
-[[.args]]
+``````````
 name = "attackType"
 type = "attacktype"
-[[.args]]
+``````````
 name = "damageType"
 type = "damagetype"
-[[.args]]
+``````````
 name = "weaponType"
 type = "weapontype"
 [[.returns]]
@@ -4540,25 +4540,25 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "target"
 type = "widget"
-[[.args]]
+``````````
 name = "amount"
 type = "number"
-[[.args]]
+``````````
 name = "attack"
 type = "boolean"
-[[.args]]
+``````````
 name = "ranged"
 type = "boolean"
-[[.args]]
+``````````
 name = "attackType"
 type = "attacktype"
-[[.args]]
+``````````
 name = "damageType"
 type = "damagetype"
-[[.args]]
+``````````
 name = "weaponType"
 type = "weapontype"
 [[.returns]]
@@ -4568,7 +4568,7 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "order"
 type = "string"
 [[.returns]]
@@ -4578,7 +4578,7 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "order"
 type = "integer"
 [[.returns]]
@@ -4588,13 +4588,13 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "order"
 type = "string"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
 [[.returns]]
@@ -4604,10 +4604,10 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "order"
 type = "string"
-[[.args]]
+``````````
 name = "whichLocation"
 type = "location"
 [[.returns]]
@@ -4617,13 +4617,13 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "order"
 type = "integer"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
 [[.returns]]
@@ -4633,10 +4633,10 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "order"
 type = "integer"
-[[.args]]
+``````````
 name = "whichLocation"
 type = "location"
 [[.returns]]
@@ -4646,10 +4646,10 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "order"
 type = "string"
-[[.args]]
+``````````
 name = "targetWidget"
 type = "widget"
 [[.returns]]
@@ -4659,10 +4659,10 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "order"
 type = "integer"
-[[.args]]
+``````````
 name = "targetWidget"
 type = "widget"
 [[.returns]]
@@ -4672,16 +4672,16 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "order"
 type = "string"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "instantTargetWidget"
 type = "widget"
 [[.returns]]
@@ -4691,16 +4691,16 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "order"
 type = "integer"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "instantTargetWidget"
 type = "widget"
 [[.returns]]
@@ -4710,13 +4710,13 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "order"
 type = "string"
-[[.args]]
+``````````
 name = "targetWidget"
 type = "widget"
-[[.args]]
+``````````
 name = "instantTargetWidget"
 type = "widget"
 [[.returns]]
@@ -4726,13 +4726,13 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "order"
 type = "integer"
-[[.args]]
+``````````
 name = "targetWidget"
 type = "widget"
-[[.args]]
+``````````
 name = "instantTargetWidget"
 type = "widget"
 [[.returns]]
@@ -4742,13 +4742,13 @@ type = "boolean"
 [[.args]]
 name = "whichPeon"
 type = "unit"
-[[.args]]
+``````````
 name = "unitToBuild"
 type = "string"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
 [[.returns]]
@@ -4758,13 +4758,13 @@ type = "boolean"
 [[.args]]
 name = "whichPeon"
 type = "unit"
-[[.args]]
+``````````
 name = "unitId"
 type = "integer"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
 [[.returns]]
@@ -4774,10 +4774,10 @@ type = "boolean"
 [[.args]]
 name = "forWhichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "neutralStructure"
 type = "unit"
-[[.args]]
+``````````
 name = "unitToBuild"
 type = "string"
 [[.returns]]
@@ -4787,10 +4787,10 @@ type = "boolean"
 [[.args]]
 name = "forWhichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "neutralStructure"
 type = "unit"
-[[.args]]
+``````````
 name = "unitId"
 type = "integer"
 [[.returns]]
@@ -4800,16 +4800,16 @@ type = "boolean"
 [[.args]]
 name = "forWhichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "neutralStructure"
 type = "unit"
-[[.args]]
+``````````
 name = "unitToBuild"
 type = "string"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
 [[.returns]]
@@ -4819,16 +4819,16 @@ type = "boolean"
 [[.args]]
 name = "forWhichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "neutralStructure"
 type = "unit"
-[[.args]]
+``````````
 name = "unitId"
 type = "integer"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
 [[.returns]]
@@ -4838,13 +4838,13 @@ type = "boolean"
 [[.args]]
 name = "forWhichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "neutralStructure"
 type = "unit"
-[[.args]]
+``````````
 name = "unitToBuild"
 type = "string"
-[[.args]]
+``````````
 name = "target"
 type = "widget"
 [[.returns]]
@@ -4854,13 +4854,13 @@ type = "boolean"
 [[.args]]
 name = "forWhichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "neutralStructure"
 type = "unit"
-[[.args]]
+``````````
 name = "unitId"
 type = "integer"
-[[.args]]
+``````````
 name = "target"
 type = "widget"
 [[.returns]]
@@ -4877,7 +4877,7 @@ type = "integer"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "amount"
 type = "integer"
 
@@ -4885,7 +4885,7 @@ type = "integer"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "amount"
 type = "integer"
 
@@ -4914,10 +4914,10 @@ type = "number"
 [[.args]]
 name = "waygate"
 type = "unit"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
 
@@ -4925,7 +4925,7 @@ type = "number"
 [[.args]]
 name = "waygate"
 type = "unit"
-[[.args]]
+``````````
 name = "activate"
 type = "boolean"
 
@@ -4940,10 +4940,10 @@ type = "boolean"
 [[.args]]
 name = "itemId"
 type = "integer"
-[[.args]]
+``````````
 name = "currentStock"
 type = "integer"
-[[.args]]
+``````````
 name = "stockMax"
 type = "integer"
 
@@ -4951,13 +4951,13 @@ type = "integer"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "itemId"
 type = "integer"
-[[.args]]
+``````````
 name = "currentStock"
 type = "integer"
-[[.args]]
+``````````
 name = "stockMax"
 type = "integer"
 
@@ -4965,10 +4965,10 @@ type = "integer"
 [[.args]]
 name = "unitId"
 type = "integer"
-[[.args]]
+``````````
 name = "currentStock"
 type = "integer"
-[[.args]]
+``````````
 name = "stockMax"
 type = "integer"
 
@@ -4976,13 +4976,13 @@ type = "integer"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "unitId"
 type = "integer"
-[[.args]]
+``````````
 name = "currentStock"
 type = "integer"
-[[.args]]
+``````````
 name = "stockMax"
 type = "integer"
 
@@ -4995,7 +4995,7 @@ type = "integer"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "itemId"
 type = "integer"
 
@@ -5008,7 +5008,7 @@ type = "integer"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "unitId"
 type = "integer"
 
@@ -5026,7 +5026,7 @@ type = "integer"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "slots"
 type = "integer"
 
@@ -5034,7 +5034,7 @@ type = "integer"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "slots"
 type = "integer"
 
@@ -5049,7 +5049,7 @@ type = "integer"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "data"
 type = "integer"
 
@@ -5068,7 +5068,7 @@ type = "player"
 [[.args]]
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "otherPlayer"
 type = "player"
 [[.returns]]
@@ -5078,7 +5078,7 @@ type = "boolean"
 [[.args]]
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "otherPlayer"
 type = "player"
 [[.returns]]
@@ -5088,7 +5088,7 @@ type = "boolean"
 [[.args]]
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "whichForce"
 type = "force"
 [[.returns]]
@@ -5105,10 +5105,10 @@ type = "boolean"
 [[.args]]
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "whichPlayer"
 type = "player"
 [[.returns]]
@@ -5118,7 +5118,7 @@ type = "boolean"
 [[.args]]
 name = "whichLocation"
 type = "location"
-[[.args]]
+``````````
 name = "whichPlayer"
 type = "player"
 [[.returns]]
@@ -5128,10 +5128,10 @@ type = "boolean"
 [[.args]]
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "whichPlayer"
 type = "player"
 [[.returns]]
@@ -5141,7 +5141,7 @@ type = "boolean"
 [[.args]]
 name = "whichLocation"
 type = "location"
-[[.args]]
+``````````
 name = "whichPlayer"
 type = "player"
 [[.returns]]
@@ -5151,10 +5151,10 @@ type = "boolean"
 [[.args]]
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "whichPlayer"
 type = "player"
 [[.returns]]
@@ -5164,7 +5164,7 @@ type = "boolean"
 [[.args]]
 name = "whichLocation"
 type = "location"
-[[.args]]
+``````````
 name = "whichPlayer"
 type = "player"
 [[.returns]]
@@ -5188,7 +5188,7 @@ type = "integer"
 [[.args]]
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "includeIncomplete"
 type = "boolean"
 [[.returns]]
@@ -5198,13 +5198,13 @@ type = "integer"
 [[.args]]
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "unitName"
 type = "string"
-[[.args]]
+``````````
 name = "includeIncomplete"
 type = "boolean"
-[[.args]]
+``````````
 name = "includeUpgrades"
 type = "boolean"
 [[.returns]]
@@ -5214,7 +5214,7 @@ type = "integer"
 [[.args]]
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "includeIncomplete"
 type = "boolean"
 [[.returns]]
@@ -5224,7 +5224,7 @@ type = "integer"
 [[.args]]
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "whichPlayerState"
 type = "playerstate"
 [[.returns]]
@@ -5234,7 +5234,7 @@ type = "integer"
 [[.args]]
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "whichPlayerScore"
 type = "playerscore"
 [[.returns]]
@@ -5244,10 +5244,10 @@ type = "integer"
 [[.args]]
 name = "sourcePlayer"
 type = "player"
-[[.args]]
+``````````
 name = "otherPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "whichAllianceSetting"
 type = "alliancetype"
 [[.returns]]
@@ -5271,7 +5271,7 @@ type = "number"
 [[.args]]
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "handicap"
 type = "number"
 
@@ -5279,7 +5279,7 @@ type = "number"
 [[.args]]
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "handicap"
 type = "number"
 
@@ -5287,10 +5287,10 @@ type = "number"
 [[.args]]
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "techid"
 type = "integer"
-[[.args]]
+``````````
 name = "maximum"
 type = "integer"
 
@@ -5298,7 +5298,7 @@ type = "integer"
 [[.args]]
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "techid"
 type = "integer"
 [[.returns]]
@@ -5308,10 +5308,10 @@ type = "integer"
 [[.args]]
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "techid"
 type = "integer"
-[[.args]]
+``````````
 name = "levels"
 type = "integer"
 
@@ -5319,10 +5319,10 @@ type = "integer"
 [[.args]]
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "techid"
 type = "integer"
-[[.args]]
+``````````
 name = "setToLevel"
 type = "integer"
 
@@ -5330,10 +5330,10 @@ type = "integer"
 [[.args]]
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "techid"
 type = "integer"
-[[.args]]
+``````````
 name = "specificonly"
 type = "boolean"
 [[.returns]]
@@ -5343,10 +5343,10 @@ type = "boolean"
 [[.args]]
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "techid"
 type = "integer"
-[[.args]]
+``````````
 name = "specificonly"
 type = "boolean"
 [[.returns]]
@@ -5356,7 +5356,7 @@ type = "integer"
 [[.args]]
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "newOwner"
 type = "integer"
 
@@ -5364,10 +5364,10 @@ type = "integer"
 [[.args]]
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "toWhichPlayers"
 type = "force"
-[[.args]]
+``````````
 name = "flag"
 type = "boolean"
 
@@ -5375,10 +5375,10 @@ type = "boolean"
 [[.args]]
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "abilid"
 type = "integer"
-[[.args]]
+``````````
 name = "avail"
 type = "boolean"
 
@@ -5386,10 +5386,10 @@ type = "boolean"
 [[.args]]
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "whichPlayerState"
 type = "playerstate"
-[[.args]]
+``````````
 name = "value"
 type = "integer"
 
@@ -5397,7 +5397,7 @@ type = "integer"
 [[.args]]
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "gameResult"
 type = "playergameresult"
 
@@ -5410,13 +5410,13 @@ type = "player"
 [[.args]]
 name = "forWhichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "whichState"
 type = "fogstate"
-[[.args]]
+``````````
 name = "where"
 type = "rect"
-[[.args]]
+``````````
 name = "useSharedVision"
 type = "boolean"
 
@@ -5424,19 +5424,19 @@ type = "boolean"
 [[.args]]
 name = "forWhichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "whichState"
 type = "fogstate"
-[[.args]]
+``````````
 name = "centerx"
 type = "number"
-[[.args]]
+``````````
 name = "centerY"
 type = "number"
-[[.args]]
+``````````
 name = "radius"
 type = "number"
-[[.args]]
+``````````
 name = "useSharedVision"
 type = "boolean"
 
@@ -5444,16 +5444,16 @@ type = "boolean"
 [[.args]]
 name = "forWhichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "whichState"
 type = "fogstate"
-[[.args]]
+``````````
 name = "center"
 type = "location"
-[[.args]]
+``````````
 name = "radius"
 type = "number"
-[[.args]]
+``````````
 name = "useSharedVision"
 type = "boolean"
 
@@ -5479,16 +5479,16 @@ type = "boolean"
 [[.args]]
 name = "forWhichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "whichState"
 type = "fogstate"
-[[.args]]
+``````````
 name = "where"
 type = "rect"
-[[.args]]
+``````````
 name = "useSharedVision"
 type = "boolean"
-[[.args]]
+``````````
 name = "afterUnits"
 type = "boolean"
 [[.returns]]
@@ -5498,22 +5498,22 @@ type = "fogmodifier"
 [[.args]]
 name = "forWhichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "whichState"
 type = "fogstate"
-[[.args]]
+``````````
 name = "centerx"
 type = "number"
-[[.args]]
+``````````
 name = "centerY"
 type = "number"
-[[.args]]
+``````````
 name = "radius"
 type = "number"
-[[.args]]
+``````````
 name = "useSharedVision"
 type = "boolean"
-[[.args]]
+``````````
 name = "afterUnits"
 type = "boolean"
 [[.returns]]
@@ -5523,19 +5523,19 @@ type = "fogmodifier"
 [[.args]]
 name = "forWhichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "whichState"
 type = "fogstate"
-[[.args]]
+``````````
 name = "center"
 type = "location"
-[[.args]]
+``````````
 name = "radius"
 type = "number"
-[[.args]]
+``````````
 name = "useSharedVision"
 type = "boolean"
-[[.args]]
+``````````
 name = "afterUnits"
 type = "boolean"
 [[.returns]]
@@ -5583,7 +5583,7 @@ type = "boolean"
 [[.args]]
 name = "newLevel"
 type = "string"
-[[.args]]
+``````````
 name = "doScoreScreen"
 type = "boolean"
 
@@ -5610,7 +5610,7 @@ type = "integer"
 [[.args]]
 name = "saveFileName"
 type = "string"
-[[.args]]
+``````````
 name = "doScoreScreen"
 type = "boolean"
 
@@ -5623,7 +5623,7 @@ type = "string"
 [[.args]]
 name = "sourceDirName"
 type = "string"
-[[.args]]
+``````````
 name = "destDirName"
 type = "string"
 [[.returns]]
@@ -5640,7 +5640,7 @@ type = "boolean"
 [[.args]]
 name = "sourceSaveName"
 type = "string"
-[[.args]]
+``````````
 name = "destSaveName"
 type = "string"
 [[.returns]]
@@ -5659,7 +5659,7 @@ type = "boolean"
 [[.args]]
 name = "whichFloatGameState"
 type = "fgamestate"
-[[.args]]
+``````````
 name = "value"
 type = "number"
 
@@ -5674,7 +5674,7 @@ type = "number"
 [[.args]]
 name = "whichIntegerGameState"
 type = "igamestate"
-[[.args]]
+``````````
 name = "value"
 type = "integer"
 
@@ -5694,10 +5694,10 @@ type = "boolean"
 [[.args]]
 name = "campaignNumber"
 type = "integer"
-[[.args]]
+``````````
 name = "missionNumber"
 type = "integer"
-[[.args]]
+``````````
 name = "available"
 type = "boolean"
 
@@ -5705,7 +5705,7 @@ type = "boolean"
 [[.args]]
 name = "campaignNumber"
 type = "integer"
-[[.args]]
+``````````
 name = "available"
 type = "boolean"
 
@@ -5713,7 +5713,7 @@ type = "boolean"
 [[.args]]
 name = "campaignNumber"
 type = "integer"
-[[.args]]
+``````````
 name = "available"
 type = "boolean"
 
@@ -5721,7 +5721,7 @@ type = "boolean"
 [[.args]]
 name = "campaignNumber"
 type = "integer"
-[[.args]]
+``````````
 name = "available"
 type = "boolean"
 
@@ -5738,7 +5738,7 @@ type = "gamedifficulty"
 [[.args]]
 name = "whichButton"
 type = "integer"
-[[.args]]
+``````````
 name = "visible"
 type = "boolean"
 
@@ -5769,7 +5769,7 @@ type = "dialog"
 [[.args]]
 name = "whichDialog"
 type = "dialog"
-[[.args]]
+``````````
 name = "messageText"
 type = "string"
 
@@ -5777,10 +5777,10 @@ type = "string"
 [[.args]]
 name = "whichDialog"
 type = "dialog"
-[[.args]]
+``````````
 name = "buttonText"
 type = "string"
-[[.args]]
+``````````
 name = "hotkey"
 type = "integer"
 [[.returns]]
@@ -5790,13 +5790,13 @@ type = "button"
 [[.args]]
 name = "whichDialog"
 type = "dialog"
-[[.args]]
+``````````
 name = "doScoreScreen"
 type = "boolean"
-[[.args]]
+``````````
 name = "buttonText"
 type = "string"
-[[.args]]
+``````````
 name = "hotkey"
 type = "integer"
 [[.returns]]
@@ -5806,10 +5806,10 @@ type = "button"
 [[.args]]
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "whichDialog"
 type = "dialog"
-[[.args]]
+``````````
 name = "flag"
 type = "boolean"
 
@@ -5835,13 +5835,13 @@ type = "boolean"
 [[.args]]
 name = "cache"
 type = "gamecache"
-[[.args]]
+``````````
 name = "missionKey"
 type = "string"
-[[.args]]
+``````````
 name = "key"
 type = "string"
-[[.args]]
+``````````
 name = "value"
 type = "integer"
 
@@ -5849,13 +5849,13 @@ type = "integer"
 [[.args]]
 name = "cache"
 type = "gamecache"
-[[.args]]
+``````````
 name = "missionKey"
 type = "string"
-[[.args]]
+``````````
 name = "key"
 type = "string"
-[[.args]]
+``````````
 name = "value"
 type = "number"
 
@@ -5863,13 +5863,13 @@ type = "number"
 [[.args]]
 name = "cache"
 type = "gamecache"
-[[.args]]
+``````````
 name = "missionKey"
 type = "string"
-[[.args]]
+``````````
 name = "key"
 type = "string"
-[[.args]]
+``````````
 name = "value"
 type = "boolean"
 
@@ -5877,13 +5877,13 @@ type = "boolean"
 [[.args]]
 name = "cache"
 type = "gamecache"
-[[.args]]
+``````````
 name = "missionKey"
 type = "string"
-[[.args]]
+``````````
 name = "key"
 type = "string"
-[[.args]]
+``````````
 name = "whichUnit"
 type = "unit"
 [[.returns]]
@@ -5893,13 +5893,13 @@ type = "boolean"
 [[.args]]
 name = "cache"
 type = "gamecache"
-[[.args]]
+``````````
 name = "missionKey"
 type = "string"
-[[.args]]
+``````````
 name = "key"
 type = "string"
-[[.args]]
+``````````
 name = "value"
 type = "string"
 [[.returns]]
@@ -5909,10 +5909,10 @@ type = "boolean"
 [[.args]]
 name = "cache"
 type = "gamecache"
-[[.args]]
+``````````
 name = "missionKey"
 type = "string"
-[[.args]]
+``````````
 name = "key"
 type = "string"
 
@@ -5920,10 +5920,10 @@ type = "string"
 [[.args]]
 name = "cache"
 type = "gamecache"
-[[.args]]
+``````````
 name = "missionKey"
 type = "string"
-[[.args]]
+``````````
 name = "key"
 type = "string"
 
@@ -5931,10 +5931,10 @@ type = "string"
 [[.args]]
 name = "cache"
 type = "gamecache"
-[[.args]]
+``````````
 name = "missionKey"
 type = "string"
-[[.args]]
+``````````
 name = "key"
 type = "string"
 
@@ -5942,10 +5942,10 @@ type = "string"
 [[.args]]
 name = "cache"
 type = "gamecache"
-[[.args]]
+``````````
 name = "missionKey"
 type = "string"
-[[.args]]
+``````````
 name = "key"
 type = "string"
 
@@ -5953,10 +5953,10 @@ type = "string"
 [[.args]]
 name = "cache"
 type = "gamecache"
-[[.args]]
+``````````
 name = "missionKey"
 type = "string"
-[[.args]]
+``````````
 name = "key"
 type = "string"
 
@@ -5964,10 +5964,10 @@ type = "string"
 [[.args]]
 name = "cache"
 type = "gamecache"
-[[.args]]
+``````````
 name = "missionKey"
 type = "string"
-[[.args]]
+``````````
 name = "key"
 type = "string"
 [[.returns]]
@@ -5977,10 +5977,10 @@ type = "boolean"
 [[.args]]
 name = "cache"
 type = "gamecache"
-[[.args]]
+``````````
 name = "missionKey"
 type = "string"
-[[.args]]
+``````````
 name = "key"
 type = "string"
 [[.returns]]
@@ -5990,10 +5990,10 @@ type = "boolean"
 [[.args]]
 name = "cache"
 type = "gamecache"
-[[.args]]
+``````````
 name = "missionKey"
 type = "string"
-[[.args]]
+``````````
 name = "key"
 type = "string"
 [[.returns]]
@@ -6003,10 +6003,10 @@ type = "boolean"
 [[.args]]
 name = "cache"
 type = "gamecache"
-[[.args]]
+``````````
 name = "missionKey"
 type = "string"
-[[.args]]
+``````````
 name = "key"
 type = "string"
 [[.returns]]
@@ -6016,10 +6016,10 @@ type = "boolean"
 [[.args]]
 name = "cache"
 type = "gamecache"
-[[.args]]
+``````````
 name = "missionKey"
 type = "string"
-[[.args]]
+``````````
 name = "key"
 type = "string"
 [[.returns]]
@@ -6034,7 +6034,7 @@ type = "gamecache"
 [[.args]]
 name = "cache"
 type = "gamecache"
-[[.args]]
+``````````
 name = "missionKey"
 type = "string"
 
@@ -6042,10 +6042,10 @@ type = "string"
 [[.args]]
 name = "cache"
 type = "gamecache"
-[[.args]]
+``````````
 name = "missionKey"
 type = "string"
-[[.args]]
+``````````
 name = "key"
 type = "string"
 
@@ -6053,10 +6053,10 @@ type = "string"
 [[.args]]
 name = "cache"
 type = "gamecache"
-[[.args]]
+``````````
 name = "missionKey"
 type = "string"
-[[.args]]
+``````````
 name = "key"
 type = "string"
 
@@ -6064,10 +6064,10 @@ type = "string"
 [[.args]]
 name = "cache"
 type = "gamecache"
-[[.args]]
+``````````
 name = "missionKey"
 type = "string"
-[[.args]]
+``````````
 name = "key"
 type = "string"
 
@@ -6075,10 +6075,10 @@ type = "string"
 [[.args]]
 name = "cache"
 type = "gamecache"
-[[.args]]
+``````````
 name = "missionKey"
 type = "string"
-[[.args]]
+``````````
 name = "key"
 type = "string"
 
@@ -6086,10 +6086,10 @@ type = "string"
 [[.args]]
 name = "cache"
 type = "gamecache"
-[[.args]]
+``````````
 name = "missionKey"
 type = "string"
-[[.args]]
+``````````
 name = "key"
 type = "string"
 
@@ -6097,10 +6097,10 @@ type = "string"
 [[.args]]
 name = "cache"
 type = "gamecache"
-[[.args]]
+``````````
 name = "missionKey"
 type = "string"
-[[.args]]
+``````````
 name = "key"
 type = "string"
 [[.returns]]
@@ -6110,10 +6110,10 @@ type = "integer"
 [[.args]]
 name = "cache"
 type = "gamecache"
-[[.args]]
+``````````
 name = "missionKey"
 type = "string"
-[[.args]]
+``````````
 name = "key"
 type = "string"
 [[.returns]]
@@ -6123,10 +6123,10 @@ type = "number"
 [[.args]]
 name = "cache"
 type = "gamecache"
-[[.args]]
+``````````
 name = "missionKey"
 type = "string"
-[[.args]]
+``````````
 name = "key"
 type = "string"
 [[.returns]]
@@ -6136,10 +6136,10 @@ type = "boolean"
 [[.args]]
 name = "cache"
 type = "gamecache"
-[[.args]]
+``````````
 name = "missionKey"
 type = "string"
-[[.args]]
+``````````
 name = "key"
 type = "string"
 [[.returns]]
@@ -6149,22 +6149,22 @@ type = "string"
 [[.args]]
 name = "cache"
 type = "gamecache"
-[[.args]]
+``````````
 name = "missionKey"
 type = "string"
-[[.args]]
+``````````
 name = "key"
 type = "string"
-[[.args]]
+``````````
 name = "forWhichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "facing"
 type = "number"
 [[.returns]]
@@ -6178,13 +6178,13 @@ type = "hashtable"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
-[[.args]]
+``````````
 name = "value"
 type = "integer"
 
@@ -6192,13 +6192,13 @@ type = "integer"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
-[[.args]]
+``````````
 name = "value"
 type = "number"
 
@@ -6206,13 +6206,13 @@ type = "number"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
-[[.args]]
+``````````
 name = "value"
 type = "boolean"
 
@@ -6220,13 +6220,13 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
-[[.args]]
+``````````
 name = "value"
 type = "string"
 [[.returns]]
@@ -6236,13 +6236,13 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
-[[.args]]
+``````````
 name = "whichPlayer"
 type = "player"
 [[.returns]]
@@ -6252,13 +6252,13 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
-[[.args]]
+``````````
 name = "whichWidget"
 type = "widget"
 [[.returns]]
@@ -6268,13 +6268,13 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
-[[.args]]
+``````````
 name = "whichDestructable"
 type = "destructable"
 [[.returns]]
@@ -6284,13 +6284,13 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
-[[.args]]
+``````````
 name = "whichItem"
 type = "item"
 [[.returns]]
@@ -6300,13 +6300,13 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
-[[.args]]
+``````````
 name = "whichUnit"
 type = "unit"
 [[.returns]]
@@ -6316,13 +6316,13 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
-[[.args]]
+``````````
 name = "whichAbility"
 type = "ability"
 [[.returns]]
@@ -6332,13 +6332,13 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
-[[.args]]
+``````````
 name = "whichTimer"
 type = "timer"
 [[.returns]]
@@ -6348,13 +6348,13 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
-[[.args]]
+``````````
 name = "whichTrigger"
 type = "trigger"
 [[.returns]]
@@ -6364,13 +6364,13 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
-[[.args]]
+``````````
 name = "whichTriggercondition"
 type = "triggercondition"
 [[.returns]]
@@ -6380,13 +6380,13 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
-[[.args]]
+``````````
 name = "whichTriggeraction"
 type = "triggeraction"
 [[.returns]]
@@ -6396,13 +6396,13 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
-[[.args]]
+``````````
 name = "whichEvent"
 type = "event"
 [[.returns]]
@@ -6412,13 +6412,13 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
-[[.args]]
+``````````
 name = "whichForce"
 type = "force"
 [[.returns]]
@@ -6428,13 +6428,13 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
-[[.args]]
+``````````
 name = "whichGroup"
 type = "group"
 [[.returns]]
@@ -6444,13 +6444,13 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
-[[.args]]
+``````````
 name = "whichLocation"
 type = "location"
 [[.returns]]
@@ -6460,13 +6460,13 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
-[[.args]]
+``````````
 name = "whichRect"
 type = "rect"
 [[.returns]]
@@ -6476,13 +6476,13 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
-[[.args]]
+``````````
 name = "whichBoolexpr"
 type = "boolexpr"
 [[.returns]]
@@ -6492,13 +6492,13 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
-[[.args]]
+``````````
 name = "whichSound"
 type = "sound"
 [[.returns]]
@@ -6508,13 +6508,13 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
-[[.args]]
+``````````
 name = "whichEffect"
 type = "effect"
 [[.returns]]
@@ -6524,13 +6524,13 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
-[[.args]]
+``````````
 name = "whichUnitpool"
 type = "unitpool"
 [[.returns]]
@@ -6540,13 +6540,13 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
-[[.args]]
+``````````
 name = "whichItempool"
 type = "itempool"
 [[.returns]]
@@ -6556,13 +6556,13 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
-[[.args]]
+``````````
 name = "whichQuest"
 type = "quest"
 [[.returns]]
@@ -6572,13 +6572,13 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
-[[.args]]
+``````````
 name = "whichQuestitem"
 type = "questitem"
 [[.returns]]
@@ -6588,13 +6588,13 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
-[[.args]]
+``````````
 name = "whichDefeatcondition"
 type = "defeatcondition"
 [[.returns]]
@@ -6604,13 +6604,13 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
-[[.args]]
+``````````
 name = "whichTimerdialog"
 type = "timerdialog"
 [[.returns]]
@@ -6620,13 +6620,13 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
-[[.args]]
+``````````
 name = "whichLeaderboard"
 type = "leaderboard"
 [[.returns]]
@@ -6636,13 +6636,13 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
-[[.args]]
+``````````
 name = "whichMultiboard"
 type = "multiboard"
 [[.returns]]
@@ -6652,13 +6652,13 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
-[[.args]]
+``````````
 name = "whichMultiboarditem"
 type = "multiboarditem"
 [[.returns]]
@@ -6668,13 +6668,13 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
-[[.args]]
+``````````
 name = "whichTrackable"
 type = "trackable"
 [[.returns]]
@@ -6684,13 +6684,13 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
-[[.args]]
+``````````
 name = "whichDialog"
 type = "dialog"
 [[.returns]]
@@ -6700,13 +6700,13 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
-[[.args]]
+``````````
 name = "whichButton"
 type = "button"
 [[.returns]]
@@ -6716,13 +6716,13 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
-[[.args]]
+``````````
 name = "whichTexttag"
 type = "texttag"
 [[.returns]]
@@ -6732,13 +6732,13 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
-[[.args]]
+``````````
 name = "whichLightning"
 type = "lightning"
 [[.returns]]
@@ -6748,13 +6748,13 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
-[[.args]]
+``````````
 name = "whichImage"
 type = "image"
 [[.returns]]
@@ -6764,13 +6764,13 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
-[[.args]]
+``````````
 name = "whichUbersplat"
 type = "ubersplat"
 [[.returns]]
@@ -6780,13 +6780,13 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
-[[.args]]
+``````````
 name = "whichRegion"
 type = "region"
 [[.returns]]
@@ -6796,13 +6796,13 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
-[[.args]]
+``````````
 name = "whichFogState"
 type = "fogstate"
 [[.returns]]
@@ -6812,13 +6812,13 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
-[[.args]]
+``````````
 name = "whichFogModifier"
 type = "fogmodifier"
 [[.returns]]
@@ -6828,13 +6828,13 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
-[[.args]]
+``````````
 name = "whichAgent"
 type = "agent"
 [[.returns]]
@@ -6844,13 +6844,13 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
-[[.args]]
+``````````
 name = "whichHashtable"
 type = "hashtable"
 [[.returns]]
@@ -6860,10 +6860,10 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -6873,10 +6873,10 @@ type = "integer"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -6886,10 +6886,10 @@ type = "number"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -6899,10 +6899,10 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -6912,10 +6912,10 @@ type = "string"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -6925,10 +6925,10 @@ type = "player"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -6938,10 +6938,10 @@ type = "widget"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -6951,10 +6951,10 @@ type = "destructable"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -6964,10 +6964,10 @@ type = "item"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -6977,10 +6977,10 @@ type = "unit"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -6990,10 +6990,10 @@ type = "ability"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -7003,10 +7003,10 @@ type = "timer"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -7016,10 +7016,10 @@ type = "trigger"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -7029,10 +7029,10 @@ type = "triggercondition"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -7042,10 +7042,10 @@ type = "triggeraction"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -7055,10 +7055,10 @@ type = "event"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -7068,10 +7068,10 @@ type = "force"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -7081,10 +7081,10 @@ type = "group"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -7094,10 +7094,10 @@ type = "location"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -7107,10 +7107,10 @@ type = "rect"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -7120,10 +7120,10 @@ type = "boolexpr"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -7133,10 +7133,10 @@ type = "sound"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -7146,10 +7146,10 @@ type = "effect"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -7159,10 +7159,10 @@ type = "unitpool"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -7172,10 +7172,10 @@ type = "itempool"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -7185,10 +7185,10 @@ type = "quest"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -7198,10 +7198,10 @@ type = "questitem"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -7211,10 +7211,10 @@ type = "defeatcondition"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -7224,10 +7224,10 @@ type = "timerdialog"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -7237,10 +7237,10 @@ type = "leaderboard"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -7250,10 +7250,10 @@ type = "multiboard"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -7263,10 +7263,10 @@ type = "multiboarditem"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -7276,10 +7276,10 @@ type = "trackable"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -7289,10 +7289,10 @@ type = "dialog"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -7302,10 +7302,10 @@ type = "button"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -7315,10 +7315,10 @@ type = "texttag"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -7328,10 +7328,10 @@ type = "lightning"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -7341,10 +7341,10 @@ type = "image"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -7354,10 +7354,10 @@ type = "ubersplat"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -7367,10 +7367,10 @@ type = "region"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -7380,10 +7380,10 @@ type = "fogstate"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -7393,10 +7393,10 @@ type = "fogmodifier"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -7406,10 +7406,10 @@ type = "hashtable"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -7419,10 +7419,10 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -7432,10 +7432,10 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -7445,10 +7445,10 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -7458,10 +7458,10 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 [[.returns]]
@@ -7471,10 +7471,10 @@ type = "boolean"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 
@@ -7482,10 +7482,10 @@ type = "integer"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 
@@ -7493,10 +7493,10 @@ type = "integer"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 
@@ -7504,10 +7504,10 @@ type = "integer"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 
@@ -7515,10 +7515,10 @@ type = "integer"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
-[[.args]]
+``````````
 name = "childKey"
 type = "integer"
 
@@ -7531,7 +7531,7 @@ type = "hashtable"
 [[.args]]
 name = "table"
 type = "hashtable"
-[[.args]]
+``````````
 name = "parentKey"
 type = "integer"
 
@@ -7539,7 +7539,7 @@ type = "integer"
 [[.args]]
 name = "lowBound"
 type = "integer"
-[[.args]]
+``````````
 name = "highBound"
 type = "integer"
 [[.returns]]
@@ -7549,7 +7549,7 @@ type = "integer"
 [[.args]]
 name = "lowBound"
 type = "number"
-[[.args]]
+``````````
 name = "highBound"
 type = "number"
 [[.returns]]
@@ -7568,10 +7568,10 @@ type = "unitpool"
 [[.args]]
 name = "whichPool"
 type = "unitpool"
-[[.args]]
+``````````
 name = "unitId"
 type = "integer"
-[[.args]]
+``````````
 name = "weight"
 type = "number"
 
@@ -7579,7 +7579,7 @@ type = "number"
 [[.args]]
 name = "whichPool"
 type = "unitpool"
-[[.args]]
+``````````
 name = "unitId"
 type = "integer"
 
@@ -7587,16 +7587,16 @@ type = "integer"
 [[.args]]
 name = "whichPool"
 type = "unitpool"
-[[.args]]
+``````````
 name = "forWhichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "facing"
 type = "number"
 [[.returns]]
@@ -7615,10 +7615,10 @@ type = "itempool"
 [[.args]]
 name = "whichItemPool"
 type = "itempool"
-[[.args]]
+``````````
 name = "itemId"
 type = "integer"
-[[.args]]
+``````````
 name = "weight"
 type = "number"
 
@@ -7626,7 +7626,7 @@ type = "number"
 [[.args]]
 name = "whichItemPool"
 type = "itempool"
-[[.args]]
+``````````
 name = "itemId"
 type = "integer"
 
@@ -7634,10 +7634,10 @@ type = "integer"
 [[.args]]
 name = "whichItemPool"
 type = "itempool"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
 [[.returns]]
@@ -7665,7 +7665,7 @@ type = "integer"
 [[.args]]
 name = "whichType"
 type = "itemtype"
-[[.args]]
+``````````
 name = "level"
 type = "integer"
 [[.returns]]
@@ -7680,16 +7680,16 @@ type = "integer"
 [[.args]]
 name = "a"
 type = "number"
-[[.args]]
+``````````
 name = "b"
 type = "number"
-[[.args]]
+``````````
 name = "c"
 type = "number"
-[[.args]]
+``````````
 name = "d"
 type = "number"
-[[.args]]
+``````````
 name = "e"
 type = "number"
 
@@ -7699,16 +7699,16 @@ type = "number"
 [[.args]]
 name = "a"
 type = "number"
-[[.args]]
+``````````
 name = "b"
 type = "number"
-[[.args]]
+``````````
 name = "c"
 type = "number"
-[[.args]]
+``````````
 name = "d"
 type = "number"
-[[.args]]
+``````````
 name = "e"
 type = "number"
 
@@ -7716,22 +7716,22 @@ type = "number"
 [[.args]]
 name = "style"
 type = "integer"
-[[.args]]
+``````````
 name = "zstart"
 type = "number"
-[[.args]]
+``````````
 name = "zend"
 type = "number"
-[[.args]]
+``````````
 name = "density"
 type = "number"
-[[.args]]
+``````````
 name = "red"
 type = "number"
-[[.args]]
+``````````
 name = "green"
 type = "number"
-[[.args]]
+``````````
 name = "blue"
 type = "number"
 
@@ -7739,13 +7739,13 @@ type = "number"
 [[.args]]
 name = "toPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "message"
 type = "string"
 
@@ -7753,16 +7753,16 @@ type = "string"
 [[.args]]
 name = "toPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "duration"
 type = "number"
-[[.args]]
+``````````
 name = "message"
 type = "string"
 
@@ -7770,16 +7770,16 @@ type = "string"
 [[.args]]
 name = "toPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "duration"
 type = "number"
-[[.args]]
+``````````
 name = "message"
 type = "string"
 
@@ -7789,7 +7789,7 @@ type = "string"
 [[.args]]
 name = "terrainDNCFile"
 type = "string"
-[[.args]]
+``````````
 name = "unitDNCFile"
 type = "string"
 
@@ -7826,7 +7826,7 @@ type = "number"
 [[.args]]
 name = "flag"
 type = "boolean"
-[[.args]]
+``````````
 name = "fadeDuration"
 type = "number"
 
@@ -7839,16 +7839,16 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "red"
 type = "integer"
-[[.args]]
+``````````
 name = "green"
 type = "integer"
-[[.args]]
+``````````
 name = "blue"
 type = "integer"
-[[.args]]
+``````````
 name = "alpha"
 type = "integer"
 
@@ -7856,16 +7856,16 @@ type = "integer"
 [[.args]]
 name = "whichWidget"
 type = "widget"
-[[.args]]
+``````````
 name = "red"
 type = "integer"
-[[.args]]
+``````````
 name = "green"
 type = "integer"
-[[.args]]
+``````````
 name = "blue"
 type = "integer"
-[[.args]]
+``````````
 name = "alpha"
 type = "integer"
 
@@ -7873,10 +7873,10 @@ type = "integer"
 [[.args]]
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "duration"
 type = "number"
 
@@ -7884,22 +7884,22 @@ type = "number"
 [[.args]]
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "duration"
 type = "number"
-[[.args]]
+``````````
 name = "red"
 type = "integer"
-[[.args]]
+``````````
 name = "green"
 type = "integer"
-[[.args]]
+``````````
 name = "blue"
 type = "integer"
-[[.args]]
+``````````
 name = "extraEffects"
 type = "boolean"
 
@@ -7965,10 +7965,10 @@ type = "texttag"
 [[.args]]
 name = "t"
 type = "texttag"
-[[.args]]
+``````````
 name = "s"
 type = "string"
-[[.args]]
+``````````
 name = "height"
 type = "number"
 
@@ -7976,13 +7976,13 @@ type = "number"
 [[.args]]
 name = "t"
 type = "texttag"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "heightOffset"
 type = "number"
 
@@ -7990,10 +7990,10 @@ type = "number"
 [[.args]]
 name = "t"
 type = "texttag"
-[[.args]]
+``````````
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "heightOffset"
 type = "number"
 
@@ -8001,16 +8001,16 @@ type = "number"
 [[.args]]
 name = "t"
 type = "texttag"
-[[.args]]
+``````````
 name = "red"
 type = "integer"
-[[.args]]
+``````````
 name = "green"
 type = "integer"
-[[.args]]
+``````````
 name = "blue"
 type = "integer"
-[[.args]]
+``````````
 name = "alpha"
 type = "integer"
 
@@ -8018,10 +8018,10 @@ type = "integer"
 [[.args]]
 name = "t"
 type = "texttag"
-[[.args]]
+``````````
 name = "xvel"
 type = "number"
-[[.args]]
+``````````
 name = "yvel"
 type = "number"
 
@@ -8029,7 +8029,7 @@ type = "number"
 [[.args]]
 name = "t"
 type = "texttag"
-[[.args]]
+``````````
 name = "flag"
 type = "boolean"
 
@@ -8037,7 +8037,7 @@ type = "boolean"
 [[.args]]
 name = "t"
 type = "texttag"
-[[.args]]
+``````````
 name = "flag"
 type = "boolean"
 
@@ -8045,7 +8045,7 @@ type = "boolean"
 [[.args]]
 name = "t"
 type = "texttag"
-[[.args]]
+``````````
 name = "flag"
 type = "boolean"
 
@@ -8053,7 +8053,7 @@ type = "boolean"
 [[.args]]
 name = "t"
 type = "texttag"
-[[.args]]
+``````````
 name = "age"
 type = "number"
 
@@ -8061,7 +8061,7 @@ type = "number"
 [[.args]]
 name = "t"
 type = "texttag"
-[[.args]]
+``````````
 name = "lifespan"
 type = "number"
 
@@ -8069,7 +8069,7 @@ type = "number"
 [[.args]]
 name = "t"
 type = "texttag"
-[[.args]]
+``````````
 name = "fadepoint"
 type = "number"
 
@@ -8100,7 +8100,7 @@ type = "boolean"
 [[.args]]
 name = "enableAlly"
 type = "boolean"
-[[.args]]
+``````````
 name = "enableCreep"
 type = "boolean"
 
@@ -8108,7 +8108,7 @@ type = "boolean"
 [[.args]]
 name = "state"
 type = "boolean"
-[[.args]]
+``````````
 name = "ui"
 type = "boolean"
 
@@ -8116,7 +8116,7 @@ type = "boolean"
 [[.args]]
 name = "state"
 type = "boolean"
-[[.args]]
+``````````
 name = "ui"
 type = "boolean"
 
@@ -8124,7 +8124,7 @@ type = "boolean"
 [[.args]]
 name = "state"
 type = "boolean"
-[[.args]]
+``````````
 name = "ui"
 type = "boolean"
 
@@ -8132,13 +8132,13 @@ type = "boolean"
 [[.args]]
 name = "trackableModelPath"
 type = "string"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "facing"
 type = "number"
 [[.returns]]
@@ -8157,7 +8157,7 @@ type = "quest"
 [[.args]]
 name = "whichQuest"
 type = "quest"
-[[.args]]
+``````````
 name = "title"
 type = "string"
 
@@ -8165,7 +8165,7 @@ type = "string"
 [[.args]]
 name = "whichQuest"
 type = "quest"
-[[.args]]
+``````````
 name = "description"
 type = "string"
 
@@ -8173,7 +8173,7 @@ type = "string"
 [[.args]]
 name = "whichQuest"
 type = "quest"
-[[.args]]
+``````````
 name = "iconPath"
 type = "string"
 
@@ -8181,7 +8181,7 @@ type = "string"
 [[.args]]
 name = "whichQuest"
 type = "quest"
-[[.args]]
+``````````
 name = "required"
 type = "boolean"
 
@@ -8189,7 +8189,7 @@ type = "boolean"
 [[.args]]
 name = "whichQuest"
 type = "quest"
-[[.args]]
+``````````
 name = "completed"
 type = "boolean"
 
@@ -8197,7 +8197,7 @@ type = "boolean"
 [[.args]]
 name = "whichQuest"
 type = "quest"
-[[.args]]
+``````````
 name = "discovered"
 type = "boolean"
 
@@ -8205,7 +8205,7 @@ type = "boolean"
 [[.args]]
 name = "whichQuest"
 type = "quest"
-[[.args]]
+``````````
 name = "failed"
 type = "boolean"
 
@@ -8213,7 +8213,7 @@ type = "boolean"
 [[.args]]
 name = "whichQuest"
 type = "quest"
-[[.args]]
+``````````
 name = "enabled"
 type = "boolean"
 
@@ -8263,7 +8263,7 @@ type = "questitem"
 [[.args]]
 name = "whichQuestItem"
 type = "questitem"
-[[.args]]
+``````````
 name = "description"
 type = "string"
 
@@ -8271,7 +8271,7 @@ type = "string"
 [[.args]]
 name = "whichQuestItem"
 type = "questitem"
-[[.args]]
+``````````
 name = "completed"
 type = "boolean"
 
@@ -8295,7 +8295,7 @@ type = "defeatcondition"
 [[.args]]
 name = "whichCondition"
 type = "defeatcondition"
-[[.args]]
+``````````
 name = "description"
 type = "string"
 
@@ -8319,7 +8319,7 @@ type = "timerdialog"
 [[.args]]
 name = "whichDialog"
 type = "timerdialog"
-[[.args]]
+``````````
 name = "title"
 type = "string"
 
@@ -8327,16 +8327,16 @@ type = "string"
 [[.args]]
 name = "whichDialog"
 type = "timerdialog"
-[[.args]]
+``````````
 name = "red"
 type = "integer"
-[[.args]]
+``````````
 name = "green"
 type = "integer"
-[[.args]]
+``````````
 name = "blue"
 type = "integer"
-[[.args]]
+``````````
 name = "alpha"
 type = "integer"
 
@@ -8344,16 +8344,16 @@ type = "integer"
 [[.args]]
 name = "whichDialog"
 type = "timerdialog"
-[[.args]]
+``````````
 name = "red"
 type = "integer"
-[[.args]]
+``````````
 name = "green"
 type = "integer"
-[[.args]]
+``````````
 name = "blue"
 type = "integer"
-[[.args]]
+``````````
 name = "alpha"
 type = "integer"
 
@@ -8361,7 +8361,7 @@ type = "integer"
 [[.args]]
 name = "whichDialog"
 type = "timerdialog"
-[[.args]]
+``````````
 name = "speedMultFactor"
 type = "number"
 
@@ -8369,7 +8369,7 @@ type = "number"
 [[.args]]
 name = "whichDialog"
 type = "timerdialog"
-[[.args]]
+``````````
 name = "display"
 type = "boolean"
 
@@ -8384,7 +8384,7 @@ type = "boolean"
 [[.args]]
 name = "whichDialog"
 type = "timerdialog"
-[[.args]]
+``````````
 name = "timeRemaining"
 type = "number"
 
@@ -8401,7 +8401,7 @@ type = "leaderboard"
 [[.args]]
 name = "lb"
 type = "leaderboard"
-[[.args]]
+``````````
 name = "show"
 type = "boolean"
 
@@ -8423,7 +8423,7 @@ type = "integer"
 [[.args]]
 name = "lb"
 type = "leaderboard"
-[[.args]]
+``````````
 name = "count"
 type = "integer"
 
@@ -8431,13 +8431,13 @@ type = "integer"
 [[.args]]
 name = "lb"
 type = "leaderboard"
-[[.args]]
+``````````
 name = "label"
 type = "string"
-[[.args]]
+``````````
 name = "value"
 type = "integer"
-[[.args]]
+``````````
 name = "p"
 type = "player"
 
@@ -8445,7 +8445,7 @@ type = "player"
 [[.args]]
 name = "lb"
 type = "leaderboard"
-[[.args]]
+``````````
 name = "index"
 type = "integer"
 
@@ -8453,7 +8453,7 @@ type = "integer"
 [[.args]]
 name = "lb"
 type = "leaderboard"
-[[.args]]
+``````````
 name = "p"
 type = "player"
 
@@ -8466,7 +8466,7 @@ type = "leaderboard"
 [[.args]]
 name = "lb"
 type = "leaderboard"
-[[.args]]
+``````````
 name = "ascending"
 type = "boolean"
 
@@ -8474,7 +8474,7 @@ type = "boolean"
 [[.args]]
 name = "lb"
 type = "leaderboard"
-[[.args]]
+``````````
 name = "ascending"
 type = "boolean"
 
@@ -8482,7 +8482,7 @@ type = "boolean"
 [[.args]]
 name = "lb"
 type = "leaderboard"
-[[.args]]
+``````````
 name = "ascending"
 type = "boolean"
 
@@ -8490,7 +8490,7 @@ type = "boolean"
 [[.args]]
 name = "lb"
 type = "leaderboard"
-[[.args]]
+``````````
 name = "p"
 type = "player"
 [[.returns]]
@@ -8500,7 +8500,7 @@ type = "boolean"
 [[.args]]
 name = "lb"
 type = "leaderboard"
-[[.args]]
+``````````
 name = "p"
 type = "player"
 [[.returns]]
@@ -8510,7 +8510,7 @@ type = "integer"
 [[.args]]
 name = "lb"
 type = "leaderboard"
-[[.args]]
+``````````
 name = "label"
 type = "string"
 
@@ -8525,7 +8525,7 @@ type = "string"
 [[.args]]
 name = "toPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "lb"
 type = "leaderboard"
 
@@ -8540,16 +8540,16 @@ type = "leaderboard"
 [[.args]]
 name = "lb"
 type = "leaderboard"
-[[.args]]
+``````````
 name = "red"
 type = "integer"
-[[.args]]
+``````````
 name = "green"
 type = "integer"
-[[.args]]
+``````````
 name = "blue"
 type = "integer"
-[[.args]]
+``````````
 name = "alpha"
 type = "integer"
 
@@ -8557,16 +8557,16 @@ type = "integer"
 [[.args]]
 name = "lb"
 type = "leaderboard"
-[[.args]]
+``````````
 name = "red"
 type = "integer"
-[[.args]]
+``````````
 name = "green"
 type = "integer"
-[[.args]]
+``````````
 name = "blue"
 type = "integer"
-[[.args]]
+``````````
 name = "alpha"
 type = "integer"
 
@@ -8574,16 +8574,16 @@ type = "integer"
 [[.args]]
 name = "lb"
 type = "leaderboard"
-[[.args]]
+``````````
 name = "showLabel"
 type = "boolean"
-[[.args]]
+``````````
 name = "showNames"
 type = "boolean"
-[[.args]]
+``````````
 name = "showValues"
 type = "boolean"
-[[.args]]
+``````````
 name = "showIcons"
 type = "boolean"
 
@@ -8591,10 +8591,10 @@ type = "boolean"
 [[.args]]
 name = "lb"
 type = "leaderboard"
-[[.args]]
+``````````
 name = "whichItem"
 type = "integer"
-[[.args]]
+``````````
 name = "val"
 type = "integer"
 
@@ -8602,10 +8602,10 @@ type = "integer"
 [[.args]]
 name = "lb"
 type = "leaderboard"
-[[.args]]
+``````````
 name = "whichItem"
 type = "integer"
-[[.args]]
+``````````
 name = "val"
 type = "string"
 
@@ -8613,16 +8613,16 @@ type = "string"
 [[.args]]
 name = "lb"
 type = "leaderboard"
-[[.args]]
+``````````
 name = "whichItem"
 type = "integer"
-[[.args]]
+``````````
 name = "showLabel"
 type = "boolean"
-[[.args]]
+``````````
 name = "showValue"
 type = "boolean"
-[[.args]]
+``````````
 name = "showIcon"
 type = "boolean"
 
@@ -8630,19 +8630,19 @@ type = "boolean"
 [[.args]]
 name = "lb"
 type = "leaderboard"
-[[.args]]
+``````````
 name = "whichItem"
 type = "integer"
-[[.args]]
+``````````
 name = "red"
 type = "integer"
-[[.args]]
+``````````
 name = "green"
 type = "integer"
-[[.args]]
+``````````
 name = "blue"
 type = "integer"
-[[.args]]
+``````````
 name = "alpha"
 type = "integer"
 
@@ -8650,19 +8650,19 @@ type = "integer"
 [[.args]]
 name = "lb"
 type = "leaderboard"
-[[.args]]
+``````````
 name = "whichItem"
 type = "integer"
-[[.args]]
+``````````
 name = "red"
 type = "integer"
-[[.args]]
+``````````
 name = "green"
 type = "integer"
-[[.args]]
+``````````
 name = "blue"
 type = "integer"
-[[.args]]
+``````````
 name = "alpha"
 type = "integer"
 
@@ -8679,7 +8679,7 @@ type = "multiboard"
 [[.args]]
 name = "lb"
 type = "multiboard"
-[[.args]]
+``````````
 name = "show"
 type = "boolean"
 
@@ -8694,7 +8694,7 @@ type = "boolean"
 [[.args]]
 name = "lb"
 type = "multiboard"
-[[.args]]
+``````````
 name = "minimize"
 type = "boolean"
 
@@ -8714,7 +8714,7 @@ type = "multiboard"
 [[.args]]
 name = "lb"
 type = "multiboard"
-[[.args]]
+``````````
 name = "label"
 type = "string"
 
@@ -8729,16 +8729,16 @@ type = "string"
 [[.args]]
 name = "lb"
 type = "multiboard"
-[[.args]]
+``````````
 name = "red"
 type = "integer"
-[[.args]]
+``````````
 name = "green"
 type = "integer"
-[[.args]]
+``````````
 name = "blue"
 type = "integer"
-[[.args]]
+``````````
 name = "alpha"
 type = "integer"
 
@@ -8760,7 +8760,7 @@ type = "integer"
 [[.args]]
 name = "lb"
 type = "multiboard"
-[[.args]]
+``````````
 name = "count"
 type = "integer"
 
@@ -8768,7 +8768,7 @@ type = "integer"
 [[.args]]
 name = "lb"
 type = "multiboard"
-[[.args]]
+``````````
 name = "count"
 type = "integer"
 
@@ -8776,10 +8776,10 @@ type = "integer"
 [[.args]]
 name = "lb"
 type = "multiboard"
-[[.args]]
+``````````
 name = "showValues"
 type = "boolean"
-[[.args]]
+``````````
 name = "showIcons"
 type = "boolean"
 
@@ -8787,7 +8787,7 @@ type = "boolean"
 [[.args]]
 name = "lb"
 type = "multiboard"
-[[.args]]
+``````````
 name = "value"
 type = "string"
 
@@ -8795,16 +8795,16 @@ type = "string"
 [[.args]]
 name = "lb"
 type = "multiboard"
-[[.args]]
+``````````
 name = "red"
 type = "integer"
-[[.args]]
+``````````
 name = "green"
 type = "integer"
-[[.args]]
+``````````
 name = "blue"
 type = "integer"
-[[.args]]
+``````````
 name = "alpha"
 type = "integer"
 
@@ -8812,7 +8812,7 @@ type = "integer"
 [[.args]]
 name = "lb"
 type = "multiboard"
-[[.args]]
+``````````
 name = "width"
 type = "number"
 
@@ -8820,7 +8820,7 @@ type = "number"
 [[.args]]
 name = "lb"
 type = "multiboard"
-[[.args]]
+``````````
 name = "iconPath"
 type = "string"
 
@@ -8828,10 +8828,10 @@ type = "string"
 [[.args]]
 name = "lb"
 type = "multiboard"
-[[.args]]
+``````````
 name = "row"
 type = "integer"
-[[.args]]
+``````````
 name = "column"
 type = "integer"
 [[.returns]]
@@ -8846,10 +8846,10 @@ type = "multiboarditem"
 [[.args]]
 name = "mbi"
 type = "multiboarditem"
-[[.args]]
+``````````
 name = "showValue"
 type = "boolean"
-[[.args]]
+``````````
 name = "showIcon"
 type = "boolean"
 
@@ -8857,7 +8857,7 @@ type = "boolean"
 [[.args]]
 name = "mbi"
 type = "multiboarditem"
-[[.args]]
+``````````
 name = "val"
 type = "string"
 
@@ -8865,16 +8865,16 @@ type = "string"
 [[.args]]
 name = "mbi"
 type = "multiboarditem"
-[[.args]]
+``````````
 name = "red"
 type = "integer"
-[[.args]]
+``````````
 name = "green"
 type = "integer"
-[[.args]]
+``````````
 name = "blue"
 type = "integer"
-[[.args]]
+``````````
 name = "alpha"
 type = "integer"
 
@@ -8882,7 +8882,7 @@ type = "integer"
 [[.args]]
 name = "mbi"
 type = "multiboarditem"
-[[.args]]
+``````````
 name = "width"
 type = "number"
 
@@ -8890,7 +8890,7 @@ type = "number"
 [[.args]]
 name = "mbi"
 type = "multiboarditem"
-[[.args]]
+``````````
 name = "iconFileName"
 type = "string"
 
@@ -8903,7 +8903,7 @@ type = "boolean"
 [[.args]]
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
 
@@ -8911,7 +8911,7 @@ type = "number"
 [[.args]]
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
 
@@ -8919,25 +8919,25 @@ type = "number"
 [[.args]]
 name = "x1"
 type = "number"
-[[.args]]
+``````````
 name = "y1"
 type = "number"
-[[.args]]
+``````````
 name = "x2"
 type = "number"
-[[.args]]
+``````````
 name = "y2"
 type = "number"
-[[.args]]
+``````````
 name = "x3"
 type = "number"
-[[.args]]
+``````````
 name = "y3"
 type = "number"
-[[.args]]
+``````````
 name = "x4"
 type = "number"
-[[.args]]
+``````````
 name = "y4"
 type = "number"
 
@@ -8952,7 +8952,7 @@ type = "number"
 [[.args]]
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
 
@@ -8960,10 +8960,10 @@ type = "number"
 [[.args]]
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "duration"
 type = "number"
 
@@ -8971,10 +8971,10 @@ type = "number"
 [[.args]]
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "zOffsetDest"
 type = "number"
 
@@ -8982,13 +8982,13 @@ type = "number"
 [[.args]]
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "zOffsetDest"
 type = "number"
-[[.args]]
+``````````
 name = "duration"
 type = "number"
 
@@ -9001,13 +9001,13 @@ type = "string"
 [[.args]]
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "radiansToSweep"
 type = "number"
-[[.args]]
+``````````
 name = "duration"
 type = "number"
 
@@ -9015,10 +9015,10 @@ type = "number"
 [[.args]]
 name = "whichField"
 type = "camerafield"
-[[.args]]
+``````````
 name = "value"
 type = "number"
-[[.args]]
+``````````
 name = "duration"
 type = "number"
 
@@ -9026,10 +9026,10 @@ type = "number"
 [[.args]]
 name = "whichField"
 type = "camerafield"
-[[.args]]
+``````````
 name = "offset"
 type = "number"
-[[.args]]
+``````````
 name = "duration"
 type = "number"
 
@@ -9037,13 +9037,13 @@ type = "number"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "xoffset"
 type = "number"
-[[.args]]
+``````````
 name = "yoffset"
 type = "number"
-[[.args]]
+``````````
 name = "inheritOrientation"
 type = "boolean"
 
@@ -9051,10 +9051,10 @@ type = "boolean"
 [[.args]]
 name = "whichUnit"
 type = "unit"
-[[.args]]
+``````````
 name = "xoffset"
 type = "number"
-[[.args]]
+``````````
 name = "yoffset"
 type = "number"
 
@@ -9066,13 +9066,13 @@ type = "camerasetup"
 [[.args]]
 name = "whichSetup"
 type = "camerasetup"
-[[.args]]
+``````````
 name = "whichField"
 type = "camerafield"
-[[.args]]
+``````````
 name = "value"
 type = "number"
-[[.args]]
+``````````
 name = "duration"
 type = "number"
 
@@ -9080,7 +9080,7 @@ type = "number"
 [[.args]]
 name = "whichSetup"
 type = "camerasetup"
-[[.args]]
+``````````
 name = "whichField"
 type = "camerafield"
 [[.returns]]
@@ -9090,13 +9090,13 @@ type = "number"
 [[.args]]
 name = "whichSetup"
 type = "camerasetup"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "duration"
 type = "number"
 
@@ -9125,10 +9125,10 @@ type = "number"
 [[.args]]
 name = "whichSetup"
 type = "camerasetup"
-[[.args]]
+``````````
 name = "doPan"
 type = "boolean"
-[[.args]]
+``````````
 name = "panTimed"
 type = "boolean"
 
@@ -9136,7 +9136,7 @@ type = "boolean"
 [[.args]]
 name = "whichSetup"
 type = "camerasetup"
-[[.args]]
+``````````
 name = "zDestOffset"
 type = "number"
 
@@ -9144,10 +9144,10 @@ type = "number"
 [[.args]]
 name = "whichSetup"
 type = "camerasetup"
-[[.args]]
+``````````
 name = "doPan"
 type = "boolean"
-[[.args]]
+``````````
 name = "forceDuration"
 type = "number"
 
@@ -9155,10 +9155,10 @@ type = "number"
 [[.args]]
 name = "whichSetup"
 type = "camerasetup"
-[[.args]]
+``````````
 name = "zDestOffset"
 type = "number"
-[[.args]]
+``````````
 name = "forceDuration"
 type = "number"
 
@@ -9166,7 +9166,7 @@ type = "number"
 [[.args]]
 name = "mag"
 type = "number"
-[[.args]]
+``````````
 name = "velocity"
 type = "number"
 
@@ -9174,7 +9174,7 @@ type = "number"
 [[.args]]
 name = "mag"
 type = "number"
-[[.args]]
+``````````
 name = "velocity"
 type = "number"
 
@@ -9182,10 +9182,10 @@ type = "number"
 [[.args]]
 name = "mag"
 type = "number"
-[[.args]]
+``````````
 name = "velocity"
 type = "number"
-[[.args]]
+``````````
 name = "vertOnly"
 type = "boolean"
 
@@ -9193,10 +9193,10 @@ type = "boolean"
 [[.args]]
 name = "mag"
 type = "number"
-[[.args]]
+``````````
 name = "velocity"
 type = "number"
-[[.args]]
+``````````
 name = "vertOnly"
 type = "boolean"
 
@@ -9224,13 +9224,13 @@ type = "texmapflags"
 [[.args]]
 name = "minu"
 type = "number"
-[[.args]]
+``````````
 name = "minv"
 type = "number"
-[[.args]]
+``````````
 name = "maxu"
 type = "number"
-[[.args]]
+``````````
 name = "maxv"
 type = "number"
 
@@ -9238,13 +9238,13 @@ type = "number"
 [[.args]]
 name = "minu"
 type = "number"
-[[.args]]
+``````````
 name = "minv"
 type = "number"
-[[.args]]
+``````````
 name = "maxu"
 type = "number"
-[[.args]]
+``````````
 name = "maxv"
 type = "number"
 
@@ -9252,13 +9252,13 @@ type = "number"
 [[.args]]
 name = "red"
 type = "integer"
-[[.args]]
+``````````
 name = "green"
 type = "integer"
-[[.args]]
+``````````
 name = "blue"
 type = "integer"
-[[.args]]
+``````````
 name = "alpha"
 type = "integer"
 
@@ -9266,13 +9266,13 @@ type = "integer"
 [[.args]]
 name = "red"
 type = "integer"
-[[.args]]
+``````````
 name = "green"
 type = "integer"
-[[.args]]
+``````````
 name = "blue"
 type = "integer"
-[[.args]]
+``````````
 name = "alpha"
 type = "integer"
 
@@ -9294,19 +9294,19 @@ type = "boolean"
 [[.args]]
 name = "portraitUnitId"
 type = "integer"
-[[.args]]
+``````````
 name = "color"
 type = "playercolor"
-[[.args]]
+``````````
 name = "speakerTitle"
 type = "string"
-[[.args]]
+``````````
 name = "text"
 type = "string"
-[[.args]]
+``````````
 name = "sceneDuration"
 type = "number"
-[[.args]]
+``````````
 name = "voiceoverDuration"
 type = "number"
 
@@ -9388,22 +9388,22 @@ type = "string"
 [[.args]]
 name = "fileName"
 type = "string"
-[[.args]]
+``````````
 name = "looping"
 type = "boolean"
-[[.args]]
+``````````
 name = "is3D"
 type = "boolean"
-[[.args]]
+``````````
 name = "stopwhenoutofrange"
 type = "boolean"
-[[.args]]
+``````````
 name = "fadeInRate"
 type = "integer"
-[[.args]]
+``````````
 name = "fadeOutRate"
 type = "integer"
-[[.args]]
+``````````
 name = "eaxSetting"
 type = "string"
 [[.returns]]
@@ -9413,22 +9413,22 @@ type = "sound"
 [[.args]]
 name = "fileName"
 type = "string"
-[[.args]]
+``````````
 name = "looping"
 type = "boolean"
-[[.args]]
+``````````
 name = "is3D"
 type = "boolean"
-[[.args]]
+``````````
 name = "stopwhenoutofrange"
 type = "boolean"
-[[.args]]
+``````````
 name = "fadeInRate"
 type = "integer"
-[[.args]]
+``````````
 name = "fadeOutRate"
 type = "integer"
-[[.args]]
+``````````
 name = "SLKEntryName"
 type = "string"
 [[.returns]]
@@ -9438,19 +9438,19 @@ type = "sound"
 [[.args]]
 name = "soundLabel"
 type = "string"
-[[.args]]
+``````````
 name = "looping"
 type = "boolean"
-[[.args]]
+``````````
 name = "is3D"
 type = "boolean"
-[[.args]]
+``````````
 name = "stopwhenoutofrange"
 type = "boolean"
-[[.args]]
+``````````
 name = "fadeInRate"
 type = "integer"
-[[.args]]
+``````````
 name = "fadeOutRate"
 type = "integer"
 [[.returns]]
@@ -9460,10 +9460,10 @@ type = "sound"
 [[.args]]
 name = "soundLabel"
 type = "string"
-[[.args]]
+``````````
 name = "fadeInRate"
 type = "integer"
-[[.args]]
+``````````
 name = "fadeOutRate"
 type = "integer"
 [[.returns]]
@@ -9473,7 +9473,7 @@ type = "sound"
 [[.args]]
 name = "soundHandle"
 type = "sound"
-[[.args]]
+``````````
 name = "soundLabel"
 type = "string"
 
@@ -9481,7 +9481,7 @@ type = "string"
 [[.args]]
 name = "soundHandle"
 type = "sound"
-[[.args]]
+``````````
 name = "cutoff"
 type = "number"
 
@@ -9489,7 +9489,7 @@ type = "number"
 [[.args]]
 name = "soundHandle"
 type = "sound"
-[[.args]]
+``````````
 name = "channel"
 type = "integer"
 
@@ -9497,7 +9497,7 @@ type = "integer"
 [[.args]]
 name = "soundHandle"
 type = "sound"
-[[.args]]
+``````````
 name = "volume"
 type = "integer"
 
@@ -9505,7 +9505,7 @@ type = "integer"
 [[.args]]
 name = "soundHandle"
 type = "sound"
-[[.args]]
+``````````
 name = "pitch"
 type = "number"
 
@@ -9513,7 +9513,7 @@ type = "number"
 [[.args]]
 name = "soundHandle"
 type = "sound"
-[[.args]]
+``````````
 name = "millisecs"
 type = "integer"
 
@@ -9521,10 +9521,10 @@ type = "integer"
 [[.args]]
 name = "soundHandle"
 type = "sound"
-[[.args]]
+``````````
 name = "minDist"
 type = "number"
-[[.args]]
+``````````
 name = "maxDist"
 type = "number"
 
@@ -9532,13 +9532,13 @@ type = "number"
 [[.args]]
 name = "soundHandle"
 type = "sound"
-[[.args]]
+``````````
 name = "inside"
 type = "number"
-[[.args]]
+``````````
 name = "outside"
 type = "number"
-[[.args]]
+``````````
 name = "outsideVolume"
 type = "integer"
 
@@ -9546,13 +9546,13 @@ type = "integer"
 [[.args]]
 name = "soundHandle"
 type = "sound"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "z"
 type = "number"
 
@@ -9560,13 +9560,13 @@ type = "number"
 [[.args]]
 name = "soundHandle"
 type = "sound"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "z"
 type = "number"
 
@@ -9574,13 +9574,13 @@ type = "number"
 [[.args]]
 name = "soundHandle"
 type = "sound"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "z"
 type = "number"
 
@@ -9588,7 +9588,7 @@ type = "number"
 [[.args]]
 name = "soundHandle"
 type = "sound"
-[[.args]]
+``````````
 name = "whichUnit"
 type = "unit"
 
@@ -9601,10 +9601,10 @@ type = "sound"
 [[.args]]
 name = "soundHandle"
 type = "sound"
-[[.args]]
+``````````
 name = "killWhenDone"
 type = "boolean"
-[[.args]]
+``````````
 name = "fadeOut"
 type = "boolean"
 
@@ -9617,10 +9617,10 @@ type = "sound"
 [[.args]]
 name = "musicName"
 type = "string"
-[[.args]]
+``````````
 name = "random"
 type = "boolean"
-[[.args]]
+``````````
 name = "index"
 type = "integer"
 
@@ -9635,10 +9635,10 @@ type = "string"
 [[.args]]
 name = "musicName"
 type = "string"
-[[.args]]
+``````````
 name = "frommsecs"
 type = "integer"
-[[.args]]
+``````````
 name = "fadeinmsecs"
 type = "integer"
 
@@ -9658,7 +9658,7 @@ type = "string"
 [[.args]]
 name = "musicFileName"
 type = "string"
-[[.args]]
+``````````
 name = "frommsecs"
 type = "integer"
 
@@ -9683,7 +9683,7 @@ type = "integer"
 [[.args]]
 name = "soundHandle"
 type = "sound"
-[[.args]]
+``````````
 name = "duration"
 type = "integer"
 
@@ -9705,7 +9705,7 @@ type = "integer"
 [[.args]]
 name = "vgroup"
 type = "volumegroup"
-[[.args]]
+``````````
 name = "scale"
 type = "number"
 
@@ -9729,13 +9729,13 @@ type = "boolean"
 [[.args]]
 name = "soundHandle"
 type = "sound"
-[[.args]]
+``````````
 name = "byPosition"
 type = "boolean"
-[[.args]]
+``````````
 name = "rectwidth"
 type = "number"
-[[.args]]
+``````````
 name = "rectheight"
 type = "number"
 
@@ -9743,13 +9743,13 @@ type = "number"
 [[.args]]
 name = "soundHandle"
 type = "sound"
-[[.args]]
+``````````
 name = "byPosition"
 type = "boolean"
-[[.args]]
+``````````
 name = "rectwidth"
 type = "number"
-[[.args]]
+``````````
 name = "rectheight"
 type = "number"
 
@@ -9757,7 +9757,7 @@ type = "number"
 [[.args]]
 name = "where"
 type = "rect"
-[[.args]]
+``````````
 name = "effectID"
 type = "integer"
 [[.returns]]
@@ -9772,7 +9772,7 @@ type = "weathereffect"
 [[.args]]
 name = "whichEffect"
 type = "weathereffect"
-[[.args]]
+``````````
 name = "enable"
 type = "boolean"
 
@@ -9780,19 +9780,19 @@ type = "boolean"
 [[.args]]
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "radius"
 type = "number"
-[[.args]]
+``````````
 name = "depth"
 type = "number"
-[[.args]]
+``````````
 name = "duration"
 type = "integer"
-[[.args]]
+``````````
 name = "permanent"
 type = "boolean"
 [[.returns]]
@@ -9802,31 +9802,31 @@ type = "terraindeformation"
 [[.args]]
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "radius"
 type = "number"
-[[.args]]
+``````````
 name = "depth"
 type = "number"
-[[.args]]
+``````````
 name = "duration"
 type = "integer"
-[[.args]]
+``````````
 name = "count"
 type = "integer"
-[[.args]]
+``````````
 name = "spaceWaves"
 type = "number"
-[[.args]]
+``````````
 name = "timeWaves"
 type = "number"
-[[.args]]
+``````````
 name = "radiusStartPct"
 type = "number"
-[[.args]]
+``````````
 name = "limitNeg"
 type = "boolean"
 [[.returns]]
@@ -9836,31 +9836,31 @@ type = "terraindeformation"
 [[.args]]
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "dirX"
 type = "number"
-[[.args]]
+``````````
 name = "dirY"
 type = "number"
-[[.args]]
+``````````
 name = "distance"
 type = "number"
-[[.args]]
+``````````
 name = "speed"
 type = "number"
-[[.args]]
+``````````
 name = "radius"
 type = "number"
-[[.args]]
+``````````
 name = "depth"
 type = "number"
-[[.args]]
+``````````
 name = "trailTime"
 type = "integer"
-[[.args]]
+``````````
 name = "count"
 type = "integer"
 [[.returns]]
@@ -9870,22 +9870,22 @@ type = "terraindeformation"
 [[.args]]
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "radius"
 type = "number"
-[[.args]]
+``````````
 name = "minDelta"
 type = "number"
-[[.args]]
+``````````
 name = "maxDelta"
 type = "number"
-[[.args]]
+``````````
 name = "duration"
 type = "integer"
-[[.args]]
+``````````
 name = "updateInterval"
 type = "integer"
 [[.returns]]
@@ -9895,7 +9895,7 @@ type = "terraindeformation"
 [[.args]]
 name = "deformation"
 type = "terraindeformation"
-[[.args]]
+``````````
 name = "duration"
 type = "integer"
 
@@ -9905,10 +9905,10 @@ type = "integer"
 [[.args]]
 name = "modelName"
 type = "string"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
 [[.returns]]
@@ -9918,7 +9918,7 @@ type = "effect"
 [[.args]]
 name = "modelName"
 type = "string"
-[[.args]]
+``````````
 name = "where"
 type = "location"
 [[.returns]]
@@ -9928,10 +9928,10 @@ type = "effect"
 [[.args]]
 name = "modelName"
 type = "string"
-[[.args]]
+``````````
 name = "targetWidget"
 type = "widget"
-[[.args]]
+``````````
 name = "attachPointName"
 type = "string"
 [[.returns]]
@@ -9946,13 +9946,13 @@ type = "effect"
 [[.args]]
 name = "abilityString"
 type = "string"
-[[.args]]
+``````````
 name = "t"
 type = "effecttype"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
 [[.returns]]
@@ -9962,10 +9962,10 @@ type = "effect"
 [[.args]]
 name = "abilityString"
 type = "string"
-[[.args]]
+``````````
 name = "t"
 type = "effecttype"
-[[.args]]
+``````````
 name = "where"
 type = "location"
 [[.returns]]
@@ -9975,13 +9975,13 @@ type = "effect"
 [[.args]]
 name = "abilityId"
 type = "integer"
-[[.args]]
+``````````
 name = "t"
 type = "effecttype"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
 [[.returns]]
@@ -9991,10 +9991,10 @@ type = "effect"
 [[.args]]
 name = "abilityId"
 type = "integer"
-[[.args]]
+``````````
 name = "t"
 type = "effecttype"
-[[.args]]
+``````````
 name = "where"
 type = "location"
 [[.returns]]
@@ -10004,13 +10004,13 @@ type = "effect"
 [[.args]]
 name = "modelName"
 type = "string"
-[[.args]]
+``````````
 name = "t"
 type = "effecttype"
-[[.args]]
+``````````
 name = "targetWidget"
 type = "widget"
-[[.args]]
+``````````
 name = "attachPoint"
 type = "string"
 [[.returns]]
@@ -10020,13 +10020,13 @@ type = "effect"
 [[.args]]
 name = "abilityId"
 type = "integer"
-[[.args]]
+``````````
 name = "t"
 type = "effecttype"
-[[.args]]
+``````````
 name = "targetWidget"
 type = "widget"
-[[.args]]
+``````````
 name = "attachPoint"
 type = "string"
 [[.returns]]
@@ -10036,19 +10036,19 @@ type = "effect"
 [[.args]]
 name = "codeName"
 type = "string"
-[[.args]]
+``````````
 name = "checkVisibility"
 type = "boolean"
-[[.args]]
+``````````
 name = "x1"
 type = "number"
-[[.args]]
+``````````
 name = "y1"
 type = "number"
-[[.args]]
+``````````
 name = "x2"
 type = "number"
-[[.args]]
+``````````
 name = "y2"
 type = "number"
 [[.returns]]
@@ -10058,25 +10058,25 @@ type = "lightning"
 [[.args]]
 name = "codeName"
 type = "string"
-[[.args]]
+``````````
 name = "checkVisibility"
 type = "boolean"
-[[.args]]
+``````````
 name = "x1"
 type = "number"
-[[.args]]
+``````````
 name = "y1"
 type = "number"
-[[.args]]
+``````````
 name = "z1"
 type = "number"
-[[.args]]
+``````````
 name = "x2"
 type = "number"
-[[.args]]
+``````````
 name = "y2"
 type = "number"
-[[.args]]
+``````````
 name = "z2"
 type = "number"
 [[.returns]]
@@ -10093,19 +10093,19 @@ type = "boolean"
 [[.args]]
 name = "whichBolt"
 type = "lightning"
-[[.args]]
+``````````
 name = "checkVisibility"
 type = "boolean"
-[[.args]]
+``````````
 name = "x1"
 type = "number"
-[[.args]]
+``````````
 name = "y1"
 type = "number"
-[[.args]]
+``````````
 name = "x2"
 type = "number"
-[[.args]]
+``````````
 name = "y2"
 type = "number"
 [[.returns]]
@@ -10115,25 +10115,25 @@ type = "boolean"
 [[.args]]
 name = "whichBolt"
 type = "lightning"
-[[.args]]
+``````````
 name = "checkVisibility"
 type = "boolean"
-[[.args]]
+``````````
 name = "x1"
 type = "number"
-[[.args]]
+``````````
 name = "y1"
 type = "number"
-[[.args]]
+``````````
 name = "z1"
 type = "number"
-[[.args]]
+``````````
 name = "x2"
 type = "number"
-[[.args]]
+``````````
 name = "y2"
 type = "number"
-[[.args]]
+``````````
 name = "z2"
 type = "number"
 [[.returns]]
@@ -10171,16 +10171,16 @@ type = "number"
 [[.args]]
 name = "whichBolt"
 type = "lightning"
-[[.args]]
+``````````
 name = "r"
 type = "number"
-[[.args]]
+``````````
 name = "g"
 type = "number"
-[[.args]]
+``````````
 name = "b"
 type = "number"
-[[.args]]
+``````````
 name = "a"
 type = "number"
 [[.returns]]
@@ -10190,10 +10190,10 @@ type = "boolean"
 [[.args]]
 name = "abilityString"
 type = "string"
-[[.args]]
+``````````
 name = "t"
 type = "effecttype"
-[[.args]]
+``````````
 name = "index"
 type = "integer"
 [[.returns]]
@@ -10203,10 +10203,10 @@ type = "string"
 [[.args]]
 name = "abilityId"
 type = "integer"
-[[.args]]
+``````````
 name = "t"
 type = "effecttype"
-[[.args]]
+``````````
 name = "index"
 type = "integer"
 [[.returns]]
@@ -10216,7 +10216,7 @@ type = "string"
 [[.args]]
 name = "abilityString"
 type = "string"
-[[.args]]
+``````````
 name = "t"
 type = "soundtype"
 [[.returns]]
@@ -10226,7 +10226,7 @@ type = "string"
 [[.args]]
 name = "abilityId"
 type = "integer"
-[[.args]]
+``````````
 name = "t"
 type = "soundtype"
 [[.returns]]
@@ -10236,7 +10236,7 @@ type = "string"
 [[.args]]
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
 [[.returns]]
@@ -10246,13 +10246,13 @@ type = "integer"
 [[.args]]
 name = "red"
 type = "integer"
-[[.args]]
+``````````
 name = "green"
 type = "integer"
-[[.args]]
+``````````
 name = "blue"
 type = "integer"
-[[.args]]
+``````````
 name = "alpha"
 type = "integer"
 
@@ -10265,7 +10265,7 @@ type = "boolean"
 [[.args]]
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
 [[.returns]]
@@ -10275,7 +10275,7 @@ type = "integer"
 [[.args]]
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
 [[.returns]]
@@ -10285,19 +10285,19 @@ type = "integer"
 [[.args]]
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "terrainType"
 type = "integer"
-[[.args]]
+``````````
 name = "variation"
 type = "integer"
-[[.args]]
+``````````
 name = "area"
 type = "integer"
-[[.args]]
+``````````
 name = "shape"
 type = "integer"
 
@@ -10305,10 +10305,10 @@ type = "integer"
 [[.args]]
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "t"
 type = "pathingtype"
 [[.returns]]
@@ -10318,13 +10318,13 @@ type = "boolean"
 [[.args]]
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "t"
 type = "pathingtype"
-[[.args]]
+``````````
 name = "flag"
 type = "boolean"
 
@@ -10332,34 +10332,34 @@ type = "boolean"
 [[.args]]
 name = "file"
 type = "string"
-[[.args]]
+``````````
 name = "sizeX"
 type = "number"
-[[.args]]
+``````````
 name = "sizeY"
 type = "number"
-[[.args]]
+``````````
 name = "sizeZ"
 type = "number"
-[[.args]]
+``````````
 name = "posX"
 type = "number"
-[[.args]]
+``````````
 name = "posY"
 type = "number"
-[[.args]]
+``````````
 name = "posZ"
 type = "number"
-[[.args]]
+``````````
 name = "originX"
 type = "number"
-[[.args]]
+``````````
 name = "originY"
 type = "number"
-[[.args]]
+``````````
 name = "originZ"
 type = "number"
-[[.args]]
+``````````
 name = "imageType"
 type = "integer"
 [[.returns]]
@@ -10374,7 +10374,7 @@ type = "image"
 [[.args]]
 name = "whichImage"
 type = "image"
-[[.args]]
+``````````
 name = "flag"
 type = "boolean"
 
@@ -10382,10 +10382,10 @@ type = "boolean"
 [[.args]]
 name = "whichImage"
 type = "image"
-[[.args]]
+``````````
 name = "flag"
 type = "boolean"
-[[.args]]
+``````````
 name = "height"
 type = "number"
 
@@ -10393,13 +10393,13 @@ type = "number"
 [[.args]]
 name = "whichImage"
 type = "image"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "z"
 type = "number"
 
@@ -10407,16 +10407,16 @@ type = "number"
 [[.args]]
 name = "whichImage"
 type = "image"
-[[.args]]
+``````````
 name = "red"
 type = "integer"
-[[.args]]
+``````````
 name = "green"
 type = "integer"
-[[.args]]
+``````````
 name = "blue"
 type = "integer"
-[[.args]]
+``````````
 name = "alpha"
 type = "integer"
 
@@ -10424,7 +10424,7 @@ type = "integer"
 [[.args]]
 name = "whichImage"
 type = "image"
-[[.args]]
+``````````
 name = "flag"
 type = "boolean"
 
@@ -10432,7 +10432,7 @@ type = "boolean"
 [[.args]]
 name = "whichImage"
 type = "image"
-[[.args]]
+``````````
 name = "flag"
 type = "boolean"
 
@@ -10440,10 +10440,10 @@ type = "boolean"
 [[.args]]
 name = "whichImage"
 type = "image"
-[[.args]]
+``````````
 name = "flag"
 type = "boolean"
-[[.args]]
+``````````
 name = "useWaterAlpha"
 type = "boolean"
 
@@ -10451,7 +10451,7 @@ type = "boolean"
 [[.args]]
 name = "whichImage"
 type = "image"
-[[.args]]
+``````````
 name = "imageType"
 type = "integer"
 
@@ -10459,28 +10459,28 @@ type = "integer"
 [[.args]]
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "name"
 type = "string"
-[[.args]]
+``````````
 name = "red"
 type = "integer"
-[[.args]]
+``````````
 name = "green"
 type = "integer"
-[[.args]]
+``````````
 name = "blue"
 type = "integer"
-[[.args]]
+``````````
 name = "alpha"
 type = "integer"
-[[.args]]
+``````````
 name = "forcePaused"
 type = "boolean"
-[[.args]]
+``````````
 name = "noBirthTime"
 type = "boolean"
 [[.returns]]
@@ -10505,7 +10505,7 @@ type = "ubersplat"
 [[.args]]
 name = "whichSplat"
 type = "ubersplat"
-[[.args]]
+``````````
 name = "flag"
 type = "boolean"
 
@@ -10513,7 +10513,7 @@ type = "boolean"
 [[.args]]
 name = "whichSplat"
 type = "ubersplat"
-[[.args]]
+``````````
 name = "flag"
 type = "boolean"
 
@@ -10521,7 +10521,7 @@ type = "boolean"
 [[.args]]
 name = "whichSplat"
 type = "ubersplat"
-[[.args]]
+``````````
 name = "flag"
 type = "boolean"
 
@@ -10529,16 +10529,16 @@ type = "boolean"
 [[.args]]
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "radius"
 type = "number"
-[[.args]]
+``````````
 name = "addBlight"
 type = "boolean"
 
@@ -10546,10 +10546,10 @@ type = "boolean"
 [[.args]]
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "r"
 type = "rect"
-[[.args]]
+``````````
 name = "addBlight"
 type = "boolean"
 
@@ -10557,13 +10557,13 @@ type = "boolean"
 [[.args]]
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "addBlight"
 type = "boolean"
 
@@ -10571,13 +10571,13 @@ type = "boolean"
 [[.args]]
 name = "whichPlayer"
 type = "player"
-[[.args]]
+``````````
 name = "whichLocation"
 type = "location"
-[[.args]]
+``````````
 name = "radius"
 type = "number"
-[[.args]]
+``````````
 name = "addBlight"
 type = "boolean"
 
@@ -10585,13 +10585,13 @@ type = "boolean"
 [[.args]]
 name = "id"
 type = "player"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "face"
 type = "number"
 [[.returns]]
@@ -10601,7 +10601,7 @@ type = "unit"
 [[.args]]
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
 [[.returns]]
@@ -10611,22 +10611,22 @@ type = "boolean"
 [[.args]]
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "radius"
 type = "number"
-[[.args]]
+``````````
 name = "doodadID"
 type = "integer"
-[[.args]]
+``````````
 name = "nearestOnly"
 type = "boolean"
-[[.args]]
+``````````
 name = "animName"
 type = "string"
-[[.args]]
+``````````
 name = "animRandom"
 type = "boolean"
 
@@ -10634,13 +10634,13 @@ type = "boolean"
 [[.args]]
 name = "r"
 type = "rect"
-[[.args]]
+``````````
 name = "doodadID"
 type = "integer"
-[[.args]]
+``````````
 name = "animName"
 type = "string"
-[[.args]]
+``````````
 name = "animRandom"
 type = "boolean"
 
@@ -10648,7 +10648,7 @@ type = "boolean"
 [[.args]]
 name = "num"
 type = "player"
-[[.args]]
+``````````
 name = "script"
 type = "string"
 
@@ -10656,7 +10656,7 @@ type = "string"
 [[.args]]
 name = "num"
 type = "player"
-[[.args]]
+``````````
 name = "script"
 type = "string"
 
@@ -10664,10 +10664,10 @@ type = "string"
 [[.args]]
 name = "num"
 type = "player"
-[[.args]]
+``````````
 name = "command"
 type = "integer"
-[[.args]]
+``````````
 name = "data"
 type = "integer"
 
@@ -10675,7 +10675,7 @@ type = "integer"
 [[.args]]
 name = "p"
 type = "player"
-[[.args]]
+``````````
 name = "pause"
 type = "boolean"
 

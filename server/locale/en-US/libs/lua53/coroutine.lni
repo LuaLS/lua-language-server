@@ -16,15 +16,15 @@ description = 'Returns the status of coroutine `co`.'
 name = 'status'
 enum = 'running'
 description = 'Is running.'
-[[.enums]]
+``````````
 name = 'status'
 enum = 'suspended'
 description = 'Is suspended or not started.'
-[[.enums]]
+``````````
 name = 'status'
 enum = 'normal'
 description = 'Is active but not running.'
-[[.enums]]
+``````````
 name = 'status'
 enum = 'dead'
 description = 'Has finished or stopped with an error.'

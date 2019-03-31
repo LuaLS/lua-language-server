@@ -2,7 +2,7 @@
 type = 'table'
 [[.source]]
 type = 'global'
-[[.source]]
+``````````
 type = 'library'
 name = 'table'
 
@@ -11,7 +11,7 @@ type = 'function'
 [[.parent]]
 type = 'global'
 name = 'table'
-[[.parent]]
+``````````
 type = 'library'
 name = 'table'
 
@@ -19,17 +19,17 @@ name = 'table'
 [[.args]]
 name = 'list'
 type = 'table'
-[[.args]]
+``````````
 name = 'sep'
 type = 'string'
 optional = 'after'
 default = ''
-[[.args]]
+``````````
 name = 'i'
 type = 'integer'
 optional = 'after'
 default = 1
-[[.args]]
+``````````
 name = 'j'
 type = 'integer'
 optional = 'self'
@@ -40,11 +40,11 @@ type = 'string'
 [[.args]]
 name = 'list'
 type = 'table'
-[[.args]]
+``````````
 name = 'pos'
 type = 'integer'
 optional = 'self'
-[[.args]]
+``````````
 name = 'value'
 type = 'any'
 
@@ -52,16 +52,16 @@ type = 'any'
 [[.args]]
 name = 'a1'
 type = 'table'
-[[.args]]
+``````````
 name = 'f'
 type = 'integer'
-[[.args]]
+``````````
 name = 'e'
 type = 'integer'
-[[.args]]
+``````````
 name = 't'
 type = 'integer'
-[[.args]]
+``````````
 name = 'a2'
 type = 'table'
 optional = 'self'
@@ -79,7 +79,7 @@ type = 'table'
 [[.args]]
 name = 'list'
 type = 'table'
-[[.args]]
+``````````
 name = 'pos'
 type = 'integer'
 optional = 'self'
@@ -89,7 +89,7 @@ optional = 'self'
 [[.args]]
 name = 'list'
 type = 'table'
-[[.args]]
+``````````
 name = 'comp'
 type = 'function'
 optional = 'self'
@@ -98,12 +98,12 @@ optional = 'self'
 [[.args]]
 name = 'list'
 type = 'table'
-[[.args]]
+``````````
 name = 'i'
 type = 'integer'
 optional = 'after'
 type = 1
-[[.args]]
+``````````
 name = 'j'
 type = 'integer'
 optional = 'self'

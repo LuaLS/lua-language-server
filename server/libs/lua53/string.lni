@@ -2,7 +2,7 @@
 type = 'table'
 [[.source]]
 type = 'global'
-[[.source]]
+``````````
 type = 'library'
 name = 'string'
 
@@ -11,45 +11,45 @@ type = 'function'
 [[.parent]]
 type = 'global'
 name = 'string'
-[[.parent]]
+``````````
 type = 'library'
 name = 'string'
-[[.parent]]
+``````````
 type = 'object'
 name = 'string'
 
 [byte]
 [[.args]]
 type = 'string'
-[[.args]]
+``````````
 name = 'i'
 type = 'integer'
 optional = 'after'
 default = 1
-[[.args]]
+``````````
 name = 'j'
 type = 'integer'
 optional = 'self'
 [[.returns]]
 type = 'integer'
-[[.returns]]
+``````````
 type = '...'
 
 [char]
 [[.args]]
 name = 'byte'
 type = 'integer'
-[[.args]]
+``````````
 type = '...'
 [[.returns]]
 type = 'string'
-[[.returns]]
+``````````
 type = '...'
 
 [dump]
 [[.args]]
 type = 'function'
-[[.args]]
+``````````
 name = 'strip'
 type = 'boolean'
 [[.returns]]
@@ -59,32 +59,32 @@ type = 'string'
 [find]
 [[.args]]
 type = 'string'
-[[.args]]
+``````````
 name = 'pattern'
 type = 'string'
-[[.args]]
+``````````
 name = 'init'
 type = 'integer'
 optional = 'after'
 default = 1
-[[.args]]
+``````````
 name = 'plain'
 type = 'boolean'
 optional = 'self'
 [[.returns]]
 name = 'start'
 type = 'integer'
-[[.returns]]
+``````````
 name = 'end'
 type = 'integer'
-[[.returns]]
+``````````
 name = 'captured'
 type = '...'
 
 [format]
 [[.args]]
 type = 'string'
-[[.args]]
+``````````
 type = '...'
 [[.returns]]
 type = 'string'
@@ -92,7 +92,7 @@ type = 'string'
 [gmatch]
 [[.args]]
 type = 'string'
-[[.args]]
+``````````
 name = 'pattern'
 type = 'string'
 [[.returns]]
@@ -109,18 +109,18 @@ returns = {
 [gsub]
 [[.args]]
 type = 'string'
-[[.args]]
+``````````
 name = 'pattern'
 type = 'string'
-[[.args]]
+``````````
 name = 'repl'
 type = {'string', 'table', 'function'}
-[[.args]]
+``````````
 name = 'n'
 type = 'integer'
 [[.returns]]
 type = 'string'
-[[.returns]]
+``````````
 name = 'count'
 type = 'integer'
 
@@ -139,10 +139,10 @@ type = 'string'
 [match]
 [[.args]]
 type = 'string'
-[[.args]]
+``````````
 name = 'pattern'
 type = 'string'
-[[.args]]
+``````````
 name = 'init'
 type = 'integer'
 optional = 'self'
@@ -155,13 +155,13 @@ type = 'string'
 [[.args]]
 name = 'fmt'
 type = 'string'
-[[.args]]
+``````````
 name = 'v1'
 type = 'string'
-[[.args]]
+``````````
 name = 'v2'
 type = 'string'
-[[.args]]
+``````````
 type = '...'
 [[.returns]]
 name = 'binary'
@@ -177,10 +177,10 @@ type = 'integer'
 [rep]
 [[.args]]
 type = 'string'
-[[.args]]
+``````````
 name = n
 type = 'integer'
-[[.args]]
+``````````
 name = 'sep'
 type = 'string'
 optional = 'self'
@@ -197,10 +197,10 @@ type = 'string'
 [sub]
 [[.args]]
 type = 'string'
-[[.args]]
+``````````
 name = 'i'
 type = 'integer'
-[[.args]]
+``````````
 name = 'j'
 type = 'integer'
 optional = 'self'
@@ -212,17 +212,17 @@ type = 'string'
 [[.args]]
 name = 'fmt'
 type = 'string'
-[[.args]]
+``````````
 name = 's'
 type = 'string'
-[[.args]]
+``````````
 name = 'pos'
 type = 'integer'
 optional = 'self'
 default = 1
 [[.returns]]
 type = '...'
-[[.returns]]
+``````````
 name = 'offset'
 type = 'integer'
 

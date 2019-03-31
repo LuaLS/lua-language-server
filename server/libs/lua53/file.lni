@@ -12,15 +12,15 @@ name = 'suc'
 type = 'boolean'
 default = true
 optional = 'after'
-[[.returns]]
+``````````
 name = 'type'
 type = 'string'
-[[.returns]]
+``````````
 name = 'code'
 [[.enums]]
 type = 'type'
 enum = 'exit'
-[[.enums]]
+``````````
 type = 'type'
 enum = 'signal'
 
@@ -31,7 +31,7 @@ type = 'FILE*'
 [lines]
 [[.args]]
 type = 'FILE*'
-[[.args]]
+``````````
 name = 'mode'
 type = '...'
 [[.returns]]
@@ -45,55 +45,55 @@ returns = {
 [[.enums]]
 name = 'mode'
 enum = 'n'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'a'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'l'
 default = true
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'L'
-[[.enums]]
+``````````
 name = 'mode'
 code = 'number'
 
 [read]
 [[.args]]
 type = 'FILE*'
-[[.args]]
+``````````
 name = 'mode'
 type = '...'
 [[.returns]]
 type = {'string', 'number'}
-[[.returns]]
+``````````
 type = '...'
 [[.enums]]
 name = 'mode'
 enum = 'n'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'a'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'l'
 default = true
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'L'
-[[.enums]]
+``````````
 name = 'mode'
 code = 'number'
 
 [seek]
 [[.args]]
 type = 'FILE*'
-[[.args]]
+``````````
 name = 'whence'
 type = 'string'
 optional = 'after'
-[[.args]]
+``````````
 name = 'offset'
 type = 'integer'
 default = 0
@@ -101,48 +101,48 @@ optional = 'self'
 [[.returns]]
 name = 'offset'
 type = 'integer'
-[[.returns]]
+``````````
 name = 'errmsg'
 type = 'string'
 optional = 'self'
 [[.enums]]
 name = 'whence'
 enum = 'set'
-[[.enums]]
+``````````
 name = 'whence'
 enum = 'cur'
 default = true
-[[.enums]]
+``````````
 name = 'whence'
 enum = 'end'
 
 [setvbuf]
 [[.args]]
 type = 'FILE*'
-[[.args]]
+``````````
 name = 'mode'
 type = 'string'
-[[.args]]
+``````````
 name = 'size'
 type = 'integer'
 [[.enums]]
 name = 'mode'
 enum = 'no'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'full'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'line'
 
 [write]
 [[.args]]
 type = 'FILE*'
-[[.args]]
+``````````
 type = '...'
 [[.returns]]
 type = 'FILE*'
-[[.returns]]
+``````````
 name = 'errmsg'
 type = 'string'
 optional = 'self'

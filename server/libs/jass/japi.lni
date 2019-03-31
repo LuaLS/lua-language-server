@@ -15,7 +15,7 @@ nick = 'japi'
 [[.args]]
 name = "u"
 type = "unit"
-[[.args]]
+``````````
 name = "abilcode"
 type = "integer"
 [[.returns]]
@@ -25,7 +25,7 @@ type = "ability"
 [[.args]]
 name = "u"
 type = "unit"
-[[.args]]
+``````````
 name = "index"
 type = "integer"
 [[.returns]]
@@ -42,7 +42,7 @@ type = "integer"
 [[.args]]
 name = "abil"
 type = "ability"
-[[.args]]
+``````````
 name = "state_type"
 type = "integer"
 [[.returns]]
@@ -52,10 +52,10 @@ type = "number"
 [[.args]]
 name = "abil"
 type = "ability"
-[[.args]]
+``````````
 name = "state_type"
 type = "integer"
-[[.args]]
+``````````
 name = "value"
 type = "number"
 [[.returns]]
@@ -65,10 +65,10 @@ type = "boolean"
 [[.args]]
 name = "abil"
 type = "ability"
-[[.args]]
+``````````
 name = "level"
 type = "integer"
-[[.args]]
+``````````
 name = "data_type"
 type = "integer"
 [[.returns]]
@@ -78,13 +78,13 @@ type = "number"
 [[.args]]
 name = "abil"
 type = "ability"
-[[.args]]
+``````````
 name = "level"
 type = "integer"
-[[.args]]
+``````````
 name = "data_type"
 type = "integer"
-[[.args]]
+``````````
 name = "value"
 type = "number"
 [[.returns]]
@@ -94,10 +94,10 @@ type = "boolean"
 [[.args]]
 name = "abil"
 type = "ability"
-[[.args]]
+``````````
 name = "level"
 type = "integer"
-[[.args]]
+``````````
 name = "data_type"
 type = "integer"
 [[.returns]]
@@ -107,13 +107,13 @@ type = "integer"
 [[.args]]
 name = "abil"
 type = "ability"
-[[.args]]
+``````````
 name = "level"
 type = "integer"
-[[.args]]
+``````````
 name = "data_type"
 type = "integer"
-[[.args]]
+``````````
 name = "value"
 type = "integer"
 [[.returns]]
@@ -123,10 +123,10 @@ type = "boolean"
 [[.args]]
 name = "abil"
 type = "ability"
-[[.args]]
+``````````
 name = "level"
 type = "integer"
-[[.args]]
+``````````
 name = "data_type"
 type = "integer"
 [[.returns]]
@@ -136,13 +136,13 @@ type = "string"
 [[.args]]
 name = "abil"
 type = "ability"
-[[.args]]
+``````````
 name = "level"
 type = "integer"
-[[.args]]
+``````````
 name = "data_type"
 type = "integer"
-[[.args]]
+``````````
 name = "value"
 type = "string"
 [[.returns]]
@@ -152,13 +152,13 @@ type = "boolean"
 [[.args]]
 name = "abilcode"
 type = "integer"
-[[.args]]
+``````````
 name = "level"
 type = "integer"
-[[.args]]
+``````````
 name = "data_type"
 type = "integer"
-[[.args]]
+``````````
 name = "value"
 type = "string"
 [[.returns]]
@@ -168,7 +168,7 @@ type = "boolean"
 [[.args]]
 name = "abil"
 type = "ability"
-[[.args]]
+``````````
 name = "unitid"
 type = "integer"
 [[.returns]]
@@ -178,7 +178,7 @@ type = "boolean"
 [[.args]]
 name = "itemcode"
 type = "integer"
-[[.args]]
+``````````
 name = "data_type"
 type = "integer"
 [[.returns]]
@@ -188,10 +188,10 @@ type = "string"
 [[.args]]
 name = "itemcode"
 type = "integer"
-[[.args]]
+``````````
 name = "data_type"
 type = "integer"
-[[.args]]
+``````````
 name = "value"
 type = "string"
 [[.returns]]
@@ -236,10 +236,10 @@ type = "number"
 [[.args]]
 name = "e"
 type = "effect"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
 
@@ -247,7 +247,7 @@ type = "number"
 [[.args]]
 name = "e"
 type = "effect"
-[[.args]]
+``````````
 name = "z"
 type = "number"
 
@@ -262,7 +262,7 @@ type = "number"
 [[.args]]
 name = "e"
 type = "effect"
-[[.args]]
+``````````
 name = "size"
 type = "number"
 
@@ -270,7 +270,7 @@ type = "number"
 [[.args]]
 name = "e"
 type = "effect"
-[[.args]]
+``````````
 name = "angle"
 type = "number"
 
@@ -278,7 +278,7 @@ type = "number"
 [[.args]]
 name = "e"
 type = "effect"
-[[.args]]
+``````````
 name = "angle"
 type = "number"
 
@@ -286,7 +286,7 @@ type = "number"
 [[.args]]
 name = "e"
 type = "effect"
-[[.args]]
+``````````
 name = "angle"
 type = "number"
 
@@ -294,13 +294,13 @@ type = "number"
 [[.args]]
 name = "e"
 type = "effect"
-[[.args]]
+``````````
 name = "x"
 type = "number"
-[[.args]]
+``````````
 name = "y"
 type = "number"
-[[.args]]
+``````````
 name = "z"
 type = "number"
 
@@ -313,7 +313,7 @@ type = "effect"
 [[.args]]
 name = "e"
 type = "effect"
-[[.args]]
+``````````
 name = "speed"
 type = "number"
 
@@ -321,10 +321,10 @@ type = "number"
 [[.args]]
 name = "p"
 type = "player"
-[[.args]]
+``````````
 name = "chat_recipient"
 type = "integer"
-[[.args]]
+``````````
 name = "message"
 type = "string"
 
@@ -339,7 +339,7 @@ type = "string"
 [[.args]]
 name = "u"
 type = "unit"
-[[.args]]
+``````````
 name = "angle"
 type = "number"
 
@@ -347,7 +347,7 @@ type = "number"
 [[.args]]
 name = "u"
 type = "unit"
-[[.args]]
+``````````
 name = "flag"
 type = "boolean"
 
@@ -355,10 +355,10 @@ type = "boolean"
 [[.args]]
 name = "enable"
 type = "boolean"
-[[.args]]
+``````````
 name = "u"
 type = "unit"
-[[.args]]
+``````````
 name = "t"
 type = "integer"
 
@@ -366,7 +366,7 @@ type = "integer"
 [[.args]]
 name = "u"
 type = "unit"
-[[.args]]
+``````````
 name = "t"
 type = "integer"
 
@@ -374,7 +374,7 @@ type = "integer"
 [[.args]]
 name = "itemcode"
 type = "integer"
-[[.args]]
+``````````
 name = "data_type"
 type = "integer"
 [[.returns]]
@@ -384,10 +384,10 @@ type = "string"
 [[.args]]
 name = "itemcode"
 type = "integer"
-[[.args]]
+``````````
 name = "data_type"
 type = "integer"
-[[.args]]
+``````````
 name = "value"
 type = "string"
 [[.returns]]
@@ -397,7 +397,7 @@ type = "boolean"
 [[.args]]
 name = "buffcode"
 type = "integer"
-[[.args]]
+``````````
 name = "data_type"
 type = "integer"
 [[.returns]]
@@ -407,10 +407,10 @@ type = "string"
 [[.args]]
 name = "buffcode"
 type = "integer"
-[[.args]]
+``````````
 name = "data_type"
 type = "integer"
-[[.args]]
+``````````
 name = "value"
 type = "string"
 [[.returns]]
@@ -425,10 +425,10 @@ type = "string"
 [[.args]]
 name = "mask"
 type = "string"
-[[.args]]
+``````````
 name = "image"
 type = "string"
-[[.args]]
+``````````
 name = "newArt"
 type = "string"
 
@@ -436,13 +436,13 @@ type = "string"
 [[.args]]
 name = "unitCode"
 type = "integer"
-[[.args]]
+``````````
 name = "data_type"
 type = "integer"
-[[.args]]
+``````````
 name = "index"
 type = "integer"
-[[.args]]
+``````````
 name = "value"
 type = "string"
 
@@ -450,10 +450,10 @@ type = "string"
 [[.args]]
 name = "unitCode"
 type = "integer"
-[[.args]]
+``````````
 name = "data_type"
 type = "integer"
-[[.args]]
+``````````
 name = "value"
 type = "integer"
 

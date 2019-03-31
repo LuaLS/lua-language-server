@@ -2,7 +2,7 @@
 type = 'table'
 [[.source]]
 type = 'global'
-[[.source]]
+``````````
 type = 'library'
 name = 'package'
 
@@ -11,7 +11,7 @@ type = 'function'
 [[.parent]]
 type = 'global'
 name = 'package'
-[[.parent]]
+``````````
 type = 'library'
 name = 'package'
 
@@ -28,7 +28,7 @@ type = 'table'
 [[.args]]
 name = 'libname'
 type = 'string'
-[[.args]]
+``````````
 name = 'funcname'
 type = 'string'
 [[.returns]]
@@ -46,15 +46,15 @@ type = 'table'
 [[.args]]
 name = 'name'
 type = 'string'
-[[.args]]
+``````````
 name = 'path'
 type = 'string'
-[[.args]]
+``````````
 name = 'sep'
 type = 'string'
 optional = 'after'
 default = '.'
-[[.args]]
+``````````
 name = 'rep'
 type = 'string'
 optional = 'self'

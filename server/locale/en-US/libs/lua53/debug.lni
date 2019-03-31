@@ -10,27 +10,27 @@ description = 'Returns a table with information about a function.'
 name = 'what'
 enum = 'n'
 description = '`name` and `namewhat`'
-[[.enums]]
+``````````
 name = 'what'
 enum = 'S'
 description = '`source`, `short_src`, `linedefined`, `lastlinedefined`, and `what`'
-[[.enums]]
+``````````
 name = 'what'
 enum = 'l'
 description = '`currentline`'
-[[.enums]]
+``````````
 name = 'what'
 enum = 't'
 description = '`istailcall`'
-[[.enums]]
+``````````
 name = 'what'
 enum = 'u'
 description = '`nups`, `nparams`, and `isvararg`'
-[[.enums]]
+``````````
 name = 'what'
 enum = 'f'
 description = '`func`'
-[[.enums]]
+``````````
 name = 'what'
 enum = 'L'
 description = '`activelines`'
@@ -56,11 +56,11 @@ description = 'Sets the given function as a hook.'
 name = 'mask'
 enum = 'c'
 description = 'Calls hook when Lua calls a function.'
-[[.enums]]
+``````````
 name = 'mask'
 enum = 'r'
 description = 'Calls hook when Lua returns from a function.'
-[[.enums]]
+``````````
 name = 'mask'
 enum = 'l'
 description = 'Calls hook when Lua enters a new line of code.'

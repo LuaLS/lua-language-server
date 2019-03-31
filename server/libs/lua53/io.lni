@@ -2,7 +2,7 @@
 type = 'table'
 [[.source]]
 type = 'global'
-[[.source]]
+``````````
 type = 'library'
 name = 'io'
 
@@ -11,7 +11,7 @@ type = 'function'
 [[.parent]]
 type = 'global'
 name = 'io'
-[[.parent]]
+``````````
 type = 'library'
 name = 'io'
 
@@ -34,15 +34,15 @@ name = 'suc'
 type = 'boolean'
 default = true
 optional = 'after'
-[[.returns]]
+``````````
 name = 'type'
 type = 'string'
-[[.returns]]
+``````````
 name = 'code'
 [[.enums]]
 type = 'type'
 enum = 'exit'
-[[.enums]]
+``````````
 type = 'type'
 enum = 'signal'
 
@@ -62,7 +62,7 @@ optional = 'self'
 name = 'filename'
 type = 'string'
 optional = 'after'
-[[.args]]
+``````````
 name = 'mode'
 type = '...'
 [[.returns]]
@@ -76,17 +76,17 @@ returns = {
 [[.enums]]
 name = 'mode'
 enum = 'n'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'a'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'l'
 default = true
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'L'
-[[.enums]]
+``````````
 name = 'mode'
 code = 'number'
 
@@ -94,7 +94,7 @@ code = 'number'
 [[.args]]
 name = 'filename'
 type = 'string'
-[[.args]]
+``````````
 name = 'mode'
 type = 'string'
 optional = 'self'
@@ -105,19 +105,19 @@ type = 'FILE*'
 name = 'mode'
 enum = 'r'
 default = true
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'w'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'a'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'r+'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'w+'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'a+'
 
@@ -127,7 +127,7 @@ enum = 'a+'
 [[.args]]
 name = 'prog'
 type = 'string'
-[[.args]]
+``````````
 name = 'mode'
 type = 'string'
 optional = 'self'
@@ -139,7 +139,7 @@ type = 'FILE*'
 name = 'mode'
 enum = 'r'
 default = true
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'w'
 
@@ -149,22 +149,22 @@ name = 'mode'
 type = '...'
 [[.returns]]
 type = {'string', 'number'}
-[[.returns]]
+``````````
 type = '...'
 [[.enums]]
 name = 'mode'
 enum = 'n'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'a'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'l'
 default = true
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'L'
-[[.enums]]
+``````````
 name = 'mode'
 code = 'number'
 
@@ -182,10 +182,10 @@ type = 'string'
 [[.enums]]
 name = 'type'
 enum = 'file'
-[[.enums]]
+``````````
 name = 'type'
 enum = 'closed file'
-[[.enums]]
+``````````
 name = 'type'
 code = 'nil'
 
@@ -194,7 +194,7 @@ code = 'nil'
 type = '...'
 [[.returns]]
 type = 'FILE*'
-[[.returns]]
+``````````
 name = 'errmsg'
 type = 'string'
 optional = 'self'

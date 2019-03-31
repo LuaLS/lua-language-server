@@ -29,19 +29,19 @@ end
 name = 'mode'
 enum = 'n'
 description = 'Reads a numeral and returns it as number.'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'a'
 description = 'Reads the whole file.'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'l'
 description = 'Reads the next line skipping the end of line.'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'L'
 description = 'Reads the next line keeping the end of line.'
-[[.enums]]
+``````````
 name = 'mode'
 code = 'number'
 description = 'Reads a string with up to this number of bytes.'
@@ -52,23 +52,23 @@ description = 'Opens a file, in the mode specified in the string `mode`.'
 name = 'mode'
 enum = 'r'
 description = 'Read mode.'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'w'
 description = 'Write mode.'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'a'
 description = 'Append mode.'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'r+'
 description = 'Update mode, all previous data is preserved.'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'w+'
 description = 'Update mode, all previous data is erased.'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'a+'
 description = 'Append update mode, previous data is preserved, writing is only allowed at the end of file.'
@@ -82,7 +82,7 @@ description = 'Starts program prog in a separated process.'
 name = 'mode'
 enum = 'r'
 description = 'Read data from this program by `file`.'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'w'
 description = 'Write data to this program by `file`.'
@@ -93,19 +93,19 @@ description = 'Reads the `file`, according to the given formats, which specify w
 name = 'mode'
 enum = 'n'
 description = 'Reads a numeral and returns it as number.'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'a'
 description = 'Reads the whole file.'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'l'
 description = 'Reads the next line skipping the end of line.'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'L'
 description = 'Reads the next line keeping the end of line.'
-[[.enums]]
+``````````
 name = 'mode'
 code = 'number'
 description = 'Reads a string with up to this number of bytes.'
@@ -119,11 +119,11 @@ description = 'Checks whether `obj` is a valid file handle.'
 name = 'type'
 enum = 'file'
 description = 'Is an open file handle.'
-[[.enums]]
+``````````
 name = 'type'
 enum = 'closed file'
 description = 'Is a closed file handle.'
-[[.enums]]
+``````````
 name = 'type'
 code = 'nil'
 description = 'Is not a file handle.'

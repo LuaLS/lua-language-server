@@ -2,7 +2,7 @@
 type = 'table'
 [[.source]]
 type = 'global'
-[[.source]]
+``````````
 type = 'library'
 name = 'os'
 
@@ -11,7 +11,7 @@ type = 'function'
 [[.parent]]
 type = 'global'
 name = 'os'
-[[.parent]]
+``````````
 type = 'library'
 name = 'os'
 
@@ -24,7 +24,7 @@ type = 'number'
 name = 'format'
 type = 'string'
 optional = 'after'
-[[.args]]
+``````````
 name = 'time'
 type = 'integer'
 optional = 'self'
@@ -35,7 +35,7 @@ type = 'string'
 [[.args]]
 name = 't2'
 type = 'integer'
-[[.args]]
+``````````
 name = 't1'
 type = 'integer'
 [[.returns]]
@@ -51,15 +51,15 @@ name = 'suc'
 type = 'boolean'
 default = 'true'
 optional = 'after'
-[[.returns]]
+``````````
 name = 'type'
 type = 'string'
-[[.returns]]
+``````````
 name = 'code'
 [[.enums]]
 type = 'type'
 enum = 'exit'
-[[.enums]]
+``````````
 type = 'type'
 enum = 'signal'
 
@@ -69,7 +69,7 @@ name = 'code'
 type = {'boolean', 'integer'}
 optional = 'after'
 default = true
-[[.args]]
+``````````
 name = 'close'
 type = 'boolean'
 optional = 'self'
@@ -88,7 +88,7 @@ type = 'string'
 [[.returns]]
 name = 'suc'
 type = 'boolean'
-[[.returns]]
+``````````
 name = 'errmsg'
 type = 'string'
 optional = 'self'
@@ -97,13 +97,13 @@ optional = 'self'
 [[.args]]
 name = 'oldname'
 type = 'string'
-[[.args]]
+``````````
 name = 'newname'
 type = 'string'
 [[.returns]]
 name = 'suc'
 type = 'boolean'
-[[.returns]]
+``````````
 name = 'errmsg'
 type = 'string'
 optional = 'self'
@@ -112,7 +112,7 @@ optional = 'self'
 [[.args]]
 name = 'locale'
 type = 'string'
-[[.args]]
+``````````
 name = 'category'
 type = 'string'
 optional = 'self'
@@ -123,19 +123,19 @@ type = 'string'
 name = 'category'
 enum = 'all'
 default = true
-[[.enums]]
+``````````
 name = 'category'
 enum = 'collate'
-[[.enums]]
+``````````
 name = 'category'
 enum = 'ctype'
-[[.enums]]
+``````````
 name = 'category'
 enum = 'monetary'
-[[.enums]]
+``````````
 name = 'category'
 enum = 'numeric'
-[[.enums]]
+``````````
 name = 'category'
 enum = 'time'
 

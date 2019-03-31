@@ -16,15 +16,15 @@ description = '以字符串形式返回协程 `co` 的状态。'
 name = 'status'
 enum = 'running'
 description = '正在运行。'
-[[.enums]]
+``````````
 name = 'status'
 enum = 'suspended'
 description = '挂起或是还没有开始运行。'
-[[.enums]]
+``````````
 name = 'status'
 enum = 'normal'
 description = '是活动的，但并不在运行。'
-[[.enums]]
+``````````
 name = 'status'
 enum = 'dead'
 description = '运行完主体函数或因错误停止。'

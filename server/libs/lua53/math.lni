@@ -2,7 +2,7 @@
 type = 'table'
 [[.source]]
 type = 'global'
-[[.source]]
+``````````
 type = 'library'
 name = 'math'
 
@@ -11,7 +11,7 @@ type = 'function'
 [[.parent]]
 type = 'global'
 name = 'math'
-[[.parent]]
+``````````
 type = 'library'
 name = 'math'
 
@@ -40,7 +40,7 @@ type = 'number'
 [[.args]]
 name = 'y'
 type = 'number'
-[[.args]]
+``````````
 name = 'x'
 type = 'number'
 optional = 'self'
@@ -87,7 +87,7 @@ type = 'integer'
 [[.args]]
 name = 'x'
 type = 'number'
-[[.args]]
+``````````
 name = 'y'
 type = 'number'
 [[.returns]]
@@ -100,7 +100,7 @@ type = 'number'
 [[.args]]
 name = 'x'
 type = 'number'
-[[.args]]
+``````````
 name = 'base'
 type = 'number'
 optional = 'self'
@@ -112,7 +112,7 @@ type = 'number'
 [[.args]]
 name = 'x'
 type = 'number'
-[[.args]]
+``````````
 type = '...'
 [[.returns]]
 type = 'number'
@@ -124,7 +124,7 @@ type = 'integer'
 [[.args]]
 name = 'x'
 type = 'number'
-[[.args]]
+``````````
 type = '...'
 [[.returns]]
 type = 'number'
@@ -138,7 +138,7 @@ name = 'x'
 type = 'number'
 [[.returns]]
 type = 'integer'
-[[.returns]]
+``````````
 type = 'number'
 
 [pi]
@@ -156,7 +156,7 @@ type = 'number'
 name = 'm'
 type = 'integer'
 optional = 'after'
-[[.args]]
+``````````
 name = 'n'
 type = 'integer'
 optional = 'self'
@@ -206,10 +206,10 @@ type = 'string'
 [[.enums]]
 name = 'type'
 enum = 'integer'
-[[.enums]]
+``````````
 name = 'type'
 enum = 'float'
-[[.enums]]
+``````````
 name = 'type'
 code = 'nil'
 
@@ -217,7 +217,7 @@ code = 'nil'
 [[.args]]
 name = 'm'
 type = 'integer'
-[[.args]]
+``````````
 name = 'n'
 type = 'integer'
 [[.returns]]

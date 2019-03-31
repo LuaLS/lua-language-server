@@ -9,31 +9,31 @@ description = '如果其参数 `v` 的值为假，它就调用 `error`。'
 name = 'opt'
 enum = 'collect'
 description = '做一次完整的垃圾收集循环。'
-[[.enums]]
+``````````
 name = 'opt'
 enum = 'stop'
 description = '停止垃圾收集器的运行。'
-[[.enums]]
+``````````
 name = 'opt'
 enum = 'restart'
 description = '重启垃圾收集器的自动运行。'
-[[.enums]]
+``````````
 name = 'opt'
 enum = 'count'
 description = '以 K 字节数为单位返回 Lua 使用的总内存数。'
-[[.enums]]
+``````````
 name = 'opt'
 enum = 'step'
 description = '单步运行垃圾收集器。'
-[[.enums]]
+``````````
 name = 'opt'
 enum = 'setpause'
 description = '设置收集器的 `间歇率`。'
-[[.enums]]
+``````````
 name = 'opt'
 enum = 'setstepmul'
 description = '设置收集器的 `步进倍率`。'
-[[.enums]]
+``````````
 name = 'opt'
 enum = 'isrunning'
 description = '返回表示收集器是否在工作的布尔值。'
@@ -66,11 +66,11 @@ description = '加载一个代码块。'
 name = 'mode'
 enum = 'b'
 description = '只能是二进制代码块。'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 't'
 description = '只能是文本代码块。'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'bt'
 description = '可以是二进制也可以是文本。'
@@ -81,11 +81,11 @@ description = '从文件中获取代码块。'
 name = 'mode'
 enum = 'b'
 description = '只能是二进制代码块。'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 't'
 description = '只能是文本代码块。'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'bt'
 description = '可以是二进制也可以是文本。'
@@ -126,7 +126,7 @@ description = '在不触发任何元方法的情况下 将 `table[index]` 设为
 name = 'index'
 enum = '#'
 description = '返回参数的个数。'
-[[.enums]]
+``````````
 name = 'index'
 code = 'integer'
 description = '返回参数中第 `index` 个之后的部分。'

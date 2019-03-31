@@ -7,7 +7,7 @@ type = 'table'
 [assert]
 [[.args]]
 name = 'v'
-[[.args]]
+``````````
 name = 'message'
 [[.returns]]
 
@@ -16,7 +16,7 @@ name = 'message'
 name = 'opt'
 type = 'string'
 optional = 'after'
-[[.args]]
+``````````
 name = 'arg'
 type = 'integer'
 optional = 'self'
@@ -25,25 +25,25 @@ optional = 'self'
 name = 'opt'
 enum = 'collect'
 default = true
-[[.enums]]
+``````````
 name = 'opt'
 enum = 'stop'
-[[.enums]]
+``````````
 name = 'opt'
 enum = 'restart'
-[[.enums]]
+``````````
 name = 'opt'
 enum = 'count'
-[[.enums]]
+``````````
 name = 'opt'
 enum = 'step'
-[[.enums]]
+``````````
 name = 'opt'
 enum = 'setpause'
-[[.enums]]
+``````````
 name = 'opt'
 enum = 'setstepmul'
-[[.enums]]
+``````````
 name = 'opt'
 enum = 'isrunning'
 
@@ -58,7 +58,7 @@ optional = 'self'
 [error]
 [[.args]]
 name = 'message'
-[[.args]]
+``````````
 name = 'level'
 type = 'integer'
 optional = 'self'
@@ -99,10 +99,10 @@ returns = {
         name = 'object',
     },
 }
-[[.returns]]
+``````````
 name = 't'
 type = 'table'
-[[.returns]]
+``````````
 name = 'i'
 type = 'integer'
 default = 0
@@ -111,15 +111,15 @@ default = 0
 [[.args]]
 name = 'chunk'
 type = {'string', 'function'}
-[[.args]]
+``````````
 name = 'chunkname'
 type = 'string'
 optional = 'after'
-[[.args]]
+``````````
 name = 'mode'
 type = 'string'
 optional = 'after'
-[[.args]]
+``````````
 name = 'env'
 type = 'table'
 optional = 'self'
@@ -130,16 +130,16 @@ args = {
         type = '...'
     },
 }
-[[.returns]]
+``````````
 name = 'error_message'
 type = 'string'
 [[.enums]]
 name = 'mode'
 enum = 'b'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 't'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'bt'
 default = true
@@ -150,11 +150,11 @@ special = 'loadfile'
 name = 'filename'
 type = 'string'
 optional = 'after'
-[[.args]]
+``````````
 name = 'mode'
 type = 'string'
 optional = 'after'
-[[.args]]
+``````````
 name = 'env'
 type = 'table'
 optional = 'self'
@@ -165,16 +165,16 @@ args = {
         type = '...'
     },
 }
-[[.returns]]
+``````````
 name = 'error_message'
 type = 'string'
 [[.enums]]
 name = 'mode'
 enum = 'b'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 't'
-[[.enums]]
+``````````
 name = 'mode'
 enum = 'bt'
 default = true
@@ -183,12 +183,12 @@ default = true
 [[.args]]
 name = 'table'
 type = 'table'
-[[.args]]
+``````````
 name = 'index'
 optional = 'self'
 [[.returns]]
 name = 'key'
-[[.returns]]
+``````````
 name = 'value'
 
 [pairs]
@@ -216,27 +216,27 @@ returns = {
         name = 'value',
     },
 }
-[[.returns]]
+``````````
 name = 't'
 type = 'table'
-[[.returns]]
+``````````
 type = 'nil'
 
 [pcall]
 [[.args]]
 name = 'f'
 type = 'function'
-[[.args]]
+``````````
 name = 'arg1'
 optional = 'after'
-[[.args]]
+``````````
 type = '...'
 [[.returns]]
 name = 'success'
 type = 'boolean'
-[[.returns]]
+``````````
 name = 'result'
-[[.returns]]
+``````````
 type = '...'
 
 [print]
@@ -246,7 +246,7 @@ type = '...'
 [rawequal]
 [[.args]]
 name = 'v1'
-[[.args]]
+``````````
 name = 'v2'
 [[.returns]]
 type = 'boolean'
@@ -255,7 +255,7 @@ type = 'boolean'
 [[.args]]
 name = 'table'
 type = 'table'
-[[.args]]
+``````````
 name = 'index'
 [[.returns]]
 
@@ -271,9 +271,9 @@ type = 'integer'
 [[.args]]
 name = 'table'
 type = 'table'
-[[.args]]
+``````````
 name = 'index'
-[[.args]]
+``````````
 name = 'value'
 [[.returns]]
 name = 'table'
@@ -283,13 +283,13 @@ type = 'table'
 [[.args]]
 name = 'index'
 type = {'string', 'integer'}
-[[.args]]
+``````````
 type = '...'
 [[.returns]]
 [[.enums]]
 name = 'index'
 enum = '#'
-[[.enums]]
+``````````
 name = 'index'
 code = 'integer'
 
@@ -298,7 +298,7 @@ special = 'setmetatable'
 [[.args]]
 name = 'table'
 type = 'table'
-[[.args]]
+``````````
 name = 'metatable'
 type = 'table'
 [[.returns]]
@@ -308,7 +308,7 @@ type = 'table'
 [[.args]]
 name = 'e'
 type = {'string', 'number'}
-[[.args]]
+``````````
 name = 'base'
 type = 'integer'
 optional = 'self'
@@ -330,25 +330,25 @@ type = 'string'
 [[.enums]]
 name = 'type'
 enum = 'nil'
-[[.enums]]
+``````````
 name = 'type'
 enum = 'number'
-[[.enums]]
+``````````
 name = 'type'
 enum = 'string'
-[[.enums]]
+``````````
 name = 'type'
 enum = 'boolean'
-[[.enums]]
+``````````
 name = 'type'
 enum = 'table'
-[[.enums]]
+``````````
 name = 'type'
 enum = 'function'
-[[.enums]]
+``````````
 name = 'type'
 enum = 'thread'
-[[.enums]]
+``````````
 name = 'type'
 enum = 'userdata'
 
@@ -360,20 +360,20 @@ value = 'Lua5.3'
 [[.args]]
 name = 'f'
 type = 'function'
-[[.args]]
+``````````
 name = 'msgh'
 type = 'function'
-[[.args]]
+``````````
 name = 'arg1'
 optional = 'after'
-[[.args]]
+``````````
 type = '...'
 [[.returns]]
 name = 'success'
 type = 'boolean'
-[[.returns]]
+``````````
 name = 'result'
-[[.returns]]
+``````````
 type = '...'
 
 [require]

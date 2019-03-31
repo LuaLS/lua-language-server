@@ -37,7 +37,7 @@ local function loadFileByLanguage(name, language)
     if not buf then
         return {}
     end
-    local suc, tbl = xpcall(lni.classics, log.error, buf, path:string())
+    local suc, tbl = xpcall(lni, log.error, buf, path:string())
     if not suc then
         return {}
     end

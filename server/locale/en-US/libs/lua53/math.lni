@@ -82,11 +82,11 @@ description = 'If the value `x` is convertible to an integer, returns that integ
 name = 'type'
 enum = 'integer'
 description = '`x` is an integer.'
-[[.enums]]
+``````````
 name = 'type'
 enum = 'float'
 description = '`x` is a float.'
-[[.enums]]
+``````````
 name = 'type'
 code = 'nil'
 description = '`x` is not a number.'

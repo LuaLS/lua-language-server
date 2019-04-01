@@ -43,7 +43,7 @@ local Template = {
         ignoreDir       = {{},   Str2Hash ';'},
         ignoreSubmodules= {true, Boolean},
         useGitIgnore    = {true, Boolean},
-        maxPreload      = {500, Integer},
+        maxPreload      = {300, Integer},
     }
 }
 

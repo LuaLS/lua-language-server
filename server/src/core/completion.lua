@@ -345,7 +345,7 @@ local function searchInRequire(vm, select, source, callback)
         return
     end
     for _, str in ipairs(list) do
-        callback(str, nil, CompletionItemKind.File, {
+        callback(str, nil, CompletionItemKind.Reference, {
             documentation = map[str],
             textEdit = {
                 -- TODO 坑爹自动完成的字符串里面不能包含符号

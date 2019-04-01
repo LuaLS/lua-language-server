@@ -16,7 +16,7 @@ local function findReferences(lsp, uri, position, declarat)
         if valueLines then
             local start_row,  start_col  = valueLines:rowcol(start)
             local finish_row, finish_col = valueLines:rowcol(finish)
-            locations[i] = {
+            locations[#locations] = {
                 uri =  valueUri,
                 range = {
                     start = {
@@ -27,6 +27,20 @@ local function findReferences(lsp, uri, position, declarat)
                         line = finish_row - 1,
                         -- 这里不用-1，因为前端期待的是匹配完成后的位置
                         character = finish_col,
+                    },
+                }
+            }
+        else
+            locations[#locations] = {
+                uri =  valueUri,
+                range = {
+                    start = {
+                        line = 0,
+                        character = 0,
+                    },
+                    ['end'] = {
+                        line = 0,
+                        character = 0,
                     },
                 }
             }

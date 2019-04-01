@@ -226,7 +226,7 @@ function mt:readText(uri, path, buf, compiled)
             self._hasShowHitMaxPreload = true
             rpc:notify('window/showMessage', {
                 type = 3,
-                message = ('预加载文件数已达上限（%d），你需要手动打开需要加载的文件。'):format(config.config.workspace.maxPreload),
+                message = lang.script('MWS_MAX_PRELOAD', config.config.workspace.maxPreload),
             })
         end
         return

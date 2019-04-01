@@ -218,6 +218,9 @@ function mt:readText(uri, path, buf, compiled)
         log.debug('No file: ', path)
         return
     end
+    if #text > 100000 then
+        return
+    end
     if self:getCachedFileCount() >= config.config.workspace.maxPreload then
         if not self._hasShowHitMaxPreload then
             self._hasShowHitMaxPreload = true

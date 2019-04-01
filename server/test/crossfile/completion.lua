@@ -147,19 +147,19 @@ TEST {
     completion = {
         {
             label = 'abc',
-            kind = CompletionItemKind.File,
+            kind = CompletionItemKind.Reference,
             documentation = 'abc.lua',
             textEdit = EXISTS,
         },
         {
             label = 'abc.aaa',
-            kind = CompletionItemKind.File,
+            kind = CompletionItemKind.Reference,
             documentation = 'abc/aaa.lua',
             textEdit = EXISTS,
         },
         {
             label = 'abcde',
-            kind = CompletionItemKind.File,
+            kind = CompletionItemKind.Reference,
             documentation = 'xxx/abcde.lua',
             textEdit = EXISTS,
         },
@@ -179,7 +179,7 @@ TEST {
     completion = {
         {
             label = 'abc',
-            kind = CompletionItemKind.File,
+            kind = CompletionItemKind.Reference,
             documentation = 'abc.lua',
             textEdit = EXISTS,
         },
@@ -203,7 +203,7 @@ TEST {
     completion = {
         {
             label = 'abc.init',
-            kind = CompletionItemKind.File,
+            kind = CompletionItemKind.Reference,
             documentation = 'abc/init.lua',
             textEdit = EXISTS,
         },
@@ -227,7 +227,7 @@ TEST {
     completion = {
         {
             label = 'abc.init',
-            kind = CompletionItemKind.File,
+            kind = CompletionItemKind.Reference,
             documentation = 'abc/init.lua',
             textEdit = EXISTS,
         },
@@ -251,7 +251,7 @@ TEST {
     completion = {
         {
             label = 'abc.init',
-            kind = CompletionItemKind.File,
+            kind = CompletionItemKind.Reference,
             documentation = 'abc/init.lua',
             textEdit = EXISTS,
         },
@@ -275,7 +275,7 @@ TEST {
     completion = {
         {
             label = 'core.core',
-            kind = CompletionItemKind.File,
+            kind = CompletionItemKind.Reference,
             documentation = 'core/core.lua',
             textEdit = EXISTS,
         },
@@ -299,13 +299,13 @@ TEST {
     completion = {
         {
             label = 'x000',
-            kind = CompletionItemKind.File,
+            kind = CompletionItemKind.Reference,
             documentation = 'x000.lua',
             textEdit = EXISTS,
         },
         {
             label = 'x111',
-            kind = CompletionItemKind.File,
+            kind = CompletionItemKind.Reference,
             documentation = 'abc/x111.lua',
             textEdit = EXISTS,
         },

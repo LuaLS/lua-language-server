@@ -67,6 +67,9 @@ return function (lsp, params)
             end
             t:remove()
             LastTask = nil
+            if not positions then
+                response(nil)
+            end
         end)
     end
 end

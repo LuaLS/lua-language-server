@@ -84,6 +84,9 @@ return function (lsp, params)
             end
             LastTask:remove()
             LastTask = nil
+            if not result then
+                response(nil)
+            end
         end)
     end
 end

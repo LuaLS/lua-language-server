@@ -14,6 +14,7 @@ local valueMgr   = require 'vm.value'
 local chainMgr   = require 'vm.chain'
 local functionMgr= require 'vm.function'
 local listMgr    = require 'vm.list'
+local config     = require 'config'
 
 local ErrorCodes = {
     -- Defined by JSON RPC
@@ -162,6 +163,7 @@ function mt:saveText(uri, version, text)
         obj.text = text
         self:needCompile(uri)
     else
+        self._fileCount = self._fileCount + 1
         self._file[uri] = {
             version = version,
             text = text,
@@ -216,6 +218,17 @@ function mt:readText(uri, path, buf, compiled)
         log.debug('No file: ', path)
         return
     end
+    if self:getCachedFileCount() >= config.config.workspace.maxPreload then
+        if not self._hasShowHitMaxPreload then
+            self._hasShowHitMaxPreload = true
+            rpc:notify('window/showMessage', {
+                type = 3,
+                message = ('预加载文件数已达上限（%d），你需要手动打开需要加载的文件。'):format(config.config.workspace.maxPreload),
+            })
+        end
+        return
+    end
+    self._fileCount = self._fileCount + 1
     self._file[uri] = {
         version = 0,
         text = text,
@@ -228,9 +241,14 @@ function mt:removeText(uri)
     if not self._file[uri] then
         return
     end
+    self._fileCount = self._fileCount - 1
     self:saveText(uri, -1, '')
     self:compileVM(uri)
     self._file[uri] = nil
+end
+
+function mt:getCachedFileCount()
+    return self._fileCount
 end
 
 function mt:reCompile()
@@ -307,6 +325,9 @@ function mt:compileAst(obj)
                 type = 3,
                 message = lang.script('PARSER_CRASH', err:match 'grammar%.lua%:%d+%:(.+)' or err),
             })
+            if message:find 'not enough memory' then
+                self:restartDueToMemoryLeak()
+            end
         end
     end
     return ast
@@ -749,6 +770,7 @@ end
 return function ()
     local session = setmetatable({
         _file = {},
+        _fileCount = 0,
         _needCompile = {},
         _needDiagnostics = {},
         _clock = -100,

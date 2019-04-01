@@ -5,6 +5,13 @@ local function Boolean(v)
     return false
 end
 
+local function Integer(v)
+    if type(v) == 'number' then
+        return true, math.floor(v)
+    end
+    return false
+end
+
 local function Str2Hash(sep)
     return function (v)
         if type(v) == 'string' then
@@ -36,6 +43,7 @@ local Template = {
         ignoreDir       = {{},   Str2Hash ';'},
         ignoreSubmodules= {true, Boolean},
         useGitIgnore    = {true, Boolean},
+        maxPreload      = {500, Integer},
     }
 }
 

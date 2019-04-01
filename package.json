@@ -61,7 +61,13 @@
 					"scope": "resource",
 					"type": "boolean",
 					"default": true,
-					"description": "Ignore files list in .gitignore.\n忽略.gitignore中列举的文件。"
+					"description": "Ignore files list in \".gitignore\" .\n忽略 \".gitignore\" 中列举的文件。"
+				},
+				"Lua.workspace.maxPreload": {
+					"scope": "resource",
+					"type": "integer",
+					"default": 500,
+					"description": "Max preloaded files.\n最大预加载文件数。"
 				}
 			}
 		}

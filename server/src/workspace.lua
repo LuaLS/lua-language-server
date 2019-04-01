@@ -1,6 +1,8 @@
 local fs = require 'bee.filesystem'
 local async = require 'async'
 local config = require 'config'
+local rpc = require 'rpc'
+local lang = require 'language'
 
 local function split(str, sep)
     local t = {}
@@ -185,7 +187,6 @@ function mt:findPath(baseUri, searchers)
         end)
         uri = results[1]
     end
-    self.lsp:readText(uri, self:uriDecode(uri))
     return uri
 end
 

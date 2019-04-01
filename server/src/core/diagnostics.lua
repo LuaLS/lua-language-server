@@ -255,6 +255,9 @@ function mt:searchLowercaseGlobal(callback)
             if definedGlobal[name] then
                 return
             end
+            if type(name) ~= 'string' then
+                return
+            end
             local first = name:match '%w'
             if not first then
                 return

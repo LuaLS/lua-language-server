@@ -92,15 +92,16 @@ return function (lsp, params)
             local result = findResult(lsp, params)
             if result then
                 response(result)
+                LastTask:remove()
+                LastTask = nil
+                return
             end
             if lsp:isWaitingCompile() then
                 return
             end
+            response(nil)
             LastTask:remove()
             LastTask = nil
-            if not result then
-                response(nil)
-            end
         end)
     end
 end

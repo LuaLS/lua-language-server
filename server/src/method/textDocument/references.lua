@@ -16,7 +16,7 @@ local function findReferences(lsp, uri, position, declarat)
         if valueLines then
             local start_row,  start_col  = valueLines:rowcol(start)
             local finish_row, finish_col = valueLines:rowcol(finish)
-            locations[#locations] = {
+            locations[#locations+1] = {
                 uri =  valueUri,
                 range = {
                     start = {
@@ -31,7 +31,7 @@ local function findReferences(lsp, uri, position, declarat)
                 }
             }
         else
-            locations[#locations] = {
+            locations[#locations+1] = {
                 uri =  valueUri,
                 range = {
                     start = {
@@ -75,15 +75,16 @@ return function (lsp, params)
             local positions = findReferences(lsp, uri, position, declarat)
             if positions then
                 response(positions)
+                t:remove()
+                LastTask = nil
+                return
             end
             if lsp:isWaitingCompile() then
                 return
             end
+            response(nil)
             t:remove()
             LastTask = nil
-            if not positions then
-                response(nil)
-            end
         end)
     end
 end

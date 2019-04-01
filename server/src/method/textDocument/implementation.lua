@@ -37,7 +37,7 @@ local function findResult(lsp, params)
         if valueLines then
             local start_row,  start_col  = valueLines:rowcol(start)
             local finish_row, finish_col = valueLines:rowcol(finish)
-            locations[#locations] = {
+            locations[#locations+1] = {
                 uri =  valueUri,
                 range = {
                     start = {
@@ -52,7 +52,7 @@ local function findResult(lsp, params)
                 }
             }
         else
-            locations[#locations] = {
+            locations[#locations+1] = {
                 uri =  valueUri,
                 range = {
                     start = {
@@ -90,16 +90,17 @@ return function (lsp, params)
         LastTask = ac.loop(0.1, function ()
             local result = findResult(lsp, params)
             if result then
+                LastTask:remove()
+                LastTask = nil
                 response(result)
+                return
             end
             if lsp:isWaitingCompile() then
                 return
             end
             LastTask:remove()
             LastTask = nil
-            if not result then
-                response(nil)
-            end
+            response(nil)
         end)
     end
 end

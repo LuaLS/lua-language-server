@@ -75,13 +75,15 @@ return function (lsp, params)
     end
     return function (response)
         LastTask = ac.loop(0.1, function ()
+            local result = findResult(lsp, params)
+            if result then
+                response(result)
+            end
             if lsp:isWaitingCompile() then
                 return
             end
             LastTask:remove()
             LastTask = nil
-            local result = findResult(lsp, params)
-            response(result)
         end)
     end
 end

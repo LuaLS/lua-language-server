@@ -104,12 +104,13 @@ function mt:scanFiles()
     log.info('忽略文件：\r\n' .. table.concat(ignored, '\r\n'))
     log.info('开始扫描文件任务')
     local compiled = {}
+    local count = 0
     self._scanRequest = async.run('scanfiles', {
         root = self.root:string(),
         ignored = ignored,
     }, function (mode, ...)
         if mode == 'ok' then
-            log.info('扫描文件任务完成')
+            log.info('扫描文件任务完成，共', count, '个文件。')
             self._complete = true
             self._scanRequest = nil
             self:reset()
@@ -123,6 +124,7 @@ function mt:scanFiles()
             local uri = self:uriEncode(path)
             self.files[name] = uri
             self.lsp:readText(uri, path, file.buf, compiled)
+            count = count + 1
         elseif mode == 'stop' then
             log.info('扫描文件任务中断')
             return false

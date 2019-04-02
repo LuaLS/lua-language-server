@@ -191,40 +191,50 @@ function mt:getMetaMethod(name)
     return meta:rawGet(name)
 end
 
+function mt:flushChild(child)
+    if not self._child then
+        return nil
+    end
+    -- 非全局值不会出现dead child
+    if not self._global then
+        return
+    end
+    local alived = {}
+    local infos = self._info
+    local count = 0
+    for srcId, info in pairs(infos) do
+        local src = listMgr.get(srcId)
+        if  src
+            and (info.type == 'set child' or info.type == 'get child')
+        then
+            alived[info[1]] = true
+            count = count + 1
+        else
+            infos[srcId] = nil
+        end
+    end
+    infos._count = count
+    infos._limit = count + 10
+    for index in pairs(self._child) do
+        if not alived[index] then
+            self._child[index] = nil
+            goto CONTINUE
+        end
+        ::CONTINUE::
+    end
+end
+
 function mt:rawEach(callback, mark)
     if not self._child then
         return nil
     end
-    local alived
-    -- 非全局值不会出现dead child
-    if self._global then
-        alived = {}
-        local infos = self._info
-        local count = 0
-        for srcId, info in pairs(infos) do
-            local src = listMgr.get(srcId)
-            if  src
-                and (info.type == 'set child' or info.type == 'get child')
-            then
-                alived[info[1]] = true
-                count = count + 1
-            else
-                infos[srcId] = nil
-            end
-        end
-        infos._count = count
-        infos._limit = count + 10
-    end
+    self:flushChild()
     for index, value in pairs(self._child) do
         if mark then
             if mark[index] then
                 goto CONTINUE
             end
             mark[index] = true
-        end
-        if alived and not alived[index] then
-            self._child[index] = nil
-            goto CONTINUE
         end
         local res = callback(index, value)
         if res ~= nil then
@@ -281,9 +291,6 @@ function mt:mergeValue(value)
     end
     value._type = self._type
 
-    -- TODO: 这里有一处泄漏：value 的 child 只在 eachChild 与 rawEach 时清理
-    -- 而 child 的 key 有可能是对象，反复合并会导致 child 越来越大
-    -- 目前只有 function:mergeReturn 会调用 mergeValue ，因此表现不明显
     if value._child then
         if not self._child then
             self._child = {}
@@ -293,6 +300,7 @@ function mt:mergeValue(value)
         end
     end
     value._child = self._child
+    self:flushChild()
 
     local infos = self._info
     for srcId, info in pairs(value._info) do

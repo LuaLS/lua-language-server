@@ -33,6 +33,7 @@ lm:executable 'rcedit' {
 lm:build 'install' {
     '$luamake', 'lua', 'make/install.lua',
     deps = {
+        'lua',
         'lni',
         'lpeglabel',
         'bee',

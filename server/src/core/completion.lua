@@ -237,8 +237,11 @@ local function searchFields(vm, source, word, callback)
             map[k] = v
         end
     end)
-    parent:eachLibChild(function (k, v)
+    parent:eachChild(function (k, v)
         if map[k] then
+            return
+        end
+        if not v:getLib() then
             return
         end
         if type(k) ~= 'string' then
@@ -457,7 +460,7 @@ local function searchCallArg(vm, source, word, callback, pos)
     end
 end
 
-local function searchAllWords(vm, source, word, callback)
+local function searchAllWords(vm, source, word, callback, pos)
     if word == '' then
         return
     end
@@ -466,6 +469,7 @@ local function searchAllWords(vm, source, word, callback)
     end
     vm:eachSource(function (src)
         if      src.type == 'name'
+            and not (src.start <= pos and src.finish >= pos)
             and matchKey(word, src[1])
         then
             callback(src[1], src, CompletionItemKind.Text)
@@ -582,7 +586,7 @@ return function (vm, pos, word, oldText)
     searchSpecial(vm, source, word, callback, pos)
     searchCallArg(vm, source, word, callback, pos)
     searchSource(vm, source, word, callback)
-    searchAllWords(vm, source, word, callback)
+    searchAllWords(vm, source, word, callback, pos)
 
     if #list == 0 then
         return nil

@@ -96,6 +96,13 @@ return function (lsp, params)
             item.textEdit.start = nil
             item.textEdit.finish = nil
         end
+        if item.additionalTextEdits then
+            for _, textEdit in ipairs(item.additionalTextEdits) do
+                textEdit.range = posToRange(lines, textEdit.start, textEdit.finish)
+                textEdit.start = nil
+                textEdit.finish = nil
+            end
+        end
     end
 
     local response = {

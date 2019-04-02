@@ -1,15 +1,25 @@
 local lm = require 'luamake'
 
-lm:lua_library 'lni' {
-    sources = '3rd/lni/src/*.cpp'
+lm:import '3rd/bee.lua/make.lua'
+
+lm.arch = 'x64'
+lm.rootdir = '3rd/'
+
+lm:shared_library 'lni' {
+    deps = 'lua54',
+    sources = {
+        'lni/src/main.cpp',
+    }
 }
 
-lm:lua_library 'lpeglabel' {
-    sources = '3rd/lpeglabel/*.c'
+lm:shared_library 'lpeglabel' {
+    deps = 'lua54',
+    sources = 'lpeglabel/*.c',
+    ldflags = '/EXPORT:luaopen_lpeglabel'
 }
 
 lm:executable 'rcedit' {
-    sources = '3rd/rcedit/src/*.cc',
+    sources = 'rcedit/src/*.cc',
     defines = {
         '_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING'
     },
@@ -20,11 +30,6 @@ lm:executable 'rcedit' {
     }
 }
 
-lm:build 'bee' {
-    '$luamake', '-C', '3rd/bee.lua',
-    pool = 'console'
-}
-
 lm:build 'install' {
     '$luamake', 'lua', 'make/install.lua',
     deps = {
@@ -33,4 +38,8 @@ lm:build 'install' {
         'bee',
         'rcedit'
     }
+}
+
+lm:default {
+    'install'
 }

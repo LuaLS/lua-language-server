@@ -217,7 +217,6 @@ local function searchFields(vm, source, word, callback)
     local map = {}
     parent:eachInfo(function (info, src)
         local k = info[1]
-        local v = info[2]
         if src == source then
             return
         end
@@ -230,11 +229,12 @@ local function searchFields(vm, source, word, callback)
         if type(k) ~= 'string' then
             return
         end
+        local v = parent:getChild(k)
         if source:get 'object' and v:getType() ~= 'function' then
             return
         end
         if matchKey(word, k) then
-            map[k] = parent:getChild(k)
+            map[k] = v
         end
     end)
     parent:eachLibChild(function (k, v)

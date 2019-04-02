@@ -230,6 +230,9 @@ local function searchFields(vm, source, word, callback)
             return
         end
         local v = parent:getChild(k)
+        if not v then
+            return
+        end
         if source:get 'object' and v:getType() ~= 'function' then
             return
         end

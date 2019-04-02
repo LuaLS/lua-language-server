@@ -167,7 +167,7 @@ function mt:getChild(index, source)
         end
         parent = method
     end
-    if not value then
+    if not value and source then
         value = create('any', source)
         self:setChild(index, value)
         value.uri = self.uri

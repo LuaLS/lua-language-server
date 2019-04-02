@@ -1,6 +1,11 @@
 local lpeg = require 'lpeglabel'
 local save_sort
 local table_pack = table.pack
+local rawset = rawset
+local tointeger = math.tointeger
+local tonumber = tonumber
+local setmetatable = setmetatable
+local string_char = string.char
 
 local P = lpeg.P
 local S = lpeg.S
@@ -61,10 +66,34 @@ local hashmt = {
     end,
 }
 
-local tointeger = math.tointeger
-local tonumber = tonumber
-local setmetatable = setmetatable
-local rawset = rawset
+-----------------------------------------------------------------------------
+-- JSON4Lua: JSON encoding / decoding support for the Lua language.
+-- json Module.
+-- Author: Craig Mason-Jones
+-- Homepage: http://github.com/craigmj/json4lua/
+-- Version: 1.0.0
+-- This module is released under the MIT License (MIT).
+-- Please see LICENCE.txt for details.
+--
+local function Utf8(str)
+    local n = tonumber(str, 16)
+    -- math.floor(x/2^y) == lazy right shift
+    -- a % 2^b == bitwise_and(a, (2^b)-1)
+    -- 64 = 2^6
+    -- 4096 = 2^12 (or 2^6 * 2^6)
+    local x
+    if n < 0x80 then
+        x = string_char(n % 0x80)
+    elseif n < 0x800 then
+        -- [110x xxxx] [10xx xxxx]
+        x = string_char(0xC0 + ((n // 64) % 0x20), 0x80 + (n % 0x40))
+    else
+        -- [1110 xxxx] [10xx xxxx] [10xx xxxx]
+        x = string_char(0xE0 + ((n // 4096) % 0x10), 0x80 + ((n // 64) % 0x40), 0x80 + (n % 0x40))
+    end
+    return x
+end
+
 local function HashTable(patt)
     return C(patt) / function (_, ...)
         local hash = table_pack(...)
@@ -108,8 +137,9 @@ local Token = P
     Float  = C(P'-'^-1 * ('0' + R'19' * R'09'^0) * '.' * R'09'^0) / tonumber,
     Null   = P'null' * Cc(nil),
     String = '"' * Cs(V'Char'^0) * '"',
-    Char   = V'Esc' + (1 - P'"' - P'\t' - V'Nl'),
+    Char   = V'Esc' + V'Utf8' + (1 - P'"' - P'\t' - V'Nl'),
     Esc    = P'\\' * C(S'tnr"\\') / EscMap,
+    Utf8   = P'\\u' * C(P(4)) / Utf8,
     Hash   = V'Spnl' * '{' * V'Spnl' * HashTable((V'Object' + P',' * V'Spnl')^0) * V'Spnl' * P'}' * V'Spnl',
     Array  = V'Spnl' * '[' * V'Spnl' * Ct((V'Value' * V'Spnl' + P',' * V'Spnl')^0) * V'Spnl' * P']' * V'Spnl',
     Object = V'Spnl' * V'Key' * V'Spnl' * V'Value' * V'Spnl',

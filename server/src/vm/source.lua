@@ -48,12 +48,11 @@ function mt:bindValue(value, action)
     end
 end
 
-function mt:bindCall(func, args)
-    if func then
-        self._bindCall = func
+function mt:bindCall(args)
+    if args then
         self._bindCallArgs = args
     else
-        return self._bindCall, self._bindCallArgs
+        return self._bindCallArgs
     end
 end
 
@@ -94,6 +93,53 @@ end
 
 function mt:isDead()
     return self._dead
+end
+
+function mt:findValue()
+    local value = self:bindValue()
+    if not value then
+        return nil
+    end
+    if not value:isGlobal() then
+        return value
+    end
+    if self.type ~= 'name' then
+        return value
+    end
+    local parent = self:get 'parent'
+    if not parent then
+        return value
+    end
+    local name = self[1]
+    if type(name) ~= 'string' then
+        return value
+    end
+    return parent:getChild(name) or value
+end
+
+function mt:findCallFunction()
+    local simple = self:get 'simple'
+    if not simple then
+        return nil
+    end
+    local source
+    for i = 1, #simple do
+        if simple[i] == self then
+            source = simple[i-1]
+        end
+    end
+    if not source then
+        return nil
+    end
+    local value = source:bindValue()
+    if value and value:getFunction() then
+        return value
+    end
+    value = source:findValue()
+    if value and value:getFunction() then
+        return value
+    end
+    return nil
 end
 
 local function instant(source)

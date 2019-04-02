@@ -462,7 +462,7 @@ function mt:getSimple(simple, max)
                 table.insert(args, 1, simple[i-3])
             end
             object = nil
-            source:bindCall(func, args)
+            source:bindCall(args)
             value = self:call(func, values, source) or valueMgr.create('any', self:getDefaultSource())
         elseif source.type == 'index' then
             local child = source[1]

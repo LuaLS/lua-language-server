@@ -47,10 +47,16 @@ local function getFunctionSource(call)
 end
 
 local function getHover(call, pos)
-    local func, args = call:bindCall()
-    if not func then
+    local args = call:bindCall()
+    if not args then
         return
     end
+
+    local value = call:findCallFunction()
+    if not value then
+        return
+    end
+
     local select = getSelect(args, pos)
     local source = getFunctionSource(call)
     local object = source:get 'object'
@@ -60,7 +66,7 @@ local function getHover(call, pos)
     if lib then
         hover = getFunctionHoverAsLib(name, lib, object, select)
     else
-        hover = getFunctionHover(name, func:getFunction(), object, select)
+        hover = getFunctionHover(name, value:getFunction(), object, select)
     end
     if hover and hover.argLabel then
         return hover
@@ -68,8 +74,8 @@ local function getHover(call, pos)
 end
 
 local function isInFunctionOrTable(call, pos)
-    local func, args = call:bindCall()
-    if not func then
+    local args = call:bindCall()
+    if not args then
         return false
     end
     local select = getSelect(args, pos)

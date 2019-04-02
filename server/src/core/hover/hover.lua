@@ -177,7 +177,7 @@ end
 
 local function hoverAsValue(source, lsp, select)
     local lib, fullkey = findLib(source)
-    local value = source:bindValue()
+    local value = source:findValue()
     local name = fullkey or buildValueName(source)
 
     local hover
@@ -186,7 +186,8 @@ local function hoverAsValue(source, lsp, select)
         if lib then
             hover = getFunctionHoverAsLib(name, lib, object, select)
         else
-            hover = getFunctionHover(name, value:getFunction(), object, select)
+            local func = value:getFunction()
+            hover = getFunctionHover(name, func, object, select)
         end
     else
         hover = getValueHover(source, name, value, lib)

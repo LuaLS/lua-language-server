@@ -400,12 +400,17 @@ local function searchCallArg(vm, source, word, callback, pos)
         return a.start > b.start
     end)
     local call = results[1]
-    local func, args = call:bindCall()
-    if not func then
+    local args = call:bindCall()
+    if not args then
         return
     end
 
-    local lib = func:getLib()
+    local value = call:findCallFunction()
+    if not value then
+        return
+    end
+
+    local lib = value:getLib()
     if not lib then
         return
     end

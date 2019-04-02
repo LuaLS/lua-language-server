@@ -203,14 +203,17 @@ end
 
 function mt:searchRedundantParameters(callback)
     self.vm:eachSource(function (source)
-        local call, args = source:bindCall()
-        if not call then
+        local args = source:bindCall()
+        if not args then
             return
         end
-        local func = call:getFunction()
-        if not func then
+
+        local value = source:findCallFunction()
+        if not value then
             return
         end
+
+        local func = value:getFunction()
         -- 参数中有 ... ，不用再检查了
         if func:hasDots() then
             return

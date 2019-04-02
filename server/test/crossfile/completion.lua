@@ -202,6 +202,12 @@ TEST {
     },
     completion = {
         {
+            label = 'abc',
+            kind = CompletionItemKind.Reference,
+            documentation = 'abc.lua',
+            textEdit = EXISTS,
+        },
+        {
             label = 'abc.init',
             kind = CompletionItemKind.Reference,
             documentation = 'abc/init.lua',
@@ -234,7 +240,7 @@ TEST {
     }
 }
 
-TEST { 
+TEST {
     {
         path = 'abc.lua',
         content = '',

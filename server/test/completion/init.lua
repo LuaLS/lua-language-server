@@ -138,7 +138,11 @@ zabcde@
     {
         label = 'zabcdefg',
         kind = CompletionItemKind.Variable,
-    }
+    },
+    {
+        label = 'zabcde',
+        kind = CompletionItemKind.Variable,
+    },
 }
 
 TEST [[
@@ -389,7 +393,7 @@ print(fff)
 }
 
 TEST [[
-local function f(f@)
+local function f(ff@)
     print(fff)
 end
 ]]
@@ -631,7 +635,12 @@ TEST [[
 local xxxx
 xxxx@
 ]]
-(nil)
+{
+    {
+        label = 'xxxx',
+        kind = CompletionItemKind.Variable,
+    },
+}
 
 TEST [[
 local xxxx
@@ -640,9 +649,13 @@ xxxx@
 ]]
 {
     {
+        label = 'xxxx',
+        kind = CompletionItemKind.Variable,
+    },
+    {
         label = 'XXXX',
         kind = CompletionItemKind.Variable,
-    }
+    },
 }
 
 TEST [[

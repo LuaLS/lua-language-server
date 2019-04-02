@@ -222,6 +222,16 @@ local function searchFields(vm, source, word, callback)
         if source:get 'object' and v:getType() ~= 'function' then
             goto CONTINUE
         end
+        if k == word then
+            local ok = v:eachInfo(function (_, src)
+                if src ~= source then
+                    return true
+                end
+            end)
+            if not ok then
+                goto CONTINUE
+            end
+        end
         if matchKey(word, k) then
             map[k] = v
         end
@@ -509,7 +519,7 @@ local function searchSpecial(vm, source, word, callback, pos)
     end
 end
 
-local function makeList(source, word)
+local function makeList(source, pos, word)
     local list = {}
     local mark = {}
     return function (name, src, kind, data)
@@ -517,7 +527,9 @@ local function makeList(source, word)
             return
         end
         if word == name then
-            return
+            if src and src.start <= pos and src.finish >= pos then
+                return
+            end
         end
         if mark[name] then
             return
@@ -547,7 +559,7 @@ return function (vm, pos, word, oldText)
             return nil
         end
     end
-    local callback, list = makeList(source, word)
+    local callback, list = makeList(source, pos, word)
     searchSpecial(vm, source, word, callback, pos)
     searchCallArg(vm, source, word, callback, pos)
     searchSource(vm, source, word, callback)

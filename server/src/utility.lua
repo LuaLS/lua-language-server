@@ -10,6 +10,8 @@ local next = next
 local rawset = rawset
 local move = table.move
 local setmetatable = setmetatable
+local tableSort = table.sort
+local mathType = math.type
 
 local TAB = setmetatable({}, { __index = function (self, n)
     self[n] = string_rep('\t', n)
@@ -41,16 +43,19 @@ function table.dump(tbl)
                 else
                     KEY[key] = key
                 end
-            elseif math_type(key) == 'integer' then
-                KEY[key] = ('[%d]'):format(key)
+            elseif mathType(key) == 'integer' then
+                KEY[key] = ('[%03d]'):format(key)
             else
                 KEY[key] = ('<%s>'):format(key)
             end
             keys[#keys+1] = key
         end
-        table_sort(keys, function (a, b)
-            return KEY[a] < KEY[b]
-        end)
+        local mt = getmetatable(tbl)
+        if not mt or not mt.__pairs then
+            tableSort(keys, function (a, b)
+                return KEY[a] < KEY[b]
+            end)
+        end
         for _, key in ipairs(keys) do
             local value = tbl[key]
             local tp = type(value)

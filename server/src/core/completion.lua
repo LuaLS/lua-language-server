@@ -215,27 +215,41 @@ local function searchFields(vm, source, word, callback)
         return
     end
     local map = {}
-    parent:eachChild(function (k, v)
+    parent:eachInfo(function (info, src)
+        local k = info[1]
+        local v = info[2]
+        if src == source then
+            return
+        end
+        if map[k] then
+            return
+        end
+        if info.type ~= 'set child' and info.type ~= 'get child' then
+            return
+        end
         if type(k) ~= 'string' then
-            goto CONTINUE
+            return
         end
         if source:get 'object' and v:getType() ~= 'function' then
-            goto CONTINUE
+            return
         end
-        if k == word then
-            local ok = v:eachInfo(function (_, src)
-                if src ~= source then
-                    return true
-                end
-            end)
-            if not ok then
-                goto CONTINUE
-            end
+        if matchKey(word, k) then
+            map[k] = parent:getChild(k)
+        end
+    end)
+    parent:eachLibChild(function (k, v)
+        if map[k] then
+            return
+        end
+        if type(k) ~= 'string' then
+            return
+        end
+        if source:get 'object' and v:getType() ~= 'function' then
+            return
         end
         if matchKey(word, k) then
             map[k] = v
         end
-        :: CONTINUE ::
     end)
     for k, v in sortPairs(map) do
         callback(k, nil, CompletionItemKind.Field, getValueData('field', k, v))

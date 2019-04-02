@@ -726,3 +726,8 @@ end
         kind = CompletionItemKind.Variable,
     },
 }
+
+TEST [[
+function table.i@
+]]
+(EXISTS)

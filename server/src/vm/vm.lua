@@ -879,6 +879,7 @@ function mt:doFunction(action)
                 local value = self:buildFunction(action)
                 local source = name[#name]
                 self:instantSource(source)
+                source:set('simple', name)
                 source:set('parent', parent)
                 source:set('object', parent)
                 if source.type == 'index' then
@@ -908,6 +909,7 @@ function mt:doFunction(action)
                 local value = self:buildFunction(action)
                 local source = name[#name]
                 self:instantSource(source)
+                source:set('simple', name)
                 source:set('parent', parent)
                 if source.type == 'index' then
                     local index = self:getIndex(source)

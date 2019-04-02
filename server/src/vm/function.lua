@@ -31,6 +31,9 @@ function mt:push(source)
 end
 
 function mt:pop()
+    if self._removed then
+        return
+    end
     local closed = self.finishs[self._top]
     local closedLocals = self.locals[self._top]
     self.locals[self._top] = nil

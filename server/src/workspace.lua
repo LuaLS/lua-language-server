@@ -268,8 +268,8 @@ function mt:matchPath(baseUri, input)
 end
 
 function mt:searchPath(baseUri, str)
-    if self.searched[str] then
-        return self.searched[str]
+    if self.searched[baseUri] and self.searched[baseUri][str] then
+        return self.searched[baseUri][str]
     end
     str = str:gsub('%.', '/')
     local searchers = {}
@@ -279,7 +279,10 @@ function mt:searchPath(baseUri, str)
 
     local uri = self:findPath(baseUri, searchers)
     if uri then
-        self.searched[str] = uri
+        if not self.searched[baseUri] then
+            self.searched[baseUri] = {}
+        end
+        self.searched[baseUri][str] = uri
     end
     return uri
 end

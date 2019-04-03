@@ -1214,6 +1214,9 @@ local Defs = {
             start = start,
             finish = start + #'*toclose' - 1,
             version = 'Lua 5.4',
+            info = {
+                version = State.Version,
+            }
         }
     end
 }

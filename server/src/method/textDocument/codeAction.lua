@@ -138,7 +138,7 @@ local function solveSyntax(lsp, uri, data, callback)
     end
     if err.version then
         callback {
-            title = lang.script.CHANGE_RUNTIME_VERSION,
+            title = lang.script('ACTION_RUNTIME_VERSION', err.version),
             kind = 'quickfix',
             command = {
                 title = lang.script.COMMAND_RUNTIME_VERSION,

@@ -11,6 +11,7 @@ DIAG_AMBIGUITY_1        = 'Compute `0 {op} {num}` first. You may need to add bra
 DIAG_LOWERCASE_GLOBAL   = 'Global variable in lowercase initial'
 DIAG_DIAGNOSTICS        = 'Diagnostics'
 DIAG_SYNTAX_CHECK       = 'Syntax Check'
+DIAG_NEED_VERSION       = 'Supported in {}'
 
 MWS_NOT_SUPPORT         = '{} dose not support multi workspace for now, I may need to restart to support the new workspace ...'
 MWS_RESTART             = 'Restart'
@@ -40,19 +41,22 @@ PARSER_MALFORMED_NUMBER = 'Malformed number.'
 PARSER_ACTION_AFTER_RETURN = '<eof> expected.'
 PARSER_NO_VISIBLE_LABEL = 'No visible label `{label}` .'
 PARSER_REDEFINE_LABEL   = 'Label `{label}` already defined.'
+PARSER_TOCLOSE          = '{version} does not support this grammar.'
 
 SYMBOL_ANONYMOUS        = '<Anonymous>'
 
-ACTION_DISABLE_DIAG     = 'Disable diagnostics ({})'
-ACTION_MARK_GLOBAL      = 'Mark `{}` as defined global'
-ACTION_REMOVE_SPACE     = 'Clear all postemptive spaces'
-ACTION_ADD_SEMICOLON    = 'Add `;`'
-ACTION_ADD_BRACKETS     = 'Add brackets'
+ACTION_DISABLE_DIAG     = 'Disable diagnostics ({}).'
+ACTION_MARK_GLOBAL      = 'Mark `{}` as defined global.'
+ACTION_REMOVE_SPACE     = 'Clear all postemptive spaces.'
+ACTION_ADD_SEMICOLON    = 'Add `;` .'
+ACTION_ADD_BRACKETS     = 'Add brackets.'
+ACTION_RUNTIME_VERSION  = 'Change runtime version to {} .'
 
 COMMAND_DISABLE_DIAG    = 'Disable diagnostics'
 COMMAND_MARK_GLOBAL     = 'Mark defined global'
 COMMAND_REMOVE_SPACE    = 'Clear all postemptive spaces'
 COMMAND_ADD_BRACKETS    = 'Add brackets'
+COMMAND_RUNTIME_VERSION = 'Change runtime version'
 
 DEBUG_MEMORY_LEAK       = "{} I'm sorry for the serious memory leak. The language service will be restarted soon."
 DEBUG_RESTART_NOW       = 'Restart now'

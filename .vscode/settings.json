@@ -8,6 +8,5 @@
         "_G"
     ],
     "Lua.diagnostics.disable": [
-        "undefined-env-child"
     ]
 }

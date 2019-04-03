@@ -64,7 +64,7 @@ function mt:searchUndefinedGlobal(callback)
         if not parent then
             return
         end
-        if not parent:get 'ENV' then
+        if not parent:get 'ENV' and not source:get 'in index' then
             return
         end
         if definedGlobal[name] then
@@ -299,6 +299,9 @@ function mt:searchUndefinedEnvChild(callback)
         end
         local name = source:getName()
         if name == '' then
+            return
+        end
+        if source:get 'in index' then
             return
         end
         local parent = source:get 'parent'

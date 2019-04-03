@@ -65,6 +65,20 @@ description = [[
 [randomseed]
 description = 'Sets `x` as the "seed" for the pseudo-random generator.'
 
+["randomseed Lua 5.4"]
+description = [[
+When called with at least one argument,
+the integer parameters `x` and `y` are
+concatenated into a 128-bit `seed` that
+is used to reinitialize the pseudo-random generator;
+equal seeds produce equal sequences of numbers.
+The default for `y` is zero.
+
+When called with no arguments,
+Lua generates a seed with
+a weak attempt for randomness.
+]]
+
 [sin]
 description = 'Returns the sine of `x` (assumed to be in radians).'
 

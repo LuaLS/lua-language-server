@@ -111,6 +111,30 @@ returns = {
     },
 }
 
+["gmatch Lua 5.4"]
+name = 'gmatch'
+version = 'Lua 5.4'
+[[.args]]
+type = 'string'
+``````````
+name = 'pattern'
+type = 'string'
+``````````
+name = 'init'
+type = 'integer'
+optional = 'after'
+default = 1
+[[.returns]]
+type = 'function'
+returns = {
+    1 = {
+        type = 'string'
+    },
+    2 = {
+        type = '...'
+    },
+}
+
 [gsub]
 [[.args]]
 type = 'string'

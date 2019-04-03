@@ -172,6 +172,19 @@ type = 'number'
 name = 'x'
 type = 'integer'
 
+["randomseed Lua 5.4"]
+name = 'randomseed'
+version = 'Lua 5.4'
+[[.args]]
+name = 'x'
+type = 'integer'
+optional = 'after'
+``````````
+name = 'y'
+type = 'integer'
+optional = 'after'
+default = 0
+
 [sin]
 [[.args]]
 name = 'x'

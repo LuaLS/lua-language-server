@@ -24,6 +24,17 @@ end
 ```
 ]]
 
+["gmatch Lua 5.4"]
+description = [[
+----------
+```lua
+s = "hello world from Lua"
+for w in string.gmatch(s, "%a+") do
+    print(w)
+end
+```
+]]
+
 [gsub]
 description = 'Returns a copy of s in which all (or the first `n`, if given) occurrences of the [`pattern`](https://www.lua.org/manual/5.3/manual.html#6.4.1) have been replaced by a replacement string specified by `repl`.'
 

@@ -122,9 +122,10 @@ end
 
 local function getValueHover(source, name, value, lib)
     local valueType = value:getType()
+    local class
 
     if not lib then
-        local class = findClass(value)
+        class = findClass(value)
         if class then
             valueType = class
         end
@@ -164,7 +165,11 @@ local function getValueHover(source, name, value, lib)
         text = ('%s %s: %s'):format(tp, name, unpackTable(value))
     else
         if literal == nil then
-            text = ('%s %s: %s'):format(tp, name, valueType)
+            if class then
+                text = ('%s %s: %s %s'):format(tp, name, valueType, unpackTable(value))
+            else
+                text = ('%s %s: %s'):format(tp, name, valueType)
+            end
         else
             text = ('%s %s: %s = %s'):format(tp, name, valueType, literal)
         end

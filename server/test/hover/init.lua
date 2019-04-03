@@ -117,7 +117,7 @@ mt.__name = 'class'
 
 local <?obj?> = setmetatable({}, mt)
 ]]
-"local obj: *class"
+"local obj: *class {}"
 
 TEST [[
 local mt = {}
@@ -126,7 +126,12 @@ mt.__index = mt
 
 local <?obj?> = setmetatable({}, mt)
 ]]
-"local obj: *class"
+[[
+local obj: *class {
+    __index: table,
+    name: string = "class",
+}
+]]
 
 TEST [[
 local mt = {}
@@ -135,7 +140,12 @@ mt.__index = mt
 
 local <?obj?> = setmetatable({}, mt)
 ]]
-"local obj: *class"
+[[
+local obj: *class {
+    TYPE: string = "class",
+    __index: table,
+}
+]]
 
 TEST [[
 local mt = {}
@@ -144,7 +154,12 @@ mt.__index = mt
 
 local <?obj?> = setmetatable({}, mt)
 ]]
-"local obj: *class"
+[[
+local obj: *class {
+    Class: string = "class",
+    __index: table,
+}
+]]
 
 TEST[[
 local fs = require 'bee.filesystem'
@@ -350,4 +365,25 @@ end
 ]]
 [[
 function mt:test(a: any, b: any)
+]]
+
+TEST[[
+local mt = {}
+mt.__index = mt
+mt.__name = 'obj'
+
+function mt:remove()
+end
+
+local <?self?> = setmetatable({
+    id = 1,
+}, mt)
+]]
+[[
+local self: *obj {
+    __index: table,
+    __name: string = "obj",
+    id: number = 1,
+    remove: function,
+}
 ]]

@@ -1,5 +1,6 @@
 local lni = require 'lni'
 local fs = require 'bee.filesystem'
+local config = require 'config'
 
 local function mergeEnum(lib, locale)
     if not lib or not locale then
@@ -89,6 +90,9 @@ end
 
 local function insert(tbl, name, key, value)
     if not name or not key then
+        return
+    end
+    if value.version and value.version == config.config.runtime.version then
         return
     end
     if not tbl[name] then

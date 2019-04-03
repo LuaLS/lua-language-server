@@ -35,6 +35,9 @@ local function Str2Hash(sep)
 end
 
 local Template = {
+    runtime = {
+        version = 'Lua 5.3',
+    },
     diagnostics = {
         globals         = {{},   Str2Hash ';'},
         disable         = {{},   Str2Hash ';'},

@@ -53,6 +53,9 @@ return function (lsp)
         local oldConfig = copyTable(config.config)
         config:setConfig(configs[1])
         local newConfig = config.config
+        if not eq(oldConfig.runtime, newConfig.runtime) then
+            lsp:reCompile()
+        end
         if not eq(oldConfig.diagnostics, newConfig.diagnostics) then
             log.debug('reDiagnostic')
             lsp:reDiagnostic()

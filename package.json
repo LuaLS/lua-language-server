@@ -33,6 +33,18 @@
 			"type": "object",
 			"title": "Lua",
 			"properties": {
+				"Lua.runtime.version": {
+					"scope": "resource",
+					"type": "string",
+					"default": "Lua 5.3",
+					"enum": [
+						"Lua 5.1",
+						"Lua 5.2",
+						"Lua 5.3",
+						"Lua 5.4"
+					],
+					"description": "Lua runtime version.\nLua运行版本。"
+				},
 				"Lua.diagnostics.disable": {
 					"scope": "resource",
 					"type": "array",

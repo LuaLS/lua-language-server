@@ -4,6 +4,13 @@ local listMgr = require 'vm.list'
 
 local Sort = 0
 local Watch = setmetatable({}, {__mode = 'kv'})
+local TypeLevel = {
+    ['table']    = 1.0,
+    ['function'] = 0.9,
+    ['string']   = 0.8,
+    ['integer']  = 0.7,
+    ['number']   = 0.6,
+}
 
 local mt = {}
 mt.__index = mt
@@ -86,6 +93,13 @@ function mt:getType()
         if rate > mRate then
             mRate = rate
             mType = tp
+        elseif rate == mRate then
+            local level1 = TypeLevel[rate] or 0.0
+            local level2 = TypeLevel[mRate] or 0.0
+            if level1 > level2 then
+                mRate = rate
+                mType = tp
+            end
         end
     end
     return mType or 'any'

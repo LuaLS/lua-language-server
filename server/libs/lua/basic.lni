@@ -47,6 +47,50 @@ enum = 'setstepmul'
 name = 'opt'
 enum = 'isrunning'
 
+["collectgarbage Lua 5.4"]
+name = 'collectgarbage'
+version = 'Lua 5.4'
+[[.args]]
+name = 'opt'
+type = 'string'
+optional = 'after'
+``````````
+name = 'arg'
+type = 'integer'
+optional = 'self'
+[[.returns]]
+[[.enums]]
+name = 'opt'
+enum = 'collect'
+default = true
+``````````
+name = 'opt'
+enum = 'stop'
+``````````
+name = 'opt'
+enum = 'restart'
+``````````
+name = 'opt'
+enum = 'count'
+``````````
+name = 'opt'
+enum = 'step'
+``````````
+name = 'opt'
+enum = 'setpause'
+``````````
+name = 'opt'
+enum = 'setstepmul'
+``````````
+name = 'opt'
+enum = 'incremental'
+``````````
+name = 'opt'
+enum = 'generational'
+``````````
+name = 'opt'
+enum = 'isrunning'
+
 [dofile]
 special = 'dofile'
 [[.args]]

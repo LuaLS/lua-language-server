@@ -38,6 +38,48 @@ name = 'opt'
 enum = 'isrunning'
 description = 'Returns whether the collector is running.'
 
+["collectgarbage Lua 5.4"]
+[[.enums]]
+name = 'opt'
+enum = 'collect'
+description = 'Performs a full garbage-collection cycle.'
+``````````
+name = 'opt'
+enum = 'stop'
+description = 'Stops automatic execution.'
+``````````
+name = 'opt'
+enum = 'restart'
+description = 'Restarts automatic execution.'
+``````````
+name = 'opt'
+enum = 'count'
+description = 'Returns the total memory in Kbytes.'
+``````````
+name = 'opt'
+enum = 'step'
+description = 'Performs a garbage-collection step.'
+``````````
+name = 'opt'
+enum = 'setpause'
+description = 'Set pause.'
+``````````
+name = 'opt'
+enum = 'setstepmul'
+description = 'Set step multiplier.'
+``````````
+name = 'opt'
+enum = 'incremental'
+description = 'Change the collector mode to incremental.'
+``````````
+name = 'opt'
+enum = 'generational'
+description = 'Change the collector mode to generational.'
+``````````
+name = 'opt'
+enum = 'isrunning'
+description = 'Returns whether the collector is running.'
+
 [dofile]
 description = 'Opens the named file and executes its contents as a Lua chunk.'
 

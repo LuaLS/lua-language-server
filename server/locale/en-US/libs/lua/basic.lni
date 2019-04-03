@@ -143,8 +143,25 @@ description = 'Receives a value of any type and converts it to a string in a hum
 [type]
 description = 'Returns the type of its only argument, coded as a string.'
 
-[_VERSION]
+["_VERSION Lua 5.1"]
 description = 'Running Lua version.'
+
+["_VERSION Lua 5.2"]
+description = 'Running Lua version.'
+
+["_VERSION Lua 5.3"]
+description = 'Running Lua version.'
+
+["_VERSION Lua 5.4"]
+description = 'Running Lua version.'
+
+[warn]
+description = [[
+Emits a warning with the given message.
+A message in a call with `tocont` true should be
+continued in another call to this function.
+The default for `tocont` is false.
+]]
 
 [xpcall]
 description = 'Calls function f with the given arguments in protected mode with a new message handler.'

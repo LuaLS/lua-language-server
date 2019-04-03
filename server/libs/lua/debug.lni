@@ -113,6 +113,20 @@ name = 'u'
 type = 'userdata'
 [[.returns]]
 
+["getuservalue Lua 5.4"]
+name = 'getuservalue'
+version = 'Lua 5.4'
+[[.args]]
+name = 'u'
+type = 'userdata'
+``````````
+name = 'n'
+type = 'integer'
+[[.returns]]
+type = 'any'
+``````````
+type = 'boolean'
+
 [sethook]
 [[.args]]
 type = 'thread'
@@ -180,6 +194,21 @@ name = 'udata'
 type = 'userdata'
 ``````````
 name = 'value'
+[[.returns]]
+name = 'udata'
+type = 'userdata'
+
+["setuservalue Lua 5.4"]
+name = 'setuservalue'
+version = 'Lua 5.4'
+[[.args]]
+name = 'udata'
+type = 'userdata'
+``````````
+name = 'value'
+``````````
+name = 'n'
+type = 'integer
 [[.returns]]
 name = 'udata'
 type = 'userdata'

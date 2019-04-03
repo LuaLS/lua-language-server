@@ -143,7 +143,16 @@ description = '可以接收任何类型，它将其转换为人可阅读的字�
 [type]
 description = '将参数的类型编码为一个字符串返回。'
 
-[_VERSION]
+["_VERSION Lua 5.1"]
+description = '当前解释器版本号。'
+
+["_VERSION Lua 5.2"]
+description = '当前解释器版本号。'
+
+["_VERSION Lua 5.3"]
+description = '当前解释器版本号。'
+
+["_VERSION Lua 5.4"]
 description = '当前解释器版本号。'
 
 [xpcall]

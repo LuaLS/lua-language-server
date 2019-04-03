@@ -14,10 +14,26 @@ end
 ```
 ]]
 
+["codes Lua 5.4"]
+description = [[
+--------
+```lua
+for p, c in utf8.codes(s) do
+    body
+end
+```
+]]
+
 [codepoint]
 description = 'Returns the codepoints (as integers) from all characters in `s` that start between byte position `i` and `j` (both included).'
 
+["codepoint Lua 5.4"]
+description = 'Returns the codepoints (as integers) from all characters in `s` that start between byte position `i` and `j` (both included).'
+
 [len]
+description = 'Returns the number of UTF-8 characters in string `s` that start between positions `i` and `j` (both inclusive).'
+
+["len Lua 5.4"]
 description = 'Returns the number of UTF-8 characters in string `s` that start between positions `i` and `j` (both inclusive).'
 
 [offset]

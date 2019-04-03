@@ -50,6 +50,13 @@ description = 'Returns the name and the value of the upvalue with index `up` of 
 [getuservalue]
 description = 'Returns the Lua value associated to u.'
 
+["getuservalue Lua 5.4"]
+description = [[
+Returns the `n`-th user value associated
+to the userdata `u` plus a boolean,
+`false` if the userdata does not have that value.
+]]
+
 [sethook]
 description = 'Sets the given function as a hook.'
 [[.enums]]
@@ -76,6 +83,13 @@ description = 'Assigns the `value` to the upvalue with index `up` of the functio
 
 [setuservalue]
 description = 'Sets the given value as the Lua value associated to the given udata.'
+
+["setuservalue Lua 5.4"]
+description = [[
+Sets the given `value` as
+the `n`-th user value associated to the given `udata`.
+`udata` must be a full userdata.
+]]
 
 [traceback]
 description = 'Returns a string with a traceback of the call stack. The optional message string is appended at the beginning of the traceback.'

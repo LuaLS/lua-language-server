@@ -125,6 +125,7 @@ function mt:read(mode)
 end
 
 function mt:needCompile(uri, compiled, mode)
+    self._needDiagnostics[uri] = true
     if self._needCompile[uri] then
         return
     end
@@ -270,8 +271,13 @@ end
 
 function mt:reDiagnostic()
     for uri in pairs(self._file) do
-        self._needDiagnostics[uri] = true
+        self:clearDiagnostics(uri)
     end
+    ac.wait(0.5, function ()
+        for uri in pairs(self._file) do
+            self._needDiagnostics[uri] = true
+        end
+    end)
 end
 
 function mt:clearAllFiles()
@@ -436,8 +442,6 @@ function mt:compileVM(uri)
     local clock = os.clock()
     obj.lines = parser:lines(obj.text, 'utf8')
     obj.lineCost = os.clock() - clock
-
-    self._needDiagnostics[uri] = true
 
     if obj.vmCost > 0.2 then
         log.debug(('Compile VM[%s] takes: %.3f sec'):format(uri, obj.vmCost))

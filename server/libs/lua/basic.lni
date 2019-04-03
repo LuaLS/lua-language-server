@@ -352,9 +352,29 @@ enum = 'thread'
 name = 'type'
 enum = 'userdata'
 
-[_VERSION]
+["_VERSION Lua 5.1"]
+name = '_VERSION'
 type = 'string'
-value = 'Lua5.3'
+value = 'Lua 5.1'
+version = 'Lua 5.1'
+
+["_VERSION Lua 5.2"]
+name = '_VERSION'
+type = 'string'
+value = 'Lua 5.2'
+version = 'Lua 5.2'
+
+["_VERSION Lua 5.3"]
+name = '_VERSION'
+type = 'string'
+value = 'Lua 5.3'
+version = 'Lua 5.3'
+
+["_VERSION Lua 5.4"]
+name = '_VERSION'
+type = 'string'
+value = 'Lua 5.4'
+version = 'Lua 5.4'
 
 [xpcall]
 [[.args]]

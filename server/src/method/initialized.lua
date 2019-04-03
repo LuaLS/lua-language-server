@@ -49,7 +49,7 @@ return function (lsp)
             },
         },
     }, function (configs)
-        config:setConfig(configs[1])
+        lsp:onUpdateConfig(configs[1])
         initAfterConfig(lsp)
     end)
     return true

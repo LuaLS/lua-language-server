@@ -12,6 +12,10 @@ local function Integer(v)
     return false
 end
 
+local function String(v)
+    return true, tostring(v)
+end
+
 local function Str2Hash(sep)
     return function (v)
         if type(v) == 'string' then
@@ -36,7 +40,7 @@ end
 
 local Template = {
     runtime = {
-        version = 'Lua 5.3',
+        version         = {'Lua 5.3', String},
     },
     diagnostics = {
         globals         = {{},   Str2Hash ';'},
@@ -46,7 +50,7 @@ local Template = {
         ignoreDir       = {{},   Str2Hash ';'},
         ignoreSubmodules= {true, Boolean},
         useGitIgnore    = {true, Boolean},
-        maxPreload      = {300, Integer},
+        maxPreload      = {300,  Integer},
     }
 }
 

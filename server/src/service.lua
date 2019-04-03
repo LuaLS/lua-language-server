@@ -255,6 +255,9 @@ function mt:getCachedFileCount()
 end
 
 function mt:reCompile()
+    self.global = core.global(self)
+    self.chain  = chainMgr()
+    self.globalValue = nil
     local compiled = {}
     local n = 0
     for uri in pairs(self._file) do
@@ -631,6 +634,25 @@ function mt:restartDueToMemoryLeak()
     ac.wait(5, function ()
         os.exit(true)
     end)
+end
+
+function mt:onUpdateConfig(updated)
+    local oldConfig = table.deepCopy(config.config)
+    config:setConfig(updated)
+    local newConfig = config.config
+    if not table.equal(oldConfig.runtime, newConfig.runtime) then
+        local library = require 'core.library'
+        library.reload()
+        self:reCompile()
+    end
+    if not table.equal(oldConfig.diagnostics, newConfig.diagnostics) then
+        log.debug('reDiagnostic')
+        self:reDiagnostic()
+    end
+    if not table.equal(oldConfig.workspace, newConfig.workspace) then
+        self:clearAllFiles()
+        self.workspace:scanFiles()
+    end
 end
 
 function mt:_testMemory()

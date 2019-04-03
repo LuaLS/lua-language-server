@@ -2,6 +2,8 @@ local lni = require 'lni'
 local fs = require 'bee.filesystem'
 local config = require 'config'
 
+local Library = {}
+
 local function mergeEnum(lib, locale)
     if not lib or not locale then
         return
@@ -63,19 +65,42 @@ local function mergeLocale(libs, locale)
     end
 end
 
+local function insertGlobal(tbl, key, value)
+    if value.version then
+        local runtimeVersion = config.config.runtime.version
+        if type(value.version) == 'table' then
+            local ok
+            for _, version in ipairs(value.version) do
+                if version == runtimeVersion then
+                    ok = true
+                    break
+                end
+            end
+            if not ok then
+                return
+            end
+        else
+            if value.version ~= runtimeVersion then
+                return
+            end
+        end
+    end
+    tbl[key] = value
+end
+
 local function mergeSource(alllibs, name, lib)
     if not lib.source then
-        alllibs.global[name] = lib
+        insertGlobal(alllibs.global, name, lib)
         return
     end
     for _, source in ipairs(lib.source) do
         local sourceName = source.name or name
         if source.type == 'global' then
-            alllibs.global[sourceName] = lib
+            insertGlobal(alllibs.global, sourceName, lib)
         elseif source.type == 'library' then
-            alllibs.library[sourceName] = lib
+            insertGlobal(alllibs.library, sourceName, lib)
         elseif source.type == 'object' then
-            alllibs.object[sourceName] = lib
+            insertGlobal(alllibs.object, sourceName, lib)
         end
     end
 end
@@ -88,12 +113,28 @@ local function copy(t)
     return new
 end
 
-local function insert(tbl, name, key, value)
+local function insertChild(tbl, name, key, value)
     if not name or not key then
         return
     end
-    if value.version and value.version == config.config.runtime.version then
-        return
+    if value.version then
+        local runtimeVersion = config.config.runtime.version
+        if type(value.version) == 'table' then
+            local ok
+            for _, version in ipairs(value.version) do
+                if version == runtimeVersion then
+                    ok = true
+                    break
+                end
+            end
+            if not ok then
+                return
+            end
+        else
+            if value.version ~= runtimeVersion then
+                return
+            end
+        end
     end
     if not tbl[name] then
         tbl[name] = {
@@ -108,11 +149,11 @@ end
 local function mergeParent(alllibs, name, lib)
     for _, parent in ipairs(lib.parent) do
         if parent.type == 'global' then
-            insert(alllibs.global,  parent.name, name, lib)
+            insertChild(alllibs.global,  parent.name, name, lib)
         elseif parent.type == 'library' then
-            insert(alllibs.library, parent.name, name, lib)
+            insertChild(alllibs.library, parent.name, name, lib)
         elseif parent.type == 'object' then
-            insert(alllibs.object,  parent.name, name, lib)
+            insertChild(alllibs.object,  parent.name, name, lib)
         end
     end
 end
@@ -169,11 +210,10 @@ end
 local function init()
     local lang = require 'language'
     local id = lang.id
-    local alllibs = {
-        global  = table.container(),
-        library = table.container(),
-        object  = table.container(),
-    }
+    Library.global  = table.container()
+    Library.library = table.container()
+    Library.object  = table.container()
+
     for path in scan(ROOT / 'libs') do
         local libs
         local buf = io.load(path)
@@ -190,10 +230,14 @@ local function init()
             locale = loadLocale(id, relative)
             mergeLocale(libs, locale)
         end
-        mergeLibs(alllibs, libs)
+        mergeLibs(Library, libs)
     end
-
-    return alllibs
 end
 
-return init()
+function Library.reload()
+    init()
+end
+
+init()
+
+return Library

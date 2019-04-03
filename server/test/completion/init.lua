@@ -700,10 +700,6 @@ end
         label = 'b',
         kind = CompletionItemKind.Field,
     },
-    {
-        label = 'end',
-        kind = CompletionItemKind.Field,
-    },
 }
 
 TEST [[
@@ -731,3 +727,10 @@ TEST [[
 function table.i@
 ]]
 (EXISTS)
+
+TEST [[
+do
+    xx.@
+end
+]]
+(nil)

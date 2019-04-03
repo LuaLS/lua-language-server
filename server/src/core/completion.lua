@@ -30,6 +30,12 @@ local CompletionItemKind = {
     TypeParameter = 25,
 }
 
+local KEYS = {'and', 'break', 'do', 'else', 'elseif', 'end', 'false', 'for', 'function', 'goto', 'if', 'in', 'local', 'nil', 'not', 'or', 'repeat', 'return', 'then', 'true', 'until', 'while', 'toclose'}
+local KEYMAP = {}
+for _, k in ipairs(KEYS) do
+    KEYMAP[k] = true
+end
+
 local function matchKey(me, other)
     if me == other then
         return true
@@ -223,6 +229,9 @@ local function searchFields(vm, source, word, callback)
         if map[k] then
             return
         end
+        if KEYMAP[k] then
+            return
+        end
         if info.type ~= 'set child' and info.type ~= 'get child' then
             return
         end
@@ -242,6 +251,9 @@ local function searchFields(vm, source, word, callback)
     end)
     parent:eachChild(function (k, v)
         if map[k] then
+            return
+        end
+        if KEYMAP[k] then
             return
         end
         if not v:getLib() then
@@ -292,7 +304,6 @@ local function searchCloseGlobal(vm, source, word, callback)
     end)
 end
 
-local KEYS = {'and', 'break', 'do', 'else', 'elseif', 'end', 'false', 'for', 'function', 'goto', 'if', 'in', 'local', 'nil', 'not', 'or', 'repeat', 'return', 'then', 'true', 'until', 'while', 'toclose'}
 local function searchKeyWords(vm, source, word, callback)
     for _, key in ipairs(KEYS) do
         if matchKey(word, key) then

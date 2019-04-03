@@ -327,7 +327,7 @@ function mt:_markCompiled(uri, compiled)
 end
 
 function mt:compileAst(obj)
-    local ast, err = parser:ast(obj.text)
+    local ast, err = parser:ast(obj.text, 'lua', config.config.runtime.version)
     obj.astErr = err
     if not ast then
         if type(err) == 'string' then

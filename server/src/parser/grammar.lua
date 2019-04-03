@@ -212,7 +212,7 @@ ASSIGN      <-  Sp '='
 
 Nothing     <-  {} -> Nothing
 
-TOCLOSE     <-  Sp '*toclose'
+TOCLOSE     <-  Sp ({} '*toclose' Cut) ->  ToClose
 
 DirtyBR     <-  BR {}  / {} -> MissBR
 DirtyTR     <-  TR {}  / {} -> MissTR

@@ -38,8 +38,6 @@
 					"type": "string",
 					"default": "Lua 5.3",
 					"enum": [
-						"Lua 5.1",
-						"Lua 5.2",
 						"Lua 5.3",
 						"Lua 5.4"
 					],

@@ -103,7 +103,7 @@ function TEST(script)
     return function (expect)
         local pos = script:find('@', 1, true) - 1
         local new_script = script:gsub('@', ' ')
-        local ast = parser:ast(new_script, 'lua', 'Lua 5.4')
+        local ast = parser:ast(new_script, 'lua', 'Lua 5.3')
         local vm = buildVM(ast)
         assert(vm)
         local word = findWord(pos, new_script)

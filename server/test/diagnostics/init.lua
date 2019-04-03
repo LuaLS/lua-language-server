@@ -41,7 +41,7 @@ end
 function TEST(script)
     local new_script, target = catch_target(script)
     local lsp = service()
-    local ast = parser:ast(new_script, 'lua', 'Lua 5.4')
+    local ast = parser:ast(new_script, 'lua', 'Lua 5.3')
     assert(ast)
     local lines = parser:lines(new_script)
     local vm = buildVM(ast, lsp)
@@ -245,4 +245,8 @@ ROOT = 1
 TEST [[
 local f = load('')
 f(1, 2, 3)
+]]
+
+TEST [[
+<!warn!>(1)
 ]]

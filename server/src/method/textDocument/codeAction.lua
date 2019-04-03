@@ -1,4 +1,5 @@
 local lang = require 'language'
+local library = require 'core.library'
 
 local function disableDiagnostic(lsp, uri, data, callback)
     callback {
@@ -18,13 +19,7 @@ local function disableDiagnostic(lsp, uri, data, callback)
     }
 end
 
-local function addGlobal(lines, text, data, callback)
-    local start = lines:position(data.range.start.line + 1, data.range.start.character + 1)
-    local finish = lines:position(data.range['end'].line + 1, data.range['end'].character)
-    local name = text:sub(start, finish)
-    if #name < 0 or name:find('[^%w_]') then
-        return
-    end
+local function addGlobal(name, callback)
     callback {
         title = lang.script('ACTION_MARK_GLOBAL', name),
         kind = 'quickfix',
@@ -42,12 +37,43 @@ local function addGlobal(lines, text, data, callback)
     }
 end
 
+
+local function changeVersion(version, callback)
+    callback {
+        title = lang.script('ACTION_RUNTIME_VERSION', version),
+        kind = 'quickfix',
+        command = {
+            title = lang.script.COMMAND_RUNTIME_VERSION,
+            command = 'config',
+            arguments = {
+                {
+                    key = {'runtime', 'version'},
+                    action = 'set',
+                    value = version,
+                }
+            }
+        },
+    }
+end
+
 local function solveUndefinedGlobal(lsp, uri, data, callback)
     local vm, lines, text = lsp:getVM(uri)
     if not vm then
         return
     end
-    addGlobal(lines, text, data, callback)
+    local start = lines:position(data.range.start.line + 1, data.range.start.character + 1)
+    local finish = lines:position(data.range['end'].line + 1, data.range['end'].character)
+    local name = text:sub(start, finish)
+    if #name < 0 or name:find('[^%w_]') then
+        return
+    end
+    addGlobal(name, callback)
+    local otherVersion = library.other[name]
+    if otherVersion then
+        for _, version in ipairs(otherVersion) do
+            changeVersion(version, callback)
+        end
+    end
 end
 
 local function solveLowercaseGlobal(lsp, uri, data, callback)
@@ -55,7 +81,13 @@ local function solveLowercaseGlobal(lsp, uri, data, callback)
     if not vm then
         return
     end
-    addGlobal(lines, text, data, callback)
+    local start = lines:position(data.range.start.line + 1, data.range.start.character + 1)
+    local finish = lines:position(data.range['end'].line + 1, data.range['end'].character)
+    local name = text:sub(start, finish)
+    if #name < 0 or name:find('[^%w_]') then
+        return
+    end
+    addGlobal(name, callback)
 end
 
 local function solveTrailingSpace(lsp, uri, data, callback)
@@ -136,22 +168,15 @@ local function solveSyntax(lsp, uri, data, callback)
     if not err then
         return nil
     end
-    if err.version then
-        callback {
-            title = lang.script('ACTION_RUNTIME_VERSION', err.version),
-            kind = 'quickfix',
-            command = {
-                title = lang.script.COMMAND_RUNTIME_VERSION,
-                command = 'config',
-                arguments = {
-                    {
-                        key = {'runtime', 'version'},
-                        action = 'set',
-                        value = err.version,
-                    }
-                }
-            },
-        }
+    if not err.version then
+        return
+    end
+    if type(err.version) == 'table' then
+        for _, version in ipairs(err.version) do
+            changeVersion(version, callback)
+        end
+    else
+        changeVersion(err.version, callback)
     end
 end
 

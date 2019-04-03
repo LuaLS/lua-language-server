@@ -335,9 +335,14 @@ return function (vm, lines, uri)
     end)
     -- 读取未定义全局变量
     session:doDiagnostics(session.searchUndefinedGlobal, 'undefined-global', function (key)
+        local message = lang.script('DIAG_UNDEF_GLOBAL', key)
+        local otherVersion = library.other[key]
+        if otherVersion then
+            message = ('%s(%s)'):format(message, lang.script('DIAG_DEFINED_VERSION', table.concat(otherVersion, '/')))
+        end
         return {
             level   = DiagnosticSeverity.Warning,
-            message = lang.script('DIAG_UNDEF_GLOBAL', key),
+            message = message,
         }
     end)
     -- 未使用的Label

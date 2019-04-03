@@ -77,26 +77,52 @@ local function insertGlobal(tbl, key, value)
                 end
             end
             if not ok then
-                return
+                return false
             end
         else
             if value.version ~= runtimeVersion then
-                return
+                return false
             end
         end
     end
     tbl[key] = value
+    return true
+end
+
+local function insertOther(tbl, key, value)
+    if not value.version then
+        return
+    end
+    if not tbl[key] then
+        tbl[key] = {}
+    end
+    if type(value.version) == 'string' then
+        tbl[key][#tbl[key]+1] = value.version
+    elseif type(value.version) == 'table' then
+        for _, version in ipairs(value.version) do
+            if type(version) == 'string' then
+                tbl[key][#tbl[key]+1] = version
+            end
+        end
+    end
+    table.sort(tbl[key])
 end
 
 local function mergeSource(alllibs, name, lib)
     if not lib.source then
-        insertGlobal(alllibs.global, name, lib)
+        local suc = insertGlobal(alllibs.global, name, lib)
+        if not suc then
+            insertOther(alllibs.other, name, lib)
+        end
         return
     end
     for _, source in ipairs(lib.source) do
         local sourceName = source.name or name
         if source.type == 'global' then
-            insertGlobal(alllibs.global, sourceName, lib)
+            local suc = insertGlobal(alllibs.global, sourceName, lib)
+            if not suc then
+                insertOther(alllibs.other, sourceName, lib)
+            end
         elseif source.type == 'library' then
             insertGlobal(alllibs.library, sourceName, lib)
         elseif source.type == 'object' then
@@ -213,6 +239,7 @@ local function init()
     Library.global  = table.container()
     Library.library = table.container()
     Library.object  = table.container()
+    Library.other   = table.container()
 
     for path in scan(ROOT / 'libs') do
         local libs

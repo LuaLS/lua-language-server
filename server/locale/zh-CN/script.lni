@@ -12,6 +12,7 @@ DIAG_LOWERCASE_GLOBAL   = '首字母小写的全局变量'
 DIAG_DIAGNOSTICS        = '诊断'
 DIAG_SYNTAX_CHECK       = '语法检查'
 DIAG_NEED_VERSION       = '在 {} 中是合法的'
+DIAG_DEFINED_VERSION    = '在 {} 中有定义'
 
 MWS_NOT_SUPPORT         = '{} 目前还不支持多工作目录，我可能需要重启才能支持新的工作目录...'
 MWS_RESTART             = '重启'

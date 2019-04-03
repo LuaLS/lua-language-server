@@ -39,7 +39,7 @@ function TEST(newName)
         local finish = script:find('?>', 1, true)
         local pos = (start + finish) // 2 + 1
         local new_script = script:gsub('<[!?]', '  '):gsub('[!?]>', '  ')
-        local ast = parser:ast(new_script, 'lua', 'Lua 5.4')
+        local ast = parser:ast(new_script, 'lua', 'Lua 5.3')
         assert(ast)
         local vm = buildVM(ast)
         assert(vm)

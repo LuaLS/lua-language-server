@@ -83,7 +83,11 @@ local function buildError(err, lines, uri)
         message = lang.script('PARSER_'..err.type, err.info)
     }
     if err.version then
-        diagnostic.message = ('%s(%s)'):format(diagnostic.message, lang.script('DIAG_NEED_VERSION', err.version))
+        if type(err.version) == 'table' then
+            diagnostic.message = ('%s(%s)'):format(diagnostic.message, lang.script('DIAG_NEED_VERSION', table.concat(err.version, '/')))
+        else
+            diagnostic.message = ('%s(%s)'):format(diagnostic.message, lang.script('DIAG_NEED_VERSION', err.version))
+        end
     end
     if err.level == 'error' then
         diagnostic.severity = DiagnosticSeverity.Error

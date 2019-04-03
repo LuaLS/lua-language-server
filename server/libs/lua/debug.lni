@@ -208,7 +208,7 @@ type = 'userdata'
 name = 'value'
 ``````````
 name = 'n'
-type = 'integer
+type = 'integer'
 [[.returns]]
 name = 'udata'
 type = 'userdata'

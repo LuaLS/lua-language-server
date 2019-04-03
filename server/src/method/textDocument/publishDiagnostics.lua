@@ -82,6 +82,9 @@ local function buildError(err, lines, uri)
         source  = lang.script.DIAG_SYNTAX_CHECK,
         message = lang.script('PARSER_'..err.type, err.info)
     }
+    if err.version then
+        diagnostic.message = ('%s(%s)'):format(diagnostic.message, lang.script('DIAG_NEED_VERSION', err.version))
+    end
     if err.level == 'error' then
         diagnostic.severity = DiagnosticSeverity.Error
     else

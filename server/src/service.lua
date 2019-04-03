@@ -497,6 +497,10 @@ function mt:doDiagnostics(uri)
     end
 end
 
+function mt:getFile(uri)
+    return self._file[uri]
+end
+
 function mt:getVM(uri)
     local obj = self._file[uri]
     if not obj then

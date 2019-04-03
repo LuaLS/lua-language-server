@@ -75,6 +75,8 @@ function command.config(lsp, data)
 
         attr[#attr+1] = data.value
         setting[key] = attr
+    elseif data.action == 'set' then
+        setting[key] = data.value
     end
 
     io.save(vscodePath / 'settings.json', json.encode(setting) .. '\r\n')

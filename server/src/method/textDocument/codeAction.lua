@@ -112,7 +112,53 @@ local function solveAmbiguity1(lsp, uri, data, callback)
     }
 end
 
+local function findSyntax(astErr, lines, data)
+    local start = lines:position(data.range.start.line + 1, data.range.start.character + 1)
+    local finish = lines:position(data.range['end'].line + 1, data.range['end'].character)
+    for _, err in ipairs(astErr) do
+        if err.start == start and err.finish == finish then
+            return err
+        end
+    end
+    return nil
+end
+
+local function solveSyntax(lsp, uri, data, callback)
+    local obj = lsp:getFile(uri)
+    if not obj then
+        return
+    end
+    local astErr, lines = obj.astErr, obj.lines
+    if not astErr or not lines then
+        return
+    end
+    local err = findSyntax(astErr, lines, data)
+    if not err then
+        return nil
+    end
+    if err.version then
+        callback {
+            title = lang.script.CHANGE_RUNTIME_VERSION,
+            kind = 'quickfix',
+            command = {
+                title = lang.script.COMMAND_RUNTIME_VERSION,
+                command = 'config',
+                arguments = {
+                    {
+                        key = {'runtime', 'version'},
+                        action = 'set',
+                        value = err.version,
+                    }
+                }
+            },
+        }
+    end
+end
+
 local function solveDiagnostic(lsp, uri, data, callback)
+    if data.source == lang.script.DIAG_SYNTAX_CHECK then
+        solveSyntax(lsp, uri, data, callback)
+    end
     if not data.code then
         return
     end

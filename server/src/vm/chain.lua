@@ -21,6 +21,7 @@ function mt:clearCache()
         if ok then
             n = n + 1
         else
+            value:getSource():kill()
             self.cache[uri] = nil
         end
     end
@@ -40,6 +41,16 @@ function mt:get(uri)
         self.cache[uri].uri = uri
     end
     return self.cache[uri]
+end
+
+function mt:remove()
+    if self.removed then
+        return
+    end
+    self.removed = true
+    for _, value in pairs(self.cache) do
+        value:getSource():kill()
+    end
 end
 
 return function ()

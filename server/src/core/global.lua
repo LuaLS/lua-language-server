@@ -37,6 +37,9 @@ function mt:hasSetGlobal(uri)
     return self.set[uri] ~= nil
 end
 
+function mt:remove()
+end
+
 return function (lsp)
     return setmetatable({
         get = {},

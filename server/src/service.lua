@@ -248,6 +248,12 @@ function mt:removeText(uri)
     self._fileCount = self._fileCount - 1
     self:saveText(uri, -1, '')
     self:compileVM(uri)
+    -- TODO 以后重构一下，把缓存的text作为一个单独的类管理
+    local vm = self._file[uri].vm
+    if vm then
+        vm:remove()
+    end
+    self._file[uri].removed = true
     self._file[uri] = nil
 end
 
@@ -256,17 +262,35 @@ function mt:getCachedFileCount()
 end
 
 function mt:reCompile()
+    if self.global then
+        self.global:remove()
+    end
+    if self.chain then
+        self.chain:remove()
+    end
+
+    for _, obj in pairs(listMgr.list) do
+        if obj.type == 'source' or obj.type == 'function' then
+            obj:kill()
+        end
+    end
+
     self.global = core.global(self)
     self.chain  = chainMgr()
     self.globalValue = nil
-    local compiled = {}
-    local n = 0
-    for uri in pairs(self._file) do
-        self:needCompile(uri, compiled)
-        n = n + 1
-    end
-    log.debug('reCompile:', n)
-    self:_testMemory()
+
+    self._needCompile = {}
+
+    ac.wait(0.5, function ()
+        local compiled = {}
+        local n = 0
+        for uri in pairs(self._file) do
+            self:needCompile(uri, compiled)
+            n = n + 1
+        end
+        log.debug('reCompile:', n)
+        self:_testMemory()
+    end)
 end
 
 function mt:reDiagnostic()
@@ -412,7 +436,7 @@ function mt:compileVM(uri)
     if vm then
         CachedVM[vm] = true
     end
-    if self:isDeadText(uri) then
+    if self:isDeadText(uri) or obj.removed then
         if vm then
             vm:remove()
         end
@@ -464,7 +488,7 @@ function mt:doDiagnostics(uri)
     end
     local name = 'textDocument/publishDiagnostics'
     local obj = self._file[uri]
-    if not obj or not obj.vm or obj.vm:isRemoved() then
+    if not obj or obj.removed or not obj.vm or obj.vm:isRemoved() then
         self._needDiagnostics[uri] = nil
         self:clearDiagnostics(uri)
         return

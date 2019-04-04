@@ -600,7 +600,9 @@ return function (vm, pos, word, oldText)
     searchSpecial(vm, source, word, callback, pos)
     searchCallArg(vm, source, word, callback, pos)
     searchSource(vm, source, word, callback)
-    searchAllWords(vm, source, word, callback, pos)
+    if not oldText then
+        searchAllWords(vm, source, word, callback, pos)
+    end
 
     if #list == 0 then
         return nil

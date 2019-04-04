@@ -659,7 +659,9 @@ function mt:onUpdateConfig(updated)
     end
     if not table.equal(oldConfig.workspace, newConfig.workspace) then
         self:clearAllFiles()
-        self.workspace:scanFiles()
+        if self.workspace then
+            self.workspace:scanFiles()
+        end
     end
 end
 

@@ -103,12 +103,12 @@ function TEST(script)
     return function (expect)
         local pos = script:find('@', 1, true) - 1
         local new_script = script:gsub('@', ' ')
-        local ast = parser:ast(new_script, 'lua', 'Lua 5.3')
+        local ast = parser:ast(new_script, 'lua', 'Lua 5.4')
         local vm = buildVM(ast)
         assert(vm)
         local word = findWord(pos, new_script)
         local startPos = findStartPos(pos, new_script)
-        local result = core.completion(vm, startPos, word)
+        local result = core.completion(vm, new_script, startPos, word)
         if expect then
             assert(result)
             assert(eq(expect, result))
@@ -734,3 +734,24 @@ do
 end
 ]]
 (nil)
+
+require 'config' .config.runtime.version = 'Lua 5.4'
+TEST [[
+local *@
+]]
+{
+    {
+        label = 'toclose',
+        kind = CompletionItemKind.Keyword,
+    }
+}
+
+TEST [[
+local *tocl@
+]]
+{
+    {
+        label = 'toclose',
+        kind = CompletionItemKind.Keyword,
+    }
+}

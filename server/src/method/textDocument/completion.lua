@@ -77,14 +77,14 @@ return function (lsp, params)
     end
     startPos = startPos or position
 
-    local items = core.completion(vm, startPos, word, oldText)
+    local items = core.completion(vm, text, startPos, word, oldText)
     if not items or #items == 0 then
         vm = lsp:loadVM(uri)
         if not vm then
             return nil
         end
         startPos = startPos or position
-        items = core.completion(vm, startPos, word)
+        items = core.completion(vm, text, startPos, word)
         if not items or #items == 0 then
             return nil
         end

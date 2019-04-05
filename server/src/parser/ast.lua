@@ -327,7 +327,6 @@ local Defs = {
                         max = '7FFFFFFF',
                     }
                 }
-                return ''
             end
         else
             if v < 0 or v > 0x10FFFF then
@@ -341,8 +340,9 @@ local Defs = {
                         max = '10FFFF',
                     }
                 }
-                return ''
             end
+        end
+        if v >= 0 and v <= 0x10FFFF then
             return utf8_char(v)
         end
         return ''
@@ -736,10 +736,29 @@ local Defs = {
             keys, values,
         }
     end,
-    Local = function (keys, values)
+    ToClose = function (start)
+        if State.Version == 'Lua 5.4' then
+            return {
+                type = 'toclose',
+                start = start,
+                finish = start + #'*toclose' - 1,
+            }
+        end
+        pushError {
+            type = 'UNSUPPORT_SYMBOL',
+            start = start,
+            finish = start + #'*toclose' - 1,
+            version = 'Lua 5.4',
+            info = {
+                version = State.Version,
+            }
+        }
+        return nil
+    end,
+    Local = function (toclose, keys, values)
         return {
             type = 'local',
-            keys, values,
+            keys, values, toclose
         }
     end,
     DoBody = function (...)
@@ -1238,20 +1257,6 @@ local Defs = {
         }
         return rtn, action
     end,
-    ToClose = function (start)
-        if State.Version == 'Lua 5.4' then
-            return
-        end
-        pushError {
-            type = 'UNSUPPORT_SYMBOL',
-            start = start,
-            finish = start + #'*toclose' - 1,
-            version = 'Lua 5.4',
-            info = {
-                version = State.Version,
-            }
-        }
-    end
 }
 
 return function (self, lua, mode, version)

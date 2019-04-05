@@ -116,7 +116,7 @@ function TEST(data)
     assert(vm)
     local word = findWord(pos, mainBuf)
     local startPos = findStartPos(pos, mainBuf) or pos
-    local result = core.completion(vm, startPos, word)
+    local result = core.completion(vm, mainBuf, startPos, word)
     local expect = data.completion
     if expect then
         assert(result)

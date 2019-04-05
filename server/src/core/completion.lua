@@ -1,6 +1,7 @@
 local findSource = require 'core.find_source'
 local getFunctionHover = require 'core.hover.function'
 local getFunctionHoverAsLib = require 'core.hover.lib_function'
+local config = require 'config'
 
 local CompletionItemKind = {
     Text = 1,
@@ -30,7 +31,7 @@ local CompletionItemKind = {
     TypeParameter = 25,
 }
 
-local KEYS = {'and', 'break', 'do', 'else', 'elseif', 'end', 'false', 'for', 'function', 'goto', 'if', 'in', 'local', 'nil', 'not', 'or', 'repeat', 'return', 'then', 'true', 'until', 'while', 'toclose'}
+local KEYS = {'and', 'break', 'do', 'else', 'elseif', 'end', 'false', 'for', 'function', 'goto', 'if', 'in', 'local', 'nil', 'not', 'or', 'repeat', 'return', 'then', 'true', 'until', 'while'}
 local KEYMAP = {}
 for _, k in ipairs(KEYS) do
     KEYMAP[k] = true
@@ -333,10 +334,13 @@ end
 
 local function searchAsLocal(vm, source, word, callback)
     searchCloseGlobal(vm, source, word, callback)
-
     -- 特殊支持 local function
     if matchKey(word, 'function') then
         callback('function', nil, CompletionItemKind.Keyword)
+    end
+    -- 特殊支持 local *toclose
+    if word == '' and config.config.runtime.version == 'Lua 5.4' then
+        callback('*toclose', nil, CompletionItemKind.Keyword)
     end
 end
 
@@ -585,7 +589,30 @@ local function makeList(source, pos, word)
     end, list
 end
 
-return function (vm, pos, word, oldText)
+local function searchToclose(text, word, callback, pos)
+    if #word > 0 then
+        pos = pos - 1
+    end
+    if text:sub(pos, pos) ~= '*' then
+        return false
+    end
+    if not matchKey(word, 'toclose') then
+        return false
+    end
+    for i = pos-1, 1, -1 do
+        if text:sub(i, i):match '[^%s%c]' then
+            if text:sub(i - #'local' + 1, i) == 'local' then
+                callback('toclose', nil, CompletionItemKind.Keyword)
+                return true
+            else
+                return false
+            end
+        end
+    end
+    return false
+end
+
+return function (vm, text, pos, word, oldText)
     local source = findSource(vm, pos) or findSource(vm, pos-1)
     if not source then
         return nil
@@ -597,6 +624,9 @@ return function (vm, pos, word, oldText)
         end
     end
     local callback, list = makeList(source, pos, word)
+    if searchToclose(text, word, callback, pos) then
+        return list
+    end
     searchSpecial(vm, source, word, callback, pos)
     searchCallArg(vm, source, word, callback, pos)
     searchSource(vm, source, word, callback)

@@ -247,6 +247,7 @@ local f = load('')
 f(1, 2, 3)
 ]]
 
+require 'config' .config.runtime.version = 'Lua 5.3'
 TEST [[
 <!warn!>(1)
 ]]

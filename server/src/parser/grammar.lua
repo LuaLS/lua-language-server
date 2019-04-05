@@ -473,7 +473,8 @@ RepeatBody  <-  REPEAT
                     BreakEnd
                 NeedUntil DirtyExp
 
-Local       <-  (LOCAL TOCLOSE? NameList (ASSIGN ExpList)?)
+ToClose     <-  TOCLOSE / %nil
+Local       <-  (LOCAL ToClose NameList (ASSIGN ExpList)?)
             ->  Local
 Set         <-  (SimpleList ASSIGN ExpList?)
             ->  Set

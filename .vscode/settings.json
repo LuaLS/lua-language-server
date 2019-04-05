@@ -9,6 +9,6 @@
     ],
     "Lua.diagnostics.disable": [
     ],
-    "Lua.runtime.version": "Lua 5.4",
+    "Lua.runtime.version": "Lua 5.2",
     "Lua.workspace.maxPreload": 400
 }

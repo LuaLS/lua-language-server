@@ -44,6 +44,36 @@ local RESERVED = {
     ['while']    = true,
 }
 
+local VersionOp = {
+    ['&']  = {'Lua 5.3', 'Lua 5.4'},
+    ['~']  = {'Lua 5.3', 'Lua 5.4'},
+    ['|']  = {'Lua 5.3', 'Lua 5.4'},
+    ['<<'] = {'Lua 5.3', 'Lua 5.4'},
+    ['>>'] = {'Lua 5.3', 'Lua 5.4'},
+    ['//'] = {'Lua 5.3', 'Lua 5.4'},
+}
+
+local function checkOpVersion(op, start)
+    local versions = VersionOp[op]
+    if not versions then
+        return
+    end
+    for i = 1, #versions do
+        if versions[i] == State.Version then
+            return
+        end
+    end
+    pushError {
+        type = 'UNSUPPORT_SYMBOL',
+        start = start,
+        finish = start + #op - 1,
+        version = versions,
+        info = {
+            version = State.Version,
+        }
+    }
+end
+
 local Exp
 
 local function expSplit(list, start, finish, level)
@@ -71,6 +101,7 @@ local function binaryForward(list, start, finish, level)
             if not e2 then
                 goto CONTINUE
             end
+            checkOpVersion(op, list[i-1])
             return {
                 type   = 'binary',
                 op     = op,
@@ -98,6 +129,7 @@ local function binaryBackward(list, start, finish, level)
             if not e2 then
                 goto CONTINUE
             end
+            checkOpVersion(op, list[i-1])
             return {
                 type   = 'binary',
                 op     = op,
@@ -118,6 +150,7 @@ local function unary(list, start, finish, level)
     if info[op] then
         local e1 = expSplit(list, start+2, finish, level)
         if e1 then
+            checkOpVersion(op, list[start])
             return {
                 type   = 'unary',
                 op     = op,
@@ -1210,7 +1243,7 @@ local Defs = {
             return
         end
         pushError {
-            type = 'TOCLOSE',
+            type = 'UNSUPPORT_SYMBOL',
             start = start,
             finish = start + #'*toclose' - 1,
             version = 'Lua 5.4',

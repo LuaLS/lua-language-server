@@ -11,7 +11,7 @@ DIAG_AMBIGUITY_1        = 'Compute `0 {op} {num}` first. You may need to add bra
 DIAG_LOWERCASE_GLOBAL   = 'Global variable in lowercase initial'
 DIAG_DIAGNOSTICS        = 'Diagnostics'
 DIAG_SYNTAX_CHECK       = 'Syntax Check'
-DIAG_NEED_VERSION       = 'Supported in {}, current is {}'
+DIAG_NEED_VERSION       = 'Supported in {}'
 DIAG_DEFINED_VERSION    = 'Defined in {}, current is {}'
 
 MWS_NOT_SUPPORT         = '{} dose not support multi workspace for now, I may need to restart to support the new workspace ...'
@@ -42,7 +42,7 @@ PARSER_MALFORMED_NUMBER = 'Malformed number.'
 PARSER_ACTION_AFTER_RETURN = '<eof> expected.'
 PARSER_NO_VISIBLE_LABEL = 'No visible label `{label}` .'
 PARSER_REDEFINE_LABEL   = 'Label `{label}` already defined.'
-PARSER_TOCLOSE          = '{version} does not support this grammar.'
+PARSER_UNSUPPORT_SYMBOL = '{version} does not support this grammar.'
 
 SYMBOL_ANONYMOUS        = '<Anonymous>'
 

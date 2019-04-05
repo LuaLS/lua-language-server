@@ -341,7 +341,7 @@ return function (vm, lines, uri)
         local message = lang.script('DIAG_UNDEF_GLOBAL', key)
         local otherVersion = library.other[key]
         if otherVersion then
-            message = ('%s(%s)'):format(message, lang.script('DIAG_DEFINED_VERSION', table.concat(otherVersion, '/')))
+            message = ('%s(%s)'):format(message, lang.script('DIAG_DEFINED_VERSION', table.concat(otherVersion, '/'), config.config.runtime.version))
         end
         return {
             level   = DiagnosticSeverity.Warning,

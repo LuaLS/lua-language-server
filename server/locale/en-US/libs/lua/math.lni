@@ -7,7 +7,13 @@ description = 'Returns the arc cosine of `x` (in radians).'
 [asin]
 description = 'Returns the arc sine of `x` (in radians).'
 
-[atan]
+["atan Lua 5.1"]
+description = 'Returns the arc tangent of `x` (in radians).'
+
+["atan Lua 5.3"]
+description = 'Returns the arc tangent of `y/x` (in radians).'
+
+[atan2]
 description = 'Returns the arc tangent of `y/x` (in radians).'
 
 [ceil]
@@ -15,6 +21,9 @@ description = 'Returns the smallest integral value larger than or equal to `x`.'
 
 [cos]
 description = 'Returns the cosine of `x` (assumed to be in radians).'
+
+[cosh]
+description = 'Returns the hyperbolic cosine of `x` (assumed to be in radians).'
 
 [deg]
 description = 'Converts the angle `x` from radians to degrees.'
@@ -52,6 +61,9 @@ description = 'Returns the integral part of `x` and the fractional part of `x`.'
 [pi]
 description = 'The value of *π*.'
 
+[power]
+description = 'Returns `x ^ y` .'
+
 [rad]
 description = 'Converts the angle `x` from degrees to radians.'
 
@@ -67,26 +79,25 @@ description = 'Sets `x` as the "seed" for the pseudo-random generator.'
 
 ["randomseed Lua 5.4"]
 description = [[
-When called with at least one argument,
-the integer parameters `x` and `y` are
-concatenated into a 128-bit `seed` that
-is used to reinitialize the pseudo-random generator;
-equal seeds produce equal sequences of numbers.
-The default for `y` is zero.
-
-When called with no arguments,
-Lua generates a seed with
-a weak attempt for randomness.
+* `math.randomseed(x, y)`: Concatenate `x` and `y` into a 128-bit `seed` to reinitialize the pseudo-random generator.
+* `math.randomseed(x)`: Equate to `math.randomseed(x, 0)` .
+* `math.randomseed()`: Generates a seed with a weak attempt for randomness.
 ]]
 
 [sin]
 description = 'Returns the sine of `x` (assumed to be in radians).'
+
+[sinh]
+description = 'Returns the hyperbolic sine of `x` (assumed to be in radians).'
 
 [sqrt]
 description = 'Returns the square root of `x`.'
 
 [tan]
 description = 'Returns the tangent of `x` (assumed to be in radians).'
+
+[tanh]
+description = 'Returns the hyperbolic tangent of `x` (assumed to be in radians).'
 
 [tointeger]
 description = 'If the value `x` is convertible to an integer, returns that integer.'

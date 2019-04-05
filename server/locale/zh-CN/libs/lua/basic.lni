@@ -38,6 +38,48 @@ name = 'opt'
 enum = 'isrunning'
 description = '返回表示收集器是否在工作的布尔值。'
 
+["collectgarbage Lua 5.4"]
+[[.enums]]
+name = 'opt'
+enum = 'collect'
+description = '做一次完整的垃圾收集循环。'
+``````````
+name = 'opt'
+enum = 'stop'
+description = '停止垃圾收集器的运行。'
+``````````
+name = 'opt'
+enum = 'restart'
+description = '重启垃圾收集器的自动运行。'
+``````````
+name = 'opt'
+enum = 'count'
+description = '以 K 字节数为单位返回 Lua 使用的总内存数。'
+``````````
+name = 'opt'
+enum = 'step'
+description = '单步运行垃圾收集器。'
+``````````
+name = 'opt'
+enum = 'setpause'
+description = '设置收集器的 `间歇率`。'
+``````````
+name = 'opt'
+enum = 'setstepmul'
+description = '设置收集器的 `步进倍率`。'
+``````````
+name = 'opt'
+enum = 'incremental'
+description = '改变收集器模式为增量模式。'
+``````````
+name = 'opt'
+enum = 'generational'
+description = '改变收集器模式为分代模式。'
+``````````
+name = 'opt'
+enum = 'isrunning'
+description = '返回表示收集器是否在工作的布尔值。'
+
 [dofile]
 description = '打开该名字的文件，并执行文件中的 Lua 代码块。'
 
@@ -154,6 +196,9 @@ description = '当前解释器版本号。'
 
 ["_VERSION Lua 5.4"]
 description = '当前解释器版本号。'
+
+[warn]
+description = '以给定消息发出一个警告。当`tocont`为 true 时，应当继续调用该函数来接续消息。`tocont`的默认值为 false 。'
 
 [xpcall]
 description = '传入参数并设置一个消息处理器 `msgh`，以 *保护模式* 调用函数 `f` 。'

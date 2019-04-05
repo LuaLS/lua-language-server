@@ -181,6 +181,7 @@ name = 'captured'
 type = 'string'
 
 [pack]
+version = {'Lua 5.3', 'Lua 5.4'}
 [[.args]]
 name = 'fmt'
 type = 'string'
@@ -197,6 +198,7 @@ name = 'binary'
 type = 'string'
 
 [packsize]
+version = {'Lua 5.3', 'Lua 5.4'}
 [[.args]]
 name = 'fmt'
 type = 'string'
@@ -238,6 +240,7 @@ default = -1
 type = 'string'
 
 [unpack]
+version = {'Lua 5.3', 'Lua 5.4'}
 [[.args]]
 name = 'fmt'
 type = 'string'

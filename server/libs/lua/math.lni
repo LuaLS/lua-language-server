@@ -40,7 +40,31 @@ type = 'number'
 [[.returns]]
 type = 'number'
 
-[atan]
+["atan Lua 5.1"]
+name = 'atan'
+version = {'Lua 5.1', 'Lua 5.2'}
+[[.args]]
+name = 'y'
+type = 'number'
+[[.returns]]
+type = 'number'
+
+["atan Lua 5.3"]
+name = 'atan'
+version = {'Lua 5.3', 'Lua 5.4'}
+[[.args]]
+name = 'y'
+type = 'number'
+``````````
+name = 'x'
+type = 'number'
+optional = 'self'
+default = 1
+[[.returns]]
+type = 'number'
+
+[atan2]
+version = {'Lua 5.1', 'Lua 5.2'}
 [[.args]]
 name = 'y'
 type = 'number'
@@ -60,6 +84,14 @@ type = 'number'
 type = 'integer'
 
 [cos]
+[[.args]]
+name = 'x'
+type = 'number'
+[[.returns]]
+type = 'number'
+
+[cosh]
+version = {'Lua 5.1', 'Lua 5.2'}
 [[.args]]
 name = 'x'
 type = 'number'
@@ -148,6 +180,17 @@ type = 'number'
 [pi]
 type = 'number'
 
+[power]
+version = {'Lua 5.1', 'Lua 5.2'}
+[[.args]]
+name = 'x'
+type = 'number'
+``````````
+name = 'y'
+type = 'number'
+[[.returns]]
+type = 'number'
+
 [rad]
 [[.args]]
 name = 'x'
@@ -192,6 +235,14 @@ type = 'number'
 [[.returns]]
 type = 'number'
 
+[sinh]
+version = {'Lua 5.1', 'Lua 5.2'}
+[[.args]]
+name = 'x'
+type = 'number'
+[[.returns]]
+type = 'number'
+
 [sqrt]
 [[.args]]
 name = 'x'
@@ -200,6 +251,14 @@ type = 'number'
 type = 'number'
 
 [tan]
+[[.args]]
+name = 'x'
+type = 'number'
+[[.returns]]
+type = 'number'
+
+[tanh]
+version = {'Lua 5.1', 'Lua 5.2'}
 [[.args]]
 name = 'x'
 type = 'number'

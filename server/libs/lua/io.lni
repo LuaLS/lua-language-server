@@ -61,7 +61,44 @@ optional = 'self'
 type = 'FILE*'
 optional = 'self'
 
-[lines]
+["lines Lua 5.1"]
+name = 'lines'
+version = {'Lua 5.1', 'Lua 5.2'}
+[[.args]]
+name = 'filename'
+type = 'string'
+optional = 'after'
+``````````
+name = 'mode'
+type = '...'
+[[.returns]]
+type = 'function'
+returns = {
+    1 = {
+        name = 'c',
+        type = {'string', 'number'},
+    }
+}
+[[.enums]]
+name = 'mode'
+enum = '*n'
+``````````
+name = 'mode'
+enum = '*a'
+``````````
+name = 'mode'
+enum = '*l'
+default = true
+``````````
+name = 'mode'
+enum = '*L'
+``````````
+name = 'mode'
+code = 'number'
+
+["lines Lua 5.3"]
+name = 'lines'
+version = {'Lua 5.3', 'Lua 5.4'}
 [[.args]]
 name = 'filename'
 type = 'string'
@@ -147,7 +184,36 @@ default = true
 name = 'mode'
 enum = 'w'
 
-[read]
+["read Lua 5.1"]
+name = 'read'
+version = {'Lua 5.3', 'Lua 5.4'}
+[[.args]]
+name = 'mode'
+type = '...'
+[[.returns]]
+type = {'string', 'number'}
+``````````
+type = '...'
+[[.enums]]
+name = 'mode'
+enum = '*n'
+``````````
+name = 'mode'
+enum = '*a'
+``````````
+name = 'mode'
+enum = '*l'
+default = true
+``````````
+name = 'mode'
+enum = '*L'
+``````````
+name = 'mode'
+code = 'number'
+
+["read Lua 5.3"]
+name = 'read'
+version = {'Lua 5.3', 'Lua 5.4'}
 [[.args]]
 name = 'mode'
 type = '...'

@@ -16,7 +16,37 @@ description = 'Saves any written data to default output file.'
 [input]
 description = 'Sets `file` as the default input file.'
 
-[lines]
+["lines Lua 5.1"]
+description = [[
+------
+```lua
+for c in io.lines(filename, ...) do
+    body
+end
+```
+]]
+[[.enums]]
+name = 'mode'
+enum = '*n'
+description = 'Reads a numeral and returns it as number.'
+``````````
+name = 'mode'
+enum = '*a'
+description = 'Reads the whole file.'
+``````````
+name = 'mode'
+enum = '*l'
+description = 'Reads the next line skipping the end of line.'
+``````````
+name = 'mode'
+enum = '*L'
+description = 'Reads the next line keeping the end of line.'
+``````````
+name = 'mode'
+code = 'number'
+description = 'Reads a string with up to this number of bytes.'
+
+["lines Lua 5.3"]
 description = [[
 ------
 ```lua
@@ -87,7 +117,30 @@ name = 'mode'
 enum = 'w'
 description = 'Write data to this program by `file`.'
 
-[read]
+["read Lua 5.1"]
+description = 'Reads the `file`, according to the given formats, which specify what to read.'
+[[.enums]]
+name = 'mode'
+enum = '*n'
+description = 'Reads a numeral and returns it as number.'
+``````````
+name = 'mode'
+enum = '*a'
+description = 'Reads the whole file.'
+``````````
+name = 'mode'
+enum = '*l'
+description = 'Reads the next line skipping the end of line.'
+``````````
+name = 'mode'
+enum = '*L'
+description = 'Reads the next line keeping the end of line.'
+``````````
+name = 'mode'
+code = 'number'
+description = 'Reads a string with up to this number of bytes.'
+
+["read Lua 5.3"]
 description = 'Reads the `file`, according to the given formats, which specify what to read.'
 [[.enums]]
 name = 'mode'

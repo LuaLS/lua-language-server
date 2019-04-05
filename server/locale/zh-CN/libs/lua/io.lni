@@ -16,7 +16,37 @@ description = '将写入的数据保存到默认输出文件中。'
 [input]
 description = '设置 `file` 为默认输入文件。'
 
-[lines]
+["lines Lua 5.1"]
+description = [[
+------
+```lua
+for c in io.lines(filename, ...) do
+    body
+end
+```
+]]
+[[.enums]]
+name = 'mode'
+enum = '*n'
+description = '读取一个数字，根据 Lua 的转换文法返回浮点数或整数。'
+``````````
+name = 'mode'
+enum = '*a'
+description = '从当前位置开始读取整个文件。'
+``````````
+name = 'mode'
+enum = '*l'
+description = '读取一行并忽略行结束标记。'
+``````````
+name = 'mode'
+enum = '*L'
+description = '读取一行并保留行结束标记。'
+``````````
+name = 'mode'
+code = 'number'
+description = '读取一个不超过这个数量字节数的字符串。'
+
+["lines Lua 5.3"]
 description = [[
 ------
 ```lua
@@ -87,7 +117,30 @@ name = 'mode'
 enum = 'w'
 description = '向这个程序写入输入。'
 
-[read]
+["read Lua 5.1"]
+description = '读文件 `file`， 指定的格式决定了要读什么。'
+[[.enums]]
+name = 'mode'
+enum = '*n'
+description = '读取一个数字，根据 Lua 的转换文法返回浮点数或整数。'
+``````````
+name = 'mode'
+enum = '*a'
+description = '从当前位置开始读取整个文件。'
+``````````
+name = 'mode'
+enum = '*l'
+description = '读取一行并忽略行结束标记。'
+``````````
+name = 'mode'
+enum = '*L'
+description = '读取一行并保留行结束标记。'
+``````````
+name = 'mode'
+code = 'number'
+description = '读取一个不超过这个数量字节数的字符串。'
+
+["read Lua 5.3"]
 description = '读文件 `file`， 指定的格式决定了要读什么。'
 [[.enums]]
 name = 'mode'

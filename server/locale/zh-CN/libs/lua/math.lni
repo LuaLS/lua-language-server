@@ -7,7 +7,13 @@ description = '返回 `x` 的反余弦值（用弧度表示）。'
 [asin]
 description = '返回 `x` 的反正弦值（用弧度表示）。'
 
-[atan]
+["atan Lua 5.1"]
+description = '返回 `x` 的反正切值（用弧度表示）。'
+
+["atan Lua 5.3"]
+description = '返回 `y/x` 的反正切值（用弧度表示）。'
+
+[atan2]
 description = '返回 `y/x` 的反正切值（用弧度表示）。'
 
 [ceil]
@@ -15,6 +21,9 @@ description = '返回不小于 `x` 的最小整数值。'
 
 [cos]
 description = '返回 `x` 的余弦（假定参数是弧度）。'
+
+[cosh]
+description = '返回 `x` 的双曲余弦（假定参数是弧度）。'
 
 [deg]
 description = '将角 `x` 从弧度转换为角度。'
@@ -52,6 +61,9 @@ description = '返回 `x` 的整数部分和小数部分。'
 [pi]
 description = '*π* 的值。'
 
+[power]
+description = '返回 `x ^ y` 。'
+
 [rad]
 description = '将角 `x` 从角度转换为弧度。'
 
@@ -65,14 +77,27 @@ description = [[
 [randomseed]
 description = '把 `x` 设为伪随机数发生器的“种子”： 相同的种子产生相同的随机数列。'
 
+["randomseed Lua 5.4"]
+description = [[
+* `math.randomseed(x, y)`: 将 `x` 与 `y` 连接为128位的种子来重新初始化伪随机生成器。
+* `math.randomseed(x)`: 等同于 `math.randomseed(x, 0)` 。
+* `math.randomseed()`: Generates a seed with a weak attempt for randomness.
+]]
+
 [sin]
 description = '返回 `x` 的正弦值（假定参数是弧度）。'
+
+[sinh]
+description = '返回 `x` 的双曲正弦值（假定参数是弧度）。'
 
 [sqrt]
 description = '返回 `x` 的平方根。'
 
 [tan]
 description = '返回 `x` 的正切值（假定参数是弧度）。'
+
+[tanh]
+description = '返回 `x` 的双曲正切值（假定参数是弧度）。'
 
 [tointeger]
 description = '如果 `x` 可以转换为一个整数， 返回该整数。'

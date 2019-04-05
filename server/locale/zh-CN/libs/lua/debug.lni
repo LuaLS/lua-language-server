@@ -50,6 +50,9 @@ description = '返回函数 `f` 的第 `up` 个上值的名字和值。'
 [getuservalue]
 description = '返回关联在 `u` 上的 `Lua` 值。'
 
+["getuservalue Lua 5.4"]
+description = '返回关联在 `u` 上的第 `n` 个 `Lua` 值，以及一个布尔，`false`表示值不存在。'
+
 [sethook]
 description = '将一个函数作为钩子函数设入。'
 [[.enums]]
@@ -73,6 +76,10 @@ description = '将 `value` 的元表设为 `table` （可以是 `nil`）。'
 
 [setupvalue]
 description = '将 `value` 设为函数 `f` 的第 `up` 个上值。'
+
+["setuservalue Lua 5.4"]
+description = '将 `value` 设为 `udata` 的第 `n` 个关联值。'
+值。'
 
 [setuservalue]
 description = '将 `value` 设为 `udata` 的关联值。'

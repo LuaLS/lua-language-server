@@ -37,8 +37,14 @@ description = '返回不大于 `x` 的最大整数值。'
 [fmod]
 description = '返回 `x` 除以 `y`，将商向零圆整后的余数。'
 
+[frexp]
+description = '将 `x` 分解为尾数与指数，返回值符合 `x = m * (2 ^ e)` 。`e` 是一个整数，`m` 是 [0.5, 1) 之间的规格化小数 (`x` 为0时 `m` 为0)。'
+
 [huge]
 description = '一个比任何数字值都大的浮点数。'
+
+[ldexp]
+description = '返回 `m * (2 ^ e)` 。'
 
 [log]
 description = '返回以指定底的 `x` 的对数。'

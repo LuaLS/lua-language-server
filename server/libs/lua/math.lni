@@ -129,7 +129,30 @@ type = 'number'
 [[.returns]]
 type = 'number'
 
+[frexp]
+version = {'Lua 5.1', 'Lua 5.2'}
+[[.args]]
+name = 'x'
+type = 'number'
+[[.returns]]
+name = 'm'
+type = 'number'
+``````````
+name = 'e'
+type = 'number'
+
 [huge]
+type = 'number'
+
+[ldexp]
+version = {'Lua 5.1', 'Lua 5.2'}
+[[.args]]
+name = 'm'
+type = 'number'
+``````````
+name = 'e'
+type = 'integer'
+[[.returns]]
 type = 'number'
 
 [log]

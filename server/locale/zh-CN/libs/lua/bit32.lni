@@ -1,0 +1,55 @@
+[arshift]
+description = [[
+返回 `x` 向右位移 `disp` 位的结果。`disp` 为负时向左位移。这是算数位移操作，左侧的空位使用 `x` 的高位填充，右侧空位使用 `0` 填充。
+]]
+
+[band]
+description = '返回参数按位与的结果。'
+
+[bnot]
+description = [[
+返回 `x` 按位取反的结果。
+
+```lua
+assert(bit32.bnot(x) == (-1 - x) % 2^32)
+```
+]]
+
+[bor]
+description = '返回参数按位或的结果。'
+
+[btest]
+description = '参数按位与的结果不为0时，返回 `true` 。'
+
+[bxor]
+description = '返回参数按位异或的结果。'
+
+[extract]
+description = '返回 `n` 中第 `field` 到第 `field + width - 1` 位组成的结果。'
+
+[replace]
+description = '返回 `v` 的第 `field` 到第 `field + width - 1` 位替换 `n` 的对应位后的结果。'
+
+[lrotate]
+description = '返回 `x` 向左旋转 `disp` 位的结果。`disp` 为负时向右旋转。'
+
+[lshift]
+description = [[
+返回 `x` 向左位移 `disp` 位的结果。`disp` 为负时向右位移。空位总是使用 `0` 填充。
+
+```lua
+assert(bit32.lshift(b, disp) == (b * 2^disp) % 2^32)
+```
+]]
+
+[rrotate]
+description = '返回 `x` 向右旋转 `disp` 位的结果。`disp` 为负时向左旋转。'
+
+[rshift]
+description = [[
+返回 `x` 向右位移 `disp` 位的结果。`disp` 为负时向左位移。空位总是使用 `0` 填充。
+
+```lua
+assert(bit32.lshift(b, disp) == (b * 2^disp) % 2^32)
+```
+]]

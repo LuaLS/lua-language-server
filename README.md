@@ -30,11 +30,9 @@
 
 Please [help me][en-US] improve the quality of `en-US`.
 
-API描述的中文翻译来自[云风](https://cloudwu.github.io/lua53doc/manual.html)。
-
 [en-US]: https://github.com/sumneko/vscode-lua-language-server/tree/master/server/locale/en-US
 
-## preview
+## Preview
 
 ### Goto Definition
 
@@ -64,10 +62,20 @@ API描述的中文翻译来自[云风](https://cloudwu.github.io/lua53doc/manual
 
 ![avatar](https://github.com/sumneko/lua-language-server/raw/master/images/Signature%20Help.gif)
 
-## library
+## Library
 
 You can add your library at [here][libs] by `Pull Requests`.
 
 你可以通过`Pull Requests`在[这里][libs]添加自己的函数库。
 
 [libs]: https://github.com/sumneko/vscode-lua-language-server/tree/master/server/libs
+
+## Credit
+[bee](https://github.com/actboy168/bee.lua)
+[luamake](https://github.com/actboy168/luamake)
+[lni](https://github.com/actboy168/lni)
+[lpeglabel](https://github.com/sqmedeiros/lpeglabel)
+[rcedit](https://github.com/electron/rcedit)
+[ScreenToGif](https://github.com/NickeManarin/ScreenToGif)
+[lsp-sample-client](https://github.com/Microsoft/vscode-extension-samples)
+[Lua 5.3 中文翻译](https://cloudwu.github.io/lua53doc/manual.html)

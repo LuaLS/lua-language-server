@@ -13,7 +13,8 @@
 	"publisher": "sumneko",
 	"categories": [
 		"Linters",
-		"Programming Languages"
+		"Programming Languages",
+		"Snippets"
 	],
 	"keywords": [
 		"Lua",

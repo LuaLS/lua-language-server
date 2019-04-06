@@ -31,6 +31,18 @@ type = 'thread'
 [[.returns]]
 type = 'boolean'
 
+[kill]
+version = 'Lua 5.4'
+[[.args]]
+name = 'co'
+type = 'thread'
+[[.returns]]
+name = 'noerror'
+type = 'boolean'
+`````````
+name = 'errorobject'
+type = 'any'
+
 [resume]
 [[.args]]
 name = 'co'

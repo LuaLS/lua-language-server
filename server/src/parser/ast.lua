@@ -295,6 +295,14 @@ local Defs = {
         return string_char(tonumber(char, 16))
     end,
     CharUtf8 = function (pos, char)
+        if State.Version ~= 'Lua 5.3' and State.Version ~= 'Lua 5.4' then
+            pushError {
+                type = 'ERR_ESC',
+                start = pos-3,
+                finish = pos-2,
+            }
+            return char
+        end
         if #char == 0 then
             pushError {
                 type = 'UTF8_SMALL',

@@ -4,6 +4,9 @@ description = '创建一个主体函数为 `f` 的新协程。'
 [isyieldable]
 description = '如果正在运行的协程可以让出，则返回真。'
 
+[kill]
+description = '杀死协程 `co`，关闭它所有等待 *to-be-closed* 的变量，并将协程状态设为 `dead` 。'
+
 [resume]
 description = '开始或继续协程 `co` 的运行。'
 

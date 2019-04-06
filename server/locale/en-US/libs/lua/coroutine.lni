@@ -4,6 +4,10 @@ description = 'Creates a new coroutine.'
 [isyieldable]
 description = 'Returns true when the running coroutine can yield.'
 
+[kill]
+description = 'Kills coroutine `co` ,
+closing all its pending to-be-closed variables and putting the coroutine in a dead state.'
+
 [resume]
 description = 'Starts or continues the execution of coroutine `co`.'
 

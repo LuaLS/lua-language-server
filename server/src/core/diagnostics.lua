@@ -308,15 +308,13 @@ function mt:searchUndefinedEnvChild(callback)
         if parent:get 'ENV' then
             return
         end
-        local ok = parent:eachInfo(function (info)
-            if info.type == 'set child' and info[1] == name then
-                return true
-            end
-        end)
-        if ok then
+        local value = source:bindValue()
+        if not value then
             return
         end
-        callback(source.start, source.finish, name)
+        if value:getSource() == source then
+            callback(source.start, source.finish, name)
+        end
         return
     end)
 end
@@ -400,10 +398,17 @@ return function (vm, lines, uri)
     end)
     -- 未定义的变量（重载了 `_ENV`）
     session:doDiagnostics(session.searchUndefinedEnvChild, 'undefined-env-child', function (key)
-        return {
-            level   = DiagnosticSeverity.Information,
-            message = lang.script('DIAG_UNDEF_ENV_CHILD', key),
-        }
+        if vm.envType == '_ENV' then
+            return {
+                level   = DiagnosticSeverity.Information,
+                message = lang.script('DIAG_UNDEF_ENV_CHILD', key),
+            }
+        else
+            return {
+                level   = DiagnosticSeverity.Information,
+                message = lang.script('DIAG_UNDEF_FENV_CHILD', key),
+            }
+        end
     end)
     return session.datas
 end

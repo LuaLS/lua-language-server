@@ -24,3 +24,6 @@ description = 'A table used by `require` to control how to load modules.'
 
 [searchpath]
 description = 'Searches for the given `name` in the given `path`.'
+
+[seeall]
+describing = 'Sets a metatable for `module` with its `__index` field referring to the global environment, so that this module inherits values from the global environment. To be used as an option to function `module` .

@@ -24,3 +24,6 @@ description = '用于 `require` 控制如何加载模块的表。'
 
 [searchpath]
 description = '在指定 `path` 中搜索指定的 `name` 。'
+
+[seeall]
+description = '给 `module` 设置一个元表，该元表的 `__index` 域为全局环境，这样模块便会继承全局环境的值。可作为 `module` 函数的选项。'

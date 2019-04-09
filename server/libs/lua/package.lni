@@ -67,3 +67,10 @@ default = '.'
 name = 'rep'
 type = 'string'
 optional = 'self'
+
+[seeall]
+version = 'Lua 5.1'
+special = seeall
+[[.args]]
+name = module
+type = table

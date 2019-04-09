@@ -50,10 +50,10 @@ description = '返回 `m * (2 ^ e)` 。'
 description = '返回以指定底的 `x` 的对数。'
 
 ['log Lua 5.1']
-description = '返回 `x` 的自然对数。`
+description = '返回 `x` 的自然对数。'
 
 [log10]
-description = '返回 `x` 的以10为底的对数。
+description = '返回 `x` 的以10为底的对数。'
 
 [max]
 description = '返回参数中最大的值， 大小由 Lua 操作 `<` 决定。'

@@ -294,6 +294,7 @@ type = 'string'
 
 [module]
 version = 'Lua 5.1'
+special = 'module'
 [[.args]]
 name = name
 type = string

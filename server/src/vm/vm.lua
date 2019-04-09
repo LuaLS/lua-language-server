@@ -7,12 +7,13 @@ local sourceMgr = require 'vm.source'
 local buildGlobal = require 'vm.global'
 local createMulti = require 'vm.multi'
 local libraryBuilder = require 'vm.library'
+local config = require 'config'
+local mt = require 'vm.manager'
+
+require 'vm.module'
 
 -- TODO source测试
 --rawset(_G, 'CachedSource', setmetatable({}, { __mode = 'kv' }))
-
-local mt = {}
-mt.__index = mt
 
 function mt:getDefaultSource()
     return self:instantSource {
@@ -272,6 +273,10 @@ function mt:callLibrary(func, values, source, lib)
             self:callLoadFile(func, values)
         elseif lib.special == 'dofile' then
             self:callDoFile(func, values)
+        elseif lib.special == 'module' then
+            self:callModuel(func, values)
+        elseif lib.special == 'seeall' then
+            self:callSeeAll(func, values)
         end
     end
 end
@@ -324,7 +329,12 @@ function mt:getName(name, source)
     if global then
         return global
     end
-    local ENV = self:loadLocal('_ENV')
+    local ENV
+    if self.envType == '_ENV' then
+        ENV = self:loadLocal('_ENV')
+    else
+        ENV = self:loadLocal('@ENV')
+    end
     local ENVValue = ENV:getValue()
     ENVValue:addInfo('get child', source, name)
     global = ENVValue:getChild(name, source)
@@ -351,7 +361,12 @@ function mt:setName(name, source, value)
     if global then
         return global
     end
-    local ENV = self:loadLocal('_ENV')
+    local ENV
+    if self.envType == '_ENV' then
+        ENV = self:loadLocal('_ENV')
+    else
+        ENV = self:loadLocal('@ENV')
+    end
     local ENVValue = ENV:getValue()
     source:bindValue(value, 'set')
     ENVValue:setChild(name, value, source)
@@ -1120,8 +1135,15 @@ function mt:createEnvironment(ast)
     end
     -- 全局变量`_G`
     local global = buildGlobal(self.lsp)
-    -- 隐藏的上值`_ENV`
-    local env = self:createLocal('_ENV', self:getDefaultSource(), global)
+    local env
+    if self.envType == '_ENV' then
+        -- 隐藏的上值`_ENV`
+        env = self:createLocal('_ENV', self:getDefaultSource(), global)
+    else
+        -- 为了实现方便，fenv也使用隐藏上值来实现
+        -- 使用了非法标识符保证用户无法访问
+        env = self:createLocal('@ENV', self:getDefaultSource(), global)
+    end
     env:set('hide', true)
     self.env = env
 end
@@ -1159,9 +1181,14 @@ function mt:remove()
 end
 
 local function compile(vm, ast, lsp, uri)
-
     -- 创建初始环境
     ast.uri = vm.uri
+    -- 根据运行版本决定环境实现方式
+    if config.config.runtime.version == 'Lua 5.1' then
+        vm.envType = 'fenv'
+    else
+        vm.envType = '_ENV'
+    end
     vm:instantSource(ast)
     vm:createEnvironment(ast)
 

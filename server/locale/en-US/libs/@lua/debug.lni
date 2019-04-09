@@ -38,8 +38,42 @@ name = 'what'
 enum = 'L'
 description = '`activelines`'
 
+['getinfo Lua 5.1']
+description = 'Returns a table with information about a function.'
+[[.enums]]
+name = 'what'
+enum = 'n'
+description = '`name` and `namewhat`'
+``````````
+name = 'what'
+enum = 'S'
+description = '`source`, `short_src`, `linedefined`, `lastlinedefined`, and `what`'
+``````````
+name = 'what'
+enum = 'l'
+description = '`currentline`'
+``````````
+name = 'what'
+enum = 't'
+description = '`istailcall`'
+``````````
+name = 'what'
+enum = 'u'
+description = '`nups`'
+``````````
+name = 'what'
+enum = 'f'
+description = '`func`'
+``````````
+name = 'what'
+enum = 'L'
+description = '`activelines`'
+
 [getlocal]
 description = 'Returns the name and the value of the local variable with index `local` of the function at level `f` of the stack.'
+
+['getlocal Lua 5.1']
+description = 'Returns the name and the value of the local variable with index `local` of the function at level `level` of the stack.'
 
 [getmetatable]
 description = 'Returns the metatable of the given value.'

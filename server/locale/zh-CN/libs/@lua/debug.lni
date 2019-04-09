@@ -38,8 +38,42 @@ name = 'what'
 enum = 'L'
 description = '`activelines`'
 
+['getinfo Lua 5.1']
+description = '返回关于一个函数信息的表。'
+[[.enums]]
+name = 'what'
+enum = 'n'
+description = '`name` 和 `namewhat`'
+``````````
+name = 'what'
+enum = 'S'
+description = '`source`，`short_src`，`linedefined`，`lastlinedefined`，和 `what`'
+``````````
+name = 'what'
+enum = 'l'
+description = '`currentline`'
+``````````
+name = 'what'
+enum = 't'
+description = '`istailcall`'
+``````````
+name = 'what'
+enum = 'u'
+description = '`nups`'
+``````````
+name = 'what'
+enum = 'f'
+description = '`func`'
+``````````
+name = 'what'
+enum = 'L'
+description = '`activelines`'
+
 [getlocal]
-description = '返回在栈的 `f` 层处函数的索引为 `local` 的局部变量 的名字和值。'
+description = '返回在栈的 `f` 层处函数的索引为 `local` 的局部变量的名字和值。'
+
+['getlocal Lua 5.1']
+description = '返回在栈的 `level` 层处函数的索引为 `local` 的局部变量的名字和值。'
 
 [getmetatable]
 description = '返回给定 `value` 的元表。'

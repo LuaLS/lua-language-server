@@ -39,10 +39,6 @@ enum = '*l'
 description = 'Reads the next line skipping the end of line.'
 ``````````
 name = 'mode'
-enum = '*L'
-description = 'Reads the next line keeping the end of line.'
-``````````
-name = 'mode'
 code = 'number'
 description = 'Reads a string with up to this number of bytes.'
 
@@ -70,6 +66,36 @@ description = 'Reads the next line skipping the end of line.'
 ``````````
 name = 'mode'
 enum = 'L'
+description = 'Reads the next line keeping the end of line.'
+``````````
+name = 'mode'
+code = 'number'
+description = 'Reads a string with up to this number of bytes.'
+
+["lines LuaJIT"]
+description = [[
+------
+```lua
+for c in io.lines(filename, ...) do
+    body
+end
+```
+]]
+[[.enums]]
+name = 'mode'
+enum = '*n'
+description = 'Reads a numeral and returns it as number.'
+``````````
+name = 'mode'
+enum = '*a'
+description = 'Reads the whole file.'
+``````````
+name = 'mode'
+enum = '*l'
+description = 'Reads the next line skipping the end of line.'
+``````````
+name = 'mode'
+enum = '*L'
 description = 'Reads the next line keeping the end of line.'
 ``````````
 name = 'mode'
@@ -133,10 +159,6 @@ enum = '*l'
 description = 'Reads the next line skipping the end of line.'
 ``````````
 name = 'mode'
-enum = '*L'
-description = 'Reads the next line keeping the end of line.'
-``````````
-name = 'mode'
 code = 'number'
 description = 'Reads a string with up to this number of bytes.'
 
@@ -157,6 +179,29 @@ description = 'Reads the next line skipping the end of line.'
 ``````````
 name = 'mode'
 enum = 'L'
+description = 'Reads the next line keeping the end of line.'
+``````````
+name = 'mode'
+code = 'number'
+description = 'Reads a string with up to this number of bytes.'
+
+["read LuaJIT"]
+description = 'Reads the `file`, according to the given formats, which specify what to read.'
+[[.enums]]
+name = 'mode'
+enum = '*n'
+description = 'Reads a numeral and returns it as number.'
+``````````
+name = 'mode'
+enum = '*a'
+description = 'Reads the whole file.'
+``````````
+name = 'mode'
+enum = '*l'
+description = 'Reads the next line skipping the end of line.'
+``````````
+name = 'mode'
+enum = '*L'
 description = 'Reads the next line keeping the end of line.'
 ``````````
 name = 'mode'

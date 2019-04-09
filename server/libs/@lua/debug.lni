@@ -23,7 +23,7 @@ parent = {
 name = 'debug'
 
 [getfenv]
-version = 'Lua 5.1'
+version = {'Lua 5.1', 'LuaJIT'}
 [[.args]]
 name = o
 [[.returns]]
@@ -79,6 +79,10 @@ enum = 'f'
 name = 'what'
 enum = 'L'
 
+['getinfo Lua 5.1':getinfo]
+name = 'getinfo'
+version = 'Lua 5.1'
+
 [getlocal]
 [[.args]]
 type = 'thread'
@@ -86,6 +90,17 @@ optional = 'self'
 ``````````
 name = 'f'
 type = {'integer', 'function'}
+``````````
+name = 'local'
+type = 'integer'
+
+['getlocal Lua 5.1']
+[[.args]]
+type = 'thread'
+optional = 'self'
+``````````
+name = 'level'
+type = integer'
 ``````````
 name = 'local'
 type = 'integer'
@@ -135,7 +150,7 @@ type = 'any'
 type = 'boolean'
 
 [setfenv]
-version = 'Lua 5.1'
+version = {'Lua 5.1', 'LuaJIT'}
 [[.args]]
 name = 'object'
 ``````````
@@ -244,6 +259,7 @@ default = 1
 name = 'message'
 
 [upvalueid]
+version = {'Lua 5.2', 'Lua 5.3', 'Lua 5.4', 'LuaJIT'}
 [[.args]]
 name = 'f'
 type = 'function'
@@ -255,6 +271,7 @@ name = 'id'
 type = 'userdata'
 
 [upvaluejoin]
+version = {'Lua 5.2', 'Lua 5.3', 'Lua 5.4', 'LuaJIT'}
 [[.args]]
 name = 'f1'
 type = 'function'

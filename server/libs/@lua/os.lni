@@ -70,7 +70,7 @@ enum = 'signal'
 
 ['execute Lua 5.1']
 name = 'execute'
-version = 'Lua 5.1'
+version = {'Lua 5.1', 'LuaJIT'}
 [[.args]]
 name = 'command'
 type = 'string'
@@ -89,6 +89,15 @@ default = true
 name = 'close'
 type = 'boolean'
 optional = 'self'
+
+['exit Lua 5.1']
+name = 'exit'
+version = 'Lua 5.1'
+[[.args]]
+name = 'code'
+type = 'integer'
+optional = 'after'
+default = 0
 
 [getenv]
 [[.args]]

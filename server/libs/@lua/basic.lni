@@ -111,7 +111,7 @@ optional = 'self'
 type = 'table'
 
 [getfenv]
-version = 'Lua 5.1'
+version = {'Lua 5.1', 'LuaJIT'}
 [[.args]]
 name = f
 type = function
@@ -201,7 +201,7 @@ default = true
 
 ['load Lua 5.1']
 name = 'load'
-version = {'Lua 5.1'}
+version = 'Lua 5.1'
 [[.args]]
 name = 'func'
 type = 'function'
@@ -274,7 +274,7 @@ name = 'error_message'
 type = 'string'
 
 [loadstring]
-version = 'Lua 5.1'
+version = {'Lua 5.1', 'LuaJIT'}
 [[.args]]
 type = string
 `````````
@@ -293,7 +293,7 @@ name = 'error_message'
 type = 'string'
 
 [module]
-version = 'Lua 5.1'
+version = {'Lua 5.1', 'LuaJIT'}
 special = 'module'
 [[.args]]
 name = name
@@ -419,7 +419,7 @@ name = 'index'
 code = 'integer'
 
 [setfenv]
-version = 'Lua 5.1'
+version = {'Lua 5.1', 'LuaJIT'}
 [[.args]]
 name = f
 type = function/integer
@@ -488,7 +488,7 @@ name = 'type'
 enum = 'userdata'
 
 ["_VERSION Lua 5.1"]
-version = 'Lua 5.1'
+version = {'Lua 5.1', 'LuaJIT'}
 name = '_VERSION'
 type = 'string'
 value = 'Lua 5.1'
@@ -549,7 +549,7 @@ type = 'string'
 [[.returns]]
 
 [unpack]
-version = {'Lua 5.1'}
+version = {'Lua 5.1', 'LuaJIT'}
 [[.args]]
 name = 'list'
 type = 'table'

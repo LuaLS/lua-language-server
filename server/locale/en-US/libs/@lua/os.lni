@@ -16,6 +16,9 @@ description = 'Passes `command` to be executed by an operating system shell.'
 [exit]
 description = 'Calls the ISO C function `exit` to terminate the host program.'
 
+['exit Lua 5.1']
+description = 'Calls the C function `exit` to terminate the host program.'
+
 [getenv]
 description = 'Returns the value of the process environment variable `varname`.'
 

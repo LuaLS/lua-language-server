@@ -42,7 +42,8 @@
 						"Lua 5.1",
 						"Lua 5.2",
 						"Lua 5.3",
-						"Lua 5.4"
+						"Lua 5.4",
+						"LuaJIT"
 					],
 					"description": "Lua runtime version.\nLua运行版本。"
 				},

@@ -29,7 +29,7 @@ type = 'string'
 type = 'table'
 
 [loaders]
-version = {'Lua 5.1'}
+version = {'Lua 5.1', 'LuaJIT'}
 type = 'table'
 
 [loadlib]
@@ -52,6 +52,7 @@ version = {'Lua 5.2', 'Lua 5.3', 'Lua 5.4'}
 type = 'table'
 
 [searchpath]
+version = {'Lua 5.2', 'Lua 5.3', 'Lua 5.4', 'LuaJIT'}
 [[.args]]
 name = 'name'
 type = 'string'
@@ -69,7 +70,7 @@ type = 'string'
 optional = 'self'
 
 [seeall]
-version = 'Lua 5.1'
+version = {'Lua 5.1', 'LuaJIT'}
 special = seeall
 [[.args]]
 name = module

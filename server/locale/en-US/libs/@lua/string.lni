@@ -56,6 +56,9 @@ description = 'Returns the size of a string resulting from `string.pack` with th
 [rep]
 description = 'Returns a string that is the concatenation of `n` copies of the string `s` separated by the string `sep`.'
 
+['rep Lua 5.1']
+description = 'Returns a string that is the concatenation of `n` copies of the string `s` .'
+
 [reverse]
 description = 'Returns a string that is the string `s` reversed.'
 

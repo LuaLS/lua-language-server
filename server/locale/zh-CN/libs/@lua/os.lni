@@ -16,6 +16,9 @@ description = '调用系统解释器执行 `command`。'
 [exit]
 description = '调用 ISO C 函数 `exit` 终止宿主程序。'
 
+['exit Lua 5.1']
+description = '调用 C 函数 `exit` 终止宿主程序。'
+
 [getenv]
 description = '返回进程环境变量 `varname` 的值。'
 

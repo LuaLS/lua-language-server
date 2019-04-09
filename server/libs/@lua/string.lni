@@ -219,6 +219,17 @@ default = ''
 [[.returns]]
 type = 'string'
 
+['rep Lua 5.1']
+name = rep
+version = 'Lua 5.1'
+[[.args]]
+type = 'string'
+``````````
+name = n
+type = 'integer'
+[[.returns]]
+type = 'string'
+
 [reverse]
 [[.args]]
 type = 'string'

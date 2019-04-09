@@ -5,9 +5,7 @@
 ## Feature
 
 - [x] Goto Definition
-- [x] Goto Implementation
 - [x] Find All References
-- [x] Type Inference
 - [x] Hover
 - [x] Diagnostics
 - [x] Rename
@@ -15,9 +13,7 @@
 - [x] IntelliSense
 - [x] Signature Help
 - [x] Document Symbols
-- [x] Support Dirty Script
 - [x] Syntax Check
-- [x] Search Globals
 - [x] Highlight
 - [x] Code Action
 - [ ] Multi Workspace
@@ -62,13 +58,20 @@ Please [help me][en-US] improve the quality of `en-US`.
 
 ![avatar](https://github.com/sumneko/lua-language-server/raw/master/images/Signature%20Help.gif)
 
-## Library
+## Version
 
-You can add your library at [here][libs] by `Pull Requests`.
+- [x] Lua 5.1
+- [x] Lua 5.2
+- [x] Lua 5.3
+- [x] Lua 5.4
+- [ ] LuaJIT
 
-你可以通过`Pull Requests`在[这里][libs]添加自己的函数库。
+If you find any mistakes, please [tell me][issues] or use [Pull Requests][@lua] to fix them directly.
 
-[libs]: https://github.com/sumneko/vscode-lua-language-server/tree/master/server/libs
+如果你发现了任何错误，请[告诉我][issues]或使用[Pull Requests][@lua]来直接修复。
+
+[issues]: https://github.com/sumneko/lua-language-server/issues
+[@lua]: https://github.com/sumneko/lua-language-server/tree/master/server/libs/%40lua
 
 ## Credit
 * [bee.lua](https://github.com/actboy168/bee.lua)
@@ -79,3 +82,8 @@ You can add your library at [here][libs] by `Pull Requests`.
 * [ScreenToGif](https://github.com/NickeManarin/ScreenToGif)
 * [lsp-sample-client](https://github.com/Microsoft/vscode-extension-samples)
 * [Lua 5.3 中文翻译](https://cloudwu.github.io/lua53doc/manual.html)
+
+## Acknowledgement
+* [actboy168](https://github.com/actboy168)
+* [Dmitry Sannikov](https://github.com/dasannikov)
+* [Jayden Charbonneau](https://github.com/Reshiram110)

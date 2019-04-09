@@ -224,7 +224,10 @@ The default for `tocont` is false.
 ]]
 
 [xpcall]
-description = 'Calls function f with the given arguments in protected mode with a new message handler.'
+description = 'Calls function `f` with the given arguments in protected mode with a new message handler.'
+
+['xpcall Lua 5.1']
+description = 'Calls function `f` in protected mode with a new message handler.'
 
 [require]
 description = 'Loads the given module.'

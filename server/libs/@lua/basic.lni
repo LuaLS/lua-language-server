@@ -541,6 +541,23 @@ name = 'result'
 ``````````
 type = '...'
 
+['xpcall Lua 5.1']
+name = 'xpcall'
+version = 'Lua 5.1'
+[[.args]]
+name = 'f'
+type = 'function'
+``````````
+name = 'err'
+type = 'function'
+[[.returns]]
+name = 'success'
+type = 'boolean'
+``````````
+name = 'result'
+``````````
+type = '...'
+
 [require]
 special = 'require'
 [[.args]]

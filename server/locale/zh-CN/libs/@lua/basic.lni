@@ -221,6 +221,9 @@ description = '以给定消息发出一个警告。当`tocont`为 true 时，应
 [xpcall]
 description = '传入参数并设置一个消息处理器 `msgh`，以 *保护模式* 调用函数 `f` 。'
 
+['xpcall Lua 5.1']
+description = '设置一个消息处理器 `err`，以 *保护模式* 调用函数 `f` 。'
+
 [require]
 description = '加载一个模块。'
 

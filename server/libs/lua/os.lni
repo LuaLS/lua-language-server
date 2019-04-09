@@ -60,12 +60,24 @@ name = 'type'
 type = 'string'
 ``````````
 name = 'code'
+type = 'integer'
 [[.enums]]
 type = 'type'
 enum = 'exit'
 ``````````
 type = 'type'
 enum = 'signal'
+
+['execute Lua 5.1']
+name = 'execute'
+version = 'Lua 5.1'
+[[.args]]
+name = 'command'
+type = 'string'
+optional = 'self'
+[[.returns]]
+name = 'code'
+type = 'integer'
 
 [exit]
 [[.args]]

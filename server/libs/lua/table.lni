@@ -52,6 +52,13 @@ optional = 'self'
 name = 'value'
 type = 'any'
 
+[maxn]
+version = {'Lua 5.1'}
+[[.args]]
+type = table
+[[.returns]]
+type = integer
+
 [move]
 version = {'Lua 5.3', 'Lua 5.4'}
 [[.args]]
@@ -75,6 +82,7 @@ name = 'a2'
 type = 'table'
 
 [pack]
+version = {'Lua 5.2', 'Lua 5.3', 'Lua 5.4'}
 [[.args]]
 type = '...'
 [[.returns]]
@@ -100,6 +108,7 @@ type = 'function'
 optional = 'self'
 
 [unpack]
+version = {'Lua 5.2', 'Lua 5.3', 'Lua 5.4'}
 [[.args]]
 name = 'list'
 type = 'table'

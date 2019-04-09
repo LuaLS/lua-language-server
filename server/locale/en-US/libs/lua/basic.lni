@@ -228,3 +228,11 @@ description = 'Calls function f with the given arguments in protected mode with 
 
 [require]
 description = 'Loads the given module.'
+
+[unpack]
+description = [[
+-------
+```lua
+return list[i], list[i+1], ···, list[j]
+```
+]]

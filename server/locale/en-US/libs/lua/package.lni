@@ -7,6 +7,9 @@ description = 'The path used by `require` to search for a C loader.'
 [loaded]
 description = 'A table used by `require` to control which modules are already loaded.'
 
+[loaders]
+description = 'A table used by `require` to control how to load modules.'
+
 [loadlib]
 description = 'Dynamically links the host program with the C library `libname`.'
 

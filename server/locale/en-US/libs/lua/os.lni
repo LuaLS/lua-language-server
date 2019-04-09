@@ -10,6 +10,9 @@ description = 'Returns the difference, in seconds, from time `t1` to time `t2`.'
 [execute]
 description = 'Passes `command` to be executed by an operating system shell.'
 
+['execute Lua 5.1']
+description = 'Passes `command` to be executed by an operating system shell.'
+
 [exit]
 description = 'Calls the ISO C function `exit` to terminate the host program.'
 

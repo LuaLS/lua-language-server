@@ -223,3 +223,11 @@ description = '传入参数并设置一个消息处理器 `msgh`，以 *保护�
 
 [require]
 description = '加载一个模块。'
+
+[unpack]
+description = [[
+-------
+```lua
+return list[i], list[i+1], ···, list[j]
+```
+]]

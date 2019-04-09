@@ -9,6 +9,9 @@ return list[i]..sep..list[i+1] ··· sep..list[j]
 [insert]
 description = '在 `list` 的位置 `pos` 处插入元素 `value`。'
 
+[maxn]
+description = '返回给定表的最大正数索引，如果表没有正数索引，则返回零。'
+
 [move]
 description = [[
 将元素从表 `a1` 移到表 `a2`。

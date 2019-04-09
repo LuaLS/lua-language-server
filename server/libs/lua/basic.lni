@@ -544,3 +544,18 @@ special = 'require'
 name = 'modname'
 type = 'string'
 [[.returns]]
+
+[unpack]
+version = {'Lua 5.1'}
+[[.args]]
+name = 'list'
+type = 'table'
+``````````
+name = 'i'
+type = 'integer'
+optional = 'after'
+type = 1
+``````````
+name = 'j'
+type = 'integer'
+optional = 'self'

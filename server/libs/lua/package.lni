@@ -28,6 +28,10 @@ type = 'string'
 [loaded]
 type = 'table'
 
+[loaders]
+version = {'Lua 5.1'}
+type = 'table'
+
 [loadlib]
 [[.args]]
 name = 'libname'
@@ -44,6 +48,7 @@ type = 'string'
 type = 'table'
 
 [searchers]
+version = {'Lua 5.2', 'Lua 5.3', 'Lua 5.4'}
 type = 'table'
 
 [searchpath]

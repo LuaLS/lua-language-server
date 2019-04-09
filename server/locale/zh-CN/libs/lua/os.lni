@@ -10,6 +10,9 @@ description = '返回以秒计算的时刻 `t1` 到 `t2` 的差值。'
 [execute]
 description = '调用系统解释器执行 `command`。'
 
+['execute Lua 5.1']
+description = '调用系统解释器执行 `command`。'
+
 [exit]
 description = '调用 ISO C 函数 `exit` 终止宿主程序。'
 

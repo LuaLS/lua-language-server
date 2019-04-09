@@ -19,6 +19,7 @@ local function pushError(err)
     Errs[#Errs+1] = err
 end
 
+-- goto 单独处理
 local RESERVED = {
     ['and']      = true,
     ['break']    = true,
@@ -29,7 +30,6 @@ local RESERVED = {
     ['false']    = true,
     ['for']      = true,
     ['function'] = true,
-    ['goto']     = true,
     ['if']       = true,
     ['in']       = true,
     ['local']    = true,
@@ -291,7 +291,15 @@ local Defs = {
         end
         return string_char(char)
     end,
-    Char16 = function (char)
+    Char16 = function (pos, char)
+        if State.Version == 'Lua 5.1' then
+            pushError {
+                type = 'ERR_ESC',
+                start = pos-1,
+                finish = pos,
+            }
+            return ''
+        end
         return string_char(tonumber(char, 16))
     end,
     CharUtf8 = function (pos, char)
@@ -379,7 +387,15 @@ local Defs = {
         end
     end,
     Name = function (start, str, finish)
+        local isKeyWord
         if RESERVED[str] then
+            isKeyWord = true
+        elseif str == 'goto' then
+            if State.Version ~= 'Lua 5.1' and State.Version ~= 'LuaJIT' then
+                isKeyWord = true
+            end
+        end
+        if isKeyWord then
             pushError {
                 type = 'KEYWORD',
                 start = start,
@@ -786,18 +802,40 @@ local Defs = {
         action.finish = finish - 1
         return action
     end,
-    Break = function (finish)
+    Break = function (finish, ...)
         if State.Break > 0 then
-            return {
+            local breakChunk = {
                 type = 'break',
             }
+            if not ... then
+                return breakChunk
+            end
+            local action = select(-1, ...)
+            if not action then
+                return breakChunk
+            end
+            if State.Version == 'Lua 5.1' or State.Version == 'LuaJIT' then
+                pushError {
+                    type = 'ACTION_AFTER_BREAK',
+                    start = finish - #'break',
+                    finish = finish - 1,
+                }
+            end
+            return breakChunk, action
         else
             pushError {
                 type = 'BREAK_OUTSIDE',
                 start = finish - #'break',
                 finish = finish - 1,
             }
-            return false
+            if not ... then
+                return false
+            end
+            local action = select(-1, ...)
+            if not action then
+                return false
+            end
+            return action
         end
     end,
     BreakStart = function ()
@@ -830,7 +868,19 @@ local Defs = {
         end
         return exp
     end,
-    Label = function (name)
+    Label = function (start, name, finish)
+        if State.Version == 'Lua 5.1' then
+            pushError {
+                type = 'UNSUPPORT_SYMBOL',
+                start = start,
+                finish = finish - 1,
+                version = {'Lua 5.2', 'Lua 5.3', 'Lua 5.4', 'LuaJIT'},
+                info = {
+                    version = State.Version,
+                }
+            }
+            return false
+        end
         name.type = 'label'
         local labels = State.Label[#State.Label]
         local str = name[1]
@@ -849,7 +899,19 @@ local Defs = {
         end
         return name
     end,
-    GoTo = function (name)
+    GoTo = function (start, name, finish)
+        if State.Version == 'Lua 5.1' then
+            pushError {
+                type = 'UNSUPPORT_SYMBOL',
+                start = start,
+                finish = finish - 1,
+                version = {'Lua 5.2', 'Lua 5.3', 'Lua 5.4', 'LuaJIT'},
+                info = {
+                    version = State.Version,
+                }
+            }
+            return false
+        end
         name.type = 'goto'
         local labels = State.Label[#State.Label]
         labels[#labels+1] = name

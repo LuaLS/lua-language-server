@@ -6,6 +6,7 @@ local scriptBuf = ''
 local compiled = {}
 local parser
 
+-- goto 可以作为名字，合法性之后处理
 local RESERVED = {
     ['and']      = true,
     ['break']    = true,
@@ -16,7 +17,6 @@ local RESERVED = {
     ['false']    = true,
     ['for']      = true,
     ['function'] = true,
-    ['goto']     = true,
     ['if']       = true,
     ['in']       = true,
     ['local']    = true,
@@ -145,7 +145,7 @@ EChar       <-  'a' -> ea
             /   "'"
             /   %nl
             /   ('z' (%nl / %s)*)       -> ''
-            /   ('x' {X16 X16})         -> Char16
+            /   ({} 'x' {X16 X16})      -> Char16
             /   ([0-9] [0-9]? [0-9]?)   -> Char10
             /   ('u{' {} {Word*} '}')   -> CharUtf8
             -- 错误处理
@@ -397,7 +397,9 @@ Do          <-  Sp ({} DO DoBody NeedEnd {})
 DoBody      <-  (!END Action)*
             ->  DoBody
 
-Break       <-  BREAK {} -> Break
+Break       <-  BREAK ({} Semicolon* AfterBreak?)
+            ->  Break
+AfterBreak  <-  Sp !END !UNTIL !ELSEIF !ELSE Action
 BreakStart  <-  {} -> BreakStart
 BreakEnd    <-  {} -> BreakEnd
 
@@ -407,9 +409,9 @@ ReturnBody  <-  Sp ({} RETURN MustExpList? {})
             ->  Return
 AfterReturn <-  Sp !END !UNTIL !ELSEIF !ELSE Action
 
-Label       <-  LABEL MustName -> Label DirtyLabel
+Label       <-  Sp ({} LABEL MustName DirtyLabel {}) -> Label 
 
-GoTo        <-  GOTO MustName -> GoTo
+GoTo        <-  Sp ({} GOTO MustName {}) -> GoTo
 
 If          <-  Sp ({} IfBody {})
             ->  If

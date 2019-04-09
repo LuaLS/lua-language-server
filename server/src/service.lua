@@ -359,7 +359,7 @@ function mt:compileAst(obj)
             log.debug(message)
             rpc:notify('window/showMessage', {
                 type = 3,
-                message = lang.script('PARSER_CRASH', err:match 'grammar%.lua%:%d+%:(.+)' or err),
+                message = lang.script('PARSER_CRASH', err:match '%.lua%:%d+%:(.+)' or err),
             })
             if message:find 'not enough memory' then
                 self:restartDueToMemoryLeak()

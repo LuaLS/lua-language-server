@@ -278,6 +278,20 @@ function mt:callLibrary(func, values, source, lib)
         elseif lib.special == 'seeall' then
             self:callSeeAll(func, values)
         end
+    else
+        -- 如果lib的参数中有function，则立即执行function
+        if lib.args then
+            local args
+            for i = 1, #lib.args do
+                local value = values[i]
+                if value and value:getFunction() then
+                    if not args then
+                        args = createMulti()
+                    end
+                    self:call(value, args, source)
+                end
+            end
+        end
     end
 end
 

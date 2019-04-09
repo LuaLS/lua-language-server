@@ -167,6 +167,23 @@ default = 'e'
 [[.returns]]
 type = 'number'
 
+['log Lua 5.1']
+name = log
+version = {'Lua 5.1'}
+[[.args]]
+name = 'x'
+type = 'number'
+[[.returns]]
+type = 'number'
+
+[log10]
+version = 'Lua 5.1'
+[[.args]]
+name = 'x'
+type = 'number'
+[[.returns]]
+type = 'number'
+
 [max]
 [[.args]]
 name = 'x'

@@ -1,6 +1,9 @@
 ["debug.debug"]
 description = '进入一个用户交互模式，运行用户输入的每个字符串。'
 
+[getfenv]
+description = '返回对象 `o` 的环境。`
+
 [gethook]
 description = '返回三个表示线程钩子设置的值： 当前钩子函数，当前钩子掩码，当前钩子计数 。'
 
@@ -52,6 +55,9 @@ description = '返回关联在 `u` 上的 `Lua` 值。'
 
 ["getuservalue Lua 5.4"]
 description = '返回关联在 `u` 上的第 `n` 个 `Lua` 值，以及一个布尔，`false`表示值不存在。'
+
+[setfenv]
+description = '将 `table` 设置为 `object` 的环境。'
 
 [sethook]
 description = '将一个函数作为钩子函数设入。'

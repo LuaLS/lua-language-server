@@ -1,6 +1,9 @@
 ["debug.debug"]
 description = 'Enters an interactive mode with the user, running each string that the user enters.'
 
+[getfenv]
+description = 'Returns the environment of object `o` .'
+
 [gethook]
 description = 'Returns the current hook settings of the thread.'
 
@@ -56,6 +59,9 @@ Returns the `n`-th user value associated
 to the userdata `u` plus a boolean,
 `false` if the userdata does not have that value.
 ]]
+
+[setfenv]
+description = 'Sets the environment of the given `object` to the given `table` .'
 
 [sethook]
 description = 'Sets the given function as a hook.'

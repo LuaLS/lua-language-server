@@ -89,6 +89,9 @@ description = 'Terminates the last protected function called and returns message
 [_G]
 description = 'Holds the global environment.'
 
+[getfenv]
+description = 'Returns the current environment in use by the function. `f` can be a Lua function or a number that specifies the function at that stack level.'
+
 [getmetatable]
 description = 'Returns the metatable of the given object.'
 
@@ -117,6 +120,9 @@ name = 'mode'
 enum = 'bt'
 description = 'Both binary and text.'
 
+['load Lua 5.1']
+description = 'Loads a chunk using function `func` to get its pieces. Each call to `func` must return a string that concatenates with previous results.'
+
 [loadfile]
 description = 'Loads a chunk from file.'
 [[.enums]]
@@ -131,6 +137,15 @@ description = 'Only text chunks.'
 name = 'mode'
 enum = 'bt'
 description = 'Both binary and text.'
+
+['loadfile Lua 5.1']
+description = 'Loads a chunk from file `filename` or from the standard input, if no file name is given.'
+
+[loadstring]
+description = 'Loads a chunk from the given string.'
+
+[module]
+description = 'Creates a module'
 
 [next]
 description = 'Returns the next index of the table and its associated value.'
@@ -172,6 +187,9 @@ description = 'Returns the total number of extra arguments.'
 name = 'index'
 code = 'integer'
 description = 'Returns all arguments after number `index`.'
+
+[setfenv]
+description = 'Sets the environment to be used by the given function. `f` can be a Lua function or a number that specifies the function at that stack level.'
 
 [setmetatable]
 description = 'Sets the metatable for the given table.'

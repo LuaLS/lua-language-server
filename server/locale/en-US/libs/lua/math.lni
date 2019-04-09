@@ -46,6 +46,12 @@ description = 'A value larger than any other numeric value.'
 [log]
 description = 'Returns the logarithm of `x` in the given base.'
 
+['log Lua 5.1']
+description = 'Returns the natural logarithm of `x` .'
+
+[log10]
+description = 'Returns the base-10 logarithm of x.'
+
 [ldexp]
 description = 'Returns `m * (2 ^ e)` .'
 

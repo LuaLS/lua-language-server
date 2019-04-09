@@ -22,6 +22,13 @@ parent = {
 ["debug.debug"]
 name = 'debug'
 
+[getfenv]
+version = 'Lua 5.1'
+[[.args]]
+name = o
+[[.returns]]
+type = table
+
 [gethook]
 [[.args]]
 type = 'thread'
@@ -126,6 +133,15 @@ type = 'integer'
 type = 'any'
 ``````````
 type = 'boolean'
+
+[setfenv]
+version = 'Lua 5.1'
+[[.args]]
+name = 'object'
+``````````
+type = 'table'
+[[.returns]]
+name = 'object'
 
 [sethook]
 [[.args]]

@@ -89,6 +89,9 @@ description = '中止上一次保护函数调用， 将错误对象 message 返�
 [_G]
 description = '内部储存有全局环境。'
 
+[getfenv]
+description = '返回给定函数的环境。`f` 可以是一个Lua函数，也可是一个表示调用栈层级的数字。'
+
 [getmetatable]
 description = '返回该对象的元表。'
 
@@ -117,6 +120,9 @@ name = 'mode'
 enum = 'bt'
 description = '可以是二进制也可以是文本。'
 
+['load Lua 5.1']
+description = '使用 `func` 分段加载代码块。每次调用 `func` 必须返回一个字符串用于连接前文。'
+
 [loadfile]
 description = '从文件中获取代码块。'
 [[.enums]]
@@ -131,6 +137,15 @@ description = '只能是文本代码块。'
 name = 'mode'
 enum = 'bt'
 description = '可以是二进制也可以是文本。'
+
+['loadfile Lua 5.1']
+description = '从 `filename` 或标准输入中加载代码块。'
+
+[loadstring]
+description = '使用给定字符串加载代码块。'
+
+[module]
+description = '创建一个模块'
 
 [next]
 description = '返回该键的下一个键及其关联的值。'
@@ -172,6 +187,9 @@ description = '返回参数的个数。'
 name = 'index'
 code = 'integer'
 description = '返回参数中第 `index` 个之后的部分。'
+
+[setfenv]
+description = '设置给定函数的环境。 `f` 可以是一个Lua函数，也可是一个表示调用栈层级的数字。'
 
 [setmetatable]
 description = '给指定表设置元表。'

@@ -366,24 +366,66 @@ local Defs = {
     Number = function (start, number, finish)
         local n = tonumber(number)
         if n then
-            return {
+            State.LastNumber = {
                 type   = 'number',
                 start  = start,
                 finish = finish - 1,
                 [1]    = n,
             }
+            return State.LastNumber
         else
             pushError {
                 type   = 'MALFORMED_NUMBER',
                 start  = start,
                 finish = finish - 1,
             }
-            return {
+            State.LastNumber = {
                 type   = 'number',
                 start  = start,
                 finish = finish - 1,
                 [1]    = 0,
             }
+            return State.LastNumber
+        end
+    end,
+    FFINumber = function (start, symbol)
+        if math.type(State.LastNumber[1]) == 'float' then
+            pushError {
+                type = 'UNKNOWN_SYMBOL',
+                start = start,
+                finish = start + #symbol - 1,
+                info = {
+                    symbol = symbol,
+                }
+            }
+            State.LastNumber[1] = 0
+            return
+        end
+        if State.Version ~= 'LuaJIT' then
+            pushError {
+                type = 'UNSUPPORT_SYMBOL',
+                start = start,
+                finish = start + #symbol - 1,
+                version = 'LuaJIT',
+                info = {
+                    version = State.Version,
+                }
+            }
+            State.LastNumber[1] = 0
+        end
+    end,
+    ImaginaryNumber = function (start, symbol)
+        if State.Version ~= 'LuaJIT' then
+            pushError {
+                type = 'UNSUPPORT_SYMBOL',
+                start = start,
+                finish = start + #symbol - 1,
+                version = 'LuaJIT',
+                info = {
+                    version = State.Version,
+                }
+            }
+            State.LastNumber[1] = 0
         end
     end,
     Name = function (start, str, finish)

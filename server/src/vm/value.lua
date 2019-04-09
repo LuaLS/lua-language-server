@@ -1,6 +1,7 @@
 local libraryBuilder = require 'vm.library'
 local library = require 'core.library'
 local listMgr = require 'vm.list'
+local config = require 'config'
 
 local Sort = 0
 local Watch = setmetatable({}, {__mode = 'kv'})
@@ -78,6 +79,12 @@ function mt:setType(tp, rate)
     end
     if tp == 'any' or tp == 'nil' then
         rate = 0.0
+    end
+    if tp == 'integer' then
+        local version = config.config.runtime.version
+        if version ~= 'Lua 5.3' and version ~= 'Lua 5.4' then
+            tp = 'number'
+        end
     end
     local current = self._type[tp] or 0.0
     self._type[tp] = current + (1 - current) * rate

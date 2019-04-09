@@ -1,6 +1,7 @@
 local parser = require 'parser'
 local core = require 'core'
 local buildVM = require 'vm'
+local config = require 'config'
 
 rawset(_G, 'TEST', true)
 
@@ -18,6 +19,8 @@ function TEST(res)
         assert(res == result:bindValue():getType())
     end
 end
+
+config.config.runtime.version = 'Lua 5.4'
 
 TEST 'string' [[
 local <?var?> = '111'

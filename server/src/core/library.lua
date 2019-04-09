@@ -108,20 +108,40 @@ local function insertOther(tbl, key, value)
     table.sort(tbl[key])
 end
 
-local function mergeSource(alllibs, name, lib)
+local function insertCustom(tbl, key, value, libName)
+    if not tbl[key] then
+        tbl[key] = {}
+    end
+    tbl[key][#tbl[key]+1] = libName
+    table.sort(tbl[key])
+end
+
+local function isEnableGlobal(libName)
+    return libName:sub(1, 1) == '@'
+end
+
+local function mergeSource(alllibs, name, lib, libName)
     if not lib.source then
-        local suc = insertGlobal(alllibs.global, name, lib)
-        if not suc then
-            insertOther(alllibs.other, name, lib)
+        if isEnableGlobal(libName) then
+            local suc = insertGlobal(alllibs.global, name, lib)
+            if not suc then
+                insertOther(alllibs.other, name, lib)
+            end
+        else
+            insertCustom(alllibs.custom, name, lib, libName)
         end
         return
     end
     for _, source in ipairs(lib.source) do
         local sourceName = source.name or name
         if source.type == 'global' then
-            local suc = insertGlobal(alllibs.global, sourceName, lib)
-            if not suc then
-                insertOther(alllibs.other, sourceName, lib)
+            if isEnableGlobal(libName) then
+                local suc = insertGlobal(alllibs.global, sourceName, lib)
+                if not suc then
+                    insertOther(alllibs.other, sourceName, lib)
+                end
+            else
+                insertCustom(alllibs.custom, sourceName, lib, libName)
             end
         elseif source.type == 'library' then
             insertGlobal(alllibs.library, sourceName, lib)
@@ -172,10 +192,12 @@ local function insertChild(tbl, name, key, value)
     tbl[name].child[key] = copy(value)
 end
 
-local function mergeParent(alllibs, name, lib)
+local function mergeParent(alllibs, name, lib, libName)
     for _, parent in ipairs(lib.parent) do
         if parent.type == 'global' then
-            insertChild(alllibs.global,  parent.name, name, lib)
+            if isEnableGlobal(libName) then
+                insertChild(alllibs.global,  parent.name, name, lib)
+            end
         elseif parent.type == 'library' then
             insertChild(alllibs.library, parent.name, name, lib)
         elseif parent.type == 'object' then
@@ -184,15 +206,15 @@ local function mergeParent(alllibs, name, lib)
     end
 end
 
-local function mergeLibs(alllibs, libs)
+local function mergeLibs(alllibs, libs, libName)
     if not libs then
         return
     end
     for _, lib in pairs(libs) do
         if lib.parent then
-            mergeParent(alllibs, lib.name, lib)
+            mergeParent(alllibs, lib.name, lib, libName)
         else
-            mergeSource(alllibs, lib.name, lib)
+            mergeSource(alllibs, lib.name, lib, libName)
         end
     end
 end
@@ -240,24 +262,29 @@ local function init()
     Library.library = table.container()
     Library.object  = table.container()
     Library.other   = table.container()
+    Library.custom  = table.container()
 
-    for path in scan(ROOT / 'libs') do
-        local libs
-        local buf = io.load(path)
-        if buf then
-            libs = table.container()
-            xpcall(lni, log.error, buf, path:string(), {libs})
-            fix(libs)
-        end
-        local relative = fs.relative(path, ROOT)
+    for libPath in (ROOT / 'libs'):list_directory() do
+        local enableGlobal
+        local libName = libPath:filename():string()
+        for path in scan(libPath) do
+            local libs
+            local buf = io.load(path)
+            if buf then
+                libs = table.container()
+                xpcall(lni, log.error, buf, path:string(), {libs})
+                fix(libs)
+            end
+            local relative = fs.relative(path, ROOT)
 
-        local locale = loadLocale('en-US', relative)
-        mergeLocale(libs, locale)
-        if id ~= 'en-US' then
-            locale = loadLocale(id, relative)
+            local locale = loadLocale('en-US', relative)
             mergeLocale(libs, locale)
+            if id ~= 'en-US' then
+                locale = loadLocale(id, relative)
+                mergeLocale(libs, locale)
+            end
+            mergeLibs(Library, libs, libName)
         end
-        mergeLibs(Library, libs)
     end
 end
 

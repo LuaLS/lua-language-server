@@ -338,8 +338,12 @@ return function (vm, lines, uri)
     session:doDiagnostics(session.searchUndefinedGlobal, 'undefined-global', function (key)
         local message = lang.script('DIAG_UNDEF_GLOBAL', key)
         local otherVersion = library.other[key]
+        local customLib = library.custom[key]
         if otherVersion then
             message = ('%s(%s)'):format(message, lang.script('DIAG_DEFINED_VERSION', table.concat(otherVersion, '/'), config.config.runtime.version))
+        end
+        if customLib then
+            message = ('%s(%s)'):format(message, lang.script('DIAG_DEFINED_CUSTOM', table.concat(customLib, '/')))
         end
         return {
             level   = DiagnosticSeverity.Warning,

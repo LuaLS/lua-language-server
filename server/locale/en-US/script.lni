@@ -14,6 +14,7 @@ DIAG_DIAGNOSTICS        = 'Diagnostics'
 DIAG_SYNTAX_CHECK       = 'Syntax Check'
 DIAG_NEED_VERSION       = 'Supported in {}'
 DIAG_DEFINED_VERSION    = 'Defined in {}, current is {}'
+DIAG_DEFINED_CUSTOM     = 'Defined in {}'
 
 MWS_NOT_SUPPORT         = '{} dose not support multi workspace for now, I may need to restart to support the new workspace ...'
 MWS_RESTART             = 'Restart'

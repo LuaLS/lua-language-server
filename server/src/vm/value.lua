@@ -232,9 +232,7 @@ function mt:flushChild(child)
     for index in pairs(self._child) do
         if not alived[index] then
             self._child[index] = nil
-            goto CONTINUE
         end
-        ::CONTINUE::
     end
 end
 

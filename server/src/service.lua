@@ -352,8 +352,9 @@ end
 
 function mt:compileAst(obj)
     local ast, err = parser:ast(obj.text, 'lua', config.config.runtime.version)
-    obj.astErr = err
-    if not ast then
+    if ast then
+        obj.astErr = err
+    else
         if type(err) == 'string' then
             local message = lang.script('PARSER_CRASH', err)
             log.debug(message)
@@ -450,6 +451,7 @@ function mt:compileVM(uri)
     end
     if self._needCompile[uri] then
         self:_markCompiled(uri, compiled)
+        self._needDiagnostics[uri] = true
     else
         if vm then
             vm:remove()

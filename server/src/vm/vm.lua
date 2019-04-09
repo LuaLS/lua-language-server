@@ -11,6 +11,7 @@ local config = require 'config'
 local mt = require 'vm.manager'
 
 require 'vm.module'
+require 'vm.raw'
 
 -- TODO source测试
 --rawset(_G, 'CachedSource', setmetatable({}, { __mode = 'kv' }))
@@ -277,6 +278,10 @@ function mt:callLibrary(func, values, source, lib)
             self:callModuel(func, values)
         elseif lib.special == 'seeall' then
             self:callSeeAll(func, values)
+        elseif lib.special == 'rawset' then
+            self:callRawSet(func, values, source)
+        elseif lib.special == 'rawget' then
+            self:callRawGet(func, values, source)
         end
     else
         -- 如果lib的参数中有function，则立即执行function

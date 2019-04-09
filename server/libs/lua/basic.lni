@@ -375,6 +375,7 @@ name = 'v2'
 type = 'boolean'
 
 [rawget]
+special = 'rawget'
 [[.args]]
 name = 'table'
 type = 'table'
@@ -391,6 +392,7 @@ name = 'len'
 type = 'integer'
 
 [rawset]
+special = 'rawset'
 [[.args]]
 name = 'table'
 type = 'table'

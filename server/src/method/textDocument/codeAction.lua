@@ -179,6 +179,43 @@ local function findSyntax(astErr, lines, data)
     return nil
 end
 
+local function solveSyntaxByChangeVersion(err, callback)
+    if type(err.version) == 'table' then
+        for _, version in ipairs(err.version) do
+            changeVersion(version, callback)
+        end
+    else
+        changeVersion(err.version, callback)
+    end
+end
+
+local function solveSyntaxByAddDoEnd(uri, data, callback)
+    callback {
+        title = lang.script.ACTION_ADD_DO_END,
+        kind = 'quickfix',
+        edit = {
+            changes = {
+                [uri] = {
+                    {
+                        range = {
+                            start = data.range.start,
+                            ['end'] = data.range.start,
+                        },
+                        newText = 'do ',
+                    },
+                    {
+                        range = {
+                            start = data.range['end'],
+                            ['end'] = data.range['end'],
+                        },
+                        newText = ' end',
+                    }
+                }
+            }
+        }
+    }
+end
+
 local function solveSyntax(lsp, uri, data, callback)
     local obj = lsp:getFile(uri)
     if not obj then
@@ -192,15 +229,11 @@ local function solveSyntax(lsp, uri, data, callback)
     if not err then
         return nil
     end
-    if not err.version then
-        return
+    if err.version then
+        solveSyntaxByChangeVersion(err, callback)
     end
-    if type(err.version) == 'table' then
-        for _, version in ipairs(err.version) do
-            changeVersion(version, callback)
-        end
-    else
-        changeVersion(err.version, callback)
+    if err.type == 'ACTION_AFTER_BREAK' or err.type == 'ACTION_AFTER_RETURN' then
+        solveSyntaxByAddDoEnd(uri, data, callback)
     end
 end
 

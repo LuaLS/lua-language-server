@@ -37,7 +37,6 @@ local function addGlobal(name, callback)
     }
 end
 
-
 local function changeVersion(version, callback)
     callback {
         title = lang.script('ACTION_RUNTIME_VERSION', version),
@@ -50,6 +49,24 @@ local function changeVersion(version, callback)
                     key = {'runtime', 'version'},
                     action = 'set',
                     value = version,
+                }
+            }
+        },
+    }
+end
+
+local function openCustomLibrary(libName, callback)
+    callback {
+        title = lang.script('ACTION_OPEN_LIBRARY', libName),
+        kind = 'quickfix',
+        command = {
+            title = lang.script.COMMAND_OPEN_LIBRARY,
+            command = 'config',
+            arguments = {
+                {
+                    key = {'runtime', 'library'},
+                    action = 'add',
+                    value = libName,
                 }
             }
         },
@@ -72,6 +89,13 @@ local function solveUndefinedGlobal(lsp, uri, data, callback)
     if otherVersion then
         for _, version in ipairs(otherVersion) do
             changeVersion(version, callback)
+        end
+    end
+
+    local customLibrary = library.custom[name]
+    if customLibrary then
+        for _, libName in ipairs(customLibrary) do
+            openCustomLibrary(libName, callback)
         end
     end
 end

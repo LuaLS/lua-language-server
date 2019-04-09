@@ -46,6 +46,12 @@
 					],
 					"description": "Lua runtime version.\nLua运行版本。"
 				},
+				"Lua.runtime.library": {
+					"scope": "resource",
+					"type": "array",
+					"items": "string",
+					"description": "Load globals from these 3rd libraries.\n加载这些第三方库中的全局变量。"
+				},
 				"Lua.diagnostics.disable": {
 					"scope": "resource",
 					"type": "array",

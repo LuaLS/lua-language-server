@@ -41,6 +41,7 @@ end
 local Template = {
     runtime = {
         version         = {'Lua 5.3', String},
+        library         = {{},        Str2Hash ';'},
     },
     diagnostics = {
         globals         = {{},   Str2Hash ';'},

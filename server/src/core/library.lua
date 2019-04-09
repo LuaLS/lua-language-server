@@ -117,7 +117,13 @@ local function insertCustom(tbl, key, value, libName)
 end
 
 local function isEnableGlobal(libName)
-    return libName:sub(1, 1) == '@'
+    if config.config.runtime.library[libName] then
+        return true
+    end
+    if libName:sub(1, 1) == '@' then
+        return true
+    end
+    return false
 end
 
 local function mergeSource(alllibs, name, lib, libName)

@@ -1203,7 +1203,7 @@ local function compile(vm, ast, lsp, uri)
     -- 创建初始环境
     ast.uri = vm.uri
     -- 根据运行版本决定环境实现方式
-    if config.config.runtime.version == 'Lua 5.1' then
+    if config.config.runtime.version == 'Lua 5.1' or config.config.runtime.version == 'LuaJIT' then
         vm.envType = 'fenv'
     else
         vm.envType = '_ENV'

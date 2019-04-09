@@ -64,7 +64,7 @@ Please [help me][en-US] improve the quality of `en-US`.
 - [x] Lua 5.2
 - [x] Lua 5.3
 - [x] Lua 5.4
-- [ ] LuaJIT
+- [x] LuaJIT
 
 If you find any mistakes, please [tell me][issues] or use [Pull Requests][@lua] to fix them directly.
 

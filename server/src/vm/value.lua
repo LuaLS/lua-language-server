@@ -354,6 +354,9 @@ function mt:mergeValue(value)
                         list[#list+1] = bc
                     end
                 end
+                if global then
+                    bc:markGlobal()
+                end
                 a._child[k] = bc
             end
         end

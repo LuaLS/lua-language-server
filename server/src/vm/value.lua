@@ -117,8 +117,12 @@ function mt:rawSet(index, value, source)
         self._child = {}
     end
     if self._child[index] then
-        --self._child[index]:mergeValue(value)
-        self._child[index]:mergeType(value)
+        if self._global then
+            self._child[index]:mergeValue(value)
+        else
+            self._child[index]:mergeType(value)
+            self._child[index]:mergeInfo(value)
+        end
         self._child[index] = value
     else
         self._child[index] = value
@@ -296,31 +300,13 @@ function mt:mergeType(value)
     value._type = self._type
 end
 
-function mt:mergeValue(value)
+function mt:mergeInfo(value)
     if self == value then
         return
     end
     if not value then
         return
     end
-    if value._type then
-        for tp, rate in pairs(value._type) do
-            self:setType(tp, rate)
-        end
-    end
-    value._type = self._type
-
-    if value._child then
-        if not self._child then
-            self._child = {}
-        end
-        for k, v in pairs(value._child) do
-            self._child[k] = v
-        end
-    end
-    value._child = self._child
-    self:flushChild()
-
     local infos = self._info
     for srcId, info in pairs(value._info) do
         local src = listMgr.get(srcId)
@@ -330,18 +316,61 @@ function mt:mergeValue(value)
         end
     end
     value._info = infos
+end
 
-    if value._meta then
-        self._meta = value._meta
+function mt:mergeValue(value)
+    if self == value then
+        return
     end
-    if value._func then
-        self._func = value._func
+    if not value then
+        return
     end
-    if value._lib then
-        self._lib = value._lib
-    end
-    if value.uri then
-        self.uri = value.uri
+    local global = self._global
+    local list = {self, value}
+    local pos = 1
+    while true do
+        local a, b = list[pos], list[pos+1]
+        if not a then
+            break
+        end
+        pos = pos + 2
+        list[a] = true
+        list[b] = true
+        a:mergeType(b)
+        a:mergeInfo(b)
+
+        a:flushChild()
+        b:flushChild()
+        if b._child then
+            if not a._child then
+                a._child = {}
+            end
+            for k, bc in pairs(b._child) do
+                local ac = a._child[k]
+                if ac and ac ~= bc and global then
+                    if list[ac] and list[bc] then
+                    else
+                        list[#list+1] = ac
+                        list[#list+1] = bc
+                    end
+                end
+                a._child[k] = bc
+            end
+        end
+        b._child = a._child
+
+        if b._meta then
+            a._meta = b._meta
+        end
+        if b._func then
+            a._func = b._func
+        end
+        if b._lib then
+            a._lib = b._lib
+        end
+        if b.uri then
+            a.uri = b.uri
+        end
     end
 end
 

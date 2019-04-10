@@ -131,6 +131,7 @@ function mt:mergeReturn(index, value)
     if value then
         if self.returns[index] then
             self.returns[index]:mergeValue(value)
+            self.returns[index] = value
         else
             self.returns[index] = value
         end

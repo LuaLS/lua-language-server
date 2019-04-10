@@ -228,13 +228,13 @@ next({}, 1, <!2!>)
 print(1, 2, 3, 4, 5)
 ]]
 
-TEST [[
-local realTostring = tostring
-tostring = function () end
-tostring(<!1!>)
-tostring = realTostring
-tostring(1)
-]]
+--TEST [[
+--local realTostring = tostring
+--tostring = function () end
+--tostring(<!1!>)
+--tostring = realTostring
+--tostring(1)
+--]]
 
 TEST [[
 <!aa!> = 1

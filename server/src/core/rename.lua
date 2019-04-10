@@ -8,7 +8,7 @@ local function parseResult(source, newName)
             return nil
         end
         source:bindLabel():eachInfo(function (info, src)
-            positions[#positions+1] = { src.start, src.finish }
+            positions[#positions+1] = { src.start, src.finish, src:getUri() }
         end)
         return positions
     end
@@ -30,7 +30,7 @@ local function parseResult(source, newName)
         loc:eachInfo(function (info, src)
             if not mark[src] then
                 mark[src] = info
-                positions[#positions+1] = { src.start, src.finish }
+                positions[#positions+1] = { src.start, src.finish, src:getUri() }
             end
         end)
         return positions
@@ -52,7 +52,7 @@ local function parseResult(source, newName)
                 mark[src] = info
                 if info.type == 'get child' or info.type == 'set child' then
                     if info[1] == source[1] then
-                        positions[#positions+1] = {src.start, src.finish}
+                        positions[#positions+1] = {src.start, src.finish, src:getUri()}
                     end
                 end
             end

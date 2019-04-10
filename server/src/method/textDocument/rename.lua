@@ -13,12 +13,19 @@ return function (lsp, params)
         return {}
     end
 
-    local TextEdit = {}
-    for i, position in ipairs(positions) do
-        local start, finish = position[1], position[2]
+    local changes = {}
+    for _, position in ipairs(positions) do
+        local start, finish, uri = position[1], position[2], position[3]
+        local _, lines = lsp:getVM(uri)
+        if not lines then
+            goto CONTINUE
+        end
         local start_row,  start_col  = lines:rowcol(start)
         local finish_row, finish_col = lines:rowcol(finish)
-        TextEdit[i] = {
+        if not changes[uri] then
+            changes[uri] = {}
+        end
+        changes[uri][#changes[uri]+1] = {
             newText = newName,
             range = {
                 start = {
@@ -32,13 +39,14 @@ return function (lsp, params)
                 },
             }
         }
+        ::CONTINUE::
     end
 
     local response = {
-        changes = {
-            [uri] = TextEdit,
-        },
+        changes = changes,
     }
+
+    log.debug(table.dump(response))
 
     return response
 end

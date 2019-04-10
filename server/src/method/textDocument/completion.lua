@@ -55,14 +55,9 @@ local function findWord(position, text)
     return word:match('^([%w_]*)')
 end
 
-return function (lsp, params)
+local function fastCompletion(lsp, params, lines)
     local uri = params.textDocument.uri
     local text, oldText = lsp:getText(uri)
-    if not text then
-        return nil
-    end
-
-    local lines = parser:lines(text, 'utf8')
     -- lua是从1开始的，因此都要+1
     local position = lines:positionAsChar(params.position.line + 1, params.position.character)
     local word = findWord(position, text)
@@ -89,6 +84,46 @@ return function (lsp, params)
             return nil
         end
     end
+
+    return items
+end
+
+local function finishCompletion(lsp, params, lines)
+    local uri = params.textDocument.uri
+    local text = lsp:getText(uri)
+    -- lua是从1开始的，因此都要+1
+    local position = lines:positionAsChar(params.position.line + 1, params.position.character)
+    local word = findWord(position, text)
+    local startPos = findStartPos(position, text)
+
+    local vm = lsp:loadVM(uri)
+    if not vm then
+        return nil
+    end
+    startPos = startPos or position
+
+    local items = core.completion(vm, text, startPos, word)
+    if not items or #items == 0 then
+        return nil
+    end
+
+    return items
+end
+
+return function (lsp, params)
+    local uri = params.textDocument.uri
+    local text, oldText = lsp:getText(uri)
+    if not text then
+        return nil
+    end
+
+    local lines = parser:lines(text, 'utf8')
+    local items = fastCompletion(lsp, params, lines)
+    --local items = finishCompletion(lsp, params, lines)
+    if not items then
+        return
+    end
+
     for i, item in ipairs(items) do
         item.sortText = ('%04d'):format(i)
         if item.textEdit then

@@ -755,3 +755,17 @@ local *tocl@
         kind = CompletionItemKind.Keyword,
     }
 }
+
+TEST [[
+local mt = {}
+mt.__index = mt
+local t = setmetatable({}, mt)
+
+t.@
+]]
+{
+    {
+        label = '__index',
+        kind = CompletionItemKind.Field,
+    }
+}

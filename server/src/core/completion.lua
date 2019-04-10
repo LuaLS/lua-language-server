@@ -216,12 +216,7 @@ local function sortPairs(t)
     end
 end
 
-local function searchFields(vm, source, word, callback)
-    local parent = source:get 'parent'
-    if not parent then
-        return
-    end
-    local map = {}
+local function searchFieldsByInfo(parent, word, source, map)
     parent:eachInfo(function (info, src)
         local k = info[1]
         if src == source then
@@ -250,6 +245,22 @@ local function searchFields(vm, source, word, callback)
             map[k] = v
         end
     end)
+end
+
+local function searchFields(vm, source, word, callback)
+    local parent = source:get 'parent'
+    if not parent then
+        return
+    end
+    local map = {}
+    local current = parent
+    for _ = 1, 3 do
+        searchFieldsByInfo(current, word, source, map)
+        current = current:getMetaMethod('__index')
+        if not current then
+            break
+        end
+    end
     parent:eachChild(function (k, v)
         if map[k] then
             return

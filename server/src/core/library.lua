@@ -65,25 +65,28 @@ local function mergeLocale(libs, locale)
     end
 end
 
-local function insertGlobal(tbl, key, value)
-    if value.version then
-        local runtimeVersion = config.config.runtime.version
-        if type(value.version) == 'table' then
-            local ok
-            for _, version in ipairs(value.version) do
-                if version == runtimeVersion then
-                    ok = true
-                    break
-                end
-            end
-            if not ok then
-                return false
-            end
-        else
-            if value.version ~= runtimeVersion then
-                return false
+local function isMatchVersion(version)
+    if not version then
+        return true
+    end
+    local runtimeVersion = config.config.runtime.version
+    if type(version) == 'table' then
+        for i = 1, #version do
+            if version[i] == runtimeVersion then
+                return true
             end
         end
+    else
+        if version == runtimeVersion then
+            return true
+        end
+    end
+    return false
+end
+
+local function insertGlobal(tbl, key, value)
+    if not isMatchVersion(value.version) then
+        return false
     end
     tbl[key] = value
     return true
@@ -169,24 +172,8 @@ local function insertChild(tbl, name, key, value)
     if not name or not key then
         return
     end
-    if value.version then
-        local runtimeVersion = config.config.runtime.version
-        if type(value.version) == 'table' then
-            local ok
-            for _, version in ipairs(value.version) do
-                if version == runtimeVersion then
-                    ok = true
-                    break
-                end
-            end
-            if not ok then
-                return
-            end
-        else
-            if value.version ~= runtimeVersion then
-                return
-            end
-        end
+    if not isMatchVersion(value.version) then
+        return
     end
     if not tbl[name] then
         tbl[name] = {

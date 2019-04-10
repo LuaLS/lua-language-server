@@ -1,3 +1,5 @@
+local hoverName = require 'core.hover.name'
+
 local function getParentName(lib, isObject)
     for _, parent in ipairs(lib.parent) do
         if isObject then
@@ -37,8 +39,15 @@ local function findLib(source)
             end
         end
     else
-        local name = lib.nick or lib.name
-        return lib, name
+        local name = hoverName(source)
+        local libName = lib.nick or lib.name
+        if name == libName or not libName then
+            return lib, name
+        elseif name == '' then
+            return lib, libName
+        else
+            return lib, ('%s<%s>'):format(name, libName)
+        end
     end
 end
 

@@ -24,11 +24,11 @@ TEST 'require' [[
 <?require?> 'xxx'
 ]]
 
-TEST 'require' [[
+TEST 'req<require>' [[
 local <?req?> = require
 ]]
 
-TEST 'require' [[
+TEST 'req<require>' [[
 local req = require
 local t = {
     xx = req,
@@ -40,11 +40,11 @@ TEST 'table' [[
 <?table?>.unpack()
 ]]
 
-TEST 'table' [[
+TEST 'xx<table>' [[
 local <?xx?> = require 'table'
 ]]
 
-TEST 'table' [[
+TEST 'xx<table>' [[
 local rq = require
 local lib = 'table'
 local <?xx?> = rq(lib)
@@ -87,7 +87,7 @@ TEST '*string.sub' [[
 ('xxx').<?sub?>()
 ]]
 
-TEST 'bee::filesystem' [[
+TEST 'fs<bee::filesystem>' [[
 local <?fs?> = require 'bee.filesystem'
 ]]
 

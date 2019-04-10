@@ -387,3 +387,17 @@ local self: *obj {
     remove: function,
 }
 ]]
+
+TEST[[
+local <?sssss?> = require 'utf8'
+]]
+[[
+local sssss<utf8>: {
+    char: function,
+    charpattern: string,
+    codepoint: function,
+    codes: function,
+    len: function,
+    offset: function,
+}
+]]

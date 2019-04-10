@@ -12,6 +12,7 @@ local mt = require 'vm.manager'
 
 require 'vm.module'
 require 'vm.raw'
+require 'vm.pcall'
 
 -- TODO source测试
 --rawset(_G, 'CachedSource', setmetatable({}, { __mode = 'kv' }))
@@ -282,6 +283,10 @@ function mt:callLibrary(func, values, source, lib)
             self:callRawSet(func, values, source)
         elseif lib.special == 'rawget' then
             self:callRawGet(func, values, source)
+        elseif lib.special == 'pcall' then
+            self:callPcall(func, values, source)
+        elseif lib.special == 'xpcall' then
+            self:callXpcall(func, values, source)
         end
     else
         -- 如果lib的参数中有function，则立即执行function

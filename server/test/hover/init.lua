@@ -401,3 +401,43 @@ local sssss<utf8>: {
     offset: function,
 }
 ]]
+
+TEST[[
+function a(v)
+    print(<?v?>)
+end
+a(1)
+]]
+[[
+local v: number = 1
+]]
+
+TEST[[
+function a(v)
+    print(<?v?>)
+end
+pcall(a, 1)
+]]
+[[
+local v: number = 1
+]]
+
+TEST[[
+function a(v)
+    print(<?v?>)
+end
+xpcall(a, log.error, 1)
+]]
+[[
+local v: number = 1
+]]
+
+TEST[[
+function a(v)
+    return 'a'
+end
+local _, <?r?> = pcall(a, 1)
+]]
+[[
+local r: string = "a"
+]]

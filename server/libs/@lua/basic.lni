@@ -346,6 +346,7 @@ type = 'table'
 type = 'nil'
 
 [pcall]
+special = pcall
 [[.args]]
 name = 'f'
 type = 'function'
@@ -522,6 +523,7 @@ type = 'boolean'
 optional = 'after'
 
 [xpcall]
+special = xpcall
 [[.args]]
 name = 'f'
 type = 'function'
@@ -544,6 +546,7 @@ type = '...'
 ['xpcall Lua 5.1']
 name = 'xpcall'
 version = 'Lua 5.1'
+special = xpcall
 [[.args]]
 name = 'f'
 type = 'function'

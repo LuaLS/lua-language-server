@@ -247,7 +247,7 @@ function mt:callLibrary(func, values, source, lib)
         for i, arg in ipairs(lib.args) do
             local value = values[i]
             if value and arg.type ~= '...' then
-                value:setType(arg.type, 1.0)
+                value:setType(arg.type, 0.9)
             end
         end
     end
@@ -261,7 +261,7 @@ function mt:callLibrary(func, values, source, lib)
                 end
                 local value = func:getReturn(i)
                 if value then
-                    value:setType(rtn.type or 'any', 1.0)
+                    value:setType(rtn.type or 'any', 0.9)
                 end
             end
         end

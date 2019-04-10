@@ -4,6 +4,9 @@ version = LuaJIT
 [jit]
 type = table
 [[.source]]
+type = library
+name = jit
+``````````
 type = global
 name = jit
 
@@ -11,6 +14,10 @@ name = jit
 type = function
 parent = {
     1 = {
+        type = 'library',
+        name = 'jit',
+    },
+    2 = {
         type = 'global',
         name = 'jit',
     },

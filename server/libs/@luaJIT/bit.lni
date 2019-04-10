@@ -1,7 +1,13 @@
+<default>
+version = LuaJIT
+
 [bit]
 type = table
 [[.source]]
 type = library
+name = bit
+``````````
+type = global
 name = bit
 
 <default>
@@ -9,6 +15,10 @@ type = function
 parent = {
     1 = {
         type = 'library',
+        name = 'bit',
+    },
+    2 = {
+        type = 'global',
         name = 'bit',
     },
 }

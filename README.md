@@ -19,15 +19,6 @@
 - [ ] Multi Workspace
 - [ ] Type Format
 
-## Locale
-
-- [x] en-US
-- [x] zh-CN
-
-Please [help me][en-US] improve the quality of `en-US`.
-
-[en-US]: https://github.com/sumneko/vscode-lua-language-server/tree/master/server/locale/en-US
-
 ## Preview
 
 ### Goto Definition
@@ -73,17 +64,30 @@ If you find any mistakes, please [tell me][issues] or use [Pull Requests][@lua] 
 [issues]: https://github.com/sumneko/lua-language-server/issues
 [@lua]: https://github.com/sumneko/lua-language-server/tree/master/server/libs/%40lua
 
+## Locale
+
+- [x] en-US
+- [x] zh-CN
+
+Please [help me][en-US] improve the quality of `en-US`.
+
+[en-US]: https://github.com/sumneko/vscode-lua-language-server/tree/master/server/locale/en-US
+
 ## Credit
+
 * [bee.lua](https://github.com/actboy168/bee.lua)
 * [luamake](https://github.com/actboy168/luamake)
 * [lni](https://github.com/actboy168/lni)
 * [LPegLabel](https://github.com/sqmedeiros/lpeglabel)
+* [LuaParser](https://github.com/sumneko/LuaParser)
 * [rcedit](https://github.com/electron/rcedit)
 * [ScreenToGif](https://github.com/NickeManarin/ScreenToGif)
 * [lsp-sample-client](https://github.com/Microsoft/vscode-extension-samples)
 * [Lua 5.3 中文翻译](https://cloudwu.github.io/lua53doc/manual.html)
 
 ## Acknowledgement
+
 * [actboy168](https://github.com/actboy168)
 * [Dmitry Sannikov](https://github.com/dasannikov)
 * [Jayden Charbonneau](https://github.com/Reshiram110)
+* [Stjepan Bakrac](https://github.com/z16)

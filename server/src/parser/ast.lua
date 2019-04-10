@@ -298,12 +298,15 @@ local Defs = {
                 start = pos-1,
                 finish = pos,
             }
-            return ''
+            return char
         end
         return string_char(tonumber(char, 16))
     end,
     CharUtf8 = function (pos, char)
-        if State.Version ~= 'Lua 5.3' and State.Version ~= 'Lua 5.4' then
+        if  State.Version ~= 'Lua 5.3'
+        and State.Version ~= 'Lua 5.4'
+        and State.Version ~= 'LuaJIT'
+        then
             pushError {
                 type = 'ERR_ESC',
                 start = pos-3,
@@ -425,8 +428,8 @@ local Defs = {
                     version = State.Version,
                 }
             }
-            State.LastNumber[1] = 0
         end
+        State.LastNumber[1] = 0
     end,
     Name = function (start, str, finish)
         local isKeyWord

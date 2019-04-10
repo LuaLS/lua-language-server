@@ -255,10 +255,11 @@ StringClose <-  ']' =eq ']'
 grammar 'Number' [[
 Number      <-  Sp ({} {NumberDef} {}) -> Number
                 NumberSuffix?
+                ErrNumber?
 NumberDef   <-  Number16 / Number10
 NumberSuffix<-  ({} {[uU]? [lL] [lL]})      -> FFINumber
             /   ({} {[iI]})                 -> ImaginaryNumber
-            /   ({} {([0-9a-zA-Z] / '.')+}) -> UnknownSymbol
+ErrNumber   <-  ({} {([0-9a-zA-Z] / '.')+}) -> UnknownSymbol
 
 Number10    <-  Float10 Float10Exp?
             /   Integer10 Float10? Float10Exp?

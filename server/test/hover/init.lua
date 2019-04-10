@@ -441,3 +441,10 @@ local _, <?r?> = pcall(a, 1)
 [[
 local r: string = "a"
 ]]
+
+TEST[[
+local <?n?> = rawlen()
+]]
+[[
+local n: integer
+]]

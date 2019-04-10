@@ -402,7 +402,6 @@ name = 'index'
 ``````````
 name = 'value'
 [[.returns]]
-name = 'table'
 type = 'table'
 
 [select]

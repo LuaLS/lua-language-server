@@ -12,6 +12,7 @@ function mt:callRawSet(func, values, source)
     end
     tbl:addInfo('set child', source, index)
     tbl:rawSet(index, value, source)
+    func:setReturn(1, tbl)
 end
 
 function mt:callRawGet(func, values, source)

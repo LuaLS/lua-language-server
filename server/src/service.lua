@@ -808,17 +808,17 @@ function mt:listen()
     local clock = os.clock()
     while true do
         local startClock = os.clock()
+        local delta = os.clock() - clock
         async.onTick()
         self:onTick()
 
-        local delta = os.clock() - clock
-        clock = os.clock()
         local suc, err = xpcall(updateTimer, log.error, delta)
         if not suc then
             io.stderr:write(err)
             io.stderr:flush()
         end
 
+        clock = os.clock()
         local passedClock = os.clock() - startClock
         if passedClock > 0.1 then
             thread.sleep(0.0)

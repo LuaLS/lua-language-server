@@ -1,4 +1,5 @@
 local Id = 0
+local Version = 0
 local List = {}
 
 local function get(id)
@@ -13,6 +14,11 @@ end
 
 local function clear(id)
     List[id] = nil
+    Version = Version + 1
+end
+
+local function getVersion()
+    return Version
 end
 
 return {
@@ -20,4 +26,5 @@ return {
     add = add,
     clear = clear,
     list = List,
+    getVersion = getVersion,
 }

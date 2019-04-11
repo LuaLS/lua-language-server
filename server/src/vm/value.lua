@@ -47,23 +47,6 @@ local function create (tp, source, literal)
     return self
 end
 
-local function isDeadChild(value, index)
-    -- 非全局值不会出现dead child
-    if not value._global then
-        return false
-    end
-    for srcId, info in pairs(value._info) do
-        local src = listMgr.get(srcId)
-        if  src
-            and (info.type == 'set child' or info.type == 'get child')
-            and info[1] == index
-        then
-            return false
-        end
-    end
-    return true
-end
-
 function mt:setType(tp, rate)
     if type(tp) == 'table' then
         for _, ctp in ipairs(tp) do
@@ -137,12 +120,9 @@ function mt:rawGet(index)
     if not self._child then
         return nil
     end
+    self:flushChild()
     local child = self._child[index]
     if not child then
-        return nil
-    end
-    if isDeadChild(self, index) then
-        self._child[index] = nil
         return nil
     end
     return child
@@ -216,7 +196,7 @@ function mt:getMetaMethod(name)
     return meta:rawGet(name)
 end
 
-function mt:flushChild(child)
+function mt:flushChild()
     if not self._child then
         return nil
     end
@@ -224,6 +204,11 @@ function mt:flushChild(child)
     if not self._global then
         return
     end
+    local listVersion = listMgr.getVersion()
+    if self._flushVersion == listVersion then
+        return
+    end
+    self._flushVersion = listVersion
     local alived = {}
     local infos = self._info
     local count = 0

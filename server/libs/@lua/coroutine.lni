@@ -31,6 +31,16 @@ type = 'thread'
 [[.returns]]
 type = 'boolean'
 
+['isyieldable Lua 5.4']
+name = isyieldable
+version = 'Lua 5.4'
+[[.args]]
+name = co
+type = thread
+optional = after
+[[.returns]]
+type = boolean
+
 [kill]
 version = 'Lua 5.4'
 [[.args]]

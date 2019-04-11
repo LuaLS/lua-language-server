@@ -4,6 +4,9 @@ description = '创建一个主体函数为 `f` 的新协程。'
 [isyieldable]
 description = '如果正在运行的协程可以让出，则返回真。'
 
+['isyieldable Lua 5.4']
+description = '如果协程 `co` 可以让出，则返回真。`co` 默认为正在运行的协程。'
+
 [kill]
 description = '杀死协程 `co`，关闭它所有等待 *to-be-closed* 的变量，并将协程状态设为 `dead` 。'
 

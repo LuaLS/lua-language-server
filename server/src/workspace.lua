@@ -134,6 +134,7 @@ end
 
 function mt:init(rootUri)
     self.root = self:uriDecode(rootUri)
+    self.uri = rootUri
     if not self.root then
         return
     end

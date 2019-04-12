@@ -225,6 +225,7 @@ function mt:flushChild()
     end
     infos._count = count
     infos._limit = count + 10
+    infos._version = listMgr.getVersion()
     for index in pairs(self._child) do
         if not alived[index] then
             self._child[index] = nil
@@ -390,8 +391,9 @@ function mt:addInfo(tp, source, ...)
     }
     infos[id] = info
     infos._count = (infos._count or 0) + 1
+    local version = listMgr.getVersion()
     -- 只有全局值需要压缩info
-    if self._global and infos._count > (infos._limit or 10) then
+    if self._global and infos._count > (infos._limit or 10) and infos._version ~= version then
         local count = 0
         for srcId in pairs(infos) do
             local src = listMgr.get(srcId)
@@ -403,6 +405,7 @@ function mt:addInfo(tp, source, ...)
         end
         infos._count = count
         infos._limit = count + 10
+        infos._version = version
     end
 end
 
@@ -419,6 +422,7 @@ function mt:eachInfo(callback)
     end
     infos._count = #list
     infos._limit = infos._count + 10
+    infos._version = listMgr.getVersion()
     table.sort(list, function (a, b)
         return a._sort < b._sort
     end)

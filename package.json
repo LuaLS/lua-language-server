@@ -88,6 +88,12 @@
 					"type": "integer",
 					"default": 300,
 					"description": "Max preloaded files.\n最大预加载文件数。"
+				},
+				"Lua.workspace.preloadFileSize": {
+					"scope": "resource",
+					"type": "integer",
+					"default": 100,
+					"description": "Skip files larger than this value (KB) when preloading.\n预加载时跳过大小大于该值（KB）的文件。"
 				}
 			}
 		}

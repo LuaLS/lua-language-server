@@ -219,8 +219,9 @@ function mt:readText(uri, path, buf, compiled)
         log.debug('No file: ', path)
         return
     end
-    if #text > 100000 then
-        log.info(('Skip large file, size: %.3f KB: %s'):format(#text / 1000.0, uri))
+    local size = #text / 1000.0
+    if size > config.config.workspace.preloadFileSize then
+        log.info(('Skip large file, size: %.3f KB: %s'):format(size, uri))
         return
     end
     if self:getCachedFileCount() >= config.config.workspace.maxPreload then

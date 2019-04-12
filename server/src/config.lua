@@ -52,6 +52,7 @@ local Template = {
         ignoreSubmodules= {true, Boolean},
         useGitIgnore    = {true, Boolean},
         maxPreload      = {300,  Integer},
+        preloadFileSize = {100,  Integer},
     }
 }
 

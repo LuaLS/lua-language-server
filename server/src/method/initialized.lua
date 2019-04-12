@@ -6,16 +6,6 @@ local function initAfterConfig(lsp, firstScope)
         lsp.workspace = workspace(lsp, firstScope.name)
         lsp.workspace:init(firstScope.uri)
     end
-    -- 请求工作目录
-    rpc:request('workspace/workspaceFolders', nil, function (folders)
-        if folders then
-            local folder = folders[1]
-            if folder then
-                lsp.workspace = workspace(lsp, folder.name)
-                lsp.workspace:init(folder.uri)
-            end
-        end
-    end)
     -- 必须动态注册的事件：
     rpc:request('client/registerCapability', {
         registrations = {

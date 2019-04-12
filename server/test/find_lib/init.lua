@@ -28,7 +28,7 @@ TEST 'req<require>' [[
 local <?req?> = require
 ]]
 
-TEST 'req<require>' [[
+TEST 'xx<require>' [[
 local req = require
 local t = {
     xx = req,

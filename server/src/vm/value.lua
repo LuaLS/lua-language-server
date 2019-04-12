@@ -424,9 +424,10 @@ function mt:eachInfo(callback)
     infos._count = #list
     infos._limit = infos._count * 1.1 + 10
     infos._version = listMgr.getVersion()
-    table.sort(list, function (a, b)
-        return a._sort < b._sort
-    end)
+    --local clock2 = os.clock()
+    --table.sort(list, function (a, b)
+    --    return a._sort < b._sort
+    --end)
     local passed = os.clock() - clock
     if passed > 0.1 then
         log.warn(('eachInfo takes: [%.3f]sec, #list: %d'):format(passed, #list))

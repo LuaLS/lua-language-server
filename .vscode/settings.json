@@ -5,7 +5,9 @@
         "IN",
         "log",
         "ac",
-        "_G"
+        "_G",
+        "GC",
+        "ID"
     ],
     "Lua.diagnostics.disable": [
     ],

@@ -8,6 +8,7 @@ package.path = (ROOT / 'src' / '?.lua'):string()
 
 --collectgarbage('generational')
 collectgarbage("setpause", 100)
+collectgarbage("setstepmul", 1000)
 
 log = require 'log'
 log.init(ROOT, ROOT / 'log' / 'service.log')
@@ -21,7 +22,7 @@ local function tryDebugger()
      log.info('Debugger startup, listen port: 11411')
 end
 
-pcall(tryDebugger)
+--pcall(tryDebugger)
 
 require 'utility'
 require 'global_protect'

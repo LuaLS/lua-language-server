@@ -750,9 +750,20 @@ function mt:_testMemory()
     end
 
     local mem = collectgarbage 'count'
+    local threadInfo = async.info
+    local threadBuf = {}
+    for i, count in ipairs(threadInfo) do
+        if count then
+            threadBuf[i] = ('#%03d Mem:  [%.3f]kb'):format(i, count)
+        else
+            threadBuf[i] = ('#%03d Mem:  <Unknown>'):format(i)
+        end
+    end
+
     log.debug(('\n\z
     State\n\z
-    Mem:       [%.3f]kb\n\z
+    Main Mem:  [%.3f]kb\n\z
+    %s\n\z
 -------------------\n\z
     CachedVM:  [%d]\n\z
     AlivedVM:  [%d]\n\z
@@ -769,6 +780,7 @@ function mt:_testMemory()
     TotalLoc:  [%d]\n\z
     TotalVal:  [%d]\n\z'):format(
         mem,
+        table.concat(threadBuf, '\n'),
 
         cachedVM,
         aliveVM,
@@ -791,7 +803,9 @@ end
 function mt:onTick()
     self:_loadProto()
     self:_doCompileTask()
-    if os.clock() - self._clock >= 60 and not self:isWaitingCompile() then
+    if (os.clock() - self._clock >= 60 and not self:isWaitingCompile())
+    or (os.clock() - self._clock >= 300)
+    then
         self._clock = os.clock()
         self:_testMemory()
     end

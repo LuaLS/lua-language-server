@@ -1,23 +1,30 @@
 local thread = require 'bee.thread'
 local errlog = thread.channel 'errlog'
+
 local TaskId = 0
 local IdlePool = {}
 local RunningList = {}
+local GCInfo = {}
+
+thread.newchannel 'gc'
 
 local function createTask()
     TaskId = TaskId + 1
+    GCInfo[TaskId] = false
     local id = TaskId
     local requestName  = 'request'  .. tostring(id)
     local responseName = 'response' .. tostring(id)
     thread.newchannel(requestName)
     thread.newchannel(responseName)
     local buf = ([[
+ID             = %d
 package.cpath  = %q
 package.path   = %q
 local thread   = require 'bee.thread'
 local request  = thread.channel(%q)
 local response = thread.channel(%q)
 local errlog   = thread.channel 'errlog'
+local gc       = thread.channel 'gc'
 
 local function task()
     local dump, arg = request:bpop()
@@ -25,6 +32,7 @@ local function task()
         IN  = request,
         OUT = response,
         ERR = errlog,
+        GC  = gc,
     }, { __index = _ENV })
     local f, err = load(dump, '=task', 't', env)
     if not f then
@@ -40,8 +48,10 @@ while true do
     if not ok then
         errlog:push(result)
     end
+    collectgarbage()
+    gc:push(ID, collectgarbage 'count')
 end
-]]):format(package.cpath, package.path, requestName, responseName)
+]]):format(id, package.cpath, package.path, requestName, responseName)
     log.debug('Create thread, id: ', id)
     return {
         id       = id,
@@ -87,6 +97,17 @@ local function callback(id, running)
     end
 end
 
+local function checkGC()
+    local gc = thread.channel 'gc'
+    while true do
+        local ok, id, count = gc:pop()
+        if not ok then
+            break
+        end
+        GCInfo[id] = count
+    end
+end
+
 local function onTick()
     local ok, msg = errlog:pop()
     if ok then
@@ -95,9 +116,11 @@ local function onTick()
     for id, running in pairs(RunningList) do
         callback(id, running)
     end
+    checkGC()
 end
 
 return {
     onTick = onTick,
     run    = run,
+    info   = GCInfo,
 }

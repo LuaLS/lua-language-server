@@ -18,6 +18,7 @@
 - [x] Code Action
 - [ ] Multi Workspace
 - [ ] Type Format
+- [ ] Document Color
 
 ## Preview
 

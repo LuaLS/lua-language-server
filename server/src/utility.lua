@@ -38,7 +38,7 @@ function table.dump(tbl)
         local keys = {}
         for key in pairs(tbl) do
             if type(key) == 'string' then
-                if key:find('[^%w_]') then
+                if key == '' or key:find('[^%w_]') then
                     KEY[key] = ('[%q]'):format(key)
                 else
                     KEY[key] = key

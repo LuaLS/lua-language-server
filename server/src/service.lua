@@ -806,20 +806,20 @@ function mt:listen()
     local _, out = async.run 'proto'
     self._proto = out
 
-    local clock = os.clock()
+    local timerClock = 0.0
     while true do
         local startClock = os.clock()
-        local delta = os.clock() - clock
         async.onTick()
         self:onTick()
 
+        local delta = os.clock() - timerClock
         local suc, err = xpcall(updateTimer, log.error, delta)
         if not suc then
             io.stderr:write(err)
             io.stderr:flush()
         end
+        timerClock = os.clock()
 
-        clock = os.clock()
         local passedClock = os.clock() - startClock
         if passedClock > 0.1 then
             thread.sleep(0.0)

@@ -13,6 +13,7 @@ function mt:clearCache()
     if self.count <= self.max then
         return
     end
+    local clock = os.clock()
     local n = 0
     for uri, value in pairs(self.cache) do
         local ok = value:eachInfo(function ()
@@ -29,6 +30,10 @@ function mt:clearCache()
     self.max = self.count + 10
     if self.max < self.min then
         self.max = self.min
+    end
+    local passed = os.clock() - clock
+    if passed > 0.1 then
+        log.warn(('chain:clearCache takes: [%.3f]sec, self.count: %d'):format(passed, self.count))
     end
 end
 

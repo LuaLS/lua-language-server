@@ -410,6 +410,7 @@ function mt:addInfo(tp, source, ...)
 end
 
 function mt:eachInfo(callback)
+    local clock = os.clock()
     local infos = self._info
     local list = {}
     for srcId, info in pairs(infos) do
@@ -426,6 +427,10 @@ function mt:eachInfo(callback)
     table.sort(list, function (a, b)
         return a._sort < b._sort
     end)
+    local passed = os.clock() - clock
+    if passed > 0.1 then
+        log.warn(('eachInfo takes: [%.3f]sec, #list: %d'):format(passed, #list))
+    end
     for i = 1, #list do
         local info = list[i]
         local res = callback(info, listMgr.get(info.source))

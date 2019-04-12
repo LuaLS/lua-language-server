@@ -87,6 +87,7 @@ return function (lsp, params)
         return result
     end
     return function (response)
+        local count = 0
         LastTask = ac.loop(0.1, function ()
             local result = findResult(lsp, params)
             if result then
@@ -95,7 +96,8 @@ return function (lsp, params)
                 response(result)
                 return
             end
-            if lsp:isWaitingCompile() then
+            count = count + 1
+            if lsp:isWaitingCompile() and count < 10 then
                 return
             end
             LastTask:remove()

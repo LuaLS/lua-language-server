@@ -224,7 +224,7 @@ function mt:flushChild()
         end
     end
     infos._count = count
-    infos._limit = count + 10
+    infos._limit = count * 1.1 + 10
     infos._version = listMgr.getVersion()
     for index in pairs(self._child) do
         if not alived[index] then
@@ -404,7 +404,7 @@ function mt:addInfo(tp, source, ...)
             end
         end
         infos._count = count
-        infos._limit = count + 10
+        infos._limit = count * 1.1 + 10
         infos._version = version
     end
 end
@@ -422,7 +422,7 @@ function mt:eachInfo(callback)
         end
     end
     infos._count = #list
-    infos._limit = infos._count + 10
+    infos._limit = infos._count * 1.1 + 10
     infos._version = listMgr.getVersion()
     table.sort(list, function (a, b)
         return a._sort < b._sort

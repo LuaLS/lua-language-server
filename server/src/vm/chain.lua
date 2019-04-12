@@ -27,7 +27,7 @@ function mt:clearCache()
         end
     end
     self.count = n
-    self.max = self.count + 10
+    self.max = self.count * 1.1 + 10
     if self.max < self.min then
         self.max = self.min
     end

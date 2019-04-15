@@ -851,6 +851,7 @@ function mt:doLocal(action)
 end
 
 function mt:doIf(action)
+    self:instantSource(action)
     for _, block in ipairs(action) do
         if block.filter then
             self:getExp(block.filter)
@@ -863,7 +864,7 @@ function mt:doIf(action)
 end
 
 function mt:doLoop(action)
-
+    self:instantSource(action)
     local min = self:getFirstInMulti(self:getExp(action.min))
     self:getExp(action.max)
     if action.step then
@@ -877,6 +878,7 @@ function mt:doLoop(action)
 end
 
 function mt:doIn(action)
+    self:instantSource(action)
     local args = self:unpackList(action.exp)
 
     self:scopePush(action)
@@ -893,7 +895,7 @@ function mt:doIn(action)
 end
 
 function mt:doWhile(action)
-
+    self:instantSource(action)
     self:getExp(action.filter)
 
     self:scopePush(action)

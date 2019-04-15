@@ -322,6 +322,31 @@ function mt:searchDuplicateIndex(callback)
     end)
 end
 
+function mt:searchEmptyBlock(callback)
+    self.vm:eachSource(function (source)
+        -- 认为空repeat是合法的
+        -- 要去vm中激活source
+        if source.type == 'if' then
+            for _, block in ipairs(source) do
+                if #block > 0 then
+                    return
+                end
+            end
+            callback(source.start, source.finish)
+            return
+        end
+        if source.type == 'loop'
+        or source.type == 'in'
+        or source.type == 'while'
+        then
+            if #source == 0 then
+                callback(source.start, source.finish)
+            end
+            return
+        end
+    end)
+end
+
 function mt:doDiagnostics(func, code, callback)
     if config.config.diagnostics.disable[code] then
         return
@@ -470,6 +495,13 @@ return function (vm, lines, uri)
             level   = DiagnosticSeverity.Warning,
             message = lang.script('DIAG_DUPLICATE_INDEX', key),
             related = related,
+        }
+    end)
+    -- 空代码块
+    session:doDiagnostics(session.searchEmptyBlock, 'empty-block', function ()
+        return {
+            level   = DiagnosticSeverity.Information,
+            message = lang.script.DIAG_EMPTY_BLOCK,
         }
     end)
     return session.datas

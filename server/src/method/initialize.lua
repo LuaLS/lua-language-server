@@ -39,6 +39,9 @@ return function (lsp)
                     changeNotifications = true,
                 }
             },
+            documentOnTypeFormattingProvider = {
+                firstTriggerCharacter = '}',
+            },
             executeCommandProvider = {
                 commands = {
                     'config',

@@ -272,6 +272,50 @@ function mt:searchLowercaseGlobal(callback)
     end)
 end
 
+function mt:searchDuplicateIndex(callback)
+    self.vm:eachSource(function (source)
+        if source.type ~= 'table' then
+            return
+        end
+        local mark = {}
+        for _, obj in ipairs(source) do
+            if obj.type == 'pair' then
+                local key = obj[1]
+                local name
+                if key.index then
+                    if key.type == 'string' then
+                        name = key[1]
+                    end
+                elseif key.type == 'name' then
+                    name = key[1]
+                end
+                if name then
+                    if mark[name] then
+                        mark[name][#mark[name]+1] = key
+                    else
+                        mark[name] = { key }
+                    end
+                end
+            end
+        end
+        for name, defs in pairs(mark) do
+            if #defs > 1 then
+                local related = {}
+                for i = 1, #defs do
+                    related[i] = {
+                        start  = defs[i].start,
+                        finish = defs[i].finish,
+                        uri    = self.uri,
+                    }
+                end
+                for i = 2, #defs do
+                    callback(defs[i].start, defs[i].finish, name, related)
+                end
+            end
+        end
+    end)
+end
+
 function mt:doDiagnostics(func, code, callback)
     if config.config.diagnostics.disable[code] then
         return
@@ -413,6 +457,14 @@ return function (vm, lines, uri)
                 message = lang.script('DIAG_UNDEF_FENV_CHILD', key),
             }
         end
+    end)
+    -- 构建表时重复定义field
+    session:doDiagnostics(session.searchDuplicateIndex, 'duplicate-index', function (key, related)
+        return {
+            level   = DiagnosticSeverity.Warning,
+            message = lang.script('DIAG_DUPLICATE_INDEX', key),
+            related = related,
+        }
     end)
     return session.datas
 end

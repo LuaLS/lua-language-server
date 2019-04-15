@@ -255,3 +255,11 @@ TEST [[
 TEST [[
 X = table[<!x!>]
 ]]
+
+TEST [[
+return {
+    x = 1,
+    y = 2,
+    <!x!> = 3,
+}
+]]

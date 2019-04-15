@@ -19,6 +19,7 @@
 - [ ] Multi Workspace
 - [ ] Type Format
 - [ ] Document Color
+- [ ] EmmyLua Annotation
 
 ## Preview
 

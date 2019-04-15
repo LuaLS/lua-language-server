@@ -1100,6 +1100,7 @@ local Defs = {
                 symbol = symbol,
             }
         }
+        return false
     end,
     DirtyName = function (pos)
         pushError {

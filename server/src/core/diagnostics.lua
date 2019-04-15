@@ -347,6 +347,33 @@ function mt:searchEmptyBlock(callback)
     end)
 end
 
+function mt:searchRedundantValue(callback)
+    self.vm:eachSource(function (source)
+        if source.type == 'set' or source.type == 'local' then
+            local args = source[1]
+            local values = source[2]
+            if not source[2] then
+                return
+            end
+            local argCount, valueCount
+            if args.type == 'list' then
+                argCount = #args
+            else
+                argCount = 1
+            end
+            if values.type == 'list' then
+                valueCount = #values
+            else
+                valueCount = 1
+            end
+            for i = argCount + 1, valueCount do
+                local value = values[i]
+                callback(value.start, value.finish, argCount, valueCount)
+            end
+        end
+    end)
+end
+
 function mt:doDiagnostics(func, code, callback)
     if config.config.diagnostics.disable[code] then
         return
@@ -455,7 +482,7 @@ return function (vm, lines, uri)
         }
     end)
     -- 调用函数时的参数数量是否超过函数的接收数量
-    session:doDiagnostics(session.searchRedundantParameters, 'remainder-parameters', function (max, passed)
+    session:doDiagnostics(session.searchRedundantParameters, 'redundant-parameter', function (max, passed)
         return {
             level   = DiagnosticSeverity.Information,
             message = lang.script('DIAG_OVER_MAX_ARGS', max, passed),
@@ -502,6 +529,13 @@ return function (vm, lines, uri)
         return {
             level   = DiagnosticSeverity.Information,
             message = lang.script.DIAG_EMPTY_BLOCK,
+        }
+    end)
+    -- 多余的赋值
+    session:doDiagnostics(session.searchRedundantValue, 'redundant-value', function (max, passed)
+        return {
+            level   = DiagnosticSeverity.Information,
+            message = lang.script('DIAG_OVER_MAX_VALUES', max, passed),
         }
     end)
     return session.datas

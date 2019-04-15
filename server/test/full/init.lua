@@ -8,6 +8,7 @@ function TEST(script)
     assert(ast)
     local vm, err = buildVM(ast)
     assert(vm, err)
+    return vm
 end
 
 require 'full.normal'

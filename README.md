@@ -92,3 +92,4 @@ Please [help me][en-US] improve the quality of `en-US`.
 * [Dmitry Sannikov](https://github.com/dasannikov)
 * [Jayden Charbonneau](https://github.com/Reshiram110)
 * [Stjepan Bakrac](https://github.com/z16)
+* [Peter Young](https://github.com/young40)

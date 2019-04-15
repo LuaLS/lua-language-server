@@ -499,6 +499,7 @@ function mt:getSimple(simple, max)
             if object then
                 table.insert(values, 1, object)
                 table.insert(args, 1, simple[i-3])
+                source:set('has object', true)
             end
             object = nil
             source:bindCall(args)

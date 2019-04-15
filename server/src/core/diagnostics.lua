@@ -220,6 +220,12 @@ function mt:searchRedundantParameters(callback)
         end
         local max = #func.args
         local passed = #args
+        -- function m.open() end
+        -- m:open()
+        -- 这种写法不算错
+        if passed == 1 and source:get 'has object' then
+            return
+        end
         for i = max + 1, passed do
             local extra = args[i]
             callback(extra.start, extra.finish, max, passed)

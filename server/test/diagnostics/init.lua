@@ -263,3 +263,11 @@ return {
     <!x!> = 3,
 }
 ]]
+
+TEST [[
+local m = {}
+function m.open()
+end
+
+m:open()
+]]

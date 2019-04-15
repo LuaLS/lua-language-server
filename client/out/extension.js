@@ -14,7 +14,7 @@ function activate(context) {
     // Otherwise the run options are used
     let serverOptions = {
         run: {
-            command: context.asAbsolutePath(path.join('server', 'bin', 'lua-language-server.exe')),
+            command: context.asAbsolutePath(path.join('server', 'bin', 'lua-language-server')),
             args: [
                 '-E',
                 '-e',
@@ -26,7 +26,7 @@ function activate(context) {
             }
         },
         debug: {
-            command: context.asAbsolutePath(path.join('server', 'bin', 'lua-language-server.exe')),
+            command: context.asAbsolutePath(path.join('server', 'bin', 'lua-language-server')),
             args: [
                 '-E',
                 '-e',

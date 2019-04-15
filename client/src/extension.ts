@@ -23,7 +23,7 @@ export function activate(context: ExtensionContext) {
 	let serverOptions: ServerOptions = {
 		run: {
 			command: context.asAbsolutePath(
-				path.join('server', 'bin', 'lua-language-server.exe')
+				path.join('server', 'bin', 'lua-language-server')
 			),
 			args: [
 				'-E',
@@ -41,7 +41,7 @@ export function activate(context: ExtensionContext) {
 		},
 		debug: {
 			command: context.asAbsolutePath(
-				path.join('server', 'bin', 'lua-language-server.exe')
+				path.join('server', 'bin', 'lua-language-server')
 			),
 			args: [
 				'-E',

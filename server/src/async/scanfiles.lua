@@ -47,13 +47,7 @@ for path in scan(fs.path(args.root), filter) do
         OUT:push 'stop'
         return
     end
-    local buf = io.load(path)
-    if buf then
-        OUT:push('file', {
-            path = fs.absolute(path):string(),
-            buf = buf,
-        })
-    end
+    OUT:push('path', fs.absolute(path):string())
 end
 
 OUT:push 'ok'

@@ -95,6 +95,16 @@ function mt:uriEncode(path)
     return 'file:///' .. table.concat(names, '/')
 end
 
+function mt:listenLoadFile()
+    self._loadFileRequest = async.run('loadfile', nil, function (filename, buf)
+        local path = fs.path(filename)
+        local name = getFileName(path)
+        local uri = self:uriEncode(path)
+        self.files[name] = uri
+        self.lsp:readText(uri, path, buf, self._currentScanCompiled)
+    end)
+end
+
 function mt:scanFiles()
     if self._scanRequest then
         log.info('中断上次扫描文件任务')
@@ -128,7 +138,7 @@ function mt:scanFiles()
 
     log.info('忽略文件：\r\n' .. table.concat(ignored, '\r\n'))
     log.info('开始扫描文件任务')
-    local compiled = {}
+    self._currentScanCompiled = {}
     local count = 0
     self._scanRequest = async.run('scanfiles', {
         root = self.root:string(),
@@ -142,16 +152,18 @@ function mt:scanFiles()
             return true
         elseif mode == 'log' then
             log.debug(...)
+        elseif mode == 'path' then
+            local path = fs.path(...)
+            if not self:isLuaFile(path) then
+                return
+            end
+            self._loadFileRequest:push(path:string())
         elseif mode == 'file' then
             local file = ...
             local path = fs.path(file.path)
             if not self:isLuaFile(path) then
                 return
             end
-            local name = getFileName(path)
-            local uri = self:uriEncode(path)
-            self.files[name] = uri
-            self.lsp:readText(uri, path, file.buf, compiled)
             count = count + 1
         elseif mode == 'stop' then
             log.info('扫描文件任务中断')
@@ -463,5 +475,6 @@ return function (lsp, name)
         pathMatcher = {}
     }, mt)
     workspace:compileLuaPath()
+    workspace:listenLoadFile()
     return workspace
 end

@@ -672,9 +672,9 @@ function mt:restartDueToMemoryLeak()
     end)
 end
 
-function mt:onUpdateConfig(updated)
+function mt:onUpdateConfig(updated, other)
     local oldConfig = table.deepCopy(config.config)
-    config:setConfig(updated)
+    config:setConfig(updated, other)
     local newConfig = config.config
     if not table.equal(oldConfig.runtime, newConfig.runtime) then
         local library = require 'core.library'

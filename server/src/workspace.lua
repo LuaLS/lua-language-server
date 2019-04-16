@@ -145,6 +145,9 @@ function mt:scanFiles()
         elseif mode == 'file' then
             local file = ...
             local path = fs.path(file.path)
+            if not self:isLuaFile(path) then
+                return
+            end
             local name = getFileName(path)
             local uri = self:uriEncode(path)
             self.files[name] = uri
@@ -175,9 +178,26 @@ function mt:isComplete()
     return not not self._complete
 end
 
+function mt:isLuaFile(path)
+    local ext = path:extension():string()
+    for k, v in pairs(config.other.associations) do
+        if fileNameEq(ext, k:match('[^%*]+$')) then
+            if v == 'lua' then
+                return true
+            else
+                return false
+            end
+        end
+    end
+    if fileNameEq(ext, '.lua') then
+        return true
+    end
+    return false
+end
+
 function mt:addFile(uri)
-    if uri:sub(-4) == '.lua' then
-        local path = self:uriDecode(uri)
+    local path = self:uriDecode(uri)
+    if self:isLuaFile(path) then
         local name = getFileName(path)
         self.files[name] = uri
         self.lsp:readText(uri, path)
@@ -402,7 +422,7 @@ function mt:loadPath(baseUri, str)
     if not ok then
         return nil
     end
-    str = getFileName(relative:string())
+    str = getFileName(relative)
     if self.loaded[str] then
         return self.loaded[str]
     end

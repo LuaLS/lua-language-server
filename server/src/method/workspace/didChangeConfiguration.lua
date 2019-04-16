@@ -9,8 +9,14 @@ return function (lsp)
                 scopeUri = uri,
                 section = 'Lua',
             },
+            {
+                scopeUri = uri,
+                section = 'files.associations',
+            }
         },
     }, function (configs)
-        lsp:onUpdateConfig(configs[1])
+        lsp:onUpdateConfig(configs[1], {
+            associations = configs[2],
+        })
     end)
 end

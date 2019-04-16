@@ -57,7 +57,27 @@ local function Array(checker)
     end
 end
 
-local Template = {
+local function Hash(keyChecker, valueChecker)
+    return function (tbl)
+        if type(tbl) ~= 'table' then
+            return false
+        end
+        local t = {}
+        for k, v in pairs(tbl) do
+            local ok1, key = keyChecker(k)
+            local ok2, value = valueChecker(v)
+            if ok1 and ok2 then
+                t[key] = value
+            end
+        end
+        if not next(t) then
+            return false
+        end
+        return true, t
+    end
+end
+
+local ConfigTemplate = {
     runtime = {
         version         = {'Lua 5.3', String},
         library         = {{},        Str2Hash ';'},
@@ -80,33 +100,50 @@ local Template = {
     }
 }
 
-local Config
+local OtherTemplate = {
+    associations = {{}, Hash(String, String)},
+}
+
+local Config, Other
 
 local function init()
     if Config then
         return
     end
+
     Config = {}
-    for c, t in pairs(Template) do
+    for c, t in pairs(ConfigTemplate) do
         Config[c] = {}
         for k, info in pairs(t) do
             Config[c][k] = info[1]
         end
     end
+
+    Other = {}
+    for k, v in pairs(OtherTemplate) do
+        Other[k] = v
+    end
 end
 
-local function setConfig(self, config)
+local function setConfig(self, config, other)
     pcall(function ()
         for c, t in pairs(config) do
             for k, v in pairs(t) do
-                local info = Template[c][k]
+                local info = ConfigTemplate[c][k]
                 local suc, v = info[2](v)
                 if suc then
                     Config[c][k] = v
                 end
             end
         end
-        log.debug('Config update: ', table.dump(Config))
+        for k, v in pairs(other) do
+            local info = OtherTemplate[k]
+            local suc, v = info[2](v)
+            if suc then
+                Other[k] = v
+            end
+        end
+        log.debug('Config update: ', table.dump(Config), table.dump(Other))
     end)
 end
 
@@ -115,4 +152,5 @@ init()
 return {
     setConfig = setConfig,
     config = Config,
+    other = Other,
 }

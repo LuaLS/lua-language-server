@@ -40,16 +40,23 @@ return function (lsp)
         if folders then
             firstScope = folders[1]
         end
+        local uri = firstScope and firstScope.uri
         -- 请求配置
         rpc:request('workspace/configuration', {
             items = {
                 {
-                    scopeUri = firstScope and firstScope.uri,
+                    scopeUri = uri,
                     section = 'Lua',
                 },
+                {
+                    scopeUri = uri,
+                    section = 'files.associations',
+                }
             },
         }, function (configs)
-            lsp:onUpdateConfig(configs[1])
+            lsp:onUpdateConfig(configs[1], {
+                associations = configs[2],
+            })
             initAfterConfig(lsp, firstScope)
         end)
     end)

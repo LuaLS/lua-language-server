@@ -47,14 +47,12 @@ for path in scan(fs.path(args.root), filter) do
         OUT:push 'stop'
         return
     end
-    if path:extension():string() == '.lua' then
-        local buf = io.load(path)
-        if buf then
-            OUT:push('file', {
-                path = fs.absolute(path):string(),
-                buf = buf,
-            })
-        end
+    local buf = io.load(path)
+    if buf then
+        OUT:push('file', {
+            path = fs.absolute(path):string(),
+            buf = buf,
+        })
     end
 end
 

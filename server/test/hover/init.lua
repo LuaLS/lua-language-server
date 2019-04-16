@@ -249,7 +249,7 @@ TEST [[
 for <?c?> in io.lines() do
 end
 ]]
-[[local c: number]]
+[[local c: string]]
 
 TEST [[
 local function f()

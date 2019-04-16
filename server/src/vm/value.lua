@@ -84,8 +84,8 @@ function mt:getType()
             mRate = rate
             mType = tp
         elseif rate == mRate then
-            local level1 = TypeLevel[rate] or 0.0
-            local level2 = TypeLevel[mRate] or 0.0
+            local level1 = TypeLevel[tp] or 0.0
+            local level2 = TypeLevel[mType] or 0.0
             if level1 > level2 then
                 mRate = rate
                 mType = tp

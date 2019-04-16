@@ -118,6 +118,9 @@ function mt:setReturn(index, value)
     if value then
         self.returns[index] = value
     end
+    if self._global then
+        value:markGlobal()
+    end
 end
 
 function mt:mergeReturn(index, value)
@@ -135,6 +138,9 @@ function mt:mergeReturn(index, value)
         else
             self.returns[index] = value
         end
+    end
+    if self._global then
+        value:markGlobal()
     end
 end
 
@@ -306,6 +312,18 @@ function mt:kill()
     end
     self._removed = true
     listMgr.clear(self.id)
+end
+
+function mt:markGlobal()
+    if self._global then
+        return
+    end
+    self._global = true
+    if self.returns then
+        self.returns:eachValue(function (_, v)
+            v:markGlobal()
+        end)
+    end
 end
 
 local function create(source)

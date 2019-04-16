@@ -446,6 +446,9 @@ end
 
 function mt:setFunction(func)
     self._func = func.id
+    if self._global then
+        func:markGlobal()
+    end
 end
 
 function mt:getFunction()
@@ -502,6 +505,10 @@ function mt:markGlobal()
     self:rawEach(function (index, value)
         value:markGlobal()
     end)
+    local func = self:getFunction()
+    if func then
+        func:markGlobal()
+    end
 end
 
 function mt:isGlobal()

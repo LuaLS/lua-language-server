@@ -6,7 +6,9 @@ package.path = (ROOT / 'src' / '?.lua'):string()
      .. ';' .. (ROOT / 'src' / '?' / 'init.lua'):string()
 
 local function runTest(root)
-    local exe = root / 'bin' / 'lua-language-server'
+    local is_macos = package.cpath:sub(-3) == '.so'
+    local ext = is_macos and '' or '.exe'
+    local exe = root / 'bin' / 'lua-language-server' .. ext
     local test = root / 'test' / 'main.lua'
     local lua = subprocess.spawn {
         exe,

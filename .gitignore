@@ -1,6 +1,7 @@
 node_modules
 /client/server
 .vscode-test
+.vscode/ipch
 /server/log
 /server/bin
 /server/*.so

@@ -19,8 +19,7 @@ local mt = getmetatable(mm.P(0))
 
 
 -- No more global accesses after this point
-local version = _VERSION
-if version == "Lua 5.2" then _ENV = nil end
+_ENV = nil
 
 
 local any = m.P(1)
@@ -358,7 +357,5 @@ local re = {
   updatelocale = updatelocale,
 	calcline = calcline
 }
-
-if version == "Lua 5.1" then _G.re = re end
 
 return re

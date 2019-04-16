@@ -70,7 +70,9 @@ function mt:setType(tp, rate)
         end
     end
     local current = self._type[tp] or 0.0
-    self._type[tp] = current + (1 - current) * rate
+    if rate > current then
+        self._type[tp] = rate
+    end
 end
 
 function mt:getType()

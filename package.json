@@ -47,6 +47,17 @@
 					],
 					"description": "Lua runtime version.\nLua运行版本。"
 				},
+				"Lua.runtime.path": {
+					"scope": "resource",
+					"type": "array",
+					"items": "string",
+					"description": "package.path",
+					"default": [
+						"?.lua",
+						"?/init.lua",
+						"?/?.lua"
+					]
+				},
 				"Lua.diagnostics.disable": {
 					"scope": "resource",
 					"type": "array",

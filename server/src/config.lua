@@ -38,10 +38,34 @@ local function Str2Hash(sep)
     end
 end
 
+local function Array(checker)
+    return function (tbl)
+        if type(tbl) ~= 'table' then
+            return false
+        end
+        local t = {}
+        for _, v in ipairs(tbl) do
+            local ok, result = checker(v)
+            if ok then
+                t[#t+1] = result
+            end
+        end
+        if #t == 0 then
+            return false
+        end
+        return true, t
+    end
+end
+
 local Template = {
     runtime = {
         version         = {'Lua 5.3', String},
         library         = {{},        Str2Hash ';'},
+        path            = {{
+                                "?.lua",
+                                "?/init.lua",
+                                "?/?.lua"
+                            },        Array(String)},
     },
     diagnostics = {
         globals         = {{},   Str2Hash ';'},

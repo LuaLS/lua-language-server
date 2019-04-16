@@ -218,6 +218,42 @@ TEST {
 
 TEST {
     {
+        path = 'abc/init.lua',
+        content = '',
+    },
+    {
+        path = 'abc/bbc.lua',
+        content = '',
+    },
+    {
+        path = 'test.lua',
+        content = 'require "abc@"',
+        main = true,
+    },
+    completion = {
+        {
+            label = 'abc',
+            kind = CompletionItemKind.Reference,
+            documentation = 'abc/init.lua',
+            textEdit = EXISTS,
+        },
+        {
+            label = 'abc.bbc',
+            kind = CompletionItemKind.Reference,
+            documentation = 'abc/bbc.lua',
+            textEdit = EXISTS,
+        },
+        {
+            label = 'abc.init',
+            kind = CompletionItemKind.Reference,
+            documentation = 'abc/init.lua',
+            textEdit = EXISTS,
+        },
+    }
+}
+
+TEST {
+    {
         path = 'abc.lua',
         content = '',
     },

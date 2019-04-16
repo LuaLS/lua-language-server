@@ -1,8 +1,7 @@
 local fs = require 'bee.filesystem'
 local async = require 'async'
 local config = require 'config'
-local rpc = require 'rpc'
-local lang = require 'language'
+local ll = require 'lpeglabel'
 
 local function split(str, sep)
     local t = {}
@@ -193,16 +192,80 @@ function mt:findPath(baseUri, searchers)
     return uri
 end
 
+function mt:createCompiler(str)
+    local state = {
+        'Main',
+    }
+    local function push(c)
+        if state.Main then
+            state.Main = state.Main * c
+        else
+            state.Main = c
+        end
+    end
+    local count = 0
+    local function code()
+        count = count + 1
+        local name = 'C' .. tostring(count)
+        local nextName = 'C' .. tostring(count + 1)
+        state[name] = ll.P(1) * (#ll.V(nextName) + ll.V(name))
+        return ll.V(name)
+    end
+    local function static(c)
+        count = count + 1
+        local name = 'C' .. tostring(count)
+        local nextName = 'C' .. tostring(count + 1)
+        state[name] = ll.P(c) * #ll.V(nextName)
+        return ll.V(name)
+    end
+    local function eof()
+        count = count + 1
+        local name = 'C' .. tostring(count)
+        state[name] = ll.Cmt(ll.P(1) + ll.Cp(), function (_, _, c)
+            return type(c) == 'number'
+        end)
+        return ll.V(name)
+    end
+    local isFirstCode = true
+    local firstCode
+    local compiler = ll.P {
+        'Result',
+        Result = (ll.V'Code' + ll.V'Static')^1,
+        Code   = ll.P'?' / function ()
+            if isFirstCode then
+                isFirstCode = false
+                push(ll.Cmt(ll.C(code()), function (_, pos, code)
+                    firstCode = code
+                    return pos, code
+                end))
+            else
+                push(ll.Cmt(
+                    ll.C(code()),
+                    function (_, _, me)
+                        return firstCode == me
+                    end
+                ))
+            end
+        end,
+        Static = (1 - ll.P'?')^1 / function (c)
+            push(static(c))
+        end,
+    }
+    compiler:match(str)
+    push(eof())
+    return ll.P(state)
+end
+
 function mt:compileLuaPath()
     for i, luapath in ipairs(self.luapath) do
-        self.compiledpath[i] = '^' .. luapath:gsub('%.', '%%.'):gsub('%?', '(.-)') .. '$'
+        self.pathMatcher[i] = self:createCompiler(luapath)
     end
 end
 
 function mt:convertPathAsRequire(filename, start)
     local list
-    for _, luapath in ipairs(self.compiledpath) do
-        local str = filename:match(luapath, start)
+    for _, matcher in ipairs(self.pathMatcher) do
+        local str, a2, a3 = matcher:match(filename:sub(start))
         if str then
             if not list then
                 list = {}
@@ -327,7 +390,7 @@ return function (lsp, name)
             '?/init.lua',
             '?/?.lua',
         },
-        compiledpath = {}
+        pathMatcher = {}
     }, mt)
     workspace:compileLuaPath()
     return workspace

@@ -674,8 +674,10 @@ end
 
 function mt:onUpdateConfig(updated, other)
     local oldConfig = table.deepCopy(config.config)
+    local oldOther  = table.deepCopy(config.other)
     config:setConfig(updated, other)
     local newConfig = config.config
+    local newOther  = config.other
     if not table.equal(oldConfig.runtime, newConfig.runtime) then
         local library = require 'core.library'
         library.reload()
@@ -685,7 +687,9 @@ function mt:onUpdateConfig(updated, other)
         log.debug('reDiagnostic')
         self:reDiagnostic()
     end
-    if not table.equal(oldConfig.workspace, newConfig.workspace) then
+    if not table.equal(oldConfig.workspace, newConfig.workspace)
+    or not table.equal(oldOther.associations, newOther.associations)
+    then
         self:clearAllFiles()
         if self.workspace then
             self.workspace:scanFiles()

@@ -133,6 +133,8 @@ local function setConfig(self, config, other)
                 local suc, v = info[2](v)
                 if suc then
                     Config[c][k] = v
+                else
+                    Config[c][k] = info[1]
                 end
             end
         end
@@ -141,6 +143,8 @@ local function setConfig(self, config, other)
             local suc, v = info[2](v)
             if suc then
                 Other[k] = v
+            else
+                Other[k] = info[1]
             end
         end
         log.debug('Config update: ', table.dump(Config), table.dump(Other))

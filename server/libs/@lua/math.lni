@@ -220,7 +220,7 @@ type = 'number'
 [pi]
 type = 'number'
 
-[power]
+[pow]
 version = {'Lua 5.1', 'Lua 5.2', 'LuaJIT'}
 [[.args]]
 name = 'x'

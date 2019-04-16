@@ -73,7 +73,7 @@ description = '返回 `x` 的整数部分和小数部分。'
 [pi]
 description = '*π* 的值。'
 
-[power]
+[pow]
 description = '返回 `x ^ y` 。'
 
 [rad]

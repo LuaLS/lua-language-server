@@ -120,8 +120,8 @@ local function init()
     end
 
     Other = {}
-    for k, v in pairs(OtherTemplate) do
-        Other[k] = v
+    for k, info in pairs(OtherTemplate) do
+        Other[k] = info[1]
     end
 end
 

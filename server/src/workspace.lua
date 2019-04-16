@@ -352,7 +352,11 @@ function mt:searchPath(baseUri, str)
 end
 
 function mt:loadPath(baseUri, str)
-    str = fs.relative(fs.absolute(self.root / str), self.root):string():lower()
+    local ok, relative = pcall(fs.relative, fs.absolute(self.root / str), self.root)
+    if not ok then
+        return nil
+    end
+    str = relative:string():lower()
     if self.loaded[str] then
         return self.loaded[str]
     end

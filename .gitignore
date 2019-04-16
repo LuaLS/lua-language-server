@@ -3,6 +3,7 @@ node_modules
 .vscode-test
 /server/log
 /server/bin
+/server/*.so
 /publish
 /build/
 !*.exe

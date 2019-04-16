@@ -52,6 +52,10 @@ local mt = {}
 mt.__index = mt
 
 function mt:uriDecode(uri)
+    -- Unix-like系统根是/
+    if uri:sub(1, 9) == 'file:////' then
+        return fs.path(uri:sub(9))
+    end
     if uri:sub(1, 8) ~= 'file:///' then
         log.error('uri decode failed: ', uri)
         return nil

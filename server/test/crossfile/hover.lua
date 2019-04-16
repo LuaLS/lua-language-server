@@ -76,7 +76,8 @@ function TEST(data)
     local hover = core.hover(source, lsp)
     assert(hover)
     if data.hover.description then
-        data.hover.description = data.hover.description:gsub('%$ROOT%$', ws:uriEncode(ROOT):gsub('%%', '%%%%'))
+        local uriROOT = ws:uriEncode(ROOT):gsub('%%', '%%%%')
+        data.hover.description = data.hover.description:gsub('%$ROOT%$', uriROOT)
     end
     if hover.label then
         hover.label = hover.label:gsub('\r\n', '\n')

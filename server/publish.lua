@@ -63,7 +63,7 @@ local function copyFiles(root, out)
 end
 
 local function runTest(root)
-    local exe = root / 'bin' / 'lua-language-server.exe'
+    local exe = root / 'bin' / 'lua-language-server'
     local test = root / 'test' / 'main.lua'
     local lua = subprocess.spawn {
         exe,

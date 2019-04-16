@@ -2,6 +2,24 @@ local fs = require 'bee.filesystem'
 local async = require 'async'
 local config = require 'config'
 local ll = require 'lpeglabel'
+local platform = require 'bee.platform'
+
+local TrueName = {}
+
+local function getFileName(path)
+    local name = path:string()
+    if platform.OS == 'Windows' then
+        local lname = name:lower()
+        TrueName[lname] = name
+        return lname
+    else
+        return name
+    end
+end
+
+local function getTrueName(name)
+    return TrueName[name] or name
+end
 
 local function split(str, sep)
     local t = {}
@@ -119,7 +137,7 @@ function mt:scanFiles()
         elseif mode == 'file' then
             local file = ...
             local path = fs.path(file.path)
-            local name = path:string():lower()
+            local name = getFileName(path)
             local uri = self:uriEncode(path)
             self.files[name] = uri
             self.lsp:readText(uri, path, file.buf, compiled)
@@ -152,14 +170,14 @@ end
 function mt:addFile(uri)
     if uri:sub(-4) == '.lua' then
         local path = self:uriDecode(uri)
-        local name = path:string():lower()
+        local name = getFileName(path)
         self.files[name] = uri
         self.lsp:readText(uri, path)
     end
 end
 
 function mt:removeFile(uri)
-    local name = self:uriDecode(uri):string():lower()
+    local name = getFileName(self:uriDecode(uri))
     self.files[name] = nil
     self.lsp:removeText(uri)
 end
@@ -265,7 +283,7 @@ end
 function mt:convertPathAsRequire(filename, start)
     local list
     for _, matcher in ipairs(self.pathMatcher) do
-        local str, a2, a3 = matcher:match(filename:sub(start))
+        local str = matcher:match(filename:sub(start))
         if str then
             if not list then
                 list = {}
@@ -277,12 +295,14 @@ function mt:convertPathAsRequire(filename, start)
 end
 
 function mt:matchPath(baseUri, input)
-    input = input:lower()
+    if platform.OS == 'Windows' then
+        input = input:lower()
+    end
     local first = input:match '[^%.]+'
     if not first then
         return nil
     end
-    local baseName = self:uriDecode(baseUri):string():lower()
+    local baseName = getFileName(self:uriDecode(baseUri))
     local rootLen = #self.root:string()
     local map = {}
     for filename in pairs(self.files) do
@@ -290,18 +310,19 @@ function mt:matchPath(baseUri, input)
         if start then
             local list = self:convertPathAsRequire(filename, start + 1)
             if list then
+                local trueFilename = getTrueName(filename)
                 for _, str in ipairs(list) do
                     if #str >= #input and str:sub(1, #input) == input then
                         if not map[str] then
-                            map[str] = filename
+                            map[str] = trueFilename
                         else
-                            local s1 = similarity(filename, baseName)
+                            local s1 = similarity(trueFilename, baseName)
                             local s2 = similarity(map[str], baseName)
                             if s1 > s2 then
-                                map[str] = filename
+                                map[str] = trueFilename
                             elseif s1 == s2 then
-                                if filename < map[str] then
-                                    map[str] = filename
+                                if trueFilename < map[str] then
+                                    map[str] = trueFilename
                                 end
                             end
                         end
@@ -338,7 +359,7 @@ function mt:searchPath(baseUri, str)
     str = str:gsub('%.', '/')
     local searchers = {}
     for i, luapath in ipairs(self.luapath) do
-        searchers[i] = luapath:gsub('%?', str):lower()
+        searchers[i] = luapath:gsub('%?', str)
     end
 
     local uri = self:findPath(baseUri, searchers)
@@ -356,7 +377,7 @@ function mt:loadPath(baseUri, str)
     if not ok then
         return nil
     end
-    str = relative:string():lower()
+    str = getFileName(relative:string())
     if self.loaded[str] then
         return self.loaded[str]
     end

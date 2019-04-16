@@ -21,6 +21,14 @@ local function getTrueName(name)
     return TrueName[name] or name
 end
 
+local function fileNameEq(a, b)
+    if platform.OS == 'Windows' then
+        return a:lower() == b:lower()
+    else
+        return a == b
+    end
+end
+
 local function split(str, sep)
     local t = {}
     for s in str:gmatch('[^' .. sep .. ']+') do
@@ -233,7 +241,22 @@ function mt:createCompiler(str)
         count = count + 1
         local name = 'C' .. tostring(count)
         local nextName = 'C' .. tostring(count + 1)
-        state[name] = ll.P(c) * #ll.V(nextName)
+        local catch = #ll.V(nextName)
+        if platform.OS == 'Windows' then
+            for i = #c, 1, -1 do
+                local char = c:sub(i, i)
+                local u = char:upper()
+                local l = char:lower()
+                if u == l then
+                    catch = ll.P(char) * catch
+                else
+                    catch = (ll.P(u) + ll.P(l)) * catch
+                end
+            end
+        else
+            catch = ll.P(c) * catch
+        end
+        state[name] = catch
         return ll.V(name)
     end
     local function eof()
@@ -295,9 +318,6 @@ function mt:convertPathAsRequire(filename, start)
 end
 
 function mt:matchPath(baseUri, input)
-    if platform.OS == 'Windows' then
-        input = input:lower()
-    end
     local first = input:match '[^%.]+'
     if not first then
         return nil
@@ -306,13 +326,18 @@ function mt:matchPath(baseUri, input)
     local rootLen = #self.root:string()
     local map = {}
     for filename in pairs(self.files) do
-        local start = filename:find('/' .. first, rootLen + 1, true)
+        local trueFilename = getTrueName(filename)
+        local start
+        if platform.OS == 'Windows' then
+            start = filename:find('[/\\]' .. first:lower(), rootLen + 1)
+        else
+            start = trueFilename:find('[/\\]' .. first, rootLen + 1)
+        end
         if start then
-            local list = self:convertPathAsRequire(filename, start + 1)
+            local list = self:convertPathAsRequire(trueFilename, start + 1)
             if list then
-                local trueFilename = getTrueName(filename)
                 for _, str in ipairs(list) do
-                    if #str >= #input and str:sub(1, #input) == input then
+                    if #str >= #input and fileNameEq(str:sub(1, #input), input) then
                         if not map[str] then
                             map[str] = trueFilename
                         else

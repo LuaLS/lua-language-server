@@ -334,7 +334,7 @@ function mt:createCompiler(str)
 end
 
 function mt:compileLuaPath()
-    for i, luapath in ipairs(self.luapath) do
+    for i, luapath in ipairs(config.config.runtime.path) do
         self.pathMatcher[i] = self:createCompiler(luapath)
     end
 end
@@ -419,7 +419,7 @@ function mt:searchPath(baseUri, str)
     end
     str = str:gsub('%.', '/')
     local searchers = {}
-    for i, luapath in ipairs(self.luapath) do
+    for i, luapath in ipairs(config.config.runtime.path) do
         searchers[i] = luapath:gsub('%?', str)
     end
 
@@ -471,11 +471,6 @@ return function (lsp, name)
         files = {},
         searched = {},
         loaded = {},
-        luapath = {
-            '?.lua',
-            '?/init.lua',
-            '?/?.lua',
-        },
         pathMatcher = {}
     }, mt)
     workspace:compileLuaPath()

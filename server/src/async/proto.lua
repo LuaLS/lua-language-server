@@ -53,6 +53,5 @@ end
 
 while true do
     readProto()
-    collectgarbage()
     GC:push(ID, collectgarbage 'count')
 end

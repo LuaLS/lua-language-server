@@ -7,6 +7,5 @@ while true do
     if buf then
         OUT:push(filename, buf)
     end
-    collectgarbage()
     GC:push(ID, collectgarbage 'count')
 end

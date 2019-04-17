@@ -6,7 +6,7 @@ return function (lsp, params)
     if not vm then
         return
     end
-    local position = lines:positionAsChar(params.position.line + 1, params.position.character)
+    local position = lines:position(params.position.line + 1, params.position.character + 1)
     local hovers = core.signature(vm, position)
     if not hovers then
         return

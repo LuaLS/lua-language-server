@@ -86,6 +86,7 @@ Please [help me][en-US] improve the quality of `en-US`.
 * [ScreenToGif](https://github.com/NickeManarin/ScreenToGif)
 * [lsp-sample-client](https://github.com/Microsoft/vscode-extension-samples)
 * [Lua 5.3 中文翻译](https://cloudwu.github.io/lua53doc/manual.html)
+* [EmmyLua](https://emmylua.github.io)
 
 ## Acknowledgement
 
@@ -94,3 +95,4 @@ Please [help me][en-US] improve the quality of `en-US`.
 * [Jayden Charbonneau](https://github.com/Reshiram110)
 * [Stjepan Bakrac](https://github.com/z16)
 * [Peter Young](https://github.com/young40)
+* [Li Xiaobin](https://github.com/Xiaobin0860)

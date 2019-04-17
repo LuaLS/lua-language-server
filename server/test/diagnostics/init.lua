@@ -312,3 +312,15 @@ local _ = 1, <!2!>
 TEST [[
 _ = 1, <!2!>
 ]]
+
+TEST [[
+local function x()
+    do
+        local k
+        print(k)
+        x()
+    end
+    local k = 1
+    print(k)
+end
+]]

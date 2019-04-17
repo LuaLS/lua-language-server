@@ -21,13 +21,17 @@ function mt:getUri()
     return source and source.uri or ''
 end
 
-function mt:push(source)
+function mt:push(source, ischunk)
     if self._removed then
         return
     end
     self._top = self._top + 1
     self.locals[self._top] = {}
     self.finishs[self._top] = source and source.finish or math.maxinteger
+end
+
+function mt:markChunk()
+    self.chunk[self._top] = true
 end
 
 function mt:pop()
@@ -37,6 +41,7 @@ function mt:pop()
     local closed = self.finishs[self._top]
     local closedLocals = self.locals[self._top]
     self.locals[self._top] = nil
+    self.chunk[self._top] = nil
     for _, loc in pairs(closedLocals) do
         loc:close(closed)
     end
@@ -57,6 +62,16 @@ function mt:saveLocal(name, loc)
     self.locals[self._top][name] = loc
 end
 
+function mt:saveUpvalue(name, loc)
+    if self._removed then
+        return
+    end
+    if loc.type ~= 'local' then
+        error('saveLocal必须是local')
+    end
+    self.upvalues[name] = loc
+end
+
 function mt:loadLocal(name)
     for i = self._top, 1, -1 do
         local locals = self.locals[i]
@@ -64,6 +79,13 @@ function mt:loadLocal(name)
         if loc then
             return loc
         end
+        if self.chunk[i] then
+            break
+        end
+    end
+    local uv = self.upvalues[name]
+    if uv then
+        return uv
     end
     return nil
 end
@@ -79,6 +101,18 @@ function mt:eachLocal(callback)
                 if res ~= nil then
                     return res
                 end
+            end
+        end
+        if self.chunk[i] then
+            break
+        end
+    end
+    for name, loc in pairs(self.upvalues) do
+        if not mark[name] then
+            mark[name] = true
+            local res = callback(name, loc)
+            if res ~= nil then
+                return res
             end
         end
     end
@@ -208,7 +242,7 @@ function mt:run(vm)
         if self._objectSource then
             local loc = localMgr.create('self', vm:instantSource(self._objectSource), self._objectValue)
             loc:set('hide', true)
-            self:saveLocal('self', loc)
+            self:saveUpvalue('self', loc)
             self.args[#self.args+1] = loc
         end
 
@@ -246,7 +280,7 @@ function mt:createArg(vm, arg)
     arg:set('arg', true)
     if arg.type == 'name' then
         local loc = localMgr.create(arg[1], arg, valueMgr.create('nil', arg))
-        self:saveLocal(arg[1], loc)
+        self:saveUpvalue(arg[1], loc)
         self.args[#self.args+1] = loc
     elseif arg.type == '...' then
         self._dots = createMulti()
@@ -259,7 +293,7 @@ function mt:createLibArg(arg, source)
     else
         local name = arg.name or '_'
         local loc = localMgr.create(name, source, valueMgr.create('any', source))
-        self:saveLocal(name, loc)
+        self:saveUpvalue(name, loc)
         self.args[#self.args+1] = loc
     end
 end
@@ -337,11 +371,12 @@ local function create(source)
     local self = setmetatable({
         source = id,
         locals = {},
+        upvalues = {},
+        chunk = {},
         finishs = {},
         args = {},
         argValues = {},
     }, mt)
-    self:push(source)
 
     local id = listMgr.add(self)
     self.id = id

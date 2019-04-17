@@ -103,6 +103,7 @@ function mt:runFunction(func)
     local originFunction = self:getCurrentFunction()
     self:setCurrentFunction(func)
     func:push(func:getSource())
+    func:markChunk()
 
     self:doActions(func:getSource())
 
@@ -125,7 +126,7 @@ function mt:buildFunction(exp)
     local func = value:getFunction()
 
     self:eachLocal(function (name, loc)
-        func:saveLocal(name, loc)
+        func:saveUpvalue(name, loc)
     end)
 
     return value
@@ -1078,6 +1079,10 @@ function mt:saveLocal(name, loc)
     self.currentFunction:saveLocal(name, loc)
 end
 
+function mt:saveUpvalue(name, loc)
+    self.currentFunction:saveUpvalue(name, loc)
+end
+
 function mt:loadLocal(name)
     return self.currentFunction:loadLocal(name)
 end
@@ -1153,6 +1158,23 @@ function mt:createLocal(key, source, value)
     return loc
 end
 
+function mt:createUpvalue(key, source, value)
+    local loc = self:bindLocal(source)
+    if loc then
+        return loc
+    end
+
+    if not value then
+        value = self:createValue('nil', source)
+    end
+
+    loc = localMgr.create(key, source, value)
+    self:saveUpvalue(key, loc)
+    self:bindLocal(source, loc, 'local')
+    value:addInfo('local', source)
+    return loc
+end
+
 function mt:createEnvironment(ast)
     -- 整个文件是一个函数
     self.main = self:createFunction(ast)
@@ -1165,11 +1187,11 @@ function mt:createEnvironment(ast)
     local env
     if self.envType == '_ENV' then
         -- 隐藏的上值`_ENV`
-        env = self:createLocal('_ENV', self:getDefaultSource(), global)
+        env = self:createUpvalue('_ENV', self:getDefaultSource(), global)
     else
         -- 为了实现方便，fenv也使用隐藏上值来实现
         -- 使用了非法标识符保证用户无法访问
-        env = self:createLocal('@ENV', self:getDefaultSource(), global)
+        env = self:createUpvalue('@ENV', self:getDefaultSource(), global)
     end
     env:set('hide', true)
     self.env = env

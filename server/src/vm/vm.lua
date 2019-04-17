@@ -1144,6 +1144,7 @@ end
 function mt:createLocal(key, source, value)
     local loc = self:bindLocal(source)
     if loc then
+        self:saveLocal(key, loc)
         return loc
     end
 

@@ -324,3 +324,11 @@ local function x()
     print(k)
 end
 ]]
+
+TEST [[
+local function x()
+    local loc
+    x()
+    print(loc)
+end
+]]

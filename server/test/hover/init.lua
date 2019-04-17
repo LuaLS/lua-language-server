@@ -448,3 +448,19 @@ local <?n?> = rawlen()
 [[
 local n: integer
 ]]
+
+TEST[[
+<?next?>()
+]]
+[[
+function next(table: table [, index: any])
+  -> key: any, value: any
+]]
+
+TEST[[
+local <?n?> = pairs()
+]]
+[[
+function n<next>(table: table [, index: any])
+  -> key: any, value: any
+]]

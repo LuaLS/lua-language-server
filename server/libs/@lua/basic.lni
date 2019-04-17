@@ -303,6 +303,7 @@ type = '...'
 optional = after
 
 [next]
+special = next
 [[.args]]
 name = 'table'
 type = 'table'
@@ -315,30 +316,12 @@ name = 'key'
 name = 'value'
 
 [pairs]
+special = pairs
 [[.args]]
 name = 't'
 type = 'table'
 [[.returns]]
-name = 'next'
-type = 'function'
-args = {
-    1 = {
-        name = 'table',
-        type = 'table',
-    },
-    2 = {
-        name = 'index',
-        optional = 'self',
-    },
-}
-returns = {
-    1 = {
-        name = 'key',
-    },
-    2 = {
-        name = 'value',
-    },
-}
+name = '@next'
 ``````````
 name = 't'
 type = 'table'

@@ -5,6 +5,7 @@ local functionMgr
 
 local CHILD_CACHE = {}
 local VALUE_CACHE = {}
+local Special = {}
 
 local buildLibValue
 local buildLibChild
@@ -39,6 +40,9 @@ function buildLibValue(lib)
                     func:setReturn(i, buildLibValue(rtn))
                 end
             end
+            if lib.special == 'pairs' then
+                func:setReturn(1, Special['next'])
+            end
         end
     elseif tp == 'string' then
         value = valueMgr.create('string', sourceMgr.dummy())
@@ -62,6 +66,10 @@ function buildLibValue(lib)
             value:rawSet(fName, fValue)
             value:addInfo('set child', sourceMgr.dummy(), fName, fValue)
         end
+    end
+
+    if lib.special == 'next' then
+        Special['next'] = value
     end
 
     return value

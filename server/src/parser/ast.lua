@@ -1090,6 +1090,118 @@ local Defs = {
         return {...}
     end,
 
+    -- EmmyLua 支持
+    EmmyName = function (start, str)
+        return {
+            type   = 'emmyName',
+            start  = start,
+            finish = start + #str - 1,
+            [1]    = str,
+        }
+    end,
+    DirtyEmmyName = function (pos)
+        pushError {
+            type = 'MISS_NAME',
+            start = pos,
+            finish = pos,
+        }
+        return {
+            type   = 'emmyName',
+            start  = pos,
+            finish = pos,
+            [1]    = ''
+        }
+    end,
+    EmmyClass = function (class, extends)
+        return {
+            type = 'emmyClass',
+            [1] = class,
+            [2] = extends,
+        }
+    end,
+    EmmyType = function (typeDef, ...)
+        if ... then
+            typeDef.enum = {...}
+        end
+        return typeDef
+    end,
+    EmmyCommonType = function (...)
+        return {
+            type = 'emmyType',
+            ...
+        }
+    end,
+    EmmyArrayType = function (typeName)
+        typeName.type = 'emmyArrayType'
+        return typeName
+    end,
+    EmmyTableType = function (typeName, keyType, valueType)
+        typeName.type = 'emmyTableType'
+        typeName[2] = keyType
+        typeName[3] = valueType
+        return typeName
+    end,
+    EmmyFunctionType = function (...)
+        return {
+            type = 'emmyFunctionType',
+            ...
+        }
+    end,
+    EmmyAlias = function (name, emmyName)
+        return {
+            type = 'emmyAlias',
+            [1]  = name,
+            [2]  = emmyName,
+        }
+    end,
+    EmmyParam = function (argName, emmyName)
+        return {
+            type = 'emmyParam',
+            [1]  = argName,
+            [2]  = emmyName,
+        }
+    end,
+    EmmyReturn = function (...)
+        return {
+            type = 'emmyReturn',
+            ...
+        }
+    end,
+    EmmyField = function (access, fieldName, ...)
+        return {
+            type = 'emmyField',
+            access, fieldName,
+            ...
+        }
+    end,
+    EmmyGenericBlock = function (genericName, parentName)
+        return { genericName, parentName }
+    end,
+    EmmyGeneric = function (...)
+        return {
+            type = 'emmyGeneric',
+            ...
+        }
+    end,
+    EmmyVararg = function (typeName)
+        return {
+            type = 'emmyVararg',
+            typeName,
+        }
+    end,
+    EmmyLanguage = function (language)
+        return {
+            type = 'emmyLanguage',
+            language,
+        }
+    end,
+    EmmySee = function (className, methodName)
+        return {
+            type = 'emmySee',
+            className, methodName
+        }
+    end,
+
     -- 捕获错误
     UnknownSymbol = function (start, symbol)
         pushError {

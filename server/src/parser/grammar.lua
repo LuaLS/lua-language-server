@@ -365,7 +365,8 @@ Set         <-  END
 ]]
 
 grammar 'Action' [[
-Action      <-  Sp (CrtAction / UnkAction)
+Action      <-  Emmy
+            /   Sp (CrtAction / UnkAction)
 CrtAction   <-  Semicolon
             /   Do
             /   Break
@@ -502,6 +503,83 @@ FunctionNamedBody
 FuncName    <-  (MustName (DOT MustName)* FuncMethod?)
             ->  Simple
 FuncMethod  <-  COLON Name / COLON {} -> MissMethod
+
+-- 占位
+Emmy        <-  '---@'
+]]
+
+grammar 'Emmy' [[
+Emmy            <-  '---@' EmmyBody ShortComment %nl*
+EmmyBody        <-  'class'    %s+ EmmyClass    -> EmmyClass
+                /   'type'     %s+ EmmyType     -> EmmyType
+                /   'alias'    %s+ EmmyAlias    -> EmmyAlias
+                /   'param'    %s+ EmmyParam    -> EmmyParam
+                /   'return'   %s+ EmmyReturn   -> EmmyReturn
+                /   'field'    %s+ EmmyField    -> EmmyField
+                /   'generic'  %s+ EmmyGeneric  -> EmmyGeneric
+                /   'vararg'   %s+ EmmyVararg   -> EmmyVararg
+                /   'language' %s+ EmmyLanguage -> EmmyLanguage
+                /   'see'      %s+ EmmySee      -> EmmySee 
+
+EmmyName        <-  ({} {[a-zA-Z_] [a-zA-Z0-9_]*})
+                ->  EmmyName
+MustEmmyName    <-  EmmyName / DirtyEmmyName
+DirtyEmmyName   <-  {} ->  DirtyEmmyName
+EmmyLongName    <-  ({} {(!%nl .)+})
+                ->  EmmyName
+
+EmmyClass       <-  (MustEmmyName EmmyParentClass?)
+EmmyParentClass <-  %s* ':' %s* MustEmmyName
+
+EmmyType        <-  (EmmyTypeDef EmmyTypeEnums*)
+                ->  EmmyType
+EmmyTypeDef     <-  EmmyFunctionType
+                /   EmmyArrayType
+                /   EmmyTableType
+                /   EmmyCommonType
+EmmyCommonType  <-  EmmyTypeNames
+                ->  EmmyCommonType
+EmmyTypeNames   <-  EmmyTypeName ('|' EmmyTypeName)*
+EmmyTypeName    <-  EmmyFunctionType
+                /   EmmyArrayType
+                /   EmmyTableType
+                /   MustEmmyName
+EmmyTypeEnums   <-  %s+ '|' %s+ String
+
+EmmyAlias       <-  MustEmmyName %s+ EmmyType
+
+EmmyParam       <-  MustEmmyName %s+ EmmyType
+
+EmmyReturn      <-  EmmyType
+
+EmmyField       <-  (EmmyFieldAccess MustEmmyName %s+ EmmyType)
+EmmyFieldAccess <-  ({'public'}    %s+)
+                /   ({'protected'} %s+)
+                /   ({'private'}   %s+)
+                /   {} -> 'public'
+
+EmmyGeneric     <-  EmmyGenericBlock
+                    (%s* ',' %s* EmmyGenericBlock)*
+EmmyGenericBlock<-  (MustEmmyName %s* (':' %s* EmmyType)?)
+                ->  EmmyGenericBlock
+
+EmmyVararg      <-  EmmyType
+
+EmmyLanguage    <-  MustEmmyName
+
+EmmyArrayType   <-  (MustEmmyName '[]')
+                ->  EmmyArrayType
+
+EmmyTableType   <-  (MustEmmyName '<' %s* EmmyType %s* ',' %s* EmmyType %s* '>')
+                ->  EmmyTableType
+
+EmmyFunctionType<-  ('fun' Cut %s* EmmyFunctionArgs? %s* EmmyFunctionRtn?)
+                ->  EmmyFunctionType
+EmmyFunctionArgs<-  '(' %s* EmmyFunctionArg %s* (',' %s* EmmyFunctionArg %s*)* ')'
+EmmyFunctionRtn <-  ':' %s* EmmyType
+EmmyFunctionArg <-  MustEmmyName %s* ':' %s* EmmyType
+
+EmmySee         <-  MustEmmyName '#' MustEmmyName
 ]]
 
 grammar 'Lua' [[

@@ -550,6 +550,18 @@ name = 'modname'
 type = 'string'
 [[.returns]]
 
+["require Lua 5.4"]
+version = 'Lua 5.4'
+name = 'require'
+special = 'require'
+[[.args]]
+name = 'modname'
+type = 'string'
+[[.returns]]
+type = any
+``````````
+name = loaderdata
+
 [unpack]
 version = {'Lua 5.1', 'LuaJIT'}
 [[.args]]

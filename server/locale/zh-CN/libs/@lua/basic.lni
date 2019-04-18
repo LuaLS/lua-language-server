@@ -221,11 +221,14 @@ description = '以给定消息发出一个警告。当`tocont`为 true 时，应
 [xpcall]
 description = '传入参数并设置一个消息处理器 `msgh`，以 *保护模式* 调用函数 `f` 。'
 
-['xpcall Lua 5.1']
+["xpcall Lua 5.1"]
 description = '设置一个消息处理器 `err`，以 *保护模式* 调用函数 `f` 。'
 
 [require]
-description = '加载一个模块。'
+description = '加载一个模块，返回该模块的返回值（`nil`时为`true`）。'
+
+["require Lua 5.4"]
+description = '加载一个模块，返回该模块的返回值（`nil`时为`true`）与搜索器返回的加载数据。默认搜索器的加载数据指示了加载位置，对于文件来说就是文件路径。'
 
 [unpack]
 description = [[

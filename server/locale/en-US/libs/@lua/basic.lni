@@ -230,7 +230,10 @@ description = 'Calls function `f` with the given arguments in protected mode wit
 description = 'Calls function `f` in protected mode with a new message handler.'
 
 [require]
-description = 'Loads the given module.'
+description = 'Loads the given module, returns any value returned by the given module(`true` when `nil`).'
+
+["require Lua 5.4"]
+description = 'Loads the given module, returns any value returned by the searcher(`true` when `nil`). Besides that value, also returns as a second result the loader data returned by the searcher, which indicates how `require` found the module. (For instance, if the module came from a file, this loader data is the file path.)'
 
 [unpack]
 description = [[

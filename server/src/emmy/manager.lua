@@ -32,13 +32,18 @@ function mt:eachClass(name, callback)
     if not list then
         return
     end
-    for _, class in pairs(list) do
-        callback(class)
+    for k, class in pairs(list) do
+        if k ~= 'version' then
+            local res = callback(class)
+            if res ~= nil then
+                return res
+            end
+        end
     end
 end
 
-function mt:addClass(class, parent)
-    local className = class[1]
+function mt:addClass(source)
+    local className = source[1][1]
     self:flushClass(className)
     local list = self._class[className]
     local version = listMgr.getVersion()
@@ -48,8 +53,8 @@ function mt:addClass(class, parent)
         }
         self._class[className] = list
     end
-    list[class.id] = newClass(class, parent)
-    return list[class.id]
+    list[source.id] = newClass(source)
+    return list[source.id]
 end
 
 function mt:remove()

@@ -374,26 +374,6 @@ function mt:searchRedundantValue(callback)
     end)
 end
 
-function mt:doDiagnostics(func, code, callback)
-    if config.config.diagnostics.disable[code] then
-        return
-    end
-    func(self, function (start, finish, ...)
-        local data = callback(...)
-        data.code   = code
-        data.start  = start
-        data.finish = finish
-        self.datas[#self.datas+1] = data
-    end)
-    if coroutine.isyieldable() then
-        if self.vm:isRemoved() then
-            coroutine.yield('stop')
-        else
-            coroutine.yield()
-        end
-    end
-end
-
 function mt:searchUndefinedEnvChild(callback)
     self.vm:eachSource(function (source)
         if not source:get 'global' then
@@ -419,6 +399,95 @@ function mt:searchUndefinedEnvChild(callback)
         end
         return
     end)
+end
+
+function mt:checkEmmyClass(source, callback)
+    local class = source:get 'emmy.class'
+    if not class then
+        return
+    end
+    -- class重复定义
+    local name = class:getName()
+    local related = {}
+    self.vm.emmyMgr:eachClass(name, function (class)
+        local src = class:getSource()
+        if src ~= source then
+            related[#related+1] = {
+                start = src.start,
+                finish = src.finish,
+                uri = src.uri,
+            }
+        end
+    end)
+    if #related > 0 then
+        callback(source.start, source.finish, lang.script.DIAG_DUPLICATE_CLASS ,related)
+    end
+    -- 继承不存在的class
+    local extends = class.extends
+    if not extends then
+        return
+    end
+    local parent = self.vm.emmyMgr:eachClass(extends, function (parent)
+        return parent
+    end)
+    if not parent then
+        callback(source[2].start, source[2].finish, lang.script.DIAG_UNDEFINED_CLASS)
+        return
+    end
+
+    -- class循环继承
+    local related = {}
+    local current = class
+    for _ = 1, 10 do
+        if parent:getName() == class:getName() then
+            callback(source.start, source.finish, lang.script.DIAG_CYCLIC_EXTENDS, related)
+            break
+        end
+        local extends = current.extends
+        if not extends then
+            break
+        end
+        related[#related+1] = {
+            start = current:getSource().start,
+            finish = current:getSource().finish,
+            uri = current:getSource().uri,
+        }
+        current = parent
+        parent = self.vm.emmyMgr:eachClass(extends, function (parent)
+            return parent
+        end)
+        if not parent then
+            break
+        end
+    end
+end
+
+function mt:searchEmmyLua(callback)
+    self.vm:eachSource(function (source)
+        if source.type == 'emmyClass' then
+            self:checkEmmyClass(source, callback)
+        end
+    end)
+end
+
+function mt:doDiagnostics(func, code, callback)
+    if config.config.diagnostics.disable[code] then
+        return
+    end
+    func(self, function (start, finish, ...)
+        local data = callback(...)
+        data.code   = code
+        data.start  = start
+        data.finish = finish
+        self.datas[#self.datas+1] = data
+    end)
+    if coroutine.isyieldable() then
+        if self.vm:isRemoved() then
+            coroutine.yield('stop')
+        else
+            coroutine.yield()
+        end
+    end
 end
 
 return function (vm, lines, uri)
@@ -536,6 +605,14 @@ return function (vm, lines, uri)
         return {
             level   = DiagnosticSeverity.Information,
             message = lang.script('DIAG_OVER_MAX_VALUES', max, passed),
+        }
+    end)
+    -- Emmy相关的检查
+    session:doDiagnostics(session.searchEmmyLua, 'emmy-lua', function (message, related)
+        return {
+            level   = DiagnosticSeverity.Warning,
+            message = message,
+            related = related,
         }
     end)
     return session.datas

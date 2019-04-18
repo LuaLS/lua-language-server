@@ -121,7 +121,7 @@ return function (lsp, params)
     local items = fastCompletion(lsp, params, lines)
     --local items = finishCompletion(lsp, params, lines)
     if not items then
-        return
+        return nil
     end
 
     for i, item in ipairs(items) do

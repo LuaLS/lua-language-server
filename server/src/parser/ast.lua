@@ -1115,6 +1115,8 @@ local Defs = {
     EmmyClass = function (class, extends)
         return {
             type = 'emmyClass',
+            start = class.start,
+            finish = (extends or class).finish,
             [1] = class,
             [2] = extends,
         }

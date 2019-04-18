@@ -333,25 +333,25 @@ local function x()
 end
 ]]
 
---TEST [[
------@class <!Class!>
------@class <!Class!>
---]]
---
---TEST [[
------@class A : <!B!>
---]]
---
---TEST [[
------@class <!A : B!>
------@class <!B : C!>
------@class <!C : D!>
------@class <!D : A!>
---]]
---
---TEST [[
------@class A : B
------@class B : C
------@class C : D
------@class D
---]]
+TEST [[
+---@class <!Class!>
+---@class <!Class!>
+]]
+
+TEST [[
+---@class A : <!B!>
+]]
+
+TEST [[
+---@class <!A : B!>
+---@class <!B : C!>
+---@class <!C : D!>
+---@class <!D : A!>
+]]
+
+TEST [[
+---@class A : B
+---@class B : C
+---@class C : D
+---@class D
+]]

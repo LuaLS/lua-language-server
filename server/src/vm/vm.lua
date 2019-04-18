@@ -1040,9 +1040,9 @@ function mt:doAction(action)
     elseif tp == 'localfunction' then
         self:doLocalFunction(action)
     elseif tp == 'emmyClass' then
-        self:doEmmyClass(action)
+        --self:doEmmyClass(action)
     elseif tp == 'emmyType' then
-        self:doEmmyType(action)
+        --self:doEmmyType(action)
     elseif tp == 'emmyAlias' then
     elseif tp == 'emmyParam' then
     elseif tp == 'emmyReturn' then

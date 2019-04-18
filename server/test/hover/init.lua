@@ -465,10 +465,10 @@ function n<next>(table: table [, index: any])
   -> key: any, value: any
 ]]
 
-TEST[[
----@class Class
-local <?x?> = class()
-]]
-[[
-local x: *Class
-]]
+--TEST[[
+-----@class Class
+--local <?x?> = class()
+--]]
+--[[
+--local x: *Class
+--]]

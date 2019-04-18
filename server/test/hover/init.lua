@@ -472,3 +472,11 @@ local <?x?> = class()
 [[
 local x: *Class
 ]]
+
+TEST[[
+---@class Class
+<?x?> = class()
+]]
+[[
+global x: *Class
+]]

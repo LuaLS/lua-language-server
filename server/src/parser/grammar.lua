@@ -338,7 +338,7 @@ ArgList     <-  (DOTS / Name / Sp {} COMMA)*
 
 Table       <-  Sp ({} TL TableFields? DirtyTR)
             ->  Table
-TableFields <-  (TableSep {} / TableField)+
+TableFields <-  (Emmy / TableSep {} / TableField)+
 TableSep    <-  COMMA / SEMICOLON
 TableField  <-  NewIndex / NewField / Exp
 NewIndex    <-  Sp ({} BL DirtyExp DirtyBR NeedAssign DirtyExp)
@@ -362,6 +362,7 @@ LabelEnd    <-  {} -> LabelEnd
 -- 纯占位，修改了 `relabel.lua` 使重复定义不抛错
 Action      <-  !END .
 Set         <-  END
+Emmy        <-  '---@'
 ]]
 
 grammar 'Action' [[

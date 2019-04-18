@@ -629,8 +629,10 @@ local Defs = {
             end
             if isField then
                 table[#table+1] = arg
-                wantField = false
-                start = arg.finish + 1
+                if arg.finish then
+                    wantField = false
+                    start = arg.finish + 1
+                end
             else
                 wantField = true
                 start = arg

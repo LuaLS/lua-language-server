@@ -111,6 +111,13 @@ function mt:shadow(old)
     end
     group[#group+1] = self
     self._shadow = group
+
+    if not self:getSource() then
+        log.debug('not self:getSource()', table.dump(self))
+    end
+    if not old.close then
+        log.debug('not old.close', table.dump(old))
+    end
     old:close(self:getSource().start - 1)
 end
 

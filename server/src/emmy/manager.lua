@@ -57,10 +57,14 @@ function mt:addClass(source)
     return list[source.id]
 end
 
+function mt:createType(source)
+end
+
 function mt:remove()
 end
 
 return function ()
+    ---@class emmyMgr
     local self = setmetatable({
         _class = {},
     }, mt)

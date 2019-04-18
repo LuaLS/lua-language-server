@@ -41,12 +41,14 @@ function mt:buildTable(source)
     end
     local n = 0
     for index, obj in ipairs(source) do
+        local emmy = self:getEmmy()
         if obj.type == 'pair' then
             local value = self:getFirstInMulti(self:getExp(obj[2]))
             local key   = obj[1]
             self:instantSource(obj)
             self:instantSource(key)
             key:bindValue(value, 'set')
+            value:setEmmy(emmy)
             if key.index then
                 local index = self:getIndex(obj)
                 key:set('parent', tbl)
@@ -58,6 +60,8 @@ function mt:buildTable(source)
                     tbl:setChild(key[1], value, key)
                 end
             end
+        elseif obj.type:sub(1, 4) == 'emmy' then
+            self:doEmmy(obj)
         else
             local value = self:getExp(obj)
             if value.type == 'multi' then
@@ -776,10 +780,11 @@ function mt:doGoTo(source)
     end
 end
 
-function mt:setOne(var, value)
+function mt:setOne(var, value, emmy)
     if not value then
         value = valueMgr.create('nil', self:getDefaultSource())
     end
+    value:setEmmy(emmy)
     self:instantSource(var)
     if var.type == 'name' then
         self:setName(var[1], var, value)
@@ -803,6 +808,7 @@ function mt:setOne(var, value)
 end
 
 function mt:doSet(action)
+    local emmy = self:getEmmy()
     if not action[2] then
         return
     end
@@ -822,11 +828,12 @@ function mt:doSet(action)
     local i = 0
     self:forList(vars, function (var)
         i = i + 1
-        self:setOne(var, values[i])
+        self:setOne(var, values[i], emmy)
     end)
 end
 
 function mt:doLocal(action)
+    local emmy = self:getEmmy()
     self:instantSource(action)
     local vars = action[1]
     local exps = action[2]
@@ -849,9 +856,8 @@ function mt:doLocal(action)
         if values then
             value = values[i]
         end
-        self:createLocal(key[1], key, value)
+        self:createLocal(key[1], key, value, emmy)
     end)
-    self.emmy = nil
 end
 
 function mt:doIf(action)
@@ -994,6 +1000,28 @@ function mt:doLocalFunction(action)
     end
 end
 
+function mt:doEmmy(action)
+    local tp = action.type
+    if tp == 'emmyClass' then
+        self:doEmmyClass(action)
+    elseif tp == 'emmyType' then
+        self:doEmmyType(action)
+    elseif tp == 'emmyAlias' then
+    elseif tp == 'emmyParam' then
+    elseif tp == 'emmyReturn' then
+    elseif tp == 'emmyField' then
+    elseif tp == 'emmyGeneric' then
+    elseif tp == 'emmyVararg' then
+    elseif tp == 'emmyLanguage' then
+    elseif tp == 'emmyArrayType' then
+    elseif tp == 'emmyTableType' then
+    elseif tp == 'emmyFunctionType' then
+    elseif tp == 'emmySee' then
+    elseif tp == 'emmyIncomplete' then
+        self:doEmmyIncomplete(action)
+    end
+end
+
 function mt:doAction(action)
     if not action then
         -- Skip
@@ -1008,6 +1036,10 @@ function mt:doAction(action)
         end
     end
     local tp = action.type
+    if tp:sub(1, 4) == 'emmy' then
+        self:doEmmy(action)
+        return
+    end
     if     tp == 'do' then
         self:doDo(action)
     elseif tp == 'break' then
@@ -1039,27 +1071,11 @@ function mt:doAction(action)
         self:doFunction(action)
     elseif tp == 'localfunction' then
         self:doLocalFunction(action)
-    elseif tp == 'emmyClass' then
-        self:doEmmyClass(action)
-    elseif tp == 'emmyType' then
-        self:doEmmyType(action)
-    elseif tp == 'emmyAlias' then
-    elseif tp == 'emmyParam' then
-    elseif tp == 'emmyReturn' then
-    elseif tp == 'emmyField' then
-    elseif tp == 'emmyGeneric' then
-    elseif tp == 'emmyVararg' then
-    elseif tp == 'emmyLanguage' then
-    elseif tp == 'emmyArrayType' then
-    elseif tp == 'emmyTableType' then
-    elseif tp == 'emmyFunctionType' then
-    elseif tp == 'emmySee' then
-    elseif tp == 'emmyIncomplete' then
-        self:doEmmyIncomplete(action)
     else
         self:getExp(action)
         action:set('as action', true)
     end
+    self:clearEmmy()
 end
 
 function mt:doActions(actions)
@@ -1161,20 +1177,20 @@ function mt:bindLabel(source, label, action)
     end
 end
 
-function mt:createLocal(key, source, value)
+function mt:createLocal(key, source, value, emmy)
     local loc = self:bindLocal(source)
     if not value then
         value = self:createValue('nil', source)
     end
     if loc then
         loc:setValue(value)
-        loc:setEmmy(self.emmy)
+        loc:setEmmy(emmy)
         self:saveLocal(key, loc)
         return loc
     end
 
     loc = localMgr.create(key, source, value)
-    loc:setEmmy(self.emmy)
+    loc:setEmmy(emmy)
     self:saveLocal(key, loc)
     self:bindLocal(source, loc, 'local')
     value:addInfo('local', source)
@@ -1281,6 +1297,7 @@ return function (ast, lsp, uri)
         main    = nil,
         env     = nil,
         emmy    = nil,
+        ---@type emmyMgr
         emmyMgr = lsp and lsp.emmy or emmyMgr(),
         lsp     = lsp,
         uri     = uri or '',

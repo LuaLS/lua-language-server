@@ -770,26 +770,31 @@ t.$
     }
 }
 
---TEST [[
---local elseaaa
---if a then
---else$
---]]
---{
---    {
---        label = 'elseaaa',
---        kind = CompletionItemKind.Variable,
---        documentation = EXISTS,
---    },
---    {
---        label = 'else',
---        kind = CompletionItemKind.Keyword,
---    },
---    {
---        label = 'elseif',
---        kind = CompletionItemKind.Keyword,
---    }
---}
+TEST [[
+local elseaaa
+ELSE = 1
+if a then
+else$
+]]
+{
+    {
+        label = 'elseaaa',
+        kind = CompletionItemKind.Variable,
+    },
+    {
+        label = 'ELSE',
+        kind = CompletionItemKind.Enum,
+        detail = EXISTS,
+    },
+    {
+        label = 'else',
+        kind = CompletionItemKind.Keyword,
+    },
+    {
+        label = 'elseif',
+        kind = CompletionItemKind.Keyword,
+    }
+}
 
 TEST [[
 ---@$

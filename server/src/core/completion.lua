@@ -1,6 +1,7 @@
 local findSource = require 'core.find_source'
 local getFunctionHover = require 'core.hover.function'
 local getFunctionHoverAsLib = require 'core.hover.lib_function'
+local sourceMgr = require 'vm.source'
 local config = require 'config'
 
 local CompletionItemKind = {
@@ -249,20 +250,7 @@ local function searchFieldsByInfo(parent, word, source, map)
     end)
 end
 
-local function searchFields(vm, source, word, callback)
-    local parent = source:get 'parent'
-    if not parent then
-        return
-    end
-    local map = {}
-    local current = parent
-    for _ = 1, 3 do
-        searchFieldsByInfo(current, word, source, map)
-        current = current:getMetaMethod('__index')
-        if not current then
-            break
-        end
-    end
+local function searchFieldsByChild(parent, word, source, map)
     parent:eachChild(function (k, v)
         if map[k] then
             return
@@ -283,6 +271,23 @@ local function searchFields(vm, source, word, callback)
             map[k] = v
         end
     end)
+end
+
+local function searchFields(vm, source, word, callback)
+    local parent = source:get 'parent'
+    if not parent then
+        return
+    end
+    local map = {}
+    local current = parent
+    for _ = 1, 3 do
+        searchFieldsByInfo(current, word, source, map)
+        current = current:getMetaMethod('__index')
+        if not current then
+            break
+        end
+    end
+    searchFieldsByChild(parent, word, source, map)
     for k, v in sortPairs(map) do
         callback(k, nil, CompletionItemKind.Field, getValueData('field', k, v))
     end
@@ -326,12 +331,35 @@ local function searchKeyWords(vm, source, word, callback)
     end
 end
 
+local function searchGlobals(vm, source, word, callback)
+    local global = vm.env:getValue()
+    local map = {}
+    local current = global
+    for _ = 1, 3 do
+        searchFieldsByInfo(current, word, source, map)
+        current = current:getMetaMethod('__index')
+        if not current then
+            break
+        end
+    end
+    searchFieldsByChild(global, word, source, map)
+    for k, v in sortPairs(map) do
+        callback(k, nil, CompletionItemKind.Field, getValueData('field', k, v))
+    end
+end
+
 local function searchAsGlobal(vm, source, word, callback)
     if word == '' then
         return
     end
     searchLocals(vm, source, word, callback)
     searchFields(vm, source, word, callback)
+    searchKeyWords(vm, source, word, callback)
+end
+
+local function searchAsKeyowrd(vm, source, word, callback)
+    searchLocals(vm, source, word, callback)
+    searchGlobals(vm, source, word, callback)
     searchKeyWords(vm, source, word, callback)
 end
 
@@ -370,6 +398,10 @@ local function searchEmmyKeyword(vm, source, word, callback)
 end
 
 local function searchSource(vm, source, word, callback)
+    if source.type == 'keyword' then
+        searchAsKeyowrd(vm, source, word, callback)
+        return
+    end
     if source:get 'table index' then
         searchAsIndex(vm, source, word, callback)
         return
@@ -641,6 +673,18 @@ local function searchToclose(text, word, callback, pos)
     return false
 end
 
+local function keywordSource(vm, word, pos)
+    if not KEYMAP[word] then
+        return nil
+    end
+    return vm:instantSource {
+        type   = 'keyword',
+        start  = pos,
+        finish = pos + #word - 1,
+        [1]    = word,
+    }
+end
+
 return function (vm, text, pos, word, oldText)
     local filter = {
         ['name']           = true,
@@ -654,6 +698,7 @@ return function (vm, text, pos, word, oldText)
     local source = findSource(vm, pos,   filter)
                 or findSource(vm, pos-1, filter)
                 or findSource(vm, pos+1, filter)
+                or keywordSource(vm, word, pos)
     if not source then
         return nil
     end

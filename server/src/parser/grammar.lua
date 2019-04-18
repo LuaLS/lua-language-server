@@ -509,7 +509,8 @@ Emmy        <-  '---@'
 ]]
 
 grammar 'Emmy' [[
-Emmy            <-  '---@' EmmyBody ShortComment %nl*
+Emmy            <-  EmmySp '---@' EmmyBody ShortComment
+EmmySp          <-  (!'---@' Comment / %s / %nl)*
 EmmyBody        <-  'class'    %s+ EmmyClass    -> EmmyClass
                 /   'type'     %s+ EmmyType     -> EmmyType
                 /   'alias'    %s+ EmmyAlias    -> EmmyAlias

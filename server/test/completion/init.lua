@@ -101,8 +101,8 @@ rawset(_G, 'TEST', true)
 
 function TEST(script)
     return function (expect)
-        local pos = script:find('@', 1, true) - 1
-        local new_script = script:gsub('@', ' ')
+        local pos = script:find('$', 1, true) - 1
+        local new_script = script:gsub('%$', ' ')
         local ast = parser:ast(new_script, 'lua', 'Lua 5.4')
         local vm = buildVM(ast)
         assert(vm)
@@ -120,7 +120,7 @@ end
 
 TEST [[
 local zabcde
-za@
+za$
 ]]
 {
     {
@@ -132,7 +132,7 @@ za@
 TEST [[
 local zabcdefg
 local zabcde
-zabcde@
+zabcde$
 ]]
 {
     {
@@ -147,7 +147,7 @@ zabcde@
 
 TEST [[
 local zabcdefg
-za@
+za$
 local zabcde
 ]]
 {
@@ -163,7 +163,7 @@ local zabcde
 
 TEST [[
 local zabcde
-zace@
+zace$
 ]]
 {
     {
@@ -175,7 +175,7 @@ zace@
 TEST [[
 ZABC
 local zabc
-zac@
+zac$
 ]]
 {
     {
@@ -189,7 +189,7 @@ zac@
 }
 
 TEST [[
-ass@
+ass$
 ]]
 {
     {
@@ -201,7 +201,7 @@ ass@
 
 TEST [[
 local zabc = 1
-z@
+z$
 ]]
 {
     {
@@ -213,7 +213,7 @@ z@
 
 TEST [[
 local zabc = 1.0
-z@
+z$
 ]]
 {
     {
@@ -227,7 +227,7 @@ TEST [[
 local t = {
     abc = 1,
 }
-t.a@
+t.a$
 ]]
 {
     {
@@ -242,7 +242,7 @@ local mt = {}
 function mt:get(a, b)
     return 1
 end
-mt:g@
+mt:g$
 ]]
 {
     {
@@ -253,7 +253,7 @@ mt:g@
 }
 
 TEST [[
-loc@
+loc$
 ]]
 {
     {
@@ -265,7 +265,7 @@ loc@
 TEST [[
 t.a = {}
 t.b = {}
-t.@
+t.$
 ]]
 {
     {
@@ -281,7 +281,7 @@ t.@
 TEST [[
 t.a = {}
 t.b = {}
-t.   @
+t.   $
 ]]
 {
     {
@@ -298,7 +298,7 @@ TEST [[
 t.a = {}
 function t:b()
 end
-t:@
+t:$
 ]]
 {
     {
@@ -312,7 +312,7 @@ TEST [[
 local t = {
     a = {},
 }
-t.@
+t.$
 xxx()
 ]]
 {
@@ -328,13 +328,13 @@ xxx()
 }
 
 TEST [[
-(''):@
+(''):$
 ]]
 (EXISTS)
 
-TEST 'local s = "a:@"' (nil)
+TEST 'local s = "a:$"' (nil)
 
-TEST 'debug.@'
+TEST 'debug.$'
 (EXISTS)
 
 TEST [[
@@ -344,7 +344,7 @@ local xxxx = {
 }
 
 local t = {
-    x@
+    x$
 }
 ]]
 {
@@ -370,7 +370,7 @@ local t = {
 TEST [[
 print(ff2)
 local faa
-local f@
+local f$
 print(fff)
 ]]
 {
@@ -393,7 +393,7 @@ print(fff)
 }
 
 TEST [[
-local function f(ff@)
+local function f(ff$)
     print(fff)
 end
 ]]
@@ -405,7 +405,7 @@ end
 }
 
 TEST [[
-collectgarbage('@')
+collectgarbage('$')
 ]]
 {
     {
@@ -491,12 +491,12 @@ collectgarbage('@')
 }
 
 TEST [[
-collectgarbage(@)
+collectgarbage($)
 ]]
 (EXISTS)
 
 TEST [[
-io.read(@)
+io.read($)
 ]]
 {
     {
@@ -522,13 +522,13 @@ io.read(@)
 }
 
 TEST [[
-local function f(a, @)
+local function f(a, $)
 end
 ]]
 (nil)
 
 TEST [[
-self.results.list[#@]
+self.results.list[#$]
 ]]
 {
     {
@@ -543,7 +543,7 @@ self.results.list[#@]
 }
 
 TEST [[
-self.results.list[#self.re@]
+self.results.list[#self.re$]
 ]]
 {
     {
@@ -562,7 +562,7 @@ self.results.list[#self.re@]
 }
 
 TEST [[
-fff[#ff@]
+fff[#ff$]
 ]]
 {
     {
@@ -581,7 +581,7 @@ fff[#ff@]
 }
 
 TEST [[
-local _ = fff.kkk[#@]
+local _ = fff.kkk[#$]
 ]]
 {
     {
@@ -600,7 +600,7 @@ local t = {
     a = 1,
 }
 
-t .    @
+t .    $
 ]]
 (EXISTS)
 
@@ -609,7 +609,7 @@ local t = {
     a = 1,
 }
 
-t .    @ b
+t .    $ b
 ]]
 (EXISTS)
 
@@ -618,7 +618,7 @@ local t = {
     a = 1,
 }
 
-t @
+t $
 ]]
 (nil)
 
@@ -627,13 +627,13 @@ local t = {
     a = 1,
 }
 
-t @.
+t $.
 ]]
 (nil)
 
 TEST [[
 local xxxx
-xxxx@
+xxxx$
 ]]
 {
     {
@@ -645,7 +645,7 @@ xxxx@
 TEST [[
 local xxxx
 local XXXX
-xxxx@
+xxxx$
 ]]
 {
     {
@@ -662,7 +662,7 @@ TEST [[
 local t = {
     xxxxx = 1,
 }
-xx@
+xx$
 ]]
 {
     {
@@ -673,7 +673,7 @@ xx@
 
 TEST [[
 local index
-tbl[ind@]
+tbl[ind$]
 ]]
 {
     {
@@ -688,7 +688,7 @@ return function ()
         a = {},
         b = {},
     }
-    t.@
+    t.$
 end
 ]]
 {
@@ -704,7 +704,7 @@ end
 
 TEST [[
 local ast = 1
-local t = 'as@'
+local t = 'as$'
 local ask = 1
 ]]
 (nil)
@@ -712,7 +712,7 @@ local ask = 1
 TEST [[
 local add
 
-function f(a@)
+function f(a$)
     local _ = add
 end
 ]]
@@ -724,20 +724,20 @@ end
 }
 
 TEST [[
-function table.i@
+function table.i$
 ]]
 (EXISTS)
 
 TEST [[
 do
-    xx.@
+    xx.$
 end
 ]]
 (nil)
 
 require 'config' .config.runtime.version = 'Lua 5.4'
 TEST [[
-local *@
+local *$
 ]]
 {
     {
@@ -747,7 +747,7 @@ local *@
 }
 
 TEST [[
-local *tocl@
+local *tocl$
 ]]
 {
     {
@@ -761,7 +761,7 @@ local mt = {}
 mt.__index = mt
 local t = setmetatable({}, mt)
 
-t.@
+t.$
 ]]
 {
     {

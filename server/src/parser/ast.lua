@@ -1102,6 +1102,7 @@ local Defs = {
     DirtyEmmyName = function (pos)
         pushError {
             type = 'MISS_NAME',
+            level = 'warning',
             start = pos,
             finish = pos,
         }

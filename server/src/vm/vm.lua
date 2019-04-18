@@ -1042,6 +1042,7 @@ function mt:doAction(action)
     elseif tp == 'emmyClass' then
         self:doEmmyClass(action)
     elseif tp == 'emmyType' then
+        self:doEmmyType(action)
     elseif tp == 'emmyAlias' then
     elseif tp == 'emmyParam' then
     elseif tp == 'emmyReturn' then
@@ -1280,7 +1281,7 @@ return function (ast, lsp, uri)
         main    = nil,
         env     = nil,
         emmy    = nil,
-        emmyMgr = lsp and lsp.emmyMgr or emmyMgr(),
+        emmyMgr = lsp and lsp.emmy or emmyMgr(),
         lsp     = lsp,
         uri     = uri or '',
     }, mt)

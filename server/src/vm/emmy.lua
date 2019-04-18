@@ -8,6 +8,10 @@ function mt:doEmmyClass(action)
     action:set('emmy.class', class)
 end
 
+function mt:doEmmyType(action)
+    local emmyMgr = self.emmyMgr
+end
+
 function mt:doEmmyIncomplete(action)
     self:instantSource(action)
 end

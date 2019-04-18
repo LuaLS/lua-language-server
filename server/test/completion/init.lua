@@ -770,6 +770,27 @@ t.$
     }
 }
 
+--TEST [[
+--local elseaaa
+--if a then
+--else$
+--]]
+--{
+--    {
+--        label = 'elseaaa',
+--        kind = CompletionItemKind.Variable,
+--        documentation = EXISTS,
+--    },
+--    {
+--        label = 'else',
+--        kind = CompletionItemKind.Keyword,
+--    },
+--    {
+--        label = 'elseif',
+--        kind = CompletionItemKind.Keyword,
+--    }
+--}
+
 TEST [[
 ---@$
 ]]

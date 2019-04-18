@@ -642,7 +642,18 @@ local function searchToclose(text, word, callback, pos)
 end
 
 return function (vm, text, pos, word, oldText)
-    local source = findSource(vm, pos) or findSource(vm, pos-1) or findSource(vm, pos+1)
+    local filter = {
+        ['name']           = true,
+        ['string']         = true,
+        ['.']              = true,
+        [':']              = true,
+        ['emmyName']       = true,
+        ['emmyIncomplete'] = true,
+        ['call']           = true,
+    }
+    local source = findSource(vm, pos,   filter)
+                or findSource(vm, pos-1, filter)
+                or findSource(vm, pos+1, filter)
     if not source then
         return nil
     end

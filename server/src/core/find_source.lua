@@ -9,13 +9,23 @@ local function isValidSource(source)
     return source.start ~= nil and source.start ~= 0
 end
 
-local function findAtPos(sources, pos, level)
+local function matchFilter(source, filter)
+    if not filter then
+        return true
+    end
+    return filter[source.type]
+end
+
+local function findAtPos(vm, pos, filter)
     local res = {}
-    for _, source in ipairs(sources) do
-        if isValidSource(source) and isContainPos(source, pos) then
+    vm:eachSource(function (source)
+        if isValidSource(source)
+        and isContainPos(source, pos)
+        and matchFilter(source, filter)
+        then
             res[#res+1] = source
         end
-    end
+    end)
     if #res == 0 then
         return nil
     end
@@ -35,13 +45,13 @@ local function findAtPos(sources, pos, level)
         end
         return rangeA < rangeB
     end)
-    local source = res[level or 1]
+    local source = res[1]
     if not source then
         return nil
     end
     return source
 end
 
-return function (vm, pos, level)
-    return findAtPos(vm.sources, pos, level)
+return function (vm, pos, filter)
+    return findAtPos(vm, pos, filter)
 end

@@ -162,12 +162,6 @@ function mt:scanFiles()
                 return
             end
             self._loadFileRequest:push(path:string())
-        elseif mode == 'file' then
-            local file = ...
-            local path = fs.path(file.path)
-            if not self:isLuaFile(path) then
-                return
-            end
             count = count + 1
         elseif mode == 'stop' then
             log.info('扫描文件任务中断')

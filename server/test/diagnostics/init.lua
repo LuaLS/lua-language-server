@@ -355,3 +355,12 @@ TEST [[
 ---@class C : D
 ---@class D
 ]]
+
+TEST [[
+---@type <!A!>
+]]
+
+TEST [[
+---@class A
+---@type A|<!B!>|<!C!>
+]]

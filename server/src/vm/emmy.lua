@@ -21,7 +21,7 @@ end
 function mt:doEmmyType(action)
     local emmyMgr = self.emmyMgr
     self:instantSource(action)
-    local type = emmyMgr:createType()
+    local type = emmyMgr:createType(action)
     self._emmy = type
     action:set('emmy.type', type)
 end

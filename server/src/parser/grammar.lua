@@ -536,9 +536,7 @@ EmmyIncomplete  <-  MustEmmyName
 EmmyClass       <-  (MustEmmyName EmmyParentClass?)
 EmmyParentClass <-  %s* ':' %s* MustEmmyName
 
-EmmyType        <-  (EmmyTypeDef EmmyTypeEnums*)
-                ->  EmmyType
-EmmyTypeDef     <-  EmmyFunctionType
+EmmyType        <-  EmmyFunctionType
                 /   EmmyArrayType
                 /   EmmyTableType
                 /   EmmyCommonType
@@ -549,11 +547,11 @@ EmmyTypeName    <-  EmmyFunctionType
                 /   EmmyArrayType
                 /   EmmyTableType
                 /   MustEmmyName
-EmmyTypeEnums   <-  %s+ '|' %s+ String
+EmmyTypeEnums   <-  %s* '|' %s* String
 
-EmmyAlias       <-  MustEmmyName %s+ EmmyType
+EmmyAlias       <-  MustEmmyName %s+ EmmyType EmmyTypeEnums*
 
-EmmyParam       <-  MustEmmyName %s+ EmmyType
+EmmyParam       <-  MustEmmyName %s+ EmmyType EmmyTypeEnums*
 
 EmmyReturn      <-  EmmyType
 

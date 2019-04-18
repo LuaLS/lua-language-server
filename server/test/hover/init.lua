@@ -480,3 +480,47 @@ TEST[[
 [[
 global x: *Class
 ]]
+
+TEST[[
+local t = {
+    ---@class Class
+    <?x?> = class()
+}
+]]
+[[
+field x: *Class
+]]
+
+TEST[[
+---@type Class
+local <?x?> = class()
+]]
+[[
+local x: *Class
+]]
+
+TEST[[
+---@type Class
+<?x?> = class()
+]]
+[[
+global x: *Class
+]]
+
+TEST[[
+local t = {
+    ---@type Class
+    <?x?> = class()
+}
+]]
+[[
+field x: *Class
+]]
+
+TEST[[
+---@type A|B|C
+local <?x?> = class()
+]]
+[[
+local x: *A|B|C
+]]

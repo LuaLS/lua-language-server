@@ -462,10 +462,24 @@ function mt:checkEmmyClass(source, callback)
     end
 end
 
+function mt:checkEmmyType(source, callback)
+    for _, tpsource in ipairs(source) do
+        local name = tpsource[1]
+        local class = self.vm.emmyMgr:eachClass(name, function (class)
+            return class
+        end)
+        if not class then
+            callback(tpsource.start, tpsource.finish, lang.script.DIAG_UNDEFINED_CLASS)
+        end
+    end
+end
+
 function mt:searchEmmyLua(callback)
     self.vm:eachSource(function (source)
         if source.type == 'emmyClass' then
             self:checkEmmyClass(source, callback)
+        elseif source.type == 'emmyType' then
+            self:checkEmmyType(source, callback)
         end
     end)
 end

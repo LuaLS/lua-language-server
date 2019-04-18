@@ -1124,10 +1124,7 @@ local Defs = {
             [2] = extends,
         }
     end,
-    EmmyType = function (typeDef, ...)
-        if ... then
-            typeDef.enum = {...}
-        end
+    EmmyType = function (typeDef)
         return typeDef
     end,
     EmmyCommonType = function (...)
@@ -1152,18 +1149,20 @@ local Defs = {
             ...
         }
     end,
-    EmmyAlias = function (name, emmyName)
+    EmmyAlias = function (name, emmyName, ...)
         return {
             type = 'emmyAlias',
-            [1]  = name,
-            [2]  = emmyName,
+            name,
+            emmyName,
+            ...
         }
     end,
-    EmmyParam = function (argName, emmyName)
+    EmmyParam = function (argName, emmyName, ...)
         return {
             type = 'emmyParam',
-            [1]  = argName,
-            [2]  = emmyName,
+            argName,
+            emmyName,
+            ...
         }
     end,
     EmmyReturn = function (...)

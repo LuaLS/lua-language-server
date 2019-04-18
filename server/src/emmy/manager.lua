@@ -1,5 +1,6 @@
 local listMgr = require 'vm.list'
 local newClass = require 'emmy.class'
+local newType = require 'emmy.type'
 
 local mt = {}
 mt.__index = mt
@@ -58,9 +59,7 @@ function mt:addClass(source)
 end
 
 function mt:createType(source)
-end
-
-function mt:remove()
+    return newType(source)
 end
 
 return function ()

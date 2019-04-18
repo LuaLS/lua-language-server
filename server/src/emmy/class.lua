@@ -3,7 +3,7 @@ mt.__index = mt
 mt.type = 'emmy.class'
 
 function mt:getType()
-    return self._name
+    return self.name
 end
 
 return function (class, parent)
@@ -11,6 +11,6 @@ return function (class, parent)
         name = class[1],
         source = class.id,
         parent = parent and parent.id,
-    })
+    }, mt)
     return self
 end

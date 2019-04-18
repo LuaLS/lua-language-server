@@ -39,6 +39,7 @@ end
 
 function mt:addClass(class, parent)
     local className = class[1]
+    self:flushClass(className)
     local list = self._class[className]
     local version = listMgr.getVersion()
     if not list then
@@ -48,7 +49,7 @@ function mt:addClass(class, parent)
         self._class[className] = list
     end
     list[class.id] = newClass(class, parent)
-    self:flushClass(className)
+    return list[class.id]
 end
 
 function mt:remove()

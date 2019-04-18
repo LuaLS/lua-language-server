@@ -7,6 +7,7 @@ local sourceMgr = require 'vm.source'
 local buildGlobal = require 'vm.global'
 local createMulti = require 'vm.multi'
 local libraryBuilder = require 'vm.library'
+local emmyMgr = require 'emmy.manager'
 local config = require 'config'
 local mt = require 'vm.manager'
 
@@ -1277,6 +1278,7 @@ return function (ast, lsp, uri)
         main    = nil,
         env     = nil,
         emmy    = nil,
+        emmyMgr = lsp and lsp.emmyMgr or emmyMgr(),
         lsp     = lsp,
         uri     = uri or '',
     }, mt)

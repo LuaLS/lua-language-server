@@ -1,10 +1,7 @@
 local mt = require 'vm.manager'
 
 function mt:doEmmyClass(action)
-    if not self.lsp then
-        return
-    end
-    local emmyMgr = self.lsp.emmyMgr
+    local emmyMgr = self.emmyMgr
     local class = action[1]
     local parent = action[2]
     self:instantSource(class)

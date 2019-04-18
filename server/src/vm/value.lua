@@ -77,10 +77,10 @@ end
 
 function mt:getType()
     if self:getEmmy() then
-        return self:getEmmy():getType()
+        return self:getEmmy():getType(), 1.0
     end
     if not self._type then
-        return 'nil'
+        return 'nil', 0.0
     end
     local mRate = 0.0
     local mType
@@ -97,7 +97,7 @@ function mt:getType()
             end
         end
     end
-    return mType or 'any'
+    return mType or 'any', mRate
 end
 
 function mt:rawSet(index, value, source)

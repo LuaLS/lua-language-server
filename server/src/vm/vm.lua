@@ -1053,6 +1053,8 @@ function mt:doAction(action)
     elseif tp == 'emmyTableType' then
     elseif tp == 'emmyFunctionType' then
     elseif tp == 'emmySee' then
+    elseif tp == 'emmyIncomplete' then
+        self:doEmmyIncomplete(action)
     else
         self:getExp(action)
         action:set('as action', true)

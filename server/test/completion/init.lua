@@ -769,3 +769,18 @@ t.$
         kind = CompletionItemKind.Field,
     }
 }
+
+TEST [[
+---@$
+]]
+(EXISTS)
+
+TEST [[
+---@cl$
+]]
+{
+    {
+        label = 'class',
+        kind = CompletionItemKind.Keyword
+    }
+}

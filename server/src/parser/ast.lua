@@ -1201,6 +1201,10 @@ local Defs = {
             className, methodName
         }
     end,
+    EmmyIncomplete = function (emmyName)
+        emmyName.type = 'emmyIncomplete'
+        return emmyName
+    end,
 
     -- 捕获错误
     UnknownSymbol = function (start, symbol)

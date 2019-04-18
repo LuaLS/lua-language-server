@@ -520,7 +520,8 @@ EmmyBody        <-  'class'    %s+ EmmyClass    -> EmmyClass
                 /   'generic'  %s+ EmmyGeneric  -> EmmyGeneric
                 /   'vararg'   %s+ EmmyVararg   -> EmmyVararg
                 /   'language' %s+ EmmyLanguage -> EmmyLanguage
-                /   'see'      %s+ EmmySee      -> EmmySee 
+                /   'see'      %s+ EmmySee      -> EmmySee
+                /   EmmyIncomplete
 
 EmmyName        <-  ({} {[a-zA-Z_] [a-zA-Z0-9_]*})
                 ->  EmmyName
@@ -528,6 +529,8 @@ MustEmmyName    <-  EmmyName / DirtyEmmyName
 DirtyEmmyName   <-  {} ->  DirtyEmmyName
 EmmyLongName    <-  ({} {(!%nl .)+})
                 ->  EmmyName
+EmmyIncomplete  <-  MustEmmyName
+                ->  EmmyIncomplete
 
 EmmyClass       <-  (MustEmmyName EmmyParentClass?)
 EmmyParentClass <-  %s* ':' %s* MustEmmyName

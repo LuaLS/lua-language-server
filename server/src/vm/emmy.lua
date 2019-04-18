@@ -11,3 +11,7 @@ function mt:doEmmyClass(action)
     local emmyClass = emmyMgr:addClass(class, parent)
     self.emmy = emmyClass
 end
+
+function mt:doEmmyIncomplete(action)
+    self:instantSource(action)
+end

@@ -37,6 +37,8 @@ for _, k in ipairs(KEYS) do
     KEYMAP[k] = true
 end
 
+local EMMY_KEYWORD = {'class', 'type', 'alias', 'param', 'return', 'field', 'generic', 'vararg', 'language', 'see'}
+
 local function matchKey(me, other)
     if me == other then
         return true
@@ -359,6 +361,14 @@ local function searchAsArg(vm, source, word, callback)
     searchCloseGlobal(vm, source, word, callback)
 end
 
+local function searchEmmyKeyword(vm, source, word, callback)
+    for _, kw in ipairs(EMMY_KEYWORD) do
+        if matchKey(word, kw) then
+            callback(kw, nil, CompletionItemKind.Keyword)
+        end
+    end
+end
+
 local function searchSource(vm, source, word, callback)
     if source:get 'table index' then
         searchAsIndex(vm, source, word, callback)
@@ -382,6 +392,10 @@ local function searchSource(vm, source, word, callback)
     end
     if source:get 'simple' then
         searchAsSuffix(vm, source, word, callback)
+        return
+    end
+    if source.type == 'emmyIncomplete' then
+        searchEmmyKeyword(vm, source, word, callback)
         return
     end
 end
@@ -506,7 +520,7 @@ local function searchAllWords(vm, source, word, callback, pos)
     end)
 end
 
-local function searchSpecial(vm, source, word, callback, pos)
+local function searchSpecialHashSign(vm, pos, callback)
     -- 尝试 XXX[#XXX+1]
     -- 1. 搜索 []
     local index
@@ -571,6 +585,10 @@ local function searchSpecial(vm, source, word, callback, pos)
     end
 end
 
+local function searchSpecial(vm, source, word, callback, pos)
+    searchSpecialHashSign(vm, pos, callback)
+end
+
 local function makeList(source, pos, word)
     local list = {}
     local mark = {}
@@ -624,7 +642,7 @@ local function searchToclose(text, word, callback, pos)
 end
 
 return function (vm, text, pos, word, oldText)
-    local source = findSource(vm, pos) or findSource(vm, pos-1)
+    local source = findSource(vm, pos) or findSource(vm, pos-1) or findSource(vm, pos+1)
     if not source then
         return nil
     end

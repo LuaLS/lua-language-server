@@ -12,6 +12,7 @@ DIAG_OVER_MAX_ARGS      = '函数只接收 {:d} 个参数，但你传了 {:d} �
 DIAG_OVER_MAX_VALUES    = '只有 {} 个变量，但你设置了 {} 个值。'
 DIAG_AMBIGUITY_1        = '会优先运算 `0 {op} {num}`，你可能需要加个括号。'
 DIAG_LOWERCASE_GLOBAL   = '首字母小写的全局变量'
+DIAG_EMPTY_BLOCK        = '空代码块'
 DIAG_DIAGNOSTICS        = '诊断'
 DIAG_SYNTAX_CHECK       = '语法检查'
 DIAG_NEED_VERSION       = '在 {} 中是合法的'

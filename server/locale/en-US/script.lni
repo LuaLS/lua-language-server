@@ -12,6 +12,7 @@ DIAG_OVER_MAX_ARGS      = 'The function takes only {:d} parameters, but you pass
 DIAG_OVER_MAX_ARGS      = 'Only has {} variables, but you set {} values.'
 DIAG_AMBIGUITY_1        = 'Compute `0 {op} {num}` first. You may need to add brackets.'
 DIAG_LOWERCASE_GLOBAL   = 'Global variable in lowercase initial'
+DIAG_EMPTY_BLOCK        = 'Empty block'
 DIAG_DIAGNOSTICS        = 'Diagnostics'
 DIAG_SYNTAX_CHECK       = 'Syntax Check'
 DIAG_NEED_VERSION       = 'Supported in {}'

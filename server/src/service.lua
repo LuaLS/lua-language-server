@@ -14,6 +14,7 @@ local valueMgr   = require 'vm.value'
 local chainMgr   = require 'vm.chain'
 local functionMgr= require 'vm.function'
 local listMgr    = require 'vm.list'
+local emmyMgr    = require 'emmy.manager'
 local config     = require 'config'
 
 local ErrorCodes = {
@@ -270,6 +271,9 @@ function mt:reCompile()
     if self.chain then
         self.chain:remove()
     end
+    if self.emmy then
+        self.emmy:remove()
+    end
 
     for _, obj in pairs(listMgr.list) do
         if obj.type == 'source' or obj.type == 'function' then
@@ -279,6 +283,7 @@ function mt:reCompile()
 
     self.global = core.global(self)
     self.chain  = chainMgr()
+    self.emmy   = emmyMgr()
     self.globalValue = nil
 
     self._needCompile = {}
@@ -859,5 +864,6 @@ return function ()
     }, mt)
     session.global = core.global(session)
     session.chain  = chainMgr()
+    session.emmy   = emmyMgr()
     return session
 end

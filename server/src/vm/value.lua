@@ -76,6 +76,9 @@ function mt:setType(tp, rate)
 end
 
 function mt:getType()
+    if self:getEmmy() then
+        return self:getEmmy():getType()
+    end
     if not self._type then
         return 'nil'
     end
@@ -513,6 +516,28 @@ end
 
 function mt:isGlobal()
     return self._global
+end
+
+function mt:setEmmy(emmy)
+    if not emmy then
+        return
+    end
+    if emmy.type ~= 'emmy.class' and emmy.type ~= 'emmy.type' then
+        return
+    end
+    self._emmy = emmy
+end
+
+function mt:getEmmy()
+    if not self._emmy then
+        return nil
+    end
+    local source = self._emmy.source
+    if not listMgr.get(source) then
+        self._emmy = nil
+        return nil
+    end
+    return self._emmy
 end
 
 return {

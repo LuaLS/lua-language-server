@@ -13,6 +13,7 @@ local mt = require 'vm.manager'
 require 'vm.module'
 require 'vm.raw'
 require 'vm.pcall'
+require 'vm.emmy'
 
 -- TODO source测试
 --rawset(_G, 'CachedSource', setmetatable({}, { __mode = 'kv' }))
@@ -849,6 +850,7 @@ function mt:doLocal(action)
         end
         self:createLocal(key[1], key, value)
     end)
+    self.emmy = nil
 end
 
 function mt:doIf(action)
@@ -1036,6 +1038,20 @@ function mt:doAction(action)
         self:doFunction(action)
     elseif tp == 'localfunction' then
         self:doLocalFunction(action)
+    elseif tp == 'emmyClass' then
+        self:doEmmyClass(action)
+    elseif tp == 'emmyType' then
+    elseif tp == 'emmyAlias' then
+    elseif tp == 'emmyParam' then
+    elseif tp == 'emmyReturn' then
+    elseif tp == 'emmyField' then
+    elseif tp == 'emmyGeneric' then
+    elseif tp == 'emmyVararg' then
+    elseif tp == 'emmyLanguage' then
+    elseif tp == 'emmyArrayType' then
+    elseif tp == 'emmyTableType' then
+    elseif tp == 'emmyFunctionType' then
+    elseif tp == 'emmySee' then
     else
         self:getExp(action)
         action:set('as action', true)
@@ -1143,16 +1159,18 @@ end
 
 function mt:createLocal(key, source, value)
     local loc = self:bindLocal(source)
+    if not value then
+        value = self:createValue('nil', source)
+    end
     if loc then
+        loc:setValue(value)
+        loc:setEmmy(self.emmy)
         self:saveLocal(key, loc)
         return loc
     end
 
-    if not value then
-        value = self:createValue('nil', source)
-    end
-
     loc = localMgr.create(key, source, value)
+    loc:setEmmy(self.emmy)
     self:saveLocal(key, loc)
     self:bindLocal(source, loc, 'local')
     value:addInfo('local', source)
@@ -1161,12 +1179,13 @@ end
 
 function mt:createUpvalue(key, source, value)
     local loc = self:bindLocal(source)
-    if loc then
-        return loc
-    end
-
     if not value then
         value = self:createValue('nil', source)
+    end
+    if loc then
+        loc:setValue(value)
+        self:saveUpvalue(key, loc)
+        return loc
     end
 
     loc = localMgr.create(key, source, value)
@@ -1257,6 +1276,7 @@ return function (ast, lsp, uri)
         sources = {},
         main    = nil,
         env     = nil,
+        emmy    = nil,
         lsp     = lsp,
         uri     = uri or '',
     }, mt)

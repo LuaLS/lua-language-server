@@ -19,6 +19,9 @@ function mt:setValue(value)
     else
         self.value = value
     end
+    if self._emmy then
+        self.value:setEmmy(self._emmy)
+    end
     return value
 end
 
@@ -124,6 +127,19 @@ end
 
 function mt:getSource()
     return listMgr.get(self.source)
+end
+
+function mt:setEmmy(emmy)
+    if not emmy then
+        return
+    end
+    if emmy.type ~= 'emmy.class' and emmy.type ~= 'emmy.type' then
+        return
+    end
+    self._emmy = emmy
+    if self.value then
+        self.value:setEmmy(emmy)
+    end
 end
 
 local function create(name, source, value)

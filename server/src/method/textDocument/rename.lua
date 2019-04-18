@@ -46,7 +46,5 @@ return function (lsp, params)
         changes = changes,
     }
 
-    log.debug(table.dump(response))
-
     return response
 end

@@ -24,10 +24,18 @@ function mt:getSource()
     return listMgr.get(self.source)
 end
 
-return function (source)
+function mt:getClass()
+    local class = self._manager:eachClass(self.name, function (class)
+        return class
+    end)
+    return class
+end
+
+return function (manager, source)
     local self = setmetatable({
         name = buildName(source),
         source = source.id,
+        _manager = manager,
     }, mt)
     return self
 end

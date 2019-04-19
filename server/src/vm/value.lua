@@ -522,7 +522,14 @@ function mt:setEmmy(emmy)
     if not emmy then
         return
     end
-    if emmy.type ~= 'emmy.class' and emmy.type ~= 'emmy.type' then
+    if emmy.type == 'emmy.class' then
+        emmy:setValue(self)
+    elseif emmy.type == 'emmy.type' then
+        local class = emmy:getClass()
+        if class then
+            self:mergeValue(class:getValue())
+        end
+    else
         return
     end
     self._emmy = emmy

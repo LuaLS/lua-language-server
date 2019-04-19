@@ -143,7 +143,6 @@ function mt:setEmmy(emmy)
     if emmy.type ~= 'emmy.class' and emmy.type ~= 'emmy.type' then
         return
     end
-    self._emmy = emmy
     if self.value then
         self.value:setEmmy(emmy)
     end

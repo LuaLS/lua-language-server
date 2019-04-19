@@ -70,12 +70,12 @@ function mt:addClass(source)
         }
         self._class[className] = list
     end
-    list[source.id] = newClass(source)
+    list[source.id] = newClass(self, source)
     return list[source.id]
 end
 
 function mt:createType(source)
-    return newType(source)
+    return newType(self, source)
 end
 
 function mt:remove()

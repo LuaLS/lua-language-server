@@ -439,10 +439,6 @@ function mt:checkEmmyClass(source, callback)
     local related = {}
     local current = class
     for _ = 1, 10 do
-        if parent:getName() == class:getName() then
-            callback(source.start, source.finish, lang.script.DIAG_CYCLIC_EXTENDS, related)
-            break
-        end
         local extends = current.extends
         if not extends then
             break
@@ -452,11 +448,14 @@ function mt:checkEmmyClass(source, callback)
             finish = current:getSource().finish,
             uri = current:getSource().uri,
         }
-        current = parent
-        parent = self.vm.emmyMgr:eachClass(extends, function (parent)
+        current = self.vm.emmyMgr:eachClass(extends, function (parent)
             return parent
         end)
-        if not parent then
+        if not current then
+            break
+        end
+        if current:getName() == class:getName() then
+            callback(source.start, source.finish, lang.script.DIAG_CYCLIC_EXTENDS, related)
             break
         end
     end

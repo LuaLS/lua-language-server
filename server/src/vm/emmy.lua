@@ -43,6 +43,9 @@ function mt:doEmmyClass(action)
     end
     self._emmy = class
     action:set('emmy.class', class)
+    if self.lsp then
+        self.lsp.global:markSet(self:getUri())
+    end
 end
 
 function mt:doEmmyType(action)
@@ -54,6 +57,9 @@ function mt:doEmmyType(action)
     for _, obj in ipairs(action) do
         self:instantSource(obj)
         obj:set('target class', obj[1])
+    end
+    if self.lsp then
+        self.lsp.global:markGet(self:getUri())
     end
 end
 

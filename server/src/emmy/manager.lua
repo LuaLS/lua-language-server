@@ -78,6 +78,9 @@ function mt:createType(source)
     return newType(source)
 end
 
+function mt:remove()
+end
+
 return function ()
     ---@class emmyMgr
     local self = setmetatable({

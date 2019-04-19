@@ -43,7 +43,7 @@ local function getRange(start, finish, lines)
     }
 end
 
-local function createInfo(data, lines)
+local function createInfo(lsp, data, lines)
     local diagnostic = {
         source   = lang.script.DIAG_DIAGNOSTICS,
         range    = getRange(data.start, data.finish, lines),
@@ -54,6 +54,7 @@ local function createInfo(data, lines)
     if data.related then
         local related = {}
         for i, info in ipairs(data.related) do
+            local _, lines = lsp:getVM(info.uri)
             local message = info.message
             if not message then
                 local start_line  = lines:rowcol(info.start)
@@ -144,7 +145,7 @@ return function (lsp, params)
     if vm then
         local datas = core.diagnostics(vm, lines, uri)
         for _, data in ipairs(datas) do
-            diagnostics[#diagnostics+1] = createInfo(data, lines)
+            diagnostics[#diagnostics+1] = createInfo(lsp, data, lines)
         end
     end
     if errs then

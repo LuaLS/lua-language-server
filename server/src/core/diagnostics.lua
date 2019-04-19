@@ -256,15 +256,15 @@ function mt:searchLowercaseGlobal(callback)
     for name in pairs(library.global) do
         definedGlobal[name] = true
     end
-    local uri = self.vm.uri
-    local envValue = self.vm.env:getValue()
-    envValue:eachInfo(function (info, src)
-        if info.type == 'set child' and src.uri == uri then
-            local name = info[1]
+    self.vm:eachSource(function (source)
+        if source.type == 'name'
+        and source:get 'parent'
+        and not source:get 'simple'
+        and not source:get 'table index'
+        and source:action() == 'set'
+        then
+            local name = source[1]
             if definedGlobal[name] then
-                return
-            end
-            if type(name) ~= 'string' then
                 return
             end
             local first = name:match '%w'
@@ -272,7 +272,7 @@ function mt:searchLowercaseGlobal(callback)
                 return
             end
             if first:match '%l' then
-                callback(src.start, src.finish)
+                callback(source.start, source.finish)
             end
         end
     end)

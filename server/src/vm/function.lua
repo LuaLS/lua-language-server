@@ -151,9 +151,9 @@ function mt:setReturn(index, value)
     end
     if value then
         self.returns[index] = value
-    end
-    if self._global then
-        value:markGlobal()
+        if self._global then
+            value:markGlobal()
+        end
     end
 end
 

@@ -126,3 +126,7 @@ TEST [[
 return function ()
 end
 ]]
+
+TEST [[
+t[...] = 1
+]]

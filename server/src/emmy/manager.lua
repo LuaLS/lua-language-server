@@ -27,7 +27,7 @@ function mt:flushClass(name)
     list.version = version
 end
 
-function mt:eachClass(name, callback)
+function mt:eachClassByName(name, callback)
     self:flushClass(name)
     local list = self._class[name]
     if not list then
@@ -40,6 +40,22 @@ function mt:eachClass(name, callback)
                 return res
             end
         end
+    end
+end
+
+function mt:eachClass(...)
+    local n = select('#', ...)
+    if n == 1 then
+        local callback = ...
+        for name in pairs(self._class) do
+            local res = self:eachClassByName(name, callback)
+            if res ~= nil then
+                return res
+            end
+        end
+    else
+        local name, callback = ...
+        return self:eachClassByName(name, callback)
     end
 end
 

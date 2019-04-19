@@ -397,6 +397,14 @@ local function searchEmmyKeyword(vm, source, word, callback)
     end
 end
 
+local function searchEmmyClass(vm, source, word, callback)
+    vm.emmyMgr:eachClass(function (class)
+        if matchKey(word, class:getName()) then
+            callback(class:getName(), class:getSource(), CompletionItemKind.Class)
+        end
+    end)
+end
+
 local function searchSource(vm, source, word, callback)
     if source.type == 'keyword' then
         searchAsKeyowrd(vm, source, word, callback)
@@ -429,6 +437,9 @@ local function searchSource(vm, source, word, callback)
     if source.type == 'emmyIncomplete' then
         searchEmmyKeyword(vm, source, word, callback)
         return
+    end
+    if source:get 'target class' then
+        searchEmmyClass(vm, source, word, callback)
     end
 end
 
@@ -650,11 +661,9 @@ local function makeList(source, pos, word)
     end, list
 end
 
-local function searchToclose(text, word, callback, pos)
-    if #word > 0 then
-        pos = pos - 1
-    end
-    if text:sub(pos, pos) ~= '*' then
+local function searchToclose(text, source, word, callback)
+    local pos = source.start
+    if text:sub(pos-1, pos-1) ~= '*' then
         return false
     end
     if not matchKey(word, 'toclose') then
@@ -685,7 +694,62 @@ local function keywordSource(vm, word, pos)
     }
 end
 
-return function (vm, text, pos, word, oldText)
+local function findStartPos(pos, buf)
+    local res = nil
+    for i = pos, 1, -1 do
+        local c = buf:sub(i, i)
+        if c:find '[%w_]' then
+            res = i
+        else
+            break
+        end
+    end
+    if not res then
+        for i = pos, 1, -1 do
+            local c = buf:sub(i, i)
+            if c == '.' or c == ':' or c == '|' then
+                res = i
+                break
+            elseif c == '#' or c == '@' then
+                res = i + 1
+                break
+            elseif c:find '[%s%c]' then
+            else
+                break
+            end
+        end
+    end
+    if not res then
+        return pos
+    end
+    return res
+end
+
+local function findWord(position, text)
+    local word = text
+    for i = position, 1, -1 do
+        local c = text:sub(i, i)
+        if not c:find '[%w_]' then
+            word = text:sub(i+1, position)
+            break
+        end
+    end
+    return word:match('^([%w_]*)')
+end
+
+local function getSource(vm, pos, text, filter)
+    local word = findWord(pos, text)
+    local source = findSource(vm, pos, filter)
+    if source then
+        return source, pos, word
+    end
+    pos = findStartPos(pos, text)
+    source = findSource(vm, pos,   filter)
+          or keywordSource(vm, word, pos)
+    return source, pos, word
+end
+
+return function (vm, text, pos, oldText)
     local filter = {
         ['name']           = true,
         ['string']         = true,
@@ -695,10 +759,7 @@ return function (vm, text, pos, word, oldText)
         ['emmyIncomplete'] = true,
         ['call']           = true,
     }
-    local source = findSource(vm, pos,   filter)
-                or findSource(vm, pos-1, filter)
-                or findSource(vm, pos+1, filter)
-                or keywordSource(vm, word, pos)
+    local source, pos, word = getSource(vm, pos, text, filter)
     if not source then
         return nil
     end
@@ -709,7 +770,7 @@ return function (vm, text, pos, word, oldText)
         end
     end
     local callback, list = makeList(source, pos, word)
-    if searchToclose(text, word, callback, pos) then
+    if searchToclose(text, source, word, callback) then
         return list
     end
     searchSpecial(vm, source, word, callback, pos)

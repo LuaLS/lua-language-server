@@ -1115,7 +1115,10 @@ local Defs = {
             [1]    = ''
         }
     end,
-    EmmyClass = function (class, extends)
+    EmmyClass = function (class, startPos, extends)
+        if extends and extends[1] == '' then
+            extends.start = startPos
+        end
         return {
             type = 'emmyClass',
             start = class.start,
@@ -1128,10 +1131,22 @@ local Defs = {
         return typeDef
     end,
     EmmyCommonType = function (...)
-        return {
+        local result = {
             type = 'emmyType',
             ...
         }
+        for i = 1, #result // 2 do
+            local startPos = result[i * 2]
+            local emmyName = result[i * 2 + 1]
+            if emmyName[1] == '' then
+                emmyName.start = startPos
+            end
+            result[i + 1] = emmyName
+        end
+        for i = #result // 2 + 2, #result do
+            result[i] = nil
+        end
+        return result
     end,
     EmmyArrayType = function (typeName)
         typeName.type = 'emmyArrayType'
@@ -1144,10 +1159,11 @@ local Defs = {
         return typeName
     end,
     EmmyFunctionType = function (...)
-        return {
+        local result = {
             type = 'emmyFunctionType',
             ...
         }
+        return result
     end,
     EmmyAlias = function (name, emmyName, ...)
         return {

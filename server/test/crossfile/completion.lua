@@ -61,31 +61,6 @@ local function eq(a, b)
     return a == b
 end
 
-local function findStartPos(pos, buf)
-    local res = nil
-    for i = pos-1, 1, -1 do
-        local c = buf:sub(i, i)
-        if c:find '%a' then
-            res = i
-        else
-            break
-        end
-    end
-    return res
-end
-
-local function findWord(position, text)
-    local word = text
-    for i = position-1, 1, -1 do
-        local c = text:sub(i, i)
-        if not c:find '[%w_]' then
-            word = text:sub(i+1, position)
-            break
-        end
-    end
-    return word:match('^([%w_]*)')
-end
-
 function TEST(data)
     local lsp = service()
     local ws = workspace(lsp, 'test')
@@ -99,7 +74,7 @@ function TEST(data)
         local uri = ws:uriEncode(fs.path(info.path))
         local script = info.content
         if info.main then
-            pos = script:find('$', 1, true)
+            pos = script:find('$', 1, true) - 1
             script = script:gsub('%$', '')
             mainUri = uri
             mainBuf = script
@@ -114,9 +89,7 @@ function TEST(data)
 
     local vm = lsp:loadVM(mainUri)
     assert(vm)
-    local word = findWord(pos, mainBuf)
-    local startPos = findStartPos(pos, mainBuf) or pos
-    local result = core.completion(vm, mainBuf, startPos, word)
+    local result = core.completion(vm, mainBuf, pos)
     local expect = data.completion
     if expect then
         assert(result)

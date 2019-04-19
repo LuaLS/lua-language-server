@@ -16,70 +16,27 @@ local function posToRange(lines, start, finish)
     }
 end
 
-local function findStartPos(pos, buf)
-    local res = nil
-    for i = pos, 1, -1 do
-        local c = buf:sub(i, i)
-        if c:find '[%w_]' then
-            res = i
-        else
-            break
-        end
-    end
-    if not res then
-        for i = pos, 1, -1 do
-            local c = buf:sub(i, i)
-            if c == '.' or c == ':' then
-                res = i
-            elseif c:find '[%s%c]' then
-            else
-                break
-            end
-        end
-    end
-    if not res then
-        return pos
-    end
-    return res
-end
-
-local function findWord(position, text)
-    local word = text
-    for i = position, 1, -1 do
-        local c = text:sub(i, i)
-        if not c:find '[%w_]' then
-            word = text:sub(i+1, position)
-            break
-        end
-    end
-    return word:match('^([%w_]*)')
-end
-
 local function fastCompletion(lsp, params, lines)
     local uri = params.textDocument.uri
     local text, oldText = lsp:getText(uri)
     -- lua是从1开始的，因此都要+1
     local position = lines:positionAsChar(params.position.line + 1, params.position.character)
-    local word = findWord(position, text)
-    local startPos = findStartPos(position, text)
 
     local vm = lsp:getVM(uri)
-    if not vm or not startPos then
+    if not vm then
         vm = lsp:loadVM(uri)
         if not vm then
             return nil
         end
     end
-    startPos = startPos or position
 
-    local items = core.completion(vm, text, startPos, word, oldText)
+    local items = core.completion(vm, text, position, oldText)
     if not items or #items == 0 then
         vm = lsp:loadVM(uri)
         if not vm then
             return nil
         end
-        startPos = startPos or position
-        items = core.completion(vm, text, startPos, word)
+        items = core.completion(vm, text, position)
         if not items or #items == 0 then
             return nil
         end
@@ -93,16 +50,13 @@ local function finishCompletion(lsp, params, lines)
     local text = lsp:getText(uri)
     -- lua是从1开始的，因此都要+1
     local position = lines:positionAsChar(params.position.line + 1, params.position.character)
-    local word = findWord(position, text)
-    local startPos = findStartPos(position, text)
 
     local vm = lsp:loadVM(uri)
     if not vm then
         return nil
     end
-    startPos = startPos or position
 
-    local items = core.completion(vm, text, startPos, word)
+    local items = core.completion(vm, text, position)
     if not items or #items == 0 then
         return nil
     end

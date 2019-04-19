@@ -58,57 +58,16 @@ local function eq(a, b)
     return a == b
 end
 
-local function findStartPos(pos, buf)
-    local res = nil
-    for i = pos, 1, -1 do
-        local c = buf:sub(i, i)
-        if c:find '[%w_]' then
-            res = i
-        else
-            break
-        end
-    end
-    if not res then
-        for i = pos, 1, -1 do
-            local c = buf:sub(i, i)
-            if c == '.' or c == ':' then
-                res = i
-            elseif c:find '[%s%c]' then
-            else
-                break
-            end
-        end
-    end
-    if not res then
-        return pos
-    end
-    return res
-end
-
-local function findWord(position, text)
-    local word = text
-    for i = position, 1, -1 do
-        local c = text:sub(i, i)
-        if not c:find '[%w_]' then
-            word = text:sub(i+1, position)
-            break
-        end
-    end
-    return word:match('^([%w_]*)')
-end
-
 rawset(_G, 'TEST', true)
 
 function TEST(script)
     return function (expect)
         local pos = script:find('$', 1, true) - 1
-        local new_script = script:gsub('%$', ' ')
+        local new_script = script:gsub('%$', '')
         local ast = parser:ast(new_script, 'lua', 'Lua 5.4')
         local vm = buildVM(ast)
         assert(vm)
-        local word = findWord(pos, new_script)
-        local startPos = findStartPos(pos, new_script)
-        local result = core.completion(vm, new_script, startPos, word)
+        local result = core.completion(vm, new_script, pos)
         if expect then
             assert(result)
             assert(eq(expect, result))
@@ -414,7 +373,7 @@ collectgarbage('$')
         documentation = EXISTS,
         textEdit = {
             start = 16,
-            finish = 18,
+            finish = 17,
             newText = '"collect"',
         },
     },
@@ -424,7 +383,7 @@ collectgarbage('$')
         documentation = EXISTS,
         textEdit = {
             start = 16,
-            finish = 18,
+            finish = 17,
             newText = '"stop"',
         },
     },
@@ -434,7 +393,7 @@ collectgarbage('$')
         documentation = EXISTS,
         textEdit = {
             start = 16,
-            finish = 18,
+            finish = 17,
             newText = '"restart"',
         },
     },
@@ -444,7 +403,7 @@ collectgarbage('$')
         documentation = EXISTS,
         textEdit = {
             start = 16,
-            finish = 18,
+            finish = 17,
             newText = '"count"',
         },
     },
@@ -454,7 +413,7 @@ collectgarbage('$')
         documentation = EXISTS,
         textEdit = {
             start = 16,
-            finish = 18,
+            finish = 17,
             newText = '"step"',
         },
     },
@@ -464,7 +423,7 @@ collectgarbage('$')
         documentation = EXISTS,
         textEdit = {
             start = 16,
-            finish = 18,
+            finish = 17,
             newText = '"setpause"',
         },
     },
@@ -474,7 +433,7 @@ collectgarbage('$')
         documentation = EXISTS,
         textEdit = {
             start = 16,
-            finish = 18,
+            finish = 17,
             newText = '"setstepmul"',
         },
     },
@@ -484,7 +443,7 @@ collectgarbage('$')
         documentation = EXISTS,
         textEdit = {
             start = 16,
-            finish = 18,
+            finish = 17,
             newText = '"isrunning"',
         },
     },
@@ -536,7 +495,7 @@ self.results.list[#$]
         kind = CompletionItemKind.Snippet,
         textEdit = {
             start = 20,
-            finish = 21,
+            finish = 20,
             newText = 'self.results.list+1] = ',
         },
     },
@@ -551,7 +510,7 @@ self.results.list[#self.re$]
         kind = CompletionItemKind.Snippet,
         textEdit = {
             start = 20,
-            finish = 28,
+            finish = 27,
             newText = 'self.results.list+1] = ',
         },
     },
@@ -570,7 +529,7 @@ fff[#ff$]
         kind = CompletionItemKind.Snippet,
         textEdit = {
             start = 6,
-            finish = 9,
+            finish = 8,
             newText = 'fff+1] = ',
         },
     },
@@ -589,7 +548,7 @@ local _ = fff.kkk[#$]
         kind = CompletionItemKind.Snippet,
         textEdit = {
             start = 20,
-            finish = 21,
+            finish = 20,
             newText = 'fff.kkk]',
         },
     },
@@ -736,25 +695,25 @@ end
 (nil)
 
 require 'config' .config.runtime.version = 'Lua 5.4'
-TEST [[
-local *$
-]]
-{
-    {
-        label = 'toclose',
-        kind = CompletionItemKind.Keyword,
-    }
-}
+--TEST [[
+--local *$
+--]]
+--{
+--    {
+--        label = 'toclose',
+--        kind = CompletionItemKind.Keyword,
+--    }
+--}
 
-TEST [[
-local *tocl$
-]]
-{
-    {
-        label = 'toclose',
-        kind = CompletionItemKind.Keyword,
-    }
-}
+--TEST [[
+--local *tocl$
+--]]
+--{
+--    {
+--        label = 'toclose',
+--        kind = CompletionItemKind.Keyword,
+--    }
+--}
 
 TEST [[
 local mt = {}
@@ -809,4 +768,19 @@ TEST [[
         label = 'class',
         kind = CompletionItemKind.Keyword
     }
+}
+
+TEST [[
+---@class ABC
+---@class BBC : $
+]]
+{
+    {
+        label = 'ABC',
+        kind = CompletionItemKind.Class,
+    },
+    {
+        label = 'BBC',
+        kind = CompletionItemKind.Class,
+    },
 }

@@ -166,6 +166,20 @@ local function jumpUri(vm, source, lsp)
     return positions
 end
 
+local function parseClass(vm, source)
+    local className = source:get 'target class'
+    local positions = {}
+    vm.emmyMgr:eachClass(className, function (class)
+        local src = class:getSource()
+        positions[#positions+1] = {
+            src.start,
+            src.finish,
+            src.uri,
+        }
+    end)
+    return positions
+end
+
 return function (vm, source, lsp)
     if not source then
         return nil
@@ -179,5 +193,12 @@ return function (vm, source, lsp)
     end
     if source:get 'target uri' then
         return jumpUri(vm, source, lsp)
+    end
+    if source:get 'in index' then
+        return parseValue(vm, source, lsp)
+            or parseValueSimily(vm, source, lsp)
+    end
+    if source:get 'target class' then
+        return parseClass(vm, source)
     end
 end

@@ -1,9 +1,8 @@
-local function parseValueSimily(vm, source, lsp)
+local function parseValueSimily(callback, vm, source, lsp)
     local key = source[1]
     if not key then
         return nil
     end
-    local positions = {}
     vm:eachSource(function (other)
         if other == source then
             goto CONTINUE
@@ -14,140 +13,43 @@ local function parseValueSimily(vm, source, lsp)
             and other:action() == 'set'
             and source:bindValue() ~= other:bindValue()
         then
-            positions[#positions+1] = {
-                other.start,
-                other.finish,
-            }
+            callback(other)
         end
         :: CONTINUE ::
     end)
-    if #positions == 0 then
-        return nil
-    end
-    return positions
 end
 
-local function parseValueCrossFile(vm, source, lsp)
+local function parseValueCrossFile(callback, vm, source, lsp)
     local value = source:bindValue()
-    local positions = {}
     value:eachInfo(function (info, src)
-        if info.type == 'local' and src.uri == value.uri then
-            positions[#positions+1] = {
-                src.start,
-                src.finish,
-                value.uri,
-            }
-            return true
+        if src.uri == value.uri then
+            if info.type == 'local' or info.type == 'set' or info.type == 'return' then
+                callback(src)
+            end
         end
     end)
-    if #positions > 0 then
-        return positions
-    end
-
-    value:eachInfo(function (info, src)
-        if info.type == 'set' and src.uri == value.uri  then
-            positions[#positions+1] = {
-                src.start,
-                src.finish,
-                value.uri,
-            }
-        end
-    end)
-    if #positions > 0 then
-        return positions
-    end
-
-    value:eachInfo(function (info, src)
-        if info.type == 'return' and src.uri == value.uri then
-            positions[#positions+1] = {
-                src.start,
-                src.finish,
-                value.uri,
-            }
-        end
-    end)
-    if #positions > 0 then
-        return positions
-    end
-
-    local destVM = lsp:getVM(value.uri)
-    if not destVM then
-        positions[#positions+1] = {
-            0, 0, value.uri,
-        }
-        return positions
-    end
-
-    local result = parseValueSimily(destVM, source, lsp)
-    if result then
-        for _, position in ipairs(result) do
-            positions[#positions+1] = position
-            position[3] = value.uri
-        end
-    end
-    if #positions > 0 then
-        return positions
-    end
-
     return nil
 end
 
-local function parseLocal(vm, source, lsp)
+local function parseLocal(callback, vm, source, lsp)
     local positions = {}
     local loc = source:bindLocal()
     local locSource = loc:getSource()
-    if locSource:get 'arg' then
-        positions[#positions+1] = {
-            locSource.start,
-            locSource.finish,
-            locSource:getUri(),
-        }
-        return positions
-    end
+    --if locSource:get 'arg' then
+    --    callback(locSource)
+    --end
     local value = source:bindValue()
     if value and value.uri ~= '' and value.uri ~= vm.uri then
-        local positions = parseValueCrossFile(vm, source, lsp)
-        if positions and #positions > 0 then
-            return positions
-        end
+        parseValueCrossFile(callback, vm, source, lsp)
     end
-    positions[#positions+1] = {
-        locSource.start,
-        locSource.finish,
-        locSource:getUri(),
-    }
+    callback(locSource)
     if #positions == 0 then
         return nil
     end
     return positions
 end
 
-local function parseValue(vm, source, lsp)
-    local positions = {}
-    local mark = {}
-
-    local function callback(src)
-        if source == src then
-            return
-        end
-        if mark[src] then
-            return
-        end
-        mark[src] = true
-        if src.start == 0 then
-            return
-        end
-        local uri = src.uri
-        if uri == '' then
-            uri = nil
-        end
-        positions[#positions+1] = {
-            src.start,
-            src.finish,
-            uri,
-        }
-    end
-
+local function parseValue(callback, vm, source, lsp)
     if source:bindValue() then
         source:bindValue():eachInfo(function (info, src)
             if info.type == 'set' or info.type == 'local' or info.type == 'return' then
@@ -165,73 +67,79 @@ local function parseValue(vm, source, lsp)
             end
         end)
     end
-    if #positions == 0 then
-        return nil
-    end
-    return positions
 end
 
-local function parseLabel(vm, label, lsp)
-    local positions = {}
+local function parseLabel(callback, vm, label, lsp)
     label:eachInfo(function (info, src)
         if info.type == 'set' then
-            positions[#positions+1] = {
-                src.start,
-                src.finish,
-            }
+            callback(src)
         end
     end)
-    if #positions == 0 then
-        return nil
-    end
-    return positions
 end
 
-local function jumpUri(vm, source, lsp)
+local function jumpUri(callback, vm, source, lsp)
     local uri = source:get 'target uri'
-    local positions = {}
-    positions[#positions+1] = {
-        0, 0, uri,
+    callback {
+        start = 0,
+        finish = 0,
+        uri = uri
     }
-    return positions
 end
 
-local function parseClass(vm, source)
+local function parseClass(callback, vm, source)
     local className = source:get 'target class'
-    local positions = {}
     vm.emmyMgr:eachClass(className, function (class)
         local src = class:getSource()
-        positions[#positions+1] = {
+        callback(src)
+    end)
+end
+
+local function makeList(source)
+    local list = {}
+    local mark = {}
+    return list, function (src)
+        if source == src then
+            return
+        end
+        if mark[src] then
+            return
+        end
+        mark[src] = true
+        local uri = src.uri
+        if uri == '' then
+            uri = nil
+        end
+        list[#list+1] = {
             src.start,
             src.finish,
-            src.uri,
+            src.uri
         }
-    end)
-    return positions
+    end
 end
 
 return function (vm, source, lsp)
     if not source then
         return nil
     end
+    local list, callback = makeList(source)
     if source:bindLocal() then
-        return parseLocal(vm, source, lsp)
-    end
-    if source:bindValue() then
-        return parseValue(vm, source, lsp)
-            or parseValueSimily(vm, source, lsp)
+        parseLocal(callback, vm, source, lsp)
+    elseif source:bindValue() then
+        parseValue(callback, vm, source, lsp)
+        --parseValueSimily(callback, vm, source, lsp)
     end
     if source:bindLabel() then
-        return parseLabel(vm, source:bindLabel(), lsp)
+        parseLabel(callback, vm, source:bindLabel(), lsp)
     end
     if source:get 'target uri' then
-        return jumpUri(vm, source, lsp)
+        jumpUri(callback, vm, source, lsp)
     end
     if source:get 'in index' then
-        return parseValue(vm, source, lsp)
-            or parseValueSimily(vm, source, lsp)
+        parseValue(callback, vm, source, lsp)
+        --parseValueSimily(callback, vm, source, lsp)
     end
     if source:get 'target class' then
-        return parseClass(vm, source)
+        parseClass(callback, vm, source)
     end
+    return list
 end

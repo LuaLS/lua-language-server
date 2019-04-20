@@ -69,37 +69,37 @@ setmetatable(api, { __index = mt })
 api:<?method1?>()
 ]]
 
-TEST [[
-local mt
-function mt:x()
-    self.<?init?>()
-end
-
-local obj = setmetatable({}, { __index = mt })
-obj.<!init!> = 1
-]]
-
-TEST [[
-local mt
-function mt:x()
-    self.<?init?>()
-end
-
-local obj = setmetatable({ <!init!> = 1 }, { __index = mt })
-]]
-
-TEST [[
-local mt
-function mt:x()
-    self.a.<?out?>()
-end
-
-local obj = setmetatable({
-    a = {
-        <!out!> = 1,
-    }
-}, { __index = mt })
-]]
+--TEST [[
+--local mt
+--function mt:x()
+--    self.<?init?>()
+--end
+--
+--local obj = setmetatable({}, { __index = mt })
+--obj.<!init!> = 1
+--]]
+--
+--TEST [[
+--local mt
+--function mt:x()
+--    self.<?init?>()
+--end
+--
+--local obj = setmetatable({ <!init!> = 1 }, { __index = mt })
+--]]
+--
+--TEST [[
+--local mt
+--function mt:x()
+--    self.a.<?out?>()
+--end
+--
+--local obj = setmetatable({
+--    a = {
+--        <!out!> = 1,
+--    }
+--}, { __index = mt })
+--]]
 
 TEST [[
 local sm = setmetatable

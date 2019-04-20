@@ -86,5 +86,5 @@ return f(), <?b?>
 
 TEST [[
 local a = os.clock()
-local <?<!b!>?> = os.clock()
+local <?b?> = os.clock()
 ]]

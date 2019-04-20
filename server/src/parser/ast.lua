@@ -629,8 +629,10 @@ local Defs = {
             end
             if isField then
                 table[#table+1] = arg
-                wantField = false
-                start = arg.finish + 1
+                if arg.finish then
+                    wantField = false
+                    start = arg.finish + 1
+                end
             else
                 wantField = true
                 start = arg
@@ -646,8 +648,7 @@ local Defs = {
             key, value,
         }
     end,
-    NewIndex = function (start, key, finish, value)
-        key.index = true
+    NewIndex = function (key, value)
         return {
             type = 'pair',
             start = key.start,
@@ -1113,7 +1114,10 @@ local Defs = {
             [1]    = ''
         }
     end,
-    EmmyClass = function (class, extends)
+    EmmyClass = function (class, startPos, extends)
+        if extends and extends[1] == '' then
+            extends.start = startPos
+        end
         return {
             type = 'emmyClass',
             start = class.start,
@@ -1122,17 +1126,26 @@ local Defs = {
             [2] = extends,
         }
     end,
-    EmmyType = function (typeDef, ...)
-        if ... then
-            typeDef.enum = {...}
-        end
+    EmmyType = function (typeDef)
         return typeDef
     end,
     EmmyCommonType = function (...)
-        return {
+        local result = {
             type = 'emmyType',
             ...
         }
+        for i = 1, #result // 2 do
+            local startPos = result[i * 2]
+            local emmyName = result[i * 2 + 1]
+            if emmyName[1] == '' then
+                emmyName.start = startPos
+            end
+            result[i + 1] = emmyName
+        end
+        for i = #result // 2 + 2, #result do
+            result[i] = nil
+        end
+        return result
     end,
     EmmyArrayType = function (typeName)
         typeName.type = 'emmyArrayType'
@@ -1145,23 +1158,26 @@ local Defs = {
         return typeName
     end,
     EmmyFunctionType = function (...)
-        return {
+        local result = {
             type = 'emmyFunctionType',
             ...
         }
+        return result
     end,
-    EmmyAlias = function (name, emmyName)
+    EmmyAlias = function (name, emmyName, ...)
         return {
             type = 'emmyAlias',
-            [1]  = name,
-            [2]  = emmyName,
+            name,
+            emmyName,
+            ...
         }
     end,
-    EmmyParam = function (argName, emmyName)
+    EmmyParam = function (argName, emmyName, ...)
         return {
             type = 'emmyParam',
-            [1]  = argName,
-            [2]  = emmyName,
+            argName,
+            emmyName,
+            ...
         }
     end,
     EmmyReturn = function (...)

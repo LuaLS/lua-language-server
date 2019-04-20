@@ -306,11 +306,12 @@ Simple      <-  (Prefix (Sp Suffix)*)
 Prefix      <-  Sp ({} PL DirtyExp DirtyPR)
             ->  Prefix
             /   FreeName
+Index       <-  ({} BL DirtyExp DirtyBR) -> Index
 Suffix      <-  DOT   Name / DOT   {} -> MissField
             /   Method (!(Sp CallStart) {} -> MissPL)?
             /   ({} Table {}) -> Call
             /   ({} String {}) -> Call
-            /   ({} BL DirtyExp DirtyBR) -> Index
+            /   Index
             /   ({} PL CallArgList DirtyPR) -> Call
 Method      <-  COLON Name / COLON {} -> MissMethod
 CallStart   <-  PL
@@ -338,10 +339,10 @@ ArgList     <-  (DOTS / Name / Sp {} COMMA)*
 
 Table       <-  Sp ({} TL TableFields? DirtyTR)
             ->  Table
-TableFields <-  (TableSep {} / TableField)+
+TableFields <-  (Emmy / TableSep {} / TableField)+
 TableSep    <-  COMMA / SEMICOLON
 TableField  <-  NewIndex / NewField / Exp
-NewIndex    <-  Sp ({} BL DirtyExp DirtyBR NeedAssign DirtyExp)
+NewIndex    <-  Sp (Index NeedAssign DirtyExp)
             ->  NewIndex
 NewField    <-  (MustName ASSIGN DirtyExp)
             ->  NewField
@@ -362,6 +363,7 @@ LabelEnd    <-  {} -> LabelEnd
 -- 纯占位，修改了 `relabel.lua` 使重复定义不抛错
 Action      <-  !END .
 Set         <-  END
+Emmy        <-  '---@'
 ]]
 
 grammar 'Action' [[
@@ -533,26 +535,24 @@ EmmyIncomplete  <-  MustEmmyName
                 ->  EmmyIncomplete
 
 EmmyClass       <-  (MustEmmyName EmmyParentClass?)
-EmmyParentClass <-  %s* ':' %s* MustEmmyName
+EmmyParentClass <-  %s* {} ':' %s* MustEmmyName
 
-EmmyType        <-  (EmmyTypeDef EmmyTypeEnums*)
-                ->  EmmyType
-EmmyTypeDef     <-  EmmyFunctionType
+EmmyType        <-  EmmyFunctionType
                 /   EmmyArrayType
                 /   EmmyTableType
                 /   EmmyCommonType
 EmmyCommonType  <-  EmmyTypeNames
                 ->  EmmyCommonType
-EmmyTypeNames   <-  EmmyTypeName ('|' EmmyTypeName)*
+EmmyTypeNames   <-  EmmyTypeName (%s* {} '|' %s* !String EmmyTypeName)*
 EmmyTypeName    <-  EmmyFunctionType
                 /   EmmyArrayType
                 /   EmmyTableType
                 /   MustEmmyName
-EmmyTypeEnums   <-  %s+ '|' %s+ String
+EmmyTypeEnums   <-  %s* '|' %s* String
 
-EmmyAlias       <-  MustEmmyName %s+ EmmyType
+EmmyAlias       <-  MustEmmyName %s+ EmmyType EmmyTypeEnums*
 
-EmmyParam       <-  MustEmmyName %s+ EmmyType
+EmmyParam       <-  MustEmmyName %s+ EmmyType EmmyTypeEnums*
 
 EmmyReturn      <-  EmmyType
 

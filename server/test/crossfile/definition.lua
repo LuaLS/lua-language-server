@@ -22,24 +22,53 @@ local function catch_target(script, sep)
     return new_script, list
 end
 
+local function founded(targets, results)
+    if #targets ~= #results then
+        return false
+    end
+    for _, target in ipairs(targets) do
+        for _, result in ipairs(results) do
+            if target[1] == result[1]
+            and target[2] == result[2]
+            and target[3] == result[3]
+            then
+                goto NEXT
+            end
+        end
+        do return false end
+        ::NEXT::
+    end
+    return true
+end
+
 function TEST(datas)
     local lsp = service()
     local ws = workspace(lsp, 'test')
     lsp.workspace = ws
 
     local compiled = {}
-    local targetList, targetUri, sourceList, sourceUri
+    local targetList = {}
+    local sourceList, sourceUri
 
     for i, data in ipairs(datas) do
         local uri = ws:uriEncode(fs.path(data.path))
         local new, list = catch_target(data.content, '!')
         if new ~= data.content or data.target then
             if data.target then
-                targetList = data.target
+                targetList[#targetList+1] = {
+                    data.target[1],
+                    data.target[2],
+                    uri
+                }
             else
-                targetList = list[1]
+                for _, position in ipairs(list) do
+                    targetList[#targetList+1] = {
+                        position[1],
+                        position[2],
+                        uri
+                    }
+                end
             end
-            targetUri = uri
             data.content = new
         end
         new, list = catch_target(data.content, '?')
@@ -62,11 +91,11 @@ function TEST(datas)
     local sourcePos = (sourceList[1][1] + sourceList[1][2]) // 2
     local source = core.findSource(sourceVM, sourcePos)
     local positions = core.definition(sourceVM, source, lsp)
-    assert(positions and positions[1])
-    local start, finish, valueUri = positions[1][1], positions[1][2], positions[1][3]
-    assert(valueUri == targetUri)
-    assert(start == targetList[1])
-    assert(finish == targetList[2])
+    if positions then
+        assert(founded(targetList, positions))
+    else
+        assert(#targetList == 0)
+    end
 end
 
 TEST {
@@ -84,7 +113,7 @@ TEST {
 TEST {
     {
         path = 'a.lua',
-        content = 'local <!t!> = 1; return t',
+        content = 'local <!t!> = 1; return <!t!>',
     },
     {
         path = 'b.lua',
@@ -140,7 +169,7 @@ TEST {
     {
         path = 'b.lua',
         content = [[
-            local f = require "a"
+            local <!f!> = require "a"
             <?f?>()
         ]],
     },

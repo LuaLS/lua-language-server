@@ -58,6 +58,7 @@ function mt:buildTable(source)
                     tbl:setChild(key[1], value, key)
                 end
             end
+        elseif obj.type:sub(1, 4) == 'emmy' then
         else
             local value = self:getExp(obj)
             if value.type == 'multi' then

@@ -648,8 +648,7 @@ local Defs = {
             key, value,
         }
     end,
-    NewIndex = function (start, key, finish, value)
-        key.index = true
+    NewIndex = function (key, value)
         return {
             type = 'pair',
             start = key.start,

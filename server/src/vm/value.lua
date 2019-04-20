@@ -101,6 +101,9 @@ function mt:getType()
 end
 
 function mt:rawSet(index, value, source)
+    if index == nil then
+        return
+    end
     if not self._child then
         self._child = {}
     end
@@ -134,6 +137,9 @@ function mt:rawGet(index)
 end
 
 function mt:setChild(index, value, source)
+    if index == nil then
+        return
+    end
     self:setType('table', 0.5)
     self:rawSet(index, value, source)
     return value

@@ -49,8 +49,8 @@ function mt:buildTable(source)
             self:instantSource(key)
             key:bindValue(value, 'set')
             value:setEmmy(emmy)
-            if key.index then
-                local index = self:getIndex(obj)
+            if key.type == 'index' then
+                local index = self:getIndex(key)
                 key:set('parent', tbl)
                 tbl:setChild(index, value, key)
             else
@@ -699,6 +699,8 @@ function mt:getExp(exp)
         return value
     elseif tp == 'simple' then
         return self:getSimple(exp)
+    elseif tp == 'index' then
+        return self:getIndex(exp)
     elseif tp == 'binary' then
         return self:getBinary(exp)
     elseif tp == 'unary' then

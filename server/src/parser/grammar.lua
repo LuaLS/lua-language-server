@@ -306,11 +306,12 @@ Simple      <-  (Prefix (Sp Suffix)*)
 Prefix      <-  Sp ({} PL DirtyExp DirtyPR)
             ->  Prefix
             /   FreeName
+Index       <-  ({} BL DirtyExp DirtyBR) -> Index
 Suffix      <-  DOT   Name / DOT   {} -> MissField
             /   Method (!(Sp CallStart) {} -> MissPL)?
             /   ({} Table {}) -> Call
             /   ({} String {}) -> Call
-            /   ({} BL DirtyExp DirtyBR) -> Index
+            /   Index
             /   ({} PL CallArgList DirtyPR) -> Call
 Method      <-  COLON Name / COLON {} -> MissMethod
 CallStart   <-  PL
@@ -341,7 +342,7 @@ Table       <-  Sp ({} TL TableFields? DirtyTR)
 TableFields <-  (Emmy / TableSep {} / TableField)+
 TableSep    <-  COMMA / SEMICOLON
 TableField  <-  NewIndex / NewField / Exp
-NewIndex    <-  Sp ({} BL DirtyExp DirtyBR NeedAssign DirtyExp)
+NewIndex    <-  Sp (Index NeedAssign DirtyExp)
             ->  NewIndex
 NewField    <-  (MustName ASSIGN DirtyExp)
             ->  NewField

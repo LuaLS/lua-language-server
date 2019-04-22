@@ -35,6 +35,9 @@ end
 
 function mt:setValue(value)
     self.value = value
+    for _, typeUnit in ipairs(self._childs) do
+        typeUnit:setValue(value)
+    end
 end
 
 function mt:getValue()

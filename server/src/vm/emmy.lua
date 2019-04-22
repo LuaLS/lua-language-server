@@ -38,6 +38,7 @@ function mt:doEmmyClass(action)
     self:instantSource(action)
     self:instantSource(action[1])
     local class = emmyMgr:addClass(action)
+    action:set('target class', class:getName())
     action[1]:set('target class', class:getName())
     local extends = action[2]
     if extends then

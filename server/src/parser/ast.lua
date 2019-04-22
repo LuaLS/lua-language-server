@@ -1235,6 +1235,17 @@ local Defs = {
                 symbol = symbol,
             }
         }
+        return
+    end,
+    UnknownAction = function (start, symbol)
+        pushError {
+            type = 'UNKNOWN_SYMBOL',
+            start = start,
+            finish = start + #symbol - 1,
+            info = {
+                symbol = symbol,
+            }
+        }
         return false
     end,
     DirtyName = function (pos)

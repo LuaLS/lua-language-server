@@ -55,6 +55,7 @@ defs.er = '\r'
 defs.et = '\t'
 defs.ev = '\v'
 defs['nil'] = m.Cp() / function () return nil end
+defs['false'] = m.Cp() / function () return false end
 defs.NotReserved = function (_, _, str)
     if RESERVED[str] then
         return false
@@ -386,9 +387,9 @@ CrtAction   <-  Semicolon
             /   Call
             /   ExpInAction
 UnkAction   <-  ({} {Word+})
-            ->  UnknownSymbol
+            ->  UnknownAction
             /   ({} {. (!Sps !CrtAction .)*})
-            ->  UnknownSymbol
+            ->  UnknownAction
 ExpInAction <-  Sp ({} Exp {})
             ->  ExpInAction
 

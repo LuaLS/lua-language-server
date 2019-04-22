@@ -1,13 +1,13 @@
 local findSource = require 'core.find_source'
 
 local function parseResult(vm, source, declarat, callback)
+    local isGlobal
     if source:bindLabel() then
         source:bindLabel():eachInfo(function (info, src)
             if (declarat and info.type == 'set') or info.type == 'get' then
                 callback(src)
             end
         end)
-        return
     end
     if source:bindLocal() then
         local loc = source:bindLocal()
@@ -22,7 +22,6 @@ local function parseResult(vm, source, declarat, callback)
                 callback(src)
             end
         end)
-        return
     end
     if source:bindFunction() then
         if declarat then
@@ -40,6 +39,9 @@ local function parseResult(vm, source, declarat, callback)
                 callback(src)
             end
         end)
+        if source:bindValue():isGlobal() then
+            isGlobal = true
+        end
     end
     local parent = source:get 'parent'
     if parent then
@@ -51,6 +53,7 @@ local function parseResult(vm, source, declarat, callback)
             end
         end)
     end
+    return isGlobal
 end
 
 return function (vm, pos, declarat)
@@ -60,7 +63,7 @@ return function (vm, pos, declarat)
     end
     local positions = {}
     local mark = {}
-    parseResult(vm, source, declarat, function (src)
+    local isGlobal = parseResult(vm, source, declarat, function (src)
         if mark[src] then
             return
         end
@@ -78,5 +81,5 @@ return function (vm, pos, declarat)
             uri,
         }
     end)
-    return positions
+    return positions, isGlobal
 end

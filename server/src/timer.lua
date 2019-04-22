@@ -193,6 +193,10 @@ function mt:remaining()
     return getRemaining(self) / 1000.0
 end
 
+function mt:onTimer()
+    self:_onTimer()
+end
+
 function ac.wait(timeout, onTimer)
     local t = setmetatable({
         ['_timeout'] = mathMax(mathFloor(timeout * 1000.0), 1),

@@ -13,7 +13,6 @@ return function (lsp)
         capabilities = {
             hoverProvider = true,
             definitionProvider = true,
-            implementationProvider = true,
             referencesProvider = true,
             renameProvider = true,
             documentSymbolProvider = true,

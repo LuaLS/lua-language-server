@@ -19,54 +19,38 @@ local function parseValueSimily(callback, vm, source, lsp)
     end)
 end
 
-local function parseValueCrossFile(callback, vm, source, lsp)
-    local value = source:bindValue()
-    value:eachInfo(function (info, src)
-        if src.uri == value.uri then
-            if info.type == 'local' or info.type == 'set' or info.type == 'return' then
-                callback(src)
-            end
-        end
-    end)
-    return nil
-end
-
 local function parseLocal(callback, vm, source, lsp)
-    local positions = {}
     local loc = source:bindLocal()
     local locSource = loc:getSource()
-    --if locSource:get 'arg' then
-    --    callback(locSource)
-    --end
-    local value = source:bindValue()
-    if value and value.uri ~= '' and value.uri ~= vm.uri then
-        parseValueCrossFile(callback, vm, source, lsp)
-    end
     callback(locSource)
-    if #positions == 0 then
-        return nil
-    end
-    return positions
 end
 
 local function parseValue(callback, vm, source, lsp)
-    if source:bindValue() then
-        source:bindValue():eachInfo(function (info, src)
+    local value = source:bindValue()
+    local isGlobal
+    if value then
+        isGlobal = value:isGlobal()
+        value:eachInfo(function (info, src)
             if info.type == 'set' or info.type == 'local' or info.type == 'return' then
-                callback(src)
+                if vm.uri == src:getUri() then
+                    if source.id > src.id then
+                        callback(src)
+                    end
+                elseif value.uri == src:getUri() then
+                    callback(src)
+                end
             end
         end)
     end
     local parent = source:get 'parent'
     if parent then
         parent:eachInfo(function (info, src)
-            if info[1] == source[1] then
-                if info.type == 'set child' then
-                    callback(src)
-                end
+            if info.type == 'set child' and info[1] == source[1] then
+                callback(src)
             end
         end)
     end
+    return isGlobal
 end
 
 local function parseLabel(callback, vm, label, lsp)
@@ -122,10 +106,12 @@ return function (vm, source, lsp)
         return nil
     end
     local list, callback = makeList(source)
+    local isGlobal
     if source:bindLocal() then
         parseLocal(callback, vm, source, lsp)
-    elseif source:bindValue() then
-        parseValue(callback, vm, source, lsp)
+    end
+    if source:bindValue() then
+        isGlobal = parseValue(callback, vm, source, lsp)
         --parseValueSimily(callback, vm, source, lsp)
     end
     if source:bindLabel() then
@@ -135,11 +121,11 @@ return function (vm, source, lsp)
         jumpUri(callback, vm, source, lsp)
     end
     if source:get 'in index' then
-        parseValue(callback, vm, source, lsp)
+        isGlobal = parseValue(callback, vm, source, lsp)
         --parseValueSimily(callback, vm, source, lsp)
     end
     if source:get 'target class' then
         parseClass(callback, vm, source)
     end
-    return list
+    return list, isGlobal
 end

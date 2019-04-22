@@ -26,9 +26,9 @@ local function findResult(lsp, params)
 
     checkWorkSpaceComplete(lsp, source)
 
-    local positions = core.definition(vm, source, lsp)
+    local positions, isGlobal = core.definition(vm, source, lsp)
     if not positions then
-        return nil
+        return nil, isGlobal
     end
 
     local locations = {}
@@ -70,10 +70,10 @@ local function findResult(lsp, params)
     end
 
     if #locations == 0 then
-        return nil
+        return nil, isGlobal
     end
 
-    return locations
+    return locations, isGlobal
 end
 
 local LastTask
@@ -83,27 +83,17 @@ return function (lsp, params)
         LastTask:remove()
         LastTask = nil
     end
-    local result = findResult(lsp, params)
-    if result then
-        return result
-    end
     return function (response)
-        local count = 0
+        local clock = os.clock()
         LastTask = ac.loop(0.1, function ()
-            local result = findResult(lsp, params)
-            if result then
-                response(result)
-                LastTask:remove()
-                LastTask = nil
+            local result, isGlobal = findResult(lsp, params)
+            if isGlobal and lsp:isWaitingCompile() and os.clock() - clock < 1 then
                 return
             end
-            count = count + 1
-            if lsp:isWaitingCompile() and count < 10 then
-                return
-            end
-            response(nil)
+            response(result)
             LastTask:remove()
             LastTask = nil
         end)
+        LastTask:onTimer()
     end
 end

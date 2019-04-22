@@ -4,7 +4,7 @@ local LastTask
 local function findReferences(lsp, uri, position, declarat)
     local vm = lsp:getVM(uri)
 
-    local positions = core.references(vm, position, declarat)
+    local positions, isGlobal = core.references(vm, position, declarat)
     if not positions then
         return nil
     end
@@ -48,10 +48,10 @@ local function findReferences(lsp, uri, position, declarat)
     end
 
     if #locations == 0 then
-        return nil
+        return nil, isGlobal
     end
 
-    return locations
+    return locations, isGlobal
 end
 
 return function (lsp, params)
@@ -71,20 +71,16 @@ return function (lsp, params)
     local position = lines:positionAsChar(params.position.line + 1, params.position.character)
 
     return function (response)
+        local clock = os.clock()
         LastTask = ac.loop(0.1, function (t)
-            local positions = findReferences(lsp, uri, position, declarat)
-            if positions then
-                response(positions)
-                t:remove()
-                LastTask = nil
+            local positions, isGlobal = findReferences(lsp, uri, position, declarat)
+            if isGlobal and lsp:isWaitingCompile() and os.clock() - clock < 5 then
                 return
             end
-            if lsp:isWaitingCompile() then
-                return
-            end
-            response(nil)
+            response(positions)
             t:remove()
             LastTask = nil
         end)
+        LastTask:onTimer()
     end
 end

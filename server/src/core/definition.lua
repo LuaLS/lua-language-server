@@ -25,30 +25,48 @@ local function parseLocal(callback, vm, source, lsp)
     callback(locSource)
 end
 
+local function parseValueByValue(callback, vm, source, value, isGlobal)
+    value:eachInfo(function (info, src)
+        if info.type == 'set' or info.type == 'local' or info.type == 'return' then
+            if vm.uri == src:getUri() then
+                if isGlobal or source.id > src.id then
+                    callback(src)
+                end
+            elseif value.uri == src:getUri() then
+                callback(src)
+            end
+        end
+    end)
+end
+
 local function parseValue(callback, vm, source, lsp)
     local value = source:bindValue()
     local isGlobal
     if value then
         isGlobal = value:isGlobal()
-        value:eachInfo(function (info, src)
-            if info.type == 'set' or info.type == 'local' or info.type == 'return' then
-                if vm.uri == src:getUri() then
-                    if isGlobal or source.id > src.id then
-                        callback(src)
-                    end
-                elseif value.uri == src:getUri() then
-                    callback(src)
-                end
+        parseValueByValue(callback, vm, source, value, isGlobal)
+        local emmy = value:getEmmy()
+        if emmy and emmy.type == 'emmy.type' then
+            local class = emmy:getClass()
+            if class and class:getValue() then
+                parseValueByValue(callback, vm, source, class:getValue(), isGlobal)
             end
-        end)
+        end
     end
     local parent = source:get 'parent'
-    if parent then
-        parent:eachInfo(function (info, src)
-            if info.type == 'set child' and info[1] == source[1] then
-                callback(src)
+    for _ = 1, 3 do
+        if parent then
+            local ok = parent:eachInfo(function (info, src)
+                if info.type == 'set child' and info[1] == source[1] then
+                    callback(src)
+                    return true
+                end
+            end)
+            if ok then
+                break
             end
-        end)
+            parent = parent:getMetaMethod('__index')
+        end
     end
     return isGlobal
 end

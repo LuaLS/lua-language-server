@@ -26,9 +26,19 @@ end
 
 function mt:getClass()
     local class = self._manager:eachClass(self.name, function (class)
-        return class
+        if class.type == 'emmy.class' then
+            return class
+        end
     end)
     return class
+end
+
+function mt:setValue(value)
+    self.value = value
+end
+
+function mt:getValue()
+    return self.value
 end
 
 return function (manager, source)

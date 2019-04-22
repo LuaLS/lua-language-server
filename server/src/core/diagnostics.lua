@@ -410,6 +410,9 @@ function mt:checkEmmyClass(source, callback)
     local name = class:getName()
     local related = {}
     self.vm.emmyMgr:eachClass(name, function (class)
+        if class.type ~= 'emmy.class' then
+            return
+        end
         local src = class:getSource()
         if src ~= source then
             related[#related+1] = {
@@ -428,7 +431,9 @@ function mt:checkEmmyClass(source, callback)
         return
     end
     local parent = self.vm.emmyMgr:eachClass(extends, function (parent)
-        return parent
+        if parent.type == 'emmy.class' then
+            return parent
+        end
     end)
     if not parent then
         callback(source[2].start, source[2].finish, lang.script.DIAG_UNDEFINED_CLASS)
@@ -449,7 +454,9 @@ function mt:checkEmmyClass(source, callback)
             uri = current:getSource().uri,
         }
         current = self.vm.emmyMgr:eachClass(extends, function (parent)
-            return parent
+            if parent.type == 'emmy.class' then
+                return parent
+            end
         end)
         if not current then
             break
@@ -465,7 +472,9 @@ function mt:checkEmmyType(source, callback)
     for _, tpsource in ipairs(source) do
         local name = tpsource[1]
         local class = self.vm.emmyMgr:eachClass(name, function (class)
-            return class
+            if class.type == 'emmy.class' then
+                return class
+            end
         end)
         if not class then
             callback(tpsource.start, tpsource.finish, lang.script.DIAG_UNDEFINED_CLASS)

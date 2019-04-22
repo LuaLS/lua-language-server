@@ -322,7 +322,7 @@ function mt:mergeValue(value)
     if not value then
         return
     end
-    local global = self._global
+    local global = self._global or value._global
     local list = {self, value}
     local pos = 1
     while true do
@@ -351,13 +351,14 @@ function mt:mergeValue(value)
                         list[#list+1] = bc
                     end
                 end
-                if global then
-                    bc:markGlobal()
-                end
                 a._child[k] = bc
             end
         end
         b._child = a._child
+        if global then
+            a:markGlobal()
+            b:markGlobal()
+        end
 
         if b._meta then
             a._meta = b._meta
@@ -530,7 +531,14 @@ function mt:setEmmy(emmy)
     end
     if emmy.type == 'emmy.class' then
         emmy:setValue(self)
+        emmy:eachChild(function (obj)
+            local value = obj:getValue()
+            if value then
+                value:mergeValue(self)
+            end
+        end)
     elseif emmy.type == 'emmy.type' then
+        emmy:setValue(self)
         local class = emmy:getClass()
         if class then
             self:mergeValue(class:getValue())

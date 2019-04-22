@@ -59,23 +59,34 @@ function mt:eachClass(...)
     end
 end
 
-function mt:addClass(source)
-    local className = source[1][1]
-    self:flushClass(className)
-    local list = self._class[className]
+function mt:getClass(name)
+    self:flushClass(name)
+    local list = self._class[name]
     local version = listMgr.getVersion()
     if not list then
         list = {
             version = version,
         }
-        self._class[className] = list
+        self._class[name] = list
     end
+    return list
+end
+
+function mt:addClass(source)
+    local className = source[1][1]
+    local list = self:getClass(className)
     list[source.id] = newClass(self, source)
     return list[source.id]
 end
 
-function mt:createType(source)
-    return newType(self, source)
+function mt:addType(source)
+    local typeObj = newType(self, source)
+    for _, obj in ipairs(source) do
+        local className = obj[1]
+        local list = self:getClass(className)
+        list[source.id] = typeObj
+    end
+    return typeObj
 end
 
 function mt:remove()
@@ -85,6 +96,7 @@ return function ()
     ---@class emmyMgr
     local self = setmetatable({
         _class = {},
+        _type = {},
     }, mt)
     return self
 end

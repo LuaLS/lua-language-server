@@ -33,7 +33,7 @@ local function parseValue(callback, vm, source, lsp)
         value:eachInfo(function (info, src)
             if info.type == 'set' or info.type == 'local' or info.type == 'return' then
                 if vm.uri == src:getUri() then
-                    if source.id > src.id then
+                    if isGlobal or source.id > src.id then
                         callback(src)
                     end
                 elseif value.uri == src:getUri() then
@@ -73,8 +73,10 @@ end
 local function parseClass(callback, vm, source)
     local className = source:get 'target class'
     vm.emmyMgr:eachClass(className, function (class)
-        local src = class:getSource()
-        callback(src)
+        if class.type == 'emmy.class' then
+            local src = class:getSource()
+            callback(src)
+        end
     end)
 end
 

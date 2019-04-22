@@ -33,6 +33,7 @@ function mt:getEmmy()
 end
 
 function mt:doEmmyClass(action)
+    ---@type emmyMgr
     local emmyMgr = self.emmyMgr
     self:instantSource(action)
     local class = emmyMgr:addClass(action)
@@ -49,9 +50,10 @@ function mt:doEmmyClass(action)
 end
 
 function mt:doEmmyType(action)
+    ---@type emmyMgr
     local emmyMgr = self.emmyMgr
     self:instantSource(action)
-    local type = emmyMgr:createType(action)
+    local type = emmyMgr:addType(action)
     self._emmy = type
     action:set('emmy.type', type)
     for _, obj in ipairs(action) do

@@ -100,3 +100,9 @@ table.<!dump!>()
 function table.<?dump?>()
 end
 ]]
+
+--TEST [[
+-----@class <?Class?>
+-----@type <!Class!>
+-----@type <!Class!>
+--]]

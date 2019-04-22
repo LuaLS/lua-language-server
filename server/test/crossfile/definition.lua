@@ -275,3 +275,37 @@ TEST {
         ]],
     },
 }
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@class Class
+            local <!obj!>
+        ]]
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            ---@type Class
+            local <?obj?>
+        ]]
+    },
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@type Class
+            local <?obj?>
+        ]]
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            ---@class Class
+            local <!obj!>
+        ]]
+    },
+}

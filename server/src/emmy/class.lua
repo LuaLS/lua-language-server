@@ -24,6 +24,14 @@ function mt:getValue()
     return self.value
 end
 
+function mt:eachChild(callback)
+    self._manager:eachClass(self.name, function (obj)
+        if obj.type == 'emmy.type' then
+            callback(obj)
+        end
+    end)
+end
+
 return function (manager, source)
     local self = setmetatable({
         name = source[1][1],

@@ -53,6 +53,12 @@ local function parseResult(vm, source, declarat, callback)
             end
         end)
     end
+    --local emmy = source:getEmmy()
+    --if emmy then
+    --    if emmy.type == 'emmy.class' or emmy.type == 'emmy.type' --then
+--
+    --    end
+    --end
     return isGlobal
 end
 

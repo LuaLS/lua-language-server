@@ -470,7 +470,7 @@ TEST[[
 local <?x?> = class()
 ]]
 [[
-local x: *Class
+local x: *Class {}
 ]]
 
 TEST[[
@@ -478,7 +478,7 @@ TEST[[
 <?x?> = class()
 ]]
 [[
-global x: *Class
+global x: *Class {}
 ]]
 
 TEST[[
@@ -488,7 +488,7 @@ local t = {
 }
 ]]
 [[
-field x: *Class
+field x: *Class {}
 ]]
 
 TEST[[
@@ -496,7 +496,7 @@ TEST[[
 local <?x?> = class()
 ]]
 [[
-local x: *Class
+local x: *Class {}
 ]]
 
 TEST[[
@@ -504,7 +504,7 @@ TEST[[
 <?x?> = class()
 ]]
 [[
-global x: *Class
+global x: *Class {}
 ]]
 
 TEST[[
@@ -514,7 +514,7 @@ local t = {
 }
 ]]
 [[
-field x: *Class
+field x: *Class {}
 ]]
 
 TEST[[
@@ -522,5 +522,17 @@ TEST[[
 local <?x?> = class()
 ]]
 [[
-local x: *A|B|C
+local x: *A|B|C {}
+]]
+
+TEST[[
+---@class Class
+local <?x?> = {
+    b = 1
+}
+]]
+[[
+local x: *Class {
+    b: number = 1,
+}
 ]]

@@ -17,6 +17,11 @@ local OriginTypes = {
 }
 
 local function findClass(value)
+    -- 检查是否有emmy
+    local emmy = value:getEmmy()
+    if emmy then
+        return emmy:getType()
+    end
     -- 检查对象元表
     local metaValue = value:getMetaTable()
     if not metaValue then

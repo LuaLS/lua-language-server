@@ -84,6 +84,18 @@ TEST {
 TEST {
     {
         path = 'a.lua',
+        content = '',
+        target = {0, 0},
+    },
+    {
+        path = 'b.lua',
+        content = 'require <?"A"?>',
+    },
+}
+
+TEST {
+    {
+        path = 'a.lua',
         content = 'local <!t!> = 1; return t',
     },
     {

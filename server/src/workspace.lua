@@ -408,6 +408,7 @@ function mt:matchPath(baseUri, input)
 end
 
 function mt:searchPath(baseUri, str)
+    str = getFileName(fs.path(str))
     if self.searched[baseUri] and self.searched[baseUri][str] then
         return self.searched[baseUri][str]
     end

@@ -89,7 +89,7 @@ function TEST(datas)
     local sourceVM = lsp:getVM(sourceUri)
     assert(sourceVM)
     local sourcePos = (sourceList[1][1] + sourceList[1][2]) // 2
-    local positions = core.definition(sourceVM, sourcePos, 'definition', lsp)
+    local positions = core.definition(sourceVM, sourcePos, 'definition')
     if positions then
         assert(founded(targetList, positions))
     else
@@ -106,6 +106,29 @@ TEST {
     {
         path = 'b.lua',
         content = 'require <?"a"?>',
+    },
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = 'local <!t!> = 1; return <!t!>',
+    },
+    {
+        path = 'b.lua',
+        content = 'local <?t?> = require "a"',
+    },
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = '',
+        target = {0, 0},
+    },
+    {
+        path = 'b.lua',
+        content = 'require <?"A"?>',
     },
 }
 

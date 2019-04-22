@@ -225,10 +225,10 @@ function mt:flushChild()
     local count = 0
     for srcId, info in pairs(infos) do
         local src = listMgr.get(srcId)
-        if  src
-            and (info.type == 'set child' or info.type == 'get child')
-        then
-            alived[info[1]] = true
+        if  src then
+            if info.type == 'set child' or info.type == 'get child' then
+                alived[info[1]] = true
+            end
             count = count + 1
         else
             infos[srcId] = nil
@@ -539,6 +539,7 @@ function mt:setEmmy(emmy)
         return
     end
     self._emmy = emmy
+    self:markGlobal()
 end
 
 function mt:getEmmy()

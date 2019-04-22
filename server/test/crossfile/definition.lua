@@ -89,8 +89,7 @@ function TEST(datas)
     local sourceVM = lsp:getVM(sourceUri)
     assert(sourceVM)
     local sourcePos = (sourceList[1][1] + sourceList[1][2]) // 2
-    local source = core.findSource(sourceVM, sourcePos)
-    local positions = core.definition(sourceVM, source, lsp)
+    local positions = core.definition(sourceVM, sourcePos, 'definition', lsp)
     if positions then
         assert(founded(targetList, positions))
     else

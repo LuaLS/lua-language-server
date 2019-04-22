@@ -1,15 +1,5 @@
 local core = require 'core'
 
-local function checkWorkSpaceComplete(lsp, source)
-    if not source:bindValue() then
-        return
-    end
-    if not source:bindValue():get 'cross file' then
-        return
-    end
-    lsp:checkWorkSpaceComplete()
-end
-
 local function findResult(lsp, params)
     local uri = params.textDocument.uri
     local vm, lines = lsp:loadVM(uri)
@@ -24,9 +14,7 @@ local function findResult(lsp, params)
         return nil
     end
 
-    checkWorkSpaceComplete(lsp, source)
-
-    local positions, isGlobal = core.definition(vm, source, lsp)
+    local positions, isGlobal = core.definition(vm, position, 'definition', lsp)
     if not positions then
         return nil, isGlobal
     end

@@ -4,7 +4,7 @@ local LastTask
 local function findReferences(lsp, uri, position, declarat)
     local vm = lsp:getVM(uri)
 
-    local positions, isGlobal = core.references(vm, position, declarat)
+    local positions, isGlobal = core.references(vm, position, 'reference')
     if not positions then
         return nil
     end

@@ -43,7 +43,7 @@ function TEST(script)
     local vm = buildVM(ast)
     assert(vm)
 
-    local positions = core.references(vm, pos, true)
+    local positions = core.references(vm, pos, 'reference')
     if positions then
         assert(founded(target, positions))
     else

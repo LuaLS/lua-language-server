@@ -109,7 +109,7 @@ function TEST(data)
     compileAll(lsp)
 
     assert(vm)
-    local result = core.references(vm, pos, 'reference')
+    local result = core.definition(vm, pos, 'reference')
     if expect then
         assert(result)
         assert(founded(expect, result))

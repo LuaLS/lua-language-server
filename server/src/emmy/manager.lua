@@ -1,6 +1,7 @@
 local listMgr = require 'vm.list'
 local newClass = require 'emmy.class'
 local newType = require 'emmy.type'
+local newTypeUnit = require 'emmy.typeUnit'
 
 local mt = {}
 mt.__index = mt
@@ -81,10 +82,14 @@ end
 
 function mt:addType(source)
     local typeObj = newType(self, source)
-    for _, obj in ipairs(source) do
+    for i, obj in ipairs(source) do
+        local typeUnit = newTypeUnit(self, obj)
         local className = obj[1]
         local list = self:getClass(className)
-        list[source.id] = typeObj
+        typeUnit:setParent(typeObj)
+        list[source.id] = typeUnit
+        typeObj._childs[i] = typeUnit
+        obj:set('emmy.typeUnit', typeUnit)
     end
     return typeObj
 end

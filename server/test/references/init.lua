@@ -43,7 +43,7 @@ function TEST(script)
     local vm = buildVM(ast)
     assert(vm)
 
-    local positions = core.references(vm, pos, 'reference')
+    local positions = core.definition(vm, pos, 'reference')
     if positions then
         assert(founded(target, positions))
     else
@@ -52,13 +52,13 @@ function TEST(script)
 end
 
 TEST [[
-local <!a!> = 1
-<?a?> = <?a?>
+local <?a?> = 1
+<!a!> = <!a!>
 ]]
 
 TEST [[
-t.<!a!> = 1
-t.<?a?> = t.<?a?>
+t.<?a?> = 1
+t.<!a!> = t.<!a!>
 ]]
 
 TEST [[
@@ -68,8 +68,8 @@ goto <?LABEL?>
 
 TEST [[
 local a = 1
-local <!a!> = 1
-<?a?> = <?a?>
+local <?a?> = 1
+<!a!> = <!a!>
 ]]
 
 TEST [[
@@ -101,8 +101,14 @@ function table.<?dump?>()
 end
 ]]
 
---TEST [[
------@class <?Class?>
------@type <!Class!>
------@type <!Class!>
---]]
+TEST [[
+---@class <!Class!>
+---@type <?Class?>
+---@type <!Class!>
+]]
+
+TEST [[
+---@class <?Class?>
+---@type <!Class!>
+---@type <!Class!>
+]]

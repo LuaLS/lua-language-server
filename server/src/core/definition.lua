@@ -23,15 +23,27 @@ local function parseValueSimily(callback, vm, source)
 end
 
 local function parseLocal(callback, vm, source)
+    ---@type Local
     local loc = source:bindLocal()
-    local locSource = loc:getSource()
-    callback(locSource)
+    loc:eachInfo(function (info, src)
+        if Mode == 'definition' then
+            if info.type == 'set' or info.type == 'local' then
+                if src.id < source.id then
+                    callback(src)
+                end
+            end
+        elseif Mode == 'reference' then
+            if info.type == 'set' or info.type == 'local' or info.type == 'return' or info.type == 'get' then
+                callback(src)
+            end
+        end
+    end)
 end
 
 local function parseValueByValue(callback, vm, source, value, isGlobal)
     value:eachInfo(function (info, src)
-        if info.type == 'set' or info.type == 'local' or info.type == 'return' then
-            if Mode == 'definition' then
+        if Mode == 'definition' then
+            if info.type == 'set' or info.type == 'local' or info.type == 'return' then
                 if vm.uri == src:getUri() then
                     if isGlobal or source.id > src.id then
                         callback(src)
@@ -39,7 +51,9 @@ local function parseValueByValue(callback, vm, source, value, isGlobal)
                 elseif value.uri == src:getUri() then
                     callback(src)
                 end
-            elseif Mode == 'reference' then
+            end
+        elseif Mode == 'reference' then
+            if info.type == 'set' or info.type == 'local' or info.type == 'return' or info.type == 'get' then
                 callback(src)
             end
         end
@@ -54,10 +68,13 @@ local function parseValue(callback, vm, source)
         parseValueByValue(callback, vm, source, value, isGlobal)
         local emmy = value:getEmmy()
         if emmy and emmy.type == 'emmy.type' then
-            local class = emmy:getClass()
-            if class and class:getValue() then
-                parseValueByValue(callback, vm, source, class:getValue(), isGlobal)
-            end
+            ---@type EmmyType
+            local emmyType = emmy
+            emmyType:eachClass(function (class)
+                if class and class:getValue() then
+                    parseValueByValue(callback, vm, source, class:getValue(), isGlobal)
+                end
+            end)
         end
     end
     local parent = source:get 'parent'
@@ -111,19 +128,39 @@ end
 local function parseClass(callback, vm, source)
     local className = source:get 'target class'
     vm.emmyMgr:eachClass(className, function (class)
-        if class.type == 'emmy.class' then
-            local src = class:getSource()
-            callback(src)
+        if Mode == 'definition' then
+            if class.type == 'emmy.class' then
+                local src = class:getSource()
+                callback(src)
+            end
+        elseif Mode == 'reference' then
+            if class.type == 'emmy.class' or class.type == 'emmy.typeUnit' then
+                local src = class:getSource()
+                callback(src)
+            end
         end
     end)
+end
+
+local function parseFunction(callback, vm, source)
+    if Mode == 'reference' then
+        callback(source:bindFunction():getSource())
+        source:bindFunction():eachInfo(function (info, src)
+            if info.type == 'set' or info.type == 'local' or info.type == 'get' then
+                callback(src)
+            end
+        end)
+    end
 end
 
 local function makeList(source)
     local list = {}
     local mark = {}
     return list, function (src)
-        if source == src then
-            return
+        if Mode == 'definition' then
+            if source == src then
+                return
+            end
         end
         if mark[src] then
             return
@@ -158,6 +195,9 @@ return function (vm, pos, mode)
     end
     if source:bindLabel() then
         parseLabel(callback, vm, source:bindLabel())
+    end
+    if source:bindFunction() then
+        parseFunction(callback, vm, source)
     end
     if source:get 'target uri' then
         jumpUri(callback, vm, source)

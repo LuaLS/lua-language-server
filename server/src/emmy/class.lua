@@ -1,5 +1,6 @@
 local listMgr = require 'vm.list'
 
+---@class EmmyClass
 local mt = {}
 mt.__index = mt
 mt.type = 'emmy.class'
@@ -26,7 +27,7 @@ end
 
 function mt:eachChild(callback)
     self._manager:eachClass(self.name, function (obj)
-        if obj.type == 'emmy.type' then
+        if obj.type == 'emmy.typeUnit' then
             callback(obj)
         end
     end)

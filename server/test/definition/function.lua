@@ -18,7 +18,7 @@ end
 
 TEST [[
 local <!x!>
-function x()
+function <!x!>()
 end
 <?x?>()
 ]]

@@ -3,6 +3,7 @@ local listMgr = require 'vm.list'
 local Sort = 0
 local Watch = setmetatable({}, {__mode = 'kv'})
 
+---@class Local
 local mt = {}
 mt.__index = mt
 mt.type = 'local'

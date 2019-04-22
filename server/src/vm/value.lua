@@ -530,19 +530,24 @@ function mt:setEmmy(emmy)
         return
     end
     if emmy.type == 'emmy.class' then
-        emmy:setValue(self)
-        emmy:eachChild(function (obj)
+        ---@type EmmyClass
+        local emmyClass = emmy
+        emmyClass:setValue(self)
+        emmyClass:eachChild(function (obj)
             local value = obj:getValue()
             if value then
                 value:mergeValue(self)
             end
         end)
     elseif emmy.type == 'emmy.type' then
-        emmy:setValue(self)
-        local class = emmy:getClass()
-        if class then
-            self:mergeValue(class:getValue())
-        end
+        ---@type EmmyType
+        local emmyType = emmy
+        emmyType:setValue(self)
+        emmyType:eachClass(function (class)
+            if class then
+                self:mergeValue(class:getValue())
+            end
+        end)
     else
         return
     end

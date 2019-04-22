@@ -1,17 +1,9 @@
 local listMgr = require 'vm.list'
 
-local function buildName(source)
-    local names = {}
-    for i, type in ipairs(source) do
-        names[i] = type[1]
-    end
-    return table.concat(names, '|')
-end
-
----@class EmmyType
+---@class EmmyTypeUnit
 local mt = {}
 mt.__index = mt
-mt.type = 'emmy.type'
+mt.type = 'emmy.typeUnit'
 
 function mt:getType()
     return self.name
@@ -25,12 +17,12 @@ function mt:getSource()
     return listMgr.get(self.source)
 end
 
-function mt:eachClass(callback)
-    for _, typeUnit in ipairs(self._childs) do
-        ---@type EmmyTypeUnit
-        local emmyTypeUnit = typeUnit
-        emmyTypeUnit:getClass(callback)
-    end
+function mt:getClass(callback)
+    self._manager:eachClass(self:getName(), function (class)
+        if class.type == 'emmy.class' then
+            callback(class)
+        end
+    end)
 end
 
 function mt:setValue(value)
@@ -41,12 +33,19 @@ function mt:getValue()
     return self.value
 end
 
+function mt:setParent(parent)
+    self.parent = parent
+end
+
+function mt:getParent()
+    return self.parent
+end
+
 return function (manager, source)
     local self = setmetatable({
-        name = buildName(source),
+        name = source[1],
         source = source.id,
         _manager = manager,
-        _childs = {},
     }, mt)
     return self
 end

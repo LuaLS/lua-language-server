@@ -784,3 +784,43 @@ TEST [[
         kind = CompletionItemKind.Class,
     },
 }
+
+TEST [[
+---@class abc
+local abcd
+---@type a$
+]]
+{
+    {
+        label = 'abc',
+        kind = CompletionItemKind.Class,
+    },
+}
+
+TEST [[
+---@class abc
+local abcd
+---@type $
+]]
+{
+    {
+        label = 'abc',
+        kind = CompletionItemKind.Class,
+    },
+}
+
+TEST [[
+---@class abc
+local abcd
+---@type xxx|$
+]]
+{
+    {
+        label = 'abc',
+        kind = CompletionItemKind.Class,
+    },
+    {
+        label = 'xxx',
+        kind = CompletionItemKind.Class,
+    },
+}

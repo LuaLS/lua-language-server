@@ -3,6 +3,7 @@ local getFunctionHover = require 'core.hover.function'
 local getFunctionHoverAsLib = require 'core.hover.lib_function'
 local sourceMgr = require 'vm.source'
 local config = require 'config'
+local State
 
 local CompletionItemKind = {
     Text = 1,
@@ -436,10 +437,13 @@ local function searchSource(vm, source, word, callback)
     end
     if source.type == 'emmyIncomplete' then
         searchEmmyKeyword(vm, source, word, callback)
+        State.ignoreText = true
         return
     end
     if source:get 'target class' then
         searchEmmyClass(vm, source, word, callback)
+        State.ignoreText = true
+        return
     end
 end
 
@@ -769,6 +773,7 @@ return function (vm, text, pos, oldText)
             return nil
         end
     end
+    State = {}
     local callback, list = makeList(source, pos, word)
     if searchToclose(text, source, word, callback) then
         return list
@@ -777,7 +782,9 @@ return function (vm, text, pos, oldText)
     searchCallArg(vm, source, word, callback, pos)
     searchSource(vm, source, word, callback)
     if not oldText or #list > 0 then
-        searchAllWords(vm, source, word, callback, pos)
+        if not State.ignoreText then
+            searchAllWords(vm, source, word, callback, pos)
+        end
     end
 
     if #list == 0 then

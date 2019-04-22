@@ -13,10 +13,17 @@ local function parseValueSimily(callback, vm, source)
         if      other[1] == key
             and not other:bindLocal()
             and other:bindValue()
-            and other:action() == 'set'
             and source:bindValue() ~= other:bindValue()
         then
-            callback(other)
+            if Mode == 'definition' then
+                if other:action() == 'set' then
+                    callback(other)
+                end
+            elseif Mode == 'reference' then
+                if other:action() == 'set' or other:action() == 'get' then
+                    callback(other)
+                end
+            end
         end
         :: CONTINUE ::
     end)
@@ -191,7 +198,6 @@ return function (vm, pos, mode)
     end
     if source:bindValue() then
         isGlobal = parseValue(callback, vm, source)
-        --parseValueSimily(callback, vm, source)
     end
     if source:bindLabel() then
         parseLabel(callback, vm, source:bindLabel())
@@ -204,10 +210,14 @@ return function (vm, pos, mode)
     end
     if source:get 'in index' then
         isGlobal = parseValue(callback, vm, source)
-        --parseValueSimily(callback, vm, source)
     end
     if source:get 'target class' then
         parseClass(callback, vm, source)
     end
+
+    if #list == 0 then
+        parseValueSimily(callback, vm, source)
+    end
+
     return list, isGlobal
 end

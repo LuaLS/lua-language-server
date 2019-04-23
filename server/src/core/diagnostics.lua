@@ -324,7 +324,7 @@ end
 
 function mt:searchEmptyBlock(callback)
     self.vm:eachSource(function (source)
-        -- 认为空repeat是合法的
+        -- 认为空repeat与空while是合法的
         -- 要去vm中激活source
         if source.type == 'if' then
             for _, block in ipairs(source) do
@@ -337,7 +337,6 @@ function mt:searchEmptyBlock(callback)
         end
         if source.type == 'loop'
         or source.type == 'in'
-        or source.type == 'while'
         then
             if #source == 0 then
                 callback(source.start, source.finish)

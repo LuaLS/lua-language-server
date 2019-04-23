@@ -292,8 +292,8 @@ end
 ]]
 
 TEST [[
-<!while true do
-end!>
+while true do
+end
 ]]
 
 TEST [[

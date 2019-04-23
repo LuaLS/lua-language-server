@@ -361,6 +361,22 @@ TEST {
 
 TEST {
     {
+        path = 'a/xxx.lua',
+        content = [[
+            return <!function () end!>
+        ]]
+    },
+    {
+        path = 'b/xxx.lua',
+        content = [[
+            local <?f?> = require 'xxx'
+            return function () end
+        ]]
+    }
+}
+
+TEST {
+    {
         path = 'a.lua',
         content = [[
             ---@class Class

@@ -510,3 +510,25 @@ TEST {
         main = true,
     },
 }
+
+TEST {
+    {
+        path = 'xxx.lua',
+        content = ''
+    },
+    {
+        path = 'xxxx.lua',
+        content = [[
+            require 'xx$'
+        ]],
+        main = true,
+    },
+    completion = {
+        {
+            label = 'xxx',
+            kind = CompletionItemKind.Reference,
+            documentation = 'xxx.lua',
+            textEdit = EXISTS,
+        },
+    }
+}

@@ -222,12 +222,15 @@ end
 
 function mt:findPath(baseUri, searchers)
     local results = {}
+    local baseName = getFileName(self:uriDecode(baseUri))
     for filename, uri in pairs(self.files) do
-        for _, searcher in ipairs(searchers) do
-            if filename:sub(-#searcher) == searcher then
-                local sep = filename:sub(-#searcher-1, -#searcher-1)
-                if sep == '/' or sep == '\\' then
-                    results[#results+1] = uri
+        if filename ~= baseName then
+            for _, searcher in ipairs(searchers) do
+                if filename:sub(-#searcher) == searcher then
+                    local sep = filename:sub(-#searcher-1, -#searcher-1)
+                    if sep == '/' or sep == '\\' then
+                        results[#results+1] = uri
+                    end
                 end
             end
         end
@@ -356,28 +359,30 @@ function mt:matchPath(baseUri, input)
     local rootLen = #self.root:string()
     local map = {}
     for filename in pairs(self.files) do
-        local trueFilename = getTrueName(filename)
-        local start
-        if platform.OS == 'Windows' then
-            start = filename:find('[/\\]' .. first:lower(), rootLen + 1)
-        else
-            start = trueFilename:find('[/\\]' .. first, rootLen + 1)
-        end
-        if start then
-            local list = self:convertPathAsRequire(trueFilename, start + 1)
-            if list then
-                for _, str in ipairs(list) do
-                    if #str >= #input and fileNameEq(str:sub(1, #input), input) then
-                        if not map[str] then
-                            map[str] = trueFilename
-                        else
-                            local s1 = similarity(trueFilename, baseName)
-                            local s2 = similarity(map[str], baseName)
-                            if s1 > s2 then
+        if filename ~= baseName then
+            local trueFilename = getTrueName(filename)
+            local start
+            if platform.OS == 'Windows' then
+                start = filename:find('[/\\]' .. first:lower(), rootLen + 1)
+            else
+                start = trueFilename:find('[/\\]' .. first, rootLen + 1)
+            end
+            if start then
+                local list = self:convertPathAsRequire(trueFilename, start + 1)
+                if list then
+                    for _, str in ipairs(list) do
+                        if #str >= #input and fileNameEq(str:sub(1, #input), input) then
+                            if not map[str] then
                                 map[str] = trueFilename
-                            elseif s1 == s2 then
-                                if trueFilename < map[str] then
+                            else
+                                local s1 = similarity(trueFilename, baseName)
+                                local s2 = similarity(map[str], baseName)
+                                if s1 > s2 then
                                     map[str] = trueFilename
+                                elseif s1 == s2 then
+                                    if trueFilename < map[str] then
+                                        map[str] = trueFilename
+                                    end
                                 end
                             end
                         end

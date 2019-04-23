@@ -70,6 +70,8 @@ defs.Reserved = function (_, _, str)
 end
 defs.np = m.Cp() / function (n) return n+1 end
 
+m.setmaxstack(1000)
+
 local eof = re.compile '!. / %{SYNTAX_ERROR}'
 
 local function grammar(tag)

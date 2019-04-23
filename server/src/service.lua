@@ -434,6 +434,9 @@ function mt:compileVM(uri)
     local ast = self:compileAst(obj)
     local version = obj.version
     obj.astCost = os.clock() - clock
+    if obj.astCost > 0.1 then
+        log.warn(('Compile[%s] takes [%.3f] sec, size [%.3f]kb'):format(uri, obj.astCost, #obj.text))
+    end
     obj.oldText = nil
 
     self:_clearChainNode(obj, uri)

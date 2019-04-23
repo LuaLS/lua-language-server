@@ -1538,4 +1538,3 @@ return function (self, lua, mode, version)
     end
     return res, Errs
 end
-

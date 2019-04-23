@@ -32,10 +32,15 @@ end
 local function parseLocal(callback, vm, source)
     ---@type Local
     local loc = source:bindLocal()
+    callback(loc:getSource())
     loc:eachInfo(function (info, src)
         if Mode == 'definition' then
             if info.type == 'set' or info.type == 'local' then
-                if src.id < source.id then
+                if vm.uri == src:getUri() then
+                    if source.id >= src.id then
+                        callback(src)
+                    end
+                else
                     callback(src)
                 end
             end
@@ -47,15 +52,22 @@ local function parseLocal(callback, vm, source)
     end)
 end
 
-local function parseValueByValue(callback, vm, source, value, isGlobal)
+local function parseValueByValue(callback, vm, source, value)
     value:eachInfo(function (info, src)
         if Mode == 'definition' then
-            if info.type == 'set' or info.type == 'local' or info.type == 'return' then
+            if info.type == 'set' or info.type == 'local' then
                 if vm.uri == src:getUri() then
-                    if isGlobal or source.id > src.id then
+                    if source.id >= src.id then
                         callback(src)
                     end
-                elseif value.uri == src:getUri() then
+                else
+                    callback(src)
+                end
+            end
+            if info.type == 'return' then
+                if src.type == 'function'
+                or (src.type == 'simple' and src[#src].type == 'call')
+                then
                     callback(src)
                 end
             end
@@ -72,14 +84,14 @@ local function parseValue(callback, vm, source)
     local isGlobal
     if value then
         isGlobal = value:isGlobal()
-        parseValueByValue(callback, vm, source, value, isGlobal)
+        parseValueByValue(callback, vm, source, value)
         local emmy = value:getEmmy()
         if emmy and emmy.type == 'emmy.type' then
             ---@type EmmyType
             local emmyType = emmy
             emmyType:eachClass(function (class)
                 if class and class:getValue() then
-                    parseValueByValue(callback, vm, source, class:getValue(), isGlobal)
+                    parseValueByValue(callback, vm, class:getValue():getSource(), class:getValue())
                 end
             end)
         end
@@ -150,7 +162,20 @@ local function parseClass(callback, vm, source)
 end
 
 local function parseFunction(callback, vm, source)
-    if Mode == 'reference' then
+    if Mode == 'definition' then
+        callback(source:bindFunction():getSource())
+        source:bindFunction():eachInfo(function (info, src)
+            if info.type == 'set' or info.type == 'local' then
+                if vm.uri == src:getUri() then
+                    if source.id >= src.id then
+                        callback(src)
+                    end
+                else
+                    callback(src)
+                end
+            end
+        end)
+    elseif Mode == 'reference' then
         callback(source:bindFunction():getSource())
         source:bindFunction():eachInfo(function (info, src)
             if info.type == 'set' or info.type == 'local' or info.type == 'get' then

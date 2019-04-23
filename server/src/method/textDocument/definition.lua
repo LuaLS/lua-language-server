@@ -14,7 +14,7 @@ local function findResult(lsp, params)
         return nil
     end
 
-    local positions, isGlobal = core.definition(vm, position, 'definition', lsp)
+    local positions, isGlobal = core.definition(vm, position, 'definition')
     if not positions then
         return nil, isGlobal
     end

@@ -22,7 +22,7 @@ local function findResult(lsp, params)
     local locations = {}
     for i, position in ipairs(positions) do
         local start, finish, valueUri = position[1], position[2], (position[3] or uri)
-        local _, valueLines = lsp:loadVM(valueUri)
+        local vm, valueLines = lsp:loadVM(valueUri)
         if valueLines then
             local start_row,  start_col  = valueLines:rowcol(start)
             local finish_row, finish_col = valueLines:rowcol(finish)
@@ -40,7 +40,7 @@ local function findResult(lsp, params)
                     },
                 }
             }
-        else
+        elseif vm then
             locations[#locations+1] = {
                 uri =  valueUri,
                 range = {

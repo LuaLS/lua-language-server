@@ -216,10 +216,6 @@ local function makeList(source)
             return
         end
         mark[src] = true
-        local uri = src.uri
-        if uri == '' then
-            uri = nil
-        end
         list[#list+1] = {
             src.start,
             src.finish,

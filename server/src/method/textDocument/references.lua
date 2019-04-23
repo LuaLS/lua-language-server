@@ -12,7 +12,7 @@ local function findReferences(lsp, uri, position, declarat)
     local locations = {}
     for i, position in ipairs(positions) do
         local start, finish, valueUri = position[1], position[2], (position[3] or uri)
-        local _, valueLines = lsp:getVM(valueUri)
+        local vm, valueLines = lsp:getVM(valueUri)
         if valueLines then
             local start_row,  start_col  = valueLines:rowcol(start)
             local finish_row, finish_col = valueLines:rowcol(finish)
@@ -30,7 +30,7 @@ local function findReferences(lsp, uri, position, declarat)
                     },
                 }
             }
-        else
+        elseif vm then
             locations[#locations+1] = {
                 uri =  valueUri,
                 range = {

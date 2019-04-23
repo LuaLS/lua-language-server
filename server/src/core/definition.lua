@@ -40,8 +40,6 @@ local function parseLocal(callback, vm, source)
                     if source.id >= src.id then
                         callback(src)
                     end
-                else
-                    callback(src)
                 end
             end
         elseif Mode == 'reference' then
@@ -53,30 +51,43 @@ local function parseLocal(callback, vm, source)
 end
 
 local function parseValueByValue(callback, vm, source, value)
-    value:eachInfo(function (info, src)
-        if Mode == 'definition' then
-            if info.type == 'set' or info.type == 'local' then
-                if vm.uri == src:getUri() then
-                    if source.id >= src.id then
+    local mark = { [vm] = true }
+    local list = {}
+    for _ = 1, 5 do
+        value:eachInfo(function (info, src)
+            if Mode == 'definition' then
+                if info.type == 'set' or info.type == 'local' then
+                    if vm.uri == src:getUri() then
+                        if source.id >= src.id then
+                            callback(src)
+                        end
+                    end
+                end
+                if info.type == 'return' then
+                    if (src.type ~= 'simple' or src[#src].type == 'call')
+                    and src.type ~= 'name'
+                    then
                         callback(src)
                     end
-                else
+                    if vm.lsp then
+                        local destVM = vm.lsp:getVM(src:getUri())
+                        if destVM and not mark[destVM] then
+                            mark[destVM] = true
+                            list[#list+1] = { destVM, src }
+                        end
+                    end
+                end
+            elseif Mode == 'reference' then
+                if info.type == 'set' or info.type == 'local' or info.type == 'return' or info.type == 'get' then
                     callback(src)
                 end
             end
-            if info.type == 'return' then
-                if src.type == 'function'
-                or (src.type == 'simple' and src[#src].type == 'call')
-                then
-                    callback(src)
-                end
-            end
-        elseif Mode == 'reference' then
-            if info.type == 'set' or info.type == 'local' or info.type == 'return' or info.type == 'get' then
-                callback(src)
-            end
+        end)
+        local nextData = table.remove(list, 1)
+        if nextData then
+            vm, source = nextData[1], nextData[2]
         end
-    end)
+    end
 end
 
 local function parseValue(callback, vm, source)
@@ -91,7 +102,14 @@ local function parseValue(callback, vm, source)
             local emmyType = emmy
             emmyType:eachClass(function (class)
                 if class and class:getValue() then
-                    parseValueByValue(callback, vm, class:getValue():getSource(), class:getValue())
+                    local emmyVM = vm
+                    if vm.lsp then
+                        local destVM = vm.lsp:getVM(class:getSource():getUri())
+                        if destVM then
+                            emmyVM = destVM
+                        end
+                    end
+                    parseValueByValue(callback, emmyVM, class:getValue():getSource(), class:getValue())
                 end
             end)
         end

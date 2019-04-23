@@ -302,6 +302,67 @@ TEST {
     {
         path = 'a.lua',
         content = [[
+            return <!{
+                a = 1,
+            }!>
+        ]],
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            local <?t?> = require 'a'
+        ]]
+    }
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            return <!function () end!>
+        ]]
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            local f = require 'a'
+        ]]
+    },
+    {
+        path = 'c.lua',
+        content = [[
+            local <?f?> = require 'a'
+        ]]
+    }
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            local function <!f!>()
+            end
+            return f
+        ]]
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            local f = require 'a'
+        ]]
+    },
+    {
+        path = 'c.lua',
+        content = [[
+            local <?f?> = require 'a'
+        ]]
+    }
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
             ---@class Class
             local <!obj!>
         ]]

@@ -2,6 +2,7 @@ local mt = require 'vm.manager'
 
 function mt:clearEmmy()
     self._emmy = nil
+    self._emmyParams = nil
 end
 
 function mt:doEmmy(action)
@@ -13,6 +14,7 @@ function mt:doEmmy(action)
     elseif tp == 'emmyAlias' then
         self:doEmmyAlias(action)
     elseif tp == 'emmyParam' then
+        self:doEmmyParam(action)
     elseif tp == 'emmyReturn' then
     elseif tp == 'emmyField' then
     elseif tp == 'emmyGeneric' then
@@ -31,6 +33,19 @@ function mt:getEmmy()
     local emmy = self._emmy
     self._emmy = nil
     return emmy
+end
+
+function mt:addEmmyParam(param)
+    if not self._emmyParams then
+        self._emmyParams = {}
+    end
+    self._emmyParams[#self._emmyParams+1] = param
+end
+
+function mt:getEmmyParams()
+    local params = self._emmyParams
+    self._emmyParams = nil
+    return params
 end
 
 function mt:doEmmyClass(action)
@@ -81,6 +96,18 @@ function mt:doEmmyAlias(action)
     if self.lsp then
         self.lsp.global:markSet(self:getUri())
     end
+end
+
+function mt:doEmmyParam(action)
+    ---@type emmyMgr
+    local emmyMgr = self.emmyMgr
+    self:instantSource(action)
+    self:instantSource(action[1])
+    local type = self:doEmmyType(action[2])
+    local param = emmyMgr:addParam(action, type)
+    action:set('emmy.param', param)
+    self._emmy = nil
+    self:addEmmyParam(param)
 end
 
 function mt:doEmmyIncomplete(action)

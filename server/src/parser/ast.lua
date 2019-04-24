@@ -629,7 +629,7 @@ local Defs = {
             end
             if isField then
                 table[#table+1] = arg
-                if arg.finish then
+                if arg.type:sub(1, 4) ~= 'emmy' then
                     wantField = false
                     start = arg.finish + 1
                 end

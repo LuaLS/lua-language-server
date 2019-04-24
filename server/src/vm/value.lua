@@ -289,6 +289,13 @@ function mt:mergeType(value)
     if not value then
         return
     end
+    if self._emmy and not value._emmy then
+        value._emmy = self._emmy
+        return
+    elseif not self._emmy and value._emmy then
+        self._emmy = value._emmy
+        return
+    end
     if value._type then
         for tp, rate in pairs(value._type) do
             self:setType(tp, rate)

@@ -536,3 +536,42 @@ local x: *Class {
     b: number = 1,
 }
 ]]
+
+TEST [[
+---@class Class
+local mt = {}
+
+---@param t Class
+function f(<?t?>)
+end
+]]
+[[
+local t: *Class {}
+]]
+
+TEST [[
+---@class Class
+local mt = {}
+
+---@param t Class
+function f(t)
+    print(<?t?>)
+end
+]]
+[[
+local t: *Class {}
+]]
+
+TEST [[
+---@class Class
+local mt = {}
+
+---@param t Class
+function f(t)
+end
+
+f(<?s?>)
+]]
+[[
+global s: *Class {}
+]]

@@ -66,3 +66,8 @@ TEST [[
 ---@alias <!B A!>
 ---@type <?B?>
 ]]
+
+TEST [[
+---@class <!Class!>
+---@param a <?Class?>
+]]

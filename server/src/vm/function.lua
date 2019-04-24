@@ -275,13 +275,33 @@ function mt:setArgs(values)
     end
 end
 
+function mt:findEmmyParamByName(name)
+    local params = self._emmyParams
+    if not params then
+        return nil
+    end
+    for i = #params, 1, -1 do
+        local param = params[i]
+        if param:getName() == name then
+            return param
+        end
+    end
+    return nil
+end
+
 function mt:createArg(vm, arg)
     vm:instantSource(arg)
     arg:set('arg', true)
     if arg.type == 'name' then
-        local loc = localMgr.create(arg[1], arg, valueMgr.create('nil', arg))
+        local emmyParam = self:findEmmyParamByName(arg[1])
+        local value = valueMgr.create('nil', arg)
+        if emmyParam then
+            value:setEmmy(emmyParam:bindType())
+        end
+        local loc = localMgr.create(arg[1], arg, value)
         self:saveUpvalue(arg[1], loc)
         self.args[#self.args+1] = loc
+
     elseif arg.type == '...' then
         self._dots = createMulti()
     end
@@ -358,6 +378,10 @@ function mt:markGlobal()
             v:markGlobal()
         end)
     end
+end
+
+function mt:setEmmyParams(params)
+    self._emmyParams = params
 end
 
 local function create(source)

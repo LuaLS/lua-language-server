@@ -11,6 +11,7 @@ function mt:doEmmy(action)
     elseif tp == 'emmyType' then
         self:doEmmyType(action)
     elseif tp == 'emmyAlias' then
+        self:doEmmyAlias(action)
     elseif tp == 'emmyParam' then
     elseif tp == 'emmyReturn' then
     elseif tp == 'emmyField' then
@@ -64,6 +65,21 @@ function mt:doEmmyType(action)
     self._emmy = type
     if self.lsp then
         self.lsp.global:markGet(self:getUri())
+    end
+    return type
+end
+
+function mt:doEmmyAlias(action)
+    ---@type emmyMgr
+    local emmyMgr = self.emmyMgr
+    self:instantSource(action)
+    self:instantSource(action[1])
+    local type = self:doEmmyType(action[2])
+    local alias = emmyMgr:addAlias(action, type)
+    action:set('emmy.alias', alias)
+    action[1]:set('target class', alias:getName())
+    if self.lsp then
+        self.lsp.global:markSet(self:getUri())
     end
 end
 

@@ -4,7 +4,7 @@ local parser = require 'parser'
 local function parseResult(source, newName)
     local positions = {}
     if source:bindLabel() then
-        if not parser.grammar(newName, 'Name') then
+        if not parser:grammar(newName, 'Name') then
             return nil
         end
         source:bindLabel():eachInfo(function (info, src)
@@ -18,11 +18,11 @@ local function parseResult(source, newName)
             return nil
         end
         if source:get 'in index' then
-            if not parser.grammar(newName, 'Exp') then
+            if not parser:grammar(newName, 'Exp') then
                 return positions
             end
         else
-            if not parser.grammar(newName, 'Name') then
+            if not parser:grammar(newName, 'Name') then
                 return positions
             end
         end
@@ -37,11 +37,11 @@ local function parseResult(source, newName)
     end
     if source:bindValue() and source:get 'parent' then
         if source:get 'in index' then
-            if not parser.grammar(newName, 'Exp') then
+            if not parser:grammar(newName, 'Exp') then
                 return positions
             end
         else
-            if not parser.grammar(newName, 'Name') then
+            if not parser:grammar(newName, 'Name') then
                 return positions
             end
         end

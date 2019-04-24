@@ -824,3 +824,18 @@ local abcd
         kind = CompletionItemKind.Class,
     },
 }
+
+TEST [[
+---@alias abc abb
+---@type a$
+]]
+{
+    {
+        label = 'abc',
+        kind = CompletionItemKind.Class,
+    },
+    {
+        label = 'abb',
+        kind = CompletionItemKind.Class,
+    },
+}

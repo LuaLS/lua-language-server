@@ -2,6 +2,7 @@ local listMgr = require 'vm.list'
 local newClass = require 'emmy.class'
 local newType = require 'emmy.type'
 local newTypeUnit = require 'emmy.typeUnit'
+local newAlias = require 'emmy.alias'
 
 local mt = {}
 mt.__index = mt
@@ -92,6 +93,15 @@ function mt:addType(source)
         obj:set('emmy.typeUnit', typeUnit)
     end
     return typeObj
+end
+
+function mt:addAlias(source, typeObj)
+    local aliasName = source[1][1]
+    local aliasObj = newAlias(self, source)
+    aliasObj:bindType(typeObj)
+    local list = self:getClass(aliasName)
+    list[source.id] = aliasObj
+    return aliasObj
 end
 
 function mt:remove()

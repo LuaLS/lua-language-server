@@ -409,7 +409,7 @@ function mt:checkEmmyClass(source, callback)
     local name = class:getName()
     local related = {}
     self.vm.emmyMgr:eachClass(name, function (class)
-        if class.type ~= 'emmy.class' then
+        if class.type ~= 'emmy.class' and class.type ~= 'emmy.alias' then
             return
         end
         local src = class:getSource()
@@ -471,7 +471,7 @@ function mt:checkEmmyType(source, callback)
     for _, tpsource in ipairs(source) do
         local name = tpsource[1]
         local class = self.vm.emmyMgr:eachClass(name, function (class)
-            if class.type == 'emmy.class' then
+            if class.type == 'emmy.class' or class.type == 'emmy.alias' then
                 return class
             end
         end)
@@ -481,12 +481,40 @@ function mt:checkEmmyType(source, callback)
     end
 end
 
+function mt:checkEmmyAlias(source, callback)
+    local class = source:get 'emmy.alias'
+    if not class then
+        return
+    end
+    -- class重复定义
+    local name = class:getName()
+    local related = {}
+    self.vm.emmyMgr:eachClass(name, function (class)
+        if class.type ~= 'emmy.class' and class.type ~= 'emmy.alias' then
+            return
+        end
+        local src = class:getSource()
+        if src ~= source then
+            related[#related+1] = {
+                start = src.start,
+                finish = src.finish,
+                uri = src.uri,
+            }
+        end
+    end)
+    if #related > 0 then
+        callback(source.start, source.finish, lang.script.DIAG_DUPLICATE_CLASS ,related)
+    end
+end
+
 function mt:searchEmmyLua(callback)
     self.vm:eachSource(function (source)
         if source.type == 'emmyClass' then
             self:checkEmmyClass(source, callback)
         elseif source.type == 'emmyType' then
             self:checkEmmyType(source, callback)
+        elseif source.type == 'emmyAlias' then
+            self:checkEmmyAlias(source, callback)
         end
     end)
 end

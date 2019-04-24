@@ -166,12 +166,12 @@ local function parseClass(callback, vm, source)
     local className = source:get 'target class'
     vm.emmyMgr:eachClass(className, function (class)
         if Mode == 'definition' then
-            if class.type == 'emmy.class' then
+            if class.type == 'emmy.class' or class.type == 'emmy.alias' then
                 local src = class:getSource()
                 callback(src)
             end
         elseif Mode == 'reference' then
-            if class.type == 'emmy.class' or class.type == 'emmy.typeUnit' then
+            if class.type == 'emmy.class' or class.type == 'emmy.alias' or class.type == 'emmy.typeUnit' then
                 local src = class:getSource()
                 callback(src)
             end
@@ -225,7 +225,19 @@ local function makeList(source)
 end
 
 return function (vm, pos, mode)
-    local source = findSource(vm, pos)
+    local filter = {
+        ['name']           = true,
+        ['string']         = true,
+        ['number']         = true,
+        ['boolean']        = true,
+        ['label']          = true,
+        ['goto']           = true,
+        ['function']       = true,
+        ['...']            = true,
+        ['emmyName']       = true,
+        ['emmyIncomplete'] = true,
+    }
+    local source = findSource(vm, pos, filter)
     if not source then
         return nil
     end

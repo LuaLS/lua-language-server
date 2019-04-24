@@ -61,3 +61,8 @@ end
 ---@class A
 local obj = setmetatable({}, mt)
 ]]
+
+TEST [[
+---@alias <!B A!>
+---@type <?B?>
+]]

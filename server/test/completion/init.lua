@@ -831,11 +831,11 @@ TEST [[
 ]]
 {
     {
-        label = 'abc',
+        label = 'abb',
         kind = CompletionItemKind.Class,
     },
     {
-        label = 'abb',
+        label = 'abc',
         kind = CompletionItemKind.Class,
     },
 }

@@ -399,11 +399,18 @@ local function searchEmmyKeyword(vm, source, word, callback)
 end
 
 local function searchEmmyClass(vm, source, word, callback)
+    local classes = {}
     vm.emmyMgr:eachClass(function (class)
         if matchKey(word, class:getName()) then
-            callback(class:getName(), class:getSource(), CompletionItemKind.Class)
+            classes[#classes+1] = class
         end
     end)
+    table.sort(classes, function (a, b)
+        return a:getName() < b:getName()
+    end)
+    for _, class in ipairs(classes) do
+        callback(class:getName(), class:getSource(), CompletionItemKind.Class)
+    end
 end
 
 local function searchSource(vm, source, word, callback)

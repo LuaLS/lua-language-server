@@ -304,18 +304,11 @@ local function searchIndex(vm, source, word, callback)
     end)
 end
 
-local function searchCloseGlobal(vm, source, word, callback)
-    local loc = source:bindLocal()
-    if not loc then
-        return
-    end
-    local close = loc:close()
-    -- 因为闭包的关系落在局部变量finish到close范围内的全局变量一定能访问到该局部变量
-
+local function searchCloseGlobal(vm, start, finish, word, callback)
     vm:eachSource(function (src)
         if      (src:get 'global' or src:bindLocal())
-            and src.start >= source.finish
-            and src.finish <= close
+            and src.start >= start
+            and src.finish <= finish
         then
             if matchKey(word, src[1]) then
                 callback(src[1], src, CompletionItemKind.Variable)
@@ -324,12 +317,25 @@ local function searchCloseGlobal(vm, source, word, callback)
     end)
 end
 
-local function searchParams(vm, source, word, callback)
+local function searchParams(vm, source, func, word, callback)
     ---@type function
-    local func = source:get 'arg'
     local emmyParams = func:getEmmyParams()
     if not emmyParams then
         return
+    end
+    if #emmyParams > 1 then
+        if not func.args
+        or not func.args[1]
+        or func.args[1]:getSource() == source then
+            if matchKey(word, source and source[1] or '') then
+                local names = {}
+                for _, param in ipairs(emmyParams) do
+                    local name = param:getName()
+                    names[#names+1] = name
+                end
+                callback(table.concat(names, ', '), nil, CompletionItemKind.Snippet)
+            end
+        end
     end
     for _, param in ipairs(emmyParams) do
         local name = param:getName()
@@ -390,7 +396,12 @@ local function searchAsIndex(vm, source, word, callback)
 end
 
 local function searchAsLocal(vm, source, word, callback)
-    searchCloseGlobal(vm, source, word, callback)
+    local loc = source:bindLocal()
+    if loc then
+        local close = loc:close()
+        -- 因为闭包的关系落在局部变量finish到close范围内的全局变量一定能访问到该局部变量
+        searchCloseGlobal(vm, source.finish, close, word, callback)
+    end
     -- 特殊支持 local function
     if matchKey(word, 'function') then
         callback('function', nil, CompletionItemKind.Keyword)
@@ -402,8 +413,22 @@ local function searchAsLocal(vm, source, word, callback)
 end
 
 local function searchAsArg(vm, source, word, callback)
-    searchParams(vm, source, word, callback)
-    searchCloseGlobal(vm, source, word, callback)
+    searchParams(vm, source, source:get 'arg', word, callback)
+
+    local loc = source:bindLocal()
+    if loc then
+        local close = loc:close()
+        -- 因为闭包的关系落在局部变量finish到close范围内的全局变量一定能访问到该局部变量
+        searchCloseGlobal(vm, source.finish, close, word, callback)
+        return
+    end
+end
+
+local function searchFunction(vm, source, word, pos, callback)
+    if pos >= source.argStart and pos <= source.argFinish then
+        searchParams(vm, nil, source:bindFunction():getFunction(), word, callback)
+        searchCloseGlobal(vm, source.argFinish, source.finish, word, callback)
+    end
 end
 
 local function searchEmmyKeyword(vm, source, word, callback)
@@ -436,7 +461,7 @@ local function searchEmmyFunctionParam(vm, source, word, callback)
     if not func.args then
         return
     end
-    if word == '' then
+    if #func.args > 1 and matchKey(word, func.args[1].name) then
         local list = {}
         local args = {}
         for i, arg in ipairs(func.args) do
@@ -447,18 +472,18 @@ local function searchEmmyFunctionParam(vm, source, word, callback)
                 list[i] = ('---@param %s any'):format(arg.name)
             end
         end
-        callback(('(%s)'):format(table.concat(args, ', ')), nil, CompletionItemKind.Snippet, {
+        callback(('%s'):format(table.concat(args, ', ')), nil, CompletionItemKind.Snippet, {
             insertText = table.concat(list, '\n')
         })
     end
     for _, arg in ipairs(func.args) do
         if matchKey(word, arg.name) then
-            callback(arg.name, arg, CompletionItemKind.Interface)
+            callback(arg.name, nil, CompletionItemKind.Interface)
         end
     end
 end
 
-local function searchSource(vm, source, word, callback)
+local function searchSource(vm, source, word, callback, pos)
     if source.type == 'keyword' then
         searchAsKeyowrd(vm, source, word, callback)
         return
@@ -485,6 +510,10 @@ local function searchSource(vm, source, word, callback)
     end
     if source:get 'simple' then
         searchAsSuffix(vm, source, word, callback)
+        return
+    end
+    if source:bindFunction() then
+        searchFunction(vm, source, word, pos, callback)
         return
     end
     if source.type == 'emmyIncomplete' then
@@ -758,7 +787,7 @@ local function findStartPos(pos, buf)
     if not res then
         for i = pos, 1, -1 do
             local c = buf:sub(i, i)
-            if c == '.' or c == ':' or c == '|' then
+            if c == '.' or c == ':' or c == '|' or c == '(' then
                 res = i
                 break
             elseif c == '#' or c == '@' then
@@ -809,6 +838,8 @@ return function (vm, text, pos, oldText)
         ['emmyName']       = true,
         ['emmyIncomplete'] = true,
         ['call']           = true,
+        ['function']       = true,
+        ['localfunction']  = true,
     }
     local source, pos, word = getSource(vm, pos, text, filter)
     if not source then
@@ -827,7 +858,7 @@ return function (vm, text, pos, oldText)
     end
     searchSpecial(vm, source, word, callback, pos, text)
     searchCallArg(vm, source, word, callback, pos)
-    searchSource(vm, source, word, callback)
+    searchSource(vm, source, word, callback, pos)
     if not oldText or #list > 0 then
         if not State.ignoreText then
             searchAllWords(vm, source, word, callback, pos)

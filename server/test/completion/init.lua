@@ -850,7 +850,7 @@ end
 ]]
 {
     {
-        label = '(a, b, c)',
+        label = 'a, b, c',
         kind = CompletionItemKind.Snippet,
         insertText = [[
 a any
@@ -877,6 +877,50 @@ TEST [[
 function f(x$)
 ]]
 {
+    {
+        label = 'xyz, xxx',
+        kind = CompletionItemKind.Snippet,
+    },
+    {
+        label = 'xyz',
+        kind = CompletionItemKind.Interface,
+    },
+    {
+        label = 'xxx',
+        kind = CompletionItemKind.Interface,
+    },
+}
+
+TEST [[
+---@param xyz Class
+---@param xxx Class
+function f($
+]]
+{
+    {
+        label = 'xyz, xxx',
+        kind = CompletionItemKind.Snippet,
+    },
+    {
+        label = 'xyz',
+        kind = CompletionItemKind.Interface,
+    },
+    {
+        label = 'xxx',
+        kind = CompletionItemKind.Interface,
+    },
+}
+
+TEST [[
+---@param xyz Class
+---@param xxx Class
+function f($)
+]]
+{
+    {
+        label = 'xyz, xxx',
+        kind = CompletionItemKind.Snippet,
+    },
     {
         label = 'xyz',
         kind = CompletionItemKind.Interface,

@@ -559,42 +559,57 @@ local Defs = {
             finish = start,
         }
     end,
-    Function = function (start, arg, ...)
+    Function = function (start, argStart, arg, argFinish, ...)
         local obj = {
-            type  = 'function',
-            start = start,
-            arg   = arg,
+            type      = 'function',
+            start     = start,
+            arg       = arg,
+            argStart  = argStart - 1,
+            argFinish = argFinish,
             ...
         }
         local max = #obj
         obj.finish = obj[max] - 1
         obj[max]   = nil
+        if obj.argFinish > obj.finish then
+            obj.argFinish = obj.finish
+        end
         return obj
     end,
-    NamedFunction = function (start, name, arg, ...)
+    NamedFunction = function (start, name, argStart, arg, argFinish, ...)
         local obj = {
-            type  = 'function',
-            start = start,
-            name  = name,
-            arg   = arg,
+            type      = 'function',
+            start     = start,
+            name      = name,
+            arg       = arg,
+            argStart  = argStart - 1,
+            argFinish = argFinish,
             ...
         }
         local max = #obj
         obj.finish = obj[max] - 1
         obj[max]   = nil
+        if obj.argFinish > obj.finish then
+            obj.argFinish = obj.finish
+        end
         return obj
     end,
-    LocalFunction = function (start, name, arg, ...)
+    LocalFunction = function (start, name, argStart, arg, argFinish, ...)
         local obj = {
-            type  = 'localfunction',
-            start = start,
-            name  = name,
-            arg   = arg,
+            type      = 'localfunction',
+            start     = start,
+            name      = name,
+            arg       = arg,
+            argStart  = argStart - 1,
+            argFinish = argFinish,
             ...
         }
         local max = #obj
         obj.finish = obj[max] - 1
         obj[max]   = nil
+        if obj.argFinish > obj.finish then
+            obj.argFinish = obj.finish
+        end
         return obj
     end,
     Table = function (start, ...)

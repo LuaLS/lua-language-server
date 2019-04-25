@@ -353,8 +353,8 @@ NewField    <-  (MustName ASSIGN DirtyExp)
 
 Function    <-  Sp ({} FunctionBody {})
             ->  Function
-FuncArg     <-  PL ArgList NeedPR
-            /   {} -> MissPL Nothing
+FuncArg     <-  PL {} ArgList {} NeedPR
+            /   {} {} -> MissPL Nothing {}
 FunctionBody<-  FUNCTION FuncArg
                     LabelStart
                     (!END Action)*
@@ -560,10 +560,10 @@ EmmyParam       <-  MustEmmyName %s* EmmyType EmmyTypeEnums*
 
 EmmyReturn      <-  EmmyType
 
-EmmyField       <-  (EmmyFieldAccess MustEmmyName %s+ EmmyType)
-EmmyFieldAccess <-  ({'public'}    %s+)
-                /   ({'protected'} %s+)
-                /   ({'private'}   %s+)
+EmmyField       <-  (EmmyFieldAccess MustEmmyName %s* EmmyType)
+EmmyFieldAccess <-  ({'public'}    Cut %s*)
+                /   ({'protected'} Cut %s*)
+                /   ({'private'}   Cut %s*)
                 /   {} -> 'public'
 
 EmmyGeneric     <-  EmmyGenericBlock

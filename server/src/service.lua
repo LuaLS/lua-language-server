@@ -435,7 +435,7 @@ function mt:compileVM(uri)
     local version = obj.version
     obj.astCost = os.clock() - clock
     if obj.astCost > 0.1 then
-        log.warn(('Compile[%s] takes [%.3f] sec, size [%.3f]kb'):format(uri, obj.astCost, #obj.text))
+        log.warn(('Compile Ast[%s] takes [%.3f] sec, size [%.3f]kb'):format(uri, obj.astCost, #obj.text / 1000))
     end
     obj.oldText = nil
 

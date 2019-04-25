@@ -892,6 +892,7 @@ function mt:doLoop(action)
 end
 
 function mt:doIn(action)
+    local emmyParams = self:getEmmyParams()
     self:instantSource(action)
     local args = self:unpackList(action.exp)
 
@@ -899,7 +900,16 @@ function mt:doIn(action)
     local func = table.remove(args, 1) or valueMgr.create('any', self:getDefaultSource())
     local values = self:call(func, args, action) or createMulti()
     self:forList(action.arg, function (arg)
-        local value = table.remove(values, 1)
+        self:instantSource(arg)
+        local value = table.remove(values, 1) or self:createValue('nil', arg)
+        if emmyParams then
+            for i = #emmyParams, 1, -1 do
+                local emmyParam = emmyParams[i]
+                if emmyParam and emmyParam:getName() == arg[1] then
+                    value:setEmmy(emmyParam:bindType())
+                end
+            end
+        end
         self:createLocal(arg[1], arg, value)
     end)
 
@@ -1012,6 +1022,9 @@ function mt:doAction(action)
             self:remove()
             coroutine.yield('stop')
         end
+    end
+    if self:isRemoved() then
+        return
     end
     local tp = action.type
     if tp:sub(1, 4) == 'emmy' then

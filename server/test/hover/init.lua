@@ -575,3 +575,25 @@ f(<?s?>)
 [[
 global s: *Class {}
 ]]
+
+TEST [[
+---@class Class
+
+---@param k Class
+for <?k?> in pairs(t) do
+end
+]]
+[[
+local k<key>: *Class {}
+]]
+
+TEST [[
+---@class Class
+
+---@param v Class
+for k, <?v?> in pairs(t) do
+end
+]]
+[[
+local v<value>: *Class {}
+]]

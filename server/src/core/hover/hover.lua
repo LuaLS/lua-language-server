@@ -127,13 +127,11 @@ end
 
 local function getValueHover(source, name, value, lib)
     local valueType = value:getType()
-    local class
+    local class = findClass(value)
 
-    if not lib then
-        class = findClass(value)
-        if class then
-            valueType = class
-        end
+    if class then
+        valueType = class
+        lib = nil
     end
 
     if not OriginTypes[valueType] then

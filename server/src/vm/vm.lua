@@ -44,20 +44,22 @@ function mt:buildTable(source)
         local emmy = self:getEmmy()
         if obj.type == 'pair' then
             local value = self:getFirstInMulti(self:getExp(obj[2]))
-            local key   = obj[1]
-            self:instantSource(obj)
-            self:instantSource(key)
-            key:bindValue(value, 'set')
-            value:setEmmy(emmy)
-            if key.type == 'index' then
-                local index = self:getIndex(key)
-                key:set('parent', tbl)
-                tbl:setChild(index, value, key)
-            else
-                if key.type == 'name' then
+            if value then
+                local key   = obj[1]
+                self:instantSource(obj)
+                self:instantSource(key)
+                key:bindValue(value, 'set')
+                value:setEmmy(emmy)
+                if key.type == 'index' then
+                    local index = self:getIndex(key)
                     key:set('parent', tbl)
-                    key:set('table index', true)
-                    tbl:setChild(key[1], value, key)
+                    tbl:setChild(index, value, key)
+                else
+                    if key.type == 'name' then
+                        key:set('parent', tbl)
+                        key:set('table index', true)
+                        tbl:setChild(key[1], value, key)
+                    end
                 end
             end
         elseif obj.type:sub(1, 4) == 'emmy' then

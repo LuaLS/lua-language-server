@@ -1023,9 +1023,6 @@ function mt:doAction(action)
             coroutine.yield('stop')
         end
     end
-    if self:isRemoved() then
-        return
-    end
     local tp = action.type
     if tp:sub(1, 4) == 'emmy' then
         self:doEmmy(action)

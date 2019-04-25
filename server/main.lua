@@ -22,7 +22,7 @@ local function tryDebugger()
      log.info('Debugger startup, listen port: 11411')
 end
 
-pcall(tryDebugger)
+--pcall(tryDebugger)
 
 require 'utility'
 require 'global_protect'

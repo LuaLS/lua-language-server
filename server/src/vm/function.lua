@@ -6,6 +6,7 @@ local listMgr = require 'vm.list'
 
 local Watch = setmetatable({}, {__mode = 'kv'})
 
+---@class function
 local mt = {}
 mt.__index = mt
 mt.type = 'function'
@@ -291,7 +292,7 @@ end
 
 function mt:createArg(vm, arg)
     vm:instantSource(arg)
-    arg:set('arg', true)
+    arg:set('arg', self)
     if arg.type == 'name' then
         local emmyParam = self:findEmmyParamByName(arg[1])
         local value = valueMgr.create('nil', arg)
@@ -384,9 +385,14 @@ function mt:setEmmyParams(params)
     if params then
         self._emmyParams = params
         for _, param in ipairs(params) do
+            param:getSource():set('emmy function', self)
             param:getSource()[1]:set('emmy function', self)
         end
     end
+end
+
+function mt:getEmmyParams()
+    return self._emmyParams
 end
 
 local function create(source)

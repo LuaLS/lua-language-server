@@ -382,3 +382,36 @@ TEST [[
 ---@class B
 ---@alias <!A B!>
 ]]
+
+TEST [[
+---@param x <!Class!>
+]]
+
+TEST [[
+---@class Class
+---@param <!y!> Class
+local function f(x)
+    return x
+end
+f()
+]]
+
+TEST [[
+---@class Class
+---@param <!y!> Class
+function F(x)
+    return x
+end
+F()
+]]
+
+TEST [[
+---@class Class
+---@param <!x!> Class
+---@param y Class
+---@param <!x!> Class
+local function f(x, y)
+    return x, y
+end
+f()
+]]

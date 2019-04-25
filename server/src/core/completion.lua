@@ -324,6 +324,21 @@ local function searchCloseGlobal(vm, source, word, callback)
     end)
 end
 
+local function searchParams(vm, source, word, callback)
+    ---@type function
+    local func = source:get 'arg'
+    local emmyParams = func:getEmmyParams()
+    if not emmyParams then
+        return
+    end
+    for _, param in ipairs(emmyParams) do
+        local name = param:getName()
+        if matchKey(word, name) then
+            callback(name, param:getSource(), CompletionItemKind.Interface)
+        end
+    end
+end
+
 local function searchKeyWords(vm, source, word, callback)
     for _, key in ipairs(KEYS) do
         if matchKey(word, key) then
@@ -387,6 +402,7 @@ local function searchAsLocal(vm, source, word, callback)
 end
 
 local function searchAsArg(vm, source, word, callback)
+    searchParams(vm, source, word, callback)
     searchCloseGlobal(vm, source, word, callback)
 end
 
@@ -422,7 +438,7 @@ local function searchEmmyFunctionParam(vm, source, word, callback)
     end
     for _, arg in ipairs(func.args) do
         if matchKey(word, arg.name) then
-            callback(arg.name, arg, CompletionItemKind.Unit)
+            callback(arg.name, arg, CompletionItemKind.Interface)
         end
     end
 end

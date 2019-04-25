@@ -851,14 +851,30 @@ end
 {
     {
         label = 'a',
-        kind = CompletionItemKind.Unit,
+        kind = CompletionItemKind.Interface,
     },
     {
         label = 'b',
-        kind = CompletionItemKind.Unit,
+        kind = CompletionItemKind.Interface,
     },
     {
         label = 'c',
-        kind = CompletionItemKind.Unit,
+        kind = CompletionItemKind.Interface,
+    },
+}
+
+TEST [[
+---@param xyz Class
+---@param xxx Class
+function f(x$)
+]]
+{
+    {
+        label = 'xyz',
+        kind = CompletionItemKind.Interface,
+    },
+    {
+        label = 'xxx',
+        kind = CompletionItemKind.Interface,
     },
 }

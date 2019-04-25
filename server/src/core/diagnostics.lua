@@ -507,7 +507,57 @@ function mt:checkEmmyAlias(source, callback)
     end
 end
 
+function mt:checkEmmyParam(source, callback, mark)
+    local func = source:get 'emmy function'
+    if not func then
+        return
+    end
+    if mark[func] then
+        return
+    end
+    mark[func] = true
+
+    -- 检查不存在的参数
+    local emmyParams = func:getEmmyParams()
+    local funcParams = {}
+    if func.args then
+        for _, arg in ipairs(func.args) do
+            funcParams[arg.name] = true
+        end
+    end
+    for _, param in ipairs(emmyParams) do
+        local name = param:getName()
+        if not funcParams[name] then
+            callback(param:getSource()[1].start, param:getSource()[1].finish, lang.script.DIAG_INEXISTENT_PARAM)
+        end
+    end
+
+    -- 检查重复的param
+    local lists = {}
+    for _, param in ipairs(emmyParams) do
+        local name = param:getName()
+        if not lists[name] then
+            lists[name] = {}
+        end
+        lists[name][#lists[name]+1] = param:getSource()[1]
+    end
+    for _, list in pairs(lists) do
+        if #list > 1 then
+            local related = {}
+            for _, src in ipairs(list) do
+                related[#related+1] = {
+                    src.start,
+                    src.finish,
+                    src.uri,
+                }
+                callback(src.start, src.finish, lang.script.DIAG_DUPLICATE_PARAM)
+            end
+        end
+    end
+end
+
 function mt:searchEmmyLua(callback)
+    local mark = {}
     self.vm:eachSource(function (source)
         if source.type == 'emmyClass' then
             self:checkEmmyClass(source, callback)
@@ -515,6 +565,8 @@ function mt:searchEmmyLua(callback)
             self:checkEmmyType(source, callback)
         elseif source.type == 'emmyAlias' then
             self:checkEmmyAlias(source, callback)
+        elseif source.type == 'emmyParam' then
+            self:checkEmmyParam(source, callback, mark)
         end
     end)
 end

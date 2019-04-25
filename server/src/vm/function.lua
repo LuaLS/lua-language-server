@@ -381,7 +381,12 @@ function mt:markGlobal()
 end
 
 function mt:setEmmyParams(params)
-    self._emmyParams = params
+    if params then
+        self._emmyParams = params
+        for _, param in ipairs(params) do
+            param:getSource()[1]:set('emmy function', self)
+        end
+    end
 end
 
 local function create(source)

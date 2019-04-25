@@ -167,7 +167,7 @@ local function jumpUri(vm, source, lsp)
 end
 
 local function parseClass(vm, source)
-    local className = source:get 'target class'
+    local className = source:get 'emmy class'
     local positions = {}
     vm.emmyMgr:eachClass(className, function (class)
         local src = class:getSource()
@@ -198,7 +198,7 @@ return function (vm, source, lsp)
         return parseValue(vm, source, lsp)
             or parseValueSimily(vm, source, lsp)
     end
-    if source:get 'target class' then
+    if source:get 'emmy class' then
         return parseClass(vm, source)
     end
 end

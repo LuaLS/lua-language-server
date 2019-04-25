@@ -554,9 +554,9 @@ EmmyTypeName    <-  EmmyFunctionType
                 /   MustEmmyName
 EmmyTypeEnums   <-  %s* '|' %s* String
 
-EmmyAlias       <-  MustEmmyName %s+ EmmyType EmmyTypeEnums*
+EmmyAlias       <-  MustEmmyName %s* EmmyType EmmyTypeEnums*
 
-EmmyParam       <-  MustEmmyName %s+ EmmyType EmmyTypeEnums*
+EmmyParam       <-  MustEmmyName %s* EmmyType EmmyTypeEnums*
 
 EmmyReturn      <-  EmmyType
 

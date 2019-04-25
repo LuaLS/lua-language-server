@@ -818,11 +818,7 @@ local abcd
     {
         label = 'abc',
         kind = CompletionItemKind.Class,
-    },
-    {
-        label = 'xxx',
-        kind = CompletionItemKind.Class,
-    },
+    }
 }
 
 TEST [[
@@ -831,11 +827,38 @@ TEST [[
 ]]
 {
     {
-        label = 'abb',
-        kind = CompletionItemKind.Class,
-    },
-    {
         label = 'abc',
         kind = CompletionItemKind.Class,
+    },
+}
+
+TEST [[
+---@class Class
+---@param x C$
+]]
+{
+    {
+        label = 'Class',
+        kind = CompletionItemKind.Class,
+    },
+}
+
+TEST [[
+---@param $
+function f(a, b, c)
+end
+]]
+{
+    {
+        label = 'a',
+        kind = CompletionItemKind.Unit,
+    },
+    {
+        label = 'b',
+        kind = CompletionItemKind.Unit,
+    },
+    {
+        label = 'c',
+        kind = CompletionItemKind.Unit,
     },
 }

@@ -401,8 +401,10 @@ end
 local function searchEmmyClass(vm, source, word, callback)
     local classes = {}
     vm.emmyMgr:eachClass(function (class)
-        if matchKey(word, class:getName()) then
-            classes[#classes+1] = class
+        if class.type == 'emmy.class' or class.type == 'emmy.alias' then
+            if matchKey(word, class:getName()) then
+                classes[#classes+1] = class
+            end
         end
     end)
     table.sort(classes, function (a, b)
@@ -410,6 +412,18 @@ local function searchEmmyClass(vm, source, word, callback)
     end)
     for _, class in ipairs(classes) do
         callback(class:getName(), class:getSource(), CompletionItemKind.Class)
+    end
+end
+
+local function searchEmmyFunctionParam(vm, source, word, callback)
+    local func = source:get 'emmy function'
+    if not func.args then
+        return
+    end
+    for _, arg in ipairs(func.args) do
+        if matchKey(word, arg.name) then
+            callback(arg.name, arg, CompletionItemKind.Unit)
+        end
     end
 end
 
@@ -447,8 +461,13 @@ local function searchSource(vm, source, word, callback)
         State.ignoreText = true
         return
     end
-    if source:get 'target class' then
+    if source:get 'emmy class' then
         searchEmmyClass(vm, source, word, callback)
+        State.ignoreText = true
+        return
+    end
+    if source:get 'emmy function' then
+        searchEmmyFunctionParam(vm, source, word, callback)
         State.ignoreText = true
         return
     end

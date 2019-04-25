@@ -54,12 +54,12 @@ function mt:doEmmyClass(action)
     self:instantSource(action)
     self:instantSource(action[1])
     local class = emmyMgr:addClass(action)
-    action:set('target class', class:getName())
-    action[1]:set('target class', class:getName())
+    action:set('emmy class', class:getName())
+    action[1]:set('emmy class', class:getName())
     local extends = action[2]
     if extends then
         self:instantSource(extends)
-        extends:set('target class', extends[1])
+        extends:set('emmy class', extends[1])
     end
     self._emmy = class
     action:set('emmy.class', class)
@@ -74,7 +74,7 @@ function mt:doEmmyType(action)
     self:instantSource(action)
     for _, obj in ipairs(action) do
         self:instantSource(obj)
-        obj:set('target class', obj[1])
+        obj:set('emmy class', obj[1])
     end
     local type = emmyMgr:addType(action)
     self._emmy = type
@@ -92,7 +92,7 @@ function mt:doEmmyAlias(action)
     local type = self:doEmmyType(action[2])
     local alias = emmyMgr:addAlias(action, type)
     action:set('emmy.alias', alias)
-    action[1]:set('target class', alias:getName())
+    action[1]:set('emmy class', alias:getName())
     if self.lsp then
         self.lsp.global:markSet(self:getUri())
     end

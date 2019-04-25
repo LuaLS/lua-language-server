@@ -163,7 +163,7 @@ local function jumpUri(callback, vm, source)
 end
 
 local function parseClass(callback, vm, source)
-    local className = source:get 'target class'
+    local className = source:get 'emmy class'
     vm.emmyMgr:eachClass(className, function (class)
         if Mode == 'definition' then
             if class.type == 'emmy.class' or class.type == 'emmy.alias' then
@@ -262,7 +262,7 @@ return function (vm, pos, mode)
     if source:get 'in index' then
         isGlobal = parseValue(callback, vm, source)
     end
-    if source:get 'target class' then
+    if source:get 'emmy class' then
         parseClass(callback, vm, source)
     end
 

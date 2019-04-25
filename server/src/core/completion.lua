@@ -593,7 +593,7 @@ local function searchAllWords(vm, source, word, callback, pos)
     end)
 end
 
-local function searchSpecialHashSign(vm, pos, callback)
+local function searchSpecialHashSign(vm, pos, text, callback)
     -- 尝试 XXX[#XXX+1]
     -- 1. 搜索 []
     local index
@@ -617,7 +617,7 @@ local function searchSpecialHashSign(vm, pos, callback)
     if inside.op ~= '#' then
         return nil
     end
-    -- 3. [] 左侧必须是纯 name 构成的 simple ,且index 是 simple 的最后一项
+    -- 3. [] 左侧必须是 simple ,且index 是 simple 的最后一项
     local simple = index:get 'simple'
     if not simple then
         return nil
@@ -625,20 +625,10 @@ local function searchSpecialHashSign(vm, pos, callback)
     if simple[#simple] ~= index then
         return nil
     end
-    local chars = {}
-    for i = 1, #simple - 1 do
-        local src = simple[i]
-        if src.type == 'name' then
-            chars[#chars+1] = src[1]
-        elseif src.type == '.' then
-            chars[#chars+1] = '.'
-        else
-            return nil
-        end
-    end
+    local chars = text:sub(simple.start, simple[#simple-1].finish)
     -- 4. 创建代码片段
     if simple:get 'as action' then
-        local label = table.concat(chars) .. '+1'
+        local label = chars .. '+1'
         callback(label, nil, CompletionItemKind.Snippet, {
             textEdit = {
                 start = inside.start + 1,
@@ -647,7 +637,7 @@ local function searchSpecialHashSign(vm, pos, callback)
             },
         })
     else
-        local label = table.concat(chars)
+        local label = chars
         callback(label, nil, CompletionItemKind.Snippet, {
             textEdit = {
                 start = inside.start + 1,
@@ -658,8 +648,8 @@ local function searchSpecialHashSign(vm, pos, callback)
     end
 end
 
-local function searchSpecial(vm, source, word, callback, pos)
-    searchSpecialHashSign(vm, pos, callback)
+local function searchSpecial(vm, source, word, callback, pos, text)
+    searchSpecialHashSign(vm, pos, text, callback)
 end
 
 local function makeList(source, pos, word)
@@ -804,7 +794,7 @@ return function (vm, text, pos, oldText)
     if searchToclose(text, source, word, callback) then
         return list
     end
-    searchSpecial(vm, source, word, callback, pos)
+    searchSpecial(vm, source, word, callback, pos, text)
     searchCallArg(vm, source, word, callback, pos)
     searchSource(vm, source, word, callback)
     if not oldText or #list > 0 then

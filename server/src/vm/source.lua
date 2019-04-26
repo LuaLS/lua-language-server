@@ -17,6 +17,13 @@ function mt:bindLocal(loc, action)
         self._action = action
         loc:addInfo(action, self)
     else
+        if not self._bindLocal then
+            return nil
+        end
+        if not self._bindLocal:getSource() then
+            self._bindLocal = nil
+            return nil
+        end
         return self._bindLocal
     end
 end

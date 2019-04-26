@@ -234,11 +234,15 @@
 			"name": "keyword.operator.lua"
 		},
 		{
-			"match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\b",
-			"name": "variable.other.lua"
+			"match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\b(?=\\s*(?:[({\"']|\\[\\[))",
+			"name": "entity.name.function.lua"
 		},
 		{
-			"match": "(?<=[^.]\\.|:)\\b([a-zA-Z_][a-zA-Z0-9_]*)",
+			"match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\b(?=\\s*:)",
+			"name": "entity.name.class.lua"
+		},
+		{
+			"match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\b",
 			"name": "variable.other.lua"
 		},
 		{

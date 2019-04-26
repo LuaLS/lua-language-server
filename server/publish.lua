@@ -138,6 +138,8 @@ local count = copyFiles(EXTENSION , out) {
     ['images'] = {
         ['logo.png'] = true,
     },
+    ['locale']            = true,
+    ['syntaxes']          = true,
     ['package-lock.json'] = true,
     ['package.json']      = true,
     ['README.md']         = true,

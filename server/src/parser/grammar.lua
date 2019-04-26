@@ -357,7 +357,7 @@ FuncArg     <-  PL {} ArgList {} NeedPR
             /   {} {} -> MissPL Nothing {}
 FunctionBody<-  FUNCTION FuncArg
                     LabelStart
-                    (!END Action)*
+                    (Emmy / !END Action)*
                     LabelEnd
                 NeedEnd
 
@@ -371,8 +371,7 @@ Emmy        <-  '---@'
 ]]
 
 grammar 'Action' [[
-Action      <-  Emmy
-            /   Sp (CrtAction / UnkAction)
+Action      <-  Sp (CrtAction / UnkAction)
 CrtAction   <-  Semicolon
             /   Do
             /   Break
@@ -403,7 +402,7 @@ SimpleList  <-  (Simple (COMMA Simple)*)
 
 Do          <-  Sp ({} DO DoBody NeedEnd {})
             ->  Do
-DoBody      <-  (!END Action)*
+DoBody      <-  (Emmy / !END Action)*
             ->  DoBody
 
 Break       <-  BREAK ({} Semicolon* AfterBreak?)
@@ -432,15 +431,15 @@ IfBody      <-  IfHead
                 (ElsePart   -> ElseBlock)?
                 NeedEnd
 IfPart      <-  IF DirtyExp THEN
-                    {} (!ELSEIF !ELSE !END Action)* {}
+                    {} (Emmy / !ELSEIF !ELSE !END Action)* {}
             /   IF DirtyExp {}->MissThen
                     {}        {}
 ElseIfPart  <-  ELSEIF DirtyExp THEN
-                    {} (!ELSE !ELSEIF !END Action)* {}
+                    {} (Emmy / !ELSE !ELSEIF !END Action)* {}
             /   ELSEIF DirtyExp {}->MissThen
                     {}         {}
 ElsePart    <-  ELSE
-                    {} (!END Action)* {}
+                    {} (Emmy / !END Action)* {}
 
 For         <-  Loop / In
             /   FOR
@@ -449,7 +448,7 @@ Loop        <-  Sp ({} LoopBody {})
             ->  Loop
 LoopBody    <-  FOR LoopStart LoopFinish LoopStep NeedDo
                     BreakStart
-                    (!END Action)*
+                    (Emmy / !END Action)*
                     BreakEnd
                 NeedEnd
 LoopStart   <-  MustName ASSIGN DirtyExp
@@ -462,7 +461,7 @@ In          <-  Sp ({} InBody {})
             ->  In
 InBody      <-  FOR InNameList NeedIn ExpList NeedDo
                     BreakStart
-                    (!END Action)*
+                    (Emmy / !END Action)*
                     BreakEnd
                 NeedEnd
 InNameList  <-  &IN DirtyName
@@ -472,7 +471,7 @@ While       <-  Sp ({} WhileBody {})
             ->  While
 WhileBody   <-  WHILE DirtyExp NeedDo
                     BreakStart
-                    (!END Action)*
+                    (Emmy / !END Action)*
                     BreakEnd
                 NeedEnd
 
@@ -480,7 +479,7 @@ Repeat      <-  Sp ({} RepeatBody {})
             ->  Repeat
 RepeatBody  <-  REPEAT
                     BreakStart
-                    (!UNTIL Action)*
+                    (Emmy / !UNTIL Action)*
                     BreakEnd
                 NeedUntil DirtyExp
 
@@ -503,7 +502,7 @@ NamedFunction
 FunctionNamedBody
             <-  FUNCTION FuncName FuncArg
                     LabelStart
-                    (!END Action)*
+                    (Emmy / !END Action)*
                     LabelEnd
                 NeedEnd
 FuncName    <-  (MustName (DOT MustName)* FuncMethod?)
@@ -593,7 +592,7 @@ EmmySee         <-  MustEmmyName '#' MustEmmyName
 grammar 'Lua' [[
 Lua         <-  Head?
                 LabelStart
-                Action* -> Lua
+                (Emmy / Action)* -> Lua
                 LabelEnd
                 Sp
 Head        <-  '#' (!%nl .)*

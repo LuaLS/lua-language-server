@@ -930,3 +930,15 @@ function f($)
         kind = CompletionItemKind.Interface,
     },
 }
+
+TEST [[
+local function f()
+    ---@t$
+end
+]]
+{
+    {
+        label = 'type',
+        kind = CompletionItemKind.Keyword,
+    }
+}

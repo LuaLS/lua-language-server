@@ -20,7 +20,6 @@
 			],
 			"consoleCoding": "utf8",
 			"sourceCoding": "utf8",
-			"experimentalServer": true,
 			"luaRuntime": "5.4 64bit"
 		},
 		{
@@ -60,14 +59,15 @@
 			"stopOnEntry": false,
 			"program": "${workspaceRoot}/server/publish.lua",
 			"cwd": "${workspaceRoot}/server",
-			"luaexe": "${workspaceRoot}\\server\\bin\\lua-language-server.exe",
-			"luadll": "${workspaceRoot}\\server\\bin\\lua54.dll",
+			//"luaexe": "${workspaceRoot}\\server\\bin\\lua-language-server.exe",
+			//"luadll": "${workspaceRoot}\\server\\bin\\lua54.dll",
 			"path": "${workspaceRoot}/server/bin/?.lua",
 			"cpath": "${workspaceRoot}/server/bin/?.dll;",
 			"arg": [
 			],
 			"consoleCoding": "utf8",
-			"sourceCoding": "utf8"
+			"sourceCoding": "utf8",
+			"luaRuntime": "5.4 64bit"
 		}
 	]
 }

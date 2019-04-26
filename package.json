@@ -45,13 +45,13 @@
 						"Lua 5.4",
 						"LuaJIT"
 					],
-					"description": "Lua runtime version.\nLua运行版本。"
+					"description": "%config.runtime.version%"
 				},
 				"Lua.runtime.path": {
 					"scope": "resource",
 					"type": "array",
 					"items": "string",
-					"description": "package.path",
+					"description": "%config.runtime.path%",
 					"default": [
 						"?.lua",
 						"?/init.lua",
@@ -62,46 +62,70 @@
 					"scope": "resource",
 					"type": "array",
 					"items": "string",
-					"description": "Disabled diagnostic (Use code in hover brackets).\n禁用的诊断（使用浮框括号内的代码）。"
+					"description": "%config.diagnostics.disable%"
 				},
 				"Lua.diagnostics.globals": {
 					"scope": "resource",
 					"type": "array",
 					"items": "string",
-					"description": "Defined global variables.\n已定义的全局变量。"
+					"description": "%config.diagnostics.globals%"
 				},
 				"Lua.workspace.ignoreDir": {
 					"scope": "resource",
 					"type": "array",
 					"items": "string",
-					"description": "Ignored directories.\n忽略的目录。"
+					"description": "%config.workspace.ignoreDir%"
 				},
 				"Lua.workspace.ignoreSubmodules": {
 					"scope": "resource",
 					"type": "boolean",
 					"default": true,
-					"description": "Ignore submodules.\n忽略子模块。"
+					"description": "%config.workspace.ignoreSubmodules%"
 				},
 				"Lua.workspace.useGitIgnore": {
 					"scope": "resource",
 					"type": "boolean",
 					"default": true,
-					"description": "Ignore files list in \".gitignore\" .\n忽略 \".gitignore\" 中列举的文件。"
+					"description": "%config.workspace.useGitIgnore%"
 				},
 				"Lua.workspace.maxPreload": {
 					"scope": "resource",
 					"type": "integer",
 					"default": 300,
-					"description": "Max preloaded files.\n最大预加载文件数。"
+					"description": "%config.workspace.maxPreload%"
 				},
 				"Lua.workspace.preloadFileSize": {
 					"scope": "resource",
 					"type": "integer",
 					"default": 100,
-					"description": "Skip files larger than this value (KB) when preloading.\n预加载时跳过大小大于该值（KB）的文件。"
+					"description": "%config.workspace.preloadFileSize%"
 				}
 			}
-		}
+		},
+		"localizations": [
+			{
+				"languageId": "en",
+				"languageName": "",
+				"localizedLanguageName": "",
+				"translations": [
+					{
+						"id": "sumneko.lua",
+						"path": "locale/en.json"
+					}
+				]
+			},
+			{
+				"languageId": "zh-cn",
+				"languageName": "",
+				"localizedLanguageName": "",
+				"translations": [
+					{
+						"id": "sumneko.lua",
+						"path": "locale/zh-cn.json"
+					}
+				]
+			}
+		]
 	},
 	"scripts": {
 		"vscode:prepublish": "cd client && npm run update-vscode && cd .."

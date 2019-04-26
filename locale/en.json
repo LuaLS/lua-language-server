@@ -1,0 +1,16 @@
+{
+    "version": "1.0.0",
+    "contents": {
+        "package": {
+            "config.runtime.version": "Lua runtime version.",
+            "config.runtime.path": "package.path",
+            "config.diagnostics.disable": "Disabled diagnostic (Use code in hover brackets).",
+            "config.diagnostics.globals": "Defined global variables.",
+            "config.workspace.ignoreDir": "Ignored directories.",
+            "config.workspace.ignoreSubmodules": "Ignore submodules.",
+            "config.workspace.useGitIgnore": "Ignore files list in \".gitignore\" .",
+            "config.workspace.maxPreload": "Max preloaded files.",
+            "config.workspace.preloadFileSize": "Skip files larger than this value (KB) when preloading."
+        }
+    }
+}

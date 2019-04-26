@@ -1,0 +1,11 @@
+{
+    "config.runtime.version": "Lua运行版本。",
+    "config.runtime.path": "package.path",
+    "config.diagnostics.disable": "禁用的诊断（使用浮框括号内的代码）。",
+    "config.diagnostics.globals": "已定义的全局变量。",
+    "config.workspace.ignoreDir": "忽略的目录。",
+    "config.workspace.ignoreSubmodules": "忽略子模块。",
+    "config.workspace.useGitIgnore": "忽略 \".gitignore\" 中列举的文件。",
+    "config.workspace.maxPreload": "最大预加载文件数。",
+    "config.workspace.preloadFileSize": "预加载时跳过大小大于该值（KB）的文件。"
+}

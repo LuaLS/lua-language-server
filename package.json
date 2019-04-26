@@ -108,30 +108,6 @@
 				"scopeName": "source.lua",
 				"path": "syntaxes/lua.tmLanguage.json"
 			}
-		],
-		"localizations": [
-			{
-				"languageId": "en",
-				"languageName": "",
-				"localizedLanguageName": "",
-				"translations": [
-					{
-						"id": "sumneko.lua",
-						"path": "locale/en.json"
-					}
-				]
-			},
-			{
-				"languageId": "zh-cn",
-				"languageName": "",
-				"localizedLanguageName": "",
-				"translations": [
-					{
-						"id": "sumneko.lua",
-						"path": "locale/zh-cn.json"
-					}
-				]
-			}
 		]
 	},
 	"scripts": {

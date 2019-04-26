@@ -138,12 +138,13 @@ local count = copyFiles(EXTENSION , out) {
     ['images'] = {
         ['logo.png'] = true,
     },
-    ['locale']            = true,
-    ['syntaxes']          = true,
-    ['package-lock.json'] = true,
-    ['package.json']      = true,
-    ['README.md']         = true,
-    ['tsconfig.json']     = true,
+    ['syntaxes']               = true,
+    ['package-lock.json']      = true,
+    ['package.json']           = true,
+    ['README.md']              = true,
+    ['tsconfig.json']          = true,
+    ['package.nls.json']       = true,
+    ['package.nls.zh-cn.json'] = true,
 }
 print(('复制了[%d]个文件'):format(count))
 

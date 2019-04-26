@@ -102,6 +102,13 @@
 				}
 			}
 		},
+		"grammars": [
+			{
+				"language": "lua",
+				"scopeName": "source.lua",
+				"path": "syntaxes/lua.tmLanguage.json"
+			}
+		],
 		"localizations": [
 			{
 				"languageId": "en",

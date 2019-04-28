@@ -1010,3 +1010,21 @@ end
         kind = CompletionItemKind.Keyword,
     }
 }
+
+TEST [[
+---@class Class
+---@field name string
+---@field id integer
+local mt = {}
+mt.$
+]]
+{
+    {
+        label = 'id',
+        kind = CompletionItemKind.Field,
+    },
+    {
+        label = 'name',
+        kind = CompletionItemKind.Field,
+    },
+}

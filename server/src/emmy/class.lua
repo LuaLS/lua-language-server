@@ -33,6 +33,23 @@ function mt:eachChild(callback)
     end)
 end
 
+function mt:addField(field)
+    if not self._fields then
+        self._fields = {}
+    end
+    self._fields[#self._fields+1] = field
+end
+
+function mt:eachField(callback)
+    if not self._fields then
+        return
+    end
+    ---@param field EmmyField
+    for _, field in ipairs(self._fields) do
+        callback(field)
+    end
+end
+
 return function (manager, source)
     local self = setmetatable({
         name = source[1][1],

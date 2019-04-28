@@ -71,3 +71,11 @@ TEST [[
 ---@class <!Class!>
 ---@param a <?Class?>
 ]]
+
+TEST [[
+---@class Class
+---@field <!name!> string
+---@field id integer
+local mt = {}
+mt.<?name?>
+]]

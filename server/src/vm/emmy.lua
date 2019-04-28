@@ -19,6 +19,7 @@ function mt:doEmmy(action)
     elseif tp == 'emmyReturn' then
         self:doEmmyReturn(action)
     elseif tp == 'emmyField' then
+        self:doEmmyField(action)
     elseif tp == 'emmyGeneric' then
     elseif tp == 'emmyVararg' then
     elseif tp == 'emmyLanguage' then
@@ -83,7 +84,7 @@ function mt:doEmmyClass(action)
     end
 end
 
-function mt:doEmmyType(action)
+function mt:buildEmmyType(action)
     ---@type emmyMgr
     local emmyMgr = self.emmyMgr
     self:instantSource(action)
@@ -92,6 +93,11 @@ function mt:doEmmyType(action)
         obj:set('emmy class', obj[1])
     end
     local type = emmyMgr:addType(action)
+    return type
+end
+
+function mt:doEmmyType(action)
+    local type = self:buildEmmyType(action)
     self._emmy = type
     if self.lsp then
         self.lsp.global:markGet(self:getUri())
@@ -104,10 +110,11 @@ function mt:doEmmyAlias(action)
     local emmyMgr = self.emmyMgr
     self:instantSource(action)
     self:instantSource(action[1])
-    local type = self:doEmmyType(action[2])
+    local type = self:buildEmmyType(action[2])
     local alias = emmyMgr:addAlias(action, type)
     action:set('emmy.alias', alias)
     action[1]:set('emmy class', alias:getName())
+    self._emmy = type
     if self.lsp then
         self.lsp.global:markSet(self:getUri())
     end
@@ -118,10 +125,9 @@ function mt:doEmmyParam(action)
     local emmyMgr = self.emmyMgr
     self:instantSource(action)
     self:instantSource(action[1])
-    local type = self:doEmmyType(action[2])
+    local type = self:buildEmmyType(action[2])
     local param = emmyMgr:addParam(action, type)
     action:set('emmy.param', param)
-    self._emmy = nil
     self:addEmmyParam(param)
 end
 
@@ -129,11 +135,29 @@ function mt:doEmmyReturn(action)
     ---@type emmyMgr
     local emmyMgr = self.emmyMgr
     self:instantSource(action)
-    local type = self:doEmmyType(action[1])
+    local type = self:buildEmmyType(action[1])
     local rtn = emmyMgr:addReturn(action, type)
     action:set('emmy.return', rtn)
-    self._emmy = nil
     self:addEmmyReturn(rtn)
+end
+
+function mt:doEmmyField(action)
+    ---@type emmyMgr
+    local emmyMgr = self.emmyMgr
+    self:instantSource(action)
+    self:instantSource(action[2])
+    local type = self:buildEmmyType(action[3])
+    local value = self:createValue('nil', action[2])
+    local field = emmyMgr:addField(action, type, value)
+    value:setEmmy(type)
+    action:set('emmy.field', field)
+
+    local class = self._emmy
+    if not self._emmy or self._emmy.type ~= 'emmy.class' then
+        return
+    end
+    class:addField(field)
+    action:set('target class', class)
 end
 
 function mt:doEmmyIncomplete(action)

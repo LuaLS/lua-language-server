@@ -5,6 +5,7 @@ local newTypeUnit = require 'emmy.typeUnit'
 local newAlias = require 'emmy.alias'
 local newParam = require 'emmy.param'
 local newReturn = require 'emmy.return'
+local newField = require 'emmy.field'
 
 local mt = {}
 mt.__index = mt
@@ -116,6 +117,13 @@ function mt:addReturn(source, typeObj)
     local returnObj = newReturn(self, source)
     returnObj:bindType(typeObj)
     return returnObj
+end
+
+function mt:addField(source, typeObj, value)
+    local fieldObj = newField(self, source)
+    fieldObj:bindType(typeObj)
+    fieldObj:bindValue(value)
+    return fieldObj
 end
 
 function mt:remove()

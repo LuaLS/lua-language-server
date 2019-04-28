@@ -114,8 +114,7 @@ function mt:shadow(old)
     self._shadow = group
 
     if not self:getSource() then
-        log.error(table.dump(self))
-        log.error(table.dump(getmetatable(self)))
+        log.error('local no source')
         return
     end
 

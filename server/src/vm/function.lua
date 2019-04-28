@@ -227,6 +227,7 @@ function mt:needSkip()
     return self._runed > 3
 end
 
+---@param vm VM
 function mt:run(vm)
     if self._removed then
         return
@@ -263,6 +264,15 @@ function mt:run(vm)
         self._dots = createMulti()
         for i = #self.args + 1, #self.argValues do
             self._dots:push(self.argValues[i])
+        end
+    end
+
+    -- 填充返回值
+    if self._emmyReturns then
+        for i, rtn in ipairs(self._emmyReturns) do
+            local value = vm:createValue('nil', rtn:getSource())
+            value:setEmmy(rtn:bindType())
+            self:setReturn(i, value)
         end
     end
 end

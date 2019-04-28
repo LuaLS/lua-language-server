@@ -44,6 +44,13 @@ function mt:addEmmyParam(param)
     self._emmyParams[#self._emmyParams+1] = param
 end
 
+function mt:addEmmyReturn(rtn)
+    if not self._emmyReturns then
+        self._emmyReturns = {}
+    end
+    self._emmyReturns[#self._emmyReturns+1] = rtn
+end
+
 function mt:getEmmyParams()
     local params = self._emmyParams
     self._emmyParams = nil

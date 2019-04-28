@@ -597,3 +597,14 @@ end
 [[
 local v<value>: *Class {}
 ]]
+
+TEST [[
+---@return A|B
+---@return C
+local function <?f?>()
+end
+]]
+[[
+function f()
+  -> A|B, C
+]]

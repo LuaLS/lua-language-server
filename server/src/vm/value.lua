@@ -549,7 +549,7 @@ function mt:setEmmy(emmy)
         emmyClass:eachField(function (field)
             local name = field:getName()
             local value = field:bindValue()
-            self:setChild(name, value, field:getSource()[2])
+            self:setChild(name, value, field:getSource())
         end)
     elseif emmy.type == 'emmy.type' then
         ---@type EmmyType

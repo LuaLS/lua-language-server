@@ -415,3 +415,14 @@ local function f(x, y)
 end
 f()
 ]]
+
+TEST [[
+---@field <!x Class!>
+---@class Class
+]]
+
+TEST [[
+---@class Class
+---@field <!x!> Class
+---@field <!x!> Class
+]]

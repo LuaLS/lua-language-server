@@ -1206,11 +1206,14 @@ local Defs = {
         }
     end,
     EmmyField = function (access, fieldName, ...)
-        return {
+        local obj = {
             type = 'emmyField',
             access, fieldName,
             ...
         }
+        obj.start = obj[2].start
+        obj.finish = obj[3].finish
+        return obj
     end,
     EmmyGenericBlock = function (genericName, parentName)
         return { genericName, parentName }

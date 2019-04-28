@@ -74,7 +74,7 @@ TEST [[
 
 TEST [[
 ---@class Class
----@field <!name!> string
+---@field <!name string!>
 ---@field id integer
 local mt = {}
 mt.<?name?>

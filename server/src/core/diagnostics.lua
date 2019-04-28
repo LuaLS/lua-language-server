@@ -556,6 +556,41 @@ function mt:checkEmmyParam(source, callback, mark)
     end
 end
 
+function mt:checkEmmyField(source, callback, mark)
+    ---@type EmmyClass
+    local class = source:get 'target class'
+    -- 必须写在 class 的后面
+    if not class then
+        callback(source.start, source.finish, lang.script.DIAG_NEED_CLASS)
+    end
+
+    -- 检查重复的 field
+    if class and not mark[class] then
+        mark[class] = true
+        local lists = {}
+        class:eachField(function (field)
+            local name = field:getName()
+            if not lists[name] then
+                lists[name] = {}
+            end
+            lists[name][#lists[name]+1] = field:getSource()[2]
+        end)
+        for _, list in pairs(lists) do
+            if #list > 1 then
+                local related = {}
+                for _, src in ipairs(list) do
+                    related[#related+1] = {
+                        src.start,
+                        src.finish,
+                        src.uri,
+                    }
+                    callback(src.start, src.finish, lang.script.DIAG_DUPLICATE_FIELD)
+                end
+            end
+        end
+    end
+end
+
 function mt:searchEmmyLua(callback)
     local mark = {}
     self.vm:eachSource(function (source)
@@ -567,6 +602,8 @@ function mt:searchEmmyLua(callback)
             self:checkEmmyAlias(source, callback)
         elseif source.type == 'emmyParam' then
             self:checkEmmyParam(source, callback, mark)
+        elseif source.type == 'emmyField' then
+            self:checkEmmyField(source, callback, mark)
         end
     end)
 end

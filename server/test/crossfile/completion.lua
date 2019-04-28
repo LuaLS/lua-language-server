@@ -427,31 +427,31 @@ TEST {
     {
         path = 'a.lua',
         content = [[
-            abc = 1
+            zabc = 1
         ]]
     },
     {
         path = 'a.lua',
         content = [[
-            abcd = print
+            zabcd = print
         ]]
     },
     {
         path = 'a.lua',
         content = [[
-            abcdef = 1
+            zabcdef = 1
         ]]
     },
     {
         path = 'b.lua',
         content = [[
-            ab$
+            zab$
         ]],
         main = true,
     },
     completion = {
         {
-            label = 'abcdef',
+            label = 'zabcdef',
             kind = CompletionItemKind.Enum,
             detail = '= 1',
         },
@@ -468,25 +468,25 @@ TEST {
     {
         path = 'a.lua',
         content = [[
-            print(abc)
+            print(zabc)
         ]]
     },
     {
         path = 'a.lua',
         content = [[
-            abcdef = 1
+            zabcdef = 1
         ]]
     },
     {
         path = 'b.lua',
         content = [[
-            ab$
+            zab$
         ]],
         main = true,
     },
     completion = {
         {
-            label = 'abcdef',
+            label = 'zabcdef',
             kind = CompletionItemKind.Enum,
             detail = '= 1',
         },

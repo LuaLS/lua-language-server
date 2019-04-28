@@ -216,6 +216,11 @@ loc$
 ]]
 {
     {
+        label = 'collectgarbage',
+        kind = CompletionItemKind.Function,
+        documentation = EXISTS,
+    },
+    {
         label = 'local',
         kind = CompletionItemKind.Keyword,
     }
@@ -318,6 +323,11 @@ local t = {
     {
         label = 'xxzz',
         kind = CompletionItemKind.Property,
+    },
+    {
+        label = 'next',
+        kind = CompletionItemKind.Function,
+        documentation = EXISTS,
     },
     {
         label = 'xpcall',
@@ -746,6 +756,16 @@ else$
         detail = EXISTS,
     },
     {
+        label = 'select',
+        kind = CompletionItemKind.Function,
+        documentation = EXISTS,
+    },
+    {
+        label = 'setmetatable',
+        kind = CompletionItemKind.Function,
+        documentation = EXISTS,
+    },
+    {
         label = 'else',
         kind = CompletionItemKind.Keyword,
     },
@@ -967,6 +987,10 @@ end
 {
     {
         label = 'type',
+        kind = CompletionItemKind.Keyword,
+    },
+    {
+        label = 'return',
         kind = CompletionItemKind.Keyword,
     }
 }

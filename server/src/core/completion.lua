@@ -3,6 +3,7 @@ local getFunctionHover = require 'core.hover.function'
 local getFunctionHoverAsLib = require 'core.hover.lib_function'
 local sourceMgr = require 'vm.source'
 local config = require 'config'
+local matchKey = require 'core.matchKey'
 local State
 
 local CompletionItemKind = {
@@ -40,75 +41,6 @@ for _, k in ipairs(KEYS) do
 end
 
 local EMMY_KEYWORD = {'class', 'type', 'alias', 'param', 'return', 'field', 'generic', 'vararg', 'language', 'see'}
-
-local function matchKey(me, other)
-    if me == other then
-        return true
-    end
-    if me == '' then
-        return true
-    end
-    if #me > #other then
-        return false
-    end
-    local lMe = me:lower()
-    local lOther = other:lower()
-    if lMe:sub(1, 1) ~= lOther:sub(1, 1) then
-        return false
-    end
-    if lMe == lOther:sub(1, #lMe) then
-        return true
-    end
-    local used = {}
-    local cur = 1
-    local lookup
-    local researched
-    for i = 1, #lMe do
-        local c = lMe:sub(i, i)
-        -- 1. 看当前字符是否匹配
-        if c == lOther:sub(cur, cur) then
-            used[cur] = true
-            goto NEXT
-        end
-        -- 2. 看前一个字符是否匹配
-        if not used[cur-1] then
-            if c == lOther:sub(cur-1, cur-1) then
-                used[cur-1] = true
-                goto NEXT
-            end
-        end
-        -- 3. 向后找这个字
-        lookup = lOther:find(c, cur+1, true)
-        if lookup then
-            cur = lookup
-            used[cur] = true
-            goto NEXT
-        end
-
-        -- 4. 重新搜索整个字符串，但是只允许1次，否则失败.如果找不到也失败
-        if researched then
-            return false
-        else
-            researched = true
-            for j = 1, cur - 2 do
-                if c == lOther:sub(j, j) then
-                    used[j] = true
-                    goto NEXT
-                end
-            end
-            return false
-        end
-        -- 5. 找到下一个可用的字，如果超出长度且把自己所有字都用尽就算成功
-        ::NEXT::
-        repeat
-            cur = cur + 1
-        until not used[cur]
-        if cur > #lOther then
-            return i == #lMe
-        end
-    end
-    return true
-end
 
 local function getDucumentation(name, value)
     if value:getType() == 'function' then

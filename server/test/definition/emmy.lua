@@ -32,7 +32,7 @@ local <!obj!>
 
 TEST [[
 ---@type A
-local <?obj?>
+local <?<!obj!>?>
 
 ---@class A
 local <!mt!>

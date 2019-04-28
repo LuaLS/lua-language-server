@@ -189,3 +189,7 @@ local x = function ()
     <?x?>()
 end
 ]]
+
+TEST [[
+local <?<!x!>?>
+]]

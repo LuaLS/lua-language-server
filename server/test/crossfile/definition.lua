@@ -117,6 +117,7 @@ TEST {
     {
         path = 'b.lua',
         content = 'local <?t?> = require "a"',
+        target = {7, 7},
     },
 }
 
@@ -140,6 +141,7 @@ TEST {
     {
         path = 'b.lua',
         content = 'local <?t?> = require "a"',
+        target = {7, 7},
     },
 }
 
@@ -209,6 +211,7 @@ TEST {
         content = [[
             local <?t?> = require 'a'
         ]],
+        target = {19, 19},
     },
 }
 
@@ -310,8 +313,9 @@ TEST {
     {
         path = 'b.lua',
         content = [[
-            local <?t?> = require 'a'
-        ]]
+            local <!t!> = require 'a'
+            <?t?>
+        ]],
     }
 }
 
@@ -331,7 +335,8 @@ TEST {
     {
         path = 'c.lua',
         content = [[
-            local <?f?> = require 'a'
+            local <!f!> = require 'a'
+            <?f?>
         ]]
     }
 }
@@ -354,7 +359,8 @@ TEST {
     {
         path = 'c.lua',
         content = [[
-            local <?f?> = require 'a'
+            local <!f!> = require 'a'
+            <?f?>
         ]]
     }
 }
@@ -369,7 +375,8 @@ TEST {
     {
         path = 'b/xxx.lua',
         content = [[
-            local <?f?> = require 'xxx'
+            local <!f!> = require 'xxx'
+            <?f?>
             return function () end
         ]]
     }
@@ -387,7 +394,8 @@ TEST {
         path = 'b.lua',
         content = [[
             ---@type Class
-            local <?obj?>
+            local <!obj!>
+            <?obj?>
         ]]
     },
 }
@@ -397,7 +405,8 @@ TEST {
         path = 'a.lua',
         content = [[
             ---@type Class
-            local <?obj?>
+            local <!obj!>
+            <?obj?>
         ]]
     },
     {

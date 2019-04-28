@@ -207,11 +207,6 @@ local function makeList(source)
     local list = {}
     local mark = {}
     return list, function (src)
-        if Mode == 'definition' then
-            if source == src then
-                return
-            end
-        end
         if mark[src] then
             return
         end

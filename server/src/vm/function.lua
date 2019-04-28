@@ -78,11 +78,7 @@ function mt:loadLocal(name)
         local locals = self.locals[i]
         local loc = locals[name]
         if loc then
-            if loc:getSource() then
-                return loc
-            else
-                locals[name] = nil
-            end
+            return loc
         end
         if self.chunk[i] then
             break
@@ -90,11 +86,7 @@ function mt:loadLocal(name)
     end
     local uv = self.upvalues[name]
     if uv then
-        if uv:getSource() then
-            return uv
-        else
-            self.upvalues[name] = nil
-        end
+        return uv
     end
     return nil
 end

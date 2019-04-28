@@ -285,6 +285,7 @@ function mt:reCompile()
     self.chain  = chainMgr()
     self.emmy   = emmyMgr()
     self.globalValue = nil
+    self._compileTask = nil
 
     self._needCompile = {}
 
@@ -630,7 +631,7 @@ function mt:_doCompileTask()
     if not self._compileTask then
         return
     end
-    while true do
+    while self._compileTask do
         local suc, res = coroutine.resume(self._compileTask)
         if not suc then
             self._compileTask = nil

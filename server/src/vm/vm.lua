@@ -1018,9 +1018,14 @@ function mt:doAction(action)
     if coroutine.isyieldable() then
         if self.lsp:isNeedCompile(self.uri) then
             coroutine.yield()
+            if self._removed then
+                coroutine.yield('stop')
+                return
+            end
         else
             self:remove()
             coroutine.yield('stop')
+            return
         end
     end
     local tp = action.type

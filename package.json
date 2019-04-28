@@ -35,7 +35,7 @@
 			"title": "Lua",
 			"properties": {
 				"Lua.runtime.version": {
-					"scope": "resource",
+					"scope": "window",
 					"type": "string",
 					"default": "Lua 5.3",
 					"enum": [
@@ -48,7 +48,7 @@
 					"description": "%config.runtime.version%"
 				},
 				"Lua.runtime.path": {
-					"scope": "resource",
+					"scope": "window",
 					"type": "array",
 					"items": "string",
 					"description": "%config.runtime.path%",
@@ -59,43 +59,43 @@
 					]
 				},
 				"Lua.diagnostics.disable": {
-					"scope": "resource",
+					"scope": "window",
 					"type": "array",
 					"items": "string",
 					"description": "%config.diagnostics.disable%"
 				},
 				"Lua.diagnostics.globals": {
-					"scope": "resource",
+					"scope": "window",
 					"type": "array",
 					"items": "string",
 					"description": "%config.diagnostics.globals%"
 				},
 				"Lua.workspace.ignoreDir": {
-					"scope": "resource",
+					"scope": "window",
 					"type": "array",
 					"items": "string",
 					"description": "%config.workspace.ignoreDir%"
 				},
 				"Lua.workspace.ignoreSubmodules": {
-					"scope": "resource",
+					"scope": "window",
 					"type": "boolean",
 					"default": true,
 					"description": "%config.workspace.ignoreSubmodules%"
 				},
 				"Lua.workspace.useGitIgnore": {
-					"scope": "resource",
+					"scope": "window",
 					"type": "boolean",
 					"default": true,
 					"description": "%config.workspace.useGitIgnore%"
 				},
 				"Lua.workspace.maxPreload": {
-					"scope": "resource",
+					"scope": "window",
 					"type": "integer",
 					"default": 300,
 					"description": "%config.workspace.maxPreload%"
 				},
 				"Lua.workspace.preloadFileSize": {
-					"scope": "resource",
+					"scope": "window",
 					"type": "integer",
 					"default": 100,
 					"description": "%config.workspace.preloadFileSize%"

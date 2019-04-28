@@ -1075,7 +1075,7 @@ end
 function mt:createFunction(source)
     local value = self:createValue('function', source)
     local func = functionMgr.create(source)
-    func:setEmmyParams(self:getEmmyParams())
+    func:setEmmy(self:getEmmyParams(), self:getEmmyReturns())
     value:setFunction(func)
     value:setType('function', 1.0)
     if source:getUri() == self.uri then

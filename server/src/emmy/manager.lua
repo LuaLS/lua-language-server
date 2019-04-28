@@ -4,6 +4,7 @@ local newType = require 'emmy.type'
 local newTypeUnit = require 'emmy.typeUnit'
 local newAlias = require 'emmy.alias'
 local newParam = require 'emmy.param'
+local newReturn = require 'emmy.return'
 
 local mt = {}
 mt.__index = mt
@@ -106,12 +107,15 @@ function mt:addAlias(source, typeObj)
 end
 
 function mt:addParam(source, typeObj)
-    local paramName = source[1][1]
     local paramObj = newParam(self, source)
     paramObj:bindType(typeObj)
-    local list = self:getClass(paramName)
-    list[source.id] = paramObj
     return paramObj
+end
+
+function mt:addReturn(source, typeObj)
+    local returnObj = newReturn(self, source)
+    returnObj:bindType(typeObj)
+    return returnObj
 end
 
 function mt:remove()

@@ -381,12 +381,18 @@ function mt:markGlobal()
     end
 end
 
-function mt:setEmmyParams(params)
+function mt:setEmmy(params, returns)
     if params then
         self._emmyParams = params
         for _, param in ipairs(params) do
             param:getSource():set('emmy function', self)
             param:getSource()[1]:set('emmy function', self)
+        end
+    end
+    if returns then
+        self._emmyReturns = returns
+        for _, rtn in ipairs(returns) do
+            rtn:getSource():set('emmy function', self)
         end
     end
 end

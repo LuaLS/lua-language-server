@@ -3,6 +3,7 @@ local mt = require 'vm.manager'
 function mt:clearEmmy()
     self._emmy = nil
     self._emmyParams = nil
+    self._emmyReturns = nil
 end
 
 function mt:doEmmy(action)
@@ -16,6 +17,7 @@ function mt:doEmmy(action)
     elseif tp == 'emmyParam' then
         self:doEmmyParam(action)
     elseif tp == 'emmyReturn' then
+        self:doEmmyReturn(action)
     elseif tp == 'emmyField' then
     elseif tp == 'emmyGeneric' then
     elseif tp == 'emmyVararg' then
@@ -46,6 +48,12 @@ function mt:getEmmyParams()
     local params = self._emmyParams
     self._emmyParams = nil
     return params
+end
+
+function mt:getEmmyReturns()
+    local returns = self._emmyReturns
+    self._emmyReturns = nil
+    return returns
 end
 
 function mt:doEmmyClass(action)
@@ -108,6 +116,17 @@ function mt:doEmmyParam(action)
     action:set('emmy.param', param)
     self._emmy = nil
     self:addEmmyParam(param)
+end
+
+function mt:doEmmyReturn(action)
+    ---@type emmyMgr
+    local emmyMgr = self.emmyMgr
+    self:instantSource(action)
+    local type = self:doEmmyType(action[1])
+    local rtn = emmyMgr:addReturn(action, type)
+    action:set('emmy.return', rtn)
+    self._emmy = nil
+    self:addEmmyReturn(rtn)
 end
 
 function mt:doEmmyIncomplete(action)

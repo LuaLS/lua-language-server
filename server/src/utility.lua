@@ -24,17 +24,12 @@ function table.dump(tbl)
     if type(tbl) ~= 'table' then
         return ('%q'):format(tbl)
     end
-    local table_mark = {}
     local lines = {}
     lines[#lines+1] = '{'
     local function unpack(tbl, tab)
-        if table_mark[tbl] then
-            return '<Circle Table>'
-        end
-        if tab > 10 then
+        if tab > 100 then
             return '<Deep Table>'
         end
-        table_mark[tbl] = true
         local keys = {}
         for key in pairs(tbl) do
             if type(key) == 'string' then

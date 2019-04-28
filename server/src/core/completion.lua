@@ -206,8 +206,9 @@ local function searchFieldsByChild(parent, word, source, map)
     end)
 end
 
+---@param vm VM
 local function searchFields(vm, source, word, callback)
-    local parent = source:get 'parent'
+    local parent = source:get 'parent' or vm.env:getValue()
     if not parent then
         return
     end
@@ -448,7 +449,8 @@ local function searchSource(vm, source, word, callback, pos)
         searchAsGlobal(vm, source, word, callback)
         return
     end
-    if source:get 'simple' then
+    if source:get 'simple'
+    and (source.type == 'name' or source.type == '.' or source.type == ':') then
         searchAsSuffix(vm, source, word, callback)
         return
     end

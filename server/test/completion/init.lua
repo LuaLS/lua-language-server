@@ -776,6 +776,22 @@ else$
 }
 
 TEST [[
+local xpcal
+xpcal$
+]]
+{
+    {
+        label = 'xpcal',
+        kind = CompletionItemKind.Variable,
+    },
+    {
+        label = 'xpcall',
+        kind = CompletionItemKind.Function,
+        documentation = EXISTS,
+    }
+}
+
+TEST [[
 ---@$
 ]]
 (EXISTS)

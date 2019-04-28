@@ -113,6 +113,12 @@ function mt:shadow(old)
     group[#group+1] = self
     self._shadow = group
 
+    if not self:getSource() then
+        log.error(table.dump(self))
+        log.error(table.dump(getmetatable(self)))
+        return
+    end
+
     old:close(self:getSource().start - 1)
 end
 

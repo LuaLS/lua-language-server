@@ -465,21 +465,29 @@ local function searchEmmyFunctionParam(vm, source, word, callback)
         local list = {}
         local args = {}
         for i, arg in ipairs(func.args) do
-            args[i] = arg.name
-            if i == 1 then
-                list[i] = ('%s any'):format(arg.name)
-            else
-                list[i] = ('---@param %s any'):format(arg.name)
+            if func:getObject() and i == 1 then
+                goto NEXT
             end
+            args[#args+1] = arg.name
+            if #list == 0 then
+                list[#list+1] = ('%s any'):format(arg.name)
+            else
+                list[#list+1] = ('---@param %s any'):format(arg.name)
+            end
+            :: NEXT ::
         end
         callback(('%s'):format(table.concat(args, ', ')), nil, CompletionItemKind.Snippet, {
             insertText = table.concat(list, '\n')
         })
     end
-    for _, arg in ipairs(func.args) do
+    for i, arg in ipairs(func.args) do
+        if func:getObject() and i == 1 then
+            goto NEXT
+        end
         if matchKey(word, arg.name) then
             callback(arg.name, nil, CompletionItemKind.Interface)
         end
+        :: NEXT ::
     end
 end
 

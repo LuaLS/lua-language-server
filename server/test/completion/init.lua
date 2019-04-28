@@ -872,6 +872,34 @@ a any
 }
 
 TEST [[
+---@param $
+function mt:f(a, b, c)
+end
+]]
+{
+    {
+        label = 'a, b, c',
+        kind = CompletionItemKind.Snippet,
+        insertText = [[
+a any
+---@param b any
+---@param c any]]
+    },
+    {
+        label = 'a',
+        kind = CompletionItemKind.Interface,
+    },
+    {
+        label = 'b',
+        kind = CompletionItemKind.Interface,
+    },
+    {
+        label = 'c',
+        kind = CompletionItemKind.Interface,
+    },
+}
+
+TEST [[
 ---@param xyz Class
 ---@param xxx Class
 function f(x$)

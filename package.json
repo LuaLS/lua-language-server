@@ -86,7 +86,7 @@
 					"scope": "window",
 					"type": "boolean",
 					"default": true,
-					"description": "%config.workspace.useGitIgnore%"
+					"markdownDescription": "%config.workspace.useGitIgnore%"
 				},
 				"Lua.workspace.maxPreload": {
 					"scope": "window",

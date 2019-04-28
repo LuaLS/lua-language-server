@@ -5,7 +5,7 @@
     "config.diagnostics.globals": "Defined global variables.",
     "config.workspace.ignoreDir": "Ignored directories.",
     "config.workspace.ignoreSubmodules": "Ignore submodules.",
-    "config.workspace.useGitIgnore": "Ignore files list in \".gitignore\" .",
+    "config.workspace.useGitIgnore": "Ignore files list in `.gitignore` .",
     "config.workspace.maxPreload": "Max preloaded files.",
     "config.workspace.preloadFileSize": "Skip files larger than this value (KB) when preloading."
 }

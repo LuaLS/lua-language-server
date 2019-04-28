@@ -27,7 +27,7 @@ function table.dump(tbl)
     local lines = {}
     lines[#lines+1] = '{'
     local function unpack(tbl, tab)
-        if tab > 100 then
+        if tab > 10 then
             return '<Deep Table>'
         end
         local keys = {}

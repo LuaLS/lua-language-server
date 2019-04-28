@@ -761,13 +761,16 @@ end
 
 local function getSource(vm, pos, text, filter)
     local word = findWord(pos, text)
-    local source = findSource(vm, pos, filter)
+    local source = keywordSource(vm, word, pos)
+    if source then
+        return source, pos, word
+    end
+    source = findSource(vm, pos, filter)
     if source then
         return source, pos, word
     end
     pos = findStartPos(pos, text)
-    source = findSource(vm, pos,   filter)
-          or keywordSource(vm, word, pos)
+    source = findSource(vm, pos, filter)
     return source, pos, word
 end
 

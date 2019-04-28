@@ -1028,3 +1028,30 @@ mt.$
         kind = CompletionItemKind.Field,
     },
 }
+
+TEST [[
+local function f()
+    if a then
+    else$
+end
+]]
+{
+    {
+        label = 'select',
+        kind = CompletionItemKind.Function,
+        documentation = EXISTS,
+    },
+    {
+        label = 'setmetatable',
+        kind = CompletionItemKind.Function,
+        documentation = EXISTS,
+    },
+    {
+        label = 'else',
+        kind = CompletionItemKind.Keyword,
+    },
+    {
+        label = 'elseif',
+        kind = CompletionItemKind.Keyword,
+    },
+}

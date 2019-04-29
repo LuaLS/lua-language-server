@@ -227,7 +227,9 @@ function mt:flushChild()
         local src = listMgr.get(srcId)
         if  src then
             if info.type == 'set child' or info.type == 'get child' then
-                alived[info[1]] = true
+                if info[1] then
+                    alived[info[1]] = true
+                end
             end
             count = count + 1
         else

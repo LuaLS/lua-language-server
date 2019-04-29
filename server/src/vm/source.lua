@@ -64,6 +64,14 @@ function mt:bindCall(args)
     end
 end
 
+function mt:bindMetatable(meta)
+    if meta then
+        self._bindMetatable = meta
+    else
+        return self._bindMetatable
+    end
+end
+
 function mt:action()
     return self._action
 end

@@ -192,11 +192,24 @@ function mt:getChild(index, source)
 end
 
 function mt:setMetaTable(metatable)
-    self._meta = metatable
+    local source = metatable:getSource()
+    if not source then
+        return
+    end
+    source:bindMetatable(metatable)
+    self._meta = metatable.source
 end
 
 function mt:getMetaTable()
-    return self._meta
+    if not self._meta then
+        return nil
+    end
+    local metaSource = listMgr.get(self._meta)
+    if not metaSource then
+        self._meta = nil
+        return nil
+    end
+    return metaSource:bindMetatable()
 end
 
 function mt:getMetaMethod(name)

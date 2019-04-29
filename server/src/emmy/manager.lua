@@ -1,12 +1,13 @@
-local listMgr     = require 'vm.list'
-local newClass    = require 'emmy.class'
-local newType     = require 'emmy.type'
-local newTypeUnit = require 'emmy.typeUnit'
-local newAlias    = require 'emmy.alias'
-local newParam    = require 'emmy.param'
-local newReturn   = require 'emmy.return'
-local newField    = require 'emmy.field'
-local newGeneric  = require 'emmy.generic'
+local listMgr      = require 'vm.list'
+local newClass     = require 'emmy.class'
+local newType      = require 'emmy.type'
+local newTypeUnit  = require 'emmy.typeUnit'
+local newAlias     = require 'emmy.alias'
+local newParam     = require 'emmy.param'
+local newReturn    = require 'emmy.return'
+local newField     = require 'emmy.field'
+local newGeneric   = require 'emmy.generic'
+local newArrayType = require 'emmy.arrayType'
 
 local mt = {}
 mt.__index = mt
@@ -96,6 +97,16 @@ function mt:addType(source)
         typeObj._childs[i] = typeUnit
         obj:set('emmy.typeUnit', typeUnit)
     end
+    return typeObj
+end
+
+function mt:addArrayType(source)
+    local typeObj = newArrayType(self, source)
+    local typeUnit = newTypeUnit(self, source)
+    local list = self:getClass(source[1])
+    typeUnit:setParent(typeObj)
+    list[source.id] = typeUnit
+    source:set('emmy.typeUnit', typeUnit)
     return typeObj
 end
 

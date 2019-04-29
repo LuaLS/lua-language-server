@@ -43,6 +43,9 @@ function buildLibValue(lib)
             if lib.special == 'pairs' then
                 func:setReturn(1, Special['next'])
             end
+            if lib.special == 'ipairs' then
+                func:setReturn(1, Special['@ipairs'])
+            end
         end
     elseif tp == 'string' then
         value = valueMgr.create('string', sourceMgr.dummy())
@@ -70,6 +73,10 @@ function buildLibValue(lib)
 
     if lib.special == 'next' then
         Special['next'] = value
+    end
+    if lib.special == '@ipairs' then
+        Special['@ipairs'] = value
+        return nil
     end
 
     return value

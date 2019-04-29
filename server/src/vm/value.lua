@@ -184,7 +184,17 @@ function mt:getChild(index, source)
         parent = method
     end
     if not value and source then
-        value = create('any', source)
+        local emmy = self:getEmmy()
+        if emmy then
+            if emmy.type == 'emmy.arrayType' then
+                if type(index) == 'number' then
+                    value = create(emmy:getName(), source)
+                end
+            end
+        end
+        if not value then
+            value = create('any', source)
+        end
         self:setChild(index, value)
         value.uri = self.uri
     end
@@ -575,6 +585,10 @@ function mt:setEmmy(emmy)
                 self:mergeValue(class:getValue())
             end
         end)
+    elseif emmy.type == 'emmy.arrayType' then
+        ---@type EmmyArrayType
+        local EmmyArrayType = emmy
+        EmmyArrayType:setValue(self)
     else
         return
     end

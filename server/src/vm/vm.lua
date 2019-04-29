@@ -14,6 +14,7 @@ local mt = require 'vm.manager'
 require 'vm.module'
 require 'vm.raw'
 require 'vm.pcall'
+require 'vm.ipairs'
 require 'vm.emmy'
 
 -- TODO source测试
@@ -296,6 +297,14 @@ function mt:callLibrary(func, values, source, lib)
             self:callPcall(func, values, source)
         elseif lib.special == 'xpcall' then
             self:callXpcall(func, values, source)
+        elseif lib.special == 'ipairs' then
+            self:callIpairs(func, values, source)
+        elseif lib.special == '@ipairs' then
+            self:callAtIpairs(func, values, source)
+        elseif lib.special == 'pairs' then
+            self:callPairs(func, values, source)
+        elseif lib.special == 'next' then
+            self:callNext(func, values, source)
         end
     else
         -- 如果lib的参数中有function，则立即执行function

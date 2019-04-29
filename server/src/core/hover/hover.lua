@@ -100,6 +100,10 @@ local function unpackTable(value)
             lines[#lines+1] = ('%s: %s'):format(key, child:getType())
         end
     end)
+    local emmy = value:getEmmy()
+    if emmy and emmy.type == 'emmy.arrayType' then
+        lines[#lines+1] = ('[*integer]: %s'):format(emmy:getName())
+    end
     if #lines == 0 then
         return '{}'
     end

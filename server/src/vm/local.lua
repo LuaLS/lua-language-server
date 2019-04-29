@@ -140,7 +140,10 @@ function mt:setEmmy(emmy)
     if not emmy then
         return
     end
-    if emmy.type ~= 'emmy.class' and emmy.type ~= 'emmy.type' then
+    if emmy.type ~= 'emmy.class'
+    and emmy.type ~= 'emmy.type'
+    and emmy.type ~= 'emmy.arrayType'
+    then
         return
     end
     if self.value then

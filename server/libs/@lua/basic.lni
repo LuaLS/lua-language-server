@@ -127,32 +127,26 @@ name = 'object'
 name = 'metatable'
 type = 'table'
 
+[@ipairs]
+special = '@ipairs'
+[[.args]]
+type = 'table'
+``````````
+name = 'i'
+type = 'integer'
+[[.returns]]
+name = 'i'
+type = 'integer'
+``````````
+type = 'object'
+
 [ipairs]
+special = 'ipairs'
 [[.args]]
 name = 't'
 type = 'table'
 [[.returns]]
 name = 'iterator'
-type = 'function'
-args = {
-    1 = {
-        name = 'table',
-        type = 'table',
-    },
-    2 = {
-        name = 'i',
-        type = 'integer',
-    }
-}
-returns = {
-    1 = {
-        name = 'i',
-        type = 'integer',
-    },
-    2 = {
-        name = 'object',
-    },
-}
 ``````````
 name = 't'
 type = 'table'

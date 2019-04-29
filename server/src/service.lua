@@ -742,17 +742,6 @@ function mt:_testMemory()
         end
     end
 
-    local totalLocal = 0
-    for _ in pairs(localMgr.watch) do
-        totalLocal = totalLocal + 1
-    end
-
-    local totalValue = 0
-    for _ in pairs(valueMgr.watch) do
-        totalValue = totalValue + 1
-    end
-
-    local totalFunction = 0
     local alivedFunction = 0
     local deadFunction = 0
     for _, id in pairs(functionMgr.watch) do
@@ -763,6 +752,18 @@ function mt:_testMemory()
         end
     end
 
+    local totalLocal = 0
+    for _ in pairs(localMgr.watch) do
+        totalLocal = totalLocal + 1
+    end
+
+    local totalValue = 0
+    for _ in pairs(valueMgr.watch) do
+        totalValue = totalValue + 1
+    end
+
+    local totalEmmy = self.emmy:count()
+    
     local mem = collectgarbage 'count'
     local threadInfo = async.info
     local threadBuf = {}
@@ -792,7 +793,8 @@ function mt:_testMemory()
     DeadFunc:  [%d]\n\z
 -------------------\n\z
     TotalLoc:  [%d]\n\z
-    TotalVal:  [%d]\n\z'):format(
+    TotalVal:  [%d]\n\z
+    TotalEmmy: [%d]\n\z'):format(
         mem,
         table.concat(threadBuf, '\n'),
 
@@ -809,7 +811,8 @@ function mt:_testMemory()
         deadFunction,
 
         totalLocal,
-        totalValue
+        totalValue,
+        totalEmmy
     ))
     log.debug('test memory: ', ('%.3f'):format(os.clock() - clock))
 end

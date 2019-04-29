@@ -143,11 +143,22 @@ end
 function mt:remove()
 end
 
+function mt:count()
+    local count = 0
+    for _, list in pairs(self._class) do
+        for k in pairs(list) do
+            if k ~= 'version' then
+                count = count + 1
+            end
+        end
+    end
+    return count
+end
+
 return function ()
     ---@class emmyMgr
     local self = setmetatable({
         _class = {},
-        _type = {},
     }, mt)
     return self
 end

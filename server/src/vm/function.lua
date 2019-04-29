@@ -261,6 +261,10 @@ function mt:run(vm)
         loc:setValue(self.argValues[i])
         local emmyParam = self:findEmmyParamByName(loc:getName())
         if emmyParam then
+            local typeObj = emmyParam:bindType()
+            if typeObj then
+                loc:getValue():setEmmy(typeObj)
+            end
             local genericObj = emmyParam:bindGeneric()
             if genericObj then
                 genericObj:setValue(loc:getValue())
@@ -268,9 +272,34 @@ function mt:run(vm)
         end
     end
     if self._dots then
+        local emmyParam = self:findEmmyParamByName('...')
         self._dots = createMulti()
         for i = #self.args + 1, #self.argValues do
-            self._dots:push(self.argValues[i])
+            local value = self.argValues[i]
+            self._dots:push(value)
+            if emmyParam then
+                local typeObj = emmyParam:bindType()
+                if typeObj then
+                    value:setEmmy(typeObj)
+                end
+                local genericObj = emmyParam:bindGeneric()
+                if genericObj then
+                    genericObj:setValue(value)
+                end
+            end
+        end
+        if emmyParam then
+            local typeObj = emmyParam:bindType()
+            if typeObj then
+                self._dots:setEmmy(typeObj)
+            end
+            local genericObj = emmyParam:bindGeneric()
+            if genericObj then
+                local value = self._dots:first()
+                if value then
+                    genericObj:setValue(value)
+                end
+            end
         end
     end
 
@@ -321,14 +350,7 @@ function mt:createArg(vm, arg)
     vm:instantSource(arg)
     arg:set('arg', self)
     if arg.type == 'name' then
-        local emmyParam = self:findEmmyParamByName(arg[1])
         local value = valueMgr.create('nil', arg)
-        if emmyParam then
-            local typeObj = emmyParam:bindType()
-            if typeObj then
-                value:setEmmy(typeObj)
-            end
-        end
         local loc = localMgr.create(arg[1], arg, value)
         self:saveUpvalue(arg[1], loc)
         self.args[#self.args+1] = loc

@@ -6,7 +6,7 @@ mt.__index = mt
 mt.type = 'emmy.generic'
 
 function mt:getName()
-    return self.name
+    return self.name:getName()
 end
 
 function mt:setValue(value)

@@ -66,6 +66,14 @@ function mt:merge(other)
     end)
 end
 
+function mt:setEmmy(emmy)
+    self._emmy = emmy
+end
+
+function mt:getEmmy()
+    return self._emmy
+end
+
 return function ()
     local self = setmetatable({}, mt)
     return self

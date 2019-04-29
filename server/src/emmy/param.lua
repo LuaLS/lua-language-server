@@ -31,9 +31,13 @@ end
 
 return function (manager, source)
     local self = setmetatable({
-        name = source[1][1],
         source = source.id,
         _manager = manager,
     }, mt)
+    if source.type == 'emmyParam' then
+        self.name = source[1][1]
+    elseif source.type == 'emmyVararg' then
+        self.name = '...'
+    end
     return self
 end

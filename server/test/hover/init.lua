@@ -609,15 +609,36 @@ function f()
   -> A|B, C
 ]]
 
---TEST [[
------@generic T
------@param x T
------@return T
---local function f(x)
---end
---
---local <?r?> = f(1)
---]]
---[[
---local r: number = 1
---]]
+TEST [[
+---@generic T
+---@param x T
+---@return T
+local function f(x)
+end
+
+local <?r?> = f(1)
+]]
+[[
+local r: number
+]]
+
+TEST [[
+---@vararg Class
+local function f(...)
+    local _, <?x?> = ...
+end
+f(1, 2, 3)
+]]
+[[
+local x: *Class = 2
+]]
+
+TEST [[
+---@vararg Class
+local function f(...)
+    local _, <?x?> = ...
+end
+]]
+[[
+local x: *Class {}
+]]

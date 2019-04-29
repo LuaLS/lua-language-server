@@ -823,6 +823,9 @@ function mt:doSet(action)
     local value = self:getExp(exps)
     local values = {}
     if value.type == 'multi' then
+        if not emmy then
+            emmy = value:getEmmy()
+        end
         value:eachValue(function (i, v)
             values[i] = v
         end)
@@ -846,6 +849,9 @@ function mt:doLocal(action)
         local value = self:getExp(exps)
         values = {}
         if value.type == 'multi' then
+            if not emmy then
+                emmy = value:getEmmy()
+            end
             value:eachValue(function (i, v)
                 values[i] = v
             end)

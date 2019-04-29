@@ -15,7 +15,7 @@ cd -
 ./3rd/luamake/luamake
 
 cd server
-mv bin/*.so .
+cp bin/*.so .
 ./bin/lua-language-server publish.lua
 cd -
 

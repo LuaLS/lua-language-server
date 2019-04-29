@@ -1,10 +1,19 @@
 local fs = require 'bee.filesystem'
 
-ROOT = fs.current_path()
+-- ROOT = fs.current_path()
+local function get_script_path()
+   local str = debug.getinfo(2, "S").source:sub(2)
+   return str:match("(.*/)")
+end
+
+-- construct fs.path
+ROOT = fs.path(get_script_path())
+
 LANG = LANG or 'en-US'
 
 package.path = (ROOT / 'src' / '?.lua'):string()
      .. ';' .. (ROOT / 'src' / '?' / 'init.lua'):string()
+package.cpath = (ROOT / 'bin' / '?.so' ):string()
 
 --collectgarbage('generational')
 collectgarbage("setpause", 100)

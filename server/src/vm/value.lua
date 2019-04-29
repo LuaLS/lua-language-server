@@ -344,7 +344,6 @@ function mt:mergeValue(value)
     if not value then
         return
     end
-    local global = self._global or value._global
     local list = {self, value}
     local pos = 1
     while true do
@@ -360,6 +359,7 @@ function mt:mergeValue(value)
 
         a:flushChild()
         b:flushChild()
+        local global = a._global or b._global
         if b._child then
             if not a._child then
                 a._child = {}

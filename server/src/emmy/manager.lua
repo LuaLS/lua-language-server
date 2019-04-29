@@ -1,11 +1,12 @@
-local listMgr = require 'vm.list'
-local newClass = require 'emmy.class'
-local newType = require 'emmy.type'
+local listMgr     = require 'vm.list'
+local newClass    = require 'emmy.class'
+local newType     = require 'emmy.type'
 local newTypeUnit = require 'emmy.typeUnit'
-local newAlias = require 'emmy.alias'
-local newParam = require 'emmy.param'
-local newReturn = require 'emmy.return'
-local newField = require 'emmy.field'
+local newAlias    = require 'emmy.alias'
+local newParam    = require 'emmy.param'
+local newReturn   = require 'emmy.return'
+local newField    = require 'emmy.field'
+local newGeneric  = require 'emmy.generic'
 
 local mt = {}
 mt.__index = mt
@@ -107,15 +108,23 @@ function mt:addAlias(source, typeObj)
     return aliasObj
 end
 
-function mt:addParam(source, typeObj)
+function mt:addParam(source, bind)
     local paramObj = newParam(self, source)
-    paramObj:bindType(typeObj)
+    if bind.type == 'emmy.type' then
+        paramObj:bindType(bind)
+    elseif bind.type == 'emmy.generic' then
+        paramObj:bindGeneric(bind)
+    end
     return paramObj
 end
 
-function mt:addReturn(source, typeObj)
+function mt:addReturn(source, bind)
     local returnObj = newReturn(self, source)
-    returnObj:bindType(typeObj)
+    if bind.type == 'emmy.type' then
+        returnObj:bindType(bind)
+    elseif bind.type == 'emmy.generic' then
+        returnObj:bindGeneric(bind)
+    end
     return returnObj
 end
 
@@ -124,6 +133,11 @@ function mt:addField(source, typeObj, value)
     fieldObj:bindType(typeObj)
     fieldObj:bindValue(value)
     return fieldObj
+end
+
+function mt:addGeneric(defs)
+    local genericObj = newGeneric(self, defs)
+    return genericObj
 end
 
 function mt:remove()

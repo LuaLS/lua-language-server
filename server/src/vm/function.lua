@@ -259,6 +259,13 @@ function mt:run(vm)
     -- 向局部变量中填充参数
     for i, loc in ipairs(self.args) do
         loc:setValue(self.argValues[i])
+        local emmyParam = self:findEmmyParamByName(loc:getName())
+        if emmyParam then
+            local genericObj = emmyParam:bindGeneric()
+            if genericObj then
+                genericObj:setValue(loc:getValue())
+            end
+        end
     end
     if self._dots then
         self._dots = createMulti()
@@ -271,7 +278,17 @@ function mt:run(vm)
     if self._emmyReturns then
         for i, rtn in ipairs(self._emmyReturns) do
             local value = vm:createValue('nil', rtn:getSource())
-            value:setEmmy(rtn:bindType())
+            local typeObj = rtn:bindType()
+            if typeObj then
+                value:setEmmy(typeObj)
+            end
+            local genericObj = rtn:bindGeneric()
+            if genericObj then
+                local destValue = genericObj:getValue()
+                if destValue then
+                    value:mergeType(destValue)
+                end
+            end
             self:setReturn(i, value)
         end
     end
@@ -307,7 +324,10 @@ function mt:createArg(vm, arg)
         local emmyParam = self:findEmmyParamByName(arg[1])
         local value = valueMgr.create('nil', arg)
         if emmyParam then
-            value:setEmmy(emmyParam:bindType())
+            local typeObj = emmyParam:bindType()
+            if typeObj then
+                value:setEmmy(typeObj)
+            end
         end
         local loc = localMgr.create(arg[1], arg, value)
         self:saveUpvalue(arg[1], loc)

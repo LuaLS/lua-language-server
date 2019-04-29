@@ -4,6 +4,7 @@ function mt:clearEmmy()
     self._emmy = nil
     self._emmyParams = nil
     self._emmyReturns = nil
+    self._emmyGeneric = nil
 end
 
 function mt:doEmmy(action)
@@ -21,6 +22,7 @@ function mt:doEmmy(action)
     elseif tp == 'emmyField' then
         self:doEmmyField(action)
     elseif tp == 'emmyGeneric' then
+        self:doEmmyGeneric(action)
     elseif tp == 'emmyVararg' then
     elseif tp == 'emmyLanguage' then
     elseif tp == 'emmyArrayType' then
@@ -62,6 +64,12 @@ function mt:getEmmyReturns()
     local returns = self._emmyReturns
     self._emmyReturns = nil
     return returns
+end
+
+function mt:getEmmyGeneric()
+    local generic = self._emmyGeneric
+    self._emmyGeneric = nil
+    return generic
 end
 
 function mt:doEmmyClass(action)
@@ -120,25 +128,48 @@ function mt:doEmmyAlias(action)
     end
 end
 
+function mt:getGenericByType(type)
+    local generics = self._emmyGeneric
+    if not generics then
+        return
+    end
+    if #type > 1 then
+        return
+    end
+    local name = type[1][1]
+    for _, generic in ipairs(generics) do
+        if generic:getName() == name then
+            return generic
+        end
+    end
+    return nil
+end
+
 function mt:doEmmyParam(action)
     ---@type emmyMgr
     local emmyMgr = self.emmyMgr
     self:instantSource(action)
     self:instantSource(action[1])
-    local type = self:buildEmmyType(action[2])
+    local type = self:getGenericByType(action[2]) or self:buildEmmyType(action[2])
     local param = emmyMgr:addParam(action, type)
     action:set('emmy.param', param)
     self:addEmmyParam(param)
+    if self.lsp then
+        self.lsp.global:markGet(self:getUri())
+    end
 end
 
 function mt:doEmmyReturn(action)
     ---@type emmyMgr
     local emmyMgr = self.emmyMgr
     self:instantSource(action)
-    local type = self:buildEmmyType(action[1])
+    local type = self:getGenericByType(action[1]) or self:buildEmmyType(action[1])
     local rtn = emmyMgr:addReturn(action, type)
     action:set('emmy.return', rtn)
     self:addEmmyReturn(rtn)
+    if self.lsp then
+        self.lsp.global:markGet(self:getUri())
+    end
 end
 
 function mt:doEmmyField(action)
@@ -158,6 +189,24 @@ function mt:doEmmyField(action)
     end
     class:addField(field)
     action:set('target class', class)
+end
+
+function mt:doEmmyGeneric(action)
+    ---@type emmyMgr
+    local emmyMgr = self.emmyMgr
+    self:instantSource(action)
+
+    local defs = {}
+    for i, obj in ipairs(action) do
+        defs[i] = {}
+        defs[i].name = self:instantSource(obj[1])
+        if obj[2] then
+            defs[i].type = self:buildEmmyType(obj[2])
+        end
+    end
+
+    local generic = emmyMgr:addGeneric(defs)
+    self._emmyGeneric = generic
 end
 
 function mt:doEmmyIncomplete(action)

@@ -19,29 +19,64 @@ local TAB = setmetatable({}, { __index = function (self, n)
 end})
 
 local KEY = {}
+local RESERVED = {
+    ['and']      = true,
+    ['break']    = true,
+    ['do']       = true,
+    ['else']     = true,
+    ['elseif']   = true,
+    ['end']      = true,
+    ['false']    = true,
+    ['for']      = true,
+    ['function'] = true,
+    ['goto']     = true,
+    ['if']       = true,
+    ['in']       = true,
+    ['local']    = true,
+    ['nil']      = true,
+    ['not']      = true,
+    ['or']       = true,
+    ['repeat']   = true,
+    ['return']   = true,
+    ['then']     = true,
+    ['true']     = true,
+    ['until']    = true,
+    ['while']    = true,
+}
 
 function table.dump(tbl)
     if type(tbl) ~= 'table' then
         return ('%q'):format(tbl)
     end
     local lines = {}
+    local mark = {}
     lines[#lines+1] = '{'
     local function unpack(tbl, tab)
-        if tab > 10 then
-            return '<Deep Table>'
+        if tab > 10 and mark[tbl] then
+            lines[#lines+1] = TAB[tab+1] .. '"<Loop>"'
+            return
         end
+        mark[tbl] = true
         local keys = {}
+        local integerFormat = '[%d]'
+        if #tbl >= 10 then
+            local width = math.log(#tbl, 10)
+            integerFormat = ('[%%0%dd]'):format(math.ceil(width))
+        end
         for key in pairs(tbl) do
             if type(key) == 'string' then
-                if key == '' or key:find('[^%w_]') then
+                if not key:match('^[%a_][%w_]*$')
+                or #key >= 32
+                or RESERVED[key]
+                then
                     KEY[key] = ('[%q]'):format(key)
                 else
                     KEY[key] = key
                 end
             elseif mathType(key) == 'integer' then
-                KEY[key] = ('[%03d]'):format(key)
+                KEY[key] = integerFormat:format(key)
             else
-                KEY[key] = ('<%s>'):format(key)
+                KEY[key] = ('["<%s>"]'):format(key)
             end
             keys[#keys+1] = key
         end
@@ -60,14 +95,15 @@ function table.dump(tbl)
                 lines[#lines+1] = ('%s},'):format(TAB[tab+1])
             elseif tp == 'string' or tp == 'number' or tp == 'boolean' then
                 lines[#lines+1] = ('%s%s = %q,'):format(TAB[tab+1], KEY[key], value)
+            elseif tp == 'nil' then
             else
-                lines[#lines+1] = ('%s%s = <%s>,'):format(TAB[tab+1], KEY[key], value)
+                lines[#lines+1] = ('%s%s = %s,'):format(TAB[tab+1], KEY[key], tostring(value))
             end
         end
     end
     unpack(tbl, 0)
     lines[#lines+1] = '}'
-    return table.concat(lines, '\n')
+    return table.concat(lines, '\r\n')
 end
 
 local function sort_table(tbl)

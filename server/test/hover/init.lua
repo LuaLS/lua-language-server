@@ -608,3 +608,16 @@ end
 function f()
   -> A|B, C
 ]]
+
+--TEST [[
+-----@generic T
+-----@param x T
+-----@return T
+--local function f(x)
+--end
+--
+--local <?r?> = f(1)
+--]]
+--[[
+--local r: number = 1
+--]]

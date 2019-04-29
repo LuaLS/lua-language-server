@@ -17,6 +17,14 @@ function mt:bindType(type)
     end
 end
 
+function mt:bindGeneric(generic)
+    if generic then
+        self._bindGeneric = generic
+    else
+        return self._bindGeneric
+    end
+end
+
 return function (manager, source)
     local self = setmetatable({
         source = source.id,

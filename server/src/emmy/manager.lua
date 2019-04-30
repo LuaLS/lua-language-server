@@ -8,6 +8,7 @@ local newReturn    = require 'emmy.return'
 local newField     = require 'emmy.field'
 local newGeneric   = require 'emmy.generic'
 local newArrayType = require 'emmy.arrayType'
+local newTableType = require 'emmy.tableType'
 
 local mt = {}
 mt.__index = mt
@@ -107,6 +108,11 @@ function mt:addArrayType(source)
     typeUnit:setParent(typeObj)
     list[source.id] = typeUnit
     source:set('emmy.typeUnit', typeUnit)
+    return typeObj
+end
+
+function mt:addTableType(source, keyType, valueType)
+    local typeObj = newTableType(self, source, keyType, valueType)
     return typeObj
 end
 

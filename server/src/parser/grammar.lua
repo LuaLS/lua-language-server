@@ -577,7 +577,7 @@ EmmyLanguage    <-  MustEmmyName
 EmmyArrayType   <-  (MustEmmyName '[]')
                 ->  EmmyArrayType
 
-EmmyTableType   <-  (MustEmmyName '<' %s* EmmyType %s* ',' %s* EmmyType %s* '>')
+EmmyTableType   <-  ({} 'table' Cut '<' %s* EmmyType %s* ',' %s* EmmyType %s* '>' {})
                 ->  EmmyTableType
 
 EmmyFunctionType<-  ('fun' Cut %s* EmmyFunctionArgs? %s* EmmyFunctionRtn?)

@@ -190,6 +190,8 @@ function mt:getChild(index, source)
                 if type(index) == 'number' then
                     value = create(emmy:getName(), source)
                 end
+            elseif emmy.type == 'emmy.tableType' then
+                value = create(emmy:getValueType():getType(), source)
             end
         end
         if not value then
@@ -587,8 +589,12 @@ function mt:setEmmy(emmy)
         end)
     elseif emmy.type == 'emmy.arrayType' then
         ---@type EmmyArrayType
-        local EmmyArrayType = emmy
-        EmmyArrayType:setValue(self)
+        local emmyArrayType = emmy
+        emmyArrayType:setValue(self)
+    elseif emmy.type == 'emmy.tableType' then
+        ---@type EmmyTableType
+        local emmyTableType = emmy
+        emmyTableType:setValue(self)
     else
         return
     end

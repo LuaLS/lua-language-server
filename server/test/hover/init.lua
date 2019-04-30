@@ -691,3 +691,52 @@ end
 [[
 local k: integer
 ]]
+
+TEST [[
+---@type table<ClassA, ClassB>
+local <?x?>
+]]
+[[
+local x: {
+    [*ClassA]: ClassB,
+}
+]]
+
+TEST [[
+---@type string[]
+local t
+local <?x?> = t[1]
+]]
+[[
+local x: string
+]]
+
+TEST [[
+---@type string[]
+local t
+for _, <?x?> in ipairs(t) do
+end
+]]
+[[
+local x: string
+]]
+
+TEST [[
+---@type string[]
+local t
+for _, <?x?> in pairs(t) do
+end
+]]
+[[
+local x: string
+]]
+
+TEST [[
+---@type string[]
+local t
+for <?k?>, v in pairs(t) do
+end
+]]
+[[
+local k: integer
+]]

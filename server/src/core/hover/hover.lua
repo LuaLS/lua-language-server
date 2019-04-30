@@ -71,23 +71,28 @@ local function findClass(value)
     end)
 end
 
+local function formatKey(key)
+    local kType = type(key)
+    if kType == 'table' then
+        key = ('[*%s]'):format(key:getType())
+    elseif math.type(key) == 'integer' then
+        key = ('[%03d]'):format(key)
+    elseif kType == 'string' then
+        if key:find '^%d' or key:find '[^%w_]' then
+            key = ('[%q]'):format(key)
+        end
+    elseif key == '' then
+        key = '[*any]'
+    else
+        key = ('[%s]'):format(key)
+    end
+    return key
+end
+
 local function unpackTable(value)
     local lines = {}
     value:eachChild(function (key, child)
-        local kType = type(key)
-        if kType == 'table' then
-            key = ('[*%s]'):format(key:getType())
-        elseif math.type(key) == 'integer' then
-            key = ('[%03d]'):format(key)
-        elseif kType == 'string' then
-            if key:find '^%d' or key:find '[^%w_]' then
-                key = ('[%q]'):format(key)
-            end
-        elseif key == '' then
-            key = '[*any]'
-        else
-            key = ('[%s]'):format(key)
-        end
+        key = formatKey(key)
 
         local vType = type(child:getLiteral())
         if     vType == 'boolean'
@@ -101,8 +106,12 @@ local function unpackTable(value)
         end
     end)
     local emmy = value:getEmmy()
-    if emmy and emmy.type == 'emmy.arrayType' then
-        lines[#lines+1] = ('[*integer]: %s'):format(emmy:getName())
+    if emmy then
+        if emmy.type == 'emmy.arrayType' then
+            lines[#lines+1] = ('[*integer]: %s'):format(emmy:getName())
+        elseif emmy.type == 'emmy.tableType' then
+            lines[#lines+1] = ('[*%s]: %s'):format(emmy:getKeyType():getType(), emmy:getValueType():getType())
+        end
     end
     if #lines == 0 then
         return '{}'

@@ -143,6 +143,7 @@ function mt:setEmmy(emmy)
     if emmy.type ~= 'emmy.class'
     and emmy.type ~= 'emmy.type'
     and emmy.type ~= 'emmy.arrayType'
+    and emmy.type ~= 'emmy.tableType'
     then
         return
     end

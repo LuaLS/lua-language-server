@@ -33,8 +33,13 @@ function mt:callNext(func, values, source)
         local emmy = tbl:getEmmy()
         if emmy then
             if emmy.type == 'emmy.arrayType' then
-                local key = self:createValue('integer', self:getDefaultSource())
+                local key = self:createValue('integer', source)
                 local value = self:createValue(emmy:getName(), source)
+                func:setReturn(1, key)
+                func:setReturn(2, value)
+            elseif emmy.type == 'emmy.tableType' then
+                local key = self:createValue(emmy:getKeyType():getType(), source)
+                local value = self:createValue(emmy:getValueType():getType(), source)
                 func:setReturn(1, key)
                 func:setReturn(2, value)
             end

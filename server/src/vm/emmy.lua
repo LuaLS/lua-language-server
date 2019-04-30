@@ -29,6 +29,7 @@ function mt:doEmmy(action)
     elseif tp == 'emmyArrayType' then
         self:doEmmyArrayType(action)
     elseif tp == 'emmyTableType' then
+        self:doEmmyTableType(action)
     elseif tp == 'emmyFunctionType' then
     elseif tp == 'emmySee' then
     elseif tp == 'emmyIncomplete' then
@@ -230,6 +231,20 @@ function mt:doEmmyArrayType(action)
     self:instantSource(action)
     action:set('emmy class', action[1])
     local type = emmyMgr:addArrayType(action)
+    self._emmy = type
+    if self.lsp then
+        self.lsp.global:markGet(self:getUri())
+    end
+    return type
+end
+
+function mt:doEmmyTableType(action)
+    ---@type emmyMgr
+    local emmyMgr = self.emmyMgr
+    self:instantSource(action)
+    local keyType = self:buildEmmyType(action[1])
+    local valueType = self:buildEmmyType(action[2])
+    local type = emmyMgr:addTableType(action, keyType, valueType)
     self._emmy = type
     if self.lsp then
         self.lsp.global:markGet(self:getUri())

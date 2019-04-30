@@ -1168,11 +1168,14 @@ local Defs = {
         typeName.type = 'emmyArrayType'
         return typeName
     end,
-    EmmyTableType = function (typeName, keyType, valueType)
-        typeName.type = 'emmyTableType'
-        typeName[2] = keyType
-        typeName[3] = valueType
-        return typeName
+    EmmyTableType = function (start, keyType, valueType, finish)
+        return {
+            type = 'emmyTableType',
+            start = start,
+            finish = finish - 1,
+            [1] = keyType,
+            [2] = valueType,
+        }
     end,
     EmmyFunctionType = function (...)
         local result = {

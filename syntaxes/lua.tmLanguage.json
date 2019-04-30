@@ -3,39 +3,33 @@
 	"scopeName": "source.lua",
 	"patterns": [
 		{
-			"begin": "\\b(?:(local)\\s+)?(function)\\s*(?:\\s+([a-zA-Z_][a-zA-Z0-9_]*(?:([\\.:])[a-zA-Z_][a-zA-Z0-9_]*)?)\\s*)?(\\()",
+			"begin": "\\b(?:(local)\\s+)?(function)\\b",
 			"beginCaptures": {
 				"1": {
 					"name": "storage.modifier.local.lua"
 				},
 				"2": {
-					"name": "keyword.control.lua"
-				},
-				"3": {
-					"name": "entity.name.function.lua"
-				},
-				"4": {
-					"name": "punctuation.separator.parameter.lua"
-				},
-				"5": {
-					"name": "punctuation.definition.parameters.begin.lua"
+					"name": "storage.modifier.function.lua"
 				}
 			},
-			"end": "\\)",
+			"end": "(?=(\\()(?:[^\\)]*)(\\)))",
 			"endCaptures": {
-				"0": {
-					"name": "punctuation.definition.parameters.end.lua"
+				"1": {
+					"name": "punctuation.definition.parameters.begin.lua"
+				},
+				"2": {
+					"name": "punctuation.definition.parameters.finish.lua"
 				}
 			},
 			"name": "meta.function.lua",
 			"patterns": [
 				{
-					"match": "[a-zA-Z_][a-zA-Z0-9_]*",
-					"name": "variable.parameter.function.lua"
+					"match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\b(?=\\s*:)",
+					"name": "entity.name.class.lua"
 				},
 				{
-					"match": ",",
-					"name": "punctuation.separator.arguments.lua"
+					"match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\b",
+					"name": "variable.other.lua"
 				}
 			]
 		},
@@ -210,8 +204,16 @@
 			"name": "string.tag.lua"
 		},
 		{
-			"match": "\\b(break|do|else|for|if|elseif|goto|return|then|repeat|while|until|end|function|local(\\s*\\*toclose)?|in)\\b",
+			"match": "\\b(break|do|else|for|if|elseif|goto|return|then|repeat|while|until|end|in)\\b",
 			"name": "keyword.control.lua"
+		},
+		{
+			"match": "\\b(local(\\s*\\*toclose)?)\\b",
+			"name": "storage.modifier.local"
+		},
+		{
+			"match": "\\b(function)\\b",
+			"name": "storage.modifier.function"
 		},
 		{
 			"match": "(?<![^.]\\.|:)\\b(false|nil|true|_G|_VERSION|math\\.(pi|huge)|utf8\\.charpattern|io\\.(stdin|stdout|stderr)|package\\.(cpath|loaded|path|preload|searchers))\\b|(?<![.])\\.{3}(?!\\.)",

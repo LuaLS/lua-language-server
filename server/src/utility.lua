@@ -13,12 +13,17 @@ local setmetatable = setmetatable
 local tableSort = table.sort
 local mathType = math.type
 
+local function formatNumber(n)
+    local str = ('%.10f'):format(n)
+    str = str:gsub('%.?0*$', '')
+    return str
+end
+
 local TAB = setmetatable({}, { __index = function (self, n)
     self[n] = string_rep('\t', n)
     return self[n]
 end})
 
-local KEY = {}
 local RESERVED = {
     ['and']      = true,
     ['break']    = true,
@@ -58,6 +63,7 @@ function table.dump(tbl)
         end
         mark[tbl] = true
         local keys = {}
+        local keymap = {}
         local integerFormat = '[%d]'
         if #tbl >= 10 then
             local width = math.log(#tbl, 10)
@@ -69,35 +75,37 @@ function table.dump(tbl)
                 or #key >= 32
                 or RESERVED[key]
                 then
-                    KEY[key] = ('[%q]'):format(key)
+                    keymap[key] = ('[%q]'):format(key)
                 else
-                    KEY[key] = key
+                    keymap[key] = key
                 end
             elseif mathType(key) == 'integer' then
-                KEY[key] = integerFormat:format(key)
+                keymap[key] = integerFormat:format(key)
             else
-                KEY[key] = ('["<%s>"]'):format(key)
+                keymap[key] = ('["<%s>"]'):format(key)
             end
             keys[#keys+1] = key
         end
         local mt = getmetatable(tbl)
         if not mt or not mt.__pairs then
             tableSort(keys, function (a, b)
-                return KEY[a] < KEY[b]
+                return keymap[a] < keymap[b]
             end)
         end
         for _, key in ipairs(keys) do
             local value = tbl[key]
             local tp = type(value)
             if tp == 'table' then
-                lines[#lines+1] = ('%s%s = {'):format(TAB[tab+1], KEY[key])
+                lines[#lines+1] = ('%s%s = {'):format(TAB[tab+1], keymap[key])
                 unpack(value, tab+1)
                 lines[#lines+1] = ('%s},'):format(TAB[tab+1])
-            elseif tp == 'string' or tp == 'number' or tp == 'boolean' then
-                lines[#lines+1] = ('%s%s = %q,'):format(TAB[tab+1], KEY[key], value)
+            elseif tp == 'string' or tp == 'boolean' then
+                lines[#lines+1] = ('%s%s = %q,'):format(TAB[tab+1], keymap[key], value)
+            elseif tp == 'number' then
+                lines[#lines+1] = ('%s%s = %s,'):format(TAB[tab+1], keymap[key], formatNumber(value))
             elseif tp == 'nil' then
             else
-                lines[#lines+1] = ('%s%s = %s,'):format(TAB[tab+1], KEY[key], tostring(value))
+                lines[#lines+1] = ('%s%s = %s,'):format(TAB[tab+1], keymap[key], tostring(value))
             end
         end
     end

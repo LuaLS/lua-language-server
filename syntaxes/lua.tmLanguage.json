@@ -6,10 +6,10 @@
 			"begin": "\\b(?:(local)\\s+)?(function)\\b",
 			"beginCaptures": {
 				"1": {
-					"name": "storage.modifier.local.lua"
+					"name": "keyword.local.lua"
 				},
 				"2": {
-					"name": "storage.modifier.function.lua"
+					"name": "keyword.control.lua"
 				}
 			},
 			"end": "(?=(\\()(?:[^\\)]*)(\\)))",
@@ -209,11 +209,11 @@
 		},
 		{
 			"match": "\\b(local(\\s*\\*toclose)?)\\b",
-			"name": "storage.modifier.local"
+			"name": "keyword.local.lua"
 		},
 		{
 			"match": "\\b(function)\\b",
-			"name": "storage.modifier.function"
+			"name": "keyword.control.lua"
 		},
 		{
 			"match": "(?<![^.]\\.|:)\\b(false|nil|true|_G|_VERSION|math\\.(pi|huge)|utf8\\.charpattern|io\\.(stdin|stdout|stderr)|package\\.(cpath|loaded|path|preload|searchers))\\b|(?<![.])\\.{3}(?!\\.)",

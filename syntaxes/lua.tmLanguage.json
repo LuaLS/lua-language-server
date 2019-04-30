@@ -216,7 +216,7 @@
 			"name": "keyword.control.lua"
 		},
 		{
-			"match": "(?<![^.]\\.|:)\\b(false|nil|true|_G|_VERSION|math\\.(pi|huge)|utf8\\.charpattern|io\\.(stdin|stdout|stderr)|package\\.(cpath|loaded|path|preload|searchers))\\b|(?<![.])\\.{3}(?!\\.)",
+			"match": "(?<![^.]\\.|:)\\b(false|nil|true|_G|_VERSION|math\\.(pi|huge)|utf8\\.charpattern|io\\.(stdin|stdout|stderr)|package\\.(cpath|loaded|loaders|path|preload|searchers))\\b|(?<![.])\\.{3}(?!\\.)",
 			"name": "constant.language.lua"
 		},
 		{

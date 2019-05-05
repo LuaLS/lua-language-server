@@ -141,9 +141,6 @@ local function buildLocalFunction(vm, source, used, callback)
         return
     end
     local name = getName(source.name)
-    if name == '' then
-        return
-    end
     local hvr = hoverFunction(name, value:getFunction())
     if not hvr then
         return
@@ -169,9 +166,6 @@ local function buildFunction(vm, source, used, callback)
         return
     end
     local name = getName(source.name)
-    if name == '' then
-        return
-    end
     local func = value:getFunction()
     if not func then
         return

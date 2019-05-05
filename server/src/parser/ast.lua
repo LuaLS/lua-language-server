@@ -738,8 +738,8 @@ local Defs = {
             local last = args[max]
             pushError {
                 type = 'MISS_NAME',
-                start = last+1,
-                finish = last+1,
+                start = last,
+                finish = last,
             }
         end
         if #list == 0 then
@@ -1276,13 +1276,13 @@ local Defs = {
     DirtyName = function (pos)
         pushError {
             type = 'MISS_NAME',
-            start = pos,
-            finish = pos,
+            start = pos-1,
+            finish = pos-1,
         }
         return {
             type   = 'name',
-            start  = pos,
-            finish = pos,
+            start  = pos-1,
+            finish = pos-1,
             [1]    = ''
         }
     end,

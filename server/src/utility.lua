@@ -208,6 +208,9 @@ function io.load(file_path)
     if not f then
         return nil, e
     end
+    if f:read(3) ~= '\xEF\xBB\xBF' then
+        f:seek("set")
+    end
     local buf = f:read 'a'
     f:close()
     return buf

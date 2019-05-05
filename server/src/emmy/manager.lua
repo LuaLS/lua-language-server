@@ -9,6 +9,7 @@ local newField     = require 'emmy.field'
 local newGeneric   = require 'emmy.generic'
 local newArrayType = require 'emmy.arrayType'
 local newTableType = require 'emmy.tableType'
+local newFuncType  = require 'emmy.funcType'
 
 local mt = {}
 mt.__index = mt
@@ -113,6 +114,11 @@ end
 
 function mt:addTableType(source, keyType, valueType)
     local typeObj = newTableType(self, source, keyType, valueType)
+    return typeObj
+end
+
+function mt:addFunctionType(source)
+    local typeObj = newFuncType(self, source)
     return typeObj
 end
 

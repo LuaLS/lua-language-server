@@ -13,6 +13,7 @@ local TypeLevel = {
     ['number']   = 0.6,
 }
 
+---@class value
 local mt = {}
 mt.__index = mt
 mt.type = 'value'
@@ -595,6 +596,10 @@ function mt:setEmmy(emmy)
         ---@type EmmyTableType
         local emmyTableType = emmy
         emmyTableType:setValue(self)
+    elseif emmy.type == 'emmy.functionType' then
+        ---@type EmmyFunctionType
+        local emmyFuncType = emmy
+        emmyFuncType:setValue(self)
     else
         return
     end

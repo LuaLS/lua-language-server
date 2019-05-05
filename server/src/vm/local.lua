@@ -136,18 +136,19 @@ function mt:getSource()
     return listMgr.get(self.source)
 end
 
+local EMMY_TYPE = {
+    ['emmy.class']        = true,
+    ['emmy.type']         = true,
+    ['emmy.arrayType']    = true,
+    ['emmy.tableType']    = true,
+    ['emmy.functionType'] = true,
+}
+
 function mt:setEmmy(emmy)
     if not emmy then
         return
     end
-    if emmy.type ~= 'emmy.class'
-    and emmy.type ~= 'emmy.type'
-    and emmy.type ~= 'emmy.arrayType'
-    and emmy.type ~= 'emmy.tableType'
-    then
-        return
-    end
-    if self.value then
+    if self.value and EMMY_TYPE[emmy.type] then
         self.value:setEmmy(emmy)
     end
 end

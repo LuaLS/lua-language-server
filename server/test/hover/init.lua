@@ -721,3 +721,12 @@ end
 [[
 local k: *ClassA
 ]]
+
+TEST [[
+---@type fun(x: number, y: number):boolean
+local <?f?>
+]]
+[[
+function f(x: number, y: number)
+  -> boolean
+]]

@@ -31,6 +31,7 @@ function mt:doEmmy(action)
     elseif tp == 'emmyTableType' then
         self:doEmmyTableType(action)
     elseif tp == 'emmyFunctionType' then
+        self:doEmmyFunctionType(action)
     elseif tp == 'emmySee' then
     elseif tp == 'emmyIncomplete' then
         self:doEmmyIncomplete(action)
@@ -225,12 +226,17 @@ function mt:doEmmyVararg(action)
     end
 end
 
-function mt:doEmmyArrayType(action)
+function mt:buildEmmyArrayType(action)
     ---@type emmyMgr
     local emmyMgr = self.emmyMgr
     self:instantSource(action)
     action:set('emmy class', action[1])
     local type = emmyMgr:addArrayType(action)
+    return type
+end
+
+function mt:doEmmyArrayType(action)
+    local type = self:buildEmmyArrayType(action)
     self._emmy = type
     if self.lsp then
         self.lsp.global:markGet(self:getUri())
@@ -238,18 +244,54 @@ function mt:doEmmyArrayType(action)
     return type
 end
 
-function mt:doEmmyTableType(action)
+function mt:buildEmmyTableType(action)
     ---@type emmyMgr
     local emmyMgr = self.emmyMgr
     self:instantSource(action)
     local keyType = self:buildEmmyType(action[1])
     local valueType = self:buildEmmyType(action[2])
     local type = emmyMgr:addTableType(action, keyType, valueType)
+    return type
+end
+
+function mt:doEmmyTableType(action)
+    local type = self:buildEmmyTableType(action)
     self._emmy = type
     if self.lsp then
         self.lsp.global:markGet(self:getUri())
     end
     return type
+end
+
+function mt:doEmmyFunctionType(action)
+    ---@type emmyMgr
+    local emmyMgr = self.emmyMgr
+    self:instantSource(action)
+    local func = emmyMgr:addFunctionType(action)
+    for i = 1, #action // 2 do
+        local nameSource = action[i*2-1]
+        local typeSource = action[i*2]
+        local paramType = self:buildEmmyAnyType(typeSource)
+        func:addParam(nameSource[1], paramType)
+    end
+    local returnType = self:buildEmmyAnyType(action[#action])
+    func:addReturn(returnType)
+    self._emmy = func
+    return func
+end
+
+function mt:buildEmmyAnyType(source)
+    if source.type == 'emmyType' then
+        return self:buildEmmyType(source)
+    elseif source.type == 'emmyArrayType' then
+        return self:buildEmmyArrayType(source)
+    elseif source.type == 'emmyTableType' then
+        return self:buildEmmyTableType(source)
+    elseif source.type == 'emmyFunctionType' then
+        return self:buildEmmyFunctionType(source)
+    else
+        error('Unknown emmy type: ' .. table.dump(source))
+    end
 end
 
 function mt:doEmmyIncomplete(action)

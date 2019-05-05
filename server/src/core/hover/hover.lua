@@ -1,6 +1,7 @@
 local findLib    = require 'core.find_lib'
 local getFunctionHover = require 'core.hover.function'
 local getFunctionHoverAsLib = require 'core.hover.lib_function'
+local getFunctionHoverAsEmmy = require 'core.hover.emmy_function'
 local buildValueName = require 'core.hover.name'
 
 local OriginTypes = {
@@ -198,6 +199,7 @@ end
 
 local function hoverAsValue(source, lsp, select)
     local lib, fullkey = findLib(source)
+    ---@type value
     local value = source:findValue()
     local name = fullkey or buildValueName(source)
 
@@ -207,8 +209,13 @@ local function hoverAsValue(source, lsp, select)
         if lib then
             hover = getFunctionHoverAsLib(name, lib, object, select)
         else
-            local func = value:getFunction()
-            hover = getFunctionHover(name, func, object, select)
+            local emmy = value:getEmmy()
+            if emmy and emmy.type == 'emmy.functionType' then
+                hover = getFunctionHoverAsEmmy(name, emmy, object, select)
+            else
+                local func = value:getFunction()
+                hover = getFunctionHover(name, func, object, select)
+            end
         end
     else
         hover = getValueHover(source, name, value, lib)

@@ -552,7 +552,7 @@ local function searchCallArg(vm, source, word, callback, pos)
             if enum.name == name and enum.enum then
                 if matchKey(word, enum.enum) then
                     local label, textEdit
-                    if source.type ~= arg.type then
+                    if source.type ~= (arg and arg.type) then
                         label = ('%q'):format(enum.enum)
                     end
                     if source.type ~= 'call' then

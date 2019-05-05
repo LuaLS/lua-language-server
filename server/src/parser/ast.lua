@@ -738,8 +738,8 @@ local Defs = {
             local last = args[max]
             pushError {
                 type = 'MISS_NAME',
-                start = last,
-                finish = last,
+                start = last+1,
+                finish = last+1,
             }
         end
         if #list == 0 then
@@ -1119,8 +1119,8 @@ local Defs = {
         pushError {
             type = 'MISS_NAME',
             level = 'warning',
-            start = pos-1,
-            finish = pos-1,
+            start = pos,
+            finish = pos,
         }
         return {
             type   = 'emmyName',
@@ -1177,11 +1177,14 @@ local Defs = {
             [2] = valueType,
         }
     end,
-    EmmyFunctionType = function (...)
+    EmmyFunctionType = function (start, ...)
         local result = {
+            start = start,
             type = 'emmyFunctionType',
             ...
         }
+        result.finish = result[#result] - 1
+        result[#result] = nil
         return result
     end,
     EmmyAlias = function (name, emmyName, ...)
@@ -1276,8 +1279,8 @@ local Defs = {
     DirtyName = function (pos)
         pushError {
             type = 'MISS_NAME',
-            start = pos-1,
-            finish = pos-1,
+            start = pos,
+            finish = pos,
         }
         return {
             type   = 'name',

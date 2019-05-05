@@ -1,3 +1,5 @@
+local functionMgr = require 'vm.function'
+local library = require 'vm.library'
 local mt = require 'vm.manager'
 
 function mt:clearEmmy()
@@ -267,17 +269,30 @@ function mt:doEmmyFunctionType(action)
     ---@type emmyMgr
     local emmyMgr = self.emmyMgr
     self:instantSource(action)
-    local func = emmyMgr:addFunctionType(action)
+    local funcObj = emmyMgr:addFunctionType(action)
+    ---@type function
+    local func = functionMgr.create(action)
     for i = 1, #action // 2 do
         local nameSource = action[i*2-1]
         local typeSource = action[i*2]
         local paramType = self:buildEmmyAnyType(typeSource)
-        func:addParam(nameSource[1], paramType)
+        funcObj:addParam(nameSource[1], paramType)
+        local value = self:createValue(paramType:getType(), typeSource)
+        value:setEmmy(paramType)
+        self:instantSource(nameSource)
+        func:addArg(nameSource[1], nameSource, value)
     end
-    local returnType = self:buildEmmyAnyType(action[#action])
-    func:addReturn(returnType)
-    self._emmy = func
-    return func
+    local returnSource = action[#action]
+    if returnSource then
+        local returnType = self:buildEmmyAnyType(returnSource)
+        funcObj:addReturn(returnType)
+        local value = self:createValue(returnType:getType(), returnSource)
+        value:setEmmy(returnType)
+        func:setReturn(1, value)
+    end
+    funcObj:bindFunction(func)
+    self._emmy = funcObj
+    return funcObj
 end
 
 function mt:buildEmmyAnyType(source)

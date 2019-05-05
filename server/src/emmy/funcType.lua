@@ -39,6 +39,14 @@ function mt:getReturn()
     return self._return
 end
 
+function mt:bindFunction(func)
+    if func then
+        self._bindFunction = func
+    else
+        return self._bindFunction
+    end
+end
+
 return function (manager, source)
     local self = setmetatable({
         source = source.id,

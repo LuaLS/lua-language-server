@@ -1,6 +1,7 @@
 local findSource = require 'core.find_source'
 local getFunctionHover = require 'core.hover.function'
 local getFunctionHoverAsLib = require 'core.hover.lib_function'
+local getFunctionHoverAsEmmy = require 'core.hover.emmy_function'
 local sourceMgr = require 'vm.source'
 local config = require 'config'
 local matchKey = require 'core.matchKey'
@@ -49,7 +50,12 @@ local function getDucumentation(name, value)
         if lib then
             hover = getFunctionHoverAsLib(name, lib)
         else
-            hover = getFunctionHover(name, value:getFunction())
+            local emmy = value:getEmmy()
+            if emmy and emmy.type == 'emmy.functionType' then
+                hover = getFunctionHoverAsEmmy(name, emmy)
+            else
+                hover = getFunctionHover(name, value:getFunction())
+            end
         end
         if not hover then
             return nil

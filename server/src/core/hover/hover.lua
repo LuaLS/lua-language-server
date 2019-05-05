@@ -182,7 +182,7 @@ local function getValueHover(source, name, value, lib)
         text = ('%s %s: %s'):format(tp, name, unpackTable(value))
     else
         if literal == nil then
-            if class then
+            if class and not OriginTypes[class] then
                 text = ('%s %s: %s %s'):format(tp, name, valueType, unpackTable(value))
             else
                 text = ('%s %s: %s'):format(tp, name, valueType)

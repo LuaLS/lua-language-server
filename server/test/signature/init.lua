@@ -6,8 +6,8 @@ rawset(_G, 'TEST', true)
 
 function TEST(script)
     return function (expect)
-        local pos = script:find('@', 1, true)
-        local new_script = script:gsub('@', '')
+        local pos = script:find('$', 1, true)
+        local new_script = script:gsub('%$', '')
         local ast = parser:ast(new_script, 'lua', 'Lua 5.3')
         local vm = buildVM(ast)
         assert(vm)
@@ -33,7 +33,7 @@ TEST [[
 local function x(a, b)
 end
 
-x(@
+x($
 ]]
 {
     label = "function x(a: any, b: any)",
@@ -44,7 +44,7 @@ TEST [[
 local function x(a, b)
 end
 
-x(@)
+x($)
 ]]
 {
     label = "function x(a: any, b: any)",
@@ -55,7 +55,7 @@ TEST [[
 local function x(a, b)
 end
 
-x(xxx@)
+x(xxx$)
 ]]
 {
     label = "function x(a: any, b: any)",
@@ -66,7 +66,7 @@ TEST [[
 local function x(a, b)
 end
 
-x(xxx, @)
+x(xxx, $)
 ]]
 {
     label = "function x(a: any, b: any)",
@@ -77,7 +77,7 @@ TEST [[
 function mt:f(a)
 end
 
-mt:f(@
+mt:f($
 ]]
 {
     label = 'function mt:f(a: any)',
@@ -85,7 +85,7 @@ mt:f(@
 }
 
 TEST [[
-(''):sub(@
+(''):sub($
 ]]
 {
     label = [[
@@ -96,7 +96,7 @@ function *string:sub(i: integer [, j: integer(-1)])
 }
 
 TEST [[
-(''):sub(1)@
+(''):sub(1)$
 ]]
 (nil)
 
@@ -104,16 +104,29 @@ TEST [[
 local function f(a, b, c)
 end
 
-f(1, 'string@')
+f(1, 'string$')
 ]]
 (nil)
 
 TEST [[
-pcall(function () @ end)
+pcall(function () $ end)
 ]]
 (nil)
 
 TEST [[
-table.unpack {@}
+table.unpack {$}
 ]]
 (nil)
+
+TEST [[
+---@type fun(x: number, y: number):boolean
+local zzzz
+zzzz($)
+]]
+{
+    label = [[
+function zzzz(x: number, y: number)
+  -> boolean
+]],
+    arg = {15, 23},
+}

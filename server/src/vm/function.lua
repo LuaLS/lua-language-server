@@ -349,15 +349,19 @@ function mt:findEmmyParamByName(name)
     return nil
 end
 
+function mt:addArg(name, source, value)
+    local loc = localMgr.create(name, source, value)
+    self:saveUpvalue(name, loc)
+    self.args[#self.args+1] = loc
+end
+
 function mt:createArg(vm, arg)
     vm:instantSource(arg)
     arg:set('arg', self)
     if arg.type == 'name' then
+        vm:instantSource(arg)
         local value = valueMgr.create('nil', arg)
-        local loc = localMgr.create(arg[1], arg, value)
-        self:saveUpvalue(arg[1], loc)
-        self.args[#self.args+1] = loc
-
+        self:addArg(arg[1], arg, value)
     elseif arg.type == '...' then
         self._dots = createMulti()
     end

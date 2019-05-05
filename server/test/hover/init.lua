@@ -730,3 +730,21 @@ local <?f?>
 function f(x: number, y: number)
   -> boolean
 ]]
+
+TEST [[
+---@type fun(x: number, y: number):boolean
+local f
+f(<?a?>)
+]]
+[[
+global a: number
+]]
+
+TEST [[
+---@type fun(x: number, y: number):boolean
+local f
+local <?r?> = f()
+]]
+[[
+local r: boolean
+]]

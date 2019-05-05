@@ -600,6 +600,7 @@ function mt:setEmmy(emmy)
         ---@type EmmyFunctionType
         local emmyFuncType = emmy
         emmyFuncType:setValue(self)
+        self:setFunction(emmyFuncType:bindFunction())
     else
         return
     end

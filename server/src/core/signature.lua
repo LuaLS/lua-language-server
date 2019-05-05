@@ -1,5 +1,6 @@
 local getFunctionHover = require 'core.hover.function'
 local getFunctionHoverAsLib = require 'core.hover.lib_function'
+local getFunctionHoverAsEmmy = require 'core.hover.emmy_function'
 local findLib = require 'core.find_lib'
 local buildValueName = require 'core.hover.name'
 local findSource = require 'core.find_source'
@@ -66,7 +67,12 @@ local function getHover(call, pos)
     if lib then
         hover = getFunctionHoverAsLib(name, lib, object, select)
     else
-        hover = getFunctionHover(name, value:getFunction(), object, select)
+        local emmy = value:getEmmy()
+        if emmy and emmy.type == 'emmy.functionType' then
+            hover = getFunctionHoverAsEmmy(name, emmy, object, select)
+        else
+            hover = getFunctionHover(name, value:getFunction(), object, select)
+        end
     end
     if hover and hover.argLabel then
         return hover

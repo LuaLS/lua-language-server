@@ -280,6 +280,12 @@ function mt:reCompile()
             obj:kill()
         end
     end
+    for _, obj in pairs(self._file) do
+        if obj.vm then
+            obj.vm:remove()
+            obj.vm = nil
+        end
+    end
 
     self.global = core.global(self)
     self.chain  = chainMgr()

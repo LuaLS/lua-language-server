@@ -41,10 +41,11 @@ return function (lsp, params)
     end
 
     return function (response)
+        local clock = os.clock()
         timerCache[uri] = ac.loop(0.1, function (t)
             local vm, lines = lsp:getVM(uri)
             if not vm then
-                if not lsp:isWaitingCompile() then
+                if os.clock() - clock > 10 then
                     t:remove()
                     timerCache[uri] = nil
                     response(nil)
@@ -67,5 +68,6 @@ return function (lsp, params)
 
             response(symbols)
         end)
+        timerCache[uri]:onTimer()
     end
 end

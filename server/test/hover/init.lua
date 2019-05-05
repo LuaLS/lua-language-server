@@ -703,40 +703,21 @@ local x: {
 ]]
 
 TEST [[
----@type string[]
-local t
-local <?x?> = t[1]
-]]
-[[
-local x: string
-]]
-
-TEST [[
----@type string[]
-local t
-for _, <?x?> in ipairs(t) do
-end
-]]
-[[
-local x: string
-]]
-
-TEST [[
----@type string[]
+---@type table<ClassA, ClassB>
 local t
 for _, <?x?> in pairs(t) do
 end
 ]]
 [[
-local x: string
+local x: *ClassB
 ]]
 
 TEST [[
----@type string[]
+---@type table<ClassA, ClassB>
 local t
 for <?k?>, v in pairs(t) do
 end
 ]]
 [[
-local k: integer
+local k: *ClassA
 ]]

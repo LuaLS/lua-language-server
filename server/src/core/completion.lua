@@ -512,7 +512,7 @@ end
 local function searchEnumAsLib(vm, source, word, callback, pos, args, lib)
     local select = #args + 1
     for i, arg in ipairs(args) do
-        if arg.start <= pos and arg.finish >= pos - 1 then
+        if arg.start <= pos and arg.finish >= pos then
             select = i
             break
         end
@@ -555,7 +555,7 @@ end
 local function searchEnumAsEmmyParams(vm, source, word, callback, pos, args, func)
     local select = #args + 1
     for i, arg in ipairs(args) do
-        if arg.start <= pos and arg.finish >= pos - 1 then
+        if arg.start <= pos and arg.finish >= pos then
             select = i
             break
         end

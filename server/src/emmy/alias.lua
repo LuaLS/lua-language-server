@@ -21,11 +21,22 @@ function mt:bindType(type)
     end
 end
 
+function mt:addEnum(enum)
+    self._enum[#self._enum+1] = enum
+end
+
+function mt:eachEnum(callback)
+    for _, enum in ipairs(self._enum) do
+        callback(enum)
+    end
+end
+
 return function (manager, source)
     local self = setmetatable({
         name = source[1][1],
         source = source.id,
         _manager = manager,
+        _enum = {},
     }, mt)
     return self
 end

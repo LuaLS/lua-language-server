@@ -426,3 +426,7 @@ TEST [[
 ---@field <!x!> Class
 ---@field <!x!> Class
 ]]
+
+TEST [[
+---@class Class : any
+]]

@@ -807,28 +807,28 @@ TEST [[
 }
 
 TEST [[
----@class ABC
----@class BBC : $
+---@class ZABC
+---@class ZBBC : Z$
 ]]
 {
     {
-        label = 'ABC',
+        label = 'ZABC',
         kind = CompletionItemKind.Class,
     },
     {
-        label = 'BBC',
+        label = 'ZBBC',
         kind = CompletionItemKind.Class,
     },
 }
 
 TEST [[
----@class abc
+---@class zabc
 local abcd
----@type a$
+---@type za$
 ]]
 {
     {
-        label = 'abc',
+        label = 'zabc',
         kind = CompletionItemKind.Class,
     },
 }
@@ -838,32 +838,27 @@ TEST [[
 local abcd
 ---@type $
 ]]
-{
-    {
-        label = 'abc',
-        kind = CompletionItemKind.Class,
-    },
-}
+(EXISTS)
 
 TEST [[
----@class abc
+---@class zabc
 local abcd
----@type xxx|$
+---@type zxxx|z$
 ]]
 {
     {
-        label = 'abc',
+        label = 'zabc',
         kind = CompletionItemKind.Class,
     }
 }
 
 TEST [[
----@alias abc abb
----@type a$
+---@alias zabc zabb
+---@type za$
 ]]
 {
     {
-        label = 'abc',
+        label = 'zabc',
         kind = CompletionItemKind.Class,
     },
 }
@@ -875,6 +870,10 @@ TEST [[
 {
     {
         label = 'Class',
+        kind = CompletionItemKind.Class,
+    },
+    {
+        label = 'function',
         kind = CompletionItemKind.Class,
     },
 }

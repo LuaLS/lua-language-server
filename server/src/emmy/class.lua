@@ -50,11 +50,11 @@ function mt:eachField(callback)
     end
 end
 
-return function (manager, source)
+return function (manager, name, extends, source)
     local self = setmetatable({
-        name = source[1][1],
+        name = name,
         source = source.id,
-        extends = source[2] and source[2][1],
+        extends = extends,
         _manager = manager,
     }, mt)
     return self

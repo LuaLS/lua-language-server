@@ -1,4 +1,5 @@
 local listMgr      = require 'vm.list'
+local sourceMgr    = require 'vm.source'
 local newClass     = require 'emmy.class'
 local newType      = require 'emmy.type'
 local newTypeUnit  = require 'emmy.typeUnit'
@@ -81,11 +82,17 @@ function mt:getClass(name)
     return list
 end
 
+function mt:newClass(name, extends, source)
+    local list = self:getClass(name)
+    list[source.id] = newClass(self, name, extends, source)
+    return list[source.id]
+end
+
 function mt:addClass(source)
     local className = source[1][1]
-    local list = self:getClass(className)
-    list[source.id] = newClass(self, source)
-    return list[source.id]
+    local extends = source[2] and source[2][1]
+    local class = self:newClass(className, extends, source)
+    return class
 end
 
 function mt:addType(source)
@@ -196,5 +203,18 @@ return function ()
     local self = setmetatable({
         _class = {},
     }, mt)
+
+    local source = sourceMgr.dummy()
+    self:newClass('any',       nil,     source)
+    self:newClass('string',   'any',    source)
+    self:newClass('number',   'any',    source)
+    self:newClass('integer',  'number', source)
+    self:newClass('boolean',  'any',    source)
+    self:newClass('table',    'any',    source)
+    self:newClass('function', 'any',    source)
+    self:newClass('nil',      'any',    source)
+    self:newClass('userdata', 'any',    source)
+    self:newClass('thread',   'any',    source)
+
     return self
 end

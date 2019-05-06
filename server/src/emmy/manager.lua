@@ -138,6 +138,9 @@ function mt:addParam(source, bind)
     elseif bind.type == 'emmy.generic' then
         paramObj:bindGeneric(bind)
     end
+    for i = 3, #source do
+        paramObj:addEnum(source[i][1])
+    end
     return paramObj
 end
 

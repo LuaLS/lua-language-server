@@ -349,6 +349,15 @@ function mt:findEmmyParamByName(name)
     return nil
 end
 
+function mt:findEmmyParamByIndex(index)
+    local arg = self.args[index]
+    if not arg then
+        return nil
+    end
+    local name = arg:getName()
+    return self:findEmmyParamByName(name)
+end
+
 function mt:addArg(name, source, value)
     local loc = localMgr.create(name, source, value)
     self:saveUpvalue(name, loc)

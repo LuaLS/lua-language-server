@@ -1055,3 +1055,47 @@ end
         kind = CompletionItemKind.Keyword,
     },
 }
+
+TEST [[
+---@param x string | "'AAA'" | "'BBB'" | "'CCC'"
+function f(y, x)
+end
+
+f(1, $)
+]]
+{
+    {
+        label = "'AAA'",
+        kind = CompletionItemKind.EnumMember,
+    },
+    {
+        label = "'BBB'",
+        kind = CompletionItemKind.EnumMember,
+    },
+    {
+        label = "'CCC'",
+        kind = CompletionItemKind.EnumMember,
+    }
+}
+
+TEST [[
+---@param x string | "'AAA'" | "'BBB'" | "'CCC'"
+function f(x)
+end
+
+f($)
+]]
+{
+    {
+        label = "'AAA'",
+        kind = CompletionItemKind.EnumMember,
+    },
+    {
+        label = "'BBB'",
+        kind = CompletionItemKind.EnumMember,
+    },
+    {
+        label = "'CCC'",
+        kind = CompletionItemKind.EnumMember,
+    }
+}

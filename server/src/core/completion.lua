@@ -509,39 +509,7 @@ local function searchInRequire(vm, select, source, callback)
     end
 end
 
-local function searchCallArg(vm, source, word, callback, pos)
-    local results = {}
-    vm:eachSource(function (src)
-        if      src.type == 'call'
-            and src.start <= pos
-            and src.finish >= pos
-        then
-            results[#results+1] = src
-        end
-    end)
-    if #results == 0 then
-        return nil
-    end
-    -- 可能处于 'func1(func2(' 的嵌套中，将最近的call放到最前面
-    table.sort(results, function (a, b)
-        return a.start > b.start
-    end)
-    local call = results[1]
-    local args = call:bindCall()
-    if not args then
-        return
-    end
-
-    local value = call:findCallFunction()
-    if not value then
-        return
-    end
-
-    local lib = value:getLib()
-    if not lib then
-        return
-    end
-
+local function searchEnumAsLib(vm, source, word, callback, pos, args, lib)
     local select = #args + 1
     for i, arg in ipairs(args) do
         if arg.start <= pos and arg.finish >= pos - 1 then
@@ -581,6 +549,71 @@ local function searchCallArg(vm, source, word, callback, pos)
     -- 搜索特殊函数
     if lib.special == 'require' then
         searchInRequire(vm, select, source, callback)
+    end
+end
+
+local function searchEnumAsEmmyParams(vm, source, word, callback, pos, args, func)
+    local select = #args + 1
+    for i, arg in ipairs(args) do
+        if arg.start <= pos and arg.finish >= pos - 1 then
+            select = i
+            break
+        end
+    end
+
+    local param = func:findEmmyParamByIndex(select)
+    if not param then
+        return
+    end
+
+    param:eachEnum(function (enum)
+        if matchKey(word, enum) then
+            callback(enum, nil, CompletionItemKind.EnumMember, {
+                label = enum,
+            })
+        end
+    end)
+end
+
+local function searchCallArg(vm, source, word, callback, pos)
+    local results = {}
+    vm:eachSource(function (src)
+        if      src.type == 'call'
+            and src.start <= pos
+            and src.finish >= pos
+        then
+            results[#results+1] = src
+        end
+    end)
+    if #results == 0 then
+        return nil
+    end
+    -- 可能处于 'func1(func2(' 的嵌套中，将最近的call放到最前面
+    table.sort(results, function (a, b)
+        return a.start > b.start
+    end)
+    local call = results[1]
+    local args = call:bindCall()
+    if not args then
+        return
+    end
+
+    local value = call:findCallFunction()
+    if not value then
+        return
+    end
+
+    local lib = value:getLib()
+    if lib then
+        searchEnumAsLib(vm, source, word, callback, pos, args, lib)
+        return
+    end
+
+    ---@type function
+    local func = value:getFunction()
+    if func then
+        searchEnumAsEmmyParams(vm, source, word, callback, pos, args, func)
+        return
     end
 end
 

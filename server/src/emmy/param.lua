@@ -29,10 +29,21 @@ function mt:bindGeneric(generic)
     end
 end
 
+function mt:addEnum(str)
+    self._enum[#self._enum+1] = str
+end
+
+function mt:eachEnum(callback)
+    for _, str in ipairs(self._enum) do
+        callback(str)
+    end
+end
+
 return function (manager, source)
     local self = setmetatable({
         source = source.id,
         _manager = manager,
+        _enum = {},
     }, mt)
     if source.type == 'emmyParam' then
         self.name = source[1][1]

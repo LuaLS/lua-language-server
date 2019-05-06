@@ -1242,9 +1242,11 @@ local Defs = {
             language,
         }
     end,
-    EmmySee = function (className, methodName)
+    EmmySee = function (start, className, methodName, finish)
         return {
             type = 'emmySee',
+            start = start,
+            finish = finish - 1,
             className, methodName
         }
     end,

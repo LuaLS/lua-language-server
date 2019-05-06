@@ -35,6 +35,7 @@ function mt:doEmmy(action)
     elseif tp == 'emmyFunctionType' then
         self:doEmmyFunctionType(action)
     elseif tp == 'emmySee' then
+        self:doEmmySee(action)
     elseif tp == 'emmyIncomplete' then
         self:doEmmyIncomplete(action)
     end
@@ -311,4 +312,10 @@ end
 
 function mt:doEmmyIncomplete(action)
     self:instantSource(action)
+end
+
+function mt:doEmmySee(action)
+    self:instantSource(action)
+    self:instantSource(action[2])
+    action[2]:set('emmy see', action)
 end

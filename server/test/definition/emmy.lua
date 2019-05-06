@@ -79,3 +79,13 @@ TEST [[
 local mt = {}
 mt.<?name?>
 ]]
+
+TEST [[
+---@class loli
+local unit
+
+function unit:<!pants!>()
+end
+
+---@see loli#<?pants?>
+]]

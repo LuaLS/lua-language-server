@@ -179,6 +179,18 @@ local function parseClass(callback, vm, source)
     end)
 end
 
+local function parseSee(callback, vm, source)
+    local see = source:get 'emmy see'
+    local className = see[1][1]
+    local childName = see[2][1]
+    vm.emmyMgr:eachClass(className, function (class)
+        ---@type value
+        local value = class:getValue()
+        local child = value:getChild(childName)
+        parseValueByValue(callback, vm, source, child)
+    end)
+end
+
 local function parseFunction(callback, vm, source)
     if Mode == 'definition' then
         callback(source:bindFunction():getSource())
@@ -259,6 +271,9 @@ return function (vm, pos, mode)
     end
     if source:get 'emmy class' then
         parseClass(callback, vm, source)
+    end
+    if source:get 'emmy see' then
+        parseSee(callback, vm, source)
     end
 
     if #list == 0 then

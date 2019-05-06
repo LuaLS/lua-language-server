@@ -1,7 +1,7 @@
 local fs = require 'bee.filesystem'
 
 local table_sort = table.sort
-local string_rep = string.rep
+local stringRep = string.rep
 local type = type
 local pairs = pairs
 local ipairs = ipairs
@@ -20,7 +20,7 @@ local function formatNumber(n)
 end
 
 local TAB = setmetatable({}, { __index = function (self, n)
-    self[n] = string_rep('\t', n)
+    self[n] = stringRep('\t', n)
     return self[n]
 end})
 
@@ -57,11 +57,11 @@ function table.dump(tbl)
     local mark = {}
     lines[#lines+1] = '{'
     local function unpack(tbl, tab)
-        if tab > 10 and mark[tbl] then
+        if mark[tbl] and mark[tbl] > 0 then
             lines[#lines+1] = TAB[tab+1] .. '"<Loop>"'
             return
         end
-        mark[tbl] = true
+        mark[tbl] = (mark[tbl] or 0) + 1
         local keys = {}
         local keymap = {}
         local integerFormat = '[%d]'
@@ -108,6 +108,7 @@ function table.dump(tbl)
                 lines[#lines+1] = ('%s%s = %s,'):format(TAB[tab+1], keymap[key], tostring(value))
             end
         end
+        mark[tbl] = mark[tbl] - 1
     end
     unpack(tbl, 0)
     lines[#lines+1] = '}'

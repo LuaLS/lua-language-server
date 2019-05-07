@@ -51,6 +51,10 @@
 
 ![avatar](https://github.com/sumneko/lua-language-server/raw/master/images/Signature%20Help.gif)
 
+### Emmy Annotation
+
+![avatar](https://github.com/sumneko/lua-language-server/raw/master/images/Emmy%20Annotation.gif)
+
 ## Version
 
 - [x] Lua 5.1

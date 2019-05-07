@@ -39,8 +39,10 @@ local function findAtPos(vm, pos, filter)
         if rangeA == rangeB then
             if b.type == 'call' and #b == 1 and b[1] == a then
                 return true
-            else
+            elseif a.type == 'call' and #a == 1 and a[1] == b then
                 return false
+            else
+                return a.id < b.id
             end
         end
         return rangeA < rangeB

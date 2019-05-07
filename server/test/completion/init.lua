@@ -907,6 +907,36 @@ a any
 }
 
 TEST [[
+local function f()
+    ---@param $
+    function f(a, b, c)
+    end
+end
+]]
+{
+    {
+        label = 'a, b, c',
+        kind = CompletionItemKind.Snippet,
+        insertText = [[
+a any
+---@param b any
+---@param c any]]
+    },
+    {
+        label = 'a',
+        kind = CompletionItemKind.Interface,
+    },
+    {
+        label = 'b',
+        kind = CompletionItemKind.Interface,
+    },
+    {
+        label = 'c',
+        kind = CompletionItemKind.Interface,
+    },
+}
+
+TEST [[
 ---@param $
 function mt:f(a, b, c)
 end

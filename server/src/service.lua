@@ -57,9 +57,6 @@ function mt:_callMethod(name, params)
         else
             local ok, r = pcall(table.dump, params)
             local dump = ok and r or '<Cyclic table>'
-            if #dump > 10000 then
-                dump = '<Large table>'
-            end
             log.debug(('Task [%s] failed, params: %s'):format(
                 name, dump
             ))
@@ -518,7 +515,7 @@ function mt:doDiagnostics(uri)
         lines = obj.lines,
         version = obj.vmVersion,
     }
-    local res  = self:_callMethod(name, data)
+    local res = self:_callMethod(name, data)
     if self:isDeadText(uri) then
         return
     end

@@ -61,6 +61,10 @@ function table.dump(tbl)
             lines[#lines+1] = TAB[tab+1] .. '"<Loop>"'
             return
         end
+        if #lines > 10000 then
+            lines[#lines+1] = TAB[tab+1] .. '"<Large>"'
+            return
+        end
         mark[tbl] = (mark[tbl] or 0) + 1
         local keys = {}
         local keymap = {}

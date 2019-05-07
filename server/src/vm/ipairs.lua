@@ -1,12 +1,12 @@
 local mt = require 'vm.manager'
 
----@param func function
+---@param func emmyFunction
 function mt:callIpairs(func, values, source)
     local tbl = values[1]
     func:setReturn(2, tbl)
 end
 
----@param func function
+---@param func emmyFunction
 function mt:callAtIpairs(func, values, source)
     local tbl = values[1]
     if tbl then
@@ -20,13 +20,13 @@ function mt:callAtIpairs(func, values, source)
     end
 end
 
----@param func function
+---@param func emmyFunction
 function mt:callPairs(func, values, source)
     local tbl = values[1]
     func:setReturn(2, tbl)
 end
 
----@param func function
+---@param func emmyFunction
 function mt:callNext(func, values, source)
     local tbl = values[1]
     if tbl then

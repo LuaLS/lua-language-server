@@ -6,7 +6,7 @@ local listMgr = require 'vm.list'
 
 local Watch = setmetatable({}, {__mode = 'kv'})
 
----@class function
+---@class emmyFunction
 local mt = {}
 mt.__index = mt
 mt.type = 'function'

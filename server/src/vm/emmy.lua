@@ -271,7 +271,7 @@ function mt:doEmmyFunctionType(action)
     local emmyMgr = self.emmyMgr
     self:instantSource(action)
     local funcObj = emmyMgr:addFunctionType(action)
-    ---@type function
+    ---@type emmyFunction
     local func = functionMgr.create(action)
     for i = 1, #action // 2 do
         local nameSource = action[i*2-1]

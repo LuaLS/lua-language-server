@@ -53,25 +53,27 @@ local function createInfo(lsp, data, lines)
     }
     if data.related then
         local related = {}
-        for i, info in ipairs(data.related) do
+        for _, info in ipairs(data.related) do
             local _, lines = lsp:getVM(info.uri)
-            local message = info.message
-            if not message then
-                local start_line  = lines:rowcol(info.start)
-                local finish_line = lines:rowcol(info.finish)
-                local chars = {}
-                for n = start_line, finish_line do
-                    chars[#chars+1] = lines:line(n)
+            if lines then
+                local message = info.message
+                if not message then
+                    local start_line  = lines:rowcol(info.start)
+                    local finish_line = lines:rowcol(info.finish)
+                    local chars = {}
+                    for n = start_line, finish_line do
+                        chars[#chars+1] = lines:line(n)
+                    end
+                    message = table.concat(chars, '\n')
                 end
-                message = table.concat(chars, '\n')
-            end
-            related[i] = {
-                message = message,
-                location = {
-                    uri = info.uri,
-                    range = getRange(info.start, info.finish, lines),
+                related[#related+1] = {
+                    message = message,
+                    location = {
+                        uri = info.uri,
+                        range = getRange(info.start, info.finish, lines),
+                    }
                 }
-            }
+            end
         end
         diagnostic.relatedInformation = related
     end

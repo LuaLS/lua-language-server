@@ -257,7 +257,7 @@ local function searchCloseGlobal(vm, start, finish, word, callback)
 end
 
 local function searchParams(vm, source, func, word, callback)
-    ---@type function
+    ---@type emmyFunction
     local emmyParams = func:getEmmyParams()
     if not emmyParams then
         return
@@ -609,7 +609,7 @@ local function searchCallArg(vm, source, word, callback, pos)
         return
     end
 
-    ---@type function
+    ---@type emmyFunction
     local func = value:getFunction()
     if func then
         searchEnumAsEmmyParams(vm, source, word, callback, pos, args, func)

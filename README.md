@@ -16,10 +16,10 @@
 - [x] Syntax Check
 - [x] Highlight
 - [x] Code Action
+- [x] EmmyLua Annotation
 - [ ] Multi Workspace
 - [ ] Type Format
 - [ ] Document Color
-- [ ] EmmyLua Annotation
 
 ## Preview
 

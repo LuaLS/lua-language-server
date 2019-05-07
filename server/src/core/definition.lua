@@ -56,11 +56,20 @@ local function parseValueByValue(callback, vm, source, value)
     for _ = 1, 5 do
         value:eachInfo(function (info, src)
             if Mode == 'definition' then
-                if info.type == 'set' or info.type == 'local' then
+                if info.type == 'local' then
                     if vm.uri == src:getUri() then
                         if source.id >= src.id then
                             callback(src)
                         end
+                    end
+                end
+                if info.type == 'set' then
+                    if vm.uri == src:getUri() then
+                        if source.id >= src.id then
+                            callback(src)
+                        end
+                    else
+                        callback(src)
                     end
                 end
                 if info.type == 'return' then

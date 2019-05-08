@@ -25,6 +25,11 @@ function mt:bindValue(value)
     if value then
         self._bindValue = value
     else
+        if self._bindValue then
+            if not self._bindValue:getSource() then
+                self._bindValue = nil
+            end
+        end
         return self._bindValue
     end
 end

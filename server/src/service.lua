@@ -433,6 +433,9 @@ function mt:compileVM(uri)
     if not compiled then
         return nil
     end
+    if obj.vm then
+        obj.vm:remove()
+    end
 
     local clock = os.clock()
     local ast = self:compileAst(obj)
@@ -846,9 +849,9 @@ function mt:_testFindDeadValues()
     local function pop()
         stack[#stack] = nil
     end
-    local function showStack()
+    local function showStack(uri)
         count = count + 1
-        log.debug(table.concat(stack, '->'))
+        log.debug(uri, table.concat(stack, '->'))
     end
     local function scan(name, tbl)
         if count > 100 then
@@ -861,10 +864,14 @@ function mt:_testFindDeadValues()
             return
         end
         mark[tbl] = true
-        push(name)
+        if tbl.type then
+            push(('%s<%s>'):format(name, tbl.type))
+        else
+            push(name)
+        end
         if tbl.type == 'value' then
             if not tbl:getSource() then
-                showStack()
+                showStack(tbl.uri)
             end
         else
             for k, v in pairs(tbl) do

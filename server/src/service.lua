@@ -826,7 +826,54 @@ function mt:_testMemory()
     ))
     log.debug('test memory: ', ('%.3f'):format(os.clock() - clock))
 
-    --self:_testDeadValue()
+    if deadValue / totalValue >= 0.1 then
+        self:_testFindDeadValues()
+    end
+end
+
+function mt:_testFindDeadValues()
+    if self._testHasFoundDeadValues then
+        return
+    end
+    self._testHasFoundDeadValues = true
+
+    local mark = {}
+    local stack = {}
+    local count = 0
+    local function push(info)
+        stack[#stack+1] = info
+    end
+    local function pop()
+        stack[#stack] = nil
+    end
+    local function showStack()
+        count = count + 1
+        log.debug(table.concat(stack, '->'))
+    end
+    local function scan(name, tbl)
+        if count > 100 then
+            return
+        end
+        if type(tbl) ~= 'table' then
+            return
+        end
+        if mark[tbl] then
+            return
+        end
+        mark[tbl] = true
+        push(name)
+        if tbl.type == 'value' then
+            if not tbl:getSource() then
+                showStack()
+            end
+        else
+            for k, v in pairs(tbl) do
+                scan(k, v)
+            end
+        end
+        pop()
+    end
+    scan('root', self._file)
 end
 
 function mt:onTick()

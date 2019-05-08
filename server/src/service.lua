@@ -830,7 +830,7 @@ function mt:_testMemory()
     ))
     log.debug('test memory: ', ('%.3f'):format(os.clock() - clock))
 
-    if deadValue / totalValue >= 0.1 then
+    if deadValue / totalValue >= 0.5 then
         self:_testFindDeadValues()
     end
 end

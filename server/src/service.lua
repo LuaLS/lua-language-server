@@ -435,6 +435,7 @@ function mt:compileVM(uri)
     end
     if obj.vm then
         obj.vm:remove()
+        obj.vm = nil
     end
 
     local clock = os.clock()

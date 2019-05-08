@@ -79,7 +79,7 @@ function TEST(datas)
             data.content = new
         end
         lsp:saveText(uri, 1, data.content)
-        ws:addFile(uri)
+        ws:addFile(ws:uriDecode(uri))
     end
 
     while lsp._needCompile[1] do

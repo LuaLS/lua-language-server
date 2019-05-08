@@ -63,10 +63,10 @@ function TEST(data)
     local sourceUri = ws:uriEncode(fs.path(data[2].path))
 
     lsp:saveText(targetUri, 1, targetScript)
-    ws:addFile(targetUri)
+    ws:addFile(ws:uriDecode(targetUri))
     lsp:compileVM(targetUri)
     lsp:saveText(sourceUri, 1, sourceScript)
-    ws:addFile(sourceUri)
+    ws:addFile(ws:uriDecode(sourceUri))
     lsp:compileVM(sourceUri)
 
     local sourceVM = lsp:loadVM(sourceUri)

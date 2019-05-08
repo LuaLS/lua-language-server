@@ -16,9 +16,9 @@ local function initAfterConfig(lsp, firstScope)
                 registerOptions = {
                     watchers = {
                         {
-                            globPattern = '**/*.lua',
-                            kind = 1 | 4, -- Create | Change | Delete
-                        },
+                            globPattern = '**/',
+                            kind = 1 | 4,
+                        }
                     },
                 },
             },

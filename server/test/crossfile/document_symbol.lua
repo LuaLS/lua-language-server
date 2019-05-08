@@ -71,9 +71,9 @@ function TEST(data)
     local sourceUri = ws:uriEncode(fs.path(data[2].path))
 
     lsp:saveText(sourceUri, 1, data[2].content)
-    ws:addFile(sourceUri)
+    ws:addFile(ws:uriDecode(sourceUri))
     lsp:saveText(targetUri, 1, data[1].content)
-    ws:addFile(targetUri)
+    ws:addFile(ws:uriDecode(targetUri))
     while lsp._needCompile[1] do
         lsp:compileVM(lsp._needCompile[1])
     end

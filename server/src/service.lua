@@ -826,7 +826,7 @@ function mt:_testMemory()
     ))
     log.debug('test memory: ', ('%.3f'):format(os.clock() - clock))
 
-    self:_testDeadValue()
+    --self:_testDeadValue()
 end
 
 function mt:onTick()

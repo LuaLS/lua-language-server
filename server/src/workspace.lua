@@ -205,18 +205,23 @@ function mt:isLuaFile(path)
     return false
 end
 
-function mt:addFile(uri)
-    local path = self:uriDecode(uri)
-    if self:isLuaFile(path) then
-        local name = getFileName(path)
-        self.files[name] = uri
-        self.lsp:readText(uri, path)
+function mt:addFile(path)
+    if not self:isLuaFile(path) then
+        return
     end
+    local name = getFileName(path)
+    local uri = self:uriEncode(path)
+    self.files[name] = uri
+    self.lsp:readText(uri, path)
 end
 
-function mt:removeFile(uri)
-    local name = getFileName(self:uriDecode(uri))
+function mt:removeFile(path)
+    local name = getFileName(path)
+    if not self.files[name] then
+        return
+    end
     self.files[name] = nil
+    local uri = self:uriEncode(path)
     self.lsp:removeText(uri)
 end
 

@@ -80,7 +80,7 @@ function TEST(data)
             mainBuf = script
         end
         lsp:saveText(uri, 1, script)
-        ws:addFile(uri)
+        ws:addFile(ws:uriDecode(uri))
 
         while lsp._needCompile[1] do
             lsp:compileVM(lsp._needCompile[1])

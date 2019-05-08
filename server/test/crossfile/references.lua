@@ -80,7 +80,7 @@ function TEST(data)
     local expect = {}
     for _, info in ipairs(data) do
         local uri = ws:uriEncode(fs.path(info.path))
-        ws:addFile(uri)
+        ws:addFile(ws:uriDecode(uri))
     end
     for _, info in ipairs(data) do
         local uri = ws:uriEncode(fs.path(info.path))

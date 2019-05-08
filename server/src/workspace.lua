@@ -122,6 +122,9 @@ function mt:scanFiles()
     for path in pairs(config.config.workspace.ignoreDir) do
         ignored[#ignored+1] = path
     end
+    for path in pairs(config.other.exclude) do
+        ignored[#ignored+1] = path
+    end
     if config.config.workspace.ignoreSubmodules then
         local buf = io.load(self.root / '.gitmodules')
         if buf then

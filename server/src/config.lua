@@ -102,6 +102,7 @@ local ConfigTemplate = {
 
 local OtherTemplate = {
     associations = {{}, Hash(String, String)},
+    exclude =      {{}, Hash(String, Boolean)},
 }
 
 local Config, Other

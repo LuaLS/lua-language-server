@@ -704,6 +704,7 @@ function mt:onUpdateConfig(updated, other)
     end
     if not table.equal(oldConfig.workspace, newConfig.workspace)
     or not table.equal(oldOther.associations, newOther.associations)
+    or not table.equal(oldOther.exclude, newOther.exclude)
     then
         self:clearAllFiles()
         if self.workspace then

@@ -51,11 +51,16 @@ return function (lsp)
                 {
                     scopeUri = uri,
                     section = 'files.associations',
+                },
+                {
+                    scopeUri = uri,
+                    section = 'files.exclude',
                 }
             },
         }, function (configs)
             lsp:onUpdateConfig(configs[1], {
                 associations = configs[2],
+                exclude      = configs[3],
             })
             initAfterConfig(lsp, firstScope)
         end)

@@ -184,6 +184,15 @@ function mt:isDeadText(uri)
 end
 
 function mt:open(uri, version, text)
+    if self.workspace then
+        local fileName = self.workspace:uriDecode(uri)
+        if not self.workspace:isLuaFile(fileName) then
+            return
+        end
+        if self.workspace.gitignore(fileName:string()) then
+            log.debug('Open ignored file:', fileName:string())
+        end
+    end
     self:saveText(uri, version, text)
     local obj = self._file[uri]
     if obj then
@@ -195,6 +204,17 @@ function mt:close(uri)
     local obj = self._file[uri]
     if obj then
         obj._openByClient = false
+    end
+    if self.workspace then
+        local fileName = self.workspace:uriDecode(uri)
+        if not self.workspace:isLuaFile(fileName) then
+            self:removeText(uri)
+            return
+        end
+        if self.workspace.gitignore(fileName:string()) then
+            log.debug('Close ignored file:', fileName:string())
+            self:removeText(uri)
+        end
     end
 end
 

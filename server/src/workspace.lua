@@ -3,6 +3,7 @@ local async = require 'async'
 local config = require 'config'
 local ll = require 'lpeglabel'
 local platform = require 'bee.platform'
+local glob = require 'glob'
 
 local TrueName = {}
 
@@ -155,16 +156,18 @@ function mt:scanFiles()
     end
 
     local pattern = self:buildScanPattern()
-    log.info('忽略文件：\r\n' .. table.concat(pattern, '\r\n'))
+    local options = {
+        ignoreCase = platform.OS == 'Windows',
+    }
+    log.info('ignore pattern:\r\n' .. table.concat(pattern, '\r\n'))
+    log.info('ignore options:' .. table.dump(options))
     log.info('开始扫描文件任务')
+    self.gitignore = glob.gitignore(pattern, options)
     self._currentScanCompiled = {}
     local count = 0
     self._scanRequest = async.run('scanfiles', {
         root = self.root:string(),
         pattern = pattern,
-        options = {
-            ignoreCase = platform.OS == 'Windows',
-        }
     }, function (mode, ...)
         if mode == 'ok' then
             log.info('扫描文件任务完成，共', count, '个文件。')

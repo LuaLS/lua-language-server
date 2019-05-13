@@ -1173,3 +1173,14 @@ f($)
         kind = CompletionItemKind.EnumMember,
     }
 }
+
+TEST [[
+---@param x function | 'function () end'
+function f(x)
+end
+
+f(function ()
+    $
+end)
+]]
+(nil)

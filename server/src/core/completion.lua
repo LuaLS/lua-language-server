@@ -575,6 +575,34 @@ local function searchEnumAsEmmyParams(vm, source, word, callback, pos, args, fun
     end)
 end
 
+local function getSelect(args, pos)
+    if not args then
+        return 1
+    end
+    for i, arg in ipairs(args) do
+        if arg.start <= pos and arg.finish >= pos - 1 then
+            return i
+        end
+    end
+    return #args + 1
+end
+
+local function isInFunctionOrTable(call, pos)
+    local args = call:bindCall()
+    if not args then
+        return false
+    end
+    local select = getSelect(args, pos)
+    local arg = args[select]
+    if not arg then
+        return false
+    end
+    if arg.type == 'function' or arg.type == 'table' then
+        return true
+    end
+    return false
+end
+
 local function searchCallArg(vm, source, word, callback, pos)
     local results = {}
     vm:eachSource(function (src)
@@ -593,6 +621,10 @@ local function searchCallArg(vm, source, word, callback, pos)
         return a.start > b.start
     end)
     local call = results[1]
+    if isInFunctionOrTable(call, pos) then
+        return
+    end
+    
     local args = call:bindCall()
     if not args then
         return

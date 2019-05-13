@@ -141,14 +141,6 @@ function mt:buildScanPattern()
             end
         end
     end
-    -- config.files.associations
-    pattern[#pattern+1] = '*.*'
-    pattern[#pattern+1] = '!*.lua'
-    for k, v in pairs(config.other.associations) do
-        if fileNameEq(v, 'lua') then
-            pattern[#pattern+1] = '!' .. k
-        end
-    end
 
     return pattern
 end
@@ -184,6 +176,9 @@ function mt:scanFiles()
             log.debug(...)
         elseif mode == 'path' then
             local path = fs.path(...)
+            if not self:isLuaFile(path) then
+                return
+            end
             self._loadFileRequest:push(path:string())
             count = count + 1
         elseif mode == 'stop' then

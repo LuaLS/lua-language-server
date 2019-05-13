@@ -708,6 +708,13 @@ function mt:restartDueToMemoryLeak()
     end)
 end
 
+function mt:reScanFiles()
+    self:clearAllFiles()
+    if self.workspace then
+        self.workspace:scanFiles()
+    end
+end
+
 function mt:onUpdateConfig(updated, other)
     local oldConfig = table.deepCopy(config.config)
     local oldOther  = table.deepCopy(config.other)
@@ -727,10 +734,7 @@ function mt:onUpdateConfig(updated, other)
     or not table.equal(oldOther.associations, newOther.associations)
     or not table.equal(oldOther.exclude, newOther.exclude)
     then
-        self:clearAllFiles()
-        if self.workspace then
-            self.workspace:scanFiles()
-        end
+        self:reScanFiles()
     end
 end
 

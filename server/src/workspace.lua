@@ -22,14 +22,6 @@ local function getTrueName(name)
     return TrueName[name] or name
 end
 
-local function fileNameEq(a, b)
-    if platform.OS == 'Windows' then
-        return a:lower() == b:lower()
-    else
-        return a == b
-    end
-end
-
 local function split(str, sep)
     local t = {}
     for s in str:gmatch('[^' .. sep .. ']+') do
@@ -51,6 +43,14 @@ end
 
 local mt = {}
 mt.__index = mt
+
+function mt:fileNameEq(a, b)
+    if platform.OS == 'Windows' then
+        return a:lower() == b:lower()
+    else
+        return a == b
+    end
+end
 
 function mt:uriDecode(uri)
     -- Unix-like系统根是/
@@ -212,7 +212,7 @@ end
 function mt:isLuaFile(path)
     local ext = path:extension():string()
     for k, v in pairs(config.other.associations) do
-        if fileNameEq(ext, k:match('[^%*]+$')) then
+        if self:fileNameEq(ext, k:match('[^%*]+$')) then
             if v == 'lua' then
                 return true
             else
@@ -220,7 +220,7 @@ function mt:isLuaFile(path)
             end
         end
     end
-    if fileNameEq(ext, '.lua') then
+    if self:fileNameEq(ext, '.lua') then
         return true
     end
     return false
@@ -397,7 +397,7 @@ function mt:matchPath(baseUri, input)
                 local list = self:convertPathAsRequire(trueFilename, start + 1)
                 if list then
                     for _, str in ipairs(list) do
-                        if #str >= #input and fileNameEq(str:sub(1, #input), input) then
+                        if #str >= #input and self:fileNameEq(str:sub(1, #input), input) then
                             if not map[str] then
                                 map[str] = trueFilename
                             else

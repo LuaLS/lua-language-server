@@ -17,7 +17,7 @@ local function initAfterConfig(lsp, firstScope)
                     watchers = {
                         {
                             globPattern = '**/',
-                            kind = 1 | 4,
+                            kind = 1 | 2 | 4,
                         }
                     },
                 },

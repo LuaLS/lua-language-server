@@ -15,11 +15,21 @@ return function (lsp, params)
         local path = lsp.workspace:uriDecode(change.uri)
         if change.type == FileChangeType.Created then
             lsp.workspace:addFile(path)
+            if lsp:getVM(change.uri) then
+                needReset = true
+            end
         elseif change.type == FileChangeType.Deleted then
             lsp.workspace:removeFile(path)
+            if lsp:getVM(change.uri) then
+                needReset = true
+            end
         end
-        if lsp:getVM(change.uri) then
-            needReset = true
+        -- 排除类文件发生更改需要重新扫描
+        local filename = path:filename():string()
+        if lsp.workspace:fileNameEq(filename, '.gitignore')
+        or lsp.workspace:fileNameEq(filename, '.gitmodules')
+        then
+            lsp:reScanFiles()
         end
     end
     -- 缓存过的文件发生变化后，重新计算

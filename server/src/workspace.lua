@@ -109,6 +109,50 @@ function mt:listenLoadFile()
     end)
 end
 
+function mt:buildScanPattern()
+    local pattern = {}
+
+    -- config.workspace.ignoreDir
+    for path in pairs(config.config.workspace.ignoreDir) do
+        pattern[#pattern+1] = path
+    end
+    -- config.files.exclude
+    for path, ignore in pairs(config.other.exclude) do
+        if ignore then
+            pattern[#pattern+1] = path
+        end
+    end
+    -- config.workspace.ignoreSubmodules
+    if config.config.workspace.ignoreSubmodules then
+        local buf = io.load(self.root / '.gitmodules')
+        if buf then
+            for path in buf:gmatch('path = ([^\r\n]+)') do
+                log.info('忽略子模块：', path)
+                pattern[#pattern+1] = path
+            end
+        end
+    end
+    -- config.workspace.useGitIgnore
+    if config.config.workspace.useGitIgnore then
+        local buf = io.load(self.root / '.gitignore')
+        if buf then
+            for line in buf:gmatch '[^\r\n]+' do
+                pattern[#pattern+1] = line
+            end
+        end
+    end
+    -- config.files.associations
+    pattern[#pattern+1] = '*.*'
+    pattern[#pattern+1] = '!*.lua'
+    for k, v in pairs(config.other.associations) do
+        if fileNameEq(v, 'lua') then
+            pattern[#pattern+1] = '!' .. k
+        end
+    end
+
+    return pattern
+end
+
 function mt:scanFiles()
     if self._scanRequest then
         log.info('中断上次扫描文件任务')
@@ -118,40 +162,17 @@ function mt:scanFiles()
         self:reset()
     end
 
-    local ignored = {'.git'}
-    for path in pairs(config.config.workspace.ignoreDir) do
-        ignored[#ignored+1] = path
-    end
-    for path, ignore in pairs(config.other.exclude) do
-        if ignore then
-            ignored[#ignored+1] = path
-        end
-    end
-    if config.config.workspace.ignoreSubmodules then
-        local buf = io.load(self.root / '.gitmodules')
-        if buf then
-            for path in buf:gmatch('path = ([^\r\n]+)') do
-                log.info('忽略子模块：', path)
-                ignored[#ignored+1] = path
-            end
-        end
-    end
-    if config.config.workspace.useGitIgnore then
-        local buf = io.load(self.root / '.gitignore')
-        if buf then
-            for line in buf:gmatch '[^\r\n]+' do
-                ignored[#ignored+1] = line
-            end
-        end
-    end
-
-    log.info('忽略文件：\r\n' .. table.concat(ignored, '\r\n'))
+    local pattern = self:buildScanPattern()
+    log.info('忽略文件：\r\n' .. table.concat(pattern, '\r\n'))
     log.info('开始扫描文件任务')
     self._currentScanCompiled = {}
     local count = 0
     self._scanRequest = async.run('scanfiles', {
         root = self.root:string(),
-        ignored = ignored,
+        pattern = pattern,
+        options = {
+            ignoreCase = platform.OS == 'Windows',
+        }
     }, function (mode, ...)
         if mode == 'ok' then
             log.info('扫描文件任务完成，共', count, '个文件。')
@@ -163,9 +184,6 @@ function mt:scanFiles()
             log.debug(...)
         elseif mode == 'path' then
             local path = fs.path(...)
-            if not self:isLuaFile(path) then
-                return
-            end
             self._loadFileRequest:push(path:string())
             count = count + 1
         elseif mode == 'stop' then

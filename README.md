@@ -91,6 +91,7 @@ Please [help me][en-US] improve the quality of `en-US`.
 * [lsp-sample-client](https://github.com/Microsoft/vscode-extension-samples)
 * [Lua 5.3 中文翻译](https://cloudwu.github.io/lua53doc/manual.html)
 * [EmmyLua](https://emmylua.github.io)
+* [lua-glob](https://github.com/sumneko/lua-glob)
 
 ## Acknowledgement
 

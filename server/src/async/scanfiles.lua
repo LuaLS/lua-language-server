@@ -1,53 +1,41 @@
 local args = ...
 
-require 'utility'
 local fs = require 'bee.filesystem'
-local path_filter = require 'path_filter'
+local glob = require 'glob'
+local root = fs.path(args.root)
 
-local function scan(root, filter)
-    local result = {}
-    local len = #root:string()
-    local name = root:string():sub(len+2):gsub('/', '\\')
-    if filter(name) then
-        OUT:push('log', '过滤文件：', root:string())
+local session = glob.gitignore(args.pattern, args.options)
+session:setInterface('type', function (path)
+    local fullpath = root / path
+    if not fs.exists(fullpath) then
+        return nil
+    end
+    if fs.is_directory(fullpath) then
+        return 'directory'
     else
-        result[#result+1] = root
+        return 'file'
     end
-    local i = 0
-    return function ()
-        i = i + 1
-        local current = result[i]
-        if not current then
-            return nil
-        end
-        if fs.is_directory(current) then
-            for path in current:list_directory() do
-                local name = path:string():sub(len+2):gsub('/', '\\')
-                if filter(name) then
-                    OUT:push('log', '过滤文件：', path:string())
-                else
-                    result[#result+1] = path
-                end
-            end
-        end
-        return current
+    return nil
+end)
+session:setInterface('list', function (path)
+    local fullpath = root / path
+    if not fs.exists(fullpath) then
+        return nil
     end
-end
+    local list = {}
+    for child in fullpath:list_directory() do
+        list[#list+1] = child:string()
+    end
+    return list
+end)
 
-local ignore = {}
-for _, name in ipairs(args.ignored) do
-    if name:sub(1, 1) ~= '!' then
-        ignore[#ignore+1] = name
-    end
-end
-local filter = path_filter(ignore)
-for path in scan(fs.path(args.root), filter) do
+session:scan(function (path)
     local ok, msg = IN:pop()
     if ok and msg == 'stop' then
         OUT:push 'stop'
         return
     end
-    OUT:push('path', fs.absolute(path):string())
-end
+    OUT:push('path', fs.absolute(root / path):string())
+end)
 
 OUT:push 'ok'

@@ -120,6 +120,7 @@ function mt:simpleMatch(path)
             end
         end
     end
+    return false
 end
 
 function mt:finishMatch(path)
@@ -150,7 +151,7 @@ function mt:scan(callback)
         return files
     end
     for _, path in ipairs(result) do
-        list[#list+1] = path
+        list[#list+1] = path:match '([^/\\]+)[/\\]*$'
     end
     while #list > 0 do
         local current = list[#list]

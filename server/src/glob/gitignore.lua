@@ -120,7 +120,7 @@ function mt:simpleMatch(path)
             end
         end
     end
-    return false
+    return nil
 end
 
 function mt:finishMatch(path)

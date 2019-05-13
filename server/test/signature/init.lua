@@ -130,3 +130,8 @@ function zzzz(x: number, y: number)
 ]],
     arg = {15, 23},
 }
+
+TEST [[
+('abc'):format(f($))
+]]
+(nil)

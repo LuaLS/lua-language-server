@@ -109,11 +109,8 @@ return function (vm, pos)
     if isInFunctionOrTable(nearCall, pos) then
         return nil
     end
-
-    local hovers = {}
-    for _, call in ipairs(calls) do
-        hovers[#hovers+1] = getHover(call, pos)
-    end
+    -- TODO 重构后改成显示多原型
+    local hovers = { getHover(nearCall, pos) }
 
     if #hovers == 0 then
         return nil

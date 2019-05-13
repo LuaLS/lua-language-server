@@ -185,12 +185,12 @@ end
 
 function mt:open(uri, version, text)
     if self.workspace then
-        local fileName = self.workspace:uriDecode(uri)
-        if not self.workspace:isLuaFile(fileName) then
+        local path = self.workspace:relativePathByUri(uri)
+        if not self.workspace:isLuaFile(path) then
             return
         end
-        if self.workspace.gitignore(fileName:string()) then
-            log.debug('Open ignored file:', fileName:string())
+        if self.workspace.gitignore(path:string()) then
+            log.debug('Open ignored file:', path:string())
         end
     end
     self:saveText(uri, version, text)
@@ -206,13 +206,13 @@ function mt:close(uri)
         obj._openByClient = false
     end
     if self.workspace then
-        local fileName = self.workspace:uriDecode(uri)
-        if not self.workspace:isLuaFile(fileName) then
+        local path = self.workspace:relativePathByUri(uri)
+        if not self.workspace:isLuaFile(path) then
             self:removeText(uri)
             return
         end
-        if self.workspace.gitignore(fileName:string()) then
-            log.debug('Close ignored file:', fileName:string())
+        if self.workspace.gitignore(path:string()) then
+            log.debug('Close ignored file:', path:string())
             self:removeText(uri)
         end
     end
@@ -236,6 +236,15 @@ function mt:readText(uri, path, buf, compiled)
     if not text then
         log.debug('No file: ', path)
         return
+    end
+    if self.workspace then
+        local path = self.workspace:relativePathByUri(uri)
+        if not self.workspace:isLuaFile(path) then
+            return
+        end
+        if self.workspace.gitignore(path:string()) then
+            return
+        end
     end
     local size = #text / 1000.0
     if size > config.config.workspace.preloadFileSize then

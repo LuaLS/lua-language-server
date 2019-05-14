@@ -3,6 +3,7 @@ local config = require 'config'
 local library = require 'core.library'
 local buildGlobal = require 'vm.global'
 local DiagnosticSeverity = require 'constant.DiagnosticSeverity'
+local DiagnosticDefaultSeverity = require 'constant.DiagnosticDefaultSeverity'
 
 local mt = {}
 mt.__index = mt
@@ -606,11 +607,16 @@ function mt:doDiagnostics(func, code, callback)
     if config.config.diagnostics.disable[code] then
         return
     end
+    local level = config.config.diagnostics.severity[code]
+    if not DiagnosticSeverity[level] then
+        level = DiagnosticDefaultSeverity[code]
+    end
     func(self, function (start, finish, ...)
         local data = callback(...)
         data.code   = code
         data.start  = start
         data.finish = finish
+        data.level  = DiagnosticSeverity[level]
         self.datas[#self.datas+1] = data
     end)
     if coroutine.isyieldable() then
@@ -633,7 +639,6 @@ return function (vm, lines, uri)
     -- 未使用的局部变量
     session:doDiagnostics(session.searchUnusedLocals, 'unused-local', function (key)
         return {
-            level   = DiagnosticSeverity.Hint,
             message = lang.script('DIAG_UNUSED_LOCAL', key),
         }
     end)
@@ -649,28 +654,24 @@ return function (vm, lines, uri)
             message = ('%s(%s)'):format(message, lang.script('DIAG_DEFINED_CUSTOM', table.concat(customLib, '/')))
         end
         return {
-            level   = DiagnosticSeverity.Warning,
             message = message,
         }
     end)
     -- 未使用的Label
     session:doDiagnostics(session.searchUnusedLabel, 'unused-label', function (key)
         return {
-            level   =DiagnosticSeverity.Hint,
             message = lang.script('DIAG_UNUSED_LABEL', key)
         }
     end)
     -- 只有空格与制表符的行，以及后置空格
     session:doDiagnostics(session.searchSpaces, 'trailing-space', function (message)
         return {
-            level   = DiagnosticSeverity.Hint,
             message = message,
         }
     end)
     -- 重定义局部变量
     session:doDiagnostics(session.searchRedefinition, 'redefined-local', function (key, related)
         return {
-            level   = DiagnosticSeverity.Hint,
             message = lang.script('DIAG_REDEFINED_LOCAL', key),
             related = related,
         }
@@ -678,28 +679,24 @@ return function (vm, lines, uri)
     -- 以括号开始的一行（可能被误解析为了上一行的call）
     session:doDiagnostics(session.searchNewLineCall, 'newline-call', function ()
         return {
-            level   = DiagnosticSeverity.Information,
             message = lang.script.DIAG_PREVIOUS_CALL,
         }
     end)
     -- 调用函数时的参数数量是否超过函数的接收数量
     session:doDiagnostics(session.searchRedundantParameters, 'redundant-parameter', function (max, passed)
         return {
-            level   = DiagnosticSeverity.Information,
             message = lang.script('DIAG_OVER_MAX_ARGS', max, passed),
         }
     end)
     -- x or 0 + 1
     session:doDiagnostics(session.searchAmbiguity1, 'ambiguity-1', function (op, num)
         return {
-            level   = DiagnosticSeverity.Warning,
             message = lang.script('DIAG_AMBIGUITY_1', op, num),
         }
     end)
     -- 不允许定义首字母小写的全局变量（很可能是拼错或者漏删）
     session:doDiagnostics(session.searchLowercaseGlobal, 'lowercase-global', function ()
         return {
-            level   = DiagnosticSeverity.Information,
             message = lang.script.DIAG_LOWERCASE_GLOBAL,
         }
     end)
@@ -707,12 +704,10 @@ return function (vm, lines, uri)
     session:doDiagnostics(session.searchUndefinedEnvChild, 'undefined-env-child', function (key)
         if vm.envType == '_ENV' then
             return {
-                level   = DiagnosticSeverity.Information,
                 message = lang.script('DIAG_UNDEF_ENV_CHILD', key),
             }
         else
             return {
-                level   = DiagnosticSeverity.Information,
                 message = lang.script('DIAG_UNDEF_FENV_CHILD', key),
             }
         end
@@ -720,7 +715,6 @@ return function (vm, lines, uri)
     -- 构建表时重复定义field
     session:doDiagnostics(session.searchDuplicateIndex, 'duplicate-index', function (key, related)
         return {
-            level   = DiagnosticSeverity.Warning,
             message = lang.script('DIAG_DUPLICATE_INDEX', key),
             related = related,
         }
@@ -728,21 +722,18 @@ return function (vm, lines, uri)
     -- 空代码块
     session:doDiagnostics(session.searchEmptyBlock, 'empty-block', function ()
         return {
-            level   = DiagnosticSeverity.Information,
             message = lang.script.DIAG_EMPTY_BLOCK,
         }
     end)
     -- 多余的赋值
     session:doDiagnostics(session.searchRedundantValue, 'redundant-value', function (max, passed)
         return {
-            level   = DiagnosticSeverity.Information,
             message = lang.script('DIAG_OVER_MAX_VALUES', max, passed),
         }
     end)
     -- Emmy相关的检查
     session:doDiagnostics(session.searchEmmyLua, 'emmy-lua', function (message, related)
         return {
-            level   = DiagnosticSeverity.Warning,
             message = message,
             related = related,
         }

@@ -556,7 +556,7 @@ local function searchEnumAsLib(vm, source, word, callback, pos, args, lib)
         local arg = lib.args[select]
         local name = arg and arg.name
         for _, enum in ipairs(lib.enums) do
-            if enum.name == name and enum.enum then
+            if enum.name and enum.name == name and enum.enum then
                 if matchKey(word, enum.enum) then
                     local label, textEdit
                     if source.type ~= (arg and arg.type) then
@@ -657,7 +657,7 @@ local function searchCallArg(vm, source, word, callback, pos)
     if isInFunctionOrTable(call, pos) then
         return
     end
-    
+
     local args = call:bindCall()
     if not args then
         return

@@ -21,10 +21,10 @@ type = 'string'
 ``````````
 name = 'code'
 [[.enums]]
-type = 'type'
+name = 'type'
 enum = 'exit'
 ``````````
-type = 'type'
+name = 'type'
 enum = 'signal'
 
 [flush]

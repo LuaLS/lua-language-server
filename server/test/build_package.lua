@@ -109,11 +109,11 @@ local package = {
                     default = 100,
                     description = "%config.workspace.preloadFileSize%"
                 },
-                ["Lua.workspace.library"] = {
-                    scope = 'resource',
-                    type = 'object',
-                    markdownDescription = "%config.workspace.library%"
-                }
+                --["Lua.workspace.library"] = {
+                --    scope = 'resource',
+                --    type = 'object',
+                --    markdownDescription = "%config.workspace.library%"
+                --}
             }
         },
         grammars = {

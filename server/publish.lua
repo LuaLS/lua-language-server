@@ -22,6 +22,10 @@ local function updateNodeModules(out, postinstall)
     for line in cmd:lines 'l' do
         print(line)
     end
+    local suc = cmd:close()
+    if not suc then
+        error('更新NodeModules失败！')
+    end
     fs.current_path(current)
 end
 

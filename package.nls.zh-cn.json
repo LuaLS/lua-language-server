@@ -6,7 +6,7 @@
     "config.runtime.version": "Lua运行版本。",
     "config.workspace.ignoreDir": "忽略的目录（使用 `.gitignore` 语法）。",
     "config.workspace.ignoreSubmodules": "忽略子模块。",
-    "config.workspace.library": "加载的外部函数库。\n下面这个例子表示加载`C:/lua`中的所有文件，以及加载`../lib`中的`.txt`与`.lua`文件，但不加载`../lib/temp`中的`.txt`文件。加载的文件最终会受设置中文件关联的影响，因此需要设置`.txt`文件关联`lua`后`*.txt`才有意义。\n```json\n\"Lua.workspace.library\": {\n    \"C:/lua\": true,\n    \"../lib\": [\n        \"*.txt\",\n        \"*.lua\",\n        \"!/temp/**/*.txt\"\n    ]\n}\n```\n",
+    "config.workspace.library": "加载的外部函数库。\n下面这个例子表示加载`C:/lua`中的所有文件，以及加载`../lib`中的`.txt`与`.lua`文件，但不加载`../lib/temp`中的`.txt`文件。加载的文件最终会受文件关联的影响，因此需要设置`.txt`文件关联`lua`后`*.txt`才有意义。\n```json\n\"Lua.workspace.library\": {\n    \"C:/lua\": true,\n    \"../lib\": [\n        \"*.txt\",\n        \"*.lua\",\n        \"!/temp/**/*.txt\"\n    ]\n}\n```\n",
     "config.workspace.maxPreload": "最大预加载文件数。",
     "config.workspace.preloadFileSize": "预加载时跳过大小大于该值（KB）的文件。",
     "config.workspace.useGitIgnore": "忽略 `.gitignore` 中列举的文件。"

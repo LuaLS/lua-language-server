@@ -53,7 +53,7 @@ local package = {
                     scope = "resource",
                     type = "array",
                     items = "string",
-                    description = "%config.runtime.path%",
+                    markdownDescription = "%config.runtime.path%",
                     default = {
                         "?.lua",
                         "?/init.lua",
@@ -75,7 +75,7 @@ local package = {
                 ["Lua.diagnostics.severity"] = {
                     scope = "resource",
                     type = 'object',
-                    description = "%config.diagnostics.severity",
+                    description = "%config.diagnostics.severity%",
                     title = "severity",
                     properties = {}
                 },
@@ -83,7 +83,7 @@ local package = {
                     scope = "resource",
                     type = "array",
                     items = "string",
-                    description = "%config.workspace.ignoreDir%"
+                    markdownDescription = "%config.workspace.ignoreDir%"
                 },
                 ["Lua.workspace.ignoreSubmodules"] = {
                     scope = "resource",

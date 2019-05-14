@@ -3,6 +3,7 @@
     "config.runtime.path": "`package.path`",
     "config.diagnostics.disable": "禁用的诊断（使用浮框括号内的代码）。",
     "config.diagnostics.globals": "已定义的全局变量。",
+    "config.diagnostics.severity": "修改诊断等级。",
     "config.workspace.ignoreDir": "忽略的目录（使用 `.gitignore` 语法）。",
     "config.workspace.ignoreSubmodules": "忽略子模块。",
     "config.workspace.useGitIgnore": "忽略 `.gitignore` 中列举的文件。",

@@ -29,7 +29,7 @@
                     "type": "array"
                 },
                 "Lua.diagnostics.severity": {
-                    "description": "%config.diagnostics.severity",
+                    "description": "%config.diagnostics.severity%",
                     "properties": {
                         "ambiguity-1": {
                             "default": "Warning",
@@ -196,8 +196,8 @@
                         "?/init.lua",
                         "?/?.lua"
                     ],
-                    "description": "%config.runtime.path%",
                     "items": "string",
+                    "markdownDescription": "%config.runtime.path%",
                     "scope": "resource",
                     "type": "array"
                 },
@@ -215,8 +215,8 @@
                     "type": "string"
                 },
                 "Lua.workspace.ignoreDir": {
-                    "description": "%config.workspace.ignoreDir%",
                     "items": "string",
+                    "markdownDescription": "%config.workspace.ignoreDir%",
                     "scope": "resource",
                     "type": "array"
                 },

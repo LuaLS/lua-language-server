@@ -84,6 +84,7 @@ name = 'getinfo'
 version = 'Lua 5.1'
 
 [getlocal]
+name = 'getlocal'
 [[.args]]
 type = 'thread'
 optional = 'self'
@@ -95,12 +96,14 @@ name = 'local'
 type = 'integer'
 
 ['getlocal Lua 5.1']
+name = 'getlocal'
+version = 'Lua 5.1'
 [[.args]]
 type = 'thread'
 optional = 'self'
 ``````````
 name = 'level'
-type = integer'
+type = 'integer'
 ``````````
 name = 'local'
 type = 'integer'

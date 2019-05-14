@@ -1184,3 +1184,53 @@ f(function ()
 end)
 ]]
 (nil)
+
+TEST [[
+local t = {
+    ['a.b.c'] = {}
+}
+
+t.$
+]]
+{
+    {
+        label = 'a.b.c',
+        kind = CompletionItemKind.Field,
+        textEdit = {
+            start = 37,
+            finish = 36,
+            newText = '["a.b.c"]',
+        },
+        additionalTextEdits = {
+            {
+                start = 36,
+                finish = 36,
+                newText = '',
+            }
+        }
+    }
+}
+
+TEST [[
+_ENV['z.b.c'] = {}
+
+z$
+]]
+{
+    {
+        label = 'z.b.c',
+        kind = CompletionItemKind.Field,
+        textEdit = {
+            start = 22,
+            finish = 21,
+            newText = '_ENV["z.b.c"]',
+        },
+        additionalTextEdits = {
+            {
+                start = 21,
+                finish = 21,
+                newText = '',
+            }
+        }
+    }
+}

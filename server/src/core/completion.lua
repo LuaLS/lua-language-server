@@ -5,6 +5,7 @@ local getFunctionHoverAsEmmy = require 'core.hover.emmy_function'
 local sourceMgr = require 'vm.source'
 local config = require 'config'
 local matchKey = require 'core.matchKey'
+local parser = require 'parser'
 local State
 
 local CompletionItemKind = {
@@ -120,15 +121,47 @@ local function getKind(cata, value)
     return nil
 end
 
-local function getValueData(cata, name, value)
-    return {
+local function getValueData(cata, name, value, pos, source)
+    local data = {
         documentation = getDucumentation(name, value),
         detail = getDetail(value),
         kind = getKind(cata, value),
     }
+    if cata == 'field' then
+        if not parser:grammar(name, 'Name') then
+            if source:get 'simple' and source:get 'simple' [1] ~= source then
+                data.textEdit = {
+                    start = pos + 1,
+                    finish = pos,
+                    newText = ('[%q]'):format(name),
+                }
+                data.additionalTextEdits = {
+                    {
+                        start = pos,
+                        finish = pos,
+                        newText = '',
+                    }
+                }
+            else
+                data.textEdit = {
+                    start = pos + 1,
+                    finish = pos,
+                    newText = ('_ENV[%q]'):format(name),
+                }
+                data.additionalTextEdits = {
+                    {
+                        start = pos,
+                        finish = pos,
+                        newText = '',
+                    }
+                }
+            end
+        end
+    end
+    return data
 end
 
-local function searchLocals(vm, source, word, callback)
+local function searchLocals(vm, source, word, callback, pos)
     vm:eachSource(function (src)
         local loc = src:bindLocal()
         if not loc then
@@ -139,7 +172,7 @@ local function searchLocals(vm, source, word, callback)
             and loc:close() >= source.finish
             and matchKey(word, loc:getName())
         then
-            callback(loc:getName(), src, CompletionItemKind.Variable, getValueData('local', loc:getName(), loc:getValue()))
+            callback(loc:getName(), src, CompletionItemKind.Variable, getValueData('local', loc:getName(), loc:getValue(), pos, source))
         end
     end)
 end
@@ -213,7 +246,7 @@ local function searchFieldsByChild(parent, word, source, map)
 end
 
 ---@param vm VM
-local function searchFields(vm, source, word, callback)
+local function searchFields(vm, source, word, callback, pos)
     local parent = source:get 'parent' or vm.env:getValue()
     if not parent then
         return
@@ -229,7 +262,7 @@ local function searchFields(vm, source, word, callback)
     end
     searchFieldsByChild(parent, word, source, map)
     for k, v in sortPairs(map) do
-        callback(k, nil, CompletionItemKind.Field, getValueData('field', k, v))
+        callback(k, nil, CompletionItemKind.Field, getValueData('field', k, v, pos, source))
     end
 end
 
@@ -292,7 +325,7 @@ local function searchKeyWords(vm, source, word, callback)
     end
 end
 
-local function searchGlobals(vm, source, word, callback)
+local function searchGlobals(vm, source, word, callback, pos)
     local global = vm.env:getValue()
     local map = {}
     local current = global
@@ -305,33 +338,33 @@ local function searchGlobals(vm, source, word, callback)
     end
     searchFieldsByChild(global, word, source, map)
     for k, v in sortPairs(map) do
-        callback(k, nil, CompletionItemKind.Field, getValueData('field', k, v))
+        callback(k, nil, CompletionItemKind.Field, getValueData('field', k, v, pos, source))
     end
 end
 
-local function searchAsGlobal(vm, source, word, callback)
+local function searchAsGlobal(vm, source, word, callback, pos)
     if word == '' then
         return
     end
-    searchLocals(vm, source, word, callback)
-    searchFields(vm, source, word, callback)
+    searchLocals(vm, source, word, callback, pos)
+    searchFields(vm, source, word, callback, pos)
     searchKeyWords(vm, source, word, callback)
 end
 
-local function searchAsKeyowrd(vm, source, word, callback)
-    searchLocals(vm, source, word, callback)
-    searchGlobals(vm, source, word, callback)
+local function searchAsKeyowrd(vm, source, word, callback, pos)
+    searchLocals(vm, source, word, callback, pos)
+    searchGlobals(vm, source, word, callback, pos)
     searchKeyWords(vm, source, word, callback)
 end
 
-local function searchAsSuffix(vm, source, word, callback)
-    searchFields(vm, source, word, callback)
+local function searchAsSuffix(vm, source, word, callback, pos)
+    searchFields(vm, source, word, callback, pos)
 end
 
-local function searchAsIndex(vm, source, word, callback)
-    searchLocals(vm, source, word, callback)
+local function searchAsIndex(vm, source, word, callback, pos)
+    searchLocals(vm, source, word, callback, pos)
     searchIndex(vm, source, word, callback)
-    searchFields(vm, source, word, callback)
+    searchFields(vm, source, word, callback, pos)
 end
 
 local function searchAsLocal(vm, source, word, callback)
@@ -432,11 +465,11 @@ end
 
 local function searchSource(vm, source, word, callback, pos)
     if source.type == 'keyword' then
-        searchAsKeyowrd(vm, source, word, callback)
+        searchAsKeyowrd(vm, source, word, callback, pos)
         return
     end
     if source:get 'table index' then
-        searchAsIndex(vm, source, word, callback)
+        searchAsIndex(vm, source, word, callback, pos)
         return
     end
     if source:get 'arg' then
@@ -444,7 +477,7 @@ local function searchSource(vm, source, word, callback, pos)
         return
     end
     if source:get 'global' then
-        searchAsGlobal(vm, source, word, callback)
+        searchAsGlobal(vm, source, word, callback, pos)
         return
     end
     if source:action() == 'local' then
@@ -452,12 +485,12 @@ local function searchSource(vm, source, word, callback, pos)
         return
     end
     if source:bindLocal() then
-        searchAsGlobal(vm, source, word, callback)
+        searchAsGlobal(vm, source, word, callback, pos)
         return
     end
     if source:get 'simple'
     and (source.type == 'name' or source.type == '.' or source.type == ':') then
-        searchAsSuffix(vm, source, word, callback)
+        searchAsSuffix(vm, source, word, callback, pos)
         return
     end
     if source:bindFunction() then

@@ -79,6 +79,19 @@ local function Hash(keyChecker, valueChecker)
     end
 end
 
+local function Or(...)
+    local checkers = {...}
+    return function (obj)
+        for _, checker in ipairs(checkers) do
+            local suc, res = checker(obj)
+            if suc then
+                return true, res
+            end
+        end
+        return false
+    end
+end
+
 local ConfigTemplate = {
     runtime = {
         version         = {'Lua 5.3', String},
@@ -98,11 +111,15 @@ local ConfigTemplate = {
         },
     },
     workspace = {
-        ignoreDir       = {{},   Str2Hash ';'},
-        ignoreSubmodules= {true, Boolean},
-        useGitIgnore    = {true, Boolean},
-        maxPreload      = {300,  Integer},
-        preloadFileSize = {100,  Integer},
+        ignoreDir       = {{},      Str2Hash ';'},
+        ignoreSubmodules= {true,    Boolean},
+        useGitIgnore    = {true,    Boolean},
+        maxPreload      = {300,     Integer},
+        preloadFileSize = {100,     Integer},
+        library         = {{},      Hash(
+                                        String,
+                                        Or(Boolean, Array(String))
+                                    )}
     }
 }
 

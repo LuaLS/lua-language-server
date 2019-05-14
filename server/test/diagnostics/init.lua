@@ -233,6 +233,13 @@ next({}, 1, <!2!>)
 print(1, 2, 3, 4, 5)
 ]]
 
+TEST [[
+local function f(callback)
+    callback(1, 2, 3)
+end
+f(function () end)
+]]
+
 --TEST [[
 --local realTostring = tostring
 --tostring = function () end

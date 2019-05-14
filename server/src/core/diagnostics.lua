@@ -219,6 +219,18 @@ function mt:searchRedundantParameters(callback)
             return
         end
 
+        -- 回调函数不检查
+        local simple = source:get 'simple'
+        if simple and simple[2] == source then
+            local loc = simple[1]:bindLocal()
+            if loc then
+                local source = loc:getSource()
+                if source:get 'arg' then
+                    return
+                end
+            end
+        end
+
         local value = source:findCallFunction()
         if not value then
             return

@@ -210,6 +210,7 @@ function mt:loadDots()
     if not self._dots then
         self._dots = createMulti()
     end
+    self._dotsLoad = true
     return self._dots
 end
 
@@ -373,6 +374,7 @@ function mt:createArg(vm, arg)
         self:addArg(arg[1], arg, value)
     elseif arg.type == '...' then
         self._dots = createMulti()
+        self._dotsSource = arg
     end
 end
 

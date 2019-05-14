@@ -92,6 +92,22 @@ function mt:searchUnusedLabel(callback)
     end)
 end
 
+function mt:searchUnusedVararg(callback)
+    self.vm:eachSource(function (source)
+        local value = source:bindFunction()
+        if not value then
+            return
+        end
+        local func = value:getFunction()
+        if not func then
+            return
+        end
+        if func._dotsSource and not func._dotsLoad then
+            callback(func._dotsSource.start, func._dotsSource.finish)
+        end
+    end)
+end
+
 local function isContainPos(obj, start, finish)
     if obj.start <= start and obj.finish >= finish then
         return true
@@ -661,6 +677,12 @@ return function (vm, lines, uri)
     session:doDiagnostics(session.searchUnusedLabel, 'unused-label', function (key)
         return {
             message = lang.script('DIAG_UNUSED_LABEL', key)
+        }
+    end)
+    -- 未使用的不定参数
+    session:doDiagnostics(session.searchUnusedVararg, 'unused-vararg', function ()
+        return {
+            message = lang.script.DIAG_UNUSED_VARARG
         }
     end)
     -- 只有空格与制表符的行，以及后置空格

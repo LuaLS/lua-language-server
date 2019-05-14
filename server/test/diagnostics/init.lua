@@ -149,7 +149,6 @@ TEST [[
 (''):sub(1, 2)
 ]]
 
-
 TEST [=[
 return [[   
    
@@ -172,6 +171,12 @@ end
 
 TEST [[
 local function f(<!self!>)
+end
+f()
+]]
+
+TEST [[
+local function f(<!...!>)
 end
 f()
 ]]
@@ -218,7 +223,7 @@ mt:f(1, 2, <!3!>, <!4!>)
 
 TEST [[
 local function f(a, b, ...)
-    return a, b
+    return a, b, ...
 end
 f(1, 2, 3, 4)
 ]]

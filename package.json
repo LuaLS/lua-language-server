@@ -184,6 +184,17 @@
                             ],
                             "scope": "resource",
                             "type": "string"
+                        },
+                        "unused-vararg": {
+                            "default": "Hint",
+                            "enum": [
+                                "Error",
+                                "Warning",
+                                "Information",
+                                "Hint"
+                            ],
+                            "scope": "resource",
+                            "type": "string"
                         }
                     },
                     "scope": "resource",

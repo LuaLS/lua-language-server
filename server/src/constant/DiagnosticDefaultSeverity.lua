@@ -2,6 +2,7 @@ return {
     ['unused-local']        = 'Hint',
     ['undefined-global']    = 'Warning',
     ['unused-label']        = 'Hint',
+    ['unused-vararg']       = 'Hint',
     ['trailing-space']      = 'Hint',
     ['redefined-local']     = 'Hint',
     ['newline-call']        = 'Information',

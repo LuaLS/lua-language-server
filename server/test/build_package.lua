@@ -1,0 +1,126 @@
+local json = require 'json'
+
+local package = {
+    name = "lua",
+    displayName = "Lua",
+    description = "Lua Language Server coded by Lua",
+    author = "sumneko",
+    icon = "images/logo.png",
+    license = "MIT",
+    repository = {
+        type = "git",
+        url = "https://github.com/sumneko/lua-language-server"
+    },
+    publisher = "sumneko",
+    categories = {
+        "Linters",
+        "Programming Languages",
+        "Snippets"
+    },
+    keywords = {
+        "Lua",
+        "LSP",
+        "GoTo Definition",
+        "IntelliSense"
+    },
+    engines = {
+        vscode = "^1.23.0"
+    },
+    activationEvents = {
+        "onLanguage:lua"
+    },
+    main = "./client/out/extension",
+    contributes = {
+        configuration = {
+            type = "object",
+            title = "Lua",
+            properties = {
+                ["Lua.runtime.version"] = {
+                    scope = "resource",
+                    type = "string",
+                    default = "Lua 5.3",
+                    enum = {
+                        "Lua 5.1",
+                        "Lua 5.2",
+                        "Lua 5.3",
+                        "Lua 5.4",
+                        "LuaJIT"
+                    },
+                    description = "%config.runtime.version%"
+                },
+                ["Lua.runtime.path"] = {
+                    scope = "resource",
+                    type = "array",
+                    items = "string",
+                    description = "%config.runtime.path%",
+                    default = {
+                        "?.lua",
+                        "?/init.lua",
+                        "?/?.lua"
+                    }
+                },
+                ["Lua.diagnostics.disable"] = {
+                    scope = "resource",
+                    type = "array",
+                    items = "string",
+                    description = "%config.diagnostics.disable%"
+                },
+                ["Lua.diagnostics.globals"] = {
+                    scope = "resource",
+                    type = "array",
+                    items = "string",
+                    description = "%config.diagnostics.globals%"
+                },
+                ["Lua.workspace.ignoreDir"] = {
+                    scope = "resource",
+                    type = "array",
+                    items = "string",
+                    description = "%config.workspace.ignoreDir%"
+                },
+                ["Lua.workspace.ignoreSubmodules"] = {
+                    scope = "resource",
+                    type = "boolean",
+                    default = true,
+                    description = "%config.workspace.ignoreSubmodules%"
+                },
+                ["Lua.workspace.useGitIgnore"] = {
+                    scope = "resource",
+                    type = "boolean",
+                    default = true,
+                    markdownDescription = "%config.workspace.useGitIgnore%"
+                },
+                ["Lua.workspace.maxPreload"] = {
+                    scope = "resource",
+                    type = "integer",
+                    default = 300,
+                    description = "%config.workspace.maxPreload%"
+                },
+                ["Lua.workspace.preloadFileSize"] = {
+                    scope = "resource",
+                    type = "integer",
+                    default = 100,
+                    description = "%config.workspace.preloadFileSize%"
+                }
+            }
+        },
+        grammars = {
+            {
+                language = "lua",
+                scopeName = "source.lua",
+                path = "syntaxes/lua.tmLanguage.json"
+            }
+        }
+    },
+    scripts = {
+        ["vscode:prepublish"] = "cd client && npm run update-vscode && cd .."
+    },
+    __metadata = {
+        id = "3a15b5a7-be12-47e3-8445-88ee3eabc8b2",
+        publisherDisplayName = "sumneko",
+        publisherId = "fb626675-24cf-4881-8c13-b465f29bec2f"
+    }
+}
+
+package.version = "0.9.2"
+
+io.save(ROOT:parent_path() / 'package.json', json.encode(package))

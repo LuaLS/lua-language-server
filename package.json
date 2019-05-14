@@ -1,121 +1,121 @@
 {
-	"name": "lua",
-	"displayName": "Lua",
-	"description": "Lua Language Server coded by Lua",
-	"author": "sumneko",
-	"icon": "images/logo.png",
-	"license": "MIT",
-	"version": "0.9.2",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/sumneko/lua-language-server"
-	},
-	"publisher": "sumneko",
-	"categories": [
-		"Linters",
-		"Programming Languages",
-		"Snippets"
-	],
-	"keywords": [
-		"Lua",
-		"LSP",
-		"GoTo Definition",
-		"IntelliSense"
-	],
-	"engines": {
-		"vscode": "^1.23.0"
-	},
-	"activationEvents": [
-		"onLanguage:lua"
-	],
-	"main": "./client/out/extension",
-	"contributes": {
-		"configuration": {
-			"type": "object",
-			"title": "Lua",
-			"properties": {
-				"Lua.runtime.version": {
-					"scope": "resource",
-					"type": "string",
-					"default": "Lua 5.3",
-					"enum": [
-						"Lua 5.1",
-						"Lua 5.2",
-						"Lua 5.3",
-						"Lua 5.4",
-						"LuaJIT"
-					],
-					"description": "%config.runtime.version%"
-				},
-				"Lua.runtime.path": {
-					"scope": "resource",
-					"type": "array",
-					"items": "string",
-					"description": "%config.runtime.path%",
-					"default": [
-						"?.lua",
-						"?/init.lua",
-						"?/?.lua"
-					]
-				},
-				"Lua.diagnostics.disable": {
-					"scope": "resource",
-					"type": "array",
-					"items": "string",
-					"description": "%config.diagnostics.disable%"
-				},
-				"Lua.diagnostics.globals": {
-					"scope": "resource",
-					"type": "array",
-					"items": "string",
-					"description": "%config.diagnostics.globals%"
-				},
-				"Lua.workspace.ignoreDir": {
-					"scope": "resource",
-					"type": "array",
-					"items": "string",
-					"description": "%config.workspace.ignoreDir%"
-				},
-				"Lua.workspace.ignoreSubmodules": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"description": "%config.workspace.ignoreSubmodules%"
-				},
-				"Lua.workspace.useGitIgnore": {
-					"scope": "resource",
-					"type": "boolean",
-					"default": true,
-					"markdownDescription": "%config.workspace.useGitIgnore%"
-				},
-				"Lua.workspace.maxPreload": {
-					"scope": "resource",
-					"type": "integer",
-					"default": 300,
-					"description": "%config.workspace.maxPreload%"
-				},
-				"Lua.workspace.preloadFileSize": {
-					"scope": "resource",
-					"type": "integer",
-					"default": 100,
-					"description": "%config.workspace.preloadFileSize%"
-				}
-			}
-		},
-		"grammars": [
-			{
-				"language": "lua",
-				"scopeName": "source.lua",
-				"path": "syntaxes/lua.tmLanguage.json"
-			}
-		]
-	},
-	"scripts": {
-		"vscode:prepublish": "cd client && npm run update-vscode && cd .."
-	},
-	"__metadata": {
-		"id": "3a15b5a7-be12-47e3-8445-88ee3eabc8b2",
-		"publisherDisplayName": "sumneko",
-		"publisherId": "fb626675-24cf-4881-8c13-b465f29bec2f"
-	}
+    "__metadata": {
+        "id": "3a15b5a7-be12-47e3-8445-88ee3eabc8b2",
+        "publisherDisplayName": "sumneko",
+        "publisherId": "fb626675-24cf-4881-8c13-b465f29bec2f"
+    },
+    "activationEvents": [
+        "onLanguage:lua"
+    ],
+    "author": "sumneko",
+    "categories": [
+        "Linters",
+        "Programming Languages",
+        "Snippets"
+    ],
+    "contributes": {
+        "configuration": {
+            "properties": {
+                "Lua.diagnostics.disable": {
+                    "description": "%config.diagnostics.disable%",
+                    "items": "string",
+                    "scope": "resource",
+                    "type": "array"
+                },
+                "Lua.diagnostics.globals": {
+                    "description": "%config.diagnostics.globals%",
+                    "items": "string",
+                    "scope": "resource",
+                    "type": "array"
+                },
+                "Lua.runtime.path": {
+                    "default": [
+                        "?.lua",
+                        "?/init.lua",
+                        "?/?.lua"
+                    ],
+                    "description": "%config.runtime.path%",
+                    "items": "string",
+                    "scope": "resource",
+                    "type": "array"
+                },
+                "Lua.runtime.version": {
+                    "default": "Lua 5.3",
+                    "description": "%config.runtime.version%",
+                    "enum": [
+                        "Lua 5.1",
+                        "Lua 5.2",
+                        "Lua 5.3",
+                        "Lua 5.4",
+                        "LuaJIT"
+                    ],
+                    "scope": "resource",
+                    "type": "string"
+                },
+                "Lua.workspace.ignoreDir": {
+                    "description": "%config.workspace.ignoreDir%",
+                    "items": "string",
+                    "scope": "resource",
+                    "type": "array"
+                },
+                "Lua.workspace.ignoreSubmodules": {
+                    "default": true,
+                    "description": "%config.workspace.ignoreSubmodules%",
+                    "scope": "resource",
+                    "type": "boolean"
+                },
+                "Lua.workspace.maxPreload": {
+                    "default": 300,
+                    "description": "%config.workspace.maxPreload%",
+                    "scope": "resource",
+                    "type": "integer"
+                },
+                "Lua.workspace.preloadFileSize": {
+                    "default": 100,
+                    "description": "%config.workspace.preloadFileSize%",
+                    "scope": "resource",
+                    "type": "integer"
+                },
+                "Lua.workspace.useGitIgnore": {
+                    "default": true,
+                    "markdownDescription": "%config.workspace.useGitIgnore%",
+                    "scope": "resource",
+                    "type": "boolean"
+                }
+            },
+            "title": "Lua",
+            "type": "object"
+        },
+        "grammars": [
+            {
+                "language": "lua",
+                "path": "syntaxes/lua.tmLanguage.json",
+                "scopeName": "source.lua"
+            }
+        ]
+    },
+    "description": "Lua Language Server coded by Lua",
+    "displayName": "Lua",
+    "engines": {
+        "vscode": "^1.23.0"
+    },
+    "icon": "images/logo.png",
+    "keywords": [
+        "Lua",
+        "LSP",
+        "GoTo Definition",
+        "IntelliSense"
+    ],
+    "license": "MIT",
+    "main": "./client/out/extension",
+    "name": "lua",
+    "publisher": "sumneko",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/sumneko/lua-language-server"
+    },
+    "scripts": {
+        "vscode:prepublish": "cd client && npm run update-vscode && cd .."
+    },
+    "version": "0.9.2"
 }

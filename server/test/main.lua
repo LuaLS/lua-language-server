@@ -15,6 +15,7 @@ ac = {}
 
 require 'utility'
 require 'global_protect'
+require 'build_package'
 
 local function main()
     local function test(name)

@@ -1,6 +1,8 @@
 local json = require 'json'
 local diagDefault = require 'constant.DiagnosticDefaultSeverity'
 
+local VERSION = "0.9.3"
+
 local package = {
     name = "lua",
     displayName = "Lua",
@@ -149,7 +151,7 @@ for name, level in pairs(diagDefault) do
     }
 end
 
-package.version = "0.9.2"
+package.version = VERSION
 
 io.save(ROOT:parent_path() / 'package.json', json.encode(package))
 

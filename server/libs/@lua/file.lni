@@ -20,12 +20,6 @@ name = 'type'
 type = 'string'
 ``````````
 name = 'code'
-[[.enums]]
-type = 'type'
-enum = 'exit'
-``````````
-type = 'type'
-enum = 'signal'
 
 [flush]
 [[.args]]

@@ -1,4 +1,5 @@
 local json = require 'json'
+local diagDefault = require 'constant.DiagnosticDefaultSeverity'
 
 local package = {
     name = "lua",
@@ -71,6 +72,13 @@ local package = {
                     items = "string",
                     description = "%config.diagnostics.globals%"
                 },
+                ["Lua.diagnostics.severity"] = {
+                    scope = "resource",
+                    type = 'object',
+                    description = "%config.diagnostics.severity",
+                    title = "severity",
+                    properties = {}
+                },
                 ["Lua.workspace.ignoreDir"] = {
                     scope = "resource",
                     type = "array",
@@ -120,6 +128,21 @@ local package = {
         publisherId = "fb626675-24cf-4881-8c13-b465f29bec2f"
     }
 }
+
+local DiagSeverity = package.contributes.configuration.properties["Lua.diagnostics.severity"].properties
+for name, level in pairs(diagDefault) do
+    DiagSeverity[name] = {
+        scope = 'resource',
+        type = 'string',
+        default = level,
+        enum = {
+            'Error',
+            'Warning',
+            'Information',
+            'Hint',
+        }
+    }
+end
 
 package.version = "0.9.2"
 

@@ -1,0 +1,16 @@
+return {
+    ['unused-local']        = 'Hint',
+    ['undefined-global']    = 'Warning',
+    ['unused-label']        = 'Hint',
+    ['trailing-space']      = 'Hint',
+    ['redefined-local']     = 'Hint',
+    ['newline-call']        = 'Information',
+    ['redundant-parameter'] = 'Information',
+    ['ambiguity-1']         = 'Warning',
+    ['lowercase-global']    = 'Information',
+    ['undefined-env-child'] = 'Information',
+    ['duplicate-index']     = 'Warning',
+    ['empty-block']         = 'Information',
+    ['redundant-value']     = 'Information',
+    ['emmy-lua']            = 'Warning',
+}

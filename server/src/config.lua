@@ -1,3 +1,5 @@
+local DiagnosticDefaultSeverity = require 'constant.DiagnosticDefaultSeverity'
+
 local function Boolean(v)
     if type(v) == 'boolean' then
         return true, v
@@ -90,6 +92,10 @@ local ConfigTemplate = {
     diagnostics = {
         globals         = {{},   Str2Hash ';'},
         disable         = {{},   Str2Hash ';'},
+        severity        = {
+            table.deepCopy(DiagnosticDefaultSeverity),
+            Hash(String, String),
+        },
     },
     workspace = {
         ignoreDir       = {{},   Str2Hash ';'},

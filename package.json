@@ -28,6 +28,168 @@
                     "scope": "resource",
                     "type": "array"
                 },
+                "Lua.diagnostics.severity": {
+                    "description": "%config.diagnostics.severity",
+                    "properties": {
+                        "ambiguity-1": {
+                            "default": "Warning",
+                            "enum": [
+                                "Error",
+                                "Warning",
+                                "Information",
+                                "Hint"
+                            ],
+                            "scope": "resource",
+                            "type": "string"
+                        },
+                        "duplicate-index": {
+                            "default": "Warning",
+                            "enum": [
+                                "Error",
+                                "Warning",
+                                "Information",
+                                "Hint"
+                            ],
+                            "scope": "resource",
+                            "type": "string"
+                        },
+                        "emmy-lua": {
+                            "default": "Warning",
+                            "enum": [
+                                "Error",
+                                "Warning",
+                                "Information",
+                                "Hint"
+                            ],
+                            "scope": "resource",
+                            "type": "string"
+                        },
+                        "empty-block": {
+                            "default": "Information",
+                            "enum": [
+                                "Error",
+                                "Warning",
+                                "Information",
+                                "Hint"
+                            ],
+                            "scope": "resource",
+                            "type": "string"
+                        },
+                        "lowercase-global": {
+                            "default": "Information",
+                            "enum": [
+                                "Error",
+                                "Warning",
+                                "Information",
+                                "Hint"
+                            ],
+                            "scope": "resource",
+                            "type": "string"
+                        },
+                        "newline-call": {
+                            "default": "Information",
+                            "enum": [
+                                "Error",
+                                "Warning",
+                                "Information",
+                                "Hint"
+                            ],
+                            "scope": "resource",
+                            "type": "string"
+                        },
+                        "redefined-local": {
+                            "default": "Hint",
+                            "enum": [
+                                "Error",
+                                "Warning",
+                                "Information",
+                                "Hint"
+                            ],
+                            "scope": "resource",
+                            "type": "string"
+                        },
+                        "redundant-parameter": {
+                            "default": "Information",
+                            "enum": [
+                                "Error",
+                                "Warning",
+                                "Information",
+                                "Hint"
+                            ],
+                            "scope": "resource",
+                            "type": "string"
+                        },
+                        "redundant-value": {
+                            "default": "Information",
+                            "enum": [
+                                "Error",
+                                "Warning",
+                                "Information",
+                                "Hint"
+                            ],
+                            "scope": "resource",
+                            "type": "string"
+                        },
+                        "trailing-space": {
+                            "default": "Hint",
+                            "enum": [
+                                "Error",
+                                "Warning",
+                                "Information",
+                                "Hint"
+                            ],
+                            "scope": "resource",
+                            "type": "string"
+                        },
+                        "undefined-env-child": {
+                            "default": "Information",
+                            "enum": [
+                                "Error",
+                                "Warning",
+                                "Information",
+                                "Hint"
+                            ],
+                            "scope": "resource",
+                            "type": "string"
+                        },
+                        "undefined-global": {
+                            "default": "Warning",
+                            "enum": [
+                                "Error",
+                                "Warning",
+                                "Information",
+                                "Hint"
+                            ],
+                            "scope": "resource",
+                            "type": "string"
+                        },
+                        "unused-label": {
+                            "default": "Hint",
+                            "enum": [
+                                "Error",
+                                "Warning",
+                                "Information",
+                                "Hint"
+                            ],
+                            "scope": "resource",
+                            "type": "string"
+                        },
+                        "unused-local": {
+                            "default": "Hint",
+                            "enum": [
+                                "Error",
+                                "Warning",
+                                "Information",
+                                "Hint"
+                            ],
+                            "scope": "resource",
+                            "type": "string"
+                        }
+                    },
+                    "scope": "resource",
+                    "title": "severity",
+                    "type": "object"
+                },
                 "Lua.runtime.path": {
                     "default": [
                         "?.lua",

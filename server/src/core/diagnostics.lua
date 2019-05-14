@@ -2,13 +2,7 @@ local lang = require 'language'
 local config = require 'config'
 local library = require 'core.library'
 local buildGlobal = require 'vm.global'
-
-local DiagnosticSeverity = {
-    Error       = 1,
-    Warning     = 2,
-    Information = 3,
-    Hint        = 4,
-}
+local DiagnosticSeverity = require 'constant.DiagnosticSeverity'
 
 local mt = {}
 mt.__index = mt

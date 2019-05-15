@@ -136,3 +136,13 @@ return {
     [...] = ...
 }
 ]]
+
+TEST [[
+-- 选取单位
+---@param center point
+---@param radius number
+---@param height number
+---@return unit[]
+function scene:selectByCylinder(center, radius, height)
+end
+]]

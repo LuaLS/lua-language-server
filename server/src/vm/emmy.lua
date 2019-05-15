@@ -125,7 +125,7 @@ function mt:doEmmyAlias(action)
     local emmyMgr = self.emmyMgr
     self:instantSource(action)
     self:instantSource(action[1])
-    local type = self:buildEmmyType(action[2])
+    local type = self:buildEmmyAnyType(action[2])
     local alias = emmyMgr:addAlias(action, type)
     action:set('emmy.alias', alias)
     action[1]:set('emmy class', alias:getName())
@@ -157,7 +157,7 @@ function mt:doEmmyParam(action)
     local emmyMgr = self.emmyMgr
     self:instantSource(action)
     self:instantSource(action[1])
-    local type = self:getGenericByType(action[2]) or self:buildEmmyType(action[2])
+    local type = self:getGenericByType(action[2]) or self:buildEmmyAnyType(action[2])
     local param = emmyMgr:addParam(action, type)
     action:set('emmy.param', param)
     self:addEmmyParam(param)
@@ -170,7 +170,7 @@ function mt:doEmmyReturn(action)
     ---@type emmyMgr
     local emmyMgr = self.emmyMgr
     self:instantSource(action)
-    local type = self:getGenericByType(action[1]) or self:buildEmmyType(action[1])
+    local type = self:getGenericByType(action[1]) or self:buildEmmyAnyType(action[1])
     local rtn = emmyMgr:addReturn(action, type)
     action:set('emmy.return', rtn)
     self:addEmmyReturn(rtn)
@@ -184,7 +184,7 @@ function mt:doEmmyField(action)
     local emmyMgr = self.emmyMgr
     self:instantSource(action)
     self:instantSource(action[2])
-    local type = self:buildEmmyType(action[3])
+    local type = self:buildEmmyAnyType(action[3])
     local value = self:createValue('nil', action[2])
     local field = emmyMgr:addField(action, type, value)
     value:setEmmy(type)
@@ -208,7 +208,7 @@ function mt:doEmmyGeneric(action)
         defs[i] = {}
         defs[i].name = self:instantSource(obj[1])
         if obj[2] then
-            defs[i].type = self:buildEmmyType(obj[2])
+            defs[i].type = self:buildEmmyAnyType(obj[2])
         end
     end
 
@@ -220,7 +220,7 @@ function mt:doEmmyVararg(action)
     ---@type emmyMgr
     local emmyMgr = self.emmyMgr
     self:instantSource(action)
-    local type = self:getGenericByType(action[1]) or self:buildEmmyType(action[1])
+    local type = self:getGenericByType(action[1]) or self:buildEmmyAnyType(action[1])
     local param = emmyMgr:addParam(action, type)
     action:set('emmy.param', param)
     self:addEmmyParam(param)
@@ -251,8 +251,8 @@ function mt:buildEmmyTableType(action)
     ---@type emmyMgr
     local emmyMgr = self.emmyMgr
     self:instantSource(action)
-    local keyType = self:buildEmmyType(action[1])
-    local valueType = self:buildEmmyType(action[2])
+    local keyType = self:buildEmmyAnyType(action[1])
+    local valueType = self:buildEmmyAnyType(action[2])
     local type = emmyMgr:addTableType(action, keyType, valueType)
     return type
 end

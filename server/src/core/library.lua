@@ -88,6 +88,9 @@ local function insertGlobal(tbl, key, value)
     if not isMatchVersion(value.version) then
         return false
     end
+    if not value.doc then
+        value.doc = key
+    end
     tbl[key] = value
     return true
 end
@@ -175,6 +178,9 @@ local function insertChild(tbl, name, key, value)
     if not isMatchVersion(value.version) then
         return
     end
+    if not value.doc then
+        value.doc = ('%s.%s'):format(name, key)
+    end
     if not tbl[name] then
         tbl[name] = {
             type = name,
@@ -189,7 +195,7 @@ local function mergeParent(alllibs, name, lib, libName)
     for _, parent in ipairs(lib.parent) do
         if parent.type == 'global' then
             if isEnableGlobal(libName) then
-                insertChild(alllibs.global,  parent.name, name, lib)
+                insertChild(alllibs.global, parent.name, name, lib)
             end
         elseif parent.type == 'library' then
             insertChild(alllibs.library, parent.name, name, lib)

@@ -69,7 +69,8 @@ local function getDucumentation(name, value)
 ```lua
 %s
 ```
-]]):format(hover.label or '', hover.description or '', hover.enum or '')
+%s
+]]):format(hover.label or '', hover.description or '', hover.enum or '', hover.doc or '')
         return {
             kind = 'markdown',
             value = text,

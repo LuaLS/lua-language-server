@@ -1,4 +1,5 @@
-
+local lang = require 'language'
+local config = require 'config'
 local function buildLibArgs(lib, object, select)
     if not lib.args then
         return ''
@@ -171,11 +172,31 @@ local function buildEnum(lib)
     return table.concat(strs)
 end
 
+local function buildDoc(lib)
+    local doc = lib.doc
+    if not doc then
+        return
+    end
+    local version = config.config.runtime.version
+    if version == 'Lua 5.1' then
+        return lang.script('HOVER_DOCUMENT_LUA51', doc)
+    elseif version == 'Lua 5.2' then
+        return lang.script('HOVER_DOCUMENT_LUA52', doc)
+    elseif version == 'Lua 5.3' then
+        return lang.script('HOVER_DOCUMENT_LUA53', doc)
+    elseif version == 'Lua 5.4' then
+        return lang.script('HOVER_DOCUMENT_LUA54', doc)
+    elseif version == 'LuaJIT' then
+        return lang.script('HOVER_DOCUMENT_LUAJIT', doc)
+    end
+end
+
 return function (name, lib, object, select)
     local args, argLabel = buildLibArgs(lib, object, select)
     local returns = buildLibReturns(lib)
     local enum = buildEnum(lib)
     local tip = lib.description
+    local doc = buildDoc(lib)
     local headLen = #('function %s('):format(name)
     local title = ('function %s(%s)%s'):format(name, args, returns)
     if argLabel then
@@ -187,5 +208,6 @@ return function (name, lib, object, select)
         description = tip,
         enum = enum,
         argLabel = argLabel,
+        doc = doc,
     }
 end

@@ -2,6 +2,7 @@ local service = require 'service'
 local workspace = require 'workspace'
 local fs = require 'bee.filesystem'
 local core = require 'core'
+local uric = require 'uri'
 
 local SymbolKind = {
     File = 1,
@@ -67,13 +68,13 @@ function TEST(data)
     local ws = workspace(lsp, 'test')
     lsp.workspace = ws
 
-    local targetUri = ws:uriEncode(fs.path(data[1].path))
-    local sourceUri = ws:uriEncode(fs.path(data[2].path))
+    local targetUri = uric.encode(fs.path(data[1].path))
+    local sourceUri = uric.encode(fs.path(data[2].path))
 
     lsp:saveText(sourceUri, 1, data[2].content)
-    ws:addFile(ws:uriDecode(sourceUri))
+    ws:addFile(uric.decode(sourceUri))
     lsp:saveText(targetUri, 1, data[1].content)
-    ws:addFile(ws:uriDecode(targetUri))
+    ws:addFile(uric.decode(targetUri))
     while lsp._needCompile[1] do
         lsp:compileVM(lsp._needCompile[1])
     end

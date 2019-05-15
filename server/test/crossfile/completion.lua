@@ -2,6 +2,7 @@ local service = require 'service'
 local workspace = require 'workspace'
 local fs = require 'bee.filesystem'
 local core = require 'core'
+local uric = require 'uri'
 
 rawset(_G, 'TEST', true)
 
@@ -71,7 +72,7 @@ function TEST(data)
     local mainBuf
     local pos
     for _, info in ipairs(data) do
-        local uri = ws:uriEncode(fs.path(info.path))
+        local uri = uric.encode(fs.path(info.path))
         local script = info.content
         if info.main then
             pos = script:find('$', 1, true) - 1
@@ -80,7 +81,7 @@ function TEST(data)
             mainBuf = script
         end
         lsp:saveText(uri, 1, script)
-        ws:addFile(ws:uriDecode(uri))
+        ws:addFile(uric.decode(uri))
 
         while lsp._needCompile[1] do
             lsp:compileVM(lsp._needCompile[1])

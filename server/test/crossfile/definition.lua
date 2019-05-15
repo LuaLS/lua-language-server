@@ -2,6 +2,7 @@ local service = require 'service'
 local workspace = require 'workspace'
 local fs = require 'bee.filesystem'
 local core = require 'core'
+local uric = require 'uri'
 
 rawset(_G, 'TEST', true)
 
@@ -51,7 +52,7 @@ function TEST(datas)
     local sourceList, sourceUri
 
     for i, data in ipairs(datas) do
-        local uri = ws:uriEncode(fs.path(data.path))
+        local uri = uric.encode(fs.path(data.path))
         local new, list = catch_target(data.content, '!')
         if new ~= data.content or data.target then
             if data.target then
@@ -79,7 +80,7 @@ function TEST(datas)
             data.content = new
         end
         lsp:saveText(uri, 1, data.content)
-        ws:addFile(ws:uriDecode(uri))
+        ws:addFile(uric.decode(uri))
     end
 
     while lsp._needCompile[1] do

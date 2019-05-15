@@ -2,6 +2,7 @@ local service = require 'service'
 local workspace = require 'workspace'
 local fs = require 'bee.filesystem'
 local core = require 'core'
+local uric = require 'uri'
 
 rawset(_G, 'TEST', true)
 
@@ -57,16 +58,16 @@ function TEST(data)
     ws.root = ROOT
 
     local targetScript = data[1].content
-    local targetUri = ws:uriEncode(fs.path(data[1].path))
+    local targetUri = uric.encode(fs.path(data[1].path))
 
     local sourceScript, sourceList = catch_target(data[2].content, '?')
-    local sourceUri = ws:uriEncode(fs.path(data[2].path))
+    local sourceUri = uric.encode(fs.path(data[2].path))
 
     lsp:saveText(targetUri, 1, targetScript)
-    ws:addFile(ws:uriDecode(targetUri))
+    ws:addFile(uric.decode(targetUri))
     lsp:compileVM(targetUri)
     lsp:saveText(sourceUri, 1, sourceScript)
-    ws:addFile(ws:uriDecode(sourceUri))
+    ws:addFile(uric.decode(sourceUri))
     lsp:compileVM(sourceUri)
 
     local sourceVM = lsp:loadVM(sourceUri)
@@ -76,7 +77,7 @@ function TEST(data)
     local hover = core.hover(source, lsp)
     assert(hover)
     if data.hover.description then
-        local uriROOT = ws:uriEncode(ROOT):gsub('%%', '%%%%')
+        local uriROOT = uric.encode(ROOT):gsub('%%', '%%%%')
         data.hover.description = data.hover.description:gsub('%$ROOT%$', uriROOT)
     end
     if hover.label then

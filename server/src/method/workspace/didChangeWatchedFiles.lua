@@ -1,4 +1,5 @@
 local fs = require 'bee.filesystem'
+local uric = require 'uri'
 
 local FileChangeType = {
     Created = 1,
@@ -12,7 +13,7 @@ return function (lsp, params)
     end
     local needReset
     for _, change in ipairs(params.changes) do
-        local path = lsp.workspace:uriDecode(change.uri)
+        local path = uric.decode(change.uri)
         if change.type == FileChangeType.Created then
             lsp.workspace:addFile(path)
             if lsp:getVM(change.uri) then

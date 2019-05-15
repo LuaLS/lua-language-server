@@ -4,6 +4,7 @@ local config = require 'config'
 local ll = require 'lpeglabel'
 local platform = require 'bee.platform'
 local glob = require 'glob'
+local uric = require 'uri'
 
 local TrueName = {}
 
@@ -52,59 +53,11 @@ function mt:fileNameEq(a, b)
     end
 end
 
-function mt:uriDecode(uri)
-    -- Unix-like系统根是/
-    if uri:sub(1, 9) == 'file:////' then
-        return fs.path(uri:sub(9))
-    end
-    if uri:sub(1, 8) ~= 'file:///' then
-        log.error('uri decode failed: ', uri)
-        return nil
-    end
-    local names = {}
-    for name in uri:sub(9):gmatch '[^%/]+' do
-        names[#names+1] = name:gsub('%%([0-9a-fA-F][0-9a-fA-F])', function (hex)
-            return string.char(tonumber(hex, 16))
-        end)
-    end
-    if #names == 0 then
-        log.error('uri decode failed: ', uri)
-        return nil
-    end
-    -- 盘符后面加个斜杠
-    local path = fs.path(names[1] .. '\\')
-    for i = 2, #names do
-        path = path / names[i]
-    end
-    return fs.absolute(path)
-end
-
-function mt:uriEncode(path)
-    local names = {}
-    local cur = fs.absolute(path)
-    while true do
-        local name = cur:filename():string()
-        if name == '' then
-            -- 盘符，去掉一个斜杠
-            name = cur:string():sub(1, -2)
-        end
-        name = name:gsub([=[[^%w%-%_%.%~]]=], function (char)
-            return ('%%%02X'):format(string.byte(char))
-        end)
-        table.insert(names, 1, name)
-        if cur == cur:parent_path() then
-            break
-        end
-        cur = cur:parent_path()
-    end
-    return 'file:///' .. table.concat(names, '/')
-end
-
 function mt:listenLoadFile()
     self._loadFileRequest = async.run('loadfile', nil, function (filename, buf)
         local path = fs.path(filename)
         local name = getFileName(path)
-        local uri = self:uriEncode(path)
+        local uri = uric.encode(path)
         self.files[name] = uri
         self.lsp:readText(uri, path, buf, self._currentScanCompiled)
     end)
@@ -192,7 +145,7 @@ function mt:scanFiles()
 end
 
 function mt:init(rootUri)
-    self.root = self:uriDecode(rootUri)
+    self.root = uric.decode(rootUri)
     self.uri = rootUri
     if not self.root then
         return
@@ -231,7 +184,7 @@ function mt:addFile(path)
         return
     end
     local name = getFileName(path)
-    local uri = self:uriEncode(path)
+    local uri = uric.encode(path)
     self.files[name] = uri
     self.lsp:readText(uri, path)
 end
@@ -242,13 +195,13 @@ function mt:removeFile(path)
         return
     end
     self.files[name] = nil
-    local uri = self:uriEncode(path)
+    local uri = uric.encode(path)
     self.lsp:removeText(uri)
 end
 
 function mt:findPath(baseUri, searchers)
     local results = {}
-    local baseName = getFileName(self:uriDecode(baseUri))
+    local baseName = getFileName(uric.decode(baseUri))
     for filename, uri in pairs(self.files) do
         if filename ~= baseName then
             for _, searcher in ipairs(searchers) do
@@ -381,7 +334,7 @@ function mt:matchPath(baseUri, input)
     if not first then
         return nil
     end
-    local baseName = getFileName(self:uriDecode(baseUri))
+    local baseName = getFileName(uric.decode(baseUri))
     local rootLen = #self.root:string()
     local map = {}
     for filename in pairs(self.files) do
@@ -485,7 +438,7 @@ function mt:reset()
 end
 
 function mt:relativePathByUri(uri)
-    local path = self:uriDecode(uri)
+    local path = uric.decode(uri)
     local relate = fs.relative(path, self.root)
     return relate
 end

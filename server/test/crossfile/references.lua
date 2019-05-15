@@ -2,6 +2,7 @@ local service = require 'service'
 local workspace = require 'workspace'
 local fs = require 'bee.filesystem'
 local core = require 'core'
+local uric = require 'uri'
 
 rawset(_G, 'TEST', true)
 
@@ -79,11 +80,11 @@ function TEST(data)
     local pos
     local expect = {}
     for _, info in ipairs(data) do
-        local uri = ws:uriEncode(fs.path(info.path))
-        ws:addFile(ws:uriDecode(uri))
+        local uri = uric.encode(fs.path(info.path))
+        ws:addFile(uric.decode(uri))
     end
     for _, info in ipairs(data) do
-        local uri = ws:uriEncode(fs.path(info.path))
+        local uri = uric.encode(fs.path(info.path))
         local script = info.content
         local list = catch_target(script)
         for _, location in ipairs(list) do

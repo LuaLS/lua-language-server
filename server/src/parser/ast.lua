@@ -545,6 +545,20 @@ local Defs = {
             finish = start + 2,
         }
     end,
+    DotsAsArg = function (obj)
+        State.Dots[#State.Dots] = true
+        return obj
+    end,
+    DotsAsExp = function (obj)
+        if not State.Dots[#State.Dots] then
+            pushError {
+                type = 'UNEXPECT_DOTS',
+                start = obj.start,
+                finish = obj.finish,
+            }
+        end
+        return obj
+    end,
     COLON = function (start)
         return {
             type   = ':',
@@ -982,12 +996,14 @@ local Defs = {
     -- 不能jump到另一个局部变量的作用域
     -- 函数会切断goto与label
     -- 不能从block外jump到block内，但是可以从block内jump到block外
-    LabelStart = function ()
+    BlockStart = function ()
         State.Label[#State.Label+1] = {}
+        State.Dots[#State.Dots+1] = false
     end,
-    LabelEnd = function ()
+    BlockEnd = function ()
         local labels = State.Label[#State.Label]
         State.Label[#State.Label] = nil
+        State.Dots[#State.Dots] = nil
         for i = 1, #labels do
             local name = labels[i]
             local str = name[1]
@@ -1567,6 +1583,7 @@ return function (self, lua, mode, version)
     State= {
         Break = 0,
         Label = {{}},
+        Dots = {true},
         Version = version,
     }
     local suc, res, err = xpcall(self.grammar, debug.traceback, self, lua, mode, Defs)

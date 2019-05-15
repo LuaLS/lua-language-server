@@ -290,6 +290,9 @@ local function searchCloseGlobal(vm, start, finish, word, callback)
 end
 
 local function searchParams(vm, source, func, word, callback)
+    if not func then
+        return
+    end
     ---@type emmyFunction
     local emmyParams = func:getEmmyParams()
     if not emmyParams then

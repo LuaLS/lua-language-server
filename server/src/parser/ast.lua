@@ -1549,6 +1549,17 @@ local Defs = {
         }
         return rtn, action
     end,
+    MissIf = function (start, block)
+        pushError {
+            type = 'MISS_SYMBOL',
+            start = start,
+            finish = start,
+            info = {
+                symbol = 'if',
+            }
+        }
+        return block
+    end
 }
 
 return function (self, lua, mode, version)

@@ -424,8 +424,10 @@ GoTo        <-  Sp ({} GOTO MustName {}) -> GoTo
 If          <-  Sp ({} IfBody {})
             ->  If
 IfHead      <-  (IfPart     -> IfBlock)
-            /   (ElseIfPart -> ElseIfBlock)
-            /   (ElsePart   -> ElseBlock)
+            /   ({} ElseIfPart -> ElseIfBlock)
+            ->  MissIf
+            /   ({} ElsePart   -> ElseBlock)
+            ->  MissIf
 IfBody      <-  IfHead
                 (ElseIfPart -> ElseIfBlock)*
                 (ElsePart   -> ElseBlock)?

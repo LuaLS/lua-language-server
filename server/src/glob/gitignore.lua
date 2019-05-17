@@ -172,7 +172,7 @@ function mt:scan(callback)
                     for _, path in ipairs(result) do
                         local filename = path:match '([^/\\]+)[/\\]*$'
                         if filename then
-                            list[#list+1] = current .. '\\' .. filename
+                            list[#list+1] = current .. '/' .. filename
                         end
                     end
                 end

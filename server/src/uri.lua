@@ -20,7 +20,7 @@ local function decode(uri)
         return nil
     end
     -- 盘符后面加个斜杠
-    local path = fs.path(names[1] .. '\\')
+    local path = fs.path(names[1] .. '/')
     for i = 2, #names do
         path = path / names[i]
     end

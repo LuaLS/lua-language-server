@@ -1,4 +1,6 @@
+
 local lm = require 'luamake'
+local platform = require "bee.platform"
 
 lm:import '3rd/bee.lua/make.lua'
 
@@ -12,6 +14,10 @@ if lm.plat == 'macos' then
     lua = 'lua'
     includes = {'bee.lua/3rd/lua/src'}
     lpeglabel_ldflags = nil
+elseif lm.plat == 'linux' then
+    lua = 'lua'
+    includes = {'bee.lua/3rd/lua/src'}
+    lpeglabel_ldflags = nil
 end
 
 lm:shared_library 'lni' {
@@ -19,7 +25,10 @@ lm:shared_library 'lni' {
     sources = {
         'lni/src/main.cpp',
     },
-    includes = includes
+    includes = includes,
+    links = {
+        platform.OS == "Linux" and "stdc++",
+    },
 }
 
 lm:shared_library 'lpeglabel' {
@@ -30,7 +39,7 @@ lm:shared_library 'lpeglabel' {
 }
 
 local rcedit = nil
-if lm.plat ~= 'macos' then
+if lm.plat ~= 'macos' and lm.plat ~= 'linux' then
     rcedit = 'rcedit'
 
     lm:executable 'rcedit' {

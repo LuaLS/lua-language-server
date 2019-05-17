@@ -101,3 +101,4 @@ Please [help me][en-US] improve the quality of `en-US`.
 * [Stjepan Bakrac](https://github.com/z16)
 * [Peter Young](https://github.com/young40)
 * [Li Xiaobin](https://github.com/Xiaobin0860)
+* [Fedora7](https://github.com/Fedora7)

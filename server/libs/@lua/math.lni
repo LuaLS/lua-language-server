@@ -192,6 +192,7 @@ type = '...'
 type = 'number'
 
 [maxinteger]
+version = {'Lua 5.3', 'Lua 5.4'}
 type = 'integer'
 
 [min]
@@ -204,6 +205,7 @@ type = '...'
 type = 'number'
 
 [mininteger]
+version = {'Lua 5.3', 'Lua 5.4'}
 type = 'integer'
 
 [modf]

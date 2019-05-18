@@ -23,7 +23,7 @@ parent = {
 [[.returns]]
 type = 'number'
 
-[data]
+[date]
 [[.args]]
 name = 'format'
 type = 'string'

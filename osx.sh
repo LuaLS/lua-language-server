@@ -21,5 +21,24 @@ cd -
 
 cp server/*.so publish/lua-language-server/server/
 
+echo "Try to install lua-language-server for you:"
+while read path; do
+    INSTALL_PATH=$path
+    break
+done <<< `find ~/.vscode/extensions -name "sumneko.lua-*" | sort -r | head -1`
+
+if [ -d "$INSTALL_PATH" ]; then
+    cp server/bin/lua-language-server "${INSTALL_PATH}/server/bin"
+
+    cp server/*.so "${INSTALL_PATH}/server"
+
+    echo "installed."
+    echo "please restart VScode and enjoy."
+    echo "Done."
+else
+    echo "please install sumneko Lua in VScode Marketplace first."
+    exit 1
+fi
+
 #cd publish/lua-language-server
 #vsce package

@@ -1,4 +1,5 @@
 local fs = require 'bee.filesystem'
+local platform = require 'bee.platform'
 
 local function decode(uri)
     -- Unix-like系统根是/
@@ -9,6 +10,12 @@ local function decode(uri)
         log.error('uri decode failed: ', uri)
         return nil
     end
+
+    -- linux uri example: file:///home/user/project/
+    if platform.OS == 'Linux' then
+        return fs.path(uri:sub(8))
+    end
+   
     local names = {}
     for name in uri:sub(9):gmatch '[^%/]+' do
         names[#names+1] = name:gsub('%%([0-9a-fA-F][0-9a-fA-F])', function (hex)

@@ -5,6 +5,7 @@ set -e
 MY_DIR=$(cd "$(dirname $0)";pwd)
 cd $MY_DIR
 
+echo "updating submodule ..."
 git submodule -q update --recursive --init
 
 echo "build luamake ..."

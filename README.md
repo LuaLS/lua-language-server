@@ -63,7 +63,7 @@ Then build lua-language-server yourself.
 
 ### Requirement
 * Xcode
-* ninja [ninja]
+* [ninja]
 
 ### Build
 * Clone souce code

@@ -71,8 +71,6 @@ type = 'number'
 ``````````
 name = 'x'
 type = 'number'
-optional = 'self'
-default = 1
 [[.returns]]
 type = 'number'
 

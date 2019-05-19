@@ -290,5 +290,5 @@
     "scripts": {
         "vscode:prepublish": "cd client && npm run update-vscode && cd .."
     },
-    "version": "0.9.4"
+    "version": "0.9.5"
 }

@@ -179,7 +179,6 @@ function mt:scan(callback)
             end
         end
     end
-    table.sort(files)
     return files
 end
 

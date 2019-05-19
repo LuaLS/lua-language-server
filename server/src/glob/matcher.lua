@@ -95,12 +95,15 @@ end
 function mt:range(exp, state, index)
     local after = self:exp(state, index)
     local ranges = {}
+    local selects = {}
     for _, range in ipairs(exp.value) do
-        if range[1] and range[2] then
+        if #range == 1 then
+            selects[#selects+1] = range[1]
+        elseif #range == 2 then
             ranges[#ranges+1] = range[1] .. range[2]
         end
     end
-    local current = m.R(table.unpack(ranges))
+    local current = m.S(table.concat(selects)) + m.R(table.unpack(ranges))
     if after then
         return current * after
     else

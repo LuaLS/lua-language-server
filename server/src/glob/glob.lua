@@ -37,8 +37,10 @@ local parser = m.P {
                     ,
     ['Char']        = object('char', (1 - m.S',{}[]*?/\\')^1),
     ['FSymbol']     = object('**', m.P'**'),
+    ['RangeWord']   = 1 - m.P']',
     ['Range']       = m.P'[' * m.Ct(m.V'RangeUnit'^0) * m.P']'^-1,
-    ['RangeUnit']   = m.Ct(- m.P']' * m.C(m.P(1)) * (m.P'-' * - m.P']' * m.C(m.P(1)))^-1),
+    ['RangeUnit']   = m.Ct(m.C(m.V'RangeWord') * m.P'-' * m.C(m.V'RangeWord'))
+                    + m.V'RangeWord',
 }
 
 local mt = {}

@@ -96,7 +96,9 @@ function mt:range(exp, state, index)
     local after = self:exp(state, index)
     local ranges = {}
     for _, range in ipairs(exp.value) do
-        ranges[#ranges+1] = range[1] .. range[2]
+        if range[1] and range[2] then
+            ranges[#ranges+1] = range[1] .. range[2]
+        end
     end
     local current = m.R(table.unpack(ranges))
     if after then

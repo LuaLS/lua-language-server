@@ -35,7 +35,6 @@ if [ -d "$INSTALL_PATH" ]; then
     echo "Done."
 else
     echo "please install sumneko Lua in VScode Marketplace first."
-    exit 1
 fi
 
 #cd publish/lua-language-server

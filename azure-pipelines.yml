@@ -11,7 +11,7 @@ pool:
 
 steps:
 - script: |
-    git submodules update --init --recursive
+    git submodule update --init --recursive
   displayName: '拉取子模块'
 - script: |
     cd 3rd\luamake

@@ -18,7 +18,7 @@ function M.make_file_uri (path)
         error("Unix relative paths can't be converted to file URIs")
     end
     path = path:gsub("//+", "/")
-    path = Util.uri_encode(path, "^A-Za-z0-9%-._~!$&'()*+,;=:@/")
+    path = Util.uri_encode(path, "^A-Za-z0-9%-._~!$&'()*+,;=@/")
     return assert(URI:new("file://" .. path))
 end
 

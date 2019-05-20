@@ -19,13 +19,13 @@ function M.filesystem_path (uri)
 end
 
 function M.make_file_uri (path)
-    if path:find("^[A-Za-z]:$") then path = path .. "\\" end
-    local _, _, host, hostpath = path:find("^\\\\([A-Za-z.]+)\\(.*)$")
+    path = path:gsub("\\", "/")
+    if path:find("^[A-Za-z]:$") then path = path .. "/" end
+    local _, _, host, hostpath = path:find("^//([A-Za-z0-9.]+)/(.*)$")
     host = host or ""
     hostpath = hostpath or path
-    hostpath = hostpath:gsub("\\", "/")
-                       :gsub("//+", "/")
-    hostpath = Util.uri_encode(hostpath, "^A-Za-z0-9%-._~!$&'()*+,;=:@/")
+    hostpath = hostpath:gsub("//+", "/")
+    hostpath = Util.uri_encode(hostpath, "^A-Za-z0-9%-._~!$&'()*+,;=@/")
     if not hostpath:find("^/") then hostpath = "/" .. hostpath end
     return assert(URI:new("file://" .. host .. hostpath))
 end

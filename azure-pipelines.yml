@@ -30,7 +30,6 @@ jobs:
   - bash: |
       sudo xcode-select -s /Applications/Xcode_10.2.app
       brew install ninja
-      ninja -f ninja/macos.ninja
     displayName: '安装ninja'
   - bash: |
       ./osx.sh

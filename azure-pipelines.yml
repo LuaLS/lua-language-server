@@ -7,13 +7,17 @@ trigger:
 - master
 
 pool:
-  vmImage: 'ubuntu-latest'
+  name: Hosted VS2017
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
-
 - script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+    cd 3rd\luamake
+    tools\ninja -f ninja\msvc.ninja
+    
+    cd ..\..
+    3rd\luamake\luamake
+  displayName: '编译C模块'
+- script: |
+    cd server
+    bin\lua-language-server.exe publish.lua
+  displayName: '测试'

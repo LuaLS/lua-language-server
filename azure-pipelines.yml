@@ -28,7 +28,10 @@ jobs:
 
   steps:
   - script: |
-      sudo apt-get update
-      sudo apt-get install -y libreadline-dev ninja-build
+    sudo xcode-select -s /Applications/Xcode_10.2.app
+    brew install ninja
+    ninja -f ninja/macos.ninja
+    displayName: '安装ninja'
+  - script: |
       ./osx.sh
     displayName: '测试'

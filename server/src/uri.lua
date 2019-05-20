@@ -1,58 +1,23 @@
 local fs = require 'bee.filesystem'
 local platform = require 'bee.platform'
+local sandbox = require 'sandbox'
+local luaUriPath = (ROOT / 'src' / '3rd' / 'lua-uri'):string()
+local URI = sandbox('uri.lua', luaUriPath, io.open)
+local URI_FILE = sandbox('uri/file.lua', luaUriPath, io.open)
+local OS = platform.OS == 'Windows' and 'win32' or 'unix'
 
 local function decode(uri)
-    -- Unix-like系统根是/
-    if uri:sub(1, 9) == 'file:////' then
-        return fs.path(uri:sub(9))
-    end
-    if uri:sub(1, 8) ~= 'file:///' then
-        log.error('uri decode failed: ', uri)
-        return nil
-    end
-
-    -- linux uri example: file:///home/user/project/
-    if platform.OS == 'Linux' then
-        return fs.path(uri:sub(8))
-    end
-   
-    local names = {}
-    for name in uri:sub(9):gmatch '[^%/]+' do
-        names[#names+1] = name:gsub('%%([0-9a-fA-F][0-9a-fA-F])', function (hex)
-            return string.char(tonumber(hex, 16))
-        end)
-    end
-    if #names == 0 then
-        log.error('uri decode failed: ', uri)
-        return nil
-    end
-    -- 盘符后面加个斜杠
-    local path = fs.path(names[1] .. '/')
-    for i = 2, #names do
-        path = path / names[i]
-    end
-    return fs.absolute(path)
+    local obj = URI:new(uri)
+    local fullPath = obj:filesystem_path(OS)
+    local path = fs.path(fullPath)
+    return path
 end
 
 local function encode(path)
-    local names = {}
-    local cur = fs.absolute(path)
-    while true do
-        local name = cur:filename():string()
-        if name == '' then
-            -- 盘符，去掉一个斜杠
-            name = cur:string():sub(1, -2)
-        end
-        name = name:gsub([=[[^%w%-%_%.%~]]=], function (char)
-            return ('%%%02X'):format(string.byte(char))
-        end)
-        table.insert(names, 1, name)
-        if cur == cur:parent_path() then
-            break
-        end
-        cur = cur:parent_path()
-    end
-    return 'file:///' .. table.concat(names, '/')
+    local fullPath = fs.absolute(path)
+    local obj = URI_FILE.make_file_uri(fullPath:string(), OS)
+    local uri = obj:uri()
+    return uri
 end
 
 return {

@@ -1,26 +1,32 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
 - master
 
-pool:
-  name: Hosted VS2017
+jobs:
+- job: windows_msvc
+  pool:
+    name: Hosted VS2017
 
-steps:
-- script: |
-    git submodule update --init --recursive
-  displayName: '拉取子模块'
-- script: |
-    cd 3rd\luamake
-    tools\ninja -f ninja\msvc.ninja
-    
-    cd ..\..
-    3rd\luamake\luamake
-  displayName: '编译C模块'
-- script: |
-    cd server
-    bin\lua-language-server.exe publish.lua
-  displayName: '测试'
+  steps:
+  - script: |
+      git submodule update --init --recursive
+    displayName: '拉取子模块'
+  - script: |
+      cd 3rd\luamake
+      tools\ninja -f ninja\msvc.ninja
+      
+      cd ..\..
+      3rd\luamake\luamake
+    displayName: '编译C模块'
+  - script: |
+      cd server
+      bin\lua-language-server.exe publish.lua
+    displayName: '测试'
+
+- job: macos
+  pool:
+    name: Hosted macOS
+
+  steps:
+  - script: |
+      osx.sh
+    displayName: '测试'

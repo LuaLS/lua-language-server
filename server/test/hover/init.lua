@@ -623,6 +623,16 @@ local r: number
 ]]
 
 TEST [[
+---@param x number
+---@param y boolean
+local function <?f?>(x, y)
+end
+]]
+[[
+function f(x: number, y: boolean)
+]]
+
+TEST [[
 ---@vararg Class
 local function f(...)
     local _, <?x?> = ...

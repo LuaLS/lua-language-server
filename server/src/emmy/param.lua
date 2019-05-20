@@ -9,6 +9,14 @@ function mt:getName()
     return self.name
 end
 
+function mt:getType()
+    if self._bindType then
+        return self._bindType:getType()
+    else
+        return 'any'
+    end
+end
+
 function mt:getSource()
     return listMgr.get(self.source)
 end

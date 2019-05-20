@@ -4,14 +4,18 @@ local function buildValueArgs(func, object, select)
     end
     local names = {}
     local values = {}
-    if func.args then
-        for _, arg in ipairs(func.args) do
-            names[#names+1] = arg:getName()
-        end
-    end
     if func.argValues then
         for i, value in ipairs(func.argValues) do
             values[i] = value:getType()
+        end
+    end
+    if func.args then
+        for i, arg in ipairs(func.args) do
+            names[#names+1] = arg:getName()
+            local param = func:findEmmyParamByName(arg:getName())
+            if param then
+                values[i] = param:getType()
+            end
         end
     end
     local strs = {}

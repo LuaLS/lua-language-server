@@ -162,6 +162,36 @@ TEST {
     }
 }
 
+TEST {
+    {
+        path = 'abc.lua',
+        content = '',
+    },
+    {
+        path = 'ABCD.lua',
+        content = '',
+    },
+    {
+        path = 'test.lua',
+        content = 'require "a$"',
+        main = true,
+    },
+    completion = {
+        {
+            label = 'ABCD',
+            kind = CompletionItemKind.Reference,
+            documentation = 'ABCD.lua',
+            textEdit = EXISTS,
+        },
+        {
+            label = 'abc',
+            kind = CompletionItemKind.Reference,
+            documentation = 'abc.lua',
+            textEdit = EXISTS,
+        },
+    }
+}
+
 else
 
 TEST {
@@ -353,36 +383,6 @@ TEST {
             label = 'x111',
             kind = CompletionItemKind.Reference,
             documentation = 'abc/x111.lua',
-            textEdit = EXISTS,
-        },
-    }
-}
-
-TEST {
-    {
-        path = 'abc.lua',
-        content = '',
-    },
-    {
-        path = 'ABCD.lua',
-        content = '',
-    },
-    {
-        path = 'test.lua',
-        content = 'require "a$"',
-        main = true,
-    },
-    completion = {
-        {
-            label = 'ABCD',
-            kind = CompletionItemKind.Reference,
-            documentation = 'ABCD.lua',
-            textEdit = EXISTS,
-        },
-        {
-            label = 'abc',
-            kind = CompletionItemKind.Reference,
-            documentation = 'abc.lua',
             textEdit = EXISTS,
         },
     }

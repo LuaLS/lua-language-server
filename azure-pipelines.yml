@@ -11,6 +11,9 @@ pool:
 
 steps:
 - script: |
+    git submodules update --init --recursive
+  displayName: '拉取子模块'
+- script: |
     cd 3rd\luamake
     tools\ninja -f ninja\msvc.ninja
     

@@ -115,13 +115,6 @@ function mt:clearDiagnostics(uri)
     self._needDiagnostics[uri] = nil
 end
 
-function mt:read(mode)
-    if not self._input then
-        return nil
-    end
-    return self._input(mode)
-end
-
 function mt:needCompile(uri, compiled, mode)
     self._needDiagnostics[uri] = true
     if self._needCompile[uri] then
@@ -271,7 +264,8 @@ function mt:readText(uri, path, buf, compiled)
 end
 
 function mt:removeText(uri)
-    if not self._file[uri] then
+    local obj = self._file[uri]
+    if not obj then
         return
     end
     self._fileCount = self._fileCount - 1

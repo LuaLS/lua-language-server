@@ -122,6 +122,7 @@ TEST {
     },
 }
 
+if require 'bee.platform'.OS == 'Windows' then
 TEST {
     {
         path = 'a.lua',
@@ -133,6 +134,7 @@ TEST {
         content = 'require <?"A"?>',
     },
 }
+end
 
 TEST {
     {

@@ -100,7 +100,7 @@ function TEST(data)
     end
 end
 
-require 'bee.platform'.OS = 'Windows'
+if require'bee.platform'.OS == 'Windows' then
 
 TEST {
     {
@@ -161,6 +161,34 @@ TEST {
         },
     }
 }
+
+else
+
+TEST {
+    {
+        path = 'abc.lua',
+        content = '',
+    },
+    {
+        path = 'ABCD.lua',
+        content = '',
+    },
+    {
+        path = 'test.lua',
+        content = 'require "a$"',
+        main = true,
+    },
+    completion = {
+        {
+            label = 'abc',
+            kind = CompletionItemKind.Reference,
+            documentation = 'abc.lua',
+            textEdit = EXISTS,
+        },
+    }
+}
+
+end
 
 TEST {
     {
@@ -351,32 +379,6 @@ TEST {
             documentation = 'ABCD.lua',
             textEdit = EXISTS,
         },
-        {
-            label = 'abc',
-            kind = CompletionItemKind.Reference,
-            documentation = 'abc.lua',
-            textEdit = EXISTS,
-        },
-    }
-}
-
-require 'bee.platform'.OS = 'Macos'
-
-TEST {
-    {
-        path = 'abc.lua',
-        content = '',
-    },
-    {
-        path = 'ABCD.lua',
-        content = '',
-    },
-    {
-        path = 'test.lua',
-        content = 'require "a$"',
-        main = true,
-    },
-    completion = {
         {
             label = 'abc',
             kind = CompletionItemKind.Reference,

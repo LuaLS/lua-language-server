@@ -30,6 +30,5 @@ jobs:
   - script: |
       sudo apt-get update
       sudo apt-get install -y libreadline-dev ninja-build
-      cd lua-language-server
       ./osx.sh
     displayName: '测试'

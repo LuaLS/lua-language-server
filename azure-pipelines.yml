@@ -28,5 +28,6 @@ jobs:
 
   steps:
   - script: |
-      osx.sh
+      cd lua-language-server
+      ./osx.sh
     displayName: '测试'

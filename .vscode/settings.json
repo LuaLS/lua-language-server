@@ -17,5 +17,6 @@
     "Lua.workspace.ignoreDir": [
         "server/locale/",
         "server/libs/",
+        "server/src/3rd",
     ]
 }

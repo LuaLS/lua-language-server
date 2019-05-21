@@ -758,3 +758,14 @@ local <?r?> = f()
 [[
 local r: boolean
 ]]
+
+TEST [[
+---@param names string[]
+local function f(<?names?>)
+end
+]]
+[[
+local names: {
+    [*integer]: string,
+}
+]]

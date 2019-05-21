@@ -143,7 +143,9 @@ end
 
 function mt:addParam(source, bind)
     local paramObj = newParam(self, source)
-    if bind.type == 'emmy.type' then
+    if bind.type == 'emmy.generic' then
+        paramObj:bindGeneric(bind)
+    else
         paramObj:bindType(bind)
         self:eachClass(bind:getName(), function (class)
             if class.type == 'emmy.alias' then
@@ -152,8 +154,6 @@ function mt:addParam(source, bind)
                 end)
             end
         end)
-    elseif bind.type == 'emmy.generic' then
-        paramObj:bindGeneric(bind)
     end
     for i = 3, #source do
         paramObj:addEnum(source[i][1])
@@ -163,10 +163,10 @@ end
 
 function mt:addReturn(source, bind)
     local returnObj = newReturn(self, source)
-    if bind.type == 'emmy.type' then
-        returnObj:bindType(bind)
-    elseif bind.type == 'emmy.generic' then
+    if bind.type == 'emmy.generic' then
         returnObj:bindGeneric(bind)
+    else
+        returnObj:bindType(bind)
     end
     return returnObj
 end

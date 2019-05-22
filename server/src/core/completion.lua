@@ -518,6 +518,29 @@ local function searchSource(vm, source, word, callback, pos)
     end
 end
 
+local function buildTextEdit(start, finish, str)
+    return {
+        label = str,
+        textEdit = {
+            start = start + 1,
+            finish = finish - 1,
+            newText = ('%q'):format(str),
+        },
+        additionalTextEdits = {
+            {
+                start = start,
+                finish = start,
+                newText = '',
+            },
+            {
+                start = finish,
+                finish = finish,
+                newText = '',
+            },
+        }
+    }
+end
+
 local function searchInRequire(vm, select, source, callback)
     if select ~= 1 then
         return
@@ -533,16 +556,9 @@ local function searchInRequire(vm, select, source, callback)
         return
     end
     for _, str in ipairs(list) do
-        callback(str, nil, CompletionItemKind.Reference, {
-            documentation = map[str],
-            textEdit = {
-                -- TODO 坑爹自动完成的字符串里面不能包含符号
-                -- 这里长字符串会出问题，不过暂时先这样吧
-                start = source.start + 1,
-                finish = source.finish - 1,
-                newText = str,
-            }
-        })
+        local data = buildTextEdit(source.start, source.finish, str)
+        data.documentation = map[str]
+        callback(str, nil, CompletionItemKind.Reference, data)
     end
 end
 

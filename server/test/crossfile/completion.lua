@@ -126,18 +126,21 @@ TEST {
             kind = CompletionItemKind.Reference,
             documentation = 'abc.lua',
             textEdit = EXISTS,
+            additionalTextEdits = EXISTS,
         },
         {
             label = 'abc.aaa',
             kind = CompletionItemKind.Reference,
             documentation = 'abc/aaa.lua',
             textEdit = EXISTS,
+            additionalTextEdits = EXISTS,
         },
         {
             label = 'abcde',
             kind = CompletionItemKind.Reference,
             documentation = 'xxx/abcde.lua',
             textEdit = EXISTS,
+            additionalTextEdits = EXISTS,
         },
     }
 }
@@ -158,6 +161,7 @@ TEST {
             kind = CompletionItemKind.Reference,
             documentation = 'abc.lua',
             textEdit = EXISTS,
+            additionalTextEdits = EXISTS,
         },
     }
 }
@@ -182,12 +186,14 @@ TEST {
             kind = CompletionItemKind.Reference,
             documentation = 'ABCD.lua',
             textEdit = EXISTS,
+            additionalTextEdits = EXISTS,
         },
         {
             label = 'abc',
             kind = CompletionItemKind.Reference,
             documentation = 'abc.lua',
             textEdit = EXISTS,
+            additionalTextEdits = EXISTS,
         },
     }
 }
@@ -214,6 +220,7 @@ TEST {
             kind = CompletionItemKind.Reference,
             documentation = 'abc.lua',
             textEdit = EXISTS,
+            additionalTextEdits = EXISTS,
         },
     }
 }
@@ -240,12 +247,14 @@ TEST {
             kind = CompletionItemKind.Reference,
             documentation = 'abc.lua',
             textEdit = EXISTS,
+            additionalTextEdits = EXISTS,
         },
         {
             label = 'abc.init',
             kind = CompletionItemKind.Reference,
             documentation = 'abc/init.lua',
             textEdit = EXISTS,
+            additionalTextEdits = EXISTS,
         },
     }
 }
@@ -270,18 +279,21 @@ TEST {
             kind = CompletionItemKind.Reference,
             documentation = 'abc/init.lua',
             textEdit = EXISTS,
+            additionalTextEdits = EXISTS,
         },
         {
             label = 'abc.bbc',
             kind = CompletionItemKind.Reference,
             documentation = 'abc/bbc.lua',
             textEdit = EXISTS,
+            additionalTextEdits = EXISTS,
         },
         {
             label = 'abc.init',
             kind = CompletionItemKind.Reference,
             documentation = 'abc/init.lua',
             textEdit = EXISTS,
+            additionalTextEdits = EXISTS,
         },
     }
 }
@@ -306,6 +318,7 @@ TEST {
             kind = CompletionItemKind.Reference,
             documentation = 'abc/init.lua',
             textEdit = EXISTS,
+            additionalTextEdits = EXISTS,
         },
     }
 }
@@ -330,6 +343,7 @@ TEST {
             kind = CompletionItemKind.Reference,
             documentation = 'abc/init.lua',
             textEdit = EXISTS,
+            additionalTextEdits = EXISTS,
         },
     }
 }
@@ -354,6 +368,7 @@ TEST {
             kind = CompletionItemKind.Reference,
             documentation = 'core/core.lua',
             textEdit = EXISTS,
+            additionalTextEdits = EXISTS,
         },
     }
 }
@@ -378,12 +393,14 @@ TEST {
             kind = CompletionItemKind.Reference,
             documentation = 'x000.lua',
             textEdit = EXISTS,
+            additionalTextEdits = EXISTS,
         },
         {
             label = 'x111',
             kind = CompletionItemKind.Reference,
             documentation = 'abc/x111.lua',
             textEdit = EXISTS,
+            additionalTextEdits = EXISTS,
         },
     }
 }
@@ -532,6 +549,7 @@ TEST {
             kind = CompletionItemKind.Reference,
             documentation = 'xxx.lua',
             textEdit = EXISTS,
+            additionalTextEdits = EXISTS,
         },
     }
 }

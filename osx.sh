@@ -17,6 +17,10 @@ cd -
 
 cd server
 mv bin/*.so .
+
+# avoid too many file opened error
+ulimit -n 4000
+
 ./bin/lua-language-server publish.lua
 cd -
 

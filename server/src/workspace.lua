@@ -331,10 +331,11 @@ function mt:convertPathAsRequire(filename, start)
 end
 
 function mt:matchPath(baseUri, input)
-    local first = input:match '[^%.]+'
+    local first = input:match '^[^%.]+'
     if not first then
         return nil
     end
+    first = first:gsub('%W', '%%%1')
     local baseName = getFileName(uric.decode(baseUri))
     local rootLen = #self.root:string()
     local map = {}

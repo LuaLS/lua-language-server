@@ -248,6 +248,8 @@ function mt:run(vm)
         if self._objectSource then
             local loc = localMgr.create('self', vm:instantSource(self._objectSource), self._objectValue)
             loc:set('hide', true)
+            loc:set('start', self:getSource().start)
+            loc:close(self:getSource().finish)
             self:saveUpvalue('self', loc)
             self.args[#self.args+1] = loc
         end
@@ -359,19 +361,20 @@ function mt:findEmmyParamByIndex(index)
     return self:findEmmyParamByName(name)
 end
 
-function mt:addArg(name, source, value)
+function mt:addArg(name, source, value, close)
     local loc = localMgr.create(name, source, value)
+    loc:close(close)
     self:saveUpvalue(name, loc)
     self.args[#self.args+1] = loc
 end
 
-function mt:createArg(vm, arg)
+function mt:createArg(vm, arg, close)
     vm:instantSource(arg)
     arg:set('arg', self)
     if arg.type == 'name' then
         vm:instantSource(arg)
         local value = valueMgr.create('nil', arg)
-        self:addArg(arg[1], arg, value)
+        self:addArg(arg[1], arg, value, close)
     elseif arg.type == '...' then
         self._dots = createMulti()
         self._dotsSource = arg
@@ -401,12 +404,13 @@ function mt:createArgs(vm)
     if not args then
         return
     end
+    local close = self:getSource().finish
     if args.type == 'list' then
         for _, arg in ipairs(args) do
-            self:createArg(vm, arg)
+            self:createArg(vm, arg, close)
         end
     else
-        self:createArg(vm, args)
+        self:createArg(vm, args, close)
     end
 end
 

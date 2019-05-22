@@ -1202,6 +1202,7 @@ function mt:createLocal(key, source, value, emmy)
     loc:setEmmy(emmy)
     self:saveLocal(key, loc)
     self:bindLocal(source, loc, 'local')
+    loc:close(self:getCurrentFunction():getSource().finish)
     value:addInfo('local', source)
     return loc
 end

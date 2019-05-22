@@ -20,7 +20,6 @@
 - [x] EmmyLua Annotation
 - [ ] Multi Workspace
 - [ ] Type Format
-- [ ] Document Color
 
 ## Preview
 
@@ -116,6 +115,7 @@ Please [help me][en-US] improve the quality of `en-US`.
 * [Lua 5.3 中文翻译](https://cloudwu.github.io/lua53doc/manual.html)
 * [EmmyLua](https://emmylua.github.io)
 * [lua-glob](https://github.com/sumneko/lua-glob)
+* [lua-uri](https://github.com/LuaDist/lua-uri)
 
 ## Acknowledgement
 

@@ -263,12 +263,13 @@ local Defs = {
             }
         end
     end,
-    String = function (start, str, finish)
+    String = function (start, quote, str, finish)
         return {
             type   = 'string',
             start  = start,
             finish = finish - 1,
             [1]    = str,
+            [2]    = quote,
         }
     end,
     LongString = function (beforeEq, afterEq, str, missPos)
@@ -282,7 +283,7 @@ local Defs = {
                 }
             }
         end
-        return str
+        return '[' .. ('='):rep(afterEq-beforeEq) .. '[', str
     end,
     Char10 = function (char)
         char = tonumber(char)

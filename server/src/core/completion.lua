@@ -518,24 +518,43 @@ local function searchSource(vm, source, word, callback, pos)
     end
 end
 
-local function buildTextEdit(start, finish, str)
+local function buildTextEdit(start, finish, str, quo)
+    local text, lquo, rquo
+    if quo == '"' then
+        text = str:gsub('\r', '\\r'):gsub('\n', '\\n'):gsub('"', '\\"')
+        lquo = quo
+        rquo = quo
+    elseif quo == "'" then
+        text = str:gsub('\r', '\\r'):gsub('\n', '\\n'):gsub("'", "\\'")
+        lquo = quo
+        rquo = quo
+    else
+        lquo = quo
+        rquo = ']' .. lquo:sub(2, -2) .. ']'
+        while str:find(rquo, 1, true) do
+            lquo = '[=' .. quo:sub(2)
+            rquo = ']' .. lquo:sub(2, -2) .. ']'
+        end
+        text = str
+    end
     return {
         label = str,
+        filterText = str,
         textEdit = {
-            start = start + 1,
-            finish = finish - 1,
-            newText = ('%q'):format(str),
+            start = start + #quo,
+            finish = finish - #quo,
+            newText = text,
         },
         additionalTextEdits = {
             {
                 start = start,
-                finish = start,
-                newText = '',
+                finish = start + #quo - 1,
+                newText = lquo,
             },
             {
-                start = finish,
+                start = finish - #quo + 1,
                 finish = finish,
-                newText = '',
+                newText = rquo,
             },
         }
     }
@@ -556,7 +575,7 @@ local function searchInRequire(vm, select, source, callback)
         return
     end
     for _, str in ipairs(list) do
-        local data = buildTextEdit(source.start, source.finish, str)
+        local data = buildTextEdit(source.start, source.finish, str, source[2])
         data.documentation = map[str]
         callback(str, nil, CompletionItemKind.Reference, data)
     end

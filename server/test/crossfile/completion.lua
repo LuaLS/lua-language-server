@@ -123,6 +123,7 @@ TEST {
     completion = {
         {
             label = 'abc',
+            filterText = 'abc',
             kind = CompletionItemKind.Reference,
             documentation = 'abc.lua',
             textEdit = EXISTS,
@@ -130,6 +131,7 @@ TEST {
         },
         {
             label = 'abc.aaa',
+            filterText = 'abc.aaa',
             kind = CompletionItemKind.Reference,
             documentation = 'abc/aaa.lua',
             textEdit = EXISTS,
@@ -137,6 +139,7 @@ TEST {
         },
         {
             label = 'abcde',
+            filterText = 'abcde',
             kind = CompletionItemKind.Reference,
             documentation = 'xxx/abcde.lua',
             textEdit = EXISTS,
@@ -158,6 +161,7 @@ TEST {
     completion = {
         {
             label = 'abc',
+            filterText = 'abc',
             kind = CompletionItemKind.Reference,
             documentation = 'abc.lua',
             textEdit = EXISTS,
@@ -183,6 +187,7 @@ TEST {
     completion = {
         {
             label = 'ABCD',
+            filterText = 'ABCD',
             kind = CompletionItemKind.Reference,
             documentation = 'ABCD.lua',
             textEdit = EXISTS,
@@ -190,6 +195,7 @@ TEST {
         },
         {
             label = 'abc',
+            filterText = 'abc',
             kind = CompletionItemKind.Reference,
             documentation = 'abc.lua',
             textEdit = EXISTS,
@@ -217,6 +223,7 @@ TEST {
     completion = {
         {
             label = 'abc',
+            filterText = 'abc',
             kind = CompletionItemKind.Reference,
             documentation = 'abc.lua',
             textEdit = EXISTS,
@@ -244,6 +251,7 @@ TEST {
     completion = {
         {
             label = 'abc',
+            filterText = 'abc',
             kind = CompletionItemKind.Reference,
             documentation = 'abc.lua',
             textEdit = EXISTS,
@@ -251,6 +259,7 @@ TEST {
         },
         {
             label = 'abc.init',
+            filterText = 'abc.init',
             kind = CompletionItemKind.Reference,
             documentation = 'abc/init.lua',
             textEdit = EXISTS,
@@ -276,6 +285,7 @@ TEST {
     completion = {
         {
             label = 'abc',
+            filterText = 'abc',
             kind = CompletionItemKind.Reference,
             documentation = 'abc/init.lua',
             textEdit = EXISTS,
@@ -283,6 +293,7 @@ TEST {
         },
         {
             label = 'abc.bbc',
+            filterText = 'abc.bbc',
             kind = CompletionItemKind.Reference,
             documentation = 'abc/bbc.lua',
             textEdit = EXISTS,
@@ -290,6 +301,7 @@ TEST {
         },
         {
             label = 'abc.init',
+            filterText = 'abc.init',
             kind = CompletionItemKind.Reference,
             documentation = 'abc/init.lua',
             textEdit = EXISTS,
@@ -315,6 +327,7 @@ TEST {
     completion = {
         {
             label = 'abc.init',
+            filterText = 'abc.init',
             kind = CompletionItemKind.Reference,
             documentation = 'abc/init.lua',
             textEdit = EXISTS,
@@ -340,6 +353,7 @@ TEST {
     completion = {
         {
             label = 'abc.init',
+            filterText = 'abc.init',
             kind = CompletionItemKind.Reference,
             documentation = 'abc/init.lua',
             textEdit = EXISTS,
@@ -365,6 +379,7 @@ TEST {
     completion = {
         {
             label = 'core.core',
+            filterText = 'core.core',
             kind = CompletionItemKind.Reference,
             documentation = 'core/core.lua',
             textEdit = EXISTS,
@@ -390,6 +405,7 @@ TEST {
     completion = {
         {
             label = 'x000',
+            filterText = 'x000',
             kind = CompletionItemKind.Reference,
             documentation = 'x000.lua',
             textEdit = EXISTS,
@@ -397,6 +413,7 @@ TEST {
         },
         {
             label = 'x111',
+            filterText = 'x111',
             kind = CompletionItemKind.Reference,
             documentation = 'abc/x111.lua',
             textEdit = EXISTS,
@@ -546,8 +563,57 @@ TEST {
     completion = {
         {
             label = 'xxx',
+            filterText = 'xxx',
             kind = CompletionItemKind.Reference,
             documentation = 'xxx.lua',
+            textEdit = EXISTS,
+            additionalTextEdits = EXISTS,
+        },
+    }
+}
+
+TEST {
+    {
+        path = [[xx'xx.lua]],
+        content = ''
+    },
+    {
+        path = 'main.lua',
+        content = [[
+            require 'xx$'
+        ]],
+        main = true,
+    },
+    completion = {
+        {
+            label = [[xx'xx]],
+            filterText = [[xx'xx]],
+            kind = CompletionItemKind.Reference,
+            documentation = [[xx'xx.lua]],
+            textEdit = EXISTS,
+            additionalTextEdits = EXISTS,
+        },
+    }
+}
+
+TEST {
+    {
+        path = [[xx]=]xx.lua]],
+        content = ''
+    },
+    {
+        path = 'main.lua',
+        content = [[
+            require [=[xx$]=]'
+        ]],
+        main = true,
+    },
+    completion = {
+        {
+            label = [[xx]=]xx]],
+            filterText = [[xx]=]xx]],
+            kind = CompletionItemKind.Reference,
+            documentation = [[xx]=]xx.lua]],
             textEdit = EXISTS,
             additionalTextEdits = EXISTS,
         },

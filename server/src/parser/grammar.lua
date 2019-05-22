@@ -242,10 +242,10 @@ Boolean     <-  Sp ({} -> True)  TRUE
 grammar 'String' [[
 String      <-  Sp ({} StringDef {})
             ->  String
-StringDef   <-  '"'
+StringDef   <-  {'"'}
                 {~(Esc / !%nl !'"' .)*~} -> 1
                 ('"' / {} -> MissQuote1)
-            /   "'"
+            /   {"'"}
                 {~(Esc / !%nl !"'" .)*~} -> 1
                 ("'" / {} -> MissQuote2)
             /   ('[' {} {:eq: '='* :} {} '['

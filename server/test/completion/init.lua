@@ -1159,6 +1159,37 @@ f($)
 }
 
 TEST [[
+---@param x string | "'AAA'" | "'BBB'" | "'CCC'"
+function f(x)
+end
+
+f('$')
+]]
+{
+    {
+        label = "AAA",
+        filterText = 'AAA',
+        kind = CompletionItemKind.EnumMember,
+        textEdit = EXISTS,
+        additionalTextEdits = EXISTS,
+    },
+    {
+        label = "BBB",
+        filterText = 'BBB',
+        kind = CompletionItemKind.EnumMember,
+        textEdit = EXISTS,
+        additionalTextEdits = EXISTS,
+    },
+    {
+        label = "CCC",
+        filterText = 'CCC',
+        kind = CompletionItemKind.EnumMember,
+        textEdit = EXISTS,
+        additionalTextEdits = EXISTS,
+    }
+}
+
+TEST [[
 ---@param x function | 'function () end'
 function f(x)
 end

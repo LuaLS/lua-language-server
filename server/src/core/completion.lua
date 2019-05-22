@@ -616,11 +616,15 @@ local function searchEnumAsLib(vm, source, word, callback, pos, args, lib)
                             data.documentation = enum.description
                             callback(enum.enum, nil, CompletionItemKind.EnumMember, data)
                         else
-                            local data = buildTextEdit(source.start, source.finish, strSource[1], nil)
-                            data.documentation = enum.description
-                            callback(enum.enum, nil, CompletionItemKind.EnumMember, data)
+                            callback(enum.enum, nil, CompletionItemKind.EnumMember, {
+                                documentation = enum.description
+                            })
                         end
                     end
+                else
+                    callback(enum.enum, nil, CompletionItemKind.EnumMember, {
+                        documentation = enum.description
+                    })
                 end
             end
         end
@@ -648,9 +652,17 @@ local function searchEnumAsEmmyParams(vm, source, word, callback, pos, args, fun
 
     param:eachEnum(function (enum)
         if matchKey(word, enum) then
-            callback(enum, nil, CompletionItemKind.EnumMember, {
-                label = enum,
-            })
+            local strSource = parser:ast(tostring(enum), 'String')
+            if strSource then
+                if source.type == 'string' then
+                    local data = buildTextEdit(source.start, source.finish, strSource[1], source[2])
+                    callback(enum, nil, CompletionItemKind.EnumMember, data)
+                else
+                    callback(enum, nil, CompletionItemKind.EnumMember)
+                end
+            else
+                callback(enum, nil, CompletionItemKind.EnumMember)
+            end
         end
     end)
 end

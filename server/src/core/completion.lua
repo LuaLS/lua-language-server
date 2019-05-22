@@ -520,6 +520,12 @@ end
 
 local function buildTextEdit(start, finish, str, quo)
     local text, lquo, rquo, label, filterText
+    if quo == nil then
+        local text = str:gsub('\r', '\\r'):gsub('\n', '\\n'):gsub('"', '\\"')
+        return {
+            label = '"' .. text .. '"'
+        }
+    end
     if quo == '"' then
         label = str
         filterText = str
@@ -532,13 +538,6 @@ local function buildTextEdit(start, finish, str, quo)
         text = str:gsub('\r', '\\r'):gsub('\n', '\\n'):gsub("'", "\\'")
         lquo = quo
         rquo = quo
-    elseif quo == nil then
-        quo = ''
-        text = str:gsub('\r', '\\r'):gsub('\n', '\\n'):gsub('"', '\\"')
-        lquo = quo
-        rquo = quo
-        label = '"' .. text .. '"'
-        filterText = label
     else
         label = str
         filterText = str

@@ -456,29 +456,21 @@ io.read($)
         label = '"n"',
         kind = CompletionItemKind.EnumMember,
         documentation = EXISTS,
-        textEdit = EXISTS,
-        additionalTextEdits = EXISTS,
     },
     {
         label = '"a"',
         kind = CompletionItemKind.EnumMember,
         documentation = EXISTS,
-        textEdit = EXISTS,
-        additionalTextEdits = EXISTS,
     },
     {
         label = '"l"',
         kind = CompletionItemKind.EnumMember,
         documentation = EXISTS,
-        textEdit = EXISTS,
-        additionalTextEdits = EXISTS,
     },
     {
         label = '"L"',
         kind = CompletionItemKind.EnumMember,
         documentation = EXISTS,
-        textEdit = EXISTS,
-        additionalTextEdits = EXISTS,
     },
 }
 

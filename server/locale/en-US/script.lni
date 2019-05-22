@@ -57,6 +57,7 @@ PARSER_ACTION_AFTER_BREAK = '<eof> expected after `break`.'
 PARSER_NO_VISIBLE_LABEL = 'No visible label `{label}` .'
 PARSER_REDEFINE_LABEL   = 'Label `{label}` already defined.'
 PARSER_UNSUPPORT_SYMBOL = '{version} does not support this grammar.'
+PARSER_UNEXPECT_DOTS    = 'Cannot use `...` outside a vararg function.'
 
 SYMBOL_ANONYMOUS        = '<Anonymous>'
 

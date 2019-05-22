@@ -57,6 +57,7 @@ PARSER_ACTION_AFTER_BREAK = '`break`之后不能再执行代码。'
 PARSER_NO_VISIBLE_LABEL = '标签`{label}`不可见。'
 PARSER_REDEFINE_LABEL   = '标签`{label}`重复定义。'
 PARSER_UNSUPPORT_SYMBOL = '{version} 不支持该符号。'
+PARSER_UNEXPECT_DOTS    = '`...`只能在不定参函数中使用。'
 
 SYMBOL_ANONYMOUS        = '<匿名函数>'
 

@@ -7,77 +7,77 @@ description = 'Calls error if the value of its argument is false.'
 [collectgarbage]
 [[.enums]]
 name = 'opt'
-enum = 'collect'
+enum = '"collect"'
 description = 'Performs a full garbage-collection cycle.'
 ``````````
 name = 'opt'
-enum = 'stop'
+enum = '"stop"'
 description = 'Stops automatic execution.'
 ``````````
 name = 'opt'
-enum = 'restart'
+enum = '"restart"'
 description = 'Restarts automatic execution.'
 ``````````
 name = 'opt'
-enum = 'count'
+enum = '"count"'
 description = 'Returns the total memory in Kbytes.'
 ``````````
 name = 'opt'
-enum = 'step'
+enum = '"step"'
 description = 'Performs a garbage-collection step.'
 ``````````
 name = 'opt'
-enum = 'setpause'
+enum = '"setpause"'
 description = 'Set pause.'
 ``````````
 name = 'opt'
-enum = 'setstepmul'
+enum = '"setstepmul"'
 description = 'Set step multiplier.'
 ``````````
 name = 'opt'
-enum = 'isrunning'
+enum = '"isrunning"'
 description = 'Returns whether the collector is running.'
 
 ["collectgarbage Lua 5.4"]
 [[.enums]]
 name = 'opt'
-enum = 'collect'
+enum = '"collect"'
 description = 'Performs a full garbage-collection cycle.'
 ``````````
 name = 'opt'
-enum = 'stop'
+enum = '"stop"'
 description = 'Stops automatic execution.'
 ``````````
 name = 'opt'
-enum = 'restart'
+enum = '"restart"'
 description = 'Restarts automatic execution.'
 ``````````
 name = 'opt'
-enum = 'count'
+enum = '"count"'
 description = 'Returns the total memory in Kbytes.'
 ``````````
 name = 'opt'
-enum = 'step'
+enum = '"step"'
 description = 'Performs a garbage-collection step.'
 ``````````
 name = 'opt'
-enum = 'setpause'
+enum = '"setpause"'
 description = 'Set pause.'
 ``````````
 name = 'opt'
-enum = 'setstepmul'
+enum = '"setstepmul"'
 description = 'Set step multiplier.'
 ``````````
 name = 'opt'
-enum = 'incremental'
+enum = '"incremental"'
 description = 'Change the collector mode to incremental.'
 ``````````
 name = 'opt'
-enum = 'generational'
+enum = '"generational"'
 description = 'Change the collector mode to generational.'
 ``````````
 name = 'opt'
-enum = 'isrunning'
+enum = '"isrunning"'
 description = 'Returns whether the collector is running.'
 
 [dofile]
@@ -109,15 +109,15 @@ end
 description = 'Loads a chunk.'
 [[.enums]]
 name = 'mode'
-enum = 'b'
+enum = '"b"'
 description = 'Only binary chunks.'
 ``````````
 name = 'mode'
-enum = 't'
+enum = '"t"'
 description = 'Only text chunks.'
 ``````````
 name = 'mode'
-enum = 'bt'
+enum = '"bt"'
 description = 'Both binary and text.'
 
 ['load Lua 5.1']
@@ -127,15 +127,15 @@ description = 'Loads a chunk using function `func` to get its pieces. Each call 
 description = 'Loads a chunk from file.'
 [[.enums]]
 name = 'mode'
-enum = 'b'
+enum = '"b"'
 description = 'Only binary chunks.'
 ``````````
 name = 'mode'
-enum = 't'
+enum = '"t"'
 description = 'Only text chunks.'
 ``````````
 name = 'mode'
-enum = 'bt'
+enum = '"bt"'
 description = 'Both binary and text.'
 
 ['loadfile Lua 5.1']
@@ -181,7 +181,7 @@ description = 'Sets the real value of `table[index]` to `value`, without invokin
 [select]
 [[.enums]]
 name = 'index'
-enum = '#'
+enum = '"#"'
 description = 'Returns the total number of extra arguments.'
 ``````````
 name = 'index'

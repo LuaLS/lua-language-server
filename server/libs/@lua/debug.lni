@@ -59,25 +59,25 @@ name = 'info'
 type = 'table'
 [[.enums]]
 name = 'what'
-enum = 'n'
+enum = '"n"'
 ``````````
 name = 'what'
-enum = 'S'
+enum = '"S"'
 ``````````
 name = 'what'
-enum = 'l'
+enum = '"l"'
 ``````````
 name = 'what'
-enum = 't'
+enum = '"t"'
 ``````````
 name = 'what'
-enum = 'u'
+enum = '"u"'
 ``````````
 name = 'what'
-enum = 'f'
+enum = '"f"'
 ``````````
 name = 'what'
-enum = 'L'
+enum = '"L"'
 
 ['getinfo Lua 5.1':getinfo]
 name = 'getinfo'
@@ -177,13 +177,13 @@ type = 'integer'
 optional = 'self'
 [[.enums]]
 name = 'mask'
-enum = 'c'
+enum = '"c"'
 ``````````
 name = 'mask'
-enum = 'r'
+enum = '"r"'
 ``````````
 name = 'mask'
-enum = 'l'
+enum = '"l"'
 
 [setlocal]
 [[.args]]

@@ -11,62 +11,62 @@ description = '返回三个表示线程钩子设置的值： 当前钩子函数�
 description = '返回关于一个函数信息的表。'
 [[.enums]]
 name = 'what'
-enum = 'n'
+enum = '"n"'
 description = '`name` 和 `namewhat`'
 ``````````
 name = 'what'
-enum = 'S'
+enum = '"S"'
 description = '`source`，`short_src`，`linedefined`，`lastlinedefined`，和 `what`'
 ``````````
 name = 'what'
-enum = 'l'
+enum = '"l"'
 description = '`currentline`'
 ``````````
 name = 'what'
-enum = 't'
+enum = '"t"'
 description = '`istailcall`'
 ``````````
 name = 'what'
-enum = 'u'
+enum = '"u"'
 description = '`nups`，`nparams`，和`isvararg`'
 ``````````
 name = 'what'
-enum = 'f'
+enum = '"f"'
 description = '`func`'
 ``````````
 name = 'what'
-enum = 'L'
+enum = '"L"'
 description = '`activelines`'
 
 ['getinfo Lua 5.1']
 description = '返回关于一个函数信息的表。'
 [[.enums]]
 name = 'what'
-enum = 'n'
+enum = '"n"'
 description = '`name` 和 `namewhat`'
 ``````````
 name = 'what'
-enum = 'S'
+enum = '"S"'
 description = '`source`，`short_src`，`linedefined`，`lastlinedefined`，和 `what`'
 ``````````
 name = 'what'
-enum = 'l'
+enum = '"l"'
 description = '`currentline`'
 ``````````
 name = 'what'
-enum = 't'
+enum = '"t"'
 description = '`istailcall`'
 ``````````
 name = 'what'
-enum = 'u'
+enum = '"u"'
 description = '`nups`'
 ``````````
 name = 'what'
-enum = 'f'
+enum = '"f"'
 description = '`func`'
 ``````````
 name = 'what'
-enum = 'L'
+enum = '"L"'
 description = '`activelines`'
 
 [getlocal]
@@ -97,15 +97,15 @@ description = '将 `table` 设置为 `object` 的环境。'
 description = '将一个函数作为钩子函数设入。'
 [[.enums]]
 name = 'mask'
-enum = 'c'
+enum = '"c"'
 description = '每当 Lua 调用一个函数时，调用钩子。'
 ``````````
 name = 'mask'
-enum = 'r'
+enum = '"r"'
 description = '每当 Lua 从一个函数内返回时，调用钩子。'
 ``````````
 name = 'mask'
-enum = 'l'
+enum = '"l"'
 description = '每当 Lua 进入新的一行时，调用钩子。'
 
 [setlocal]

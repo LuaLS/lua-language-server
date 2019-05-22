@@ -87,16 +87,16 @@ name = 'status'
 type = 'string'
 [[.enums]]
 name = 'status'
-enum = 'running'
+enum = '"running"'
 ``````````
 name = 'status'
-enum = 'suspended'
+enum = '"suspended"'
 ``````````
 name = 'status'
-enum = 'normal'
+enum = '"normal"'
 ``````````
 name = 'status'
-enum = 'dead'
+enum = '"dead"'
 
 [wrap]
 [[.args]]

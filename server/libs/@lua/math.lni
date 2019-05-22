@@ -321,10 +321,10 @@ name = 'type'
 type = 'string'
 [[.enums]]
 name = 'type'
-enum = 'integer'
+enum = '"integer"'
 ``````````
 name = 'type'
-enum = 'float'
+enum = '"float"'
 ``````````
 name = 'type'
 code = 'nil'

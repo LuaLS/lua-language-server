@@ -20,19 +20,19 @@ description = 'Returns the running coroutine plus a boolean, true when the runni
 description = 'Returns the status of coroutine `co`.'
 [[.enums]]
 name = 'status'
-enum = 'running'
+enum = '"running"'
 description = 'Is running.'
 ``````````
 name = 'status'
-enum = 'suspended'
+enum = '"suspended"'
 description = 'Is suspended or not started.'
 ``````````
 name = 'status'
-enum = 'normal'
+enum = '"normal"'
 description = 'Is active but not running.'
 ``````````
 name = 'status'
-enum = 'dead'
+enum = '"dead"'
 description = 'Has finished or stopped with an error.'
 
 [wrap]

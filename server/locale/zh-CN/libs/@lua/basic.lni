@@ -7,77 +7,77 @@ description = '如果其参数 `v` 的值为假，它就调用 `error`。'
 [collectgarbage]
 [[.enums]]
 name = 'opt'
-enum = 'collect'
+enum = '"collect"'
 description = '做一次完整的垃圾收集循环。'
 ``````````
 name = 'opt'
-enum = 'stop'
+enum = '"stop"'
 description = '停止垃圾收集器的运行。'
 ``````````
 name = 'opt'
-enum = 'restart'
+enum = '"restart"'
 description = '重启垃圾收集器的自动运行。'
 ``````````
 name = 'opt'
-enum = 'count'
+enum = '"count"'
 description = '以 K 字节数为单位返回 Lua 使用的总内存数。'
 ``````````
 name = 'opt'
-enum = 'step'
+enum = '"step"'
 description = '单步运行垃圾收集器。'
 ``````````
 name = 'opt'
-enum = 'setpause'
+enum = '"setpause"'
 description = '设置收集器的 `间歇率`。'
 ``````````
 name = 'opt'
-enum = 'setstepmul'
+enum = '"setstepmul"'
 description = '设置收集器的 `步进倍率`。'
 ``````````
 name = 'opt'
-enum = 'isrunning'
+enum = '"isrunning"'
 description = '返回表示收集器是否在工作的布尔值。'
 
 ["collectgarbage Lua 5.4"]
 [[.enums]]
 name = 'opt'
-enum = 'collect'
+enum = '"collect"'
 description = '做一次完整的垃圾收集循环。'
 ``````````
 name = 'opt'
-enum = 'stop'
+enum = '"stop"'
 description = '停止垃圾收集器的运行。'
 ``````````
 name = 'opt'
-enum = 'restart'
+enum = '"restart"'
 description = '重启垃圾收集器的自动运行。'
 ``````````
 name = 'opt'
-enum = 'count'
+enum = '"count"'
 description = '以 K 字节数为单位返回 Lua 使用的总内存数。'
 ``````````
 name = 'opt'
-enum = 'step'
+enum = '"step"'
 description = '单步运行垃圾收集器。'
 ``````````
 name = 'opt'
-enum = 'setpause'
+enum = '"setpause"'
 description = '设置收集器的 `间歇率`。'
 ``````````
 name = 'opt'
-enum = 'setstepmul'
+enum = '"setstepmul"'
 description = '设置收集器的 `步进倍率`。'
 ``````````
 name = 'opt'
-enum = 'incremental'
+enum = '"incremental"'
 description = '改变收集器模式为增量模式。'
 ``````````
 name = 'opt'
-enum = 'generational'
+enum = '"generational"'
 description = '改变收集器模式为分代模式。'
 ``````````
 name = 'opt'
-enum = 'isrunning'
+enum = '"isrunning"'
 description = '返回表示收集器是否在工作的布尔值。'
 
 [dofile]
@@ -109,15 +109,15 @@ end
 description = '加载一个代码块。'
 [[.enums]]
 name = 'mode'
-enum = 'b'
+enum = '"b"'
 description = '只能是二进制代码块。'
 ``````````
 name = 'mode'
-enum = 't'
+enum = '"t"'
 description = '只能是文本代码块。'
 ``````````
 name = 'mode'
-enum = 'bt'
+enum = '"bt"'
 description = '可以是二进制也可以是文本。'
 
 ['load Lua 5.1']
@@ -127,15 +127,15 @@ description = '使用 `func` 分段加载代码块。每次调用 `func` 必须�
 description = '从文件中获取代码块。'
 [[.enums]]
 name = 'mode'
-enum = 'b'
+enum = '"b"'
 description = '只能是二进制代码块。'
 ``````````
 name = 'mode'
-enum = 't'
+enum = '"t"'
 description = '只能是文本代码块。'
 ``````````
 name = 'mode'
-enum = 'bt'
+enum = '"bt"'
 description = '可以是二进制也可以是文本。'
 
 ['loadfile Lua 5.1']
@@ -181,7 +181,7 @@ description = '在不触发任何元方法的情况下 将 `table[index]` 设为
 [select]
 [[.enums]]
 name = 'index'
-enum = '#'
+enum = '"#"'
 description = '返回参数的个数。'
 ``````````
 name = 'index'

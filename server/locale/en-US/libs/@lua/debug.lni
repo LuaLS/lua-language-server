@@ -11,62 +11,62 @@ description = 'Returns the current hook settings of the thread.'
 description = 'Returns a table with information about a function.'
 [[.enums]]
 name = 'what'
-enum = 'n'
+enum = '"n"'
 description = '`name` and `namewhat`'
 ``````````
 name = 'what'
-enum = 'S'
+enum = '"S"'
 description = '`source`, `short_src`, `linedefined`, `lastlinedefined`, and `what`'
 ``````````
 name = 'what'
-enum = 'l'
+enum = '"l"'
 description = '`currentline`'
 ``````````
 name = 'what'
-enum = 't'
+enum = '"t"'
 description = '`istailcall`'
 ``````````
 name = 'what'
-enum = 'u'
+enum = '"u"'
 description = '`nups`, `nparams`, and `isvararg`'
 ``````````
 name = 'what'
-enum = 'f'
+enum = '"f"'
 description = '`func`'
 ``````````
 name = 'what'
-enum = 'L'
+enum = '"L"'
 description = '`activelines`'
 
 ['getinfo Lua 5.1']
 description = 'Returns a table with information about a function.'
 [[.enums]]
 name = 'what'
-enum = 'n'
+enum = '"n"'
 description = '`name` and `namewhat`'
 ``````````
 name = 'what'
-enum = 'S'
+enum = '"S"'
 description = '`source`, `short_src`, `linedefined`, `lastlinedefined`, and `what`'
 ``````````
 name = 'what'
-enum = 'l'
+enum = '"l"'
 description = '`currentline`'
 ``````````
 name = 'what'
-enum = 't'
+enum = '"t"'
 description = '`istailcall`'
 ``````````
 name = 'what'
-enum = 'u'
+enum = '"u"'
 description = '`nups`'
 ``````````
 name = 'what'
-enum = 'f'
+enum = '"f"'
 description = '`func`'
 ``````````
 name = 'what'
-enum = 'L'
+enum = '"L"'
 description = '`activelines`'
 
 [getlocal]
@@ -101,15 +101,15 @@ description = 'Sets the environment of the given `object` to the given `table` .
 description = 'Sets the given function as a hook.'
 [[.enums]]
 name = 'mask'
-enum = 'c'
+enum = '"c"'
 description = 'Calls hook when Lua calls a function.'
 ``````````
 name = 'mask'
-enum = 'r'
+enum = '"r"'
 description = 'Calls hook when Lua returns from a function.'
 ``````````
 name = 'mask'
-enum = 'l'
+enum = '"l"'
 description = 'Calls hook when Lua enters a new line of code.'
 
 [setlocal]

@@ -23,29 +23,29 @@ optional = 'self'
 [[.returns]]
 [[.enums]]
 name = 'opt'
-enum = 'collect'
+enum = '"collect"'
 default = true
 ``````````
 name = 'opt'
-enum = 'stop'
+enum = '"stop"'
 ``````````
 name = 'opt'
-enum = 'restart'
+enum = '"restart"'
 ``````````
 name = 'opt'
-enum = 'count'
+enum = '"count"'
 ``````````
 name = 'opt'
-enum = 'step'
+enum = '"step"'
 ``````````
 name = 'opt'
-enum = 'setpause'
+enum = '"setpause"'
 ``````````
 name = 'opt'
-enum = 'setstepmul'
+enum = '"setstepmul"'
 ``````````
 name = 'opt'
-enum = 'isrunning'
+enum = '"isrunning"'
 
 ["collectgarbage Lua 5.4"]
 name = 'collectgarbage'
@@ -61,35 +61,35 @@ optional = 'self'
 [[.returns]]
 [[.enums]]
 name = 'opt'
-enum = 'collect'
+enum = '"collect"'
 default = true
 ``````````
 name = 'opt'
-enum = 'stop'
+enum = '"stop"'
 ``````````
 name = 'opt'
-enum = 'restart'
+enum = '"restart"'
 ``````````
 name = 'opt'
-enum = 'count'
+enum = '"count"'
 ``````````
 name = 'opt'
-enum = 'step'
+enum = '"step"'
 ``````````
 name = 'opt'
-enum = 'setpause'
+enum = '"setpause"'
 ``````````
 name = 'opt'
-enum = 'setstepmul'
+enum = '"setstepmul"'
 ``````````
 name = 'opt'
-enum = 'incremental'
+enum = '"incremental"'
 ``````````
 name = 'opt'
-enum = 'generational'
+enum = '"generational"'
 ``````````
 name = 'opt'
-enum = 'isrunning'
+enum = '"isrunning"'
 
 [dofile]
 special = 'dofile'
@@ -184,13 +184,13 @@ name = 'error_message'
 type = 'string'
 [[.enums]]
 name = 'mode'
-enum = 'b'
+enum = '"b"'
 ``````````
 name = 'mode'
-enum = 't'
+enum = '"t"'
 ``````````
 name = 'mode'
-enum = 'bt'
+enum = '"bt"'
 default = true
 
 ['load Lua 5.1']
@@ -239,13 +239,13 @@ name = 'error_message'
 type = 'string'
 [[.enums]]
 name = 'mode'
-enum = 'b'
+enum = '"b"'
 ``````````
 name = 'mode'
-enum = 't'
+enum = '"t"'
 ``````````
 name = 'mode'
-enum = 'bt'
+enum = '"bt"'
 default = true
 
 ['loadfile Lua 5.1']
@@ -390,7 +390,7 @@ type = '...'
 [[.returns]]
 [[.enums]]
 name = 'index'
-enum = '#'
+enum = '"#"'
 ``````````
 name = 'index'
 code = 'integer'
@@ -441,28 +441,28 @@ name = 'type'
 type = 'string'
 [[.enums]]
 name = 'type'
-enum = 'nil'
+enum = '"nil"'
 ``````````
 name = 'type'
-enum = 'number'
+enum = '"number"'
 ``````````
 name = 'type'
-enum = 'string'
+enum = '"string"'
 ``````````
 name = 'type'
-enum = 'boolean'
+enum = '"boolean"'
 ``````````
 name = 'type'
-enum = 'table'
+enum = '"table"'
 ``````````
 name = 'type'
-enum = 'function'
+enum = '"function"'
 ``````````
 name = 'type'
-enum = 'thread'
+enum = '"thread"'
 ``````````
 name = 'type'
-enum = 'userdata'
+enum = '"userdata"'
 
 ["_VERSION Lua 5.1"]
 version = {'Lua 5.1', 'LuaJIT'}

@@ -63,10 +63,10 @@ name = 'code'
 type = 'integer'
 [[.enums]]
 type = 'type'
-enum = 'exit'
+enum = '"exit"'
 ``````````
 type = 'type'
-enum = 'signal'
+enum = '"signal"'
 
 ['execute Lua 5.1']
 name = 'execute'
@@ -146,23 +146,23 @@ name = 'locale'
 type = 'string'
 [[.enums]]
 name = 'category'
-enum = 'all'
+enum = '"all"'
 default = true
 ``````````
 name = 'category'
-enum = 'collate'
+enum = '"collate"'
 ``````````
 name = 'category'
-enum = 'ctype'
+enum = '"ctype"'
 ``````````
 name = 'category'
-enum = 'monetary'
+enum = '"monetary"'
 ``````````
 name = 'category'
-enum = 'numeric'
+enum = '"numeric"'
 ``````````
 name = 'category'
-enum = 'time'
+enum = '"time"'
 
 [time]
 [[.args]]

@@ -519,16 +519,29 @@ local function searchSource(vm, source, word, callback, pos)
 end
 
 local function buildTextEdit(start, finish, str, quo)
-    local text, lquo, rquo
+    local text, lquo, rquo, label, filterText
     if quo == '"' then
+        label = str
+        filterText = str
         text = str:gsub('\r', '\\r'):gsub('\n', '\\n'):gsub('"', '\\"')
         lquo = quo
         rquo = quo
     elseif quo == "'" then
+        label = str
+        filterText = str
         text = str:gsub('\r', '\\r'):gsub('\n', '\\n'):gsub("'", "\\'")
         lquo = quo
         rquo = quo
+    elseif quo == nil then
+        quo = ''
+        text = str:gsub('\r', '\\r'):gsub('\n', '\\n'):gsub('"', '\\"')
+        lquo = quo
+        rquo = quo
+        label = '"' .. text .. '"'
+        filterText = label
     else
+        label = str
+        filterText = str
         lquo = quo
         rquo = ']' .. lquo:sub(2, -2) .. ']'
         while str:find(rquo, 1, true) do
@@ -538,8 +551,8 @@ local function buildTextEdit(start, finish, str, quo)
         text = str
     end
     return {
-        label = str,
-        filterText = str,
+        label = label,
+        filterText = filterText,
         textEdit = {
             start = start + #quo,
             finish = finish - #quo,
@@ -597,22 +610,18 @@ local function searchEnumAsLib(vm, source, word, callback, pos, args, lib)
         for _, enum in ipairs(lib.enums) do
             if enum.name and enum.name == name and enum.enum then
                 if matchKey(word, enum.enum) then
-                    local label, textEdit
-                    if source.type ~= (arg and arg.type) then
-                        label = ('%q'):format(enum.enum)
+                    local strSource = parser:ast(tostring(enum.enum), 'String')
+                    if strSource then
+                        if source.type == 'string' then
+                            local data = buildTextEdit(source.start, source.finish, strSource[1], source[2])
+                            data.documentation = enum.description
+                            callback(enum.enum, nil, CompletionItemKind.EnumMember, data)
+                        else
+                            local data = buildTextEdit(source.start, source.finish, strSource[1], nil)
+                            data.documentation = enum.description
+                            callback(enum.enum, nil, CompletionItemKind.EnumMember, data)
+                        end
                     end
-                    if source.type ~= 'call' then
-                        textEdit = {
-                            start = source.start,
-                            finish = source.finish,
-                            newText = ('%q'):format(enum.enum),
-                        }
-                    end
-                    callback(enum.enum, nil, CompletionItemKind.EnumMember, {
-                        label = label,
-                        documentation = enum.description,
-                        textEdit = textEdit,
-                    })
                 end
             end
         end

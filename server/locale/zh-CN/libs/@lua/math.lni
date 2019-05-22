@@ -117,11 +117,11 @@ description = '如果 `x` 可以转换为一个整数， 返回该整数。'
 [type]
 [[.enums]]
 name = 'type'
-enum = 'integer'
+enum = '"integer"'
 description = '`x` 是一个整数。'
 ``````````
 name = 'type'
-enum = 'float'
+enum = '"float"'
 description = '`x` 是一个浮点数。'
 ``````````
 name = 'type'

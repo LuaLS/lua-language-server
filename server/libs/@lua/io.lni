@@ -45,10 +45,10 @@ type = 'string'
 name = 'code'
 [[.enums]]
 name = 'type'
-enum = 'exit'
+enum = '"exit"'
 ``````````
 name = 'type'
-enum = 'signal'
+enum = '"signal"'
 
 [flush]
 
@@ -81,13 +81,13 @@ returns = {
 }
 [[.enums]]
 name = 'mode'
-enum = '*n'
+enum = '"*n"'
 ``````````
 name = 'mode'
-enum = '*a'
+enum = '"*a"'
 ``````````
 name = 'mode'
-enum = '*l'
+enum = '"*l"'
 default = true
 ``````````
 name = 'mode'
@@ -113,17 +113,17 @@ returns = {
 }
 [[.enums]]
 name = 'mode'
-enum = 'n'
+enum = '"n"'
 ``````````
 name = 'mode'
-enum = 'a'
+enum = '"a"'
 ``````````
 name = 'mode'
-enum = 'l'
+enum = '"l"'
 default = true
 ``````````
 name = 'mode'
-enum = 'L'
+enum = '"L"'
 ``````````
 name = 'mode'
 code = 'number'
@@ -148,17 +148,17 @@ returns = {
 }
 [[.enums]]
 name = 'mode'
-enum = '*n'
+enum = '"*n"'
 ``````````
 name = 'mode'
-enum = '*a'
+enum = '"*a"'
 ``````````
 name = 'mode'
-enum = '*l'
+enum = '"*l"'
 default = true
 ``````````
 name = 'mode'
-enum = '*L'
+enum = '"*L"'
 ``````````
 name = 'mode'
 code = 'number'
@@ -176,23 +176,23 @@ default = 'r'
 type = 'FILE*'
 [[.enums]]
 name = 'mode'
-enum = 'r'
+enum = '"r"'
 default = true
 ``````````
 name = 'mode'
-enum = 'w'
+enum = '"w"'
 ``````````
 name = 'mode'
-enum = 'a'
+enum = '"a"'
 ``````````
 name = 'mode'
-enum = 'r+'
+enum = '"r+"'
 ``````````
 name = 'mode'
-enum = 'w+'
+enum = '"w+"'
 ``````````
 name = 'mode'
-enum = 'a+'
+enum = '"a+"'
 
 [output:input]
 
@@ -210,11 +210,11 @@ name = 'file'
 type = 'FILE*'
 [[.enums]]
 name = 'mode'
-enum = 'r'
+enum = '"r"'
 default = true
 ``````````
 name = 'mode'
-enum = 'w'
+enum = '"w"'
 
 ["read Lua 5.1"]
 name = 'read'
@@ -228,13 +228,13 @@ type = {'string', 'number'}
 type = '...'
 [[.enums]]
 name = 'mode'
-enum = '*n'
+enum = '"*n"'
 ``````````
 name = 'mode'
-enum = '*a'
+enum = '"*a"'
 ``````````
 name = 'mode'
-enum = '*l'
+enum = '"*l"'
 default = true
 ``````````
 name = 'mode'
@@ -252,17 +252,17 @@ type = {'string', 'number'}
 type = '...'
 [[.enums]]
 name = 'mode'
-enum = 'n'
+enum = '"n"'
 ``````````
 name = 'mode'
-enum = 'a'
+enum = '"a"'
 ``````````
 name = 'mode'
-enum = 'l'
+enum = '"l"'
 default = true
 ``````````
 name = 'mode'
-enum = 'L'
+enum = '"L"'
 ``````````
 name = 'mode'
 code = 'number'
@@ -279,17 +279,17 @@ type = {'string', 'number'}
 type = '...'
 [[.enums]]
 name = 'mode'
-enum = '*n'
+enum = '"*n"'
 ``````````
 name = 'mode'
-enum = '*a'
+enum = '"*a"'
 ``````````
 name = 'mode'
-enum = '*l'
+enum = '"*l"'
 default = true
 ``````````
 name = 'mode'
-enum = '*L'
+enum = '"*L"'
 ``````````
 name = 'mode'
 code = 'number'
@@ -307,10 +307,10 @@ name = 'type'
 type = 'string'
 [[.enums]]
 name = 'type'
-enum = 'file'
+enum = '"file"'
 ``````````
 name = 'type'
-enum = 'closed file'
+enum = '"closed file"'
 ``````````
 name = 'type'
 code = 'nil'

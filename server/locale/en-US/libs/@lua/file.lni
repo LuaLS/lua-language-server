@@ -15,19 +15,19 @@ end
 ]]
 [[.enums]]
 name = 'mode'
-enum = 'n'
+enum = '"n"'
 description = 'Reads a numeral and returns it as number.'
 ``````````
 name = 'mode'
-enum = 'a'
+enum = '"a"'
 description = 'Reads the whole file.'
 ``````````
 name = 'mode'
-enum = 'l'
+enum = '"l"'
 description = 'Reads the next line skipping the end of line.'
 ``````````
 name = 'mode'
-enum = 'L'
+enum = '"L"'
 description = 'Reads the next line keeping the end of line.'
 ``````````
 name = 'mode'
@@ -38,19 +38,19 @@ description = 'Reads a string with up to this number of bytes.'
 description = 'Reads the `file`, according to the given formats, which specify what to read.'
 [[.enums]]
 name = 'mode'
-enum = 'n'
+enum = '"n"'
 description = 'Reads a numeral and returns it as number.'
 ``````````
 name = 'mode'
-enum = 'a'
+enum = '"a"'
 description = 'Reads the whole file.'
 ``````````
 name = 'mode'
-enum = 'l'
+enum = '"l"'
 description = 'Reads the next line skipping the end of line.'
 ``````````
 name = 'mode'
-enum = 'L'
+enum = '"L"'
 description = 'Reads the next line keeping the end of line.'
 ``````````
 name = 'mode'
@@ -61,30 +61,30 @@ description = 'Reads a string with up to this number of bytes.'
 description = 'Sets and gets the file position, measured from the beginning of the file.'
 [[.enums]]
 name = 'whence'
-enum = 'set'
+enum = '"set"'
 description = 'Base is beginning of the file.'
 ``````````
 name = 'whence'
-enum = 'cur'
+enum = '"cur"'
 description = 'Base is current position.'
 ``````````
 name = 'whence'
-enum = 'end'
+enum = '"end"'
 description = 'Base is end of file.'
 
 [setvbuf]
 description = 'Sets the buffering mode for an output file.'
 [[.enums]]
 name = 'mode'
-enum = 'no'
+enum = '"no"'
 description = 'Output operation appears immediately.'
 ``````````
 name = 'mode'
-enum = 'full'
+enum = '"full"'
 description = 'Performed only when the buffer is full.'
 ``````````
 name = 'mode'
-enum = 'line'
+enum = '"line"'
 description = 'Buffered until a newline is output.'
 
 [write]

@@ -20,19 +20,19 @@ description = '返回当前正在运行的协程加一个布尔量。 如果当�
 description = '以字符串形式返回协程 `co` 的状态。'
 [[.enums]]
 name = 'status'
-enum = 'running'
+enum = '"running"'
 description = '正在运行。'
 ``````````
 name = 'status'
-enum = 'suspended'
+enum = '"suspended"'
 description = '挂起或是还没有开始运行。'
 ``````````
 name = 'status'
-enum = 'normal'
+enum = '"normal"'
 description = '是活动的，但并不在运行。'
 ``````````
 name = 'status'
-enum = 'dead'
+enum = '"dead"'
 description = '运行完主体函数或因错误停止。'
 
 [wrap]

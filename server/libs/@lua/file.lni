@@ -22,10 +22,10 @@ type = 'string'
 name = 'code'
 [[.enums]]
 name = 'type'
-enum = 'exit'
+enum = '"exit"'
 ``````````
 name = 'type'
-enum = 'signal'
+enum = '"signal"'
 
 [flush]
 [[.args]]
@@ -47,17 +47,17 @@ returns = {
 }
 [[.enums]]
 name = 'mode'
-enum = 'n'
+enum = '"n"'
 ``````````
 name = 'mode'
-enum = 'a'
+enum = '"a"'
 ``````````
 name = 'mode'
-enum = 'l'
+enum = '"l"'
 default = true
 ``````````
 name = 'mode'
-enum = 'L'
+enum = '"L"'
 ``````````
 name = 'mode'
 code = 'number'
@@ -74,17 +74,17 @@ type = {'string', 'number'}
 type = '...'
 [[.enums]]
 name = 'mode'
-enum = 'n'
+enum = '"n"'
 ``````````
 name = 'mode'
-enum = 'a'
+enum = '"a"'
 ``````````
 name = 'mode'
-enum = 'l'
+enum = '"l"'
 default = true
 ``````````
 name = 'mode'
-enum = 'L'
+enum = '"L"'
 ``````````
 name = 'mode'
 code = 'number'
@@ -110,14 +110,14 @@ type = 'string'
 optional = 'self'
 [[.enums]]
 name = 'whence'
-enum = 'set'
+enum = '"set"'
 ``````````
 name = 'whence'
-enum = 'cur'
+enum = '"cur"'
 default = true
 ``````````
 name = 'whence'
-enum = 'end'
+enum = '"end"'
 
 [setvbuf]
 [[.args]]
@@ -130,13 +130,13 @@ name = 'size'
 type = 'integer'
 [[.enums]]
 name = 'mode'
-enum = 'no'
+enum = '"no"'
 ``````````
 name = 'mode'
-enum = 'full'
+enum = '"full"'
 ``````````
 name = 'mode'
-enum = 'line'
+enum = '"line"'
 
 [write]
 [[.args]]

@@ -25,6 +25,9 @@ function mt:get(index)
 end
 
 function mt:set(index, value)
+    if index > self.len then
+        self.len = index
+    end
     self[index] = value
 end
 

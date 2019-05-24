@@ -154,7 +154,7 @@ function mt:setReturn(index, value)
         self.returns = createMulti()
     end
     if value then
-        self.returns[index] = value
+        self.returns:set(index, value)
         if self._global then
             value:markGlobal()
         end
@@ -174,7 +174,7 @@ function mt:mergeReturn(index, value)
             self.returns[index]:mergeValue(value)
             self.returns[index] = value
         else
-            self.returns[index] = value
+            self.returns:set(index, value)
         end
     end
     if self._global then

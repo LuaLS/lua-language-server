@@ -1,8 +1,10 @@
 local mt = require 'vm.manager'
+local library = require 'vm.library'
 
 ---@param func emmyFunction
 function mt:callIpairs(func, values, source)
     local tbl = values[1]
+    func:setReturn(1, library.special['@ipairs'])
     func:setReturn(2, tbl)
 end
 
@@ -23,6 +25,7 @@ end
 ---@param func emmyFunction
 function mt:callPairs(func, values, source)
     local tbl = values[1]
+    func:setReturn(1, library.special['next'])
     func:setReturn(2, tbl)
 end
 

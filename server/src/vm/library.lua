@@ -108,4 +108,5 @@ return {
     value = buildLibValue,
     child = buildLibChild,
     clear = clearCache,
+    special = Special,
 }

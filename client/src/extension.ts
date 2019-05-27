@@ -32,12 +32,7 @@ export function activate(context: ExtensionContext) {
 				context.asAbsolutePath(
 					path.join('server', 'main.lua')
 				)
-			],
-			options: {
-				cwd: context.asAbsolutePath(
-					path.join('server')
-				),
-			}
+			]
 		},
 		debug: {
 			command: context.asAbsolutePath(
@@ -50,12 +45,7 @@ export function activate(context: ExtensionContext) {
 				context.asAbsolutePath(
 					path.join('server', 'main.lua')
 				)
-			],
-			options: {
-				cwd: context.asAbsolutePath(
-					path.join('server')
-				),
-			}
+			]
 		}
 	};
 

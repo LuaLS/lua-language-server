@@ -1,6 +1,16 @@
+local function findExe()
+     local n = 0
+     while true do
+          if not arg[n-1] then
+               return arg[n]
+          end
+          n = n - 1
+     end
+end
+
 local fs = require 'bee.filesystem'
 
-ROOT = fs.current_path()
+ROOT = fs.path(findExe()):parent_path():parent_path()
 LANG = LANG or 'en-US'
 
 package.path = (ROOT / 'src' / '?.lua'):string()

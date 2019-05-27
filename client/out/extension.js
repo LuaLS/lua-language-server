@@ -20,10 +20,7 @@ function activate(context) {
                 '-e',
                 'LANG="' + language + '"',
                 context.asAbsolutePath(path.join('server', 'main.lua'))
-            ],
-            options: {
-                cwd: context.asAbsolutePath(path.join('server')),
-            }
+            ]
         },
         debug: {
             command: context.asAbsolutePath(path.join('server', 'bin', 'lua-language-server')),
@@ -32,10 +29,7 @@ function activate(context) {
                 '-e',
                 'LANG="' + language + '"',
                 context.asAbsolutePath(path.join('server', 'main.lua'))
-            ],
-            options: {
-                cwd: context.asAbsolutePath(path.join('server')),
-            }
+            ]
         }
     };
     // Options to control the language client
@@ -48,7 +42,7 @@ function activate(context) {
         }
     };
     // Create the language client and start the client.
-    client = new vscode_languageclient_1.LanguageClient('sumneko.lua-lsp', 'sumneko.lua-lsp', serverOptions, clientOptions);
+    client = new vscode_languageclient_1.LanguageClient('Lua Language Server', 'Lua Language Client', serverOptions, clientOptions);
     // Start the client. This will also launch the server
     client.start();
 }

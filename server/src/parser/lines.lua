@@ -21,7 +21,7 @@ local function Space(...)
     for i = 1, #line do
         if line[i] == ' ' then
             sp = sp + 1
-        else
+        elseif line[i] == '\t' then
             tab = tab + 1
         end
         line[i] = nil

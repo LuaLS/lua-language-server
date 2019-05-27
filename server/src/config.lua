@@ -120,6 +120,9 @@ local ConfigTemplate = {
                                         String,
                                         Or(Boolean, Array(String))
                                     )}
+    },
+    zombi = {
+        party           = {false,   Boolean},
     }
 }
 

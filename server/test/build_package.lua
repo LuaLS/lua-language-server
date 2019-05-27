@@ -111,6 +111,12 @@ local package = {
                     default = 100,
                     description = "%config.workspace.preloadFileSize%"
                 },
+                ["Lua.zombi.party"] = {
+                    scope = "resource",
+                    type = "boolean",
+                    default = false,
+                    description = "DONT TOUCH ME >_<"
+                }
                 --["Lua.workspace.library"] = {
                 --    scope = 'resource',
                 --    type = 'object',

@@ -17,6 +17,14 @@ local OriginTypes = {
     ['function'] = true,
 }
 
+local function formatLiteral(v)
+    if math.type(v) == 'float' then
+        return ('%.10f'):format(v):gsub('[0]*$', ''):gsub('%.$', '.0')
+    else
+        return ('%q'):format(v)
+    end
+end
+
 local function findClass(value)
     -- 检查是否有emmy
     local emmy = value:getEmmy()
@@ -101,7 +109,7 @@ local function unpackTable(value)
             or vType == 'number'
             or vType == 'string'
         then
-            lines[#lines+1] = ('%s: %s = %q'):format(key, child:getType(), child:getLiteral())
+            lines[#lines+1] = ('%s: %s = %s'):format(key, child:getType(), formatLiteral(child:getLiteral()))
         else
             lines[#lines+1] = ('%s: %s'):format(key, child:getType())
         end
@@ -155,10 +163,10 @@ local function getValueHover(source, name, value, lib)
     local tip
     local literal
     if lib then
-        literal = lib.code or (lib.value and ('%q'):format(lib.value))
+        literal = lib.code or (lib.value and formatLiteral(lib.value))
         tip = lib.description
     else
-        literal = value:getLiteral() and ('%q'):format(value:getLiteral())
+        literal = value:getLiteral() and formatLiteral(value:getLiteral())
     end
 
     local tp

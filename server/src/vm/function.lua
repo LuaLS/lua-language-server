@@ -145,7 +145,7 @@ function mt:loadLabel(name)
     return nil
 end
 
-function mt:setReturn(index, value)
+function mt:rawSetReturn(index, value)
     if self._removed then
         return
     end
@@ -161,8 +161,18 @@ function mt:setReturn(index, value)
     end
 end
 
+function mt:setReturn(index, value)
+    if self._emmyReturns then
+        return
+    end
+    return self:rawSetReturn(index, value)
+end
+
 function mt:mergeReturn(index, value)
     if self._removed then
+        return
+    end
+    if self._emmyReturns then
         return
     end
     self:set('hasReturn', true)
@@ -324,7 +334,7 @@ function mt:run(vm)
                     value:mergeType(destValue)
                 end
             end
-            self:setReturn(i, value)
+            self:rawSetReturn(i, value)
         end
     end
 end

@@ -769,3 +769,30 @@ local names: {
     [*integer]: string,
 }
 ]]
+
+TEST [[
+---@return any
+function <?f?>()
+    ---@type integer
+    local a
+    return a
+end
+]]
+[[
+function f()
+  -> any
+]]
+
+TEST [[
+---@return any
+function f()
+    ---@type integer
+    local a
+    return a
+end
+
+local <?x?> = f()
+]]
+[[
+local x: any
+]]

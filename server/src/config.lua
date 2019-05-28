@@ -121,9 +121,6 @@ local ConfigTemplate = {
                                         Or(Boolean, Array(String))
                                     )}
     },
-    zombi = {
-        party           = {false,   Boolean},
-    }
 }
 
 local OtherTemplate = {

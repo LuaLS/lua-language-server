@@ -249,12 +249,6 @@
                     "markdownDescription": "%config.workspace.useGitIgnore%",
                     "scope": "resource",
                     "type": "boolean"
-                },
-                "Lua.zombi.party": {
-                    "default": false,
-                    "description": "DONT TOUCH ME >_<",
-                    "scope": "resource",
-                    "type": "boolean"
                 }
             },
             "title": "Lua",

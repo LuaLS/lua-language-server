@@ -20,7 +20,7 @@ echo "build binary ..."
 
 if [ -d "$INSTALL_PATH" ]; then
     echo "Try to install lua-language-server for you:"
-    cp server/bin "${INSTALL_PATH}/server"
+    cp -R server/bin "${INSTALL_PATH}/server"
 
     echo "Test ..."
     ${INSTALL_PATH}/server/bin/lua-language-server ${INSTALL_PATH}/server/test.lua

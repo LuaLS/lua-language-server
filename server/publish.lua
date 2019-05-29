@@ -9,6 +9,7 @@ local fs = require 'bee.filesystem'
 local subprocess = require 'bee.subprocess'
 ROOT = fs.path(rootPath:gsub('[/\\]$', ''))
 EXTENSION = ROOT:parent_path()
+print(ROOT:string(), EXTENSION:string())
 
 require 'utility'
 local json = require 'json'

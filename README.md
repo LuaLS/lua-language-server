@@ -55,28 +55,31 @@
 
 ![avatar](https://github.com/sumneko/lua-language-server/raw/master/images/Emmy%20Annotation.gif)
 
-## For macOS Users
+## For macOS/Linux Users
 
 Please install sumneko Lua in VScode Marketplace first.
 
 Then build lua-language-server yourself.
 
-### Requirement
-* Xcode
-* [ninja]
-
 ### Build
+* Install [ninja]
 * Clone souce code
-* Run the build script in Terminal
-* Restart VScode and open your lua project 
-
 ```
 git clone git@github.com:sumneko/lua-language-server.git
+```
+* Run `osx.sh` / `linux.sh` in Terminal
+```
 cd lua-language-server
 ./osx.sh
 ```
+```
+cd lua-language-server
+./linux.sh
+```
+* Restart VScode and open your lua project 
 
-[ninja]: https://ninja-build.org
+
+[ninja]: https://github.com/ninja-build/ninja/wiki/Pre-built-Ninja-packages
 
 ## Version
 

@@ -1,16 +1,12 @@
-local function findExe()
-     local n = 0
-     while true do
-          if not arg[n-1] then
-               return arg[n]
-          end
-          n = n - 1
-     end
-end
+local currentPath = debug.getinfo(1, 'S').source:sub(2)
+local rootPath = currentPath:gsub('[/\\][^/\\]-$', '')
+package.cpath = rootPath .. '/bin/?.dll'
+      .. ';' .. rootPath .. '/bin/?.so'
+package.path  = rootPath .. '/src/?.lua'
+      .. ';' .. rootPath .. '/src/?/init.lua'
 
 local fs = require 'bee.filesystem'
-
-ROOT = fs.path(findExe()):parent_path():parent_path()
+ROOT = fs.path(rootPath)
 LANG = LANG or 'en-US'
 
 package.path = (ROOT / 'src' / '?.lua'):string()

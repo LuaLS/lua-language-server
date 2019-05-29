@@ -3,6 +3,12 @@
 set -e
 
 MY_DIR=$(cd "$(dirname $0)";pwd)
+INSTALL_PATH=`find ~/.vscode/extensions -name "sumneko.lua-*" | sort -r | head -1`
+if [ -d "$INSTALL_PATH" ]; then
+else
+    echo "please install sumneko Lua in VScode Marketplace first."
+fi
+
 cd $MY_DIR
 
 echo "updating submodule ..."
@@ -13,29 +19,16 @@ cd 3rd/luamake
 ninja -f ninja/linux.ninja
 cd -
 
+echo "build binary ..."
 ./3rd/luamake/luamake
 
-cd server
-
-# avoid too many file opened error
-ulimit -n 4000
-
-./bin/lua-language-server publish.lua
-cd -
-
+echo "Try to install lua-language-server for you:"
+cp server/bin/lua-language-server "${INSTALL_PATH}/server/bin"
 cp server/bin/*.so "${INSTALL_PATH}/server/bin"
 
-echo "Try to install lua-language-server for you:"
-INSTALL_PATH=`find ~/.vscode/extensions -name "sumneko.lua-*" | sort -r | head -1`
+echo "Test ..."
+${INSTALL_PATH}/server/bin/lua-language-server ${INSTALL_PATH}/server/test.lua
 
-if [ -d "$INSTALL_PATH" ]; then
-    cp server/bin/lua-language-server "${INSTALL_PATH}/server/bin"
-
-    cp server/*.so "${INSTALL_PATH}/server"
-
-    echo "installed."
-    echo "please restart VScode and enjoy."
-    echo "Done."
-else
-    echo "please install sumneko Lua in VScode Marketplace first."
-fi
+echo "installed."
+echo "please restart VScode and enjoy."
+echo "Done."

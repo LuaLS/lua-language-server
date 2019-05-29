@@ -7,7 +7,7 @@ package.path  = rootPath .. 'src/?.lua'
 
 local fs = require 'bee.filesystem'
 local subprocess = require 'bee.subprocess'
-ROOT = fs.path(rootPath)
+ROOT = fs.path(rootPath:gsub('[/\\]$', ''))
 EXTENSION = ROOT:parent_path()
 
 require 'utility'

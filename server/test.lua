@@ -7,7 +7,7 @@ package.path  = rootPath .. 'src/?.lua'
 
 local fs = require 'bee.filesystem'
 local subprocess = require 'bee.subprocess'
-ROOT = fs.path(rootPath)
+ROOT = fs.path(rootPath:gsub('[/\\]$', ''))
 
 local function runTest(root)
     local is_macos = package.cpath:sub(-3) == '.so'

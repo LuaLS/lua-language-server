@@ -6,7 +6,7 @@ package.path  = rootPath .. 'src/?.lua'
       .. ';' .. rootPath .. 'src/?/init.lua'
 
 local fs = require 'bee.filesystem'
-ROOT = fs.path(rootPath)
+ROOT = fs.path(rootPath:gsub('[/\\]$', ''))
 LANG = LANG or 'en-US'
 
 --collectgarbage('generational')

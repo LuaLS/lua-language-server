@@ -23,7 +23,9 @@ if [ -d "$INSTALL_PATH" ]; then
     cp -R server/bin "${INSTALL_PATH}/server"
 
     echo "Test ..."
+    cp server/test.lua "${INSTALL_PATH}/server"
     ${INSTALL_PATH}/server/bin/lua-language-server ${INSTALL_PATH}/server/test.lua
+    rm ${INSTALL_PATH}/server/test.lua
 
     echo "installed."
     echo "please restart VScode and enjoy."

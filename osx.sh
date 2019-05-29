@@ -16,7 +16,6 @@ cd -
 ./3rd/luamake/luamake
 
 cd server
-cp bin/*.so .
 
 # avoid too many file opened error
 ulimit -n 4000
@@ -24,7 +23,7 @@ ulimit -n 4000
 ./bin/lua-language-server publish.lua
 cd -
 
-cp server/*.so publish/lua-language-server/server/
+cp server/bin/*.so "${INSTALL_PATH}/server/bin"
 
 echo "Try to install lua-language-server for you:"
 INSTALL_PATH=`find ~/.vscode/extensions -name "sumneko.lua-*" | sort -r | head -1`

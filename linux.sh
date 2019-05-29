@@ -5,37 +5,37 @@ set -e
 MY_DIR=$(cd "$(dirname $0)";pwd)
 cd $MY_DIR
 
+echo "updating submodule ..."
 git submodule -q update --recursive --init
-
-## apt install ninja-build
-## apt install clang
 
 echo "build luamake ..."
 cd 3rd/luamake
 ninja -f ninja/linux.ninja
-cd $MY_DIR
+cd -
 
 ./3rd/luamake/luamake
 
 cd server
-cp bin/*.so .
 
 # avoid too many file opened error
 ulimit -n 4000
 
 ./bin/lua-language-server publish.lua
-cd $MY_DIR
+cd -
 
-# cp server/*.so publish/lua-language-server/server/
+cp server/bin/*.so "${INSTALL_PATH}/server/bin"
 
-## nvm install stable
-## nvm use stable
-## npm install -g vsce
+echo "Try to install lua-language-server for you:"
+INSTALL_PATH=`find ~/.vscode/extensions -name "sumneko.lua-*" | sort -r | head -1`
 
-# cd publish/lua-language-server
-# vsce package
+if [ -d "$INSTALL_PATH" ]; then
+    cp server/bin/lua-language-server "${INSTALL_PATH}/server/bin"
 
+    cp server/*.so "${INSTALL_PATH}/server"
 
-## example of development environment
-## cp ~/lua-language-server/server/*.so ~/.vscode/extensions/sumneko.lua-0.9.4/server/
-## killall -9 lua-language-server; cp ~/lua-language-server/server/bin/lua-language-server ~/.vscode/extensions/sumneko.lua-0.9.4/server/bin/
+    echo "installed."
+    echo "please restart VScode and enjoy."
+    echo "Done."
+else
+    echo "please install sumneko Lua in VScode Marketplace first."
+fi

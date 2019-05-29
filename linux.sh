@@ -18,7 +18,7 @@ cd $MY_DIR
 ./3rd/luamake/luamake
 
 cd server
-mv bin/*.so .
+cp bin/*.so .
 
 # avoid too many file opened error
 ulimit -n 4000

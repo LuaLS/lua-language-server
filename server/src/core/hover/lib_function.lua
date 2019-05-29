@@ -162,7 +162,7 @@ local function buildEnum(lib)
             if enum.code then
                 strs[#strs+1] = tostring(enum.code)
             else
-                strs[#strs+1] = ('%q'):format(enum.enum)
+                strs[#strs+1] = tostring(enum.enum)
             end
             if enum.description then
                 strs[#strs+1] = ' -- ' .. enum.description

@@ -129,6 +129,11 @@ local package = {
     scripts = {
         ["vscode:prepublish"] = "cd client && npm run update-vscode && cd .."
     },
+	__metadata = {
+		id = "3a15b5a7-be12-47e3-8445-88ee3eabc8b2",
+		publisherDisplayName = "sumneko",
+		publisherId = "fb626675-24cf-4881-8c13-b465f29bec2f",
+	},
 }
 
 local DiagSeverity = package.contributes.configuration.properties["Lua.diagnostics.severity"].properties

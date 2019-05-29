@@ -9,9 +9,6 @@ local fs = require 'bee.filesystem'
 ROOT = fs.path(rootPath)
 LANG = LANG or 'en-US'
 
-package.path = (ROOT / 'src' / '?.lua'):string()
-     .. ';' .. (ROOT / 'src' / '?' / 'init.lua'):string()
-
 --collectgarbage('generational')
 collectgarbage("setpause", 100)
 collectgarbage("setstepmul", 1000)

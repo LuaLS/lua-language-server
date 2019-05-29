@@ -128,4 +128,5 @@ Please [help me][en-US] improve the quality of `en-US`.
 * [Peter Young](https://github.com/young40)
 * [Li Xiaobin](https://github.com/Xiaobin0860)
 * [Fedora7](https://github.com/Fedora7)
+* [Allen Shaw](https://github.com/shuxiao9058)
 * [Bartel](https://github.com/Letrab)

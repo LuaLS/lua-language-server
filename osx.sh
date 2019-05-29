@@ -5,6 +5,7 @@ set -e
 MY_DIR=$(cd "$(dirname $0)";pwd)
 INSTALL_PATH=`find ~/.vscode/extensions -name "sumneko.lua-*" | sort -r | head -1`
 if [ -d "$INSTALL_PATH" ]; then
+    echo "found install path"
 else
     echo "please install sumneko Lua in VScode Marketplace first."
 fi

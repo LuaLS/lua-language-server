@@ -1,12 +1,15 @@
 local currentPath = debug.getinfo(1, 'S').source:sub(2)
 local rootPath = currentPath:gsub('[^/\\]-$', '')
+if rootPath == '' then
+    rootPath = './'
+end
 package.cpath = rootPath .. 'bin/?.so'
       .. ';' .. rootPath .. 'bin/?.dll'
 package.path  = rootPath .. 'src/?.lua'
       .. ';' .. rootPath .. 'src/?/init.lua'
 
 local fs = require 'bee.filesystem'
-ROOT = fs.path(rootPath:gsub('[/\\]$', ''))
+ROOT = fs.path(rootPath)
 LANG = LANG or 'en-US'
 
 --collectgarbage('generational')

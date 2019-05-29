@@ -1,5 +1,8 @@
 local currentPath = debug.getinfo(1, 'S').source:sub(2)
 local rootPath = currentPath:gsub('[^/\\]-$', '')
+if rootPath == '' then
+    rootPath = './'
+end
 package.cpath = rootPath .. 'bin/?.so'
       .. ';' .. rootPath .. 'bin/?.dll'
 package.path  = rootPath .. 'src/?.lua'
@@ -7,7 +10,7 @@ package.path  = rootPath .. 'src/?.lua'
 
 local fs = require 'bee.filesystem'
 local subprocess = require 'bee.subprocess'
-ROOT = fs.path(rootPath:gsub('[/\\]$', ''))
+ROOT = fs.path(rootPath)
 
 local function runTest(root)
     local is_macos = package.cpath:sub(-3) == '.so'

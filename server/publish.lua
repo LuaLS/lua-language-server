@@ -9,13 +9,15 @@ local fs = require 'bee.filesystem'
 local subprocess = require 'bee.subprocess'
 ROOT = fs.path(rootPath:gsub('[/\\]$', ''))
 EXTENSION = ROOT:parent_path()
-print(ROOT:string(), EXTENSION:string())
 
 require 'utility'
 local json = require 'json'
 
 local function loadPackage()
     local buf = io.load(EXTENSION / 'package.json')
+    if not buf then
+        error(ROOT:string() .. '|' .. EXTENSION:string())
+    end
     local package = json.decode(buf)
     return package.version
 end

@@ -31,7 +31,7 @@ if [ -d "$INSTALL_PATH" ]; then
     echo "please restart VScode and enjoy."
 else
     echo "Test ..."
-    ./server/bin/lua-language-server ./server/test.lua
+    ./server/bin/lua-language-server ./server/publish.lua
 
     echo "please install sumneko Lua in VScode Marketplace first."
 fi

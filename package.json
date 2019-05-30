@@ -130,6 +130,17 @@
                             "scope": "resource",
                             "type": "string"
                         },
+                        "set-const": {
+                            "default": "Error",
+                            "enum": [
+                                "Error",
+                                "Warning",
+                                "Information",
+                                "Hint"
+                            ],
+                            "scope": "resource",
+                            "type": "string"
+                        },
                         "trailing-space": {
                             "default": "Hint",
                             "enum": [

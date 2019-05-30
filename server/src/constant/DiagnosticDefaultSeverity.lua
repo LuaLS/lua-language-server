@@ -14,4 +14,5 @@ return {
     ['empty-block']         = 'Information',
     ['redundant-value']     = 'Information',
     ['emmy-lua']            = 'Warning',
+    ['set-const']           = 'Error',
 }

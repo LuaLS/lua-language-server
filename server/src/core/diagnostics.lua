@@ -631,6 +631,38 @@ function mt:searchEmmyLua(callback)
     end)
 end
 
+function mt:searchSetConstLocal(callback)
+    local mark = {}
+    self.vm:eachSource(function (source)
+        local loc = source:bindLocal()
+        if not loc then
+            return
+        end
+        if mark[loc] then
+            return
+        end
+        mark[loc] = true
+        if not loc.tags then
+            return
+        end
+        local const
+        for _, tag in ipairs(loc.tags) do
+            if tag[1] == 'const' then
+                const = true
+                break
+            end
+        end
+        if not const then
+            return
+        end
+        loc:eachInfo(function (info, src)
+            if info.type == 'set' then
+                callback(src.start, src.finish)
+            end
+        end)
+    end)
+end
+
 function mt:doDiagnostics(func, code, callback)
     if config.config.diagnostics.disable[code] then
         return
@@ -770,6 +802,12 @@ return function (vm, lines, uri)
         return {
             message = message,
             related = related,
+        }
+    end)
+    -- 检查给const变量赋值
+    session:doDiagnostics(session.searchSetConstLocal, 'set-const', function ()
+        return {
+            message = lang.script.DIAG_SET_CONST
         }
     end)
     return session.datas

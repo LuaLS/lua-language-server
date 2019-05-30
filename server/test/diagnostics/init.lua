@@ -442,3 +442,9 @@ TEST [[
 TEST [[
 ---@class Class : any
 ]]
+
+TEST [[
+local <const> x = 1
+<!x!> = 2
+return x
+]]

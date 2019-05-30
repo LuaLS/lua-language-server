@@ -482,8 +482,8 @@ RepeatBody  <-  REPEAT
                     BreakEnd
                 NeedUntil DirtyExp
 
-LocalTag    <-  Sp '<' MustName LocalTagEnd
-            /   %nil
+LocalTag    <-  (Sp '<' MustName LocalTagEnd)*
+            ->  LocalTag
 LocalTagEnd <-  '>' / {} -> MissGT
 Local       <-  (LOCAL LocalTag NameList (ASSIGN ExpList)?)
             ->  Local

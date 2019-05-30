@@ -796,3 +796,10 @@ local <?x?> = f()
 [[
 local x: any
 ]]
+
+TEST [[
+local <toclose> <const> <?x?> = 1
+]]
+[[
+local <toclose> <const> x: number = 1
+]]

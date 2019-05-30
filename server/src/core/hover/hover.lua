@@ -172,6 +172,17 @@ local function getValueHover(source, name, value, lib)
     local tp
     if source:bindLocal() then
         tp = 'local'
+        local loc = source:bindLocal()
+        if loc.tags then
+            local mark = {}
+            for _, tag in ipairs(loc.tags) do
+                local tagName = tag[1]
+                if not mark[tagName] then
+                    mark[tagName] = true
+                    tp = ('%s <%s>'):format(tp, tagName)
+                end
+            end
+        end
     elseif source:get 'global' then
         tp = 'global'
     elseif source:get 'simple' then

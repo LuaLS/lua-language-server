@@ -153,7 +153,7 @@ function mt:setEmmy(emmy)
     end
 end
 
-local function create(name, source, value)
+local function create(name, source, value, tags)
     if not value then
         error('Local must has a value')
     end
@@ -168,6 +168,7 @@ local function create(name, source, value)
         name = name,
         source = id,
         value = value,
+        tags = tags,
         _info = {},
     }, mt)
     Watch[self] = true

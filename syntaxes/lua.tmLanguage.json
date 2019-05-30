@@ -225,15 +225,16 @@
 			"name": "keyword.control.lua"
 		},
 		{
+			"match": "\\b(local)\\b(?:\\s*)*",
+			"name": "keyword.local.lua"
+		},
+		{
 			"captures": {
 				"1": {
-					"name": "keyword.local.lua"
-				},
-				"2": {
 					"name": "string.tag.lua"
 				}
 			},
-			"match": "\\b(local)\\b(?:\\s*<([a-zA-Z_][a-zA-Z0-9_]*)>)"
+			"match": "<([a-zA-Z_][a-zA-Z0-9_]*)>"
 		},
 		{
 			"match": "\\b(function)\\b",

@@ -26,6 +26,7 @@ DIAG_INEXISTENT_PARAM   = '不存在的参数。'
 DIAG_DUPLICATE_PARAM    = '重复的参数。'
 DIAG_NEED_CLASS         = '需要先定义 Class 。'
 DIAG_DUPLICATE_FIELD    = '重复定义的 field 。'
+DIAG_SET_CONST          = '不能对常量赋值。'
 
 MWS_NOT_SUPPORT         = '{} 目前还不支持多工作目录，我可能需要重启才能支持新的工作目录...'
 MWS_RESTART             = '重启'
@@ -58,6 +59,7 @@ PARSER_NO_VISIBLE_LABEL = '标签`{label}`不可见。'
 PARSER_REDEFINE_LABEL   = '标签`{label}`重复定义。'
 PARSER_UNSUPPORT_SYMBOL = '{version} 不支持该符号。'
 PARSER_UNEXPECT_DOTS    = '`...`只能在不定参函数中使用。'
+PARSER_UNKNOWN_TAG      = '不支持的标签。'
 
 SYMBOL_ANONYMOUS        = '<匿名函数>'
 

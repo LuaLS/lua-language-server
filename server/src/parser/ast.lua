@@ -836,29 +836,21 @@ local Defs = {
             keys, values,
         }
     end,
-    ToClose = function (start)
-        if State.Version == 'Lua 5.4' then
-            return {
-                type = 'toclose',
-                start = start,
-                finish = start + #'*toclose' - 1,
+    Local = function (tag, keys, values)
+        if tag and State.Version ~= 'Lua 5.4' then
+            pushError {
+                type = 'UNSUPPORT_SYMBOL',
+                start = tag.start,
+                finish = tag.finish,
+                version = 'Lua 5.4',
+                info = {
+                    version = State.Version,
+                }
             }
         end
-        pushError {
-            type = 'UNSUPPORT_SYMBOL',
-            start = start,
-            finish = start + #'*toclose' - 1,
-            version = 'Lua 5.4',
-            info = {
-                version = State.Version,
-            }
-        }
-        return nil
-    end,
-    Local = function (toclose, keys, values)
         return {
             type = 'local',
-            keys, values, toclose
+            keys, values, tag
         }
     end,
     DoBody = function (...)
@@ -1576,6 +1568,16 @@ local Defs = {
             }
         }
         return block
+    end,
+    MissGT = function (start)
+        pushError {
+            type = 'MISS_SYMBOL',
+            start = start,
+            finish = start,
+            info = {
+                symbol = '>'
+            }
+        }
     end
 }
 

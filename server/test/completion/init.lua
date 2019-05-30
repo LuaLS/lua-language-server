@@ -690,21 +690,25 @@ end
 
 require 'config' .config.runtime.version = 'Lua 5.4'
 --TEST [[
---local *$
+--local $
 --]]
 --{
 --    {
---        label = 'toclose',
+--        label = '<toclose>',
 --        kind = CompletionItemKind.Keyword,
---    }
+--    },
+--    {
+--        label = '<const>',
+--        kind = CompletionItemKind.Keyword,
+--    },
 --}
-
+--
 --TEST [[
---local *tocl$
+--local <toc$
 --]]
 --{
 --    {
---        label = 'toclose',
+--        label = '<toclose>',
 --        kind = CompletionItemKind.Keyword,
 --    }
 --}

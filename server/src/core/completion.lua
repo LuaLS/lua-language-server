@@ -373,18 +373,15 @@ end
 
 local function searchAsLocal(vm, source, word, callback)
     local loc = source:bindLocal()
-    if loc then
-        local close = loc:close()
-        -- 因为闭包的关系落在局部变量finish到close范围内的全局变量一定能访问到该局部变量
-        searchCloseGlobal(vm, source.finish, close, word, callback)
+    if not loc then
+        return
     end
+    local close = loc:close()
+    -- 因为闭包的关系落在局部变量finish到close范围内的全局变量一定能访问到该局部变量
+    searchCloseGlobal(vm, source.finish, close, word, callback)
     -- 特殊支持 local function
     if matchKey(word, 'function') then
         callback('function', nil, CompletionItemKind.Keyword)
-    end
-    -- 特殊支持 local *toclose
-    if word == '' and config.config.runtime.version == 'Lua 5.4' then
-        callback('*toclose', nil, CompletionItemKind.Keyword)
     end
 end
 
@@ -846,27 +843,6 @@ local function makeList(source, pos, word)
     end, list
 end
 
-local function searchToclose(text, source, word, callback)
-    local pos = source.start
-    if text:sub(pos-1, pos-1) ~= '*' then
-        return false
-    end
-    if not matchKey(word, 'toclose') then
-        return false
-    end
-    for i = pos-1, 1, -1 do
-        if text:sub(i, i):match '[^%s%c]' then
-            if text:sub(i - #'local' + 1, i) == 'local' then
-                callback('toclose', nil, CompletionItemKind.Keyword)
-                return true
-            else
-                return false
-            end
-        end
-    end
-    return false
-end
-
 local function keywordSource(vm, word, pos)
     if not KEYMAP[word] then
         return nil
@@ -933,7 +909,7 @@ local function getSource(vm, pos, text, filter)
         return source, pos, word
     end
     pos = findStartPos(pos, text)
-    source = findSource(vm, pos, filter)
+    source = findSource(vm, pos, filter) or findSource(vm, pos-1, filter)
     return source, pos, word
 end
 
@@ -961,9 +937,6 @@ return function (vm, text, pos, oldText)
     end
     State = {}
     local callback, list = makeList(source, pos, word)
-    if searchToclose(text, source, word, callback) then
-        return list
-    end
     searchSpecial(vm, source, word, callback, pos, text)
     searchCallArg(vm, source, word, callback, pos)
     searchSource(vm, source, word, callback, pos)

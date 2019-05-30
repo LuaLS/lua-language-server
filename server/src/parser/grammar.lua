@@ -215,8 +215,6 @@ ASSIGN      <-  Sp '='
 
 Nothing     <-  {} -> Nothing
 
-TOCLOSE     <-  Sp ({} '*toclose' Cut) ->  ToClose
-
 DirtyBR     <-  BR {}  / {} -> MissBR
 DirtyTR     <-  TR {}  / {} -> MissTR
 DirtyPR     <-  PR {}  / {} -> DirtyPR
@@ -484,8 +482,10 @@ RepeatBody  <-  REPEAT
                     BreakEnd
                 NeedUntil DirtyExp
 
-ToClose     <-  TOCLOSE / %nil
-Local       <-  (LOCAL ToClose NameList (ASSIGN ExpList)?)
+LocalTag    <-  Sp '<' MustName LocalTagEnd
+            /   %nil
+LocalTagEnd <-  '>' / {} -> MissGT
+Local       <-  (LOCAL LocalTag NameList (ASSIGN ExpList)?)
             ->  Local
 Set         <-  (SimpleList ASSIGN ExpList?)
             ->  Set

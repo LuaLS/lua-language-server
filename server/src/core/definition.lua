@@ -51,6 +51,9 @@ local function parseLocal(callback, vm, source)
 end
 
 local function parseValueByValue(callback, vm, source, value)
+    if not source then
+        return
+    end
     local mark = { [vm] = true }
     local list = {}
     for _ = 1, 5 do

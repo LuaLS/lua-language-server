@@ -42,7 +42,7 @@ local function mWakeup(self)
     end
     self._running = false
     if self._onTimer then
-        self:_onTimer()
+        xpcall(self._onTimer, log.error, self)
     end
     if self._removed then
         return

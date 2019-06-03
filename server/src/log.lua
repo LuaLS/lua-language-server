@@ -43,6 +43,7 @@ local function push_log(level, ...)
     local str = table.concat(t, '\t', 1, t.n)
     if level == 'error' then
         str = str .. '\n' .. debug.traceback(nil, 3)
+        io.stderr:write(str .. '\n')
     end
     init_log_file()
     if not log.file then

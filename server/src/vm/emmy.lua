@@ -266,16 +266,16 @@ function mt:doEmmyTableType(action)
     return type
 end
 
-function mt:doEmmyFunctionType(action)
+function mt:buildEmmyFunctionType(source)
     ---@type emmyMgr
     local emmyMgr = self.emmyMgr
-    self:instantSource(action)
-    local funcObj = emmyMgr:addFunctionType(action)
+    self:instantSource(source)
+    local funcObj = emmyMgr:addFunctionType(source)
     ---@type emmyFunction
-    local func = functionMgr.create(action)
-    for i = 1, #action // 2 do
-        local nameSource = action[i*2-1]
-        local typeSource = action[i*2]
+    local func = functionMgr.create(source)
+    for i = 1, #source // 2 do
+        local nameSource = source[i*2-1]
+        local typeSource = source[i*2]
         local paramType = self:buildEmmyAnyType(typeSource)
         funcObj:addParam(nameSource[1], paramType)
         local value = self:createValue(paramType:getType(), typeSource)
@@ -283,7 +283,7 @@ function mt:doEmmyFunctionType(action)
         self:instantSource(nameSource)
         func:addArg(nameSource[1], nameSource, value)
     end
-    local returnSource = action[#action]
+    local returnSource = source[#source]
     if returnSource then
         local returnType = self:buildEmmyAnyType(returnSource)
         funcObj:addReturn(returnType)
@@ -293,6 +293,11 @@ function mt:doEmmyFunctionType(action)
     end
     funcObj:bindFunction(func)
     self._emmy = funcObj
+    return funcObj
+end
+
+function mt:doEmmyFunctionType(action)
+    local funcObj = self:buildEmmyFunctionType(action)
     return funcObj
 end
 

@@ -225,16 +225,22 @@
 			"name": "keyword.control.lua"
 		},
 		{
-			"match": "\\b(local)\\b(?:\\s*)*",
+			"match": "\\b(local)\\b",
 			"name": "keyword.local.lua"
 		},
 		{
-			"captures": {
-				"1": {
-					"name": "string.tag.lua"
+			"begin": "(?<=local)",
+			"end": "(?=[a-zA-Z_=])",
+			"patterns": [
+				{
+					"match": "<\\s*([a-zA-Z_][a-zA-Z0-9_]*)",
+					"captures": {
+						"1": {
+							"name": "string.tag.lua"
+						}
+					}
 				}
-			},
-			"match": "<([a-zA-Z_][a-zA-Z0-9_]*)>"
+			]
 		},
 		{
 			"match": "\\b(function)\\b",

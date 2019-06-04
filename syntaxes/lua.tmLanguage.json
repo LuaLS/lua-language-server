@@ -12,7 +12,7 @@
 					"name": "keyword.control.lua"
 				}
 			},
-			"end": "(?=[\\)\\-\\.:{}\\[\\]\"'])",
+			"end": "(?=[\\)\\-:{}\\[\\]\"'])",
 			"name": "meta.function.lua",
 			"patterns": [
 				{

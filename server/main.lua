@@ -21,15 +21,7 @@ log.init(ROOT, ROOT / 'log' / 'service.log')
 log.info('Lua Lsp startup, root: ', ROOT)
 ac = {}
 
-local function tryDebugger()
-     local dbg = require 'debugger'
-     dbg:io 'listen:127.0.0.1:11411'
-     dbg:start()
-     log.info('Debugger startup, listen port: 11411')
-end
-
---pcall(tryDebugger)
-
+--xpcall(dofile, log.debug, rootPath .. 'debugger.lua')
 require 'utility'
 require 'global_protect'
 local service = require 'service'

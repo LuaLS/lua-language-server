@@ -22,7 +22,7 @@
 							"name": "punctuation.definition.parameters.begin.lua"
 						}
 					},
-					"end": "(?=\\))",
+					"end": "(?!.)",
 					"endCaptures": {
 						"1": {
 							"name": "punctuation.definition.parameters.finish.lua"

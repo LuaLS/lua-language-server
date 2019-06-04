@@ -841,7 +841,7 @@ local Defs = {
             return nil
         end
         local tags = {...}
-        for _, tag in ipairs(tags) do
+        for i, tag in ipairs(tags) do
             if State.Version ~= 'Lua 5.4' then
                 pushError {
                     type = 'UNSUPPORT_SYMBOL',
@@ -855,6 +855,15 @@ local Defs = {
             elseif tag[1] ~= 'const' and tag[1] ~= 'toclose' then
                 pushError {
                     type = 'UNKNOWN_TAG',
+                    start = tag.start,
+                    finish = tag.finish,
+                    info = {
+                        tag = tag[1],
+                    }
+                }
+            elseif i > 1 then
+                pushError {
+                    type = 'MULTI_TAG',
                     start = tag.start,
                     finish = tag.finish,
                     info = {

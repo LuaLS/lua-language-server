@@ -60,6 +60,7 @@ PARSER_REDEFINE_LABEL   = '标签`{label}`重复定义。'
 PARSER_UNSUPPORT_SYMBOL = '{version} 不支持该符号。'
 PARSER_UNEXPECT_DOTS    = '`...`只能在不定参函数中使用。'
 PARSER_UNKNOWN_TAG      = '不支持的标签。'
+PARSER_MULTI_TAG        = '只能设置一个标签。'
 
 SYMBOL_ANONYMOUS        = '<匿名函数>'
 

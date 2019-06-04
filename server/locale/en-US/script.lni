@@ -60,6 +60,7 @@ PARSER_REDEFINE_LABEL   = 'Label `{label}` already defined.'
 PARSER_UNSUPPORT_SYMBOL = '{version} does not support this grammar.'
 PARSER_UNEXPECT_DOTS    = 'Cannot use `...` outside a vararg function.'
 PARSER_UNKNOWN_TAG      = 'Unknown tag.'
+PARSER_MULTI_TAG        = 'Dose not support multi tags.'
 
 SYMBOL_ANONYMOUS        = '<Anonymous>'
 

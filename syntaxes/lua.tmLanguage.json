@@ -12,7 +12,7 @@
 					"name": "keyword.control.lua"
 				}
 			},
-			"end": "(?=\\)|,|{|\\b(break|do|else|for|if|elseif|goto|return|then|repeat|while|until|end|in|local|function)\\b)",
+			"end": "(?=[\\)\\-\\.:{}\\[\\]\"'])",
 			"name": "meta.function.lua",
 			"patterns": [
 				{
@@ -25,7 +25,7 @@
 							"name": "punctuation.definition.parameters.begin.lua"
 						}
 					},
-					"end": "(?=\\))|(?!.)",
+					"end": "(?=[\\)\\-\\.:{}\\[\\]\"'])",
 					"endCaptures": {
 						"1": {
 							"name": "punctuation.definition.parameters.finish.lua"

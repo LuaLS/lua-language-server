@@ -16,13 +16,16 @@
 			"name": "meta.function.lua",
 			"patterns": [
 				{
+					"include": "#comment"
+				},
+				{
 					"begin": "(\\()",
 					"beginCaptures": {
 						"1": {
 							"name": "punctuation.definition.parameters.begin.lua"
 						}
 					},
-					"end": "(?!.)",
+					"end": "(\\))|(?!.)",
 					"endCaptures": {
 						"1": {
 							"name": "punctuation.definition.parameters.finish.lua"
@@ -30,6 +33,9 @@
 					},
 					"name": "meta.parameter.lua",
 					"patterns": [
+						{
+							"include": "#comment"
+						},
 						{
 							"match": "[a-zA-Z_][a-zA-Z0-9_]*",
 							"name": "variable.parameter.function.lua"
@@ -157,45 +163,7 @@
 			"name": "comment.line.shebang.lua"
 		},
 		{
-			"begin": "(^[ \\t]+)?(?=--)",
-			"beginCaptures": {
-				"1": {
-					"name": "punctuation.whitespace.comment.leading.lua"
-				}
-			},
-			"end": "(?!\\G)((?!^)[ \\t]+\\n)?",
-			"endCaptures": {
-				"1": {
-					"name": "punctuation.whitespace.comment.trailing.lua"
-				}
-			},
-			"patterns": [
-				{
-					"begin": "--\\[(=*)\\[",
-					"beginCaptures": {
-						"0": {
-							"name": "punctuation.definition.comment.begin.lua"
-						}
-					},
-					"end": "\\]\\1\\]",
-					"endCaptures": {
-						"0": {
-							"name": "punctuation.definition.comment.end.lua"
-						}
-					},
-					"name": "comment.block.lua"
-				},
-				{
-					"begin": "--",
-					"beginCaptures": {
-						"0": {
-							"name": "punctuation.definition.comment.lua"
-						}
-					},
-					"end": "\\n",
-					"name": "comment.line.double-dash.lua"
-				}
-			]
+			"include": "#comment"
 		},
 		{
 			"captures": {
@@ -232,6 +200,9 @@
 			"begin": "(?<=local)",
 			"end": "(?=[a-zA-Z_=])",
 			"patterns": [
+				{
+					"include": "#comment"
+				},
 				{
 					"match": "<\\s*([a-zA-Z_][a-zA-Z0-9_]*)",
 					"captures": {
@@ -305,6 +276,51 @@
 				{
 					"match": "\\\\.",
 					"name": "invalid.illegal.character.escape.lua"
+				}
+			]
+		},
+		"comment": {
+			"patterns": [
+				{
+					"begin": "(^[ \\t]+)?(?=--)",
+					"beginCaptures": {
+						"1": {
+							"name": "punctuation.whitespace.comment.leading.lua"
+						}
+					},
+					"end": "(?!\\G)((?!^)[ \\t]+\\n)?",
+					"endCaptures": {
+						"1": {
+							"name": "punctuation.whitespace.comment.trailing.lua"
+						}
+					},
+					"patterns": [
+						{
+							"begin": "--\\[(=*)\\[",
+							"beginCaptures": {
+								"0": {
+									"name": "punctuation.definition.comment.begin.lua"
+								}
+							},
+							"end": "\\]\\1\\]",
+							"endCaptures": {
+								"0": {
+									"name": "punctuation.definition.comment.end.lua"
+								}
+							},
+							"name": "comment.block.lua"
+						},
+						{
+							"begin": "--",
+							"beginCaptures": {
+								"0": {
+									"name": "punctuation.definition.comment.lua"
+								}
+							},
+							"end": "\\n",
+							"name": "comment.line.double-dash.lua"
+						}
+					]
 				}
 			]
 		}

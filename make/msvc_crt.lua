@@ -34,7 +34,7 @@ local RedistVersion = (function ()
 end)()
 
 local function crtpath(platform)
-    return InstallDir / 'VC' / 'Redist' / 'MSVC' / RedistVersion / platform / 'Microsoft.VC141.CRT'
+    return InstallDir / 'VC' / 'Redist' / 'MSVC' / RedistVersion / platform / 'Microsoft.VC142.CRT'
 end
 
 local function sdkpath()

@@ -19,9 +19,10 @@ collectgarbage("setstepmul", 1000)
 log = require 'log'
 log.init(ROOT, ROOT / 'log' / 'service.log')
 log.info('Lua Lsp startup, root: ', ROOT)
+log.debug('ROOT:', ROOT:string())
 ac = {}
 
---xpcall(dofile, log.debug, rootPath .. 'debugger.lua')
+xpcall(dofile, log.debug, rootPath .. 'debugger.lua')
 require 'utility'
 require 'global_protect'
 local service = require 'service'

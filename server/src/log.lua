@@ -8,7 +8,8 @@ log.size = 0
 log.max_size = 100 * 1024 * 1024
 
 local function trim_src(src)
-    src = src:sub(log.prefix_len, -5)
+    src = src:sub(log.prefix_len + 1, -5)
+    src = src:gsub('^[/\\]+', '')
     src = src:gsub('[\\/]+', '.')
     return src
 end
@@ -98,7 +99,7 @@ function log.init(root, path)
         end
     end
     log.path = path:string()
-    log.prefix_len = #root:string() + 3
+    log.prefix_len = #root:string()
     log.size = 0
     if not fs.exists(path:parent_path()) then
         fs.create_directories(path:parent_path())

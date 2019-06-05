@@ -34,18 +34,22 @@ table.sort(luaDebugs, function (a, b)
 end)
 
 local debugPath = extensionPath / luaDebugs[1]
-local cpath = "runtime/win64/lua54/?.dll"
-local path  = "script/?.lua"
+local cpath = "/runtime/win64/lua54/?.dll"
+local path  = "/script/?.lua"
 
-package.cpath = package.cpath .. ';' .. (debugPath / cpath):string()
+package.cpath = package.cpath .. ';' .. debugPath:string() .. cpath
 
 local function tryDebugger()
     local rdebug = require "remotedebug"
-    local entry = package.searchpath('start_debug', (debugPath / path):string())
-    local dbg = loadfile(entry)(rdebug, debugPath:string() .. '/', path, cpath)
-    local port = "11411"
-    dbg:start("listen:127.0.0.1:" .. port, true)
-    log.debug('Debugger startup, listen port:', port)
+    local entry = package.searchpath('start_debug', debugPath:string() .. path)
+    local root = debugPath:string()
+    local pid = "11411"
+    local addr = ("@%s/runtime/tmp/pid_%s.tmp"):format(root, pid)
+    local dbg = loadfile(entry)(rdebug, root, path, cpath)
+    debug.getregistry()["lua-debug"] = dbg
+    dbg:start(addr, true)
+    log.debug('Debugger startup, listen port:', pid)
+    log.debug('Args:', addr, rdebug, root, path, cpath)
 end
 
 xpcall(tryDebugger, log.debug)

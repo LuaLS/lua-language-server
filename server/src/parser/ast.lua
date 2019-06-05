@@ -1234,18 +1234,24 @@ local Defs = {
         }
     end,
     EmmyParam = function (argName, emmyName, ...)
-        return {
+        local emmy = {
             type = 'emmyParam',
             argName,
             emmyName,
             ...
         }
+        emmy.start = emmy[1].start
+        emmy.finish = emmy[#emmy].finish
+        return emmy
     end,
     EmmyReturn = function (...)
-        return {
+        local emmy = {
             type = 'emmyReturn',
             ...
         }
+        emmy.start = emmy[1].start
+        emmy.finish = emmy[#emmy].finish
+        return emmy
     end,
     EmmyField = function (access, fieldName, ...)
         local obj = {
@@ -1258,23 +1264,35 @@ local Defs = {
         return obj
     end,
     EmmyGenericBlock = function (genericName, parentName)
-        return { genericName, parentName }
+        return {
+            start = genericName.start,
+            finish = parentName and parentName.finish or genericName.finish,
+            genericName,
+            parentName,
+        }
     end,
     EmmyGeneric = function (...)
-        return {
+        local emmy = {
             type = 'emmyGeneric',
             ...
         }
+        emmy.start = emmy[1].start
+        emmy.finish = emmy[#emmy].finish
+        return emmy
     end,
     EmmyVararg = function (typeName)
         return {
             type = 'emmyVararg',
+            start = typeName.start,
+            finish = typeName.finish,
             typeName,
         }
     end,
     EmmyLanguage = function (language)
         return {
             type = 'emmyLanguage',
+            start = language.start,
+            finish = language.finish,
             language,
         }
     end,

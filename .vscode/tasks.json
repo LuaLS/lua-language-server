@@ -4,7 +4,7 @@
         {
             "type": "shell",
             "label": "编译",
-            "command": "cd 3rd\\luamake && tools\\ninja -f ninja\\msvc.ninja && cd ..\\.. && 3rd\\luamake\\luamake remake"
+            "command": "cd 3rd\\luamake && tools\\ninja -f ninja\\msvc.ninja && cd ..\\.. && 3rd\\luamake\\luamake rebuild"
         }
     ]
 }

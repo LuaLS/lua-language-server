@@ -41,7 +41,7 @@ optional = after
 [[.returns]]
 type = boolean
 
-[kill]
+[close]
 version = 'Lua 5.4'
 [[.args]]
 name = 'co'

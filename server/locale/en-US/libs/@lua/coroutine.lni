@@ -7,8 +7,8 @@ description = 'Returns true when the running coroutine can yield.'
 ['isyieldable Lua 5.4']
 description = 'Returns true when the coroutine `co` can yield. The default for `co` is the running coroutine.'
 
-[kill]
-description = 'Kills coroutine `co` , closing all its pending to-be-closed variables and putting the coroutine in a dead state.'
+[close]
+description = 'Closes coroutine `co` , closing all its pending to-be-closed variables and putting the coroutine in a dead state.'
 
 [resume]
 description = 'Starts or continues the execution of coroutine `co`.'

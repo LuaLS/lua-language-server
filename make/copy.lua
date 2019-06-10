@@ -45,7 +45,7 @@ local sourceDir = fs.path(".")
 local extensionDirName = getExtensionDirName(packageDir)
 local extensionDir = fs.path(extensionPath) / extensionDirName
 if not fs.exists(extensionDir) then
-    error(extensionDir .. "is not installed.")
+    error("`" .. extensionDir .. "` is not installed.")
 end
 
 if pcall(fs.remove_all, extensionDir / "server" / "bin-bak") then

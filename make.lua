@@ -1,9 +1,10 @@
 local lm = require 'luamake'
 local platform = require "bee.platform"
 
+lm.arch = 'x64'
+
 lm:import '3rd/bee.lua/make.lua'
 
-lm.arch = 'x64'
 lm.rootdir = '3rd/'
 
 lm:shared_library 'lni' {

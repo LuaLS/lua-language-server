@@ -65,6 +65,7 @@ You need to build `lua-language-server` yourself on macOS/Linux.
 * Clone source code
 ```
 git clone https://github.com/sumneko/lua-language-server
+cd lua-language-server
 git submodule update --init --recursive
 ```
 * Open repo and execute tasks in VSCode

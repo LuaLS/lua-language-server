@@ -174,9 +174,6 @@ removeFiles(out) {
     ['server'] = {
         ['log']  = true,
         ['test'] = true,
-        ['bin']  = {
-            ['debugger.dll'] = true,
-        },
     },
 }
 

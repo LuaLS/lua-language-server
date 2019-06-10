@@ -5,6 +5,28 @@
             "type": "shell",
             "label": "编译",
             "command": "cd 3rd\\luamake && tools\\ninja -f ninja\\msvc.ninja && cd ..\\.. && 3rd\\luamake\\luamake rebuild"
+        },
+        {
+            "label": "Copy Extension",
+            "command": "${workspaceFolder}/build/lua",
+            "args": [
+                "make/copy.lua",
+                "${command:extensionPath}"
+            ],
+            "type": "shell",
+            "windows": {
+                "options": {
+                    "shell": {
+                        "executable": "C:\\Windows\\System32\\cmd.exe",
+                        "args": [
+                            "/c"
+                        ]
+                    }
+                }
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
         }
     ]
 }

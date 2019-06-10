@@ -44,6 +44,7 @@ lm:build 'install' {
         'lni',
         'lpeglabel',
         'bee',
+        'bootstrap',
         platform.OS == "Windows" and "rcedit"
     }
 }

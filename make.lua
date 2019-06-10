@@ -56,7 +56,7 @@ if lm.plat ~= 'macos' and lm.plat ~= 'linux' then
 end
 
 lm:build 'install' {
-    '$luamake', 'lua', 'make/install.lua',
+    '$luamake', 'lua', 'make/install.lua', lm.plat,
     deps = {
         'lua',
         'lni',

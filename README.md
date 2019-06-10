@@ -60,25 +60,23 @@
 You need to build `lua-language-server` yourself on macOS/Linux.
 
 * Install [sumneko.lua] in VSCode
+* Install [extension-path] in VSCode
 * Install [ninja]
 * Clone source code
 ```
-git clone git@github.com:sumneko/lua-language-server.git
+git clone https://github.com/sumneko/lua-language-server
+git submodule update --init --recursive
 ```
-* Run `osx.sh` / `linux.sh`
-```
-cd lua-language-server
-./osx.sh
-```
-```
-cd lua-language-server
-./linux.sh
-```
+* Open repo and execute tasks in VSCode
+    1. PreCompile
+    2. Compile
+    3. Install
 * Restart VSCode and open your lua project
 * Enjoy
 
 [ninja]: https://github.com/ninja-build/ninja/wiki/Pre-built-Ninja-packages
 [sumneko.lua]: https://marketplace.visualstudio.com/items?itemName=sumneko.lua
+[extension-path]: https://marketplace.visualstudio.com/items?itemName=actboy168.extension-path
 
 ## Version
 

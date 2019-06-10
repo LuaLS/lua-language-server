@@ -1,32 +1,48 @@
 {
     "version": "2.0.0",
+    "type": "shell",
+    "windows": {
+        "options": {
+            "shell": {
+                "executable": "C:\\Windows\\System32\\cmd.exe",
+                "args": [
+                    "/c"
+                ]
+            }
+        }
+    },
+    "options": {
+        "cwd": "${workspaceFolder}"
+    },
     "tasks": [
         {
             "type": "shell",
-            "label": "编译",
-            "command": "cd 3rd\\luamake && tools\\ninja -f ninja\\msvc.ninja && cd ..\\.. && 3rd\\luamake\\luamake rebuild"
+            "label": "PreCompile",
+            "windows": {
+                "command": "tools\\ninja -f ninja\\msvc.ninja"
+            },
+            "linux": {
+                "command": "ninja -f ninja/linux.ninja"
+            },
+            "osx": {
+                "command": "ninja -f ninja/macos.ninja"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/3rd/luamake"
+            },
         },
         {
-            "label": "Copy Extension",
+            "type": "shell",
+            "label": "Compile",
+            "command": "${workspaceFolder}/3rd/luamake/luamake rebuild"
+        },
+        {
+            "label": "Install",
             "command": "${workspaceFolder}/build/lua",
             "args": [
                 "make/copy.lua",
                 "${command:extensionPath}"
-            ],
-            "type": "shell",
-            "windows": {
-                "options": {
-                    "shell": {
-                        "executable": "C:\\Windows\\System32\\cmd.exe",
-                        "args": [
-                            "/c"
-                        ]
-                    }
-                }
-            },
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
+            ]
         }
     ]
 }

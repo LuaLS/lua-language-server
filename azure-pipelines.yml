@@ -11,16 +11,13 @@ jobs:
       git submodule update --init --recursive
     displayName: '拉取子模块'
   - script: |
-      cd 3rd\luamake
-      tools\ninja -f ninja\msvc.ninja
-      
-      cd ..\..
-      3rd\luamake\luamake
-    displayName: '编译C模块'
+      cd 3rd/luamake
+      tools/ninja -f ninja/msvc.ninja
+      cd ../..
+    displayName: 'PreCompile'
   - script: |
-      cd server
-      bin\lua-language-server.exe publish.lua
-    displayName: '测试'
+      ./3rd/luamake/luamake rebuild
+    displayName: 'Compile'
 
 - job: macos
   pool:
@@ -28,9 +25,17 @@ jobs:
 
   steps:
   - bash: |
+      git submodule update --init --recursive
+    displayName: '拉取子模块'
+  - bash: |
       sudo xcode-select -s /Applications/Xcode_10.2.app
       brew install ninja
     displayName: '安装ninja'
   - bash: |
-      ./osx.sh
-    displayName: '测试'
+      cd 3rd/luamake
+      ninja -f ninja/macos.ninja
+      cd ../..
+    displayName: 'PreCompile'
+  - bash: |
+      ./3rd/luamake/luamake rebuild
+    displayName: 'Compile'

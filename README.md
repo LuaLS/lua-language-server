@@ -1,8 +1,11 @@
 # lua-language-server
 
-| Windows | Linux | macOS |
-| ------- | ----- | ----- |
-| [![Build Status](https://dev.azure.com/sumneko/lua-language-server/_apis/build/status/sumneko.lua-language-server?branchName=master&jobName=windows_msvc)](https://dev.azure.com/sumneko/lua-language-server/_build/latest?definitionId=1&branchName=master) | [![Build status](https://ci.appveyor.com/api/projects/status/0tng1g72fssvu9rr/branch/master?svg=true)](https://ci.appveyor.com/project/sumneko/vscode-lua-language-server/branch/master) | [![Build Status](https://dev.azure.com/sumneko/lua-language-server/_apis/build/status/sumneko.lua-language-server?branchName=master&jobName=macos)](https://dev.azure.com/sumneko/lua-language-server/_build/latest?definitionId=1&branchName=master) |
+| Windows | [![Build Status](https://dev.azure.com/sumneko/lua-language-server/_apis/build/status/sumneko.lua-language-server?branchName=master&jobName=windows_msvc)](https://dev.azure.com/sumneko/lua-language-server/_build/latest?definitionId=1&branchName=master) |
+| ------- | ----- |
+| Linux   | [![Build status](https://ci.appveyor.com/api/projects/status/0tng1g72fssvu9rr/branch/master?svg=true)](https://ci.appveyor.com/project/sumneko/vscode-lua-language-server/branch/master) |
+| ------- | ----- |
+| macOs   | [![Build Status](https://dev.azure.com/sumneko/lua-language-server/_apis/build/status/sumneko.lua-language-server?branchName=master&jobName=macos)](https://dev.azure.com/sumneko/lua-language-server/_build/latest?definitionId=1&branchName=master) |
+
 ## Feature
 
 - [x] Goto Definition

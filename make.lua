@@ -1,4 +1,3 @@
-
 local lm = require 'luamake'
 local platform = require "bee.platform"
 
@@ -7,41 +6,24 @@ lm:import '3rd/bee.lua/make.lua'
 lm.arch = 'x64'
 lm.rootdir = '3rd/'
 
-local lua = 'lua54'
-local includes = nil
-local lpeglabel_ldflags = '/EXPORT:luaopen_lpeglabel'
-if lm.plat == 'macos' then
-    lua = 'lua'
-    includes = {'bee.lua/3rd/lua/src'}
-    lpeglabel_ldflags = nil
-elseif lm.plat == 'linux' then
-    lua = 'lua'
-    includes = {'bee.lua/3rd/lua/src'}
-    lpeglabel_ldflags = nil
-end
-
 lm:shared_library 'lni' {
-    deps = lua,
+    deps = platform.OS == "Windows" and "lua54" or "lua",
     sources = {
         'lni/src/main.cpp',
     },
-    includes = includes,
     links = {
         platform.OS == "Linux" and "stdc++",
     },
 }
 
 lm:shared_library 'lpeglabel' {
-    deps = lua,
+    deps = platform.OS == "Windows" and "lua54" or "lua",
     sources = 'lpeglabel/*.c',
-    ldflags = lpeglabel_ldflags,
-    includes = includes
+    undefs = "NDEBUG",
+    ldflags = platform.OS == "Windows" and "/EXPORT:luaopen_lpeglabel",
 }
 
-local rcedit = nil
-if lm.plat ~= 'macos' and lm.plat ~= 'linux' then
-    rcedit = 'rcedit'
-
+if platform.OS == "Windows" then
     lm:executable 'rcedit' {
         sources = 'rcedit/src/*.cc',
         defines = {
@@ -62,7 +44,7 @@ lm:build 'install' {
         'lni',
         'lpeglabel',
         'bee',
-        rcedit
+        platform.OS == "Windows" and "rcedit"
     }
 }
 

@@ -29,8 +29,7 @@
 			"stopOnEntry": true,
 			"sourceCoding": "utf8",
 			"consoleCoding": "utf8",
-			"ip": "127.0.0.1",
-			"port": 11411
+			"address": "127.0.0.1:11411"
 		},
 		{
 			"name": "编译",

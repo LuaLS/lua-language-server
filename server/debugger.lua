@@ -46,7 +46,7 @@ local function tryDebugger()
     local addr = "127.0.0.1:" .. port
     local dbg = loadfile(entry)(rdebug, root, path, cpath)
     debug.getregistry()["lua-debug"] = dbg
-    dbg:start(addr, true)
+    dbg:start(addr)
     log.debug('Debugger startup, listen port:', port)
     log.debug('Debugger args:', addr, root, path, cpath)
 end

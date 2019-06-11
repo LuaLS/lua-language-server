@@ -49,11 +49,17 @@ if not fs.exists(extensionDir) then
     return
 end
 
-if pcall(fs.remove_all, extensionDir / "server" / "bin-bak") then
-    fs.rename(extensionDir / "server" / "bin", extensionDir / "server" / "bin-bak")
-else
-    fs.remove_all(extensionDir / "server" / "bin")
+local binDir = extensionDir / "server" / "bin"
+local bakDir = extensionDir / "server" / "bak"
+
+if fs.exists(binDir) then
+    if pcall(fs.remove_all, bakDir) then
+        fs.rename(binDir, bakDir)
+    else
+        fs.remove_all(binDir)
+    end
 end
-copy_directory(sourceDir / "server" / "bin", extensionDir / "server" / "bin")
+
+copy_directory(sourceDir / "server" / "bin", binDir)
 
 print 'ok'

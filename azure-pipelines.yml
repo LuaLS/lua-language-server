@@ -7,16 +7,16 @@ jobs:
     name: Hosted VS2017
 
   steps:
-  - bash: |
+  - script: |
       git submodule update --init --recursive
     displayName: '拉取子模块'
-  - bash: |
-      cd 3rd/luamake
-      tools/ninja -f ninja/msvc.ninja
-      cd ../..
+  - script: |
+      cd 3rd\luamake
+      tools\ninja.exe -f ninja\msvc.ninja
+      cd ..\..
     displayName: 'PreCompile'
-  - bash: |
-      ./3rd/luamake/luamake rebuild
+  - script: |
+      3rd\luamake\luamake.exe rebuild
     displayName: 'Compile'
 
 - job: macos

@@ -16,7 +16,7 @@ jobs:
       cd ../..
     displayName: 'PreCompile'
   - script: |
-      "./3rd/luamake/luamake" rebuild
+      ./3rd/luamake/luamake.exe rebuild
     displayName: 'Compile'
 
 - job: macos

@@ -1,3 +1,4 @@
 return function ()
-    return true
+    log.info('Server exited.')
+    os.exit(true)
 end

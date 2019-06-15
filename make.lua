@@ -50,6 +50,14 @@ lm:build 'install' {
     }
 }
 
+lm:build 'unittest' {
+    '$luamake', 'lua', 'make/unittest.lua', lm.plat,
+    deps = {
+        'install',
+    }
+}
+
 lm:default {
-    'install'
+    'install',
+    'unittest',
 }

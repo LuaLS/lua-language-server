@@ -216,12 +216,7 @@ description = 'Running Lua version.'
 description = 'Running Lua version.'
 
 [warn]
-description = [[
-Emits a warning with the given message.
-A message in a call with `tocont` true should be
-continued in another call to this function.
-The default for `tocont` is false.
-]]
+description = 'Emits a warning with a message composed by the concatenation of all its arguments (which should be strings).'
 
 [xpcall]
 description = 'Calls function `f` with the given arguments in protected mode with a new message handler.'

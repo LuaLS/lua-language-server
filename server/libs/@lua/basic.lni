@@ -494,9 +494,7 @@ version = 'Lua 5.4'
 name = 'message'
 type = 'string'
 ``````````
-name = 'tocont'
-type = 'boolean'
-optional = 'after'
+type = '...'
 
 [xpcall]
 special = xpcall

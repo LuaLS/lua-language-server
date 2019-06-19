@@ -216,7 +216,7 @@ description = '当前解释器版本号。'
 description = '当前解释器版本号。'
 
 [warn]
-description = '以给定消息发出一个警告。当`tocont`为 true 时，应当继续调用该函数来接续消息。`tocont`的默认值为 false 。'
+description = '使用所有参数组成的字符串消息来发送警告。'
 
 [xpcall]
 description = '传入参数并设置一个消息处理器 `msgh`，以 *保护模式* 调用函数 `f` 。'

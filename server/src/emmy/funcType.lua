@@ -9,6 +9,10 @@ function mt:getType()
     return 'function'
 end
 
+function mt:getName()
+    return 'function'
+end
+
 function mt:getSource()
     return listMgr.get(self.source)
 end

@@ -760,6 +760,15 @@ local r: boolean
 ]]
 
 TEST [[
+---@param f fun():void
+function t(<?f?>) end
+]]
+[[
+function ()
+  -> any
+]]
+
+TEST [[
 ---@param names string[]
 local function f(<?names?>)
 end

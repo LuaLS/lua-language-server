@@ -41,7 +41,12 @@ local function buildEmmyArgs(emmy, object, select)
 end
 
 local function buildEmmyReturns(emmy)
-    return '\n  -> ' .. emmy:getReturn():getType()
+    local rtn = emmy:getReturn()
+    if rtn then
+        return '\n  -> ' .. rtn:getType()
+    else
+        return '\n  -> ' .. 'any'
+    end
 end
 
 local function buildEnum(lib)

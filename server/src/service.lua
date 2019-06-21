@@ -17,6 +17,7 @@ local listMgr    = require 'vm.list'
 local emmyMgr    = require 'emmy.manager'
 local config     = require 'config'
 local task       = require 'task'
+local files      = require 'files'
 
 local ErrorCodes = {
     -- Defined by JSON RPC
@@ -38,6 +39,8 @@ local CachedVM = setmetatable({}, {__mode = 'kv'})
 
 local mt = {}
 mt.__index = mt
+---@type files
+mt._files = nil
 
 function mt:_callMethod(name, params)
     local optional
@@ -116,16 +119,20 @@ function mt:clearDiagnostics(uri)
     self._needDiagnostics[uri] = nil
 end
 
+---@param uri uri
+---@param compiled table
+---@param mode string
+---@return boolean
 function mt:needCompile(uri, compiled, mode)
     self._needDiagnostics[uri] = true
     if self._needCompile[uri] then
-        return
+        return false
     end
     if not compiled then
         compiled = {}
     end
     if compiled[uri] then
-        return
+        return false
     end
     self._needCompile[uri] = compiled
     if mode == 'child' then
@@ -133,6 +140,7 @@ function mt:needCompile(uri, compiled, mode)
     else
         table.insert(self._needCompile, 1, uri)
     end
+    return true
 end
 
 function mt:isNeedCompile(uri)
@@ -147,98 +155,84 @@ function mt:isWaitingCompile()
     end
 end
 
+---@param uri uri
+---@param version integer
+---@param text string
 function mt:saveText(uri, version, text)
     self._lastLoadedVM = uri
-    local obj = self._file[uri]
-    if obj then
-        obj.version = version
-        obj.oldText = obj.text
-        obj.text = text
-        self:needCompile(uri)
-    else
-        self._fileCount = self._fileCount + 1
-        self._file[uri] = {
-            version = version,
-            text = text,
-            uri = uri,
-        }
-        self:needCompile(uri)
-    end
+    self._files:save(uri, text, version)
+    self:needCompile(uri)
 end
 
+---@param uri uri
 function mt:isDeadText(uri)
-    local obj = self._file[uri]
-    if not obj then
+    return self._files:isDead(uri)
+end
+
+---@param uri uri
+---@return boolean
+function mt:isLua(uri)
+    if not self.workspace then
         return true
     end
-    if obj.version == -1 then
+    local path = self.workspace:relativePathByUri(uri)
+    if self.workspace:isLuaFile(path) then
         return true
     end
     return false
 end
 
+function mt:isIgnored(uri)
+    if not self.workspace then
+        return true
+    end
+    local path = self.workspace:relativePathByUri(uri)
+    if self.workspace.gitignore(path:string()) then
+        return true
+    end
+    return false
+end
+
+---@param uri uri
+---@param version integer
+---@param text string
 function mt:open(uri, version, text)
-    if self.workspace then
-        local path = self.workspace:relativePathByUri(uri)
-        if not self.workspace:isLuaFile(path) then
-            return
-        end
-        if self.workspace.gitignore(path:string()) then
-            log.debug('Open ignored file:', path:string())
-        end
+    if not self:isLua(uri) then
+        return
     end
     self:saveText(uri, version, text)
-    local obj = self._file[uri]
-    if obj then
-        obj._openByClient = true
-    end
+    self._files:open(uri)
 end
 
+---@param uri uri
 function mt:close(uri)
-    local obj = self._file[uri]
-    if obj then
-        obj._openByClient = false
-    end
-    if self.workspace then
-        local path = self.workspace:relativePathByUri(uri)
-        if not self.workspace:isLuaFile(path) then
-            self:removeText(uri)
-            return
-        end
-        if self.workspace.gitignore(path:string()) then
-            log.debug('Close ignored file:', path:string())
-            self:removeText(uri)
-        end
+    self._files:close(uri)
+    if not self:isLua() or self:isIgnored(uri) then
+        self:removeText(uri)
     end
 end
 
+---@param uri uri
+---@return boolean
 function mt:isOpen(uri)
-    local obj = self._file[uri]
-    if obj and obj._openByClient then
-        return true
-    else
-        return false
-    end
+    return self._files:isOpen(uri)
 end
 
+---@param uri uri
+---@param path path
+---@param buf string
+---@param compiled table
 function mt:readText(uri, path, buf, compiled)
-    local obj = self._file[uri]
-    if obj then
+    if self._files:get(uri) then
+        return
+    end
+    if not self:isLua(uri) or self:isIgnored(uri) then
         return
     end
     local text = buf or io.load(path)
     if not text then
         log.debug('No file: ', path)
         return
-    end
-    if self.workspace then
-        local path = self.workspace:relativePathByUri(uri)
-        if not self.workspace:isLuaFile(path) then
-            return
-        end
-        if self.workspace.gitignore(path:string()) then
-            return
-        end
     end
     local size = #text / 1000.0
     if size > config.config.workspace.preloadFileSize then
@@ -255,30 +249,14 @@ function mt:readText(uri, path, buf, compiled)
         end
         return
     end
-    self._fileCount = self._fileCount + 1
-    self._file[uri] = {
-        version = 0,
-        text = text,
-        uri = uri,
-    }
+    self._files:save(uri, text, 0)
     self:needCompile(uri, compiled)
 end
 
+---@param uri uri
 function mt:removeText(uri)
-    local obj = self._file[uri]
-    if not obj then
-        return
-    end
-    self._fileCount = self._fileCount - 1
-    self:saveText(uri, -1, '')
+    self._files:remove(uri)
     self:compileVM(uri)
-    -- TODO 以后重构一下，把缓存的text作为一个单独的类管理
-    local vm = self._file[uri].vm
-    if vm then
-        vm:remove()
-    end
-    self._file[uri].removed = true
-    self._file[uri] = nil
 end
 
 function mt:getCachedFileCount()
@@ -296,15 +274,19 @@ function mt:reCompile()
         self.emmy:remove()
     end
 
+    local reload = {}
+    for uri in self._files:eachFile() do
+        reload[uri] = true
+    end
+    for uri in self._files:eachOpened() do
+        reload[uri] = true
+    end
+
+    self._files:clear()
+
     for _, obj in pairs(listMgr.list) do
         if obj.type == 'source' or obj.type == 'function' then
             obj:kill()
-        end
-    end
-    for _, obj in pairs(self._file) do
-        if obj.vm then
-            obj.vm:remove()
-            obj.vm = nil
         end
     end
 
@@ -312,43 +294,37 @@ function mt:reCompile()
     self.chain  = chainMgr()
     self.emmy   = emmyMgr()
     self.globalValue = nil
-    self._compileTask = nil
-
+    self._compileTask:remove()
     self._needCompile = {}
-
-    ac.wait(0.5, function ()
-        local compiled = {}
-        local n = 0
-        for uri in pairs(self._file) do
-            self:needCompile(uri, compiled)
+    local compiled = {}
+    local n = 0
+    for uri in pairs(reload) do
+        local suc = self:needCompile(uri, compiled)
+        if suc then
             n = n + 1
         end
-        log.debug('reCompile:', n)
-        self:_testMemory()
-    end)
+    end
+    log.debug('reCompile:', n)
+    self:_testMemory()
 end
 
 function mt:reDiagnostic()
-    for uri in pairs(self._file) do
+    for uri in self._files:eachFile() do
         self:clearDiagnostics(uri)
+        self._needDiagnostics[uri] = true
     end
-    ac.wait(0.5, function ()
-        for uri in pairs(self._file) do
-            self._needDiagnostics[uri] = true
-        end
-    end)
 end
 
 function mt:clearAllFiles()
-    for uri in pairs(self._file) do
-        self:removeText(uri)
+    for uri in self._files:eachFile() do
         self:clearDiagnostics(uri)
     end
+    self._files:clear()
 end
 
 function mt:loadVM(uri)
-    local obj = self._file[uri]
-    if not obj then
+    local file = self._files:get(uri)
+    if not file then
         return nil
     end
     if uri ~= self._lastLoadedVM then
@@ -362,10 +338,10 @@ function mt:loadVM(uri)
     else
         self:compileVM(uri)
     end
-    if obj.vm then
+    if file:getVM() then
         self._lastLoadedVM = uri
     end
-    return obj.vm, obj.lines, obj.text
+    return file
 end
 
 function mt:_markCompiled(uri, compiled)
@@ -392,10 +368,11 @@ function mt:_markCompiled(uri, compiled)
     return compiled
 end
 
-function mt:compileAst(obj)
-    local ast, err = parser:ast(obj.text, 'lua', config.config.runtime.version)
+---@param file file
+function mt:compileAst(file)
+    local ast, err = parser:ast(file.text, 'lua', config.config.runtime.version)
     if ast then
-        obj.astErr = err
+        file.astErr = err
     else
         if type(err) == 'string' then
             local message = lang.script('PARSER_CRASH', err)
@@ -412,30 +389,28 @@ function mt:compileAst(obj)
     return ast
 end
 
-function mt:_clearChainNode(obj, uri)
-    if obj.parent then
-        for pUri in pairs(obj.parent) do
-            local parent = self._file[pUri]
-            if parent and parent.child then
-                parent.child[uri] = nil
-            end
+---@param file file
+---@param uri uri
+function mt:_clearChainNode(file, uri)
+    for pUri in file:eachParent() do
+        local parent = self._files:get(pUri)
+        if parent then
+            parent:removeChild(uri)
         end
     end
 end
 
-function mt:_compileChain(obj, compiled)
+---@param file file
+---@param compiled table
+function mt:_compileChain(file, compiled)
     if not compiled then
         compiled = {}
     end
-    if obj.child then
-        for uri in pairs(obj.child) do
-            self:needCompile(uri, compiled, 'child')
-        end
+    for uri in file:eachChild() do
+        self:needCompile(uri, compiled, 'child')
     end
-    if obj.parent then
-        for uri in pairs(obj.parent) do
-            self:needCompile(uri, compiled, 'parent')
-        end
+    for uri in file:eachParent() do
+        self:needCompile(uri, compiled, 'parent')
     end
 end
 
@@ -454,9 +429,10 @@ function mt:_hasSetGlobal(uri)
     return self.global:hasSetGlobal(uri)
 end
 
+---@param uri uri
 function mt:compileVM(uri)
-    local obj = self._file[uri]
-    if not obj then
+    local file = self._files:get(uri)
+    if not file then
         self:_markCompiled(uri)
         return nil
     end
@@ -464,21 +440,18 @@ function mt:compileVM(uri)
     if not compiled then
         return nil
     end
-    if obj.vm then
-        obj.vm:remove()
-        obj.vm = nil
-    end
+    file:removeVM()
 
     local clock = os.clock()
-    local ast = self:compileAst(obj)
-    local version = obj.version
-    obj.astCost = os.clock() - clock
-    if obj.astCost > 0.1 then
-        log.warn(('Compile Ast[%s] takes [%.3f] sec, size [%.3f]kb'):format(uri, obj.astCost, #obj.text / 1000))
+    local ast = self:compileAst(file)
+    local version = file.version
+    file.astCost = os.clock() - clock
+    if file.astCost > 0.1 then
+        log.warn(('Compile Ast[%s] takes [%.3f] sec, size [%.3f]kb'):format(uri, file.astCost, #file.text / 1000))
     end
-    obj.oldText = nil
+    file.oldText = nil
 
-    self:_clearChainNode(obj, uri)
+    self:_clearChainNode(file, uri)
     self:_clearGlobal(uri)
 
     local clock = os.clock()
@@ -486,13 +459,13 @@ function mt:compileVM(uri)
     if vm then
         CachedVM[vm] = true
     end
-    if self:isDeadText(uri) or obj.removed then
+    if self:isDeadText(uri) or file.removed then
         if vm then
             vm:remove()
         end
         return nil
     end
-    if version ~= obj.version then
+    if version ~= file.version then
         if vm then
             vm:remove()
         end
@@ -507,30 +480,30 @@ function mt:compileVM(uri)
         end
         return nil
     end
-    if obj.vm then
-        obj.vm:remove()
+    if file.vm then
+        file.vm:remove()
     end
-    obj.vm = vm
-    obj.vmCost = os.clock() - clock
-    obj.vmVersion = version
+    file.vm = vm
+    file.vmCost = os.clock() - clock
+    file.vmVersion = version
 
     local clock = os.clock()
-    obj.lines = parser:lines(obj.text, 'utf8')
-    obj.lineCost = os.clock() - clock
+    file.lines = parser:lines(file.text, 'utf8')
+    file.lineCost = os.clock() - clock
 
-    if obj.vmCost > 0.2 then
-        log.debug(('Compile VM[%s] takes: %.3f sec'):format(uri, obj.vmCost))
+    if file.vmCost > 0.2 then
+        log.debug(('Compile VM[%s] takes: %.3f sec'):format(uri, file.vmCost))
     end
-    if not obj.vm then
+    if not file.vm then
         error(err)
     end
 
-    self:_compileChain(obj, compiled)
+    self:_compileChain(file, compiled)
     if self:_hasSetGlobal(uri) then
         self:_compileGlobal(compiled)
     end
 
-    return obj
+    return file
 end
 
 function mt:doDiagnostics(uri)
@@ -962,6 +935,7 @@ return function ()
         _needDiagnostics = {},
         _clock = -100,
         _version = 0,
+        _files = files(),
     }, mt)
     session.global = core.global(session)
     session.chain  = chainMgr()

@@ -16,6 +16,7 @@ local functionMgr= require 'vm.function'
 local listMgr    = require 'vm.list'
 local emmyMgr    = require 'emmy.manager'
 local config     = require 'config'
+local task       = require 'task'
 
 local ErrorCodes = {
     -- Defined by JSON RPC
@@ -353,7 +354,14 @@ function mt:loadVM(uri)
     if uri ~= self._lastLoadedVM then
         self:needCompile(uri)
     end
-    self:compileVM(uri)
+    if self._compileTask
+        and not self._compileTask:isRemoved()
+        and self._compileTask:get 'uri' == uri
+    then
+        self._compileTask:fastForward()
+    else
+        self:compileVM(uri)
+    end
     if obj.vm then
         self._lastLoadedVM = uri
     end
@@ -638,12 +646,12 @@ function mt:_createCompileTask()
                 message = lang.script.MWS_COMPLETE,
             })
         end
-        return
     end
-    self._compileTask = coroutine.create(function ()
+    self._compileTask = task(function ()
         self:doDiagnostics(self._lastLoadedVM)
         local uri = self._needCompile[1]
         if uri then
+            self._compileTask:set('uri', uri)
             pcall(function () self:compileVM(uri) end)
         else
             uri = next(self._needDiagnostics)
@@ -655,29 +663,20 @@ function mt:_createCompileTask()
 end
 
 function mt:_doCompileTask()
-    if not self._compileTask then
+    if not self._compileTask or self._compileTask:isRemoved() then
         self:_createCompileTask()
     end
-    if not self._compileTask then
-        return
-    end
-    while self._compileTask do
-        local suc, res = coroutine.resume(self._compileTask)
-        if not suc then
-            self._compileTask = nil
-            return
-        end
+    while true do
+        local res = self._compileTask:step()
         if res == 'stop' then
-            self._compileTask = nil
-            return
+            self._compileTask:remove()
+            break
         end
-        if coroutine.status(self._compileTask) == 'suspended' then
-            self:_loadProto()
-        else
-            self._compileTask = nil
-            return
+        if self._compileTask:isRemoved() then
+            break
         end
     end
+    self:_loadProto()
 end
 
 function mt:_loadProto()

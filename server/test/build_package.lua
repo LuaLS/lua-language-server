@@ -212,8 +212,10 @@ io.save(ROOT:parent_path() / 'package.nls.json', json.encode {
     ["config.workspace.maxPreload"]       = "Max preloaded files.",
     ["config.workspace.preloadFileSize"]  = "Skip files larger than this value (KB) when preloading.",
     ["config.workspace.library"]          = [[
-加载的外部函数库。
-下面这个例子表示加载`C:/lua`中的所有文件，以及加载`../lib`中的`.txt`与`.lua`文件，但不加载`../lib/temp`中的`.txt`文件。
+(Plz help me to translate these into nice English!)
+Load external library.
+This feature can load external Lua files, which can be used for definition, automatic completion and other functions. Note that the language server does not monitor changes in external files and needs to restart if the external files are modified.
+The following example shows loaded files in `C:/lua` without `../lib/temp`.
 ]] .. example.library,
 })
 

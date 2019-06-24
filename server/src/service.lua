@@ -177,7 +177,7 @@ function mt:isLua(uri)
     if not self.workspace then
         return true
     end
-    local path = self.workspace:relativePathByUri(uri)
+    local path = self.workspace:absolutePathByUri(uri)
     if self.workspace:isLuaFile(path) then
         return true
     end

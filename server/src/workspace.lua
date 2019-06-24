@@ -471,10 +471,19 @@ function mt:reset()
     self.lsp:reCompile()
 end
 
+---@param uri uri
+---@return path
 function mt:relativePathByUri(uri)
     local path = uric.decode(uri)
     local relate = fs.relative(path, self.root)
     return relate
+end
+
+---@param uri uri
+---@return path
+function mt:absolutePathByUri(uri)
+    local path = uric.decode(uri)
+    return fs.absolute(path)
 end
 
 return function (lsp, name)

@@ -18,5 +18,8 @@
         "server/locale/",
         "server/libs/",
         "server/src/3rd",
-    ]
+    ],
+    "Lua.workspace.library": {
+        "E:/Github/test" : true
+    }
 }

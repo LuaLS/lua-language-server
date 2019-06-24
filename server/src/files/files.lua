@@ -86,6 +86,12 @@ function mt:clear()
     self._library = {}
 end
 
+function mt:clearVM()
+    for _, f in pairs(self._files) do
+        f:removeVM()
+    end
+end
+
 function mt:eachFile()
     return pairs(self._files)
 end

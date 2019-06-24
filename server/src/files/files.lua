@@ -34,8 +34,8 @@ function mt:remove(uri)
 end
 
 ---@param uri uri
-function mt:open(uri)
-    self._open[uri] = true
+function mt:open(uri, text)
+    self._open[uri] = text
 end
 
 ---@param uri uri
@@ -46,7 +46,7 @@ end
 ---@param uri uri
 ---@return boolean
 function mt:isOpen(uri)
-    return self._open[uri] == true
+    return self._open[uri] ~= nil
 end
 
 ---@param uri uri
@@ -78,10 +78,11 @@ function mt:get(uri)
     return self._files[uri]
 end
 
-function mt:clearVM()
+function mt:clear()
     for _, f in pairs(self._files) do
-        f:removeVM()
+        f:remove()
     end
+    self._files = {}
     self._library = {}
 end
 

@@ -18,6 +18,7 @@ local emmyMgr    = require 'emmy.manager'
 local config     = require 'config'
 local task       = require 'task'
 local files      = require 'files'
+local uric       = require 'uri'
 
 local ErrorCodes = {
     -- Defined by JSON RPC
@@ -205,7 +206,7 @@ function mt:open(uri, version, text)
         return
     end
     self:saveText(uri, version, text)
-    self._files:open(uri)
+    self._files:open(uri, text)
 end
 
 ---@param uri uri
@@ -259,11 +260,14 @@ function mt:readText(uri, path, buf, compiled)
     if self._files:get(uri) then
         return
     end
-    if not self:isLua(uri) or self:isIgnored(uri) then
+    if not self:isLua(uri) then
+        return
+    end
+    if not self._files:isOpen() and self:isIgnored(uri) then
         return
     end
     local text = buf or io.load(path)
-    if not self:checkReadFile(uri, path, text) then
+    if not self._files:isOpen() and not self:checkReadFile(uri, path, text) then
         return
     end
     self._files:save(uri, text, 0)
@@ -307,15 +311,7 @@ function mt:reCompile()
         self.emmy:remove()
     end
 
-    local reload = {}
-    for uri in self._files:eachFile() do
-        reload[uri] = true
-    end
-    for uri in self._files:eachOpened() do
-        reload[uri] = true
-    end
-
-    self._files:clearVM()
+    self._files:clear()
 
     for _, obj in pairs(listMgr.list) do
         if obj.type == 'source' or obj.type == 'function' then
@@ -330,14 +326,10 @@ function mt:reCompile()
     self._compileTask:remove()
     self._needCompile = {}
     local compiled = {}
-    local n = 0
-    for uri in pairs(reload) do
-        local suc = self:needCompile(uri, compiled)
-        if suc then
-            n = n + 1
-        end
+    for uri, buf in self._files:eachOpened() do
+        self:readText(uri, uric.decode(uri), buf, compiled)
     end
-    log.debug('reCompile:', n)
+
     self:_testMemory('skip')
 end
 
@@ -352,7 +344,7 @@ function mt:clearAllFiles()
     for uri in self._files:eachFile() do
         self:clearDiagnostics(uri)
     end
-    self._files:clearVM()
+    self._files:clear()
 end
 
 ---@param uri uri

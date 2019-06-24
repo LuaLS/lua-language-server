@@ -52,9 +52,6 @@ local function Array(checker)
                 t[#t+1] = result
             end
         end
-        if #t == 0 then
-            return false
-        end
         return true, t
     end
 end

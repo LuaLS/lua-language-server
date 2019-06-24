@@ -17,19 +17,19 @@
         "configuration": {
             "properties": {
                 "Lua.diagnostics.disable": {
-                    "description": "%config.diagnostics.disable%",
                     "items": "string",
+                    "markdownDescription": "%config.diagnostics.disable%",
                     "scope": "resource",
                     "type": "array"
                 },
                 "Lua.diagnostics.globals": {
-                    "description": "%config.diagnostics.globals%",
                     "items": "string",
+                    "markdownDescription": "%config.diagnostics.globals%",
                     "scope": "resource",
                     "type": "array"
                 },
                 "Lua.diagnostics.severity": {
-                    "description": "%config.diagnostics.severity%",
+                    "markdownDescription": "%config.diagnostics.severity%",
                     "properties": {
                         "ambiguity-1": {
                             "default": "Warning",
@@ -225,7 +225,6 @@
                 },
                 "Lua.runtime.version": {
                     "default": "Lua 5.3",
-                    "description": "%config.runtime.version%",
                     "enum": [
                         "Lua 5.1",
                         "Lua 5.2",
@@ -233,6 +232,7 @@
                         "Lua 5.4",
                         "LuaJIT"
                     ],
+                    "markdownDescription": "%config.runtime.version%",
                     "scope": "resource",
                     "type": "string"
                 },
@@ -244,19 +244,19 @@
                 },
                 "Lua.workspace.ignoreSubmodules": {
                     "default": true,
-                    "description": "%config.workspace.ignoreSubmodules%",
+                    "markdownDescription": "%config.workspace.ignoreSubmodules%",
                     "scope": "resource",
                     "type": "boolean"
                 },
                 "Lua.workspace.maxPreload": {
                     "default": 300,
-                    "description": "%config.workspace.maxPreload%",
+                    "markdownDescription": "%config.workspace.maxPreload%",
                     "scope": "resource",
                     "type": "integer"
                 },
                 "Lua.workspace.preloadFileSize": {
                     "default": 100,
-                    "description": "%config.workspace.preloadFileSize%",
+                    "markdownDescription": "%config.workspace.preloadFileSize%",
                     "scope": "resource",
                     "type": "integer"
                 },

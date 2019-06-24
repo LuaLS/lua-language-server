@@ -215,7 +215,7 @@ io.save(ROOT:parent_path() / 'package.nls.json', json.encode {
     ["config.workspace.preloadFileSize"]  = "Skip files larger than this value (KB) when preloading.",
     ["config.workspace.library"]          = [[
 加载的外部函数库。
-下面这个例子表示加载`C:/lua`中的所有文件，以及加载`../lib`中的`.txt`与`.lua`文件，但不加载`../lib/temp`中的`.txt`文件。加载的文件最终会受文件关联的影响，因此需要设置`.txt`文件关联`lua`后`*.txt`才有意义。
+下面这个例子表示加载`C:/lua`中的所有文件，以及加载`../lib`中的`.txt`与`.lua`文件，但不加载`../lib/temp`中的`.txt`文件。
 ]] .. example.library,
 })
 
@@ -233,6 +233,6 @@ io.save(ROOT:parent_path() / 'package.nls.zh-cn.json', json.encode {
     ["config.workspace.library"]          = [[
 加载外部函数库。
 该功能可以加载外部的Lua文件，用于函数定义、自动完成等功能。注意，语言服务不会监视外部文件的变化，如果修改了外部文件需要重启。
-下面这个例子表示加载`C:/lua`中的所有文件，以及加载`../lib`中的`.txt`与`.lua`文件，但不加载`../lib/temp`中的`.txt`文件。加载的文件最终会受文件关联的影响，因此需要设置`.txt`文件关联`lua`后`*.txt`才有意义。
+下面这个例子表示加载`C:/lua`中的所有文件，以及加载`../lib`中的`.txt`与`.lua`文件，但不加载`../lib/temp`中的`.txt`文件。
 ]] .. example.library,
 })

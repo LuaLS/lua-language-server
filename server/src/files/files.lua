@@ -50,6 +50,17 @@ function mt:isOpen(uri)
 end
 
 ---@param uri uri
+function mt:setLibrary(uri)
+    self._library[uri] = true
+end
+
+---@param uri uri
+---@return uri
+function mt:isLibrary(uri)
+    return self._library[uri] == true
+end
+
+---@param uri uri
 function mt:isDead(uri)
     local f = self._files[uri]
     if not f then
@@ -89,6 +100,7 @@ return function ()
     local self = setmetatable({
         _files = {},
         _open = {},
+        _library = {},
     }, mt)
     return self
 end

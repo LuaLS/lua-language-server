@@ -248,6 +248,11 @@
                     "scope": "resource",
                     "type": "boolean"
                 },
+                "Lua.workspace.library": {
+                    "markdownDescription": "%config.workspace.library%",
+                    "scope": "resource",
+                    "type": "object"
+                },
                 "Lua.workspace.maxPreload": {
                     "default": 300,
                     "markdownDescription": "%config.workspace.maxPreload%",

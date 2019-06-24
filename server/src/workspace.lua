@@ -59,7 +59,11 @@ function mt:listenLoadFile()
         local name = getFileName(path)
         local uri = uric.encode(path)
         self.files[name] = uri
-        self.lsp:readText(uri, path, buf, self._currentScanCompiled)
+        if mode == 'workspace' then
+            self.lsp:readText(uri, path, buf, self._currentScanCompiled)
+        elseif mode == 'library' then
+            self.lsp:readLibrary(uri, path, buf, self._currentScanCompiled)
+        end
     end)
 end
 
@@ -103,6 +107,20 @@ function mt:buildScanPattern()
     return pattern
 end
 
+---@param options table
+function mt:buildLibraryRequests(options)
+    local requests = {}
+    for path, pattern in pairs(config.config.workspace.library) do
+        requests[#requests+1] = {
+            mode = 'library',
+            root = fs.absolute(fs.path(path)):string(),
+            pattern = pattern == true and '*' or pattern,
+            options = options,
+        }
+    end
+    return table.unpack(requests)
+end
+
 function mt:scanFiles()
     if self._scanRequest then
         log.info('Break scan.')
@@ -126,7 +144,8 @@ function mt:scanFiles()
             root = self.root:string(),
             pattern = pattern,
             options = options,
-        }
+        },
+        self:buildLibraryRequests(options),
     }, function (mode, ...)
         if mode == 'ok' then
             log.info('Scan finish, got', count, 'files.')
@@ -142,6 +161,10 @@ function mt:scanFiles()
                 return
             end
             self._loadFileRequest:push(path:string(), 'workspace')
+            count = count + 1
+        elseif mode == 'library' then
+            local path = fs.path(...)
+            self._loadFileRequest:push(path:string(), 'library')
             count = count + 1
         elseif mode == 'stop' then
             log.info('Scan stoped.')

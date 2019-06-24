@@ -211,6 +211,9 @@ end
 ---@param uri uri
 function mt:close(uri)
     self._files:close(uri)
+    if self._files:isLibrary(uri) then
+        return
+    end
     if not self:isLua(uri) or self:isIgnored(uri) then
         self:removeText(uri)
     end
@@ -220,6 +223,32 @@ end
 ---@return boolean
 function mt:isOpen(uri)
     return self._files:isOpen(uri)
+end
+
+---@param uri uri
+---@param path path
+---@param text string
+function mt:checkReadFile(uri, path, text)
+    if not text then
+        log.debug('No file: ', path)
+        return false
+    end
+    local size = #text / 1000.0
+    if size > config.config.workspace.preloadFileSize then
+        log.info(('Skip large file, size: %.3f KB: %s'):format(size, uri))
+        return false
+    end
+    if self:getCachedFileCount() >= config.config.workspace.maxPreload then
+        if not self._hasShowHitMaxPreload then
+            self._hasShowHitMaxPreload = true
+            rpc:notify('window/showMessage', {
+                type = 3,
+                message = lang.script('MWS_MAX_PRELOAD', config.config.workspace.maxPreload),
+            })
+        end
+        return false
+    end
+    return true
 end
 
 ---@param uri uri
@@ -234,26 +263,23 @@ function mt:readText(uri, path, buf, compiled)
         return
     end
     local text = buf or io.load(path)
-    if not text then
-        log.debug('No file: ', path)
-        return
-    end
-    local size = #text / 1000.0
-    if size > config.config.workspace.preloadFileSize then
-        log.info(('Skip large file, size: %.3f KB: %s'):format(size, uri))
-        return
-    end
-    if self:getCachedFileCount() >= config.config.workspace.maxPreload then
-        if not self._hasShowHitMaxPreload then
-            self._hasShowHitMaxPreload = true
-            rpc:notify('window/showMessage', {
-                type = 3,
-                message = lang.script('MWS_MAX_PRELOAD', config.config.workspace.maxPreload),
-            })
-        end
+    if not self:checkReadFile(uri, path, text) then
         return
     end
     self._files:save(uri, text, 0)
+    self:needCompile(uri, compiled)
+end
+
+---@param uri uri
+---@param path path
+---@param buf string
+---@param compiled table
+function mt:readLibrary(uri, path, buf, compiled)
+    if not self:checkReadFile(uri, path, buf) then
+        return
+    end
+    self._files:save(uri, buf, 0)
+    self._files:setLibrary(uri)
     self:needCompile(uri, compiled)
 end
 
@@ -515,7 +541,9 @@ function mt:doDiagnostics(uri)
     if not file
         or file:isRemoved()
         or not file:getVM()
-        or file:getVM():isRemoved() then
+        or file:getVM():isRemoved()
+        or self._files:isLibrary(uri)
+    then
         self._needDiagnostics[uri] = nil
         self:clearDiagnostics(uri)
         return

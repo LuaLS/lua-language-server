@@ -246,7 +246,7 @@ StringDef   <-  {'"'}
             /   {"'"}
                 {~(Esc / !%nl !"'" .)*~} -> 1
                 ("'" / {} -> MissQuote2)
-            /   ('[' {} {:eq: '='* :} {} '['
+            /   ('[' {} {:eq: '='* :} {} '[' %nl?
                 {(!StringClose .)*} -> 1
                 (StringClose / {}))
             ->  LongString

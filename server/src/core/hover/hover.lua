@@ -17,9 +17,40 @@ local OriginTypes = {
     ['function'] = true,
 }
 
+local function longString(str)
+    for i = 0, 10 do
+        local finish = ']' .. ('='):rep(i) .. ']'
+        if not str:find(finish, 1, true) then
+            return ('[%s[\n%s%s'):format(('='):rep(i), str, finish)
+        end
+    end
+    return ('%q'):format(str)
+end
+
+local function formatString(str)
+    if #str > 1000 then
+        str = str:sub(1000)
+    end
+    if str:find('[\r\n]') then
+        return longString(str)
+    else
+        local single = str:find("'", 1, true)
+        local double = str:find('"', 1, true)
+        if single and double then
+            return longString(str)
+        elseif double then
+            return ("'%s'"):format(str)
+        else
+            return ('"%s"'):format(str)
+        end
+    end
+end
+
 local function formatLiteral(v)
     if math.type(v) == 'float' then
         return ('%.10f'):format(v):gsub('[0]*$', ''):gsub('%.$', '.0')
+    elseif type(v) == 'string' then
+        return formatString(v)
     else
         return ('%q'):format(v)
     end
@@ -88,7 +119,7 @@ local function formatKey(key)
         key = ('[%03d]'):format(key)
     elseif kType == 'string' then
         if key:find '^%d' or key:find '[^%w_]' then
-            key = ('[%q]'):format(key)
+            key = ('[%s]'):format(formatString(key))
         end
     elseif key == '' then
         key = '[*any]'

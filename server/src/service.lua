@@ -288,6 +288,7 @@ function mt:readLibrary(uri, path, buf, compiled)
     self._files:save(uri, buf, 0)
     self._files:setLibrary(uri)
     self:needCompile(uri, compiled)
+    self:clearDiagnostics(uri)
 end
 
 ---@param uri uri

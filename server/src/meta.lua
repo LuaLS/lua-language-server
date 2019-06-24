@@ -1,2 +1,0 @@
----@class uri string
----@class path

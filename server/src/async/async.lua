@@ -36,7 +36,7 @@ local function task()
     }, { __index = _ENV })
     local f, err = load(dump, '=task', 't', env)
     if not f then
-        errlog:push(err)
+        errlog:push(err .. '\n' .. dump)
         return
     end
     local result = f(arg)

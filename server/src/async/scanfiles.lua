@@ -8,14 +8,8 @@ local function scan(mode, root, pattern, options)
     OUT:push('log', 'Scanning:', root:string())
     OUT:push('log', 'Scan pattern:', table.dump(pattern))
     OUT:push('log', 'Scan options:', table.dump(options))
-    local session
-    if mode == 'workspace' then
-        session = glob.gitignore(pattern, options)
-    elseif mode == 'library' then
-        session = glob.glob(pattern, options)
-    else
-        return
-    end
+    local session = glob.gitignore(pattern, options)
+
     session:setInterface('type', function (path)
         local fullpath = root / path
         if not fs.exists(fullpath) then

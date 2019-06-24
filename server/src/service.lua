@@ -275,6 +275,9 @@ end
 ---@param buf string
 ---@param compiled table
 function mt:readLibrary(uri, path, buf, compiled)
+    if not self:isLua(uri) then
+        return
+    end
     if not self:checkReadFile(uri, path, buf) then
         return
     end

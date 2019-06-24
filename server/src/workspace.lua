@@ -114,7 +114,7 @@ function mt:buildLibraryRequests(options)
         requests[#requests+1] = {
             mode = 'library',
             root = fs.absolute(fs.path(path)):string(),
-            pattern = pattern == true and '*' or pattern,
+            pattern = pattern,
             options = options,
         }
     end
@@ -164,6 +164,9 @@ function mt:scanFiles()
             count = count + 1
         elseif mode == 'library' then
             local path = fs.path(...)
+            if not self:isLuaFile(path) then
+                return
+            end
             self._loadFileRequest:push(path:string(), 'library')
             count = count + 1
         elseif mode == 'stop' then

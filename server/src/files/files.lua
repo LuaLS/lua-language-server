@@ -82,6 +82,7 @@ function mt:clearVM()
     for _, f in pairs(self._files) do
         f:removeVM()
     end
+    self._library = {}
 end
 
 function mt:eachFile()

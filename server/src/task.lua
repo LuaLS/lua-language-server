@@ -7,6 +7,7 @@ function mt:remove()
         return
     end
     self._removed = true
+    coroutine.close(self.task)
 end
 
 function mt:isRemoved()

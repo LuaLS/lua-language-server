@@ -299,7 +299,6 @@ function mt:reCompile()
     self.emmy   = emmyMgr()
     self.globalValue = nil
     self._compileTask:remove()
-    --self._compileTask = nil
     self._needCompile = {}
     local compiled = {}
     local n = 0
@@ -310,7 +309,7 @@ function mt:reCompile()
         end
     end
     log.debug('reCompile:', n)
-    self:_testMemory()
+    self:_testMemory('skip')
 end
 
 function mt:reDiagnostic()
@@ -723,7 +722,7 @@ function mt:onUpdateConfig(updated, other)
     end
 end
 
-function mt:_testMemory()
+function mt:_testMemory(skipDead)
     local clock = os.clock()
     collectgarbage()
     log.debug('collectgarbage: ', ('%.3f'):format(os.clock() - clock))
@@ -841,7 +840,7 @@ function mt:_testMemory()
     ))
     log.debug('test memory: ', ('%.3f'):format(os.clock() - clock))
 
-    if deadValue / totalValue >= 0.5 then
+    if deadValue / totalValue >= 0.5 and not skipDead then
         self:_testFindDeadValues()
     end
 end

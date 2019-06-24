@@ -37,6 +37,7 @@ local ErrorCodes = {
 
 local CachedVM = setmetatable({}, {__mode = 'kv'})
 
+---@class LSP
 local mt = {}
 mt.__index = mt
 ---@type files
@@ -186,6 +187,9 @@ function mt:isIgnored(uri)
     if not self.workspace then
         return true
     end
+    if not self.workspace.gitignore then
+        return true
+    end
     local path = self.workspace:relativePathByUri(uri)
     if self.workspace.gitignore(path:string()) then
         return true
@@ -260,7 +264,7 @@ function mt:removeText(uri)
 end
 
 function mt:getCachedFileCount()
-    return self._fileCount
+    return self._files:count()
 end
 
 function mt:reCompile()
@@ -322,6 +326,7 @@ function mt:clearAllFiles()
     self._files:clear()
 end
 
+---@param uri uri
 function mt:loadVM(uri)
     local file = self._files:get(uri)
     if not file then
@@ -341,7 +346,7 @@ function mt:loadVM(uri)
     if file:getVM() then
         self._lastLoadedVM = uri
     end
-    return file
+    return file:getVM(), file:getLines()
 end
 
 function mt:_markCompiled(uri, compiled)

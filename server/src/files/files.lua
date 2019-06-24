@@ -91,6 +91,10 @@ function mt:eachOpened()
     return pairs(self._open)
 end
 
+function mt:count()
+    return self._fileCount
+end
+
 return function ()
     local self = setmetatable({
         _files = {},

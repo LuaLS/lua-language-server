@@ -55,6 +55,8 @@ end
 
 local LastTask
 
+---@param lsp LSP
+---@param params table
 return function (lsp, params)
     local uri = params.textDocument.uri
     local vm, lines = lsp:loadVM(uri)

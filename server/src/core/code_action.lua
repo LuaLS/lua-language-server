@@ -216,12 +216,16 @@ local function solveSyntaxByAddDoEnd(uri, data, callback)
     }
 end
 
+---@param lsp LSP
+---@param uri uri
+---@param data table
+---@param callback function
 local function solveSyntax(lsp, uri, data, callback)
-    local obj = lsp:getFile(uri)
-    if not obj then
+    local file = lsp:getFile(uri)
+    if not file then
         return
     end
-    local astErr, lines = obj.astErr, obj.lines
+    local astErr, lines = file:getAstErr(), file:getLines()
     if not astErr or not lines then
         return
     end

@@ -369,10 +369,11 @@ function mt:_markCompiled(uri, compiled)
 end
 
 ---@param file file
+---@return table
 function mt:compileAst(file)
-    local ast, err = parser:ast(file.text, 'lua', config.config.runtime.version)
+    local ast, err = parser:ast(file:getText(), 'lua', config.config.runtime.version)
     if ast then
-        file.astErr = err
+        file:setAstErr(err)
     else
         if type(err) == 'string' then
             local message = lang.script('PARSER_CRASH', err)
@@ -444,12 +445,12 @@ function mt:compileVM(uri)
 
     local clock = os.clock()
     local ast = self:compileAst(file)
-    local version = file.version
-    file.astCost = os.clock() - clock
-    if file.astCost > 0.1 then
-        log.warn(('Compile Ast[%s] takes [%.3f] sec, size [%.3f]kb'):format(uri, file.astCost, #file.text / 1000))
+    local version = file:getVersion()
+    local astCost = os.clock() - clock
+    if astCost > 0.1 then
+        log.warn(('Compile Ast[%s] takes [%.3f] sec, size [%.3f]kb'):format(uri, astCost, #file:getText() / 1000))
     end
-    file.oldText = nil
+    file:clearOldText()
 
     self:_clearChainNode(file, uri)
     self:_clearGlobal(uri)
@@ -459,13 +460,10 @@ function mt:compileVM(uri)
     if vm then
         CachedVM[vm] = true
     end
-    if self:isDeadText(uri) or file.removed then
-        if vm then
-            vm:remove()
-        end
-        return nil
-    end
-    if version ~= file.version then
+    if self:isDeadText(uri)
+        or file:isRemoved()
+        or version ~= file:getVersion()
+    then
         if vm then
             vm:remove()
         end
@@ -480,21 +478,17 @@ function mt:compileVM(uri)
         end
         return nil
     end
-    if file.vm then
-        file.vm:remove()
-    end
-    file.vm = vm
-    file.vmCost = os.clock() - clock
-    file.vmVersion = version
+    file:saveVM(vm, os.clock() - clock, version)
 
     local clock = os.clock()
-    file.lines = parser:lines(file.text, 'utf8')
-    file.lineCost = os.clock() - clock
+    local lines = parser:lines(file:getText(), 'utf8')
+    local lineCost = os.clock() - clock
+    file:saveLines(lines, lineCost)
 
-    if file.vmCost > 0.2 then
-        log.debug(('Compile VM[%s] takes: %.3f sec'):format(uri, file.vmCost))
+    if file:getVMCost() > 0.2 then
+        log.debug(('Compile VM[%s] takes: %.3f sec'):format(uri, file:getVMCost()))
     end
-    if not file.vm then
+    if not vm then
         error(err)
     end
 
@@ -506,28 +500,32 @@ function mt:compileVM(uri)
     return file
 end
 
+---@param uri uri
 function mt:doDiagnostics(uri)
     if not self._needDiagnostics[uri] then
         return
     end
     local name = 'textDocument/publishDiagnostics'
-    local obj = self._file[uri]
-    if not obj or obj.removed or not obj.vm or obj.vm:isRemoved() then
+    local file = self._files:get(uri)
+    if not file
+        or file:isRemoved()
+        or not file:getVM()
+        or file:getVM():isRemoved() then
         self._needDiagnostics[uri] = nil
         self:clearDiagnostics(uri)
         return
     end
     local data = {
         uri   = uri,
-        vm    = obj.vm,
-        lines = obj.lines,
-        version = obj.vmVersion,
+        vm    = file:getVM(),
+        lines = file:getLines(),
+        version = file:getVM():getVersion(),
     }
     local res = self:_callMethod(name, data)
     if self:isDeadText(uri) then
         return
     end
-    if obj.version ~= data.version then
+    if file:getVM():getVersion() ~= data.version then
         return
     end
     if self._needDiagnostics[uri] then
@@ -545,54 +543,60 @@ function mt:doDiagnostics(uri)
     end
 end
 
+---@param uri uri
+---@return file
 function mt:getFile(uri)
-    return self._file[uri]
+    return self._files:get(uri)
 end
 
+---@param uri uri
+---@return VM
+---@return table
+---@return string
 function mt:getVM(uri)
-    local obj = self._file[uri]
-    if not obj then
+    local file = self._files:get(uri)
+    if not file then
         return nil
     end
-    return obj.vm, obj.lines, obj.text
+    return file:getVM(), file:getLines(), file:getText()
 end
 
+---@param uri uri
+---@return string
+---@return string
 function mt:getText(uri)
-    local obj = self._file[uri]
-    if not obj then
+    local file = self._files:get(uri)
+    if not file then
         return nil
     end
-    return obj.text, obj.oldText
+    return file:getText(), file:getOldText()
 end
 
+---@param uri uri
+---@return table
 function mt:getAstErrors(uri)
-    local obj = self._file[uri]
-    if not obj then
+    local file = self._files:get(uri)
+    if not file then
         return nil
     end
-    return obj.astErr
+    return file:getAstErr()
 end
 
+---@param child uri
+---@param parent uri
 function mt:compileChain(child, parent)
-    local parentObj = self._file[parent]
-    local childObj = self._file[child]
+    local parentFile = self._files:get(parent)
+    local childFile = self._files:get(child)
 
-    if not parentObj or not childObj then
+    if not parentFile or not childFile then
         return
     end
-    if parentObj == childObj then
+    if parentFile == childFile then
         return
     end
 
-    if not parentObj.child then
-        parentObj.child = {}
-    end
-    parentObj.child[child] = true
-
-    if not childObj.parent then
-        childObj.parent = {}
-    end
-    childObj.parent[parent] = true
+    parentFile:addChild(child)
+    childFile:addParent(parent)
 end
 
 function mt:checkWorkSpaceComplete()
@@ -722,11 +726,12 @@ function mt:_testMemory()
     local cachedVM = 0
     local cachedSource = 0
     local cachedFunction = 0
-    for _, obj in pairs(self._file) do
-        if obj.vm and not obj.vm:isRemoved() then
+    for _, file in self._files:eachFile() do
+        local vm = file:getVM()
+        if vm and not vm:isRemoved() then
             cachedVM = cachedVM + 1
-            cachedSource = cachedSource + #obj.vm.sources
-            cachedFunction = cachedFunction + #obj.vm.funcs
+            cachedSource = cachedSource + #vm.sources
+            cachedFunction = cachedFunction + #vm.funcs
         end
     end
     local aliveVM = 0
@@ -841,9 +846,12 @@ function mt:_testFindDeadValues()
     end
     self._testHasFoundDeadValues = true
 
+    log.debug('Start find dead values, may takes few seconds...')
+
     local mark = {}
     local stack = {}
     local count = 0
+    local clock = os.clock()
     local function push(info)
         stack[#stack+1] = info
     end
@@ -855,7 +863,7 @@ function mt:_testFindDeadValues()
         log.debug(uri, table.concat(stack, '->'))
     end
     local function scan(name, tbl)
-        if count > 100 then
+        if count > 100 or os.clock() - clock > 5.0 then
             return
         end
         if type(tbl) ~= 'table' then
@@ -874,6 +882,10 @@ function mt:_testFindDeadValues()
             if not tbl:getSource() then
                 showStack(tbl.uri)
             end
+        elseif tbl.type == 'files' then
+            for k, v in tbl:eachFile() do
+                scan(k, v)
+            end
         else
             for k, v in pairs(tbl) do
                 scan(k, v)
@@ -881,7 +893,7 @@ function mt:_testFindDeadValues()
         end
         pop()
     end
-    scan('root', self._file)
+    scan('root', self._files)
 end
 
 function mt:onTick()
@@ -929,8 +941,6 @@ end
 
 return function ()
     local session = setmetatable({
-        _file = {},
-        _fileCount = 0,
         _needCompile = {},
         _needDiagnostics = {},
         _clock = -100,

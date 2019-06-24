@@ -95,7 +95,7 @@ local function getComment(func)
     if not func then
         return nil
     end
-    return func:getComment() or ''
+    return func:getComment()
 end
 
 return function (name, func, object, select)

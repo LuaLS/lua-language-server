@@ -6,6 +6,8 @@ while true do
     local buf = io.load(fs.path(filename))
     if buf then
         OUT:push(filename, mode, buf)
+    else
+        ERR:push('Load failed:' .. filename)
     end
     GC:push(ID, collectgarbage 'count')
 end

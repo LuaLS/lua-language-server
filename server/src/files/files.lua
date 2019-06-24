@@ -84,6 +84,7 @@ function mt:clear()
     end
     self._files = {}
     self._library = {}
+    self._fileCount = nil
 end
 
 function mt:clearVM()

@@ -258,16 +258,20 @@ end
 ---@param compiled table
 function mt:readText(uri, path, buf, compiled)
     if self._files:get(uri) then
+        log.debug('Read failed due to duplicate:', uri)
         return
     end
     if not self:isLua(uri) then
+        log.debug('Read failed due to not lua:', uri)
         return
     end
     if not self._files:isOpen() and self:isIgnored(uri) then
+        log.debug('Read failed due to ignored:', uri)
         return
     end
     local text = buf or io.load(path)
     if not self._files:isOpen() and not self:checkReadFile(uri, path, text) then
+        log.debug('Read failed due to check failed:', uri)
         return
     end
     self._files:save(uri, text, 0)
@@ -327,9 +331,12 @@ function mt:reCompile()
     self.globalValue = nil
     self._compileTask:remove()
     self._needCompile = {}
+    local n = 0
     for uri in self._files:eachFile() do
         self:needCompile(uri, compiled)
+        n = n + 1
     end
+    log.debug('reCompile:', n, self._files:count())
 
     self:_testMemory('skip')
 end
@@ -717,6 +724,7 @@ function mt:restartDueToMemoryLeak()
 end
 
 function mt:reScanFiles()
+    log.debug('reScanFiles')
     self:clearAllFiles()
     if self.workspace then
         self.workspace:scanFiles()

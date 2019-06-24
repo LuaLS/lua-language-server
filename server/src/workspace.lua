@@ -63,6 +63,8 @@ function mt:listenLoadFile()
             self.lsp:readText(uri, path, buf, self._currentScanCompiled)
         elseif mode == 'library' then
             self.lsp:readLibrary(uri, path, buf, self._currentScanCompiled)
+        else
+            error('Unknown mode:' .. tostring(mode))
         end
     end)
 end

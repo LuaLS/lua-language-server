@@ -311,7 +311,14 @@ function mt:reCompile()
         self.emmy:remove()
     end
 
+    local compiled = {}
+    local needCompile = {}
+    for uri in self._files:eachFile() do
+        needCompile[uri] = true
+    end
+
     self._files:clear()
+
 
     for _, obj in pairs(listMgr.list) do
         if obj.type == 'source' or obj.type == 'function' then
@@ -325,9 +332,12 @@ function mt:reCompile()
     self.globalValue = nil
     self._compileTask:remove()
     self._needCompile = {}
-    local compiled = {}
     for uri, buf in self._files:eachOpened() do
         self:readText(uri, uric.decode(uri), buf, compiled)
+        self:needCompile(uri, compiled)
+    end
+    for uri in pairs(needCompile) do
+        self:needCompile(uri, compiled)
     end
 
     self:_testMemory('skip')

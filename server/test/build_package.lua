@@ -215,7 +215,7 @@ io.save(ROOT:parent_path() / 'package.nls.json', json.encode {
 (Plz help me to translate these into nice English!)
 Load external library.
 This feature can load external Lua files, which can be used for definition, automatic completion and other functions. Note that the language server does not monitor changes in external files and needs to restart if the external files are modified.
-The following example shows loaded files in `C:/lua` without `../lib/temp`.
+The following example shows loaded files in `C:/lua` and `../lib` ,exclude `../lib/temp`.
 ]] .. example.library,
 })
 

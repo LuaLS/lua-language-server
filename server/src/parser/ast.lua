@@ -1308,6 +1308,12 @@ local Defs = {
         emmyName.type = 'emmyIncomplete'
         return emmyName
     end,
+    EmmyComment = function (...)
+        return {
+            type = 'emmyComment',
+            [1] = table.concat({...}, ' '),
+        }
+    end,
 
     -- 捕获错误
     UnknownSymbol = function (start, symbol)

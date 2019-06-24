@@ -481,6 +481,16 @@ function mt:setEmmy(params, returns)
     end
 end
 
+---@param comment string
+function mt:setComment(comment)
+    self._comment = comment
+end
+
+---@return string
+function mt:getComment()
+    return self._comment
+end
+
 function mt:getEmmyParams()
     return self._emmyParams
 end

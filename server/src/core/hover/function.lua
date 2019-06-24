@@ -91,9 +91,17 @@ local function buildValueReturns(func)
     return '\n  -> ' .. table.concat(strs, ', ')
 end
 
+local function getComment(func)
+    if not func then
+        return nil
+    end
+    return func:getComment() or ''
+end
+
 return function (name, func, object, select)
     local args, argLabel = buildValueArgs(func, object, select)
     local returns = buildValueReturns(func)
+    local comment = getComment(func)
     local headLen = #('function %s('):format(name)
     local title = ('function %s(%s)%s'):format(name, args, returns)
     if argLabel then
@@ -103,5 +111,6 @@ return function (name, func, object, select)
     return {
         label = title,
         argLabel = argLabel,
+        description = comment,
     }
 end

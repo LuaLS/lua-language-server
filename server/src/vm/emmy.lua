@@ -7,6 +7,7 @@ function mt:clearEmmy()
     self._emmyParams = nil
     self._emmyReturns = nil
     self._emmyGeneric = nil
+    self._emmyComment = nil
 end
 
 function mt:doEmmy(action)
@@ -38,6 +39,8 @@ function mt:doEmmy(action)
         self:doEmmySee(action)
     elseif tp == 'emmyIncomplete' then
         self:doEmmyIncomplete(action)
+    elseif tp == 'emmyComment' then
+        self:doEmmyComment(action)
     end
 end
 
@@ -77,6 +80,13 @@ function mt:getEmmyGeneric()
     local generic = self._emmyGeneric
     self._emmyGeneric = nil
     return generic
+end
+
+---@return string
+function mt:getEmmyComment()
+    local comment = self._emmyComment
+    self._emmyComment = nil
+    return comment
 end
 
 function mt:doEmmyClass(action)
@@ -317,6 +327,10 @@ end
 
 function mt:doEmmyIncomplete(action)
     self:instantSource(action)
+end
+
+function mt:doEmmyComment(action)
+    self._emmyComment = action[1]
 end
 
 function mt:doEmmySee(action)

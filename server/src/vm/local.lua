@@ -153,6 +153,16 @@ function mt:setEmmy(emmy)
     end
 end
 
+---@param comment string
+function mt:setComment(comment)
+    self._comment = comment
+end
+
+---@return string
+function mt:getComment()
+    return self._comment
+end
+
 local function create(name, source, value, tags)
     if not value then
         error('Local must has a value')

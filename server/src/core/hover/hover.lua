@@ -214,6 +214,14 @@ local function getValueHover(source, name, value, lib)
                 end
             end
         end
+        local comment = loc:getComment()
+        if comment then
+            if tip then
+                tip = tip .. '\n\n-------------\n\n' .. comment
+            else
+                tip = comment
+            end
+        end
     elseif source:get 'global' then
         tp = 'global'
     elseif source:get 'simple' then

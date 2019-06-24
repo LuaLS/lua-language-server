@@ -54,7 +54,7 @@ function mt:fileNameEq(a, b)
 end
 
 function mt:listenLoadFile()
-    self._loadFileRequest = async.run('loadfile', nil, function (filename, buf)
+    self._loadFileRequest = async.run('loadfile', nil, function (filename, mode, buf)
         local path = fs.path(filename)
         local name = getFileName(path)
         local uri = uric.encode(path)
@@ -95,13 +95,17 @@ function mt:buildScanPattern()
             end
         end
     end
+    -- config.workspace.library
+    for path in pairs(config.config.workspace.library) do
+        pattern[#pattern+1] = path
+    end
 
     return pattern
 end
 
 function mt:scanFiles()
     if self._scanRequest then
-        log.info('中断上次扫描文件任务')
+        log.info('Break scan.')
         self._scanRequest:push('stop')
         self._scanRequest = nil
         self._complete = false
@@ -112,33 +116,35 @@ function mt:scanFiles()
     local options = {
         ignoreCase = platform.OS == 'Windows',
     }
-    log.info('ignore pattern:\r\n' .. table.concat(pattern, '\r\n'))
-    log.info('ignore options:' .. table.dump(options))
-    log.info('开始扫描文件任务')
+
     self.gitignore = glob.gitignore(pattern, options)
     self._currentScanCompiled = {}
     local count = 0
     self._scanRequest = async.run('scanfiles', {
-        root = self.root:string(),
-        pattern = pattern,
+        {
+            mode = 'workspace',
+            root = self.root:string(),
+            pattern = pattern,
+            options = options,
+        }
     }, function (mode, ...)
         if mode == 'ok' then
-            log.info('扫描文件任务完成，共', count, '个文件。')
+            log.info('Scan finish, got', count, 'files.')
             self._complete = true
             self._scanRequest = nil
             self:reset()
             return true
         elseif mode == 'log' then
             log.debug(...)
-        elseif mode == 'path' then
+        elseif mode == 'workspace' then
             local path = fs.path(...)
             if not self:isLuaFile(path) then
                 return
             end
-            self._loadFileRequest:push(path:string())
+            self._loadFileRequest:push(path:string(), 'workspace')
             count = count + 1
         elseif mode == 'stop' then
-            log.info('扫描文件任务中断')
+            log.info('Scan stoped.')
             return false
         end
     end)
@@ -160,7 +166,7 @@ function mt:init(rootUri)
 end
 
 function mt:isComplete()
-    return not not self._complete
+    return self._complete == true
 end
 
 function mt:isLuaFile(path)

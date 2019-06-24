@@ -211,7 +211,7 @@ end
 ---@param uri uri
 function mt:close(uri)
     self._files:close(uri)
-    if not self:isLua() or self:isIgnored(uri) then
+    if not self:isLua(uri) or self:isIgnored(uri) then
         self:removeText(uri)
     end
 end

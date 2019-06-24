@@ -67,19 +67,9 @@ function mt:get(uri)
     return self._files[uri]
 end
 
----@param uri uri
----@param vm VM
-function mt:saveVM(uri, vm)
-    local f = self._files[uri]
-    if not f then
-        return
-    end
-    f:saveVM(vm)
-end
-
-function mt:clear()
+function mt:clearVM()
     for _, f in pairs(self._files) do
-        f:remove()
+        f:removeVM()
     end
 end
 

@@ -286,7 +286,7 @@ function mt:reCompile()
         reload[uri] = true
     end
 
-    self._files:clear()
+    self._files:clearVM()
 
     for _, obj in pairs(listMgr.list) do
         if obj.type == 'source' or obj.type == 'function' then
@@ -299,6 +299,7 @@ function mt:reCompile()
     self.emmy   = emmyMgr()
     self.globalValue = nil
     self._compileTask:remove()
+    --self._compileTask = nil
     self._needCompile = {}
     local compiled = {}
     local n = 0
@@ -323,7 +324,7 @@ function mt:clearAllFiles()
     for uri in self._files:eachFile() do
         self:clearDiagnostics(uri)
     end
-    self._files:clear()
+    self._files:clearVM()
 end
 
 ---@param uri uri
@@ -483,7 +484,7 @@ function mt:compileVM(uri)
         end
         return nil
     end
-    file:saveVM(vm, os.clock() - clock, version)
+    file:saveVM(vm, version, os.clock() - clock)
 
     local clock = os.clock()
     local lines = parser:lines(file:getText(), 'utf8')
@@ -899,6 +900,7 @@ function mt:_testFindDeadValues()
         pop()
     end
     scan('root', self._files)
+    log.debug('Finish...')
 end
 
 function mt:onTick()

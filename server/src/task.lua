@@ -56,7 +56,6 @@ end
 
 return function (callback)
     local self = setmetatable({
-        callback = callback,
         data = {},
         task = coroutine.create(callback),
     }, mt)

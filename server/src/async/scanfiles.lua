@@ -46,7 +46,10 @@ end
 
 for _, data in ipairs(args) do
     local root = fs.path(data.root)
-    scan(data.mode, root, data.pattern, data.options)
+    local suc, err = xpcall(scan, debug.traceback, data.mode, root, data.pattern, data.options)
+    if not suc then
+        ERR:push(err)
+    end
 end
 
 OUT:push 'ok'

@@ -445,17 +445,17 @@ TEST {
         {
             label = 'a',
             kind = CompletionItemKind.Enum,
-            detail = '= 1',
+            detail = '(number) = 1',
         },
         {
             label = 'b',
             kind = CompletionItemKind.Enum,
-            detail = '= 2',
+            detail = '(number) = 2',
         },
         {
             label = 'c',
             kind = CompletionItemKind.Enum,
-            detail = '= 3',
+            detail = '(number) = 3',
         },
     }
 }
@@ -490,7 +490,7 @@ TEST {
         {
             label = 'zabcdef',
             kind = CompletionItemKind.Enum,
-            detail = '= 1',
+            detail = '(number) = 1',
         },
     }
 }
@@ -525,7 +525,7 @@ TEST {
         {
             label = 'zabcdef',
             kind = CompletionItemKind.Enum,
-            detail = '= 1',
+            detail = '(number) = 1',
         },
     }
 }

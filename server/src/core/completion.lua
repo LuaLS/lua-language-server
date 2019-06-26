@@ -82,25 +82,40 @@ end
 local function getDetail(value)
     local literal = value:getLiteral()
     local tp = type(literal)
+    local detals = {}
+    if value:getType() ~= 'any' then
+        detals[#detals+1] = ('(%s)'):format(value:getType())
+    end
     if tp == 'boolean' then
-        return ('= %q'):format(literal)
+        detals[#detals+1] = (' = %q'):format(literal)
     elseif tp == 'string' then
-        return ('= %q'):format(literal)
+        detals[#detals+1] =  (' = %q'):format(literal)
     elseif tp == 'number' then
         if math.type(literal) == 'integer' then
-            return ('= %q'):format(literal)
+            detals[#detals+1] =  (' = %q'):format(literal)
         else
-            local str = ('= %.16f'):format(literal)
+            local str = (' = %.16f'):format(literal)
             local dot = str:find('.', 1, true)
             local suffix = str:find('[0]+$', dot + 2)
             if suffix then
-                return str:sub(1, suffix - 1)
+                detals[#detals+1] =  str:sub(1, suffix - 1)
             else
-                return str
+                detals[#detals+1] =  str
             end
         end
     end
-    return nil
+    if value:getType() == 'function' then
+        ---@type emmyFunction
+        local func = value:getFunction()
+        local overLoads = func and func:getEmmyOverLoads()
+        if overLoads then
+            detals[#detals+1] = ('(%d 个原型)'):format(#overLoads + 1)
+        end
+    end
+    if #detals == 0 then
+        return nil
+    end
+    return table.concat(detals)
 end
 
 local function getKind(cata, value)

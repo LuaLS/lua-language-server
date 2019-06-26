@@ -155,6 +155,7 @@ ass$
         label = 'assert',
         kind = CompletionItemKind.Function,
         documentation = EXISTS,
+        detail = '(function)',
     }
 }
 
@@ -166,7 +167,7 @@ z$
     {
         label = 'zabc',
         kind = CompletionItemKind.Variable,
-        detail = '= 1',
+        detail = '(number) = 1',
     }
 }
 
@@ -178,7 +179,7 @@ z$
     {
         label = 'zabc',
         kind = CompletionItemKind.Variable,
-        detail = '= 1.0',
+        detail = '(number) = 1.0',
     }
 }
 
@@ -192,7 +193,7 @@ t.a$
     {
         label = 'abc',
         kind = CompletionItemKind.Enum,
-        detail = '= 1',
+        detail = '(number) = 1',
     }
 }
 
@@ -208,6 +209,7 @@ mt:g$
         label = 'get',
         kind = CompletionItemKind.Method,
         documentation = EXISTS,
+        detail = EXISTS,
     }
 }
 
@@ -219,6 +221,7 @@ loc$
         label = 'collectgarbage',
         kind = CompletionItemKind.Function,
         documentation = EXISTS,
+        detail = EXISTS,
     },
     {
         label = 'local',
@@ -235,10 +238,12 @@ t.$
     {
         label = 'a',
         kind = CompletionItemKind.Field,
+        detail = EXISTS,
     },
     {
         label = 'b',
         kind = CompletionItemKind.Field,
+        detail = EXISTS,
     },
 }
 
@@ -251,10 +256,12 @@ t.   $
     {
         label = 'a',
         kind = CompletionItemKind.Field,
+        detail = EXISTS,
     },
     {
         label = 'b',
         kind = CompletionItemKind.Field,
+        detail = EXISTS,
     },
 }
 
@@ -269,6 +276,7 @@ t:$
         label = 'b',
         kind = CompletionItemKind.Method,
         documentation = EXISTS,
+        detail = EXISTS,
     },
 }
 
@@ -283,11 +291,13 @@ xxx()
     {
         label = 'a',
         kind = CompletionItemKind.Field,
+        detail = EXISTS,
     },
     {
         label = 'xxx',
         kind = CompletionItemKind.Function,
         documentation = EXISTS,
+        detail = EXISTS,
     },
 }
 
@@ -315,6 +325,7 @@ local t = {
     {
         label = 'xxxx',
         kind = CompletionItemKind.Variable,
+        detail = EXISTS,
     },
     {
         label = 'xxyy',
@@ -328,11 +339,13 @@ local t = {
         label = 'next',
         kind = CompletionItemKind.Function,
         documentation = EXISTS,
+        detail = EXISTS,
     },
     {
         label = 'xpcall',
         kind = CompletionItemKind.Function,
         documentation = EXISTS,
+        detail = EXISTS,
     }
 }
 
@@ -511,6 +524,7 @@ self.results.list[#self.re$]
     {
         label = 'results',
         kind = CompletionItemKind.Field,
+        detail = EXISTS,
     },
 }
 
@@ -530,6 +544,7 @@ fff[#ff$]
     {
         label = 'fff',
         kind = CompletionItemKind.Field,
+        detail = EXISTS,
     }
 }
 
@@ -648,10 +663,12 @@ end
     {
         label = 'a',
         kind = CompletionItemKind.Field,
+        detail = EXISTS,
     },
     {
         label = 'b',
         kind = CompletionItemKind.Field,
+        detail = EXISTS,
     },
 }
 
@@ -724,6 +741,7 @@ t.$
     {
         label = '__index',
         kind = CompletionItemKind.Field,
+        detail = EXISTS,
     }
 }
 
@@ -747,11 +765,13 @@ else$
         label = 'select',
         kind = CompletionItemKind.Function,
         documentation = EXISTS,
+        detail = EXISTS,
     },
     {
         label = 'setmetatable',
         kind = CompletionItemKind.Function,
         documentation = EXISTS,
+        detail = EXISTS,
     },
     {
         label = 'else',
@@ -776,6 +796,7 @@ xpcal$
         label = 'xpcall',
         kind = CompletionItemKind.Function,
         documentation = EXISTS,
+        detail = EXISTS,
     }
 }
 
@@ -1039,10 +1060,12 @@ mt.$
     {
         label = 'id',
         kind = CompletionItemKind.Field,
+        detail = EXISTS,
     },
     {
         label = 'name',
         kind = CompletionItemKind.Field,
+        detail = EXISTS,
     },
 }
 
@@ -1057,11 +1080,13 @@ end
         label = 'select',
         kind = CompletionItemKind.Function,
         documentation = EXISTS,
+        detail = EXISTS,
     },
     {
         label = 'setmetatable',
         kind = CompletionItemKind.Function,
         documentation = EXISTS,
+        detail = EXISTS,
     },
     {
         label = 'else',
@@ -1215,6 +1240,7 @@ t.$
     {
         label = 'a.b.c',
         kind = CompletionItemKind.Field,
+        detail = EXISTS,
         textEdit = {
             start = 37,
             finish = 36,
@@ -1239,6 +1265,7 @@ z$
     {
         label = 'z.b.c',
         kind = CompletionItemKind.Field,
+        detail = EXISTS,
         textEdit = {
             start = 22,
             finish = 21,
@@ -1258,3 +1285,39 @@ TEST [[
 io.close(1, $)
 ]]
 (nil)
+
+TEST [[
+--- JustTest
+---@overload fun(list:table):string
+---@overload fun(list:table, sep:string):string
+---@overload fun(list:table, sep:string, i:number):string
+---@param list table
+---@param sep string
+---@param i number
+---@param j number
+---@return string
+local function zzzzz(list, sep, i, j) end
+
+zzz$
+]]
+{
+    {
+        label = 'zzzzz',
+        kind = CompletionItemKind.Function,
+        detail = '(function)(4 个原型)',
+        documentation = {
+            kind = 'markdown',
+            value = [[
+```lua
+function zzzzz(list: table, sep: string, i: number, j: number)
+  -> string
+```
+JustTest
+```lua
+
+```
+
+]]
+        },
+    }
+}

@@ -519,7 +519,7 @@ Emmy            <-  EmmySp '---@' EmmyBody ShortComment
 EmmySp          <-  (!'---@' !'---' Comment / %s / %nl)*
 EmmyComments    <-  (EmmyComment (%nl EmmyComment)*)
                 ->  EmmyComment
-EmmyComment     <-  EmmySp '---' %s* {(!%nl .)*}
+EmmyComment     <-  EmmySp '---' !'@' %s* {(!%nl .)*}
 EmmyBody        <-  'class'    %s+ EmmyClass    -> EmmyClass
                 /   'type'     %s+ EmmyType     -> EmmyType
                 /   'alias'    %s+ EmmyAlias    -> EmmyAlias

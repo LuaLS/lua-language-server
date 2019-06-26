@@ -47,15 +47,15 @@ local function getFunctionSource(call)
     return nil
 end
 
-local function getHover(call, pos)
+local function hovers(call, pos)
     local args = call:bindCall()
     if not args then
-        return
+        return nil
     end
 
     local value = call:findCallFunction()
     if not value then
-        return
+        return nil
     end
 
     local select = getSelect(args, pos)
@@ -63,20 +63,29 @@ local function getHover(call, pos)
     local object = source:get 'object'
     local lib, fullkey = findLib(source)
     local name = fullkey or buildValueName(source)
-    local hover
+    local hovers = {}
     if lib then
-        hover = getFunctionHoverAsLib(name, lib, object, select)
+        hovers[#hovers+1] = getFunctionHoverAsLib(name, lib, object, select)
     else
         local emmy = value:getEmmy()
         if emmy and emmy.type == 'emmy.functionType' then
-            hover = getFunctionHoverAsEmmy(name, emmy, object, select)
+            hovers[#hovers+1] = getFunctionHoverAsEmmy(name, emmy, object, select)
         else
-            hover = getFunctionHover(name, value:getFunction(), object, select)
+            ---@type emmyFunction
+            local func = value:getFunction()
+            hovers[#hovers+1] = getFunctionHover(name, func, object, select)
+            local overLoads = func and func:getEmmyOverLoads()
+            if overLoads then
+                for _, ol in ipairs(overLoads) do
+                    hovers[#hovers+1] = getFunctionHoverAsEmmy(name, ol, object, select)
+                end
+            end
         end
     end
-    if hover and hover.argLabel then
-        return hover
+    if #hovers == 0 then
+        return nil
     end
+    return hovers
 end
 
 local function isInFunctionOrTable(call, pos)
@@ -109,12 +118,8 @@ return function (vm, pos)
     if isInFunctionOrTable(nearCall, pos) then
         return nil
     end
-    -- TODO 重构后改成显示多原型
-    local hovers = { getHover(nearCall, pos) }
 
-    if #hovers == 0 then
-        return nil
-    end
+    local hovers = hovers(nearCall, pos)
 
     return hovers
 end

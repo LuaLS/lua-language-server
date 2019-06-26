@@ -12,28 +12,40 @@ return function (lsp, params)
         return
     end
 
+    local description = hovers[1].description
+    table.sort(hovers, function (a, b)
+        return a.label < b.label
+    end)
+
+    local active
     local signatures = {}
     for i, hover in ipairs(hovers) do
-        signatures[i] = {
+        local signature = {
             label = hover.label,
             documentation = {
                 kind = 'markdown',
                 value = hover.description,
             },
-            parameters = {
+        }
+        if hover.argLabel then
+            if not active then
+                active = i
+            end
+            signature.parameters = {
                 {
                     label = {
                         hover.argLabel[1] - 1,
                         hover.argLabel[2],
-                    },
-                },
-            },
-        }
+                    }
+                }
+            }
+        end
+        signatures[i] = signature
     end
 
     local response = {
         signatures = signatures,
-        activeSignature = 0,
+        activeSignature = active and active - 1 or 0,
     }
 
     return response

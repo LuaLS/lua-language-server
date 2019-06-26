@@ -1321,3 +1321,20 @@ JustTest
         },
     }
 }
+
+TEST [[
+--- abc
+zzz = 1
+zz$
+]]
+{
+    {
+        label = 'zzz',
+        kind = CompletionItemKind.Enum,
+        detail = '(number) = 1',
+        documentation = {
+            kind = 'markdown',
+            value = 'abc',
+        }
+    }
+}

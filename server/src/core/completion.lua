@@ -76,6 +76,20 @@ local function getDucumentation(name, value)
             value = text,
         }
     end
+    local lib = value:getLib()
+    if lib then
+        return {
+            kind = 'markdown',
+            value = lib.description,
+        }
+    end
+    local comment = value:getComment()
+    if comment then
+        return {
+            kind = 'markdown',
+            value = comment,
+        }
+    end
     return nil
 end
 

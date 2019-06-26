@@ -220,3 +220,23 @@ global t: {
         name = 't',
     },
 }
+
+TEST {
+    {
+        path = 'a.lua',
+        content = '',
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            --- abc
+            ---@param x number
+            function <?f?>(x) end
+        ]],
+    },
+    hover = {
+        label = [[function f(x: number)]],
+        name = 'f',
+        description = 'abc',
+    }
+}

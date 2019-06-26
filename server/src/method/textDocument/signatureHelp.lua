@@ -13,10 +13,6 @@ return function (lsp, params)
     end
 
     local description = hovers[1].description
-    table.sort(hovers, function (a, b)
-        return a.label < b.label
-    end)
-
     local active
     local signatures = {}
     for i, hover in ipairs(hovers) do

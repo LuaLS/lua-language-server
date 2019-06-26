@@ -793,11 +793,12 @@ function mt:doGoTo(source)
     end
 end
 
-function mt:setOne(var, value, emmy)
+function mt:setOne(var, value, emmy, comment)
     if not value then
         value = valueMgr.create('nil', self:getDefaultSource())
     end
     value:setEmmy(emmy)
+    value:setComment(comment)
     self:instantSource(var)
     if var.type == 'name' then
         self:setName(var[1], var, value)
@@ -822,6 +823,7 @@ end
 
 function mt:doSet(action)
     local emmy = self:getEmmy()
+    local comment = self:getEmmyComment()
     if not action[2] then
         return
     end
@@ -844,7 +846,7 @@ function mt:doSet(action)
     local i = 0
     self:forList(vars, function (var)
         i = i + 1
-        self:setOne(var, values[i], emmy)
+        self:setOne(var, values[i], emmy, comment)
     end)
 end
 

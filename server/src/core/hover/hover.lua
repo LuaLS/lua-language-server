@@ -191,14 +191,16 @@ local function getValueHover(source, name, value, lib)
         valueType = '*' .. valueType
     end
 
-    local tip
+    local tips = {}
     local literal
     if lib then
         literal = lib.code or (lib.value and formatLiteral(lib.value))
-        tip = lib.description
+        tips[#tips+1] = lib.description
     else
         literal = value:getLiteral() and formatLiteral(value:getLiteral())
     end
+
+    tips[#tips+1] = value:getComment()
 
     local tp
     if source:bindLocal() then
@@ -214,14 +216,7 @@ local function getValueHover(source, name, value, lib)
                 end
             end
         end
-        local comment = loc:getComment()
-        if comment then
-            if tip then
-                tip = tip .. '\n\n-------------\n\n' .. comment
-            else
-                tip = comment
-            end
-        end
+        tips[#tips+1] = loc:getComment()
     elseif source:get 'global' then
         tp = 'global'
     elseif source:get 'simple' then
@@ -248,6 +243,11 @@ local function getValueHover(source, name, value, lib)
         else
             text = ('%s %s: %s = %s'):format(tp, name, valueType, literal)
         end
+    end
+
+    local tip
+    if #tips > 0 then
+        tip = table.concat(tips, '\n\n-------------\n\n')
     end
     return {
         label = text,

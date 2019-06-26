@@ -620,6 +620,14 @@ function mt:getEmmy()
     return self._emmy
 end
 
+function mt:setComment(comment)
+    self._comment = comment
+end
+
+function mt:getComment(comment)
+    return self._comment
+end
+
 return {
     create = create,
     watch = Watch,

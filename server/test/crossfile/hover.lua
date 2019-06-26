@@ -240,3 +240,22 @@ TEST {
         description = 'abc',
     }
 }
+
+TEST {
+    {
+        path = 'a.lua',
+        content = '',
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            --- abc
+            <?x?> = 1
+        ]],
+    },
+    hover = {
+        label = [[global x: number = 1]],
+        name = 'x',
+        description = 'abc',
+    }
+}

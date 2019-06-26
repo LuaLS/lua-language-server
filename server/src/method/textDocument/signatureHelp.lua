@@ -24,7 +24,7 @@ return function (lsp, params)
             label = hover.label,
             documentation = {
                 kind = 'markdown',
-                value = hover.description,
+                value = description,
             },
         }
         if hover.argLabel then

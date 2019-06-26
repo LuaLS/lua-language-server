@@ -4,6 +4,7 @@ local function buildValueArgs(func, object, select)
     end
     local names = {}
     local values = {}
+    local options = {}
     if func.argValues then
         for i, value in ipairs(func.argValues) do
             values[i] = value:getType()
@@ -15,6 +16,7 @@ local function buildValueArgs(func, object, select)
             local param = func:findEmmyParamByName(arg:getName())
             if param then
                 values[i] = param:getType()
+                options[i] = param:getOption()
             end
         end
     end
@@ -30,11 +32,20 @@ local function buildValueArgs(func, object, select)
         max = math.max(#names, #values)
     end
     for i = start, max do
+        local name = names[i]
+        local value = values[i] or 'any'
+        local option = options[i]
+        if option and option.optional then
+            if i > start then
+                strs[#strs+1] = ' ['
+            else
+                strs[#strs+1] = '['
+            end
+        end
         if i > start then
             strs[#strs+1] = ', '
         end
-        local name = names[i]
-        local value = values[i] or 'any'
+
         if i == select then
             strs[#strs+1] = '@ARG'
         end
@@ -46,6 +57,10 @@ local function buildValueArgs(func, object, select)
         if i == select then
             strs[#strs+1] = '@ARG'
         end
+
+        if option and option.optional == 'self' then
+            strs[#strs+1] = ']'
+        end
     end
     if func:hasDots() then
         if max > 0 then
@@ -53,6 +68,15 @@ local function buildValueArgs(func, object, select)
         end
         strs[#strs+1] = '...'
     end
+
+    if options then
+        for _, option in pairs(options) do
+            if option.optional == 'after' then
+                strs[#strs+1] = ']'
+            end
+        end
+    end
+
     local text = table.concat(strs)
     local argLabel = {}
     for i = 1, 2 do

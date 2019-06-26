@@ -1,0 +1,10 @@
+---@class any
+---@class string   any
+---@class number   any
+---@class integer  number
+---@class boolean  any
+---@class table    any
+---@class function any
+---@class nil      any
+---@class userdata any
+---@class thread   any

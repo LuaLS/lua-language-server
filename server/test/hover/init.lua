@@ -812,3 +812,13 @@ local <toclose> <const> <?x?> = 1
 [[
 local <toclose> <const> x: number = 1
 ]]
+
+TEST [[
+---@param x number {optional = 'after'}
+---@param y boolean {optional = 'self'}
+---@param z string
+function <?f?>(x, y, z) end
+]]
+[=[
+function f([x: number [, y: boolean], z: string])
+]=]

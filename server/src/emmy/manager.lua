@@ -158,6 +158,7 @@ function mt:addParam(source, bind)
     for i = 3, #source do
         paramObj:addEnum(source[i][1])
     end
+    paramObj:setOption(source.option)
     return paramObj
 end
 

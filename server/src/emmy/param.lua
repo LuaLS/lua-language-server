@@ -47,6 +47,14 @@ function mt:eachEnum(callback)
     end
 end
 
+function mt:setOption(option)
+    self._option = option
+end
+
+function mt:getOption()
+    return self._option
+end
+
 return function (manager, source)
     local self = setmetatable({
         source = source.id,

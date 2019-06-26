@@ -560,7 +560,8 @@ EmmyTypeEnums   <-  %s* '|' %s* String
 
 EmmyAlias       <-  MustEmmyName %s* EmmyType EmmyTypeEnums*
 
-EmmyParam       <-  MustEmmyName %s* EmmyType EmmyTypeEnums*
+EmmyParam       <-  MustEmmyName %s* EmmyType %s* EmmyOption %s* EmmyTypeEnums*
+EmmyOption      <-  Table / %nil
 
 EmmyReturn      <-  EmmyType
 

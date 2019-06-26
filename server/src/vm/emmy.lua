@@ -8,6 +8,7 @@ function mt:clearEmmy()
     self._emmyReturns = nil
     self._emmyGeneric = nil
     self._emmyComment = nil
+    self._emmyOverLoads = nil
 end
 
 function mt:doEmmy(action)
@@ -37,6 +38,8 @@ function mt:doEmmy(action)
         self:doEmmyFunctionType(action)
     elseif tp == 'emmySee' then
         self:doEmmySee(action)
+    elseif tp == 'emmyOverLoad' then
+        self:doEmmyOverLoad(action)
     elseif tp == 'emmyIncomplete' then
         self:doEmmyIncomplete(action)
     elseif tp == 'emmyComment' then
@@ -64,6 +67,13 @@ function mt:addEmmyReturn(rtn)
     self._emmyReturns[#self._emmyReturns+1] = rtn
 end
 
+function mt:addEmmyOverLoad(funcObj)
+    if not self._emmyOverLoads then
+        self._emmyOverLoads = {}
+    end
+    self._emmyOverLoads[#self._emmyOverLoads+1] = funcObj
+end
+
 function mt:getEmmyParams()
     local params = self._emmyParams
     self._emmyParams = nil
@@ -74,6 +84,12 @@ function mt:getEmmyReturns()
     local returns = self._emmyReturns
     self._emmyReturns = nil
     return returns
+end
+
+function mt:getEmmyOverLoads()
+    local overLoads = self._emmyOverLoads
+    self._emmyOverLoads = nil
+    return overLoads
 end
 
 function mt:getEmmyGeneric()
@@ -302,12 +318,12 @@ function mt:buildEmmyFunctionType(source)
         func:setReturn(1, value)
     end
     funcObj:bindFunction(func)
-    self._emmy = funcObj
     return funcObj
 end
 
 function mt:doEmmyFunctionType(action)
     local funcObj = self:buildEmmyFunctionType(action)
+    self._emmy = funcObj
     return funcObj
 end
 
@@ -337,4 +353,9 @@ function mt:doEmmySee(action)
     self:instantSource(action)
     self:instantSource(action[2])
     action[2]:set('emmy see', action)
+end
+
+function mt:doEmmyOverLoad(action)
+    local funcObj = self:buildEmmyFunctionType(action)
+    self:addEmmyOverLoad(funcObj)
 end

@@ -1097,7 +1097,7 @@ end
 function mt:createFunction(source)
     local value = self:createValue('function', source)
     local func = functionMgr.create(source)
-    func:setEmmy(self:getEmmyParams(), self:getEmmyReturns())
+    func:setEmmy(self:getEmmyParams(), self:getEmmyReturns(), self:getEmmyOverLoads())
     func:setComment(self:getEmmyComment())
     value:setFunction(func)
     value:setType('function', 1.0)

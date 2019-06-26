@@ -465,7 +465,7 @@ function mt:markGlobal()
     end
 end
 
-function mt:setEmmy(params, returns)
+function mt:setEmmy(params, returns, overLoads)
     if params then
         self._emmyParams = params
         for _, param in ipairs(params) do
@@ -477,6 +477,12 @@ function mt:setEmmy(params, returns)
         self._emmyReturns = returns
         for _, rtn in ipairs(returns) do
             rtn:getSource():set('emmy function', self)
+        end
+    end
+    if overLoads then
+        self._emmyOverLoads = overLoads
+        for _, ol in ipairs(overLoads) do
+            ol:getSource():set('emmy function', self)
         end
     end
 end
@@ -493,6 +499,10 @@ end
 
 function mt:getEmmyParams()
     return self._emmyParams
+end
+
+function mt:getEmmyOverLoads()
+    return self._emmyOverLoads
 end
 
 local function create(source)

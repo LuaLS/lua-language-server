@@ -1304,6 +1304,10 @@ local Defs = {
             className, methodName
         }
     end,
+    EmmyOverLoad = function (EmmyFunctionType)
+        EmmyFunctionType.type = 'emmyOverLoad'
+        return EmmyFunctionType
+    end,
     EmmyIncomplete = function (emmyName)
         emmyName.type = 'emmyIncomplete'
         return emmyName

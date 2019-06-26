@@ -42,7 +42,7 @@ for _, k in ipairs(KEYS) do
     KEYMAP[k] = true
 end
 
-local EMMY_KEYWORD = {'class', 'type', 'alias', 'param', 'return', 'field', 'generic', 'vararg', 'language', 'see'}
+local EMMY_KEYWORD = {'class', 'type', 'alias', 'param', 'return', 'field', 'generic', 'vararg', 'language', 'see', 'overload'}
 
 local function getDucumentation(name, value)
     if value:getType() == 'function' then

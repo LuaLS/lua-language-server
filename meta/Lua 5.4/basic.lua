@@ -8,3 +8,11 @@ arg = {}
 ---@return any
 function assert(v, message)
 end
+
+---@overload fun()
+---@overload fun(opt:string):any
+---@param opt string {optional = 'after'} | '"collect"' | '"stop"' | '"restart"' | '"count"' | '"step"' | '"setpause"' | '"setstepmul"' | '"incremental"' | '"generational"' | '"isrunning"'
+---@param arg integer {optional = 'self'}
+---@return any
+function collectgarbage(opt, arg)
+end

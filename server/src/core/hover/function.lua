@@ -115,6 +115,17 @@ local function buildValueReturns(func)
     return '\n  -> ' .. table.concat(strs, ', ')
 end
 
+---@param func emmyFunction
+local function buildEnum(func)
+    if not func then
+        return nil
+    end
+    local params = func:getEmmyParams()
+    if not params then
+        return nil
+    end
+end
+
 local function getComment(func)
     if not func then
         return nil
@@ -125,6 +136,7 @@ end
 return function (name, func, object, select)
     local args, argLabel = buildValueArgs(func, object, select)
     local returns = buildValueReturns(func)
+    local enum = buildEnum(func)
     local comment = getComment(func)
     local headLen = #('function %s('):format(name)
     local title = ('function %s(%s)%s'):format(name, args, returns)
@@ -134,7 +146,8 @@ return function (name, func, object, select)
     end
     return {
         label = title,
-        argLabel = argLabel,
         description = comment,
+        enum = enum,
+        argLabel = argLabel,
     }
 end

@@ -1233,20 +1233,7 @@ local Defs = {
             ...
         }
     end,
-    EmmyParam = function (argName, emmyName, options, ...)
-        local option
-        if options then
-            option = {}
-            for _, pair in ipairs(options) do
-                if pair.type == 'pair' then
-                    local key = pair[1]
-                    local value = pair[2]
-                    if key.type == 'name' then
-                        option[key[1]] = value[1]
-                    end
-                end
-            end
-        end
+    EmmyParam = function (argName, emmyName, option, ...)
         local emmy = {
             type = 'emmyParam',
             option = option,
@@ -1330,6 +1317,31 @@ local Defs = {
         return {
             type = 'emmyComment',
             [1] = table.concat({...}, ' '),
+        }
+    end,
+    EmmyOption = function (options)
+        if not options or options == '' then
+            return nil
+        end
+        local option = {}
+        for _, pair in ipairs(options) do
+            if pair.type == 'pair' then
+                local key = pair[1]
+                local value = pair[2]
+                if key.type == 'name' then
+                    option[key[1]] = value[1]
+                end
+            end
+        end
+        return option
+    end,
+    EmmyTypeEnum = function (enum, option)
+        return {
+            type = 'emmyEnum',
+            option = option,
+            start = enum.start,
+            finish = enum.finish,
+            [1] = enum,
         }
     end,
 

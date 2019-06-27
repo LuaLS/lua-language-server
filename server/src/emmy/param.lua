@@ -37,13 +37,13 @@ function mt:bindGeneric(generic)
     end
 end
 
-function mt:addEnum(str)
-    self._enum[#self._enum+1] = str
+function mt:addEnum(enum, option)
+    self._enum[#self._enum+1] = {enum, option}
 end
 
 function mt:eachEnum(callback)
-    for _, str in ipairs(self._enum) do
-        callback(str)
+    for _, enum in ipairs(self._enum) do
+        callback(enum[1], enum[2])
     end
 end
 

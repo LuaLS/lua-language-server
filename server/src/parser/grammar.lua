@@ -556,12 +556,14 @@ EmmyTypeName    <-  EmmyFunctionType
                 /   EmmyTableType
                 /   EmmyArrayType
                 /   MustEmmyName
-EmmyTypeEnums   <-  %s* '|' %s* String
+EmmyTypeEnum    <-  %s* (%nl %s* '---')? '|' %s* (String EmmyOption)
+                ->  EmmyTypeEnum
 
-EmmyAlias       <-  MustEmmyName %s* EmmyType EmmyTypeEnums*
+EmmyAlias       <-  MustEmmyName %s* EmmyType EmmyTypeEnum*
 
-EmmyParam       <-  MustEmmyName %s* EmmyType %s* EmmyOption %s* EmmyTypeEnums*
-EmmyOption      <-  Table / %nil
+EmmyParam       <-  MustEmmyName %s* EmmyType %s* EmmyOption %s* EmmyTypeEnum*
+EmmyOption      <-  Table?
+                ->  EmmyOption
 
 EmmyReturn      <-  EmmyType
 

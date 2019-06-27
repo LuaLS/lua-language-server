@@ -677,18 +677,18 @@ local function searchEnumAsEmmyParams(vm, source, word, callback, pos, args, fun
         return
     end
 
-    param:eachEnum(function (enum)
-        if matchKey(word, enum) then
-            local strSource = parser:ast(tostring(enum), 'String')
+    param:eachEnum(function (str)
+        if matchKey(word, str) then
+            local strSource = parser:ast(tostring(str), 'String')
             if strSource then
                 if source.type == 'string' then
                     local data = buildTextEdit(source.start, source.finish, strSource[1], source[2])
-                    callback(enum, nil, CompletionItemKind.EnumMember, data)
+                    callback(str, nil, CompletionItemKind.EnumMember, data)
                 else
-                    callback(enum, nil, CompletionItemKind.EnumMember)
+                    callback(str, nil, CompletionItemKind.EnumMember)
                 end
             else
-                callback(enum, nil, CompletionItemKind.EnumMember)
+                callback(str, nil, CompletionItemKind.EnumMember)
             end
         end
     end)

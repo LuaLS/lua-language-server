@@ -132,7 +132,11 @@ local function buildEnum(func)
                 first = false
                 strs[#strs+1] = ('\n%s:%s'):format(param:getName(), param:getType())
             end
-            strs[#strs+1] = ('\n   | %s'):format(enum)
+            if option and option.default then
+                strs[#strs+1] = ('\n   |>%s'):format(enum)
+            else
+                strs[#strs+1] = ('\n   | %s'):format(enum)
+            end
             if option and option.comment then
                 strs[#strs+1] = ' -- ' .. option.comment
             end

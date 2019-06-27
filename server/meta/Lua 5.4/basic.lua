@@ -12,7 +12,7 @@ end
 ---@overload fun()
 ---@overload fun(opt:string):any
 ---@param opt string {optional = 'after'}
----| '"collect"'        {comment = '做一次完整的垃圾收集循环。'}
+---| '"collect"'        {comment = '做一次完整的垃圾收集循环。', default = true}
 ---| '"stop"'           {comment = '停止垃圾收集器的运行。'}
 ---| '"restart"'        {comment = '重启垃圾收集器的自动运行。'}
 ---| '"count"'          {comment = '以 K 字节数为单位返回 Lua 使用的总内存数。'}

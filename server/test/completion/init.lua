@@ -1304,7 +1304,7 @@ zzz$
     {
         label = 'zzzzz',
         kind = CompletionItemKind.Function,
-        detail = '(function)(4 个原型)',
+        detail = '(function)(4 prototypes)',
         documentation = {
             kind = 'markdown',
             value = [[

@@ -6,6 +6,7 @@ local sourceMgr = require 'vm.source'
 local config = require 'config'
 local matchKey = require 'core.matchKey'
 local parser = require 'parser'
+local lang = require 'language'
 local State
 
 local CompletionItemKind = {
@@ -123,7 +124,7 @@ local function getDetail(value)
         local func = value:getFunction()
         local overLoads = func and func:getEmmyOverLoads()
         if overLoads then
-            detals[#detals+1] = ('(%d 个原型)'):format(#overLoads + 1)
+            detals[#detals+1] = lang.script('HOVER_MULTI_PROTOTYPE', #overLoads + 1)
         end
     end
     if #detals == 0 then

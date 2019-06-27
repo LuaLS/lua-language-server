@@ -69,6 +69,7 @@ HOVER_DOCUMENT_LUA52    = '[查看文档](http://www.lua.org/manual/5.2/manual.h
 HOVER_DOCUMENT_LUA53    = '[查看文档](http://cloudwu.github.io/lua53doc/manual.html#pdf-{})'
 HOVER_DOCUMENT_LUA54    = '[查看文档](http://www.lua.org/work/doc/manual.html#pdf-{})'
 HOVER_DOCUMENT_LUAJIT   = '[查看文档](http://www.lua.org/manual/5.1/manual.html#pdf-{})'
+HOVER_MULTI_PROTOTYPE   = '({} 个原型)'
 
 ACTION_DISABLE_DIAG     = '禁用诊断({})。'
 ACTION_MARK_GLOBAL      = '标记 `{}` 为已定义的全局变量。'

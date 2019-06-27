@@ -69,6 +69,7 @@ HOVER_DOCUMENT_LUA52    = '[View documents](http://www.lua.org/manual/5.2/manual
 HOVER_DOCUMENT_LUA53    = '[View documents](http://www.lua.org/manual/5.3/manual.html#pdf-{})'
 HOVER_DOCUMENT_LUA54    = '[View documents](http://www.lua.org/work/doc/manual.html#pdf-{})'
 HOVER_DOCUMENT_LUAJIT   = '[View documents](http://www.lua.org/manual/5.1/manual.html#pdf-{})'
+HOVER_MULTI_PROTOTYPE   = '({} prototypes)'
 
 ACTION_DISABLE_DIAG     = 'Disable diagnostics ({}).'
 ACTION_MARK_GLOBAL      = 'Mark `{}` as defined global.'

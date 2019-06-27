@@ -1338,3 +1338,24 @@ zz$
         }
     }
 }
+
+TEST [[
+---@param x string
+---| "'选项1'" {comment = '注释1'}
+---| "'选项2'" {comment = '注释2'}
+function f(x) end
+
+f($)
+]]
+{
+    {
+        label = "'选项1'",
+        kind = CompletionItemKind.EnumMember,
+        documentation = '注释1',
+    },
+    {
+        label = "'选项2'",
+        kind = CompletionItemKind.EnumMember,
+        documentation = '注释2',
+    },
+}

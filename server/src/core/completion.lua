@@ -663,6 +663,17 @@ local function searchEnumAsLib(vm, source, word, callback, pos, args, lib)
     end
 end
 
+local function buildEmmyEnumComment(option, data)
+    if not option or not option.comment then
+        return data
+    end
+    if not data then
+        data = {}
+    end
+    data.documentation = tostring(option.comment)
+    return data
+end
+
 local function searchEnumAsEmmyParams(vm, source, word, callback, pos, args, func)
     local select = #args + 1
     for i, arg in ipairs(args) do
@@ -677,18 +688,18 @@ local function searchEnumAsEmmyParams(vm, source, word, callback, pos, args, fun
         return
     end
 
-    param:eachEnum(function (str)
+    param:eachEnum(function (str, option)
         if matchKey(word, str) then
             local strSource = parser:ast(tostring(str), 'String')
             if strSource then
                 if source.type == 'string' then
                     local data = buildTextEdit(source.start, source.finish, strSource[1], source[2])
-                    callback(str, nil, CompletionItemKind.EnumMember, data)
+                    callback(str, nil, CompletionItemKind.EnumMember, buildEmmyEnumComment(option, data))
                 else
-                    callback(str, nil, CompletionItemKind.EnumMember)
+                    callback(str, nil, CompletionItemKind.EnumMember, buildEmmyEnumComment(option))
                 end
             else
-                callback(str, nil, CompletionItemKind.EnumMember)
+                callback(str, nil, CompletionItemKind.EnumMember, buildEmmyEnumComment(option))
             end
         end
     end)

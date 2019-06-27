@@ -259,3 +259,28 @@ TEST {
         description = 'abc',
     }
 }
+
+TEST {
+    {
+        path = 'a.lua',
+        content = '',
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            ---@param x string
+            ---| "'选项1'" {comment = '注释1'}
+            ---| "'选项2'" {comment = '注释2'}
+            function <?f?>(x) end
+        ]]
+    },
+    hover = {
+        label = 'function f(x: string)',
+        name = 'f',
+        enum = [[
+
+x:string
+   | '选项1' -- 注释1
+   | '选项2' -- 注释2]]
+    }
+}

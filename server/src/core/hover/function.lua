@@ -124,6 +124,24 @@ local function buildEnum(func)
     if not params then
         return nil
     end
+    local strs = {}
+    for _, param in ipairs(params) do
+        local first = true
+        param:eachEnum(function (enum, option)
+            if first then
+                first = false
+                strs[#strs+1] = ('\n%s:%s'):format(param:getName(), param:getType())
+            end
+            strs[#strs+1] = ('\n   | %s'):format(enum)
+            if option and option.comment then
+                strs[#strs+1] = ' -- ' .. option.comment
+            end
+        end)
+    end
+    if #strs == 0 then
+        return nil
+    end
+    return table.concat(strs)
 end
 
 local function getComment(func)

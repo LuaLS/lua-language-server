@@ -26,3 +26,19 @@ end
 ---@return any
 function collectgarbage(opt, arg)
 end
+
+--- 当前解释器版本号。
+_VERSION = 'Lua 5.4'
+
+local next = next
+
+--- 能迭代表 `t` 中的所有键值对。
+---|```lua
+---|for k, v in pairs(t) do
+---|    -- body
+---|end
+---|```
+---@param t table
+function pairs(t)
+    return next, nil
+end

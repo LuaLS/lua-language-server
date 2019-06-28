@@ -1316,7 +1316,7 @@ local Defs = {
     EmmyComment = function (...)
         return {
             type = 'emmyComment',
-            [1] = table.concat({...}, ' '),
+            [1] = table.concat({...}),
         }
     end,
     EmmyOption = function (options)

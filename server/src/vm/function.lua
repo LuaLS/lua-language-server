@@ -339,6 +339,15 @@ function mt:run(vm)
     end
 end
 
+function mt:eachEmmyReturn(callback)
+    if not self._emmyReturns then
+        return
+    end
+    for _, rtn in ipairs(self._emmyReturns) do
+        callback(rtn)
+    end
+end
+
 function mt:setArgs(values)
     for i = 1, #self.argValues do
         self.argValues[i] = nil

@@ -822,3 +822,13 @@ function <?f?>(x, y, z) end
 [=[
 function f([x: number [, y: boolean], z: string])
 ]=]
+
+TEST [[
+---@return string {name = 'key'}
+---@return string {name = 'value'}
+function <?f?>() end
+]]
+[=[
+function f()
+  -> key: string, value: string
+]=]

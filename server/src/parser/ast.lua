@@ -1245,13 +1245,14 @@ local Defs = {
         emmy.finish = emmy[#emmy].finish
         return emmy
     end,
-    EmmyReturn = function (...)
+    EmmyReturn = function (type, option)
         local emmy = {
             type = 'emmyReturn',
-            ...
+            option = option,
+            start = type.start,
+            finish = type.finish,
+            [1] = type,
         }
-        emmy.start = emmy[1].start
-        emmy.finish = emmy[#emmy].finish
         return emmy
     end,
     EmmyField = function (access, fieldName, ...)

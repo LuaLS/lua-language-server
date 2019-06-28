@@ -28,6 +28,7 @@ end
 return function (manager, source)
     local self = setmetatable({
         source = source.id,
+        option = source.option,
         _manager = manager,
     }, mt)
     return self

@@ -106,9 +106,24 @@ local function buildValueReturns(func)
         return ''
     end
     local strs = {}
+    local n = 0
+    func:eachEmmyReturn(function (emmy)
+        n = n + 1
+        local name = ''
+        if emmy.option and emmy.option.name then
+            name = emmy.option.name .. ': '
+        end
+        local rtn = func:getReturn(n)
+        if not rtn then
+            strs[#strs+1] = name .. 'any'
+            return
+        end
+        strs[#strs+1] = name .. rtn:getType()
+    end)
     if func.returns then
-        for i, rtn in ipairs(func.returns) do
-            strs[i] = rtn:getType()
+        for i = n + 1, #func.returns do
+            local rtn = func:getReturn(i)
+            strs[#strs+1] = rtn:getType()
         end
     end
     if #strs == 0 then

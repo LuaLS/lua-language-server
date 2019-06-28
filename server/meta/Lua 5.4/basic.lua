@@ -31,7 +31,15 @@ end
 --- 当前解释器版本号。
 _VERSION = 'Lua 5.4'
 
-local next = next
+--- 返回该键的下一个键及其关联的值。
+---@param t table
+---@param index any {optional = 'self'}
+---@return any {name = 'key'}
+---@return any {name = 'value'}
+local function next(t, index)
+end
+
+_G['next'] = next
 
 --- 能迭代表 `t` 中的所有键值对。
 ---|```lua

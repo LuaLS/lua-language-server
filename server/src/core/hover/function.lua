@@ -1,3 +1,5 @@
+local emmyFunction = require 'core.hover.emmy_function'
+
 local function buildValueArgs(func, object, select)
     if not func then
         return '', nil
@@ -155,11 +157,25 @@ local function getComment(func)
     return func:getComment()
 end
 
+local function getOverLoads(name, func, object, select)
+    local overloads = func and func:getEmmyOverLoads()
+    if not overloads then
+        return nil
+    end
+    local list = {}
+    for _, ol in ipairs(overloads) do
+        local hover = emmyFunction(name, ol, object, select)
+        list[#list+1] = hover.label
+    end
+    return table.concat(list, '\n')
+end
+
 return function (name, func, object, select)
     local args, argLabel = buildValueArgs(func, object, select)
     local returns = buildValueReturns(func)
     local enum = buildEnum(func)
     local comment = getComment(func)
+    local overloads = getOverLoads(name, func, object, select)
     local headLen = #('function %s('):format(name)
     local title = ('function %s(%s)%s'):format(name, args, returns)
     if argLabel then
@@ -171,5 +187,6 @@ return function (name, func, object, select)
         description = comment,
         enum = enum,
         argLabel = argLabel,
+        overloads = overloads,
     }
 end

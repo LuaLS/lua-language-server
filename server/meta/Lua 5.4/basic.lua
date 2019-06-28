@@ -27,7 +27,7 @@ function assert(v, message) end
 function collectgarbage(opt, arg) end
 
 --- 打开该名字的文件，并执行文件中的 Lua 代码块。
----@param filename string {optional = 'self'}
+---@param filename string {optional = 'self', special = 'dofile:1'}
 ---@return any
 function dofile(filename) end
 

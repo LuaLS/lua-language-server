@@ -16,6 +16,7 @@ require 'vm.raw'
 require 'vm.pcall'
 require 'vm.ipairs'
 require 'vm.emmy'
+require 'vm.special'
 
 -- TODO source测试
 --rawset(_G, 'CachedSource', setmetatable({}, { __mode = 'kv' }))
@@ -325,6 +326,7 @@ end
 
 function mt:call(value, values, source)
     local lib = value:getLib()
+    ---@type emmyFunction
     local func = value:getFunction()
     value:setType('function', 0.5)
     if not func then
@@ -342,6 +344,9 @@ function mt:call(value, values, source)
             end
         else
             func:mergeReturn(1, self:createValue('any', source))
+        end
+        if func:getEmmyParams() then
+            self:callEmmySpecial(func, values)
         end
     end
 

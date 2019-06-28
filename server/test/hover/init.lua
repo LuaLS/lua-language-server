@@ -832,3 +832,14 @@ function <?f?>() end
 function f()
   -> key: string, value: string
 ]=]
+
+TEST [[
+---@return string {name = 'x', optional = 'after'}
+---@return string {name = 'y', optional = 'self'}
+---@return string {name = 'z'}
+function <?f?>() end
+]]
+[=[
+function f()
+  -> [x: string [, y: string], z: string]
+]=]

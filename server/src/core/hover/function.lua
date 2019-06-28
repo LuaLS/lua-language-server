@@ -106,30 +106,45 @@ local function buildValueReturns(func)
         return ''
     end
     local strs = {}
+    local emmys = {}
     local n = 0
     func:eachEmmyReturn(function (emmy)
         n = n + 1
-        local name = ''
-        if emmy.option and emmy.option.name then
-            name = emmy.option.name .. ': '
-        end
-        local rtn = func:getReturn(n)
-        if not rtn then
-            strs[#strs+1] = name .. 'any'
-            return
-        end
-        strs[#strs+1] = name .. rtn:getType()
+        emmys[n] = emmy
     end)
     if func.returns then
-        for i = n + 1, #func.returns do
-            local rtn = func:getReturn(i)
+        for i, rtn in ipairs(func.returns) do
+            local emmy = emmys[i]
+            local option = emmy and emmy.option
+            if option and option.optional then
+                if i > 1 then
+                    strs[#strs+1] = ' ['
+                else
+                    strs[#strs+1] = '['
+                end
+            end
+            if i > 1 then
+                strs[#strs+1] = ', '
+            end
+            if option and option.name then
+                strs[#strs+1] = ('%s: '):format(option.name)
+            end
             strs[#strs+1] = rtn:getType()
+            if option and option.optional == 'self' then
+                strs[#strs+1] = ']'
+            end
+        end
+        for i = 1, #func.returns do
+            local emmy = emmys[i]
+            if emmy and emmy.option and emmy.option.optional == 'after' then
+                strs[#strs+1] = ']'
+            end
         end
     end
     if #strs == 0 then
         strs[1] = 'any'
     end
-    return '\n  -> ' .. table.concat(strs, ', ')
+    return '\n  -> ' .. table.concat(strs)
 end
 
 ---@param func emmyFunction

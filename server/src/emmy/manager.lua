@@ -136,7 +136,7 @@ function mt:addAlias(source, typeObj)
     local list = self:getClass(aliasName)
     list[source.id] = aliasObj
     for i = 3, #source do
-        aliasObj:addEnum(source[i][1][1], source[i].option)
+        aliasObj:addEnum(source[i])
     end
     return aliasObj
 end
@@ -149,14 +149,14 @@ function mt:addParam(source, bind)
         paramObj:bindType(bind)
         self:eachClass(bind:getName(), function (class)
             if class.type == 'emmy.alias' then
-                class:eachEnum(function (enum, option)
-                    paramObj:addEnum(enum, option)
+                class:eachEnum(function (enum)
+                    paramObj:addEnum(enum)
                 end)
             end
         end)
     end
     for i = 3, #source do
-        paramObj:addEnum(source[i][1][1], source[i].option)
+        paramObj:addEnum(source[i])
     end
     paramObj:setOption(source.option)
     return paramObj

@@ -1341,8 +1341,8 @@ zz$
 
 TEST [[
 ---@param x string
----| "'选项1'" {comment = '注释1'}
----| "'选项2'" {comment = '注释2'}
+---| "'选项1'" # 注释1
+---| "'选项2'" # 注释2
 function f(x) end
 
 f($)

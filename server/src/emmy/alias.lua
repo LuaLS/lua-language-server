@@ -21,13 +21,13 @@ function mt:bindType(type)
     end
 end
 
-function mt:addEnum(enum, option)
-    self._enum[#self._enum+1] = {enum, option}
+function mt:addEnum(enum)
+    self._enum[#self._enum+1] = enum
 end
 
 function mt:eachEnum(callback)
     for _, enum in ipairs(self._enum) do
-        callback(enum[1], enum[2])
+        callback(enum)
     end
 end
 

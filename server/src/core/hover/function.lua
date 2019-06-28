@@ -129,18 +129,18 @@ local function buildEnum(func)
     local strs = {}
     for _, param in ipairs(params) do
         local first = true
-        param:eachEnum(function (enum, option)
+        param:eachEnum(function (enum)
             if first then
                 first = false
                 strs[#strs+1] = ('\n%s: %s'):format(param:getName(), param:getType())
             end
-            if option and option.default then
-                strs[#strs+1] = ('\n   |>%s'):format(enum)
+            if enum.default then
+                strs[#strs+1] = ('\n   |>%s'):format(enum[1])
             else
-                strs[#strs+1] = ('\n   | %s'):format(enum)
+                strs[#strs+1] = ('\n   | %s'):format(enum[1])
             end
-            if option and option.comment then
-                strs[#strs+1] = ' -- ' .. option.comment
+            if enum.comment then
+                strs[#strs+1] = ' -- ' .. enum.comment
             end
         end)
     end

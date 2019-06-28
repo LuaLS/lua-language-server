@@ -269,8 +269,8 @@ TEST {
         path = 'b.lua',
         content = [[
             ---@param x string
-            ---| "'选项1'" {comment = '注释1'}
-            ---| "'选项2'" {comment = '注释2', default = true}
+            ---|   "'选项1'" # 注释1
+            ---| > "'选项2'" # 注释2
             function <?f?>(x) end
         ]]
     },
@@ -294,8 +294,8 @@ TEST {
         path = 'b.lua',
         content = [[
             ---@alias option
-            ---| "'选项1'" {comment = '注释1'}
-            ---| "'选项2'" {comment = '注释2', default = true}
+            ---|   "'选项1'" # 注释1
+            ---| > "'选项2'" # 注释2
             ---@param x option
             function <?f?>(x) end
         ]]

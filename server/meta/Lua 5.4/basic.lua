@@ -10,16 +10,16 @@ function assert(v, message)
 end
 
 ---@alias GCOption string
----| '"collect"'        {comment = '做一次完整的垃圾收集循环。', default = true}
----| '"stop"'           {comment = '停止垃圾收集器的运行。'}
----| '"restart"'        {comment = '重启垃圾收集器的自动运行。'}
----| '"count"'          {comment = '以 K 字节数为单位返回 Lua 使用的总内存数。'}
----| '"step"'           {comment = '单步运行垃圾收集器。'}
----| '"setpause"'       {comment = '设置收集器的 `间歇率`。'}
----| '"setstepmul"'     {comment = '设置收集器的 `步进倍率`。'}
----| '"incremental"'    {comment = '改变收集器模式为增量模式。'}
----| '"generational"'   {comment = '改变收集器模式为分代模式。'}
----| '"isrunning"'      {comment = '返回表示收集器是否在工作的布尔值。'}
+---| > '"collect"'        # 做一次完整的垃圾收集循环。
+---|   '"stop"'           # 停止垃圾收集器的运行。
+---|   '"restart"'        # 重启垃圾收集器的自动运行。
+---|   '"count"'          # 以 K 字节数为单位返回 Lua 使用的总内存数。
+---|   '"step"'           # 单步运行垃圾收集器。
+---|   '"setpause"'       # 设置收集器的 `间歇率`。
+---|   '"setstepmul"'     # 设置收集器的 `步进倍率`。
+---|   '"incremental"'    # 改变收集器模式为增量模式。
+---|   '"generational"'   # 改变收集器模式为分代模式。
+---|   '"isrunning"'      # 返回表示收集器是否在工作的布尔值。
 ---@overload fun()
 ---@overload fun(opt:GCOption):any
 ---@param opt GCOption {optional = 'after'}

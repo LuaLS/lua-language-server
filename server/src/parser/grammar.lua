@@ -558,8 +558,10 @@ EmmyTypeName    <-  EmmyFunctionType
                 /   EmmyTableType
                 /   EmmyArrayType
                 /   MustEmmyName
-EmmyTypeEnum    <-  %s* (%nl %s* '---')? '|' %s* (String EmmyOption)
+EmmyTypeEnum    <-  %s* (%nl %s* '---')? '|' EmmyEnum
                 ->  EmmyTypeEnum
+EmmyEnum        <-  %s* {'>'?} %s* String (EmmyEnumComment / (!%nl !'|' .)*)
+EmmyEnumComment <-  %s* '#' %s* {(!%nl .)*}
 
 EmmyAlias       <-  MustEmmyName %s* EmmyType EmmyTypeEnum*
 

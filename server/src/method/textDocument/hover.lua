@@ -22,6 +22,8 @@ return function (lsp, params)
     local text = ([[
 ```lua
 %s
+```
+```lua
 %s
 ```
 %s

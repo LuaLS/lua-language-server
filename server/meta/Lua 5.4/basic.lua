@@ -6,8 +6,7 @@ arg = {}
 ---@param v any
 ---@param message any {optional = 'self'}
 ---@return any
-function assert(v, message)
-end
+function assert(v, message) end
 
 ---@alias GCOption string
 ---| > '"collect"'        # 做一次完整的垃圾收集循环。
@@ -25,21 +24,22 @@ end
 ---@param opt GCOption {optional = 'after'}
 ---@param arg integer {optional = 'self'}
 ---@return any
-function collectgarbage(opt, arg)
-end
+function collectgarbage(opt, arg) end
 
---- 当前解释器版本号。
-_VERSION = 'Lua 5.4'
+--- 打开该名字的文件，并执行文件中的 Lua 代码块。
+---@param filename string {optional = 'self'}
+---@return any
+function dofile(filename) end
+
+--- 内部储存有全局环境。
+_G = {}
 
 --- 返回该键的下一个键及其关联的值。
 ---@param t table
 ---@param index any {optional = 'self'}
 ---@return any {name = 'key'}
 ---@return any {name = 'value'}
-local function next(t, index)
-end
-
-_G['next'] = next
+function next(t, index) end
 
 --- 能迭代表 `t` 中的所有键值对。
 ---|```lua
@@ -52,5 +52,15 @@ _G['next'] = next
 ---@return table {name = 't'}
 ---@return any   {name = 'key'}
 function pairs(t)
+    --- 返回该键的下一个键及其关联的值。
+    ---@param t table
+    ---@param index any {optional = 'self'}
+    ---@return any {name = 'key'}
+    ---@return any {name = 'value'}
+    local function next(t, index) end
+
     return next, t, nil
 end
+
+--- 当前解释器版本号。
+_VERSION = 'Lua 5.4'

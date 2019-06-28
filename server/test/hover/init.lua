@@ -824,8 +824,8 @@ function f([x: number [, y: boolean], z: string])
 ]=]
 
 TEST [[
----@return any {name = 'key'}
----@return any {name = 'value'}
+---@return string {name = 'key'}
+---@return string {name = 'value'}
 function <?f?>() end
 ]]
 [=[

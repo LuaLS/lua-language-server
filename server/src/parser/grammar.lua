@@ -569,7 +569,8 @@ EmmyParam       <-  MustEmmyName %s* EmmyType %s* EmmyOption %s* EmmyTypeEnum*
 EmmyOption      <-  Table?
                 ->  EmmyOption
 
-EmmyReturn      <-  EmmyType EmmyOption
+EmmyReturn      <-  {} %nil     {} Table -> EmmyOption
+                /   {} EmmyType {} EmmyOption
 
 EmmyField       <-  (EmmyFieldAccess MustEmmyName %s* EmmyType)
 EmmyFieldAccess <-  ({'public'}    Cut %s*)

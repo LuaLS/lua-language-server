@@ -196,7 +196,7 @@ function mt:doEmmyReturn(action)
     ---@type emmyMgr
     local emmyMgr = self.emmyMgr
     self:instantSource(action)
-    local type = self:getGenericByType(action[1]) or self:buildEmmyAnyType(action[1])
+    local type = action[1] and (self:getGenericByType(action[1]) or self:buildEmmyAnyType(action[1]))
     local rtn = emmyMgr:addReturn(action, type)
     action:set('emmy.return', rtn)
     self:addEmmyReturn(rtn)

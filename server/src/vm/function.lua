@@ -162,8 +162,11 @@ function mt:rawSetReturn(index, value)
 end
 
 function mt:setReturn(index, value)
-    if self._emmyReturns then
-        return
+    local emmy = self._emmyReturns and self._emmyReturns[index]
+    if emmy then
+        if emmy:bindType() or emmy:bindGeneric() then
+            return
+        end
     end
     return self:rawSetReturn(index, value)
 end
@@ -172,8 +175,11 @@ function mt:mergeReturn(index, value)
     if self._removed then
         return
     end
-    if self._emmyReturns then
-        return
+    local emmy = self._emmyReturns and self._emmyReturns[index]
+    if emmy then
+        if emmy:bindType() or emmy:bindGeneric() then
+            return
+        end
     end
     self:set('hasReturn', true)
     if not self.returns then

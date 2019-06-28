@@ -1245,12 +1245,12 @@ local Defs = {
         emmy.finish = emmy[#emmy].finish
         return emmy
     end,
-    EmmyReturn = function (type, option)
+    EmmyReturn = function (start, type, finish, option)
         local emmy = {
             type = 'emmyReturn',
             option = option,
-            start = type.start,
-            finish = type.finish,
+            start = start,
+            finish = finish - 1,
             [1] = type,
         }
         return emmy

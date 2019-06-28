@@ -164,10 +164,12 @@ end
 
 function mt:addReturn(source, bind)
     local returnObj = newReturn(self, source)
-    if bind.type == 'emmy.generic' then
-        returnObj:bindGeneric(bind)
-    else
-        returnObj:bindType(bind)
+    if bind then
+        if bind.type == 'emmy.generic' then
+            returnObj:bindGeneric(bind)
+        else
+            returnObj:bindType(bind)
+        end
     end
     return returnObj
 end

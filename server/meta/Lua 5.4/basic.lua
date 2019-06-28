@@ -48,6 +48,9 @@ _G['next'] = next
 ---|end
 ---|```
 ---@param t table
+---@return       {name = 'next'}
+---@return table {name = 't'}
+---@return any   {name = 'key'}
 function pairs(t)
-    return next, nil
+    return next, t, nil
 end

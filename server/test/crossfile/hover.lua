@@ -279,7 +279,33 @@ TEST {
         name = 'f',
         enum = [[
 
-x:string
+x: string
+   | '选项1' -- 注释1
+   |>'选项2' -- 注释2]]
+    }
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = '',
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            ---@alias option
+            ---| "'选项1'" {comment = '注释1'}
+            ---| "'选项2'" {comment = '注释2', default = true}
+            ---@param x option
+            function <?f?>(x) end
+        ]]
+    },
+    hover = {
+        label = 'function f(x: option)',
+        name = 'f',
+        enum = [[
+
+x: option
    | '选项1' -- 注释1
    |>'选项2' -- 注释2]]
     }

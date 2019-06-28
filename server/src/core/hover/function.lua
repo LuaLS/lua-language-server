@@ -132,7 +132,7 @@ local function buildEnum(func)
         param:eachEnum(function (enum, option)
             if first then
                 first = false
-                strs[#strs+1] = ('\n%s:%s'):format(param:getName(), param:getType())
+                strs[#strs+1] = ('\n%s: %s'):format(param:getName(), param:getType())
             end
             if option and option.default then
                 strs[#strs+1] = ('\n   |>%s'):format(enum)

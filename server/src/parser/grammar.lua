@@ -593,10 +593,15 @@ EmmyArrayType   <-  (MustEmmyName '[]')
 EmmyTableType   <-  ({} 'table' Cut '<' %s* EmmyType %s* ',' %s* EmmyType %s* '>' {})
                 ->  EmmyTableType
 
-EmmyFunctionType<-  ({} 'fun' Cut %s* EmmyFunctionArgs? %s* EmmyFunctionRtn? {})
+EmmyFunctionType<-  ({} 'fun' Cut %s* EmmyFunctionArgs %s* EmmyFunctionRtns {})
                 ->  EmmyFunctionType
-EmmyFunctionArgs<-  '(' %s* EmmyFunctionArg %s* (',' %s* EmmyFunctionArg %s*)* ')'
-EmmyFunctionRtn <-  ':' %s* EmmyType
+EmmyFunctionArgs<-  ('(' %s* EmmyFunctionArg %s* (',' %s* EmmyFunctionArg %s*)* ')')
+                ->  EmmyFunctionArgs
+                /  '(' %nil ')'?
+                /   %nil
+EmmyFunctionRtns<-  (':' %s* EmmyType (%s* ',' %s* EmmyType)*)
+                ->  EmmyFunctionRtns
+                /   %nil
 EmmyFunctionArg <-  MustEmmyName %s* ':' %s* EmmyType
 
 EmmySee         <-  {} MustEmmyName %s* '#' %s* MustEmmyName {}

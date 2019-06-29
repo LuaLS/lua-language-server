@@ -299,23 +299,29 @@ function mt:buildEmmyFunctionType(source)
     local funcObj = emmyMgr:addFunctionType(source)
     ---@type emmyFunction
     local func = functionMgr.create(source)
-    for i = 1, #source // 2 do
-        local nameSource = source[i*2-1]
-        local typeSource = source[i*2]
-        local paramType = self:buildEmmyAnyType(typeSource)
-        funcObj:addParam(nameSource[1], paramType)
-        local value = self:createValue(paramType:getType(), typeSource)
-        value:setEmmy(paramType)
-        self:instantSource(nameSource)
-        func:addArg(nameSource[1], nameSource, value)
+    local args = source.args
+    if args then
+        for i = 1, #args // 2 do
+            local nameSource = args[i*2-1]
+            local typeSource = args[i*2]
+            local paramType = self:buildEmmyAnyType(typeSource)
+            funcObj:addParam(nameSource[1], paramType)
+            local value = self:createValue(paramType:getType(), typeSource)
+            value:setEmmy(paramType)
+            self:instantSource(nameSource)
+            func:addArg(nameSource[1], nameSource, value)
+        end
     end
-    local returnSource = source[#source]
-    if returnSource then
-        local returnType = self:buildEmmyAnyType(returnSource)
-        funcObj:addReturn(returnType)
-        local value = self:createValue(returnType:getType(), returnSource)
-        value:setEmmy(returnType)
-        func:setReturn(1, value)
+    local returns = source.returns
+    if returns then
+        for i = 1, #returns do
+            local returnSource = returns[i]
+            local returnType = self:buildEmmyAnyType(returnSource)
+            funcObj:addReturn(returnType)
+            local value = self:createValue(returnType:getType(), returnSource)
+            value:setEmmy(returnType)
+            func:setReturn(i, value)
+        end
     end
     funcObj:bindFunction(func)
     return funcObj

@@ -1213,15 +1213,21 @@ local Defs = {
             [2] = valueType,
         }
     end,
-    EmmyFunctionType = function (start, ...)
+    EmmyFunctionType = function (start, args, returns, finish)
         local result = {
             start = start,
+            finish = finish - 1,
             type = 'emmyFunctionType',
-            ...
+            args = args,
+            returns = returns,
         }
-        result.finish = result[#result] - 1
-        result[#result] = nil
         return result
+    end,
+    EmmyFunctionRtns = function (...)
+        return {...}
+    end,
+    EmmyFunctionArgs = function (...)
+        return {...}
     end,
     EmmyAlias = function (name, emmyName, ...)
         return {

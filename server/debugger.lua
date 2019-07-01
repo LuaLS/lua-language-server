@@ -38,14 +38,11 @@ local cpath = "/runtime/win64/lua54/?.dll"
 local path  = "/script/?.lua"
 
 local function tryDebugger()
-    local remote = package.searchpath('remotedebug', debugPath:string() .. cpath)
-    local entry = package.searchpath('start_debug', debugPath:string() .. path)
-    local rdebug = package.loadlib(remote,'luaopen_remotedebug')()
+    local entry = assert(package.searchpath('debugger', debugPath:string() .. path))
     local root = debugPath:string()
     local port = '11411'
     local addr = "127.0.0.1:" .. port
-    local dbg = loadfile(entry)(rdebug, root, path, cpath)
-    debug.getregistry()["lua-debug"] = dbg
+    local dbg = loadfile(entry)('windows', root)
     dbg:start(addr)
     log.debug('Debugger startup, listen port:', port)
     log.debug('Debugger args:', addr, root, path, cpath)

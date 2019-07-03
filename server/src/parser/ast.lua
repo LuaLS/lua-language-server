@@ -2,6 +2,7 @@ local tonumber = tonumber
 local string_char = string.char
 local utf8_char = utf8.char
 local type = type
+local table = table
 
 local Errs
 local State
@@ -625,6 +626,15 @@ local Defs = {
         if obj.argFinish > obj.finish then
             obj.argFinish = obj.finish
         end
+
+        if name.type ~= 'name' then
+            pushError {
+                type = 'UNEXPECT_LFUNC_NAME',
+                start = name.start,
+                finish = name.finish,
+            }
+        end
+
         return obj
     end,
     Table = function (start, ...)
@@ -696,10 +706,10 @@ local Defs = {
             local last = list[#list]
             list.finish = last.finish
             return list
-        elseif first == '' then
-            return nil
-        else
+        elseif type(first) == 'table' then
             return first
+        else
+            return nil
         end
     end,
     ArgList = function (...)
@@ -1213,15 +1223,21 @@ local Defs = {
             [2] = valueType,
         }
     end,
-    EmmyFunctionType = function (start, ...)
+    EmmyFunctionType = function (start, args, returns, finish)
         local result = {
             start = start,
+            finish = finish - 1,
             type = 'emmyFunctionType',
-            ...
+            args = args,
+            returns = returns,
         }
-        result.finish = result[#result] - 1
-        result[#result] = nil
         return result
+    end,
+    EmmyFunctionRtns = function (...)
+        return {...}
+    end,
+    EmmyFunctionArgs = function (...)
+        return {...}
     end,
     EmmyAlias = function (name, emmyName, ...)
         return {
@@ -1233,9 +1249,10 @@ local Defs = {
             ...
         }
     end,
-    EmmyParam = function (argName, emmyName, ...)
+    EmmyParam = function (argName, emmyName, option, ...)
         local emmy = {
             type = 'emmyParam',
+            option = option,
             argName,
             emmyName,
             ...
@@ -1244,13 +1261,14 @@ local Defs = {
         emmy.finish = emmy[#emmy].finish
         return emmy
     end,
-    EmmyReturn = function (...)
+    EmmyReturn = function (start, type, finish, option)
         local emmy = {
             type = 'emmyReturn',
-            ...
+            option = option,
+            start = start,
+            finish = finish - 1,
+            [1] = type,
         }
-        emmy.start = emmy[1].start
-        emmy.finish = emmy[#emmy].finish
         return emmy
     end,
     EmmyField = function (access, fieldName, ...)
@@ -1315,8 +1333,32 @@ local Defs = {
     EmmyComment = function (...)
         return {
             type = 'emmyComment',
-            [1] = table.concat({...}, ' '),
+            [1] = table.concat({...}),
         }
+    end,
+    EmmyOption = function (options)
+        if not options or options == '' then
+            return nil
+        end
+        local option = {}
+        for _, pair in ipairs(options) do
+            if pair.type == 'pair' then
+                local key = pair[1]
+                local value = pair[2]
+                if key.type == 'name' then
+                    option[key[1]] = value[1]
+                end
+            end
+        end
+        return option
+    end,
+    EmmyTypeEnum = function (default, enum, comment)
+        enum.type = 'emmyEnum'
+        if default ~= '' then
+            enum.default = true
+        end
+        enum.comment = comment
+        return enum
     end,
 
     -- 捕获错误

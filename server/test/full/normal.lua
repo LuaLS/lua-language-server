@@ -146,3 +146,7 @@ TEST [[
 function scene:selectByCylinder(center, radius, height)
 end
 ]]
+
+TEST [[
+local x = ,
+]]

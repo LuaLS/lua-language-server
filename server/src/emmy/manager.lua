@@ -147,7 +147,7 @@ function mt:addParam(source, bind)
         paramObj:bindGeneric(bind)
     else
         paramObj:bindType(bind)
-        self:eachClass(bind:getName(), function (class)
+        self:eachClass(bind:getType(), function (class)
             if class.type == 'emmy.alias' then
                 class:eachEnum(function (enum)
                     paramObj:addEnum(enum)

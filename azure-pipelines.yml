@@ -2,61 +2,60 @@ trigger:
 - master
 
 jobs:
-- job: windows_msvc
+- job: windows
   pool:
-    name: Hosted VS2017
+    vmImage: 'windows-latest'
 
   steps:
   - script: |
       git submodule update --init --recursive
-    displayName: '拉取子模块'
+    displayName: 'Init'
   - script: |
       cd 3rd\luamake
       tools\ninja.exe -f ninja\msvc.ninja
       cd ..\..
-    displayName: 'PreCompile'
+    displayName: 'Compile luamake'
   - script: |
       3rd\luamake\luamake.exe rebuild
     displayName: 'Compile'
 
 - job: macos
   pool:
-    name: Hosted macOS
+    vmImage: 'macos-latest'
 
   steps:
   - bash: |
       git submodule update --init --recursive
-    displayName: '拉取子模块'
+    displayName: 'Init'
   - bash: |
       sudo xcode-select -s /Applications/Xcode_10.2.app
       brew install ninja
-    displayName: '安装ninja'
+    displayName: 'Install'
   - bash: |
       cd 3rd/luamake
       ninja -f ninja/macos.ninja
       cd ../..
-    displayName: 'PreCompile'
+    displayName: 'Compile luamake'
   - bash: |
       ./3rd/luamake/luamake rebuild
     displayName: 'Compile'
 
 - job: linux
   pool:
-    name: Hosted Ubuntu 1604
+    vmImage: 'ubuntu-latest'
 
   steps:
   - bash: |
       git submodule update --init --recursive
-    displayName: '拉取子模块'
+    displayName: 'Init'
   - bash: |
-      sudo apt-get update
       sudo apt-get install -y libreadline-dev ninja-build
-    displayName: '安装ninja'
+    displayName: 'Install'
   - bash: |
       cd 3rd/luamake
       ninja -f ninja/linux.ninja
       cd ../..
-    displayName: 'PreCompile'
+    displayName: 'Compile luamake'
   - bash: |
       ./3rd/luamake/luamake rebuild
     displayName: 'Compile'

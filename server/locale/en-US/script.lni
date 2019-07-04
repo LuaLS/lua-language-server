@@ -61,6 +61,7 @@ PARSER_UNSUPPORT_SYMBOL = '{version} does not support this grammar.'
 PARSER_UNEXPECT_DOTS    = 'Cannot use `...` outside a vararg function.'
 PARSER_UNKNOWN_TAG      = 'Unknown tag.'
 PARSER_MULTI_TAG        = 'Dose not support multi tags.'
+PARSER_UNEXPECT_LFUNC_NAME = 'Local function can only use identifiers as name.'
 
 SYMBOL_ANONYMOUS        = '<Anonymous>'
 

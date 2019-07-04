@@ -2,6 +2,7 @@ local tonumber = tonumber
 local string_char = string.char
 local utf8_char = utf8.char
 local type = type
+local table = table
 
 local Errs
 local State
@@ -625,6 +626,15 @@ local Defs = {
         if obj.argFinish > obj.finish then
             obj.argFinish = obj.finish
         end
+
+        if name.type ~= 'name' then
+            pushError {
+                type = 'UNEXPECT_LFUNC_NAME',
+                start = name.start,
+                finish = name.finish,
+            }
+        end
+
         return obj
     end,
     Table = function (start, ...)
@@ -696,10 +706,10 @@ local Defs = {
             local last = list[#list]
             list.finish = last.finish
             return list
-        elseif first == '' then
-            return nil
-        else
+        elseif type(first) == 'table' then
             return first
+        else
+            return nil
         end
     end,
     ArgList = function (...)

@@ -765,7 +765,7 @@ function t(<?f?>) end
 ]]
 [[
 function ()
-  -> any
+  -> void
 ]]
 
 TEST [[

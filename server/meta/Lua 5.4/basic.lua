@@ -72,6 +72,19 @@ function load(chunk, chunkname, mode, env)
     return function (...) end
 end
 
+--- 从文件中获取代码块。
+---@overload fun():function,string
+---@overload fun(filename:string):function,string
+---@overload fun(filename:string, mode:loadOption):function,string
+---@param filename  string      {optional = 'after', special = 'loadfile:1'}
+---@param mode      loadOption  {optional = 'after'}
+---@param env       table       {optional = 'self'}
+---@return          {name = 'init'}
+---@return string   {name = 'errMessage', optional = 'self'}
+function loadfile(filename, mode, env)
+    return function (...) end
+end
+
 --- 返回该键的下一个键及其关联的值。
 ---@overload fun(t:table):any, any
 ---@param t table
@@ -100,6 +113,25 @@ function pairs(t)
     local function next(t, index) end
 
     return next, t, nil
+end
+
+--- 传入参数，以 *保护模式* 调用函数 `f` 。
+---@param f function    {special = 'pcall:1'}
+---@param arg1 any      {optional = 'after'}
+---@return boolean      {name = 'success'}
+---@return              {name = 'result'}
+function pcall(f, arg1, ...)
+end
+
+--- 接收任意数量的参数，并将它们的值打印到 `stdout`。
+function print(...)
+end
+
+--- 在不触发任何元方法的情况下 检查 `v1` 是否和 `v2` 相等。
+---@param v1 any
+---@param v2 any
+---@return boolean
+function rawequal(v1, v2)
 end
 
 --- 当前解释器版本号。

@@ -346,7 +346,7 @@ function mt:call(value, values, source)
             func:mergeReturn(1, self:createValue('any', source))
         end
         if func:getEmmyParams() then
-            self:callEmmySpecial(func, values)
+            self:callEmmySpecial(func, values, source)
         end
     end
 

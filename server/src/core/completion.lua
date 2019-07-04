@@ -43,7 +43,7 @@ for _, k in ipairs(KEYS) do
     KEYMAP[k] = true
 end
 
-local EMMY_KEYWORD = {'class', 'type', 'alias', 'param', 'return', 'field', 'generic', 'vararg', 'language', 'see'}
+local EMMY_KEYWORD = {'class', 'type', 'alias', 'param', 'return', 'field', 'generic', 'vararg', 'language', 'see', 'overload'}
 
 local function getDucumentation(name, value)
     if value:getType() == 'function' then
@@ -663,6 +663,17 @@ local function searchEnumAsLib(vm, source, word, callback, pos, args, lib)
     end
 end
 
+local function buildEmmyEnumComment(enum, data)
+    if not enum.comment then
+        return data
+    end
+    if not data then
+        data = {}
+    end
+    data.documentation = tostring(enum.comment)
+    return data
+end
+
 local function searchEnumAsEmmyParams(vm, source, word, callback, pos, args, func)
     local select = #args + 1
     for i, arg in ipairs(args) do
@@ -678,17 +689,18 @@ local function searchEnumAsEmmyParams(vm, source, word, callback, pos, args, fun
     end
 
     param:eachEnum(function (enum)
-        if matchKey(word, enum) then
-            local strSource = parser:ast(tostring(enum), 'String')
+        local str = enum[1]
+        if matchKey(word, str) then
+            local strSource = parser:ast(tostring(str), 'String')
             if strSource then
                 if source.type == 'string' then
                     local data = buildTextEdit(source.start, source.finish, strSource[1], source[2])
-                    callback(enum, nil, CompletionItemKind.EnumMember, data)
+                    callback(str, nil, CompletionItemKind.EnumMember, buildEmmyEnumComment(enum, data))
                 else
-                    callback(enum, nil, CompletionItemKind.EnumMember)
+                    callback(str, nil, CompletionItemKind.EnumMember, buildEmmyEnumComment(enum))
                 end
             else
-                callback(enum, nil, CompletionItemKind.EnumMember)
+                callback(str, nil, CompletionItemKind.EnumMember, buildEmmyEnumComment(enum))
             end
         end
     end)

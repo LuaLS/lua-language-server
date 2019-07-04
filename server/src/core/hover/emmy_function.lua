@@ -41,11 +41,14 @@ local function buildEmmyArgs(emmy, object, select)
 end
 
 local function buildEmmyReturns(emmy)
-    local rtn = emmy:getReturn()
-    if rtn then
-        return '\n  -> ' .. rtn:getType()
-    else
+    local rtns = {}
+    emmy:eachReturn(function (rtn)
+        rtns[#rtns+1] = rtn:getType()
+    end)
+    if #rtns == 0 then
         return '\n  -> ' .. 'any'
+    else
+        return '\n  -> ' .. table.concat(rtns, ', ')
     end
 end
 

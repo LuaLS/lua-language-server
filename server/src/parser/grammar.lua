@@ -517,9 +517,11 @@ grammar 'Emmy' [[
 Emmy            <-  EmmySp '---@' EmmyBody ShortComment
                 /   EmmyComments
 EmmySp          <-  (!'---@' !'---' Comment / %s / %nl)*
-EmmyComments    <-  (EmmyComment (%nl EmmyComment)*)
+EmmyComments    <-  (EmmyComment (%nl EmmyComMulti / %nl EmmyComSingle)*)
                 ->  EmmyComment
-EmmyComment     <-  EmmySp '---' !'@' %s* {(!%nl .)*}
+EmmyComment     <-  EmmySp '---' !'@' %s*           {(!%nl .)*}
+EmmyComMulti    <-  EmmySp '---|'         {} -> en  {(!%nl .)*}
+EmmyComSingle   <-  EmmySp '---' !'@' %s* {} -> ' ' {(!%nl .)*}
 EmmyBody        <-  'class'    %s+ EmmyClass    -> EmmyClass
                 /   'type'     %s+ EmmyType     -> EmmyType
                 /   'alias'    %s+ EmmyAlias    -> EmmyAlias
@@ -556,13 +558,19 @@ EmmyTypeName    <-  EmmyFunctionType
                 /   EmmyTableType
                 /   EmmyArrayType
                 /   MustEmmyName
-EmmyTypeEnums   <-  %s* '|' %s* String
+EmmyTypeEnum    <-  %s* (%nl %s* '---')? '|' EmmyEnum
+                ->  EmmyTypeEnum
+EmmyEnum        <-  %s* {'>'?} %s* String (EmmyEnumComment / (!%nl !'|' .)*)
+EmmyEnumComment <-  %s* '#' %s* {(!%nl .)*}
 
-EmmyAlias       <-  MustEmmyName %s* EmmyType EmmyTypeEnums*
+EmmyAlias       <-  MustEmmyName %s* EmmyType EmmyTypeEnum*
 
-EmmyParam       <-  MustEmmyName %s* EmmyType EmmyTypeEnums*
+EmmyParam       <-  MustEmmyName %s* EmmyType %s* EmmyOption %s* EmmyTypeEnum*
+EmmyOption      <-  Table?
+                ->  EmmyOption
 
-EmmyReturn      <-  EmmyType
+EmmyReturn      <-  {} %nil     {} Table -> EmmyOption
+                /   {} EmmyType {} EmmyOption
 
 EmmyField       <-  (EmmyFieldAccess MustEmmyName %s* EmmyType)
 EmmyFieldAccess <-  ({'public'}    Cut %s*)
@@ -585,10 +593,15 @@ EmmyArrayType   <-  (MustEmmyName '[]')
 EmmyTableType   <-  ({} 'table' Cut '<' %s* EmmyType %s* ',' %s* EmmyType %s* '>' {})
                 ->  EmmyTableType
 
-EmmyFunctionType<-  ({} 'fun' Cut %s* EmmyFunctionArgs? %s* EmmyFunctionRtn? {})
+EmmyFunctionType<-  ({} 'fun' Cut %s* EmmyFunctionArgs %s* EmmyFunctionRtns {})
                 ->  EmmyFunctionType
-EmmyFunctionArgs<-  '(' %s* EmmyFunctionArg %s* (',' %s* EmmyFunctionArg %s*)* ')'
-EmmyFunctionRtn <-  ':' %s* EmmyType
+EmmyFunctionArgs<-  ('(' %s* EmmyFunctionArg %s* (',' %s* EmmyFunctionArg %s*)* ')')
+                ->  EmmyFunctionArgs
+                /  '(' %nil ')'?
+                /   %nil
+EmmyFunctionRtns<-  (':' %s* EmmyType (%s* ',' %s* EmmyType)*)
+                ->  EmmyFunctionRtns
+                /   %nil
 EmmyFunctionArg <-  MustEmmyName %s* ':' %s* EmmyType
 
 EmmySee         <-  {} MustEmmyName %s* '#' %s* MustEmmyName {}

@@ -1,9 +1,12 @@
+local emmyFunction = require 'core.hover.emmy_function'
+
 local function buildValueArgs(func, object, select)
     if not func then
         return '', nil
     end
     local names = {}
     local values = {}
+    local options = {}
     if func.argValues then
         for i, value in ipairs(func.argValues) do
             values[i] = value:getType()
@@ -15,6 +18,7 @@ local function buildValueArgs(func, object, select)
             local param = func:findEmmyParamByName(arg:getName())
             if param then
                 values[i] = param:getType()
+                options[i] = param:getOption()
             end
         end
     end
@@ -30,11 +34,20 @@ local function buildValueArgs(func, object, select)
         max = math.max(#names, #values)
     end
     for i = start, max do
+        local name = names[i]
+        local value = values[i] or 'any'
+        local option = options[i]
+        if option and option.optional then
+            if i > start then
+                strs[#strs+1] = ' ['
+            else
+                strs[#strs+1] = '['
+            end
+        end
         if i > start then
             strs[#strs+1] = ', '
         end
-        local name = names[i]
-        local value = values[i] or 'any'
+
         if i == select then
             strs[#strs+1] = '@ARG'
         end
@@ -46,6 +59,10 @@ local function buildValueArgs(func, object, select)
         if i == select then
             strs[#strs+1] = '@ARG'
         end
+
+        if option and option.optional == 'self' then
+            strs[#strs+1] = ']'
+        end
     end
     if func:hasDots() then
         if max > 0 then
@@ -53,6 +70,15 @@ local function buildValueArgs(func, object, select)
         end
         strs[#strs+1] = '...'
     end
+
+    if options then
+        for _, option in pairs(options) do
+            if option.optional == 'after' then
+                strs[#strs+1] = ']'
+            end
+        end
+    end
+
     local text = table.concat(strs)
     local argLabel = {}
     for i = 1, 2 do
@@ -80,15 +106,78 @@ local function buildValueReturns(func)
         return ''
     end
     local strs = {}
+    local emmys = {}
+    local n = 0
+    func:eachEmmyReturn(function (emmy)
+        n = n + 1
+        emmys[n] = emmy
+    end)
     if func.returns then
         for i, rtn in ipairs(func.returns) do
-            strs[i] = rtn:getType()
+            local emmy = emmys[i]
+            local option = emmy and emmy.option
+            if option and option.optional then
+                if i > 1 then
+                    strs[#strs+1] = ' ['
+                else
+                    strs[#strs+1] = '['
+                end
+            end
+            if i > 1 then
+                strs[#strs+1] = ', '
+            end
+            if option and option.name then
+                strs[#strs+1] = ('%s: '):format(option.name)
+            end
+            strs[#strs+1] = rtn:getType()
+            if option and option.optional == 'self' then
+                strs[#strs+1] = ']'
+            end
+        end
+        for i = 1, #func.returns do
+            local emmy = emmys[i]
+            if emmy and emmy.option and emmy.option.optional == 'after' then
+                strs[#strs+1] = ']'
+            end
         end
     end
     if #strs == 0 then
         strs[1] = 'any'
     end
-    return '\n  -> ' .. table.concat(strs, ', ')
+    return '\n  -> ' .. table.concat(strs)
+end
+
+---@param func emmyFunction
+local function buildEnum(func)
+    if not func then
+        return nil
+    end
+    local params = func:getEmmyParams()
+    if not params then
+        return nil
+    end
+    local strs = {}
+    for _, param in ipairs(params) do
+        local first = true
+        param:eachEnum(function (enum)
+            if first then
+                first = false
+                strs[#strs+1] = ('\n%s: %s'):format(param:getName(), param:getType())
+            end
+            if enum.default then
+                strs[#strs+1] = ('\n   |>%s'):format(enum[1])
+            else
+                strs[#strs+1] = ('\n   | %s'):format(enum[1])
+            end
+            if enum.comment then
+                strs[#strs+1] = ' -- ' .. enum.comment
+            end
+        end)
+    end
+    if #strs == 0 then
+        return nil
+    end
+    return table.concat(strs)
 end
 
 local function getComment(func)
@@ -98,10 +187,25 @@ local function getComment(func)
     return func:getComment()
 end
 
+local function getOverLoads(name, func, object, select)
+    local overloads = func and func:getEmmyOverLoads()
+    if not overloads then
+        return nil
+    end
+    local list = {}
+    for _, ol in ipairs(overloads) do
+        local hover = emmyFunction(name, ol, object, select)
+        list[#list+1] = hover.label
+    end
+    return table.concat(list, '\n')
+end
+
 return function (name, func, object, select)
     local args, argLabel = buildValueArgs(func, object, select)
     local returns = buildValueReturns(func)
+    local enum = buildEnum(func)
     local comment = getComment(func)
+    local overloads = getOverLoads(name, func, object, select)
     local headLen = #('function %s('):format(name)
     local title = ('function %s(%s)%s'):format(name, args, returns)
     if argLabel then
@@ -110,7 +214,9 @@ return function (name, func, object, select)
     end
     return {
         label = title,
-        argLabel = argLabel,
         description = comment,
+        enum = enum,
+        argLabel = argLabel,
+        overloads = overloads,
     }
 end

@@ -30,7 +30,7 @@ function mt:addParam(name, type)
 end
 
 function mt:addReturn(type)
-    self._return = type
+    self._returns[#self._returns+1] = type
 end
 
 function mt:eachParam(callback)
@@ -39,8 +39,10 @@ function mt:eachParam(callback)
     end
 end
 
-function mt:getReturn()
-    return self._return
+function mt:eachReturn(callback)
+    for _, rtn in ipairs(self._returns) do
+        callback(rtn)
+    end
 end
 
 function mt:bindFunction(func)
@@ -55,6 +57,7 @@ return function (manager, source)
     local self = setmetatable({
         source = source.id,
         _params = {},
+        _returns = {},
         _manager = manager,
     }, mt)
     return self

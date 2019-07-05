@@ -261,12 +261,15 @@ function mt:searchAmbiguity1(callback)
         if source.op ~= 'or' then
             return
         end
-        local exp = source[2]
-        if exp.op ~= '+' and exp.op ~= '-' then
-            return
-        end
-        if exp[1][1] == 0 and exp[2].type == 'number' then
-            callback(source.start, source.finish, exp.op, exp[2][1])
+        -- (a or 0) + c --> a or (0 + c)
+        -- a + (b or 0) --> (a + b) or 0
+        for x = 1, 2 do
+            local y = x % 2 + 1
+            local exp = source[x]
+            local other = source[y]
+            if exp.op and not other.op then
+                callback(source.start, source.finish, exp.start, exp.finish)
+            end
         end
     end)
 end
@@ -755,9 +758,9 @@ return function (vm, lines, uri)
         }
     end)
     -- x or 0 + 1
-    session:doDiagnostics(session.searchAmbiguity1, 'ambiguity-1', function (op, num)
+    session:doDiagnostics(session.searchAmbiguity1, 'ambiguity-1', function (start, finish)
         return {
-            message = lang.script('DIAG_AMBIGUITY_1', op, num),
+            message = lang.script('DIAG_AMBIGUITY_1', lines.buf:sub(start, finish)),
         }
     end)
     -- 不允许定义首字母小写的全局变量（很可能是拼错或者漏删）

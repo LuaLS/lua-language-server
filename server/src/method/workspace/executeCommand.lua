@@ -133,22 +133,38 @@ function command.solve(lsp, data)
     local start = lines:position(data.range.start.line + 1, data.range.start.character + 1)
     local finish = lines:position(data.range['end'].line + 1, data.range['end'].character)
 
-    local source = vm:eachSource(function (source)
+    local result = vm:eachSource(function (source)
+        if not isContainPos(source, start, finish) then
+            return
+        end
         if source.op ~= 'or' then
             return
         end
-        local exp = source[2]
-        if exp.op ~= '+' and exp.op ~= '-' then
-            return
-        end
-        if exp[1][1] == 0 and exp[2].type == 'number' then
-            if source.start == start and source.finish == finish then
-                return source
+        for x = 1, 2 do
+            local y = x % 2 + 1
+            local exp = source[x]
+            local other = source[y]
+            if exp.op and not other.op then
+                if x == 1 then
+                    -- (a + b) or c --> a + (b or c)
+                    return {
+                        start = source[1][2].start,
+                        finish = source[2].finish,
+                    }
+                else
+                    -- a or (b + c) --> (a or b) + c
+                    return {
+                        start = source[1].start,
+                        finish = source[2][1].finish,
+                    }
+                end
             end
         end
     end)
 
-    if not source then
+    log.debug(table.dump(result))
+
+    if not result then
         return
     end
 
@@ -158,11 +174,11 @@ function command.solve(lsp, data)
             changes = {
                 [uri] = {
                     {
-                        range = posToRange(lines, source.start, source.start - 1),
+                        range = posToRange(lines, result.start, result.start - 1),
                         newText = '(',
                     },
                     {
-                        range = posToRange(lines, source[2][1].finish + 1, source[2][1].finish),
+                        range = posToRange(lines, result.finish + 1, result.finish),
                         newText = ')',
                     },
                 }

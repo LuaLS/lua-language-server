@@ -266,13 +266,31 @@ local function solveDiagnostic(lsp, uri, data, callback)
     disableDiagnostic(lsp, uri, data, callback)
 end
 
-return function (lsp, uri, diagnostics)
+local function rangeContain(a, b)
+    if a.start.line > b.start.line then
+        return false
+    end
+    if a.start.character > b.start.character then
+        return false
+    end
+    if a['end'].line < b['end'].line then
+        return false
+    end
+    if a['end'].character < b['end'].character then
+        return false
+    end
+    return true
+end
+
+return function (lsp, uri, diagnostics, range)
     local results = {}
 
     for _, data in ipairs(diagnostics) do
-        solveDiagnostic(lsp, uri, data, function (result)
-            results[#results+1] = result
-        end)
+        if rangeContain(data.range, range) then
+            solveDiagnostic(lsp, uri, data, function (result)
+                results[#results+1] = result
+            end)
+        end
     end
 
     return results

@@ -256,6 +256,21 @@ function mt:searchRedundantParameters(callback)
     end)
 end
 
+local opMap = {
+    ['+']  = true,
+    ['-']  = true,
+    ['*']  = true,
+    ['/']  = true,
+    ['//'] = true,
+    ['^']  = true,
+    ['<<'] = true,
+    ['>>'] = true,
+    ['&']  = true,
+    ['|']  = true,
+    ['~']  = true,
+    ['..'] = true,
+}
+
 function mt:searchAmbiguity1(callback)
     self.vm:eachSource(function (source)
         if source.op ~= 'or' then
@@ -267,7 +282,7 @@ function mt:searchAmbiguity1(callback)
             local y = x % 2 + 1
             local exp = source[x]
             local other = source[y]
-            if exp.op and not other.op then
+            if opMap[exp.op] and not opMap[other.op] then
                 callback(source.start, source.finish, exp.start, exp.finish)
             end
         end

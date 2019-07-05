@@ -123,6 +123,21 @@ function command.removeSpace(lsp, data)
     })
 end
 
+local opMap = {
+    ['+']  = true,
+    ['-']  = true,
+    ['*']  = true,
+    ['/']  = true,
+    ['//'] = true,
+    ['^']  = true,
+    ['<<'] = true,
+    ['>>'] = true,
+    ['&']  = true,
+    ['|']  = true,
+    ['~']  = true,
+    ['..'] = true,
+}
+
 function command.solve(lsp, data)
     local uri = data.uri
     local vm, lines = lsp:getVM(uri)
@@ -144,7 +159,7 @@ function command.solve(lsp, data)
             local y = x % 2 + 1
             local exp = source[x]
             local other = source[y]
-            if exp.op and not other.op then
+            if opMap[exp.op] and not opMap[other.op] then
                 if x == 1 then
                     -- (a + b) or c --> a + (b or c)
                     return {

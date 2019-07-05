@@ -448,3 +448,8 @@ local <const> x = 1
 <!x!> = 2
 return x
 ]]
+
+TEST [[
+local x
+x = <!x or 0 + 1!>
+]]

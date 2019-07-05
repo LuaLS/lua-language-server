@@ -177,8 +177,6 @@ function command.solve(lsp, data)
         end
     end)
 
-    log.debug(table.dump(result))
-
     if not result then
         return
     end

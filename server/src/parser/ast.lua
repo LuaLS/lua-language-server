@@ -651,13 +651,14 @@ local Defs = {
         for i = 1, max-1 do
             local arg = args[i]
             local isField = type(arg) == 'table'
+            local isEmmy = isField and arg.type:sub(1, 4) == 'emmy'
             if wantField and not isField then
                 pushError {
                     type = 'MISS_EXP',
                     start = start,
                     finish = arg - 1,
                 }
-            elseif not wantField and isField then
+            elseif not wantField and isField and not isEmmy then
                 pushError {
                     type = 'MISS_SYMBOL',
                     start = start,
@@ -669,7 +670,7 @@ local Defs = {
             end
             if isField then
                 table[#table+1] = arg
-                if arg.type:sub(1, 4) ~= 'emmy' then
+                if not isEmmy then
                     wantField = false
                     start = arg.finish + 1
                 end

@@ -134,5 +134,12 @@ end
 function rawequal(v1, v2)
 end
 
+--- 加载一个模块，返回该模块的返回值（`nil`时为`true`）。
+---@param modname string {special = 'require:1'}
+---@return any
+---@return {name = 'loaderdata'}
+function require(modname)
+end
+
 --- 当前解释器版本号。
 _VERSION = 'Lua 5.4'

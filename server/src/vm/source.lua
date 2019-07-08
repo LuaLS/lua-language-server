@@ -1,5 +1,6 @@
 local listMgr = require 'vm.list'
 
+---@class source
 local mt = {}
 mt.__index = mt
 mt.type = 'source'

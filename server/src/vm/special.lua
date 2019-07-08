@@ -1,5 +1,7 @@
 local mt = require 'vm.manager'
 local multi = require 'vm.multi'
+local library = require 'core.library'
+local libraryBuilder = require 'vm.library'
 
 ---@param func emmyFunction
 ---@param values table
@@ -24,6 +26,8 @@ function mt:checkEmmyParam(func, values, index, special, source)
         self:callEmmyLoadFile(func, values, index)
     elseif special == 'pcall:1' then
         self:callEmmyPCall(func, values, index, source)
+    elseif special == 'require:1' then
+        self:callEmmyRequire(func, values, index, source)
     end
 end
 
@@ -68,6 +72,7 @@ end
 ---@param func emmyFunction
 ---@param values table
 ---@param index integer
+---@param source source
 function mt:callEmmyPCall(func, values, index, source)
     local funcValue = values[index]
     if not funcValue then
@@ -89,5 +94,32 @@ function mt:callEmmyPCall(func, values, index, source)
         realFunc:getReturn():eachValue(function (i, v)
             func:setReturn(i + 1, v)
         end)
+    end
+end
+
+---@param func emmyFunction
+---@param values table
+---@param index integer
+function mt:callEmmyRequire(func, values, index)
+    if not values[index] then
+        values[index] = self:createValue('any', self:getDefaultSource())
+    end
+    local str = values[index]:getLiteral()
+    if type(str) ~= 'string' then
+        return
+    end
+    local lib = library.library[str]
+    if lib then
+        local value = libraryBuilder.value(lib)
+        value:markGlobal()
+        func:setReturn(1, value)
+        return
+    else
+        local requireValue = self:tryRequireOne(values[1], 'require')
+        if not requireValue then
+            requireValue = self:createValue('any', self:getDefaultSource())
+            requireValue:set('cross file', true)
+        end
+        func:setReturn(1, requireValue)
     end
 end

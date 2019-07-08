@@ -599,10 +599,7 @@ local function buildTextEdit(start, finish, str, quo)
     }
 end
 
-local function searchInRequire(vm, select, source, callback)
-    if select ~= 1 then
-        return
-    end
+local function searchInRequire(vm, source, callback)
     if not vm.lsp or not vm.lsp.workspace then
         return
     end
@@ -659,7 +656,9 @@ local function searchEnumAsLib(vm, source, word, callback, pos, args, lib)
 
     -- 搜索特殊函数
     if lib.special == 'require' then
-        searchInRequire(vm, select, source, callback)
+        if select == 1 then
+            searchInRequire(vm, source, callback)
+        end
     end
 end
 
@@ -704,6 +703,11 @@ local function searchEnumAsEmmyParams(vm, source, word, callback, pos, args, fun
             end
         end
     end)
+
+    local option = param:getOption()
+    if option and option.special == 'require:1' then
+        searchInRequire(vm, source, callback)
+    end
 end
 
 local function getSelect(args, pos)

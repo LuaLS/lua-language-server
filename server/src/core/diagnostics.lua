@@ -271,19 +271,36 @@ local opMap = {
     ['..'] = true,
 }
 
+local literalMap = {
+    ['number']  = true,
+    ['boolean'] = true,
+    ['string']  = true,
+    ['table']   = true,
+}
+
 function mt:searchAmbiguity1(callback)
     self.vm:eachSource(function (source)
         if source.op ~= 'or' then
             return
         end
-        -- (a or 0) + c --> a or (0 + c)
+        local first  = source[1]
+        local second = source[2]
         -- a + (b or 0) --> (a + b) or 0
-        for x = 1, 2 do
-            local y = x % 2 + 1
-            local exp = source[x]
-            local other = source[y]
-            if opMap[exp.op] and not opMap[other.op] then
-                callback(source.start, source.finish, exp.start, exp.finish)
+        do
+            if opMap[first.op]
+                and not second.op
+                and literalMap[second.type]
+            then
+                callback(source.start, source.finish, first.start, first.finish)
+            end
+        end
+        -- (a or 0) + c --> a or (0 + c)
+        do
+            if opMap[second.op]
+                and not first.op
+                and literalMap[second[1].type]
+            then
+                callback(source.start, source.finish, second.start, second.finish)
             end
         end
     end)

@@ -458,3 +458,8 @@ TEST [[
 local x, y
 x = <!x + y or 0!>
 ]]
+
+TEST [[
+local x, y, z
+x = x and y or '' .. z
+]]

@@ -138,6 +138,13 @@ local opMap = {
     ['..'] = true,
 }
 
+local literalMap = {
+    ['number']  = true,
+    ['boolean'] = true,
+    ['string']  = true,
+    ['table']   = true,
+}
+
 function command.solve(lsp, data)
     local uri = data.uri
     local vm, lines = lsp:getVM(uri)
@@ -155,24 +162,30 @@ function command.solve(lsp, data)
         if source.op ~= 'or' then
             return
         end
-        for x = 1, 2 do
-            local y = x % 2 + 1
-            local exp = source[x]
-            local other = source[y]
-            if opMap[exp.op] and not opMap[other.op] then
-                if x == 1 then
-                    -- (a + b) or c --> a + (b or c)
-                    return {
-                        start = source[1][2].start,
-                        finish = source[2].finish,
-                    }
-                else
-                    -- a or (b + c) --> (a or b) + c
-                    return {
-                        start = source[1].start,
-                        finish = source[2][1].finish,
-                    }
-                end
+        local first  = source[1]
+        local second = source[2]
+        -- (a + b) or 0 --> a + (b or 0)
+        do
+            if opMap[first.op]
+                and not second.op
+                and literalMap[second.type]
+            then
+                return {
+                    start = source[1][2].start,
+                    finish = source[2].finish,
+                }
+            end
+        end
+        -- a or (b + c) --> (a or b) + c
+        do
+            if opMap[second.op]
+                and not first.op
+                and literalMap[second[1].type]
+            then
+                return {
+                    start = source[1].start,
+                    finish = source[2][1].finish,
+                }
             end
         end
     end)

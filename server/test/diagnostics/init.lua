@@ -463,3 +463,8 @@ TEST [[
 local x, y, z
 x = x and y or '' .. z
 ]]
+
+TEST [[
+local x
+x = x or -1
+]]

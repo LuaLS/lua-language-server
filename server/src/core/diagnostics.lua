@@ -288,6 +288,7 @@ function mt:searchAmbiguity1(callback)
         -- a + (b or 0) --> (a + b) or 0
         do
             if opMap[first.op]
+                and first.type ~= 'unary'
                 and not second.op
                 and literalMap[second.type]
             then
@@ -297,6 +298,7 @@ function mt:searchAmbiguity1(callback)
         -- (a or 0) + c --> a or (0 + c)
         do
             if opMap[second.op]
+                and second.type ~= 'unary'
                 and not first.op
                 and literalMap[second[1].type]
             then

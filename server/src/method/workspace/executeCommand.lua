@@ -167,6 +167,7 @@ function command.solve(lsp, data)
         -- (a + b) or 0 --> a + (b or 0)
         do
             if opMap[first.op]
+                and first.type ~= 'unary'
                 and not second.op
                 and literalMap[second.type]
             then
@@ -179,6 +180,7 @@ function command.solve(lsp, data)
         -- a or (b + c) --> (a or b) + c
         do
             if opMap[second.op]
+                and second.type ~= 'unary'
                 and not first.op
                 and literalMap[second[1].type]
             then

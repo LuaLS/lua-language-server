@@ -259,7 +259,10 @@ function mt:buildEmmyArrayType(action)
     ---@type emmyMgr
     local emmyMgr = self.emmyMgr
     self:instantSource(action)
-    action:set('emmy class', action[1])
+    for _, obj in ipairs(action) do
+        self:instantSource(obj)
+        action:set('emmy class', obj[1])
+    end
     local type = emmyMgr:addArrayType(action)
     return type
 end

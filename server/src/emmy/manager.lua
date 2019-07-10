@@ -110,13 +110,9 @@ function mt:addType(source)
 end
 
 function mt:addArrayType(source)
-    local typeObj = newArrayType(self, source)
-    local typeUnit = newTypeUnit(self, source)
-    local list = self:getClass(source[1])
-    typeUnit:setParent(typeObj)
-    list[source.id] = typeUnit
-    source:set('emmy.typeUnit', typeUnit)
-    return typeObj
+    local typeObj = self:addType(source)
+    local arrayTypeObj = newArrayType(self, source, typeObj)
+    return arrayTypeObj
 end
 
 function mt:addTableType(source, keyType, valueType)

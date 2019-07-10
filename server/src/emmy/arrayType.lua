@@ -19,17 +19,18 @@ end
 
 function mt:setValue(value)
     self.value = value
-    self:getSource():get('emmy.typeUnit'):setValue(value)
+    self._child:setValue(value)
 end
 
 function mt:getValue()
     return self.value
 end
 
-return function (manager, source)
+return function (manager, source, child)
     local self = setmetatable({
-        name = source[1],
+        name = child:getName(),
         source = source.id,
+        _child = child,
         _manager = manager,
     }, mt)
     return self

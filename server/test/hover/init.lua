@@ -664,6 +664,16 @@ local x: {
 ]]
 
 TEST [[
+---@type (string|boolean)[]
+local <?x?>
+]]
+[[
+local x: {
+    [*integer]: string|boolean,
+}
+]]
+
+TEST [[
 ---@type string[]
 local t
 local <?x?> = t[1]

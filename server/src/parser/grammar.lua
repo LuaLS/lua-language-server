@@ -68,6 +68,7 @@ defs.Reserved = function (_, _, str)
     end
     return false
 end
+defs.None = function () end
 defs.np = m.Cp() / function (n) return n+1 end
 
 m.setmaxstack(1000)
@@ -587,7 +588,9 @@ EmmyVararg      <-  EmmyType
 
 EmmyLanguage    <-  MustEmmyName
 
-EmmyArrayType   <-  (MustEmmyName '[]')
+EmmyArrayType   <-  ({}    MustEmmyName -> EmmyCommonType {}      '[' DirtyBR)
+                ->  EmmyArrayType
+                /   ({} PL EmmyCommonType                 DirtyPR '[' DirtyBR)
                 ->  EmmyArrayType
 
 EmmyTableType   <-  ({} 'table' Cut '<' %s* EmmyType %s* ',' %s* EmmyType %s* '>' {})
@@ -595,9 +598,9 @@ EmmyTableType   <-  ({} 'table' Cut '<' %s* EmmyType %s* ',' %s* EmmyType %s* '>
 
 EmmyFunctionType<-  ({} 'fun' Cut %s* EmmyFunctionArgs %s* EmmyFunctionRtns {})
                 ->  EmmyFunctionType
-EmmyFunctionArgs<-  ('(' %s* EmmyFunctionArg %s* (',' %s* EmmyFunctionArg %s*)* ')')
+EmmyFunctionArgs<-  ('(' %s* EmmyFunctionArg %s* (',' %s* EmmyFunctionArg %s*)* DirtyPR)
                 ->  EmmyFunctionArgs
-                /  '(' %nil ')'?
+                /  '(' %nil DirtyPR -> None
                 /   %nil
 EmmyFunctionRtns<-  (':' %s* EmmyType (%s* ',' %s* EmmyType)*)
                 ->  EmmyFunctionRtns

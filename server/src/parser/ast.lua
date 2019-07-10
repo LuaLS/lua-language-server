@@ -1211,9 +1211,11 @@ local Defs = {
         result.finish = result[#result].finish
         return result
     end,
-    EmmyArrayType = function (typeName)
-        typeName.type = 'emmyArrayType'
-        return typeName
+    EmmyArrayType = function (start, emmy, _, finish)
+        emmy.type = 'emmyArrayType'
+        emmy.start = start
+        emmy.finish = finish - 1
+        return emmy
     end,
     EmmyTableType = function (start, keyType, valueType, finish)
         return {
@@ -1238,7 +1240,9 @@ local Defs = {
         return {...}
     end,
     EmmyFunctionArgs = function (...)
-        return {...}
+        local args = {...}
+        args[#args] = nil
+        return args
     end,
     EmmyAlias = function (name, emmyName, ...)
         return {

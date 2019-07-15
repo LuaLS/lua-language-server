@@ -184,7 +184,22 @@ local function getComment(func)
     if not func then
         return nil
     end
-    return func:getComment()
+    local comments = {}
+    local params = func:getEmmyParams()
+    if params then
+        for _, param in ipairs(params) do
+            local option = param:getOption()
+            if option and option.comment then
+                comments[#comments+1] = ('+ `%s`*(%s)*: %s'):format(param:getName(), param:getType(), option.comment)
+            end
+        end
+    end
+    comments[#comments+1] = '\n'
+    comments[#comments+1] = func:getComment()
+    if #comments == 0 then
+        return nil
+    end
+    return table.concat(comments, '\n')
 end
 
 local function getOverLoads(name, func, object, select)

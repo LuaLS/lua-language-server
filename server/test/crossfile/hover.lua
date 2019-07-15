@@ -310,3 +310,22 @@ x: option
    |>'选项2' -- 注释2]]
     }
 }
+
+TEST {
+    {
+        path = 'a.lua',
+        content = '',
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            ---@param x string {comment = 'aaaa'}
+            ---@param y string {comment = 'bbbb'}
+            local function <?f?>(x, y) end
+        ]]
+    },
+    hover = {
+        label = 'function f(x: string, y: string)',
+        name = 'f',
+    }
+}

@@ -327,5 +327,9 @@ TEST {
     hover = {
         label = 'function f(x: string, y: string)',
         name = 'f',
+        description = [[
++ `x`*(string)*: aaaa
+
++ `y`*(string)*: bbbb]]
     }
 }

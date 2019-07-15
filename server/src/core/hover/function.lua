@@ -194,12 +194,11 @@ local function getComment(func)
             end
         end
     end
-    comments[#comments+1] = '\n'
     comments[#comments+1] = func:getComment()
     if #comments == 0 then
         return nil
     end
-    return table.concat(comments, '\n')
+    return table.concat(comments, '\n\n')
 end
 
 local function getOverLoads(name, func, object, select)

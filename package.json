@@ -22,6 +22,12 @@
                     "scope": "resource",
                     "type": "array"
                 },
+                "Lua.diagnostics.enable": {
+                    "default": true,
+                    "markdownDescription": "%config.diagnostics.enable%",
+                    "scope": "resource",
+                    "type": "boolean"
+                },
                 "Lua.diagnostics.globals": {
                     "items": "string",
                     "markdownDescription": "%config.diagnostics.globals%",

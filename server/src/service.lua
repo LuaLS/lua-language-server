@@ -536,6 +536,10 @@ end
 
 ---@param uri uri
 function mt:doDiagnostics(uri)
+    if not config.config.diagnostics.enable then
+        self._needDiagnostics[uri] = nil
+        return
+    end
     if not self._needDiagnostics[uri] then
         return
     end

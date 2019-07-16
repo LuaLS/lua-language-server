@@ -100,6 +100,7 @@ local ConfigTemplate = {
                             },        Array(String)},
     },
     diagnostics = {
+        enable          = {true, Boolean},
         globals         = {{},   Str2Hash ';'},
         disable         = {{},   Str2Hash ';'},
         severity        = {

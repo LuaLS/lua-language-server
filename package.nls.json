@@ -1,5 +1,6 @@
 {
     "config.diagnostics.disable": "Disabled diagnostic (Use code in hover brackets).\n```json\n\"Lua.diagnostics.disable\" : [\n    \"unused-local\",\n    \"lowercase-global\"\n]\n```\n",
+    "config.diagnostics.enable": "Enable diagnostics.",
     "config.diagnostics.globals": "Defined global variables.\n```json\n\"Lua.diagnostics.globals\" : [\n    \"GLOBAL1\",\n    \"GLOBAL2\"\n]\n```\n",
     "config.diagnostics.severity": "Modified diagnostic severity.\n```json\n\"Lua.diagnostics.severity\" : {\n    \"redefined-local\" : \"Warning\",\n    \"emmy-lua\" : \"Hint\"\n}\n```\n",
     "config.runtime.path": "`package.path`",

@@ -62,6 +62,12 @@ local package = {
                         "?/?.lua"
                     }
                 },
+                ["Lua.diagnostics.enable"] = {
+                    scope = 'resource',
+                    type = 'boolean',
+                    default = true,
+                    markdownDescription = "%config.diagnostics.enable%"
+                },
                 ["Lua.diagnostics.disable"] = {
                     scope = "resource",
                     type = "array",
@@ -203,6 +209,7 @@ local example = {
 io.save(ROOT:parent_path() / 'package.nls.json', json.encode {
     ["config.runtime.version"]            = "Lua runtime version.",
     ["config.runtime.path"]               = "`package.path`",
+    ["config.diagnostics.enable"]         = "Enable diagnostics.",
     ["config.diagnostics.disable"]        = "Disabled diagnostic (Use code in hover brackets).\n" .. example.disable,
     ["config.diagnostics.globals"]        = "Defined global variables.\n" .. example.globals,
     ["config.diagnostics.severity"]       = "Modified diagnostic severity.\n" .. example.severity,
@@ -222,6 +229,7 @@ The following example shows loaded files in `C:/lua` and `../lib` ,exclude `../l
 io.save(ROOT:parent_path() / 'package.nls.zh-cn.json', json.encode {
     ["config.runtime.version"]            = "Lua运行版本。",
     ["config.runtime.path"]               = "`package.path`",
+    ["config.diagnostics.enable"]         = "启用诊断。",
     ["config.diagnostics.disable"]        = "禁用的诊断（使用浮框括号内的代码）。\n" .. example.disable,
     ["config.diagnostics.globals"]        = "已定义的全局变量。\n" .. example.globals,
     ["config.diagnostics.severity"]       = "修改诊断等级。\n" .. example.severity,

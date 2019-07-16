@@ -728,11 +728,12 @@ function mt:restartDueToMemoryLeak()
 end
 
 function mt:reScanFiles()
+    if not self.workspace then
+        return
+    end
     log.debug('reScanFiles')
     self:clearAllFiles()
-    if self.workspace then
-        self.workspace:scanFiles()
-    end
+    self.workspace:scanFiles()
 end
 
 function mt:onUpdateConfig(updated, other)

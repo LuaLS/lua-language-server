@@ -216,6 +216,36 @@ local function solveSyntaxByAddDoEnd(uri, data, callback)
     }
 end
 
+local function solveSyntaxByFix(uri, err, lines, callback)
+    local changes = {}
+    for _, e in ipairs(err.fix) do
+        local start_row,  start_col  = lines:rowcol(e.start)
+        local finish_row, finish_col = lines:rowcol(e.finish)
+        changes[#changes+1] = {
+            range = {
+                start = {
+                    line = start_row - 1,
+                    character = start_col - 1,
+                },
+                ['end'] = {
+                    line = finish_row - 1,
+                    character = finish_col,
+                },
+            },
+            newText = e.text,
+        }
+    end
+    callback {
+        title = lang.script[err.fix.title],
+        kind  = 'quickfix',
+        edit = {
+            changes = {
+                [uri] = changes,
+            }
+        }
+    }
+end
+
 ---@param lsp LSP
 ---@param uri uri
 ---@param data table
@@ -238,6 +268,9 @@ local function solveSyntax(lsp, uri, data, callback)
     end
     if err.type == 'ACTION_AFTER_BREAK' or err.type == 'ACTION_AFTER_RETURN' then
         solveSyntaxByAddDoEnd(uri, data, callback)
+    end
+    if err.fix then
+        solveSyntaxByFix(uri, err, lines, callback)
     end
 end
 

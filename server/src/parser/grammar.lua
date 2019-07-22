@@ -388,6 +388,8 @@ CrtAction   <-  Semicolon
             /   ExpInAction
 UnkAction   <-  ({} {Word+})
             ->  UnknownAction
+            /   ({} '//' {} (LongComment / ShortComment))
+            ->  CCommentPrefix
             /   ({} {. (!Sps !CrtAction .)*})
             ->  UnknownAction
 ExpInAction <-  Sp ({} Exp {})

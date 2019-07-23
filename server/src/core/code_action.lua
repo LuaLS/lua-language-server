@@ -279,17 +279,30 @@ local function findEndPosition(lines, row, endrow)
     end
 end
 
-local function solveSyntaxByAddEnd(uri, start, lines, callback)
+local function isIfPart(id, lines, i)
+    if id ~= 'if' then
+        return false
+    end
+    local buf = lines:line(i)
+    local first = buf:match '^[%s\t]*([%w]+)'
+    if first == 'else' or first == 'elseif' then
+        return true
+    end
+    return false
+end
+
+local function solveSyntaxByAddEnd(uri, start, finish, lines, callback)
     local row = lines:rowcol(start)
     local line = lines[row]
     if not line then
         return nil
     end
+    local id = lines.buf:sub(start, finish)
     local sp = line.sp + line.tab * 4
     for i = row + 1, #lines do
         local nl = lines[i]
         local lsp = nl.sp + nl.tab * 4
-        if lsp <= sp then
+        if lsp <= sp and not isIfPart(id, lines, i) then
             callback {
                 title = lang.script['ACTION_ADD_END'],
                 kind  = 'quickfix',
@@ -331,10 +344,10 @@ local function solveSyntax(lsp, uri, data, callback)
         solveSyntaxByAddDoEnd(uri, data, callback)
     end
     if err.type == 'MISS_END' then
-        solveSyntaxByAddEnd(uri, err.start, lines, callback)
+        solveSyntaxByAddEnd(uri, err.start, err.finish, lines, callback)
     end
     if err.type == 'MISS_SYMBOL' and err.info.symbol == 'end' then
-        solveSyntaxByAddEnd(uri, err.info.related[1], lines, callback)
+        solveSyntaxByAddEnd(uri, err.info.related[1], err.info.related[2], lines, callback)
     end
     if err.fix then
         solveSyntaxByFix(uri, err, lines, callback)

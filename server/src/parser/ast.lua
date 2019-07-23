@@ -18,6 +18,7 @@ local function pushError(err)
     end
     err.level = err.level or 'error'
     Errs[#Errs+1] = err
+    return err
 end
 
 -- goto 单独处理
@@ -162,6 +163,24 @@ local function unary(list, start, finish, level)
         end
     end
     return expSplit(list, start, finish, level+1)
+end
+
+local function checkMissEnd(start)
+    if not State.MissEndErr then
+        return
+    end
+    local err = State.MissEndErr
+    State.MissEndErr = nil
+    local _, finish = State.Lua:find('[%w_]+', start)
+    if not finish then
+        return
+    end
+    err.info.related = { start, finish }
+    pushError {
+        type   = 'MISS_END',
+        start  = start,
+        finish = finish,
+    }
 end
 
 Exp = {
@@ -682,6 +701,7 @@ local Defs = {
         if obj.argFinish > obj.finish then
             obj.argFinish = obj.finish
         end
+        checkMissEnd(start)
         return obj
     end,
     NamedFunction = function (start, name, argStart, arg, argFinish, ...)
@@ -700,6 +720,7 @@ local Defs = {
         if obj.argFinish > obj.finish then
             obj.argFinish = obj.finish
         end
+        checkMissEnd(start)
         return obj
     end,
     LocalFunction = function (start, name, argStart, arg, argFinish, ...)
@@ -727,6 +748,7 @@ local Defs = {
             }
         end
 
+        checkMissEnd(start)
         return obj
     end,
     Table = function (start, ...)
@@ -995,6 +1017,7 @@ local Defs = {
     Do = function (start, action, finish)
         action.start  = start
         action.finish = finish - 1
+        checkMissEnd(start)
         return action
     end,
     Break = function (finish, ...)
@@ -1180,6 +1203,7 @@ local Defs = {
         local max = #obj
         obj.finish = obj[max] - 1
         obj[max]   = nil
+        checkMissEnd(start)
         return obj
     end,
     Loop = function (start, arg, min, max, step, ...)
@@ -1195,6 +1219,7 @@ local Defs = {
         local max = #obj
         obj.finish = obj[max] - 1
         obj[max]   = nil
+        checkMissEnd(start)
         return obj
     end,
     In = function (start, arg, exp, ...)
@@ -1208,6 +1233,7 @@ local Defs = {
         local max = #obj
         obj.finish = obj[max] - 1
         obj[max]   = nil
+        checkMissEnd(start)
         return obj
     end,
     While = function (start, filter, ...)
@@ -1220,6 +1246,7 @@ local Defs = {
         local max = #obj
         obj.finish = obj[max] - 1
         obj[max]   = nil
+        checkMissEnd(start)
         return obj
     end,
     Repeat = function (start, ...)
@@ -1667,7 +1694,7 @@ local Defs = {
         }
     end,
     MissEnd = function (pos)
-        pushError {
+        State.MissEndErr = pushError {
             type = 'MISS_SYMBOL',
             start = pos,
             finish = pos,
@@ -1856,6 +1883,7 @@ return function (self, lua, mode, version)
         Label = {{}},
         Dots = {true},
         Version = version,
+        Lua = lua,
     }
     local suc, res, err = xpcall(self.grammar, debug.traceback, self, lua, mode, Defs)
     if not suc then

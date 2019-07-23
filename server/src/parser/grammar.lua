@@ -215,7 +215,8 @@ DOTS        <-  Sp ({} '...') -> DOTS
 DOT         <-  Sp ({} '.' !'.') -> DOT
 COLON       <-  Sp ({} ':' !':') -> COLON
 LABEL       <-  Sp '::'
-ASSIGN      <-  Sp ({} '==' {}) -> ErrAssign
+ASSIGN      <-  Sp '=' !'='
+AssignOrEQ  <-  Sp ({} '==' {}) -> ErrAssign
             /   Sp '='
 
 Nothing     <-  {} -> Nothing
@@ -457,7 +458,7 @@ LoopBody    <-  FOR LoopStart LoopFinish LoopStep NeedDo
                     (Emmy / !END Action)*
                     BreakEnd
                 NeedEnd
-LoopStart   <-  MustName ASSIGN DirtyExp
+LoopStart   <-  MustName AssignOrEQ DirtyExp
 LoopFinish  <-  NeedComma DirtyExp
 LoopStep    <-  COMMA DirtyExp
             /   NeedComma Exp
@@ -492,9 +493,9 @@ RepeatBody  <-  REPEAT
 LocalTag    <-  (Sp '<' Sp MustName Sp LocalTagEnd)*
             ->  LocalTag
 LocalTagEnd <-  '>' / {} -> MissGT
-Local       <-  (LOCAL LocalTag NameList (ASSIGN ExpList)?)
+Local       <-  (LOCAL LocalTag NameList (AssignOrEQ ExpList)?)
             ->  Local
-Set         <-  (SimpleList ASSIGN ExpList?)
+Set         <-  (SimpleList AssignOrEQ ExpList?)
             ->  Set
 
 Call        <-  Simple

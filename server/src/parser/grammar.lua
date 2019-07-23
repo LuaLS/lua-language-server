@@ -404,7 +404,7 @@ Semicolon   <-  SEMICOLON
 SimpleList  <-  (Simple (COMMA Simple)*)
             ->  List
 
-Do          <-  Sp ({} 'do' DoBody NeedEnd {})
+Do          <-  Sp ({} 'do' Cut DoBody NeedEnd {})
             ->  Do
 DoBody      <-  (Emmy / !END Action)*
             ->  DoBody

@@ -252,17 +252,65 @@ local Defs = {
             [1]    = false,
         }
     end,
-    LongComment = function (beforeEq, afterEq, missPos)
+    LongComment = function (beforeEq, afterEq, str, missPos)
         if missPos then
+            local endSymbol = ']' .. ('='):rep(afterEq-beforeEq) .. ']'
+            local s, _, w = str:find('(%][%=]*%])[%c%s]*$')
+            if s then
+                pushError {
+                    type   = 'ERR_LCOMMENT_END',
+                    start  = missPos - #str + s - 1,
+                    finish = missPos - #str + s + #w - 2,
+                    info   = {
+                        symbol = endSymbol,
+                    },
+                    fix    = {
+                        title = 'FIX_LCOMMENT_END',
+                        {
+                            start  = missPos - #str + s - 1,
+                            finish = missPos - #str + s + #w - 2,
+                            text   = endSymbol,
+                        }
+                    },
+                }
+            end
             pushError {
                 type   = 'MISS_SYMBOL',
                 start  = missPos,
                 finish = missPos,
                 info   = {
-                    symbol = ']' .. ('='):rep(afterEq-beforeEq) .. ']'
-                }
+                    symbol = endSymbol,
+                },
+                fix    = {
+                    title = 'ADD_LCOMMENT_END',
+                    {
+                        start  = missPos,
+                        finish = missPos,
+                        text   = endSymbol,
+                    }
+                },
             }
         end
+    end,
+    CLongComment = function (start1, finish1, start2, finish2)
+        pushError {
+            type   = 'ERR_C_LONG_COMMENT',
+            start  = start1,
+            finish = finish2 - 1,
+            fix    = {
+                title = 'FIX_C_LONG_COMMENT',
+                {
+                    start  = start1,
+                    finish = finish1 - 1,
+                    text   = '--[[',
+                },
+                {
+                    start  = start2,
+                    finish = finish2 - 1,
+                    text   =  '--]]'
+                },
+            }
+        }
     end,
     CCommentPrefix = function (start, finish)
         pushError {
@@ -273,7 +321,7 @@ local Defs = {
                 title = 'FIX_COMMENT_PREFIX',
                 {
                     start  = start,
-                    finish = finish,
+                    finish = finish - 1,
                     text   = '--',
                 },
             }
@@ -291,13 +339,41 @@ local Defs = {
     end,
     LongString = function (beforeEq, afterEq, str, missPos)
         if missPos then
+            local endSymbol = ']' .. ('='):rep(afterEq-beforeEq) .. ']'
+            local s, _, w = str:find('(%][%=]*%])[%c%s]*$')
+            if s then
+                pushError {
+                    type   = 'ERR_LSTRING_END',
+                    start  = missPos - #str + s - 1,
+                    finish = missPos - #str + s + #w - 2,
+                    info   = {
+                        symbol = endSymbol,
+                    },
+                    fix    = {
+                        title = 'FIX_LSTRING_END',
+                        {
+                            start  = missPos - #str + s - 1,
+                            finish = missPos - #str + s + #w - 2,
+                            text   = endSymbol,
+                        }
+                    },
+                }
+            end
             pushError {
                 type   = 'MISS_SYMBOL',
                 start  = missPos,
                 finish = missPos,
                 info   = {
-                    symbol = ']' .. ('='):rep(afterEq-beforeEq) .. ']'
-                }
+                    symbol = endSymbol,
+                },
+                fix    = {
+                    title = 'ADD_LSTRING_END',
+                    {
+                        start  = missPos,
+                        finish = missPos,
+                        text   = endSymbol,
+                    }
+                },
             }
         end
         return '[' .. ('='):rep(afterEq-beforeEq) .. '[', str
@@ -1693,7 +1769,84 @@ local Defs = {
                 symbol = '>'
             }
         }
-    end
+    end,
+    ErrAssign = function (start, finish)
+        pushError {
+            type = 'ERR_ASSIGN_AS_EQ',
+            start = start,
+            finish = finish - 1,
+            fix = {
+                title = 'FIX_ASSIGN_AS_EQ',
+                {
+                    start   = start,
+                    finish  = finish - 1,
+                    text    = '=',
+                }
+            }
+        }
+    end,
+    ErrEQ = function (start, finish)
+        pushError {
+            type   = 'ERR_EQ_AS_ASSIGN',
+            start  = start,
+            finish = finish - 1,
+            fix = {
+                title = 'FIX_EQ_AS_ASSIGN',
+                {
+                    start  = start,
+                    finish = finish - 1,
+                    text   = '==',
+                }
+            }
+        }
+        return '=='
+    end,
+    ErrUEQ = function (start, finish)
+        pushError {
+            type   = 'ERR_UEQ',
+            start  = start,
+            finish = finish - 1,
+            fix = {
+                title = 'FIX_UEQ',
+                {
+                    start  = start,
+                    finish = finish - 1,
+                    text   = '~=',
+                }
+            }
+        }
+        return '=='
+    end,
+    ErrThen = function (start, finish)
+        pushError {
+            type = 'ERR_THEN_AS_DO',
+            start = start,
+            finish = finish - 1,
+            fix = {
+                title = 'FIX_THEN_AS_DO',
+                {
+                    start   = start,
+                    finish  = finish - 1,
+                    text    = 'then',
+                }
+            }
+        }
+    end,
+    ErrDo = function (start, finish)
+        pushError {
+            type = 'ERR_DO_AS_THEN',
+            start = start,
+            finish = finish - 1,
+            fix = {
+                title = 'ERR_DO_AS_THEN',
+                {
+                    start   = start,
+                    finish  = finish - 1,
+                    text    = 'do',
+                }
+            }
+        }
+    end,
 }
 
 return function (self, lua, mode, version)

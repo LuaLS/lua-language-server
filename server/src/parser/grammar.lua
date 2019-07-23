@@ -92,11 +92,17 @@ local function errorpos(pos, err)
 end
 
 grammar 'Comment' [[
-Comment         <-  '--' (LongComment / ShortComment)
-LongComment     <-  ('[' {} {:eq: '='* :} {} '[' 
-                    (!CommentClose .)*
+Comment         <-  LongComment / '--' ShortComment
+LongComment     <-  ('--[' {} {:eq: '='* :} {} '[' 
+                    {(!CommentClose .)*}
                     (CommentClose / {}))
                 ->  LongComment
+                /   (
+                    {} '/*' {}
+                    (!'*/' .)*
+                    {} '*/' {}
+                    )
+                ->  CLongComment
 CommentClose    <-  ']' =eq ']'
 ShortComment    <-  (!%nl .)*
 ]]
@@ -115,6 +121,7 @@ Rest        <-  (!%nl .)*
 AND         <-  Sp {'and'}    Cut
 BREAK       <-  Sp 'break'    Cut
 DO          <-  Sp 'do'       Cut
+            /   Sp ({} 'then' Cut {}) -> ErrDo
 ELSE        <-  Sp 'else'     Cut
 ELSEIF      <-  Sp 'elseif'   Cut
 END         <-  Sp 'end'      Cut
@@ -131,6 +138,7 @@ OR          <-  Sp {'or'}     Cut
 REPEAT      <-  Sp 'repeat'   Cut
 RETURN      <-  Sp 'return'   Cut
 THEN        <-  Sp 'then'     Cut
+            /   Sp ({} 'do' Cut {}) -> ErrThen
 TRUE        <-  Sp 'true'     Cut
 UNTIL       <-  Sp 'until'    Cut
 WHILE       <-  Sp 'while'    Cut
@@ -158,13 +166,6 @@ EChar       <-  'a' -> ea
             /   'u{' Word* !'}' {}      -> MissTR
             /   {}                      -> ErrEsc
 
-Comp        <-  Sp {CompList}
-CompList    <-  '<='
-            /   '>='
-            /   '<'
-            /   '>'
-            /   '~='
-            /   '=='
 BOR         <-  Sp {'|'}
 BXOR        <-  Sp {'~'} !'='
 BAND        <-  Sp {'&'}
@@ -190,6 +191,8 @@ POWER       <-  Sp {'^'}
 BinaryOp    <-  Sp {} {'or'} Cut
             /   Sp {} {'and'} Cut
             /   Sp {} {'<=' / '>=' / '<'!'<' / '>'!'>' / '~=' / '=='}
+            /   Sp {} ({} '=' {}) -> ErrEQ
+            /   Sp {} ({} '!=' {}) -> ErrUEQ
             /   Sp {} {'|'}
             /   Sp {} {'~'}
             /   Sp {} {'&'}
@@ -212,7 +215,8 @@ DOTS        <-  Sp ({} '...') -> DOTS
 DOT         <-  Sp ({} '.' !'.') -> DOT
 COLON       <-  Sp ({} ':' !':') -> COLON
 LABEL       <-  Sp '::'
-ASSIGN      <-  Sp '='
+ASSIGN      <-  Sp ({} '==' {}) -> ErrAssign
+            /   Sp '='
 
 Nothing     <-  {} -> Nothing
 
@@ -400,7 +404,7 @@ Semicolon   <-  SEMICOLON
 SimpleList  <-  (Simple (COMMA Simple)*)
             ->  List
 
-Do          <-  Sp ({} DO DoBody NeedEnd {})
+Do          <-  Sp ({} 'do' DoBody NeedEnd {})
             ->  Do
 DoBody      <-  (Emmy / !END Action)*
             ->  DoBody

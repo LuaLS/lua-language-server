@@ -236,7 +236,7 @@ local function solveSyntaxByFix(uri, err, lines, callback)
         }
     end
     callback {
-        title = lang.script[err.fix.title],
+        title = lang.script['ACTION_' .. err.fix.title],
         kind  = 'quickfix',
         edit = {
             changes = {

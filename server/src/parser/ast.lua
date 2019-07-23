@@ -1865,7 +1865,7 @@ local Defs = {
             start = start,
             finish = finish - 1,
             fix = {
-                title = 'ERR_DO_AS_THEN',
+                title = 'FIX_DO_AS_THEN',
                 {
                     start   = start,
                     finish  = finish - 1,

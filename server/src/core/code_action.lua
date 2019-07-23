@@ -246,7 +246,7 @@ local function solveSyntaxByFix(uri, err, lines, callback)
     }
 end
 
-local function findEndPosition(err, lines, row, endrow)
+local function findEndPosition(lines, row, endrow)
     if endrow == row then
         return {
             newText = ' end',
@@ -279,8 +279,8 @@ local function findEndPosition(err, lines, row, endrow)
     end
 end
 
-local function solveSyntaxByAddEnd(uri, err, lines, callback)
-    local row = lines:rowcol(err.start)
+local function solveSyntaxByAddEnd(uri, start, lines, callback)
+    local row = lines:rowcol(start)
     local line = lines[row]
     if not line then
         return nil
@@ -296,7 +296,7 @@ local function solveSyntaxByAddEnd(uri, err, lines, callback)
                 edit  = {
                     changes = {
                         [uri] = {
-                            findEndPosition(err, lines, row, i - 1)
+                            findEndPosition(lines, row, i - 1)
                         }
                     }
                 }
@@ -331,7 +331,10 @@ local function solveSyntax(lsp, uri, data, callback)
         solveSyntaxByAddDoEnd(uri, data, callback)
     end
     if err.type == 'MISS_END' then
-        solveSyntaxByAddEnd(uri, err, lines, callback)
+        solveSyntaxByAddEnd(uri, err.start, lines, callback)
+    end
+    if err.type == 'MISS_SYMBOL' and err.info.symbol == 'end' then
+        solveSyntaxByAddEnd(uri, err.info.related[1], lines, callback)
     end
     if err.fix then
         solveSyntaxByFix(uri, err, lines, callback)

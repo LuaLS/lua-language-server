@@ -99,7 +99,7 @@ ACTION_FIX_EQ_AS_ASSIGN = 'Modify to `==` .'
 ACTION_FIX_UEQ          = 'Modify to `~=` .'
 ACTION_FIX_THEN_AS_DO   = 'Modify to `then` .'
 ACTION_FIX_DO_AS_THEN   = 'Modify to `do` .'
-ACTION_ADD_DO_END       = 'Add `end` (infer the addition location ny indentations).'
+ACTION_ADD_END          = 'Add `end` (infer the addition location ny indentations).'
 
 COMMAND_DISABLE_DIAG    = 'Disable diagnostics'
 COMMAND_MARK_GLOBAL     = 'Mark defined global'

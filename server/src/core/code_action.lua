@@ -246,6 +246,67 @@ local function solveSyntaxByFix(uri, err, lines, callback)
     }
 end
 
+local function findEndPosition(err, lines, row, endrow)
+    if endrow == row then
+        return {
+            newText = ' end',
+            range = {
+                start = {
+                    line = row - 1,
+                    character = 999999,
+                },
+                ['end'] = {
+                    line = row - 1,
+                    character = 999999,
+                }
+            }
+        }
+    else
+        local l = lines[row]
+        return {
+            newText = ('\t'):rep(l.tab) .. (' '):rep(l.sp) .. 'end\n',
+            range = {
+                start = {
+                    line = endrow,
+                    character = 0,
+                },
+                ['end'] = {
+                    line = endrow,
+                    character = 0,
+                }
+            }
+        }
+    end
+end
+
+local function solveSyntaxByAddEnd(uri, err, lines, callback)
+    local row = lines:rowcol(err.start)
+    local line = lines[row]
+    if not line then
+        return nil
+    end
+    local sp = line.sp + line.tab * 4
+    for i = row + 1, #lines do
+        local nl = lines[i]
+        local lsp = nl.sp + nl.tab * 4
+        if lsp <= sp then
+            callback {
+                title = lang.script['ACTION_ADD_END'],
+                kind  = 'quickfix',
+                edit  = {
+                    changes = {
+                        [uri] = {
+                            findEndPosition(err, lines, row, i - 1)
+                        }
+                    }
+                }
+            }
+            return
+        end
+    end
+    return nil
+end
+
 ---@param lsp LSP
 ---@param uri uri
 ---@param data table
@@ -268,6 +329,9 @@ local function solveSyntax(lsp, uri, data, callback)
     end
     if err.type == 'ACTION_AFTER_BREAK' or err.type == 'ACTION_AFTER_RETURN' then
         solveSyntaxByAddDoEnd(uri, data, callback)
+    end
+    if err.type == 'MISS_END' then
+        solveSyntaxByAddEnd(uri, err, lines, callback)
     end
     if err.fix then
         solveSyntaxByFix(uri, err, lines, callback)
@@ -325,6 +389,8 @@ return function (lsp, uri, diagnostics, range)
             end)
         end
     end
+
+    log.debug(table.dump(results))
 
     return results
 end

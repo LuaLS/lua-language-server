@@ -27,7 +27,7 @@ function mt:checkEmmyParam(func, values, index, special, source)
     elseif special == 'pcall:1' then
         self:callEmmyPCall(func, values, index, source)
     elseif special == 'require:1' then
-        self:callEmmyRequire(func, values, index, source)
+        self:callEmmyRequire(func, values, index)
     end
 end
 

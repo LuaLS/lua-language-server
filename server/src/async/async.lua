@@ -8,7 +8,7 @@ local GCInfo = {}
 
 thread.newchannel 'gc'
 
-local function createTask()
+local function createTask(name)
     TaskId = TaskId + 1
     GCInfo[TaskId] = false
     local id = TaskId
@@ -52,7 +52,7 @@ while true do
     gc:push(ID, collectgarbage 'count')
 end
 ]]):format(id, package.cpath, package.path, requestName, responseName)
-    log.debug('Create thread, id: ', id)
+    log.debug('Create thread, id: ', id, 'task: ', name)
     return {
         id       = id,
         thread   = thread.thread(buf),
@@ -68,7 +68,7 @@ local function run(name, arg, callback)
     end
     local task = table.remove(IdlePool)
     if not task then
-        task = createTask()
+        task = createTask(name)
     end
     RunningList[task.id] = {
         task     = task,

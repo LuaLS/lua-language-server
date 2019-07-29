@@ -346,7 +346,7 @@ ArgList     <-  (DOTS -> DotsAsArg / Name / Sp {} COMMA)*
             ->  ArgList
 
 Table       <-  Sp ({} TL TableFields? DirtyTR)
-            ->  Table
+            =>  RTTable
 TableFields <-  (Emmy / TableSep {} / TableField)+
 TableSep    <-  COMMA / SEMICOLON
 TableField  <-  NewIndex / NewField / Exp

@@ -751,7 +751,7 @@ local Defs = {
         checkMissEnd(start)
         return obj
     end,
-    Table = function (start, ...)
+    RTTable = function (_, _, start, ...)
         local args = {...}
         local max = #args
         local finish = args[max] - 1
@@ -790,7 +790,7 @@ local Defs = {
                 start = arg
             end
         end
-        return table
+        return true, table
     end,
     NewField = function (key, value)
         return {

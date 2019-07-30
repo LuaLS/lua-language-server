@@ -996,10 +996,14 @@ local Defs = {
         end
         return tags
     end,
-    Local = function (tags, keys, values)
+    LocalName = function (tags, name)
+        name.tags = tags
+        return name
+    end,
+    Local = function (keys, values)
         return {
             type = 'local',
-            keys, values, tags
+            keys, values,
         }
     end,
     DoBody = function (...)

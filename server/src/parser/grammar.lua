@@ -493,10 +493,15 @@ RepeatBody  <-  REPEAT
 LocalTag    <-  (Sp '<' Sp MustName Sp LocalTagEnd)*
             ->  LocalTag
 LocalTagEnd <-  '>' / {} -> MissGT
-Local       <-  (LOCAL LocalTag NameList (AssignOrEQ ExpList)?)
+Local       <-  (LOCAL LocalNameList (AssignOrEQ ExpList)?)
             ->  Local
 Set         <-  (SimpleList AssignOrEQ ExpList?)
             ->  Set
+LocalNameList
+            <-  (LocalName (COMMA LocalName)*)
+            ->  List
+LocalName   <-  (LocalTag MustName)
+            ->  LocalName
 
 Call        <-  Simple
             ->  SimpleCall

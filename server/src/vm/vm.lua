@@ -861,7 +861,6 @@ function mt:doLocal(action)
     self:instantSource(action)
     local vars = action[1]
     local exps = action[2]
-    local tags = action[3]
     local values
     if exps then
         local value = self:getExp(exps)
@@ -884,7 +883,7 @@ function mt:doLocal(action)
         if values then
             value = values[i]
         end
-        self:createLocal(key[1], key, value, tags, emmy, comment)
+        self:createLocal(key[1], key, value, emmy, comment)
     end)
 end
 
@@ -1196,7 +1195,7 @@ function mt:bindLabel(source, label, action)
     end
 end
 
-function mt:createLocal(key, source, value, tags, emmy, comment)
+function mt:createLocal(key, source, value, emmy, comment)
     local loc = self:bindLocal(source)
     if not value then
         value = self:createValue('nil', source)
@@ -1208,7 +1207,7 @@ function mt:createLocal(key, source, value, tags, emmy, comment)
         return loc
     end
 
-    loc = localMgr.create(key, source, value, tags)
+    loc = localMgr.create(key, source, value, source.tags)
     loc:setEmmy(emmy)
     loc:setComment(comment)
     self:saveLocal(key, loc)

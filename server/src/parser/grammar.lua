@@ -500,7 +500,7 @@ Set         <-  (SimpleList AssignOrEQ ExpList?)
 LocalNameList
             <-  (LocalName (COMMA LocalName)*)
             ->  List
-LocalName   <-  (LocalTag MustName)
+LocalName   <-  (MustName LocalTag)
             ->  LocalName
 
 Call        <-  Simple

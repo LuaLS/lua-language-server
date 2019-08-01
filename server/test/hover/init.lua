@@ -817,10 +817,10 @@ local x: any
 ]]
 
 TEST [[
-local <toclose> <const> <?x?> = 1
+local <?x?> <close> <const> = 1
 ]]
 [[
-local <toclose> <const> x: number = 1
+local x <close> <const>: number = 1
 ]]
 
 TEST [[

@@ -974,7 +974,7 @@ local Defs = {
                         version = State.Version,
                     }
                 }
-            elseif tag[1] ~= 'const' and tag[1] ~= 'toclose' then
+            elseif tag[1] ~= 'const' and tag[1] ~= 'close' then
                 pushError {
                     type = 'UNKNOWN_TAG',
                     start = tag.start,
@@ -996,7 +996,7 @@ local Defs = {
         end
         return tags
     end,
-    LocalName = function (tags, name)
+    LocalName = function (name, tags)
         name.tags = tags
         return name
     end,

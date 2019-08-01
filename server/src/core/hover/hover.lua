@@ -208,13 +208,15 @@ local function getValueHover(source, name, value, lib)
         local loc = source:bindLocal()
         if loc.tags then
             local mark = {}
+            local tagBufs = {}
             for _, tag in ipairs(loc.tags) do
                 local tagName = tag[1]
                 if not mark[tagName] then
                     mark[tagName] = true
-                    tp = ('%s <%s>'):format(tp, tagName)
+                    tagBufs[#tagBufs+1] = ('<%s>'):format(tagName)
                 end
             end
+            name = name .. ' ' .. table.concat(tagBufs, ' ')
         end
         tips[#tips+1] = loc:getComment()
     elseif source:get 'global' then

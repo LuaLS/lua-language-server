@@ -444,7 +444,7 @@ TEST [[
 ]]
 
 TEST [[
-local <const> x = 1
+local x <const> = 1
 <!x!> = 2
 return x
 ]]

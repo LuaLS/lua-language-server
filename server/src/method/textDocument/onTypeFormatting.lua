@@ -1,7 +1,7 @@
 return function (lsp, params)
     local uri = params.textDocument.uri
     local vm, lines = lsp:loadVM(uri)
-    log.debug(table.dump(params))
+    --log.debug(table.dump(params))
     if not vm then
         return nil
     end

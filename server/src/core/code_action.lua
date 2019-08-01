@@ -406,7 +406,5 @@ return function (lsp, uri, diagnostics, range)
         end
     end
 
-    log.debug(table.dump(results))
-
     return results
 end

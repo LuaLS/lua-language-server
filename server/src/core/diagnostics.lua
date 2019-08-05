@@ -14,6 +14,9 @@ function mt:searchUnusedLocals(callback)
         if not loc then
             return
         end
+        if loc:get 'emmy arg' then
+            return
+        end
         local name = loc:getName()
         if name == '_' or name == '_ENV' or name == '' then
             return

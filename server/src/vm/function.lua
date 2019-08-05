@@ -391,6 +391,7 @@ function mt:addArg(name, source, value, close)
     loc:close(close)
     self:saveUpvalue(name, loc)
     self.args[#self.args+1] = loc
+    return loc
 end
 
 function mt:createArg(vm, arg, close)

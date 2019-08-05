@@ -312,7 +312,8 @@ function mt:buildEmmyFunctionType(source)
             local value = self:createValue(paramType:getType(), typeSource)
             value:setEmmy(paramType)
             self:instantSource(nameSource)
-            func:addArg(nameSource[1], nameSource, value)
+            local arg = func:addArg(nameSource[1], nameSource, value)
+            arg:set('emmy arg', true)
         end
     end
     local returns = source.returns

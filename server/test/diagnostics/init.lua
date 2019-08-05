@@ -444,6 +444,12 @@ TEST [[
 ]]
 
 TEST [[
+---@type fun(a: integer)
+local f
+f()
+]]
+
+TEST [[
 local x <const> = 1
 <!x!> = 2
 return x

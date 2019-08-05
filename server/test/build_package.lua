@@ -132,9 +132,6 @@ local package = {
             }
         }
     },
-    scripts = {
-        ["vscode:prepublish"] = "cd client && npm run update-vscode && cd .."
-    },
 	__metadata = {
 		id = "3a15b5a7-be12-47e3-8445-88ee3eabc8b2",
 		publisherDisplayName = "sumneko",

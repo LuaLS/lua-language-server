@@ -136,6 +136,7 @@ removeFiles(out)(true)
 print('开始复制文件...')
 local count = copyFiles(EXTENSION , out) {
     ['client'] = {
+        ['node_modules']      = true,
         ['out']               = true,
         ['package-lock.json'] = true,
         ['package.json']      = true,
@@ -161,10 +162,6 @@ local count = copyFiles(EXTENSION , out) {
     ['package.nls.zh-cn.json'] = true,
 }
 print(('复制了[%d]个文件'):format(count))
-
-
-print('更新NodeModules...')
-updateNodeModules(out, 'cd client && npm install && cd ..')
 
 print('开始测试...')
 runTest(out / 'server')

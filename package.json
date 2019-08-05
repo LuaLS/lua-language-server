@@ -309,8 +309,5 @@
         "type": "git",
         "url": "https://github.com/sumneko/lua-language-server"
     },
-    "scripts": {
-        "vscode:prepublish": "cd client && npm run update-vscode && cd .."
-    },
     "version": "0.11.4"
 }

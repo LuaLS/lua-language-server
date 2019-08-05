@@ -779,6 +779,17 @@ function ()
 ]]
 
 TEST [[
+---@type fun(a:any, b:any)
+local f
+local t = {f = f}
+t:<?f?>()
+]]
+[[
+function f(b: any)
+  -> any
+]]
+
+TEST [[
 ---@param names string[]
 local function f(<?names?>)
 end

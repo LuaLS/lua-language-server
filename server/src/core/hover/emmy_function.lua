@@ -10,6 +10,9 @@ local function buildEmmyArgs(emmy, object, select)
     local i = 0
     emmy:eachParam(function (name, typeObj)
         i = i + 1
+        if i < start then
+            return
+        end
         if i > start then
             strs[#strs+1] = ', '
         end

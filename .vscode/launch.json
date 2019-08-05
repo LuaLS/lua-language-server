@@ -29,7 +29,8 @@
 			"stopOnEntry": true,
 			"sourceCoding": "utf8",
 			"consoleCoding": "utf8",
-			"address": "127.0.0.1:11411"
+			"address": "127.0.0.1:11411",
+			"outputCapture": []
 		},
 		{
 			"name": "编译",

@@ -32,8 +32,12 @@ local function formatString(str)
         str = str:sub(1000)
     end
     if str:find('[\r\n]') then
+        str = str:gsub('[\000-\008\011-\012\014-\031\127]', '')
         return longString(str)
     else
+        str = str:gsub('[\000-\008\011-\012\014-\031\127]', function (char)
+            return ('\\%03d'):format(char:byte())
+        end)
         local single = str:find("'", 1, true)
         local double = str:find('"', 1, true)
         if single and double then

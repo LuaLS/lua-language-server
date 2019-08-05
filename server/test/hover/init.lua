@@ -466,6 +466,11 @@ function n<next>(table: table [, index: any])
 ]]
 
 TEST[[
+local <?x?> = '\a'
+]]
+'local x: string = "\007"'
+
+TEST[[
 ---@class Class
 local <?x?> = class()
 ]]

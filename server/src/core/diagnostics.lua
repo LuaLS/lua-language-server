@@ -879,7 +879,7 @@ return function (vm, lines, uri)
     -- 往表里面塞重复的method
     session:doDiagnostics(session.searchDuplicateMethod, 'duplicate-method', function (key, related)
         return {
-            message = lang.script('DIAG_DUPLICATE_FIELD', key),
+            message = lang.script('DIAG_DUPLICATE_METHOD', key),
             related = related,
         }
     end)

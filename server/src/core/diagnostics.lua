@@ -385,8 +385,10 @@ function mt:searchDuplicateIndex(callback)
     end)
 end
 
-function mt:searchDuplicateField(callback)
+function mt:searchDuplicateMethod(callback)
+    local uri = self.uri
     local mark = {}
+    local map = {}
     self.vm:eachSource(function (source)
         local parent = source:get 'parent'
         if not parent then
@@ -399,9 +401,6 @@ function mt:searchDuplicateField(callback)
         local relates = {}
         parent:eachInfo(function (info, src)
             local k = info[1]
-            if source == src then
-                return
-            end
             if info.type ~= 'set child' then
                 return
             end
@@ -411,23 +410,30 @@ function mt:searchDuplicateField(callback)
             if src.start == 0 then
                 return
             end
-            if not relates[k] then
-                relates[k] = {}
+            if not src:get 'object' then
+                return
             end
+            if map[src] then
+                return
+            end
+            if not relates[k] then
+                relates[k] = map[src] or {
+                    name = k,
+                }
+            end
+            map[src] = relates[k]
             relates[k][#relates[k]+1] = {
                 start  = src.start,
                 finish = src.finish,
                 uri    = src.uri
             }
         end)
-        for name, relate in pairs(relates) do
-            if #relate > 1 then
-                for _, data in ipairs(relate) do
-                    callback(data.start, data.finish, name, relate)
-                end
-            end
-        end
     end)
+    for src, relate in pairs(map) do
+        if #relate > 1 and src.uri == uri then
+            callback(src.start, src.finish, relate.name, relate)
+        end
+    end
 end
 
 function mt:searchEmptyBlock(callback)
@@ -870,8 +876,8 @@ return function (vm, lines, uri)
             related = related,
         }
     end)
-    -- 往表里面塞重复的field
-    session:doDiagnostics(session.searchDuplicateField, 'duplicate-field', function (key, related)
+    -- 往表里面塞重复的method
+    session:doDiagnostics(session.searchDuplicateMethod, 'duplicate-method', function (key, related)
         return {
             message = lang.script('DIAG_DUPLICATE_FIELD', key),
             related = related,

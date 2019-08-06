@@ -48,7 +48,7 @@
                             "scope": "resource",
                             "type": "string"
                         },
-                        "duplicate-field": {
+                        "duplicate-index": {
                             "default": "Warning",
                             "enum": [
                                 "Error",
@@ -59,7 +59,7 @@
                             "scope": "resource",
                             "type": "string"
                         },
-                        "duplicate-index": {
+                        "duplicate-method": {
                             "default": "Warning",
                             "enum": [
                                 "Error",

@@ -44,7 +44,7 @@ function TEST(script)
     local ast = parser:ast(new_script, 'lua', 'Lua 5.3')
     assert(ast)
     local lines = parser:lines(new_script)
-    local vm = buildVM(ast, lsp)
+    local vm = buildVM(ast, lsp, 'test')
     assert(vm)
     local datas = core.diagnostics(vm, lines, 'test')
     local results = {}
@@ -477,6 +477,14 @@ x = x or -1
 
 TEST [[
 local t = {}
-t.<!a!> = 1
-t.<!a!> = 2
+function t:<!a!>()
+end
+function t:<!a!>()
+end
+]]
+
+TEST [[
+local t = {}
+t.a = 1
+t.a = 2
 ]]

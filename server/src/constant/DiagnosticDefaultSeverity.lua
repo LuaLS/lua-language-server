@@ -11,6 +11,7 @@ return {
     ['lowercase-global']    = 'Information',
     ['undefined-env-child'] = 'Information',
     ['duplicate-index']     = 'Warning',
+    ['duplicate-field']     = 'Warning',
     ['empty-block']         = 'Information',
     ['redundant-value']     = 'Information',
     ['emmy-lua']            = 'Warning',

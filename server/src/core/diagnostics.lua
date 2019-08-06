@@ -385,6 +385,51 @@ function mt:searchDuplicateIndex(callback)
     end)
 end
 
+function mt:searchDuplicateField(callback)
+    local mark = {}
+    self.vm:eachSource(function (source)
+        local parent = source:get 'parent'
+        if not parent then
+            return
+        end
+        if mark[parent] then
+            return
+        end
+        mark[parent] = true
+        local relates = {}
+        parent:eachInfo(function (info, src)
+            local k = info[1]
+            if source == src then
+                return
+            end
+            if info.type ~= 'set child' then
+                return
+            end
+            if type(k) ~= 'string' then
+                return
+            end
+            if src.start == 0 then
+                return
+            end
+            if not relates[k] then
+                relates[k] = {}
+            end
+            relates[k][#relates[k]+1] = {
+                start  = src.start,
+                finish = src.finish,
+                uri    = src.uri
+            }
+        end)
+        for name, relate in pairs(relates) do
+            if #relate > 1 then
+                for _, data in ipairs(relate) do
+                    callback(data.start, data.finish, name, relate)
+                end
+            end
+        end
+    end)
+end
+
 function mt:searchEmptyBlock(callback)
     self.vm:eachSource(function (source)
         -- 认为空repeat与空while是合法的
@@ -822,6 +867,13 @@ return function (vm, lines, uri)
     session:doDiagnostics(session.searchDuplicateIndex, 'duplicate-index', function (key, related)
         return {
             message = lang.script('DIAG_DUPLICATE_INDEX', key),
+            related = related,
+        }
+    end)
+    -- 往表里面塞重复的field
+    session:doDiagnostics(session.searchDuplicateField, 'duplicate-field', function (key, related)
+        return {
+            message = lang.script('DIAG_DUPLICATE_FIELD', key),
             related = related,
         }
     end)

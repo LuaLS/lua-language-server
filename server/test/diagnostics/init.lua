@@ -474,3 +474,9 @@ TEST [[
 local x
 x = x or -1
 ]]
+
+TEST [[
+local t = {}
+t.<!a!> = 1
+t.<!a!> = 2
+]]

@@ -48,6 +48,17 @@
                             "scope": "resource",
                             "type": "string"
                         },
+                        "duplicate-field": {
+                            "default": "Warning",
+                            "enum": [
+                                "Error",
+                                "Warning",
+                                "Information",
+                                "Hint"
+                            ],
+                            "scope": "resource",
+                            "type": "string"
+                        },
                         "duplicate-index": {
                             "default": "Warning",
                             "enum": [

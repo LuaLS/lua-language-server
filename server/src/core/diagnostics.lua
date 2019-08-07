@@ -877,12 +877,12 @@ return function (vm, lines, uri)
         }
     end)
     -- 往表里面塞重复的method
-    session:doDiagnostics(session.searchDuplicateMethod, 'duplicate-method', function (key, related)
-        return {
-            message = lang.script('DIAG_DUPLICATE_METHOD', key),
-            related = related,
-        }
-    end)
+    --session:doDiagnostics(session.searchDuplicateMethod, 'duplicate-method', function (key, related)
+    --    return {
+    --        message = lang.script('DIAG_DUPLICATE_METHOD', key),
+    --        related = related,
+    --    }
+    --end)
     -- 空代码块
     session:doDiagnostics(session.searchEmptyBlock, 'empty-block', function ()
         return {

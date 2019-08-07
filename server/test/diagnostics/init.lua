@@ -475,13 +475,13 @@ local x
 x = x or -1
 ]]
 
-TEST [[
-local t = {}
-function t:<!a!>()
-end
-function t:<!a!>()
-end
-]]
+--TEST [[
+--local t = {}
+--function t:<!a!>()
+--end
+--function t:<!a!>()
+--end
+--]]
 
 TEST [[
 local t = {}

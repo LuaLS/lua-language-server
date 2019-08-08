@@ -150,3 +150,8 @@ end
 TEST [[
 local x = ,
 ]]
+
+TEST [[
+---@type any|fun():nil
+local t    
+]]

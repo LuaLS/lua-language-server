@@ -100,9 +100,11 @@ function mt:addType(source)
     for i, obj in ipairs(source) do
         local typeUnit = newTypeUnit(self, obj)
         local className = obj[1]
-        local list = self:getClass(className)
+        if className then
+            local list = self:getClass(className)
+            list[source.id] = typeUnit
+        end
         typeUnit:setParent(typeObj)
-        list[source.id] = typeUnit
         typeObj._childs[i] = typeUnit
         obj:set('emmy.typeUnit', typeUnit)
     end

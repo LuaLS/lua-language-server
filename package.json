@@ -86,7 +86,7 @@
                             "type": "string"
                         },
                         "empty-block": {
-                            "default": "Information",
+                            "default": "Hint",
                             "enum": [
                                 "Error",
                                 "Warning",
@@ -130,7 +130,7 @@
                             "type": "string"
                         },
                         "redundant-parameter": {
-                            "default": "Information",
+                            "default": "Hint",
                             "enum": [
                                 "Error",
                                 "Warning",
@@ -141,7 +141,7 @@
                             "type": "string"
                         },
                         "redundant-value": {
-                            "default": "Information",
+                            "default": "Hint",
                             "enum": [
                                 "Error",
                                 "Warning",

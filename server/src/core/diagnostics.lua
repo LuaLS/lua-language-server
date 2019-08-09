@@ -4,6 +4,7 @@ local library = require 'core.library'
 local buildGlobal = require 'vm.global'
 local DiagnosticSeverity = require 'constant.DiagnosticSeverity'
 local DiagnosticDefaultSeverity = require 'constant.DiagnosticDefaultSeverity'
+local DiagnosticTag = require 'constant.DiagnosticTag'
 
 local mt = {}
 mt.__index = mt
@@ -791,6 +792,7 @@ return function (vm, lines, uri)
     session:doDiagnostics(session.searchUnusedLocals, 'unused-local', function (key)
         return {
             message = lang.script('DIAG_UNUSED_LOCAL', key),
+            tags = {DiagnosticTag.Unnecessary},
         }
     end)
     -- 读取未定义全局变量
@@ -811,13 +813,15 @@ return function (vm, lines, uri)
     -- 未使用的Label
     session:doDiagnostics(session.searchUnusedLabel, 'unused-label', function (key)
         return {
-            message = lang.script('DIAG_UNUSED_LABEL', key)
+            message = lang.script('DIAG_UNUSED_LABEL', key),
+            tags = {DiagnosticTag.Unnecessary},
         }
     end)
     -- 未使用的不定参数
     session:doDiagnostics(session.searchUnusedVararg, 'unused-vararg', function ()
         return {
-            message = lang.script.DIAG_UNUSED_VARARG
+            message = lang.script.DIAG_UNUSED_VARARG,
+            tags = {DiagnosticTag.Unnecessary},
         }
     end)
     -- 只有空格与制表符的行，以及后置空格
@@ -843,6 +847,7 @@ return function (vm, lines, uri)
     session:doDiagnostics(session.searchRedundantParameters, 'redundant-parameter', function (max, passed)
         return {
             message = lang.script('DIAG_OVER_MAX_ARGS', max, passed),
+            tags = {DiagnosticTag.Unnecessary},
         }
     end)
     -- x or 0 + 1
@@ -887,12 +892,14 @@ return function (vm, lines, uri)
     session:doDiagnostics(session.searchEmptyBlock, 'empty-block', function ()
         return {
             message = lang.script.DIAG_EMPTY_BLOCK,
+            tags = {DiagnosticTag.Unnecessary},
         }
     end)
     -- 多余的赋值
     session:doDiagnostics(session.searchRedundantValue, 'redundant-value', function (max, passed)
         return {
             message = lang.script('DIAG_OVER_MAX_VALUES', max, passed),
+            tags = {DiagnosticTag.Unnecessary},
         }
     end)
     -- Emmy相关的检查

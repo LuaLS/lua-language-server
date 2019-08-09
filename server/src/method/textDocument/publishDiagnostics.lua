@@ -50,6 +50,7 @@ local function createInfo(lsp, data, lines)
         severity = data.level,
         message  = data.message,
         code     = data.code,
+        tags     = data.tags,
     }
     if data.related then
         local related = {}

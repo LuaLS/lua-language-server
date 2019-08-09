@@ -17,7 +17,9 @@
         "configuration": {
             "properties": {
                 "Lua.diagnostics.disable": {
-                    "items": "string",
+                    "items": {
+                        "type": "string"
+                    },
                     "markdownDescription": "%config.diagnostics.disable%",
                     "scope": "resource",
                     "type": "array"
@@ -29,7 +31,9 @@
                     "type": "boolean"
                 },
                 "Lua.diagnostics.globals": {
-                    "items": "string",
+                    "items": {
+                        "type": "string"
+                    },
                     "markdownDescription": "%config.diagnostics.globals%",
                     "scope": "resource",
                     "type": "array"
@@ -235,7 +239,9 @@
                         "?/init.lua",
                         "?/?.lua"
                     ],
-                    "items": "string",
+                    "items": {
+                        "type": "string"
+                    },
                     "markdownDescription": "%config.runtime.path%",
                     "scope": "resource",
                     "type": "array"
@@ -254,7 +260,9 @@
                     "type": "string"
                 },
                 "Lua.workspace.ignoreDir": {
-                    "items": "string",
+                    "items": {
+                        "type": "string"
+                    },
                     "markdownDescription": "%config.workspace.ignoreDir%",
                     "scope": "resource",
                     "type": "array"

@@ -54,7 +54,9 @@ local package = {
                 ["Lua.runtime.path"] = {
                     scope = "resource",
                     type = "array",
-                    items = "string",
+                    items = {
+                        type = 'string',
+                    },
                     markdownDescription = "%config.runtime.path%",
                     default = {
                         "?.lua",
@@ -71,13 +73,17 @@ local package = {
                 ["Lua.diagnostics.disable"] = {
                     scope = "resource",
                     type = "array",
-                    items = "string",
+                    items = {
+                        type = 'string',
+                    },
                     markdownDescription = "%config.diagnostics.disable%"
                 },
                 ["Lua.diagnostics.globals"] = {
                     scope = "resource",
                     type = "array",
-                    items = "string",
+                    items = {
+                        type = 'string',
+                    },
                     markdownDescription = "%config.diagnostics.globals%"
                 },
                 ["Lua.diagnostics.severity"] = {
@@ -90,7 +96,9 @@ local package = {
                 ["Lua.workspace.ignoreDir"] = {
                     scope = "resource",
                     type = "array",
-                    items = "string",
+                    items = {
+                        type = 'string',
+                    },
                     markdownDescription = "%config.workspace.ignoreDir%"
                 },
                 ["Lua.workspace.ignoreSubmodules"] = {

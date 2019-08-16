@@ -8,6 +8,9 @@ local OS = platform.OS == 'Windows' and 'win32' or 'unix'
 
 local function decode(uri)
     local obj = URI:new(uri)
+    if not obj.filesystem_path then
+        return ''
+    end
     local fullPath = obj:filesystem_path(OS)
     local path = fs.path(fullPath)
     return path

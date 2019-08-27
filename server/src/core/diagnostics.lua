@@ -361,9 +361,9 @@ function mt:searchDuplicateIndex(callback)
                 end
                 if name then
                     if mark[name] then
-                        mark[name][#mark[name]+1] = key
+                        mark[name][#mark[name]+1] = obj
                     else
-                        mark[name] = { key }
+                        mark[name] = { obj }
                     end
                 end
             end
@@ -373,13 +373,16 @@ function mt:searchDuplicateIndex(callback)
                 local related = {}
                 for i = 1, #defs do
                     related[i] = {
-                        start  = defs[i].start,
-                        finish = defs[i].finish,
+                        start  = defs[i][1].start,
+                        finish = defs[i][2].finish,
                         uri    = self.uri,
                     }
                 end
-                for i = 2, #defs do
-                    callback(defs[i].start, defs[i].finish, name, related)
+                for i = 1, #defs - 1 do
+                    callback(defs[i][1].start, defs[i][2].finish, name, related, 'unused')
+                end
+                for i = #defs, #defs do
+                    callback(defs[i][1].start, defs[i][1].finish, name, related, 'duplicate')
                 end
             end
         end
@@ -768,7 +771,7 @@ function mt:doDiagnostics(func, code, callback)
         data.code   = code
         data.start  = start
         data.finish = finish
-        data.level  = DiagnosticSeverity[level]
+        data.level  = data.level or DiagnosticSeverity[level]
         self.datas[#self.datas+1] = data
     end)
     if coroutine.isyieldable() then
@@ -875,11 +878,20 @@ return function (vm, lines, uri)
         end
     end)
     -- 构建表时重复定义field
-    session:doDiagnostics(session.searchDuplicateIndex, 'duplicate-index', function (key, related)
-        return {
-            message = lang.script('DIAG_DUPLICATE_INDEX', key),
-            related = related,
-        }
+    session:doDiagnostics(session.searchDuplicateIndex, 'duplicate-index', function (key, related, type)
+        if type == 'unused' then
+            return {
+                message = lang.script('DIAG_DUPLICATE_INDEX', key),
+                related = related,
+                level = DiagnosticSeverity.Hint,
+                tags = {DiagnosticTag.Unnecessary},
+            }
+        else
+            return {
+                message = lang.script('DIAG_DUPLICATE_INDEX', key),
+                related = related,
+            }
+        end
     end)
     -- 往表里面塞重复的method
     --session:doDiagnostics(session.searchDuplicateMethod, 'duplicate-method', function (key, related)

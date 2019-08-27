@@ -226,6 +226,12 @@ loc$
     {
         label = 'local',
         kind = CompletionItemKind.Keyword,
+    },
+    {
+        label = 'local function',
+        kind = CompletionItemKind.Snippet,
+        insertText = EXISTS,
+        insertTextFormat = 2,
     }
 }
 
@@ -780,6 +786,12 @@ else$
     {
         label = 'elseif',
         kind = CompletionItemKind.Keyword,
+    },
+    {
+        label = 'elseif .. then',
+        kind = CompletionItemKind.Snippet,
+        insertText = EXISTS,
+        insertTextFormat = 2,
     }
 }
 
@@ -1095,6 +1107,12 @@ end
     {
         label = 'elseif',
         kind = CompletionItemKind.Keyword,
+    },
+    {
+        label = 'elseif .. then',
+        kind = CompletionItemKind.Snippet,
+        insertTextFormat = 2,
+        insertText = EXISTS,
     },
 }
 

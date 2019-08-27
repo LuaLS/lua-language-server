@@ -153,11 +153,45 @@ local function getKind(cata, value)
     return nil
 end
 
+local function buildSnipArgs(args)
+    local t = {}
+    for i, name in ipairs(args) do
+        t[i] = ('${%d:%s}'):format(i, name)
+    end
+    return table.concat(t, ', ')
+end
+
+local function getFunctionSnip(name, value)
+    if value:getType() ~= 'function' then
+        return
+    end
+    local lib = value:getLib()
+    local hover
+    if lib then
+        hover = getFunctionHoverAsLib(name, lib)
+    else
+        local emmy = value:getEmmy()
+        if emmy and emmy.type == 'emmy.functionType' then
+            hover = getFunctionHoverAsEmmy(name, emmy)
+        else
+            hover = getFunctionHover(name, value:getFunction())
+        end
+    end
+    if not hover then
+        return ('%s()'):format(name)
+    end
+    if not hover.args then
+        return ('%s()'):format(name)
+    end
+    return ('%s(%s)'):format(name, buildSnipArgs(hover.args))
+end
+
 local function getValueData(cata, name, value, pos, source)
     local data = {
         documentation = getDucumentation(name, value),
         detail = getDetail(value),
         kind = getKind(cata, value),
+        snip = getFunctionSnip(name, value),
     }
     if cata == 'field' then
         if not parser:grammar(name, 'Name') then
@@ -869,49 +903,6 @@ local function searchSpecial(vm, source, word, callback, pos, text)
     searchSpecialHashSign(vm, pos, text, callback)
 end
 
-local function buildSnipArgs(args)
-    local t = {}
-    for i, name in ipairs(args) do
-        t[i] = ('${%d:%s}'):format(i, name)
-    end
-    return table.concat(t, ', ')
-end
-
-local function makeFunctionSnippet(src, data)
-    if not src then
-        return
-    end
-    local value = src:findValue()
-    if not value then
-        return
-    end
-    local func = value:getFunction()
-    if not func then
-        return
-    end
-    local name = data.label
-    local lib = value:getLib()
-    local hover
-    if lib then
-        hover = getFunctionHoverAsLib(name, lib)
-    else
-        local emmy = value:getEmmy()
-        if emmy and emmy.type == 'emmy.functionType' then
-            hover = getFunctionHoverAsEmmy(name, emmy)
-        else
-            hover = getFunctionHover(name, value:getFunction())
-        end
-    end
-    if not hover then
-        return
-    end
-    if not hover.args then
-        return
-    end
-    data.insertTextFormat = 2
-    data.insertText = ('%s(%s)'):format(data.label, buildSnipArgs(hover.args))
-end
-
 local function makeList(source, pos, word)
     local list = {}
     local mark = {}
@@ -937,8 +928,16 @@ local function makeList(source, pos, word)
         if not data.kind then
             data.kind = kind
         end
-        makeFunctionSnippet(src, data)
         list[#list+1] = data
+        if data.snip then
+            local snipData = table.deepCopy(data)
+            snipData.insertText = data.snip
+            snipData.kind = CompletionItemKind.Snippet
+            snipData.label = snipData.label .. '()'
+            snipData.snip = nil
+            data.snip = nil
+            list[#list+1] = snipData
+        end
     end, list
 end
 

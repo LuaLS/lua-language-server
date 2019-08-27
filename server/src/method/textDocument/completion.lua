@@ -80,6 +80,7 @@ return function (lsp, params)
 
     for i, item in ipairs(items) do
         item.sortText = ('%04d'):format(i)
+        item.insertTextFormat = 2
         if item.textEdit then
             item.textEdit.range = posToRange(lines, item.textEdit.start, item.textEdit.finish)
             item.textEdit.start = nil

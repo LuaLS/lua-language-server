@@ -30,7 +30,7 @@ local CompletionItemKind = {
     TypeParameter = 25,
 }
 
-local EXISTS = {}
+local EXISTS = {'EXISTS'}
 
 local function eq(a, b)
     if a == EXISTS and b ~= nil then
@@ -156,7 +156,14 @@ ass$
         kind = CompletionItemKind.Function,
         documentation = EXISTS,
         detail = '(function)',
-    }
+    },
+    {
+        label = 'assert()',
+        kind = CompletionItemKind.Snippet,
+        documentation = EXISTS,
+        insertText = EXISTS,
+        detail = '(function)',
+    },
 }
 
 TEST [[
@@ -210,7 +217,14 @@ mt:g$
         kind = CompletionItemKind.Method,
         documentation = EXISTS,
         detail = EXISTS,
-    }
+    },
+    {
+        label = 'get()',
+        kind = CompletionItemKind.Snippet,
+        documentation = EXISTS,
+        insertText = EXISTS,
+        detail = EXISTS,
+    },
 }
 
 TEST [[
@@ -222,6 +236,13 @@ loc$
         kind = CompletionItemKind.Function,
         documentation = EXISTS,
         detail = EXISTS,
+    },
+    {
+        label = 'collectgarbage()',
+        kind = CompletionItemKind.Snippet,
+        documentation = EXISTS,
+        detail = EXISTS,
+        insertText = EXISTS,
     },
     {
         label = 'local',
@@ -284,6 +305,13 @@ t:$
         documentation = EXISTS,
         detail = EXISTS,
     },
+    {
+        label = 'b()',
+        kind = CompletionItemKind.Snippet,
+        documentation = EXISTS,
+        detail = EXISTS,
+        insertText = EXISTS,
+    },
 }
 
 TEST [[
@@ -304,6 +332,13 @@ xxx()
         kind = CompletionItemKind.Function,
         documentation = EXISTS,
         detail = EXISTS,
+    },
+    {
+        label = 'xxx()',
+        kind = CompletionItemKind.Snippet,
+        documentation = EXISTS,
+        detail = EXISTS,
+        insertText = EXISTS,
     },
 }
 
@@ -348,11 +383,25 @@ local t = {
         detail = EXISTS,
     },
     {
+        label = 'next()',
+        kind = CompletionItemKind.Snippet,
+        documentation = EXISTS,
+        detail = EXISTS,
+        insertText = EXISTS,
+    },
+    {
         label = 'xpcall',
         kind = CompletionItemKind.Function,
         documentation = EXISTS,
         detail = EXISTS,
-    }
+    },
+    {
+        label = 'xpcall()',
+        kind = CompletionItemKind.Snippet,
+        documentation = EXISTS,
+        detail = EXISTS,
+        insertText = EXISTS,
+    },
 }
 
 TEST [[
@@ -774,10 +823,24 @@ else$
         detail = EXISTS,
     },
     {
+        label = 'select()',
+        kind = CompletionItemKind.Snippet,
+        documentation = EXISTS,
+        detail = EXISTS,
+        insertText = EXISTS,
+    },
+    {
         label = 'setmetatable',
         kind = CompletionItemKind.Function,
         documentation = EXISTS,
         detail = EXISTS,
+    },
+    {
+        label = 'setmetatable()',
+        kind = CompletionItemKind.Snippet,
+        documentation = EXISTS,
+        detail = EXISTS,
+        insertText = EXISTS,
     },
     {
         label = 'else',
@@ -809,7 +872,14 @@ xpcal$
         kind = CompletionItemKind.Function,
         documentation = EXISTS,
         detail = EXISTS,
-    }
+    },
+    {
+        label = 'xpcall()',
+        kind = CompletionItemKind.Snippet,
+        documentation = EXISTS,
+        detail = EXISTS,
+        insertText = EXISTS,
+    },
 }
 
 TEST [[
@@ -1095,10 +1165,24 @@ end
         detail = EXISTS,
     },
     {
+        label = 'select()',
+        kind = CompletionItemKind.Snippet,
+        documentation = EXISTS,
+        detail = EXISTS,
+        insertText = EXISTS,
+    },
+    {
         label = 'setmetatable',
         kind = CompletionItemKind.Function,
         documentation = EXISTS,
         detail = EXISTS,
+    },
+    {
+        label = 'setmetatable()',
+        kind = CompletionItemKind.Snippet,
+        documentation = EXISTS,
+        detail = EXISTS,
+        insertText = EXISTS,
     },
     {
         label = 'else',
@@ -1323,8 +1407,6 @@ zzz$
         label = 'zzzzz',
         kind = CompletionItemKind.Function,
         detail = '(function)(4 prototypes)',
-        insertText = EXISTS,
-        insertTextFormat = 2,
         documentation = {
             kind = 'markdown',
             value = [[
@@ -1339,6 +1421,13 @@ JustTest
 
 ]]
         },
+    },
+    {
+        label = 'zzzzz()',
+        kind = CompletionItemKind.Snippet,
+        detail = '(function)(4 prototypes)',
+        insertText = EXISTS,
+        documentation = EXISTS,
     }
 }
 

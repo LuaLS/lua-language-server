@@ -12,6 +12,9 @@ local function eq(a, b)
     if a == EXISTS and b ~= nil then
         return true
     end
+    if b == EXISTS and a ~= nil then
+        return true
+    end
     local tp1, tp2 = type(a), type(b)
     if tp1 ~= tp2 then
         return false
@@ -119,6 +122,7 @@ TEST {
     hover = {
         label = 'function f(a: any, b: any)',
         name = 'f',
+        args = EXISTS,
     }
 }
 
@@ -140,6 +144,7 @@ TEST {
     hover = {
         label = 'function (a: any, b: any)',
         name = '',
+        args = EXISTS,
     }
 }
 
@@ -169,6 +174,7 @@ TEST {
     hover = {
         label = 'function mt:add(a: any, b: any)',
         name = 'mt:add',
+        args = EXISTS,
     },
 }
 
@@ -238,6 +244,7 @@ TEST {
         label = [[function f(x: number)]],
         name = 'f',
         description = 'abc',
+        args = EXISTS,
     }
 }
 
@@ -277,6 +284,7 @@ TEST {
     hover = {
         label = 'function f(x: string)',
         name = 'f',
+        args = EXISTS,
         enum = [[
 
 x: string
@@ -303,6 +311,7 @@ TEST {
     hover = {
         label = 'function f(x: option)',
         name = 'f',
+        args = EXISTS,
         enum = [[
 
 x: option
@@ -327,6 +336,7 @@ TEST {
     hover = {
         label = 'function f(x: string, y: string)',
         name = 'f',
+        args = EXISTS,
         description = [[
 + `x`*(string)*: aaaa
 

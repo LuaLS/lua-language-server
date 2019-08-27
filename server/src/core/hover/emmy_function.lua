@@ -7,6 +7,7 @@ local function buildEmmyArgs(emmy, object, select)
         start = 1
     end
     local strs = {}
+    local args = {}
     local i = 0
     emmy:eachParam(function (name, typeObj)
         i = i + 1
@@ -20,6 +21,7 @@ local function buildEmmyArgs(emmy, object, select)
             strs[#strs+1] = '@ARG'
         end
         strs[#strs+1] = name .. ': ' .. typeObj:getType()
+        args[#args+1] = strs[#strs]
         if i == select then
             strs[#strs+1] = '@ARG'
         end
@@ -40,7 +42,7 @@ local function buildEmmyArgs(emmy, object, select)
     if #argLabel == 0 then
         argLabel = nil
     end
-    return text, argLabel
+    return text, argLabel, args
 end
 
 local function buildEmmyReturns(emmy)
@@ -115,12 +117,12 @@ local function buildEnum(lib)
 end
 
 return function (name, emmy, object, select)
-    local args, argLabel = buildEmmyArgs(emmy, object, select)
+    local argStr, argLabel, args = buildEmmyArgs(emmy, object, select)
     local returns = buildEmmyReturns(emmy)
     local enum = buildEnum(emmy)
     local tip = emmy.description
     local headLen = #('function %s('):format(name)
-    local title = ('function %s(%s)%s'):format(name, args, returns)
+    local title = ('function %s(%s)%s'):format(name, argStr, returns)
     if argLabel then
         argLabel[1] = argLabel[1] + headLen
         argLabel[2] = argLabel[2] + headLen
@@ -130,5 +132,6 @@ return function (name, emmy, object, select)
         description = tip,
         enum = enum,
         argLabel = argLabel,
+        args = args,
     }
 end

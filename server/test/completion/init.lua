@@ -1323,6 +1323,8 @@ zzz$
         label = 'zzzzz',
         kind = CompletionItemKind.Function,
         detail = '(function)(4 prototypes)',
+        insertText = EXISTS,
+        insertTextFormat = 2,
         documentation = {
             kind = 'markdown',
             value = [[

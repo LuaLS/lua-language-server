@@ -33,6 +33,7 @@ local function buildValueArgs(func, object, select)
     else
         max = math.max(#names, #values)
     end
+    local args = {}
     for i = start, max do
         local name = names[i]
         local value = values[i] or 'any'
@@ -56,6 +57,7 @@ local function buildValueArgs(func, object, select)
         else
             strs[#strs+1] = value
         end
+        args[#args+1] = strs[#strs]
         if i == select then
             strs[#strs+1] = '@ARG'
         end
@@ -95,7 +97,7 @@ local function buildValueArgs(func, object, select)
     if #argLabel == 0 then
         argLabel = nil
     end
-    return text, argLabel
+    return text, argLabel, args
 end
 
 local function buildValueReturns(func)
@@ -215,13 +217,13 @@ local function getOverLoads(name, func, object, select)
 end
 
 return function (name, func, object, select)
-    local args, argLabel = buildValueArgs(func, object, select)
+    local argStr, argLabel, args = buildValueArgs(func, object, select)
     local returns = buildValueReturns(func)
     local enum = buildEnum(func)
     local comment = getComment(func)
     local overloads = getOverLoads(name, func, object, select)
     local headLen = #('function %s('):format(name)
-    local title = ('function %s(%s)%s'):format(name, args, returns)
+    local title = ('function %s(%s)%s'):format(name, argStr, returns)
     if argLabel then
         argLabel[1] = argLabel[1] + headLen
         argLabel[2] = argLabel[2] + headLen
@@ -232,5 +234,6 @@ return function (name, func, object, select)
         enum = enum,
         argLabel = argLabel,
         overloads = overloads,
+        args = args,
     }
 end

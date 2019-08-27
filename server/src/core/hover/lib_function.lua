@@ -11,6 +11,7 @@ local function buildLibArgs(lib, object, select)
         start = 1
     end
     local strs = {}
+    local args = {}
     for i = start, #lib.args do
         local arg = lib.args[i]
         if arg.optional then
@@ -28,14 +29,17 @@ local function buildLibArgs(lib, object, select)
         if i == select then
             argStr[#argStr+1] = '@ARG'
         end
+        local name = ''
         if arg.name then
-            argStr[#argStr+1] = ('%s: '):format(arg.name)
+            name = ('%s: '):format(arg.name)
         end
         if type(arg.type) == 'table' then
-            argStr[#argStr+1] = table.concat(arg.type, '/')
+            name = name .. table.concat(arg.type, '/')
         else
-            argStr[#argStr+1] = arg.type or 'any'
+            name = name .. (arg.type or 'any')
         end
+        argStr[#argStr+1] = name
+        args[#args+1] = name
         if arg.default then
             argStr[#argStr+1] = ('(%q)'):format(arg.default)
         end
@@ -71,7 +75,7 @@ local function buildLibArgs(lib, object, select)
     if #argLabel == 0 then
         argLabel = nil
     end
-    return text, argLabel
+    return text, argLabel, args
 end
 
 local function buildLibReturns(lib)
@@ -192,13 +196,13 @@ local function buildDoc(lib)
 end
 
 return function (name, lib, object, select)
-    local args, argLabel = buildLibArgs(lib, object, select)
+    local argStr, argLabel, args = buildLibArgs(lib, object, select)
     local returns = buildLibReturns(lib)
     local enum = buildEnum(lib)
     local tip = lib.description
     local doc = buildDoc(lib)
     local headLen = #('function %s('):format(name)
-    local title = ('function %s(%s)%s'):format(name, args, returns)
+    local title = ('function %s(%s)%s'):format(name, argStr, returns)
     if argLabel then
         argLabel[1] = argLabel[1] + headLen
         argLabel[2] = argLabel[2] + headLen
@@ -209,5 +213,6 @@ return function (name, lib, object, select)
         enum = enum,
         argLabel = argLabel,
         doc = doc,
+        args = args,
     }
 end

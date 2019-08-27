@@ -930,13 +930,17 @@ local function makeList(source, pos, word)
         end
         list[#list+1] = data
         if data.snip then
-            local snipData = table.deepCopy(data)
-            snipData.insertText = data.snip
-            snipData.kind = CompletionItemKind.Snippet
-            snipData.label = snipData.label .. '()'
-            snipData.snip = nil
-            data.snip = nil
-            list[#list+1] = snipData
+            if config.config.completion.callSnippet then
+                local snipData = table.deepCopy(data)
+                snipData.insertText = data.snip
+                snipData.kind = CompletionItemKind.Snippet
+                snipData.label = snipData.label .. '()'
+                snipData.snip = nil
+                data.snip = nil
+                list[#list+1] = snipData
+            else
+                data.snip = nil
+            end
         end
     end, list
 end

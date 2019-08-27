@@ -119,6 +119,9 @@ local ConfigTemplate = {
                                         Or(Boolean, Array(String))
                                     )}
     },
+    completion = {
+        callSnippet     = {true, Boolean},
+    },
 }
 
 local OtherTemplate = {

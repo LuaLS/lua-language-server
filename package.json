@@ -16,6 +16,12 @@
     "contributes": {
         "configuration": {
             "properties": {
+                "Lua.completion.callSnippet": {
+                    "default": true,
+                    "markdownDescription": "%config.completion.callSnippet%",
+                    "scope": "resource",
+                    "type": "boolean"
+                },
                 "Lua.diagnostics.disable": {
                     "items": {
                         "type": "string"

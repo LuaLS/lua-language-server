@@ -1,4 +1,5 @@
 {
+    "config.completion.callSnippet": "Show function call snippets.",
     "config.diagnostics.disable": "Disabled diagnostic (Use code in hover brackets).\n```json\n\"Lua.diagnostics.disable\" : [\n    \"unused-local\",\n    \"lowercase-global\"\n]\n```\n",
     "config.diagnostics.enable": "Enable diagnostics.",
     "config.diagnostics.globals": "Defined global variables.\n```json\n\"Lua.diagnostics.globals\" : [\n    \"GLOBAL1\",\n    \"GLOBAL2\"\n]\n```\n",
@@ -7,7 +8,7 @@
     "config.runtime.version": "Lua runtime version.",
     "config.workspace.ignoreDir": "Ignored directories (Use `.gitignore` grammar).\n```json\n\"Lua.workspace.ignoreDir\" : [\n    \"temp/*.*\",\n    \"!temp/*.lua\"\n]\n```\n",
     "config.workspace.ignoreSubmodules": "Ignore submodules.",
-    "config.workspace.library": "(Plz help me to translate these into nice English!)\nLoad external library.\nThis feature can load external Lua files, which can be used for definition, automatic completion and other functions. Note that the language server does not monitor changes in external files and needs to restart if the external files are modified.\nThe following example shows loaded files in `C:/lua` and `../lib` ,exclude `../lib/temp`.\n```json\n\"Lua.workspace.library\": {\n    \"C:/lua\": true,\n    \"../lib\": [\n        \"temp/*\"\n    ]\n}\n```\n",
+    "config.workspace.library": "Load external library.\nThis feature can load external Lua files, which can be used for definition, automatic completion and other functions. Note that the language server does not monitor changes in external files and needs to restart if the external files are modified.\nThe following example shows loaded files in `C:/lua` and `../lib` ,exclude `../lib/temp`.\n```json\n\"Lua.workspace.library\": {\n    \"C:/lua\": true,\n    \"../lib\": [\n        \"temp/*\"\n    ]\n}\n```\n",
     "config.workspace.maxPreload": "Max preloaded files.",
     "config.workspace.preloadFileSize": "Skip files larger than this value (KB) when preloading.",
     "config.workspace.useGitIgnore": "Ignore files list in `.gitignore` ."

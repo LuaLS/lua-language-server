@@ -7,6 +7,7 @@ local config = require 'config'
 local matchKey = require 'core.matchKey'
 local parser = require 'parser'
 local lang = require 'language'
+local snippet = require 'core.snippet'
 local State
 
 local CompletionItemKind = {
@@ -355,6 +356,14 @@ local function searchKeyWords(vm, source, word, callback)
     for _, key in ipairs(KEYS) do
         if matchKey(word, key) then
             callback(key, nil, CompletionItemKind.Keyword)
+            if snippet.key[key] then
+                for _, data in ipairs(snippet.key[key]) do
+                    callback(data.label, nil, CompletionItemKind.Snippet, {
+                        insertTextFormat = 2,
+                        insertText = data.text,
+                    })
+                end
+            end
         end
     end
 end

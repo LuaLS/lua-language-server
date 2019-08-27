@@ -149,6 +149,7 @@ local function buildEnum(lib)
         ::NEXT_ENUM::
     end
     local strs = {}
+    local raw = {}
     for name, enums in pairs(container) do
         local tp
         if type(enums.type) == 'table' then
@@ -157,6 +158,7 @@ local function buildEnum(lib)
             tp = enums.type
         end
         strs[#strs+1] = ('\n%s: %s'):format(name, tp or 'any')
+        raw[name] = {}
         for _, enum in ipairs(enums) do
             if enum.default then
                 strs[#strs+1] = '\n  -> '
@@ -168,12 +170,13 @@ local function buildEnum(lib)
             else
                 strs[#strs+1] = tostring(enum.enum)
             end
+            raw[name][#raw[name]+1] = strs[#strs]
             if enum.description then
                 strs[#strs+1] = ' -- ' .. enum.description
             end
         end
     end
-    return table.concat(strs)
+    return table.concat(strs), raw
 end
 
 local function buildDoc(lib)
@@ -198,7 +201,7 @@ end
 return function (name, lib, object, select)
     local argStr, argLabel, args = buildLibArgs(lib, object, select)
     local returns = buildLibReturns(lib)
-    local enum = buildEnum(lib)
+    local enum, rawEnum = buildEnum(lib)
     local tip = lib.description
     local doc = buildDoc(lib)
     local headLen = #('function %s('):format(name)
@@ -211,6 +214,7 @@ return function (name, lib, object, select)
         label = title,
         description = tip,
         enum = enum,
+        rawEnum = rawEnum,
         argLabel = argLabel,
         doc = doc,
         args = args,

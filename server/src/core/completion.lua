@@ -153,10 +153,16 @@ local function getKind(cata, value)
     return nil
 end
 
-local function buildSnipArgs(args)
+local function buildSnipArgs(args, enums)
     local t = {}
-    for i, name in ipairs(args) do
-        t[i] = ('${%d:%s}'):format(i, name)
+    for i, arg in ipairs(args) do
+        local name = arg:match '^[^:]+'
+        local enum = enums and enums[name]
+        if enum and #enum > 0 then
+            t[i] = ('${%d|%s|}'):format(i, table.concat(enum, ','))
+        else
+            t[i] = ('${%d:%s}'):format(i, arg)
+        end
     end
     return table.concat(t, ', ')
 end
@@ -183,7 +189,7 @@ local function getFunctionSnip(name, value)
     if not hover.args then
         return ('%s()'):format(name)
     end
-    return ('%s(%s)'):format(name, buildSnipArgs(hover.args))
+    return ('%s(%s)'):format(name, buildSnipArgs(hover.args, hover.rawEnum))
 end
 
 local function getValueData(cata, name, value, pos, source)

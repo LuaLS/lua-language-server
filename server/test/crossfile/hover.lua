@@ -285,6 +285,7 @@ TEST {
         label = 'function f(x: string)',
         name = 'f',
         args = EXISTS,
+        rawEnum = EXISTS,
         enum = [[
 
 x: string
@@ -312,6 +313,7 @@ TEST {
         label = 'function f(x: option)',
         name = 'f',
         args = EXISTS,
+        rawEnum = EXISTS,
         enum = [[
 
 x: option

@@ -159,8 +159,11 @@ local function buildEnum(func)
         return nil
     end
     local strs = {}
+    local raw = {}
     for _, param in ipairs(params) do
         local first = true
+        local name = param:getName()
+        raw[name] = {}
         param:eachEnum(function (enum)
             if first then
                 first = false
@@ -174,12 +177,13 @@ local function buildEnum(func)
             if enum.comment then
                 strs[#strs+1] = ' -- ' .. enum.comment
             end
+            raw[name][#raw[name]+1] = enum[1]
         end)
     end
     if #strs == 0 then
         return nil
     end
-    return table.concat(strs)
+    return table.concat(strs), raw
 end
 
 local function getComment(func)
@@ -219,7 +223,7 @@ end
 return function (name, func, object, select)
     local argStr, argLabel, args = buildValueArgs(func, object, select)
     local returns = buildValueReturns(func)
-    local enum = buildEnum(func)
+    local enum, rawEnum = buildEnum(func)
     local comment = getComment(func)
     local overloads = getOverLoads(name, func, object, select)
     local headLen = #('function %s('):format(name)
@@ -232,6 +236,7 @@ return function (name, func, object, select)
         label = title,
         description = comment,
         enum = enum,
+        rawEnum = rawEnum,
         argLabel = argLabel,
         overloads = overloads,
         args = args,

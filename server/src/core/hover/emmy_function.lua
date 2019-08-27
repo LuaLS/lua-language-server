@@ -89,6 +89,7 @@ local function buildEnum(lib)
         ::NEXT_ENUM::
     end
     local strs = {}
+    local raw = {}
     for name, enums in pairs(container) do
         local tp
         if type(enums.type) == 'table' then
@@ -96,6 +97,7 @@ local function buildEnum(lib)
         else
             tp = enums.type
         end
+        raw[name] = {}
         strs[#strs+1] = ('\n%s: %s'):format(name, tp or 'any')
         for _, enum in ipairs(enums) do
             if enum.default then
@@ -108,18 +110,19 @@ local function buildEnum(lib)
             else
                 strs[#strs+1] = ('%q'):format(enum.enum)
             end
+            raw[name][#raw[name]+1] = strs[#strs]
             if enum.description then
                 strs[#strs+1] = ' -- ' .. enum.description
             end
         end
     end
-    return table.concat(strs)
+    return table.concat(strs), raw
 end
 
 return function (name, emmy, object, select)
     local argStr, argLabel, args = buildEmmyArgs(emmy, object, select)
     local returns = buildEmmyReturns(emmy)
-    local enum = buildEnum(emmy)
+    local enum, rawEnum = buildEnum(emmy)
     local tip = emmy.description
     local headLen = #('function %s('):format(name)
     local title = ('function %s(%s)%s'):format(name, argStr, returns)
@@ -131,6 +134,7 @@ return function (name, emmy, object, select)
         label = title,
         description = tip,
         enum = enum,
+        rawEnum = rawEnum,
         argLabel = argLabel,
         args = args,
     }

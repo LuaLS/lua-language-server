@@ -1,5 +1,6 @@
 return {
     ['unused-local']        = 'Hint',
+    ['unused-function']     = 'Hint',
     ['undefined-global']    = 'Warning',
     ['unused-label']        = 'Hint',
     ['unused-vararg']       = 'Hint',

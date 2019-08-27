@@ -5,18 +5,26 @@ local service = require 'service'
 
 rawset(_G, 'TEST', true)
 
-local function catch_target(script)
+local function catch_target(script, ...)
     local list = {}
-    local cur = 1
-    local cut = 0
-    while true do
-        local start, finish  = script:find('<!.-!>', cur)
-        if not start then
-            break
+    local function catch(buf)
+        local cur = 1
+        local cut = 0
+        while true do
+            local start, finish  = buf:find('<!.-!>', cur)
+            if not start then
+                break
+            end
+            list[#list+1] = { start - cut, finish - 4 - cut }
+            cur = finish + 1
+            cut = cut + 4
         end
-        list[#list+1] = { start - cut, finish - 4 - cut }
-        cur = finish + 1
-        cut = cut + 4
+    end
+    catch(script)
+    if ... then
+        for _, buf in ipairs {...} do
+            catch(buf)
+        end
     end
     local new_script = script:gsub('<!(.-)!>', '%1')
     return new_script, list
@@ -38,8 +46,8 @@ local function founded(targets, results)
     return true
 end
 
-function TEST(script)
-    local new_script, target = catch_target(script)
+function TEST(script, ...)
+    local new_script, target = catch_target(script, ...)
     local lsp = service()
     local ast = parser:ast(new_script, 'lua', 'Lua 5.3')
     assert(ast)
@@ -64,6 +72,26 @@ end
 TEST [[
 local <!x!>
 ]]
+
+TEST([[
+<!local function x()
+end!>
+]],
+[[
+local function <!x!>()
+end
+]]
+)
+
+TEST [[
+local <!x!> = <!function () end!>
+]]
+
+TEST [[
+local <!x!>
+x = <!function () end!>
+]]
+
 
 TEST [[
 print(<!x!>)

@@ -9,6 +9,13 @@ local DiagnosticTag = require 'constant.DiagnosticTag'
 local mt = {}
 mt.__index = mt
 
+local function isContainPos(obj, start, finish)
+    if obj.start <= start and obj.finish >= finish then
+        return true
+    end
+    return false
+end
+
 function mt:searchUnusedLocals(callback)
     self.vm:eachSource(function (source)
         local loc = source:bindLocal()
@@ -36,6 +43,41 @@ function mt:searchUnusedLocals(callback)
         if not used then
             callback(source.start, source.finish, name)
         end
+    end)
+end
+
+function mt:searchUnusedFunctions(callback)
+    self.vm:eachSource(function (source)
+        local loc = source:bindLocal()
+        if not loc then
+            return
+        end
+        if loc:get 'emmy arg' then
+            return
+        end
+        if source:action() ~= 'local' then
+            return
+        end
+        if loc:get 'hide' then
+            return
+        end
+        local used = loc:eachInfo(function (info)
+            if info.type == 'get' then
+                return true
+            end
+        end)
+        if used then
+            return
+        end
+        loc:eachInfo(function (info, src)
+            if info.type == 'set' or info.type == 'local' then
+                local v = src:bindValue()
+                local func = v and v:getFunction()
+                if func then
+                    callback(func:getSource().start, func:getSource().finish)
+                end
+            end
+        end)
     end)
 end
 
@@ -110,13 +152,6 @@ function mt:searchUnusedVararg(callback)
             callback(func._dotsSource.start, func._dotsSource.finish)
         end
     end)
-end
-
-local function isContainPos(obj, start, finish)
-    if obj.start <= start and obj.finish >= finish then
-        return true
-    end
-    return false
 end
 
 local function isInString(vm, start, finish)
@@ -795,6 +830,13 @@ return function (vm, lines, uri)
     session:doDiagnostics(session.searchUnusedLocals, 'unused-local', function (key)
         return {
             message = lang.script('DIAG_UNUSED_LOCAL', key),
+            tags = {DiagnosticTag.Unnecessary},
+        }
+    end)
+    -- 未使用的函数
+    session:doDiagnostics(session.searchUnusedFunctions, 'unused-function', function ()
+        return {
+            message = lang.script.DIAG_UNUSED_FUNCTION,
             tags = {DiagnosticTag.Unnecessary},
         }
     end)

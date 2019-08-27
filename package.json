@@ -195,6 +195,17 @@
                             "scope": "resource",
                             "type": "string"
                         },
+                        "unused-function": {
+                            "default": "Hint",
+                            "enum": [
+                                "Error",
+                                "Warning",
+                                "Information",
+                                "Hint"
+                            ],
+                            "scope": "resource",
+                            "type": "string"
+                        },
                         "unused-label": {
                             "default": "Hint",
                             "enum": [

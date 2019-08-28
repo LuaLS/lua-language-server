@@ -461,6 +461,12 @@ local function searchAsLocal(vm, source, word, callback)
     -- 特殊支持 local function
     if matchKey(word, 'function') then
         callback('function', nil, CompletionItemKind.Keyword)
+        -- TODO 需要有更优美的实现方式
+        local data = snippet.key['function'][1]
+        callback(data.label, nil, CompletionItemKind.Snippet, {
+            insertTextFormat = 2,
+            insertText = data.text,
+        })
     end
 end
 

@@ -18,6 +18,18 @@ jobs:
   - script: |
       3rd\luamake\luamake.exe rebuild
     displayName: 'Compile'
+  - script: |
+      server\bin\lua-language-server.exe server\publish.lua
+    displayName: 'Publish'
+  - task: CopyFiles@2
+    inputs:
+      Contents: '**'
+      SourceFolder: 'publish\lua-language-server'
+      TargetFolder: '$(Build.ArtifactStagingDirectory)'
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathToPublish: $(Build.ArtifactStagingDirectory)
+      artifactName: lua-language-server
 
 - job: macos
   pool:
@@ -39,6 +51,18 @@ jobs:
   - bash: |
       ./3rd/luamake/luamake rebuild
     displayName: 'Compile'
+  - bash: |
+      server/bin/lua-language-server server/publish.lua
+    displayName: 'Publish'
+  - task: CopyFiles@2
+    inputs:
+      Contents: '**'
+      SourceFolder: 'publish/lua-language-server'
+      TargetFolder: '$(Build.ArtifactStagingDirectory)'
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathToPublish: $(Build.ArtifactStagingDirectory)
+      artifactName: lua-language-server
 
 - job: linux
   pool:
@@ -59,3 +83,15 @@ jobs:
   - bash: |
       ./3rd/luamake/luamake rebuild
     displayName: 'Compile'
+  - bash: |
+      server/bin/lua-language-server server/publish.lua
+    displayName: 'Publish'
+  - task: CopyFiles@2
+    inputs:
+      Contents: '**'
+      SourceFolder: 'publish/lua-language-server'
+      TargetFolder: '$(Build.ArtifactStagingDirectory)'
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathToPublish: $(Build.ArtifactStagingDirectory)
+      artifactName: lua-language-server

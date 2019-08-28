@@ -62,6 +62,9 @@ jobs:
       cd ..
     displayName: 'Install Client'
   - bash: |
+      cd server
+      ls
+      cd ..
       ulimit -n 10000
       ./server/Macos/bin/lua-language-server server/publish.lua
     displayName: 'Publish'
@@ -100,6 +103,9 @@ jobs:
       cd ..
     displayName: 'Install Client'
   - bash: |
+      cd server
+      ls
+      cd ..
       ulimit -n 10000
       ./server/Linux/bin/lua-language-server server/publish.lua
     displayName: 'Publish'

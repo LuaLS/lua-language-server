@@ -17,7 +17,7 @@ local function decode(uri)
 end
 
 local function encode(path)
-    local fullPath = fs.absolute(path)
+    local fullPath = fs.absolute(ROOT / path)
     local obj = URI_FILE.make_file_uri(fullPath:string(), OS)
     local uri = obj:uri()
     return uri

@@ -12,7 +12,6 @@ package.path  = rootPath .. 'test/?.lua'
 
 local fs = require 'bee.filesystem'
 ROOT = fs.absolute(fs.path(rootPath):parent_path())
-print('ROOT =', ROOT)
 LANG = 'en-US'
 
 log = require 'log'

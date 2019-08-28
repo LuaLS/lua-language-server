@@ -1,11 +1,12 @@
 local platform = ...
 local fs = require 'bee.filesystem'
 local sp = require 'bee.subprocess'
+local pf = require 'bee.platform'
 local exe = platform == 'msvc' and ".exe" or ""
 local CWD = fs.current_path()
 
 local process = assert(sp.spawn {
-    CWD / 'server' / 'bin' / ('lua-language-server' .. exe),
+    CWD / 'server' / pf.OS / 'bin' / ('lua-language-server' .. exe),
     CWD / 'server' / 'test.lua',
     '-E',
     stdout = true,

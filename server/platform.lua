@@ -7,10 +7,10 @@ end
 package.path  = rootPath .. 'src/?.lua'
       .. ';' .. rootPath .. 'src/?/init.lua'
 
-if package.loadlib(rootPath .. '/bin-macos/bee.so', 'luaopen_bee_platform') then
-    package.cpath = rootPath .. 'bin-macos/?.so'
-elseif package.loadlib(rootPath .. '/bin-linux/bee.so', 'luaopen_bee_platform') then
-    package.cpath = rootPath .. 'bin-linux/?.so'
-elseif package.loadlib(rootPath .. '/bin-windows/bee.dll', 'luaopen_bee_platform') then
-    package.cpath = rootPath .. 'bin-windows/?.dll'
+if package.loadlib(rootPath .. '/Macos/bin/bee.so', 'luaopen_bee_platform') then
+    package.cpath = rootPath .. '/Macos/bin/?.so'
+elseif package.loadlib(rootPath .. '/Linux/bin/bee.so', 'luaopen_bee_platform') then
+    package.cpath = rootPath .. '/Linux/bin/?.so'
+elseif package.loadlib(rootPath .. '/Windows/bin/bee.dll', 'luaopen_bee_platform') then
+    package.cpath = rootPath .. '/Windows/bin/?.dll'
 end

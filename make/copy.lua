@@ -1,4 +1,5 @@
 local fs = require 'bee.filesystem'
+local pf = require 'bee.platform'
 
 local function getExtensionDirName(packageDir)
     local publisher,name,version
@@ -49,7 +50,7 @@ if not fs.exists(extensionDir) then
     return
 end
 
-local binDir = extensionDir / "server" / "bin"
+local binDir = extensionDir / "server" / pf.OS / "bin"
 local bakDir = extensionDir / "server" / "bak"
 
 if fs.exists(binDir) then
@@ -60,6 +61,6 @@ if fs.exists(binDir) then
     end
 end
 
-copy_directory(sourceDir / "server" / "bin", binDir)
+copy_directory(sourceDir / "server" / pf.OS / "bin", binDir)
 
 print 'ok'

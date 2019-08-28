@@ -1,9 +1,10 @@
 local platform = ...
 local fs = require 'bee.filesystem'
 local sp = require 'bee.subprocess'
+local pf = require 'bee.platform'
 
 local CWD = fs.current_path()
-local output = CWD / 'server' / 'bin'
+local output = CWD / 'server' / pf.OS / 'bin'
 local bindir = CWD / 'build' / platform / 'bin'
 local exe = platform == 'msvc' and ".exe" or ""
 local dll = platform == 'msvc' and ".dll" or ".so"

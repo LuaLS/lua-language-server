@@ -2,8 +2,6 @@ local platform = ...
 local fs = require 'bee.filesystem'
 local sp = require 'bee.subprocess'
 local exe = platform == 'msvc' and ".exe" or ""
-
-error('测试')
 local CWD = fs.current_path()
 
 local process = assert(sp.spawn {
@@ -16,7 +14,9 @@ local process = assert(sp.spawn {
 
 for line in process.stdout:lines 'l' do
     print(line)
+    error(line)
 end
+error('测试')
 process:wait()
 local err = process.stderr:read 'a'
 if err ~= '' then

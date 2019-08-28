@@ -63,7 +63,7 @@ jobs:
     displayName: 'Install Client'
   - bash: |
       ulimit -n 10000
-      server/Macos/bin/lua-language-server server/publish.lua
+      ./server/Macos/bin/lua-language-server server/publish.lua
     displayName: 'Publish'
   - task: CopyFiles@2
     inputs:
@@ -101,7 +101,7 @@ jobs:
     displayName: 'Install Client'
   - bash: |
       ulimit -n 10000
-      server/Linux/bin/lua-language-server server/publish.lua
+      ./server/Linux/bin/lua-language-server server/publish.lua
     displayName: 'Publish'
   - task: CopyFiles@2
     inputs:

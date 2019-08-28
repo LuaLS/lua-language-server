@@ -10,11 +10,11 @@ package.path  = rootPath .. 'src/?.lua'
 
 local fs = require 'bee.filesystem'
 local subprocess = require 'bee.subprocess'
+local platform = require 'bee.platform'
 ROOT = fs.absolute(fs.path(rootPath))
 
 local function runTest(root)
-    local is_macos = package.cpath:sub(-3) == '.so'
-    local ext = is_macos and '' or '.exe'
+    local ext = platform.OS == 'Windows' and '.exe' or ''
     local exe = root / 'bin' / 'lua-language-server' .. ext
     local test = root / 'test' / 'main.lua'
     local lua = subprocess.spawn {

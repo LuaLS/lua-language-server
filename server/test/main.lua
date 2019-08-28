@@ -12,7 +12,7 @@ log = require 'log'
 log.init(ROOT, ROOT / 'log' / 'test.log')
 log.debug('测试开始')
 ac = {}
-
+error '测试'
 require 'utility'
 require 'global_protect'
 require 'build_package'

@@ -7,7 +7,7 @@ package.cpath = rootPath .. 'bin/?.so'
       .. ';' .. rootPath .. 'bin/?.dll'
 package.path  = rootPath .. 'src/?.lua'
       .. ';' .. rootPath .. 'src/?/init.lua'
-error '测试'
+
 local fs = require 'bee.filesystem'
 local subprocess = require 'bee.subprocess'
 ROOT = fs.absolute(fs.path(rootPath))

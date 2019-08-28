@@ -15,6 +15,7 @@ lm:shared_library 'lni' {
     links = {
         platform.OS == "Linux" and "stdc++",
     },
+    visibility = 'default',
 }
 
 lm:shared_library 'lpeglabel' {

@@ -5,22 +5,12 @@
  * ------------------------------------------------------------------------------------------ */
 Object.defineProperty(exports, "__esModule", { value: true });
 const path = require("path");
+const os = require("os");
 const vscode_1 = require("vscode");
 const vscode_languageclient_1 = require("vscode-languageclient");
 let client;
 function activate(context) {
     let language = vscode_1.env.language;
-    // If the extension is launched in debug mode then the debug server options are used
-    // Otherwise the run options are used
-    let serverOptions = {
-        command: context.asAbsolutePath(path.join('server', 'Windows', 'bin', 'lua-language-server')),
-        args: [
-            '-E',
-            '-e',
-            'LANG="' + language + '"',
-            context.asAbsolutePath(path.join('server', 'main.lua'))
-        ]
-    };
     // Options to control the language client
     let clientOptions = {
         // Register the server for plain text documents
@@ -30,9 +20,29 @@ function activate(context) {
             fileEvents: vscode_1.workspace.createFileSystemWatcher('**/.clientrc')
         }
     };
-    // Create the language client and start the client.
+    let command;
+    let platform = os.platform();
+    switch (platform) {
+        case "win32":
+            command = context.asAbsolutePath(path.join('server', 'Windows', 'bin', 'lua-language-server.exe'));
+            break;
+        case "linux":
+            command = context.asAbsolutePath(path.join('server', 'Linux', 'bin', 'lua-language-server'));
+            break;
+        case "darwin":
+            command = context.asAbsolutePath(path.join('server', 'Macos', 'bin', 'lua-language-server'));
+            break;
+    }
+    let serverOptions = {
+        command: command,
+        args: [
+            '-E',
+            '-e',
+            'LANG="' + language + '"',
+            context.asAbsolutePath(path.join('server', 'main.lua'))
+        ]
+    };
     client = new vscode_languageclient_1.LanguageClient('Lua Language Server', 'Lua Language Client', serverOptions, clientOptions);
-    // Start the client. This will also launch the server
     client.start();
 }
 exports.activate = activate;

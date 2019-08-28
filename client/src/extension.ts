@@ -4,6 +4,7 @@
  * ------------------------------------------------------------------------------------------ */
 
 import * as path from 'path';
+import * as os from 'os';
 import { workspace, ExtensionContext, env } from 'vscode';
 
 import {
@@ -11,27 +12,12 @@ import {
 	LanguageClientOptions,
 	ServerOptions,
 } from 'vscode-languageclient';
+import { openSync } from 'fs';
 
 let client: LanguageClient;
 
 export function activate(context: ExtensionContext) {
 	let language = env.language;
-
-	// If the extension is launched in debug mode then the debug server options are used
-	// Otherwise the run options are used
-	let serverOptions: ServerOptions = {
-		command: context.asAbsolutePath(
-			path.join('server', 'Windows', 'bin', 'lua-language-server')
-		),
-		args: [
-			'-E',
-			'-e',
-			'LANG="' + language + '"',
-			context.asAbsolutePath(
-				path.join('server', 'main.lua')
-			)
-		]
-	};
 
 	// Options to control the language client
 	let clientOptions: LanguageClientOptions = {
@@ -43,7 +29,39 @@ export function activate(context: ExtensionContext) {
 		}
 	};
 
-	// Create the language client and start the client.
+	let command: string;
+	let platform: string = os.platform();
+	switch (platform) {
+		case "win32":
+			command = context.asAbsolutePath(
+				path.join('server', 'Windows', 'bin', 'lua-language-server.exe')
+			);
+			break;
+		case "linux":
+			command = context.asAbsolutePath(
+				path.join('server', 'Linux', 'bin', 'lua-language-server')
+			);
+			break;
+
+		case "darwin":
+			command = context.asAbsolutePath(
+				path.join('server', 'Macos', 'bin', 'lua-language-server')
+			);
+			break;
+	}
+	
+	let serverOptions: ServerOptions = {
+		command: command,
+		args: [
+			'-E',
+			'-e',
+			'LANG="' + language + '"',
+			context.asAbsolutePath(
+				path.join('server', 'main.lua')
+			)
+		]
+	};
+
 	client = new LanguageClient(
 		'Lua Language Server',
 		'Lua Language Client',
@@ -51,7 +69,6 @@ export function activate(context: ExtensionContext) {
 		clientOptions
 	);
 
-	// Start the client. This will also launch the server
 	client.start();
 }
 

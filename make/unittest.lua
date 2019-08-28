@@ -14,9 +14,7 @@ local process = assert(sp.spawn {
 
 for line in process.stdout:lines 'l' do
     print(line)
-    error(line)
 end
-error('测试')
 process:wait()
 local err = process.stderr:read 'a'
 if err ~= '' then

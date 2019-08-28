@@ -21,7 +21,7 @@ lm:shared_library 'lpeglabel' {
     deps = platform.OS == "Windows" and "lua54" or "lua",
     sources = 'lpeglabel/*.c',
     undefs = "NDEBUG",
-    ldflags = platform.OS == "Windows" and "/EXPORT:luaopen_lpeglabel",
+    ldflags = "/EXPORT:luaopen_lpeglabel",
 }
 
 if platform.OS == "Windows" then

@@ -17,6 +17,15 @@ require 'utility'
 require 'global_protect'
 require 'build_package'
 
+local function loadAllLibs()
+    assert(require 'bee.filesystem')
+    assert(require 'bee.subprocess')
+    assert(require 'bee.thread')
+    assert(require 'bee.socket')
+    assert(require 'lni')
+    assert(require 'lpeglabel')
+end
+
 local function main()
     local function test(name)
         local clock = os.clock()
@@ -43,6 +52,7 @@ local function main()
     print('测试完成')
 end
 
+loadAllLibs()
 main()
 
 log.debug('测试完成')

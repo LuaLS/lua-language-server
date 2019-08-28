@@ -29,7 +29,7 @@ jobs:
   - task: PublishBuildArtifacts@1
     inputs:
       pathToPublish: $(Build.ArtifactStagingDirectory)
-      artifactName: lua-language-server
+      artifactName: sumneko.lua-windows
 
 - job: macos
   pool:
@@ -62,7 +62,7 @@ jobs:
   - task: PublishBuildArtifacts@1
     inputs:
       pathToPublish: $(Build.ArtifactStagingDirectory)
-      artifactName: lua-language-server
+      artifactName: sumneko.lua-macos
 
 - job: linux
   pool:
@@ -94,4 +94,4 @@ jobs:
   - task: PublishBuildArtifacts@1
     inputs:
       pathToPublish: $(Build.ArtifactStagingDirectory)
-      artifactName: lua-language-server
+      artifactName: sumneko.lua-linux

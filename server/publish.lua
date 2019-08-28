@@ -10,8 +10,9 @@ package.path  = rootPath .. 'src/?.lua'
 
 local fs = require 'bee.filesystem'
 local subprocess = require 'bee.subprocess'
+local platform = require 'bee.platform'
 ROOT = fs.absolute(fs.path(rootPath):parent_path())
-EXTENSION = fs.absolute(fs.path(rootPath .. '..'))
+EXTENSION = ROOT:parent_path()
 
 require 'utility'
 local json = require 'json'
@@ -77,10 +78,9 @@ local function copyFiles(root, out)
 end
 
 local function runTest(root)
-    local is_macos = package.cpath:sub(-3) == '.so'
-    local ext = is_macos and '' or '.exe'
+    local ext = platform.OS == 'Windows' and '.exe' or ''
     local exe = root / 'bin' / 'lua-language-server' .. ext
-    local test = root / 'test' / 'main.lua'
+    local test = root / 'test.lua'
     local lua = subprocess.spawn {
         exe,
         test,
@@ -150,6 +150,8 @@ local count = copyFiles(EXTENSION , out) {
         ['src']      = true,
         ['test']     = true,
         ['main.lua'] = true,
+        ['test.lua'] = true,
+        ['build_package.lua'] = true,
     },
     ['images'] = {
         ['logo.png'] = true,
@@ -172,6 +174,8 @@ removeFiles(out) {
     ['server'] = {
         ['log']  = true,
         ['test'] = true,
+        ['test.lua'] = true,
+        ['build_package.lua'] = true,
     },
 }
 

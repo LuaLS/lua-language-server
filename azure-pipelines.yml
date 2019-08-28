@@ -18,6 +18,11 @@ jobs:
   - script: |
       3rd\luamake\luamake.exe rebuild
     displayName: 'Compile'
+  - scirpt: |
+      cd client
+      npm install
+      cd ..
+    displayName: 'Install Client'
   - script: |
       server\bin\lua-language-server.exe server\publish.lua
     displayName: 'Publish'
@@ -51,6 +56,11 @@ jobs:
   - bash: |
       ./3rd/luamake/luamake rebuild
     displayName: 'Compile'
+  - scirpt: |
+      cd client
+      npm install
+      cd ..
+    displayName: 'Install Client'
   - bash: |
       server/bin/lua-language-server server/publish.lua
     displayName: 'Publish'
@@ -83,6 +93,11 @@ jobs:
   - bash: |
       ./3rd/luamake/luamake rebuild
     displayName: 'Compile'
+  - scirpt: |
+      cd client
+      npm install
+      cd ..
+    displayName: 'Install Client'
   - bash: |
       server/bin/lua-language-server server/publish.lua
     displayName: 'Publish'

@@ -13,24 +13,13 @@ function activate(context) {
     // If the extension is launched in debug mode then the debug server options are used
     // Otherwise the run options are used
     let serverOptions = {
-        run: {
-            command: context.asAbsolutePath(path.join('server', 'bin', 'lua-language-server')),
-            args: [
-                '-E',
-                '-e',
-                'LANG="' + language + '"',
-                context.asAbsolutePath(path.join('server', 'main.lua'))
-            ]
-        },
-        debug: {
-            command: context.asAbsolutePath(path.join('server', 'bin', 'lua-language-server')),
-            args: [
-                '-E',
-                '-e',
-                'LANG="' + language + '"',
-                context.asAbsolutePath(path.join('server', 'main.lua'))
-            ]
-        }
+        command: context.asAbsolutePath(path.join('server', 'Windows', 'bin', 'lua-language-server')),
+        args: [
+            '-E',
+            '-e',
+            'LANG="' + language + '"',
+            context.asAbsolutePath(path.join('server', 'main.lua'))
+        ]
     };
     // Options to control the language client
     let clientOptions = {

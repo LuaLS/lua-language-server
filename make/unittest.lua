@@ -12,7 +12,7 @@ local process = assert(sp.spawn {
     stdout = true,
     stderr = true,
 })
-
+error('故意失败')
 for line in process.stdout:lines 'l' do
     print(line)
 end

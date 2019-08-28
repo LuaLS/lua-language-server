@@ -3,6 +3,7 @@ local fs = require 'bee.filesystem'
 local sp = require 'bee.subprocess'
 local exe = platform == 'msvc' and ".exe" or ""
 
+error('测试')
 local CWD = fs.current_path()
 
 local process = assert(sp.spawn {

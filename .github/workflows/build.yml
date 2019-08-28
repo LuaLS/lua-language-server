@@ -1,0 +1,69 @@
+on:
+  push:
+    branches:
+    - master
+
+jobs:
+  windows:
+    name: build in windows
+    runs-on: windows-latest
+    steps:
+    - name: Init
+      run: |
+        git submodule update --init --recursive
+    - name: Compile luamake
+      run: |
+        cd 3rd\luamake
+        tools\ninja.exe -f ninja\msvc.ninja
+        cd ..\..
+    - name: Compile
+      run: |
+        3rd\luamake\luamake.exe rebuild
+    - name: Publish
+      run: |
+        server\bin\lua-language-server.exe server\publish.lua
+        
+  macos:
+    name: build in macos
+    runs-on: macos-latest
+    steps:
+    - name: Init
+      run: |
+        git submodule update --init --recursive
+    - name: Install
+      run: |
+        sudo xcode-select -s /Applications/Xcode_10.2.app
+        brew install ninja
+    - name: Compile luamake
+      run: |
+        cd 3rd/luamake
+        ninja -f ninja/macos.ninja
+        cd ../..
+    - name: Compile
+      run: |
+        ./3rd/luamake/luamake rebuild
+    - name: Publish
+      run: |
+        server/bin/lua-language-server server/publish.lua
+        
+    linux:
+    name: build in linux
+    runs-on: ubuntu-latest
+    steps:
+    - name: Init
+      run: |
+        git submodule update --init --recursive
+    - name: Install
+      run: |
+        sudo apt-get install -y libreadline-dev ninja-build
+    - name: Compile luamake
+      run: |
+        cd 3rd/luamake
+        ninja -f ninja/linux.ninja
+        cd ../..
+    - name: Compile
+      run: |
+        ./3rd/luamake/luamake rebuild
+    - name: Publish
+      run: |
+        server/bin/lua-language-server server/publish.lua

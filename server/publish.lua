@@ -141,7 +141,7 @@ local count = copyFiles(EXTENSION , out) {
     },
     ['server'] = {
         ['Windows']           = true,
-        ['Macos']             = true,
+        ['macOS']             = true,
         ['Linux']             = true,
         ['libs']              = true,
         ['locale']            = true,

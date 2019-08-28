@@ -30,7 +30,7 @@ function activate(context) {
             command = context.asAbsolutePath(path.join('server', 'Linux', 'bin', 'lua-language-server'));
             break;
         case "darwin":
-            command = context.asAbsolutePath(path.join('server', 'Macos', 'bin', 'lua-language-server'));
+            command = context.asAbsolutePath(path.join('server', 'macOS', 'bin', 'lua-language-server'));
             break;
     }
     let serverOptions = {

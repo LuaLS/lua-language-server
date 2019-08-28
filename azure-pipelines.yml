@@ -54,6 +54,7 @@ jobs:
       cd ../..
     displayName: 'Compile luamake'
   - bash: |
+      rm server/macOS
       ./3rd/luamake/luamake rebuild
     displayName: 'Compile'
   - bash: |
@@ -62,11 +63,8 @@ jobs:
       cd ..
     displayName: 'Install Client'
   - bash: |
-      cd server
-      ls
-      cd ..
       ulimit -n 10000
-      ./server/Macos/bin/lua-language-server server/publish.lua
+      ./server/macOS/bin/lua-language-server server/publish.lua
     displayName: 'Publish'
   - task: CopyFiles@2
     inputs:
@@ -95,6 +93,7 @@ jobs:
       cd ../..
     displayName: 'Compile luamake'
   - bash: |
+      rm server/Linux
       ./3rd/luamake/luamake rebuild
     displayName: 'Compile'
   - bash: |
@@ -103,9 +102,6 @@ jobs:
       cd ..
     displayName: 'Install Client'
   - bash: |
-      cd server
-      ls
-      cd ..
       ulimit -n 10000
       ./server/Linux/bin/lua-language-server server/publish.lua
     displayName: 'Publish'

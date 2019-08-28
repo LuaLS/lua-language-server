@@ -45,7 +45,7 @@ export function activate(context: ExtensionContext) {
 
 		case "darwin":
 			command = context.asAbsolutePath(
-				path.join('server', 'Macos', 'bin', 'lua-language-server')
+				path.join('server', 'macOS', 'bin', 'lua-language-server')
 			);
 			break;
 	}

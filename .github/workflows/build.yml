@@ -46,7 +46,7 @@ jobs:
       run: |
         server/bin/lua-language-server server/publish.lua
         
-    linux:
+  linux:
     name: build in linux
     runs-on: ubuntu-latest
     steps:

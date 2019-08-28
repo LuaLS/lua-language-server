@@ -3,7 +3,6 @@ node_modules
 .vscode-test
 .vscode/ipch
 /server/log
-/server/bin
 /server/*.so
 /publish
 /build/

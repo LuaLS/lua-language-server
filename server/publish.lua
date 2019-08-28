@@ -3,11 +3,7 @@ local rootPath = currentPath:gsub('[^/\\]-$', '')
 if rootPath == '' then
     rootPath = './'
 end
-package.cpath = rootPath .. 'bin/?.so'
-      .. ';' .. rootPath .. 'bin/?.dll'
-package.path  = rootPath .. 'src/?.lua'
-      .. ';' .. rootPath .. 'src/?/init.lua'
-
+dofile(rootPath .. 'platform.lua')
 local fs = require 'bee.filesystem'
 local subprocess = require 'bee.subprocess'
 local platform = require 'bee.platform'

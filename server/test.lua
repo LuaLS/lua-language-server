@@ -3,13 +3,7 @@ local rootPath = currentPath:gsub('[^/\\]-$', '')
 if rootPath == '' then
     rootPath = './'
 end
-package.cpath = rootPath .. 'bin/?.so'
-      .. ';' .. rootPath .. 'bin/?.dll'
-package.path  = rootPath .. 'test/?.lua'
-      .. ';' .. rootPath .. 'test/?/init.lua'
-      .. ';' .. rootPath .. 'src/?.lua'
-      .. ';' .. rootPath .. 'src/?/init.lua'
-
+dofile(rootPath .. 'platform.lua')
 local fs = require 'bee.filesystem'
 ROOT = fs.absolute(fs.path(rootPath):parent_path())
 LANG = 'en-US'

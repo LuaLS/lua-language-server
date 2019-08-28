@@ -18,7 +18,7 @@ jobs:
   - script: |
       3rd\luamake\luamake.exe rebuild
     displayName: 'Compile'
-  - scirpt: |
+  - script: |
       cd client
       npm install
       cd ..
@@ -56,7 +56,7 @@ jobs:
   - bash: |
       ./3rd/luamake/luamake rebuild
     displayName: 'Compile'
-  - scirpt: |
+  - bash: |
       cd client
       npm install
       cd ..
@@ -93,7 +93,7 @@ jobs:
   - bash: |
       ./3rd/luamake/luamake rebuild
     displayName: 'Compile'
-  - scirpt: |
+  - bash: |
       cd client
       npm install
       cd ..

@@ -7,15 +7,10 @@
 			"type": "lua",
 			"request": "launch",
 			"stopOnEntry": false,
-			"program": "${workspaceRoot}/server/test/main.lua",
+			"program": "${workspaceRoot}/server/test.lua",
 			"cwd": "${workspaceRoot}/server",
-			"env": {
-				"PATH": "${workspaceRoot}\\server\\bin\\"
-			},
 			//"luaexe": "${workspaceRoot}\\server\\bin\\lua-language-server.exe",
 			//"luadll": "${workspaceRoot}\\server\\bin\\lua54.dll",
-			"path": "${workspaceRoot}/server/bin/?.lua",
-			"cpath": "${workspaceRoot}/server/bin/?.dll;",
 			"arg": [
 			],
 			"consoleCoding": "utf8",

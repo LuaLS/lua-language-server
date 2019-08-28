@@ -5,34 +5,60 @@ if rootPath == '' then
 end
 package.cpath = rootPath .. 'bin/?.so'
       .. ';' .. rootPath .. 'bin/?.dll'
-package.path  = rootPath .. 'src/?.lua'
+package.path  = rootPath .. 'test/?.lua'
+      .. ';' .. rootPath .. 'test/?/init.lua'
+      .. ';' .. rootPath .. 'src/?.lua'
       .. ';' .. rootPath .. 'src/?/init.lua'
 
 local fs = require 'bee.filesystem'
-local subprocess = require 'bee.subprocess'
-local platform = require 'bee.platform'
-ROOT = fs.absolute(fs.path(rootPath))
+ROOT = fs.absolute(fs.path(rootPath):parent_path())
+LANG = 'en-US'
 
-local function runTest(root)
-    local ext = platform.OS == 'Windows' and '.exe' or ''
-    local exe = root / 'bin' / 'lua-language-server' .. ext
-    local test = root / 'test' / 'main.lua'
-    local lua = subprocess.spawn {
-        exe,
-        test,
-        '-E',
-        cwd = root,
-        stdout = true,
-        stderr = true,
-    }
-    for line in lua.stdout:lines 'l' do
-        print(line)
-    end
-    lua:wait()
-    local err = lua.stderr:read 'a'
-    if err ~= '' then
-        error(err)
-    end
+log = require 'log'
+log.init(ROOT, ROOT / 'log' / 'test.log')
+log.debug('测试开始')
+ac = {}
+
+require 'utility'
+require 'global_protect'
+dofile((ROOT / 'build_package.lua'):string())
+
+local function loadAllLibs()
+    assert(require 'bee.filesystem')
+    assert(require 'bee.subprocess')
+    assert(require 'bee.thread')
+    assert(require 'bee.socket')
+    assert(require 'lni')
+    assert(require 'lpeglabel')
 end
 
-runTest(ROOT)
+local function main()
+    local function test(name)
+        local clock = os.clock()
+        print(('测试[%s]...'):format(name))
+        require(name)
+        print(('测试[%s]用时[%.3f]'):format(name, os.clock() - clock))
+    end
+
+    test 'core'
+    test 'definition'
+    test 'rename'
+    test 'highlight'
+    test 'references'
+    test 'diagnostics'
+    test 'type_inference'
+    test 'find_lib'
+    test 'hover'
+    test 'completion'
+    test 'signature'
+    test 'document_symbol'
+    test 'crossfile'
+    test 'full'
+
+    print('测试完成')
+end
+
+loadAllLibs()
+main()
+
+log.debug('测试完成')

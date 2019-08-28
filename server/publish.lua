@@ -10,7 +10,7 @@ package.path  = rootPath .. 'src/?.lua'
 
 local fs = require 'bee.filesystem'
 local subprocess = require 'bee.subprocess'
-ROOT = fs.absolute(fs.path(rootPath))
+ROOT = fs.absolute(fs.path(rootPath):parent_path())
 EXTENSION = fs.absolute(fs.path(rootPath .. '..'))
 
 require 'utility'

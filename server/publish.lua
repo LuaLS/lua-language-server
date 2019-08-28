@@ -85,6 +85,7 @@ local function runTest(root)
         exe,
         test,
         '-E',
+        cwd = root,
         stdout = true,
         stderr = true,
     }

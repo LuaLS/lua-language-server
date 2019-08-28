@@ -4,6 +4,9 @@ if rootPath == '' then
     rootPath = './'
 end
 dofile(rootPath .. 'platform.lua')
+package.path  = package.path
+      .. ';' .. rootPath .. 'test/?.lua'
+      .. ';' .. rootPath .. 'test/?/init.lua'
 local fs = require 'bee.filesystem'
 ROOT = fs.absolute(fs.path(rootPath):parent_path())
 LANG = 'en-US'

@@ -24,6 +24,7 @@ local function loadAllLibs()
     assert(require 'bee.socket')
     assert(require 'lni')
     assert(require 'lpeglabel')
+    error('测试')
 end
 
 local function main()

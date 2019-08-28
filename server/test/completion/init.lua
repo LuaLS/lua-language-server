@@ -252,7 +252,6 @@ loc$
         label = 'local function',
         kind = CompletionItemKind.Snippet,
         insertText = EXISTS,
-        insertTextFormat = 2,
     }
 }
 
@@ -418,6 +417,11 @@ print(fff)
     {
         label = 'function',
         kind = CompletionItemKind.Keyword,
+    },
+    {
+        label = 'function name()',
+        kind = CompletionItemKind.Snippet,
+        insertText = EXISTS,
     },
     {
         label = 'ff2',
@@ -854,7 +858,6 @@ else$
         label = 'elseif .. then',
         kind = CompletionItemKind.Snippet,
         insertText = EXISTS,
-        insertTextFormat = 2,
     }
 }
 
@@ -1195,7 +1198,6 @@ end
     {
         label = 'elseif .. then',
         kind = CompletionItemKind.Snippet,
-        insertTextFormat = 2,
         insertText = EXISTS,
     },
 }

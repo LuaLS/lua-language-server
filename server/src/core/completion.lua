@@ -399,7 +399,6 @@ local function searchKeyWords(vm, source, word, callback)
             if snippet.key[key] then
                 for _, data in ipairs(snippet.key[key]) do
                     callback(data.label, nil, CompletionItemKind.Snippet, {
-                        insertTextFormat = 2,
                         insertText = data.text,
                     })
                 end
@@ -464,7 +463,6 @@ local function searchAsLocal(vm, source, word, callback)
         -- TODO 需要有更优美的实现方式
         local data = snippet.key['function'][1]
         callback(data.label, nil, CompletionItemKind.Snippet, {
-            insertTextFormat = 2,
             insertText = data.text,
         })
     end

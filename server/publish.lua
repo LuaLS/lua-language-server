@@ -75,7 +75,7 @@ end
 
 local function runTest(root)
     local ext = platform.OS == 'Windows' and '.exe' or ''
-    local exe = root / 'bin' / 'lua-language-server' .. ext
+    local exe = root / platform.OS / 'bin' / 'lua-language-server' .. ext
     local test = root / 'test.lua'
     local lua = subprocess.spawn {
         exe,
@@ -140,13 +140,16 @@ local count = copyFiles(EXTENSION , out) {
         ['tsconfig.json']     = true,
     },
     ['server'] = {
-        ['bin']      = true,
-        ['libs']     = true,
-        ['locale']   = true,
-        ['src']      = true,
-        ['test']     = true,
-        ['main.lua'] = true,
-        ['test.lua'] = true,
+        ['Windows']           = true,
+        ['Macos']             = true,
+        ['Linux']             = true,
+        ['libs']              = true,
+        ['locale']            = true,
+        ['src']               = true,
+        ['test']              = true,
+        ['main.lua']          = true,
+        ['platform.lua']      = true,
+        ['test.lua']          = true,
         ['build_package.lua'] = true,
     },
     ['images'] = {
@@ -168,9 +171,9 @@ runTest(out / 'server')
 print('删除多余文件...')
 removeFiles(out) {
     ['server'] = {
-        ['log']  = true,
-        ['test'] = true,
-        ['test.lua'] = true,
+        ['log']               = true,
+        ['test']              = true,
+        ['test.lua']          = true,
         ['build_package.lua'] = true,
     },
 }

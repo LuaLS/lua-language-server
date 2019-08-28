@@ -7,10 +7,12 @@ end
 package.path  = rootPath .. 'src/?.lua'
       .. ';' .. rootPath .. 'src/?/init.lua'
 
-if package.loadlib(rootPath .. '/Macos/bin/bee.so', 'luaopen_bee_platform') then
-    package.cpath = rootPath .. '/Macos/bin/?.so'
-elseif package.loadlib(rootPath .. '/Linux/bin/bee.so', 'luaopen_bee_platform') then
-    package.cpath = rootPath .. '/Linux/bin/?.so'
-elseif package.loadlib(rootPath .. '/Windows/bin/bee.dll', 'luaopen_bee_platform') then
-    package.cpath = rootPath .. '/Windows/bin/?.dll'
+if package.loadlib(rootPath .. 'Macos/bin/bee.so', 'luaopen_bee_platform') then
+    package.cpath = rootPath .. 'Macos/bin/?.so'
+elseif package.loadlib(rootPath .. 'Linux/bin/bee.so', 'luaopen_bee_platform') then
+    package.cpath = rootPath .. 'Linux/bin/?.so'
+elseif package.loadlib(rootPath .. 'Windows/bin/bee.dll', 'luaopen_bee_platform') then
+    package.cpath = rootPath .. 'Windows/bin/?.dll'
+else
+    error([[It doesn't seem to support your OS, please let me know at https://github.com/sumneko/lua-language-server/issues]])
 end

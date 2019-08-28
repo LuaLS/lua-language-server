@@ -8,6 +8,8 @@ local fs = require 'bee.filesystem'
 ROOT = fs.absolute(fs.path(rootPath):parent_path())
 LANG = LANG or 'en-US'
 
+print(package.cpath)
+
 --collectgarbage('generational')
 collectgarbage("setpause", 100)
 collectgarbage("setstepmul", 1000)

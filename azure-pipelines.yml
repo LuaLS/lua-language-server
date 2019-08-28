@@ -24,7 +24,7 @@ jobs:
       cd ..
     displayName: 'Install Client'
   - script: |
-      server\bin\lua-language-server.exe server\publish.lua
+      server\Windows\bin\lua-language-server.exe server\publish.lua
     displayName: 'Publish'
   - task: CopyFiles@2
     inputs:
@@ -62,7 +62,7 @@ jobs:
       cd ..
     displayName: 'Install Client'
   - bash: |
-      server/bin/lua-language-server server/publish.lua
+      server/Macos/bin/lua-language-server server/publish.lua
     displayName: 'Publish'
   - task: CopyFiles@2
     inputs:
@@ -99,7 +99,7 @@ jobs:
       cd ..
     displayName: 'Install Client'
   - bash: |
-      server/bin/lua-language-server server/publish.lua
+      server/Linux/bin/lua-language-server server/publish.lua
     displayName: 'Publish'
   - task: CopyFiles@2
     inputs:

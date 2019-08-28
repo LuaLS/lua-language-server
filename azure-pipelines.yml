@@ -54,7 +54,7 @@ jobs:
       cd ../..
     displayName: 'Compile luamake'
   - bash: |
-      rm server/macOS
+      rm server/macOS -r
       ./3rd/luamake/luamake rebuild
     displayName: 'Compile'
   - bash: |
@@ -93,7 +93,7 @@ jobs:
       cd ../..
     displayName: 'Compile luamake'
   - bash: |
-      rm server/Linux
+      server/Linux -r
       ./3rd/luamake/luamake rebuild
     displayName: 'Compile'
   - bash: |

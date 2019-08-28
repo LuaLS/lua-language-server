@@ -86,7 +86,7 @@ function TEST(data)
     if hover.label then
         hover.label = hover.label:gsub('\r\n', '\n')
     end
-    assert(eq(hover, data.hover))
+    assert(eq(hover, data.hover), table.dump(hover) .. '\n' .. table.dump(data.hover))
 end
 
 TEST {

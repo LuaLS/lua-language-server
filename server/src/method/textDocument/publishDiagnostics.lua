@@ -1,5 +1,6 @@
 local core = require 'core'
 local lang = require 'language'
+local config = require 'config'
 
 local DiagnosticSeverity = {
     Error       = 1,
@@ -87,10 +88,11 @@ local function buildError(err, lines, uri)
         message = lang.script('PARSER_'..err.type, err.info)
     }
     if err.version then
+        local currentVersion = err.info and err.info.version or config.config.runtime.version
         if type(err.version) == 'table' then
-            diagnostic.message = ('%s(%s)'):format(diagnostic.message, lang.script('DIAG_NEED_VERSION', table.concat(err.version, '/')))
+            diagnostic.message = ('%s(%s)'):format(diagnostic.message, lang.script('DIAG_NEED_VERSION', table.concat(err.version, '/'), currentVersion))
         else
-            diagnostic.message = ('%s(%s)'):format(diagnostic.message, lang.script('DIAG_NEED_VERSION', err.version))
+            diagnostic.message = ('%s(%s)'):format(diagnostic.message, lang.script('DIAG_NEED_VERSION', err.version, currentVersion))
         end
     end
     if err.level == 'error' then

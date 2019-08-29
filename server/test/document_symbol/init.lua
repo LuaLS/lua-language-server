@@ -76,7 +76,7 @@ end
 
 function TEST(script)
     return function (expect)
-        local ast = parser:ast(script, 'lua', 'Lua 5.3')
+        local ast = parser:parse(script, 'lua', 'Lua 5.3')
         local vm = buildVM(ast)
         assert(vm)
         local result = core.documentSymbol(vm)

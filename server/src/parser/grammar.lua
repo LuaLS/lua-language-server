@@ -1,10 +1,11 @@
 local re = require 'parser.relabel'
 local m = require 'lpeglabel'
-
+local ast = require 'parser.ast'
 
 local scriptBuf = ''
 local compiled = {}
 local parser
+local defs = ast.defs
 
 -- goto 可以作为名字，合法性之后处理
 local RESERVED = {
@@ -31,20 +32,7 @@ local RESERVED = {
     ['while']    = true,
 }
 
-local defs = setmetatable({}, {__index = function (self, key)
-    self[key] = function (...)
-        if parser[key] then
-            return parser[key](...)
-        end
-    end
-    return self[key]
-end})
-
-defs.nl = (m.P'\r\n' + m.S'\r\n') / function ()
-    if parser.nl then
-        return parser.nl()
-    end
-end
+defs.nl = (m.P'\r\n' + m.S'\r\n')
 defs.s  = m.S' \t'
 defs.S  = - defs.s
 defs.ea = '\a'
@@ -60,7 +48,7 @@ defs.NotReserved = function (_, _, str)
     if RESERVED[str] then
         return false
     end
-    return true, str
+    return true
 end
 defs.Reserved = function (_, _, str)
     if RESERVED[str] then
@@ -289,7 +277,7 @@ grammar 'Name' [[
 Name        <-  Sp ({} NameBody {})
             ->  Name
 NameBody    <-  {[a-zA-Z_] [a-zA-Z0-9_]*}
-FreeName    <-  Sp ({} NameBody=>NotReserved {})
+FreeName    <-  Sp ({} {NameBody=>NotReserved} {})
             ->  Name
 MustName    <-  Name / DirtyName
 DirtyName   <-  {} -> DirtyName
@@ -346,7 +334,7 @@ ArgList     <-  (DOTS -> DotsAsArg / Name / Sp {} COMMA)*
             ->  ArgList
 
 Table       <-  Sp ({} TL TableFields? DirtyTR)
-            =>  RTTable
+            ->  Table
 TableFields <-  (Emmy / TableSep {} / TableField)+
 TableSep    <-  COMMA / SEMICOLON
 TableField  <-  NewIndex / NewField / Exp
@@ -631,8 +619,7 @@ Lua         <-  Head?
 Head        <-  '#' (!%nl .)*
 ]]
 
-return function (self, lua, mode, parser_)
-    parser = parser_ or {}
+return function (self, lua, mode)
     local gram = compiled[mode] or compiled['Lua']
     local r, _, pos = gram:match(lua)
     if not r then

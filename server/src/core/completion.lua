@@ -686,7 +686,7 @@ local function searchEnumAsLib(vm, source, word, callback, pos, args, lib)
         for _, enum in ipairs(lib.enums) do
             if enum.name and enum.name == name and enum.enum then
                 if matchKey(word, enum.enum) then
-                    local strSource = parser:ast(tostring(enum.enum), 'String')
+                    local strSource = parser:parse(tostring(enum.enum), 'String')
                     if strSource then
                         if source.type == 'string' then
                             local data = buildTextEdit(source.start, source.finish, strSource[1], source[2])
@@ -743,7 +743,7 @@ local function searchEnumAsEmmyParams(vm, source, word, callback, pos, args, fun
     param:eachEnum(function (enum)
         local str = enum[1]
         if matchKey(word, str) then
-            local strSource = parser:ast(tostring(str), 'String')
+            local strSource = parser:parse(tostring(str), 'String')
             if strSource then
                 if source.type == 'string' then
                     local data = buildTextEdit(source.start, source.finish, strSource[1], source[2])

@@ -11,7 +11,7 @@ function TEST(res)
         local finish = script:find('?>', 1, true)
         local pos = (start + finish) // 2 + 1
         local new_script = script:gsub('<[!?]', '  '):gsub('[!?]>', '  ')
-        local ast = parser:ast(new_script, 'lua', 'Lua 5.3')
+        local ast = parser:parse(new_script, 'lua', 'Lua 5.3')
         local vm = buildVM(ast)
         assert(vm)
         local result = core.findSource(vm, pos)

@@ -49,7 +49,7 @@ end
 function TEST(script, ...)
     local new_script, target = catch_target(script, ...)
     local lsp = service()
-    local ast = parser:ast(new_script, 'lua', 'Lua 5.3')
+    local ast = parser:parse(new_script, 'lua', 'Lua 5.3')
     assert(ast)
     local lines = parser:lines(new_script)
     local vm = buildVM(ast, lsp, 'test')

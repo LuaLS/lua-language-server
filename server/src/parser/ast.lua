@@ -410,6 +410,10 @@ local Defs = {
                 type = 'ERR_ESC',
                 start = pos-1,
                 finish = pos,
+                version = {'Lua 5.2', 'Lua 5.3', 'Lua 5.4', 'LuaJIT'},
+                info = {
+                    version = State.Version,
+                }
             }
             return char
         end
@@ -424,6 +428,10 @@ local Defs = {
                 type = 'ERR_ESC',
                 start = pos-3,
                 finish = pos-2,
+                version = {'Lua 5.3', 'Lua 5.4', 'LuaJIT'},
+                info = {
+                    version = State.Version,
+                }
             }
             return char
         end
@@ -751,7 +759,7 @@ local Defs = {
         checkMissEnd(start)
         return obj
     end,
-    RTTable = function (_, _, start, ...)
+    Table = function (start, ...)
         local args = {...}
         local max = #args
         local finish = args[max] - 1
@@ -790,7 +798,7 @@ local Defs = {
                 start = arg
             end
         end
-        return true, table
+        return table
     end,
     NewField = function (key, value)
         return {
@@ -1880,22 +1888,12 @@ local Defs = {
     end,
 }
 
-return function (self, lua, mode, version)
-    Errs = {}
-    State= {
-        Break = 0,
-        Label = {{}},
-        Dots = {true},
-        Version = version,
-        Lua = lua,
-    }
-    local suc, res, err = xpcall(self.grammar, debug.traceback, self, lua, mode, Defs)
-    if not suc then
-        return nil, res
-    end
-    if not res then
-        pushError(err)
-        return nil, Errs
-    end
-    return res, Errs
+local function init(state, errs)
+    State = state
+    Errs = errs
 end
+
+return {
+    defs = Defs,
+    init = init,
+}

@@ -64,7 +64,7 @@ function TEST(script)
     return function (expect)
         local pos = script:find('$', 1, true) - 1
         local new_script = script:gsub('%$', '')
-        local ast = parser:ast(new_script, 'lua', 'Lua 5.4')
+        local ast = parser:parse(new_script, 'lua', 'Lua 5.4')
         local vm = buildVM(ast)
         assert(vm)
         local result = core.completion(vm, new_script, pos)

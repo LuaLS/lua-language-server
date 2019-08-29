@@ -405,7 +405,7 @@ end
 ---@param file file
 ---@return table
 function mt:compileAst(file)
-    local ast, err = parser:ast(file:getText(), 'lua', config.config.runtime.version)
+    local ast, err = parser:parse(file:getText(), 'lua', config.config.runtime.version)
     if ast then
         file:setAstErr(err)
     else

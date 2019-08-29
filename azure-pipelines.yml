@@ -93,7 +93,7 @@ jobs:
       cd ../..
     displayName: 'Compile luamake'
   - bash: |
-      server/Linux -r
+      rm server/Linux -r
       ./3rd/luamake/luamake rebuild
     displayName: 'Compile'
   - bash: |

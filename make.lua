@@ -21,8 +21,10 @@ lm:shared_library 'lni' {
 lm:shared_library 'lpeglabel' {
     deps = platform.OS == "Windows" and "lua54" or "lua",
     sources = 'lpeglabel/*.c',
-    undefs = "NDEBUG",
     visibility = 'default',
+    defines = {
+        'MAXRECLEVEL=1000',
+    },
     ldflags = platform.OS == "Windows" and "/EXPORT:luaopen_lpeglabel",
 }
 

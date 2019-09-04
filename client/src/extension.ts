@@ -5,6 +5,7 @@
 
 import * as path from 'path';
 import * as os from 'os';
+import * as fs from 'fs';
 import { workspace, ExtensionContext, env } from 'vscode';
 
 import {
@@ -12,7 +13,6 @@ import {
 	LanguageClientOptions,
 	ServerOptions,
 } from 'vscode-languageclient';
-import { openSync } from 'fs';
 
 let client: LanguageClient;
 
@@ -41,12 +41,13 @@ export function activate(context: ExtensionContext) {
 			command = context.asAbsolutePath(
 				path.join('server', 'Linux', 'bin', 'lua-language-server')
 			);
+			fs.chmodSync(command, '777');
 			break;
-
 		case "darwin":
 			command = context.asAbsolutePath(
 				path.join('server', 'macOS', 'bin', 'lua-language-server')
 			);
+			fs.chmodSync(command, '777');
 			break;
 	}
 	

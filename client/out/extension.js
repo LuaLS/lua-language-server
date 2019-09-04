@@ -6,6 +6,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const path = require("path");
 const os = require("os");
+const fs = require("fs");
 const vscode_1 = require("vscode");
 const vscode_languageclient_1 = require("vscode-languageclient");
 let client;
@@ -28,9 +29,11 @@ function activate(context) {
             break;
         case "linux":
             command = context.asAbsolutePath(path.join('server', 'Linux', 'bin', 'lua-language-server'));
+            fs.chmodSync(command, '777');
             break;
         case "darwin":
             command = context.asAbsolutePath(path.join('server', 'macOS', 'bin', 'lua-language-server'));
+            fs.chmodSync(command, '777');
             break;
     }
     let serverOptions = {

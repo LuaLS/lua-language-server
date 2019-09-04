@@ -320,7 +320,7 @@
         "grammars": [
             {
                 "language": "lua",
-                "path": "syntaxes/lua.tmLanguage.json",
+                "path": "./syntaxes/lua.tmLanguage.json",
                 "scopeName": "source.lua"
             }
         ]

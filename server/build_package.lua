@@ -142,7 +142,7 @@ local package = {
             {
                 language = "lua",
                 scopeName = "source.lua",
-                path = "syntaxes/lua.tmLanguage.json"
+                path = "./syntaxes/lua.tmLanguage.json"
             }
         }
     },

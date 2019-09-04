@@ -1,6 +1,6 @@
 local currentPath = debug.getinfo(1, 'S').source:sub(2)
 local rootPath = currentPath:gsub('[^/\\]-$', '')
-dofile('./' .. rootPath .. 'platform.lua')
+dofile(rootPath .. 'platform.lua')
 local fs = require 'bee.filesystem'
 ROOT = fs.absolute(fs.path(rootPath)):parent_path():parent_path()
 LANG = LANG or 'en-US'

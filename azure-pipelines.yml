@@ -47,6 +47,7 @@ jobs:
   - bash: |
       sudo xcode-select -s /Applications/Xcode_10.2.app
       brew install ninja
+      brew install g++-8
     displayName: 'Install'
   - bash: |
       cd 3rd/luamake
@@ -85,6 +86,7 @@ jobs:
     displayName: 'Init'
   - bash: |
       sudo apt-get install -y libreadline-dev ninja-build
+      sudo apt-get install g++-8
     displayName: 'Install'
   - bash: |
       cd 3rd/luamake

@@ -14,6 +14,9 @@ return function (lsp, params)
     local needReset
     for _, change in ipairs(params.changes) do
         local path = uric.decode(change.uri)
+        if not path then
+            goto CONTINUE
+        end
         if change.type == FileChangeType.Created then
             lsp.workspace:addFile(path)
             if lsp:getVM(change.uri) then
@@ -32,6 +35,7 @@ return function (lsp, params)
         then
             lsp:reScanFiles()
         end
+        ::CONTINUE::
     end
     -- 缓存过的文件发生变化后，重新计算
     if needReset then

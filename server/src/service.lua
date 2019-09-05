@@ -178,6 +178,9 @@ function mt:isLua(uri)
         return true
     end
     local path = self.workspace:absolutePathByUri(uri)
+    if not path then
+        return false
+    end
     if self.workspace:isLuaFile(path) then
         return true
     end
@@ -192,6 +195,9 @@ function mt:isIgnored(uri)
         return true
     end
     local path = self.workspace:relativePathByUri(uri)
+    if not path then
+        return true
+    end
     if self.workspace.gitignore(path:string()) then
         return true
     end

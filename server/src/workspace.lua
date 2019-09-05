@@ -236,7 +236,11 @@ end
 
 function mt:findPath(baseUri, searchers)
     local results = {}
-    local baseName = getFileName(uric.decode(baseUri))
+    local basePath = uric.decode(baseUri)
+    if not basePath then
+        return nil
+    end
+    local baseName = getFileName(basePath)
     for filename, uri in pairs(self.files) do
         if filename ~= baseName then
             for _, searcher in ipairs(searchers) do
@@ -370,8 +374,12 @@ function mt:matchPath(baseUri, input)
         return nil
     end
     first = first:gsub('%W', '%%%1')
-    local baseName = getFileName(uric.decode(baseUri))
-    local rootLen = #self.root:string()
+    local basePath = uric.decode(baseUri)
+    if not basePath then
+        return nil
+    end
+    local baseName = getFileName()
+    local rootLen = #self.root:string(basePath)
     local map = {}
     for filename in pairs(self.files) do
         if filename ~= baseName then
@@ -477,6 +485,9 @@ end
 ---@return path
 function mt:relativePathByUri(uri)
     local path = uric.decode(uri)
+    if not path then
+        return nil
+    end
     local relate = fs.relative(path, self.root)
     return relate
 end
@@ -485,6 +496,9 @@ end
 ---@return path
 function mt:absolutePathByUri(uri)
     local path = uric.decode(uri)
+    if not path then
+        return nil
+    end
     return fs.absolute(path)
 end
 

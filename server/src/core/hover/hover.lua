@@ -298,6 +298,9 @@ local function hoverAsTargetUri(source, lsp)
         return nil
     end
     local path = lsp.workspace:relativePathByUri(uri)
+    if not path then
+        return nil
+    end
     return {
         description = ('[%s](%s)'):format(path:string(), uri),
     }

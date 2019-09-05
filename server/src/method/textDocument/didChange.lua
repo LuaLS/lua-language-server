@@ -3,7 +3,7 @@ return function (lsp, params)
     local change = params.contentChanges
     if lsp.workspace then
         local path = lsp.workspace:relativePathByUri(doc.uri)
-        if not lsp.workspace:isLuaFile(path) then
+        if not path or not lsp.workspace:isLuaFile(path) then
             return
         end
         if not lsp:isOpen(doc.uri) and lsp.workspace.gitignore(path:string()) then

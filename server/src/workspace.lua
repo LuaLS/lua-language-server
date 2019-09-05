@@ -378,7 +378,7 @@ function mt:matchPath(baseUri, input)
     if not basePath then
         return nil
     end
-    local baseName = getFileName()
+    local baseName = getFileName(basePath)
     local rootLen = #self.root:string(basePath)
     local map = {}
     for filename in pairs(self.files) do

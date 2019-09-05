@@ -86,8 +86,6 @@ jobs:
     displayName: 'Init'
   - bash: |
       sudo apt-get install -y libreadline-dev ninja-build
-      sudo apt-get remove  -y gcc
-      sudo apt-get remove  -y g++
       sudo apt-get install -y g++-8
     displayName: 'Install'
   - bash: |

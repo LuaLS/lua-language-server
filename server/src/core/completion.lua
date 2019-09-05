@@ -167,20 +167,21 @@ local function buildSnipArgs(args, enums)
     return table.concat(t, ', ')
 end
 
-local function getFunctionSnip(name, value)
+local function getFunctionSnip(name, value, source)
     if value:getType() ~= 'function' then
         return
     end
     local lib = value:getLib()
+    local object = source:get 'object'
     local hover
     if lib then
-        hover = getFunctionHoverAsLib(name, lib)
+        hover = getFunctionHoverAsLib(name, lib, object)
     else
         local emmy = value:getEmmy()
         if emmy and emmy.type == 'emmy.functionType' then
-            hover = getFunctionHoverAsEmmy(name, emmy)
+            hover = getFunctionHoverAsEmmy(name, emmy, object)
         else
-            hover = getFunctionHover(name, value:getFunction())
+            hover = getFunctionHover(name, value:getFunction(), object)
         end
     end
     if not hover then
@@ -197,7 +198,7 @@ local function getValueData(cata, name, value, pos, source)
         documentation = getDucumentation(name, value),
         detail = getDetail(value),
         kind = getKind(cata, value),
-        snip = getFunctionSnip(name, value),
+        snip = getFunctionSnip(name, value, source),
     }
     if cata == 'field' then
         if not parser:grammar(name, 'Name') then

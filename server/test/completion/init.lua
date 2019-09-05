@@ -886,6 +886,28 @@ xpcal$
 }
 
 TEST [[
+function mt:f(a, b, c)
+end
+
+mt:f$
+]]
+{
+    {
+        label = 'f',
+        kind = CompletionItemKind.Method,
+        documentation = EXISTS,
+        detail = EXISTS,
+    },
+    {
+        label = 'f()',
+        kind = CompletionItemKind.Snippet,
+        documentation = EXISTS,
+        detail = EXISTS,
+        insertText = 'f(${1:a: any}, ${2:b: any}, ${3:c: any})',
+    },
+}
+
+TEST [[
 ---@$
 ]]
 (EXISTS)

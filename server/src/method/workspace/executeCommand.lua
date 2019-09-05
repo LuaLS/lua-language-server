@@ -3,6 +3,7 @@ local json = require 'json'
 local config = require 'config'
 local rpc = require 'rpc'
 local lang = require 'language'
+local platform = require 'bee.platform'
 
 local command = {}
 
@@ -50,7 +51,28 @@ function command.config(lsp, data)
         end
     end
 
-    local vscodePath = lsp.workspace.root / '.vscode'
+    local vscodePath
+    local mode
+    if lsp.workspace then
+        vscodePath = lsp.workspace.root / '.vscode'
+        mode = 'workspace'
+    else
+        if platform.OS == 'Windows' then
+            vscodePath = fs.path(os.getenv 'USERPROFILE') / 'AppData' / 'Roaming' / 'Code' / 'User'
+        else
+            vscodePath = fs.path(os.getenv 'HOME') / '.vscode-server' / 'data' / 'Machine'
+        end
+        mode = 'user'
+    end
+
+    if not fs.exists(vscodePath) then
+        rpc:notify('window/showMessage', {
+            type = 3,
+            message = lang.script.MWS_UCONFIG_FAILED,
+        })
+        return
+    end
+
     local settingBuf = io.load(vscodePath / 'settings.json')
     if not settingBuf then
         fs.create_directories(vscodePath)
@@ -80,6 +102,18 @@ function command.config(lsp, data)
     end
 
     io.save(vscodePath / 'settings.json', json.encode(setting) .. '\r\n')
+
+    if mode == 'workspace' then
+        rpc:notify('window/showMessage', {
+            type = 3,
+            message = lang.script.MWS_WCONFIG_UPDATED,
+        })
+    elseif mode == 'user' then
+        rpc:notify('window/showMessage', {
+            type = 3,
+            message = lang.script.MWS_UCONFIG_UPDATED,
+        })
+    end
 end
 
 function command.removeSpace(lsp, data)

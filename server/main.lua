@@ -17,7 +17,6 @@ ac = {}
 
 --xpcall(dofile, log.debug, rootPath .. 'debugger.lua')
 require 'utility'
-require 'global_protect'
 local service = require 'service'
 local session = service()
 

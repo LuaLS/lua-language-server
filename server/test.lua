@@ -17,7 +17,6 @@ log.debug('测试开始')
 ac = {}
 
 require 'utility'
-require 'global_protect'
 dofile((ROOT / 'build_package.lua'):string())
 
 local function loadAllLibs()

@@ -47,8 +47,6 @@ jobs:
   - bash: |
       sudo xcode-select -s /Applications/Xcode_10.2.app
       brew install ninja
-      brew search  clang
-      brew install clang@8
     displayName: 'Install'
   - bash: |
       cd 3rd/luamake

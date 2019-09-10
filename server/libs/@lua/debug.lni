@@ -152,6 +152,14 @@ type = 'any'
 ``````````
 type = 'boolean'
 
+[setCstacklimit]
+version = 'Lua 5.4'
+[[.args]]
+name = 'limit'
+type = 'integer'
+[[.returns]]
+type = {'interger', 'boolean'}
+
 [setfenv]
 version = {'Lua 5.1', 'LuaJIT'}
 [[.args]]

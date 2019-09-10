@@ -90,6 +90,13 @@ description = '返回关联在 `u` 上的 `Lua` 值。'
 ["getuservalue Lua 5.4"]
 description = '返回关联在 `u` 上的第 `n` 个 `Lua` 值，以及一个布尔，`false`表示值不存在。'
 
+[setCstacklimit]
+description = [[
+设置新的C栈限制。该限制控制Lua中嵌套调用的深度，以避免堆栈溢出。
+
+如果设置成功，该函数返回之前的限制；否则返回`false`。
+]]
+
 [setfenv]
 description = '将 `table` 设置为 `object` 的环境。'
 

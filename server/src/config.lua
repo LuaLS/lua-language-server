@@ -120,6 +120,7 @@ local ConfigTemplate = {
                                     )}
     },
     completion = {
+        enable          = {true, Boolean},
         callSnippet     = {true, Boolean},
     },
 }

@@ -8,7 +8,7 @@ log.size = 0
 log.max_size = 100 * 1024 * 1024
 
 local function trim_src(src)
-    src = src:sub(log.prefix_len + 1, -5)
+    src = src:sub(log.prefix_len + 3, -5)
     src = src:gsub('^[/\\]+', '')
     src = src:gsub('[\\/]+', '.')
     return src

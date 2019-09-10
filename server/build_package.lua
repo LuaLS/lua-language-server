@@ -130,6 +130,12 @@ local package = {
                     type = 'object',
                     markdownDescription = "%config.workspace.library%"
                 },
+                ["Lua.completion.enable"] = {
+                    scope = "resource",
+                    type = "boolean",
+                    default = true,
+                    markdownDescription = "%config.completion.enable%"
+                },
                 ["Lua.completion.callSnippet"] = {
                     scope = "resource",
                     type = "boolean",
@@ -234,6 +240,7 @@ Load external library.
 This feature can load external Lua files, which can be used for definition, automatic completion and other functions. Note that the language server does not monitor changes in external files and needs to restart if the external files are modified.
 The following example shows loaded files in `C:/lua` and `../lib` ,exclude `../lib/temp`.
 ]] .. example.library,
+    ['config.completion.enable']          = 'Enable completion.',
     ['config.completion.callSnippet']     = 'Show function call snippets.',
 })
 
@@ -254,5 +261,6 @@ io.save(ROOT:parent_path() / 'package.nls.zh-cn.json', json.encode {
 该功能可以加载外部的Lua文件，用于函数定义、自动完成等功能。注意，语言服务不会监视外部文件的变化，如果修改了外部文件需要重启。
 下面这个例子表示加载`C:/lua`与`../lib`中的所有文件，但不加载`../lib/temp`中的文件。
 ]] .. example.library,
+    ['config.completion.enable']          = '启用自动完成。',
     ['config.completion.callSnippet']     = '显示函数调用片段。',
 })

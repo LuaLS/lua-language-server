@@ -19,6 +19,7 @@ local config     = require 'config'
 local task       = require 'task'
 local files      = require 'files'
 local uric       = require 'uri'
+local capability = require 'capability'
 
 local ErrorCodes = {
     -- Defined by JSON RPC
@@ -756,6 +757,11 @@ function mt:onUpdateConfig(updated, other)
     if not table.equal(oldConfig.diagnostics, newConfig.diagnostics) then
         log.debug('reDiagnostic')
         self:reDiagnostic()
+    end
+    if newConfig.completion.enable then
+        capability.completion.enable()
+    else
+        capability.completion.disable()
     end
     if not table.equal(oldConfig.workspace, newConfig.workspace)
     or not table.equal(oldOther.associations, newOther.associations)

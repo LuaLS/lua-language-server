@@ -22,6 +22,12 @@
                     "scope": "resource",
                     "type": "boolean"
                 },
+                "Lua.completion.enable": {
+                    "default": true,
+                    "markdownDescription": "%config.completion.enable%",
+                    "scope": "resource",
+                    "type": "boolean"
+                },
                 "Lua.diagnostics.disable": {
                     "items": {
                         "type": "string"

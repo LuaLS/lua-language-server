@@ -99,7 +99,10 @@ local package = {
                     items = {
                         type = 'string',
                     },
-                    markdownDescription = "%config.workspace.ignoreDir%"
+                    markdownDescription = "%config.workspace.ignoreDir%",
+                    default = {
+                        "./.vscode/",
+                    },
                 },
                 ["Lua.workspace.ignoreSubmodules"] = {
                     scope = "resource",
@@ -141,6 +144,18 @@ local package = {
                     type = "boolean",
                     default = true,
                     markdownDescription = "%config.completion.callSnippet%"
+                },
+                ["Lua.plugin.enable"] = {
+                    scope = "resource",
+                    type = "boolean",
+                    default = false,
+                    markdownDescription = "%config.plugin.enable%"
+                },
+                ["Lua.plugin.path"] = {
+                    scope = "resource",
+                    type = "${workspaceRoot}/.vscode/lua/*.lua",
+                    default = false,
+                    markdownDescription = "%config.plugin.path%"
                 },
             }
         },

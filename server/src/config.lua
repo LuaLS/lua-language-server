@@ -123,6 +123,10 @@ local ConfigTemplate = {
         enable          = {true, Boolean},
         callSnippet     = {true, Boolean},
     },
+    plugin = {
+        enable          = {false, Boolean},
+        path            = {'${workspaceRoot}/.vscode/lua/', String},
+    },
 }
 
 local OtherTemplate = {

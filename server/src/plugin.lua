@@ -75,6 +75,18 @@ local function load(workspace)
     end)
 end
 
+local function call(name, ...)
+    for _, plugin in ipairs(Plugins) do
+        if type(plugin[name]) == 'function' then
+            local suc, res = xpcall(plugin[name], showError, ...)
+            if suc and res then
+                return res
+            end
+        end
+    end
+end
+
 return {
     load = load,
+    call = call,
 }

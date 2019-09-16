@@ -10,6 +10,7 @@ local libraryBuilder = require 'vm.library'
 local emmyMgr = require 'emmy.manager'
 local config = require 'config'
 local mt = require 'vm.manager'
+local plugin = require 'plugin'
 
 require 'vm.module'
 require 'vm.raw'
@@ -171,12 +172,14 @@ function mt:tryRequireOne(strValue, mode)
         return nil
     end
     local str = strValue:getLiteral()
+    local strSource = strValue:getSource()
+    if not strSource then
+        return nil
+    end
+    local raw = self.file:getText():sub(strSource.start, strSource.finish)
+    str = plugin.call('OnRequirePath', str, raw) or str
     if type(str) == 'string' then
         -- 支持 require 'xxx' 的转到定义
-        local strSource = strValue:getSource()
-        if not strSource then
-            return nil
-        end
         self:instantSource(strSource)
         local uri
         if mode == 'require' then
@@ -1307,7 +1310,7 @@ local function compile(vm, ast, lsp, uri)
     return vm
 end
 
-return function (ast, lsp, uri)
+return function (ast, lsp, uri, file)
     if not ast then
         return nil, 'Ast failed'
     end
@@ -1321,6 +1324,7 @@ return function (ast, lsp, uri)
         emmyMgr = lsp and lsp.emmy or emmyMgr(),
         lsp     = lsp,
         uri     = uri or '',
+        file    = file,
     }, mt)
     local suc, res = xpcall(compile, log.error, vm, ast, lsp, uri)
     if not suc then

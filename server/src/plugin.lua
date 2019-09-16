@@ -43,7 +43,8 @@ local function loadPluginFrom(path, root)
 end
 
 local function load(workspace)
-    Plugins = {}
+    Plugins = nil
+
     if not config.config.plugin.enable then
         return
     end
@@ -52,6 +53,7 @@ local function load(workspace)
         return
     end
 
+    Plugins = {}
     local pluginPath
     if workspace then
         pluginPath = fs.absolute(workspace.root / path)
@@ -76,14 +78,18 @@ local function load(workspace)
 end
 
 local function call(name, ...)
+    if not Plugins then
+        return nil
+    end
     for _, plugin in ipairs(Plugins) do
         if type(plugin[name]) == 'function' then
             local suc, res = xpcall(plugin[name], showError, ...)
-            if suc and res then
+            if suc and res ~= nil then
                 return res
             end
         end
     end
+    return nil
 end
 
 return {

@@ -101,7 +101,7 @@ local package = {
                     },
                     markdownDescription = "%config.workspace.ignoreDir%",
                     default = {
-                        "./.vscode/",
+                        ".vscode",
                     },
                 },
                 ["Lua.workspace.ignoreSubmodules"] = {
@@ -153,8 +153,8 @@ local package = {
                 },
                 ["Lua.plugin.path"] = {
                     scope = "resource",
-                    type = "${workspaceRoot}/.vscode/lua/*.lua",
-                    default = false,
+                    type = "string",
+                    default = ".vscode/lua-plugin/*.lua",
                     markdownDescription = "%config.plugin.path%"
                 },
             }

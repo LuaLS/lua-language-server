@@ -44,6 +44,7 @@ local function tryDebugger()
     local addr = "127.0.0.1:" .. port
     local dbg = loadfile(entry)('windows', root)
     dbg:start(addr)
+    dbg:wait()
     log.debug('Debugger startup, listen port:', port)
     log.debug('Debugger args:', addr, root, path, cpath)
 end

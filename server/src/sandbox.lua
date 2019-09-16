@@ -1,5 +1,5 @@
-local function standard(loaded)
-    local r = {}
+local function standard(loaded, env)
+    local r = env or {}
     for _, s in ipairs {
         --'package',
         'coroutine',
@@ -45,9 +45,9 @@ local function standard(loaded)
     return r
 end
 
-local function sandbox_env(loadlua, openfile, loaded)
+local function sandbox_env(loadlua, openfile, loaded, env)
     local _LOADED = loaded or {}
-    local _E = standard(_LOADED)
+    local _E = standard(_LOADED, env)
     local _PRELOAD = {}
 
     _E.io = {
@@ -56,14 +56,14 @@ local function sandbox_env(loadlua, openfile, loaded)
 
     local function searchpath(name, path)
         local err = ''
-    	name = string.gsub(name, '%.', '/')
-    	for c in string.gmatch(path, '[^;]+') do
+        name = string.gsub(name, '%.', '/')
+        for c in string.gmatch(path, '[^;]+') do
             local filename = string.gsub(c, '%?', name)
             local f = openfile(filename)
             if f then
                 f:close()
-    			return filename
-    		end
+                return filename
+            end
             err = err .. ("\n\tno file '%s'"):format(filename)
         end
         return nil, err
@@ -76,25 +76,25 @@ local function sandbox_env(loadlua, openfile, loaded)
         end
         return _PRELOAD[name]
     end
-    
+
     local function searcher_lua(name)
         assert(type(_E.package.path) == "string", "'package.path' must be a string")
-    	local filename, err = searchpath(name, _E.package.path)
-    	if not filename then
-    		return err
-    	end
-    	local f, err = loadlua(filename)
-    	if not f then
-    		error(("error loading module '%s' from file '%s':\n\t%s"):format(name, filename, err))
-    	end
-    	return f, filename
+        local filename, err = searchpath(name, _E.package.path)
+        if not filename then
+            return err
+        end
+        local f, err = loadlua(filename)
+        if not f then
+            error(("error loading module '%s' from file '%s':\n\t%s"):format(name, filename, err))
+        end
+        return f, filename
     end
 
     local function require_load(name)
         local msg = ''
         local _SEARCHERS = _E.package.searchers
         assert(type(_SEARCHERS) == "table", "'package.searchers' must be a table")
-    	for _, searcher in ipairs(_SEARCHERS) do
+        for _, searcher in ipairs(_SEARCHERS) do
             local f, extra = searcher(name)
             if type(f) == 'function' then
                 return f, extra
@@ -107,20 +107,22 @@ local function sandbox_env(loadlua, openfile, loaded)
 
     _E.require = function(name)
         assert(type(name) == "string", ("bad argument #1 to 'require' (string expected, got %s)"):format(type(name)))
-    	local p = _LOADED[name]
-    	if p ~= nil then
-    		return p
-    	end
-    	local init, extra = require_load(name)
-        debug.setupvalue(init, 1, _E)
-    	local res = init(name, extra)
-    	if res ~= nil then
-    		_LOADED[name] = res
-    	end
-    	if _LOADED[name] == nil then
-    		_LOADED[name] = true
-    	end
-    	return _LOADED[name]
+        local p = _LOADED[name]
+        if p ~= nil then
+            return p
+        end
+        local init, extra = require_load(name)
+        if debug.getupvalue(init, 1) == '_ENV' then
+            debug.setupvalue(init, 1, _E)
+        end
+        local res = init(name, extra)
+        if res ~= nil then
+            _LOADED[name] = res
+        end
+        if _LOADED[name] == nil then
+            _LOADED[name] = true
+        end
+        return _LOADED[name]
     end
     _E.package = {
         config = [[
@@ -139,7 +141,7 @@ local function sandbox_env(loadlua, openfile, loaded)
     return _E
 end
 
-return function(name, root, io_open, loaded)
+return function(name, root, io_open, loaded, env)
     if not root:sub(-1):find '[/\\]' then
         root = root .. '/'
     end
@@ -158,6 +160,8 @@ return function(name, root, io_open, loaded)
     if not init then
         return
     end
-    debug.setupvalue(init, 1, sandbox_env(loadlua, openfile, loaded))
-	return init()
+    if debug.getupvalue(init, 1) == '_ENV' then
+        debug.setupvalue(init, 1, sandbox_env(loadlua, openfile, loaded, env))
+    end
+    return init()
 end

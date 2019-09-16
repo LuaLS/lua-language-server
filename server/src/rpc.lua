@@ -67,8 +67,10 @@ local function recieve(self, proto)
     BUF[id] = nil
     if data.timeout and os.clock() > data.timeout then
         log.warn('Recieve timeout: ', table.dump(proto))
-        local info = debug.getinfo(data.callback, 'S')
-        log.warn('Call back info: ', info.source, info.linedefined)
+        if data.callback then
+            local info = debug.getinfo(data.callback, 'S')
+            log.warn('Call back info: ', info.source, info.linedefined)
+        end
         return
     end
     if proto.error then

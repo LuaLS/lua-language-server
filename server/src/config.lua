@@ -125,7 +125,7 @@ local ConfigTemplate = {
     },
     plugin = {
         enable          = {false, Boolean},
-        path            = {'${workspaceRoot}/.vscode/lua/', String},
+        path            = {'.vscode/lua-plugin/*.lua', String},
     },
 }
 

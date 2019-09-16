@@ -18,10 +18,12 @@
         "/server/locale/",
         "/server/libs/",
         "/server/src/3rd",
-        "/server/meta/"
+        "/server/meta/",
+        ".vscode"
     ],
     "Lua.workspace.library": {
         "E:/Github/test" : true,
         "server/src/meta" : true
-    }
+    },
+    "Lua.plugin.enable": true
 }

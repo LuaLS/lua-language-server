@@ -145,18 +145,18 @@ local package = {
                     default = true,
                     markdownDescription = "%config.completion.callSnippet%"
                 },
-                ["Lua.plugin.enable"] = {
-                    scope = "resource",
-                    type = "boolean",
-                    default = false,
-                    markdownDescription = "%config.plugin.enable%"
-                },
-                ["Lua.plugin.path"] = {
-                    scope = "resource",
-                    type = "string",
-                    default = ".vscode/lua-plugin/*.lua",
-                    markdownDescription = "%config.plugin.path%"
-                },
+                --["Lua.plugin.enable"] = {
+                --    scope = "resource",
+                --    type = "boolean",
+                --    default = false,
+                --    markdownDescription = "%config.plugin.enable%"
+                --},
+                --["Lua.plugin.path"] = {
+                --    scope = "resource",
+                --    type = "string",
+                --    default = ".vscode/lua-plugin/*.lua",
+                --    markdownDescription = "%config.plugin.path%"
+                --},
             }
         },
         grammars = {

@@ -256,18 +256,6 @@
                     "title": "severity",
                     "type": "object"
                 },
-                "Lua.plugin.enable": {
-                    "default": false,
-                    "markdownDescription": "%config.plugin.enable%",
-                    "scope": "resource",
-                    "type": "boolean"
-                },
-                "Lua.plugin.path": {
-                    "default": ".vscode/lua-plugin/*.lua",
-                    "markdownDescription": "%config.plugin.path%",
-                    "scope": "resource",
-                    "type": "string"
-                },
                 "Lua.runtime.path": {
                     "default": [
                         "?.lua",

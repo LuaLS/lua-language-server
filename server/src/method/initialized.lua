@@ -1,4 +1,4 @@
-local rpc = require 'rpc'
+local rpc       = require 'rpc'
 local workspace = require 'workspace'
 
 local function initAfterConfig(lsp, firstScope)

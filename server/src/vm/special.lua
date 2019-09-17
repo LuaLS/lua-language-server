@@ -1,7 +1,8 @@
-local mt = require 'vm.manager'
-local multi = require 'vm.multi'
-local library = require 'core.library'
+local mt             = require 'vm.manager'
+local multi          = require 'vm.multi'
+local library        = require 'core.library'
 local libraryBuilder = require 'vm.library'
+local plugin         = require 'plugin'
 
 ---@param func emmyFunction
 ---@param values table
@@ -42,7 +43,7 @@ function mt:callEmmyDoFile(func, values, index)
     if type(str) ~= 'string' then
         return
     end
-    local requireValue = self:tryRequireOne(values[index], 'dofile')
+    local requireValue = self:tryRequireOne(str, values[index], 'dofile')
     if not requireValue then
         requireValue = self:createValue('any', self:getDefaultSource())
         requireValue.isRequire = true
@@ -61,7 +62,7 @@ function mt:callEmmyLoadFile(func, values, index)
     if type(str) ~= 'string' then
         return
     end
-    local requireValue = self:tryRequireOne(values[index], 'loadfile')
+    local requireValue = self:tryRequireOne(str, values[index], 'loadfile')
     if not requireValue then
         requireValue = self:createValue('any', self:getDefaultSource())
         requireValue:set('cross file', true)
@@ -104,10 +105,14 @@ function mt:callEmmyRequire(func, values, index)
     if not values[index] then
         values[index] = self:createValue('any', self:getDefaultSource())
     end
-    local str = values[index]:getLiteral()
-    if type(str) ~= 'string' then
-        return
+    local strValue = values[index]
+    local strSource = strValue:getSource()
+    if not strSource then
+        return nil
     end
+    local str = strValue:getLiteral()
+    local raw = self.text:sub(strSource.start, strSource.finish)
+    str = plugin.call('OnRequirePath', str, raw) or str
     local lib = library.library[str]
     if lib then
         local value = libraryBuilder.value(lib)
@@ -115,7 +120,7 @@ function mt:callEmmyRequire(func, values, index)
         func:setReturn(1, value)
         return
     else
-        local requireValue = self:tryRequireOne(values[1], 'require')
+        local requireValue = self:tryRequireOne(str, strValue, 'require')
         if not requireValue then
             requireValue = self:createValue('any', self:getDefaultSource())
             requireValue:set('cross file', true)

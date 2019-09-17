@@ -167,17 +167,14 @@ function mt:callSetMetaTable(func, values, source)
     values[1]:setMetaTable(values[2])
 end
 
-function mt:tryRequireOne(strValue, mode)
+function mt:tryRequireOne(str, strValue, mode)
     if not self.lsp or not self.lsp.workspace then
         return nil
     end
-    local str = strValue:getLiteral()
     local strSource = strValue:getSource()
     if not strSource then
         return nil
     end
-    local raw = self.file:getText():sub(strSource.start, strSource.finish)
-    str = plugin.call('OnRequirePath', str, raw) or str
     if type(str) == 'string' then
         -- 支持 require 'xxx' 的转到定义
         self:instantSource(strSource)
@@ -204,10 +201,14 @@ function mt:callRequire(func, values)
     if not values[1] then
         values[1] = self:createValue('any', self:getDefaultSource())
     end
-    local str = values[1]:getLiteral()
-    if type(str) ~= 'string' then
-        return
+    local strValue = values[1]
+    local strSource = strValue:getSource()
+    if not strSource then
+        return nil
     end
+    local str = strValue:getLiteral()
+    local raw = self.text:sub(strSource.start, strSource.finish)
+    str = plugin.call('OnRequirePath', str, raw) or str
     local lib = library.library[str]
     if lib then
         local value = libraryBuilder.value(lib)
@@ -215,7 +216,7 @@ function mt:callRequire(func, values)
         func:setReturn(1, value)
         return
     else
-        local requireValue = self:tryRequireOne(values[1], 'require')
+        local requireValue = self:tryRequireOne(str, values[1], 'require')
         if not requireValue then
             requireValue = self:createValue('any', self:getDefaultSource())
             requireValue:set('cross file', true)
@@ -228,11 +229,8 @@ function mt:callLoadFile(func, values)
     if not values[1] then
         values[1] = self:createValue('any', self:getDefaultSource())
     end
-    local str = values[1]:getLiteral()
-    if type(str) ~= 'string' then
-        return
-    end
-    local requireValue = self:tryRequireOne(values[1], 'loadfile')
+    local strValue = values[1]
+    local requireValue = self:tryRequireOne(strValue:getLiteral(), values[1], 'loadfile')
     if not requireValue then
         requireValue = self:createValue('any', self:getDefaultSource())
         requireValue:set('cross file', true)
@@ -244,11 +242,8 @@ function mt:callDoFile(func, values)
     if not values[1] then
         values[1] = self:createValue('any', self:getDefaultSource())
     end
-    local str = values[1]:getLiteral()
-    if type(str) ~= 'string' then
-        return
-    end
-    local requireValue = self:tryRequireOne(values[1], 'dofile')
+    local strValue = values[1]
+    local requireValue = self:tryRequireOne(strValue:getLiteral(), values[1], 'dofile')
     if not requireValue then
         requireValue = self:createValue('any', self:getDefaultSource())
         requireValue.isRequire = true
@@ -1310,7 +1305,7 @@ local function compile(vm, ast, lsp, uri)
     return vm
 end
 
-return function (ast, lsp, uri, file)
+return function (ast, lsp, uri, text)
     if not ast then
         return nil, 'Ast failed'
     end
@@ -1324,7 +1319,7 @@ return function (ast, lsp, uri, file)
         emmyMgr = lsp and lsp.emmy or emmyMgr(),
         lsp     = lsp,
         uri     = uri or '',
-        file    = file,
+        text    = text or '',
     }, mt)
     local suc, res = xpcall(compile, log.error, vm, ast, lsp, uri)
     if not suc then

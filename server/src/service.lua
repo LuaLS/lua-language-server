@@ -498,7 +498,7 @@ function mt:compileVM(uri)
     self:_clearGlobal(uri)
 
     local clock = os.clock()
-    local vm, err = buildVM(ast, self, uri, file)
+    local vm, err = buildVM(ast, self, uri, file:getText())
     if vm then
         CachedVM[vm] = true
     end

@@ -1,6 +1,6 @@
 local json = require 'json'
 
-local TIMEOUT = 1.0
+local TIMEOUT = 600.0
 
 local ID = 0
 local BUF = {}

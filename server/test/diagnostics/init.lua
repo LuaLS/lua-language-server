@@ -1,7 +1,8 @@
-local core = require 'core'
+local core    = require 'core'
 local buildVM = require 'vm'
 local parser  = require 'parser'
 local service = require 'service'
+local config  = require 'config'
 
 rawset(_G, 'TEST', true)
 
@@ -151,6 +152,28 @@ print(1)
 _ENV = nil
 ]]
 
+config.config.diagnostics.disable['undefined-env-child'] = true
+TEST [[
+_ENV = nil
+<!GLOBAL!> = 1 --> _ENV.GLOBAL = 1
+]]
+
+TEST [[
+_ENV = nil
+local _ = <!GLOBAL!> --> local _ = _ENV.GLOBAL
+]]
+
+TEST [[
+_ENV = {}
+GLOBAL = 1 --> _ENV.GLOBAL = 1
+]]
+
+TEST [[
+_ENV = {}
+local _ = GLOBAL --> local _ = _ENV.GLOBAL
+]]
+
+config.config.diagnostics.disable['undefined-env-child'] = nil
 TEST [[
 print()
 <!('string')!>:sub(1, 1)

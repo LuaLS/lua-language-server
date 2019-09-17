@@ -553,6 +553,29 @@ function mt:searchUndefinedEnvChild(callback)
     end)
 end
 
+function mt:searchGlobalInNilEnv(callback)
+    self.vm:eachSource(function (source)
+        if not source:get 'global' then
+            return
+        end
+        local name = source:getName()
+        if name == '' then
+            return
+        end
+        local parentSource = source:get 'parent' :getSource()
+        if parentSource.type == 'nil' then
+            callback(source.start, source.finish, {
+                {
+                    start  = parentSource.start,
+                    finish = parentSource.finish,
+                    uri    = self.uri,
+                }
+            })
+        end
+        return
+    end)
+end
+
 function mt:checkEmmyClass(source, callback)
     local class = source:get 'emmy.class'
     if not class then
@@ -916,6 +939,20 @@ return function (vm, lines, uri)
         else
             return {
                 message = lang.script('DIAG_UNDEF_FENV_CHILD', key),
+            }
+        end
+    end)
+    -- 全局变量不可用（置空了 `_ENV`）
+    session:doDiagnostics(session.searchGlobalInNilEnv, 'global-in-nil-env', function (related)
+        if vm.envType == '_ENV' then
+            return {
+                message = lang.script.DIAG_GLOBAL_IN_NIL_ENV,
+                related = related,
+            }
+        else
+            return {
+                message = lang.script.DIAG_GLOBAL_IN_NIL_FENV,
+                related = related,
             }
         end
     end)

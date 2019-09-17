@@ -108,6 +108,17 @@
                             "scope": "resource",
                             "type": "string"
                         },
+                        "global-in-nil-env": {
+                            "default": "Warning",
+                            "enum": [
+                                "Error",
+                                "Warning",
+                                "Information",
+                                "Hint"
+                            ],
+                            "scope": "resource",
+                            "type": "string"
+                        },
                         "lowercase-global": {
                             "default": "Information",
                             "enum": [

@@ -2,6 +2,7 @@ return {
     ['unused-local']        = 'Hint',
     ['unused-function']     = 'Hint',
     ['undefined-global']    = 'Warning',
+    ['global-in-nil-env']   = 'Warning',
     ['unused-label']        = 'Hint',
     ['unused-vararg']       = 'Hint',
     ['trailing-space']      = 'Hint',

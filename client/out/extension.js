@@ -36,16 +36,17 @@ function activate(context) {
             fs.chmodSync(command, '777');
             break;
     }
+    let beta = vscode_1.workspace.getConfiguration("Lua.zzzzzz").get("cat");
     let serverOptions = {
         command: command,
         args: [
             '-E',
             '-e',
             'LANG="' + language + '"',
-            context.asAbsolutePath(path.join('server', 'main.lua'))
+            context.asAbsolutePath(path.join(beta ? 'server-beta' : 'server', 'main.lua'))
         ]
     };
-    client = new vscode_languageclient_1.LanguageClient('Lua Language Server', 'Lua Language Client', serverOptions, clientOptions);
+    client = new vscode_languageclient_1.LanguageClient('Lua', 'Lua', serverOptions, clientOptions);
     client.start();
 }
 exports.activate = activate;

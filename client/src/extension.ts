@@ -50,6 +50,8 @@ export function activate(context: ExtensionContext) {
 			fs.chmodSync(command, '777');
 			break;
 	}
+
+	let beta: boolean = workspace.getConfiguration("Lua.zzzzzz").get("cat");
 	
 	let serverOptions: ServerOptions = {
 		command: command,
@@ -57,9 +59,10 @@ export function activate(context: ExtensionContext) {
 			'-E',
 			'-e',
 			'LANG="' + language + '"',
-			context.asAbsolutePath(
-				path.join('server', 'main.lua')
-			)
+			context.asAbsolutePath(path.join(
+				beta ? 'server-beta' : 'server',
+				'main.lua'
+			))
 		]
 	};
 

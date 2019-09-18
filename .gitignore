@@ -3,7 +3,7 @@ node_modules
 .vscode-test
 .vscode/ipch
 /server/log
-/server/*.so
+/server-beta/log
 /publish
 /build/
 !*.exe

@@ -157,6 +157,12 @@ local package = {
                 --    default = ".vscode/lua-plugin/*.lua",
                 --    markdownDescription = "%config.plugin.path%"
                 --},
+                ["Lua.zzzzzz.cat"] = {
+                    scope = "resource",
+                    type = "boolean",
+                    default = false,
+                    markdownDescription = "DO NOT TOUCH ME, LET ME SLEEP >_<"
+                },
             }
         },
         grammars = {

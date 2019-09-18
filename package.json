@@ -332,6 +332,12 @@
                     "markdownDescription": "%config.workspace.useGitIgnore%",
                     "scope": "resource",
                     "type": "boolean"
+                },
+                "Lua.zzzzzz.cat": {
+                    "default": false,
+                    "markdownDescription": "DO NOT TOUCH ME, LET ME SLEEP >_<",
+                    "scope": "resource",
+                    "type": "boolean"
                 }
             },
             "title": "Lua",

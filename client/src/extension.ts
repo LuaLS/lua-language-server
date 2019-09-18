@@ -64,8 +64,8 @@ export function activate(context: ExtensionContext) {
 	};
 
 	client = new LanguageClient(
-		'Lua Language Server',
-		'Lua Language Client',
+		'Lua',
+		'Lua',
 		serverOptions,
 		clientOptions
 	);

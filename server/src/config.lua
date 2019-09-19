@@ -156,15 +156,18 @@ local function init()
 end
 
 local function setConfig(self, config, other)
-    pcall(function ()
+    xpcall(function ()
         for c, t in pairs(config) do
             for k, v in pairs(t) do
-                local info = ConfigTemplate[c][k]
-                local suc, v = info[2](v)
-                if suc then
-                    Config[c][k] = v
-                else
-                    Config[c][k] = info[1]
+                local region = ConfigTemplate[c]
+                if region then
+                    local info = region[k]
+                    local suc, v = info[2](v)
+                    if suc then
+                        Config[c][k] = v
+                    else
+                        Config[c][k] = info[1]
+                    end
                 end
             end
         end
@@ -178,7 +181,7 @@ local function setConfig(self, config, other)
             end
         end
         log.debug('Config update: ', table.dump(Config), table.dump(Other))
-    end)
+    end, log.error)
 end
 
 init()

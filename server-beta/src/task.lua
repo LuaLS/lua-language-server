@@ -12,7 +12,8 @@ end
 
 --- 创建一个任务
 function m.create(callback)
-    coroutine.create(callback)
+    local co = coroutine.create(callback)
+    coroutine.resume(co)
 end
 
 --- 休眠一段时间

@@ -1,11 +1,15 @@
 local thread  = require 'bee.thread'
 local utility = require 'utility'
 local task    = require 'task'
-local type    = require 'type'
+
+local errLog  = thread.channel 'errlog'
+local type    = type
 
 local braveTemplate = [[
 package.path  = %q
 package.cpath = %q
+
+--log = require 'work.log'
 
 local brave = require 'pub.brave'
 brave.register(%d)
@@ -21,7 +25,7 @@ m.braves = {}
 function m.recruitBraves(num)
     for _ = 1, num do
         local id = #m.braves + 1
-        log.info('Create pub brave:', id)
+        log.info('Create brave:', id)
         thread.newchannel('taskpad' .. id)
         thread.newchannel('waiter'  .. id)
         m.braves[id] = {
@@ -83,28 +87,30 @@ end
 ---|返回接收到的反馈数量
 ---@return integer
 function m.recieve()
-    local count = 0
-    while true do
-        local hasRecived = false
-        for _, brave in ipairs(m.braves) do
-            local suc, id, result = brave.waiter:pop()
-            if not suc then
-                goto CONTINUE
-            end
-            count = count + 1
-            hasRecived = true
-            if type(id) == 'string' then
-                m.popTask(brave, id, result)
-            else
-                m.popReport(brave, id, result)
-            end
-            ::CONTINUE::
+    for _, brave in ipairs(m.braves) do
+        local suc, id, result = brave.waiter:pop()
+        if not suc then
+            goto CONTINUE
         end
-        if not hasRecived then
+        if type(id) == 'string' then
+            m.popTask(brave, id, result)
+        else
+            m.popReport(brave, id, result)
+        end
+        task.sleep(0)
+        ::CONTINUE::
+    end
+end
+
+--- 检查伤亡情况
+function m.checkDead()
+    while true do
+        local suc, err = errLog:pop()
+        if not suc then
             break
         end
+        log.error('Brave is dead!: ' .. err)
     end
-    return count
 end
 
 return m

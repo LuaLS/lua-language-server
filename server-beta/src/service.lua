@@ -24,10 +24,9 @@ end
 function m.listenPub()
     task.create(function ()
         while true do
-            local count = client.recieve()
-            if count == 0 then
-                task.sleep(0.001)
-            end
+            client.checkDead()
+            client.recieve()
+            task.sleep(0)
         end
     end)
 end

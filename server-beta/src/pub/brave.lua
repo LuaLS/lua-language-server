@@ -1,5 +1,4 @@
 local thread = require 'bee.thread'
-local work   = require 'work'
 
 ---@class pub_brave
 local m = {}
@@ -11,7 +10,6 @@ function m.register(id)
     m.taskpad = thread.channel('taskpad' .. id)
     m.waiter  = thread.channel('waiter'  .. id)
     m.id      = id
-    work.init()
     m.start()
 end
 

@@ -9,7 +9,8 @@ local braveTemplate = [[
 package.path  = %q
 package.cpath = %q
 
---log = require 'work.log'
+log = require 'work.log'
+require 'work'
 
 local brave = require 'pub.brave'
 brave.register(%d)

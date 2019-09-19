@@ -184,6 +184,9 @@ local function buildDoc(lib)
     if not doc then
         return
     end
+    if lib.web then
+        return lang.script(lib.web, doc)
+    end
     local version = config.config.runtime.version
     if version == 'Lua 5.1' then
         return lang.script('HOVER_DOCUMENT_LUA51', doc)

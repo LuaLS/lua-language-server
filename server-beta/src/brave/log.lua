@@ -1,4 +1,4 @@
-local brave          = require 'pub.brave'
+local brave          = require 'brave'
 
 local tablePack      = table.pack
 local tostring       = tostring

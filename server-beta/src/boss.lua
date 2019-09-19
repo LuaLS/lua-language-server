@@ -9,16 +9,14 @@ local braveTemplate = [[
 package.path  = %q
 package.cpath = %q
 
-log = require 'work.log'
-require 'work'
-
-local brave = require 'pub.brave'
+log         = require 'brave.log'
+local brave = require 'brave'
 brave.register(%d)
 ]]
 
----@class pub_client
+---@class boss
 local m = {}
-m.type = 'pub.client'
+m.type = 'boss'
 m.braves = {}
 
 --- 招募勇者，勇者会从公告板上领取任务，完成任务后到看板娘处交付任务
@@ -94,9 +92,9 @@ function m.recieve()
             goto CONTINUE
         end
         if type(id) == 'string' then
-            m.popTask(brave, id, result)
-        else
             m.popReport(brave, id, result)
+        else
+            m.popTask(brave, id, result)
         end
         task.sleep(0)
         ::CONTINUE::

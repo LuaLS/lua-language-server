@@ -1,4 +1,4 @@
-local brave   = require 'pub.brave'
+local brave   = require 'brave.brave'
 local jsonrpc = require 'jsonrpc'
 
 brave.on('loadProto', function ()
@@ -9,3 +9,5 @@ brave.on('loadProto', function ()
         end
     end
 end)
+
+return brave

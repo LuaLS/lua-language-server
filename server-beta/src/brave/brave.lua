@@ -2,7 +2,7 @@ local thread = require 'bee.thread'
 
 ---@class pub_brave
 local m = {}
-m.type = 'pub.brave'
+m.type = 'brave'
 m.ability = {}
 
 --- 注册成为勇者

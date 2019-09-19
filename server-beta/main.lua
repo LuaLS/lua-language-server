@@ -14,3 +14,5 @@ log.debug('ROOT:', ROOT:string())
 ac = {}
 
 xpcall(dofile, log.debug, rootPath .. '/debugger.lua')
+local service = require 'service'
+service:start()

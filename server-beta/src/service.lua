@@ -39,7 +39,7 @@ function m.startTimer()
         local current = os.clock()
         local delta = current - last
         last = current
-        m.update(delta)
+        timer.update(delta)
     end
 end
 

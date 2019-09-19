@@ -30,7 +30,7 @@ local function init_log_file()
     end
 end
 
-local function push_log(level, ...)
+local function pushLog(level, ...)
     if not log.path then
         return
     end
@@ -68,23 +68,23 @@ local function push_log(level, ...)
 end
 
 function log.info(...)
-    push_log('info', ...)
+    pushLog('info', ...)
 end
 
 function log.debug(...)
-    push_log('debug', ...)
+    pushLog('debug', ...)
 end
 
 function log.trace(...)
-    push_log('trace', ...)
+    pushLog('trace', ...)
 end
 
 function log.warn(...)
-    push_log('warn', ...)
+    pushLog('warn', ...)
 end
 
 function log.error(...)
-    push_log('error', ...)
+    pushLog('error', ...)
 end
 
 function log.init(root, path)

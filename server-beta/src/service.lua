@@ -21,10 +21,21 @@ function m.listenProto()
     end)
 end
 
+function m.listenPub()
+    task.create(function ()
+        while true do
+            local count = client.recieve()
+            if count == 0 then
+                task.sleep(0.001)
+            end
+        end
+    end)
+end
+
 function m.startTimer()
     local last = os.clock()
     while true do
-        thread.sleep(0.01)
+        thread.sleep(0.001)
         local current = os.clock()
         local delta = current - last
         last = current
@@ -34,7 +45,9 @@ end
 
 function m.start()
     client.recruitBraves(4)
+    task.setErrorHandle(log.error)
     m.listenProto()
+    m.listenPub()
 
     m.startTimer()
 end

@@ -48,30 +48,30 @@ end
 --- 给勇者推送任务
 function m.pushTask(brave, name, params)
     local taskID = brave.counter()
-    local co = coroutine.running()
     brave.taskpad:push(name, taskID, params)
-    brave.taskList[taskID] = co
-    return coroutine.yield(co)
+    return task.wait(function (waker)
+        brave.taskList[taskID] = waker
+    end)
 end
 
 --- 从勇者处接收任务反馈
-function m.popTask(brave, id, params)
-    local co = brave.taskList[id]
-    if not co then
+function m.popTask(brave, id, result)
+    local waker = brave.taskList[id]
+    if not waker then
         log.warn(('Brave pushed unknown task result: [%d] => [%d]'):format(brave.id, id))
         return
     end
     brave.taskList[id] = nil
-    coroutine.resume(co, params)
+    waker(result)
+end
+
+--- 从勇者处接收报告
+function m.popReport(brave, name, params)
 end
 
 --- 发布任务
 ---@parma name string
 function m.task(name, params)
-    local _, main = coroutine.running()
-    if main then
-        error('不能在主线程中发布任务')
-    end
     for _, brave in ipairs(m.braves) do
         if m.isIdle(brave) then
             return m.pushTask(brave, name, params)
@@ -80,18 +80,31 @@ function m.task(name, params)
 end
 
 --- 接收反馈
+---|返回接收到的反馈数量
+---@return integer
 function m.recieve()
-    local _, main = coroutine.running()
-    if main then
-        error('不能在主线程中接收反馈')
-    end
-    for _, brave in ipairs(m.braves) do
-        local suc, id, result
-        if not suc then
-            goto CONTINUE
+    local count = 0
+    while true do
+        local hasRecived = false
+        for _, brave in ipairs(m.braves) do
+            local suc, id, result = brave.waiter:pop()
+            if not suc then
+                goto CONTINUE
+            end
+            count = count + 1
+            hasRecived = true
+            if type(id) == 'string' then
+                m.popTask(brave, id, result)
+            else
+                m.popReport(brave, id, result)
+            end
+            ::CONTINUE::
         end
-        ::CONTINUE::
+        if not hasRecived then
+            break
+        end
     end
+    return count
 end
 
 return m

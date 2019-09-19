@@ -84,7 +84,7 @@ function log.warn(...)
 end
 
 function log.error(...)
-    return push_log('error', ...)
+    push_log('error', ...)
 end
 
 function log.init(root, path)

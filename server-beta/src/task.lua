@@ -31,7 +31,7 @@ function m.sleep(time)
             m.errHandle(debug.traceback(co, err))
         end
     end)
-    coroutine.yield()
+    return coroutine.yield()
 end
 
 --- 等待直到唤醒
@@ -44,11 +44,13 @@ function m.wait(waker)
         end
         return
     end
-    waker(function ()
-        local suc, err = coroutine.resume(co)
+    waker(function (...)
+        local suc, err = coroutine.resume(co, ...)
         if not suc and m.errHandle then
             m.errHandle(debug.traceback(co, err))
         end
     end)
-    coroutine.yield()
+    return coroutine.yield()
 end
+
+return m

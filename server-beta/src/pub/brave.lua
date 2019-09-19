@@ -1,15 +1,10 @@
 local thread = require 'bee.thread'
 
----@class pub_brave
-local mt = {}
-mt.__index = mt
-mt.type = 'pub.brave'
+local m = {}
+m.type = 'pub.brave'
 
-return function (name)
-    log.info('Create pub brave:', name)
-    thread.newchannel(name)
-    local brave = setmetatable({
-        channel = thread.channel(name),
-    }, mt)
-    return brave
+--- 注册成为勇者
+function m:register(id)
+    self.taskpad = thread.channel('taskpad' .. id)
+    self.waiter  = thread.channel('waiter'  .. id)
 end

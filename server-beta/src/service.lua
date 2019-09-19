@@ -1,14 +1,11 @@
-local pub    = require 'pub'
+local client = require 'pub.client'
 local thread = require 'bee.thread'
 
 local m = {}
 m.type = 'service'
 
 function m:start()
-    pub:build()
-    pub:createTaskPads(4)
-    pub:hireWaiters(4)
-    pub:recruitBraves(4)
+    client:recruitBraves(4)
 end
 
 return m

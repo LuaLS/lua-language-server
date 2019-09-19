@@ -29,30 +29,44 @@ export function activate(context: ExtensionContext) {
 		}
 	};
 
+	let beta: boolean = workspace.getConfiguration("Lua.zzzzzz").get("cat");
 	let command: string;
 	let platform: string = os.platform();
 	switch (platform) {
 		case "win32":
 			command = context.asAbsolutePath(
-				path.join('server', 'Windows', 'bin', 'lua-language-server.exe')
+				path.join(
+					beta ? 'server-beta' : 'server',
+					'Windows',
+					'bin',
+					beta ? 'lua-beta.exe' : 'lua.exe'
+				)
 			);
 			break;
 		case "linux":
 			command = context.asAbsolutePath(
-				path.join('server', 'Linux', 'bin', 'lua-language-server')
+				path.join(
+					beta ? 'server-beta' : 'server',
+					'Linux',
+					'bin',
+					beta? 'lua-beta' : 'lua'
+				)
 			);
 			fs.chmodSync(command, '777');
 			break;
 		case "darwin":
 			command = context.asAbsolutePath(
-				path.join('server', 'macOS', 'bin', 'lua-language-server')
+				path.join(
+					beta ? 'server-beta' : 'server',
+					'macOS',
+					'bin',
+					beta? 'lua-beta' : 'lua'
+				)
 			);
 			fs.chmodSync(command, '777');
 			break;
 	}
 
-	let beta: boolean = workspace.getConfiguration("Lua.zzzzzz").get("cat");
-	
 	let serverOptions: ServerOptions = {
 		command: command,
 		args: [

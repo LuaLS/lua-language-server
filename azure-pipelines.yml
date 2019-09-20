@@ -24,12 +24,12 @@ jobs:
       cd ..
     displayName: 'Install Client'
   - script: |
-      server\Windows\bin\lua-language-server.exe server\publish.lua
+      server\Windows\bin\lua.exe server\publish.lua
     displayName: 'Publish'
   - task: CopyFiles@2
     inputs:
       Contents: '**'
-      SourceFolder: 'publish\lua-language-server'
+      SourceFolder: 'publish\lua'
       TargetFolder: '$(Build.ArtifactStagingDirectory)'
   - task: PublishBuildArtifacts@1
     inputs:
@@ -63,12 +63,12 @@ jobs:
       cd ..
     displayName: 'Install Client'
   - bash: |
-      ./server/macOS/bin/lua-language-server server/publish.lua
+      ./server/macOS/bin/lua server/publish.lua
     displayName: 'Publish'
   - task: CopyFiles@2
     inputs:
       Contents: '**'
-      SourceFolder: 'publish/lua-language-server'
+      SourceFolder: 'publish/lua'
       TargetFolder: '$(Build.ArtifactStagingDirectory)'
   - task: PublishBuildArtifacts@1
     inputs:
@@ -102,12 +102,12 @@ jobs:
       cd ..
     displayName: 'Install Client'
   - bash: |
-      ./server/Linux/bin/lua-language-server server/publish.lua
+      ./server/Linux/bin/lua server/publish.lua
     displayName: 'Publish'
   - task: CopyFiles@2
     inputs:
       Contents: '**'
-      SourceFolder: 'publish/lua-language-server'
+      SourceFolder: 'publish/lua'
       TargetFolder: '$(Build.ArtifactStagingDirectory)'
   - task: PublishBuildArtifacts@1
     inputs:

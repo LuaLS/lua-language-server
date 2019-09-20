@@ -6,7 +6,7 @@ local exe = platform == 'msvc' and ".exe" or ""
 local CWD = fs.current_path()
 
 local process = assert(sp.spawn {
-    CWD / 'server' / pf.OS / 'bin' / ('lua-language-server' .. exe),
+    CWD / 'server' / pf.OS / 'bin' / ('lua' .. exe),
     CWD / 'server' / 'test.lua',
     '-E',
     stdout = true,

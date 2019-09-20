@@ -13,7 +13,7 @@ fs.create_directories(output)
 fs.copy_file(bindir / 'lni'..dll, output / 'lni'..dll, true)
 fs.copy_file(bindir / 'lpeglabel'..dll, output / 'lpeglabel'..dll, true)
 fs.copy_file(bindir / 'bee'..dll, output / 'bee'..dll, true)
-fs.copy_file(bindir / 'lua'..exe, output / 'lua-language-server'..exe, true)
+fs.copy_file(bindir / 'lua'..exe, output / 'lua'..exe, true)
 
 local bootstrap = CWD / "3rd" / "bee.lua" / "bootstrap"
 fs.copy_file(bootstrap / "main.lua",      CWD / 'build' / "main.lua",   true)
@@ -29,7 +29,7 @@ if platform == 'msvc' then
 
     local process = assert(sp.spawn {
         bindir / 'rcedit.exe',
-        output / 'lua-language-server.exe',
+        output / 'lua.exe',
         '--set-icon',
         CWD / 'images' / 'icon.ico'
     })

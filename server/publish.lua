@@ -75,7 +75,7 @@ end
 
 local function runTest(root)
     local ext = platform.OS == 'Windows' and '.exe' or ''
-    local exe = root / platform.OS / 'bin' / 'lua-language-server' .. ext
+    local exe = root / platform.OS / 'bin' / 'lua' .. ext
     local test = root / 'test.lua'
     local lua = subprocess.spawn {
         exe,
@@ -178,7 +178,7 @@ removeFiles(out) {
     },
 }
 
-local path = EXTENSION / 'publish' / 'lua-language-server'
+local path = EXTENSION / 'publish' / 'lua'
 print('清理发布目录...')
 removeFiles(path)(true)
 

@@ -2,7 +2,7 @@ local pub        = require 'pub'
 local thread     = require 'bee.thread'
 local task       = require 'task'
 local timer      = require 'timer'
-local proto      = require 'service.proto'
+local proto      = require 'proto'
 
 local m = {}
 m.type = 'service'

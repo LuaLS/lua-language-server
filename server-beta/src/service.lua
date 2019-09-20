@@ -1,4 +1,4 @@
-local boss       = require 'boss'
+local pub        = require 'pub'
 local subprocess = require 'bee.subprocess'
 local thread     = require 'bee.thread'
 local task       = require 'task'
@@ -15,7 +15,7 @@ function m.listenProto()
     io.stdout:setvbuf 'no'
     task.create(function ()
         while true do
-            local proto = boss.task('loadProto')
+            local proto = pub.task('loadProto')
             log.debug('proto:', utility.dump(proto))
         end
     end)
@@ -24,8 +24,8 @@ end
 function m.listenPub()
     task.create(function ()
         while true do
-            boss.checkDead()
-            boss.recieve()
+            pub.checkDead()
+            pub.recieve()
             task.sleep(0)
         end
     end)
@@ -43,7 +43,7 @@ function m.startTimer()
 end
 
 function m.start()
-    boss.recruitBraves(4)
+    pub.recruitBraves(4)
     task.setErrorHandle(log.error)
     m.listenProto()
     m.listenPub()

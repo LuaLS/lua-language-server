@@ -63,14 +63,13 @@ function command.config(lsp, data)
             vscodePath = fs.path(os.getenv 'HOME') / '.vscode-server' / 'data' / 'Machine'
         end
         mode = 'user'
-    end
-
-    if not fs.exists(vscodePath) then
-        rpc:notify('window/showMessage', {
-            type = 3,
-            message = lang.script.MWS_UCONFIG_FAILED,
-        })
-        return
+        if not fs.exists(vscodePath) then
+            rpc:notify('window/showMessage', {
+                type = 3,
+                message = lang.script.MWS_UCONFIG_FAILED,
+            })
+            return
+        end
     end
 
     local settingBuf = io.load(vscodePath / 'settings.json')

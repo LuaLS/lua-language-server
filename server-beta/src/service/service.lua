@@ -1,25 +1,11 @@
 local pub        = require 'pub'
-local subprocess = require 'bee.subprocess'
 local thread     = require 'bee.thread'
 local task       = require 'task'
-local utility    = require 'utility'
 local timer      = require 'timer'
+local proto      = require 'service.proto'
 
 local m = {}
 m.type = 'service'
-
-function m.listenProto()
-    subprocess.filemode(io.stdin,  'b')
-    subprocess.filemode(io.stdout, 'b')
-    io.stdin:setvbuf  'no'
-    io.stdout:setvbuf 'no'
-    task.create(function ()
-        while true do
-            local proto = pub.task('loadProto')
-            log.debug('proto:', utility.dump(proto))
-        end
-    end)
-end
 
 function m.listenPub()
     task.create(function ()
@@ -45,7 +31,7 @@ end
 function m.start()
     pub.recruitBraves(4)
     task.setErrorHandle(log.error)
-    m.listenProto()
+    proto.listen()
     m.listenPub()
 
     m.startTimer()

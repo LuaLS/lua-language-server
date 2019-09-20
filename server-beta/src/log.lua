@@ -61,7 +61,7 @@ local function pushLog(level, ...)
         ioStdErr:write(str .. '\n')
     end
     local info = debugGetInfo(3, 'Sl')
-    return m.raw(level, str, info.source, info.currentline)
+    return m.raw(0, level, str, info.source, info.currentline)
 end
 
 function m.info(...)
@@ -84,15 +84,18 @@ function m.error(...)
     pushLog('error', ...)
 end
 
-function m.raw(level, msg, source, currentline)
+function m.raw(thd, level, msg, source, currentline)
     init_log_file()
     if not m.file then
         return
     end
     local sec, ms = mathModf(m.startTime + osClock())
     local timestr = osDate('%Y-%m-%d %H:%M:%S', sec)
-    local buf
-    buf = ('[%s.%03.f][%s]: [%s:%s]%s\n'):format(timestr, ms * 1000, level, trimSrc(source), currentline, msg)
+    local agl = ''
+    if #level < 5 then
+        agl = (' '):rep(5 - #level)
+    end
+    local buf = ('[%s.%03.f][%s]: %s[#%d:%s:%s]%s\n'):format(timestr, ms * 1000, level, agl, thd, trimSrc(source), currentline, msg)
     m.file:write(buf)
     m.size = m.size + #buf
     if m.size > m.maxSize then

@@ -556,9 +556,9 @@ local function PostCompile()
 end
 
 return function (self, lua, mode, version)
-    local state, errs = self:parse(lua, mode, version)
+    local state, err = self:parse(lua, mode, version)
     if not state then
-        return errs
+        return nil, err
     end
     pushError = state.pushError
     Root = state.root
@@ -570,5 +570,5 @@ return function (self, lua, mode, version)
     PostCompile()
     state.ast = nil
     Cache = nil
-    return state, errs
+    return state
 end

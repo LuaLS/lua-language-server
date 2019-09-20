@@ -7,6 +7,7 @@ return function (self, lua, mode, version)
         lua = lua,
         emmy = {},
         root = {},
+        errs = errs,
         pushError = function (err)
             if err.finish < err.start then
                 err.finish = err.start
@@ -30,8 +31,7 @@ return function (self, lua, mode, version)
     end
     if not res then
         state.pushError(err)
-        return nil, errs
     end
     state.ast = res
-    return state, errs
+    return state
 end

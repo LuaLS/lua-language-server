@@ -19,6 +19,7 @@ local m = {}
 m.type = 'pub'
 m.braves = {}
 m.ability = {}
+m.taskList = {}
 
 --- 注册酒馆的功能
 function m.on(name, callback)
@@ -71,6 +72,7 @@ function m.popTask(brave, id, result)
         return
     end
     brave.taskList[id] = nil
+    m.checkWaitingTask(brave)
     waker(result)
 end
 
@@ -92,6 +94,25 @@ function m.task(name, params)
             return m.pushTask(brave, name, params)
         end
     end
+    -- 如果所有勇者都在战斗，那么把任务缓存到队列里
+    -- 当有勇者提交任务反馈后，尝试把按顺序将堆积任务
+    -- 交给该勇者
+    m.taskList[#m.taskList+1] = function (brave)
+        return m.pushTask(brave, name, params)
+    end
+end
+
+--- 检查堆积任务
+function m.checkWaitingTask(brave)
+    if #m.taskList == 0 then
+        return
+    end
+    -- 如果勇者还有其他活要忙，那么让他继续忙去吧
+    if next(brave.taskList) then
+        return
+    end
+    local waiting = table.remove(m.taskList, 1)
+    waiting(brave)
 end
 
 --- 接收反馈

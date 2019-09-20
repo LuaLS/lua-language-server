@@ -35,7 +35,7 @@ return function (lsp, params)
 
     local response = {
         contents = {
-            value = text,
+            value = text:gsub("```lua\n\n```", ""),
             kind  = 'markdown',
         }
     }

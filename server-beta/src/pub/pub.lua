@@ -46,6 +46,7 @@ function m.recruitBraves(num)
             taskList = {},
             counter  = utility.counter(),
             currentTask = nil,
+            memory   = 0,
         }
     end
 end
@@ -143,6 +144,16 @@ function m.checkDead()
         end
         log.error('Brave is dead!: ' .. err)
     end
+end
+
+function m.listen()
+    task.create(function ()
+        while true do
+            m.checkDead()
+            m.recieve()
+            task.sleep(0)
+        end
+    end)
 end
 
 return m

@@ -25,6 +25,7 @@ end
 
 --- 开始找工作
 function m.start()
+    m.push('mem', collectgarbage 'count')
     while true do
         local suc, name, id, params = m.taskpad:pop()
         if not suc then
@@ -39,12 +40,13 @@ function m.start()
             log.error('Brave can not handle this work: ' .. name)
             goto CONTINUE
         end
-        local suc, res = xpcall(ability, log.error, params)
-        if not suc then
+        local ok, res = xpcall(ability, log.error, params)
+        if ok then
+            m.waiter:push(id, res)
+        else
             m.waiter:push(id)
-            goto CONTINUE
         end
-        m.waiter:push(id, res)
+        m.push('mem', collectgarbage 'count')
         ::CONTINUE::
     end
 end

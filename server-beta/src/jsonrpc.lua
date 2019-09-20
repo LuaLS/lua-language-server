@@ -21,7 +21,7 @@ function m.decode(reader, errHandle)
     if line:find('Content-Type', 1, true) then
         return nil
     end
-    local len = line:match('Content-Length: (%d+)')
+    local len = line:match('Content%-Length%: (%d+)')
     if not len then
         errHandle('Error header: ' .. line)
         return nil

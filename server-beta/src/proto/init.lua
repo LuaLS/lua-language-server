@@ -3,6 +3,7 @@ local util    = require 'utility'
 local cap     = require 'proto.capability'
 local pub     = require 'pub'
 local task    = require 'task'
+local files   = require 'files'
 
 proto.on('initialize', function (params)
     --log.debug(util.dump(params))
@@ -38,10 +39,16 @@ proto.on('textDocument/didOpen', function (params)
     local doc   = params.textDocument
     local uri   = doc.uri
     local text  = doc.text
-    local state = pub.task('compile', text)
+    files.open(uri)
+    files.setText(uri, text)
+    local ast = pub.task('compile', text)
+    files.setAst(uri, ast)
 end)
 
 proto.on('textDocument/didClose', function (params)
+    local doc   = params.textDocument
+    local uri   = doc.uri
+    files.close(uri)
 end)
 
 proto.on('textDocument/didChange', function (params)
@@ -49,7 +56,9 @@ proto.on('textDocument/didChange', function (params)
     local change = params.contentChanges
     local uri    = doc.uri
     local text   = change[1].text
-    local state  = pub.task('compile', text)
+    files.setText(uri, text)
+    local ast = pub.task('compile', text)
+    files.setAst(uri, ast)
 end)
 
 return proto

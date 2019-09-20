@@ -19,8 +19,10 @@ local function pushLog(level, ...)
     end
     local info = debugGetInfo(3, 'Sl')
     brave.push('log', {
-        msg  = str,
-        info = info,
+        level = level,
+        msg   = str,
+        src   = info.source,
+        line  = info.currentline,
     })
     return str
 end

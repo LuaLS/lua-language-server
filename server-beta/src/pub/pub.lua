@@ -9,6 +9,8 @@ local braveTemplate = [[
 package.path  = %q
 package.cpath = %q
 
+collectgarbage 'generational'
+
 log         = require 'brave.log'
 local brave = require 'brave'
 brave.register(%d)

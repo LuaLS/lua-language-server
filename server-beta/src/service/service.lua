@@ -29,6 +29,7 @@ end
 function m.report()
     local t = timer.loop(60.0, function ()
         local lines = {}
+        lines[#lines+1] = ''
         lines[#lines+1] = '========= Medical Examination Report ========='
         lines[#lines+1] = m.reportMemory()
         lines[#lines+1] = '=============================================='

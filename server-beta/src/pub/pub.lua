@@ -4,6 +4,7 @@ local task    = require 'task'
 
 local errLog  = thread.channel 'errlog'
 local type    = type
+local counter = utility.counter()
 
 local braveTemplate = [[
 package.path  = %q
@@ -21,7 +22,7 @@ local m = {}
 m.type = 'pub'
 m.braves = {}
 m.ability = {}
-m.taskList = {}
+m.taskQueue = {}
 
 --- 注册酒馆的功能
 function m.on(name, callback)
@@ -46,7 +47,6 @@ function m.recruitBraves(num)
                 id
             )),
             taskList = {},
-            counter  = utility.counter(),
             currentTask = nil,
             memory   = 0,
         }
@@ -55,28 +55,43 @@ end
 
 --- 勇者是否有空
 function m.isIdle(brave)
-    return next(brave.taskList) == nil
+    return next(brave.taskMap) == nil
 end
 
 --- 给勇者推送任务
-function m.pushTask(brave, name, params)
-    local taskID = brave.counter()
-    brave.taskpad:push(name, taskID, params)
+function m.pushTask(brave, info)
+    if info.removed then
+        return
+    end
+    brave.taskpad:push(info.name, info.id, info.params)
     return task.wait(function (waker)
-        brave.taskList[taskID] = waker
+        info.callback = waker
+        brave.taskMap[info.id] = info
     end)
+end
+
+--- 给勇者推送任务（异步）
+function m.pushAsyncTask(brave, info)
+    if info.removed then
+        return
+    end
+    brave.taskpad:push(info.name, info.id, info.params)
+    brave.taskMap[info.id] = info
 end
 
 --- 从勇者处接收任务反馈
 function m.popTask(brave, id, result)
-    local waker = brave.taskList[id]
-    if not waker then
+    local info = brave.taskMap[id]
+    if not info then
         log.warn(('Brave pushed unknown task result: # %d => [%d]'):format(brave.id, id))
         return
     end
-    brave.taskList[id] = nil
+    brave.taskMap[id] = nil
     m.checkWaitingTask(brave)
-    waker(result)
+    if not info.removed then
+        info.removed = true
+        info.callback(result)
+    end
 end
 
 --- 从勇者处接收报告
@@ -89,33 +104,89 @@ function m.popReport(brave, name, params)
     abil(params, brave)
 end
 
---- 发布任务
+--- 发布任务（同步）
 ---@parma name string
+---@param params any
 function m.task(name, params)
+    local info = {
+        id     = counter(),
+        name   = name,
+        params = params,
+    }
     for _, brave in ipairs(m.braves) do
         if m.isIdle(brave) then
-            return m.pushTask(brave, name, params)
+            return m.pushTask(brave, info)
         end
     end
     -- 如果所有勇者都在战斗，那么把任务缓存到队列里
     -- 当有勇者提交任务反馈后，尝试把按顺序将堆积任务
     -- 交给该勇者
-    m.taskList[#m.taskList+1] = function (brave)
-        return m.pushTask(brave, name, params)
+    m.taskQueue[#m.taskQueue+1] = info
+end
+
+--- 发布异步任务，如果任务进入了队列，会返回执行器
+---|通过 jumpQueue 可以插队
+---@parma name string
+---@param params any
+---@param callback function
+function m.asyncTask(name, params, callback)
+    local info = {
+        id       = counter(),
+        name     = name,
+        params   = params,
+        callback = callback or function () end,
+    }
+    for _, brave in ipairs(m.braves) do
+        if m.isIdle(brave) then
+            m.pushAsyncTask(brave, info)
+            return nil
+        end
+    end
+    -- 如果所有勇者都在战斗，那么把任务缓存到队列里
+    -- 当有勇者提交任务反馈后，尝试把按顺序将堆积任务
+    -- 交给该勇者
+    m.taskQueue[#m.taskQueue+1] = info
+    return info
+end
+
+--- 插队
+function m.jumpQueue(info)
+    for i = 2, #m.taskQueue do
+        if m.taskQueue[i] == info then
+            m.taskQueue[i] = nil
+            table.move(m.taskQueue, 1, i - 1, 2)
+            m.taskQueue[1] = info
+            return
+        end
+    end
+end
+
+--- 移除任务
+function m.remove(info)
+    info.removed = true
+    for i = 1, #m.taskQueue do
+        if m.taskQueue[i] == info then
+            table.remove(m.taskQueue[i], i)
+            return
+        end
     end
 end
 
 --- 检查堆积任务
 function m.checkWaitingTask(brave)
-    if #m.taskList == 0 then
+    if #m.taskQueue == 0 then
         return
     end
     -- 如果勇者还有其他活要忙，那么让他继续忙去吧
-    if next(brave.taskList) then
+    if next(brave.taskMap) then
         return
     end
-    local waiting = table.remove(m.taskList, 1)
-    waiting(brave)
+    local info = table.remove(m.taskQueue, 1)
+    if info.callback then
+        m.pushAsyncTask(brave, info)
+    else
+        m.pushTask(brave, info)
+    end
 end
 
 --- 接收反馈

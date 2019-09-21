@@ -41,8 +41,6 @@ proto.on('textDocument/didOpen', function (params)
     local text  = doc.text
     files.open(uri)
     files.setText(uri, text)
-    local ast = pub.task('compile', text)
-    files.setAst(uri, ast)
 end)
 
 proto.on('textDocument/didClose', function (params)
@@ -57,8 +55,6 @@ proto.on('textDocument/didChange', function (params)
     local uri    = doc.uri
     local text   = change[1].text
     files.setText(uri, text)
-    local ast = pub.task('compile', text)
-    files.setAst(uri, ast)
 end)
 
 return proto

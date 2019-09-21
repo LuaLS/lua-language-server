@@ -1,9 +1,10 @@
-local util    = require 'utility'
-local cap     = require 'proto.capability'
-local pub     = require 'pub'
-local task    = require 'task'
-local files   = require 'files'
-local proto   = require 'proto.proto'
+local util      = require 'utility'
+local cap       = require 'proto.capability'
+local pub       = require 'pub'
+local task      = require 'task'
+local files     = require 'files'
+local proto     = require 'proto.proto'
+local interface = require 'proto.interface'
 
 proto.on('initialize', function (params)
     --log.debug(util.dump(params))
@@ -58,13 +59,14 @@ proto.on('textDocument/hover', function ()
 end)
 
 proto.on('textDocument/definition', function (params)
-    local core  = require 'core.definition'
-    local uri   = params.textDocument.uri
-    local ast   = files.getAst(uri)
-    local text  = files.getText(uri)
-    local clock = os.clock()
+    local clock  = os.clock()
+    local core   = require 'core.definition'
+    local uri    = params.textDocument.uri
+    local ast    = files.getAst(uri)
+    local text   = files.getText(uri)
+    local offset = interface.offset(ast.lines, text, params.position)
     local result, correct
     repeat
-        result, correct = core(ast, text, pos)
+        result, correct = core(ast, text, offset)
     until correct or os.clock() - clock >= 1.0
 end)

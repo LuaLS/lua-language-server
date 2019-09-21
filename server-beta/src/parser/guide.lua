@@ -230,4 +230,20 @@ function m.offsetOf(lines, row, col)
     end
 end
 
+function m.lineContent(lines, text, row)
+    local line = lines[row]
+    if not line then
+        return ''
+    end
+    return text:sub(line.start + 1, line.finish)
+end
+
+function m.lineRange(lines, row)
+    local line = lines[row]
+    if not line then
+        return 0, 0
+    end
+    return line.start + 1, line.finish
+end
+
 return m

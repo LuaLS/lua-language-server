@@ -1,4 +1,6 @@
-local error = error
+local error      = error
+local utf8Len    = utf8.len
+local utf8Offset = utf8.offset
 
 _ENV = nil
 
@@ -170,6 +172,62 @@ function m.getLabel(root, block, name)
         block = m.getParentBlock(root, block)
     end
     error('guide.getLocal overstack')
+end
+
+--- 获取偏移对应的坐标（row从0开始，col为光标位置）
+---@param lines table
+---@return integer {name = 'row'}
+---@return integer {name = 'col'}
+function m.positionOf(lines, offset)
+    if offset < 1 then
+        return 0, 0
+    end
+    local lastLine = lines[#lines]
+    if offset > lastLine.finish then
+        return #lines - 1, lastLine.finish - lastLine.start
+    end
+    local min = 1
+    local max = #lines
+    for _ = 1, 100 do
+        if max <= min then
+            local line = lines[min]
+            return min - 1, offset - line.start
+        end
+        local row = (max - min) // 2 + min
+        local line = lines[row]
+        if offset < line.start then
+            max = row - 1
+        elseif offset >= line.finish then
+            min = row + 1
+        else
+            return row - 1, offset - line.start
+        end
+    end
+    error('Stack overflow!')
+end
+
+--- 获取坐标对应的偏移（row从0开始，col为光标位置）
+---@param lines table
+---@param row integer
+---@param col integer
+---@return integer {name = 'offset'}
+function m.offsetOf(lines, row, col)
+    if row < 0 then
+        return 0
+    end
+    if row > #lines - 1 then
+        local lastLine = lines[#lines]
+        return lastLine.finish
+    end
+    local line = lines[row + 1]
+    local len = line.finish - line.start
+    if col < 0 then
+        return line.start
+    elseif col > len then
+        return line.finish
+    else
+        return line.start + col
+    end
 end
 
 return m

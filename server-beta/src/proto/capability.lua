@@ -10,7 +10,7 @@ m.initer = {
     },
 
     hoverProvider = true,
-    --definitionProvider = true,
+    definitionProvider = true,
     --referencesProvider = true,
     --renameProvider = true,
     --documentSymbolProvider = true,

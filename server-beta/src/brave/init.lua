@@ -17,9 +17,11 @@ brave.on('compile', function (text)
         log.debug(err)
         return
     end
+    local lines = parser:lines(text, 'utf8')
     return {
-        root = state.root,
-        errs = state.errs,
+        root  = state.root,
+        errs  = state.errs,
+        lines = lines,
     }
 end)
 

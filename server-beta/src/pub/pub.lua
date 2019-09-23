@@ -46,7 +46,7 @@ function m.recruitBraves(num)
                 package.cpath,
                 id
             )),
-            taskList = {},
+            taskMap = {},
             currentTask = nil,
             memory   = 0,
         }

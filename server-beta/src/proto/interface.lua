@@ -11,7 +11,7 @@ local m = {}
 function m.offset(lines, text, position)
     local row    = position.line
     local start  = guide.lineRange(lines, row)
-    local col    = utf8.offset(text, position.character, start)
+    local col    = utf8.offset(text, position.character + 1, start)
     local offset = guide.offsetOf(lines, row, col)
     return offset
 end
@@ -25,7 +25,7 @@ end
 function m.position(lines, text, offset)
     local row, col = guide.positionOf(lines, offset)
     local start    = guide.lineRange(lines, row)
-    local ucol     = utf8.len(text, start, col, true)
+    local ucol     = utf8.len(text, start + 1, col, true)
     return {
         line      = row,
         character = ucol,
@@ -53,6 +53,20 @@ function m.location(uri, range)
     return {
         uri   = uri,
         range = range,
+    }
+end
+
+---@alias locationLink table
+---@param uri string
+---@param range range
+---@param selection range
+---@param origin range
+function m.locationLink(uri, range, selection, origin)
+    return {
+        targetUri            = uri,
+        targetRange          = range,
+        targetSelectionRange = selection,
+        originSelectionRange = origin,
     }
 end
 

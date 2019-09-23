@@ -517,7 +517,7 @@ FuncName    <-  {| Single (Sp SuffixWithoutCall)* |}
 
 grammar 'Lua' [[
 Lua         <-  Head?
-                {| Action* |} -> Lua
+                ({} {| Action* |} {}) -> Lua
                 Sp
 Head        <-  '#' (!%nl .)*
 ]]

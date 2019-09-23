@@ -3,6 +3,8 @@ local rootPath = currentPath:gsub('[^/\\]-$', '')
 if package.loadlib(rootPath .. 'Windows/bin/bee.dll', 'luaopen_bee_platform') then
     if rootPath == '' then
         rootPath = '.\\'
+    else
+        rootPath = rootPath:gsub('/', '\\')
     end
     package.cpath = rootPath .. 'Windows\\bin\\?.dll'
     package.path  = rootPath .. 'src\\?.lua'

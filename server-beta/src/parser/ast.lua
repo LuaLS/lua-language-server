@@ -1255,8 +1255,10 @@ local Defs = {
         block.filter = filter
         return block
     end,
-    Lua = function (actions)
-        actions.type = 'main'
+    Lua = function (start, actions, finish)
+        actions.type   = 'main'
+        actions.start  = start
+        actions.finish = finish - 1
         return actions
     end,
 

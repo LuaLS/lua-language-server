@@ -32,11 +32,15 @@ function m.setText(uri, text)
         m.fileMap[uri] = {}
     end
     local file = m.fileMap[uri]
+    if file.text == text then
+        return
+    end
     file.text = text
     if file.compiling then
         pub.removeTask(file.compiling)
     end
     file.compiling = pub.syncTask('compile', text, function (ast)
+        ast.uri = uri
         file.ast = ast
         file.compiling = nil
         local onCompiledList = file.onCompiledList

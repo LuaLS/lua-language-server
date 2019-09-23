@@ -898,6 +898,7 @@ local Defs = {
         end
 
         local loc = createLocal(name, start, actions)
+        loc.localfunction = true
 
         return loc
     end,
@@ -1037,6 +1038,9 @@ local Defs = {
                 key.value = getValue(values, i)
             elseif key.type == 'getfield' then
                 key.type = 'setfield'
+                key.value = getValue(values, i)
+            elseif key.type == 'getindex' then
+                key.type = 'setindex'
                 key.value = getValue(values, i)
             end
         end

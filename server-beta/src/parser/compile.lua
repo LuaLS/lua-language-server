@@ -120,6 +120,21 @@ local vmMap = {
         end
         return id
     end,
+    ['setindex'] = function (obj)
+        Root[#Root+1] = obj
+        local id = #Root
+        local node = obj.node
+        obj.node = Compile(node, id)
+        local index = obj.index
+        if index then
+            obj.index = Compile(index, id)
+        end
+        local value = obj.value
+        if value then
+            obj.value = Compile(value, id)
+        end
+        return id
+    end,
     ['getmethod'] = function (obj)
         Root[#Root+1] = obj
         local id = #Root
@@ -259,11 +274,20 @@ local vmMap = {
             end
             Block.locals[#Block.locals+1] = id
         end
-        local value = obj.value
-        if value then
-            obj.value = Compile(value, id)
+        if obj.localfunction then
+            obj.localfunction = nil
+            Cache[obj] = id
+            local value = obj.value
+            if value then
+                obj.value = Compile(value, id)
+            end
+        else
+            local value = obj.value
+            if value then
+                obj.value = Compile(value, id)
+            end
+            Cache[obj] = id
         end
-        Cache[obj] = id
         return id
     end,
     ['localattr'] = function (obj)
@@ -274,10 +298,8 @@ local vmMap = {
         Root[#Root+1] = obj
         local id = #Root
         local node  = obj.node
-        local field = obj.field
         local value = obj.value
         obj.node  = Compile(node, id)
-        obj.field = Compile(field, id)
         obj.value = Compile(value, id)
         return id
     end,

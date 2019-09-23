@@ -71,9 +71,9 @@ proto.on('textDocument/definition', function (params)
     local response = {}
     for i, info in ipairs(result) do
         response[i] = inte.locationLink(info.uri
-            , inte.range(ast.lines, text, info.target.start, info.target.finish)
-            , inte.range(ast.lines, text, info.target.start, info.target.finish)
-            , inte.range(ast.lines, text, info.source.start, info.source.finish)
+            , inte.range(ast.lines, text, info.target.start - 1, info.target.finish)
+            , inte.range(ast.lines, text, info.target.start - 1, info.target.finish)
+            , inte.range(ast.lines, text, info.source.start - 1, info.source.finish)
         )
     end
     return response

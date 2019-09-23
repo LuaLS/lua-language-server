@@ -25,6 +25,7 @@ end
 
 --- 设置文件文本
 function m.setText(uri, text)
+    local originUri = uri
     if platform.OS == 'Windows' then
         uri = uri:lower()
     end
@@ -40,7 +41,7 @@ function m.setText(uri, text)
         pub.removeTask(file.compiling)
     end
     file.compiling = pub.syncTask('compile', text, function (ast)
-        ast.uri = uri
+        ast.uri = originUri
         file.ast = ast
         file.compiling = nil
         local onCompiledList = file.onCompiledList

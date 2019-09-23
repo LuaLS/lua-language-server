@@ -64,6 +64,7 @@ function m.pushTask(brave, info)
         return
     end
     brave.taskpad:push(info.name, info.id, info.params)
+    log.info(('Push task %q to # %d, queue length %d'):format(info.name, brave.id, #m.taskQueue))
     return task.wait(function (waker)
         info.callback = waker
         brave.taskMap[info.id] = info
@@ -77,6 +78,7 @@ function m.pushSyncTask(brave, info)
     end
     brave.taskpad:push(info.name, info.id, info.params)
     brave.taskMap[info.id] = info
+    log.info(('Push task %q to # %d, queue length %d'):format(info.name, brave.id, #m.taskQueue))
 end
 
 --- 从勇者处接收任务反馈
@@ -122,6 +124,7 @@ function m.task(name, params)
     -- 当有勇者提交任务反馈后，尝试把按顺序将堆积任务
     -- 交给该勇者
     m.taskQueue[#m.taskQueue+1] = info
+    log.info(('Add task %q in queue, length %d.'):format(name, #m.taskQueue))
 end
 
 --- 发布同步任务，如果任务进入了队列，会返回执行器
@@ -146,6 +149,7 @@ function m.syncTask(name, params, callback)
     -- 当有勇者提交任务反馈后，尝试把按顺序将堆积任务
     -- 交给该勇者
     m.taskQueue[#m.taskQueue+1] = info
+    log.info(('Add task %q in queue, length %d.'):format(name, #m.taskQueue))
     return info
 end
 

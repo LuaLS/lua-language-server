@@ -1,6 +1,9 @@
 local brave   = require 'brave.brave'
 local jsonrpc = require 'jsonrpc'
 local parser  = require 'parser'
+local fs      = require 'bee.filesystem'
+local furi    = require 'file-uri'
+local util    = require 'utility'
 
 brave.on('loadProto', function ()
     while true do
@@ -23,6 +26,33 @@ brave.on('compile', function (text)
         errs  = state.errs,
         lines = lines,
     }
+end)
+
+brave.on('listDirectory', function (uri)
+    local path = fs.path(furi.decode(uri))
+    local uris = {}
+    local dirs = {}
+    for child in path:list_directory() do
+        local childUri = furi.encode(child:string())
+        uris[#uris+1] = childUri
+        if fs.is_directory(child) then
+            dirs[childUri] = true
+        end
+    end
+    return {
+        uris = uris,
+        dirs = dirs,
+    }
+end)
+
+brave.on('loadFile', function (uri)
+    local filename = furi.decode(uri)
+    return util.loadFile(filename)
+end)
+
+brave.on('saveFile', function (params)
+    local filename = furi.decode(params.uri)
+    return util.saveFile(filename, params.text)
 end)
 
 return brave

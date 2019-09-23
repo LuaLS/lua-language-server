@@ -1,0 +1,239 @@
+[arg]
+description = '独立版Lua的启动参数。'
+
+[assert]
+description = '如果其参数 `v` 的值为假，它就调用 `error`。'
+
+[collectgarbage]
+[[.enums]]
+name = 'opt'
+enum = '"collect"'
+description = '做一次完整的垃圾收集循环。'
+``````````
+name = 'opt'
+enum = '"stop"'
+description = '停止垃圾收集器的运行。'
+``````````
+name = 'opt'
+enum = '"restart"'
+description = '重启垃圾收集器的自动运行。'
+``````````
+name = 'opt'
+enum = '"count"'
+description = '以 K 字节数为单位返回 Lua 使用的总内存数。'
+``````````
+name = 'opt'
+enum = '"step"'
+description = '单步运行垃圾收集器。'
+``````````
+name = 'opt'
+enum = '"setpause"'
+description = '设置收集器的 `间歇率`。'
+``````````
+name = 'opt'
+enum = '"setstepmul"'
+description = '设置收集器的 `步进倍率`。'
+``````````
+name = 'opt'
+enum = '"isrunning"'
+description = '返回表示收集器是否在工作的布尔值。'
+
+["collectgarbage Lua 5.4"]
+[[.enums]]
+name = 'opt'
+enum = '"collect"'
+description = '做一次完整的垃圾收集循环。'
+``````````
+name = 'opt'
+enum = '"stop"'
+description = '停止垃圾收集器的运行。'
+``````````
+name = 'opt'
+enum = '"restart"'
+description = '重启垃圾收集器的自动运行。'
+``````````
+name = 'opt'
+enum = '"count"'
+description = '以 K 字节数为单位返回 Lua 使用的总内存数。'
+``````````
+name = 'opt'
+enum = '"step"'
+description = '单步运行垃圾收集器。'
+``````````
+name = 'opt'
+enum = '"setpause"'
+description = '设置收集器的 `间歇率`。'
+``````````
+name = 'opt'
+enum = '"setstepmul"'
+description = '设置收集器的 `步进倍率`。'
+``````````
+name = 'opt'
+enum = '"incremental"'
+description = '改变收集器模式为增量模式。'
+``````````
+name = 'opt'
+enum = '"generational"'
+description = '改变收集器模式为分代模式。'
+``````````
+name = 'opt'
+enum = '"isrunning"'
+description = '返回表示收集器是否在工作的布尔值。'
+
+[dofile]
+description = '打开该名字的文件，并执行文件中的 Lua 代码块。'
+
+[error]
+description = '中止上一次保护函数调用， 将错误对象 message 返回。'
+
+[_G]
+description = '内部储存有全局环境。'
+
+[getfenv]
+description = '返回给定函数的环境。`f` 可以是一个Lua函数，也可是一个表示调用栈层级的数字。'
+
+[getmetatable]
+description = '返回该对象的元表。'
+
+[ipairs]
+description = [[
+----------------
+```lua
+for i, v in ipairs(t) do
+    body
+end
+```
+]]
+
+[load]
+description = '加载一个代码块。'
+[[.enums]]
+name = 'mode'
+enum = '"b"'
+description = '只能是二进制代码块。'
+``````````
+name = 'mode'
+enum = '"t"'
+description = '只能是文本代码块。'
+``````````
+name = 'mode'
+enum = '"bt"'
+description = '可以是二进制也可以是文本。'
+
+['load Lua 5.1']
+description = '使用 `func` 分段加载代码块。每次调用 `func` 必须返回一个字符串用于连接前文。'
+
+[loadfile]
+description = '从文件中获取代码块。'
+[[.enums]]
+name = 'mode'
+enum = '"b"'
+description = '只能是二进制代码块。'
+``````````
+name = 'mode'
+enum = '"t"'
+description = '只能是文本代码块。'
+``````````
+name = 'mode'
+enum = '"bt"'
+description = '可以是二进制也可以是文本。'
+
+['loadfile Lua 5.1']
+description = '从 `filename` 或标准输入中加载代码块。'
+
+[loadstring]
+description = '使用给定字符串加载代码块。'
+
+[module]
+description = '创建一个模块'
+
+[next]
+description = '返回该键的下一个键及其关联的值。'
+
+[pairs]
+description = [[
+----------------
+```lua
+for k, v in pairs(t) do
+    body
+end
+```
+]]
+
+[pcall]
+description = '传入参数，以 *保护模式* 调用函数 `f` 。'
+
+[print]
+description = '接收任意数量的参数，并将它们的值打印到 `stdout`。'
+
+[rawequal]
+description = '在不触发任何元方法的情况下 检查 `v1` 是否和 `v2` 相等。'
+
+[rawget]
+description = '在不触发任何元方法的情况下 获取 `table[index]` 的值。'
+
+[rawlen]
+description = '在不触发任何元方法的情况下 返回对象 `v` 的长度。'
+
+[rawset]
+description = '在不触发任何元方法的情况下 将 `table[index]` 设为 `value`。'
+
+[select]
+[[.enums]]
+name = 'index'
+enum = '"#"'
+description = '返回参数的个数。'
+``````````
+name = 'index'
+code = 'integer'
+description = '返回参数中第 `index` 个之后的部分。'
+
+[setfenv]
+description = '设置给定函数的环境。 `f` 可以是一个Lua函数，也可是一个表示调用栈层级的数字。'
+
+[setmetatable]
+description = '给指定表设置元表。'
+
+[tonumber]
+description = '尝试把参数转换为一个数字。'
+
+[tostring]
+description = '可以接收任何类型，它将其转换为人可阅读的字符串形式。'
+
+[type]
+description = '将参数的类型编码为一个字符串返回。'
+
+["_VERSION Lua 5.1"]
+description = '当前解释器版本号。'
+
+["_VERSION Lua 5.2"]
+description = '当前解释器版本号。'
+
+["_VERSION Lua 5.3"]
+description = '当前解释器版本号。'
+
+["_VERSION Lua 5.4"]
+description = '当前解释器版本号。'
+
+[warn]
+description = '使用所有参数组成的字符串消息来发送警告。'
+
+[xpcall]
+description = '传入参数并设置一个消息处理器 `msgh`，以 *保护模式* 调用函数 `f` 。'
+
+["xpcall Lua 5.1"]
+description = '设置一个消息处理器 `err`，以 *保护模式* 调用函数 `f` 。'
+
+[require]
+description = '加载一个模块，返回该模块的返回值（`nil`时为`true`）。'
+
+["require Lua 5.4"]
+description = '加载一个模块，返回该模块的返回值（`nil`时为`true`）与搜索器返回的加载数据。默认搜索器的加载数据指示了加载位置，对于文件来说就是文件路径。'
+
+[unpack]
+description = [[
+-------
+```lua
+return list[i], list[i+1], ···, list[j]
+```
+]]

@@ -1,0 +1,73 @@
+<default>
+version = LuaJIT
+
+[jit]
+type = table
+[[.source]]
+type = library
+name = jit
+``````````
+type = global
+name = jit
+
+<default>
+type = function
+parent = {
+    1 = {
+        type = 'library',
+        name = 'jit',
+    },
+    2 = {
+        type = 'global',
+        name = 'jit',
+    },
+}
+
+[on]
+[[.args]]
+type = {'function', 'boolean'}
+optional = after
+``````````
+type = boolean
+optional = after
+
+[off]
+[[.args]]
+type = {'function', 'boolean'}
+optional = after
+``````````
+type = boolean
+optional = after
+
+[flush]
+[[.args]]
+type = {'function', 'boolean'}
+optional = after
+``````````
+type = boolean
+optional = after
+
+[status]
+[[.returns]]
+name = status
+type = boolean
+``````````
+type = '...'
+
+[version]
+type = string
+
+[version_num]
+type = string
+
+[os]
+type = string
+
+[arch]
+type = string
+
+[opt]
+type = table
+
+[util]
+type = table

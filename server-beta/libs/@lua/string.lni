@@ -1,0 +1,276 @@
+[string]
+type = 'table'
+[[.source]]
+type = 'global'
+``````````
+type = 'library'
+name = 'string'
+
+<default>
+type = 'function'
+parent = {
+    1 = {
+        type = 'global',
+        name = 'string',
+    },
+    2 = {
+        type = 'library',
+        name = 'string',
+    },
+    3 = {
+        type = 'object',
+        name = 'string',
+    }
+}
+
+[byte]
+[[.args]]
+type = 'string'
+``````````
+name = 'i'
+type = 'integer'
+optional = 'after'
+default = 1
+``````````
+name = 'j'
+type = 'integer'
+optional = 'self'
+[[.returns]]
+type = 'integer'
+``````````
+type = '...'
+
+[char]
+[[.args]]
+name = 'byte'
+type = 'integer'
+``````````
+type = '...'
+[[.returns]]
+type = 'string'
+``````````
+type = '...'
+
+[dump]
+[[.args]]
+type = 'function'
+``````````
+name = 'strip'
+type = 'boolean'
+[[.returns]]
+name = 'binary'
+type = 'string'
+
+[find]
+[[.args]]
+type = 'string'
+``````````
+name = 'pattern'
+type = 'string'
+``````````
+name = 'init'
+type = 'integer'
+optional = 'after'
+default = 1
+``````````
+name = 'plain'
+type = 'boolean'
+optional = 'self'
+[[.returns]]
+name = 'start'
+type = 'integer'
+``````````
+name = 'end'
+type = 'integer'
+``````````
+name = 'captured'
+type = '...'
+
+[format]
+[[.args]]
+type = 'string'
+``````````
+type = '...'
+[[.returns]]
+type = 'string'
+
+[gmatch]
+[[.args]]
+type = 'string'
+``````````
+name = 'pattern'
+type = 'string'
+[[.returns]]
+type = 'function'
+returns = {
+    1 = {
+        type = 'string'
+    },
+    2 = {
+        type = '...'
+    },
+}
+
+["gmatch Lua 5.4"]
+name = 'gmatch'
+version = 'Lua 5.4'
+[[.args]]
+type = 'string'
+``````````
+name = 'pattern'
+type = 'string'
+``````````
+name = 'init'
+type = 'integer'
+optional = 'after'
+default = 1
+[[.returns]]
+type = 'function'
+returns = {
+    1 = {
+        type = 'string'
+    },
+    2 = {
+        type = '...'
+    },
+}
+
+[gsub]
+[[.args]]
+type = 'string'
+``````````
+name = 'pattern'
+type = 'string'
+``````````
+name = 'repl'
+type = {'string', 'table', 'function'}
+``````````
+name = 'n'
+type = 'integer'
+[[.returns]]
+type = 'string'
+``````````
+name = 'count'
+type = 'integer'
+
+[len]
+[[.args]]
+type = 'string'
+[[.returns]]
+type = 'integer'
+
+[lower]
+[[.args]]
+type = 'string'
+[[.returns]]
+type = 'string'
+
+[match]
+[[.args]]
+type = 'string'
+``````````
+name = 'pattern'
+type = 'string'
+``````````
+name = 'init'
+type = 'integer'
+optional = 'self'
+default = 1
+[[.returns]]
+name = 'captured'
+type = 'string'
+
+[pack]
+version = {'Lua 5.3', 'Lua 5.4'}
+[[.args]]
+name = 'fmt'
+type = 'string'
+``````````
+name = 'v1'
+type = 'string'
+``````````
+name = 'v2'
+type = 'string'
+``````````
+type = '...'
+[[.returns]]
+name = 'binary'
+type = 'string'
+
+[packsize]
+version = {'Lua 5.3', 'Lua 5.4'}
+[[.args]]
+name = 'fmt'
+type = 'string'
+[[.returns]]
+type = 'integer'
+
+[rep]
+[[.args]]
+type = 'string'
+``````````
+name = n
+type = 'integer'
+``````````
+name = 'sep'
+type = 'string'
+optional = 'self'
+default = ''
+[[.returns]]
+type = 'string'
+
+['rep Lua 5.1']
+name = rep
+version = 'Lua 5.1'
+[[.args]]
+type = 'string'
+``````````
+name = n
+type = 'integer'
+[[.returns]]
+type = 'string'
+
+[reverse]
+[[.args]]
+type = 'string'
+[[.returns]]
+type = 'string'
+
+[sub]
+[[.args]]
+type = 'string'
+``````````
+name = 'i'
+type = 'integer'
+``````````
+name = 'j'
+type = 'integer'
+optional = 'self'
+default = -1
+[[.returns]]
+type = 'string'
+
+[unpack]
+version = {'Lua 5.3', 'Lua 5.4'}
+[[.args]]
+name = 'fmt'
+type = 'string'
+``````````
+name = 's'
+type = 'string'
+``````````
+name = 'pos'
+type = 'integer'
+optional = 'self'
+default = 1
+[[.returns]]
+type = '...'
+``````````
+name = 'offset'
+type = 'integer'
+
+[upper]
+[[.args]]
+type = 'string'
+[[.returns]]
+type = 'string'

@@ -1,0 +1,145 @@
+<default>
+version = LuaJIT
+
+[bit]
+type = table
+[[.source]]
+type = library
+name = bit
+``````````
+type = global
+name = bit
+
+<default>
+type = function
+parent = {
+    1 = {
+        type = 'library',
+        name = 'bit',
+    },
+    2 = {
+        type = 'global',
+        name = 'bit',
+    },
+}
+
+[tobit]
+[[.args]]
+name = x
+type = number
+[[.returns]]
+type = number
+
+[tohex]
+[[.args]]
+name = x
+type = number
+``````````
+name = n
+type = number
+optional = after
+[[.returns]]
+type = number
+
+[bnot]
+[[.args]]
+name = x
+type = number
+[[.returns]]
+type = number
+
+[bor]
+[[.args]]
+name = x1
+type = number
+``````````
+name = x2
+type = number
+optional = after
+`````````
+type = '...'
+[[.returns]]
+type = number
+
+[band]
+[[.args]]
+name = x1
+type = number
+``````````
+name = x2
+type = number
+optional = after
+`````````
+type = '...'
+[[.returns]]
+type = number
+
+[bxor]
+[[.args]]
+name = x1
+type = number
+``````````
+name = x2
+type = number
+optional = after
+`````````
+type = '...'
+[[.returns]]
+type = number
+
+[lshift]
+[[.args]]
+name = x
+type = number
+``````````
+name = n
+type = number
+[[.returns]]
+type = number
+
+[rshift]
+[[.args]]
+name = x
+type = number
+``````````
+name = n
+type = number
+[[.returns]]
+type = number
+
+[arshift]
+[[.args]]
+name = x
+type = number
+``````````
+name = n
+type = number
+[[.returns]]
+type = number
+
+[rol]
+[[.args]]
+name = x
+type = number
+``````````
+name = n
+type = number
+[[.returns]]
+type = number
+
+[ror]
+[[.args]]
+name = x
+type = number
+``````````
+name = n
+type = number
+[[.returns]]
+type = number
+
+[bswap]
+[[.args]]
+name = x
+type = number
+[[.returns]]
+type = number

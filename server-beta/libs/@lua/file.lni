@@ -1,0 +1,151 @@
+<default>
+type = 'function'
+parent = {
+    1 = {
+        type = 'object',
+        name = 'FILE*',
+    },
+}
+
+[close]
+[[.args]]
+type = 'FILE*'
+[[.returns]]
+name = 'suc'
+type = 'boolean'
+default = true
+optional = 'after'
+``````````
+name = 'type'
+type = 'string'
+``````````
+name = 'code'
+[[.enums]]
+name = 'type'
+enum = '"exit"'
+``````````
+name = 'type'
+enum = '"signal"'
+
+[flush]
+[[.args]]
+type = 'FILE*'
+
+[lines]
+[[.args]]
+type = 'FILE*'
+``````````
+name = 'mode'
+type = '...'
+[[.returns]]
+type = 'function'
+returns = {
+    1 = {
+        name = 'c',
+        type = {'string', 'number'},
+    }
+}
+[[.enums]]
+name = 'mode'
+enum = '"n"'
+``````````
+name = 'mode'
+enum = '"a"'
+``````````
+name = 'mode'
+enum = '"l"'
+default = true
+``````````
+name = 'mode'
+enum = '"L"'
+``````````
+name = 'mode'
+code = 'number'
+
+[read]
+[[.args]]
+type = 'FILE*'
+``````````
+name = 'mode'
+type = '...'
+[[.returns]]
+type = {'string', 'number'}
+``````````
+type = '...'
+[[.enums]]
+name = 'mode'
+enum = '"n"'
+``````````
+name = 'mode'
+enum = '"a"'
+``````````
+name = 'mode'
+enum = '"l"'
+default = true
+``````````
+name = 'mode'
+enum = '"L"'
+``````````
+name = 'mode'
+code = 'number'
+
+[seek]
+[[.args]]
+type = 'FILE*'
+``````````
+name = 'whence'
+type = 'string'
+optional = 'after'
+``````````
+name = 'offset'
+type = 'integer'
+default = 0
+optional = 'self'
+[[.returns]]
+name = 'offset'
+type = 'integer'
+``````````
+name = 'errmsg'
+type = 'string'
+optional = 'self'
+[[.enums]]
+name = 'whence'
+enum = '"set"'
+``````````
+name = 'whence'
+enum = '"cur"'
+default = true
+``````````
+name = 'whence'
+enum = '"end"'
+
+[setvbuf]
+[[.args]]
+type = 'FILE*'
+``````````
+name = 'mode'
+type = 'string'
+``````````
+name = 'size'
+type = 'integer'
+[[.enums]]
+name = 'mode'
+enum = '"no"'
+``````````
+name = 'mode'
+enum = '"full"'
+``````````
+name = 'mode'
+enum = '"line"'
+
+[write]
+[[.args]]
+type = 'FILE*'
+``````````
+type = '...'
+[[.returns]]
+type = 'FILE*'
+``````````
+name = 'errmsg'
+type = 'string'
+optional = 'self'

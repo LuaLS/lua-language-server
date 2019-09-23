@@ -1,0 +1,136 @@
+[bit32]
+version = 'Lua 5.2'
+type = 'table'
+[[.source]]
+type = 'global'
+``````````
+type = 'library'
+name = 'bit32'
+
+<default>
+version = 'Lua 5.2'
+type = 'function'
+parent = {
+    1 = {
+        type = 'global',
+        name = 'bit32',
+    },
+    2 = {
+        type = 'library',
+        name = 'bit32',
+    }
+}
+
+[arshift]
+[[.args]]
+name = x
+type = integer
+``````````
+name = disp
+type = integer
+[[.returns]]
+type = integer
+
+[band]
+[[.args]]
+type = '...'
+[[.returns]]
+type = integer
+
+[bnot]
+[[.args]]
+name = x
+type = integer
+[[.returns]]
+type = integer
+
+[bor]
+[[.args]]
+type = '...'
+[[.returns]]
+type = integer
+
+[btest]
+[[.args]]
+type = '...'
+[[.returns]]
+type = boolean
+
+[bxor]
+[[.args]]
+type = '...'
+[[.returns]]
+type = integer
+
+[extract]
+[[.args]]
+name = n
+type = integer
+``````````
+name = field
+type = integer
+``````````
+name = width
+type = integer
+optional = after
+default = 1
+[[.returns]]
+type = integer
+
+[replace]
+[[.args]]
+name = n
+type = integer
+``````````
+name = v
+type = integer
+``````````
+name = field
+type = integer
+``````````
+name = width
+type = integer
+optional = false
+default = 1
+[[.returns]]
+type = integer
+
+[lrotate]
+[[.args]]
+name = x
+type = integer
+``````````
+name = disp
+type = integer
+[[.returns]]
+type = integer
+
+[lshift]
+[[.args]]
+name = x
+type = integer
+``````````
+name = disp
+type = integer
+[[.returns]]
+type = integer
+
+[rrotate]
+[[.args]]
+name = x
+type = integer
+``````````
+name = disp
+type = integer
+[[.returns]]
+type = integer
+
+[rshift]
+[[.args]]
+name = x
+type = integer
+``````````
+name = disp
+type = integer
+[[.returns]]
+type = integer

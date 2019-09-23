@@ -1,0 +1,722 @@
+[japi]
+type = 'table'
+[[.source]]
+type = 'library'
+name = 'jass.japi'
+nick = 'japi'
+
+<default>
+type = 'function'
+parent = {
+    1 = {
+        type = 'library',
+        name = 'jass.japi',
+        nick = 'japi',
+    },
+}
+
+[EXGetUnitAbility]
+[[.args]]
+name = "u"
+type = "unit"
+``````````
+name = "abilcode"
+type = "integer"
+[[.returns]]
+type = "ability"
+
+[EXGetUnitAbilityByIndex]
+[[.args]]
+name = "u"
+type = "unit"
+``````````
+name = "index"
+type = "integer"
+[[.returns]]
+type = "ability"
+
+[EXGetAbilityId]
+[[.args]]
+name = "abil"
+type = "ability"
+[[.returns]]
+type = "integer"
+
+[EXGetAbilityState]
+[[.args]]
+name = "abil"
+type = "ability"
+``````````
+name = "state_type"
+type = "integer"
+[[.returns]]
+type = "number"
+
+[EXSetAbilityState]
+[[.args]]
+name = "abil"
+type = "ability"
+``````````
+name = "state_type"
+type = "integer"
+``````````
+name = "value"
+type = "number"
+[[.returns]]
+type = "boolean"
+
+[EXGetAbilityDataReal]
+[[.args]]
+name = "abil"
+type = "ability"
+``````````
+name = "level"
+type = "integer"
+``````````
+name = "data_type"
+type = "integer"
+[[.returns]]
+type = "number"
+
+[EXSetAbilityDataReal]
+[[.args]]
+name = "abil"
+type = "ability"
+``````````
+name = "level"
+type = "integer"
+``````````
+name = "data_type"
+type = "integer"
+``````````
+name = "value"
+type = "number"
+[[.returns]]
+type = "boolean"
+
+[EXGetAbilityDataInteger]
+[[.args]]
+name = "abil"
+type = "ability"
+``````````
+name = "level"
+type = "integer"
+``````````
+name = "data_type"
+type = "integer"
+[[.returns]]
+type = "integer"
+
+[EXSetAbilityDataInteger]
+[[.args]]
+name = "abil"
+type = "ability"
+``````````
+name = "level"
+type = "integer"
+``````````
+name = "data_type"
+type = "integer"
+``````````
+name = "value"
+type = "integer"
+[[.returns]]
+type = "boolean"
+
+[EXGetAbilityDataString]
+[[.args]]
+name = "abil"
+type = "ability"
+``````````
+name = "level"
+type = "integer"
+``````````
+name = "data_type"
+type = "integer"
+[[.returns]]
+type = "string"
+
+[EXSetAbilityDataString]
+[[.args]]
+name = "abil"
+type = "ability"
+``````````
+name = "level"
+type = "integer"
+``````````
+name = "data_type"
+type = "integer"
+``````````
+name = "value"
+type = "string"
+[[.returns]]
+type = "boolean"
+
+[EXSetAbilityString]
+[[.args]]
+name = "abilcode"
+type = "integer"
+``````````
+name = "level"
+type = "integer"
+``````````
+name = "data_type"
+type = "integer"
+``````````
+name = "value"
+type = "string"
+[[.returns]]
+type = "boolean"
+
+[EXSetAbilityAEmeDataA]
+[[.args]]
+name = "abil"
+type = "ability"
+``````````
+name = "unitid"
+type = "integer"
+[[.returns]]
+type = "boolean"
+
+[EXGetItemDataString]
+[[.args]]
+name = "itemcode"
+type = "integer"
+``````````
+name = "data_type"
+type = "integer"
+[[.returns]]
+type = "string"
+
+[EXSetItemDataString]
+[[.args]]
+name = "itemcode"
+type = "integer"
+``````````
+name = "data_type"
+type = "integer"
+``````````
+name = "value"
+type = "string"
+[[.returns]]
+type = "boolean"
+
+[EXGetEventDamageData]
+[[.args]]
+name = "edd_type"
+type = "integer"
+[[.returns]]
+type = "integer"
+
+[EXSetEventDamage]
+[[.args]]
+name = "amount"
+type = "number"
+[[.returns]]
+type = "boolean"
+
+[EXGetEffectX]
+[[.args]]
+name = "e"
+type = "effect"
+[[.returns]]
+type = "number"
+
+[EXGetEffectY]
+[[.args]]
+name = "e"
+type = "effect"
+[[.returns]]
+type = "number"
+
+[EXGetEffectZ]
+[[.args]]
+name = "e"
+type = "effect"
+[[.returns]]
+type = "number"
+
+[EXSetEffectXY]
+[[.args]]
+name = "e"
+type = "effect"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+
+[EXSetEffectZ]
+[[.args]]
+name = "e"
+type = "effect"
+``````````
+name = "z"
+type = "number"
+
+[EXGetEffectSize]
+[[.args]]
+name = "e"
+type = "effect"
+[[.returns]]
+type = "number"
+
+[EXSetEffectSize]
+[[.args]]
+name = "e"
+type = "effect"
+``````````
+name = "size"
+type = "number"
+
+[EXEffectMatRotateX]
+[[.args]]
+name = "e"
+type = "effect"
+``````````
+name = "angle"
+type = "number"
+
+[EXEffectMatRotateY]
+[[.args]]
+name = "e"
+type = "effect"
+``````````
+name = "angle"
+type = "number"
+
+[EXEffectMatRotateZ]
+[[.args]]
+name = "e"
+type = "effect"
+``````````
+name = "angle"
+type = "number"
+
+[EXEffectMatScale]
+[[.args]]
+name = "e"
+type = "effect"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "z"
+type = "number"
+
+[EXEffectMatReset]
+[[.args]]
+name = "e"
+type = "effect"
+
+[EXSetEffectSpeed]
+[[.args]]
+name = "e"
+type = "effect"
+``````````
+name = "speed"
+type = "number"
+
+[EXDisplayChat]
+[[.args]]
+name = "p"
+type = "player"
+``````````
+name = "chat_recipient"
+type = "integer"
+``````````
+name = "message"
+type = "string"
+
+[EXExecuteScript]
+[[.args]]
+name = "script"
+type = "string"
+[[.returns]]
+type = "string"
+
+[EXSetUnitFacing]
+[[.args]]
+name = "u"
+type = "unit"
+``````````
+name = "angle"
+type = "number"
+
+[EXPauseUnit]
+[[.args]]
+name = "u"
+type = "unit"
+``````````
+name = "flag"
+type = "boolean"
+
+[EXSetUnitCollisionType]
+[[.args]]
+name = "enable"
+type = "boolean"
+``````````
+name = "u"
+type = "unit"
+``````````
+name = "t"
+type = "integer"
+
+[EXSetUnitMoveType]
+[[.args]]
+name = "u"
+type = "unit"
+``````````
+name = "t"
+type = "integer"
+
+[EXGetItemDataString]
+[[.args]]
+name = "itemcode"
+type = "integer"
+``````````
+name = "data_type"
+type = "integer"
+[[.returns]]
+type = "string"
+
+[EXSetItemDataString]
+[[.args]]
+name = "itemcode"
+type = "integer"
+``````````
+name = "data_type"
+type = "integer"
+``````````
+name = "value"
+type = "string"
+[[.returns]]
+type = "boolean"
+
+[EXGetBuffDataString]
+[[.args]]
+name = "buffcode"
+type = "integer"
+``````````
+name = "data_type"
+type = "integer"
+[[.returns]]
+type = "string"
+
+[EXSetBuffDataString]
+[[.args]]
+name = "buffcode"
+type = "integer"
+``````````
+name = "data_type"
+type = "integer"
+``````````
+name = "value"
+type = "string"
+[[.returns]]
+type = "boolean"
+
+[EXDclareButtonIcon]
+[[.args]]
+name = "art"
+type = "string"
+
+[EXBlendButtonIcon]
+[[.args]]
+name = "mask"
+type = "string"
+``````````
+name = "image"
+type = "string"
+``````````
+name = "newArt"
+type = "string"
+
+[EXSetUnitArrayString]
+[[.args]]
+name = "unitCode"
+type = "integer"
+``````````
+name = "data_type"
+type = "integer"
+``````````
+name = "index"
+type = "integer"
+``````````
+name = "value"
+type = "string"
+
+[EXSetUnitInteger]
+[[.args]]
+name = "unitCode"
+type = "integer"
+``````````
+name = "data_type"
+type = "integer"
+``````````
+name = "value"
+type = "integer"
+
+[ABILITY_STATE_COOLDOWN]
+type = "integer"
+value = 1
+
+[ABILITY_DATA_TARGS]
+type = "integer"
+value = 100
+
+[ABILITY_DATA_CAST]
+type = "integer"
+value = 101
+
+[ABILITY_DATA_DUR]
+type = "integer"
+value = 102
+
+[ABILITY_DATA_HERODUR]
+type = "integer"
+value = 103
+
+[ABILITY_DATA_COST]
+type = "integer"
+value = 104
+
+[ABILITY_DATA_COOL]
+type = "integer"
+value = 105
+
+[ABILITY_DATA_AREA]
+type = "integer"
+value = 106
+
+[ABILITY_DATA_RNG]
+type = "integer"
+value = 107
+
+[ABILITY_DATA_DATA_A]
+type = "integer"
+value = 108
+
+[ABILITY_DATA_DATA_B]
+type = "integer"
+value = 109
+
+[ABILITY_DATA_DATA_C]
+type = "integer"
+value = 110
+
+[ABILITY_DATA_DATA_D]
+type = "integer"
+value = 111
+
+[ABILITY_DATA_DATA_E]
+type = "integer"
+value = 112
+
+[ABILITY_DATA_DATA_F]
+type = "integer"
+value = 113
+
+[ABILITY_DATA_DATA_G]
+type = "integer"
+value = 114
+
+[ABILITY_DATA_DATA_H]
+type = "integer"
+value = 115
+
+[ABILITY_DATA_DATA_I]
+type = "integer"
+value = 116
+
+[ABILITY_DATA_UNITID]
+type = "integer"
+value = 117
+
+[ABILITY_DATA_HOTKET]
+type = "integer"
+value = 200
+
+[ABILITY_DATA_UNHOTKET]
+type = "integer"
+value = 201
+
+[ABILITY_DATA_RESEARCH_HOTKEY]
+type = "integer"
+value = 202
+
+[ABILITY_DATA_NAME]
+type = "integer"
+value = 203
+
+[ABILITY_DATA_ART]
+type = "integer"
+value = 204
+
+[ABILITY_DATA_TARGET_ART]
+type = "integer"
+value = 205
+
+[ABILITY_DATA_CASTER_ART]
+type = "integer"
+value = 206
+
+[ABILITY_DATA_EFFECT_ART]
+type = "integer"
+value = 207
+
+[ABILITY_DATA_AREAEFFECT_ART]
+type = "integer"
+value = 208
+
+[ABILITY_DATA_MISSILE_ART]
+type = "integer"
+value = 209
+
+[ABILITY_DATA_SPECIAL_ART]
+type = "integer"
+value = 210
+
+[ABILITY_DATA_LIGHTNING_EFFECT]
+type = "integer"
+value = 211
+
+[ABILITY_DATA_BUFF_TIP]
+type = "integer"
+value = 212
+
+[ABILITY_DATA_BUFF_UBERTIP]
+type = "integer"
+value = 213
+
+[ABILITY_DATA_RESEARCH_TIP]
+type = "integer"
+value = 214
+
+[ABILITY_DATA_TIP]
+type = "integer"
+value = 215
+
+[ABILITY_DATA_UNTIP]
+type = "integer"
+value = 216
+
+[ABILITY_DATA_RESEARCH_UBERTIP]
+type = "integer"
+value = 217
+
+[ABILITY_DATA_UBERTIP]
+type = "integer"
+value = 218
+
+[ABILITY_DATA_UNUBERTIP]
+type = "integer"
+value = 219
+
+[ABILITY_DATA_UNART]
+type = "integer"
+value = 220
+
+[EVENT_DAMAGE_DATA_VAILD]
+type = "integer"
+value = 0
+
+[EVENT_DAMAGE_DATA_IS_PHYSICAL]
+type = "integer"
+value = 1
+
+[EVENT_DAMAGE_DATA_IS_ATTACK]
+type = "integer"
+value = 2
+
+[EVENT_DAMAGE_DATA_IS_RANGED]
+type = "integer"
+value = 3
+
+[EVENT_DAMAGE_DATA_DAMAGE_TYPE]
+type = "integer"
+value = 4
+
+[EVENT_DAMAGE_DATA_WEAPON_TYPE]
+type = "integer"
+value = 5
+
+[EVENT_DAMAGE_DATA_ATTACK_TYPE]
+type = "integer"
+value = 6
+
+[CHAT_RECIPIENT_ALL]
+type = "integer"
+value = 0
+
+[CHAT_RECIPIENT_ALLIES]
+type = "integer"
+value = 1
+
+[CHAT_RECIPIENT_OBSERVERS]
+type = "integer"
+value = 2
+
+[CHAT_RECIPIENT_REFEREES]
+type = "integer"
+value = 2
+
+[CHAT_RECIPIENT_PRIVATE]
+type = "integer"
+value = 3
+
+[YDWE_OBJECT_TYPE_ABILITY]
+type = "integer"
+value = 0
+
+[YDWE_OBJECT_TYPE_BUFF]
+type = "integer"
+value = 1
+
+[YDWE_OBJECT_TYPE_UNIT]
+type = "integer"
+value = 2
+
+[YDWE_OBJECT_TYPE_ITEM]
+type = "integer"
+value = 3
+
+[YDWE_OBJECT_TYPE_UPGRADE]
+type = "integer"
+value = 4
+
+[YDWE_OBJECT_TYPE_DOODAD]
+type = "integer"
+value = 5
+
+[YDWE_OBJECT_TYPE_DESTRUCTABLE]
+type = "integer"
+value = 6
+
+[ITEM_DATA_ART]
+type = "integer"
+value = 1
+
+[ITEM_DATA_UBERTIP]
+type = "integer"
+value = 3
+
+[ITEM_DATA_NAME]
+type = "integer"
+value = 4
+
+[BUFF_DATA_ART]
+type = "integer"
+value = 1
+
+[BUFF_DATA_TIP]
+type = "integer"
+value = 2
+
+[BUFF_DATA_UBERTIP]
+type = "integer"
+value = 3

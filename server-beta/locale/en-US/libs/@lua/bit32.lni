@@ -1,0 +1,57 @@
+[arshift]
+description = [[
+Returns the number `x` shifted `disp` bits to the right. Negative displacements shift to the left.
+
+This shift operation is what is called arithmetic shift. Vacant bits on the left are filled with copies of the higher bit of `x`; vacant bits on the right are filled with zeros.
+]]
+
+[band]
+description = 'Returns the bitwise *and* of its operands.'
+
+[bnot]
+description = [[
+Returns the bitwise negation of `x`.
+
+```lua
+assert(bit32.bnot(x) == (-1 - x) % 2^32)
+```
+]]
+
+[bor]
+description = 'Returns the bitwise *or* of its operands.'
+
+[btest]
+description = 'Returns a boolean signaling whether the bitwise *and* of its operands is different from zero.'
+
+[bxor]
+description = 'Returns the bitwise *exclusive or* of its operands.'
+
+[extract]
+description = 'Returns the unsigned number formed by the bits `field` to `field + width - 1` from `n`.'
+
+[replace]
+description = 'Returns a copy of `n` with the bits `field` to `field + width - 1` replaced by the value `v` .'
+
+[lrotate]
+description = 'Returns the number `x` rotated `disp` bits to the left. Negative displacements rotate to the right.'
+
+[lshift]
+description = [[
+Returns the number `x` shifted `disp` bits to the left. Negative displacements shift to the right. In any direction, vacant bits are filled with zeros.
+
+```lua
+assert(bit32.lshift(b, disp) == (b * 2^disp) % 2^32)
+```
+]]
+
+[rrotate]
+description = 'Returns the number `x` rotated `disp` bits to the right. Negative displacements rotate to the left.'
+
+[rshift]
+description = [[
+Returns the number `x` shifted `disp` bits to the right. Negative displacements shift to the left. In any direction, vacant bits are filled with zeros.
+
+```lua
+assert(bit32.rshift(b, disp) == math.floor(b % 2^32 / 2^disp))
+```
+]]

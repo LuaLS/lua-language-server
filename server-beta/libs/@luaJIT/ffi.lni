@@ -1,0 +1,194 @@
+<default>
+version = LuaJIT
+
+[ffi]
+type = table
+[[.source]]
+type = library
+name = ffi
+
+<default>
+type = function
+parent = {
+    1 = {
+        type = 'library',
+        name = 'ffi',
+    },
+}
+
+[cdef]
+[[.args]]
+name = def
+type = string
+
+[C]
+type = namespace
+
+[load]
+[[.args]]
+name = name
+type = string
+``````````
+name = global
+type = boolean
+optional = after
+[[.returns]]
+name = clib
+type = namespace
+
+[new]
+[[.args]]
+name = ct
+type = string
+``````````
+name = nelem
+type = number
+optional = self
+``````````
+name = init
+optional = after
+``````````
+type = '...'
+[[.returns]]
+type = cdata
+
+[typeof]
+[[.args]]
+name = ct
+type = string
+[[.returns]]
+type = ctype
+
+[cast]
+[[.args]]
+name = ct
+type = string
+``````````
+name = init
+[[.returns]]
+type = cdata
+
+[metatype]
+[[.args]]
+name = ct
+type = string
+``````````
+name = metatable
+type = table
+[[.returns]]
+type = ctype
+
+[gc]
+[[.args]]
+type = cdata
+``````````
+name = finalizer
+type = function
+[[.returns]]
+type = cdata
+
+[sizeof]
+[[.args]]
+name = ct
+type = string
+``````````
+name = nelem
+type = number
+optional = after
+[[.returns]]
+name = size
+type = number
+
+[alignof]
+[[.args]]
+name = ct
+type = string
+[[.returns]]
+name = align
+type = number
+
+[offsetof]
+[[.args]]
+name = ct
+type = string
+``````````
+name = field
+type = string
+[[.returns]]
+name = ofs
+type = number
+``````````
+name = bpos
+type = number
+optional = after
+``````````
+name = bsize
+type = number
+
+[istype]
+[[.args]]
+name = ct
+type = string
+``````````
+name = obj
+[[.returns]]
+name = status
+type = boolean
+
+[errno]
+[[.args]]
+name = newerr
+type = number
+optional = after
+[[.returns]]
+name = err
+type = number
+
+[string]
+[[.args]]
+name = ptr
+type = number
+``````````
+name = len
+type = number
+optional = after
+[[.returns]]
+name = str
+type = string
+
+[copy]
+[[.args]]
+name = dst
+type = number
+``````````
+name = src
+type = number/string
+``````````
+name = len
+type = number
+
+[fill]
+[[.args]]
+name = dst
+type = number
+``````````
+name = len
+type = number
+``````````
+name = c
+type = string
+optional = after
+
+[abi]
+[[.args]]
+name = param
+type = string
+[[.returns]]
+name = status
+type = boolean
+
+[os]
+type = 'string'
+
+[arch]
+type = 'string'

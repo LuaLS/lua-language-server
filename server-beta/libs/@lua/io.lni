@@ -1,0 +1,326 @@
+[io]
+type = 'table'
+[[.source]]
+type = 'global'
+``````````
+type = 'library'
+name = 'io'
+
+<default>
+type = 'function'
+parent = {
+    1 = {
+        type = 'global',
+        name = 'io',
+    },
+    2 = {
+        type = 'library',
+        name = 'io',
+    }
+}
+
+[stdin]
+type = 'FILE*'
+
+[stdout]
+type = 'FILE*'
+
+[stderr]
+type = 'FILE*'
+
+[close]
+[[.args]]
+name = 'file'
+type = 'FILE*'
+optional = 'self'
+[[.returns]]
+name = 'suc'
+type = 'boolean'
+default = true
+optional = 'after'
+``````````
+name = 'type'
+type = 'string'
+``````````
+name = 'code'
+[[.enums]]
+name = 'type'
+enum = '"exit"'
+``````````
+name = 'type'
+enum = '"signal"'
+
+[flush]
+
+[input]
+[[.args]]
+name = 'file'
+type = {'string', 'FILE*'}
+optional = 'self'
+[[.returns]]
+type = 'FILE*'
+optional = 'self'
+
+["lines Lua 5.1"]
+name = 'lines'
+version = {'Lua 5.1', 'Lua 5.2'}
+[[.args]]
+name = 'filename'
+type = 'string'
+optional = 'after'
+``````````
+name = 'mode'
+type = '...'
+[[.returns]]
+type = 'function'
+returns = {
+    1 = {
+        name = 'c',
+        type = {'string', 'number'},
+    }
+}
+[[.enums]]
+name = 'mode'
+enum = '"*n"'
+``````````
+name = 'mode'
+enum = '"*a"'
+``````````
+name = 'mode'
+enum = '"*l"'
+default = true
+``````````
+name = 'mode'
+code = 'number'
+
+["lines Lua 5.3"]
+name = 'lines'
+version = {'Lua 5.3', 'Lua 5.4'}
+[[.args]]
+name = 'filename'
+type = 'string'
+optional = 'after'
+``````````
+name = 'mode'
+type = '...'
+[[.returns]]
+type = 'function'
+returns = {
+    1 = {
+        name = 'c',
+        type = {'string', 'number'},
+    }
+}
+[[.enums]]
+name = 'mode'
+enum = '"n"'
+``````````
+name = 'mode'
+enum = '"a"'
+``````````
+name = 'mode'
+enum = '"l"'
+default = true
+``````````
+name = 'mode'
+enum = '"L"'
+``````````
+name = 'mode'
+code = 'number'
+
+["lines LuaJIT"]
+name = 'lines'
+version = 'LuaJIT'
+[[.args]]
+name = 'filename'
+type = 'string'
+optional = 'after'
+``````````
+name = 'mode'
+type = '...'
+[[.returns]]
+type = 'function'
+returns = {
+    1 = {
+        name = 'c',
+        type = {'string', 'number'},
+    }
+}
+[[.enums]]
+name = 'mode'
+enum = '"*n"'
+``````````
+name = 'mode'
+enum = '"*a"'
+``````````
+name = 'mode'
+enum = '"*l"'
+default = true
+``````````
+name = 'mode'
+enum = '"*L"'
+``````````
+name = 'mode'
+code = 'number'
+
+[open]
+[[.args]]
+name = 'filename'
+type = 'string'
+``````````
+name = 'mode'
+type = 'string'
+optional = 'self'
+default = 'r'
+[[.returns]]
+type = 'FILE*'
+[[.enums]]
+name = 'mode'
+enum = '"r"'
+default = true
+``````````
+name = 'mode'
+enum = '"w"'
+``````````
+name = 'mode'
+enum = '"a"'
+``````````
+name = 'mode'
+enum = '"r+"'
+``````````
+name = 'mode'
+enum = '"w+"'
+``````````
+name = 'mode'
+enum = '"a+"'
+
+[output:input]
+
+[popen]
+[[.args]]
+name = 'prog'
+type = 'string'
+``````````
+name = 'mode'
+type = 'string'
+optional = 'self'
+default = 'r'
+[[.returns]]
+name = 'file'
+type = 'FILE*'
+[[.enums]]
+name = 'mode'
+enum = '"r"'
+default = true
+``````````
+name = 'mode'
+enum = '"w"'
+
+["read Lua 5.1"]
+name = 'read'
+version = {'Lua 5.1', 'Lua 5.2'}
+[[.args]]
+name = 'mode'
+type = '...'
+[[.returns]]
+type = {'string', 'number'}
+``````````
+type = '...'
+[[.enums]]
+name = 'mode'
+enum = '"*n"'
+``````````
+name = 'mode'
+enum = '"*a"'
+``````````
+name = 'mode'
+enum = '"*l"'
+default = true
+``````````
+name = 'mode'
+code = 'number'
+
+["read Lua 5.3"]
+name = 'read'
+version = {'Lua 5.3', 'Lua 5.4'}
+[[.args]]
+name = 'mode'
+type = '...'
+[[.returns]]
+type = {'string', 'number'}
+``````````
+type = '...'
+[[.enums]]
+name = 'mode'
+enum = '"n"'
+``````````
+name = 'mode'
+enum = '"a"'
+``````````
+name = 'mode'
+enum = '"l"'
+default = true
+``````````
+name = 'mode'
+enum = '"L"'
+``````````
+name = 'mode'
+code = 'number'
+
+["read LuaJIT"]
+name = 'read'
+version = 'LuaJIT'
+[[.args]]
+name = 'mode'
+type = '...'
+[[.returns]]
+type = {'string', 'number'}
+``````````
+type = '...'
+[[.enums]]
+name = 'mode'
+enum = '"*n"'
+``````````
+name = 'mode'
+enum = '"*a"'
+``````````
+name = 'mode'
+enum = '"*l"'
+default = true
+``````````
+name = 'mode'
+enum = '"*L"'
+``````````
+name = 'mode'
+code = 'number'
+
+[tmpfile]
+[[.returns]]
+type = 'FILE*'
+
+[type]
+[[.args]]
+name = 'obj'
+type = 'FILE*'
+[[.returns]]
+name = 'type'
+type = 'string'
+[[.enums]]
+name = 'type'
+enum = '"file"'
+``````````
+name = 'type'
+enum = '"closed file"'
+``````````
+name = 'type'
+code = 'nil'
+
+[write]
+[[.args]]
+type = '...'
+[[.returns]]
+type = 'FILE*'
+``````````
+name = 'errmsg'
+type = 'string'
+optional = 'self'

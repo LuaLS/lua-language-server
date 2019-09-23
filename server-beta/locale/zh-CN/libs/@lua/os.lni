@@ -1,0 +1,38 @@
+[clock]
+description = '返回程序使用的按秒计 CPU 时间的近似值。'
+
+[data]
+description = '返回一个包含日期及时刻的字符串或表。 格式化方法取决于所给字符串 `format`。'
+
+[difftime]
+description = '返回以秒计算的时刻 `t1` 到 `t2` 的差值。'
+
+[execute]
+description = '调用系统解释器执行 `command`。'
+
+['execute Lua 5.1']
+description = '调用系统解释器执行 `command`。'
+
+[exit]
+description = '调用 ISO C 函数 `exit` 终止宿主程序。'
+
+['exit Lua 5.1']
+description = '调用 C 函数 `exit` 终止宿主程序。'
+
+[getenv]
+description = '返回进程环境变量 `varname` 的值。'
+
+[remove]
+description = '删除指定名字的文件。'
+
+[rename]
+description = '将名字为 `oldname` 的文件或目录更名为 `newname`。'
+
+[setlocale]
+description = '设置程序的当前区域。'
+
+[time]
+description = '当不传参数时，返回当前时刻。 如果传入一张表，就返回由这张表表示的时刻。'
+
+[tmpname]
+description = '返回一个可用于临时文件的文件名字符串。'

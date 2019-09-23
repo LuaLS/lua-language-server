@@ -1,0 +1,239 @@
+[arg]
+description = 'Command-line arguments of Lua Standalone.'
+
+[assert]
+description = 'Calls error if the value of its argument is false.'
+
+[collectgarbage]
+[[.enums]]
+name = 'opt'
+enum = '"collect"'
+description = 'Performs a full garbage-collection cycle.'
+``````````
+name = 'opt'
+enum = '"stop"'
+description = 'Stops automatic execution.'
+``````````
+name = 'opt'
+enum = '"restart"'
+description = 'Restarts automatic execution.'
+``````````
+name = 'opt'
+enum = '"count"'
+description = 'Returns the total memory in Kbytes.'
+``````````
+name = 'opt'
+enum = '"step"'
+description = 'Performs a garbage-collection step.'
+``````````
+name = 'opt'
+enum = '"setpause"'
+description = 'Set pause.'
+``````````
+name = 'opt'
+enum = '"setstepmul"'
+description = 'Set step multiplier.'
+``````````
+name = 'opt'
+enum = '"isrunning"'
+description = 'Returns whether the collector is running.'
+
+["collectgarbage Lua 5.4"]
+[[.enums]]
+name = 'opt'
+enum = '"collect"'
+description = 'Performs a full garbage-collection cycle.'
+``````````
+name = 'opt'
+enum = '"stop"'
+description = 'Stops automatic execution.'
+``````````
+name = 'opt'
+enum = '"restart"'
+description = 'Restarts automatic execution.'
+``````````
+name = 'opt'
+enum = '"count"'
+description = 'Returns the total memory in Kbytes.'
+``````````
+name = 'opt'
+enum = '"step"'
+description = 'Performs a garbage-collection step.'
+``````````
+name = 'opt'
+enum = '"setpause"'
+description = 'Set pause.'
+``````````
+name = 'opt'
+enum = '"setstepmul"'
+description = 'Set step multiplier.'
+``````````
+name = 'opt'
+enum = '"incremental"'
+description = 'Change the collector mode to incremental.'
+``````````
+name = 'opt'
+enum = '"generational"'
+description = 'Change the collector mode to generational.'
+``````````
+name = 'opt'
+enum = '"isrunning"'
+description = 'Returns whether the collector is running.'
+
+[dofile]
+description = 'Opens the named file and executes its contents as a Lua chunk.'
+
+[error]
+description = 'Terminates the last protected function called and returns message as the error object.'
+
+[_G]
+description = 'Holds the global environment.'
+
+[getfenv]
+description = 'Returns the current environment in use by the function. `f` can be a Lua function or a number that specifies the function at that stack level.'
+
+[getmetatable]
+description = 'Returns the metatable of the given object.'
+
+[ipairs]
+description = [[
+----------------
+```lua
+for i, v in ipairs(t) do
+    body
+end
+```
+]]
+
+[load]
+description = 'Loads a chunk.'
+[[.enums]]
+name = 'mode'
+enum = '"b"'
+description = 'Only binary chunks.'
+``````````
+name = 'mode'
+enum = '"t"'
+description = 'Only text chunks.'
+``````````
+name = 'mode'
+enum = '"bt"'
+description = 'Both binary and text.'
+
+['load Lua 5.1']
+description = 'Loads a chunk using function `func` to get its pieces. Each call to `func` must return a string that concatenates with previous results.'
+
+[loadfile]
+description = 'Loads a chunk from file.'
+[[.enums]]
+name = 'mode'
+enum = '"b"'
+description = 'Only binary chunks.'
+``````````
+name = 'mode'
+enum = '"t"'
+description = 'Only text chunks.'
+``````````
+name = 'mode'
+enum = '"bt"'
+description = 'Both binary and text.'
+
+['loadfile Lua 5.1']
+description = 'Loads a chunk from file `filename` or from the standard input, if no file name is given.'
+
+[loadstring]
+description = 'Loads a chunk from the given string.'
+
+[module]
+description = 'Creates a module'
+
+[next]
+description = 'Returns the next index of the table and its associated value.'
+
+[pairs]
+description = [[
+----------------
+```lua
+for k, v in pairs(t) do
+    body
+end
+```
+]]
+
+[pcall]
+description = 'Calls function with the given arguments in protected mode.'
+
+[print]
+description = 'Receives any number of arguments and prints their values to stdout.'
+
+[rawequal]
+description = 'Checks whether v1 is equal to v2, without invoking the `__eq` metamethod.'
+
+[rawget]
+description = 'Gets the real value of `table[index]`, without invoking the `__index` metamethod.'
+
+[rawlen]
+description = 'Returns the length of the object `v`, without invoking the `__len` metamethod.'
+
+[rawset]
+description = 'Sets the real value of `table[index]` to `value`, without invoking the `__newindex` metamethod.'
+
+[select]
+[[.enums]]
+name = 'index'
+enum = '"#"'
+description = 'Returns the total number of extra arguments.'
+``````````
+name = 'index'
+code = 'integer'
+description = 'Returns all arguments after number `index`.'
+
+[setfenv]
+description = 'Sets the environment to be used by the given function. `f` can be a Lua function or a number that specifies the function at that stack level.'
+
+[setmetatable]
+description = 'Sets the metatable for the given table.'
+
+[tonumber]
+description = 'Tries to convert its argument to a number.'
+
+[tostring]
+description = 'Receives a value of any type and converts it to a string in a human-readable format.'
+
+[type]
+description = 'Returns the type of its only argument, coded as a string.'
+
+["_VERSION Lua 5.1"]
+description = 'Running Lua version.'
+
+["_VERSION Lua 5.2"]
+description = 'Running Lua version.'
+
+["_VERSION Lua 5.3"]
+description = 'Running Lua version.'
+
+["_VERSION Lua 5.4"]
+description = 'Running Lua version.'
+
+[warn]
+description = 'Emits a warning with a message composed by the concatenation of all its arguments (which should be strings).'
+
+[xpcall]
+description = 'Calls function `f` with the given arguments in protected mode with a new message handler.'
+
+['xpcall Lua 5.1']
+description = 'Calls function `f` in protected mode with a new message handler.'
+
+[require]
+description = 'Loads the given module, returns any value returned by the given module(`true` when `nil`).'
+
+["require Lua 5.4"]
+description = 'Loads the given module, returns any value returned by the searcher(`true` when `nil`). Besides that value, also returns as a second result the loader data returned by the searcher, which indicates how `require` found the module. (For instance, if the module came from a file, this loader data is the file path.)'
+
+[unpack]
+description = [[
+-------
+```lua
+return list[i], list[i+1], ···, list[j]
+```
+]]

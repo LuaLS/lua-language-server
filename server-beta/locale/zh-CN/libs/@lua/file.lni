@@ -1,0 +1,91 @@
+[close]
+description = '关闭 `file`。'
+
+[flush]
+description = '将写入的数据保存到 `file` 中。'
+
+[lines]
+description = [[
+------
+```lua
+for c in file:lines(...) do
+    body
+end
+```
+]]
+[[.enums]]
+name = 'mode'
+enum = '"n"'
+description = '读取一个数字，根据 Lua 的转换文法返回浮点数或整数。'
+``````````
+name = 'mode'
+enum = '"a"'
+description = '从当前位置开始读取整个文件。'
+``````````
+name = 'mode'
+enum = '"l"'
+description = '读取一行并忽略行结束标记。'
+``````````
+name = 'mode'
+enum = '"L"'
+description = '读取一行并保留行结束标记。'
+``````````
+name = 'mode'
+code = 'number'
+description = '读取一个不超过这个数量字节数的字符串。'
+
+[read]
+description = '读文件 `file`， 指定的格式决定了要读什么。'
+[[.enums]]
+name = 'mode'
+enum = '"n"'
+description = '读取一个数字，根据 Lua 的转换文法返回浮点数或整数。'
+``````````
+name = 'mode'
+enum = '"a"'
+description = '从当前位置开始读取整个文件。'
+``````````
+name = 'mode'
+enum = '"l"'
+description = '读取一行并忽略行结束标记。'
+``````````
+name = 'mode'
+enum = '"L"'
+description = '读取一行并保留行结束标记。'
+``````````
+name = 'mode'
+code = 'number'
+description = '读取一个不超过这个数量字节数的字符串。'
+
+[seek]
+description = '设置及获取基于文件开头处计算出的位置。'
+[[.enums]]
+name = 'whence'
+enum = '"set"'
+description = '基点为 0 （文件开头）。'
+``````````
+name = 'whence'
+enum = '"cur"'
+description = '基点为当前位置。'
+``````````
+name = 'whence'
+enum = '"end"'
+description = '基点为文件尾。'
+
+[setvbuf]
+description = '设置输出文件的缓冲模式。'
+[[.enums]]
+name = 'mode'
+enum = '"no"'
+description = '不缓冲；输出操作立刻生效。'
+``````````
+name = 'mode'
+enum = '"full"'
+description = '完全缓冲；只有在缓存满或调用 flush 时才做输出操作。'
+``````````
+name = 'mode'
+enum = '"line"'
+description = '行缓冲；输出将缓冲到每次换行前。'
+
+[write]
+description = '将参数的值逐个写入 `file`。'

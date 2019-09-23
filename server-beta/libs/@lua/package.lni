@@ -1,0 +1,77 @@
+[package]
+type = 'table'
+[[.source]]
+type = 'global'
+``````````
+type = 'library'
+name = 'package'
+
+<default>
+type = 'function'
+parent = {
+    1 = {
+        type = 'global',
+        name = 'package',
+    },
+    2 = {
+        type = 'library',
+        name = 'package',
+    }
+}
+
+[config]
+type = 'string'
+
+[cpath]
+type = 'string'
+
+[loaded]
+type = 'table'
+
+[loaders]
+version = {'Lua 5.1', 'LuaJIT'}
+type = 'table'
+
+[loadlib]
+[[.args]]
+name = 'libname'
+type = 'string'
+``````````
+name = 'funcname'
+type = 'string'
+[[.returns]]
+
+[path]
+type = 'string'
+
+[preload]
+type = 'table'
+
+[searchers]
+version = {'Lua 5.2', 'Lua 5.3', 'Lua 5.4'}
+type = 'table'
+
+[searchpath]
+version = {'Lua 5.2', 'Lua 5.3', 'Lua 5.4', 'LuaJIT'}
+[[.args]]
+name = 'name'
+type = 'string'
+``````````
+name = 'path'
+type = 'string'
+``````````
+name = 'sep'
+type = 'string'
+optional = 'after'
+default = '.'
+``````````
+name = 'rep'
+type = 'string'
+optional = 'self'
+
+[seeall]
+version = {'Lua 5.1', 'LuaJIT'}
+special = seeall
+[[.args]]
+name = module
+type = table

@@ -1,0 +1,42 @@
+[create]
+description = '创建一个主体函数为 `f` 的新协程。'
+
+[isyieldable]
+description = '如果正在运行的协程可以让出，则返回真。'
+
+['isyieldable Lua 5.4']
+description = '如果协程 `co` 可以让出，则返回真。`co` 默认为正在运行的协程。'
+
+[close]
+description = '关闭协程 `co`，并关闭它所有等待 *to-be-closed* 的变量，并将协程状态设为 `dead` 。'
+
+[resume]
+description = '开始或继续协程 `co` 的运行。'
+
+[running]
+description = '返回当前正在运行的协程加一个布尔量。 如果当前运行的协程是主线程，其为真。'
+
+[status]
+description = '以字符串形式返回协程 `co` 的状态。'
+[[.enums]]
+name = 'status'
+enum = '"running"'
+description = '正在运行。'
+``````````
+name = 'status'
+enum = '"suspended"'
+description = '挂起或是还没有开始运行。'
+``````````
+name = 'status'
+enum = '"normal"'
+description = '是活动的，但并不在运行。'
+``````````
+name = 'status'
+enum = '"dead"'
+description = '运行完主体函数或因错误停止。'
+
+[wrap]
+description = '创建一个主体函数为 `f` 的新协程。'
+
+[yield]
+description = '挂起正在调用的协程的执行。'

@@ -1,0 +1,12452 @@
+[common]
+type = 'table'
+[[.source]]
+type = 'library'
+name = 'jass.common'
+nick = 'jass'
+
+<default>
+type = 'function'
+parent = {
+    1 = {
+        type = 'library',
+        name = 'jass.common',
+        nick = 'jass',
+    },
+}
+
+[ConvertRace]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "race"
+
+[ConvertAllianceType]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "alliancetype"
+
+[ConvertRacePref]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "racepreference"
+
+[ConvertIGameState]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "igamestate"
+
+[ConvertFGameState]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "fgamestate"
+
+[ConvertPlayerState]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "playerstate"
+
+[ConvertPlayerScore]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "playerscore"
+
+[ConvertPlayerGameResult]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "playergameresult"
+
+[ConvertUnitState]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "unitstate"
+
+[ConvertAIDifficulty]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "aidifficulty"
+
+[ConvertGameEvent]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "gameevent"
+
+[ConvertPlayerEvent]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "playerevent"
+
+[ConvertPlayerUnitEvent]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "playerunitevent"
+
+[ConvertWidgetEvent]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "widgetevent"
+
+[ConvertDialogEvent]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "dialogevent"
+
+[ConvertUnitEvent]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "unitevent"
+
+[ConvertLimitOp]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "limitop"
+
+[ConvertUnitType]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "unittype"
+
+[ConvertGameSpeed]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "gamespeed"
+
+[ConvertPlacement]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "placement"
+
+[ConvertStartLocPrio]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "startlocprio"
+
+[ConvertGameDifficulty]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "gamedifficulty"
+
+[ConvertGameType]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "gametype"
+
+[ConvertMapFlag]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "mapflag"
+
+[ConvertMapVisibility]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "mapvisibility"
+
+[ConvertMapSetting]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "mapsetting"
+
+[ConvertMapDensity]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "mapdensity"
+
+[ConvertMapControl]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "mapcontrol"
+
+[ConvertPlayerColor]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "playercolor"
+
+[ConvertPlayerSlotState]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "playerslotstate"
+
+[ConvertVolumeGroup]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "volumegroup"
+
+[ConvertCameraField]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "camerafield"
+
+[ConvertBlendMode]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "blendmode"
+
+[ConvertRarityControl]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "raritycontrol"
+
+[ConvertTexMapFlags]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "texmapflags"
+
+[ConvertFogState]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "fogstate"
+
+[ConvertEffectType]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "effecttype"
+
+[ConvertVersion]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "version"
+
+[ConvertItemType]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "itemtype"
+
+[ConvertAttackType]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "attacktype"
+
+[ConvertDamageType]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "damagetype"
+
+[ConvertWeaponType]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "weapontype"
+
+[ConvertSoundType]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "soundtype"
+
+[ConvertPathingType]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "pathingtype"
+
+[OrderId]
+[[.args]]
+name = "orderIdString"
+type = "string"
+[[.returns]]
+type = "integer"
+
+[OrderId2String]
+[[.args]]
+name = "orderId"
+type = "integer"
+[[.returns]]
+type = "string"
+
+[UnitId]
+[[.args]]
+name = "unitIdString"
+type = "string"
+[[.returns]]
+type = "integer"
+
+[UnitId2String]
+[[.args]]
+name = "unitId"
+type = "integer"
+[[.returns]]
+type = "string"
+
+[AbilityId]
+[[.args]]
+name = "abilityIdString"
+type = "string"
+[[.returns]]
+type = "integer"
+
+[AbilityId2String]
+[[.args]]
+name = "abilityId"
+type = "integer"
+[[.returns]]
+type = "string"
+
+[GetObjectName]
+[[.args]]
+name = "objectId"
+type = "integer"
+[[.returns]]
+type = "string"
+
+[Deg2Rad]
+[[.args]]
+name = "degrees"
+type = "number"
+[[.returns]]
+type = "number"
+
+[Rad2Deg]
+[[.args]]
+name = "radians"
+type = "number"
+[[.returns]]
+type = "number"
+
+[Sin]
+[[.args]]
+name = "radians"
+type = "number"
+[[.returns]]
+type = "number"
+
+[Cos]
+[[.args]]
+name = "radians"
+type = "number"
+[[.returns]]
+type = "number"
+
+[Tan]
+[[.args]]
+name = "radians"
+type = "number"
+[[.returns]]
+type = "number"
+
+[Asin]
+[[.args]]
+name = "y"
+type = "number"
+[[.returns]]
+type = "number"
+
+[Acos]
+[[.args]]
+name = "x"
+type = "number"
+[[.returns]]
+type = "number"
+
+[Atan]
+[[.args]]
+name = "x"
+type = "number"
+[[.returns]]
+type = "number"
+
+[Atan2]
+[[.args]]
+name = "y"
+type = "number"
+``````````
+name = "x"
+type = "number"
+[[.returns]]
+type = "number"
+
+[SquareRoot]
+[[.args]]
+name = "x"
+type = "number"
+[[.returns]]
+type = "number"
+
+[Pow]
+[[.args]]
+name = "x"
+type = "number"
+``````````
+name = "power"
+type = "number"
+[[.returns]]
+type = "number"
+
+[I2R]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "number"
+
+[R2I]
+[[.args]]
+name = "r"
+type = "number"
+[[.returns]]
+type = "integer"
+
+[I2S]
+[[.args]]
+name = "i"
+type = "integer"
+[[.returns]]
+type = "string"
+
+[R2S]
+[[.args]]
+name = "r"
+type = "number"
+[[.returns]]
+type = "string"
+
+[R2SW]
+[[.args]]
+name = "r"
+type = "number"
+``````````
+name = "width"
+type = "integer"
+``````````
+name = "precision"
+type = "integer"
+[[.returns]]
+type = "string"
+
+[S2I]
+[[.args]]
+name = "s"
+type = "string"
+[[.returns]]
+type = "integer"
+
+[S2R]
+[[.args]]
+name = "s"
+type = "string"
+[[.returns]]
+type = "number"
+
+[GetHandleId]
+[[.args]]
+name = "h"
+type = "handle"
+[[.returns]]
+type = "integer"
+
+[SubString]
+[[.args]]
+name = "source"
+type = "string"
+``````````
+name = "start"
+type = "integer"
+``````````
+name = "end"
+type = "integer"
+[[.returns]]
+type = "string"
+
+[StringLength]
+[[.args]]
+name = "s"
+type = "string"
+[[.returns]]
+type = "integer"
+
+[StringCase]
+[[.args]]
+name = "source"
+type = "string"
+``````````
+name = "upper"
+type = "boolean"
+[[.returns]]
+type = "string"
+
+[StringHash]
+[[.args]]
+name = "s"
+type = "string"
+[[.returns]]
+type = "integer"
+
+[GetLocalizedString]
+[[.args]]
+name = "source"
+type = "string"
+[[.returns]]
+type = "string"
+
+[GetLocalizedHotkey]
+[[.args]]
+name = "source"
+type = "string"
+[[.returns]]
+type = "integer"
+
+[SetMapName]
+[[.args]]
+name = "name"
+type = "string"
+
+[SetMapDescription]
+[[.args]]
+name = "description"
+type = "string"
+
+[SetTeams]
+[[.args]]
+name = "teamcount"
+type = "integer"
+
+[SetPlayers]
+[[.args]]
+name = "playercount"
+type = "integer"
+
+[DefineStartLocation]
+[[.args]]
+name = "whichStartLoc"
+type = "integer"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+
+[DefineStartLocationLoc]
+[[.args]]
+name = "whichStartLoc"
+type = "integer"
+``````````
+name = "whichLocation"
+type = "location"
+
+[SetStartLocPrioCount]
+[[.args]]
+name = "whichStartLoc"
+type = "integer"
+``````````
+name = "prioSlotCount"
+type = "integer"
+
+[SetStartLocPrio]
+[[.args]]
+name = "whichStartLoc"
+type = "integer"
+``````````
+name = "prioSlotIndex"
+type = "integer"
+``````````
+name = "otherStartLocIndex"
+type = "integer"
+``````````
+name = "priority"
+type = "startlocprio"
+
+[GetStartLocPrioSlot]
+[[.args]]
+name = "whichStartLoc"
+type = "integer"
+``````````
+name = "prioSlotIndex"
+type = "integer"
+[[.returns]]
+type = "integer"
+
+[GetStartLocPrio]
+[[.args]]
+name = "whichStartLoc"
+type = "integer"
+``````````
+name = "prioSlotIndex"
+type = "integer"
+[[.returns]]
+type = "startlocprio"
+
+[SetGameTypeSupported]
+[[.args]]
+name = "whichGameType"
+type = "gametype"
+``````````
+name = "value"
+type = "boolean"
+
+[SetMapFlag]
+[[.args]]
+name = "whichMapFlag"
+type = "mapflag"
+``````````
+name = "value"
+type = "boolean"
+
+[SetGamePlacement]
+[[.args]]
+name = "whichPlacementType"
+type = "placement"
+
+[SetGameSpeed]
+[[.args]]
+name = "whichspeed"
+type = "gamespeed"
+
+[SetGameDifficulty]
+[[.args]]
+name = "whichdifficulty"
+type = "gamedifficulty"
+
+[SetResourceDensity]
+[[.args]]
+name = "whichdensity"
+type = "mapdensity"
+
+[SetCreatureDensity]
+[[.args]]
+name = "whichdensity"
+type = "mapdensity"
+
+[GetTeams]
+[[.returns]]
+type = "integer"
+
+[GetPlayers]
+[[.returns]]
+type = "integer"
+
+[IsGameTypeSupported]
+[[.args]]
+name = "whichGameType"
+type = "gametype"
+[[.returns]]
+type = "boolean"
+
+[GetGameTypeSelected]
+[[.returns]]
+type = "gametype"
+
+[IsMapFlagSet]
+[[.args]]
+name = "whichMapFlag"
+type = "mapflag"
+[[.returns]]
+type = "boolean"
+
+[GetGamePlacement]
+[[.returns]]
+type = "placement"
+
+[GetGameSpeed]
+[[.returns]]
+type = "gamespeed"
+
+[GetGameDifficulty]
+[[.returns]]
+type = "gamedifficulty"
+
+[GetResourceDensity]
+[[.returns]]
+type = "mapdensity"
+
+[GetCreatureDensity]
+[[.returns]]
+type = "mapdensity"
+
+[GetStartLocationX]
+[[.args]]
+name = "whichStartLocation"
+type = "integer"
+[[.returns]]
+type = "number"
+
+[GetStartLocationY]
+[[.args]]
+name = "whichStartLocation"
+type = "integer"
+[[.returns]]
+type = "number"
+
+[GetStartLocationLoc]
+[[.args]]
+name = "whichStartLocation"
+type = "integer"
+[[.returns]]
+type = "location"
+
+[SetPlayerTeam]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+``````````
+name = "whichTeam"
+type = "integer"
+
+[SetPlayerStartLocation]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+``````````
+name = "startLocIndex"
+type = "integer"
+
+[ForcePlayerStartLocation]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+``````````
+name = "startLocIndex"
+type = "integer"
+
+[SetPlayerColor]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+``````````
+name = "color"
+type = "playercolor"
+
+[SetPlayerAlliance]
+[[.args]]
+name = "sourcePlayer"
+type = "player"
+``````````
+name = "otherPlayer"
+type = "player"
+``````````
+name = "whichAllianceSetting"
+type = "alliancetype"
+``````````
+name = "value"
+type = "boolean"
+
+[SetPlayerTaxRate]
+[[.args]]
+name = "sourcePlayer"
+type = "player"
+``````````
+name = "otherPlayer"
+type = "player"
+``````````
+name = "whichResource"
+type = "playerstate"
+``````````
+name = "rate"
+type = "integer"
+
+[SetPlayerRacePreference]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+``````````
+name = "whichRacePreference"
+type = "racepreference"
+
+[SetPlayerRaceSelectable]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+``````````
+name = "value"
+type = "boolean"
+
+[SetPlayerController]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+``````````
+name = "controlType"
+type = "mapcontrol"
+
+[SetPlayerName]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+``````````
+name = "name"
+type = "string"
+
+[SetPlayerOnScoreScreen]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+``````````
+name = "flag"
+type = "boolean"
+
+[GetPlayerTeam]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+[[.returns]]
+type = "integer"
+
+[GetPlayerStartLocation]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+[[.returns]]
+type = "integer"
+
+[GetPlayerColor]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+[[.returns]]
+type = "playercolor"
+
+[GetPlayerSelectable]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+[[.returns]]
+type = "boolean"
+
+[GetPlayerController]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+[[.returns]]
+type = "mapcontrol"
+
+[GetPlayerSlotState]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+[[.returns]]
+type = "playerslotstate"
+
+[GetPlayerTaxRate]
+[[.args]]
+name = "sourcePlayer"
+type = "player"
+``````````
+name = "otherPlayer"
+type = "player"
+``````````
+name = "whichResource"
+type = "playerstate"
+[[.returns]]
+type = "integer"
+
+[IsPlayerRacePrefSet]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+``````````
+name = "pref"
+type = "racepreference"
+[[.returns]]
+type = "boolean"
+
+[GetPlayerName]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+[[.returns]]
+type = "string"
+
+[CreateTimer]
+[[.returns]]
+type = "timer"
+
+[DestroyTimer]
+[[.args]]
+name = "whichTimer"
+type = "timer"
+
+[TimerStart]
+[[.args]]
+name = "whichTimer"
+type = "timer"
+``````````
+name = "timeout"
+type = "number"
+``````````
+name = "periodic"
+type = "boolean"
+``````````
+name = "handlerFunc"
+type = "code"
+
+[TimerGetElapsed]
+[[.args]]
+name = "whichTimer"
+type = "timer"
+[[.returns]]
+type = "number"
+
+[TimerGetRemaining]
+[[.args]]
+name = "whichTimer"
+type = "timer"
+[[.returns]]
+type = "number"
+
+[TimerGetTimeout]
+[[.args]]
+name = "whichTimer"
+type = "timer"
+[[.returns]]
+type = "number"
+
+[PauseTimer]
+[[.args]]
+name = "whichTimer"
+type = "timer"
+
+[ResumeTimer]
+[[.args]]
+name = "whichTimer"
+type = "timer"
+
+[GetExpiredTimer]
+[[.returns]]
+type = "timer"
+
+[CreateGroup]
+[[.returns]]
+type = "group"
+
+[DestroyGroup]
+[[.args]]
+name = "whichGroup"
+type = "group"
+
+[GroupAddUnit]
+[[.args]]
+name = "whichGroup"
+type = "group"
+``````````
+name = "whichUnit"
+type = "unit"
+
+[GroupRemoveUnit]
+[[.args]]
+name = "whichGroup"
+type = "group"
+``````````
+name = "whichUnit"
+type = "unit"
+
+[GroupClear]
+[[.args]]
+name = "whichGroup"
+type = "group"
+
+[GroupEnumUnitsOfType]
+[[.args]]
+name = "whichGroup"
+type = "group"
+``````````
+name = "unitname"
+type = "string"
+``````````
+name = "filter"
+type = "boolexpr"
+
+[GroupEnumUnitsOfPlayer]
+[[.args]]
+name = "whichGroup"
+type = "group"
+``````````
+name = "whichPlayer"
+type = "player"
+``````````
+name = "filter"
+type = "boolexpr"
+
+[GroupEnumUnitsOfTypeCounted]
+[[.args]]
+name = "whichGroup"
+type = "group"
+``````````
+name = "unitname"
+type = "string"
+``````````
+name = "filter"
+type = "boolexpr"
+``````````
+name = "countLimit"
+type = "integer"
+
+[GroupEnumUnitsInRect]
+[[.args]]
+name = "whichGroup"
+type = "group"
+``````````
+name = "r"
+type = "rect"
+``````````
+name = "filter"
+type = "boolexpr"
+
+[GroupEnumUnitsInRectCounted]
+[[.args]]
+name = "whichGroup"
+type = "group"
+``````````
+name = "r"
+type = "rect"
+``````````
+name = "filter"
+type = "boolexpr"
+``````````
+name = "countLimit"
+type = "integer"
+
+[GroupEnumUnitsInRange]
+[[.args]]
+name = "whichGroup"
+type = "group"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "radius"
+type = "number"
+``````````
+name = "filter"
+type = "boolexpr"
+
+[GroupEnumUnitsInRangeOfLoc]
+[[.args]]
+name = "whichGroup"
+type = "group"
+``````````
+name = "whichLocation"
+type = "location"
+``````````
+name = "radius"
+type = "number"
+``````````
+name = "filter"
+type = "boolexpr"
+
+[GroupEnumUnitsInRangeCounted]
+[[.args]]
+name = "whichGroup"
+type = "group"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "radius"
+type = "number"
+``````````
+name = "filter"
+type = "boolexpr"
+``````````
+name = "countLimit"
+type = "integer"
+
+[GroupEnumUnitsInRangeOfLocCounted]
+[[.args]]
+name = "whichGroup"
+type = "group"
+``````````
+name = "whichLocation"
+type = "location"
+``````````
+name = "radius"
+type = "number"
+``````````
+name = "filter"
+type = "boolexpr"
+``````````
+name = "countLimit"
+type = "integer"
+
+[GroupEnumUnitsSelected]
+[[.args]]
+name = "whichGroup"
+type = "group"
+``````````
+name = "whichPlayer"
+type = "player"
+``````````
+name = "filter"
+type = "boolexpr"
+
+[GroupImmediateOrder]
+[[.args]]
+name = "whichGroup"
+type = "group"
+``````````
+name = "order"
+type = "string"
+[[.returns]]
+type = "boolean"
+
+[GroupImmediateOrderById]
+[[.args]]
+name = "whichGroup"
+type = "group"
+``````````
+name = "order"
+type = "integer"
+[[.returns]]
+type = "boolean"
+
+[GroupPointOrder]
+[[.args]]
+name = "whichGroup"
+type = "group"
+``````````
+name = "order"
+type = "string"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+[[.returns]]
+type = "boolean"
+
+[GroupPointOrderLoc]
+[[.args]]
+name = "whichGroup"
+type = "group"
+``````````
+name = "order"
+type = "string"
+``````````
+name = "whichLocation"
+type = "location"
+[[.returns]]
+type = "boolean"
+
+[GroupPointOrderById]
+[[.args]]
+name = "whichGroup"
+type = "group"
+``````````
+name = "order"
+type = "integer"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+[[.returns]]
+type = "boolean"
+
+[GroupPointOrderByIdLoc]
+[[.args]]
+name = "whichGroup"
+type = "group"
+``````````
+name = "order"
+type = "integer"
+``````````
+name = "whichLocation"
+type = "location"
+[[.returns]]
+type = "boolean"
+
+[GroupTargetOrder]
+[[.args]]
+name = "whichGroup"
+type = "group"
+``````````
+name = "order"
+type = "string"
+``````````
+name = "targetWidget"
+type = "widget"
+[[.returns]]
+type = "boolean"
+
+[GroupTargetOrderById]
+[[.args]]
+name = "whichGroup"
+type = "group"
+``````````
+name = "order"
+type = "integer"
+``````````
+name = "targetWidget"
+type = "widget"
+[[.returns]]
+type = "boolean"
+
+[ForGroup]
+[[.args]]
+name = "whichGroup"
+type = "group"
+``````````
+name = "callback"
+type = "code"
+
+[FirstOfGroup]
+[[.args]]
+name = "whichGroup"
+type = "group"
+[[.returns]]
+type = "unit"
+
+[CreateForce]
+[[.returns]]
+type = "force"
+
+[DestroyForce]
+[[.args]]
+name = "whichForce"
+type = "force"
+
+[ForceAddPlayer]
+[[.args]]
+name = "whichForce"
+type = "force"
+``````````
+name = "whichPlayer"
+type = "player"
+
+[ForceRemovePlayer]
+[[.args]]
+name = "whichForce"
+type = "force"
+``````````
+name = "whichPlayer"
+type = "player"
+
+[ForceClear]
+[[.args]]
+name = "whichForce"
+type = "force"
+
+[ForceEnumPlayers]
+[[.args]]
+name = "whichForce"
+type = "force"
+``````````
+name = "filter"
+type = "boolexpr"
+
+[ForceEnumPlayersCounted]
+[[.args]]
+name = "whichForce"
+type = "force"
+``````````
+name = "filter"
+type = "boolexpr"
+``````````
+name = "countLimit"
+type = "integer"
+
+[ForceEnumAllies]
+[[.args]]
+name = "whichForce"
+type = "force"
+``````````
+name = "whichPlayer"
+type = "player"
+``````````
+name = "filter"
+type = "boolexpr"
+
+[ForceEnumEnemies]
+[[.args]]
+name = "whichForce"
+type = "force"
+``````````
+name = "whichPlayer"
+type = "player"
+``````````
+name = "filter"
+type = "boolexpr"
+
+[ForForce]
+[[.args]]
+name = "whichForce"
+type = "force"
+``````````
+name = "callback"
+type = "code"
+
+[Rect]
+[[.args]]
+name = "minx"
+type = "number"
+``````````
+name = "miny"
+type = "number"
+``````````
+name = "maxx"
+type = "number"
+``````````
+name = "maxy"
+type = "number"
+[[.returns]]
+type = "rect"
+
+[RectFromLoc]
+[[.args]]
+name = "min"
+type = "location"
+``````````
+name = "max"
+type = "location"
+[[.returns]]
+type = "rect"
+
+[RemoveRect]
+[[.args]]
+name = "whichRect"
+type = "rect"
+
+[SetRect]
+[[.args]]
+name = "whichRect"
+type = "rect"
+``````````
+name = "minx"
+type = "number"
+``````````
+name = "miny"
+type = "number"
+``````````
+name = "maxx"
+type = "number"
+``````````
+name = "maxy"
+type = "number"
+
+[SetRectFromLoc]
+[[.args]]
+name = "whichRect"
+type = "rect"
+``````````
+name = "min"
+type = "location"
+``````````
+name = "max"
+type = "location"
+
+[MoveRectTo]
+[[.args]]
+name = "whichRect"
+type = "rect"
+``````````
+name = "newCenterX"
+type = "number"
+``````````
+name = "newCenterY"
+type = "number"
+
+[MoveRectToLoc]
+[[.args]]
+name = "whichRect"
+type = "rect"
+``````````
+name = "newCenterLoc"
+type = "location"
+
+[GetRectCenterX]
+[[.args]]
+name = "whichRect"
+type = "rect"
+[[.returns]]
+type = "number"
+
+[GetRectCenterY]
+[[.args]]
+name = "whichRect"
+type = "rect"
+[[.returns]]
+type = "number"
+
+[GetRectMinX]
+[[.args]]
+name = "whichRect"
+type = "rect"
+[[.returns]]
+type = "number"
+
+[GetRectMinY]
+[[.args]]
+name = "whichRect"
+type = "rect"
+[[.returns]]
+type = "number"
+
+[GetRectMaxX]
+[[.args]]
+name = "whichRect"
+type = "rect"
+[[.returns]]
+type = "number"
+
+[GetRectMaxY]
+[[.args]]
+name = "whichRect"
+type = "rect"
+[[.returns]]
+type = "number"
+
+[CreateRegion]
+[[.returns]]
+type = "region"
+
+[RemoveRegion]
+[[.args]]
+name = "whichRegion"
+type = "region"
+
+[RegionAddRect]
+[[.args]]
+name = "whichRegion"
+type = "region"
+``````````
+name = "r"
+type = "rect"
+
+[RegionClearRect]
+[[.args]]
+name = "whichRegion"
+type = "region"
+``````````
+name = "r"
+type = "rect"
+
+[RegionAddCell]
+[[.args]]
+name = "whichRegion"
+type = "region"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+
+[RegionAddCellAtLoc]
+[[.args]]
+name = "whichRegion"
+type = "region"
+``````````
+name = "whichLocation"
+type = "location"
+
+[RegionClearCell]
+[[.args]]
+name = "whichRegion"
+type = "region"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+
+[RegionClearCellAtLoc]
+[[.args]]
+name = "whichRegion"
+type = "region"
+``````````
+name = "whichLocation"
+type = "location"
+
+[Location]
+[[.args]]
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+[[.returns]]
+type = "location"
+
+[RemoveLocation]
+[[.args]]
+name = "whichLocation"
+type = "location"
+
+[MoveLocation]
+[[.args]]
+name = "whichLocation"
+type = "location"
+``````````
+name = "newX"
+type = "number"
+``````````
+name = "newY"
+type = "number"
+
+[GetLocationX]
+[[.args]]
+name = "whichLocation"
+type = "location"
+[[.returns]]
+type = "number"
+
+[GetLocationY]
+[[.args]]
+name = "whichLocation"
+type = "location"
+[[.returns]]
+type = "number"
+
+[GetLocationZ]
+[[.args]]
+name = "whichLocation"
+type = "location"
+[[.returns]]
+type = "number"
+
+[IsUnitInRegion]
+[[.args]]
+name = "whichRegion"
+type = "region"
+``````````
+name = "whichUnit"
+type = "unit"
+[[.returns]]
+type = "boolean"
+
+[IsPointInRegion]
+[[.args]]
+name = "whichRegion"
+type = "region"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+[[.returns]]
+type = "boolean"
+
+[IsLocationInRegion]
+[[.args]]
+name = "whichRegion"
+type = "region"
+``````````
+name = "whichLocation"
+type = "location"
+[[.returns]]
+type = "boolean"
+
+[GetWorldBounds]
+[[.returns]]
+type = "rect"
+
+[CreateTrigger]
+[[.returns]]
+type = "trigger"
+
+[DestroyTrigger]
+[[.args]]
+name = "whichTrigger"
+type = "trigger"
+
+[ResetTrigger]
+[[.args]]
+name = "whichTrigger"
+type = "trigger"
+
+[EnableTrigger]
+[[.args]]
+name = "whichTrigger"
+type = "trigger"
+
+[DisableTrigger]
+[[.args]]
+name = "whichTrigger"
+type = "trigger"
+
+[IsTriggerEnabled]
+[[.args]]
+name = "whichTrigger"
+type = "trigger"
+[[.returns]]
+type = "boolean"
+
+[TriggerWaitOnSleeps]
+[[.args]]
+name = "whichTrigger"
+type = "trigger"
+``````````
+name = "flag"
+type = "boolean"
+
+[IsTriggerWaitOnSleeps]
+[[.args]]
+name = "whichTrigger"
+type = "trigger"
+[[.returns]]
+type = "boolean"
+
+[GetFilterUnit]
+[[.returns]]
+type = "unit"
+
+[GetEnumUnit]
+[[.returns]]
+type = "unit"
+
+[GetFilterDestructable]
+[[.returns]]
+type = "destructable"
+
+[GetEnumDestructable]
+[[.returns]]
+type = "destructable"
+
+[GetFilterItem]
+[[.returns]]
+type = "item"
+
+[GetEnumItem]
+[[.returns]]
+type = "item"
+
+[GetFilterPlayer]
+[[.returns]]
+type = "player"
+
+[GetEnumPlayer]
+[[.returns]]
+type = "player"
+
+[GetTriggeringTrigger]
+[[.returns]]
+type = "trigger"
+
+[GetTriggerEventId]
+[[.returns]]
+type = "eventid"
+
+[GetTriggerEvalCount]
+[[.args]]
+name = "whichTrigger"
+type = "trigger"
+[[.returns]]
+type = "integer"
+
+[GetTriggerExecCount]
+[[.args]]
+name = "whichTrigger"
+type = "trigger"
+[[.returns]]
+type = "integer"
+
+[ExecuteFunc]
+[[.args]]
+name = "funcName"
+type = "string"
+
+[And]
+[[.args]]
+name = "operandA"
+type = "boolexpr"
+``````````
+name = "operandB"
+type = "boolexpr"
+[[.returns]]
+type = "boolexpr"
+
+[Or]
+[[.args]]
+name = "operandA"
+type = "boolexpr"
+``````````
+name = "operandB"
+type = "boolexpr"
+[[.returns]]
+type = "boolexpr"
+
+[Not]
+[[.args]]
+name = "operand"
+type = "boolexpr"
+[[.returns]]
+type = "boolexpr"
+
+[Condition]
+[[.args]]
+name = "func"
+type = "code"
+[[.returns]]
+type = "conditionfunc"
+
+[DestroyCondition]
+[[.args]]
+name = "c"
+type = "conditionfunc"
+
+[Filter]
+[[.args]]
+name = "func"
+type = "code"
+[[.returns]]
+type = "filterfunc"
+
+[DestroyFilter]
+[[.args]]
+name = "f"
+type = "filterfunc"
+
+[DestroyBoolExpr]
+[[.args]]
+name = "e"
+type = "boolexpr"
+
+[TriggerRegisterVariableEvent]
+[[.args]]
+name = "whichTrigger"
+type = "trigger"
+``````````
+name = "varName"
+type = "string"
+``````````
+name = "opcode"
+type = "limitop"
+``````````
+name = "limitval"
+type = "number"
+[[.returns]]
+type = "event"
+
+[TriggerRegisterTimerEvent]
+[[.args]]
+name = "whichTrigger"
+type = "trigger"
+``````````
+name = "timeout"
+type = "number"
+``````````
+name = "periodic"
+type = "boolean"
+[[.returns]]
+type = "event"
+
+[TriggerRegisterTimerExpireEvent]
+[[.args]]
+name = "whichTrigger"
+type = "trigger"
+``````````
+name = "t"
+type = "timer"
+[[.returns]]
+type = "event"
+
+[TriggerRegisterGameStateEvent]
+[[.args]]
+name = "whichTrigger"
+type = "trigger"
+``````````
+name = "whichState"
+type = "gamestate"
+``````````
+name = "opcode"
+type = "limitop"
+``````````
+name = "limitval"
+type = "number"
+[[.returns]]
+type = "event"
+
+[TriggerRegisterDialogEvent]
+[[.args]]
+name = "whichTrigger"
+type = "trigger"
+``````````
+name = "whichDialog"
+type = "dialog"
+[[.returns]]
+type = "event"
+
+[TriggerRegisterDialogButtonEvent]
+[[.args]]
+name = "whichTrigger"
+type = "trigger"
+``````````
+name = "whichButton"
+type = "button"
+[[.returns]]
+type = "event"
+
+[GetEventGameState]
+[[.returns]]
+type = "gamestate"
+
+[TriggerRegisterGameEvent]
+[[.args]]
+name = "whichTrigger"
+type = "trigger"
+``````````
+name = "whichGameEvent"
+type = "gameevent"
+[[.returns]]
+type = "event"
+
+[GetWinningPlayer]
+[[.returns]]
+type = "player"
+
+[TriggerRegisterEnterRegion]
+[[.args]]
+name = "whichTrigger"
+type = "trigger"
+``````````
+name = "whichRegion"
+type = "region"
+``````````
+name = "filter"
+type = "boolexpr"
+[[.returns]]
+type = "event"
+
+[GetTriggeringRegion]
+[[.returns]]
+type = "region"
+
+[GetEnteringUnit]
+[[.returns]]
+type = "unit"
+
+[TriggerRegisterLeaveRegion]
+[[.args]]
+name = "whichTrigger"
+type = "trigger"
+``````````
+name = "whichRegion"
+type = "region"
+``````````
+name = "filter"
+type = "boolexpr"
+[[.returns]]
+type = "event"
+
+[GetLeavingUnit]
+[[.returns]]
+type = "unit"
+
+[TriggerRegisterTrackableHitEvent]
+[[.args]]
+name = "whichTrigger"
+type = "trigger"
+``````````
+name = "t"
+type = "trackable"
+[[.returns]]
+type = "event"
+
+[TriggerRegisterTrackableTrackEvent]
+[[.args]]
+name = "whichTrigger"
+type = "trigger"
+``````````
+name = "t"
+type = "trackable"
+[[.returns]]
+type = "event"
+
+[GetTriggeringTrackable]
+[[.returns]]
+type = "trackable"
+
+[GetClickedButton]
+[[.returns]]
+type = "button"
+
+[GetClickedDialog]
+[[.returns]]
+type = "dialog"
+
+[GetTournamentFinishSoonTimeRemaining]
+[[.returns]]
+type = "number"
+
+[GetTournamentFinishNowRule]
+[[.returns]]
+type = "integer"
+
+[GetTournamentFinishNowPlayer]
+[[.returns]]
+type = "player"
+
+[GetTournamentScore]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+[[.returns]]
+type = "integer"
+
+[GetSaveBasicFilename]
+[[.returns]]
+type = "string"
+
+[TriggerRegisterPlayerEvent]
+[[.args]]
+name = "whichTrigger"
+type = "trigger"
+``````````
+name = "whichPlayer"
+type = "player"
+``````````
+name = "whichPlayerEvent"
+type = "playerevent"
+[[.returns]]
+type = "event"
+
+[GetTriggerPlayer]
+[[.returns]]
+type = "player"
+
+[TriggerRegisterPlayerUnitEvent]
+[[.args]]
+name = "whichTrigger"
+type = "trigger"
+``````````
+name = "whichPlayer"
+type = "player"
+``````````
+name = "whichPlayerUnitEvent"
+type = "playerunitevent"
+``````````
+name = "filter"
+type = "boolexpr"
+[[.returns]]
+type = "event"
+
+[GetLevelingUnit]
+[[.returns]]
+type = "unit"
+
+[GetLearningUnit]
+[[.returns]]
+type = "unit"
+
+[GetLearnedSkill]
+[[.returns]]
+type = "integer"
+
+[GetLearnedSkillLevel]
+[[.returns]]
+type = "integer"
+
+[GetRevivableUnit]
+[[.returns]]
+type = "unit"
+
+[GetRevivingUnit]
+[[.returns]]
+type = "unit"
+
+[GetAttacker]
+[[.returns]]
+type = "unit"
+
+[GetRescuer]
+[[.returns]]
+type = "unit"
+
+[GetDyingUnit]
+[[.returns]]
+type = "unit"
+
+[GetKillingUnit]
+[[.returns]]
+type = "unit"
+
+[GetDecayingUnit]
+[[.returns]]
+type = "unit"
+
+[GetConstructingStructure]
+[[.returns]]
+type = "unit"
+
+[GetCancelledStructure]
+[[.returns]]
+type = "unit"
+
+[GetConstructedStructure]
+[[.returns]]
+type = "unit"
+
+[GetResearchingUnit]
+[[.returns]]
+type = "unit"
+
+[GetResearched]
+[[.returns]]
+type = "integer"
+
+[GetTrainedUnitType]
+[[.returns]]
+type = "integer"
+
+[GetTrainedUnit]
+[[.returns]]
+type = "unit"
+
+[GetDetectedUnit]
+[[.returns]]
+type = "unit"
+
+[GetSummoningUnit]
+[[.returns]]
+type = "unit"
+
+[GetSummonedUnit]
+[[.returns]]
+type = "unit"
+
+[GetTransportUnit]
+[[.returns]]
+type = "unit"
+
+[GetLoadedUnit]
+[[.returns]]
+type = "unit"
+
+[GetSellingUnit]
+[[.returns]]
+type = "unit"
+
+[GetSoldUnit]
+[[.returns]]
+type = "unit"
+
+[GetBuyingUnit]
+[[.returns]]
+type = "unit"
+
+[GetSoldItem]
+[[.returns]]
+type = "item"
+
+[GetChangingUnit]
+[[.returns]]
+type = "unit"
+
+[GetChangingUnitPrevOwner]
+[[.returns]]
+type = "player"
+
+[GetManipulatingUnit]
+[[.returns]]
+type = "unit"
+
+[GetManipulatedItem]
+[[.returns]]
+type = "item"
+
+[GetOrderedUnit]
+[[.returns]]
+type = "unit"
+
+[GetIssuedOrderId]
+[[.returns]]
+type = "integer"
+
+[GetOrderPointX]
+[[.returns]]
+type = "number"
+
+[GetOrderPointY]
+[[.returns]]
+type = "number"
+
+[GetOrderPointLoc]
+[[.returns]]
+type = "location"
+
+[GetOrderTarget]
+[[.returns]]
+type = "widget"
+
+[GetOrderTargetDestructable]
+[[.returns]]
+type = "destructable"
+
+[GetOrderTargetItem]
+[[.returns]]
+type = "item"
+
+[GetOrderTargetUnit]
+[[.returns]]
+type = "unit"
+
+[GetSpellAbilityUnit]
+[[.returns]]
+type = "unit"
+
+[GetSpellAbilityId]
+[[.returns]]
+type = "integer"
+
+[GetSpellAbility]
+[[.returns]]
+type = "ability"
+
+[GetSpellTargetLoc]
+[[.returns]]
+type = "location"
+
+[GetSpellTargetX]
+[[.returns]]
+type = "number"
+
+[GetSpellTargetY]
+[[.returns]]
+type = "number"
+
+[GetSpellTargetDestructable]
+[[.returns]]
+type = "destructable"
+
+[GetSpellTargetItem]
+[[.returns]]
+type = "item"
+
+[GetSpellTargetUnit]
+[[.returns]]
+type = "unit"
+
+[TriggerRegisterPlayerAllianceChange]
+[[.args]]
+name = "whichTrigger"
+type = "trigger"
+``````````
+name = "whichPlayer"
+type = "player"
+``````````
+name = "whichAlliance"
+type = "alliancetype"
+[[.returns]]
+type = "event"
+
+[TriggerRegisterPlayerStateEvent]
+[[.args]]
+name = "whichTrigger"
+type = "trigger"
+``````````
+name = "whichPlayer"
+type = "player"
+``````````
+name = "whichState"
+type = "playerstate"
+``````````
+name = "opcode"
+type = "limitop"
+``````````
+name = "limitval"
+type = "number"
+[[.returns]]
+type = "event"
+
+[GetEventPlayerState]
+[[.returns]]
+type = "playerstate"
+
+[TriggerRegisterPlayerChatEvent]
+[[.args]]
+name = "whichTrigger"
+type = "trigger"
+``````````
+name = "whichPlayer"
+type = "player"
+``````````
+name = "chatMessageToDetect"
+type = "string"
+``````````
+name = "exactMatchOnly"
+type = "boolean"
+[[.returns]]
+type = "event"
+
+[GetEventPlayerChatString]
+[[.returns]]
+type = "string"
+
+[GetEventPlayerChatStringMatched]
+[[.returns]]
+type = "string"
+
+[TriggerRegisterDeathEvent]
+[[.args]]
+name = "whichTrigger"
+type = "trigger"
+``````````
+name = "whichWidget"
+type = "widget"
+[[.returns]]
+type = "event"
+
+[GetTriggerUnit]
+[[.returns]]
+type = "unit"
+
+[TriggerRegisterUnitStateEvent]
+[[.args]]
+name = "whichTrigger"
+type = "trigger"
+``````````
+name = "whichUnit"
+type = "unit"
+``````````
+name = "whichState"
+type = "unitstate"
+``````````
+name = "opcode"
+type = "limitop"
+``````````
+name = "limitval"
+type = "number"
+[[.returns]]
+type = "event"
+
+[GetEventUnitState]
+[[.returns]]
+type = "unitstate"
+
+[TriggerRegisterUnitEvent]
+[[.args]]
+name = "whichTrigger"
+type = "trigger"
+``````````
+name = "whichUnit"
+type = "unit"
+``````````
+name = "whichEvent"
+type = "unitevent"
+[[.returns]]
+type = "event"
+
+[GetEventDamage]
+[[.returns]]
+type = "number"
+
+[GetEventDamageSource]
+[[.returns]]
+type = "unit"
+
+[GetEventDetectingPlayer]
+[[.returns]]
+type = "player"
+
+[TriggerRegisterFilterUnitEvent]
+[[.args]]
+name = "whichTrigger"
+type = "trigger"
+``````````
+name = "whichUnit"
+type = "unit"
+``````````
+name = "whichEvent"
+type = "unitevent"
+``````````
+name = "filter"
+type = "boolexpr"
+[[.returns]]
+type = "event"
+
+[GetEventTargetUnit]
+[[.returns]]
+type = "unit"
+
+[TriggerRegisterUnitInRange]
+[[.args]]
+name = "whichTrigger"
+type = "trigger"
+``````````
+name = "whichUnit"
+type = "unit"
+``````````
+name = "range"
+type = "number"
+``````````
+name = "filter"
+type = "boolexpr"
+[[.returns]]
+type = "event"
+
+[TriggerAddCondition]
+[[.args]]
+name = "whichTrigger"
+type = "trigger"
+``````````
+name = "condition"
+type = "boolexpr"
+[[.returns]]
+type = "triggercondition"
+
+[TriggerRemoveCondition]
+[[.args]]
+name = "whichTrigger"
+type = "trigger"
+``````````
+name = "whichCondition"
+type = "triggercondition"
+
+[TriggerClearConditions]
+[[.args]]
+name = "whichTrigger"
+type = "trigger"
+
+[TriggerAddAction]
+[[.args]]
+name = "whichTrigger"
+type = "trigger"
+``````````
+name = "actionFunc"
+type = "code"
+[[.returns]]
+type = "triggeraction"
+
+[TriggerRemoveAction]
+[[.args]]
+name = "whichTrigger"
+type = "trigger"
+``````````
+name = "whichAction"
+type = "triggeraction"
+
+[TriggerClearActions]
+[[.args]]
+name = "whichTrigger"
+type = "trigger"
+
+[TriggerSleepAction]
+[[.args]]
+name = "timeout"
+type = "number"
+
+[TriggerWaitForSound]
+[[.args]]
+name = "s"
+type = "sound"
+``````````
+name = "offset"
+type = "number"
+
+[TriggerEvaluate]
+[[.args]]
+name = "whichTrigger"
+type = "trigger"
+[[.returns]]
+type = "boolean"
+
+[TriggerExecute]
+[[.args]]
+name = "whichTrigger"
+type = "trigger"
+
+[TriggerExecuteWait]
+[[.args]]
+name = "whichTrigger"
+type = "trigger"
+
+[TriggerSyncStart]
+
+[TriggerSyncReady]
+
+[GetWidgetLife]
+[[.args]]
+name = "whichWidget"
+type = "widget"
+[[.returns]]
+type = "number"
+
+[SetWidgetLife]
+[[.args]]
+name = "whichWidget"
+type = "widget"
+``````````
+name = "newLife"
+type = "number"
+
+[GetWidgetX]
+[[.args]]
+name = "whichWidget"
+type = "widget"
+[[.returns]]
+type = "number"
+
+[GetWidgetY]
+[[.args]]
+name = "whichWidget"
+type = "widget"
+[[.returns]]
+type = "number"
+
+[GetTriggerWidget]
+[[.returns]]
+type = "widget"
+
+[CreateDestructable]
+[[.args]]
+name = "objectid"
+type = "integer"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "face"
+type = "number"
+``````````
+name = "scale"
+type = "number"
+``````````
+name = "variation"
+type = "integer"
+[[.returns]]
+type = "destructable"
+
+[CreateDestructableZ]
+[[.args]]
+name = "objectid"
+type = "integer"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "z"
+type = "number"
+``````````
+name = "face"
+type = "number"
+``````````
+name = "scale"
+type = "number"
+``````````
+name = "variation"
+type = "integer"
+[[.returns]]
+type = "destructable"
+
+[CreateDeadDestructable]
+[[.args]]
+name = "objectid"
+type = "integer"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "face"
+type = "number"
+``````````
+name = "scale"
+type = "number"
+``````````
+name = "variation"
+type = "integer"
+[[.returns]]
+type = "destructable"
+
+[CreateDeadDestructableZ]
+[[.args]]
+name = "objectid"
+type = "integer"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "z"
+type = "number"
+``````````
+name = "face"
+type = "number"
+``````````
+name = "scale"
+type = "number"
+``````````
+name = "variation"
+type = "integer"
+[[.returns]]
+type = "destructable"
+
+[RemoveDestructable]
+[[.args]]
+name = "d"
+type = "destructable"
+
+[KillDestructable]
+[[.args]]
+name = "d"
+type = "destructable"
+
+[SetDestructableInvulnerable]
+[[.args]]
+name = "d"
+type = "destructable"
+``````````
+name = "flag"
+type = "boolean"
+
+[IsDestructableInvulnerable]
+[[.args]]
+name = "d"
+type = "destructable"
+[[.returns]]
+type = "boolean"
+
+[EnumDestructablesInRect]
+[[.args]]
+name = "r"
+type = "rect"
+``````````
+name = "filter"
+type = "boolexpr"
+``````````
+name = "actionFunc"
+type = "code"
+
+[GetDestructableTypeId]
+[[.args]]
+name = "d"
+type = "destructable"
+[[.returns]]
+type = "integer"
+
+[GetDestructableX]
+[[.args]]
+name = "d"
+type = "destructable"
+[[.returns]]
+type = "number"
+
+[GetDestructableY]
+[[.args]]
+name = "d"
+type = "destructable"
+[[.returns]]
+type = "number"
+
+[SetDestructableLife]
+[[.args]]
+name = "d"
+type = "destructable"
+``````````
+name = "life"
+type = "number"
+
+[GetDestructableLife]
+[[.args]]
+name = "d"
+type = "destructable"
+[[.returns]]
+type = "number"
+
+[SetDestructableMaxLife]
+[[.args]]
+name = "d"
+type = "destructable"
+``````````
+name = "max"
+type = "number"
+
+[GetDestructableMaxLife]
+[[.args]]
+name = "d"
+type = "destructable"
+[[.returns]]
+type = "number"
+
+[DestructableRestoreLife]
+[[.args]]
+name = "d"
+type = "destructable"
+``````````
+name = "life"
+type = "number"
+``````````
+name = "birth"
+type = "boolean"
+
+[QueueDestructableAnimation]
+[[.args]]
+name = "d"
+type = "destructable"
+``````````
+name = "whichAnimation"
+type = "string"
+
+[SetDestructableAnimation]
+[[.args]]
+name = "d"
+type = "destructable"
+``````````
+name = "whichAnimation"
+type = "string"
+
+[SetDestructableAnimationSpeed]
+[[.args]]
+name = "d"
+type = "destructable"
+``````````
+name = "speedFactor"
+type = "number"
+
+[ShowDestructable]
+[[.args]]
+name = "d"
+type = "destructable"
+``````````
+name = "flag"
+type = "boolean"
+
+[GetDestructableOccluderHeight]
+[[.args]]
+name = "d"
+type = "destructable"
+[[.returns]]
+type = "number"
+
+[SetDestructableOccluderHeight]
+[[.args]]
+name = "d"
+type = "destructable"
+``````````
+name = "height"
+type = "number"
+
+[GetDestructableName]
+[[.args]]
+name = "d"
+type = "destructable"
+[[.returns]]
+type = "string"
+
+[GetTriggerDestructable]
+[[.returns]]
+type = "destructable"
+
+[CreateItem]
+[[.args]]
+name = "itemid"
+type = "integer"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+[[.returns]]
+type = "item"
+
+[RemoveItem]
+[[.args]]
+name = "whichItem"
+type = "item"
+
+[GetItemPlayer]
+[[.args]]
+name = "whichItem"
+type = "item"
+[[.returns]]
+type = "player"
+
+[GetItemTypeId]
+[[.args]]
+name = "i"
+type = "item"
+[[.returns]]
+type = "integer"
+
+[GetItemX]
+[[.args]]
+name = "i"
+type = "item"
+[[.returns]]
+type = "number"
+
+[GetItemY]
+[[.args]]
+name = "i"
+type = "item"
+[[.returns]]
+type = "number"
+
+[SetItemPosition]
+[[.args]]
+name = "i"
+type = "item"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+
+[SetItemDropOnDeath]
+[[.args]]
+name = "whichItem"
+type = "item"
+``````````
+name = "flag"
+type = "boolean"
+
+[SetItemDroppable]
+[[.args]]
+name = "i"
+type = "item"
+``````````
+name = "flag"
+type = "boolean"
+
+[SetItemPawnable]
+[[.args]]
+name = "i"
+type = "item"
+``````````
+name = "flag"
+type = "boolean"
+
+[SetItemPlayer]
+[[.args]]
+name = "whichItem"
+type = "item"
+``````````
+name = "whichPlayer"
+type = "player"
+``````````
+name = "changeColor"
+type = "boolean"
+
+[SetItemInvulnerable]
+[[.args]]
+name = "whichItem"
+type = "item"
+``````````
+name = "flag"
+type = "boolean"
+
+[IsItemInvulnerable]
+[[.args]]
+name = "whichItem"
+type = "item"
+[[.returns]]
+type = "boolean"
+
+[SetItemVisible]
+[[.args]]
+name = "whichItem"
+type = "item"
+``````````
+name = "show"
+type = "boolean"
+
+[IsItemVisible]
+[[.args]]
+name = "whichItem"
+type = "item"
+[[.returns]]
+type = "boolean"
+
+[IsItemOwned]
+[[.args]]
+name = "whichItem"
+type = "item"
+[[.returns]]
+type = "boolean"
+
+[IsItemPowerup]
+[[.args]]
+name = "whichItem"
+type = "item"
+[[.returns]]
+type = "boolean"
+
+[IsItemSellable]
+[[.args]]
+name = "whichItem"
+type = "item"
+[[.returns]]
+type = "boolean"
+
+[IsItemPawnable]
+[[.args]]
+name = "whichItem"
+type = "item"
+[[.returns]]
+type = "boolean"
+
+[IsItemIdPowerup]
+[[.args]]
+name = "itemId"
+type = "integer"
+[[.returns]]
+type = "boolean"
+
+[IsItemIdSellable]
+[[.args]]
+name = "itemId"
+type = "integer"
+[[.returns]]
+type = "boolean"
+
+[IsItemIdPawnable]
+[[.args]]
+name = "itemId"
+type = "integer"
+[[.returns]]
+type = "boolean"
+
+[EnumItemsInRect]
+[[.args]]
+name = "r"
+type = "rect"
+``````````
+name = "filter"
+type = "boolexpr"
+``````````
+name = "actionFunc"
+type = "code"
+
+[GetItemLevel]
+[[.args]]
+name = "whichItem"
+type = "item"
+[[.returns]]
+type = "integer"
+
+[GetItemType]
+[[.args]]
+name = "whichItem"
+type = "item"
+[[.returns]]
+type = "itemtype"
+
+[SetItemDropID]
+[[.args]]
+name = "whichItem"
+type = "item"
+``````````
+name = "unitId"
+type = "integer"
+
+[GetItemName]
+[[.args]]
+name = "whichItem"
+type = "item"
+[[.returns]]
+type = "string"
+
+[GetItemCharges]
+[[.args]]
+name = "whichItem"
+type = "item"
+[[.returns]]
+type = "integer"
+
+[SetItemCharges]
+[[.args]]
+name = "whichItem"
+type = "item"
+``````````
+name = "charges"
+type = "integer"
+
+[GetItemUserData]
+[[.args]]
+name = "whichItem"
+type = "item"
+[[.returns]]
+type = "integer"
+
+[SetItemUserData]
+[[.args]]
+name = "whichItem"
+type = "item"
+``````````
+name = "data"
+type = "integer"
+
+[CreateUnit]
+[[.args]]
+name = "id"
+type = "player"
+``````````
+name = "unitid"
+type = "integer"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "face"
+type = "number"
+[[.returns]]
+type = "unit"
+
+[CreateUnitByName]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+``````````
+name = "unitname"
+type = "string"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "face"
+type = "number"
+[[.returns]]
+type = "unit"
+
+[CreateUnitAtLoc]
+[[.args]]
+name = "id"
+type = "player"
+``````````
+name = "unitid"
+type = "integer"
+``````````
+name = "whichLocation"
+type = "location"
+``````````
+name = "face"
+type = "number"
+[[.returns]]
+type = "unit"
+
+[CreateUnitAtLocByName]
+[[.args]]
+name = "id"
+type = "player"
+``````````
+name = "unitname"
+type = "string"
+``````````
+name = "whichLocation"
+type = "location"
+``````````
+name = "face"
+type = "number"
+[[.returns]]
+type = "unit"
+
+[CreateCorpse]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+``````````
+name = "unitid"
+type = "integer"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "face"
+type = "number"
+[[.returns]]
+type = "unit"
+
+[KillUnit]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+
+[RemoveUnit]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+
+[ShowUnit]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "show"
+type = "boolean"
+
+[SetUnitState]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "whichUnitState"
+type = "unitstate"
+``````````
+name = "newVal"
+type = "number"
+
+[SetUnitX]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "newX"
+type = "number"
+
+[SetUnitY]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "newY"
+type = "number"
+
+[SetUnitPosition]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "newX"
+type = "number"
+``````````
+name = "newY"
+type = "number"
+
+[SetUnitPositionLoc]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "whichLocation"
+type = "location"
+
+[SetUnitFacing]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "facingAngle"
+type = "number"
+
+[SetUnitFacingTimed]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "facingAngle"
+type = "number"
+``````````
+name = "duration"
+type = "number"
+
+[SetUnitMoveSpeed]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "newSpeed"
+type = "number"
+
+[SetUnitFlyHeight]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "newHeight"
+type = "number"
+``````````
+name = "rate"
+type = "number"
+
+[SetUnitTurnSpeed]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "newTurnSpeed"
+type = "number"
+
+[SetUnitPropWindow]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "newPropWindowAngle"
+type = "number"
+
+[SetUnitAcquireRange]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "newAcquireRange"
+type = "number"
+
+[SetUnitCreepGuard]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "creepGuard"
+type = "boolean"
+
+[GetUnitAcquireRange]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+[[.returns]]
+type = "number"
+
+[GetUnitTurnSpeed]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+[[.returns]]
+type = "number"
+
+[GetUnitPropWindow]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+[[.returns]]
+type = "number"
+
+[GetUnitFlyHeight]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+[[.returns]]
+type = "number"
+
+[GetUnitDefaultAcquireRange]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+[[.returns]]
+type = "number"
+
+[GetUnitDefaultTurnSpeed]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+[[.returns]]
+type = "number"
+
+[GetUnitDefaultPropWindow]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+[[.returns]]
+type = "number"
+
+[GetUnitDefaultFlyHeight]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+[[.returns]]
+type = "number"
+
+[SetUnitOwner]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "whichPlayer"
+type = "player"
+``````````
+name = "changeColor"
+type = "boolean"
+
+[SetUnitColor]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "whichColor"
+type = "playercolor"
+
+[SetUnitScale]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "scaleX"
+type = "number"
+``````````
+name = "scaleY"
+type = "number"
+``````````
+name = "scaleZ"
+type = "number"
+
+[SetUnitTimeScale]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "timeScale"
+type = "number"
+
+[SetUnitBlendTime]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "blendTime"
+type = "number"
+
+[SetUnitVertexColor]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "red"
+type = "integer"
+``````````
+name = "green"
+type = "integer"
+``````````
+name = "blue"
+type = "integer"
+``````````
+name = "alpha"
+type = "integer"
+
+[QueueUnitAnimation]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "whichAnimation"
+type = "string"
+
+[SetUnitAnimation]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "whichAnimation"
+type = "string"
+
+[SetUnitAnimationByIndex]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "whichAnimation"
+type = "integer"
+
+[SetUnitAnimationWithRarity]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "whichAnimation"
+type = "string"
+``````````
+name = "rarity"
+type = "raritycontrol"
+
+[AddUnitAnimationProperties]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "animProperties"
+type = "string"
+``````````
+name = "add"
+type = "boolean"
+
+[SetUnitLookAt]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "whichBone"
+type = "string"
+``````````
+name = "lookAtTarget"
+type = "unit"
+``````````
+name = "offsetX"
+type = "number"
+``````````
+name = "offsetY"
+type = "number"
+``````````
+name = "offsetZ"
+type = "number"
+
+[ResetUnitLookAt]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+
+[SetUnitRescuable]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "byWhichPlayer"
+type = "player"
+``````````
+name = "flag"
+type = "boolean"
+
+[SetUnitRescueRange]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "range"
+type = "number"
+
+[SetHeroStr]
+[[.args]]
+name = "whichHero"
+type = "unit"
+``````````
+name = "newStr"
+type = "integer"
+``````````
+name = "permanent"
+type = "boolean"
+
+[SetHeroAgi]
+[[.args]]
+name = "whichHero"
+type = "unit"
+``````````
+name = "newAgi"
+type = "integer"
+``````````
+name = "permanent"
+type = "boolean"
+
+[SetHeroInt]
+[[.args]]
+name = "whichHero"
+type = "unit"
+``````````
+name = "newInt"
+type = "integer"
+``````````
+name = "permanent"
+type = "boolean"
+
+[GetHeroStr]
+[[.args]]
+name = "whichHero"
+type = "unit"
+``````````
+name = "includeBonuses"
+type = "boolean"
+[[.returns]]
+type = "integer"
+
+[GetHeroAgi]
+[[.args]]
+name = "whichHero"
+type = "unit"
+``````````
+name = "includeBonuses"
+type = "boolean"
+[[.returns]]
+type = "integer"
+
+[GetHeroInt]
+[[.args]]
+name = "whichHero"
+type = "unit"
+``````````
+name = "includeBonuses"
+type = "boolean"
+[[.returns]]
+type = "integer"
+
+[UnitStripHeroLevel]
+[[.args]]
+name = "whichHero"
+type = "unit"
+``````````
+name = "howManyLevels"
+type = "integer"
+[[.returns]]
+type = "boolean"
+
+[GetHeroXP]
+[[.args]]
+name = "whichHero"
+type = "unit"
+[[.returns]]
+type = "integer"
+
+[SetHeroXP]
+[[.args]]
+name = "whichHero"
+type = "unit"
+``````````
+name = "newXpVal"
+type = "integer"
+``````````
+name = "showEyeCandy"
+type = "boolean"
+
+[GetHeroSkillPoints]
+[[.args]]
+name = "whichHero"
+type = "unit"
+[[.returns]]
+type = "integer"
+
+[UnitModifySkillPoints]
+[[.args]]
+name = "whichHero"
+type = "unit"
+``````````
+name = "skillPointDelta"
+type = "integer"
+[[.returns]]
+type = "boolean"
+
+[AddHeroXP]
+[[.args]]
+name = "whichHero"
+type = "unit"
+``````````
+name = "xpToAdd"
+type = "integer"
+``````````
+name = "showEyeCandy"
+type = "boolean"
+
+[SetHeroLevel]
+[[.args]]
+name = "whichHero"
+type = "unit"
+``````````
+name = "level"
+type = "integer"
+``````````
+name = "showEyeCandy"
+type = "boolean"
+
+[GetHeroLevel]
+[[.args]]
+name = "whichHero"
+type = "unit"
+[[.returns]]
+type = "integer"
+
+[GetUnitLevel]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+[[.returns]]
+type = "integer"
+
+[GetHeroProperName]
+[[.args]]
+name = "whichHero"
+type = "unit"
+[[.returns]]
+type = "string"
+
+[SuspendHeroXP]
+[[.args]]
+name = "whichHero"
+type = "unit"
+``````````
+name = "flag"
+type = "boolean"
+
+[IsSuspendedXP]
+[[.args]]
+name = "whichHero"
+type = "unit"
+[[.returns]]
+type = "boolean"
+
+[SelectHeroSkill]
+[[.args]]
+name = "whichHero"
+type = "unit"
+``````````
+name = "abilcode"
+type = "integer"
+
+[GetUnitAbilityLevel]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "abilcode"
+type = "integer"
+[[.returns]]
+type = "integer"
+
+[DecUnitAbilityLevel]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "abilcode"
+type = "integer"
+[[.returns]]
+type = "integer"
+
+[IncUnitAbilityLevel]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "abilcode"
+type = "integer"
+[[.returns]]
+type = "integer"
+
+[SetUnitAbilityLevel]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "abilcode"
+type = "integer"
+``````````
+name = "level"
+type = "integer"
+[[.returns]]
+type = "integer"
+
+[ReviveHero]
+[[.args]]
+name = "whichHero"
+type = "unit"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "doEyecandy"
+type = "boolean"
+[[.returns]]
+type = "boolean"
+
+[ReviveHeroLoc]
+[[.args]]
+name = "whichHero"
+type = "unit"
+``````````
+name = "loc"
+type = "location"
+``````````
+name = "doEyecandy"
+type = "boolean"
+[[.returns]]
+type = "boolean"
+
+[SetUnitExploded]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "exploded"
+type = "boolean"
+
+[SetUnitInvulnerable]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "flag"
+type = "boolean"
+
+[PauseUnit]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "flag"
+type = "boolean"
+
+[IsUnitPaused]
+[[.args]]
+name = "whichHero"
+type = "unit"
+[[.returns]]
+type = "boolean"
+
+[SetUnitPathing]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "flag"
+type = "boolean"
+
+[ClearSelection]
+
+[SelectUnit]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "flag"
+type = "boolean"
+
+[GetUnitPointValue]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+[[.returns]]
+type = "integer"
+
+[GetUnitPointValueByType]
+[[.args]]
+name = "unitType"
+type = "integer"
+[[.returns]]
+type = "integer"
+
+[UnitAddItem]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "whichItem"
+type = "item"
+[[.returns]]
+type = "boolean"
+
+[UnitAddItemById]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "itemId"
+type = "integer"
+[[.returns]]
+type = "item"
+
+[UnitAddItemToSlotById]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "itemId"
+type = "integer"
+``````````
+name = "itemSlot"
+type = "integer"
+[[.returns]]
+type = "boolean"
+
+[UnitRemoveItem]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "whichItem"
+type = "item"
+
+[UnitRemoveItemFromSlot]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "itemSlot"
+type = "integer"
+[[.returns]]
+type = "item"
+
+[UnitHasItem]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "whichItem"
+type = "item"
+[[.returns]]
+type = "boolean"
+
+[UnitItemInSlot]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "itemSlot"
+type = "integer"
+[[.returns]]
+type = "item"
+
+[UnitInventorySize]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+[[.returns]]
+type = "integer"
+
+[UnitDropItemPoint]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "whichItem"
+type = "item"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+[[.returns]]
+type = "boolean"
+
+[UnitDropItemSlot]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "whichItem"
+type = "item"
+``````````
+name = "slot"
+type = "integer"
+[[.returns]]
+type = "boolean"
+
+[UnitDropItemTarget]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "whichItem"
+type = "item"
+``````````
+name = "target"
+type = "widget"
+[[.returns]]
+type = "boolean"
+
+[UnitUseItem]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "whichItem"
+type = "item"
+[[.returns]]
+type = "boolean"
+
+[UnitUseItemPoint]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "whichItem"
+type = "item"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+[[.returns]]
+type = "boolean"
+
+[UnitUseItemTarget]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "whichItem"
+type = "item"
+``````````
+name = "target"
+type = "widget"
+[[.returns]]
+type = "boolean"
+
+[GetUnitX]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+[[.returns]]
+type = "number"
+
+[GetUnitY]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+[[.returns]]
+type = "number"
+
+[GetUnitLoc]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+[[.returns]]
+type = "location"
+
+[GetUnitFacing]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+[[.returns]]
+type = "number"
+
+[GetUnitMoveSpeed]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+[[.returns]]
+type = "number"
+
+[GetUnitDefaultMoveSpeed]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+[[.returns]]
+type = "number"
+
+[GetUnitState]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "whichUnitState"
+type = "unitstate"
+[[.returns]]
+type = "number"
+
+[GetOwningPlayer]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+[[.returns]]
+type = "player"
+
+[GetUnitTypeId]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+[[.returns]]
+type = "integer"
+
+[GetUnitRace]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+[[.returns]]
+type = "race"
+
+[GetUnitName]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+[[.returns]]
+type = "string"
+
+[GetUnitFoodUsed]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+[[.returns]]
+type = "integer"
+
+[GetUnitFoodMade]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+[[.returns]]
+type = "integer"
+
+[GetFoodMade]
+[[.args]]
+name = "unitId"
+type = "integer"
+[[.returns]]
+type = "integer"
+
+[GetFoodUsed]
+[[.args]]
+name = "unitId"
+type = "integer"
+[[.returns]]
+type = "integer"
+
+[SetUnitUseFood]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "useFood"
+type = "boolean"
+
+[GetUnitRallyPoint]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+[[.returns]]
+type = "location"
+
+[GetUnitRallyUnit]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+[[.returns]]
+type = "unit"
+
+[GetUnitRallyDestructable]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+[[.returns]]
+type = "destructable"
+
+[IsUnitInGroup]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "whichGroup"
+type = "group"
+[[.returns]]
+type = "boolean"
+
+[IsUnitInForce]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "whichForce"
+type = "force"
+[[.returns]]
+type = "boolean"
+
+[IsUnitOwnedByPlayer]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "whichPlayer"
+type = "player"
+[[.returns]]
+type = "boolean"
+
+[IsUnitAlly]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "whichPlayer"
+type = "player"
+[[.returns]]
+type = "boolean"
+
+[IsUnitEnemy]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "whichPlayer"
+type = "player"
+[[.returns]]
+type = "boolean"
+
+[IsUnitVisible]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "whichPlayer"
+type = "player"
+[[.returns]]
+type = "boolean"
+
+[IsUnitDetected]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "whichPlayer"
+type = "player"
+[[.returns]]
+type = "boolean"
+
+[IsUnitInvisible]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "whichPlayer"
+type = "player"
+[[.returns]]
+type = "boolean"
+
+[IsUnitFogged]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "whichPlayer"
+type = "player"
+[[.returns]]
+type = "boolean"
+
+[IsUnitMasked]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "whichPlayer"
+type = "player"
+[[.returns]]
+type = "boolean"
+
+[IsUnitSelected]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "whichPlayer"
+type = "player"
+[[.returns]]
+type = "boolean"
+
+[IsUnitRace]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "whichRace"
+type = "race"
+[[.returns]]
+type = "boolean"
+
+[IsUnitType]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "whichUnitType"
+type = "unittype"
+[[.returns]]
+type = "boolean"
+
+[IsUnit]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "whichSpecifiedUnit"
+type = "unit"
+[[.returns]]
+type = "boolean"
+
+[IsUnitInRange]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "otherUnit"
+type = "unit"
+``````````
+name = "distance"
+type = "number"
+[[.returns]]
+type = "boolean"
+
+[IsUnitInRangeXY]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "distance"
+type = "number"
+[[.returns]]
+type = "boolean"
+
+[IsUnitInRangeLoc]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "whichLocation"
+type = "location"
+``````````
+name = "distance"
+type = "number"
+[[.returns]]
+type = "boolean"
+
+[IsUnitHidden]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+[[.returns]]
+type = "boolean"
+
+[IsUnitIllusion]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+[[.returns]]
+type = "boolean"
+
+[IsUnitInTransport]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "whichTransport"
+type = "unit"
+[[.returns]]
+type = "boolean"
+
+[IsUnitLoaded]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+[[.returns]]
+type = "boolean"
+
+[IsHeroUnitId]
+[[.args]]
+name = "unitId"
+type = "integer"
+[[.returns]]
+type = "boolean"
+
+[IsUnitIdType]
+[[.args]]
+name = "unitId"
+type = "integer"
+``````````
+name = "whichUnitType"
+type = "unittype"
+[[.returns]]
+type = "boolean"
+
+[UnitShareVision]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "whichPlayer"
+type = "player"
+``````````
+name = "share"
+type = "boolean"
+
+[UnitSuspendDecay]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "suspend"
+type = "boolean"
+
+[UnitAddType]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "whichUnitType"
+type = "unittype"
+[[.returns]]
+type = "boolean"
+
+[UnitRemoveType]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "whichUnitType"
+type = "unittype"
+[[.returns]]
+type = "boolean"
+
+[UnitAddAbility]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "abilityId"
+type = "integer"
+[[.returns]]
+type = "boolean"
+
+[UnitRemoveAbility]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "abilityId"
+type = "integer"
+[[.returns]]
+type = "boolean"
+
+[UnitMakeAbilityPermanent]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "permanent"
+type = "boolean"
+``````````
+name = "abilityId"
+type = "integer"
+[[.returns]]
+type = "boolean"
+
+[UnitRemoveBuffs]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "removePositive"
+type = "boolean"
+``````````
+name = "removeNegative"
+type = "boolean"
+
+[UnitRemoveBuffsEx]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "removePositive"
+type = "boolean"
+``````````
+name = "removeNegative"
+type = "boolean"
+``````````
+name = "magic"
+type = "boolean"
+``````````
+name = "physical"
+type = "boolean"
+``````````
+name = "timedLife"
+type = "boolean"
+``````````
+name = "aura"
+type = "boolean"
+``````````
+name = "autoDispel"
+type = "boolean"
+
+[UnitHasBuffsEx]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "removePositive"
+type = "boolean"
+``````````
+name = "removeNegative"
+type = "boolean"
+``````````
+name = "magic"
+type = "boolean"
+``````````
+name = "physical"
+type = "boolean"
+``````````
+name = "timedLife"
+type = "boolean"
+``````````
+name = "aura"
+type = "boolean"
+``````````
+name = "autoDispel"
+type = "boolean"
+[[.returns]]
+type = "boolean"
+
+[UnitCountBuffsEx]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "removePositive"
+type = "boolean"
+``````````
+name = "removeNegative"
+type = "boolean"
+``````````
+name = "magic"
+type = "boolean"
+``````````
+name = "physical"
+type = "boolean"
+``````````
+name = "timedLife"
+type = "boolean"
+``````````
+name = "aura"
+type = "boolean"
+``````````
+name = "autoDispel"
+type = "boolean"
+[[.returns]]
+type = "integer"
+
+[UnitAddSleep]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "add"
+type = "boolean"
+
+[UnitCanSleep]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+[[.returns]]
+type = "boolean"
+
+[UnitAddSleepPerm]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "add"
+type = "boolean"
+
+[UnitCanSleepPerm]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+[[.returns]]
+type = "boolean"
+
+[UnitIsSleeping]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+[[.returns]]
+type = "boolean"
+
+[UnitWakeUp]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+
+[UnitApplyTimedLife]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "buffId"
+type = "integer"
+``````````
+name = "duration"
+type = "number"
+
+[UnitIgnoreAlarm]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "flag"
+type = "boolean"
+[[.returns]]
+type = "boolean"
+
+[UnitIgnoreAlarmToggled]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+[[.returns]]
+type = "boolean"
+
+[UnitResetCooldown]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+
+[UnitSetConstructionProgress]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "constructionPercentage"
+type = "integer"
+
+[UnitSetUpgradeProgress]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "upgradePercentage"
+type = "integer"
+
+[UnitPauseTimedLife]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "flag"
+type = "boolean"
+
+[UnitSetUsesAltIcon]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "flag"
+type = "boolean"
+
+[UnitDamagePoint]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "delay"
+type = "number"
+``````````
+name = "radius"
+type = "number"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "amount"
+type = "number"
+``````````
+name = "attack"
+type = "boolean"
+``````````
+name = "ranged"
+type = "boolean"
+``````````
+name = "attackType"
+type = "attacktype"
+``````````
+name = "damageType"
+type = "damagetype"
+``````````
+name = "weaponType"
+type = "weapontype"
+[[.returns]]
+type = "boolean"
+
+[UnitDamageTarget]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "target"
+type = "widget"
+``````````
+name = "amount"
+type = "number"
+``````````
+name = "attack"
+type = "boolean"
+``````````
+name = "ranged"
+type = "boolean"
+``````````
+name = "attackType"
+type = "attacktype"
+``````````
+name = "damageType"
+type = "damagetype"
+``````````
+name = "weaponType"
+type = "weapontype"
+[[.returns]]
+type = "boolean"
+
+[IssueImmediateOrder]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "order"
+type = "string"
+[[.returns]]
+type = "boolean"
+
+[IssueImmediateOrderById]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "order"
+type = "integer"
+[[.returns]]
+type = "boolean"
+
+[IssuePointOrder]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "order"
+type = "string"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+[[.returns]]
+type = "boolean"
+
+[IssuePointOrderLoc]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "order"
+type = "string"
+``````````
+name = "whichLocation"
+type = "location"
+[[.returns]]
+type = "boolean"
+
+[IssuePointOrderById]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "order"
+type = "integer"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+[[.returns]]
+type = "boolean"
+
+[IssuePointOrderByIdLoc]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "order"
+type = "integer"
+``````````
+name = "whichLocation"
+type = "location"
+[[.returns]]
+type = "boolean"
+
+[IssueTargetOrder]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "order"
+type = "string"
+``````````
+name = "targetWidget"
+type = "widget"
+[[.returns]]
+type = "boolean"
+
+[IssueTargetOrderById]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "order"
+type = "integer"
+``````````
+name = "targetWidget"
+type = "widget"
+[[.returns]]
+type = "boolean"
+
+[IssueInstantPointOrder]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "order"
+type = "string"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "instantTargetWidget"
+type = "widget"
+[[.returns]]
+type = "boolean"
+
+[IssueInstantPointOrderById]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "order"
+type = "integer"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "instantTargetWidget"
+type = "widget"
+[[.returns]]
+type = "boolean"
+
+[IssueInstantTargetOrder]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "order"
+type = "string"
+``````````
+name = "targetWidget"
+type = "widget"
+``````````
+name = "instantTargetWidget"
+type = "widget"
+[[.returns]]
+type = "boolean"
+
+[IssueInstantTargetOrderById]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "order"
+type = "integer"
+``````````
+name = "targetWidget"
+type = "widget"
+``````````
+name = "instantTargetWidget"
+type = "widget"
+[[.returns]]
+type = "boolean"
+
+[IssueBuildOrder]
+[[.args]]
+name = "whichPeon"
+type = "unit"
+``````````
+name = "unitToBuild"
+type = "string"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+[[.returns]]
+type = "boolean"
+
+[IssueBuildOrderById]
+[[.args]]
+name = "whichPeon"
+type = "unit"
+``````````
+name = "unitId"
+type = "integer"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+[[.returns]]
+type = "boolean"
+
+[IssueNeutralImmediateOrder]
+[[.args]]
+name = "forWhichPlayer"
+type = "player"
+``````````
+name = "neutralStructure"
+type = "unit"
+``````````
+name = "unitToBuild"
+type = "string"
+[[.returns]]
+type = "boolean"
+
+[IssueNeutralImmediateOrderById]
+[[.args]]
+name = "forWhichPlayer"
+type = "player"
+``````````
+name = "neutralStructure"
+type = "unit"
+``````````
+name = "unitId"
+type = "integer"
+[[.returns]]
+type = "boolean"
+
+[IssueNeutralPointOrder]
+[[.args]]
+name = "forWhichPlayer"
+type = "player"
+``````````
+name = "neutralStructure"
+type = "unit"
+``````````
+name = "unitToBuild"
+type = "string"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+[[.returns]]
+type = "boolean"
+
+[IssueNeutralPointOrderById]
+[[.args]]
+name = "forWhichPlayer"
+type = "player"
+``````````
+name = "neutralStructure"
+type = "unit"
+``````````
+name = "unitId"
+type = "integer"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+[[.returns]]
+type = "boolean"
+
+[IssueNeutralTargetOrder]
+[[.args]]
+name = "forWhichPlayer"
+type = "player"
+``````````
+name = "neutralStructure"
+type = "unit"
+``````````
+name = "unitToBuild"
+type = "string"
+``````````
+name = "target"
+type = "widget"
+[[.returns]]
+type = "boolean"
+
+[IssueNeutralTargetOrderById]
+[[.args]]
+name = "forWhichPlayer"
+type = "player"
+``````````
+name = "neutralStructure"
+type = "unit"
+``````````
+name = "unitId"
+type = "integer"
+``````````
+name = "target"
+type = "widget"
+[[.returns]]
+type = "boolean"
+
+[GetUnitCurrentOrder]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+[[.returns]]
+type = "integer"
+
+[SetResourceAmount]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "amount"
+type = "integer"
+
+[AddResourceAmount]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "amount"
+type = "integer"
+
+[GetResourceAmount]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+[[.returns]]
+type = "integer"
+
+[WaygateGetDestinationX]
+[[.args]]
+name = "waygate"
+type = "unit"
+[[.returns]]
+type = "number"
+
+[WaygateGetDestinationY]
+[[.args]]
+name = "waygate"
+type = "unit"
+[[.returns]]
+type = "number"
+
+[WaygateSetDestination]
+[[.args]]
+name = "waygate"
+type = "unit"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+
+[WaygateActivate]
+[[.args]]
+name = "waygate"
+type = "unit"
+``````````
+name = "activate"
+type = "boolean"
+
+[WaygateIsActive]
+[[.args]]
+name = "waygate"
+type = "unit"
+[[.returns]]
+type = "boolean"
+
+[AddItemToAllStock]
+[[.args]]
+name = "itemId"
+type = "integer"
+``````````
+name = "currentStock"
+type = "integer"
+``````````
+name = "stockMax"
+type = "integer"
+
+[AddItemToStock]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "itemId"
+type = "integer"
+``````````
+name = "currentStock"
+type = "integer"
+``````````
+name = "stockMax"
+type = "integer"
+
+[AddUnitToAllStock]
+[[.args]]
+name = "unitId"
+type = "integer"
+``````````
+name = "currentStock"
+type = "integer"
+``````````
+name = "stockMax"
+type = "integer"
+
+[AddUnitToStock]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "unitId"
+type = "integer"
+``````````
+name = "currentStock"
+type = "integer"
+``````````
+name = "stockMax"
+type = "integer"
+
+[RemoveItemFromAllStock]
+[[.args]]
+name = "itemId"
+type = "integer"
+
+[RemoveItemFromStock]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "itemId"
+type = "integer"
+
+[RemoveUnitFromAllStock]
+[[.args]]
+name = "unitId"
+type = "integer"
+
+[RemoveUnitFromStock]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "unitId"
+type = "integer"
+
+[SetAllItemTypeSlots]
+[[.args]]
+name = "slots"
+type = "integer"
+
+[SetAllUnitTypeSlots]
+[[.args]]
+name = "slots"
+type = "integer"
+
+[SetItemTypeSlots]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "slots"
+type = "integer"
+
+[SetUnitTypeSlots]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "slots"
+type = "integer"
+
+[GetUnitUserData]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+[[.returns]]
+type = "integer"
+
+[SetUnitUserData]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "data"
+type = "integer"
+
+[Player]
+[[.args]]
+name = "number"
+type = "integer"
+[[.returns]]
+type = "player"
+
+[GetLocalPlayer]
+[[.returns]]
+type = "player"
+
+[IsPlayerAlly]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+``````````
+name = "otherPlayer"
+type = "player"
+[[.returns]]
+type = "boolean"
+
+[IsPlayerEnemy]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+``````````
+name = "otherPlayer"
+type = "player"
+[[.returns]]
+type = "boolean"
+
+[IsPlayerInForce]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+``````````
+name = "whichForce"
+type = "force"
+[[.returns]]
+type = "boolean"
+
+[IsPlayerObserver]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+[[.returns]]
+type = "boolean"
+
+[IsVisibleToPlayer]
+[[.args]]
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "whichPlayer"
+type = "player"
+[[.returns]]
+type = "boolean"
+
+[IsLocationVisibleToPlayer]
+[[.args]]
+name = "whichLocation"
+type = "location"
+``````````
+name = "whichPlayer"
+type = "player"
+[[.returns]]
+type = "boolean"
+
+[IsFoggedToPlayer]
+[[.args]]
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "whichPlayer"
+type = "player"
+[[.returns]]
+type = "boolean"
+
+[IsLocationFoggedToPlayer]
+[[.args]]
+name = "whichLocation"
+type = "location"
+``````````
+name = "whichPlayer"
+type = "player"
+[[.returns]]
+type = "boolean"
+
+[IsMaskedToPlayer]
+[[.args]]
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "whichPlayer"
+type = "player"
+[[.returns]]
+type = "boolean"
+
+[IsLocationMaskedToPlayer]
+[[.args]]
+name = "whichLocation"
+type = "location"
+``````````
+name = "whichPlayer"
+type = "player"
+[[.returns]]
+type = "boolean"
+
+[GetPlayerRace]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+[[.returns]]
+type = "race"
+
+[GetPlayerId]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+[[.returns]]
+type = "integer"
+
+[GetPlayerUnitCount]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+``````````
+name = "includeIncomplete"
+type = "boolean"
+[[.returns]]
+type = "integer"
+
+[GetPlayerTypedUnitCount]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+``````````
+name = "unitName"
+type = "string"
+``````````
+name = "includeIncomplete"
+type = "boolean"
+``````````
+name = "includeUpgrades"
+type = "boolean"
+[[.returns]]
+type = "integer"
+
+[GetPlayerStructureCount]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+``````````
+name = "includeIncomplete"
+type = "boolean"
+[[.returns]]
+type = "integer"
+
+[GetPlayerState]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+``````````
+name = "whichPlayerState"
+type = "playerstate"
+[[.returns]]
+type = "integer"
+
+[GetPlayerScore]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+``````````
+name = "whichPlayerScore"
+type = "playerscore"
+[[.returns]]
+type = "integer"
+
+[GetPlayerAlliance]
+[[.args]]
+name = "sourcePlayer"
+type = "player"
+``````````
+name = "otherPlayer"
+type = "player"
+``````````
+name = "whichAllianceSetting"
+type = "alliancetype"
+[[.returns]]
+type = "boolean"
+
+[GetPlayerHandicap]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+[[.returns]]
+type = "number"
+
+[GetPlayerHandicapXP]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+[[.returns]]
+type = "number"
+
+[SetPlayerHandicap]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+``````````
+name = "handicap"
+type = "number"
+
+[SetPlayerHandicapXP]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+``````````
+name = "handicap"
+type = "number"
+
+[SetPlayerTechMaxAllowed]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+``````````
+name = "techid"
+type = "integer"
+``````````
+name = "maximum"
+type = "integer"
+
+[GetPlayerTechMaxAllowed]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+``````````
+name = "techid"
+type = "integer"
+[[.returns]]
+type = "integer"
+
+[AddPlayerTechResearched]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+``````````
+name = "techid"
+type = "integer"
+``````````
+name = "levels"
+type = "integer"
+
+[SetPlayerTechResearched]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+``````````
+name = "techid"
+type = "integer"
+``````````
+name = "setToLevel"
+type = "integer"
+
+[GetPlayerTechResearched]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+``````````
+name = "techid"
+type = "integer"
+``````````
+name = "specificonly"
+type = "boolean"
+[[.returns]]
+type = "boolean"
+
+[GetPlayerTechCount]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+``````````
+name = "techid"
+type = "integer"
+``````````
+name = "specificonly"
+type = "boolean"
+[[.returns]]
+type = "integer"
+
+[SetPlayerUnitsOwner]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+``````````
+name = "newOwner"
+type = "integer"
+
+[CripplePlayer]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+``````````
+name = "toWhichPlayers"
+type = "force"
+``````````
+name = "flag"
+type = "boolean"
+
+[SetPlayerAbilityAvailable]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+``````````
+name = "abilid"
+type = "integer"
+``````````
+name = "avail"
+type = "boolean"
+
+[SetPlayerState]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+``````````
+name = "whichPlayerState"
+type = "playerstate"
+``````````
+name = "value"
+type = "integer"
+
+[RemovePlayer]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+``````````
+name = "gameResult"
+type = "playergameresult"
+
+[CachePlayerHeroData]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+
+[SetFogStateRect]
+[[.args]]
+name = "forWhichPlayer"
+type = "player"
+``````````
+name = "whichState"
+type = "fogstate"
+``````````
+name = "where"
+type = "rect"
+``````````
+name = "useSharedVision"
+type = "boolean"
+
+[SetFogStateRadius]
+[[.args]]
+name = "forWhichPlayer"
+type = "player"
+``````````
+name = "whichState"
+type = "fogstate"
+``````````
+name = "centerx"
+type = "number"
+``````````
+name = "centerY"
+type = "number"
+``````````
+name = "radius"
+type = "number"
+``````````
+name = "useSharedVision"
+type = "boolean"
+
+[SetFogStateRadiusLoc]
+[[.args]]
+name = "forWhichPlayer"
+type = "player"
+``````````
+name = "whichState"
+type = "fogstate"
+``````````
+name = "center"
+type = "location"
+``````````
+name = "radius"
+type = "number"
+``````````
+name = "useSharedVision"
+type = "boolean"
+
+[FogMaskEnable]
+[[.args]]
+name = "enable"
+type = "boolean"
+
+[IsFogMaskEnabled]
+[[.returns]]
+type = "boolean"
+
+[FogEnable]
+[[.args]]
+name = "enable"
+type = "boolean"
+
+[IsFogEnabled]
+[[.returns]]
+type = "boolean"
+
+[CreateFogModifierRect]
+[[.args]]
+name = "forWhichPlayer"
+type = "player"
+``````````
+name = "whichState"
+type = "fogstate"
+``````````
+name = "where"
+type = "rect"
+``````````
+name = "useSharedVision"
+type = "boolean"
+``````````
+name = "afterUnits"
+type = "boolean"
+[[.returns]]
+type = "fogmodifier"
+
+[CreateFogModifierRadius]
+[[.args]]
+name = "forWhichPlayer"
+type = "player"
+``````````
+name = "whichState"
+type = "fogstate"
+``````````
+name = "centerx"
+type = "number"
+``````````
+name = "centerY"
+type = "number"
+``````````
+name = "radius"
+type = "number"
+``````````
+name = "useSharedVision"
+type = "boolean"
+``````````
+name = "afterUnits"
+type = "boolean"
+[[.returns]]
+type = "fogmodifier"
+
+[CreateFogModifierRadiusLoc]
+[[.args]]
+name = "forWhichPlayer"
+type = "player"
+``````````
+name = "whichState"
+type = "fogstate"
+``````````
+name = "center"
+type = "location"
+``````````
+name = "radius"
+type = "number"
+``````````
+name = "useSharedVision"
+type = "boolean"
+``````````
+name = "afterUnits"
+type = "boolean"
+[[.returns]]
+type = "fogmodifier"
+
+[DestroyFogModifier]
+[[.args]]
+name = "whichFogModifier"
+type = "fogmodifier"
+
+[FogModifierStart]
+[[.args]]
+name = "whichFogModifier"
+type = "fogmodifier"
+
+[FogModifierStop]
+[[.args]]
+name = "whichFogModifier"
+type = "fogmodifier"
+
+[VersionGet]
+[[.returns]]
+type = "version"
+
+[VersionCompatible]
+[[.args]]
+name = "whichVersion"
+type = "version"
+[[.returns]]
+type = "boolean"
+
+[VersionSupported]
+[[.args]]
+name = "whichVersion"
+type = "version"
+[[.returns]]
+type = "boolean"
+
+[EndGame]
+[[.args]]
+name = "doScoreScreen"
+type = "boolean"
+
+[ChangeLevel]
+[[.args]]
+name = "newLevel"
+type = "string"
+``````````
+name = "doScoreScreen"
+type = "boolean"
+
+[RestartGame]
+[[.args]]
+name = "doScoreScreen"
+type = "boolean"
+
+[ReloadGame]
+
+[SetCampaignMenuRace]
+[[.args]]
+name = "r"
+type = "race"
+
+[SetCampaignMenuRaceEx]
+[[.args]]
+name = "campaignIndex"
+type = "integer"
+
+[ForceCampaignSelectScreen]
+
+[LoadGame]
+[[.args]]
+name = "saveFileName"
+type = "string"
+``````````
+name = "doScoreScreen"
+type = "boolean"
+
+[SaveGame]
+[[.args]]
+name = "saveFileName"
+type = "string"
+
+[RenameSaveDirectory]
+[[.args]]
+name = "sourceDirName"
+type = "string"
+``````````
+name = "destDirName"
+type = "string"
+[[.returns]]
+type = "boolean"
+
+[RemoveSaveDirectory]
+[[.args]]
+name = "sourceDirName"
+type = "string"
+[[.returns]]
+type = "boolean"
+
+[CopySaveGame]
+[[.args]]
+name = "sourceSaveName"
+type = "string"
+``````````
+name = "destSaveName"
+type = "string"
+[[.returns]]
+type = "boolean"
+
+[SaveGameExists]
+[[.args]]
+name = "saveName"
+type = "string"
+[[.returns]]
+type = "boolean"
+
+[SyncSelections]
+
+[SetFloatGameState]
+[[.args]]
+name = "whichFloatGameState"
+type = "fgamestate"
+``````````
+name = "value"
+type = "number"
+
+[GetFloatGameState]
+[[.args]]
+name = "whichFloatGameState"
+type = "fgamestate"
+[[.returns]]
+type = "number"
+
+[SetIntegerGameState]
+[[.args]]
+name = "whichIntegerGameState"
+type = "igamestate"
+``````````
+name = "value"
+type = "integer"
+
+[GetIntegerGameState]
+[[.args]]
+name = "whichIntegerGameState"
+type = "igamestate"
+[[.returns]]
+type = "integer"
+
+[SetTutorialCleared]
+[[.args]]
+name = "cleared"
+type = "boolean"
+
+[SetMissionAvailable]
+[[.args]]
+name = "campaignNumber"
+type = "integer"
+``````````
+name = "missionNumber"
+type = "integer"
+``````````
+name = "available"
+type = "boolean"
+
+[SetCampaignAvailable]
+[[.args]]
+name = "campaignNumber"
+type = "integer"
+``````````
+name = "available"
+type = "boolean"
+
+[SetOpCinematicAvailable]
+[[.args]]
+name = "campaignNumber"
+type = "integer"
+``````````
+name = "available"
+type = "boolean"
+
+[SetEdCinematicAvailable]
+[[.args]]
+name = "campaignNumber"
+type = "integer"
+``````````
+name = "available"
+type = "boolean"
+
+[GetDefaultDifficulty]
+[[.returns]]
+type = "gamedifficulty"
+
+[SetDefaultDifficulty]
+[[.args]]
+name = "g"
+type = "gamedifficulty"
+
+[SetCustomCampaignButtonVisible]
+[[.args]]
+name = "whichButton"
+type = "integer"
+``````````
+name = "visible"
+type = "boolean"
+
+[GetCustomCampaignButtonVisible]
+[[.args]]
+name = "whichButton"
+type = "integer"
+[[.returns]]
+type = "boolean"
+
+[DoNotSaveReplay]
+
+[DialogCreate]
+[[.returns]]
+type = "dialog"
+
+[DialogDestroy]
+[[.args]]
+name = "whichDialog"
+type = "dialog"
+
+[DialogClear]
+[[.args]]
+name = "whichDialog"
+type = "dialog"
+
+[DialogSetMessage]
+[[.args]]
+name = "whichDialog"
+type = "dialog"
+``````````
+name = "messageText"
+type = "string"
+
+[DialogAddButton]
+[[.args]]
+name = "whichDialog"
+type = "dialog"
+``````````
+name = "buttonText"
+type = "string"
+``````````
+name = "hotkey"
+type = "integer"
+[[.returns]]
+type = "button"
+
+[DialogAddQuitButton]
+[[.args]]
+name = "whichDialog"
+type = "dialog"
+``````````
+name = "doScoreScreen"
+type = "boolean"
+``````````
+name = "buttonText"
+type = "string"
+``````````
+name = "hotkey"
+type = "integer"
+[[.returns]]
+type = "button"
+
+[DialogDisplay]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+``````````
+name = "whichDialog"
+type = "dialog"
+``````````
+name = "flag"
+type = "boolean"
+
+[ReloadGameCachesFromDisk]
+[[.returns]]
+type = "boolean"
+
+[InitGameCache]
+[[.args]]
+name = "campaignFile"
+type = "string"
+[[.returns]]
+type = "gamecache"
+
+[SaveGameCache]
+[[.args]]
+name = "whichCache"
+type = "gamecache"
+[[.returns]]
+type = "boolean"
+
+[StoreInteger]
+[[.args]]
+name = "cache"
+type = "gamecache"
+``````````
+name = "missionKey"
+type = "string"
+``````````
+name = "key"
+type = "string"
+``````````
+name = "value"
+type = "integer"
+
+[StoreReal]
+[[.args]]
+name = "cache"
+type = "gamecache"
+``````````
+name = "missionKey"
+type = "string"
+``````````
+name = "key"
+type = "string"
+``````````
+name = "value"
+type = "number"
+
+[StoreBoolean]
+[[.args]]
+name = "cache"
+type = "gamecache"
+``````````
+name = "missionKey"
+type = "string"
+``````````
+name = "key"
+type = "string"
+``````````
+name = "value"
+type = "boolean"
+
+[StoreUnit]
+[[.args]]
+name = "cache"
+type = "gamecache"
+``````````
+name = "missionKey"
+type = "string"
+``````````
+name = "key"
+type = "string"
+``````````
+name = "whichUnit"
+type = "unit"
+[[.returns]]
+type = "boolean"
+
+[StoreString]
+[[.args]]
+name = "cache"
+type = "gamecache"
+``````````
+name = "missionKey"
+type = "string"
+``````````
+name = "key"
+type = "string"
+``````````
+name = "value"
+type = "string"
+[[.returns]]
+type = "boolean"
+
+[SyncStoredInteger]
+[[.args]]
+name = "cache"
+type = "gamecache"
+``````````
+name = "missionKey"
+type = "string"
+``````````
+name = "key"
+type = "string"
+
+[SyncStoredReal]
+[[.args]]
+name = "cache"
+type = "gamecache"
+``````````
+name = "missionKey"
+type = "string"
+``````````
+name = "key"
+type = "string"
+
+[SyncStoredBoolean]
+[[.args]]
+name = "cache"
+type = "gamecache"
+``````````
+name = "missionKey"
+type = "string"
+``````````
+name = "key"
+type = "string"
+
+[SyncStoredUnit]
+[[.args]]
+name = "cache"
+type = "gamecache"
+``````````
+name = "missionKey"
+type = "string"
+``````````
+name = "key"
+type = "string"
+
+[SyncStoredString]
+[[.args]]
+name = "cache"
+type = "gamecache"
+``````````
+name = "missionKey"
+type = "string"
+``````````
+name = "key"
+type = "string"
+
+[HaveStoredInteger]
+[[.args]]
+name = "cache"
+type = "gamecache"
+``````````
+name = "missionKey"
+type = "string"
+``````````
+name = "key"
+type = "string"
+[[.returns]]
+type = "boolean"
+
+[HaveStoredReal]
+[[.args]]
+name = "cache"
+type = "gamecache"
+``````````
+name = "missionKey"
+type = "string"
+``````````
+name = "key"
+type = "string"
+[[.returns]]
+type = "boolean"
+
+[HaveStoredBoolean]
+[[.args]]
+name = "cache"
+type = "gamecache"
+``````````
+name = "missionKey"
+type = "string"
+``````````
+name = "key"
+type = "string"
+[[.returns]]
+type = "boolean"
+
+[HaveStoredUnit]
+[[.args]]
+name = "cache"
+type = "gamecache"
+``````````
+name = "missionKey"
+type = "string"
+``````````
+name = "key"
+type = "string"
+[[.returns]]
+type = "boolean"
+
+[HaveStoredString]
+[[.args]]
+name = "cache"
+type = "gamecache"
+``````````
+name = "missionKey"
+type = "string"
+``````````
+name = "key"
+type = "string"
+[[.returns]]
+type = "boolean"
+
+[FlushGameCache]
+[[.args]]
+name = "cache"
+type = "gamecache"
+
+[FlushStoredMission]
+[[.args]]
+name = "cache"
+type = "gamecache"
+``````````
+name = "missionKey"
+type = "string"
+
+[FlushStoredInteger]
+[[.args]]
+name = "cache"
+type = "gamecache"
+``````````
+name = "missionKey"
+type = "string"
+``````````
+name = "key"
+type = "string"
+
+[FlushStoredReal]
+[[.args]]
+name = "cache"
+type = "gamecache"
+``````````
+name = "missionKey"
+type = "string"
+``````````
+name = "key"
+type = "string"
+
+[FlushStoredBoolean]
+[[.args]]
+name = "cache"
+type = "gamecache"
+``````````
+name = "missionKey"
+type = "string"
+``````````
+name = "key"
+type = "string"
+
+[FlushStoredUnit]
+[[.args]]
+name = "cache"
+type = "gamecache"
+``````````
+name = "missionKey"
+type = "string"
+``````````
+name = "key"
+type = "string"
+
+[FlushStoredString]
+[[.args]]
+name = "cache"
+type = "gamecache"
+``````````
+name = "missionKey"
+type = "string"
+``````````
+name = "key"
+type = "string"
+
+[GetStoredInteger]
+[[.args]]
+name = "cache"
+type = "gamecache"
+``````````
+name = "missionKey"
+type = "string"
+``````````
+name = "key"
+type = "string"
+[[.returns]]
+type = "integer"
+
+[GetStoredReal]
+[[.args]]
+name = "cache"
+type = "gamecache"
+``````````
+name = "missionKey"
+type = "string"
+``````````
+name = "key"
+type = "string"
+[[.returns]]
+type = "number"
+
+[GetStoredBoolean]
+[[.args]]
+name = "cache"
+type = "gamecache"
+``````````
+name = "missionKey"
+type = "string"
+``````````
+name = "key"
+type = "string"
+[[.returns]]
+type = "boolean"
+
+[GetStoredString]
+[[.args]]
+name = "cache"
+type = "gamecache"
+``````````
+name = "missionKey"
+type = "string"
+``````````
+name = "key"
+type = "string"
+[[.returns]]
+type = "string"
+
+[RestoreUnit]
+[[.args]]
+name = "cache"
+type = "gamecache"
+``````````
+name = "missionKey"
+type = "string"
+``````````
+name = "key"
+type = "string"
+``````````
+name = "forWhichPlayer"
+type = "player"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "facing"
+type = "number"
+[[.returns]]
+type = "unit"
+
+[InitHashtable]
+[[.returns]]
+type = "hashtable"
+
+[SaveInteger]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+``````````
+name = "value"
+type = "integer"
+
+[SaveReal]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+``````````
+name = "value"
+type = "number"
+
+[SaveBoolean]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+``````````
+name = "value"
+type = "boolean"
+
+[SaveStr]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+``````````
+name = "value"
+type = "string"
+[[.returns]]
+type = "boolean"
+
+[SavePlayerHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+``````````
+name = "whichPlayer"
+type = "player"
+[[.returns]]
+type = "boolean"
+
+[SaveWidgetHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+``````````
+name = "whichWidget"
+type = "widget"
+[[.returns]]
+type = "boolean"
+
+[SaveDestructableHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+``````````
+name = "whichDestructable"
+type = "destructable"
+[[.returns]]
+type = "boolean"
+
+[SaveItemHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+``````````
+name = "whichItem"
+type = "item"
+[[.returns]]
+type = "boolean"
+
+[SaveUnitHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+``````````
+name = "whichUnit"
+type = "unit"
+[[.returns]]
+type = "boolean"
+
+[SaveAbilityHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+``````````
+name = "whichAbility"
+type = "ability"
+[[.returns]]
+type = "boolean"
+
+[SaveTimerHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+``````````
+name = "whichTimer"
+type = "timer"
+[[.returns]]
+type = "boolean"
+
+[SaveTriggerHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+``````````
+name = "whichTrigger"
+type = "trigger"
+[[.returns]]
+type = "boolean"
+
+[SaveTriggerConditionHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+``````````
+name = "whichTriggercondition"
+type = "triggercondition"
+[[.returns]]
+type = "boolean"
+
+[SaveTriggerActionHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+``````````
+name = "whichTriggeraction"
+type = "triggeraction"
+[[.returns]]
+type = "boolean"
+
+[SaveTriggerEventHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+``````````
+name = "whichEvent"
+type = "event"
+[[.returns]]
+type = "boolean"
+
+[SaveForceHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+``````````
+name = "whichForce"
+type = "force"
+[[.returns]]
+type = "boolean"
+
+[SaveGroupHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+``````````
+name = "whichGroup"
+type = "group"
+[[.returns]]
+type = "boolean"
+
+[SaveLocationHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+``````````
+name = "whichLocation"
+type = "location"
+[[.returns]]
+type = "boolean"
+
+[SaveRectHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+``````````
+name = "whichRect"
+type = "rect"
+[[.returns]]
+type = "boolean"
+
+[SaveBooleanExprHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+``````````
+name = "whichBoolexpr"
+type = "boolexpr"
+[[.returns]]
+type = "boolean"
+
+[SaveSoundHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+``````````
+name = "whichSound"
+type = "sound"
+[[.returns]]
+type = "boolean"
+
+[SaveEffectHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+``````````
+name = "whichEffect"
+type = "effect"
+[[.returns]]
+type = "boolean"
+
+[SaveUnitPoolHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+``````````
+name = "whichUnitpool"
+type = "unitpool"
+[[.returns]]
+type = "boolean"
+
+[SaveItemPoolHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+``````````
+name = "whichItempool"
+type = "itempool"
+[[.returns]]
+type = "boolean"
+
+[SaveQuestHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+``````````
+name = "whichQuest"
+type = "quest"
+[[.returns]]
+type = "boolean"
+
+[SaveQuestItemHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+``````````
+name = "whichQuestitem"
+type = "questitem"
+[[.returns]]
+type = "boolean"
+
+[SaveDefeatConditionHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+``````````
+name = "whichDefeatcondition"
+type = "defeatcondition"
+[[.returns]]
+type = "boolean"
+
+[SaveTimerDialogHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+``````````
+name = "whichTimerdialog"
+type = "timerdialog"
+[[.returns]]
+type = "boolean"
+
+[SaveLeaderboardHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+``````````
+name = "whichLeaderboard"
+type = "leaderboard"
+[[.returns]]
+type = "boolean"
+
+[SaveMultiboardHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+``````````
+name = "whichMultiboard"
+type = "multiboard"
+[[.returns]]
+type = "boolean"
+
+[SaveMultiboardItemHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+``````````
+name = "whichMultiboarditem"
+type = "multiboarditem"
+[[.returns]]
+type = "boolean"
+
+[SaveTrackableHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+``````````
+name = "whichTrackable"
+type = "trackable"
+[[.returns]]
+type = "boolean"
+
+[SaveDialogHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+``````````
+name = "whichDialog"
+type = "dialog"
+[[.returns]]
+type = "boolean"
+
+[SaveButtonHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+``````````
+name = "whichButton"
+type = "button"
+[[.returns]]
+type = "boolean"
+
+[SaveTextTagHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+``````````
+name = "whichTexttag"
+type = "texttag"
+[[.returns]]
+type = "boolean"
+
+[SaveLightningHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+``````````
+name = "whichLightning"
+type = "lightning"
+[[.returns]]
+type = "boolean"
+
+[SaveImageHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+``````````
+name = "whichImage"
+type = "image"
+[[.returns]]
+type = "boolean"
+
+[SaveUbersplatHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+``````````
+name = "whichUbersplat"
+type = "ubersplat"
+[[.returns]]
+type = "boolean"
+
+[SaveRegionHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+``````````
+name = "whichRegion"
+type = "region"
+[[.returns]]
+type = "boolean"
+
+[SaveFogStateHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+``````````
+name = "whichFogState"
+type = "fogstate"
+[[.returns]]
+type = "boolean"
+
+[SaveFogModifierHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+``````````
+name = "whichFogModifier"
+type = "fogmodifier"
+[[.returns]]
+type = "boolean"
+
+[SaveAgentHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+``````````
+name = "whichAgent"
+type = "agent"
+[[.returns]]
+type = "boolean"
+
+[SaveHashtableHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+``````````
+name = "whichHashtable"
+type = "hashtable"
+[[.returns]]
+type = "boolean"
+
+[LoadInteger]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "integer"
+
+[LoadReal]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "number"
+
+[LoadBoolean]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "boolean"
+
+[LoadStr]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "string"
+
+[LoadPlayerHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "player"
+
+[LoadWidgetHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "widget"
+
+[LoadDestructableHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "destructable"
+
+[LoadItemHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "item"
+
+[LoadUnitHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "unit"
+
+[LoadAbilityHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "ability"
+
+[LoadTimerHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "timer"
+
+[LoadTriggerHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "trigger"
+
+[LoadTriggerConditionHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "triggercondition"
+
+[LoadTriggerActionHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "triggeraction"
+
+[LoadTriggerEventHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "event"
+
+[LoadForceHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "force"
+
+[LoadGroupHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "group"
+
+[LoadLocationHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "location"
+
+[LoadRectHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "rect"
+
+[LoadBooleanExprHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "boolexpr"
+
+[LoadSoundHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "sound"
+
+[LoadEffectHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "effect"
+
+[LoadUnitPoolHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "unitpool"
+
+[LoadItemPoolHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "itempool"
+
+[LoadQuestHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "quest"
+
+[LoadQuestItemHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "questitem"
+
+[LoadDefeatConditionHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "defeatcondition"
+
+[LoadTimerDialogHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "timerdialog"
+
+[LoadLeaderboardHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "leaderboard"
+
+[LoadMultiboardHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "multiboard"
+
+[LoadMultiboardItemHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "multiboarditem"
+
+[LoadTrackableHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "trackable"
+
+[LoadDialogHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "dialog"
+
+[LoadButtonHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "button"
+
+[LoadTextTagHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "texttag"
+
+[LoadLightningHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "lightning"
+
+[LoadImageHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "image"
+
+[LoadUbersplatHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "ubersplat"
+
+[LoadRegionHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "region"
+
+[LoadFogStateHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "fogstate"
+
+[LoadFogModifierHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "fogmodifier"
+
+[LoadHashtableHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "hashtable"
+
+[HaveSavedInteger]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "boolean"
+
+[HaveSavedReal]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "boolean"
+
+[HaveSavedBoolean]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "boolean"
+
+[HaveSavedString]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "boolean"
+
+[HaveSavedHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+[[.returns]]
+type = "boolean"
+
+[RemoveSavedInteger]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+
+[RemoveSavedReal]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+
+[RemoveSavedBoolean]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+
+[RemoveSavedString]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+
+[RemoveSavedHandle]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+``````````
+name = "childKey"
+type = "integer"
+
+[FlushParentHashtable]
+[[.args]]
+name = "table"
+type = "hashtable"
+
+[FlushChildHashtable]
+[[.args]]
+name = "table"
+type = "hashtable"
+``````````
+name = "parentKey"
+type = "integer"
+
+[GetRandomInt]
+[[.args]]
+name = "lowBound"
+type = "integer"
+``````````
+name = "highBound"
+type = "integer"
+[[.returns]]
+type = "integer"
+
+[GetRandomReal]
+[[.args]]
+name = "lowBound"
+type = "number"
+``````````
+name = "highBound"
+type = "number"
+[[.returns]]
+type = "number"
+
+[CreateUnitPool]
+[[.returns]]
+type = "unitpool"
+
+[DestroyUnitPool]
+[[.args]]
+name = "whichPool"
+type = "unitpool"
+
+[UnitPoolAddUnitType]
+[[.args]]
+name = "whichPool"
+type = "unitpool"
+``````````
+name = "unitId"
+type = "integer"
+``````````
+name = "weight"
+type = "number"
+
+[UnitPoolRemoveUnitType]
+[[.args]]
+name = "whichPool"
+type = "unitpool"
+``````````
+name = "unitId"
+type = "integer"
+
+[PlaceRandomUnit]
+[[.args]]
+name = "whichPool"
+type = "unitpool"
+``````````
+name = "forWhichPlayer"
+type = "player"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "facing"
+type = "number"
+[[.returns]]
+type = "unit"
+
+[CreateItemPool]
+[[.returns]]
+type = "itempool"
+
+[DestroyItemPool]
+[[.args]]
+name = "whichItemPool"
+type = "itempool"
+
+[ItemPoolAddItemType]
+[[.args]]
+name = "whichItemPool"
+type = "itempool"
+``````````
+name = "itemId"
+type = "integer"
+``````````
+name = "weight"
+type = "number"
+
+[ItemPoolRemoveItemType]
+[[.args]]
+name = "whichItemPool"
+type = "itempool"
+``````````
+name = "itemId"
+type = "integer"
+
+[PlaceRandomItem]
+[[.args]]
+name = "whichItemPool"
+type = "itempool"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+[[.returns]]
+type = "item"
+
+[ChooseRandomCreep]
+[[.args]]
+name = "level"
+type = "integer"
+[[.returns]]
+type = "integer"
+
+[ChooseRandomNPBuilding]
+[[.returns]]
+type = "integer"
+
+[ChooseRandomItem]
+[[.args]]
+name = "level"
+type = "integer"
+[[.returns]]
+type = "integer"
+
+[ChooseRandomItemEx]
+[[.args]]
+name = "whichType"
+type = "itemtype"
+``````````
+name = "level"
+type = "integer"
+[[.returns]]
+type = "integer"
+
+[SetRandomSeed]
+[[.args]]
+name = "seed"
+type = "integer"
+
+[SetTerrainFog]
+[[.args]]
+name = "a"
+type = "number"
+``````````
+name = "b"
+type = "number"
+``````````
+name = "c"
+type = "number"
+``````````
+name = "d"
+type = "number"
+``````````
+name = "e"
+type = "number"
+
+[ResetTerrainFog]
+
+[SetUnitFog]
+[[.args]]
+name = "a"
+type = "number"
+``````````
+name = "b"
+type = "number"
+``````````
+name = "c"
+type = "number"
+``````````
+name = "d"
+type = "number"
+``````````
+name = "e"
+type = "number"
+
+[SetTerrainFogEx]
+[[.args]]
+name = "style"
+type = "integer"
+``````````
+name = "zstart"
+type = "number"
+``````````
+name = "zend"
+type = "number"
+``````````
+name = "density"
+type = "number"
+``````````
+name = "red"
+type = "number"
+``````````
+name = "green"
+type = "number"
+``````````
+name = "blue"
+type = "number"
+
+[DisplayTextToPlayer]
+[[.args]]
+name = "toPlayer"
+type = "player"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "message"
+type = "string"
+
+[DisplayTimedTextToPlayer]
+[[.args]]
+name = "toPlayer"
+type = "player"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "duration"
+type = "number"
+``````````
+name = "message"
+type = "string"
+
+[DisplayTimedTextFromPlayer]
+[[.args]]
+name = "toPlayer"
+type = "player"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "duration"
+type = "number"
+``````````
+name = "message"
+type = "string"
+
+[ClearTextMessages]
+
+[SetDayNightModels]
+[[.args]]
+name = "terrainDNCFile"
+type = "string"
+``````````
+name = "unitDNCFile"
+type = "string"
+
+[SetSkyModel]
+[[.args]]
+name = "skyModelFile"
+type = "string"
+
+[EnableUserControl]
+[[.args]]
+name = "b"
+type = "boolean"
+
+[EnableUserUI]
+[[.args]]
+name = "b"
+type = "boolean"
+
+[SuspendTimeOfDay]
+[[.args]]
+name = "b"
+type = "boolean"
+
+[SetTimeOfDayScale]
+[[.args]]
+name = "r"
+type = "number"
+
+[GetTimeOfDayScale]
+[[.returns]]
+type = "number"
+
+[ShowInterface]
+[[.args]]
+name = "flag"
+type = "boolean"
+``````````
+name = "fadeDuration"
+type = "number"
+
+[PauseGame]
+[[.args]]
+name = "flag"
+type = "boolean"
+
+[UnitAddIndicator]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "red"
+type = "integer"
+``````````
+name = "green"
+type = "integer"
+``````````
+name = "blue"
+type = "integer"
+``````````
+name = "alpha"
+type = "integer"
+
+[AddIndicator]
+[[.args]]
+name = "whichWidget"
+type = "widget"
+``````````
+name = "red"
+type = "integer"
+``````````
+name = "green"
+type = "integer"
+``````````
+name = "blue"
+type = "integer"
+``````````
+name = "alpha"
+type = "integer"
+
+[PingMinimap]
+[[.args]]
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "duration"
+type = "number"
+
+[PingMinimapEx]
+[[.args]]
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "duration"
+type = "number"
+``````````
+name = "red"
+type = "integer"
+``````````
+name = "green"
+type = "integer"
+``````````
+name = "blue"
+type = "integer"
+``````````
+name = "extraEffects"
+type = "boolean"
+
+[EnableOcclusion]
+[[.args]]
+name = "flag"
+type = "boolean"
+
+[SetIntroShotText]
+[[.args]]
+name = "introText"
+type = "string"
+
+[SetIntroShotModel]
+[[.args]]
+name = "introModelPath"
+type = "string"
+
+[EnableWorldFogBoundary]
+[[.args]]
+name = "b"
+type = "boolean"
+
+[PlayModelCinematic]
+[[.args]]
+name = "modelName"
+type = "string"
+
+[PlayCinematic]
+[[.args]]
+name = "movieName"
+type = "string"
+
+[ForceUIKey]
+[[.args]]
+name = "key"
+type = "string"
+
+[ForceUICancel]
+
+[DisplayLoadDialog]
+
+[SetAltMinimapIcon]
+[[.args]]
+name = "iconPath"
+type = "string"
+
+[DisableRestartMission]
+[[.args]]
+name = "flag"
+type = "boolean"
+
+[CreateTextTag]
+[[.returns]]
+type = "texttag"
+
+[DestroyTextTag]
+[[.args]]
+name = "t"
+type = "texttag"
+
+[SetTextTagText]
+[[.args]]
+name = "t"
+type = "texttag"
+``````````
+name = "s"
+type = "string"
+``````````
+name = "height"
+type = "number"
+
+[SetTextTagPos]
+[[.args]]
+name = "t"
+type = "texttag"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "heightOffset"
+type = "number"
+
+[SetTextTagPosUnit]
+[[.args]]
+name = "t"
+type = "texttag"
+``````````
+name = "whichUnit"
+type = "unit"
+``````````
+name = "heightOffset"
+type = "number"
+
+[SetTextTagColor]
+[[.args]]
+name = "t"
+type = "texttag"
+``````````
+name = "red"
+type = "integer"
+``````````
+name = "green"
+type = "integer"
+``````````
+name = "blue"
+type = "integer"
+``````````
+name = "alpha"
+type = "integer"
+
+[SetTextTagVelocity]
+[[.args]]
+name = "t"
+type = "texttag"
+``````````
+name = "xvel"
+type = "number"
+``````````
+name = "yvel"
+type = "number"
+
+[SetTextTagVisibility]
+[[.args]]
+name = "t"
+type = "texttag"
+``````````
+name = "flag"
+type = "boolean"
+
+[SetTextTagSuspended]
+[[.args]]
+name = "t"
+type = "texttag"
+``````````
+name = "flag"
+type = "boolean"
+
+[SetTextTagPermanent]
+[[.args]]
+name = "t"
+type = "texttag"
+``````````
+name = "flag"
+type = "boolean"
+
+[SetTextTagAge]
+[[.args]]
+name = "t"
+type = "texttag"
+``````````
+name = "age"
+type = "number"
+
+[SetTextTagLifespan]
+[[.args]]
+name = "t"
+type = "texttag"
+``````````
+name = "lifespan"
+type = "number"
+
+[SetTextTagFadepoint]
+[[.args]]
+name = "t"
+type = "texttag"
+``````````
+name = "fadepoint"
+type = "number"
+
+[SetReservedLocalHeroButtons]
+[[.args]]
+name = "reserved"
+type = "integer"
+
+[GetAllyColorFilterState]
+[[.returns]]
+type = "integer"
+
+[SetAllyColorFilterState]
+[[.args]]
+name = "state"
+type = "integer"
+
+[GetCreepCampFilterState]
+[[.returns]]
+type = "boolean"
+
+[SetCreepCampFilterState]
+[[.args]]
+name = "state"
+type = "boolean"
+
+[EnableMinimapFilterButtons]
+[[.args]]
+name = "enableAlly"
+type = "boolean"
+``````````
+name = "enableCreep"
+type = "boolean"
+
+[EnableDragSelect]
+[[.args]]
+name = "state"
+type = "boolean"
+``````````
+name = "ui"
+type = "boolean"
+
+[EnablePreSelect]
+[[.args]]
+name = "state"
+type = "boolean"
+``````````
+name = "ui"
+type = "boolean"
+
+[EnableSelect]
+[[.args]]
+name = "state"
+type = "boolean"
+``````````
+name = "ui"
+type = "boolean"
+
+[CreateTrackable]
+[[.args]]
+name = "trackableModelPath"
+type = "string"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "facing"
+type = "number"
+[[.returns]]
+type = "trackable"
+
+[CreateQuest]
+[[.returns]]
+type = "quest"
+
+[DestroyQuest]
+[[.args]]
+name = "whichQuest"
+type = "quest"
+
+[QuestSetTitle]
+[[.args]]
+name = "whichQuest"
+type = "quest"
+``````````
+name = "title"
+type = "string"
+
+[QuestSetDescription]
+[[.args]]
+name = "whichQuest"
+type = "quest"
+``````````
+name = "description"
+type = "string"
+
+[QuestSetIconPath]
+[[.args]]
+name = "whichQuest"
+type = "quest"
+``````````
+name = "iconPath"
+type = "string"
+
+[QuestSetRequired]
+[[.args]]
+name = "whichQuest"
+type = "quest"
+``````````
+name = "required"
+type = "boolean"
+
+[QuestSetCompleted]
+[[.args]]
+name = "whichQuest"
+type = "quest"
+``````````
+name = "completed"
+type = "boolean"
+
+[QuestSetDiscovered]
+[[.args]]
+name = "whichQuest"
+type = "quest"
+``````````
+name = "discovered"
+type = "boolean"
+
+[QuestSetFailed]
+[[.args]]
+name = "whichQuest"
+type = "quest"
+``````````
+name = "failed"
+type = "boolean"
+
+[QuestSetEnabled]
+[[.args]]
+name = "whichQuest"
+type = "quest"
+``````````
+name = "enabled"
+type = "boolean"
+
+[IsQuestRequired]
+[[.args]]
+name = "whichQuest"
+type = "quest"
+[[.returns]]
+type = "boolean"
+
+[IsQuestCompleted]
+[[.args]]
+name = "whichQuest"
+type = "quest"
+[[.returns]]
+type = "boolean"
+
+[IsQuestDiscovered]
+[[.args]]
+name = "whichQuest"
+type = "quest"
+[[.returns]]
+type = "boolean"
+
+[IsQuestFailed]
+[[.args]]
+name = "whichQuest"
+type = "quest"
+[[.returns]]
+type = "boolean"
+
+[IsQuestEnabled]
+[[.args]]
+name = "whichQuest"
+type = "quest"
+[[.returns]]
+type = "boolean"
+
+[QuestCreateItem]
+[[.args]]
+name = "whichQuest"
+type = "quest"
+[[.returns]]
+type = "questitem"
+
+[QuestItemSetDescription]
+[[.args]]
+name = "whichQuestItem"
+type = "questitem"
+``````````
+name = "description"
+type = "string"
+
+[QuestItemSetCompleted]
+[[.args]]
+name = "whichQuestItem"
+type = "questitem"
+``````````
+name = "completed"
+type = "boolean"
+
+[IsQuestItemCompleted]
+[[.args]]
+name = "whichQuestItem"
+type = "questitem"
+[[.returns]]
+type = "boolean"
+
+[CreateDefeatCondition]
+[[.returns]]
+type = "defeatcondition"
+
+[DestroyDefeatCondition]
+[[.args]]
+name = "whichCondition"
+type = "defeatcondition"
+
+[DefeatConditionSetDescription]
+[[.args]]
+name = "whichCondition"
+type = "defeatcondition"
+``````````
+name = "description"
+type = "string"
+
+[FlashQuestDialogButton]
+
+[ForceQuestDialogUpdate]
+
+[CreateTimerDialog]
+[[.args]]
+name = "t"
+type = "timer"
+[[.returns]]
+type = "timerdialog"
+
+[DestroyTimerDialog]
+[[.args]]
+name = "whichDialog"
+type = "timerdialog"
+
+[TimerDialogSetTitle]
+[[.args]]
+name = "whichDialog"
+type = "timerdialog"
+``````````
+name = "title"
+type = "string"
+
+[TimerDialogSetTitleColor]
+[[.args]]
+name = "whichDialog"
+type = "timerdialog"
+``````````
+name = "red"
+type = "integer"
+``````````
+name = "green"
+type = "integer"
+``````````
+name = "blue"
+type = "integer"
+``````````
+name = "alpha"
+type = "integer"
+
+[TimerDialogSetTimeColor]
+[[.args]]
+name = "whichDialog"
+type = "timerdialog"
+``````````
+name = "red"
+type = "integer"
+``````````
+name = "green"
+type = "integer"
+``````````
+name = "blue"
+type = "integer"
+``````````
+name = "alpha"
+type = "integer"
+
+[TimerDialogSetSpeed]
+[[.args]]
+name = "whichDialog"
+type = "timerdialog"
+``````````
+name = "speedMultFactor"
+type = "number"
+
+[TimerDialogDisplay]
+[[.args]]
+name = "whichDialog"
+type = "timerdialog"
+``````````
+name = "display"
+type = "boolean"
+
+[IsTimerDialogDisplayed]
+[[.args]]
+name = "whichDialog"
+type = "timerdialog"
+[[.returns]]
+type = "boolean"
+
+[TimerDialogSetRealTimeRemaining]
+[[.args]]
+name = "whichDialog"
+type = "timerdialog"
+``````````
+name = "timeRemaining"
+type = "number"
+
+[CreateLeaderboard]
+[[.returns]]
+type = "leaderboard"
+
+[DestroyLeaderboard]
+[[.args]]
+name = "lb"
+type = "leaderboard"
+
+[LeaderboardDisplay]
+[[.args]]
+name = "lb"
+type = "leaderboard"
+``````````
+name = "show"
+type = "boolean"
+
+[IsLeaderboardDisplayed]
+[[.args]]
+name = "lb"
+type = "leaderboard"
+[[.returns]]
+type = "boolean"
+
+[LeaderboardGetItemCount]
+[[.args]]
+name = "lb"
+type = "leaderboard"
+[[.returns]]
+type = "integer"
+
+[LeaderboardSetSizeByItemCount]
+[[.args]]
+name = "lb"
+type = "leaderboard"
+``````````
+name = "count"
+type = "integer"
+
+[LeaderboardAddItem]
+[[.args]]
+name = "lb"
+type = "leaderboard"
+``````````
+name = "label"
+type = "string"
+``````````
+name = "value"
+type = "integer"
+``````````
+name = "p"
+type = "player"
+
+[LeaderboardRemoveItem]
+[[.args]]
+name = "lb"
+type = "leaderboard"
+``````````
+name = "index"
+type = "integer"
+
+[LeaderboardRemovePlayerItem]
+[[.args]]
+name = "lb"
+type = "leaderboard"
+``````````
+name = "p"
+type = "player"
+
+[LeaderboardClear]
+[[.args]]
+name = "lb"
+type = "leaderboard"
+
+[LeaderboardSortItemsByValue]
+[[.args]]
+name = "lb"
+type = "leaderboard"
+``````````
+name = "ascending"
+type = "boolean"
+
+[LeaderboardSortItemsByPlayer]
+[[.args]]
+name = "lb"
+type = "leaderboard"
+``````````
+name = "ascending"
+type = "boolean"
+
+[LeaderboardSortItemsByLabel]
+[[.args]]
+name = "lb"
+type = "leaderboard"
+``````````
+name = "ascending"
+type = "boolean"
+
+[LeaderboardHasPlayerItem]
+[[.args]]
+name = "lb"
+type = "leaderboard"
+``````````
+name = "p"
+type = "player"
+[[.returns]]
+type = "boolean"
+
+[LeaderboardGetPlayerIndex]
+[[.args]]
+name = "lb"
+type = "leaderboard"
+``````````
+name = "p"
+type = "player"
+[[.returns]]
+type = "integer"
+
+[LeaderboardSetLabel]
+[[.args]]
+name = "lb"
+type = "leaderboard"
+``````````
+name = "label"
+type = "string"
+
+[LeaderboardGetLabelText]
+[[.args]]
+name = "lb"
+type = "leaderboard"
+[[.returns]]
+type = "string"
+
+[PlayerSetLeaderboard]
+[[.args]]
+name = "toPlayer"
+type = "player"
+``````````
+name = "lb"
+type = "leaderboard"
+
+[PlayerGetLeaderboard]
+[[.args]]
+name = "toPlayer"
+type = "player"
+[[.returns]]
+type = "leaderboard"
+
+[LeaderboardSetLabelColor]
+[[.args]]
+name = "lb"
+type = "leaderboard"
+``````````
+name = "red"
+type = "integer"
+``````````
+name = "green"
+type = "integer"
+``````````
+name = "blue"
+type = "integer"
+``````````
+name = "alpha"
+type = "integer"
+
+[LeaderboardSetValueColor]
+[[.args]]
+name = "lb"
+type = "leaderboard"
+``````````
+name = "red"
+type = "integer"
+``````````
+name = "green"
+type = "integer"
+``````````
+name = "blue"
+type = "integer"
+``````````
+name = "alpha"
+type = "integer"
+
+[LeaderboardSetStyle]
+[[.args]]
+name = "lb"
+type = "leaderboard"
+``````````
+name = "showLabel"
+type = "boolean"
+``````````
+name = "showNames"
+type = "boolean"
+``````````
+name = "showValues"
+type = "boolean"
+``````````
+name = "showIcons"
+type = "boolean"
+
+[LeaderboardSetItemValue]
+[[.args]]
+name = "lb"
+type = "leaderboard"
+``````````
+name = "whichItem"
+type = "integer"
+``````````
+name = "val"
+type = "integer"
+
+[LeaderboardSetItemLabel]
+[[.args]]
+name = "lb"
+type = "leaderboard"
+``````````
+name = "whichItem"
+type = "integer"
+``````````
+name = "val"
+type = "string"
+
+[LeaderboardSetItemStyle]
+[[.args]]
+name = "lb"
+type = "leaderboard"
+``````````
+name = "whichItem"
+type = "integer"
+``````````
+name = "showLabel"
+type = "boolean"
+``````````
+name = "showValue"
+type = "boolean"
+``````````
+name = "showIcon"
+type = "boolean"
+
+[LeaderboardSetItemLabelColor]
+[[.args]]
+name = "lb"
+type = "leaderboard"
+``````````
+name = "whichItem"
+type = "integer"
+``````````
+name = "red"
+type = "integer"
+``````````
+name = "green"
+type = "integer"
+``````````
+name = "blue"
+type = "integer"
+``````````
+name = "alpha"
+type = "integer"
+
+[LeaderboardSetItemValueColor]
+[[.args]]
+name = "lb"
+type = "leaderboard"
+``````````
+name = "whichItem"
+type = "integer"
+``````````
+name = "red"
+type = "integer"
+``````````
+name = "green"
+type = "integer"
+``````````
+name = "blue"
+type = "integer"
+``````````
+name = "alpha"
+type = "integer"
+
+[CreateMultiboard]
+[[.returns]]
+type = "multiboard"
+
+[DestroyMultiboard]
+[[.args]]
+name = "lb"
+type = "multiboard"
+
+[MultiboardDisplay]
+[[.args]]
+name = "lb"
+type = "multiboard"
+``````````
+name = "show"
+type = "boolean"
+
+[IsMultiboardDisplayed]
+[[.args]]
+name = "lb"
+type = "multiboard"
+[[.returns]]
+type = "boolean"
+
+[MultiboardMinimize]
+[[.args]]
+name = "lb"
+type = "multiboard"
+``````````
+name = "minimize"
+type = "boolean"
+
+[IsMultiboardMinimized]
+[[.args]]
+name = "lb"
+type = "multiboard"
+[[.returns]]
+type = "boolean"
+
+[MultiboardClear]
+[[.args]]
+name = "lb"
+type = "multiboard"
+
+[MultiboardSetTitleText]
+[[.args]]
+name = "lb"
+type = "multiboard"
+``````````
+name = "label"
+type = "string"
+
+[MultiboardGetTitleText]
+[[.args]]
+name = "lb"
+type = "multiboard"
+[[.returns]]
+type = "string"
+
+[MultiboardSetTitleTextColor]
+[[.args]]
+name = "lb"
+type = "multiboard"
+``````````
+name = "red"
+type = "integer"
+``````````
+name = "green"
+type = "integer"
+``````````
+name = "blue"
+type = "integer"
+``````````
+name = "alpha"
+type = "integer"
+
+[MultiboardGetRowCount]
+[[.args]]
+name = "lb"
+type = "multiboard"
+[[.returns]]
+type = "integer"
+
+[MultiboardGetColumnCount]
+[[.args]]
+name = "lb"
+type = "multiboard"
+[[.returns]]
+type = "integer"
+
+[MultiboardSetColumnCount]
+[[.args]]
+name = "lb"
+type = "multiboard"
+``````````
+name = "count"
+type = "integer"
+
+[MultiboardSetRowCount]
+[[.args]]
+name = "lb"
+type = "multiboard"
+``````````
+name = "count"
+type = "integer"
+
+[MultiboardSetItemsStyle]
+[[.args]]
+name = "lb"
+type = "multiboard"
+``````````
+name = "showValues"
+type = "boolean"
+``````````
+name = "showIcons"
+type = "boolean"
+
+[MultiboardSetItemsValue]
+[[.args]]
+name = "lb"
+type = "multiboard"
+``````````
+name = "value"
+type = "string"
+
+[MultiboardSetItemsValueColor]
+[[.args]]
+name = "lb"
+type = "multiboard"
+``````````
+name = "red"
+type = "integer"
+``````````
+name = "green"
+type = "integer"
+``````````
+name = "blue"
+type = "integer"
+``````````
+name = "alpha"
+type = "integer"
+
+[MultiboardSetItemsWidth]
+[[.args]]
+name = "lb"
+type = "multiboard"
+``````````
+name = "width"
+type = "number"
+
+[MultiboardSetItemsIcon]
+[[.args]]
+name = "lb"
+type = "multiboard"
+``````````
+name = "iconPath"
+type = "string"
+
+[MultiboardGetItem]
+[[.args]]
+name = "lb"
+type = "multiboard"
+``````````
+name = "row"
+type = "integer"
+``````````
+name = "column"
+type = "integer"
+[[.returns]]
+type = "multiboarditem"
+
+[MultiboardReleaseItem]
+[[.args]]
+name = "mbi"
+type = "multiboarditem"
+
+[MultiboardSetItemStyle]
+[[.args]]
+name = "mbi"
+type = "multiboarditem"
+``````````
+name = "showValue"
+type = "boolean"
+``````````
+name = "showIcon"
+type = "boolean"
+
+[MultiboardSetItemValue]
+[[.args]]
+name = "mbi"
+type = "multiboarditem"
+``````````
+name = "val"
+type = "string"
+
+[MultiboardSetItemValueColor]
+[[.args]]
+name = "mbi"
+type = "multiboarditem"
+``````````
+name = "red"
+type = "integer"
+``````````
+name = "green"
+type = "integer"
+``````````
+name = "blue"
+type = "integer"
+``````````
+name = "alpha"
+type = "integer"
+
+[MultiboardSetItemWidth]
+[[.args]]
+name = "mbi"
+type = "multiboarditem"
+``````````
+name = "width"
+type = "number"
+
+[MultiboardSetItemIcon]
+[[.args]]
+name = "mbi"
+type = "multiboarditem"
+``````````
+name = "iconFileName"
+type = "string"
+
+[MultiboardSuppressDisplay]
+[[.args]]
+name = "flag"
+type = "boolean"
+
+[SetCameraPosition]
+[[.args]]
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+
+[SetCameraQuickPosition]
+[[.args]]
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+
+[SetCameraBounds]
+[[.args]]
+name = "x1"
+type = "number"
+``````````
+name = "y1"
+type = "number"
+``````````
+name = "x2"
+type = "number"
+``````````
+name = "y2"
+type = "number"
+``````````
+name = "x3"
+type = "number"
+``````````
+name = "y3"
+type = "number"
+``````````
+name = "x4"
+type = "number"
+``````````
+name = "y4"
+type = "number"
+
+[StopCamera]
+
+[ResetToGameCamera]
+[[.args]]
+name = "duration"
+type = "number"
+
+[PanCameraTo]
+[[.args]]
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+
+[PanCameraToTimed]
+[[.args]]
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "duration"
+type = "number"
+
+[PanCameraToWithZ]
+[[.args]]
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "zOffsetDest"
+type = "number"
+
+[PanCameraToTimedWithZ]
+[[.args]]
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "zOffsetDest"
+type = "number"
+``````````
+name = "duration"
+type = "number"
+
+[SetCinematicCamera]
+[[.args]]
+name = "cameraModelFile"
+type = "string"
+
+[SetCameraRotateMode]
+[[.args]]
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "radiansToSweep"
+type = "number"
+``````````
+name = "duration"
+type = "number"
+
+[SetCameraField]
+[[.args]]
+name = "whichField"
+type = "camerafield"
+``````````
+name = "value"
+type = "number"
+``````````
+name = "duration"
+type = "number"
+
+[AdjustCameraField]
+[[.args]]
+name = "whichField"
+type = "camerafield"
+``````````
+name = "offset"
+type = "number"
+``````````
+name = "duration"
+type = "number"
+
+[SetCameraTargetController]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "xoffset"
+type = "number"
+``````````
+name = "yoffset"
+type = "number"
+``````````
+name = "inheritOrientation"
+type = "boolean"
+
+[SetCameraOrientController]
+[[.args]]
+name = "whichUnit"
+type = "unit"
+``````````
+name = "xoffset"
+type = "number"
+``````````
+name = "yoffset"
+type = "number"
+
+[CreateCameraSetup]
+[[.returns]]
+type = "camerasetup"
+
+[CameraSetupSetField]
+[[.args]]
+name = "whichSetup"
+type = "camerasetup"
+``````````
+name = "whichField"
+type = "camerafield"
+``````````
+name = "value"
+type = "number"
+``````````
+name = "duration"
+type = "number"
+
+[CameraSetupGetField]
+[[.args]]
+name = "whichSetup"
+type = "camerasetup"
+``````````
+name = "whichField"
+type = "camerafield"
+[[.returns]]
+type = "number"
+
+[CameraSetupSetDestPosition]
+[[.args]]
+name = "whichSetup"
+type = "camerasetup"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "duration"
+type = "number"
+
+[CameraSetupGetDestPositionLoc]
+[[.args]]
+name = "whichSetup"
+type = "camerasetup"
+[[.returns]]
+type = "location"
+
+[CameraSetupGetDestPositionX]
+[[.args]]
+name = "whichSetup"
+type = "camerasetup"
+[[.returns]]
+type = "number"
+
+[CameraSetupGetDestPositionY]
+[[.args]]
+name = "whichSetup"
+type = "camerasetup"
+[[.returns]]
+type = "number"
+
+[CameraSetupApply]
+[[.args]]
+name = "whichSetup"
+type = "camerasetup"
+``````````
+name = "doPan"
+type = "boolean"
+``````````
+name = "panTimed"
+type = "boolean"
+
+[CameraSetupApplyWithZ]
+[[.args]]
+name = "whichSetup"
+type = "camerasetup"
+``````````
+name = "zDestOffset"
+type = "number"
+
+[CameraSetupApplyForceDuration]
+[[.args]]
+name = "whichSetup"
+type = "camerasetup"
+``````````
+name = "doPan"
+type = "boolean"
+``````````
+name = "forceDuration"
+type = "number"
+
+[CameraSetupApplyForceDurationWithZ]
+[[.args]]
+name = "whichSetup"
+type = "camerasetup"
+``````````
+name = "zDestOffset"
+type = "number"
+``````````
+name = "forceDuration"
+type = "number"
+
+[CameraSetTargetNoise]
+[[.args]]
+name = "mag"
+type = "number"
+``````````
+name = "velocity"
+type = "number"
+
+[CameraSetSourceNoise]
+[[.args]]
+name = "mag"
+type = "number"
+``````````
+name = "velocity"
+type = "number"
+
+[CameraSetTargetNoiseEx]
+[[.args]]
+name = "mag"
+type = "number"
+``````````
+name = "velocity"
+type = "number"
+``````````
+name = "vertOnly"
+type = "boolean"
+
+[CameraSetSourceNoiseEx]
+[[.args]]
+name = "mag"
+type = "number"
+``````````
+name = "velocity"
+type = "number"
+``````````
+name = "vertOnly"
+type = "boolean"
+
+[CameraSetSmoothingFactor]
+[[.args]]
+name = "factor"
+type = "number"
+
+[SetCineFilterTexture]
+[[.args]]
+name = "filename"
+type = "string"
+
+[SetCineFilterBlendMode]
+[[.args]]
+name = "whichMode"
+type = "blendmode"
+
+[SetCineFilterTexMapFlags]
+[[.args]]
+name = "whichFlags"
+type = "texmapflags"
+
+[SetCineFilterStartUV]
+[[.args]]
+name = "minu"
+type = "number"
+``````````
+name = "minv"
+type = "number"
+``````````
+name = "maxu"
+type = "number"
+``````````
+name = "maxv"
+type = "number"
+
+[SetCineFilterEndUV]
+[[.args]]
+name = "minu"
+type = "number"
+``````````
+name = "minv"
+type = "number"
+``````````
+name = "maxu"
+type = "number"
+``````````
+name = "maxv"
+type = "number"
+
+[SetCineFilterStartColor]
+[[.args]]
+name = "red"
+type = "integer"
+``````````
+name = "green"
+type = "integer"
+``````````
+name = "blue"
+type = "integer"
+``````````
+name = "alpha"
+type = "integer"
+
+[SetCineFilterEndColor]
+[[.args]]
+name = "red"
+type = "integer"
+``````````
+name = "green"
+type = "integer"
+``````````
+name = "blue"
+type = "integer"
+``````````
+name = "alpha"
+type = "integer"
+
+[SetCineFilterDuration]
+[[.args]]
+name = "duration"
+type = "number"
+
+[DisplayCineFilter]
+[[.args]]
+name = "flag"
+type = "boolean"
+
+[IsCineFilterDisplayed]
+[[.returns]]
+type = "boolean"
+
+[SetCinematicScene]
+[[.args]]
+name = "portraitUnitId"
+type = "integer"
+``````````
+name = "color"
+type = "playercolor"
+``````````
+name = "speakerTitle"
+type = "string"
+``````````
+name = "text"
+type = "string"
+``````````
+name = "sceneDuration"
+type = "number"
+``````````
+name = "voiceoverDuration"
+type = "number"
+
+[EndCinematicScene]
+
+[ForceCinematicSubtitles]
+[[.args]]
+name = "flag"
+type = "boolean"
+
+[GetCameraMargin]
+[[.args]]
+name = "whichMargin"
+type = "integer"
+[[.returns]]
+type = "number"
+
+[GetCameraBoundMinX]
+[[.returns]]
+type = "number"
+
+[GetCameraBoundMinY]
+[[.returns]]
+type = "number"
+
+[GetCameraBoundMaxX]
+[[.returns]]
+type = "number"
+
+[GetCameraBoundMaxY]
+[[.returns]]
+type = "number"
+
+[GetCameraField]
+[[.args]]
+name = "whichField"
+type = "camerafield"
+[[.returns]]
+type = "number"
+
+[GetCameraTargetPositionX]
+[[.returns]]
+type = "number"
+
+[GetCameraTargetPositionY]
+[[.returns]]
+type = "number"
+
+[GetCameraTargetPositionZ]
+[[.returns]]
+type = "number"
+
+[GetCameraTargetPositionLoc]
+[[.returns]]
+type = "location"
+
+[GetCameraEyePositionX]
+[[.returns]]
+type = "number"
+
+[GetCameraEyePositionY]
+[[.returns]]
+type = "number"
+
+[GetCameraEyePositionZ]
+[[.returns]]
+type = "number"
+
+[GetCameraEyePositionLoc]
+[[.returns]]
+type = "location"
+
+[NewSoundEnvironment]
+[[.args]]
+name = "environmentName"
+type = "string"
+
+[CreateSound]
+[[.args]]
+name = "fileName"
+type = "string"
+``````````
+name = "looping"
+type = "boolean"
+``````````
+name = "is3D"
+type = "boolean"
+``````````
+name = "stopwhenoutofrange"
+type = "boolean"
+``````````
+name = "fadeInRate"
+type = "integer"
+``````````
+name = "fadeOutRate"
+type = "integer"
+``````````
+name = "eaxSetting"
+type = "string"
+[[.returns]]
+type = "sound"
+
+[CreateSoundFilenameWithLabel]
+[[.args]]
+name = "fileName"
+type = "string"
+``````````
+name = "looping"
+type = "boolean"
+``````````
+name = "is3D"
+type = "boolean"
+``````````
+name = "stopwhenoutofrange"
+type = "boolean"
+``````````
+name = "fadeInRate"
+type = "integer"
+``````````
+name = "fadeOutRate"
+type = "integer"
+``````````
+name = "SLKEntryName"
+type = "string"
+[[.returns]]
+type = "sound"
+
+[CreateSoundFromLabel]
+[[.args]]
+name = "soundLabel"
+type = "string"
+``````````
+name = "looping"
+type = "boolean"
+``````````
+name = "is3D"
+type = "boolean"
+``````````
+name = "stopwhenoutofrange"
+type = "boolean"
+``````````
+name = "fadeInRate"
+type = "integer"
+``````````
+name = "fadeOutRate"
+type = "integer"
+[[.returns]]
+type = "sound"
+
+[CreateMIDISound]
+[[.args]]
+name = "soundLabel"
+type = "string"
+``````````
+name = "fadeInRate"
+type = "integer"
+``````````
+name = "fadeOutRate"
+type = "integer"
+[[.returns]]
+type = "sound"
+
+[SetSoundParamsFromLabel]
+[[.args]]
+name = "soundHandle"
+type = "sound"
+``````````
+name = "soundLabel"
+type = "string"
+
+[SetSoundDistanceCutoff]
+[[.args]]
+name = "soundHandle"
+type = "sound"
+``````````
+name = "cutoff"
+type = "number"
+
+[SetSoundChannel]
+[[.args]]
+name = "soundHandle"
+type = "sound"
+``````````
+name = "channel"
+type = "integer"
+
+[SetSoundVolume]
+[[.args]]
+name = "soundHandle"
+type = "sound"
+``````````
+name = "volume"
+type = "integer"
+
+[SetSoundPitch]
+[[.args]]
+name = "soundHandle"
+type = "sound"
+``````````
+name = "pitch"
+type = "number"
+
+[SetSoundPlayPosition]
+[[.args]]
+name = "soundHandle"
+type = "sound"
+``````````
+name = "millisecs"
+type = "integer"
+
+[SetSoundDistances]
+[[.args]]
+name = "soundHandle"
+type = "sound"
+``````````
+name = "minDist"
+type = "number"
+``````````
+name = "maxDist"
+type = "number"
+
+[SetSoundConeAngles]
+[[.args]]
+name = "soundHandle"
+type = "sound"
+``````````
+name = "inside"
+type = "number"
+``````````
+name = "outside"
+type = "number"
+``````````
+name = "outsideVolume"
+type = "integer"
+
+[SetSoundConeOrientation]
+[[.args]]
+name = "soundHandle"
+type = "sound"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "z"
+type = "number"
+
+[SetSoundPosition]
+[[.args]]
+name = "soundHandle"
+type = "sound"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "z"
+type = "number"
+
+[SetSoundVelocity]
+[[.args]]
+name = "soundHandle"
+type = "sound"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "z"
+type = "number"
+
+[AttachSoundToUnit]
+[[.args]]
+name = "soundHandle"
+type = "sound"
+``````````
+name = "whichUnit"
+type = "unit"
+
+[StartSound]
+[[.args]]
+name = "soundHandle"
+type = "sound"
+
+[StopSound]
+[[.args]]
+name = "soundHandle"
+type = "sound"
+``````````
+name = "killWhenDone"
+type = "boolean"
+``````````
+name = "fadeOut"
+type = "boolean"
+
+[KillSoundWhenDone]
+[[.args]]
+name = "soundHandle"
+type = "sound"
+
+[SetMapMusic]
+[[.args]]
+name = "musicName"
+type = "string"
+``````````
+name = "random"
+type = "boolean"
+``````````
+name = "index"
+type = "integer"
+
+[ClearMapMusic]
+
+[PlayMusic]
+[[.args]]
+name = "musicName"
+type = "string"
+
+[PlayMusicEx]
+[[.args]]
+name = "musicName"
+type = "string"
+``````````
+name = "frommsecs"
+type = "integer"
+``````````
+name = "fadeinmsecs"
+type = "integer"
+
+[StopMusic]
+[[.args]]
+name = "fadeOut"
+type = "boolean"
+
+[ResumeMusic]
+
+[PlayThematicMusic]
+[[.args]]
+name = "musicFileName"
+type = "string"
+
+[PlayThematicMusicEx]
+[[.args]]
+name = "musicFileName"
+type = "string"
+``````````
+name = "frommsecs"
+type = "integer"
+
+[EndThematicMusic]
+
+[SetMusicVolume]
+[[.args]]
+name = "volume"
+type = "integer"
+
+[SetMusicPlayPosition]
+[[.args]]
+name = "millisecs"
+type = "integer"
+
+[SetThematicMusicPlayPosition]
+[[.args]]
+name = "millisecs"
+type = "integer"
+
+[SetSoundDuration]
+[[.args]]
+name = "soundHandle"
+type = "sound"
+``````````
+name = "duration"
+type = "integer"
+
+[GetSoundDuration]
+[[.args]]
+name = "soundHandle"
+type = "sound"
+[[.returns]]
+type = "integer"
+
+[GetSoundFileDuration]
+[[.args]]
+name = "musicFileName"
+type = "string"
+[[.returns]]
+type = "integer"
+
+[VolumeGroupSetVolume]
+[[.args]]
+name = "vgroup"
+type = "volumegroup"
+``````````
+name = "scale"
+type = "number"
+
+[VolumeGroupReset]
+
+[GetSoundIsPlaying]
+[[.args]]
+name = "soundHandle"
+type = "sound"
+[[.returns]]
+type = "boolean"
+
+[GetSoundIsLoading]
+[[.args]]
+name = "soundHandle"
+type = "sound"
+[[.returns]]
+type = "boolean"
+
+[RegisterStackedSound]
+[[.args]]
+name = "soundHandle"
+type = "sound"
+``````````
+name = "byPosition"
+type = "boolean"
+``````````
+name = "rectwidth"
+type = "number"
+``````````
+name = "rectheight"
+type = "number"
+
+[UnregisterStackedSound]
+[[.args]]
+name = "soundHandle"
+type = "sound"
+``````````
+name = "byPosition"
+type = "boolean"
+``````````
+name = "rectwidth"
+type = "number"
+``````````
+name = "rectheight"
+type = "number"
+
+[AddWeatherEffect]
+[[.args]]
+name = "where"
+type = "rect"
+``````````
+name = "effectID"
+type = "integer"
+[[.returns]]
+type = "weathereffect"
+
+[RemoveWeatherEffect]
+[[.args]]
+name = "whichEffect"
+type = "weathereffect"
+
+[EnableWeatherEffect]
+[[.args]]
+name = "whichEffect"
+type = "weathereffect"
+``````````
+name = "enable"
+type = "boolean"
+
+[TerrainDeformCrater]
+[[.args]]
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "radius"
+type = "number"
+``````````
+name = "depth"
+type = "number"
+``````````
+name = "duration"
+type = "integer"
+``````````
+name = "permanent"
+type = "boolean"
+[[.returns]]
+type = "terraindeformation"
+
+[TerrainDeformRipple]
+[[.args]]
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "radius"
+type = "number"
+``````````
+name = "depth"
+type = "number"
+``````````
+name = "duration"
+type = "integer"
+``````````
+name = "count"
+type = "integer"
+``````````
+name = "spaceWaves"
+type = "number"
+``````````
+name = "timeWaves"
+type = "number"
+``````````
+name = "radiusStartPct"
+type = "number"
+``````````
+name = "limitNeg"
+type = "boolean"
+[[.returns]]
+type = "terraindeformation"
+
+[TerrainDeformWave]
+[[.args]]
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "dirX"
+type = "number"
+``````````
+name = "dirY"
+type = "number"
+``````````
+name = "distance"
+type = "number"
+``````````
+name = "speed"
+type = "number"
+``````````
+name = "radius"
+type = "number"
+``````````
+name = "depth"
+type = "number"
+``````````
+name = "trailTime"
+type = "integer"
+``````````
+name = "count"
+type = "integer"
+[[.returns]]
+type = "terraindeformation"
+
+[TerrainDeformRandom]
+[[.args]]
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "radius"
+type = "number"
+``````````
+name = "minDelta"
+type = "number"
+``````````
+name = "maxDelta"
+type = "number"
+``````````
+name = "duration"
+type = "integer"
+``````````
+name = "updateInterval"
+type = "integer"
+[[.returns]]
+type = "terraindeformation"
+
+[TerrainDeformStop]
+[[.args]]
+name = "deformation"
+type = "terraindeformation"
+``````````
+name = "duration"
+type = "integer"
+
+[TerrainDeformStopAll]
+
+[AddSpecialEffect]
+[[.args]]
+name = "modelName"
+type = "string"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+[[.returns]]
+type = "effect"
+
+[AddSpecialEffectLoc]
+[[.args]]
+name = "modelName"
+type = "string"
+``````````
+name = "where"
+type = "location"
+[[.returns]]
+type = "effect"
+
+[AddSpecialEffectTarget]
+[[.args]]
+name = "modelName"
+type = "string"
+``````````
+name = "targetWidget"
+type = "widget"
+``````````
+name = "attachPointName"
+type = "string"
+[[.returns]]
+type = "effect"
+
+[DestroyEffect]
+[[.args]]
+name = "whichEffect"
+type = "effect"
+
+[AddSpellEffect]
+[[.args]]
+name = "abilityString"
+type = "string"
+``````````
+name = "t"
+type = "effecttype"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+[[.returns]]
+type = "effect"
+
+[AddSpellEffectLoc]
+[[.args]]
+name = "abilityString"
+type = "string"
+``````````
+name = "t"
+type = "effecttype"
+``````````
+name = "where"
+type = "location"
+[[.returns]]
+type = "effect"
+
+[AddSpellEffectById]
+[[.args]]
+name = "abilityId"
+type = "integer"
+``````````
+name = "t"
+type = "effecttype"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+[[.returns]]
+type = "effect"
+
+[AddSpellEffectByIdLoc]
+[[.args]]
+name = "abilityId"
+type = "integer"
+``````````
+name = "t"
+type = "effecttype"
+``````````
+name = "where"
+type = "location"
+[[.returns]]
+type = "effect"
+
+[AddSpellEffectTarget]
+[[.args]]
+name = "modelName"
+type = "string"
+``````````
+name = "t"
+type = "effecttype"
+``````````
+name = "targetWidget"
+type = "widget"
+``````````
+name = "attachPoint"
+type = "string"
+[[.returns]]
+type = "effect"
+
+[AddSpellEffectTargetById]
+[[.args]]
+name = "abilityId"
+type = "integer"
+``````````
+name = "t"
+type = "effecttype"
+``````````
+name = "targetWidget"
+type = "widget"
+``````````
+name = "attachPoint"
+type = "string"
+[[.returns]]
+type = "effect"
+
+[AddLightning]
+[[.args]]
+name = "codeName"
+type = "string"
+``````````
+name = "checkVisibility"
+type = "boolean"
+``````````
+name = "x1"
+type = "number"
+``````````
+name = "y1"
+type = "number"
+``````````
+name = "x2"
+type = "number"
+``````````
+name = "y2"
+type = "number"
+[[.returns]]
+type = "lightning"
+
+[AddLightningEx]
+[[.args]]
+name = "codeName"
+type = "string"
+``````````
+name = "checkVisibility"
+type = "boolean"
+``````````
+name = "x1"
+type = "number"
+``````````
+name = "y1"
+type = "number"
+``````````
+name = "z1"
+type = "number"
+``````````
+name = "x2"
+type = "number"
+``````````
+name = "y2"
+type = "number"
+``````````
+name = "z2"
+type = "number"
+[[.returns]]
+type = "lightning"
+
+[DestroyLightning]
+[[.args]]
+name = "whichBolt"
+type = "lightning"
+[[.returns]]
+type = "boolean"
+
+[MoveLightning]
+[[.args]]
+name = "whichBolt"
+type = "lightning"
+``````````
+name = "checkVisibility"
+type = "boolean"
+``````````
+name = "x1"
+type = "number"
+``````````
+name = "y1"
+type = "number"
+``````````
+name = "x2"
+type = "number"
+``````````
+name = "y2"
+type = "number"
+[[.returns]]
+type = "boolean"
+
+[MoveLightningEx]
+[[.args]]
+name = "whichBolt"
+type = "lightning"
+``````````
+name = "checkVisibility"
+type = "boolean"
+``````````
+name = "x1"
+type = "number"
+``````````
+name = "y1"
+type = "number"
+``````````
+name = "z1"
+type = "number"
+``````````
+name = "x2"
+type = "number"
+``````````
+name = "y2"
+type = "number"
+``````````
+name = "z2"
+type = "number"
+[[.returns]]
+type = "boolean"
+
+[GetLightningColorA]
+[[.args]]
+name = "whichBolt"
+type = "lightning"
+[[.returns]]
+type = "number"
+
+[GetLightningColorR]
+[[.args]]
+name = "whichBolt"
+type = "lightning"
+[[.returns]]
+type = "number"
+
+[GetLightningColorG]
+[[.args]]
+name = "whichBolt"
+type = "lightning"
+[[.returns]]
+type = "number"
+
+[GetLightningColorB]
+[[.args]]
+name = "whichBolt"
+type = "lightning"
+[[.returns]]
+type = "number"
+
+[SetLightningColor]
+[[.args]]
+name = "whichBolt"
+type = "lightning"
+``````````
+name = "r"
+type = "number"
+``````````
+name = "g"
+type = "number"
+``````````
+name = "b"
+type = "number"
+``````````
+name = "a"
+type = "number"
+[[.returns]]
+type = "boolean"
+
+[GetAbilityEffect]
+[[.args]]
+name = "abilityString"
+type = "string"
+``````````
+name = "t"
+type = "effecttype"
+``````````
+name = "index"
+type = "integer"
+[[.returns]]
+type = "string"
+
+[GetAbilityEffectById]
+[[.args]]
+name = "abilityId"
+type = "integer"
+``````````
+name = "t"
+type = "effecttype"
+``````````
+name = "index"
+type = "integer"
+[[.returns]]
+type = "string"
+
+[GetAbilitySound]
+[[.args]]
+name = "abilityString"
+type = "string"
+``````````
+name = "t"
+type = "soundtype"
+[[.returns]]
+type = "string"
+
+[GetAbilitySoundById]
+[[.args]]
+name = "abilityId"
+type = "integer"
+``````````
+name = "t"
+type = "soundtype"
+[[.returns]]
+type = "string"
+
+[GetTerrainCliffLevel]
+[[.args]]
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+[[.returns]]
+type = "integer"
+
+[SetWaterBaseColor]
+[[.args]]
+name = "red"
+type = "integer"
+``````````
+name = "green"
+type = "integer"
+``````````
+name = "blue"
+type = "integer"
+``````````
+name = "alpha"
+type = "integer"
+
+[SetWaterDeforms]
+[[.args]]
+name = "val"
+type = "boolean"
+
+[GetTerrainType]
+[[.args]]
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+[[.returns]]
+type = "integer"
+
+[GetTerrainVariance]
+[[.args]]
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+[[.returns]]
+type = "integer"
+
+[SetTerrainType]
+[[.args]]
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "terrainType"
+type = "integer"
+``````````
+name = "variation"
+type = "integer"
+``````````
+name = "area"
+type = "integer"
+``````````
+name = "shape"
+type = "integer"
+
+[IsTerrainPathable]
+[[.args]]
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "t"
+type = "pathingtype"
+[[.returns]]
+type = "boolean"
+
+[SetTerrainPathable]
+[[.args]]
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "t"
+type = "pathingtype"
+``````````
+name = "flag"
+type = "boolean"
+
+[CreateImage]
+[[.args]]
+name = "file"
+type = "string"
+``````````
+name = "sizeX"
+type = "number"
+``````````
+name = "sizeY"
+type = "number"
+``````````
+name = "sizeZ"
+type = "number"
+``````````
+name = "posX"
+type = "number"
+``````````
+name = "posY"
+type = "number"
+``````````
+name = "posZ"
+type = "number"
+``````````
+name = "originX"
+type = "number"
+``````````
+name = "originY"
+type = "number"
+``````````
+name = "originZ"
+type = "number"
+``````````
+name = "imageType"
+type = "integer"
+[[.returns]]
+type = "image"
+
+[DestroyImage]
+[[.args]]
+name = "whichImage"
+type = "image"
+
+[ShowImage]
+[[.args]]
+name = "whichImage"
+type = "image"
+``````````
+name = "flag"
+type = "boolean"
+
+[SetImageConstantHeight]
+[[.args]]
+name = "whichImage"
+type = "image"
+``````````
+name = "flag"
+type = "boolean"
+``````````
+name = "height"
+type = "number"
+
+[SetImagePosition]
+[[.args]]
+name = "whichImage"
+type = "image"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "z"
+type = "number"
+
+[SetImageColor]
+[[.args]]
+name = "whichImage"
+type = "image"
+``````````
+name = "red"
+type = "integer"
+``````````
+name = "green"
+type = "integer"
+``````````
+name = "blue"
+type = "integer"
+``````````
+name = "alpha"
+type = "integer"
+
+[SetImageRender]
+[[.args]]
+name = "whichImage"
+type = "image"
+``````````
+name = "flag"
+type = "boolean"
+
+[SetImageRenderAlways]
+[[.args]]
+name = "whichImage"
+type = "image"
+``````````
+name = "flag"
+type = "boolean"
+
+[SetImageAboveWater]
+[[.args]]
+name = "whichImage"
+type = "image"
+``````````
+name = "flag"
+type = "boolean"
+``````````
+name = "useWaterAlpha"
+type = "boolean"
+
+[SetImageType]
+[[.args]]
+name = "whichImage"
+type = "image"
+``````````
+name = "imageType"
+type = "integer"
+
+[CreateUbersplat]
+[[.args]]
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "name"
+type = "string"
+``````````
+name = "red"
+type = "integer"
+``````````
+name = "green"
+type = "integer"
+``````````
+name = "blue"
+type = "integer"
+``````````
+name = "alpha"
+type = "integer"
+``````````
+name = "forcePaused"
+type = "boolean"
+``````````
+name = "noBirthTime"
+type = "boolean"
+[[.returns]]
+type = "ubersplat"
+
+[DestroyUbersplat]
+[[.args]]
+name = "whichSplat"
+type = "ubersplat"
+
+[ResetUbersplat]
+[[.args]]
+name = "whichSplat"
+type = "ubersplat"
+
+[FinishUbersplat]
+[[.args]]
+name = "whichSplat"
+type = "ubersplat"
+
+[ShowUbersplat]
+[[.args]]
+name = "whichSplat"
+type = "ubersplat"
+``````````
+name = "flag"
+type = "boolean"
+
+[SetUbersplatRender]
+[[.args]]
+name = "whichSplat"
+type = "ubersplat"
+``````````
+name = "flag"
+type = "boolean"
+
+[SetUbersplatRenderAlways]
+[[.args]]
+name = "whichSplat"
+type = "ubersplat"
+``````````
+name = "flag"
+type = "boolean"
+
+[SetBlight]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "radius"
+type = "number"
+``````````
+name = "addBlight"
+type = "boolean"
+
+[SetBlightRect]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+``````````
+name = "r"
+type = "rect"
+``````````
+name = "addBlight"
+type = "boolean"
+
+[SetBlightPoint]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "addBlight"
+type = "boolean"
+
+[SetBlightLoc]
+[[.args]]
+name = "whichPlayer"
+type = "player"
+``````````
+name = "whichLocation"
+type = "location"
+``````````
+name = "radius"
+type = "number"
+``````````
+name = "addBlight"
+type = "boolean"
+
+[CreateBlightedGoldmine]
+[[.args]]
+name = "id"
+type = "player"
+``````````
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "face"
+type = "number"
+[[.returns]]
+type = "unit"
+
+[IsPointBlighted]
+[[.args]]
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+[[.returns]]
+type = "boolean"
+
+[SetDoodadAnimation]
+[[.args]]
+name = "x"
+type = "number"
+``````````
+name = "y"
+type = "number"
+``````````
+name = "radius"
+type = "number"
+``````````
+name = "doodadID"
+type = "integer"
+``````````
+name = "nearestOnly"
+type = "boolean"
+``````````
+name = "animName"
+type = "string"
+``````````
+name = "animRandom"
+type = "boolean"
+
+[SetDoodadAnimationRect]
+[[.args]]
+name = "r"
+type = "rect"
+``````````
+name = "doodadID"
+type = "integer"
+``````````
+name = "animName"
+type = "string"
+``````````
+name = "animRandom"
+type = "boolean"
+
+[StartMeleeAI]
+[[.args]]
+name = "num"
+type = "player"
+``````````
+name = "script"
+type = "string"
+
+[StartCampaignAI]
+[[.args]]
+name = "num"
+type = "player"
+``````````
+name = "script"
+type = "string"
+
+[CommandAI]
+[[.args]]
+name = "num"
+type = "player"
+``````````
+name = "command"
+type = "integer"
+``````````
+name = "data"
+type = "integer"
+
+[PauseCompAI]
+[[.args]]
+name = "p"
+type = "player"
+``````````
+name = "pause"
+type = "boolean"
+
+[GetAIDifficulty]
+[[.args]]
+name = "num"
+type = "player"
+[[.returns]]
+type = "aidifficulty"
+
+[RemoveGuardPosition]
+[[.args]]
+name = "hUnit"
+type = "unit"
+
+[RecycleGuardPosition]
+[[.args]]
+name = "hUnit"
+type = "unit"
+
+[RemoveAllGuardPositions]
+[[.args]]
+name = "num"
+type = "player"
+
+[Cheat]
+[[.args]]
+name = "cheatStr"
+type = "string"
+
+[IsNoVictoryCheat]
+[[.returns]]
+type = "boolean"
+
+[IsNoDefeatCheat]
+[[.returns]]
+type = "boolean"
+
+[Preload]
+[[.args]]
+name = "filename"
+type = "string"
+
+[PreloadEnd]
+[[.args]]
+name = "timeout"
+type = "number"
+
+[PreloadStart]
+
+[PreloadRefresh]
+
+[PreloadEndEx]
+
+[PreloadGenClear]
+
+[PreloadGenStart]
+
+[PreloadGenEnd]
+[[.args]]
+name = "filename"
+type = "string"
+
+[Preloader]
+[[.args]]
+name = "filename"
+type = "string"
+
+[FALSE]
+type = "boolean"
+value = false
+
+[TRUE]
+type = "boolean"
+value = true
+
+[JASS_MAX_ARRAY_SIZE]
+type = "integer"
+value = 8192
+
+[PLAYER_NEUTRAL_PASSIVE]
+type = "integer"
+value = 15
+
+[PLAYER_NEUTRAL_AGGRESSIVE]
+type = "integer"
+value = 12
+
+[PLAYER_COLOR_RED]
+type = "integer"
+value = 0
+
+[PLAYER_COLOR_BLUE]
+type = "integer"
+value = 1
+
+[PLAYER_COLOR_CYAN]
+type = "integer"
+value = 2
+
+[PLAYER_COLOR_PURPLE]
+type = "integer"
+value = 3
+
+[PLAYER_COLOR_YELLOW]
+type = "integer"
+value = 4
+
+[PLAYER_COLOR_ORANGE]
+type = "integer"
+value = 5
+
+[PLAYER_COLOR_GREEN]
+type = "integer"
+value = 6
+
+[PLAYER_COLOR_PINK]
+type = "integer"
+value = 7
+
+[PLAYER_COLOR_LIGHT_GRAY]
+type = "integer"
+value = 8
+
+[PLAYER_COLOR_LIGHT_BLUE]
+type = "integer"
+value = 9
+
+[PLAYER_COLOR_AQUA]
+type = "integer"
+value = 10
+
+[PLAYER_COLOR_BROWN]
+type = "integer"
+value = 11
+
+[RACE_HUMAN]
+type = "integer"
+value = 1
+
+[RACE_ORC]
+type = "integer"
+value = 2
+
+[RACE_UNDEAD]
+type = "integer"
+value = 3
+
+[RACE_NIGHTELF]
+type = "integer"
+value = 4
+
+[RACE_DEMON]
+type = "integer"
+value = 5
+
+[RACE_OTHER]
+type = "integer"
+value = 7
+
+[PLAYER_GAME_RESULT_VICTORY]
+type = "integer"
+value = 0
+
+[PLAYER_GAME_RESULT_DEFEAT]
+type = "integer"
+value = 1
+
+[PLAYER_GAME_RESULT_TIE]
+type = "integer"
+value = 2
+
+[PLAYER_GAME_RESULT_NEUTRAL]
+type = "integer"
+value = 3
+
+[ALLIANCE_PASSIVE]
+type = "integer"
+value = 0
+
+[ALLIANCE_HELP_REQUEST]
+type = "integer"
+value = 1
+
+[ALLIANCE_HELP_RESPONSE]
+type = "integer"
+value = 2
+
+[ALLIANCE_SHARED_XP]
+type = "integer"
+value = 3
+
+[ALLIANCE_SHARED_SPELLS]
+type = "integer"
+value = 4
+
+[ALLIANCE_SHARED_VISION]
+type = "integer"
+value = 5
+
+[ALLIANCE_SHARED_CONTROL]
+type = "integer"
+value = 6
+
+[ALLIANCE_SHARED_ADVANCED_CONTROL]
+type = "integer"
+value = 7
+
+[ALLIANCE_RESCUABLE]
+type = "integer"
+value = 8
+
+[ALLIANCE_SHARED_VISION_FORCED]
+type = "integer"
+value = 9
+
+[VERSION_REIGN_OF_CHAOS]
+type = "integer"
+value = 0
+
+[VERSION_FROZEN_THRONE]
+type = "integer"
+value = 1
+
+[ATTACK_TYPE_NORMAL]
+type = "integer"
+value = 0
+
+[ATTACK_TYPE_MELEE]
+type = "integer"
+value = 1
+
+[ATTACK_TYPE_PIERCE]
+type = "integer"
+value = 2
+
+[ATTACK_TYPE_SIEGE]
+type = "integer"
+value = 3
+
+[ATTACK_TYPE_MAGIC]
+type = "integer"
+value = 4
+
+[ATTACK_TYPE_CHAOS]
+type = "integer"
+value = 5
+
+[ATTACK_TYPE_HERO]
+type = "integer"
+value = 6
+
+[DAMAGE_TYPE_UNKNOWN]
+type = "integer"
+value = 0
+
+[DAMAGE_TYPE_NORMAL]
+type = "integer"
+value = 4
+
+[DAMAGE_TYPE_ENHANCED]
+type = "integer"
+value = 5
+
+[DAMAGE_TYPE_FIRE]
+type = "integer"
+value = 8
+
+[DAMAGE_TYPE_COLD]
+type = "integer"
+value = 9
+
+[DAMAGE_TYPE_LIGHTNING]
+type = "integer"
+value = 10
+
+[DAMAGE_TYPE_POISON]
+type = "integer"
+value = 11
+
+[DAMAGE_TYPE_DISEASE]
+type = "integer"
+value = 12
+
+[DAMAGE_TYPE_DIVINE]
+type = "integer"
+value = 13
+
+[DAMAGE_TYPE_MAGIC]
+type = "integer"
+value = 14
+
+[DAMAGE_TYPE_SONIC]
+type = "integer"
+value = 15
+
+[DAMAGE_TYPE_ACID]
+type = "integer"
+value = 16
+
+[DAMAGE_TYPE_FORCE]
+type = "integer"
+value = 17
+
+[DAMAGE_TYPE_DEATH]
+type = "integer"
+value = 18
+
+[DAMAGE_TYPE_MIND]
+type = "integer"
+value = 19
+
+[DAMAGE_TYPE_PLANT]
+type = "integer"
+value = 20
+
+[DAMAGE_TYPE_DEFENSIVE]
+type = "integer"
+value = 21
+
+[DAMAGE_TYPE_DEMOLITION]
+type = "integer"
+value = 22
+
+[DAMAGE_TYPE_SLOW_POISON]
+type = "integer"
+value = 23
+
+[DAMAGE_TYPE_SPIRIT_LINK]
+type = "integer"
+value = 24
+
+[DAMAGE_TYPE_SHADOW_STRIKE]
+type = "integer"
+value = 25
+
+[DAMAGE_TYPE_UNIVERSAL]
+type = "integer"
+value = 26
+
+[WEAPON_TYPE_WHOKNOWS]
+type = "integer"
+value = 0
+
+[WEAPON_TYPE_METAL_LIGHT_CHOP]
+type = "integer"
+value = 1
+
+[WEAPON_TYPE_METAL_MEDIUM_CHOP]
+type = "integer"
+value = 2
+
+[WEAPON_TYPE_METAL_HEAVY_CHOP]
+type = "integer"
+value = 3
+
+[WEAPON_TYPE_METAL_LIGHT_SLICE]
+type = "integer"
+value = 4
+
+[WEAPON_TYPE_METAL_MEDIUM_SLICE]
+type = "integer"
+value = 5
+
+[WEAPON_TYPE_METAL_HEAVY_SLICE]
+type = "integer"
+value = 6
+
+[WEAPON_TYPE_METAL_MEDIUM_BASH]
+type = "integer"
+value = 7
+
+[WEAPON_TYPE_METAL_HEAVY_BASH]
+type = "integer"
+value = 8
+
+[WEAPON_TYPE_METAL_MEDIUM_STAB]
+type = "integer"
+value = 9
+
+[WEAPON_TYPE_METAL_HEAVY_STAB]
+type = "integer"
+value = 10
+
+[WEAPON_TYPE_WOOD_LIGHT_SLICE]
+type = "integer"
+value = 11
+
+[WEAPON_TYPE_WOOD_MEDIUM_SLICE]
+type = "integer"
+value = 12
+
+[WEAPON_TYPE_WOOD_HEAVY_SLICE]
+type = "integer"
+value = 13
+
+[WEAPON_TYPE_WOOD_LIGHT_BASH]
+type = "integer"
+value = 14
+
+[WEAPON_TYPE_WOOD_MEDIUM_BASH]
+type = "integer"
+value = 15
+
+[WEAPON_TYPE_WOOD_HEAVY_BASH]
+type = "integer"
+value = 16
+
+[WEAPON_TYPE_WOOD_LIGHT_STAB]
+type = "integer"
+value = 17
+
+[WEAPON_TYPE_WOOD_MEDIUM_STAB]
+type = "integer"
+value = 18
+
+[WEAPON_TYPE_CLAW_LIGHT_SLICE]
+type = "integer"
+value = 19
+
+[WEAPON_TYPE_CLAW_MEDIUM_SLICE]
+type = "integer"
+value = 20
+
+[WEAPON_TYPE_CLAW_HEAVY_SLICE]
+type = "integer"
+value = 21
+
+[WEAPON_TYPE_AXE_MEDIUM_CHOP]
+type = "integer"
+value = 22
+
+[WEAPON_TYPE_ROCK_HEAVY_BASH]
+type = "integer"
+value = 23
+
+[PATHING_TYPE_ANY]
+type = "integer"
+value = 0
+
+[PATHING_TYPE_WALKABILITY]
+type = "integer"
+value = 1
+
+[PATHING_TYPE_FLYABILITY]
+type = "integer"
+value = 2
+
+[PATHING_TYPE_BUILDABILITY]
+type = "integer"
+value = 3
+
+[PATHING_TYPE_PEONHARVESTPATHING]
+type = "integer"
+value = 4
+
+[PATHING_TYPE_BLIGHTPATHING]
+type = "integer"
+value = 5
+
+[PATHING_TYPE_FLOATABILITY]
+type = "integer"
+value = 6
+
+[PATHING_TYPE_AMPHIBIOUSPATHING]
+type = "integer"
+value = 7
+
+[RACE_PREF_HUMAN]
+type = "integer"
+value = 1
+
+[RACE_PREF_ORC]
+type = "integer"
+value = 2
+
+[RACE_PREF_NIGHTELF]
+type = "integer"
+value = 4
+
+[RACE_PREF_UNDEAD]
+type = "integer"
+value = 8
+
+[RACE_PREF_DEMON]
+type = "integer"
+value = 16
+
+[RACE_PREF_RANDOM]
+type = "integer"
+value = 32
+
+[RACE_PREF_USER_SELECTABLE]
+type = "integer"
+value = 64
+
+[MAP_CONTROL_USER]
+type = "integer"
+value = 0
+
+[MAP_CONTROL_COMPUTER]
+type = "integer"
+value = 1
+
+[MAP_CONTROL_RESCUABLE]
+type = "integer"
+value = 2
+
+[MAP_CONTROL_NEUTRAL]
+type = "integer"
+value = 3
+
+[MAP_CONTROL_CREEP]
+type = "integer"
+value = 4
+
+[MAP_CONTROL_NONE]
+type = "integer"
+value = 5
+
+[GAME_TYPE_MELEE]
+type = "integer"
+value = 1
+
+[GAME_TYPE_FFA]
+type = "integer"
+value = 2
+
+[GAME_TYPE_USE_MAP_SETTINGS]
+type = "integer"
+value = 4
+
+[GAME_TYPE_BLIZ]
+type = "integer"
+value = 8
+
+[GAME_TYPE_ONE_ON_ONE]
+type = "integer"
+value = 16
+
+[GAME_TYPE_TWO_TEAM_PLAY]
+type = "integer"
+value = 32
+
+[GAME_TYPE_THREE_TEAM_PLAY]
+type = "integer"
+value = 64
+
+[GAME_TYPE_FOUR_TEAM_PLAY]
+type = "integer"
+value = 128
+
+[MAP_FOG_HIDE_TERRAIN]
+type = "integer"
+value = 1
+
+[MAP_FOG_MAP_EXPLORED]
+type = "integer"
+value = 2
+
+[MAP_FOG_ALWAYS_VISIBLE]
+type = "integer"
+value = 4
+
+[MAP_USE_HANDICAPS]
+type = "integer"
+value = 8
+
+[MAP_OBSERVERS]
+type = "integer"
+value = 16
+
+[MAP_OBSERVERS_ON_DEATH]
+type = "integer"
+value = 32
+
+[MAP_FIXED_COLORS]
+type = "integer"
+value = 128
+
+[MAP_LOCK_RESOURCE_TRADING]
+type = "integer"
+value = 256
+
+[MAP_RESOURCE_TRADING_ALLIES_ONLY]
+type = "integer"
+value = 512
+
+[MAP_LOCK_ALLIANCE_CHANGES]
+type = "integer"
+value = 1024
+
+[MAP_ALLIANCE_CHANGES_HIDDEN]
+type = "integer"
+value = 2048
+
+[MAP_CHEATS]
+type = "integer"
+value = 4096
+
+[MAP_CHEATS_HIDDEN]
+type = "integer"
+value = 8192
+
+[MAP_LOCK_SPEED]
+type = "integer"
+value = nil
+
+[MAP_LOCK_RANDOM_SEED]
+type = "integer"
+value = nil
+
+[MAP_SHARED_ADVANCED_CONTROL]
+type = "integer"
+value = nil
+
+[MAP_RANDOM_HERO]
+type = "integer"
+value = nil
+
+[MAP_RANDOM_RACES]
+type = "integer"
+value = nil
+
+[MAP_RELOADED]
+type = "integer"
+value = nil
+
+[MAP_PLACEMENT_RANDOM]
+type = "integer"
+value = 0
+
+[MAP_PLACEMENT_FIXED]
+type = "integer"
+value = 1
+
+[MAP_PLACEMENT_USE_MAP_SETTINGS]
+type = "integer"
+value = 2
+
+[MAP_PLACEMENT_TEAMS_TOGETHER]
+type = "integer"
+value = 3
+
+[MAP_LOC_PRIO_LOW]
+type = "integer"
+value = 0
+
+[MAP_LOC_PRIO_HIGH]
+type = "integer"
+value = 1
+
+[MAP_LOC_PRIO_NOT]
+type = "integer"
+value = 2
+
+[MAP_DENSITY_NONE]
+type = "integer"
+value = 0
+
+[MAP_DENSITY_LIGHT]
+type = "integer"
+value = 1
+
+[MAP_DENSITY_MEDIUM]
+type = "integer"
+value = 2
+
+[MAP_DENSITY_HEAVY]
+type = "integer"
+value = 3
+
+[MAP_DIFFICULTY_EASY]
+type = "integer"
+value = 0
+
+[MAP_DIFFICULTY_NORMAL]
+type = "integer"
+value = 1
+
+[MAP_DIFFICULTY_HARD]
+type = "integer"
+value = 2
+
+[MAP_DIFFICULTY_INSANE]
+type = "integer"
+value = 3
+
+[MAP_SPEED_SLOWEST]
+type = "integer"
+value = 0
+
+[MAP_SPEED_SLOW]
+type = "integer"
+value = 1
+
+[MAP_SPEED_NORMAL]
+type = "integer"
+value = 2
+
+[MAP_SPEED_FAST]
+type = "integer"
+value = 3
+
+[MAP_SPEED_FASTEST]
+type = "integer"
+value = 4
+
+[PLAYER_SLOT_STATE_EMPTY]
+type = "integer"
+value = 0
+
+[PLAYER_SLOT_STATE_PLAYING]
+type = "integer"
+value = 1
+
+[PLAYER_SLOT_STATE_LEFT]
+type = "integer"
+value = 2
+
+[SOUND_VOLUMEGROUP_UNITMOVEMENT]
+type = "integer"
+value = 0
+
+[SOUND_VOLUMEGROUP_UNITSOUNDS]
+type = "integer"
+value = 1
+
+[SOUND_VOLUMEGROUP_COMBAT]
+type = "integer"
+value = 2
+
+[SOUND_VOLUMEGROUP_SPELLS]
+type = "integer"
+value = 3
+
+[SOUND_VOLUMEGROUP_UI]
+type = "integer"
+value = 4
+
+[SOUND_VOLUMEGROUP_MUSIC]
+type = "integer"
+value = 5
+
+[SOUND_VOLUMEGROUP_AMBIENTSOUNDS]
+type = "integer"
+value = 6
+
+[SOUND_VOLUMEGROUP_FIRE]
+type = "integer"
+value = 7
+
+[GAME_STATE_DIVINE_INTERVENTION]
+type = "integer"
+value = 0
+
+[GAME_STATE_DISCONNECTED]
+type = "integer"
+value = 1
+
+[GAME_STATE_TIME_OF_DAY]
+type = "integer"
+value = 2
+
+[PLAYER_STATE_GAME_RESULT]
+type = "integer"
+value = 0
+
+[PLAYER_STATE_RESOURCE_GOLD]
+type = "integer"
+value = 1
+
+[PLAYER_STATE_RESOURCE_LUMBER]
+type = "integer"
+value = 2
+
+[PLAYER_STATE_RESOURCE_HERO_TOKENS]
+type = "integer"
+value = 3
+
+[PLAYER_STATE_RESOURCE_FOOD_CAP]
+type = "integer"
+value = 4
+
+[PLAYER_STATE_RESOURCE_FOOD_USED]
+type = "integer"
+value = 5
+
+[PLAYER_STATE_FOOD_CAP_CEILING]
+type = "integer"
+value = 6
+
+[PLAYER_STATE_GIVES_BOUNTY]
+type = "integer"
+value = 7
+
+[PLAYER_STATE_ALLIED_VICTORY]
+type = "integer"
+value = 8
+
+[PLAYER_STATE_PLACED]
+type = "integer"
+value = 9
+
+[PLAYER_STATE_OBSERVER_ON_DEATH]
+type = "integer"
+value = 10
+
+[PLAYER_STATE_OBSERVER]
+type = "integer"
+value = 11
+
+[PLAYER_STATE_UNFOLLOWABLE]
+type = "integer"
+value = 12
+
+[PLAYER_STATE_GOLD_UPKEEP_RATE]
+type = "integer"
+value = 13
+
+[PLAYER_STATE_LUMBER_UPKEEP_RATE]
+type = "integer"
+value = 14
+
+[PLAYER_STATE_GOLD_GATHERED]
+type = "integer"
+value = 15
+
+[PLAYER_STATE_LUMBER_GATHERED]
+type = "integer"
+value = 16
+
+[PLAYER_STATE_NO_CREEP_SLEEP]
+type = "integer"
+value = 25
+
+[UNIT_STATE_LIFE]
+type = "integer"
+value = 0
+
+[UNIT_STATE_MAX_LIFE]
+type = "integer"
+value = 1
+
+[UNIT_STATE_MANA]
+type = "integer"
+value = 2
+
+[UNIT_STATE_MAX_MANA]
+type = "integer"
+value = 3
+
+[AI_DIFFICULTY_NEWBIE]
+type = "integer"
+value = 0
+
+[AI_DIFFICULTY_NORMAL]
+type = "integer"
+value = 1
+
+[AI_DIFFICULTY_INSANE]
+type = "integer"
+value = 2
+
+[PLAYER_SCORE_UNITS_TRAINED]
+type = "integer"
+value = 0
+
+[PLAYER_SCORE_UNITS_KILLED]
+type = "integer"
+value = 1
+
+[PLAYER_SCORE_STRUCT_BUILT]
+type = "integer"
+value = 2
+
+[PLAYER_SCORE_STRUCT_RAZED]
+type = "integer"
+value = 3
+
+[PLAYER_SCORE_TECH_PERCENT]
+type = "integer"
+value = 4
+
+[PLAYER_SCORE_FOOD_MAXPROD]
+type = "integer"
+value = 5
+
+[PLAYER_SCORE_FOOD_MAXUSED]
+type = "integer"
+value = 6
+
+[PLAYER_SCORE_HEROES_KILLED]
+type = "integer"
+value = 7
+
+[PLAYER_SCORE_ITEMS_GAINED]
+type = "integer"
+value = 8
+
+[PLAYER_SCORE_MERCS_HIRED]
+type = "integer"
+value = 9
+
+[PLAYER_SCORE_GOLD_MINED_TOTAL]
+type = "integer"
+value = 10
+
+[PLAYER_SCORE_GOLD_MINED_UPKEEP]
+type = "integer"
+value = 11
+
+[PLAYER_SCORE_GOLD_LOST_UPKEEP]
+type = "integer"
+value = 12
+
+[PLAYER_SCORE_GOLD_LOST_TAX]
+type = "integer"
+value = 13
+
+[PLAYER_SCORE_GOLD_GIVEN]
+type = "integer"
+value = 14
+
+[PLAYER_SCORE_GOLD_RECEIVED]
+type = "integer"
+value = 15
+
+[PLAYER_SCORE_LUMBER_TOTAL]
+type = "integer"
+value = 16
+
+[PLAYER_SCORE_LUMBER_LOST_UPKEEP]
+type = "integer"
+value = 17
+
+[PLAYER_SCORE_LUMBER_LOST_TAX]
+type = "integer"
+value = 18
+
+[PLAYER_SCORE_LUMBER_GIVEN]
+type = "integer"
+value = 19
+
+[PLAYER_SCORE_LUMBER_RECEIVED]
+type = "integer"
+value = 20
+
+[PLAYER_SCORE_UNIT_TOTAL]
+type = "integer"
+value = 21
+
+[PLAYER_SCORE_HERO_TOTAL]
+type = "integer"
+value = 22
+
+[PLAYER_SCORE_RESOURCE_TOTAL]
+type = "integer"
+value = 23
+
+[PLAYER_SCORE_TOTAL]
+type = "integer"
+value = 24
+
+[EVENT_GAME_VICTORY]
+type = "integer"
+value = 0
+
+[EVENT_GAME_END_LEVEL]
+type = "integer"
+value = 1
+
+[EVENT_GAME_VARIABLE_LIMIT]
+type = "integer"
+value = 2
+
+[EVENT_GAME_STATE_LIMIT]
+type = "integer"
+value = 3
+
+[EVENT_GAME_TIMER_EXPIRED]
+type = "integer"
+value = 4
+
+[EVENT_GAME_ENTER_REGION]
+type = "integer"
+value = 5
+
+[EVENT_GAME_LEAVE_REGION]
+type = "integer"
+value = 6
+
+[EVENT_GAME_TRACKABLE_HIT]
+type = "integer"
+value = 7
+
+[EVENT_GAME_TRACKABLE_TRACK]
+type = "integer"
+value = 8
+
+[EVENT_GAME_SHOW_SKILL]
+type = "integer"
+value = 9
+
+[EVENT_GAME_BUILD_SUBMENU]
+type = "integer"
+value = 10
+
+[EVENT_PLAYER_STATE_LIMIT]
+type = "integer"
+value = 11
+
+[EVENT_PLAYER_ALLIANCE_CHANGED]
+type = "integer"
+value = 12
+
+[EVENT_PLAYER_DEFEAT]
+type = "integer"
+value = 13
+
+[EVENT_PLAYER_VICTORY]
+type = "integer"
+value = 14
+
+[EVENT_PLAYER_LEAVE]
+type = "integer"
+value = 15
+
+[EVENT_PLAYER_CHAT]
+type = "integer"
+value = 16
+
+[EVENT_PLAYER_END_CINEMATIC]
+type = "integer"
+value = 17
+
+[EVENT_PLAYER_UNIT_ATTACKED]
+type = "integer"
+value = 18
+
+[EVENT_PLAYER_UNIT_RESCUED]
+type = "integer"
+value = 19
+
+[EVENT_PLAYER_UNIT_DEATH]
+type = "integer"
+value = 20
+
+[EVENT_PLAYER_UNIT_DECAY]
+type = "integer"
+value = 21
+
+[EVENT_PLAYER_UNIT_DETECTED]
+type = "integer"
+value = 22
+
+[EVENT_PLAYER_UNIT_HIDDEN]
+type = "integer"
+value = 23
+
+[EVENT_PLAYER_UNIT_SELECTED]
+type = "integer"
+value = 24
+
+[EVENT_PLAYER_UNIT_DESELECTED]
+type = "integer"
+value = 25
+
+[EVENT_PLAYER_UNIT_CONSTRUCT_START]
+type = "integer"
+value = 26
+
+[EVENT_PLAYER_UNIT_CONSTRUCT_CANCEL]
+type = "integer"
+value = 27
+
+[EVENT_PLAYER_UNIT_CONSTRUCT_FINISH]
+type = "integer"
+value = 28
+
+[EVENT_PLAYER_UNIT_UPGRADE_START]
+type = "integer"
+value = 29
+
+[EVENT_PLAYER_UNIT_UPGRADE_CANCEL]
+type = "integer"
+value = 30
+
+[EVENT_PLAYER_UNIT_UPGRADE_FINISH]
+type = "integer"
+value = 31
+
+[EVENT_PLAYER_UNIT_TRAIN_START]
+type = "integer"
+value = 32
+
+[EVENT_PLAYER_UNIT_TRAIN_CANCEL]
+type = "integer"
+value = 33
+
+[EVENT_PLAYER_UNIT_TRAIN_FINISH]
+type = "integer"
+value = 34
+
+[EVENT_PLAYER_UNIT_RESEARCH_START]
+type = "integer"
+value = 35
+
+[EVENT_PLAYER_UNIT_RESEARCH_CANCEL]
+type = "integer"
+value = 36
+
+[EVENT_PLAYER_UNIT_RESEARCH_FINISH]
+type = "integer"
+value = 37
+
+[EVENT_PLAYER_UNIT_ISSUED_ORDER]
+type = "integer"
+value = 38
+
+[EVENT_PLAYER_UNIT_ISSUED_POINT_ORDER]
+type = "integer"
+value = 39
+
+[EVENT_PLAYER_UNIT_ISSUED_TARGET_ORDER]
+type = "integer"
+value = 40
+
+[EVENT_PLAYER_UNIT_ISSUED_UNIT_ORDER]
+type = "integer"
+value = 40
+
+[EVENT_PLAYER_HERO_LEVEL]
+type = "integer"
+value = 41
+
+[EVENT_PLAYER_HERO_SKILL]
+type = "integer"
+value = 42
+
+[EVENT_PLAYER_HERO_REVIVABLE]
+type = "integer"
+value = 43
+
+[EVENT_PLAYER_HERO_REVIVE_START]
+type = "integer"
+value = 44
+
+[EVENT_PLAYER_HERO_REVIVE_CANCEL]
+type = "integer"
+value = 45
+
+[EVENT_PLAYER_HERO_REVIVE_FINISH]
+type = "integer"
+value = 46
+
+[EVENT_PLAYER_UNIT_SUMMON]
+type = "integer"
+value = 47
+
+[EVENT_PLAYER_UNIT_DROP_ITEM]
+type = "integer"
+value = 48
+
+[EVENT_PLAYER_UNIT_PICKUP_ITEM]
+type = "integer"
+value = 49
+
+[EVENT_PLAYER_UNIT_USE_ITEM]
+type = "integer"
+value = 50
+
+[EVENT_PLAYER_UNIT_LOADED]
+type = "integer"
+value = 51
+
+[EVENT_UNIT_DAMAGED]
+type = "integer"
+value = 52
+
+[EVENT_UNIT_DEATH]
+type = "integer"
+value = 53
+
+[EVENT_UNIT_DECAY]
+type = "integer"
+value = 54
+
+[EVENT_UNIT_DETECTED]
+type = "integer"
+value = 55
+
+[EVENT_UNIT_HIDDEN]
+type = "integer"
+value = 56
+
+[EVENT_UNIT_SELECTED]
+type = "integer"
+value = 57
+
+[EVENT_UNIT_DESELECTED]
+type = "integer"
+value = 58
+
+[EVENT_UNIT_STATE_LIMIT]
+type = "integer"
+value = 59
+
+[EVENT_UNIT_ACQUIRED_TARGET]
+type = "integer"
+value = 60
+
+[EVENT_UNIT_TARGET_IN_RANGE]
+type = "integer"
+value = 61
+
+[EVENT_UNIT_ATTACKED]
+type = "integer"
+value = 62
+
+[EVENT_UNIT_RESCUED]
+type = "integer"
+value = 63
+
+[EVENT_UNIT_CONSTRUCT_CANCEL]
+type = "integer"
+value = 64
+
+[EVENT_UNIT_CONSTRUCT_FINISH]
+type = "integer"
+value = 65
+
+[EVENT_UNIT_UPGRADE_START]
+type = "integer"
+value = 66
+
+[EVENT_UNIT_UPGRADE_CANCEL]
+type = "integer"
+value = 67
+
+[EVENT_UNIT_UPGRADE_FINISH]
+type = "integer"
+value = 68
+
+[EVENT_UNIT_TRAIN_START]
+type = "integer"
+value = 69
+
+[EVENT_UNIT_TRAIN_CANCEL]
+type = "integer"
+value = 70
+
+[EVENT_UNIT_TRAIN_FINISH]
+type = "integer"
+value = 71
+
+[EVENT_UNIT_RESEARCH_START]
+type = "integer"
+value = 72
+
+[EVENT_UNIT_RESEARCH_CANCEL]
+type = "integer"
+value = 73
+
+[EVENT_UNIT_RESEARCH_FINISH]
+type = "integer"
+value = 74
+
+[EVENT_UNIT_ISSUED_ORDER]
+type = "integer"
+value = 75
+
+[EVENT_UNIT_ISSUED_POINT_ORDER]
+type = "integer"
+value = 76
+
+[EVENT_UNIT_ISSUED_TARGET_ORDER]
+type = "integer"
+value = 77
+
+[EVENT_UNIT_HERO_LEVEL]
+type = "integer"
+value = 78
+
+[EVENT_UNIT_HERO_SKILL]
+type = "integer"
+value = 79
+
+[EVENT_UNIT_HERO_REVIVABLE]
+type = "integer"
+value = 80
+
+[EVENT_UNIT_HERO_REVIVE_START]
+type = "integer"
+value = 81
+
+[EVENT_UNIT_HERO_REVIVE_CANCEL]
+type = "integer"
+value = 82
+
+[EVENT_UNIT_HERO_REVIVE_FINISH]
+type = "integer"
+value = 83
+
+[EVENT_UNIT_SUMMON]
+type = "integer"
+value = 84
+
+[EVENT_UNIT_DROP_ITEM]
+type = "integer"
+value = 85
+
+[EVENT_UNIT_PICKUP_ITEM]
+type = "integer"
+value = 86
+
+[EVENT_UNIT_USE_ITEM]
+type = "integer"
+value = 87
+
+[EVENT_UNIT_LOADED]
+type = "integer"
+value = 88
+
+[EVENT_WIDGET_DEATH]
+type = "integer"
+value = 89
+
+[EVENT_DIALOG_BUTTON_CLICK]
+type = "integer"
+value = 90
+
+[EVENT_DIALOG_CLICK]
+type = "integer"
+value = 91
+
+[EVENT_GAME_LOADED]
+type = "integer"
+value = 256
+
+[EVENT_GAME_TOURNAMENT_FINISH_SOON]
+type = "integer"
+value = 257
+
+[EVENT_GAME_TOURNAMENT_FINISH_NOW]
+type = "integer"
+value = 258
+
+[EVENT_GAME_SAVE]
+type = "integer"
+value = 259
+
+[EVENT_PLAYER_ARROW_LEFT_DOWN]
+type = "integer"
+value = 261
+
+[EVENT_PLAYER_ARROW_LEFT_UP]
+type = "integer"
+value = 262
+
+[EVENT_PLAYER_ARROW_RIGHT_DOWN]
+type = "integer"
+value = 263
+
+[EVENT_PLAYER_ARROW_RIGHT_UP]
+type = "integer"
+value = 264
+
+[EVENT_PLAYER_ARROW_DOWN_DOWN]
+type = "integer"
+value = 265
+
+[EVENT_PLAYER_ARROW_DOWN_UP]
+type = "integer"
+value = 266
+
+[EVENT_PLAYER_ARROW_UP_DOWN]
+type = "integer"
+value = 267
+
+[EVENT_PLAYER_ARROW_UP_UP]
+type = "integer"
+value = 268
+
+[EVENT_PLAYER_UNIT_SELL]
+type = "integer"
+value = 269
+
+[EVENT_PLAYER_UNIT_CHANGE_OWNER]
+type = "integer"
+value = 270
+
+[EVENT_PLAYER_UNIT_SELL_ITEM]
+type = "integer"
+value = 271
+
+[EVENT_PLAYER_UNIT_SPELL_CHANNEL]
+type = "integer"
+value = 272
+
+[EVENT_PLAYER_UNIT_SPELL_CAST]
+type = "integer"
+value = 273
+
+[EVENT_PLAYER_UNIT_SPELL_EFFECT]
+type = "integer"
+value = 274
+
+[EVENT_PLAYER_UNIT_SPELL_FINISH]
+type = "integer"
+value = 275
+
+[EVENT_PLAYER_UNIT_SPELL_ENDCAST]
+type = "integer"
+value = 276
+
+[EVENT_PLAYER_UNIT_PAWN_ITEM]
+type = "integer"
+value = 277
+
+[EVENT_UNIT_SELL]
+type = "integer"
+value = 286
+
+[EVENT_UNIT_CHANGE_OWNER]
+type = "integer"
+value = 287
+
+[EVENT_UNIT_SELL_ITEM]
+type = "integer"
+value = 288
+
+[EVENT_UNIT_SPELL_CHANNEL]
+type = "integer"
+value = 289
+
+[EVENT_UNIT_SPELL_CAST]
+type = "integer"
+value = 290
+
+[EVENT_UNIT_SPELL_EFFECT]
+type = "integer"
+value = 291
+
+[EVENT_UNIT_SPELL_FINISH]
+type = "integer"
+value = 292
+
+[EVENT_UNIT_SPELL_ENDCAST]
+type = "integer"
+value = 293
+
+[EVENT_UNIT_PAWN_ITEM]
+type = "integer"
+value = 294
+
+[LESS_THAN]
+type = "integer"
+value = 0
+
+[LESS_THAN_OR_EQUAL]
+type = "integer"
+value = 1
+
+[EQUAL]
+type = "integer"
+value = 2
+
+[GREATER_THAN_OR_EQUAL]
+type = "integer"
+value = 3
+
+[GREATER_THAN]
+type = "integer"
+value = 4
+
+[NOT_EQUAL]
+type = "integer"
+value = 5
+
+[UNIT_TYPE_HERO]
+type = "integer"
+value = 0
+
+[UNIT_TYPE_DEAD]
+type = "integer"
+value = 1
+
+[UNIT_TYPE_STRUCTURE]
+type = "integer"
+value = 2
+
+[UNIT_TYPE_FLYING]
+type = "integer"
+value = 3
+
+[UNIT_TYPE_GROUND]
+type = "integer"
+value = 4
+
+[UNIT_TYPE_ATTACKS_FLYING]
+type = "integer"
+value = 5
+
+[UNIT_TYPE_ATTACKS_GROUND]
+type = "integer"
+value = 6
+
+[UNIT_TYPE_MELEE_ATTACKER]
+type = "integer"
+value = 7
+
+[UNIT_TYPE_RANGED_ATTACKER]
+type = "integer"
+value = 8
+
+[UNIT_TYPE_GIANT]
+type = "integer"
+value = 9
+
+[UNIT_TYPE_SUMMONED]
+type = "integer"
+value = 10
+
+[UNIT_TYPE_STUNNED]
+type = "integer"
+value = 11
+
+[UNIT_TYPE_PLAGUED]
+type = "integer"
+value = 12
+
+[UNIT_TYPE_SNARED]
+type = "integer"
+value = 13
+
+[UNIT_TYPE_UNDEAD]
+type = "integer"
+value = 14
+
+[UNIT_TYPE_MECHANICAL]
+type = "integer"
+value = 15
+
+[UNIT_TYPE_PEON]
+type = "integer"
+value = 16
+
+[UNIT_TYPE_SAPPER]
+type = "integer"
+value = 17
+
+[UNIT_TYPE_TOWNHALL]
+type = "integer"
+value = 18
+
+[UNIT_TYPE_ANCIENT]
+type = "integer"
+value = 19
+
+[UNIT_TYPE_TAUREN]
+type = "integer"
+value = 20
+
+[UNIT_TYPE_POISONED]
+type = "integer"
+value = 21
+
+[UNIT_TYPE_POLYMORPHED]
+type = "integer"
+value = 22
+
+[UNIT_TYPE_SLEEPING]
+type = "integer"
+value = 23
+
+[UNIT_TYPE_RESISTANT]
+type = "integer"
+value = 24
+
+[UNIT_TYPE_ETHEREAL]
+type = "integer"
+value = 25
+
+[UNIT_TYPE_MAGIC_IMMUNE]
+type = "integer"
+value = 26
+
+[ITEM_TYPE_PERMANENT]
+type = "integer"
+value = 0
+
+[ITEM_TYPE_CHARGED]
+type = "integer"
+value = 1
+
+[ITEM_TYPE_POWERUP]
+type = "integer"
+value = 2
+
+[ITEM_TYPE_ARTIFACT]
+type = "integer"
+value = 3
+
+[ITEM_TYPE_PURCHASABLE]
+type = "integer"
+value = 4
+
+[ITEM_TYPE_CAMPAIGN]
+type = "integer"
+value = 5
+
+[ITEM_TYPE_MISCELLANEOUS]
+type = "integer"
+value = 6
+
+[ITEM_TYPE_UNKNOWN]
+type = "integer"
+value = 7
+
+[ITEM_TYPE_ANY]
+type = "integer"
+value = 8
+
+[ITEM_TYPE_TOME]
+type = "integer"
+value = 2
+
+[CAMERA_FIELD_TARGET_DISTANCE]
+type = "integer"
+value = 0
+
+[CAMERA_FIELD_FARZ]
+type = "integer"
+value = 1
+
+[CAMERA_FIELD_ANGLE_OF_ATTACK]
+type = "integer"
+value = 2
+
+[CAMERA_FIELD_FIELD_OF_VIEW]
+type = "integer"
+value = 3
+
+[CAMERA_FIELD_ROLL]
+type = "integer"
+value = 4
+
+[CAMERA_FIELD_ROTATION]
+type = "integer"
+value = 5
+
+[CAMERA_FIELD_ZOFFSET]
+type = "integer"
+value = 6
+
+[BLEND_MODE_NONE]
+type = "integer"
+value = 0
+
+[BLEND_MODE_DONT_CARE]
+type = "integer"
+value = 0
+
+[BLEND_MODE_KEYALPHA]
+type = "integer"
+value = 1
+
+[BLEND_MODE_BLEND]
+type = "integer"
+value = 2
+
+[BLEND_MODE_ADDITIVE]
+type = "integer"
+value = 3
+
+[BLEND_MODE_MODULATE]
+type = "integer"
+value = 4
+
+[BLEND_MODE_MODULATE_2X]
+type = "integer"
+value = 5
+
+[RARITY_FREQUENT]
+type = "integer"
+value = 0
+
+[RARITY_RARE]
+type = "integer"
+value = 1
+
+[TEXMAP_FLAG_NONE]
+type = "integer"
+value = 0
+
+[TEXMAP_FLAG_WRAP_U]
+type = "integer"
+value = 1
+
+[TEXMAP_FLAG_WRAP_V]
+type = "integer"
+value = 2
+
+[TEXMAP_FLAG_WRAP_UV]
+type = "integer"
+value = 3
+
+[FOG_OF_WAR_MASKED]
+type = "integer"
+value = 1
+
+[FOG_OF_WAR_FOGGED]
+type = "integer"
+value = 2
+
+[FOG_OF_WAR_VISIBLE]
+type = "integer"
+value = 4
+
+[CAMERA_MARGIN_LEFT]
+type = "integer"
+value = 0
+
+[CAMERA_MARGIN_RIGHT]
+type = "integer"
+value = 1
+
+[CAMERA_MARGIN_TOP]
+type = "integer"
+value = 2
+
+[CAMERA_MARGIN_BOTTOM]
+type = "integer"
+value = 3
+
+[EFFECT_TYPE_EFFECT]
+type = "integer"
+value = 0
+
+[EFFECT_TYPE_TARGET]
+type = "integer"
+value = 1
+
+[EFFECT_TYPE_CASTER]
+type = "integer"
+value = 2
+
+[EFFECT_TYPE_SPECIAL]
+type = "integer"
+value = 3
+
+[EFFECT_TYPE_AREA_EFFECT]
+type = "integer"
+value = 4
+
+[EFFECT_TYPE_MISSILE]
+type = "integer"
+value = 5
+
+[EFFECT_TYPE_LIGHTNING]
+type = "integer"
+value = 6
+
+[SOUND_TYPE_EFFECT]
+type = "integer"
+value = 0
+
+[SOUND_TYPE_EFFECT_LOOPED]
+type = "integer"
+value = 1

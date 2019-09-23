@@ -1,0 +1,123 @@
+[table]
+type = 'table'
+[[.source]]
+type = 'global'
+``````````
+type = 'library'
+name = 'table'
+
+<default>
+type = 'function'
+parent = {
+    1 = {
+        type = 'global',
+        name = 'table',
+    },
+    2 = {
+        type = 'library',
+        name = 'table',
+    }
+}
+
+[concat]
+[[.args]]
+name = 'list'
+type = 'table'
+``````````
+name = 'sep'
+type = 'string'
+optional = 'after'
+default = ''
+``````````
+name = 'i'
+type = 'integer'
+optional = 'after'
+default = 1
+``````````
+name = 'j'
+type = 'integer'
+optional = 'self'
+[[.returns]]
+type = 'string'
+
+[insert]
+[[.args]]
+name = 'list'
+type = 'table'
+``````````
+name = 'pos'
+type = 'integer'
+optional = 'self'
+``````````
+name = 'value'
+type = 'any'
+
+[maxn]
+version = {'Lua 5.1', 'LuaJIT'}
+[[.args]]
+type = table
+[[.returns]]
+type = integer
+
+[move]
+version = {'Lua 5.3', 'Lua 5.4'}
+[[.args]]
+name = 'a1'
+type = 'table'
+``````````
+name = 'f'
+type = 'integer'
+``````````
+name = 'e'
+type = 'integer'
+``````````
+name = 't'
+type = 'integer'
+``````````
+name = 'a2'
+type = 'table'
+optional = 'self'
+[[.returns]]
+name = 'a2'
+type = 'table'
+
+[pack]
+version = {'Lua 5.2', 'Lua 5.3', 'Lua 5.4'}
+[[.args]]
+type = '...'
+[[.returns]]
+type = 'table'
+
+[remove]
+[[.args]]
+name = 'list'
+type = 'table'
+``````````
+name = 'pos'
+type = 'integer'
+optional = 'self'
+[[.returns]]
+
+[sort]
+[[.args]]
+name = 'list'
+type = 'table'
+``````````
+name = 'comp'
+type = 'function'
+optional = 'self'
+
+[unpack]
+version = {'Lua 5.2', 'Lua 5.3', 'Lua 5.4'}
+[[.args]]
+name = 'list'
+type = 'table'
+``````````
+name = 'i'
+type = 'integer'
+optional = 'after'
+type = 1
+``````````
+name = 'j'
+type = 'integer'
+optional = 'self'

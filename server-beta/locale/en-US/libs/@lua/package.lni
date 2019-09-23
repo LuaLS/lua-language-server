@@ -1,0 +1,29 @@
+[config]
+description = 'A string describing some compile-time configurations for packages.'
+
+[cpath]
+description = 'The path used by `require` to search for a C loader.'
+
+[loaded]
+description = 'A table used by `require` to control which modules are already loaded.'
+
+[loaders]
+description = 'A table used by `require` to control how to load modules.'
+
+[loadlib]
+description = 'Dynamically links the host program with the C library `libname`.'
+
+[path]
+description = 'The path used by `require` to search for a Lua loader.'
+
+[preload]
+description = 'A table to store loaders for specific modules.'
+
+[searchers]
+description = 'A table used by `require` to control how to load modules.'
+
+[searchpath]
+description = 'Searches for the given `name` in the given `path`.'
+
+[seeall]
+describing = 'Sets a metatable for `module` with its `__index` field referring to the global environment, so that this module inherits values from the global environment. To be used as an option to function `module` .'

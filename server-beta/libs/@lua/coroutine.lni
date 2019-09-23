@@ -1,0 +1,112 @@
+[coroutine]
+type = 'table'
+[[.source]]
+type = 'global'
+``````````
+type = 'library'
+name = 'coroutine'
+
+<default>
+type = 'function'
+parent = {
+    1 = {
+        type = 'global',
+        name = 'coroutine',
+    },
+    2 = {
+        type = 'library',
+        name = 'coroutine',
+    }
+}
+
+[create]
+[[.args]]
+name = 'f'
+type = 'function'
+[[.returns]]
+name = 'coroutine'
+type = 'thread'
+
+[isyieldable]
+[[.returns]]
+type = 'boolean'
+
+['isyieldable Lua 5.4']
+name = isyieldable
+version = 'Lua 5.4'
+[[.args]]
+name = co
+type = thread
+optional = after
+[[.returns]]
+type = boolean
+
+[close]
+version = 'Lua 5.4'
+[[.args]]
+name = 'co'
+type = 'thread'
+[[.returns]]
+name = 'noerror'
+type = 'boolean'
+`````````
+name = 'errorobject'
+type = 'any'
+
+[resume]
+[[.args]]
+name = 'co'
+type = 'thread'
+``````````
+name = 'val1'
+optional = 'after'
+``````````
+type = '...'
+[[.returns]]
+name = 'success'
+type = 'boolean'
+``````````
+name = 'result'
+``````````
+type = '...'
+
+[running]
+[[.returns]]
+name = 'running_co'
+type = 'thread'
+``````````
+name = 'is_main'
+type = 'boolean'
+
+[status]
+[[.args]]
+name = 'co'
+type = 'thread'
+[[.returns]]
+name = 'status'
+type = 'string'
+[[.enums]]
+name = 'status'
+enum = '"running"'
+``````````
+name = 'status'
+enum = '"suspended"'
+``````````
+name = 'status'
+enum = '"normal"'
+``````````
+name = 'status'
+enum = '"dead"'
+
+[wrap]
+[[.args]]
+name = 'f'
+type = 'function'
+[[.returns]]
+type = '...'
+
+[yield]
+[[.args]]
+type = '...'
+[[.returns]]
+type = '...'

@@ -1,0 +1,176 @@
+[os]
+type = 'table'
+[[.source]]
+type = 'global'
+``````````
+type = 'library'
+name = 'os'
+
+<default>
+type = 'function'
+parent = {
+    1 = {
+        type = 'global',
+        name = 'os',
+    },
+    2 = {
+        type = 'library',
+        name = 'os',
+    }
+}
+
+[clock]
+[[.returns]]
+type = 'number'
+
+[date]
+[[.args]]
+name = 'format'
+type = 'string'
+optional = 'after'
+``````````
+name = 'time'
+type = 'integer'
+optional = 'self'
+[[.returns]]
+type = 'string'
+
+[difftime]
+[[.args]]
+name = 't2'
+type = 'integer'
+``````````
+name = 't1'
+type = 'integer'
+[[.returns]]
+type = 'integer'
+
+[execute]
+[[.args]]
+name = 'command'
+type = 'string'
+optional = 'self'
+[[.returns]]
+name = 'suc'
+type = 'boolean'
+default = 'true'
+optional = 'after'
+``````````
+name = 'type'
+type = 'string'
+``````````
+name = 'code'
+type = 'integer'
+[[.enums]]
+type = 'type'
+enum = '"exit"'
+``````````
+type = 'type'
+enum = '"signal"'
+
+['execute Lua 5.1']
+name = 'execute'
+version = {'Lua 5.1', 'LuaJIT'}
+[[.args]]
+name = 'command'
+type = 'string'
+optional = 'self'
+[[.returns]]
+name = 'code'
+type = 'integer'
+
+[exit]
+[[.args]]
+name = 'code'
+type = {'boolean', 'integer'}
+optional = 'after'
+default = true
+``````````
+name = 'close'
+type = 'boolean'
+optional = 'self'
+
+['exit Lua 5.1']
+name = 'exit'
+version = 'Lua 5.1'
+[[.args]]
+name = 'code'
+type = 'integer'
+optional = 'after'
+default = 0
+
+[getenv]
+[[.args]]
+name = 'varname'
+type = 'string'
+[[.returns]]
+type = 'string'
+
+[remove]
+[[.args]]
+name = 'filename'
+type = 'string'
+[[.returns]]
+name = 'suc'
+type = 'boolean'
+``````````
+name = 'errmsg'
+type = 'string'
+optional = 'self'
+
+[rename]
+[[.args]]
+name = 'oldname'
+type = 'string'
+``````````
+name = 'newname'
+type = 'string'
+[[.returns]]
+name = 'suc'
+type = 'boolean'
+``````````
+name = 'errmsg'
+type = 'string'
+optional = 'self'
+
+[setlocale]
+[[.args]]
+name = 'locale'
+type = 'string'
+``````````
+name = 'category'
+type = 'string'
+optional = 'self'
+[[.returns]]
+name = 'locale'
+type = 'string'
+[[.enums]]
+name = 'category'
+enum = '"all"'
+default = true
+``````````
+name = 'category'
+enum = '"collate"'
+``````````
+name = 'category'
+enum = '"ctype"'
+``````````
+name = 'category'
+enum = '"monetary"'
+``````````
+name = 'category'
+enum = '"numeric"'
+``````````
+name = 'category'
+enum = '"time"'
+
+[time]
+[[.args]]
+type = 'table'
+optional = 'self'
+[[.returns]]
+type = 'integer'
+
+[tmpname]
+[[.returns]]
+type = 'string'

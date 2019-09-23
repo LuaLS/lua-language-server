@@ -1,0 +1,340 @@
+[math]
+type = 'table'
+[[.source]]
+type = 'global'
+``````````
+type = 'library'
+name = 'math'
+
+<default>
+type = 'function'
+parent = {
+    1 = {
+        type = 'global',
+        name = 'math',
+    },
+    2 = {
+        type = 'library',
+        name = 'math',
+    }
+}
+
+[abs]
+[[.args]]
+name = 'x'
+type = 'number'
+[[.returns]]
+type = 'number'
+
+[acos]
+[[.args]]
+name = 'x'
+type = 'number'
+[[.returns]]
+type = 'number'
+
+[asin]
+[[.args]]
+name = 'x'
+type = 'number'
+[[.returns]]
+type = 'number'
+
+["atan Lua 5.1"]
+name = 'atan'
+version = {'Lua 5.1', 'Lua 5.2', 'LuaJIT'}
+[[.args]]
+name = 'y'
+type = 'number'
+[[.returns]]
+type = 'number'
+
+["atan Lua 5.3"]
+name = 'atan'
+version = {'Lua 5.3', 'Lua 5.4'}
+[[.args]]
+name = 'y'
+type = 'number'
+``````````
+name = 'x'
+type = 'number'
+optional = 'self'
+default = 1
+[[.returns]]
+type = 'number'
+
+[atan2]
+version = {'Lua 5.1', 'Lua 5.2', 'LuaJIT'}
+[[.args]]
+name = 'y'
+type = 'number'
+``````````
+name = 'x'
+type = 'number'
+[[.returns]]
+type = 'number'
+
+[ceil]
+[[.args]]
+name = 'x'
+type = 'number'
+[[.returns]]
+type = 'integer'
+
+[cos]
+[[.args]]
+name = 'x'
+type = 'number'
+[[.returns]]
+type = 'number'
+
+[cosh]
+version = {'Lua 5.1', 'Lua 5.2', 'LuaJIT'}
+[[.args]]
+name = 'x'
+type = 'number'
+[[.returns]]
+type = 'number'
+
+[deg]
+[[.args]]
+name = 'x'
+type = 'number'
+[[.returns]]
+type = 'number'
+
+[exp]
+[[.args]]
+name = 'x'
+type = 'number'
+[[.returns]]
+type = 'number'
+
+[floor]
+[[.args]]
+name = 'x'
+type = 'number'
+[[.returns]]
+type = 'integer'
+
+[fmod]
+[[.args]]
+name = 'x'
+type = 'number'
+``````````
+name = 'y'
+type = 'number'
+[[.returns]]
+type = 'number'
+
+[frexp]
+version = {'Lua 5.1', 'Lua 5.2', 'LuaJIT'}
+[[.args]]
+name = 'x'
+type = 'number'
+[[.returns]]
+name = 'm'
+type = 'number'
+``````````
+name = 'e'
+type = 'number'
+
+[huge]
+type = 'number'
+
+[ldexp]
+version = {'Lua 5.1', 'Lua 5.2', 'LuaJIT'}
+[[.args]]
+name = 'm'
+type = 'number'
+``````````
+name = 'e'
+type = 'integer'
+[[.returns]]
+type = 'number'
+
+[log]
+[[.args]]
+name = 'x'
+type = 'number'
+``````````
+name = 'base'
+type = 'number'
+optional = 'self'
+default = 'e'
+[[.returns]]
+type = 'number'
+
+['log Lua 5.1']
+name = log
+version = 'Lua 5.1'
+[[.args]]
+name = 'x'
+type = 'number'
+[[.returns]]
+type = 'number'
+
+[log10]
+version = 'Lua 5.1'
+[[.args]]
+name = 'x'
+type = 'number'
+[[.returns]]
+type = 'number'
+
+[max]
+[[.args]]
+name = 'x'
+type = 'number'
+``````````
+type = '...'
+[[.returns]]
+type = 'number'
+
+[maxinteger]
+version = {'Lua 5.3', 'Lua 5.4'}
+type = 'integer'
+
+[min]
+[[.args]]
+name = 'x'
+type = 'number'
+``````````
+type = '...'
+[[.returns]]
+type = 'number'
+
+[mininteger]
+version = {'Lua 5.3', 'Lua 5.4'}
+type = 'integer'
+
+[modf]
+[[.args]]
+name = 'x'
+type = 'number'
+[[.returns]]
+type = 'integer'
+``````````
+type = 'number'
+
+[pi]
+type = 'number'
+
+[pow]
+version = {'Lua 5.1', 'Lua 5.2', 'LuaJIT'}
+[[.args]]
+name = 'x'
+type = 'number'
+``````````
+name = 'y'
+type = 'number'
+[[.returns]]
+type = 'number'
+
+[rad]
+[[.args]]
+name = 'x'
+type = 'number'
+[[.returns]]
+type = 'number'
+
+[random]
+[[.args]]
+name = 'm'
+type = 'integer'
+optional = 'after'
+``````````
+name = 'n'
+type = 'integer'
+optional = 'self'
+[[.returns]]
+type = 'number'
+
+[randomseed]
+[[.args]]
+name = 'x'
+type = 'integer'
+
+["randomseed Lua 5.4"]
+name = 'randomseed'
+version = 'Lua 5.4'
+[[.args]]
+name = 'x'
+type = 'integer'
+optional = 'after'
+``````````
+name = 'y'
+type = 'integer'
+optional = 'after'
+default = 0
+
+[sin]
+[[.args]]
+name = 'x'
+type = 'number'
+[[.returns]]
+type = 'number'
+
+[sinh]
+version = {'Lua 5.1', 'Lua 5.2', 'LuaJIT'}
+[[.args]]
+name = 'x'
+type = 'number'
+[[.returns]]
+type = 'number'
+
+[sqrt]
+[[.args]]
+name = 'x'
+type = 'number'
+[[.returns]]
+type = 'number'
+
+[tan]
+[[.args]]
+name = 'x'
+type = 'number'
+[[.returns]]
+type = 'number'
+
+[tanh]
+version = {'Lua 5.1', 'Lua 5.2', 'LuaJIT'}
+[[.args]]
+name = 'x'
+type = 'number'
+[[.returns]]
+type = 'number'
+
+[tointeger]
+[[.args]]
+name = 'x'
+type = 'number'
+[[.returns]]
+type = 'integer'
+
+[type]
+[[.args]]
+name = 'x'
+type = 'number'
+[[.returns]]
+name = 'type'
+type = 'string'
+[[.enums]]
+name = 'type'
+enum = '"integer"'
+``````````
+name = 'type'
+enum = '"float"'
+``````````
+name = 'type'
+code = 'nil'
+
+[ult]
+[[.args]]
+name = 'm'
+type = 'integer'
+``````````
+name = 'n'
+type = 'integer'
+[[.returns]]
+type = 'boolean'

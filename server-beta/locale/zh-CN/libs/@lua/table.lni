@@ -1,0 +1,39 @@
+[concat]
+description = [[
+--------
+```lua
+return list[i]..sep..list[i+1] ··· sep..list[j]
+```
+]]
+
+[insert]
+description = '在 `list` 的位置 `pos` 处插入元素 `value`。'
+
+[maxn]
+description = '返回给定表的最大正数索引，如果表没有正数索引，则返回零。'
+
+[move]
+description = [[
+将元素从表 `a1` 移到表 `a2`。
+```lua
+a2[t],··· = a1[f],···,a1[e]
+return a2
+```
+]]
+
+[pack]
+description = '返回用所有参数以键 `1`,`2`, 等填充的新表， 并将 `"n"` 这个域设为参数的总数。'
+
+[remove]
+description = '移除 `list` 中 `pos` 位置上的元素，并返回这个被移除的值。'
+
+[sort]
+description = '在表内从 `list[1]` 到 `list[#list]` *原地* 对其间元素按指定次序排序。'
+
+[unpack]
+description = [[
+-------
+```lua
+return list[i], list[i+1], ···, list[j]
+```
+]]

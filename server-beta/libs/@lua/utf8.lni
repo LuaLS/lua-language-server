@@ -1,0 +1,174 @@
+[utf8]
+version = {'Lua 5.3', 'Lua 5.4'}
+type = 'table'
+[[.source]]
+type = 'global'
+``````````
+type = 'library'
+name = 'utf8'
+
+<default>
+version = {'Lua 5.3', 'Lua 5.4'}
+type = 'function'
+parent = {
+    1 = {
+        type = 'global',
+        name = 'utf8',
+    },
+    2 = {
+        type = 'library',
+        name = 'utf8',
+    }
+}
+
+[char]
+[[.args]]
+name = 'code'
+type = 'integer'
+``````````
+type = '...'
+[[.returns]]
+type = 'string'
+
+[charpattern]
+type = 'string'
+code = [=['[\0-\x7F\xC2-\xF4][\x80-\xBF]*']=]
+
+[codes]
+[[.args]]
+type = 'string'
+[[.returns]]
+type = 'function'
+returns = {
+    1 = {
+        name = 'p',
+        type = 'integer',
+    },
+    2 = {
+        name = 'c',
+        type = 'integer',
+    }
+}
+
+["codes Lua 5.4"]
+name = 'codes'
+version = 'Lua 5.4'
+[[.args]]
+type = 'string'
+``````````
+name = 'lax'
+type = 'boolean'
+optional = 'after'
+[[.returns]]
+type = 'function'
+returns = {
+    1 = {
+        name = 'p',
+        type = 'integer',
+    },
+    2 = {
+        name = 'c',
+        type = 'integer',
+    }
+}
+
+[codepoint]
+[[.args]]
+type = 'string'
+``````````
+name = 'i'
+type = 'integer'
+optional = 'after'
+default = 1
+``````````
+name = 'j'
+type = 'integer'
+optional = 'self'
+[[.returns]]
+name = 'code'
+type = 'integer'
+``````````
+type = '...'
+
+["codepoint Lua 5.4"]
+name = 'codepoint'
+version = 'Lua 5.4'
+[[.args]]
+type = 'string'
+``````````
+name = 'i'
+type = 'integer'
+optional = 'after'
+default = 1
+``````````
+name = 'j'
+type = 'integer'
+optional = 'after'
+``````````
+name = 'lax'
+type = 'boolean'
+optional = 'after'
+[[.returns]]
+name = 'code'
+type = 'integer'
+``````````
+type = '...'
+
+[len]
+[[.args]]
+type = 'string'
+``````````
+name = 'i'
+type = 'integer'
+optional = 'after'
+default = 1
+``````````
+name = 'j'
+type = 'integer'
+optional = 'self'
+default = -1
+[[.returns]]
+type = 'integer'
+``````````
+name = 'errpos'
+type = 'integer'
+optional = 'self'
+
+["len Lua 5.4"]
+name = 'len'
+version = 'Lua 5.4'
+[[.args]]
+type = 'string'
+``````````
+name = 'i'
+type = 'integer'
+optional = 'after'
+default = 1
+``````````
+name = 'j'
+type = 'integer'
+optional = 'after'
+default = -1
+``````````
+name = 'lax'
+type = 'boolean'
+optional = 'after'
+[[.returns]]
+type = 'integer'
+``````````
+name = 'errpos'
+type = 'integer'
+optional = 'self'
+
+[offset]
+[[.args]]
+type = 'string'
+``````````
+name = 'n'
+type = 'integer'
+``````````
+name = 'i'
+type = 'integer'
+[[.returns]]
+name = 'p'
+type = 'integer'

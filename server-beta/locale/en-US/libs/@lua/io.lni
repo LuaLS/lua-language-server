@@ -1,0 +1,230 @@
+[stdin]
+description = 'standard input.'
+
+[stdout]
+description = 'standard output.'
+
+[stderr]
+description = 'standard error.'
+
+[close]
+description = 'Close `file` or default output file.'
+
+[flush]
+description = 'Saves any written data to default output file.'
+
+[input]
+description = 'Sets `file` as the default input file.'
+
+["lines Lua 5.1"]
+description = [[
+------
+```lua
+for c in io.lines(filename, ...) do
+    body
+end
+```
+]]
+[[.enums]]
+name = 'mode'
+enum = '"*n"'
+description = 'Reads a numeral and returns it as number.'
+``````````
+name = 'mode'
+enum = '"*a"'
+description = 'Reads the whole file.'
+``````````
+name = 'mode'
+enum = '"*l"'
+description = 'Reads the next line skipping the end of line.'
+``````````
+name = 'mode'
+code = 'number'
+description = 'Reads a string with up to this number of bytes.'
+
+["lines Lua 5.3"]
+description = [[
+------
+```lua
+for c in io.lines(filename, ...) do
+    body
+end
+```
+]]
+[[.enums]]
+name = 'mode'
+enum = '"n"'
+description = 'Reads a numeral and returns it as number.'
+``````````
+name = 'mode'
+enum = '"a"'
+description = 'Reads the whole file.'
+``````````
+name = 'mode'
+enum = '"l"'
+description = 'Reads the next line skipping the end of line.'
+``````````
+name = 'mode'
+enum = '"L"'
+description = 'Reads the next line keeping the end of line.'
+``````````
+name = 'mode'
+code = 'number'
+description = 'Reads a string with up to this number of bytes.'
+
+["lines LuaJIT"]
+description = [[
+------
+```lua
+for c in io.lines(filename, ...) do
+    body
+end
+```
+]]
+[[.enums]]
+name = 'mode'
+enum = '"*n"'
+description = 'Reads a numeral and returns it as number.'
+``````````
+name = 'mode'
+enum = '"*a"'
+description = 'Reads the whole file.'
+``````````
+name = 'mode'
+enum = '"*l"'
+description = 'Reads the next line skipping the end of line.'
+``````````
+name = 'mode'
+enum = '"*L"'
+description = 'Reads the next line keeping the end of line.'
+``````````
+name = 'mode'
+code = 'number'
+description = 'Reads a string with up to this number of bytes.'
+
+[open]
+description = 'Opens a file, in the mode specified in the string `mode`.'
+[[.enums]]
+name = 'mode'
+enum = '"r"'
+description = 'Read mode.'
+``````````
+name = 'mode'
+enum = '"w"'
+description = 'Write mode.'
+``````````
+name = 'mode'
+enum = '"a"'
+description = 'Append mode.'
+``````````
+name = 'mode'
+enum = '"r+"'
+description = 'Update mode, all previous data is preserved.'
+``````````
+name = 'mode'
+enum = '"w+"'
+description = 'Update mode, all previous data is erased.'
+``````````
+name = 'mode'
+enum = '"a+"'
+description = 'Append update mode, previous data is preserved, writing is only allowed at the end of file.'
+
+[output]
+description = 'Sets `file` as the default output file.'
+
+[popen]
+description = 'Starts program prog in a separated process.'
+[[.enums]]
+name = 'mode'
+enum = '"r"'
+description = 'Read data from this program by `file`.'
+``````````
+name = 'mode'
+enum = '"w"'
+description = 'Write data to this program by `file`.'
+
+["read Lua 5.1"]
+description = 'Reads the `file`, according to the given formats, which specify what to read.'
+[[.enums]]
+name = 'mode'
+enum = '"*n"'
+description = 'Reads a numeral and returns it as number.'
+``````````
+name = 'mode'
+enum = '"*a"'
+description = 'Reads the whole file.'
+``````````
+name = 'mode'
+enum = '"*l"'
+description = 'Reads the next line skipping the end of line.'
+``````````
+name = 'mode'
+code = 'number'
+description = 'Reads a string with up to this number of bytes.'
+
+["read Lua 5.3"]
+description = 'Reads the `file`, according to the given formats, which specify what to read.'
+[[.enums]]
+name = 'mode'
+enum = '"n"'
+description = 'Reads a numeral and returns it as number.'
+``````````
+name = 'mode'
+enum = '"a"'
+description = 'Reads the whole file.'
+``````````
+name = 'mode'
+enum = '"l"'
+description = 'Reads the next line skipping the end of line.'
+``````````
+name = 'mode'
+enum = '"L"'
+description = 'Reads the next line keeping the end of line.'
+``````````
+name = 'mode'
+code = 'number'
+description = 'Reads a string with up to this number of bytes.'
+
+["read LuaJIT"]
+description = 'Reads the `file`, according to the given formats, which specify what to read.'
+[[.enums]]
+name = 'mode'
+enum = '"*n"'
+description = 'Reads a numeral and returns it as number.'
+``````````
+name = 'mode'
+enum = '"*a"'
+description = 'Reads the whole file.'
+``````````
+name = 'mode'
+enum = '"*l"'
+description = 'Reads the next line skipping the end of line.'
+``````````
+name = 'mode'
+enum = '"*L"'
+description = 'Reads the next line keeping the end of line.'
+``````````
+name = 'mode'
+code = 'number'
+description = 'Reads a string with up to this number of bytes.'
+
+[tmpfile]
+description = 'In case of success, returns a handle for a temporary file.'
+
+[type]
+description = 'Checks whether `obj` is a valid file handle.'
+[[.enums]]
+name = 'type'
+enum = '"file"'
+description = 'Is an open file handle.'
+``````````
+name = 'type'
+enum = '"closed file"'
+description = 'Is a closed file handle.'
+``````````
+name = 'type'
+code = 'nil'
+description = 'Is not a file handle.'
+
+[write]
+description = 'Writes the value of each of its arguments to default output file.'

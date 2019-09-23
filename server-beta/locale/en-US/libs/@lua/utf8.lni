@@ -1,0 +1,40 @@
+[char]
+description = 'Receives zero or more integers, converts each one to its corresponding UTF-8 byte sequence and returns a string with the concatenation of all these sequences.'
+
+[charpattern]
+description = 'The pattern which matches exactly one UTF-8 byte sequence, assuming that the subject is a valid UTF-8 string.'
+
+[codes]
+description = [[
+--------
+```lua
+for p, c in utf8.codes(s) do
+    body
+end
+```
+]]
+
+["codes Lua 5.4"]
+description = [[
+--------
+```lua
+for p, c in utf8.codes(s) do
+    body
+end
+```
+]]
+
+[codepoint]
+description = 'Returns the codepoints (as integers) from all characters in `s` that start between byte position `i` and `j` (both included).'
+
+["codepoint Lua 5.4"]
+description = 'Returns the codepoints (as integers) from all characters in `s` that start between byte position `i` and `j` (both included).'
+
+[len]
+description = 'Returns the number of UTF-8 characters in string `s` that start between positions `i` and `j` (both inclusive).'
+
+["len Lua 5.4"]
+description = 'Returns the number of UTF-8 characters in string `s` that start between positions `i` and `j` (both inclusive).'
+
+[offset]
+description = 'Returns the position (in bytes) where the encoding of the `n`-th character of `s` (counting from position `i`) starts.'

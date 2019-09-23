@@ -1,0 +1,38 @@
+[clock]
+description = 'Returns an approximation of the amount in seconds of CPU time used by the program.'
+
+[data]
+description = 'Returns a string or a table containing date and time, formatted according to the given string `format`.'
+
+[difftime]
+description = 'Returns the difference, in seconds, from time `t1` to time `t2`.'
+
+[execute]
+description = 'Passes `command` to be executed by an operating system shell.'
+
+['execute Lua 5.1']
+description = 'Passes `command` to be executed by an operating system shell.'
+
+[exit]
+description = 'Calls the ISO C function `exit` to terminate the host program.'
+
+['exit Lua 5.1']
+description = 'Calls the C function `exit` to terminate the host program.'
+
+[getenv]
+description = 'Returns the value of the process environment variable `varname`.'
+
+[remove]
+description = 'Deletes the file with the given name.'
+
+[rename]
+description = 'Renames the file or directory named `oldname` to `newname`.'
+
+[setlocale]
+description = 'Sets the current locale of the program.'
+
+[time]
+description = 'Returns the current time when called without arguments, or a time representing the local date and time specified by the given table.'
+
+[tmpname]
+description = 'Returns a string with a file name that can be used for a temporary file.'

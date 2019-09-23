@@ -1,13 +1,19 @@
-local util  = require 'utility'
-local cap   = require 'proto.capability'
-local pub   = require 'pub'
-local task  = require 'task'
-local files = require 'files'
-local proto = require 'proto.proto'
-local inte  = require 'proto.interface'
+local util      = require 'utility'
+local cap       = require 'proto.capability'
+local pub       = require 'pub'
+local task      = require 'task'
+local files     = require 'files'
+local proto     = require 'proto.proto'
+local inte      = require 'proto.interface'
+local workspace = require 'workspace'
 
 proto.on('initialize', function (params)
     --log.debug(util.dump(params))
+    if params.workspaceFolders then
+        local name = params.workspaceFolders[1].name
+        local uri  = params.workspaceFolders[1].uri
+        workspace.init(name, uri)
+    end
     return {
         capabilities = cap.initer,
     }

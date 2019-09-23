@@ -1,0 +1,230 @@
+[stdin]
+description = '标准输入。'
+
+[stdout]
+description = '标准输出。'
+
+[stderr]
+description = '标准错误。'
+
+[close]
+description = '关闭 `file` 或默认输出文件。'
+
+[flush]
+description = '将写入的数据保存到默认输出文件中。'
+
+[input]
+description = '设置 `file` 为默认输入文件。'
+
+["lines Lua 5.1"]
+description = [[
+------
+```lua
+for c in io.lines(filename, ...) do
+    body
+end
+```
+]]
+[[.enums]]
+name = 'mode'
+enum = '"*n"'
+description = '读取一个数字，根据 Lua 的转换文法返回浮点数或整数。'
+``````````
+name = 'mode'
+enum = '"*a"'
+description = '从当前位置开始读取整个文件。'
+``````````
+name = 'mode'
+enum = '"*l"'
+description = '读取一行并忽略行结束标记。'
+``````````
+name = 'mode'
+code = 'number'
+description = '读取一个不超过这个数量字节数的字符串。'
+
+["lines Lua 5.3"]
+description = [[
+------
+```lua
+for c in io.lines(filename, ...) do
+    body
+end
+```
+]]
+[[.enums]]
+name = 'mode'
+enum = '"n"'
+description = '读取一个数字，根据 Lua 的转换文法返回浮点数或整数。'
+``````````
+name = 'mode'
+enum = '"a"'
+description = '从当前位置开始读取整个文件。'
+``````````
+name = 'mode'
+enum = '"l"'
+description = '读取一行并忽略行结束标记。'
+``````````
+name = 'mode'
+enum = '"L"'
+description = '读取一行并保留行结束标记。'
+``````````
+name = 'mode'
+code = 'number'
+description = '读取一个不超过这个数量字节数的字符串。'
+
+["lines LuaJIT"]
+description = [[
+------
+```lua
+for c in io.lines(filename, ...) do
+    body
+end
+```
+]]
+[[.enums]]
+name = 'mode'
+enum = '"*n"'
+description = '读取一个数字，根据 Lua 的转换文法返回浮点数或整数。'
+``````````
+name = 'mode'
+enum = '"*a"'
+description = '从当前位置开始读取整个文件。'
+``````````
+name = 'mode'
+enum = '"*l"'
+description = '读取一行并忽略行结束标记。'
+``````````
+name = 'mode'
+enum = '"*L"'
+description = '读取一行并保留行结束标记。'
+``````````
+name = 'mode'
+code = 'number'
+description = '读取一个不超过这个数量字节数的字符串。'
+
+[open]
+description = '用字符串 `mode` 指定的模式打开一个文件。'
+[[.enums]]
+name = 'mode'
+enum = '"r"'
+description = '读模式。'
+``````````
+name = 'mode'
+enum = '"w"'
+description = '写模式。'
+``````````
+name = 'mode'
+enum = '"a"'
+description = '追加模式。'
+``````````
+name = 'mode'
+enum = '"r+"'
+description = '更新模式，所有之前的数据都保留。'
+``````````
+name = 'mode'
+enum = '"w+"'
+description = '更新模式，所有之前的数据都删除。'
+``````````
+name = 'mode'
+enum = '"a+"'
+description = '追加更新模式，所有之前的数据都保留，只允许在文件尾部做写入。'
+
+[output]
+description = '设置 `file` 为默认输出文件。'
+
+[popen]
+description = '用一个分离进程开启程序 `prog` 。'
+[[.enums]]
+name = 'mode'
+enum = '"r"'
+description = '从这个程序中读取数据。'
+``````````
+name = 'mode'
+enum = '"w"'
+description = '向这个程序写入输入。'
+
+["read Lua 5.1"]
+description = '读文件 `file`， 指定的格式决定了要读什么。'
+[[.enums]]
+name = 'mode'
+enum = '"*n"'
+description = '读取一个数字，根据 Lua 的转换文法返回浮点数或整数。'
+``````````
+name = 'mode'
+enum = '"*a"'
+description = '从当前位置开始读取整个文件。'
+``````````
+name = 'mode'
+enum = '"*l"'
+description = '读取一行并忽略行结束标记。'
+``````````
+name = 'mode'
+code = 'number'
+description = '读取一个不超过这个数量字节数的字符串。'
+
+["read Lua 5.3"]
+description = '读文件 `file`， 指定的格式决定了要读什么。'
+[[.enums]]
+name = 'mode'
+enum = '"n"'
+description = '读取一个数字，根据 Lua 的转换文法返回浮点数或整数。'
+``````````
+name = 'mode'
+enum = '"a"'
+description = '从当前位置开始读取整个文件。'
+``````````
+name = 'mode'
+enum = '"l"'
+description = '读取一行并忽略行结束标记。'
+``````````
+name = 'mode'
+enum = '"L"'
+description = '读取一行并保留行结束标记。'
+``````````
+name = 'mode'
+code = 'number'
+description = '读取一个不超过这个数量字节数的字符串。'
+
+["read LuaJIT"]
+description = '读文件 `file`， 指定的格式决定了要读什么。'
+[[.enums]]
+name = 'mode'
+enum = '"*n"'
+description = '读取一个数字，根据 Lua 的转换文法返回浮点数或整数。'
+``````````
+name = 'mode'
+enum = '"*a"'
+description = '从当前位置开始读取整个文件。'
+``````````
+name = 'mode'
+enum = '"*l"'
+description = '读取一行并忽略行结束标记。'
+``````````
+name = 'mode'
+enum = '"*L"'
+description = '读取一行并保留行结束标记。'
+``````````
+name = 'mode'
+code = 'number'
+description = '读取一个不超过这个数量字节数的字符串。'
+
+[tmpfile]
+description = '如果成功，返回一个临时文件的句柄。'
+
+[type]
+description = '检查 `obj` 是否是合法的文件句柄。'
+[[.enums]]
+name = 'type'
+enum = '"file"'
+description = '是一个打开的文件句柄。'
+``````````
+name = 'type'
+enum = '"closed file"'
+description = '是一个关闭的文件句柄。'
+``````````
+name = 'type'
+code = 'nil'
+description = '不是文件句柄。'
+
+[write]
+description = '将参数的值逐个写入默认输出文件。'

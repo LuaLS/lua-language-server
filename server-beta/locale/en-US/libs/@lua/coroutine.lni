@@ -1,0 +1,42 @@
+[create]
+description = 'Creates a new coroutine.'
+
+[isyieldable]
+description = 'Returns true when the running coroutine can yield.'
+
+['isyieldable Lua 5.4']
+description = 'Returns true when the coroutine `co` can yield. The default for `co` is the running coroutine.'
+
+[close]
+description = 'Closes coroutine `co` , closing all its pending to-be-closed variables and putting the coroutine in a dead state.'
+
+[resume]
+description = 'Starts or continues the execution of coroutine `co`.'
+
+[running]
+description = 'Returns the running coroutine plus a boolean, true when the running coroutine is the main one.'
+
+[status]
+description = 'Returns the status of coroutine `co`.'
+[[.enums]]
+name = 'status'
+enum = '"running"'
+description = 'Is running.'
+``````````
+name = 'status'
+enum = '"suspended"'
+description = 'Is suspended or not started.'
+``````````
+name = 'status'
+enum = '"normal"'
+description = 'Is active but not running.'
+``````````
+name = 'status'
+enum = '"dead"'
+description = 'Has finished or stopped with an error.'
+
+[wrap]
+description = 'Creates a new coroutine.'
+
+[yield]
+description = 'Suspends the execution of the calling coroutine.'

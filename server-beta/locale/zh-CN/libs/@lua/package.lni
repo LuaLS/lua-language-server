@@ -1,0 +1,29 @@
+[config]
+description = '一个描述有一些为包管理准备的编译期配置信息的串。'
+
+[cpath]
+description = '这个路径被 `require` 在 C 加载器中做搜索时用到。'
+
+[loaded]
+description = '用于 `require` 控制哪些模块已经被加载的表。'
+
+[loaders]
+description = '用于 `require` 控制如何加载模块的表。'
+
+[loadlib]
+description = '让宿主程序动态链接 C 库 `libname` 。'
+
+[path]
+description = '这个路径被 `require` 在 Lua 加载器中做搜索时用到。'
+
+[preload]
+description = '保存有一些特殊模块的加载器。'
+
+[searchers]
+description = '用于 `require` 控制如何加载模块的表。'
+
+[searchpath]
+description = '在指定 `path` 中搜索指定的 `name` 。'
+
+[seeall]
+description = '给 `module` 设置一个元表，该元表的 `__index` 域为全局环境，这样模块便会继承全局环境的值。可作为 `module` 函数的选项。'

@@ -1,0 +1,91 @@
+[close]
+description = 'Close `file`.'
+
+[flush]
+description = 'Saves any written data to `file`.'
+
+[lines]
+description = [[
+------
+```lua
+for c in file:lines(...) do
+    body
+end
+```
+]]
+[[.enums]]
+name = 'mode'
+enum = '"n"'
+description = 'Reads a numeral and returns it as number.'
+``````````
+name = 'mode'
+enum = '"a"'
+description = 'Reads the whole file.'
+``````````
+name = 'mode'
+enum = '"l"'
+description = 'Reads the next line skipping the end of line.'
+``````````
+name = 'mode'
+enum = '"L"'
+description = 'Reads the next line keeping the end of line.'
+``````````
+name = 'mode'
+code = 'number'
+description = 'Reads a string with up to this number of bytes.'
+
+[read]
+description = 'Reads the `file`, according to the given formats, which specify what to read.'
+[[.enums]]
+name = 'mode'
+enum = '"n"'
+description = 'Reads a numeral and returns it as number.'
+``````````
+name = 'mode'
+enum = '"a"'
+description = 'Reads the whole file.'
+``````````
+name = 'mode'
+enum = '"l"'
+description = 'Reads the next line skipping the end of line.'
+``````````
+name = 'mode'
+enum = '"L"'
+description = 'Reads the next line keeping the end of line.'
+``````````
+name = 'mode'
+code = 'number'
+description = 'Reads a string with up to this number of bytes.'
+
+[seek]
+description = 'Sets and gets the file position, measured from the beginning of the file.'
+[[.enums]]
+name = 'whence'
+enum = '"set"'
+description = 'Base is beginning of the file.'
+``````````
+name = 'whence'
+enum = '"cur"'
+description = 'Base is current position.'
+``````````
+name = 'whence'
+enum = '"end"'
+description = 'Base is end of file.'
+
+[setvbuf]
+description = 'Sets the buffering mode for an output file.'
+[[.enums]]
+name = 'mode'
+enum = '"no"'
+description = 'Output operation appears immediately.'
+``````````
+name = 'mode'
+enum = '"full"'
+description = 'Performed only when the buffer is full.'
+``````````
+name = 'mode'
+enum = '"line"'
+description = 'Buffered until a newline is output.'
+
+[write]
+description = 'Writes the value of each of its arguments to `file`.'

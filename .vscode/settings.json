@@ -19,6 +19,10 @@
         "/server/libs/",
         "/server/src/3rd",
         "/server/meta/",
+        "/server-beta/locale/",
+        "/server-beta/libs/",
+        "/server-beta/src/3rd",
+        "/server-beta/meta/",
         ".vscode"
     ],
     "Lua.workspace.library": {

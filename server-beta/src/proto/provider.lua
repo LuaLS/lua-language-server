@@ -8,7 +8,7 @@ local inte      = require 'proto.interface'
 local workspace = require 'workspace'
 
 proto.on('initialize', function (params)
-    --log.debug(util.dump(params))
+    log.debug(util.dump(params))
     if params.workspaceFolders then
         local name = params.workspaceFolders[1].name
         local uri  = params.workspaceFolders[1].uri

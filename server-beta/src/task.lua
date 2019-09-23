@@ -1,8 +1,11 @@
 local timer  = require 'timer'
 
+
 ---@class task
 local m = {}
 m.type = 'task'
+
+m.coTracker = setmetatable({}, { __mode = 'k' })
 
 --- 设置错误处理器
 ---@param errHandle function {comment = '当有错误发生时，会以错误堆栈为参数调用该函数'}
@@ -13,6 +16,7 @@ end
 --- 创建一个任务
 function m.create(callback)
     local co = coroutine.create(callback)
+    m.coTracker[co] = true
     local suc, err = coroutine.resume(co)
     if not suc and m.errHandle then
         m.errHandle(debug.traceback(co, err))

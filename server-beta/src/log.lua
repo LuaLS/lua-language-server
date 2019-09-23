@@ -58,7 +58,6 @@ local function pushLog(level, ...)
     local str = tableConcat(t, '\t', 1, t.n)
     if level == 'error' then
         str = str .. '\n' .. debugTraceBack(nil, 3)
-        ioStdErr:write(str .. '\n')
     end
     local info = debugGetInfo(3, 'Sl')
     return m.raw(0, level, str, info.source, info.currentline)
@@ -85,6 +84,9 @@ function m.error(...)
 end
 
 function m.raw(thd, level, msg, source, currentline)
+    if level == 'error' then
+        ioStdErr:write(msg .. '\n')
+    end
     init_log_file()
     if not m.file then
         return
@@ -95,7 +97,12 @@ function m.raw(thd, level, msg, source, currentline)
     if #level < 5 then
         agl = (' '):rep(5 - #level)
     end
-    local buf = ('[%s.%03.f][%s]: %s[#%d:%s:%s]%s\n'):format(timestr, ms * 1000, level, agl, thd, trimSrc(source), currentline, msg)
+    local buf
+    if currentline == -1 then
+        buf = ('[%s.%03.f][%s]: %s[#%d]%s\n'):format(timestr, ms * 1000, level, agl, thd, msg)
+    else
+        buf = ('[%s.%03.f][%s]: %s[#%d:%s:%s]%s\n'):format(timestr, ms * 1000, level, agl, thd, trimSrc(source), currentline, msg)
+    end
     m.file:write(buf)
     m.size = m.size + #buf
     if m.size > m.maxSize then

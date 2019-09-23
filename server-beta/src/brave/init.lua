@@ -14,10 +14,10 @@ end)
 brave.on('compile', function (text)
     local state, err = parser:compile(text, 'lua', 'Lua 5.4')
     if not state then
-        log.debug(err)
+        log.error(err)
         return
     end
-    local lines = parser:lines(text, 'utf8')
+    local lines = parser:lines(text)
     return {
         root  = state.root,
         errs  = state.errs,

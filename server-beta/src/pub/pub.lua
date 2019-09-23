@@ -70,8 +70,8 @@ function m.pushTask(brave, info)
     end)
 end
 
---- 给勇者推送任务（异步）
-function m.pushAsyncTask(brave, info)
+--- 给勇者推送任务（同步）
+function m.pushSyncTask(brave, info)
     if info.removed then
         return
     end
@@ -104,7 +104,7 @@ function m.popReport(brave, name, params)
     abil(params, brave)
 end
 
---- 发布任务（同步）
+--- 发布任务（异步）
 ---@parma name string
 ---@param params any
 function m.task(name, params)
@@ -124,12 +124,12 @@ function m.task(name, params)
     m.taskQueue[#m.taskQueue+1] = info
 end
 
---- 发布异步任务，如果任务进入了队列，会返回执行器
+--- 发布同步任务，如果任务进入了队列，会返回执行器
 ---|通过 jumpQueue 可以插队
 ---@parma name string
 ---@param params any
 ---@param callback function
-function m.asyncTask(name, params, callback)
+function m.syncTask(name, params, callback)
     local info = {
         id       = counter(),
         name     = name,
@@ -138,7 +138,7 @@ function m.asyncTask(name, params, callback)
     }
     for _, brave in ipairs(m.braves) do
         if m.isIdle(brave) then
-            m.pushAsyncTask(brave, info)
+            m.pushSyncTask(brave, info)
             return nil
         end
     end
@@ -183,7 +183,7 @@ function m.checkWaitingTask(brave)
     end
     local info = table.remove(m.taskQueue, 1)
     if info.callback then
-        m.pushAsyncTask(brave, info)
+        m.pushSyncTask(brave, info)
     else
         m.pushTask(brave, info)
     end

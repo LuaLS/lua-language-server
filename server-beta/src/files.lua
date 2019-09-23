@@ -36,7 +36,7 @@ function m.setText(uri, text)
     if file.compiling then
         pub.removeTask(file.compiling)
     end
-    file.compiling = pub.asyncTask('compile', text, function (ast)
+    file.compiling = pub.syncTask('compile', text, function (ast)
         file.ast = ast
         file.compiling = nil
         local onCompiledList = file.onCompiledList
@@ -76,7 +76,7 @@ function m.getText(uri)
     return file.text
 end
 
---- 获取文件语法树（同步）
+--- 获取文件语法树（异步）
 function m.getAst(uri)
     if platform.OS == 'Windows' then
         uri = uri:lower()

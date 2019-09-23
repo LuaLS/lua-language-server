@@ -41,9 +41,11 @@ function m.setText(uri, text)
         pub.removeTask(file.compiling)
     end
     file.compiling = pub.syncTask('compile', text, function (ast)
-        ast.uri = originUri
-        file.ast = ast
         file.compiling = nil
+        file.ast = ast
+        if ast then
+            ast.uri = originUri
+        end
         local onCompiledList = file.onCompiledList
         if onCompiledList then
             file.onCompiledList = nil

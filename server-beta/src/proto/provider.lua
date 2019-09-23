@@ -68,6 +68,9 @@ proto.on('textDocument/definition', function (params)
     local core   = require 'core.definition'
     local uri    = params.textDocument.uri
     local ast    = files.getAst(uri)
+    if not ast then
+        return nil
+    end
     local text   = files.getText(uri)
     local offset = inte.offset(ast.lines, text, params.position)
     local result = core(ast, text, offset)

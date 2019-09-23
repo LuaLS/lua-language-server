@@ -90,7 +90,7 @@ function m.popTask(brave, id, result)
     m.checkWaitingTask(brave)
     if not info.removed then
         info.removed = true
-        info.callback(result)
+        xpcall(info.callback, log.error, result)
     end
 end
 

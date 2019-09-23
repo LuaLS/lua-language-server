@@ -13,7 +13,10 @@ end
 --- 创建一个任务
 function m.create(callback)
     local co = coroutine.create(callback)
-    coroutine.resume(co)
+    local suc, err = coroutine.resume(co)
+    if not suc and m.errHandle then
+        m.errHandle(debug.traceback(co, err))
+    end
 end
 
 --- 休眠一段时间

@@ -563,7 +563,7 @@ function mt:searchGlobalInNilEnv(callback)
             return
         end
         local parentSource = source:get 'parent' :getSource()
-        if parentSource.type == 'nil' then
+        if parentSource and parentSource.type == 'nil' then
             callback(source.start, source.finish, {
                 {
                     start  = parentSource.start,

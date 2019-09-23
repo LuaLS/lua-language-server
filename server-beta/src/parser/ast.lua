@@ -6,6 +6,8 @@ local utf8Char    = utf8.char
 local tableUnpack = table.unpack
 local mathType    = math.type
 local tableRemove = table.remove
+local pairs       = pairs
+local tableSort   = table.sort
 
 _ENV = nil
 
@@ -65,98 +67,6 @@ local function checkOpVersion(op)
             version = State.version,
         }
     }
-end
-
-local Exp
-
-local function expSplit(list, start, finish, level)
-    if start == finish then
-        return list[start]
-    end
-    local info = Exp[level]
-    if not info then
-        return
-    end
-    local func = info[1]
-    return func(list, start, finish, level)
-end
-
-local function binaryForward(list, start, finish, level)
-    local info = Exp[level]
-    for i = finish-1, start+1, -1 do
-        local op = list[i]
-        local opType = op.type
-        if info[opType] then
-            local e1 = expSplit(list, start, i-1, level)
-            if not e1 then
-                goto CONTINUE
-            end
-            local e2 = expSplit(list, i+1, finish, level+1)
-            if not e2 then
-                goto CONTINUE
-            end
-            checkOpVersion(op)
-            return {
-                type   = 'binary',
-                op     = op,
-                start  = e1.start,
-                finish = e2.finish,
-                [1]    = e1,
-                [2]    = e2,
-            }
-        end
-        ::CONTINUE::
-    end
-    return expSplit(list, start, finish, level+1)
-end
-
-local function binaryBackward(list, start, finish, level)
-    local info = Exp[level]
-    for i = start+1, finish-1 do
-        local op = list[i]
-        local opType = op.type
-        if info[opType] then
-            local e1 = expSplit(list, start, i-1, level+1)
-            if not e1 then
-                goto CONTINUE
-            end
-            local e2 = expSplit(list, i+1, finish, level)
-            if not e2 then
-                goto CONTINUE
-            end
-            checkOpVersion(op)
-            return {
-                type   = 'binary',
-                op     = op,
-                start  = e1.start,
-                finish = e2.finish,
-                [1]    = e1,
-                [2]    = e2,
-            }
-        end
-        ::CONTINUE::
-    end
-    return expSplit(list, start, finish, level+1)
-end
-
-local function unary(list, start, finish, level)
-    local info = Exp[level]
-    local op = list[start]
-    local opType = op.type
-    if info[opType] then
-        local e1 = expSplit(list, start+1, finish, level)
-        if e1 then
-            checkOpVersion(op)
-            return {
-                type   = 'unary',
-                op     = op,
-                start  = op.start,
-                finish = e1.finish,
-                [1]    = e1,
-            }
-        end
-    end
-    return expSplit(list, start, finish, level+1)
 end
 
 local function checkMissEnd(start)
@@ -274,68 +184,42 @@ local function packList(start, list, finish)
     return list
 end
 
-Exp = {
-    {
-        ['or'] = true,
-        binaryForward,
-    },
-    {
-        ['and'] = true,
-        binaryForward,
-    },
-    {
-        ['<='] = true,
-        ['>='] = true,
-        ['<']  = true,
-        ['>']  = true,
-        ['~='] = true,
-        ['=='] = true,
-        binaryForward,
-    },
-    {
-        ['|'] = true,
-        binaryForward,
-    },
-    {
-        ['~'] = true,
-        binaryForward,
-    },
-    {
-        ['&'] = true,
-        binaryForward,
-    },
-    {
-        ['<<'] = true,
-        ['>>'] = true,
-        binaryForward,
-    },
-    {
-        ['..'] = true,
-        binaryBackward,
-    },
-    {
-        ['+'] = true,
-        ['-'] = true,
-        binaryForward,
-    },
-    {
-        ['*']  = true,
-        ['//'] = true,
-        ['/']  = true,
-        ['%']  = true,
-        binaryForward,
-    },
-    {
-        ['^'] = true,
-        binaryBackward,
-    },
-    {
-        ['not'] = true,
-        ['#']   = true,
-        ['~']   = true,
-        ['-']   = true,
-        unary,
-    },
+local BinaryLevel = {
+    ['or']  = 1,
+    ['and'] = 2,
+    ['<=']  = 3,
+    ['>=']  = 3,
+    ['<']   = 3,
+    ['>']   = 3,
+    ['~=']  = 3,
+    ['==']  = 3,
+    ['|']   = 4,
+    ['~']   = 5,
+    ['&']   = 6,
+    ['<<']  = 7,
+    ['>>']  = 7,
+    ['..']  = 8,
+    ['+']   = 9,
+    ['-']   = 9,
+    ['*']   = 10,
+    ['//']  = 10,
+    ['/']   = 10,
+    ['%']   = 10,
+    ['^']   = 11,
+}
+
+local BinaryForward = {
+    [01]  = true,
+    [02]  = true,
+    [03]  = true,
+    [04]  = true,
+    [05]  = true,
+    [06]  = true,
+    [07]  = true,
+    [08]  = false,
+    [09]  = true,
+    [10]  = true,
+    [11]  = false,
 }
 
 local Defs = {
@@ -737,12 +621,80 @@ local Defs = {
             finish = start + #op - 1,
         }
     end,
-    Exp = function (first, ...)
+    Unary = function (first, ...)
         if not ... then
-            return first
+            return nil
         end
         local list = {first, ...}
-        return expSplit(list, 1, #list, 1)
+        local e = list[#list]
+        for i = #list - 1, 1, -1 do
+            local op = list[i]
+            checkOpVersion(op)
+            e = {
+                type   = 'unary',
+                op     = op,
+                start  = op.start,
+                finish = e.finish,
+                [1]    = e,
+            }
+        end
+        return e
+    end,
+    Binary = function (first, op, second, ...)
+        if not op then
+            return first
+        end
+        if not ... then
+            checkOpVersion(op)
+            return {
+                type   = 'binary',
+                op     = op,
+                start  = first.start,
+                finish = second.finish,
+                [1]    = first,
+                [2]    = second,
+            }
+        end
+        local list = {first, op, second, ...}
+        local ops = {}
+        for i = 2, #list, 2 do
+            ops[#ops+1] = i
+        end
+        tableSort(ops, function (a, b)
+            local op1 = list[a]
+            local op2 = list[b]
+            local lv1 = BinaryLevel[op1.type]
+            local lv2 = BinaryLevel[op2.type]
+            if lv1 == lv2 then
+                local forward = BinaryForward[lv1]
+                if forward then
+                    return op1.start > op2.start
+                else
+                    return op1.start < op2.start
+                end
+            else
+                return lv1 < lv2
+            end
+        end)
+        for i = #ops, 1, -1 do
+            local n     = ops[i]
+            local op    = list[n]
+            local left  = list[n-1]
+            local right = list[n+1]
+            local exp = {
+                type   = 'binary',
+                op     = op,
+                start  = left.start,
+                finish = right.finish,
+                [1]    = left,
+                [2]    = right,
+            }
+            list[n-1] = exp
+            list[n+1] = exp
+            checkOpVersion(op)
+        end
+        local final = ops[1]
+        return list[final-1]
     end,
     Paren = function (start, exp, finish)
         if exp and exp.type == 'paren' then

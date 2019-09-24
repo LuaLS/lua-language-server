@@ -116,6 +116,20 @@ function m.preload()
         end)
     end)
 
+    while true do
+        local count = 0
+        for _, file in pairs(files.fileMap) do
+            if file.compiling then
+                task.sleep(0.1)
+                goto CONTINUE
+            end
+            count = count + 1
+        end
+        log.info(('Preloaded %d files.'):format(count))
+        break
+        ::CONTINUE::
+    end
+
     log.info('Preload finish.')
 end
 

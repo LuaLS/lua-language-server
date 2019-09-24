@@ -34,7 +34,7 @@ local function updateConfig()
 
     local oldConfig = util.deepCopy(config.config)
     local oldOther  = util.deepCopy(config.other)
-    config:setConfig(updated, other)
+    config.setConfig(updated, other)
     local newConfig = config.config
     local newOther  = config.other
     if not util.equal(oldConfig.runtime, newConfig.runtime) then

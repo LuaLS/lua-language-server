@@ -1,6 +1,7 @@
-local pub  = require 'pub'
-local fs   = require 'bee.filesystem'
-local furi = require 'file-uri'
+local pub   = require 'pub'
+local fs    = require 'bee.filesystem'
+local furi  = require 'file-uri'
+local files = require 'files'
 
 local m = {}
 m.type = 'workspace'
@@ -32,8 +33,12 @@ function m.preload()
         end
     end
     scan(m.uri, function (uri)
-        local text = pub.task('loadFile', uri)
-        log.debug('Preload file at: ' .. uri, #text)
+        if files.isLua(uri) then
+            pub.syncTask('loadFile', uri, function (text)
+                log.debug('Preload file at: ' .. uri, #text)
+                files.setText(uri, text)
+            end)
+        end
     end)
     log.info('Preload finish.')
 end

@@ -1,6 +1,9 @@
 local util = require 'utility'
 local DiagnosticDefaultSeverity = require 'define.DiagnosticDefaultSeverity'
 
+local m = {}
+m.version = 0
+
 local function Boolean(v)
     if type(v) == 'boolean' then
         return true, v
@@ -135,28 +138,27 @@ local OtherTemplate = {
     exclude =      {{}, Hash(String, Boolean)},
 }
 
-local Config, Other
-
 local function init()
-    if Config then
+    if m.config then
         return
     end
 
-    Config = {}
+    m.config = {}
     for c, t in pairs(ConfigTemplate) do
-        Config[c] = {}
+        m.config[c] = {}
         for k, info in pairs(t) do
-            Config[c][k] = info[1]
+            m.config[c][k] = info[1]
         end
     end
 
-    Other = {}
+    m.other = {}
     for k, info in pairs(OtherTemplate) do
-        Other[k] = info[1]
+        m.other[k] = info[1]
     end
 end
 
-local function setConfig(self, config, other)
+function m.setConfig(config, other)
+    m.version = m.version + 1
     xpcall(function ()
         for c, t in pairs(config) do
             for k, v in pairs(t) do
@@ -165,9 +167,9 @@ local function setConfig(self, config, other)
                     local info = region[k]
                     local suc, v = info[2](v)
                     if suc then
-                        Config[c][k] = v
+                        m.config[c][k] = v
                     else
-                        Config[c][k] = info[1]
+                        m.config[c][k] = info[1]
                     end
                 end
             end
@@ -176,19 +178,15 @@ local function setConfig(self, config, other)
             local info = OtherTemplate[k]
             local suc, v = info[2](v)
             if suc then
-                Other[k] = v
+                m.other[k] = v
             else
-                Other[k] = info[1]
+                m.other[k] = info[1]
             end
         end
-        log.debug('Config update: ', util.dump(Config), util.dump(Other))
+        log.debug('Config update: ', util.dump(m.config), util.dump(m.other))
     end, log.error)
 end
 
 init()
 
-return {
-    setConfig = setConfig,
-    config = Config,
-    other = Other,
-}
+return m

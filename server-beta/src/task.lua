@@ -17,8 +17,8 @@ function m.create(callback)
     local co = coroutine.create(callback)
     m.coTracker[co] = true
     local suc, err = coroutine.resume(co)
-    if not suc and m.errHandle then
-        m.errHandle(debug.traceback(co, err))
+    if not suc and m.errorHandle then
+        m.errorHandle(debug.traceback(co, err))
     end
 end
 
@@ -34,8 +34,8 @@ function m.sleep(time)
     end
     timer.wait(time, function ()
         local suc, err = coroutine.resume(co)
-        if not suc and m.errHandle then
-            m.errHandle(debug.traceback(co, err))
+        if not suc and m.errorHandle then
+            m.errorHandle(debug.traceback(co, err))
         end
     end)
     return coroutine.yield()
@@ -53,8 +53,8 @@ function m.wait(waker)
     end
     waker(function (...)
         local suc, err = coroutine.resume(co, ...)
-        if not suc and m.errHandle then
-            m.errHandle(debug.traceback(co, err))
+        if not suc and m.errorHandle then
+            m.errorHandle(debug.traceback(co, err))
         end
     end)
     return coroutine.yield()

@@ -83,8 +83,8 @@ function m.startTimer()
 end
 
 function m.start()
-    pub.recruitBraves(4)
     task.setErrorHandle(log.error)
+    pub.recruitBraves(4)
     proto.listen()
     pub.listen()
     m.report()

@@ -88,6 +88,13 @@ function m.getText(uri)
     return file.text
 end
 
+function m.remove(uri)
+    if platform.OS == 'Windows' then
+        uri = uri:lower()
+    end
+    m.fileMap[uri] = nil
+end
+
 --- 获取文件语法树（异步）
 function m.getAst(uri)
     if platform.OS == 'Windows' then
@@ -135,6 +142,9 @@ end
 --- 判断是否是Lua文件
 function m.isLua(uri)
     local ext = uri:match '%.(.-)$'
+    if not ext then
+        return false
+    end
     if m.eq(ext, 'lua') then
         return true
     end

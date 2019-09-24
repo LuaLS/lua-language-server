@@ -110,6 +110,9 @@ proto.on('workspace/configuration', function ()
     updateConfig()
 end)
 
+proto.on('workspace/didChangeWatchedFiles', function (params)
+end)
+
 proto.on('textDocument/didOpen', function (params)
     local doc   = params.textDocument
     local uri   = doc.uri
@@ -122,6 +125,9 @@ proto.on('textDocument/didClose', function (params)
     local doc   = params.textDocument
     local uri   = doc.uri
     files.close(uri)
+    if not files.isLua(uri) then
+        files.remove(uri)
+    end
 end)
 
 proto.on('textDocument/didChange', function (params)

@@ -1,6 +1,7 @@
 local thread  = require 'bee.thread'
 local utility = require 'utility'
 local task    = require 'task'
+local timer   = require 'timer'
 
 local errLog  = thread.channel 'errlog'
 local type    = type
@@ -97,7 +98,7 @@ function m.popReport(brave, name, params)
         log.warn(('Brave pushed unknown report: # %d => %q'):format(brave.id, name))
         return
     end
-    abil(params, brave)
+    xpcall(abil, log.error, params, brave)
 end
 
 --- 发布任务（异步）
@@ -210,7 +211,6 @@ function m.recieve()
         else
             m.popTask(brave, id, result)
         end
-        task.sleep(0)
         ::CONTINUE::
     end
 end
@@ -227,12 +227,9 @@ function m.checkDead()
 end
 
 function m.listen()
-    task.create(function ()
-        while true do
-            m.checkDead()
-            m.recieve()
-            task.sleep(0)
-        end
+    timer.loop(0.001, function ()
+        m.checkDead()
+        m.recieve()
     end)
 end
 

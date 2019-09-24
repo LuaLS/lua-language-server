@@ -1,4 +1,5 @@
-local pub = require 'pub.pub'
+local pub  = require 'pub.pub'
+local task = require 'task'
 
 pub.on('log', function (params, brave)
     log.raw(brave.id, params.level, params.msg, params.src, params.line)
@@ -10,11 +11,13 @@ end)
 
 pub.on('proto', function (params)
     local proto = require 'proto'
-    if params.method then
-        proto.doMethod(params)
-    else
-        proto.doResponse(params)
-    end
+    task.create(function ()
+        if params.method then
+            proto.doMethod(params)
+        else
+            proto.doResponse(params)
+        end
+    end)
 end)
 
 return pub

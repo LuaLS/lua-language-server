@@ -64,24 +64,12 @@ end
 --- 给勇者推送任务
 function m.pushTask(brave, info)
     if info.removed then
-        return
-    end
-    brave.taskpad:push(info.name, info.id, info.params)
-    log.info(('Push task %q to # %d, queue length %d'):format(info.name, brave.id, #m.taskQueue))
-    return task.wait(function (waker)
-        info.callback = waker
-        brave.taskMap[info.id] = info
-    end)
-end
-
---- 给勇者推送任务（同步）
-function m.pushSyncTask(brave, info)
-    if info.removed then
-        return
+        return false
     end
     brave.taskpad:push(info.name, info.id, info.params)
     brave.taskMap[info.id] = info
     log.info(('Push task %q to # %d, queue length %d'):format(info.name, brave.id, #m.taskQueue))
+    return true
 end
 
 --- 从勇者处接收任务反馈
@@ -95,7 +83,9 @@ function m.popTask(brave, id, result)
     m.checkWaitingTask(brave)
     if not info.removed then
         info.removed = true
-        xpcall(info.callback, log.error, result)
+        if info.callback then
+            xpcall(info.callback, log.error, result)
+        end
     end
 end
 
@@ -120,7 +110,13 @@ function m.task(name, params)
     }
     for _, brave in ipairs(m.braves) do
         if m.isIdle(brave) then
-            return m.pushTask(brave, info)
+            if m.pushTask(brave, info) then
+                return task.wait(function (waker)
+                    info.callback = waker
+                end)
+            else
+                return nil
+            end
         end
     end
     -- 如果所有勇者都在战斗，那么把任务缓存到队列里
@@ -128,6 +124,9 @@ function m.task(name, params)
     -- 交给该勇者
     m.taskQueue[#m.taskQueue+1] = info
     log.info(('Add task %q in queue, length %d.'):format(name, #m.taskQueue))
+    return task.wait(function (waker)
+        info.callback = waker
+    end)
 end
 
 --- 发布同步任务，如果任务进入了队列，会返回执行器
@@ -140,11 +139,11 @@ function m.syncTask(name, params, callback)
         id       = counter(),
         name     = name,
         params   = params,
-        callback = callback or function () end,
+        callback = callback,
     }
     for _, brave in ipairs(m.braves) do
         if m.isIdle(brave) then
-            m.pushSyncTask(brave, info)
+            m.pushTask(brave, info)
             return nil
         end
     end
@@ -188,11 +187,11 @@ function m.checkWaitingTask(brave)
     if next(brave.taskMap) then
         return
     end
-    local info = table.remove(m.taskQueue, 1)
-    if info.callback then
-        m.pushSyncTask(brave, info)
-    else
-        m.pushTask(brave, info)
+    while #m.taskQueue > 0 do
+        local info = table.remove(m.taskQueue, 1)
+        if m.pushTask(brave, info) then
+            break
+        end
     end
 end
 

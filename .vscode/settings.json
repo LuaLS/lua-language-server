@@ -29,6 +29,5 @@
         "E:/Github/test" : true,
         "server/src/meta" : true
     },
-    "Lua.plugin.enable": true,
-    "Lua.zzzzzz.cat": true
+    "Lua.plugin.enable": true
 }

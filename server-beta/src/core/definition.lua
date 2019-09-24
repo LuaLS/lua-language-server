@@ -37,22 +37,24 @@ function m.aslocal(state, ast, source)
     end
 end
 
-function m.assetglobal(state, ast, source)
+function m.globals(state, ast, source)
     local name = source[1]
-    guide.eachSourceOf(ast.root, 'setglobal', function (src)
-        if src[1] == name then
+    guide.eachGloabl(ast.root, function (src, gname)
+        if name ~= gname then
+            return
+        end
+        if src.type == 'setglobal' or src.type == 'setfield' then
             state.callback(src, ast.uri)
         end
     end)
 end
 
+function m.assetglobal(state, ast, source)
+    m.globals(state, ast, source)
+end
+
 function m.asgetglobal(state, ast, source)
-    local name = source[1]
-    guide.eachSourceOf(ast.root, 'setglobal', function (src)
-        if src[1] == name then
-            state.callback(src, ast.uri)
-        end
-    end)
+    m.globals(state, ast, source)
 end
 
 return function (ast, text, offset)

@@ -215,6 +215,30 @@ function m.eachSourceOf(root, types, callback)
     end
 end
 
+--- 遍历全局变量
+function m.eachGloabl(root, callback)
+    m.eachSourceOf(root, {'setglobal', 'getglobal', 'setfield', 'getfield'}, function (src)
+        if src.type == 'setglobal' or src.type == 'getglobal' then
+            callback(src, src[1])
+        elseif src.type == 'setfield' or src.type == 'getfield' then
+            local node = root[src.node]
+            if m.isGlobal(root, node) then
+                callback(src, src.field[1])
+            end
+        end
+    end)
+end
+
+--- 判断全局变量
+function m.isGlobal(root, obj)
+    if obj.type == 'getglobal' then
+        if obj[1] == '_G' or obj[1] == '_ENV' then
+            return true
+        end
+    end
+    return false
+end
+
 --- 获取偏移对应的坐标（row从0开始，col为光标位置）
 ---@param lines table
 ---@return integer {name = 'row'}

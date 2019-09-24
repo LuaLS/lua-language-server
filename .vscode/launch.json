@@ -51,6 +51,18 @@
 			"consoleCoding": "utf8",
 			"sourceCoding": "utf8",
 			"luaRuntime": "5.4 64bit"
-		}
+		},
+		{
+			"name": "测试-beta",
+			"type": "lua",
+			"request": "launch",
+			"stopOnEntry": false,
+			"program": "${workspaceRoot}/server-beta/test.lua",
+			"arg": [
+			],
+			"consoleCoding": "utf8",
+			"sourceCoding": "utf8",
+			"luaRuntime": "5.4 64bit"
+		},
 	]
 }

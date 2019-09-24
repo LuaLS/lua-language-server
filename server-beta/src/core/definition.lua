@@ -2,40 +2,73 @@ local guide = require 'parser.guide'
 
 local m = {}
 
-function m.asgetlocal(ast, source, callback)
-    local loc = ast.root[source.loc]
-    if not loc then
+function m.search(state, ast, source)
+    if not source then
         return
     end
-    return m.aslocal(ast, loc, callback)
-end
-
-function m.assetlocal(ast, source, callback)
-    local loc = ast.root[source.loc]
-    if not loc then
+    if state.cache[source] then
         return
     end
-    return m.aslocal(ast, loc, callback)
+    state.cache[source] = true
+    local f = m['as' .. source.type]
+    if not f then
+        return
+    end
+    f(state, ast, source)
 end
 
-function m.aslocal(ast, source, callback)
-    callback(source, ast.uri)
+function m.asgetlocal(state, ast, source)
+    local loc = ast.root[source.loc]
+    m.search(state, ast, loc)
+end
+
+function m.assetlocal(state, ast, source)
+    local loc = ast.root[source.loc]
+    m.search(state, ast, loc)
+    state.callback(source, ast.uri)
+end
+
+function m.aslocal(state, ast, source)
+    state.callback(source, ast.uri)
+    if source.ref then
+        for _, ref in ipairs(source.ref) do
+            m.search(state, ast, ast.root[ref])
+        end
+    end
+end
+
+function m.assetglobal(state, ast, source)
+    local name = source[1]
+    guide.eachSourceOf(ast.root, 'setglobal', function (src)
+        if src[1] == name then
+            state.callback(src, ast.uri)
+        end
+    end)
+end
+
+function m.asgetglobal(state, ast, source)
+    local name = source[1]
+    guide.eachSourceOf(ast.root, 'setglobal', function (src)
+        if src[1] == name then
+            state.callback(src, ast.uri)
+        end
+    end)
 end
 
 return function (ast, text, offset)
     local results = {}
-    guide.eachSource(ast.root, offset, function (source)
-        local tp = source.type
-        local f = m['as' .. tp]
-        if f then
-            f(ast, source, function (target, uri)
-                results[#results+1] = {
-                    uri    = uri or ast.uri,
-                    source = source,
-                    target = target,
-                }
-            end)
+    local state = {
+        cache = {},
+        callback = function (target, uri)
+            results[#results+1] = {
+                uri    = uri or ast.uri,
+                source = source,
+                target = target,
+            }
         end
+    }
+    guide.eachSource(ast.root, offset, function (source)
+        m.search(state, ast, source)
     end)
     if #results == 0 then
         return nil

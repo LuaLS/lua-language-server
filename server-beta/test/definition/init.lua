@@ -42,8 +42,12 @@ function TEST(script)
     local ast = parser:compile(new_script, 'lua', 'Lua 5.3')
     assert(ast)
 
-    local positions = core(ast, new_script, pos)
-    if positions then
+    local results = core(ast, new_script, pos)
+    if results then
+        local positions = {}
+        for i, result in ipairs(results) do
+            positions[i] = { result.target.start, result.target.finish }
+        end
         assert(founded(target, positions))
     else
         assert(#target == 0)

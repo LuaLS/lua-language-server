@@ -112,16 +112,7 @@ function m.listen()
     subprocess.filemode(io.stdout, 'b')
     io.stdin:setvbuf  'no'
     io.stdout:setvbuf 'no'
-    task.create(function ()
-        while true do
-            local proto = pub.task('loadProto')
-            if proto.method then
-                m.doMethod(proto)
-            else
-                m.doResponse(proto)
-            end
-        end
-    end)
+    pub.syncTask('loadProto')
 end
 
 return m

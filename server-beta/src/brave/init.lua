@@ -9,7 +9,7 @@ brave.on('loadProto', function ()
     while true do
         local proto = jsonrpc.decode(io.read, log.error)
         if proto then
-            return proto
+            brave.push('proto', proto)
         end
     end
 end)

@@ -1,6 +1,5 @@
 local timer  = require 'timer'
 
-
 ---@class task
 local m = {}
 m.type = 'task'

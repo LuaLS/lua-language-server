@@ -13,6 +13,9 @@ end
 
 --- 预读工作区内所有文件（异步）
 function m.preload()
+    if not m.uri then
+        return
+    end
     log.info('Preload start.')
     local function scan(dir, callback)
         local result = pub.task('listDirectory', dir)

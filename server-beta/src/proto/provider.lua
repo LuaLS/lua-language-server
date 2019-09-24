@@ -6,6 +6,53 @@ local files     = require 'files'
 local proto     = require 'proto.proto'
 local inte      = require 'proto.interface'
 local workspace = require 'workspace'
+local config    = require 'config'
+
+local function updateConfig()
+    local configs = proto.request('workspace/configuration', {
+        items = {
+            {
+                scopeUri = workspace.uri,
+                section = 'Lua',
+            },
+            {
+                scopeUri = workspace.uri,
+                section = 'files.associations',
+            },
+            {
+                scopeUri = workspace.uri,
+                section = 'files.exclude',
+            }
+        },
+    })
+
+    local updated = configs[1]
+    local other   = {
+        associations = configs[2],
+        exclude      = configs[3],
+    }
+
+    local oldConfig = util.deepCopy(config.config)
+    local oldOther  = util.deepCopy(config.other)
+    config:setConfig(updated, other)
+    local newConfig = config.config
+    local newOther  = config.other
+    if not util.equal(oldConfig.runtime, newConfig.runtime) then
+    end
+    if not util.equal(oldConfig.diagnostics, newConfig.diagnostics) then
+    end
+    if newConfig.completion.enable then
+    else
+    end
+    if not util.equal(oldConfig.plugin, newConfig.plugin) then
+    end
+    if not util.equal(oldConfig.workspace, newConfig.workspace)
+    or not util.equal(oldConfig.plugin, newConfig.plugin)
+    or not util.equal(oldOther.associations, newOther.associations)
+    or not util.equal(oldOther.exclude, newOther.exclude)
+    then
+    end
+end
 
 proto.on('initialize', function (params)
     --log.debug(util.dump(params))
@@ -13,9 +60,6 @@ proto.on('initialize', function (params)
         local name = params.workspaceFolders[1].name
         local uri  = params.workspaceFolders[1].uri
         workspace.init(name, uri)
-        task.create(function ()
-            workspace.preload()
-        end)
     end
     return {
         capabilities = cap.initer,
@@ -23,6 +67,32 @@ proto.on('initialize', function (params)
 end)
 
 proto.on('initialized', function (params)
+    updateConfig()
+    proto.request('client/registerCapability', {
+        registrations = {
+            -- 监视文件变化
+            {
+                id = '0',
+                method = 'workspace/didChangeWatchedFiles',
+                registerOptions = {
+                    watchers = {
+                        {
+                            globPattern = '**/',
+                            kind = 1 | 2 | 4,
+                        }
+                    },
+                },
+            },
+            -- 配置变化
+            {
+                id = '1',
+                method = 'workspace/didChangeConfiguration',
+            }
+        }
+    })
+    task.create(function ()
+        workspace.preload()
+    end)
     return true
 end)
 
@@ -34,6 +104,10 @@ end)
 proto.on('shutdown', function ()
     log.info('Server shutdown.')
     return true
+end)
+
+proto.on('workspace/configuration', function ()
+    updateConfig()
 end)
 
 proto.on('textDocument/didOpen', function (params)

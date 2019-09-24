@@ -15,12 +15,16 @@ m.ignoreMatcher = nil
 function m.init(name, uri)
     m.name = name
     m.uri  = uri
+    m.path = furi.decode(uri)
 end
 
 --- 创建排除文件匹配器
-function m.buildIgnoreMatcher()
-    local pattern = {}
+function m.getIgnoreMatcher()
+    if m.ignoreVersion == config.version then
+        return m.ignoreMatcher
+    end
 
+    local pattern = {}
     -- config.workspace.ignoreDir
     for path in pairs(config.config.workspace.ignoreDir) do
         log.info('Ignore directory:', path)
@@ -35,7 +39,7 @@ function m.buildIgnoreMatcher()
     end
     -- config.workspace.ignoreSubmodules
     if config.config.workspace.ignoreSubmodules then
-        local buf = pub.task('loadFile', furi.encode((ROOT / '.gitmodules'):string()))
+        local buf = pub.task('loadFile', furi.encode(m.path .. '/.gitmodules'))
         if buf then
             for path in buf:gmatch('path = ([^\r\n]+)') do
                 log.info('Ignore by .gitmodules:', path)
@@ -45,7 +49,7 @@ function m.buildIgnoreMatcher()
     end
     -- config.workspace.useGitIgnore
     if config.config.workspace.useGitIgnore then
-        local buf = pub.task('loadFile', furi.encode((ROOT / '.gitignore'):string()))
+        local buf = pub.task('loadFile', furi.encode(m.path .. '/.gitignore'))
         if buf then
             for line in buf:gmatch '[^\r\n]+' do
                 log.info('Ignore by .gitignore:', line)
@@ -59,24 +63,21 @@ function m.buildIgnoreMatcher()
         pattern[#pattern+1] = path
     end
 
-    local matcher = glob.gitignore(pattern)
+    m.ignoreMatcher = glob.gitignore(pattern)
 
     if platform.OS == "Windows" then
-        matcher:setOption 'ignoreCase'
+        m.ignoreMatcher:setOption 'ignoreCase'
     end
 
-    return matcher
+    m.ignoreVersion = config.version
+    return m.ignoreMatcher
 end
 
 --- 文件是否被忽略
 function m.isIgnored(uri)
     local path = furi.decode(uri)
-    if m.ignoreVersion == config.version then
-        return m.ignoreMatcher(path)
-    end
-    m.ignoreMatcher = m.buildIgnoreMatcher()
-    m.ignoreVersion = config.version
-    return m.ignoreMatcher(path)
+    local ignore = m.getIgnoreMatcher()
+    return ignore(path)
 end
 
 --- 预读工作区内所有文件（异步）
@@ -85,28 +86,36 @@ function m.preload()
         return
     end
     log.info('Preload start.')
-    local function scan(dir, callback)
-        local result = pub.task('listDirectory', dir)
-        if not result then
+    local ignore = m.getIgnoreMatcher()
+
+    ignore:setInterface('type', function (path)
+        if pub.task('isDirectory', furi.encode(m.path .. '/' .. path)) then
+            return 'directory'
+        else
+            return 'file'
+        end
+    end)
+
+    ignore:setInterface('list', function (path)
+        local uris = pub.task('listDirectory', furi.encode(m.path .. '/' .. path))
+        local paths = {}
+        for i, uri in ipairs(uris) do
+            paths[i] = furi.decode(uri)
+        end
+        return paths
+    end)
+
+    ignore:scan(function (path)
+        local uri = furi.encode(m.path .. '/' .. path)
+        if not files.isLua(uri) then
             return
         end
-        for i = 1, #result.uris do
-            local childUri = result.uris[i]
-            if not m.isIgnored(childUri) then
-                if result.dirs[childUri] then
-                    scan(childUri, callback)
-                elseif files.isLua(childUri) then
-                    callback(childUri)
-                end
-            end
-        end
-    end
-    scan(m.uri, function (uri)
         pub.syncTask('loadFile', uri, function (text)
-            log.debug('Preload file at: ' .. uri, #text)
+            log.info(('Preload file at: %s , size = %.3f KB'):format(uri, #text / 1000.0))
             files.setText(uri, text)
         end)
     end)
+
     log.info('Preload finish.')
 end
 

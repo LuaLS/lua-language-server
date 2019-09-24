@@ -141,7 +141,7 @@ end
 
 --- 判断是否是Lua文件
 function m.isLua(uri)
-    local ext = uri:match '%.(.-)$'
+    local ext = uri:match '%.([^%.%/%\\]-)$'
     if not ext then
         return false
     end

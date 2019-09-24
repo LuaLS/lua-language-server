@@ -1,3 +1,4 @@
+local wait = ...
 local fs = require 'bee.filesystem'
 local extensionPath = fs.path(os.getenv 'USERPROFILE') / '.vscode' / 'extensions'
 log.debug('Search extensions at:', extensionPath:string())
@@ -46,10 +47,10 @@ local function tryDebugger()
     dbg:start(addr)
     log.debug('Debugger startup, listen port:', port)
     log.debug('Debugger args:', addr, root, path, cpath)
+    if wait == 'wait' then
+        dbg:wait()
+    end
     return dbg
 end
 
-local suc, dbg = xpcall(tryDebugger, log.debug)
-if suc then
-    return dbg
-end
+xpcall(tryDebugger, log.debug)

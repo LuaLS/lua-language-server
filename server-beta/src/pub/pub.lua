@@ -13,6 +13,8 @@ package.cpath = %q
 collectgarbage 'generational'
 
 log         = require 'brave.log'
+
+dofile(%q)
 local brave = require 'brave'
 brave.register(%d)
 ]]
@@ -44,6 +46,7 @@ function m.recruitBraves(num)
             thread  = thread.thread(braveTemplate:format(
                 package.path,
                 package.cpath,
+                (ROOT / 'debugger.lua'):string(),
                 id
             )),
             taskMap = {},

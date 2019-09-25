@@ -73,7 +73,7 @@ function mt:searchUnusedFunctions(callback)
             if info.type == 'set' or info.type == 'local' then
                 local v = src:bindValue()
                 local func = v and v:getFunction()
-                if func then
+                if func and func:getSource().uri == self.vm.uri then
                     callback(func:getSource().start, func:getSource().finish)
                 end
             end

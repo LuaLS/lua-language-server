@@ -1,35 +1,197 @@
-local guide = require 'parser.guide'
+local guide  = require 'parser.guide'
+local config = require 'config'
+
+local type         = type
+local setmetatable = setmetatable
+
+_ENV = nil
 
 ---@class engineer
 local mt = {}
 mt.__index = mt
 mt.type = 'engineer'
 
---- 遍历全局变量
-function mt:eachGloabl(root, callback)
-    guide.eachSourceOf(root, {'setglobal', 'getglobal', 'setfield', 'getfield'}, function (src)
-        if src.type == 'setglobal' or src.type == 'getglobal' then
-            callback(src, src[1])
-        elseif src.type == 'setfield' or src.type == 'getfield' then
-            local node = root[src.node]
-            if self.isGlobal(root, node) then
-                callback(src, src.field[1])
-            end
-        end
-    end)
+function mt:call(method, obj, ...)
+    self.step = self.step + 1
+    if self.step > 100 then
+        return nil
+    end
+    if not obj then
+        return nil
+    end
+    if ... == nil and obj['_'..method] ~= nil then
+        return obj['_'..method]
+    end
+    local res = self[method](self, obj, ...)
+    self.step = self.step - 1
+    if ... == nil then
+        obj['_'..method] = res
+    end
+    return res
 end
 
---- 判断全局变量
-function mt:isGlobal(root, obj)
+--- 根据变量名，遍历全局变量
+function mt:eachGloablOfName(name, callback)
+    if type(name) ~= 'string' then
+        return
+    end
+    guide.eachSourceOf(self.ast.root, {
+        ['setglobal'] = function (source)
+            if source[1] == name then
+                callback(source, 'set')
+            end
+        end,
+        ['getglobal'] = function (source)
+            if source[1] == name then
+                callback(source, 'get')
+            end
+        end,
+        ['setfield'] = function (source)
+            if source.field[1] ~= name then
+                return
+            end
+            if self:call('isGlobalField', source) then
+                callback(source, 'set')
+            end
+        end,
+        ['getfield'] = function (source)
+            if source.field[1] ~= name then
+                return
+            end
+            if self:call('isGlobalField', source) then
+                callback(source, 'get')
+            end
+        end,
+        ['call'] = function (source)
+            local d = self:call('asRawSet', source)
+            if d then
+                if self:call('getLiteral', d.k) == name then
+                    callback(source, 'set')
+                end
+            end
+            local d = self:call('asRawGet', source)
+            if d then
+                if self:call('getLiteral', d.k) == name then
+                    callback(source, 'get')
+                end
+            end
+        end,
+    })
+end
+
+--- 是否是全局变量
+function mt:isGlobal(obj)
     if obj.type == 'getglobal' then
-        if obj[1] == '_G' or obj[1] == '_ENV' then
-            return true
-        end
+        return true
+    end
+    if obj.type == 'getfield' then
+        return self:call('isGlobalField', obj)
     end
     return false
 end
 
---- 遍历局部变量引用
+--- 是否是指定名称的全局变量
+function mt:isGlobalOfName(obj, name)
+    if not self:call('isGlobal', obj) then
+        return false
+    end
+    return self:call('getName', obj) == name
+end
+
+--- 获取名称
+function mt:getName(obj)
+    if obj.type == 'setglobal' or obj.type == 'getglobal' then
+        return obj[1]
+    elseif obj.type == 'setfield' or obj.type == 'getfield' then
+        return obj.field[1]
+    elseif obj.type == 'local' or obj.type == 'setlocal' or obj.type == 'getlocal' then
+        return obj[1]
+    end
+    return false
+end
+
+--- 获取字面量值
+function mt:getLiteral(obj)
+    if obj.type == 'number' then
+        return obj[1]
+    elseif obj.type == 'boolean' then
+        return obj[1]
+    elseif obj.type == 'string' then
+        return obj[1]
+    end
+    return nil
+end
+
+--- 是否是全局field
+---|_G.xxx
+---|_ENV.xxx
+---|_ENV._G.xxx
+function mt:isGlobalField(obj)
+    local node = self.ast.root[obj.node]
+    if self:call('isG', node) then
+        return true
+    end
+    if self:call('isENV', node) then
+        return true
+    end
+    return false
+end
+
+--- 是否是_ENV
+function mt:isENV(obj)
+    local version = config.config.runtime.version
+    if version == 'Lua 5.1' or version == 'LuaJIT' then
+        return false
+    end
+    if self:isGlobalOfName(obj, '_ENV') then
+        return true
+    end
+    return false
+end
+
+--- 是否是_G
+function mt:isG(obj)
+    if self:isGlobalOfName(obj, '_G') then
+        return true
+    end
+    return false
+end
+
+--- 获取call的参数
+function mt:getCallArg(obj, i)
+    local args = self.ast.root[obj.args]
+    if not args then
+        return nil
+    end
+    return self.ast.root[args[i]]
+end
+
+--- 获取rawset信息
+function mt:asRawSet(obj)
+    local node = self.ast.root[obj.node]
+    if not self:isGlobalOfName(node, 'rawset') then
+        return false
+    end
+    return {
+        t = self:getCallArg(obj, 1),
+        k = self:getCallArg(obj, 2),
+        v = self:getCallArg(obj, 3),
+    }
+end
+
+--- 获取rawget信息
+function mt:asRawGet(obj)
+    local node = self.ast.root[obj.node]
+    if not self:isGlobalOfName(node, 'rawget') then
+        return false
+    end
+    return {
+        t = self:getCallArg(obj, 1),
+        k = self:getCallArg(obj, 2),
+    }
+end
+
+--- 根据指定的局部变量，遍历局部变量引用
 function mt:eachLocalRef(obj, callback)
     if not obj then
         return
@@ -42,11 +204,16 @@ function mt:eachLocalRef(obj, callback)
     else
         return
     end
-    callback(src)
+    callback(src, 'local')
     if src.ref then
         for i = 1, #src.ref do
             local ref = src.ref[i]
-            callback(self.ast.root[ref])
+            local refObj = self.ast.root[ref]
+            if refObj.type == 'setlocal' then
+                callback(refObj, 'set')
+            elseif refObj.type == 'getlocal' then
+                callback(refObj, 'get')
+            end
         end
     end
 end

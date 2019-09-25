@@ -1,6 +1,4 @@
 local error      = error
-local utf8Len    = utf8.len
-local utf8Offset = utf8.offset
 local type       = type
 
 _ENV = nil
@@ -199,18 +197,19 @@ end
 --- 遍历所有某种类型的source
 function m.eachSourceOf(root, types, callback)
     if type(types) == 'string' then
-        types = {[types] = true}
+        types = {[types] = callback}
     elseif type(types) == 'table' then
         for i = 1, #types do
-            types[types[i]] = true
+            types[types[i]] = callback
         end
     else
         return
     end
     for i = 1, #root do
         local source = root[i]
-        if types[source.type] then
-            callback(source)
+        local f = types[source.type]
+        if f then
+            f(source)
         end
     end
 end

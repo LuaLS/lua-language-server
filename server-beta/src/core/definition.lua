@@ -19,8 +19,8 @@ function m.search(state, ast, source)
 end
 
 function m.aslocal(state, ast, source)
-    engineer(ast):eachLocalRef(source, function (src)
-        if src.type == 'local' or src.type == 'setlocal' then
+    engineer(ast):eachLocalRef(source, function (src, mode)
+        if mode == 'local' or mode == 'set' then
             state.callback(src)
         end
     end)
@@ -30,24 +30,15 @@ m.asgetlocal = m.aslocal
 m.assetlocal = m.aslocal
 
 function m.globals(state, ast, source)
-    local name = source[1]
-    guide.eachGloabl(ast.root, function (src, gname)
-        if name ~= gname then
-            return
-        end
-        if src.type == 'setglobal' or src.type == 'setfield' then
-            state.callback(src, ast.uri)
+    engineer(ast):eachGloablOfName(source[1], function (src, mode)
+        if mode == 'set' then
+            state.callback(src)
         end
     end)
 end
 
-function m.assetglobal(state, ast, source)
-    m.globals(state, ast, source)
-end
-
-function m.asgetglobal(state, ast, source)
-    m.globals(state, ast, source)
-end
+m.assetglobal = m.globals
+m.asgetglobal = m.globals
 
 return function (ast, text, offset)
     local results = {}

@@ -45,6 +45,6 @@ print(<?x?>)
 ]]
 
 TEST [[
-rawset<!(_G, 'x', 1)!>
+<!rawset(_G, 'x', 1)!>
 print(<?x?>)
 ]]

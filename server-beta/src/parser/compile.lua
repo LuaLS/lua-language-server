@@ -3,7 +3,7 @@ local type = type
 
 _ENV = nil
 
-local pushError, Root, Compile, CompileBlock, Cache, Block, GoToTag
+local pushError, Root, Compile, CompileBlock, Cache, Block, GoToTag, Version, ENVMode
 
 local vmMap = {
     ['nil'] = function (obj)
@@ -475,6 +475,15 @@ local vmMap = {
         Block = obj
         Root[#Root+1] = obj
         local id = #Root
+        if ENVMode == '_ENV' then
+            Compile({
+                type   = 'local',
+                start  = 0,
+                finish = 0,
+                effect = 0,
+                [1]    = '_ENV',
+            }, id)
+        end
         CompileBlock(obj, id)
         Block = nil
         return id
@@ -584,6 +593,12 @@ return function (self, lua, mode, version)
     end
     pushError = state.pushError
     Root = state.root
+    Version = version
+    if version == 'Lua 5.1' or version == 'LuaJIT' then
+        ENVMode = 'fenv'
+    else
+        ENVMode = '_ENV'
+    end
     Cache = {}
     GoToTag = {}
     if type(state.ast) == 'table' then

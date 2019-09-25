@@ -5,6 +5,7 @@ local files    = require 'files'
 local config   = require 'config'
 local glob     = require 'glob'
 local platform = require 'bee.platform'
+local task     = require 'task'
 
 local m = {}
 m.type = 'workspace'

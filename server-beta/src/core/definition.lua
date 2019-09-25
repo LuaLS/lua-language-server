@@ -1,4 +1,5 @@
-local guide = require 'parser.guide'
+local guide    = require 'parser.guide'
+local engineer = require 'core.engineer'
 
 local m = {}
 
@@ -17,25 +18,16 @@ function m.search(state, ast, source)
     f(state, ast, source)
 end
 
-function m.asgetlocal(state, ast, source)
-    local loc = ast.root[source.loc]
-    m.search(state, ast, loc)
-end
-
-function m.assetlocal(state, ast, source)
-    local loc = ast.root[source.loc]
-    m.search(state, ast, loc)
-    state.callback(source, ast.uri)
-end
-
 function m.aslocal(state, ast, source)
-    state.callback(source, ast.uri)
-    if source.ref then
-        for _, ref in ipairs(source.ref) do
-            m.search(state, ast, ast.root[ref])
+    engineer(ast):eachLocalRef(source, function (src)
+        if src.type == 'local' or src.type == 'setlocal' then
+            state.callback(src)
         end
-    end
+    end)
 end
+
+m.asgetlocal = m.aslocal
+m.assetlocal = m.aslocal
 
 function m.globals(state, ast, source)
     local name = source[1]
@@ -60,16 +52,18 @@ end
 return function (ast, text, offset)
     local results = {}
     local state = {
+        ast = ast,
         cache = {},
-        callback = function (target, uri)
-            results[#results+1] = {
-                uri    = uri or ast.uri,
-                source = source,
-                target = target,
-            }
-        end
     }
+    function state.callback(target, uri)
+        results[#results+1] = {
+            uri    = uri or ast.uri,
+            source = state.source,
+            target = target,
+        }
+    end
     guide.eachSource(ast.root, offset, function (source)
+        state.source = source
         m.search(state, ast, source)
     end)
     if #results == 0 then

@@ -54,8 +54,8 @@ function TEST(script)
     end
 end
 
-require 'definition.set'
 require 'definition.local'
+require 'definition.set'
 require 'definition.arg'
 require 'definition.function'
 require 'definition.table'

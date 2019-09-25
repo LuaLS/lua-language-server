@@ -87,6 +87,10 @@ function mt:isGlobal(obj)
     if obj.type == 'getfield' then
         return self:call('isGlobalField', obj)
     end
+    if obj.type == 'call' then
+        local d = self:call('asRawGet', obj)
+        return not not d
+    end
     return false
 end
 
@@ -214,6 +218,23 @@ function mt:eachLocalRef(obj, callback)
             elseif refObj.type == 'getlocal' then
                 callback(refObj, 'get')
             end
+        end
+    end
+end
+
+--- 遍历class
+function mt:eachClass(obj, callback)
+    local root = self.ast.root
+    if obj.type == 'setlocal' or obj.type == 'getlocal' then
+        local loc = root[obj.loc]
+        local setmethod = root[loc.method]
+        if setmethod then
+            local node = root[setmethod.node]
+            self:call('eachLocalRef', node, function (src, mode)
+                if mode == 'local' or mode == 'set' then
+                    callback(src)
+                end
+            end)
         end
     end
 end

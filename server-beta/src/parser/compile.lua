@@ -156,6 +156,14 @@ local vmMap = {
         if method then
             obj.method = Compile(method, id)
         end
+        value.localself = {
+            type   = 'local',
+            start  = 0,
+            finish = 0,
+            method = id,
+            effect = obj.finish,
+            [1]    = 'self',
+        }
         obj.value = Compile(value, id)
         return id
     end,
@@ -168,6 +176,10 @@ local vmMap = {
         Block = obj
         Root[#Root+1] = obj
         local id = #Root
+        if obj.localself then
+            Compile(obj.localself, id)
+            obj.localself = nil
+        end
         local args = obj.args
         if args then
             obj.args = Compile(args, id)

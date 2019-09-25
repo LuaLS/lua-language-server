@@ -19,10 +19,14 @@ function m.search(state, ast, source)
 end
 
 function m.aslocal(state, ast, source)
-    engineer(ast):eachLocalRef(source, function (src, mode)
+    local searcher = engineer(ast)
+    searcher:eachLocalRef(source, function (src, mode)
         if mode == 'local' or mode == 'set' then
             state.callback(src)
         end
+    end)
+    searcher:eachClass(source, function (src)
+        state.callback(src)
     end)
 end
 
@@ -30,7 +34,8 @@ m.asgetlocal = m.aslocal
 m.assetlocal = m.aslocal
 
 function m.globals(state, ast, source)
-    engineer(ast):eachGloablOfName(source[1], function (src, mode)
+    local searcher = engineer(ast)
+    searcher:eachGloablOfName(source[1], function (src, mode)
         if mode == 'set' then
             state.callback(src)
         end
@@ -47,6 +52,9 @@ return function (ast, text, offset)
         cache = {},
     }
     function state.callback(target, uri)
+        if target.start == 0 then
+            return
+        end
         results[#results+1] = {
             uri    = uri or ast.uri,
             source = state.source,

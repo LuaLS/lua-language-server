@@ -23,6 +23,7 @@ brave.on('compile', function (text)
     local lines = parser:lines(text)
     return {
         root  = state.root,
+        value = state.value,
         errs  = state.errs,
         lines = lines,
     }

@@ -30,10 +30,6 @@ function mt:eachRefAsLocal(obj, callback)
                 callback(self.root[ref], 'set')
             elseif refObj.type == 'getlocal' then
                 callback(self.root[ref], 'get')
-            elseif refObj.type == 'setglobal' then
-                callback(self.root[ref], 'settable', refObj)
-            elseif refObj.type == 'getglobal' then
-                callback(self.root[ref], 'gettable', refObj)
             end
         end
     end
@@ -43,24 +39,23 @@ end
 function mt:eachRefAsGlobal(obj, callback)
     local version = config.config.runtime.version
     if version ~= 'Lua 5.1' and version ~= 'LuaJIT' then
-        local env   = guide.getLocal(self.root, obj, '_ENV', obj.start)
-        local field = self:getFieldName(obj)
-        self:eachRefAsField(env, field, callback)
+        self:eachRefAsField(obj, callback)
         return
     end
 end
 
 --- 查找所有域引用
-function mt:eachRefAsField(parent, field, callback)
-    self:eachRef(parent, function (src, mode)
-        if self:getFieldName(src) ~= field then
-            return
-        end
-        if mode == 'settable' then
-            callback(src, 'set')
-        elseif mode == 'gettable' then
-            callback(src, 'get')
-        end
+function mt:eachRefAsField(obj, callback)
+    local nodeID = obj.node
+    if not nodeID then
+        return
+    end
+    local node = self.root[nodeID]
+    local key = guide.getKeyName(obj)
+    if not key then
+        return
+    end
+    guide.eachField(self.value, node, key, function ()
     end)
 end
 
@@ -81,9 +76,10 @@ return function (ast)
         ast.vm = {}
     end
     local self = setmetatable({
-        step = 0,
-        root = ast.root,
-        vm   = ast.vm,
+        step  = 0,
+        root  = ast.root,
+        value = ast.value,
+        vm    = ast.vm,
     }, mt)
     return self
 end

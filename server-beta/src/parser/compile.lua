@@ -3,7 +3,105 @@ local type = type
 
 _ENV = nil
 
-local pushError, Root, Compile, CompileBlock, Cache, Block, GoToTag, Version, ENVMode
+local pushError, Root, Compile, CompileBlock, Cache, Block, GoToTag, Version, ENVMode, Value
+
+--[[
+-- value 类右字面量创建，在set get call中传递
+-- obj 用 vref 表标记当前可能的 value 是哪些
+Value
+    type    -> 确定类型
+    literal -> 字面量对象
+    tag     -> 特殊标记
+    ref     -> 值的引用者
+    child   -> 值的child
+    func    -> 函数对象
+--]]
+
+local function createValue(data)
+    local id = #Value+1
+    Value[id] = data
+    data.ref = {}
+    return id
+end
+
+local function addValue(objID, valueID)
+    local obj = Root[objID]
+    local vref = obj.vref
+    if not vref then
+        vref = {}
+        obj.vref = vref
+        Cache[vref] = {}
+    end
+    local cache = Cache[vref]
+    if cache[valueID] then
+        return
+    end
+    cache[valueID] = true
+    vref[#vref+1] = valueID
+    local valueRef = Value[valueID].ref
+    valueRef[#valueRef+1] = objID
+end
+
+local function getValue(objID)
+    local obj = Root[objID]
+    local vref = obj.vref
+    if vref then
+        return vref
+    end
+    addValue(objID, createValue {})
+    return obj.vref
+end
+
+local function mergeValue(objID1, objID2)
+    local obj1  = Root[objID1]
+    local obj2  = Root[objID2]
+    local vref1 = obj1.vref
+    local vref2 = obj2.vref
+    if not vref2 then
+        return
+    end
+    if not vref1 then
+        vref1 = {}
+        obj1.vref = vref1
+        Cache[vref1] = {}
+    end
+    local cache = Cache[vref1]
+    for i = 1, #vref2 do
+        local valueID = vref2[i]
+        if not cache[valueID] then
+            cache[valueID] = true
+            vref1[#vref1+1] = valueID
+            local valueRef = Value[valueID].ref
+            valueRef[#valueRef+1] = objID1
+        end
+    end
+end
+
+local function setChildValue(objID, keyID, valueID)
+    if not valueID then
+        return
+    end
+    local objVref   = getValue(objID)
+    local key       = guide.getKeyName(Root[keyID])
+    local valueVref = getValue(valueID)
+    for i = 1, #objVref do
+        local value = Value[objVref[i]]
+        if not value.child then
+            value.child = {}
+        end
+        value.child[key] = valueVref
+    end
+end
+
+local function addLocalRef(nodeID, objID)
+    local node = Root[nodeID]
+    local obj  = Root[objID]
+    if not node.ref then
+        node.ref = {}
+    end
+    node.ref[#node.ref+1] = objID
+    obj.node = nodeID
+end
 
 local vmMap = {
     ['nil'] = function (obj)
@@ -40,13 +138,9 @@ local vmMap = {
         else
             obj.type = 'getglobal'
             if ENVMode == '_ENV' then
-                local node = guide.getLocal(Root, obj, '_ENV', obj.start)
+                local node, nodeID = guide.getLocal(Root, obj, '_ENV', obj.start)
                 if node then
-                    if not node.ref then
-                        node.ref = {}
-                    end
-                    node.ref[#node.ref+1] = id
-                    obj.node = Cache[node]
+                    addLocalRef(nodeID, id)
                 end
             end
         end
@@ -278,13 +372,10 @@ local vmMap = {
         else
             obj.type = 'setglobal'
             if ENVMode == '_ENV' then
-                local node = guide.getLocal(Root, obj, '_ENV', obj.start)
+                local node, nodeID = guide.getLocal(Root, obj, '_ENV', obj.start)
                 if node then
-                    if not node.ref then
-                        node.ref = {}
-                    end
-                    node.ref[#node.ref+1] = id
-                    obj.node = Cache[node]
+                    addLocalRef(nodeID, id)
+                    setChildValue(nodeID, id, obj.value)
                 end
             end
         end
@@ -508,13 +599,17 @@ local vmMap = {
         Root[#Root+1] = obj
         local id = #Root
         if ENVMode == '_ENV' then
-            Compile({
+            local envID = Compile({
                 type   = 'local',
                 start  = 0,
                 finish = 0,
                 effect = 0,
                 [1]    = '_ENV',
             }, id)
+            addValue(envID, createValue {
+                type = 'table',
+                tag  = '_ENV',
+            })
         end
         CompileBlock(obj, id)
         Block = nil
@@ -633,11 +728,14 @@ return function (self, lua, mode, version)
     end
     Cache = {}
     GoToTag = {}
+    Value = {}
     if type(state.ast) == 'table' then
         Compile(state.ast)
     end
     PostCompile()
     state.ast = nil
+    state.value = Value
     Cache = nil
+    Value = nil
     return state
 end

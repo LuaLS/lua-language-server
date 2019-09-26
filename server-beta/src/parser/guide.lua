@@ -129,18 +129,19 @@ function m.getLocal(root, block, name, pos)
             goto CONTINUE
         end
         for i = 1, #locals do
-            local loc = root[locals[i]]
+            local locID = locals[i]
+            local loc = root[locID]
             if loc.effect > pos then
                 break
             end
             if loc[1] == name then
-                if not res or res.effect < loc.effect then
-                    res = loc
+                if not res or root[res].effect < loc.effect then
+                    res = locID
                 end
             end
         end
         if res then
-            return res
+            return root[res], res
         end
         ::CONTINUE::
         block = m.getParentBlock(root, block)
@@ -284,6 +285,32 @@ function m.lineRange(lines, row)
         return 0, 0
     end
     return line.start + 1, line.finish
+end
+
+function m.getKeyName(obj)
+    if obj.type == 'getglobal' or obj.type == 'setglobal' then
+        return 'string|' .. obj[1]
+    elseif obj.type == 'getfield' or obj.type == 'getglobal' then
+        return 'string|' .. obj[1]
+    end
+end
+
+function m.eachField(value, obj, key, callback)
+    local vref = obj.vref
+    if not vref then
+        return
+    end
+    for x = 1, #vref do
+        local vID   = vref[x]
+        local v     = value[vID]
+        local child = v.child
+        if child then
+            local refs = child[key]
+            if refs then
+
+            end
+        end
+    end
 end
 
 return m

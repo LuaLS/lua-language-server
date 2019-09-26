@@ -1,69 +1,22 @@
 local guide    = require 'parser.guide'
 local engineer = require 'core.engineer'
 
-local m = {}
-
-function m.search(state, ast, source)
-    if not source then
-        return
-    end
-    if state.cache[source] then
-        return
-    end
-    state.cache[source] = true
-    local f = m['as' .. source.type]
-    if not f then
-        return
-    end
-    f(state, ast, source)
-end
-
-function m.aslocal(state, ast, source)
-    local searcher = engineer(ast)
-    searcher:eachLocalRef(source, function (src, mode)
-        if mode == 'local' or mode == 'set' then
-            state.callback(src)
-        end
-    end)
-    searcher:eachClass(source, function (src)
-        state.callback(src)
-    end)
-end
-
-m.asgetlocal = m.aslocal
-m.assetlocal = m.aslocal
-
-function m.globals(state, ast, source)
-    local searcher = engineer(ast)
-    searcher:eachGloablOfName(source[1], function (src, mode)
-        if mode == 'set' then
-            state.callback(src)
-        end
-    end)
-end
-
-m.assetglobal = m.globals
-m.asgetglobal = m.globals
-
 return function (ast, text, offset)
     local results = {}
-    local state = {
-        ast = ast,
-        cache = {},
-    }
-    function state.callback(target, uri)
-        if target.start == 0 then
-            return
-        end
-        results[#results+1] = {
-            uri    = uri or ast.uri,
-            source = state.source,
-            target = target,
-        }
-    end
+    local searcher = engineer(ast)
     guide.eachSource(ast.root, offset, function (source)
-        state.source = source
-        m.search(state, ast, source)
+        searcher:eachRef(source, function (src, mode)
+            if src.start == 0 then
+                return
+            end
+            if mode == 'local' or mode == 'set' then
+                results[#results+1] = {
+                    uri    = ast.uri,
+                    source = source,
+                    target = src,
+                }
+            end
+        end)
     end)
     if #results == 0 then
         return nil

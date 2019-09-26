@@ -39,6 +39,16 @@ local vmMap = {
             loc.ref[#loc.ref+1] = id
         else
             obj.type = 'getglobal'
+            if ENVMode == '_ENV' then
+                local node = guide.getLocal(Root, obj, '_ENV', obj.start)
+                if node then
+                    if not node.ref then
+                        node.ref = {}
+                    end
+                    node.ref[#node.ref+1] = id
+                    obj.node = Cache[node]
+                end
+            end
         end
         return id
     end,
@@ -267,6 +277,16 @@ local vmMap = {
             loc.ref[#loc.ref+1] = id
         else
             obj.type = 'setglobal'
+            if ENVMode == '_ENV' then
+                local node = guide.getLocal(Root, obj, '_ENV', obj.start)
+                if node then
+                    if not node.ref then
+                        node.ref = {}
+                    end
+                    node.ref[#node.ref+1] = id
+                    obj.node = Cache[node]
+                end
+            end
         end
         return id
     end,

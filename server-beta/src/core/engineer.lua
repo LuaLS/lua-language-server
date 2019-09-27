@@ -78,8 +78,6 @@ return function (ast)
     local self = setmetatable({
         step  = 0,
         root  = ast.root,
-        value = ast.value,
-        vm    = ast.vm,
     }, mt)
     return self
 end

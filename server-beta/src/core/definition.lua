@@ -4,7 +4,7 @@ local engineer = require 'core.engineer'
 return function (ast, text, offset)
     local results = {}
     local searcher = engineer(ast)
-    guide.eachSource(ast.root, offset, function (source)
+    guide.eachSource(offset, function (source)
         searcher:eachRef(source, function (src, mode)
             if src.start == 0 then
                 return

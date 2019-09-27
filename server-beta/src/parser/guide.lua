@@ -26,9 +26,9 @@ local breakBlockTypes = {
 }
 
 --- 寻找所在函数
-function m.getParentFunction(root, obj)
+function m.getParentFunction(obj)
     for _ = 1, 1000 do
-        obj = root[obj.parent]
+        obj = obj.parent
         if not obj then
             break
         end
@@ -41,7 +41,7 @@ function m.getParentFunction(root, obj)
 end
 
 --- 寻找所在区块
-function m.getBlock(root, obj)
+function m.getBlock(obj)
     for _ = 1, 1000 do
         if not obj then
             return nil
@@ -50,15 +50,15 @@ function m.getBlock(root, obj)
         if blockTypes[tp] then
             return obj
         end
-        obj = root[obj.parent]
+        obj = obj.parent
     end
     error('guide.getBlock overstack')
 end
 
 --- 寻找所在父区块
-function m.getParentBlock(root, obj)
+function m.getParentBlock(obj)
     for _ = 1, 1000 do
-        obj = root[obj.parent]
+        obj = obj.parent
         if not obj then
             return nil
         end
@@ -71,9 +71,9 @@ function m.getParentBlock(root, obj)
 end
 
 --- 寻找所在可break的父区块
-function m.getBreakBlock(root, obj)
+function m.getBreakBlock(obj)
     for _ = 1, 1000 do
-        obj = root[obj.parent]
+        obj = obj.parent
         if not obj then
             return nil
         end
@@ -92,19 +92,19 @@ end
 --- 如果函数是主函数，则返回`0, nil`。
 ---@return table
 ---@return integer
-function m.getFunctionVarArgs(root, func)
+function m.getFunctionVarArgs(func)
     if func.type == 'main' then
         return 0, nil
     end
     if func.type ~= 'function' then
         return nil, nil
     end
-    local args = root[func.args]
+    local args = func.args
     if not args then
         return nil, nil
     end
     for i = 1, #args do
-        local arg = root[args[i]]
+        local arg = args[i]
         if arg.type == '...' then
             return i, arg
         end
@@ -113,12 +113,11 @@ function m.getFunctionVarArgs(root, func)
 end
 
 --- 获取指定区块中可见的局部变量
----@param root table
 ---@param block table
 ---@param name string {comment = '变量名'}
 ---@param pos integer {comment = '可见位置'}
-function m.getLocal(root, block, name, pos)
-    block = m.getBlock(root, block)
+function m.getLocal(block, name, pos)
+    block = m.getBlock(block)
     for _ = 1, 1000 do
         if not block then
             return nil
@@ -129,32 +128,30 @@ function m.getLocal(root, block, name, pos)
             goto CONTINUE
         end
         for i = 1, #locals do
-            local locID = locals[i]
-            local loc = root[locID]
+            local loc = locals[i]
             if loc.effect > pos then
                 break
             end
             if loc[1] == name then
-                if not res or root[res].effect < loc.effect then
-                    res = locID
+                if not res or res.effect < loc.effect then
+                    res = loc
                 end
             end
         end
         if res then
-            return root[res], res
+            return res, res
         end
         ::CONTINUE::
-        block = m.getParentBlock(root, block)
+        block = m.getParentBlock(block)
     end
     error('guide.getLocal overstack')
 end
 
 --- 获取指定区块中可见的标签
----@param root table
 ---@param block table
 ---@param name string {comment = '标签名'}
-function m.getLabel(root, block, name)
-    block = m.getBlock(root, block)
+function m.getLabel(block, name)
+    block = m.getBlock(block)
     for _ = 1, 1000 do
         if not block then
             return nil
@@ -163,13 +160,13 @@ function m.getLabel(root, block, name)
         if labels then
             local label = labels[name]
             if label then
-                return root[label]
+                return label
             end
         end
         if block.type == 'function' then
             return nil
         end
-        block = m.getParentBlock(root, block)
+        block = m.getParentBlock(block)
     end
     error('guide.getLocal overstack')
 end
@@ -183,20 +180,20 @@ function m.isContain(source, offset)
 end
 
 --- 遍历所有包含offset的source
-function m.eachSource(root, offset, callback)
-    for i = 1, #root do
-        local source = root[i]
-        if m.isContain(source, offset) then
-            local res = callback(source)
-            if res ~= nil then
-                return res
-            end
-        end
-    end
+function m.eachSource(offset, callback)
+    --for i = 1, #root do
+    --    local source = root[i]
+    --    if m.isContain(source, offset) then
+    --        local res = callback(source)
+    --        if res ~= nil then
+    --            return res
+    --        end
+    --    end
+    --end
 end
 
 --- 遍历所有某种类型的source
-function m.eachSourceOf(root, types, callback)
+function m.eachSourceOf(types, callback)
     if type(types) == 'string' then
         types = {[types] = callback}
     elseif type(types) == 'table' then
@@ -206,13 +203,13 @@ function m.eachSourceOf(root, types, callback)
     else
         return
     end
-    for i = 1, #root do
-        local source = root[i]
-        local f = types[source.type]
-        if f then
-            f(source)
-        end
-    end
+    --for i = 1, #root do
+    --    local source = root[i]
+    --    local f = types[source.type]
+    --    if f then
+    --        f(source)
+    --    end
+    --end
 end
 
 --- 获取偏移对应的坐标（row从0开始，col为光标位置）
@@ -292,24 +289,6 @@ function m.getKeyName(obj)
         return 'string|' .. obj[1]
     elseif obj.type == 'getfield' or obj.type == 'getglobal' then
         return 'string|' .. obj[1]
-    end
-end
-
-function m.eachField(value, obj, key, callback)
-    local vref = obj.vref
-    if not vref then
-        return
-    end
-    for x = 1, #vref do
-        local vID   = vref[x]
-        local v     = value[vID]
-        local child = v.child
-        if child then
-            local refs = child[key]
-            if refs then
-
-            end
-        end
     end
 end
 

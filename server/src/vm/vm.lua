@@ -979,16 +979,18 @@ function mt:doFunction(action)
                 source:bindValue(value, 'set')
 
                 local func = value:getFunction()
-                if #name == 3 then
-                    -- function x:b()
-                    local loc = self:loadLocal(name[1][1])
-                    if loc then
-                        func:setObject(parent, loc:getSource())
+                if func then
+                    if #name == 3 then
+                        -- function x:b()
+                        local loc = self:loadLocal(name[1][1])
+                        if loc then
+                            func:setObject(parent, loc:getSource())
+                        else
+                            func:setObject(parent, name[#name-2])
+                        end
                     else
                         func:setObject(parent, name[#name-2])
                     end
-                else
-                    func:setObject(parent, name[#name-2])
                 end
             else
                 local value = self:buildFunction(action)

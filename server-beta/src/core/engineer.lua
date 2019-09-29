@@ -26,6 +26,19 @@ function mt:eachRefAsLocal(obj, callback)
     end
 end
 
+--- 查找所有域的引用
+function mt:eachRefAsField(obj, callback)
+    local node = obj.node
+    guide.eachFieldOf(node, guide.getKeyName(obj), function (value)
+        local tp = value.type
+        if tp == 'setglobal' or tp == 'setfield' then
+            callback(value, 'set')
+        elseif tp == 'getglobal' or tp == 'getfield' then
+            callback(value, 'get')
+        end
+    end)
+end
+
 --- 查找所有引用
 function mt:eachRef(obj, callback)
     if obj.type == 'local' then
@@ -33,7 +46,7 @@ function mt:eachRef(obj, callback)
     elseif obj.type == 'getlocal' or obj.type == 'setlocal' then
         self:eachRefAsLocal(obj.loc, callback)
     elseif obj.type == 'setglobal' or obj.type == 'getglobal' then
-        self:eachRefAsGlobal(obj, callback)
+        self:eachRefAsField(obj, callback)
     end
 end
 

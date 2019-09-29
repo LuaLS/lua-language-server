@@ -43,7 +43,11 @@ local function getValue(obj)
     if vref then
         return vref
     end
-    addValue(obj, {})
+    if guide.isLiteral(obj) then
+        addValue(obj, obj)
+    else
+        addValue(obj, {})
+    end
     return obj.vref
 end
 

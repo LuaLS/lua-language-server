@@ -251,6 +251,30 @@ function mt:searchNewLineCall(callback)
     end)
 end
 
+function mt:searchNewFieldCall(callback)
+    local lines = self.lines
+    self.vm:eachSource(function (source)
+        if source.type ~= 'table' then
+            return
+        end
+        for i = 1, #source do
+            local field = source[i]
+            if field.type == 'simple' then
+                local callSource = field[#field]
+                local funcSource = field[#field-1]
+                local callLine = lines:rowcol(callSource.start)
+                local funcLine = lines:rowcol(funcSource.finish)
+                if callLine > funcLine then
+                    callback(funcSource.start, callSource.finish
+                        , lines.buf:sub(funcSource.start, funcSource.finish)
+                        , lines.buf:sub(callSource.start, callSource.finish)
+                    )
+                end
+            end
+        end
+    end)
+end
+
 function mt:searchRedundantParameters(callback)
     self.vm:eachSource(function (source)
         local args = source:bindCall()
@@ -909,6 +933,12 @@ return function (vm, lines, uri)
     session:doDiagnostics(session.searchNewLineCall, 'newline-call', function ()
         return {
             message = lang.script.DIAG_PREVIOUS_CALL,
+        }
+    end)
+    -- 以字符串开始的field（可能被误解析为了上一行的call）
+    session:doDiagnostics(session.searchNewFieldCall, 'newfield-call', function (func, call)
+        return {
+            message = lang.script('DIAG_PREFIELD_CALL', func, call),
         }
     end)
     -- 调用函数时的参数数量是否超过函数的接收数量

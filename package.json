@@ -130,6 +130,17 @@
                             "scope": "resource",
                             "type": "string"
                         },
+                        "newfield-call": {
+                            "default": "Warning",
+                            "enum": [
+                                "Error",
+                                "Warning",
+                                "Information",
+                                "Hint"
+                            ],
+                            "scope": "resource",
+                            "type": "string"
+                        },
                         "newline-call": {
                             "default": "Information",
                             "enum": [

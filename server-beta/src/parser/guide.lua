@@ -25,6 +25,29 @@ local breakBlockTypes = {
     ['repeat']      = true,
 }
 
+m.childMap = {
+    ['repeat']      = {'#', 'filter'},
+    ['while']       = {'filter', '#'},
+    ['in']          = {'keys', '#'},
+    ['loop']        = {'loc', 'max', 'step', '#'},
+    ['ifblock']     = {'filter', '#'},
+    ['elseifblock'] = {'filter', '#'},
+    ['setfield']    = {'node', 'value'},
+    ['local']       = {'attrs', 'value'},
+    ['setlocal']    = {'value'},
+    ['index']       = {'index'},
+    ['tableindex']  = {'index', 'value'},
+    ['tablefield']  = {'value'},
+    ['function']    = {'args'},
+    ['setmethod']   = {'node', 'method', 'value'},
+    ['getmethod']   = {'node', 'method'},
+    ['setindex']    = {'node', 'index', 'value'},
+    ['getindex']    = {'node', 'index'},
+    ['paren']       = {'exp'},
+    ['call']        = {'node', 'args'},
+    ['getfield']    = {'node'},
+}
+
 --- 寻找所在函数
 function m.getParentFunction(obj)
     for _ = 1, 1000 do
@@ -180,16 +203,37 @@ function m.isContain(source, offset)
 end
 
 --- 遍历所有包含offset的source
-function m.eachSource(offset, callback)
-    --for i = 1, #root do
-    --    local source = root[i]
-    --    if m.isContain(source, offset) then
-    --        local res = callback(source)
-    --        if res ~= nil then
-    --            return res
-    --        end
-    --    end
-    --end
+function m.eachSource(ast, offset, callback)
+    local map = m.childMap
+    local list = { ast }
+    while true do
+        local len = #list
+        if len == 0 then
+            return
+        end
+        local obj = list[len]
+        list[len] = nil
+        if m.isContain(obj, offset) then
+            callback(obj)
+            local keys = map[obj.type]
+            if keys then
+                for i = 1, #keys do
+                    local key = keys[i]
+                    if key == '#' then
+                        for i = 1, #obj do
+                            list[#list+1] = obj[i]
+                        end
+                    else
+                        list[#list+1] = obj[key]
+                    end
+                end
+            else
+                for i = 1, #obj do
+                    list[#list+1] = obj[i]
+                end
+            end
+        end
+    end
 end
 
 --- 遍历所有某种类型的source

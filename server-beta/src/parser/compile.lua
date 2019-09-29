@@ -133,7 +133,7 @@ local vmMap = {
     end,
     ['binary'] = function (obj)
         Compile(obj[1], obj)
-        Compile( obj[2], obj)
+        Compile(obj[2], obj)
     end,
     ['unary'] = function (obj)
         Compile(obj[1], obj)

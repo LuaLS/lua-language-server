@@ -90,6 +90,8 @@ end
 local function getSelect(vararg, index)
     return {
         type   = 'select',
+        start  = vararg.start,
+        finish = vararg.finish,
         vararg = vararg,
         index  = index,
     }

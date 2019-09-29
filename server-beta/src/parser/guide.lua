@@ -26,26 +26,35 @@ local breakBlockTypes = {
 }
 
 m.childMap = {
+    ['main']        = {'#'},
     ['repeat']      = {'#', 'filter'},
     ['while']       = {'filter', '#'},
     ['in']          = {'keys', '#'},
     ['loop']        = {'loc', 'max', 'step', '#'},
+    ['if']          = {'#'},
     ['ifblock']     = {'filter', '#'},
     ['elseifblock'] = {'filter', '#'},
+    ['elseblock']   = {'#'},
     ['setfield']    = {'node', 'value'},
     ['local']       = {'attrs', 'value'},
     ['setlocal']    = {'value'},
+    ['return']      = {'#'},
+    ['do']          = {'#'},
     ['index']       = {'index'},
+    ['table']       = {'#'},
     ['tableindex']  = {'index', 'value'},
     ['tablefield']  = {'value'},
     ['function']    = {'args'},
+    ['funcargs']    = {'#'},
     ['setmethod']   = {'node', 'method', 'value'},
     ['getmethod']   = {'node', 'method'},
     ['setindex']    = {'node', 'index', 'value'},
     ['getindex']    = {'node', 'index'},
     ['paren']       = {'exp'},
     ['call']        = {'node', 'args'},
+    ['callargs']    = {'#'},
     ['getfield']    = {'node'},
+    ['list']        = {'#'},
 }
 
 --- 寻找所在函数
@@ -196,10 +205,12 @@ end
 
 --- 判断source是否包含offset
 function m.isContain(source, offset)
-    if not source.start then
-        return false
-    end
     return source.start <= offset and source.finish >= offset - 1
+end
+
+--- 判断offset在source的范围内
+function m.isInRange(source, offset)
+    return source.start <= offset and (source.range or source.finish) >= offset - 1
 end
 
 --- 遍历所有包含offset的source
@@ -213,8 +224,10 @@ function m.eachSource(ast, offset, callback)
         end
         local obj = list[len]
         list[len] = nil
-        if m.isContain(obj, offset) then
-            callback(obj)
+        if m.isInRange(obj, offset) then
+            if m.isContain(obj, offset) then
+                callback(obj)
+            end
             local keys = map[obj.type]
             if keys then
                 for i = 1, #keys do
@@ -226,10 +239,6 @@ function m.eachSource(ast, offset, callback)
                     else
                         list[#list+1] = obj[key]
                     end
-                end
-            else
-                for i = 1, #obj do
-                    list[#list+1] = obj[i]
                 end
             end
         end

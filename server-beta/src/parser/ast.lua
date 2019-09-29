@@ -124,6 +124,9 @@ local function createLocal(key, effect, value, attrs)
     key.effect = effect
     key.value  = value
     key.attrs  = attrs
+    if value then
+        key.range = value.finish
+    end
     return key
 end
 
@@ -179,7 +182,8 @@ local function packList(start, list, finish)
     for i = count + 1, #list do
         list[i] = nil
     end
-    list.start = start
+    list.type   = 'list'
+    list.start  = start
     list.finish = finish - 1
     return list
 end
@@ -995,6 +999,9 @@ local Defs = {
                 key.type = 'setindex'
                 key.value = getValue(values, i)
             end
+            if key.value then
+                key.range = key.value.finish
+            end
         end
         return tableUnpack(keys)
     end,
@@ -1177,20 +1184,22 @@ local Defs = {
         block.type   = 'in'
         block.start  = start
         block.finish = finish - 1
-        block.keys = {}
+        block.keys   = keys
 
         local values
         if func then
             local call = createCall(exp, func.finish + 1, exp.finish)
             call.node = func
+            call.start = func.start
             values = { call }
+            keys.range = call.finish
         end
         for i = 1, #keys do
             local loc = keys[i]
             if values then
-                block.keys[i] = createLocal(loc, blockStart, getValue(values, i))
+                createLocal(loc, blockStart, getValue(values, i))
             else
-                block.keys[i] = createLocal(loc, blockStart)
+                createLocal(loc, blockStart)
             end
         end
         checkMissEnd(start)

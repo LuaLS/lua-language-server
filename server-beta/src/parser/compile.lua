@@ -3,7 +3,7 @@ local type = type
 
 _ENV = nil
 
-local pushError, Compile, CompileBlock, Cache, Block, GoToTag, Version, ENVMode
+local pushError, Compile, CompileBlock, Cache, Block, GoToTag, Version, ENVMode, Compiled
 
 --[[
 -- value 类右字面量创建，在set get call中传递
@@ -416,6 +416,10 @@ function Compile(obj, parent)
     if not obj then
         return nil
     end
+    if Compiled[obj] then
+        return
+    end
+    Compiled[obj] = true
     local f = vmMap[obj.type]
     if not f then
         return
@@ -510,11 +514,14 @@ return function (self, lua, mode, version)
         ENVMode = '_ENV'
     end
     Cache = {}
+    Compiled = {}
     GoToTag = {}
     if type(state.ast) == 'table' then
         Compile(state.ast)
     end
     PostCompile()
     Cache = nil
+    Compiled = nil
+    GoToTag = nil
     return state
 end

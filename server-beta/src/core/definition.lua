@@ -4,12 +4,9 @@ local engineer = require 'core.engineer'
 return function (ast, text, offset)
     local results = {}
     local searcher = engineer(ast)
-    guide.eachSource(offset, function (source)
+    guide.eachSource(ast.ast, offset, function (source)
         searcher:eachRef(source, function (src, mode)
-            if src.start == 0 then
-                return
-            end
-            if mode == 'local' or mode == 'set' then
+            if mode == 'set' or mode == 'local' then
                 results[#results+1] = {
                     uri    = ast.uri,
                     source = source,

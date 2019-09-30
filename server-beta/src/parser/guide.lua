@@ -349,4 +349,13 @@ function m.lineRange(lines, row)
     return line.start + 1, line.finish
 end
 
+function m.getKeyName(obj)
+    if obj.type == 'getglobal' or obj.type == 'setglobal' then
+        return obj[1]
+    elseif obj.type == 'getfield' or obj.type == 'setfield' then
+        return obj.field[1]
+    end
+    return nil
+end
+
 return m

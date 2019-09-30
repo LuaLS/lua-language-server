@@ -28,21 +28,41 @@ mt['getlocal'] = function (self, source, mode, callback)
     self:search(source.loc, 'local', mode, callback)
 end
 mt['setlocal'] = mt['getlocal']
-mt['_ENV'] = function (self, source, mode, callback)
+mt['_G'] = function (self, source, mode, callback)
     if mode == 'def' then
-        if source.ref then
-            for _, ref in ipairs(source.ref) do
+        local parent = source.parent
+        if parent.type == 'setfield' then
+            callback(parent, 'set')
+        elseif parent.type == 'getfield' then
+            self:search(parent, 'special', mode, callback)
+        end
+    end
+end
+mt['getglobal'] = function (self, source, mode, callback)
+    local env = source.node
+    if mode == 'def' then
+        if env.ref then
+            for _, ref in ipairs(env.ref) do
                 if ref.type == 'setglobal' then
                     callback(ref, 'set')
+                elseif ref.type == 'getglobal' then
+                    self:search(ref, 'special', mode, callback)
+                elseif ref.type == 'getlocal' then
+                    self:search(ref, '_G', mode, callback)
                 end
             end
         end
     end
 end
-mt['getglobal'] = function (self, source, mode, callback)
-    self:search(source.node, '_ENV', mode, callback)
-end
 mt['setglobal'] = mt['getglobal']
+mt['special'] = function (self, source, mode, callback)
+    if mode == 'def' then
+        local name = guide.getKeyName(source)
+        if name == '_G' then
+            self:search(source, '_G', mode, callback)
+        end
+    end
+end
 
 function mt:search(source, method, mode, callback)
     local f = mt[method]

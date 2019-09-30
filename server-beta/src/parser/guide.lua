@@ -37,6 +37,7 @@ m.childMap = {
     ['elseifblock'] = {'filter', '#'},
     ['elseblock']   = {'#'},
     ['setfield']    = {'node', 'value'},
+    ['setglobal']   = {'value'},
     ['local']       = {'attrs', 'value'},
     ['setlocal']    = {'value'},
     ['return']      = {'#'},

@@ -29,6 +29,37 @@ mt['local'] = function (self, source, mode, callback)
             local node = method.node
             self:search(node, node.type, mode, callback)
         end
+    elseif mode == 'ref' then
+        if source.tag ~= 'self' then
+            callback(source, 'local')
+        end
+        if source.ref then
+            for _, ref in ipairs(source.ref) do
+                if ref.type == 'setlocal' then
+                    callback(ref, 'set')
+                elseif ref.type == 'getlocal' then
+                    callback(ref, 'get')
+                end
+            end
+        end
+        if source.tag == 'self' then
+            local method = source.method
+            local node = method.node
+            self:search(node, node.type, mode, callback)
+        end
+    elseif mode == 'field' then
+        if source.ref then
+            for _, ref in ipairs(source.ref) do
+                if ref.type == 'getlocal' then
+                    local parent = ref.parent
+                    if parent.type == 'setfield' then
+                        callback(parent)
+                    elseif parent.type == 'getfield' then
+                        callback(parent)
+                    end
+                end
+            end
+        end
     end
 end
 mt['getlocal'] = function (self, source, mode, callback)
@@ -40,6 +71,17 @@ mt['_G'] = function (self, source, mode, callback)
         local parent = source.parent
         if parent.type == 'setfield' then
             callback(parent, 'set')
+        elseif parent.type == 'getfield' then
+            self:search(parent, 'special', mode, callback)
+        elseif parent.type == 'callargs' then
+            self:search(parent.parent, 'special', mode, callback)
+        end
+    elseif mode == 'ref' then
+        local parent = source.parent
+        if parent.type == 'setfield' then
+            callback(parent, 'set')
+        elseif parent.type == 'getfield' then
+            callback(parent, 'get')
         elseif parent.type == 'getfield' then
             self:search(parent, 'special', mode, callback)
         elseif parent.type == 'callargs' then
@@ -61,9 +103,47 @@ mt['getglobal'] = function (self, source, mode, callback)
                 end
             end
         end
+    elseif mode == 'ref' then
+        if env.ref then
+            for _, ref in ipairs(env.ref) do
+                if ref.type == 'setglobal' then
+                    callback(ref, 'set')
+                elseif ref.type == 'getglobal' then
+                    callback(ref, 'get')
+                elseif ref.type == 'getglobal' then
+                    self:search(ref, 'special', mode, callback)
+                elseif ref.type == 'getlocal' then
+                    self:search(ref, '_G', mode, callback)
+                end
+            end
+        end
+    elseif mode == 'field' then
+        self:search(source, 'getglobal', 'ref', function (src)
+            local parent = src.parent
+            if parent.type == 'setfield' then
+                callback(parent)
+            elseif parent.type == 'getfield' then
+                callback(parent)
+            end
+        end)
     end
 end
 mt['setglobal'] = mt['getglobal']
+mt['field'] = function (self, source, mode, callback)
+    local node = source.node
+    local key = guide.getKeyName(source)
+    self:eachRef(node, 'field', function (src)
+        if key == guide.getKeyName(src) then
+            if mode == 'def' then
+                if src.type == 'setfield' then
+                    callback(src.field, 'set')
+                end
+            end
+        end
+    end)
+end
+mt['getfield'] = mt['field']
+mt['setfield'] = mt['field']
 mt['special'] = function (self, source, mode, callback)
     local name = self:getSpecial(source)
     if not name then

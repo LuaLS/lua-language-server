@@ -35,6 +35,8 @@ mt['_G'] = function (self, source, mode, callback)
             callback(parent, 'set')
         elseif parent.type == 'getfield' then
             self:search(parent, 'special', mode, callback)
+        elseif parent.type == 'callargs' then
+            self:search(parent.parent, 'special', mode, callback)
         end
     end
 end
@@ -56,12 +58,26 @@ mt['getglobal'] = function (self, source, mode, callback)
 end
 mt['setglobal'] = mt['getglobal']
 mt['special'] = function (self, source, mode, callback)
+    local name = self:getSpecial(source)
+    if not name then
+        return
+    end
     if mode == 'def' then
-        local name = guide.getKeyName(source)
         if name == '_G' then
             self:search(source, '_G', mode, callback)
+        elseif name == 'rawset' then
+            callback(source.parent, 'set')
         end
     end
+end
+
+function mt:getSpecial(source)
+    local node = source.node
+    if node.tag ~= '_ENV' then
+        return nil
+    end
+    local name = guide.getKeyName(source)
+    return name
 end
 
 function mt:search(source, method, mode, callback)
@@ -78,12 +94,12 @@ function mt:eachRef(source, mode, callback)
 end
 
 return function (ast)
-    if not ast.vm then
-        ast.vm = {}
-    end
     local self = setmetatable({
         step = 0,
         ast  = ast.ast,
     }, mt)
+    if not ast.vm then
+        ast.vm = {}
+    end
     return self
 end

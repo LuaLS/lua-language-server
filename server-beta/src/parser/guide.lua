@@ -226,7 +226,7 @@ function m.isInRange(source, offset)
 end
 
 --- 遍历所有包含offset的source
-function m.eachSource(ast, offset, callback)
+function m.eachSourceContain(ast, offset, callback)
     local map = m.childMap
     local list = { ast }
     while true do
@@ -257,24 +257,32 @@ function m.eachSource(ast, offset, callback)
     end
 end
 
---- 遍历所有某种类型的source
-function m.eachSourceOf(types, callback)
-    if type(types) == 'string' then
-        types = {[types] = callback}
-    elseif type(types) == 'table' then
-        for i = 1, #types do
-            types[types[i]] = callback
+--- 遍历所有包含offset的source
+function m.eachSource(ast, callback)
+    local map = m.childMap
+    local list = { ast }
+    while true do
+        local len = #list
+        if len == 0 then
+            return
         end
-    else
-        return
+        local obj = list[len]
+        list[len] = nil
+        callback(obj)
+        local keys = map[obj.type]
+        if keys then
+            for i = 1, #keys do
+                local key = keys[i]
+                if key == '#' then
+                    for i = 1, #obj do
+                        list[#list+1] = obj[i]
+                    end
+                else
+                    list[#list+1] = obj[key]
+                end
+            end
+        end
     end
-    --for i = 1, #root do
-    --    local source = root[i]
-    --    local f = types[source.type]
-    --    if f then
-    --        f(source)
-    --    end
-    --end
 end
 
 --- 获取偏移对应的坐标（row从0开始，col为光标位置）

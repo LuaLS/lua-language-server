@@ -3,7 +3,7 @@ local engineer = require 'core.engineer'
 
 return function (ast, text, offset)
     local results = {}
-    guide.eachSource(ast.ast, offset, function (source)
+    guide.eachSourceContain(ast.ast, offset, function (source)
         local searcher = engineer(ast)
         searcher:eachRef(source, 'def', function (src, mode)
             results[#results+1] = {

@@ -29,12 +29,11 @@ end
 --- 查找所有域的引用
 function mt:eachRefAsField(obj, callback)
     local node = obj.node
-    guide.eachFieldOf(node, guide.getKeyName(obj), function (value)
-        local tp = value.type
-        if tp == 'setglobal' or tp == 'setfield' then
-            callback(value, 'set')
-        elseif tp == 'getglobal' or tp == 'getfield' then
-            callback(value, 'get')
+    guide.eachRef(node, function (ref)
+        if ref.type == 'setglobal' or ref.type == 'setfield' then
+            callback(ref, 'set')
+        elseif ref.type == 'getglobal' or ref.type == 'getfield' then
+            callback(ref, 'get')
         end
     end)
 end

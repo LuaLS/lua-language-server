@@ -352,9 +352,9 @@ end
 --- 获取对象作为key时的名字
 function m.getKeyName(obj)
     if obj.type == 'getglobal' or obj.type == 'setglobal' then
-        return 'string|' .. obj[1]
+        return 's|' .. obj[1]
     elseif obj.type == 'getfield' or obj.type == 'getglobal' then
-        return 'string|' .. obj[1]
+        return 's|' .. obj[1]
     end
 end
 
@@ -394,6 +394,17 @@ function m.eachFieldOf(obj, field, callback)
                 end
             end
         end
+    end
+end
+
+--- 获取对象的所有引用
+function m.eachRef(obj, callback)
+    local ref = obj.ref
+    if not ref then
+        return
+    end
+    for i = 1, #ref do
+        callback(ref[i])
     end
 end
 

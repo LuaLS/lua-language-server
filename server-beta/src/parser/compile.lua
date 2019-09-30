@@ -89,6 +89,7 @@ local vmMap = {
             finish = 0,
             method = obj,
             effect = obj.finish,
+            tag    = 'self',
             [1]    = 'self',
         }
         Compile(value, obj)

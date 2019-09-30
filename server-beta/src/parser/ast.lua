@@ -824,16 +824,15 @@ local Defs = {
         if name.type == 'getname' then
             name.type = 'setname'
             name.value = actions
-            return name
         elseif name.type == 'getfield' then
             name.type = 'setfield'
             name.value = actions
-            return name
         elseif name.type == 'getmethod' then
             name.type = 'setmethod'
             name.value = actions
-            return name
         end
+        name.range = actions.finish
+        return name
     end,
     LocalFunction = function (start, name, args, actions, finish)
         actions.type   = 'function'

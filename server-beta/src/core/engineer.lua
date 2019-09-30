@@ -14,13 +14,20 @@ mt.type = 'engineer'
 
 mt['local'] = function (self, source, mode, callback)
     if mode == 'def' then
-        callback(source, 'local')
+        if source.tag ~= 'self' then
+            callback(source, 'local')
+        end
         if source.ref then
             for _, ref in ipairs(source.ref) do
                 if ref.type == 'setlocal' then
                     callback(ref, 'set')
                 end
             end
+        end
+        if source.tag == 'self' then
+            local method = source.method
+            local node = method.node
+            self:search(node, node.type, mode, callback)
         end
     end
 end

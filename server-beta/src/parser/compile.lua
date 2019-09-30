@@ -3,98 +3,9 @@ local type = type
 
 _ENV = nil
 
-local pushError, Compile, CompileBlock, Cache, Block, GoToTag, Version, ENVMode, Compiled
+local pushError, Compile, CompileBlock, Cache, Block, GoToTag, Version, ENVMode, Compiled, ValueID
 
---[[
--- value 类右字面量创建，在set get call中传递
--- obj 用 vref 表标记当前可能的 value 是哪些
-Value
-    type    -> 确定类型
-    literal -> 字面量对象
-    tag     -> 特殊标记
-    ref     -> 值的引用者
-    child   -> 值的child
-    func    -> 函数对象
---]]
-
-local function addValue(obj, value)
-    local vref = obj.vref
-    if not vref then
-        vref = {}
-        obj.vref = vref
-        Cache[vref] = {}
-    end
-    local cache = Cache[vref]
-    if cache[value] then
-        return
-    end
-    cache[value] = true
-    vref[#vref+1] = value
-    local valueRef = value.ref
-    if not valueRef then
-        valueRef = {}
-        value.ref = valueRef
-    end
-    valueRef[#valueRef+1] = obj
-end
-
-local function getValue(obj)
-    local vref = obj.vref
-    if vref then
-        return vref
-    end
-    if guide.isLiteral(obj) then
-        addValue(obj, obj)
-    else
-        addValue(obj, {})
-    end
-    return obj.vref
-end
-
-local function mergeValue(obj1, obj2)
-    local vref1 = obj1.vref
-    local vref2 = obj2.vref
-    if not vref2 then
-        return
-    end
-    if not vref1 then
-        vref1 = {}
-        obj1.vref = vref1
-        Cache[vref1] = {}
-    end
-    local cache = Cache[vref1]
-    for i = 1, #vref2 do
-        local value = vref2[i]
-        if not cache[value] then
-            cache[value] = true
-            vref1[#vref1+1] = value
-            local valueRef = value.ref
-            if not valueRef then
-                valueRef = {}
-                value.ref = valueRef
-            end
-            valueRef[#valueRef+1] = obj1
-        end
-    end
-end
-
-local function setChildValue(obj, key, value)
-    if not value then
-        return
-    end
-    local objVref   = getValue(obj)
-    local keyName   = guide.getKeyName(key)
-    local valueVref = getValue(value)
-    for i = 1, #objVref do
-        local v = objVref[i]
-        if not v.child then
-            v.child = {}
-        end
-        v.child[keyName] = valueVref
-    end
-end
-
-local function addLocalRef(node, obj)
+local function addRef(node, obj)
     if not node.ref then
         node.ref = {}
     end
@@ -108,16 +19,13 @@ local vmMap = {
         if loc then
             obj.type = 'getlocal'
             obj.loc  = loc
-            if not loc.ref then
-                loc.ref = {}
-            end
-            loc.ref[#loc.ref+1] = obj
+            addRef(loc, obj)
         else
             obj.type = 'getglobal'
             if ENVMode == '_ENV' then
                 local node = guide.getLocal(obj, '_ENV', obj.start)
                 if node then
-                    addLocalRef(node, obj)
+                    addRef(node, obj)
                 end
             end
         end
@@ -235,17 +143,13 @@ local vmMap = {
         if loc then
             obj.type = 'setlocal'
             obj.loc  = loc
-            if not loc.ref then
-                loc.ref = {}
-            end
-            loc.ref[#loc.ref+1] = obj
+            addRef(loc, obj)
         else
             obj.type = 'setglobal'
             if ENVMode == '_ENV' then
                 local node = guide.getLocal(obj, '_ENV', obj.start)
                 if node then
-                    addLocalRef(node, obj)
-                    setChildValue(node, obj, obj.value)
+                    addRef(node, obj)
                 end
             end
         end
@@ -387,18 +291,13 @@ local vmMap = {
     ['main'] = function (obj)
         Block = obj
         if ENVMode == '_ENV' then
-            local env = {
+            Compile({
                 type   = 'local',
                 start  = 0,
                 finish = 0,
                 effect = 0,
                 [1]    = '_ENV',
-            }
-            Compile(env, obj)
-            addValue(env, {
-                type = 'table',
-                tag  = '_ENV',
-            })
+            }, obj)
         end
         CompileBlock(obj, obj)
         Block = nil
@@ -520,6 +419,7 @@ return function (self, lua, mode, version)
     Cache = {}
     Compiled = {}
     GoToTag = {}
+    ValueID = 0
     if type(state.ast) == 'table' then
         Compile(state.ast)
     end

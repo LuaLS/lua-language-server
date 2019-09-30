@@ -12,41 +12,49 @@ local mt = {}
 mt.__index = mt
 mt.type = 'engineer'
 
---- 查找所有局部变量引用
-function mt:eachRefAsLocal(obj, callback)
-    callback(obj, 'local')
-    if obj.ref then
-        for _, ref in ipairs(obj.ref) do
-            if ref.type == 'setlocal' then
-                callback(ref, 'set')
-            elseif ref.type == 'getlocal' then
-                callback(ref, 'get')
+mt['local'] = function (self, source, mode, callback)
+    if mode == 'def' then
+        callback(source, 'local')
+        if source.ref then
+            for _, ref in ipairs(source.ref) do
+                if ref.type == 'setlocal' then
+                    callback(ref, 'set')
+                end
             end
         end
     end
 end
-
---- 查找所有域的引用
-function mt:eachRefAsField(obj, callback)
-    local node = obj.node
-    guide.eachChildRef(node, function (ref)
-        if ref.type == 'setglobal' or ref.type == 'setfield' then
-            callback(ref, 'set')
-        elseif ref.type == 'getglobal' or ref.type == 'getfield' then
-            callback(ref, 'get')
+mt['getlocal'] = function (self, source, mode, callback)
+    self:search(source.loc, 'local', mode, callback)
+end
+mt['setlocal'] = mt['getlocal']
+mt['_ENV'] = function (self, source, mode, callback)
+    if mode == 'def' then
+        if source.ref then
+            for _, ref in ipairs(source.ref) do
+                if ref.type == 'setglobal' then
+                    callback(ref, 'set')
+                end
+            end
         end
-    end)
+    end
+end
+mt['getglobal'] = function (self, source, mode, callback)
+    self:search(source.node, '_ENV', mode, callback)
+end
+mt['setglobal'] = mt['getglobal']
+
+function mt:search(source, method, mode, callback)
+    local f = mt[method]
+    if not f then
+        return
+    end
+    f(self, source, mode, callback)
 end
 
---- 查找所有引用
-function mt:eachRef(obj, callback)
-    if obj.type == 'local' then
-        self:eachRefAsLocal(obj, callback)
-    elseif obj.type == 'getlocal' or obj.type == 'setlocal' then
-        self:eachRefAsLocal(obj.loc, callback)
-    elseif obj.type == 'setglobal' or obj.type == 'getglobal' then
-        self:eachRefAsField(obj, callback)
-    end
+function mt:eachRef(source, mode, callback)
+    local tp = source.type
+    self:search(source, tp, mode, callback)
 end
 
 return function (ast)

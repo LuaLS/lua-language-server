@@ -359,7 +359,7 @@ function m.getKeyName(obj)
 end
 
 --- 获取对象所有field的key与valueObj
-function m.eachField(obj, callback)
+function m.eachChildValue(obj, callback)
     local vref = obj.vref
     if not vref then
         return
@@ -378,7 +378,7 @@ function m.eachField(obj, callback)
 end
 
 --- 获取对象所有指定field的key与valueObj
-function m.eachFieldOf(obj, field, callback)
+function m.eachChildValueOf(obj, field, callback)
     local vref = obj.vref
     if not vref then
         return
@@ -391,6 +391,29 @@ function m.eachFieldOf(obj, field, callback)
             if cvref then
                 for j = 1, #cvref do
                     callback(cvref[j])
+                end
+            end
+        end
+    end
+end
+
+--- 获取对象所有field的引用
+function m.eachChildRef(obj, callback)
+    local vref = obj.vref
+    if not vref then
+        return
+    end
+    for x = 1, #vref do
+        local v = vref[x]
+        local cref = v.ref
+        if cref then
+            for y = 1, #cref do
+                local co = cref[y]
+                local ref = co.ref
+                if ref then
+                    for i = 1, #ref do
+                        callback(ref[i])
+                    end
                 end
             end
         end

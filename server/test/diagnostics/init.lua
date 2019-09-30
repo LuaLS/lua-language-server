@@ -186,15 +186,15 @@ print()
 
 TEST [[
 return {
-    print
-    <!'string'!>
+    <!print
+    'string'!>
 }
 ]]
 
 TEST [[
 return {
-    print
-    <!{
+    <!print
+    {
         x = 1,
     }!>
 }

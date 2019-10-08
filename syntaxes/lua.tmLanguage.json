@@ -197,7 +197,7 @@
 			"name": "keyword.local.lua"
 		},
 		{
-			"match": "<\\s*(const|close)\\s*\\>",
+			"match": "<\\s*(const|close)\\s*>",
 			"captures": {
 				"1": {
 					"name": "string.tag.lua"

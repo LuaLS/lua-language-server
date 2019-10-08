@@ -130,7 +130,7 @@ mt['getglobal'] = function (self, source, mode, callback)
 end
 mt['setglobal'] = mt['getglobal']
 mt['field'] = function (self, source, mode, callback)
-    local node = source.node
+    local node = source.node.node
     local key = guide.getKeyName(source)
     self:eachRef(node, 'field', function (src)
         if key == guide.getKeyName(src) then

@@ -161,7 +161,7 @@ local package = {
                     scope = "resource",
                     type = "boolean",
                     default = false,
-                    markdownDescription = "DO NOT TOUCH ME, LET ME SLEEP >_<"
+                    markdownDescription = "%config.zzzzzz.cat%"
                 },
             }
         },
@@ -263,6 +263,7 @@ The following example shows loaded files in `C:/lua` and `../lib` ,exclude `../l
 ]] .. example.library,
     ['config.completion.enable']          = 'Enable completion.',
     ['config.completion.callSnippet']     = 'Show function call snippets.',
+    ['config.zzzzzz.cat']                 = 'DO NOT TOUCH ME, LET ME SLEEP >_<\n\n(This will enable beta version, which are still in the early stages of development, and all features will fail after enabling this setting.)',
 })
 
 io.save(ROOT:parent_path() / 'package.nls.zh-cn.json', json.encode {
@@ -284,4 +285,5 @@ io.save(ROOT:parent_path() / 'package.nls.zh-cn.json', json.encode {
 ]] .. example.library,
     ['config.completion.enable']          = '启用自动完成。',
     ['config.completion.callSnippet']     = '显示函数调用片段。',
+    ['config.zzzzzz.cat']                 = 'DO NOT TOUCH ME, LET ME SLEEP >_<\n\n（这会启用还处于早期开发阶段的beta版，开启后所有的功能都会失效）',
 })

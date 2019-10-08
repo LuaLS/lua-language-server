@@ -346,7 +346,7 @@
                 },
                 "Lua.zzzzzz.cat": {
                     "default": false,
-                    "markdownDescription": "DO NOT TOUCH ME, LET ME SLEEP >_<",
+                    "markdownDescription": "%config.zzzzzz.cat%",
                     "scope": "resource",
                     "type": "boolean"
                 }

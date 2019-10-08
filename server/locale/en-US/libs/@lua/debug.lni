@@ -94,7 +94,7 @@ to the userdata `u` plus a boolean,
 `false` if the userdata does not have that value.
 ]]
 
-[setCstacklimit]
+[setcstacklimit]
 description = [[
 Sets a new limit for the C stack. This limit controls how deeply nested calls can go in Lua, with the intent of avoiding a stack overflow.
 

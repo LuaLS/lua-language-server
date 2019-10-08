@@ -152,7 +152,7 @@ type = 'any'
 ``````````
 type = 'boolean'
 
-[setCstacklimit]
+[setcstacklimit]
 version = 'Lua 5.4'
 [[.args]]
 name = 'limit'

@@ -14,10 +14,26 @@ end
 ```
 ]]
 
+["codes Lua 5.4"]
+description = [[
+--------
+```lua
+for p, c in utf8.codes(s) do
+    body
+end
+```
+]]
+
 [codepoint]
 description = '以整数形式返回 `s` 中 从位置 `i` 到 `j` 间（包括两端） 所有字符的编号。'
 
+["codepoint Lua 5.4"]
+description = '以整数形式返回 `s` 中 从位置 `i` 到 `j` 间（包括两端） 所有字符的编号。'
+
 [len]
+description = '返回字符串 `s` 中 从位置 `i` 到 `j` 间 （包括两端） UTF-8 字符的个数。'
+
+["len Lua 5.4"]
 description = '返回字符串 `s` 中 从位置 `i` 到 `j` 间 （包括两端） UTF-8 字符的个数。'
 
 [offset]

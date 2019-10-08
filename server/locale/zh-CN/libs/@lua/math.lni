@@ -93,7 +93,7 @@ description = '把 `x` 设为伪随机数发生器的“种子”： 相同的�
 description = [[
 * `math.randomseed(x, y)`: 将 `x` 与 `y` 连接为128位的种子来重新初始化伪随机生成器。
 * `math.randomseed(x)`: 等同于 `math.randomseed(x, 0)` 。
-* `math.randomseed()`: Generates a seed with a weak attempt for randomness.
+* `math.randomseed()`: Generates a seed with a weak attempt for randomness.（不会翻）
 ]]
 
 [sin]

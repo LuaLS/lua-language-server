@@ -142,8 +142,6 @@ mt['field'] = function (self, source, mode, callback)
         end
     end)
 end
-mt['getfield'] = mt['field']
-mt['setfield'] = mt['field']
 mt['special'] = function (self, source, mode, callback)
     local name = self:getSpecial(source)
     if not name then

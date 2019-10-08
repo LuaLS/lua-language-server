@@ -558,16 +558,18 @@ local Defs = {
         }
     end,
     GetField = function (dot, field)
-        if field then
-            field.type = 'field'
-        end
-        return {
+        local obj = {
             type   = 'getfield',
             field  = field,
             dot    = dot,
             start  = dot.start,
             finish = (field or dot).finish,
         }
+        if field then
+            field.type = 'field'
+            field.node = obj
+        end
+        return obj
     end,
     GetIndex = function (start, index, finish)
         return {
@@ -898,14 +900,16 @@ local Defs = {
         return tbl
     end,
     NewField = function (start, field, value, finish)
-        field.type = 'field'
-        return {
+        local obj = {
             type   = 'tablefield',
             start  = start,
             finish = finish-1,
             field  = field,
             value  = value,
         }
+        field.type = 'field'
+        field.node = obj
+        return obj
     end,
     Index = function (start, index, finish)
         return {

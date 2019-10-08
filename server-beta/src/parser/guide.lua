@@ -36,7 +36,7 @@ m.childMap = {
     ['ifblock']     = {'filter', '#'},
     ['elseifblock'] = {'filter', '#'},
     ['elseblock']   = {'#'},
-    ['setfield']    = {'node', 'value'},
+    ['setfield']    = {'node', 'field', 'value'},
     ['setglobal']   = {'value'},
     ['local']       = {'attrs', 'value'},
     ['setlocal']    = {'value'},
@@ -56,7 +56,7 @@ m.childMap = {
     ['paren']       = {'exp'},
     ['call']        = {'node', 'args'},
     ['callargs']    = {'#'},
-    ['getfield']    = {'node'},
+    ['getfield']    = {'node', 'field'},
     ['list']        = {'#'},
 }
 
@@ -363,6 +363,8 @@ function m.getKeyName(obj)
         return obj[1]
     elseif obj.type == 'getfield' or obj.type == 'setfield' then
         return obj.field[1]
+    elseif obj.type == 'field' then
+        return obj[1]
     end
     return nil
 end

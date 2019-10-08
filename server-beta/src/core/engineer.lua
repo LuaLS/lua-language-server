@@ -59,8 +59,13 @@ mt['local'] = function (self, source, mode, callback)
                     or tp == 'getindex' then
                         callback(parent)
                     end
+                elseif ref.type == 'setlocal' then
+                    self:eachRef(ref.value, 'field', callback)
                 end
             end
+        end
+        if source.value then
+            self:eachRef(source.value, 'field', callback)
         end
     end
 end
@@ -142,8 +147,13 @@ mt['field'] = function (self, source, mode, callback)
     self:eachRef(node, 'field', function (src)
         if key == guide.getKeyName(src) then
             if mode == 'def' then
-                if src.type == 'setfield' then
+                if src.type == 'setfield'
+                or src.type == 'tablefield'
+                then
                     callback(src.field, 'set')
+                elseif src.type == 'setindex'
+                or     src.type == 'tableindex' then
+                    callback(src.index, 'set')
                 end
             end
         end
@@ -188,6 +198,17 @@ mt['number']  = mt['asindex']
 mt['boolean'] = mt['asindex']
 mt['string'] = function (self, source, mode, callback)
     mt['asindex'](self, source, mode, callback)
+end
+mt['table'] = function (self, source, mode, callback)
+    if mode == 'field' then
+        for i = 1, #source do
+            local src = source[i]
+            if src.type == 'tablefield'
+            or src.type == 'tableindex' then
+                callback(src)
+            end
+        end
+    end
 end
 
 function mt:getSpecial(source)

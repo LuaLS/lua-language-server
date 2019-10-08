@@ -365,13 +365,17 @@ function m.getKeyName(obj)
     or tp == 'setglobal' then
         return 's|' .. obj[1]
     elseif tp == 'getfield'
-    or     tp == 'setfield' then
+    or     tp == 'setfield'
+    or     tp == 'tablefield' then
         return 's|' .. obj.field[1]
     elseif tp == 'getindex'
-    or     tp == 'setindex' then
+    or     tp == 'setindex'
+    or     tp == 'tableindex' then
         return m.getKeyName(obj.index)
     elseif tp == 'field' then
         return 's|' .. obj[1]
+    elseif tp == 'index' then
+        return m.getKeyName(obj.index)
     elseif tp == 'string' then
         local s = obj[1]
         if s then

@@ -578,7 +578,9 @@ local Defs = {
             finish = finish - 1,
             index  = index,
         }
-        index.parent = obj
+        if index then
+            index.parent = obj
+        end
         return obj
     end,
     GetMethod = function (colon, method)
@@ -911,8 +913,10 @@ local Defs = {
             field  = field,
             value  = value,
         }
-        field.type = 'field'
-        field.parent = obj
+        if field then
+            field.type = 'field'
+            field.parent = obj
+        end
         return obj
     end,
     Index = function (start, index, finish)
@@ -922,7 +926,9 @@ local Defs = {
             finish = finish - 1,
             index  = index,
         }
-        index.parent = obj
+        if index then
+            index.parent = obj
+        end
         return obj
     end,
     NewIndex = function (start, index, value, finish)
@@ -933,7 +939,9 @@ local Defs = {
             index  = index,
             value  = value,
         }
-        index.parent = obj
+        if index then
+            index.parent = obj
+        end
         return obj
     end,
     FuncArgs = function (start, args, finish)

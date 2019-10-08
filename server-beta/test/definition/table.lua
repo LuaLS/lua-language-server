@@ -96,6 +96,27 @@ local t = {
 t.<?insert?>()
 ]]
 
+TEST[[
+local t = {
+    <!['insert']!> = 1,
+}
+t.<?insert?>()
+]]
+
+TEST[[
+local t;t = {
+    <!insert!> = 1,
+}
+t.<?insert?>()
+]]
+
+TEST[[
+local t;t = {
+    <!insert!> = 1,
+}
+t.<?insert?>()
+]]
+
 --TEST[[
 --local t = {
 --    <!insert!> = 1,

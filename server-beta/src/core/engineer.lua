@@ -52,9 +52,11 @@ mt['local'] = function (self, source, mode, callback)
             for _, ref in ipairs(source.ref) do
                 if ref.type == 'getlocal' then
                     local parent = ref.parent
-                    if parent.type == 'setfield' then
-                        callback(parent)
-                    elseif parent.type == 'getfield' then
+                    local tp     = parent.type
+                    if tp == 'setfield'
+                    or tp == 'getfield'
+                    or tp == 'setindex'
+                    or tp == 'getindex' then
                         callback(parent)
                     end
                 end
@@ -69,18 +71,22 @@ mt['setlocal'] = mt['getlocal']
 mt['_G'] = function (self, source, mode, callback)
     if mode == 'def' then
         local parent = source.parent
-        if parent.type == 'setfield' then
+        if parent.type == 'setfield'
+        or parent.type == 'setindex' then
             callback(parent, 'set')
-        elseif parent.type == 'getfield' then
+        elseif parent.type == 'getfield'
+        or     parent.type == 'getindex' then
             self:search(parent, 'special', mode, callback)
         elseif parent.type == 'callargs' then
             self:search(parent.parent, 'special', mode, callback)
         end
     elseif mode == 'ref' then
         local parent = source.parent
-        if parent.type == 'setfield' then
+        if parent.type == 'setfield'
+        or parent.type == 'setindex' then
             callback(parent, 'set')
-        elseif parent.type == 'getfield' then
+        elseif parent.type == 'getfield'
+        or     parent.type == 'getindex' then
             callback(parent, 'get')
         elseif parent.type == 'getfield' then
             self:search(parent, 'special', mode, callback)
@@ -110,7 +116,6 @@ mt['getglobal'] = function (self, source, mode, callback)
                     callback(ref, 'set')
                 elseif ref.type == 'getglobal' then
                     callback(ref, 'get')
-                elseif ref.type == 'getglobal' then
                     self:search(ref, 'special', mode, callback)
                 elseif ref.type == 'getlocal' then
                     self:search(ref, '_G', mode, callback)
@@ -120,9 +125,11 @@ mt['getglobal'] = function (self, source, mode, callback)
     elseif mode == 'field' then
         self:search(source, 'getglobal', 'ref', function (src)
             local parent = src.parent
-            if parent.type == 'setfield' then
-                callback(parent)
-            elseif parent.type == 'getfield' then
+            local tp     = parent.type
+            if tp == 'setfield'
+            or tp == 'getfield'
+            or tp == 'setindex'
+            or tp == 'getindex' then
                 callback(parent)
             end
         end)
@@ -130,7 +137,7 @@ mt['getglobal'] = function (self, source, mode, callback)
 end
 mt['setglobal'] = mt['getglobal']
 mt['field'] = function (self, source, mode, callback)
-    local node = source.node.node
+    local node = source.parent.node
     local key = guide.getKeyName(source)
     self:eachRef(node, 'field', function (src)
         if key == guide.getKeyName(src) then
@@ -148,12 +155,39 @@ mt['special'] = function (self, source, mode, callback)
         return
     end
     if mode == 'def' then
-        if name == '_G' then
+        if name == 's|_G' then
             self:search(source, '_G', mode, callback)
-        elseif name == 'rawset' then
+        elseif name == 's|rawset' then
             callback(source.parent, 'set')
         end
     end
+end
+mt['asindex'] = function (self, source, mode, callback)
+    local parent = source.parent
+    if not parent then
+        return
+    end
+    if parent.type ~= 'setindex' and parent.type ~= 'getindex' then
+        return
+    end
+    local node = parent.node
+    local key = guide.getKeyName(source)
+    self:eachRef(node, 'field', function (src)
+        if key == guide.getKeyName(src) then
+            if mode == 'def' then
+                if src.type == 'setfield' then
+                    callback(src.field, 'set')
+                elseif src.type == 'setindex' then
+                    callback(src.index, 'set')
+                end
+            end
+        end
+    end)
+end
+mt['number']  = mt['asindex']
+mt['boolean'] = mt['asindex']
+mt['string'] = function (self, source, mode, callback)
+    mt['asindex'](self, source, mode, callback)
 end
 
 function mt:getSpecial(source)

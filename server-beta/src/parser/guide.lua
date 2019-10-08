@@ -1,6 +1,7 @@
 local error      = error
 local type       = type
 local next       = next
+local tostring   = tostring
 
 _ENV = nil
 
@@ -359,12 +360,39 @@ function m.lineRange(lines, row)
 end
 
 function m.getKeyName(obj)
-    if obj.type == 'getglobal' or obj.type == 'setglobal' then
-        return obj[1]
-    elseif obj.type == 'getfield' or obj.type == 'setfield' then
-        return obj.field[1]
-    elseif obj.type == 'field' then
-        return obj[1]
+    local tp = obj.type
+    if tp == 'getglobal'
+    or tp == 'setglobal' then
+        return 's|' .. obj[1]
+    elseif tp == 'getfield'
+    or     tp == 'setfield' then
+        return 's|' .. obj.field[1]
+    elseif tp == 'getindex'
+    or     tp == 'setindex' then
+        return m.getKeyName(obj.index)
+    elseif tp == 'field' then
+        return 's|' .. obj[1]
+    elseif tp == 'string' then
+        local s = obj[1]
+        if s then
+            return 's|' .. s
+        else
+            return s
+        end
+    elseif tp == 'number' then
+        local n = obj[1]
+        if n then
+            return ('n|%q'):format(obj[1])
+        else
+            return 'n'
+        end
+    elseif tp == 'boolean' then
+        local b = obj[1]
+        if b then
+            return 'b|' .. tostring(b)
+        else
+            return 'b'
+        end
     end
     return nil
 end

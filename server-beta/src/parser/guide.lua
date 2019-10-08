@@ -368,11 +368,15 @@ function m.getKeyName(obj)
     or     tp == 'setfield'
     or     tp == 'tablefield' then
         return 's|' .. obj.field[1]
+    elseif tp == 'getmethod'
+    or     tp == 'setmethod' then
+        return 's|' .. obj.method[1]
     elseif tp == 'getindex'
     or     tp == 'setindex'
     or     tp == 'tableindex' then
         return m.getKeyName(obj.index)
-    elseif tp == 'field' then
+    elseif tp == 'field'
+    or     tp == 'method' then
         return 's|' .. obj[1]
     elseif tp == 'index' then
         return m.getKeyName(obj.index)

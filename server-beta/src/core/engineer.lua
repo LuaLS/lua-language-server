@@ -55,6 +55,8 @@ mt['local'] = function (self, source, mode, callback)
                     local tp     = parent.type
                     if tp == 'setfield'
                     or tp == 'getfield'
+                    or tp == 'setmethod'
+                    or tp == 'getmethod'
                     or tp == 'setindex'
                     or tp == 'getindex' then
                         callback(parent)
@@ -77,7 +79,8 @@ mt['_G'] = function (self, source, mode, callback)
     if mode == 'def' then
         local parent = source.parent
         if parent.type == 'setfield'
-        or parent.type == 'setindex' then
+        or parent.type == 'setindex'
+        or parent.type == 'setmethod' then
             callback(parent, 'set')
         elseif parent.type == 'getfield'
         or     parent.type == 'getindex' then
@@ -88,10 +91,12 @@ mt['_G'] = function (self, source, mode, callback)
     elseif mode == 'ref' then
         local parent = source.parent
         if parent.type == 'setfield'
-        or parent.type == 'setindex' then
+        or parent.type == 'setindex'
+        or parent.type == 'setmethod' then
             callback(parent, 'set')
         elseif parent.type == 'getfield'
-        or     parent.type == 'getindex' then
+        or     parent.type == 'getindex'
+        or     parent.type == 'getmethod' then
             callback(parent, 'get')
         elseif parent.type == 'getfield' then
             self:search(parent, 'special', mode, callback)
@@ -133,6 +138,8 @@ mt['getglobal'] = function (self, source, mode, callback)
             local tp     = parent.type
             if tp == 'setfield'
             or tp == 'getfield'
+            or tp == 'setmethod'
+            or tp == 'getmethod'
             or tp == 'setindex'
             or tp == 'getindex' then
                 callback(parent)
@@ -141,23 +148,32 @@ mt['getglobal'] = function (self, source, mode, callback)
     end
 end
 mt['setglobal'] = mt['getglobal']
-mt['field'] = function (self, source, mode, callback)
-    local node = source.parent.node
-    local key = guide.getKeyName(source)
+mt['eachfield'] = function (self, node, key, mode, callback)
     self:eachRef(node, 'field', function (src)
         if key == guide.getKeyName(src) then
             if mode == 'def' then
                 if src.type == 'setfield'
-                or src.type == 'tablefield'
-                then
+                or src.type == 'tablefield' then
                     callback(src.field, 'set')
                 elseif src.type == 'setindex'
                 or     src.type == 'tableindex' then
                     callback(src.index, 'set')
+                elseif src.type == 'setmethod' then
+                    callback(src.method, 'set')
                 end
             end
         end
     end)
+end
+mt['field'] = function (self, source, mode, callback)
+    local node = source.parent.node
+    local key = guide.getKeyName(source)
+    mt['eachfield'](self, node, key, mode, callback)
+end
+mt['method'] = function (self, source, mode, callback)
+    local node = source.parent.node
+    local key = guide.getKeyName(source)
+    mt['eachfield'](self, node, key, mode, callback)
 end
 mt['special'] = function (self, source, mode, callback)
     local name = self:getSpecial(source)
@@ -182,17 +198,7 @@ mt['asindex'] = function (self, source, mode, callback)
     end
     local node = parent.node
     local key = guide.getKeyName(source)
-    self:eachRef(node, 'field', function (src)
-        if key == guide.getKeyName(src) then
-            if mode == 'def' then
-                if src.type == 'setfield' then
-                    callback(src.field, 'set')
-                elseif src.type == 'setindex' then
-                    callback(src.index, 'set')
-                end
-            end
-        end
-    end)
+    mt['eachfield'](self, node, key, mode, callback)
 end
 mt['number']  = mt['asindex']
 mt['boolean'] = mt['asindex']

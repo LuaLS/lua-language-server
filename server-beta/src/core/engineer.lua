@@ -27,7 +27,7 @@ mt['local'] = function (self, source, mode, callback)
         if source.tag == 'self' then
             local method = source.method
             local node = method.node
-            self:search(node, node.type, mode, callback)
+            self:eachRef(node, mode, callback)
         end
     elseif mode == 'ref' then
         if source.tag ~= 'self' then
@@ -45,7 +45,7 @@ mt['local'] = function (self, source, mode, callback)
         if source.tag == 'self' then
             local method = source.method
             local node = method.node
-            self:search(node, node.type, mode, callback)
+            self:eachRef(node, mode, callback)
         end
     elseif mode == 'field' then
         if source.ref then
@@ -65,6 +65,11 @@ mt['local'] = function (self, source, mode, callback)
                     self:eachRef(ref.value, 'field', callback)
                 end
             end
+        end
+        if source.tag == 'self' then
+            local method = source.method
+            local node = method.node
+            self:eachRef(node, 'field', callback)
         end
         if source.value then
             self:eachRef(source.value, 'field', callback)

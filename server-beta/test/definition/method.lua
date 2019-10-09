@@ -42,16 +42,6 @@ obj:<?method1?>()
 
 TEST [[
 local mt
-mt.__index = mt
-function mt:<!method1!>()
-end
-
-local obj = setmetatable({}, mt)
-obj:<?method1?>()
-]]
-
-TEST [[
-local mt
 function mt:<!method1!>()
 end
 

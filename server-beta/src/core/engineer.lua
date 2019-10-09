@@ -153,32 +153,15 @@ mt['getglobal'] = function (self, source, mode, callback)
     end
 end
 mt['setglobal'] = mt['getglobal']
-mt['eachfield'] = function (self, node, key, mode, callback)
-    self:eachRef(node, 'field', function (src)
-        if key == guide.getKeyName(src) then
-            if mode == 'def' then
-                if src.type == 'setfield'
-                or src.type == 'tablefield' then
-                    callback(src.field, 'set')
-                elseif src.type == 'setindex'
-                or     src.type == 'tableindex' then
-                    callback(src.index, 'set')
-                elseif src.type == 'setmethod' then
-                    callback(src.method, 'set')
-                end
-            end
-        end
-    end)
-end
 mt['field'] = function (self, source, mode, callback)
     local node = source.parent.node
     local key = guide.getKeyName(source)
-    mt['eachfield'](self, node, key, mode, callback)
+    self:eachField(node, key, mode, callback)
 end
 mt['method'] = function (self, source, mode, callback)
     local node = source.parent.node
     local key = guide.getKeyName(source)
-    mt['eachfield'](self, node, key, mode, callback)
+    self:eachField(node, key, mode, callback)
 end
 mt['special'] = function (self, source, mode, callback)
     local name = self:getSpecial(source)
@@ -193,22 +176,14 @@ mt['special'] = function (self, source, mode, callback)
         end
     end
 end
-mt['asindex'] = function (self, source, mode, callback)
-    local parent = source.parent
-    if not parent then
-        return
-    end
-    if parent.type ~= 'setindex' and parent.type ~= 'getindex' then
-        return
-    end
-    local node = parent.node
-    local key = guide.getKeyName(source)
-    mt['eachfield'](self, node, key, mode, callback)
+mt['number']  = function (self, source, mode, callback)
+    self:asindex(source, mode, callback)
 end
-mt['number']  = mt['asindex']
-mt['boolean'] = mt['asindex']
+mt['boolean'] = function (self, source, mode, callback)
+    self:asindex(source, mode, callback)
+end
 mt['string'] = function (self, source, mode, callback)
-    mt['asindex'](self, source, mode, callback)
+    self:asindex(source, mode, callback)
 end
 mt['table'] = function (self, source, mode, callback)
     if mode == 'field' then
@@ -220,6 +195,41 @@ mt['table'] = function (self, source, mode, callback)
             end
         end
     end
+end
+mt['select'] = function (self, source, mode, callback)
+    local vararg = source.vararg
+    if vararg.type == 'call' then
+        local func = vararg.node
+        self:specialreturn(func, source.index, mode, callback)
+    end
+end
+
+function mt:specialreturn(source, index, mode, callback)
+    local name = self:getSpecial(source)
+    if not name then
+        return
+    end
+    local call = source.parent
+    if name == 's|setmetatable' then
+        if index ~= 1 then
+            return
+        end
+        self:eachField(call.args[2], 's|__index', 'def', callback)
+        return
+    end
+end
+
+function mt:asindex(source, mode, callback)
+    local parent = source.parent
+    if not parent then
+        return
+    end
+    if parent.type ~= 'setindex' and parent.type ~= 'getindex' then
+        return
+    end
+    local node = parent.node
+    local key = guide.getKeyName(source)
+    self:eachField(node, key, mode, callback)
 end
 
 function mt:getSpecial(source)
@@ -237,6 +247,24 @@ function mt:search(source, method, mode, callback)
         return
     end
     f(self, source, mode, callback)
+end
+
+function mt:eachField(node, key, mode, callback)
+    self:eachRef(node, 'field', function (src)
+        if key == guide.getKeyName(src) then
+            if mode == 'def' then
+                if src.type == 'setfield'
+                or src.type == 'tablefield' then
+                    callback(src.field, 'set')
+                elseif src.type == 'setindex'
+                or     src.type == 'tableindex' then
+                    callback(src.index, 'set')
+                elseif src.type == 'setmethod' then
+                    callback(src.method, 'set')
+                end
+            end
+        end
+    end)
 end
 
 function mt:eachRef(source, mode, callback)

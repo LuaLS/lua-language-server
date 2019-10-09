@@ -12,19 +12,24 @@ function m.setErrorHandle(errHandle)
     m.errorHandle = errHandle
 end
 
---- 创建一个任务
-function m.create(callback)
-    local co = coroutine.create(callback)
-    m.coTracker[co] = true
-    local suc, err = coroutine.resume(co)
+function m.checkResult(co, ...)
+    local suc, err = ...
     if not suc and m.errorHandle then
         m.errorHandle(debug.traceback(co, err))
     end
+    return ...
+end
+
+--- 创建一个任务
+function m.create(callback, ...)
+    local co = coroutine.create(callback)
+    m.coTracker[co] = true
+    return m.checkResult(co, coroutine.resume(co, ...))
 end
 
 --- 休眠一段时间
 ---@param time number
-function m.sleep(time)
+function m.sleep(time, ...)
     local co, main = coroutine.running()
     if main then
         if m.errorHandle then
@@ -33,17 +38,14 @@ function m.sleep(time)
         return
     end
     timer.wait(time, function ()
-        local suc, err = coroutine.resume(co)
-        if not suc and m.errorHandle then
-            m.errorHandle(debug.traceback(co, err))
-        end
+        return m.checkResult(co, coroutine.resume(co))
     end)
-    return coroutine.yield()
+    return coroutine.yield(...)
 end
 
 --- 等待直到唤醒
 ---@param waker function
-function m.wait(waker)
+function m.wait(waker, ...)
     local co, main = coroutine.running()
     if main then
         if m.errorHandle then
@@ -52,12 +54,9 @@ function m.wait(waker)
         return
     end
     waker(function (...)
-        local suc, err = coroutine.resume(co, ...)
-        if not suc and m.errorHandle then
-            m.errorHandle(debug.traceback(co, err))
-        end
+        return m.checkResult(co, coroutine.resume(co, ...))
     end)
-    return coroutine.yield()
+    return coroutine.yield(...)
 end
 
 return m

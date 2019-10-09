@@ -72,7 +72,7 @@ mt['local'] = function (self, source, mode, callback)
             self:eachRef(node, 'field', callback)
         end
         if source.value then
-            self:eachRef(source.value, 'field', callback)
+            self:eachField(source.value, nil, 'ref', callback)
         end
     end
 end
@@ -196,25 +196,19 @@ mt['table'] = function (self, source, mode, callback)
         end
     end
 end
-mt['select'] = function (self, source, mode, callback)
-    local vararg = source.vararg
-    if vararg.type == 'call' then
-        local func = vararg.node
-        self:specialreturn(func, source.index, mode, callback)
-    end
-end
-
-function mt:specialreturn(source, index, mode, callback)
+mt['call'] = function (self, source, mode, callback)
     local name = self:getSpecial(source)
     if not name then
         return
     end
-    local call = source.parent
+    local parent = source.parent
     if name == 's|setmetatable' then
-        if index ~= 1 then
+        if parent.index ~= 1 then
             return
         end
-        self:eachField(call.args[2], 's|__index', 'def', callback)
+        self:eachField(source.args[2], 's|__index', 'def', function (src)
+            self:eachField(src, nil, 'ref', callback)
+        end)
         return
     end
 end
@@ -251,7 +245,7 @@ end
 
 function mt:eachField(node, key, mode, callback)
     self:eachRef(node, 'field', function (src)
-        if key == guide.getKeyName(src) then
+        if not key or key == guide.getKeyName(src) then
             if mode == 'def' then
                 if src.type == 'setfield'
                 or src.type == 'tablefield' then
@@ -261,6 +255,22 @@ function mt:eachField(node, key, mode, callback)
                     callback(src.index, 'set')
                 elseif src.type == 'setmethod' then
                     callback(src.method, 'set')
+                end
+            elseif mode == 'ref' then
+                if src.type == 'setfield'
+                or src.type == 'tablefield' then
+                    callback(src.field, 'set')
+                elseif src.type == 'setindex'
+                or     src.type == 'tableindex' then
+                    callback(src.index, 'set')
+                elseif src.type == 'setmethod' then
+                    callback(src.method, 'set')
+                elseif src.type == 'getfield' then
+                    callback(src.field, 'get')
+                elseif src.type == 'getindex' then
+                    callback(src.index, 'get')
+                elseif src.type == 'getmethod' then
+                    callback(src.method, 'get')
                 end
             end
         end

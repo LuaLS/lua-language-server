@@ -12,4 +12,8 @@ function m:field(source, key, callback)
     self:eachField(source.loc, key, callback)
 end
 
+function m:value(source, callback)
+    self:eachValue(source.loc, callback)
+end
+
 return m

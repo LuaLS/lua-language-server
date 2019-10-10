@@ -15,4 +15,8 @@ function m:field(source, key, callback)
     end
 end
 
+function m:value(source, callback)
+    callback(source)
+end
+
 return m

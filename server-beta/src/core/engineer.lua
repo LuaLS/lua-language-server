@@ -21,6 +21,7 @@ mt['number']    = require 'core.number'
 mt['boolean']   = require 'core.boolean'
 mt['string']    = require 'core.string'
 mt['table']     = require 'core.table'
+mt['select']    = require 'core.select'
 
 function mt:getSpecialName(source)
     if source.type == 'getglobal' then
@@ -102,6 +103,19 @@ function mt:eachDef(source, callback)
     f(self, source, callback)
 end
 
+function mt:eachValue(source, callback)
+    local tp = source.type
+    local d = mt[tp]
+    if not d then
+        return
+    end
+    local f = d.value
+    if not f then
+        return
+    end
+    f(self, source, callback)
+end
+
 function mt:childDef(source, callback)
     local tp = source.type
     if     tp == 'setfield' then
@@ -139,6 +153,10 @@ function mt:callArgOf(source)
         return
     end
     return tableUnpack(args)
+end
+
+function mt:callReturnOf(source)
+
 end
 
 return function (ast)

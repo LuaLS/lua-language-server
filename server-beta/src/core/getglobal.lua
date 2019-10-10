@@ -40,6 +40,18 @@ function m:ref(source, callback)
             if guide.getKeyName(parent) == key then
                 self:childRef(parent, callback)
             end
+        elseif name == 'rawset' then
+            local t, k = self:callArgOf(src.parent)
+            if self:getSpecialName(t) == '_G'
+            and guide.getKeyName(k) == key then
+                callback(src.parent, 'set')
+            end
+        elseif name == 'rawget' then
+            local t, k = self:callArgOf(src.parent)
+            if self:getSpecialName(t) == '_G'
+            and guide.getKeyName(k) == key then
+                callback(src.parent, 'get')
+            end
         end
     end)
 end

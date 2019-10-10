@@ -36,4 +36,8 @@ function m:ref(source, callback)
     end)
 end
 
+function m:value(source, callback)
+    callback(source)
+end
+
 return m

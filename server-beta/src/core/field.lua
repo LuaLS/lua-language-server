@@ -10,6 +10,8 @@ function m:def(source, callback)
             callback(src, mode)
         end
     end)
+    -- 尝试 __index
+
 end
 
 function m:ref(source, callback)
@@ -20,6 +22,15 @@ function m:ref(source, callback)
             callback(src, mode)
         end
     end)
+end
+
+function m:value(source, callback)
+    local parent = source.parent
+    if parent.type == 'setfield' then
+        if parent.value then
+            self:eachValue(parent.value, callback)
+        end
+    end
 end
 
 return m

@@ -28,6 +28,7 @@ local function loadAllLibs()
 end
 
 local function main()
+    debug.setcstacklimit(1000)
     local function test(name)
         local clock = os.clock()
         print(('测试[%s]...'):format(name))

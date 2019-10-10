@@ -405,4 +405,11 @@ function m.getKeyName(obj)
     return nil
 end
 
+function m.getENV(ast)
+    if ast.type ~= 'main' then
+        return nil
+    end
+    return ast.locals[1]
+end
+
 return m

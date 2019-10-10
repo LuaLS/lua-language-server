@@ -2,7 +2,6 @@ local guide   = require 'parser.guide'
 local require = require
 
 local setmetatable = setmetatable
-local ipairs       = ipairs
 
 _ENV = nil
 ---@class engineer
@@ -13,7 +12,6 @@ mt.type = 'engineer'
 mt['local']     = require 'core.local'
 mt['getlocal']  = require 'core.getlocal'
 mt['setlocal']  = mt['getlocal']
-mt['_G']        = require 'core._G'
 mt['getglobal'] = require 'core.getglobal'
 mt['setglobal'] = mt['getglobal']
 mt['field']     = require 'core.field'
@@ -23,43 +21,33 @@ mt['boolean']   = require 'core.boolean'
 mt['string']    = require 'core.string'
 mt['table']     = require 'core.table'
 
---mt['special'] = function (self, source, mode, callback)
---    local name = self:getSpecial(source)
---    if not name then
---        return
---    end
---    if mode == 'def' then
---        if name == 's|_G' then
---            self:search(source, '_G', mode, callback)
---        elseif name == 's|rawset' then
---            callback(source.parent, 'set')
---        end
---    end
---end
---mt['call'] = function (self, source, mode, callback)
---    local name = self:getSpecial(source)
---    if not name then
---        return
---    end
---    local parent = source.parent
---    if name == 's|setmetatable' then
---        if parent.index ~= 1 then
---            return
---        end
---        self:eachField(source.args[2], 's|__index', 'def', function (src)
---            self:eachField(src, nil, 'ref', callback)
---        end)
---        return
---    end
---end
-
-function mt:getSpecial(source)
+function mt:getSpecialName(source)
     local node = source.node
     if node.tag ~= '_ENV' then
         return nil
     end
     local name = guide.getKeyName(source)
-    return name
+    if name:sub(1, 2) ~= 's|' then
+        return nil
+    end
+    return name:sub(3)
+end
+
+function mt:eachSpecial(callback)
+    local env = guide.getENV(self.ast)
+    if not env then
+        return
+    end
+    local refs = env.ref
+    if not refs then
+        return
+    end
+    for i = 1, #refs do
+        local ref = refs[i]
+        if ref.type == 'getglobal' then
+            callback(ref[1], ref)
+        end
+    end
 end
 
 function mt:eachField(source, key, callback)
@@ -101,13 +89,39 @@ function mt:eachDef(source, callback)
     f(self, source, callback)
 end
 
+function mt:childDef(source, callback)
+    local tp = source.type
+    if     tp == 'setfield' then
+        callback(source.field, 'set')
+    elseif tp == 'setmethod' then
+        callback(source.field, 'set')
+    elseif tp == 'setindex' then
+        callback(source.index, 'set')
+    end
+end
+
+function mt:childRef(source, callback)
+    local tp = source.type
+    if     tp == 'setfield' then
+        callback(source.field, 'set')
+    elseif tp == 'setmethod' then
+        callback(source.field, 'set')
+    elseif tp == 'setindex' then
+        callback(source.index, 'set')
+    elseif tp == 'getfield' then
+        callback(source.field, 'get')
+    elseif tp == 'getmethod' then
+        callback(source.method, 'get')
+    elseif tp == 'getindex' then
+        callback(source.index, 'get')
+    end
+end
+
 return function (ast)
     local self = setmetatable({
-        step = 0,
-        ast  = ast.ast,
+        step  = 0,
+        ast   = ast.ast,
+        cache = {},
     }, mt)
-    if not ast.vm then
-        ast.vm = {}
-    end
     return self
 end

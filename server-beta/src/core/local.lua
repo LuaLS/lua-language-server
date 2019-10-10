@@ -46,20 +46,7 @@ function m:field(source, key, callback)
             if ref.type == 'getlocal' then
                 local parent = ref.parent
                 if key == guide.getKeyName(parent) then
-                    local tp     = parent.type
-                    if     tp == 'setfield' then
-                        callback(parent.field, 'set')
-                    elseif tp == 'setmethod' then
-                        callback(parent.method, 'set')
-                    elseif tp == 'setindex' then
-                        callback(parent.index, 'set')
-                    elseif tp == 'getfield' then
-                        callback(parent.field, 'get')
-                    elseif tp == 'getmethod' then
-                        callback(parent.method, 'get')
-                    elseif tp == 'getindex' then
-                        callback(parent.index, 'get')
-                    end
+                    self:childRef(parent, callback)
                 end
             elseif ref.type == 'setlocal' then
                 self:eachField(ref.value, key, callback)

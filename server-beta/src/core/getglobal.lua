@@ -10,6 +10,14 @@ function m:def(source, callback)
             callback(src, mode)
         end
     end)
+    self:eachSpecial(function (name, src)
+        if name == '_G' then
+            local parent = src.parent
+            if guide.getKeyName(parent) == key then
+                self:childDef(parent, callback)
+            end
+        end
+    end)
 end
 
 function m:ref(source, callback)
@@ -20,6 +28,14 @@ function m:ref(source, callback)
             callback(src, mode)
         end
     end)
+    self:eachSpecial(function (name, src)
+        if name == '_G' then
+            local parent = src.parent
+            if guide.getKeyName(parent) == key then
+                self:childRef(parent, callback)
+            end
+        end
+    end)
 end
 
 function m:field(source, key, callback)
@@ -28,20 +44,7 @@ function m:field(source, key, callback)
         if mode == 'get' then
             local parent = src.parent
             if key == guide.getKeyName(parent) then
-                local tp = parent.type
-                if     tp == 'getfield' then
-                    callback(parent.field, 'get')
-                elseif tp == 'getmethod' then
-                    callback(parent.method, 'get')
-                elseif tp == 'getindex' then
-                    callback(parent.index, 'get')
-                elseif tp == 'setfield' then
-                    callback(parent.field, 'set')
-                elseif tp == 'setmethod' then
-                    callback(parent.method, 'set')
-                elseif tp == 'setindex' then
-                    callback(parent.index, 'set')
-                end
+                self:childRef(parent)
             end
         end
     end)

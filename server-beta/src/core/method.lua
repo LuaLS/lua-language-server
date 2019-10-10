@@ -22,4 +22,13 @@ function m:ref(source, callback)
     end)
 end
 
+function m:value(source, callback)
+    local parent = source.parent
+    if parent.type == 'setmethod' then
+        if parent.value then
+            self:eachValue(parent.value, callback)
+        end
+    end
+end
+
 return m

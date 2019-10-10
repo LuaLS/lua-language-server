@@ -74,7 +74,14 @@ function mt:eachField(source, key, callback)
     if not f then
         return
     end
-    f(self, source, key, callback)
+    local mark = {}
+    f(self, source, key, function (src, ...)
+        if mark[src] then
+            return
+        end
+        mark[src] = true
+        callback(src, ...)
+    end)
 end
 
 function mt:eachRef(source, callback)
@@ -87,7 +94,14 @@ function mt:eachRef(source, callback)
     if not f then
         return
     end
-    f(self, source, callback)
+    local mark = {}
+    f(self, source, function (src, ...)
+        if mark[src] then
+            return
+        end
+        mark[src] = true
+        callback(src, ...)
+    end)
 end
 
 function mt:eachDef(source, callback)
@@ -100,7 +114,14 @@ function mt:eachDef(source, callback)
     if not f then
         return
     end
-    f(self, source, callback)
+    local mark = {}
+    f(self, source, function (src, ...)
+        if mark[src] then
+            return
+        end
+        mark[src] = true
+        callback(src, ...)
+    end)
 end
 
 function mt:eachValue(source, callback)
@@ -113,7 +134,14 @@ function mt:eachValue(source, callback)
     if not f then
         return
     end
-    f(self, source, callback)
+    local mark = {}
+    f(self, source, function (src, ...)
+        if mark[src] then
+            return
+        end
+        mark[src] = true
+        callback(src, ...)
+    end)
 end
 
 function mt:childDef(source, callback)
@@ -153,10 +181,6 @@ function mt:callArgOf(source)
         return
     end
     return tableUnpack(args)
-end
-
-function mt:callReturnOf(source)
-
 end
 
 return function (ast)

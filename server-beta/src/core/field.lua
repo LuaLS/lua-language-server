@@ -10,8 +10,6 @@ function m:def(source, callback)
             callback(src, mode)
         end
     end)
-    -- 尝试 __index
-
 end
 
 function m:ref(source, callback)

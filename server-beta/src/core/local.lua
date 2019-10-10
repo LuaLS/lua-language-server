@@ -69,7 +69,7 @@ function m:field(source, key, callback)
         self:eachField(node, key, callback)
     end
     self:eachValue(source, function (src)
-        if src ~= source then
+        if source ~= src then
             self:eachField(src, key, callback)
         end
     end)

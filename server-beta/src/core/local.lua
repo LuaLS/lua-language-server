@@ -38,22 +38,29 @@ function m:ref(source, callback)
     end
 end
 
-function m:field(source, callback)
+function m:field(source, key, callback)
     if source.ref then
         for _, ref in ipairs(source.ref) do
             if ref.type == 'getlocal' then
                 local parent = ref.parent
                 local tp     = parent.type
-                if tp == 'setfield'
-                or tp == 'getfield'
-                or tp == 'setmethod'
-                or tp == 'getmethod'
-                or tp == 'setindex'
-                or tp == 'getindex' then
-                    callback(parent)
+                if     tp == 'setfield'
+                or     tp == 'setmethod'
+                or     tp == 'setindex' then
+                    callback(parent, 'set')
+                elseif tp == 'getfield'
+                or     tp == 'getmethod'
+                or     tp == 'getindex' then
+                    callback(parent, 'get')
                 end
             elseif ref.type == 'setlocal' then
                 self:eachRef(ref.value, 'field', callback)
+            elseif ref.type == 'getglobal' then
+                -- _ENV.XXX
+                callback(ref, 'get')
+            elseif ref.type == 'setglobal' then
+                -- _ENV.XXX = XXX
+                callback(ref, 'set')
             end
         end
     end

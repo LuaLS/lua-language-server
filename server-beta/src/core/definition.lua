@@ -5,7 +5,7 @@ return function (ast, text, offset)
     local results = {}
     guide.eachSourceContain(ast.ast, offset, function (source)
         local searcher = engineer(ast)
-        searcher:eachRef(source, 'def', function (src, mode)
+        searcher:eachDef(source, function (src, mode)
             results[#results+1] = {
                 uri    = ast.uri,
                 source = source,

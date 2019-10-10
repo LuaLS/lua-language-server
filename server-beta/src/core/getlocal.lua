@@ -1,15 +1,15 @@
 local m = {}
 
 function m:def(source, callback)
-    self:search(source.loc, 'local', 'def', callback)
+    self:eachDef(source.loc, callback)
 end
 
 function m:ref(source, callback)
-    self:search(source.loc, 'local', 'ref', callback)
+    self:eachRef(source.loc, callback)
 end
 
-function m:field(source, callback)
-    self:search(source.loc, 'local', 'field', callback)
+function m:field(source, key, callback)
+    self:eachField(source.loc, key, callback)
 end
 
 return m

@@ -53,7 +53,7 @@ mt['table']     = require 'core.table'
 --    end
 --end
 
-function mt:asindex(source, mode, callback)
+function mt:asIndex(source, mode, callback)
     local parent = source.parent
     if not parent then
         return
@@ -75,55 +75,39 @@ function mt:getSpecial(source)
     return name
 end
 
-function mt:search(source, method, mode, callback)
-    local f = mt[method]
-    if not f then
-        return
-    end
-    f(self, source, mode, callback)
-end
-
-function mt:eachField(node, key, mode, callback)
-    self:eachRef(node, 'field', function (src)
-        if not key or key == guide.getKeyName(src) then
-            if mode == 'def' then
-                if src.type == 'setfield'
-                or src.type == 'tablefield' then
-                    callback(src.field, 'set')
-                elseif src.type == 'setindex'
-                or     src.type == 'tableindex' then
-                    callback(src.index, 'set')
-                elseif src.type == 'setmethod' then
-                    callback(src.method, 'set')
-                end
-            elseif mode == 'ref' then
-                if src.type == 'setfield'
-                or src.type == 'tablefield' then
-                    callback(src.field, 'set')
-                elseif src.type == 'setindex'
-                or     src.type == 'tableindex' then
-                    callback(src.index, 'set')
-                elseif src.type == 'setmethod' then
-                    callback(src.method, 'set')
-                elseif src.type == 'getfield' then
-                    callback(src.field, 'get')
-                elseif src.type == 'getindex' then
-                    callback(src.index, 'get')
-                elseif src.type == 'getmethod' then
-                    callback(src.method, 'get')
-                end
-            end
-        end
-    end)
-end
-
-function mt:eachRef(source, mode, callback)
+function mt:eachField(source, key, callback)
     local tp = source.type
     local d = mt[tp]
     if not d then
         return
     end
-    local f = d[mode]
+    local f = d.field
+    if not f then
+        return
+    end
+    f(self, source, key, callback)
+end
+
+function mt:eachRef(source, callback)
+    local tp = source.type
+    local d = mt[tp]
+    if not d then
+        return
+    end
+    local f = d.ref
+    if not f then
+        return
+    end
+    f(self, source, callback)
+end
+
+function mt:eachDef(source, callback)
+    local tp = source.type
+    local d = mt[tp]
+    if not d then
+        return
+    end
+    local f = d.def
     if not f then
         return
     end

@@ -76,11 +76,11 @@ function m:field(source, key, callback)
             end
         end
     end
-    --if source.tag == 'self' then
-    --    local method = source.method
-    --    local node = method.node
-    --    self:eachRef(node, 'field', callback)
-    --end
+    if source.tag == 'self' then
+        local method = source.method
+        local node = method.node
+        self:eachField(node, key, callback)
+    end
     if source.value then
         self:eachField(source.value, key, callback)
     end

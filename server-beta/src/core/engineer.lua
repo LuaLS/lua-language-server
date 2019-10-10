@@ -53,19 +53,6 @@ mt['table']     = require 'core.table'
 --    end
 --end
 
-function mt:asIndex(source, mode, callback)
-    local parent = source.parent
-    if not parent then
-        return
-    end
-    if parent.type ~= 'setindex' and parent.type ~= 'getindex' then
-        return
-    end
-    local node = parent.node
-    local key = guide.getKeyName(source)
-    self:eachField(node, key, mode, callback)
-end
-
 function mt:getSpecial(source)
     local node = source.node
     if node.tag ~= '_ENV' then

@@ -40,7 +40,7 @@ print(<?x?>)
 ]]
 
 TEST [[
-<!_ENV.x!> = 1
+_ENV.<!x!> = 1
 print(<?x?>)
 ]]
 

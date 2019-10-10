@@ -22,17 +22,27 @@ function m:ref(source, callback)
     end)
 end
 
-function m:field(source, callback)
-    self:search(source, 'getglobal', 'ref', function (src)
-        local parent = src.parent
-        local tp     = parent.type
-        if tp == 'setfield'
-        or tp == 'getfield'
-        or tp == 'setmethod'
-        or tp == 'getmethod'
-        or tp == 'setindex'
-        or tp == 'getindex' then
-            callback(parent)
+function m:field(source, key, callback)
+    local global = guide.getKeyName(source)
+    self:eachField(source.node, global, function (src, mode)
+        if mode == 'get' then
+            local parent = src.parent
+            if key == guide.getKeyName(parent) then
+                local tp = parent.type
+                if     tp == 'getfield' then
+                    callback(parent.field, 'get')
+                elseif tp == 'getmethod' then
+                    callback(parent.method, 'get')
+                elseif tp == 'getindex' then
+                    callback(parent.index, 'get')
+                elseif tp == 'setfield' then
+                    callback(parent.field, 'set')
+                elseif tp == 'setmethod' then
+                    callback(parent.method, 'set')
+                elseif tp == 'setindex' then
+                    callback(parent.index, 'set')
+                end
+            end
         end
     end)
 end

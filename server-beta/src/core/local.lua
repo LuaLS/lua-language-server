@@ -16,7 +16,7 @@ function m:def(source, callback)
     if source.tag == 'self' then
         local method = source.method
         local node = method.node
-        self:eachRef(node, 'def', callback)
+        self:eachDef(node, callback)
     end
 end
 
@@ -36,7 +36,7 @@ function m:ref(source, callback)
     if source.tag == 'self' then
         local method = source.method
         local node = method.node
-        self:eachRef(node, 'ref', callback)
+        self:eachRef(node, callback)
     end
 end
 
@@ -47,18 +47,22 @@ function m:field(source, key, callback)
                 local parent = ref.parent
                 if key == guide.getKeyName(parent) then
                     local tp     = parent.type
-                    if     tp == 'setfield'
-                    or     tp == 'setmethod'
-                    or     tp == 'setindex' then
-                        callback(parent, 'set')
-                    elseif tp == 'getfield'
-                    or     tp == 'getmethod'
-                    or     tp == 'getindex' then
-                        callback(parent, 'get')
+                    if     tp == 'setfield' then
+                        callback(parent.field, 'set')
+                    elseif tp == 'setmethod' then
+                        callback(parent.method, 'set')
+                    elseif tp == 'setindex' then
+                        callback(parent.index, 'set')
+                    elseif tp == 'getfield' then
+                        callback(parent.field, 'get')
+                    elseif tp == 'getmethod' then
+                        callback(parent.method, 'get')
+                    elseif tp == 'getindex' then
+                        callback(parent.index, 'get')
                     end
                 end
             elseif ref.type == 'setlocal' then
-                self:eachRef(ref.value, 'field', callback)
+                self:eachField(ref.value, key, callback)
             elseif ref.type == 'getglobal' then
                 -- _ENV.XXX
                 if key == guide.getKeyName(ref) then
@@ -77,9 +81,9 @@ function m:field(source, key, callback)
     --    local node = method.node
     --    self:eachRef(node, 'field', callback)
     --end
-    --if source.value then
-    --    self:eachField(source.value, nil, 'ref', callback)
-    --end
+    if source.value then
+        self:eachField(source.value, key, callback)
+    end
 end
 
 return m

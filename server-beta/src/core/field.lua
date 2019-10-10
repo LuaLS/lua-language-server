@@ -5,19 +5,21 @@ local m = {}
 function m:def(source, callback)
     local node = source.parent.node
     local key = guide.getKeyName(source)
-    self:eachField(node, key, 'def', callback)
+    self:eachField(node, key, function (src, mode)
+        if mode == 'set' then
+            callback(src, mode)
+        end
+    end)
 end
 
 function m:ref(source, callback)
     local node = source.parent.node
     local key = guide.getKeyName(source)
-    self:eachField(node, key, 'ref', callback)
-end
-
-function m:field(source, callback)
-    local node = source.parent.node
-    local key = guide.getKeyName(source)
-    self:eachField(node, key, 'field', callback)
+    self:eachField(node, key, function (src, mode)
+        if mode == 'set' or mode == 'get' then
+            callback(src, mode)
+        end
+    end)
 end
 
 return m

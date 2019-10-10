@@ -58,11 +58,27 @@ end
 
 function m:field(source, key, callback)
     local global = guide.getKeyName(source)
+    local used = {}
     self:eachField(source.node, global, function (src, mode)
         if mode == 'get' then
+            used[src] = true
             local parent = src.parent
             if key == guide.getKeyName(parent) then
                 self:childRef(parent, callback)
+            end
+        end
+    end)
+    self:eachSpecial(function (name, src)
+        if name == 'setmetatable' then
+            local t, mt = self:callArgOf(src.parent)
+            if used[t] then
+                self:eachField(mt, 's|__index', function (src, mode)
+                    if mode == 'set' then
+                        self:eachValue(src, function (src)
+                            self:eachField(src, key, callback)
+                        end)
+                    end
+                end)
             end
         end
     end)

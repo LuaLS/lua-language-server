@@ -17,6 +17,7 @@ mt['getglobal'] = require 'core.getglobal'
 mt['setglobal'] = mt['getglobal']
 mt['field']     = require 'core.field'
 mt['method']    = require 'core.method'
+mt['index']     = require 'core.index'
 mt['number']    = require 'core.number'
 mt['boolean']   = require 'core.boolean'
 mt['string']    = require 'core.string'

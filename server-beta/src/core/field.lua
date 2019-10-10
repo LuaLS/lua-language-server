@@ -24,7 +24,8 @@ end
 
 function m:value(source, callback)
     local parent = source.parent
-    if parent.type == 'setfield' then
+    if parent.type == 'setfield'
+    or parent.type == 'tablefield' then
         if parent.value then
             self:eachValue(parent.value, callback)
         end

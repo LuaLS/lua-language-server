@@ -51,6 +51,15 @@ obj:<?method1?>()
 
 TEST [[
 local mt
+function mt:<!method1!>()
+end
+
+setmetatable(api, { __index = mt })
+api:<?method1?>()
+]]
+
+TEST [[
+local mt
 local api
 function mt:<!method1!>()
 end

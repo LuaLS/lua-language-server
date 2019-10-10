@@ -1,5 +1,6 @@
-local guide   = require 'parser.guide'
-local require = require
+local guide       = require 'parser.guide'
+local require     = require
+local tableUnpack = table.unpack
 
 local setmetatable = setmetatable
 
@@ -22,15 +23,27 @@ mt['string']    = require 'core.string'
 mt['table']     = require 'core.table'
 
 function mt:getSpecialName(source)
-    local node = source.node
-    if node.tag ~= '_ENV' then
+    if source.type == 'getglobal' then
+        local node = source.node
+        if node.tag ~= '_ENV' then
+            return
+        end
+        local name = guide.getKeyName(source)
+        if name:sub(1, 2) ~= 's|' then
+            return nil
+        end
+        return name:sub(3)
+    elseif source.type == 'local' then
+        if source.tag == '_ENV' then
+            return '_G'
+        end
         return nil
+    elseif source.type == 'getlocal' then
+        local loc = source.loc
+        if loc.tag == '_ENV' then
+            return '_G'
+        end
     end
-    local name = guide.getKeyName(source)
-    if name:sub(1, 2) ~= 's|' then
-        return nil
-    end
-    return name:sub(3)
 end
 
 function mt:eachSpecial(callback)
@@ -94,7 +107,7 @@ function mt:childDef(source, callback)
     if     tp == 'setfield' then
         callback(source.field, 'set')
     elseif tp == 'setmethod' then
-        callback(source.field, 'set')
+        callback(source.method, 'set')
     elseif tp == 'setindex' then
         callback(source.index, 'set')
     end
@@ -105,7 +118,7 @@ function mt:childRef(source, callback)
     if     tp == 'setfield' then
         callback(source.field, 'set')
     elseif tp == 'setmethod' then
-        callback(source.field, 'set')
+        callback(source.method, 'set')
     elseif tp == 'setindex' then
         callback(source.index, 'set')
     elseif tp == 'getfield' then
@@ -115,6 +128,17 @@ function mt:childRef(source, callback)
     elseif tp == 'getindex' then
         callback(source.index, 'get')
     end
+end
+
+function mt:callArgOf(source)
+    if not source or source.type ~= 'call' then
+        return
+    end
+    local args = source.args
+    if not args then
+        return
+    end
+    return tableUnpack(args)
 end
 
 return function (ast)

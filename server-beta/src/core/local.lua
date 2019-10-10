@@ -58,6 +58,19 @@ function m:field(source, key, callback)
             elseif ref.type == 'getglobal' then
                 -- _ENV.XXX
                 callback(ref, 'get')
+                if self:getSpecial(ref) == 's|_G' then
+                    local parent = ref.parent
+                    local tp     = parent.type
+                    if     tp == 'setfield'
+                    or     tp == 'setmethod'
+                    or     tp == 'setindex' then
+                        callback(parent, 'set')
+                    elseif tp == 'getfield'
+                    or     tp == 'getmethod'
+                    or     tp == 'getindex' then
+                        callback(parent, 'get')
+                    end
+                end
             elseif ref.type == 'setglobal' then
                 -- _ENV.XXX = XXX
                 callback(ref, 'set')

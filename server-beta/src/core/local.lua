@@ -93,30 +93,32 @@ function m:field(source, key, callback)
             end
         elseif name == 'setmetatable' then
             local t, mt = self:callArgOf(call)
-            self:eachField(mt, 's|__index', function (src, mode)
-                if mode == 'set' then
-                    -- t.field -> mt.__index.field
-                    if used[t] then
-                        self:eachValue(src, function (mtvalue)
-                            self:eachField(mtvalue, key, callback)
-                        end)
-                    end
-                    -- mt.__index.field -> t.field
-                    self:eachDef(src, function (src)
-                        if used[src] then
-                            self:eachValue(t, function (mtvalue)
+            if mt then
+                self:eachField(mt, 's|__index', function (src, mode)
+                    if mode == 'set' then
+                        -- t.field -> mt.__index.field
+                        if used[t] then
+                            self:eachValue(src, function (mtvalue)
                                 self:eachField(mtvalue, key, callback)
                             end)
-                            local obj = self:callReturnOf(call)
-                            if obj then
-                                self:eachValue(obj, function (mtvalue)
+                        end
+                        -- mt.__index.field -> t.field
+                        self:eachDef(src, function (src)
+                            if used[src] then
+                                self:eachValue(t, function (mtvalue)
                                     self:eachField(mtvalue, key, callback)
                                 end)
+                                local obj = self:callReturnOf(call)
+                                if obj then
+                                    self:eachValue(obj, function (mtvalue)
+                                        self:eachField(mtvalue, key, callback)
+                                    end)
+                                end
                             end
-                        end
-                    end)
-                end
-            end)
+                        end)
+                    end
+                end)
+            end
         end
     end)
 end

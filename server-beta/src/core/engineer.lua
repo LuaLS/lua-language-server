@@ -16,6 +16,7 @@ mt['getlocal']  = require 'core.getlocal'
 mt['setlocal']  = mt['getlocal']
 mt['getglobal'] = require 'core.getglobal'
 mt['setglobal'] = mt['getglobal']
+mt['getfield']  = require 'core.getfield'
 mt['field']     = require 'core.field'
 mt['method']    = require 'core.method'
 mt['index']     = require 'core.index'
@@ -25,17 +26,28 @@ mt['string']    = require 'core.string'
 mt['table']     = require 'core.table'
 mt['select']    = require 'core.select'
 
+local specials = {
+    ['_G']           = true,
+    ['rawset']       = true,
+    ['rawget']       = true,
+    ['setmetatable'] = true,
+}
+
 function mt:getSpecialName(source)
     if source.type == 'getglobal' then
         local node = source.node
         if node.tag ~= '_ENV' then
-            return
+            return nil
         end
         local name = guide.getKeyName(source)
         if name:sub(1, 2) ~= 's|' then
             return nil
         end
-        return name:sub(3)
+        local spName = name:sub(3)
+        if not specials[spName] then
+            return nil
+        end
+        return spName
     elseif source.type == 'local' then
         if source.tag == '_ENV' then
             return '_G'
@@ -47,9 +59,17 @@ function mt:getSpecialName(source)
             return '_G'
         end
     end
+    return nil
 end
 
 function mt:eachSpecial(callback)
+    local cache = self.cache.special
+    if cache then
+        for i = 1, #cache do
+            callback(cache[i][1], cache[i][2])
+        end
+        return
+    end
     local env = guide.getENV(self.ast)
     if not env then
         return
@@ -58,11 +78,17 @@ function mt:eachSpecial(callback)
     if not refs then
         return
     end
+    cache = {}
+    self.cache.special = cache
     for i = 1, #refs do
         local ref = refs[i]
-        if ref.type == 'getglobal' then
-            callback(ref[1], ref)
+        local name = self:getSpecialName(ref)
+        if name then
+            cache[#cache+1] = {name, ref}
         end
+    end
+    for i = 1, #cache do
+        callback(cache[i][1], cache[i][2])
     end
 end
 
@@ -100,8 +126,10 @@ function mt:eachField(source, key, callback)
         end
         mark[src] = true
         cache[key][#cache[key]+1] = { src, ... }
-        callback(src, ...)
     end)
+    for i = 1, #cache[key] do
+        callback(tableUnpack(cache[key][i]))
+    end
     self.step = self.step - 1
 end
 
@@ -136,8 +164,10 @@ function mt:eachRef(source, callback)
         end
         mark[src] = true
         cache[#cache+1] = {src, ...}
-        callback(src, ...)
     end)
+    for i = 1, #cache do
+        callback(tableUnpack(cache[i]))
+    end
     self.step = self.step - 1
 end
 
@@ -172,8 +202,10 @@ function mt:eachDef(source, callback)
         end
         mark[src] = true
         cache[#cache+1] = {src, ...}
-        callback(src, ...)
     end)
+    for i = 1, #cache do
+        callback(tableUnpack(cache[i]))
+    end
     self.step = self.step - 1
 end
 
@@ -208,8 +240,10 @@ function mt:eachValue(source, callback)
         end
         mark[src] = true
         cache[#cache+1] = {src, ...}
-        callback(src, ...)
     end)
+    for i = 1, #cache do
+        callback(tableUnpack(cache[i]))
+    end
     self.step = self.step - 1
 end
 

@@ -259,7 +259,7 @@ function m.eachSourceContain(ast, offset, callback)
     end
 end
 
---- 遍历所有包含offset的source
+--- 遍历所有的source
 function m.eachSource(ast, callback)
     local map = m.childMap
     local list = { ast }

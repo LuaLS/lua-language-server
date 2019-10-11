@@ -34,32 +34,41 @@ local specials = {
 }
 
 function mt:getSpecialName(source)
-    if source.type == 'getglobal' then
-        local node = source.node
-        if node.tag ~= '_ENV' then
-            return nil
-        end
-        local name = guide.getKeyName(source)
-        if name:sub(1, 2) ~= 's|' then
-            return nil
-        end
-        local spName = name:sub(3)
-        if not specials[spName] then
-            return nil
-        end
-        return spName
-    elseif source.type == 'local' then
-        if source.tag == '_ENV' then
-            return '_G'
+    local spName = self.cache.specialName[source]
+    if spName ~= nil then
+        if spName then
+            return spName
         end
         return nil
-    elseif source.type == 'getlocal' then
-        local loc = source.loc
-        if loc.tag == '_ENV' then
-            return '_G'
+    end
+    local function getName(src)
+        if src.type == 'getglobal' then
+            local node = src.node
+            if node.tag ~= '_ENV' then
+                return nil
+            end
+            local name = guide.getKeyName(src)
+            if name:sub(1, 2) ~= 's|' then
+                return nil
+            end
+            spName = name:sub(3)
+            if not specials[spName] then
+                spName = nil
+            end
+        elseif src.type == 'local' then
+            if src.tag == '_ENV' then
+                spName = '_G'
+            end
+        elseif src.type == 'getlocal' then
+            local loc = src.loc
+            if loc.tag == '_ENV' then
+                spName = '_G'
+            end
         end
     end
-    return nil
+    self:eachValue(source, getName)
+    self.cache.specialName[source] = spName or false
+    return spName
 end
 
 function mt:eachSpecial(callback)
@@ -70,23 +79,20 @@ function mt:eachSpecial(callback)
         end
         return
     end
-    local env = guide.getENV(self.ast)
-    if not env then
-        return
-    end
-    local refs = env.ref
-    if not refs then
-        return
-    end
     cache = {}
     self.cache.special = cache
-    for i = 1, #refs do
-        local ref = refs[i]
-        local name = self:getSpecialName(ref)
-        if name then
-            cache[#cache+1] = {name, ref}
+    guide.eachSource(self.ast, function (source)
+        if source.type == 'getlocal'
+        or source.type == 'getglobal'
+        or source.type == 'local'
+        or source.type == 'field'
+        or source.type == 'string' then
+            local name = self:getSpecialName(source)
+            if name then
+                cache[#cache+1] = { name, source }
+            end
         end
-    end
+    end)
     for i = 1, #cache do
         callback(cache[i][1], cache[i][2])
     end
@@ -312,6 +318,7 @@ return function (ast)
             ref   = {},
             field = {},
             value = {},
+            specialName = {},
         },
     }, mt)
     return self

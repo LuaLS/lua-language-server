@@ -42,6 +42,7 @@ end
 
 function m:field(source, key, callback)
     local used = {}
+    used[source] = true
     local refs = source.ref
     if refs then
         for i = 1, #refs do
@@ -78,28 +79,44 @@ function m:field(source, key, callback)
         end
     end)
     self:eachSpecial(function (name, src)
+        local call = src.parent
         if name == 'rawset' then
-            local t, k = self:callArgOf(src.parent)
+            local t, k = self:callArgOf(call)
             if used[t] and guide.getKeyName(k) == key then
-                callback(src.parent, 'set')
+                callback(call, 'set')
             end
         elseif name == 'rawget' then
-            local t, k, v = self:callArgOf(src.parent)
+            local t, k, v = self:callArgOf(call)
             if used[t] and guide.getKeyName(k) == key then
-                callback(src.parent, 'get')
+                callback(call, 'get')
                 self:eachField(v, key, callback)
             end
         elseif name == 'setmetatable' then
-            local t, mt = self:callArgOf(src.parent)
-            if used[t] then
-                self:eachField(mt, 's|__index', function (src, mode)
-                    if mode == 'set' then
-                        self:eachValue(src, function (src)
-                            self:eachField(src, key, callback)
+            local t, mt = self:callArgOf(call)
+            self:eachField(mt, 's|__index', function (src, mode)
+                if mode == 'set' then
+                    -- t.field -> mt.__index.field
+                    if used[t] then
+                        self:eachValue(src, function (mtvalue)
+                            self:eachField(mtvalue, key, callback)
                         end)
                     end
-                end)
-            end
+                    -- mt.__index.field -> t.field
+                    self:eachDef(src, function (src)
+                        if used[src] then
+                            self:eachValue(t, function (mtvalue)
+                                self:eachField(mtvalue, key, callback)
+                            end)
+                            local obj = self:callReturnOf(call)
+                            if obj then
+                                self:eachValue(obj, function (mtvalue)
+                                    self:eachField(mtvalue, key, callback)
+                                end)
+                            end
+                        end
+                    end)
+                end
+            end)
         end
     end)
 end

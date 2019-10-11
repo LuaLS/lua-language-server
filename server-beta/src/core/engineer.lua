@@ -1,6 +1,7 @@
 local guide       = require 'parser.guide'
 local require     = require
 local tableUnpack = table.unpack
+local error       = error
 
 local setmetatable = setmetatable
 
@@ -66,6 +67,13 @@ function mt:eachSpecial(callback)
 end
 
 function mt:eachField(source, key, callback)
+    local cache = self.cache.field[source]
+    if cache and cache[key] then
+        for i = 1, #cache[key] do
+            callback(tableUnpack(cache[key][i]))
+        end
+        return
+    end
     local tp = source.type
     local d = mt[tp]
     if not d then
@@ -75,17 +83,36 @@ function mt:eachField(source, key, callback)
     if not f then
         return
     end
+    if self.step >= 100 then
+        error('Stack overflow!')
+        return
+    end
+    self.step = self.step + 1
     local mark = {}
+    if not cache then
+        cache = {}
+        self.cache.field[source] = cache
+    end
+    cache[key] = {}
     f(self, source, key, function (src, ...)
         if mark[src] then
             return
         end
         mark[src] = true
+        cache[key][#cache[key]+1] = { src, ... }
         callback(src, ...)
     end)
+    self.step = self.step - 1
 end
 
 function mt:eachRef(source, callback)
+    local cache = self.cache.ref[source]
+    if cache then
+        for i = 1, #cache do
+            callback(tableUnpack(cache[i]))
+        end
+        return
+    end
     local tp = source.type
     local d = mt[tp]
     if not d then
@@ -95,17 +122,33 @@ function mt:eachRef(source, callback)
     if not f then
         return
     end
+    if self.step >= 100 then
+        error('Stack overflow!')
+        return
+    end
+    self.step = self.step + 1
+    cache = {}
+    self.cache.ref[source] = cache
     local mark = {}
     f(self, source, function (src, ...)
         if mark[src] then
             return
         end
         mark[src] = true
+        cache[#cache+1] = {src, ...}
         callback(src, ...)
     end)
+    self.step = self.step - 1
 end
 
 function mt:eachDef(source, callback)
+    local cache = self.cache.def[source]
+    if cache then
+        for i = 1, #cache do
+            callback(tableUnpack(cache[i]))
+        end
+        return
+    end
     local tp = source.type
     local d = mt[tp]
     if not d then
@@ -115,17 +158,33 @@ function mt:eachDef(source, callback)
     if not f then
         return
     end
+    if self.step >= 100 then
+        error('Stack overflow!')
+        return
+    end
+    self.step = self.step + 1
+    cache = {}
+    self.cache.def[source] = cache
     local mark = {}
     f(self, source, function (src, ...)
         if mark[src] then
             return
         end
         mark[src] = true
+        cache[#cache+1] = {src, ...}
         callback(src, ...)
     end)
+    self.step = self.step - 1
 end
 
 function mt:eachValue(source, callback)
+    local cache = self.cache.value[source]
+    if cache then
+        for i = 1, #cache do
+            callback(tableUnpack(cache[i]))
+        end
+        return
+    end
     local tp = source.type
     local d = mt[tp]
     if not d then
@@ -135,14 +194,23 @@ function mt:eachValue(source, callback)
     if not f then
         return
     end
+    if self.step >= 100 then
+        error('Stack overflow!')
+        return
+    end
+    self.step = self.step + 1
+    cache = {}
+    self.cache.value[source] = cache
     local mark = {}
     f(self, source, function (src, ...)
         if mark[src] then
             return
         end
         mark[src] = true
+        cache[#cache+1] = {src, ...}
         callback(src, ...)
     end)
+    self.step = self.step - 1
 end
 
 function mt:childDef(source, callback)
@@ -184,11 +252,33 @@ function mt:callArgOf(source)
     return tableUnpack(args)
 end
 
+function mt:callReturnOf(source)
+    if not source or source.type ~= 'call' then
+        return
+    end
+    local parent = source.parent
+    local extParent = source.extParent
+    if extParent then
+        local returns = {parent.parent}
+        for i = 1, #extParent do
+            returns[i+1] = extParent[i].parent
+        end
+        return tableUnpack(returns)
+    elseif parent then
+        return parent.parent
+    end
+end
+
 return function (ast)
     local self = setmetatable({
         step  = 0,
         ast   = ast.ast,
-        cache = {},
+        cache = {
+            def   = {},
+            ref   = {},
+            field = {},
+            value = {},
+        },
     }, mt)
     return self
 end

@@ -126,14 +126,15 @@ end
 mt:<?x?>()
 ]]
 
-TEST [[
-local mt = {}
-function mt:x()
-end
-
-local obj = setmetatable({}, {__index = mt})
-function obj:<!x!>()
-end
-
-obj:<?x?>()
-]]
+-- TODO 通过代码执行顺序来判断
+--TEST [[
+--local mt = {}
+--function mt:x()
+--end
+--
+--local obj = setmetatable({}, {__index = mt})
+--function obj:<!x!>()
+--end
+--
+--obj:<?x?>()
+--]]

@@ -1,4 +1,5 @@
 local guide = require 'parser.guide'
+local checkSMT = require 'core.setmetatable'
 
 local m = {}
 
@@ -43,6 +44,7 @@ end
 function m:field(source, key, callback)
     local used = {}
     used[source] = true
+    local found = false
     local refs = source.ref
     if refs then
         for i = 1, #refs do
@@ -51,7 +53,12 @@ function m:field(source, key, callback)
                 used[ref] = true
                 local parent = ref.parent
                 if key == guide.getKeyName(parent) then
-                    self:childRef(parent, callback)
+                    self:childRef(parent, function (src, mode)
+                        callback(src, mode)
+                        if mode == 'set' then
+                            found = true
+                        end
+                    end)
                 end
             elseif ref.type == 'getglobal' then
                 used[ref] = true
@@ -64,6 +71,7 @@ function m:field(source, key, callback)
                 -- _ENV.XXX = XXX
                 if key == guide.getKeyName(ref) then
                     callback(ref, 'set')
+                    found = true
                 end
             end
         end
@@ -71,56 +79,24 @@ function m:field(source, key, callback)
     if source.tag == 'self' then
         local method = source.method
         local node = method.node
-        self:eachField(node, key, callback)
+        self:eachField(node, key, function (src, mode)
+            callback(src, mode)
+            if mode == 'set' then
+                found = true
+            end
+        end)
     end
     self:eachValue(source, function (src)
         if source ~= src then
-            self:eachField(src, key, callback)
+            self:eachField(src, key, function (src, mode)
+                callback(src, mode)
+                if mode == 'set' then
+                    found = true
+                end
+            end)
         end
     end)
-    self:eachSpecial(function (name, src)
-        local call = src.parent
-        if name == 'rawset' then
-            local t, k = self:callArgOf(call)
-            if used[t] and guide.getKeyName(k) == key then
-                callback(call, 'set')
-            end
-        elseif name == 'rawget' then
-            local t, k, v = self:callArgOf(call)
-            if used[t] and guide.getKeyName(k) == key then
-                callback(call, 'get')
-                self:eachField(v, key, callback)
-            end
-        elseif name == 'setmetatable' then
-            local t, mt = self:callArgOf(call)
-            if mt then
-                self:eachField(mt, 's|__index', function (src, mode)
-                    if mode == 'set' then
-                        -- t.field -> mt.__index.field
-                        if used[t] then
-                            self:eachValue(src, function (mtvalue)
-                                self:eachField(mtvalue, key, callback)
-                            end)
-                        end
-                        -- mt.__index.field -> t.field
-                        self:eachDef(src, function (src)
-                            if used[src] then
-                                self:eachValue(t, function (mtvalue)
-                                    self:eachField(mtvalue, key, callback)
-                                end)
-                                local obj = self:callReturnOf(call)
-                                if obj then
-                                    self:eachValue(obj, function (mtvalue)
-                                        self:eachField(mtvalue, key, callback)
-                                    end)
-                                end
-                            end
-                        end)
-                    end
-                end)
-            end
-        end
-    end)
+    checkSMT(self, key, used, found, callback)
 end
 
 function m:value(source, callback)

@@ -25,6 +25,8 @@ mt['boolean']   = require 'core.boolean'
 mt['string']    = require 'core.string'
 mt['table']     = require 'core.table'
 mt['select']    = require 'core.select'
+mt['goto']      = require 'core.goto'
+mt['label']     = require 'core.label'
 
 local specials = {
     ['_G']           = true,

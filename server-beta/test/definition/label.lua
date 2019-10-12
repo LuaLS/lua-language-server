@@ -23,7 +23,7 @@ end
 ]]
 
 TEST [[
-::<!LABEL!>::
+::LABEL::
 goto <?LABEL?>
 ::<!LABEL!>::
 ]]

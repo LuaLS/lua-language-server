@@ -59,6 +59,8 @@ m.childMap = {
     ['callargs']    = {'#'},
     ['getfield']    = {'node', 'field'},
     ['list']        = {'#'},
+    ['binary']      = {1, 2},
+    ['unary']       = {1}
 }
 
 --- 是否是字面量

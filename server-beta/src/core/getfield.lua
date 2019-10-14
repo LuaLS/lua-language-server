@@ -11,8 +11,11 @@ function m:field(source, key, callback)
     local node = source.node
     used[node] = true
 
-    callback(source.field, 'get')
     local myKey = guide.getKeyName(source)
+    if key == myKey then
+        callback(source.field, 'get')
+    end
+
     self:eachField(node, myKey, function (src, mode)
         if used[src] then
             return

@@ -13,7 +13,7 @@ function m:field(source, key, callback)
 
     local myKey = guide.getKeyName(source)
     if key == myKey then
-        callback(source.field, 'set')
+        callback(source.method, 'set')
     end
 
     self:eachField(node, myKey, function (src, mode)

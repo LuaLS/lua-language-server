@@ -16,33 +16,27 @@ function m:field(source, key, callback)
         callback(source.method, 'set')
     end
 
-    self:eachField(node, myKey, function (src, mode)
+    self:eachField(node, key, function (src, mode)
         if used[src] then
             return
         end
         used[src] = true
+        if mode == 'set' then
+            callback(src, mode)
+            found = true
+        end
+    end)
+
+    self:eachValue(node, function (src)
         self:eachField(src, key, function (src, mode)
+            if used[src] then
+                return
+            end
             used[src] = true
             if mode == 'set' then
                 callback(src, mode)
                 found = true
             end
-        end)
-    end)
-
-    self:eachValue(node, function (src)
-        self:eachField(src, myKey, function (src, mode)
-            if used[src] then
-                return
-            end
-            used[src] = true
-            self:eachField(src, key, function (src, mode)
-                used[src] = true
-                if mode == 'set' then
-                    callback(src, mode)
-                    found = true
-                end
-            end)
         end)
     end)
 

@@ -22,6 +22,10 @@ function m:ref(source, callback)
     end)
 end
 
+function m:field(source, key, callback)
+    self:eachField(source.parent, key, callback)
+end
+
 function m:value(source, callback)
     local parent = source.parent
     if parent.type == 'setmethod' then

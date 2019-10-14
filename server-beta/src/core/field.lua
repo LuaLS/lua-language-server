@@ -5,32 +5,22 @@ local m = {}
 
 function m:def(source, callback)
     local parent = source.parent
-    if parent.type == 'setfield' or parent.type == 'getfield' then
-        local node = parent.node
-        local key = guide.getKeyName(source)
-        self:eachField(node, key, function (src, mode)
-            if mode == 'set' then
-                callback(src, mode)
-            end
-        end)
-    elseif parent.type == 'tablefield' then
-        self:eachDef(parent.value, callback)
-    end
+    local key = guide.getKeyName(source)
+    self:eachField(parent, key, function (src, mode)
+        if mode == 'set' then
+            callback(src, mode)
+        end
+    end)
 end
 
 function m:ref(source, callback)
     local parent = source.parent
-    if parent.type == 'setfield' or parent.type == 'getfield' then
-        local node = parent.node
-        local key = guide.getKeyName(source)
-        self:eachField(node, key, function (src, mode)
-            if mode == 'set' or mode == 'get' then
-                callback(src, mode)
-            end
-        end)
-    elseif parent.type == 'tablefield' then
-        self:eachDef(parent.value, callback)
-    end
+    local key = guide.getKeyName(source)
+    self:eachField(parent, key, function (src, mode)
+        if mode == 'set' or mode == 'set' then
+            callback(src, mode)
+        end
+    end)
 end
 
 function m:field(source, key, callback)

@@ -1,4 +1,5 @@
-local guide = require 'parser.guide'
+local guide    = require 'parser.guide'
+local checkSMT = require 'core.setmetatable'
 
 local m = {}
 
@@ -30,6 +31,10 @@ function m:ref(source, callback)
     elseif parent.type == 'tablefield' then
         self:eachDef(parent.value, callback)
     end
+end
+
+function m:field(source, key, callback)
+    self:eachField(source.parent, key, callback)
 end
 
 function m:value(source, callback)

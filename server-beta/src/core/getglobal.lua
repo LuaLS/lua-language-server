@@ -1,4 +1,5 @@
 local guide    = require 'parser.guide'
+local checkSMT = require 'core.setmetatable'
 
 local m = {}
 
@@ -57,31 +58,46 @@ function m:ref(source, callback)
 end
 
 function m:field(source, key, callback)
-    local global = guide.getKeyName(source)
     local used = {}
-    self:eachField(source.node, global, function (src, mode)
-        if mode == 'get' then
+    local found = false
+    used[source] = true
+
+    local parent = source.parent
+    self:eachField(parent, key, callback)
+
+    local node = source.node
+    local myKey = guide.getKeyName(source)
+    self:eachField(node, myKey, function (src, mode)
+        if used[src] then
+            return
+        end
+        used[src] = true
+        self:eachField(src, key, function (src, mode)
             used[src] = true
-            local parent = src.parent
-            if key == guide.getKeyName(parent) then
-                self:childRef(parent, callback)
+            if mode == 'set' then
+                callback(src, mode)
+                found = true
             end
-        end
+        end)
     end)
-    self:eachSpecial(function (name, src)
-        if name == 'setmetatable' then
-            local t, mt = self:callArgOf(src.parent)
-            if used[t] then
-                self:eachField(mt, 's|__index', function (src, mode)
-                    if mode == 'set' then
-                        self:eachValue(src, function (src)
-                            self:eachField(src, key, callback)
-                        end)
-                    end
-                end)
+
+    self:eachValue(node, function (src)
+        self:eachField(src, myKey, function (src, mode)
+            if used[src] then
+                return
             end
-        end
+            used[src] = true
+            self:eachField(src, key, function (src, mode)
+                used[src] = true
+                if mode == 'set' then
+                    callback(src, mode)
+                    found = true
+                end
+            end)
+        end)
     end)
+
+    checkSMT(self, key, used, found, callback)
 end
 
 function m:value(source, callback)

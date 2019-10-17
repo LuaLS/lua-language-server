@@ -87,7 +87,7 @@ SYMBOL_ANONYMOUS        = '<匿名函数>'
 HOVER_DOCUMENT_LUA51    = '[查看文档](http://www.lua.org/manual/5.1/manual.html#pdf-{})'
 HOVER_DOCUMENT_LUA52    = '[查看文档](http://www.lua.org/manual/5.2/manual.html#pdf-{})'
 HOVER_DOCUMENT_LUA53    = '[查看文档](http://cloudwu.github.io/lua53doc/manual.html#pdf-{})'
-HOVER_DOCUMENT_LUA54    = '[查看文档](http://www.lua.org/work/doc/manual.html#pdf-{})'
+HOVER_DOCUMENT_LUA54    = '[查看文档](http://www.lua.org/manual/5.4/manual.html#pdf-{})'
 HOVER_DOCUMENT_LUAJIT   = '[查看文档](http://www.lua.org/manual/5.1/manual.html#pdf-{})'
 HOVER_MULTI_PROTOTYPE   = '({} 个原型)'
 

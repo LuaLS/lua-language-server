@@ -87,7 +87,7 @@ SYMBOL_ANONYMOUS        = '<Anonymous>'
 HOVER_DOCUMENT_LUA51    = '[View documents](http://www.lua.org/manual/5.1/manual.html#pdf-{})'
 HOVER_DOCUMENT_LUA52    = '[View documents](http://www.lua.org/manual/5.2/manual.html#pdf-{})'
 HOVER_DOCUMENT_LUA53    = '[View documents](http://www.lua.org/manual/5.3/manual.html#pdf-{})'
-HOVER_DOCUMENT_LUA54    = '[View documents](http://www.lua.org/work/doc/manual.html#pdf-{})'
+HOVER_DOCUMENT_LUA54    = '[View documents](http://www.lua.org/manual/5.4/manual.html#pdf-{})'
 HOVER_DOCUMENT_LUAJIT   = '[View documents](http://www.lua.org/manual/5.1/manual.html#pdf-{})'
 HOVER_MULTI_PROTOTYPE   = '({} prototypes)'
 

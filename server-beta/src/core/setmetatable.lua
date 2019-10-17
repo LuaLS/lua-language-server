@@ -27,7 +27,7 @@ return function (self, key, used, found, callback)
                             end)
                         end
                         -- mt.__index.field -> t.field
-                        self:eachDef(src, function (src)
+                        self:eachValue(src, function (src)
                             if used[src] then
                                 self:eachValue(t, function (mtvalue)
                                     self:eachField(mtvalue, key, callback)

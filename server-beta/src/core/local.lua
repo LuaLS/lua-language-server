@@ -107,6 +107,14 @@ function m:value(source, callback)
             local ref = refs[i]
             if ref.type == 'setlocal' then
                 self:eachValue(ref.value, callback)
+            elseif ref.type == 'getlocal' then
+                local parent = ref.parent
+                if parent.type == 'setmethod' then
+                    local func = parent.value
+                    if func and func.locals then
+                        callback(func.locals[1])
+                    end
+                end
             end
         end
     end

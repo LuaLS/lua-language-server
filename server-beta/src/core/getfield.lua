@@ -9,7 +9,9 @@ function m:field(source, key, callback)
     used[source] = true
 
     local node = source.node
-    used[node] = true
+    self:eachDef(node, function (src)
+        used[src] = true
+    end)
 
     local myKey = guide.getKeyName(source)
     if key == myKey then

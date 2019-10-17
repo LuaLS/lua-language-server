@@ -6,4 +6,10 @@ function m:field(source, key, callback)
     end
 end
 
+function m:value(source, callback)
+    if source.value then
+        self:eachValue(source.value, callback)
+    end
+end
+
 return m

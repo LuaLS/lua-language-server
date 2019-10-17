@@ -16,15 +16,17 @@ function m:field(source, key, callback)
         callback(source, 'set')
     end
 
-    self:eachField(node, key, function (src, mode)
-        if used[src] then
-            return
-        end
-        used[src] = true
-        if mode == 'set' then
-            callback(src, mode)
-            found = true
-        end
+    self:eachField(node, myKey, function (src, mode)
+        self:eachField(src, key, function (src, mode)
+            if used[src] then
+                return
+            end
+            used[src] = true
+            if mode == 'set' then
+                callback(src, mode)
+                found = true
+            end
+        end)
     end)
 
     self:eachValue(node, function (src)
@@ -41,6 +43,12 @@ function m:field(source, key, callback)
     end)
 
     checkSMT(self, key, used, found, callback)
+end
+
+function m:value(source, callback)
+    if source.value then
+        self:eachValue(source.value, callback)
+    end
 end
 
 return m

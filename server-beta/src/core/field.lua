@@ -28,13 +28,7 @@ function m:field(source, key, callback)
 end
 
 function m:value(source, callback)
-    local parent = source.parent
-    if parent.type == 'setfield'
-    or parent.type == 'tablefield' then
-        if parent.value then
-            self:eachValue(parent.value, callback)
-        end
-    end
+    self:eachValue(source.parent, callback)
 end
 
 return m

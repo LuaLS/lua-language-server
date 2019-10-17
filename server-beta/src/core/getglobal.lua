@@ -15,7 +15,7 @@ function m:def(source, callback)
         if name == '_G' then
             local parent = src.parent
             if guide.getKeyName(parent) == key then
-                self:childDef(parent, callback)
+                callback(parent, 'set')
             end
         elseif name == 'rawset' then
             local t, k = self:callArgOf(src.parent)
@@ -39,7 +39,11 @@ function m:ref(source, callback)
         if name == '_G' then
             local parent = src.parent
             if guide.getKeyName(parent) == key then
-                self:childRef(parent, callback)
+                if parent.type:sub(1, 3) == 'set' then
+                    callback(parent, 'set')
+                else
+                    callback(parent, 'get')
+                end
             end
         elseif name == 'rawset' then
             local t, k = self:callArgOf(src.parent)

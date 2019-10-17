@@ -53,12 +53,12 @@ function m:field(source, key, callback)
                 used[ref] = true
                 local parent = ref.parent
                 if key == guide.getKeyName(parent) then
-                    self:childRef(parent, function (src, mode)
-                        callback(src, mode)
-                        if mode == 'set' then
-                            found = true
-                        end
-                    end)
+                    if parent.type:sub(1, 3) == 'set' then
+                        callback(parent, 'set')
+                        found = true
+                    else
+                        callback(parent, 'get')
+                    end
                 end
             elseif ref.type == 'getglobal' then
                 used[ref] = true

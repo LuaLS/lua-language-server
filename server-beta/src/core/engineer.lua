@@ -261,34 +261,6 @@ function mt:eachValue(source, callback)
     self.step = self.step - 1
 end
 
-function mt:childDef(source, callback)
-    local tp = source.type
-    if     tp == 'setfield' then
-        callback(source.field, 'set')
-    elseif tp == 'setmethod' then
-        callback(source.method, 'set')
-    elseif tp == 'setindex' then
-        callback(source.index, 'set')
-    end
-end
-
-function mt:childRef(source, callback)
-    local tp = source.type
-    if     tp == 'setfield' then
-        callback(source.field, 'set')
-    elseif tp == 'setmethod' then
-        callback(source.method, 'set')
-    elseif tp == 'setindex' then
-        callback(source.index, 'set')
-    elseif tp == 'getfield' then
-        callback(source.field, 'get')
-    elseif tp == 'getmethod' then
-        callback(source.method, 'get')
-    elseif tp == 'getindex' then
-        callback(source.index, 'get')
-    end
-end
-
 function mt:callArgOf(source)
     if not source or source.type ~= 'call' then
         return

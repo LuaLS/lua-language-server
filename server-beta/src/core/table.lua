@@ -7,9 +7,9 @@ function m:field(source, key, callback)
         local src = source[i]
         if key == guide.getKeyName(src) then
             if     src.type == 'tablefield' then
-                callback(src.field, 'set')
+                callback(src, 'set')
             elseif src.type == 'tableindex' then
-                callback(src.index, 'set')
+                callback(src, 'set')
             end
         end
     end

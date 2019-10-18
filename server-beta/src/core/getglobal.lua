@@ -68,38 +68,29 @@ function m:field(source, key, callback)
 
     self:eachRef(source, function (src)
         used[src] = true
-        if     src.type == 'getfield' then
-            if guide.getKeyName(src.field) == key then
-                callback(src.field, 'get')
+        local child, mode = self:childMode(src)
+        if child then
+            if key == guide.getKeyName(child) then
+                callback(child, mode)
             end
-        elseif src.type == 'setfield' then
-            if guide.getKeyName(src.field) == key then
-                callback(src.field, 'set')
-            end
-        elseif src.type == 'getmethod' then
-            if guide.getKeyName(src.method) == key then
-                callback(src.method, 'get')
-            end
-        elseif src.type == 'setmethod' then
-            if guide.getKeyName(src.method) == key then
-                callback(src.method, 'set')
-            end
-        elseif src.type == 'getindex' then
-            if guide.getKeyName(src.index) == key then
-                callback(src.index, 'get')
-            end
-        elseif src.type == 'setindex' then
-            if guide.getKeyName(src.index) == key then
-                callback(src.index, 'set')
-            end
-        elseif src.type == 'getglobal' then
-            if guide.getKeyName(src.parent) == key then
-                callback(src.parent, 'get')
+            return
+        end
+        if src.type == 'getglobal' then
+            local parent = src.parent
+            child, mode = self:childMode(parent)
+            if child then
+                if key == guide.getKeyName(child) then
+                    callback(child, mode)
+                end
             end
         elseif src.type == 'setglobal' then
-            --if guide.getKeyName(src.parent) == key then
-            --    callback(src.parent, 'set')
-            --end
+            local parent = src.parent
+            child, mode = self:childMode(parent)
+            if child then
+                if key == guide.getKeyName(child) then
+                    callback(child, mode)
+                end
+            end
         else
             self:eachField(src, key, callback)
         end

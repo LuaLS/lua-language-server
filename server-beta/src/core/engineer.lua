@@ -289,6 +289,27 @@ function mt:callReturnOf(source)
     end
 end
 
+function mt:childMode(source)
+    if     source.type == 'getfield' then
+        return source.field, 'get'
+    elseif source.type == 'setfield' then
+        return source.field, 'set'
+    elseif source.type == 'getmethod' then
+        return source.method, 'get'
+    elseif source.type == 'setmethod' then
+        return source.method, 'set'
+    elseif source.type == 'getindex' then
+        return source.index, 'get'
+    elseif source.type == 'setindex' then
+        return source.index, 'set'
+    elseif source.type == 'field' then
+        return self:childMode(source.parent)
+    elseif source.type == 'method' then
+        return self:childMode(source.parent)
+    end
+    return nil, nil
+end
+
 return function (ast)
     local self = setmetatable({
         step  = 0,

@@ -4,7 +4,6 @@ local checkSMT = require 'core.setmetatable'
 local m = {}
 
 function m:ref(source, callback)
-    local key = guide.getKeyName(source)
     local node = source.node
     if     node.type == 'setfield'
     or     node.type == 'getfield'
@@ -12,6 +11,7 @@ function m:ref(source, callback)
     or     node.type == 'getmethod'
     or     node.type == 'setindex'
     or     node.type == 'getindex' then
+        local key = guide.getKeyName(node)
         self:eachField(node.node, key, function (src, mode)
             if mode == 'set' or mode == 'get' then
                 callback(src, mode)

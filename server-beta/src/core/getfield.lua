@@ -5,11 +5,21 @@ local m = {}
 
 function m:ref(source, callback)
     local key = guide.getKeyName(source)
-    self:eachField(source.node, key, function (src, mode)
-        if mode == 'set' or mode == 'get' then
-            callback(src, mode)
-        end
-    end)
+    local node = source.node
+    if     node.type == 'setfield'
+    or     node.type == 'getfield'
+    or     node.type == 'setmethod'
+    or     node.type == 'getmethod'
+    or     node.type == 'setindex'
+    or     node.type == 'getindex' then
+        self:eachField(node.node, key, function (src, mode)
+            if mode == 'set' or mode == 'get' then
+                callback(src, mode)
+            end
+        end)
+    else
+        self:eachRef(node, callback)
+    end
 end
 
 function m:field(source, key, callback)

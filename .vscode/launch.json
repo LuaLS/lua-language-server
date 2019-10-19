@@ -20,6 +20,8 @@
 			"request": "attach",
 			"stopOnEntry": true,
 			"address": "127.0.0.1:11411",
+			"outputCapture": [
+			]
 		},
 		{
 			"name": "编译",
@@ -70,6 +72,8 @@
 			"request": "attach",
 			"stopOnEntry": true,
 			"address": "127.0.0.1:11412",
+			"outputCapture": [
+			]
 		},
 	]
 }

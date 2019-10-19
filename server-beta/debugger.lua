@@ -41,7 +41,7 @@ local path  = "/script/?.lua"
 local function tryDebugger()
     local entry = assert(package.searchpath('debugger', debugPath:string() .. path))
     local root = debugPath:string()
-    local port = '11411'
+    local port = '11412'
     local addr = "127.0.0.1:" .. port
     local dbg = loadfile(entry)('windows', root)
     dbg:start(addr)

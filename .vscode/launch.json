@@ -64,5 +64,12 @@
 			"sourceCoding": "utf8",
 			"luaRuntime": "5.4 64bit"
 		},
+		{
+			"name": "附加-beta",
+			"type": "lua",
+			"request": "attach",
+			"stopOnEntry": true,
+			"address": "127.0.0.1:11412",
+		},
 	]
 }

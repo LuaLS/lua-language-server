@@ -1,4 +1,5 @@
 local core = require 'core.definition'
+local engineer = require 'core.engineer'
 local parser  = require 'parser'
 
 rawset(_G, 'TEST', true)
@@ -41,8 +42,12 @@ function TEST(script)
     local new_script = script:gsub('<[!?]', '  '):gsub('[!?]>', '  ')
     local ast = parser:compile(new_script, 'lua', 'Lua 5.3')
     assert(ast)
+    local file = {
+        ast = ast,
+        searcher = engineer(ast),
+    }
 
-    local results = core(ast, new_script, pos)
+    local results = core(file, pos)
     if results then
         local positions = {}
         for i, result in ipairs(results) do

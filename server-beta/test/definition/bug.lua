@@ -54,6 +54,13 @@ self[self.results.<?labels?>] = lbl
 ]]
 
 TEST [[
+self.results = {
+    <!labels!> = {},
+}
+self[self.results.<?labels?>] = lbl
+]]
+
+TEST [[
 local mt = {}
 function mt:<!x!>()
 end

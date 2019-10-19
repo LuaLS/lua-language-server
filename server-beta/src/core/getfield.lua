@@ -29,10 +29,13 @@ function m:field(source, key, callback)
 
     self:eachRef(source, function (src)
         used[src] = true
-        local child, mode = self:childMode(src)
+        local child, mode, value = self:childMode(src)
         if child then
             if key == guide.getKeyName(child) then
                 callback(child, mode)
+            end
+            if value then
+                self:eachField(value, key, callback)
             end
             return
         end
@@ -45,13 +48,7 @@ function m:field(source, key, callback)
                 end
             end
         elseif src.type == 'setglobal' then
-            local parent = src.parent
-            child, mode = self:childMode(parent)
-            if child then
-                if key == guide.getKeyName(child) then
-                    callback(child, mode)
-                end
-            end
+            self:eachField(src.value, key, callback)
         else
             self:eachField(src, key, callback)
         end

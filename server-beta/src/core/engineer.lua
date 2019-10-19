@@ -293,15 +293,15 @@ function mt:childMode(source)
     if     source.type == 'getfield' then
         return source.field, 'get'
     elseif source.type == 'setfield' then
-        return source.field, 'set'
+        return source.field, 'set', source.value
     elseif source.type == 'getmethod' then
         return source.method, 'get'
     elseif source.type == 'setmethod' then
-        return source.method, 'set'
+        return source.method, 'set', source.value
     elseif source.type == 'getindex' then
         return source.index, 'get'
     elseif source.type == 'setindex' then
-        return source.index, 'set'
+        return source.index, 'set', source.value
     elseif source.type == 'field' then
         return self:childMode(source.parent)
     elseif source.type == 'method' then

@@ -42,12 +42,8 @@ function TEST(script)
     local new_script = script:gsub('<[!?]', '  '):gsub('[!?]>', '  ')
     local ast = parser:compile(new_script, 'lua', 'Lua 5.3')
     assert(ast)
-    local file = {
-        ast = ast,
-        searcher = engineer(ast),
-    }
 
-    local results = core(file, pos)
+    local results = core(ast, new_script, pos)
     if results then
         local positions = {}
         for i, result in ipairs(results) do

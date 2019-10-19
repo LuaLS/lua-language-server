@@ -1,9 +1,11 @@
 local guide    = require 'parser.guide'
+local engineer = require 'core.engineer'
 
-return function (file, offset)
+return function (ast, text, offset)
     local results = {}
-    guide.eachSourceContain(file.ast.ast, offset, function (source)
-        file.searcher:eachDef(source, function (src)
+    local searcher = engineer(ast)
+    guide.eachSourceContain(ast.ast, offset, function (source)
+        searcher:eachDef(source, function (src)
             if     src.type == 'setfield'
             or     src.type == 'getfield'
             or     src.type == 'tablefield' then
@@ -17,7 +19,7 @@ return function (file, offset)
                 src = src.method
             end
             results[#results+1] = {
-                uri    = file.uri,
+                uri    = ast.uri,
                 source = source,
                 target = src,
             }

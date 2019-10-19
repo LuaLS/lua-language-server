@@ -154,8 +154,9 @@ proto.on('textDocument/definition', function (params)
     if not ast then
         return nil
     end
+    local lines  = files.getLines(uri)
     local text   = files.getText(uri)
-    local offset = inte.offset(ast.lines, text, params.position)
+    local offset = inte.offset(lines, text, params.position)
     local result = core(ast, text, offset)
     if not result then
         return nil
@@ -163,9 +164,9 @@ proto.on('textDocument/definition', function (params)
     local response = {}
     for i, info in ipairs(result) do
         response[i] = inte.locationLink(info.uri
-            , inte.range(ast.lines, text, info.target.start - 1, info.target.finish)
-            , inte.range(ast.lines, text, info.target.start - 1, info.target.finish)
-            , inte.range(ast.lines, text, info.source.start - 1, info.source.finish)
+            , inte.range(lines, text, info.target.start - 1, info.target.finish)
+            , inte.range(lines, text, info.target.start - 1, info.target.finish)
+            , inte.range(lines, text, info.source.start - 1, info.source.finish)
         )
     end
     return response

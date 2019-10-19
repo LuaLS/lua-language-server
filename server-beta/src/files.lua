@@ -4,6 +4,7 @@ local task     = require 'task'
 local config   = require 'config'
 local glob     = require 'glob'
 local furi     = require 'file-uri'
+local parser   = require 'parser'
 
 local m = {}
 
@@ -42,23 +43,6 @@ function m.setText(uri, text)
         return
     end
     file.text = text
-    if file.compiling then
-        pub.removeTask(file.compiling)
-    end
-    file.compiling = pub.syncTask('compile', text, function (ast)
-        file.compiling = nil
-        file.ast = ast
-        if ast then
-            ast.uri = originUri
-        end
-        local onCompiledList = file.onCompiledList
-        if onCompiledList then
-            file.onCompiledList = nil
-            for _, callback in ipairs(onCompiledList) do
-                callback()
-            end
-        end
-    end)
 end
 
 --- 监听编译完成
@@ -95,20 +79,35 @@ function m.remove(uri)
     m.fileMap[uri] = nil
 end
 
---- 获取文件语法树（异步）
+--- 获取文件语法树
 function m.getAst(uri)
     if platform.OS == 'Windows' then
         uri = uri:lower()
     end
     local file = m.fileMap[uri]
-    if not file.compiling then
-        return file.ast
+    if file.ast == nil then
+        local state, err = parser:compile(file.text, 'lua', config.config.runtime.version)
+        if state then
+            file.ast = state
+        else
+            log.error(err)
+            file.ast = false
+            return nil
+        end
     end
-    pub.jumpQueue(file.compiling)
-    task.wait(function (waker)
-        m.onCompiled(file, waker)
-    end)
     return file.ast
+end
+
+--- 获取文件行信息
+function m.getLines(uri)
+    if platform.OS == 'Windows' then
+        uri = uri:lower()
+    end
+    local file = m.fileMap[uri]
+    if not file.lines then
+        file.lines = parser:lines(file.text)
+    end
+    return file.lines
 end
 
 --- 判断文件名相等

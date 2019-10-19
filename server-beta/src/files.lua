@@ -36,7 +36,9 @@ function m.setText(uri, text)
         uri = uri:lower()
     end
     if not m.fileMap[uri] then
-        m.fileMap[uri] = {}
+        m.fileMap[uri] = {
+            uri = originUri,
+        }
     end
     local file = m.fileMap[uri]
     if file.text == text then
@@ -88,6 +90,7 @@ function m.getAst(uri)
     if file.ast == nil then
         local state, err = parser:compile(file.text, 'lua', config.config.runtime.version)
         if state then
+            state.uri = file.uri
             file.ast = state
         else
             log.error(err)

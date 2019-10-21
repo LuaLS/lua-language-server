@@ -92,7 +92,7 @@ local function buildLibReturns(lib)
             end
         end
         if i > 1 then
-            strs[#strs+1] = '\n   , '
+            strs[#strs+1] = ('\n% 3d. '):format(i)
         end
         if rtn.name then
             strs[#strs+1] = ('%s: '):format(rtn.name)

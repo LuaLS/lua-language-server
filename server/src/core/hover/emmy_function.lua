@@ -47,13 +47,18 @@ end
 
 local function buildEmmyReturns(emmy)
     local rtns = {}
+    local i = 0
     emmy:eachReturn(function (rtn)
+        i = i + 1
+        if i > 1 then
+            rtns[#rtns+1] = ('\n% 3d. '):format(i)
+        end
         rtns[#rtns+1] = rtn:getType()
     end)
     if #rtns == 0 then
         return '\n  -> ' .. 'any'
     else
-        return '\n  -> ' .. table.concat(rtns, ', ')
+        return '\n  -> ' .. table.concat(rtns)
     end
 end
 

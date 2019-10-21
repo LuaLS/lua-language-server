@@ -197,7 +197,8 @@ function mt:doEmmyReturn(action)
     local emmyMgr = self.emmyMgr
     self:instantSource(action)
     local type = action[1] and (self:getGenericByType(action[1]) or self:buildEmmyAnyType(action[1]))
-    local rtn = emmyMgr:addReturn(action, type)
+    local name = action[2]
+    local rtn = emmyMgr:addReturn(action, type, name)
     action:set('emmy.return', rtn)
     self:addEmmyReturn(rtn)
     if self.lsp then

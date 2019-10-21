@@ -850,8 +850,8 @@ function f([x: number [, y: boolean], z: string])
 ]=]
 
 TEST [[
----@return string {name = 'key'}
----@return string {name = 'value'}
+---@return string key
+---@return string value
 function <?f?>() end
 ]]
 [=[
@@ -860,9 +860,9 @@ function f()
 ]=]
 
 TEST [[
----@return        {name = 'x', optional = 'after'}
----@return string {name = 'y', optional = 'self'}
----@return string {name = 'z'}
+---@return any    x {optional = 'after'}
+---@return string y {optional = 'self'}
+---@return string z
 function <?f?>() end
 ]]
 [=[
@@ -871,9 +871,6 @@ function f()
 ]=]
 
 TEST [[
----@return        {name = 'x', optional = 'after'}
----@return string {name = 'y', optional = 'self'}
----@return string {name = 'z'}
 function f()
     return function (a, b)
     end

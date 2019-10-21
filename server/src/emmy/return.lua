@@ -25,9 +25,10 @@ function mt:bindGeneric(generic)
     end
 end
 
-return function (manager, source)
+return function (manager, source, name)
     local self = setmetatable({
         source = source.id,
+        name   = name and name[1],
         option = source.option,
         _manager = manager,
     }, mt)

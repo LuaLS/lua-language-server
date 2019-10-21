@@ -160,8 +160,8 @@ function mt:addParam(source, bind)
     return paramObj
 end
 
-function mt:addReturn(source, bind)
-    local returnObj = newReturn(self, source)
+function mt:addReturn(source, bind, name)
+    local returnObj = newReturn(self, source, name)
     if bind then
         if bind.type == 'emmy.generic' then
             returnObj:bindGeneric(bind)

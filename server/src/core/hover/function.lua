@@ -128,7 +128,9 @@ local function buildValueReturns(func)
             if i > 1 then
                 strs[#strs+1] = ', '
             end
-            if option and option.name then
+            if emmy and emmy.name then
+                strs[#strs+1] = ('%s: '):format(emmy.name)
+            elseif option and option.name then
                 strs[#strs+1] = ('%s: '):format(option.name)
             end
             strs[#strs+1] = rtn:getType()

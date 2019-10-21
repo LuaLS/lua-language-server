@@ -126,7 +126,7 @@ local function buildValueReturns(func)
                 end
             end
             if i > 1 then
-                strs[#strs+1] = ', '
+                strs[#strs+1] = '\n   , '
             end
             if emmy and emmy.name then
                 strs[#strs+1] = ('%s: '):format(emmy.name)

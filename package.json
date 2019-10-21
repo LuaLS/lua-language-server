@@ -20,15 +20,13 @@
                     "default": "Disable",
                     "enum": [
                         "Disable",
-                        "Show after",
-                        "Show before",
+                        "Both",
                         "Replace"
                     ],
                     "markdownDescription": "%config.completion.callSnippet%",
                     "markdownEnumDescriptions": [
                         "%config.completion.callSnippet.Disable%",
-                        "%config.completion.callSnippet.Show after%",
-                        "%config.completion.callSnippet.Show before%",
+                        "%config.completion.callSnippet.Both%",
                         "%config.completion.callSnippet.Replace%"
                     ],
                     "scope": "resource",
@@ -44,15 +42,13 @@
                     "default": "Replace",
                     "enum": [
                         "Disable",
-                        "Show after",
-                        "Show before",
+                        "Both",
                         "Replace"
                     ],
                     "markdownDescription": "%config.completion.keywordSnippet%",
                     "markdownEnumDescriptions": [
                         "%config.completion.keywordSnippet.Disable%",
-                        "%config.completion.keywordSnippet.Show after%",
-                        "%config.completion.keywordSnippet.Show before%",
+                        "%config.completion.keywordSnippet.Both%",
                         "%config.completion.keywordSnippet.Replace%"
                     ],
                     "scope": "resource",

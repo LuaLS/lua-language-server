@@ -941,17 +941,20 @@ local function makeList(source, pos, word)
         end
         list[#list+1] = data
         if data.snip then
-            if config.config.completion.callSnippet then
+            local snipType = config.config.completion.callSnippet
+            if snipType ~= 'Disable' then
                 local snipData = table.deepCopy(data)
                 snipData.insertText = data.snip
                 snipData.kind = CompletionItemKind.Snippet
                 snipData.label = snipData.label .. '()'
                 snipData.snip = nil
-                data.snip = nil
-                list[#list+1] = snipData
-            else
-                data.snip = nil
+                if snipType == 'Both' then
+                    list[#list+1] = snipData
+                elseif snipType == 'Replace' then
+                    list[#list] = snipData
+                end
             end
+            data.snip = nil
         end
     end, list
 end

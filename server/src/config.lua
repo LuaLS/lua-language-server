@@ -120,8 +120,9 @@ local ConfigTemplate = {
                                     )}
     },
     completion = {
-        enable          = {true, Boolean},
-        callSnippet     = {true, Boolean},
+        enable          = {true,   Boolean},
+        callSnippet     = {'Both', String},
+        keywordSnippet  = {'Both', String},
     },
     plugin = {
         enable          = {false, Boolean},

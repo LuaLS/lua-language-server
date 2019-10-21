@@ -145,14 +145,12 @@ local package = {
                     default = "Disable",
                     enum = {
                         "Disable",
-                        "Show after",
-                        "Show before",
+                        "Both",
                         "Replace",
                     },
                     markdownEnumDescriptions = {
                         "%config.completion.callSnippet.Disable%",
-                        "%config.completion.callSnippet.Show after%",
-                        "%config.completion.callSnippet.Show before%",
+                        "%config.completion.callSnippet.Both%",
                         "%config.completion.callSnippet.Replace%",
                     },
                     markdownDescription = "%config.completion.callSnippet%"
@@ -163,14 +161,12 @@ local package = {
                     default = "Replace",
                     enum = {
                         "Disable",
-                        "Show after",
-                        "Show before",
+                        "Both",
                         "Replace",
                     },
                     markdownEnumDescriptions = {
                         "%config.completion.keywordSnippet.Disable%",
-                        "%config.completion.keywordSnippet.Show after%",
-                        "%config.completion.keywordSnippet.Show before%",
+                        "%config.completion.keywordSnippet.Both%",
                         "%config.completion.keywordSnippet.Replace%",
                     },
                     markdownDescription = "%config.completion.keywordSnippet%"
@@ -294,13 +290,11 @@ The following example shows loaded files in `C:/lua` and `../lib` ,exclude `../l
     ['config.completion.enable']          = 'Enable completion.',
     ['config.completion.callSnippet']     = 'Shows function call snippets.',
     ['config.completion.callSnippet.Disable'] = "Only shows `function name`.",
-    ['config.completion.callSnippet.Show after'] = "Shows `function name` and `call snippet`.",
-    ['config.completion.callSnippet.Show before'] = "Shows `call snippet` and `function name`.",
+    ['config.completion.callSnippet.Both'] = "Shows `function name` and `call snippet`.",
     ['config.completion.callSnippet.Replace'] = "Only shows `call snippet.`",
     ['config.completion.keywordSnippet']     = 'Shows keyword syntax snippets.',
     ['config.completion.keywordSnippet.Disable'] = "Only shows `keyword`.",
-    ['config.completion.keywordSnippet.Show after'] = "Shows `keyword` and `syntax snippet`.",
-    ['config.completion.keywordSnippet.Show before'] = "Shows `syntax snippet` and `keyword`.",
+    ['config.completion.keywordSnippet.Both'] = "Shows `keyword` and `syntax snippet`.",
     ['config.completion.keywordSnippet.Replace'] = "Only shows `syntax snippet`.",
     ['config.zzzzzz.cat']                 = 'DO NOT TOUCH ME, LET ME SLEEP >_<\n\n(This will enable beta version, which are still in the early stages of development, and all features will fail after enabling this setting.)',
 })

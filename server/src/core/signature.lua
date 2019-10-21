@@ -47,7 +47,7 @@ local function getFunctionSource(call)
     return nil
 end
 
-local function hovers(call, pos)
+local function getHover(call, pos)
     local args = call:bindCall()
     if not args then
         return nil
@@ -82,10 +82,7 @@ local function hovers(call, pos)
             end
         end
     end
-    if not hover then
-        return nil
-    end
-    return { hover }
+    return hover
 end
 
 local function isInFunctionOrTable(call, pos)
@@ -119,7 +116,18 @@ return function (vm, pos)
         return nil
     end
 
-    local hovers = hovers(nearCall, pos)
+    local hover = getHover(nearCall, pos)
+    if not hover then
+        return nil
+    end
 
-    return hovers
+    -- skip `name(`
+    local head = #hover.name + 1
+    hover.label = ('%s(%s)'):format(hover.name, hover.argStr)
+    if hover.argLabel then
+        hover.argLabel[1] = hover.argLabel[1] + head
+        hover.argLabel[2] = hover.argLabel[2] + head
+    end
+    
+    return { hover }
 end

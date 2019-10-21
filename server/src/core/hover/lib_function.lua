@@ -207,15 +207,10 @@ return function (name, lib, object, select)
     local enum, rawEnum = buildEnum(lib)
     local tip = lib.description
     local doc = buildDoc(lib)
-    local headLen = #('function %s('):format(name)
-    local title = ('function %s(%s)'):format(name, argStr)
-    if argLabel then
-        argLabel[1] = argLabel[1] + headLen
-        argLabel[2] = argLabel[2] + headLen
-    end
     return {
-        label = title .. returns,
-        title = title,
+        label = ('function %s(%s)%s'):format(name, argStr, returns),
+        name = name,
+        argStr = argStr,
         returns = returns,
         description = tip,
         enum = enum,

@@ -36,8 +36,8 @@ end
 x($
 ]]
 {
-    label = "function x(a: any, b: any)",
-    arg = {12, 17},
+    label = "x(a: any, b: any)",
+    arg = {3, 8},
 }
 
 TEST [[
@@ -47,8 +47,8 @@ end
 x($)
 ]]
 {
-    label = "function x(a: any, b: any)",
-    arg = {12, 17},
+    label = "x(a: any, b: any)",
+    arg = {3, 8},
 }
 
 TEST [[
@@ -58,8 +58,8 @@ end
 x(xxx$)
 ]]
 {
-    label = "function x(a: any, b: any)",
-    arg = {12, 17},
+    label = "x(a: any, b: any)",
+    arg = {3, 8},
 }
 
 TEST [[
@@ -69,8 +69,8 @@ end
 x(xxx, $)
 ]]
 {
-    label = "function x(a: any, b: any)",
-    arg = {20, 25},
+    label = "x(a: any, b: any)",
+    arg = {11, 16},
 }
 
 TEST [[
@@ -80,8 +80,8 @@ end
 mt:f($
 ]]
 {
-    label = 'function mt:f(a: any)',
-    arg = {15, 20},
+    label = 'mt:f(a: any)',
+    arg = {6, 11},
 }
 
 TEST [[
@@ -89,10 +89,9 @@ TEST [[
 ]]
 {
     label = [[
-function *string:sub(i: integer [, j: integer(-1)])
-  -> string
+*string:sub(i: integer [, j: integer(-1)])
 ]],
-    arg = {22, 31},
+    arg = {13, 22},
 }
 
 TEST [[
@@ -125,10 +124,9 @@ zzzz($)
 ]]
 {
     label = [[
-function zzzz(x: number, y: number)
-  -> boolean
+zzzz(x: number, y: number)
 ]],
-    arg = {15, 23},
+    arg = {6, 14},
 }
 
 TEST [[

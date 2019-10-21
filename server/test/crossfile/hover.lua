@@ -123,7 +123,7 @@ TEST {
         label = 'function f(a: any, b: any)',
         name = 'f',
         args = EXISTS,
-        title = EXISTS,
+        argStr = EXISTS,
         returns = EXISTS,
     }
 }
@@ -147,7 +147,7 @@ TEST {
         label = 'function (a: any, b: any)',
         name = '',
         args = EXISTS,
-        title = EXISTS,
+        argStr = EXISTS,
         returns = EXISTS,
     }
 }
@@ -179,7 +179,7 @@ TEST {
         label = 'function mt:add(a: any, b: any)',
         name = 'mt:add',
         args = EXISTS,
-        title = EXISTS,
+        argStr = EXISTS,
         returns = EXISTS,
     },
 }
@@ -251,7 +251,7 @@ TEST {
         name = 'f',
         description = 'abc',
         args = EXISTS,
-        title = EXISTS,
+        argStr = EXISTS,
         returns = EXISTS,
     }
 }
@@ -294,7 +294,7 @@ TEST {
         name = 'f',
         args = EXISTS,
         rawEnum = EXISTS,
-        title = EXISTS,
+        argStr = EXISTS,
         returns = EXISTS,
         enum = [[
 
@@ -324,7 +324,7 @@ TEST {
         name = 'f',
         args = EXISTS,
         rawEnum = EXISTS,
-        title = EXISTS,
+        argStr = EXISTS,
         returns = EXISTS,
         enum = [[
 
@@ -351,7 +351,7 @@ TEST {
         label = 'function f(x: string, y: string)',
         name = 'f',
         args = EXISTS,
-        title = EXISTS,
+        argStr = EXISTS,
         returns = EXISTS,
         description = [[
 + `x`*(string)*: aaaa

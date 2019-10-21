@@ -14,13 +14,12 @@ return function (lsp, params)
 
     local hover = hovers[1]
     local desc = {}
-    desc[#desc+1] = '```lua\n' .. hover.label .. '\n```\n'
     desc[#desc+1] = hover.description
     local active
     local signatures = {}
     for i, hover in ipairs(hovers) do
         local signature = {
-            label = hover.title,
+            label = hover.label,
             documentation = {
                 kind = 'markdown',
                 value = table.concat(desc, '\n'),

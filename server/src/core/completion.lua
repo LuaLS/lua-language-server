@@ -394,15 +394,22 @@ local function searchParams(vm, source, func, word, callback)
 end
 
 local function searchKeyWords(vm, source, word, callback)
+    local snipType = config.config.completion.keywordSnippet
     for _, key in ipairs(KEYS) do
         if matchKey(word, key) then
-            callback(key, nil, CompletionItemKind.Keyword)
             if snippet.key[key] then
-                for _, data in ipairs(snippet.key[key]) do
-                    callback(data.label, nil, CompletionItemKind.Snippet, {
-                        insertText = data.text,
-                    })
+                if snipType ~= 'Replace' then
+                    callback(key, nil, CompletionItemKind.Keyword)
                 end
+                if snipType ~= 'Disable' then
+                    for _, data in ipairs(snippet.key[key]) do
+                        callback(data.label, nil, CompletionItemKind.Snippet, {
+                            insertText = data.text,
+                        })
+                    end
+                end
+            else
+                callback(key, nil, CompletionItemKind.Keyword)
             end
         end
     end

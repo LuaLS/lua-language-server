@@ -124,8 +124,9 @@ local ConfigTemplate = {
                                     )}
     },
     completion = {
-        enable          = {true, Boolean},
-        callSnippet     = {true, Boolean},
+        enable          = {true,      Boolean},
+        callSnippet     = {'Disable', String},
+        keywordSnippet  = {'Replace', String},
     },
     plugin = {
         enable          = {false, Boolean},

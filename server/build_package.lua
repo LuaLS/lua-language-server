@@ -141,9 +141,39 @@ local package = {
                 },
                 ["Lua.completion.callSnippet"] = {
                     scope = "resource",
-                    type = "boolean",
-                    default = true,
+                    type = "string",
+                    default = "Disable",
+                    enum = {
+                        "Disable",
+                        "Show after",
+                        "Show before",
+                        "Replace",
+                    },
+                    markdownEnumDescriptions = {
+                        "%config.completion.callSnippet.Disable%",
+                        "%config.completion.callSnippet.Show after%",
+                        "%config.completion.callSnippet.Show before%",
+                        "%config.completion.callSnippet.Replace%",
+                    },
                     markdownDescription = "%config.completion.callSnippet%"
+                },
+                ["Lua.completion.keywordSnippet"] = {
+                    scope = "resource",
+                    type = "string",
+                    default = "Replace",
+                    enum = {
+                        "Disable",
+                        "Show after",
+                        "Show before",
+                        "Replace",
+                    },
+                    markdownEnumDescriptions = {
+                        "%config.completion.keywordSnippet.Disable%",
+                        "%config.completion.keywordSnippet.Show after%",
+                        "%config.completion.keywordSnippet.Show before%",
+                        "%config.completion.keywordSnippet.Replace%",
+                    },
+                    markdownDescription = "%config.completion.keywordSnippet%"
                 },
                 --["Lua.plugin.enable"] = {
                 --    scope = "resource",
@@ -262,7 +292,16 @@ This feature can load external Lua files, which can be used for definition, auto
 The following example shows loaded files in `C:/lua` and `../lib` ,exclude `../lib/temp`.
 ]] .. example.library,
     ['config.completion.enable']          = 'Enable completion.',
-    ['config.completion.callSnippet']     = 'Show function call snippets.',
+    ['config.completion.callSnippet']     = 'Shows function call snippets.',
+    ['config.completion.callSnippet.Disable'] = "Only shows `function name`.",
+    ['config.completion.callSnippet.Show after'] = "Shows `function name` and `call snippet`.",
+    ['config.completion.callSnippet.Show before'] = "Shows `call snippet` and `function name`.",
+    ['config.completion.callSnippet.Replace'] = "Only shows `call snippet.`",
+    ['config.completion.keywordSnippet']     = 'Shows keyword syntax snippets.',
+    ['config.completion.keywordSnippet.Disable'] = "Only shows `keyword`.",
+    ['config.completion.keywordSnippet.Show after'] = "Shows `keyword` and `syntax snippet`.",
+    ['config.completion.keywordSnippet.Show before'] = "Shows `syntax snippet` and `keyword`.",
+    ['config.completion.keywordSnippet.Replace'] = "Only shows `syntax snippet`.",
     ['config.zzzzzz.cat']                 = 'DO NOT TOUCH ME, LET ME SLEEP >_<\n\n(This will enable beta version, which are still in the early stages of development, and all features will fail after enabling this setting.)',
 })
 
@@ -285,5 +324,14 @@ io.save(ROOT:parent_path() / 'package.nls.zh-cn.json', json.encode {
 ]] .. example.library,
     ['config.completion.enable']          = '启用自动完成。',
     ['config.completion.callSnippet']     = '显示函数调用片段。',
+    ['config.completion.callSnippet.Disable'] = "只显示 `函数名`",
+    ['config.completion.callSnippet.Show after'] = "显示 `函数名` 与 `调用片段`。",
+    ['config.completion.callSnippet.Show before'] = "显示 `调用片段` 与 `函数名`。",
+    ['config.completion.callSnippet.Replace'] = "只显示 `调用片段`。",
+    ['config.completion.keywordSnippet']     = '显示关键字语法片段',
+    ['config.completion.keywordSnippet.Disable'] = "只显示 `关键字`。",
+    ['config.completion.keywordSnippet.Show after'] = "显示 `关键字` 与 `语法片段`。",
+    ['config.completion.keywordSnippet.Show before'] = "显示 `语法片段` 与 `关键字`。",
+    ['config.completion.keywordSnippet.Replace'] = "只显示 `语法片段`。",
     ['config.zzzzzz.cat']                 = 'DO NOT TOUCH ME, LET ME SLEEP >_<\n\n（这会启用还处于早期开发阶段的beta版，开启后所有的功能都会失效）',
 })

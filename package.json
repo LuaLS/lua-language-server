@@ -17,16 +17,46 @@
         "configuration": {
             "properties": {
                 "Lua.completion.callSnippet": {
-                    "default": true,
+                    "default": "Disable",
+                    "enum": [
+                        "Disable",
+                        "Show after",
+                        "Show before",
+                        "Replace"
+                    ],
                     "markdownDescription": "%config.completion.callSnippet%",
+                    "markdownEnumDescriptions": [
+                        "%config.completion.callSnippet.Disable%",
+                        "%config.completion.callSnippet.Show after%",
+                        "%config.completion.callSnippet.Show before%",
+                        "%config.completion.callSnippet.Replace%"
+                    ],
                     "scope": "resource",
-                    "type": "boolean"
+                    "type": "string"
                 },
                 "Lua.completion.enable": {
                     "default": true,
                     "markdownDescription": "%config.completion.enable%",
                     "scope": "resource",
                     "type": "boolean"
+                },
+                "Lua.completion.keywordSnippet": {
+                    "default": "Replace",
+                    "enum": [
+                        "Disable",
+                        "Show after",
+                        "Show before",
+                        "Replace"
+                    ],
+                    "markdownDescription": "%config.completion.keywordSnippet%",
+                    "markdownEnumDescriptions": [
+                        "%config.completion.keywordSnippet.Disable%",
+                        "%config.completion.keywordSnippet.Show after%",
+                        "%config.completion.keywordSnippet.Show before%",
+                        "%config.completion.keywordSnippet.Replace%"
+                    ],
+                    "scope": "resource",
+                    "type": "string"
                 },
                 "Lua.diagnostics.disable": {
                     "items": {

@@ -229,13 +229,15 @@ return function (name, func, object, select)
     local comment = getComment(func)
     local overloads = getOverLoads(name, func, object, select)
     local headLen = #('function %s('):format(name)
-    local title = ('function %s(%s)%s'):format(name, argStr, returns)
+    local title = ('function %s(%s)'):format(name, argStr)
     if argLabel then
         argLabel[1] = argLabel[1] + headLen
         argLabel[2] = argLabel[2] + headLen
     end
     return {
-        label = title,
+        label = title .. returns,
+        title = title,
+        returns = returns,
         description = comment,
         enum = enum,
         rawEnum = rawEnum,

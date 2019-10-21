@@ -63,29 +63,29 @@ local function hovers(call, pos)
     local object = source:get 'object'
     local lib, fullkey = findLib(source)
     local name = fullkey or buildValueName(source)
-    local hovers = {}
+    local hover
     if lib then
-        hovers[#hovers+1] = getFunctionHoverAsLib(name, lib, object, select)
+        hover = getFunctionHoverAsLib(name, lib, object, select)
     else
         local emmy = value:getEmmy()
         if emmy and emmy.type == 'emmy.functionType' then
-            hovers[#hovers+1] = getFunctionHoverAsEmmy(name, emmy, object, select)
+            hover = getFunctionHoverAsEmmy(name, emmy, object, select)
         else
             ---@type emmyFunction
             local func = value:getFunction()
-            hovers[#hovers+1] = getFunctionHover(name, func, object, select)
+            hover = getFunctionHover(name, func, object, select)
             local overLoads = func and func:getEmmyOverLoads()
             if overLoads then
                 for _, ol in ipairs(overLoads) do
-                    hovers[#hovers+1] = getFunctionHoverAsEmmy(name, ol, object, select)
+                    hover = getFunctionHoverAsEmmy(name, ol, object, select)
                 end
             end
         end
     end
-    if #hovers == 0 then
+    if not hover then
         return nil
     end
-    return hovers
+    return { hover }
 end
 
 local function isInFunctionOrTable(call, pos)

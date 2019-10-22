@@ -43,7 +43,7 @@ function TEST(script)
     local ast = parser:compile(new_script, 'lua', 'Lua 5.3')
     assert(ast)
 
-    local results = core(ast, new_script, pos)
+    local results = core(ast, pos)
     if results then
         local positions = {}
         for i, result in ipairs(results) do

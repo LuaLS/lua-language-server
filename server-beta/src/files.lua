@@ -14,6 +14,7 @@ m.assocVersion = -1
 m.assocMatcher = nil
 
 --- 打开文件
+---@param uri string
 function m.open(uri)
     if platform.OS == 'Windows' then
         uri = uri:lower()
@@ -22,6 +23,7 @@ function m.open(uri)
 end
 
 --- 关闭文件
+---@param uri string
 function m.close(uri)
     if platform.OS == 'Windows' then
         uri = uri:lower()
@@ -30,6 +32,8 @@ function m.close(uri)
 end
 
 --- 设置文件文本
+---@param uri string
+---@param text string
 function m.setText(uri, text)
     local originUri = uri
     if platform.OS == 'Windows' then
@@ -63,6 +67,8 @@ function m.onCompiled(uri, callback)
 end
 
 --- 获取文件文本
+---@param uri string
+---@return string text
 function m.getText(uri)
     if platform.OS == 'Windows' then
         uri = uri:lower()
@@ -74,6 +80,8 @@ function m.getText(uri)
     return file.text
 end
 
+--- 移除文件
+---@param uri string
 function m.remove(uri)
     if platform.OS == 'Windows' then
         uri = uri:lower()
@@ -81,7 +89,16 @@ function m.remove(uri)
     m.fileMap[uri] = nil
 end
 
+--- 移除所有文件
+function m.removeAll()
+    for uri in pairs(m.fileMap) do
+        m.fileMap[uri] = nil
+    end
+end
+
 --- 获取文件语法树
+---@param uri string
+---@return table ast
 function m.getAst(uri)
     if platform.OS == 'Windows' then
         uri = uri:lower()
@@ -102,6 +119,8 @@ function m.getAst(uri)
 end
 
 --- 获取文件行信息
+---@param uri string
+---@return table lines
 function m.getLines(uri)
     if platform.OS == 'Windows' then
         uri = uri:lower()
@@ -142,6 +161,8 @@ function m.getAssoc()
 end
 
 --- 判断是否是Lua文件
+---@param uri string
+---@return boolean
 function m.isLua(uri)
     local ext = uri:match '%.([^%.%/%\\]-)$'
     if not ext then

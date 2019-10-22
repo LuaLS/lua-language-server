@@ -157,7 +157,7 @@ proto.on('textDocument/definition', function (params)
     local lines  = files.getLines(uri)
     local text   = files.getText(uri)
     local offset = inte.offset(lines, text, params.position)
-    local result = core(ast, text, offset)
+    local result = core(ast, offset)
     if not result then
         return nil
     end

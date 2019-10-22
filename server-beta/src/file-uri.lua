@@ -38,6 +38,9 @@ local m = {}
 -- /usr/home                 --> file:///usr/home
 -- \\server\share\some\path  --> file://server/share/some/path
 
+--- path -> uri
+---@param path string
+---@return string uri
 function m.encode(path)
     local authority = ''
     if platform.OS == 'Windows' then
@@ -77,6 +80,9 @@ end
 -- file:///usr/home               --> /usr/home
 -- file://server/share/some/path  --> \\server\share\some\path
 
+--- uri -> path
+---@param uri string
+---@return string path
 function m.decode(uri)
     local scheme, authority, path = uri:match('([^:]*):?/?/?([^/]*)(.*)')
     if not scheme then

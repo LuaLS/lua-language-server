@@ -1,7 +1,7 @@
 local guide    = require 'parser.guide'
 local engineer = require 'core.engineer'
 
-return function (ast, text, offset)
+return function (ast, offset)
     local results = {}
     local searcher = engineer(ast)
     guide.eachSourceContain(ast.ast, offset, function (source)

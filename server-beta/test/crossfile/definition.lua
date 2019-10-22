@@ -1,8 +1,6 @@
-local service = require 'service'
-local workspace = require 'workspace'
-local fs = require 'bee.filesystem'
-local core = require 'core'
-local uric = require 'uri'
+local files = require 'files'
+local furi  = require 'file-uri'
+local core  = require 'core.definition'
 
 rawset(_G, 'TEST', true)
 
@@ -43,30 +41,27 @@ local function founded(targets, results)
 end
 
 function TEST(datas)
-    local lsp = service()
-    local ws = workspace(lsp, 'test')
-    lsp.workspace = ws
+    files.removeAll()
 
-    local compiled = {}
     local targetList = {}
-    local sourceList, sourceUri
-
+    local sourceList
+    local sourceUri
     for i, data in ipairs(datas) do
-        local uri = uric.encode(fs.path(data.path))
+        local uri = furi.encode(data.path)
         local new, list = catch_target(data.content, '!')
         if new ~= data.content or data.target then
             if data.target then
                 targetList[#targetList+1] = {
                     data.target[1],
                     data.target[2],
-                    uri
+                    uri,
                 }
             else
                 for _, position in ipairs(list) do
                     targetList[#targetList+1] = {
                         position[1],
                         position[2],
-                        uri
+                        uri,
                     }
                 end
             end
@@ -74,23 +69,17 @@ function TEST(datas)
         end
         new, list = catch_target(data.content, '?')
         if new ~= data.content then
-            compiled[i] = new
             sourceList = list
             sourceUri = uri
             data.content = new
         end
-        lsp:saveText(uri, 1, data.content)
-        ws:addFile(uric.decode(uri))
+        files.setText(uri, data.content)
     end
 
-    while lsp._needCompile[1] do
-        lsp:compileVM(lsp._needCompile[1])
-    end
-
-    local sourceVM = lsp:getVM(sourceUri)
-    assert(sourceVM)
+    local sourceAst = files.getAst(sourceUri)
+    assert(sourceAst)
     local sourcePos = (sourceList[1][1] + sourceList[1][2]) // 2
-    local positions = core.definition(sourceVM, sourcePos, 'definition')
+    local positions = core(sourceAst, sourcePos)
     if positions then
         assert(founded(targetList, positions))
     else

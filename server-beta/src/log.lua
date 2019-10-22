@@ -92,7 +92,7 @@ function m.raw(thd, level, msg, source, currentline)
         return
     end
     local sec, ms = mathModf(m.startTime + osClock())
-    local timestr = osDate('%Y-%m-%d %H:%M:%S', sec)
+    local timestr = osDate('%H:%M:%S', sec)
     local agl = ''
     if #level < 5 then
         agl = (' '):rep(5 - #level)

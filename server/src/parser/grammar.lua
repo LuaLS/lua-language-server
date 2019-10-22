@@ -518,11 +518,9 @@ grammar 'Emmy' [[
 Emmy            <-  EmmySp '---@' EmmyBody ShortComment
                 /   EmmyComments
 EmmySp          <-  (!'---@' !'---' Comment / %s / %nl)*
-EmmyComments    <-  (EmmyComment (%nl EmmyComMulti / %nl EmmyComSingle)*)
+EmmyComments    <-  EmmyComment+
                 ->  EmmyComment
-EmmyComment     <-  EmmySp '---' !'@' %s*           {(!%nl .)*}
-EmmyComMulti    <-  EmmySp '---|'         {} -> en  {(!%nl .)*}
-EmmyComSingle   <-  EmmySp '---' !'@' %s* {} -> ' ' {(!%nl .)*}
+EmmyComment     <-  EmmySp '---' !'@' %s* {(!%nl .)*}
 EmmyBody        <-  'class'    %s+ EmmyClass    -> EmmyClass
                 /   'type'     %s+ EmmyType     -> EmmyType
                 /   'alias'    %s+ EmmyAlias    -> EmmyAlias

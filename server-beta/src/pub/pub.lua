@@ -132,7 +132,7 @@ function m.task(name, params)
 end
 
 --- 发布同步任务，如果任务进入了队列，会返回执行器
----|通过 jumpQueue 可以插队
+--- 通过 jumpQueue 可以插队
 ---@parma name string
 ---@param params any
 ---@param callback function

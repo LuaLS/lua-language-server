@@ -86,6 +86,8 @@ function m.preload()
     if not m.uri then
         return
     end
+    local max = 0
+    local read = 0
     log.info('Preload start.')
     local ignore = m.getIgnoreMatcher()
 
@@ -111,22 +113,21 @@ function m.preload()
         if not files.isLua(uri) then
             return
         end
+        max = max + 1
         pub.syncTask('loadFile', uri, function (text)
+            read = read + 1
             log.info(('Preload file at: %s , size = %.3f KB'):format(uri, #text / 1000.0))
             files.setText(uri, text)
         end)
     end)
 
+    log.info(('Found %d files.'):format(max))
     while true do
-        local count = 0
-        for _, file in pairs(files.fileMap) do
-            if file.compiling then
-                task.sleep(0.1)
-                goto CONTINUE
-            end
-            count = count + 1
+        log.info(('Loaded %d/%d files'):format(read, max))
+        if read < max then
+            task.sleep(0.1)
+            goto CONTINUE
         end
-        log.info(('Preloaded %d files.'):format(count))
         break
         ::CONTINUE::
     end

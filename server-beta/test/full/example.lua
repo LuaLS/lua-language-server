@@ -1,12 +1,9 @@
-local fs = require 'bee.filesystem'
-local core = require 'core'
+local util = require 'utility'
 local parser = require 'parser'
-
-TEST(io.load(ROOT / 'src' / 'vm' / 'vm.lua'))
 
 -- 临时
 local function testIfExit(path)
-    local buf = io.load(fs.path(path))
+    local buf = util.loadFile(path:string())
     if buf then
         local vm
 
@@ -26,9 +23,9 @@ local function testIfExit(path)
         local clock = os.clock()
         local max = 100
         local need
-        local lines = parser:lines(buf, 'utf8')
+        local lines = parser:lines(buf)
         for i = 1, max do
-            core.diagnostics(vm, lines, 'test')
+            --core.diagnostics(vm, lines, 'test')
             local passed = os.clock() - clock
             if passed >= 1.0 or i == max then
                 need = passed / i

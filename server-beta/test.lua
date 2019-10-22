@@ -47,9 +47,9 @@ local function main()
     --test 'completion'
     --test 'signature'
     --test 'document_symbol'
-    --test 'crossfile'
-    --test 'full'
-    --test 'other'
+    test 'crossfile'
+    test 'full'
+    test 'other'
 
     print('测试完成')
 end

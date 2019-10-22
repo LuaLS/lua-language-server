@@ -2,7 +2,7 @@ local guide = require 'parser.guide'
 
 local m = {}
 
-function m:value(source, callback)
+function m:eachValue(source, callback)
     local vararg = source.vararg
     if vararg.type == 'call' then
         local func = vararg.node

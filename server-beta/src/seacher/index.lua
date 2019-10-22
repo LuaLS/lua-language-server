@@ -1,6 +1,6 @@
 local m = {}
 
-function m:value(source, callback)
+function m:eachValue(source, callback)
     local parent = source.parent
     if parent.type == 'setindex'
     or parent.type == 'tableindex' then

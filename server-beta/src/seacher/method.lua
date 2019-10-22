@@ -2,7 +2,7 @@ local guide    = require 'parser.guide'
 
 local m = {}
 
-function m:def(source, callback)
+function m:eachDef(source, callback)
     local node = source.parent.node
     local key = guide.getKeyName(source)
     self:eachField(node, key, function (src, mode)
@@ -12,7 +12,7 @@ function m:def(source, callback)
     end)
 end
 
-function m:ref(source, callback)
+function m:eachRef(source, callback)
     local node = source.parent.node
     local key = guide.getKeyName(source)
     self:eachField(node, key, function (src, mode)
@@ -22,11 +22,11 @@ function m:ref(source, callback)
     end)
 end
 
-function m:field(source, key, callback)
+function m:eachField(source, key, callback)
     self:eachField(source.parent, key, callback)
 end
 
-function m:value(source, callback)
+function m:eachValue(source, callback)
     self:eachValue(source.parent, callback)
 end
 

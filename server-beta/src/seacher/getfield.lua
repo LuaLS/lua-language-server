@@ -1,9 +1,9 @@
 local guide    = require 'parser.guide'
-local checkSMT = require 'core.setmetatable'
+local checkSMT = require 'seacher.setmetatable'
 
 local m = {}
 
-function m:ref(source, callback)
+function m:eachRef(source, callback)
     local node = source.node
     if     node.type == 'setfield'
     or     node.type == 'getfield'
@@ -22,7 +22,7 @@ function m:ref(source, callback)
     end
 end
 
-function m:field(source, key, callback)
+function m:eachField(source, key, callback)
     local used = {}
     local found = false
     used[source] = true
@@ -57,7 +57,7 @@ function m:field(source, key, callback)
     checkSMT(self, key, used, found, callback)
 end
 
-function m:value(source, callback)
+function m:eachValue(source, callback)
     if source.value then
         self:eachValue(source.value, callback)
     end

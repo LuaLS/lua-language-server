@@ -1,5 +1,4 @@
 local guide     = require 'parser.guide'
-local engineer  = require 'core.engineer'
 local workspace = require 'workspace'
 local files     = require 'files'
 
@@ -56,12 +55,11 @@ end
 
 return function (uri, offset)
     local results = {}
-    local ast = files.getAst(uri)
-    if not ast then
+    local searcher = files.getSearcher(uri)
+    if not searcher then
         return nil
     end
-    local searcher = engineer(ast, uri)
-    guide.eachSourceContain(ast.ast, offset, function (source)
+    guide.eachSourceContain(searcher.ast, offset, function (source)
         checkRequire(searcher, source, offset, function (uri)
             results[#results+1] = {
                 uri    = uri,

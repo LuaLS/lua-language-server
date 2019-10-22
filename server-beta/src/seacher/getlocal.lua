@@ -1,18 +1,18 @@
 local m = {}
 
-function m:def(source, callback)
+function m:eachDef(source, callback)
     self:eachDef(source.loc, callback)
 end
 
-function m:ref(source, callback)
+function m:eachRef(source, callback)
     self:eachRef(source.loc, callback)
 end
 
-function m:field(source, key, callback)
+function m:eachField(source, key, callback)
     self:eachField(source.loc, key, callback)
 end
 
-function m:value(source, callback)
+function m:eachValue(source, callback)
     self:eachValue(source.loc, callback)
 end
 

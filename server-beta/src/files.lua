@@ -131,10 +131,29 @@ function m.getLines(uri)
         uri = uri:lower()
     end
     local file = m.fileMap[uri]
+    if not file then
+        return nil
+    end
     if not file.lines then
         file.lines = parser:lines(file.text)
     end
     return file.lines
+end
+
+--- 获取搜索器
+function m.getSearcher(uri)
+    if platform.OS == 'Windows' then
+        uri = uri:lower()
+    end
+    local file = m.fileMap[uri]
+    if not file then
+        return nil
+    end
+    if not file.searcher then
+        local seacher = require 'seacher'
+        file.searcher = seacher.create(uri)
+    end
+    return file.searcher
 end
 
 --- 判断文件名相等

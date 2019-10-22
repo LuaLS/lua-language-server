@@ -1,9 +1,9 @@
 local guide = require 'parser.guide'
-local checkSMT = require 'core.setmetatable'
+local checkSMT = require 'seacher.setmetatable'
 
 local m = {}
 
-function m:def(source, callback)
+function m:eachDef(source, callback)
     if source.tag ~= 'self' then
         callback(source, 'local')
     end
@@ -21,7 +21,7 @@ function m:def(source, callback)
     end
 end
 
-function m:ref(source, callback)
+function m:eachRef(source, callback)
     if source.tag ~= 'self' then
         callback(source, 'local')
     end
@@ -41,7 +41,7 @@ function m:ref(source, callback)
     end
 end
 
-function m:field(source, key, callback)
+function m:eachField(source, key, callback)
     local used = {}
     used[source] = true
     local found = false
@@ -99,7 +99,7 @@ function m:field(source, key, callback)
     checkSMT(self, key, used, found, callback)
 end
 
-function m:value(source, callback)
+function m:eachValue(source, callback)
     callback(source)
     local refs = source.ref
     if refs then

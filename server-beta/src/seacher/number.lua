@@ -2,7 +2,7 @@ local guide    = require 'parser.guide'
 
 local m = {}
 
-function m:def(source, callback)
+function m:eachDef(source, callback)
     local parent = source.parent
     if not parent then
         return
@@ -19,7 +19,7 @@ function m:def(source, callback)
     end)
 end
 
-function m:ref(source, callback)
+function m:eachRef(source, callback)
     local parent = source.parent
     if not parent then
         return
@@ -36,7 +36,7 @@ function m:ref(source, callback)
     end)
 end
 
-function m:value(source, callback)
+function m:eachValue(source, callback)
     callback(source)
 end
 

@@ -1,39 +1,11 @@
-local guide       = require 'parser.guide'
-local require     = require
-local tableUnpack = table.unpack
-local error       = error
-
+local guide        = require 'parser.guide'
+local files        = require 'files'
+local methods      = require 'seacher.methods'
+local tableUnpack  = table.unpack
+local error        = error
 local setmetatable = setmetatable
 
 _ENV = nil
----@class engineer
-local mt = {}
-mt.__index = mt
-mt.type = 'engineer'
-
-mt['local']      = require 'core.local'
-mt['getlocal']   = require 'core.getlocal'
-mt['setlocal']   = mt['getlocal']
-mt['getglobal']  = require 'core.getglobal'
-mt['setglobal']  = mt['getglobal']
-mt['getfield']   = require 'core.getfield'
-mt['setfield']   = mt['getfield']
-mt['tablefield'] = require 'core.tablefield'
-mt['getmethod']  = mt['getfield']
-mt['setmethod']  = mt['getfield']
-mt['getindex']   = mt['getfield']
-mt['setindex']   = mt['getfield']
-mt['field']      = require 'core.field'
-mt['method']     = require 'core.method'
-mt['index']      = require 'core.index'
-mt['number']     = require 'core.number'
-mt['boolean']    = require 'core.boolean'
-mt['string']     = require 'core.string'
-mt['table']      = require 'core.table'
-mt['select']     = require 'core.select'
-mt['goto']       = require 'core.goto'
-mt['label']      = require 'core.label'
-
 local specials = {
     ['_G']           = true,
     ['rawset']       = true,
@@ -44,6 +16,12 @@ local specials = {
     ['loadfile']     = true,
 }
 
+---@class seacher
+local mt = {}
+mt.__index = mt
+mt.__name = 'seacher'
+
+--- 获取特殊对象的名字
 function mt:getSpecialName(source)
     local spName = self.cache.specialName[source]
     if spName ~= nil then
@@ -82,6 +60,8 @@ function mt:getSpecialName(source)
     return spName
 end
 
+--- 遍历特殊对象
+---@param callback fun(name:string, source:table)
 function mt:eachSpecial(callback)
     local cache = self.cache.special
     if cache then
@@ -109,6 +89,10 @@ function mt:eachSpecial(callback)
     end
 end
 
+--- 遍历元素
+---@param source table
+---@param key string
+---@param callback fun(field:table, mode:string)
 function mt:eachField(source, key, callback)
     local cache = self.cache.field[source]
     if cache and cache[key] then
@@ -118,11 +102,11 @@ function mt:eachField(source, key, callback)
         return
     end
     local tp = source.type
-    local d = mt[tp]
+    local d = methods[tp]
     if not d then
         return
     end
-    local f = d.field
+    local f = d.eachField
     if not f then
         return
     end
@@ -150,6 +134,9 @@ function mt:eachField(source, key, callback)
     self.step = self.step - 1
 end
 
+--- 遍历引用
+---@param source table
+---@param callback fun(def:table, mode:string)
 function mt:eachRef(source, callback)
     local cache = self.cache.ref[source]
     if cache then
@@ -159,11 +146,11 @@ function mt:eachRef(source, callback)
         return
     end
     local tp = source.type
-    local d = mt[tp]
+    local d = methods[tp]
     if not d then
         return
     end
-    local f = d.ref
+    local f = d.eachRef
     if not f then
         return
     end
@@ -188,6 +175,9 @@ function mt:eachRef(source, callback)
     self.step = self.step - 1
 end
 
+--- 遍历定义
+---@param source table
+---@param callback fun(def:table, mode:string)
 function mt:eachDef(source, callback)
     local cache = self.cache.def[source]
     if cache then
@@ -197,11 +187,11 @@ function mt:eachDef(source, callback)
         return
     end
     local tp = source.type
-    local d = mt[tp]
+    local d = methods[tp]
     if not d then
         return
     end
-    local f = d.def
+    local f = d.eachDef
     if not f then
         return
     end
@@ -226,6 +216,9 @@ function mt:eachDef(source, callback)
     self.step = self.step - 1
 end
 
+--- 遍历value
+---@param source table
+---@param callback fun(value:table)
 function mt:eachValue(source, callback)
     local cache = self.cache.value[source]
     if cache then
@@ -235,11 +228,11 @@ function mt:eachValue(source, callback)
         return
     end
     local tp = source.type
-    local d = mt[tp]
+    local d = methods[tp]
     if not d then
         return
     end
-    local f = d.value
+    local f = d.eachValue
     if not f then
         return
     end
@@ -264,6 +257,10 @@ function mt:eachValue(source, callback)
     self.step = self.step - 1
 end
 
+--- 获取函数的参数
+---@param source table
+---@return table arg1
+---@return table arg2
 function mt:callArgOf(source)
     if not source or source.type ~= 'call' then
         return
@@ -275,6 +272,10 @@ function mt:callArgOf(source)
     return tableUnpack(args)
 end
 
+--- 获取函数的返回值
+---@param source table
+---@return table return1
+---@return table return2
 function mt:callReturnOf(source)
     if not source or source.type ~= 'call' then
         return
@@ -292,6 +293,11 @@ function mt:callReturnOf(source)
     end
 end
 
+--- 获取source的索引，模式与值
+---@param source table
+---@return table field
+---@return string mode
+---@return table value
 function mt:childMode(source)
     if     source.type == 'getfield' then
         return source.field, 'get'
@@ -313,11 +319,18 @@ function mt:childMode(source)
     return nil, nil
 end
 
-return function (ast, uri)
-    local self = setmetatable({
-        step  = 0,
-        ast   = ast.ast,
-        uri   = uri,
+---@class engineer
+local m = {}
+
+--- 新建搜索器
+---@param uri string
+---@return seacher
+function m.create(uri)
+    local ast = files.getAst(uri)
+    local searcher = setmetatable({
+        step = 0,
+        ast  = ast.ast,
+        uri  = uri,
         cache = {
             def   = {},
             ref   = {},
@@ -326,5 +339,7 @@ return function (ast, uri)
             specialName = {},
         },
     }, mt)
-    return self
+    return searcher
 end
+
+return m

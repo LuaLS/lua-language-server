@@ -2,7 +2,7 @@ local guide    = require 'parser.guide'
 
 local m = {}
 
-function m:field(source, key, callback)
+function m:eachField(source, key, callback)
     for i = 1, #source do
         local src = source[i]
         if key == guide.getKeyName(src) then
@@ -15,7 +15,7 @@ function m:field(source, key, callback)
     end
 end
 
-function m:value(source, callback)
+function m:eachValue(source, callback)
     callback(source)
 end
 

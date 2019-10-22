@@ -313,10 +313,11 @@ function mt:childMode(source)
     return nil, nil
 end
 
-return function (ast)
+return function (ast, uri)
     local self = setmetatable({
         step  = 0,
         ast   = ast.ast,
+        uri   = uri,
         cache = {
             def   = {},
             ref   = {},

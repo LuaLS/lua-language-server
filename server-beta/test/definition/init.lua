@@ -1,6 +1,5 @@
 local core = require 'core.definition'
-local engineer = require 'core.engineer'
-local parser  = require 'parser'
+local files = require 'files'
 
 rawset(_G, 'TEST', true)
 
@@ -35,15 +34,15 @@ local function founded(targets, results)
 end
 
 function TEST(script)
+    files.removeAll()
     local target = catch_target(script)
     local start  = script:find('<?', 1, true)
     local finish = script:find('?>', 1, true)
     local pos = (start + finish) // 2 + 1
     local new_script = script:gsub('<[!?]', '  '):gsub('[!?]>', '  ')
-    local ast = parser:compile(new_script, 'lua', 'Lua 5.3')
-    assert(ast)
+    files.setText('', new_script)
 
-    local results = core(ast, pos)
+    local results = core('', pos)
     if results then
         local positions = {}
         for i, result in ipairs(results) do

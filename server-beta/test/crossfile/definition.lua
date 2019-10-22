@@ -76,10 +76,8 @@ function TEST(datas)
         files.setText(uri, data.content)
     end
 
-    local sourceAst = files.getAst(sourceUri)
-    assert(sourceAst)
     local sourcePos = (sourceList[1][1] + sourceList[1][2]) // 2
-    local positions = core(sourceAst, sourcePos)
+    local positions = core(sourceUri, sourcePos)
     if positions then
         local result = {}
         for i, position in ipairs(positions) do

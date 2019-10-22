@@ -1,22 +1,23 @@
 local guide     = require 'parser.guide'
 local engineer  = require 'core.engineer'
 local workspace = require 'workspace'
+local files     = require 'files'
 
 local function findDef(searcher, source, callback)
-    searcher:eachDef(source, function (src)
+    searcher:eachDef(source, function (src, uri)
         if     src.type == 'setfield'
         or     src.type == 'getfield'
         or     src.type == 'tablefield' then
-            callback(src.field)
+            callback(src.field, uri)
         elseif src.type == 'setindex'
         or     src.type == 'getindex'
         or     src.type == 'tableindex' then
-            callback(src.index)
+            callback(src.index, uri)
         elseif src.type == 'getmethod'
         or     src.type == 'setmethod' then
-            callback(src.method)
+            callback(src.method, uri)
         else
-            callback(src)
+            callback(src, uri)
         end
     end)
 end
@@ -53,9 +54,13 @@ local function checkRequire(searcher, source, offset, callback)
     end
 end
 
-return function (ast, offset)
+return function (uri, offset)
     local results = {}
-    local searcher = engineer(ast)
+    local ast = files.getAst(uri)
+    if not ast then
+        return nil
+    end
+    local searcher = engineer(ast, uri)
     guide.eachSourceContain(ast.ast, offset, function (source)
         checkRequire(searcher, source, offset, function (uri)
             results[#results+1] = {
@@ -67,9 +72,9 @@ return function (ast, offset)
                 }
             }
         end)
-        findDef(searcher, source, function (src)
+        findDef(searcher, source, function (src, uri)
             results[#results+1] = {
-                uri    = ast.uri,
+                uri    = uri,
                 source = source,
                 target = src,
             }

@@ -39,6 +39,9 @@ local specials = {
     ['rawset']       = true,
     ['rawget']       = true,
     ['setmetatable'] = true,
+    ['require']      = true,
+    ['dofile']       = true,
+    ['loadfile']     = true,
 }
 
 function mt:getSpecialName(source)

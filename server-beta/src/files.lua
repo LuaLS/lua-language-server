@@ -96,6 +96,11 @@ function m.removeAll()
     end
 end
 
+--- 遍历文件
+function m.eachFile()
+    return pairs(m.fileMap)
+end
+
 --- 获取文件语法树
 ---@param uri string
 ---@return table ast

@@ -132,4 +132,45 @@ function m.preload()
     log.info('Preload finish.')
 end
 
+--- 查找符合指定file path的所有uri
+---@param path string
+---@param whole boolean
+function m.findUrisByFilePath(path, whole)
+    local results = {}
+    for uri in files.eachFile() do
+        local pathLen = #path
+        local uriLen  = #uri
+        for i = uriLen, uriLen - pathLen + 1, -1 do
+            local see = uri:sub(i - pathLen + 1, i)
+            if files.eq(see, path) then
+                results[#results+1] = uri
+            end
+            if not whole then
+                break
+            end
+        end
+    end
+    return results
+end
+
+--- 查找符合指定require path的所有uri
+---@param path string
+---@param whole boolean
+function m.findUrisByRequirePath(path, whole)
+    local results = {}
+    local mark = {}
+    local input = path:gsub('%.', '/')
+    for _, luapath in ipairs(config.config.runtime.path) do
+        local part = luapath:gsub('%?', input)
+        local uris = m.findUrisByFilePath(part, whole)
+        for _, uri in ipairs(uris) do
+            if not mark[uri] then
+                mark[uri] = true
+                results[#results+1] = uri
+            end
+        end
+    end
+    return results
+end
+
 return m

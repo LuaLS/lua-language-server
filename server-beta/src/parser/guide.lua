@@ -73,6 +73,19 @@ function m.isLiteral(obj)
         or tp == 'table'
 end
 
+--- 获取字面量
+function m.getLiteral(obj)
+    local tp = obj.type
+    if     tp == 'boolean' then
+        return obj[1]
+    elseif tp == 'string' then
+        return obj[1]
+    elseif tp == 'number' then
+        return obj[1]
+    end
+    return nil
+end
+
 --- 寻找所在函数
 function m.getParentFunction(obj)
     for _ = 1, 1000 do
@@ -224,7 +237,9 @@ function m.isContain(source, offset)
     return source.start <= offset and source.finish >= offset - 1
 end
 
---- 判断offset在source的范围内
+--- 判断offset在source的影响范围内
+---
+--- 主要针对赋值等语句时，key包含value
 function m.isInRange(source, offset)
     return source.start <= offset and (source.range or source.finish) >= offset - 1
 end

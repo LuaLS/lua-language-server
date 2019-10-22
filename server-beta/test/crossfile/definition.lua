@@ -81,7 +81,15 @@ function TEST(datas)
     local sourcePos = (sourceList[1][1] + sourceList[1][2]) // 2
     local positions = core(sourceAst, sourcePos)
     if positions then
-        assert(founded(targetList, positions))
+        local result = {}
+        for i, position in ipairs(positions) do
+            result[i] = {
+                position.target.start,
+                position.target.finish,
+                position.uri,
+            }
+        end
+        assert(founded(targetList, result))
     else
         assert(#targetList == 0)
     end

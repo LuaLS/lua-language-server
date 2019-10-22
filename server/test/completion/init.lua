@@ -419,7 +419,7 @@ print(fff)
         kind = CompletionItemKind.Keyword,
     },
     {
-        label = 'function name()',
+        label = 'function ()',
         kind = CompletionItemKind.Snippet,
         insertText = EXISTS,
     },

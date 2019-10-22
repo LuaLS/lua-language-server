@@ -190,7 +190,7 @@ TEST [[
 [=[
 function load(chunk: string/function [, chunkname: string [, mode: string [, env: table]]])
   -> function
-   , error_message: string
+  2. error_message: string
 ]=]
 
 TEST [[
@@ -456,7 +456,7 @@ TEST[[
 [[
 function next(table: table [, index: any])
   -> key: any
-   , value: any
+  2. value: any
 ]]
 
 TEST[[
@@ -465,7 +465,7 @@ local <?n?> = pairs()
 [[
 function n<next>(table: table [, index: any])
   -> key: any
-   , value: any
+  2. value: any
 ]]
 
 TEST[[
@@ -615,7 +615,7 @@ end
 [[
 function f()
   -> A|B
-   , C
+  2. C
 ]]
 
 TEST [[
@@ -861,7 +861,7 @@ function <?f?>() end
 [=[
 function f()
   -> key: string
-   , value: string
+  2. value: string
 ]=]
 
 TEST [[
@@ -873,8 +873,8 @@ function <?f?>() end
 [=[
 function f()
   -> [x: any [
-   , y: string]
-   , z: string]
+  2. y: string]
+  3. z: string]
 ]=]
 
 TEST [[

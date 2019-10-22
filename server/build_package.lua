@@ -318,7 +318,7 @@ io.save(ROOT:parent_path() / 'package.nls.zh-cn.json', json.encode {
 ]] .. example.library,
     ['config.completion.enable']          = '启用自动完成。',
     ['config.completion.callSnippet']     = '显示函数调用片段。',
-    ['config.completion.callSnippet.Disable'] = "只显示 `函数名`",
+    ['config.completion.callSnippet.Disable'] = "只显示 `函数名`。",
     ['config.completion.callSnippet.Both'] = "显示 `函数名` 与 `调用片段`。",
     ['config.completion.callSnippet.Replace'] = "只显示 `调用片段`。",
     ['config.completion.keywordSnippet']     = '显示关键字语法片段',

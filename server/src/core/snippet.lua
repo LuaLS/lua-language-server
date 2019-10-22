@@ -33,13 +33,8 @@ for ${1:i} = ${2:1}, ${3:10, 2} do
     $0
 end]]
 
-add('key', 'function', 'function name()') [[
-function ${1:name}(${2:arg1, arg2, arg3})
-    $0
-end]]
-
 add('key', 'function', 'function ()') [[
-function (${1:arg1, arg2, arg3})
+function $1(${2:arg1, arg2, arg3})
     $0
 end]]
 

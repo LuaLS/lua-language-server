@@ -398,7 +398,9 @@ local function searchKeyWords(vm, source, word, callback)
     for _, key in ipairs(KEYS) do
         if matchKey(word, key) then
             if snippet.key[key] then
-                if snipType ~= 'Replace' then
+                if snipType ~= 'Replace'
+                or key == 'local'
+                or key == 'return' then
                     callback(key, nil, CompletionItemKind.Keyword)
                 end
                 if snipType ~= 'Disable' then

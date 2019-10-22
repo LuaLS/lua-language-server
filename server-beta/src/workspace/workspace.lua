@@ -92,7 +92,7 @@ function m.preload()
     local ignore = m.getIgnoreMatcher()
 
     ignore:setInterface('type', function (path)
-        if pub.task('isDirectory', furi.encode(m.path .. '/' .. path)) then
+        if fs.is_directory(fs.path(m.path .. '/' .. path)) then
             return 'directory'
         else
             return 'file'
@@ -100,10 +100,9 @@ function m.preload()
     end)
 
     ignore:setInterface('list', function (path)
-        local uris = pub.task('listDirectory', furi.encode(m.path .. '/' .. path))
         local paths = {}
-        for i, uri in ipairs(uris) do
-            paths[i] = furi.decode(uri)
+        for fullpath in fs.path(m.path .. '/' .. path):list_directory() do
+            paths[#paths+1] = fullpath:string()
         end
         return paths
     end)
@@ -124,12 +123,10 @@ function m.preload()
     log.info(('Found %d files.'):format(max))
     while true do
         log.info(('Loaded %d/%d files'):format(read, max))
-        if read < max then
-            task.sleep(0.1)
-            goto CONTINUE
+        if read >= max then
+            break
         end
-        break
-        ::CONTINUE::
+        task.sleep(0.1)
     end
 
     log.info('Preload finish.')

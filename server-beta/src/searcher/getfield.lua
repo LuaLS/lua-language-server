@@ -66,9 +66,11 @@ function m:eachField(source, key, callback)
     checkSMT(self, key, used, found, callback)
 end
 
-function m:eachValue(source, callback)
-    if source.value then
-        self:eachValue(source.value, callback)
+function m:getValue(source)
+    if source.type == 'setfield'
+    or source.type == 'setmethod'
+    or source.type == 'setindex' then
+        return source.value and self:getValue(source.value)
     end
 end
 

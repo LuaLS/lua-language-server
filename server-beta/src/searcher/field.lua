@@ -31,4 +31,8 @@ function m:eachValue(source, callback)
     self:eachValue(source.parent, callback)
 end
 
+function m:getValue(source)
+    return self:getValue(source.parent)
+end
+
 return m

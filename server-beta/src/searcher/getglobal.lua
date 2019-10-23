@@ -137,8 +137,20 @@ function m:eachValue(source, callback)
         source = source,
         uri    = self.uri,
     }
-    if source.value then
-        self:eachValue(source.value, callback)
+    self:eachDef(source, function (info)
+        local src = info.source
+        if src.value then
+            callback {
+                source = src.value,
+                uri    = info.uri,
+            }
+        end
+    end)
+end
+
+function m:getValue(source)
+    if source.type == 'setglobal' then
+        return source.value and self:getValue(source.value)
     end
 end
 

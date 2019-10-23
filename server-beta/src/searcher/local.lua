@@ -27,6 +27,9 @@ function m:eachDef(source, callback)
         local node = method.node
         self:eachDef(node, callback)
     end
+    if source.value then
+        self:eachDef(source.value, callback)
+    end
 end
 
 function m:eachRef(source, callback)
@@ -163,6 +166,13 @@ function m:eachValue(source, callback)
     end
     if source.value then
         self:eachValue(source.value, callback)
+    end
+end
+
+function m:getValue(source)
+    if source.type == 'local'
+    or source.type == 'setlocal' then
+        return source.value or source
     end
 end
 

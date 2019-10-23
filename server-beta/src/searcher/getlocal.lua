@@ -16,4 +16,8 @@ function m:eachValue(source, callback)
     self:eachValue(source.loc, callback)
 end
 
+function m:getValue(source)
+    return self:getValue(source.loc)
+end
+
 return m

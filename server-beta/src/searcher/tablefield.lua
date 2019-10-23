@@ -12,4 +12,8 @@ function m:eachValue(source, callback)
     end
 end
 
+function m:getValue(source)
+    return source.value and self:getValue(source.value) or source
+end
+
 return m

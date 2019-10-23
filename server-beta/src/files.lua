@@ -49,6 +49,9 @@ function m.setText(uri, text)
         return
     end
     file.text = text
+    file.searcher = nil
+    file.lines = nil
+    file.ast = nil
 end
 
 --- 监听编译完成

@@ -63,6 +63,21 @@ m.childMap = {
     ['unary']       = {1}
 }
 
+m.actionMap = {
+    ['main']        = {'#'},
+    ['repeat']      = {'#'},
+    ['while']       = {'#'},
+    ['in']          = {'#'},
+    ['loop']        = {'#'},
+    ['if']          = {'#'},
+    ['ifblock']     = {'#'},
+    ['elseifblock'] = {'#'},
+    ['elseblock']   = {'#'},
+    ['do']          = {'#'},
+    ['function']    = {'#'},
+    ['funcargs']    = {'#'},
+}
+
 --- 是否是字面量
 function m.isLiteral(obj)
     local tp = obj.type
@@ -232,6 +247,28 @@ function m.getLabel(block, name)
     error('guide.getLocal overstack')
 end
 
+--- 获取指定区块中的 return
+function m.getReturns(block)
+    local list = { block }
+    local returns = {}
+    for i = 1, 1000 do
+        local len = #list
+        if len == 0 then
+            return
+        end
+        local obj = list[len]
+        list[len] = nil
+        if obj.type == 'return' then
+            returns[#returns+1] = obj
+        end
+        if i > 1 and obj.type == 'function' then
+        else
+            m.addChilds(list, obj, m.actionMap)
+        end
+    end
+    return returns
+end
+
 --- 判断source是否包含offset
 function m.isContain(source, offset)
     return source.start <= offset and source.finish >= offset - 1
@@ -244,9 +281,25 @@ function m.isInRange(source, offset)
     return source.start <= offset and (source.range or source.finish) >= offset - 1
 end
 
+--- 添加child
+function m.addChilds(list, obj, map)
+    local keys = map[obj.type]
+    if keys then
+        for i = 1, #keys do
+            local key = keys[i]
+            if key == '#' then
+                for i = 1, #obj do
+                    list[#list+1] = obj[i]
+                end
+            else
+                list[#list+1] = obj[key]
+            end
+        end
+    end
+end
+
 --- 遍历所有包含offset的source
 function m.eachSourceContain(ast, offset, callback)
-    local map = m.childMap
     local list = { ast }
     while true do
         local len = #list
@@ -259,26 +312,13 @@ function m.eachSourceContain(ast, offset, callback)
             if m.isContain(obj, offset) then
                 callback(obj)
             end
-            local keys = map[obj.type]
-            if keys then
-                for i = 1, #keys do
-                    local key = keys[i]
-                    if key == '#' then
-                        for i = 1, #obj do
-                            list[#list+1] = obj[i]
-                        end
-                    else
-                        list[#list+1] = obj[key]
-                    end
-                end
-            end
+            m.addChilds(list, obj, m.childMap)
         end
     end
 end
 
 --- 遍历所有的source
 function m.eachSource(ast, callback)
-    local map = m.childMap
     local list = { ast }
     while true do
         local len = #list
@@ -288,19 +328,7 @@ function m.eachSource(ast, callback)
         local obj = list[len]
         list[len] = nil
         callback(obj)
-        local keys = map[obj.type]
-        if keys then
-            for i = 1, #keys do
-                local key = keys[i]
-                if key == '#' then
-                    for i = 1, #obj do
-                        list[#list+1] = obj[i]
-                    end
-                else
-                    list[#list+1] = obj[key]
-                end
-            end
-        end
+        m.addChilds(list, obj, m.childMap)
     end
 end
 

@@ -275,6 +275,29 @@ function mt:eachValue(source, callback)
     self.step = self.step - 1
 end
 
+--- 获取value
+---@param source table
+---@return value table
+function mt:getValue(source)
+    local tp = source.type
+    local d = methods[tp]
+    if not d then
+        return
+    end
+    local f = d.getValue
+    if not f then
+        return
+    end
+    if self.step >= 100 then
+        error('Stack overflow!')
+        return
+    end
+    self.step = self.step + 1
+    local value = f(self, source)
+    self.step = self.step - 1
+    return value
+end
+
 --- 获取函数的参数
 ---@param source table
 ---@return table arg1
@@ -290,7 +313,7 @@ function mt:callArgOf(source)
     return tableUnpack(args)
 end
 
---- 获取函数的返回值
+--- 获取调用函数的返回值
 ---@param source table
 ---@return table return1
 ---@return table return2
@@ -308,6 +331,20 @@ function mt:callReturnOf(source)
         return tableUnpack(returns)
     elseif parent then
         return parent.parent
+    end
+end
+
+--- 获取函数定义的返回值
+---@param source table
+---@param callback fun(source:table)
+function mt:functionReturnOf(source, callback)
+    if not source or source.type ~= 'function' then
+        return
+    end
+    local returns = guide.getReturns(source)
+    for i = 1, #returns do
+        local src = returns[i]
+        callback()
     end
 end
 

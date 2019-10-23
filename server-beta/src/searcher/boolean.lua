@@ -36,11 +36,8 @@ function m:eachRef(source, callback)
     end)
 end
 
-function m:eachValue(source, callback)
-    callback {
-        uri = self.uri,
-        source = source,
-    }
+function m:getValue(source)
+    return source
 end
 
 return m

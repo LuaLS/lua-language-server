@@ -150,8 +150,8 @@ function m.getSearcher(uri)
         return nil
     end
     if not file.searcher then
-        local seacher = require 'seacher'
-        file.searcher = seacher.create(uri)
+        local searcher = require 'searcher'
+        file.searcher = searcher.create(uri)
     end
     return file.searcher
 end

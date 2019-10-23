@@ -12,9 +12,9 @@ function m:eachDef(source, callback)
     end
     local node = parent.node
     local key = guide.getKeyName(source)
-    self:eachField(node, key, function (src, mode)
-        if mode == 'set' then
-            callback(src, mode)
+    self:eachField(node, key, function (info)
+        if info.mode == 'set' then
+            callback(info)
         end
     end)
 end
@@ -29,15 +29,18 @@ function m:eachRef(source, callback)
     end
     local node = parent.node
     local key = guide.getKeyName(source)
-    self:eachField(node, key, function (src, mode)
-        if mode == 'set' or mode == 'get' then
-            callback(src, mode)
+    self:eachField(node, key, function (info)
+        if info.mode == 'set' or info.mode == 'get' then
+            callback(info)
         end
     end)
 end
 
 function m:eachValue(source, callback)
-    callback(source)
+    callback {
+        uri = self.uri,
+        source = source,
+    }
 end
 
 return m

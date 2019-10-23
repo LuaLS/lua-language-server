@@ -1,9 +1,10 @@
 local guide        = require 'parser.guide'
 local files        = require 'files'
-local methods      = require 'seacher.methods'
+local methods      = require 'searcher.methods'
 local tableUnpack  = table.unpack
 local error        = error
 local setmetatable = setmetatable
+local assert       = assert
 
 _ENV = nil
 local specials = {
@@ -16,10 +17,10 @@ local specials = {
     ['loadfile']     = true,
 }
 
----@class seacher
+---@class searcher
 local mt = {}
 mt.__index = mt
-mt.__name = 'seacher'
+mt.__name = 'searcher'
 
 --- 获取特殊对象的名字
 function mt:getSpecialName(source)
@@ -30,7 +31,8 @@ function mt:getSpecialName(source)
         end
         return nil
     end
-    local function getName(src)
+    local function getName(info)
+        local src = info.source
         if src.type == 'getglobal' then
             local node = src.node
             if node.tag ~= '_ENV' then
@@ -92,12 +94,12 @@ end
 --- 遍历元素
 ---@param source table
 ---@param key string
----@param callback fun(field:table, mode:string)
+---@param callback fun(info:table)
 function mt:eachField(source, key, callback)
     local cache = self.cache.field[source]
     if cache and cache[key] then
         for i = 1, #cache[key] do
-            callback(tableUnpack(cache[key][i]))
+            callback(cache[key][i])
         end
         return
     end
@@ -121,27 +123,31 @@ function mt:eachField(source, key, callback)
         self.cache.field[source] = cache
     end
     cache[key] = {}
-    f(self, source, key, function (src, ...)
+    f(self, source, key, function (info)
+        local src = info.source
+        local uri = info.uri
+        assert(src and uri)
         if mark[src] then
             return
         end
         mark[src] = true
-        cache[key][#cache[key]+1] = { src, ... }
+        info.searcher = files.getSearcher(uri)
+        cache[key][#cache[key]+1] = info
     end)
     for i = 1, #cache[key] do
-        callback(tableUnpack(cache[key][i]))
+        callback(cache[key][i])
     end
     self.step = self.step - 1
 end
 
 --- 遍历引用
 ---@param source table
----@param callback fun(def:table, mode:string)
+---@param callback fun(info:table)
 function mt:eachRef(source, callback)
     local cache = self.cache.ref[source]
     if cache then
         for i = 1, #cache do
-            callback(tableUnpack(cache[i]))
+            callback(cache[i])
         end
         return
     end
@@ -162,27 +168,31 @@ function mt:eachRef(source, callback)
     cache = {}
     self.cache.ref[source] = cache
     local mark = {}
-    f(self, source, function (src, ...)
+    f(self, source, function (info)
+        local src = info.source
+        local uri = info.uri
+        assert(src and uri)
         if mark[src] then
             return
         end
         mark[src] = true
-        cache[#cache+1] = {src, ...}
+        info.searcher = files.getSearcher(uri)
+        cache[#cache+1] = info
     end)
     for i = 1, #cache do
-        callback(tableUnpack(cache[i]))
+        callback(cache[i])
     end
     self.step = self.step - 1
 end
 
 --- 遍历定义
 ---@param source table
----@param callback fun(def:table, mode:string)
+---@param callback fun(info:table)
 function mt:eachDef(source, callback)
     local cache = self.cache.def[source]
     if cache then
         for i = 1, #cache do
-            callback(tableUnpack(cache[i]))
+            callback(cache[i])
         end
         return
     end
@@ -203,27 +213,31 @@ function mt:eachDef(source, callback)
     cache = {}
     self.cache.def[source] = cache
     local mark = {}
-    f(self, source, function (src, ...)
+    f(self, source, function (info)
+        local src = info.source
+        local uri = info.uri
+        assert(src and uri)
         if mark[src] then
             return
         end
         mark[src] = true
-        cache[#cache+1] = {src, ...}
+        info.searcher = files.getSearcher(uri)
+        cache[#cache+1] = info
     end)
     for i = 1, #cache do
-        callback(tableUnpack(cache[i]))
+        callback(cache[i])
     end
     self.step = self.step - 1
 end
 
 --- 遍历value
 ---@param source table
----@param callback fun(value:table)
+---@param callback fun(info:table)
 function mt:eachValue(source, callback)
     local cache = self.cache.value[source]
     if cache then
         for i = 1, #cache do
-            callback(tableUnpack(cache[i]))
+            callback(cache[i])
         end
         return
     end
@@ -244,15 +258,19 @@ function mt:eachValue(source, callback)
     cache = {}
     self.cache.value[source] = cache
     local mark = {}
-    f(self, source, function (src, ...)
+    f(self, source, function (info)
+        local src = info.source
+        local uri = info.uri
+        assert(src and uri)
         if mark[src] then
             return
         end
         mark[src] = true
-        cache[#cache+1] = {src, ...}
+        info.searcher = files.getSearcher(uri)
+        cache[#cache+1] = info
     end)
     for i = 1, #cache do
-        callback(tableUnpack(cache[i]))
+        callback(cache[i])
     end
     self.step = self.step - 1
 end
@@ -324,7 +342,7 @@ local m = {}
 
 --- 新建搜索器
 ---@param uri string
----@return seacher
+---@return searcher
 function m.create(uri)
     local ast = files.getAst(uri)
     local searcher = setmetatable({

@@ -1,16 +1,24 @@
 local guide = require 'parser.guide'
-local checkSMT = require 'seacher.setmetatable'
+local checkSMT = require 'searcher.setmetatable'
 
 local m = {}
 
 function m:eachDef(source, callback)
     if source.tag ~= 'self' then
-        callback(source, 'local')
+        callback {
+            source = source,
+            uri    = self.uri,
+            mode   = 'local',
+        }
     end
     if source.ref then
         for _, ref in ipairs(source.ref) do
             if ref.type == 'setlocal' then
-                callback(ref, 'set')
+                callback {
+                    source = ref,
+                    uri    = self.uri,
+                    mode   = 'set',
+                }
             end
         end
     end
@@ -23,14 +31,26 @@ end
 
 function m:eachRef(source, callback)
     if source.tag ~= 'self' then
-        callback(source, 'local')
+        callback {
+            source = source,
+            uri    = self.uri,
+            mode   = 'local',
+        }
     end
     if source.ref then
         for _, ref in ipairs(source.ref) do
             if ref.type == 'setlocal' then
-                callback(ref, 'set')
+                callback {
+                    source = ref,
+                    uri    = self.uri,
+                    mode   = 'set',
+                }
             elseif ref.type == 'getlocal' then
-                callback(ref, 'get')
+                callback {
+                    source = ref,
+                    uri    = self.uri,
+                    mode   = 'get',
+                }
             end
         end
     end
@@ -54,23 +74,39 @@ function m:eachField(source, key, callback)
                 local parent = ref.parent
                 if key == guide.getKeyName(parent) then
                     if parent.type:sub(1, 3) == 'set' then
-                        callback(parent, 'set')
+                        callback {
+                            source = parent,
+                            uri    = self.uri,
+                            mode   = 'set',
+                        }
                         found = true
                     else
-                        callback(parent, 'get')
+                        callback {
+                            source = parent,
+                            uri    = self.uri,
+                            mode   = 'get',
+                        }
                     end
                 end
             elseif ref.type == 'getglobal' then
                 used[ref] = true
                 if key == guide.getKeyName(ref) then
                     -- _ENV.XXX
-                    callback(ref, 'get')
+                    callback {
+                        source = ref,
+                        uri    = self.uri,
+                        mode   = 'get',
+                    }
                 end
             elseif ref.type == 'setglobal' then
                 used[ref] = true
                 -- _ENV.XXX = XXX
                 if key == guide.getKeyName(ref) then
-                    callback(ref, 'set')
+                    callback {
+                        source = ref,
+                        uri    = self.uri,
+                        mode   = 'set',
+                    }
                     found = true
                 end
             end
@@ -79,18 +115,19 @@ function m:eachField(source, key, callback)
     if source.tag == 'self' then
         local method = source.method
         local node = method.node
-        self:eachField(node, key, function (src, mode)
-            callback(src, mode)
-            if mode == 'set' then
+        self:eachField(node, key, function (info)
+            callback(info)
+            if info.mode == 'set' then
                 found = true
             end
         end)
     end
-    self:eachValue(source, function (src)
+    self:eachValue(source, function (info)
+        local src = info.source
         if source ~= src then
-            self:eachField(src, key, function (src, mode)
-                callback(src, mode)
-                if mode == 'set' then
+            info.searcher:eachField(src, key, function (info)
+                callback(info)
+                if info.mode == 'set' then
                     found = true
                 end
             end)
@@ -100,7 +137,10 @@ function m:eachField(source, key, callback)
 end
 
 function m:eachValue(source, callback)
-    callback(source)
+    callback {
+        source = source,
+        uri    = self.uri,
+    }
     local refs = source.ref
     if refs then
         for i = 1, #refs do
@@ -112,7 +152,10 @@ function m:eachValue(source, callback)
                 if parent.type == 'setmethod' then
                     local func = parent.value
                     if func and func.locals then
-                        callback(func.locals[1])
+                        callback {
+                            source = func.locals[1],
+                            uri    = self.uri,
+                        }
                     end
                 end
             end

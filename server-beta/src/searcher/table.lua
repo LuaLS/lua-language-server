@@ -7,16 +7,27 @@ function m:eachField(source, key, callback)
         local src = source[i]
         if key == guide.getKeyName(src) then
             if     src.type == 'tablefield' then
-                callback(src, 'set')
+                callback {
+                    source = src,
+                    uri    = self.uri,
+                    mode   = 'set',
+                }
             elseif src.type == 'tableindex' then
-                callback(src, 'set')
+                callback {
+                    source = src,
+                    uri    = self.uri,
+                    mode   = 'set',
+                }
             end
         end
     end
 end
 
 function m:eachValue(source, callback)
-    callback(source)
+    callback {
+        source = source,
+        uri    = self.uri,
+    }
 end
 
 return m

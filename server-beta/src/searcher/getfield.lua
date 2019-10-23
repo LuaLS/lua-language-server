@@ -1,5 +1,5 @@
 local guide    = require 'parser.guide'
-local checkSMT = require 'seacher.setmetatable'
+local checkSMT = require 'searcher.setmetatable'
 
 local m = {}
 
@@ -12,9 +12,9 @@ function m:eachRef(source, callback)
     or     node.type == 'setindex'
     or     node.type == 'getindex' then
         local key = guide.getKeyName(node)
-        self:eachField(node.node, key, function (src, mode)
-            if mode == 'set' or mode == 'get' then
-                callback(src, mode)
+        self:eachField(node.node, key, function (info)
+            if info.mode == 'set' or info.mode == 'get' then
+                callback(info)
             end
         end)
     else
@@ -27,30 +27,39 @@ function m:eachField(source, key, callback)
     local found = false
     used[source] = true
 
-    self:eachRef(source, function (src)
+    self:eachRef(source, function (info)
+        local src = info.source
         used[src] = true
         local child, mode, value = self:childMode(src)
         if child then
             if key == guide.getKeyName(child) then
-                callback(child, mode)
+                callback {
+                    uri    = self.uri,
+                    source = child,
+                    mode   = mode,
+                }
             end
             if value then
-                self:eachField(value, key, callback)
+                info.searcher:eachField(value, key, callback)
             end
             return
         end
         if src.type == 'getglobal' then
             local parent = src.parent
-            child, mode = self:childMode(parent)
+            child, mode = info.searcher:childMode(parent)
             if child then
                 if key == guide.getKeyName(child) then
-                    callback(child, mode)
+                    callback {
+                        uri    = self.uri,
+                        source = child,
+                        mode   = mode,
+                    }
                 end
             end
         elseif src.type == 'setglobal' then
-            self:eachField(src.value, key, callback)
+            info.searcher:eachField(src.value, key, callback)
         else
-            self:eachField(src, key, callback)
+            info.searcher:eachField(src, key, callback)
         end
     end)
 

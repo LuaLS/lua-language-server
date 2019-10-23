@@ -3,7 +3,9 @@ local workspace = require 'workspace'
 local files     = require 'files'
 
 local function findDef(searcher, source, callback)
-    searcher:eachDef(source, function (src, uri)
+    searcher:eachDef(source, function (info)
+        local src = info.source
+        local uri = info.uri
         if     src.type == 'setfield'
         or     src.type == 'getfield'
         or     src.type == 'tablefield' then
@@ -70,11 +72,11 @@ return function (uri, offset)
                 }
             }
         end)
-        findDef(searcher, source, function (src, uri)
+        findDef(searcher, source, function (target, uri)
             results[#results+1] = {
+                target = target,
                 uri    = uri,
                 source = source,
-                target = src,
             }
         end)
     end)

@@ -9,9 +9,9 @@ function m:eachValue(source, callback)
         if self:getSpecialName(func) == 'setmetatable' then
             local t, mt = self:callArgOf(vararg)
             self:eachValue(t, callback)
-            self:eachField(mt, 's|__index', function (src, mode)
-                if mode == 'set' then
-                    self:eachValue(src, callback)
+            self:eachField(mt, 's|__index', function (info)
+                if info.mode == 'set' then
+                    info.searcher:eachValue(info.source, callback)
                 end
             end)
         end

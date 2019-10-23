@@ -1,23 +1,24 @@
 local guide    = require 'parser.guide'
+local checkSMT = require 'searcher.setmetatable'
 
 local m = {}
 
 function m:eachDef(source, callback)
-    local node = source.parent.node
+    local parent = source.parent
     local key = guide.getKeyName(source)
-    self:eachField(node, key, function (src, mode)
-        if mode == 'set' then
-            callback(src, mode)
+    self:eachField(parent, key, function (info)
+        if info.mode == 'set' then
+            callback(info)
         end
     end)
 end
 
 function m:eachRef(source, callback)
-    local node = source.parent.node
+    local parent = source.parent
     local key = guide.getKeyName(source)
-    self:eachField(node, key, function (src, mode)
-        if mode == 'set' or mode == 'get' then
-            callback(src, mode)
+    self:eachField(parent, key, function (info)
+        if info.mode == 'set' or info.mode == 'set' then
+            callback(info)
         end
     end)
 end

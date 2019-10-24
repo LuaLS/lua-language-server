@@ -78,10 +78,6 @@ function m.dump(tbl, option)
     local mark = {}
     lines[#lines+1] = '{'
     local function unpack(tbl, tab)
-        if mark[tbl] and mark[tbl] > 0 then
-            lines[#lines+1] = TAB[tab+1] .. '"<Loop>"'
-            return
-        end
         mark[tbl] = (mark[tbl] or 0) + 1
         local keys = {}
         local keymap = {}
@@ -140,13 +136,17 @@ function m.dump(tbl, option)
             local value = tbl[key]
             local tp = type(value)
             if tp == 'table' then
-                lines[#lines+1] = ('%s%s{'):format(TAB[tab+1], keyWord)
-                unpack(value, tab+1)
-                lines[#lines+1] = ('%s},'):format(TAB[tab+1])
+                if mark[value] and mark[value] > 0 then
+                    lines[#lines+1] = ('%s%s%s,'):format(TAB[tab+1], keyWord, option.loop or '"<Loop>"')
+                else
+                    lines[#lines+1] = ('%s%s{'):format(TAB[tab+1], keyWord)
+                    unpack(value, tab+1)
+                    lines[#lines+1] = ('%s},'):format(TAB[tab+1])
+                end
             elseif tp == 'string' then
                 lines[#lines+1] = ('%s%s%q,'):format(TAB[tab+1], keyWord, value)
             elseif tp == 'number' then
-                lines[#lines+1] = ('%s%s%s,'):format(TAB[tab+1], keyWord, formatNumber(value))
+                lines[#lines+1] = ('%s%s%s,'):format(TAB[tab+1], keyWord, (option.number or formatNumber)(value))
             elseif tp == 'nil' then
             else
                 lines[#lines+1] = ('%s%s%s,'):format(TAB[tab+1], keyWord, tostring(value))
@@ -331,6 +331,63 @@ function m.deepCopy(source, target)
         return b
     end
     return copy(source, target)
+end
+
+--- 序列化
+function m.unpack(t)
+    local result = {}
+    local tid = 0
+    local cache = {}
+    local function unpack(o)
+        local id = cache[o]
+        if not id then
+            tid = tid + 1
+            id = tid
+            cache[o] = tid
+            if type(o) == 'table' then
+                local new = {}
+                result[tid] = new
+                for k, v in next, o do
+                    new[unpack(k)] = unpack(v)
+                end
+            else
+                result[id] = o
+            end
+        end
+        return id
+    end
+    unpack(t)
+    return result
+end
+
+--- 反序列化
+function m.pack(t)
+    local cache = {}
+    local function pack(id)
+        local o = cache[id]
+        if o then
+            return o
+        end
+        o = t[id]
+        if type(o) == 'table' then
+            local new = {}
+            cache[id] = new
+            for k, v in next, o do
+                new[pack(k)] = pack(v)
+            end
+            return new
+        else
+            cache[id] = o
+            return o
+        end
+    end
+    return pack(1)
+end
+
+--- defer
+local deferMT = { __close = function (self) self[1]() end }
+function m.defer(callback)
+    return setmetatable({ callback }, deferMT)
 end
 
 return m

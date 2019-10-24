@@ -55,7 +55,7 @@
 			"luaRuntime": "5.4 64bit"
 		},
 		{
-			"name": "测试-beta",
+			"name": "🍺测试-beta",
 			"type": "lua",
 			"request": "launch",
 			"stopOnEntry": false,

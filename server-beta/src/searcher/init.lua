@@ -54,7 +54,7 @@ function mt:getField(source)
     return getField(self, source)
 end
 
---- 获取所有的引用（不递归）
+--- 获取所有的引用
 function mt:eachRef(source, callback)
     local lock <close> = self:lock('eachRef', source)
     if not lock then
@@ -75,7 +75,7 @@ function mt:eachRef(source, callback)
     end)
 end
 
---- 获取所有的field（不递归）
+--- 获取所有的field
 function mt:eachField(source, callback)
     local lock <close> = self:lock('eachField', source)
     if not lock then

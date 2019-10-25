@@ -120,6 +120,22 @@ local function ofLiteral(searcher, source, callback)
     end
 end
 
+local function ofGoTo(searcher, source, callback)
+    local name = source[1]
+    local label = guide.getLabel(source, name)
+    if label then
+        callback {
+            searcher = searcher,
+            source   = label,
+            mode     = 'set',
+        }
+    end
+end
+
+local function ofLabel(searcher, source, callback)
+    
+end
+
 return function (searcher, source, callback)
     local stype = source.type
     if     stype == 'local' then
@@ -138,5 +154,9 @@ return function (searcher, source, callback)
     or     stype == 'boolean'
     or     stype == 'string' then
         ofLiteral(searcher, source, callback)
+    elseif stype == 'goto' then
+        ofGoTo(searcher, source, callback)
+    elseif stype == 'label' then
+        ofLabel(searcher, source, callback)
     end
 end

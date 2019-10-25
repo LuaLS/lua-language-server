@@ -45,12 +45,13 @@ local function checkField(key, info, callback)
     if key ~= guide.getKeyName(src) then
         return
     end
+    local stype = src.type
     local mode
-    if src.type == 'setglobal' then
+    if     stype == 'setglobal' then
         mode = 'set'
-    elseif src.type == 'getglobal' then
+    elseif stype == 'getglobal' then
         mode = 'get'
-    elseif src.type == 'field' then
+    elseif stype == 'field' then
         local parent = src.parent
         if     parent.type == 'setfield' then
             mode = 'set'
@@ -59,16 +60,25 @@ local function checkField(key, info, callback)
         elseif parent.type == 'tablefield' then
             mode = 'set'
         end
-    elseif src.type == 'method' then
+    elseif stype == 'index' then
+        local parent = src.parent
+        if     parent.type == 'setindex' then
+            mode = 'set'
+        elseif parent.type == 'getindex' then
+            mode = 'get'
+        elseif parent.type == 'tableindex' then
+            mode = 'set'
+        end
+    elseif stype == 'method' then
         local parent = src.parent
         if     parent.type == 'setmethod' then
             mode = 'set'
         elseif parent.type == 'getmethod' then
             mode = 'get'
         end
-    elseif src.type == 'number'
-    or     src.type == 'string'
-    or     src.type == 'boolean' then
+    elseif stype == 'number'
+    or     stype == 'string'
+    or     stype == 'boolean' then
         local parent = src.parent
         if     parent.type == 'setindex' then
             mode = 'set'

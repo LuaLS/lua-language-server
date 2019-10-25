@@ -69,7 +69,13 @@ function mt:eachRef(source, callback)
     end
     cache = {}
     self.cache.eachRef[source] = cache
+    local mark = {}
     eachRef(self, source, function (info)
+        local src = info.source
+        if mark[src] then
+            return
+        end
+        mark[src] = true
         cache[#cache+1] = info
         callback(info)
     end)
@@ -90,7 +96,13 @@ function mt:eachField(source, callback)
     end
     cache = {}
     self.cache.eachField[source] = cache
+    local mark = {}
     eachField(self, source, function (info)
+        local src = info.source
+        if mark[src] then
+            return
+        end
+        mark[src] = true
         cache[#cache+1] = info
         callback(info)
     end)

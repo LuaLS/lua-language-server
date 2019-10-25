@@ -4,6 +4,7 @@ local util     = require 'utility'
 local getValue = require 'searcher.getValue'
 local getField = require 'searcher.getField'
 local eachRef  = require 'searcher.eachRef'
+local eachField = require 'searcher.eachField'
 
 local setmetatable = setmetatable
 local assert       = assert
@@ -53,7 +54,7 @@ function mt:getField(source)
     return getField(self, source)
 end
 
---- 获取所有的定义（不递归）
+--- 获取所有的引用（不递归）
 function mt:eachRef(source, callback)
     local lock <close> = self:lock('eachRef', source)
     if not lock then
@@ -74,6 +75,27 @@ function mt:eachRef(source, callback)
     end)
 end
 
+--- 获取所有的field（不递归）
+function mt:eachField(source, callback)
+    local lock <close> = self:lock('eachField', source)
+    if not lock then
+        return
+    end
+    local cache = self.cache.eachField[source]
+    if cache then
+        for i = 1, #cache do
+            callback(cache[i])
+        end
+        return
+    end
+    cache = {}
+    self.cache.eachField[source] = cache
+    eachField(self, source, function (info)
+        cache[#cache+1] = info
+        callback(info)
+    end)
+end
+
 ---@class engineer
 local m = {}
 
@@ -86,11 +108,13 @@ function m.create(uri)
         ast  = ast.ast,
         uri  = uri,
         cache = {
-            eachRef  = {},
+            eachRef   = {},
+            eachField = {},
         },
         locked = {
-            getValue = {},
-            eachRef  = {},
+            getValue  = {},
+            eachRef   = {},
+            eachField = {},
         }
     }, mt)
     return searcher

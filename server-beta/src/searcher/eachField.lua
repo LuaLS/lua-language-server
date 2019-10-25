@@ -1,19 +1,19 @@
-local function ofLocal(seacher, source, callback)
+local function ofLocal(searcher, source, callback)
     if source.ref then
         for _, ref in ipairs(source.ref) do
             if     ref.type == 'getlocal' then
                 local parent = ref.parent
-                local field = seacher:getField(parent)
+                local field = searcher:getField(parent)
                 if field then
                     callback {
-                        seacher = seacher,
+                        searcher = searcher,
                         source  = field,
                     }
                 end
             elseif ref.type == 'getglobal'
             or     ref.type == 'setglobal' then
                 callback {
-                    seacher = seacher,
+                    searcher = searcher,
                     source  = ref,
                 }
             end
@@ -21,11 +21,31 @@ local function ofLocal(seacher, source, callback)
     end
 end
 
-return function (seacher, source, callback)
+local function ofGlobal(searcher, source, callback)
+    searcher:eachRef(source, function (info)
+        local src = info.source
+        if src.type == 'getglobal' then
+            if src.parent then
+                local field = info.searcher:getField(src.parent)
+                if field then
+                    callback {
+                        searcher = info.searcher,
+                        source  = field,
+                    }
+                end
+            end
+        end
+    end)
+end
+
+return function (searcher, source, callback)
     if     source.type == 'local' then
-        ofLocal(seacher, source, callback)
+        ofLocal(searcher, source, callback)
     elseif source.type == 'getlocal'
     or     source.type == 'setlocal' then
-        ofLocal(seacher, source.node, callback)
+        ofLocal(searcher, source.node, callback)
+    elseif source.type == 'getglobal'
+    or     source.type == 'setglobal' then
+        ofGlobal(searcher, source, callback)
     end
 end

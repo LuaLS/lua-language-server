@@ -66,6 +66,15 @@ local function checkField(key, info, callback)
         elseif parent.type == 'getmethod' then
             mode = 'get'
         end
+    elseif src.type == 'number'
+    or     src.type == 'string'
+    or     src.type == 'boolean' then
+        local parent = src.parent
+        if     parent.type == 'setindex' then
+            mode = 'set'
+        elseif parent.type == 'getindex' then
+            mode = 'get'
+        end
     end
     if mode then
         callback {
@@ -93,6 +102,14 @@ local function ofField(searcher, source, callback)
     end)
 end
 
+local function ofLiteral(searcher, source, callback)
+    local parent = source.parent
+    if parent.type == 'setindex'
+    or parent.type == 'getindex' then
+        ofField(searcher, source, callback)
+    end
+end
+
 return function (searcher, source, callback)
     local stype = source.type
     if     stype == 'local' then
@@ -107,5 +124,9 @@ return function (searcher, source, callback)
     or     stype == 'method'
     or     stype == 'index' then
         ofField(searcher, source, callback)
+    elseif stype == 'number'
+    or     stype == 'boolean'
+    or     stype == 'string' then
+        ofLiteral(searcher, source, callback)
     end
 end

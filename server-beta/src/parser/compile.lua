@@ -194,6 +194,13 @@ local vmMap = {
                 finish = obj.finish,
             }
         end
+        local func = guide.getParentFunction(obj)
+        if func then
+            if not func.returns then
+                func.returns = {}
+            end
+            func.returns[#func.returns+1] = obj
+        end
     end,
     ['label'] = function (obj)
         local block = guide.getBlock(obj)
@@ -281,7 +288,13 @@ local vmMap = {
         Block = lastBlock
     end,
     ['break'] = function (obj)
-        if not guide.getBreakBlock(obj) then
+        local block = guide.getBreakBlock(obj)
+        if block then
+            if not block.breaks then
+                block.breaks = {}
+            end
+            block.breaks[#block.breaks+1] = obj
+        else
             pushError {
                 type   = 'BREAK_OUTSIDE',
                 start  = obj.start,

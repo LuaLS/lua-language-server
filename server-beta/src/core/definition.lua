@@ -5,7 +5,8 @@ local files     = require 'files'
 local function findDef(searcher, source, callback)
     searcher:eachRef(source, function (info)
         if info.mode == 'declare'
-        or info.mode == 'set' then
+        or info.mode == 'set'
+        or info.mode == 'return' then
             local src = info.source
             local uri = info.uri
             if     src.type == 'setfield'

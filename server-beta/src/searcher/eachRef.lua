@@ -4,8 +4,19 @@ local function ofCall(searcher, func, index, callback)
     searcher:eachRef(func, function (info)
         local src = info.source
         local funcDef = src.value
-        if funcDef and funcDef.type == 'function' then
+        if funcDef and funcDef.returns then
             -- 搜索函数第 index 个返回值
+            for _, rtn in ipairs(funcDef.returns) do
+                local val = rtn[index]
+                if val then
+                    callback {
+                        searcher = info.searcher,
+                        source   = val,
+                        mode     = 'return',
+                    }
+                    info.searcher:eachRef(val, callback)
+                end
+            end
         end
     end)
 end

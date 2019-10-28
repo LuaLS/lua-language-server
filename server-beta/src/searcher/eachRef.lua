@@ -108,107 +108,20 @@ local function ofLocal(searcher, loc, callback)
     end
 end
 
-local function checkSpecialField(key, info, callback)
-    local source = info.source
-    if source.type == 'call' then
-        local func = source.node
-        local args = source.args
-        local name = info.searcher:getSpecialName(func)
-        if     name == 'rawset' then
-            if key == guide.getKeyName(args[2]) then
-                return 'set', args[3]
-            end
-        elseif name == 'rawget' then
-            if key == guide.getKeyName(args[2]) then
-                return 'get'
-            end
-        end
-    end
-end
-
-local function checkCommonField(key, info, callback)
-    local src = info.source
-    local srcKey = guide.getKeyName(src)
-    if key ~= srcKey then
-        return
-    end
-
-    local stype = src.type
-    if     stype == 'setglobal' then
-        return 'set', src.value
-    elseif stype == 'getglobal' then
-        return 'get'
-    elseif stype == 'setfield' then
-        return 'set', src.value
-    elseif stype == 'getfield' then
-        return 'get'
-    elseif stype == 'setmethod' then
-        return 'set', src.value
-    elseif stype == 'getmethod' then
-        return 'get'
-    elseif stype == 'setindex' then
-        return 'set', src.value
-    elseif stype == 'getindex' then
-        return 'get'
-    elseif stype == 'field' then
-        local parent = src.parent
-        if     parent.type == 'setfield' then
-            return 'set', parent.value
-        elseif parent.type == 'getfield' then
-            return 'get'
-        elseif parent.type == 'tablefield' then
-            return 'set', parent.value
-        end
-    elseif stype == 'index' then
-        local parent = src.parent
-        if     parent.type == 'setindex' then
-            return 'set', parent.value
-        elseif parent.type == 'getindex' then
-            return 'get'
-        elseif parent.type == 'tableindex' then
-            return 'set', parent.value
-        end
-    elseif stype == 'method' then
-        local parent = src.parent
-        if     parent.type == 'setmethod' then
-            return 'set', parent.value
-        elseif parent.type == 'getmethod' then
-            return 'get'
-        end
-    elseif stype == 'number'
-    or     stype == 'string'
-    or     stype == 'boolean' then
-        local parent = src.parent
-        if     parent.type == 'setindex' then
-            return 'set', parent.value
-        elseif parent.type == 'getindex' then
-            return 'get'
-        end
-    end
-end
-
-local function checkField(key, info, callback)
-    local mode, value = checkCommonField(key, info, callback)
-    if not mode then
-        mode, value = checkSpecialField(key, info, callback)
-    end
-    if mode then
-        callback {
-            searcher = info.searcher,
-            source   = info.source,
-            mode     = mode,
-        }
-    end
-    if value then
-        ofValue(info.searcher, value, callback)
-    end
-end
-
 local function ofGlobal(searcher, source, callback)
     local node = source.node
     local key  = guide.getKeyName(source)
     searcher:eachField(node, function (info)
-        checkField(key, info, callback)
+        if key == info.key then
+            callback {
+                searcher = info.searcher,
+                source   = info.source,
+                mode     = info.mode,
+            }
+            if info.value then
+                ofValue(info.searcher, info.value, callback)
+            end
+        end
     end)
 end
 
@@ -217,7 +130,16 @@ local function ofField(searcher, source, callback)
     local node   = parent.node
     local key    = guide.getKeyName(source)
     searcher:eachField(node, function (info)
-        checkField(key, info, callback)
+        if key == info.key then
+            callback {
+                searcher = info.searcher,
+                source   = info.source,
+                mode     = info.mode,
+            }
+            if info.value then
+                ofValue(info.searcher, info.value, callback)
+            end
+        end
     end)
 end
 

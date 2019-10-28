@@ -81,6 +81,31 @@ local function ofLocal(searcher, loc, callback)
     if loc.value then
         ofValue(searcher, loc.value, callback)
     end
+    if loc.tag == '_ENV' then
+        for _, ref in ipairs(loc.ref) do
+            if ref.type == 'getlocal' then
+                local parent = ref.parent
+                if parent.type == 'getfield'
+                or parent.type == 'getindex' then
+                    if guide.getKeyName(parent) == 's|_G' then
+                        callback {
+                            searcher = searcher,
+                            source   = parent,
+                            mode     = 'get',
+                        }
+                    end
+                end
+            elseif ref.type == 'getglobal' then
+                if guide.getKeyName(ref) == 's|_G' then
+                    callback {
+                        searcher = searcher,
+                        source   = ref,
+                        mode     = 'get',
+                    }
+                end
+            end
+        end
+    end
 end
 
 local function checkField(key, info, callback)

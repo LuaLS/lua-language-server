@@ -1,7 +1,7 @@
 TEST [[
-    _ENV.<!x!> = 1
-    print(<?x?>)
-    ]]
+_ENV.<!x!> = 1
+print(<?x?>)
+]]
 
 TEST [[
 _G.<!x!> = 1

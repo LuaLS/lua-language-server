@@ -1,5 +1,25 @@
 local guide = require 'parser.guide'
 
+local function ofCall(searcher, func, index, callback)
+    searcher:eachRef(func, function (info)
+        local src = info.source
+        local funcDef = src.value
+        if funcDef and funcDef.type == 'function' then
+            -- 搜索函数第 index 个返回值
+        end
+    end)
+end
+
+local function ofValue(searcher, value, callback)
+    -- 检查函数返回值
+    if value.type == 'select' then
+        local call = value.vararg
+        if call.type == 'call' then
+            ofCall(searcher, call.node, value.index, callback)
+        end
+    end
+end
+
 local function ofSelf(searcher, loc, callback)
     -- self 的2个特殊引用位置：
     -- 1. 当前方法定义时的对象（mt）
@@ -32,11 +52,17 @@ local function ofLocal(searcher, loc, callback)
                     source   = ref,
                     mode     = 'set',
                 }
+                if ref.value then
+                    ofValue(searcher, ref.value, callback)
+                end
             end
         end
     end
     if loc.tag == 'self' then
         ofSelf(searcher, loc, callback)
+    end
+    if loc.value then
+        ofValue(searcher, loc.value, callback)
     end
 end
 

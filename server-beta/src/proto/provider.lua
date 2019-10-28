@@ -150,14 +150,13 @@ end)
 proto.on('textDocument/definition', function (params)
     local core   = require 'core.definition'
     local uri    = params.textDocument.uri
-    local ast    = files.getAst(uri)
-    if not ast then
+    if not files.exists(uri) then
         return nil
     end
     local lines  = files.getLines(uri)
     local text   = files.getText(uri)
     local offset = inte.offset(lines, text, params.position)
-    local result = core(ast, offset)
+    local result = core(uri, offset)
     if not result then
         return nil
     end

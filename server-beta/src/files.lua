@@ -31,6 +31,15 @@ function m.close(uri)
     m.openMap[uri] = nil
 end
 
+--- 是否存在
+---@return boolean
+function m.exists(uri)
+    if platform.OS == 'Windows' then
+        uri = uri:lower()
+    end
+    return m.fileMap[uri] ~= nil
+end
+
 --- 设置文件文本
 ---@param uri string
 ---@param text string

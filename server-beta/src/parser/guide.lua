@@ -247,28 +247,6 @@ function m.getLabel(block, name)
     error('guide.getLocal overstack')
 end
 
---- 获取指定区块中的 return
-function m.getReturns(block)
-    local list = { block }
-    local returns = {}
-    for i = 1, 1000 do
-        local len = #list
-        if len == 0 then
-            return
-        end
-        local obj = list[len]
-        list[len] = nil
-        if obj.type == 'return' then
-            returns[#returns+1] = obj
-        end
-        if i > 1 and obj.type == 'function' then
-        else
-            m.addChilds(list, obj, m.actionMap)
-        end
-    end
-    return returns
-end
-
 --- 判断source是否包含offset
 function m.isContain(source, offset)
     return source.start <= offset and source.finish >= offset - 1

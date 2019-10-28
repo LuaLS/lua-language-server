@@ -19,14 +19,15 @@ local function ofTabel(searcher, value, callback)
     end
 end
 
-local function rawField(searcher, source, callback)
+local function ofENV(searcher, source, callback)
     if source.type == 'getlocal' then
         local parent = source.parent
-        local field = searcher:getField(parent)
-        if field then
+        if parent.type == 'getfield'
+        or parent.type == 'getmethod'
+        or parent.type == 'getindex' then
             callback {
                 searcher = searcher,
-                source  = field,
+                source  = parent,
             }
         end
     elseif source.type == 'getglobal'
@@ -38,37 +39,40 @@ local function rawField(searcher, source, callback)
     end
 end
 
+local function ofVar(searcher, source, callback)
+    local parent = source.parent
+    if parent then
+        if parent.type == 'getfield'
+        or parent.type == 'getmethod'
+        or parent.type == 'getindex'
+        or parent.type == 'setfield'
+        or parent.type == 'setmethod'
+        or parent.type == 'setindex' then
+            callback {
+                searcher = searcher,
+                source  = parent,
+            }
+        end
+    end
+end
+
 return function (searcher, source, callback)
     searcher:eachRef(source, function (info)
         local src = info.source
         if src.tag == '_ENV' then
             if src.ref then
                 for _, ref in ipairs(src.ref) do
-                    rawField(info.searcher, ref, callback)
+                    ofENV(info.searcher, ref, callback)
                 end
             end
-        elseif src.type == 'getlocal' then
-            if src.parent then
-                local field = info.searcher:getField(src.parent)
-                if field then
-                    callback {
-                        searcher = info.searcher,
-                        source  = field,
-                    }
-                end
-            end
-        elseif src.type == 'getglobal' then
-            if src.parent then
-                local field = info.searcher:getField(src.parent)
-                if field then
-                    callback {
-                        searcher = info.searcher,
-                        source  = field,
-                    }
-                end
-            end
+        elseif src.type == 'getlocal'
+        or     src.type == 'getglobal'
+        or     src.type == 'getfield'
+        or     src.type == 'getmethod'
+        or     src.type == 'getindex' then
+            ofVar(info.searcher, src, callback)
         elseif src.type == 'table' then
-            ofTabel(searcher, src, callback)
+            ofTabel(info.searcher, src, callback)
         end
     end)
 end

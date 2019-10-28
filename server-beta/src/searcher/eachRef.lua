@@ -121,6 +121,21 @@ local function checkField(key, info, callback)
         value = src.value
     elseif stype == 'getglobal' then
         mode = 'get'
+    elseif stype == 'setfield' then
+        mode = 'set'
+        value = src.value
+    elseif stype == 'getfield' then
+        mode = 'get'
+    elseif stype == 'setmethod' then
+        mode = 'set'
+        value = src.value
+    elseif stype == 'getmethod' then
+        mode = 'get'
+    elseif stype == 'setindex' then
+        mode = 'set'
+        value = src.value
+    elseif stype == 'getindex' then
+        mode = 'get'
     elseif stype == 'field' then
         local parent = src.parent
         if     parent.type == 'setfield' then

@@ -1,7 +1,6 @@
 local guide     = require 'parser.guide'
 local files     = require 'files'
 local util      = require 'utility'
-local getField  = require 'searcher.getField'
 local eachRef   = require 'searcher.eachRef'
 local eachField = require 'searcher.eachField'
 
@@ -33,13 +32,6 @@ function mt:lock(tp, source)
     return util.defer(function ()
         self.locked[tp][source] = nil
     end)
-end
-
---- 获取关联的field
----@param source table
----@return table field
-function mt:getField(source)
-    return getField(self, source)
 end
 
 --- 获取所有的引用

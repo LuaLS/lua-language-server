@@ -22,13 +22,19 @@ local function ofCall(searcher, func, index, callback)
 end
 
 local function ofValue(searcher, value, callback)
-    -- 检查函数返回值
     if value.type == 'select' then
+        -- 检查函数返回值
         local call = value.vararg
         if call.type == 'call' then
             ofCall(searcher, call.node, value.index, callback)
         end
+        return
     end
+    callback {
+        searcher = searcher,
+        source   = value,
+        mode     = 'value',
+    }
 end
 
 local function ofSelf(searcher, loc, callback)
@@ -84,8 +90,10 @@ local function checkField(key, info, callback)
     end
     local stype = src.type
     local mode
+    local value
     if     stype == 'setglobal' then
         mode = 'set'
+        value = src.value
     elseif stype == 'getglobal' then
         mode = 'get'
     elseif stype == 'field' then
@@ -97,6 +105,7 @@ local function checkField(key, info, callback)
         elseif parent.type == 'tablefield' then
             mode = 'set'
         end
+        value = parent.value
     elseif stype == 'index' then
         local parent = src.parent
         if     parent.type == 'setindex' then
@@ -106,6 +115,7 @@ local function checkField(key, info, callback)
         elseif parent.type == 'tableindex' then
             mode = 'set'
         end
+        value = parent.value
     elseif stype == 'method' then
         local parent = src.parent
         if     parent.type == 'setmethod' then
@@ -113,6 +123,7 @@ local function checkField(key, info, callback)
         elseif parent.type == 'getmethod' then
             mode = 'get'
         end
+        value = parent.value
     elseif stype == 'number'
     or     stype == 'string'
     or     stype == 'boolean' then
@@ -129,6 +140,9 @@ local function checkField(key, info, callback)
             source   = src,
             mode     = mode,
         }
+    end
+    if value then
+        ofValue(info.searcher, value, callback)
     end
 end
 
@@ -187,6 +201,12 @@ return function (searcher, source, callback)
     or     stype == 'method'
     or     stype == 'index' then
         ofField(searcher, source, callback)
+    elseif stype == 'setfield'
+    or     stype == 'getfield' then
+        ofField(searcher, source.field, callback)
+    elseif stype == 'setmethod'
+    or     stype == 'getmethod' then
+        ofField(searcher, source.method, callback)
     elseif stype == 'number'
     or     stype == 'boolean'
     or     stype == 'string' then

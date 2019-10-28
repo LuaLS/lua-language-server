@@ -3,6 +3,19 @@ local workspace = require 'workspace'
 local files     = require 'files'
 
 local function findDef(searcher, source, callback)
+    if  source.type ~= 'local'
+    and source.type ~= 'getlocal'
+    and source.type ~= 'setlocal'
+    and source.type ~= 'setglobal'
+    and source.type ~= 'getglobal'
+    and source.type ~= 'field'
+    and source.type ~= 'method'
+    and source.type ~= 'string'
+    and source.type ~= 'number'
+    and source.type ~= 'boolean'
+    and source.type ~= 'goto' then
+        return
+    end
     searcher:eachRef(source, function (info)
         if info.mode == 'declare'
         or info.mode == 'set'

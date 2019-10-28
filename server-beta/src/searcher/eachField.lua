@@ -41,17 +41,33 @@ end
 
 local function ofVar(searcher, source, callback)
     local parent = source.parent
-    if parent then
-        if parent.type == 'getfield'
-        or parent.type == 'getmethod'
-        or parent.type == 'getindex'
-        or parent.type == 'setfield'
-        or parent.type == 'setmethod'
-        or parent.type == 'setindex' then
-            callback {
-                searcher = searcher,
-                source  = parent,
-            }
+    if not parent then
+        return
+    end
+    if parent.type == 'getfield'
+    or parent.type == 'getmethod'
+    or parent.type == 'getindex'
+    or parent.type == 'setfield'
+    or parent.type == 'setmethod'
+    or parent.type == 'setindex' then
+        callback {
+            searcher = searcher,
+            source   = parent,
+        }
+        return
+    end
+    if parent.type == 'callargs' then
+        local call = parent.parent
+        local func = call.node
+        local name = searcher:getSpecialName(func)
+        if name == 'rawset'
+        or name == 'rawget' then
+            if parent[1] == source then
+                callback {
+                    searcher = searcher,
+                    source   = call,
+                }
+            end
         end
     end
 end

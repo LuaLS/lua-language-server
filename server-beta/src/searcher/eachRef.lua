@@ -108,76 +108,94 @@ local function ofLocal(searcher, loc, callback)
     end
 end
 
-local function checkField(key, info, callback)
+local function checkSpecialField(key, info, callback)
+    local source = info.source
+    if source.type == 'call' then
+        local func = source.node
+        local args = source.args
+        local name = info.searcher:getSpecialName(func)
+        if     name == 'rawset' then
+            if key == guide.getKeyName(args[2]) then
+                return 'set', args[3]
+            end
+        elseif name == 'rawget' then
+            if key == guide.getKeyName(args[2]) then
+                return 'get'
+            end
+        end
+    end
+end
+
+local function checkCommonField(key, info, callback)
     local src = info.source
-    if key ~= guide.getKeyName(src) then
+    local srcKey = guide.getKeyName(src)
+    if key ~= srcKey then
         return
     end
+
     local stype = src.type
-    local mode
-    local value
     if     stype == 'setglobal' then
-        mode = 'set'
-        value = src.value
+        return 'set', src.value
     elseif stype == 'getglobal' then
-        mode = 'get'
+        return 'get'
     elseif stype == 'setfield' then
-        mode = 'set'
-        value = src.value
+        return 'set', src.value
     elseif stype == 'getfield' then
-        mode = 'get'
+        return 'get'
     elseif stype == 'setmethod' then
-        mode = 'set'
-        value = src.value
+        return 'set', src.value
     elseif stype == 'getmethod' then
-        mode = 'get'
+        return 'get'
     elseif stype == 'setindex' then
-        mode = 'set'
-        value = src.value
+        return 'set', src.value
     elseif stype == 'getindex' then
-        mode = 'get'
+        return 'get'
     elseif stype == 'field' then
         local parent = src.parent
         if     parent.type == 'setfield' then
-            mode = 'set'
+            return 'set', parent.value
         elseif parent.type == 'getfield' then
-            mode = 'get'
+            return 'get'
         elseif parent.type == 'tablefield' then
-            mode = 'set'
+            return 'set', parent.value
         end
-        value = parent.value
     elseif stype == 'index' then
         local parent = src.parent
         if     parent.type == 'setindex' then
-            mode = 'set'
+            return 'set', parent.value
         elseif parent.type == 'getindex' then
-            mode = 'get'
+            return 'get'
         elseif parent.type == 'tableindex' then
-            mode = 'set'
+            return 'set', parent.value
         end
-        value = parent.value
     elseif stype == 'method' then
         local parent = src.parent
         if     parent.type == 'setmethod' then
-            mode = 'set'
+            return 'set', parent.value
         elseif parent.type == 'getmethod' then
-            mode = 'get'
+            return 'get'
         end
-        value = parent.value
     elseif stype == 'number'
     or     stype == 'string'
     or     stype == 'boolean' then
         local parent = src.parent
         if     parent.type == 'setindex' then
-            mode = 'set'
+            return 'set', parent.value
         elseif parent.type == 'getindex' then
-            mode = 'get'
+            return 'get'
         end
+    end
+end
+
+local function checkField(key, info, callback)
+    local mode, value = checkCommonField(key, info, callback)
+    if not mode then
+        mode, value = checkSpecialField(key, info, callback)
     end
     if mode then
         callback {
             searcher = info.searcher,
-            source   = src,
+            source   = info.source,
             mode     = mode,
         }
     end

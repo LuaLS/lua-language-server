@@ -97,8 +97,7 @@ function mt:getSpecialName(source)
         end
         return nil
     end
-    local function getName(info)
-        local src = info.source
+    local function getName(src)
         if src.type == 'getglobal' then
             local node = src.node
             if node.tag ~= '_ENV' then
@@ -123,7 +122,12 @@ function mt:getSpecialName(source)
             end
         end
     end
-    self:eachRef(source, getName)
+    getName(source)
+    if not spName then
+        self:eachRef(source, function (info)
+            getName(info.source)
+        end)
+    end
     self.cache.specialName[source] = spName or false
     return spName
 end

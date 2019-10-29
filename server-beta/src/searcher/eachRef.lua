@@ -21,12 +21,35 @@ local function ofCall(searcher, func, index, callback)
     end)
 end
 
+local function ofSpecialCall(searcher, call, func, index, callback)
+    local name = searcher:getSpecialName(func)
+    if name == 'setmetatable' then
+        if index == 1 then
+            local args = call.args
+            if args[1] then
+                searcher:eachRef(args[1], callback)
+            end
+            if args[2] then
+                searcher:eachField(args[2], function (info)
+                    if info.key == 's|__index' then
+                        info.searcher:eachRef(info.source, callback)
+                        if info.value then
+                            info.searcher:eachRef(info.value, callback)
+                        end
+                    end
+                end)
+            end
+        end
+    end
+end
+
 local function ofValue(searcher, value, callback)
     if value.type == 'select' then
         -- 检查函数返回值
         local call = value.vararg
         if call.type == 'call' then
             ofCall(searcher, call.node, value.index, callback)
+            ofSpecialCall(searcher, call, call.node, value.index, callback)
         end
         return
     end
@@ -195,5 +218,10 @@ return function (searcher, source, callback)
         ofGoTo(searcher, source, callback)
     elseif stype == 'label' then
         ofLabel(searcher, source, callback)
+    else
+        callback {
+            searcher = searcher,
+            source  = source,
+        }
     end
 end

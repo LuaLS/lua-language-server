@@ -46,6 +46,41 @@ local function ofENV(searcher, source, callback)
     end
 end
 
+local function ofSpecialArg(searcher, source, callback)
+    local args = source.parent
+    local call = args.parent
+    local func = call.node
+    local name = searcher:getSpecialName(func)
+    if    name == 'rawset' then
+        if args[1] == source and args[2] then
+            callback {
+                searcher = searcher,
+                source   = call,
+                key      = guide.getKeyName(args[2]),
+                value    = args[3],
+                mode     = 'set',
+            }
+        end
+    elseif name == 'rawget' then
+        if args[1] == source and args[2] then
+            callback {
+                searcher = searcher,
+                source   = call,
+                key      = guide.getKeyName(args[2]),
+                mode     = 'get',
+            }
+        end
+    elseif name == 'setmetatable' then
+        if args[1] == source and args[2] then
+            searcher:eachField(args[2], function (info)
+                if info.key == 's|__index' and info.value then
+                    info.searcher:eachField(info.value, callback)
+                end
+            end)
+        end
+    end
+end
+
 local function ofVar(searcher, source, callback)
     local parent = source.parent
     if not parent then
@@ -75,29 +110,7 @@ local function ofVar(searcher, source, callback)
         return
     end
     if parent.type == 'callargs' then
-        local call = parent.parent
-        local func = call.node
-        local name = searcher:getSpecialName(func)
-        if    name == 'rawset' then
-            if parent[1] == source then
-                callback {
-                    searcher = searcher,
-                    source   = call,
-                    key      = guide.getKeyName(parent[2]),
-                    value    = parent[3],
-                    mode     = 'set',
-                }
-            end
-        elseif name == 'rawget' then
-            if parent[1] == source then
-                callback {
-                    searcher = searcher,
-                    source   = call,
-                    key      = guide.getKeyName(parent[2]),
-                    mode     = 'get',
-                }
-            end
-        end
+        ofSpecialArg(searcher, source, callback)
     end
 end
 

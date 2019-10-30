@@ -515,14 +515,13 @@ Emmy        <-  '---@'
 ]]
 
 grammar 'Emmy' [[
-Emmy            <-  EmmySp '---' %s*
-                    ( '@' EmmyBody ShortComment
-                    /     EmmyComments
-                    )
+Emmy            <-  EmmyAction
+                /   EmmyComments
+EmmyAction      <-  EmmySp '---' %s* '@' EmmyBody ShortComment
 EmmySp          <-  (!'---' Comment / %s / %nl)*
 EmmyComments    <-  EmmyComment+
                 ->  EmmyComment
-EmmyComment     <-  {(!%nl .)+}
+EmmyComment     <-  EmmySp '---' %s* !'@' {(!%nl .)*}
 EmmyBody        <-  'class'    %s+ EmmyClass    -> EmmyClass
                 /   'type'     %s+ EmmyType     -> EmmyType
                 /   'alias'    %s+ EmmyAlias    -> EmmyAlias

@@ -69,6 +69,35 @@ local function ofSelf(searcher, loc, callback)
     -- 2. 调用该方法时传入的对象
 end
 
+--- 自己作为赋值的值
+local function asValue(searcher, source, callback)
+    local parent = source.parent
+    if parent and parent.value == source then
+        if guide.getKeyName(parent) == 's|__index' then
+            if parent.type == 'tablefield'
+            or parent.type == 'tableindex' then
+                local t = parent.parent
+                local args = t.parent
+                if args[2] == t then
+                    local call = args.parent
+                    local func = call.node
+                    if searcher:getSpecialName(func) == 'setmetatable' then
+                        searcher:eachRef(args[1], callback)
+                    end
+                end
+            end
+        end
+    end
+end
+
+--- 自己作为函数的参数
+local function asArg(searcher, source, callback)
+    local parent = source.parent
+    if parent == 'callargs' then
+        print(parent)
+    end
+end
+
 local function ofLocal(searcher, loc, callback)
     -- 方法中的 self 使用了一个虚拟的定义位置
     if loc.tag ~= 'self' then
@@ -86,6 +115,7 @@ local function ofLocal(searcher, loc, callback)
                     source   = ref,
                     mode     = 'get',
                 }
+                asValue(searcher, ref, callback)
             elseif ref.type == 'setlocal' then
                 callback {
                     searcher = searcher,
@@ -224,4 +254,5 @@ return function (searcher, source, callback)
             source  = source,
         }
     end
+    asArg(searcher, source, callback)
 end

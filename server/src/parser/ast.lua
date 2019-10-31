@@ -627,6 +627,7 @@ local Defs = {
         return expSplit(list, 1, #list, 1)
     end,
     Prefix = function (start, exp, finish)
+        exp.brackets = true
         return exp
     end,
     Index = function (start, exp, finish)

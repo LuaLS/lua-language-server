@@ -554,6 +554,16 @@ local x
 x = x or -1
 ]]
 
+TEST [[
+local x
+x = x or (0 + 1)
+]]
+
+TEST [[
+local x, y
+x = (x + y) or 0
+]]
+
 --TEST [[
 --local t = {}
 --function t:<!a!>()

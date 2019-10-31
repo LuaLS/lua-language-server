@@ -354,6 +354,7 @@ function mt:searchAmbiguity1(callback)
                 and first.type ~= 'unary'
                 and not second.op
                 and literalMap[second.type]
+                and not first.brackets
             then
                 callback(source.start, source.finish, first.start, first.finish)
             end
@@ -364,6 +365,7 @@ function mt:searchAmbiguity1(callback)
                 and second.type ~= 'unary'
                 and not first.op
                 and literalMap[second[1].type]
+                and not second.brackets
             then
                 callback(source.start, source.finish, second.start, second.finish)
             end

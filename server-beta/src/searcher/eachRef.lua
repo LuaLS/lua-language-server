@@ -90,11 +90,35 @@ local function asValue(searcher, source, callback)
     end
 end
 
+local function getCallRecvs(call)
+    local parent = call.parent
+    if parent.type ~= 'select' then
+        return
+    end
+end
+
 --- 自己作为函数的参数
 local function asArg(searcher, source, callback)
     local parent = source.parent
-    if parent == 'callargs' then
-        print(parent)
+    if parent.type == 'callargs' then
+        local call = parent.parent
+        local func = call.node
+        local name = searcher:getSpecialName(func)
+        if name == 'setmetatable' then
+            if parent[1] == source then
+                if parent[2] then
+                    searcher:eachField(parent[2], function (info)
+                        if info.key == 's|__index' then
+                            info.searcher:eachRef(info.source, callback)
+                            if info.value then
+                                info.searcher:eachRef(info.value, callback)
+                            end
+                        end
+                    end)
+                end
+            end
+            getCallRecvs(call)
+        end
     end
 end
 

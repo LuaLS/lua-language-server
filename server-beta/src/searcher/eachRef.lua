@@ -1,4 +1,6 @@
 local guide = require 'parser.guide'
+local files = require 'files'
+local workspace = require 'workspace'
 
 local function ofCall(searcher, func, index, callback)
     searcher:eachRef(func, function (info)
@@ -38,6 +40,22 @@ local function ofSpecialCall(searcher, call, func, index, callback)
                         end
                     end
                 end)
+            end
+        end
+    elseif name == 'require' then
+        if index == 1 then
+            local args = call.args
+            if args[1] then
+                local literal = guide.getLiteral(args[1])
+                if type(literal) == 'string' then
+                    local result = workspace.findUrisByRequirePath(literal, true)
+                    for _, uri in ipairs(result) do
+                        local ast = files.getAst(uri)
+                        if ast then
+                            local other = files.getSearcher(uri)
+                        end
+                    end
+                end
             end
         end
     end

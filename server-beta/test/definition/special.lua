@@ -57,7 +57,7 @@ function mt:x()
     self.<?init?>()
 end
 
-local obj = setmetatable({}, { __index = mt })
+local obj, _ = setmetatable({}, { __index = mt })
 obj.<!init!> = 1
 obj:x()
 ]]

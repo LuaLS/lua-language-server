@@ -93,8 +93,17 @@ end
 local function getCallRecvs(call)
     local parent = call.parent
     if parent.type ~= 'select' then
-        return
+        return nil
     end
+    local exParent = call.exParent
+    local recvs = {}
+    recvs[1] = parent.parent
+    if exParent then
+        for _, p in ipairs(exParent) do
+            recvs[#recvs+1] = p.parent
+        end
+    end
+    return recvs
 end
 
 --- 自己作为函数的参数
@@ -117,7 +126,10 @@ local function asArg(searcher, source, callback)
                     end)
                 end
             end
-            getCallRecvs(call)
+            local recvs = getCallRecvs(call)
+            if recvs and recvs[1] then
+                searcher:eachRef(recvs[1], callback)
+            end
         end
     end
 end

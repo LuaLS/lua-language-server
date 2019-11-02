@@ -21,7 +21,7 @@ local function findDef(searcher, source, callback)
         or info.mode == 'set'
         or info.mode == 'return' then
             local src = info.source
-            local uri = info.uri
+            local uri = info.searcher.uri
             if     src.type == 'setfield'
             or     src.type == 'getfield'
             or     src.type == 'tablefield' then
@@ -81,7 +81,7 @@ return function (uri, offset)
     guide.eachSourceContain(searcher.ast, offset, function (source)
         checkRequire(searcher, source, offset, function (uri)
             results[#results+1] = {
-                uri    = uri,
+                uri    = files.getOriginUri(uri),
                 source = source,
                 target = {
                     start  = 0,
@@ -92,7 +92,7 @@ return function (uri, offset)
         findDef(searcher, source, function (target, uri)
             results[#results+1] = {
                 target = target,
-                uri    = uri,
+                uri    = files.getOriginUri(uri),
                 source = source,
             }
         end)

@@ -168,6 +168,18 @@ function m.getSearcher(uri)
     return file.searcher
 end
 
+--- 获取原始uri
+function m.getOriginUri(uri)
+    if platform.OS == 'Windows' then
+        uri = uri:lower()
+    end
+    local file = m.fileMap[uri]
+    if not file then
+        return nil
+    end
+    return file.uri
+end
+
 --- 判断文件名相等
 function m.eq(a, b)
     if platform.OS == 'Windows' then

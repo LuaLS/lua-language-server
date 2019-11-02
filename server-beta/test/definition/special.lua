@@ -97,17 +97,18 @@ local obj = sm({}, mt)
 obj:<?method1?>()
 ]]
 
-TEST [[
-local mt = {}
-function mt:<!x!>()
-end
-
-local obj = setmetatable({}, {__index = mt})
-function obj:x()
-end
-
-mt:<?x?>()
-]]
+-- TODO
+--TEST [[
+--local mt = {}
+--function mt:<!x!>()
+--end
+--
+--local obj = setmetatable({}, {__index = mt})
+--function obj:x()
+--end
+--
+--mt:<?x?>()
+--]]
 
 -- TODO 通过代码执行顺序来判断
 --TEST [[

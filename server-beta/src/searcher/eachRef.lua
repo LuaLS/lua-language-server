@@ -109,6 +109,9 @@ end
 --- 自己作为函数的参数
 local function asArg(searcher, source, callback)
     local parent = source.parent
+    if not parent then
+        return
+    end
     if parent.type == 'callargs' then
         local call = parent.parent
         local func = call.node
@@ -234,6 +237,9 @@ end
 
 local function ofLiteral(searcher, source, callback)
     local parent = source.parent
+    if not parent then
+        return
+    end
     if parent.type == 'setindex'
     or parent.type == 'getindex' then
         ofField(searcher, source, callback)

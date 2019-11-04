@@ -1,10 +1,9 @@
 local util      = require 'utility'
 local cap       = require 'proto.capability'
-local pub       = require 'pub'
 local task      = require 'task'
 local files     = require 'files'
 local proto     = require 'proto.proto'
-local inte      = require 'proto.interface'
+local interface = require 'proto.interface'
 local workspace = require 'workspace'
 local config    = require 'config'
 
@@ -155,17 +154,19 @@ proto.on('textDocument/definition', function (params)
     end
     local lines  = files.getLines(uri)
     local text   = files.getText(uri)
-    local offset = inte.offset(lines, text, params.position)
+    local offset = interface.offset(lines, text, params.position)
     local result = core(uri, offset)
     if not result then
         return nil
     end
     local response = {}
     for i, info in ipairs(result) do
-        response[i] = inte.locationLink(info.uri
-            , inte.range(lines, text, info.target.start - 1, info.target.finish)
-            , inte.range(lines, text, info.target.start - 1, info.target.finish)
-            , inte.range(lines, text, info.source.start - 1, info.source.finish)
+        local targetUri = info.uri
+        local targetLines = files.getLines(targetUri)
+        response[i] = interface.locationLink(targetUri
+            , interface.range(targetLines, text, info.target.start - 1, info.target.finish)
+            , interface.range(targetLines, text, info.target.start - 1, info.target.finish)
+            , interface.range(lines      , text, info.source.start - 1, info.source.finish)
         )
     end
     return response

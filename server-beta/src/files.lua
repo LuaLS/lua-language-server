@@ -129,6 +129,7 @@ function m.getAst(uri)
         local state, err = parser:compile(file.text, 'lua', config.config.runtime.version)
         if state then
             state.uri = file.uri
+            state.ast.uri = file.uri
             file.ast = state
         else
             log.error(err)

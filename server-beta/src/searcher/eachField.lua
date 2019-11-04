@@ -47,7 +47,7 @@ local function ofSpecialArg(source, callback)
     local args = source.parent
     local call = args.parent
     local func = call.node
-    local name = searcher:getSpecialName(func)
+    local name = searcher.getSpecialName(func)
     if    name == 'rawset' then
         if args[1] == source and args[2] then
             callback {

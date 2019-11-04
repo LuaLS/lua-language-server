@@ -3,7 +3,7 @@ local type = type
 
 _ENV = nil
 
-local pushError, Compile, CompileBlock, Cache, Block, GoToTag, Version, ENVMode, Compiled, ValueID
+local pushError, Compile, CompileBlock, Block, GoToTag, ENVMode, Compiled
 
 local function addRef(node, obj)
     if not node.ref then
@@ -425,21 +425,17 @@ return function (self, lua, mode, version)
         return nil, err
     end
     pushError = state.pushError
-    Version = version
     if version == 'Lua 5.1' or version == 'LuaJIT' then
         ENVMode = 'fenv'
     else
         ENVMode = '_ENV'
     end
-    Cache = {}
     Compiled = {}
     GoToTag = {}
-    ValueID = 0
     if type(state.ast) == 'table' then
         Compile(state.ast)
     end
     PostCompile()
-    Cache = nil
     Compiled = nil
     GoToTag = nil
     return state

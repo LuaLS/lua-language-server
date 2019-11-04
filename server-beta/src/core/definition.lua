@@ -3,7 +3,7 @@ local workspace = require 'workspace'
 local files     = require 'files'
 local searcher  = require 'searcher'
 
-local function findDef(sch, source, callback)
+local function findDef(source, callback)
     if  source.type ~= 'local'
     and source.type ~= 'getlocal'
     and source.type ~= 'setlocal'
@@ -21,8 +21,9 @@ local function findDef(sch, source, callback)
         if info.mode == 'declare'
         or info.mode == 'set' 
         or info.mode == 'return' then
-            local src = info.source
-            local uri = info.uri
+            local src  = info.source
+            local root = guide.getRoot(src)
+            local uri  = root.uri
             if     src.type == 'setfield'
             or     src.type == 'getfield'
             or     src.type == 'tablefield' then
@@ -41,8 +42,7 @@ local function findDef(sch, source, callback)
     end)
 end
 
----@param sch searcher
-local function checkRequire(sch, source, offset, callback)
+local function checkRequire(source, offset, callback)
     if source.type ~= 'call' then
         return
     end
@@ -80,7 +80,7 @@ return function (uri, offset)
     end
     local results = {}
     guide.eachSourceContain(ast.ast, offset, function (source)
-        checkRequire(searcher, source, offset, function (uri)
+        checkRequire(source, offset, function (uri)
             results[#results+1] = {
                 uri    = files.getOriginUri(uri),
                 source = source,
@@ -90,7 +90,7 @@ return function (uri, offset)
                 }
             }
         end)
-        findDef(searcher, source, function (target, uri)
+        findDef(source, function (target, uri)
             results[#results+1] = {
                 target = target,
                 uri    = files.getOriginUri(uri),

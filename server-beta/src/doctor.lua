@@ -1,10 +1,8 @@
-local ac             = ac
 local type           = type
 local next           = next
 local ipairs         = ipairs
 local rawget         = rawget
 local pcall          = pcall
-local collectgarbage = collectgarbage
 local getregistry    = debug.getregistry
 local getmetatable   = debug.getmetatable
 local getupvalue     = debug.getupvalue
@@ -16,101 +14,102 @@ local mathType       = math.type
 local tableConcat    = table.concat
 local _G             = _G
 local registry       = getregistry()
+local tableSort      = table.sort
 
 _ENV = nil
 
 local m = {}
+
+local function getTostring(obj)
+    local mt = getmetatable(obj)
+    if not mt then
+        return nil
+    end
+    local toString = rawget(mt, '__tostring')
+    if not toString then
+        return nil
+    end
+    local suc, str = pcall(toString, obj)
+    if not suc then
+        return nil
+    end
+    if type(str) ~= 'string' then
+        return nil
+    end
+    return str
+end
+
+local function formatName(obj)
+    local tp = type(obj)
+    if tp == 'nil' then
+        return 'nil:nil'
+    elseif tp == 'boolean' then
+        if obj == true then
+            return 'boolean:true'
+        else
+            return 'boolean:false'
+        end
+    elseif tp == 'number' then
+        if mathType(obj) == 'integer' then
+            return ('number:%d'):format(obj)
+        else
+            -- 如果浮点数可以完全表示为整数，那么就转换为整数
+            local str = ('%.10f'):format(obj):gsub('%.?[0]+$', '')
+            if str:find('.', 1, true) then
+                -- 如果浮点数不能表示为整数，那么再加上它的精确表示法
+                str = ('%s(%q)'):format(str, obj)
+            end
+            return 'number:' .. str
+        end
+    elseif tp == 'string' then
+        local str = ('%q'):format(obj)
+        if #str > 100 then
+            local new = ('%s...(len=%d)'):format(str:sub(1, 100), #str)
+            if #new < #str then
+                str = new
+            end
+        end
+        return 'string:' .. str
+    elseif tp == 'function' then
+        local info = getinfo(obj, 'S')
+        if info.what == 'c' then
+            return ('function:%p(C)'):format(obj)
+        elseif info.what == 'main' then
+            return ('function:%p(main)'):format(obj)
+        else
+            return ('function:%p(%s:%d-%d)'):format(obj, info.source, info.linedefined, info.lastlinedefined)
+        end
+    elseif tp == 'table' then
+        local id = getTostring(obj)
+        if not id then
+            if obj == _G then
+                id = '_G'
+            elseif obj == registry then
+                id = 'registry'
+            end
+        end
+        if id then
+            return ('table:%p(%s)'):format(obj, id)
+        else
+            return ('table:%p'):format(obj)
+        end
+    elseif tp == 'userdata' then
+        local id = getTostring(obj)
+        if id then
+            return ('userdata:%p(%s)'):format(obj, id)
+        else
+            return ('userdata:%p'):format(obj)
+        end
+    else
+        return ('%s:%p'):format(tp, obj)
+    end
+end
 
 --- 内存快照
 ---@return table
 function m.snapshot()
     local mark = {}
     local find
-
-    local function getTostring(obj)
-        local mt = getmetatable(obj)
-        if not mt then
-            return nil
-        end
-        local toString = rawget(mt, '__tostring')
-        if not toString then
-            return nil
-        end
-        local suc, str = pcall(toString, obj)
-        if not suc then
-            return nil
-        end
-        if type(str) ~= 'string' then
-            return nil
-        end
-        return str
-    end
-
-    local function formatName(obj)
-        local tp = type(obj)
-        if tp == 'nil' then
-            return 'nil:nil'
-        elseif tp == 'boolean' then
-            if obj == true then
-                return 'boolean:true'
-            else
-                return 'boolean:false'
-            end
-        elseif tp == 'number' then
-            if mathType(obj) == 'integer' then
-                return ('number:%d'):format(obj)
-            else
-                -- 如果浮点数可以完全表示为整数，那么就转换为整数
-                local str = ('%.10f'):format(obj):gsub('%.?[0]+$', '')
-                if str:find('.', 1, true) then
-                    -- 如果浮点数不能表示为整数，那么再加上它的精确表示法
-                    str = ('%s(%q)'):format(str, obj)
-                end
-                return 'number:' .. str
-            end
-        elseif tp == 'string' then
-            local str = ('%q'):format(obj)
-            if #str > 100 then
-                local new = ('%s...(len=%d)'):format(str:sub(1, 100), #str)
-                if #new < #str then
-                    str = new
-                end
-            end
-            return 'string:' .. str
-        elseif tp == 'function' then
-            local info = getinfo(obj, 'S')
-            if info.what == 'c' then
-                return ('function:%p(C)'):format(obj)
-            elseif info.what == 'main' then
-                return ('function:%p(main)'):format(obj)
-            else
-                return ('function:%p(%s:%d-%d)'):format(obj, info.source, info.linedefined, info.lastlinedefined)
-            end
-        elseif tp == 'table' then
-            local id = getTostring(obj)
-            if not id then
-                if obj == _G then
-                    id = '_G'
-                elseif obj == registry then
-                    id = 'registry'
-                end
-            end
-            if id then
-                return ('table:%p(%s)'):format(obj, id)
-            else
-                return ('table:%p'):format(obj)
-            end
-        elseif tp == 'userdata' then
-            local id = getTostring(obj)
-            if id then
-                return ('userdata:%p(%s)'):format(obj, id)
-            else
-                return ('userdata:%p'):format(obj)
-            end
-        else
-            return ('%s:%p'):format(tp, obj)
-        end
-    end
 
     local function findTable(t, result)
         result = result or {}
@@ -331,6 +330,51 @@ function m.catch(...)
     search(report)
 
     return result
+end
+
+--- 生成一个报告
+---@return string
+function m.report()
+    local snapshot = m.snapshot()
+    local cache = {}
+    local mark = {}
+
+    local function scan(t)
+        local obj = t.info.object
+        local tp = type(obj)
+        if tp == 'table'
+        or tp == 'userdata'
+        or tp == 'function'
+        or tp == 'string'
+        or tp == 'thread' then
+            local point = ('%p'):format(obj)
+            if not cache[point] then
+                cache[point] = {
+                    point = point,
+                    count = 0,
+                    name  = formatName(obj),
+                }
+            end
+            cache[point].count = cache[point].count + 1
+        end
+        if not mark[t.info] then
+            mark[t.info] = true
+            for _, child in ipairs(t.info) do
+                scan(child)
+            end
+        end
+    end
+
+    scan(snapshot)
+
+    local list = {}
+    for _, info in next, cache do
+        list[#list+1] = info
+    end
+    tableSort(list, function (a, b)
+        return a.name < b.name
+    end)
+    return list
 end
 
 return m

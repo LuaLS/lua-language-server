@@ -164,6 +164,18 @@ function m.getBreakBlock(obj)
     error('guide.getBreakBlock overstack')
 end
 
+--- 寻找根区块
+function m.getRoot(obj)
+    for _ = 1, 1000 do
+        local parent = obj.parent
+        if not parent then
+            return obj
+        end
+        obj = parent
+    end
+    error('guide.getRoot overstack')
+end
+
 --- 寻找函数的不定参数，返回不定参在第几个参数上，以及该参数对象。
 --- 如果函数是主函数，则返回`0, nil`。
 ---@return table

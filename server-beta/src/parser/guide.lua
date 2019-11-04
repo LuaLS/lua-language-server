@@ -307,6 +307,23 @@ function m.eachSourceContain(ast, offset, callback)
     end
 end
 
+--- 遍历所有指定类型的source
+function m.eachSourceType(ast, type, callback)
+    local cache = ast.typeCache
+    if not cache then
+        cache = {}
+        ast.typeCache = cache
+        m.eachSource(ast, function (source)
+            if source.type == type then
+                cache[#cache+1] = source
+            end
+        end)
+    end
+    for i = 1, #cache do
+        callback(cache[i])
+    end
+end
+
 --- 遍历所有的source
 function m.eachSource(ast, callback)
     local list = { ast }

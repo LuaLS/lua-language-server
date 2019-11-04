@@ -1,5 +1,6 @@
-local fs = require 'bee.filesystem'
-local lni = require 'lni'
+local fs   = require 'bee.filesystem'
+local lni  = require 'lni'
+local util = require 'utility'
 
 local function supportLanguage()
     local list = {}
@@ -33,7 +34,7 @@ end
 
 local function loadFileByLanguage(name, language)
     local path = ROOT / 'locale' / language / (name .. '.lni')
-    local buf = io.load(path)
+    local buf = util.loadFile(path:string())
     if not buf then
         return {}
     end

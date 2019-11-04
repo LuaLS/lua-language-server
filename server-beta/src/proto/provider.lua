@@ -3,7 +3,7 @@ local cap       = require 'proto.capability'
 local task      = require 'task'
 local files     = require 'files'
 local proto     = require 'proto.proto'
-local interface = require 'proto.interface'
+local define    = require 'proto.define'
 local workspace = require 'workspace'
 local config    = require 'config'
 
@@ -154,7 +154,7 @@ proto.on('textDocument/definition', function (params)
     end
     local lines  = files.getLines(uri)
     local text   = files.getText(uri)
-    local offset = interface.offset(lines, text, params.position)
+    local offset = define.offset(lines, text, params.position)
     local result = core(uri, offset)
     if not result then
         return nil
@@ -164,10 +164,10 @@ proto.on('textDocument/definition', function (params)
         local targetUri = info.uri
         local targetLines = files.getLines(targetUri)
         local targetText  = files.getText(targetUri)
-        response[i] = interface.locationLink(targetUri
-            , interface.range(targetLines, targetText, info.target.start - 1, info.target.finish)
-            , interface.range(targetLines, targetText, info.target.start - 1, info.target.finish)
-            , interface.range(lines,       text,       info.source.start - 1, info.source.finish)
+        response[i] = define.locationLink(targetUri
+            , define.range(targetLines, targetText, info.target.start - 1, info.target.finish)
+            , define.range(targetLines, targetText, info.target.start - 1, info.target.finish)
+            , define.range(lines,       text,       info.source.start - 1, info.source.finish)
         )
     end
     return response

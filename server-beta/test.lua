@@ -37,10 +37,10 @@ local function main()
     end
 
     test 'definition'
-    --test 'rename'
-    --test 'highlight'
+    test 'diagnostics'
     --test 'references'
-    --test 'diagnostics'
+    --test 'highlight'
+    --test 'rename'
     --test 'type_inference'
     --test 'find_lib'
     --test 'hover'

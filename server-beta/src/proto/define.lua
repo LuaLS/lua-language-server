@@ -2,7 +2,6 @@ local guide = require 'parser.guide'
 
 local m = {}
 
-
 --- 获取 position 对应的光标位置
 ---@param lines table
 ---@param text string
@@ -68,5 +67,43 @@ function m.locationLink(uri, range, selection, origin)
         originSelectionRange = origin,
     }
 end
+
+--- 诊断等级
+m.DiagnosticSeverity = {
+    Error       = 1,
+    Warning     = 2,
+    Information = 3,
+    Hint        = 4,
+}
+
+--- 诊断类型与默认等级
+m.DiagnosticDefaultSeverity = {
+    ['unused-local']        = 'Hint',
+    ['unused-function']     = 'Hint',
+    ['undefined-global']    = 'Warning',
+    ['global-in-nil-env']   = 'Warning',
+    ['unused-label']        = 'Hint',
+    ['unused-vararg']       = 'Hint',
+    ['trailing-space']      = 'Hint',
+    ['redefined-local']     = 'Hint',
+    ['newline-call']        = 'Information',
+    ['newfield-call']       = 'Warning',
+    ['redundant-parameter'] = 'Hint',
+    ['ambiguity-1']         = 'Warning',
+    ['lowercase-global']    = 'Information',
+    ['undefined-env-child'] = 'Information',
+    ['duplicate-index']     = 'Warning',
+    ['duplicate-method']    = 'Warning',
+    ['empty-block']         = 'Hint',
+    ['redundant-value']     = 'Hint',
+    ['emmy-lua']            = 'Warning',
+    ['set-const']           = 'Error',
+}
+
+--- 诊断报告标签
+m.DiagnosticTag = {
+    Unnecessary = 1,
+    Deprecated  = 2,
+}
 
 return m

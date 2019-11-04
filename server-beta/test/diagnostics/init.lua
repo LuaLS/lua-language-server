@@ -1,8 +1,7 @@
-local core    = require 'core'
-local buildVM = require 'vm'
-local parser  = require 'parser'
-local service = require 'service'
-local config  = require 'config'
+local core   = require 'core.diagnostics'
+local files  = require 'files'
+local config = require 'config'
+local util   = require 'utility'
 
 rawset(_G, 'TEST', true)
 
@@ -48,14 +47,10 @@ local function founded(targets, results)
 end
 
 function TEST(script, ...)
+    files.removeAll()
     local new_script, target = catch_target(script, ...)
-    local lsp = service()
-    local ast = parser:parse(new_script, 'lua', 'Lua 5.3')
-    assert(ast)
-    local lines = parser:lines(new_script)
-    local vm = buildVM(ast, lsp, 'test')
-    assert(vm)
-    local datas = core.diagnostics(vm, lines, 'test')
+    files.setText('', new_script)
+    local datas = core('')
     local results = {}
     for i, data in ipairs(datas) do
         results[i] = { data.start, data.finish }
@@ -63,7 +58,7 @@ function TEST(script, ...)
 
     if results[1] then
         if not founded(target, results) then
-            error(('%s\n%s'):format(table.dump(target), table.dump(results)))
+            error(('%s\n%s'):format(util.dump(target), util.dump(results)))
         end
     else
         assert(#target == 0)
@@ -402,108 +397,108 @@ local <!t!> = {}
 t[1] = 1
 ]]
 
-TEST [[
----@class <!Class!>
----@class <!Class!>
-]]
-
-TEST [[
----@class A : <!B!>
-]]
-
-TEST [[
----@class <!A : B!>
----@class <!B : C!>
----@class <!C : D!>
----@class <!D : A!>
-]]
-
-TEST [[
----@class A : B
----@class B : C
----@class C : D
----@class D
-]]
-
-TEST [[
----@type <!A!>
-]]
-
-TEST [[
----@class A
----@type A|<!B!>|<!C!>
-]]
-
-TEST [[
----@class AAA
----@alias B AAA
-
----@type B
-]]
-
-TEST [[
----@alias B <!AAA!>
-]]
-
-TEST [[
----@class <!A!>
----@class B
----@alias <!A B!>
-]]
-
-TEST [[
----@param x <!Class!>
-]]
-
-TEST [[
----@class Class
----@param <!y!> Class
-local function f(x)
-    return x
-end
-f()
-]]
-
-TEST [[
----@class Class
----@param <!y!> Class
-function F(x)
-    return x
-end
-F()
-]]
-
-TEST [[
----@class Class
----@param <!x!> Class
----@param y Class
----@param <!x!> Class
-local function f(x, y)
-    return x, y
-end
-f()
-]]
-
-TEST [[
----@field <!x Class!>
----@class Class
-]]
-
-TEST [[
----@class Class
----@field <!x!> Class
----@field <!x!> Class
-]]
-
-TEST [[
----@class Class : any
-]]
-
-TEST [[
----@type fun(a: integer)
-local f
-f()
-]]
+--TEST [[
+-----@class <!Class!>
+-----@class <!Class!>
+--]]
+--
+--TEST [[
+-----@class A : <!B!>
+--]]
+--
+--TEST [[
+-----@class <!A : B!>
+-----@class <!B : C!>
+-----@class <!C : D!>
+-----@class <!D : A!>
+--]]
+--
+--TEST [[
+-----@class A : B
+-----@class B : C
+-----@class C : D
+-----@class D
+--]]
+--
+--TEST [[
+-----@type <!A!>
+--]]
+--
+--TEST [[
+-----@class A
+-----@type A|<!B!>|<!C!>
+--]]
+--
+--TEST [[
+-----@class AAA
+-----@alias B AAA
+--
+-----@type B
+--]]
+--
+--TEST [[
+-----@alias B <!AAA!>
+--]]
+--
+--TEST [[
+-----@class <!A!>
+-----@class B
+-----@alias <!A B!>
+--]]
+--
+--TEST [[
+-----@param x <!Class!>
+--]]
+--
+--TEST [[
+-----@class Class
+-----@param <!y!> Class
+--local function f(x)
+--    return x
+--end
+--f()
+--]]
+--
+--TEST [[
+-----@class Class
+-----@param <!y!> Class
+--function F(x)
+--    return x
+--end
+--F()
+--]]
+--
+--TEST [[
+-----@class Class
+-----@param <!x!> Class
+-----@param y Class
+-----@param <!x!> Class
+--local function f(x, y)
+--    return x, y
+--end
+--f()
+--]]
+--
+--TEST [[
+-----@field <!x Class!>
+-----@class Class
+--]]
+--
+--TEST [[
+-----@class Class
+-----@field <!x!> Class
+-----@field <!x!> Class
+--]]
+--
+--TEST [[
+-----@class Class : any
+--]]
+--
+--TEST [[
+-----@type fun(a: integer)
+--local f
+--f()
+--]]
 
 TEST [[
 local x <const> = 1
@@ -531,13 +526,13 @@ local x
 x = x or -1
 ]]
 
---TEST [[
---local t = {}
---function t:<!a!>()
---end
---function t:<!a!>()
---end
---]]
+TEST [[
+local t = {}
+function t:<!a!>()
+end
+function t:<!a!>()
+end
+]]
 
 TEST [[
 local t = {}

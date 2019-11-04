@@ -338,11 +338,11 @@ function Compile(obj, parent)
         return
     end
     Compiled[obj] = true
+    obj.parent = parent
     local f = vmMap[obj.type]
     if not f then
         return
     end
-    obj.parent = parent
     f(obj)
 end
 

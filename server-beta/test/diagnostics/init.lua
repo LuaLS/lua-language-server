@@ -398,6 +398,11 @@ end
 ]]
 
 TEST [[
+local <!t!> = {}
+t[1] = 1
+]]
+
+TEST [[
 ---@class <!Class!>
 ---@class <!Class!>
 ]]

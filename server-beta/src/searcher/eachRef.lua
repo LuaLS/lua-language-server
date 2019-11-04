@@ -51,7 +51,7 @@ local function ofSpecialCall(call, func, index, callback)
                     local result = workspace.findUrisByRequirePath(literal, true)
                     local myUri = guide.getRoot(call).uri
                     for _, uri in ipairs(result) do
-                        if uri ~= myUri then
+                        if not files.eq(uri, myUri) then
                             local ast = files.getAst(uri)
                             if ast then
                                 searcher.eachRef(ast.ast, callback)
@@ -78,6 +78,7 @@ local function ofValue(value, callback)
         source   = value,
         mode     = 'value',
     }
+    searcher.eachRef(value, callback)
 end
 
 local function ofSelf(loc, callback)

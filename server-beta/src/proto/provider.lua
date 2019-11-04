@@ -163,10 +163,11 @@ proto.on('textDocument/definition', function (params)
     for i, info in ipairs(result) do
         local targetUri = info.uri
         local targetLines = files.getLines(targetUri)
+        local targetText  = files.getText(targetUri)
         response[i] = interface.locationLink(targetUri
-            , interface.range(targetLines, text, info.target.start - 1, info.target.finish)
-            , interface.range(targetLines, text, info.target.start - 1, info.target.finish)
-            , interface.range(lines      , text, info.source.start - 1, info.source.finish)
+            , interface.range(targetLines, targetText, info.target.start - 1, info.target.finish)
+            , interface.range(targetLines, targetText, info.target.start - 1, info.target.finish)
+            , interface.range(lines,       text,       info.source.start - 1, info.source.finish)
         )
     end
     return response

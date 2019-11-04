@@ -19,7 +19,7 @@ local function findDef(source, callback)
     end
     searcher.eachRef(source, function (info)
         if info.mode == 'declare'
-        or info.mode == 'set' 
+        or info.mode == 'set'
         or info.mode == 'return' then
             local src  = info.source
             local root = guide.getRoot(src)

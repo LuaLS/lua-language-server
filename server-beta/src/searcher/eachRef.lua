@@ -1,7 +1,7 @@
-local guide = require 'parser.guide'
-local files = require 'files'
+local guide     = require 'parser.guide'
+local files     = require 'files'
 local workspace = require 'workspace'
-local searcher = require 'searcher.searcher'
+local searcher  = require 'searcher.searcher'
 
 local function ofCall(func, index, callback)
     searcher.eachRef(func, function (info)
@@ -52,7 +52,7 @@ local function ofSpecialCall(call, func, index, callback)
                     for _, uri in ipairs(result) do
                         local ast = files.getAst(uri)
                         if ast then
-                            local other = files.getSearcher(uri)
+                            searcher.eachRef(ast.ast, callback)
                         end
                     end
                 end
@@ -271,6 +271,21 @@ local function ofLabel(source, callback)
     
 end
 
+local function ofMain(source, callback)
+    if source.returns then
+        for _, rtn in ipairs(source.returns) do
+            local val = rtn[1]
+                if val then
+                    callback {
+                        source   = val,
+                        mode     = 'return',
+                    }
+                    searcher.eachRef(val, callback)
+                end
+        end
+    end
+end
+
 local function eachRef(source, callback)
     local stype = source.type
     if     stype == 'local' then
@@ -299,11 +314,10 @@ local function eachRef(source, callback)
         ofGoTo(source, callback)
     elseif stype == 'label' then
         ofLabel(source, callback)
-    else
-        callback {
-            source  = source,
-            mode    = 'value',
-        }
+    elseif stype == 'table' then
+        ofValue(source, callback)
+    elseif stype == 'main' then
+        ofMain(source, callback)
     end
     asArg(source, callback)
 end

@@ -109,7 +109,7 @@ function m.getParentFunction(obj)
             break
         end
         local tp = obj.type
-        if tp == 'function' then
+        if tp == 'function' or tp == 'main' then
             return obj
         end
     end

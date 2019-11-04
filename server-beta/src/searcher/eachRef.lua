@@ -274,7 +274,12 @@ local function ofGoTo(source, callback)
 end
 
 local function ofLabel(source, callback)
-    
+    if source.ref then
+        callback {
+            source = source.ref,
+            mode   = 'get',
+        }
+    end
 end
 
 local function ofMain(source, callback)

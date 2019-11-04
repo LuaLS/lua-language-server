@@ -1,7 +1,5 @@
 local files    = require 'files'
-local guide    = require 'parser.guide'
 local searcher = require 'searcher'
-local define   = require 'proto.define'
 local lang     = require 'language'
 local library  = require 'library'
 local config   = require 'config'
@@ -12,9 +10,9 @@ return function (uri, callback)
         return
     end
 
-    -- 先遍历一次所有该文件中的全局变量
+    -- 先遍历一次该文件中的全局变量
     -- 如果变量有 set 行为，则做标记
-    -- 然后再遍历一次，对所有的行为打上标记
+    -- 然后再遍历一次，对所有的行为打上相同标记
     local hasSet = {}
     searcher.eachGlobal(ast.ast, function (info)
         if hasSet[info.source] ~= nil then

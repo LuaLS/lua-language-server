@@ -143,6 +143,12 @@ local _ENV
 ]]
 
 TEST [[
+local x
+return x, function (<!x!>)
+end
+]]
+
+TEST [[
 print(1)
 _ENV = nil
 ]]

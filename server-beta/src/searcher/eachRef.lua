@@ -187,7 +187,7 @@ local function ofLocal(loc, callback)
     if loc.value then
         ofValue(loc.value, callback)
     end
-    if loc.tag == '_ENV' then
+    if loc.tag == '_ENV' and loc.ref then
         for _, ref in ipairs(loc.ref) do
             if ref.type == 'getlocal' then
                 local parent = ref.parent
@@ -212,18 +212,29 @@ local function ofLocal(loc, callback)
     end
 end
 
+local function eachGlobalInWorkSpace(name, callback)
+    for uri in files.eachFile() do
+        local globals = files.getGlobals(uri)
+        local ast = files.getAst(uri)
+        if ast and globals and globals[name] then
+            searcher.eachGlobal(ast.ast, function (info)
+                if name == info.key then
+                    callback(info)
+                    if info.value then
+                        ofValue(info.value, callback)
+                    end
+                end
+            end)
+        end
+    end
+end
+
 local function ofGlobal(source, callback)
-    local node = source.node
     local key  = guide.getKeyName(source)
-    searcher.eachField(node, function (info)
-        if key == info.key then
-            callback {
-                source   = info.source,
-                mode     = info.mode,
-            }
-            if info.value then
-                ofValue(info.value, callback)
-            end
+    eachGlobalInWorkSpace(key, function (info)
+        callback(info)
+        if info.value then
+            ofValue(info.value, callback)
         end
     end)
 end

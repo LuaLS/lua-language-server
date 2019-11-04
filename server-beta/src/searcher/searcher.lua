@@ -107,12 +107,14 @@ function m.refreshCache()
     m.cache = {
         eachRef     = {},
         eachField   = {},
+        eachGlobal  = {},
         specialName = {},
         specials    = nil,
     }
     m.locked = {
-        eachRef   = {},
-        eachField = {},
+        eachRef    = {},
+        eachField  = {},
+        eachGlobal = {},
     }
 end
 

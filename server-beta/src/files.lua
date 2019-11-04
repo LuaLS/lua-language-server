@@ -1,11 +1,10 @@
 local platform = require 'bee.platform'
-local pub      = require 'pub'
-local task     = require 'task'
 local config   = require 'config'
 local glob     = require 'glob'
 local furi     = require 'file-uri'
 local parser   = require 'parser'
 local searcher = require 'searcher.searcher'
+local guide    = require 'parser.guide'
 
 local m = {}
 
@@ -62,6 +61,7 @@ function m.setText(uri, text)
     file.searcher = nil
     file.lines = nil
     file.ast = nil
+    file.globals = nil
     searcher.refreshCache()
 end
 
@@ -167,6 +167,32 @@ function m.getOriginUri(uri)
         return nil
     end
     return file.uri
+end
+
+--- 获取全局变量
+function m.getGlobals(uri)
+    if platform.OS == 'Windows' then
+        uri = uri:lower()
+    end
+    local file = m.fileMap[uri]
+    if not file then
+        return nil
+    end
+    if file.globals then
+        return file.globals
+    end
+    local ast = m.getAst(uri)
+    if not ast then
+        return nil
+    end
+    file.globals = {}
+    searcher.eachGlobal(ast.ast, function (info)
+        local name   = info.key
+        if name then
+            file.globals[name] = true
+        end
+    end)
+    return file.globals
 end
 
 --- 判断文件名相等

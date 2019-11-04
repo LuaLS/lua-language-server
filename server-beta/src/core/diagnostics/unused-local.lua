@@ -8,7 +8,7 @@ local function hasGet(loc)
         return false
     end
     for _, ref in ipairs(loc.ref) do
-        if ref.type == 'get' then
+        if ref.mode == 'get' then
             return true
         end
     end

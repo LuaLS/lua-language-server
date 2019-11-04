@@ -5,6 +5,7 @@ local config   = require 'config'
 local glob     = require 'glob'
 local furi     = require 'file-uri'
 local parser   = require 'parser'
+local searcher = require 'searcher.searcher'
 
 local m = {}
 
@@ -61,6 +62,7 @@ function m.setText(uri, text)
     file.searcher = nil
     file.lines = nil
     file.ast = nil
+    searcher.refreshCache()
 end
 
 --- 监听编译完成
@@ -99,6 +101,7 @@ function m.remove(uri)
         uri = uri:lower()
     end
     m.fileMap[uri] = nil
+    searcher.refreshCache()
 end
 
 --- 移除所有文件
@@ -106,6 +109,7 @@ function m.removeAll()
     for uri in pairs(m.fileMap) do
         m.fileMap[uri] = nil
     end
+    searcher.refreshCache()
 end
 
 --- 遍历文件
@@ -150,22 +154,6 @@ function m.getLines(uri)
         file.lines = parser:lines(file.text)
     end
     return file.lines
-end
-
---- 获取搜索器
-function m.getSearcher(uri)
-    if platform.OS == 'Windows' then
-        uri = uri:lower()
-    end
-    local file = m.fileMap[uri]
-    if not file then
-        return nil
-    end
-    if not file.searcher then
-        local searcher = require 'searcher'
-        file.searcher = searcher.create(uri)
-    end
-    return file.searcher
 end
 
 --- 获取原始uri

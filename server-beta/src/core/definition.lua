@@ -1,8 +1,9 @@
 local guide     = require 'parser.guide'
 local workspace = require 'workspace'
 local files     = require 'files'
+local searcher  = require 'searcher'
 
-local function findDef(searcher, source, callback)
+local function findDef(sch, source, callback)
     if  source.type ~= 'local'
     and source.type ~= 'getlocal'
     and source.type ~= 'setlocal'
@@ -16,12 +17,12 @@ local function findDef(searcher, source, callback)
     and source.type ~= 'goto' then
         return
     end
-    searcher:eachRef(source, function (info)
+    searcher.eachRef(source, function (info)
         if info.mode == 'declare'
-        or info.mode == 'set'
+        or info.mode == 'set' 
         or info.mode == 'return' then
             local src = info.source
-            local uri = info.searcher.uri
+            local uri = info.uri
             if     src.type == 'setfield'
             or     src.type == 'getfield'
             or     src.type == 'tablefield' then
@@ -40,8 +41,8 @@ local function findDef(searcher, source, callback)
     end)
 end
 
----@param searcher engineer
-local function checkRequire(searcher, source, offset, callback)
+---@param sch searcher
+local function checkRequire(sch, source, offset, callback)
     if source.type ~= 'call' then
         return
     end
@@ -57,7 +58,7 @@ local function checkRequire(searcher, source, offset, callback)
     if type(literal) ~= 'string' then
         return
     end
-    local name = searcher:getSpecialName(func)
+    local name = searcher.getSpecialName(func)
     if     name == 'require' then
         local result = workspace.findUrisByRequirePath(literal, true)
         for _, uri in ipairs(result) do
@@ -73,12 +74,12 @@ local function checkRequire(searcher, source, offset, callback)
 end
 
 return function (uri, offset)
-    local results = {}
-    local searcher = files.getSearcher(uri)
-    if not searcher then
+    local ast = files.getAst(uri)
+    if not ast then
         return nil
     end
-    guide.eachSourceContain(searcher.ast, offset, function (source)
+    local results = {}
+    guide.eachSourceContain(ast.ast, offset, function (source)
         checkRequire(searcher, source, offset, function (uri)
             results[#results+1] = {
                 uri    = files.getOriginUri(uri),

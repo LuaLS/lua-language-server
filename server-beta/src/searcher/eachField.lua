@@ -1,11 +1,11 @@
 local guide = require 'parser.guide'
+local searcher = require 'searcher.searcher'
 
-local function ofTabel(searcher, value, callback)
+local function ofTabel(value, callback)
     for _, field in ipairs(value) do
         if field.type == 'tablefield'
         or field.type == 'tableindex' then
             callback {
-                searcher = searcher,
                 source   = field,
                 key      = guide.getKeyName(field),
                 value    = field.value,
@@ -15,14 +15,13 @@ local function ofTabel(searcher, value, callback)
     end
 end
 
-local function ofENV(searcher, source, callback)
+local function ofENV(source, callback)
     if source.type == 'getlocal' then
         local parent = source.parent
         if parent.type == 'getfield'
         or parent.type == 'getmethod'
         or parent.type == 'getindex' then
             callback {
-                searcher = searcher,
                 source   = parent,
                 key      = guide.getKeyName(parent),
                 mode     = 'get',
@@ -30,14 +29,12 @@ local function ofENV(searcher, source, callback)
         end
     elseif source.type == 'getglobal' then
         callback {
-            searcher = searcher,
             source   = source,
             key      = guide.getKeyName(source),
             mode     = 'get',
         }
     elseif source.type == 'setglobal' then
         callback {
-            searcher = searcher,
             source   = source,
             key      = guide.getKeyName(source),
             mode     = 'set',
@@ -46,7 +43,7 @@ local function ofENV(searcher, source, callback)
     end
 end
 
-local function ofSpecialArg(searcher, source, callback)
+local function ofSpecialArg(source, callback)
     local args = source.parent
     local call = args.parent
     local func = call.node
@@ -54,7 +51,6 @@ local function ofSpecialArg(searcher, source, callback)
     if    name == 'rawset' then
         if args[1] == source and args[2] then
             callback {
-                searcher = searcher,
                 source   = call,
                 key      = guide.getKeyName(args[2]),
                 value    = args[3],
@@ -64,7 +60,6 @@ local function ofSpecialArg(searcher, source, callback)
     elseif name == 'rawget' then
         if args[1] == source and args[2] then
             callback {
-                searcher = searcher,
                 source   = call,
                 key      = guide.getKeyName(args[2]),
                 mode     = 'get',
@@ -72,16 +67,16 @@ local function ofSpecialArg(searcher, source, callback)
         end
     elseif name == 'setmetatable' then
         if args[1] == source and args[2] then
-            searcher:eachField(args[2], function (info)
+            searcher.eachField(args[2], function (info)
                 if info.key == 's|__index' and info.value then
-                    info.searcher:eachField(info.value, callback)
+                    searcher.eachField(info.value, callback)
                 end
             end)
         end
     end
 end
 
-local function ofVar(searcher, source, callback)
+local function ofVar(source, callback)
     local parent = source.parent
     if not parent then
         return
@@ -90,7 +85,6 @@ local function ofVar(searcher, source, callback)
     or parent.type == 'getmethod'
     or parent.type == 'getindex' then
         callback {
-            searcher = searcher,
             source   = parent,
             key      = guide.getKeyName(parent),
             mode     = 'get',
@@ -101,7 +95,6 @@ local function ofVar(searcher, source, callback)
     or parent.type == 'setmethod'
     or parent.type == 'setindex' then
         callback {
-            searcher = searcher,
             source   = parent,
             key      = guide.getKeyName(parent),
             value    = parent.value,
@@ -110,17 +103,17 @@ local function ofVar(searcher, source, callback)
         return
     end
     if parent.type == 'callargs' then
-        ofSpecialArg(searcher, source, callback)
+        ofSpecialArg(source, callback)
     end
 end
 
-return function (searcher, source, callback)
-    searcher:eachRef(source, function (info)
+local function eachField(source, callback)
+    searcher.eachRef(source, function (info)
         local src = info.source
         if src.tag == '_ENV' then
             if src.ref then
                 for _, ref in ipairs(src.ref) do
-                    ofENV(info.searcher, ref, callback)
+                    ofENV(ref, callback)
                 end
             end
         elseif src.type == 'getlocal'
@@ -128,9 +121,36 @@ return function (searcher, source, callback)
         or     src.type == 'getfield'
         or     src.type == 'getmethod'
         or     src.type == 'getindex' then
-            ofVar(info.searcher, src, callback)
+            ofVar(src, callback)
         elseif src.type == 'table' then
-            ofTabel(info.searcher, src, callback)
+            ofTabel(src, callback)
         end
+    end)
+end
+
+--- 获取所有的field
+function searcher.eachField(source, callback)
+    local lock <close> = searcher.lock('eachField', source)
+    if not lock then
+        return
+    end
+    local cache = searcher.cache.eachField[source]
+    if cache then
+        for i = 1, #cache do
+            callback(cache[i])
+        end
+        return
+    end
+    cache = {}
+    searcher.cache.eachField[source] = cache
+    local mark = {}
+    eachField(source, function (info)
+        local src = info.source
+        if mark[src] then
+            return
+        end
+        mark[src] = true
+        cache[#cache+1] = info
+        callback(info)
     end)
 end

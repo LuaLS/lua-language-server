@@ -24,9 +24,9 @@ function m.lock(tp, source)
         return nil
     end
     m.locked[tp][source] = true
-    return util.defer(function ()
+    return function ()
         m.locked[tp][source] = nil
-    end)
+    end
 end
 
 --- 获取特殊对象的名字

@@ -8,15 +8,15 @@ local function eachGlobal(source, callback)
 end
 
 function searcher.eachGlobal(source, callback)
-    local lock <close> = searcher.lock('eachGlobal', source)
-    if not lock then
-        return
-    end
     local cache = searcher.cache.eachGlobal[source]
     if cache then
         for i = 1, #cache do
             callback(cache[i])
         end
+        return
+    end
+    local unlock = searcher.lock('eachGlobal', source)
+    if not unlock then
         return
     end
     cache = {}
@@ -29,6 +29,9 @@ function searcher.eachGlobal(source, callback)
         end
         mark[src] = true
         cache[#cache+1] = info
-        callback(info)
     end)
+    unlock()
+    for i = 1, #cache do
+        callback(cache[i])
+    end
 end

@@ -130,15 +130,15 @@ end
 
 --- 获取所有的field
 function searcher.eachField(source, callback)
-    local lock <close> = searcher.lock('eachField', source)
-    if not lock then
-        return
-    end
     local cache = searcher.cache.eachField[source]
     if cache then
         for i = 1, #cache do
             callback(cache[i])
         end
+        return
+    end
+    local unlock = searcher.lock('eachField', source)
+    if not unlock then
         return
     end
     cache = {}
@@ -151,6 +151,9 @@ function searcher.eachField(source, callback)
         end
         mark[src] = true
         cache[#cache+1] = info
-        callback(info)
     end)
+    unlock()
+    for i = 1, #cache do
+        callback(cache[i])
+    end
 end

@@ -330,15 +330,15 @@ end
 
 --- 获取所有的引用
 function searcher.eachRef(source, callback)
-    local lock <close> = searcher.lock('eachRef', source)
-    if not lock then
-        return
-    end
     local cache = searcher.cache.eachRef[source]
     if cache then
         for i = 1, #cache do
             callback(cache[i])
         end
+        return
+    end
+    local unlock = searcher.lock('eachRef', source)
+    if not unlock then
         return
     end
     cache = {}
@@ -351,6 +351,9 @@ function searcher.eachRef(source, callback)
         end
         mark[src] = true
         cache[#cache+1] = info
-        callback(info)
     end)
+    unlock()
+    for i = 1, #cache do
+        callback(cache[i])
+    end
 end

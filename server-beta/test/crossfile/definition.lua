@@ -345,7 +345,7 @@ TEST {
         content = [[
             local function <!f!>()
             end
-            return f
+            return <!f!>
         ]]
     },
     {
@@ -380,38 +380,38 @@ TEST {
     }
 }
 
-TEST {
-    {
-        path = 'a.lua',
-        content = [[
-            ---@class Class
-            local <!obj!>
-        ]]
-    },
-    {
-        path = 'b.lua',
-        content = [[
-            ---@type Class
-            local <!obj!>
-            <?obj?>
-        ]]
-    },
-}
+--TEST {
+--    {
+--        path = 'a.lua',
+--        content = [[
+--            ---@class Class
+--            local <!obj!>
+--        ]]
+--    },
+--    {
+--        path = 'b.lua',
+--        content = [[
+--            ---@type Class
+--            local <!obj!>
+--            <?obj?>
+--        ]]
+--    },
+--}
 
-TEST {
-    {
-        path = 'a.lua',
-        content = [[
-            ---@type Class
-            local <!obj!>
-            <?obj?>
-        ]]
-    },
-    {
-        path = 'b.lua',
-        content = [[
-            ---@class Class
-            local <!obj!>
-        ]]
-    },
-}
+--TEST {
+--    {
+--        path = 'a.lua',
+--        content = [[
+--            ---@type Class
+--            local <!obj!>
+--            <?obj?>
+--        ]]
+--    },
+--    {
+--        path = 'b.lua',
+--        content = [[
+--            ---@class Class
+--            local <!obj!>
+--        ]]
+--    },
+--}

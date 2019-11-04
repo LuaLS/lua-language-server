@@ -49,10 +49,13 @@ local function ofSpecialCall(call, func, index, callback)
                 local literal = guide.getLiteral(args[1])
                 if type(literal) == 'string' then
                     local result = workspace.findUrisByRequirePath(literal, true)
+                    local myUri = guide.getRoot(call).uri
                     for _, uri in ipairs(result) do
-                        local ast = files.getAst(uri)
-                        if ast then
-                            searcher.eachRef(ast.ast, callback)
+                        if uri ~= myUri then
+                            local ast = files.getAst(uri)
+                            if ast then
+                                searcher.eachRef(ast.ast, callback)
+                            end
                         end
                     end
                 end
@@ -212,13 +215,14 @@ local function ofLocal(loc, callback)
     end
 end
 
-local function eachGlobalInWorkSpace(name, callback)
+local function ofGlobal(source, callback)
+    local key   = guide.getKeyName(source)
     for uri in files.eachFile() do
         local globals = files.getGlobals(uri)
         local ast = files.getAst(uri)
-        if ast and globals and globals[name] then
+        if ast and globals and globals[key] then
             searcher.eachGlobal(ast.ast, function (info)
-                if name == info.key then
+                if key == info.key then
                     callback(info)
                     if info.value then
                         ofValue(info.value, callback)
@@ -227,16 +231,6 @@ local function eachGlobalInWorkSpace(name, callback)
             end)
         end
     end
-end
-
-local function ofGlobal(source, callback)
-    local key  = guide.getKeyName(source)
-    eachGlobalInWorkSpace(key, function (info)
-        callback(info)
-        if info.value then
-            ofValue(info.value, callback)
-        end
-    end)
 end
 
 local function ofField(source, callback)

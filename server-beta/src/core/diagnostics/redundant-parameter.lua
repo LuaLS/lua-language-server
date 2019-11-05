@@ -3,12 +3,28 @@ local guide    = require 'parser.guide'
 local searcher = require 'searcher'
 local lang     = require 'language'
 local define   = require 'proto.define'
+local library  = require 'library'
 
-local function packCallArgs(source)
-    if not source.args then
+local function packLibraryArgs(source)
+    local func = searcher.getLibrary(source)
+    if not func then
         return nil
     end
     local result = {}
+    if not func.args then
+        return result
+    end
+    for _, lib in ipairs(func.args) do
+        result[#result+1] = lib
+    end
+    return result
+end
+
+local function packCallArgs(source)
+    local result = {}
+    if not source.args then
+        return result
+    end
     if source.node and source.node.type == 'getmethod' then
         result[#result+1] = source.node.node
     end
@@ -19,10 +35,10 @@ local function packCallArgs(source)
 end
 
 local function packFuncArgs(source)
-    if not source.args then
-        return nil
-    end
     local result = {}
+    if not source.args then
+        return result
+    end
     if source.parent and source.parent.type == 'setmethod' then
         result[#result+1] = source.parent.node
     end
@@ -58,6 +74,7 @@ return function (uri, callback)
             end
         end)
 
+        funcArgs = funcArgs or packLibraryArgs(func)
         if not funcArgs then
             return
         end

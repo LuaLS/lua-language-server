@@ -9,7 +9,15 @@ local function hasGet(loc)
     end
     for _, ref in ipairs(loc.ref) do
         if ref.type == 'getlocal' then
-            return true
+            if not ref.next then
+                return true
+            end
+            local nextType = ref.next.type
+            if  nextType ~= 'setmethod'
+            and nextType ~= 'setfield'
+            and nextType ~= 'setindex' then
+                return true
+            end
         end
     end
     return false

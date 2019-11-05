@@ -286,6 +286,16 @@ end
 ]]
 
 TEST [[
+local <!x!> = {}
+x.a = 1
+]]
+
+TEST [[
+local <!x!> = {}
+x['a'] = 1
+]]
+
+TEST [[
 local function f(<!self!>)
 end
 f()

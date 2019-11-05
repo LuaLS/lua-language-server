@@ -109,12 +109,14 @@ function m.refreshCache()
         eachField   = {},
         eachGlobal  = {},
         specialName = {},
+        getLibrary  = {},
         specials    = nil,
     }
     m.locked = {
         eachRef    = {},
         eachField  = {},
         eachGlobal = {},
+        getLibrary = {},
     }
 end
 

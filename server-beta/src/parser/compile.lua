@@ -53,13 +53,19 @@ local vmMap = {
     ['varargs'] = function (obj)
         local func = guide.getParentFunction(obj)
         if func then
-            local index = guide.getFunctionVarArgs(func)
+            local index, vararg = guide.getFunctionVarArgs(func)
             if not index then
                 pushError {
                     type   = 'UNEXPECT_DOTS',
                     start  = obj.start,
                     finish = obj.finish,
                 }
+            end
+            if vararg then
+                if not vararg.ref then
+                    vararg.ref = {}
+                end
+                vararg.ref[#vararg.ref+1] = obj
             end
         end
     end,

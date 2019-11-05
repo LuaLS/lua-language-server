@@ -13,7 +13,7 @@ return function (uri, callback)
         or name == '_ENV' then
             return
         end
-        local exist = guide.getLocal(source, name, source.start)
+        local exist = guide.getLocal(source, name, source.start-1)
         if exist then
             callback {
                 start   = source.start,

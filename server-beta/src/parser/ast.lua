@@ -862,7 +862,7 @@ local Defs = {
             return
         end
 
-        local loc = createLocal(name, start, actions)
+        local loc = createLocal(name, name.start, actions)
         loc.localfunction = true
 
         return loc

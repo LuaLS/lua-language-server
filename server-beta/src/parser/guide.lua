@@ -316,12 +316,14 @@ function m.eachSourceType(ast, type, callback)
     if not cache then
         cache = {}
         ast.typeCache[type] = cache
+        local mark = {}
+        m.eachSource(ast, function (source)
+            if source.type == type and not mark[source] then
+                mark[source] = true
+                cache[#cache+1] = source
+            end
+        end)
     end
-    m.eachSource(ast, function (source)
-        if source.type == type then
-            cache[#cache+1] = source
-        end
-    end)
     for i = 1, #cache do
         callback(cache[i])
     end

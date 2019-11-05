@@ -309,23 +309,31 @@ end
 
 --- 遍历所有指定类型的source
 function m.eachSourceType(ast, type, callback)
-    if not ast.typeCache then
-        ast.typeCache = {}
-    end
-    local cache = ast.typeCache[type]
+    local cache = ast.typeCache
     if not cache then
-        cache = {}
-        ast.typeCache[type] = cache
         local mark = {}
+        cache = {}
+        ast.typeCache = cache
         m.eachSource(ast, function (source)
-            if source.type == type and not mark[source] then
-                mark[source] = true
-                cache[#cache+1] = source
+            if mark[source] then
+                return
             end
+            mark[source] = true
+            local tp = source.type
+            local myCache = cache[tp]
+            if not myCache then
+                myCache = {}
+                cache[tp] = myCache
+            end
+            myCache[#myCache+1] = source
         end)
     end
-    for i = 1, #cache do
-        callback(cache[i])
+    local myCache = cache[type]
+    if not myCache then
+        return
+    end
+    for i = 1, #myCache do
+        callback(myCache[i])
     end
 end
 

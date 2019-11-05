@@ -262,6 +262,13 @@ return [[
 ]]
 ]=]
 
+TEST [[
+local t = {}
+<!function t:x()
+end!>
+return t
+]]
+
 config.config.diagnostics.disable['unused-function'] = true
 TEST [[
 local mt, x

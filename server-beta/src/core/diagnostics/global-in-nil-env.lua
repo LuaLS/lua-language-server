@@ -40,13 +40,24 @@ return function (uri, callback)
                 local mode, pathA = guide.getPath(nilDef, source)
                 if  mode == 'before'
                 and mayRun(pathA) then
-                    callback {
-                        start   = source.start,
-                        finish  = source.finish,
-                        uri     = uri,
-                        message = lang.script.DIAG_GLOBAL_IN_NIL_ENV,
-                    }
+                    ok = nilDef
+                    break
                 end
+            end
+            if ok then
+                callback {
+                    start   = source.start,
+                    finish  = source.finish,
+                    uri     = uri,
+                    message = lang.script.DIAG_GLOBAL_IN_NIL_ENV,
+                    relative = {
+                        {
+                            start  = ok.start,
+                            finish = ok.finish,
+                            uri    = uri,
+                        }
+                    }
+                }
             end
         end
     end

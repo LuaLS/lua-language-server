@@ -607,6 +607,7 @@ local Defs = {
             local current  = units[i]
             current.node = last
             current.start  = last.start
+            last.next = current
             last = units[i]
         end
         return last
@@ -1212,6 +1213,7 @@ local Defs = {
             local call = createCall(exp, func.finish + 1, exp.finish)
             call.node = func
             call.start = func.start
+            func.next = call
             values = { call }
             keys.range = call.finish
         end

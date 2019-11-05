@@ -11,12 +11,16 @@ return function (uri, callback)
     end
     guide.eachSourceType(ast.ast, 'function', function (source)
         local hasGet
+        local hasSet
         searcher.eachRef(source, function (info)
-            if info.mode == 'get' then
+            if     info.mode == 'get' then
                 hasGet = true
+            elseif info.mode == 'set'
+            or     info.mode == 'declare' then
+                hasSet = true
             end
         end)
-        if not hasGet then
+        if not hasGet and hasSet then
             callback {
                 start   = source.start,
                 finish  = source.finish,

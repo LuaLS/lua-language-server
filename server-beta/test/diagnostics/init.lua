@@ -69,6 +69,12 @@ TEST [[
 local <!x!>
 ]]
 
+TEST [[
+local function x()
+end
+x()
+]]
+
 TEST([[
 <!local function x()
 end!>
@@ -145,6 +151,7 @@ local _ENV
 TEST [[
 local x
 return x, function (<!x!>)
+    return x
 end
 ]]
 

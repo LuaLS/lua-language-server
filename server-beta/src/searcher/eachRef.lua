@@ -78,7 +78,17 @@ local function ofValue(value, callback)
         source   = value,
         mode     = 'value',
     }
-    searcher.eachRef(value, callback)
+    local parent = value.parent
+    if parent.type == 'local'
+    or parent.type == 'setglobal'
+    or parent.type == 'setlocal'
+    or parent.type == 'setfield'
+    or parent.type == 'setmethod'
+    or parent.type == 'setindex' then
+        if parent.value == value then
+            searcher.eachRef(parent, callback)
+        end
+    end
 end
 
 local function ofSelf(loc, callback)
@@ -325,7 +335,8 @@ local function eachRef(source, callback)
         ofGoTo(source, callback)
     elseif stype == 'label' then
         ofLabel(source, callback)
-    elseif stype == 'table' then
+    elseif stype == 'table'
+    or     stype == 'function' then
         ofValue(source, callback)
     elseif stype == 'main' then
         ofMain(source, callback)

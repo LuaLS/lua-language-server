@@ -588,12 +588,6 @@ t[1] = 1
 --]]
 
 TEST [[
-local x <const> = 1
-<!x!> = 2
-return x
-]]
-
-TEST [[
 local x
 x = <!x or 0 + 1!>
 ]]

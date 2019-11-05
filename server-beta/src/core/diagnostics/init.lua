@@ -11,7 +11,7 @@ local function check(uri, name, level, results)
         result.level = level or result.level
         result.code  = name
         results[#results+1] = result
-    end)
+    end, name)
 end
 
 return function (uri)

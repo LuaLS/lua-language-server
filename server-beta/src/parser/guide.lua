@@ -320,6 +320,9 @@ function m.eachSourceType(ast, type, callback)
             end
             mark[source] = true
             local tp = source.type
+            if not tp then
+                return
+            end
             local myCache = cache[tp]
             if not myCache then
                 myCache = {}

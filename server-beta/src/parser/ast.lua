@@ -13,6 +13,7 @@ _ENV = nil
 
 local State
 local PushError
+local PushDiag
 
 -- goto 单独处理
 local RESERVED = {
@@ -1025,6 +1026,17 @@ local Defs = {
                 key.range = key.value.finish
             end
         end
+        if values then
+            for i = #keys+1, #values do
+                local value = values[i]
+                PushDiag('redundant-value', {
+                    start  = value.start,
+                    finish = value.finish,
+                    max    = #keys,
+                    passed = #values,
+                })
+            end
+        end
         return tableUnpack(keys)
     end,
     LocalAttr = function (attrs)
@@ -1078,6 +1090,17 @@ local Defs = {
             key.attrs = nil
             local value = getValue(values, i)
             createLocal(key, finish, value, attrs)
+        end
+        if values then
+            for i = #keys+1, #values do
+                local value = values[i]
+                PushDiag('redundant-value', {
+                    start  = value.start,
+                    finish = value.finish,
+                    max    = #keys,
+                    passed = #values,
+                })
+            end
         end
         return tableUnpack(keys)
     end,
@@ -1619,12 +1642,14 @@ local Defs = {
 local function init(state)
     State     = state
     PushError = state.pushError
+    PushDiag  = state.pushDiag
     emmy.init(State)
 end
 
 local function close()
     State     = nil
     PushError = nil
+    PushDiag  = nil
 end
 
 return {

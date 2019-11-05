@@ -64,6 +64,16 @@ return function (uri, callback)
     -- 再遍历一次 getglobal ，找出 _ENV 被重载的情况
     guide.eachSourceType(ast.ast, 'getglobal', function (source)
         if hasSet[source] == nil then
+            -- 单独验证自己是否在重载过的 _ENV 中有定义
+            local setInENV
+            searcher.eachRef(source, function (info)
+                if info.mode == 'set' then
+                    setInENV = true
+                end
+            end)
+            if setInENV then
+                return
+            end
             local key = source[1]
             callback {
                 start   = source.start,

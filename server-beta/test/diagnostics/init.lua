@@ -160,6 +160,11 @@ print(1)
 _ENV = nil
 ]]
 
+TEST [[
+local _ENV = { print = print }
+print(1)
+]]
+
 config.config.diagnostics.disable['undefined-env-child'] = true
 TEST [[
 _ENV = nil
@@ -168,7 +173,7 @@ _ENV = nil
 
 TEST [[
 _ENV = nil
-local _ = <!GLOBAL!> --> local _ = _ENV.GLOBAL
+local _ = <!print!> --> local _ = _ENV.print
 ]]
 
 TEST [[
@@ -178,7 +183,12 @@ GLOBAL = 1 --> _ENV.GLOBAL = 1
 
 TEST [[
 _ENV = {}
-local _ = GLOBAL --> local _ = _ENV.GLOBAL
+local _ = print --> local _ = _ENV.print
+]]
+
+TEST [[
+GLOBAL = 1
+_ENV = nil
 ]]
 
 config.config.diagnostics.disable['undefined-env-child'] = nil

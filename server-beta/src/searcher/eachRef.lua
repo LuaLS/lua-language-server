@@ -227,20 +227,35 @@ local function ofLocal(loc, callback)
 end
 
 local function ofGlobal(source, callback)
-    local key   = guide.getKeyName(source)
-    for uri in files.eachFile() do
-        local globals = files.getGlobals(uri)
-        local ast = files.getAst(uri)
-        if ast and globals and globals[key] then
-            searcher.eachGlobal(ast.ast, function (info)
-                if key == info.key then
-                    callback(info)
-                    if info.value then
-                        ofValue(info.value, callback)
+    local key = guide.getKeyName(source)
+    local node = source.node
+    if node.tag == '_ENV' then
+        for uri in files.eachFile() do
+            local globals = files.getGlobals(uri)
+            local ast = files.getAst(uri)
+            if ast and globals and globals[key] then
+                searcher.eachGlobal(ast.ast, function (info)
+                    if key == info.key then
+                        callback(info)
+                        if info.value then
+                            ofValue(info.value, callback)
+                        end
                     end
-                end
-            end)
+                end)
+            end
         end
+    else
+        searcher.eachField(node, function (info)
+            if key == info.key then
+                callback {
+                    source   = info.source,
+                    mode     = info.mode,
+                }
+                if info.value then
+                    ofValue(info.value, callback)
+                end
+            end
+        end)
     end
 end
 

@@ -469,4 +469,88 @@ function m.getENV(ast)
     return ast.locals[1]
 end
 
+--- 测试 a 到 b 的路径（不经过函数，不考虑 goto），
+--- 每个路径是一个 block 。
+---
+--- 如果 a 在 b 的前面，返回 `"before"` 加上 2个`list<block>`
+---
+--- 如果 a 在 b 的后面，返回 `"after"` 加上 2个`list<block>`
+---
+--- 否则返回 `false`
+---
+--- 返回的2个 `list` 分别为基准block到达 a 与 b 的路径。
+---@param a table
+---@param b table
+---@return string|boolean mode
+---@return table|nil pathA
+---@return table|nil pathB
+function m.getPath(a, b)
+    --- 首先测试双方在同一个函数内
+    if m.getParentFunction(a) ~= m.getParentFunction(b) then
+        return false
+    end
+    local mode
+    local objA
+    local objB
+    if a.start < b.start then
+        mode = 'before'
+        objA = a
+        objB = b
+    else
+        mode = 'after'
+        objA = b
+        objB = a
+    end
+    local pathA = {}
+    local pathB = {}
+    for _ = 1, 1000 do
+        objA = m.getParentBlock(objA)
+        pathA[#pathA+1] = objA
+        if objA.type == 'function' or objA.type == 'main' then
+            break
+        end
+    end
+    for _ = 1, 1000 do
+        objB = m.getParentBlock(objB)
+        pathB[#pathB+1] = objB
+        if objB.type == 'function' or objB.type == 'main' then
+            break
+        end
+    end
+    -- pathA: {1, 2, 3, 4, 5}
+    -- pathB: {5, 6, 2, 3}
+    local top = #pathB
+    local start
+    for i = #pathA, 1, -1 do
+        local currentBlock = pathA[i]
+        if currentBlock == pathB[top] then
+            start = i
+            break
+        end
+    end
+    -- pathA: {   1, 2, 3}
+    -- pathB: {5, 6, 2, 3}
+    local extra = 0
+    local align = top - start
+    for i = start, 1, -1 do
+        local currentA = pathA[i]
+        local currentB = pathB[i+align]
+        if currentA ~= currentB then
+            extra = i
+            break
+        end
+    end
+    -- pathA: {1}
+    local resultA = {}
+    for i = extra, 1, -1 do
+        resultA[#resultA+1] = pathA[i]
+    end
+    -- pathB: {5, 6}
+    local resultB = {}
+    for i = extra + align, 1, -1 do
+        resultB[#resultB+1] = pathB[i]
+    end
+    return mode, resultA, resultB
+end
+
 return m

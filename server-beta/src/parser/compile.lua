@@ -151,6 +151,24 @@ local vmMap = {
             obj.type = 'setlocal'
             obj.loc  = loc
             addRef(loc, obj)
+            if loc.attrs then
+                local const
+                for i = 1, #loc.attrs do
+                    local attr = loc.attrs[i][1]
+                    if attr == 'const'
+                    or attr == 'close' then
+                        const = true
+                        break
+                    end
+                end
+                if const then
+                    pushError {
+                        type   = 'SET_CONST',
+                        start  = obj.start,
+                        finish = obj.finish,
+                    }
+                end
+            end
         else
             obj.type = 'setglobal'
             if ENVMode == '_ENV' then

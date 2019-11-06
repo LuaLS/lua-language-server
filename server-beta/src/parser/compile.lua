@@ -3,7 +3,8 @@ local type = type
 
 _ENV = nil
 
-local pushError, Compile, CompileBlock, Block, GoToTag, ENVMode, Compiled
+local LocalLimit = 200
+local pushError, Compile, CompileBlock, Block, GoToTag, ENVMode, Compiled, LocalCount
 
 local function addRef(node, obj)
     if not node.ref then
@@ -102,7 +103,9 @@ local vmMap = {
     end,
     ['function'] = function (obj)
         local lastBlock = Block
+        local LastLocalCount = LocalCount
         Block = obj
+        LocalCount = 0
         if obj.localself then
             Compile(obj.localself, obj)
             obj.localself = nil
@@ -112,6 +115,7 @@ local vmMap = {
             Compile(obj[i], obj)
         end
         Block = lastBlock
+        LocalCount = LastLocalCount
     end,
     ['funcargs'] = function (obj)
         for i = 1, #obj do
@@ -191,6 +195,14 @@ local vmMap = {
                 Block.locals = {}
             end
             Block.locals[#Block.locals+1] = obj
+            LocalCount = LocalCount + 1
+            if LocalCount > LocalLimit then
+                pushError {
+                    type   = 'LOCAL_LIMIT',
+                    start  = obj.start,
+                    finish = obj.finish,
+                }
+            end
         end
         if obj.localfunction then
             obj.localfunction = nil
@@ -205,6 +217,9 @@ local vmMap = {
         local lastBlock = Block
         Block = obj
         CompileBlock(obj, obj)
+        if Block.locals then
+            LocalCount = LocalCount - #Block.locals
+        end
         Block = lastBlock
     end,
     ['return'] = function (obj)
@@ -263,6 +278,9 @@ local vmMap = {
         Block = obj
         Compile(obj.filter, obj)
         CompileBlock(obj, obj)
+        if Block.locals then
+            LocalCount = LocalCount - #Block.locals
+        end
         Block = lastBlock
     end,
     ['elseifblock'] = function (obj)
@@ -270,12 +288,18 @@ local vmMap = {
         Block = obj
         Compile(obj.filter, obj)
         CompileBlock(obj, obj)
+        if Block.locals then
+            LocalCount = LocalCount - #Block.locals
+        end
         Block = lastBlock
     end,
     ['elseblock'] = function (obj)
         local lastBlock = Block
         Block = obj
         CompileBlock(obj, obj)
+        if Block.locals then
+            LocalCount = LocalCount - #Block.locals
+        end
         Block = lastBlock
     end,
     ['loop'] = function (obj)
@@ -285,6 +309,9 @@ local vmMap = {
         Compile(obj.max, obj)
         Compile(obj.step, obj)
         CompileBlock(obj, obj)
+        if Block.locals then
+            LocalCount = LocalCount - #Block.locals
+        end
         Block = lastBlock
     end,
     ['in'] = function (obj)
@@ -295,6 +322,9 @@ local vmMap = {
             Compile(keys[i], obj)
         end
         CompileBlock(obj, obj)
+        if Block.locals then
+            LocalCount = LocalCount - #Block.locals
+        end
         Block = lastBlock
     end,
     ['while'] = function (obj)
@@ -302,6 +332,9 @@ local vmMap = {
         Block = obj
         Compile(obj.filter, obj)
         CompileBlock(obj, obj)
+        if Block.locals then
+            LocalCount = LocalCount - #Block.locals
+        end
         Block = lastBlock
     end,
     ['repeat'] = function (obj)
@@ -309,6 +342,9 @@ local vmMap = {
         Block = obj
         CompileBlock(obj, obj)
         Compile(obj.filter, obj)
+        if Block.locals then
+            LocalCount = LocalCount - #Block.locals
+        end
         Block = lastBlock
     end,
     ['break'] = function (obj)
@@ -338,6 +374,8 @@ local vmMap = {
                 [1]    = '_ENV',
             }, obj)
         end
+        --- _ENV 是上值，不计入局部变量计数
+        LocalCount = 0
         CompileBlock(obj, obj)
         Block = nil
     end,
@@ -458,6 +496,7 @@ return function (self, lua, mode, version)
     end
     Compiled = {}
     GoToTag = {}
+    LocalCount = 0
     if type(state.ast) == 'table' then
         Compile(state.ast)
     end

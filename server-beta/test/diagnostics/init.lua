@@ -203,6 +203,34 @@ print()
 ]]
 
 TEST [[
+return {
+    <!print
+    'string'!>
+}
+]]
+
+TEST [[
+return {
+    <!print
+    {
+        x = 1,
+    }!>
+}
+]]
+
+TEST [[
+print()
+'string'
+]]
+
+TEST [[
+print
+{
+    x = 1,
+}
+]]
+
+TEST [[
 local function x(a, b)
     return a, b
 end
@@ -619,14 +647,7 @@ x = (x + y) or 0
 
 TEST [[
 local t = {}
-function t:<!a!>()
-end
-function t:<!a!>()
-end
-]]
-
-TEST [[
-local t = {}
 t.a = 1
 t.a = 2
+return t
 ]]

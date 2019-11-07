@@ -93,11 +93,9 @@ m.DiagnosticDefaultSeverity = {
     ['lowercase-global']    = 'Information',
     ['undefined-env-child'] = 'Information',
     ['duplicate-index']     = 'Warning',
-    ['duplicate-method']    = 'Warning',
     ['empty-block']         = 'Hint',
     ['redundant-value']     = 'Hint',
     ['emmy-lua']            = 'Warning',
-    ['set-const']           = 'Error',
 }
 
 --- 诊断报告标签

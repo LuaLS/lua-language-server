@@ -74,10 +74,14 @@ local function ofValue(value, callback)
         end
         return
     end
+
     callback {
         source   = value,
         mode     = 'value',
     }
+
+    searcher.eachRef(value, callback)
+
     local parent = value.parent
     if parent.type == 'local'
     or parent.type == 'setglobal'

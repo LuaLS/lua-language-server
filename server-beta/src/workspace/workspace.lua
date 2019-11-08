@@ -1,11 +1,12 @@
-local pub      = require 'pub'
-local fs       = require 'bee.filesystem'
-local furi     = require 'file-uri'
-local files    = require 'files'
-local config   = require 'config'
-local glob     = require 'glob'
-local platform = require 'bee.platform'
-local await    = require 'await'
+local pub        = require 'pub'
+local fs         = require 'bee.filesystem'
+local furi       = require 'file-uri'
+local files      = require 'files'
+local config     = require 'config'
+local glob       = require 'glob'
+local platform   = require 'bee.platform'
+local await      = require 'await'
+local diagnostic = require 'service.diagnostic'
 
 local m = {}
 m.type = 'workspace'
@@ -115,7 +116,7 @@ function m.preload()
         max = max + 1
         pub.syncTask('loadFile', uri, function (text)
             read = read + 1
-            log.info(('Preload file at: %s , size = %.3f KB'):format(uri, #text / 1000.0))
+            --log.info(('Preload file at: %s , size = %.3f KB'):format(uri, #text / 1000.0))
             files.setText(uri, text)
         end)
     end)
@@ -130,6 +131,7 @@ function m.preload()
     end
 
     log.info('Preload finish.')
+    diagnostic.start()
 end
 
 --- 查找符合指定file path的所有uri

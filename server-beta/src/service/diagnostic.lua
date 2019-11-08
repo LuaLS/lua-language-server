@@ -9,6 +9,7 @@ local core   = require 'core.diagnostics'
 local m = {}
 
 m.version = 0
+m._start = false
 
 local function concat(t, sep)
     if type(t) ~= 'table' then
@@ -35,8 +36,14 @@ local function buildSyntaxError(uri, err)
     if related then
         relatedInformation = {}
         for _, rel in ipairs(related) do
+            local rmessage
+            if rel.message then
+                rmessage = lang.script('PARSER_'..rel.message)
+            else
+                rmessage = text:sub(rel.start, rel.finish)
+            end
             relatedInformation[#relatedInformation+1] = {
-                message  = lang.script('PARSER_'..rel.message),
+                message  = rmessage,
                 location = define.location(uri, define.range(lines, text, rel.start, rel.finish)),
             }
         end
@@ -67,7 +74,7 @@ local function buildDiagnostic(uri, diag)
             }
         end
     end
-    
+
     return {
         range    = define.range(lines, text, diag.start, diag.finish),
         source   = lang.script.DIAG_DIAGNOSTICS,
@@ -91,11 +98,12 @@ function m.doDiagnostic(uri)
         diagnostics[#diagnostics+1] = buildSyntaxError(uri, err)
     end
 
-    local diags = core(uri)
-    for _, diag in ipairs(diags) do
-        diagnostics[#diagnostics+1] = buildDiagnostic(uri, diag)
+    if m._start then
+        local diags = core(uri)
+        for _, diag in ipairs(diags) do
+            diagnostics[#diagnostics+1] = buildDiagnostic(uri, diag)
+        end
     end
-
 
     proto.notify('textDocument/publishDiagnostics', {
         uri = uri,
@@ -107,10 +115,13 @@ end
 function m.refresh(uri)
     m.version = m.version + 1
     local myVersion = m.version
+    if uri then
+        m.doDiagnostic(files.getOriginUri(uri))
+    end
+    if not m._start then
+        return
+    end
     await.create(function ()
-        if uri then
-            m.doDiagnostic(files.getOriginUri(uri))
-        end
         await.sleep(1.0)
         if myVersion ~= m.version then
             return
@@ -125,6 +136,11 @@ function m.refresh(uri)
             end
         end
     end)
+end
+
+function m.start()
+    m._start = true
+    m.refresh()
 end
 
 return m

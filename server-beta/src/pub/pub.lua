@@ -69,7 +69,7 @@ function m.pushTask(brave, info)
     end
     brave.taskpad:push(info.name, info.id, info.params)
     brave.taskMap[info.id] = info
-    log.info(('Push task %q(%d) to # %d, queue length %d'):format(info.name, info.id, brave.id, #m.taskQueue))
+    --log.info(('Push task %q(%d) to # %d, queue length %d'):format(info.name, info.id, brave.id, #m.taskQueue))
     return true
 end
 
@@ -81,7 +81,7 @@ function m.popTask(brave, id, result)
         return
     end
     brave.taskMap[id] = nil
-    log.info(('Pop task %q(%d) from # %d'):format(info.name, info.id, brave.id))
+    --log.info(('Pop task %q(%d) from # %d'):format(info.name, info.id, brave.id))
     m.checkWaitingTask(brave)
     if not info.removed then
         info.removed = true
@@ -125,7 +125,7 @@ function m.task(name, params)
     -- 当有勇者提交任务反馈后，尝试把按顺序将堆积任务
     -- 交给该勇者
     m.taskQueue[#m.taskQueue+1] = info
-    log.info(('Add task %q(%d) in queue, length %d.'):format(name, info.id, #m.taskQueue))
+    --log.info(('Add task %q(%d) in queue, length %d.'):format(name, info.id, #m.taskQueue))
     return await.wait(function (waker)
         info.callback = waker
     end)
@@ -153,7 +153,7 @@ function m.syncTask(name, params, callback)
     -- 当有勇者提交任务反馈后，尝试把按顺序将堆积任务
     -- 交给该勇者
     m.taskQueue[#m.taskQueue+1] = info
-    log.info(('Add task %q(%d) in queue, length %d.'):format(name, info.id, #m.taskQueue))
+    --log.info(('Add task %q(%d) in queue, length %d.'):format(name, info.id, #m.taskQueue))
     return info
 end
 

@@ -32,7 +32,7 @@ return function (uri, callback)
     searcher.eachGlobal(ast.ast, function (info)
         local source = info.source
         local key = info.key
-        local skey = key:match '^s|(.+)$'
+        local skey = key and key:match '^s|(.+)$'
         if not skey then
             return
         end

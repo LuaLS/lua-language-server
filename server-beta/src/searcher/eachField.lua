@@ -153,6 +153,10 @@ function searcher.eachField(source, callback)
         cache[#cache+1] = info
     end)
     unlock()
+    searcher.eachRef(source, function (info)
+        local src = info.source
+        searcher.cache.eachField[src] = cache
+    end)
     for i = 1, #cache do
         callback(cache[i])
     end

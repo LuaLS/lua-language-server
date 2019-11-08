@@ -52,7 +52,7 @@ function m.notify(name, params)
     io.stdout:write(buf)
 end
 
-function m.request(name, params)
+function m.awaitRequest(name, params)
     local id = reqCounter()
     local buf = jsonrpc.encode {
         id     = id,
@@ -112,7 +112,7 @@ function m.listen()
     subprocess.filemode(io.stdout, 'b')
     io.stdin:setvbuf  'no'
     io.stdout:setvbuf 'no'
-    pub.syncTask('loadProto')
+    pub.task('loadProto')
 end
 
 return m

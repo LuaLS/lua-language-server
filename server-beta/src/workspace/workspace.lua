@@ -41,7 +41,7 @@ function m.getIgnoreMatcher()
     end
     -- config.workspace.ignoreSubmodules
     if config.config.workspace.ignoreSubmodules then
-        local buf = pub.task('loadFile', furi.encode(m.path .. '/.gitmodules'))
+        local buf = pub.awaitTask('loadFile', furi.encode(m.path .. '/.gitmodules'))
         if buf then
             for path in buf:gmatch('path = ([^\r\n]+)') do
                 log.info('Ignore by .gitmodules:', path)
@@ -51,7 +51,7 @@ function m.getIgnoreMatcher()
     end
     -- config.workspace.useGitIgnore
     if config.config.workspace.useGitIgnore then
-        local buf = pub.task('loadFile', furi.encode(m.path .. '/.gitignore'))
+        local buf = pub.awaitTask('loadFile', furi.encode(m.path .. '/.gitignore'))
         if buf then
             for line in buf:gmatch '[^\r\n]+' do
                 log.info('Ignore by .gitignore:', line)
@@ -82,8 +82,8 @@ function m.isIgnored(uri)
     return ignore(path)
 end
 
---- 预读工作区内所有文件（异步）
-function m.preload()
+--- 预读工作区内所有文件
+function m.awaitPreload()
     if not m.uri then
         return
     end
@@ -114,7 +114,7 @@ function m.preload()
             return
         end
         max = max + 1
-        pub.syncTask('loadFile', uri, function (text)
+        pub.task('loadFile', uri, function (text)
             read = read + 1
             --log.info(('Preload file at: %s , size = %.3f KB'):format(uri, #text / 1000.0))
             files.setText(uri, text)

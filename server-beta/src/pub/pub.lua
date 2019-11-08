@@ -101,10 +101,10 @@ function m.popReport(brave, name, params)
     xpcall(abil, log.error, params, brave)
 end
 
---- 发布任务（异步）
+--- 发布任务
 ---@parma name string
 ---@param params any
-function m.task(name, params)
+function m.awaitTask(name, params)
     local info = {
         id     = counter(),
         name   = name,
@@ -136,7 +136,7 @@ end
 ---@parma name string
 ---@param params any
 ---@param callback function
-function m.syncTask(name, params, callback)
+function m.task(name, params, callback)
     local info = {
         id       = counter(),
         name     = name,

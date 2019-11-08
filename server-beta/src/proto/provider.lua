@@ -8,7 +8,7 @@ local workspace = require 'workspace'
 local config    = require 'config'
 
 local function updateConfig()
-    local configs = proto.request('workspace/configuration', {
+    local configs = proto.awaitRequest('workspace/configuration', {
         items = {
             {
                 scopeUri = workspace.uri,
@@ -67,7 +67,7 @@ end)
 
 proto.on('initialized', function (params)
     updateConfig()
-    proto.request('client/registerCapability', {
+    proto.awaitRequest('client/registerCapability', {
         registrations = {
             -- 监视文件变化
             {
@@ -89,9 +89,7 @@ proto.on('initialized', function (params)
             }
         }
     })
-    await.create(function ()
-        workspace.preload()
-    end)
+    await.create(workspace.awaitPreload)
     return true
 end)
 

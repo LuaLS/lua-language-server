@@ -389,6 +389,10 @@ function searcher.eachRef(source, callback)
     end)
     unlock()
     for i = 1, #cache do
+        local src = cache[i].source
+        searcher.cache.eachRef[src] = cache
+    end
+    for i = 1, #cache do
         callback(cache[i])
     end
 end

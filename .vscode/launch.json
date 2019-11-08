@@ -12,7 +12,11 @@
 			],
 			"consoleCoding": "utf8",
 			"sourceCoding": "utf8",
-			"luaRuntime": "5.4 64bit"
+			"luaRuntime": "5.4 64bit",
+			"outputCapture": [
+				"print",
+				"stderr",
+			],
 		},
 		{
 			"name": "附加",
@@ -40,7 +44,11 @@
 			"consoleCoding": "utf8",
 			"sourceCoding": "utf8",
 			"preLaunchTask": "编译",
-			"luaRuntime": "5.4 64bit"
+			"luaRuntime": "5.4 64bit",
+			"outputCapture": [
+				"print",
+				"stderr",
+			],
 		},
 		{
 			"name": "发布",
@@ -52,7 +60,11 @@
 			],
 			"consoleCoding": "utf8",
 			"sourceCoding": "utf8",
-			"luaRuntime": "5.4 64bit"
+			"luaRuntime": "5.4 64bit",
+			"outputCapture": [
+				"print",
+				"stderr",
+			],
 		},
 		{
 			"name": "🍺测试-beta",
@@ -64,7 +76,11 @@
 			],
 			"consoleCoding": "utf8",
 			"sourceCoding": "utf8",
-			"luaRuntime": "5.4 64bit"
+			"luaRuntime": "5.4 64bit",
+			"outputCapture": [
+				"print",
+				"stderr",
+			],
 		},
 		{
 			"name": "附加-beta",

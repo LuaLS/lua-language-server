@@ -439,6 +439,16 @@ return {
 ]]
 
 TEST [[
+return {
+    x = 1,
+    y = 2,
+}, {
+    x = 1,
+    y = 2,
+}
+]]
+
+TEST [[
 local m = {}
 function m.open()
 end

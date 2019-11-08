@@ -17,17 +17,19 @@ return function (uri, callback)
             if field.type == 'call' then
                 local func = field.node
                 local args = field.args
-                local funcLine = guide.positionOf(lines, func.finish)
-                local argsLine = guide.positionOf(lines, args.start)
-                if argsLine > funcLine then
-                    callback {
-                        start   = field.start,
-                        finish  = field.finish,
-                        message = lang.script('DIAG_PREFIELD_CALL'
-                            , text:sub(func.start, func.finish)
-                            , text:sub(args.start, args.finish)
-                        )
-                    }
+                if args then
+                    local funcLine = guide.positionOf(lines, func.finish)
+                    local argsLine = guide.positionOf(lines, args.start)
+                    if argsLine > funcLine then
+                        callback {
+                            start   = field.start,
+                            finish  = field.finish,
+                            message = lang.script('DIAG_PREFIELD_CALL'
+                                , text:sub(func.start, func.finish)
+                                , text:sub(args.start, args.finish)
+                            )
+                        }
+                    end
                 end
             end
         end

@@ -10,6 +10,7 @@ local m = {}
 
 m.version = 0
 m._start = false
+m.cache = {}
 
 local function concat(t, sep)
     if type(t) ~= 'table' then
@@ -86,32 +87,69 @@ local function buildDiagnostic(uri, diag)
     }
 end
 
+local function merge(a, b)
+    local t = {}
+    if a then
+        for i = 1, #a do
+            t[#t+1] = a[i]
+        end
+    end
+    if b then
+        for i = 1, #b do
+            t[#t+1] = b[i]
+        end
+    end
+    return t
+end
+
+function m.clear(uri)
+    m.cache[uri] = nil
+    proto.notify('textDocument/publishDiagnostics', {
+        uri = uri,
+        diagnostics = {},
+    })
+end
+
+function m.syntaxErrors(uri, ast)
+    local results = {}
+
+    for _, err in ipairs(ast.errs) do
+        results[#results+1] = buildSyntaxError(uri, err)
+    end
+
+    return results
+end
+
+function m.diagnostics(uri, syntaxOnly)
+    if syntaxOnly or not m._start then
+        return m.cache[uri]
+    end
+
+    local results = {}
+
+    local diags = core(uri)
+    for _, diag in ipairs(diags) do
+        results[#results+1] = buildDiagnostic(uri, diag)
+    end
+
+    m.cache[uri] = results
+
+    return results
+end
+
 function m.doDiagnostic(uri, syntaxOnly)
     local ast = files.getAst(uri)
     if not ast then
-        proto.notify('textDocument/publishDiagnostics', {
-            uri = uri,
-            diagnostics = {},
-        })
+        m.clear(uri)
         return
     end
 
-    local diagnostics = {}
-
-    for _, err in ipairs(ast.errs) do
-        diagnostics[#diagnostics+1] = buildSyntaxError(uri, err)
-    end
-
-    if not syntaxOnly and m._start then
-        local diags = core(uri)
-        for _, diag in ipairs(diags) do
-            diagnostics[#diagnostics+1] = buildDiagnostic(uri, diag)
-        end
-    end
+    local syntax = m.syntaxErrors(uri, ast)
+    local diagnostics = m.diagnostics(uri, syntaxOnly)
 
     proto.notify('textDocument/publishDiagnostics', {
         uri = uri,
-        diagnostics = diagnostics,
+        diagnostics = merge(syntax, diagnostics),
     })
 end
 
@@ -125,9 +163,12 @@ function m.refresh(uri)
         return
     end
     await.create(function ()
-        await.sleep(1.0)
+        await.sleep(0.2)
         if myVersion ~= m.version then
             return
+        end
+        if uri then
+            m.doDiagnostic(uri)
         end
         for destUri in files.eachFile() do
             if destUri ~= uri then

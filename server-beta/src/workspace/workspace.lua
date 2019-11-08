@@ -6,7 +6,7 @@ local config     = require 'config'
 local glob       = require 'glob'
 local platform   = require 'bee.platform'
 local await      = require 'await'
-local diagnostic = require 'service.diagnostic'
+local diagnostic = require 'provider.diagnostic'
 
 local m = {}
 m.type = 'workspace'

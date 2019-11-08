@@ -74,7 +74,7 @@ function m.setText(uri, text)
     file.globals = nil
     searcher.refreshCache()
 
-    local diagnostic = require 'service.diagnostic'
+    local diagnostic = require 'provider.diagnostic'
     diagnostic.refresh(originUri)
 end
 

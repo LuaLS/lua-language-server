@@ -167,6 +167,7 @@ function m.refresh(uri)
         if myVersion ~= m.version then
             return
         end
+        local clock = os.clock()
         if uri then
             m.doDiagnostic(uri)
         end
@@ -179,6 +180,8 @@ function m.refresh(uri)
                 end
             end
         end
+        local passed = os.clock() - clock
+        log.info(('Finish diagnostics, takes [%.3f] sec.'):format(passed))
     end)
 end
 

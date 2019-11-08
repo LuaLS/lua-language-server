@@ -18,6 +18,10 @@ function m.init(name, uri)
     m.name = name
     m.uri  = uri
     m.path = furi.decode(uri)
+    log.info('Workspace inited: ', uri)
+    local logPath = ROOT / 'log' / (uri:gsub('[/:]+', '_') .. '.log')
+    log.info('Log path: ', logPath)
+    log.init(ROOT, logPath)
 end
 
 --- 创建排除文件匹配器

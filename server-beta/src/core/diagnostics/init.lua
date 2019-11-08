@@ -1,6 +1,7 @@
 local files  = require 'files'
 local define = require 'proto.define'
 local config = require 'config'
+local await  = require 'await'
 
 local function check(uri, name, level, results)
     if config.config.diagnostics.disable[name] then
@@ -8,11 +9,17 @@ local function check(uri, name, level, results)
     end
     level = config.config.diagnostics.severity[name] or level
     local severity = define.DiagnosticSeverity[level]
+    local clock = os.clock()
     require('core.diagnostics.' .. name)(uri, function (result)
         result.level = severity or result.level
         result.code  = name
         results[#results+1] = result
     end, name)
+    local passed = os.clock() - clock
+    if passed >= 0.1 then
+        log.warn(('Diagnostics [%s] @ [%s] takes [%.3f] sec!'):format(name, uri, passed))
+        await.delay()
+    end
 end
 
 return function (uri)

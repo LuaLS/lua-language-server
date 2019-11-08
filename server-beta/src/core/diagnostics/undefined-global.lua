@@ -44,14 +44,14 @@ return function (uri, callback)
         end
         if info.mode == 'get' and not hasSet[source] then
             local message
-            local otherVersion  = library.other[key]
-            local customVersion = library.custom[key]
+            local otherVersion  = library.other[skey]
+            local customVersion = library.custom[skey]
             if otherVersion then
                 message = ('%s(%s)'):format(message, lang.script('DIAG_DEFINED_VERSION', table.concat(otherVersion, '/'), config.config.runtime.version))
             elseif customVersion then
                 message = ('%s(%s)'):format(message, lang.script('DIAG_DEFINED_CUSTOM', table.concat(customVersion, '/')))
             else
-                message = lang.script('DIAG_UNDEF_GLOBAL', info.key)
+                message = lang.script('DIAG_UNDEF_GLOBAL', skey)
             end
             callback {
                 start   = source.start,

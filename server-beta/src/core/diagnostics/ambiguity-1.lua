@@ -57,7 +57,6 @@ return function (uri, callback)
                 and second.type ~= 'unary'
                 and not first.op
                 and literalMap[second[1].type]
-                and not literalMap[second[2].type]
             then
                 callback {
                     start   = source.start,

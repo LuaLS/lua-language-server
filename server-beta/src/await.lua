@@ -1,8 +1,8 @@
 local timer  = require 'timer'
 
----@class task
+---@class await
 local m = {}
-m.type = 'task'
+m.type = 'await'
 
 m.coTracker = setmetatable({}, { __mode = 'k' })
 

@@ -1,6 +1,6 @@
 local thread  = require 'bee.thread'
 local utility = require 'utility'
-local task    = require 'task'
+local await   = require 'await'
 local timer   = require 'timer'
 
 local errLog  = thread.channel 'errlog'
@@ -113,7 +113,7 @@ function m.task(name, params)
     for _, brave in ipairs(m.braves) do
         if m.isIdle(brave) then
             if m.pushTask(brave, info) then
-                return task.wait(function (waker)
+                return await.wait(function (waker)
                     info.callback = waker
                 end)
             else
@@ -126,7 +126,7 @@ function m.task(name, params)
     -- 交给该勇者
     m.taskQueue[#m.taskQueue+1] = info
     log.info(('Add task %q(%d) in queue, length %d.'):format(name, info.id, #m.taskQueue))
-    return task.wait(function (waker)
+    return await.wait(function (waker)
         info.callback = waker
     end)
 end

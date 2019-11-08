@@ -1,6 +1,6 @@
 local pub        = require 'pub'
 local thread     = require 'bee.thread'
-local task       = require 'task'
+local await      = require 'await'
 local timer      = require 'timer'
 local proto      = require 'proto'
 
@@ -33,7 +33,7 @@ function m.reportTask()
     local normal    = 0
     local dead      = 0
 
-    for co in pairs(task.coTracker) do
+    for co in pairs(await.coTracker) do
         total = total + 1
         local status = coroutine.status(co)
         if status == 'running' then
@@ -72,18 +72,14 @@ function m.report()
 end
 
 function m.startTimer()
-    local last = os.clock()
     while true do
         thread.sleep(0.001)
-        local current = os.clock()
-        local delta = current - last
-        last = current
-        timer.update(delta)
+        timer.update()
     end
 end
 
 function m.start()
-    task.setErrorHandle(log.error)
+    await.setErrorHandle(log.error)
     pub.recruitBraves(4)
     proto.listen()
     pub.listen()

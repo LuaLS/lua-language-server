@@ -1,6 +1,7 @@
 local setmetatable = setmetatable
 local mathMax      = math.max
 local mathFloor    = math.floor
+local osClock      = os.clock
 
 _ENV = nil
 
@@ -199,7 +200,11 @@ function m.clock()
     return curFrame / 1000.0
 end
 
-function m.update(delta)
+local lastClock = osClock()
+function m.update()
+    local currentClock = osClock()
+    local delta = currentClock - lastClock
+    lastClock = currentClock
     if curIndex ~= 0 then
         curFrame = curFrame - 1
     end

@@ -1,6 +1,6 @@
 local util      = require 'utility'
 local cap       = require 'proto.capability'
-local task      = require 'task'
+local await     = require 'await'
 local files     = require 'files'
 local proto     = require 'proto.proto'
 local define    = require 'proto.define'
@@ -89,7 +89,7 @@ proto.on('initialized', function (params)
             }
         }
     })
-    task.create(function ()
+    await.create(function ()
         workspace.preload()
     end)
     return true
@@ -134,7 +134,9 @@ proto.on('textDocument/didChange', function (params)
     local change = params.contentChanges
     local uri    = doc.uri
     local text   = change[1].text
-    files.setText(uri, text)
+    if files.isLua(uri) or files.isOpen(uri) then
+        files.setText(uri, text)
+    end
 end)
 
 proto.on('textDocument/hover', function ()

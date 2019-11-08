@@ -1,10 +1,10 @@
-local platform = require 'bee.platform'
-local config   = require 'config'
-local glob     = require 'glob'
-local furi     = require 'file-uri'
-local parser   = require 'parser'
-local searcher = require 'searcher.searcher'
-local guide    = require 'parser.guide'
+local platform   = require 'bee.platform'
+local config     = require 'config'
+local glob       = require 'glob'
+local furi       = require 'file-uri'
+local parser     = require 'parser'
+local searcher   = require 'searcher.searcher'
+local guide      = require 'parser.guide'
 
 local m = {}
 
@@ -29,6 +29,16 @@ function m.close(uri)
         uri = uri:lower()
     end
     m.openMap[uri] = nil
+end
+
+--- 是否打开
+---@param uri string
+---@return boolean
+function m.isOpen(uri)
+    if platform.OS == 'Windows' then
+        uri = uri:lower()
+    end
+    return m.openMap[uri] == true
 end
 
 --- 是否存在
@@ -63,6 +73,9 @@ function m.setText(uri, text)
     file.ast = nil
     file.globals = nil
     searcher.refreshCache()
+
+    local diagnostic = require 'service.diagnostic'
+    diagnostic.refresh(originUri)
 end
 
 --- 监听编译完成

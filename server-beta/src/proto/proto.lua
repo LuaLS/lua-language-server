@@ -1,6 +1,6 @@
 local subprocess = require 'bee.subprocess'
 local util       = require 'utility'
-local task       = require 'task'
+local await      = require 'await'
 local pub        = require 'pub'
 local jsonrpc    = require 'jsonrpc'
 local ErrorCodes = require 'define.ErrorCodes'
@@ -60,7 +60,7 @@ function m.request(name, params)
         params = params,
     }
     io.stdout:write(buf)
-    return task.wait(function (waker)
+    return await.wait(function (waker)
         m.waiting[id] = waker
     end)
 end
@@ -77,7 +77,7 @@ function m.doMethod(proto)
         end
         return
     end
-    task.create(function ()
+    await.create(function ()
         local clock = os.clock()
         local ok, res = xpcall(abil, log.error, proto.params)
         local passed = os.clock() - clock

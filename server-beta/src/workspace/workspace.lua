@@ -5,7 +5,7 @@ local files    = require 'files'
 local config   = require 'config'
 local glob     = require 'glob'
 local platform = require 'bee.platform'
-local task     = require 'task'
+local await    = require 'await'
 
 local m = {}
 m.type = 'workspace'
@@ -126,7 +126,7 @@ function m.preload()
         if read >= max then
             break
         end
-        task.sleep(0.1)
+        await.sleep(0.1)
     end
 
     log.info('Preload finish.')

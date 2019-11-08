@@ -7,8 +7,9 @@ local function check(uri, name, level, results)
         return
     end
     level = config.config.diagnostics.severity[name] or level
+    local severity = define.DiagnosticSeverity[level]
     require('core.diagnostics.' .. name)(uri, function (result)
-        result.level = level or result.level
+        result.level = severity or result.level
         result.code  = name
         results[#results+1] = result
     end, name)

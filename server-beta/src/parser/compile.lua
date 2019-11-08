@@ -254,7 +254,7 @@ local vmMap = {
                     type   = 'REDEFINED_LABEL',
                     start  = obj.start,
                     finish = obj.finish,
-                    relative = {
+                    related = {
                         {
                             message = 'REDEFINED_LABEL',
                             start   = label.start,
@@ -460,7 +460,7 @@ local function compileGoTo(obj)
                     info   = {
                         loc = loc[1],
                     },
-                    relative = {
+                    related = {
                         {
                             message = 'JUMPED_LABEL',
                             start   = label.start,

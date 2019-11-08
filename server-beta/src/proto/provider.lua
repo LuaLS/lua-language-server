@@ -167,9 +167,9 @@ proto.on('textDocument/definition', function (params)
         local targetLines = files.getLines(targetUri)
         local targetText  = files.getText(targetUri)
         response[i] = define.locationLink(targetUri
-            , define.range(targetLines, targetText, info.target.start - 1, info.target.finish)
-            , define.range(targetLines, targetText, info.target.start - 1, info.target.finish)
-            , define.range(lines,       text,       info.source.start - 1, info.source.finish)
+            , define.range(targetLines, targetText, info.target.start, info.target.finish)
+            , define.range(targetLines, targetText, info.target.start, info.target.finish)
+            , define.range(lines,       text,       info.source.start, info.source.finish)
         )
     end
     return response

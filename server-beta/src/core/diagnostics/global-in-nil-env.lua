@@ -50,7 +50,7 @@ return function (uri, callback)
                     finish  = source.finish,
                     uri     = uri,
                     message = lang.script.DIAG_GLOBAL_IN_NIL_ENV,
-                    relative = {
+                    related = {
                         {
                             start  = ok.start,
                             finish = ok.finish,

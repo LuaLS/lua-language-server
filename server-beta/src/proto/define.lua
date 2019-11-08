@@ -30,7 +30,7 @@ function m.position(lines, text, offset)
     }
 end
 
---- 将2个光标位置转化为 range
+--- 将起点与终点位置转化为 range
 ---@alias range table
 ---@param lines table
 ---@param text string
@@ -38,7 +38,7 @@ end
 ---@param offset2 integer
 function m.range(lines, text, offset1, offset2)
     return {
-        start   = m.position(lines, text, offset1),
+        start   = m.position(lines, text, offset1-1),
         ['end'] = m.position(lines, text, offset2),
     }
 end

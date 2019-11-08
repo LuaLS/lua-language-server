@@ -115,6 +115,9 @@ function m.remove(uri)
     end
     m.fileMap[uri] = nil
     searcher.refreshCache()
+
+    local diagnostic = require 'service.diagnostic'
+    diagnostic.refresh()
 end
 
 --- 移除所有文件

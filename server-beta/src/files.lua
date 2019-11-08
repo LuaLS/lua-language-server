@@ -113,11 +113,15 @@ function m.remove(uri)
     if platform.OS == 'Windows' then
         uri = uri:lower()
     end
+    local file = m.fileMap[uri]
+    if not file then
+        return
+    end
     m.fileMap[uri] = nil
     searcher.refreshCache()
 
     local diagnostic = require 'service.diagnostic'
-    diagnostic.refresh()
+    diagnostic.refresh(file.uri)
 end
 
 --- 移除所有文件

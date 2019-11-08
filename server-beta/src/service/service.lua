@@ -85,6 +85,8 @@ function m.start()
     pub.listen()
     m.report()
 
+    require 'provider'
+
     m.startTimer()
 end
 

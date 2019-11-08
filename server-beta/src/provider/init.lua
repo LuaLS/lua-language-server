@@ -1,5 +1,6 @@
 local util      = require 'utility'
-local cap       = require 'proto.capability'
+local cap       = require 'provider.capability'
+local completion= require 'provider.completion'
 local await     = require 'await'
 local files     = require 'files'
 local proto     = require 'proto.proto'
@@ -50,6 +51,12 @@ local function updateConfig()
     or not util.equal(oldOther.associations, newOther.associations)
     or not util.equal(oldOther.exclude, newOther.exclude)
     then
+    end
+
+    if newConfig.completion.enable then
+        completion.enable()
+    else
+        completion.disable()
     end
 end
 
@@ -171,4 +178,9 @@ proto.on('textDocument/definition', function (params)
         )
     end
     return response
+end)
+
+proto.on('textDocument/completion', function (params)
+    log.info(util.dump(params))
+    return nil
 end)

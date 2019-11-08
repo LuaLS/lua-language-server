@@ -86,9 +86,13 @@ local function buildDiagnostic(uri, diag)
     }
 end
 
-function m.doDiagnostic(uri)
+function m.doDiagnostic(uri, syntaxOnly)
     local ast = files.getAst(uri)
     if not ast then
+        proto.notify('textDocument/publishDiagnostics', {
+            uri = uri,
+            diagnostics = {},
+        })
         return
     end
 
@@ -98,7 +102,7 @@ function m.doDiagnostic(uri)
         diagnostics[#diagnostics+1] = buildSyntaxError(uri, err)
     end
 
-    if m._start then
+    if not syntaxOnly and m._start then
         local diags = core(uri)
         for _, diag in ipairs(diags) do
             diagnostics[#diagnostics+1] = buildDiagnostic(uri, diag)
@@ -109,14 +113,13 @@ function m.doDiagnostic(uri)
         uri = uri,
         diagnostics = diagnostics,
     })
-
 end
 
 function m.refresh(uri)
     m.version = m.version + 1
     local myVersion = m.version
     if uri then
-        m.doDiagnostic(files.getOriginUri(uri))
+        m.doDiagnostic(uri, true)
     end
     if not m._start then
         return

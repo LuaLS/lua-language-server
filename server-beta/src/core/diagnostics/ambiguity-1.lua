@@ -42,11 +42,12 @@ return function (uri, callback)
                 and first.type ~= 'unary'
                 and not second.op
                 and literalMap[second.type]
+                and not literalMap[first[2].type]
             then
                 callback {
                     start   = source.start,
                     finish  = source.finish,
-                    message = lang.script('DIAG_AMBIGUITY_1', text.sub(first.start, first.finish))
+                    message = lang.script('DIAG_AMBIGUITY_1', text:sub(first.start, first.finish))
                 }
             end
         end
@@ -56,11 +57,12 @@ return function (uri, callback)
                 and second.type ~= 'unary'
                 and not first.op
                 and literalMap[second[1].type]
+                and not literalMap[second[2].type]
             then
                 callback {
                     start   = source.start,
                     finish  = source.finish,
-                    message = lang.script('DIAG_AMBIGUITY_1', text.sub(second.start, second.finish))
+                    message = lang.script('DIAG_AMBIGUITY_1', text:sub(second.start, second.finish))
                 }
             end
         end

@@ -108,6 +108,7 @@ function m.refreshCache()
         eachRef     = {},
         eachField   = {},
         eachGlobal  = {},
+        isGlobal    = {},
         specialName = {},
         getLibrary  = {},
         specials    = nil,

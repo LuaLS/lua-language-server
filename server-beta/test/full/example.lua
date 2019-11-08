@@ -1,5 +1,7 @@
-local util = require 'utility'
+local util   = require 'utility'
 local parser = require 'parser'
+local files  = require 'files'
+local diag   = require 'core.diagnostics'
 
 -- 临时
 local function testIfExit(path)
@@ -25,7 +27,9 @@ local function testIfExit(path)
         local need
         local lines = parser:lines(buf)
         for i = 1, max do
-            --core.diagnostics(vm, lines, 'test')
+            files.removeAll()
+            files.setText('', buf)
+            diag('')
             local passed = os.clock() - clock
             if passed >= 1.0 or i == max then
                 need = passed / i

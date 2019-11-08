@@ -73,8 +73,11 @@ end
 
 function m.startTimer()
     while true do
-        thread.sleep(0.001)
-        timer.update()
+        pub.step()
+        if not await.step() then
+            thread.sleep(0.001)
+            timer.update()
+        end
     end
 end
 
@@ -82,7 +85,6 @@ function m.start()
     await.setErrorHandle(log.error)
     pub.recruitBraves(4)
     proto.listen()
-    pub.listen()
     m.report()
 
     require 'provider'

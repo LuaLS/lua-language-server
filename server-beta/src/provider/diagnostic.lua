@@ -173,7 +173,7 @@ function m.refresh(uri)
         for destUri in files.eachFile() do
             if destUri ~= uri then
                 m.doDiagnostic(files.getOriginUri(destUri))
-                await.sleep(0.001)
+                await.delay()
                 if myVersion ~= m.version then
                     return
                 end

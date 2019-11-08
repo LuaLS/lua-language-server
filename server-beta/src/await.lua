@@ -5,6 +5,8 @@ local m = {}
 m.type = 'await'
 
 m.coTracker = setmetatable({}, { __mode = 'k' })
+m.delayQueue = {}
+m.delayQueueIndex = 1
 
 --- 设置错误处理器
 ---@param errHandle function {comment = '当有错误发生时，会以错误堆栈为参数调用该函数'}
@@ -44,8 +46,8 @@ function m.sleep(time, ...)
 end
 
 --- 等待直到唤醒
----@param waker function
-function m.wait(waker, ...)
+---@param callback function
+function m.wait(callback, ...)
     local co, main = coroutine.running()
     if main then
         if m.errorHandle then
@@ -53,10 +55,40 @@ function m.wait(waker, ...)
         end
         return
     end
-    waker(function (...)
+    callback(function (...)
         return m.checkResult(co, coroutine.resume(co, ...))
     end)
     return coroutine.yield(...)
+end
+
+--- 延迟
+function m.delay(...)
+    local co, main = coroutine.running()
+    if main then
+        if m.errorHandle then
+            m.errorHandle(debug.traceback('Cant wait in main thread'))
+        end
+        return
+    end
+    m.delayQueue[#m.delayQueue+1] = function (...)
+        return m.checkResult(co, coroutine.resume(co, ...))
+    end
+    return coroutine.yield(...)
+end
+
+--- 步进
+function m.step()
+    local waker = m.delayQueue[m.delayQueueIndex]
+    if waker then
+        m.delayQueueIndex = m.delayQueueIndex + 1
+        waker()
+        return true
+    else
+        for i = 1, #m.delayQueue do
+            m.delayQueue[i] = nil
+        end
+        return false
+    end
 end
 
 return m

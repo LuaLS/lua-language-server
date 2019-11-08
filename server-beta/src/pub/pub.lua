@@ -226,11 +226,9 @@ function m.checkDead()
     end
 end
 
-function m.listen()
-    timer.loop(0.001, function ()
-        m.checkDead()
-        m.recieve()
-    end)
+function m.step()
+    m.checkDead()
+    m.recieve()
 end
 
 return m

@@ -17,41 +17,39 @@ return function (uri, callback)
     if not ast then
         return
     end
-    local lines = files.getLines(uri)
     local text  = files.getText(uri)
-
+    local lines = files.getLines(uri)
     for i = 1, #lines do
-        local start  = lines[i].start + 1
-        local finish = lines[i].finish - 1
-        local line = text:sub(start, finish)
-        if line:find '^[ \t]+[\r\n]*$' then
-            local offset = guide.offsetOf(lines, i-1, start-1)
-            if isInString(ast.ast, offset) then
-                goto NEXT_LINE
+        local start  = lines[i].start
+        local range  = lines[i].range
+        local lastChar = text:sub(range, range)
+        if lastChar ~= ' ' and lastChar ~= '\t' then
+            goto NEXT_LINE
+        end
+        if isInString(ast.ast, range) then
+            goto NEXT_LINE
+        end
+        local first = start
+        for n = range - 1, start, -1 do
+            local char = text:sub(n, n)
+            if char ~= ' ' and char ~= '\t' then
+                first = n + 1
+                break
             end
+        end
+        if first == start then
             callback {
-                start   = start,
-                finish  = finish,
+                start   = first,
+                finish  = range,
                 message = lang.script.DIAG_LINE_ONLY_SPACE,
             }
-            goto NEXT_LINE
-        end
-
-        local pos = line:find '[ \t]+[\r\n]*$'
-        if pos then
-            start = start + pos - 1
-            local offset = guide.offsetOf(lines, i-1, start-1)
-            if isInString(ast.ast, offset) then
-                goto NEXT_LINE
-            end
+        else
             callback {
-                start   = start,
-                finish  = finish,
+                start   = first,
+                finish  = range,
                 message = lang.script.DIAG_LINE_POST_SPACE,
             }
-            goto NEXT_LINE
         end
-
         ::NEXT_LINE::
     end
 end

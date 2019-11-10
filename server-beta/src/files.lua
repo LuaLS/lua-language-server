@@ -213,6 +213,27 @@ function m.getGlobals(uri)
     return file.globals
 end
 
+--- 寻找全局变量
+function m.findGlobals(name)
+    local uris = {}
+    for uri, file in pairs(m.fileMap) do
+        if not file.globals then
+            local ast = m.getAst(uri)
+            if ast then
+                file.globals = {}
+                local globals = searcher.getGlobals(ast.ast)
+                for name in pairs(globals) do
+                    file.globals[name] = true
+                end
+            end
+        end
+        if file.globals[name] then
+            uris[#uris+1] = file.uri
+        end
+    end
+    return uris
+end
+
 --- 判断文件名相等
 function m.eq(a, b)
     if platform.OS == 'Windows' then

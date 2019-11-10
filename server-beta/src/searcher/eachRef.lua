@@ -234,17 +234,15 @@ local function ofGlobal(source, callback)
     local key = guide.getKeyName(source)
     local node = source.node
     if node.tag == '_ENV' then
-        for uri in files.eachFile() do
-            local globals = files.getGlobals(uri)
+        local uris = files.findGlobals(key)
+        for _, uri in ipairs(uris) do
             local ast = files.getAst(uri)
-            if ast and globals and globals[key] then
-                globals = searcher.getGlobals(ast.ast)
-                if globals[key] then
-                    for _, info in ipairs(globals[key]) do
-                        callback(info)
-                        if info.value then
-                            ofValue(info.value, callback)
-                        end
+            local globals = searcher.getGlobals(ast.ast)
+            if globals[key] then
+                for _, info in ipairs(globals[key]) do
+                    callback(info)
+                    if info.value then
+                        ofValue(info.value, callback)
                     end
                 end
             end

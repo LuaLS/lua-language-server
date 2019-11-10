@@ -10,10 +10,15 @@ return function (uri, callback)
         return
     end
 
+    local globalCache = {}
+
     -- 遍历全局变量，检查所有没有 mode['set'] 的全局变量
     local globals = searcher.getGlobals(ast.ast)
     for key, infos in pairs(globals) do
         if infos.mode['set'] == true then
+            goto CONTINUE
+        end
+        if globalCache[key] then
             goto CONTINUE
         end
         local skey = key and key:match '^s|(.+)$'
@@ -26,6 +31,18 @@ return function (uri, callback)
         if config.config.diagnostics.globals[skey] then
             goto CONTINUE
         end
+        if globalCache[key] == nil then
+            local uris = files.findGlobals(key)
+            for i = 1, #uris do
+                local destAst = files.getAst(uris[i])
+                local destGlobals = searcher.getGlobals(destAst.ast)
+                if destGlobals[key] and destGlobals[key].mode['set'] then
+                    globalCache[key] = true
+                    goto CONTINUE
+                end
+            end
+        end
+        globalCache[key] = false
         local message
         local otherVersion  = library.other[skey]
         local customVersion = library.custom[skey]

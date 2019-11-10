@@ -7,8 +7,6 @@ local config = require 'config'
 local core   = require 'core.diagnostics'
 
 local m = {}
-
-m.version = 0
 m._start = false
 m.cache = {}
 
@@ -154,21 +152,14 @@ function m.doDiagnostic(uri, syntaxOnly)
 end
 
 function m.refresh(uri)
-    m.version = m.version + 1
-    local myVersion = m.version
     await.create(function ()
-        await.delay()
-        if myVersion ~= m.version then
-            return
-        end
+        await.delay(function ()
+            return files.globalVersion
+        end)
         if uri then
             m.doDiagnostic(uri, true)
         end
         if not m._start then
-            return
-        end
-        await.sleep(0.2)
-        if myVersion ~= m.version then
             return
         end
         local clock = os.clock()
@@ -178,10 +169,9 @@ function m.refresh(uri)
         for destUri in files.eachFile() do
             if destUri ~= uri then
                 m.doDiagnostic(files.getOriginUri(destUri))
-                await.delay()
-                if myVersion ~= m.version then
-                    return
-                end
+                await.delay(function ()
+                    return files.globalVersion
+                end)
             end
         end
         local passed = os.clock() - clock

@@ -12,6 +12,7 @@ m.openMap = {}
 m.fileMap = {}
 m.assocVersion = -1
 m.assocMatcher = nil
+m.globalVersion = 0
 
 --- 打开文件
 ---@param uri string
@@ -72,6 +73,7 @@ function m.setText(uri, text)
     file.lines = nil
     file.ast = nil
     file.globals = nil
+    m.globalVersion = m.globalVersion + 1
     searcher.refreshCache()
 
     local diagnostic = require 'provider.diagnostic'
@@ -118,6 +120,8 @@ function m.remove(uri)
         return
     end
     m.fileMap[uri] = nil
+
+    m.globalVersion = m.globalVersion + 1
     searcher.refreshCache()
 
     local diagnostic = require 'service.diagnostic'
@@ -129,6 +133,7 @@ function m.removeAll()
     for uri in pairs(m.fileMap) do
         m.fileMap[uri] = nil
     end
+    m.globalVersion = m.globalVersion + 1
     searcher.refreshCache()
 end
 

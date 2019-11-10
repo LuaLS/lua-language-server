@@ -3,7 +3,7 @@ local guide    = require 'parser.guide'
 local searcher = require 'searcher'
 local lang     = require 'language'
 local define   = require 'proto.define'
-local library  = require 'library'
+local await    = require 'await'
 
 local function countLibraryArgs(source)
     local func = searcher.getLibrary(source)
@@ -59,6 +59,10 @@ return function (uri, callback)
         if callArgs == 0 then
             return
         end
+
+        await.delay(function ()
+            return files.globalVersion
+        end)
 
         local func = source.node
         local funcArgs

@@ -62,7 +62,7 @@ function m.wait(callback, ...)
 end
 
 --- 延迟
-function m.delay(...)
+function m.delay(getVersion)
     local co, main = coroutine.running()
     if main then
         if m.errorHandle then
@@ -70,16 +70,22 @@ function m.delay(...)
         end
         return
     end
-    m.delayQueue[#m.delayQueue+1] = function (...)
-        return m.checkResult(co, coroutine.resume(co, ...))
+    local version = getVersion and getVersion()
+    m.delayQueue[#m.delayQueue+1] = function ()
+        if version == (getVersion and getVersion()) then
+            return m.checkResult(co, coroutine.resume(co))
+        else
+            coroutine.close(co)
+        end
     end
-    return coroutine.yield(...)
+    return coroutine.yield()
 end
 
 --- 步进
 function m.step()
     local waker = m.delayQueue[m.delayQueueIndex]
     if waker then
+        m.delayQueue[m.delayQueueIndex] = false
         m.delayQueueIndex = m.delayQueueIndex + 1
         waker()
         return true

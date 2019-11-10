@@ -1,8 +1,9 @@
 local files    = require 'files'
 local guide    = require 'parser.guide'
 local searcher = require 'searcher'
-local define = require 'proto.define'
-local lang   = require 'language'
+local define   = require 'proto.define'
+local lang     = require 'language'
+local await    = require 'await'
 
 return function (uri, callback)
     local ast = files.getAst(uri)
@@ -27,5 +28,8 @@ return function (uri, callback)
                 message = lang.script.DIAG_UNUSED_FUNCTION,
             }
         end
+        await.delay(function ()
+            return files.globalVersion
+        end)
     end)
 end

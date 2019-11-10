@@ -23,7 +23,13 @@ end
 function m.position(lines, text, offset)
     local row, col = guide.positionOf(lines, offset)
     local start    = guide.lineRange(lines, row)
+    if start < 1 then
+        start = 1
+    end
     local ucol     = utf8.len(text, start, start + col - 1, true)
+    if row < 1 then
+        row = 1
+    end
     return {
         line      = row - 1,
         character = ucol,

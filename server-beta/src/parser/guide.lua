@@ -361,7 +361,7 @@ end
 ---@return integer {name = 'col'}
 function m.positionOf(lines, offset)
     if offset < 1 then
-        return 1, 1
+        return 0, 0
     end
     local lastLine = lines[#lines]
     if offset > lastLine.finish then
@@ -394,7 +394,7 @@ end
 ---@return integer {name = 'offset'}
 function m.offsetOf(lines, row, col)
     if row < 1 then
-        return 1
+        return 0
     end
     if row > #lines then
         local lastLine = lines[#lines]
@@ -422,7 +422,7 @@ end
 function m.lineRange(lines, row)
     local line = lines[row]
     if not line then
-        return 1, 1
+        return 0, 0
     end
     return line.start, line.finish
 end

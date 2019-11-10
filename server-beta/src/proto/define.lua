@@ -43,10 +43,12 @@ end
 ---@param offset1 integer
 ---@param offset2 integer
 function m.range(lines, text, offset1, offset2)
-    return {
-        start   = m.position(lines, text, offset1-1),
+    local range = {
+        start   = m.position(lines, text, offset1),
         ['end'] = m.position(lines, text, offset2),
     }
+    range.start.character = range.start.character - 1
+    return range
 end
 
 ---@alias location table

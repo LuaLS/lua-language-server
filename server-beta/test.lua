@@ -38,7 +38,7 @@ local function main()
 
     test 'definition'
     test 'diagnostics'
-    test 'references'
+    --test 'references'
     --test 'highlight'
     --test 'rename'
     --test 'type_inference'

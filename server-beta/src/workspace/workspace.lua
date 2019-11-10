@@ -146,13 +146,20 @@ function m.findUrisByFilePath(path, whole)
     for uri in files.eachFile() do
         local pathLen = #path
         local uriLen  = #uri
-        for i = uriLen, uriLen - pathLen + 1, -1 do
-            local see = uri:sub(i - pathLen + 1, i)
-            if files.eq(see, path) then
-                results[#results+1] = uri
+        if whole then
+            local seg = uri:sub(uriLen - pathLen, uriLen - pathLen)
+            if seg == '/' or seg == '\\' or seg == '' then
+                local see = uri:sub(uriLen - pathLen + 1, uriLen)
+                if files.eq(see, path) then
+                    results[#results+1] = uri
+                end
             end
-            if not whole then
-                break
+        else
+            for i = uriLen, uriLen - pathLen + 1, -1 do
+                local see = uri:sub(i - pathLen + 1, i)
+                if files.eq(see, path) then
+                    results[#results+1] = uri
+                end
             end
         end
     end

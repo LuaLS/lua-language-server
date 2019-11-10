@@ -42,7 +42,7 @@ function m.reportMemory()
 
     local lines = {}
     lines[#lines+1] = '    --------------- Memory ---------------'
-    lines[#lines+1] = ('        Total: %.3 MB'):format(totalMem / 1000.0)
+    lines[#lines+1] = ('        Total: %.3f MB'):format(totalMem / 1000.0)
     for i = 0, #mems do
         lines[#lines+1] = ('        # %02d : %.3f MB'):format(i, mems[i] / 1000.0)
     end
@@ -92,7 +92,7 @@ function m.reportCache()
     end
 
     local lines = {}
-    lines[#lines+1] = '    --------------- Coroutine ---------------'
+    lines[#lines+1] = '    --------------- Cache ---------------'
     lines[#lines+1] = ('        Total: %d'):format(total)
     lines[#lines+1] = ('        Dead:  %d'):format(dead)
     return table.concat(lines, '\n')

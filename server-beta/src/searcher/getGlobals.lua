@@ -13,6 +13,9 @@ local function getGlobals(source)
         end
         mark[src] = true
         local name = info.key
+        if not name then
+            return
+        end
         if not cache[name] then
             cache[name] = {
                 key  = name,

@@ -10,11 +10,10 @@ return function (uri, callback)
         return
     end
     guide.eachSourceType(ast.ast, 'function', function (source)
-        local hasGet
         local hasSet
-        searcher.eachRef(source, function (info)
+        local hasGet = searcher.eachRef(source, function (info)
             if     info.mode == 'get' then
-                hasGet = true
+                return true
             elseif info.mode == 'set'
             or     info.mode == 'declare' then
                 hasSet = true

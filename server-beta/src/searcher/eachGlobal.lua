@@ -21,6 +21,7 @@ local function eachGlobal(source, callback)
         end
         result[name][#result[name]+1] = info
         result[name].mode[info.mode] = true
+        searcher.cache.isGlobal[src] = true
     end)
     for _, info in pairs(result) do
         callback(info)

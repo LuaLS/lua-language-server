@@ -36,8 +36,8 @@ local function main()
         print(('测试[%s]用时[%.3f]'):format(name, os.clock() - clock))
     end
 
-    test 'definition'
-    test 'diagnostics'
+    --test 'definition'
+    --test 'diagnostics'
     --test 'references'
     --test 'highlight'
     --test 'rename'
@@ -47,7 +47,7 @@ local function main()
     --test 'completion'
     --test 'signature'
     --test 'document_symbol'
-    test 'crossfile'
+    --test 'crossfile'
     test 'full'
     test 'other'
 

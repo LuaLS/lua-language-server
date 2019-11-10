@@ -87,6 +87,7 @@ function m.step()
         for i = 1, #m.delayQueue do
             m.delayQueue[i] = nil
         end
+        m.delayQueueIndex = 1
         return false
     end
 end

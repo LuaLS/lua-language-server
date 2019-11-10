@@ -8,7 +8,7 @@ local m = {}
 ---@param position position
 ---@return integer
 function m.offset(lines, text, position)
-    local row    = position.line
+    local row    = position.line + 1
     local start  = guide.lineRange(lines, row)
     local offset = utf8.offset(text, position.character + 1, start)
     return offset
@@ -23,9 +23,9 @@ end
 function m.position(lines, text, offset)
     local row, col = guide.positionOf(lines, offset)
     local start    = guide.lineRange(lines, row)
-    local ucol     = utf8.len(text, start + 1, start + col, true)
+    local ucol     = utf8.len(text, start, start + col - 1, true)
     return {
-        line      = row,
+        line      = row - 1,
         character = ucol,
     }
 end

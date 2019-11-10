@@ -355,24 +355,24 @@ function m.eachSource(ast, callback)
     end
 end
 
---- 获取偏移对应的坐标（row从0开始，col为光标位置）
+--- 获取偏移对应的坐标
 ---@param lines table
 ---@return integer {name = 'row'}
 ---@return integer {name = 'col'}
 function m.positionOf(lines, offset)
     if offset < 1 then
-        return 0, 0
+        return 1, 1
     end
     local lastLine = lines[#lines]
     if offset > lastLine.finish then
-        return #lines - 1, lastLine.finish - lastLine.start
+        return #lines, lastLine.finish - lastLine.start + 1
     end
     local min = 1
     local max = #lines
     for _ = 1, 100 do
         if max <= min then
             local line = lines[min]
-            return min - 1, offset - line.start
+            return min, offset - line.start + 1
         end
         local row = (max - min) // 2 + min
         local line = lines[row]
@@ -381,50 +381,50 @@ function m.positionOf(lines, offset)
         elseif offset >= line.finish then
             min = row + 1
         else
-            return row - 1, offset - line.start
+            return row, offset - line.start + 1
         end
     end
     error('Stack overflow!')
 end
 
---- 获取坐标对应的偏移（row从0开始，col为光标位置）
+--- 获取坐标对应的偏移
 ---@param lines table
 ---@param row integer
 ---@param col integer
 ---@return integer {name = 'offset'}
 function m.offsetOf(lines, row, col)
-    if row < 0 then
-        return 0
+    if row < 1 then
+        return 1
     end
-    if row > #lines - 1 then
+    if row > #lines then
         local lastLine = lines[#lines]
         return lastLine.finish
     end
-    local line = lines[row + 1]
-    local len = line.finish - line.start
+    local line = lines[row]
+    local len = line.finish - line.start + 1
     if col < 0 then
         return line.start
     elseif col > len then
         return line.finish
     else
-        return line.start + col
+        return line.start + col - 1
     end
 end
 
 function m.lineContent(lines, text, row)
-    local line = lines[row + 1]
+    local line = lines[row]
     if not line then
         return ''
     end
-    return text:sub(line.start + 1, line.finish)
+    return text:sub(line.start, line.finish)
 end
 
 function m.lineRange(lines, row)
-    local line = lines[row + 1]
+    local line = lines[row]
     if not line then
-        return 0, 0
+        return 1, 1
     end
-    return line.start + 1, line.finish
+    return line.start, line.finish
 end
 
 function m.getKeyName(obj)

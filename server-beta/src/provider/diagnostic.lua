@@ -156,13 +156,17 @@ end
 function m.refresh(uri)
     m.version = m.version + 1
     local myVersion = m.version
-    if uri then
-        m.doDiagnostic(uri, true)
-    end
-    if not m._start then
-        return
-    end
     await.create(function ()
+        await.delay()
+        if myVersion ~= m.version then
+            return
+        end
+        if uri then
+            m.doDiagnostic(uri, true)
+        end
+        if not m._start then
+            return
+        end
         await.sleep(0.2)
         if myVersion ~= m.version then
             return

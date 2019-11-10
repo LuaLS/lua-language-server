@@ -1,6 +1,5 @@
-local core = require 'core'
-local parser  = require 'parser'
-local buildVM = require 'vm'
+local core = require 'core.reference'
+local files = require 'files'
 
 local function catch_target(script)
     local list = {}
@@ -33,18 +32,20 @@ local function founded(targets, results)
 end
 
 function TEST(script)
+    files.removeAll()
     local target = catch_target(script)
     local start  = script:find('<?', 1, true)
     local finish = script:find('?>', 1, true)
     local pos = (start + finish) // 2 + 1
     local new_script = script:gsub('<[!?]', '  '):gsub('[!?]>', '  ')
-    local ast = parser:parse(new_script, 'lua', 'Lua 5.3')
-    assert(ast)
-    local vm = buildVM(ast)
-    assert(vm)
+    files.setText('', new_script)
 
-    local positions = core.definition(vm, pos, 'reference')
-    if positions then
+    local results = core('', pos)
+    if results then
+        local positions = {}
+        for i, result in ipairs(results) do
+            positions[i] = { result.target.start, result.target.finish }
+        end
         assert(founded(target, positions))
     else
         assert(#target == 0)
@@ -101,14 +102,14 @@ function table.<?dump?>()
 end
 ]]
 
-TEST [[
----@class <!Class!>
----@type <?Class?>
----@type <!Class!>
-]]
-
-TEST [[
----@class <?Class?>
----@type <!Class!>
----@type <!Class!>
-]]
+--TEST [[
+-----@class <!Class!>
+-----@type <?Class?>
+-----@type <!Class!>
+--]]
+--
+--TEST [[
+-----@class <?Class?>
+-----@type <!Class!>
+-----@type <!Class!>
+--]]

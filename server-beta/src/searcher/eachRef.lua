@@ -75,10 +75,17 @@ local function ofValue(value, callback)
         return
     end
 
-    callback {
-        source   = value,
-        mode     = 'value',
-    }
+    if value.type == 'table'
+    or value.type == 'string'
+    or value.type == 'number'
+    or value.type == 'boolean'
+    or value.type == 'nil'
+    or value.type == 'function' then
+        callback {
+            source   = value,
+            mode     = 'value',
+        }
+    end
 
     searcher.eachRef(value, callback)
 

@@ -107,7 +107,7 @@ function m.refreshCache()
     m.cache = {
         eachRef     = {},
         eachField   = {},
-        eachGlobal  = {},
+        getGlobals  = {},
         isGlobal    = {},
         specialName = {},
         getLibrary  = {},
@@ -116,7 +116,7 @@ function m.refreshCache()
     m.locked = {
         eachRef    = {},
         eachField  = {},
-        eachGlobal = {},
+        getGlobals = {},
         getLibrary = {},
     }
 end

@@ -11,20 +11,20 @@ return function (uri, callback)
     end
 
     -- 遍历全局变量，检查所有没有 mode['set'] 的全局变量
-    searcher.eachGlobal(ast.ast, function (infos)
+    local globals = searcher.getGlobals(ast.ast)
+    for key, infos in pairs(globals) do
         if infos.mode['set'] == true then
-            return
+            goto CONTINUE
         end
-        local key = infos.key
         local skey = key and key:match '^s|(.+)$'
         if not skey then
-            return
+            goto CONTINUE
         end
         if library.global[skey] then
-            return
+            goto CONTINUE
         end
         if config.config.diagnostics.globals[skey] then
-            return
+            goto CONTINUE
         end
         local message
         local otherVersion  = library.other[skey]
@@ -43,5 +43,6 @@ return function (uri, callback)
                 message = message,
             }
         end
-    end)
+        ::CONTINUE::
+    end
 end

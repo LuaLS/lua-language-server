@@ -206,10 +206,10 @@ function m.getGlobals(uri)
         return nil
     end
     file.globals = {}
-    searcher.eachGlobal(ast.ast, function (info)
-        local name   = info.key
+    local globals = searcher.getGlobals(ast.ast)
+    for name in pairs(globals) do
         file.globals[name] = true
-    end)
+    end
     return file.globals
 end
 

@@ -238,17 +238,15 @@ local function ofGlobal(source, callback)
             local globals = files.getGlobals(uri)
             local ast = files.getAst(uri)
             if ast and globals and globals[key] then
-                searcher.eachGlobal(ast.ast, function (infos)
-                    if key == infos.key then
-                        for _, info in ipairs(infos) do
-                            callback(info)
-                            if info.value then
-                                ofValue(info.value, callback)
-                            end
+                globals = searcher.getGlobals(ast.ast)
+                if globals[key] then
+                    for _, info in ipairs(globals[key]) do
+                        callback(info)
+                        if info.value then
+                            ofValue(info.value, callback)
                         end
-                        return true
                     end
-                end)
+                end
             end
         end
     else

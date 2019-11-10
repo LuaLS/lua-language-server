@@ -208,9 +208,7 @@ function m.getGlobals(uri)
     file.globals = {}
     searcher.eachGlobal(ast.ast, function (info)
         local name   = info.key
-        if name then
-            file.globals[name] = true
-        end
+        file.globals[name] = true
     end)
     return file.globals
 end

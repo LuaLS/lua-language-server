@@ -181,6 +181,6 @@ proto.on('textDocument/definition', function (params)
 end)
 
 proto.on('textDocument/completion', function (params)
-    log.info(util.dump(params))
+    --log.info(util.dump(params))
     return nil
 end)

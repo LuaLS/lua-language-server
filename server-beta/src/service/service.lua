@@ -3,23 +3,46 @@ local thread     = require 'bee.thread'
 local await      = require 'await'
 local timer      = require 'timer'
 local proto      = require 'proto'
+local searcher   = require 'searcher'
 
 local m = {}
 m.type = 'service'
 
-function m.reportMemory()
+local function countMemory()
     local mems = {}
-    local totalMem = 0
+    local total  = 0
     mems[0] = collectgarbage 'count'
-    totalMem = totalMem + collectgarbage 'count'
+    total = total + collectgarbage 'count'
     for id, brave in ipairs(pub.braves) do
         mems[id] = brave.memory
-        totalMem = totalMem + brave.memory
+        total = total + brave.memory
     end
+    return total, mems
+end
+
+function m.reportMemoryCollect()
+    local totalMemBefore = countMemory()
+    local clock = os.clock()
+    collectgarbage()
+    local passed = os.clock() - clock
+    local totalMemAfter, mems  = countMemory()
 
     local lines = {}
     lines[#lines+1] = '    --------------- Memory ---------------'
-    lines[#lines+1] = ('        Total: %.3f MB'):format(totalMem / 1000.0)
+    lines[#lines+1] = ('        Total: %.3f(%.3f) MB'):format(totalMemAfter / 1000.0, totalMemBefore / 1000.0)
+    for i = 0, #mems do
+        lines[#lines+1] = ('        # %02d : %.3f MB'):format(i, mems[i] / 1000.0)
+    end
+    lines[#lines+1] = ('        Collect garbage takes [%.3f] sec'):format(passed)
+    return table.concat(lines, '\n')
+end
+
+function m.reportMemory()
+    local totalMem, mems = countMemory()
+
+    local lines = {}
+    lines[#lines+1] = '    --------------- Memory ---------------'
+    lines[#lines+1] = ('        Total: %.3 MB'):format(totalMem / 1000.0)
     for i = 0, #mems do
         lines[#lines+1] = ('        # %02d : %.3f MB'):format(i, mems[i] / 1000.0)
     end
@@ -57,6 +80,24 @@ function m.reportTask()
     return table.concat(lines, '\n')
 end
 
+function m.reportCache()
+    local total = 0
+    local dead  = 0
+
+    for cache in pairs(searcher.cacheTracker) do
+        total = total + 1
+        if cache.dead then
+            dead = dead + 1
+        end
+    end
+
+    local lines = {}
+    lines[#lines+1] = '    --------------- Coroutine ---------------'
+    lines[#lines+1] = ('        Total: %d'):format(total)
+    lines[#lines+1] = ('        Dead:  %d'):format(dead)
+    return table.concat(lines, '\n')
+end
+
 function m.report()
     local t = timer.loop(60.0, function ()
         local lines = {}
@@ -64,6 +105,7 @@ function m.report()
         lines[#lines+1] = '========= Medical Examination Report ========='
         lines[#lines+1] = m.reportMemory()
         lines[#lines+1] = m.reportTask()
+        lines[#lines+1] = m.reportCache()
         lines[#lines+1] = '=============================================='
 
         log.debug(table.concat(lines, '\n'))

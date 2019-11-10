@@ -102,8 +102,13 @@ function m.eachSpecial(callback)
     end
 end
 
+m.cacheTracker = setmetatable({}, { __mode = 'kv' })
+
 --- 刷新缓存
 function m.refreshCache()
+    if m.cache then
+        m.cache.dead = true
+    end
     m.cache = {
         eachRef     = {},
         eachField   = {},
@@ -119,6 +124,7 @@ function m.refreshCache()
         getGlobals = {},
         getLibrary = {},
     }
+    m.cacheTracker[m.cache] = true
 end
 
 return m

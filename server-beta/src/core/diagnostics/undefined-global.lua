@@ -18,10 +18,9 @@ return function (uri, callback)
         if hasSet[info.source] ~= nil then
             return
         end
-        local mark = false
-        searcher.eachRef(info.source, function (info)
+        local mark = searcher.eachRef(info.source, function (info)
             if info.mode == 'set' then
-                mark = true
+                return true
             end
         end)
         searcher.eachRef(info.source, function (info)

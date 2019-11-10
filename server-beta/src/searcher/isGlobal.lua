@@ -5,13 +5,12 @@ local function isGlobal(source)
     if not node then
         return false
     end
-    local global
-    searcher.eachRef(node, function (info)
+    local global = searcher.eachRef(node, function (info)
         if info.source.tag == '_ENV' then
-            global = true
+            return true
         end
     end)
-    return global
+    return global or false
 end
 
 function searcher.isGlobal(source)

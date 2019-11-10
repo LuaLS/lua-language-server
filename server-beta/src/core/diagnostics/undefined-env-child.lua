@@ -14,10 +14,9 @@ return function (uri, callback)
         if source.node.tag == '_ENV' then
             return
         end
-        local setInENV
-        searcher.eachRef(source, function (info)
+        local setInENV = searcher.eachRef(source, function (info)
             if info.mode == 'set' then
-                setInENV = true
+                return true
             end
         end)
         if setInENV then

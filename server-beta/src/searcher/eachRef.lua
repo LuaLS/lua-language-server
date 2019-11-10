@@ -368,7 +368,10 @@ function searcher.eachRef(source, callback)
     local cache = searcher.cache.eachRef[source]
     if cache then
         for i = 1, #cache do
-            callback(cache[i])
+            local res = callback(cache[i])
+            if res ~= nil then
+                return res
+            end
         end
         return
     end
@@ -393,6 +396,9 @@ function searcher.eachRef(source, callback)
         searcher.cache.eachRef[src] = cache
     end
     for i = 1, #cache do
-        callback(cache[i])
+        local res = callback(cache[i])
+        if res ~= nil then
+            return res
+        end
     end
 end

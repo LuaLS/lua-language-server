@@ -3,7 +3,15 @@ local workspace = require 'workspace'
 local files     = require 'files'
 local searcher  = require 'searcher'
 
-local function findDef(source, callback)
+local function isFunction(source, offset)
+    if source.type ~= 'function' then
+        return false
+    end
+    -- 必须点在 `function` 这个单词上才能查找函数引用
+    return offset >= source.start and offset < source.start + #'function'
+end
+
+local function findDef(source, offset, callback)
     if  source.type ~= 'local'
     and source.type ~= 'getlocal'
     and source.type ~= 'setlocal'
@@ -15,7 +23,8 @@ local function findDef(source, callback)
     and source.type ~= 'string'
     and source.type ~= 'number'
     and source.type ~= 'boolean'
-    and source.type ~= 'goto' then
+    and source.type ~= 'goto'
+    and not isFunction(source, offset) then
         return
     end
     searcher.eachRef(source, function (info)
@@ -41,6 +50,16 @@ local function findDef(source, callback)
                 callback(src, uri)
             end
         end
+        if info.mode == 'value' then
+            local src  = info.source
+            local root = guide.getRoot(src)
+            local uri  = root.uri
+            if     src.type == 'function' then
+                if src.parent.type == 'return' then
+                    callback(src, uri)
+                end
+            end
+        end
     end)
 end
 
@@ -51,7 +70,7 @@ return function (uri, offset)
     end
     local results = {}
     guide.eachSourceContain(ast.ast, offset, function (source)
-        findDef(source, function (target, uri)
+        findDef(source, offset, function (target, uri)
             results[#results+1] = {
                 target = target,
                 uri    = files.getOriginUri(uri),

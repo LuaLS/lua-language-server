@@ -23,6 +23,35 @@ local function ofCall(func, index, callback)
     end)
 end
 
+local function ofReturn(rtn, index, callback)
+    local func = guide.getParentFunction(rtn)
+    if not func then
+        return
+    end
+    -- 搜索函数调用的第 index 个接收值
+    searcher.eachRef(func, function (info)
+        local source = info.source
+        local call = source.parent
+        if not call or call.type ~= 'call' then
+            return
+        end
+        local slc = call.parent
+        if slc.index == index then
+            searcher.eachRef(slc.parent, callback)
+            return
+        end
+        if call.extParent then
+            for i = 1, #call.extParent do
+                slc = call.extParent[i]
+                if slc.index == index then
+                    searcher.eachRef(slc.parent, callback)
+                    return
+                end
+            end
+        end
+    end)
+end
+
 local function ofSpecialCall(call, func, index, callback)
     local name = searcher.getSpecialName(func)
     if name == 'setmetatable' then
@@ -98,6 +127,14 @@ local function ofValue(value, callback)
     or parent.type == 'setindex' then
         if parent.value == value then
             searcher.eachRef(parent, callback)
+        end
+    end
+    if parent.type == 'return' then
+        for i = 1, #parent do
+            if parent[i] == value then
+                ofReturn(parent, i, callback)
+                break
+            end
         end
     end
 end

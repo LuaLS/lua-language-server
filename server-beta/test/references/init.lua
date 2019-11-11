@@ -34,10 +34,10 @@ end
 function TEST(script)
     files.removeAll()
     local target = catch_target(script)
-    local start  = script:find('<?', 1, true)
-    local finish = script:find('?>', 1, true)
+    local start  = script:find('<[?~]')
+    local finish = script:find('[?~]>')
     local pos = (start + finish) // 2 + 1
-    local new_script = script:gsub('<[!?]', '  '):gsub('[!?]>', '  ')
+    local new_script = script:gsub('<[!?~]', '  '):gsub('[!?~]>', '  ')
     files.setText('', new_script)
 
     local results = core('', pos)
@@ -92,11 +92,20 @@ end
 
 TEST [[
 local function f()
-    return <?function ()
-    end?>
+    return <~<!function~> ()
+    end!>
 end
 
 local <!f2!> = f()
+]]
+
+TEST [[
+local function f()
+    return nil, <~<!function~> ()
+    end!>
+end
+
+local _, <!f2!> = f()
 ]]
 
 TEST [[

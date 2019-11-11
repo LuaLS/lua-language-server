@@ -706,7 +706,7 @@ local Defs = {
                 type   = 'binary',
                 op     = op,
                 start  = left.start,
-                finish = right.finish,
+                finish = right and right.finish or op.finish,
                 [1]    = left,
                 [2]    = right,
             }

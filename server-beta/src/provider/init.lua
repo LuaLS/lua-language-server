@@ -182,6 +182,31 @@ proto.on('textDocument/definition', function (params)
     return response
 end)
 
+proto.on('textDocument/references', function (params)
+    local core   = require 'core.reference'
+    local uri    = params.textDocument.uri
+    if not files.exists(uri) then
+        return nil
+    end
+    local lines  = files.getLines(uri)
+    local text   = files.getText(uri)
+    local offset = define.offset(lines, text, params.position)
+    local result = core(uri, offset)
+    if not result then
+        return nil
+    end
+    local response = {}
+    for i, info in ipairs(result) do
+        local targetUri = info.uri
+        local targetLines = files.getLines(targetUri)
+        local targetText  = files.getText(targetUri)
+        response[i] = define.location(targetUri
+            , define.range(targetLines, targetText, info.target.start, info.target.finish)
+        )
+    end
+    return response
+end)
+
 proto.on('textDocument/completion', function (params)
     --log.info(util.dump(params))
     return nil

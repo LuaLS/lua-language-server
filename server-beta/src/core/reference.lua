@@ -74,7 +74,6 @@ return function (uri, offset)
             results[#results+1] = {
                 target = target,
                 uri    = files.getOriginUri(uri),
-                source = source,
             }
         end)
     end)

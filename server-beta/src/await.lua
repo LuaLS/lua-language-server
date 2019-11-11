@@ -32,13 +32,13 @@ end
 --- 休眠一段时间
 ---@param time number
 function m.sleep(time, ...)
-    local co, main = coroutine.running()
-    if main then
+    if not coroutine.isyieldable() then
         if m.errorHandle then
-            m.errorHandle(debug.traceback('Cant sleep in main thread'))
+            m.errorHandle(debug.traceback('Cannot yield'))
         end
         return
     end
+    local co = coroutine.running()
     timer.wait(time, function ()
         return m.checkResult(co, coroutine.resume(co))
     end)
@@ -48,13 +48,10 @@ end
 --- 等待直到唤醒
 ---@param callback function
 function m.wait(callback, ...)
-    local co, main = coroutine.running()
-    if main then
-        if m.errorHandle then
-            m.errorHandle(debug.traceback('Cant wait in main thread'))
-        end
+    if not coroutine.isyieldable() then
         return
     end
+    local co = coroutine.running()
     callback(function (...)
         return m.checkResult(co, coroutine.resume(co, ...))
     end)
@@ -63,13 +60,10 @@ end
 
 --- 延迟
 function m.delay(getVersion)
-    local co, main = coroutine.running()
-    if main then
-        if m.errorHandle then
-            m.errorHandle(debug.traceback('Cant wait in main thread'))
-        end
+    if not coroutine.isyieldable() then
         return
     end
+    local co = coroutine.running()
     local version = getVersion and getVersion()
     m.delayQueue[#m.delayQueue+1] = function ()
         if version == (getVersion and getVersion()) then

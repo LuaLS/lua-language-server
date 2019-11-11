@@ -7,6 +7,7 @@ local proto     = require 'proto.proto'
 local define    = require 'proto.define'
 local workspace = require 'workspace'
 local config    = require 'config'
+local library   = require 'library'
 
 local function updateConfig()
     local configs = proto.awaitRequest('workspace/configuration', {
@@ -38,6 +39,7 @@ local function updateConfig()
     local newConfig = config.config
     local newOther  = config.other
     if not util.equal(oldConfig.runtime, newConfig.runtime) then
+        library.reload()
     end
     if not util.equal(oldConfig.diagnostics, newConfig.diagnostics) then
     end

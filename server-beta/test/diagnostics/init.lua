@@ -203,6 +203,13 @@ print()
 ]]
 
 TEST [[
+local x
+return x
+    : f(1)
+    : f(1)
+]]
+
+TEST [[
 return {
     <!print
     'string'!>

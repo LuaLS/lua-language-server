@@ -43,15 +43,13 @@ return function (uri, callback)
             end
         end
         globalCache[key] = false
-        local message
+        local message = lang.script('DIAG_UNDEF_GLOBAL', skey)
         local otherVersion  = library.other[skey]
         local customVersion = library.custom[skey]
         if otherVersion then
             message = ('%s(%s)'):format(message, lang.script('DIAG_DEFINED_VERSION', table.concat(otherVersion, '/'), config.config.runtime.version))
         elseif customVersion then
             message = ('%s(%s)'):format(message, lang.script('DIAG_DEFINED_CUSTOM', table.concat(customVersion, '/')))
-        else
-            message = lang.script('DIAG_UNDEF_GLOBAL', skey)
         end
         for _, info in ipairs(infos) do
             callback {

@@ -21,7 +21,7 @@ return function (uri, callback)
             return
         end
 
-        local nodeRow = guide.positionOf(lines, node.start)
+        local nodeRow = guide.positionOf(lines, node.finish)
         local argRow  = guide.positionOf(lines, args.start)
         if nodeRow == argRow then
             return

@@ -47,7 +47,9 @@ function m.range(lines, text, offset1, offset2)
         start   = m.position(lines, text, offset1),
         ['end'] = m.position(lines, text, offset2),
     }
-    range.start.character = range.start.character - 1
+    if range.start.character > 0 then
+        range.start.character = range.start.character - 1
+    end
     return range
 end
 

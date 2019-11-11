@@ -3,12 +3,15 @@ local searcher = require 'searcher.searcher'
 
 local function getLinks(root)
     local cache = {}
-    guide.eachSourceType(root, 'call', function (info)
-        local uris = searcher.getLinkUris(info.source)
+    guide.eachSourceType(root, 'call', function (source)
+        local uris = searcher.getLinkUris(source)
         if uris then
             for i = 1, #uris do
                 local uri = uris[i]
-                cache[uri] = true
+                if not cache[uri] then
+                    cache[uri] = {}
+                end
+                cache[uri][#cache[uri]+1] = source
             end
         end
     end)
@@ -25,8 +28,8 @@ function searcher.getLinks(source)
     if not unlock then
         return nil
     end
-    cache = getLinks(source)
-    searcher.cache.getLinks[source] = cache or false
+    cache = getLinks(source) or false
+    searcher.cache.getLinks[source] = cache
     unlock()
     return cache
 end

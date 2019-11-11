@@ -6,10 +6,16 @@ local searcher  = require 'searcher.searcher'
 local function ofCall(func, index, callback)
     searcher.eachRef(func, function (info)
         local src = info.source
-        local funcDef = src.value
-        if funcDef and funcDef.returns then
+        local returns
+        if info.mode == 'main' then
+            returns = src.returns
+        else
+            local funcDef = src.value
+            returns = funcDef and funcDef.returns
+        end
+        if returns then
             -- 搜索函数第 index 个返回值
-            for _, rtn in ipairs(funcDef.returns) do
+            for _, rtn in ipairs(returns) do
                 local val = rtn[index]
                 if val then
                     callback {
@@ -21,6 +27,23 @@ local function ofCall(func, index, callback)
             end
         end
     end)
+end
+
+local function ofCallSelect(call, index, callback)
+    local slc = call.parent
+    if slc.index == index then
+        searcher.eachRef(slc.parent, callback)
+        return
+    end
+    if call.extParent then
+        for i = 1, #call.extParent do
+            slc = call.extParent[i]
+            if slc.index == index then
+                searcher.eachRef(slc.parent, callback)
+                return
+            end
+        end
+    end
 end
 
 local function ofReturn(rtn, index, callback)
@@ -35,20 +58,7 @@ local function ofReturn(rtn, index, callback)
         if not call or call.type ~= 'call' then
             return
         end
-        local slc = call.parent
-        if slc.index == index then
-            searcher.eachRef(slc.parent, callback)
-            return
-        end
-        if call.extParent then
-            for i = 1, #call.extParent do
-                slc = call.extParent[i]
-                if slc.index == index then
-                    searcher.eachRef(slc.parent, callback)
-                    return
-                end
-            end
-        end
+        ofCallSelect(call, index, callback)
     end)
 end
 
@@ -80,7 +90,7 @@ local function ofSpecialCall(call, func, index, callback)
                     if not files.eq(uri, myUri) then
                         local ast = files.getAst(uri)
                         if ast then
-                            searcher.eachRef(ast.ast, callback)
+                            ofCall(ast.ast, 1, callback)
                         end
                     end
                 end
@@ -369,16 +379,28 @@ local function ofGoTo(source, callback)
 end
 
 local function ofMain(source, callback)
-    if source.returns then
-        for _, rtn in ipairs(source.returns) do
-            local val = rtn[1]
-                if val then
-                    callback {
-                        source   = val,
-                        mode     = 'return',
-                    }
-                    searcher.eachRef(val, callback)
+    callback {
+        source = source,
+        mode   = 'main',
+    }
+    local myUri = source.uri
+    local uris = files.findLinkTo(myUri)
+    if not uris then
+        return
+    end
+    for _, uri in ipairs(uris) do
+        local ast = files.getAst(uri)
+        if ast then
+            local links = searcher.getLinks(ast.ast)
+            if links then
+                for linkUri, calls in pairs(links) do
+                    if files.eq(linkUri, myUri) then
+                        for i = 1, #calls do
+                            ofCallSelect(calls[i], 1, callback)
+                        end
+                    end
                 end
+            end
         end
     end
 end

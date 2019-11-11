@@ -101,7 +101,7 @@ function m.getLiteral(obj)
     return nil
 end
 
---- 寻找所在函数
+--- 寻找父函数
 function m.getParentFunction(obj)
     for _ = 1, 1000 do
         obj = obj.parent

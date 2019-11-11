@@ -38,8 +38,8 @@ function searcher.getGlobals(source)
     if not unlock then
         return nil
     end
-    cache = getGlobals(source)
-    searcher.cache.getGlobals[source] = cache or false
+    cache = getGlobals(source) or false
+    searcher.cache.getGlobals[source] = cache
     unlock()
     return cache
 end

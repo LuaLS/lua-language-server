@@ -224,15 +224,19 @@ function m.findLinkTo(uri)
     local result = {}
     for _, file in pairs(m.fileMap) do
         if file.links == nil then
-            local ast = m.getAst(uri)
+            local ast = m.getAst(file.uri)
             if ast then
                 file.links = searcher.getLinks(ast.ast)
             else
                 file.links = false
             end
         end
-        if file.links and file.links[uri] then
-            result[#result+1] = file.uri
+        if file.links then
+            for linkUri in pairs(file.links) do
+                if m.eq(uri, linkUri) then
+                    result[#result+1] = file.uri
+                end
+            end
         end
     end
     return result

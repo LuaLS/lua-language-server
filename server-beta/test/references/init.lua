@@ -65,6 +65,9 @@ t.<!a!> = t.<!a!>
 TEST [[
 :: <!LABEL!> ::
 goto <?LABEL?>
+if true then
+    goto <!LABEL!>
+end
 ]]
 
 TEST [[

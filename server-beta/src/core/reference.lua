@@ -10,6 +10,7 @@ local function findDef(source, callback)
     and source.type ~= 'setglobal'
     and source.type ~= 'getglobal'
     and source.type ~= 'field'
+    and source.type ~= 'tablefield'
     and source.type ~= 'method'
     and source.type ~= 'string'
     and source.type ~= 'number'

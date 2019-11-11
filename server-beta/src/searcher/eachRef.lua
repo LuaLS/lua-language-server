@@ -271,19 +271,34 @@ end
 
 local function ofField(source, callback)
     local parent = source.parent
-    local node   = parent.node
     local key    = guide.getKeyName(source)
-    searcher.eachField(node, function (info)
-        if key == info.key then
-            callback {
-                source   = info.source,
-                mode     = info.mode,
-            }
-            if info.value then
-                ofValue(info.value, callback)
+    if parent.type == 'tablefield' then
+        local tbl = parent.parent
+        searcher.eachField(tbl, function (info)
+            if key == info.key then
+                callback {
+                    source   = info.source,
+                    mode     = info.mode,
+                }
+                if info.value then
+                    ofValue(info.value, callback)
+                end
             end
-        end
-    end)
+        end)
+    else
+        local node = parent.node
+        searcher.eachField(node, function (info)
+            if key == info.key then
+                callback {
+                    source   = info.source,
+                    mode     = info.mode,
+                }
+                if info.value then
+                    ofValue(info.value, callback)
+                end
+            end
+        end)
+    end
 end
 
 local function ofLiteral(source, callback)
@@ -297,23 +312,26 @@ local function ofLiteral(source, callback)
     end
 end
 
+local function ofLabel(source, callback)
+    callback {
+        source = source,
+        mode   = 'set',
+    }
+    if source.ref then
+        for _, ref in ipairs(source.ref) do
+            callback {
+                source = ref,
+                mode   = 'get',
+            }
+        end
+    end
+end
+
 local function ofGoTo(source, callback)
     local name = source[1]
     local label = guide.getLabel(source, name)
     if label then
-        callback {
-            source   = label,
-            mode     = 'set',
-        }
-    end
-end
-
-local function ofLabel(source, callback)
-    if source.ref then
-        callback {
-            source = source.ref,
-            mode   = 'get',
-        }
+        ofLabel(label, callback)
     end
 end
 
@@ -347,7 +365,8 @@ local function eachRef(source, callback)
     or     stype == 'index' then
         ofField(source, callback)
     elseif stype == 'setfield'
-    or     stype == 'getfield' then
+    or     stype == 'getfield'
+    or     stype == 'tablefield' then
         ofField(source.field, callback)
     elseif stype == 'setmethod'
     or     stype == 'getmethod' then

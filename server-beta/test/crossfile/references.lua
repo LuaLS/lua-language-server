@@ -1,8 +1,6 @@
-local service = require 'service'
-local workspace = require 'workspace'
-local fs = require 'bee.filesystem'
-local core = require 'core'
-local uric = require 'uri'
+local files = require 'files'
+local furi  = require 'file-uri'
+local core  = require 'core.reference'
 
 rawset(_G, 'TEST', true)
 
@@ -34,18 +32,21 @@ local function eq(a, b)
     return a == b
 end
 
-local function catch_target(script)
+local function catch_target(script, sep)
     local list = {}
     local cur = 1
+    local cut = 0
     while true do
-        local start, finish  = script:find('<[!?].-[!?]>', cur)
+        local start, finish  = script:find(('<%%%s.-%%%s>'):format(sep, sep), cur)
         if not start then
             break
         end
-        list[#list+1] = { start + 2, finish - 2 }
+        list[#list+1] = { start - cut, finish - 4 - cut }
         cur = finish + 1
+        cut = cut + 4
     end
-    return list
+    local new_script = script:gsub(('<%%%s(.-)%%%s>'):format(sep, sep), '%1')
+    return new_script, list
 end
 
 local function founded(targets, results)
@@ -54,7 +55,10 @@ local function founded(targets, results)
     end
     for _, target in ipairs(targets) do
         for _, result in ipairs(results) do
-            if target[1] == result[1] and target[2] == result[2] then
+            if target[1] == result[1]
+            and target[2] == result[2]
+            and target[3] == result[3]
+            then
                 goto NEXT
             end
         end
@@ -64,58 +68,69 @@ local function founded(targets, results)
     return true
 end
 
-local function compileAll(lsp)
-    while lsp._needCompile[1] do
-        lsp:compileVM(lsp._needCompile[1])
-    end
-end
+function TEST(datas)
+    files.removeAll()
 
-function TEST(data)
-    local lsp = service()
-    local ws = workspace(lsp, 'test')
-    lsp.workspace = ws
-    ws.root = ROOT
-
-    local mainUri
-    local pos
-    local expect = {}
-    for _, info in ipairs(data) do
-        local uri = uric.encode(fs.path(info.path))
-        ws:addFile(uric.decode(uri))
+    local targetList = {}
+    local sourceList
+    local sourceUri
+    for i, data in ipairs(datas) do
+        local uri = furi.encode(data.path)
+        local new, list = catch_target(data.content, '!')
+        if new ~= data.content or data.target then
+            if data.target then
+                targetList[#targetList+1] = {
+                    data.target[1],
+                    data.target[2],
+                    uri,
+                }
+            else
+                for _, position in ipairs(list) do
+                    targetList[#targetList+1] = {
+                        position[1],
+                        position[2],
+                        uri,
+                    }
+                end
+            end
+            data.content = new
+        end
+        new, list = catch_target(data.content, '~')
+        if new ~= data.content then
+            sourceList = list
+            sourceUri = uri
+            data.content = new
+        end
+        new, list = catch_target(data.content, '?')
+        if new ~= data.content then
+            sourceList = list
+            sourceUri = uri
+            data.content = new
+            for _, position in ipairs(list) do
+                targetList[#targetList+1] = {
+                    position[1],
+                    position[2],
+                    uri,
+                }
+            end
+        end
+        files.setText(uri, data.content)
     end
-    for _, info in ipairs(data) do
-        local uri = uric.encode(fs.path(info.path))
-        local script = info.content
-        local list = catch_target(script)
-        for _, location in ipairs(list) do
-            expect[#expect+1] = {
-                location[1],
-                location[2],
-                uri,
+
+    local sourcePos = (sourceList[1][1] + sourceList[1][2]) // 2
+    local positions = core(sourceUri, sourcePos)
+    if positions then
+        local result = {}
+        for i, position in ipairs(positions) do
+            result[i] = {
+                position.target.start,
+                position.target.finish,
+                position.uri,
             }
         end
-        local start  = script:find('<?', 1, true)
-        local finish = script:find('?>', 1, true)
-        if start then
-            mainUri = uri
-            pos = (start + finish) // 2 + 1
-        end
-        local newScript = script:gsub('<[!?]', '  '):gsub('[!?]>', '  ')
-        lsp:saveText(uri, 1, newScript)
-        compileAll(lsp)
-    end
-
-    local vm = lsp:loadVM(mainUri)
-
-    compileAll(lsp)
-
-    assert(vm)
-    local result = core.definition(vm, pos, 'reference')
-    if expect then
-        assert(result)
-        assert(founded(expect, result))
+        assert(founded(targetList, result))
     else
-        assert(result == nil)
+        assert(#targetList == 0)
     end
 end
 
@@ -145,9 +160,10 @@ TEST {
     {
         path = 'lib.lua',
         content = [[
-            return <?function ()
-            end?>
+            return <~function~> ()
+            end
         ]],
+        target = {20, 46},
     },
 }
 

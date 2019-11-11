@@ -3,6 +3,8 @@ local util      = require 'utility'
 
 local setmetatable = setmetatable
 local assert       = assert
+local require      = require
+local type         = type
 
 _ENV = nil
 
@@ -73,32 +75,21 @@ function m.getSpecialName(source)
     return spName
 end
 
---- 遍历特殊对象
----@param callback fun(name:string, source:table)
-function m.eachSpecial(callback)
-    local cache = m.cache.specials
-    if cache then
-        for i = 1, #cache do
-            callback(cache[i][1], cache[i][2])
+--- 获取link的uri
+function m.getLinkUris(call)
+    local workspace = require 'workspace'
+    local func = call.node
+    local name = m.getSpecialName(func)
+    if name == 'require' then
+        local args = call.args
+        if not args[1] then
+            return nil
         end
-        return
-    end
-    cache = {}
-    m.cache.specials = cache
-    guide.eachSource(m.ast, function (source)
-        if source.type == 'getlocal'
-        or source.type == 'getglobal'
-        or source.type == 'local'
-        or source.type == 'field'
-        or source.type == 'string' then
-            local name = m.getSpecialName(source)
-            if name then
-                cache[#cache+1] = { name, source }
-            end
+        local literal = guide.getLiteral(args[1])
+        if type(literal) ~= 'string' then
+            return nil
         end
-    end)
-    for i = 1, #cache do
-        callback(cache[i][1], cache[i][2])
+        return workspace.findUrisByRequirePath(literal, true)
     end
 end
 
@@ -113,6 +104,7 @@ function m.refreshCache()
         eachRef     = {},
         eachField   = {},
         getGlobals  = {},
+        getLinks    = {},
         isGlobal    = {},
         specialName = {},
         getLibrary  = {},
@@ -122,6 +114,7 @@ function m.refreshCache()
         eachRef    = {},
         eachField  = {},
         getGlobals = {},
+        getLinks   = {},
         getLibrary = {},
     }
     m.cacheTracker[m.cache] = true

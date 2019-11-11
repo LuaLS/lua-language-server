@@ -1,8 +1,7 @@
 local guide = require 'parser.guide'
 local searcher = require 'searcher.searcher'
 
-local function getGlobals(source)
-    local root = guide.getRoot(source)
+local function getGlobals(root)
     local env  = guide.getENV(root)
     local cache = {}
     local mark = {}
@@ -32,7 +31,7 @@ end
 function searcher.getGlobals(source)
     source = guide.getRoot(source)
     local cache = searcher.cache.getGlobals[source]
-    if cache then
+    if cache ~= nil then
         return cache
     end
     local unlock = searcher.lock('getGlobals', source)
@@ -40,7 +39,7 @@ function searcher.getGlobals(source)
         return nil
     end
     cache = getGlobals(source)
-    searcher.cache.getGlobals[source] = cache
+    searcher.cache.getGlobals[source] = cache or false
     unlock()
     return cache
 end

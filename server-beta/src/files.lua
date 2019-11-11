@@ -73,6 +73,7 @@ function m.setText(uri, text)
     file.lines = nil
     file.ast = nil
     file.globals = nil
+    file.links = nil
     m.globalVersion = m.globalVersion + 1
     searcher.refreshCache()
 
@@ -194,30 +195,6 @@ function m.getOriginUri(uri)
     return file.uri
 end
 
---- 获取全局变量
-function m.getGlobals(uri)
-    if platform.OS == 'Windows' then
-        uri = uri:lower()
-    end
-    local file = m.fileMap[uri]
-    if not file then
-        return nil
-    end
-    if file.globals then
-        return file.globals
-    end
-    local ast = m.getAst(uri)
-    if not ast then
-        return nil
-    end
-    file.globals = {}
-    local globals = searcher.getGlobals(ast.ast)
-    for name in pairs(globals) do
-        file.globals[name] = true
-    end
-    return file.globals
-end
-
 --- 寻找全局变量
 function m.findGlobals(name)
     local uris = {}
@@ -237,6 +214,28 @@ function m.findGlobals(name)
         end
     end
     return uris
+end
+
+--- 寻找link自己的其他文件
+function m.findLinkTo(uri)
+    if platform.OS == 'Windows' then
+        uri = uri:lower()
+    end
+    local result = {}
+    for _, file in pairs(m.fileMap) do
+        if file.links == nil then
+            local ast = m.getAst(uri)
+            if ast then
+                file.links = searcher.getLinks(ast.ast)
+            else
+                file.links = false
+            end
+        end
+        if file.links and file.links[uri] then
+            result[#result+1] = file.uri
+        end
+    end
+    return result
 end
 
 --- 判断文件名相等

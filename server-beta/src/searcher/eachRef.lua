@@ -73,18 +73,14 @@ local function ofSpecialCall(call, func, index, callback)
         end
     elseif name == 'require' then
         if index == 1 then
-            local args = call.args
-            if args[1] then
-                local literal = guide.getLiteral(args[1])
-                if type(literal) == 'string' then
-                    local result = workspace.findUrisByRequirePath(literal, true)
-                    local myUri = guide.getRoot(call).uri
-                    for _, uri in ipairs(result) do
-                        if not files.eq(uri, myUri) then
-                            local ast = files.getAst(uri)
-                            if ast then
-                                searcher.eachRef(ast.ast, callback)
-                            end
+            local result = searcher.getLinkUris(call)
+            if result then
+                local myUri = guide.getRoot(call).uri
+                for _, uri in ipairs(result) do
+                    if not files.eq(uri, myUri) then
+                        local ast = files.getAst(uri)
+                        if ast then
+                            searcher.eachRef(ast.ast, callback)
                         end
                     end
                 end

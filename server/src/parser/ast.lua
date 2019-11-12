@@ -1466,9 +1466,16 @@ local Defs = {
         return emmyName
     end,
     EmmyComment = function (...)
+        local lines = {...}
+        for i = 2, #lines do
+            local line = lines[i]
+            if line:sub(1, 1) == '|' then
+                lines[i] = '\n' .. line:sub(2)
+            end
+        end
         return {
             type = 'emmyComment',
-            [1] = table.concat({...}, '\n'),
+            [1] = table.concat(lines, '\n'),
         }
     end,
     EmmyOption = function (options)

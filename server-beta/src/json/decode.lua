@@ -123,7 +123,7 @@ local Token = P
 {
     V'Value' * Cp(),
     Nl     = P'\r\n' + S'\r\n',
-    Sp     = S' \t',
+    Sp     = S' \t' + '//' * (1-V'Nl')^0,
     Spnl   = (V'Sp' + V'Nl')^0,
     Bool   = C(P'true' + P'false') / BoolMap,
     Int    = C('0' + (P'-'^-1 * R'19' * R'09'^0)) / tointeger,

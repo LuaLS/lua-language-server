@@ -1,8 +1,11 @@
+// Just some comment
 {
-    "Lua.diagnostics.globals": [
+    "Lua.diagnostics.globals": [ // Just some comment
+        // Just some comment
         "ERR",
         "OUT",
         "IN",
+        // Just some comment
         "log",
         "ac",
         "_G",
@@ -12,6 +15,7 @@
     "Lua.diagnostics.disable": [
     ],
     "Lua.runtime.version": "Lua 5.4",
+    // Just some comment
     "Lua.workspace.maxPreload": 400,
     "Lua.workspace.preloadFileSize": 1000,
     "Lua.workspace.ignoreDir": [
@@ -27,8 +31,9 @@
     ],
     "Lua.workspace.library": {
         "E:/Github/test" : true,
+        // Just some comment
         "server/src/meta" : true
     },
     "Lua.plugin.enable": true,
-    "Lua.zzzzzz.cat": true
+    //"Lua.zzzzzz.cat": true
 }

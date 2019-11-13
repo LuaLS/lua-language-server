@@ -47,8 +47,6 @@ return function (lsp, params)
                 results[#results+1] = convertRange(lines, range)
             end
 
-            log.debug(vm.text)
-            log.debug(table.dump(results))
             response(results)
         end)
     end

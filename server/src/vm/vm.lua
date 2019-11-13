@@ -949,6 +949,7 @@ function mt:doWhile(action)
 end
 
 function mt:doRepeat(action)
+    self:instantSource(action)
     self:scopePush(action)
     self:doActions(action)
     self:getExp(action.filter)

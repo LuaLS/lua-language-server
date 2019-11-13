@@ -18,6 +18,7 @@ return function (lsp)
             documentSymbolProvider = true,
             documentHighlightProvider = true,
             codeActionProvider = true,
+            foldingRangeProvider = true,
             signatureHelpProvider = {
                 triggerCharacters = { '(', ',' },
             },

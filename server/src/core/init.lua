@@ -12,7 +12,8 @@ local api = {
     documentSymbol = require 'core.document_symbol',
     global         = require 'core.global',
     highlight      = require 'core.highlight',
-    codeAction     = require 'core.code_action'
+    codeAction     = require 'core.code_action',
+    foldingRange   = require 'core.folding_range',
 }
 
 return api

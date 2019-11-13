@@ -68,6 +68,5 @@ return function (lsp, params)
 
             response(symbols)
         end)
-        timerCache[uri]:onTimer()
     end
 end

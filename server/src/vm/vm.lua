@@ -740,6 +740,7 @@ function mt:getMultiByList(list)
 end
 
 function mt:doDo(action)
+    self:instantSource(action)
     self:scopePush(action)
     self:doActions(action)
     self:scopePop()

@@ -119,6 +119,7 @@ Please [help me][en-US] improve the quality of `en-US`.
 * [EmmyLua](https://emmylua.github.io)
 * [lua-glob](https://github.com/sumneko/lua-glob)
 * [lua-uri](https://github.com/sumneko/lua-uri)
+* [JSON4Lua](http://github.com/craigmj/json4lua/)
 
 ## Acknowledgement
 

@@ -1,19 +1,21 @@
-local lpeg = require 'lpeglabel'
-local save_sort
-local table_pack = table.pack
-local rawset = rawset
-local tointeger = math.tointeger
-local tonumber = tonumber
+local lpeg         = require 'lpeglabel'
+local tablePack    = table.pack
+local rawset       = rawset
+local tointeger    = math.tointeger
+local tonumber     = tonumber
 local setmetatable = setmetatable
-local string_char = string.char
+local stringChar   = string.char
+local error        = error
 
-local P = lpeg.P
-local S = lpeg.S
-local R = lpeg.R
-local V = lpeg.V
-local C = lpeg.C
+_ENV = nil
+
+local SaveSort
+local P  = lpeg.P
+local S  = lpeg.S
+local R  = lpeg.R
+local V  = lpeg.V
+local C  = lpeg.C
 local Ct = lpeg.Ct
-local Cg = lpeg.Cg
 local Cc = lpeg.Cc
 local Cp = lpeg.Cp
 local Cs = lpeg.Cs
@@ -55,15 +57,6 @@ local hashmt = {
         rawset(self, i, k)
         rawset(self, k, v)
     end,
-    __debugger_extand = function (self)
-        local list = {}
-        for k, v in pairs(self) do
-            k = tostring(k)
-            list[#list+1] = k
-            list[k] = v
-        end
-        return list
-    end,
 }
 
 -----------------------------------------------------------------------------
@@ -83,23 +76,23 @@ local function Utf8(str)
     -- 4096 = 2^12 (or 2^6 * 2^6)
     local x
     if n < 0x80 then
-        x = string_char(n % 0x80)
+        x = stringChar(n % 0x80)
     elseif n < 0x800 then
         -- [110x xxxx] [10xx xxxx]
-        x = string_char(0xC0 + ((n // 64) % 0x20), 0x80 + (n % 0x40))
+        x = stringChar(0xC0 + ((n // 64) % 0x20), 0x80 + (n % 0x40))
     else
         -- [1110 xxxx] [10xx xxxx] [10xx xxxx]
-        x = string_char(0xE0 + ((n // 4096) % 0x10), 0x80 + ((n // 64) % 0x40), 0x80 + (n % 0x40))
+        x = stringChar(0xE0 + ((n // 4096) % 0x10), 0x80 + ((n // 64) % 0x40), 0x80 + (n % 0x40))
     end
     return x
 end
 
 local function HashTable(patt)
     return C(patt) / function (_, ...)
-        local hash = table_pack(...)
+        local hash = tablePack(...)
         local n = hash.n
         hash.n = nil
-        if save_sort then
+        if SaveSort then
             local max = n // 2
             for i = 1, max do
                 local key, value = hash[2*i-1], hash[2*i]
@@ -130,7 +123,7 @@ local Token = P
 {
     V'Value' * Cp(),
     Nl     = P'\r\n' + S'\r\n',
-    Sp     = S' \t',
+    Sp     = S' \t' + '//' * (1-V'Nl')^0,
     Spnl   = (V'Sp' + V'Nl')^0,
     Bool   = C(P'true' + P'false') / BoolMap,
     Int    = C('0' + (P'-'^-1 * R'19' * R'09'^0)) / tointeger,
@@ -148,7 +141,7 @@ local Token = P
 }
 
 return function (str, save_sort_)
-    save_sort = save_sort_
+    SaveSort = save_sort_
     local table, res, pos = Token:match(str)
     if not table then
         if not pos or pos <= #str then

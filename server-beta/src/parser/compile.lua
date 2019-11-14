@@ -1,10 +1,20 @@
 local guide = require 'parser.guide'
 local type = type
 
+local specials = {
+    ['_G']           = true,
+    ['rawset']       = true,
+    ['rawget']       = true,
+    ['setmetatable'] = true,
+    ['require']      = true,
+    ['dofile']       = true,
+    ['loadfile']     = true,
+}
+
 _ENV = nil
 
 local LocalLimit = 200
-local pushError, Compile, CompileBlock, Block, GoToTag, ENVMode, Compiled, LocalCount
+local pushError, Compile, CompileBlock, Block, GoToTag, ENVMode, Compiled, LocalCount, Version, Special
 
 local function addRef(node, obj)
     if not node.ref then
@@ -14,6 +24,14 @@ local function addRef(node, obj)
     obj.node = node
 end
 
+local function addSpecial(name, obj)
+    if not Special[name] then
+        Special[name] = {}
+    end
+    Special[name][#Special[name]+1] = obj
+    obj.special = name
+end
+
 local vmMap = {
     ['getname'] = function (obj)
         local loc = guide.getLocal(obj, obj[1], obj.start)
@@ -21,6 +39,9 @@ local vmMap = {
             obj.type = 'getlocal'
             obj.loc  = loc
             addRef(loc, obj)
+            if loc.special then
+                addSpecial(loc.special, obj)
+            end
         else
             obj.type = 'getglobal'
             if ENVMode == '_ENV' then
@@ -28,6 +49,10 @@ local vmMap = {
                 if node then
                     addRef(node, obj)
                 end
+            end
+            local name = obj[1]
+            if specials[name] then
+                addSpecial(name, obj)
             end
         end
         return obj
@@ -208,6 +233,9 @@ local vmMap = {
             obj.localfunction = nil
         end
         Compile(obj.value, obj)
+        if obj.value and obj.value.special then
+            addSpecial(obj.value.special, obj)
+        end
     end,
     ['setfield'] = function (obj)
         Compile(obj.node, obj)
@@ -250,18 +278,20 @@ local vmMap = {
             local name = obj[1]
             local label = guide.getLabel(block, name)
             if label then
-                pushError {
-                    type   = 'REDEFINED_LABEL',
-                    start  = obj.start,
-                    finish = obj.finish,
-                    related = {
-                        {
-                            message = 'REDEFINED_LABEL',
-                            start   = label.start,
-                            finish  = label.finish,
+                if Version == 'Lua 5.4'
+                or block == guide.getBlock(label) then
+                    pushError {
+                        type   = 'REDEFINED_LABEL',
+                        start  = obj.start,
+                        finish = obj.finish,
+                        relative = {
+                            {
+                                label.start,
+                                label.finish,
+                            }
                         }
                     }
-                }
+                end
             end
             block.labels[name] = obj
         end
@@ -423,10 +453,7 @@ local function compileGoTo(obj)
         }
         return
     end
-    if not label.ref then
-        label.ref = {}
-    end
-    label.ref[#label.ref+1] = obj
+    label.ref = obj
 
     -- 如果有局部变量在 goto 与 label 之间声明，
     -- 并在 label 之后使用，则算作语法错误
@@ -463,16 +490,14 @@ local function compileGoTo(obj)
                     info   = {
                         loc = loc[1],
                     },
-                    related = {
+                    relative = {
                         {
-                            message = 'JUMPED_LABEL',
-                            start   = label.start,
-                            finish  = label.finish,
+                            start  = label.start,
+                            finish = label.finish,
                         },
                         {
-                            message = 'JUMPED_LOCAL',
-                            start   = loc.start,
-                            finish  = loc.finish,
+                            start  = loc.start,
+                            finish = loc.finish,
                         }
                     },
                 }
@@ -503,6 +528,8 @@ return function (self, lua, mode, version)
     Compiled = {}
     GoToTag = {}
     LocalCount = 0
+    Version = version
+    Special = state.special
     if type(state.ast) == 'table' then
         Compile(state.ast)
     end

@@ -8,6 +8,7 @@ return function (self, lua, mode, version)
         lua = lua,
         emmy = {},
         root = {},
+        special = {},
         errs = errs,
         diags = diags,
         pushError = function (err)

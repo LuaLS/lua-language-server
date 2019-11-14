@@ -378,7 +378,7 @@ function m.positionOf(lines, offset)
         local line = lines[row]
         if offset < line.start then
             max = row - 1
-        elseif offset >= line.finish then
+        elseif offset > line.finish then
             min = row + 1
         else
             return row, offset - line.start + 1

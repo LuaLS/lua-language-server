@@ -453,7 +453,10 @@ local function compileGoTo(obj)
         }
         return
     end
-    label.ref = obj
+    if not label.ref then
+        label.ref = {}
+    end
+    label.ref[#label.ref+1] = obj
 
     -- 如果有局部变量在 goto 与 label 之间声明，
     -- 并在 label 之后使用，则算作语法错误

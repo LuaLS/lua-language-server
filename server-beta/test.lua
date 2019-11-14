@@ -36,9 +36,9 @@ local function main()
         print(('测试[%s]用时[%.3f]'):format(name, os.clock() - clock))
     end
 
+    test 'references'
     test 'definition'
     test 'diagnostics'
-    test 'references'
     --test 'highlight'
     --test 'rename'
     --test 'type_inference'

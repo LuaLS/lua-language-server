@@ -202,14 +202,16 @@ end
 ---@return integer
 function m.recieve()
     for _, brave in ipairs(m.braves) do
-        local suc, id, result = brave.waiter:pop()
-        if not suc then
-            goto CONTINUE
-        end
-        if type(id) == 'string' then
-            m.popReport(brave, id, result)
-        else
-            m.popTask(brave, id, result)
+        while true do
+            local suc, id, result = brave.waiter:pop()
+            if not suc then
+                goto CONTINUE
+            end
+            if type(id) == 'string' then
+                m.popReport(brave, id, result)
+            else
+                m.popTask(brave, id, result)
+            end
         end
         ::CONTINUE::
     end

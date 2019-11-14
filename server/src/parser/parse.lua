@@ -25,6 +25,7 @@ return function (self, lua, mode, version)
         Label = {{}},
         Dots = {true},
         Version = version,
+        Comments = {},
         Lua = lua,
     }
     ast.init(State, Errs)
@@ -36,5 +37,5 @@ return function (self, lua, mode, version)
         pushError(err)
         return nil, Errs
     end
-    return res, Errs
+    return res, Errs, State.Comments
 end

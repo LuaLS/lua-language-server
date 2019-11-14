@@ -413,7 +413,8 @@ end
 ---@param file file
 ---@return table
 function mt:compileAst(file)
-    local ast, err = parser:parse(file:getText(), 'lua', config.config.runtime.version)
+    local ast, err, comments = parser:parse(file:getText(), 'lua', config.config.runtime.version)
+    file.comments = comments
     if ast then
         file:setAstErr(err)
     else
@@ -618,6 +619,14 @@ function mt:getText(uri)
         return nil
     end
     return file:getText(), file:getOldText()
+end
+
+function mt:getComments(uri)
+    local file = self._files:get(uri)
+    if not file then
+        return nil
+    end
+    return file:getComments()
 end
 
 ---@param uri uri

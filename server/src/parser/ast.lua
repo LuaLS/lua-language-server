@@ -271,7 +271,11 @@ local Defs = {
             [1]    = false,
         }
     end,
-    LongComment = function (beforeEq, afterEq, str, missPos)
+    LongComment = function (beforeEq, afterEq, str, finish, missPos)
+        State.Comments[#State.Comments+1] = {
+            start  = beforeEq,
+            finish = finish,
+        }
         if missPos then
             local endSymbol = ']' .. ('='):rep(afterEq-beforeEq) .. ']'
             local s, _, w = str:find('(%][%=]*%])[%c%s]*$')

@@ -36,7 +36,8 @@ return function (lsp, params)
             t:remove()
             timerCache[uri] = nil
 
-            local ranges = core.foldingRange(vm)
+            local comments = lsp:getComments(uri)
+            local ranges = core.foldingRange(vm, comments)
             if not ranges then
                 response(nil)
                 return

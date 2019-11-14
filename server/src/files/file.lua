@@ -100,6 +100,10 @@ function mt:getLines()
     return self._lines
 end
 
+function mt:getComments()
+    return self.comments
+end
+
 ---@return file
 function mt:getParent()
     return self._parent

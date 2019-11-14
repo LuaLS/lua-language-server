@@ -10,7 +10,7 @@ local foldingType = {
     ['table']         = {'region', '}',    },
 }
 
-return function (vm)
+return function (vm, comments)
     local result = {}
     vm:eachSource(function (source)
         local tp = source.type
@@ -50,6 +50,15 @@ return function (vm)
             }
         end
     end)
+    if comments then
+        for _, comment in ipairs(comments) do
+            result[#result+1] = {
+                start  = comment.start,
+                finish = comment.finish,
+                kind   = 'comment',
+            }
+        end
+    end
     if #result == 0 then
         return nil
     end

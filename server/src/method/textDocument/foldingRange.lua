@@ -10,6 +10,9 @@ local function convertRange(lines, range)
         endLine        = finish_row - 2,
         kind           = range.kind,
     }
+    if result.startLine >= result.endLine then
+        return nil
+    end
     return result
 end
 

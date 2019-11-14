@@ -8,6 +8,7 @@ local foldingType = {
     ['while']         = {'region', 'end',  },
     ['repeat']        = {'region', 'until',},
     ['table']         = {'region', '}',    },
+    ['string']        = {'regtion', ']',   },
 }
 
 return function (vm, comments)
@@ -42,6 +43,12 @@ return function (vm, comments)
                     kind   = data[1],
                 }
             end
+        elseif tp == 'string' then
+            result[#result+1] = {
+                start  = start,
+                finish = finish,
+                kind   = data[1],
+            }
         elseif data[1] == 'region' then
             result[#result+1] = {
                 start  = start,

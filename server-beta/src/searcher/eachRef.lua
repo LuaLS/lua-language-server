@@ -52,14 +52,18 @@ local function ofReturn(rtn, index, callback)
         return
     end
     -- 搜索函数调用的第 index 个接收值
-    searcher.eachRef(func, function (info)
-        local source = info.source
-        local call = source.parent
-        if not call or call.type ~= 'call' then
-            return
-        end
-        ofCallSelect(call, index, callback)
-    end)
+    if func.type == 'main' then
+        searcher.eachRef(func, callback)
+    else
+        searcher.eachRef(func, function (info)
+            local source = info.source
+            local call = source.parent
+            if not call or call.type ~= 'call' then
+                return
+            end
+            ofCallSelect(call, index, callback)
+        end)
+    end
 end
 
 local function ofSpecialCall(call, func, index, callback)

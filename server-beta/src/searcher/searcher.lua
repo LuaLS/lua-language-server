@@ -61,7 +61,7 @@ function m.refreshCache()
         eachField   = {},
         getGlobals  = {},
         getLinks    = {},
-        isGlobal    = {},
+        getGlobal   = {},
         specialName = {},
         getLibrary  = {},
         specials    = nil,

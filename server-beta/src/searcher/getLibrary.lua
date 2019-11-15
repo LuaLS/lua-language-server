@@ -3,16 +3,13 @@ local guide    = require 'parser.guide'
 local library  = require 'library'
 
 local function getLibrary(source)
-    local name = guide.getKeyName(source)
-    if not name then
+    local globalName = searcher.getGlobal(source)
+    if not globalName then
         return nil
     end
-    local sname = name:match '^s|(.+)$'
-    if not sname then
-        return nil
-    end
-    if searcher.isGlobal(source) then
-        return library.global[sname]
+    local name = globalName:match '^s|(.+)$'
+    if library.global[name] then
+        return library.global[name]
     end
     return nil
 end

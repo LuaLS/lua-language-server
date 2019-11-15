@@ -4,6 +4,6 @@ require 'searcher.eachRef'
 require 'searcher.eachDef'
 require 'searcher.getGlobals'
 require 'searcher.getLinks'
-require 'searcher.isGlobal'
+require 'searcher.getGlobal'
 require 'searcher.getLibrary'
 return searcher

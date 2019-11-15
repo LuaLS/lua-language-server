@@ -23,7 +23,7 @@ local function getGlobals(root)
         end
         cache[name][#cache[name]+1] = info
         cache[name].mode[info.mode] = true
-        searcher.cache.isGlobal[src] = true
+        searcher.cache.getGlobal[src] = name
     end)
     return cache
 end

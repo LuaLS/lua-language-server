@@ -712,6 +712,11 @@ local Defs = {
             }
             list[n-1] = exp
             list[n+1] = exp
+            local lastN = ops[i+1]
+            if lastN then
+                list[lastN-1] = exp
+                list[lastN+1] = exp
+            end
             checkOpVersion(op)
         end
         local final = ops[1]

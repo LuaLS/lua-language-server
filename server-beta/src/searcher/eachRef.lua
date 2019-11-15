@@ -134,7 +134,9 @@ local function ofValue(value, callback)
     or parent.type == 'setlocal'
     or parent.type == 'setfield'
     or parent.type == 'setmethod'
-    or parent.type == 'setindex' then
+    or parent.type == 'setindex'
+    or parent.type == 'tablefield'
+    or parent.type == 'tableindex' then
         if parent.value == value then
             searcher.eachRef(parent, callback)
         end

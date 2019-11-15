@@ -17,7 +17,7 @@ local function findDef(source, callback)
     and source.type ~= 'goto' then
         return
     end
-    searcher.eachRef(source, function (info)
+    searcher.eachDef(source, function (info)
         if info.mode == 'declare'
         or info.mode == 'set'
         or info.mode == 'return' then

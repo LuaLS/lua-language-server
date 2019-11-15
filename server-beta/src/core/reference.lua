@@ -24,6 +24,7 @@ local function findRef(source, offset, callback)
     and source.type ~= 'number'
     and source.type ~= 'boolean'
     and source.type ~= 'goto'
+    and source.type ~= 'label'
     and not isFunction(source, offset) then
         return
     end

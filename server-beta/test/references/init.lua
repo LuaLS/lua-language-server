@@ -71,6 +71,14 @@ end
 ]]
 
 TEST [[
+:: <?LABEL?> ::
+goto <!LABEL!>
+if true then
+    goto <!LABEL!>
+end
+]]
+
+TEST [[
 local a = 1
 local <?a?> = 1
 <!a!> = <!a!>

@@ -297,13 +297,28 @@ return [[
 ]]
 ]=]
 
+config.config.diagnostics.disable['unused-local'] = true
 TEST [[
-local t = {}
-<!function t:x()
-end!>
-return t
+local f = <!function () end!>
 ]]
 
+TEST [[
+local f;f = <!function () end!>
+]]
+
+TEST [[
+<!local function f() end!>
+]]
+
+TEST [[
+F = <!function () end!>
+]]
+
+TEST [[
+<!function F() end!>
+]]
+
+config.config.diagnostics.disable['unused-local'] = false
 config.config.diagnostics.disable['unused-function'] = true
 TEST [[
 local mt, x

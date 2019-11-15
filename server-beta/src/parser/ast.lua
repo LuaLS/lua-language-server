@@ -697,6 +697,7 @@ local Defs = {
                 return lv1 < lv2
             end
         end)
+        local final
         for i = #ops, 1, -1 do
             local n     = ops[i]
             local op    = list[n]
@@ -710,17 +711,28 @@ local Defs = {
                 [1]    = left,
                 [2]    = right,
             }
-            list[n-1] = exp
-            list[n+1] = exp
-            local lastN = ops[i+1]
-            if lastN then
-                list[lastN-1] = exp
-                list[lastN+1] = exp
+            local leftIndex, rightIndex
+            if list[left] then
+                leftIndex = list[left[1]]
+            else
+                leftIndex = n - 1
             end
+            if list[right] then
+                rightIndex = list[right[2]]
+            else
+                rightIndex = n + 1
+            end
+
+            list[leftIndex]  = exp
+            list[rightIndex] = exp
+            list[left]       = leftIndex
+            list[right]      = rightIndex
+            list[exp]        = n
+            final = exp
+
             checkOpVersion(op)
         end
-        local final = ops[1]
-        return list[final-1]
+        return final
     end,
     Paren = function (start, exp, finish)
         if exp and exp.type == 'paren' then

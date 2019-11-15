@@ -1,5 +1,4 @@
 local searcher = require 'searcher.searcher'
-local guide    = require 'parser.guide'
 local library  = require 'library'
 
 local function getLibrary(source)

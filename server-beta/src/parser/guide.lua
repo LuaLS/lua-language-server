@@ -518,14 +518,16 @@ function m.getPath(a, b)
     local mode
     local objA
     local objB
-    if a.start < b.start then
+    if a.finish < b.start then
         mode = 'before'
         objA = a
         objB = b
-    else
+    elseif a.start > b.finish then
         mode = 'after'
         objA = b
         objB = a
+    else
+        return 'equal', {}, {}
     end
     local pathA = {}
     local pathB = {}

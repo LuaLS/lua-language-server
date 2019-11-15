@@ -66,7 +66,7 @@ return function (uri, callback)
 
         local func = source.node
         local funcArgs
-        searcher.eachRef(func, function (info)
+        searcher.eachDef(func, function (info)
             if info.mode == 'value' then
                 local src = info.source
                 if src.type == 'function' then

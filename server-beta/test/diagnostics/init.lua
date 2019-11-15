@@ -683,3 +683,7 @@ t.a = 1
 t.a = 2
 return t
 ]]
+
+TEST [[
+table.insert({}, 1, 2, <!3!>)
+]]

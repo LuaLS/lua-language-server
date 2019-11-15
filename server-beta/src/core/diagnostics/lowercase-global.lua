@@ -20,18 +20,11 @@ return function (uri, callback)
     end
 
     guide.eachSourceType(ast.ast, 'setglobal', function (source)
-        local name = guide.getKeyName(source)
-        if not name then
+        local name = guide.getKeyString(source)
+        if definedGlobal[name] then
             return
         end
-        local sname = name:match '^s|(.+)$'
-        if not sname then
-            return
-        end
-        if definedGlobal[sname] then
-            return
-        end
-        local first = sname:match '%w'
+        local first = name:match '%w'
         if not first then
             return
         end

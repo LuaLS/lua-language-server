@@ -164,7 +164,7 @@ end
 local function asValue(source, callback)
     local parent = source.parent
     if parent and parent.value == source then
-        if guide.getKeyName(parent) == 's|__index' then
+        if guide.getKeyString(parent) == '__index' then
             if parent.type == 'tablefield'
             or parent.type == 'tableindex' then
                 local t = parent.parent
@@ -267,7 +267,7 @@ local function ofLocal(loc, callback)
                 local parent = ref.parent
                 if parent.type == 'getfield'
                 or parent.type == 'getindex' then
-                    if guide.getKeyName(parent) == 's|_G' then
+                    if guide.getKeyName(parent) == '_G' then
                         callback {
                             source   = parent,
                             mode     = 'get',
@@ -275,7 +275,7 @@ local function ofLocal(loc, callback)
                     end
                 end
             elseif ref.type == 'getglobal' then
-                if guide.getKeyName(ref) == 's|_G' then
+                if guide.getKeyString(ref) == '_G' then
                     callback {
                         source   = ref,
                         mode     = 'get',

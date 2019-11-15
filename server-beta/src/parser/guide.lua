@@ -268,7 +268,7 @@ end
 ---
 --- 主要针对赋值等语句时，key包含value
 function m.isInRange(source, offset)
-    return source.start <= offset and (source.range or source.finish) >= offset - 1
+    return (source.vstart or source.start) <= offset and (source.range or source.finish) >= offset - 1
 end
 
 --- 添加child

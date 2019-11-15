@@ -35,58 +35,111 @@ local function founded(targets, results)
 end
 
 function TEST(script)
-    files.removeAll()
     local target = catch_target(script)
-    local start  = script:find('<?', 1, true)
-    local finish = script:find('?>', 1, true)
-    local pos = (start + finish) // 2 + 1
-    local new_script = script:gsub('<[!?]', '  '):gsub('[!?]>', '  ')
-    files.setText('', new_script)
+    for _, enter in ipairs(target) do
+        local start, finish = enter.start, enter.finish
+        files.removeAll()
+        local pos = (start + finish) // 2 + 1
+        local new_script = script:gsub('<[!?~]', '  '):gsub('[!?~]>', '  ')
+        files.setText('', new_script)
 
-    local positions = core('', pos)
-    if positions then
-        assert(founded(target, positions))
-    else
-        assert(#target == 0)
+        local positions = core('', pos)
+        if positions then
+            assert(founded(target, positions))
+        else
+            assert(#target == 0)
+        end
     end
 end
 
 TEST [[
-local <?a?> = 1
+local <!a!> = 1
 ]]
 
 TEST [[
-local <?a?> = 1
+local <!a!> = 1
 <!a!> = 2
 <!a!> = <!a!>
 ]]
 
 TEST [[
-t.<?a?> = 1
+t.<!a!> = 1
 a = t.<!a!>
 ]]
 
 TEST [[
 t[<!'a'!>] = 1
-a = t.<?a?>
-]]
-
-TEST [[
-t[<?'a'?>] = 1
 a = t.<!a!>
 ]]
 
 TEST [[
-:: <?a?> ::
+:: <!a!> ::
 goto <!a!>
 ]]
 
 TEST [[
 local function f(<!a!>)
-    return <?a?>
+    return <!a!>
 end
 ]]
 
 TEST [[
-local s = <?'asd/gadasd.fad.zxczg'?>
+local s = <!'asd/gadasd.fad.zxczg'!>
+]]
+
+TEST [[
+local b = <!true!>
+]]
+
+TEST [[
+local n = <!nil!>
+]]
+
+TEST [[
+local n = <!1.2354!>
+]]
+
+TEST [[
+local <!function!> f () <!end!>
+]]
+
+TEST [[
+<!function!> f () <!end!>
+]]
+
+TEST [[
+return <!function!> () <!end!>
+]]
+
+TEST [[
+<!if!> true <!then!>
+<!elseif!> true <!then!>
+<!elseif!> true <!then!>
+<!else!>
+<!end!>
+]]
+
+TEST [[
+<!for!> _ <!in!> _ <!do!>
+<!end!>
+]]
+
+TEST [[
+<!for!> i = 1, 10 <!do!>
+<!end!>
+]]
+
+TEST [[
+<!while!> true <!do!>
+<!end!>
+]]
+
+TEST [[
+<!repeat!>
+<!until!> true
+]]
+
+TEST [[
+<!do!>
+<!end!>
 ]]

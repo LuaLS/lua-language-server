@@ -662,6 +662,9 @@ local Defs = {
         return e
     end,
     Binary = function (first, op, second, ...)
+        if not first then
+            return second
+        end
         if not op then
             return first
         end
@@ -836,20 +839,28 @@ local Defs = {
             finish = start,
         }
     end,
-    Function = function (start, args, actions, finish)
+    Function = function (functionStart, functionFinish, args, actions, endStart, endFinish)
         actions.type   = 'function'
-        actions.start  = start
-        actions.finish = finish - 1
+        actions.start  = functionStart
+        actions.finish = endFinish - 1
         actions.args   = args
-        checkMissEnd(start)
+        actions.keyword= {
+            functionStart, functionFinish - 1,
+            endStart,      endFinish - 1,
+        }
+        checkMissEnd(functionStart)
         return actions
     end,
-    NamedFunction = function (start, name, args, actions, finish)
+    NamedFunction = function (functionStart, functionFinish, name, args, actions, endStart, endFinish)
         actions.type   = 'function'
-        actions.start  = start
-        actions.finish = finish - 1
+        actions.start  = functionStart
+        actions.finish = endFinish - 1
         actions.args   = args
-        checkMissEnd(start)
+        actions.keyword= {
+            functionStart, functionFinish - 1,
+            endStart,      endFinish - 1,
+        }
+        checkMissEnd(functionStart)
         if not name then
             return
         end
@@ -864,13 +875,18 @@ local Defs = {
             name.value = actions
         end
         name.range = actions.finish
+        name.vstart = functionStart
         return name
     end,
-    LocalFunction = function (start, name, args, actions, finish)
+    LocalFunction = function (start, functionStart, functionFinish, name, args, actions, endStart, endFinish)
         actions.type   = 'function'
         actions.start  = start
-        actions.finish = finish - 1
+        actions.finish = endFinish - 1
         actions.args   = args
+        actions.keyword= {
+            functionStart, functionFinish - 1,
+            endStart,      endFinish - 1,
+        }
         checkMissEnd(start)
 
         if not name then
@@ -888,6 +904,7 @@ local Defs = {
 
         local loc = createLocal(name, name.start, actions)
         loc.localfunction = true
+        loc.vstart = functionStart
 
         return loc
     end,
@@ -1126,10 +1143,14 @@ local Defs = {
         end
         return tableUnpack(keys)
     end,
-    Do = function (start, actions, finish)
+    Do = function (start, actions, endA, endB)
         actions.type = 'do'
         actions.start  = start
-        actions.finish = finish - 1
+        actions.finish = endB - 1
+        actions.keyword= {
+            start, start + #'do' - 1,
+            endA , endB - 1,
+        }
         checkMissEnd(start)
         return actions
     end,
@@ -1184,30 +1205,41 @@ local Defs = {
         name.type = 'goto'
         return name
     end,
-    IfBlock = function (start, exp, actions, finish)
+    IfBlock = function (ifStart, ifFinish, exp, thenStart, thenFinish, actions, finish)
         actions.type   = 'ifblock'
-        actions.start  = start
+        actions.start  = ifStart
         actions.finish = finish - 1
         actions.filter = exp
+        actions.keyword= {
+            ifStart,   ifFinish - 1,
+            thenStart, thenFinish - 1,
+        }
         return actions
     end,
-    ElseIfBlock = function (start, exp, actions, finish)
+    ElseIfBlock = function (elseifStart, elseifFinish, exp, thenStart, thenFinish, actions, finish)
         actions.type   = 'elseifblock'
-        actions.start  = start
+        actions.start  = elseifStart
         actions.finish = finish - 1
         actions.filter = exp
+        actions.keyword= {
+            elseifStart, elseifFinish - 1,
+            thenStart,   thenFinish - 1,
+        }
         return actions
     end,
-    ElseBlock = function (start, actions, finish)
+    ElseBlock = function (elseStart, elseFinish, actions, finish)
         actions.type   = 'elseblock'
-        actions.start  = start
+        actions.start  = elseStart
         actions.finish = finish - 1
+        actions.keyword= {
+            elseStart, elseFinish - 1,
+        }
         return actions
     end,
-    If = function (start, blocks, finish)
+    If = function (start, blocks, endStart, endFinish)
         blocks.type   = 'if'
         blocks.start  = start
-        blocks.finish = finish - 1
+        blocks.finish = endFinish - 1
         local hasElse
         for i = 1, #blocks do
             local block = blocks[i]
@@ -1235,23 +1267,34 @@ local Defs = {
         checkMissEnd(start)
         return blocks
     end,
-    Loop = function (start, arg, steps, blockStart, block, finish)
+    Loop = function (forA, forB, arg, steps, doA, doB, blockStart, block, endA, endB)
         local loc = createLocal(arg, blockStart, steps[1])
         block.type   = 'loop'
-        block.start  = start
-        block.finish = finish - 1
+        block.start  = forA
+        block.finish = endB - 1
         block.loc    = loc
         block.max    = steps[2]
         block.step   = steps[3]
-        checkMissEnd(start)
+        block.keyword= {
+            forA, forB - 1,
+            doA , doB  - 1,
+            endA, endB - 1,
+        }
+        checkMissEnd(forA)
         return block
     end,
-    In = function (start, keys, exp, blockStart, block, finish)
+    In = function (forA, forB, keys, inA, inB, exp, doA, doB, blockStart, block, endA, endB)
         local func = tableRemove(exp, 1)
         block.type   = 'in'
-        block.start  = start
-        block.finish = finish - 1
+        block.start  = forA
+        block.finish = endB - 1
         block.keys   = keys
+        block.keyword= {
+            forA, forB - 1,
+            inA , inB  - 1,
+            doA , doB  - 1,
+            endA, endB - 1,
+        }
 
         local values
         if func then
@@ -1270,22 +1313,31 @@ local Defs = {
                 createLocal(loc, blockStart)
             end
         end
-        checkMissEnd(start)
+        checkMissEnd(forA)
         return block
     end,
-    While = function (start, filter, block, finish)
+    While = function (whileA, whileB, filter, doA, doB, block, endA, endB)
         block.type   = 'while'
-        block.start  = start
-        block.finish = finish - 1
+        block.start  = whileA
+        block.finish = endB - 1
         block.filter = filter
-        checkMissEnd(start)
+        block.keyword= {
+            whileA, whileB - 1,
+            doA   , doB    - 1,
+            endA  , endB   - 1,
+        }
+        checkMissEnd(whileA)
         return block
     end,
-    Repeat = function (start, block, filter, finish)
+    Repeat = function (repeatA, repeatB, block, untilA, untilB, filter, finish)
         block.type   = 'repeat'
-        block.start  = start
+        block.start  = repeatA
         block.finish = finish
         block.filter = filter
+        block.keyword= {
+            repeatA, repeatB - 1,
+            untilA , untilB  - 1,
+        }
         return block
     end,
     Lua = function (start, actions, finish)
@@ -1491,6 +1543,7 @@ local Defs = {
                 symbol = 'end',
             }
         }
+        return pos, pos
     end,
     MissDo = function (pos)
         PushError {
@@ -1501,6 +1554,7 @@ local Defs = {
                 symbol = 'do',
             }
         }
+        return pos, pos
     end,
     MissComma = function (pos)
         PushError {
@@ -1521,6 +1575,7 @@ local Defs = {
                 symbol = 'in',
             }
         }
+        return pos, pos
     end,
     MissUntil = function (pos)
         PushError {
@@ -1531,6 +1586,7 @@ local Defs = {
                 symbol = 'until',
             }
         }
+        return pos, pos
     end,
     MissThen = function (pos)
         PushError {
@@ -1541,6 +1597,7 @@ local Defs = {
                 symbol = 'then',
             }
         }
+        return pos, pos
     end,
     MissName = function (pos)
         PushError {
@@ -1639,6 +1696,7 @@ local Defs = {
                 }
             }
         }
+        return start, finish
     end,
     ErrDo = function (start, finish)
         PushError {
@@ -1654,6 +1712,7 @@ local Defs = {
                 }
             }
         }
+        return start, finish
     end,
 }
 

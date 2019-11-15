@@ -112,28 +112,30 @@ Rest        <-  (!%nl .)*
 
 AND         <-  Sp {'and'}    Cut
 BREAK       <-  Sp 'break'    Cut
-DO          <-  Sp 'do'       Cut
-            /   Sp ({} 'then' Cut {}) -> ErrDo
-ELSE        <-  Sp 'else'     Cut
-ELSEIF      <-  Sp 'elseif'   Cut
-END         <-  Sp 'end'      Cut
 FALSE       <-  Sp 'false'    Cut
-FOR         <-  Sp 'for'      Cut
-FUNCTION    <-  Sp 'function' Cut
 GOTO        <-  Sp 'goto'     Cut
-IF          <-  Sp 'if'       Cut
-IN          <-  Sp 'in'       Cut
 LOCAL       <-  Sp 'local'    Cut
 NIL         <-  Sp 'nil'      Cut
 NOT         <-  Sp 'not'      Cut
 OR          <-  Sp {'or'}     Cut
-REPEAT      <-  Sp 'repeat'   Cut
 RETURN      <-  Sp 'return'   Cut
-THEN        <-  Sp 'then'     Cut
-            /   Sp ({} 'do' Cut {}) -> ErrThen
 TRUE        <-  Sp 'true'     Cut
-UNTIL       <-  Sp 'until'    Cut
-WHILE       <-  Sp 'while'    Cut
+
+DO          <-  Sp {} 'do'       {} Cut
+            /   Sp({} 'then'     {} Cut) -> ErrDo
+IF          <-  Sp {} 'if'       {} Cut
+ELSE        <-  Sp {} 'else'     {} Cut
+ELSEIF      <-  Sp {} 'elseif'   {} Cut
+END         <-  Sp {} 'end'      {} Cut
+FOR         <-  Sp {} 'for'      {} Cut
+FUNCTION    <-  Sp {} 'function' {} Cut
+IN          <-  Sp {} 'in'       {} Cut
+REPEAT      <-  Sp {} 'repeat'   {} Cut
+THEN        <-  Sp {} 'then'     {} Cut
+            /   Sp({} 'do'       {} Cut) -> ErrThen
+UNTIL       <-  Sp {} 'until'    {} Cut
+WHILE       <-  Sp {} 'while'    {} Cut
+
 
 Esc         <-  '\' -> ''
                 EChar
@@ -365,7 +367,7 @@ NewIndex    <-  Sp ({} Index NeedAssign DirtyExp {})
 NewField    <-  Sp ({} MustName ASSIGN DirtyExp {})
             ->  NewField
 
-Function    <-  Sp ({} FunctionBody {})
+Function    <-  FunctionBody
             ->  Function
 FuncArgs    <-  Sp ({} PL {| FuncArg+ |} DirtyPR {})
             ->  FuncArgs
@@ -415,8 +417,7 @@ SimpleList  <-  {| Simple (Sp ',' Simple)* |}
 Do          <-  Sp ({} 
                 'do' Cut
                     {| (!END Action)* |}
-                NeedEnd
-                {})
+                NeedEnd)
             ->  Do
 
 Break       <-  Sp ({} BREAK {})
@@ -435,14 +436,14 @@ Label       <-  Sp ({} LABEL MustName DirtyLabel {})
 GoTo        <-  Sp ({} GOTO MustName {})
             ->  GoTo
 
-If          <-  Sp ({} {| IfHead IfBody* |} NeedEnd {})
+If          <-  Sp ({} {| IfHead IfBody* |} NeedEnd)
             ->  If
 
-IfHead      <-  Sp ({} IfPart     {}) -> IfBlock
-            /   Sp ({} ElseIfPart {}) -> ElseIfBlock
-            /   Sp ({} ElsePart   {}) -> ElseBlock
-IfBody      <-  Sp ({} ElseIfPart {}) -> ElseIfBlock
-            /   Sp ({} ElsePart   {}) -> ElseBlock
+IfHead      <-  Sp (IfPart     {}) -> IfBlock
+            /   Sp (ElseIfPart {}) -> ElseIfBlock
+            /   Sp (ElsePart   {}) -> ElseBlock
+IfBody      <-  Sp (ElseIfPart {}) -> ElseIfBlock
+            /   Sp (ElsePart   {}) -> ElseBlock
 IfPart      <-  IF DirtyExp NeedThen
                     {| (!ELSEIF !ELSE !END Action)* |}
 ElseIfPart  <-  ELSEIF DirtyExp NeedThen
@@ -452,7 +453,7 @@ ElsePart    <-  ELSE
 
 For         <-  Loop / In
 
-Loop        <-  Sp ({} LoopBody {})
+Loop        <-  LoopBody
             ->  Loop
 LoopBody    <-  FOR LoopArgs NeedDo
                     {} {| (!END Action)* |}
@@ -461,7 +462,7 @@ LoopArgs    <-  MustName AssignOrEQ
                 ({} {| (COMMA / !DO !END Exp)* |} {})
             ->  PackLoopArgs
 
-In          <-  Sp ({} InBody {})
+In          <-  InBody
             ->  In
 InBody      <-  FOR InNameList NeedIn InExpList NeedDo
                     {} {| (!END Action)* |}
@@ -471,13 +472,13 @@ InNameList  <-  ({} {| (COMMA / !IN !DO !END Name)* |} {})
 InExpList   <-  ({} {| (COMMA / !DO !DO !END Exp)*  |} {})
             ->  PackInExpList
 
-While       <-  Sp ({} WhileBody {})
+While       <-  WhileBody
             ->  While
 WhileBody   <-  WHILE DirtyExp NeedDo
                     {| (!END Action)* |}
                 NeedEnd
 
-Repeat      <-  Sp ({} RepeatBody {})
+Repeat      <-  (RepeatBody {})
             ->  Repeat
 RepeatBody  <-  REPEAT
                     {| (!UNTIL Action)* |}
@@ -499,11 +500,11 @@ Call        <-  Simple
             ->  SimpleCall
 
 LocalFunction
-            <-  Sp ({} LOCAL FunctionNamedBody {})
+            <-  Sp ({} LOCAL FunctionNamedBody)
             ->  LocalFunction
 
 NamedFunction
-            <-  Sp ({} FunctionNamedBody {})
+            <-  FunctionNamedBody
             ->  NamedFunction
 FunctionNamedBody
             <-  FUNCTION FuncName FuncArgs

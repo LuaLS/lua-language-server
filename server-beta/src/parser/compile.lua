@@ -9,12 +9,14 @@ local specials = {
     ['require']      = true,
     ['dofile']       = true,
     ['loadfile']     = true,
+    ['pcall']        = true,
+    ['xpcall']       = true,
 }
 
 _ENV = nil
 
 local LocalLimit = 200
-local pushError, Compile, CompileBlock, Block, GoToTag, ENVMode, Compiled, LocalCount, Version, Special
+local pushError, Compile, CompileBlock, Block, GoToTag, ENVMode, Compiled, LocalCount, Version, Root
 
 local function addRef(node, obj)
     if not node.ref then
@@ -25,10 +27,13 @@ local function addRef(node, obj)
 end
 
 local function addSpecial(name, obj)
-    if not Special[name] then
-        Special[name] = {}
+    if not Root.specials then
+        Root.specials = {}
     end
-    Special[name][#Special[name]+1] = obj
+    if not Root.specials[name] then
+        Root.specials[name] = {}
+    end
+    Root.specials[name][#Root.specials[name]+1] = obj
     obj.special = name
 end
 
@@ -532,7 +537,7 @@ return function (self, lua, mode, version)
     GoToTag = {}
     LocalCount = 0
     Version = version
-    Special = state.special
+    Root = state.ast
     if type(state.ast) == 'table' then
         Compile(state.ast)
     end

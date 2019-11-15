@@ -28,7 +28,12 @@ function searcher.getLinks(source)
     if not unlock then
         return nil
     end
+    local clock = os.clock()
     cache = getLinks(source) or false
+    local passed = os.clock() - clock
+    if passed > 0.1 then
+        log.warn(('getLinks takes [%.3f] sec!'):format(passed))
+    end
     searcher.cache.getLinks[source] = cache
     unlock()
     return cache

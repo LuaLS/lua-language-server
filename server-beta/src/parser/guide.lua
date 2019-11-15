@@ -355,6 +355,13 @@ function m.eachSource(ast, callback)
     end
 end
 
+--- 获取指定的 special
+function m.eachSpecialOf(ast, name, callback)
+    if not ast.special then
+        
+    end
+end
+
 --- 获取偏移对应的坐标
 ---@param lines table
 ---@return integer {name = 'row'}

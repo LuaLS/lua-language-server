@@ -39,7 +39,7 @@ local function main()
     test 'references'
     test 'definition'
     test 'diagnostics'
-    --test 'highlight'
+    test 'highlight'
     --test 'rename'
     --test 'type_inference'
     --test 'find_lib'

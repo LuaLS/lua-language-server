@@ -1,5 +1,4 @@
 local guide     = require 'parser.guide'
-local workspace = require 'workspace'
 local files     = require 'files'
 local searcher  = require 'searcher'
 

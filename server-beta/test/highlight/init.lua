@@ -1,6 +1,5 @@
-local core = require 'core'
-local parser  = require 'parser'
-local buildVM = require 'vm'
+local core  = require 'core.highlight'
+local files = require 'files'
 
 local function catch_target(script)
     local list = {}
@@ -10,7 +9,10 @@ local function catch_target(script)
         if not start then
             break
         end
-        list[#list+1] = { start + 2, finish - 2 }
+        list[#list+1] = {
+            start  = start + 2,
+            finish = finish - 2,
+        }
         cur = finish + 1
     end
     return list
@@ -32,53 +34,54 @@ local function founded(targets, results)
     return true
 end
 
-function TEST(newName)
-    return function (script)
-        local target = catch_target(script)
-        local start  = script:find('<?', 1, true)
-        local finish = script:find('?>', 1, true)
-        local pos = (start + finish) // 2 + 1
-        local new_script = script:gsub('<[!?]', '  '):gsub('[!?]>', '  ')
-        local ast = parser:parse(new_script, 'lua', 'Lua 5.3')
-        assert(ast)
-        local vm = buildVM(ast)
-        assert(vm)
+function TEST(script)
+    files.removeAll()
+    local target = catch_target(script)
+    local start  = script:find('<?', 1, true)
+    local finish = script:find('?>', 1, true)
+    local pos = (start + finish) // 2 + 1
+    local new_script = script:gsub('<[!?]', '  '):gsub('[!?]>', '  ')
+    files.setText('', new_script)
 
-        local positions = core.highlight(vm, pos)
-        if positions then
-            assert(founded(target, positions))
-        else
-            assert(#target == 0)
-        end
+    local positions = core('', pos)
+    if positions then
+        assert(founded(target, positions))
+    else
+        assert(#target == 0)
     end
 end
 
-TEST 'b' [[
+TEST [[
 local <?a?> = 1
 ]]
 
-TEST 'b' [[
+TEST [[
 local <?a?> = 1
 <!a!> = 2
 <!a!> = <!a!>
 ]]
 
-TEST 'b' [[
+TEST [[
 t.<?a?> = 1
 a = t.<!a!>
 ]]
 
-TEST 'b' [[
+TEST [[
 t[<!'a'!>] = 1
 a = t.<?a?>
 ]]
 
-TEST 'b' [[
+TEST [[
+t[<?'a'?>] = 1
+a = t.<!a!>
+]]
+
+TEST [[
 :: <?a?> ::
 goto <!a!>
 ]]
 
-TEST 'b' [[
+TEST [[
 local function f(<!a!>)
     return <?a?>
 end

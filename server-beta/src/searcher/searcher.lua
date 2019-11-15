@@ -31,55 +31,11 @@ function m.lock(tp, source)
     end
 end
 
---- 获取特殊对象的名字
-function m.getSpecialName(source)
-    local spName = m.cache.specialName[source]
-    if spName ~= nil then
-        if spName then
-            return spName
-        end
-        return nil
-    end
-    local function getName(src)
-        if src.type == 'getglobal' then
-            local node = src.node
-            if node.tag ~= '_ENV' then
-                return nil
-            end
-            local name = guide.getKeyName(src)
-            if name:sub(1, 2) ~= 's|' then
-                return nil
-            end
-            spName = name:sub(3)
-            if not specials[spName] then
-                spName = nil
-            end
-        elseif src.type == 'local' then
-            if src.tag == '_ENV' then
-                spName = '_G'
-            end
-        elseif src.type == 'getlocal' then
-            local loc = src.loc
-            if loc.tag == '_ENV' then
-                spName = '_G'
-            end
-        end
-    end
-    getName(source)
-    if not spName then
-        m.eachRef(source, function (info)
-            getName(info.source)
-        end)
-    end
-    m.cache.specialName[source] = spName or false
-    return spName
-end
-
 --- 获取link的uri
 function m.getLinkUris(call)
     local workspace = require 'workspace'
     local func = call.node
-    local name = m.getSpecialName(func)
+    local name = func.special
     if name == 'require' then
         local args = call.args
         if not args[1] then

@@ -58,7 +58,7 @@ local function checkRequire(source, offset, callback)
     if type(literal) ~= 'string' then
         return
     end
-    local name = searcher.getSpecialName(func)
+    local name = func.special
     if     name == 'require' then
         local result = workspace.findUrisByRequirePath(literal, true)
         for _, uri in ipairs(result) do

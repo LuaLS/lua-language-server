@@ -67,7 +67,7 @@ local function ofReturn(rtn, index, callback)
 end
 
 local function ofSpecialCall(call, func, index, callback)
-    local name = searcher.getSpecialName(func)
+    local name = func.special
     if name == 'setmetatable' then
         if index == 1 then
             local args = call.args
@@ -170,7 +170,7 @@ local function asValue(source, callback)
                 if args[2] == t then
                     local call = args.parent
                     local func = call.node
-                    if searcher.getSpecialName(func) == 'setmetatable' then
+                    if func.special == 'setmetatable' then
                         searcher.eachRef(args[1], callback)
                     end
                 end
@@ -204,7 +204,7 @@ local function asArg(source, callback)
     if parent.type == 'callargs' then
         local call = parent.parent
         local func = call.node
-        local name = searcher.getSpecialName(func)
+        local name = func.special
         if name == 'setmetatable' then
             if parent[1] == source then
                 if parent[2] then

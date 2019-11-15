@@ -407,6 +407,7 @@ local vmMap = {
                 finish = 0,
                 effect = 0,
                 tag    = '_ENV',
+                special= '_G',
                 [1]    = '_ENV',
             }, obj)
         end

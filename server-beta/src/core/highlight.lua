@@ -1,6 +1,7 @@
 local guide    = require 'parser.guide'
 local files    = require 'files'
 local searcher = require 'searcher'
+local define   = require 'proto.define'
 
 local function ofLocal(source, callback)
     callback(source)
@@ -54,8 +55,10 @@ local function find(source, uri, callback)
     elseif source.type == 'field'
     or     source.type == 'method' then
         ofField(source, uri, callback)
-    elseif source.type == 'string'
-    or     source.type == 'boolean'
+    elseif source.type == 'string' then
+        ofIndex(source, uri, callback)
+        callback(source)
+    elseif source.type == 'boolean'
     or     source.type == 'number' then
         ofIndex(source, uri, callback)
     elseif source.type == 'goto'
@@ -73,17 +76,41 @@ return function (uri, offset)
     local mark = {}
     guide.eachSourceContain(ast.ast, offset, function (source)
         find(source, uri, function (target)
-            if     target.type == 'getfield'
-            or     target.type == 'setfield'
+            local kind
+            if     target.type == 'getfield' then
+                target = target.field
+                kind   = define.DocumentHighlightKind.Read
+            elseif target.type == 'setfield'
             or     target.type == 'tablefield' then
                 target = target.field
-            elseif target.type == 'getmethod'
-            or     target.type == 'setmethod' then
+                kind   = define.DocumentHighlightKind.Write
+            elseif target.type == 'getmethod' then
                 target = target.method
-            elseif target.type == 'getindex'
-            or     target.type == 'setindex'
+                kind   = define.DocumentHighlightKind.Read
+            elseif target.type == 'setmethod' then
+                target = target.method
+                kind   = define.DocumentHighlightKind.Write
+            elseif target.type == 'getindex' then
+                target = target.index
+                kind   = define.DocumentHighlightKind.Read
+            elseif target.type == 'setindex'
             or     target.type == 'tableindex' then
                 target = target.index
+                kind   = define.DocumentHighlightKind.Write
+            elseif target.type == 'getlocal'
+            or     target.type == 'getglobal'
+            or     target.type == 'goto' then
+                kind   = define.DocumentHighlightKind.Read
+            elseif target.type == 'setlocal'
+            or     target.type == 'local'
+            or     target.type == 'setglobal'
+            or     target.type == 'label' then
+                kind   = define.DocumentHighlightKind.Write
+            elseif target.type == 'string' then
+                kind   = define.DocumentHighlightKind.Text
+            else
+                log.warn('Unknow target.type:', target.type)
+                return
             end
             if mark[target] then
                 return
@@ -92,6 +119,7 @@ return function (uri, offset)
             results[#results+1] = {
                 start  = target.start,
                 finish = target.finish,
+                kind   = kind,
             }
         end)
     end)

@@ -207,6 +207,29 @@ proto.on('textDocument/references', function (params)
     return response
 end)
 
+proto.on('textDocument/documentHighlight', function (params)
+    local core = require 'core.highlight'
+    local uri  = params.textDocument.uri
+    if not files.exists(uri) then
+        return nil
+    end
+    local lines  = files.getLines(uri)
+    local text   = files.getText(uri)
+    local offset = define.offset(lines, text, params.position)
+    local result = core(uri, offset)
+    if not result then
+        return nil
+    end
+    local response = {}
+    for _, info in ipairs(result) do
+        response[#response+1] = {
+            range = define.range(lines, text, info.start, info.finish),
+            kind  = info.kind,
+        }
+    end
+    return response
+end)
+
 proto.on('textDocument/completion', function (params)
     --log.info(util.dump(params))
     return nil

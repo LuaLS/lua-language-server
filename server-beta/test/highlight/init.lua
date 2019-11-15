@@ -86,3 +86,7 @@ local function f(<!a!>)
     return <?a?>
 end
 ]]
+
+TEST [[
+local s = <?'asd/gadasd.fad.zxczg'?>
+]]

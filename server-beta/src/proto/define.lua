@@ -114,4 +114,10 @@ m.DiagnosticTag = {
     Deprecated  = 2,
 }
 
+m.DocumentHighlightKind = {
+    Text  = 1,
+    Read  = 2,
+    Write = 3,
+}
+
 return m

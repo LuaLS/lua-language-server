@@ -11,6 +11,9 @@ function m.offset(lines, text, position)
     local row    = position.line + 1
     local start  = guide.lineRange(lines, row)
     local offset = utf8.offset(text, position.character + 1, start)
+    if text:sub(offset-1, offset):match '[%w_][^%w_]' then
+        offset = offset - 1
+    end
     return offset
 end
 

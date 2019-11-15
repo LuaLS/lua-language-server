@@ -357,8 +357,16 @@ end
 
 --- 获取指定的 special
 function m.eachSpecialOf(ast, name, callback)
-    if not ast.special then
-        
+    local root = m.getRoot(ast)
+    if not root.specials then
+        return
+    end
+    local specials = root.specials[name]
+    if not specials then
+        return
+    end
+    for i = 1, #specials do
+        callback(specials[i])
     end
 end
 

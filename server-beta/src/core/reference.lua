@@ -11,7 +11,7 @@ local function isFunction(source, offset)
     return offset >= source.start and offset < source.start + #'function'
 end
 
-local function findDef(source, offset, callback)
+local function findRef(source, offset, callback)
     if  source.type ~= 'local'
     and source.type ~= 'getlocal'
     and source.type ~= 'setlocal'
@@ -70,7 +70,7 @@ return function (uri, offset)
     end
     local results = {}
     guide.eachSourceContain(ast.ast, offset, function (source)
-        findDef(source, offset, function (target, uri)
+        findRef(source, offset, function (target, uri)
             results[#results+1] = {
                 target = target,
                 uri    = files.getOriginUri(uri),

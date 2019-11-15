@@ -3,18 +3,26 @@ local searcher = require 'searcher.searcher'
 
 local function getLinks(root)
     local cache = {}
-    guide.eachSourceType(root, 'call', function (source)
-        local uris = searcher.getLinkUris(source)
-        if uris then
-            for i = 1, #uris do
-                local uri = uris[i]
-                if not cache[uri] then
-                    cache[uri] = {}
+    local ok
+    guide.eachSpecialOf(root, 'require', function (source)
+        local call = source.parent
+        if call.type == 'call' then
+            local uris = searcher.getLinkUris(call)
+            if uris then
+                ok = true
+                for i = 1, #uris do
+                    local uri = uris[i]
+                    if not cache[uri] then
+                        cache[uri] = {}
+                    end
+                    cache[uri][#cache[uri]+1] = call
                 end
-                cache[uri][#cache[uri]+1] = source
             end
         end
     end)
+    if not ok then
+        return nil
+    end
     return cache
 end
 

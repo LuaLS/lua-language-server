@@ -299,7 +299,10 @@ function m.eachSourceContain(ast, offset, callback)
         list[len] = nil
         if m.isInRange(obj, offset) then
             if m.isContain(obj, offset) then
-                callback(obj)
+                local res = callback(obj)
+                if res ~= nil then
+                    return res
+                end
             end
             m.addChilds(list, obj, m.childMap)
         end
@@ -476,19 +479,23 @@ function m.getKeyName(obj)
     elseif tp == 'getfield'
     or     tp == 'setfield'
     or     tp == 'tablefield' then
-        return 's|' .. obj.field[1]
+        if obj.field then
+            return 's|' .. obj.field[1]
+        end
     elseif tp == 'getmethod'
     or     tp == 'setmethod' then
-        return 's|' .. obj.method[1]
+        if obj.method then
+            return 's|' .. obj.method[1]
+        end
     elseif tp == 'getindex'
     or     tp == 'setindex'
     or     tp == 'tableindex' then
-        return m.getKeyName(obj.index)
+        if obj.index then
+            return m.getKeyName(obj.index)
+        end
     elseif tp == 'field'
     or     tp == 'method' then
         return 's|' .. obj[1]
-    elseif tp == 'index' then
-        return m.getKeyName(obj.index)
     elseif tp == 'string' then
         local s = obj[1]
         if s then

@@ -1,22 +1,37 @@
-local parser = require 'parser'
-local core = require 'core'
-local buildVM = require 'vm'
-local config = require 'config'
+local files    = require 'files'
+local config   = require 'config'
+local searcher = require 'searcher'
+local guide    = require 'parser.guide'
 
 rawset(_G, 'TEST', true)
 
-function TEST(res)
+local function getSource(pos)
+    local ast = files.getAst('')
+    return guide.eachSourceContain(ast.ast, pos, function (source)
+        if source.type == 'local'
+        or source.type == 'getlocal'
+        or source.type == 'setlocal'
+        or source.type == 'setglobal'
+        or source.type == 'getglobal'
+        or source.type == 'field'
+        or source.type == 'method' then
+            return source
+        end
+    end)
+end
+
+function TEST(wanted)
     return function (script)
+        files.removeAll()
         local start  = script:find('<?', 1, true)
         local finish = script:find('?>', 1, true)
         local pos = (start + finish) // 2 + 1
-        local new_script = script:gsub('<[!?]', '  '):gsub('[!?]>', '  ')
-        local ast = parser:parse(new_script, 'lua', 'Lua 5.3')
-        local vm = buildVM(ast)
-        assert(vm)
-        local result = core.findSource(vm, pos)
-        assert(result)
-        assert(res == result:bindValue():getType())
+        local newScript = script:gsub('<[!?]', '  '):gsub('[!?]>', '  ')
+        files.setText('', newScript)
+        local source = getSource(pos)
+        assert(source)
+        local result = searcher.typeInference(source) or 'any'
+        assert(wanted == result)
     end
 end
 
@@ -30,8 +45,12 @@ TEST 'boolean' [[
 local <?var?> = true
 ]]
 
-TEST 'number' [[
+TEST 'integer' [[
 local <?var?> = 1
+]]
+
+TEST 'number' [[
+local <?var?> = 1.0
 ]]
 
 TEST 'string' [[
@@ -39,9 +58,15 @@ local var = '111'
 t.<?x?> = var
 ]]
 
-TEST 'string' [[
+TEST 'any' [[
 local <?var?>
 var = '111'
+]]
+
+TEST 'string' [[
+local var
+var = '111'
+print(<?var?>)
 ]]
 
 TEST 'function' [[
@@ -55,18 +80,13 @@ end
 ]]
 
 TEST 'function' [[
-local <?xx?>
-xx = function ()
+local xx
+<?xx?> = function ()
 end
 ]]
 
 TEST 'table' [[
 local <?t?> = {}
-]]
-
-TEST 'table' [[
-local <?t?>
-t = {}
 ]]
 
 TEST 'function' [[

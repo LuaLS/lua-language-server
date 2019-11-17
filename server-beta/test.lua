@@ -40,7 +40,7 @@ local function main()
     test 'definition'
     test 'diagnostics'
     test 'highlight'
-    --test 'rename'
+    test 'rename'
     --test 'type_inference'
     --test 'find_lib'
     --test 'hover'

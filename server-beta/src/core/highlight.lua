@@ -14,20 +14,35 @@ end
 
 local function ofField(source, uri, callback)
     local parent = source.parent
-    if not parent or not parent.node then
+    if not parent then
         return
     end
     local myKey = guide.getKeyName(source)
-    searcher.eachField(parent.node, function (info)
-        if info.key ~= myKey then
-            return
-        end
-        local destUri = guide.getRoot(info.source).uri
-        if destUri ~= uri then
-            return
-        end
-        callback(info.source)
-    end)
+    if parent.type == 'tableindex'
+    or parent.type == 'tablefield' then
+        local tbl = parent.parent
+        searcher.eachField(tbl, function (info)
+            if info.key ~= myKey then
+                return
+            end
+            local destUri = guide.getRoot(info.source).uri
+            if destUri ~= uri then
+                return
+            end
+            callback(info.source)
+        end)
+    else
+        searcher.eachField(parent.node, function (info)
+            if info.key ~= myKey then
+                return
+            end
+            local destUri = guide.getRoot(info.source).uri
+            if destUri ~= uri then
+                return
+            end
+            callback(info.source)
+        end)
+    end
 end
 
 local function ofIndex(source, uri, callback)

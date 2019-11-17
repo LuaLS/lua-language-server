@@ -427,8 +427,7 @@ local function eachRef(source, callback)
     or     stype == 'method' then
         ofField(source, callback)
     elseif stype == 'setfield'
-    or     stype == 'getfield'
-    or     stype == 'tablefield' then
+    or     stype == 'getfield' then
         ofField(source.field, callback)
     elseif stype == 'setmethod'
     or     stype == 'getmethod' then

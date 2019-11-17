@@ -130,4 +130,11 @@ m.DocumentHighlightKind = {
     Write = 3,
 }
 
+m.MessageType = {
+    Error   = 1,
+    Warning = 2,
+    Info    = 3,
+    Log     = 4,
+}
+
 return m

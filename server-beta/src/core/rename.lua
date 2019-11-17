@@ -1,17 +1,59 @@
 local files    = require 'files'
 local searcher = require 'searcher'
 local guide    = require 'parser.guide'
+local proto    = require 'proto'
+local define   = require 'proto.define'
+
+local Forcing
+
+local function askForcing(str)
+    if TEST then
+        return true
+    end
+    if Forcing == false then
+        return false
+    end
+    local version = files.globalVersion
+    -- TODO
+    local item = proto.awaitRequest('window/showMessageRequest', {
+        type    = define.MessageType.Warning,
+        message = '不是有效的标识符，是否强制替换？',
+        actions = {
+            {
+                title = '强制替换',
+            },
+            {
+                title = '取消',
+            },
+        }
+    })
+    if version ~= files.globalVersion then
+        Forcing = false
+        proto.notify('window/showMessage', {
+            type    = define.MessageType.Warning,
+            message = '文件发生了变化，替换取消。'
+        })
+        return false
+    end
+    if not item then
+        Forcing = false
+        return false
+    end
+    if item.title == '强制替换' then
+        Forcing = true
+        return true
+    else
+        Forcing = false
+        return false
+    end
+end
 
 local function isValidName(str)
     return str:match '^[%a_][%w_]*$'
 end
 
-local function forceReplace(name)
-    return true
-end
-
 local function ofLocal(source, newname, callback)
-    if not isValidName(newname) and not forceReplace(newname) then
+    if not isValidName(newname) and not askForcing(newname) then
         return false
     end
     callback(source, source.start, source.finish, newname)
@@ -68,11 +110,29 @@ local function renameField(source, newname, callback)
     elseif parent.type == 'tablefield' then
         local newstr = '[' .. toString('"', newname) .. ']'
         callback(source, source.start, source.finish, newstr)
-    else
-        if not forceReplace(newname) then
+    elseif parent.type == 'getmethod' then
+        if not askForcing(newname) then
             return false
         end
         callback(source, source.start, source.finish, newname)
+    elseif parent.type == 'setmethod' then
+        local uri = guide.getRoot(source).uri
+        local text = files.getText(uri)
+        local func = parent.value
+        -- function mt:name () end --> mt['newname'] = function (self) end
+        local newstr = string.format('%s[%s] = function '
+            , text:sub(parent.start, parent.node.finish)
+            , toString('"', newname)
+        )
+        callback(source, func.start, parent.finish, newstr)
+        local pl = text:find('(', parent.finish, true)
+        if pl then
+            if func.args then
+                callback(source, pl + 1, pl, 'self, ')
+            else
+                callback(source, pl + 1, pl, 'self')
+            end
+        end
     end
     return true
 end
@@ -80,9 +140,15 @@ end
 local function renameGlobal(source, newname, callback)
     if isValidName(newname) then
         callback(source, source.start, source.finish, newname)
-        return false
+        return true
     end
     local newstr = '_ENV[' .. toString('"', newname) .. ']'
+    -- function name () end --> _ENV['newname'] = function () end
+    if source.value and source.value.type == 'function'
+    and source.value.start < source.start then
+        callback(source, source.value.start, source.finish, newstr .. ' = function ')
+        return true
+    end
     callback(source, source.start, source.finish, newstr)
     return true
 end
@@ -126,7 +192,7 @@ end
 local function rename(source, newname, callback)
     if source.type == 'label'
     or source.type == 'goto' then
-        if not isValidName(newname) and not forceReplace(newname)then
+        if not isValidName(newname) and not askForcing(newname)then
             return false
         end
         searcher.eachRef(source, function (info)
@@ -156,9 +222,8 @@ return function (uri, pos, newname)
     end
     local results = {}
 
-    local ok = true
     guide.eachSourceContain(ast.ast, pos, function(source)
-        local suc = rename(source, newname, function (target, start, finish, text)
+        rename(source, newname, function (target, start, finish, text)
             results[#results+1] = {
                 start  = start,
                 finish = finish,
@@ -166,13 +231,13 @@ return function (uri, pos, newname)
                 uri    = guide.getRoot(target).uri,
             }
         end)
-        if suc == false then
-            ok = false
-        end
     end)
-    if not ok then
+
+    if Forcing == false then
+        Forcing = nil
         return nil
     end
+
     if #results == 0 then
         return nil
     end

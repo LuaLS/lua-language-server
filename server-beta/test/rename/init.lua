@@ -140,7 +140,17 @@ function mt:a()
 end
 mt:a()
 ]] [[
-function mt:!!!()
+mt["!!!"] = function (self)
+end
+mt:!!!()
+]]
+
+TEST ('a', '!!!') [[
+function mt:a(x, y)
+end
+mt:a()
+]] [[
+mt["!!!"] = function (self, x, y)
 end
 mt:!!!()
 ]]
@@ -149,4 +159,10 @@ TEST ('a', '!!!') [[
 a = a
 ]] [[
 _ENV["!!!"] = _ENV["!!!"]
+]]
+
+TEST ('a', '!!!') [[
+function a() end
+]] [[
+_ENV["!!!"] = function () end
 ]]

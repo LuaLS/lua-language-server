@@ -1732,15 +1732,15 @@ local Defs = {
 
 local function init(state)
     State     = state
-    PushError = state.pushError or function () end
-    PushDiag  = state.pushDiag  or function () end
+    PushError = state.pushError
+    PushDiag  = state.pushDiag
     emmy.init(State)
 end
 
 local function close()
     State     = nil
-    PushError = function () end
-    PushDiag  = function () end
+    PushError = nil
+    PushDiag  = nil
 end
 
 return {

@@ -661,6 +661,16 @@ local Defs = {
         end
         return e
     end,
+    SubBinary = function (op, symb)
+        if symb then
+            return op, symb
+        end
+        PushError {
+            type   = 'MISS_EXP',
+            start  = op.start,
+            finish = op.finish,
+        }
+    end,
     Binary = function (first, op, second, ...)
         if not first then
             return second

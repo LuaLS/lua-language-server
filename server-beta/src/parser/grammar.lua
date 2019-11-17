@@ -362,8 +362,7 @@ TableField  <-  COMMA
             /   NewIndex
             /   NewField
             /   Exp
-Index       <-  ({} BL DirtyExp DirtyBR {})
-            ->  Index
+Index       <-  BL DirtyExp DirtyBR
 NewIndex    <-  Sp ({} Index NeedAssign DirtyExp {})
             ->  NewIndex
 NewField    <-  Sp ({} MustName ASSIGN DirtyExp {})

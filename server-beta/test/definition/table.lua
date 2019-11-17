@@ -98,7 +98,7 @@ t.<?insert?>()
 
 TEST[[
 local t = {
-    <!['insert']!> = 1,
+    [<!'insert'!>] = 1,
 }
 t.<?insert?>()
 ]]

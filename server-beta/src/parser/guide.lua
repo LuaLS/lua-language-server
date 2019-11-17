@@ -44,7 +44,6 @@ m.childMap = {
     ['return']      = {'#'},
     ['do']          = {'#'},
     ['select']      = {'vararg'},
-    ['index']       = {'index'},
     ['table']       = {'#'},
     ['tableindex']  = {'index', 'value'},
     ['tablefield']  = {'value'},

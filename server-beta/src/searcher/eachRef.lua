@@ -321,7 +321,8 @@ end
 local function ofField(source, callback)
     local parent = source.parent
     local key    = guide.getKeyName(source)
-    if parent.type == 'tablefield' then
+    if parent.type == 'tablefield'
+    or parent.type == 'tableindex' then
         local tbl = parent.parent
         searcher.eachField(tbl, function (info)
             if key == info.key then
@@ -356,7 +357,8 @@ local function ofLiteral(source, callback)
         return
     end
     if parent.type == 'setindex'
-    or parent.type == 'getindex' then
+    or parent.type == 'getindex'
+    or parent.type == 'tableindex' then
         ofField(source, callback)
     end
 end
@@ -422,8 +424,7 @@ local function eachRef(source, callback)
     or     stype == 'getglobal' then
         ofGlobal(source, callback)
     elseif stype == 'field'
-    or     stype == 'method'
-    or     stype == 'index' then
+    or     stype == 'method' then
         ofField(source, callback)
     elseif stype == 'setfield'
     or     stype == 'getfield'

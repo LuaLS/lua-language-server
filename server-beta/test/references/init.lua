@@ -92,6 +92,13 @@ print(t.<!a!>)
 ]]
 
 TEST [[
+local t = {
+    [<?'a'?>] = 1
+}
+print(t.<!a!>)
+]]
+
+TEST [[
 local <!mt!> = {}
 function <!mt!>:a()
     <?self?>:remove()

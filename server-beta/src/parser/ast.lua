@@ -970,18 +970,6 @@ local Defs = {
         end
         return obj
     end,
-    Index = function (start, index, finish)
-        local obj = {
-            type   = 'index',
-            start  = start,
-            finish = finish - 1,
-            index  = index,
-        }
-        if index then
-            index.parent = obj
-        end
-        return obj
-    end,
     NewIndex = function (start, index, value, finish)
         local obj = {
             type   = 'tableindex',

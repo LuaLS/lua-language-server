@@ -12,7 +12,9 @@ m.initer = {
     hoverProvider = true,
     definitionProvider = true,
     referencesProvider = true,
-    renameProvider = true,
+    renameProvider = {
+        prepareProvider = true,
+    },
     --documentSymbolProvider = true,
     documentHighlightProvider = true,
     --codeActionProvider = true,

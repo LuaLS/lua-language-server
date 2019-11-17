@@ -239,7 +239,7 @@ proto.on('textDocument/rename', function (params)
     local lines  = files.getLines(uri)
     local text   = files.getText(uri)
     local offset = define.offset(lines, text, params.position)
-    local result = core(uri, offset, params.newName)
+    local result = core.rename(uri, offset, params.newName)
     if not result then
         return nil
     end
@@ -257,6 +257,25 @@ proto.on('textDocument/rename', function (params)
         workspaceEdit.changes[ruri][#workspaceEdit.changes[ruri]+1] = textEdit
     end
     return workspaceEdit
+end)
+
+proto.on('textDocument/prepareRename', function (params)
+    local core = require 'core.rename'
+    local uri  = params.textDocument.uri
+    if not files.exists(uri) then
+        return nil
+    end
+    local lines  = files.getLines(uri)
+    local text   = files.getText(uri)
+    local offset = define.offset(lines, text, params.position)
+    local result = core.prepareRename(uri, offset)
+    if not result then
+        return nil
+    end
+    return {
+        range       = define.range(lines, text, result.start, result.finish),
+        placeholder = result.text,
+    }
 end)
 
 proto.on('textDocument/completion', function (params)

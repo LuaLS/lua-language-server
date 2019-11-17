@@ -57,7 +57,7 @@ function TEST(oldName, newName)
             local pos = oldScript:find('[^%w_]'..oldName..'[^%w_]')
             assert(pos)
 
-            local positions = core('', pos+1, newName)
+            local positions = core.rename('', pos+1, newName)
             local script = oldScript
             if positions then
                 script = replace(script, positions)
@@ -118,6 +118,20 @@ end
 TEST ('a', '!!!') [[
 t = {
     a = 0
+}
+t.a = 1
+a = t.a
+]] [[
+t = {
+    ["!!!"] = 0
+}
+t["!!!"] = 1
+a = t["!!!"]
+]]
+
+TEST ('a', '!!!') [[
+t = {
+    ['a'] = 0
 }
 t.a = 1
 a = t.a

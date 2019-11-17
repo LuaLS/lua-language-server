@@ -198,8 +198,7 @@ local function rename(source, newname, callback)
         searcher.eachRef(source, function (info)
             callback(info.source, info.source.start, info.source.finish, newname)
         end)
-    end
-    if     source.type == 'local' then
+    elseif source.type == 'local' then
         return ofLocal(source, newname, callback)
     elseif source.type == 'setlocal'
     or     source.type == 'getlocal' then
@@ -215,7 +214,36 @@ local function rename(source, newname, callback)
     return true
 end
 
-return function (uri, pos, newname)
+local function prepareRename(source)
+    if source.type == 'label'
+    or source.type == 'goto'
+    or source.type == 'local'
+    or source.type == 'setlocal'
+    or source.type == 'getlocal'
+    or source.type == 'field'
+    or source.type == 'method'
+    or source.type == 'tablefield'
+    or source.type == 'setglobal'
+    or source.type == 'getglobal' then
+        return source, source[1]
+    elseif source.type == 'string' then
+        local parent = source.parent
+        if not parent then
+            return nil
+        end
+        if parent.type == 'setindex'
+        or parent.type == 'getindex'
+        or parent.type == 'tableindex' then
+            return source, source[1]
+        end
+        return nil
+    end
+    return nil
+end
+
+local m = {}
+
+function m.rename(uri, pos, newname)
     local ast = files.getAst(uri)
     if not ast then
         return nil
@@ -243,3 +271,26 @@ return function (uri, pos, newname)
     end
     return results
 end
+
+function m.prepareRename(uri, pos)
+    local ast = files.getAst(uri)
+    if not ast then
+        return nil
+    end
+
+    local result
+    guide.eachSourceContain(ast.ast, pos, function(source)
+        local res, text = prepareRename(source)
+        if res then
+            result = {
+                start  = source.start,
+                finish = source.finish,
+                text   = text,
+            }
+        end
+    end)
+
+    return result
+end
+
+return m

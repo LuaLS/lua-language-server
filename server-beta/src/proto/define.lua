@@ -81,6 +81,13 @@ function m.locationLink(uri, range, selection, origin)
     }
 end
 
+function m.textEdit(range, newtext)
+    return {
+        range   = range,
+        newText = newtext,
+    }
+end
+
 --- 诊断等级
 m.DiagnosticSeverity = {
     Error       = 1,

@@ -230,6 +230,35 @@ proto.on('textDocument/documentHighlight', function (params)
     return response
 end)
 
+proto.on('textDocument/rename', function (params)
+    local core = require 'core.rename'
+    local uri  = params.textDocument.uri
+    if not files.exists(uri) then
+        return nil
+    end
+    local lines  = files.getLines(uri)
+    local text   = files.getText(uri)
+    local offset = define.offset(lines, text, params.position)
+    local result = core(uri, offset, params.newName)
+    if not result then
+        return nil
+    end
+    local workspaceEdit = {
+        changes = {},
+    }
+    for _, info in ipairs(result) do
+        local ruri   = info.uri
+        local rlines = files.getLines(ruri)
+        local rtext  = files.getText(ruri)
+        if not workspaceEdit.changes[ruri] then
+            workspaceEdit.changes[ruri] = {}
+        end
+        local textEdit = define.textEdit(define.range(rlines, rtext, info.start, info.finish), info.text)
+        workspaceEdit.changes[ruri][#workspaceEdit.changes[ruri]+1] = textEdit
+    end
+    return workspaceEdit
+end)
+
 proto.on('textDocument/completion', function (params)
     --log.info(util.dump(params))
     return nil

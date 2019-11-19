@@ -449,6 +449,21 @@ local function eachRef(source, callback)
     asArg(source, callback)
 end
 
+--- 判断2个对象是否拥有相同的引用
+function searcher.isSameRef(a, b)
+    local cache = searcher.cache.eachRef[a]
+    if cache then
+        -- 相同引用的source共享同一份cache
+        return cache == searcher.cache.eachRef[b]
+    else
+        return searcher.eachRef(a, function (info)
+            if info.source == b then
+                return true
+            end
+        end) or false
+    end
+end
+
 --- 获取所有的引用
 function searcher.eachRef(source, callback)
     local cache = searcher.cache.eachRef[source]

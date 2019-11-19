@@ -30,7 +30,7 @@ function TEST(wanted)
         files.setText('', newScript)
         local source = getSource(pos)
         assert(source)
-        local result = searcher.typeInference(source) or 'any'
+        local result = searcher.getValue(source) or 'any'
         assert(wanted == result)
     end
 end
@@ -113,7 +113,7 @@ TEST 'integer' [[
 <?x?> = ~ y
 ]]
 
-TEST 'number' [[
+TEST 'integer' [[
 local a = true
 local b = 1
 <?x?> = a and b

@@ -64,8 +64,7 @@ function m.refreshCache()
         getGlobal   = {},
         specialName = {},
         getLibrary  = {},
-        typeInfer   = {},
-        isTrue      = {},
+        getValue    = {},
         specials    = nil,
     }
     m.locked = {
@@ -74,8 +73,7 @@ function m.refreshCache()
         getGlobals = {},
         getLinks   = {},
         getLibrary = {},
-        typeInfer  = {},
-        isTrue     = {},
+        getValue   = {},
     }
     m.cacheTracker[m.cache] = true
 end

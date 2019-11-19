@@ -16,7 +16,7 @@ local function check(uri, name, level, results)
         results[#results+1] = result
     end, name)
     local passed = os.clock() - clock
-    if passed >= 0.1 then
+    if passed >= 0.5 then
         log.warn(('Diagnostics [%s] @ [%s] takes [%.3f] sec!'):format(name, uri, passed))
         await.delay()
     end

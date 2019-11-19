@@ -31,18 +31,23 @@ end
 
 --- 休眠一段时间
 ---@param time number
-function m.sleep(time, ...)
+function m.sleep(time, getVersion)
     if not coroutine.isyieldable() then
         if m.errorHandle then
             m.errorHandle(debug.traceback('Cannot yield'))
         end
         return
     end
+    local version = getVersion and getVersion()
     local co = coroutine.running()
     timer.wait(time, function ()
-        return m.checkResult(co, coroutine.resume(co))
+        if version == (getVersion and getVersion()) then
+            return m.checkResult(co, coroutine.resume(co))
+        else
+            coroutine.close(co)
+        end
     end)
-    return coroutine.yield(...)
+    return coroutine.yield(getVersion)
 end
 
 --- 等待直到唤醒

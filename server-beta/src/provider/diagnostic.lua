@@ -144,10 +144,20 @@ function m.doDiagnostic(uri, syntaxOnly)
 
     local syntax = m.syntaxErrors(uri, ast)
     local diagnostics = m.diagnostics(uri, syntaxOnly)
+    local newDiag = merge(syntax, diagnostics)
+    local lastDiag = files.getDiagnostic(uri)
+    if #newDiag == 0 then
+        if not lastDiag then
+            return
+        end
+        files.setDiagnostic(uri, nil)
+    else
+        files.setDiagnostic(uri, newDiag)
+    end
 
     proto.notify('textDocument/publishDiagnostics', {
         uri = uri,
-        diagnostics = merge(syntax, diagnostics),
+        diagnostics = newDiag,
     })
 end
 

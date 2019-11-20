@@ -12,11 +12,7 @@ local typeSort = {
 
 NIL = setmetatable({'<nil>'}, { __tostring = function () return 'nil' end })
 
-local function merge(a, b)
-    local t = {}
-    for i = 1, #a do
-        t[#t+1] = a[i]
-    end
+local function merge(t, b)
     for i = 1, #b do
         t[#t+1] = b[i]
     end
@@ -438,7 +434,7 @@ local function checkCall(result, source)
     end
 end
 
-local function checkNext(result, source)
+local function checkNext(results, source)
     local next = source.next
     if not next then
         return
@@ -449,36 +445,18 @@ local function checkNext(result, source)
     or next.type == 'setfield'
     or next.type == 'setindex'
     or next.type == 'setmethod' then
-        merge(result, 'table')
+        merge(results, 'table')
     end
 end
 
-local function checkDef(result, source)
+local function checkDef(results, source)
     vm.eachDef(source, function (info)
         local src = info.source
         local tp  = vm.getValue(src)
         if tp then
-            merge(result, tp)
+            merge(results, tp)
         end
     end)
-end
-
-local function typeInference(source)
-    local tp = checkLiteral(source)
-            or checkValue(source)
-            or checkUnary(source)
-            or checkBinary(source)
-    if tp then
-        return tp
-    end
-
-    local result = {}
-
-    checkCall(result, source)
-    checkNext(result, source)
-    checkDef(result, source)
-
-    return dump(result)
 end
 
 local function getValue(source)
@@ -492,6 +470,17 @@ local function getValue(source)
     if results then
         return results
     end
+
+    results = {}
+    checkDef(results, source)
+    --checkCall(results, source)
+    --checkNext(results, source)
+
+    if #results == 0 then
+        return nil
+    end
+
+    return results
 end
 
 function vm.checkTrue(source)

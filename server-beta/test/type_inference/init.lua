@@ -119,7 +119,7 @@ local b = 1
 <?x?> = a and b
 ]]
 
-TEST 'number' [[
+TEST 'integer' [[
 local a = false
 local b = 1
 <?x?> = a or b

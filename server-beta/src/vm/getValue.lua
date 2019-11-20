@@ -14,51 +14,70 @@ NIL = setmetatable({'<nil>'}, { __tostring = function () return 'nil' end })
 
 local function merge(t, b)
     for i = 1, #b do
-        t[#t+1] = b[i]
+        local o = b[i]
+        if not t[o] then
+            t[o] = true
+            t[#t+1] = o
+        end
+    end
+    return t
+end
+
+local function alloc(o)
+    return {
+        [1] = o,
+        [o] = true,
+    }
+end
+
+local function insert(t, o)
+    if not t[o] then
+        t[o] = true
+        t[#t+1] = o
     end
     return t
 end
 
 local function checkLiteral(source)
     if source.type == 'string' then
-        return {
+        return alloc {
             type   = 'string',
             value  = source[1],
             source = source,
         }
     elseif source.type == 'nil' then
-        return {
+        return alloc {
             type   = 'nil',
             value  = NIL,
             source = source,
         }
     elseif source.type == 'boolean' then
-        return {
+        return alloc {
             type   = 'boolean',
             value  = source[1],
             source = source,
         }
     elseif source.type == 'number' then
         if math.type(source[1]) == 'integer' then
-            return {
+            return alloc {
                 type   = 'integer',
                 value  = source[1],
                 source = source,
             }
         else
-            return {
+            return alloc {
                 type   = 'number',
                 value  = source[1],
                 source = source,
             }
         end
     elseif source.type == 'table' then
-        return {
+        return alloc {
             type   = 'table',
             source = source,
         }
     elseif source.type == 'function' then
-        return {
+        return alloc {
             type   = 'function',
             source = source,
         }
@@ -71,26 +90,26 @@ local function checkUnary(source)
     end
     local op = source.op
     if op.type == 'not' then
-        local isTrue = vm.isTrue(source[1])
+        local checkTrue = vm.checkTrue(source[1])
         local value = nil
-        if isTrue == true then
+        if checkTrue == true then
             value = false
-        elseif isTrue == false then
+        elseif checkTrue == false then
             value = true
         end
-        return {
+        return alloc {
             type   = 'boolean',
             value  = value,
             source = source,
         }
     elseif op.type == '#' then
-        return {
+        return alloc {
             type   = 'integer',
             source = source,
         }
     elseif op.type == '~' then
         local l = vm.getLiteral(source[1], 'integer')
-        return {
+        return alloc {
             type   = 'integer',
             value  = l and ~l or nil,
             source = source,
@@ -98,14 +117,14 @@ local function checkUnary(source)
     elseif op.type == '-' then
         local v = vm.getLiteral(source[1], 'integer')
         if v then
-            return {
+            return alloc {
                 type   = 'integer',
                 value  = - v,
                 source = source,
             }
         end
         v = vm.getLiteral(source[1], 'number')
-        return {
+        return alloc {
             type   = 'number',
             value  = v and -v or nil,
             source = source,
@@ -145,7 +164,7 @@ local function checkBinary(source)
     elseif op.type == '==' then
         local value = vm.isSameValue(source[1], source[2])
         if value ~= nil then
-            return {
+            return alloc {
                 type   = 'boolean',
                 value  = value,
                 source = source,
@@ -157,7 +176,7 @@ local function checkBinary(source)
         else
             value = nil
         end
-        return {
+        return alloc {
             type   = 'boolean',
             value  = value,
             source = source,
@@ -165,7 +184,7 @@ local function checkBinary(source)
     elseif op.type == '~=' then
         local value = vm.isSameValue(source[1], source[2])
         if value ~= nil then
-            return {
+            return alloc {
                 type   = 'boolean',
                 value  = not value,
                 source = source,
@@ -177,7 +196,7 @@ local function checkBinary(source)
         else
             value = nil
         end
-        return {
+        return alloc {
             type   = 'boolean',
             value  = value,
             source = source,
@@ -189,7 +208,7 @@ local function checkBinary(source)
         if v1 and v2 then
             v = v1 <= v2
         end
-        return {
+        return alloc {
             type   = 'boolean',
             value  = v,
             source = source,
@@ -201,7 +220,7 @@ local function checkBinary(source)
         if v1 and v2 then
             v = v1 >= v2
         end
-        return {
+        return alloc {
             type   = 'boolean',
             value  = v,
             source = source,
@@ -213,7 +232,7 @@ local function checkBinary(source)
         if v1 and v2 then
             v = v1 < v2
         end
-        return {
+        return alloc {
             type   = 'boolean',
             value  = v,
             source = source,
@@ -225,7 +244,7 @@ local function checkBinary(source)
         if v1 and v2 then
             v = v1 > v2
         end
-        return {
+        return alloc {
             type   = 'boolean',
             value  = v,
             source = source,
@@ -237,7 +256,7 @@ local function checkBinary(source)
         if v1 and v2 then
             v = v1 | v2
         end
-        return {
+        return alloc {
             type   = 'integer',
             value  = v,
             source = source,
@@ -249,7 +268,7 @@ local function checkBinary(source)
         if v1 and v2 then
             v = v1 ~ v2
         end
-        return {
+        return alloc {
             type   = 'integer',
             value  = v,
             source = source,
@@ -261,7 +280,7 @@ local function checkBinary(source)
         if v1 and v2 then
             v = v1 & v2
         end
-        return {
+        return alloc {
             type   = 'integer',
             value  = v,
             source = source,
@@ -273,7 +292,7 @@ local function checkBinary(source)
         if v1 and v2 then
             v = v1 << v2
         end
-        return {
+        return alloc {
             type   = 'integer',
             value  = v,
             source = source,
@@ -285,7 +304,7 @@ local function checkBinary(source)
         if v1 and v2 then
             v = v1 >> v2
         end
-        return {
+        return alloc {
             type   = 'integer',
             value  = v,
             source = source,
@@ -297,7 +316,7 @@ local function checkBinary(source)
         if v1 and v2 then
             v = v1 .. v2
         end
-        return {
+        return alloc {
             type   = 'string',
             value  = v,
             source = source,
@@ -309,7 +328,7 @@ local function checkBinary(source)
         if v1 and v2 then
             v = v1 ^ v2
         end
-        return {
+        return alloc {
             type   = 'number',
             value  = v,
             source = source,
@@ -321,7 +340,7 @@ local function checkBinary(source)
         if v1 and v2 then
             v = v1 > v2
         end
-        return {
+        return alloc {
             type   = 'number',
             value  = v,
             source = source,
@@ -331,7 +350,7 @@ local function checkBinary(source)
         local v1 = vm.getLiteral(source[1], 'integer')
         local v2 = vm.getLiteral(source[2], 'integer')
         if v1 and v2 then
-            return {
+            return alloc {
                 type   = 'integer',
                 value  = v1 + v2,
                 source = source,
@@ -339,7 +358,7 @@ local function checkBinary(source)
         end
         v1 = v1 or vm.getLiteral(source[1], 'number')
         v2 = v2 or vm.getLiteral(source[1], 'number')
-        return {
+        return alloc {
             type   = 'number',
             value  = (v1 and v2) and (v1 + v2) or nil,
             source = source,
@@ -348,7 +367,7 @@ local function checkBinary(source)
         local v1 = vm.getLiteral(source[1], 'integer')
         local v2 = vm.getLiteral(source[2], 'integer')
         if v1 and v2 then
-            return {
+            return alloc {
                 type   = 'integer',
                 value  = v1 - v2,
                 source = source,
@@ -356,7 +375,7 @@ local function checkBinary(source)
         end
         v1 = v1 or vm.getLiteral(source[1], 'number')
         v2 = v2 or vm.getLiteral(source[1], 'number')
-        return {
+        return alloc {
             type   = 'number',
             value  = (v1 and v2) and (v1 - v2) or nil,
             source = source,
@@ -365,7 +384,7 @@ local function checkBinary(source)
         local v1 = vm.getLiteral(source[1], 'integer')
         local v2 = vm.getLiteral(source[2], 'integer')
         if v1 and v2 then
-            return {
+            return alloc {
                 type   = 'integer',
                 value  = v1 * v2,
                 source = source,
@@ -373,7 +392,7 @@ local function checkBinary(source)
         end
         v1 = v1 or vm.getLiteral(source[1], 'number')
         v2 = v2 or vm.getLiteral(source[1], 'number')
-        return {
+        return alloc {
             type   = 'number',
             value  = (v1 and v2) and (v1 * v2) or nil,
             source = source,
@@ -382,7 +401,7 @@ local function checkBinary(source)
         local v1 = vm.getLiteral(source[1], 'integer')
         local v2 = vm.getLiteral(source[2], 'integer')
         if v1 and v2 then
-            return {
+            return alloc {
                 type   = 'integer',
                 value  = v1 % v2,
                 source = source,
@@ -390,7 +409,7 @@ local function checkBinary(source)
         end
         v1 = v1 or vm.getLiteral(source[1], 'number')
         v2 = v2 or vm.getLiteral(source[1], 'number')
-        return {
+        return alloc {
             type   = 'number',
             value  = (v1 and v2) and (v1 % v2) or nil,
             source = source,
@@ -399,7 +418,7 @@ local function checkBinary(source)
         local v1 = vm.getLiteral(source[1], 'integer')
         local v2 = vm.getLiteral(source[2], 'integer')
         if v1 and v2 then
-            return {
+            return alloc {
                 type   = 'integer',
                 value  = v1 // v2,
                 source = source,
@@ -407,7 +426,7 @@ local function checkBinary(source)
         end
         v1 = v1 or vm.getLiteral(source[1], 'number')
         v2 = v2 or vm.getLiteral(source[1], 'number')
-        return {
+        return alloc {
             type   = 'number',
             value  = (v1 and v2) and (v1 // v2) or nil,
             source = source,
@@ -421,7 +440,7 @@ local function checkValue(source)
     end
 end
 
-local function checkCall(result, source)
+local function checkCall(results, source)
     if not source.parent then
         return
     end
@@ -429,7 +448,10 @@ local function checkCall(result, source)
         return
     end
     if source.parent.node == source then
-        merge(result, 'function')
+        insert(results, {
+            type   = 'function',
+            source = source,
+        })
         return
     end
 end
@@ -445,7 +467,10 @@ local function checkNext(results, source)
     or next.type == 'setfield'
     or next.type == 'setindex'
     or next.type == 'setmethod' then
-        merge(results, 'table')
+        insert(results, {
+            type   = 'table',
+            source = source,
+        })
     end
 end
 
@@ -460,11 +485,8 @@ local function checkDef(results, source)
 end
 
 local function getValue(source)
-    local result = checkLiteral(source)
-    if result then
-        return { result }
-    end
-    local results = checkValue(source)
+    local results = checkLiteral(source)
+                 or checkValue(source)
                  or checkUnary(source)
                  or checkBinary(source)
     if results then
@@ -473,8 +495,8 @@ local function getValue(source)
 
     results = {}
     checkDef(results, source)
-    --checkCall(results, source)
-    --checkNext(results, source)
+    checkCall(results, source)
+    checkNext(results, source)
 
     if #results == 0 then
         return nil

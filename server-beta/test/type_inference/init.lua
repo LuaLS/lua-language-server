@@ -1,6 +1,6 @@
 local files  = require 'files'
 local config = require 'config'
-local vm     = require 'searvmcher'
+local vm     = require 'vm'
 local guide  = require 'parser.guide'
 
 rawset(_G, 'TEST', true)

@@ -127,10 +127,10 @@ local function renameField(source, newname, callback)
     if parent.type == 'setfield'
     or parent.type == 'getfield' then
         local dot = parent.dot
-        local newstr = '[' .. util.viewString('"', newname) .. ']'
+        local newstr = '[' .. util.viewString(newname) .. ']'
         callback(source, dot.start, source.finish, newstr)
     elseif parent.type == 'tablefield' then
-        local newstr = '[' .. util.viewString('"', newname) .. ']'
+        local newstr = '[' .. util.viewString(newname) .. ']'
         callback(source, source.start, source.finish, newstr)
     elseif parent.type == 'getmethod' then
         if not askForcing(newname) then
@@ -144,7 +144,7 @@ local function renameField(source, newname, callback)
         -- function mt:name () end --> mt['newname'] = function (self) end
         local newstr = string.format('%s[%s] = function '
             , text:sub(parent.start, parent.node.finish)
-            , util.viewString('"', newname)
+            , util.viewString(newname)
         )
         callback(source, func.start, parent.finish, newstr)
         local pl = text:find('(', parent.finish, true)
@@ -164,7 +164,7 @@ local function renameGlobal(source, newname, callback)
         callback(source, source.start, source.finish, newname)
         return true
     end
-    local newstr = '_ENV[' .. util.viewString('"', newname) .. ']'
+    local newstr = '_ENV[' .. util.viewString(newname) .. ']'
     -- function name () end --> _ENV['newname'] = function () end
     if source.value and source.value.type == 'function'
     and source.value.start < source.start then
@@ -192,7 +192,7 @@ local function ofField(source, newname, callback)
         end
         if src.type == 'string' then
             local quo = src[2]
-            local text = util.viewString(quo, newname)
+            local text = util.viewString(newname, quo)
             callback(src, src.start, src.finish, text)
             return
         elseif src.type == 'field'

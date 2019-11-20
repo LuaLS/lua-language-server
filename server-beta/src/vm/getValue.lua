@@ -187,37 +187,235 @@ local function checkBinary(source)
             source = source,
         }
     elseif op.type == '<=' then
-    elseif op.type == '>='
-    or op.type == '<'
-    or op.type == '>' then
-        return 'boolean'
-    end
-    if op.type == '|'
-    or op.type == '~'
-    or op.type == '&'
-    or op.type == '<<'
-    or op.type == '>>' then
-        return 'integer'
-    end
-    if op.type == '..' then
-        return 'string'
-    end
-    if op.type == '^'
-    or op.type == '/' then
-        return 'number'
-    end
-    -- 其他数学运算根据2侧的值决定，当2侧的值均为整数时返回整数
-    if op.type == '+'
-    or op.type == '-'
-    or op.type == '*'
-    or op.type == '%'
-    or op.type == '//' then
-        if  hasType('integer', vm.getValue(source[1]))
-        and hasType('integer', vm.getValue(source[2])) then
-            return 'integer'
-        else
-            return 'number'
+        local v1 = vm.getLiteral(source[1], 'integer') or vm.getLiteral(source[1], 'number')
+        local v2 = vm.getLiteral(source[2], 'integer') or vm.getLiteral(source[2], 'number')
+        local v
+        if v1 and v2 then
+            v = v1 <= v2
         end
+        return {
+            type   = 'boolean',
+            value  = v,
+            source = source,
+        }
+    elseif op.type == '>=' then
+        local v1 = vm.getLiteral(source[1], 'integer') or vm.getLiteral(source[1], 'number')
+        local v2 = vm.getLiteral(source[2], 'integer') or vm.getLiteral(source[2], 'number')
+        local v
+        if v1 and v2 then
+            v = v1 >= v2
+        end
+        return {
+            type   = 'boolean',
+            value  = v,
+            source = source,
+        }
+    elseif op.type == '<' then
+        local v1 = vm.getLiteral(source[1], 'integer') or vm.getLiteral(source[1], 'number')
+        local v2 = vm.getLiteral(source[2], 'integer') or vm.getLiteral(source[2], 'number')
+        local v
+        if v1 and v2 then
+            v = v1 < v2
+        end
+        return {
+            type   = 'boolean',
+            value  = v,
+            source = source,
+        }
+    elseif op.type == '>' then
+        local v1 = vm.getLiteral(source[1], 'integer') or vm.getLiteral(source[1], 'number')
+        local v2 = vm.getLiteral(source[2], 'integer') or vm.getLiteral(source[2], 'number')
+        local v
+        if v1 and v2 then
+            v = v1 > v2
+        end
+        return {
+            type   = 'boolean',
+            value  = v,
+            source = source,
+        }
+    elseif op.type == '|' then
+        local v1 = vm.getLiteral(source[1], 'integer')
+        local v2 = vm.getLiteral(source[2], 'integer')
+        local v
+        if v1 and v2 then
+            v = v1 | v2
+        end
+        return {
+            type   = 'integer',
+            value  = v,
+            source = source,
+        }
+    elseif op.type == '~' then
+        local v1 = vm.getLiteral(source[1], 'integer')
+        local v2 = vm.getLiteral(source[2], 'integer')
+        local v
+        if v1 and v2 then
+            v = v1 ~ v2
+        end
+        return {
+            type   = 'integer',
+            value  = v,
+            source = source,
+        }
+    elseif op.type == '&' then
+        local v1 = vm.getLiteral(source[1], 'integer')
+        local v2 = vm.getLiteral(source[2], 'integer')
+        local v
+        if v1 and v2 then
+            v = v1 & v2
+        end
+        return {
+            type   = 'integer',
+            value  = v,
+            source = source,
+        }
+    elseif op.type == '<<' then
+        local v1 = vm.getLiteral(source[1], 'integer')
+        local v2 = vm.getLiteral(source[2], 'integer')
+        local v
+        if v1 and v2 then
+            v = v1 << v2
+        end
+        return {
+            type   = 'integer',
+            value  = v,
+            source = source,
+        }
+    elseif op.type == '>>' then
+        local v1 = vm.getLiteral(source[1], 'integer')
+        local v2 = vm.getLiteral(source[2], 'integer')
+        local v
+        if v1 and v2 then
+            v = v1 >> v2
+        end
+        return {
+            type   = 'integer',
+            value  = v,
+            source = source,
+        }
+    elseif op.type == '..' then
+        local v1 = vm.getLiteral(source[1], 'string')
+        local v2 = vm.getLiteral(source[2], 'string')
+        local v
+        if v1 and v2 then
+            v = v1 .. v2
+        end
+        return {
+            type   = 'string',
+            value  = v,
+            source = source,
+        }
+    elseif op.type == '^' then
+        local v1 = vm.getLiteral(source[1], 'integer') or vm.getLiteral(source[1], 'number')
+        local v2 = vm.getLiteral(source[2], 'integer') or vm.getLiteral(source[2], 'number')
+        local v
+        if v1 and v2 then
+            v = v1 ^ v2
+        end
+        return {
+            type   = 'number',
+            value  = v,
+            source = source,
+        }
+    elseif op.type == '/' then
+        local v1 = vm.getLiteral(source[1], 'integer') or vm.getLiteral(source[1], 'number')
+        local v2 = vm.getLiteral(source[2], 'integer') or vm.getLiteral(source[2], 'number')
+        local v
+        if v1 and v2 then
+            v = v1 > v2
+        end
+        return {
+            type   = 'number',
+            value  = v,
+            source = source,
+        }
+    -- 其他数学运算根据2侧的值决定，当2侧的值均为整数时返回整数
+    elseif op.type == '+' then
+        local v1 = vm.getLiteral(source[1], 'integer')
+        local v2 = vm.getLiteral(source[2], 'integer')
+        if v1 and v2 then
+            return {
+                type   = 'integer',
+                value  = v1 + v2,
+                source = source,
+            }
+        end
+        v1 = v1 or vm.getLiteral(source[1], 'number')
+        v2 = v2 or vm.getLiteral(source[1], 'number')
+        return {
+            type   = 'number',
+            value  = (v1 and v2) and (v1 + v2) or nil,
+            source = source,
+        }
+    elseif op.type == '-' then
+        local v1 = vm.getLiteral(source[1], 'integer')
+        local v2 = vm.getLiteral(source[2], 'integer')
+        if v1 and v2 then
+            return {
+                type   = 'integer',
+                value  = v1 - v2,
+                source = source,
+            }
+        end
+        v1 = v1 or vm.getLiteral(source[1], 'number')
+        v2 = v2 or vm.getLiteral(source[1], 'number')
+        return {
+            type   = 'number',
+            value  = (v1 and v2) and (v1 - v2) or nil,
+            source = source,
+        }
+    elseif op.type == '*' then
+        local v1 = vm.getLiteral(source[1], 'integer')
+        local v2 = vm.getLiteral(source[2], 'integer')
+        if v1 and v2 then
+            return {
+                type   = 'integer',
+                value  = v1 * v2,
+                source = source,
+            }
+        end
+        v1 = v1 or vm.getLiteral(source[1], 'number')
+        v2 = v2 or vm.getLiteral(source[1], 'number')
+        return {
+            type   = 'number',
+            value  = (v1 and v2) and (v1 * v2) or nil,
+            source = source,
+        }
+    elseif op.type == '%' then
+        local v1 = vm.getLiteral(source[1], 'integer')
+        local v2 = vm.getLiteral(source[2], 'integer')
+        if v1 and v2 then
+            return {
+                type   = 'integer',
+                value  = v1 % v2,
+                source = source,
+            }
+        end
+        v1 = v1 or vm.getLiteral(source[1], 'number')
+        v2 = v2 or vm.getLiteral(source[1], 'number')
+        return {
+            type   = 'number',
+            value  = (v1 and v2) and (v1 % v2) or nil,
+            source = source,
+        }
+    elseif op.type == '//' then
+        local v1 = vm.getLiteral(source[1], 'integer')
+        local v2 = vm.getLiteral(source[2], 'integer')
+        if v1 and v2 then
+            return {
+                type   = 'integer',
+                value  = v1 // v2,
+                source = source,
+            }
+        end
+        v1 = v1 or vm.getLiteral(source[1], 'number')
+        v2 = v2 or vm.getLiteral(source[1], 'number')
+        return {
+            type   = 'number',
+            value  = (v1 and v2) and (v1 // v2) or nil,
+            source = source,
+        }
     end
 end
 
@@ -394,14 +592,14 @@ function vm.isSameValue(a, b)
     return true
 end
 
-function vm.typeInference(source)
+function vm.getType(source)
     local values = vm.getValue(source)
     if not values then
         return 'any'
     end
     local types = {}
-    for _ = 1, #values do
-        local tp = values.type
+    for i = 1, #values do
+        local tp = values[i].type
         if not types[tp] then
             types[tp] = true
             types[#types+1] = tp

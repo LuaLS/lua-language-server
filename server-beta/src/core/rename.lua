@@ -3,6 +3,7 @@ local searcher = require 'searcher'
 local guide    = require 'parser.guide'
 local proto    = require 'proto'
 local define   = require 'proto.define'
+local ws       = require 'workspace'
 
 local Forcing
 
@@ -48,7 +49,7 @@ local function askForcing(str)
     end
 end
 
-local function askForMultiChange(results)
+local function askForMultiChange(results, newname)
     if TEST then
         return true
     end
@@ -65,19 +66,13 @@ local function askForMultiChange(results)
         return true
     end
 
-    local fileList = {}
-    for _, uri in ipairs(uris) do
-        fileList[#fileList+1] = ('%s (%d)'):format(uri, uris[uri])
-    end
-
     local version = files.globalVersion
     -- TODO
     local item = proto.awaitRequest('window/showMessageRequest', {
         type    = define.MessageType.Warning,
-        message = ('将修改以下 %d 个文件，共 %d 处。\r\n%s'):format(
+        message = ('将修改 %d 个文件，共 %d 处。'):format(
             #uris,
-            #results,
-            table.concat(fileList, '\r\n')
+            #results
         ),
         actions = {
             {
@@ -96,6 +91,12 @@ local function askForMultiChange(results)
         return false
     end
     if item and item.title == '继续' then
+        local fileList = {}
+        for _, uri in ipairs(uris) do
+            fileList[#fileList+1] = ('%s (%d)'):format(uri, uris[uri])
+        end
+
+        log.debug(('Renamed [%s]\r\n%s'):format(newname, table.concat(fileList, '\r\n')))
         return true
     end
     return false
@@ -323,7 +324,7 @@ function m.rename(uri, pos, newname)
         return nil
     end
 
-    if not askForMultiChange(results) then
+    if not askForMultiChange(results, newname) then
         return nil
     end
 

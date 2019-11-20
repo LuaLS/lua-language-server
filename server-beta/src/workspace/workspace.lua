@@ -186,4 +186,9 @@ function m.findUrisByRequirePath(path, whole)
     return results
 end
 
+function m.getRelativePath(uri)
+    local path = furi.decode(uri)
+    return fs.relative(fs.path(path), fs.path(m.path)):string()
+end
+
 return m

@@ -3,7 +3,7 @@ local searcher = require 'searcher'
 local guide    = require 'parser.guide'
 local proto    = require 'proto'
 local define   = require 'proto.define'
-local ws       = require 'workspace'
+local util     = require 'utility'
 
 local Forcing
 
@@ -118,38 +118,6 @@ local function ofLocal(source, newname, callback)
     end
 end
 
-local esc = {
-    ["'"]  = [[\']],
-    ['"']  = [[\"]],
-    ['\r'] = [[\r]],
-    ['\n'] = [[\n]],
-}
-
-local function toString(quo, newstr)
-    if quo == "'" then
-        return quo .. newstr:gsub([=[['\r\n]]=], esc) .. quo
-    elseif quo == '"' then
-        return quo .. newstr:gsub([=[["\r\n]]=], esc) .. quo
-    else
-        if newstr:find([[\r]], 1, true) then
-            return toString('"', newstr)
-        end
-        local eqnum = #quo - 2
-        local fsymb = ']' .. ('='):rep(eqnum) .. ']'
-        if not newstr:find(fsymb, 1, true) then
-            return quo .. newstr .. fsymb
-        end
-        for i = 0, 100 do
-            local fsymb = ']' .. ('='):rep(i) .. ']'
-            if not newstr:find(fsymb, 1, true) then
-                local ssymb = '[' .. ('='):rep(i) .. '['
-                return ssymb .. newstr .. fsymb
-            end
-        end
-        return toString('"', newstr)
-    end
-end
-
 local function renameField(source, newname, callback)
     if isValidName(newname) then
         callback(source, source.start, source.finish, newname)
@@ -159,10 +127,10 @@ local function renameField(source, newname, callback)
     if parent.type == 'setfield'
     or parent.type == 'getfield' then
         local dot = parent.dot
-        local newstr = '[' .. toString('"', newname) .. ']'
+        local newstr = '[' .. util.vieString('"', newname) .. ']'
         callback(source, dot.start, source.finish, newstr)
     elseif parent.type == 'tablefield' then
-        local newstr = '[' .. toString('"', newname) .. ']'
+        local newstr = '[' .. util.vieString('"', newname) .. ']'
         callback(source, source.start, source.finish, newstr)
     elseif parent.type == 'getmethod' then
         if not askForcing(newname) then
@@ -176,7 +144,7 @@ local function renameField(source, newname, callback)
         -- function mt:name () end --> mt['newname'] = function (self) end
         local newstr = string.format('%s[%s] = function '
             , text:sub(parent.start, parent.node.finish)
-            , toString('"', newname)
+            , util.vieString('"', newname)
         )
         callback(source, func.start, parent.finish, newstr)
         local pl = text:find('(', parent.finish, true)
@@ -196,7 +164,7 @@ local function renameGlobal(source, newname, callback)
         callback(source, source.start, source.finish, newname)
         return true
     end
-    local newstr = '_ENV[' .. toString('"', newname) .. ']'
+    local newstr = '_ENV[' .. util.vieString('"', newname) .. ']'
     -- function name () end --> _ENV['newname'] = function () end
     if source.value and source.value.type == 'function'
     and source.value.start < source.start then
@@ -224,7 +192,7 @@ local function ofField(source, newname, callback)
         end
         if src.type == 'string' then
             local quo = src[2]
-            local text = toString(quo, newname)
+            local text = util.vieString(quo, newname)
             callback(src, src.start, src.finish, text)
             return
         elseif src.type == 'field'

@@ -135,9 +135,11 @@ function m.dump(tbl, option)
             end
             local value = tbl[key]
             local tp = type(value)
-            if tp == 'table' then
+            if option['format'] and option['format'][key] then
+                lines[#lines+1] = ('%s%s%s,'):format(TAB[tab+1], keyWord, option['format'][key](value, unpack, tab+1))
+            elseif tp == 'table' then
                 if mark[value] and mark[value] > 0 then
-                    lines[#lines+1] = ('%s%s%s,'):format(TAB[tab+1], keyWord, option.loop or '"<Loop>"')
+                    lines[#lines+1] = ('%s%s%s,'):format(TAB[tab+1], keyWord, option['loop'] or '"<Loop>"')
                 else
                     lines[#lines+1] = ('%s%s{'):format(TAB[tab+1], keyWord)
                     unpack(value, tab+1)
@@ -146,7 +148,7 @@ function m.dump(tbl, option)
             elseif tp == 'string' then
                 lines[#lines+1] = ('%s%s%q,'):format(TAB[tab+1], keyWord, value)
             elseif tp == 'number' then
-                lines[#lines+1] = ('%s%s%s,'):format(TAB[tab+1], keyWord, (option.number or formatNumber)(value))
+                lines[#lines+1] = ('%s%s%s,'):format(TAB[tab+1], keyWord, (option['number'] or formatNumber)(value))
             elseif tp == 'nil' then
             else
                 lines[#lines+1] = ('%s%s%s,'):format(TAB[tab+1], keyWord, tostring(value))
@@ -286,7 +288,7 @@ function m.counter(init, step)
     if not step then
         step = 1
     end
-    local current = init and (init - 1) or -1
+    local current = init and (init - 1) or 0
     return function ()
         current = current + step
         return current
@@ -388,6 +390,45 @@ end
 local deferMT = { __close = function (self) self[1]() end }
 function m.defer(callback)
     return setmetatable({ callback }, deferMT)
+end
+
+local esc = {
+    ["'"]  = [[\']],
+    ['"']  = [[\"]],
+    ['\r'] = [[\r]],
+    ['\n'] = '\\\n',
+}
+
+function m.viewString(str, quo)
+    if not quo then
+        if not str:find("'", 1, true) and str:find('"', 1, true) then
+            quo = "'"
+        else
+            quo = '"'
+        end
+    end
+    if quo == "'" then
+        return quo .. str:gsub([=[['\r\n]]=], esc) .. quo
+    elseif quo == '"' then
+        return quo .. str:gsub([=[["\r\n]]=], esc) .. quo
+    else
+        if str:find '\r' then
+            return m.viewString(str)
+        end
+        local eqnum = #quo - 2
+        local fsymb = ']' .. ('='):rep(eqnum) .. ']'
+        if not str:find(fsymb, 1, true) then
+            return quo .. str .. fsymb
+        end
+        for i = 0, 10 do
+            local fsymb = ']' .. ('='):rep(i) .. ']'
+            if not str:find(fsymb, 1, true) then
+                local ssymb = '[' .. ('='):rep(i) .. '['
+                return ssymb .. str .. fsymb
+            end
+        end
+        return m.viewString(str)
+    end
 end
 
 return m

@@ -55,8 +55,7 @@ name = 'opt'
 type = 'string'
 optional = 'after'
 ``````````
-name = 'arg'
-type = 'integer'
+type = '...'
 optional = 'self'
 [[.returns]]
 [[.enums]]
@@ -75,12 +74,6 @@ enum = '"count"'
 ``````````
 name = 'opt'
 enum = '"step"'
-``````````
-name = 'opt'
-enum = '"setpause"'
-``````````
-name = 'opt'
-enum = '"setstepmul"'
 ``````````
 name = 'opt'
 enum = '"incremental"'

@@ -1,7 +1,7 @@
-local files    = require 'files'
-local guide    = require 'parser.guide'
-local searcher = require 'searcher'
-local lang     = require 'language'
+local files  = require 'files'
+local guide  = require 'parser.guide'
+local vm     = require 'vm'
+local lang   = require 'language'
 
 return function (uri, callback)
     local ast = files.getAst(uri)
@@ -14,7 +14,7 @@ return function (uri, callback)
         if source.node.tag == '_ENV' then
             return
         end
-        local setInENV = searcher.eachRef(source, function (info)
+        local setInENV = vm.eachRef(source, function (info)
             if info.mode == 'set' then
                 return true
             end

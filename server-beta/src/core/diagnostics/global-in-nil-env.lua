@@ -1,6 +1,5 @@
 local files    = require 'files'
 local guide    = require 'parser.guide'
-local searcher = require 'searcher'
 local lang     = require 'language'
 
 -- TODO: 检查路径是否可达

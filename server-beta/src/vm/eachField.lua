@@ -1,5 +1,5 @@
 local guide = require 'parser.guide'
-local searcher = require 'searcher.searcher'
+local vm    = require 'vm.vm'
 
 local function ofTabel(value, callback)
     for _, field in ipairs(value) do
@@ -67,9 +67,9 @@ local function ofSpecialArg(source, callback)
         end
     elseif name == 'setmetatable' then
         if args[1] == source and args[2] then
-            searcher.eachField(args[2], function (info)
+            vm.eachField(args[2], function (info)
                 if info.key == 's|__index' and info.value then
-                    searcher.eachField(info.value, callback)
+                    vm.eachField(info.value, callback)
                 end
             end)
         end
@@ -108,7 +108,7 @@ local function ofVar(source, callback)
 end
 
 local function eachField(source, callback)
-    searcher.eachRef(source, function (info)
+    vm.eachRef(source, function (info)
         local src = info.source
         if src.tag == '_ENV' then
             if src.ref then
@@ -129,20 +129,20 @@ local function eachField(source, callback)
 end
 
 --- 获取所有的field
-function searcher.eachField(source, callback)
-    local cache = searcher.cache.eachField[source]
+function vm.eachField(source, callback)
+    local cache = vm.cache.eachField[source]
     if cache then
         for i = 1, #cache do
             callback(cache[i])
         end
         return
     end
-    local unlock = searcher.lock('eachField', source)
+    local unlock = vm.lock('eachField', source)
     if not unlock then
         return
     end
     cache = {}
-    searcher.cache.eachField[source] = cache
+    vm.cache.eachField[source] = cache
     local mark = {}
     eachField(source, function (info)
         local src = info.source
@@ -153,9 +153,9 @@ function searcher.eachField(source, callback)
         cache[#cache+1] = info
     end)
     unlock()
-    searcher.eachRef(source, function (info)
+    vm.eachRef(source, function (info)
         local src = info.source
-        searcher.cache.eachField[src] = cache
+        vm.cache.eachField[src] = cache
     end)
     for i = 1, #cache do
         callback(cache[i])

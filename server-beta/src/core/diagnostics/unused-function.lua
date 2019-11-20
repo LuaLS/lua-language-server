@@ -1,9 +1,9 @@
-local files    = require 'files'
-local guide    = require 'parser.guide'
-local searcher = require 'searcher'
-local define   = require 'proto.define'
-local lang     = require 'language'
-local await    = require 'await'
+local files   = require 'files'
+local guide   = require 'parser.guide'
+local vm      = require 'vm'
+local define  = require 'proto.define'
+local lang    = require 'language'
+local await   = require 'await'
 
 return function (uri, callback)
     local ast = files.getAst(uri)
@@ -22,7 +22,7 @@ return function (uri, callback)
             return
         end
         local hasSet
-        local hasGet = searcher.eachRef(source, function (info)
+        local hasGet = vm.eachRef(source, function (info)
             if     info.mode == 'get' then
                 return true
             elseif info.mode == 'set'

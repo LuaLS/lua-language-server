@@ -1,9 +1,9 @@
-local pub        = require 'pub'
-local thread     = require 'bee.thread'
-local await      = require 'await'
-local timer      = require 'timer'
-local proto      = require 'proto'
-local searcher   = require 'searcher'
+local pub    = require 'pub'
+local thread = require 'bee.thread'
+local await  = require 'await'
+local timer  = require 'timer'
+local proto  = require 'proto'
+local vm     = require 'vm'
 
 local m = {}
 m.type = 'service'
@@ -84,7 +84,7 @@ function m.reportCache()
     local total = 0
     local dead  = 0
 
-    for cache in pairs(searcher.cacheTracker) do
+    for cache in pairs(vm.cacheTracker) do
         total = total + 1
         if cache.dead then
             dead = dead + 1

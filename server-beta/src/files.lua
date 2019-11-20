@@ -1,10 +1,10 @@
-local platform   = require 'bee.platform'
-local config     = require 'config'
-local glob       = require 'glob'
-local furi       = require 'file-uri'
-local parser     = require 'parser'
-local searcher   = require 'searcher.searcher'
-local guide      = require 'parser.guide'
+local platform = require 'bee.platform'
+local config   = require 'config'
+local glob     = require 'glob'
+local furi     = require 'file-uri'
+local parser   = require 'parser'
+local vm       = require 'vm.vm'
+local guide    = require 'parser.guide'
 
 local m = {}
 
@@ -69,13 +69,13 @@ function m.setText(uri, text)
         return
     end
     file.text = text
-    file.searcher = nil
+    file.vm = nil
     file.lines = nil
     file.ast = nil
     file.globals = nil
     file.links = nil
     m.globalVersion = m.globalVersion + 1
-    searcher.refreshCache()
+    vm.refreshCache()
 
     local diagnostic = require 'provider.diagnostic'
     diagnostic.refresh(originUri)
@@ -123,7 +123,7 @@ function m.remove(uri)
     m.fileMap[uri] = nil
 
     m.globalVersion = m.globalVersion + 1
-    searcher.refreshCache()
+    vm.refreshCache()
 
     local diagnostic = require 'service.diagnostic'
     diagnostic.refresh(file.uri)
@@ -135,7 +135,7 @@ function m.removeAll()
         m.fileMap[uri] = nil
     end
     m.globalVersion = m.globalVersion + 1
-    searcher.refreshCache()
+    vm.refreshCache()
 end
 
 --- 遍历文件
@@ -225,7 +225,7 @@ function m.findGlobals(name)
             file.globals = {}
             local ast = m.getAst(uri)
             if ast then
-                local globals = searcher.getGlobals(ast.ast)
+                local globals = vm.getGlobals(ast.ast)
                 for name in pairs(globals) do
                     file.globals[name] = true
                 end
@@ -248,7 +248,7 @@ function m.findLinkTo(uri)
         if file.links == nil then
             local ast = m.getAst(file.uri)
             if ast then
-                file.links = searcher.getLinks(ast.ast)
+                file.links = vm.getLinks(ast.ast)
             else
                 file.links = false
             end

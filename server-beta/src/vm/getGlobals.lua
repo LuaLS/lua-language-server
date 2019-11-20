@@ -1,11 +1,11 @@
 local guide = require 'parser.guide'
-local searcher = require 'searcher.searcher'
+local vm    = require 'vm.vm'
 
 local function getGlobals(root)
     local env  = guide.getENV(root)
     local cache = {}
     local mark = {}
-    searcher.eachField(env, function (info)
+    vm.eachField(env, function (info)
         local src = info.source
         if mark[src] then
             return
@@ -23,23 +23,23 @@ local function getGlobals(root)
         end
         cache[name][#cache[name]+1] = info
         cache[name].mode[info.mode] = true
-        searcher.cache.getGlobal[src] = name
+        vm.cache.getGlobal[src] = name
     end)
     return cache
 end
 
-function searcher.getGlobals(source)
+function vm.getGlobals(source)
     source = guide.getRoot(source)
-    local cache = searcher.cache.getGlobals[source]
+    local cache = vm.cache.getGlobals[source]
     if cache ~= nil then
         return cache
     end
-    local unlock = searcher.lock('getGlobals', source)
+    local unlock = vm.lock('getGlobals', source)
     if not unlock then
         return nil
     end
     cache = getGlobals(source) or false
-    searcher.cache.getGlobals[source] = cache
+    vm.cache.getGlobals[source] = cache
     unlock()
     return cache
 end

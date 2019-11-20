@@ -1,6 +1,6 @@
-local searcher  = require 'searcher.searcher'
-local guide     = require 'parser.guide'
-local files     = require 'files'
+local vm    = require 'vm.vm'
+local guide = require 'parser.guide'
+local files = require 'files'
 
 local function checkPath(source, info)
     if source.type == 'goto' then
@@ -17,11 +17,11 @@ local function checkPath(source, info)
     return true
 end
 
-function searcher.eachDef(source, callback)
+function vm.eachDef(source, callback)
     local results = {}
     local valueUris = {}
     local sourceUri = guide.getRoot(source).uri
-    searcher.eachRef(source, function (info)
+    vm.eachRef(source, function (info)
         if info.mode == 'declare'
         or info.mode == 'set'
         or info.mode == 'return'

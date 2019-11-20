@@ -1,6 +1,4 @@
-local searcher = require 'searcher.searcher'
-local guide    = require 'parser.guide'
-local config   = require 'config'
+local vm = require 'vm.vm'
 
 local typeSort = {
     ['boolean']  = 1,
@@ -77,7 +75,7 @@ local function checkUnary(source)
     end
     local op = source.op
     if op.type == 'not' then
-        local isTrue = searcher.isTrue(source[1])
+        local isTrue = vm.isTrue(source[1])
         local value = nil
         if isTrue == true then
             value = false
@@ -95,14 +93,14 @@ local function checkUnary(source)
             source = source,
         }
     elseif op.type == '~' then
-        local l = searcher.getLiteral(source[1], 'integer')
+        local l = vm.getLiteral(source[1], 'integer')
         return {
             type   = 'integer',
             value  = l and ~l or nil,
             source = source,
         }
     elseif op.type == '-' then
-        local v = searcher.getLiteral(source[1], 'integer')
+        local v = vm.getLiteral(source[1], 'integer')
         if v then
             return {
                 type   = 'integer',
@@ -110,7 +108,7 @@ local function checkUnary(source)
                 source = source,
             }
         end
-        v = searcher.getLiteral(source[1], 'number')
+        v = vm.getLiteral(source[1], 'number')
         return {
             type   = 'number',
             value  = v and -v or nil,
@@ -125,31 +123,31 @@ local function checkBinary(source)
     end
     local op = source.op
     if op.type == 'and' then
-        local isTrue = searcher.checkTrue(source[1])
+        local isTrue = vm.checkTrue(source[1])
         if isTrue == true then
-            return searcher.getValue(source[2])
+            return vm.getValue(source[2])
         elseif isTrue == false then
-            return searcher.getValue(source[1])
+            return vm.getValue(source[1])
         else
             return merge(
-                searcher.getValue(source[1]),
-                searcher.getValue(source[2])
+                vm.getValue(source[1]),
+                vm.getValue(source[2])
             )
         end
     elseif op.type == 'or' then
-        local isTrue = searcher.checkTrue(source[1])
+        local isTrue = vm.checkTrue(source[1])
         if isTrue == true then
-            return searcher.getValue(source[1])
+            return vm.getValue(source[1])
         elseif isTrue == false then
-            return searcher.getValue(source[2])
+            return vm.getValue(source[2])
         else
             return merge(
-                searcher.getValue(source[1]),
-                searcher.getValue(source[2])
+                vm.getValue(source[1]),
+                vm.getValue(source[2])
             )
         end
     elseif op.type == '==' then
-        local value = searcher.isSameValue(source[1], source[2])
+        local value = vm.isSameValue(source[1], source[2])
         if value ~= nil then
             return {
                 type   = 'boolean',
@@ -157,7 +155,7 @@ local function checkBinary(source)
                 source = source,
             }
         end
-        local isSame = searcher.isSameRef(source[1], source[2])
+        local isSame = vm.isSameRef(source[1], source[2])
         if isSame == true then
             value = true
         else
@@ -169,7 +167,7 @@ local function checkBinary(source)
             source = source,
         }
     elseif op.type == '~=' then
-        local value = searcher.isSameValue(source[1], source[2])
+        local value = vm.isSameValue(source[1], source[2])
         if value ~= nil then
             return {
                 type   = 'boolean',
@@ -177,7 +175,7 @@ local function checkBinary(source)
                 source = source,
             }
         end
-        local isSame = searcher.isSameRef(source[1], source[2])
+        local isSame = vm.isSameRef(source[1], source[2])
         if isSame == true then
             value = false
         else
@@ -214,8 +212,8 @@ local function checkBinary(source)
     or op.type == '*'
     or op.type == '%'
     or op.type == '//' then
-        if  hasType('integer', searcher.getValue(source[1]))
-        and hasType('integer', searcher.getValue(source[2])) then
+        if  hasType('integer', vm.getValue(source[1]))
+        and hasType('integer', vm.getValue(source[2])) then
             return 'integer'
         else
             return 'number'
@@ -225,7 +223,7 @@ end
 
 local function checkValue(source)
     if source.value then
-        return searcher.getValue(source.value)
+        return vm.getValue(source.value)
     end
 end
 
@@ -258,9 +256,9 @@ local function checkNext(result, source)
 end
 
 local function checkDef(result, source)
-    searcher.eachDef(source, function (info)
+    vm.eachDef(source, function (info)
         local src = info.source
-        local tp  = searcher.getValue(src)
+        local tp  = vm.getValue(src)
         if tp then
             merge(result, tp)
         end
@@ -298,8 +296,8 @@ local function getValue(source)
     end
 end
 
-function searcher.checkTrue(source)
-    local values = searcher.getValue(source)
+function vm.checkTrue(source)
+    local values = vm.getValue(source)
     if not values then
         return
     end
@@ -333,8 +331,8 @@ function searcher.checkTrue(source)
 end
 
 --- 拥有某个类型的值
-function searcher.eachValueType(source, type, callback)
-    local values = searcher.getValue(source)
+function vm.eachValueType(source, type, callback)
+    local values = vm.getValue(source)
     if not values then
         return
     end
@@ -350,8 +348,8 @@ function searcher.eachValueType(source, type, callback)
 end
 
 --- 获取特定类型的字面量值
-function searcher.getLiteral(source, type)
-    local values = searcher.getValue(source)
+function vm.getLiteral(source, type)
+    local values = vm.getValue(source)
     if not values then
         return nil
     end
@@ -364,9 +362,9 @@ function searcher.getLiteral(source, type)
     return nil
 end
 
-function searcher.isSameValue(a, b)
-    local valuesA = searcher.getValue(a)
-    local valuesB = searcher.getValue(b)
+function vm.isSameValue(a, b)
+    local valuesA = vm.getValue(a)
+    local valuesB = vm.getValue(b)
     if valuesA == valuesB and valuesA ~= nil then
         return true
     end
@@ -396,8 +394,8 @@ function searcher.isSameValue(a, b)
     return true
 end
 
-function searcher.typeInference(source)
-    local values = searcher.getValue(source)
+function vm.typeInference(source)
+    local values = vm.getValue(source)
     if not values then
         return 'any'
     end
@@ -435,20 +433,20 @@ function searcher.typeInference(source)
     return table.concat(types, '|')
 end
 
-function searcher.getValue(source)
+function vm.getValue(source)
     if not source then
         return
     end
-    local cache = searcher.cache.getValue[source]
+    local cache = vm.cache.getValue[source]
     if cache ~= nil then
         return cache
     end
-    local unlock = searcher.lock('getValue', source)
+    local unlock = vm.lock('getValue', source)
     if not unlock then
         return
     end
     cache = getValue(source) or false
-    searcher.cache.getValue[source] = cache
+    vm.cache.getValue[source] = cache
     unlock()
     return cache
 end

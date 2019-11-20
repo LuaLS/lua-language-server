@@ -1,5 +1,5 @@
 local guide = require 'parser.guide'
-local searcher = require 'searcher.searcher'
+local vm    = require 'vm.vm'
 
 local function getLinks(root)
     local cache = {}
@@ -7,7 +7,7 @@ local function getLinks(root)
     guide.eachSpecialOf(root, 'require', function (source)
         local call = source.parent
         if call.type == 'call' then
-            local uris = searcher.getLinkUris(call)
+            local uris = vm.getLinkUris(call)
             if uris then
                 ok = true
                 for i = 1, #uris do
@@ -26,13 +26,13 @@ local function getLinks(root)
     return cache
 end
 
-function searcher.getLinks(source)
+function vm.getLinks(source)
     source = guide.getRoot(source)
-    local cache = searcher.cache.getLinks[source]
+    local cache = vm.cache.getLinks[source]
     if cache ~= nil then
         return cache
     end
-    local unlock = searcher.lock('getLinks', source)
+    local unlock = vm.lock('getLinks', source)
     if not unlock then
         return nil
     end
@@ -42,7 +42,7 @@ function searcher.getLinks(source)
     if passed > 0.1 then
         log.warn(('getLinks takes [%.3f] sec!'):format(passed))
     end
-    searcher.cache.getLinks[source] = cache
+    vm.cache.getLinks[source] = cache
     unlock()
     return cache
 end

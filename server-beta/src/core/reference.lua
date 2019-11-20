@@ -1,6 +1,6 @@
-local guide     = require 'parser.guide'
-local files     = require 'files'
-local searcher  = require 'searcher'
+local guide = require 'parser.guide'
+local files = require 'files'
+local vm    = require 'vm'
 
 local function isFunction(source, offset)
     if source.type ~= 'function' then
@@ -27,7 +27,7 @@ local function findRef(source, offset, callback)
     and not isFunction(source, offset) then
         return
     end
-    searcher.eachRef(source, function (info)
+    vm.eachRef(source, function (info)
         if info.mode == 'declare'
         or info.mode == 'set'
         or info.mode == 'get'

@@ -1,12 +1,12 @@
-local files    = require 'files'
-local guide    = require 'parser.guide'
-local searcher = require 'searcher'
-local lang     = require 'language'
-local define   = require 'proto.define'
-local await    = require 'await'
+local files  = require 'files'
+local guide  = require 'parser.guide'
+local vm     = require 'vm'
+local lang   = require 'language'
+local define = require 'proto.define'
+local await  = require 'await'
 
 local function countLibraryArgs(source)
-    local func = searcher.getLibrary(source)
+    local func = vm.getLibrary(source)
     if not func then
         return nil
     end
@@ -66,7 +66,7 @@ return function (uri, callback)
 
         local func = source.node
         local funcArgs
-        searcher.eachDef(func, function (info)
+        vm.eachDef(func, function (info)
             if info.mode == 'value' then
                 local src = info.source
                 if src.type == 'function' then

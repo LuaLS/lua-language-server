@@ -1,9 +1,9 @@
-local searcher = require 'searcher.searcher'
-local library  = require 'library'
-local guide    = require 'parser.guide'
+local vm      = require 'vm.vm'
+local library = require 'library'
+local guide   = require 'parser.guide'
 
 local function checkStdLibrary(source)
-    local globalName = searcher.getGlobal(source)
+    local globalName = vm.getGlobal(source)
     if not globalName then
         return nil
     end
@@ -18,7 +18,7 @@ local function getLibrary(source)
     if lib then
         return lib
     end
-    return searcher.eachRef(source, function (info)
+    return vm.eachRef(source, function (info)
         local src = info.source
         if  src.type ~= 'getfield'
         and src.type ~= 'getmethod'
@@ -26,7 +26,7 @@ local function getLibrary(source)
             return
         end
         local node = src.node
-        local nodeGlobalName = searcher.getGlobal(node)
+        local nodeGlobalName = vm.getGlobal(node)
         if not nodeGlobalName then
             return
         end
@@ -44,17 +44,17 @@ local function getLibrary(source)
     end)
 end
 
-function searcher.getLibrary(source)
-    local cache = searcher.cache.getLibrary[source]
+function vm.getLibrary(source)
+    local cache = vm.cache.getLibrary[source]
     if cache ~= nil then
         return cache
     end
-    local unlock = searcher.lock('getLibrary', source)
+    local unlock = vm.lock('getLibrary', source)
     if not unlock then
         return
     end
     cache = getLibrary(source) or false
-    searcher.cache.getLibrary[source] = cache
+    vm.cache.getLibrary[source] = cache
     unlock()
     return cache
 end

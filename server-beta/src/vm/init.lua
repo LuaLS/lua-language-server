@@ -1,0 +1,10 @@
+local vm = require 'vm.vm'
+require 'vm.eachField'
+require 'vm.eachRef'
+require 'vm.eachDef'
+require 'vm.getGlobals'
+require 'vm.getLinks'
+require 'vm.getGlobal'
+require 'vm.getLibrary'
+require 'vm.getValue'
+return vm

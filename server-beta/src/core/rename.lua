@@ -1,9 +1,9 @@
-local files    = require 'files'
-local searcher = require 'searcher'
-local guide    = require 'parser.guide'
-local proto    = require 'proto'
-local define   = require 'proto.define'
-local util     = require 'utility'
+local files  = require 'files'
+local vm     = require 'vm'
+local guide  = require 'parser.guide'
+local proto  = require 'proto'
+local define = require 'proto.define'
+local util   = require 'utility'
 
 local Forcing
 
@@ -127,10 +127,10 @@ local function renameField(source, newname, callback)
     if parent.type == 'setfield'
     or parent.type == 'getfield' then
         local dot = parent.dot
-        local newstr = '[' .. util.vieString('"', newname) .. ']'
+        local newstr = '[' .. util.viewString('"', newname) .. ']'
         callback(source, dot.start, source.finish, newstr)
     elseif parent.type == 'tablefield' then
-        local newstr = '[' .. util.vieString('"', newname) .. ']'
+        local newstr = '[' .. util.viewString('"', newname) .. ']'
         callback(source, source.start, source.finish, newstr)
     elseif parent.type == 'getmethod' then
         if not askForcing(newname) then
@@ -144,7 +144,7 @@ local function renameField(source, newname, callback)
         -- function mt:name () end --> mt['newname'] = function (self) end
         local newstr = string.format('%s[%s] = function '
             , text:sub(parent.start, parent.node.finish)
-            , util.vieString('"', newname)
+            , util.viewString('"', newname)
         )
         callback(source, func.start, parent.finish, newstr)
         local pl = text:find('(', parent.finish, true)
@@ -164,7 +164,7 @@ local function renameGlobal(source, newname, callback)
         callback(source, source.start, source.finish, newname)
         return true
     end
-    local newstr = '_ENV[' .. util.vieString('"', newname) .. ']'
+    local newstr = '_ENV[' .. util.viewString('"', newname) .. ']'
     -- function name () end --> _ENV['newname'] = function () end
     if source.value and source.value.type == 'function'
     and source.value.start < source.start then
@@ -176,7 +176,7 @@ local function renameGlobal(source, newname, callback)
 end
 
 local function ofField(source, newname, callback)
-    return searcher.eachRef(source, function (info)
+    return vm.eachRef(source, function (info)
         local src = info.source
         if     src.type == 'tablefield'
         or     src.type == 'getfield'
@@ -192,7 +192,7 @@ local function ofField(source, newname, callback)
         end
         if src.type == 'string' then
             local quo = src[2]
-            local text = util.vieString(quo, newname)
+            local text = util.viewString(quo, newname)
             callback(src, src.start, src.finish, text)
             return
         elseif src.type == 'field'
@@ -217,7 +217,7 @@ local function rename(source, newname, callback)
         if not isValidName(newname) and not askForcing(newname)then
             return false
         end
-        searcher.eachRef(source, function (info)
+        vm.eachRef(source, function (info)
             callback(info.source, info.source.start, info.source.finish, newname)
         end)
     elseif source.type == 'local' then

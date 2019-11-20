@@ -18,7 +18,7 @@ local specials = {
     ['loadfile']     = true,
 }
 
----@class searcher
+---@class vm
 local m = {}
 
 function m.lock(tp, source)

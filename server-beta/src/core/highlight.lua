@@ -1,7 +1,7 @@
-local guide    = require 'parser.guide'
-local files    = require 'files'
-local searcher = require 'searcher'
-local define   = require 'proto.define'
+local guide  = require 'parser.guide'
+local files  = require 'files'
+local vm     = require 'vm'
+local define = require 'proto.define'
 
 local function ofLocal(source, callback)
     callback(source)
@@ -21,7 +21,7 @@ local function ofField(source, uri, callback)
     if parent.type == 'tableindex'
     or parent.type == 'tablefield' then
         local tbl = parent.parent
-        searcher.eachField(tbl, function (info)
+        vm.eachField(tbl, function (info)
             if info.key ~= myKey then
                 return
             end
@@ -32,7 +32,7 @@ local function ofField(source, uri, callback)
             callback(info.source)
         end)
     else
-        searcher.eachField(parent.node, function (info)
+        vm.eachField(parent.node, function (info)
             if info.key ~= myKey then
                 return
             end
@@ -58,7 +58,7 @@ local function ofIndex(source, uri, callback)
 end
 
 local function ofLabel(source, callback)
-    searcher.eachRef(source, function (info)
+    vm.eachRef(source, function (info)
         callback(info.source)
     end)
 end

@@ -1,7 +1,7 @@
-local files    = require 'files'
-local config   = require 'config'
-local searcher = require 'searcher'
-local guide    = require 'parser.guide'
+local files  = require 'files'
+local config = require 'config'
+local vm     = require 'searvmcher'
+local guide  = require 'parser.guide'
 
 rawset(_G, 'TEST', true)
 
@@ -30,7 +30,7 @@ function TEST(wanted)
         files.setText('', newScript)
         local source = getSource(pos)
         assert(source)
-        local result = searcher.getValue(source) or 'any'
+        local result = vm.getValue(source) or 'any'
         assert(wanted == result)
     end
 end

@@ -1,7 +1,7 @@
 local guide     = require 'parser.guide'
 local workspace = require 'workspace'
 local files     = require 'files'
-local searcher  = require 'searcher'
+local vm        = require 'vm'
 
 local function findDef(source, callback)
     if  source.type ~= 'local'
@@ -17,7 +17,7 @@ local function findDef(source, callback)
     and source.type ~= 'goto' then
         return
     end
-    searcher.eachDef(source, function (info)
+    vm.eachDef(source, function (info)
         if info.mode == 'declare'
         or info.mode == 'set'
         or info.mode == 'return' then

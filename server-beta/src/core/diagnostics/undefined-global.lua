@@ -1,8 +1,8 @@
-local files    = require 'files'
-local searcher = require 'searcher'
-local lang     = require 'language'
-local library  = require 'library'
-local config   = require 'config'
+local files   = require 'files'
+local vm      = require 'vm'
+local lang    = require 'language'
+local library = require 'library'
+local config  = require 'config'
 
 return function (uri, callback)
     local ast = files.getAst(uri)
@@ -13,7 +13,7 @@ return function (uri, callback)
     local globalCache = {}
 
     -- 遍历全局变量，检查所有没有 mode['set'] 的全局变量
-    local globals = searcher.getGlobals(ast.ast)
+    local globals = vm.getGlobals(ast.ast)
     for key, infos in pairs(globals) do
         if infos.mode['set'] == true then
             goto CONTINUE
@@ -35,7 +35,7 @@ return function (uri, callback)
             local uris = files.findGlobals(key)
             for i = 1, #uris do
                 local destAst = files.getAst(uris[i])
-                local destGlobals = searcher.getGlobals(destAst.ast)
+                local destGlobals = vm.getGlobals(destAst.ast)
                 if destGlobals[key] and destGlobals[key].mode['set'] then
                     globalCache[key] = true
                     goto CONTINUE

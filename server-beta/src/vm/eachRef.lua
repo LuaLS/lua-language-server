@@ -1,10 +1,9 @@
-local guide     = require 'parser.guide'
-local files     = require 'files'
-local workspace = require 'workspace'
-local searcher  = require 'searcher.searcher'
+local guide = require 'parser.guide'
+local files = require 'files'
+local vm    = require 'vm.vm'
 
 local function ofCall(func, index, callback)
-    searcher.eachRef(func, function (info)
+    vm.eachRef(func, function (info)
         local src = info.source
         local returns
         if info.mode == 'main' then
@@ -22,7 +21,7 @@ local function ofCall(func, index, callback)
                         source   = val,
                         mode     = 'return',
                     }
-                    searcher.eachRef(val, callback)
+                    vm.eachRef(val, callback)
                 end
             end
         end
@@ -32,14 +31,14 @@ end
 local function ofCallSelect(call, index, callback)
     local slc = call.parent
     if slc.index == index then
-        searcher.eachRef(slc.parent, callback)
+        vm.eachRef(slc.parent, callback)
         return
     end
     if call.extParent then
         for i = 1, #call.extParent do
             slc = call.extParent[i]
             if slc.index == index then
-                searcher.eachRef(slc.parent, callback)
+                vm.eachRef(slc.parent, callback)
                 return
             end
         end
@@ -53,9 +52,9 @@ local function ofReturn(rtn, index, callback)
     end
     -- 搜索函数调用的第 index 个接收值
     if func.type == 'main' then
-        searcher.eachRef(func, callback)
+        vm.eachRef(func, callback)
     else
-        searcher.eachRef(func, function (info)
+        vm.eachRef(func, function (info)
             local source = info.source
             local call = source.parent
             if not call or call.type ~= 'call' then
@@ -72,14 +71,14 @@ local function ofSpecialCall(call, func, index, callback)
         if index == 1 then
             local args = call.args
             if args[1] then
-                searcher.eachRef(args[1], callback)
+                vm.eachRef(args[1], callback)
             end
             if args[2] then
-                searcher.eachField(args[2], function (info)
+                vm.eachField(args[2], function (info)
                     if info.key == 's|__index' then
-                        searcher.eachRef(info.source, callback)
+                        vm.eachRef(info.source, callback)
                         if info.value then
-                            searcher.eachRef(info.value, callback)
+                            vm.eachRef(info.value, callback)
                         end
                     end
                 end)
@@ -87,7 +86,7 @@ local function ofSpecialCall(call, func, index, callback)
         end
     elseif name == 'require' then
         if index == 1 then
-            local result = searcher.getLinkUris(call)
+            local result = vm.getLinkUris(call)
             if result then
                 local myUri = guide.getRoot(call).uri
                 for _, uri in ipairs(result) do
@@ -126,7 +125,7 @@ local function ofValue(value, callback)
         }
     end
 
-    searcher.eachRef(value, callback)
+    vm.eachRef(value, callback)
 
     local parent = value.parent
     if parent.type == 'local'
@@ -138,7 +137,7 @@ local function ofValue(value, callback)
     or parent.type == 'tablefield'
     or parent.type == 'tableindex' then
         if parent.value == value then
-            searcher.eachRef(parent, callback)
+            vm.eachRef(parent, callback)
         end
     end
     if parent.type == 'return' then
@@ -156,7 +155,7 @@ local function ofSelf(loc, callback)
     -- 1. 当前方法定义时的对象（mt）
     local method = loc.method
     local node   = method.node
-    searcher.eachRef(node, callback)
+    vm.eachRef(node, callback)
     -- 2. 调用该方法时传入的对象
 end
 
@@ -173,7 +172,7 @@ local function asValue(source, callback)
                     local call = args.parent
                     local func = call.node
                     if func.special == 'setmetatable' then
-                        searcher.eachRef(args[1], callback)
+                        vm.eachRef(args[1], callback)
                     end
                 end
             end
@@ -210,11 +209,11 @@ local function asArg(source, callback)
         if name == 'setmetatable' then
             if parent[1] == source then
                 if parent[2] then
-                    searcher.eachField(parent[2], function (info)
+                    vm.eachField(parent[2], function (info)
                         if info.key == 's|__index' then
-                            searcher.eachRef(info.source, callback)
+                            vm.eachRef(info.source, callback)
                             if info.value then
-                                searcher.eachRef(info.value, callback)
+                                vm.eachRef(info.value, callback)
                             end
                         end
                     end)
@@ -222,7 +221,7 @@ local function asArg(source, callback)
             end
             local recvs = getCallRecvs(call)
             if recvs and recvs[1] then
-                searcher.eachRef(recvs[1], callback)
+                vm.eachRef(recvs[1], callback)
             end
         end
     end
@@ -293,7 +292,7 @@ local function ofGlobal(source, callback)
         local uris = files.findGlobals(key)
         for _, uri in ipairs(uris) do
             local ast = files.getAst(uri)
-            local globals = searcher.getGlobals(ast.ast)
+            local globals = vm.getGlobals(ast.ast)
             if globals[key] then
                 for _, info in ipairs(globals[key]) do
                     callback(info)
@@ -304,7 +303,7 @@ local function ofGlobal(source, callback)
             end
         end
     else
-        searcher.eachField(node, function (info)
+        vm.eachField(node, function (info)
             if key == info.key then
                 callback {
                     source   = info.source,
@@ -324,7 +323,7 @@ local function ofField(source, callback)
     if parent.type == 'tablefield'
     or parent.type == 'tableindex' then
         local tbl = parent.parent
-        searcher.eachField(tbl, function (info)
+        vm.eachField(tbl, function (info)
             if key == info.key then
                 callback {
                     source   = info.source,
@@ -337,7 +336,7 @@ local function ofField(source, callback)
         end)
     else
         local node = parent.node
-        searcher.eachField(node, function (info)
+        vm.eachField(node, function (info)
             if key == info.key then
                 callback {
                     source   = info.source,
@@ -399,7 +398,7 @@ local function ofMain(source, callback)
     for _, uri in ipairs(uris) do
         local ast = files.getAst(uri)
         if ast then
-            local links = searcher.getLinks(ast.ast)
+            local links = vm.getLinks(ast.ast)
             if links then
                 for linkUri, calls in pairs(links) do
                     if files.eq(linkUri, myUri) then
@@ -450,13 +449,13 @@ local function eachRef(source, callback)
 end
 
 --- 判断2个对象是否拥有相同的引用
-function searcher.isSameRef(a, b)
-    local cache = searcher.cache.eachRef[a]
+function vm.isSameRef(a, b)
+    local cache = vm.cache.eachRef[a]
     if cache then
         -- 相同引用的source共享同一份cache
-        return cache == searcher.cache.eachRef[b]
+        return cache == vm.cache.eachRef[b]
     else
-        return searcher.eachRef(a, function (info)
+        return vm.eachRef(a, function (info)
             if info.source == b then
                 return true
             end
@@ -465,8 +464,8 @@ function searcher.isSameRef(a, b)
 end
 
 --- 获取所有的引用
-function searcher.eachRef(source, callback)
-    local cache = searcher.cache.eachRef[source]
+function vm.eachRef(source, callback)
+    local cache = vm.cache.eachRef[source]
     if cache then
         for i = 1, #cache do
             local res = callback(cache[i])
@@ -476,12 +475,12 @@ function searcher.eachRef(source, callback)
         end
         return
     end
-    local unlock = searcher.lock('eachRef', source)
+    local unlock = vm.lock('eachRef', source)
     if not unlock then
         return
     end
     cache = {}
-    searcher.cache.eachRef[source] = cache
+    vm.cache.eachRef[source] = cache
     local mark = {}
     eachRef(source, function (info)
         local src = info.source
@@ -494,7 +493,7 @@ function searcher.eachRef(source, callback)
     unlock()
     for i = 1, #cache do
         local src = cache[i].source
-        searcher.cache.eachRef[src] = cache
+        vm.cache.eachRef[src] = cache
     end
     for i = 1, #cache do
         local res = callback(cache[i])

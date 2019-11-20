@@ -25,6 +25,10 @@ function m.on(method, callback)
 end
 
 function m.response(id, res)
+    if id == nil then
+        log.error('Response id is nil!', util.dump(res))
+        return
+    end
     -- res 可能是nil，为了转成json时保留nil，使用 container 容器
     local data = util.container()
     data.id     = id
@@ -35,6 +39,10 @@ function m.response(id, res)
 end
 
 function m.responseErr(id, code, message)
+    if id == nil then
+        log.error('Response id is nil!', util.dump(message))
+        return
+    end
     local buf = jsonrpc.encode {
         id    = id,
         error = {
@@ -87,6 +95,9 @@ function m.doMethod(proto)
         local passed = os.clock() - clock
         if passed > 0.2 then
             log.debug(('Method [%s] takes [%.3f]sec.'):format(method, passed))
+        end
+        if not proto.id then
+            return
         end
         if ok then
             m.response(proto.id, res)

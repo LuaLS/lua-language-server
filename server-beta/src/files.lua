@@ -127,6 +127,7 @@ function m.remove(uri)
 
     local diagnostic = require 'service.diagnostic'
     diagnostic.refresh(file.uri)
+    diagnostic.clear(file.uri)
 end
 
 --- 移除所有文件
@@ -193,28 +194,6 @@ function m.getOriginUri(uri)
         return nil
     end
     return file.uri
-end
-
-function m.setDiagnostic(uri, diag)
-    if platform.OS == 'Windows' then
-        uri = uri:lower()
-    end
-    local file = m.fileMap[uri]
-    if not file then
-        return
-    end
-    file._diag = diag
-end
-
-function m.getDiagnostic(uri)
-    if platform.OS == 'Windows' then
-        uri = uri:lower()
-    end
-    local file = m.fileMap[uri]
-    if not file then
-        return nil
-    end
-    return file._diag
 end
 
 --- 寻找全局变量

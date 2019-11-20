@@ -5,6 +5,7 @@ local lang   = require 'language'
 local files  = require 'files'
 local config = require 'config'
 local core   = require 'core.diagnostics'
+local util   = require 'utility'
 
 local m = {}
 m._start = false
@@ -86,6 +87,9 @@ local function buildDiagnostic(uri, diag)
 end
 
 local function merge(a, b)
+    if not a and not b then
+        return nil
+    end
     local t = {}
     if a then
         for i = 1, #a do
@@ -101,6 +105,9 @@ local function merge(a, b)
 end
 
 function m.clear(uri)
+    if not m.cache[uri] then
+        return
+    end
     m.cache[uri] = nil
     proto.notify('textDocument/publishDiagnostics', {
         uri = uri,
@@ -109,6 +116,10 @@ function m.clear(uri)
 end
 
 function m.syntaxErrors(uri, ast)
+    if #ast.errs == 0 then
+        return nil
+    end
+
     local results = {}
 
     for _, err in ipairs(ast.errs) do
@@ -123,14 +134,15 @@ function m.diagnostics(uri, syntaxOnly)
         return m.cache[uri]
     end
 
-    local results = {}
-
     local diags = core(uri)
+    if not diags then
+        return nil
+    end
+
+    local results = {}
     for _, diag in ipairs(diags) do
         results[#results+1] = buildDiagnostic(uri, diag)
     end
-
-    m.cache[uri] = results
 
     return results
 end
@@ -144,20 +156,20 @@ function m.doDiagnostic(uri, syntaxOnly)
 
     local syntax = m.syntaxErrors(uri, ast)
     local diagnostics = m.diagnostics(uri, syntaxOnly)
-    local newDiag = merge(syntax, diagnostics)
-    local lastDiag = files.getDiagnostic(uri)
-    if #newDiag == 0 then
-        if not lastDiag then
-            return
-        end
-        files.setDiagnostic(uri, nil)
-    else
-        files.setDiagnostic(uri, newDiag)
+    local full = merge(syntax, diagnostics)
+    if not full then
+        m.clear(uri)
+        return
     end
+
+    if util.equal(m.cache[uri], full) then
+        return
+    end
+    m.cache[uri] = full
 
     proto.notify('textDocument/publishDiagnostics', {
         uri = uri,
-        diagnostics = newDiag,
+        diagnostics = full,
     })
 end
 

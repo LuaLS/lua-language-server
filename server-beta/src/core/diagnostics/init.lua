@@ -33,5 +33,9 @@ return function (uri)
         check(uri, name, level, results)
     end
 
+    if #results == 0 then
+        return nil
+    end
+
     return results
 end

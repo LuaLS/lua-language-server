@@ -438,6 +438,9 @@ local function checkValue(source)
     if source.value then
         return vm.getValue(source.value)
     end
+    if source.type == 'paren' then
+        return vm.getValue(source.exp)
+    end
 end
 
 local function checkCall(results, source)
@@ -484,11 +487,24 @@ local function checkDef(results, source)
     end)
 end
 
+local function checkLibrary(source)
+    local lib = vm.getLibrary(source)
+    if not lib then
+        return nil
+    end
+    return alloc {
+        type   = lib.type,
+        value  = lib.value,
+        source = vm.librarySource(lib),
+    }
+end
+
 local function getValue(source)
     local results = checkLiteral(source)
                  or checkValue(source)
                  or checkUnary(source)
                  or checkBinary(source)
+                 or checkLibrary(source)
     if results then
         return results
     end
@@ -539,23 +555,6 @@ function vm.checkTrue(source)
     return current
 end
 
---- 拥有某个类型的值
-function vm.eachValueType(source, type, callback)
-    local values = vm.getValue(source)
-    if not values then
-        return
-    end
-    for i = 1, #values do
-        local v = values[i]
-        if v.type == type then
-            local res = callback(v)
-            if res ~= nil then
-                return res
-            end
-        end
-    end
-end
-
 --- 获取特定类型的字面量值
 function vm.getLiteral(source, type)
     local values = vm.getValue(source)
@@ -601,6 +600,21 @@ function vm.isSameValue(a, b)
         end
     end
     return true
+end
+
+--- 是否包含某种类型
+function vm.hasType(source, type)
+    local values = vm.getValue(source)
+    if not values then
+        return false
+    end
+    for i = 1, #values do
+        local value = values[i]
+        if value.type == type then
+            return true
+        end
+    end
+    return false
 end
 
 function vm.getType(source)

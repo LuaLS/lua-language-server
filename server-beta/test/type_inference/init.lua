@@ -150,6 +150,10 @@ TEST 'string' [[
 ]]
 
 TEST 'function' [[
+<?x?> = ('x').sub
+]]
+
+TEST 'function' [[
 <?x?> = _VERSION.sub
 ]]
 

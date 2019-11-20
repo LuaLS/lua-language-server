@@ -48,6 +48,59 @@ local function askForcing(str)
     end
 end
 
+local function askForMultiChange(results)
+    if TEST then
+        return true
+    end
+    local uris = {}
+    for _, result in ipairs(results) do
+        local uri = result.uri
+        if not uris[uri] then
+            uris[uri] = 0
+            uris[#uris+1] = uri
+        end
+        uris[uri] = uris[uri] + 1
+    end
+    if #uris <= 1 then
+        return true
+    end
+
+    local fileList = {}
+    for _, uri in ipairs(uris) do
+        fileList[#fileList+1] = ('%s (%d)'):format(uri, uris[uri])
+    end
+
+    local version = files.globalVersion
+    -- TODO
+    local item = proto.awaitRequest('window/showMessageRequest', {
+        type    = define.MessageType.Warning,
+        message = ('将修改以下 %d 个文件，共 %d 处。\r\n%s'):format(
+            #uris,
+            #results,
+            table.concat(fileList, '\r\n')
+        ),
+        actions = {
+            {
+                title = '继续',
+            },
+            {
+                title = '放弃',
+            },
+        }
+    })
+    if version ~= files.globalVersion then
+        proto.notify('window/showMessage', {
+            type    = define.MessageType.Warning,
+            message = '文件发生了变化，替换取消。'
+        })
+        return false
+    end
+    if item and item.title == '继续' then
+        return true
+    end
+    return false
+end
+
 local function isValidName(str)
     return str:match '^[%a_][%w_]*$'
 end
@@ -269,6 +322,11 @@ function m.rename(uri, pos, newname)
     if #results == 0 then
         return nil
     end
+
+    if not askForMultiChange(results) then
+        return nil
+    end
+
     return results
 end
 

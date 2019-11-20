@@ -43,9 +43,6 @@ local function updateConfig()
     end
     if not util.equal(oldConfig.diagnostics, newConfig.diagnostics) then
     end
-    if newConfig.completion.enable then
-    else
-    end
     if not util.equal(oldConfig.plugin, newConfig.plugin) then
     end
     if not util.equal(oldConfig.workspace, newConfig.workspace)
@@ -56,7 +53,7 @@ local function updateConfig()
     end
 
     if newConfig.completion.enable then
-        completion.enable()
+        --completion.enable()
     else
         completion.disable()
     end

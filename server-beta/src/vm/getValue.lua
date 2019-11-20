@@ -443,7 +443,7 @@ local function checkValue(source)
     end
 end
 
-local function checkCall(results, source)
+local function inferByCall(results, source)
     if not source.parent then
         return
     end
@@ -459,7 +459,7 @@ local function checkCall(results, source)
     end
 end
 
-local function checkNext(results, source)
+local function inferByGetTable(results, source)
     local next = source.next
     if not next then
         return
@@ -499,20 +499,52 @@ local function checkLibrary(source)
     }
 end
 
+local function checkLibraryReturn(source)
+    if source.type ~= 'select' then
+        return nil
+    end
+    local index = source.index
+    local call = source.vararg
+    if call.type ~= 'call' then
+        return nil
+    end
+    local func = call.node
+    local lib = vm.getLibrary(func)
+    if not lib then
+        return nil
+    end
+    if lib.type ~= 'function' then
+        return nil
+    end
+    if not lib.returns then
+        return nil
+    end
+    local rtn = lib.returns[index]
+    if not rtn then
+        return nil
+    end
+    return alloc {
+        type   = rtn.type,
+        value  = rtn.value,
+        source = vm.librarySource(rtn),
+    }
+end
+
 local function getValue(source)
     local results = checkLiteral(source)
                  or checkValue(source)
                  or checkUnary(source)
                  or checkBinary(source)
                  or checkLibrary(source)
+                 or checkLibraryReturn(source)
     if results then
         return results
     end
 
     results = {}
     checkDef(results, source)
-    checkCall(results, source)
-    checkNext(results, source)
+    inferByCall(results, source)
+    inferByGetTable(results, source)
 
     if #results == 0 then
         return nil

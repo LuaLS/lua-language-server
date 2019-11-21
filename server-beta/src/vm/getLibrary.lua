@@ -20,7 +20,7 @@ local function getLibInNode(source, nodeLib)
     if not nodeLib.child then
         return nil
     end
-    local key = guide.getKeyString(source)
+    local key = guide.getName(source)
     local defLib = nodeLib.child[key]
     return defLib
 end

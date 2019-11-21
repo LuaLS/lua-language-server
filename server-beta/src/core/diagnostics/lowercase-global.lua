@@ -20,7 +20,7 @@ return function (uri, callback)
     end
 
     guide.eachSourceType(ast.ast, 'setglobal', function (source)
-        local name = guide.getKeyString(source)
+        local name = guide.getName(source)
         if definedGlobal[name] then
             return
         end

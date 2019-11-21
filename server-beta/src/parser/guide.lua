@@ -444,10 +444,14 @@ function m.lineRange(lines, row)
     return line.start, line.finish
 end
 
-function m.getKeyString(obj)
+function m.getName(obj)
     local tp = obj.type
     if tp == 'getglobal'
     or tp == 'setglobal' then
+        return obj[1]
+    elseif tp == 'local'
+    or     tp == 'getlocal'
+    or     tp == 'setlocal' then
         return obj[1]
     elseif tp == 'getfield'
     or     tp == 'setfield'
@@ -459,12 +463,12 @@ function m.getKeyString(obj)
     elseif tp == 'getindex'
     or     tp == 'setindex'
     or     tp == 'tableindex' then
-        return m.getKeyString(obj.index)
+        return m.getName(obj.index)
     elseif tp == 'field'
     or     tp == 'method' then
         return obj[1]
     elseif tp == 'index' then
-        return m.getKeyString(obj.index)
+        return m.getName(obj.index)
     elseif tp == 'string' then
         return obj[1]
     end

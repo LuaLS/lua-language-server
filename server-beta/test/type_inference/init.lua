@@ -168,6 +168,14 @@ end
 <?y?> = x()
 ]]
 
+TEST 'string|table' [[
+local y = #<?x?>
+]]
+
+TEST 'integer' [[
+local y = <?x?> << 0
+]]
+
 -- 不根据调用者的输入参数来推测
 --TEST 'number' [[
 --local function x(a)

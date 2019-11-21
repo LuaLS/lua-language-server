@@ -45,7 +45,7 @@ local obj = setmetatable({}, mt)
 obj:<?init?>(1, '测试')
 ]]
 [[
-function mt:init(a: number, b: string, c: any)
+function mt:init(a: any, b: any, c: any)
   -> table
 ]]
 

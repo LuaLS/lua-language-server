@@ -452,7 +452,19 @@ local function checkValue(source)
     end
 end
 
+local function hasTypeInResults(results, type)
+    for i = 1, #results do
+        if results[i].type == type then
+            return true
+        end
+    end
+    return false
+end
+
 local function inferByCall(results, source)
+    if #results ~= 0 then
+        return
+    end
     if not source.parent then
         return
     end
@@ -469,6 +481,9 @@ local function inferByCall(results, source)
 end
 
 local function inferByGetTable(results, source)
+    if #results ~= 0 then
+        return
+    end
     local next = source.next
     if not next then
         return
@@ -577,6 +592,79 @@ local function checkLibraryArg(source)
     }
 end
 
+local function inferByUnary(results, source)
+    if #results ~= 0 then
+        return
+    end
+    local parent = source.parent
+    if not parent or parent.type ~= 'unary' then
+        return
+    end
+    local op = parent.op
+    if op.type == '#' then
+        insert(results, {
+            type   = 'string',
+            source = vm.librarySource(source)
+        })
+        insert(results, {
+            type   = 'table',
+            source = vm.librarySource(source)
+        })
+    elseif op.type == '~' then
+        insert(results, {
+            type   = 'integer',
+            source = vm.librarySource(source)
+        })
+    elseif op.type == '-' then
+        insert(results, {
+            type   = 'number',
+            source = vm.librarySource(source)
+        })
+    end
+end
+
+local function inferByBinary(results, source)
+    if #results ~= 0 then
+        return
+    end
+    local parent = source.parent
+    if not parent or parent.type ~= 'binary' then
+        return
+    end
+    local op = parent.op
+    if op.type == '<='
+    or op.type == '>='
+    or op.type == '<'
+    or op.type == '>'
+    or op.type == '^'
+    or op.type == '/'
+    or op.type == '+'
+    or op.type == '-'
+    or op.type == '*'
+    or op.type == '%' then
+        insert(results, {
+            type   = 'number',
+            source = vm.librarySource(source)
+        })
+    elseif op.type == '|'
+    or     op.type == '~'
+    or     op.type == '&'
+    or     op.type == '<<'
+    or     op.type == '>>'
+    -- 整数的可能性比较高
+    or     op.type == '//' then
+        insert(results, {
+            type   = 'integer',
+            source = vm.librarySource(source)
+        })
+    elseif op.type == '..' then
+        insert(results, {
+            type   = 'string',
+            source = vm.librarySource(source)
+        })
+    end
+end
+
 local function getValue(source)
     local results = checkLiteral(source)
                  or checkValue(source)
@@ -593,6 +681,8 @@ local function getValue(source)
     checkDef(results, source)
     inferByCall(results, source)
     inferByGetTable(results, source)
+    inferByUnary(results, source)
+    inferByBinary(results, source)
 
     if #results == 0 then
         return nil

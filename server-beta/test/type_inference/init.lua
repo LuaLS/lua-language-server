@@ -176,6 +176,12 @@ TEST 'integer' [[
 local y = <?x?> << 0
 ]]
 
+TEST 'integer' [[
+local function f(<?a?>, b)
+    return a << b
+end
+]]
+
 -- 不根据调用者的输入参数来推测
 --TEST 'number' [[
 --local function x(a)

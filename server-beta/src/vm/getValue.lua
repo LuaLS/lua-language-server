@@ -665,6 +665,30 @@ local function inferByBinary(results, source)
     end
 end
 
+local function inferBySetOfLocal(results, source)
+    if source.ref then
+        for i = 1, #source.ref do
+            local ref = source.ref[i]
+            if ref.type == 'setlocal' then
+                break
+            end
+            merge(results, vm.getValue(ref))
+        end
+    end
+end
+
+local function inferBySet(results, source)
+    if #results ~= 0 then
+        return
+    end
+    if source.type == 'local' then
+        inferBySetOfLocal(results, source)
+    elseif source.type == 'setlocal'
+    or     source.type == 'getlocal' then
+        inferBySetOfLocal(results, source.node)
+    end
+end
+
 local function getValue(source)
     local results = checkLiteral(source)
                  or checkValue(source)
@@ -679,6 +703,7 @@ local function getValue(source)
 
     results = {}
     checkDef(results, source)
+    inferBySet(results, source)
     inferByCall(results, source)
     inferByGetTable(results, source)
     inferByUnary(results, source)

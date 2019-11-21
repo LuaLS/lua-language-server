@@ -133,7 +133,10 @@ function vm.eachField(source, callback)
     local cache = vm.cache.eachField[source]
     if cache then
         for i = 1, #cache do
-            callback(cache[i])
+            local res = callback(cache[i])
+            if res ~= nil then
+                return res
+            end
         end
         return
     end
@@ -158,6 +161,9 @@ function vm.eachField(source, callback)
         vm.cache.eachField[src] = cache
     end)
     for i = 1, #cache do
-        callback(cache[i])
+        local res = callback(cache[i])
+        if res ~= nil then
+            return res
+        end
     end
 end

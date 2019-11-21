@@ -37,6 +37,56 @@ local mt = {}
 mt.__index = mt
 
 function mt:init(a, b, c)
+    return
+end
+
+local obj = setmetatable({}, mt)
+
+obj:<?init?>(1, '测试')
+]]
+[[
+function mt:init(a: any, b: any, c: any)
+]]
+
+TEST [[
+local mt = {}
+mt.__index = mt
+mt.type = 'Class'
+
+function mt:init(a, b, c)
+    return
+end
+
+local obj = setmetatable({}, mt)
+
+obj:<?init?>(1, '测试')
+]]
+[[
+function Class:init(a: any, b: any, c: any)
+]]
+
+TEST [[
+local mt = {}
+mt.__index = mt
+mt.__name = 'Class'
+
+function mt:init(a, b, c)
+    return
+end
+
+local obj = setmetatable({}, mt)
+
+obj:<?init?>(1, '测试')
+]]
+[[
+function Class:init(a: any, b: any, c: any)
+]]
+
+TEST [[
+local mt = {}
+mt.__index = mt
+
+function mt:init(a, b, c)
     return {}
 end
 

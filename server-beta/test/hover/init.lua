@@ -1,28 +1,20 @@
-local parser = require 'parser'
-local core = require 'core'
-local buildVM = require 'vm'
+local core  = require 'core.hover'
+local files = require 'files'
 
 rawset(_G, 'TEST', true)
 
 function TEST(script)
     return function (expect)
+        files.removeAll()
         local start  = script:find('<?', 1, true)
         local finish = script:find('?>', 1, true)
         local pos = (start + finish) // 2 + 1
         local new_script = script:gsub('<[!?]', '  '):gsub('[!?]>', '  ')
-        local ast = parser:parse(new_script, 'lua', 'Lua 5.3')
-        local vm = buildVM(ast)
-        assert(vm)
-        local source = core.findSource(vm, pos)
-        local hover = core.hover(source)
-        if expect then
-            assert(hover)
-            expect = expect:gsub('^[\r\n]*(.-)[\r\n]*$', '%1'):gsub('\r\n', '\n')
-            local label = hover.label:gsub('^[\r\n]*(.-)[\r\n]*$', '%1'):gsub('\r\n', '\n')
-            assert(expect == label)
-        else
-            assert(hover == nil)
-        end
+        local hover = core(new_script, pos)
+        assert(hover)
+        expect = expect:gsub('^[\r\n]*(.-)[\r\n]*$', '%1'):gsub('\r\n', '\n')
+        local label = hover.label:gsub('^[\r\n]*(.-)[\r\n]*$', '%1'):gsub('\r\n', '\n')
+        assert(expect == label)
     end
 end
 

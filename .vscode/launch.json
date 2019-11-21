@@ -12,7 +12,8 @@
 			],
 			"consoleCoding": "utf8",
 			"sourceCoding": "utf8",
-			"luaRuntime": "5.4 64bit",
+			"luaVersion": "5.4",
+			"luaArch": "x86_64",
 			"outputCapture": [
 				"print",
 				"stderr",
@@ -44,7 +45,8 @@
 			"consoleCoding": "utf8",
 			"sourceCoding": "utf8",
 			"preLaunchTask": "编译",
-			"luaRuntime": "5.4 64bit",
+			"luaVersion": "5.4",
+			"luaArch": "x86_64",
 			"outputCapture": [
 				"print",
 				"stderr",
@@ -60,7 +62,8 @@
 			],
 			"consoleCoding": "utf8",
 			"sourceCoding": "utf8",
-			"luaRuntime": "5.4 64bit",
+			"luaVersion": "5.4",
+			"luaArch": "x86_64",
 			"outputCapture": [
 				"print",
 				"stderr",
@@ -76,7 +79,8 @@
 			],
 			"consoleCoding": "utf8",
 			"sourceCoding": "utf8",
-			"luaRuntime": "5.4 64bit",
+			"luaVersion": "5.4",
+			"luaArch": "x86_64",
 			"outputCapture": [
 				"print",
 				"stderr",

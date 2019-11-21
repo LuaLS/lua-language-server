@@ -1,9 +1,11 @@
-local buildName = require 'core.hover.name'
-local buildArg  = require 'core.hover.arg'
+local buildName   = require 'core.hover.name'
+local buildArg    = require 'core.hover.arg'
+local buildReturn = require 'core.hover.return'
 
 local function asFunction(source)
     local name = buildName(source)
     local arg  = buildArg(source)
+    local rtn  = buildReturn(source)
     return ('function %s(%s)'):format(name, arg)
 end
 

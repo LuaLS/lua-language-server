@@ -13,6 +13,12 @@ local typeSort = {
 NIL = setmetatable({'<nil>'}, { __tostring = function () return 'nil' end })
 
 local function merge(t, b)
+    if not t then
+        t = {}
+    end
+    if not b then
+        return t
+    end
     for i = 1, #b do
         local o = b[i]
         if not t[o] then
@@ -31,6 +37,9 @@ local function alloc(o)
 end
 
 local function insert(t, o)
+    if not o then
+        return
+    end
     if not t[o] then
         t[o] = true
         t[#t+1] = o
@@ -530,6 +539,44 @@ local function checkLibraryReturn(source)
     }
 end
 
+local function checkLibraryArg(source)
+    local args = source.parent
+    if not args then
+        return
+    end
+    if args.type ~= 'callargs' then
+        return
+    end
+    local call = args.parent
+    if not call then
+        return
+    end
+    local func = call.node
+    local index
+    for i = 1, #args do
+        if args[i] == source then
+            index = i
+            break
+        end
+    end
+    if not index then
+        return
+    end
+    local lib = vm.getLibrary(func)
+    local arg = lib and lib.args and lib.args[index]
+    if not arg then
+        return
+    end
+    if arg.type == '...' then
+        return
+    end
+    return alloc {
+        type   = arg.type,
+        value  = arg.value,
+        source = vm.librarySource(arg),
+    }
+end
+
 local function getValue(source)
     local results = checkLiteral(source)
                  or checkValue(source)
@@ -537,6 +584,7 @@ local function getValue(source)
                  or checkBinary(source)
                  or checkLibrary(source)
                  or checkLibraryReturn(source)
+                 or checkLibraryArg(source)
     if results then
         return results
     end

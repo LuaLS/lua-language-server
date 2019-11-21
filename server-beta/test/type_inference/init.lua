@@ -161,51 +161,55 @@ TEST 'table' [[
 <?x?> = setmetatable({})
 ]]
 
-TEST 'number' [[
+TEST 'integer' [[
 local function x()
     return 1
 end
 <?y?> = x()
 ]]
 
-TEST 'number' [[
-local function x(a)
-    return <?a?>
-end
-x(1)
-]]
+-- 不根据调用者的输入参数来推测
+--TEST 'number' [[
+--local function x(a)
+--    return <?a?>
+--end
+--x(1)
+--]]
 
 TEST 'table' [[
 setmetatable(<?b?>)
 ]]
 
-TEST 'number' [[
-local function x(a)
-    _ = a + 1
-end
-local b
-x(<?b?>)
-]]
+-- 不根据对方函数内的使用情况来推测
+--TEST 'number' [[
+--local function x(a)
+--    _ = a + 1
+--end
+--local b
+--x(<?b?>)
+--]]
 
-TEST 'number' [[
-local function x(a, ...)
-    local _, <?b?>, _ = ...
-end
-x(nil, 'xx', 1, true)
-]]
+--TEST 'number' [[
+--local function x(a, ...)
+--    local _, <?b?>, _ = ...
+--end
+--x(nil, 'xx', 1, true)
+--]]
 
-TEST 'number' [[
-local function x(a, ...)
-    return true, 'ss', ...
-end
-local _, _, _, <?b?>, _ = x(nil, true, 1, 'yy')
-]]
+-- 引用不跨越参数
+--TEST 'number' [[
+--local function x(a, ...)
+--    return true, 'ss', ...
+--end
+--local _, _, _, <?b?>, _ = x(nil, true, 1, 'yy')
+--]]
 
-TEST 'integer' [[
-for <?i?> in ipairs(t) do
-end
-]]
-
-TEST 'any' [[
-local <?x?> = next()
-]]
+-- 暂不支持这些特殊情况，之后用其他语法定义
+--TEST 'integer' [[
+--for <?i?> in ipairs(t) do
+--end
+--]]
+--
+--TEST 'any' [[
+--local <?x?> = next()
+--]]

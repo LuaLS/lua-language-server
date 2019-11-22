@@ -42,7 +42,7 @@ local function main()
     test 'highlight'
     test 'rename'
     test 'type_inference'
-    test 'hover'
+    --test 'hover'
     --test 'completion'
     --test 'signature'
     --test 'document_symbol'

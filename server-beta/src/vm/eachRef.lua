@@ -6,11 +6,8 @@ local function ofCall(func, index, callback)
     vm.eachRef(func, function (info)
         local src = info.source
         local returns
-        if info.mode == 'main' then
+        if src.type == 'main' or src.type == 'function' then
             returns = src.returns
-        else
-            local funcDef = src.value
-            returns = funcDef and funcDef.returns
         end
         if returns then
             -- 搜索函数第 index 个返回值
@@ -52,7 +49,26 @@ local function ofReturn(rtn, index, callback)
     end
     -- 搜索函数调用的第 index 个接收值
     if func.type == 'main' then
-        vm.eachRef(func, callback)
+        local myUri = func.uri
+        local uris = files.findLinkTo(myUri)
+        if not uris then
+            return
+        end
+        for _, uri in ipairs(uris) do
+            local ast = files.getAst(uri)
+            if ast then
+                local links = vm.getLinks(ast.ast)
+                if links then
+                    for linkUri, calls in pairs(links) do
+                        if files.eq(linkUri, myUri) then
+                            for i = 1, #calls do
+                                ofCallSelect(calls[i], 1, callback)
+                            end
+                        end
+                    end
+                end
+            end
+        end
     else
         vm.eachRef(func, function (info)
             local source = info.source
@@ -390,26 +406,6 @@ local function ofMain(source, callback)
         source = source,
         mode   = 'main',
     }
-    local myUri = source.uri
-    local uris = files.findLinkTo(myUri)
-    if not uris then
-        return
-    end
-    for _, uri in ipairs(uris) do
-        local ast = files.getAst(uri)
-        if ast then
-            local links = vm.getLinks(ast.ast)
-            if links then
-                for linkUri, calls in pairs(links) do
-                    if files.eq(linkUri, myUri) then
-                        for i = 1, #calls do
-                            ofCallSelect(calls[i], 1, callback)
-                        end
-                    end
-                end
-            end
-        end
-    end
 end
 
 local function eachRef(source, callback)

@@ -229,3 +229,21 @@ TEST {
         ]],
     },
 }
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            local f = require 'lib'
+            local <?o?> = f()
+        ]],
+    },
+    {
+        path = 'lib.lua',
+        content = [[
+            return function ()
+                return <!{}!>
+            end
+        ]],
+    },
+}

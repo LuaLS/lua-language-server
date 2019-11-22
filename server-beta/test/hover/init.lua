@@ -113,7 +113,7 @@ obj:init(1, '测试')
 obj.<?init?>(obj, 1, '测试')
 ]]
 [[
-function mt.init(self: table, a: number, b: string, c: any)
+function mt:init(a: any, b: any, c: any)
   -> table
 ]]
 

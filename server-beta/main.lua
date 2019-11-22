@@ -5,7 +5,7 @@ local fs = require 'bee.filesystem'
 ROOT = fs.path(rootPath)
 LANG = LANG or 'en-US'
 
-collectgarbage('generational', 5, 20)
+collectgarbage('generational', 10, 50)
 
 log = require 'log'
 log.init(ROOT, ROOT / 'log' / 'service.log')

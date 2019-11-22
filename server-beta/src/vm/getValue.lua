@@ -812,8 +812,7 @@ function vm.hasType(source, type)
     return false
 end
 
-function vm.getType(source)
-    local values = vm.getValue(source)
+function vm.viewType(values)
     if not values then
         return 'any'
     end
@@ -849,6 +848,11 @@ function vm.getType(source)
         return false
     end)
     return table.concat(types, '|')
+end
+
+function vm.getType(source)
+    local values = vm.getValue(source)
+    return vm.viewType(values)
 end
 
 function vm.getValue(source)

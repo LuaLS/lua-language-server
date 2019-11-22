@@ -6,7 +6,10 @@ local function asFunction(source)
     local name = buildName(source)
     local arg  = buildArg(source)
     local rtn  = buildReturn(source)
-    return ('function %s(%s)'):format(name, arg)
+    local lines = {}
+    lines[1] = ('function %s(%s)'):format(name, arg)
+    lines[2] = rtn
+    return table.concat(lines, '\n')
 end
 
 return function (source)

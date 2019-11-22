@@ -18,7 +18,7 @@ local function askForcing(str)
     -- TODO
     local item = proto.awaitRequest('window/showMessageRequest', {
         type    = define.MessageType.Warning,
-        message = '不是有效的标识符，是否强制替换？',
+        message = ('[%s]不是有效的标识符，是否强制替换？'):format(str),
         actions = {
             {
                 title = '强制替换',
@@ -102,19 +102,54 @@ local function askForMultiChange(results, newname)
     return false
 end
 
+local function trim(str)
+    return str:match '^%s*(%S+)%s*$'
+end
+
 local function isValidName(str)
     return str:match '^[%a_][%w_]*$'
 end
 
-local function ofLocal(source, newname, callback)
-    if not isValidName(newname) and not askForcing(newname) then
+local function isValidGlobal(str)
+    for s in str:gmatch '[^%.]*' do
+        if not isValidName(trim(s)) then
+            return false
+        end
+    end
+    return true
+end
+
+local function isValidFunctionName(str)
+    if isValidGlobal(str) then
+        return true
+    end
+    local pos = str:find(':', 1, true)
+    if not pos then
         return false
     end
-    callback(source, source.start, source.finish, newname)
-    if source.ref then
-        for _, ref in ipairs(source.ref) do
-            callback(ref, ref.start, ref.finish, newname)
-        end
+    return  isValidGlobal(trim(str:sub(1, pos-1)))
+        and isValidName(trim(str:sub(pos+1)))
+end
+
+local function isFunctionGlobalName(source)
+    local parent = source.parent
+    if parent.type ~= 'setglobal' then
+        return false
+    end
+    local value = parent.value
+    if not value.type ~= 'function' then
+        return false
+    end
+    return value.start <= parent.start
+end
+
+local function renameLocal(source, newname, callback)
+    if isValidName(newname) then
+        callback(source, source.start, source.finish, newname)
+        return
+    end
+    if askForcing(newname) then
+        callback(source, source.start, source.finish, newname)
     end
 end
 
@@ -160,7 +195,14 @@ local function renameField(source, newname, callback)
 end
 
 local function renameGlobal(source, newname, callback)
-    if isValidName(newname) then
+    if isValidGlobal(newname) then
+        callback(source, source.start, source.finish, newname)
+        return true
+    end
+    if isValidFunctionName(newname) then
+        if not isFunctionGlobalName(source) then
+            askForcing(newname)
+        end
         callback(source, source.start, source.finish, newname)
         return true
     end
@@ -173,6 +215,15 @@ local function renameGlobal(source, newname, callback)
     end
     callback(source, source.start, source.finish, newstr)
     return true
+end
+
+local function ofLocal(source, newname, callback)
+    renameLocal(source, newname, callback)
+    if source.ref then
+        for _, ref in ipairs(source.ref) do
+            renameLocal(ref, newname, callback)
+        end
+    end
 end
 
 local function ofField(source, newname, callback)

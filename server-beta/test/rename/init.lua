@@ -147,3 +147,19 @@ function a() end
 ]] [[
 _ENV["!!!"] = function () end
 ]]
+
+TEST ('a', 'a.b') [[
+function a() end
+a()
+]] [[
+function a.b() end
+a.b()
+]]
+
+TEST ('a', 'a:b') [[
+function a() end
+a()
+]] [[
+function a:b() end
+a:b()
+]]

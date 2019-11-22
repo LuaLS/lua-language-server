@@ -2,7 +2,7 @@ local fs = require 'bee.filesystem'
 local core = require 'core'
 local parser = require 'parser'
 
-TEST(io.load(ROOT / 'src' / 'vm' / 'vm.lua'))
+TEST(io.load(ROOT / 'script' / 'vm' / 'vm.lua'))
 
 -- 临时
 local function testIfExit(path)

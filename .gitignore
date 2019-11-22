@@ -1,3 +1,3 @@
-/log/
-/build/
+/log
+/build
 !*.exe

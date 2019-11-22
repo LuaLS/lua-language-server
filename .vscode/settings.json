@@ -19,20 +19,15 @@
     "Lua.workspace.maxPreload": 400,
     "Lua.workspace.preloadFileSize": 1000,
     "Lua.workspace.ignoreDir": [
-        "/server/locale/",
-        "/server/libs/",
-        "/server/src/3rd",
-        "/server/meta/",
-        "/server-beta/locale/",
-        "/server-beta/libs/",
-        "/server-beta/src/3rd",
-        "/server-beta/meta/",
+        "locale/",
+        "libs/",
+        "3rd",
         ".vscode"
     ],
     "Lua.workspace.library": {
         "E:/Github/test" : true,
         // Just some comment
-        "server/src/meta" : true
+        "script/meta" : true,
     },
     "Lua.plugin.enable": true,
     "Lua.zzzzzz.cat": true

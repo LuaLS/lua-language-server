@@ -62,7 +62,7 @@ end
 end
 
 local function run(name, arg, callback)
-    local dump = io.load(ROOT / 'src' / 'async' / (name .. '.lua'))
+    local dump = io.load(ROOT / 'script' / 'async' / (name .. '.lua'))
     if not dump then
         error(('找不到[%s]'):format(name))
     end

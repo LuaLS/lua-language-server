@@ -12,8 +12,8 @@ log.init(ROOT, ROOT / 'log' / 'service.log')
 log.info('Lua Lsp startup, root: ', ROOT)
 log.debug('ROOT:', ROOT:string())
 
---loadfile(rootPath .. '/debugger.lua')'wait'
-dofile(rootPath .. '/debugger.lua')
+--loadfile(rootPath .. '/script-beta/debugger.lua')'wait'
+dofile(rootPath .. '/script-beta/debugger.lua')
 
 local service = require 'service'
 service.start()

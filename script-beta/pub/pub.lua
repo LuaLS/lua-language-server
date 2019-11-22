@@ -47,7 +47,7 @@ function m.recruitBraves(num)
             thread  = thread.thread(braveTemplate:format(
                 package.path,
                 package.cpath,
-                (ROOT / 'debugger.lua'):string(),
+                (ROOT / 'script-beta' / 'debugger.lua'):string(),
                 id
             )),
             taskMap = {},

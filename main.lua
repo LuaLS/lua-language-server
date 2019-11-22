@@ -15,7 +15,7 @@ log.info('Lua Lsp startup, root: ', ROOT)
 log.debug('ROOT:', ROOT:string())
 ac = {}
 
---xpcall(dofile, log.debug, rootPath .. '/debugger.lua')
+--xpcall(dofile, log.debug, rootPath .. '/script/debugger.lua')
 require 'utility'
 local service = require 'service'
 local session = service()

@@ -1,7 +1,7 @@
 local fs = require 'bee.filesystem'
 local platform = require 'bee.platform'
 local sandbox = require 'sandbox'
-local luaUriPath = (ROOT / 'src' / '3rd' / 'lua-uri'):string()
+local luaUriPath = (ROOT / 'script' / '3rd' / 'lua-uri'):string()
 local URI = sandbox('uri.lua', luaUriPath, io.open)
 local URI_FILE = sandbox('uri/file.lua', luaUriPath, io.open)
 local OS = platform.OS == 'Windows' and 'win32' or 'unix'

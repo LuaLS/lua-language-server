@@ -39,7 +39,7 @@ export function activate(context: ExtensionContext) {
 					beta ? 'server-beta' : 'server',
 					'Windows',
 					'bin',
-					beta ? 'lua-beta.exe' : 'lua.exe'
+					beta ? 'lua-beta.exe' : 'lua-language-server.exe'
 				)
 			);
 			break;
@@ -49,7 +49,7 @@ export function activate(context: ExtensionContext) {
 					beta ? 'server-beta' : 'server',
 					'Linux',
 					'bin',
-					beta? 'lua-beta' : 'lua'
+					beta? 'lua-beta' : 'lua-language-server'
 				)
 			);
 			fs.chmodSync(command, '777');
@@ -60,7 +60,7 @@ export function activate(context: ExtensionContext) {
 					beta ? 'server-beta' : 'server',
 					'macOS',
 					'bin',
-					beta? 'lua-beta' : 'lua'
+					beta? 'lua-beta' : 'lua-language-server'
 				)
 			);
 			fs.chmodSync(command, '777');

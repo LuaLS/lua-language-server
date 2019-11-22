@@ -26,14 +26,14 @@ function activate(context) {
     let platform = os.platform();
     switch (platform) {
         case "win32":
-            command = context.asAbsolutePath(path.join(beta ? 'server-beta' : 'server', 'Windows', 'bin', beta ? 'lua-beta.exe' : 'lua.exe'));
+            command = context.asAbsolutePath(path.join(beta ? 'server-beta' : 'server', 'Windows', 'bin', beta ? 'lua-beta.exe' : 'lua-language-server.exe'));
             break;
         case "linux":
-            command = context.asAbsolutePath(path.join(beta ? 'server-beta' : 'server', 'Linux', 'bin', beta ? 'lua-beta' : 'lua'));
+            command = context.asAbsolutePath(path.join(beta ? 'server-beta' : 'server', 'Linux', 'bin', beta ? 'lua-beta' : 'lua-language-server'));
             fs.chmodSync(command, '777');
             break;
         case "darwin":
-            command = context.asAbsolutePath(path.join(beta ? 'server-beta' : 'server', 'macOS', 'bin', beta ? 'lua-beta' : 'lua'));
+            command = context.asAbsolutePath(path.join(beta ? 'server-beta' : 'server', 'macOS', 'bin', beta ? 'lua-beta' : 'lua-language-server'));
             fs.chmodSync(command, '777');
             break;
     }

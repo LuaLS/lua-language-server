@@ -29,23 +29,6 @@
 			]
 		},
 		{
-			"name": "发布",
-			"type": "lua",
-			"request": "launch",
-			"stopOnEntry": false,
-			"program": "${workspaceRoot}/server/publish.lua",
-			"arg": [
-			],
-			"consoleCoding": "utf8",
-			"sourceCoding": "utf8",
-			"luaVersion": "5.4",
-			"luaArch": "x86_64",
-			"outputCapture": [
-				"print",
-				"stderr",
-			],
-		},
-		{
 			"name": "🍺测试-beta",
 			"type": "lua",
 			"request": "launch",

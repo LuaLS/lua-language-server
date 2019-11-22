@@ -1,9 +1,3 @@
-node_modules
-/client/server
-.vscode-test
-.vscode/ipch
-/server/log
-/server-beta/log
-/publish
+/log/
 /build/
 !*.exe

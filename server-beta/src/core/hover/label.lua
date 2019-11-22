@@ -1,6 +1,7 @@
 local buildName   = require 'core.hover.name'
 local buildArg    = require 'core.hover.arg'
 local buildReturn = require 'core.hover.return'
+local buildTable  = require 'core.hover.table'
 local vm          = require 'vm'
 local util        = require 'utility'
 
@@ -18,6 +19,9 @@ local function asLocal(source)
     local name = buildName(source)
     local type = vm.getType(source)
     local literal = vm.getLiteral(source)
+    if type == 'table' then
+        type = buildTable(source)
+    end
     if literal == nil then
         return ('local %s: %s'):format(name, type)
     else
@@ -29,6 +33,9 @@ local function asGlobal(source)
     local name = buildName(source)
     local type = vm.getType(source)
     local literal = vm.getLiteral(source)
+    if type == 'table' then
+        type = buildTable(source)
+    end
     if literal == nil then
         return ('global %s: %s'):format(name, type)
     else
@@ -64,6 +71,9 @@ local function asField(source)
     local name = buildName(source)
     local type = vm.getType(source)
     local literal = vm.getLiteral(source)
+    if type == 'table' then
+        type = buildTable(source)
+    end
     if literal == nil then
         return ('field %s: %s'):format(name, type)
     else

@@ -156,12 +156,17 @@ t.<?x?> = 1
 "global t.x: integer = 1"
 
 TEST [[
+local <?obj?> = {}
+]]
+"local obj: {}"
+
+TEST [[
 local mt = {}
 mt.__name = 'class'
 
 local <?obj?> = setmetatable({}, mt)
 ]]
-"local obj: *class {}"
+"local obj: class {}"
 
 TEST [[
 local mt = {}
@@ -171,7 +176,7 @@ mt.__index = mt
 local <?obj?> = setmetatable({}, mt)
 ]]
 [[
-local obj: *class {
+local obj: class {
     __index: table,
     name: string = "class",
 }

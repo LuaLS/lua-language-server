@@ -7,26 +7,26 @@ end
 
 local function asMethod(source)
     local class = vm.eachField(source.node, function (info)
-        if info.key == 's|type' or info.key == 's|__name' then
+        if info.key == 's|type' or info.key == 's|__name' or info.key == 's|name' then
             if info.value and info.value.type == 'string' then
                 return info.value[1]
             end
         end
     end)
-    local node = class or guide.getName(source.node) or '*'
+    local node = class or guide.getName(source.node) or '?'
     local method = guide.getName(source)
     return ('%s:%s'):format(node, method)
 end
 
 local function asField(source)
     local class = vm.eachField(source.node, function (info)
-        if info.key == 's|type' or info.key == 's|__name' then
+        if info.key == 's|type' or info.key == 's|__name' or info.key == 's|name' then
             if info.value and info.value.type == 'string' then
                 return info.value[1]
             end
         end
     end)
-    local node = class or guide.getName(source.node) or '*'
+    local node = class or guide.getName(source.node) or '?'
     local method = guide.getName(source)
     return ('%s.%s'):format(node, method)
 end

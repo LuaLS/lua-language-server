@@ -7,7 +7,7 @@
 			"type": "lua",
 			"request": "launch",
 			"stopOnEntry": false,
-			"program": "${workspaceRoot}/server/test.lua",
+			"program": "${workspaceRoot}/test.lua",
 			"arg": [
 			],
 			"consoleCoding": "utf8",
@@ -74,7 +74,7 @@
 			"type": "lua",
 			"request": "launch",
 			"stopOnEntry": false,
-			"program": "${workspaceRoot}/server-beta/test.lua",
+			"program": "${workspaceRoot}/test-beta.lua",
 			"arg": [
 			],
 			"consoleCoding": "utf8",

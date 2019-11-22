@@ -3,7 +3,7 @@ local rootPath = currentPath:gsub('[^/\\]-$', '')
 if rootPath == '' then
     rootPath = './'
 end
-dofile(rootPath .. 'platform.lua')
+loadfile(rootPath .. 'platform.lua')('script')
 package.path  = package.path
       .. ';' .. rootPath .. 'test/?.lua'
       .. ';' .. rootPath .. 'test/?/init.lua'
@@ -17,7 +17,6 @@ log.debug('测试开始')
 ac = {}
 
 require 'utility'
-dofile((ROOT / 'build_package.lua'):string())
 
 local function loadAllLibs()
     assert(require 'bee.filesystem')

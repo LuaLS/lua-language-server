@@ -1,9 +1,9 @@
 local currentPath = debug.getinfo(1, 'S').source:sub(2)
 local rootPath = currentPath:gsub('[/\\]*[^/\\]-$', '')
-dofile(rootPath .. '/platform.lua')
+loadfile(rootPath .. '\\platform.lua')('script-beta')
 package.path  = package.path
-      .. ';' .. rootPath .. '\\test\\?.lua'
-      .. ';' .. rootPath .. '\\test\\?\\init.lua'
+      .. ';' .. rootPath .. '\\test-beta\\?.lua'
+      .. ';' .. rootPath .. '\\test-beta\\?\\init.lua'
 local fs = require 'bee.filesystem'
 ROOT = fs.path(rootPath)
 LANG = 'en-US'

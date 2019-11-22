@@ -31,16 +31,27 @@ local function asField(source)
     return ('%s.%s'):format(node, method)
 end
 
+local function asGlobal(source)
+    return guide.getName(source)
+end
+
 local function buildName(source)
     if source.type == 'local'
     or source.type == 'getlocal'
     or source.type == 'setlocal' then
         return asLocal(source) or ''
     end
-    if source.type == 'setmethod' then
+    if source.type == 'setglobal'
+    or source.type == 'getglobal' then
+        return asGlobal(source) or ''
+    end
+    if source.type == 'setmethod'
+    or source.type == 'getmethod' then
         return asMethod(source) or ''
     end
-    if source.type == 'setfield' then
+    if source.type == 'setfield'
+    or source.tyoe == 'getfield'
+    or source.type == 'tablefield' then
         return asField(source) or ''
     end
     local parent = source.parent

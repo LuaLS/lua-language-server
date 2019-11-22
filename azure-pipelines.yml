@@ -52,7 +52,7 @@ jobs:
   - task: CopyFiles@2
     inputs:
       Contents: '**'
-      SourceFolder: 'bin/macOS
+      SourceFolder: 'bin/macOS'
       TargetFolder: '$(Build.ArtifactStagingDirectory)'
   - task: PublishBuildArtifacts@1
     inputs:

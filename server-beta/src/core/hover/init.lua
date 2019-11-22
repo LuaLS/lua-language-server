@@ -4,8 +4,6 @@ local vm        = require 'vm'
 local getLabel  = require 'core.hover.label'
 
 local function getHoverAsFunction(source)
-    local uri = guide.getRoot(source).uri
-    local text = files.getText(uri)
     local values = vm.getValue(source)
     local labels = {}
     for _, value in ipairs(values) do
@@ -21,10 +19,20 @@ local function getHoverAsFunction(source)
     }
 end
 
+local function getHoverAsValue(source)
+    local label = getLabel(source)
+    return {
+        label  = label,
+        source = source,
+    }
+end
+
 local function getHover(source)
     local isFunction = vm.hasType(source, 'function')
     if isFunction then
         return getHoverAsFunction(source)
+    else
+        return getHoverAsValue(source)
     end
 end
 

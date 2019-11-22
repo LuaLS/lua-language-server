@@ -431,4 +431,22 @@ function m.viewString(str, quo)
     end
 end
 
+function m.viewLiteral(v)
+    local tp = type(v)
+    if tp == 'nil' then
+        return 'nil'
+    elseif tp == 'string' then
+        return m.viewString(v)
+    elseif tp == 'boolean' then
+        return tostring(v)
+    elseif tp == 'number' then
+        if isInteger(v) then
+            return tostring(v)
+        else
+            return formatNumber(v)
+        end
+    end
+    return nil
+end
+
 return m

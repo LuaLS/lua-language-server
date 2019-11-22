@@ -30,10 +30,26 @@ local function merge(t, b)
 end
 
 local function alloc(o)
-    return {
-        [1] = o,
-        [o] = true,
-    }
+    -- TODO
+    assert(o.type)
+    if type(o.type) == 'table' then
+        local values = {}
+        for i = 1, #o.type do
+            local sub = {
+                type   = o.type[i],
+                value  = o.value,
+                source = o.source,
+            }
+            values[i] = sub
+            values[sub] = true
+        end
+        return values
+    else
+        return {
+            [1] = o,
+            [o] = true,
+        }
+    end
 end
 
 local function insert(t, o)
@@ -758,8 +774,10 @@ function vm.getLiteral(source, type)
     end
     for i = 1, #values do
         local v = values[i]
-        if v.type == type and v.value ~= nil then
-            return v.value
+        if v.value ~= nil then
+            if type == nil or v.type == type then
+                return v.value
+            end
         end
     end
     return nil

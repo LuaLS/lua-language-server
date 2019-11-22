@@ -125,34 +125,35 @@ obj.<?xxx?>()
 ]]
 "function obj.xxx()"
 
-TEST [[
-obj.<?xxx?>()
-]]
-[[function obj.xxx()
-  -> any
-]]
+-- 不不同调用方式推断定义
+--TEST [[
+--obj.<?xxx?>()
+--]]
+--[[function obj.xxx()
+--  -> any
+--]]
 
 TEST [[
 local <?x?> = 1
 ]]
-"local x: number = 1"
+"local x: integer = 1"
 
 TEST [[
 <?x?> = 1
 ]]
-"global x: number = 1"
+"global x: integer = 1"
 
 TEST [[
 local t = {}
 t.<?x?> = 1
 ]]
-"field t.x: number = 1"
+"field t.x: integer = 1"
 
 TEST [[
 t = {}
 t.<?x?> = 1
 ]]
-"global t.x: number = 1"
+"global t.x: integer = 1"
 
 TEST [[
 local mt = {}

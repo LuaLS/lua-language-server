@@ -1,0 +1,92 @@
+trigger:
+- master
+
+jobs:
+- job: windows
+  pool:
+    vmImage: 'windows-latest'
+
+  steps:
+  - script: |
+      git submodule update --init --recursive
+    displayName: 'Init'
+  - script: |
+      cd 3rd\luamake
+      tools\ninja.exe -f ninja\msvc.ninja
+      cd ..\..
+    displayName: 'Compile luamake'
+  - script: |
+      3rd\luamake\luamake.exe rebuild
+    displayName: 'Compile'
+  - task: CopyFiles@2
+    inputs:
+      Contents: '**'
+      SourceFolder: 'bin\Windows'
+      TargetFolder: '$(Build.ArtifactStagingDirectory)'
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathToPublish: $(Build.ArtifactStagingDirectory)
+      artifactName: sumneko.lua-windows
+
+- job: macos
+  pool:
+    vmImage: 'macos-latest'
+
+  steps:
+  - bash: |
+      git submodule update --init --recursive
+    displayName: 'Init'
+  - bash: |
+      sudo xcode-select -s /Applications/Xcode_10.2.app
+      brew install ninja
+    displayName: 'Install'
+  - bash: |
+      cd 3rd/luamake
+      ninja -f ninja/macos.ninja
+      cd ../..
+    displayName: 'Compile luamake'
+  - bash: |
+      rm -r server/macOS/*
+      ./3rd/luamake/luamake rebuild
+    displayName: 'Compile'
+  - task: CopyFiles@2
+    inputs:
+      Contents: '**'
+      SourceFolder: 'bin/macOS
+      TargetFolder: '$(Build.ArtifactStagingDirectory)'
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathToPublish: $(Build.ArtifactStagingDirectory)
+      artifactName: sumneko.lua-macos
+
+- job: linux
+  pool:
+    vmImage: 'ubuntu-latest'
+
+  steps:
+  - bash: |
+      git submodule update --init --recursive
+    displayName: 'Init'
+  - bash: |
+      sudo apt-get update
+      sudo apt-get install -y libreadline-dev ninja-build
+      sudo apt-get install -y g++-8
+    displayName: 'Install'
+  - bash: |
+      cd 3rd/luamake
+      ninja -f ninja/linux.ninja
+      cd ../..
+    displayName: 'Compile luamake'
+  - bash: |
+      rm -r server/Linux/*
+      ./3rd/luamake/luamake rebuild
+    displayName: 'Compile'
+  - task: CopyFiles@2
+    inputs:
+      Contents: '**'
+      SourceFolder: 'bin/Linux'
+      TargetFolder: '$(Build.ArtifactStagingDirectory)'
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathToPublish: $(Build.ArtifactStagingDirectory)
+      artifactName: sumneko.lua-linux

@@ -29,30 +29,6 @@
 			]
 		},
 		{
-			"name": "编译",
-			"type": "lua",
-			"request": "launch",
-			"stopOnEntry": false,
-			"program": "${workspaceRoot}/server/test/main.lua",
-			"cwd": "${workspaceRoot}/server",
-			"env": {
-				"PATH": "${workspaceRoot}\\server\\bin\\"
-			},
-			"path": "${workspaceRoot}/server/bin/?.lua",
-			"cpath": "${workspaceRoot}/server/bin/?.dll;",
-			"arg": [
-			],
-			"consoleCoding": "utf8",
-			"sourceCoding": "utf8",
-			"preLaunchTask": "编译",
-			"luaVersion": "5.4",
-			"luaArch": "x86_64",
-			"outputCapture": [
-				"print",
-				"stderr",
-			],
-		},
-		{
 			"name": "发布",
 			"type": "lua",
 			"request": "launch",

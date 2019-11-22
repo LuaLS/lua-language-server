@@ -93,7 +93,7 @@ If you find any mistakes, please [tell me][issues] or use [Pull Requests][@lua] 
 如果你发现了任何错误，请[告诉我][issues]或使用[Pull Requests][@lua]来直接修复。
 
 [issues]: https://github.com/sumneko/lua-language-server/issues
-[@lua]: https://github.com/sumneko/lua-language-server/tree/master/server/libs/%40lua
+[@lua]: https://github.com/sumneko/lua-language-server/tree/master/libs/%40lua
 
 ## Locale
 
@@ -102,7 +102,7 @@ If you find any mistakes, please [tell me][issues] or use [Pull Requests][@lua] 
 
 Please [help me][en-US] improve the quality of `en-US`.
 
-[en-US]: https://github.com/sumneko/vscode-lua-language-server/tree/master/server/locale/en-US
+[en-US]: https://github.com/sumneko/vscode-lua-language-server/tree/master/locale/en-US
 
 ## Credit
 

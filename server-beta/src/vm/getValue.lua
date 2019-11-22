@@ -768,7 +768,10 @@ end
 function vm.isSameValue(a, b)
     local valuesA = vm.getValue(a)
     local valuesB = vm.getValue(b)
-    if valuesA == valuesB and valuesA ~= nil then
+    if not valuesA or not valuesB then
+        return false
+    end
+    if valuesA == valuesB then
         return true
     end
     local values = {}

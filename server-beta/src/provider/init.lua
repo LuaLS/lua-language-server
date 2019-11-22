@@ -8,6 +8,7 @@ local define    = require 'proto.define'
 local workspace = require 'workspace'
 local config    = require 'config'
 local library   = require 'library'
+local markdown  = require 'provider.markdown'
 
 local function updateConfig()
     local configs = proto.awaitRequest('workspace/configuration', {
@@ -143,12 +144,28 @@ proto.on('textDocument/didChange', function (params)
     end
 end)
 
-proto.on('textDocument/hover', function ()
+proto.on('textDocument/hover', function (params)
+    local core = require 'core.hover'
+    local doc    = params.textDocument
+    local uri    = doc.uri
+    if not files.exists(uri) then
+        return nil
+    end
+    local lines  = files.getLines(uri)
+    local text   = files.getText(uri)
+    local offset = define.offset(lines, text, params.position)
+    local hover = core(uri, offset)
+    if not hover then
+        return nil
+    end
+    local md = markdown()
+    md:add('lua', hover.label)
     return {
         contents = {
-            value = 'Hello loli!',
+            value = md:string(),
             kind  = 'markdown',
-        }
+        },
+        range = define.range(lines, text, hover.source.start, hover.source.finish),
     }
 end)
 

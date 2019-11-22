@@ -16,7 +16,8 @@ local function getHoverAsFunction(source)
 
     local label = table.concat(labels, '\n')
     return {
-        label = label,
+        label  = label,
+        source = source,
     }
 end
 

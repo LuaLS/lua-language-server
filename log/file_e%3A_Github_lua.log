@@ -1,0 +1,946 @@
+[2019-10-30 18:39:29.001][info]: [main:14]Lua Lsp startup, root: 	c:/Users/l/.vscode/extensions/sumneko.lua/server
+[2019-10-30 18:39:29.002][debug]: [main:15]ROOT:	c:/Users/l/.vscode/extensions/sumneko.lua/server
+[2019-10-30 18:39:29.072][info]: [src.language:125]VSC language: zh-cn
+[2019-10-30 18:39:29.072][info]: [src.language:126]LS  language: zh-cn
+[2019-10-30 18:39:29.195][debug]: [src.async.async:55]Create thread, id: 	1	task: 	proto
+[2019-10-30 18:39:29.209][debug]: [src.service:782]collectgarbage: 	0.014
+[2019-10-30 18:39:29.209][debug]: [src.service:853]
+State
+Main Mem:  [8404.774]kb
+#001 Mem:  <Unknown>
+-------------------
+CachedVM:  [0]
+AlivedVM:  [0]
+DeadVM:    [0]
+-------------------
+CachedSrc: [0]
+AlivedSrc: [1]
+DeadSrc:   [0]
+-------------------
+CachedFunc:[0]
+AlivedFunc:[0]
+DeadFunc:  [0]
+-------------------
+TotalVal:  [0]
+DeadVal:   [0]
+-------------------
+TotalLoc:  [0]
+TotalEmmy: [10]
+
+[2019-10-30 18:39:29.209][debug]: [src.service:895]test memory: 	0.000
+[2019-10-30 18:39:29.300][debug]: [src.config:184]Config update: 	{
+	completion = {
+		callSnippet = "Disable",
+		enable = true,
+		keywordSnippet = "Replace",
+	},
+	diagnostics = {
+		disable = {
+		},
+		enable = true,
+		globals = {
+			warn = true,
+		},
+		severity = {
+			["ambiguity-1"] = "Warning",
+			["duplicate-index"] = "Warning",
+			["duplicate-method"] = "Warning",
+			["emmy-lua"] = "Warning",
+			["empty-block"] = "Hint",
+			["global-in-nil-env"] = "Warning",
+			["lowercase-global"] = "Information",
+			["newfield-call"] = "Warning",
+			["newline-call"] = "Information",
+			["redefined-local"] = "Hint",
+			["redundant-parameter"] = "Hint",
+			["redundant-value"] = "Hint",
+			["set-const"] = "Error",
+			["trailing-space"] = "Hint",
+			["undefined-env-child"] = "Information",
+			["undefined-global"] = "Warning",
+			["unused-function"] = "Hint",
+			["unused-label"] = "Hint",
+			["unused-local"] = "Hint",
+			["unused-vararg"] = "Hint",
+		},
+	},
+	plugin = {
+		enable = false,
+		path = ".vscode/lua-plugin/*.lua",
+	},
+	runtime = {
+		library = {
+		},
+		path = {
+			[1] = "?.lua",
+			[2] = "?/init.lua",
+			[3] = "?/?.lua",
+		},
+		version = "Lua 5.4",
+	},
+	workspace = {
+		ignoreDir = {
+			[".vscode"] = true,
+		},
+		ignoreSubmodules = true,
+		library = {
+		},
+		maxPreload = 300,
+		preloadFileSize = 100,
+		useGitIgnore = true,
+	},
+}	{
+	associations = {
+		["*.lni"] = "lua",
+	},
+	exclude = {
+		["**/.DS_Store"] = true,
+		["**/.git"] = true,
+		["**/.hg"] = true,
+		["**/.svn"] = true,
+		["**/CVS"] = true,
+	},
+}
+[2019-10-30 18:39:29.395][debug]: [src.service:347]reCompile:	1	1
+[2019-10-30 18:39:29.415][debug]: [src.service:782]collectgarbage: 	0.020
+[2019-10-30 18:39:29.415][debug]: [src.service:853]
+State
+Main Mem:  [10340.694]kb
+#001 Mem:  [394.314]kb
+-------------------
+CachedVM:  [0]
+AlivedVM:  [0]
+DeadVM:    [0]
+-------------------
+CachedSrc: [0]
+AlivedSrc: [1]
+DeadSrc:   [1]
+-------------------
+CachedFunc:[0]
+AlivedFunc:[0]
+DeadFunc:  [0]
+-------------------
+TotalVal:  [352]
+DeadVal:   [352]
+-------------------
+TotalLoc:  [0]
+TotalEmmy: [10]
+
+[2019-10-30 18:39:29.415][debug]: [src.service:895]test memory: 	0.000
+[2019-10-30 18:39:29.415][debug]: [src.service:759]reDiagnostic
+[2019-10-30 18:39:29.415][debug]: [src.capability.completion:19]Enable completion.
+[2019-10-30 18:39:29.416][debug]: [src.async.async:55]Create thread, id: 	2	task: 	loadfile
+[2019-10-30 18:39:29.417][info]: [src.workspace:187]Workspace inited, root: 	e:/Github/lua
+[2019-10-30 18:39:29.417][info]: [src.workspace:188]Workspace inited, uri: 	file:///e%3A/Github/lua
+[2019-10-30 18:39:29.417][info]: [src.workspace:190]Log path: 	c:/Users/l/.vscode/extensions/sumneko.lua/server/log/file_e%3A_Github_lua.log
+[2019-10-30 18:39:29.418][debug]: [src.async.async:55]Create thread, id: 	3	task: 	scanfiles
+[2019-10-30 18:39:29.468][debug]: [src.method.initialized:32]client/registerCapability Success!
+[2019-10-30 18:39:29.468][debug]: [src.workspace:159]Scanning:	e:/Github/lua
+[2019-10-30 18:39:29.468][debug]: [src.workspace:159]Scan pattern:	{
+	[1] = ".vscode",
+	[2] = "**/CVS",
+	[3] = "**/.git",
+	[4] = "**/.svn",
+	[5] = "**/.DS_Store",
+	[6] = "**/.hg",
+}
+[2019-10-30 18:39:29.468][debug]: [src.workspace:159]Scan options:	{
+	ignoreCase = true,
+}
+[2019-10-30 18:39:29.468][info]: [src.workspace:153]Scan finish, got	32	files.
+[2019-10-30 18:39:29.471][debug]: [src.service:347]reCompile:	1	1
+[2019-10-30 18:39:29.491][debug]: [src.service:782]collectgarbage: 	0.020
+[2019-10-30 18:39:29.491][debug]: [src.service:853]
+State
+Main Mem:  [9814.729]kb
+#001 Mem:  [394.314]kb
+#002 Mem:  <Unknown>
+#003 Mem:  <Unknown>
+-------------------
+CachedVM:  [0]
+AlivedVM:  [0]
+DeadVM:    [0]
+-------------------
+CachedSrc: [0]
+AlivedSrc: [1]
+DeadSrc:   [1]
+-------------------
+CachedFunc:[0]
+AlivedFunc:[0]
+DeadFunc:  [0]
+-------------------
+TotalVal:  [360]
+DeadVal:   [360]
+-------------------
+TotalLoc:  [0]
+TotalEmmy: [10]
+
+[2019-10-30 18:39:29.491][debug]: [src.service:895]test memory: 	0.000
+[2019-10-30 18:39:29.545][debug]: [src.service:269]Read failed due to duplicate:	file:///e%3A/Github/lua/testes/db.lua
+[2019-10-30 18:40:04.239][debug]: [src.config:184]Config update: 	{
+	completion = {
+		callSnippet = "Disable",
+		enable = true,
+		keywordSnippet = "Replace",
+	},
+	diagnostics = {
+		disable = {
+			["lowercase-global"] = true,
+		},
+		enable = true,
+		globals = {
+			warn = true,
+		},
+		severity = {
+			["ambiguity-1"] = "Warning",
+			["duplicate-index"] = "Warning",
+			["duplicate-method"] = "Warning",
+			["emmy-lua"] = "Warning",
+			["empty-block"] = "Hint",
+			["global-in-nil-env"] = "Warning",
+			["lowercase-global"] = "Information",
+			["newfield-call"] = "Warning",
+			["newline-call"] = "Information",
+			["redefined-local"] = "Hint",
+			["redundant-parameter"] = "Hint",
+			["redundant-value"] = "Hint",
+			["set-const"] = "Error",
+			["trailing-space"] = "Hint",
+			["undefined-env-child"] = "Information",
+			["undefined-global"] = "Warning",
+			["unused-function"] = "Hint",
+			["unused-label"] = "Hint",
+			["unused-local"] = "Hint",
+			["unused-vararg"] = "Hint",
+		},
+	},
+	plugin = {
+		enable = false,
+		path = ".vscode/lua-plugin/*.lua",
+	},
+	runtime = {
+		library = {
+		},
+		path = {
+			[1] = "?.lua",
+			[2] = "?/init.lua",
+			[3] = "?/?.lua",
+		},
+		version = "Lua 5.4",
+	},
+	workspace = {
+		ignoreDir = {
+			[".vscode"] = true,
+		},
+		ignoreSubmodules = true,
+		library = {
+		},
+		maxPreload = 300,
+		preloadFileSize = 100,
+		useGitIgnore = true,
+	},
+}	{
+	associations = {
+		["*.lni"] = "lua",
+	},
+	exclude = {
+		["**/.DS_Store"] = true,
+		["**/.git"] = true,
+		["**/.hg"] = true,
+		["**/.svn"] = true,
+		["**/CVS"] = true,
+	},
+}
+[2019-10-30 18:40:04.239][debug]: [src.service:759]reDiagnostic
+[2019-10-30 18:40:16.037][debug]: [src.config:184]Config update: 	{
+	completion = {
+		callSnippet = "Disable",
+		enable = true,
+		keywordSnippet = "Replace",
+	},
+	diagnostics = {
+		disable = {
+			["lowercase-global"] = true,
+		},
+		enable = true,
+		globals = {
+			undef = true,
+			warn = true,
+		},
+		severity = {
+			["ambiguity-1"] = "Warning",
+			["duplicate-index"] = "Warning",
+			["duplicate-method"] = "Warning",
+			["emmy-lua"] = "Warning",
+			["empty-block"] = "Hint",
+			["global-in-nil-env"] = "Warning",
+			["lowercase-global"] = "Information",
+			["newfield-call"] = "Warning",
+			["newline-call"] = "Information",
+			["redefined-local"] = "Hint",
+			["redundant-parameter"] = "Hint",
+			["redundant-value"] = "Hint",
+			["set-const"] = "Error",
+			["trailing-space"] = "Hint",
+			["undefined-env-child"] = "Information",
+			["undefined-global"] = "Warning",
+			["unused-function"] = "Hint",
+			["unused-label"] = "Hint",
+			["unused-local"] = "Hint",
+			["unused-vararg"] = "Hint",
+		},
+	},
+	plugin = {
+		enable = false,
+		path = ".vscode/lua-plugin/*.lua",
+	},
+	runtime = {
+		library = {
+		},
+		path = {
+			[1] = "?.lua",
+			[2] = "?/init.lua",
+			[3] = "?/?.lua",
+		},
+		version = "Lua 5.4",
+	},
+	workspace = {
+		ignoreDir = {
+			[".vscode"] = true,
+		},
+		ignoreSubmodules = true,
+		library = {
+		},
+		maxPreload = 300,
+		preloadFileSize = 100,
+		useGitIgnore = true,
+	},
+}	{
+	associations = {
+		["*.lni"] = "lua",
+	},
+	exclude = {
+		["**/.DS_Store"] = true,
+		["**/.git"] = true,
+		["**/.hg"] = true,
+		["**/.svn"] = true,
+		["**/CVS"] = true,
+	},
+}
+[2019-10-30 18:40:16.037][debug]: [src.service:759]reDiagnostic
+[2019-10-30 18:40:26.595][debug]: [src.config:184]Config update: 	{
+	completion = {
+		callSnippet = "Disable",
+		enable = true,
+		keywordSnippet = "Replace",
+	},
+	diagnostics = {
+		disable = {
+			["lowercase-global"] = true,
+		},
+		enable = true,
+		globals = {
+			REQUIRED = true,
+			undef = true,
+			warn = true,
+		},
+		severity = {
+			["ambiguity-1"] = "Warning",
+			["duplicate-index"] = "Warning",
+			["duplicate-method"] = "Warning",
+			["emmy-lua"] = "Warning",
+			["empty-block"] = "Hint",
+			["global-in-nil-env"] = "Warning",
+			["lowercase-global"] = "Information",
+			["newfield-call"] = "Warning",
+			["newline-call"] = "Information",
+			["redefined-local"] = "Hint",
+			["redundant-parameter"] = "Hint",
+			["redundant-value"] = "Hint",
+			["set-const"] = "Error",
+			["trailing-space"] = "Hint",
+			["undefined-env-child"] = "Information",
+			["undefined-global"] = "Warning",
+			["unused-function"] = "Hint",
+			["unused-label"] = "Hint",
+			["unused-local"] = "Hint",
+			["unused-vararg"] = "Hint",
+		},
+	},
+	plugin = {
+		enable = false,
+		path = ".vscode/lua-plugin/*.lua",
+	},
+	runtime = {
+		library = {
+		},
+		path = {
+			[1] = "?.lua",
+			[2] = "?/init.lua",
+			[3] = "?/?.lua",
+		},
+		version = "Lua 5.4",
+	},
+	workspace = {
+		ignoreDir = {
+			[".vscode"] = true,
+		},
+		ignoreSubmodules = true,
+		library = {
+		},
+		maxPreload = 300,
+		preloadFileSize = 100,
+		useGitIgnore = true,
+	},
+}	{
+	associations = {
+		["*.lni"] = "lua",
+	},
+	exclude = {
+		["**/.DS_Store"] = true,
+		["**/.git"] = true,
+		["**/.hg"] = true,
+		["**/.svn"] = true,
+		["**/CVS"] = true,
+	},
+}
+[2019-10-30 18:40:26.595][debug]: [src.service:759]reDiagnostic
+[2019-10-30 18:40:29.265][debug]: [src.service:782]collectgarbage: 	0.070
+[2019-10-30 18:40:29.281][debug]: [src.service:853]
+State
+Main Mem:  [68164.897]kb
+#001 Mem:  [170.971]kb
+#002 Mem:  [113.615]kb
+#003 Mem:  [140.799]kb
+-------------------
+CachedVM:  [32]
+AlivedVM:  [32]
+DeadVM:    [0]
+-------------------
+CachedSrc: [86473]
+AlivedSrc: [87276]
+DeadSrc:   [0]
+-------------------
+CachedFunc:[926]
+AlivedFunc:[1083]
+DeadFunc:  [0]
+-------------------
+TotalVal:  [8929]
+DeadVal:   [64]
+-------------------
+TotalLoc:  [3654]
+TotalEmmy: [10]
+
+[2019-10-30 18:40:29.281][debug]: [src.service:895]test memory: 	0.015
+[2019-10-30 18:41:05.506][debug]: [src.config:184]Config update: 	{
+	completion = {
+		callSnippet = "Disable",
+		enable = true,
+		keywordSnippet = "Replace",
+	},
+	diagnostics = {
+		disable = {
+			["lowercase-global"] = true,
+		},
+		enable = true,
+		globals = {
+			REQUIRED = true,
+			module = true,
+			undef = true,
+			warn = true,
+		},
+		severity = {
+			["ambiguity-1"] = "Warning",
+			["duplicate-index"] = "Warning",
+			["duplicate-method"] = "Warning",
+			["emmy-lua"] = "Warning",
+			["empty-block"] = "Hint",
+			["global-in-nil-env"] = "Warning",
+			["lowercase-global"] = "Information",
+			["newfield-call"] = "Warning",
+			["newline-call"] = "Information",
+			["redefined-local"] = "Hint",
+			["redundant-parameter"] = "Hint",
+			["redundant-value"] = "Hint",
+			["set-const"] = "Error",
+			["trailing-space"] = "Hint",
+			["undefined-env-child"] = "Information",
+			["undefined-global"] = "Warning",
+			["unused-function"] = "Hint",
+			["unused-label"] = "Hint",
+			["unused-local"] = "Hint",
+			["unused-vararg"] = "Hint",
+		},
+	},
+	plugin = {
+		enable = false,
+		path = ".vscode/lua-plugin/*.lua",
+	},
+	runtime = {
+		library = {
+		},
+		path = {
+			[1] = "?.lua",
+			[2] = "?/init.lua",
+			[3] = "?/?.lua",
+		},
+		version = "Lua 5.4",
+	},
+	workspace = {
+		ignoreDir = {
+			[".vscode"] = true,
+		},
+		ignoreSubmodules = true,
+		library = {
+		},
+		maxPreload = 300,
+		preloadFileSize = 100,
+		useGitIgnore = true,
+	},
+}	{
+	associations = {
+		["*.lni"] = "lua",
+	},
+	exclude = {
+		["**/.DS_Store"] = true,
+		["**/.git"] = true,
+		["**/.hg"] = true,
+		["**/.svn"] = true,
+		["**/CVS"] = true,
+	},
+}
+[2019-10-30 18:41:05.506][debug]: [src.service:759]reDiagnostic
+[2019-10-30 18:41:31.320][debug]: [src.service:782]collectgarbage: 	0.073
+[2019-10-30 18:41:31.336][debug]: [src.service:853]
+State
+Main Mem:  [69102.705]kb
+#001 Mem:  [297.174]kb
+#002 Mem:  [113.615]kb
+#003 Mem:  [140.799]kb
+-------------------
+CachedVM:  [32]
+AlivedVM:  [32]
+DeadVM:    [0]
+-------------------
+CachedSrc: [86473]
+AlivedSrc: [87276]
+DeadSrc:   [0]
+-------------------
+CachedFunc:[926]
+AlivedFunc:[1083]
+DeadFunc:  [0]
+-------------------
+TotalVal:  [8911]
+DeadVal:   [61]
+-------------------
+TotalLoc:  [3654]
+TotalEmmy: [10]
+
+[2019-10-30 18:41:31.336][debug]: [src.service:895]test memory: 	0.015
+[2019-10-30 18:41:37.733][debug]: [src.config:184]Config update: 	{
+	completion = {
+		callSnippet = "Disable",
+		enable = true,
+		keywordSnippet = "Replace",
+	},
+	diagnostics = {
+		disable = {
+			["lowercase-global"] = true,
+		},
+		enable = true,
+		globals = {
+			REQUIRED = true,
+			Y = true,
+			module = true,
+			undef = true,
+			warn = true,
+		},
+		severity = {
+			["ambiguity-1"] = "Warning",
+			["duplicate-index"] = "Warning",
+			["duplicate-method"] = "Warning",
+			["emmy-lua"] = "Warning",
+			["empty-block"] = "Hint",
+			["global-in-nil-env"] = "Warning",
+			["lowercase-global"] = "Information",
+			["newfield-call"] = "Warning",
+			["newline-call"] = "Information",
+			["redefined-local"] = "Hint",
+			["redundant-parameter"] = "Hint",
+			["redundant-value"] = "Hint",
+			["set-const"] = "Error",
+			["trailing-space"] = "Hint",
+			["undefined-env-child"] = "Information",
+			["undefined-global"] = "Warning",
+			["unused-function"] = "Hint",
+			["unused-label"] = "Hint",
+			["unused-local"] = "Hint",
+			["unused-vararg"] = "Hint",
+		},
+	},
+	plugin = {
+		enable = false,
+		path = ".vscode/lua-plugin/*.lua",
+	},
+	runtime = {
+		library = {
+		},
+		path = {
+			[1] = "?.lua",
+			[2] = "?/init.lua",
+			[3] = "?/?.lua",
+		},
+		version = "Lua 5.4",
+	},
+	workspace = {
+		ignoreDir = {
+			[".vscode"] = true,
+		},
+		ignoreSubmodules = true,
+		library = {
+		},
+		maxPreload = 300,
+		preloadFileSize = 100,
+		useGitIgnore = true,
+	},
+}	{
+	associations = {
+		["*.lni"] = "lua",
+	},
+	exclude = {
+		["**/.DS_Store"] = true,
+		["**/.git"] = true,
+		["**/.hg"] = true,
+		["**/.svn"] = true,
+		["**/CVS"] = true,
+	},
+}
+[2019-10-30 18:41:37.733][debug]: [src.service:759]reDiagnostic
+[2019-10-30 18:42:31.328][debug]: [src.service:782]collectgarbage: 	0.080
+[2019-10-30 18:42:31.343][debug]: [src.service:853]
+State
+Main Mem:  [68643.197]kb
+#001 Mem:  [333.046]kb
+#002 Mem:  [113.615]kb
+#003 Mem:  [140.799]kb
+-------------------
+CachedVM:  [32]
+AlivedVM:  [32]
+DeadVM:    [0]
+-------------------
+CachedSrc: [86473]
+AlivedSrc: [87276]
+DeadSrc:   [0]
+-------------------
+CachedFunc:[926]
+AlivedFunc:[1083]
+DeadFunc:  [0]
+-------------------
+TotalVal:  [8911]
+DeadVal:   [61]
+-------------------
+TotalLoc:  [3654]
+TotalEmmy: [10]
+
+[2019-10-30 18:42:31.343][debug]: [src.service:895]test memory: 	0.015
+[2019-10-30 18:42:57.131][warn]: [src.service:493]Compile Ast[file:///e%3A/Github/lua/testes/strings.lua] takes [0.127] sec, size [16.949]kb
+[2019-10-30 18:43:25.413][warn]: [src.service:493]Compile Ast[file:///e%3A/Github/lua/testes/nextvar.lua] takes [0.123] sec, size [18.234]kb
+[2019-10-30 18:43:31.756][debug]: [src.service:782]collectgarbage: 	0.083
+[2019-10-30 18:43:31.772][debug]: [src.service:853]
+State
+Main Mem:  [66237.678]kb
+#001 Mem:  [599.596]kb
+#002 Mem:  [113.615]kb
+#003 Mem:  [140.799]kb
+-------------------
+CachedVM:  [32]
+AlivedVM:  [32]
+DeadVM:    [0]
+-------------------
+CachedSrc: [86475]
+AlivedSrc: [87278]
+DeadSrc:   [0]
+-------------------
+CachedFunc:[926]
+AlivedFunc:[1083]
+DeadFunc:  [0]
+-------------------
+TotalVal:  [8925]
+DeadVal:   [72]
+-------------------
+TotalLoc:  [3654]
+TotalEmmy: [10]
+
+[2019-10-30 18:43:31.772][debug]: [src.service:895]test memory: 	0.016
+[2019-10-30 18:44:31.749][debug]: [src.service:782]collectgarbage: 	0.074
+[2019-10-30 18:44:31.765][debug]: [src.service:853]
+State
+Main Mem:  [68545.219]kb
+#001 Mem:  [328.458]kb
+#002 Mem:  [113.615]kb
+#003 Mem:  [140.799]kb
+-------------------
+CachedVM:  [32]
+AlivedVM:  [32]
+DeadVM:    [0]
+-------------------
+CachedSrc: [86473]
+AlivedSrc: [87276]
+DeadSrc:   [0]
+-------------------
+CachedFunc:[926]
+AlivedFunc:[1083]
+DeadFunc:  [0]
+-------------------
+TotalVal:  [8913]
+DeadVal:   [63]
+-------------------
+TotalLoc:  [3654]
+TotalEmmy: [10]
+
+[2019-10-30 18:44:31.765][debug]: [src.service:895]test memory: 	0.016
+[2019-10-30 18:45:31.737][debug]: [src.service:782]collectgarbage: 	0.061
+[2019-10-30 18:45:31.752][debug]: [src.service:853]
+State
+Main Mem:  [68506.500]kb
+#001 Mem:  [328.458]kb
+#002 Mem:  [113.615]kb
+#003 Mem:  [140.799]kb
+-------------------
+CachedVM:  [32]
+AlivedVM:  [32]
+DeadVM:    [0]
+-------------------
+CachedSrc: [86473]
+AlivedSrc: [87276]
+DeadSrc:   [0]
+-------------------
+CachedFunc:[926]
+AlivedFunc:[1083]
+DeadFunc:  [0]
+-------------------
+TotalVal:  [8913]
+DeadVal:   [63]
+-------------------
+TotalLoc:  [3654]
+TotalEmmy: [10]
+
+[2019-10-30 18:45:31.752][debug]: [src.service:895]test memory: 	0.015
+[2019-10-30 18:46:31.739][debug]: [src.service:782]collectgarbage: 	0.063
+[2019-10-30 18:46:31.755][debug]: [src.service:853]
+State
+Main Mem:  [68513.328]kb
+#001 Mem:  [330.791]kb
+#002 Mem:  [113.615]kb
+#003 Mem:  [140.799]kb
+-------------------
+CachedVM:  [32]
+AlivedVM:  [32]
+DeadVM:    [0]
+-------------------
+CachedSrc: [86473]
+AlivedSrc: [87276]
+DeadSrc:   [0]
+-------------------
+CachedFunc:[926]
+AlivedFunc:[1083]
+DeadFunc:  [0]
+-------------------
+TotalVal:  [8913]
+DeadVal:   [63]
+-------------------
+TotalLoc:  [3654]
+TotalEmmy: [10]
+
+[2019-10-30 18:46:31.755][debug]: [src.service:895]test memory: 	0.016
+[2019-10-30 18:47:31.741][debug]: [src.service:782]collectgarbage: 	0.065
+[2019-10-30 18:47:31.756][debug]: [src.service:853]
+State
+Main Mem:  [68572.598]kb
+#001 Mem:  [355.209]kb
+#002 Mem:  [113.615]kb
+#003 Mem:  [140.799]kb
+-------------------
+CachedVM:  [32]
+AlivedVM:  [32]
+DeadVM:    [0]
+-------------------
+CachedSrc: [86473]
+AlivedSrc: [87276]
+DeadSrc:   [0]
+-------------------
+CachedFunc:[926]
+AlivedFunc:[1083]
+DeadFunc:  [0]
+-------------------
+TotalVal:  [8913]
+DeadVal:   [63]
+-------------------
+TotalLoc:  [3654]
+TotalEmmy: [10]
+
+[2019-10-30 18:47:31.756][debug]: [src.service:895]test memory: 	0.015
+[2019-10-30 18:48:31.740][debug]: [src.service:782]collectgarbage: 	0.062
+[2019-10-30 18:48:31.755][debug]: [src.service:853]
+State
+Main Mem:  [68503.418]kb
+#001 Mem:  [324.641]kb
+#002 Mem:  [113.615]kb
+#003 Mem:  [140.799]kb
+-------------------
+CachedVM:  [32]
+AlivedVM:  [32]
+DeadVM:    [0]
+-------------------
+CachedSrc: [86473]
+AlivedSrc: [87276]
+DeadSrc:   [0]
+-------------------
+CachedFunc:[926]
+AlivedFunc:[1083]
+DeadFunc:  [0]
+-------------------
+TotalVal:  [8913]
+DeadVal:   [63]
+-------------------
+TotalLoc:  [3654]
+TotalEmmy: [10]
+
+[2019-10-30 18:48:31.755][debug]: [src.service:895]test memory: 	0.015
+[2019-10-30 18:49:31.740][debug]: [src.service:782]collectgarbage: 	0.061
+[2019-10-30 18:49:31.756][debug]: [src.service:853]
+State
+Main Mem:  [68514.793]kb
+#001 Mem:  [333.213]kb
+#002 Mem:  [113.615]kb
+#003 Mem:  [140.799]kb
+-------------------
+CachedVM:  [32]
+AlivedVM:  [32]
+DeadVM:    [0]
+-------------------
+CachedSrc: [86473]
+AlivedSrc: [87276]
+DeadSrc:   [0]
+-------------------
+CachedFunc:[926]
+AlivedFunc:[1083]
+DeadFunc:  [0]
+-------------------
+TotalVal:  [8913]
+DeadVal:   [63]
+-------------------
+TotalLoc:  [3654]
+TotalEmmy: [10]
+
+[2019-10-30 18:49:31.756][debug]: [src.service:895]test memory: 	0.016
+[2019-10-30 18:50:31.740][debug]: [src.service:782]collectgarbage: 	0.061
+[2019-10-30 18:50:31.755][debug]: [src.service:853]
+State
+Main Mem:  [68519.496]kb
+#001 Mem:  [333.213]kb
+#002 Mem:  [113.615]kb
+#003 Mem:  [140.799]kb
+-------------------
+CachedVM:  [32]
+AlivedVM:  [32]
+DeadVM:    [0]
+-------------------
+CachedSrc: [86473]
+AlivedSrc: [87276]
+DeadSrc:   [0]
+-------------------
+CachedFunc:[926]
+AlivedFunc:[1083]
+DeadFunc:  [0]
+-------------------
+TotalVal:  [8913]
+DeadVal:   [63]
+-------------------
+TotalLoc:  [3654]
+TotalEmmy: [10]
+
+[2019-10-30 18:50:31.755][debug]: [src.service:895]test memory: 	0.015
+[2019-10-30 18:51:31.741][debug]: [src.service:782]collectgarbage: 	0.062
+[2019-10-30 18:51:31.757][debug]: [src.service:853]
+State
+Main Mem:  [68519.004]kb
+#001 Mem:  [333.213]kb
+#002 Mem:  [113.615]kb
+#003 Mem:  [140.799]kb
+-------------------
+CachedVM:  [32]
+AlivedVM:  [32]
+DeadVM:    [0]
+-------------------
+CachedSrc: [86473]
+AlivedSrc: [87276]
+DeadSrc:   [0]
+-------------------
+CachedFunc:[926]
+AlivedFunc:[1083]
+DeadFunc:  [0]
+-------------------
+TotalVal:  [8913]
+DeadVal:   [63]
+-------------------
+TotalLoc:  [3654]
+TotalEmmy: [10]
+
+[2019-10-30 18:51:31.757][debug]: [src.service:895]test memory: 	0.016
+[2019-10-30 18:52:31.740][debug]: [src.service:782]collectgarbage: 	0.061
+[2019-10-30 18:52:31.755][debug]: [src.service:853]
+State
+Main Mem:  [68520.098]kb
+#001 Mem:  [335.412]kb
+#002 Mem:  [113.615]kb
+#003 Mem:  [140.799]kb
+-------------------
+CachedVM:  [32]
+AlivedVM:  [32]
+DeadVM:    [0]
+-------------------
+CachedSrc: [86473]
+AlivedSrc: [87276]
+DeadSrc:   [0]
+-------------------
+CachedFunc:[926]
+AlivedFunc:[1083]
+DeadFunc:  [0]
+-------------------
+TotalVal:  [8913]
+DeadVal:   [63]
+-------------------
+TotalLoc:  [3654]
+TotalEmmy: [10]
+
+[2019-10-30 18:52:31.755][debug]: [src.service:895]test memory: 	0.015
+[2019-10-30 18:53:31.740][debug]: [src.service:782]collectgarbage: 	0.061
+[2019-10-30 18:53:31.756][debug]: [src.service:853]
+State
+Main Mem:  [68518.129]kb
+#001 Mem:  [335.412]kb
+#002 Mem:  [113.615]kb
+#003 Mem:  [140.799]kb
+-------------------
+CachedVM:  [32]
+AlivedVM:  [32]
+DeadVM:    [0]
+-------------------
+CachedSrc: [86473]
+AlivedSrc: [87276]
+DeadSrc:   [0]
+-------------------
+CachedFunc:[926]
+AlivedFunc:[1083]
+DeadFunc:  [0]
+-------------------
+TotalVal:  [8913]
+DeadVal:   [63]
+-------------------
+TotalLoc:  [3654]
+TotalEmmy: [10]
+
+[2019-10-30 18:53:31.756][debug]: [src.service:895]test memory: 	0.016
+[2019-10-30 18:54:25.861][info]: [src.method.shutdown:2]Server shutdown.
+[2019-10-30 18:54:25.863][info]: [src.method.exit:2]Server exited.

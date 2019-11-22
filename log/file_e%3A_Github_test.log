@@ -1,0 +1,746 @@
+[2019-11-18 00:53:44.000][info]: [main:14]Lua Lsp startup, root: 	c:/Users/l/.vscode/extensions/sumneko.lua/server
+[2019-11-18 00:53:44.001][debug]: [main:15]ROOT:	c:/Users/l/.vscode/extensions/sumneko.lua/server
+[2019-11-18 00:53:44.063][info]: [src.language:125]VSC language: zh-cn
+[2019-11-18 00:53:44.063][info]: [src.language:126]LS  language: zh-cn
+[2019-11-18 00:53:44.194][debug]: [src.async.async:55]Create thread, id: 	1	task: 	proto
+[2019-11-18 00:53:44.208][debug]: [src.service:791]collectgarbage: 	0.014
+[2019-11-18 00:53:44.208][debug]: [src.service:862]
+State
+Main Mem:  [8412.208]kb
+#001 Mem:  <Unknown>
+-------------------
+CachedVM:  [0]
+AlivedVM:  [0]
+DeadVM:    [0]
+-------------------
+CachedSrc: [0]
+AlivedSrc: [1]
+DeadSrc:   [0]
+-------------------
+CachedFunc:[0]
+AlivedFunc:[0]
+DeadFunc:  [0]
+-------------------
+TotalVal:  [0]
+DeadVal:   [0]
+-------------------
+TotalLoc:  [0]
+TotalEmmy: [10]
+
+[2019-11-18 00:53:44.208][debug]: [src.service:904]test memory: 	0.000
+[2019-11-18 00:53:44.228][debug]: [src.config:184]Config update: 	{
+	completion = {
+		callSnippet = "Disable",
+		enable = true,
+		keywordSnippet = "Replace",
+	},
+	diagnostics = {
+		disable = {
+		},
+		enable = true,
+		globals = {
+		},
+		severity = {
+			["ambiguity-1"] = "Warning",
+			["duplicate-index"] = "Warning",
+			["duplicate-method"] = "Warning",
+			["emmy-lua"] = "Warning",
+			["empty-block"] = "Hint",
+			["global-in-nil-env"] = "Warning",
+			["lowercase-global"] = "Information",
+			["newfield-call"] = "Warning",
+			["newline-call"] = "Information",
+			["redefined-local"] = "Hint",
+			["redundant-parameter"] = "Hint",
+			["redundant-value"] = "Hint",
+			["set-const"] = "Error",
+			["trailing-space"] = "Hint",
+			["undefined-env-child"] = "Information",
+			["undefined-global"] = "Warning",
+			["unused-function"] = "Hint",
+			["unused-label"] = "Hint",
+			["unused-local"] = "Hint",
+			["unused-vararg"] = "Hint",
+		},
+	},
+	plugin = {
+		enable = false,
+		path = ".vscode/lua-plugin/*.lua",
+	},
+	runtime = {
+		library = {
+		},
+		path = {
+			[1] = "?.lua",
+			[2] = "?/init.lua",
+			[3] = "?/?.lua",
+		},
+		version = "Lua 5.4",
+	},
+	workspace = {
+		ignoreDir = {
+			[".vscode"] = true,
+		},
+		ignoreSubmodules = true,
+		library = {
+		},
+		maxPreload = 300,
+		preloadFileSize = 100,
+		useGitIgnore = true,
+	},
+}	{
+	associations = {
+		["*.lni"] = "lua",
+	},
+	exclude = {
+		["**/.DS_Store"] = true,
+		["**/.git"] = true,
+		["**/.hg"] = true,
+		["**/.svn"] = true,
+		["**/CVS"] = true,
+	},
+}
+[2019-11-18 00:53:44.314][debug]: [src.service:347]reCompile:	1	1
+[2019-11-18 00:53:44.340][debug]: [src.service:791]collectgarbage: 	0.026
+[2019-11-18 00:53:44.340][debug]: [src.service:862]
+State
+Main Mem:  [9383.160]kb
+#001 Mem:  [96.560]kb
+-------------------
+CachedVM:  [0]
+AlivedVM:  [0]
+DeadVM:    [0]
+-------------------
+CachedSrc: [0]
+AlivedSrc: [1]
+DeadSrc:   [1]
+-------------------
+CachedFunc:[0]
+AlivedFunc:[0]
+DeadFunc:  [0]
+-------------------
+TotalVal:  [287]
+DeadVal:   [287]
+-------------------
+TotalLoc:  [0]
+TotalEmmy: [10]
+
+[2019-11-18 00:53:44.340][debug]: [src.service:904]test memory: 	0.000
+[2019-11-18 00:53:44.340][debug]: [src.capability.completion:19]Enable completion.
+[2019-11-18 00:53:44.340][debug]: [src.async.async:55]Create thread, id: 	2	task: 	loadfile
+[2019-11-18 00:53:44.341][info]: [src.workspace:187]Workspace inited, root: 	e:/Github/test
+[2019-11-18 00:53:44.341][info]: [src.workspace:188]Workspace inited, uri: 	file:///e%3A/Github/test
+[2019-11-18 00:53:44.341][info]: [src.workspace:190]Log path: 	c:/Users/l/.vscode/extensions/sumneko.lua/server/log/file_e%3A_Github_test.log
+[2019-11-18 00:53:44.342][debug]: [src.async.async:55]Create thread, id: 	3	task: 	scanfiles
+[2019-11-18 00:53:44.345][debug]: [src.method.initialized:32]client/registerCapability Success!
+[2019-11-18 00:53:44.346][debug]: [src.workspace:159]Scanning:	e:/Github/test
+[2019-11-18 00:53:44.346][debug]: [src.workspace:159]Scan pattern:	{
+	[1] = ".vscode",
+	[2] = "**/CVS",
+	[3] = "**/.git",
+	[4] = "**/.svn",
+	[5] = "**/.DS_Store",
+	[6] = "**/.hg",
+}
+[2019-11-18 00:53:44.346][debug]: [src.workspace:159]Scan options:	{
+	ignoreCase = true,
+}
+[2019-11-18 00:53:44.346][info]: [src.workspace:153]Scan finish, got	1	files.
+[2019-11-18 00:53:44.346][debug]: [src.service:347]reCompile:	1	1
+[2019-11-18 00:53:44.361][debug]: [src.service:791]collectgarbage: 	0.015
+[2019-11-18 00:53:44.362][debug]: [src.service:862]
+State
+Main Mem:  [8802.850]kb
+#001 Mem:  [96.560]kb
+#002 Mem:  <Unknown>
+#003 Mem:  <Unknown>
+-------------------
+CachedVM:  [0]
+AlivedVM:  [0]
+DeadVM:    [0]
+-------------------
+CachedSrc: [0]
+AlivedSrc: [1]
+DeadSrc:   [1]
+-------------------
+CachedFunc:[0]
+AlivedFunc:[0]
+DeadFunc:  [0]
+-------------------
+TotalVal:  [295]
+DeadVal:   [295]
+-------------------
+TotalLoc:  [0]
+TotalEmmy: [10]
+
+[2019-11-18 00:53:44.362][debug]: [src.service:904]test memory: 	0.001
+[2019-11-18 00:53:44.367][debug]: [src.service:269]Read failed due to duplicate:	file:///e%3A/Github/test/mod.lua
+[2019-11-18 00:54:44.210][debug]: [src.service:791]collectgarbage: 	0.015
+[2019-11-18 00:54:44.210][debug]: [src.service:862]
+State
+Main Mem:  [9115.922]kb
+#001 Mem:  [103.297]kb
+#002 Mem:  [53.554]kb
+#003 Mem:  [105.377]kb
+-------------------
+CachedVM:  [1]
+AlivedVM:  [1]
+DeadVM:    [0]
+-------------------
+CachedSrc: [8]
+AlivedSrc: [691]
+DeadSrc:   [0]
+-------------------
+CachedFunc:[1]
+AlivedFunc:[133]
+DeadFunc:  [0]
+-------------------
+TotalVal:  [513]
+DeadVal:   [0]
+-------------------
+TotalLoc:  [218]
+TotalEmmy: [10]
+
+[2019-11-18 00:54:44.210][debug]: [src.service:904]test memory: 	0.000
+[2019-11-18 00:55:44.211][debug]: [src.service:791]collectgarbage: 	0.015
+[2019-11-18 00:55:44.212][debug]: [src.service:862]
+State
+Main Mem:  [9148.625]kb
+#001 Mem:  [103.297]kb
+#002 Mem:  [53.554]kb
+#003 Mem:  [105.377]kb
+-------------------
+CachedVM:  [1]
+AlivedVM:  [1]
+DeadVM:    [0]
+-------------------
+CachedSrc: [8]
+AlivedSrc: [691]
+DeadSrc:   [0]
+-------------------
+CachedFunc:[1]
+AlivedFunc:[133]
+DeadFunc:  [0]
+-------------------
+TotalVal:  [513]
+DeadVal:   [0]
+-------------------
+TotalLoc:  [218]
+TotalEmmy: [10]
+
+[2019-11-18 00:55:44.212][debug]: [src.service:904]test memory: 	0.001
+[2019-11-18 00:56:44.207][debug]: [src.service:791]collectgarbage: 	0.011
+[2019-11-18 00:56:44.207][debug]: [src.service:862]
+State
+Main Mem:  [9086.938]kb
+#001 Mem:  [103.297]kb
+#002 Mem:  [53.554]kb
+#003 Mem:  [105.377]kb
+-------------------
+CachedVM:  [1]
+AlivedVM:  [1]
+DeadVM:    [0]
+-------------------
+CachedSrc: [8]
+AlivedSrc: [691]
+DeadSrc:   [0]
+-------------------
+CachedFunc:[1]
+AlivedFunc:[133]
+DeadFunc:  [0]
+-------------------
+TotalVal:  [513]
+DeadVal:   [0]
+-------------------
+TotalLoc:  [218]
+TotalEmmy: [10]
+
+[2019-11-18 00:56:44.207][debug]: [src.service:904]test memory: 	0.000
+[2019-11-18 00:57:44.212][debug]: [src.service:791]collectgarbage: 	0.015
+[2019-11-18 00:57:44.212][debug]: [src.service:862]
+State
+Main Mem:  [9093.555]kb
+#001 Mem:  [103.297]kb
+#002 Mem:  [53.554]kb
+#003 Mem:  [105.377]kb
+-------------------
+CachedVM:  [1]
+AlivedVM:  [1]
+DeadVM:    [0]
+-------------------
+CachedSrc: [8]
+AlivedSrc: [691]
+DeadSrc:   [0]
+-------------------
+CachedFunc:[1]
+AlivedFunc:[133]
+DeadFunc:  [0]
+-------------------
+TotalVal:  [513]
+DeadVal:   [0]
+-------------------
+TotalLoc:  [218]
+TotalEmmy: [10]
+
+[2019-11-18 00:57:44.212][debug]: [src.service:904]test memory: 	0.000
+[2019-11-18 00:58:44.211][debug]: [src.service:791]collectgarbage: 	0.014
+[2019-11-18 00:58:44.212][debug]: [src.service:862]
+State
+Main Mem:  [9095.633]kb
+#001 Mem:  [103.297]kb
+#002 Mem:  [53.554]kb
+#003 Mem:  [105.377]kb
+-------------------
+CachedVM:  [1]
+AlivedVM:  [1]
+DeadVM:    [0]
+-------------------
+CachedSrc: [8]
+AlivedSrc: [691]
+DeadSrc:   [0]
+-------------------
+CachedFunc:[1]
+AlivedFunc:[133]
+DeadFunc:  [0]
+-------------------
+TotalVal:  [513]
+DeadVal:   [0]
+-------------------
+TotalLoc:  [218]
+TotalEmmy: [10]
+
+[2019-11-18 00:58:44.212][debug]: [src.service:904]test memory: 	0.001
+[2019-11-18 00:59:44.208][debug]: [src.service:791]collectgarbage: 	0.011
+[2019-11-18 00:59:44.209][debug]: [src.service:862]
+State
+Main Mem:  [9093.719]kb
+#001 Mem:  [103.297]kb
+#002 Mem:  [53.554]kb
+#003 Mem:  [105.377]kb
+-------------------
+CachedVM:  [1]
+AlivedVM:  [1]
+DeadVM:    [0]
+-------------------
+CachedSrc: [8]
+AlivedSrc: [691]
+DeadSrc:   [0]
+-------------------
+CachedFunc:[1]
+AlivedFunc:[133]
+DeadFunc:  [0]
+-------------------
+TotalVal:  [513]
+DeadVal:   [0]
+-------------------
+TotalLoc:  [218]
+TotalEmmy: [10]
+
+[2019-11-18 00:59:44.209][debug]: [src.service:904]test memory: 	0.001
+[2019-11-18 01:00:44.212][debug]: [src.service:791]collectgarbage: 	0.014
+[2019-11-18 01:00:44.212][debug]: [src.service:862]
+State
+Main Mem:  [9096.180]kb
+#001 Mem:  [103.297]kb
+#002 Mem:  [53.554]kb
+#003 Mem:  [105.377]kb
+-------------------
+CachedVM:  [1]
+AlivedVM:  [1]
+DeadVM:    [0]
+-------------------
+CachedSrc: [8]
+AlivedSrc: [691]
+DeadSrc:   [0]
+-------------------
+CachedFunc:[1]
+AlivedFunc:[133]
+DeadFunc:  [0]
+-------------------
+TotalVal:  [513]
+DeadVal:   [0]
+-------------------
+TotalLoc:  [218]
+TotalEmmy: [10]
+
+[2019-11-18 01:00:44.212][debug]: [src.service:904]test memory: 	0.000
+[2019-11-18 01:01:44.213][debug]: [src.service:791]collectgarbage: 	0.015
+[2019-11-18 01:01:44.213][debug]: [src.service:862]
+State
+Main Mem:  [9096.125]kb
+#001 Mem:  [103.297]kb
+#002 Mem:  [53.554]kb
+#003 Mem:  [105.377]kb
+-------------------
+CachedVM:  [1]
+AlivedVM:  [1]
+DeadVM:    [0]
+-------------------
+CachedSrc: [8]
+AlivedSrc: [691]
+DeadSrc:   [0]
+-------------------
+CachedFunc:[1]
+AlivedFunc:[133]
+DeadFunc:  [0]
+-------------------
+TotalVal:  [513]
+DeadVal:   [0]
+-------------------
+TotalLoc:  [218]
+TotalEmmy: [10]
+
+[2019-11-18 01:01:44.213][debug]: [src.service:904]test memory: 	0.000
+[2019-11-18 01:02:44.211][debug]: [src.service:791]collectgarbage: 	0.012
+[2019-11-18 01:02:44.212][debug]: [src.service:862]
+State
+Main Mem:  [9092.953]kb
+#001 Mem:  [103.297]kb
+#002 Mem:  [53.554]kb
+#003 Mem:  [105.377]kb
+-------------------
+CachedVM:  [1]
+AlivedVM:  [1]
+DeadVM:    [0]
+-------------------
+CachedSrc: [8]
+AlivedSrc: [691]
+DeadSrc:   [0]
+-------------------
+CachedFunc:[1]
+AlivedFunc:[133]
+DeadFunc:  [0]
+-------------------
+TotalVal:  [513]
+DeadVal:   [0]
+-------------------
+TotalLoc:  [218]
+TotalEmmy: [10]
+
+[2019-11-18 01:02:44.212][debug]: [src.service:904]test memory: 	0.001
+[2019-11-18 01:03:44.213][debug]: [src.service:791]collectgarbage: 	0.013
+[2019-11-18 01:03:44.214][debug]: [src.service:862]
+State
+Main Mem:  [9099.078]kb
+#001 Mem:  [103.297]kb
+#002 Mem:  [53.554]kb
+#003 Mem:  [105.377]kb
+-------------------
+CachedVM:  [1]
+AlivedVM:  [1]
+DeadVM:    [0]
+-------------------
+CachedSrc: [8]
+AlivedSrc: [691]
+DeadSrc:   [0]
+-------------------
+CachedFunc:[1]
+AlivedFunc:[133]
+DeadFunc:  [0]
+-------------------
+TotalVal:  [513]
+DeadVal:   [0]
+-------------------
+TotalLoc:  [218]
+TotalEmmy: [10]
+
+[2019-11-18 01:03:44.214][debug]: [src.service:904]test memory: 	0.001
+[2019-11-18 01:04:44.228][debug]: [src.service:791]collectgarbage: 	0.027
+[2019-11-18 01:04:44.229][debug]: [src.service:862]
+State
+Main Mem:  [9096.672]kb
+#001 Mem:  [103.297]kb
+#002 Mem:  [53.554]kb
+#003 Mem:  [105.377]kb
+-------------------
+CachedVM:  [1]
+AlivedVM:  [1]
+DeadVM:    [0]
+-------------------
+CachedSrc: [8]
+AlivedSrc: [691]
+DeadSrc:   [0]
+-------------------
+CachedFunc:[1]
+AlivedFunc:[133]
+DeadFunc:  [0]
+-------------------
+TotalVal:  [513]
+DeadVal:   [0]
+-------------------
+TotalLoc:  [218]
+TotalEmmy: [10]
+
+[2019-11-18 01:04:44.229][debug]: [src.service:904]test memory: 	0.001
+[2019-11-18 01:05:44.218][debug]: [src.service:791]collectgarbage: 	0.016
+[2019-11-18 01:05:44.219][debug]: [src.service:862]
+State
+Main Mem:  [9096.453]kb
+#001 Mem:  [103.297]kb
+#002 Mem:  [53.554]kb
+#003 Mem:  [105.377]kb
+-------------------
+CachedVM:  [1]
+AlivedVM:  [1]
+DeadVM:    [0]
+-------------------
+CachedSrc: [8]
+AlivedSrc: [691]
+DeadSrc:   [0]
+-------------------
+CachedFunc:[1]
+AlivedFunc:[133]
+DeadFunc:  [0]
+-------------------
+TotalVal:  [513]
+DeadVal:   [0]
+-------------------
+TotalLoc:  [218]
+TotalEmmy: [10]
+
+[2019-11-18 01:05:44.219][debug]: [src.service:904]test memory: 	0.001
+[2019-11-18 01:06:44.214][debug]: [src.service:791]collectgarbage: 	0.011
+[2019-11-18 01:06:44.215][debug]: [src.service:862]
+State
+Main Mem:  [9101.813]kb
+#001 Mem:  [103.297]kb
+#002 Mem:  [53.554]kb
+#003 Mem:  [105.377]kb
+-------------------
+CachedVM:  [1]
+AlivedVM:  [1]
+DeadVM:    [0]
+-------------------
+CachedSrc: [8]
+AlivedSrc: [691]
+DeadSrc:   [0]
+-------------------
+CachedFunc:[1]
+AlivedFunc:[133]
+DeadFunc:  [0]
+-------------------
+TotalVal:  [513]
+DeadVal:   [0]
+-------------------
+TotalLoc:  [218]
+TotalEmmy: [10]
+
+[2019-11-18 01:06:44.215][debug]: [src.service:904]test memory: 	0.000
+[2019-11-18 01:07:44.217][debug]: [src.service:791]collectgarbage: 	0.014
+[2019-11-18 01:07:44.217][debug]: [src.service:862]
+State
+Main Mem:  [9094.758]kb
+#001 Mem:  [103.297]kb
+#002 Mem:  [53.554]kb
+#003 Mem:  [105.377]kb
+-------------------
+CachedVM:  [1]
+AlivedVM:  [1]
+DeadVM:    [0]
+-------------------
+CachedSrc: [8]
+AlivedSrc: [691]
+DeadSrc:   [0]
+-------------------
+CachedFunc:[1]
+AlivedFunc:[133]
+DeadFunc:  [0]
+-------------------
+TotalVal:  [513]
+DeadVal:   [0]
+-------------------
+TotalLoc:  [218]
+TotalEmmy: [10]
+
+[2019-11-18 01:07:44.217][debug]: [src.service:904]test memory: 	0.000
+[2019-11-18 01:08:44.217][debug]: [src.service:791]collectgarbage: 	0.014
+[2019-11-18 01:08:44.217][debug]: [src.service:862]
+State
+Main Mem:  [9100.117]kb
+#001 Mem:  [103.297]kb
+#002 Mem:  [53.554]kb
+#003 Mem:  [105.377]kb
+-------------------
+CachedVM:  [1]
+AlivedVM:  [1]
+DeadVM:    [0]
+-------------------
+CachedSrc: [8]
+AlivedSrc: [691]
+DeadSrc:   [0]
+-------------------
+CachedFunc:[1]
+AlivedFunc:[133]
+DeadFunc:  [0]
+-------------------
+TotalVal:  [513]
+DeadVal:   [0]
+-------------------
+TotalLoc:  [218]
+TotalEmmy: [10]
+
+[2019-11-18 01:08:44.218][debug]: [src.service:904]test memory: 	0.001
+[2019-11-18 01:09:44.218][debug]: [src.service:791]collectgarbage: 	0.015
+[2019-11-18 01:09:44.218][debug]: [src.service:862]
+State
+Main Mem:  [9109.086]kb
+#001 Mem:  [103.297]kb
+#002 Mem:  [53.554]kb
+#003 Mem:  [105.377]kb
+-------------------
+CachedVM:  [1]
+AlivedVM:  [1]
+DeadVM:    [0]
+-------------------
+CachedSrc: [8]
+AlivedSrc: [691]
+DeadSrc:   [0]
+-------------------
+CachedFunc:[1]
+AlivedFunc:[133]
+DeadFunc:  [0]
+-------------------
+TotalVal:  [513]
+DeadVal:   [0]
+-------------------
+TotalLoc:  [218]
+TotalEmmy: [10]
+
+[2019-11-18 01:09:44.218][debug]: [src.service:904]test memory: 	0.000
+[2019-11-18 01:10:44.216][debug]: [src.service:791]collectgarbage: 	0.013
+[2019-11-18 01:10:44.217][debug]: [src.service:862]
+State
+Main Mem:  [9095.688]kb
+#001 Mem:  [103.297]kb
+#002 Mem:  [53.554]kb
+#003 Mem:  [105.377]kb
+-------------------
+CachedVM:  [1]
+AlivedVM:  [1]
+DeadVM:    [0]
+-------------------
+CachedSrc: [8]
+AlivedSrc: [691]
+DeadSrc:   [0]
+-------------------
+CachedFunc:[1]
+AlivedFunc:[133]
+DeadFunc:  [0]
+-------------------
+TotalVal:  [513]
+DeadVal:   [0]
+-------------------
+TotalLoc:  [218]
+TotalEmmy: [10]
+
+[2019-11-18 01:10:44.217][debug]: [src.service:904]test memory: 	0.001
+[2019-11-18 01:11:44.214][debug]: [src.service:791]collectgarbage: 	0.011
+[2019-11-18 01:11:44.215][debug]: [src.service:862]
+State
+Main Mem:  [9098.148]kb
+#001 Mem:  [103.297]kb
+#002 Mem:  [53.554]kb
+#003 Mem:  [105.377]kb
+-------------------
+CachedVM:  [1]
+AlivedVM:  [1]
+DeadVM:    [0]
+-------------------
+CachedSrc: [8]
+AlivedSrc: [691]
+DeadSrc:   [0]
+-------------------
+CachedFunc:[1]
+AlivedFunc:[133]
+DeadFunc:  [0]
+-------------------
+TotalVal:  [513]
+DeadVal:   [0]
+-------------------
+TotalLoc:  [218]
+TotalEmmy: [10]
+
+[2019-11-18 01:11:44.215][debug]: [src.service:904]test memory: 	0.001
+[2019-11-18 01:12:44.218][debug]: [src.service:791]collectgarbage: 	0.015
+[2019-11-18 01:12:44.219][debug]: [src.service:862]
+State
+Main Mem:  [9099.352]kb
+#001 Mem:  [103.297]kb
+#002 Mem:  [53.554]kb
+#003 Mem:  [105.377]kb
+-------------------
+CachedVM:  [1]
+AlivedVM:  [1]
+DeadVM:    [0]
+-------------------
+CachedSrc: [8]
+AlivedSrc: [691]
+DeadSrc:   [0]
+-------------------
+CachedFunc:[1]
+AlivedFunc:[133]
+DeadFunc:  [0]
+-------------------
+TotalVal:  [513]
+DeadVal:   [0]
+-------------------
+TotalLoc:  [218]
+TotalEmmy: [10]
+
+[2019-11-18 01:12:44.219][debug]: [src.service:904]test memory: 	0.001
+[2019-11-18 01:13:44.215][debug]: [src.service:791]collectgarbage: 	0.012
+[2019-11-18 01:13:44.215][debug]: [src.service:862]
+State
+Main Mem:  [9097.273]kb
+#001 Mem:  [103.297]kb
+#002 Mem:  [53.554]kb
+#003 Mem:  [105.377]kb
+-------------------
+CachedVM:  [1]
+AlivedVM:  [1]
+DeadVM:    [0]
+-------------------
+CachedSrc: [8]
+AlivedSrc: [691]
+DeadSrc:   [0]
+-------------------
+CachedFunc:[1]
+AlivedFunc:[133]
+DeadFunc:  [0]
+-------------------
+TotalVal:  [513]
+DeadVal:   [0]
+-------------------
+TotalLoc:  [218]
+TotalEmmy: [10]
+
+[2019-11-18 01:13:44.216][debug]: [src.service:904]test memory: 	0.001
+[2019-11-18 01:14:44.219][debug]: [src.service:791]collectgarbage: 	0.016
+[2019-11-18 01:14:44.219][debug]: [src.service:862]
+State
+Main Mem:  [9100.719]kb
+#001 Mem:  [103.297]kb
+#002 Mem:  [53.554]kb
+#003 Mem:  [105.377]kb
+-------------------
+CachedVM:  [1]
+AlivedVM:  [1]
+DeadVM:    [0]
+-------------------
+CachedSrc: [8]
+AlivedSrc: [691]
+DeadSrc:   [0]
+-------------------
+CachedFunc:[1]
+AlivedFunc:[133]
+DeadFunc:  [0]
+-------------------
+TotalVal:  [513]
+DeadVal:   [0]
+-------------------
+TotalLoc:  [218]
+TotalEmmy: [10]
+
+[2019-11-18 01:14:44.219][debug]: [src.service:904]test memory: 	0.000
+[2019-11-18 01:15:26.369][info]: [src.method.shutdown:2]Server shutdown.
+[2019-11-18 01:15:26.372][info]: [src.method.exit:2]Server exited.

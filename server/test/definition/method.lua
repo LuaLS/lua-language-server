@@ -138,3 +138,13 @@ end
 
 obj:<?x?>()
 ]]
+
+TEST [[
+local sm = setmetatable
+local mt
+function mt:method1()
+end
+
+local obj = sm({}, mt)
+obj:<?method1?>()
+]]

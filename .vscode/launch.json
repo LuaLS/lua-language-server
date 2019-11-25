@@ -12,8 +12,7 @@
 			],
 			"consoleCoding": "utf8",
 			"sourceCoding": "utf8",
-			"luaVersion": "5.4",
-			"luaArch": "x86_64",
+			"luaexe": "${workspaceFolder}/bin/Windows/lua-language-server.exe",
 			"outputCapture": [
 				"print",
 				"stderr",
@@ -33,7 +32,7 @@
 			"type": "lua",
 			"request": "launch",
 			"stopOnEntry": false,
-			"program": "${workspaceRoot}/test-beta.lua",
+			"luaexe": "${workspaceFolder}/bin/Windows/lua-language-server.exe",
 			"arg": [
 			],
 			"consoleCoding": "utf8",

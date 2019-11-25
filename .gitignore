@@ -1,3 +1,4 @@
 /log
 /build
+/bin
 !*.exe

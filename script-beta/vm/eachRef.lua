@@ -234,10 +234,10 @@ local function asArg(source, callback)
                         end
                     end)
                 end
-            end
-            local recvs = getCallRecvs(call)
-            if recvs and recvs[1] then
-                vm.eachRef(recvs[1], callback)
+                local recvs = getCallRecvs(call)
+                if recvs and recvs[1] then
+                    vm.eachRef(recvs[1], callback)
+                end
             end
         end
     end

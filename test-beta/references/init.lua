@@ -131,6 +131,11 @@ end
 
 TEST [[
 local mt = {}
+local <?obj?> = setmetatable({}, mt)
+]]
+
+TEST [[
+local mt = {}
 mt.x = 1
 local obj = setmetatable({}, mt)
 print(obj.<?x?>)

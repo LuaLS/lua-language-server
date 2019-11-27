@@ -129,6 +129,13 @@ function table.<?dump?>()
 end
 ]]
 
+TEST [[
+local mt = {}
+mt.x = 1
+local obj = setmetatable({}, mt)
+print(obj.<?x?>)
+]]
+
 --TEST [[
 -----@class <!Class!>
 -----@type <?Class?>

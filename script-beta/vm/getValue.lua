@@ -1,4 +1,5 @@
 local vm = require 'vm.vm'
+local util = require 'utility'
 
 local typeSort = {
     ['boolean']  = 1,
@@ -563,6 +564,12 @@ local function checkLibraryReturn(source)
     if not rtn then
         return nil
     end
+    if not rtn.type then
+        return nil
+    end
+    if rtn.type == '...' then
+        return
+    end
     return alloc {
         type   = rtn.type,
         value  = rtn.value,
@@ -596,6 +603,9 @@ local function checkLibraryArg(source)
     local lib = vm.getLibrary(func)
     local arg = lib and lib.args and lib.args[index]
     if not arg then
+        return
+    end
+    if not arg.type then
         return
     end
     if arg.type == '...' then

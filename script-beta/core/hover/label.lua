@@ -53,12 +53,12 @@ local function isGlobalField(source)
     or source.type == 'setmethod'
     or source.type == 'getmethod'
     or source.type == 'tablefield' then
-        local node = source.node
-        if node.type == 'setglobal'
-        or node.type == 'getglobal' then
+        local parent = source.parent
+        if parent.type == 'setglobal'
+        or parent.type == 'getglobal' then
             return true
         end
-        return isGlobalField(node)
+        return isGlobalField(parent)
     else
         return false
     end

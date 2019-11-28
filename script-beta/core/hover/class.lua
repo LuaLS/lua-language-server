@@ -5,7 +5,14 @@ local function getClass(source, deep)
         return nil
     end
     local class = vm.eachField(source, function (info)
-        if info.key == 's|type' or info.key == 's|__name' or info.key == 's|name' then
+        if not info.key then
+            return
+        end
+        local lkey = info.key:lower()
+        if lkey == 's|type'
+        or lkey == 's|__name'
+        or lkey == 's|name'
+        or lkey == 's|class' then
             if info.value and info.value.type == 'string' then
                 return info.value[1]
             end

@@ -42,7 +42,7 @@ local function buildName(source)
         return asMethod(source) or ''
     end
     if source.type == 'setfield'
-    or source.tyoe == 'getfield' then
+    or source.type == 'getfield' then
         return asField(source) or ''
     end
     if source.type == 'tablefield' then

@@ -309,7 +309,7 @@ local function ofGlobal(source, callback)
         for _, uri in ipairs(uris) do
             local ast = files.getAst(uri)
             local globals = vm.getGlobals(ast.ast)
-            if globals[key] then
+            if globals and globals[key] then
                 for _, info in ipairs(globals[key]) do
                     callback(info)
                     if info.value then

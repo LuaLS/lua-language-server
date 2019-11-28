@@ -2,6 +2,7 @@ local buildName   = require 'core.hover.name'
 local buildArg    = require 'core.hover.arg'
 local buildReturn = require 'core.hover.return'
 local buildTable  = require 'core.hover.table'
+local getClass    = require 'core.hover.class'
 local vm          = require 'vm'
 local util        = require 'utility'
 
@@ -15,32 +16,36 @@ local function asFunction(source)
     return table.concat(lines, '\n')
 end
 
-local function asLocal(source)
+local function asValue(source, title)
     local name = buildName(source)
+    local class = getClass(source)
     local type = vm.getType(source)
     local literal = vm.getLiteral(source)
+    local cont
     if type == 'table' then
-        type = buildTable(source)
+        cont = buildTable(source)
+        type = nil
     end
-    if literal == nil then
-        return ('local %s: %s'):format(name, type)
-    else
-        return ('local %s: %s = %s'):format(name, type, util.viewLiteral(literal))
+    local pack = {}
+    pack[#pack+1] = title
+    pack[#pack+1] = name .. ':'
+    pack[#pack+1] = class or type
+    if literal then
+        pack[#pack+1] = '='
+        pack[#pack+1] = util.viewLiteral(literal)
     end
+    if cont then
+        pack[#pack+1] = cont
+    end
+    return table.concat(pack, ' ')
+end
+
+local function asLocal(source)
+    return asValue(source, 'local')
 end
 
 local function asGlobal(source)
-    local name = buildName(source)
-    local type = vm.getType(source)
-    local literal = vm.getLiteral(source)
-    if type == 'table' then
-        type = buildTable(source)
-    end
-    if literal == nil then
-        return ('global %s: %s'):format(name, type)
-    else
-        return ('global %s: %s = %s'):format(name, type, util.viewLiteral(literal))
-    end
+    return asValue(source, 'global')
 end
 
 local function isGlobalField(source)
@@ -74,17 +79,7 @@ local function asField(source)
     if isGlobalField(source) then
         return asGlobal(source)
     end
-    local name = buildName(source)
-    local type = vm.getType(source)
-    local literal = vm.getLiteral(source)
-    if type == 'table' then
-        type = buildTable(source)
-    end
-    if literal == nil then
-        return ('field %s: %s'):format(name, type)
-    else
-        return ('field %s: %s = %s'):format(name, type, util.viewLiteral(literal))
-    end
+    return asValue(source, 'field')
 end
 
 return function (source)

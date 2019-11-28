@@ -1,35 +1,8 @@
-local guide = require 'parser.guide'
-local vm    = require 'vm'
-
-local function getClass(source, deep)
-    if deep and deep > 3 then
-        return nil
-    end
-    local class = vm.eachField(source, function (info)
-        if info.key == 's|type' or info.key == 's|__name' or info.key == 's|name' then
-            if info.value and info.value.type == 'string' then
-                return info.value[1]
-            end
-        end
-    end)
-    if class then
-        return class
-    end
-    return vm.eachMeta(source, function (meta)
-        local cl = getClass(meta, deep and (deep + 1) or 1)
-        if cl then
-            return cl
-        end
-    end)
-end
+local guide    = require 'parser.guide'
+local getClass = require 'core.hover.class'
 
 local function asLocal(source)
-    local class = getClass(source)
-    if class then
-        return ('%s: %s'):format(guide.getName(source), class)
-    else
-        return guide.getName(source)
-    end
+    return guide.getName(source)
 end
 
 local function asMethod(source)

@@ -156,6 +156,13 @@ t.<?x?> = 1
 "global t.x: integer = 1"
 
 TEST [[
+t = {
+    <?x?> = 1
+}
+]]
+"field x: integer = 1"
+
+TEST [[
 local <?obj?> = {}
 ]]
 "local obj: {}"

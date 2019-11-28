@@ -59,17 +59,20 @@ function m.refreshCache()
     m.cache = {
         eachRef     = {},
         eachField   = {},
+        eachMeta    = {},
         getGlobals  = {},
         getLinks    = {},
         getGlobal   = {},
         specialName = {},
         getLibrary  = {},
         getValue    = {},
+        getMeta     = {},
         specials    = nil,
     }
     m.locked = {
         eachRef    = {},
         eachField  = {},
+        eachMeta    = {},
         getGlobals = {},
         getLinks   = {},
         getLibrary = {},

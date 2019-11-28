@@ -99,6 +99,7 @@ local function ofSpecialCall(call, func, index, callback)
                     end
                 end)
             end
+            vm.setMeta(args[1], args[2])
         end
     elseif name == 'require' then
         if index == 1 then
@@ -238,6 +239,7 @@ local function asArg(source, callback)
                 if recvs and recvs[1] then
                     vm.eachRef(recvs[1], callback)
                 end
+                vm.setMeta(source, parent[2])
             end
         end
     end

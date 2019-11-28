@@ -8,4 +8,5 @@ require 'vm.getGlobal'
 require 'vm.getLibrary'
 require 'vm.getValue'
 require 'vm.dummySource'
+require 'vm.eachMeta'
 return vm

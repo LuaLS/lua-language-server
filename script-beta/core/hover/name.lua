@@ -5,14 +5,14 @@ local function asLocal(source)
     return guide.getName(source)
 end
 
-local function asMethod(source)
+local function asMethod(source, caller)
     local class = getClass(source.node)
     local node = class or guide.getName(source.node) or '?'
     local method = guide.getName(source)
     return ('%s:%s'):format(node, method)
 end
 
-local function asField(source)
+local function asField(source, caller)
     local class = getClass(source.node)
     local node = class or guide.getName(source.node) or '?'
     local method = guide.getName(source)
@@ -27,13 +27,39 @@ local function asGlobal(source)
     return guide.getName(source)
 end
 
-local function asLibrary(source)
-    return source.doc or source.name
+local function asLibrary(source, caller)
+    local p
+    if caller.type == 'method'
+    or caller.type == 'getmethod'
+    or caller.type == 'setmethod' then
+        if source.parent then
+            for _, parent in ipairs(source.parent) do
+                if parent.type == 'object' then
+                    p = parent.name .. ':'
+                    break
+                end
+            end
+        end
+    else
+        if source.parent then
+            for _, parent in ipairs(source.parent) do
+                if parent.type == 'global' then
+                    p = parent.name .. '.'
+                    break
+                end
+            end
+        end
+    end
+    if p then
+        return ('%s%s'):format(p, source.name)
+    else
+        return source.name
+    end
 end
 
-local function buildName(source)
+local function buildName(source, caller)
     if source.library then
-        return asLibrary(source) or ''
+        return asLibrary(source, caller) or ''
     end
     if source.type == 'local'
     or source.type == 'getlocal'
@@ -46,18 +72,18 @@ local function buildName(source)
     end
     if source.type == 'setmethod'
     or source.type == 'getmethod' then
-        return asMethod(source) or ''
+        return asMethod(source, caller) or ''
     end
     if source.type == 'setfield'
     or source.type == 'getfield' then
-        return asField(source) or ''
+        return asField(source, caller) or ''
     end
     if source.type == 'tablefield' then
         return asTableField(source) or ''
     end
     local parent = source.parent
     if parent then
-        return buildName(parent)
+        return buildName(parent, caller)
     end
     return ''
 end

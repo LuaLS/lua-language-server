@@ -242,7 +242,7 @@ TEST[[
 ('xx'):<?sub?>()
 ]]
 [[function string:sub(i: integer, j: integer)
-  -> any]]
+  -> string]]
 
 TEST [[
 local <?v?> = collectgarbage()
@@ -255,12 +255,14 @@ w2l:get_default()[<?type?>]
 ]]
 "local type: any"
 
+-- TODO 可选参数（或多原型）
 TEST [[
 <?load?>()
 ]]
 [=[
-function load(chunk: string/function [, chunkname: string [, mode: string [, env: table]]])
-  -> function, error_message: string
+function load(chunk: string|function, chunkname: string, mode: string, env: table)
+  -> function
+  2. error_message: string
 ]=]
 
 TEST [[
@@ -271,6 +273,7 @@ function string.lower(string)
   -> string
 ]]
 
+-- TODO 不根据传入值推测参数类型
 TEST [[
 local function x(a, ...)
 end
@@ -278,7 +281,7 @@ end
 <?x?>(1, 2, 3, 4, 5, 6, 7)
 ]]
 [[
-function x(a: number, ...)
+function x(a: any, ...)
 ]]
 
 TEST [[

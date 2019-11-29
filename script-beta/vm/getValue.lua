@@ -538,6 +538,20 @@ local function checkDef(results, source)
     end)
 end
 
+local function checkLibraryTypes(source)
+    if type(source.type) ~= 'table' then
+        return nil
+    end
+    local results = {}
+    for i = 1, #source.type do
+        insert(results, {
+            type = source.type[i],
+            source = source,
+        })
+    end
+    return results
+end
+
 local function checkLibrary(source)
     local lib = vm.getLibrary(source)
     if not lib then
@@ -730,6 +744,7 @@ local function getValue(source)
                  or checkValue(source)
                  or checkUnary(source)
                  or checkBinary(source)
+                 or checkLibraryTypes(source)
                  or checkLibrary(source)
                  or checkLibraryReturn(source)
                  or checkLibraryArg(source)

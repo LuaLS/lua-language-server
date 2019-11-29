@@ -1,7 +1,7 @@
 local guide = require 'parser.guide'
 local vm    = require 'vm'
 
-local function asFunction(source)
+local function asFunction(source, caller)
     if not source.args then
         return ''
     end
@@ -15,11 +15,25 @@ local function asFunction(source)
             args[i] = ('%s'):format(vm.getType(arg))
         end
     end
-    return table.concat(args, ', ')
+    local methodDef, methodCall
+    local parent = source.parent
+    if parent and parent.type == 'setmethod' then
+        methodDef = true
+    end
+    if caller.type == 'method'
+    or caller.type == 'getmethod'
+    or caller.type == 'setmethod' then
+        methodCall = true
+    end
+    if not methodDef and methodCall then
+        return table.concat(args, ', ', 2)
+    else
+        return table.concat(args, ', ')
+    end
 end
 
-return function (source)
+return function (source, caller)
     if source.type == 'function' then
-        return asFunction(source)
+        return asFunction(source, caller)
     end
 end

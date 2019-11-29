@@ -8,7 +8,7 @@ local function getHoverAsFunction(source)
     local labels = {}
     for _, value in ipairs(values) do
         if value.type == 'function' then
-            labels[#labels+1] = getLabel(value.source)
+            labels[#labels+1] = getLabel(value.source, source)
         end
     end
 
@@ -20,7 +20,7 @@ local function getHoverAsFunction(source)
 end
 
 local function getHoverAsValue(source)
-    local label = getLabel(source)
+    local label = getLabel(source, source)
     return {
         label  = label,
         source = source,

@@ -248,7 +248,7 @@ end
 --- 自己作为函数的返回值
 local function asReturn(source, callback)
     local parent = source.parent
-    if parent.type ~= 'return' then
+    if not parent or parent.type ~= 'return' then
         return
     end
     local func = guide.getParentFunction(source)

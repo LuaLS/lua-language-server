@@ -1,6 +1,6 @@
 local wait = ...
 local fs = require 'bee.filesystem'
-local extensionPath = fs.path(os.getenv 'USERPROFILE') / '.vscode' / 'extensions'
+local extensionPath = fs.path(os.getenv 'USERPROFILE' or '') / '.vscode' / 'extensions'
 log.debug('Search extensions at:', extensionPath:string())
 if not fs.is_directory(extensionPath) then
     log.debug('Extension path is not a directory.')

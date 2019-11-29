@@ -97,6 +97,11 @@ local function checkLiteral(source)
                 source = source,
             }
         end
+    elseif source.type == 'integer' then
+        return alloc {
+            type   = 'integer',
+            source = source,
+        }
     elseif source.type == 'table' then
         return alloc {
             type   = 'table',
@@ -105,6 +110,11 @@ local function checkLiteral(source)
     elseif source.type == 'function' then
         return alloc {
             type   = 'function',
+            source = source,
+        }
+    elseif source.type == '...' then
+        return alloc {
+            type   = '...',
             source = source,
         }
     end
@@ -536,7 +546,7 @@ local function checkLibrary(source)
     return alloc {
         type   = lib.type,
         value  = lib.value,
-        source = vm.librarySource(lib),
+        source = lib,
     }
 end
 
@@ -573,7 +583,7 @@ local function checkLibraryReturn(source)
     return alloc {
         type   = rtn.type,
         value  = rtn.value,
-        source = vm.librarySource(rtn),
+        source = rtn,
     }
 end
 
@@ -614,7 +624,7 @@ local function checkLibraryArg(source)
     return alloc {
         type   = arg.type,
         value  = arg.value,
-        source = vm.librarySource(arg),
+        source = arg,
     }
 end
 
@@ -630,21 +640,21 @@ local function inferByUnary(results, source)
     if op.type == '#' then
         insert(results, {
             type   = 'string',
-            source = vm.librarySource(source)
+            source = source
         })
         insert(results, {
             type   = 'table',
-            source = vm.librarySource(source)
+            source = source
         })
     elseif op.type == '~' then
         insert(results, {
             type   = 'integer',
-            source = vm.librarySource(source)
+            source = source
         })
     elseif op.type == '-' then
         insert(results, {
             type   = 'number',
-            source = vm.librarySource(source)
+            source = source
         })
     end
 end
@@ -670,7 +680,7 @@ local function inferByBinary(results, source)
     or op.type == '%' then
         insert(results, {
             type   = 'number',
-            source = vm.librarySource(source)
+            source = source
         })
     elseif op.type == '|'
     or     op.type == '~'
@@ -681,12 +691,12 @@ local function inferByBinary(results, source)
     or     op.type == '//' then
         insert(results, {
             type   = 'integer',
-            source = vm.librarySource(source)
+            source = source
         })
     elseif op.type == '..' then
         insert(results, {
             type   = 'string',
-            source = vm.librarySource(source)
+            source = source
         })
     end
 end

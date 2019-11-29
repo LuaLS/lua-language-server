@@ -194,6 +194,14 @@ TEST 'table' [[
 setmetatable(<?b?>)
 ]]
 
+TEST 'function' [[
+string.<?sub?>()
+]]
+
+TEST 'function' [[
+(''):<?sub?>()
+]]
+
 -- 不根据对方函数内的使用情况来推测
 --TEST 'number' [[
 --local function x(a)

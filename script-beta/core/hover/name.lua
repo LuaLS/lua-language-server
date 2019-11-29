@@ -28,6 +28,12 @@ local function asGlobal(source)
 end
 
 local function buildName(source)
+    if source.doc then
+        return source.doc
+    end
+    if source.name then
+        return source.name
+    end
     if source.type == 'local'
     or source.type == 'getlocal'
     or source.type == 'setlocal' then

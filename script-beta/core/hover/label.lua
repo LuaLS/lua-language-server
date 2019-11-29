@@ -82,6 +82,13 @@ local function asField(source)
     return asValue(source, 'field')
 end
 
+local function asLibrary(source)
+    local lib = source.library
+    if lib.type == 'function' then
+        return asFunction(source)
+    end
+end
+
 return function (source)
     if source.type == 'function' then
         return asFunction(source)

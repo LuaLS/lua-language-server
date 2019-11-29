@@ -54,13 +54,17 @@ local function getNodeAsObject(source)
 end
 
 local function checkNode(source)
-    if  source.type ~= 'getfield'
-    and source.type ~= 'getmethod'
-    and source.type ~= 'getindex' then
-        return nil
+    if source.type == 'method' then
+        source = source.parent
+    elseif source.type == 'field' then
+        source = source.parent
     end
-    return getNodeAsTable(source)
-        or getNodeAsObject(source)
+    if source.type == 'getfield'
+    or source.type == 'getmethod'
+    or source.type == 'getindex' then
+        return getNodeAsTable(source)
+            or getNodeAsObject(source)
+    end
 end
 
 local function getLibrary(source)

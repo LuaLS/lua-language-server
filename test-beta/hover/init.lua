@@ -217,16 +217,31 @@ local obj: class {
 }
 ]]
 
-TEST[[
-local fs = require 'bee.filesystem'
-local <?root?> = fs.current_path()
+--TEST[[
+--local fs = require 'bee.filesystem'
+--local <?root?> = fs.current_path()
+--]]
+--"local root: bee::filesystem"
+
+TEST [[
+<?print?>()
 ]]
-"local root: *bee::filesystem"
+[[
+function print(...)
+]]
+
+TEST [[
+string.<?sub?>()
+]]
+[[
+function string.sub(string, i: integer, j: integer)
+  -> string
+]]
 
 TEST[[
-('xx'):<?yy?>()
+('xx'):<?sub?>()
 ]]
-[[function *string:yy()
+[[function string:sub(i: integer, j: integer)
   -> any]]
 
 TEST [[
@@ -526,417 +541,417 @@ local <?x?> = '\a'
 ]]
 [[local x: string = "\007"]]
 
-TEST[[
----@class Class
-local <?x?> = class()
-]]
-[[
-local x: *Class {}
-]]
-
-TEST[[
----@class Class
-<?x?> = class()
-]]
-[[
-global x: *Class {}
-]]
-
-TEST[[
-local t = {
-    ---@class Class
-    <?x?> = class()
-}
-]]
-[[
-field x: *Class {}
-]]
-
-TEST[[
----@type Class
-local <?x?> = class()
-]]
-[[
-local x: *Class {}
-]]
-
-TEST[[
----@type Class
-<?x?> = class()
-]]
-[[
-global x: *Class {}
-]]
-
-TEST[[
-local t = {
-    ---@type Class
-    <?x?> = class()
-}
-]]
-[[
-field x: *Class {}
-]]
-
-TEST[[
----@type A|B|C
-local <?x?> = class()
-]]
-[[
-local x: *A|B|C {}
-]]
-
-TEST[[
----@class Class
-local <?x?> = {
-    b = 1
-}
-]]
-[[
-local x: *Class {
-    b: number = 1,
-}
-]]
-
-TEST [[
----@class Class
-local mt = {}
-
----@param t Class
-function f(<?t?>)
-end
-]]
-[[
-local t: *Class {}
-]]
-
-TEST [[
----@class Class
-local mt = {}
-
----@param t Class
-function f(t)
-    print(<?t?>)
-end
-]]
-[[
-local t: *Class {}
-]]
-
-TEST [[
----@class Class
-local mt = {}
-
----@param t Class
-function f(t)
-end
-
-f(<?s?>)
-]]
-[[
-global s: *Class {}
-]]
-
-TEST [[
----@class Class
-
----@param k Class
-for <?k?> in pairs(t) do
-end
-]]
-[[
-local k<key>: *Class {}
-]]
-
-TEST [[
----@class Class
-
----@param v Class
-for k, <?v?> in pairs(t) do
-end
-]]
-[[
-local v<value>: *Class {}
-]]
-
-TEST [[
----@return A|B
----@return C
-local function <?f?>()
-end
-]]
-[[
-function f()
-  -> A|B, C
-]]
-
-TEST [[
----@generic T
----@param x T
----@return T
-local function f(x)
-end
-
-local <?r?> = f(1)
-]]
-[[
-local r: number
-]]
-
-TEST [[
----@param x number
----@param y boolean
-local function <?f?>(x, y)
-end
-]]
-[[
-function f(x: number, y: boolean)
-]]
-
-TEST [[
----@vararg Class
-local function f(...)
-    local _, <?x?> = ...
-end
-f(1, 2, 3)
-]]
-[[
-local x: *Class = 2
-]]
-
-TEST [[
----@vararg Class
-local function f(...)
-    local _, <?x?> = ...
-end
-]]
-[[
-local x: *Class {}
-]]
-
-TEST [[
----@type string[]
-local <?x?>
-]]
-[[
-local x: {
-    [*integer]: string,
-}
-]]
-
-TEST [[
----@type (string|boolean)[]
-local <?x?>
-]]
-[[
-local x: {
-    [*integer]: string|boolean,
-}
-]]
-
-TEST [[
----@type string[]
-local t
-local <?x?> = t[1]
-]]
-[[
-local x: string
-]]
-
-TEST [[
----@type string[]
-local t
-for _, <?x?> in ipairs(t) do
-end
-]]
-[[
-local x: string
-]]
-
-TEST [[
----@type string[]
-local t
-for _, <?x?> in pairs(t) do
-end
-]]
-[[
-local x: string
-]]
-
-TEST [[
----@type string[]
-local t
-for <?k?>, v in pairs(t) do
-end
-]]
-[[
-local k: integer
-]]
-
-TEST [[
----@type table<ClassA, ClassB>
-local <?x?>
-]]
-[[
-local x: {
-    [*ClassA]: ClassB,
-}
-]]
-
-TEST [[
----@type table<ClassA, ClassB>
-local t
-for _, <?x?> in pairs(t) do
-end
-]]
-[[
-local x: *ClassB
-]]
-
-TEST [[
----@type table<ClassA, ClassB>
-local t
-for <?k?>, v in pairs(t) do
-end
-]]
-[[
-local k: *ClassA
-]]
-
-TEST [[
----@type fun(x: number, y: number):boolean
-local <?f?>
-]]
-[[
-function f(x: number, y: number)
-  -> boolean
-]]
-
-TEST [[
----@type fun(x: number, y: number):boolean
-local f
-f(<?a?>)
-]]
-[[
-global a: number
-]]
-
-TEST [[
----@type fun(x: number, y: number):boolean
-local f
-local <?r?> = f()
-]]
-[[
-local r: boolean
-]]
-
-TEST [[
----@param f fun():void
-function t(<?f?>) end
-]]
-[[
-function ()
-  -> void
-]]
-
-TEST [[
----@type fun(a:any, b:any)
-local f
-local t = {f = f}
-t:<?f?>()
-]]
-[[
-function f(b: any)
-  -> any
-]]
-
-TEST [[
----@param names string[]
-local function f(<?names?>)
-end
-]]
-[[
-local names: {
-    [*integer]: string,
-}
-]]
-
-TEST [[
----@return any
-function <?f?>()
-    ---@type integer
-    local a
-    return a
-end
-]]
-[[
-function f()
-  -> any
-]]
-
-TEST [[
----@return any
-function f()
-    ---@type integer
-    local a
-    return a
-end
-
-local <?x?> = f()
-]]
-[[
-local x: any
-]]
-
-TEST [[
-local <?x?> <close> <const> = 1
-]]
-[[
-local x <close> <const>: number = 1
-]]
-
-TEST [[
----@param x number {optional = 'after'}
----@param y boolean {optional = 'self'}
----@param z string
-function <?f?>(x, y, z) end
-]]
-[=[
-function f([x: number [, y: boolean], z: string])
-]=]
-
-TEST [[
----@return string {name = 'key'}
----@return string {name = 'value'}
-function <?f?>() end
-]]
-[=[
-function f()
-  -> key: string, value: string
-]=]
-
-TEST [[
----@return        {name = 'x', optional = 'after'}
----@return string {name = 'y', optional = 'self'}
----@return string {name = 'z'}
-function <?f?>() end
-]]
-[=[
-function f()
-  -> [x: any [, y: string], z: string]
-]=]
-
-TEST [[
----@return        {name = 'x', optional = 'after'}
----@return string {name = 'y', optional = 'self'}
----@return string {name = 'z'}
-function f()
-    return function (a, b)
-    end
-end
-
-<?f2?> = f()
-]]
-[=[
-function f2(a: any, b: any)
-]=]
+--TEST[[
+-----@class Class
+--local <?x?> = class()
+--]]
+--[[
+--local x: *Class {}
+--]]
+--
+--TEST[[
+-----@class Class
+--<?x?> = class()
+--]]
+--[[
+--global x: *Class {}
+--]]
+--
+--TEST[[
+--local t = {
+--    ---@class Class
+--    <?x?> = class()
+--}
+--]]
+--[[
+--field x: *Class {}
+--]]
+--
+--TEST[[
+-----@type Class
+--local <?x?> = class()
+--]]
+--[[
+--local x: *Class {}
+--]]
+--
+--TEST[[
+-----@type Class
+--<?x?> = class()
+--]]
+--[[
+--global x: *Class {}
+--]]
+--
+--TEST[[
+--local t = {
+--    ---@type Class
+--    <?x?> = class()
+--}
+--]]
+--[[
+--field x: *Class {}
+--]]
+--
+--TEST[[
+-----@type A|B|C
+--local <?x?> = class()
+--]]
+--[[
+--local x: *A|B|C {}
+--]]
+--
+--TEST[[
+-----@class Class
+--local <?x?> = {
+--    b = 1
+--}
+--]]
+--[[
+--local x: *Class {
+--    b: number = 1,
+--}
+--]]
+--
+--TEST [[
+-----@class Class
+--local mt = {}
+--
+-----@param t Class
+--function f(<?t?>)
+--end
+--]]
+--[[
+--local t: *Class {}
+--]]
+--
+--TEST [[
+-----@class Class
+--local mt = {}
+--
+-----@param t Class
+--function f(t)
+--    print(<?t?>)
+--end
+--]]
+--[[
+--local t: *Class {}
+--]]
+--
+--TEST [[
+-----@class Class
+--local mt = {}
+--
+-----@param t Class
+--function f(t)
+--end
+--
+--f(<?s?>)
+--]]
+--[[
+--global s: *Class {}
+--]]
+--
+--TEST [[
+-----@class Class
+--
+-----@param k Class
+--for <?k?> in pairs(t) do
+--end
+--]]
+--[[
+--local k<key>: *Class {}
+--]]
+--
+--TEST [[
+-----@class Class
+--
+-----@param v Class
+--for k, <?v?> in pairs(t) do
+--end
+--]]
+--[[
+--local v<value>: *Class {}
+--]]
+--
+--TEST [[
+-----@return A|B
+-----@return C
+--local function <?f?>()
+--end
+--]]
+--[[
+--function f()
+--  -> A|B, C
+--]]
+--
+--TEST [[
+-----@generic T
+-----@param x T
+-----@return T
+--local function f(x)
+--end
+--
+--local <?r?> = f(1)
+--]]
+--[[
+--local r: number
+--]]
+--
+--TEST [[
+-----@param x number
+-----@param y boolean
+--local function <?f?>(x, y)
+--end
+--]]
+--[[
+--function f(x: number, y: boolean)
+--]]
+--
+--TEST [[
+-----@vararg Class
+--local function f(...)
+--    local _, <?x?> = ...
+--end
+--f(1, 2, 3)
+--]]
+--[[
+--local x: *Class = 2
+--]]
+--
+--TEST [[
+-----@vararg Class
+--local function f(...)
+--    local _, <?x?> = ...
+--end
+--]]
+--[[
+--local x: *Class {}
+--]]
+--
+--TEST [[
+-----@type string[]
+--local <?x?>
+--]]
+--[[
+--local x: {
+--    [*integer]: string,
+--}
+--]]
+--
+--TEST [[
+-----@type (string|boolean)[]
+--local <?x?>
+--]]
+--[[
+--local x: {
+--    [*integer]: string|boolean,
+--}
+--]]
+--
+--TEST [[
+-----@type string[]
+--local t
+--local <?x?> = t[1]
+--]]
+--[[
+--local x: string
+--]]
+--
+--TEST [[
+-----@type string[]
+--local t
+--for _, <?x?> in ipairs(t) do
+--end
+--]]
+--[[
+--local x: string
+--]]
+--
+--TEST [[
+-----@type string[]
+--local t
+--for _, <?x?> in pairs(t) do
+--end
+--]]
+--[[
+--local x: string
+--]]
+--
+--TEST [[
+-----@type string[]
+--local t
+--for <?k?>, v in pairs(t) do
+--end
+--]]
+--[[
+--local k: integer
+--]]
+--
+--TEST [[
+-----@type table<ClassA, ClassB>
+--local <?x?>
+--]]
+--[[
+--local x: {
+--    [*ClassA]: ClassB,
+--}
+--]]
+--
+--TEST [[
+-----@type table<ClassA, ClassB>
+--local t
+--for _, <?x?> in pairs(t) do
+--end
+--]]
+--[[
+--local x: *ClassB
+--]]
+--
+--TEST [[
+-----@type table<ClassA, ClassB>
+--local t
+--for <?k?>, v in pairs(t) do
+--end
+--]]
+--[[
+--local k: *ClassA
+--]]
+--
+--TEST [[
+-----@type fun(x: number, y: number):boolean
+--local <?f?>
+--]]
+--[[
+--function f(x: number, y: number)
+--  -> boolean
+--]]
+--
+--TEST [[
+-----@type fun(x: number, y: number):boolean
+--local f
+--f(<?a?>)
+--]]
+--[[
+--global a: number
+--]]
+--
+--TEST [[
+-----@type fun(x: number, y: number):boolean
+--local f
+--local <?r?> = f()
+--]]
+--[[
+--local r: boolean
+--]]
+--
+--TEST [[
+-----@param f fun():void
+--function t(<?f?>) end
+--]]
+--[[
+--function ()
+--  -> void
+--]]
+--
+--TEST [[
+-----@type fun(a:any, b:any)
+--local f
+--local t = {f = f}
+--t:<?f?>()
+--]]
+--[[
+--function f(b: any)
+--  -> any
+--]]
+--
+--TEST [[
+-----@param names string[]
+--local function f(<?names?>)
+--end
+--]]
+--[[
+--local names: {
+--    [*integer]: string,
+--}
+--]]
+--
+--TEST [[
+-----@return any
+--function <?f?>()
+--    ---@type integer
+--    local a
+--    return a
+--end
+--]]
+--[[
+--function f()
+--  -> any
+--]]
+--
+--TEST [[
+-----@return any
+--function f()
+--    ---@type integer
+--    local a
+--    return a
+--end
+--
+--local <?x?> = f()
+--]]
+--[[
+--local x: any
+--]]
+--
+--TEST [[
+--local <?x?> <close> <const> = 1
+--]]
+--[[
+--local x <close> <const>: number = 1
+--]]
+--
+--TEST [[
+-----@param x number {optional = 'after'}
+-----@param y boolean {optional = 'self'}
+-----@param z string
+--function <?f?>(x, y, z) end
+--]]
+--[=[
+--function f([x: number [, y: boolean], z: string])
+--]=]
+--
+--TEST [[
+-----@return string {name = 'key'}
+-----@return string {name = 'value'}
+--function <?f?>() end
+--]]
+--[=[
+--function f()
+--  -> key: string, value: string
+--]=]
+--
+--TEST [[
+-----@return        {name = 'x', optional = 'after'}
+-----@return string {name = 'y', optional = 'self'}
+-----@return string {name = 'z'}
+--function <?f?>() end
+--]]
+--[=[
+--function f()
+--  -> [x: any [, y: string], z: string]
+--]=]
+--
+--TEST [[
+-----@return        {name = 'x', optional = 'after'}
+-----@return string {name = 'y', optional = 'self'}
+-----@return string {name = 'z'}
+--function f()
+--    return function (a, b)
+--    end
+--end
+--
+--<?f2?> = f()
+--]]
+--[=[
+--function f2(a: any, b: any)
+--]=]

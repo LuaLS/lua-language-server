@@ -8,7 +8,12 @@ local function asFunction(source)
     local args = {}
     for i = 1, #source.args do
         local arg = source.args[i]
-        args[i] = ('%s: %s'):format(guide.getName(arg), vm.getType(arg))
+        local name = arg.name or guide.getName(arg)
+        if name then
+            args[i] = ('%s: %s'):format(name, vm.getType(arg))
+        else
+            args[i] = ('%s'):format(vm.getType(arg))
+        end
     end
     return table.concat(args, ', ')
 end

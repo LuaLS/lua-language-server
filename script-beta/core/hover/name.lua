@@ -27,12 +27,13 @@ local function asGlobal(source)
     return guide.getName(source)
 end
 
+local function asLibrary(source)
+    return source.doc or source.name
+end
+
 local function buildName(source)
-    if source.doc then
-        return source.doc
-    end
-    if source.name then
-        return source.name
+    if source.library then
+        return asLibrary(source) or ''
     end
     if source.type == 'local'
     or source.type == 'getlocal'

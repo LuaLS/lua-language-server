@@ -857,6 +857,9 @@ function vm.viewType(values)
     if not values then
         return 'any'
     end
+    if type(values) ~= 'table' then
+        return values or 'any'
+    end
     local types = {}
     for i = 1, #values do
         local tp = values[i].type

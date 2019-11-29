@@ -255,6 +255,15 @@ local function scan(path)
     end
 end
 
+local function markLibrary(library)
+    for _, lib in pairs(library) do
+        lib.library = true
+        if lib.child then
+            markLibrary(lib.child)
+        end
+    end
+end
+
 local function init()
     local lang = require 'language'
     local id = lang.id
@@ -285,6 +294,12 @@ local function init()
             mergeLibs(m, libs, libName)
         end
     end
+
+    markLibrary(m.global)
+    markLibrary(m.library)
+    markLibrary(m.object)
+    markLibrary(m.other)
+    markLibrary(m.custom)
 end
 
 function m.reload()

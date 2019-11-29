@@ -245,6 +245,21 @@ local function asArg(source, callback)
     end
 end
 
+--- 自己作为函数的返回值
+local function asReturn(source, callback)
+    local parent = source.parent
+    if parent.type ~= 'return' then
+        return
+    end
+    local func = guide.getParentFunction(source)
+    if func.type == 'main' then
+    else
+        vm.eachRef(func, function (info)
+
+        end)
+    end
+end
+
 local function ofLocal(loc, callback)
     -- 方法中的 self 使用了一个虚拟的定义位置
     if loc.tag ~= 'self' then
@@ -444,6 +459,7 @@ local function eachRef(source, callback)
         ofMain(source, callback)
     end
     asArg(source, callback)
+    asReturn(source, callback)
 end
 
 --- 判断2个对象是否拥有相同的引用

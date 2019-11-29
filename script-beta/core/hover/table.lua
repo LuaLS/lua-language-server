@@ -3,6 +3,9 @@ local util     = require 'utility'
 local getClass = require 'core.hover.class'
 
 local function getKey(info)
+    if not info.key then
+        return 'any'
+    end
     local ktype = info.key:sub(1, 2)
     if ktype == 's|' then
         return info.key:sub(3)

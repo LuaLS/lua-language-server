@@ -141,6 +141,16 @@ local obj = setmetatable({}, mt)
 print(obj.<?x?>)
 ]]
 
+TEST [[
+local <?x?>
+local function f()
+    return function ()
+        return <!x!>
+    end
+end
+local <?y?> = f()()
+]]
+
 --TEST [[
 -----@class <!Class!>
 -----@type <?Class?>

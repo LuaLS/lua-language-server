@@ -400,7 +400,8 @@ local function searchKeyWords(vm, source, word, callback)
             if snippet.key[key] then
                 if snipType ~= 'Replace'
                 or key == 'local'
-                or key == 'return' then
+                or key == 'return'
+                or key == 'do' then
                     callback(key, nil, CompletionItemKind.Keyword)
                 end
                 if snipType ~= 'Disable' then

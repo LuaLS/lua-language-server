@@ -254,8 +254,31 @@ local function asReturn(source, callback)
     local func = guide.getParentFunction(source)
     if func.type == 'main' then
     else
+        local index
+        for i = 1, #parent do
+            if parent[i] == source then
+                index = i
+                break
+            end
+        end
+        if not index then
+            return
+        end
         vm.eachRef(func, function (info)
-
+            local src = info.source
+            local call = src.parent
+            if not call or call.type ~= 'call' then
+                return
+            end
+            local recvs = getCallRecvs(call)
+            if recvs and recvs[index] then
+                vm.eachRef(recvs[index], callback)
+            elseif index == 1 then
+                callback {
+                    type   = 'call',
+                    source = call,
+                }
+            end
         end)
     end
 end
@@ -276,6 +299,7 @@ local function ofLocal(loc, callback)
                     mode     = 'get',
                 }
                 asValue(ref, callback)
+                asReturn(ref, callback)
             elseif ref.type == 'setlocal' then
                 callback {
                     source   = ref,
@@ -455,6 +479,8 @@ local function eachRef(source, callback)
     elseif stype == 'table'
     or     stype == 'function' then
         ofValue(source, callback)
+    elseif stype == 'call' then
+        ofCall(source.node, 1, callback)
     elseif stype == 'main' then
         ofMain(source, callback)
     end

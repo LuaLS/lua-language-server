@@ -481,6 +481,7 @@ local function eachRef(source, callback)
         ofValue(source, callback)
     elseif stype == 'call' then
         ofCall(source.node, 1, callback)
+        ofSpecialCall(source, source.node, 1, callback)
     elseif stype == 'main' then
         ofMain(source, callback)
     end

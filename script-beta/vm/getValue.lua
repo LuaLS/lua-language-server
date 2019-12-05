@@ -593,6 +593,15 @@ local function checkLibraryArg(source)
     }
 end
 
+local function hasTypeInResults(results, type)
+    for i = 1, #results do
+        if results[i].type == 'type' then
+            return true
+        end
+    end
+    return false
+end
+
 local function inferByUnary(results, source)
     if #results ~= 0 then
         return
@@ -603,6 +612,11 @@ local function inferByUnary(results, source)
     end
     local op = parent.op
     if op.type == '#' then
+        -- 会受顺序影响，不检查了
+        --if hasTypeInResults(results, 'string')
+        --or hasTypeInResults(results, 'integer') then
+        --    return
+        --end
         insert(results, {
             type   = 'string',
             source = source

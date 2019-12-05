@@ -46,6 +46,9 @@ local function mergeLiteral(a, b)
         return b
     end
     local view = util.viewLiteral(a)
+    if not view then
+        return b
+    end
     if not b then
         return { view, [view] = true }
     end

@@ -168,6 +168,16 @@ local function checkUnary(source)
     end
 end
 
+local function mathCheck(a, b)
+    local v1  = vm.getLiteral(a, 'integer') or vm.getLiteral(a, 'number')
+    local v2  = vm.getLiteral(b, 'integer') or vm.getLiteral(a, 'number')
+    local int = vm.hasType(a, 'integer')
+            and vm.hasType(b, 'integer')
+            and not vm.hasType(a, 'number')
+            and not vm.hasType(b, 'number')
+    return int and 'integer' or 'number', v1, v2
+end
+
 local function checkBinary(source)
     if source.type ~= 'binary' then
         return
@@ -383,87 +393,37 @@ local function checkBinary(source)
         }
     -- 其他数学运算根据2侧的值决定，当2侧的值均为整数时返回整数
     elseif op.type == '+' then
-        local v1 = vm.getLiteral(source[1], 'integer')
-        local v2 = vm.getLiteral(source[2], 'integer')
-        if v1 and v2 then
-            return alloc {
-                type   = 'integer',
-                value  = v1 + v2,
-                source = source,
-            }
-        end
-        v1 = v1 or vm.getLiteral(source[1], 'number')
-        v2 = v2 or vm.getLiteral(source[1], 'number')
+        local int, v1, v2 = mathCheck(source[1], source[2])
         return alloc {
-            type   = 'number',
+            type   = int,
             value  = (v1 and v2) and (v1 + v2) or nil,
             source = source,
         }
     elseif op.type == '-' then
-        local v1 = vm.getLiteral(source[1], 'integer')
-        local v2 = vm.getLiteral(source[2], 'integer')
-        if v1 and v2 then
-            return alloc {
-                type   = 'integer',
-                value  = v1 - v2,
-                source = source,
-            }
-        end
-        v1 = v1 or vm.getLiteral(source[1], 'number')
-        v2 = v2 or vm.getLiteral(source[1], 'number')
+        local int, v1, v2 = mathCheck(source[1], source[2])
         return alloc {
-            type   = 'number',
+            type   = int,
             value  = (v1 and v2) and (v1 - v2) or nil,
             source = source,
         }
     elseif op.type == '*' then
-        local v1 = vm.getLiteral(source[1], 'integer')
-        local v2 = vm.getLiteral(source[2], 'integer')
-        if v1 and v2 then
-            return alloc {
-                type   = 'integer',
-                value  = v1 * v2,
-                source = source,
-            }
-        end
-        v1 = v1 or vm.getLiteral(source[1], 'number')
-        v2 = v2 or vm.getLiteral(source[1], 'number')
+        local int, v1, v2 = mathCheck(source[1], source[2])
         return alloc {
-            type   = 'number',
+            type   = int,
             value  = (v1 and v2) and (v1 * v2) or nil,
             source = source,
         }
     elseif op.type == '%' then
-        local v1 = vm.getLiteral(source[1], 'integer')
-        local v2 = vm.getLiteral(source[2], 'integer')
-        if v1 and v2 then
-            return alloc {
-                type   = 'integer',
-                value  = v1 % v2,
-                source = source,
-            }
-        end
-        v1 = v1 or vm.getLiteral(source[1], 'number')
-        v2 = v2 or vm.getLiteral(source[1], 'number')
+        local int, v1, v2 = mathCheck(source[1], source[2])
         return alloc {
-            type   = 'number',
+            type   = int,
             value  = (v1 and v2) and (v1 % v2) or nil,
             source = source,
         }
     elseif op.type == '//' then
-        local v1 = vm.getLiteral(source[1], 'integer')
-        local v2 = vm.getLiteral(source[2], 'integer')
-        if v1 and v2 then
-            return alloc {
-                type   = 'integer',
-                value  = v1 // v2,
-                source = source,
-            }
-        end
-        v1 = v1 or vm.getLiteral(source[1], 'number')
-        v2 = v2 or vm.getLiteral(source[1], 'number')
+        local int, v1, v2 = mathCheck(source[1], source[2])
         return alloc {
-            type   = 'number',
+            type   = int,
             value  = (v1 and v2) and (v1 // v2) or nil,
             source = source,
         }
@@ -477,15 +437,6 @@ local function checkValue(source)
     if source.type == 'paren' then
         return vm.getValue(source.exp)
     end
-end
-
-local function hasTypeInResults(results, type)
-    for i = 1, #results do
-        if results[i].type == type then
-            return true
-        end
-    end
-    return false
 end
 
 local function inferByCall(results, source)

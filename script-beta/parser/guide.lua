@@ -2,6 +2,7 @@ local error      = error
 local type       = type
 local next       = next
 local tostring   = tostring
+local util       = require 'utility'
 
 _ENV = nil
 
@@ -510,7 +511,7 @@ function m.getKeyName(obj)
     elseif tp == 'number' then
         local n = obj[1]
         if n then
-            return ('n|%q'):format(obj[1])
+            return ('n|%s'):format(util.viewLiteral(obj[1]))
         else
             return 'n'
         end

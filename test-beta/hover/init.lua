@@ -393,10 +393,10 @@ local <?t?> = {
 [[
 local t: {
     ["012"]: integer = 8,
-    [*function]: integer = 6,
-    [*table]: integer = 5,
-    [001]: integer = 2,
+    [1]: integer = 2,
     [5.5]: integer = 4,
+    [function]: integer = 6,
+    [table]: integer = 5,
     [true]: integer = 3,
     a: integer = 1,
     b: integer = 7,
@@ -413,7 +413,7 @@ t[any] = any
 ]]
 [[
 local t: {
-    [*number]: number = 1,
+    [integer]: integer = 1,
 }
 ]]
 
@@ -423,7 +423,7 @@ local y = x
 print(<?y?>)
 ]]
 [[
-local y: number = 1
+local y: integer = 1
 ]]
 
 TEST[[
@@ -435,9 +435,9 @@ local <?obj?> = setmetatable({}, {__index = mt})
 ]]
 [[
 local obj: {
-    a: number = 1,
-    b: number = 2,
-    c: number = 3,
+    a: integer = 1,
+    b: integer = 2,
+    c: integer = 3,
 }
 ]]
 
@@ -466,10 +466,10 @@ local <?self?> = setmetatable({
 }, mt)
 ]]
 [[
-local self: *obj {
-    __index: table,
+local self: obj {
+    __index: obj,
     __name: string = "obj",
-    id: number = 1,
+    id: integer = 1,
     remove: function,
 }
 ]]

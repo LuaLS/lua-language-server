@@ -317,13 +317,14 @@ function mt:add(a: any, b: any)
 TEST [[
 local <?t?> = - 1000
 ]]
-[[local t: number = -1000]]
+[[local t: integer = -1000]]
 
-TEST [[
-for <?c?> in io.lines() do
-end
-]]
-[[local c: string]]
+-- TODO 暂不支持
+--TEST [[
+--for <?c?> in io.lines() do
+--end
+--]]
+--[[local c: string]]
 
 TEST [[
 local function f()
@@ -347,9 +348,9 @@ local n: any
 ]]
 
 TEST [[
-(<?'xxx'?>):sub()
+local s = <?'abc中文'?>
 ]]
-(nil)
+[[9 个字节，5 个字符]]
 
 TEST [[
 local <?t?> = {
@@ -360,9 +361,20 @@ local <?t?> = {
 ]]
 [[
 local t: {
-    a: number = 1,
-    b: number = 2,
-    c: number = 3,
+    a: integer = 1,
+    b: integer = 2,
+    c: integer = 3,
+}
+]]
+
+TEST [[
+local <?t?> = {}
+t.a = 1
+t.a = true
+]]
+[[
+local t: {
+    a: boolean|integer = 1|true,
 }
 ]]
 
@@ -380,14 +392,14 @@ local <?t?> = {
 ]]
 [[
 local t: {
-    ["012"]: number = 8,
-    [*function]: number = 6,
-    [*table]: number = 5,
-    [001]: number = 2,
-    [5.5]: number = 4,
-    [true]: number = 3,
-    a: number = 1,
-    b: number = 7,
+    ["012"]: integer = 8,
+    [*function]: integer = 6,
+    [*table]: integer = 5,
+    [001]: integer = 2,
+    [5.5]: integer = 4,
+    [true]: integer = 3,
+    a: integer = 1,
+    b: integer = 7,
 }
 ]]
 

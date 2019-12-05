@@ -48,7 +48,8 @@ return function (uri, offset)
         or source.type == 'setglobal'
         or source.type == 'getglobal'
         or source.type == 'field'
-        or source.type == 'method' then
+        or source.type == 'method'
+        or source.type == 'string' then
             return getHover(source)
         end
     end)

@@ -89,6 +89,21 @@ local function asLibrary(source)
     end
 end
 
+local function asString(source)
+    local str = source[1]
+    if type(str) ~= 'string' then
+        return ''
+    end
+    local len = #str
+    local charLen = utf8.len(str, 1, -1, true)
+    -- TODO 翻译
+    if len == charLen then
+        return ('%d 个字节'):format(len)
+    else
+        return ('%d 个字节，%d 个字符'):format(len, charLen)
+    end
+end
+
 return function (source, caller)
     if source.type == 'function' then
         return asFunction(source, caller)
@@ -107,5 +122,7 @@ return function (source, caller)
     or     source.type == 'field'
     or     source.type == 'method' then
         return asField(source)
+    elseif source.type == 'string' then
+        return asString(source)
     end
 end

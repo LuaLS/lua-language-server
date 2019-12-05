@@ -868,21 +868,7 @@ function vm.hasType(source, type)
     return false
 end
 
-function vm.viewType(values)
-    if not values then
-        return 'any'
-    end
-    if type(values) ~= 'table' then
-        return values or 'any'
-    end
-    local types = {}
-    for i = 1, #values do
-        local tp = values[i].type
-        if not types[tp] then
-            types[tp] = true
-            types[#types+1] = tp
-        end
-    end
+local function viewTypes(types)
     if #types == 0 then
         return 'any'
     end
@@ -907,6 +893,37 @@ function vm.viewType(values)
         return false
     end)
     return table.concat(types, '|')
+end
+
+function vm.viewType(values)
+    if not values then
+        return 'any'
+    end
+    if type(values) ~= 'table' then
+        return values or 'any'
+    end
+    local types = {}
+    for i = 1, #values do
+        local tp = values[i].type
+        if not types[tp] and tp ~= 'any' then
+            types[tp] = true
+            types[#types+1] = tp
+        end
+    end
+    return viewTypes(types)
+end
+
+function vm.mergeTypeViews(...)
+    local types = {}
+    for _, view in ipairs {...} do
+        for tp in view:gmatch '[^|]+' do
+            if not types[tp] and tp ~= 'any' then
+                types[tp] = true
+                types[#types+1] = tp
+            end
+        end
+    end
+    return viewTypes(types)
 end
 
 function vm.getType(source)

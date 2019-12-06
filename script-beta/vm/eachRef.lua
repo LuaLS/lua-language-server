@@ -1,6 +1,7 @@
-local guide = require 'parser.guide'
-local files = require 'files'
-local vm    = require 'vm.vm'
+local guide   = require 'parser.guide'
+local files   = require 'files'
+local vm      = require 'vm.vm'
+local library = require 'library'
 
 local function ofCall(func, index, callback)
     vm.eachRef(func, function (info)
@@ -112,6 +113,20 @@ local function ofSpecialCall(call, func, index, callback)
                         if ast then
                             ofCall(ast.ast, 1, callback)
                         end
+                    end
+                end
+            end
+
+            local args = call.args
+            if args[1] then
+                if args[1].type == 'string' then
+                    local objName = args[1][1]
+                    local lib = library.library[objName]
+                    if lib then
+                        callback {
+                            source   = lib,
+                            mode     = 'library',
+                        }
                     end
                 end
             end

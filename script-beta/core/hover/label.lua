@@ -18,6 +18,7 @@ end
 
 local function asValue(source, title)
     local name = buildName(source)
+    local lib  = vm.getLibrary(source)
     local class = getClass(source)
     local type = vm.getType(source)
     local literal = vm.getLiteral(source)

@@ -25,12 +25,15 @@ local function asString(source)
         end
         if result and #result > 0 then
             for i, uri in ipairs(result) do
+                uri = files.getOriginUri(uri)
                 local path = furi.decode(uri)
                 if files.eq(path:sub(1, #ws.path), ws.path) then
-                    path = path:sub(#ws.path + 1):gsub('^[/\\]*', '')
+                    path = path:sub(#ws.path + 1)
                 end
+                path = path:gsub('^[/\\]*', '')
                 result[i] = ('[%s](%s)'):format(path, uri)
             end
+            table.sort(result)
             return table.concat(result, '\n')
         end
     end

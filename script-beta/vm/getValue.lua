@@ -542,7 +542,7 @@ local function checkLibraryReturn(source)
     if not rtn.type then
         return nil
     end
-    if rtn.type == '...' then
+    if rtn.type == '...' or rtn.type == 'any' then
         return
     end
     return alloc {
@@ -583,7 +583,7 @@ local function checkLibraryArg(source)
     if not arg.type then
         return
     end
-    if arg.type == '...' then
+    if arg.type == '...' or arg.type == 'any' then
         return
     end
     return alloc {

@@ -313,6 +313,7 @@ proto.on('textDocument/completion', function (params)
         items[i] = {
             label = res.label,
             kind  = res.kind,
+            sortText = ('%04d'):format(i),
         }
     end
 

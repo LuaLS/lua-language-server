@@ -89,7 +89,7 @@ local function buildAsConst(classes, literals)
         keys[#keys+1] = k
     end
     table.sort(keys, function (a, b)
-        return literals[a][1] < literals[b][1]
+        return tonumber(literals[a][1]) < tonumber(literals[b][1])
     end)
     local lines = {}
     lines[#lines+1] = '{'

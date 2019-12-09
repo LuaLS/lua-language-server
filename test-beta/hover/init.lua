@@ -588,6 +588,13 @@ local <?t?> = {
     c = 2,
     d = 3,
     a = 4,
+    s = 5,
+    y = 6,
+    z = 7,
+    q = 8,
+    g = 9,
+    p = 10,
+    l = 11,
 }
 ]]
 [[
@@ -596,6 +603,13 @@ local t: {
     c: integer = 2,
     d: integer = 3,
     a: integer = 4,
+    s: integer = 5,
+    y: integer = 6,
+    z: integer = 7,
+    q: integer = 8,
+    g: integer = 9,
+    p: integer = 10,
+    l: integer = 11,
 }
 ]]
 

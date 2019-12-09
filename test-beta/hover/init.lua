@@ -522,6 +522,16 @@ TEST[[
 function a(v)
     return 'a'
 end
+local <?r?> = a(1)
+]]
+[[
+local r: string = "a"
+]]
+
+TEST[[
+function a(v)
+    return 'a'
+end
 local _, <?r?> = pcall(a, 1)
 ]]
 [[

@@ -3,7 +3,8 @@ local files   = require 'files'
 local vm      = require 'vm.vm'
 local library = require 'library'
 
-local function ofCall(func, index, callback)
+local function ofCall(func, index, callback, offset)
+    offset = offset or 0
     vm.eachRef(func, function (info)
         local src = info.source
         local returns
@@ -13,7 +14,7 @@ local function ofCall(func, index, callback)
         if returns then
             -- 搜索函数第 index 个返回值
             for _, rtn in ipairs(returns) do
-                local val = rtn[index]
+                local val = rtn[index-offset]
                 if val then
                     callback {
                         source   = val,
@@ -82,16 +83,17 @@ local function ofReturn(rtn, index, callback)
     end
 end
 
-local function ofSpecialCall(call, func, index, callback)
+local function ofSpecialCall(call, func, index, callback, offset)
     local name = func.special
+    offset = offset or 0
     if name == 'setmetatable' then
-        if index == 1 then
+        if index == 1 + offset then
             local args = call.args
-            if args[1] then
-                vm.eachRef(args[1], callback)
+            if args[1+offset] then
+                vm.eachRef(args[1+offset], callback)
             end
-            if args[2] then
-                vm.eachField(args[2], function (info)
+            if args[2+offset] then
+                vm.eachField(args[2+offset], function (info)
                     if info.key == 's|__index' then
                         vm.eachRef(info.source, callback)
                         if info.value then
@@ -100,10 +102,10 @@ local function ofSpecialCall(call, func, index, callback)
                     end
                 end)
             end
-            vm.setMeta(args[1], args[2])
+            vm.setMeta(args[1+offset], args[2+offset])
         end
     elseif name == 'require' then
-        if index == 1 then
+        if index == 1 + offset then
             local result = vm.getLinkUris(call)
             if result then
                 local myUri = guide.getRoot(call).uri
@@ -118,9 +120,9 @@ local function ofSpecialCall(call, func, index, callback)
             end
 
             local args = call.args
-            if args[1] then
-                if args[1].type == 'string' then
-                    local objName = args[1][1]
+            if args[1+offset] then
+                if args[1+offset].type == 'string' then
+                    local objName = args[1+offset][1]
                     local lib = library.library[objName]
                     if lib then
                         callback {
@@ -129,6 +131,20 @@ local function ofSpecialCall(call, func, index, callback)
                         }
                     end
                 end
+            end
+        end
+    elseif name == 'pcall'
+    or     name == 'xpcall' then
+        if index >= 2-offset then
+            local args = call.args
+            if args[1+offset] then
+                vm.eachRef(args[1+offset], function (info)
+                    local src = info.source
+                    if src.type == 'function' then
+                        ofCall(src, index, callback, 1+offset)
+                        ofSpecialCall(call, src, index, callback, 1+offset)
+                    end
+                end)
             end
         end
     end

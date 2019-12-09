@@ -54,7 +54,7 @@ local function updateConfig()
     end
 
     if newConfig.completion.enable then
-        --completion.enable()
+        completion.enable()
     else
         completion.disable()
     end
@@ -295,5 +295,26 @@ end)
 
 proto.on('textDocument/completion', function (params)
     --log.info(util.dump(params))
-    return nil
+    local core = require 'core.completion'
+    local uri  = params.textDocument.uri
+    if not files.exists(uri) then
+        return nil
+    end
+    local lines  = files.getLines(uri)
+    local text   = files.getText(uri)
+    local offset = define.offset(lines, text, params.position)
+    local result = core(uri, offset)
+    if not result then
+        return nil
+    end
+
+    local items = {}
+    for i, res in ipairs(result) do
+        items[i] = {
+            label = res.label,
+            kind  = res.kind,
+        }
+    end
+
+    return items
 end)

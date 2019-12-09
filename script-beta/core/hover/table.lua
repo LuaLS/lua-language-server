@@ -60,20 +60,7 @@ local function mergeLiteral(a, b)
     return b
 end
 
-return function (source)
-    local literals = {}
-    local classes = {}
-    vm.eachField(source, function (info)
-        local key, class, literal = getField(info)
-        classes[key] = vm.mergeTypeViews(class, classes[key])
-        literals[key] = mergeLiteral(literal, literals[key])
-    end)
-    if classes['[any]'] == 'any' then
-        classes['[any]'] = nil
-    end
-    if not next(classes) then
-        return '{}'
-    end
+local function buildAsHash(classes, literals)
     local keys = {}
     for k in pairs(classes) do
         keys[#keys+1] = k
@@ -94,4 +81,56 @@ return function (source)
     end
     lines[#lines+1] = '}'
     return table.concat(lines, '\n')
+end
+
+local function buildAsConst(classes, literals)
+    local keys = {}
+    for k in pairs(classes) do
+        keys[#keys+1] = k
+    end
+    table.sort(keys, function (a, b)
+        return literals[a][1] < literals[b][1]
+    end)
+    local lines = {}
+    lines[#lines+1] = '{'
+    for _, key in ipairs(keys) do
+        local class   = classes[key]
+        local literal = literals[key]
+        if literal then
+            table.sort(literal)
+            local view = table.concat(literal, '|')
+            lines[#lines+1] = ('    %s: %s = %s,'):format(key, class, view)
+        else
+            lines[#lines+1] = ('    %s: %s,'):format(key, class)
+        end
+    end
+    lines[#lines+1] = '}'
+    return table.concat(lines, '\n')
+end
+
+return function (source)
+    local literals = {}
+    local classes = {}
+    local intValue = true
+    vm.eachField(source, function (info)
+        local key, class, literal = getField(info)
+        classes[key] = vm.mergeTypeViews(class, classes[key])
+        literals[key] = mergeLiteral(literal, literals[key])
+        if class ~= 'integer'
+        or not literals[key]
+        or #literals[key] ~= 1 then
+            intValue = false
+        end
+    end)
+    if classes['[any]'] == 'any' then
+        classes['[any]'] = nil
+    end
+    if not next(classes) then
+        return '{}'
+    end
+    if intValue then
+        return buildAsConst(classes, literals)
+    else
+        return buildAsHash(classes, literals)
+    end
 end

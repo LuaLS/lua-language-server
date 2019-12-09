@@ -392,14 +392,14 @@ local <?t?> = {
 ]]
 [[
 local t: {
-    ["012"]: integer = 8,
-    [1]: integer = 2,
-    [5.5]: integer = 4,
-    [function]: integer = 6,
-    [table]: integer = 5,
-    [true]: integer = 3,
     a: integer = 1,
+    [1]: integer = 2,
+    [true]: integer = 3,
+    [5.5]: integer = 4,
+    [table]: integer = 5,
+    [function]: integer = 6,
     b: integer = 7,
+    ["012"]: integer = 8,
 }
 ]]
 
@@ -581,6 +581,23 @@ TEST[[
 local <?x?> = '\a'
 ]]
 [[local x: string = "\007"]]
+
+TEST [[
+local <?t?> = {
+    b = 1,
+    c = 2,
+    d = 3,
+    a = 4,
+}
+]]
+[[
+local t: {
+    b: integer = 1,
+    c: integer = 2,
+    d: integer = 3,
+    a: integer = 4,
+}
+]]
 
 --TEST[[
 -----@class Class

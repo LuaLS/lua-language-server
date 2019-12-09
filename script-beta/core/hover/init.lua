@@ -2,6 +2,7 @@ local files     = require 'files'
 local guide     = require 'parser.guide'
 local vm        = require 'vm'
 local getLabel  = require 'core.hover.label'
+local getDesc   = require 'core.hover.description'
 local util      = require 'utility'
 
 local function getHoverAsFunction(source)
@@ -54,9 +55,11 @@ end
 
 local function getHoverAsValue(source)
     local label = getLabel(source, source)
+    local desc  = getDesc(source)
     return {
-        label  = label,
-        source = source,
+        label       = label,
+        description = desc,
+        source      = source,
     }
 end
 

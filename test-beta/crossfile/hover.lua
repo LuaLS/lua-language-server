@@ -1,8 +1,6 @@
-local service = require 'service'
-local workspace = require 'workspace'
-local fs = require 'bee.filesystem'
-local core = require 'core'
-local uric = require 'uri'
+local files = require 'files'
+local furi  = require 'file-uri'
+local core  = require 'core.hover'
 
 rawset(_G, 'TEST', true)
 
@@ -55,38 +53,25 @@ local function catch_target(script, sep)
 end
 
 function TEST(data)
-    local lsp = service()
-    local ws = workspace(lsp, 'test')
-    lsp.workspace = ws
-    ws.root = ROOT
+    files.removeAll()
 
     local targetScript = data[1].content
-    local targetUri = uric.encode(fs.path(data[1].path))
+    local targetUri = furi.encode(data[1].path)
 
     local sourceScript, sourceList = catch_target(data[2].content, '?')
-    local sourceUri = uric.encode(fs.path(data[2].path))
+    local sourceUri = furi.encode(data[2].path)
 
-    lsp:saveText(targetUri, 1, targetScript)
-    ws:addFile(uric.decode(targetUri))
-    lsp:compileVM(targetUri)
-    lsp:saveText(sourceUri, 1, sourceScript)
-    ws:addFile(uric.decode(sourceUri))
-    lsp:compileVM(sourceUri)
+    files.setText(targetUri, targetScript)
+    files.setText(sourceUri, sourceScript)
 
-    local sourceVM = lsp:loadVM(sourceUri)
-    assert(sourceVM)
     local sourcePos = (sourceList[1][1] + sourceList[1][2]) // 2
-    local source = core.findSource(sourceVM, sourcePos)
-    local hover = core.hover(source, lsp)
+    local hover = core(sourceUri, sourcePos)
     assert(hover)
-    if data.hover.description then
-        local uriROOT = uric.encode(ROOT):gsub('%%', '%%%%')
-        data.hover.description = data.hover.description:gsub('%$ROOT%$', uriROOT)
-    end
     if hover.label then
         hover.label = hover.label:gsub('\r\n', '\n')
     end
-    assert(eq(hover, data.hover))
+    assert(eq(hover.label, data.hover.label))
+    assert(eq(hover.description, data.hover.description))
 end
 
 TEST {
@@ -99,7 +84,8 @@ TEST {
         content = 'require <?"a"?>',
     },
     hover = {
-        description = [[[a.lua]($ROOT$/a.lua)]],
+        label = '1 个字节',
+        description = [[[a.lua](file:///a.lua)]],
     }
 }
 
@@ -227,6 +213,8 @@ global t: {
     },
 }
 
+-- 先屏蔽掉 emmy
+do return end
 TEST {
     {
         path = 'a.lua',

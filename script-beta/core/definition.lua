@@ -58,14 +58,17 @@ local function checkRequire(source, offset, callback)
     if type(literal) ~= 'string' then
         return
     end
-    local name = func.special
-    if     name == 'require' then
+    local lib = vm.getLibrary(func)
+    if not lib then
+        return
+    end
+    if     lib.name == 'require' then
         local result = workspace.findUrisByRequirePath(literal, true)
         for _, uri in ipairs(result) do
             callback(uri)
         end
-    elseif name == 'dofile'
-    or     name == 'loadfile' then
+    elseif lib.name == 'dofile'
+    or     lib.name == 'loadfile' then
         local result = workspace.findUrisByFilePath(literal, true)
         for _, uri in ipairs(result) do
             callback(uri)

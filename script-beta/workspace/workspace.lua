@@ -12,6 +12,8 @@ local m = {}
 m.type = 'workspace'
 m.ignoreVersion = -1
 m.ignoreMatcher = nil
+m.uri = ''
+m.path = ''
 
 --- 初始化工作区
 function m.init(name, uri)

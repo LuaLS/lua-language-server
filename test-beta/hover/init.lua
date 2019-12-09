@@ -549,17 +549,18 @@ TEST[[
 <?next?>()
 ]]
 [[
-function next(table: table [, index: any])
-  -> key: any, value: any
+function next(table: table, index: any)
+  -> key: any
+  2. value: any
 ]]
 
-TEST[[
-local <?n?> = pairs()
-]]
-[[
-function n<next>(table: table [, index: any])
-  -> key: any, value: any
-]]
+--TEST[[
+--local <?n?> = pairs()
+--]]
+--[[
+--function n<next>(table: table [, index: any])
+--  -> key: any, value: any
+--]]
 
 TEST[[
 local <?x?> = '\a'

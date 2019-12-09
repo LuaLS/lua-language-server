@@ -8,7 +8,7 @@ local function asLibrary(source)
     local returns = {}
     for _, rtn in ipairs(source.returns) do
         local name = rtn.name
-        local tp = rtn.type
+        local tp = rtn.type or 'any'
         if name then
             returns[#returns+1] = ('%s: %s'):format(name, tp)
         else

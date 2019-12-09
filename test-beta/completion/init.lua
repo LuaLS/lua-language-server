@@ -1,34 +1,6 @@
-local core = require 'core'
-local parser  = require 'parser'
-local buildVM = require 'vm'
-
-local CompletionItemKind = {
-    Text = 1,
-    Method = 2,
-    Function = 3,
-    Constructor = 4,
-    Field = 5,
-    Variable = 6,
-    Class = 7,
-    Interface = 8,
-    Module = 9,
-    Property = 10,
-    Unit = 11,
-    Value = 12,
-    Enum = 13,
-    Keyword = 14,
-    Snippet = 15,
-    Color = 16,
-    File = 17,
-    Reference = 18,
-    Folder = 19,
-    EnumMember = 20,
-    Constant = 21,
-    Struct = 22,
-    Event = 23,
-    Operator = 24,
-    TypeParameter = 25,
-}
+local core  = require 'core.completion'
+local files = require 'files'
+local CompletionItemKind = require 'define.CompletionItemKind'
 
 local EXISTS = {'EXISTS'}
 
@@ -62,12 +34,12 @@ rawset(_G, 'TEST', true)
 
 function TEST(script)
     return function (expect)
-        local pos = script:find('$', 1, true) - 1
+        files.removeAll()
+        local pos = script:find('$', 1, true)
         local new_script = script:gsub('%$', '')
-        local ast = parser:parse(new_script, 'lua', 'Lua 5.4')
-        local vm = buildVM(ast)
-        assert(vm)
-        local result = core.completion(vm, new_script, pos)
+
+        files.setText('', new_script)
+        local result = core('', pos)
         if expect then
             assert(result)
             assert(eq(expect, result))

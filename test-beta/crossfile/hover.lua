@@ -212,6 +212,32 @@ global t: {
     },
 }
 
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            return {
+                a = 1,
+                b = 2,
+            }
+        ]],
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            local <?t?> = require 'a'
+        ]]
+    },
+    hover = {
+        label = [[
+local t: {
+    a: integer = 1,
+    b: integer = 2,
+}]],
+        name = 't',
+    },
+}
+
 -- 先屏蔽掉 emmy
 do return end
 TEST {

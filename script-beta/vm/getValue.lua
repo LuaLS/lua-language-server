@@ -870,7 +870,7 @@ function vm.viewType(values)
     local types = {}
     for i = 1, #values do
         local tp = values[i].type
-        if not types[tp] and tp ~= 'any' then
+        if tp and not types[tp] and tp ~= 'any' then
             types[tp] = true
             types[#types+1] = tp
         end

@@ -71,13 +71,12 @@ local function checkNode(source)
 end
 
 local function getLibrary(source)
-    local lib = checkStdLibrary(source)
-    if lib then
-        return lib
-    end
-    return checkNode(source) or vm.eachRef(source, function (info)
-        return checkStdLibrary(info.source) or checkNode(info.source)
-    end)
+    return checkNode(source)
+        or checkStdLibrary(source)
+        or vm.eachRef(source, function (info)
+            return checkStdLibrary(info.source)
+                or checkNode(info.source)
+        end, 100)
 end
 
 function vm.getLibrary(source)

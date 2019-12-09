@@ -682,7 +682,7 @@ end
 
 local function inferBySetOfLocal(results, source)
     if source.ref then
-        for i = 1, #source.ref do
+        for i = 1, math.min(#source.ref, 100) do
             local ref = source.ref[i]
             if ref.type == 'setlocal' then
                 break
@@ -700,7 +700,7 @@ local function inferBySet(results, source)
         inferBySetOfLocal(results, source)
     elseif source.type == 'setlocal'
     or     source.type == 'getlocal' then
-        inferBySetOfLocal(results, source.node)
+        merge(results, vm.getValue(source.node))
     end
 end
 

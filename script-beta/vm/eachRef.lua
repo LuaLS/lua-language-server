@@ -536,10 +536,17 @@ function vm.isSameRef(a, b)
 end
 
 --- 获取所有的引用
-function vm.eachRef(source, callback)
+function vm.eachRef(source, callback, max)
     local cache = vm.cache.eachRef[source]
     if cache then
-        for i = 1, #cache do
+        if max then
+            if max > #cache then
+                max = #cache
+            end
+        else
+            max = #cache
+        end
+        for i = 1, max do
             local res = callback(cache[i])
             if res ~= nil then
                 return res
@@ -567,7 +574,14 @@ function vm.eachRef(source, callback)
         local src = cache[i].source
         vm.cache.eachRef[src] = cache
     end
-    for i = 1, #cache do
+    if max then
+        if max > #cache then
+            max = #cache
+        end
+    else
+        max = #cache
+    end
+    for i = 1, max do
         local res = callback(cache[i])
         if res ~= nil then
             return res

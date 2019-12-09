@@ -89,9 +89,7 @@ function m.step()
         waker()
         return true
     else
-        for i = 1, #m.delayQueue do
-            m.delayQueue[i] = nil
-        end
+        m.delayQueue = {}
         m.delayQueueIndex = 1
         return false
     end

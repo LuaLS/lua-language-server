@@ -2,15 +2,28 @@ local guide = require 'parser.guide'
 local vm    = require 'vm.vm'
 
 local function ofTabel(value, callback)
-    for _, field in ipairs(value) do
-        if field.type == 'tablefield'
-        or field.type == 'tableindex' then
-            callback {
-                source   = field,
-                key      = guide.getKeyName(field),
-                value    = field.value,
-                mode     = 'set',
-            }
+    if value.library then
+        if value.child then
+            for k, field in pairs(value.child) do
+                callback {
+                    source   = field,
+                    key      = 's|' .. k,
+                    value    = field,
+                    mode     = 'set',
+                }
+            end
+        end
+    else
+        for _, field in ipairs(value) do
+            if field.type == 'tablefield'
+            or field.type == 'tableindex' then
+                callback {
+                    source   = field,
+                    key      = guide.getKeyName(field),
+                    value    = field.value,
+                    mode     = 'set',
+                }
+            end
         end
     end
 end

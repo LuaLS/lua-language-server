@@ -27,6 +27,9 @@ local function asValue(source, title)
         cont = buildTable(source)
         type = nil
     end
+    if lib then
+        name = ('%s<%s>'):format(name, buildName(lib))
+    end
     local pack = {}
     pack[#pack+1] = title
     pack[#pack+1] = name .. ':'

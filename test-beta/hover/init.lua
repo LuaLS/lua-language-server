@@ -488,35 +488,35 @@ local sssss<utf8>: {
 }
 ]]
 
-TEST[[
-function a(v)
-    print(<?v?>)
-end
-a(1)
-]]
-[[
-local v: number = 1
-]]
+--TEST[[
+--function a(v)
+--    print(<?v?>)
+--end
+--a(1)
+--]]
+--[[
+--local v: number = 1
+--]]
+--
+--TEST[[
+--function a(v)
+--    print(<?v?>)
+--end
+--pcall(a, 1)
+--]]
+--[[
+--local v: number = 1
+--]]
 
-TEST[[
-function a(v)
-    print(<?v?>)
-end
-pcall(a, 1)
-]]
-[[
-local v: number = 1
-]]
-
-TEST[[
-function a(v)
-    print(<?v?>)
-end
-xpcall(a, log.error, 1)
-]]
-[[
-local v: number = 1
-]]
+--TEST[[
+--function a(v)
+--    print(<?v?>)
+--end
+--xpcall(a, log.error, 1)
+--]]
+--[[
+--local v: number = 1
+--]]
 
 TEST[[
 function a(v)

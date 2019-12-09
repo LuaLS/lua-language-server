@@ -25,7 +25,8 @@ function vm.eachDef(source, callback)
         if info.mode == 'declare'
         or info.mode == 'set'
         or info.mode == 'return'
-        or info.mode == 'value' then
+        or info.mode == 'value'
+        or info.mode == 'library' then
             results[#results+1] = info
             local src = info.source
             if info.mode == 'return' then
@@ -38,11 +39,9 @@ function vm.eachDef(source, callback)
     for _, info in ipairs(results) do
         local src = info.source
         local destUri = guide.getRoot(src).uri
-        -- 如果是同一个文件，则检查位置关系后放行
-        if sourceUri == destUri then
-            if checkPath(source, info) then
-                callback(info)
-            end
+        -- 如果是library，则直接放行
+        if src.library then
+            callback(info)
             goto CONTINUE
         end
         -- 如果是global或field，则直接放行（因为无法确定顺序）
@@ -53,6 +52,13 @@ function vm.eachDef(source, callback)
         or src.type == 'tableindex'
         or src.type == 'setglobal' then
             callback(info)
+            goto CONTINUE
+        end
+        -- 如果是同一个文件，则检查位置关系后放行
+        if sourceUri == destUri then
+            if checkPath(source, info) then
+                callback(info)
+            end
             goto CONTINUE
         end
         -- 如果不是同一个文件，则必须在该文件 return 后才放行

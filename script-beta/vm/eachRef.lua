@@ -125,7 +125,7 @@ local function ofSpecialCall(call, func, index, callback)
                     if lib then
                         callback {
                             source   = lib,
-                            mode     = 'library',
+                            mode     = 'value',
                         }
                     end
                 end

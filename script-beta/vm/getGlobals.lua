@@ -3,6 +3,9 @@ local vm    = require 'vm.vm'
 
 local function getGlobals(root)
     local env  = guide.getENV(root)
+    if not env then
+        return nil
+    end
     local cache = {}
     local mark = {}
     vm.eachField(env, function (info)

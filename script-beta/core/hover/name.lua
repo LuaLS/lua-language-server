@@ -29,9 +29,10 @@ end
 
 local function asLibrary(source, caller)
     local p
-    if caller.type == 'method'
-    or caller.type == 'getmethod'
-    or caller.type == 'setmethod' then
+    if caller
+    and (caller.type == 'method'
+      or caller.type == 'getmethod'
+      or caller.type == 'setmethod') then
         if source.parent then
             for _, parent in ipairs(source.parent) do
                 if parent.type == 'object' then

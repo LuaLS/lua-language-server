@@ -3,6 +3,9 @@ local library = require 'library'
 local guide   = require 'parser.guide'
 
 local function checkStdLibrary(source)
+    if source.library then
+        return source
+    end
     local globalName = vm.getGlobal(source)
     if not globalName then
         return nil
@@ -73,7 +76,7 @@ local function getLibrary(source)
         return lib
     end
     return checkNode(source) or vm.eachRef(source, function (info)
-        return checkNode(info.source)
+        return checkStdLibrary(info.source) or checkNode(info.source)
     end)
 end
 

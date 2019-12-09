@@ -300,10 +300,15 @@ proto.on('textDocument/completion', function (params)
     if not files.exists(uri) then
         return nil
     end
+    local clock  = os.clock()
     local lines  = files.getLines(uri)
     local text   = files.getText(uri)
     local offset = define.offset(lines, text, params.position)
     local result = core(uri, offset)
+    local passed = os.clock() - clock
+    if passed > 0.1 then
+        log.warn(('Completion takes %.3f sec.'):format(passed))
+    end
     if not result then
         return nil
     end

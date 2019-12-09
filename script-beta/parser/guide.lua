@@ -259,9 +259,6 @@ function m.getVisibleLocalNames(block, pos, callback)
                 callback(name)
             end
         end
-        if res then
-            return res, res
-        end
         ::CONTINUE::
         block = m.getParentBlock(block)
     end

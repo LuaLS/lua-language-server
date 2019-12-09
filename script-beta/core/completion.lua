@@ -85,18 +85,20 @@ local function checkField(ast, text, word, offset, results)
             return
         end
     end
+    local used = {}
     vm.eachField(parent, function (info)
         local key = info.key
         if key
         and key:sub(1, 1) == 's'
         and info.source.finish ~= offset then
             local name = key:sub(3)
-            if matchKey(word, name) then
+            if not used[name] and matchKey(word, name) then
                 results[#results+1] = {
                     label = name,
                     kind  = ckind.Field,
                 }
             end
+            used[name] = true
         end
     end)
 end

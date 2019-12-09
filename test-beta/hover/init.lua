@@ -488,6 +488,21 @@ local sssss<utf8>: {
 }
 ]]
 
+TEST [[
+function F(a)
+end
+function F(b)
+end
+function F(a)
+end
+<?F?>()
+]]
+[[
+(3 个定义，2 个原型)
+(2) function F(a: any)
+(1) function F(b: any)
+]]
+
 --TEST[[
 --function a(v)
 --    print(<?v?>)

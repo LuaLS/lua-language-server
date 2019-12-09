@@ -182,8 +182,7 @@ TEST {
     hover = {
         label = [[
 global t: {
-    [*table]: number = 1,
-    [*table]: number = 2,
+    [table]: integer = 1|2,
 }]],
         name = 't',
     },
@@ -207,7 +206,7 @@ TEST {
     hover = {
         label = [[
 global t: {
-    [*table]: number = 2,
+    [table]: integer = 2,
 }]],
         name = 't',
     },

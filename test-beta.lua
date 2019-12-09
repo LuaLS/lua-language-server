@@ -43,7 +43,7 @@ local function main()
     test 'rename'
     test 'type_inference'
     test 'hover'
-    --test 'completion'
+    test 'completion'
     --test 'signature'
     --test 'document_symbol'
     test 'crossfile'

@@ -235,6 +235,39 @@ function m.getLocal(block, name, pos)
     error('guide.getLocal overstack')
 end
 
+--- 获取指定区块中所有的可见局部变量名称
+function m.getVisibleLocalNames(block, pos, callback)
+    block = m.getBlock(block)
+    local used = {}
+    for _ = 1, 1000 do
+        if not block then
+            return nil
+        end
+        local locals = block.locals
+        local res
+        if not locals then
+            goto CONTINUE
+        end
+        for i = 1, #locals do
+            local loc = locals[i]
+            if loc.effect > pos then
+                break
+            end
+            local name = loc[1]
+            if not used[name] then
+                used[name] = true
+                callback(name)
+            end
+        end
+        if res then
+            return res, res
+        end
+        ::CONTINUE::
+        block = m.getParentBlock(block)
+    end
+    error('guide.getLocal overstack')
+end
+
 --- 获取指定区块中可见的标签
 ---@param block table
 ---@param name string {comment = '标签名'}

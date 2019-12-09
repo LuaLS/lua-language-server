@@ -35,7 +35,7 @@ rawset(_G, 'TEST', true)
 function TEST(script)
     return function (expect)
         files.removeAll()
-        local pos = script:find('$', 1, true)
+        local pos = script:find('$', 1, true) - 1
         local new_script = script:gsub('%$', '')
 
         files.setText('', new_script)

@@ -236,33 +236,21 @@ function m.getLocal(block, name, pos)
 end
 
 --- 获取指定区块中所有的可见局部变量名称
-function m.getVisibleLocalNames(block, pos, callback)
-    block = m.getBlock(block)
-    local used = {}
-    for _ = 1, 1000 do
-        if not block then
-            return nil
-        end
-        local locals = block.locals
-        local res
-        if not locals then
-            goto CONTINUE
-        end
-        for i = 1, #locals do
-            local loc = locals[i]
-            if loc.effect > pos then
-                break
-            end
-            local name = loc[1]
-            if not used[name] then
-                used[name] = true
-                callback(name)
+function m.getVisibleLocals(block, pos)
+    local result = {}
+    m.eachSourceContain(m.getRoot(block), pos, function (source)
+        local locals = source.locals
+        if locals then
+            for i = 1, #locals do
+                local loc = locals[i]
+                local name = loc[1]
+                if loc.effect <= pos then
+                    result[name] = loc
+                end
             end
         end
-        ::CONTINUE::
-        block = m.getParentBlock(block)
-    end
-    error('guide.getLocal overstack')
+    end)
+    return result
 end
 
 --- 获取指定区块中可见的标签

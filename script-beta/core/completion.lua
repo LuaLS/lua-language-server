@@ -67,18 +67,24 @@ local function findParent(ast, text, offset)
 end
 
 local function checkLocal(ast, word, offset, results)
-    guide.getVisibleLocalNames(ast.ast, offset, function (name)
+    local locals = guide.getVisibleLocals(ast.ast, offset)
+    for name in pairs(locals) do
         if matchKey(word, name) then
             results[#results+1] = {
                 label = name,
                 kind  = ckind.Variable,
             }
         end
-    end)
+    end
+end
+
+local function isSameSource(source, pos)
+    return source.start <= pos and source.finish >= pos
 end
 
 local function checkField(ast, text, word, offset, results)
-    local parent, oop = findParent(ast, text, offset - #word)
+    local myStart = offset - #word + 1
+    local parent, oop = findParent(ast, text, myStart - 1)
     if not parent then
         parent = guide.getLocal(ast.ast, '_ENV', offset)
         if not parent then
@@ -90,7 +96,7 @@ local function checkField(ast, text, word, offset, results)
         local key = info.key
         if key
         and key:sub(1, 1) == 's'
-        and info.source.finish ~= offset then
+        and not isSameSource(info.source, myStart) then
             local name = key:sub(3)
             if not used[name] and matchKey(word, name) then
                 results[#results+1] = {

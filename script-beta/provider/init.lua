@@ -304,7 +304,7 @@ proto.on('textDocument/completion', function (params)
     local lines  = files.getLines(uri)
     local text   = files.getText(uri)
     local offset = define.offset(lines, text, params.position)
-    local result = core(uri, offset)
+    local result = core.completion(uri, offset)
     local passed = os.clock() - clock
     if passed > 0.1 then
         log.warn(('Completion takes %.3f sec.'):format(passed))
@@ -317,16 +317,33 @@ proto.on('textDocument/completion', function (params)
         items[i] = {
             label            = res.label,
             kind             = res.kind,
-            detail           = res.detail,
-            documentation    = {
-                value = res.documentation,
-                kind  = 'markdown',
+            data             = res.id and {
+                version = files.globalVersion,
+                id      = res.id,
             },
             sortText         = ('%04d'):format(i),
             insertText       = res.insertText,
             insertTextFormat = res.insertTextFormat,
         }
     end
-
     return items
+end)
+
+proto.on('completionItem/resolve', function (item)
+    local core = require 'core.completion'
+    if not item.data then
+        return item
+    end
+    local globalVersion = item.data.version
+    local id = item.data.id
+    if globalVersion ~= files.globalVersion then
+        return item
+    end
+    local resolved = core.resolve(id)
+    item.detail = resolved.detail
+    item.documentation = resolved.documentation and {
+        value = resolved.documentation,
+        kind  = 'markdown',
+    }
+    return item
 end)

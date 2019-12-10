@@ -23,7 +23,7 @@ local function enable()
                 id = 'completion',
                 method = 'textDocument/completion',
                 registerOptions = {
-                    resolveProvider = false,
+                    resolveProvider = true,
                     triggerCharacters = allWords(),
                 },
             },

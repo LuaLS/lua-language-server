@@ -10,6 +10,26 @@ local getArg   = require 'core.hover.arg'
 local config   = require 'config'
 local util     = require 'utility'
 
+local stackID = 0
+local stacks = {}
+local function stack(callback)
+    stackID = stackID + 1
+    stacks[stackID] = callback
+    return stackID
+end
+
+local function clearStack()
+    stacks = {}
+end
+
+local function resolveStack(id)
+    local callback = stacks[id]
+    if not callback then
+        return nil
+    end
+    return callback()
+end
+
 local function isSpace(char)
     if char == ' '
     or char == '\n'
@@ -79,7 +99,11 @@ local function checkLocal(ast, word, offset, results)
             results[#results+1] = {
                 label  = name,
                 kind   = ckind.Variable,
-                detail = getLabel(source),
+                id     = stack(function ()
+                    return {
+                        detail = getLabel(source),
+                    }
+                end),
             }
         end
     end
@@ -151,8 +175,12 @@ local function checkLibrary(ast, text, word, offset, results)
                 buildFunction(results, lib, false, {
                     label = name,
                     kind  = ckind.Function,
-                    documentation = lib.description,
-                    detail = getLabel(lib),
+                    id    = stack(function ()
+                        return {
+                            detail        = getLabel(lib),
+                            documentation = lib.description,
+                        }
+                    end),
                 })
             end
         end
@@ -198,11 +226,12 @@ local function tryWord(ast, text, offset, results)
     checkCommon(word, text, results)
 end
 
-return function (uri, offset)
+local function completion(uri, offset)
     local ast = files.getAst(uri)
     if not ast then
         return nil
     end
+    clearStack()
     local text = files.getText(uri)
     local results = {}
 
@@ -213,3 +242,12 @@ return function (uri, offset)
     end
     return results
 end
+
+local function resolve(id)
+    return resolveStack(id)
+end
+
+return {
+    completion = completion,
+    resolve    = resolve,
+}

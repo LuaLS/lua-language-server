@@ -36,12 +36,13 @@ function vm.eachDef(source, callback)
         end
     end)
 
+    local res
     for _, info in ipairs(results) do
         local src = info.source
         local destUri = guide.getRoot(src).uri
         -- 如果是library，则直接放行
         if src.library then
-            callback(info)
+            res = callback(info)
             goto CONTINUE
         end
         -- 如果是global或field，则直接放行（因为无法确定顺序）
@@ -51,21 +52,24 @@ function vm.eachDef(source, callback)
         or src.type == 'tablefield'
         or src.type == 'tableindex'
         or src.type == 'setglobal' then
-            callback(info)
+            res = callback(info)
             goto CONTINUE
         end
         -- 如果是同一个文件，则检查位置关系后放行
         if sourceUri == destUri then
             if checkPath(source, info) then
-                callback(info)
+                res = callback(info)
             end
             goto CONTINUE
         end
         -- 如果不是同一个文件，则必须在该文件 return 后才放行
         if valueUris[destUri] then
-            callback(info)
+            res = callback(info)
             goto CONTINUE
         end
         ::CONTINUE::
+        if res ~= nil then
+            return res
+        end
     end
 end

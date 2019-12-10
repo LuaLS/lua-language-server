@@ -97,7 +97,8 @@ function m.doMethod(proto)
     await.create(function ()
         log.debug('Start method:', method)
         local clock = os.clock()
-        local ok, res
+        local ok = true
+        local res
         -- 任务可能在执行过程中被中断，通过close来捕获
         local response <close> = util.defer(function ()
             local passed = os.clock() - clock

@@ -258,6 +258,8 @@ end
 local function markLibrary(library)
     for _, lib in pairs(library) do
         lib.library = true
+        lib.start = 0
+        lib.finish = 0
         if lib.child then
             markLibrary(lib.child)
         end

@@ -1,7 +1,8 @@
-local guide = require 'parser.guide'
-local vm    = require 'vm.vm'
-local files = require 'files'
-local await = require 'await'
+local guide   = require 'parser.guide'
+local vm      = require 'vm.vm'
+local files   = require 'files'
+local await   = require 'await'
+local library = require 'library'
 
 local function ofTabel(value, callback)
     if value.library then
@@ -130,6 +131,13 @@ local function eachField(source, callback)
                 for _, ref in ipairs(src.ref) do
                     ofENV(ref, callback)
                 end
+            end
+            for name, lib in pairs(library.global) do
+                callback {
+                    source = lib,
+                    key    = 's|' .. name,
+                    mode   = 'value',
+                }
             end
         elseif src.type == 'getlocal'
         or     src.type == 'getglobal'

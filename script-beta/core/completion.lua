@@ -94,7 +94,11 @@ end
 
 local function buildFunctionSnip(source)
     local name = getName(source):gsub('^.-[$.:]', '')
-    local args = getArg(source)
+    local args = vm.eachDef(source, function (info)
+        if info.source.type == 'function' then
+            return getArg(info.source)
+        end
+    end) or ''
     local id = 0
     args = args:gsub('[^,]+', function (arg)
         id = id + 1
@@ -187,6 +191,8 @@ local function checkField(word, start, parent, oop, results)
         if vm.hasType(info.source, 'function') then
             if oop then
                 kind = ckind.Method
+            else
+                kind = ckind.Function
             end
             used[name] = true
             buildFunction(results, info.source, oop, {
@@ -220,25 +226,7 @@ local function checkField(word, start, parent, oop, results)
             }
         end
     end)
-end
-
-local function checkLibrary(word, results)
-    for name, lib in pairs(library.global) do
-        if matchKey(word, name) then
-            if lib.type == 'function' then
-                buildFunction(results, lib, false, {
-                    label = name,
-                    kind  = ckind.Function,
-                    id    = stack(function ()
-                        return {
-                            detail        = getLabel(lib),
-                            documentation = buildDesc(lib),
-                        }
-                    end),
-                })
-            end
-        end
-    end
+    return used
 end
 
 local function checkCommon(word, text, results)
@@ -374,7 +362,6 @@ local function tryWord(ast, text, offset, results)
             checkLocal(ast, word, start, results)
             local env = guide.getLocal(ast.ast, '_ENV', start)
             checkField(word, start, env, false, results)
-            checkLibrary(word, results)
             checkKeyWord(ast, text, start, word, results)
         end
     end

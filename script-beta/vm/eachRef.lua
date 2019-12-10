@@ -177,6 +177,9 @@ local function ofValue(value, callback)
     vm.eachRef(value, callback)
 
     local parent = value.parent
+    if not parent then
+        return
+    end
     if parent.type == 'local'
     or parent.type == 'setglobal'
     or parent.type == 'setlocal'

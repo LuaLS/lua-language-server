@@ -67,13 +67,12 @@ return function (uri, callback)
         local func = source.node
         local funcArgs
         vm.eachDef(func, function (info)
-            if info.mode == 'value' then
-                local src = info.source
-                if src.type == 'function' then
-                    local args = countFuncArgs(src)
-                    if not funcArgs or args > funcArgs then
-                        funcArgs = args
-                    end
+            local src = info.source
+            local f = src.value
+            if f and f.type == 'function' then
+                local args = countFuncArgs(f)
+                if not funcArgs or args > funcArgs then
+                    funcArgs = args
                 end
             end
         end)

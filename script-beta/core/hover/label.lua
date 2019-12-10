@@ -6,9 +6,9 @@ local getClass    = require 'core.hover.class'
 local vm          = require 'vm'
 local util        = require 'utility'
 
-local function asFunction(source, caller)
-    local name = buildName(source, caller)
-    local arg  = buildArg(source, caller)
+local function asFunction(source, oop)
+    local name = buildName(source, oop)
+    local arg  = buildArg(source, oop)
     local rtn  = buildReturn(source)
     local lines = {}
     lines[1] = ('function %s(%s)'):format(name, arg)
@@ -28,7 +28,10 @@ local function asValue(source, title)
         type = nil
     end
     if lib then
-        name = ('%s<%s>'):format(name, buildName(lib))
+        local libName = buildName(lib)
+        if name ~= libName then
+            name = ('%s<%s>'):format(name, buildName(lib))
+        end
     end
     local pack = {}
     pack[#pack+1] = title
@@ -108,9 +111,9 @@ local function asString(source)
     end
 end
 
-return function (source, caller)
+return function (source, oop)
     if source.type == 'function' then
-        return asFunction(source, caller)
+        return asFunction(source, oop)
     elseif source.type == 'local'
     or     source.type == 'getlocal'
     or     source.type == 'setlocal' then

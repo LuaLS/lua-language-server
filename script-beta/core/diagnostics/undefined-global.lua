@@ -14,6 +14,9 @@ return function (uri, callback)
 
     -- 遍历全局变量，检查所有没有 mode['set'] 的全局变量
     local globals = vm.getGlobals(ast.ast)
+    if not globals then
+        return
+    end
     for key, infos in pairs(globals) do
         if infos.mode['set'] == true then
             goto CONTINUE

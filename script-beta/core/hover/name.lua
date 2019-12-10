@@ -5,14 +5,14 @@ local function asLocal(source)
     return guide.getName(source)
 end
 
-local function asMethod(source, caller)
+local function asMethod(source)
     local class = getClass(source.node)
     local node = class or guide.getName(source.node) or '?'
     local method = guide.getName(source)
     return ('%s:%s'):format(node, method)
 end
 
-local function asField(source, caller)
+local function asField(source)
     local class = getClass(source.node)
     local node = class or guide.getName(source.node) or '?'
     local method = guide.getName(source)
@@ -27,12 +27,9 @@ local function asGlobal(source)
     return guide.getName(source)
 end
 
-local function asLibrary(source, caller)
+local function asLibrary(source, oop)
     local p
-    if caller
-    and (caller.type == 'method'
-      or caller.type == 'getmethod'
-      or caller.type == 'setmethod') then
+    if oop then
         if source.parent then
             for _, parent in ipairs(source.parent) do
                 if parent.type == 'object' then
@@ -58,9 +55,9 @@ local function asLibrary(source, caller)
     end
 end
 
-local function buildName(source, caller)
+local function buildName(source, oop)
     if source.library then
-        return asLibrary(source, caller) or ''
+        return asLibrary(source, oop) or ''
     end
     if source.type == 'local'
     or source.type == 'getlocal'
@@ -73,18 +70,18 @@ local function buildName(source, caller)
     end
     if source.type == 'setmethod'
     or source.type == 'getmethod' then
-        return asMethod(source, caller) or ''
+        return asMethod(source) or ''
     end
     if source.type == 'setfield'
     or source.type == 'getfield' then
-        return asField(source, caller) or ''
+        return asField(source) or ''
     end
     if source.type == 'tablefield' then
         return asTableField(source) or ''
     end
     local parent = source.parent
     if parent then
-        return buildName(parent, caller)
+        return buildName(parent, oop)
     end
     return ''
 end

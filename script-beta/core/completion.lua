@@ -92,59 +92,8 @@ local function findParent(ast, text, offset)
     return nil, nil
 end
 
-local function checkLocal(ast, word, offset, results)
-    local locals = guide.getVisibleLocals(ast.ast, offset)
-    for name, source in pairs(locals) do
-        if matchKey(word, name) then
-            results[#results+1] = {
-                label  = name,
-                kind   = ckind.Variable,
-                id     = stack(function ()
-                    return {
-                        detail = getLabel(source),
-                    }
-                end),
-            }
-        end
-    end
-end
-
-local function isSameSource(source, pos)
-    return source.start <= pos and source.finish >= pos
-end
-
-local function checkField(word, start, parent, oop, results)
-    local used = {}
-    vm.eachField(parent, function (info)
-        local key = info.key
-        if key
-        and key:sub(1, 1) == 's'
-        and not isSameSource(info.source, start) then
-            local name = key:sub(3)
-            if not used[name] and matchKey(word, name) then
-                local kind = ckind.Field
-                local literal = vm.getLiteral(info.source)
-                if literal ~= nil then
-                    kind = ckind.Enum
-                end
-                results[#results+1] = {
-                    label = name,
-                    kind  = kind,
-                    id    = stack(function ()
-                        return {
-                            detail = getLabel(info.source),
-                            description = info.source.description,
-                        }
-                    end)
-                }
-            end
-            used[name] = true
-        end
-    end)
-end
-
 local function buildFunctionSnip(source)
-    local name = getName(source)
+    local name = getName(source):gsub('^.-[$.:]', '')
     local args = getArg(source)
     local id = 0
     args = args:gsub('[^,]+', function (arg)
@@ -171,6 +120,108 @@ local function buildFunction(results, source, oop, data)
     end
 end
 
+local function buildDesc(source)
+    if source.description then
+        return source.description
+    end
+    local lib = vm.getLibrary(source)
+    if lib then
+        return lib.description
+    end
+end
+
+local function checkLocal(ast, word, offset, results)
+    local locals = guide.getVisibleLocals(ast.ast, offset)
+    for name, source in pairs(locals) do
+        if matchKey(word, name) then
+            if vm.hasType(source, 'function') then
+                buildFunction(results, source, false, {
+                    label  = name,
+                    kind   = ckind.Function,
+                    id     = stack(function ()
+                        return {
+                            detail      = getLabel(source),
+                            description = buildDesc(source),
+                        }
+                    end),
+                })
+            else
+                results[#results+1] = {
+                    label  = name,
+                    kind   = ckind.Variable,
+                    id     = stack(function ()
+                        return {
+                            detail      = getLabel(source),
+                            description = buildDesc(source),
+                        }
+                    end),
+                }
+            end
+        end
+    end
+end
+
+local function isSameSource(source, pos)
+    return source.start <= pos and source.finish >= pos
+end
+
+local function checkField(word, start, parent, oop, results)
+    local used = {}
+    vm.eachField(parent, function (info)
+        local key = info.key
+        if not key or key:sub(1, 1) ~= 's' then
+            return
+        end
+        if isSameSource(info.source, start) then
+            return
+        end
+        local name = key:sub(3)
+        if used[name] then
+            return
+        end
+        if not matchKey(word, name) then
+            used[name] = true
+            return
+        end
+        local kind = ckind.Field
+        if vm.hasType(info.source, 'function') then
+            if oop then
+                kind = ckind.Method
+            end
+            used[name] = true
+            buildFunction(results, info.source, oop, {
+                label = name,
+                kind  = kind,
+                id    = stack(function ()
+                    return {
+                        detail      = getLabel(info.source),
+                        description = buildDesc(info.source),
+                    }
+                end),
+            })
+        else
+            if oop then
+                return
+            end
+            used[name] = true
+            local literal = vm.getLiteral(info.source)
+            if literal ~= nil then
+                kind = ckind.Enum
+            end
+            results[#results+1] = {
+                label = name,
+                kind  = kind,
+                id    = stack(function ()
+                    return {
+                        detail      = getLabel(info.source),
+                        description = buildDesc(info.source),
+                    }
+                end)
+            }
+        end
+    end)
+end
+
 local function checkLibrary(word, results)
     for name, lib in pairs(library.global) do
         if matchKey(word, name) then
@@ -181,7 +232,7 @@ local function checkLibrary(word, results)
                     id    = stack(function ()
                         return {
                             detail        = getLabel(lib),
-                            documentation = lib.description,
+                            documentation = buildDesc(lib),
                         }
                     end),
                 })
@@ -216,6 +267,99 @@ local function isInString(ast, offset)
     end)
 end
 
+local keyWordMap = {
+{'and'},
+{'break'},
+{'do', function (ast, text, start, results)
+    if config.config.completion.keywordSnippet then
+        guide.eachSourceContain()
+        results[#results+1] = {
+            label = 'do .. end',
+            kind  = ckind.Snippet,
+            insertTextFormat = 2,
+            insertText = [[
+do
+    $0
+end]],
+        }
+    end
+end},
+{'else'},
+{'elseif', function (ast, text, start, results)
+    if config.config.completion.keywordSnippet then
+        results[#results+1] = {
+            label = 'elseif .. then',
+            kind  = ckind.Snippet,
+            insertTextFormat = 2,
+            insertText = [[elseif $1 then]],
+        }
+    end
+end},
+{'end'},
+{'false'},
+{'for', function (ast, text, start, results)
+    if config.config.completion.keywordSnippet then
+        results[#results+1] = {
+            label = 'for .. in',
+            kind  = ckind.Snippet,
+            insertTextFormat = 2,
+            insertText = [[
+for ${1:key, value} in ${2:pairs(t)} do
+    $0
+end]]
+        }
+        results[#results+1] = {
+            label = 'for i = ..',
+            kind  = ckind.Snippet,
+            insertTextFormat = 2,
+            insertText = [[
+for ${1:i} = ${2:1}, ${3:10, 2} do
+    $0
+end]]
+        }
+    end
+end},
+{'function', function (ast, text, start, results)
+
+end},
+{'goto'},
+{'if'},
+{'in'},
+{'local', function (ast, text, start, results)
+    if config.config.completion.keywordSnippet then
+        results[#results+1] = {
+            label = 'local function',
+            kind  = ckind.Snippet,
+        }
+    end
+end},
+{'nil'},
+{'not'},
+{'or'},
+{'repeat'},
+{'return'},
+{'then'},
+{'true'},
+{'until'},
+{'while'},
+}
+
+local function checkKeyWord(ast, text, start, word, results)
+    for _, data in ipairs(keyWordMap) do
+        local key = data[1]
+        if matchKey(word, key) then
+            results[#results+1] = {
+                label = key,
+                kind  = ckind.Keyword,
+            }
+            local func = data[2]
+            if func then
+                func(ast, text, start, results)
+            end
+        end
+    end
+end
+
 local function tryWord(ast, text, offset, results)
     local word = findWord(text, offset)
     if not word then
@@ -231,6 +375,7 @@ local function tryWord(ast, text, offset, results)
             local env = guide.getLocal(ast.ast, '_ENV', start)
             checkField(word, start, env, false, results)
             checkLibrary(word, results)
+            checkKeyWord(ast, text, start, word, results)
         end
     end
     checkCommon(word, text, results)

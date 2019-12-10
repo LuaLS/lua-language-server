@@ -11,9 +11,12 @@ local function getHoverAsFunction(source)
     local defs = 0
     local protos = 0
     local other = 0
+    local oop = source.type == 'method'
+             or source.type == 'getmethod'
+             or source.type == 'setmethod'
     for _, value in ipairs(values) do
         if value.type == 'function' then
-            local label = getLabel(value.source, source)
+            local label = getLabel(value.source, oop)
             defs = defs + 1
             labels[label] = (labels[label] or 0) + 1
             if labels[label] == 1 then
@@ -54,7 +57,10 @@ local function getHoverAsFunction(source)
 end
 
 local function getHoverAsValue(source)
-    local label = getLabel(source, source)
+    local oop = source.type == 'method'
+             or source.type == 'getmethod'
+             or source.type == 'setmethod'
+    local label = getLabel(source, oop)
     local desc  = getDesc(source)
     return {
         label       = label,

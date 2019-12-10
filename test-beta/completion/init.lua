@@ -132,12 +132,28 @@ ass$
 {
     {
         label = 'assert',
-        kind = CompletionItemKind.Function,
+        kind  = CompletionItemKind.Function,
     },
     {
         label = 'assert()',
-        kind = CompletionItemKind.Snippet,
+        kind  = CompletionItemKind.Snippet,
     },
+}
+
+TEST [[
+local function ffff(a, b)
+end
+ff$
+]]
+{
+    {
+        label = 'ffff',
+        kind  = CompletionItemKind.Function,
+    },
+    {
+        label = 'ffff()',
+        kind  = CompletionItemKind.Snippet,
+    }
 }
 
 TEST [[
@@ -177,6 +193,7 @@ t.ab$
 
 TEST [[
 local mt = {}
+mt.ggg = 1
 function mt:get(a, b)
     return 1
 end
@@ -186,16 +203,15 @@ mt:g$
     {
         label = 'get',
         kind = CompletionItemKind.Method,
-        documentation = EXISTS,
-        detail = EXISTS,
     },
     {
         label = 'get()',
         kind = CompletionItemKind.Snippet,
-        documentation = EXISTS,
-        insertText = EXISTS,
-        detail = EXISTS,
     },
+    {
+        label = 'ggg',
+        kind  = CompletionItemKind.Text,
+    }
 }
 
 TEST [[
@@ -205,15 +221,10 @@ loc$
     {
         label = 'collectgarbage',
         kind = CompletionItemKind.Function,
-        documentation = EXISTS,
-        detail = EXISTS,
     },
     {
         label = 'collectgarbage()',
         kind = CompletionItemKind.Snippet,
-        documentation = EXISTS,
-        detail = EXISTS,
-        insertText = EXISTS,
     },
     {
         label = 'local',
@@ -222,8 +233,55 @@ loc$
     {
         label = 'local function',
         kind = CompletionItemKind.Snippet,
-        insertText = EXISTS,
     }
+}
+
+TEST [[
+do$
+]]
+{
+    {
+        label = 'dofile',
+        kind  = CompletionItemKind.Function,
+    },
+    {
+        label = 'dofile()',
+        kind  = CompletionItemKind.Snippet,
+    },
+    {
+        label = 'load',
+        kind  = CompletionItemKind.Function,
+    },
+    {
+        label = 'load()',
+        kind  = CompletionItemKind.Snippet,
+    },
+    {
+        label = 'loadfile',
+        kind  = CompletionItemKind.Function,
+    },
+    {
+        label = 'loadfile()',
+        kind  = CompletionItemKind.Snippet,
+    },
+    {
+        label = 'do',
+        kind = CompletionItemKind.Keyword,
+    },
+    {
+        label = 'do .. end',
+        kind = CompletionItemKind.Snippet,
+    }
+}
+
+TEST [[
+while true d$
+]]
+{
+    {
+        label = 'do',
+        kind = CompletionItemKind.Keyword,
+    },
 }
 
 TEST [[

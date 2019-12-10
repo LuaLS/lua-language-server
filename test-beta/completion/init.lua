@@ -15,14 +15,22 @@ local function eq(a, b)
     if tp1 == 'table' then
         local mark = {}
         for k in pairs(a) do
-            if not eq(a[k], b[k]) then
-                return false
+            if type(k) == 'number'
+            or k == 'label'
+            or k == 'kind' then
+                if not eq(a[k], b[k]) then
+                    return false
+                end
+                mark[k] = true
             end
-            mark[k] = true
         end
         for k in pairs(b) do
-            if not mark[k] then
-                return false
+            if type(k) == 'number'
+            or k == 'label'
+            or k == 'kind' then
+                if not mark[k] then
+                    return false
+                end
             end
         end
         return true
@@ -126,16 +134,10 @@ ass$
     {
         label = 'assert',
         kind = CompletionItemKind.Function,
-        documentation = EXISTS,
-        detail = EXISTS,
     },
     {
         label = 'assert()',
         kind = CompletionItemKind.Snippet,
-        documentation = EXISTS,
-        insertText = EXISTS,
-        insertTextFormat = 2,
-        detail = EXISTS,
     },
 }
 
@@ -147,7 +149,6 @@ z$
     {
         label = 'zabc',
         kind = CompletionItemKind.Variable,
-        detail = '(number) = 1',
     }
 }
 
@@ -159,7 +160,6 @@ z$
     {
         label = 'zabc',
         kind = CompletionItemKind.Variable,
-        detail = '(number) = 1.0',
     }
 }
 

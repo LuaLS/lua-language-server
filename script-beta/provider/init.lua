@@ -315,10 +315,15 @@ proto.on('textDocument/completion', function (params)
     local items = {}
     for i, res in ipairs(result) do
         items[i] = {
-            label      = res.label,
-            kind       = res.kind,
-            sortText   = ('%04d'):format(i),
-            insertText = res.insertText,
+            label            = res.label,
+            kind             = res.kind,
+            detail           = res.detail,
+            documentation    = {
+                value = res.documentation,
+                kind  = 'markdown',
+            },
+            sortText         = ('%04d'):format(i),
+            insertText       = res.insertText,
             insertTextFormat = res.insertTextFormat,
         }
     end

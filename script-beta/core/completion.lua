@@ -74,11 +74,12 @@ end
 
 local function checkLocal(ast, word, offset, results)
     local locals = guide.getVisibleLocals(ast.ast, offset)
-    for name in pairs(locals) do
+    for name, source in pairs(locals) do
         if matchKey(word, name) then
             results[#results+1] = {
-                label = name,
-                kind  = ckind.Variable,
+                label  = name,
+                kind   = ckind.Variable,
+                detail = getLabel(source),
             }
         end
     end
@@ -146,12 +147,14 @@ end
 local function checkLibrary(ast, text, word, offset, results)
     for name, lib in pairs(library.global) do
         if matchKey(word, name) then
-            buildFunction(results, lib, false, {
-                label = name,
-                kind  = ckind.Function,
-                documentation = lib.description,
-                detail = getLabel(lib),
-            })
+            if lib.type == 'function' then
+                buildFunction(results, lib, false, {
+                    label = name,
+                    kind  = ckind.Function,
+                    documentation = lib.description,
+                    detail = getLabel(lib),
+                })
+            end
         end
     end
 end

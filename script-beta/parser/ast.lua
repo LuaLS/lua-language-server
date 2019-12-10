@@ -1111,6 +1111,8 @@ local Defs = {
                 }
             end
         end
+        attrs.start  = attrs[1].start
+        attrs.finish = attrs[#attrs].finish
         return attrs
     end,
     LocalName = function (name, attrs)

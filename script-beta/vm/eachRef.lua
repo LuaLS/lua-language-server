@@ -2,6 +2,7 @@ local guide   = require 'parser.guide'
 local files   = require 'files'
 local vm      = require 'vm.vm'
 local library = require 'library'
+local await   = require 'await'
 
 local function ofCall(func, index, callback, offset)
     offset = offset or 0
@@ -542,6 +543,9 @@ end
 function vm.eachRef(source, callback, max)
     local cache = vm.cache.eachRef[source]
     if cache then
+        await.delay(function ()
+            return files.globalVersion
+        end)
         if max then
             if max > #cache then
                 max = #cache
@@ -577,6 +581,9 @@ function vm.eachRef(source, callback, max)
         local src = cache[i].source
         vm.cache.eachRef[src] = cache
     end
+    await.delay(function ()
+        return files.globalVersion
+    end)
     if max then
         if max > #cache then
             max = #cache

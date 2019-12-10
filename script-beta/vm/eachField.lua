@@ -1,5 +1,7 @@
 local guide = require 'parser.guide'
 local vm    = require 'vm.vm'
+local files = require 'files'
+local await = require 'await'
 
 local function ofTabel(value, callback)
     if value.library then
@@ -145,6 +147,9 @@ end
 function vm.eachField(source, callback)
     local cache = vm.cache.eachField[source]
     if cache then
+        await.delay(function ()
+            return files.globalVersion
+        end)
         for i = 1, #cache do
             local res = callback(cache[i])
             if res ~= nil then
@@ -172,6 +177,9 @@ function vm.eachField(source, callback)
     vm.eachRef(source, function (info)
         local src = info.source
         vm.cache.eachField[src] = cache
+    end)
+    await.delay(function ()
+        return files.globalVersion
     end)
     for i = 1, #cache do
         local res = callback(cache[i])

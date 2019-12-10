@@ -91,21 +91,24 @@ function m.doMethod(proto)
     end
     await.create(function ()
         log.debug('Start method:', method)
+        local ok, res, passed
+        local response <close> = util.defer(function ()
+            if passed > 0.2 then
+                log.debug(('Method [%s] takes [%.3f]sec.'):format(method, passed))
+            end
+            log.debug('Finish method:', method)
+            if not proto.id then
+                return
+            end
+            if ok then
+                m.response(proto.id, res)
+            else
+                m.responseErr(proto.id, ErrorCodes.InternalError, res)
+            end
+        end)
         local clock = os.clock()
-        local ok, res = xpcall(abil, log.error, proto.params)
-        local passed = os.clock() - clock
-        if passed > 0.2 then
-            log.debug(('Method [%s] takes [%.3f]sec.'):format(method, passed))
-        end
-        log.debug('Finish method:', method)
-        if not proto.id then
-            return
-        end
-        if ok then
-            m.response(proto.id, res)
-        else
-            m.responseErr(proto.id, ErrorCodes.InternalError, res)
-        end
+        ok, res = xpcall(abil, log.error, proto.params)
+        passed = os.clock() - clock
     end)
 end
 

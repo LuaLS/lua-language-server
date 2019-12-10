@@ -38,8 +38,5 @@ return function (uri, callback)
                 message = lang.script.DIAG_UNUSED_FUNCTION,
             }
         end
-        await.delay(function ()
-            return files.globalVersion
-        end)
     end)
 end

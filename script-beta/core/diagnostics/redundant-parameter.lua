@@ -60,10 +60,6 @@ return function (uri, callback)
             return
         end
 
-        await.delay(function ()
-            return files.globalVersion
-        end)
-
         local func = source.node
         local funcArgs
         vm.eachDef(func, function (info)

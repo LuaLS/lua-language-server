@@ -245,8 +245,10 @@ function m.findGlobals(name)
             local ast = m.getAst(uri)
             if ast then
                 local globals = vm.getGlobals(ast.ast)
-                for name in pairs(globals) do
-                    file.globals[name] = true
+                if globals then
+                    for name in pairs(globals) do
+                        file.globals[name] = true
+                    end
                 end
             end
         end

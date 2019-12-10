@@ -69,29 +69,36 @@ function m.setText(uri, text)
         return
     end
     file.text = text
-    file.lastAst = file.ast or file.lastAst
-    file.vm = nil
-    file.lines = nil
-    file.ast = nil
-    file.globals = nil
-    file.links = nil
     m.globalVersion = m.globalVersion + 1
-    m.needRefreshUri = originUri
+    if not m.needRefreshUri then
+        m.needRefreshUri = {}
+    end
+    m.needRefreshUri[file] = true
 end
 
 --- 刷新缓存
 ---|必须在自动完成请求后执行，否则会影响自动完成的响应速度
 function m.refresh()
-    local uri = m.needRefreshUri
-    if not uri then
-        return false
+    local refreshed = m.needRefreshUri
+    if not refreshed then
+        return
     end
-    log.debug('Refresh cache.')
-    m.needRefreshUri = nil
-    vm.refreshCache()
 
     local diagnostic = require 'provider.diagnostic'
-    diagnostic.refresh(uri)
+    log.debug('Refresh cache.')
+    m.needRefreshUri = nil
+    local lastFile
+    for file in pairs(refreshed) do
+        lastFile = file
+        file.vm = nil
+        file.lines = nil
+        file.ast = nil
+        file.globals = nil
+        file.links = nil
+    end
+    vm.refreshCache()
+
+    diagnostic.refresh(lastFile.uri)
     return true
 end
 

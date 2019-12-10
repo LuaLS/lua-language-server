@@ -80,13 +80,36 @@ function m.delay(getVersion)
     return coroutine.yield()
 end
 
+local function buildInfo(waker)
+    local co
+    for i = 1, 100 do
+        local n, v = debug.getupvalue(waker, i)
+        if not n then
+            return nil
+        end
+        if n == 'co' then
+            co = v
+            break
+        end
+    end
+    if not co then
+        return nil
+    end
+    return debug.traceback(co)
+end
+
 --- 步进
 function m.step()
     local waker = m.delayQueue[m.delayQueueIndex]
     if waker then
         m.delayQueue[m.delayQueueIndex] = false
         m.delayQueueIndex = m.delayQueueIndex + 1
+        local clock = os.clock()
         waker()
+        local passed = os.clock() - clock
+        if passed > 0.01 then
+            log.warn(('Await step takes [%.3f] sec.\n%s'):format(passed, buildInfo(waker)))
+        end
         return true
     else
         m.delayQueue = {}

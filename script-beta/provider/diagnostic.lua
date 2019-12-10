@@ -184,6 +184,9 @@ function m.refresh(uri)
         if not m._start then
             return
         end
+        await.delay(function ()
+            return files.globalVersion
+        end)
         local clock = os.clock()
         if uri then
             m.doDiagnostic(uri)

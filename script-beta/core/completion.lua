@@ -117,8 +117,15 @@ end
 
 local function buildFunctionSnip(source)
     local name = getName(source)
-    local arg  = getArg(source)
-    return ('%s(%s)'):format(name, arg)
+    local args = getArg(source)
+    local id = 0
+    args = args:gsub('[^,]+', function (arg)
+        id = id + 1
+        return arg:gsub('^(%s*)(.+)', function (sp, word)
+            return ('%s${%d:%s}'):format(sp, id, word)
+        end)
+    end)
+    return ('%s(%s)'):format(name, args)
 end
 
 local function buildFunction(results, source, oop, data)
@@ -131,6 +138,7 @@ local function buildFunction(results, source, oop, data)
         snipData.kind = ckind.Snippet
         snipData.label = snipData.label .. '()'
         snipData.insertText = buildFunctionSnip(source)
+        snipData.insertTextFormat = 2
         results[#results+1] = snipData
     end
 end

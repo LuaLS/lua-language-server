@@ -134,6 +134,7 @@ ass$
         kind = CompletionItemKind.Snippet,
         documentation = EXISTS,
         insertText = EXISTS,
+        insertTextFormat = 2,
         detail = EXISTS,
     },
 }

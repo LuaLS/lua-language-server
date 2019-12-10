@@ -312,13 +312,14 @@ proto.on('textDocument/completion', function (params)
     if not result then
         return nil
     end
-
     local items = {}
     for i, res in ipairs(result) do
         items[i] = {
-            label = res.label,
-            kind  = res.kind,
-            sortText = ('%04d'):format(i),
+            label      = res.label,
+            kind       = res.kind,
+            sortText   = ('%04d'):format(i),
+            insertText = res.insertText,
+            insertTextFormat = res.insertTextFormat,
         }
     end
 

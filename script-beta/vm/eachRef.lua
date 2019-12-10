@@ -406,6 +406,9 @@ local function ofGlobal(source, callback)
 end
 
 local function ofField(source, callback)
+    if not source then
+        return
+    end
     local parent = source.parent
     local key    = guide.getKeyName(source)
     if parent.type == 'tablefield'

@@ -38,4 +38,5 @@ return function (source, caller)
     if source.type == 'function' then
         return asFunction(source, caller)
     end
+    return ''
 end

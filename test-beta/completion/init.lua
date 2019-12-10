@@ -219,6 +219,14 @@ loc$
 ]]
 {
     {
+        label = 'local',
+        kind = CompletionItemKind.Keyword,
+    },
+    {
+        label = 'local function',
+        kind = CompletionItemKind.Snippet,
+    },
+    {
         label = 'collectgarbage',
         kind = CompletionItemKind.Function,
     },
@@ -226,20 +234,20 @@ loc$
         label = 'collectgarbage()',
         kind = CompletionItemKind.Snippet,
     },
-    {
-        label = 'local',
-        kind = CompletionItemKind.Keyword,
-    },
-    {
-        label = 'local function',
-        kind = CompletionItemKind.Snippet,
-    }
 }
 
 TEST [[
 do$
 ]]
 {
+    {
+        label = 'do',
+        kind = CompletionItemKind.Keyword,
+    },
+    {
+        label = 'do .. end',
+        kind = CompletionItemKind.Snippet,
+    },
     {
         label = 'dofile',
         kind  = CompletionItemKind.Function,
@@ -264,14 +272,6 @@ do$
         label = 'loadfile()',
         kind  = CompletionItemKind.Snippet,
     },
-    {
-        label = 'do',
-        kind = CompletionItemKind.Keyword,
-    },
-    {
-        label = 'do .. end',
-        kind = CompletionItemKind.Snippet,
-    }
 }
 
 TEST [[

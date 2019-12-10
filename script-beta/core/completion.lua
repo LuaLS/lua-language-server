@@ -259,6 +259,7 @@ local keyWordMap = {
 {'and'},
 {'break'},
 {'do', function (ast, text, start, results)
+    --local stop = guide.eachSourceContain()
     if config.config.completion.keywordSnippet then
         guide.eachSourceContain()
         results[#results+1] = {
@@ -342,7 +343,10 @@ local function checkKeyWord(ast, text, start, word, results)
             }
             local func = data[2]
             if func then
-                func(ast, text, start, results)
+                local stop = func(ast, text, start, results)
+                if stop then
+                    return true
+                end
             end
         end
     end
@@ -359,10 +363,13 @@ local function tryWord(ast, text, offset, results)
         if parent then
             checkField(word, start, parent, oop, results)
         else
+            local stop = checkKeyWord(ast, text, start, word, results)
+            if stop then
+                return
+            end
             checkLocal(ast, word, start, results)
             local env = guide.getLocal(ast.ast, '_ENV', start)
             checkField(word, start, env, false, results)
-            checkKeyWord(ast, text, start, word, results)
         end
     end
     checkCommon(word, text, results)

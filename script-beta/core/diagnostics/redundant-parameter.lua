@@ -64,9 +64,8 @@ return function (uri, callback)
         local funcArgs
         vm.eachDef(func, function (info)
             local src = info.source
-            local f = src.value
-            if f and f.type == 'function' then
-                local args = countFuncArgs(f)
+            if src.type == 'function' then
+                local args = countFuncArgs(src)
                 if not funcArgs or args > funcArgs then
                     funcArgs = args
                 end

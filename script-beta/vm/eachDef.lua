@@ -20,6 +20,7 @@ end
 function vm.eachDef(source, callback)
     local results = {}
     local valueUris = {}
+    local valueInfos = {}
     local sourceUri = guide.getRoot(source).uri
     vm.eachRef(source, function (info)
         if info.mode == 'declare'
@@ -28,6 +29,7 @@ function vm.eachDef(source, callback)
         or info.mode == 'value'
         or info.mode == 'library' then
             results[#results+1] = info
+            valueInfos[info.source] = info
             local src = info.source
             if info.mode == 'return' then
                 local uri = guide.getRoot(src).uri
@@ -37,9 +39,15 @@ function vm.eachDef(source, callback)
     end)
 
     local res
+    local used = {}
     for _, info in ipairs(results) do
         local src = info.source
-        local destUri = guide.getRoot(src).uri
+        local destUri
+        if used[src] then
+            goto CONTINUE
+        end
+        used[src] = true
+        destUri = guide.getRoot(src).uri
         -- 如果是library，则直接放行
         if src.library then
             res = callback(info)
@@ -53,6 +61,10 @@ function vm.eachDef(source, callback)
         or src.type == 'tableindex'
         or src.type == 'setglobal' then
             res = callback(info)
+            if src.value and valueInfos[src.value] then
+                used[src.value] = true
+                res = callback(valueInfos[src.value])
+            end
             goto CONTINUE
         end
         -- 如果是同一个文件，则检查位置关系后放行

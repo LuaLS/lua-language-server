@@ -20,10 +20,12 @@ local function asFunction(source, caller)
     if parent and parent.type == 'setmethod' then
         methodDef = true
     end
-    if caller.type == 'method'
-    or caller.type == 'getmethod'
-    or caller.type == 'setmethod' then
-        methodCall = true
+    if caller then
+        if caller.type == 'method'
+        or caller.type == 'getmethod'
+        or caller.type == 'setmethod' then
+            methodCall = true
+        end
     end
     if not methodDef and methodCall then
         return table.concat(args, ', ', 2)

@@ -127,14 +127,14 @@ ass$
         label = 'assert',
         kind = CompletionItemKind.Function,
         documentation = EXISTS,
-        detail = '(function)',
+        detail = EXISTS,
     },
     {
         label = 'assert()',
         kind = CompletionItemKind.Snippet,
         documentation = EXISTS,
         insertText = EXISTS,
-        detail = '(function)',
+        detail = EXISTS,
     },
 }
 

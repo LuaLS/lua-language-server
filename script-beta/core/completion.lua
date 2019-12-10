@@ -3,6 +3,12 @@ local files    = require 'files'
 local guide    = require 'parser.guide'
 local matchKey = require 'core.matchKey'
 local vm       = require 'vm'
+local library  = require 'library'
+local getLabel = require 'core.hover.label'
+local getName  = require 'core.hover.name'
+local getArg   = require 'core.hover.arg'
+local config   = require 'config'
+local util     = require 'utility'
 
 local function isSpace(char)
     if char == ' '
@@ -23,7 +29,7 @@ local function findWord(text, offset)
             return text:sub(i+1, offset)
         end
     end
-    return nil
+    return text:sub(1, offset)
 end
 
 local function findAnyPos(text, offset)
@@ -109,6 +115,39 @@ local function checkField(ast, text, word, offset, results)
     end)
 end
 
+local function buildFunctionSnip(source)
+    local name = getName(source)
+    local arg  = getArg(source)
+    return ('%s(%s)'):format(name, arg)
+end
+
+local function buildFunction(results, source, oop, data)
+    local snipType = config.config.completion.callSnippet
+    if snipType == 'Disable' or snipType == 'Both' then
+        results[#results+1] = data
+    end
+    if snipType == 'Both' or snipType == 'Replace' then
+        local snipData = util.deepCopy(data)
+        snipData.kind = ckind.Snippet
+        snipData.label = snipData.label .. '()'
+        snipData.insertText = buildFunctionSnip(source)
+        results[#results+1] = snipData
+    end
+end
+
+local function checkLibrary(ast, text, word, offset, results)
+    for name, lib in pairs(library.global) do
+        if matchKey(word, name) then
+            buildFunction(results, lib, false, {
+                label = name,
+                kind  = ckind.Function,
+                documentation = lib.description,
+                detail = getLabel(lib),
+            })
+        end
+    end
+end
+
 local function checkCommon(word, text, results)
     local used = {}
     for _, result in ipairs(results) do
@@ -143,6 +182,7 @@ local function tryWord(ast, text, offset, results)
     if not isInString(ast, offset) then
         checkLocal(ast, word, offset, results)
         checkField(ast, text, word, offset, results)
+        checkLibrary(ast, text, word, offset, results)
     end
     checkCommon(word, text, results)
 end

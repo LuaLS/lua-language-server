@@ -90,12 +90,14 @@ function m.doMethod(proto)
         return
     end
     await.create(function ()
+        log.debug('Start method:', method)
         local clock = os.clock()
         local ok, res = xpcall(abil, log.error, proto.params)
         local passed = os.clock() - clock
         if passed > 0.2 then
             log.debug(('Method [%s] takes [%.3f]sec.'):format(method, passed))
         end
+        log.debug('Finish method:', method)
         if not proto.id then
             return
         end

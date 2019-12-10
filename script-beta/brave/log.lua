@@ -5,6 +5,7 @@ local tostring       = tostring
 local tableConcat    = table.concat
 local debugTraceBack = debug.traceback
 local debugGetInfo   = debug.getinfo
+local osClock        = os.clock
 
 _ENV = nil
 
@@ -23,6 +24,7 @@ local function pushLog(level, ...)
         msg   = str,
         src   = info.source,
         line  = info.currentline,
+        clock = osClock(),
     })
     return str
 end

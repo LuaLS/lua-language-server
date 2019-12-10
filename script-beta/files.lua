@@ -69,7 +69,7 @@ function m.setText(uri, text)
         return
     end
     file.text = text
-    file.lastAst = file.ast
+    file.lastAst = file.ast or file.lastAst
     file.vm = nil
     file.lines = nil
     file.ast = nil
@@ -167,7 +167,12 @@ function m.getAst(uri)
     end
     local file = m.fileMap[uri]
     if file.ast == nil then
+        local clock = os.clock()
         local state, err = parser:compile(file.text, 'lua', config.config.runtime.version)
+        local passed = os.clock() - clock
+        if passed > 0.01 then
+            log.warn(('Compile [%s] takes [%.3f] sec, size [%.3f] kb.'):format(uri, passed, #file.text / 1000))
+        end
         if state then
             state.uri = file.uri
             state.ast.uri = file.uri

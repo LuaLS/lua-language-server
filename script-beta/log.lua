@@ -60,7 +60,7 @@ local function pushLog(level, ...)
         str = str .. '\n' .. debugTraceBack(nil, 3)
     end
     local info = debugGetInfo(3, 'Sl')
-    return m.raw(0, level, str, info.source, info.currentline)
+    return m.raw(0, level, str, info.source, info.currentline, osClock())
 end
 
 function m.info(...)
@@ -83,7 +83,7 @@ function m.error(...)
     pushLog('error', ...)
 end
 
-function m.raw(thd, level, msg, source, currentline)
+function m.raw(thd, level, msg, source, currentline, clock)
     if level == 'error' then
         ioStdErr:write(msg .. '\n')
     end
@@ -91,7 +91,7 @@ function m.raw(thd, level, msg, source, currentline)
     if not m.file then
         return
     end
-    local sec, ms = mathModf(m.startTime + osClock())
+    local sec, ms = mathModf(m.startTime + clock)
     local timestr = osDate('%H:%M:%S', sec)
     local agl = ''
     if #level < 5 then

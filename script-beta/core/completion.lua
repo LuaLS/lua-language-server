@@ -369,7 +369,7 @@ local function tryWord(ast, text, offset, results)
 end
 
 local function completion(uri, offset)
-    local ast = files.getLastAst(uri)
+    local ast = files.getAst(uri)
     if not ast then
         return nil
     end

@@ -193,20 +193,6 @@ function m.getAst(uri)
     return file.ast
 end
 
-function m.getLastAst(uri)
-    if platform.OS == 'Windows' then
-        uri = uri:lower()
-    end
-    local file = m.fileMap[uri]
-    if file.ast then
-        return file.ast
-    end
-    if file.lastAst then
-        return file.lastAst
-    end
-    return m.getAst(uri)
-end
-
 --- 获取文件行信息
 ---@param uri string
 ---@return table lines

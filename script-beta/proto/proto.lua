@@ -34,7 +34,7 @@ function m.response(id, res)
     data.id     = id
     data.result = res
     local buf = jsonrpc.encode(data)
-    log.debug('Response', id, #buf)
+    --log.debug('Response', id, #buf)
     io.stdout:write(buf)
 end
 
@@ -50,7 +50,7 @@ function m.responseErr(id, code, message)
             message = message,
         }
     }
-    log.debug('ResponseErr', id, #buf)
+    --log.debug('ResponseErr', id, #buf)
     io.stdout:write(buf)
 end
 
@@ -59,7 +59,7 @@ function m.notify(name, params)
         method = name,
         params = params,
     }
-    log.debug('Notify', name, #buf)
+    --log.debug('Notify', name, #buf)
     io.stdout:write(buf)
 end
 
@@ -70,7 +70,7 @@ function m.awaitRequest(name, params)
         method = name,
         params = params,
     }
-    log.debug('Request', name, #buf)
+    --log.debug('Request', name, #buf)
     io.stdout:write(buf)
     return await.wait(function (waker)
         m.waiting[id] = waker

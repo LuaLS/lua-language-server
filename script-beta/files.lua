@@ -69,16 +69,30 @@ function m.setText(uri, text)
         return
     end
     file.text = text
+    file.lastAst = file.ast
     file.vm = nil
     file.lines = nil
     file.ast = nil
     file.globals = nil
     file.links = nil
     m.globalVersion = m.globalVersion + 1
+    m.needRefreshUri = originUri
+end
+
+--- 刷新缓存
+---|必须在自动完成请求后执行，否则会影响自动完成的响应速度
+function m.refresh()
+    local uri = m.needRefreshUri
+    if not uri then
+        return false
+    end
+    log.debug('Refresh cache.')
+    m.needRefreshUri = nil
     vm.refreshCache()
 
     local diagnostic = require 'provider.diagnostic'
-    diagnostic.refresh(originUri)
+    diagnostic.refresh(uri)
+    return true
 end
 
 --- 监听编译完成
@@ -125,7 +139,7 @@ function m.remove(uri)
     m.globalVersion = m.globalVersion + 1
     vm.refreshCache()
 
-    local diagnostic = require 'service.diagnostic'
+    local diagnostic = require 'provider.diagnostic'
     diagnostic.refresh(file.uri)
     diagnostic.clear(file.uri)
 end
@@ -165,6 +179,20 @@ function m.getAst(uri)
         end
     end
     return file.ast
+end
+
+function m.getLastAst(uri)
+    if platform.OS == 'Windows' then
+        uri = uri:lower()
+    end
+    local file = m.fileMap[uri]
+    if file.ast then
+        return file.ast
+    end
+    if file.lastAst then
+        return file.lastAst
+    end
+    return m.getAst(uri)
 end
 
 --- 获取文件行信息

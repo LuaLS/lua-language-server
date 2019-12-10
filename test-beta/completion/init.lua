@@ -47,7 +47,7 @@ function TEST(script)
         local new_script = script:gsub('%$', '')
 
         files.setText('', new_script)
-        local result = core('', pos)
+        local result = core.completion('', pos)
         if expect then
             assert(result)
             assert(eq(expect, result))

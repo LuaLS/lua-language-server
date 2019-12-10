@@ -4,6 +4,7 @@ local await  = require 'await'
 local timer  = require 'timer'
 local proto  = require 'proto'
 local vm     = require 'vm'
+local files  = require 'files'
 
 local m = {}
 m.type = 'service'
@@ -115,11 +116,16 @@ end
 
 function m.startTimer()
     while true do
+        ::CONTINUE::
         pub.step()
-        if not await.step() then
-            thread.sleep(0.001)
-            timer.update()
+        if await.step() then
+            goto CONTINUE
         end
+        if files.refresh() then
+            goto CONTINUE
+        end
+        thread.sleep(0.001)
+        timer.update()
     end
 end
 

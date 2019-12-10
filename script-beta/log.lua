@@ -80,7 +80,7 @@ function m.warn(...)
 end
 
 function m.error(...)
-    pushLog('error', ...)
+    return pushLog('error', ...)
 end
 
 function m.raw(thd, level, msg, source, currentline, clock)
@@ -89,7 +89,7 @@ function m.raw(thd, level, msg, source, currentline, clock)
     end
     init_log_file()
     if not m.file then
-        return
+        return ''
     end
     local sec, ms = mathModf(m.startTime + clock)
     local timestr = osDate('%H:%M:%S', sec)
@@ -108,7 +108,7 @@ function m.raw(thd, level, msg, source, currentline, clock)
     if m.size > m.maxSize then
         m.file:write('[REACH MAX SIZE]')
     end
-    return
+    return buf
 end
 
 function m.init(root, path)

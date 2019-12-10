@@ -113,26 +113,29 @@ local function isSameSource(source, pos)
     return source.start <= pos and source.finish >= pos
 end
 
-local function checkField(ast, text, word, offset, results)
-    local myStart = offset - #word + 1
-    local parent, oop = findParent(ast, text, myStart - 1)
-    if not parent then
-        parent = guide.getLocal(ast.ast, '_ENV', offset)
-        if not parent then
-            return
-        end
-    end
+local function checkField(word, start, parent, oop, results)
     local used = {}
     vm.eachField(parent, function (info)
         local key = info.key
         if key
         and key:sub(1, 1) == 's'
-        and not isSameSource(info.source, myStart) then
+        and not isSameSource(info.source, start) then
             local name = key:sub(3)
             if not used[name] and matchKey(word, name) then
+                local kind = ckind.Field
+                local literal = vm.getLiteral(info.source)
+                if literal ~= nil then
+                    kind = ckind.Enum
+                end
                 results[#results+1] = {
                     label = name,
-                    kind  = ckind.Field,
+                    kind  = kind,
+                    id    = stack(function ()
+                        return {
+                            detail = getLabel(info.source),
+                            description = info.source.description,
+                        }
+                    end)
                 }
             end
             used[name] = true
@@ -168,7 +171,7 @@ local function buildFunction(results, source, oop, data)
     end
 end
 
-local function checkLibrary(ast, text, word, offset, results)
+local function checkLibrary(word, results)
     for name, lib in pairs(library.global) do
         if matchKey(word, name) then
             if lib.type == 'function' then
@@ -218,10 +221,17 @@ local function tryWord(ast, text, offset, results)
     if not word then
         return nil
     end
+    local start = offset - #word + 1
     if not isInString(ast, offset) then
-        checkLocal(ast, word, offset, results)
-        checkField(ast, text, word, offset, results)
-        checkLibrary(ast, text, word, offset, results)
+        local parent, oop = findParent(ast, text, start - 1)
+        if parent then
+            checkField(word, start, parent, oop, results)
+        else
+            checkLocal(ast, word, start, results)
+            local env = guide.getLocal(ast.ast, '_ENV', start)
+            checkField(word, start, env, false, results)
+            checkLibrary(word, results)
+        end
     end
     checkCommon(word, text, results)
 end

@@ -15,22 +15,14 @@ local function eq(a, b)
     if tp1 == 'table' then
         local mark = {}
         for k in pairs(a) do
-            if type(k) == 'number'
-            or k == 'label'
-            or k == 'kind' then
-                if not eq(a[k], b[k]) then
-                    return false
-                end
-                mark[k] = true
+            if not eq(a[k], b[k]) then
+                return false
             end
+            mark[k] = true
         end
         for k in pairs(b) do
-            if type(k) == 'number'
-            or k == 'label'
-            or k == 'kind' then
-                if not mark[k] then
-                    return false
-                end
+            if not mark[k] then
+                return false
             end
         end
         return true
@@ -48,6 +40,13 @@ function TEST(script)
 
         files.setText('', new_script)
         local result = core.completion('', pos)
+        for _, item in ipairs(result) do
+            for k in pairs(item) do
+                if k ~= 'label' and k ~= 'kind' then
+                    item[k] = nil
+                end
+            end
+        end
         if expect then
             assert(result)
             assert(eq(expect, result))
@@ -167,13 +166,12 @@ TEST [[
 local t = {
     abc = 1,
 }
-t.a$
+t.ab$
 ]]
 {
     {
         label = 'abc',
         kind = CompletionItemKind.Enum,
-        detail = '(number) = 1',
     }
 }
 

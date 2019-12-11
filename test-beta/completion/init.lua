@@ -283,6 +283,10 @@ while true d$
         label = 'do',
         kind = CompletionItemKind.Keyword,
     },
+    {
+        label = 'do .. end',
+        kind = CompletionItemKind.Snippet,
+    },
 }
 
 TEST [[

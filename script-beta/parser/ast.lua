@@ -1077,6 +1077,9 @@ local Defs = {
         return tableUnpack(keys)
     end,
     LocalAttr = function (attrs)
+        if #attrs == 0 then
+            return nil
+        end
         for i = 1, #attrs do
             local attr = attrs[i]
             local attrAst = attr

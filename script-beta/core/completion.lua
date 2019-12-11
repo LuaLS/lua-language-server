@@ -360,29 +360,15 @@ end]]
 end},
 {'function', function (ast, text, start, results)
     if config.config.completion.keywordSnippet then
-        local spStart = skipSpace(text, start - 1)
-        local before  = findWord(text, spStart)
-        if before == 'local' then
-            results[#results+1] = {
-                label = 'function ()',
-                kind  = ckind.Snippet,
-                insertTextFormat = 2,
-                insertText = [[
-function ($1)
-    $0
-end]]
-            }
-        else
-            results[#results+1] = {
-                label = 'function ()',
-                kind  = ckind.Snippet,
-                insertTextFormat = 2,
-                insertText = [[
+        results[#results+1] = {
+            label = 'function ()',
+            kind  = ckind.Snippet,
+            insertTextFormat = 2,
+            insertText = [[
 function $1($2)
     $0
 end]]
-            }
-        end
+        }
     end
 end},
 {'goto'},

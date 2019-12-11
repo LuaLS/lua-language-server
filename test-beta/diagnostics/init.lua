@@ -70,9 +70,24 @@ local <!x!>
 ]]
 
 TEST [[
+local x <close>
+]]
+
+TEST [[
 local function x()
 end
 x()
+]]
+
+TEST [[
+return function (x)
+    x.a = 1
+end
+]]
+
+TEST [[
+local <!t!> = {}
+<!t!>.a = 1
 ]]
 
 TEST([[
@@ -91,7 +106,7 @@ local <!x!> = <!function () end!>
 
 TEST [[
 local <!x!>
-x = <!function () end!>
+<!x!> = <!function () end!>
 ]]
 
 
@@ -338,18 +353,18 @@ return mt
 
 TEST [[
 local <!mt!> = {}
-function mt:f()
+function <!mt!>:f()
 end
 ]]
 
 TEST [[
 local <!x!> = {}
-x.a = 1
+<!x!>.a = 1
 ]]
 
 TEST [[
 local <!x!> = {}
-x['a'] = 1
+<!x!>['a'] = 1
 ]]
 
 TEST [[
@@ -541,7 +556,7 @@ end
 
 TEST [[
 local <!t!> = {}
-t[1] = 1
+<!t!>[1] = 1
 ]]
 
 --TEST [[

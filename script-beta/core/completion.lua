@@ -75,6 +75,8 @@ local function findSymbol(text, offset)
         or char == ':'
         or char == '#' then
             return char, i
+        else
+            return nil
         end
         ::CONTINUE::
     end
@@ -474,10 +476,6 @@ local function checkKeyWord(ast, text, start, word, results)
     end
 end
 
-local function checkDot(ast, start, results)
-
-end
-
 local function tryWord(ast, text, offset, results)
     local word, start = findWord(text, offset)
     if not word then
@@ -508,8 +506,12 @@ local function trySymbol(ast, text, offset, results)
     if isInString(ast, offset) then
         return nil
     end
-    if symbol == '.' then
-        checkDot(ast, start, results)
+    if symbol == '.'
+    or symbol == ':' then
+        local parent, oop = findParent(ast, text, start)
+        if parent then
+            checkField('', start, parent, oop, results)
+        end
     end
 end
 

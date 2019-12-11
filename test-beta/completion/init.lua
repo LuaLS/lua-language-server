@@ -298,12 +298,10 @@ t.$
     {
         label = 'a',
         kind = CompletionItemKind.Field,
-        detail = EXISTS,
     },
     {
         label = 'b',
         kind = CompletionItemKind.Field,
-        detail = EXISTS,
     },
 }
 
@@ -316,12 +314,10 @@ t.   $
     {
         label = 'a',
         kind = CompletionItemKind.Field,
-        detail = EXISTS,
     },
     {
         label = 'b',
         kind = CompletionItemKind.Field,
-        detail = EXISTS,
     },
 }
 
@@ -335,15 +331,10 @@ t:$
     {
         label = 'b',
         kind = CompletionItemKind.Method,
-        documentation = EXISTS,
-        detail = EXISTS,
     },
     {
         label = 'b()',
         kind = CompletionItemKind.Snippet,
-        documentation = EXISTS,
-        detail = EXISTS,
-        insertText = EXISTS,
     },
 }
 
@@ -358,20 +349,6 @@ xxx()
     {
         label = 'a',
         kind = CompletionItemKind.Field,
-        detail = EXISTS,
-    },
-    {
-        label = 'xxx',
-        kind = CompletionItemKind.Function,
-        documentation = EXISTS,
-        detail = EXISTS,
-    },
-    {
-        label = 'xxx()',
-        kind = CompletionItemKind.Snippet,
-        documentation = EXISTS,
-        detail = EXISTS,
-        insertText = EXISTS,
     },
 }
 

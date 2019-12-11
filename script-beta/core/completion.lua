@@ -7,6 +7,7 @@ local library  = require 'library'
 local getLabel = require 'core.hover.label'
 local getName  = require 'core.hover.name'
 local getArg   = require 'core.hover.arg'
+local getDesc  = require 'core.hover.description'
 local config   = require 'config'
 local util     = require 'utility'
 
@@ -124,16 +125,6 @@ local function buildFunction(results, source, oop, data)
     end
 end
 
-local function buildDesc(source)
-    if source.description then
-        return source.description
-    end
-    local lib = vm.getLibrary(source)
-    if lib then
-        return lib.description
-    end
-end
-
 local function checkLocal(ast, word, offset, results)
     local locals = guide.getVisibleLocals(ast.ast, offset)
     for name, source in pairs(locals) do
@@ -145,7 +136,7 @@ local function checkLocal(ast, word, offset, results)
                     id     = stack(function ()
                         return {
                             detail      = getLabel(source),
-                            description = buildDesc(source),
+                            description = getDesc(source),
                         }
                     end),
                 })
@@ -156,7 +147,7 @@ local function checkLocal(ast, word, offset, results)
                     id     = stack(function ()
                         return {
                             detail      = getLabel(source),
-                            description = buildDesc(source),
+                            description = getDesc(source),
                         }
                     end),
                 }
@@ -201,7 +192,7 @@ local function checkField(word, start, parent, oop, results)
                 id    = stack(function ()
                     return {
                         detail      = getLabel(info.source),
-                        description = buildDesc(info.source),
+                        description = getDesc(info.source),
                     }
                 end),
             })
@@ -220,7 +211,7 @@ local function checkField(word, start, parent, oop, results)
                 id    = stack(function ()
                     return {
                         detail      = getLabel(info.source),
-                        description = buildDesc(info.source),
+                        description = getDesc(info.source),
                     }
                 end)
             }

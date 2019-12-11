@@ -39,8 +39,17 @@ local function asString(source)
     end
 end
 
+local function tryLibrary(source)
+    local lib = vm.getLibrary(source)
+    if not lib then
+        return
+    end
+    return lib.description
+end
+
 return function (source)
     if source.type == 'string' then
         return asString(source)
     end
+    return tryLibrary(source)
 end

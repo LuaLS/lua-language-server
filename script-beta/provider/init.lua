@@ -344,8 +344,8 @@ proto.on('completionItem/resolve', function (item)
     end
     local resolved = core.resolve(id)
     item.detail = resolved.detail
-    item.documentation = resolved.documentation and {
-        value = resolved.documentation,
+    item.documentation = resolved.description and {
+        value = resolved.description,
         kind  = 'markdown',
     }
     return item

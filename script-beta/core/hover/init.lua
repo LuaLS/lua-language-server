@@ -7,6 +7,7 @@ local util      = require 'utility'
 
 local function getHoverAsFunction(source)
     local values = vm.getValue(source)
+    local desc   = getDesc(source)
     local labels = {}
     local defs = 0
     local protos = 0
@@ -29,8 +30,9 @@ local function getHoverAsFunction(source)
 
     if defs == 1 and other == 0 then
         return {
-            label  = next(labels),
-            source = source,
+            label       = next(labels),
+            source      = source,
+            description = desc,
         }
     end
 
@@ -51,8 +53,9 @@ local function getHoverAsFunction(source)
     end
     local label = table.concat(lines, '\n')
     return {
-        label  = label,
-        source = source,
+        label       = label,
+        source      = source,
+        description = desc,
     }
 end
 
@@ -64,8 +67,8 @@ local function getHoverAsValue(source)
     local desc  = getDesc(source)
     return {
         label       = label,
-        description = desc,
         source      = source,
+        description = desc,
     }
 end
 

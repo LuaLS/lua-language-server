@@ -41,6 +41,7 @@ function TEST(script)
         files.setText('', new_script)
         local result = core.completion('', pos)
         for _, item in ipairs(result) do
+            core.resolve(item.id)
             for k in pairs(item) do
                 if k ~= 'label' and k ~= 'kind' then
                     item[k] = nil

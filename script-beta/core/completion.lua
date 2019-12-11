@@ -8,8 +8,10 @@ local getLabel = require 'core.hover.label'
 local getName  = require 'core.hover.name'
 local getArg   = require 'core.hover.arg'
 local getDesc  = require 'core.hover.description'
+local getHover = require 'core.hover'
 local config   = require 'config'
 local util     = require 'utility'
+local markdown = require 'provider.markdown'
 
 local stackID = 0
 local stacks = {}
@@ -118,6 +120,14 @@ local function buildDetail(source)
     return types
 end
 
+local function buildDesc(source)
+    local hover = getHover.get(source)
+    local md = markdown()
+    md:add('lua', hover.label)
+    md:add('md',  hover.description)
+    return md:string()
+end
+
 local function buildFunction(results, source, oop, data)
     local snipType = config.config.completion.callSnippet
     if snipType == 'Disable' or snipType == 'Both' then
@@ -132,7 +142,7 @@ local function buildFunction(results, source, oop, data)
         snipData.id  = stack(function ()
             return {
                 detail      = buildDetail(source),
-                description = getDesc(source),
+                description = buildDesc(source),
             }
         end)
         results[#results+1] = snipData
@@ -150,7 +160,7 @@ local function checkLocal(ast, word, offset, results)
                     id     = stack(function ()
                         return {
                             detail      = buildDetail(source),
-                            description = getDesc(source),
+                            description = buildDesc(source),
                         }
                     end),
                 })
@@ -161,7 +171,7 @@ local function checkLocal(ast, word, offset, results)
                     id     = stack(function ()
                         return {
                             detail      = buildDetail(source),
-                            description = getDesc(source),
+                            description = buildDesc(source),
                         }
                     end),
                 }
@@ -206,7 +216,7 @@ local function checkField(word, start, parent, oop, results)
                 id    = stack(function ()
                     return {
                         detail      = buildDetail(info.source),
-                        description = getDesc(info.source),
+                        description = buildDesc(info.source),
                     }
                 end),
             })
@@ -225,7 +235,7 @@ local function checkField(word, start, parent, oop, results)
                 id    = stack(function ()
                     return {
                         detail      = buildDetail(info.source),
-                        description = getDesc(info.source),
+                        description = buildDesc(info.source),
                     }
                 end)
             }

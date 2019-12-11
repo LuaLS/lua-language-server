@@ -156,7 +156,7 @@ proto.on('textDocument/hover', function (params)
     local lines  = files.getLines(uri)
     local text   = files.getText(uri)
     local offset = define.offset(lines, text, params.position)
-    local hover = core(uri, offset)
+    local hover = core.byUri(uri, offset)
     if not hover then
         return nil
     end

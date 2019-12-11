@@ -81,7 +81,7 @@ local function getHover(source)
     end
 end
 
-return function (uri, offset)
+local function getHoverByUri(uri, offset)
     local ast = files.getAst(uri)
     if not ast then
         return nil
@@ -100,3 +100,8 @@ return function (uri, offset)
     end)
     return hover
 end
+
+return {
+    get   = getHover,
+    byUri = getHoverByUri,
+}

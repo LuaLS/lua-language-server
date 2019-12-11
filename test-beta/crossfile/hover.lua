@@ -65,7 +65,7 @@ function TEST(data)
     files.setText(sourceUri, sourceScript)
 
     local sourcePos = (sourceList[1][1] + sourceList[1][2]) // 2
-    local hover = core(sourceUri, sourcePos)
+    local hover = core.byUri(sourceUri, sourcePos)
     assert(hover)
     if hover.label then
         hover.label = hover.label:gsub('\r\n', '\n')

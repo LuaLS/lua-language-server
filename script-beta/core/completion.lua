@@ -271,12 +271,22 @@ local function isInString(ast, offset)
 end
 
 local keyWordMap = {
-{'and'},
-{'break'},
 {'do', function (ast, text, start, results)
-    --local stop = guide.eachSourceContain()
+    local stop = guide.eachSourceContain(ast.ast, start, function (source)
+        if source.type == 'while'
+        or source.type == 'in'
+        or source.type == 'loop' then
+            for i = 1, #source.keyword do
+                if start == source.keyword[i] then
+                    return true
+                end
+            end
+        end
+    end)
+    if stop then
+        return true
+    end
     if config.config.completion.keywordSnippet then
-        guide.eachSourceContain()
         results[#results+1] = {
             label = 'do .. end',
             kind  = ckind.Snippet,
@@ -288,6 +298,8 @@ end]],
         }
     end
 end},
+{'and'},
+{'break'},
 {'else'},
 {'elseif', function (ast, text, start, results)
     if config.config.completion.keywordSnippet then
@@ -308,7 +320,7 @@ end},
             kind  = ckind.Snippet,
             insertTextFormat = 2,
             insertText = [[
-for ${1:key, value} in ${2:pairs(t)} do
+for ${1:key, value} in ${2:pairs(${3:t})} do
     $0
 end]]
         }
@@ -317,7 +329,7 @@ end]]
             kind  = ckind.Snippet,
             insertTextFormat = 2,
             insertText = [[
-for ${1:i} = ${2:1}, ${3:10, 2} do
+for ${1:i} = ${2:1}, ${3:10, 1} do
     $0
 end]]
         }
@@ -334,6 +346,11 @@ end},
         results[#results+1] = {
             label = 'local function',
             kind  = ckind.Snippet,
+            insertTextFormat = 2,
+            insertText = [[
+local function $1($2)
+    $0
+end]]
         }
     end
 end},

@@ -97,7 +97,10 @@ local function buildFunctionSnip(source)
     local name = getName(source):gsub('^.-[$.:]', '')
     local args = vm.eachDef(source, function (info)
         if info.source.type == 'function' then
-            return getArg(info.source)
+            local args = getArg(info.source)
+            if args ~= '' then
+                return args
+            end
         end
     end) or ''
     local id = 0
@@ -108,6 +111,11 @@ local function buildFunctionSnip(source)
         end)
     end)
     return ('%s(%s)'):format(name, args)
+end
+
+local function buildDetail(source)
+    local types = vm.getType(source)
+    return types
 end
 
 local function buildFunction(results, source, oop, data)
@@ -121,6 +129,12 @@ local function buildFunction(results, source, oop, data)
         snipData.label = snipData.label .. '()'
         snipData.insertText = buildFunctionSnip(source)
         snipData.insertTextFormat = 2
+        snipData.id  = stack(function ()
+            return {
+                detail      = buildDetail(source),
+                description = getDesc(source),
+            }
+        end)
         results[#results+1] = snipData
     end
 end
@@ -135,7 +149,7 @@ local function checkLocal(ast, word, offset, results)
                     kind   = ckind.Function,
                     id     = stack(function ()
                         return {
-                            detail      = getLabel(source),
+                            detail      = buildDetail(source),
                             description = getDesc(source),
                         }
                     end),
@@ -146,7 +160,7 @@ local function checkLocal(ast, word, offset, results)
                     kind   = ckind.Variable,
                     id     = stack(function ()
                         return {
-                            detail      = getLabel(source),
+                            detail      = buildDetail(source),
                             description = getDesc(source),
                         }
                     end),
@@ -191,7 +205,7 @@ local function checkField(word, start, parent, oop, results)
                 kind  = kind,
                 id    = stack(function ()
                     return {
-                        detail      = getLabel(info.source),
+                        detail      = buildDetail(info.source),
                         description = getDesc(info.source),
                     }
                 end),
@@ -210,7 +224,7 @@ local function checkField(word, start, parent, oop, results)
                 kind  = kind,
                 id    = stack(function ()
                     return {
-                        detail      = getLabel(info.source),
+                        detail      = buildDetail(info.source),
                         description = getDesc(info.source),
                     }
                 end)

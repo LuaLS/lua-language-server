@@ -315,19 +315,33 @@ proto.on('textDocument/completion', function (params)
     if not result then
         return nil
     end
+    local easy = true
     local items = {}
     for i, res in ipairs(result) do
-        items[i] = {
+        local item = {
             label            = res.label,
             kind             = res.kind,
-            data             = res.id and {
-                version = files.globalVersion,
-                id      = res.id,
-            },
             sortText         = ('%04d'):format(i),
             insertText       = res.insertText,
             insertTextFormat = res.insertTextFormat,
         }
+        if res.id then
+            if easy and os.clock() - clock < 0.05 then
+                local resolved = core.resolve(res.id)
+                item.detail = resolved.detail
+                item.documentation = resolved.description and {
+                    value = resolved.description,
+                    kind  = 'markdown',
+                }
+            else
+                easy = false
+                item.data = {
+                    version = files.globalVersion,
+                    id      = res.id,
+                }
+            end
+        end
+        items[i] = item
     end
     return items
 end)

@@ -28,6 +28,9 @@ local function findRef(source, offset, callback)
         return
     end
     vm.eachRef(source, function (info)
+        if info.source.library then
+            return
+        end
         if info.mode == 'declare'
         or info.mode == 'set'
         or info.mode == 'get'

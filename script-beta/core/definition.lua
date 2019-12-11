@@ -18,6 +18,9 @@ local function findDef(source, callback)
         return
     end
     vm.eachDef(source, function (info)
+        if info.source.library then
+            return
+        end
         if info.mode == 'declare'
         or info.mode == 'set'
         or info.mode == 'return' then

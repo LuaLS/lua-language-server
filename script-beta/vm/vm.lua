@@ -5,6 +5,7 @@ local setmetatable = setmetatable
 local assert       = assert
 local require      = require
 local type         = type
+local running      = coroutine.running
 
 _ENV = nil
 
@@ -22,12 +23,21 @@ local specials = {
 local m = {}
 
 function m.lock(tp, source)
-    if m.locked[tp][source] then
+    local co = running()
+    local master = m.locked[co]
+    if not master then
+        master = {}
+        m.locked[co] = master
+    end
+    if not master[tp] then
+        master[tp] = {}
+    end
+    if master[tp][source] then
         return nil
     end
-    m.locked[tp][source] = true
+    master[tp][source] = true
     return function ()
-        m.locked[tp][source] = nil
+        master[tp][source] = nil
     end
 end
 
@@ -69,15 +79,7 @@ function m.refreshCache()
         getMeta     = {},
         specials    = nil,
     }
-    m.locked = {
-        eachRef    = {},
-        eachField  = {},
-        eachMeta    = {},
-        getGlobals = {},
-        getLinks   = {},
-        getLibrary = {},
-        getValue   = {},
-    }
+    m.locked = setmetatable({}, { __mode = 'k' })
     m.cacheTracker[m.cache] = true
 end
 

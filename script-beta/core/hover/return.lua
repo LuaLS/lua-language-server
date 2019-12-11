@@ -23,7 +23,7 @@ local function asLibrary(source)
         if i == 1 then
             lines[i] = ('  -> %s'):format(vm.viewType(returns[i]))
         else
-            lines[i] = ('% 3d. %s'):format(i, returns[i])
+            lines[i] = ('% 3d. %s'):format(i, vm.viewType(returns[i]))
         end
     end
     return table.concat(lines, '\n')
@@ -49,7 +49,7 @@ local function asFunction(source)
         if i == 1 then
             lines[i] = ('  -> %s'):format(vm.viewType(returns[i]))
         else
-            lines[i] = ('% 3d. %s'):format(i, returns[i])
+            lines[i] = ('% 3d. %s'):format(i, vm.viewType(returns[i]))
         end
     end
     return table.concat(lines, '\n')

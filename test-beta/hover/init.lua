@@ -624,6 +624,16 @@ function f()
   2. nil
 ]]
 
+TEST [[
+local function f()
+    return nil
+end
+local <?x?> = f()
+]]
+[[
+local x: nil
+]]
+
 --TEST[[
 -----@class Class
 --local <?x?> = class()

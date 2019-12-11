@@ -38,8 +38,11 @@ local function asValue(source, title)
     pack[#pack+1] = name .. ':'
     pack[#pack+1] = class or type
     if literal then
-        pack[#pack+1] = '='
-        pack[#pack+1] = util.viewLiteral(literal)
+        local literalView = util.viewLiteral(literal)
+        if literalView then
+            pack[#pack+1] = '='
+            pack[#pack+1] = util.viewLiteral(literal)
+        end
     end
     if cont then
         pack[#pack+1] = cont

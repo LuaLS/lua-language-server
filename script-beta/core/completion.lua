@@ -299,8 +299,15 @@ local function isInString(ast, offset)
 end
 
 local keyWordMap = {
-{'do', function (ast, text, start, results)
-    if config.config.completion.keywordSnippet then
+{'do', function (hasSpace, results)
+    if hasSpace then
+        results[#results+1] = {
+            label = 'do .. end',
+            kind  = ckind.Snippet,
+            insertTextFormat = 2,
+            insertText = [[$0 end]],
+        }
+    else
         results[#results+1] = {
             label = 'do .. end',
             kind  = ckind.Snippet,
@@ -311,6 +318,7 @@ do
 end]],
         }
     end
+end, function (ast, start)
     return guide.eachSourceContain(ast.ast, start, function (source)
         if source.type == 'while'
         or source.type == 'in'
@@ -326,8 +334,15 @@ end},
 {'and'},
 {'break'},
 {'else'},
-{'elseif', function (ast, text, start, results)
-    if config.config.completion.keywordSnippet then
+{'elseif', function (hasSpace, results)
+    if hasSpace then
+        results[#results+1] = {
+            label = 'elseif .. then',
+            kind  = ckind.Snippet,
+            insertTextFormat = 2,
+            insertText = [[$1 then]],
+        }
+    else
         results[#results+1] = {
             label = 'elseif .. then',
             kind  = ckind.Snippet,
@@ -338,8 +353,27 @@ end},
 end},
 {'end'},
 {'false'},
-{'for', function (ast, text, start, results)
-    if config.config.completion.keywordSnippet then
+{'for', function (hasSpace, results)
+    if hasSpace then
+        results[#results+1] = {
+            label = 'for .. in',
+            kind  = ckind.Snippet,
+            insertTextFormat = 2,
+            insertText = [[
+${1:key, value} in ${2:pairs(${3:t})} do
+    $0
+end]]
+        }
+        results[#results+1] = {
+            label = 'for i = ..',
+            kind  = ckind.Snippet,
+            insertTextFormat = 2,
+            insertText = [[
+${1:i} = ${2:1}, ${3:10, 1} do
+    $0
+end]]
+        }
+    else
         results[#results+1] = {
             label = 'for .. in',
             kind  = ckind.Snippet,
@@ -360,8 +394,18 @@ end]]
         }
     end
 end},
-{'function', function (ast, text, start, results)
-    if config.config.completion.keywordSnippet then
+{'function', function (hasSpace, results)
+    if hasSpace then
+        results[#results+1] = {
+            label = 'function ()',
+            kind  = ckind.Snippet,
+            insertTextFormat = 2,
+            insertText = [[
+$1($2)
+    $0
+end]]
+        }
+    else
         results[#results+1] = {
             label = 'function ()',
             kind  = ckind.Snippet,
@@ -374,8 +418,18 @@ end]]
     end
 end},
 {'goto'},
-{'if', function (ast, text, start, results)
-    if config.config.completion.keywordSnippet then
+{'if', function (hasSpace, results)
+    if hasSpace then
+        results[#results+1] = {
+            label = 'if .. then',
+            kind  = ckind.Snippet,
+            insertTextFormat = 2,
+            insertText = [[
+$1 then
+    $0
+end]]
+        }
+    else
         results[#results+1] = {
             label = 'if .. then',
             kind  = ckind.Snippet,
@@ -387,8 +441,18 @@ end]]
         }
     end
 end},
-{'in', function (ast, text, start, results)
-    if config.config.completion.keywordSnippet then
+{'in', function (hasSpace, results)
+    if hasSpace then
+        results[#results+1] = {
+            label = 'in ..',
+            kind  = ckind.Snippet,
+            insertTextFormat = 2,
+            insertText = [[
+${1:pairs(${2:t})} do
+    $0
+end]]
+        }
+    else
         results[#results+1] = {
             label = 'in ..',
             kind  = ckind.Snippet,
@@ -400,8 +464,18 @@ end]]
         }
     end
 end},
-{'local', function (ast, text, start, results)
-    if config.config.completion.keywordSnippet then
+{'local', function (hasSpace, results)
+    if hasSpace then
+        results[#results+1] = {
+            label = 'local function',
+            kind  = ckind.Snippet,
+            insertTextFormat = 2,
+            insertText = [[
+function $1($2)
+    $0
+end]]
+        }
+    else
         results[#results+1] = {
             label = 'local function',
             kind  = ckind.Snippet,
@@ -416,8 +490,15 @@ end},
 {'nil'},
 {'not'},
 {'or'},
-{'repeat', function (ast, text, start, results)
-    if config.config.completion.keywordSnippet then
+{'repeat', function (hasSpace, results)
+    if hasSpace then
+        results[#results+1] = {
+            label = 'repeat .. until',
+            kind  = ckind.Snippet,
+            insertTextFormat = 2,
+            insertText = [[$0 until $1]]
+        }
+    else
         results[#results+1] = {
             label = 'repeat .. until',
             kind  = ckind.Snippet,
@@ -429,8 +510,8 @@ until $1]]
         }
     end
 end},
-{'return', function (ast, text, start, results)
-    if config.config.completion.keywordSnippet then
+{'return', function (hasSpace, results)
+    if not hasSpace then
         results[#results+1] = {
             label = 'do return end',
             kind  = ckind.Snippet,
@@ -442,8 +523,18 @@ end},
 {'then'},
 {'true'},
 {'until'},
-{'while', function (ast, text, start, results)
-    if config.config.completion.keywordSnippet then
+{'while', function (hasSpace, results)
+    if hasSpace then
+        results[#results+1] = {
+            label = 'while .. do',
+            kind  = ckind.Snippet,
+            insertTextFormat = 2,
+            insertText = [[
+${1:true} do
+    $0
+end]]
+        }
+    else
         results[#results+1] = {
             label = 'while .. do',
             kind  = ckind.Snippet,
@@ -457,17 +548,28 @@ end]]
 end},
 }
 
-local function checkKeyWord(ast, text, start, word, results)
+local function checkKeyWord(ast, text, start, word, hasSpace, results)
+    local snipType = config.config.completion.keywordSnippet
     for _, data in ipairs(keyWordMap) do
         local key = data[1]
         if matchKey(word, key) then
-            results[#results+1] = {
-                label = key,
-                kind  = ckind.Keyword,
-            }
-            local func = data[2]
-            if func then
-                local stop = func(ast, text, start, results)
+            if snipType == 'Both' or snipType == 'Disable' then
+                if not hasSpace then
+                    results[#results+1] = {
+                        label = key,
+                        kind  = ckind.Keyword,
+                    }
+                end
+            end
+            if snipType == 'Both' or snipType == 'Replace' then
+                local func = data[2]
+                if func then
+                    func(hasSpace, results)
+                end
+            end
+            local checkStop = data[3]
+            if checkStop then
+                local stop = checkStop(ast, start)
                 if stop then
                     return true
                 end
@@ -477,25 +579,33 @@ local function checkKeyWord(ast, text, start, word, results)
 end
 
 local function tryWord(ast, text, offset, results)
-    local word, start = findWord(text, offset)
+    local finish = skipSpace(text, offset)
+    local word, start = findWord(text, finish)
     if not word then
         return nil
     end
+    local hasSpace = finish ~= offset
     if not isInString(ast, offset) then
         local parent, oop = findParent(ast, text, start - 1)
         if parent then
-            checkField(word, start, parent, oop, results)
+            if not hasSpace then
+                checkField(word, start, parent, oop, results)
+            end
         else
-            local stop = checkKeyWord(ast, text, start, word, results)
+            local stop = checkKeyWord(ast, text, start, word, hasSpace, results)
             if stop then
                 return
             end
-            checkLocal(ast, word, start, results)
-            local env = guide.getLocal(ast.ast, '_ENV', start)
-            checkField(word, start, env, false, results)
+            if not hasSpace then
+                checkLocal(ast, word, start, results)
+                local env = guide.getLocal(ast.ast, '_ENV', start)
+                checkField(word, start, env, false, results)
+            end
         end
     end
-    checkCommon(word, text, results)
+    if not hasSpace then
+        checkCommon(word, text, results)
+    end
 end
 
 local function trySymbol(ast, text, offset, results)

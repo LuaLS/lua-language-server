@@ -552,7 +552,13 @@ local function checkKeyWord(ast, text, start, word, hasSpace, results)
     local snipType = config.config.completion.keywordSnippet
     for _, data in ipairs(keyWordMap) do
         local key = data[1]
-        if matchKey(word, key) then
+        local eq
+        if hasSpace then
+            eq = word == key
+        else
+            eq = matchKey(word, key)
+        end
+        if eq then
             if snipType == 'Both' or snipType == 'Disable' then
                 if not hasSpace then
                     results[#results+1] = {

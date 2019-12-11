@@ -627,15 +627,18 @@ end
 
 local function completion(uri, offset)
     local ast = files.getAst(uri)
-    if not ast then
-        return nil
-    end
-    clearStack()
     local text = files.getText(uri)
     local results = {}
-
-    tryWord(ast, text, offset, results)
-    trySymbol(ast, text, offset, results)
+    clearStack()
+    if ast then
+        tryWord(ast, text, offset, results)
+        trySymbol(ast, text, offset, results)
+    else
+        local word = findWord(text, offset)
+        if word then
+            checkCommon(word, text, results)
+        end
+    end
 
     if #results == 0 then
         return nil

@@ -12,6 +12,7 @@ local m = {}
 m.type = 'workspace'
 m.ignoreVersion = -1
 m.ignoreMatcher = nil
+m.preloadVersion = 0
 m.uri = ''
 m.path = ''
 
@@ -133,7 +134,9 @@ function m.awaitPreload()
         if read >= max then
             break
         end
-        await.sleep(0.1)
+        await.sleep(0.1, function ()
+            return m.preloadVersion
+        end)
     end
 
     log.info('Preload finish.')
@@ -191,6 +194,14 @@ end
 function m.getRelativePath(uri)
     local path = furi.decode(uri)
     return fs.relative(fs.path(path), fs.path(m.path)):string()
+end
+
+function m.reload()
+    m.preloadVersion = m.preloadVersion + 1
+    files.removeAll()
+    await.create(function ()
+        m.awaitPreload()
+    end)
 end
 
 return m

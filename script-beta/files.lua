@@ -5,11 +5,14 @@ local furi     = require 'file-uri'
 local parser   = require 'parser'
 local vm       = require 'vm.vm'
 local guide    = require 'parser.guide'
+local proto    = require 'proto'
+local lang     = require 'language'
 
 local m = {}
 
 m.openMap = {}
 m.fileMap = {}
+m.notifyCache = {}
 m.assocVersion = -1
 m.assocMatcher = nil
 m.globalVersion = 0
@@ -157,6 +160,7 @@ function m.removeAll()
         m.fileMap[uri] = nil
     end
     m.globalVersion = m.globalVersion + 1
+    m.notifyCache = {}
     vm.refreshCache()
 end
 
@@ -173,6 +177,26 @@ function m.getAst(uri)
         uri = uri:lower()
     end
     local file = m.fileMap[uri]
+    if #file.text >= config.config.workspace.maxPreload * 1000 then
+        if not m.notifyCache['maxPreload'] then
+            m.notifyCache['maxPreload'] = {}
+        end
+        if not m.notifyCache['maxPreload'][uri] then
+            m.notifyCache['maxPreload'][uri] = true
+            local ws = require 'workspace'
+            proto.notify('window/showMessage', {
+                type = 3,
+                -- TODO 翻译
+                message = lang.script('已跳过过大的文件：{}。当前设置的大小限制为：{} KB，该文件大小为：{} KB'
+                    , ws.getRelativePath(file.uri)
+                    , config.config.workspace.maxPreload
+                    , #file.text / 1000
+                ),
+            })
+        end
+        file.ast = nil
+        return nil
+    end
     if file.ast == nil then
         local clock = os.clock()
         local state, err = parser:compile(file.text, 'lua', config.config.runtime.version)

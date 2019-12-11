@@ -51,6 +51,7 @@ local function updateConfig()
     or not util.equal(oldOther.associations, newOther.associations)
     or not util.equal(oldOther.exclude, newOther.exclude)
     then
+        workspace.reload()
     end
 
     if newConfig.completion.enable then

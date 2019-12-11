@@ -43,16 +43,42 @@ local function isSpace(char)
     return false
 end
 
+local function skipSpace(text, offset)
+    for i = offset, 1, -1 do
+        local char = text:sub(i, i)
+        if not isSpace(char) then
+            return i
+        end
+    end
+    return 0
+end
+
 local function findWord(text, offset)
     for i = offset, 1, -1 do
         if not text:sub(i, i):match '[%w_]' then
             if i == offset then
                 return nil
             end
-            return text:sub(i+1, offset)
+            return text:sub(i+1, offset), i+1
         end
     end
-    return text:sub(1, offset)
+    return text:sub(1, offset), 1
+end
+
+local function findSymbol(text, offset)
+    for i = offset, 1, -1 do
+        local char = text:sub(i, i)
+        if isSpace(char) then
+            goto CONTINUE
+        end
+        if char == '.'
+        or char == ':'
+        or char == '#' then
+            return char, i
+        end
+        ::CONTINUE::
+    end
+    return nil
 end
 
 local function findAnyPos(text, offset)
@@ -272,20 +298,6 @@ end
 
 local keyWordMap = {
 {'do', function (ast, text, start, results)
-    local stop = guide.eachSourceContain(ast.ast, start, function (source)
-        if source.type == 'while'
-        or source.type == 'in'
-        or source.type == 'loop' then
-            for i = 1, #source.keyword do
-                if start == source.keyword[i] then
-                    return true
-                end
-            end
-        end
-    end)
-    if stop then
-        return true
-    end
     if config.config.completion.keywordSnippet then
         results[#results+1] = {
             label = 'do .. end',
@@ -297,6 +309,17 @@ do
 end]],
         }
     end
+    return guide.eachSourceContain(ast.ast, start, function (source)
+        if source.type == 'while'
+        or source.type == 'in'
+        or source.type == 'loop' then
+            for i = 1, #source.keyword do
+                if start == source.keyword[i] then
+                    return true
+                end
+            end
+        end
+    end)
 end},
 {'and'},
 {'break'},
@@ -336,11 +359,59 @@ end]]
     end
 end},
 {'function', function (ast, text, start, results)
-
+    if config.config.completion.keywordSnippet then
+        local spStart = skipSpace(text, start - 1)
+        local before  = findWord(text, spStart)
+        if before == 'local' then
+            results[#results+1] = {
+                label = 'function ()',
+                kind  = ckind.Snippet,
+                insertTextFormat = 2,
+                insertText = [[
+function ($1)
+    $0
+end]]
+            }
+        else
+            results[#results+1] = {
+                label = 'function ()',
+                kind  = ckind.Snippet,
+                insertTextFormat = 2,
+                insertText = [[
+function $1($2)
+    $0
+end]]
+            }
+        end
+    end
 end},
 {'goto'},
-{'if'},
-{'in'},
+{'if', function (ast, text, start, results)
+    if config.config.completion.keywordSnippet then
+        results[#results+1] = {
+            label = 'if .. then',
+            kind  = ckind.Snippet,
+            insertTextFormat = 2,
+            insertText = [[
+if $1 then
+    $0
+end]]
+        }
+    end
+end},
+{'in', function (ast, text, start, results)
+    if config.config.completion.keywordSnippet then
+        results[#results+1] = {
+            label = 'in ..',
+            kind  = ckind.Snippet,
+            insertTextFormat = 2,
+            insertText = [[
+in ${1:pairs(${2:t})} do
+    $0
+end]]
+        }
+    end
+end},
 {'local', function (ast, text, start, results)
     if config.config.completion.keywordSnippet then
         results[#results+1] = {
@@ -357,12 +428,45 @@ end},
 {'nil'},
 {'not'},
 {'or'},
-{'repeat'},
-{'return'},
+{'repeat', function (ast, text, start, results)
+    if config.config.completion.keywordSnippet then
+        results[#results+1] = {
+            label = 'repeat .. until',
+            kind  = ckind.Snippet,
+            insertTextFormat = 2,
+            insertText = [[
+repeat
+    $0
+until $1]]
+        }
+    end
+end},
+{'return', function (ast, text, start, results)
+    if config.config.completion.keywordSnippet then
+        results[#results+1] = {
+            label = 'do return end',
+            kind  = ckind.Snippet,
+            insertTextFormat = 2,
+            insertText = [[do return $1end]]
+        }
+    end
+end},
 {'then'},
 {'true'},
 {'until'},
-{'while'},
+{'while', function (ast, text, start, results)
+    if config.config.completion.keywordSnippet then
+        results[#results+1] = {
+            label = 'while .. do',
+            kind  = ckind.Snippet,
+            insertTextFormat = 2,
+            insertText = [[
+while ${1:true} do
+    $0
+end]]
+        }
+    end
+end},
 }
 
 local function checkKeyWord(ast, text, start, word, results)
@@ -384,12 +488,15 @@ local function checkKeyWord(ast, text, start, word, results)
     end
 end
 
+local function checkDot(ast, start, results)
+
+end
+
 local function tryWord(ast, text, offset, results)
-    local word = findWord(text, offset)
+    local word, start = findWord(text, offset)
     if not word then
         return nil
     end
-    local start = offset - #word + 1
     if not isInString(ast, offset) then
         local parent, oop = findParent(ast, text, start - 1)
         if parent then
@@ -407,6 +514,19 @@ local function tryWord(ast, text, offset, results)
     checkCommon(word, text, results)
 end
 
+local function trySymbol(ast, text, offset, results)
+    local symbol, start = findSymbol(text, offset)
+    if not symbol then
+        return nil
+    end
+    if isInString(ast, offset) then
+        return nil
+    end
+    if symbol == '.' then
+        checkDot(ast, start, results)
+    end
+end
+
 local function completion(uri, offset)
     local ast = files.getAst(uri)
     if not ast then
@@ -417,6 +537,7 @@ local function completion(uri, offset)
     local results = {}
 
     tryWord(ast, text, offset, results)
+    trySymbol(ast, text, offset, results)
 
     if #results == 0 then
         return nil

@@ -322,9 +322,14 @@ function m.rename(uri, pos, newname)
         return nil
     end
     local results = {}
+    local mark = {}
 
     guide.eachSourceContain(ast.ast, pos, function(source)
         rename(source, newname, function (target, start, finish, text)
+            if mark[start] then
+                return
+            end
+            mark[start] = true
             results[#results+1] = {
                 start  = start,
                 finish = finish,

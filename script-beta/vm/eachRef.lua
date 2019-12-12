@@ -162,18 +162,6 @@ local function ofValue(value, callback)
         return
     end
 
-    if value.type == 'table'
-    or value.type == 'string'
-    or value.type == 'number'
-    or value.type == 'boolean'
-    or value.type == 'nil'
-    or value.type == 'function' then
-        callback {
-            source   = value,
-            mode     = 'value',
-        }
-    end
-
     vm.eachRef(value, callback)
 
     local parent = value.parent
@@ -487,6 +475,19 @@ local function ofMain(source, callback)
     }
 end
 
+local function asParen(source, callback)
+    if source.parent and source.parent.type == 'paren' then
+        vm.eachRef(source.parent, callback)
+    end
+end
+
+local function ofSelfValue(source, callback)
+    callback {
+        source   = source,
+        mode     = 'value',
+    }
+end
+
 local function eachRef(source, callback)
     local stype = source.type
     if     stype == 'local' then
@@ -510,6 +511,7 @@ local function eachRef(source, callback)
     or     stype == 'boolean'
     or     stype == 'string' then
         ofLiteral(source, callback)
+        ofSelfValue(source, callback)
     elseif stype == 'goto' then
         ofGoTo(source, callback)
     elseif stype == 'label' then
@@ -517,14 +519,18 @@ local function eachRef(source, callback)
     elseif stype == 'table'
     or     stype == 'function' then
         ofValue(source, callback)
+        ofSelfValue(source, callback)
     elseif stype == 'call' then
         ofCall(source.node, 1, callback)
         ofSpecialCall(source, source.node, 1, callback)
     elseif stype == 'main' then
         ofMain(source, callback)
+    elseif stype == 'paren' then
+        eachRef(source.exp, callback)
     end
     asArg(source, callback)
     asReturn(source, callback)
+    asParen(source, callback)
 end
 
 --- 判断2个对象是否拥有相同的引用

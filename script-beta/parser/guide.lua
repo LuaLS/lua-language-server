@@ -364,13 +364,14 @@ end
 --- 遍历所有的source
 function m.eachSource(ast, callback)
     local list = { ast }
+    local index = 1
     while true do
-        local len = #list
-        if len == 0 then
+        local obj = list[index]
+        if not obj then
             return
         end
-        local obj = list[len]
-        list[len] = nil
+        list[index] = false
+        index = index + 1
         callback(obj)
         m.addChilds(list, obj, m.childMap)
     end

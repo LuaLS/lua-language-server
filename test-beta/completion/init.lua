@@ -376,7 +376,6 @@ local t = {
     {
         label = 'xxxx',
         kind = CompletionItemKind.Variable,
-        detail = EXISTS,
     },
     {
         label = 'xxyy',
@@ -389,28 +388,18 @@ local t = {
     {
         label = 'next',
         kind = CompletionItemKind.Function,
-        documentation = EXISTS,
-        detail = EXISTS,
     },
     {
         label = 'next()',
         kind = CompletionItemKind.Snippet,
-        documentation = EXISTS,
-        detail = EXISTS,
-        insertText = EXISTS,
     },
     {
         label = 'xpcall',
         kind = CompletionItemKind.Function,
-        documentation = EXISTS,
-        detail = EXISTS,
     },
     {
         label = 'xpcall()',
         kind = CompletionItemKind.Snippet,
-        documentation = EXISTS,
-        detail = EXISTS,
-        insertText = EXISTS,
     },
 }
 

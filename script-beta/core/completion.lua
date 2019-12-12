@@ -272,6 +272,29 @@ local function checkField(word, start, parent, oop, results)
     return used
 end
 
+local function checkTableField(ast, word, start, results)
+    local source = guide.eachSourceContain(ast.ast, start, function (source)
+        if  source.start == start
+        and source.parent
+        and source.parent.type == 'table' then
+            return source
+        end
+    end)
+    if not source then
+        return
+    end
+    guide.eachSourceType(ast.ast, 'tablefield', function (src)
+        local key = src.field[1]
+        if  matchKey(word, key)
+        and src ~= source then
+            results[#results+1] = {
+                label = key,
+                kind  = ckind.Property,
+            }
+        end
+    end)
+end
+
 local function checkCommon(word, text, results)
     local used = {}
     for _, result in ipairs(results) do
@@ -604,6 +627,7 @@ local function tryWord(ast, text, offset, results)
             end
             if not hasSpace then
                 checkLocal(ast, word, start, results)
+                checkTableField(ast, word, start, results)
                 local env = guide.getLocal(ast.ast, '_ENV', start)
                 checkField(word, start, env, false, results)
             end

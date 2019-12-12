@@ -358,6 +358,7 @@ proto.on('completionItem/resolve', function (item)
     if globalVersion ~= files.globalVersion then
         return item
     end
+    await.setPriority(1000)
     local resolved = core.resolve(id)
     item.detail = resolved.detail
     item.documentation = resolved.description and {

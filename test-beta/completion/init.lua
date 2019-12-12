@@ -411,17 +411,16 @@ print(fff)
 ]]
 {
     {
-        label = 'fff',
-        kind = CompletionItemKind.Variable,
-    },
-    {
         label = 'function',
         kind = CompletionItemKind.Keyword,
     },
     {
-        label = 'function name()',
+        label = 'function ()',
         kind = CompletionItemKind.Snippet,
-        insertText = EXISTS,
+    },
+    {
+        label = 'fff',
+        kind = CompletionItemKind.Variable,
     },
     {
         label = 'ff2',

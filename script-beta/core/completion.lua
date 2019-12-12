@@ -180,31 +180,33 @@ end
 local function checkLocal(ast, word, offset, results)
     local locals = guide.getVisibleLocals(ast.ast, offset)
     for name, source in pairs(locals) do
-        if matchKey(word, name) then
-            if vm.hasType(source, 'function') then
-                buildFunction(results, source, false, {
-                    label  = name,
-                    kind   = ckind.Function,
-                    id     = stack(function ()
-                        return {
-                            detail      = buildDetail(source),
-                            description = buildDesc(source),
-                        }
-                    end),
-                })
-            else
-                results[#results+1] = {
-                    label  = name,
-                    kind   = ckind.Variable,
-                    id     = stack(function ()
-                        return {
-                            detail      = buildDetail(source),
-                            description = buildDesc(source),
-                        }
-                    end),
-                }
-            end
+        if not matchKey(word, name) then
+            goto CONTINUE
         end
+        if vm.hasType(source, 'function') then
+            buildFunction(results, source, false, {
+                label  = name,
+                kind   = ckind.Function,
+                id     = stack(function ()
+                    return {
+                        detail      = buildDetail(source),
+                        description = buildDesc(source),
+                    }
+                end),
+            })
+        else
+            results[#results+1] = {
+                label  = name,
+                kind   = ckind.Variable,
+                id     = stack(function ()
+                    return {
+                        detail      = buildDetail(source),
+                        description = buildDesc(source),
+                    }
+                end),
+            }
+        end
+        ::CONTINUE::
     end
 end
 
@@ -571,7 +573,7 @@ end]]
 end},
 }
 
-local function checkKeyWord(ast, text, start, word, hasSpace, results)
+local function checkKeyWord(ast, text, start, word, hasSpace, afterLocal, results)
     local snipType = config.config.completion.keywordSnippet
     for _, data in ipairs(keyWordMap) do
         local key = data[1]
@@ -580,6 +582,9 @@ local function checkKeyWord(ast, text, start, word, hasSpace, results)
             eq = word == key
         else
             eq = matchKey(word, key)
+        end
+        if afterLocal and key ~= 'function' then
+            eq = false
         end
         if eq then
             if snipType == 'Both' or snipType == 'Disable' then
@@ -607,6 +612,34 @@ local function checkKeyWord(ast, text, start, word, hasSpace, results)
     end
 end
 
+local function checkProvideLocal(ast, word, start, results)
+    local block
+    guide.eachSourceContain(ast.ast, start, function (source)
+        if source.type == 'function'
+        or source.type == 'main' then
+            block = source
+        end
+    end)
+    if not block then
+        return
+    end
+    guide.eachSourceType(block, 'getglobal', function (source)
+        if source.start > start
+        and matchKey(word, source[1]) then
+            results[#results+1] = {
+                label = source[1],
+                kind  = ckind.Variable,
+            }
+        end
+    end)
+end
+
+local function isAfterLocal(text, start)
+    local pos = skipSpace(text, start-1)
+    local word = findWord(text, pos)
+    return word == 'local'
+end
+
 local function tryWord(ast, text, offset, results)
     local finish = skipSpace(text, offset)
     local word, start = findWord(text, finish)
@@ -621,15 +654,20 @@ local function tryWord(ast, text, offset, results)
                 checkField(word, start, parent, oop, results)
             end
         else
-            local stop = checkKeyWord(ast, text, start, word, hasSpace, results)
+            local afterLocal = isAfterLocal(text, start)
+            local stop = checkKeyWord(ast, text, start, word, hasSpace, afterLocal, results)
             if stop then
                 return
             end
             if not hasSpace then
-                checkLocal(ast, word, start, results)
-                checkTableField(ast, word, start, results)
-                local env = guide.getLocal(ast.ast, '_ENV', start)
-                checkField(word, start, env, false, results)
+                if afterLocal then
+                    checkProvideLocal(ast, word, start, results)
+                else
+                    checkLocal(ast, word, start, results)
+                    checkTableField(ast, word, start, results)
+                    local env = guide.getLocal(ast.ast, '_ENV', start)
+                    checkField(word, start, env, false, results)
+                end
             end
         end
     end

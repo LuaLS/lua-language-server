@@ -9,7 +9,7 @@ function mt:add(language, text)
     if language == 'lua' then
         self[#self+1] = ('```lua\n%s\n```'):format(text)
     else
-        self[#self+1] = text:gsub('\n', '\n\n')
+        self[#self+1] = text
     end
 end
 

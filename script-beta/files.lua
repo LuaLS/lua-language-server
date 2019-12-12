@@ -72,6 +72,7 @@ function m.setText(uri, text)
         return
     end
     file.text = text
+    file.lines = nil
     m.globalVersion = m.globalVersion + 1
     if not m.needRefreshUri then
         m.needRefreshUri = {}
@@ -94,7 +95,6 @@ function m.refresh()
     for file in pairs(refreshed) do
         lastFile = file
         file.vm = nil
-        file.lines = nil
         file.ast = nil
         file.globals = nil
         file.links = nil

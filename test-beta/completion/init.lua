@@ -40,6 +40,10 @@ function TEST(script)
 
         files.setText('', new_script)
         local result = core.completion('', pos)
+        if not expect then
+            assert(result == nil)
+            return
+        end
         for _, item in ipairs(result) do
             core.resolve(item.id)
             for k in pairs(item) do
@@ -48,12 +52,8 @@ function TEST(script)
                 end
             end
         end
-        if expect then
-            assert(result)
-            assert(eq(expect, result))
-        else
-            assert(result == nil)
-        end
+        assert(result)
+        assert(eq(expect, result))
     end
 end
 

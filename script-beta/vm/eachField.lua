@@ -148,6 +148,16 @@ local function eachField(source, callback)
         elseif src.type == 'table' then
             ofTabel(src, callback)
         end
+        local lib = library.object[src.type]
+        if lib then
+            for k, v in pairs(lib.child) do
+                callback {
+                    source = v,
+                    key    = 's|' .. k,
+                    mode   = 'value',
+                }
+            end
+        end
     end)
 end
 

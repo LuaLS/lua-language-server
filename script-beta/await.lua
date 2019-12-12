@@ -5,6 +5,7 @@ local m = {}
 m.type = 'await'
 
 m.coTracker = setmetatable({}, { __mode = 'k' })
+m.coPriority = setmetatable({}, { __mode = 'k' })
 m.delayQueue = {}
 m.delayQueueIndex = 1
 
@@ -69,6 +70,10 @@ function m.delay(getVersion)
         return
     end
     local co = coroutine.running()
+    -- TODO
+    if m.coPriority[co] then
+        return
+    end
     local version = getVersion and getVersion()
     m.delayQueue[#m.delayQueue+1] = function ()
         if version == (getVersion and getVersion()) then
@@ -80,7 +85,7 @@ function m.delay(getVersion)
     return coroutine.yield()
 end
 
-local function buildInfo(waker)
+local function getCo(waker)
     local co
     for i = 1, 100 do
         local n, v = debug.getupvalue(waker, i)
@@ -92,10 +97,7 @@ local function buildInfo(waker)
             break
         end
     end
-    if not co then
-        return nil
-    end
-    return debug.traceback(co)
+    return co
 end
 
 --- 步进
@@ -108,7 +110,7 @@ function m.step()
         waker()
         local passed = os.clock() - clock
         if passed > 0.1 then
-            log.warn(('Await step takes [%.3f] sec.\n%s'):format(passed, buildInfo(waker)))
+            log.debug(('Await step takes [%.3f] sec.'):format(passed))
         end
         return true
     else
@@ -116,6 +118,10 @@ function m.step()
         m.delayQueueIndex = 1
         return false
     end
+end
+
+function m.setPriority(n)
+    m.coPriority[coroutine.running()] = n
 end
 
 return m

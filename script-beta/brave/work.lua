@@ -8,7 +8,7 @@ local util    = require 'utility'
 brave.on('loadProto', function ()
     while true do
         local proto = jsonrpc.decode(io.read, log.error)
-        log.debug('loaded proto', proto.method)
+        --log.debug('loaded proto', proto.method)
         if proto then
             brave.push('proto', proto)
         end

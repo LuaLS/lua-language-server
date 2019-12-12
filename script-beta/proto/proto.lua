@@ -95,7 +95,7 @@ function m.doMethod(proto)
         m.running[proto.id] = method
     end
     await.create(function ()
-        log.debug('Start method:', method)
+        --log.debug('Start method:', method)
         local clock = os.clock()
         local ok = true
         local res
@@ -105,7 +105,7 @@ function m.doMethod(proto)
             if passed > 0.2 then
                 log.debug(('Method [%s] takes [%.3f]sec.'):format(method, passed))
             end
-            log.debug('Finish method:', method)
+            --log.debug('Finish method:', method)
             if not proto.id then
                 return
             end

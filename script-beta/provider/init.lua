@@ -141,9 +141,9 @@ proto.on('textDocument/didChange', function (params)
     local uri    = doc.uri
     local text   = change[1].text
     if files.isLua(uri) or files.isOpen(uri) then
-        log.debug('didChange:', uri)
+        --log.debug('didChange:', uri)
         files.setText(uri, text)
-        log.debug('setText:', #text)
+        --log.debug('setText:', #text)
     end
 end)
 
@@ -299,11 +299,12 @@ end)
 proto.on('textDocument/completion', function (params)
     --log.info(util.dump(params))
     local core = require 'core.completion'
-    log.debug('completion:', params.context and params.context.triggerKind, params.context and params.context.triggerCharacter)
+    --log.debug('completion:', params.context and params.context.triggerKind, params.context and params.context.triggerCharacter)
     local uri  = params.textDocument.uri
     if not files.exists(uri) then
         return nil
     end
+    await.setPriority(1000)
     local clock  = os.clock()
     local lines  = files.getLines(uri)
     local text   = files.getText(uri)

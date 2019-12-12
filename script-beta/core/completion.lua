@@ -343,6 +343,7 @@ do
 end]],
         }
     end
+    return true
 end, function (ast, start)
     return guide.eachSourceContain(ast.ast, start, function (source)
         if source.type == 'while'
@@ -375,6 +376,7 @@ end},
             insertText = [[elseif $1 then]],
         }
     end
+    return true
 end},
 {'end'},
 {'false'},
@@ -418,6 +420,7 @@ for ${1:i} = ${2:1}, ${3:10, 1} do
 end]]
         }
     end
+    return true
 end},
 {'function', function (hasSpace, results)
     if hasSpace then
@@ -441,6 +444,7 @@ function $1($2)
 end]]
         }
     end
+    return true
 end},
 {'goto'},
 {'if', function (hasSpace, results)
@@ -465,6 +469,7 @@ if $1 then
 end]]
         }
     end
+    return true
 end},
 {'in', function (hasSpace, results)
     if hasSpace then
@@ -488,6 +493,7 @@ in ${1:pairs(${2:t})} do
 end]]
         }
     end
+    return true
 end},
 {'local', function (hasSpace, results)
     if hasSpace then
@@ -511,6 +517,7 @@ local function $1($2)
 end]]
         }
     end
+    return false
 end},
 {'nil'},
 {'not'},
@@ -534,6 +541,7 @@ repeat
 until $1]]
         }
     end
+    return true
 end},
 {'return', function (hasSpace, results)
     if not hasSpace then
@@ -544,6 +552,7 @@ end},
             insertText = [[do return $1end]]
         }
     end
+    return false
 end},
 {'then'},
 {'true'},
@@ -570,6 +579,7 @@ while ${1:true} do
 end]]
         }
     end
+    return true
 end},
 }
 
@@ -587,18 +597,22 @@ local function checkKeyWord(ast, text, start, word, hasSpace, afterLocal, result
             eq = false
         end
         if eq then
-            if snipType == 'Both' or snipType == 'Disable' then
+            local replaced
+            if snipType == 'Both' or snipType == 'Replace' then
+                local func = data[2]
+                if func then
+                    replaced = func(hasSpace, results)
+                end
+            end
+            if snipType == 'Both' then
+                replaced = false
+            end
+            if not replaced then
                 if not hasSpace then
                     results[#results+1] = {
                         label = key,
                         kind  = ckind.Keyword,
                     }
-                end
-            end
-            if snipType == 'Both' or snipType == 'Replace' then
-                local func = data[2]
-                if func then
-                    func(hasSpace, results)
                 end
             end
             local checkStop = data[3]

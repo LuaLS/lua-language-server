@@ -30,7 +30,5 @@
         "script/meta" : true,
     },
     "Lua.plugin.enable": true,
-    "Lua.zzzzzz.cat": true,
-    "Lua.completion.callSnippet": "Both",
-    "Lua.completion.keywordSnippet": "Both"
+    "Lua.zzzzzz.cat": true
 }

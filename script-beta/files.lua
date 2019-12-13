@@ -177,6 +177,9 @@ function m.getAst(uri)
         uri = uri:lower()
     end
     local file = m.fileMap[uri]
+    if not file then
+        return nil
+    end
     if #file.text >= config.config.workspace.maxPreload * 1000 then
         if not m.notifyCache['maxPreload'] then
             m.notifyCache['maxPreload'] = {}

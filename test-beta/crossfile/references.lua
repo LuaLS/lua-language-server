@@ -247,3 +247,43 @@ TEST {
         ]],
     },
 }
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            local function <!f!>()
+            end
+
+            return {
+                <!f!> = <!f!>,
+            }
+        ]]
+    },
+    {
+        path = 'c.lua',
+        content = [[
+            local t = require 'a'
+            local <!f!> = t.<!f!>
+
+            <!f!>()
+
+            return {
+                <!f!> = <!f!>,
+            }
+        ]]
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            local t = require 'a'
+            local <!f!> = t.<!f!>
+
+            <?f?>()
+
+            return {
+                <!f!> = <!f!>,
+            }
+        ]]
+    }
+}

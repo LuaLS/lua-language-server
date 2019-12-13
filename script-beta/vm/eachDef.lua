@@ -19,24 +19,36 @@ end
 
 function vm.eachDef(source, callback)
     local results = {}
-    local valueUris = {}
-    local valueInfos = {}
+    local returns = {}
+    local infoMap = {}
     local sourceUri = guide.getRoot(source).uri
     vm.eachRef(source, function (info)
         if info.mode == 'declare'
-        or info.mode == 'set'
-        or info.mode == 'return'
-        or info.mode == 'value'
-        or info.mode == 'library' then
+        or info.mode == 'set' then
             results[#results+1] = info
-            valueInfos[info.source] = info
-            local src = info.source
-            if info.mode == 'return' then
-                local uri = guide.getRoot(src).uri
-                valueUris[uri] = info.source
+        end
+        if info.mode == 'return' then
+            results[#results+1] = info
+            local root = guide.getParentBlock(info.source)
+            if root.type == 'main' then
+                returns[root.uri] = info
             end
         end
+        infoMap[info.source] = info
     end)
+
+    local function pushDef(info)
+        local res = callback(info)
+        if res ~= nil then
+            return res
+        end
+        local value = info.source.value
+        local vinfo = infoMap[value]
+        if vinfo then
+            res = callback(vinfo)
+        end
+        return res
+    end
 
     local res
     local used = {}
@@ -48,11 +60,6 @@ function vm.eachDef(source, callback)
         end
         used[src] = true
         destUri = guide.getRoot(src).uri
-        -- 如果是library，则直接放行
-        if src.library then
-            res = callback(info)
-            goto CONTINUE
-        end
         -- 如果是global或field，则直接放行（因为无法确定顺序）
         if src.type == 'setindex'
         or src.type == 'setfield'
@@ -60,23 +67,19 @@ function vm.eachDef(source, callback)
         or src.type == 'tablefield'
         or src.type == 'tableindex'
         or src.type == 'setglobal' then
-            res = callback(info)
-            if src.value and valueInfos[src.value] then
-                used[src.value] = true
-                res = callback(valueInfos[src.value])
-            end
+            res = pushDef(info)
             goto CONTINUE
         end
         -- 如果是同一个文件，则检查位置关系后放行
         if sourceUri == destUri then
             if checkPath(source, info) then
-                res = callback(info)
+                res = pushDef(info)
             end
             goto CONTINUE
         end
         -- 如果不是同一个文件，则必须在该文件 return 后才放行
-        if valueUris[destUri] then
-            res = callback(info)
+        if returns[destUri] then
+            res = pushDef(info)
             goto CONTINUE
         end
         ::CONTINUE::

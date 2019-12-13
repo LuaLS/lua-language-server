@@ -12,7 +12,7 @@ jobs:
     displayName: 'Init'
   - script: |
       cd 3rd\luamake
-      tools\ninja.exe -f ninja\msvc.ninja
+      .\msvc_build.bat
       cd ..\..
     displayName: 'Compile luamake'
   - script: |

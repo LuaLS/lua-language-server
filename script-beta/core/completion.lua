@@ -285,10 +285,13 @@ local function checkTableField(ast, word, start, results)
     if not source then
         return
     end
+    local used = {}
     guide.eachSourceType(ast.ast, 'tablefield', function (src)
         local key = src.field[1]
-        if  matchKey(word, key)
+        if  not used[key]
+        and matchKey(word, key)
         and src ~= source then
+            used[key] = true
             results[#results+1] = {
                 label = key,
                 kind  = ckind.Property,

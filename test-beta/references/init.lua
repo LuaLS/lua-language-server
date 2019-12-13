@@ -192,6 +192,18 @@ local t = init()
 t:<?add?>()
 ]]
 
+TEST [[
+local t = {}
+t.<?x?> = 1
+t[a.b.x] = 1
+]]
+
+TEST [[
+local t = {}
+t.x = 1
+t[a.b.<?x?>] = 1
+]]
+
 --TEST [[
 -----@class <!Class!>
 -----@type <?Class?>

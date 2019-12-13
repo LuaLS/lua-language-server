@@ -464,6 +464,17 @@ function m.lineRange(lines, row)
     return line.start, line.finish
 end
 
+function m.getNameOfLiteral(obj)
+    if not obj then
+        return nil
+    end
+    local tp = obj.type
+    if tp == 'string' then
+        return obj[1]
+    end
+    return nil
+end
+
 function m.getName(obj)
     local tp = obj.type
     if tp == 'getglobal'
@@ -483,41 +494,22 @@ function m.getName(obj)
     elseif tp == 'getindex'
     or     tp == 'setindex'
     or     tp == 'tableindex' then
-        return m.getName(obj.index)
+        return m.getNameOfLiteral(obj.index)
     elseif tp == 'field'
     or     tp == 'method' then
         return obj[1]
     elseif tp == 'index' then
-        return m.getName(obj.index)
-    elseif tp == 'string' then
-        return obj[1]
+        return m.getNameOfLiteral(obj.index)
     end
-    return nil
+    return m.getNameOfLiteral(obj)
 end
 
-function m.getKeyName(obj)
+function m.getKeyNameOfLiteral(obj)
+    if not obj then
+        return nil
+    end
     local tp = obj.type
-    if tp == 'getglobal'
-    or tp == 'setglobal' then
-        return 's|' .. obj[1]
-    elseif tp == 'getfield'
-    or     tp == 'setfield'
-    or     tp == 'tablefield' then
-        if obj.field then
-            return 's|' .. obj.field[1]
-        end
-    elseif tp == 'getmethod'
-    or     tp == 'setmethod' then
-        if obj.method then
-            return 's|' .. obj.method[1]
-        end
-    elseif tp == 'getindex'
-    or     tp == 'setindex'
-    or     tp == 'tableindex' then
-        if obj.index then
-            return m.getKeyName(obj.index)
-        end
-    elseif tp == 'field'
+    if tp == 'field'
     or     tp == 'method' then
         return 's|' .. obj[1]
     elseif tp == 'string' then
@@ -543,6 +535,35 @@ function m.getKeyName(obj)
         end
     end
     return nil
+end
+
+function m.getKeyName(obj)
+    local tp = obj.type
+    if tp == 'getglobal'
+    or tp == 'setglobal' then
+        return 's|' .. obj[1]
+    elseif tp == 'getfield'
+    or     tp == 'setfield'
+    or     tp == 'tablefield' then
+        if obj.field then
+            return 's|' .. obj.field[1]
+        end
+    elseif tp == 'getmethod'
+    or     tp == 'setmethod' then
+        if obj.method then
+            return 's|' .. obj.method[1]
+        end
+    elseif tp == 'getindex'
+    or     tp == 'setindex'
+    or     tp == 'tableindex' then
+        return m.getKeyNameOfLiteral(obj.index)
+    elseif tp == 'index' then
+        return m.getKeyNameOfLiteral(obj.index)
+    elseif tp == 'field'
+    or     tp == 'method' then
+        return 's|' .. obj[1]
+    end
+    return m.getKeyNameOfLiteral(obj)
 end
 
 function m.getENV(ast)

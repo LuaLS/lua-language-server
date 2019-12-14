@@ -634,6 +634,9 @@ function m.getPath(a, b, sameFunction)
             break
         end
     end
+    if not start then
+        return nil
+    end
     -- pathA: {   1, 2, 3}
     -- pathB: {5, 6, 2, 3}
     local extra = 0

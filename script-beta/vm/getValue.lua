@@ -437,6 +437,10 @@ local function checkValue(source)
     if source.type == 'paren' then
         return vm.getValue(source.exp)
     end
+    if source.type == 'field'
+    or source.type == 'method' then
+        return vm.getValue(source.parent)
+    end
 end
 
 local function inferByCall(results, source)

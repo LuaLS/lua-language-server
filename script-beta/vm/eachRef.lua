@@ -131,6 +131,20 @@ local function asSetValue(value, callback)
     or parent.type == 'tableindex' then
         if parent.value == value then
             vm.eachRef(parent, callback)
+            if guide.getName(parent) == '__index' then
+                if parent.type == 'tablefield'
+                or parent.type == 'tableindex' then
+                    local t = parent.parent
+                    local args = t.parent
+                    if args[2] == t then
+                        local call = args.parent
+                        local func = call.node
+                        if func.special == 'setmetatable' then
+                            vm.eachRef(args[1], callback)
+                        end
+                    end
+                end
+            end
         end
     end
 end
@@ -151,27 +165,6 @@ local function ofSelf(loc, callback)
     local node   = method.node
     vm.eachRef(node, callback)
     -- 2. 调用该方法时传入的对象
-end
-
---- 自己作为赋值的值
-local function asValue(source, callback)
-    local parent = source.parent
-    if parent and parent.value == source then
-        if guide.getName(parent) == '__index' then
-            if parent.type == 'tablefield'
-            or parent.type == 'tableindex' then
-                local t = parent.parent
-                local args = t.parent
-                if args[2] == t then
-                    local call = args.parent
-                    local func = call.node
-                    if func.special == 'setmetatable' then
-                        vm.eachRef(args[1], callback)
-                    end
-                end
-            end
-        end
-    end
 end
 
 local function getCallRecvs(call)

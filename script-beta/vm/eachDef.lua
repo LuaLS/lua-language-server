@@ -14,6 +14,16 @@ local function checkPath(source, info)
     if mode == 'before' then
         return false
     end
+    if mode == 'equal' then
+        if src.type == 'field'
+        or src.type == 'method'
+        or src.type == 'local'
+        or src.type == 'setglobal' then
+            return true
+        else
+            return false
+        end
+    end
     return true
 end
 
@@ -60,6 +70,13 @@ function vm.eachDef(source, callback)
         end
         used[src] = true
         destUri = guide.getRoot(src).uri
+        -- 如果是同一个文件，则检查位置关系后放行
+        if sourceUri == destUri then
+            if checkPath(source, info) then
+                res = pushDef(info)
+            end
+            goto CONTINUE
+        end
         -- 如果是global或field，则直接放行（因为无法确定顺序）
         if src.type == 'setindex'
         or src.type == 'setfield'
@@ -68,13 +85,6 @@ function vm.eachDef(source, callback)
         or src.type == 'tableindex'
         or src.type == 'setglobal' then
             res = pushDef(info)
-            goto CONTINUE
-        end
-        -- 如果是同一个文件，则检查位置关系后放行
-        if sourceUri == destUri then
-            if checkPath(source, info) then
-                res = pushDef(info)
-            end
             goto CONTINUE
         end
         -- 如果不是同一个文件，则必须在该文件 return 后才放行

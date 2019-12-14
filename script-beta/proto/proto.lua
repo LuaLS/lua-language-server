@@ -12,7 +12,6 @@ local m = {}
 
 m.ability = {}
 m.waiting = {}
-m.running = {}
 
 function m.getMethodName(proto)
     if proto.method:sub(1, 2) == '$/' then
@@ -91,9 +90,6 @@ function m.doMethod(proto)
         end
         return
     end
-    if proto.id then
-        m.running[proto.id] = method
-    end
     await.create(function ()
         --log.debug('Start method:', method)
         local clock = os.clock()
@@ -114,7 +110,6 @@ function m.doMethod(proto)
             else
                 m.responseErr(proto.id, ErrorCodes.InternalError, res)
             end
-            m.running[proto.id] = nil
         end)
         ok, res = xpcall(abil, log.error, proto.params)
     end)
@@ -141,11 +136,6 @@ function m.listen()
     io.stdin:setvbuf  'no'
     io.stdout:setvbuf 'no'
     pub.task('loadProto')
-    timer.loop(10, function ()
-        for id, name in pairs(m.running) do
-            m.responseErr(id, ErrorCodes.InternalError, ('Task [%s] failed unexpected!'):format(name))
-        end
-    end)
 end
 
 return m

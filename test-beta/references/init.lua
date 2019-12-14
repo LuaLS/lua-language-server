@@ -204,6 +204,17 @@ t.x = 1
 t[a.b.<?x?>] = 1
 ]]
 
+TEST [[
+local t
+local <!f!> = t.<?f?>
+
+<!f!>()
+
+return {
+    <!f!> = <!f!>,
+}
+]]
+
 --TEST [[
 -----@class <!Class!>
 -----@type <?Class?>

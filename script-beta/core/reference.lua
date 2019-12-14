@@ -72,8 +72,13 @@ return function (uri, offset)
         return nil
     end
     local results = {}
+    local mark = {}
     guide.eachSourceContain(ast.ast, offset, function (source)
         findRef(source, offset, function (target, uri)
+            if mark[target] then
+                return
+            end
+            mark[target] = true
             results[#results+1] = {
                 target = target,
                 uri    = files.getOriginUri(uri),

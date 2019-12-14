@@ -145,6 +145,9 @@ local function eachField(source, callback)
         or     src.type == 'getmethod'
         or     src.type == 'getindex' then
             ofVar(src, callback)
+        elseif src.type == 'field'
+        or     src.type == 'method' then
+            ofVar(src.parent, callback)
         elseif src.type == 'table' then
             ofTabel(src, callback)
         end

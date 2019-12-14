@@ -227,7 +227,18 @@ local function ofLocal(source, newname, callback)
 end
 
 local function ofField(source, newname, callback)
-    return vm.eachRef(source, function (info)
+    local key    = guide.getKeyName(source)
+    local tbl
+    if source.type == 'tablefield'
+    or source.type == 'tableindex' then
+        tbl = source.parent
+    else
+        tbl = source.node
+    end
+    return vm.eachField(tbl, function (info)
+        if info.key ~= key then
+            return
+        end
         local src = info.source
         if     src.type == 'tablefield'
         or     src.type == 'getfield'
@@ -278,8 +289,9 @@ local function rename(source, newname, callback)
         return ofLocal(source.node, newname, callback)
     elseif source.type == 'field'
     or     source.type == 'method'
-    or     source.type == 'tablefield'
-    or     source.type == 'string'
+    or     source.type == 'string' then
+        return ofField(source.parent, newname, callback)
+    elseif source.type == 'tablefield'
     or     source.type == 'setglobal'
     or     source.type == 'getglobal' then
         return ofField(source, newname, callback)

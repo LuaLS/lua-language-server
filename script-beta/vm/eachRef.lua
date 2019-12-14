@@ -383,6 +383,7 @@ local function ofField(source, callback)
                     source   = info.source,
                     mode     = info.mode,
                 }
+                vm.eachRef(info.source, callback)
                 if info.value then
                     vm.eachRef(info.value, callback)
                 end
@@ -396,6 +397,7 @@ local function ofField(source, callback)
                     source   = info.source,
                     mode     = info.mode,
                 }
+                vm.eachRef(info.source, callback)
                 if info.value then
                     vm.eachRef(info.value, callback)
                 end

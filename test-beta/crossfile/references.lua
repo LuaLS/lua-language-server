@@ -35,17 +35,15 @@ end
 local function catch_target(script, sep)
     local list = {}
     local cur = 1
-    local cut = 0
     while true do
         local start, finish  = script:find(('<%%%s.-%%%s>'):format(sep, sep), cur)
         if not start then
             break
         end
-        list[#list+1] = { start - cut, finish - 4 - cut }
+        list[#list+1] = { start + 2, finish - 2 }
         cur = finish + 1
-        cut = cut + 4
     end
-    local new_script = script:gsub(('<%%%s(.-)%%%s>'):format(sep, sep), '%1')
+    local new_script = script:gsub(('<%%%s(.-)%%%s>'):format(sep, sep), '  %1  ')
     return new_script, list
 end
 
@@ -163,7 +161,7 @@ TEST {
             return <~function~> ()
             end
         ]],
-        target = {20, 46},
+        target = {22, 50},
     },
 }
 

@@ -27,6 +27,10 @@ local function checkPath(source, info)
     return true
 end
 
+-- TODO
+-- 只搜索本文件中的引用
+-- 跨文件时，选确定入口（main的return)，然后递归搜索本文件中的引用
+-- 如果类型为setfield等，要确定tbl相同
 function vm.eachDef(source, callback)
     local results = {}
     local returns = {}

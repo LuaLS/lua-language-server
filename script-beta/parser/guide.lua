@@ -588,9 +588,9 @@ end
 ---@return string|boolean mode
 ---@return table|nil pathA
 ---@return table|nil pathB
-function m.getPath(a, b)
+function m.getPath(a, b, sameFunction)
     --- 首先测试双方在同一个函数内
-    if m.getParentFunction(a) ~= m.getParentFunction(b) then
+    if not sameFunction and m.getParentFunction(a) ~= m.getParentFunction(b) then
         return false
     end
     local mode
@@ -612,14 +612,14 @@ function m.getPath(a, b)
     for _ = 1, 1000 do
         objA = m.getParentBlock(objA)
         pathA[#pathA+1] = objA
-        if objA.type == 'function' or objA.type == 'main' then
+        if (not sameFunction and objA.type == 'function') or objA.type == 'main' then
             break
         end
     end
     for _ = 1, 1000 do
         objB = m.getParentBlock(objB)
         pathB[#pathB+1] = objB
-        if objB.type == 'function' or objB.type == 'main' then
+        if (not sameFunction and objA.type == 'function') or objB.type == 'main' then
             break
         end
     end

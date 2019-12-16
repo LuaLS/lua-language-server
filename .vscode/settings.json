@@ -10,7 +10,10 @@
         "ac",
         "_G",
         "GC",
-        "ID"
+        "ID",
+        "DEVELOP",
+        "DBGPORT",
+        "DBGWAIT"
     ],
     "Lua.diagnostics.disable": [
     ],
@@ -30,5 +33,6 @@
         "script/meta" : true,
     },
     "Lua.plugin.enable": true,
-    "Lua.zzzzzz.cat": true
+    "Lua.zzzzzz.cat": true,
+    "Lua.develop.enable": true
 }

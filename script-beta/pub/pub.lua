@@ -10,12 +10,15 @@ local counter = utility.counter()
 local braveTemplate = [[
 package.path  = %q
 package.cpath = %q
+DEVELOP = %s
+DBGPORT = %d
+DBGWAIT = %s
 
 collectgarbage 'generational'
 
 log         = require 'brave.log'
 
-dofile(%q)
+xpcall(dofile, log.error, %q)
 local brave = require 'brave'
 brave.register(%d)
 ]]
@@ -47,7 +50,10 @@ function m.recruitBraves(num)
             thread  = thread.thread(braveTemplate:format(
                 package.path,
                 package.cpath,
-                (ROOT / 'script-beta' / 'debugger.lua'):string(),
+                DEVELOP,
+                DBGPORT,
+                DBGWAIT,
+                (ROOT / 'debugger.lua'):string(),
                 id
             )),
             taskMap = {},

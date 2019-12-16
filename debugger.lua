@@ -1,5 +1,9 @@
+if not DEVELOP then
+    return
+end
+
 local fs = require 'bee.filesystem'
-local extensionPath = fs.path(os.getenv 'USERPROFILE') / '.vscode' / 'extensions'
+local extensionPath = fs.path(os.getenv 'USERPROFILE' or '') / '.vscode' / 'extensions'
 log.debug('Search extensions at:', extensionPath:string())
 if not fs.is_directory(extensionPath) then
     log.debug('Extension path is not a directory.')
@@ -40,13 +44,15 @@ local path  = "/script/?.lua"
 local function tryDebugger()
     local entry = assert(package.searchpath('debugger', debugPath:string() .. path))
     local root = debugPath:string()
-    local port = '11411'
-    local addr = "127.0.0.1:" .. port
+    local addr = ("127.0.0.1:%d"):format(DBGPORT)
     local dbg = loadfile(entry)('windows', root)
     dbg:start(addr)
-    dbg:wait()
-    log.debug('Debugger startup, listen port:', port)
+    log.debug('Debugger startup, listen port:', DBGPORT)
     log.debug('Debugger args:', addr, root, path, cpath)
+    if DBGWAIT then
+        dbg:wait()
+    end
+    return dbg
 end
 
 xpcall(tryDebugger, log.debug)

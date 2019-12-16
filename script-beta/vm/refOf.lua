@@ -3,6 +3,15 @@ local guide   = require 'parser.guide'
 local files   = require 'files'
 local library = require 'library'
 
+local function ofSelf(state, loc, callback)
+    -- self 的2个特殊引用位置：
+    -- 1. 当前方法定义时的对象（mt）
+    local method = loc.method
+    local node   = method.node
+    callback(node)
+    -- 2. 调用该方法时传入的对象
+end
+
 local function ofLocal(state, loc, callback)
     if state[loc] then
         return
@@ -37,6 +46,9 @@ local function ofLocal(state, loc, callback)
                 end
             end
         end
+    end
+    if loc.tag == 'self' then
+        ofSelf(state, loc, callback)
     end
 end
 
@@ -367,7 +379,7 @@ local function checkValue(state, source, callback)
     end
 end
 
-local function checkSetValue(value, callback)
+local function checkSetValue(state, value, callback)
     if value.type == 'field'
     or value.type == 'method' then
         value = value.parent
@@ -438,6 +450,9 @@ function vm.refOf(state, source, callback)
         ofValue(state, source, callback)
     elseif stype == 'select' then
         ofSelect(state, source, callback)
+    elseif stype == 'call' then
+        ofCall(state, source.node, 1, callback)
+        ofSpecialCall(state, source, source.node, 1, callback)
     elseif stype == 'main' then
         ofMain(state, source, callback)
     elseif stype == 'paren' then

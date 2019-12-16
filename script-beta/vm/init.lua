@@ -1,6 +1,5 @@
 local vm = require 'vm.vm'
 require 'vm.eachField'
-require 'vm.refOf'
 require 'vm.eachRef'
 require 'vm.eachDef'
 require 'vm.getGlobals'

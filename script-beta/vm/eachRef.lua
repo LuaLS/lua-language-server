@@ -548,12 +548,23 @@ local function eachRef(source, callback)
     local mark = {}
     local result = {}
     local state  = {}
-    local function found(info)
-        local src = info.source
+    local function found(src, mode)
+        local info
+        if src.mode then
+            info = src
+            src = info.source
+        end
         if not mark[src] then
             list[#list+1] = src
         end
-        mark[src] = info
+        if info then
+            mark[src] = info
+        elseif mode then
+            mark[src] = {
+                source = src,
+                mode   = mode,
+            }
+        end
     end
     while #list > 0 do
         local max = #list

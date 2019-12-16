@@ -10,43 +10,29 @@ local function ofLocal(state, loc, callback)
     state[loc] = true
     -- 方法中的 self 使用了一个虚拟的定义位置
     if loc.tag ~= 'self' then
-        callback {
-            source   = loc,
-            mode     = 'declare',
-        }
+        callback(loc, 'declare')
     end
     local refs = loc.ref
     if refs then
         for i = 1, #refs do
             local ref = refs[i]
             if ref.type == 'getlocal' then
-                callback {
-                    source   = ref,
-                    mode     = 'get',
-                }
+                callback(ref, 'get')
                 if loc.tag == '_ENV' then
                     local parent = ref.parent
                     if parent.type == 'getfield'
                     or parent.type == 'getindex' then
                         if guide.getKeyName(parent) == '_G' then
-                            callback {
-                                source   = parent,
-                                mode     = 'get',
-                            }
+                            callback(parent, 'declare')
                         end
                     end
                 end
             elseif ref.type == 'setlocal' then
-                callback {
-                    source   = ref,
-                    mode     = 'set',
-                }
+                callback(ref, 'set')
+            elseif ref.type == 'getglobal' then
                 if loc.tag == '_ENV' then
                     if guide.getName(ref) == '_G' then
-                        callback {
-                            source   = ref,
-                            mode     = 'get',
-                        }
+                        callback(ref, 'get')
                     end
                 end
             end
@@ -77,10 +63,7 @@ local function ofGlobal(state, source, callback)
         vm.eachField(node, function (info)
             if key == info.key then
                 state[info.source] = true
-                callback {
-                    source   = info.source,
-                    mode     = info.mode,
-                }
+                callback(info)
             end
         end)
     end
@@ -98,10 +81,7 @@ local function ofField(state, source, callback)
         vm.eachField(tbl, function (info)
             if key == info.key then
                 state[info.source] = true
-                callback {
-                    source   = info.source,
-                    mode     = info.mode,
-                }
+                callback(info)
             end
         end)
     else
@@ -109,10 +89,7 @@ local function ofField(state, source, callback)
         vm.eachField(node, function (info)
             if key == info.key then
                 state[info.source] = true
-                callback {
-                    source   = info.source,
-                    mode     = info.mode,
-                }
+                callback(info)
             end
         end)
     end
@@ -123,16 +100,10 @@ local function ofLabel(state, source, callback)
         return
     end
     state[source] = true
-    callback {
-        source = source,
-        mode   = 'set',
-    }
+    callback(source, 'set')
     if source.ref then
         for _, ref in ipairs(source.ref) do
-            callback {
-                source = ref,
-                mode   = 'get',
-            }
+            callback(ref, 'get')
         end
     end
 end
@@ -146,10 +117,7 @@ local function ofGoTo(state, source, callback)
 end
 
 local function ofValue(state, source, callback)
-    callback {
-        source   = source,
-        mode     = 'value',
-    }
+    callback(source, 'value')
 end
 
 local function ofIndex(state, source, callback)
@@ -178,10 +146,7 @@ local function ofCall(state, func, index, callback, offset)
                 local rtn = returns[i]
                 local val = rtn[index-offset]
                 if val then
-                    callback {
-                        source = val,
-                        mode   = 'return',
-                    }
+                    callback(val)
                 end
             end
         end
@@ -195,15 +160,12 @@ local function ofSpecialCall(state, call, func, index, callback, offset)
         if index == 1 + offset then
             local args = call.args
             if args[1+offset] then
-                callback {
-                    source = args[1+offset],
-                    mode   = 'get',
-                }
+                callback(args[1+offset])
             end
             if args[2+offset] then
                 vm.eachField(args[2+offset], function (info)
                     if info.key == 's|__index' then
-                        callback(info)
+                        callback(info.source)
                     end
                 end)
             end
@@ -231,10 +193,7 @@ local function ofSpecialCall(state, call, func, index, callback, offset)
                     local objName = args[1+offset][1]
                     local lib = library.library[objName]
                     if lib then
-                        callback {
-                            source   = lib,
-                            mode     = 'value',
-                        }
+                        callback(lib)
                     end
                 end
             end
@@ -266,10 +225,7 @@ local function ofSelect(state, source, callback)
 end
 
 local function ofMain(state, source, callback)
-    callback {
-        source = source,
-        mode   = 'main',
-    }
+    callback(source, 'main')
 end
 
 local function getCallRecvs(call)
@@ -310,10 +266,7 @@ local function checkAsArg(state, source, callback)
                 end
                 local recvs = getCallRecvs(call)
                 if recvs and recvs[1] then
-                    callback {
-                        source = recvs[1],
-                        mode   = 'return',
-                    }
+                    callback(recvs[1])
                 end
                 vm.setMeta(source, parent[2])
             end
@@ -324,20 +277,14 @@ end
 local function ofCallSelect(state, call, index, callback)
     local slc = call.parent
     if slc.index == index then
-        callback {
-            source = slc.parent,
-            mode   = 'get',
-        }
+        callback(slc.parent)
         return
     end
     if call.extParent then
         for i = 1, #call.extParent do
             slc = call.extParent[i]
             if slc.index == index then
-                callback {
-                    source = slc.parent,
-                    mode   = 'get',
-                }
+                callback(slc.parent)
                 return
             end
         end
@@ -396,15 +343,9 @@ local function checkAsReturn(state, source, callback)
             end
             local recvs = getCallRecvs(call)
             if recvs and recvs[index] then
-                callback {
-                    source = recvs[index],
-                    mode   = 'return',
-                }
+                callback(recvs[index])
             elseif index == 1 then
-                callback {
-                    type   = 'call',
-                    source = call,
-                }
+                callback(call, 'call')
             end
         end)
     end
@@ -422,10 +363,7 @@ end
 
 local function checkValue(state, source, callback)
     if source.value then
-        callback {
-            source = source.value,
-            mode   = 'value',
-        }
+        callback(source.value)
     end
 end
 
@@ -447,10 +385,7 @@ local function checkSetValue(value, callback)
     or parent.type == 'tablefield'
     or parent.type == 'tableindex' then
         if parent.value == value then
-            callback {
-                source = parent,
-                mode   = 'set',
-            }
+            callback(parent)
             if guide.getName(parent) == '__index' then
                 if parent.type == 'tablefield'
                 or parent.type == 'tableindex' then
@@ -460,10 +395,7 @@ local function checkSetValue(value, callback)
                         local call = args.parent
                         local func = call.node
                         if func.special == 'setmetatable' then
-                            callback {
-                                source = args[1],
-                                mode   = 'get',
-                            }
+                            callback(args[1])
                         end
                     end
                 end

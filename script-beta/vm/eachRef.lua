@@ -524,48 +524,7 @@ function vm.isSameRef(a, b)
     end
 end
 
---- 获取所有的引用
-function vm.eachRef(source, callback, max)
-    local cache = vm.cache.eachRef[source]
-    if cache then
-        await.delay(function ()
-            return files.globalVersion
-        end)
-        if max then
-            if max > #cache then
-                max = #cache
-            end
-        else
-            max = #cache
-        end
-        for i = 1, max do
-            local res = callback(cache[i])
-            if res ~= nil then
-                return res
-            end
-        end
-        return
-    end
-    local unlock = vm.lock('eachRef', source)
-    if not unlock then
-        return
-    end
-    cache = {}
-    vm.cache.eachRef[source] = cache
-    local mark = {}
-    eachRef(source, function (info)
-        local src = info.source
-        if mark[src] then
-            return
-        end
-        mark[src] = true
-        cache[#cache+1] = info
-    end)
-    unlock()
-    for i = 1, #cache do
-        local src = cache[i].source
-        vm.cache.eachRef[src] = cache
-    end
+local function applyCache(cache, callback, max)
     await.delay(function ()
         return files.globalVersion
     end)
@@ -582,4 +541,48 @@ function vm.eachRef(source, callback, max)
             return res
         end
     end
+end
+
+local function eachRef(source, callback)
+    local list   = { source }
+    local mark = {}
+    local result = {}
+    local state  = {}
+    local function found(info)
+        local src = info.source
+        if not mark[src] then
+            list[#list+1] = src
+        end
+        mark[src] = info
+    end
+    while #list > 0 do
+        local max = #list
+        local src = list[max]
+        list[max] = nil
+        vm.refOf(state, src, found)
+    end
+    for _, info in pairs(mark) do
+        result[#result+1] = info
+    end
+    return result
+end
+
+--- 获取所有的引用
+function vm.eachRef(source, callback, max)
+    local cache = vm.cache.eachRef[source]
+    if cache then
+        applyCache(cache, callback, max)
+        return
+    end
+    local unlock = vm.lock('eachRef', source)
+    if not unlock then
+        return
+    end
+    cache = eachRef(source, callback)
+    unlock()
+    for i = 1, #cache do
+        local src = cache[i].source
+        vm.cache.eachRef[src] = cache
+    end
+    applyCache(cache, callback, max)
 end

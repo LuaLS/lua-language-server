@@ -68,6 +68,7 @@ function m.refreshCache()
     end
     m.cache = {
         eachRef     = {},
+        eachDef     = {},
         eachField   = {},
         eachMeta    = {},
         getGlobals  = {},

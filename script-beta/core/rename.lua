@@ -11,8 +11,8 @@ local function askForcing(str)
     if TEST then
         return true
     end
-    if Forcing == false then
-        return false
+    if Forcing ~= nil then
+        return Forcing
     end
     local version = files.globalVersion
     -- TODO

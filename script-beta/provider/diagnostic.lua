@@ -10,6 +10,7 @@ local util   = require 'utility'
 local m = {}
 m._start = false
 m.cache = {}
+m.lastSynaxErrors = {}
 
 local function concat(t, sep)
     if type(t) ~= 'table' then
@@ -105,6 +106,7 @@ local function merge(a, b)
 end
 
 function m.clear(uri)
+    m.lastSynaxErrors[uri] = nil
     if not m.cache[uri] then
         return
     end
@@ -147,7 +149,7 @@ function m.diagnostics(uri, syntaxOnly)
     return results
 end
 
-function m.doDiagnostic(uri, syntaxOnly)
+function m.doDiagnostic(uri, main, syntaxOnly)
     local ast = files.getAst(uri)
     if not ast then
         m.clear(uri)
@@ -166,6 +168,12 @@ function m.doDiagnostic(uri, syntaxOnly)
         return
     end
     m.cache[uri] = full
+    if main and syntaxOnly and #syntax > (m.lastSynaxErrors[uri] or 0) then
+        await.sleep(2, function ()
+            return files.globalVersion
+        end)
+    end
+    m.lastSynaxErrors[uri] = #syntax
 
     proto.notify('textDocument/publishDiagnostics', {
         uri = uri,
@@ -179,7 +187,7 @@ function m.refresh(uri)
             return files.globalVersion
         end)
         if uri then
-            m.doDiagnostic(uri, true)
+            m.doDiagnostic(uri, true, true)
         end
         if not m._start then
             return
@@ -189,7 +197,7 @@ function m.refresh(uri)
         end)
         local clock = os.clock()
         if uri then
-            m.doDiagnostic(uri)
+            m.doDiagnostic(uri, true, false)
         end
         for destUri in files.eachFile() do
             if destUri ~= uri then

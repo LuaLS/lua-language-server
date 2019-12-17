@@ -149,7 +149,7 @@ print(obj.<?x?>)
 TEST [[
 local <!x!>
 local function f()
-    return x
+    return <!x!>
 end
 local <?y?> = f()
 ]]
@@ -166,7 +166,7 @@ TEST [[
 local <!x!>
 local function f()
     return function ()
-        return x
+        return <!x!>
     end
 end
 local <?y?> = f()()

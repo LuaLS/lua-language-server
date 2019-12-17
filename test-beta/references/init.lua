@@ -183,6 +183,21 @@ local <!y!> = f()()
 ]]
 
 TEST [[
+local <!mt!> = {}
+<!mt!>.<!__index!> = <!mt!>
+
+function <!mt!>:add(a, b)
+end
+
+local function init()
+    return setmetatable({}, <!mt!>)
+end
+
+local <!t!> = init()
+<?t?>:add()
+]]
+
+TEST [[
 local mt = {}
 mt.__index = mt
 

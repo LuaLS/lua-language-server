@@ -4,23 +4,37 @@ local vm      = require 'vm.vm'
 local library = require 'library'
 local await   = require 'await'
 
+local STATE_USED  = 1 << 0
+local STATE_LOCAL = 1 << 1
+local STATE_NODE  = 1 << 2
+local STATE_LABEL = 1 << 3
+
+local function markFlag(state, source, flag)
+    local flags = state[source] or 0
+    if flags & flag ~= 0 then
+        return false
+    end
+    state[source] = flags | flag
+    return true
+end
+
 local function ofSelf(state, loc, callback)
     -- self 的2个特殊引用位置：
     -- 1. 当前方法定义时的对象（mt）
     local method = loc.method
     local node   = method.node
-    callback(node)
+    vm.refOf(state, node, callback)
     -- 2. 调用该方法时传入的对象
 end
 
 local function ofLocal(state, loc, callback)
-    if state[loc] then
+    if not markFlag(state, loc, STATE_LOCAL) then
         return
     end
-    state[loc] = true
     -- 方法中的 self 使用了一个虚拟的定义位置
     if loc.tag ~= 'self' then
         callback(loc, 'declare')
+        vm.refOf(state, loc, callback)
     end
     local refs = loc.ref
     if refs then
@@ -28,21 +42,25 @@ local function ofLocal(state, loc, callback)
             local ref = refs[i]
             if ref.type == 'getlocal' then
                 callback(ref, 'get')
+                vm.refOf(state, ref, callback)
                 if loc.tag == '_ENV' then
                     local parent = ref.parent
                     if parent.type == 'getfield'
                     or parent.type == 'getindex' then
                         if guide.getKeyName(parent) == '_G' then
                             callback(parent, 'declare')
+                            vm.refOf(state, ref, callback)
                         end
                     end
                 end
             elseif ref.type == 'setlocal' then
                 callback(ref, 'set')
+                vm.refOf(state, ref, callback)
             elseif ref.type == 'getglobal' then
                 if loc.tag == '_ENV' then
                     if guide.getName(ref) == '_G' then
                         callback(ref, 'get')
+                        vm.refOf(state, ref, callback)
                     end
                 end
             end
@@ -54,11 +72,11 @@ local function ofLocal(state, loc, callback)
 end
 
 local function ofGlobal(state, source, callback)
-    if state[source] then
-        return
-    end
     local key = guide.getKeyName(source)
     local node = source.node
+    if not markFlag(state, node, STATE_NODE) then
+        return
+    end
     if node.tag == '_ENV' then
         local uris = files.findGlobals(key)
         for i = 1, #uris do
@@ -67,52 +85,47 @@ local function ofGlobal(state, source, callback)
             local globals = vm.getGlobals(ast.ast)
             if globals and globals[key] then
                 for _, info in ipairs(globals[key]) do
-                    state[info.source] = true
                     callback(info)
+                    vm.refOf(state, info.source, callback)
                 end
             end
         end
     else
+        -- 重载了 _ENV
         vm.eachField(node, function (info)
             if key == info.key then
-                state[info.source] = true
                 callback(info)
+                vm.refOf(state, info.source, callback)
             end
         end)
     end
 end
 
 local function ofField(state, source, callback)
-    if state[source] then
-        return
-    end
     local parent = source.parent
     local key    = guide.getKeyName(source)
+    local node
     if parent.type == 'tablefield'
     or parent.type == 'tableindex' then
-        local tbl = parent.parent
-        vm.eachField(tbl, function (info)
-            if key == info.key then
-                state[info.source] = true
-                callback(info)
-            end
-        end)
+        node = parent.parent
     else
-        local node = parent.node
-        vm.eachField(node, function (info)
-            if key == info.key then
-                state[info.source] = true
-                callback(info)
-            end
-        end)
+        node = parent.node
     end
+    if not markFlag(state, node, STATE_NODE) then
+        return
+    end
+    vm.eachField(node, function (info)
+        if key == info.key then
+            callback(info)
+            vm.refOf(source, state, callback)
+        end
+    end)
 end
 
 local function ofLabel(state, source, callback)
-    if state[source] then
+    if not markFlag(state, source, STATE_LABEL) then
         return
     end
-    state[source] = true
     callback(source, 'set')
     if source.ref then
         for _, ref in ipairs(source.ref) do
@@ -145,7 +158,10 @@ local function ofIndex(state, source, callback)
     end
 end
 
-local function ofCall(state, func, index, callback, offset)
+local function ofCallRecv(state, func, index, callback, offset)
+    if not markFlag(state, func, STATE_USED) then
+        return
+    end
     offset = offset or 0
     vm.eachRef(func, function (info)
         local src = info.source
@@ -159,26 +175,26 @@ local function ofCall(state, func, index, callback, offset)
                 local rtn = returns[i]
                 local val = rtn[index-offset]
                 if val then
-                    callback(val)
+                    vm.refOf(state, val, callback)
                 end
             end
         end
     end)
 end
 
-local function ofSpecialCall(state, call, func, index, callback, offset)
+local function ofSpecialCallRecv(state, call, func, index, callback, offset)
     local name = func.special
     offset = offset or 0
     if name == 'setmetatable' then
         if index == 1 + offset then
             local args = call.args
             if args[1+offset] then
-                callback(args[1+offset])
+                vm.refOf(state, args[1+offset], callback)
             end
             if args[2+offset] then
                 vm.eachField(args[2+offset], function (info)
                     if info.key == 's|__index' then
-                        callback(info.source)
+                        vm.refOf(state, info.source, callback)
                     end
                 end)
             end
@@ -194,7 +210,7 @@ local function ofSpecialCall(state, call, func, index, callback, offset)
                     if not files.eq(uri, myUri) then
                         local ast = files.getAst(uri)
                         if ast then
-                            ofCall(state, ast.ast, 1, callback)
+                            ofCallRecv(state, ast.ast, 1, callback)
                         end
                     end
                 end
@@ -206,7 +222,7 @@ local function ofSpecialCall(state, call, func, index, callback, offset)
                     local objName = args[1+offset][1]
                     local lib = library.library[objName]
                     if lib then
-                        callback(lib)
+                        callback(lib, 'value')
                     end
                 end
             end
@@ -215,12 +231,13 @@ local function ofSpecialCall(state, call, func, index, callback, offset)
     or     name == 'xpcall' then
         if index >= 2-offset then
             local args = call.args
-            if args[1+offset] then
+            if  args[1+offset]
+            and markFlag(state, args[1+offset], STATE_USED) then
                 vm.eachRef(args[1+offset], function (info)
                     local src = info.source
                     if src.type == 'function' then
-                        ofCall(state, src, index, callback, 1+offset)
-                        ofSpecialCall(state, call, src, index, callback, 1+offset)
+                        ofCallRecv(state, src, index, callback, 1+offset)
+                        ofSpecialCallRecv(state, call, src, index, callback, 1+offset)
                     end
                 end)
             end
@@ -228,12 +245,12 @@ local function ofSpecialCall(state, call, func, index, callback, offset)
     end
 end
 
+-- 自己是函数调用的接收者，引用函数定义的返回值
 local function ofSelect(state, source, callback)
-    -- 检查函数返回值
     local call = source.vararg
     if call.type == 'call' then
-        ofCall(state, call.node, source.index, callback)
-        ofSpecialCall(state, call, call.node, source.index, callback)
+        ofCallRecv(state, call.node, source.index, callback)
+        ofSpecialCallRecv(state, call, call.node, source.index, callback)
     end
 end
 
@@ -273,13 +290,13 @@ local function checkAsArg(state, source, callback)
                 if parent[2] then
                     vm.eachField(parent[2], function (info)
                         if info.key == 's|__index' then
-                            callback(info)
+                            vm.refOf(state, info.source, callback)
                         end
                     end)
                 end
                 local recvs = getCallRecvs(call)
                 if recvs and recvs[1] then
-                    callback(recvs[1])
+                    vm.refOf(state, recvs[1], callback)
                 end
                 vm.setMeta(source, parent[2])
             end
@@ -290,14 +307,14 @@ end
 local function ofCallSelect(state, call, index, callback)
     local slc = call.parent
     if slc.index == index then
-        callback(slc.parent)
+        vm.refOf(state, slc.parent, callback)
         return
     end
     if call.extParent then
         for i = 1, #call.extParent do
             slc = call.extParent[i]
             if slc.index == index then
-                callback(slc.parent)
+                vm.refOf(state, slc.parent, callback)
                 return
             end
         end
@@ -356,7 +373,7 @@ local function checkAsReturn(state, source, callback)
             end
             local recvs = getCallRecvs(call)
             if recvs and recvs[index] then
-                callback(recvs[index])
+                vm.refOf(state, recvs[index], callback)
             elseif index == 1 then
                 callback(call, 'call')
             end
@@ -365,10 +382,6 @@ local function checkAsReturn(state, source, callback)
 end
 
 local function checkAsParen(state, source, callback)
-    if state[source] then
-        return
-    end
-    state[source] = true
     if source.parent and source.parent.type == 'paren' then
         vm.refOf(state, source.parent, callback)
     end
@@ -376,7 +389,7 @@ end
 
 local function checkValue(state, source, callback)
     if source.value then
-        callback(source.value)
+        vm.refOf(state, source.value, callback)
     end
 end
 
@@ -398,7 +411,7 @@ local function checkSetValue(state, value, callback)
     or parent.type == 'tablefield'
     or parent.type == 'tableindex' then
         if parent.value == value then
-            callback(parent)
+            vm.refOf(state, parent, callback)
             if guide.getName(parent) == '__index' then
                 if parent.type == 'tablefield'
                 or parent.type == 'tableindex' then
@@ -408,13 +421,17 @@ local function checkSetValue(state, value, callback)
                         local call = args.parent
                         local func = call.node
                         if func.special == 'setmetatable' then
-                            callback(args[1])
+                            vm.refOf(state, args[1], callback)
                         end
                     end
                 end
             end
         end
     end
+end
+
+local function ofInParen(state, source, callback)
+    vm.refOf(state, source, callback)
 end
 
 local function applyCache(cache, callback, max)
@@ -437,67 +454,33 @@ local function applyCache(cache, callback, max)
 end
 
 local function eachRef(source, result)
-    local list     = { source }
-    local mark     = {}
-    local state    = {}
-    local hasOf    = {}
-    local hasCheck = {}
-    local function found(src, mode)
+    local mark   = {}
+    vm.refOf({}, source, function (src, mode)
         local info
         if src.mode then
             info = src
             src = info.source
         end
-        if mark[src] == nil then
-            list[#list+1] = src
+        if mark[src] then
+            return
         end
+        mark[src] = true
         if info then
-            mark[src] = info
+            result[#result+1] = info
         elseif mode then
-            mark[src] = {
+            result[#result+1] = {
                 source = src,
                 mode   = mode,
             }
-        else
-            mark[src] = mark[src] or false
         end
-    end
-    for _ = 1, 10000 do
-        if _ == 10000 then
-            error('stack overflow!')
-        end
-        local max = #list
-        if max == 0 then
-            break
-        end
-        local src = list[max]
-        list[max] = nil
-        if not hasOf[src] then
-            hasOf[src] = true
-            vm.refOf(state, src, found)
-        end
-        if not hasCheck[src] then
-            hasCheck[src] = true
-            vm.refCheck(state, src, found)
-        end
-    end
-    for _, info in pairs(mark) do
-        if info then
-            result[#result+1] = info
-        end
-    end
+    end)
     return result
 end
 
-function vm.refCheck(state, source, callback)
-    checkValue(state, source, callback)
-    checkAsArg(state, source, callback)
-    checkAsReturn(state, source, callback)
-    checkAsParen(state, source, callback)
-    checkSetValue(state, source, callback)
-end
-
 function vm.refOf(state, source, callback)
+    if not markFlag(state, source, STATE_USED) then
+        return
+    end
     local stype = source.type
     if stype     == 'local' then
         ofLocal(state, source, callback)
@@ -533,13 +516,18 @@ function vm.refOf(state, source, callback)
     elseif stype == 'select' then
         ofSelect(state, source, callback)
     elseif stype == 'call' then
-        ofCall(state, source.node, 1, callback)
-        ofSpecialCall(state, source, source.node, 1, callback)
+        ofCallRecv(state, source.node, 1, callback)
+        ofSpecialCallRecv(state, source, source.node, 1, callback)
     elseif stype == 'main' then
         ofMain(state, source, callback)
     elseif stype == 'paren' then
-        vm.refOf(state, source.exp, callback)
+        ofInParen(state, source.exp, callback)
     end
+    checkValue(state, source, callback)
+    checkSetValue(state, source, callback)
+    checkAsParen(state, source, callback)
+    checkAsReturn(state, source, callback)
+    checkAsArg(state, source, callback)
 end
 
 --- 判断2个对象是否拥有相同的引用

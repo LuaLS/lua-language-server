@@ -168,12 +168,14 @@ function m.doDiagnostic(uri, main, syntaxOnly)
         return
     end
     m.cache[uri] = full
-    if main and syntaxOnly and #syntax > (m.lastSynaxErrors[uri] or 0) then
+    if main
+    and syntaxOnly
+    and (syntax and #syntax or 0) > (m.lastSynaxErrors[uri] or 0) then
         await.sleep(2, function ()
             return files.globalVersion
         end)
     end
-    m.lastSynaxErrors[uri] = #syntax
+    m.lastSynaxErrors[uri] = syntax and #syntax or 0
 
     proto.notify('textDocument/publishDiagnostics', {
         uri = uri,

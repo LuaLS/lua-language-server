@@ -440,18 +440,19 @@ local function applyCache(cache, callback, max)
     end
 end
 
-local function eachRef(source, callback)
-    local list   = { source }
-    local mark = {}
-    local result = {}
-    local state  = {}
+local function eachRef(source, result)
+    local list     = { source }
+    local mark     = {}
+    local state    = {}
+    local hasOf    = {}
+    local hasCheck = {}
     local function found(src, mode)
         local info
         if src.mode then
             info = src
             src = info.source
         end
-        if not mark[src] then
+        if mark[src] == nil then
             list[#list+1] = src
         end
         if info then
@@ -461,25 +462,40 @@ local function eachRef(source, callback)
                 source = src,
                 mode   = mode,
             }
+        else
+            mark[src] = mark[src] or false
         end
     end
     for _ = 1, 1000 do
-        if _ == 1000 then
-            warn('stack overflow!')
-            break
-        end
         local max = #list
         if max == 0 then
             break
         end
         local src = list[max]
         list[max] = nil
-        vm.refOf(state, src, found)
+        if not hasOf[src] then
+            hasOf[src] = true
+            vm.refOf(state, src, found)
+        end
+        if not hasCheck[src] then
+            hasCheck[src] = true
+            vm.refCheck(state, src, found)
+        end
     end
     for _, info in pairs(mark) do
-        result[#result+1] = info
+        if info then
+            result[#result+1] = info
+        end
     end
     return result
+end
+
+function vm.refCheck(state, source, callback)
+    checkValue(state, source, callback)
+    checkAsArg(state, source, callback)
+    checkAsReturn(state, source, callback)
+    checkAsParen(state, source, callback)
+    checkSetValue(state, source, callback)
 end
 
 function vm.refOf(state, source, callback)
@@ -524,11 +540,6 @@ function vm.refOf(state, source, callback)
     elseif stype == 'paren' then
         vm.refOf(state, source.exp, callback)
     end
-    checkValue(state, source, callback)
-    checkAsArg(state, source, callback)
-    checkAsReturn(state, source, callback)
-    checkAsParen(state, source, callback)
-    checkSetValue(state, source, callback)
 end
 
 --- 判断2个对象是否拥有相同的引用
@@ -557,7 +568,9 @@ function vm.eachRef(source, callback, max)
     if not unlock then
         return
     end
-    cache = eachRef(source, callback)
+    cache = {}
+    vm.cache.eachRef[source] = cache
+    eachRef(source, cache)
     unlock()
     for i = 1, #cache do
         local src = cache[i].source

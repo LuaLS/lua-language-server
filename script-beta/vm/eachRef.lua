@@ -3,10 +3,6 @@ local files   = require 'files'
 local vm      = require 'vm.vm'
 local library = require 'library'
 local await   = require 'await'
-local vm      = require 'vm.vm'
-local guide   = require 'parser.guide'
-local files   = require 'files'
-local library = require 'library'
 
 local function ofSelf(state, loc, callback)
     -- self 的2个特殊引用位置：
@@ -466,7 +462,10 @@ local function eachRef(source, result)
             mark[src] = mark[src] or false
         end
     end
-    for _ = 1, 1000 do
+    for _ = 1, 10000 do
+        if _ == 10000 then
+            error('stack overflow!')
+        end
         local max = #list
         if max == 0 then
             break

@@ -421,6 +421,67 @@ local function checkSetValue(state, value, callback)
     end
 end
 
+local function applyCache(cache, callback, max)
+    await.delay(function ()
+        return files.globalVersion
+    end)
+    if max then
+        if max > #cache then
+            max = #cache
+        end
+    else
+        max = #cache
+    end
+    for i = 1, max do
+        local res = callback(cache[i])
+        if res ~= nil then
+            return res
+        end
+    end
+end
+
+local function eachRef(source, callback)
+    local list   = { source }
+    local mark = {}
+    local result = {}
+    local state  = {}
+    local function found(src, mode)
+        local info
+        if src.mode then
+            info = src
+            src = info.source
+        end
+        if not mark[src] then
+            list[#list+1] = src
+        end
+        if info then
+            mark[src] = info
+        elseif mode then
+            mark[src] = {
+                source = src,
+                mode   = mode,
+            }
+        end
+    end
+    for _ = 1, 1000 do
+        if _ == 1000 then
+            warn('stack overflow!')
+            break
+        end
+        local max = #list
+        if max == 0 then
+            break
+        end
+        local src = list[max]
+        list[max] = nil
+        vm.refOf(state, src, found)
+    end
+    for _, info in pairs(mark) do
+        result[#result+1] = info
+    end
+    return result
+end
+
 function vm.refOf(state, source, callback)
     local stype = source.type
     if stype     == 'local' then
@@ -468,60 +529,6 @@ function vm.refOf(state, source, callback)
     checkAsReturn(state, source, callback)
     checkAsParen(state, source, callback)
     checkSetValue(state, source, callback)
-end
-
-local function applyCache(cache, callback, max)
-    await.delay(function ()
-        return files.globalVersion
-    end)
-    if max then
-        if max > #cache then
-            max = #cache
-        end
-    else
-        max = #cache
-    end
-    for i = 1, max do
-        local res = callback(cache[i])
-        if res ~= nil then
-            return res
-        end
-    end
-end
-
-local function eachRef(source, callback)
-    local list   = { source }
-    local mark = {}
-    local result = {}
-    local state  = {}
-    local function found(src, mode)
-        local info
-        if src.mode then
-            info = src
-            src = info.source
-        end
-        if not mark[src] then
-            list[#list+1] = src
-        end
-        if info then
-            mark[src] = info
-        elseif mode then
-            mark[src] = {
-                source = src,
-                mode   = mode,
-            }
-        end
-    end
-    while #list > 0 do
-        local max = #list
-        local src = list[max]
-        list[max] = nil
-        vm.refOf(state, src, found)
-    end
-    for _, info in pairs(mark) do
-        result[#result+1] = info
-    end
-    return result
 end
 
 --- 判断2个对象是否拥有相同的引用

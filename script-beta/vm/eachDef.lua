@@ -22,6 +22,9 @@ local function ofLocal(state, loc, source, callback)
     if loc.tag ~= 'self' then
         callback(loc, 'declare')
     end
+    if source == loc then
+        return
+    end
     local refs = loc.ref
     if refs then
         for i = 1, #refs do
@@ -297,7 +300,8 @@ function vm.defOf(state, source, callback)
         ofIndex(state, source, callback)
         ofValue(state, source, callback)
     elseif stype == 'table'
-    or     stype == 'function' then
+    or     stype == 'function'
+    or     stype == 'nil' then
         ofValue(state, source, callback)
     elseif stype == 'select' then
         ofSelect(state, source, callback)
@@ -383,12 +387,11 @@ local function applyCache(cache, callback, max)
     end
 end
 
---- 获取所有的引用
+--- 获取所有的定义
 function vm.eachDef(source, callback, max)
     local cache = vm.cache.eachDef[source]
     if cache then
-        applyCache(cache, callback, max)
-        return
+        return applyCache(cache, callback, max)
     end
     local unlock = vm.lock('eachDef', source)
     if not unlock then
@@ -398,5 +401,5 @@ function vm.eachDef(source, callback, max)
     vm.cache.eachDef[source] = cache
     eachDef(source, cache)
     unlock()
-    applyCache(cache, callback, max)
+    return applyCache(cache, callback, max)
 end

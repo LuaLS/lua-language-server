@@ -120,7 +120,7 @@ TEST {
 TEST {
     {
         path = 'a.lua',
-        content = 'local <!t!> = 1; return <!t!>',
+        content = 'local <!t!> = 1; return t',
     },
     {
         path = 'b.lua',
@@ -146,7 +146,7 @@ end
 TEST {
     {
         path = 'a.lua',
-        content = 'local <!t!> = 1; return <!t!>',
+        content = 'local <!t!> = 1; return t',
     },
     {
         path = 'b.lua',
@@ -213,7 +213,7 @@ TEST {
     {
         path = 'a.lua',
         content = [[
-            return <!a():b():c()!>
+            return a():b():c()
         ]],
     },
     {
@@ -357,7 +357,7 @@ TEST {
         content = [[
             local function <!f!>()
             end
-            return <!f!>
+            return f
         ]]
     },
     {
@@ -396,7 +396,7 @@ TEST {
     {
         path = 'a.lua',
         content = [[
-            local x
+            local <!x!>
             return {
                 <!x!> = x,
             }

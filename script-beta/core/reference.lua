@@ -33,8 +33,7 @@ local function findRef(source, offset, callback)
         end
         if info.mode == 'declare'
         or info.mode == 'set'
-        or info.mode == 'get'
-        or info.mode == 'return' then
+        or info.mode == 'get' then
             local src  = info.source
             local root = guide.getRoot(src)
             local uri  = root.uri
@@ -57,10 +56,8 @@ local function findRef(source, offset, callback)
             local src  = info.source
             local root = guide.getRoot(src)
             local uri  = root.uri
-            if     src.type == 'function' then
-                if src.parent.type == 'return' then
-                    callback(src, uri)
-                end
+            if src.parent.type == 'return' then
+                callback(src, uri)
             end
         end
     end)

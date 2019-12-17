@@ -22,8 +22,7 @@ local function findDef(source, callback)
             return
         end
         if info.mode == 'declare'
-        or info.mode == 'set'
-        or info.mode == 'return' then
+        or info.mode == 'set' then
             local src  = info.source
             local root = guide.getRoot(src)
             local uri  = root.uri
@@ -39,6 +38,14 @@ local function findDef(source, callback)
             or     src.type == 'setmethod' then
                 callback(src.method, uri)
             else
+                callback(src, uri)
+            end
+        end
+        if info.mode == 'value' then
+            local src  = info.source
+            local root = guide.getRoot(src)
+            local uri  = root.uri
+            if src.parent.type == 'return' then
                 callback(src, uri)
             end
         end

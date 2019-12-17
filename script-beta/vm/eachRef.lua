@@ -527,7 +527,8 @@ function vm.refOf(state, source, callback)
         ofIndex(state, source, callback)
         ofValue(state, source, callback)
     elseif stype == 'table'
-    or     stype == 'function' then
+    or     stype == 'function'
+    or     stype == 'nil' then
         ofValue(state, source, callback)
     elseif stype == 'select' then
         ofSelect(state, source, callback)
@@ -560,8 +561,7 @@ end
 function vm.eachRef(source, callback, max)
     local cache = vm.cache.eachRef[source]
     if cache then
-        applyCache(cache, callback, max)
-        return
+        return applyCache(cache, callback, max)
     end
     local unlock = vm.lock('eachRef', source)
     if not unlock then
@@ -575,5 +575,5 @@ function vm.eachRef(source, callback, max)
         local src = cache[i].source
         vm.cache.eachRef[src] = cache
     end
-    applyCache(cache, callback, max)
+    return applyCache(cache, callback, max)
 end

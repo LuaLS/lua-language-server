@@ -177,9 +177,16 @@ local function buildFunction(results, source, oop, data)
     end
 end
 
+local function isSameSource(source, pos)
+    return source.start <= pos and source.finish >= pos
+end
+
 local function checkLocal(ast, word, offset, results)
     local locals = guide.getVisibleLocals(ast.ast, offset)
     for name, source in pairs(locals) do
+        if isSameSource(source, offset) then
+            goto CONTINUE
+        end
         if not matchKey(word, name) then
             goto CONTINUE
         end
@@ -208,10 +215,6 @@ local function checkLocal(ast, word, offset, results)
         end
         ::CONTINUE::
     end
-end
-
-local function isSameSource(source, pos)
-    return source.start <= pos and source.finish >= pos
 end
 
 local function checkField(word, start, parent, oop, results)
@@ -601,10 +604,12 @@ local function checkKeyWord(ast, text, start, word, hasSpace, afterLocal, result
         end
         if eq then
             local replaced
+            local extra
             if snipType == 'Both' or snipType == 'Replace' then
                 local func = data[2]
                 if func then
                     replaced = func(hasSpace, results)
+                    extra = true
                 end
             end
             if snipType == 'Both' then
@@ -612,10 +617,15 @@ local function checkKeyWord(ast, text, start, word, hasSpace, afterLocal, result
             end
             if not replaced then
                 if not hasSpace then
-                    results[#results+1] = {
+                    local item = {
                         label = key,
                         kind  = ckind.Keyword,
                     }
+                    if extra then
+                        table.insert(results, #results, item)
+                    else
+                        results[#results+1] = item
+                    end
                 end
             end
             local checkStop = data[3]

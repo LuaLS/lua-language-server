@@ -440,7 +440,7 @@ end
 {
     {
         label = 'fff',
-        kind = CompletionItemKind.Variable,
+        kind = CompletionItemKind.Field,
     },
 }
 
@@ -906,6 +906,7 @@ mt:f$
     },
 }
 
+do return end
 TEST [[
 ---@$
 ]]

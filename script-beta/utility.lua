@@ -14,6 +14,7 @@ local mathCeil     = math.ceil
 local getmetatable = getmetatable
 local mathAbs      = math.abs
 local ioOpen       = io.open
+local utf8Len      = utf8.len
 
 _ENV = nil
 
@@ -454,6 +455,14 @@ function m.viewLiteral(v)
         end
     end
     return nil
+end
+
+function m.utf8Len(str, start, finish)
+    local len, pos = utf8Len(str, start, finish, true)
+    if len then
+        return len
+    end
+    return 1 + m.utf8Len(str, start, pos-1) + m.utf8Len(str, pos+1, finish)
 end
 
 return m

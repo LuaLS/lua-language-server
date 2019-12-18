@@ -1,4 +1,5 @@
 local guide = require 'parser.guide'
+local util  = require 'utility'
 
 local m = {}
 
@@ -30,7 +31,7 @@ function m.position(lines, text, offset)
     if start < 1 then
         start = 1
     end
-    local ucol     = utf8.len(text, start, start + col - 1, true)
+    local ucol     = util.utf8Len(text, start, start + col - 1, true)
     if row < 1 then
         row = 1
     end

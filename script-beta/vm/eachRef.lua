@@ -10,8 +10,10 @@ local function ofLocal(loc, callback)
             mode     = 'declare',
         }
     end
-    if loc.ref then
-        for _, ref in ipairs(loc.ref) do
+    local refs = loc.ref
+    if refs then
+        for i = 1, #refs do
+            local ref = refs[i]
             if ref.type == 'getlocal' then
                 callback {
                     source   = ref,
@@ -22,29 +24,6 @@ local function ofLocal(loc, callback)
                     source   = ref,
                     mode     = 'set',
                 }
-            end
-        end
-    end
-    if loc.tag == '_ENV' and loc.ref then
-        for _, ref in ipairs(loc.ref) do
-            if ref.type == 'getlocal' then
-                local parent = ref.parent
-                if parent.type == 'getfield'
-                or parent.type == 'getindex' then
-                    if guide.getKeyName(parent) == '_G' then
-                        callback {
-                            source   = parent,
-                            mode     = 'get',
-                        }
-                    end
-                end
-            elseif ref.type == 'getglobal' then
-                if guide.getName(ref) == '_G' then
-                    callback {
-                        source   = ref,
-                        mode     = 'get',
-                    }
-                end
             end
         end
     end
@@ -172,7 +151,6 @@ end
 --- 获取所有的引用
 function vm.eachRef(source, callback, max)
     local mark = {}
-    local result = {}
     eachRef(source, function (info)
         local src = info.source
         if mark[src] then

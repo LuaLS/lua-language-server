@@ -117,6 +117,15 @@ local function ofGoTo(source, callback)
     end
 end
 
+local function ofTableField(source, callback)
+    local tbl = source.parent
+    local src = tbl.parent
+    if not src then
+        return
+    end
+    return vm.eachField(src, callback)
+end
+
 local function eachRef(source, callback)
     local stype = source.type
     if     stype == 'local' then
@@ -131,12 +140,13 @@ local function eachRef(source, callback)
     or     stype == 'method' then
         ofField(source, callback)
     elseif stype == 'setfield'
-    or     stype == 'getfield'
-    or     stype == 'tablefield' then
+    or     stype == 'getfield' then
         ofField(source.field, callback)
     elseif stype == 'setmethod'
     or     stype == 'getmethod' then
         ofField(source.method, callback)
+    elseif stype == 'tablefield' then
+        ofTableField(source, callback)
     elseif stype == 'number'
     or     stype == 'boolean'
     or     stype == 'string' then

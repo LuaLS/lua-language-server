@@ -97,6 +97,13 @@ local <?a?> = 1
 
 TEST [[
 local t = {
+    <!a!> = 1
+}
+print(t.<?a?>)
+]]
+
+TEST [[
+local t = {
     <?a?> = 1
 }
 print(t.<!a!>)

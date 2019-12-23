@@ -20,6 +20,27 @@ local function checkNext(source)
     return nil
 end
 
+local function findFieldInTable(value, callback)
+    if not value then
+        return
+    end
+    if value.type ~= 'table' then
+        return
+    end
+    for i = 1, #value do
+        local field = value[i]
+        if field.type == 'tablefield'
+        or field.type == 'tableindex' then
+            callback {
+                source   = field,
+                key      = guide.getKeyName(field),
+                value    = field.value,
+                mode     = 'set',
+            }
+        end
+    end
+end
+
 local function ofENV(source, callback)
     local refs = source.ref
     if not refs then
@@ -40,6 +61,7 @@ local function ofENV(source, callback)
                 mode   = 'set',
             }
         end
+        findFieldInTable(ref.value, callback)
     end
 end
 
@@ -49,6 +71,7 @@ local function ofLocal(source, callback)
     else
         vm.eachRef(source, function (info)
             local src = info.source
+            findFieldInTable(src.value, callback)
             local nextSrc, mode = checkNext(src)
             if not nextSrc then
                 return
@@ -62,6 +85,31 @@ local function ofLocal(source, callback)
     end
 end
 
+local function ofGlobal(source, callback)
+    vm.eachRef(source, function (info)
+        local src = info.source
+        local nextSrc, mode = checkNext(src)
+        if not nextSrc then
+            return
+        end
+        callback {
+            source = nextSrc,
+            key    = guide.getKeyName(nextSrc),
+            mode   = mode,
+        }
+        findFieldInTable(src.value, callback)
+    end)
+end
+
+local function ofTable(source, callback)
+    local parent = source.parent
+    if parent and parent.value == source then
+        return vm.eachField(parent, callback)
+    else
+        findFieldInTable(source, callback)
+    end
+end
+
 function vm.eachField(source, callback)
     local stype = source.type
     if     stype == 'local' then
@@ -69,6 +117,10 @@ function vm.eachField(source, callback)
     elseif stype == 'getlocal'
     or     stype == 'setlocal' then
         ofLocal(source.node, callback)
-    elseif stype == 'getglobal' then
+    elseif stype == 'getglobal'
+    or     stype == 'setglobal' then
+        ofGlobal(source, callback)
+    elseif stype == 'table' then
+        ofTable(source, callback)
     end
 end

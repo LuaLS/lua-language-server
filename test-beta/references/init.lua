@@ -116,17 +116,17 @@ local t = {
 print(t.<!a!>)
 ]]
 
-TEST [[
-local <!mt!> = {}
-function <!mt!>:a()
-    <?self?>:remove()
-end
-]]
+--TEST [[
+--local <!mt!> = {}
+--function <!mt!>:a()
+--    <?self?>:remove()
+--end
+--]]
 
 TEST [[
 local function f()
-    return <~<!function~> ()
-    end!>
+    return <~function~> ()
+    end
 end
 
 local <!f2!> = f()
@@ -134,8 +134,8 @@ local <!f2!> = f()
 
 TEST [[
 local function f()
-    return nil, <~<!function~> ()
-    end!>
+    return nil, <~function~> ()
+    end
 end
 
 local _, <!f2!> = f()

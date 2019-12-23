@@ -126,6 +126,60 @@ local function ofTableField(source, callback)
     return vm.eachField(src, callback)
 end
 
+local function findIndex(parent, source)
+    for i = 1, #parent do
+        if parent[i] == source then
+            return i
+        end
+    end
+    return nil
+end
+
+local function findCallRecvs(func, index, callback)
+    vm.eachRef(func, function (info)
+        local source = info.source
+        local parent = source.parent
+        if parent.type ~= 'call' then
+            return
+        end
+        if index == 1 then
+            local slt = parent.parent
+            if not slt or slt.type ~= 'select' then
+                return
+            end
+            callback(slt.parent)
+        else
+            local slt = parent.extParent and parent.extParent[index-1]
+            if not slt or slt.type ~= 'select' then
+                return
+            end
+            callback(slt.parent)
+        end
+    end)
+end
+
+local function ofFunction(source, callback)
+    local parent = source.parent
+    if not parent then
+        return
+    end
+    if parent.type == 'return' then
+        local func = guide.getParentFunction(parent)
+        if not func then
+            return
+        end
+        local index = findIndex(parent, source)
+        if not index then
+            return
+        end
+        findCallRecvs(func, index, function (src)
+            vm.eachRef(src, callback)
+        end)
+    elseif parent.value == source then
+        vm.eachRef(parent, callback)
+    end
+end
+
 local function eachRef(source, callback)
     local stype = source.type
     if     stype == 'local' then
@@ -151,6 +205,8 @@ local function eachRef(source, callback)
     or     stype == 'boolean'
     or     stype == 'string' then
         ofLiteral(source, callback)
+    elseif stype == 'function' then
+        ofFunction(source, callback)
     elseif stype == 'goto' then
         ofGoTo(source, callback)
     elseif stype == 'label' then

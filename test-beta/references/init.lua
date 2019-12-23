@@ -160,9 +160,9 @@ print(obj.<?x?>)
 ]]
 
 TEST [[
-local <!x!>
+local x
 local function f()
-    return <!x!>
+    return x
 end
 local <?y?> = f()
 ]]
@@ -172,14 +172,14 @@ local <?x?>
 local function f()
     return <!x!>
 end
-local <!y!> = f()
+local y = f()
 ]]
 
 TEST [[
-local <!x!>
+local x
 local function f()
     return function ()
-        return <!x!>
+        return x
     end
 end
 local <?y?> = f()()
@@ -192,18 +192,18 @@ local function f()
         return <!x!>
     end
 end
-local <!y!> = f()()
+local y = f()()
 ]]
 
 TEST [[
-local <!mt!> = {}
-<!mt!>.<!__index!> = <!mt!>
+local mt = {}
+mt.__index = mt
 
-function <!mt!>:add(a, b)
+function mt:add(a, b)
 end
 
 local function init()
-    return setmetatable({}, <!mt!>)
+    return setmetatable({}, mt)
 end
 
 local <!t!> = init()
@@ -214,7 +214,7 @@ TEST [[
 local mt = {}
 mt.__index = mt
 
-function mt:<!add!>(a, b)
+function mt:add(a, b)
 end
 
 local function init()
@@ -231,20 +231,20 @@ t.<?x?> = 1
 t[a.b.x] = 1
 ]]
 
-TEST [[
-local t = {}
-t.x = 1
-t[a.b.<?x?>] = 1
-]]
+--TEST [[
+--local t = {}
+--t.x = 1
+--t[a.b.<?x?>] = 1
+--]]
 
 TEST [[
 local t
-local <!f!> = t.<?f?>
+local f = t.<?f?>
 
-<!f!>()
+f()
 
 return {
-    <!f!> = <!f!>,
+    f = f,
 }
 ]]
 

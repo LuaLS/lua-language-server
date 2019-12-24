@@ -27,38 +27,22 @@ local function findRef(source, offset, callback)
     and not isFunction(source, offset) then
         return
     end
-    vm.eachRef(source, function (info)
-        if info.source.library then
-            return
-        end
-        if info.mode == 'declare'
-        or info.mode == 'set'
-        or info.mode == 'get' then
-            local src  = info.source
-            local root = guide.getRoot(src)
-            local uri  = root.uri
-            if     src.type == 'setfield'
-            or     src.type == 'getfield'
-            or     src.type == 'tablefield' then
-                callback(src.field, uri)
-            elseif src.type == 'setindex'
-            or     src.type == 'getindex'
-            or     src.type == 'tableindex' then
-                callback(src.index, uri)
-            elseif src.type == 'getmethod'
-            or     src.type == 'setmethod' then
-                callback(src.method, uri)
-            else
-                callback(src, uri)
-            end
-        end
-        if info.mode == 'value' then
-            local src  = info.source
-            local root = guide.getRoot(src)
-            local uri  = root.uri
-            if src.parent.type == 'return' then
-                callback(src, uri)
-            end
+    vm.eachRef(source, function (src)
+        local root = guide.getRoot(src)
+        local uri  = root.uri
+        if     src.type == 'setfield'
+        or     src.type == 'getfield'
+        or     src.type == 'tablefield' then
+            callback(src.field, uri)
+        elseif src.type == 'setindex'
+        or     src.type == 'getindex'
+        or     src.type == 'tableindex' then
+            callback(src.index, uri)
+        elseif src.type == 'getmethod'
+        or     src.type == 'setmethod' then
+            callback(src.method, uri)
+        else
+            callback(src, uri)
         end
     end)
 end

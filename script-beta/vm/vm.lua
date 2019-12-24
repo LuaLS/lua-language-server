@@ -59,6 +59,18 @@ function m.getLinkUris(call)
     end
 end
 
+function m.isSet(src)
+    local tp = src.type
+    return tp == 'setglobal'
+        or tp == 'local'
+        or tp == 'setlocal'
+        or tp == 'setfield'
+        or tp == 'setmethod'
+        or tp == 'setindex'
+        or tp == 'tablefield'
+        or tp == 'tableindex'
+end
+
 m.cacheTracker = setmetatable({}, { __mode = 'kv' })
 
 --- 刷新缓存

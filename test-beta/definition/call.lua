@@ -1,6 +1,6 @@
 TEST [[
 function f()
-    local <!x!>
+    local x
     return x
 end
 local <!y!> = f()

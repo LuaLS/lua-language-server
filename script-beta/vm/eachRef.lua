@@ -5,25 +5,16 @@ local vm      = require 'vm.vm'
 local function ofLocal(loc, callback)
     -- 方法中的 self 使用了一个虚拟的定义位置
     if loc.tag ~= 'self' then
-        callback {
-            source   = loc,
-            mode     = 'declare',
-        }
+        callback(loc)
     end
     local refs = loc.ref
     if refs then
         for i = 1, #refs do
             local ref = refs[i]
             if ref.type == 'getlocal' then
-                callback {
-                    source   = ref,
-                    mode     = 'get',
-                }
+                callback(ref)
             elseif ref.type == 'setlocal' then
-                callback {
-                    source   = ref,
-                    mode     = 'set',
-                }
+                callback(ref)
             end
         end
     end
@@ -44,12 +35,9 @@ local function ofGlobal(source, callback)
             end
         end
     else
-        vm.eachField(node, function (info)
-            if key == info.key then
-                callback {
-                    source   = info.source,
-                    mode     = info.mode,
-                }
+        vm.eachField(node, function (src)
+            if key == guide.getKeyName(src) then
+                callback(src)
             end
         end)
     end
@@ -61,22 +49,16 @@ local function ofField(source, callback)
     if parent.type == 'tablefield'
     or parent.type == 'tableindex' then
         local tbl = parent.parent
-        vm.eachField(tbl, function (info)
-            if key == info.key then
-                callback {
-                    source   = info.source,
-                    mode     = info.mode,
-                }
+        vm.eachField(tbl, function (src)
+            if key == guide.getKeyName(src) then
+                callback(src)
             end
         end)
     else
         local node = parent.node
-        vm.eachField(node, function (info)
-            if key == info.key then
-                callback {
-                    source   = info.source,
-                    mode     = info.mode,
-                }
+        vm.eachField(node, function (src)
+            if key == guide.getKeyName(src) then
+                callback(src)
             end
         end)
     end
@@ -95,16 +77,10 @@ local function ofLiteral(source, callback)
 end
 
 local function ofLabel(source, callback)
-    callback {
-        source = source,
-        mode   = 'set',
-    }
+    callback(source)
     if source.ref then
         for _, ref in ipairs(source.ref) do
-            callback {
-                source = ref,
-                mode   = 'get',
-            }
+            callback(ref)
         end
     end
 end
@@ -136,8 +112,7 @@ local function findIndex(parent, source)
 end
 
 local function findCallRecvs(func, index, callback)
-    vm.eachRef(func, function (info)
-        local source = info.source
+    vm.eachRef(func, function (source)
         local parent = source.parent
         if parent.type ~= 'call' then
             return
@@ -217,12 +192,11 @@ end
 --- 获取所有的引用
 function vm.eachRef(source, callback, max)
     local mark = {}
-    eachRef(source, function (info)
-        local src = info.source
+    eachRef(source, function (src)
         if mark[src] then
             return
         end
         mark[src] = true
-        callback(info)
+        callback(src)
     end)
 end

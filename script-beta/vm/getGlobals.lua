@@ -8,24 +8,21 @@ local function getGlobals(root)
     end
     local cache = {}
     local mark = {}
-    vm.eachField(env, function (info)
-        local src = info.source
+    vm.eachField(env, function (src)
         if mark[src] then
             return
         end
         mark[src] = true
-        local name = info.key
+        local name = guide.getKeyName(src)
         if not name then
             return
         end
         if not cache[name] then
             cache[name] = {
                 key  = name,
-                mode = {},
             }
         end
-        cache[name][#cache[name]+1] = info
-        cache[name].mode[info.mode] = true
+        cache[name][#cache[name]+1] = src
         vm.cache.getGlobal[src] = name
     end)
     return cache

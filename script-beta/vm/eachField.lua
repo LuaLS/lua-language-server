@@ -10,10 +10,8 @@ local function checkNext(source)
     local ntype = nextSrc.type
     if ntype == 'setfield'
     or ntype == 'setmethod'
-    or ntype == 'setindex'
     or ntype == 'getfield'
-    or ntype == 'getmethod'
-    or ntype == 'getindex' then
+    or ntype == 'getmethod' then
         return nextSrc
     end
     return nil
@@ -86,6 +84,15 @@ local function ofTable(source, callback)
     end
 end
 
+local function ofTableField(source, callback)
+    vm.eachRef(source, function (src)
+        local nextSrc = checkNext(src)
+        if nextSrc then
+            callback(nextSrc)
+        end
+    end)
+end
+
 function vm.eachField(source, callback)
     local stype = source.type
     if     stype == 'local' then
@@ -98,5 +105,7 @@ function vm.eachField(source, callback)
         ofGlobal(source, callback)
     elseif stype == 'table' then
         ofTable(source, callback)
+    elseif stype == 'tablefield' then
+        ofTableField(source, callback)
     end
 end

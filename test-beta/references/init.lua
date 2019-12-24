@@ -248,6 +248,15 @@ return {
 }
 ]]
 
+TEST [[
+self = {
+    results = {
+        <?labels?> = {},
+    }
+}
+self[self.results.<!labels!>] = lbl
+]]
+
 --TEST [[
 -----@class <!Class!>
 -----@type <?Class?>

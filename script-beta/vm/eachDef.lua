@@ -135,8 +135,7 @@ local function findIndex(parent, source)
 end
 
 local function findCallRecvs(func, index, callback)
-    vm.eachRef(func, function (info)
-        local source = info.source
+    vm.eachRef(func, function (source)
         local parent = source.parent
         if parent.type ~= 'call' then
             return

@@ -62,18 +62,16 @@ local function ofGlobal(source, callback)
     end
 end
 
+local function ofTableField(source, callback)
+    callback(source)
+end
+
 local function ofField(source, callback)
     local parent = source.parent
     local key    = guide.getKeyName(source)
     if parent.type == 'tablefield'
     or parent.type == 'tableindex' then
-        local tbl = parent.parent
-        vm.eachField(tbl, function (src)
-            if  vm.isSet(src)
-            and key == guide.getKeyName(src) then
-                callback(src)
-            end
-        end)
+        ofTableField(parent, callback)
     else
         local node = parent.node
         vm.eachField(node, function (src)
@@ -81,6 +79,9 @@ local function ofField(source, callback)
             and key == guide.getKeyName(src) then
                 callback(src)
             end
+        end)
+        vm.eachRef(node, function (src)
+            vm.eachFieldInTable(src.value, callback)
         end)
     end
 end
@@ -114,15 +115,6 @@ local function ofGoTo(source, callback)
     if label then
         ofLabel(label, callback)
     end
-end
-
-local function ofTableField(source, callback)
-    local tbl = source.parent
-    local src = tbl.parent
-    if not src then
-        return
-    end
-    return vm.eachField(src, callback)
 end
 
 local function findIndex(parent, source)

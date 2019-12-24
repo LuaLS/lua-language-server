@@ -78,11 +78,10 @@ local function ofLiteral(source, callback)
     if not parent then
         return
     end
-    if     parent.type == 'setindex'
-    or     parent.type == 'getindex' then
+    if parent.type == 'setindex'
+    or parent.type == 'getindex'
+    or parent.type == 'tableindex' then
         ofField(source, callback)
-    elseif parent.type == 'tableindex' then
-        ofTableField(parent, callback)
     end
 end
 

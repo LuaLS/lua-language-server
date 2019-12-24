@@ -14,23 +14,13 @@ local function checkNext(source)
     or ntype == 'getmethod' then
         return nextSrc
     end
-    return nil
-end
-
-local function findFieldInTable(value, callback)
-    if not value then
-        return
-    end
-    if value.type ~= 'table' then
-        return
-    end
-    for i = 1, #value do
-        local field = value[i]
-        if field.type == 'tablefield'
-        or field.type == 'tableindex' then
-            callback(field)
+    if ntype == 'setindex'
+    or ntype == 'getindex' then
+        if nextSrc.node == source then
+            return nextSrc
         end
     end
+    return nil
 end
 
 local function ofENV(source, callback)
@@ -45,7 +35,7 @@ local function ofENV(source, callback)
         elseif ref.type == 'setglobal' then
             callback(ref)
         end
-        findFieldInTable(ref.value, callback)
+        vm.eachFieldInTable(ref.value, callback)
     end
 end
 
@@ -54,8 +44,8 @@ local function ofLocal(source, callback)
         ofENV(source, callback)
     else
         vm.eachRef(source, function (src)
-            findFieldInTable(src.value, callback)
-            local nextSrc, mode = checkNext(src)
+            vm.eachFieldInTable(src.value, callback)
+            local nextSrc = checkNext(src)
             if not nextSrc then
                 return
             end
@@ -71,7 +61,18 @@ local function ofGlobal(source, callback)
             return
         end
         callback(nextSrc)
-        findFieldInTable(src.value, callback)
+        vm.eachFieldInTable(src.value, callback)
+    end)
+end
+
+local function ofGetField(source, callback)
+    vm.eachRef(source, function (src)
+        local nextSrc = checkNext(src)
+        if not nextSrc then
+            return
+        end
+        callback(nextSrc)
+        vm.eachFieldInTable(src.value, callback)
     end)
 end
 
@@ -80,7 +81,7 @@ local function ofTable(source, callback)
     if parent and parent.value == source then
         return vm.eachField(parent, callback)
     else
-        findFieldInTable(source, callback)
+        vm.eachFieldInTable(source, callback)
     end
 end
 
@@ -91,6 +92,22 @@ local function ofTableField(source, callback)
             callback(nextSrc)
         end
     end)
+end
+
+function vm.eachFieldInTable(value, callback)
+    if not value then
+        return
+    end
+    if value.type ~= 'table' then
+        return
+    end
+    for i = 1, #value do
+        local field = value[i]
+        if field.type == 'tablefield'
+        or field.type == 'tableindex' then
+            callback(field)
+        end
+    end
 end
 
 function vm.eachField(source, callback)
@@ -107,5 +124,12 @@ function vm.eachField(source, callback)
         ofTable(source, callback)
     elseif stype == 'tablefield' then
         ofTableField(source, callback)
+    elseif stype == 'getfield'
+    or     stype == 'setfield'
+    or     stype == 'getmethod'
+    or     stype == 'setmethod'
+    or     stype == 'getindex'
+    or     stype == 'setindex' then
+        ofGetField(source, callback)
     end
 end

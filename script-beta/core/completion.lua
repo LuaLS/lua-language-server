@@ -290,6 +290,9 @@ local function checkTableField(ast, word, start, results)
     end
     local used = {}
     guide.eachSourceType(ast.ast, 'tablefield', function (src)
+        if not src.field then
+            return
+        end
         local key = src.field[1]
         if  not used[key]
         and matchKey(word, key)

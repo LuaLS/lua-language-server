@@ -2,25 +2,42 @@ local guide   = require 'parser.guide'
 local files   = require 'files'
 local vm      = require 'vm.vm'
 
-local function checkNext(source)
+local function checkNext(source, callback)
     local nextSrc = source.next
     if not nextSrc then
-        return nil
+        return
     end
     local ntype = nextSrc.type
     if ntype == 'setfield'
     or ntype == 'setmethod'
     or ntype == 'getfield'
     or ntype == 'getmethod' then
-        return nextSrc
+        callback(nextSrc)
     end
     if ntype == 'setindex'
     or ntype == 'getindex' then
         if nextSrc.node == source then
-            return nextSrc
+            callback(nextSrc)
         end
     end
-    return nil
+    return
+end
+
+local function checkMetaArg1(source, callback)
+    local node, index = vm.getArgInfo(source)
+    local special = vm.getSpecial(node)
+    if special == 'setmetatable' and index == 1 then
+        local mt = node.next.args[2]
+        if mt then
+            vm.eachField(mt, function (src)
+                if vm.getKeyName(src) == 's|__index' then
+                    if src.value then
+                        vm.eachField(src.value, callback)
+                    end
+                end
+            end)
+        end
+    end
 end
 
 local function ofENV(source, callback)
@@ -34,10 +51,8 @@ local function ofENV(source, callback)
         or ref.type == 'setglobal' then
             callback(ref)
             if guide.getName(ref) == '_G' then
-                local nextSrc = checkNext(ref)
-                if nextSrc then
-                    callback(nextSrc)
-                end
+                checkNext(ref, callback)
+                checkMetaArg1(ref, callback)
                 local call, index = vm.getArgInfo(ref)
                 local special = vm.getSpecial(call)
                 if (special == 'rawset' or special == 'rawget')
@@ -46,10 +61,8 @@ local function ofENV(source, callback)
                 end
             end
         elseif ref.type == 'getlocal' then
-            local nextSrc = checkNext(ref)
-            if nextSrc then
-                callback(nextSrc)
-            end
+            checkNext(ref, callback)
+            checkMetaArg1(ref, callback)
         end
         vm.eachFieldInTable(ref.value, callback)
     end
@@ -61,33 +74,24 @@ local function ofLocal(source, callback)
     else
         vm.eachRef(source, function (src)
             vm.eachFieldInTable(src.value, callback)
-            local nextSrc = checkNext(src)
-            if not nextSrc then
-                return
-            end
-            callback(nextSrc)
+            checkNext(src, callback)
+            checkMetaArg1(src, callback)
         end)
     end
 end
 
 local function ofGlobal(source, callback)
     vm.eachRef(source, function (src)
-        local nextSrc = checkNext(src)
-        if not nextSrc then
-            return
-        end
-        callback(nextSrc)
+        checkNext(src, callback)
+        checkMetaArg1(src, callback)
         vm.eachFieldInTable(src.value, callback)
     end)
 end
 
 local function ofGetField(source, callback)
     vm.eachRef(source, function (src)
-        local nextSrc = checkNext(src)
-        if not nextSrc then
-            return
-        end
-        callback(nextSrc)
+        checkNext(src, callback)
+        checkMetaArg1(src, callback)
         vm.eachFieldInTable(src.value, callback)
     end)
 end
@@ -103,10 +107,8 @@ end
 
 local function ofTableField(source, callback)
     vm.eachRef(source, function (src)
-        local nextSrc = checkNext(src)
-        if nextSrc then
-            callback(nextSrc)
-        end
+        checkNext(src, callback)
+        checkMetaArg1(src, callback)
     end)
 end
 

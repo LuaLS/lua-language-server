@@ -105,6 +105,9 @@ function m.getSpecial(source)
 end
 
 function m.getKeyName(source)
+    if not source then
+        return nil
+    end
     if source.type == 'call' then
         local special = m.getSpecial(source.node)
         if special == 'rawset'

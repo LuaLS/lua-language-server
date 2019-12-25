@@ -2,6 +2,7 @@ local files   = require 'files'
 local guide   = require 'parser.guide'
 local lang    = require 'language'
 local define  = require 'proto.define'
+local vm      = require 'vm'
 
 return function (uri, callback)
     local ast = files.getAst(uri)
@@ -14,7 +15,7 @@ return function (uri, callback)
         for _, obj in ipairs(source) do
             if obj.type == 'tablefield'
             or obj.type == 'tableindex' then
-                local name = guide.getKeyName(obj)
+                local name = vm.getKeyName(obj)
                 if name then
                     if not mark[name] then
                         mark[name] = {}

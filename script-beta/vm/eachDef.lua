@@ -37,7 +37,7 @@ local function ofLocal(loc, callback)
 end
 
 local function ofGlobal(source, callback)
-    local key = guide.getKeyName(source)
+    local key = vm.getKeyName(source)
     local node = source.node
     if node.tag == '_ENV' then
         local uris = files.findGlobals(key)
@@ -55,7 +55,7 @@ local function ofGlobal(source, callback)
     else
         vm.eachField(node, function (src)
             if  vm.isSet(src)
-            and key == guide.getKeyName(src) then
+            and key == vm.getKeyName(src) then
                 callback(src)
             end
         end)
@@ -68,7 +68,7 @@ end
 
 local function ofField(source, callback)
     local parent = source.parent
-    local key    = guide.getKeyName(source)
+    local key    = vm.getKeyName(source)
     if parent.type == 'tablefield'
     or parent.type == 'tableindex' then
         ofTableField(parent, callback)
@@ -76,7 +76,7 @@ local function ofField(source, callback)
         local node = parent.node
         vm.eachField(node, function (src)
             if  vm.isSet(src)
-            and key == guide.getKeyName(src) then
+            and key == vm.getKeyName(src) then
                 callback(src)
             end
         end)

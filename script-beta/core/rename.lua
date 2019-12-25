@@ -227,7 +227,7 @@ local function ofLocal(source, newname, callback)
 end
 
 local function ofField(source, newname, callback)
-    local key    = guide.getKeyName(source)
+    local key    = vm.getKeyName(source)
     local tbl
     if source.type == 'tablefield'
     or source.type == 'tableindex' then

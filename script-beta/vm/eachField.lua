@@ -30,20 +30,19 @@ local function ofENV(source, callback)
     end
     for i = 1, #refs do
         local ref = refs[i]
-        if ref.type == 'getglobal' then
+        if ref.type == 'getglobal'
+        or ref.type == 'setglobal' then
             callback(ref)
             if guide.getName(ref) == '_G' then
                 local nextSrc = checkNext(ref)
                 if nextSrc then
                     callback(nextSrc)
                 end
-            end
-        elseif ref.type == 'setglobal' then
-            callback(ref)
-            if guide.getName(ref) == '_G' then
-                local nextSrc = checkNext(ref)
-                if nextSrc then
-                    callback(nextSrc)
+                local call, index = vm.getArgInfo(ref)
+                local special = vm.getSpecial(call)
+                if (special == 'rawset' or special == 'rawget')
+                and index == 1 then
+                    callback(call.next)
                 end
             end
         elseif ref.type == 'getlocal' then

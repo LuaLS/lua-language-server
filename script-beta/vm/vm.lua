@@ -61,14 +61,58 @@ end
 
 function m.isSet(src)
     local tp = src.type
-    return tp == 'setglobal'
-        or tp == 'local'
-        or tp == 'setlocal'
-        or tp == 'setfield'
-        or tp == 'setmethod'
-        or tp == 'setindex'
-        or tp == 'tablefield'
-        or tp == 'tableindex'
+    if tp == 'setglobal'
+    or tp == 'local'
+    or tp == 'setlocal'
+    or tp == 'setfield'
+    or tp == 'setmethod'
+    or tp == 'setindex'
+    or tp == 'tablefield'
+    or tp == 'tableindex' then
+        return true
+    end
+    if tp == 'call' then
+        local special = m.getSpecial(src.node)
+        if special == 'rawset' then
+            return true
+        end
+    end
+    return false
+end
+
+function m.getArgInfo(source)
+    local callargs = source.parent
+    if not callargs or callargs.type ~= 'callargs' then
+        return nil
+    end
+    local call = callargs.parent
+    if not call or call.type ~= 'call' then
+        return nil
+    end
+    for i = 1, #callargs do
+        if callargs[i] == source then
+            return call.node, i
+        end
+    end
+    return nil
+end
+
+function m.getSpecial(source)
+    if not source then
+        return nil
+    end
+    return source.special
+end
+
+function m.getKeyName(source)
+    if source.type == 'call' then
+        local special = m.getSpecial(source.node)
+        if special == 'rawset'
+        or special == 'rawget' then
+            return guide.getKeyName(source.args[2])
+        end
+    end
+    return guide.getKeyName(source)
 end
 
 m.cacheTracker = setmetatable({}, { __mode = 'kv' })

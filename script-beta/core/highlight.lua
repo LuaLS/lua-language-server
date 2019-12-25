@@ -17,7 +17,7 @@ local function ofField(source, uri, callback)
     if not parent then
         return
     end
-    local myKey = guide.getKeyName(source)
+    local myKey = vm.getKeyName(source)
     if parent.type == 'tableindex'
     or parent.type == 'tablefield' then
         local tbl = parent.parent

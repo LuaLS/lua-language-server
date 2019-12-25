@@ -13,7 +13,7 @@ local function getGlobals(root)
             return
         end
         mark[src] = true
-        local name = guide.getKeyName(src)
+        local name = vm.getKeyName(src)
         if not name then
             return
         end

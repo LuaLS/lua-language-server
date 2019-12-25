@@ -235,11 +235,10 @@ local function ofField(source, newname, callback)
     else
         tbl = source.node
     end
-    return vm.eachField(tbl, function (info)
-        if info.key ~= key then
+    return vm.eachField(tbl, function (src)
+        if vm.getKeyName(src) ~= key then
             return
         end
-        local src = info.source
         if     src.type == 'tablefield'
         or     src.type == 'getfield'
         or     src.type == 'setfield' then
@@ -279,8 +278,8 @@ local function rename(source, newname, callback)
         if not isValidName(newname) and not askForcing(newname)then
             return false
         end
-        vm.eachRef(source, function (info)
-            callback(info.source, info.source.start, info.source.finish, newname)
+        vm.eachRef(source, function (src)
+            callback(src, src.start, src.finish, newname)
         end)
     elseif source.type == 'local' then
         return ofLocal(source, newname, callback)

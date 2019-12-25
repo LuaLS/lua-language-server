@@ -484,8 +484,7 @@ local function inferByGetTable(results, source)
 end
 
 local function checkDef(results, source)
-    vm.eachDef(source, function (info)
-        local src = info.source
+    vm.eachDef(source, function (src)
         local tp  = vm.getValue(src)
         if tp then
             merge(results, tp)

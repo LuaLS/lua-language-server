@@ -62,8 +62,7 @@ return function (uri, callback)
 
         local func = source.node
         local funcArgs
-        vm.eachDef(func, function (info)
-            local src = info.source
+        vm.eachDef(func, function (src)
             if src.type == 'function' then
                 local args = countFuncArgs(src)
                 if not funcArgs or args > funcArgs then

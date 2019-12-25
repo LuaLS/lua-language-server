@@ -22,12 +22,12 @@ return function (uri, callback)
             return
         end
         local hasSet
-        local hasGet = vm.eachRef(source, function (info)
-            if     info.mode == 'get' then
-                return true
-            elseif info.mode == 'set'
-            or     info.mode == 'declare' then
+        local hasGet
+        vm.eachRef(source, function (src)
+            if vm.isSet(src) then
                 hasSet = true
+            else
+                hasGet = true
             end
         end)
         if not hasGet and hasSet then

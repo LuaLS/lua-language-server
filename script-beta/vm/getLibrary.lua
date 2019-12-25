@@ -73,9 +73,9 @@ end
 local function getLibrary(source)
     return checkNode(source)
         or checkStdLibrary(source)
-        or vm.eachRef(source, function (info)
-            return checkStdLibrary(info.source)
-                or checkNode(info.source)
+        or vm.eachRef(source, function (src)
+            return checkStdLibrary(src)
+                or checkNode(src)
         end, 100)
 end
 

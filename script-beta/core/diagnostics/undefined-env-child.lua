@@ -14,9 +14,10 @@ return function (uri, callback)
         if source.node.tag == '_ENV' then
             return
         end
-        local setInENV = vm.eachRef(source, function (info)
-            if info.mode == 'set' then
-                return true
+        local setInENV
+        vm.eachRef(source, function (src)
+            if vm.isSet(src) then
+                setInENV = true
             end
         end)
         if setInENV then

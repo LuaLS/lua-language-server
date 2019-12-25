@@ -125,9 +125,9 @@ end
 
 local function buildFunctionSnip(source)
     local name = getName(source):gsub('^.-[$.:]', '')
-    local args = vm.eachDef(source, function (info)
-        if info.source.type == 'function' then
-            local args = getArg(info.source)
+    local args = vm.eachDef(source, function (src)
+        if src.type == 'function' then
+            local args = getArg(src)
             if args ~= '' then
                 return args
             end
@@ -219,12 +219,12 @@ end
 
 local function checkField(word, start, parent, oop, results)
     local used = {}
-    vm.eachField(parent, function (info)
-        local key = info.key
+    vm.eachField(parent, function (src)
+        local key = vm.getKeyName(src)
         if not key or key:sub(1, 1) ~= 's' then
             return
         end
-        if isSameSource(info.source, start) then
+        if isSameSource(src, start) then
             return
         end
         local name = key:sub(3)
@@ -236,20 +236,20 @@ local function checkField(word, start, parent, oop, results)
             return
         end
         local kind = ckind.Field
-        if vm.hasType(info.source, 'function') then
+        if vm.hasType(src, 'function') then
             if oop then
                 kind = ckind.Method
             else
                 kind = ckind.Function
             end
             used[name] = true
-            buildFunction(results, info.source, oop, {
+            buildFunction(results, src, oop, {
                 label = name,
                 kind  = kind,
                 id    = stack(function ()
                     return {
-                        detail      = buildDetail(info.source),
-                        description = buildDesc(info.source),
+                        detail      = buildDetail(src),
+                        description = buildDesc(src),
                     }
                 end),
             })
@@ -258,7 +258,7 @@ local function checkField(word, start, parent, oop, results)
                 return
             end
             used[name] = true
-            local literal = vm.getLiteral(info.source)
+            local literal = vm.getLiteral(src)
             if literal ~= nil then
                 kind = ckind.Enum
             end
@@ -267,8 +267,8 @@ local function checkField(word, start, parent, oop, results)
                 kind  = kind,
                 id    = stack(function ()
                     return {
-                        detail      = buildDetail(info.source),
-                        description = buildDesc(info.source),
+                        detail      = buildDetail(src),
+                        description = buildDesc(src),
                     }
                 end)
             }

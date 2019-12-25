@@ -4,6 +4,19 @@ local lang    = require 'language'
 local library = require 'library'
 local config  = require 'config'
 
+local function hasSet(sources)
+    if sources.hasSet ~= nil then
+        return sources.hasSet
+    end
+    sources.hasSet = false
+    for i = 1, #sources do
+        if vm.isSet(sources[i]) then
+            sources.hasSet = true
+        end
+    end
+    return sources.hasSet
+end
+
 return function (uri, callback)
     local ast = files.getAst(uri)
     if not ast then
@@ -12,13 +25,13 @@ return function (uri, callback)
 
     local globalCache = {}
 
-    -- 遍历全局变量，检查所有没有 mode['set'] 的全局变量
+    -- 遍历全局变量，检查所有没有 set 模式的全局变量
     local globals = vm.getGlobals(ast.ast)
     if not globals then
         return
     end
-    for key, infos in pairs(globals) do
-        if infos.mode['set'] == true then
+    for key, sources in pairs(globals) do
+        if hasSet(sources) then
             goto CONTINUE
         end
         if globalCache[key] then
@@ -39,7 +52,7 @@ return function (uri, callback)
             for i = 1, #uris do
                 local destAst = files.getAst(uris[i])
                 local destGlobals = vm.getGlobals(destAst.ast)
-                if destGlobals[key] and destGlobals[key].mode['set'] then
+                if destGlobals[key] and hasSet(destGlobals[key]) then
                     globalCache[key] = true
                     goto CONTINUE
                 end
@@ -54,10 +67,10 @@ return function (uri, callback)
         elseif customVersion then
             message = ('%s(%s)'):format(message, lang.script('DIAG_DEFINED_CUSTOM', table.concat(customVersion, '/')))
         end
-        for _, info in ipairs(infos) do
+        for _, source in ipairs(sources) do
             callback {
-                start   = info.source.start,
-                finish  = info.source.finish,
+                start   = source.start,
+                finish  = source.finish,
                 message = message,
             }
         end

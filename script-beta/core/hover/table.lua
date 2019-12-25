@@ -2,24 +2,24 @@ local vm       = require 'vm'
 local util     = require 'utility'
 local getClass = require 'core.hover.class'
 
-local function getKey(info)
-    if not info.key or #info.key <= 2 then
-        local source = info.source
-        if not source.index then
+local function getKey(src)
+    local key = vm.getKeyName(src)
+    if not key or #key <= 2 then
+        if not src.index then
             return '[any]'
         end
-        local class = getClass(source.index)
+        local class = getClass(src.index)
         if class then
             return ('[%s]'):format(class)
         end
-        local tp = vm.getType(source.index)
+        local tp = vm.getType(src.index)
         if tp then
             return ('[%s]'):format(tp)
         end
         return '[any]'
     end
-    local ktype = info.key:sub(1, 2)
-    local key = info.key:sub(3)
+    local ktype = key:sub(1, 2)
+    key = key:sub(3)
     if ktype == 's|' then
         if key:match '^[%a_][%w_]*$' then
             return key
@@ -30,11 +30,11 @@ local function getKey(info)
     return ('[%s]'):format(key)
 end
 
-local function getField(info)
-    local tp = vm.getType(info.source)
-    local class = getClass(info.source)
-    local literal = vm.getLiteral(info.source)
-    local key = getKey(info)
+local function getField(src)
+    local tp = vm.getType(src)
+    local class = getClass(src)
+    local literal = vm.getLiteral(src)
+    local key = getKey(src)
     if type(literal) == 'string' and #literal >= 50 then
         literal = literal:sub(1, 47) .. '...'
     end
@@ -112,8 +112,8 @@ return function (source)
     local literals = {}
     local classes = {}
     local intValue = true
-    vm.eachField(source, function (info)
-        local key, class, literal = getField(info)
+    vm.eachField(source, function (src)
+        local key, class, literal = getField(src)
         classes[key] = vm.mergeTypeViews(class, classes[key])
         literals[key] = mergeLiteral(literal, literals[key])
         if class ~= 'integer'

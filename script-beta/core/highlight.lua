@@ -21,26 +21,26 @@ local function ofField(source, uri, callback)
     if parent.type == 'tableindex'
     or parent.type == 'tablefield' then
         local tbl = parent.parent
-        vm.eachField(tbl, function (info)
-            if info.key ~= myKey then
+        vm.eachField(tbl, function (src)
+            if vm.getKeyName(src) ~= myKey then
                 return
             end
-            local destUri = guide.getRoot(info.source).uri
+            local destUri = guide.getRoot(src).uri
             if destUri ~= uri then
                 return
             end
-            callback(info.source)
+            callback(src)
         end)
     else
-        vm.eachField(parent.node, function (info)
-            if info.key ~= myKey then
+        vm.eachField(parent.node, function (src)
+            if vm.getKeyName(src) ~= myKey then
                 return
             end
-            local destUri = guide.getRoot(info.source).uri
+            local destUri = guide.getRoot(src).uri
             if destUri ~= uri then
                 return
             end
-            callback(info.source)
+            callback(src)
         end)
     end
 end
@@ -58,9 +58,7 @@ local function ofIndex(source, uri, callback)
 end
 
 local function ofLabel(source, callback)
-    vm.eachRef(source, function (info)
-        callback(info.source)
-    end)
+    vm.eachRef(source, callback)
 end
 
 local function find(source, uri, callback)

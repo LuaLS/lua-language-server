@@ -4,17 +4,15 @@ local function getClass(source, deep)
     if deep > 3 then
         return nil
     end
-    local class = vm.eachField(source, function (info)
-        if not info.key then
-            return
-        end
-        local lkey = info.key:lower()
+    local class = vm.eachField(source, function (src)
+        local key = vm.getKeyName(src)
+        local lkey = key:lower()
         if lkey == 's|type'
         or lkey == 's|__name'
         or lkey == 's|name'
         or lkey == 's|class' then
-            if info.value and info.value.type == 'string' then
-                return info.value[1]
+            if src.value and src.value.type == 'string' then
+                return src.value[1]
             end
         end
     end)

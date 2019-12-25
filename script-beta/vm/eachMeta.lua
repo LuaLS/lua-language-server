@@ -24,13 +24,11 @@ function vm.eachMeta(source, callback)
         return
     end
     cache = {}
-    vm.eachRef(source, function (info)
-        local src = info.source
+    vm.eachRef(source, function (src)
         vm.cache.eachMeta[src] = cache
     end)
     unlock()
-    vm.eachRef(source, function (info)
-        local src = info.source
+    vm.eachRef(source, function (src)
         cache[#cache+1] = vm.cache.getMeta[src]
     end)
     for i = 1, #cache do

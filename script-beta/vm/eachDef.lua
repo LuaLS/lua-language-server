@@ -17,6 +17,21 @@ local function ofParentMT(func, callback)
     vm.eachDef(node, callback)
 end
 
+local function checkValue(value, callback)
+    if not value then
+        return
+    end
+    local stype = value.type
+    if stype == 'number'
+    or stype == 'string'
+    or stype == 'function'
+    or stype == 'table'
+    or stype == 'nil'
+    or stype == 'boolean' then
+        callback(value)
+    end
+end
+
 local function ofLocal(loc, callback)
     -- 方法中的 self 使用了一个虚拟的定义位置
     if loc.tag == 'self' then
@@ -24,6 +39,7 @@ local function ofLocal(loc, callback)
         ofParentMT(func, callback)
     else
         callback(loc)
+        checkValue(loc.value, callback)
     end
     local refs = loc.ref
     if refs then
@@ -31,6 +47,7 @@ local function ofLocal(loc, callback)
             local ref = refs[i]
             if vm.isSet(ref) then
                 callback(ref)
+                checkValue(ref.value, callback)
             end
         end
     end

@@ -80,7 +80,7 @@ local function ofField(source, callback)
                 callback(src)
             end
         end)
-        vm.eachRef(node, function (src)
+        vm.eachDef(node, function (src)
             vm.eachFieldInTable(src.value, callback)
         end)
     end

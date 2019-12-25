@@ -32,8 +32,25 @@ local function ofENV(source, callback)
         local ref = refs[i]
         if ref.type == 'getglobal' then
             callback(ref)
+            if guide.getName(ref) == '_G' then
+                local nextSrc = checkNext(ref)
+                if nextSrc then
+                    callback(nextSrc)
+                end
+            end
         elseif ref.type == 'setglobal' then
             callback(ref)
+            if guide.getName(ref) == '_G' then
+                local nextSrc = checkNext(ref)
+                if nextSrc then
+                    callback(nextSrc)
+                end
+            end
+        elseif ref.type == 'getlocal' then
+            local nextSrc = checkNext(ref)
+            if nextSrc then
+                callback(nextSrc)
+            end
         end
         vm.eachFieldInTable(ref.value, callback)
     end

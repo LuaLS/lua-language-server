@@ -35,5 +35,5 @@
         "server/src/meta" : true
     },
     "Lua.plugin.enable": true,
-    //"Lua.zzzzzz.cat": true
+    "Lua.zzzzzz.cat": true
 }

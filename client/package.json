@@ -17,10 +17,11 @@
 		"postinstall": "vscode-install"
 	},
 	"dependencies": {
-		"vscode-languageclient": "^6.0.0-next.1"
+		"vscode-languageclient": "^6.0.0-next.5",
+		"vscode-jsonrpc": "^5.0.0-next.4"
 	},
 	"devDependencies": {
-		"@types/node": "^8.10.54",
+		"@types/node": "^8.10.59",
 		"vscode": "^1.1.36"
 	}
 }

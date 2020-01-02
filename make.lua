@@ -63,5 +63,6 @@ lm:build 'unittest' {
 
 lm:default {
     'install',
+    'test',
     'unittest',
 }

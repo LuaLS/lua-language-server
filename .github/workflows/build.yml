@@ -1,0 +1,16 @@
+name: build
+on: push
+jobs:
+  compile:
+    runs-on: ${{ matrix.os }}-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows, ubuntu, macos]
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        ref: refs/heads/master
+        submodules : recursive
+    - uses: actboy168/setup-luamake@master
+    - run: luamake

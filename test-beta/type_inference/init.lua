@@ -58,7 +58,7 @@ local var = '111'
 t.<?x?> = var
 ]]
 
-TEST 'any' [[
+TEST 'string' [[
 local <?var?>
 var = '111'
 ]]

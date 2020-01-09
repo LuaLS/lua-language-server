@@ -707,6 +707,41 @@ local function inferBySet(results, source)
     end
 end
 
+local function mergeFunctionReturns(results, source, index)
+    local returns = source.returns
+    if not returns then
+        return
+    end
+    for i = 1, #returns do
+        local rtn = returns[i]
+        if rtn[index] then
+            merge(results, vm.getValue(rtn[index]))
+        end
+    end
+end
+
+local function inferByCallReturn(results, source)
+    if source.type ~= 'select' then
+        return
+    end
+    if not source.vararg or source.vararg.type ~= 'call' then
+        return
+    end
+    local node = source.vararg.node
+    local nodeValues = vm.getValue(node)
+    if not nodeValues then
+        return
+    end
+    local index = source.index
+    for i = 1, #nodeValues do
+        local value = nodeValues[i]
+        local src = value.source
+        if src.type == 'function' then
+            mergeFunctionReturns(results, src, index)
+        end
+    end
+end
+
 local function getValue(source)
     local results = checkLiteral(source)
                  or checkValue(source)
@@ -727,6 +762,7 @@ local function getValue(source)
     inferByGetTable(results, source)
     inferByUnary(results, source)
     inferByBinary(results, source)
+    inferByCallReturn(results, source)
 
     if #results == 0 then
         return nil

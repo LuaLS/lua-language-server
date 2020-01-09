@@ -62,14 +62,18 @@ return function (uri, callback)
 
         local func = source.node
         local funcArgs
-        vm.eachDef(func, function (src)
-            if src.type == 'function' then
-                local args = countFuncArgs(src)
+        if not vm.hasType(func, 'function') then
+            return
+        end
+        local values = vm.getValue(func)
+        for _, value in ipairs(values) do
+            if value.type and value.source.type == 'function' then
+                local args = countFuncArgs(value.source)
                 if not funcArgs or args > funcArgs then
                     funcArgs = args
                 end
             end
-        end)
+        end
 
         funcArgs = funcArgs or countLibraryArgs(func)
         if not funcArgs then

@@ -1,6 +1,5 @@
 local vm       = require 'vm'
 local util     = require 'utility'
-local getClass = require 'core.hover.class'
 
 local function getKey(src)
     local key = vm.getKeyName(src)
@@ -8,7 +7,7 @@ local function getKey(src)
         if not src.index then
             return '[any]'
         end
-        local class = getClass(src.index)
+        local class = vm.getClass(src.index)
         if class then
             return ('[%s]'):format(class)
         end
@@ -32,7 +31,7 @@ end
 
 local function getField(src)
     local tp = vm.getType(src)
-    local class = getClass(src)
+    local class = vm.getClass(src)
     local literal = vm.getLiteral(src)
     local key = getKey(src)
     if type(literal) == 'string' and #literal >= 50 then

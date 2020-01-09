@@ -1,4 +1,4 @@
-local vm = require 'vm'
+local vm = require 'vm.vm'
 
 local function getClass(source, deep)
     if deep > 3 then
@@ -18,11 +18,11 @@ local function getClass(source, deep)
         end
     end)
     if #classes == 0 then
-        return
+        return nil
     end
     return vm.mergeTypeViews(table.unpack(classes))
 end
 
-return function (source)
+function vm.getClass(source)
     return getClass(source, 1)
 end

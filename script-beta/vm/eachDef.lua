@@ -66,34 +66,6 @@ local function ofTableField(source, callback)
     callback(source)
 end
 
-local function checkMetaRecv(source, callback)
-    if not source or source.type ~= 'select' then
-        return
-    end
-    if source.index ~= 1 then
-        return
-    end
-    local call = source.vararg
-    if not call or call.type ~= 'call' then
-        return
-    end
-    local special = vm.getSpecial(call.node)
-    if special ~= 'setmetatable' then
-        return
-    end
-    vm.eachFieldInTable(call.args[1])
-    local mt = call.args[2]
-    if mt then
-        vm.eachField(mt, function (src)
-            if vm.getKeyName(src) == 's|__index' then
-                if src.value then
-                    vm.eachField(src.value, callback)
-                end
-            end
-        end)
-    end
-end
-
 local function ofField(source, callback)
     local parent = source.parent
     local key    = vm.getKeyName(source)
@@ -109,10 +81,6 @@ local function ofField(source, callback)
     else
         local node = parent.node
         vm.eachField(node, checkKey)
-        vm.eachDef(node, function (src)
-            vm.eachFieldInTable(src.value, checkKey)
-            checkMetaRecv(src.value, checkKey)
-        end)
     end
 end
 

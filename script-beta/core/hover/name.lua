@@ -1,19 +1,19 @@
 local guide    = require 'parser.guide'
-local getClass = require 'core.hover.class'
+local vm       = require 'vm'
 
 local function asLocal(source)
     return guide.getName(source)
 end
 
 local function asMethod(source)
-    local class = getClass(source.node)
+    local class = vm.getClass(source.node)
     local node = class or guide.getName(source.node) or '?'
     local method = guide.getName(source)
     return ('%s:%s'):format(node, method)
 end
 
 local function asField(source)
-    local class = getClass(source.node)
+    local class = vm.getClass(source.node)
     local node = class or guide.getName(source.node) or '?'
     local method = guide.getName(source)
     return ('%s.%s'):format(node, method)

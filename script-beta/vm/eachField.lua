@@ -23,23 +23,6 @@ local function checkNext(source, callback)
     return
 end
 
-local function checkMetaArg1(source, callback)
-    local node, index = vm.getArgInfo(source)
-    local special = vm.getSpecial(node)
-    if special == 'setmetatable' and index == 1 then
-        local mt = node.next.args[2]
-        if mt then
-            vm.eachField(mt, function (src)
-                if vm.getKeyName(src) == 's|__index' then
-                    if src.value then
-                        vm.eachField(src.value, callback)
-                    end
-                end
-            end)
-        end
-    end
-end
-
 local function ofENV(source, callback)
     local refs = source.ref
     if not refs then
@@ -52,7 +35,7 @@ local function ofENV(source, callback)
             callback(ref)
             if guide.getName(ref) == '_G' then
                 checkNext(ref, callback)
-                checkMetaArg1(ref, callback)
+                vm.checkMeta(ref, callback)
                 local call, index = vm.getArgInfo(ref)
                 local special = vm.getSpecial(call)
                 if (special == 'rawset' or special == 'rawget')
@@ -62,7 +45,7 @@ local function ofENV(source, callback)
             end
         elseif ref.type == 'getlocal' then
             checkNext(ref, callback)
-            checkMetaArg1(ref, callback)
+            vm.checkMeta(ref, callback)
         end
         vm.eachFieldInTable(ref.value, callback)
     end
@@ -75,7 +58,7 @@ local function ofLocal(source, callback)
         vm.eachRef(source, function (src)
             vm.eachFieldInTable(src.value, callback)
             checkNext(src, callback)
-            checkMetaArg1(src, callback)
+            vm.checkMeta(src, callback)
         end)
     end
 end
@@ -83,7 +66,7 @@ end
 local function ofGlobal(source, callback)
     vm.eachRef(source, function (src)
         checkNext(src, callback)
-        checkMetaArg1(src, callback)
+        vm.checkMeta(src, callback)
         vm.eachFieldInTable(src.value, callback)
     end)
 end
@@ -91,7 +74,7 @@ end
 local function ofGetField(source, callback)
     vm.eachRef(source, function (src)
         checkNext(src, callback)
-        checkMetaArg1(src, callback)
+        vm.checkMeta(src, callback)
         vm.eachFieldInTable(src.value, callback)
     end)
 end
@@ -108,7 +91,7 @@ end
 local function ofTableField(source, callback)
     vm.eachRef(source, function (src)
         checkNext(src, callback)
-        checkMetaArg1(src, callback)
+        vm.checkMeta(src, callback)
     end)
 end
 
@@ -124,6 +107,7 @@ function vm.eachFieldInTable(value, callback)
         if field.type == 'tablefield'
         or field.type == 'tableindex' then
             callback(field)
+            vm.checkMeta(field, callback)
         end
     end
 end

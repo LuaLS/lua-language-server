@@ -2,7 +2,6 @@ local buildName   = require 'core.hover.name'
 local buildArg    = require 'core.hover.arg'
 local buildReturn = require 'core.hover.return'
 local buildTable  = require 'core.hover.table'
-local getClass    = require 'core.hover.class'
 local vm          = require 'vm'
 local util        = require 'utility'
 
@@ -19,7 +18,7 @@ end
 local function asValue(source, title)
     local name = buildName(source)
     local lib  = vm.getLibrary(source)
-    local class = getClass(source)
+    local class = vm.getClass(source)
     local type = vm.getType(source)
     local literal = vm.getLiteral(source)
     local cont

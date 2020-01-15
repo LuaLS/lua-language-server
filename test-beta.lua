@@ -48,7 +48,7 @@ local function main()
     --test 'document_symbol'
     test 'crossfile'
     test 'full'
-    test 'other'
+    --test 'other'
 
     print('测试完成')
 end

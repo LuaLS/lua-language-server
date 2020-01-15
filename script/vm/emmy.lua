@@ -166,7 +166,7 @@ function mt:getGenericByType(type)
     if not generics then
         return
     end
-    if #type > 1 then
+    if #type ~= 1 then
         return
     end
     local name = type[1][1]

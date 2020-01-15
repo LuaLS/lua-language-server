@@ -1615,7 +1615,12 @@ local Defs = {
             start = start,
             finish = finish - 1,
         }
-        return exp
+        -- 当exp为nil时，不能返回任何值，否则会产生带洞的actionlist
+        if exp then
+            return exp
+        else
+            return
+        end
     end,
     MissIf = function (start, block)
         PushError {

@@ -34,8 +34,7 @@ local function ofENV(source, callback)
         or ref.type == 'setglobal' then
             callback(ref)
             if guide.getName(ref) == '_G' then
-                checkNext(ref, callback)
-                vm.eachMetaValue(ref, callback)
+                vm.ofField(ref, callback)
                 local call, index = vm.getArgInfo(ref)
                 local special = vm.getSpecial(call)
                 if (special == 'rawset' or special == 'rawget')
@@ -44,8 +43,7 @@ local function ofENV(source, callback)
                 end
             end
         elseif ref.type == 'getlocal' then
-            checkNext(ref, callback)
-            vm.eachMetaValue(ref, callback)
+            vm.ofField(ref, callback)
         end
         vm.eachFieldInTable(ref.value, callback)
     end
@@ -56,26 +54,20 @@ local function ofLocal(source, callback)
         ofENV(source, callback)
     else
         vm.eachRef(source, function (src)
-            checkNext(src, callback)
-            vm.eachMetaValue(src, callback)
-            vm.eachFieldInTable(src.value, callback)
+            vm.ofField(src, callback)
         end)
     end
 end
 
 local function ofGlobal(source, callback)
     vm.eachRef(source, function (src)
-        checkNext(src, callback)
-        vm.eachMetaValue(src, callback)
-        vm.eachFieldInTable(src.value, callback)
+        vm.ofField(src, callback)
     end)
 end
 
 local function ofGetField(source, callback)
     vm.eachRef(source, function (src)
-        checkNext(src, callback)
-        vm.eachMetaValue(src, callback)
-        vm.eachFieldInTable(src.value, callback)
+        vm.ofField(src, callback)
     end)
 end
 
@@ -90,9 +82,14 @@ end
 
 local function ofTableField(source, callback)
     vm.eachRef(source, function (src)
-        checkNext(src, callback)
-        vm.eachMetaValue(src, callback)
+        vm.ofField(src, callback)
     end)
+end
+
+function vm.ofField(source, callback)
+    checkNext(source, callback)
+    vm.eachMetaValue(source, callback)
+    vm.eachFieldInTable(source.value, callback)
 end
 
 function vm.eachFieldInTable(value, callback)

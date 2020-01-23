@@ -203,6 +203,7 @@ local function eachDef(source, callback)
 end
 
 --- 获取所有的定义
+--- 只检查语法上的定义，不穿透函数调用
 function vm.eachDef(source, callback, max)
     local mark = {}
     eachDef(source, function (src)

@@ -1,5 +1,6 @@
 local vm = require 'vm.vm'
 local util = require 'utility'
+local guide = require 'parser.guide'
 
 local typeSort = {
     ['boolean']  = 1,
@@ -935,6 +936,8 @@ function vm.getType(source)
     return vm.viewType(values)
 end
 
+--- 获取对象的值
+--- 会尝试穿透函数调用
 function vm.getValue(source)
     if not source then
         return

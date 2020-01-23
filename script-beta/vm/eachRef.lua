@@ -190,6 +190,7 @@ local function eachRef(source, callback)
 end
 
 --- 获取所有的引用
+--- 可以穿透函数返回值
 function vm.eachRef(source, callback, max)
     local mark = {}
     eachRef(source, function (src)

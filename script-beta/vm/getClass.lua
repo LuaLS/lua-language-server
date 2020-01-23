@@ -6,6 +6,9 @@ local function getClass(source, classes, deep)
     end
     vm.eachField(source, function (src)
         local key = vm.getKeyName(src)
+        if not key then
+            return
+        end
         local lkey = key:lower()
         if lkey == 's|type'
         or lkey == 's|__name'
@@ -19,6 +22,9 @@ local function getClass(source, classes, deep)
     if source.value then
         vm.eachField(source.value, function (src)
             local key = vm.getKeyName(src)
+            if not key then
+                return
+            end
             local lkey = key:lower()
             if lkey == 's|type'
             or lkey == 's|__name'

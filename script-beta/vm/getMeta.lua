@@ -45,7 +45,7 @@ local function checkMetaRecv(source, callback)
     end
 end
 
-function vm.checkMeta(source, callback)
+function vm.checkMetaValue(source, callback)
     checkMetaArg1(source, callback)
     checkMetaRecv(source.value, callback)
 end

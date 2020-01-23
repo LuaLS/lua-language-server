@@ -2,9 +2,27 @@ local guide   = require 'parser.guide'
 local files   = require 'files'
 local vm      = require 'vm.vm'
 
+local function ofParentMT(func, callback)
+    if not func or func.type ~= 'function' then
+        return
+    end
+    local parent = func.parent
+    if not parent or parent.type ~= 'setmethod' then
+        return
+    end
+    local node = parent.node
+    if not node then
+        return
+    end
+    vm.eachRef(node, callback)
+end
+
 local function ofLocal(loc, callback)
     -- 方法中的 self 使用了一个虚拟的定义位置
-    if loc.tag ~= 'self' then
+    if loc.tag == 'self' then
+        local func = guide.getParentFunction(loc)
+        ofParentMT(func, callback)
+    else
         callback(loc)
     end
     local refs = loc.ref
@@ -191,7 +209,7 @@ end
 
 --- 获取所有的引用
 --- 可以穿透函数返回值
-function vm.eachRef(source, callback, max)
+function vm.eachRef(source, callback)
     local mark = {}
     eachRef(source, function (src)
         if mark[src] then

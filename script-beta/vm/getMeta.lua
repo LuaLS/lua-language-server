@@ -1,23 +1,17 @@
 local vm = require 'vm.vm'
 
-local function checkMetaArg1(source, callback)
+local function eachMetaOfArg1(source, callback)
     local node, index = vm.getArgInfo(source)
     local special = vm.getSpecial(node)
     if special == 'setmetatable' and index == 1 then
         local mt = node.next.args[2]
         if mt then
-            vm.eachField(mt, function (src)
-                if vm.getKeyName(src) == 's|__index' then
-                    if src.value then
-                        vm.eachField(src.value, callback)
-                    end
-                end
-            end)
+            callback(mt)
         end
     end
 end
 
-local function checkMetaRecv(source, callback)
+local function eachMetaOfRecv(source, callback)
     if not source or source.type ~= 'select' then
         return
     end
@@ -35,6 +29,12 @@ local function checkMetaRecv(source, callback)
     vm.eachFieldInTable(call.args[1])
     local mt = call.args[2]
     if mt then
+        callback(mt)
+    end
+end
+
+function vm.eachMetaValue(source, callback)
+    vm.eachMeta(source, function (mt)
         vm.eachField(mt, function (src)
             if vm.getKeyName(src) == 's|__index' then
                 if src.value then
@@ -42,10 +42,10 @@ local function checkMetaRecv(source, callback)
                 end
             end
         end)
-    end
+    end)
 end
 
-function vm.checkMetaValue(source, callback)
-    checkMetaArg1(source, callback)
-    checkMetaRecv(source.value, callback)
+function vm.eachMeta(source, callback)
+    eachMetaOfArg1(source, callback)
+    eachMetaOfRecv(source.value, callback)
 end

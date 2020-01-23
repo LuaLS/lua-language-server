@@ -1,10 +1,9 @@
 local vm = require 'vm.vm'
 
-local function getClass(source, deep)
+local function getClass(source, classes, deep)
     if deep > 3 then
-        return nil
+        return
     end
-    local classes = {}
     vm.eachField(source, function (src)
         local key = vm.getKeyName(src)
         local lkey = key:lower()
@@ -17,12 +16,19 @@ local function getClass(source, deep)
             end
         end
     end)
+    if #classes ~= 0 then
+        return
+    end
+    vm.eachMeta(source, function (mt)
+        getClass(mt, classes, deep + 1)
+    end)
+end
+
+function vm.getClass(source)
+    local classes = {}
+    getClass(source, classes, 1)
     if #classes == 0 then
         return nil
     end
     return vm.mergeTypeViews(table.unpack(classes))
-end
-
-function vm.getClass(source)
-    return getClass(source, 1)
 end

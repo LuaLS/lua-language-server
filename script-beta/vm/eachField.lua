@@ -35,7 +35,7 @@ local function ofENV(source, callback)
             callback(ref)
             if guide.getName(ref) == '_G' then
                 checkNext(ref, callback)
-                vm.checkMetaValue(ref, callback)
+                vm.eachMetaValue(ref, callback)
                 local call, index = vm.getArgInfo(ref)
                 local special = vm.getSpecial(call)
                 if (special == 'rawset' or special == 'rawget')
@@ -45,7 +45,7 @@ local function ofENV(source, callback)
             end
         elseif ref.type == 'getlocal' then
             checkNext(ref, callback)
-            vm.checkMetaValue(ref, callback)
+            vm.eachMetaValue(ref, callback)
         end
         vm.eachFieldInTable(ref.value, callback)
     end
@@ -57,7 +57,7 @@ local function ofLocal(source, callback)
     else
         vm.eachRef(source, function (src)
             checkNext(src, callback)
-            vm.checkMetaValue(src, callback)
+            vm.eachMetaValue(src, callback)
             vm.eachFieldInTable(src.value, callback)
         end)
     end
@@ -66,7 +66,7 @@ end
 local function ofGlobal(source, callback)
     vm.eachRef(source, function (src)
         checkNext(src, callback)
-        vm.checkMetaValue(src, callback)
+        vm.eachMetaValue(src, callback)
         vm.eachFieldInTable(src.value, callback)
     end)
 end
@@ -74,7 +74,7 @@ end
 local function ofGetField(source, callback)
     vm.eachRef(source, function (src)
         checkNext(src, callback)
-        vm.checkMetaValue(src, callback)
+        vm.eachMetaValue(src, callback)
         vm.eachFieldInTable(src.value, callback)
     end)
 end
@@ -91,7 +91,7 @@ end
 local function ofTableField(source, callback)
     vm.eachRef(source, function (src)
         checkNext(src, callback)
-        vm.checkMetaValue(src, callback)
+        vm.eachMetaValue(src, callback)
     end)
 end
 
@@ -107,7 +107,7 @@ function vm.eachFieldInTable(value, callback)
         if field.type == 'tablefield'
         or field.type == 'tableindex' then
             callback(field)
-            vm.checkMetaValue(field, callback)
+            vm.eachMetaValue(field, callback)
         end
     end
 end

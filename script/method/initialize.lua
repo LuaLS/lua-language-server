@@ -11,6 +11,9 @@ return function (lsp)
     lsp._inited = true
     return {
         capabilities = {
+            completionProvider = {
+                triggerCharacters = { '.' },
+            },
             hoverProvider = true,
             definitionProvider = true,
             referencesProvider = true,

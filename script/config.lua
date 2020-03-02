@@ -124,6 +124,9 @@ local ConfigTemplate = {
         callSnippet     = {'Both', String},
         keywordSnippet  = {'Both', String},
     },
+    color = {
+        mode            = {'Grammar', String},
+    },
     plugin = {
         enable          = {false, Boolean},
         path            = {'.vscode/lua-plugin/*.lua', String},

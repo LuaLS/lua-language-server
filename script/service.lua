@@ -773,6 +773,11 @@ function mt:onUpdateConfig(updated, other)
     else
         capability.completion.disable()
     end
+    if newConfig.color.mode == 'Semantic' then
+        capability.semantic.enable()
+    else
+        capability.semantic.disable()
+    end
     if not table.equal(oldConfig.plugin, newConfig.plugin) then
         plugin.load(self.workspace)
     end

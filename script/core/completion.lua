@@ -111,7 +111,7 @@ local function getDetail(value)
             detals[#detals+1] =  (' = %q'):format(literal)
         else
             local str = (' = %.16f'):format(literal)
-            local dot = str:find('.', 1, true)
+            local dot = str:find('.', 1, true) or 0
             local suffix = str:find('[0]+$', dot + 2)
             if suffix then
                 detals[#detals+1] =  str:sub(1, suffix - 1)

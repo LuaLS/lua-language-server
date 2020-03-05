@@ -1,3 +1,5 @@
+local workspace = require 'workspace'
+
 local function allWords()
     local str = [[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.:('"[,#*@| ]]
     local list = {}
@@ -7,8 +9,14 @@ local function allWords()
     return list
 end
 
-return function (lsp)
+return function (lsp, params)
     lsp._inited = true
+
+    if params.rootUri then
+        lsp.workspace = workspace(lsp, 'root')
+        lsp.workspace:init(params.rootUri)
+    end
+
     return {
         capabilities = {
             completionProvider = {

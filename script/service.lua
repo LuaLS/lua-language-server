@@ -769,9 +769,9 @@ function mt:onUpdateConfig(updated, other)
         self:reDiagnostic()
     end
     if newConfig.completion.enable then
-        capability.completion.enable()
+        capability.completion.enable(self)
     else
-        capability.completion.disable()
+        capability.completion.disable(self)
     end
     if newConfig.color.mode == 'Semantic' then
         capability.semantic.enable()

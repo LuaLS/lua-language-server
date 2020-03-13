@@ -1,4 +1,5 @@
 local workspace = require 'workspace'
+local nonil = require 'without-check-nil'
 
 local function allWords()
     local str = [[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.:('"[,#*@| ]]
@@ -11,17 +12,15 @@ end
 
 return function (lsp, params)
     lsp._inited = true
+    lsp.client = params
 
     if params.rootUri then
         lsp.workspace = workspace(lsp, 'root')
         lsp.workspace:init(params.rootUri)
     end
 
-    return {
+    local server = {
         capabilities = {
-            completionProvider = {
-                triggerCharacters = { '.' },
-            },
             hoverProvider = true,
             definitionProvider = true,
             referencesProvider = true,
@@ -58,4 +57,14 @@ return function (lsp, params)
             },
         }
     }
+
+    nonil.enable()
+    if not params.capabilities.textDocument.completion.dynamicRegistration then
+        server.capabilities.completionProvider = {
+            triggerCharacters = allWords(),
+        }
+    end
+    nonil.disable()
+
+    return server
 end

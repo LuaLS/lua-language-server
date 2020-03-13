@@ -1,4 +1,5 @@
 local rpc = require 'rpc'
+local nonil = require 'without-check-nil'
 
 local isEnable = false
 
@@ -11,10 +12,17 @@ local function allWords()
     return list
 end
 
-local function enable()
+local function enable(lsp)
     if isEnable then
         return
     end
+
+    nonil.enable()
+    if not lsp.client.capabilities.textDocument.completion.dynamicRegistration then
+        return
+    end
+    nonil.disable()
+
     isEnable = true
     log.debug('Enable completion.')
     rpc:request('client/registerCapability', {
@@ -31,10 +39,17 @@ local function enable()
     })
 end
 
-local function disable()
+local function disable(lsp)
     if not isEnable then
         return
     end
+
+    nonil.enable()
+    if not lsp.client.capabilities.textDocument.completion.dynamicRegistration then
+        return
+    end
+    nonil.disable()
+
     isEnable = false
     log.debug('Disable completion.')
     rpc:request('client/unregisterCapability', {

@@ -3,7 +3,11 @@ local listMgr = require 'vm.list'
 local function buildName(source)
     local names = {}
     for i, type in ipairs(source) do
-        names[i] = type[1]
+        if type.type == 'emmyName' then
+            names[i] = type[1]
+        elseif type.type == 'emmyArrayType' then
+            names[i] = type[1][1]..'[]'
+        end
     end
     return table.concat(names, '|')
 end

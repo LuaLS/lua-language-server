@@ -155,3 +155,7 @@ TEST [[
 ---@type any|fun():nil
 local t    
 ]]
+
+TEST [[
+---@field name fun(self: Command, aliases: string|string[])
+]]

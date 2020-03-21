@@ -92,7 +92,7 @@ HOVER_DOCUMENT_LUAJIT   = '[查看文档](http://www.lua.org/manual/5.1/manual.h
 
 HOVER_NATIVE_DOCUMENT_LUA51     = '[查看文档](command:extension.lua.doc?["en-us/51/manual.html/pdf-{}"])'
 HOVER_NATIVE_DOCUMENT_LUA52     = '[查看文档](command:extension.lua.doc?["en-us/52/manual.html/pdf-{}"])'
-HOVER_NATIVE_DOCUMENT_LUA53     = '[查看文档](command:extension.lua.doc?["en-us/53/manual.html/pdf-{}"])'
+HOVER_NATIVE_DOCUMENT_LUA53     = '[查看文档](command:extension.lua.doc?["zh-cn/53/manual.html/pdf-{}"])'
 HOVER_NATIVE_DOCUMENT_LUA54     = '[查看文档](command:extension.lua.doc?["en-us/54/manual.html/pdf-{}"])'
 HOVER_NATIVE_DOCUMENT_LUAJIT    = '[查看文档](command:extension.lua.doc?["en-us/51/manual.html/pdf-{}"])'
 

@@ -1,5 +1,7 @@
 local lang = require 'language'
 local config = require 'config'
+local client = require 'client'
+
 local function buildLibArgs(lib, object, select)
     if not lib.args then
         return ''
@@ -188,16 +190,30 @@ local function buildDoc(lib)
         return lang.script(lib.web, doc)
     end
     local version = config.config.runtime.version
-    if version == 'Lua 5.1' then
-        return lang.script('HOVER_DOCUMENT_LUA51', doc)
-    elseif version == 'Lua 5.2' then
-        return lang.script('HOVER_DOCUMENT_LUA52', doc)
-    elseif version == 'Lua 5.3' then
-        return lang.script('HOVER_DOCUMENT_LUA53', doc)
-    elseif version == 'Lua 5.4' then
-        return lang.script('HOVER_DOCUMENT_LUA54', doc)
-    elseif version == 'LuaJIT' then
-        return lang.script('HOVER_DOCUMENT_LUAJIT', doc)
+    if client.client() == 'vscode' then
+        if version == 'Lua 5.1' then
+            return lang.script('HOVER_NATIVE_DOCUMENT_LUA51', doc)
+        elseif version == 'Lua 5.2' then
+            return lang.script('HOVER_NATIVE_DOCUMENT_LUA52', doc)
+        elseif version == 'Lua 5.3' then
+            return lang.script('HOVER_NATIVE_DOCUMENT_LUA53', doc)
+        elseif version == 'Lua 5.4' then
+            return lang.script('HOVER_NATIVE_DOCUMENT_LUA54', doc)
+        elseif version == 'LuaJIT' then
+            return lang.script('HOVER_NATIVE_DOCUMENT_LUAJIT', doc)
+        end
+    else
+        if version == 'Lua 5.1' then
+            return lang.script('HOVER_DOCUMENT_LUA51', doc)
+        elseif version == 'Lua 5.2' then
+            return lang.script('HOVER_DOCUMENT_LUA52', doc)
+        elseif version == 'Lua 5.3' then
+            return lang.script('HOVER_DOCUMENT_LUA53', doc)
+        elseif version == 'Lua 5.4' then
+            return lang.script('HOVER_DOCUMENT_LUA54', doc)
+        elseif version == 'LuaJIT' then
+            return lang.script('HOVER_DOCUMENT_LUAJIT', doc)
+        end
     end
 end
 

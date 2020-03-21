@@ -1,5 +1,6 @@
 local workspace = require 'workspace'
 local nonil = require 'without-check-nil'
+local client = require 'client'
 
 local function allWords()
     local str = [[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.:('"[,#*@| ]]
@@ -13,6 +14,8 @@ end
 return function (lsp, params)
     lsp._inited = true
     lsp.client = params
+    client.init(params)
+    log.info(table.dump(params))
 
     if params.rootUri then
         lsp.workspace = workspace(lsp, 'root')

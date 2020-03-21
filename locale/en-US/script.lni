@@ -89,6 +89,14 @@ HOVER_DOCUMENT_LUA52    = '[View documents](http://www.lua.org/manual/5.2/manual
 HOVER_DOCUMENT_LUA53    = '[View documents](http://www.lua.org/manual/5.3/manual.html#pdf-{})'
 HOVER_DOCUMENT_LUA54    = '[View documents](http://www.lua.org/manual/5.4/manual.html#pdf-{})'
 HOVER_DOCUMENT_LUAJIT   = '[View documents](http://www.lua.org/manual/5.1/manual.html#pdf-{})'
+
+
+HOVER_NATIVE_DOCUMENT_LUA51     = '[View documents](command:extension.lua.doc?["en-us/51/manual.html/pdf-{}"])'
+HOVER_NATIVE_DOCUMENT_LUA52     = '[View documents](command:extension.lua.doc?["en-us/52/manual.html/pdf-{}"])'
+HOVER_NATIVE_DOCUMENT_LUA53     = '[View documents](command:extension.lua.doc?["en-us/53/manual.html/pdf-{}"])'
+HOVER_NATIVE_DOCUMENT_LUA54     = '[View documents](command:extension.lua.doc?["en-us/54/manual.html/pdf-{}"])'
+HOVER_NATIVE_DOCUMENT_LUAJIT    = '[View documents](command:extension.lua.doc?["en-us/51/manual.html/pdf-{}"])'
+
 HOVER_MULTI_PROTOTYPE   = '({} prototypes)'
 
 ACTION_DISABLE_DIAG     = 'Disable diagnostics ({}).'

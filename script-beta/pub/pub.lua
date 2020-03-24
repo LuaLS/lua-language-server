@@ -51,8 +51,8 @@ function m.recruitBraves(num)
                 package.path,
                 package.cpath,
                 DEVELOP,
-                DBGPORT,
-                DBGWAIT,
+                DBGPORT or 11412,
+                DBGWAIT or 'nil',
                 (ROOT / 'debugger.lua'):string(),
                 id
             )),

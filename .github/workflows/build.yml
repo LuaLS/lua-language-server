@@ -14,3 +14,7 @@ jobs:
         submodules : recursive
     - uses: actboy168/setup-luamake@master
     - run: luamake
+    - uses: actions/upload-artifact@v1.0.0
+      with:
+        name: lua-language-server
+        path: publish

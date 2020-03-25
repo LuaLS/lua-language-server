@@ -42,7 +42,7 @@ local function fastCompletion(lsp, params, lines)
         end
     end
 
-    return items
+    return items, position
 end
 
 local function finishCompletion(lsp, params, lines)
@@ -64,6 +64,23 @@ local function finishCompletion(lsp, params, lines)
     return items
 end
 
+local function cuterFactory(lines, text, position)
+    local start = position
+    local head = ''
+    for i = position, position - 100, -1 do
+        if not text:sub(i, i):match '[%w_]' then
+            start = i + 1
+            head = text:sub(start, position)
+        end
+    end
+    return function (insertText)
+        return {
+            newText = insertText,
+            range   = posToRange(lines, start, position)
+        }
+    end
+end
+
 return function (lsp, params)
     local uri = params.textDocument.uri
     local text, oldText = lsp:getText(uri)
@@ -72,20 +89,27 @@ return function (lsp, params)
     end
 
     local lines = parser:lines(text, 'utf8')
-    local items = fastCompletion(lsp, params, lines)
+    local items, position = fastCompletion(lsp, params, lines)
     --local items = finishCompletion(lsp, params, lines)
     if not items then
         return nil
     end
 
+    -- TODO 在协议阶段将 `insertText` 转化为 `textEdit` ，
+    -- 以避免不同客户端对 `insertText` 实现的不一致。
+    -- 重构后直接在 core 中使用 `textEdit` 。
+    local cuter = cuterFactory(lines, text, position)
+
     for i, item in ipairs(items) do
         item.sortText = ('%04d'):format(i)
         item.insertTextFormat = 2
-        item.insertText = item.insertText or item.label
+
         if item.textEdit then
             item.textEdit.range = posToRange(lines, item.textEdit.start, item.textEdit.finish)
             item.textEdit.start = nil
             item.textEdit.finish = nil
+        else
+            item.textEdit = cuter(item.insertText or item.label)
         end
         if item.additionalTextEdits then
             for _, textEdit in ipairs(item.additionalTextEdits) do
@@ -100,5 +124,8 @@ return function (lsp, params)
         isIncomplete = true,
         items = items,
     }
+
+    log.debug(table.dump(response))
+    
     return response
 end

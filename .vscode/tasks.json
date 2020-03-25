@@ -19,7 +19,7 @@
             "type": "shell",
             "label": "PreCompile",
             "windows": {
-                "command": "tools\\ninja -f ninja\\msvc.ninja"
+                "command": "chcp 65001 && msvc_build.bat"
             },
             "linux": {
                 "command": "ninja -f ninja/linux.ninja"
@@ -34,7 +34,7 @@
         {
             "type": "shell",
             "label": "Compile",
-            "command": "${workspaceFolder}/3rd/luamake/luamake rebuild"
+            "command": "chcp 65001 && ${workspaceFolder}/3rd/luamake/luamake rebuild"
         },
     ]
 }

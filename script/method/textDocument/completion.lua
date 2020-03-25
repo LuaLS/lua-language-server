@@ -71,6 +71,7 @@ local function cuterFactory(lines, text, position)
         if not text:sub(i, i):match '[%w_]' then
             start = i + 1
             head = text:sub(start, position)
+            break
         end
     end
     return function (insertText)

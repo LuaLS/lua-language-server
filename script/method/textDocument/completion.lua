@@ -125,7 +125,5 @@ return function (lsp, params)
         items = items,
     }
 
-    log.debug(table.dump(response))
-    
     return response
 end

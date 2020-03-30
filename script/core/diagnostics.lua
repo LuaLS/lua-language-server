@@ -671,7 +671,13 @@ end
 
 function mt:checkEmmyType(source, callback)
     for _, tpsource in ipairs(source) do
-        local name = tpsource[1]
+        -- TODO 临时决绝办法，重构后解决
+        local name
+        if tpsource.type == 'emmyArrayType' then
+            name = tpsource[1][1]
+        else
+            name = tpsource[1]
+        end
         local class = self.vm.emmyMgr:eachClass(name, function (class)
             if class.type == 'emmy.class' or class.type == 'emmy.alias' then
                 return class

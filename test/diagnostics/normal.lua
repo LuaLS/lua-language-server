@@ -501,3 +501,9 @@ local t = {}
 t.a = 1
 t.a = 2
 ]]
+
+TEST [[
+---@type table<number, boolean|string[]>
+local t
+print(t)
+]]

@@ -273,12 +273,12 @@ function mt:readText(uri, path, buf, compiled)
         log.debug('Read failed due to not lua:', uri)
         return
     end
-    if not self._files:isOpen() and self:isIgnored(uri) then
+    if not self._files:isOpen(uri) and self:isIgnored(uri) then
         log.debug('Read failed due to ignored:', uri)
         return
     end
     local text = buf or io.load(path)
-    if not self._files:isOpen() and not self:checkReadFile(uri, path, text) then
+    if not self._files:isOpen(uri) and not self:checkReadFile(uri, path, text) then
         log.debug('Read failed due to check failed:', uri)
         return
     end

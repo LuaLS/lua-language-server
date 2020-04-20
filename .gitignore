@@ -2,3 +2,5 @@
 /build
 /bin
 !*.exe
+/test/temp.lua
+

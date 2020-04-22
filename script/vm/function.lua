@@ -486,7 +486,9 @@ function mt:setEmmy(params, returns, overLoads)
         self._emmyParams = params
         for _, param in ipairs(params) do
             param:getSource():set('emmy function', self)
-            param:getSource()[1]:set('emmy function', self)
+            if param:getSource()[1] then
+                param:getSource()[1]:set('emmy function', self)
+            end
         end
     end
     if returns then

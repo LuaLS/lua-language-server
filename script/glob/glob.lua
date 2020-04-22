@@ -19,7 +19,7 @@ end
 local parser = m.P {
     'Main',
     ['Sp']          = m.S(' \t')^0,
-    ['Slash']       = m.S('/\\')^1,
+    ['Slash']       = m.P('/')^1,
     ['Main']        = m.Ct(m.V'Sp' * m.P'{' * m.V'Pattern' * (',' * expect(m.V'Pattern', 'Miss exp after ","'))^0 * m.P'}')
                     + m.Ct(m.V'Pattern')
                     + m.T'Main Failed'
@@ -35,7 +35,9 @@ local parser = m.P {
                     + object('?',    m.P'?')
                     + object('[]',   m.V'Range')
                     ,
-    ['Char']        = object('char', (1 - m.S',{}[]*?/\\')^1),
+    ['SimpleChar']  = m.P(1) - m.S',{}[]*?/',
+    ['EscChar']     = m.P'\\' / '' * m.P(1),
+    ['Char']        = object('char', m.Cs((m.V'EscChar' + m.V'SimpleChar')^1)),
     ['FSymbol']     = object('**', m.P'**'),
     ['RangeWord']   = 1 - m.P']',
     ['Range']       = m.P'[' * m.Ct(m.V'RangeUnit'^0) * m.P']'^-1,

@@ -19,7 +19,7 @@ end
 local parser = m.P {
     'Main',
     ['Sp']          = m.S(' \t')^0,
-    ['Slash']       = m.S('/\\')^1,
+    ['Slash']       = m.S('/')^1,
     ['Main']        = m.Ct(m.V'Sp' * m.P'{' * m.V'Pattern' * (',' * expect(m.V'Pattern', 'Miss exp after ","'))^0 * m.P'}')
                     + m.Ct(m.V'Pattern')
                     + m.T'Main Failed'

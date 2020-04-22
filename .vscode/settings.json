@@ -19,7 +19,7 @@
     ],
     "Lua.runtime.version": "Lua 5.4",
     // Just some comment
-    "Lua.workspace.maxPreload": 400,
+    "Lua.workspace.maxPreload": 600,
     "Lua.workspace.preloadFileSize": 1000,
     "Lua.workspace.ignoreDir": [
         "locale/",

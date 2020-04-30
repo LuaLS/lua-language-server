@@ -13,7 +13,10 @@ jobs:
         ref: refs/heads/master
         submodules : recursive
     - uses: actboy168/setup-luamake@master
-    - run: luamake
+    - if: runner.os != 'Linux'
+      run: luamake
+    - if: runner.os == 'Linux'
+      run: luamake -gcc gcc-8 -gxx g++-8
     - uses: actions/upload-artifact@v1.0.0
       with:
         name: lua-language-server

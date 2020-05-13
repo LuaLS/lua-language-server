@@ -1,30 +1,10 @@
 local platform = require 'bee.platform'
 
-local esc = {
-    [':'] = '%3A',
-    ['/'] = '%2F',
-    ['?'] = '%3F',
-    ['#'] = '%23',
-    ['['] = '%5B',
-    [']'] = '%5D',
-    ['@'] = '%40',
-
-    ['!'] = '%21', -- sub-delims
-    ['$'] = '%24',
-    ['&'] = '%26',
-    ["'"] = '%27',
-    ['('] = '%28',
-    [')'] = '%29',
-    ['*'] = '%2A',
-    ['+'] = '%2B',
-    [','] = '%2C',
-    [';'] = '%3B',
-    ['='] = '%3D',
-
-    [' '] = '%20',
-}
-
 local escPatt = '[^%w%-%.%_%~%/]'
+
+local function esc(c)
+    return ('%%%02X'):format(c:byte())
+end
 
 local function normalize(str)
     return str:gsub('%%(%x%x)', function (n)

@@ -72,7 +72,7 @@ function TEST(data)
     local mainBuf
     local pos
     for _, info in ipairs(data) do
-        local uri = uric.encode(fs.path(info.path))
+        local uri = uric.encode(ROOT / fs.path(info.path))
         local script = info.content
         if info.main then
             pos = script:find('$', 1, true) - 1

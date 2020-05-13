@@ -61,10 +61,10 @@ function TEST(data)
     ws.root = ROOT
 
     local targetScript = data[1].content
-    local targetUri = uric.encode(fs.path(data[1].path))
+    local targetUri = uric.encode(ROOT / fs.path(data[1].path))
 
     local sourceScript, sourceList = catch_target(data[2].content, '?')
-    local sourceUri = uric.encode(fs.path(data[2].path))
+    local sourceUri = uric.encode(ROOT / fs.path(data[2].path))
 
     lsp:saveText(targetUri, 1, targetScript)
     ws:addFile(uric.decode(targetUri))

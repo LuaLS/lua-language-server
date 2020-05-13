@@ -80,11 +80,11 @@ function TEST(data)
     local pos
     local expect = {}
     for _, info in ipairs(data) do
-        local uri = uric.encode(fs.path(info.path))
+        local uri = uric.encode(ROOT / fs.path(info.path))
         ws:addFile(uric.decode(uri))
     end
     for _, info in ipairs(data) do
-        local uri = uric.encode(fs.path(info.path))
+        local uri = uric.encode(ROOT / fs.path(info.path))
         local script = info.content
         local list = catch_target(script)
         for _, location in ipairs(list) do

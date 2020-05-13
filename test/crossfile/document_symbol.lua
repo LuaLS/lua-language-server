@@ -68,8 +68,8 @@ function TEST(data)
     local ws = workspace(lsp, 'test')
     lsp.workspace = ws
 
-    local targetUri = uric.encode(fs.path(data[1].path))
-    local sourceUri = uric.encode(fs.path(data[2].path))
+    local targetUri = uric.encode(ROOT / fs.path(data[1].path))
+    local sourceUri = uric.encode(ROOT / fs.path(data[2].path))
 
     lsp:saveText(sourceUri, 1, data[2].content)
     ws:addFile(uric.decode(sourceUri))

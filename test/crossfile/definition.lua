@@ -52,7 +52,7 @@ function TEST(datas)
     local sourceList, sourceUri
 
     for i, data in ipairs(datas) do
-        local uri = uric.encode(fs.path(data.path))
+        local uri = uric.encode(ROOT / fs.path(data.path))
         local new, list = catch_target(data.content, '!')
         if new ~= data.content or data.target then
             if data.target then

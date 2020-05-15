@@ -774,7 +774,7 @@ function mt:onUpdateConfig(updated, other)
         capability.completion.disable(self)
     end
     if newConfig.color.mode == 'Semantic' then
-        capability.semantic.enable()
+        capability.semantic.enable(self)
     else
         capability.semantic.disable()
     end

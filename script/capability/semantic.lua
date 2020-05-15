@@ -1,9 +1,25 @@
-local rpc = require 'rpc'
+local rpc            = require 'rpc'
+local TokenTypes     = require 'constant.TokenTypes'
+local TokenModifiers = require 'constant.TokenModifiers'
 
 local isEnable = false
 
-local function enable()
+local function toArray(map)
+    local array = {}
+    for k in pairs(map) do
+        array[#array+1] = k
+    end
+    table.sort(array, function (a, b)
+        return map[a] < map[b]
+    end)
+    return array
+end
+
+local function enable(lsp)
     if isEnable then
+        return
+    end
+    if not lsp.client.capabilities.textDocument.semanticTokens then
         return
     end
     isEnable = true
@@ -13,6 +29,14 @@ local function enable()
             {
                 id = 'semantic',
                 method = 'textDocument/semanticTokens',
+                registerOptions = {
+                    legend = {
+                        tokenTypes = toArray(TokenTypes),
+                        tokenModifiers = toArray(TokenModifiers),
+                    },
+                    rangeProvider = false,
+                    documentProvider = false,
+                },
             },
         }
     })

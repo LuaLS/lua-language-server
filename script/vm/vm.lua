@@ -108,7 +108,6 @@ function mt:runFunction(func)
     for _, arg in ipairs(func.args) do
         if arg:getSource() ~= func:getObject() then
             self:bindLocal(arg:getSource(), arg, 'local')
-            arg:getSource():set('arg', true)
         end
     end
 

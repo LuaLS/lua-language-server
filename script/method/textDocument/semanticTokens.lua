@@ -23,36 +23,48 @@ local constLib = {
     ['package.searchers'] = true
 }
 
-local function buildLibToken(source, lib)
-    local modifieres
-    if constLib[lib.doc] then
-        modifieres = TokenModifiers.readonly
-    else
-        modifieres = TokenModifiers.static
-    end
-    return {
-        start      = source.start,
-        finish     = source.finish,
-        type       = TokenTypes.namespace,
-        modifieres = modifieres,
-    }
-end
-
 local Care = {
-    ['name'] = function (source)
-        local lib = findLib(source)
-        if lib then
-            return buildLibToken(source, lib)
-        end
+    ['name'] = function (source, sources)
         if source:get 'global' then
-            return {
+            if findLib(source) then
+                if source[1] == '_G' then
+                    return
+                end
+                sources[#sources+1] = {
+                    start      = source.start,
+                    finish     = source.finish,
+                    type       = TokenTypes.namespace,
+                    modifieres = TokenModifiers.static,
+                }
+                return
+            end
+            sources[#sources+1] = {
                 start      = source.start,
                 finish     = source.finish,
                 type       = TokenTypes.namespace,
                 modifieres = TokenModifiers.deprecated,
             }
-        else
-            return {
+        elseif source:get 'table index' then
+            sources[#sources+1] = {
+                start      = source.start,
+                finish     = source.finish,
+                type       = TokenTypes.property,
+                modifieres = TokenModifiers.declaration,
+            }
+        elseif source:bindLocal() then
+            if source:get 'arg' then
+                sources[#sources+1] = {
+                    start      = source.start,
+                    finish     = source.finish,
+                    type       = TokenTypes.parameter,
+                    modifieres = TokenModifiers.declaration,
+                }
+            end
+            if source[1] == '_ENV'
+            or source[1] == 'self' then
+                return
+            end
+            sources[#sources+1] = {
                 start      = source.start,
                 finish     = source.finish,
                 type       = TokenTypes.variable,
@@ -92,7 +104,7 @@ local function resolveTokens(vm, lines)
     local sources = {}
     for _, source in ipairs(vm.sources) do
         if Care[source.type] then
-            sources[#sources+1] = Care[source.type](source)
+            Care[source.type](source, sources)
         end
     end
 

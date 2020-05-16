@@ -125,7 +125,7 @@ local ConfigTemplate = {
         keywordSnippet  = {'Both', String},
     },
     color = {
-        mode            = {'Grammar', String},
+        mode            = {'Semantic', String},
     },
     plugin = {
         enable          = {false, Boolean},

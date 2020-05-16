@@ -35,6 +35,13 @@ function mt:searchUnusedLocals(callback)
         if loc:get 'hide' then
             return
         end
+        if loc.tags then
+            for _, tag in ipairs(loc.tags) do
+                if tag[1] == 'close' then
+                    return
+                end
+            end
+        end
         local used = loc:eachInfo(function (info)
             if info.type == 'get' then
                 return true

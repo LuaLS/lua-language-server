@@ -356,6 +356,10 @@ end
 ]]
 
 TEST [[
+local f <close> = io.open()
+]]
+
+TEST [[
 ---@class <!Class!>
 ---@class <!Class!>
 ]]

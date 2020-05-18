@@ -25,6 +25,9 @@ local constLib = {
 
 local Care = {
     ['name'] = function (source, sources)
+        if source.start == source.finish then
+            return
+        end
         if source:get 'global' then
             if findLib(source) then
                 if source[1] == '_G' then

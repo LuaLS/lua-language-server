@@ -67,6 +67,17 @@ local Care = {
             or source[1] == 'self' then
                 return
             end
+            local value = source:bindValue()
+            local func = value:getFunction()
+            if func and func:getSource().name == source then
+                sources[#sources+1] = {
+                    start      = source.start,
+                    finish     = source.finish,
+                    type       = TokenTypes.interface,
+                    modifieres = TokenModifiers.declaration,
+                }
+                return
+            end
             sources[#sources+1] = {
                 start      = source.start,
                 finish     = source.finish,

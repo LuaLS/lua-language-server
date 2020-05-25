@@ -1,11 +1,7 @@
 local rpc       = require 'rpc'
 local workspace = require 'workspace'
 
-local function initAfterConfig(lsp, firstScope)
-    if firstScope then
-        lsp.workspace = workspace(lsp, firstScope.name)
-        lsp.workspace:init(firstScope.uri)
-    end
+local function initAfterConfig(lsp)
     -- 必须动态注册的事件：
     rpc:request('client/registerCapability', {
         registrations = {
@@ -34,36 +30,29 @@ local function initAfterConfig(lsp, firstScope)
 end
 
 return function (lsp)
-    -- 请求工作目录
-    rpc:request('workspace/workspaceFolders', nil, function (folders)
-        local firstScope
-        if folders then
-            firstScope = folders[1]
-        end
-        local uri = firstScope and firstScope.uri
-        -- 请求配置
-        rpc:request('workspace/configuration', {
-            items = {
-                {
-                    scopeUri = uri,
-                    section = 'Lua',
-                },
-                {
-                    scopeUri = uri,
-                    section = 'files.associations',
-                },
-                {
-                    scopeUri = uri,
-                    section = 'files.exclude',
-                }
+    local uri = lsp.workspace and lsp.workspace.uri
+    -- 请求配置
+    rpc:request('workspace/configuration', {
+        items = {
+            {
+                scopeUri = uri,
+                section = 'Lua',
             },
-        }, function (configs)
-            lsp:onUpdateConfig(configs[1], {
-                associations = configs[2],
-                exclude      = configs[3],
-            })
-            initAfterConfig(lsp, firstScope)
-        end)
+            {
+                scopeUri = uri,
+                section = 'files.associations',
+            },
+            {
+                scopeUri = uri,
+                section = 'files.exclude',
+            }
+        },
+    }, function (configs)
+        lsp:onUpdateConfig(configs[1], {
+            associations = configs[2],
+            exclude      = configs[3],
+        })
+        initAfterConfig(lsp)
     end)
     return true
 end

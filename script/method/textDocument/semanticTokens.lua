@@ -127,8 +127,6 @@ local function resolveTokens(vm, lines)
         return a.start < b.start
     end)
 
-    log.debug(table.dump(sources))
-
     local tokens = buildTokens(sources, lines)
 
     return tokens

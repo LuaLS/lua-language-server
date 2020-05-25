@@ -45,7 +45,6 @@ return function (lsp, params)
             workspace = {
                 workspaceFolders = {
                     supported = true,
-                    changeNotifications = true,
                 }
             },
             documentOnTypeFormattingProvider = {

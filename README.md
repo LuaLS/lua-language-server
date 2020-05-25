@@ -83,6 +83,11 @@ Please [help me][en-US] improve the quality of `en-US`.
 * [Build and Run (In VSCode)](https://github.com/sumneko/lua-language-server/wiki/Build-and-Run-(In-VSCode))
 * [Build and Run (Standalone)](https://github.com/sumneko/lua-language-server/wiki/Build-and-Run-(Standalone))
 
+## Setting
+
+* In VSCode: Just use the setting of VSCode.
+* Standalone: See https://github.com/sumneko/lua-language-server/wiki/Setting-without-VSCode
+
 ## Credit
 
 * [bee.lua](https://github.com/actboy168/bee.lua)

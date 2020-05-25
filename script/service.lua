@@ -121,6 +121,7 @@ function mt:clearDiagnostics(uri)
         diagnostics = {},
     })
     self._needDiagnostics[uri] = nil
+    log.debug('clearDiagnostics', uri)
 end
 
 ---@param uri uri
@@ -307,6 +308,7 @@ end
 function mt:removeText(uri)
     self._files:remove(uri)
     self:compileVM(uri)
+    self:clearDiagnostics(uri)
 end
 
 function mt:getCachedFileCount()

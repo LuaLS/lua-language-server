@@ -79,8 +79,9 @@ Please [help me][en-US] improve the quality of `en-US`.
 [en-US]: https://github.com/sumneko/lua-language-server/tree/master/locale/en-US
 
 ## Build
-[Build and Run (In VSCode)](https://github.com/sumneko/lua-language-server/wiki/Build-and-Run-(In-VSCode))
-[Build and Run (Standalone)](https://github.com/sumneko/lua-language-server/wiki/Build-and-Run-(Standalone))
+
+* [Build and Run (In VSCode)](https://github.com/sumneko/lua-language-server/wiki/Build-and-Run-(In-VSCode))
+* [Build and Run (Standalone)](https://github.com/sumneko/lua-language-server/wiki/Build-and-Run-(Standalone))
 
 ## Credit
 

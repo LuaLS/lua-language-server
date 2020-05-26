@@ -16,6 +16,9 @@ local function convertRange(lines, range)
     return result
 end
 
+--- @param lsp LSP
+--- @param params table
+--- @return function
 return function (lsp, params)
     local uri = params.textDocument.uri
     if timerCache[uri] then

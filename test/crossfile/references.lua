@@ -72,9 +72,7 @@ end
 
 function TEST(data)
     local lsp = service()
-    local ws = workspace(lsp, 'test')
-    lsp.workspace = ws
-    ws.root = ROOT
+    local ws = lsp:addWorkspace('test', uric.encode(ROOT))
 
     local mainUri
     local pos

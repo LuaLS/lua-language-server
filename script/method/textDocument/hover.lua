@@ -1,5 +1,8 @@
 local core = require 'core'
 
+--- @param lsp LSP
+--- @param params table
+--- @return table
 return function (lsp, params)
     local uri = params.textDocument.uri
     local vm, lines = lsp:loadVM(uri)

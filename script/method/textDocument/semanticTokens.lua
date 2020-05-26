@@ -169,6 +169,9 @@ local function testTokens(vm, lines)
     return tokens
 end
 
+--- @param lsp LSP
+--- @param params table
+--- @return function
 return function (lsp, params)
     local uri = params.textDocument.uri
 

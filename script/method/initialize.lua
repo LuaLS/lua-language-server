@@ -11,15 +11,21 @@ local function allWords()
     return list
 end
 
+--- @param lsp LSP
+--- @param params table
+--- @return table
 return function (lsp, params)
     lsp._inited = true
     lsp.client = params
     client.init(params)
     log.info(table.dump(params))
 
-    if params.rootUri then
-        lsp.workspace = workspace(lsp, 'root')
-        lsp.workspace:init(params.rootUri)
+    if params.workspaceFolders then
+        for _, folder in ipairs(params.workspaceFolders) do
+            lsp:addWorkspace(folder.name, folder.uri)
+        end
+    elseif params.rootUri then
+        lsp:addWorkspace('root', params.rootUri)
     end
 
     local server = {
@@ -45,6 +51,7 @@ return function (lsp, params)
             workspace = {
                 workspaceFolders = {
                     supported = true,
+                    changeNotifications = true,
                 }
             },
             documentOnTypeFormattingProvider = {

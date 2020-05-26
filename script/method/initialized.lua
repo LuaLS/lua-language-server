@@ -1,8 +1,37 @@
-local rpc       = require 'rpc'
-local workspace = require 'workspace'
+local rpc = require 'rpc'
 
-local function initAfterConfig(lsp)
-    -- 必须动态注册的事件：
+--- @param lsp LSP
+--- @return boolean
+return function (lsp)
+    local ws = lsp.workspaces[1]
+
+    if ws then
+        -- 请求工作目录
+        local uri = ws.uri
+        -- 请求配置
+        rpc:request('workspace/configuration', {
+            items = {
+                {
+                    scopeUri = uri,
+                    section = 'Lua',
+                },
+                {
+                    scopeUri = uri,
+                    section = 'files.associations',
+                },
+                {
+                    scopeUri = uri,
+                    section = 'files.exclude',
+                }
+            },
+        }, function (configs)
+            lsp:onUpdateConfig(configs[1], {
+                associations = configs[2],
+                exclude      = configs[3],
+            })
+        end)
+    end
+
     rpc:request('client/registerCapability', {
         registrations = {
             -- 监视文件变化
@@ -27,32 +56,6 @@ local function initAfterConfig(lsp)
     }, function ()
         log.debug('client/registerCapability Success!')
     end)
-end
 
-return function (lsp)
-    local uri = lsp.workspace and lsp.workspace.uri
-    -- 请求配置
-    rpc:request('workspace/configuration', {
-        items = {
-            {
-                scopeUri = uri,
-                section = 'Lua',
-            },
-            {
-                scopeUri = uri,
-                section = 'files.associations',
-            },
-            {
-                scopeUri = uri,
-                section = 'files.exclude',
-            }
-        },
-    }, function (configs)
-        lsp:onUpdateConfig(configs[1], {
-            associations = configs[2],
-            exclude      = configs[3],
-        })
-        initAfterConfig(lsp)
-    end)
     return true
 end

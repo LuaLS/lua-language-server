@@ -65,8 +65,7 @@ rawset(_G, 'TEST', true)
 
 function TEST(data)
     local lsp = service()
-    local ws = workspace(lsp, 'test')
-    lsp.workspace = ws
+    local ws = lsp:addWorkspace('test', uric.encode(ROOT))
 
     local targetUri = uric.encode(ROOT / fs.path(data[1].path))
     local sourceUri = uric.encode(ROOT / fs.path(data[2].path))

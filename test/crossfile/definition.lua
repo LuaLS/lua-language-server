@@ -44,8 +44,7 @@ end
 
 function TEST(datas)
     local lsp = service()
-    local ws = workspace(lsp, 'test')
-    lsp.workspace = ws
+    local ws = lsp:addWorkspace('test', uric.encode(ROOT))
 
     local compiled = {}
     local targetList = {}

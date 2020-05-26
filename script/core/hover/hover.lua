@@ -294,10 +294,14 @@ end
 
 local function hoverAsTargetUri(source, lsp)
     local uri = source:get 'target uri'
-    if not lsp or not lsp.workspace then
+    if not lsp then
         return nil
     end
-    local path = lsp.workspace:relativePathByUri(uri)
+    local ws = lsp:findWorkspaceFor(uri)
+    if not ws then
+        return nil
+    end
+    local path = ws:relativePathByUri(uri)
     if not path then
         return nil
     end

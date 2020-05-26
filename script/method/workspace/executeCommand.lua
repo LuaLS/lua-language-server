@@ -37,6 +37,8 @@ local function posToRange(lines, start, finish)
     }
 end
 
+--- @param lsp LSP
+--- @param data table
 function command.config(lsp, data)
     local def = config.config
     for _, k in ipairs(data.key) do
@@ -53,8 +55,12 @@ function command.config(lsp, data)
 
     local vscodePath
     local mode
-    if lsp.workspace then
-        vscodePath = lsp.workspace.root / '.vscode'
+    local ws
+    if data.uri then
+        ws = lsp:findWorkspaceFor(data.uri)
+    end
+    if ws then
+        vscodePath = ws.root / '.vscode'
         mode = 'workspace'
     else
         if platform.OS == 'Windows' then
@@ -115,6 +121,8 @@ function command.config(lsp, data)
     end
 end
 
+--- @param lsp LSP
+--- @param data table
 function command.removeSpace(lsp, data)
     local uri = data.uri
     local vm, lines = lsp:getVM(uri)
@@ -178,6 +186,8 @@ local literalMap = {
     ['table']   = true,
 }
 
+--- @param lsp LSP
+--- @param data table
 function command.solve(lsp, data)
     local uri = data.uri
     local vm, lines = lsp:getVM(uri)
@@ -248,6 +258,8 @@ function command.solve(lsp, data)
     })
 end
 
+--- @param lsp LSP
+--- @param params table
 return function (lsp, params)
     local name = params.command
     if not command[name] then

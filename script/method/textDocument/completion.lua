@@ -82,6 +82,9 @@ local function cuterFactory(lines, text, position)
     end
 end
 
+--- @param lsp LSP
+--- @param params table
+--- @return table
 return function (lsp, params)
     local uri = params.textDocument.uri
     local text, oldText = lsp:getText(uri)

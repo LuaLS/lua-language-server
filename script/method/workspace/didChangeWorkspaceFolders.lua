@@ -1,8 +1,21 @@
 local rpc = require 'rpc'
 
 --- @param lsp LSP
-return function (lsp)
-    for _, ws in ipairs(lsp.workspaces) do
+--- @param params table
+return function (lsp, params)
+    local event = params.event
+
+    for _, removed in ipairs(event.removed) do
+        lsp:removeWorkspace(removed.name, removed.uri)
+    end
+
+    for _, added in ipairs(event.added) do
+        lsp:addWorkspace(added.name, added.uri)
+    end
+
+    local ws = lsp.workspaces[1]
+    if ws then
+        -- 请求工作目录
         local uri = ws.uri
         -- 请求配置
         rpc:request('workspace/configuration', {

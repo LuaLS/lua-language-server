@@ -56,9 +56,7 @@ end
 
 function TEST(data)
     local lsp = service()
-    local ws = workspace(lsp, 'test')
-    lsp.workspace = ws
-    ws.root = ROOT
+    local ws = lsp:addWorkspace('test', uric.encode(ROOT))
 
     local targetScript = data[1].content
     local targetUri = uric.encode(ROOT / fs.path(data[1].path))

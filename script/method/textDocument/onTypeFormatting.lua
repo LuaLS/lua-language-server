@@ -1,3 +1,6 @@
+--- @param lsp LSP
+--- @param params table
+--- @return any
 return function (lsp, params)
     local uri = params.textDocument.uri
     local vm, lines = lsp:loadVM(uri)

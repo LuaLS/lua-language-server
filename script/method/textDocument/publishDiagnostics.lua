@@ -140,6 +140,9 @@ local function buildError(err, lines, uri)
     return diagnostic
 end
 
+--- @param lsp LSP
+--- @param params table
+--- @return table
 return function (lsp, params)
     local vm     = params.vm
     local lines  = params.lines

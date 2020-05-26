@@ -1,12 +1,16 @@
+--- @param lsp LSP
+--- @param params table
+--- @return boolean
 return function (lsp, params)
     local doc = params.textDocument
     local change = params.contentChanges
-    if lsp.workspace then
-        local path = lsp.workspace:relativePathByUri(doc.uri)
-        if not path or not lsp.workspace:isLuaFile(path) then
+    local ws = lsp:findWorkspaceFor(doc.uri)
+    if ws then
+        local path = ws:relativePathByUri(doc.uri)
+        if not path or not ws:isLuaFile(path) then
             return
         end
-        if not lsp:isOpen(doc.uri) and lsp.workspace.gitignore(path:string()) then
+        if not lsp:isOpen(doc.uri) and ws.gitignore(path:string()) then
             return
         end
     end

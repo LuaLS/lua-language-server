@@ -32,6 +32,9 @@ local function convertRange(lines, symbol)
     end
 end
 
+--- @param lsp LSP
+--- @param params table
+--- @return function
 return function (lsp, params)
     local uri = params.textDocument.uri
 

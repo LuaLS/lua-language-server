@@ -168,7 +168,11 @@ function mt:callSetMetaTable(func, values, source)
 end
 
 function mt:tryRequireOne(str, strValue, mode)
-    if not self.lsp or not self.lsp.workspace then
+    if not self.lsp then
+        return nil
+    end
+    local ws = self.lsp:findWorkspaceFor(self:getUri())
+    if not ws then
         return nil
     end
     local strSource = strValue:getSource()
@@ -180,11 +184,11 @@ function mt:tryRequireOne(str, strValue, mode)
         self:instantSource(strSource)
         local uri
         if mode == 'require' then
-            uri = self.lsp.workspace:searchPath(self:getUri(), str)
+            uri = ws:searchPath(self:getUri(), str)
         elseif mode == 'loadfile' then
-            uri = self.lsp.workspace:loadPath(self:getUri(), str)
+            uri = ws:loadPath(self:getUri(), str)
         elseif mode == 'dofile' then
-            uri = self.lsp.workspace:loadPath(self:getUri(), str)
+            uri = ws:loadPath(self:getUri(), str)
         end
         if not uri then
             return nil

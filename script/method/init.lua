@@ -27,6 +27,7 @@ init 'textDocument/semanticTokens'
 init 'textDocument/signatureHelp'
 init 'workspace/didChangeConfiguration'
 init 'workspace/didChangeWatchedFiles'
+init 'workspace/didChangeWorkspaceFolders'
 init 'workspace/executeCommand'
 
 return method

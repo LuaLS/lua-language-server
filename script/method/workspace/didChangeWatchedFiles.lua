@@ -7,38 +7,45 @@ local FileChangeType = {
     Deleted = 3,
 }
 
+--- @param lsp LSP
+--- @param params table
 return function (lsp, params)
-    if not lsp.workspace then
-        return
-    end
-    local needReset
+    local needReset = {}
+    local needRescan
     for _, change in ipairs(params.changes) do
+        local ws = lsp:findWorkspaceFor(change.uri)
+        if not ws then
+            goto CONTINUE
+        end
         local path = uric.decode(change.uri)
         if not path then
             goto CONTINUE
         end
         if change.type == FileChangeType.Created then
-            lsp.workspace:addFile(path)
+            ws:addFile(path)
             if lsp:getVM(change.uri) then
-                needReset = true
+                needReset[ws] = true
             end
         elseif change.type == FileChangeType.Deleted then
-            lsp.workspace:removeFile(path)
+            ws:removeFile(path)
             if lsp:getVM(change.uri) then
-                needReset = true
+                needReset[ws] = true
             end
         end
         -- 排除类文件发生更改需要重新扫描
         local filename = path:filename():string()
-        if lsp.workspace:fileNameEq(filename, '.gitignore')
-        or lsp.workspace:fileNameEq(filename, '.gitmodules')
+        if ws:fileNameEq(filename, '.gitignore')
+        or ws:fileNameEq(filename, '.gitmodules')
         then
-            lsp:reScanFiles()
+            needRescan = true
         end
         ::CONTINUE::
     end
+    if needRescan then
+        lsp:reScanFiles()
+    end
     -- 缓存过的文件发生变化后，重新计算
-    if needReset then
-        lsp.workspace:reset()
+    for ws, _ in pairs(needReset) do
+        ws:reset()
     end
 end

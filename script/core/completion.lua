@@ -663,14 +663,21 @@ local function buildTextEdit(start, finish, str, quo)
     }
 end
 
+--- @param vm VM
+--- @param source table
+--- @param callback function
 local function searchInRequire(vm, source, callback)
-    if not vm.lsp or not vm.lsp.workspace then
+    if not vm.lsp then
+        return
+    end
+    local ws = vm.lsp:findWorkspaceFor(vm.uri)
+    if not ws then
         return
     end
     if source.type ~= 'string' then
         return
     end
-    local list, map = vm.lsp.workspace:matchPath(vm.uri, source[1])
+    local list, map = ws:matchPath(vm.uri, source[1])
     if not list then
         return
     end
@@ -1039,6 +1046,11 @@ local function getSource(vm, pos, text, filter)
     return source, pos, word
 end
 
+--- @param vm VM
+--- @param text string
+--- @param pos table
+--- @param oldText string
+--- @return table
 return function (vm, text, pos, oldText)
     local filter = {
         ['name']           = true,

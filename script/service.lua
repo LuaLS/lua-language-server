@@ -21,6 +21,7 @@ local files      = require 'files'
 local uric       = require 'uri'
 local capability = require 'capability'
 local plugin     = require 'plugin'
+local workspace = require 'workspace'
 
 local ErrorCodes = {
     -- Defined by JSON RPC
@@ -174,34 +175,83 @@ function mt:isDeadText(uri)
     return self._files:isDead(uri)
 end
 
+---@param name string
+---@param uri uri
+function mt:addWorkspace(name, uri)
+    log.info("Add workspace", name, uri)
+    for _, ws in ipairs(self.workspaces) do
+        if ws.name == name and ws.uri == uri then
+            return
+        end
+    end
+    local ws = workspace(self, name)
+    ws:init(uri)
+    table.insert(self.workspaces, ws)
+    return ws
+end
+
+---@param name string
+---@param uri uri
+function mt:removeWorkspace(name, uri)
+    log.info("Remove workspace", name, uri)
+    local index
+    for i, ws in ipairs(self.workspaces) do
+        if ws.name == name and ws.uri == uri then
+            index = i
+            break
+        end
+    end
+    if index then
+        table.remove(self.workspaces, index)
+    end
+end
+
+---@param uri uri
+---@return Workspace
+function mt:findWorkspaceFor(uri)
+    local path = uric.decode(uri)
+    if not path then
+        return nil
+    end
+    for _, ws in ipairs(self.workspaces) do
+        if not ws:relativePathByUri(uri):string():match("^%.%.") then
+            return ws
+        end
+    end
+    log.info("No workspace for", uri)
+    return nil
+end
+
 ---@param uri uri
 ---@return boolean
 function mt:isLua(uri)
-    if not self.workspace then
-        return true
+    local ws = self:findWorkspaceFor(uri)
+    if not ws then
+        return false
     end
-    local path = self.workspace:absolutePathByUri(uri)
+    local path = ws:absolutePathByUri(uri)
     if not path then
         return false
     end
-    if self.workspace:isLuaFile(path) then
+    if ws:isLuaFile(path) then
         return true
     end
     return false
 end
 
 function mt:isIgnored(uri)
-    if not self.workspace then
+    local ws = self:findWorkspaceFor(uri)
+    if not ws then
         return true
     end
-    if not self.workspace.gitignore then
+    if not ws.gitignore then
         return true
     end
-    local path = self.workspace:relativePathByUri(uri)
+    local path = ws:relativePathByUri(uri)
     if not path then
         return true
     end
-    if self.workspace.gitignore(path:string()) then
+    if ws.gitignore(path:string()) then
         return true
     end
     return false
@@ -261,11 +311,16 @@ function mt:checkReadFile(uri, path, text)
     return true
 end
 
+---@param ws Workspace
 ---@param uri uri
 ---@param path path
 ---@param buf string
 ---@param compiled table
-function mt:readText(uri, path, buf, compiled)
+function mt:readText(ws, uri, path, buf, compiled)
+    if self:findWorkspaceFor(uri) ~= ws then
+        log.debug('Read failed due to different workspace:', uri, debug.traceback())
+        return
+    end
     if self._files:get(uri) then
         log.debug('Read failed due to duplicate:', uri)
         return
@@ -287,18 +342,22 @@ function mt:readText(uri, path, buf, compiled)
     self:needCompile(uri, compiled)
 end
 
+---@param ws Workspace
 ---@param uri uri
 ---@param path path
 ---@param buf string
 ---@param compiled table
-function mt:readLibrary(uri, path, buf, compiled)
+function mt:readLibrary(ws, uri, path, buf, compiled)
+    if self:findWorkspaceFor(uri) ~= ws then
+        return
+    end
     if not self:isLua(uri) then
         return
     end
     if not self:checkReadFile(uri, path, buf) then
         return
     end
-    self._files:save(uri, buf, 0)
+    self._files:save(uri, buf, 0, ws)
     self._files:setLibrary(uri)
     self:needCompile(uri, compiled)
     self:clearDiagnostics(uri)
@@ -663,8 +722,10 @@ function mt:checkWorkSpaceComplete()
         return
     end
     self._hasCheckedWorkSpaceComplete = true
-    if self.workspace:isComplete() then
-        return
+    for _, ws in ipairs(self.workspaces) do
+        if ws:isComplete() then
+            return
+        end
     end
     self._needShowComplete = true
     rpc:notify('window/showMessage', {
@@ -747,12 +808,11 @@ function mt:restartDueToMemoryLeak()
 end
 
 function mt:reScanFiles()
-    if not self.workspace then
-        return
-    end
     log.debug('reScanFiles')
     self:clearAllFiles()
-    self.workspace:scanFiles()
+    for _, ws in ipairs(self.workspaces) do
+        ws:scanFiles()
+    end
 end
 
 function mt:onUpdateConfig(updated, other)
@@ -781,7 +841,9 @@ function mt:onUpdateConfig(updated, other)
         capability.semantic.disable()
     end
     if not table.equal(oldConfig.plugin, newConfig.plugin) then
-        plugin.load(self.workspace)
+        for _, ws in ipairs(self.workspaces) do
+            plugin.load(ws)
+        end
     end
     if not table.equal(oldConfig.workspace, newConfig.workspace)
     or not table.equal(oldConfig.plugin, newConfig.plugin)
@@ -1015,6 +1077,7 @@ function mt:listen()
     end
 end
 
+--- @return LSP
 return function ()
     local session = setmetatable({
         _needCompile = {},
@@ -1026,5 +1089,7 @@ return function ()
     session.global = core.global(session)
     session.chain  = chainMgr()
     session.emmy   = emmyMgr()
+    ---@type Workspace[]
+    session.workspaces = {}
     return session
 end

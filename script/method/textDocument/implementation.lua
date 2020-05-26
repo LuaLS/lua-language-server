@@ -77,6 +77,9 @@ end
 
 local LastTask
 
+--- @param lsp LSP
+--- @param params table
+--- @return function
 return function (lsp, params)
     if LastTask then
         LastTask:remove()

@@ -54,6 +54,9 @@ local function findReferences(lsp, uri, position)
     return locations, isGlobal
 end
 
+--- @param lsp LSP
+--- @param params table
+--- @return function
 return function (lsp, params)
     local uri = params.textDocument.uri
     local declarat = params.context.includeDeclaration

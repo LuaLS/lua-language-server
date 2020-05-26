@@ -42,6 +42,7 @@ local function similarity(a, b)
     return #ta
 end
 
+--- @class Workspace
 local mt = {}
 mt.__index = mt
 
@@ -60,9 +61,9 @@ function mt:listenLoadFile()
         local uri = uric.encode(path)
         self.files[name] = uri
         if mode == 'workspace' then
-            self.lsp:readText(uri, path, buf, self._currentScanCompiled)
+            self.lsp:readText(self, uri, path, buf, self._currentScanCompiled)
         elseif mode == 'library' then
-            self.lsp:readLibrary(uri, path, buf, self._currentScanCompiled)
+            self.lsp:readLibrary(self, uri, path, buf, self._currentScanCompiled)
         else
             error('Unknown mode:' .. tostring(mode))
         end
@@ -221,7 +222,7 @@ function mt:addFile(path)
     local name = getFileName(path)
     local uri = uric.encode(path)
     self.files[name] = uri
-    self.lsp:readText(uri, path)
+    self.lsp:readText(self, uri, path)
 end
 
 function mt:removeFile(path)
@@ -368,6 +369,8 @@ function mt:convertPathAsRequire(filename, start)
     return list
 end
 
+--- @param baseUri uri
+--- @param input string
 function mt:matchPath(baseUri, input)
     local first = input:match '^[^%.]+'
     if not first then
@@ -502,6 +505,9 @@ function mt:absolutePathByUri(uri)
     return fs.absolute(path)
 end
 
+--- @param lsp LSP
+--- @param name string
+--- @return Workspace
 return function (lsp, name)
     local workspace = setmetatable({
         lsp = lsp,

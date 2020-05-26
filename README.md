@@ -17,7 +17,7 @@
 - [x] Highlight
 - [x] Code Action
 - [x] EmmyLua Annotation
-- [ ] Multi Workspace
+- [x] Multi Workspace
 - [ ] Type Format
 
 ## Preview
@@ -116,3 +116,4 @@ Please [help me][en-US] improve the quality of `en-US`.
 * [Fedora7](https://github.com/Fedora7)
 * [Allen Shaw](https://github.com/shuxiao9058)
 * [Bartel](https://github.com/Letrab)
+* [Ruin0x11](https://github.com/Ruin0x11)

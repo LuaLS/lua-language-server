@@ -219,24 +219,15 @@ local function renameGlobal(source, newname, callback)
 end
 
 local function ofLocal(source, newname, callback)
-    renameLocal(source, newname, callback)
-    if source.ref then
-        for _, ref in ipairs(source.ref) do
-            renameLocal(ref, newname, callback)
-        end
+    local results = guide.requestReference(source)
+    for i = 1, #results do
+        renameLocal(results[i], newname, callback)
     end
 end
 
 local function ofField(source, newname, callback)
-    local key    = vm.getKeyName(source)
-    local tbl
-    if source.type == 'tablefield'
-    or source.type == 'tableindex' then
-        tbl = source.parent
-    else
-        tbl = source.node
-    end
-    return vm.eachField(tbl, function (src)
+    local key = guide.getKeyName(source)
+    vm.eachRef(source, function (src)
         if vm.getKeyName(src) ~= key then
             return
         end
@@ -273,30 +264,46 @@ local function ofField(source, newname, callback)
     end)
 end
 
+local function ofLabel(source, newname, callback)
+    if not isValidName(newname) and not askForcing(newname)then
+        return false
+    end
+    vm.eachRef(source, function (src)
+        callback(src, src.start, src.finish, newname)
+    end)
+end
+
 local function rename(source, newname, callback)
     if source.type == 'label'
     or source.type == 'goto' then
-        if not isValidName(newname) and not askForcing(newname)then
-            return false
-        end
-        vm.eachRef(source, function (src)
-            callback(src, src.start, src.finish, newname)
-        end)
+        return ofLabel(source, newname, callback)
     elseif source.type == 'local' then
         return ofLocal(source, newname, callback)
     elseif source.type == 'setlocal'
     or     source.type == 'getlocal' then
-        return ofLocal(source.node, newname, callback)
+        return ofLocal(source, newname, callback)
     elseif source.type == 'field'
     or     source.type == 'method'
-    or     source.type == 'string' then
-        return ofField(source.parent, newname, callback)
+    or     source.type == 'index' then
+        return ofField(source, newname, callback)
     elseif source.type == 'tablefield'
     or     source.type == 'setglobal'
     or     source.type == 'getglobal' then
         return ofField(source, newname, callback)
+    elseif source.type == 'string'
+    or     source.type == 'number'
+    or     source.type == 'boolean' then
+        local parent = source.parent
+        if not parent then
+            return
+        end
+        if parent.type == 'setindex'
+        or parent.type == 'getindex'
+        or parent.type == 'tableindex' then
+            return ofField(parent, newname, callback)
+        end
     end
-    return true
+    return
 end
 
 local function prepareRename(source)
@@ -311,7 +318,9 @@ local function prepareRename(source)
     or source.type == 'setglobal'
     or source.type == 'getglobal' then
         return source, source[1]
-    elseif source.type == 'string' then
+    elseif source.type == 'string'
+    or     source.type == 'number'
+    or     source.type == 'boolean' then
         local parent = source.parent
         if not parent then
             return nil
@@ -338,6 +347,8 @@ local accept = {
     ['setglobal']  = true,
     ['getglobal']  = true,
     ['string']     = true,
+    ['boolean']    = true,
+    ['number']     = true,
 }
 
 local m = {}

@@ -372,13 +372,16 @@ Function    <-  FunctionBody
             ->  Function
 FuncArgs    <-  Sp ({} PL {| FuncArg+ |} DirtyPR {})
             ->  FuncArgs
-            /   PL DirtyPR %nil 
-            /   {} -> MissPL DirtyPR %nil
+            /   PL DirtyPR %nil
+FuncArgsMiss<-  {} -> MissPL DirtyPR %nil
 FuncArg     <-  DOTS
             /   Name
             /   COMMA
 FunctionBody<-  FUNCTION FuncArgs
                     {| (!END Action)* |}
+                NeedEnd
+            /   FUNCTION FuncArgsMiss
+                    {| %nil |}
                 NeedEnd
 
 -- 纯占位，修改了 `relabel.lua` 使重复定义不抛错
@@ -510,6 +513,9 @@ NamedFunction
 FunctionNamedBody
             <-  FUNCTION FuncName FuncArgs
                     {| (!END Action)* |}
+                NeedEnd
+            /   FUNCTION FuncName FuncArgsMiss
+                    {| %nil |}
                 NeedEnd
 FuncName    <-  {| Single (Sp SuffixWithoutCall)* |}
             ->  Simple

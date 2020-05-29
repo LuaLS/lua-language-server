@@ -463,6 +463,7 @@ local function compileGoTo(obj)
         label.ref = {}
     end
     label.ref[#label.ref+1] = obj
+    obj.node = label
 
     -- 如果有局部变量在 goto 与 label 之间声明，
     -- 并在 label 之后使用，则算作语法错误

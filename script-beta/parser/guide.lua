@@ -1,8 +1,14 @@
-local error      = error
-local type       = type
-local next       = next
-local tostring   = tostring
-local util       = require 'utility'
+local util        = require 'utility'
+local error       = error
+local type        = type
+local next        = next
+local tostring    = tostring
+local print       = print
+local ipairs      = ipairs
+local tableInsert = table.insert
+local tableUnpack = table.unpack
+local tableRemove = table.remove
+local tableMove   = table.move
 
 _ENV = nil
 
@@ -498,8 +504,6 @@ function m.getName(obj)
     elseif tp == 'field'
     or     tp == 'method' then
         return obj[1]
-    elseif tp == 'index' then
-        return m.getNameOfLiteral(obj.index)
     end
     return m.getNameOfLiteral(obj)
 end
@@ -542,6 +546,10 @@ function m.getKeyName(obj)
     if tp == 'getglobal'
     or tp == 'setglobal' then
         return 's|' .. obj[1]
+    elseif tp == 'local'
+    or     tp == 'getlocal'
+    or     tp == 'setlocal' then
+        return 'l|' .. obj[1]
     elseif tp == 'getfield'
     or     tp == 'setfield'
     or     tp == 'tablefield' then
@@ -557,13 +565,19 @@ function m.getKeyName(obj)
     or     tp == 'setindex'
     or     tp == 'tableindex' then
         return m.getKeyNameOfLiteral(obj.index)
-    elseif tp == 'index' then
-        return m.getKeyNameOfLiteral(obj.index)
     elseif tp == 'field'
     or     tp == 'method' then
         return 's|' .. obj[1]
     end
     return m.getKeyNameOfLiteral(obj)
+end
+
+function m.getSimpleName(obj)
+    if obj.type == 'call' then
+        local key = obj.args[2]
+        return m.getKeyName(key)
+    end
+    return m.getKeyName(obj)
 end
 
 function m.getENV(ast)
@@ -660,6 +674,751 @@ function m.getPath(a, b, sameFunction)
         resultB[#resultB+1] = pathB[i]
     end
     return mode, resultA, resultB
+end
+
+-- 根据语法，单步搜索定义
+local function stepRefOfLocal(loc, mode)
+    local results = {}
+    if loc.start ~= 0 then
+        results[#results+1] = loc
+    end
+    local refs = loc.ref
+    if not refs then
+        return results
+    end
+    for i = 1, #refs do
+        local ref = refs[i]
+        if ref.start == 0 then
+            goto CONTINUE
+        end
+        if mode == 'def' then
+            if ref.type == 'local'
+            or ref.type == 'setlocal' then
+                results[#results+1] = ref
+            end
+        else
+            if ref.type == 'local'
+            or ref.type == 'setlocal'
+            or ref.type == 'getlocal' then
+                results[#results+1] = ref
+            end
+        end
+        ::CONTINUE::
+    end
+    return results
+end
+
+local function stepRefOfLabel(label, mode)
+    local results = { label }
+    if not label or mode == 'def' then
+        return results
+    end
+    local refs = label.ref
+    for i = 1, #refs do
+        local ref = refs[i]
+        results[#results+1] = ref
+    end
+    return results
+end
+
+local function stepRefOfGlobal(obj, mode)
+    local results = {}
+    local name = m.getKeyName(obj)
+    local refs = obj.node.ref
+    for i = 1, #refs do
+        local ref = refs[i]
+        if m.getKeyName(ref) == name then
+            if mode == 'def' then
+                if obj == 'setglobal' then
+                    results[#results+1] = ref
+                end
+            else
+                results[#results+1] = ref
+            end
+        end
+    end
+    return results
+end
+
+function m.getStepRef(obj, mode)
+    if obj.type == 'getlocal'
+    or obj.type == 'setlocal' then
+        return stepRefOfLocal(obj.node, mode)
+    end
+    if obj.type == 'local' then
+        return stepRefOfLocal(obj, mode)
+    end
+    if obj.type == 'label' then
+        return stepRefOfLabel(obj, mode)
+    end
+    if obj.type == 'goto' then
+        return stepRefOfLabel(obj.node, mode)
+    end
+    if obj.type == 'getglobal'
+    or obj.type == 'setglobal' then
+        return stepRefOfGlobal(obj, mode)
+    end
+    return nil
+end
+
+-- 根据语法，单步搜索field
+local function stepFieldOfLocal(loc)
+    local results = {}
+    local refs = loc.ref
+    for i = 1, #refs do
+        local ref = refs[i]
+        if ref.type == 'setglobal'
+        or ref.type == 'getglobal' then
+            results[#results+1] = ref
+        elseif ref.type == 'getlocal' then
+            local nxt = ref.next
+            if nxt then
+                if nxt.type == 'setfield'
+                or nxt.type == 'getfield'
+                or nxt.type == 'setmethod'
+                or nxt.type == 'getmethod'
+                or nxt.type == 'setindex'
+                or nxt.type == 'getindex' then
+                    results[#results+1] = nxt
+                end
+            end
+        end
+    end
+    return results
+end
+local function stepFieldOfTable(tbl)
+    local result = {}
+    for i = 1, #tbl do
+        result[i] = tbl[i]
+    end
+    return result
+end
+function m.getStepField(obj)
+    if obj.type == 'getlocal'
+    or obj.type == 'setlocal' then
+        return stepFieldOfLocal(obj.node)
+    end
+    if obj.type == 'local' then
+        return stepFieldOfLocal(obj)
+    end
+    if obj.type == 'table' then
+        return stepFieldOfTable(obj)
+    end
+end
+
+local function convertSimpleList(list)
+    local simple = {}
+    for i = #list, 1, -1 do
+        local c = list[i]
+        if c.special == '_G' then
+            simple.global = true
+            goto CONTINUE
+        end
+        if c.type == 'getglobal'
+        or c.type == 'setglobal' then
+            simple.global = true
+        end
+        simple[#simple+1] = m.getSimpleName(c)
+        if #simple == 1 then
+            if simple.global then
+                simple.first = m.getLocal(c, '_ENV', c.start)
+            elseif c.type == 'setlocal'
+            or     c.type == 'getlocal' then
+                simple.first = c.node
+            else
+                simple.first = c
+            end
+        end
+        ::CONTINUE::
+    end
+    return simple
+end
+
+-- 搜索 `a.b.c` 的等价表达式
+local function buildSimpleList(obj, max)
+    local list = {}
+    local cur = obj
+    local limit = max and (max + 1) or 11
+    for i = 1, max or limit do
+        if i == limit then
+            return nil
+        end
+        if cur.type == 'setfield'
+        or cur.type == 'getfield'
+        or cur.type == 'setmethod'
+        or cur.type == 'getmethod'
+        or cur.type == 'setindex'
+        or cur.type == 'getindex' then
+            list[i] = cur
+            cur = cur.node
+        elseif cur.type == 'tablefield'
+        or     cur.type == 'tableindex' then
+            list[i] = cur
+            cur = cur.parent.parent
+        elseif cur.type == 'getlocal'
+        or     cur.type == 'setlocal'
+        or     cur.type == 'local' then
+            list[i] = cur
+            break
+        elseif cur.type == 'setglobal'
+        or     cur.type == 'getglobal' then
+            list[i] = cur
+            break
+        elseif cur.type == 'function'
+        or     cur.type == 'main' then
+            break
+        else
+            return nil
+        end
+    end
+    return convertSimpleList(list)
+end
+
+function m.getSimple(obj, max)
+    local simpleList
+    if obj.type == 'getfield'
+    or obj.type == 'setfield'
+    or obj.type == 'getmethod'
+    or obj.type == 'setmethod'
+    or obj.type == 'getindex'
+    or obj.type == 'setindex'
+    or obj.type == 'local'
+    or obj.type == 'getlocal'
+    or obj.type == 'setlocal'
+    or obj.type == 'setglobal'
+    or obj.type == 'getglobal'
+    or obj.type == 'tableindex' then
+        simpleList = buildSimpleList(obj, max)
+    elseif obj.type == 'field'
+    or     obj.type == 'method' then
+        simpleList = buildSimpleList(obj.parent, max)
+    end
+    return simpleList
+end
+
+m.SearchFlag = {
+    STEP   = 1 << 0,
+    SIMPLE = 1 << 1,
+    ALL    = 0xffff,
+}
+m.Version = 53
+
+function m.status(parentStatus)
+    local status = {
+        cache   = parentStatus and parentStatus.cache or {},
+        depth   = parentStatus and parentStatus.depth or 0,
+        flag    = m.SearchFlag.ALL,
+        results = {},
+    }
+    return status
+end
+
+function m.copyStatusResults(a, b)
+    local ra = a.results
+    local rb = b.results
+    for i = 1, #rb do
+        ra[#ra+1] = rb[i]
+    end
+end
+
+function m.getCallAndArgIndex(callarg)
+    local callargs = callarg.parent
+    if not callargs or callargs.type ~= 'callargs' then
+        return nil
+    end
+    local index
+    for i = 1, #callargs do
+        if callargs[i] == callarg then
+            index = i
+            break
+        end
+    end
+    local call = callargs.parent
+    return call, index
+end
+
+function m.getNextRef(ref)
+    local nextRef = ref.next
+    if nextRef then
+        if nextRef.type == 'setfield'
+        or nextRef.type == 'getfield'
+        or nextRef.type == 'setmethod'
+        or nextRef.type == 'getmethod'
+        or nextRef.type == 'setindex'
+        or nextRef.type == 'getindex' then
+            return nextRef
+        end
+    else
+        -- 穿透 rawget 与 rawset
+        local call, index = m.getCallAndArgIndex(ref)
+        if call then
+            if call.node.special == 'rawset' and index == 1 then
+                return call
+            end
+            if call.node.special == 'rawget' and index == 1 then
+                return call
+            end
+        end
+    end
+
+    return nil
+end
+
+function m.checkSameSimpleInValueOfTable(status, value, start, queue)
+    if value.type ~= 'table' then
+        return
+    end
+    for i = 1, #value do
+        local field = value[i]
+        queue[#queue+1] = {
+            obj   = field,
+            start = start + 1,
+        }
+    end
+end
+
+function m.searchFields(status, obj, key)
+    if obj.type == 'table' then
+        local keyName = key and ('s|' .. key)
+        local results = {}
+        for i = 1, #obj do
+            local field = obj[i]
+            if not keyName or keyName == m.getSimpleName(field) then
+                results[#results+1] = field
+            end
+        end
+        return results
+    else
+        local newStatus = m.status(status)
+        local simple = m.getSimple(obj, 1)
+        if not simple then
+            return nil
+        end
+        simple[2] = key and ('s|' .. key) or '*'
+        m.searchSameFields(newStatus, simple, 'def')
+        local results = newStatus.results
+        m.cleanResults(results)
+        return results
+    end
+end
+
+function m.getObjectValue(obj)
+    if obj.value then
+        return obj.value
+    end
+    if obj.type == 'field'
+    or obj.type == 'method' then
+        return obj.parent.value
+    end
+    if obj.type == 'call' then
+        if obj.node.special == 'rawset' then
+            return obj.args[3]
+        end
+    end
+    return nil
+end
+
+function m.checkSameSimpleInValueInMetaTable(status, mt, start, queue)
+    local indexes = m.searchFields(status, mt, '__index')
+    if not indexes then
+        return
+    end
+    local refsStatus = m.status(status)
+    for i = 1, #indexes do
+        local indexValue = m.getObjectValue(indexes[i])
+        if indexValue then
+            m.searchRefs(refsStatus, indexValue, 'ref')
+        end
+    end
+    for i = 1, #refsStatus.results do
+        local obj = refsStatus.results[i]
+        queue[#queue+1] = {
+            obj   = obj,
+            start = start,
+            force = true,
+        }
+    end
+end
+
+function m.checkSameSimpleInValueOfSetMetaTable(status, value, start, queue)
+    if value.type ~= 'select' then
+        return
+    end
+    local vararg = value.vararg
+    if not vararg or vararg.type ~= 'call' then
+        return
+    end
+    local func = vararg.node
+    if not func or func.special ~= 'setmetatable' then
+        return
+    end
+    local args = vararg.args
+    local obj = args[1]
+    local mt = args[2]
+    if obj then
+        queue[#queue+1] = {
+            obj   = obj,
+            start = start,
+        }
+    end
+    if mt then
+        m.checkSameSimpleInValueInMetaTable(status, mt, start, queue)
+    end
+end
+
+function m.checkSameSimpleInArg1OfSetMetaTable(status, obj, start, queue)
+    local args = obj.parent
+    if not args or args.type ~= 'callargs' then
+        return
+    end
+    if args[1] ~= obj then
+        return
+    end
+    local mt = args[2]
+    if mt then
+        m.checkSameSimpleInValueInMetaTable(status, mt, start, queue)
+    end
+end
+
+function m.checkSameSimpleInBranch(status, ref, start, queue)
+    -- 根据赋值扩大搜索范围
+    local value = m.getObjectValue(ref)
+    if value then
+        -- 检查赋值是字面量表的情况
+        m.checkSameSimpleInValueOfTable(status, value, start, queue)
+        -- 检查赋值是 setmetatable 调用的情况
+        m.checkSameSimpleInValueOfSetMetaTable(status, value, start, queue)
+    end
+
+    -- 检查自己作为 setmetatable 第一个参数的情况
+    m.checkSameSimpleInArg1OfSetMetaTable(status, ref, start, queue)
+end
+
+function m.searchSameMethodCrossSelf(ref, mark)
+    local selfNode
+    if ref.tag == 'self' then
+        selfNode = ref
+    else
+        if ref.type == 'getlocal'
+        or ref.type == 'setlocal' then
+            local node = ref.node
+            if node.tag == 'self' then
+                selfNode = node
+            end
+        end
+    end
+    if selfNode then
+        if mark[selfNode] then
+            return nil
+        end
+        mark[selfNode] = true
+        return selfNode.method.node
+    end
+end
+
+function m.searchSameMethod(ref, mark)
+    if mark['method'] then
+        return nil
+    end
+    local nxt = ref.next
+    if not nxt then
+        return nil
+    end
+    if nxt.type == 'setmethod' then
+        mark['method'] = true
+        return ref
+    end
+    return nil
+end
+
+function m.searchSameFieldsCrossMethod(status, ref, start, queue)
+    local mark = status.cache.crossMethodMark
+    if not mark then
+        mark = {}
+        status.cache.crossMethodMark = mark
+    end
+    local method = m.searchSameMethod(ref, mark)
+                or m.searchSameMethodCrossSelf(ref, mark)
+    if not method then
+        return
+    end
+    local methodStatus = m.status(status)
+    m.searchRefs(methodStatus, method, 'ref')
+    for _, md in ipairs(methodStatus.results) do
+        queue[#queue+1] = {
+            obj   = md,
+            start = start,
+            force = true,
+        }
+        local nxt = md.next
+        if not nxt then
+            goto CONTINUE
+        end
+        if nxt.type == 'setmethod' then
+            local func = nxt.value
+            if not func then
+                goto CONTINUE
+            end
+            local selfNode = func.locals and func.locals[1]
+            if not selfNode or not selfNode.ref then
+                goto CONTINUE
+            end
+            if mark[selfNode] then
+                goto CONTINUE
+            end
+            mark[selfNode] = true
+            for _, selfRef in ipairs(selfNode.ref) do
+                queue[#queue+1] = {
+                    obj   = selfRef,
+                    start = start,
+                    force = true,
+                }
+            end
+        end
+        ::CONTINUE::
+    end
+end
+
+function m.checkSameSimple(status, simple, data, mode, results, queue)
+    local ref   = data.obj
+    local start = data.start
+    local force = data.force
+    for i = start, #simple do
+        local sm = simple[i]
+        if sm ~= '*' and not force and m.getSimpleName(ref) ~= sm then
+            return
+        end
+        force = false
+        -- 穿透 self:func 与 mt:func
+        m.searchSameFieldsCrossMethod(status, ref, i, queue)
+        if i == #simple then
+            break
+        end
+        -- 检查形如 a = {} 的分支情况
+        m.checkSameSimpleInBranch(status, ref, i, queue)
+        ref = m.getNextRef(ref)
+        if not ref then
+            return
+        end
+    end
+    if mode == 'def' then
+        if ref.type == 'setglobal'
+        or ref.type == 'setlocal'
+        or ref.type == 'local' then
+            results[#results+1] = ref
+        elseif ref.type == 'setfield'
+        or     ref.type == 'tablefield' then
+            results[#results+1] = ref.field
+        elseif ref.type == 'setmethod' then
+            results[#results+1] = ref.method
+        elseif ref.type == 'setindex'
+        or     ref.type == 'tableindex' then
+            results[#results+1] = ref.index
+        elseif ref.type == 'call' then
+            if ref.node.special == 'rawset' then
+                results[#results+1] = ref
+            end
+        end
+    else
+        if ref.type == 'setfield'
+        or ref.type == 'getfield'
+        or ref.type == 'tablefield' then
+            results[#results+1] = ref.field
+        elseif ref.type == 'setmethod'
+        or     ref.type == 'getmethod' then
+            results[#results+1] = ref.method
+        elseif ref.type == 'setindex'
+        or     ref.type == 'getindex'
+        or     ref.type == 'tableindex' then
+            results[#results+1] = ref.index
+        else
+            results[#results+1] = ref
+        end
+    end
+end
+
+function m.searchSameFields(status, simple, mode)
+    local first = simple.first
+    local fref = first.ref
+    if not fref then
+        return
+    end
+    local queue = {}
+    for i = 1, #fref do
+        local ref = fref[i]
+        queue[i] = {
+            obj   = ref,
+            start = 1,
+        }
+    end
+    if simple.global then
+        for i = 1, #queue do
+            local data = queue[i]
+            local obj  = data.obj
+            local nxt  = m.getNextRef(obj)
+            if nxt and obj.special == '_G' then
+                data.obj = nxt
+            end
+        end
+    else
+        queue[#queue+1] = {
+            obj   = first,
+            start = 1,
+        }
+    end
+    for i = 1, 999 do
+        local data = queue[i]
+        if not data then
+            return
+        end
+        m.checkSameSimple(status, simple, data, mode, status.results, queue)
+    end
+end
+
+function m.searchRefsAsFunctionReturn(status, obj)
+    -- 只有 function 才搜索返回值引用
+    if obj.type ~= 'function' then
+        return
+    end
+    status.results[#status.results+1] = obj
+    -- 搜索所在函数
+    local currentFunc = m.getParentFunction(obj)
+    local returns = currentFunc.returns
+    if not returns then
+        return
+    end
+    -- 看看他是第几个返回值
+    local index
+    for i = 1, #returns do
+        local rtn = returns[i]
+        if m.isContain(rtn, obj.start) then
+            for j = 1, #rtn do
+                if obj == rtn[j] then
+                    index = j
+                    goto BREAK
+                end
+            end
+        end
+    end
+    ::BREAK::
+    if not index then
+        return
+    end
+    -- 搜索所有所在函数的调用者
+    local funcRefs = m.status(status)
+    m.searchRefOfValue(funcRefs, currentFunc)
+
+    if #funcRefs.results == 0 then
+        return
+    end
+    local calls = {}
+    for _, res in ipairs(funcRefs.results) do
+        local call = res.parent
+        if call.type == 'call' then
+            calls[#calls+1] = call
+        end
+    end
+    -- 搜索调用者的返回值
+    if #calls == 0 then
+        return
+    end
+    local selects = {}
+    for i = 1, #calls do
+        local parent = calls[i].parent
+        if parent.type == 'select' and parent.index == index then
+            selects[#selects+1] = parent.parent
+        end
+        local extParent = calls[i].extParent
+        if extParent then
+            for j = 1, #extParent do
+                local ext = extParent[j]
+                if ext.type == 'select' and ext.index == index then
+                    selects[#selects+1] = ext.parent
+                end
+            end
+        end
+    end
+    -- 搜索调用者的引用
+    for i = 1, #selects do
+        m.searchRefs(status, selects[i])
+    end
+end
+
+function m.cleanResults(results)
+    local mark = {}
+    for i = #results, 1, -1 do
+        local res = results[i]
+        if res.tag == 'self'
+        or mark[res] then
+            results[i] = results[#results]
+            results[#results] = nil
+        else
+            mark[res] = true
+        end
+    end
+end
+
+function m.searchRefs(status, obj, mode)
+    status.depth = status.depth + 1
+
+    -- 检查单步引用
+    if status.flag & m.SearchFlag.STEP ~= 0 then
+        local res = m.getStepRef(obj, mode)
+        if res then
+            for i = 1, #res do
+                status.results[#status.results+1] = res[i]
+            end
+        end
+    end
+    -- 检查simple
+    if status.flag & m.SearchFlag.SIMPLE ~= 0 then
+        if status.depth <= 10 then
+            local simple = m.getSimple(obj)
+            if simple then
+                m.searchSameFields(status, simple, mode)
+            end
+        elseif m.debugMode then
+            error('stack overflow')
+        end
+    end
+
+    status.depth = status.depth - 1
+
+    m.cleanResults(status.results)
+end
+
+function m.searchRefOfValue(status, obj)
+    local var = obj.parent
+    if var.type == 'local'
+    or var.type == 'set' then
+        return m.searchRefs(status, var, 'ref')
+    end
+end
+
+--- 请求对象的引用，包括 `a.b.c` 形式
+--- 与 `return function` 形式。
+--- 不穿透 `setmetatable` ，考虑由
+--- 业务层进行反向 def 搜索。
+function m.requestReference(obj)
+    local status = m.status()
+    -- 根据 field 搜索引用
+    m.searchRefs(status, obj, 'ref')
+
+    -- 检查自己作为返回函数时的引用
+    m.searchRefsAsFunctionReturn(status, obj)
+
+    return status.results
+end
+
+--- 请求对象的定义，包括 `a.b.c` 形式
+--- 与 `return function` 形式。
+--- 穿透 `setmetatable` 。
+function m.requestDefinition(obj)
+    local status = m.status()
+    -- 根据 field 搜索定义
+    m.searchRefs(status, obj, 'def')
+
+    return status.results
 end
 
 return m

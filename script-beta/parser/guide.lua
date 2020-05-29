@@ -994,7 +994,7 @@ function m.searchFields(status, obj, key)
         if not simple then
             return nil
         end
-        simple[2] = key and ('s|' .. key) or '*'
+        simple[#simple+1] = key and ('s|' .. key) or '*'
         m.searchSameFields(newStatus, simple, 'def')
         local results = newStatus.results
         m.cleanResults(results)
@@ -1242,7 +1242,7 @@ end
 
 function m.searchSameFields(status, simple, mode)
     local first = simple.first
-    local fref = first.ref
+    local fref = first and first.ref
     local queue = {}
     if fref then
         for i = 1, #fref do
@@ -1277,11 +1277,7 @@ function m.searchSameFields(status, simple, mode)
     end
 end
 
-function m.searchRefsAsFunctionReturn(status, obj)
-    -- 只有 function 才搜索返回值引用
-    if obj.type ~= 'function' then
-        return
-    end
+function m.searchRefsAsFunctionReturn(status, obj, mode)
     status.results[#status.results+1] = obj
     -- 搜索所在函数
     local currentFunc = m.getParentFunction(obj)
@@ -1346,6 +1342,32 @@ function m.searchRefsAsFunctionReturn(status, obj)
     end
 end
 
+function m.searchRefsAsFunctionSet(status, obj, mode)
+    local parent = obj.parent
+    if not parent then
+        return
+    end
+    if parent.type == 'local'
+    or parent.type == 'setlocal'
+    or parent.type == 'setglobal'
+    or parent.type == 'setfield'
+    or parent.type == 'setmethod'
+    or parent.type == 'setindex'
+    or parent.type == 'tableindex'
+    or parent.type == 'tablefield' then
+        m.searchRefs(status, parent, mode)
+    end
+end
+
+function m.searchRefsAsFunction(status, obj, mode)
+    if obj.type ~= 'function' then
+        return
+    end
+    m.searchRefsAsFunctionSet(status, obj, mode)
+    -- 检查自己作为返回函数时的引用
+    m.searchRefsAsFunctionReturn(status, obj, mode)
+end
+
 function m.cleanResults(results)
     local mark = {}
     for i = #results, 1, -1 do
@@ -1406,8 +1428,7 @@ function m.requestReference(obj)
     -- 根据 field 搜索引用
     m.searchRefs(status, obj, 'ref')
 
-    -- 检查自己作为返回函数时的引用
-    m.searchRefsAsFunctionReturn(status, obj)
+    m.searchRefsAsFunction(status, obj, 'ref')
 
     return status.results
 end

@@ -7,12 +7,8 @@ local function getGlobals(root)
         return nil
     end
     local cache = {}
-    local mark = {}
-    vm.eachField(env, function (src)
-        if mark[src] then
-            return
-        end
-        mark[src] = true
+    local fields = guide.requestFields(env)
+    for _, src in ipairs(fields) do
         local name = vm.getKeyName(src)
         if not name then
             return
@@ -24,7 +20,7 @@ local function getGlobals(root)
         end
         cache[name][#cache[name]+1] = src
         vm.cache.getGlobal[src] = name
-    end)
+    end
     return cache
 end
 

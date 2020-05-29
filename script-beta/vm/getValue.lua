@@ -485,12 +485,13 @@ local function inferByGetTable(results, source)
 end
 
 local function checkDef(results, source)
-    vm.eachDef(source, function (src)
+    local defs = guide.requestDefinition(source)
+    for _, src in ipairs(defs) do
         local tp  = vm.getValue(src)
         if tp then
             merge(results, tp)
         end
-    end)
+    end
 end
 
 local function checkLibraryTypes(source)

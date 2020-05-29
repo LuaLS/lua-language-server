@@ -80,6 +80,24 @@ function m.isSet(src)
     return false
 end
 
+function m.isGet(src)
+    local tp = src.type
+    if tp == 'getglobal'
+    or tp == 'getlocal'
+    or tp == 'getfield'
+    or tp == 'getmethod'
+    or tp == 'getindex' then
+        return true
+    end
+    if tp == 'call' then
+        local special = m.getSpecial(src.node)
+        if special == 'rawget' then
+            return true
+        end
+    end
+    return false
+end
+
 function m.getArgInfo(source)
     local callargs = source.parent
     if not callargs or callargs.type ~= 'callargs' then

@@ -70,13 +70,21 @@ local function checkNode(source)
     end
 end
 
+local function checkRef(source)
+    local results = guide.requestReference(source)
+    for _, src in ipairs(results) do
+        local lib = checkStdLibrary(src) or checkNode(src)
+        if lib then
+            return lib
+        end
+    end
+    return nil
+end
+
 local function getLibrary(source)
     return checkNode(source)
         or checkStdLibrary(source)
-        or vm.eachRef(source, function (src)
-            return checkStdLibrary(src)
-                or checkNode(src)
-        end, 100)
+        or checkRef(source)
 end
 
 function vm.getLibrary(source)

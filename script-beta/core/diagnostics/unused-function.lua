@@ -21,16 +21,15 @@ return function (uri, callback)
         and parent.type ~= 'setglobal' then
             return
         end
-        local hasSet
         local hasGet
-        vm.eachRef(source, function (src)
-            if vm.isSet(src) then
-                hasSet = true
-            else
+        local refs = guide.requestReference(source)
+        for _, src in ipairs(refs) do
+            if vm.isGet(src) then
                 hasGet = true
+                break
             end
-        end)
-        if not hasGet and hasSet then
+        end
+        if not hasGet then
             callback {
                 start   = source.start,
                 finish  = source.finish,

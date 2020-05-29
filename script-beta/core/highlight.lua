@@ -4,83 +4,30 @@ local vm         = require 'vm'
 local define     = require 'proto.define'
 local findSource = require 'core.find-source'
 
-local function ofLocal(source, callback)
-    callback(source)
-    if source.ref then
-        for _, ref in ipairs(source.ref) do
-            callback(ref)
-        end
+local function eachRef(source, callback)
+    local results = guide.requestReference(source)
+    for i = 1, #results do
+        callback(results[i])
     end
-end
-
-local function ofField(source, uri, callback)
-    local parent = source.parent
-    if not parent then
-        return
-    end
-    local myKey = vm.getKeyName(source)
-    if parent.type == 'tableindex'
-    or parent.type == 'tablefield' then
-        local tbl = parent.parent
-        vm.eachField(tbl, function (src)
-            if vm.getKeyName(src) ~= myKey then
-                return
-            end
-            local destUri = guide.getRoot(src).uri
-            if destUri ~= uri then
-                return
-            end
-            callback(src)
-        end)
-    else
-        vm.eachField(parent.node, function (src)
-            if vm.getKeyName(src) ~= myKey then
-                return
-            end
-            local destUri = guide.getRoot(src).uri
-            if destUri ~= uri then
-                return
-            end
-            callback(src)
-        end)
-    end
-end
-
-local function ofIndex(source, uri, callback)
-    local parent = source.parent
-    if not parent then
-        return
-    end
-    if parent.type == 'setindex'
-    or parent.type == 'getindex'
-    or parent.type == 'tableindex' then
-        ofField(source, uri, callback)
-    end
-end
-
-local function ofLabel(source, callback)
-    vm.eachRef(source, callback)
 end
 
 local function find(source, uri, callback)
-    if     source.type == 'local' then
-        ofLocal(source, callback)
-    elseif source.type == 'getlocal'
-    or     source.type == 'setlocal' then
-        ofLocal(source.node, callback)
-    elseif source.type == 'field'
-    or     source.type == 'method' then
-        ofField(source, uri, callback)
+    if     source.type == 'local'
+    or     source.type == 'getlocal'
+    or     source.type == 'setlocal'
+    or     source.type == 'field'
+    or     source.type == 'method'
+    or     source.type == 'getindex'
+    or     source.type == 'setindex'
+    or     source.type == 'tableindex'
+    or     source.type == 'goto'
+    or     source.type == 'label' then
+        eachRef(source, callback)
     elseif source.type == 'string'
     or     source.type == 'boolean'
-    or     source.type == 'number' then
-        ofIndex(source, uri, callback)
+    or     source.type == 'number'
+    or     source.type == 'nil' then
         callback(source)
-    elseif source.type == 'nil' then
-        callback(source)
-    elseif source.type == 'goto'
-    or     source.type == 'label' then
-        ofLabel(source, callback)
     end
 end
 
@@ -183,6 +130,24 @@ return function (uri, offset)
             elseif target.type == 'getindex' then
                 target = target.index
                 kind   = define.DocumentHighlightKind.Read
+            elseif target.type == 'field' then
+                if target.parent.type == 'getfield' then
+                    kind   = define.DocumentHighlightKind.Read
+                else
+                    kind   = define.DocumentHighlightKind.Write
+                end
+            elseif target.type == 'method' then
+                if target.parent.type == 'getmethod' then
+                    kind   = define.DocumentHighlightKind.Read
+                else
+                    kind   = define.DocumentHighlightKind.Write
+                end
+            elseif target.type == 'index' then
+                if target.parent.type == 'getindex' then
+                    kind   = define.DocumentHighlightKind.Read
+                else
+                    kind   = define.DocumentHighlightKind.Write
+                end
             elseif target.type == 'setindex'
             or     target.type == 'tableindex' then
                 target = target.index

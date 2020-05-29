@@ -1,9 +1,10 @@
-local files     = require 'files'
-local guide     = require 'parser.guide'
-local vm        = require 'vm'
-local getLabel  = require 'core.hover.label'
-local getDesc   = require 'core.hover.description'
-local util      = require 'utility'
+local files      = require 'files'
+local guide      = require 'parser.guide'
+local vm         = require 'vm'
+local getLabel   = require 'core.hover.label'
+local getDesc    = require 'core.hover.description'
+local util       = require 'utility'
+local findSource = require 'core.find-source'
 
 local function getHoverAsFunction(source)
     local values = vm.getValue(source)
@@ -81,23 +82,27 @@ local function getHover(source)
     end
 end
 
+local accept = {
+    ['local']     = true,
+    ['setlocal']  = true,
+    ['getlocal']  = true,
+    ['setglobal'] = true,
+    ['getglobal'] = true,
+    ['field']     = true,
+    ['method']    = true,
+    ['string']    = true,
+}
+
 local function getHoverByUri(uri, offset)
     local ast = files.getAst(uri)
     if not ast then
         return nil
     end
-    local hover = guide.eachSourceContain(ast.ast, offset, function (source)
-        if source.type == 'local'
-        or source.type == 'setlocal'
-        or source.type == 'getlocal'
-        or source.type == 'setglobal'
-        or source.type == 'getglobal'
-        or source.type == 'field'
-        or source.type == 'method'
-        or source.type == 'string' then
-            return getHover(source)
-        end
-    end)
+    local source = findSource(ast, offset, accept)
+    if not source then
+        return nil
+    end
+    local hover = getHover(source)
     return hover
 end
 

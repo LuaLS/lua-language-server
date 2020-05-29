@@ -1,7 +1,8 @@
-local guide  = require 'parser.guide'
-local files  = require 'files'
-local vm     = require 'vm'
-local define = require 'proto.define'
+local guide      = require 'parser.guide'
+local files      = require 'files'
+local vm         = require 'vm'
+local define     = require 'proto.define'
+local findSource = require 'core.find-source'
 
 local function ofLocal(source, callback)
     callback(source)
@@ -162,6 +163,7 @@ return function (uri, offset)
     local text = files.getText(uri)
     local results = {}
     local mark = {}
+
     guide.eachSourceContain(ast.ast, offset, function (source)
         find(source, uri, function (target)
             local kind

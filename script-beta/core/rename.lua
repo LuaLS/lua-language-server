@@ -1,9 +1,10 @@
-local files  = require 'files'
-local vm     = require 'vm'
-local guide  = require 'parser.guide'
-local proto  = require 'proto'
-local define = require 'proto.define'
-local util   = require 'utility'
+local files      = require 'files'
+local vm         = require 'vm'
+local guide      = require 'parser.guide'
+local proto      = require 'proto'
+local define     = require 'proto.define'
+local util       = require 'utility'
+local findSource = require 'core.find-source'
 
 local Forcing
 
@@ -325,6 +326,20 @@ local function prepareRename(source)
     return nil
 end
 
+local accept = {
+    ['label']      = true,
+    ['goto']       = true,
+    ['local']      = true,
+    ['setlocal']   = true,
+    ['getlocal']   = true,
+    ['field']      = true,
+    ['method']     = true,
+    ['tablefield'] = true,
+    ['setglobal']  = true,
+    ['getglobal']  = true,
+    ['string']     = true,
+}
+
 local m = {}
 
 function m.rename(uri, pos, newname)
@@ -332,22 +347,24 @@ function m.rename(uri, pos, newname)
     if not ast then
         return nil
     end
+    local source = findSource(ast, pos, accept)
+    if not source then
+        return nil
+    end
     local results = {}
     local mark = {}
 
-    guide.eachSourceContain(ast.ast, pos, function(source)
-        rename(source, newname, function (target, start, finish, text)
-            if mark[start] then
-                return
-            end
-            mark[start] = true
-            results[#results+1] = {
-                start  = start,
-                finish = finish,
-                text   = text,
-                uri    = guide.getRoot(target).uri,
-            }
-        end)
+    rename(source, newname, function (target, start, finish, text)
+        if mark[start] then
+            return
+        end
+        mark[start] = true
+        results[#results+1] = {
+            start  = start,
+            finish = finish,
+            text   = text,
+            uri    = guide.getRoot(target).uri,
+        }
     end)
 
     if Forcing == false then
@@ -371,20 +388,21 @@ function m.prepareRename(uri, pos)
     if not ast then
         return nil
     end
+    local source = findSource(ast, pos, accept)
+    if not source then
+        return
+    end
 
-    local result
-    guide.eachSourceContain(ast.ast, pos, function(source)
-        local res, text = prepareRename(source)
-        if res then
-            result = {
-                start  = source.start,
-                finish = source.finish,
-                text   = text,
-            }
-        end
-    end)
+    local res, text = prepareRename(source)
+    if not res then
+        return nil
+    end
 
-    return result
+    return {
+        start  = source.start,
+        finish = source.finish,
+        text   = text,
+    }
 end
 
 return m

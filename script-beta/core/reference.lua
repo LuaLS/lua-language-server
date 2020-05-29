@@ -1,5 +1,6 @@
-local guide = require 'parser.guide'
-local files = require 'files'
+local guide      = require 'parser.guide'
+local files      = require 'files'
+local findSource = require 'core.find-source'
 
 local function isValidFunction(source, offset)
     -- 必须点在 `function` 这个单词上才能查找函数引用
@@ -22,29 +23,17 @@ local accept = {
     ['function']    = true,
 }
 
-local function findSource(ast, offset)
-    local len = 999
-    local result
-    guide.eachSourceContain(ast.ast, offset, function (source)
-        if source.finish - source.start < len and accept[source.type] then
-            result = source
-            len = source.finish - source.start
-        end
-    end)
-    if result.type == 'function' and not isValidFunction(result, offset) and not TEST then
-        return nil
-    end
-    return result
-end
-
 return function (uri, offset)
     local ast = files.getAst(uri)
     if not ast then
         return nil
     end
 
-    local source = findSource(ast, offset)
+    local source = findSource(ast, offset, accept)
     if not source then
+        return nil
+    end
+    if source.type == 'function' and not isValidFunction(source, offset) and not TEST then
         return nil
     end
 

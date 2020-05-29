@@ -1,7 +1,8 @@
-local guide     = require 'parser.guide'
-local workspace = require 'workspace'
-local files     = require 'files'
-local vm        = require 'vm'
+local guide      = require 'parser.guide'
+local workspace  = require 'workspace'
+local files      = require 'files'
+local vm         = require 'vm'
+local findSource = require 'core.find-source'
 
 local accept = {
     ['local']       = true,
@@ -17,18 +18,6 @@ local accept = {
     ['setglobal']   = true,
     ['getglobal']   = true,
 }
-
-local function findSource(ast, offset)
-    local len = 999
-    local result
-    guide.eachSourceContain(ast.ast, offset, function (source)
-        if source.finish - source.start < len and accept[source.type] then
-            result = source
-            len = source.finish - source.start
-        end
-    end)
-    return result
-end
 
 local function checkRequire(source, offset)
     if source.type ~= 'call' then
@@ -65,7 +54,7 @@ return function (uri, offset)
         return nil
     end
 
-    local source = findSource(ast, offset)
+    local source = findSource(ast, offset, accept)
     if not source then
         return nil
     end

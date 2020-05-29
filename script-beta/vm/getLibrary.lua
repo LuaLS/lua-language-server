@@ -6,11 +6,10 @@ local function checkStdLibrary(source)
     if source.library then
         return source
     end
-    local globalName = vm.getGlobal(source)
-    if not globalName then
+    local name = guide.getName(source)
+    if not name then
         return nil
     end
-    local name = globalName:match '^s|(.+)$'
     if library.global[name] then
         return library.global[name]
     end
@@ -30,12 +29,8 @@ end
 
 local function getNodeAsTable(source)
     local node = source.node
-    local nodeGlobalName = vm.getGlobal(node)
-    if not nodeGlobalName then
-        return nil
-    end
-    local nodeName = nodeGlobalName:match '^s|(.+)$'
-    return getLibInNode(source, library.global[nodeName])
+    local name = guide.getName(node)
+    return getLibInNode(source, library.global[name])
 end
 
 local function getNodeAsObject(source)

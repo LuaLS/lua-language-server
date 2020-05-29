@@ -26,7 +26,6 @@ local function eachMetaOfRecv(source, callback)
     if special ~= 'setmetatable' then
         return
     end
-    vm.eachFieldInTable(call.args[1], callback)
     local mt = call.args[2]
     if mt then
         callback(mt)

@@ -991,7 +991,7 @@ function m.searchFields(status, obj, key)
         local newStatus = m.status(status)
         local simple = m.getSimple(obj, 1)
         if not simple then
-            return nil
+            return {}
         end
         simple[#simple+1] = key and ('s|' .. key) or '*'
         m.searchSameFields(newStatus, simple, 'def')

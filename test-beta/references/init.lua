@@ -110,35 +110,15 @@ print(t.<!a!>)
 ]]
 
 TEST [[
+t[<?'a'?>] = 1
+print(t.<!a!>)
+]]
+
+TEST [[
 local t = {
     [<?'a'?>] = 1
 }
 print(t.<!a!>)
-]]
-
---TEST [[
---local <!mt!> = {}
---function <!mt!>:a()
---    <?self?>:remove()
---end
---]]
-
-TEST [[
-local function f()
-    return <~function~> ()
-    end
-end
-
-local <!f2!> = f()
-]]
-
-TEST [[
-local function f()
-    return nil, <~function~> ()
-    end
-end
-
-local _, <!f2!> = f()
 ]]
 
 TEST [[
@@ -148,23 +128,21 @@ end
 ]]
 
 TEST [[
-local mt = {}
-local <?obj?> = setmetatable({}, mt)
-]]
-
-TEST [[
-local mt = {}
-mt.x = 1
-local obj = setmetatable({}, mt)
-print(obj.<?x?>)
-]]
-
-TEST [[
-local x
 local function f()
-    return x
+    return <?function ()
+    end?>
 end
-local <?y?> = f()
+
+local <!f2!> = f()
+]]
+
+TEST [[
+local function f()
+    return nil, <?function ()
+    end?>
+end
+
+local _, <!f2!> = f()
 ]]
 
 TEST [[
@@ -173,16 +151,6 @@ local function f()
     return <!x!>
 end
 local y = f()
-]]
-
-TEST [[
-local x
-local function f()
-    return function ()
-        return x
-    end
-end
-local <?y?> = f()()
 ]]
 
 TEST [[
@@ -196,46 +164,16 @@ local y = f()()
 ]]
 
 TEST [[
-local mt = {}
-mt.__index = mt
-
-function mt:add(a, b)
-end
-
-local function init()
-    return setmetatable({}, mt)
-end
-
-local <!t!> = init()
-<?t?>:add()
-]]
-
-TEST [[
-local mt = {}
-mt.__index = mt
-
-function mt:add(a, b)
-end
-
-local function init()
-    return setmetatable({}, mt)
-end
-
-local t = init()
-t:<?add?>()
-]]
-
-TEST [[
 local t = {}
 t.<?x?> = 1
 t[a.b.x] = 1
 ]]
 
---TEST [[
---local t = {}
---t.x = 1
---t[a.b.<?x?>] = 1
---]]
+TEST [[
+local t = {}
+t.x = 1
+t[a.b.<?x?>] = 1
+]]
 
 TEST [[
 local t
@@ -260,6 +198,39 @@ self[self.results.<!labels!>] = lbl
 TEST [[
 a.b.<?c?> = 1
 print(a.b.<!c!>)
+]]
+
+TEST [[
+local <!mt!> = {}
+function <!mt!>:x()
+    <?self?>:x()
+end
+]]
+
+TEST [[
+local <?mt?> = {}
+function <!mt!>:x()
+    <!self!>:x()
+end
+]]
+
+TEST [[
+local mt = {}
+function mt:<!x!>()
+    self:<?x?>()
+end
+]]
+
+TEST [[
+local mt = {}
+function mt:<?x?>()
+    self:<!x!>()
+end
+]]
+
+TEST [[
+a.<!b!>.c = 1
+print(a.<?b?>.c)
 ]]
 
 --TEST [[

@@ -1059,6 +1059,7 @@ function m.checkSameSimpleInValueOfSetMetaTable(status, value, start, queue)
         queue[#queue+1] = {
             obj   = obj,
             start = start,
+            force = true,
         }
     end
     if mt then
@@ -1090,6 +1091,8 @@ function m.checkSameSimpleInBranch(status, ref, start, queue)
         m.checkSameSimpleInValueOfSetMetaTable(status, value, start, queue)
     end
 
+    -- 检查自己是字面量表的情况
+    m.checkSameSimpleInValueOfTable(status, ref, start, queue)
     -- 检查自己作为 setmetatable 第一个参数的情况
     m.checkSameSimpleInArg1OfSetMetaTable(status, ref, start, queue)
 end
@@ -1240,16 +1243,15 @@ end
 function m.searchSameFields(status, simple, mode)
     local first = simple.first
     local fref = first.ref
-    if not fref then
-        return
-    end
     local queue = {}
-    for i = 1, #fref do
-        local ref = fref[i]
-        queue[i] = {
-            obj   = ref,
-            start = 1,
-        }
+    if fref then
+        for i = 1, #fref do
+            local ref = fref[i]
+            queue[i] = {
+                obj   = ref,
+                start = 1,
+            }
+        end
     end
     if simple.global then
         for i = 1, #queue do
@@ -1419,6 +1421,11 @@ function m.requestDefinition(obj)
     m.searchRefs(status, obj, 'def')
 
     return status.results
+end
+
+--- 请求对象的域
+function m.requestFields(obj)
+    return m.searchFields(nil, obj)
 end
 
 return m

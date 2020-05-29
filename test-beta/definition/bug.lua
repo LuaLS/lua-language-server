@@ -22,13 +22,13 @@ function a:b()
 end
 ]]
 
-TEST [[
-function _(...)
-    function _()
-        print(<?...?>)
-    end
-end
-]]
+--TEST [[
+--function _(...)
+--    function _()
+--        print(<?...?>)
+--    end
+--end
+--]]
 
 TEST [[
 local <!a!>

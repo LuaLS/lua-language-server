@@ -812,14 +812,14 @@ local function convertSimpleList(list)
         local c = list[i]
         if c.special == '_G' then
             simple.global = true
-            goto CONTINUE
+        else
+            simple[#simple+1] = m.getSimpleName(c)
         end
         if c.type == 'getglobal'
         or c.type == 'setglobal' then
             simple.global = true
         end
-        simple[#simple+1] = m.getSimpleName(c)
-        if #simple == 1 then
+        if #simple <= 1 then
             if simple.global then
                 simple.first = m.getLocal(c, '_ENV', c.start)
             elseif c.type == 'setlocal'
@@ -829,7 +829,6 @@ local function convertSimpleList(list)
                 simple.first = c
             end
         end
-        ::CONTINUE::
     end
     return simple
 end
@@ -1261,6 +1260,9 @@ function m.searchSameFields(status, simple, mode)
             if nxt and obj.special == '_G' then
                 data.obj = nxt
             end
+        end
+        if first and first.tag ~= '_ENV' then
+            m.checkSameSimpleInBranch(status, first, 0, queue)
         end
     else
         queue[#queue+1] = {

@@ -8,19 +8,13 @@ return function (uri, callback)
     if not ast then
         return
     end
-    -- 再遍历一次 getglobal ，找出 _ENV 被重载的情况
     guide.eachSourceType(ast.ast, 'getglobal', function (source)
         -- 单独验证自己是否在重载过的 _ENV 中有定义
         if source.node.tag == '_ENV' then
             return
         end
-        local setInENV
-        vm.eachRef(source, function (src)
-            if vm.isSet(src) then
-                setInENV = true
-            end
-        end)
-        if setInENV then
+        local defs = guide.requestDefinition(source)
+        if #defs > 0 then
             return
         end
         local key = source[1]

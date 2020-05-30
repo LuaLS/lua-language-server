@@ -7,4 +7,6 @@ require 'vm.getValue'
 require 'vm.getClass'
 require 'vm.getMeta'
 require 'vm.eachField'
+require 'vm.eachDef'
+require 'vm.eachRef'
 return vm

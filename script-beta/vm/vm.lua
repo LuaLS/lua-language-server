@@ -136,20 +136,6 @@ function m.getKeyName(source)
     return guide.getKeyName(source)
 end
 
-function m.eachDef(source, callback)
-    local results = guide.requestDefinition(source)
-    for i = 1, #results do
-        callback(results[i])
-    end
-end
-
-function m.eachRef(source, callback)
-    local results = guide.requestReference(source)
-    for i = 1, #results do
-        callback(results[i])
-    end
-end
-
 m.cacheTracker = setmetatable({}, { __mode = 'kv' })
 
 --- 刷新缓存

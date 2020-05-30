@@ -906,9 +906,9 @@ function vm.hasType(source, type)
     return false
 end
 
-local function viewTypes(types)
+local function mergeViews(types)
     if #types == 0 then
-        return 'any'
+        return nil
     end
     if #types == 1 then
         return types[1]
@@ -948,20 +948,20 @@ function vm.viewType(values)
             types[#types+1] = tp
         end
     end
-    return viewTypes(types)
+    return mergeViews(types) or 'any'
 end
 
-function vm.mergeTypeViews(...)
-    local types = {}
+function vm.mergeViews(...)
+    local views = {}
     for _, view in ipairs {...} do
         for tp in view:gmatch '[^|]+' do
-            if not types[tp] and tp ~= 'any' then
-                types[tp] = true
-                types[#types+1] = tp
+            if not views[tp] and tp ~= 'any' then
+                views[tp] = true
+                views[#views+1] = tp
             end
         end
     end
-    return viewTypes(types)
+    return mergeViews(views)
 end
 
 function vm.getType(source)

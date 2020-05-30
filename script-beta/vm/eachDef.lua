@@ -2,7 +2,11 @@ local vm    = require 'vm.vm'
 local guide = require 'parser.guide'
 
 local function eachDef(source)
+    local lib = vm.getLibrary(source)
     local results = guide.requestDefinition(source)
+    if lib then
+        results[#results+1] = lib
+    end
     return results
 end
 

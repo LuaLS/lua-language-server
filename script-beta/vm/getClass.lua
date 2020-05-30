@@ -41,5 +41,5 @@ function vm.getClass(source)
     if #classes == 0 then
         return nil
     end
-    return vm.mergeTypeViews(table.unpack(classes))
+    return vm.mergeViews(table.unpack(classes))
 end

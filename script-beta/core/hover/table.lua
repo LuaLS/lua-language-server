@@ -121,7 +121,7 @@ return function (source)
     local intValue = true
     vm.eachField(source, function (src)
         local key, class, literal = getField(src)
-        classes[key] = vm.mergeTypeViews(class, classes[key])
+        classes[key] = vm.mergeViews(class, classes[key])
         literals[key] = mergeLiteral(literal, literals[key])
         if class ~= 'integer'
         or not literals[key]

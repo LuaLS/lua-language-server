@@ -17,31 +17,30 @@ end
 
 local function asValue(source, title)
     local name = buildName(source)
-    local lib  = vm.getLibrary(source)
-    local class = vm.getClass(source)
-    local type = vm.getType(source)
-    local literal = vm.getLiteral(source)
-    local cont
-    if type == 'table' then
-        cont = buildTable(source)
-        type = nil
-    end
-    if lib then
-        local libName = buildName(lib)
-        if name ~= libName then
-            name = ('%s<%s>'):format(name, buildName(lib))
+    local class, type, literal, cont
+    vm.eachDef(source, function (src)
+        class   = vm.mergeViews(vm.getClass(src), class)
+        type    = vm.mergeViews(vm.getType(src), type)
+        local sl = vm.getLiteral(src)
+        if sl then
+            literal = vm.mergeViews(util.viewLiteral(sl), literal)
         end
-    end
+        if type == 'table' then
+            cont = buildTable(source)
+        end
+    end)
     local pack = {}
     pack[#pack+1] = title
     pack[#pack+1] = name .. ':'
+    if cont then
+        type = nil
+    else
+        type = type or 'any'
+    end
     pack[#pack+1] = class or type
     if literal then
-        local literalView = util.viewLiteral(literal)
-        if literalView then
-            pack[#pack+1] = '='
-            pack[#pack+1] = util.viewLiteral(literal)
-        end
+        pack[#pack+1] = '='
+        pack[#pack+1] = literal
     end
     if cont then
         pack[#pack+1] = cont

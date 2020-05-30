@@ -2,6 +2,7 @@ local vm      = require 'vm.vm'
 local util    = require 'utility'
 local guide   = require 'parser.guide'
 local library = require 'library'
+local select  = select
 
 local typeSort = {
     ['boolean']  = 1,
@@ -952,12 +953,16 @@ function vm.viewType(values)
 end
 
 function vm.mergeViews(...)
+    local max = select('#', ...)
     local views = {}
-    for _, view in ipairs {...} do
-        for tp in view:gmatch '[^|]+' do
-            if not views[tp] and tp ~= 'any' then
-                views[tp] = true
-                views[#views+1] = tp
+    for i = 1, max do
+        local view = select(i, ...)
+        if view then
+            for tp in view:gmatch '[^|]+' do
+                if not views[tp] and tp ~= 'any' then
+                    views[tp] = true
+                    views[#views+1] = tp
+                end
             end
         end
     end

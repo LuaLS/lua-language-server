@@ -3,9 +3,13 @@ local guide = require 'parser.guide'
 
 local function eachDef(source)
     local lib = vm.getLibrary(source)
+    local value = guide.getObjectValue(source)
     local results = guide.requestDefinition(source)
     if lib then
         results[#results+1] = lib
+    end
+    if value then
+        results[#results+1] = value
     end
     return results
 end

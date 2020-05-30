@@ -19,11 +19,11 @@ local function asValue(source, title)
     local name = buildName(source)
     local class, type, literal, cont
     vm.eachDef(source, function (src)
-        class   = vm.mergeViews(vm.getClass(src), class)
-        type    = vm.mergeViews(vm.getType(src), type)
+        class   = vm.mergeViews(class, vm.getClass(src))
+        type    = vm.mergeViews(type, vm.getType(src))
         local sl = vm.getLiteral(src)
         if sl then
-            literal = vm.mergeViews(util.viewLiteral(sl), literal)
+            literal = vm.mergeViews(literal, util.viewLiteral(sl))
         end
         if type == 'table' then
             cont = buildTable(source)

@@ -6,6 +6,10 @@ local function checkStdLibrary(source)
     if source.library then
         return source
     end
+    if  source.type ~= 'getglobal'
+    and source.type ~= 'setglobal' then
+        return
+    end
     local name = guide.getName(source)
     if not name then
         return nil
@@ -29,6 +33,10 @@ end
 
 local function getNodeAsTable(source)
     local node = source.node
+    if  node.type ~= 'getglobal'
+    and node.type ~= 'setglobal' then
+        return
+    end
     local name = guide.getName(node)
     return getLibInNode(source, library.global[name])
 end

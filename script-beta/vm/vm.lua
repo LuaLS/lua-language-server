@@ -150,13 +150,6 @@ function m.eachRef(source, callback)
     end
 end
 
-function m.eachField(source, callback)
-    local results = guide.requestFields(source)
-    for i = 1, #results do
-        callback(results[i])
-    end
-end
-
 m.cacheTracker = setmetatable({}, { __mode = 'kv' })
 
 --- 刷新缓存

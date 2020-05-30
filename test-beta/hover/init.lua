@@ -492,11 +492,25 @@ local self: obj {
 }
 ]]
 
-TEST[[
+TEST [[
+print(<?utf8?>)
+]]
+[[
+global utf8: utf8 {
+    char: function,
+    charpattern: string,
+    codepoint: function,
+    codes: function,
+    len: function,
+    offset: function,
+}
+]]
+
+TEST [[
 local <?sssss?> = require 'utf8'
 ]]
 [[
-local sssss<utf8>: {
+local sssss: utf8 {
     char: function,
     charpattern: string,
     codepoint: function,

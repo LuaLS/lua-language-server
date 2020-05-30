@@ -1,6 +1,7 @@
-local vm = require 'vm.vm'
-local util = require 'utility'
-local guide = require 'parser.guide'
+local vm      = require 'vm.vm'
+local util    = require 'utility'
+local guide   = require 'parser.guide'
+local library = require 'library'
 
 local typeSort = {
     ['boolean']  = 1,
@@ -484,7 +485,7 @@ local function inferByGetTable(results, source)
     end
 end
 
-local function checkDef(results, source)
+local function inferByDef(results, source)
     local defs = guide.requestDefinition(source)
     for _, src in ipairs(defs) do
         local tp  = vm.getValue(src)
@@ -518,6 +519,36 @@ local function checkLibrary(source)
         value  = lib.value,
         source = lib,
     }
+end
+
+local function checkSpecialReturn(source)
+    if source.type ~= 'select' then
+        return nil
+    end
+    local index = source.index
+    local call = source.vararg
+    if call.type ~= 'call' then
+        return nil
+    end
+    local func = call.node
+    local lib = vm.getLibrary(func)
+    if not lib then
+        return nil
+    end
+    if lib.special == 'require' then
+        local modName = call.args[1]
+        if modName and modName.type == 'string' then
+            lib = library.library[modName[1]]
+            if lib then
+                return alloc {
+                    type   = lib.type,
+                    value  = lib.value,
+                    source = lib,
+                }
+            end
+        end
+    end
+    return nil
 end
 
 local function checkLibraryReturn(source)
@@ -557,7 +588,7 @@ local function checkLibraryReturn(source)
     }
 end
 
-local function checkLibraryArg(source)
+local function inferByLibraryArg(results, source)
     local args = source.parent
     if not args then
         return
@@ -591,11 +622,11 @@ local function checkLibraryArg(source)
     if arg.type == '...' or arg.type == 'any' then
         return
     end
-    return alloc {
+    return insert(results, {
         type   = arg.type,
         value  = arg.value,
         source = arg,
-    }
+    })
 end
 
 local function hasTypeInResults(results, type)
@@ -751,14 +782,15 @@ local function getValue(source)
                  or checkBinary(source)
                  or checkLibraryTypes(source)
                  or checkLibrary(source)
+                 or checkSpecialReturn(source)
                  or checkLibraryReturn(source)
-                 or checkLibraryArg(source)
     if results then
         return results
     end
 
     results = {}
-    checkDef(results, source)
+    inferByLibraryArg(results, source)
+    inferByDef(results, source)
     inferBySet(results, source)
     inferByCall(results, source)
     inferByGetTable(results, source)

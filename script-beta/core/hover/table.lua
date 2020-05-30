@@ -4,6 +4,9 @@ local util     = require 'utility'
 local function getKey(src)
     local key = vm.getKeyName(src)
     if not key or #key <= 2 then
+        if src.library then
+            return src.name
+        end
         if not src.index then
             return '[any]'
         end
@@ -30,6 +33,11 @@ local function getKey(src)
 end
 
 local function getField(src)
+    if src.parent.type == 'tableindex'
+    or src.parent.type == 'setindex'
+    or src.parent.type == 'getindex' then
+        src = src.parent
+    end
     local tp = vm.getType(src)
     local class = vm.getClass(src)
     local literal = vm.getLiteral(src)

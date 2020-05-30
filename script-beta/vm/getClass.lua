@@ -5,6 +5,11 @@ local function getClass(source, classes, deep)
     if deep > 3 then
         return
     end
+    local lib = vm.getLibrary(source)
+    if lib and lib.type == 'table' then
+        classes[#classes+1] = lib.name
+        return
+    end
     local value = guide.getObjectValue(source) or source
     vm.eachField(value, function (src)
         local key = vm.getKeyName(src)

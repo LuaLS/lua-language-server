@@ -6,4 +6,5 @@ require 'vm.getLibrary'
 require 'vm.getValue'
 require 'vm.getClass'
 require 'vm.getMeta'
+require 'vm.eachField'
 return vm

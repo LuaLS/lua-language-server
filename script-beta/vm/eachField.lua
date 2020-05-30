@@ -1,19 +1,31 @@
-local vm    = require 'vm.vm'
-local guide = require 'parser.guide'
+local vm      = require 'vm.vm'
+local guide   = require 'parser.guide'
+local library = require 'library'
 
-local function eachFieldOfLibrary(source, lib, results)
+local function eachFieldInTableLibrary(source, lib, results)
     if not lib or lib.type ~= 'table' or not lib.child then
         return
     end
     for _, value in pairs(lib.child) do
-        results[#results+1] =value
+        results[#results+1] = value
+    end
+end
+
+local function eachFieldOfLibrary(results)
+    for _, lib in pairs(library.global) do
+        results[#results+1] = lib
     end
 end
 
 local function eachField(source)
-    local lib = vm.getLibrary(source)
     local results = guide.requestFields(source)
-    eachFieldOfLibrary(source, lib, results)
+    local lib = vm.getLibrary(source)
+    if lib then
+        eachFieldInTableLibrary(source, lib, results)
+    end
+    if source.special == '_G' then
+        eachFieldOfLibrary(results)
+    end
     return results
 end
 

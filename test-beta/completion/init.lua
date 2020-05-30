@@ -112,7 +112,7 @@ zace$
 }
 
 TEST [[
-ZABC
+ZABC = x
 local zabc
 zac$
 ]]

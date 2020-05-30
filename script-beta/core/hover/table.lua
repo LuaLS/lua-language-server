@@ -4,9 +4,6 @@ local util     = require 'utility'
 local function getKey(src)
     local key = vm.getKeyName(src)
     if not key or #key <= 2 then
-        if src.library then
-            return src.name
-        end
         if not src.index then
             return '[any]'
         end

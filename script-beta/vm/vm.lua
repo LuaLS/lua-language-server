@@ -126,6 +126,9 @@ function m.getKeyName(source)
     if not source then
         return nil
     end
+    if source.library then
+        return 's|' .. source.name
+    end
     if source.type == 'call' then
         local special = m.getSpecial(source.node)
         if special == 'rawset'

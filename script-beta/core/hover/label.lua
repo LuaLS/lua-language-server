@@ -26,7 +26,7 @@ local function asValue(source, title)
             literal = vm.mergeViews(literal, util.viewLiteral(sl))
         end
         if type == 'table' then
-            cont = buildTable(source)
+            cont = buildTable(src)
         end
     end)
     local pack = {}

@@ -6,16 +6,27 @@ local function checkStdLibrary(source)
     if source.library then
         return source
     end
-    if  source.type ~= 'getglobal'
-    and source.type ~= 'setglobal' then
-        return
-    end
-    local name = guide.getName(source)
-    if not name then
-        return nil
-    end
-    if library.global[name] then
+    if source.type == 'getglobal'
+    or source.type == 'setglobal' then
+        local name = guide.getName(source)
         return library.global[name]
+    elseif source.type == 'select' then
+        local call = source.vararg
+        if call.type ~= 'call' then
+            goto CONTINUE
+        end
+        local func = call.node
+        local lib = vm.getLibrary(func)
+        if not lib then
+            goto CONTINUE
+        end
+        if lib.name == 'require' then
+            local modName = call.args[1]
+            if modName and modName.type == 'string' then
+                return library.library[modName[1]]
+            end
+        end
+        ::CONTINUE::
     end
 end
 
@@ -32,13 +43,8 @@ local function getLibInNode(source, nodeLib)
 end
 
 local function getNodeAsTable(source)
-    local node = source.node
-    if  node.type ~= 'getglobal'
-    and node.type ~= 'setglobal' then
-        return
-    end
-    local name = guide.getName(node)
-    return getLibInNode(source, library.global[name])
+    local nodeLib = checkStdLibrary(source.node)
+    return getLibInNode(source, nodeLib)
 end
 
 local function getNodeAsObject(source)

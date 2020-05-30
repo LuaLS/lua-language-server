@@ -9,7 +9,9 @@ local function eachDef(source)
         results[#results+1] = lib
     end
     if value then
-        results[#results+1] = value
+        vm.eachDef(value, function (res)
+            results[#results+1] = res
+        end)
     end
     return results
 end

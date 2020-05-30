@@ -444,6 +444,9 @@ end
     },
 }
 
+-- TODO
+do return end
+
 TEST [[
 collectgarbage('$')
 ]]

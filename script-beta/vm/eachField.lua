@@ -2,8 +2,8 @@ local vm      = require 'vm.vm'
 local guide   = require 'parser.guide'
 local library = require 'library'
 
-local function eachFieldInTableLibrary(source, lib, results)
-    if not lib or lib.type ~= 'table' or not lib.child then
+local function eachFieldInLibrary(source, lib, results)
+    if not lib or not lib.child then
         return
     end
     for _, value in pairs(lib.child) do
@@ -18,13 +18,19 @@ local function eachFieldOfLibrary(results)
 end
 
 local function eachField(source)
+    while source.type == 'paren' do
+        source = source.exp
+    end
     local results = guide.requestFields(source)
     local lib = vm.getLibrary(source)
     if lib then
-        eachFieldInTableLibrary(source, lib, results)
+        eachFieldInLibrary(source, lib, results)
     end
     if source.special == '_G' then
         eachFieldOfLibrary(results)
+    end
+    if library.object[source.type] then
+        eachFieldInLibrary(source, library.object[source.type], results)
     end
     return results
 end

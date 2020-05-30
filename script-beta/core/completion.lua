@@ -218,62 +218,71 @@ local function checkLocal(ast, word, offset, results)
     end
 end
 
+local function checkFieldThen(src, used, word, start, parent, oop, results)
+    local key = vm.getKeyName(src)
+    if not key or key:sub(1, 1) ~= 's' then
+        return
+    end
+    if isSameSource(src, start) then
+        return
+    end
+    local name = key:sub(3)
+    if used[name] then
+        return
+    end
+    if not matchKey(word, name) then
+        used[name] = true
+        return
+    end
+    local kind = ckind.Field
+    if vm.hasType(src, 'function') then
+        if oop then
+            kind = ckind.Method
+        else
+            kind = ckind.Function
+        end
+        used[name] = true
+        buildFunction(results, src, oop, {
+            label = name,
+            kind  = kind,
+            id    = stack(function ()
+                return {
+                    detail      = buildDetail(src),
+                    description = buildDesc(src),
+                }
+            end),
+        })
+    else
+        if oop then
+            return
+        end
+        used[name] = true
+        local literal = vm.getLiteral(src)
+        if literal ~= nil then
+            kind = ckind.Enum
+        end
+        results[#results+1] = {
+            label = name,
+            kind  = kind,
+            id    = stack(function ()
+                return {
+                    detail      = buildDetail(src),
+                    description = buildDesc(src),
+                }
+            end)
+        }
+    end
+end
+
 local function checkField(word, start, parent, oop, results)
     local used = {}
+    if parent.ref then
+        for _, src in ipairs(parent.ref) do
+            checkFieldThen(src, used, word, start, parent, oop, results)
+        end
+    end
     vm.eachField(parent, function (src)
-        local key = vm.getKeyName(src)
-        if not key or key:sub(1, 1) ~= 's' then
-            return
-        end
-        if isSameSource(src, start) then
-            return
-        end
-        local name = key:sub(3)
-        if used[name] then
-            return
-        end
-        if not matchKey(word, name) then
-            used[name] = true
-            return
-        end
-        local kind = ckind.Field
-        if vm.hasType(src, 'function') then
-            if oop then
-                kind = ckind.Method
-            else
-                kind = ckind.Function
-            end
-            used[name] = true
-            buildFunction(results, src, oop, {
-                label = name,
-                kind  = kind,
-                id    = stack(function ()
-                    return {
-                        detail      = buildDetail(src),
-                        description = buildDesc(src),
-                    }
-                end),
-            })
-        else
-            if oop then
-                return
-            end
-            used[name] = true
-            local literal = vm.getLiteral(src)
-            if literal ~= nil then
-                kind = ckind.Enum
-            end
-            results[#results+1] = {
-                label = name,
-                kind  = kind,
-                id    = stack(function ()
-                    return {
-                        detail      = buildDetail(src),
-                        description = buildDesc(src),
-                    }
-                end)
-            }
-        end
+        checkFieldThen(src, used, word, start, parent, oop, results)
     end)
     return used
 end

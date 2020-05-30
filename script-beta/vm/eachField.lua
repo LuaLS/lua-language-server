@@ -1,20 +1,38 @@
 local vm    = require 'vm.vm'
 local guide = require 'parser.guide'
 
-local function eachFieldOfLibrary(source, lib, callback)
+local function eachFieldOfLibrary(source, lib, results)
     if not lib or lib.type ~= 'table' or not lib.child then
         return
     end
     for _, value in pairs(lib.child) do
-        callback(value)
+        results[#results+1] =value
     end
 end
 
-function vm.eachField(source, callback)
+local function eachField(source)
     local lib = vm.getLibrary(source)
-    eachFieldOfLibrary(source, lib, callback)
     local results = guide.requestFields(source)
-    for i = 1, #results do
-        callback(results[i])
+    eachFieldOfLibrary(source, lib, results)
+    return results
+end
+
+function vm.eachField(source, callback)
+    local cache = vm.cache.eachField[source]
+    if cache ~= nil then
+        for i = 1, #cache do
+            callback(cache[i])
+        end
+        return
+    end
+    local unlock = vm.lock('eachField', source)
+    if not unlock then
+        return
+    end
+    cache = eachField(source) or false
+    vm.cache.eachField[source] = cache
+    unlock()
+    for i = 1, #cache do
+        callback(cache[i])
     end
 end

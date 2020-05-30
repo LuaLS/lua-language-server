@@ -12,29 +12,27 @@ local accept = {
     ['goto']        = true,
     ['field']       = true,
     ['method']      = true,
-    ['setindex']    = true,
-    ['getindex']    = true,
-    ['tableindex']  = true,
     ['setglobal']   = true,
     ['getglobal']   = true,
+    ['string']      = true,
+    ['boolean']     = true,
+    ['number']      = true,
 }
 
 local function checkRequire(source, offset)
-    if source.type ~= 'call' then
+    if source.type ~= 'string' then
         return nil
     end
-    local func = source.node
-    local pathSource = source.args and source.args[1]
-    if not pathSource then
-        return nil
+    local callargs = source.parent
+    if callargs.type ~= 'callargs' then
+        return
     end
-    if not guide.isContain(pathSource, offset) then
-        return nil
+    if callargs[1] ~= source then
+        return
     end
-    local literal = guide.getLiteral(pathSource)
-    if type(literal) ~= 'string' then
-        return nil
-    end
+    local call = callargs.parent
+    local func = call.node
+    local literal = guide.getLiteral(source)
     local lib = vm.getLibrary(func)
     if not lib then
         return nil
@@ -48,13 +46,27 @@ local function checkRequire(source, offset)
     return nil
 end
 
+local function convertIndex(source)
+    if source.type == 'string'
+    or source.type == 'boolean'
+    or source.type == 'number' then
+        local parent = source.parent
+        if parent.type == 'setindex'
+        or parent.type == 'getindex'
+        or parent.type == 'tableindex' then
+            return parent
+        end
+    end
+    return source
+end
+
 return function (uri, offset)
     local ast = files.getAst(uri)
     if not ast then
         return nil
     end
 
-    local source = findSource(ast, offset, accept)
+    local source = convertIndex(findSource(ast, offset, accept))
     if not source then
         return nil
     end
@@ -63,7 +75,7 @@ return function (uri, offset)
     local uris = checkRequire(source)
     if uris then
         for i, uri in ipairs(uris) do
-            results[#uris+1] = {
+            results[#results+1] = {
                 uri    = files.getOriginUri(uri),
                 source = source,
                 target = {

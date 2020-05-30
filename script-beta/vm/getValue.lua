@@ -776,6 +776,42 @@ local function inferByCallReturn(results, source)
     end
 end
 
+local function inferByPCallReturn(results, source)
+    if source.type ~= 'select' then
+        return
+    end
+    local call = source.vararg
+    if not call or call.type ~= 'call' then
+        return
+    end
+    local node = call.node
+    local lib = vm.getLibrary(node)
+    if not lib then
+        return
+    end
+    local func, index
+    if lib.name == 'pcall' then
+        func = call.args[1]
+        index = source.index - 1
+    elseif lib.name == 'xpcall' then
+        func = call.args[1]
+        index = source.index - 2
+    else
+        return
+    end
+    local funcValues = vm.getValue(func)
+    if not funcValues then
+        return
+    end
+    for i = 1, #funcValues do
+        local value = funcValues[i]
+        local src = value.source
+        if src.type == 'function' then
+            mergeFunctionReturns(results, src, index)
+        end
+    end
+end
+
 local function getValue(source)
     local results = checkLiteral(source)
                  or checkValue(source)
@@ -798,6 +834,7 @@ local function getValue(source)
     inferByUnary(results, source)
     inferByBinary(results, source)
     inferByCallReturn(results, source)
+    inferByPCallReturn(results, source)
 
     if #results == 0 then
         return nil

@@ -18,6 +18,7 @@ return function (lsp, params)
     local hover = hovers[1]
     local desc = {}
     desc[#desc+1] = hover.description
+    desc[#desc+1] = hover.doc
     local active
     local signatures = {}
     for i, hover in ipairs(hovers) do
@@ -25,7 +26,7 @@ return function (lsp, params)
             label = hover.label,
             documentation = {
                 kind = 'markdown',
-                value = table.concat(desc, '\n'),
+                value = table.concat(desc, '\n\n'),
             },
         }
         if hover.argLabel then

@@ -84,18 +84,20 @@ PARSER_MISS_SEP_IN_TABLE = 'Miss symbol `,` or `;` .'
 
 SYMBOL_ANONYMOUS        = '<Anonymous>'
 
-HOVER_DOCUMENT_LUA51    = '[View documents](http://www.lua.org/manual/5.1/manual.html#pdf-{})'
-HOVER_DOCUMENT_LUA52    = '[View documents](http://www.lua.org/manual/5.2/manual.html#pdf-{})'
-HOVER_DOCUMENT_LUA53    = '[View documents](http://www.lua.org/manual/5.3/manual.html#pdf-{})'
-HOVER_DOCUMENT_LUA54    = '[View documents](http://www.lua.org/manual/5.4/manual.html#pdf-{})'
-HOVER_DOCUMENT_LUAJIT   = '[View documents](http://www.lua.org/manual/5.1/manual.html#pdf-{})'
+HOVER_VIEW_DOCUMENTS    = 'View documents'
+
+HOVER_DOCUMENT_LUA51    = 'http://www.lua.org/manual/5.1/manual.html#{}'
+HOVER_DOCUMENT_LUA52    = 'http://www.lua.org/manual/5.2/manual.html#{}'
+HOVER_DOCUMENT_LUA53    = 'http://www.lua.org/manual/5.3/manual.html#{}'
+HOVER_DOCUMENT_LUA54    = 'http://www.lua.org/manual/5.4/manual.html#{}'
+HOVER_DOCUMENT_LUAJIT   = 'http://www.lua.org/manual/5.1/manual.html#{}'
 
 
-HOVER_NATIVE_DOCUMENT_LUA51     = '[View documents](command:extension.lua.doc?["en-us/51/manual.html/pdf-{}"])'
-HOVER_NATIVE_DOCUMENT_LUA52     = '[View documents](command:extension.lua.doc?["en-us/52/manual.html/pdf-{}"])'
-HOVER_NATIVE_DOCUMENT_LUA53     = '[View documents](command:extension.lua.doc?["en-us/53/manual.html/pdf-{}"])'
-HOVER_NATIVE_DOCUMENT_LUA54     = '[View documents](command:extension.lua.doc?["en-us/54/manual.html/pdf-{}"])'
-HOVER_NATIVE_DOCUMENT_LUAJIT    = '[View documents](command:extension.lua.doc?["en-us/51/manual.html/pdf-{}"])'
+HOVER_NATIVE_DOCUMENT_LUA51     = 'command:extension.lua.doc?["en-us/51/manual.html/{}"]'
+HOVER_NATIVE_DOCUMENT_LUA52     = 'command:extension.lua.doc?["en-us/52/manual.html/{}"]'
+HOVER_NATIVE_DOCUMENT_LUA53     = 'command:extension.lua.doc?["en-us/53/manual.html/{}"]'
+HOVER_NATIVE_DOCUMENT_LUA54     = 'command:extension.lua.doc?["en-us/54/manual.html/{}"]'
+HOVER_NATIVE_DOCUMENT_LUAJIT    = 'command:extension.lua.doc?["en-us/51/manual.html/{}"]'
 
 HOVER_MULTI_PROTOTYPE   = '({} prototypes)'
 

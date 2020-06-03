@@ -8,7 +8,7 @@ description = 'Returns a string with length equal to the number of arguments, in
 description = 'Returns a string containing a binary representation (a *binary chunk*) of the given function.'
 
 [find]
-description = 'Looks for the first match of [`pattern`](https://www.lua.org/manual/5.3/manual.html#6.4.1) in the string.'
+description = 'Looks for the first match of [`pattern`](doc:6.4.1) in the string.'
 
 [format]
 description = 'Returns a formatted version of its variable number of arguments following the description given in its first argument.'
@@ -36,7 +36,7 @@ end
 ]]
 
 [gsub]
-description = 'Returns a copy of s in which all (or the first `n`, if given) occurrences of the [`pattern`](https://www.lua.org/manual/5.3/manual.html#6.4.1) have been replaced by a replacement string specified by `repl`.'
+description = 'Returns a copy of s in which all (or the first `n`, if given) occurrences of the [`pattern`](doc:6.4.1) have been replaced by a replacement string specified by `repl`.'
 
 [len]
 description = 'Returns its length.'
@@ -45,10 +45,10 @@ description = 'Returns its length.'
 description = 'Returns a copy of this string with all uppercase letters changed to lowercase.'
 
 [match]
-description = 'Looks for the first match of [`pattern`](https://www.lua.org/manual/5.3/manual.html#6.4.1) in the string.'
+description = 'Looks for the first match of [`pattern`](doc:6.4.1) in the string.'
 
 [pack]
-description = 'Returns a binary string containing the values `v1`, `v2`, etc. packed (that is, serialized in binary form) according to the format string [`fmt`](https://www.lua.org/manual/5.3/manual.html#6.4.2).'
+description = 'Returns a binary string containing the values `v1`, `v2`, etc. packed (that is, serialized in binary form) according to the format string [`fmt`](doc:6.4.2).'
 
 [packsize]
 description = 'Returns the size of a string resulting from `string.pack` with the given format.'
@@ -66,7 +66,7 @@ description = 'Returns a string that is the string `s` reversed.'
 description = 'Returns the substring of the string that starts at `i` and continues until `j`.'
 
 [unpack]
-description = 'Returns the values packed in string according to the format string [`fmt`](https://www.lua.org/manual/5.3/manual.html#6.4.2).'
+description = 'Returns the values packed in string according to the format string [`fmt`](doc:6.4.2).'
 
 [upper]
 description = 'Returns a copy of this string with all lowercase letters changed to uppercase.'

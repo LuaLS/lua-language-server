@@ -181,6 +181,48 @@ local function buildEnum(lib)
     return table.concat(strs), raw
 end
 
+local function getDocFormater()
+    local version = config.config.runtime.version
+    if client.client() == 'vscode' then
+        if version == 'Lua 5.1' then
+            return 'HOVER_NATIVE_DOCUMENT_LUA51'
+        elseif version == 'Lua 5.2' then
+            return 'HOVER_NATIVE_DOCUMENT_LUA52'
+        elseif version == 'Lua 5.3' then
+            return 'HOVER_NATIVE_DOCUMENT_LUA53'
+        elseif version == 'Lua 5.4' then
+            return 'HOVER_NATIVE_DOCUMENT_LUA54'
+        elseif version == 'LuaJIT' then
+            return 'HOVER_NATIVE_DOCUMENT_LUAJIT'
+        end
+    else
+        if version == 'Lua 5.1' then
+            return 'HOVER_DOCUMENT_LUA51'
+        elseif version == 'Lua 5.2' then
+            return 'HOVER_DOCUMENT_LUA52'
+        elseif version == 'Lua 5.3' then
+            return 'HOVER_DOCUMENT_LUA53'
+        elseif version == 'Lua 5.4' then
+            return 'HOVER_DOCUMENT_LUA54'
+        elseif version == 'LuaJIT' then
+            return 'HOVER_DOCUMENT_LUAJIT'
+        end
+    end
+end
+
+local function buildDescription(lib)
+    local desc = lib.description
+    if not desc then
+        return
+    end
+    return desc:gsub('%(doc%:(.-)%)', function (tag)
+        local fmt = getDocFormater()
+        if fmt then
+            return '(' .. lang.script(fmt, tag) .. ')'
+        end
+    end)
+end
+
 local function buildDoc(lib)
     local doc = lib.doc
     if not doc then
@@ -189,31 +231,9 @@ local function buildDoc(lib)
     if lib.web then
         return lang.script(lib.web, doc)
     end
-    local version = config.config.runtime.version
-    if client.client() == 'vscode' then
-        if version == 'Lua 5.1' then
-            return lang.script('HOVER_NATIVE_DOCUMENT_LUA51', doc)
-        elseif version == 'Lua 5.2' then
-            return lang.script('HOVER_NATIVE_DOCUMENT_LUA52', doc)
-        elseif version == 'Lua 5.3' then
-            return lang.script('HOVER_NATIVE_DOCUMENT_LUA53', doc)
-        elseif version == 'Lua 5.4' then
-            return lang.script('HOVER_NATIVE_DOCUMENT_LUA54', doc)
-        elseif version == 'LuaJIT' then
-            return lang.script('HOVER_NATIVE_DOCUMENT_LUAJIT', doc)
-        end
-    else
-        if version == 'Lua 5.1' then
-            return lang.script('HOVER_DOCUMENT_LUA51', doc)
-        elseif version == 'Lua 5.2' then
-            return lang.script('HOVER_DOCUMENT_LUA52', doc)
-        elseif version == 'Lua 5.3' then
-            return lang.script('HOVER_DOCUMENT_LUA53', doc)
-        elseif version == 'Lua 5.4' then
-            return lang.script('HOVER_DOCUMENT_LUA54', doc)
-        elseif version == 'LuaJIT' then
-            return lang.script('HOVER_DOCUMENT_LUAJIT', doc)
-        end
+    local fmt = getDocFormater()
+    if fmt then
+        return ('[%s](%s)'):format(lang.script.HOVER_VIEW_DOCUMENTS, lang.script(fmt, 'pdf-' .. doc))
     end
 end
 
@@ -221,7 +241,7 @@ return function (name, lib, object, select)
     local argStr, argLabel, args = buildLibArgs(lib, object, select)
     local returns = buildLibReturns(lib)
     local enum, rawEnum = buildEnum(lib)
-    local tip = lib.description
+    local tip = buildDescription(lib)
     local doc = buildDoc(lib)
     return {
         label = ('function %s(%s)%s'):format(name, argStr, returns),

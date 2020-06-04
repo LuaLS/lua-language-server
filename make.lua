@@ -3,6 +3,12 @@ local platform = require "bee.platform"
 
 lm.arch = 'x64'
 
+if lm.plat == "macos" then
+    lm.flags = {
+        "-mmacosx-version-min=10.13",
+    }
+end
+
 lm:import '3rd/bee.lua/make.lua'
 
 lm.rootdir = '3rd/'

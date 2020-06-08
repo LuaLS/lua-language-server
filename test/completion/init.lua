@@ -1,6 +1,7 @@
-local core = require 'core'
+local core    = require 'core'
 local parser  = require 'parser'
 local buildVM = require 'vm'
+local config  = require 'config'
 
 local CompletionItemKind = {
     Text = 1,
@@ -76,6 +77,9 @@ function TEST(script)
         end
     end
 end
+
+config.config.completion.callSnippet    = 'Both'
+config.config.completion.keywordSnippet = 'Both'
 
 TEST [[
 local zabcde

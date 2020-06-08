@@ -120,9 +120,9 @@ local ConfigTemplate = {
                                     )}
     },
     completion = {
-        enable          = {true,   Boolean},
-        callSnippet     = {'Both', String},
-        keywordSnippet  = {'Both', String},
+        enable          = {true,      Boolean},
+        callSnippet     = {'Disable', String},
+        keywordSnippet  = {'Replace', String},
     },
     color = {
         mode            = {'Semantic', String},

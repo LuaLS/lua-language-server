@@ -124,6 +124,9 @@ local ConfigTemplate = {
         callSnippet     = {'Disable', String},
         keywordSnippet  = {'Replace', String},
     },
+    signatureHelp = {
+        enable          = {true,      Boolean},
+    },
     color = {
         mode            = {'Semantic', String},
     },

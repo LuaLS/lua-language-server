@@ -1,9 +1,13 @@
 local core = require 'core'
+local config = require 'config'
 
 --- @param lsp LSP
 --- @param params table
 --- @return table
 return function (lsp, params)
+    if not config.config.signatureHelp.enable then
+        return
+    end
     local uri = params.textDocument.uri
     local vm, lines = lsp:loadVM(uri)
     if not vm then

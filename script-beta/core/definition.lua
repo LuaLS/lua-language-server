@@ -86,14 +86,13 @@ return function (uri, offset)
         end
     end
 
-    local defs = guide.requestDefinition(source)
-    for _, src in ipairs(defs) do
+    vm.eachDef(source, function (src)
         results[#results+1] = {
             target = src,
             uri    = files.getOriginUri(uri),
             source = source,
         }
-    end
+    end)
 
     if #results == 0 then
         return nil

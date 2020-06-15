@@ -10,16 +10,17 @@ local function disableDiagnostic(lsp, uri, data, callback)
             command = 'config',
             arguments = {
                 {
-                    key = {'diagnostics', 'disable'},
+                    key    = {'diagnostics', 'disable'},
                     action = 'add',
-                    value = data.code,
+                    value  = data.code,
+                    uri    = uri,
                 }
             }
         }
     }
 end
 
-local function addGlobal(name, callback)
+local function addGlobal(name, uri, callback)
     callback {
         title = lang.script('ACTION_MARK_GLOBAL', name),
         kind = 'quickfix',
@@ -28,16 +29,17 @@ local function addGlobal(name, callback)
             command = 'config',
             arguments = {
                 {
-                    key = {'diagnostics', 'globals'},
+                    key    = {'diagnostics', 'globals'},
                     action = 'add',
-                    value = name,
+                    value  = name,
+                    uri    = uri,
                 }
             }
         },
     }
 end
 
-local function changeVersion(version, callback)
+local function changeVersion(version, uri, callback)
     callback {
         title = lang.script('ACTION_RUNTIME_VERSION', version),
         kind = 'quickfix',
@@ -46,16 +48,17 @@ local function changeVersion(version, callback)
             command = 'config',
             arguments = {
                 {
-                    key = {'runtime', 'version'},
+                    key    = {'runtime', 'version'},
                     action = 'set',
-                    value = version,
+                    value  = version,
+                    uri    = uri,
                 }
             }
         },
     }
 end
 
-local function openCustomLibrary(libName, callback)
+local function openCustomLibrary(libName, uri, callback)
     callback {
         title = lang.script('ACTION_OPEN_LIBRARY', libName),
         kind = 'quickfix',
@@ -64,9 +67,10 @@ local function openCustomLibrary(libName, callback)
             command = 'config',
             arguments = {
                 {
-                    key = {'runtime', 'library'},
+                    key    = {'runtime', 'library'},
                     action = 'add',
-                    value = libName,
+                    value  = libName,
+                    uri    = uri,
                 }
             }
         },
@@ -84,18 +88,18 @@ local function solveUndefinedGlobal(lsp, uri, data, callback)
     if #name < 0 or name:find('[^%w_]') then
         return
     end
-    addGlobal(name, callback)
+    addGlobal(name, uri, callback)
     local otherVersion = library.other[name]
     if otherVersion then
         for _, version in ipairs(otherVersion) do
-            changeVersion(version, callback)
+            changeVersion(version, uri, callback)
         end
     end
 
     local customLibrary = library.custom[name]
     if customLibrary then
         for _, libName in ipairs(customLibrary) do
-            openCustomLibrary(libName, callback)
+            openCustomLibrary(libName, uri, callback)
         end
     end
 end
@@ -111,7 +115,7 @@ local function solveLowercaseGlobal(lsp, uri, data, callback)
     if #name < 0 or name:find('[^%w_]') then
         return
     end
-    addGlobal(name, callback)
+    addGlobal(name, uri, callback)
 end
 
 local function solveTrailingSpace(lsp, uri, data, callback)
@@ -179,13 +183,13 @@ local function findSyntax(astErr, lines, data)
     return nil
 end
 
-local function solveSyntaxByChangeVersion(err, callback)
+local function solveSyntaxByChangeVersion(err, uri, callback)
     if type(err.version) == 'table' then
         for _, version in ipairs(err.version) do
-            changeVersion(version, callback)
+            changeVersion(version, uri, callback)
         end
     else
-        changeVersion(err.version, callback)
+        changeVersion(err.version, uri, callback)
     end
 end
 
@@ -338,7 +342,7 @@ local function solveSyntax(lsp, uri, data, callback)
         return nil
     end
     if err.version then
-        solveSyntaxByChangeVersion(err, callback)
+        solveSyntaxByChangeVersion(err, uri, callback)
     end
     if err.type == 'ACTION_AFTER_BREAK' or err.type == 'ACTION_AFTER_RETURN' then
         solveSyntaxByAddDoEnd(uri, data, callback)

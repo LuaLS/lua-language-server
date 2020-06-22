@@ -199,9 +199,10 @@ function mt:isComplete()
 end
 
 function mt:isLuaFile(path)
-    local ext = path:extension():string()
+    local pathStr = path:string()
     for k, v in pairs(config.other.associations) do
-        if self:fileNameEq(ext, k:match('[^%*]+$')) then
+        k = k:gsub('^%*', '')
+        if self:fileNameEq(pathStr:sub(-#k), k) then
             if v == 'lua' then
                 return true
             else
@@ -209,7 +210,7 @@ function mt:isLuaFile(path)
             end
         end
     end
-    if self:fileNameEq(ext, '.lua') then
+    if self:fileNameEq(pathStr:sub(-4), '.lua') then
         return true
     end
     return false

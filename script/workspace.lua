@@ -190,8 +190,6 @@ function mt:init(rootUri)
     local logPath = ROOT / 'log' / (rootUri:gsub('[/:]+', '_') .. '.log')
     log.info('Log path: ', logPath)
     log.init(ROOT, logPath)
-
-    self:scanFiles()
 end
 
 function mt:isComplete()

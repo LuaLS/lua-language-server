@@ -3,9 +3,7 @@ local rpc = require 'rpc'
 --- @param lsp LSP
 --- @return boolean
 return function (lsp)
-    local ws = lsp.workspaces[1]
-
-    if ws then
+    for _, ws in ipairs(lsp.workspaces) do
         -- 请求工作目录
         local uri = ws.uri
         -- 请求配置

@@ -201,12 +201,10 @@ end
 function mt:isLuaFile(path)
     local pathStr = path:string()
     for k, v in pairs(config.other.associations) do
-        k = k:gsub('^%*', '')
-        if self:fileNameEq(pathStr:sub(-#k), k) then
-            if v == 'lua' then
+        if v == 'lua' then
+            k = k:gsub('^%*', '')
+            if self:fileNameEq(pathStr:sub(-#k), k) then
                 return true
-            else
-                return false
             end
         end
     end

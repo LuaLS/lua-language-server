@@ -9,25 +9,35 @@ local function pushError(...)
     ERR:push(buf)
 end
 
-local function readProtoHeader()
-    local header = io.read 'l'
-    if header:sub(1, #'Content-Length') == 'Content-Length' then
-        return header
-    elseif header:sub(1, #'Content-Type') == 'Content-Type' then
-        return nil
-    else
-        pushError('Proto header error:', header)
-        return nil
+local function readProtoHead(reader)
+    local head = {}
+    while true do
+        local line = reader 'L'
+        if line == '\r\n' then
+            break
+        else
+            local k, v = line:match '^([^:]+)%s*%:%s*(.+)\r\n$'
+            if k then
+                if k == 'Content-Length' then
+                    v = tonumber(v)
+                end
+                head[k] = v
+            else
+                pushError('Proto header error:', head)
+                break
+            end
+        end
     end
+    return head
 end
 
-local function readProtoContent(header)
-    local len = tonumber(header:match('%d+'))
+local function readProtoContent(head)
+    local len = head['Content-Length']
     if not len then
-        pushError('Proto header error:', header)
+        pushError('Proto header error:', head)
         return nil
     end
-    local buf = io.read(len+2)
+    local buf = io.read(len)
     if not buf then
         return nil
     end
@@ -40,11 +50,11 @@ local function readProtoContent(header)
 end
 
 local function readProto()
-    local header = readProtoHeader()
-    if not header then
+    local head = readProtoHead(io.read)
+    if not head then
         return
     end
-    local data = readProtoContent(header)
+    local data = readProtoContent(head)
     if not data then
         return
     end

@@ -1,5 +1,6 @@
 local json  = require 'json'
 local pcall = pcall
+local tonumber = tonumber
 
 _ENV = nil
 
@@ -14,19 +15,36 @@ function m.encode(pack)
     return buf
 end
 
+local function readProtoHead(reader, errHandle)
+    local head = {}
+    while true do
+        local line = reader 'L'
+        if line == '\r\n' then
+            break
+        else
+            local k, v = line:match '^([^:]+)%s*%:%s*(.+)\r\n$'
+            if k then
+                if k == 'Content-Length' then
+                    v = tonumber(v)
+                end
+                head[k] = v
+            else
+                errHandle('Proto header error:', head)
+                break
+            end
+        end
+    end
+    return head
+end
+
 function m.decode(reader, errHandle)
-    -- 读取协议头
-    local line = reader 'l'
-    -- 不支持修改文本编码
-    if line:find('Content-Type', 1, true) then
-        return nil
-    end
-    local len = line:match('Content%-Length%: (%d+)')
+    local head = readProtoHead(reader, errHandle)
+    local len = head['Content-Length']
     if not len then
-        errHandle('Error header: ' .. line)
+        errHandle('Proto header error:', head)
         return nil
     end
-    local content = reader(len + 2)
+    local content = reader(len)
     if not content then
         return nil
     end

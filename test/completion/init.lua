@@ -71,6 +71,10 @@ function TEST(script)
         local result = core.completion(vm, new_script, pos)
         if expect then
             assert(result)
+            -- 不检查 data 字段
+            for _, item in ipairs(result) do
+                item.data = nil
+            end
             assert(eq(expect, result))
         else
             assert(result == nil)
@@ -1488,11 +1492,17 @@ f($)
     {
         label = "'选项1'",
         kind = CompletionItemKind.EnumMember,
-        documentation = '注释1',
+        documentation = {
+            kind  = 'markdown',
+            value = '注释1',
+        },
     },
     {
         label = "'选项2'",
         kind = CompletionItemKind.EnumMember,
-        documentation = '注释2',
+        documentation = {
+            kind  = 'markdown',
+            value = '注释2',
+        },
     },
 }

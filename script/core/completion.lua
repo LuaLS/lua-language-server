@@ -264,7 +264,7 @@ local function sortPairs(t)
     end
 end
 
-local function searchFieldsByInfo(parent, word, source, map)
+local function searchFieldsByInfo(parent, word, source, map, srcMap)
     parent:eachInfo(function (info, src)
         local k = info[1]
         if src == source then
@@ -291,12 +291,13 @@ local function searchFieldsByInfo(parent, word, source, map)
         end
         if matchKey(word, k) then
             map[k] = v
+            srcMap[k] = src
         end
     end)
 end
 
-local function searchFieldsByChild(parent, word, source, map)
-    parent:eachChild(function (k, v)
+local function searchFieldsByChild(parent, word, source, map, srcMap)
+    parent:eachChild(function (k, v, src)
         if map[k] then
             return
         end
@@ -314,6 +315,7 @@ local function searchFieldsByChild(parent, word, source, map)
         end
         if matchKey(word, k) then
             map[k] = v
+            srcMap[k] = src
         end
     end)
 end
@@ -325,17 +327,18 @@ local function searchFields(vm, source, word, callback, pos)
         return
     end
     local map = {}
+    local srcMap = {}
     local current = parent
     for _ = 1, 3 do
-        searchFieldsByInfo(current, word, source, map)
+        searchFieldsByInfo(current, word, source, map, srcMap)
         current = current:getMetaMethod('__index')
         if not current then
             break
         end
     end
-    searchFieldsByChild(parent, word, source, map)
+    searchFieldsByChild(parent, word, source, map, srcMap)
     for k, v in sortPairs(map) do
-        callback(k, nil, CompletionItemKind.Field, getValueData('field', k, v, pos, source))
+        callback(k, srcMap[k], CompletionItemKind.Field, getValueData('field', k, v, pos, source))
     end
 end
 
@@ -421,17 +424,18 @@ end
 local function searchGlobals(vm, source, word, callback, pos)
     local global = vm.env:getValue()
     local map = {}
+    local srcMap = {}
     local current = global
     for _ = 1, 3 do
-        searchFieldsByInfo(current, word, source, map)
+        searchFieldsByInfo(current, word, source, map, srcMap)
         current = current:getMetaMethod('__index')
         if not current then
             break
         end
     end
-    searchFieldsByChild(global, word, source, map)
+    searchFieldsByChild(global, word, source, map, srcMap)
     for k, v in sortPairs(map) do
-        callback(k, nil, CompletionItemKind.Field, getValueData('field', k, v, pos, source))
+        callback(k, srcMap[k], CompletionItemKind.Field, getValueData('field', k, v, pos, source))
     end
 end
 
@@ -683,7 +687,10 @@ local function searchInRequire(vm, source, callback)
     end
     for _, str in ipairs(list) do
         local data = buildTextEdit(source.start, source.finish, str, source[2])
-        data.documentation = map[str]
+        data.documentation = {
+            value = map[str],
+            kind  = 'markdown',
+        }
         callback(str, nil, CompletionItemKind.Reference, data)
     end
 end
@@ -708,17 +715,26 @@ local function searchEnumAsLib(vm, source, word, callback, pos, args, lib)
                     if strSource then
                         if source.type == 'string' then
                             local data = buildTextEdit(source.start, source.finish, strSource[1], source[2])
-                            data.documentation = enum.description
+                            data.documentation = {
+                                kind  = 'markdown',
+                                value = enum.description,
+                            }
                             callback(enum.enum, nil, CompletionItemKind.EnumMember, data)
                         else
                             callback(enum.enum, nil, CompletionItemKind.EnumMember, {
-                                documentation = enum.description
+                                documentation = {
+                                    value = enum.description,
+                                    kind  = 'markdown',
+                                }
                             })
                         end
                     end
                 else
                     callback(enum.enum, nil, CompletionItemKind.EnumMember, {
-                        documentation = enum.description
+                        documentation = {
+                            value = enum.description,
+                            kind  = 'markdown',
+                        }
                     })
                 end
             end
@@ -740,7 +756,10 @@ local function buildEmmyEnumComment(enum, data)
     if not data then
         data = {}
     end
-    data.documentation = tostring(enum.comment)
+    data.documentation = {
+        value = tostring(enum.comment),
+        kind  = 'markdown',
+    }
     return data
 end
 
@@ -955,6 +974,12 @@ local function makeList(source, pos, word)
         end
         if not data.kind then
             data.kind = kind
+        end
+        if src then
+            data.data = {
+                uri    = src.uri,
+                offset = src.start,
+            }
         end
         list[#list+1] = data
         if data.snip then

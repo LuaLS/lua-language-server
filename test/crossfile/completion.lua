@@ -92,6 +92,17 @@ function TEST(data)
     local expect = data.completion
     if expect then
         assert(result)
+        for _, item in ipairs(result) do
+            item.data = nil
+        end
+        for _, item in ipairs(expect) do
+            if item.documentation then
+                item.documentation = {
+                    kind  = 'markdown',
+                    value = item.documentation,
+                }
+            end
+        end
         assert(eq(expect, result))
     else
         assert(result == nil)

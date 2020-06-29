@@ -136,7 +136,7 @@ optional = 'self'
 [setlocale]
 [[.args]]
 name = 'locale'
-type = 'string'
+type = {'string', 'nil'}
 ``````````
 name = 'category'
 type = 'string'

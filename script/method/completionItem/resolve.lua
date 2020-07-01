@@ -14,6 +14,7 @@ return function (lsp, item)
     local snip = text:sub(firstRow.start, lastRow.finish)
     local document = ([[
 %s
+
 ------------
 ```lua
 %s

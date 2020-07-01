@@ -310,6 +310,45 @@ local function hoverAsTargetUri(source, lsp)
     }
 end
 
+local function hoverAsString(source)
+    local str = source[1]
+    if type(str) ~= 'string' then
+        return ''
+    end
+    local len = #str
+    local charLen = utf8.len(str, 1, -1, true)
+    -- TODO 翻译
+    if len == charLen then
+        return {
+            description = ([[
+%d 个字节
+
+------------------
+```txt
+%s
+```]]):format(len, str),
+            range = {
+                start = source.start,
+                finish = source.finish,
+            },
+        }
+    else
+        return {
+            description = ([[
+%d 个字节，%d 个字符
+
+------------------
+```txt
+%s
+```]]):format(len, charLen, str),
+            range = {
+                start = source.start,
+                finish = source.finish,
+            },
+        }
+    end
+end
+
 return function (source, lsp, select)
     if not source then
         return nil
@@ -325,6 +364,9 @@ return function (source, lsp, select)
         if source.type == 'name' and source:bindValue() then
             return hoverAsValue(source, lsp, select)
         end
+    end
+    if source.type == 'string' then
+        return hoverAsString(source)
     end
     return nil
 end

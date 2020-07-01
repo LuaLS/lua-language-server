@@ -274,11 +274,6 @@ local n: any
 ]]
 
 TEST [[
-(<?'xxx'?>):sub()
-]]
-(nil)
-
-TEST [[
 local <?t?> = {
     a = 1,
     b = 2,

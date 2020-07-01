@@ -68,6 +68,13 @@ default = '.'
 name = 'rep'
 type = 'string'
 optional = 'self'
+[[.returns]]
+name = 'filename'
+type = {'string', 'nil'}
+``````````
+name = 'errmsg'
+type = 'string'
+optional = 'self'
 
 [seeall]
 version = {'Lua 5.1', 'LuaJIT'}

@@ -209,6 +209,9 @@ end
 ---@param uri uri
 ---@return Workspace
 function mt:findWorkspaceFor(uri)
+    if #self.workspaces == 0 then
+        return nil
+    end
     local path = uric.decode(uri)
     if not path then
         return nil
@@ -227,7 +230,7 @@ end
 function mt:isLua(uri)
     local ws = self:findWorkspaceFor(uri)
     if not ws then
-        return false
+        return true
     end
     local path = ws:absolutePathByUri(uri)
     if not path then
@@ -283,6 +286,10 @@ end
 ---@return boolean
 function mt:isOpen(uri)
     return self._files:isOpen(uri)
+end
+
+function mt:eachOpened()
+    return self._files:eachOpened()
 end
 
 ---@param uri uri
@@ -812,6 +819,9 @@ function mt:reScanFiles()
     self:clearAllFiles()
     for _, ws in ipairs(self.workspaces) do
         ws:scanFiles()
+    end
+    for uri, text in self:eachOpened() do
+        self:open(uri, 0, text)
     end
 end
 

@@ -318,36 +318,29 @@ local function hoverAsString(source)
     end
     local len = #str
     local charLen = utf8.len(str, 1, -1, true)
-    -- TODO 翻译
+    local lines = {}
     if len == charLen then
-        return {
-            description = ([[
-%s
-
-------------------
-```txt
-%s
-```]]):format(lang.script('HOVER_STRING_BYTES', len), str),
-            range = {
-                start = source.start,
-                finish = source.finish,
-            },
-        }
+        lines[#lines+1] = lang.script('HOVER_STRING_BYTES', len)
     else
-        return {
-            description = ([[
-%s
+        lines[#lines+1] = lang.script('HOVER_STRING_CHARACTERS', len, charLen)
+    end
+    -- 内部包含转义符？
+    local rawLen = source.finish - source.start - 2 * #source[2]
+    if rawLen > #str then
+        lines[#lines+1] = ([[
 
 ------------------
 ```txt
 %s
-```]]):format(lang.script('HOVER_STRING_CHARACTERS', len, charLen), str),
-            range = {
-                start = source.start,
-                finish = source.finish,
-            },
-        }
+```]]):format(str)
     end
+    return {
+        description = table.concat(lines, '\n'),
+        range = {
+            start = source.start,
+            finish = source.finish,
+        },
+    }
 end
 
 return function (source, lsp, select)

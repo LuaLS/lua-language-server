@@ -325,7 +325,7 @@ local function hoverAsString(source)
         lines[#lines+1] = lang.script('HOVER_STRING_CHARACTERS', len, charLen)
     end
     -- 内部包含转义符？
-    local rawLen = source.finish - source.start - 2 * #source[2]
+    local rawLen = source.finish - source.start - 2 * #source[2] + 1
     if rawLen > #str then
         lines[#lines+1] = ([[
 

@@ -100,6 +100,8 @@ HOVER_NATIVE_DOCUMENT_LUA54     = 'command:extension.lua.doc?["en-us/54/manual.h
 HOVER_NATIVE_DOCUMENT_LUAJIT    = 'command:extension.lua.doc?["en-us/51/manual.html/{}"]'
 
 HOVER_MULTI_PROTOTYPE   = '({} prototypes)'
+HOVER_STRING_BYTES      = '{} bytes'
+HOVER_STRING_CHARACTERS = '{} bytes, {} characters'
 
 ACTION_DISABLE_DIAG     = 'Disable diagnostics ({}).'
 ACTION_MARK_GLOBAL      = 'Mark `{}` as defined global.'

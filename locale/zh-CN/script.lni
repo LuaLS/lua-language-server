@@ -99,6 +99,8 @@ HOVER_NATIVE_DOCUMENT_LUA54     = 'command:extension.lua.doc?["en-us/54/manual.h
 HOVER_NATIVE_DOCUMENT_LUAJIT    = 'command:extension.lua.doc?["en-us/51/manual.html/{}"]'
 
 HOVER_MULTI_PROTOTYPE   = '({} 个原型)'
+HOVER_STRING_BYTES      = '{} 个字节'
+HOVER_STRING_CHARACTERS = '{} 个字节，{} 个字符'
 
 ACTION_DISABLE_DIAG     = '禁用诊断({})。'
 ACTION_MARK_GLOBAL      = '标记 `{}` 为已定义的全局变量。'

@@ -3,6 +3,7 @@ local getFunctionHover = require 'core.hover.function'
 local getFunctionHoverAsLib = require 'core.hover.lib_function'
 local getFunctionHoverAsEmmy = require 'core.hover.emmy_function'
 local buildValueName = require 'core.hover.name'
+local lang = require 'language'
 
 local OriginTypes = {
     ['any']      = true,
@@ -321,12 +322,12 @@ local function hoverAsString(source)
     if len == charLen then
         return {
             description = ([[
-%d 个字节
+%s
 
 ------------------
 ```txt
 %s
-```]]):format(len, str),
+```]]):format(lang.script('HOVER_STRING_BYTES', len), str),
             range = {
                 start = source.start,
                 finish = source.finish,
@@ -335,12 +336,12 @@ local function hoverAsString(source)
     else
         return {
             description = ([[
-%d 个字节，%d 个字符
+%s
 
 ------------------
 ```txt
 %s
-```]]):format(len, charLen, str),
+```]]):format(lang.script('HOVER_STRING_CHARACTERS', len, charLen), str),
             range = {
                 start = source.start,
                 finish = source.finish,

@@ -315,7 +315,7 @@ end
 local function hoverAsString(source)
     local str = source[1]
     if type(str) ~= 'string' then
-        return ''
+        return nil
     end
     local len = #str
     local charLen = utf8.len(str, 1, -1, true)
@@ -351,6 +351,30 @@ local function hoverAsString(source)
     }
 end
 
+local function formatNumber(n)
+    local str = ('%.10f'):format(n)
+    str = str:gsub('%.?0*$', '')
+    return str
+end
+
+local function hoverAsNumber(source)
+    local num = source[1]
+    if type(num) ~= 'number' then
+        return nil
+    end
+    local raw = source[2]
+    if not raw:find '[^%-%d%.]' then
+        return nil
+    end
+    return {
+        description = formatNumber(num),
+        range = {
+            start = source.start,
+            finish = source.finish,
+        },
+    }
+end
+
 return function (source, lsp, select)
     if not source then
         return nil
@@ -369,6 +393,9 @@ return function (source, lsp, select)
     end
     if source.type == 'string' then
         return hoverAsString(source)
+    end
+    if source.type == 'number' then
+        return hoverAsNumber(source)
     end
     return nil
 end

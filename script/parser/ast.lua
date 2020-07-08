@@ -499,6 +499,7 @@ local Defs = {
                 start  = start,
                 finish = finish - 1,
                 [1]    = n,
+                [2]    = number,
             }
             return State.LastNumber
         else

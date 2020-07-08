@@ -327,12 +327,16 @@ local function hoverAsString(source)
     -- 内部包含转义符？
     local rawLen = source.finish - source.start - 2 * #source[2] + 1
     if (source[2] == '"' or source[2] == "'") and rawLen > #str then
+        local view = str
+        if #view > 1000 then
+            view = view:sub(1, 1000) .. '...'
+        end
         lines[#lines+1] = ([[
 
 ------------------
 ```txt
 %s
-```]]):format(str)
+```]]):format(view)
     end
     return {
         description = table.concat(lines, '\n'),

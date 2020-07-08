@@ -5,59 +5,16 @@ local ll = require 'lpeglabel'
 local platform = require 'bee.platform'
 local glob = require 'glob'
 local uric = require 'uri'
-
-local TrueName = {}
-
-local function getFileName(path)
-    local name = path:string()
-    if platform.OS == 'Windows' then
-        local lname = name:lower()
-        TrueName[lname] = name
-        return lname
-    else
-        return name
-    end
-end
-
-local function getTrueName(name)
-    return TrueName[name] or name
-end
-
-local function split(str, sep)
-    local t = {}
-    for s in str:gmatch('[^' .. sep .. ']+') do
-        t[#t+1] = s
-    end
-    return t
-end
-
-local function similarity(a, b)
-    local ta = split(a, '/\\')
-    local tb = split(b, '/\\')
-    for i = 1, #ta do
-        if ta[i] ~= tb[i] then
-            return i - 1
-        end
-    end
-    return #ta
-end
+local fn = require 'filename'
 
 --- @class Workspace
 local mt = {}
 mt.__index = mt
 
-function mt:fileNameEq(a, b)
-    if platform.OS == 'Windows' then
-        return a:lower() == b:lower()
-    else
-        return a == b
-    end
-end
-
 function mt:listenLoadFile()
     self._loadFileRequest = async.run('loadfile', nil, function (filename, mode, buf)
         local path = fs.path(filename)
-        local name = getFileName(path)
+        local name = fn.getFileName(path)
         local uri = uric.encode(path)
         self.files[name] = uri
         if mode == 'workspace' then
@@ -160,14 +117,14 @@ function mt:scanFiles()
             log.debug(...)
         elseif mode == 'workspace' then
             local path = fs.path(...)
-            if not self:isLuaFile(path) then
+            if not fn.isLuaFile(path) then
                 return
             end
             self._loadFileRequest:push(path:string(), 'workspace')
             count = count + 1
         elseif mode == 'library' then
             local path = fs.path(...)
-            if not self:isLuaFile(path) then
+            if not fn.isLuaFile(path) then
                 return
             end
             self._loadFileRequest:push(path:string(), 'library')
@@ -196,34 +153,18 @@ function mt:isComplete()
     return self._complete == true
 end
 
-function mt:isLuaFile(path)
-    local pathStr = path:string()
-    for k, v in pairs(config.other.associations) do
-        if v == 'lua' then
-            k = k:gsub('^%*', '')
-            if self:fileNameEq(pathStr:sub(-#k), k) then
-                return true
-            end
-        end
-    end
-    if self:fileNameEq(pathStr:sub(-4), '.lua') then
-        return true
-    end
-    return false
-end
-
 function mt:addFile(path)
-    if not self:isLuaFile(path) then
+    if not fn.isLuaFile(path) then
         return
     end
-    local name = getFileName(path)
+    local name = fn.getFileName(path)
     local uri = uric.encode(path)
     self.files[name] = uri
     self.lsp:readText(self, uri, path)
 end
 
 function mt:removeFile(path)
-    local name = getFileName(path)
+    local name = fn.getFileName(path)
     if not self.files[name] then
         return
     end
@@ -238,7 +179,7 @@ function mt:findPath(baseUri, searchers)
     if not basePath then
         return nil
     end
-    local baseName = getFileName(basePath)
+    local baseName = fn.getFileName(basePath)
     for filename, uri in pairs(self.files) do
         if filename ~= baseName then
             for _, searcher in ipairs(searchers) do
@@ -260,7 +201,7 @@ function mt:findPath(baseUri, searchers)
         uri = results[1]
     else
         table.sort(results, function (a, b)
-            return similarity(a, baseUri) > similarity(b, baseUri)
+            return fn.similarity(a, baseUri) > fn.similarity(b, baseUri)
         end)
         uri = results[1]
     end
@@ -378,12 +319,12 @@ function mt:matchPath(baseUri, input)
     if not basePath then
         return nil
     end
-    local baseName = getFileName(basePath)
+    local baseName = fn.getFileName(basePath)
     local rootLen = #self.root:string(basePath)
     local map = {}
     for filename in pairs(self.files) do
         if filename ~= baseName then
-            local trueFilename = getTrueName(filename)
+            local trueFilename = fn.getTrueName(filename)
             local start
             if platform.OS == 'Windows' then
                 start = filename:find('[/\\]' .. first:lower(), rootLen + 1)
@@ -394,12 +335,12 @@ function mt:matchPath(baseUri, input)
                 local list = self:convertPathAsRequire(trueFilename, start + 1)
                 if list then
                     for _, str in ipairs(list) do
-                        if #str >= #input and self:fileNameEq(str:sub(1, #input), input) then
+                        if #str >= #input and fn.fileNameEq(str:sub(1, #input), input) then
                             if not map[str] then
                                 map[str] = trueFilename
                             else
-                                local s1 = similarity(trueFilename, baseName)
-                                local s2 = similarity(map[str], baseName)
+                                local s1 = fn.similarity(trueFilename, baseName)
+                                local s2 = fn.similarity(map[str], baseName)
                                 if s1 > s2 then
                                     map[str] = trueFilename
                                 elseif s1 == s2 then
@@ -424,8 +365,8 @@ function mt:matchPath(baseUri, input)
         return nil
     end
     table.sort(list, function (a, b)
-        local sa = similarity(map[a], baseName)
-        local sb = similarity(map[b], baseName)
+        local sa = fn.similarity(map[a], baseName)
+        local sb = fn.similarity(map[b], baseName)
         if sa == sb then
             return a < b
         else
@@ -436,7 +377,7 @@ function mt:matchPath(baseUri, input)
 end
 
 function mt:searchPath(baseUri, str)
-    str = getFileName(fs.path(str))
+    str = fn.getFileName(fs.path(str))
     if self.searched[baseUri] and self.searched[baseUri][str] then
         return self.searched[baseUri][str]
     end
@@ -461,7 +402,7 @@ function mt:loadPath(baseUri, str)
     if not ok then
         return nil
     end
-    str = getFileName(relative)
+    str = fn.getFileName(relative)
     if self.loaded[str] then
         return self.loaded[str]
     end

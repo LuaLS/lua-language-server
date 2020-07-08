@@ -21,7 +21,8 @@ local files      = require 'files'
 local uric       = require 'uri'
 local capability = require 'capability'
 local plugin     = require 'plugin'
-local workspace = require 'workspace'
+local workspace  = require 'workspace'
+local fn         = require 'filename'
 
 local ErrorCodes = {
     -- Defined by JSON RPC
@@ -228,15 +229,7 @@ end
 ---@param uri uri
 ---@return boolean
 function mt:isLua(uri)
-    local ws = self:findWorkspaceFor(uri)
-    if not ws then
-        return true
-    end
-    local path = ws:absolutePathByUri(uri)
-    if not path then
-        return false
-    end
-    if ws:isLuaFile(path) then
+    if fn.isLuaFile(uric.decode(uri)) then
         return true
     end
     return false
@@ -355,9 +348,6 @@ end
 ---@param buf string
 ---@param compiled table
 function mt:readLibrary(ws, uri, path, buf, compiled)
-    if self:findWorkspaceFor(uri) ~= ws then
-        return
-    end
     if not self:isLua(uri) then
         return
     end

@@ -5,6 +5,7 @@ local getFunctionHoverAsEmmy = require 'core.hover.emmy_function'
 local buildValueName = require 'core.hover.name'
 local lang = require 'language'
 local config = require 'config'
+local uric = require 'uri'
 
 local OriginTypes = {
     ['any']      = true,
@@ -300,16 +301,19 @@ local function hoverAsTargetUri(source, lsp)
         return nil
     end
     local ws = lsp:findWorkspaceFor(uri)
-    if not ws then
-        return nil
+    if ws then
+        local path = ws:relativePathByUri(uri)
+        if not path then
+            return nil
+        end
+        return {
+            description = ('[%s](%s)'):format(path:string(), uri),
+        }
+    else
+        return {
+            description = ('[%s](%s)'):format(uric.decode(uri):string(), uri),
+        }
     end
-    local path = ws:relativePathByUri(uri)
-    if not path then
-        return nil
-    end
-    return {
-        description = ('[%s](%s)'):format(path:string(), uri),
-    }
 end
 
 local function hoverAsString(source)

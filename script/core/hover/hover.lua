@@ -358,6 +358,9 @@ local function formatNumber(n)
 end
 
 local function hoverAsNumber(source)
+    if not config.config.hover.viewNumber then
+        return nil
+    end
     local num = source[1]
     if type(num) ~= 'number' then
         return nil

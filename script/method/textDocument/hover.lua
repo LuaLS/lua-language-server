@@ -1,4 +1,5 @@
 local core = require 'core'
+local config = require 'config'
 
 local function convertRange(lines, range)
     local start_row,  start_col  = lines:rowcol(range.start)
@@ -21,6 +22,9 @@ end
 --- @param params table
 --- @return table
 return function (lsp, params)
+    if not config.config.hover.enable then
+        return nil
+    end
     local uri = params.textDocument.uri
     local vm, lines = lsp:loadVM(uri)
     if not vm then

@@ -4,6 +4,7 @@ local getFunctionHoverAsLib = require 'core.hover.lib_function'
 local getFunctionHoverAsEmmy = require 'core.hover.emmy_function'
 local buildValueName = require 'core.hover.name'
 local lang = require 'language'
+local config = require 'config'
 
 local OriginTypes = {
     ['any']      = true,
@@ -326,10 +327,13 @@ local function hoverAsString(source)
     end
     -- 内部包含转义符？
     local rawLen = source.finish - source.start - 2 * #source[2] + 1
-    if (source[2] == '"' or source[2] == "'") and rawLen > #str then
+    if  config.config.hover.viewString
+    and (source[2] == '"' or source[2] == "'")
+    and rawLen > #str then
         local view = str
-        if #view > 1000 then
-            view = view:sub(1, 1000) .. '...'
+        local max = config.config.hover.viewStringMax
+        if #view > max then
+            view = view:sub(1, max) .. '...'
         end
         lines[#lines+1] = ([[
 

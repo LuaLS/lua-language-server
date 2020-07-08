@@ -127,6 +127,11 @@ local ConfigTemplate = {
     signatureHelp = {
         enable          = {true,      Boolean},
     },
+    hover = {
+        enable          = {true,      Boolean},
+        viewString      = {true,      Boolean},
+        viewStringMax   = {1000,      Integer},
+    },
     color = {
         mode            = {'Semantic', String},
     },

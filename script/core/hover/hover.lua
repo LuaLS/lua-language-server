@@ -326,7 +326,7 @@ local function hoverAsString(source)
     end
     -- 内部包含转义符？
     local rawLen = source.finish - source.start - 2 * #source[2] + 1
-    if rawLen > #str then
+    if (source[2] == '"' or source[2] == "'") and rawLen > #str then
         lines[#lines+1] = ([[
 
 ------------------

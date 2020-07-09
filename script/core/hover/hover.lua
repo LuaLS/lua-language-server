@@ -370,7 +370,7 @@ local function hoverAsNumber(source)
         return nil
     end
     local raw = source[2]
-    if not raw:find '[^%-%d%.]' then
+    if not raw or not raw:find '[^%-%d%.]' then
         return nil
     end
     return {

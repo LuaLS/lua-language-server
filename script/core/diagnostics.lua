@@ -420,9 +420,9 @@ function mt:searchDuplicateIndex(callback)
             if obj.type == 'pair' then
                 local key = obj[1]
                 local name
-                if key.index then
-                    if key.type == 'string' then
-                        name = key[1]
+                if key.type == 'index' then
+                    if key[1].type == 'string' then
+                        name = key[1][1]
                     end
                 elseif key.type == 'name' then
                     name = key[1]

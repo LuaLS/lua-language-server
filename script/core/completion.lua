@@ -8,6 +8,7 @@ local matchKey = require 'core.matchKey'
 local parser = require 'parser'
 local lang = require 'language'
 local snippet = require 'core.snippet'
+local uric = require 'uri'
 local State
 
 local CompletionItemKind = {
@@ -674,11 +675,11 @@ local function searchInRequire(vm, source, callback)
     if not vm.lsp then
         return
     end
-    local ws = vm.lsp:findWorkspaceFor(vm.uri)
-    if not ws then
+    if source.type ~= 'string' then
         return
     end
-    if source.type ~= 'string' then
+    local ws = vm.lsp:findWorkspaceFor(vm.uri)
+    if not ws then
         return
     end
     local list, map = ws:matchPath(vm.uri, source[1])

@@ -1,5 +1,6 @@
 local fs = require 'bee.filesystem'
 local uric = require 'uri'
+local fn   = require 'filename'
 
 local FileChangeType = {
     Created = 1,
@@ -34,8 +35,8 @@ return function (lsp, params)
         end
         -- 排除类文件发生更改需要重新扫描
         local filename = path:filename():string()
-        if ws:fileNameEq(filename, '.gitignore')
-        or ws:fileNameEq(filename, '.gitmodules')
+        if fn.fileNameEq(filename, '.gitignore')
+        or fn.fileNameEq(filename, '.gitmodules')
         then
             needRescan = true
         end

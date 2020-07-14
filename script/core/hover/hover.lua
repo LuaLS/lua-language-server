@@ -4,6 +4,8 @@ local getFunctionHoverAsLib = require 'core.hover.lib_function'
 local getFunctionHoverAsEmmy = require 'core.hover.emmy_function'
 local buildValueName = require 'core.hover.name'
 local lang = require 'language'
+local config = require 'config'
+local uric = require 'uri'
 
 local OriginTypes = {
     ['any']      = true,
@@ -299,22 +301,25 @@ local function hoverAsTargetUri(source, lsp)
         return nil
     end
     local ws = lsp:findWorkspaceFor(uri)
-    if not ws then
-        return nil
+    if ws then
+        local path = ws:relativePathByUri(uri)
+        if not path then
+            return nil
+        end
+        return {
+            description = ('[%s](%s)'):format(path:string(), uri),
+        }
+    else
+        return {
+            description = ('[%s](%s)'):format(uric.decode(uri):string(), uri),
+        }
     end
-    local path = ws:relativePathByUri(uri)
-    if not path then
-        return nil
-    end
-    return {
-        description = ('[%s](%s)'):format(path:string(), uri),
-    }
 end
 
 local function hoverAsString(source)
     local str = source[1]
     if type(str) ~= 'string' then
-        return ''
+        return nil
     end
     local len = #str
     local charLen = utf8.len(str, 1, -1, true)
@@ -326,16 +331,50 @@ local function hoverAsString(source)
     end
     -- 内部包含转义符？
     local rawLen = source.finish - source.start - 2 * #source[2] + 1
-    if rawLen > #str then
+    if  config.config.hover.viewString
+    and (source[2] == '"' or source[2] == "'")
+    and rawLen > #str then
+        local view = str
+        local max = config.config.hover.viewStringMax
+        if #view > max then
+            view = view:sub(1, max) .. '...'
+        end
         lines[#lines+1] = ([[
 
 ------------------
 ```txt
 %s
-```]]):format(str)
+```]]):format(view)
     end
     return {
         description = table.concat(lines, '\n'),
+        range = {
+            start = source.start,
+            finish = source.finish,
+        },
+    }
+end
+
+local function formatNumber(n)
+    local str = ('%.10f'):format(n)
+    str = str:gsub('%.?0*$', '')
+    return str
+end
+
+local function hoverAsNumber(source)
+    if not config.config.hover.viewNumber then
+        return nil
+    end
+    local num = source[1]
+    if type(num) ~= 'number' then
+        return nil
+    end
+    local raw = source[2]
+    if not raw or not raw:find '[^%-%d%.]' then
+        return nil
+    end
+    return {
+        description = formatNumber(num),
         range = {
             start = source.start,
             finish = source.finish,
@@ -361,6 +400,9 @@ return function (source, lsp, select)
     end
     if source.type == 'string' then
         return hoverAsString(source)
+    end
+    if source.type == 'number' then
+        return hoverAsNumber(source)
     end
     return nil
 end

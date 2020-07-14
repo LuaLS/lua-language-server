@@ -173,7 +173,11 @@ type = 'string'
 optional = 'self'
 default = 'r'
 [[.returns]]
-type = 'FILE*'
+type = {'FILE*', 'nil'}
+``````````
+name = 'error_message'
+type = 'string'
+optional = 'self'
 [[.enums]]
 name = 'mode'
 enum = '"r"'
@@ -193,6 +197,25 @@ enum = '"w+"'
 ``````````
 name = 'mode'
 enum = '"a+"'
+``````````
+name = 'mode'
+enum = '"rb"'
+default = true
+``````````
+name = 'mode'
+enum = '"wb"'
+``````````
+name = 'mode'
+enum = '"ab"'
+``````````
+name = 'mode'
+enum = '"r+b"'
+``````````
+name = 'mode'
+enum = '"w+b"'
+``````````
+name = 'mode'
+enum = '"a+b"'
 
 [output:input]
 
@@ -206,8 +229,11 @@ type = 'string'
 optional = 'self'
 default = 'r'
 [[.returns]]
-name = 'file'
-type = 'FILE*'
+type = {'FILE*', 'nil'}
+``````````
+name = 'error_message'
+type = 'string'
+optional = 'self'
 [[.enums]]
 name = 'mode'
 enum = '"r"'

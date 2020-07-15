@@ -813,6 +813,9 @@ function mt:setOne(var, value, emmy, comment)
     elseif var.type == 'simple' then
         local parent = self:getSimple(var, -2)
         parent = self:getFirstInMulti(parent)
+        if not parent then
+            return
+        end
         local key = var[#var]
         self:instantSource(key)
         key:set('simple', var)

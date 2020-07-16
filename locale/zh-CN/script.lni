@@ -32,6 +32,7 @@ DIAG_DUPLICATE_PARAM    = '重复的参数。'
 DIAG_NEED_CLASS         = '需要先定义 Class 。'
 DIAG_DUPLICATE_FIELD    = '重复定义的 field 。'
 DIAG_SET_CONST          = '不能对常量赋值。'
+DIAG_SET_FOR_STATE      = '修改了循环变量。'
 
 MWS_NOT_SUPPORT         = '{} 目前还不支持多工作目录，我可能需要重启才能支持新的工作目录...'
 MWS_RESTART             = '重启'

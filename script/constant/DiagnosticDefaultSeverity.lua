@@ -19,4 +19,5 @@ return {
     ['redundant-value']     = 'Hint',
     ['emmy-lua']            = 'Warning',
     ['set-const']           = 'Error',
+    ['set-for-state']       = 'Warning',
 }

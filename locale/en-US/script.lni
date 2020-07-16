@@ -32,6 +32,7 @@ DIAG_DUPLICATE_PARAM    = 'Duplicate param.'
 DIAG_NEED_CLASS         = 'Class needs to be defined first.'
 DIAG_DUPLICATE_FIELD    = 'Duplicate field.'
 DIAG_SET_CONST          = 'Assignment to const variable.'
+DIAG_SET_FOR_STATE      = 'Assignment to for-state variable.'
 
 MWS_NOT_SUPPORT         = '{} dose not support multi workspace for now, I may need to restart to support the new workspace ...'
 MWS_RESTART             = 'Restart'

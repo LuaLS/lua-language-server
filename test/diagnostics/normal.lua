@@ -531,6 +531,21 @@ t.a = 2
 ]]
 
 TEST [[
+for k, v in pairs {1, 2, 3, 4 ,5} do
+    print(k, v)
+    <!k!> = 1
+    print(v)
+end
+]]
+
+TEST [[
+for i = 1, 10 do
+    <!i!> = 2
+    print(i)
+end
+]]
+
+TEST [[
 ---@type table<number, boolean|string[]>
 local t
 print(t)

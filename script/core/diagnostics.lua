@@ -861,9 +861,9 @@ function mt:searchSetForState(callback)
         if source.type == 'loop' then
             locs[#locs+1] = source.arg:bindLocal()
         elseif source.type == 'in' then
-            self.vm:forList(source.arg, function (arg)
-                locs[#locs+1] = arg:bindLocal()
-            end)
+            --self.vm:forList(source.arg, function (arg)
+            --    locs[#locs+1] = arg:bindLocal()
+            --end)
         end
     end)
     for i = 1, #locs do

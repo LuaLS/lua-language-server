@@ -30,5 +30,6 @@ init 'workspace/didChangeConfiguration'
 init 'workspace/didChangeWatchedFiles'
 init 'workspace/didChangeWorkspaceFolders'
 init 'workspace/executeCommand'
+init 'workspace/symbol'
 
 return method

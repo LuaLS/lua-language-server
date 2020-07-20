@@ -285,6 +285,10 @@ function mt:eachOpened()
     return self._files:eachOpened()
 end
 
+function mt:eachFile()
+    return self._files:eachFile()
+end
+
 ---@param uri uri
 ---@param path path
 ---@param text string

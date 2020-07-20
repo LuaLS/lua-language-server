@@ -38,6 +38,7 @@ return function (lsp, params)
             documentHighlightProvider = true,
             codeActionProvider = true,
             foldingRangeProvider = true,
+            workspaceSymbolProvider = true,
             signatureHelpProvider = {
                 triggerCharacters = { '(', ',' },
             },
@@ -52,7 +53,7 @@ return function (lsp, params)
                 workspaceFolders = {
                     supported = true,
                     changeNotifications = true,
-                }
+                },
             },
             documentOnTypeFormattingProvider = {
                 firstTriggerCharacter = '}',

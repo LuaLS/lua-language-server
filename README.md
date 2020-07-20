@@ -13,11 +13,13 @@
 - [x] IntelliSense
 - [x] Signature Help
 - [x] Document Symbols
+- [x] Workspace Symbols
 - [x] Syntax Check
 - [x] Highlight
 - [x] Code Action
 - [x] EmmyLua Annotation
 - [x] Multi Workspace
+- [x] Semantic Tokens
 - [ ] Type Format
 
 ## Preview

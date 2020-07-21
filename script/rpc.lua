@@ -1,5 +1,4 @@
 local json = require 'json'
-json.null = nil
 
 local TIMEOUT = 600.0
 

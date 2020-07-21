@@ -1,5 +1,4 @@
 local json   = require 'json'
-json.null = nil
 
 local function pushError(...)
     local t = table.pack(...)

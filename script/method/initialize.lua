@@ -1,6 +1,7 @@
 local workspace = require 'workspace'
 local nonil = require 'without-check-nil'
 local client = require 'client'
+local json = require 'json'
 
 local function allWords()
     local str = [[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.:('"[,#*@| ]]
@@ -20,7 +21,7 @@ return function (lsp, params)
     client.init(params)
     log.info(table.dump(params))
 
-    if params.workspaceFolders then
+    if params.workspaceFolders ~= json.null then
         for _, folder in ipairs(params.workspaceFolders) do
             lsp:addWorkspace(folder.name, folder.uri)
         end

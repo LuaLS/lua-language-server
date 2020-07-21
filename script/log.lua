@@ -55,7 +55,7 @@ local function push_log(level, ...)
     local info = debug.getinfo(3, 'Sl')
     local buf
     if info and info.currentline > 0 then
-        buf = ('[%s.%03.f][%s]: [%s:%s]%s\n'):format(timestr, ms * 1000, level, trim_src(info.source), info.currentline, str)
+        buf = ('[%s.%03.f][%s][%s:%s]: %s\n'):format(timestr, ms * 1000, level, trim_src(info.source), info.currentline, str)
     else
         buf = ('[%s.%03.f][%s]: %s\n'):format(timestr, ms * 1000, level, str)
     end

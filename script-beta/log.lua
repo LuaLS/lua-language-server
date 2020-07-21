@@ -99,9 +99,9 @@ function m.raw(thd, level, msg, source, currentline, clock)
     end
     local buf
     if currentline == -1 then
-        buf = ('[%s.%03.f][%s]: %s[#%d]%s\n'):format(timestr, ms * 1000, level, agl, thd, msg)
+        buf = ('[%s.%03.f][%s]%s[#%d]: %s\n'):format(timestr, ms * 1000, level, agl, thd, msg)
     else
-        buf = ('[%s.%03.f][%s]: %s[#%d:%s:%s]%s\n'):format(timestr, ms * 1000, level, agl, thd, trimSrc(source), currentline, msg)
+        buf = ('[%s.%03.f][%s]%s[#%d:%s:%s]: %s\n'):format(timestr, ms * 1000, level, agl, thd, trimSrc(source), currentline, msg)
     end
     m.file:write(buf)
     m.size = m.size + #buf

@@ -92,13 +92,10 @@ function mt:_callMethod(name, params)
 end
 
 function mt:responseProto(id, response, err)
-    local container = table.container()
-    if err then
-        container.error = err
-    else
-        container.result = response
-    end
-    rpc:response(id, container)
+    rpc:response(id, {
+        error  = err and err or nil,
+        result = response and response or json.null,
+    })
 end
 
 function mt:_doProto(proto)

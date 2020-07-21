@@ -9,4 +9,5 @@ require 'vm.getMeta'
 require 'vm.eachField'
 require 'vm.eachDef'
 require 'vm.eachRef'
+require 'vm.getCall'
 return vm

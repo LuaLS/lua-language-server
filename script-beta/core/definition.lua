@@ -89,7 +89,7 @@ return function (uri, offset)
     vm.eachDef(source, function (src)
         results[#results+1] = {
             target = src,
-            uri    = files.getOriginUri(uri),
+            uri    = guide.getRoot(src).uri,
             source = source,
         }
     end)

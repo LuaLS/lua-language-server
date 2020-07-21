@@ -1,26 +1,56 @@
 local vm    = require 'vm.vm'
-local req   = require 'vm.getRequire'
 local guide = require 'parser.guide'
+local ws    = require 'workspace'
+local files = require 'files'
 
 local m = {}
 
-function m.searchDefAcrossRequire(results)
-    for _, source in ipairs(results) do
-
-    end
-end
-
-function m.mergeResults(a, b, mark)
+function m.mergeResults(a, b)
     for _, r in ipairs(b) do
-        if not mark[r] then
-            mark[r] = true
+        if not a[r] then
+            a[r] = true
             a[#a+1] = r
         end
     end
     return a
 end
 
-function m.searchLibrary(source, results, mark)
+function m.searchFileReturn(results, ast, source)
+    local returns = ast.returns
+    for _, ret in ipairs(returns) do
+        if ret[1] then
+            m.eachDef(ret[1], results)
+        end
+    end
+end
+
+function m.require(results, source, args)
+    local reqName = args[1] and args[1][1]
+    if not reqName then
+        return
+    end
+    local uris = ws.findUrisByRequirePath(reqName, true)
+    for _, uri in ipairs(uris) do
+        local ast = files.getAst(uri)
+        if ast then
+            m.searchFileReturn(results, ast.ast, source)
+        end
+    end
+end
+
+function m.searchDefAcrossRequire(results)
+    for _, source in ipairs(results) do
+        local func, args, index = guide.getCallValue(source)
+        if func and index == 1 then
+            local lib = vm.getLibrary(func)
+            if lib and lib.name == 'require' then
+                m.require(results, source, args)
+            end
+        end
+    end
+end
+
+function m.searchLibrary(source, results)
     if not source then
         return
     end
@@ -28,24 +58,23 @@ function m.searchLibrary(source, results, mark)
     if not lib then
         return
     end
-    if mark[lib] then
-        return
-    end
-    mark[lib] = true
-    results[#results+1] = lib
+    m.mergeResults(results, { lib })
 end
 
-function m.eachDef(source, results, mark)
+function m.eachDef(source, results)
     results = results or {}
-    mark    = mark    or {}
-    if mark[source] then
+    local lock = vm.lock('eachDef', source)
+    if not lock then
         return results
     end
 
-    m.mergeResults(results, guide.requestDefinition(source), mark)
-    m.searchLibrary(source, results, mark)
-    m.searchLibrary(guide.getObjectValue(source), results, mark)
-    m.searchDefAcrossRequire(results, mark)
+    local myResults = guide.requestDefinition(source)
+    m.searchDefAcrossRequire(myResults)
+    m.mergeResults(results, myResults)
+    m.searchLibrary(source, results)
+    m.searchLibrary(guide.getObjectValue(source), results)
+
+    lock()
 
     return results
 end

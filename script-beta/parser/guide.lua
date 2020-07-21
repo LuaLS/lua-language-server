@@ -936,6 +936,19 @@ function m.getCallAndArgIndex(callarg)
     return call, index
 end
 
+-- 根据函数调用的返回值，获取：调用的函数，参数列表，自己是第几个返回值
+function m.getCallValue(source)
+    local value = source.value
+    if not value or value.type ~= 'select' then
+        return
+    end
+    local call = value.vararg
+    if call.type ~= 'call' then
+        return
+    end
+    return call.node, call.args, value.index
+end
+
 function m.getNextRef(ref)
     local nextRef = ref.next
     if nextRef then

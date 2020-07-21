@@ -535,7 +535,7 @@ EmmyBody        <-  'class'    %s+ EmmyClass    -> EmmyClass
                 /   'overload' %s+ EmmyOverLoad -> EmmyOverLoad
                 /   EmmyIncomplete
 
-EmmyName        <-  ({} {[a-zA-Z_] [a-zA-Z0-9_]*})
+EmmyName        <-  ({} {[a-zA-Z_] [a-zA-Z0-9_.]*})
                 ->  EmmyName
 MustEmmyName    <-  EmmyName / DirtyEmmyName
 DirtyEmmyName   <-  {} ->  DirtyEmmyName

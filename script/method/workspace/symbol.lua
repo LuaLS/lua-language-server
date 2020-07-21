@@ -47,7 +47,8 @@ local function convertRange(lines, range)
 end
 
 local function collect(results, source, uri, lines)
-    if source:action() ~= 'set' then
+    if source:action() ~= 'set'
+    and source:action() ~= 'local' then
         return
     end
     local kind = SymbolKind.Variable

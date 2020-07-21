@@ -1,10 +1,13 @@
 local vm    = require 'vm.vm'
+local req   = require 'vm.getRequire'
 local guide = require 'parser.guide'
 
 local m = {}
 
 function m.searchDefAcrossRequire(results)
+    for _, source in ipairs(results) do
 
+    end
 end
 
 function m.mergeResults(a, b, mark)
@@ -17,6 +20,21 @@ function m.mergeResults(a, b, mark)
     return a
 end
 
+function m.searchLibrary(source, results, mark)
+    if not source then
+        return
+    end
+    local lib = vm.getLibrary(source)
+    if not lib then
+        return
+    end
+    if mark[lib] then
+        return
+    end
+    mark[lib] = true
+    results[#results+1] = lib
+end
+
 function m.eachDef(source, results, mark)
     results = results or {}
     mark    = mark    or {}
@@ -25,17 +43,9 @@ function m.eachDef(source, results, mark)
     end
 
     m.mergeResults(results, guide.requestDefinition(source), mark)
-    m.searchDefAcrossRequire(results)
-
-    local lib = vm.getLibrary(source)
-    if lib then
-        results[#results+1] = lib
-    end
-
-    local value   = guide.getObjectValue(source)
-    if value then
-        m.eachDef(value, results, mark)
-    end
+    m.searchLibrary(source, results, mark)
+    m.searchLibrary(guide.getObjectValue(source), results, mark)
+    m.searchDefAcrossRequire(results, mark)
 
     return results
 end

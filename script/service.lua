@@ -784,18 +784,17 @@ function mt:_loadProto()
     while true do
         local ok, protoStream = self._proto:pop()
         if not ok then
-            goto CONTINUE
+            break
         end
         local suc, proto = xpcall(json.decode, log.error, protoStream)
         if not suc then
-            goto CONTINUE
+            break
         end
         if proto.method then
             self:_doProto(proto)
         else
             rpc:recieve(proto)
         end
-        ::CONTINUE::
     end
 end
 

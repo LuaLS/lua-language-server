@@ -46,6 +46,49 @@ local function convertRange(lines, range)
     return result
 end
 
+local function getParentName(source)
+    local parentValue = source:get 'parent'
+    if not parentValue then
+        return
+    end
+    local pSource = parentValue:getSource()
+    if not pSource then
+        return
+    end
+    local name = pSource[1]
+    if type(name) ~= 'string' or name == '' then
+        return
+    end
+    return name
+end
+
+local function collect(results, source, uri, lines)
+    if source:action() ~= 'set' then
+        return
+    end
+    local kind = SymbolKind.Variable
+    local contain = getParentName(source)
+    local value = source:bindValue()
+    if value and value:getFunction() then
+        kind = SymbolKind.Function
+    else
+        if source:get 'global' then
+            kind = SymbolKind.Namespace
+        elseif source:get 'table index' then
+            kind = SymbolKind.EnumMember
+        end
+    end
+    results[#results+1] = {
+        name = source[1],
+        kind = kind,
+        containerName = contain,
+        location = {
+            uri = uri,
+            range = convertRange(lines, source),
+        }
+    }
+end
+
 local function searchVM(lsp, results, query, uri)
     local vm, lines = lsp:getVM(uri)
     if not vm then
@@ -53,15 +96,11 @@ local function searchVM(lsp, results, query, uri)
     end
     vm:eachSource(function (src)
         if src.type == 'name' then
+            if src[1] == '' then
+                return
+            end
             if matchKey(query, src[1]) then
-                results[#results+1] = {
-                    name = src[1],
-                    kind = SymbolKind.Variable,
-                    location = {
-                        uri = uri,
-                        range = convertRange(lines, src),
-                    }
-                }
+                collect(results, src, uri, lines)
             end
         end
     end)

@@ -23,6 +23,7 @@ local capability = require 'capability'
 local plugin     = require 'plugin'
 local workspace  = require 'workspace'
 local fn         = require 'filename'
+local json       = require 'json'
 
 local ErrorCodes = {
     -- Defined by JSON RPC
@@ -399,7 +400,9 @@ function mt:reCompile()
     self.chain  = chainMgr()
     self.emmy   = emmyMgr()
     self.globalValue = nil
-    self._compileTask:remove()
+    if self._compileTask then
+        self._compileTask:remove()
+    end
     self._needCompile = {}
     local n = 0
     for uri in self._files:eachFile() do
@@ -779,15 +782,20 @@ end
 
 function mt:_loadProto()
     while true do
-        local ok, proto = self._proto:pop()
+        local ok, protoStream = self._proto:pop()
         if not ok then
-            break
+            goto CONTINUE
+        end
+        local suc, proto = xpcall(json.decode, log.error, protoStream)
+        if not suc then
+            goto CONTINUE
         end
         if proto.method then
             self:_doProto(proto)
         else
             rpc:recieve(proto)
         end
+        ::CONTINUE::
     end
 end
 

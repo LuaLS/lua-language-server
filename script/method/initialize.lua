@@ -21,11 +21,11 @@ return function (lsp, params)
     client.init(params)
     log.info(table.dump(params))
 
-    if params.workspaceFolders ~= json.null then
+    if params.workspaceFolders and params.workspaceFolders ~= json.null then
         for _, folder in ipairs(params.workspaceFolders) do
             lsp:addWorkspace(folder.name, folder.uri)
         end
-    elseif params.rootUri then
+    elseif params.rootUri and params.rootUri ~= json.null then
         lsp:addWorkspace('root', params.rootUri)
     end
 

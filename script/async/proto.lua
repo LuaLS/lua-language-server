@@ -41,12 +41,7 @@ local function readProtoContent(head)
     if not buf then
         return nil
     end
-    local suc, res = pcall(json.decode, buf)
-    if not suc then
-        pushError('Proto error:', buf)
-        return nil
-    end
-    return res
+    return buf
 end
 
 local function readProto()

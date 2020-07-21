@@ -46,28 +46,11 @@ local function convertRange(lines, range)
     return result
 end
 
-local function getParentName(source)
-    local parentValue = source:get 'parent'
-    if not parentValue then
-        return
-    end
-    local pSource = parentValue:getSource()
-    if not pSource then
-        return
-    end
-    local name = pSource[1]
-    if type(name) ~= 'string' or name == '' then
-        return
-    end
-    return name
-end
-
 local function collect(results, source, uri, lines)
     if source:action() ~= 'set' then
         return
     end
     local kind = SymbolKind.Variable
-    local contain = getParentName(source)
     local value = source:bindValue()
     if value and value:getFunction() then
         kind = SymbolKind.Function
@@ -81,7 +64,6 @@ local function collect(results, source, uri, lines)
     results[#results+1] = {
         name = source[1],
         kind = kind,
-        containerName = contain,
         location = {
             uri = uri,
             range = convertRange(lines, source),

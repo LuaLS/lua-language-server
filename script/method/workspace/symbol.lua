@@ -92,9 +92,6 @@ end
 --- @param params table
 return function (lsp, params)
     local query = params.query
-    if #query <= 0 then
-        return {}
-    end
     local results = {}
 
     for uri in lsp:eachFile() do

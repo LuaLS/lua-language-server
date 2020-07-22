@@ -61,9 +61,8 @@ return function (lsp, params)
             },
             executeCommandProvider = {
                 commands = {
-                    'config',
-                    'removeSpace',
-                    'solve',
+                    'lua.removeSpace',
+                    'lua.solve',
                 },
             },
         }

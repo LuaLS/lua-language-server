@@ -47,7 +47,7 @@ end
 
 for i = 0, 31 do
     local c = string_char(i)
-    if not decode_escape_map[c] then
+    if not encode_escape_map[c] then
         encode_escape_map[c] = string_format("\\u%04x", i)
     end
 end
@@ -62,7 +62,7 @@ encode_map["nil"] = function ()
 end
 
 function encode_map.string(v)
-    return '"' .. string_gsub(v, '[\0-\31\\"/]', encode_escape_map) .. '"'
+    return '"' .. string_gsub(v, '[\0-\31\\"]', encode_escape_map) .. '"'
 end
 local encode_string = encode_map.string
 

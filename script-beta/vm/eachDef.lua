@@ -5,21 +5,21 @@ local files = require 'files'
 
 local m = {}
 
-function m.searchFileReturn(results, ast)
+function m.searchFileReturn(results, ast, index)
     local returns = ast.returns
     for _, ret in ipairs(returns) do
-        local first = ret[1]
-        if first then
-            local newRes = m.eachDef(ret[1])
+        local exp = ret[index]
+        if exp then
+            local newRes = m.eachDef(ret[index])
             if #newRes == 0 then
-                newRes[1] = first
+                newRes[1] = exp
             end
             vm.mergeResults(results, newRes)
         end
     end
 end
 
-function m.require(results, args)
+function m.require(results, args, index)
     local reqName = args[1] and args[1][1]
     if not reqName then
         return
@@ -28,7 +28,21 @@ function m.require(results, args)
     for _, uri in ipairs(uris) do
         local ast = files.getAst(uri)
         if ast then
-            m.searchFileReturn(results, ast.ast)
+            m.searchFileReturn(results, ast.ast, index)
+        end
+    end
+end
+
+function m.dofile(results, args, index)
+    local reqName = args[1] and args[1][1]
+    if not reqName then
+        return
+    end
+    local uris = ws.findUrisByFilePath(reqName, true)
+    for _, uri in ipairs(uris) do
+        local ast = files.getAst(uri)
+        if ast then
+            m.searchFileReturn(results, ast.ast, index)
         end
     end
 end
@@ -36,12 +50,20 @@ end
 function m.searchDefAcrossRequire(results)
     for _, source in ipairs(results) do
         local func, args, index = guide.getCallValue(source)
-        if func and index == 1 then
-            local lib = vm.getLibrary(func)
-            if lib and lib.name == 'require' then
-                m.require(results, args)
-            end
+        if not func then
+            goto CONTINUE
         end
+        local lib = vm.getLibrary(func)
+        if not lib then
+            goto CONTINUE
+        end
+        if lib.name == 'require' and index == 1 then
+            m.require(results, args, index)
+        end
+        if lib.name == 'dofile' then
+            m.dofile(results, args, index)
+        end
+        ::CONTINUE::
     end
 end
 

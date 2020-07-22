@@ -213,7 +213,7 @@ TEST {
     {
         path = 'a.lua',
         content = [[
-            return a():b():c()
+            return <!a():b():c()!>
         ]],
     },
     {

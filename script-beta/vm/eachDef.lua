@@ -8,8 +8,13 @@ local m = {}
 function m.searchFileReturn(results, ast)
     local returns = ast.returns
     for _, ret in ipairs(returns) do
-        if ret[1] then
-            m.eachDef(ret[1], results)
+        local first = ret[1]
+        if first then
+            local newRes = m.eachDef(ret[1])
+            if #newRes == 0 then
+                newRes[1] = first
+            end
+            vm.mergeResults(results, newRes)
         end
     end
 end

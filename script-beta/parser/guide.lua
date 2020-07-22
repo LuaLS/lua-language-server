@@ -1218,6 +1218,7 @@ function m.checkSameSimpleIncall(status, ref, start, queue)
             queue[#queue+1] = {
                 obj   = obj,
                 start = start,
+                force = true,
             }
         end
     end
@@ -1327,6 +1328,9 @@ function m.searchRefsAsFunctionReturn(status, obj, mode)
     status.results[#status.results+1] = obj
     -- 搜索所在函数
     local currentFunc = m.getParentFunction(obj)
+    if currentFunc.type == 'main' then
+        return
+    end
     local returns = currentFunc.returns
     if not returns then
         return

@@ -1,4 +1,3 @@
-local pairs = pairs
 local type = type
 local next = next
 local error = error
@@ -16,15 +15,17 @@ local string_sub = string.sub
 local string_format = string.format
 local math_type = math.type
 local setmetatable = setmetatable
+local getmetatable = getmetatable
 local Inf = math.huge
 
 local json = {}
-json.null = function() end
 json.object = {}
 
 -- json.encode --
+local statusMark
+local statusQue
 
-local encode
+local encode_map = {}
 
 local encode_escape_map = {
     [ "\"" ] = "\\\"",
@@ -39,7 +40,7 @@ local encode_escape_map = {
 
 local decode_escape_set = {}
 local decode_escape_map = {}
-for k, v in pairs(encode_escape_map) do
+for k, v in next, encode_escape_map do
     decode_escape_map[v] = k
     decode_escape_set[string_byte(v, 2)] = true
 end
@@ -51,20 +52,19 @@ for i = 0, 31 do
     end
 end
 
-local function encode_nil()
+local function encode(v)
+    local res = encode_map[type(v)](v)
+    statusQue[#statusQue+1] = res
+end
+
+encode_map["nil"] = function ()
     return "null"
 end
 
-local function encode_null(val)
-    if val == json.null then
-        return "null"
-    end
-    error "cannot serialise function: type not supported"
+function encode_map.string(v)
+    return '"' .. string_gsub(v, '[\0-\31\\"/]', encode_escape_map) .. '"'
 end
-
-local function encode_string(val)
-    return '"' .. string_gsub(val, '[\0-\31\\"/]', encode_escape_map) .. '"'
-end
+local encode_string = encode_map.string
 
 local function convertreal(v)
     local g = string_format('%.16g', v)
@@ -74,75 +74,97 @@ local function convertreal(v)
     return string_format('%.17g', v)
 end
 
-local function encode_number(val)
-    if val ~= val or val <= -Inf or val >= Inf then
-        error("unexpected number value '" .. tostring(val) .. "'")
+function encode_map.number(v)
+    if v ~= v or v <= -Inf or v >= Inf then
+        error("unexpected number value '" .. tostring(v) .. "'")
     end
-    return string_gsub(convertreal(val), ',', '.')
+    return string_gsub(convertreal(v), ',', '.')
 end
 
-local function encode_table(val, mark)
-    local first_val = next(val)
+function encode_map.boolean(v)
+    if v then
+        return "true"
+    else
+        return "false"
+    end
+end
+
+function encode_map.table(t)
+    local first_val = next(t)
     if first_val == nil then
-        if getmetatable(val) == json.object then
+        if getmetatable(t) == json.object then
             return "{}"
         else
             return "[]"
         end
     end
-    mark = mark or {}
-    if mark[val] then
+    if statusMark[t] then
         error("circular reference")
     end
-    mark[val] = true
-    local res = {}
+    statusMark[t] = true
     if type(first_val) == 'string' then
         local key = {}
-        for k in pairs(val) do
+        for k in next, t do
             if type(k) ~= "string" then
                 error("invalid table: mixed or invalid key types")
             end
             key[#key+1] = k
         end
         table_sort(key)
-        for i = 1, #key do
+        statusQue[#statusQue+1] = "{"
+        local k = key[1]
+        statusQue[#statusQue+1] = encode_string(k)
+        statusQue[#statusQue+1] = ":"
+        encode(t[k])
+        for i = 2, #key do
             local k = key[i]
-            res[i] = encode_string(k) .. ":" .. encode(val[k], mark)
+            statusQue[#statusQue+1] = ","
+            statusQue[#statusQue+1] = encode_string(k)
+            statusQue[#statusQue+1] = ":"
+            encode(t[k])
         end
-        mark[val] = nil
-        return "{" .. table_concat(res, ",") .. "}"
+        statusMark[t] = nil
+        return "}"
     else
         local max = 0
-        for k in pairs(val) do
-            if math_type(k) ~= "integer" then
+        for k in next, t do
+            if math_type(k) ~= "integer" or k <= 0 then
                 error("invalid table: mixed or invalid key types")
             end
-            max = max > k and max or k
+            if max < k then
+                max = k
+            end
         end
-        for i = 1, max do
-            res[i] = encode(val[i], mark)
+        statusQue[#statusQue+1] = "["
+        encode(t[1])
+        for i = 2, max do
+            statusQue[#statusQue+1] = ","
+            encode(t[i])
         end
-        mark[val] = nil
-        return "[" .. table_concat(res, ",") .. "]"
+        statusMark[t] = nil
+        return "]"
     end
 end
 
-local encode_map = {
-    [ "nil"      ] = encode_nil,
-    [ "table"    ] = encode_table,
-    [ "string"   ] = encode_string,
-    [ "number"   ] = encode_number,
-    [ "boolean"  ] = tostring,
-    [ "function" ] = encode_null,
-    [ "userdata" ] = function () error("unexpected type 'userdata'") end,
-    [ "thread"   ] = function () error("unexpected type 'thread'") end,
-}
+local function encode_unexpected(v)
+    if v == json.null then
+        return "null"
+    else
+        error("unexpected type '"..type(v).."'")
+    end
+end
+encode_map[ "function" ] = encode_unexpected
+encode_map[ "userdata" ] = encode_unexpected
+encode_map[ "thread"   ] = encode_unexpected
 
-encode = function(val, mark)
-    return encode_map[type(val)](val, mark)
+function json.encode(v)
+    statusMark = {}
+    statusQue = {}
+    encode(v)
+    return table_concat(statusQue)
 end
 
-json.encode = encode
+json.encode_map = encode_map
 
 -- json.decode --
 
@@ -184,6 +206,14 @@ local function next_byte()
     end
     statusPos = #statusBuf + 1
     decode_error("unexpected character '<eol>'")
+end
+
+local function expect_byte(c)
+    local _, pos = string_find(statusBuf, c, statusPos)
+    if not pos then
+        decode_error(string_format("expected '%s'", string_sub(c, #c)))
+    end
+    statusPos = pos
 end
 
 local function decode_unicode_surrogate(s1, s2)
@@ -375,13 +405,9 @@ local function decode_item()
     if statusAry[top] then
         ref[#ref+1] = decode()
     else
-        if next_byte() ~= 34 --[[ '"' ]] then
-            decode_error "expected string for key"
-        end
+        expect_byte '^[ \t\r\n]*"'
         local key = decode_string()
-        if next_byte() ~= 58 --[[ ":" ]] then
-            decode_error "expected ':' after key"
-        end
+        expect_byte '^[ \t\r\n]*:'
         statusPos = statusPos + 1
         ref[key] = decode()
     end
@@ -417,5 +443,8 @@ function json.decode(str)
     end
     return res
 end
+
+-- Generate a lightuserdata
+json.null = debug.upvalueid(decode, 1)
 
 return json

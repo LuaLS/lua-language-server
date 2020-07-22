@@ -5,17 +5,7 @@ local files = require 'files'
 
 local m = {}
 
-function m.mergeResults(a, b)
-    for _, r in ipairs(b) do
-        if not a[r] then
-            a[r] = true
-            a[#a+1] = r
-        end
-    end
-    return a
-end
-
-function m.searchFileReturn(results, ast, source)
+function m.searchFileReturn(results, ast)
     local returns = ast.returns
     for _, ret in ipairs(returns) do
         if ret[1] then
@@ -24,7 +14,7 @@ function m.searchFileReturn(results, ast, source)
     end
 end
 
-function m.require(results, source, args)
+function m.require(results, args)
     local reqName = args[1] and args[1][1]
     if not reqName then
         return
@@ -33,7 +23,7 @@ function m.require(results, source, args)
     for _, uri in ipairs(uris) do
         local ast = files.getAst(uri)
         if ast then
-            m.searchFileReturn(results, ast.ast, source)
+            m.searchFileReturn(results, ast.ast)
         end
     end
 end
@@ -44,7 +34,7 @@ function m.searchDefAcrossRequire(results)
         if func and index == 1 then
             local lib = vm.getLibrary(func)
             if lib and lib.name == 'require' then
-                m.require(results, source, args)
+                m.require(results, args)
             end
         end
     end
@@ -58,7 +48,7 @@ function m.searchLibrary(source, results)
     if not lib then
         return
     end
-    m.mergeResults(results, { lib })
+    vm.mergeResults(results, { lib })
 end
 
 function m.eachDef(source, results)
@@ -68,9 +58,9 @@ function m.eachDef(source, results)
         return results
     end
 
-    local myResults = guide.requestDefinition(source)
+    local myResults = guide.requestDefinition(source, vm.interface)
     m.searchDefAcrossRequire(myResults)
-    m.mergeResults(results, myResults)
+    vm.mergeResults(results, myResults)
     m.searchLibrary(source, results)
     m.searchLibrary(guide.getObjectValue(source), results)
 

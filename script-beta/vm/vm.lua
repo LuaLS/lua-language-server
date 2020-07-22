@@ -6,6 +6,7 @@ local assert       = assert
 local require      = require
 local type         = type
 local running      = coroutine.running
+local ipairs       = ipairs
 
 _ENV = nil
 
@@ -137,6 +138,16 @@ function m.getKeyName(source)
         end
     end
     return guide.getKeyName(source)
+end
+
+function m.mergeResults(a, b)
+    for _, r in ipairs(b) do
+        if not a[r] then
+            a[r] = true
+            a[#a+1] = r
+        end
+    end
+    return a
 end
 
 m.cacheTracker = setmetatable({}, { __mode = 'kv' })

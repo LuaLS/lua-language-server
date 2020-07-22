@@ -10,4 +10,5 @@ require 'vm.eachField'
 require 'vm.eachDef'
 require 'vm.eachRef'
 require 'vm.getCall'
+require 'vm.guideInterface'
 return vm

@@ -1,9 +1,5 @@
-local fs = require 'bee.filesystem'
-local json = require 'json'
-local config = require 'config'
 local rpc = require 'rpc'
 local lang = require 'language'
-local platform = require 'bee.platform'
 
 local command = {}
 
@@ -39,91 +35,7 @@ end
 
 --- @param lsp LSP
 --- @param data table
-function command.config(lsp, data)
-    local def = config.config
-    for _, k in ipairs(data.key) do
-        def = def[k]
-        if not def then
-            return
-        end
-    end
-    if data.action == 'add' then
-        if type(def) ~= 'table' then
-            return
-        end
-    end
-
-    local vscodePath
-    local mode
-    local ws
-    if data.uri then
-        ws = lsp:findWorkspaceFor(data.uri)
-    end
-    if ws then
-        vscodePath = ws.root / '.vscode'
-        mode = 'workspace'
-    else
-        if platform.OS == 'Windows' then
-            vscodePath = fs.path(os.getenv 'USERPROFILE') / 'AppData' / 'Roaming' / 'Code' / 'User'
-        else
-            vscodePath = fs.path(os.getenv 'HOME') / '.vscode-server' / 'data' / 'Machine'
-        end
-        mode = 'user'
-        if not fs.exists(vscodePath) then
-            rpc:notify('window/showMessage', {
-                type = 3,
-                message = lang.script.MWS_UCONFIG_FAILED,
-            })
-            return
-        end
-    end
-
-    local settingBuf = io.load(vscodePath / 'settings.json')
-    if not settingBuf then
-        fs.create_directories(vscodePath)
-    end
-
-    local setting = json.decode(settingBuf or '', true) or {}
-    local key = 'Lua.' .. table.concat(data.key, '.')
-    local attr = setting[key]
-
-    if data.action == 'add' then
-        if attr == nil then
-            attr = {}
-        elseif type(attr) == 'string' then
-            attr = {}
-            for str in attr:gmatch '[^;]+' do
-                attr[#attr+1] = str
-            end
-        elseif type(attr) == 'table' then
-        else
-            return
-        end
-
-        attr[#attr+1] = data.value
-        setting[key] = attr
-    elseif data.action == 'set' then
-        setting[key] = data.value
-    end
-
-    io.save(vscodePath / 'settings.json', json.encode(setting) .. '\r\n')
-
-    if mode == 'workspace' then
-        rpc:notify('window/showMessage', {
-            type = 3,
-            message = lang.script.MWS_WCONFIG_UPDATED,
-        })
-    elseif mode == 'user' then
-        rpc:notify('window/showMessage', {
-            type = 3,
-            message = lang.script.MWS_UCONFIG_UPDATED,
-        })
-    end
-end
-
---- @param lsp LSP
---- @param data table
-function command.removeSpace(lsp, data)
+command['lua.removeSpace'] = function (lsp, data)
     local uri = data.uri
     local vm, lines = lsp:getVM(uri)
     if not vm then
@@ -188,7 +100,7 @@ local literalMap = {
 
 --- @param lsp LSP
 --- @param data table
-function command.solve(lsp, data)
+command['lua.resolve'] = function (lsp, data)
     local uri = data.uri
     local vm, lines = lsp:getVM(uri)
     if not vm then

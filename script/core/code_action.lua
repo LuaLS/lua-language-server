@@ -7,10 +7,10 @@ local function disableDiagnostic(lsp, uri, data, callback)
         kind = 'quickfix',
         command = {
             title = lang.script.COMMAND_DISABLE_DIAG,
-            command = 'config',
+            command = 'lua.config',
             arguments = {
                 {
-                    key    = {'diagnostics', 'disable'},
+                    key    = 'Lua.diagnostics.disable',
                     action = 'add',
                     value  = data.code,
                     uri    = uri,
@@ -26,10 +26,10 @@ local function addGlobal(name, uri, callback)
         kind = 'quickfix',
         command = {
             title = lang.script.COMMAND_MARK_GLOBAL,
-            command = 'config',
+            command = 'lua.config',
             arguments = {
                 {
-                    key    = {'diagnostics', 'globals'},
+                    key    = 'Lua.diagnostics.globals',
                     action = 'add',
                     value  = name,
                     uri    = uri,
@@ -45,10 +45,10 @@ local function changeVersion(version, uri, callback)
         kind = 'quickfix',
         command = {
             title = lang.script.COMMAND_RUNTIME_VERSION,
-            command = 'config',
+            command = 'lua.config',
             arguments = {
                 {
-                    key    = {'runtime', 'version'},
+                    key    = 'Lua.runtime.version',
                     action = 'set',
                     value  = version,
                     uri    = uri,
@@ -64,10 +64,10 @@ local function openCustomLibrary(libName, uri, callback)
         kind = 'quickfix',
         command = {
             title = lang.script.COMMAND_OPEN_LIBRARY,
-            command = 'config',
+            command = 'lua.config',
             arguments = {
                 {
-                    key    = {'runtime', 'library'},
+                    key    = 'Lua.runtime.library',
                     action = 'add',
                     value  = libName,
                     uri    = uri,
@@ -124,7 +124,7 @@ local function solveTrailingSpace(lsp, uri, data, callback)
         kind = 'quickfix',
         command = {
             title = lang.script.COMMAND_REMOVE_SPACE,
-            command = 'removeSpace',
+            command = 'lua.removeSpace',
             arguments = {
                 {
                     uri = uri,
@@ -160,7 +160,7 @@ local function solveAmbiguity1(lsp, uri, data, callback)
         kind = 'quickfix',
         command = {
             title = lang.script.COMMAND_ADD_BRACKETS,
-            command = 'solve',
+            command = 'lua.solve',
             arguments = {
                 {
                     name = 'ambiguity-1',

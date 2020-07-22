@@ -10,16 +10,6 @@ local ipairs       = ipairs
 
 _ENV = nil
 
-local specials = {
-    ['_G']           = true,
-    ['rawset']       = true,
-    ['rawget']       = true,
-    ['setmetatable'] = true,
-    ['require']      = true,
-    ['dofile']       = true,
-    ['loadfile']     = true,
-}
-
 ---@class vm
 local m = {}
 

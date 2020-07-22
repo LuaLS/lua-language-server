@@ -79,10 +79,15 @@ function m.eachDef(source, results)
     return results
 end
 
-function vm.eachDef(source, callback)
+function vm.getDefs(source)
     local cache = vm.cache.eachDef[source] or m.eachDef(source)
     vm.cache.eachDef[source] = cache
-    for i = 1, #cache do
-        callback(cache[i])
+    return cache
+end
+
+function vm.eachDef(source, callback)
+    local results = vm.getDefs(source)
+    for i = 1, #results do
+        callback(results[i])
     end
 end

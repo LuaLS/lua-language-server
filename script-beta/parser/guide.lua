@@ -315,6 +315,7 @@ end
 --- 遍历所有包含offset的source
 function m.eachSourceContain(ast, offset, callback)
     local list = { ast }
+    local mark = {}
     while true do
         local len = #list
         if len == 0 then
@@ -322,14 +323,17 @@ function m.eachSourceContain(ast, offset, callback)
         end
         local obj = list[len]
         list[len] = nil
-        if m.isInRange(obj, offset) then
-            if m.isContain(obj, offset) then
-                local res = callback(obj)
-                if res ~= nil then
-                    return res
+        if not mark[obj] then
+            mark[obj] = true
+            if m.isInRange(obj, offset) then
+                if m.isContain(obj, offset) then
+                    local res = callback(obj)
+                    if res ~= nil then
+                        return res
+                    end
                 end
+                m.addChilds(list, obj, m.childMap)
             end
-            m.addChilds(list, obj, m.childMap)
         end
     end
 end
@@ -338,14 +342,9 @@ end
 function m.eachSourceType(ast, type, callback)
     local cache = ast.typeCache
     if not cache then
-        local mark = {}
         cache = {}
         ast.typeCache = cache
         m.eachSource(ast, function (source)
-            if mark[source] then
-                return
-            end
-            mark[source] = true
             local tp = source.type
             if not tp then
                 return
@@ -370,6 +369,7 @@ end
 --- 遍历所有的source
 function m.eachSource(ast, callback)
     local list = { ast }
+    local mark = {}
     local index = 1
     while true do
         local obj = list[index]
@@ -378,8 +378,11 @@ function m.eachSource(ast, callback)
         end
         list[index] = false
         index = index + 1
-        callback(obj)
-        m.addChilds(list, obj, m.childMap)
+        if not mark[obj] then
+            mark[obj] = true
+            callback(obj)
+            m.addChilds(list, obj, m.childMap)
+        end
     end
 end
 

@@ -9,6 +9,7 @@ local tableInsert = table.insert
 local tableUnpack = table.unpack
 local tableRemove = table.remove
 local tableMove   = table.move
+local pairs       = pairs
 
 _ENV = nil
 
@@ -905,13 +906,19 @@ m.SearchFlag = {
 }
 m.Version = 53
 
-function m.status(parentStatus)
+function m.status(parentStatus, interface)
     local status = {
-        cache   = parentStatus and parentStatus.cache or {},
-        depth   = parentStatus and parentStatus.depth or 0,
-        flag    = m.SearchFlag.ALL,
-        results = {},
+        cache     = parentStatus and parentStatus.cache or {},
+        depth     = parentStatus and parentStatus.depth or 0,
+        interface = parentStatus and parentStatus.interface or {},
+        flag      = m.SearchFlag.ALL,
+        results   = {},
     }
+    if interface then
+        for k, v in pairs(interface) do
+            status.interface[k] = v
+        end
+    end
     return status
 end
 
@@ -992,7 +999,7 @@ function m.checkSameSimpleInValueOfTable(status, value, start, queue)
     end
 end
 
-function m.searchFields(status, obj, key)
+function m.searchFields(status, obj, key, interface)
     if obj.type == 'table' then
         local keyName = key and ('s|' .. key)
         local results = {}
@@ -1004,7 +1011,7 @@ function m.searchFields(status, obj, key)
         end
         return results
     else
-        local newStatus = m.status(status)
+        local newStatus = m.status(status, interface)
         local simple = m.getSimple(obj, 1)
         if not simple then
             return {}
@@ -1197,6 +1204,25 @@ function m.searchSameFieldsCrossMethod(status, ref, start, queue)
     end
 end
 
+function m.checkSameSimpleIncall(status, ref, start, queue)
+    if not status.interface.call then
+        return
+    end
+    local func, args, index = m.getCallValue(ref)
+    if not func then
+        return
+    end
+    local objs = status.interface.call(func, args, index)
+    if objs then
+        for _, obj in ipairs(objs) do
+            queue[#queue+1] = {
+                obj   = obj,
+                start = start,
+            }
+        end
+    end
+end
+
 function m.checkSameSimple(status, simple, data, mode, results, queue)
     local ref   = data.obj
     local start = data.start
@@ -1214,6 +1240,8 @@ function m.checkSameSimple(status, simple, data, mode, results, queue)
         end
         -- 检查形如 a = {} 的分支情况
         m.checkSameSimpleInBranch(status, ref, i, queue)
+        -- 检查形如 a = f() 的分支情况，需要业务层传入 interface.call
+        m.checkSameSimpleIncall(status, ref, i, queue)
         ref = m.getNextRef(ref)
         if not ref then
             return
@@ -1441,8 +1469,8 @@ end
 --- 与 `return function` 形式。
 --- 不穿透 `setmetatable` ，考虑由
 --- 业务层进行反向 def 搜索。
-function m.requestReference(obj)
-    local status = m.status()
+function m.requestReference(obj, interface)
+    local status = m.status(nil, interface)
     -- 根据 field 搜索引用
     m.searchRefs(status, obj, 'ref')
 
@@ -1454,8 +1482,8 @@ end
 --- 请求对象的定义，包括 `a.b.c` 形式
 --- 与 `return function` 形式。
 --- 穿透 `setmetatable` 。
-function m.requestDefinition(obj)
-    local status = m.status()
+function m.requestDefinition(obj, interface)
+    local status = m.status(nil, interface)
     -- 根据 field 搜索定义
     m.searchRefs(status, obj, 'def')
 
@@ -1463,8 +1491,8 @@ function m.requestDefinition(obj)
 end
 
 --- 请求对象的域
-function m.requestFields(obj)
-    return m.searchFields(nil, obj)
+function m.requestFields(obj, interface)
+    return m.searchFields(nil, obj, nil, interface)
 end
 
 return m

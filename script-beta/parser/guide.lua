@@ -1219,6 +1219,7 @@ function m.checkSameSimpleInCall(status, ref, start, queue)
                 obj   = obj,
                 start = start,
                 force = true,
+                call  = true,
             }
         end
     end
@@ -1288,6 +1289,9 @@ function m.checkSameSimple(status, simple, data, mode, results, queue)
                 results[#results+1] = ref
             end
         end
+        if data.call then
+            results[#results+1] = ref
+        end
     else
         if ref.type == 'setfield'
         or ref.type == 'getfield'
@@ -1330,12 +1334,17 @@ function m.searchSameFields(status, simple, mode)
         end
         if first and first.tag ~= '_ENV' then
             m.checkSameSimpleInBranch(status, first, 0, queue)
+            m.checkSameSimpleInCall(status, first, 0, queue)
+            m.checkSameSimpleInGlobal(status, first, 0, queue)
         end
     else
         queue[#queue+1] = {
             obj   = first,
             start = 1,
         }
+        if first then
+            m.checkSameSimpleInCall(status, first, 1, queue)
+        end
     end
     for i = 1, 999 do
         local data = queue[i]

@@ -13,7 +13,11 @@ function m.searchFileReturn(results, ast, index)
                 vm.mergeResults(results, { exp })
             else
                 local newRes = vm.getDefs(exp)
-                vm.mergeResults(results, newRes)
+                if #newRes > 0 then
+                    vm.mergeResults(results, newRes)
+                else
+                    vm.mergeResults(results, { exp })
+                end
             end
         end
     end

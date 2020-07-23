@@ -1,6 +1,7 @@
 local vm    = require 'vm.vm'
 local files = require 'files'
 local ws    = require 'workspace'
+local guide = require 'parser.guide'
 
 local m = {}
 
@@ -29,11 +30,14 @@ function m.require(args, index)
         return nil
     end
     local results = {}
+    local myUri = guide.getRoot(args[1]).uri
     local uris = ws.findUrisByRequirePath(reqName, true)
     for _, uri in ipairs(uris) do
-        local ast = files.getAst(uri)
-        if ast then
-            m.searchFileReturn(results, ast.ast, index)
+        if not files.eq(myUri, uri) then
+            local ast = files.getAst(uri)
+            if ast then
+                m.searchFileReturn(results, ast.ast, index)
+            end
         end
     end
     return results
@@ -45,11 +49,14 @@ function m.dofile(args, index)
         return
     end
     local results = {}
+    local myUri = guide.getRoot(args[1]).uri
     local uris = ws.findUrisByFilePath(reqName, true)
     for _, uri in ipairs(uris) do
-        local ast = files.getAst(uri)
-        if ast then
-            m.searchFileReturn(results, ast.ast, index)
+        if not files.eq(myUri, uri) then
+            local ast = files.getAst(uri)
+            if ast then
+                m.searchFileReturn(results, ast.ast, index)
+            end
         end
     end
     return results

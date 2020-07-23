@@ -65,3 +65,7 @@ function vm.interface.call(func, args, index)
         return m.dofile(args, index)
     end
 end
+
+function vm.interface.global(name)
+    return vm.getGlobals(name)
+end

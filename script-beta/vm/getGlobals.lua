@@ -1,41 +1,45 @@
 local guide = require 'parser.guide'
 local vm    = require 'vm.vm'
+local files = require 'files'
 
-local function getGlobals(root)
-    local env  = guide.getENV(root)
-    if not env then
-        return nil
+local function getGlobalsOfFile(uri)
+    local globals = {}
+    local ast = files.getAst(uri)
+    if not ast then
+        return globals
     end
-    local cache = {}
-    local fields = guide.requestFields(env)
-    for _, src in ipairs(fields) do
-        local name = vm.getKeyName(src)
-        if not name then
-            return
+    local env = guide.getENV(ast.ast)
+    local results = guide.requestFields(env)
+    for _, res in ipairs(results) do
+        local name = guide.getName(res)
+        if not globals[name] then
+            globals[name] = {}
         end
-        if not cache[name] then
-            cache[name] = {
-                key  = name,
-            }
-        end
-        cache[name][#cache[name]+1] = src
-        vm.cache.getGlobal[src] = name
+        globals[name][#globals[name]+1] = res
     end
-    return cache
+    return globals
 end
 
-function vm.getGlobals(source)
-    source = guide.getRoot(source)
-    local cache = vm.cache.getGlobals[source]
+local function getGlobals(name)
+    local results = {}
+    for uri in files:eachFile() do
+        local cache = files.getCache(uri)
+        cache.globals = cache.globals or getGlobalsOfFile(uri)
+        if cache.globals[name] then
+            for _, source in ipairs(cache.globals[name]) do
+                results[#results+1] = source
+            end
+        end
+    end
+    return results
+end
+
+function vm.getGlobals(name)
+    local cache = vm.cache.getGlobals[name]
     if cache ~= nil then
         return cache
     end
-    local unlock = vm.lock('getGlobals', source)
-    if not unlock then
-        return nil
-    end
-    cache = getGlobals(source) or false
-    vm.cache.getGlobals[source] = cache
-    unlock()
+    cache = getGlobals(name)
+    vm.cache.getGlobals[name] = cache
     return cache
 end

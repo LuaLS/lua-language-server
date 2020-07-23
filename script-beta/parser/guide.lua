@@ -1204,7 +1204,7 @@ function m.searchSameFieldsCrossMethod(status, ref, start, queue)
     end
 end
 
-function m.checkSameSimpleIncall(status, ref, start, queue)
+function m.checkSameSimpleInCall(status, ref, start, queue)
     if not status.interface.call then
         return
     end
@@ -1213,6 +1213,26 @@ function m.checkSameSimpleIncall(status, ref, start, queue)
         return
     end
     local objs = status.interface.call(func, args, index)
+    if objs then
+        for _, obj in ipairs(objs) do
+            queue[#queue+1] = {
+                obj   = obj,
+                start = start,
+                force = true,
+            }
+        end
+    end
+end
+
+function m.checkSameSimpleInGlobal(status, ref, start, queue)
+    if not status.interface.global then
+        return
+    end
+    if ref.type ~= 'setglobal' and ref.type ~= 'getglobal' then
+        return
+    end
+    local globalName = ref[1]
+    local objs = status.interface.global(globalName)
     if objs then
         for _, obj in ipairs(objs) do
             queue[#queue+1] = {
@@ -1242,7 +1262,9 @@ function m.checkSameSimple(status, simple, data, mode, results, queue)
         -- 检查形如 a = {} 的分支情况
         m.checkSameSimpleInBranch(status, ref, i, queue)
         -- 检查形如 a = f() 的分支情况，需要业务层传入 interface.call
-        m.checkSameSimpleIncall(status, ref, i, queue)
+        m.checkSameSimpleInCall(status, ref, i, queue)
+        -- 检查全局变量的分支情况，需要业务层传入 interface.global
+        m.checkSameSimpleInGlobal(status, ref, i, queue)
         ref = m.getNextRef(ref)
         if not ref then
             return

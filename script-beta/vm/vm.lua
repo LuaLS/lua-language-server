@@ -152,14 +152,9 @@ function m.refreshCache()
         eachDef     = {},
         eachField   = {},
         eachMeta    = {},
-        getGlobals  = {},
-        getLinks    = {},
-        getGlobal   = {},
-        specialName = {},
         getLibrary  = {},
         getValue    = {},
-        getMeta     = {},
-        specials    = nil,
+        getGlobals  = {},
     }
     m.locked = setmetatable({}, { __mode = 'k' })
     m.cacheTracker[m.cache] = true

@@ -71,38 +71,14 @@ function m.setText(uri, text)
     if file.text == text then
         return
     end
-    file.text = text
+    file.text  = text
     file.lines = nil
+    file.cache = {}
     m.globalVersion = m.globalVersion + 1
     if not m.needRefreshUri then
         m.needRefreshUri = {}
     end
     m.needRefreshUri[file] = true
-end
-
---- 刷新缓存
----|必须在自动完成请求后执行，否则会影响自动完成的响应速度
-function m.refresh()
-    local refreshed = m.needRefreshUri
-    if not refreshed then
-        return
-    end
-
-    local diagnostic = require 'provider.diagnostic'
-    log.debug('Refresh cache.')
-    m.needRefreshUri = nil
-    local lastFile
-    for file in pairs(refreshed) do
-        lastFile = file
-        file.vm = nil
-        file.ast = nil
-        file.globals = nil
-        file.links = nil
-    end
-    vm.refreshCache()
-
-    diagnostic.refresh(lastFile.uri)
-    return true
 end
 
 --- 监听编译完成
@@ -148,10 +124,6 @@ function m.remove(uri)
 
     m.globalVersion = m.globalVersion + 1
     vm.refreshCache()
-
-    local diagnostic = require 'provider.diagnostic'
-    diagnostic.refresh(file.uri)
-    diagnostic.clear(file.uri)
 end
 
 --- 移除所有文件
@@ -249,53 +221,16 @@ function m.getOriginUri(uri)
     return file.uri
 end
 
---- 寻找全局变量
-function m.findGlobals(name)
-    local uris = {}
-    for uri, file in pairs(m.fileMap) do
-        if not file.globals then
-            file.globals = {}
-            local ast = m.getAst(uri)
-            if ast then
-                local globals = vm.getGlobals(ast.ast)
-                if globals then
-                    for name in pairs(globals) do
-                        file.globals[name] = true
-                    end
-                end
-            end
-        end
-        if file.globals[name] then
-            uris[#uris+1] = file.uri
-        end
-    end
-    return uris
-end
-
---- 寻找link自己的其他文件
-function m.findLinkTo(uri)
+--- 获取文件的自定义缓存信息（在文件内容更新后自动失效）
+function m.getCache(uri)
     if platform.OS == 'Windows' then
         uri = uri:lower()
     end
-    local result = {}
-    for _, file in pairs(m.fileMap) do
-        if file.links == nil then
-            local ast = m.getAst(file.uri)
-            if ast then
-                file.links = vm.getLinks(ast.ast)
-            else
-                file.links = false
-            end
-        end
-        if file.links then
-            for linkUri in pairs(file.links) do
-                if m.eq(uri, linkUri) then
-                    result[#result+1] = file.uri
-                end
-            end
-        end
+    local file = m.fileMap[uri]
+    if not file then
+        return nil
     end
-    return result
+    return file.cache
 end
 
 --- 判断文件名相等

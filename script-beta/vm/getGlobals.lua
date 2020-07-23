@@ -11,7 +11,7 @@ local function getGlobalsOfFile(uri)
     local env = guide.getENV(ast.ast)
     local results = guide.requestFields(env)
     for _, res in ipairs(results) do
-        local name = guide.getName(res)
+        local name = guide.getSimpleName(res)
         if not globals[name] then
             globals[name] = {}
         end

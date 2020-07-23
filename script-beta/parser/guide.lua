@@ -1225,15 +1225,11 @@ function m.checkSameSimpleInCall(status, ref, start, queue)
     end
 end
 
-function m.checkSameSimpleInGlobal(status, ref, start, queue)
+function m.checkSameSimpleInGlobal(status, name, start, queue)
     if not status.interface.global then
         return
     end
-    if ref.type ~= 'setglobal' and ref.type ~= 'getglobal' then
-        return
-    end
-    local globalName = ref[1]
-    local objs = status.interface.global(globalName)
+    local objs = status.interface.global(name)
     if objs then
         for _, obj in ipairs(objs) do
             queue[#queue+1] = {
@@ -1264,8 +1260,6 @@ function m.checkSameSimple(status, simple, data, mode, results, queue)
         m.checkSameSimpleInBranch(status, ref, i, queue)
         -- 检查形如 a = f() 的分支情况，需要业务层传入 interface.call
         m.checkSameSimpleInCall(status, ref, i, queue)
-        -- 检查全局变量的分支情况，需要业务层传入 interface.global
-        m.checkSameSimpleInGlobal(status, ref, i, queue)
         ref = m.getNextRef(ref)
         if not ref then
             return
@@ -1332,10 +1326,14 @@ function m.searchSameFields(status, simple, mode)
                 data.obj = nxt
             end
         end
-        if first and first.tag ~= '_ENV' then
-            m.checkSameSimpleInBranch(status, first, 0, queue)
-            m.checkSameSimpleInCall(status, first, 0, queue)
-            m.checkSameSimpleInGlobal(status, first, 0, queue)
+        if first then
+            if first.tag == '_ENV' then
+                -- 检查全局变量的分支情况，需要业务层传入 interface.global
+                m.checkSameSimpleInGlobal(status, simple[1], 1, queue)
+            else
+                -- local _ENV 的情况
+                m.checkSameSimpleInBranch(status, first, 0, queue)
+            end
         end
     else
         queue[#queue+1] = {

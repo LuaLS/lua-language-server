@@ -1017,7 +1017,7 @@ function m.searchFields(status, obj, key, interface)
             return {}
         end
         simple[#simple+1] = key and ('s|' .. key) or '*'
-        m.searchSameFields(newStatus, simple, 'ref')
+        m.searchSameFields(newStatus, simple, 'field')
         local results = newStatus.results
         m.cleanResults(results)
         return results
@@ -1241,6 +1241,18 @@ function m.checkSameSimpleInGlobal(status, name, start, queue)
     end
 end
 
+function m.searchSameFieldsInValue(status, ref, start, queue)
+    local value = m.getObjectValue(ref)
+    if not value then
+        return
+    end
+    queue[#queue+1] = {
+        obj   = value,
+        start = start,
+        force = true,
+    }
+end
+
 function m.checkSameSimple(status, simple, data, mode, results, queue)
     local ref   = data.obj
     local start = data.start
@@ -1253,6 +1265,8 @@ function m.checkSameSimple(status, simple, data, mode, results, queue)
         force = false
         -- 穿透 self:func 与 mt:func
         m.searchSameFieldsCrossMethod(status, ref, i, queue)
+        -- 穿透赋值
+        m.searchSameFieldsInValue(status, ref, i, queue)
         if i == #simple then
             break
         end
@@ -1286,7 +1300,7 @@ function m.checkSameSimple(status, simple, data, mode, results, queue)
         if data.call then
             results[#results+1] = ref
         end
-    else
+    elseif mode == 'ref' then
         if ref.type == 'setfield'
         or ref.type == 'getfield'
         or ref.type == 'tablefield' then
@@ -1298,8 +1312,46 @@ function m.checkSameSimple(status, simple, data, mode, results, queue)
         or     ref.type == 'getindex'
         or     ref.type == 'tableindex' then
             results[#results+1] = ref.index
-        else
+        elseif ref.type == 'setglobal'
+        or     ref.type == 'getglobal'
+        or     ref.type == 'local'
+        or     ref.type == 'setlocal'
+        or     ref.type == 'getlocal' then
             results[#results+1] = ref
+        elseif ref.type == 'function' then
+            results[#results+1] = ref
+        elseif ref.type == 'call' then
+            if ref.node.special == 'rawset'
+            or ref.node.special == 'rawget' then
+                results[#results+1] = ref
+            end
+        end
+        if data.call then
+            results[#results+1] = ref
+        end
+    elseif mode == 'field' then
+        if ref.type == 'setfield'
+        or ref.type == 'getfield'
+        or ref.type == 'tablefield' then
+            results[#results+1] = ref.field
+        elseif ref.type == 'setmethod'
+        or     ref.type == 'getmethod' then
+            results[#results+1] = ref.method
+        elseif ref.type == 'setindex'
+        or     ref.type == 'getindex'
+        or     ref.type == 'tableindex' then
+            results[#results+1] = ref.index
+        elseif ref.type == 'setglobal'
+        or     ref.type == 'getglobal'
+        or     ref.type == 'local'
+        or     ref.type == 'setlocal'
+        or     ref.type == 'getlocal' then
+            results[#results+1] = ref
+        elseif ref.type == 'call' then
+            if ref.node.special == 'rawset'
+            or ref.node.special == 'rawget' then
+                results[#results+1] = ref
+            end
         end
     end
 end
@@ -1344,12 +1396,16 @@ function m.searchSameFields(status, simple, mode)
             m.checkSameSimpleInCall(status, first, 1, queue)
         end
     end
+    local mark = {}
     for i = 1, 999 do
         local data = queue[i]
         if not data then
             return
         end
-        m.checkSameSimple(status, simple, data, mode, status.results, queue)
+        if not mark[data.obj] then
+            mark[data.obj] = true
+            m.checkSameSimple(status, simple, data, mode, status.results, queue)
+        end
     end
 end
 

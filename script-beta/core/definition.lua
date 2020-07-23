@@ -4,6 +4,24 @@ local files      = require 'files'
 local vm         = require 'vm'
 local findSource = require 'core.find-source'
 
+local function sortResults(results)
+    -- 先按照顺序排序
+    table.sort(results, function (a, b)
+        return a.target.start < b.target.start
+    end)
+    -- 如果2个结果处于嵌套状态，则取范围小的那个
+    local lf
+    for i = #results, 1, -1 do
+        local res = results[i].target
+        local f = res.finish
+        if lf and f > lf then
+            table.remove(results, i)
+        else
+            lf = f
+        end
+    end
+end
+
 local accept = {
     ['local']       = true,
     ['setlocal']    = true,
@@ -97,5 +115,8 @@ return function (uri, offset)
     if #results == 0 then
         return nil
     end
+
+    sortResults(results)
+
     return results
 end

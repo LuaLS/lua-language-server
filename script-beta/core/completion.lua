@@ -179,6 +179,10 @@ local function buildFunction(results, source, oop, data)
 end
 
 local function isSameSource(source, pos)
+    if source.type == 'field'
+    or source.type == 'method' then
+        source = source.parent
+    end
     return source.start <= pos and source.finish >= pos
 end
 

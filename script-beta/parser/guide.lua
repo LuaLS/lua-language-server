@@ -1017,7 +1017,7 @@ function m.searchFields(status, obj, key, interface)
             return {}
         end
         simple[#simple+1] = key and ('s|' .. key) or '*'
-        m.searchSameFields(newStatus, simple, 'def')
+        m.searchSameFields(newStatus, simple, 'ref')
         local results = newStatus.results
         m.cleanResults(results)
         return results

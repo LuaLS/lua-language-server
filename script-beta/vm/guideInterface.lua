@@ -13,7 +13,7 @@ function m.searchFileReturn(results, ast, index)
             if exp.type == 'table' then
                 vm.mergeResults(results, { exp })
             else
-                local newRes = vm.getDefs(exp)
+                local newRes = vm.getRefs(exp)
                 if #newRes > 0 then
                     vm.mergeResults(results, newRes)
                 else

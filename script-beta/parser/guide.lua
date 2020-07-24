@@ -943,15 +943,24 @@ end
 
 -- 根据函数调用的返回值，获取：调用的函数，参数列表，自己是第几个返回值
 function m.getCallValue(source)
-    local value = source.value
-    if not value or value.type ~= 'select' then
+    local value = m.getObjectValue(source)
+    if not value then
         return
     end
-    local call = value.vararg
-    if call.type ~= 'call' then
+    local call, index
+    if value.type == 'call' then
+        call  = value
+        index = 1
+    elseif value.type == 'select' then
+        call  = value.vararg
+        index = value.index
+        if call.type ~= 'call' then
+            return
+        end
+    else
         return
     end
-    return call.node, call.args, value.index
+    return call.node, call.args, index
 end
 
 function m.getNextRef(ref)
@@ -1266,13 +1275,13 @@ function m.checkSameSimple(status, simple, data, mode, results, queue)
         m.searchSameFieldsCrossMethod(status, ref, i, queue)
         -- 穿透赋值
         m.searchSameFieldsInValue(status, ref, i, queue)
+        -- 检查形如 a = f() 的分支情况，需要业务层传入 interface.call
+        m.checkSameSimpleInCall(status, ref, i, queue)
         if i == #simple then
             break
         end
         -- 检查形如 a = {} 的分支情况
         m.checkSameSimpleInBranch(status, ref, i, queue)
-        -- 检查形如 a = f() 的分支情况，需要业务层传入 interface.call
-        m.checkSameSimpleInCall(status, ref, i, queue)
         ref = m.getNextRef(ref)
         if not ref then
             return
@@ -1375,7 +1384,6 @@ function m.searchSameFields(status, simple, mode)
         if status.lock[data.obj] then
             mark[data.obj] = true
         end
-        status.lock[data.obj] = true
     end
     for i = 1, #queue do
         local data = queue[i]

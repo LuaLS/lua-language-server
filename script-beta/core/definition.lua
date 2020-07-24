@@ -7,16 +7,24 @@ local findSource = require 'core.find-source'
 local function sortResults(results)
     -- 先按照顺序排序
     table.sort(results, function (a, b)
-        return a.target.start < b.target.start
+        local u1 = guide.getRoot(a).uri
+        local u2 = guide.getRoot(b).uri
+        if u1 == u2 then
+            return a.target.start < b.target.start
+        else
+            return u1 < u2
+        end
     end)
     -- 如果2个结果处于嵌套状态，则取范围小的那个
-    local lf
+    local lf, lu
     for i = #results, 1, -1 do
         local res = results[i].target
-        local f = res.finish
-        if lf and f > lf then
+        local f   = res.finish
+        local uri = guide.getRoot(res).uri
+        if lf and f > lf and uri == lu then
             table.remove(results, i)
         else
+            lu = uri
             lf = f
         end
     end

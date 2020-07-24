@@ -1,27 +1,30 @@
 local vm    = require 'vm.vm'
 local guide = require 'parser.guide'
 
-local function eachRef(source)
-    local results = guide.requestReference(source)
+local function eachRef(source, results)
+    results = results or {}
+    local lock = vm.lock('eachDef', source)
+    if not lock then
+        return results
+    end
+
+    local myResults = guide.requestReference(source)
+    vm.mergeResults(results, myResults)
+
+    lock()
+
     return results
 end
 
+function vm.getRefs(source)
+    local cache = vm.cache.eachRef[source] or eachRef(source)
+    vm.cache.eachDef[source] = cache
+    return cache
+end
+
 function vm.eachRef(source, callback)
-    local cache = vm.cache.eachRef[source]
-    if cache ~= nil then
-        for i = 1, #cache do
-            callback(cache[i])
-        end
-        return
-    end
-    local unlock = vm.lock('eachRef', source)
-    if not unlock then
-        return
-    end
-    cache = eachRef(source) or false
-    vm.cache.eachRef[source] = cache
-    unlock()
-    for i = 1, #cache do
-        callback(cache[i])
+    local results = vm.getRefs(source)
+    for i = 1, #results do
+        callback(results[i])
     end
 end

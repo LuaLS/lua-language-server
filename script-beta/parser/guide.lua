@@ -899,19 +899,14 @@ function m.getSimple(obj, max)
     return simpleList
 end
 
-m.SearchFlag = {
-    STEP   = 1 << 0,
-    SIMPLE = 1 << 1,
-    ALL    = 0xffff,
-}
 m.Version = 53
 
 function m.status(parentStatus, interface)
     local status = {
-        cache     = parentStatus and parentStatus.cache or {},
-        depth     = parentStatus and parentStatus.depth or 0,
+        cache     = parentStatus and parentStatus.cache     or {},
+        depth     = parentStatus and parentStatus.depth     or 0,
         interface = parentStatus and parentStatus.interface or {},
-        flag      = m.SearchFlag.ALL,
+        lock      = parentStatus and parentStatus.lock      or {},
         results   = {},
     }
     if interface then
@@ -1246,11 +1241,15 @@ function m.searchSameFieldsInValue(status, ref, start, queue)
     if not value then
         return
     end
-    queue[#queue+1] = {
-        obj   = value,
-        start = start,
-        force = true,
-    }
+    local newStatus = m.status(status)
+    m.searchRefs(newStatus, value, 'def')
+    for _, res in ipairs(newStatus.results) do
+        queue[#queue+1] = {
+            obj   = res,
+            start = start,
+            force = true,
+        }
+    end
 end
 
 function m.checkSameSimple(status, simple, data, mode, results, queue)
@@ -1397,12 +1396,21 @@ function m.searchSameFields(status, simple, mode)
         end
     end
     local mark = {}
+    for i = 1, #queue do
+        local data = queue[i]
+        if status.lock[data.obj] then
+            mark[data.obj] = true
+        else
+            mark[data.obj] = false
+        end
+    end
     for i = 1, 999 do
         local data = queue[i]
         if not data then
             return
         end
         if not mark[data.obj] then
+            status.lock[data.obj] = true
             mark[data.obj] = true
             m.checkSameSimple(status, simple, data, mode, status.results, queue)
         end
@@ -1521,24 +1529,20 @@ function m.searchRefs(status, obj, mode)
     status.depth = status.depth + 1
 
     -- 检查单步引用
-    if status.flag & m.SearchFlag.STEP ~= 0 then
-        local res = m.getStepRef(obj, mode)
-        if res then
-            for i = 1, #res do
-                status.results[#status.results+1] = res[i]
-            end
+    local res = m.getStepRef(obj, mode)
+    if res then
+        for i = 1, #res do
+            status.results[#status.results+1] = res[i]
         end
     end
     -- 检查simple
-    if status.flag & m.SearchFlag.SIMPLE ~= 0 then
-        if status.depth <= 10 then
-            local simple = m.getSimple(obj)
-            if simple then
-                m.searchSameFields(status, simple, mode)
-            end
-        elseif m.debugMode then
-            error('stack overflow')
+    if status.depth <= 10 then
+        local simple = m.getSimple(obj)
+        if simple then
+            m.searchSameFields(status, simple, mode)
         end
+    elseif m.debugMode then
+        error('stack overflow')
     end
 
     status.depth = status.depth - 1

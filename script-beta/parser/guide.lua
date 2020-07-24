@@ -909,14 +909,9 @@ function m.status(parentStatus, interface)
         lock      = parentStatus and parentStatus.lock      or {},
         results   = {},
     }
-    --if parentStatus then
-    --    for obj in pairs(parentStatus.lock) do
-    --        status.lock[obj] = true
-    --    end
-    --end
     if interface then
         for k, v in pairs(interface) do
-            status.interface[k] = v
+            status.interface[k] = interface[k] or v
         end
     end
     return status

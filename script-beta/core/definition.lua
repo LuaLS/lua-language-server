@@ -105,6 +105,7 @@ return function (uri, offset)
     end
 
     vm.eachDef(source, function (src)
+        src = src.field or src.method or src.index or src
         results[#results+1] = {
             target = src,
             uri    = guide.getRoot(src).uri,

@@ -909,6 +909,11 @@ function m.status(parentStatus, interface)
         lock      = parentStatus and parentStatus.lock      or {},
         results   = {},
     }
+    --if parentStatus then
+    --    for obj in pairs(parentStatus.lock) do
+    --        status.lock[obj] = true
+    --    end
+    --end
     if interface then
         for k, v in pairs(interface) do
             status.interface[k] = v
@@ -1285,12 +1290,12 @@ function m.checkSameSimple(status, simple, data, mode, results, queue)
             results[#results+1] = ref
         elseif ref.type == 'setfield'
         or     ref.type == 'tablefield' then
-            results[#results+1] = ref.field
+            results[#results+1] = ref
         elseif ref.type == 'setmethod' then
-            results[#results+1] = ref.method
+            results[#results+1] = ref
         elseif ref.type == 'setindex'
         or     ref.type == 'tableindex' then
-            results[#results+1] = ref.index
+            results[#results+1] = ref
         elseif ref.type == 'call' then
             if ref.node.special == 'rawset' then
                 results[#results+1] = ref
@@ -1303,14 +1308,14 @@ function m.checkSameSimple(status, simple, data, mode, results, queue)
         if ref.type == 'setfield'
         or ref.type == 'getfield'
         or ref.type == 'tablefield' then
-            results[#results+1] = ref.field
+            results[#results+1] = ref
         elseif ref.type == 'setmethod'
         or     ref.type == 'getmethod' then
-            results[#results+1] = ref.method
+            results[#results+1] = ref
         elseif ref.type == 'setindex'
         or     ref.type == 'getindex'
         or     ref.type == 'tableindex' then
-            results[#results+1] = ref.index
+            results[#results+1] = ref
         elseif ref.type == 'setglobal'
         or     ref.type == 'getglobal'
         or     ref.type == 'local'
@@ -1332,14 +1337,14 @@ function m.checkSameSimple(status, simple, data, mode, results, queue)
         if ref.type == 'setfield'
         or ref.type == 'getfield'
         or ref.type == 'tablefield' then
-            results[#results+1] = ref.field
+            results[#results+1] = ref
         elseif ref.type == 'setmethod'
         or     ref.type == 'getmethod' then
-            results[#results+1] = ref.method
+            results[#results+1] = ref
         elseif ref.type == 'setindex'
         or     ref.type == 'getindex'
         or     ref.type == 'tableindex' then
-            results[#results+1] = ref.index
+            results[#results+1] = ref
         elseif ref.type == 'setglobal'
         or     ref.type == 'getglobal'
         or     ref.type == 'local'
@@ -1368,6 +1373,20 @@ function m.searchSameFields(status, simple, mode)
             }
         end
     end
+    -- 防止无限递归
+    local mark = {}
+    for i = 1, #queue do
+        local data = queue[i]
+        if status.lock[data.obj] then
+            mark[data.obj] = true
+        end
+        status.lock[data.obj] = true
+    end
+    for i = 1, #queue do
+        local data = queue[i]
+        status.lock[data.obj] = true
+    end
+    -- 对初始对象进行预处理
     if simple.global then
         for i = 1, #queue do
             local data = queue[i]
@@ -1393,15 +1412,6 @@ function m.searchSameFields(status, simple, mode)
         }
         if first then
             m.checkSameSimpleInCall(status, first, 1, queue)
-        end
-    end
-    local mark = {}
-    for i = 1, #queue do
-        local data = queue[i]
-        if status.lock[data.obj] then
-            mark[data.obj] = true
-        else
-            mark[data.obj] = false
         end
     end
     for i = 1, 999 do

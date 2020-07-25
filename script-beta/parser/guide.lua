@@ -1230,6 +1230,9 @@ function m.checkSameSimpleInCall(status, ref, start, queue)
 end
 
 function m.checkSameSimpleInGlobal(status, name, start, queue)
+    if not name then
+        return
+    end
     if not status.interface.global then
         return
     end

@@ -10,7 +10,6 @@ local util   = require 'utility'
 local m = {}
 m._start = false
 m.cache = {}
-m.lastSynaxErrors = {}
 
 local function concat(t, sep)
     if type(t) ~= 'table' then
@@ -106,7 +105,6 @@ local function merge(a, b)
 end
 
 function m.clear(uri)
-    m.lastSynaxErrors[uri] = nil
     if not m.cache[uri] then
         return
     end
@@ -131,8 +129,8 @@ function m.syntaxErrors(uri, ast)
     return results
 end
 
-function m.diagnostics(uri, syntaxOnly)
-    if syntaxOnly or not m._start then
+function m.diagnostics(uri)
+    if not m._start then
         return m.cache[uri]
     end
 
@@ -149,7 +147,7 @@ function m.diagnostics(uri, syntaxOnly)
     return results
 end
 
-function m.doDiagnostic(uri, main, syntaxOnly)
+function m.doDiagnostic(uri)
     local ast = files.getAst(uri)
     if not ast then
         m.clear(uri)
@@ -157,7 +155,7 @@ function m.doDiagnostic(uri, main, syntaxOnly)
     end
 
     local syntax = m.syntaxErrors(uri, ast)
-    local diagnostics = m.diagnostics(uri, syntaxOnly)
+    local diagnostics = m.diagnostics(uri)
     local full = merge(syntax, diagnostics)
     if not full then
         m.clear(uri)
@@ -168,14 +166,6 @@ function m.doDiagnostic(uri, main, syntaxOnly)
         return
     end
     m.cache[uri] = full
-    if main
-    and syntaxOnly
-    and (syntax and #syntax or 0) > (m.lastSynaxErrors[uri] or 0) then
-        await.sleep(2, function ()
-            return files.globalVersion
-        end)
-    end
-    m.lastSynaxErrors[uri] = syntax and #syntax or 0
 
     proto.notify('textDocument/publishDiagnostics', {
         uri = uri,
@@ -214,9 +204,23 @@ function m.refresh(uri)
     end)
 end
 
+function m.diagnosticsAll()
+    for uri in files.eachFile() do
+        m.doDiagnostic(uri)
+    end
+end
+
 function m.start()
     m._start = true
-    m.refresh()
+    m.diagnosticsAll()
 end
+
+files.watch(function (env, uri)
+    if env == 'remove' then
+        m.clear(uri)
+    elseif env == 'update' then
+        m.doDiagnostic(uri)
+    end
+end)
 
 return m

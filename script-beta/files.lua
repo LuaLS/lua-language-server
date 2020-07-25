@@ -10,6 +10,7 @@ local m = {}
 
 m.openMap = {}
 m.fileMap = {}
+m.watchList = {}
 m.notifyCache = {}
 m.assocVersion = -1
 m.assocMatcher = nil
@@ -18,19 +19,23 @@ m.globalVersion = 0
 --- 打开文件
 ---@param uri string
 function m.open(uri)
+    local originUri = uri
     if platform.OS == 'Windows' then
         uri = uri:lower()
     end
     m.openMap[uri] = true
+    m.onWatch('open', originUri)
 end
 
 --- 关闭文件
 ---@param uri string
 function m.close(uri)
+    local originUri = uri
     if platform.OS == 'Windows' then
         uri = uri:lower()
     end
     m.openMap[uri] = nil
+    m.onWatch('close', originUri)
 end
 
 --- 是否打开
@@ -70,24 +75,11 @@ function m.setText(uri, text)
         return
     end
     file.text  = text
+    file.ast   = nil
     file.lines = nil
     file.cache = {}
     m.globalVersion = m.globalVersion + 1
-end
-
---- 监听编译完成
-function m.onCompiled(uri, callback)
-    if platform.OS == 'Windows' then
-        uri = uri:lower()
-    end
-    local file = m.fileMap[uri]
-    if not file then
-        return
-    end
-    if not file.onCompiledList then
-        file.onCompiledList = {}
-    end
-    file.onCompiledList[#file.onCompiledList+1] = callback
+    m.onWatch('update', originUri)
 end
 
 --- 获取文件文本
@@ -107,6 +99,7 @@ end
 --- 移除文件
 ---@param uri string
 function m.remove(uri)
+    local originUri = uri
     if platform.OS == 'Windows' then
         uri = uri:lower()
     end
@@ -117,14 +110,16 @@ function m.remove(uri)
     m.fileMap[uri] = nil
 
     m.globalVersion = m.globalVersion + 1
+    m.onWatch('remove', originUri)
 end
 
 --- 移除所有文件
 function m.removeAll()
+    m.globalVersion = m.globalVersion + 1
     for uri in pairs(m.fileMap) do
         m.fileMap[uri] = nil
+        m.onWatch('remove', uri)
     end
-    m.globalVersion = m.globalVersion + 1
     m.notifyCache = {}
 end
 
@@ -213,6 +208,13 @@ function m.getOriginUri(uri)
     return file.uri
 end
 
+function m.getUri(uri)
+    if platform.OS == 'Windows' then
+        uri = uri:lower()
+    end
+    return uri
+end
+
 --- 获取文件的自定义缓存信息（在文件内容更新后自动失效）
 function m.getCache(uri)
     if platform.OS == 'Windows' then
@@ -267,6 +269,17 @@ function m.isLua(uri)
     local matcher = m.getAssoc()
     local path = furi.decode(uri)
     return matcher(path)
+end
+
+--- 注册事件
+function m.watch(callback)
+    m.watchList[#m.watchList+1] = callback
+end
+
+function m.onWatch(ev, ...)
+    for _, callback in ipairs(m.watchList) do
+        callback(ev, ...)
+    end
 end
 
 return m

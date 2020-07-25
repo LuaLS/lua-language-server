@@ -19,7 +19,7 @@ return function (uri, callback)
             return
         end
         if globalCache[key] == nil then
-            local defs = guide.requestDefinition(src)
+            local defs = vm.getDefs(src)
             -- 这里要处理跨文件的情况
             globalCache[key] = #defs > 0
         end

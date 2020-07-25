@@ -12,10 +12,12 @@ local function getGlobalsOfFile(uri)
     local results = guide.requestFields(env)
     for _, res in ipairs(results) do
         local name = guide.getSimpleName(res)
-        if not globals[name] then
-            globals[name] = {}
+        if name then
+            if not globals[name] then
+                globals[name] = {}
+            end
+            globals[name][#globals[name]+1] = res
         end
-        globals[name][#globals[name]+1] = res
     end
     return globals
 end

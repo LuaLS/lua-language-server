@@ -3,8 +3,6 @@ local config   = require 'config'
 local glob     = require 'glob'
 local furi     = require 'file-uri'
 local parser   = require 'parser'
-local vm       = require 'vm.vm'
-local guide    = require 'parser.guide'
 local proto    = require 'proto'
 local lang     = require 'language'
 
@@ -75,10 +73,6 @@ function m.setText(uri, text)
     file.lines = nil
     file.cache = {}
     m.globalVersion = m.globalVersion + 1
-    if not m.needRefreshUri then
-        m.needRefreshUri = {}
-    end
-    m.needRefreshUri[file] = true
 end
 
 --- 监听编译完成
@@ -123,7 +117,6 @@ function m.remove(uri)
     m.fileMap[uri] = nil
 
     m.globalVersion = m.globalVersion + 1
-    vm.refreshCache()
 end
 
 --- 移除所有文件
@@ -133,7 +126,6 @@ function m.removeAll()
     end
     m.globalVersion = m.globalVersion + 1
     m.notifyCache = {}
-    vm.refreshCache()
 end
 
 --- 遍历文件

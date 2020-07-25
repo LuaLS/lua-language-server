@@ -97,7 +97,7 @@ local function getLibrary(source)
 end
 
 function vm.getLibrary(source)
-    local cache = vm.cache.getLibrary[source]
+    local cache = vm.getCache('getLibrary')[source]
     if cache ~= nil then
         return cache
     end
@@ -106,7 +106,7 @@ function vm.getLibrary(source)
         return
     end
     cache = getLibrary(source) or false
-    vm.cache.getLibrary[source] = cache
+    vm.getCache('getLibrary')[source] = cache
     unlock()
     return cache
 end

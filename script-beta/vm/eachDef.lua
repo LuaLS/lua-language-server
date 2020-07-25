@@ -34,8 +34,8 @@ function m.eachDef(source, results)
 end
 
 function vm.getDefs(source)
-    local cache = vm.cache.eachDef[source] or m.eachDef(source)
-    vm.cache.eachDef[source] = cache
+    local cache = vm.getCache('eachDef')[source] or m.eachDef(source)
+    vm.getCache('eachDef')[source] = cache
     return cache
 end
 

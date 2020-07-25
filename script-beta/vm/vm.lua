@@ -1,5 +1,6 @@
 local guide     = require 'parser.guide'
 local util      = require 'utility'
+local files     = require 'files'
 
 local setmetatable = setmetatable
 local assert       = assert
@@ -142,22 +143,20 @@ end
 
 m.cacheTracker = setmetatable({}, { __mode = 'kv' })
 
---- 刷新缓存
-function m.refreshCache()
-    if m.cache then
-        m.cache.dead = true
+function m.getCache(name)
+    if m.cacheVersion ~= files.globalVersion then
+        if m.cache then
+            m.cache.dead = true
+        end
+        m.cacheVersion = files.globalVersion
+        m.cache = {}
+        m.locked = setmetatable({}, { __mode = 'k' })
+        m.cacheTracker[m.cache] = true
     end
-    m.cache = {
-        eachRef     = {},
-        eachDef     = {},
-        eachField   = {},
-        eachMeta    = {},
-        getLibrary  = {},
-        getValue    = {},
-        getGlobals  = {},
-    }
-    m.locked = setmetatable({}, { __mode = 'k' })
-    m.cacheTracker[m.cache] = true
+    if not m.cache[name] then
+        m.cache[name] = {}
+    end
+    return m.cache[name]
 end
 
 return m

@@ -17,8 +17,8 @@ local function eachRef(source, results)
 end
 
 function vm.getRefs(source)
-    local cache = vm.cache.eachRef[source] or eachRef(source)
-    vm.cache.eachDef[source] = cache
+    local cache = vm.getCache('eachRef')[source] or eachRef(source)
+    vm.getCache('eachDef')[source] = cache
     return cache
 end
 

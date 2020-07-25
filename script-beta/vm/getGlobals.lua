@@ -35,11 +35,11 @@ local function getGlobals(name)
 end
 
 function vm.getGlobals(name)
-    local cache = vm.cache.getGlobals[name]
+    local cache = vm.getCache('getGlobals')[name]
     if cache ~= nil then
         return cache
     end
     cache = getGlobals(name)
-    vm.cache.getGlobals[name] = cache
+    vm.getCache('getGlobals')[name] = cache
     return cache
 end

@@ -1017,7 +1017,7 @@ function vm.getValue(source)
     if not source then
         return
     end
-    local cache = vm.cache.getValue[source]
+    local cache = vm.getCache('getValue')[source]
     if cache ~= nil then
         return cache
     end
@@ -1026,7 +1026,7 @@ function vm.getValue(source)
         return
     end
     cache = getValue(source) or false
-    vm.cache.getValue[source] = cache
+    vm.getCache('getValue')[source] = cache
     unlock()
     return cache
 end

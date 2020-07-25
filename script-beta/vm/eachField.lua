@@ -36,7 +36,7 @@ local function eachField(source)
 end
 
 function vm.eachField(source, callback)
-    local cache = vm.cache.eachField[source]
+    local cache = vm.getCache('eachField')[source]
     if cache ~= nil then
         for i = 1, #cache do
             callback(cache[i])
@@ -48,7 +48,7 @@ function vm.eachField(source, callback)
         return
     end
     cache = eachField(source) or false
-    vm.cache.eachField[source] = cache
+    vm.getCache('eachField')[source] = cache
     unlock()
     for i = 1, #cache do
         callback(cache[i])

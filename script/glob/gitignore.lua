@@ -173,7 +173,9 @@ function mt:scan(callback)
                 if type(result) == 'table' then
                     for _, path in ipairs(result) do
                         local filename = path:match '([^/\\]+)[/\\]*$'
-                        if filename then
+                        if  filename
+                        and filename ~= '.'
+                        and filename ~= '..' then
                             list[#list+1] = current .. '/' .. filename
                         end
                     end

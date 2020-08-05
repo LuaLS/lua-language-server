@@ -178,6 +178,7 @@ function m.findUrisByRequirePath(path, whole)
     local results = {}
     local mark = {}
     local input = path:gsub('%.', '/')
+                      :gsub('%%', '%%%%')
     for _, luapath in ipairs(config.config.runtime.path) do
         local part = luapath:gsub('%?', input)
         local uris = m.findUrisByFilePath(part, whole)

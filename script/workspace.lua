@@ -382,6 +382,7 @@ function mt:searchPath(baseUri, str)
         return self.searched[baseUri][str]
     end
     str = str:gsub('%.', '/')
+             :gsub('%%', '%%%%')
     local searchers = {}
     for i, luapath in ipairs(config.config.runtime.path) do
         searchers[i] = luapath:gsub('%?', str)

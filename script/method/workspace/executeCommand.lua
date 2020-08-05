@@ -100,7 +100,7 @@ local literalMap = {
 
 --- @param lsp LSP
 --- @param data table
-command['lua.resolve'] = function (lsp, data)
+command['lua.solve'] = function (lsp, data)
     local uri = data.uri
     local vm, lines = lsp:getVM(uri)
     if not vm then

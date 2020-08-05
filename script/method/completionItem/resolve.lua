@@ -1,4 +1,10 @@
+local config = require 'config'
+
 return function (lsp, item)
+    local context = config.config.completion.displayContext
+    if context <= 0 then
+        return item
+    end
     if not item.data then
         return item
     end
@@ -10,7 +16,7 @@ return function (lsp, item)
     end
     local row = lines:rowcol(offset)
     local firstRow = lines[row]
-    local lastRow = lines[math.min(row + 5, #lines)]
+    local lastRow = lines[math.min(row + context - 1, #lines)]
     local snip = text:sub(firstRow.start, lastRow.finish)
     local document = ([[
 %s

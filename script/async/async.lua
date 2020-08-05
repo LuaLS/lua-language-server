@@ -27,14 +27,14 @@ local errlog   = thread.channel 'errlog'
 local gc       = thread.channel 'gc'
 
 local function task()
-    local dump, arg = request:bpop()
+    local dump, path, arg = request:bpop()
     local env = setmetatable({
         IN  = request,
         OUT = response,
         ERR = errlog,
         GC  = gc,
     }, { __index = _ENV })
-    local f, err = load(dump, '=task', 't', env)
+    local f, err = load(dump, '@'..path, 't', env)
     if not f then
         errlog:push(err .. '\n' .. dump)
         return
@@ -62,7 +62,8 @@ end
 end
 
 local function run(name, arg, callback)
-    local dump = io.load(ROOT / 'script' / 'async' / (name .. '.lua'))
+    local path = ROOT / 'script' / 'async' / (name .. '.lua')
+    local dump = io.load(path)
     if not dump then
         error(('找不到[%s]'):format(name))
     end
@@ -74,7 +75,7 @@ local function run(name, arg, callback)
         task     = task,
         callback = callback,
     }
-    task.request:push(dump, arg)
+    task.request:push(dump, path:string(), arg)
     -- TODO 线程回收后禁止外部再使用通道
     return task.request, task.response
 end

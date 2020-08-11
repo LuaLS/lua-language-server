@@ -925,6 +925,7 @@ function m.copyStatusResults(a, b)
     end
 end
 
+--- 根据函数的调用参数，获取：调用，参数索引
 function m.getCallAndArgIndex(callarg)
     local callargs = callarg.parent
     if not callargs or callargs.type ~= 'callargs' then
@@ -941,7 +942,7 @@ function m.getCallAndArgIndex(callarg)
     return call, index
 end
 
--- 根据函数调用的返回值，获取：调用的函数，参数列表，自己是第几个返回值
+--- 根据函数调用的返回值，获取：调用的函数，参数列表，自己是第几个返回值
 function m.getCallValue(source)
     local value = m.getObjectValue(source)
     if not value then

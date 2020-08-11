@@ -57,6 +57,13 @@ function m.exists(uri)
     return m.fileMap[uri] ~= nil
 end
 
+function m.asKey(uri)
+    if platform.OS == 'Windows' then
+        uri = uri:lower()
+    end
+    return uri
+end
+
 --- 设置文件文本
 ---@param uri string
 ---@param text string

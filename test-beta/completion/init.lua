@@ -1,6 +1,7 @@
 local core  = require 'core.completion'
 local files = require 'files'
 local CompletionItemKind = require 'define.CompletionItemKind'
+local config = require 'config'
 
 local EXISTS = {'EXISTS'}
 
@@ -56,6 +57,9 @@ function TEST(script)
         assert(eq(expect, result))
     end
 end
+
+config.config.completion.callSnippet    = 'Both'
+config.config.completion.keywordSnippet = 'Both'
 
 TEST [[
 local zabcde

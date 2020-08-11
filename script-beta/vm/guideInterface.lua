@@ -7,6 +7,9 @@ local m = {}
 
 function m.searchFileReturn(results, ast, index)
     local returns = ast.returns
+    if not returns then
+        return
+    end
     for _, ret in ipairs(returns) do
         local exp = ret[index]
         if exp then
@@ -79,4 +82,8 @@ end
 
 function vm.interface.global(name)
     return vm.getGlobals(name)
+end
+
+function vm.interface.links(uri)
+    return vm.getLinksTo(uri)
 end

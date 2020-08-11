@@ -1434,37 +1434,10 @@ function m.searchSameFields(status, simple, mode)
     end
 end
 
-function m.searchRefsAsFunctionReturn(status, obj, mode)
-    status.results[#status.results+1] = obj
-    -- 搜索所在函数
-    local currentFunc = m.getParentFunction(obj)
-    if currentFunc.type == 'main' then
-        return
-    end
-    local returns = currentFunc.returns
-    if not returns then
-        return
-    end
-    -- 看看他是第几个返回值
-    local index
-    for i = 1, #returns do
-        local rtn = returns[i]
-        if m.isContain(rtn, obj.start) then
-            for j = 1, #rtn do
-                if obj == rtn[j] then
-                    index = j
-                    goto BREAK
-                end
-            end
-        end
-    end
-    ::BREAK::
-    if not index then
-        return
-    end
+function m.getCallerInSameFile(status, func, index)
     -- 搜索所有所在函数的调用者
     local funcRefs = m.status(status)
-    m.searchRefOfValue(funcRefs, currentFunc)
+    m.searchRefOfValue(funcRefs, func)
 
     if #funcRefs.results == 0 then
         return
@@ -1496,7 +1469,44 @@ function m.searchRefsAsFunctionReturn(status, obj, mode)
             end
         end
     end
+    return selects
+end
+
+function m.searchRefsAsFunctionReturn(status, obj, mode)
+    status.results[#status.results+1] = obj
+    -- 搜索所在函数
+    local currentFunc = m.getParentFunction(obj)
+    local returns = currentFunc.returns
+    if not returns then
+        return
+    end
+    -- 看看他是第几个返回值
+    local index
+    for i = 1, #returns do
+        local rtn = returns[i]
+        if m.isContain(rtn, obj.start) then
+            for j = 1, #rtn do
+                if obj == rtn[j] then
+                    index = j
+                    goto BREAK
+                end
+            end
+        end
+    end
+    ::BREAK::
+    if not index then
+        return
+    end
+    local selects
+    if currentFunc.type == 'main' then
+        selects = m.getCallerCrossFiles(status, currentFunc, index)
+    else
+        selects = m.getCallerInSameFile(status, currentFunc, index)
+    end
     -- 搜索调用者的引用
+    if not selects then
+        return
+    end
     for i = 1, #selects do
         m.searchRefs(status, selects[i])
     end

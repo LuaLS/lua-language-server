@@ -8,7 +8,7 @@ local function eachRef(source, results)
         return results
     end
 
-    local myResults = guide.requestReference(source)
+    local myResults = guide.requestReference(source, vm.interface)
     vm.mergeResults(results, myResults)
 
     lock()

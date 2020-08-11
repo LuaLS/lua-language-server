@@ -1434,7 +1434,7 @@ function m.searchSameFields(status, simple, mode)
     end
 end
 
-function m.getCallerInSameFile(status, func, index)
+function m.getCallerInSameFile(status, func)
     -- 搜索所有所在函数的调用者
     local funcRefs = m.status(status)
     m.searchRefOfValue(funcRefs, func)
@@ -1449,27 +1449,14 @@ function m.getCallerInSameFile(status, func, index)
             calls[#calls+1] = call
         end
     end
-    -- 搜索调用者的返回值
-    if #calls == 0 then
-        return
+    return calls
+end
+
+function  m.getCallerCrossFiles(status, main)
+    if status.interface.link then
+        return status.interface.link(main.uri)
     end
-    local selects = {}
-    for i = 1, #calls do
-        local parent = calls[i].parent
-        if parent.type == 'select' and parent.index == index then
-            selects[#selects+1] = parent.parent
-        end
-        local extParent = calls[i].extParent
-        if extParent then
-            for j = 1, #extParent do
-                local ext = extParent[j]
-                if ext.type == 'select' and ext.index == index then
-                    selects[#selects+1] = ext.parent
-                end
-            end
-        end
-    end
-    return selects
+    return {}
 end
 
 function m.searchRefsAsFunctionReturn(status, obj, mode)
@@ -1497,16 +1484,33 @@ function m.searchRefsAsFunctionReturn(status, obj, mode)
     if not index then
         return
     end
-    local selects
+    local calls
     if currentFunc.type == 'main' then
-        selects = m.getCallerCrossFiles(status, currentFunc, index)
+        calls = m.getCallerCrossFiles(status, currentFunc)
     else
-        selects = m.getCallerInSameFile(status, currentFunc, index)
+        calls = m.getCallerInSameFile(status, currentFunc)
     end
-    -- 搜索调用者的引用
-    if not selects then
+    -- 搜索调用者的返回值
+    if #calls == 0 then
         return
     end
+    local selects = {}
+    for i = 1, #calls do
+        local parent = calls[i].parent
+        if parent.type == 'select' and parent.index == index then
+            selects[#selects+1] = parent.parent
+        end
+        local extParent = calls[i].extParent
+        if extParent then
+            for j = 1, #extParent do
+                local ext = extParent[j]
+                if ext.type == 'select' and ext.index == index then
+                    selects[#selects+1] = ext.parent
+                end
+            end
+        end
+    end
+    -- 搜索调用者的引用
     for i = 1, #selects do
         m.searchRefs(status, selects[i])
     end

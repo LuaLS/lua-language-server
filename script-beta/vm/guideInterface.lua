@@ -84,6 +84,6 @@ function vm.interface.global(name)
     return vm.getGlobals(name)
 end
 
-function vm.interface.links(uri)
+function vm.interface.link(uri)
     return vm.getLinksTo(uri)
 end

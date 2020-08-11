@@ -179,7 +179,7 @@ function m.refresh(uri)
             return files.globalVersion
         end)
         if uri then
-            m.doDiagnostic(uri, true, true)
+            m.doDiagnostic(uri)
         end
         if not m._start then
             return
@@ -189,7 +189,7 @@ function m.refresh(uri)
         end)
         local clock = os.clock()
         if uri then
-            m.doDiagnostic(uri, true, false)
+            m.doDiagnostic(uri)
         end
         for destUri in files.eachFile() do
             if destUri ~= uri then
@@ -219,7 +219,12 @@ files.watch(function (env, uri)
     if env == 'remove' then
         m.clear(uri)
     elseif env == 'update' then
-        m.doDiagnostic(uri)
+        await.create(function ()
+            await.delay(function ()
+                return files.globalVersion
+            end)
+            m.doDiagnostic(uri)
+        end)
     end
 end)
 

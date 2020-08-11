@@ -1,6 +1,7 @@
 local guide = require 'parser.guide'
 local vm    = require 'vm.vm'
 local files = require 'files'
+local ws    = require 'workspace'
 
 local function getFileLinks(uri)
     local links = {}
@@ -13,22 +14,30 @@ local function getFileLinks(uri)
         if not call or call.type ~= 'call' then
             return
         end
+        local args = call.args
+        if type(args[1]) ~= 'string' then
+            return
+        end
+        local uris = ws.findUrisByRequirePath(args[1], true)
+        for _, u in ipairs(uris) do
+            u = files.asKey(u)
+            if not links[u] then
+                links[u] = {}
+            end
+            links[u][#links[u]+1] = call
+        end
     end)
     return links
 end
 
 local function getLinksTo(uri)
+    uri = files.asKey(uri)
     local links = {}
-    local mark = {}
     for u in files.eachFile() do
-        local l = vm.getFileLinks(u)
-        for _, lu in ipairs(l) do
-            if files.eq(uri, lu) then
-                local ku = files.asKey(u)
-                if not mark[ku] then
-                    mark[ku] = true
-                    links[#links+1] = u
-                end
+        local ls = vm.getFileLinks(u)
+        if ls[uri] then
+            for _, l in ipairs(ls[uri]) do
+                links[#links+1] = l
             end
         end
     end

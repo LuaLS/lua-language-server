@@ -128,6 +128,18 @@ local ConfigTemplate = {
         callSnippet     = {'Both', String},
         keywordSnippet  = {'Both', String},
     },
+    signatureHelp = {
+        enable          = {true,      Boolean},
+    },
+    hover = {
+        enable          = {true,      Boolean},
+        viewString      = {true,      Boolean},
+        viewStringMax   = {1000,      Integer},
+        viewNumber      = {true,      Boolean},
+    },
+    color = {
+        mode            = {'Semantic', String},
+    },
     plugin = {
         enable          = {false, Boolean},
         path            = {'.vscode/lua-plugin/*.lua', String},

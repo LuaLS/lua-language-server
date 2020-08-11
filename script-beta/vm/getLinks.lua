@@ -19,3 +19,13 @@ function vm.getLinksTo(uri)
     vm.getCache('getLinksTo')[uri] = cache
     return cache
 end
+
+function vm.getFileLinks(uri)
+    local cache = vm.getCache('getFileLinks')[uri]
+    if cache ~= nil then
+        return cache
+    end
+    cache = getFileLinks(uri)
+    vm.getCache('getFileLinks')[uri] = cache
+    return cache
+end

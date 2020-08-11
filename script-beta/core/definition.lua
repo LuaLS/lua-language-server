@@ -73,6 +73,9 @@ local function checkRequire(source, offset)
 end
 
 local function convertIndex(source)
+    if not source then
+        return
+    end
     if source.type == 'string'
     or source.type == 'boolean'
     or source.type == 'number' then

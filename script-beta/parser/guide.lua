@@ -1215,9 +1215,18 @@ function m.checkSameSimpleInCallInSameFile(status, func, args, index)
     local results = {}
     for _, def in ipairs(newStatus.results) do
         if def.type == 'function' then
-            
+            local returns = def.returns
+            if returns then
+                for _, ret in ipairs(returns) do
+                    local exp = ret[index]
+                    if exp then
+                        results[#results+1] = exp
+                    end
+                end
+            end
         end
     end
+    return results
 end
 
 function m.checkSameSimpleInCall(status, ref, start, queue, mode)
@@ -1229,9 +1238,11 @@ function m.checkSameSimpleInCall(status, ref, start, queue, mode)
         return
     end
     local objs = m.checkSameSimpleInCallInSameFile(status, func, args, index)
-    local objs = status.interface.call(func, args, index)
-    if not objs then
-        return
+    local cobjs = status.interface.call(func, args, index)
+    if cobjs then
+        for _, obj in ipairs(cobjs) do
+            objs[#objs+1] = obj
+        end
     end
     local newStatus = m.status(status)
     for _, obj in ipairs(objs) do

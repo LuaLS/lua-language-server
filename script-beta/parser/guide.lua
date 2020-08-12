@@ -1209,6 +1209,17 @@ function m.searchSameFieldsCrossMethod(status, ref, start, queue)
     end
 end
 
+function m.checkSameSimpleInCallInSameFile(status, func, args, index)
+    local newStatus = m.status(status)
+    m.searchRefs(newStatus, func, 'def')
+    local results = {}
+    for _, def in ipairs(newStatus.results) do
+        if def.type == 'function' then
+            
+        end
+    end
+end
+
 function m.checkSameSimpleInCall(status, ref, start, queue, mode)
     if not status.interface.call then
         return
@@ -1217,6 +1228,7 @@ function m.checkSameSimpleInCall(status, ref, start, queue, mode)
     if not func then
         return
     end
+    local objs = m.checkSameSimpleInCallInSameFile(status, func, args, index)
     local objs = status.interface.call(func, args, index)
     if not objs then
         return

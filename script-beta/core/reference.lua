@@ -1,5 +1,6 @@
 local guide      = require 'parser.guide'
 local files      = require 'files'
+local vm         = require 'vm'
 local findSource = require 'core.find-source'
 
 local function isValidFunction(source, offset)
@@ -56,8 +57,7 @@ return function (uri, offset)
     end
 
     local results = {}
-    local refs = guide.requestReference(source)
-    for _, src in ipairs(refs) do
+    vm.eachRef(source, function (src)
         local root = guide.getRoot(src)
         if     src.type == 'setfield'
         or     src.type == 'getfield'
@@ -75,7 +75,7 @@ return function (uri, offset)
             target = src,
             uri    = files.getOriginUri(root.uri),
         }
-    end
+    end)
 
     if #results == 0 then
         return nil

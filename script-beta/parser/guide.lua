@@ -1230,18 +1230,17 @@ function m.checkSameSimpleInCallInSameFile(status, func, args, index)
 end
 
 function m.checkSameSimpleInCall(status, ref, start, queue, mode)
-    if not status.interface.call then
-        return
-    end
     local func, args, index = m.getCallValue(ref)
     if not func then
         return
     end
     local objs = m.checkSameSimpleInCallInSameFile(status, func, args, index)
-    local cobjs = status.interface.call(func, args, index)
-    if cobjs then
-        for _, obj in ipairs(cobjs) do
-            objs[#objs+1] = obj
+    if status.interface.call then
+        local cobjs = status.interface.call(func, args, index)
+        if cobjs then
+            for _, obj in ipairs(cobjs) do
+                objs[#objs+1] = obj
+            end
         end
     end
     local newStatus = m.status(status)
@@ -1299,6 +1298,22 @@ function m.searchSameFieldsInValue(status, ref, start, queue)
     end
 end
 
+function m.checkSameSimpleAsTableField(status, ref, start, queue)
+    local parent = ref.parent
+    if parent.type ~= 'tablefield' then
+        return
+    end
+    local newStatus = m.status(status)
+    m.searchRefs(newStatus, parent.field, 'ref')
+    for _, res in ipairs(newStatus.results) do
+        queue[#queue+1] = {
+            obj   = res,
+            start = start,
+            force = true,
+        }
+    end
+end
+
 function m.checkSameSimple(status, simple, data, mode, results, queue)
     local ref   = data.obj
     local start = data.start
@@ -1315,6 +1330,10 @@ function m.checkSameSimple(status, simple, data, mode, results, queue)
         m.searchSameFieldsInValue(status, ref, i, queue)
         -- 检查形如 a = f() 的分支情况，需要业务层传入 interface.call
         m.checkSameSimpleInCall(status, ref, i, queue, mode)
+        if i < #simple or mode ~= 'def' then
+            -- 检查形如 { a = f } 的情况
+            m.checkSameSimpleAsTableField(status, ref, i, queue)
+        end
         if i == #simple then
             break
         end
@@ -1417,11 +1436,8 @@ function m.searchSameFields(status, simple, mode)
     end
     -- 防止无限递归
     local mark = {}
-    for i = 1, #queue do
-        local data = queue[i]
-        if status.lock[data.obj] then
-            mark[data.obj] = true
-        end
+    for obj in pairs(status.lock) do
+        mark[obj] = true
     end
     for i = 1, #queue do
         local data = queue[i]

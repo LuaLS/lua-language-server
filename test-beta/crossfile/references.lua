@@ -250,11 +250,38 @@ TEST {
     {
         path = 'a.lua',
         content = [[
+            local function <?f?>()
+            end
+
+            return {
+                f = <!f!>,
+            }
+        ]]
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            local t = require 'a'
+            local <!f!> = t.f
+
+            <!f!>()
+
+            return {
+                f = <!f!>,
+            }
+        ]]
+    }
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
             local function <!f!>()
             end
 
             return {
-                <!f!> = <!f!>,
+                f = <!f!>,
             }
         ]]
     },
@@ -267,7 +294,7 @@ TEST {
             <!f!>()
 
             return {
-                <!f!> = <!f!>,
+                f = <!f!>,
             }
         ]]
     },
@@ -275,12 +302,12 @@ TEST {
         path = 'b.lua',
         content = [[
             local t = require 'a'
-            local <!f!> = t.<!f!>
+            local <!f!> = t.f
 
             <?f?>()
 
             return {
-                <!f!> = <!f!>,
+                f = <!f!>,
             }
         ]]
     }

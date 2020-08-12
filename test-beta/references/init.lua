@@ -233,6 +233,14 @@ a.<!b!>.c = 1
 print(a.<?b?>.c)
 ]]
 
+TEST [[
+local <?f?>
+local t = {
+    <!a!> = <!f!>
+}
+print(t.<!a!>)
+]]
+
 --TEST [[
 -----@class <!Class!>
 -----@type <?Class?>

@@ -1217,16 +1217,27 @@ function m.checkSameSimpleInCall(status, ref, start, queue, mode)
     if not func then
         return
     end
-    local objs = status.interface.call(func, args, index, mode)
-    if objs then
-        for _, obj in ipairs(objs) do
-            queue[#queue+1] = {
-                obj   = obj,
-                start = start,
-                force = true,
-                call  = true,
-            }
-        end
+    local objs = status.interface.call(func, args, index)
+    if not objs then
+        return
+    end
+    local newStatus = m.status(status)
+    for _, obj in ipairs(objs) do
+        m.searchRefs(newStatus, obj, 'ref')
+        queue[#queue+1] = {
+            obj   = obj,
+            start = start,
+            force = true,
+            call  = true,
+        }
+    end
+    for _, obj in ipairs(newStatus.results) do
+        queue[#queue+1] = {
+            obj   = obj,
+            start = start,
+            force = true,
+            call  = true,
+        }
     end
 end
 

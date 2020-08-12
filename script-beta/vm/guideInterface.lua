@@ -5,7 +5,7 @@ local guide = require 'parser.guide'
 
 local m = {}
 
-function m.searchFileReturn(results, ast, index)
+function m.searchFileReturn(results, ast, index, mode)
     local returns = ast.returns
     if not returns then
         return
@@ -16,18 +16,22 @@ function m.searchFileReturn(results, ast, index)
             if exp.type == 'table' then
                 vm.mergeResults(results, { exp })
             else
-                local newRes = vm.getRefs(exp)
+                local newRes
+                if mode == 'ref' then
+                    newRes = vm.getRefs(exp)
+                else
+                    newRes = vm.getDefs(exp)
+                end
                 if #newRes > 0 then
                     vm.mergeResults(results, newRes)
-                else
-                    vm.mergeResults(results, { exp })
                 end
+                vm.mergeResults(results, { exp })
             end
         end
     end
 end
 
-function m.require(args, index)
+function m.require(args, index, mode)
     local reqName = args[1] and args[1][1]
     if not reqName then
         return nil
@@ -39,14 +43,14 @@ function m.require(args, index)
         if not files.eq(myUri, uri) then
             local ast = files.getAst(uri)
             if ast then
-                m.searchFileReturn(results, ast.ast, index)
+                m.searchFileReturn(results, ast.ast, index, mode)
             end
         end
     end
     return results
 end
 
-function m.dofile(args, index)
+function m.dofile(args, index, mode)
     local reqName = args[1] and args[1][1]
     if not reqName then
         return
@@ -58,7 +62,7 @@ function m.dofile(args, index)
         if not files.eq(myUri, uri) then
             local ast = files.getAst(uri)
             if ast then
-                m.searchFileReturn(results, ast.ast, index)
+                m.searchFileReturn(results, ast.ast, index, mode)
             end
         end
     end
@@ -67,16 +71,16 @@ end
 
 vm.interface = {}
 
-function vm.interface.call(func, args, index)
+function vm.interface.call(func, args, index, mode)
     local lib = vm.getLibrary(func)
     if not lib then
         return nil
     end
     if lib.name == 'require' and index == 1 then
-        return m.require(args, index)
+        return m.require(args, index, mode)
     end
     if lib.name == 'dofile' then
-        return m.dofile(args, index)
+        return m.dofile(args, index, mode)
     end
 end
 

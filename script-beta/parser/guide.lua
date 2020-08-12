@@ -1209,7 +1209,7 @@ function m.searchSameFieldsCrossMethod(status, ref, start, queue)
     end
 end
 
-function m.checkSameSimpleInCall(status, ref, start, queue)
+function m.checkSameSimpleInCall(status, ref, start, queue, mode)
     if not status.interface.call then
         return
     end
@@ -1217,7 +1217,7 @@ function m.checkSameSimpleInCall(status, ref, start, queue)
     if not func then
         return
     end
-    local objs = status.interface.call(func, args, index)
+    local objs = status.interface.call(func, args, index, mode)
     if objs then
         for _, obj in ipairs(objs) do
             queue[#queue+1] = {
@@ -1280,7 +1280,7 @@ function m.checkSameSimple(status, simple, data, mode, results, queue)
         -- 穿透赋值
         m.searchSameFieldsInValue(status, ref, i, queue)
         -- 检查形如 a = f() 的分支情况，需要业务层传入 interface.call
-        m.checkSameSimpleInCall(status, ref, i, queue)
+        m.checkSameSimpleInCall(status, ref, i, queue, mode)
         if i == #simple then
             break
         end
@@ -1418,7 +1418,7 @@ function m.searchSameFields(status, simple, mode)
             start = 1,
         }
         if first then
-            m.checkSameSimpleInCall(status, first, 1, queue)
+            m.checkSameSimpleInCall(status, first, 1, queue, mode)
         end
     end
     for i = 1, 999 do
@@ -1460,6 +1460,9 @@ function  m.getCallerCrossFiles(status, main)
 end
 
 function m.searchRefsAsFunctionReturn(status, obj, mode)
+    if mode == 'def' then
+        return
+    end
     status.results[#status.results+1] = obj
     -- 搜索所在函数
     local currentFunc = m.getParentFunction(obj)
@@ -1512,7 +1515,7 @@ function m.searchRefsAsFunctionReturn(status, obj, mode)
     end
     -- 搜索调用者的引用
     for i = 1, #selects do
-        m.searchRefs(status, selects[i])
+        m.searchRefs(status, selects[i], 'ref')
     end
 end
 

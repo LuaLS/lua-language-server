@@ -150,7 +150,7 @@ local <?x?>
 local function f()
     return <!x!>
 end
-local y = f()
+local <!y!> = f()
 ]]
 
 TEST [[

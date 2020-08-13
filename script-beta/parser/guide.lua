@@ -1245,7 +1245,7 @@ function m.checkSameSimpleInCall(status, ref, start, queue, mode)
     end
     local newStatus = m.status(status)
     for _, obj in ipairs(objs) do
-        m.searchRefs(newStatus, obj, 'ref')
+        m.searchRefs(newStatus, obj, mode)
         queue[#queue+1] = {
             obj   = obj,
             start = start,
@@ -1312,6 +1312,32 @@ function m.checkSameSimpleAsTableField(status, ref, start, queue)
             force = true,
         }
     end
+    -- 检查所属的table被return出去
+    --local tbl = parent.parent
+    --local newStatus = m.status(status)
+    --m.searchRefsAsFunctionReturn(newStatus, tbl, 'ref')
+    --for _, res in ipairs(newStatus.results) do
+    --    queue[#queue+1] = {
+    --        obj   = res,
+    --        start = start-1,
+    --        force = true,
+    --    }
+    --end
+end
+
+function m.checkSameSimpleAsReturn(status, ref, start, queue)
+    if ref.parent.type ~= 'return' then
+        return
+    end
+    local newStatus = m.status(status)
+    m.searchRefsAsFunctionReturn(newStatus, ref, 'ref')
+    for _, res in ipairs(newStatus.results) do
+        queue[#queue+1] = {
+            obj   = res,
+            start = start,
+            force = true,
+        }
+    end
 end
 
 function m.checkSameSimple(status, simple, data, mode, results, queue)
@@ -1333,6 +1359,8 @@ function m.checkSameSimple(status, simple, data, mode, results, queue)
         if i < #simple or mode ~= 'def' then
             -- 检查形如 { a = f } 的情况
             m.checkSameSimpleAsTableField(status, ref, i, queue)
+            -- 检查形如 return m 的情况
+            m.checkSameSimpleAsReturn(status, ref, i, queue)
         end
         if i == #simple then
             break
@@ -1468,7 +1496,11 @@ function m.searchSameFields(status, simple, mode)
             start = 1,
         }
         if first then
-            m.checkSameSimpleInCall(status, first, 1, queue, mode)
+            if #simple > 1 then
+                m.checkSameSimpleInCall(status, first, 1, queue, 'ref')
+            else
+                m.checkSameSimpleInCall(status, first, 1, queue, mode)
+            end
         end
     end
     for i = 1, 999 do
@@ -1489,10 +1521,10 @@ function m.getCallerInSameFile(status, func)
     local funcRefs = m.status(status)
     m.searchRefOfValue(funcRefs, func)
 
-    if #funcRefs.results == 0 then
-        return
-    end
     local calls = {}
+    if #funcRefs.results == 0 then
+        return calls
+    end
     for _, res in ipairs(funcRefs.results) do
         local call = res.parent
         if call.type == 'call' then
@@ -1516,24 +1548,18 @@ function m.searchRefsAsFunctionReturn(status, obj, mode)
     status.results[#status.results+1] = obj
     -- 搜索所在函数
     local currentFunc = m.getParentFunction(obj)
-    local returns = currentFunc.returns
-    if not returns then
+    local rtn = obj.parent
+    if rtn.type ~= 'return' then
         return
     end
     -- 看看他是第几个返回值
     local index
-    for i = 1, #returns do
-        local rtn = returns[i]
-        if m.isContain(rtn, obj.start) then
-            for j = 1, #rtn do
-                if obj == rtn[j] then
-                    index = j
-                    goto BREAK
-                end
-            end
+    for i = 1, #rtn do
+        if obj == rtn[i] then
+            index = i
+            break
         end
     end
-    ::BREAK::
     if not index then
         return
     end

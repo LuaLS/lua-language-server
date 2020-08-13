@@ -199,6 +199,25 @@ TEST {
     {
         path = 'a.lua',
         content = [[
+            local m = {}
+            function m.<?func?>()
+            end
+            return m
+        ]],
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            local t = require 'a'
+            t.<!func!>()
+        ]],
+    },
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
             return <?function () end?>
         ]],
     },

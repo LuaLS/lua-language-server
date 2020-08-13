@@ -273,7 +273,7 @@ TEST {
             end
 
             return {
-                f = <!f!>,
+                <!f!> = <!f!>,
             }
         ]]
     },
@@ -281,7 +281,7 @@ TEST {
         path = 'b.lua',
         content = [[
             local t = require 'a'
-            local <!f!> = t.f
+            local <!f!> = t.<!f!>
 
             <!f!>()
 

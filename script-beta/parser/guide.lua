@@ -868,6 +868,7 @@ local function buildSimpleList(obj, max)
             list[i] = cur
             break
         elseif cur.type == 'function'
+        or     cur.type == 'return'
         or     cur.type == 'main' then
             break
         else
@@ -1312,17 +1313,6 @@ function m.checkSameSimpleAsTableField(status, ref, start, queue)
             force = true,
         }
     end
-    -- 检查所属的table被return出去
-    --local tbl = parent.parent
-    --local newStatus = m.status(status)
-    --m.searchRefsAsFunctionReturn(newStatus, tbl, 'ref')
-    --for _, res in ipairs(newStatus.results) do
-    --    queue[#queue+1] = {
-    --        obj   = res,
-    --        start = start-1,
-    --        force = true,
-    --    }
-    --end
 end
 
 function m.checkSameSimpleAsReturn(status, ref, start, queue)
@@ -1338,6 +1328,33 @@ function m.checkSameSimpleAsReturn(status, ref, start, queue)
             force = true,
         }
     end
+end
+
+function m.checkSameSimpleAsReturnTableField(status, ref, start, queue)
+    if ref.type ~= 'tablefield' then
+        return
+    end
+    local tbl = ref.parent
+    if tbl.type ~= 'table' then
+        return
+    end
+    local rtn = tbl.parent
+    if rtn.type ~= 'return' then
+        return
+    end
+    local newStatus = m.status(status)
+    m.searchRefsAsFunctionReturn(newStatus, tbl, 'ref')
+    for _, res in ipairs(newStatus.results) do
+        queue[#queue+1] = {
+            obj   = res,
+            start = start-1,
+            force = true,
+        }
+    end
+end
+
+function m.checkSameSimpleAsSetValue(status, ref, start, queue)
+    
 end
 
 function m.checkSameSimple(status, simple, data, mode, results, queue)
@@ -1361,6 +1378,10 @@ function m.checkSameSimple(status, simple, data, mode, results, queue)
             m.checkSameSimpleAsTableField(status, ref, i, queue)
             -- 检查形如 return m 的情况
             m.checkSameSimpleAsReturn(status, ref, i, queue)
+            -- 检查形如 return { f = 1 } 的情况
+            m.checkSameSimpleAsReturnTableField(status, ref, i, queue)
+            -- 检查形如 a = f 的情况
+            m.checkSameSimpleAsSetValue(status, ref, i, queue)
         end
         if i == #simple then
             break

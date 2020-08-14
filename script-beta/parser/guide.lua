@@ -1283,18 +1283,27 @@ function m.checkSameSimpleInGlobal(status, name, start, queue)
     end
 end
 
+function m.checkValueMark(status, a, b)
+    if not status.cache.valueMark then
+        status.cache.valueMark = {}
+    end
+    if status.cache.valueMark[a]
+    or status.cache.valueMark[b] then
+        return true
+    end
+    status.cache.valueMark[a] = true
+    status.cache.valueMark[b] = true
+    return false
+end
+
 function m.searchSameFieldsInValue(status, ref, start, queue, mode)
     local value = m.getObjectValue(ref)
     if not value then
         return
     end
-    if not status.cache.valueMark then
-        status.cache.valueMark = {}
-    end
-    if status.cache.valueMark[value] then
+    if m.checkValueMark(status, ref, value) then
         return
     end
-    status.cache.valueMark[value] = true
     local newStatus = m.status(status)
     m.searchRefs(newStatus, value, mode)
     for _, res in ipairs(newStatus.results) do
@@ -1368,13 +1377,9 @@ function m.checkSameSimpleAsSetValue(status, ref, start, queue)
     if m.getObjectValue(parent) ~= ref then
         return
     end
-    if not status.cache.valueMark then
-        status.cache.valueMark = {}
-    end
-    if status.cache.valueMark[ref] then
+    if m.checkValueMark(status, ref, parent) then
         return
     end
-    status.cache.valueMark[ref] = true
     local obj
     if     parent.type == 'local'
     or     parent.type == 'setglobal'

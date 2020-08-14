@@ -34,5 +34,6 @@
     },
     "Lua.plugin.enable": true,
     "Lua.zzzzzz.cat": true,
-    "Lua.develop.enable": true
+    "Lua.develop.enable": true,
+    "Lua.develop.debuggerPort": 11413
 }

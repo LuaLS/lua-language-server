@@ -249,6 +249,10 @@ TEST [[
 a.<!t!> = <?f?>
 ]]
 
+TEST [[
+local <?t?> = <!f!>
+]]
+
 --TEST [[
 -----@class <!Class!>
 -----@type <?Class?>

@@ -1283,13 +1283,20 @@ function m.checkSameSimpleInGlobal(status, name, start, queue)
     end
 end
 
-function m.searchSameFieldsInValue(status, ref, start, queue)
+function m.searchSameFieldsInValue(status, ref, start, queue, mode)
     local value = m.getObjectValue(ref)
     if not value then
         return
     end
+    if not status.cache.valueMark then
+        status.cache.valueMark = {}
+    end
+    if status.cache.valueMark[value] then
+        return
+    end
+    status.cache.valueMark[value] = true
     local newStatus = m.status(status)
-    m.searchRefs(newStatus, value, 'def')
+    m.searchRefs(newStatus, value, mode)
     for _, res in ipairs(newStatus.results) do
         queue[#queue+1] = {
             obj   = res,
@@ -1354,10 +1361,20 @@ function m.checkSameSimpleAsReturnTableField(status, ref, start, queue)
 end
 
 function m.checkSameSimpleAsSetValue(status, ref, start, queue)
+    if ref.type == 'select' then
+        return
+    end
     local parent = ref.parent
     if m.getObjectValue(parent) ~= ref then
         return
     end
+    if not status.cache.valueMark then
+        status.cache.valueMark = {}
+    end
+    if status.cache.valueMark[ref] then
+        return
+    end
+    status.cache.valueMark[ref] = true
     local obj
     if     parent.type == 'local'
     or     parent.type == 'setglobal'
@@ -1392,13 +1409,17 @@ function m.checkSameSimple(status, simple, data, mode, results, queue)
             return
         end
         force = false
+        local cmode = mode
+        if i < #simple then
+            cmode = 'ref'
+        end
         -- 穿透 self:func 与 mt:func
         m.searchSameFieldsCrossMethod(status, ref, i, queue)
         -- 穿透赋值
-        m.searchSameFieldsInValue(status, ref, i, queue)
+        m.searchSameFieldsInValue(status, ref, i, queue, cmode)
         -- 检查形如 a = f() 的分支情况，需要业务层传入 interface.call
         m.checkSameSimpleInCall(status, ref, i, queue, mode)
-        if i < #simple or mode ~= 'def' then
+        if cmode ~= 'def' then
             -- 检查形如 { a = f } 的情况
             m.checkSameSimpleAsTableField(status, ref, i, queue)
             -- 检查形如 return m 的情况
@@ -1555,7 +1576,6 @@ function m.searchSameFields(status, simple, mode)
             return
         end
         if not mark[data.obj] then
-            -- TODO 改一下锁
             status.lock[data.obj] = true
             mark[data.obj] = true
             m.checkSameSimple(status, simple, data, mode, status.results, queue)

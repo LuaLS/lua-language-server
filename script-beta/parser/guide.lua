@@ -1354,7 +1354,32 @@ function m.checkSameSimpleAsReturnTableField(status, ref, start, queue)
 end
 
 function m.checkSameSimpleAsSetValue(status, ref, start, queue)
-    
+    local parent = ref.parent
+    if m.getObjectValue(parent) ~= ref then
+        return
+    end
+    local obj
+    if     parent.type == 'local'
+    or     parent.type == 'setglobal'
+    or     parent.type == 'setlocal' then
+        obj = parent
+    elseif parent.type == 'setfield' then
+        obj = parent.field
+    elseif parent.type == 'setmethod' then
+        obj = parent.method
+    end
+    if not obj then
+        return
+    end
+    local newStatus = m.status(status)
+    m.searchRefs(newStatus, obj, 'ref')
+    for _, res in ipairs(newStatus.results) do
+        queue[#queue+1] = {
+            obj   = res,
+            start = start,
+            force = true,
+        }
+    end
 end
 
 function m.checkSameSimple(status, simple, data, mode, results, queue)
@@ -1488,10 +1513,10 @@ function m.searchSameFields(status, simple, mode)
     for obj in pairs(status.lock) do
         mark[obj] = true
     end
-    for i = 1, #queue do
-        local data = queue[i]
-        status.lock[data.obj] = true
-    end
+    --for i = 1, #queue do
+    --    local data = queue[i]
+    --    status.lock[data.obj] = true
+    --end
     -- 对初始对象进行预处理
     if simple.global then
         for i = 1, #queue do
@@ -1530,9 +1555,11 @@ function m.searchSameFields(status, simple, mode)
             return
         end
         if not mark[data.obj] then
+            -- TODO 改一下锁
             status.lock[data.obj] = true
             mark[data.obj] = true
             m.checkSameSimple(status, simple, data, mode, status.results, queue)
+            status.lock[data.obj] = nil
         end
     end
 end

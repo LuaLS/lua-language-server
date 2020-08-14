@@ -177,12 +177,12 @@ t[a.b.<?x?>] = 1
 
 TEST [[
 local t
-local f = t.<?f?>
+local <!f!> = t.<?f?>
 
-f()
+<!f!>()
 
 return {
-    f = f,
+    <!f!> = <!f!>,
 }
 ]]
 
@@ -239,6 +239,14 @@ local t = {
     <!a!> = <!f!>
 }
 print(t.<!a!>)
+]]
+
+TEST [[
+local <!t!> = <?f?>
+]]
+
+TEST [[
+a.<!t!> = <?f?>
 ]]
 
 --TEST [[

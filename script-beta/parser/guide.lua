@@ -1430,9 +1430,10 @@ function m.checkSameSimpleAsSetValue(status, ref, start, queue)
 end
 
 function m.checkSameSimple(status, simple, data, mode, results, queue)
-    local ref   = data.obj
-    local start = data.start
-    local force = data.force
+    local ref    = data.obj
+    local start  = data.start
+    local force  = data.force
+    local isCall = data.call
     for i = start, #simple do
         local sm = simple[i]
         if sm ~= '*' and not force and m.getSimpleName(ref) ~= sm then
@@ -1468,6 +1469,7 @@ function m.checkSameSimple(status, simple, data, mode, results, queue)
         if not ref then
             return
         end
+        isCall = false
     end
     if mode == 'def' then
         if ref.type == 'setglobal'
@@ -1487,7 +1489,7 @@ function m.checkSameSimple(status, simple, data, mode, results, queue)
                 results[#results+1] = ref
             end
         end
-        if data.call then
+        if isCall then
             results[#results+1] = ref
         end
     elseif mode == 'ref' then
@@ -1516,7 +1518,7 @@ function m.checkSameSimple(status, simple, data, mode, results, queue)
                 results[#results+1] = ref
             end
         end
-        if data.call then
+        if isCall then
             results[#results+1] = ref
         end
     elseif mode == 'field' then

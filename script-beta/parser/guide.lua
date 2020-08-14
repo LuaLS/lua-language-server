@@ -1237,6 +1237,9 @@ function m.checkSameSimpleInCall(status, ref, start, queue, mode)
     if not func then
         return
     end
+    if m.checkCallMark(status, func) then
+        return
+    end
     local objs = m.checkSameSimpleInCallInSameFile(status, func, args, index)
     if status.interface.call then
         local cobjs = status.interface.call(func, args, index)
@@ -1295,6 +1298,17 @@ function m.checkValueMark(status, a, b)
     end
     status.cache.valueMark[a] = true
     status.cache.valueMark[b] = true
+    return false
+end
+
+function m.checkCallMark(status, a)
+    if not status.cache.callMark then
+        status.cache.callMark = {}
+    end
+    if status.cache.callMark[a] then
+        return true
+    end
+    status.cache.callMark[a] = true
     return false
 end
 

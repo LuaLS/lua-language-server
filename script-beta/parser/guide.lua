@@ -904,7 +904,9 @@ m.Version = 53
 
 function m.status(parentStatus, interface)
     local status = {
-        cache     = parentStatus and parentStatus.cache     or {},
+        cache     = parentStatus and parentStatus.cache     or {
+            count = 0,
+        },
         depth     = parentStatus and parentStatus.depth     or 0,
         interface = parentStatus and parentStatus.interface or {},
         lock      = parentStatus and parentStatus.lock      or {},
@@ -1583,6 +1585,7 @@ function m.searchSameFields(status, simple, mode)
         if not mark[data.obj] then
             status.lock[data.obj] = true
             mark[data.obj] = true
+            status.cache.count = status.cache.count + 1
             m.checkSameSimple(status, simple, data, mode, status.results, queue)
             status.lock[data.obj] = nil
         end
@@ -1752,7 +1755,11 @@ function m.requestReference(obj, interface)
 
     m.searchRefsAsFunction(status, obj, 'ref')
 
-    return status.results
+    if m.debugMode then
+        print('count:', status.cache.count)
+    end
+
+    return status.results, status.cache.count
 end
 
 --- 请求对象的定义，包括 `a.b.c` 形式
@@ -1763,7 +1770,7 @@ function m.requestDefinition(obj, interface)
     -- 根据 field 搜索定义
     m.searchRefs(status, obj, 'def')
 
-    return status.results
+    return status.results, status.cache.count
 end
 
 --- 请求对象的域

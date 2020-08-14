@@ -1336,6 +1336,9 @@ function m.checkSameSimpleAsTableField(status, ref, start, queue)
     if parent.type ~= 'tablefield' then
         return
     end
+    if m.checkValueMark(status, parent, ref) then
+        return
+    end
     local newStatus = m.status(status)
     m.searchRefs(newStatus, parent.field, 'ref')
     for _, res in ipairs(newStatus.results) do
@@ -1349,6 +1352,9 @@ end
 
 function m.checkSameSimpleAsReturn(status, ref, start, queue)
     if ref.parent.type ~= 'return' then
+        return
+    end
+    if m.checkCallMark(status, ref) then
         return
     end
     local newStatus = m.status(status)
@@ -1372,6 +1378,9 @@ function m.checkSameSimpleAsReturnTableField(status, ref, start, queue)
     end
     local rtn = tbl.parent
     if rtn.type ~= 'return' then
+        return
+    end
+    if m.checkCallMark(status, tbl) then
         return
     end
     local newStatus = m.status(status)

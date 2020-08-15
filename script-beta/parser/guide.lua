@@ -922,7 +922,7 @@ function m.status(parentStatus, interface)
     status.locks[status.index] = status.lock
     if interface then
         for k, v in pairs(interface) do
-            status.interface[k] = interface[k] or v
+            status.interface[k] = v
         end
     end
     return status

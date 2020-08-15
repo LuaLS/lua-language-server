@@ -75,6 +75,7 @@ function m.setText(uri, text)
     if not m.fileMap[uri] then
         m.fileMap[uri] = {
             uri = originUri,
+            version = 0,
         }
     end
     local file = m.fileMap[uri]
@@ -85,8 +86,21 @@ function m.setText(uri, text)
     file.ast   = nil
     file.lines = nil
     file.cache = {}
+    file.version = file.version + 1
     m.globalVersion = m.globalVersion + 1
     m.onWatch('update', originUri)
+end
+
+--- 获取文件版本
+function m.getVersion(uri)
+    if platform.OS == 'Windows' then
+        uri = uri:lower()
+    end
+    local file = m.fileMap[uri]
+    if not file then
+        return nil
+    end
+    return file.version
 end
 
 --- 获取文件文本

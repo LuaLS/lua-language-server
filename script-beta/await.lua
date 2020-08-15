@@ -4,8 +4,9 @@ local timer  = require 'timer'
 local m = {}
 m.type = 'await'
 
-m.coTracker = setmetatable({}, { __mode = 'k' })
+m.coTracker  = setmetatable({}, { __mode = 'k' })
 m.coPriority = setmetatable({}, { __mode = 'k' })
+m.coDelayer  = setmetatable({}, { __mode = 'k' })
 m.delayQueue = {}
 m.delayQueueIndex = 1
 
@@ -28,6 +29,11 @@ function m.create(callback, ...)
     local co = coroutine.create(callback)
     m.coTracker[co] = true
     return m.checkResult(co, coroutine.resume(co, ...))
+end
+
+function m.setDelayer(callback)
+    local co = coroutine.running()
+    m.coDelayer[co] = callback
 end
 
 --- 休眠一段时间
@@ -75,8 +81,11 @@ function m.delay(getVersion)
         return
     end
     local version = getVersion and getVersion()
+    local delayer = m.coDelayer[co]
+    local dVersion = delayer and delayer()
     m.delayQueue[#m.delayQueue+1] = function ()
-        if version == (getVersion and getVersion()) then
+        if  version == (getVersion and getVersion())
+        and dVersion == (delayer and delayer()) then
             return m.checkResult(co, coroutine.resume(co))
         else
             coroutine.close(co)

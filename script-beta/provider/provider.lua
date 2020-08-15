@@ -319,7 +319,7 @@ proto.on('textDocument/completion', function (params)
     if not result then
         return nil
     end
-    local easy = false
+    local easy = true
     local items = {}
     for i, res in ipairs(result) do
         local item = {

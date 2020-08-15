@@ -1,6 +1,7 @@
 local vm     = require 'vm.vm'
 local guide  = require 'parser.guide'
 local util   = require 'utility'
+local await  = require 'await'
 
 local function getRefs(source, results)
     results = results or {}
@@ -8,6 +9,8 @@ local function getRefs(source, results)
     if not lock then
         return results
     end
+
+    await.delay()
 
     local clock = os.clock()
     local myResults, count = guide.requestReference(source, vm.interface)

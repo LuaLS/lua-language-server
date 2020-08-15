@@ -1376,6 +1376,8 @@ function m.checkSameSimpleAsReturn(status, ref, start, queue)
     if m.checkCallMark(status, ref) then
         return
     end
+    -- TODO 这里的开销非常大
+    do return end
     local newStatus = m.status(status)
     m.searchRefsAsFunctionReturn(newStatus, ref, 'ref')
     for _, res in ipairs(newStatus.results) do

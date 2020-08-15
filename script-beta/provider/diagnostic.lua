@@ -212,7 +212,7 @@ end
 
 function m.start()
     m._start = true
-    --m.diagnosticsAll()
+    m.diagnosticsAll()
 end
 
 files.watch(function (env, uri)

@@ -1,6 +1,7 @@
 local vm      = require 'vm.vm'
 local guide   = require 'parser.guide'
 local library = require 'library'
+local await   = require 'await'
 
 local function eachFieldInLibrary(source, lib, results)
     if not lib or not lib.child then
@@ -21,6 +22,8 @@ local function eachField(source)
     while source.type == 'paren' do
         source = source.exp
     end
+
+    await.delay()
     local results = guide.requestFields(source, vm.interface)
     local lib = vm.getLibrary(source)
     if lib then

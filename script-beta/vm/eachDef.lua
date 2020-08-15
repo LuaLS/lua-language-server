@@ -3,6 +3,7 @@ local guide = require 'parser.guide'
 local ws    = require 'workspace'
 local files = require 'files'
 local util  = require 'utility'
+local await = require 'await'
 
 local m = {}
 
@@ -23,6 +24,8 @@ function m.eachDef(source, results)
     if not lock then
         return results
     end
+
+    await.delay()
 
     local clock = os.clock()
     local myResults, count = guide.requestDefinition(source, vm.interface)

@@ -1439,6 +1439,87 @@ function m.checkSameSimpleAsSetValue(status, ref, start, queue)
     end
 end
 
+function m.pushResult(status, mode, ref, isCall)
+    local results = status.results
+    if mode == 'def' then
+        if isCall then
+            results[#results+1] = ref
+            return
+        end
+        if ref.type == 'setglobal'
+        or ref.type == 'setlocal'
+        or ref.type == 'local' then
+            results[#results+1] = ref
+        elseif ref.type == 'setfield'
+        or     ref.type == 'tablefield' then
+            results[#results+1] = ref
+        elseif ref.type == 'setmethod' then
+            results[#results+1] = ref
+        elseif ref.type == 'setindex'
+        or     ref.type == 'tableindex' then
+            results[#results+1] = ref
+        elseif ref.type == 'call' then
+            if ref.node.special == 'rawset' then
+                results[#results+1] = ref
+            end
+        end
+    elseif mode == 'ref' then
+        if isCall then
+            results[#results+1] = ref
+            return
+        end
+        if ref.type == 'setfield'
+        or ref.type == 'getfield'
+        or ref.type == 'tablefield' then
+            results[#results+1] = ref
+        elseif ref.type == 'setmethod'
+        or     ref.type == 'getmethod' then
+            results[#results+1] = ref
+        elseif ref.type == 'setindex'
+        or     ref.type == 'getindex'
+        or     ref.type == 'tableindex' then
+            results[#results+1] = ref
+        elseif ref.type == 'setglobal'
+        or     ref.type == 'getglobal'
+        or     ref.type == 'local'
+        or     ref.type == 'setlocal'
+        or     ref.type == 'getlocal' then
+            results[#results+1] = ref
+        elseif ref.type == 'function' then
+            results[#results+1] = ref
+        elseif ref.type == 'call' then
+            if ref.node.special == 'rawset'
+            or ref.node.special == 'rawget' then
+                results[#results+1] = ref
+            end
+        end
+    elseif mode == 'field' then
+        if ref.type == 'setfield'
+        or ref.type == 'getfield'
+        or ref.type == 'tablefield' then
+            results[#results+1] = ref
+        elseif ref.type == 'setmethod'
+        or     ref.type == 'getmethod' then
+            results[#results+1] = ref
+        elseif ref.type == 'setindex'
+        or     ref.type == 'getindex'
+        or     ref.type == 'tableindex' then
+            results[#results+1] = ref
+        elseif ref.type == 'setglobal'
+        or     ref.type == 'getglobal'
+        or     ref.type == 'local'
+        or     ref.type == 'setlocal'
+        or     ref.type == 'getlocal' then
+            results[#results+1] = ref
+        elseif ref.type == 'call' then
+            if ref.node.special == 'rawset'
+            or ref.node.special == 'rawget' then
+                results[#results+1] = ref
+            end
+        end
+    end
+end
+
 function m.checkSameSimple(status, simple, data, mode, results, queue)
     local ref    = data.obj
     local start  = data.start
@@ -1479,81 +1560,7 @@ function m.checkSameSimple(status, simple, data, mode, results, queue)
         end
         isCall = false
     end
-    if mode == 'def' then
-        if ref.type == 'setglobal'
-        or ref.type == 'setlocal'
-        or ref.type == 'local' then
-            results[#results+1] = ref
-        elseif ref.type == 'setfield'
-        or     ref.type == 'tablefield' then
-            results[#results+1] = ref
-        elseif ref.type == 'setmethod' then
-            results[#results+1] = ref
-        elseif ref.type == 'setindex'
-        or     ref.type == 'tableindex' then
-            results[#results+1] = ref
-        elseif ref.type == 'call' then
-            if ref.node.special == 'rawset' then
-                results[#results+1] = ref
-            end
-        end
-        if isCall then
-            results[#results+1] = ref
-        end
-    elseif mode == 'ref' then
-        if ref.type == 'setfield'
-        or ref.type == 'getfield'
-        or ref.type == 'tablefield' then
-            results[#results+1] = ref
-        elseif ref.type == 'setmethod'
-        or     ref.type == 'getmethod' then
-            results[#results+1] = ref
-        elseif ref.type == 'setindex'
-        or     ref.type == 'getindex'
-        or     ref.type == 'tableindex' then
-            results[#results+1] = ref
-        elseif ref.type == 'setglobal'
-        or     ref.type == 'getglobal'
-        or     ref.type == 'local'
-        or     ref.type == 'setlocal'
-        or     ref.type == 'getlocal' then
-            results[#results+1] = ref
-        elseif ref.type == 'function' then
-            results[#results+1] = ref
-        elseif ref.type == 'call' then
-            if ref.node.special == 'rawset'
-            or ref.node.special == 'rawget' then
-                results[#results+1] = ref
-            end
-        end
-        if isCall then
-            results[#results+1] = ref
-        end
-    elseif mode == 'field' then
-        if ref.type == 'setfield'
-        or ref.type == 'getfield'
-        or ref.type == 'tablefield' then
-            results[#results+1] = ref
-        elseif ref.type == 'setmethod'
-        or     ref.type == 'getmethod' then
-            results[#results+1] = ref
-        elseif ref.type == 'setindex'
-        or     ref.type == 'getindex'
-        or     ref.type == 'tableindex' then
-            results[#results+1] = ref
-        elseif ref.type == 'setglobal'
-        or     ref.type == 'getglobal'
-        or     ref.type == 'local'
-        or     ref.type == 'setlocal'
-        or     ref.type == 'getlocal' then
-            results[#results+1] = ref
-        elseif ref.type == 'call' then
-            if ref.node.special == 'rawset'
-            or ref.node.special == 'rawget' then
-                results[#results+1] = ref
-            end
-        end
-    end
+    m.pushResult(status, mode, ref, isCall)
 end
 
 function m.searchSameFields(status, simple, mode)

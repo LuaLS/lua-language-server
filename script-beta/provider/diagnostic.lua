@@ -212,13 +212,16 @@ end
 
 function m.start()
     m._start = true
-    m.diagnosticsAll()
+    --m.diagnosticsAll()
 end
 
 files.watch(function (env, uri)
     if env == 'remove' then
         m.clear(uri)
     elseif env == 'update' then
+        if not m._start then
+            return
+        end
         await.create(function ()
             await.delay(function ()
                 return files.globalVersion

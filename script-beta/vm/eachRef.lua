@@ -2,7 +2,7 @@ local vm     = require 'vm.vm'
 local guide  = require 'parser.guide'
 local util   = require 'utility'
 
-local function eachRef(source, results)
+local function getRefs(source, results)
     results = results or {}
     local lock = vm.lock('eachDef', source)
     if not lock then
@@ -22,8 +22,8 @@ local function eachRef(source, results)
 end
 
 function vm.getRefs(source)
-    local cache = vm.getCache('eachRef')[source] or eachRef(source)
-    vm.getCache('eachDef')[source] = cache
+    local cache = vm.getCache('eachRef')[source] or getRefs(source)
+    vm.getCache('eachRef')[source] = cache
     return cache
 end
 

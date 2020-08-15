@@ -319,7 +319,7 @@ proto.on('textDocument/completion', function (params)
     if not result then
         return nil
     end
-    local easy = true
+    local easy = false
     local items = {}
     for i, res in ipairs(result) do
         local item = {
@@ -332,11 +332,13 @@ proto.on('textDocument/completion', function (params)
         if res.id then
             if easy and os.clock() - clock < 0.05 then
                 local resolved = core.resolve(res.id)
-                item.detail = resolved.detail
-                item.documentation = resolved.description and {
-                    value = resolved.description,
-                    kind  = 'markdown',
-                }
+                if resolved then
+                    item.detail = resolved.detail
+                    item.documentation = resolved.description and {
+                        value = resolved.description,
+                        kind  = 'markdown',
+                    }
+                end
             else
                 easy = false
                 item.data = {
@@ -362,6 +364,9 @@ proto.on('completionItem/resolve', function (item)
     end
     await.setPriority(1000)
     local resolved = core.resolve(id)
+    if not resolved then
+        return nil
+    end
     item.detail = resolved.detail
     item.documentation = resolved.description and {
         value = resolved.description,

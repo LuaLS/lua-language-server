@@ -13,6 +13,7 @@ local config     = require 'config'
 local util       = require 'utility'
 local markdown   = require 'provider.markdown'
 local findSource = require 'core.find-source'
+local await      = require 'await'
 
 local stackID = 0
 local stacks = {}
@@ -234,8 +235,8 @@ local function checkFieldThen(src, used, word, start, parent, oop, results)
     if used[name] then
         return
     end
+    used[name] = true
     if not matchKey(word, name) then
-        used[name] = true
         return
     end
     local kind = ckind.Field
@@ -245,7 +246,6 @@ local function checkFieldThen(src, used, word, start, parent, oop, results)
         else
             kind = ckind.Function
         end
-        used[name] = true
         buildFunction(results, src, oop, {
             label = name,
             kind  = kind,
@@ -260,7 +260,6 @@ local function checkFieldThen(src, used, word, start, parent, oop, results)
         if oop then
             return
         end
-        used[name] = true
         local literal = vm.getLiteral(src)
         if literal ~= nil then
             kind = ckind.Enum

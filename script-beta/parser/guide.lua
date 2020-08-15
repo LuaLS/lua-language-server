@@ -1254,26 +1254,29 @@ function m.checkSameSimpleInCall(status, ref, start, queue, mode)
     if not func then
         return
     end
+    if m.checkCallMark(status, func.parent, true) then
+        return
+    end
     local objs = m.checkSameSimpleInCallInSameFile(status, func, args, index)
     if status.interface.call then
         local cobjs = status.interface.call(func, args, index)
         if cobjs then
             for _, obj in ipairs(cobjs) do
-                objs[#objs+1] = obj
+                if not m.checkReturnMark(status, obj) then
+                    objs[#objs+1] = obj
+                end
             end
         end
     end
     local newStatus = m.status(status)
     for _, obj in ipairs(objs) do
-        if not m.checkCallMark(status, obj) then
-            m.searchRefs(newStatus, obj, mode)
-            queue[#queue+1] = {
-                obj   = obj,
-                start = start,
-                force = true,
-                call  = true,
-            }
-        end
+        m.searchRefs(newStatus, obj, mode)
+        queue[#queue+1] = {
+            obj   = obj,
+            start = start,
+            force = true,
+            call  = true,
+        }
     end
     for _, obj in ipairs(newStatus.results) do
         queue[#queue+1] = {
@@ -1324,25 +1327,25 @@ function m.checkValueMark(status, a, b)
     return false
 end
 
-function m.checkCallMark(status, a)
+function m.checkCallMark(status, a, mark)
     if not status.cache.callMark then
         status.cache.callMark = {}
     end
     if status.cache.callMark[a] then
         return true
     end
-    status.cache.callMark[a] = true
+    status.cache.callMark[a] = mark
     return false
 end
 
-function m.checkReturnMark(status, a)
+function m.checkReturnMark(status, a, mark)
     if not status.cache.returnMark then
         status.cache.returnMark = {}
     end
     if status.cache.returnMark[a] then
         return true
     end
-    status.cache.returnMark[a] = true
+    status.cache.returnMark[a] = mark
     return false
 end
 
@@ -1396,11 +1399,13 @@ function m.checkSameSimpleAsReturn(status, ref, start, queue)
     local newStatus = m.status(status)
     m.searchRefsAsFunctionReturn(newStatus, ref, 'ref')
     for _, res in ipairs(newStatus.results) do
-        queue[#queue+1] = {
-            obj   = res,
-            start = start,
-            force = true,
-        }
+        if not m.checkCallMark(status, res) then
+            queue[#queue+1] = {
+                obj   = res,
+                start = start,
+                force = true,
+            }
+        end
     end
 end
 
@@ -1650,7 +1655,7 @@ function m.searchRefsAsFunctionReturn(status, obj, mode)
     if mode == 'def' then
         return
     end
-    if m.checkReturnMark(status, obj) then
+    if m.checkReturnMark(status, obj, true) then
         return
     end
     status.results[#status.results+1] = obj

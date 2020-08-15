@@ -84,6 +84,7 @@ function vm.interface.link(uri)
 end
 
 function vm.interface.cache(source, mode)
+    await.delay()
     local cache = vm.getCache('cache')
     if not cache[mode] then
         cache[mode] = {}

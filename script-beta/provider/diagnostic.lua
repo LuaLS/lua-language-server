@@ -212,6 +212,7 @@ end
 
 function m.start()
     m._start = true
+    
     m.diagnosticsAll()
 end
 

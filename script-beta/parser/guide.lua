@@ -1378,6 +1378,9 @@ function m.checkSameSimpleAsReturn(status, ref, start, queue)
     end
     -- TODO 这里的开销非常大
     do return end
+    if ref.parent.parent.type ~= 'main' then
+        return
+    end
     local newStatus = m.status(status)
     m.searchRefsAsFunctionReturn(newStatus, ref, 'ref')
     for _, res in ipairs(newStatus.results) do

@@ -205,14 +205,15 @@ function m.refresh(uri)
 end
 
 function m.diagnosticsAll()
+    local clock = os.clock()
     for uri in files.eachFile() do
         m.doDiagnostic(uri)
     end
+    log.debug('全文诊断耗时：', os.clock() - clock)
 end
 
 function m.start()
     m._start = true
-    
     m.diagnosticsAll()
 end
 

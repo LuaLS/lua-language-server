@@ -1387,6 +1387,15 @@ function m.checkSameSimpleAsTableField(status, ref, start, queue)
     end
 end
 
+function m.checkBackCount(status)
+    status.cache.back = status.cache.back or 0
+    if status.cache.back >= (status.interface.backlimit or 0) then
+        return true
+    end
+    status.cache.back = status.cache.back + 1
+    return false
+end
+
 function m.checkSameSimpleAsReturn(status, ref, start, queue)
     if ref.parent.type ~= 'return' then
         return
@@ -1394,6 +1403,9 @@ function m.checkSameSimpleAsReturn(status, ref, start, queue)
     -- TODO 这里的开销非常大
     --do return end
     if ref.parent.parent.type ~= 'main' then
+        return
+    end
+    if m.checkBackCount(status) then
         return
     end
     local newStatus = m.status(status)
@@ -1418,6 +1430,9 @@ function m.checkSameSimpleAsSetValue(status, ref, start, queue)
         return
     end
     if m.checkValueMark(status, ref, parent) then
+        return
+    end
+    if m.checkBackCount(status) then
         return
     end
     local obj

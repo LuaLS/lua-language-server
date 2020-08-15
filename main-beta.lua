@@ -5,8 +5,8 @@ local fs = require 'bee.filesystem'
 ROOT = fs.path(rootPath)
 LANG = LANG or 'en-US'
 
-debug.setcstacklimit(500)
-collectgarbage('generational', 10, 50)
+debug.setcstacklimit(1000)
+--collectgarbage('generational', 10, 50)
 --collectgarbage('incremental', 120, 120, 0)
 
 log = require 'log'

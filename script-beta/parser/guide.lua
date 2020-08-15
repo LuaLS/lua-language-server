@@ -580,6 +580,8 @@ function m.getSimpleName(obj)
     if obj.type == 'call' then
         local key = obj.args[2]
         return m.getKeyName(key)
+    elseif obj.type == 'table' then
+        return ('t|%p'):format(obj)
     end
     return m.getKeyName(obj)
 end
@@ -858,6 +860,10 @@ local function buildSimpleList(obj, max)
         or     cur.type == 'tableindex' then
             list[i] = cur
             cur = cur.parent.parent
+            if cur.type == 'return' then
+                list[i+1] = list[i].parent
+                break
+            end
         elseif cur.type == 'getlocal'
         or     cur.type == 'setlocal'
         or     cur.type == 'local' then
@@ -868,7 +874,6 @@ local function buildSimpleList(obj, max)
             list[i] = cur
             break
         elseif cur.type == 'function'
-        or     cur.type == 'return'
         or     cur.type == 'main' then
             break
         else
@@ -1249,9 +1254,6 @@ function m.checkSameSimpleInCall(status, ref, start, queue, mode)
     if not func then
         return
     end
-    if m.checkCallMark(status, func) then
-        return
-    end
     local objs = m.checkSameSimpleInCallInSameFile(status, func, args, index)
     if status.interface.call then
         local cobjs = status.interface.call(func, args, index)
@@ -1263,13 +1265,15 @@ function m.checkSameSimpleInCall(status, ref, start, queue, mode)
     end
     local newStatus = m.status(status)
     for _, obj in ipairs(objs) do
-        m.searchRefs(newStatus, obj, mode)
-        queue[#queue+1] = {
-            obj   = obj,
-            start = start,
-            force = true,
-            call  = true,
-        }
+        if not m.checkCallMark(status, obj) then
+            m.searchRefs(newStatus, obj, mode)
+            queue[#queue+1] = {
+                obj   = obj,
+                start = start,
+                force = true,
+                call  = true,
+            }
+        end
     end
     for _, obj in ipairs(newStatus.results) do
         queue[#queue+1] = {
@@ -1331,6 +1335,17 @@ function m.checkCallMark(status, a)
     return false
 end
 
+function m.checkReturnMark(status, a)
+    if not status.cache.returnMark then
+        status.cache.returnMark = {}
+    end
+    if status.cache.returnMark[a] then
+        return true
+    end
+    status.cache.returnMark[a] = true
+    return false
+end
+
 function m.searchSameFieldsInValue(status, ref, start, queue, mode)
     local value = m.getObjectValue(ref)
     if not value then
@@ -1373,11 +1388,8 @@ function m.checkSameSimpleAsReturn(status, ref, start, queue)
     if ref.parent.type ~= 'return' then
         return
     end
-    if m.checkCallMark(status, ref) then
-        return
-    end
     -- TODO 这里的开销非常大
-    do return end
+    --do return end
     if ref.parent.parent.type ~= 'main' then
         return
     end
@@ -1387,32 +1399,6 @@ function m.checkSameSimpleAsReturn(status, ref, start, queue)
         queue[#queue+1] = {
             obj   = res,
             start = start,
-            force = true,
-        }
-    end
-end
-
-function m.checkSameSimpleAsReturnTableField(status, ref, start, queue)
-    if ref.type ~= 'tablefield' then
-        return
-    end
-    local tbl = ref.parent
-    if tbl.type ~= 'table' then
-        return
-    end
-    local rtn = tbl.parent
-    if rtn.type ~= 'return' then
-        return
-    end
-    if m.checkCallMark(status, tbl) then
-        return
-    end
-    local newStatus = m.status(status)
-    m.searchRefsAsFunctionReturn(newStatus, tbl, 'ref')
-    for _, res in ipairs(newStatus.results) do
-        queue[#queue+1] = {
-            obj   = res,
-            start = start-1,
             force = true,
         }
     end
@@ -1479,8 +1465,6 @@ function m.checkSameSimple(status, simple, data, mode, results, queue)
             m.checkSameSimpleAsTableField(status, ref, i, queue)
             -- 检查形如 return m 的情况
             m.checkSameSimpleAsReturn(status, ref, i, queue)
-            -- 检查形如 return { f = 1 } 的情况
-            m.checkSameSimpleAsReturnTableField(status, ref, i, queue)
             -- 检查形如 a = f 的情况
             m.checkSameSimpleAsSetValue(status, ref, i, queue)
         end
@@ -1657,6 +1641,9 @@ end
 
 function m.searchRefsAsFunctionReturn(status, obj, mode)
     if mode == 'def' then
+        return
+    end
+    if m.checkReturnMark(status, obj) then
         return
     end
     status.results[#status.results+1] = obj

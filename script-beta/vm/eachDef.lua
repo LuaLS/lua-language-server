@@ -2,6 +2,7 @@ local vm    = require 'vm.vm'
 local guide = require 'parser.guide'
 local ws    = require 'workspace'
 local files = require 'files'
+local util  = require 'utility'
 
 local m = {}
 
@@ -23,7 +24,10 @@ function m.eachDef(source, results)
         return results
     end
 
-    local myResults = guide.requestDefinition(source, vm.interface)
+    local myResults, count = guide.requestDefinition(source, vm.interface)
+    if DEVELOP and count > 10 then
+        log.warn('requestDefinition', count, util.dump(source, { deep = 0 }))
+    end
     vm.mergeResults(results, myResults)
     m.searchLibrary(source, results)
     m.searchLibrary(guide.getObjectValue(source), results)

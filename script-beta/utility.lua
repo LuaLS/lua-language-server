@@ -78,7 +78,7 @@ function m.dump(tbl, option)
     local lines = {}
     local mark = {}
     lines[#lines+1] = '{'
-    local function unpack(tbl, tab)
+    local function unpack(tbl, deep)
         mark[tbl] = (mark[tbl] or 0) + 1
         local keys = {}
         local keymap = {}
@@ -137,22 +137,24 @@ function m.dump(tbl, option)
             local value = tbl[key]
             local tp = type(value)
             if option['format'] and option['format'][key] then
-                lines[#lines+1] = ('%s%s%s,'):format(TAB[tab+1], keyWord, option['format'][key](value, unpack, tab+1))
+                lines[#lines+1] = ('%s%s%s,'):format(TAB[deep+1], keyWord, option['format'][key](value, unpack, deep+1))
             elseif tp == 'table' then
                 if mark[value] and mark[value] > 0 then
-                    lines[#lines+1] = ('%s%s%s,'):format(TAB[tab+1], keyWord, option['loop'] or '"<Loop>"')
+                    lines[#lines+1] = ('%s%s%s,'):format(TAB[deep+1], keyWord, option['loop'] or '"<Loop>"')
+                elseif deep > (option['deep'] or math.huge) then
+                    lines[#lines+1] = ('%s%s%s,'):format(TAB[deep+1], keyWord, '"<Deep>"')
                 else
-                    lines[#lines+1] = ('%s%s{'):format(TAB[tab+1], keyWord)
-                    unpack(value, tab+1)
-                    lines[#lines+1] = ('%s},'):format(TAB[tab+1])
+                    lines[#lines+1] = ('%s%s{'):format(TAB[deep+1], keyWord)
+                    unpack(value, deep+1)
+                    lines[#lines+1] = ('%s},'):format(TAB[deep+1])
                 end
             elseif tp == 'string' then
-                lines[#lines+1] = ('%s%s%q,'):format(TAB[tab+1], keyWord, value)
+                lines[#lines+1] = ('%s%s%q,'):format(TAB[deep+1], keyWord, value)
             elseif tp == 'number' then
-                lines[#lines+1] = ('%s%s%s,'):format(TAB[tab+1], keyWord, (option['number'] or formatNumber)(value))
+                lines[#lines+1] = ('%s%s%s,'):format(TAB[deep+1], keyWord, (option['number'] or formatNumber)(value))
             elseif tp == 'nil' then
             else
-                lines[#lines+1] = ('%s%s%s,'):format(TAB[tab+1], keyWord, tostring(value))
+                lines[#lines+1] = ('%s%s%s,'):format(TAB[deep+1], keyWord, tostring(value))
             end
         end
         mark[tbl] = mark[tbl] - 1

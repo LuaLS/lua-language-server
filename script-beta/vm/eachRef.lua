@@ -1,5 +1,6 @@
-local vm    = require 'vm.vm'
-local guide = require 'parser.guide'
+local vm     = require 'vm.vm'
+local guide  = require 'parser.guide'
+local util   = require 'utility'
 
 local function eachRef(source, results)
     results = results or {}
@@ -8,7 +9,10 @@ local function eachRef(source, results)
         return results
     end
 
-    local myResults = guide.requestReference(source, vm.interface)
+    local myResults, count = guide.requestReference(source, vm.interface)
+    if DEVELOP and count > 10 then
+        log.warn('requestReference', count, util.dump(source, { deep = 0 }))
+    end
     vm.mergeResults(results, myResults)
 
     lock()

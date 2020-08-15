@@ -331,3 +331,66 @@ TEST {
         ]]
     }
 }
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            local function <?f?>()
+            end
+
+            return {
+                <!f!> = <!f!>,
+            }
+        ]]
+    },
+    {
+        path = 'b1.lua',
+        content = [[
+            local t = require 'a'
+            t.<!f!>()
+        ]]
+    },
+    {
+        path = 'b2.lua',
+        content = [[
+            local t = require 'a'
+            t.<!f!>()
+        ]]
+    },
+    {
+        path = 'b3.lua',
+        content = [[
+            local t = require 'a'
+            t.<!f!>()
+        ]]
+    },
+    {
+        path = 'b4.lua',
+        content = [[
+            local t = require 'a'
+            t.<!f!>()
+        ]]
+    },
+    {
+        path = 'b5.lua',
+        content = [[
+            local t = require 'a'
+            t.<!f!>()
+        ]]
+    },
+    {
+        path = 'b6.lua',
+        content = [[
+            local t = require 'a'
+            t.<!f!>()
+        ]]
+    },
+    {
+        path = 'b7.lua',
+        content = [[
+            local t = require 'a'
+            t.<!f!>()
+        ]]
+    },
+}

@@ -50,7 +50,7 @@ function vm.eachField(source, callback)
     if not unlock then
         return
     end
-    cache = eachField(source) or false
+    cache = eachField(source)
     vm.getCache('eachField')[source] = cache
     unlock()
     for i = 1, #cache do

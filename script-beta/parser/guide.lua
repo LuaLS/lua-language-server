@@ -1736,8 +1736,29 @@ function m.cleanResults(results)
     end
 end
 
+function m.getCache(status, obj, mode)
+    if not status.interface.cache then
+        return
+    end
+    if obj.type == 'getglobal'
+    or obj.type == 'setglobal' then
+        local name = m.getKeyName(obj)
+        return status.interface.cache(name, mode)
+    else
+        return status.interface.cache(obj, mode)
+    end
+end
+
 function m.searchRefs(status, obj, mode)
     status.depth = status.depth + 1
+
+    local cache, makeCache = m.getCache(status, obj, mode)
+    if cache then
+        for i = 1, #cache do
+            status.results[#status.results+1] = cache[i]
+        end
+        return
+    end
 
     -- 检查单步引用
     local res = m.getStepRef(obj, mode)
@@ -1759,6 +1780,10 @@ function m.searchRefs(status, obj, mode)
     status.depth = status.depth - 1
 
     m.cleanResults(status.results)
+
+    if makeCache then
+        makeCache(status.results)
+    end
 end
 
 function m.searchRefOfValue(status, obj)

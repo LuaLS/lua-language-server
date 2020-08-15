@@ -82,3 +82,21 @@ function vm.interface.link(uri)
     await.delay()
     return vm.getLinksTo(uri)
 end
+
+function vm.interface.cache(source, mode)
+    local cache = vm.getCache('cache')
+    if not cache[mode] then
+        cache[mode] = {}
+    end
+    local sourceCache = cache[mode][source]
+    if cache[mode][source] then
+        return sourceCache
+    end
+    sourceCache = {}
+    cache[mode][source] = sourceCache
+    return nil, function (results)
+        for i = 1, #results do
+            sourceCache[i] = results[i]
+        end
+    end
+end

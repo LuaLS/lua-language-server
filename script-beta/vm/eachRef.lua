@@ -10,8 +10,8 @@ local function eachRef(source, results)
     end
 
     local myResults, count = guide.requestReference(source, vm.interface)
-    if DEVELOP and count > 10 then
-        log.warn('requestReference', count, util.dump(source, { deep = 0 }))
+    if DEVELOP and count > 100 then
+        log.warn('requestReference', count, guide.getRoot(source).uri, util.dump(source, { deep = 1 }))
     end
     vm.mergeResults(results, myResults)
 

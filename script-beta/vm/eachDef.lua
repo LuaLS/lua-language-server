@@ -25,8 +25,8 @@ function m.eachDef(source, results)
     end
 
     local myResults, count = guide.requestDefinition(source, vm.interface)
-    if DEVELOP and count > 10 then
-        log.warn('requestDefinition', count, util.dump(source, { deep = 0 }))
+    if DEVELOP and count > 100 then
+        log.warn('requestDefinition', count, guide.getRoot(source).uri, util.dump(source, { deep = 1 }))
     end
     vm.mergeResults(results, myResults)
     m.searchLibrary(source, results)

@@ -15,6 +15,7 @@ local getmetatable = getmetatable
 local mathAbs      = math.abs
 local ioOpen       = io.open
 local utf8Len      = utf8.len
+local mathHuge     = math.huge
 
 _ENV = nil
 
@@ -141,7 +142,7 @@ function m.dump(tbl, option)
             elseif tp == 'table' then
                 if mark[value] and mark[value] > 0 then
                     lines[#lines+1] = ('%s%s%s,'):format(TAB[deep+1], keyWord, option['loop'] or '"<Loop>"')
-                elseif deep > (option['deep'] or math.huge) then
+                elseif deep >= (option['deep'] or mathHuge) then
                     lines[#lines+1] = ('%s%s%s,'):format(TAB[deep+1], keyWord, '"<Deep>"')
                 else
                     lines[#lines+1] = ('%s%s{'):format(TAB[deep+1], keyWord)

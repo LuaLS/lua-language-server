@@ -143,15 +143,19 @@ end
 
 m.cacheTracker = setmetatable({}, { __mode = 'kv' })
 
+function m.flushCache()
+    if m.cache then
+        m.cache.dead = true
+    end
+    m.cacheVersion = files.globalVersion
+    m.cache = {}
+    m.locked = setmetatable({}, { __mode = 'k' })
+    m.cacheTracker[m.cache] = true
+end
+
 function m.getCache(name)
     if m.cacheVersion ~= files.globalVersion then
-        if m.cache then
-            m.cache.dead = true
-        end
-        m.cacheVersion = files.globalVersion
-        m.cache = {}
-        m.locked = setmetatable({}, { __mode = 'k' })
-        m.cacheTracker[m.cache] = true
+        m.flushCache()
     end
     if not m.cache[name] then
         m.cache[name] = {}

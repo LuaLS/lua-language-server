@@ -59,6 +59,11 @@ end
 
 vm.interface = {}
 
+-- 向前寻找引用的层数限制，一般情况下都为0
+-- 在自动完成/漂浮提示等情况时设置为5（需要清空缓存）
+-- 在查找引用时设置为10（需要清空缓存）
+vm.interface.searchLevel = 0
+
 function vm.interface.call(func, args, index)
     local lib = vm.getLibrary(func)
     if not lib then
@@ -100,4 +105,12 @@ function vm.interface.cache(source, mode)
             sourceCache[i] = results[i]
         end
     end
+end
+
+function vm.setSearchLevel(n)
+    -- 只有在搜索等级由低变高时，才需要清空缓存
+    if n > vm.interface.searchLevel then
+        vm.flushCache()
+    end
+    vm.interface.searchLevel = n
 end

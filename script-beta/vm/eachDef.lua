@@ -1,6 +1,5 @@
 local vm    = require 'vm.vm'
 local guide = require 'parser.guide'
-local ws    = require 'workspace'
 local files = require 'files'
 local util  = require 'utility'
 local await = require 'await'

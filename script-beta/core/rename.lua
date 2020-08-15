@@ -365,6 +365,7 @@ function m.rename(uri, pos, newname)
     local results = {}
     local mark = {}
 
+    vm.setSearchLevel(3)
     rename(source, newname, function (target, start, finish, text)
         if mark[start] then
             return

@@ -5,7 +5,7 @@ local fs = require 'bee.filesystem'
 ROOT = fs.path(rootPath)
 LANG = LANG or 'en-US'
 
-debug.setcstacklimit(1000)
+debug.setcstacklimit(200)
 --collectgarbage('generational', 10, 50)
 --collectgarbage('incremental', 120, 120, 0)
 
@@ -17,4 +17,5 @@ log.debug('ROOT:', ROOT:string())
 xpcall(dofile, log.debug, rootPath .. '/debugger.lua')
 
 local service = require 'service'
+
 service.start()

@@ -1,9 +1,9 @@
 local guide = require 'parser.guide'
 local vm    = require 'vm.vm'
 local files = require 'files'
-local ws    = require 'workspace'
 
 local function getFileLinks(uri)
+    local ws    = require 'workspace'
     local links = {}
     local ast = files.getAst(uri)
     if not ast then

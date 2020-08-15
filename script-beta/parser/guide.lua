@@ -1387,9 +1387,11 @@ function m.checkSameSimpleAsTableField(status, ref, start, queue)
     end
 end
 
-function m.checkBackCount(status)
+function m.checkSearchLevel(status)
+    -- TODO
+    do return false end
     status.cache.back = status.cache.back or 0
-    if status.cache.back >= (status.interface.backlimit or 0) then
+    if status.cache.back >= (status.interface.searchLevel or 0) then
         return true
     end
     status.cache.back = status.cache.back + 1
@@ -1405,7 +1407,7 @@ function m.checkSameSimpleAsReturn(status, ref, start, queue)
     if ref.parent.parent.type ~= 'main' then
         return
     end
-    if m.checkBackCount(status) then
+    if m.checkSearchLevel(status) then
         return
     end
     local newStatus = m.status(status)
@@ -1432,7 +1434,7 @@ function m.checkSameSimpleAsSetValue(status, ref, start, queue)
     if m.checkValueMark(status, ref, parent) then
         return
     end
-    if m.checkBackCount(status) then
+    if m.checkSearchLevel(status) then
         return
     end
     local obj

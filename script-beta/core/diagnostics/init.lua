@@ -22,6 +22,7 @@ local function check(uri, name, level, results)
 end
 
 return function (uri)
+    local vm  = require 'vm'
     local ast = files.getAst(uri)
     if not ast then
         return nil
@@ -30,6 +31,7 @@ return function (uri)
 
     for name, level in pairs(define.DiagnosticDefaultSeverity) do
         await.delay()
+        vm.setSearchLevel(0)
         check(uri, name, level, results)
     end
 

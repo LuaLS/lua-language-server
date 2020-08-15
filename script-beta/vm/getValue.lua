@@ -814,27 +814,27 @@ end
 
 local function getValue(source)
     local results = checkLiteral(source)
-                 or checkValue(source)
-                 or checkUnary(source)
-                 or checkBinary(source)
-                 or checkLibraryTypes(source)
-                 or checkLibrary(source)
-                 or checkSpecialReturn(source)
-                 or checkLibraryReturn(source)
+                 --or checkValue(source)
+                 --or checkUnary(source)
+                 --or checkBinary(source)
+                 --or checkLibraryTypes(source)
+                 --or checkLibrary(source)
+                 --or checkSpecialReturn(source)
+                 --or checkLibraryReturn(source)
     if results then
         return results
     end
 
     results = {}
-    inferByLibraryArg(results, source)
-    inferByDef(results, source)
-    inferBySet(results, source)
-    inferByCall(results, source)
-    inferByGetTable(results, source)
-    inferByUnary(results, source)
-    inferByBinary(results, source)
-    inferByCallReturn(results, source)
-    inferByPCallReturn(results, source)
+    --inferByLibraryArg(results, source)
+    --inferByDef(results, source)
+    --inferBySet(results, source)
+    --inferByCall(results, source)
+    --inferByGetTable(results, source)
+    --inferByUnary(results, source)
+    --inferByBinary(results, source)
+    --inferByCallReturn(results, source)
+    --inferByPCallReturn(results, source)
 
     if #results == 0 then
         return nil

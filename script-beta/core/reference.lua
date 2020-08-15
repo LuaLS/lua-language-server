@@ -65,6 +65,7 @@ return function (uri, offset)
     end
 
     local results = {}
+    vm.setSearchLevel(10)
     vm.eachRef(source, function (src)
         local root = guide.getRoot(src)
         if     src.type == 'setfield'

@@ -115,6 +115,7 @@ return function (uri, offset)
         end
     end
 
+    vm.setSearchLevel(10)
     vm.eachDef(source, function (src)
         src = src.field or src.method or src.index or src
         results[#results+1] = {

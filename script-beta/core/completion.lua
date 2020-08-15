@@ -749,6 +749,7 @@ local function completion(uri, offset)
     local text = files.getText(uri)
     local results = {}
     clearStack()
+    vm.setSearchLevel(3)
     if ast then
         tryWord(ast, text, offset, results)
         trySymbol(ast, text, offset, results)

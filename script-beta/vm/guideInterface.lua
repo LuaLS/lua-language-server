@@ -2,6 +2,7 @@ local vm    = require 'vm.vm'
 local files = require 'files'
 local ws    = require 'workspace'
 local guide = require 'parser.guide'
+local await = require 'await'
 
 local m = {}
 
@@ -63,6 +64,7 @@ function vm.interface.call(func, args, index)
     if not lib then
         return nil
     end
+    await.delay()
     if lib.name == 'require' and index == 1 then
         return m.require(args, index)
     end
@@ -72,9 +74,11 @@ function vm.interface.call(func, args, index)
 end
 
 function vm.interface.global(name)
+    await.delay()
     return vm.getGlobals(name)
 end
 
 function vm.interface.link(uri)
+    await.delay()
     return vm.getLinksTo(uri)
 end

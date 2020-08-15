@@ -31,6 +31,7 @@ function m.create(callback, ...)
     return m.checkResult(co, coroutine.resume(co, ...))
 end
 
+--- 对当前任务设置一个延迟检查器，当延迟前后检查器的返回值不同时，放弃此任务
 function m.setDelayer(callback)
     local co = coroutine.running()
     m.coDelayer[co] = callback
@@ -47,8 +48,11 @@ function m.sleep(time, getVersion)
     end
     local version = getVersion and getVersion()
     local co = coroutine.running()
+    local delayer = m.coDelayer[co]
+    local dVersion = delayer and delayer()
     timer.wait(time, function ()
-        if version == (getVersion and getVersion()) then
+        if  version == (getVersion and getVersion())
+        and dVersion == (delayer and delayer()) then
             return m.checkResult(co, coroutine.resume(co))
         else
             coroutine.close(co)

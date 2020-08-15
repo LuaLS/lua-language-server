@@ -52,14 +52,14 @@ local function catch_target(script, sep)
     return new_script, list
 end
 
-function TEST(data)
+function TEST(expect)
     files.removeAll()
 
-    local targetScript = data[1].content
-    local targetUri = furi.encode(data[1].path)
+    local targetScript = expect[1].content
+    local targetUri = furi.encode(expect[1].path)
 
-    local sourceScript, sourceList = catch_target(data[2].content, '?')
-    local sourceUri = furi.encode(data[2].path)
+    local sourceScript, sourceList = catch_target(expect[2].content, '?')
+    local sourceUri = furi.encode(expect[2].path)
 
     files.setText(targetUri, targetScript)
     files.setText(sourceUri, sourceScript)
@@ -70,8 +70,8 @@ function TEST(data)
     if hover.label then
         hover.label = hover.label:gsub('\r\n', '\n')
     end
-    assert(eq(hover.label, data.hover.label))
-    assert(eq(hover.description, data.hover.description))
+    assert(eq(hover.label, expect.hover.label))
+    assert(eq(hover.description, expect.hover.description))
 end
 
 TEST {

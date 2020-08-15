@@ -24,9 +24,10 @@ function m.eachDef(source, results)
         return results
     end
 
+    local clock = os.clock()
     local myResults, count = guide.requestDefinition(source, vm.interface)
-    if DEVELOP and count > 100 then
-        log.warn('requestDefinition', count, guide.getRoot(source).uri, util.dump(source, { deep = 1 }))
+    if DEVELOP and os.clock() - clock > 0.1 then
+        log.warn('requestDefinition', count, os.clock() - clock, guide.getRoot(source).uri, util.dump(source, { deep = 1 }))
     end
     vm.mergeResults(results, myResults)
     m.searchLibrary(source, results)

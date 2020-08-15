@@ -1285,6 +1285,13 @@ function m.checkSameSimpleInGlobal(status, name, start, queue)
     if not status.interface.global then
         return
     end
+    --if not status.cache.globalMark then
+    --    status.cache.globalMark = {}
+    --end
+    --if status.cache.globalMark[name] then
+    --    return
+    --end
+    --status.cache.globalMark[name] = true
     local objs = status.interface.global(name)
     if objs then
         for _, obj in ipairs(objs) do

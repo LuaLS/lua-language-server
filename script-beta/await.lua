@@ -110,7 +110,7 @@ function m.step()
         waker()
         local passed = os.clock() - clock
         if passed > 0.1 then
-            log.debug(('Await step takes [%.3f] sec.'):format(passed))
+            log.warn(('Await step takes [%.3f] sec.'):format(passed))
         end
         return true
     else

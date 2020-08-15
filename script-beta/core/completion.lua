@@ -684,6 +684,10 @@ local function isAfterLocal(text, start)
     return word == 'local'
 end
 
+local function checkUri(word, text, results)
+    
+end
+
 local function tryWord(ast, text, offset, results)
     local finish = skipSpace(text, offset)
     local word, start = findWord(text, finish)
@@ -691,7 +695,11 @@ local function tryWord(ast, text, offset, results)
         return nil
     end
     local hasSpace = finish ~= offset
-    if not isInString(ast, offset) then
+    if isInString(ast, offset) then
+        if not hasSpace then
+            checkUri(word, text, results)
+        end
+    else
         local parent, oop = findParent(ast, text, start - 1)
         if parent then
             if not hasSpace then
@@ -714,9 +722,9 @@ local function tryWord(ast, text, offset, results)
                 end
             end
         end
-    end
-    if not hasSpace then
-        checkCommon(word, text, results)
+        if not hasSpace then
+            checkCommon(word, text, results)
+        end
     end
 end
 

@@ -904,14 +904,17 @@ m.Version = 53
 
 function m.status(parentStatus, interface)
     local status = {
-        cache     = parentStatus and parentStatus.cache     or {
+        cache     = parentStatus and parentStatus.cache       or {
             count = 0,
         },
-        depth     = parentStatus and parentStatus.depth     or 0,
-        interface = parentStatus and parentStatus.interface or {},
-        lock      = parentStatus and parentStatus.lock      or {},
+        depth     = parentStatus and parentStatus.depth       or 0,
+        interface = parentStatus and parentStatus.interface   or {},
+        locks     = parentStatus and parentStatus.locks       or {},
+        index     = parentStatus and (parentStatus.index + 1) or 1,
         results   = {},
     }
+    status.lock = status.locks[status.index] or {}
+    status.locks[status.index] = status.lock
     if interface then
         for k, v in pairs(interface) do
             status.interface[k] = interface[k] or v
@@ -1577,15 +1580,6 @@ function m.searchSameFields(status, simple, mode)
             }
         end
     end
-    -- 防止无限递归
-    local mark = {}
-    for obj in pairs(status.lock) do
-        mark[obj] = true
-    end
-    --for i = 1, #queue do
-    --    local data = queue[i]
-    --    status.lock[data.obj] = true
-    --end
     -- 对初始对象进行预处理
     if simple.global then
         for i = 1, #queue do
@@ -1623,12 +1617,10 @@ function m.searchSameFields(status, simple, mode)
         if not data then
             return
         end
-        if not mark[data.obj] then
+        if not status.lock[data.obj] then
             status.lock[data.obj] = true
-            mark[data.obj] = true
             status.cache.count = status.cache.count + 1
             m.checkSameSimple(status, simple, data, mode, status.results, queue)
-            status.lock[data.obj] = nil
         end
     end
 end

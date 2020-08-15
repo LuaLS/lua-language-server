@@ -521,6 +521,31 @@ TEST {
     }
 }
 
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            local mt = {}
+            mt.__index = mt
+
+            function mt:<!add!>(a, b)
+            end
+            
+            return function ()
+                return setmetatable({}, mt)
+            end
+        ]],
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            local m = require 'a'
+            local obj = m()
+            obj:<?add?>()
+        ]]
+    },
+}
+
 --TEST {
 --    {
 --        path = 'a.lua',

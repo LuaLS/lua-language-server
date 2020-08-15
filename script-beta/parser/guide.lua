@@ -947,7 +947,7 @@ end
 
 --- 根据函数调用的返回值，获取：调用的函数，参数列表，自己是第几个返回值
 function m.getCallValue(source)
-    local value = m.getObjectValue(source)
+    local value = m.getObjectValue(source) or source
     if not value then
         return
     end
@@ -1070,19 +1070,15 @@ function m.checkSameSimpleInValueInMetaTable(status, mt, start, queue)
     end
 end
 
-function m.checkSameSimpleInValueOfSetMetaTable(status, value, start, queue)
-    if value.type ~= 'select' then
+function m.checkSameSimpleInValueOfCallMetaTable(status, call, start, queue)
+    if not call or call.type ~= 'call' then
         return
     end
-    local vararg = value.vararg
-    if not vararg or vararg.type ~= 'call' then
-        return
-    end
-    local func = vararg.node
+    local func = call.node
     if not func or func.special ~= 'setmetatable' then
         return
     end
-    local args = vararg.args
+    local args = call.args
     local obj = args[1]
     local mt = args[2]
     if obj then
@@ -1095,6 +1091,14 @@ function m.checkSameSimpleInValueOfSetMetaTable(status, value, start, queue)
     if mt then
         m.checkSameSimpleInValueInMetaTable(status, mt, start, queue)
     end
+end
+
+function m.checkSameSimpleInValueOfSetMetaTable(status, value, start, queue)
+    if value.type ~= 'select' then
+        return
+    end
+    local call = value.vararg
+    m.checkSameSimpleInValueOfCallMetaTable(status, call, start, queue)
 end
 
 function m.checkSameSimpleInArg1OfSetMetaTable(status, obj, start, queue)
@@ -1119,6 +1123,11 @@ function m.checkSameSimpleInBranch(status, ref, start, queue)
         m.checkSameSimpleInValueOfTable(status, value, start, queue)
         -- 检查赋值是 setmetatable 调用的情况
         m.checkSameSimpleInValueOfSetMetaTable(status, value, start, queue)
+    end
+
+    if ref.type == 'call' then
+        -- 检查赋值是 setmetatable 调用的情况
+        m.checkSameSimpleInValueOfCallMetaTable(status, ref, start, queue)
     end
 
     -- 检查自己是字面量表的情况

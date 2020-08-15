@@ -1,8 +1,6 @@
-local service = require 'service'
-local workspace = require 'workspace'
-local fs = require 'bee.filesystem'
-local core = require 'core'
-local uric = require 'uri'
+local files = require 'files'
+local core = require 'core.completion'
+local furi = require 'file-uri'
 
 rawset(_G, 'TEST', true)
 
@@ -63,34 +61,22 @@ local function eq(a, b)
 end
 
 function TEST(data)
-    local lsp = service()
-    local ws = workspace(lsp, 'test')
-    lsp.workspace = ws
-    ws.root = ROOT
+    files.removeAll()
 
     local mainUri
-    local mainBuf
     local pos
     for _, info in ipairs(data) do
-        local uri = uric.encode(fs.path(info.path))
+        local uri = furi.encode(info.path)
         local script = info.content
         if info.main then
             pos = script:find('$', 1, true) - 1
             script = script:gsub('%$', '')
             mainUri = uri
-            mainBuf = script
         end
-        lsp:saveText(uri, 1, script)
-        ws:addFile(uric.decode(uri))
-
-        while lsp._needCompile[1] do
-            lsp:compileVM(lsp._needCompile[1])
-        end
+        files.setText(uri, script)
     end
 
-    local vm = lsp:loadVM(mainUri)
-    assert(vm)
-    local result = core.completion(vm, mainBuf, pos)
+    local result = core.completion(mainUri, pos)
     local expect = data.completion
     if expect then
         assert(result)

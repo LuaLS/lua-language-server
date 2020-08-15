@@ -18,7 +18,6 @@ local function check(uri, name, level, results)
     local passed = os.clock() - clock
     if passed >= 0.5 then
         log.warn(('Diagnostics [%s] @ [%s] takes [%.3f] sec!'):format(name, uri, passed))
-        await.delay()
     end
 end
 
@@ -30,6 +29,7 @@ return function (uri)
     local results = {}
 
     for name, level in pairs(define.DiagnosticDefaultSeverity) do
+        await.delay()
         check(uri, name, level, results)
     end
 

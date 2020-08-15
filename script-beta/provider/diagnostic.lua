@@ -221,6 +221,7 @@ files.watch(function (env, uri)
         m.clear(uri)
     elseif env == 'update' then
         await.create(function ()
+            -- 一旦文件的版本发生变化，就放弃这次诊断
             await.setDelayer(function ()
                 return files.getVersion(uri)
             end)

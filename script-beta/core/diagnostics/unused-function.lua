@@ -22,7 +22,7 @@ return function (uri, callback)
             return
         end
         local hasGet
-        local refs = guide.requestReference(source)
+        local refs = vm.getRefs(source)
         for _, src in ipairs(refs) do
             if vm.isGet(src) then
                 hasGet = true

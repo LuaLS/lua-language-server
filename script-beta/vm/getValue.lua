@@ -487,7 +487,7 @@ local function inferByGetTable(results, source)
 end
 
 local function inferByDef(results, source)
-    local defs = guide.requestDefinition(source)
+    local defs = vm.getDefs(source)
     for _, src in ipairs(defs) do
         local tp  = vm.getValue(src)
         if tp then

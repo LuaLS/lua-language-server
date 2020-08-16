@@ -1,5 +1,6 @@
 local vm       = require 'vm'
 local util     = require 'utility'
+local guide    = require 'parser.guide'
 
 local function getKey(src)
     local key = vm.getKeyName(src)
@@ -118,7 +119,7 @@ return function (source)
     local intValue = true
     vm.eachField(source, function (src)
         local key, class, literal = getField(src)
-        classes[key] = guide.mergeInfers(class, classes[key])
+        classes[key] = guide.mergeTypes {class, classes[key]}
         literals[key] = mergeLiteral(literal, literals[key])
         if class ~= 'integer'
         or not literals[key]

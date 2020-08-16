@@ -95,7 +95,7 @@ function vm.interface.cache(source, mode)
         cache[mode] = {}
     end
     local sourceCache = cache[mode][source]
-    if cache[mode][source] then
+    if sourceCache then
         return sourceCache
     end
     sourceCache = {}

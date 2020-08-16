@@ -189,25 +189,25 @@ local function checkBinary(source)
     if op.type == 'and' then
         local isTrue = vm.checkTrue(source[1])
         if isTrue == true then
-            return vm.getValue(source[2])
+            return vm.getInfers(source[2])
         elseif isTrue == false then
-            return vm.getValue(source[1])
+            return vm.getInfers(source[1])
         else
             return merge(
-                vm.getValue(source[1]),
-                vm.getValue(source[2])
+                vm.getInfers(source[1]),
+                vm.getInfers(source[2])
             )
         end
     elseif op.type == 'or' then
         local isTrue = vm.checkTrue(source[1])
         if isTrue == true then
-            return vm.getValue(source[1])
+            return vm.getInfers(source[1])
         elseif isTrue == false then
-            return vm.getValue(source[2])
+            return vm.getInfers(source[2])
         else
             return merge(
-                vm.getValue(source[1]),
-                vm.getValue(source[2])
+                vm.getInfers(source[1]),
+                vm.getInfers(source[2])
             )
         end
     elseif op.type == '==' then
@@ -711,7 +711,7 @@ local function inferBySetOfLocal(results, source)
             if ref.type == 'setlocal' then
                 break
             end
-            merge(results, vm.getValue(ref))
+            merge(results, vm.getInfers(ref))
         end
     end
 end
@@ -724,7 +724,7 @@ local function inferBySet(results, source)
         inferBySetOfLocal(results, source)
     elseif source.type == 'setlocal'
     or     source.type == 'getlocal' then
-        merge(results, vm.getValue(source.node))
+        merge(results, vm.getInfers(source.node))
     end
 end
 
@@ -736,7 +736,7 @@ local function mergeFunctionReturns(results, source, index)
     for i = 1, #returns do
         local rtn = returns[i]
         if rtn[index] then
-            merge(results, vm.getValue(rtn[index]))
+            merge(results, vm.getInfers(rtn[index]))
         end
     end
 end
@@ -749,7 +749,7 @@ local function inferByCallReturn(results, source)
         return
     end
     local node = source.vararg.node
-    local nodeValues = vm.getValue(node)
+    local nodeValues = vm.getInfers(node)
     if not nodeValues then
         return
     end
@@ -786,7 +786,7 @@ local function inferByPCallReturn(results, source)
     else
         return
     end
-    local funcValues = vm.getValue(func)
+    local funcValues = vm.getInfers(func)
     if not funcValues then
         return
     end
@@ -817,7 +817,7 @@ function vm.inferValue(source, infer)
 
     results = {}
     inferByLibraryArg(results, source)
-    --inferByDef(results, source)
+    inferByDef(results, source)
     inferBySet(results, source)
     inferByCall(results, source)
     inferByGetTable(results, source)
@@ -834,7 +834,7 @@ function vm.inferValue(source, infer)
 end
 
 function vm.checkTrue(source)
-    local values = vm.getValue(source)
+    local values = vm.getInfers(source)
     if not values then
         return
     end
@@ -869,7 +869,7 @@ end
 
 --- 获取特定类型的字面量值
 function vm.getLiteral(source, type)
-    local values = vm.getValue(source)
+    local values = vm.getInfers(source)
     if not values then
         return nil
     end
@@ -885,8 +885,8 @@ function vm.getLiteral(source, type)
 end
 
 function vm.isSameValue(a, b)
-    local valuesA = vm.getValue(a)
-    local valuesB = vm.getValue(b)
+    local valuesA = vm.getInfers(a)
+    local valuesB = vm.getInfers(b)
     if not valuesA or not valuesB then
         return false
     end
@@ -921,13 +921,13 @@ end
 
 --- 是否包含某种类型
 function vm.hasType(source, type)
-    local values = vm.getValue(source)
-    if not values then
+    local infers = vm.getInfers(source)
+    if not infers then
         return false
     end
-    for i = 1, #values do
-        local value = values[i]
-        if value.type == type then
+    for i = 1, #infers do
+        local infer = infers[i]
+        if infer.type == type then
             return true
         end
     end
@@ -935,26 +935,15 @@ function vm.hasType(source, type)
 end
 
 function vm.getType(source)
-    local values = vm.getValue(source)
-    return guide.viewInfer(values)
+    local infers = vm.getInfers(source)
+    return guide.viewInfer(infers)
 end
 
 --- 获取对象的值
 --- 会尝试穿透函数调用
-function vm.getValue(source)
+function vm.getInfers(source)
     if not source then
         return
     end
-    local cache = vm.getCache('getValue')[source]
-    if cache ~= nil then
-        return cache
-    end
-    local unlock = vm.lock('getValue', source)
-    if not unlock then
-        return
-    end
-    cache = guide.requestInfer(source, vm.interface) or false
-    vm.getCache('getValue')[source] = cache
-    unlock()
-    return cache
+    return guide.requestInfer(source, vm.interface)
 end

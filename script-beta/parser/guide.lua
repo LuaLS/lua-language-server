@@ -1423,8 +1423,6 @@ function m.checkSameSimpleAsReturn(status, ref, start, queue)
     if ref.parent.type ~= 'return' then
         return
     end
-    -- TODO 这里的开销非常大
-    --do return end
     if ref.parent.parent.type ~= 'main' then
         return
     end
@@ -1786,7 +1784,7 @@ function m.cleanResults(results)
     end
 end
 
-function m.getCache(status, obj, mode)
+function m.getRefCache(status, obj, mode)
     if not status.interface.cache then
         return
     end
@@ -1802,7 +1800,7 @@ end
 function m.searchRefs(status, obj, mode)
     status.depth = status.depth + 1
 
-    local cache, makeCache = m.getCache(status, obj, mode)
+    local cache, makeCache = m.getRefCache(status, obj, mode)
     if cache then
         for i = 1, #cache do
             status.results[#status.results+1] = cache[i]
@@ -1844,23 +1842,6 @@ function m.searchRefOfValue(status, obj)
     end
 end
 
-function m.mergeInfer(t, b)
-    if not t then
-        t = {}
-    end
-    if not b then
-        return t
-    end
-    for i = 1, #b do
-        local o = b[i]
-        if not t[o] then
-            t[o] = true
-            t[#t+1] = o
-        end
-    end
-    return t
-end
-
 function m.allocInfer(o)
     -- TODO
     assert(o.type)
@@ -1873,31 +1854,26 @@ function m.allocInfer(o)
                 source = o.source,
             }
             values[i] = sub
-            values[sub] = true
         end
         return values
     else
         return {
             [1] = o,
-            [o] = true,
         }
     end
 end
 
-function m.insertInfer(t, o)
-    if not o then
-        return
+function m.mergeTypes(infers)
+    local types = {}
+    for i = 1, #infers do
+        for tp in infers[i]:gmatch '[^|]+' do
+            if not types[tp] and tp ~= 'any' then
+                types[#types+1] = tp
+            end
+        end
     end
-    if not t[o] then
-        t[o] = true
-        t[#t+1] = o
-    end
-    return t
-end
-
-local function mergeInfers(types)
     if #types == 0 then
-        return nil
+        return 'any'
     end
     if #types == 1 then
         return types[1]
@@ -1922,23 +1898,6 @@ local function mergeInfers(types)
     return tableConcat(types, '|')
 end
 
-function m.mergeInfers(...)
-    local max = select('#', ...)
-    local views = {}
-    for i = 1, max do
-        local view = select(i, ...)
-        if view then
-            for tp in view:gmatch '[^|]+' do
-                if not views[tp] and tp ~= 'any' then
-                    views[tp] = true
-                    views[#views+1] = tp
-                end
-            end
-        end
-    end
-    return mergeInfers(views)
-end
-
 function m.viewInfer(infers)
     if not infers then
         return 'any'
@@ -1946,102 +1905,142 @@ function m.viewInfer(infers)
     if type(infers) ~= 'table' then
         return infers or 'any'
     end
+    local mark = {}
     local types = {}
     for i = 1, #infers do
         local tp = infers[i].type
-        if tp and not types[tp] and tp ~= 'any' then
-            types[tp] = true
+        if not mark[tp] and tp ~= 'any' then
             types[#types+1] = tp
         end
+        mark[tp] = true
     end
-    return m.mergeInfers(types) or 'any'
+    return m.mergeTypes(types)
 end
 
 function m.inferCheckLiteral(status, source)
     if source.type == 'string' then
-        return m.alloc {
+        return m.allocInfer {
             type   = 'string',
             value  = source[1],
             source = source,
         }
     elseif source.type == 'nil' then
-        return m.alloc {
+        return m.allocInfer {
             type   = 'nil',
             value  = NIL,
             source = source,
         }
     elseif source.type == 'boolean' then
-        return m.alloc {
+        return m.allocInfer {
             type   = 'boolean',
             value  = source[1],
             source = source,
         }
     elseif source.type == 'number' then
         if mathType(source[1]) == 'integer' then
-            return m.alloc {
+            return m.allocInfer {
                 type   = 'integer',
                 value  = source[1],
                 source = source,
             }
         else
-            return m.alloc {
+            return m.allocInfer {
                 type   = 'number',
                 value  = source[1],
                 source = source,
             }
         end
     elseif source.type == 'integer' then
-        return m.alloc {
+        return m.allocInfer {
             type   = 'integer',
             source = source,
         }
     elseif source.type == 'table' then
-        return m.alloc {
+        return m.allocInfer {
             type   = 'table',
             source = source,
         }
     elseif source.type == 'function' then
-        return m.alloc {
+        return m.allocInfer {
             type   = 'function',
             source = source,
         }
     elseif source.type == '...' then
-        return m.alloc {
+        return m.allocInfer {
             type   = '...',
             source = source,
         }
     end
 end
 
+function m.inferByDef(status, obj)
+    local newStatus = m.status(status)
+    m.searchRefs(newStatus, obj, 'def')
+    for _, src in ipairs(newStatus.results) do
+        local inferStatus = m.status(status)
+        local infers = m.searchInfer(inferStatus, src)
+
+    end
+end
+
+function m.cleanInfers(infers)
+    local mark = {}
+    for i = 1, #infers do
+        local source = infers[i].source
+        if mark[source] then
+            infers[i] = infers[#infers]
+            infers[#infers] = nil
+        else
+            mark[source] = true
+        end
+    end
+end
+
 function m.searchInfer(status, obj)
     obj = m.getObjectValue(obj) or obj
+
+    local cache, makeCache
+    if status.interface.cache then
+        cache, makeCache = status.interface.cache(obj, 'infer')
+    end
+    if cache then
+        for i = 1, #cache do
+            status.results[#status.results+1] = cache[i]
+        end
+        return
+    end
+
     local results = m.inferCheckLiteral(status, obj)
-                 --or inferCheckUnary(obj)
-                 --or inferCheckBinary(obj)
-                 --or inferCheckLibraryTypes(obj)
-                 --or inferCheckLibrary(obj)
-                 --or inferCheckSpecialReturn(obj)
-                 --or inferCheckLibraryReturn(obj)
+                 --or m.inferCheckUnary(obj)
+                 --or m.inferCheckBinary(obj)
+                 --or m.inferCheckLibraryTypes(obj)
+                 --or m.inferCheckLibrary(obj)
+                 --or m.inferCheckSpecialReturn(obj)
+                 --or m.inferCheckLibraryReturn(obj)
     if results then
-        return results
+        m.cleanInfers(results)
+        for i = 1, #results do
+            status.results[#status.results+1] = results[i]
+        end
+        if makeCache then
+            makeCache(status.results)
+        end
+        return
     end
 
-    results = {}
-    --inferByLibraryArg(results, obj)
-    --inferByDef(results, source)
-    --inferBySet(results, obj)
-    --inferByCall(results, obj)
-    --inferByGetTable(results, obj)
-    --inferByUnary(results, obj)
-    --inferByBinary(results, obj)
-    --inferByCallReturn(results, obj)
-    --inferByPCallReturn(results, obj)
-
-    if #results == 0 then
-        return nil
+    --inferByLibraryArg(status, obj)
+    m.inferByDef(status, obj)
+    --m.inferBySet(status, obj)
+    --m.inferByCall(status, obj)
+    --m.inferByGetTable(status, obj)
+    --m.inferByUnary(status, obj)
+    --m.inferByBinary(status, obj)
+    --m.inferByCallReturn(status, obj)
+    --m.inferByPCallReturn(status, obj)
+    m.cleanInfers(status.results)
+    if makeCache then
+        makeCache(status.results)
     end
-
-    return results
 end
 
 --- 请求对象的引用，包括 `a.b.c` 形式
@@ -2081,7 +2080,9 @@ end
 --- 请求对象的类型推测
 function m.requestInfer(obj, interface)
     local status = m.status(nil, interface)
-    return m.searchInfer(status, obj)
+    m.searchInfer(status, obj)
+
+    return status.results, status.cache.count
 end
 
 return m

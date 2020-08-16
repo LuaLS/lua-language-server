@@ -1,7 +1,7 @@
 local vm = require 'vm.vm'
 require 'vm.getGlobals'
 require 'vm.getLibrary'
-require 'vm.getValue'
+require 'vm.getInfer'
 require 'vm.getClass'
 require 'vm.getMeta'
 require 'vm.eachField'

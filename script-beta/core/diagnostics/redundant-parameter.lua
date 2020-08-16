@@ -65,7 +65,7 @@ return function (uri, callback)
         if not vm.hasType(func, 'function') then
             return
         end
-        local values = vm.getValue(func)
+        local values = vm.getInfers(func)
         for _, value in ipairs(values) do
             if value.type and value.source.type == 'function' then
                 local args = countFuncArgs(value.source)

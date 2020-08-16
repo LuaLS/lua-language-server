@@ -7,7 +7,7 @@ local util       = require 'utility'
 local findSource = require 'core.find-source'
 
 local function getHoverAsFunction(source)
-    local values = vm.getValue(source)
+    local values = vm.getInfers(source)
     local desc   = getDesc(source)
     local labels = {}
     local defs = 0

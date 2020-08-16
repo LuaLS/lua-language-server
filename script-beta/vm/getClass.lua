@@ -41,5 +41,5 @@ function vm.getClass(source)
     if #classes == 0 then
         return nil
     end
-    return guide.mergeInfers(table.unpack(classes))
+    return guide.mergeTypes(classes)
 end

@@ -36,7 +36,7 @@ local function asFunction(source)
     local returns = {}
     for _, rtn in ipairs(source.returns) do
         for i = 1, #rtn do
-            local values = vm.getValue(rtn[i])
+            local values = vm.getInfers(rtn[i])
             returns[#returns+1] = values
         end
         break

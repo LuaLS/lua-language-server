@@ -49,7 +49,7 @@ end
 
 local function getNodeAsObject(source)
     local node = source.node
-    local values = vm.getValue(node)
+    local values = vm.getInfers(node)
     if not values then
         return nil
     end

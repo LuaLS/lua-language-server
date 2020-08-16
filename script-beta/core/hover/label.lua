@@ -18,17 +18,19 @@ end
 
 local function asValue(source, title)
     local name = buildName(source)
-    local class, type, literal, cont
-    local values = vm.getValue(source)
+    local class = 'any'
+    local type  = 'any'
+    local literal, cont
+    local values = vm.getInfers(source)
     if values then
         for _, value in ipairs(values) do
             local src = value.source
             local tp  = value.type
-            class = guide.mergeInfers(class, vm.getClass(src))
-            type  = guide.mergeInfers(type, tp)
+            class = guide.mergeTypes {class, vm.getClass(src)}
+            type  = guide.mergeTypes {type, tp}
             local sl = vm.getLiteral(src)
             if sl then
-                literal = guide.mergeInfers(literal, util.viewLiteral(sl))
+                literal = guide.mergeTypes {literal, util.viewLiteral(sl)}
             end
             if tp == 'table' then
                 cont = buildTable(src)
@@ -36,11 +38,11 @@ local function asValue(source, title)
         end
     end
     vm.eachDef(source, function (src)
-        class   = guide.mergeInfers(class, vm.getClass(src))
-        type    = guide.mergeInfers(type, vm.getType(src))
+        class   = guide.mergeTypes {class, vm.getClass(src)}
+        type    = guide.mergeTypes {type, vm.getType(src)}
         local sl = vm.getLiteral(src)
         if sl then
-            literal = guide.mergeInfers(literal, util.viewLiteral(sl))
+            literal = guide.mergeTypes {literal, util.viewLiteral(sl)}
         end
         if type == 'table' then
             cont = buildTable(src)

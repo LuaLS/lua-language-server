@@ -1949,7 +1949,7 @@ function m.checkTrue(status, source)
 end
 
 --- 获取特定类型的字面量值
-function m.getLiteral(status, source, type)
+function m.getInferLiteral(status, source, type)
     local newStatus = m.status(status)
     m.searchInfer(newStatus, source)
     for _, infer in ipairs(newStatus.results) do
@@ -1965,8 +1965,7 @@ end
 --- 是否包含某种类型
 function m.hasType(status, source, type)
     m.searchInfer(status, source)
-    for refer in ipairs(status.results) do
-        local infer = infers[i]
+    for _, infer in ipairs(status.results) do
         if infer.type == type then
             return true
         end
@@ -1976,9 +1975,9 @@ end
 
 function m.isSameValue(status, a, b)
     local statusA = m.status(status)
-    m.getInfers(statusA, a)
+    m.searchInfer(statusA, a)
     local statusB = m.status(status)
-    m.getInfers(statusB, b)
+    m.searchInfer(statusB, b)
     local infers = {}
     for _, infer in ipairs(statusA.results) do
         local literal = infer.value
@@ -2094,7 +2093,7 @@ function m.inferCheckUnary(status, source)
         }
         return true
     elseif op.type == '~' then
-        local l = m.getLiteral(status, source[1], 'integer')
+        local l = m.getInferLiteral(status, source[1], 'integer')
         status.results = m.allocInfer {
             type   = 'integer',
             value  = l and ~l or nil,
@@ -2102,7 +2101,7 @@ function m.inferCheckUnary(status, source)
         }
         return true
     elseif op.type == '-' then
-        local v = m.getLiteral(status, source[1], 'integer')
+        local v = m.getInferLiteral(status, source[1], 'integer')
         if v then
             status.results = m.allocInfer {
                 type   = 'integer',
@@ -2111,7 +2110,7 @@ function m.inferCheckUnary(status, source)
             }
             return true
         end
-        v = m.getLiteral(status, source[1], 'number')
+        v = m.getInferLiteral(status, source[1], 'number')
         status.results = m.allocInfer {
             type   = 'number',
             value  = v and -v or nil,
@@ -2122,8 +2121,8 @@ function m.inferCheckUnary(status, source)
 end
 
 local function mathCheck(status, a, b)
-    local v1  = m.getLiteral(status, a, 'integer') or m.getLiteral(status, a, 'number')
-    local v2  = m.getLiteral(status, b, 'integer') or m.getLiteral(status, a, 'number')
+    local v1  = m.getInferLiteral(status, a, 'integer') or m.getInferLiteral(status, a, 'number')
+    local v2  = m.getInferLiteral(status, b, 'integer') or m.getInferLiteral(status, a, 'number')
     local int = m.hasType(status, a, 'integer')
             and m.hasType(status, b, 'integer')
             and not m.hasType(status, a, 'number')
@@ -2152,10 +2151,10 @@ function m.inferCheckBinary(status, source)
     elseif op.type == 'or' then
         local isTrue = m.checkTrue(status, source[1])
         if isTrue == true then
-            m.getInfers(status, source[1])
+            m.searchInfer(status, source[1])
             return true
         elseif isTrue == false then
-            m.getInfers(status, source[2])
+            m.searchInfer(status, source[2])
             return true
         else
             m.searchInfer(status, source[1])
@@ -2207,185 +2206,202 @@ function m.inferCheckBinary(status, source)
         }
         return true
     elseif op.type == '<=' then
-        local v1 = m.getLiteral(status, source[1], 'integer') or m.getLiteral(status, source[1], 'number')
-        local v2 = m.getLiteral(status, source[2], 'integer') or m.getLiteral(source[2], 'number')
+        local v1 = m.getInferLiteral(status, source[1], 'integer') or m.getInferLiteral(status, source[1], 'number')
+        local v2 = m.getInferLiteral(status, source[2], 'integer') or m.getInferLiteral(source[2], 'number')
         local v
         if v1 and v2 then
             v = v1 <= v2
         end
-        return alloc {
+        status.results = m.allocInfer {
             type   = 'boolean',
             value  = v,
             source = source,
         }
+        return true
     elseif op.type == '>=' then
-        local v1 = vm.getLiteral(source[1], 'integer') or vm.getLiteral(source[1], 'number')
-        local v2 = vm.getLiteral(source[2], 'integer') or vm.getLiteral(source[2], 'number')
+        local v1 = m.getInferLiteral(status, source[1], 'integer') or m.getInferLiteral(status, source[1], 'number')
+        local v2 = m.getInferLiteral(status, source[2], 'integer') or m.getInferLiteral(status, source[2], 'number')
         local v
         if v1 and v2 then
             v = v1 >= v2
         end
-        return alloc {
+        status.results = m.allocInfer {
             type   = 'boolean',
             value  = v,
             source = source,
         }
+        return true
     elseif op.type == '<' then
-        local v1 = vm.getLiteral(source[1], 'integer') or vm.getLiteral(source[1], 'number')
-        local v2 = vm.getLiteral(source[2], 'integer') or vm.getLiteral(source[2], 'number')
+        local v1 = m.getInferLiteral(status, source[1], 'integer') or m.getInferLiteral(status, source[1], 'number')
+        local v2 = m.getInferLiteral(status, source[2], 'integer') or m.getInferLiteral(status, source[2], 'number')
         local v
         if v1 and v2 then
             v = v1 < v2
         end
-        return alloc {
+        status.results = m.allocInfer {
             type   = 'boolean',
             value  = v,
             source = source,
         }
+        return true
     elseif op.type == '>' then
-        local v1 = vm.getLiteral(source[1], 'integer') or vm.getLiteral(source[1], 'number')
-        local v2 = vm.getLiteral(source[2], 'integer') or vm.getLiteral(source[2], 'number')
+        local v1 = m.getInferLiteral(status, source[1], 'integer') or m.getInferLiteral(status, source[1], 'number')
+        local v2 = m.getInferLiteral(source[2], 'integer') or m.getInferLiteral(status, source[2], 'number')
         local v
         if v1 and v2 then
             v = v1 > v2
         end
-        return alloc {
+        status.results = m.allocInfer {
             type   = 'boolean',
             value  = v,
             source = source,
         }
+        return true
     elseif op.type == '|' then
-        local v1 = vm.getLiteral(source[1], 'integer')
-        local v2 = vm.getLiteral(source[2], 'integer')
+        local v1 = m.getInferLiteral(status, source[1], 'integer')
+        local v2 = m.getInferLiteral(status, source[2], 'integer')
         local v
         if v1 and v2 then
             v = v1 | v2
         end
-        return alloc {
+        status.results = m.allocInfer {
             type   = 'integer',
             value  = v,
             source = source,
         }
+        return true
     elseif op.type == '~' then
-        local v1 = vm.getLiteral(source[1], 'integer')
-        local v2 = vm.getLiteral(source[2], 'integer')
+        local v1 = m.getInferLiteral(status, source[1], 'integer')
+        local v2 = m.getInferLiteral(status, source[2], 'integer')
         local v
         if v1 and v2 then
             v = v1 ~ v2
         end
-        return alloc {
+        status.results = m.allocInfer {
             type   = 'integer',
             value  = v,
             source = source,
         }
+        return true
     elseif op.type == '&' then
-        local v1 = vm.getLiteral(source[1], 'integer')
-        local v2 = vm.getLiteral(source[2], 'integer')
+        local v1 = m.getInferLiteral(status, source[1], 'integer')
+        local v2 = m.getInferLiteral(status, source[2], 'integer')
         local v
         if v1 and v2 then
             v = v1 & v2
         end
-        return alloc {
+        status.results = m.allocInfer {
             type   = 'integer',
             value  = v,
             source = source,
         }
+        return true
     elseif op.type == '<<' then
-        local v1 = vm.getLiteral(source[1], 'integer')
-        local v2 = vm.getLiteral(source[2], 'integer')
+        local v1 = m.getInferLiteral(status, source[1], 'integer')
+        local v2 = m.getInferLiteral(status, source[2], 'integer')
         local v
         if v1 and v2 then
             v = v1 << v2
         end
-        return alloc {
+        status.results = m.allocInfer {
             type   = 'integer',
             value  = v,
             source = source,
         }
+        return true
     elseif op.type == '>>' then
-        local v1 = vm.getLiteral(source[1], 'integer')
-        local v2 = vm.getLiteral(source[2], 'integer')
+        local v1 = m.getInferLiteral(status, source[1], 'integer')
+        local v2 = m.getInferLiteral(status, source[2], 'integer')
         local v
         if v1 and v2 then
             v = v1 >> v2
         end
-        return alloc {
+        status.results = m.allocInfer {
             type   = 'integer',
             value  = v,
             source = source,
         }
+        return true
     elseif op.type == '..' then
-        local v1 = vm.getLiteral(source[1], 'string')
-        local v2 = vm.getLiteral(source[2], 'string')
+        local v1 = m.getInferLiteral(status, source[1], 'string')
+        local v2 = m.getInferLiteral(status, source[2], 'string')
         local v
         if v1 and v2 then
             v = v1 .. v2
         end
-        return alloc {
+        status.results = m.allocInfer {
             type   = 'string',
             value  = v,
             source = source,
         }
+        return true
     elseif op.type == '^' then
-        local v1 = vm.getLiteral(source[1], 'integer') or vm.getLiteral(source[1], 'number')
-        local v2 = vm.getLiteral(source[2], 'integer') or vm.getLiteral(source[2], 'number')
+        local v1 = m.getInferLiteral(status, source[1], 'integer') or m.getInferLiteral(status, source[1], 'number')
+        local v2 = m.getInferLiteral(source[2], 'integer') or m.getInferLiteral(status, source[2], 'number')
         local v
         if v1 and v2 then
             v = v1 ^ v2
         end
-        return alloc {
+        status.results = m.allocInfer {
             type   = 'number',
             value  = v,
             source = source,
         }
+        return true
     elseif op.type == '/' then
-        local v1 = vm.getLiteral(source[1], 'integer') or vm.getLiteral(source[1], 'number')
-        local v2 = vm.getLiteral(source[2], 'integer') or vm.getLiteral(source[2], 'number')
+        local v1 = m.getInferLiteral(status, source[1], 'integer') or m.getInferLiteral(status, source[1], 'number')
+        local v2 = m.getInferLiteral(status, source[2], 'integer') or m.getInferLiteral(status, source[2], 'number')
         local v
         if v1 and v2 then
             v = v1 > v2
         end
-        return alloc {
+        status.results = m.allocInfer {
             type   = 'number',
             value  = v,
             source = source,
         }
+        return true
     -- 其他数学运算根据2侧的值决定，当2侧的值均为整数时返回整数
     elseif op.type == '+' then
-        local int, v1, v2 = mathCheck(source[1], source[2])
-        return alloc {
+        local int, v1, v2 = mathCheck(status, source[1], source[2])
+        status.results = m.allocInfer{
             type   = int,
             value  = (v1 and v2) and (v1 + v2) or nil,
             source = source,
         }
+        return true
     elseif op.type == '-' then
-        local int, v1, v2 = mathCheck(source[1], source[2])
-        return alloc {
+        local int, v1, v2 = mathCheck(status, source[1], source[2])
+        status.results = m.allocInfer{
             type   = int,
             value  = (v1 and v2) and (v1 - v2) or nil,
             source = source,
         }
+        return true
     elseif op.type == '*' then
-        local int, v1, v2 = mathCheck(source[1], source[2])
-        return alloc {
+        local int, v1, v2 = mathCheck(status, source[1], source[2])
+        status.results = m.allocInfer {
             type   = int,
             value  = (v1 and v2) and (v1 * v2) or nil,
             source = source,
         }
+        return true
     elseif op.type == '%' then
-        local int, v1, v2 = mathCheck(source[1], source[2])
-        return alloc {
+        local int, v1, v2 = mathCheck(status, source[1], source[2])
+        status.results = m.allocInfer {
             type   = int,
             value  = (v1 and v2) and (v1 % v2) or nil,
             source = source,
         }
+        return true
     elseif op.type == '//' then
-        local int, v1, v2 = mathCheck(source[1], source[2])
-        return alloc {
+        local int, v1, v2 = mathCheck(status, source[1], source[2])
+        status.results = m.allocInfer {
             type   = int,
             value  = (v1 and v2) and (v1 // v2) or nil,
             source = source,
         }
+        return true
     end
 end
 
@@ -2501,7 +2517,7 @@ function m.searchInfer(status, obj)
 
     local checked = m.inferCheckLiteral(status, obj)
                  or m.inferCheckUnary(status, obj)
-                 --or m.inferCheckBinary(status, obj)
+                 or m.inferCheckBinary(status, obj)
                  --or m.inferCheckLibraryTypes(status, obj)
                  --or m.inferCheckLibrary(status, obj)
                  --or m.inferCheckSpecialReturn(status, obj)

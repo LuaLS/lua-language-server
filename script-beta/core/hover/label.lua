@@ -22,9 +22,9 @@ local function asValue(source, title)
     local type    = 'any'
     local literal = ''
     local cont
-    local values = vm.getInfers(source)
-    if values then
-        for _, value in ipairs(values) do
+    local infers = vm.getInfers(source)
+    if infers then
+        for _, value in ipairs(infers) do
             local src = value.source
             local tp  = value.type
             class = guide.mergeTypes {class, vm.getClass(src)}
@@ -54,10 +54,12 @@ local function asValue(source, title)
     pack[#pack+1] = name .. ':'
     if cont then
         type = nil
-    else
-        type = type or 'any'
     end
-    pack[#pack+1] = class or type
+    if class == 'any' then
+        pack[#pack+1] = type
+    else
+        pack[#pack+1] = class
+    end
     if literal ~= '' then
         pack[#pack+1] = '='
         pack[#pack+1] = literal

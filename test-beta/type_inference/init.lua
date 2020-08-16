@@ -179,6 +179,13 @@ end
 _, <?y?> = pcall(x)
 ]]
 
+TEST 'integer' [[
+function x()
+    return 1
+end
+_, <?y?> = pcall(x)
+]]
+
 TEST 'table' [[
 local <?os?> = require 'os'
 ]]

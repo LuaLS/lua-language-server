@@ -1846,16 +1846,15 @@ function m.allocInfer(o)
     -- TODO
     assert(o.type)
     if type(o.type) == 'table' then
-        local values = {}
+        local infers = {}
         for i = 1, #o.type do
-            local sub = {
+            infers[i] = {
                 type   = o.type[i],
                 value  = o.value,
                 source = o.source,
             }
-            values[i] = sub
         end
-        return values
+        return infers
     else
         return {
             [1] = o,
@@ -1865,9 +1864,11 @@ end
 
 function m.mergeTypes(infers)
     local types = {}
+    local mark = {}
     for i = 1, #infers do
         for tp in infers[i]:gmatch '[^|]+' do
-            if not types[tp] and tp ~= 'any' then
+            if not mark[tp] and tp ~= 'any' then
+                mark[tp] = true
                 types[#types+1] = tp
             end
         end
@@ -2733,6 +2734,9 @@ function m.cleanInfers(infers)
     local mark = {}
     for i = 1, #infers do
         local infer = infers[i]
+        if not infer then
+            return
+        end
         local key = ('%s|%p'):format(infer.type, infer.source)
         if mark[key] then
             infers[i] = infers[#infers]

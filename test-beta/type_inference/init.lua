@@ -172,6 +172,17 @@ end
 <?y?> = x()
 ]]
 
+TEST 'integer' [[
+local function x()
+    return 1
+end
+_, <?y?> = pcall(x)
+]]
+
+TEST 'table' [[
+local <?os?> = require 'os'
+]]
+
 TEST 'string|table' [[
 local y = #<?x?>
 ]]

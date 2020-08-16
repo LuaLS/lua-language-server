@@ -2469,6 +2469,47 @@ function m.inferCheckLibraryReturn(status, source)
     return true
 end
 
+function m.inferByLibraryArg(status, source)
+    local args = source.parent
+    if not args then
+        return
+    end
+    if args.type ~= 'callargs' then
+        return
+    end
+    local call = args.parent
+    if not call then
+        return
+    end
+    local func = call.node
+    local index
+    for i = 1, #args do
+        if args[i] == source then
+            index = i
+            break
+        end
+    end
+    if not index then
+        return
+    end
+    local lib = status.interface.library and status.interface.library(func)
+    local arg = lib and lib.args and lib.args[index]
+    if not arg then
+        return
+    end
+    if not arg.type then
+        return
+    end
+    if arg.type == '...' or arg.type == 'any' then
+        return
+    end
+    status.results[#status.results+1] = {
+        type   = arg.type,
+        value  = arg.value,
+        source = arg,
+    }
+end
+
 function m.inferByDef(status, obj)
     if status.index > 1 then
         return
@@ -2659,6 +2700,35 @@ function m.inferByCallReturn(status, source)
     end
 end
 
+function m.inferByPCallReturn(status, source)
+    if source.type ~= 'select' then
+        return
+    end
+    local call = source.vararg
+    if not call or call.type ~= 'call' then
+        return
+    end
+    local node = call.node
+    local specialName = node.special
+    local func, index
+    if specialName == 'pcall' then
+        func = call.args[1]
+        index = source.index - 1
+    elseif specialName == 'xpcall' then
+        func = call.args[1]
+        index = source.index - 2
+    else
+        return
+    end
+    local newStatus = m.status(status)
+    m.searchRefs(newStatus, func, 'def')
+    for _, src in ipairs(newStatus.results) do
+        if src.value and src.value.type == 'function' then
+            mergeFunctionReturns(status, src.value, index)
+        end
+    end
+end
+
 function m.cleanInfers(infers)
     local mark = {}
     for i = 1, #infers do
@@ -2695,7 +2765,6 @@ function m.searchInfer(status, obj)
                  or m.inferCheckBinary(status, obj)
                  or m.inferCheckLibraryTypes(status, obj)
                  or m.inferCheckLibrary(status, obj)
-                 --or m.inferCheckSpecialReturn(status, obj)
                  or m.inferCheckLibraryReturn(status, obj)
     if checked then
         m.cleanInfers(status.results)
@@ -2705,7 +2774,7 @@ function m.searchInfer(status, obj)
         return
     end
 
-    --m.inferByLibraryArg(status, obj)
+    m.inferByLibraryArg(status, obj)
     m.inferByDef(status, obj)
     m.inferBySet(status, obj)
     m.inferByCall(status, obj)
@@ -2713,7 +2782,7 @@ function m.searchInfer(status, obj)
     m.inferByUnary(status, obj)
     m.inferByBinary(status, obj)
     m.inferByCallReturn(status, obj)
-    --m.inferByPCallReturn(status, obj)
+    m.inferByPCallReturn(status, obj)
     m.cleanInfers(status.results)
     if makeCache then
         makeCache(status.results)

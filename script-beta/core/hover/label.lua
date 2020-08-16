@@ -17,10 +17,11 @@ local function asFunction(source, oop)
 end
 
 local function asValue(source, title)
-    local name = buildName(source)
-    local class = 'any'
-    local type  = 'any'
-    local literal, cont
+    local name    = buildName(source)
+    local class   = 'any'
+    local type    = 'any'
+    local literal = ''
+    local cont
     local values = vm.getInfers(source)
     if values then
         for _, value in ipairs(values) do
@@ -57,7 +58,7 @@ local function asValue(source, title)
         type = type or 'any'
     end
     pack[#pack+1] = class or type
-    if literal then
+    if literal ~= '' then
         pack[#pack+1] = '='
         pack[#pack+1] = literal
     end

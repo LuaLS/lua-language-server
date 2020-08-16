@@ -150,6 +150,10 @@ TEST 'string' [[
 ]]
 
 TEST 'function' [[
+return ('x').<?sub?>
+]]
+
+TEST 'function' [[
 <?x?> = ('x').sub
 ]]
 

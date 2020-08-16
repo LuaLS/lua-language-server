@@ -2405,6 +2405,70 @@ function m.inferCheckBinary(status, source)
     end
 end
 
+function m.inferCheckLibraryTypes(status, source)
+    if type(source.type) ~= 'table' then
+        return false
+    end
+    for i = 1, #source.type do
+        status.results[#status.results+1] = {
+            type = source.type[i],
+            source = source,
+        }
+    end
+    return true
+end
+
+function m.inferCheckLibrary(status, source)
+    local lib = status.interface.library and status.interface.library(source)
+    if not lib then
+        return false
+    end
+    status.results = m.allocInfer {
+        type   = lib.type,
+        value  = lib.value,
+        source = lib,
+    }
+    return true
+end
+
+function m.inferCheckLibraryReturn(status, source)
+    if source.type ~= 'select' then
+        return nil
+    end
+    local index = source.index
+    local call = source.vararg
+    if call.type ~= 'call' then
+        return nil
+    end
+    local func = call.node
+    local lib = status.interface.library and status.interface.library(func)
+    if not lib then
+        return nil
+    end
+    if lib.type ~= 'function' then
+        return nil
+    end
+    if not lib.returns then
+        return nil
+    end
+    local rtn = lib.returns[index]
+    if not rtn then
+        return nil
+    end
+    if not rtn.type then
+        return nil
+    end
+    if rtn.type == '...' or rtn.type == 'any' then
+        return
+    end
+    status.results = m.allocInfer {
+        type   = rtn.type,
+        value  = rtn.value,
+        source = rtn,
+    }
+    return true
+end
+
 function m.inferByDef(status, obj)
     local newStatus = m.status(status)
     m.searchRefs(newStatus, obj, 'def')
@@ -2488,6 +2552,41 @@ function m.inferByUnary(status, source)
     end
 end
 
+local function mergeFunctionReturns(status, source, index)
+    local returns = source.returns
+    if not returns then
+        return
+    end
+    for i = 1, #returns do
+        local rtn = returns[i]
+        if rtn[index] then
+            local newStatus = m.status(status)
+            m.searchInfer(newStatus, rtn[index])
+            for _, infer in ipairs(newStatus.results) do
+                status.results[#status.results+1] = infer
+            end
+        end
+    end
+end
+
+function m.inferByCallReturn(status, source)
+    if source.type ~= 'select' then
+        return
+    end
+    if not source.vararg or source.vararg.type ~= 'call' then
+        return
+    end
+    local node = source.vararg.node
+    local newStatus = m.status(status)
+    m.searchRefs(newStatus, node, 'def')
+    local index = source.index
+    for _, src in ipairs(newStatus.results) do
+        if src.value and src.value.type == 'function' then
+            mergeFunctionReturns(status, src.value, index)
+        end
+    end
+end
+
 function m.cleanInfers(infers)
     local mark = {}
     for i = 1, #infers do
@@ -2502,6 +2601,9 @@ function m.cleanInfers(infers)
 end
 
 function m.searchInfer(status, obj)
+    while obj.type == 'paren' do
+        obj = obj.exp
+    end
     obj = m.getObjectValue(obj) or obj
 
     local cache, makeCache
@@ -2518,10 +2620,10 @@ function m.searchInfer(status, obj)
     local checked = m.inferCheckLiteral(status, obj)
                  or m.inferCheckUnary(status, obj)
                  or m.inferCheckBinary(status, obj)
-                 --or m.inferCheckLibraryTypes(status, obj)
-                 --or m.inferCheckLibrary(status, obj)
+                 or m.inferCheckLibraryTypes(status, obj)
+                 or m.inferCheckLibrary(status, obj)
                  --or m.inferCheckSpecialReturn(status, obj)
-                 --or m.inferCheckLibraryReturn(status, obj)
+                 or m.inferCheckLibraryReturn(status, obj)
     if checked then
         m.cleanInfers(status.results)
         if makeCache then
@@ -2541,7 +2643,7 @@ function m.searchInfer(status, obj)
     m.inferByGetTable(status, obj)
     m.inferByUnary(status, obj)
     --m.inferByBinary(status, obj)
-    --m.inferByCallReturn(status, obj)
+    m.inferByCallReturn(status, obj)
     --m.inferByPCallReturn(status, obj)
     m.cleanInfers(status.results)
     if makeCache then

@@ -1,17 +1,23 @@
-local util        = require 'utility'
-local error       = error
-local type        = type
-local next        = next
-local tostring    = tostring
-local print       = print
-local ipairs      = ipairs
-local tableInsert = table.insert
-local tableUnpack = table.unpack
-local tableRemove = table.remove
-local tableMove   = table.move
-local pairs       = pairs
+local util         = require 'utility'
+local error        = error
+local type         = type
+local next         = next
+local tostring     = tostring
+local print        = print
+local ipairs       = ipairs
+local tableInsert  = table.insert
+local tableUnpack  = table.unpack
+local tableRemove  = table.remove
+local tableMove    = table.move
+local tableSort    = table.sort
+local tableConcat  = table.concat
+local mathType     = math.type
+local pairs        = pairs
+local setmetatable = setmetatable
+local assert       = assert
+local select       = select
 
-_ENV = nil
+local _ENV = nil
 
 local m = {}
 
@@ -84,6 +90,18 @@ m.actionMap = {
     ['function']    = {'#'},
     ['funcargs']    = {'#'},
 }
+
+local TypeSort = {
+    ['boolean']  = 1,
+    ['string']   = 2,
+    ['integer']  = 3,
+    ['number']   = 4,
+    ['table']    = 5,
+    ['function'] = 6,
+    ['nil']      = 999,
+}
+
+local NIL = setmetatable({'<nil>'}, { __tostring = function () return 'nil' end })
 
 --- 是否是字面量
 function m.isLiteral(obj)
@@ -1041,6 +1059,9 @@ function m.searchFields(status, obj, key, interface)
 end
 
 function m.getObjectValue(obj)
+    while obj.type == 'paren' do
+        obj = obj.exp
+    end
     if obj.value then
         return obj.value
     end
@@ -1823,6 +1844,206 @@ function m.searchRefOfValue(status, obj)
     end
 end
 
+function m.mergeInfer(t, b)
+    if not t then
+        t = {}
+    end
+    if not b then
+        return t
+    end
+    for i = 1, #b do
+        local o = b[i]
+        if not t[o] then
+            t[o] = true
+            t[#t+1] = o
+        end
+    end
+    return t
+end
+
+function m.allocInfer(o)
+    -- TODO
+    assert(o.type)
+    if type(o.type) == 'table' then
+        local values = {}
+        for i = 1, #o.type do
+            local sub = {
+                type   = o.type[i],
+                value  = o.value,
+                source = o.source,
+            }
+            values[i] = sub
+            values[sub] = true
+        end
+        return values
+    else
+        return {
+            [1] = o,
+            [o] = true,
+        }
+    end
+end
+
+function m.insertInfer(t, o)
+    if not o then
+        return
+    end
+    if not t[o] then
+        t[o] = true
+        t[#t+1] = o
+    end
+    return t
+end
+
+local function mergeInfers(types)
+    if #types == 0 then
+        return nil
+    end
+    if #types == 1 then
+        return types[1]
+    end
+    tableSort(types, function (a, b)
+        local sa = TypeSort[a]
+        local sb = TypeSort[b]
+        if sa and sb then
+            return sa < sb
+        end
+        if not sa and not sb then
+            return a < b
+        end
+        if sa and not sb then
+            return true
+        end
+        if not sa and sb then
+            return false
+        end
+        return false
+    end)
+    return tableConcat(types, '|')
+end
+
+function m.mergeInfers(...)
+    local max = select('#', ...)
+    local views = {}
+    for i = 1, max do
+        local view = select(i, ...)
+        if view then
+            for tp in view:gmatch '[^|]+' do
+                if not views[tp] and tp ~= 'any' then
+                    views[tp] = true
+                    views[#views+1] = tp
+                end
+            end
+        end
+    end
+    return mergeInfers(views)
+end
+
+function m.viewInfer(infers)
+    if not infers then
+        return 'any'
+    end
+    if type(infers) ~= 'table' then
+        return infers or 'any'
+    end
+    local types = {}
+    for i = 1, #infers do
+        local tp = infers[i].type
+        if tp and not types[tp] and tp ~= 'any' then
+            types[tp] = true
+            types[#types+1] = tp
+        end
+    end
+    return m.mergeInfers(types) or 'any'
+end
+
+function m.inferCheckLiteral(status, source)
+    if source.type == 'string' then
+        return m.alloc {
+            type   = 'string',
+            value  = source[1],
+            source = source,
+        }
+    elseif source.type == 'nil' then
+        return m.alloc {
+            type   = 'nil',
+            value  = NIL,
+            source = source,
+        }
+    elseif source.type == 'boolean' then
+        return m.alloc {
+            type   = 'boolean',
+            value  = source[1],
+            source = source,
+        }
+    elseif source.type == 'number' then
+        if mathType(source[1]) == 'integer' then
+            return m.alloc {
+                type   = 'integer',
+                value  = source[1],
+                source = source,
+            }
+        else
+            return m.alloc {
+                type   = 'number',
+                value  = source[1],
+                source = source,
+            }
+        end
+    elseif source.type == 'integer' then
+        return m.alloc {
+            type   = 'integer',
+            source = source,
+        }
+    elseif source.type == 'table' then
+        return m.alloc {
+            type   = 'table',
+            source = source,
+        }
+    elseif source.type == 'function' then
+        return m.alloc {
+            type   = 'function',
+            source = source,
+        }
+    elseif source.type == '...' then
+        return m.alloc {
+            type   = '...',
+            source = source,
+        }
+    end
+end
+
+function m.searchInfer(status, obj)
+    obj = m.getObjectValue(obj) or obj
+    local results = m.inferCheckLiteral(status, obj)
+                 --or inferCheckUnary(obj)
+                 --or inferCheckBinary(obj)
+                 --or inferCheckLibraryTypes(obj)
+                 --or inferCheckLibrary(obj)
+                 --or inferCheckSpecialReturn(obj)
+                 --or inferCheckLibraryReturn(obj)
+    if results then
+        return results
+    end
+
+    results = {}
+    --inferByLibraryArg(results, obj)
+    --inferByDef(results, source)
+    --inferBySet(results, obj)
+    --inferByCall(results, obj)
+    --inferByGetTable(results, obj)
+    --inferByUnary(results, obj)
+    --inferByBinary(results, obj)
+    --inferByCallReturn(results, obj)
+    --inferByPCallReturn(results, obj)
+
+    if #results == 0 then
+        return nil
+    end
+
+    return results
+end
+
 --- 请求对象的引用，包括 `a.b.c` 形式
 --- 与 `return function` 形式。
 --- 不穿透 `setmetatable` ，考虑由
@@ -1855,6 +2076,12 @@ end
 --- 请求对象的域
 function m.requestFields(obj, interface)
     return m.searchFields(nil, obj, nil, interface)
+end
+
+--- 请求对象的类型推测
+function m.requestInfer(obj, interface)
+    local status = m.status(nil, interface)
+    return m.searchInfer(status, obj)
 end
 
 return m

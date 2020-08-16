@@ -4,6 +4,7 @@ local buildReturn = require 'core.hover.return'
 local buildTable  = require 'core.hover.table'
 local vm          = require 'vm'
 local util        = require 'utility'
+local guide       = require 'parser.guide'
 
 local function asFunction(source, oop)
     local name = buildName(source, oop)
@@ -23,11 +24,11 @@ local function asValue(source, title)
         for _, value in ipairs(values) do
             local src = value.source
             local tp  = value.type
-            class = vm.mergeViews(class, vm.getClass(src))
-            type  = vm.mergeViews(type, tp)
+            class = guide.mergeInfers(class, vm.getClass(src))
+            type  = guide.mergeInfers(type, tp)
             local sl = vm.getLiteral(src)
             if sl then
-                literal = vm.mergeViews(literal, util.viewLiteral(sl))
+                literal = guide.mergeInfers(literal, util.viewLiteral(sl))
             end
             if tp == 'table' then
                 cont = buildTable(src)
@@ -35,11 +36,11 @@ local function asValue(source, title)
         end
     end
     vm.eachDef(source, function (src)
-        class   = vm.mergeViews(class, vm.getClass(src))
-        type    = vm.mergeViews(type, vm.getType(src))
+        class   = guide.mergeInfers(class, vm.getClass(src))
+        type    = guide.mergeInfers(type, vm.getType(src))
         local sl = vm.getLiteral(src)
         if sl then
-            literal = vm.mergeViews(literal, util.viewLiteral(sl))
+            literal = guide.mergeInfers(literal, util.viewLiteral(sl))
         end
         if type == 'table' then
             cont = buildTable(src)

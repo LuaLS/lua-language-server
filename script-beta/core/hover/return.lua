@@ -21,9 +21,9 @@ local function asLibrary(source)
     local lines = {}
     for i = 1, #returns do
         if i == 1 then
-            lines[i] = ('  -> %s'):format(vm.viewType(returns[i]))
+            lines[i] = ('  -> %s'):format(guide.viewInfer(returns[i]))
         else
-            lines[i] = ('% 3d. %s'):format(i, vm.viewType(returns[i]))
+            lines[i] = ('% 3d. %s'):format(i, guide.viewInfer(returns[i]))
         end
     end
     return table.concat(lines, '\n')
@@ -47,9 +47,9 @@ local function asFunction(source)
     local lines = {}
     for i = 1, #returns do
         if i == 1 then
-            lines[i] = ('  -> %s'):format(vm.viewType(returns[i]))
+            lines[i] = ('  -> %s'):format(guide.viewInfer(returns[i]))
         else
-            lines[i] = ('% 3d. %s'):format(i, vm.viewType(returns[i]))
+            lines[i] = ('% 3d. %s'):format(i, guide.viewInfer(returns[i]))
         end
     end
     return table.concat(lines, '\n')

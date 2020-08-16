@@ -433,19 +433,6 @@ local function checkBinary(source)
     end
 end
 
-local function checkValue(source)
-    if source.value then
-        return vm.getValue(source.value)
-    end
-    if source.type == 'paren' then
-        return vm.getValue(source.exp)
-    end
-    if source.type == 'field'
-    or source.type == 'method' then
-        return vm.getValue(source.parent)
-    end
-end
-
 local function inferByCall(results, source)
     if #results ~= 0 then
         return
@@ -489,7 +476,7 @@ end
 local function inferByDef(results, source)
     local defs = vm.getDefs(source)
     for _, src in ipairs(defs) do
-        local tp  = vm.getValue(src)
+        local tp = vm.inferValue(src, false)
         if tp then
             merge(results, tp)
         end
@@ -812,29 +799,32 @@ local function inferByPCallReturn(results, source)
     end
 end
 
-local function getValue(source)
+function vm.inferValue(source, infer)
+    source = guide.getObjectValue(source) or source
     local results = checkLiteral(source)
-                 --or checkValue(source)
-                 --or checkUnary(source)
-                 --or checkBinary(source)
-                 --or checkLibraryTypes(source)
-                 --or checkLibrary(source)
-                 --or checkSpecialReturn(source)
-                 --or checkLibraryReturn(source)
+                 or checkUnary(source)
+                 or checkBinary(source)
+                 or checkLibraryTypes(source)
+                 or checkLibrary(source)
+                 or checkSpecialReturn(source)
+                 or checkLibraryReturn(source)
     if results then
         return results
     end
+    if not infer then
+        return
+    end
 
     results = {}
-    --inferByLibraryArg(results, source)
+    inferByLibraryArg(results, source)
     --inferByDef(results, source)
-    --inferBySet(results, source)
-    --inferByCall(results, source)
-    --inferByGetTable(results, source)
-    --inferByUnary(results, source)
-    --inferByBinary(results, source)
-    --inferByCallReturn(results, source)
-    --inferByPCallReturn(results, source)
+    inferBySet(results, source)
+    inferByCall(results, source)
+    inferByGetTable(results, source)
+    inferByUnary(results, source)
+    inferByBinary(results, source)
+    inferByCallReturn(results, source)
+    inferByPCallReturn(results, source)
 
     if #results == 0 then
         return nil
@@ -944,71 +934,9 @@ function vm.hasType(source, type)
     return false
 end
 
-local function mergeViews(types)
-    if #types == 0 then
-        return nil
-    end
-    if #types == 1 then
-        return types[1]
-    end
-    table.sort(types, function (a, b)
-        local sa = typeSort[a]
-        local sb = typeSort[b]
-        if sa and sb then
-            return sa < sb
-        end
-        if not sa and not sb then
-            return a < b
-        end
-        if sa and not sb then
-            return true
-        end
-        if not sa and sb then
-            return false
-        end
-        return false
-    end)
-    return table.concat(types, '|')
-end
-
-function vm.viewType(values)
-    if not values then
-        return 'any'
-    end
-    if type(values) ~= 'table' then
-        return values or 'any'
-    end
-    local types = {}
-    for i = 1, #values do
-        local tp = values[i].type
-        if tp and not types[tp] and tp ~= 'any' then
-            types[tp] = true
-            types[#types+1] = tp
-        end
-    end
-    return mergeViews(types) or 'any'
-end
-
-function vm.mergeViews(...)
-    local max = select('#', ...)
-    local views = {}
-    for i = 1, max do
-        local view = select(i, ...)
-        if view then
-            for tp in view:gmatch '[^|]+' do
-                if not views[tp] and tp ~= 'any' then
-                    views[tp] = true
-                    views[#views+1] = tp
-                end
-            end
-        end
-    end
-    return mergeViews(views)
-end
-
 function vm.getType(source)
     local values = vm.getValue(source)
-    return vm.viewType(values)
+    return guide.viewInfer(values)
 end
 
 --- 获取对象的值
@@ -1025,7 +953,7 @@ function vm.getValue(source)
     if not unlock then
         return
     end
-    cache = getValue(source) or false
+    cache = guide.requestInfer(source, vm.interface) or false
     vm.getCache('getValue')[source] = cache
     unlock()
     return cache

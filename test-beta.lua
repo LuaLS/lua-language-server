@@ -39,10 +39,10 @@ local function main()
 
     test 'references'
     test 'definition'
+    test 'type_inference'
     test 'diagnostics'
     test 'highlight'
     test 'rename'
-    test 'type_inference'
     test 'hover'
     test 'completion'
     --test 'signature'

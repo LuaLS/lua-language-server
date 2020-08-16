@@ -110,7 +110,7 @@ end
 function vm.setSearchLevel(n)
     -- 只有在搜索等级由低变高时，才需要清空缓存
     if n > vm.interface.searchLevel then
-        vm.flushCache()
+        --vm.flushCache()
     end
     vm.interface.searchLevel = n
 end

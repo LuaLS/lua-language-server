@@ -41,5 +41,5 @@ function vm.getClass(source)
     if #classes == 0 then
         return nil
     end
-    return vm.mergeViews(table.unpack(classes))
+    return guide.mergeInfers(table.unpack(classes))
 end

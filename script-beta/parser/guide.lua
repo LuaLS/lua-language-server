@@ -2470,6 +2470,9 @@ function m.inferCheckLibraryReturn(status, source)
 end
 
 function m.inferByDef(status, obj)
+    if status.index > 1 then
+        return
+    end
     local newStatus = m.status(status)
     m.searchRefs(newStatus, obj, 'def')
     for _, src in ipairs(newStatus.results) do
@@ -2478,6 +2481,33 @@ function m.inferByDef(status, obj)
         for _, infer in ipairs(inferStatus.results) do
             status.results[#status.results+1] = infer
         end
+    end
+end
+
+local function inferBySetOfLocal(status, source)
+    if source.ref then
+        local newStatus = m.status(status)
+        for _, ref in ipairs(source.ref) do
+            if ref.type == 'setlocal' then
+                break
+            end
+            m.searchInfer(newStatus, ref)
+        end
+        for _, infer in ipairs(newStatus.results) do
+            status.results[#status.results+1] = infer
+        end
+    end
+end
+
+function m.inferBySet(status, source)
+    if #status.results ~= 0 then
+        return
+    end
+    if source.type == 'local' then
+        inferBySetOfLocal(status, source)
+    elseif source.type == 'setlocal'
+    or     source.type == 'getlocal' then
+        inferBySetOfLocal(status, source.node)
     end
 end
 
@@ -2552,6 +2582,48 @@ function m.inferByUnary(status, source)
     end
 end
 
+function m.inferByBinary(status, source)
+    if #status.results ~= 0 then
+        return
+    end
+    local parent = source.parent
+    if not parent or parent.type ~= 'binary' then
+        return
+    end
+    local op = parent.op
+    if op.type == '<='
+    or op.type == '>='
+    or op.type == '<'
+    or op.type == '>'
+    or op.type == '^'
+    or op.type == '/'
+    or op.type == '+'
+    or op.type == '-'
+    or op.type == '*'
+    or op.type == '%' then
+        status.results[#status.results+1] = {
+            type   = 'number',
+            source = source,
+        }
+    elseif op.type == '|'
+    or     op.type == '~'
+    or     op.type == '&'
+    or     op.type == '<<'
+    or     op.type == '>>'
+    -- 整数的可能性比较高
+    or     op.type == '//' then
+        status.results[#status.results+1] = {
+            type   = 'integer',
+            source = source,
+        }
+    elseif op.type == '..' then
+        status.results[#status.results+1] = {
+            type   = 'string',
+            source = source,
+        }
+    end
+end
+
 local function mergeFunctionReturns(status, source, index)
     local returns = source.returns
     if not returns then
@@ -2590,12 +2662,13 @@ end
 function m.cleanInfers(infers)
     local mark = {}
     for i = 1, #infers do
-        local source = infers[i].source
-        if mark[source] then
+        local infer = infers[i]
+        local key = ('%s|%p'):format(infer.type, infer.source)
+        if mark[key] then
             infers[i] = infers[#infers]
             infers[#infers] = nil
         else
-            mark[source] = true
+            mark[key] = true
         end
     end
 end
@@ -2632,17 +2705,13 @@ function m.searchInfer(status, obj)
         return
     end
 
-    if status.index > 1 then
-        return
-    end
-
     --m.inferByLibraryArg(status, obj)
     m.inferByDef(status, obj)
-    --m.inferBySet(status, obj)
+    m.inferBySet(status, obj)
     m.inferByCall(status, obj)
     m.inferByGetTable(status, obj)
     m.inferByUnary(status, obj)
-    --m.inferByBinary(status, obj)
+    m.inferByBinary(status, obj)
     m.inferByCallReturn(status, obj)
     --m.inferByPCallReturn(status, obj)
     m.cleanInfers(status.results)

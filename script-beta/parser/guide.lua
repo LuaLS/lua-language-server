@@ -1917,57 +1917,473 @@ function m.viewInfer(infers)
     return m.mergeTypes(types)
 end
 
+function m.checkTrue(status, source)
+    local newStatus = m.status(status)
+    m.searchInfer(newStatus, source)
+    -- 当前认为的结果
+    local current
+    for _, infer in ipairs(newStatus.results) do
+        -- 新的结果
+        local new
+        if infer.type == 'nil' then
+            new = false
+        elseif infer.type == 'boolean' then
+            if infer.value == true then
+                new = true
+            elseif infer.value == false then
+                new = false
+            end
+        end
+        if new ~= nil then
+            if current == nil then
+                current = new
+            else
+                -- 如果2个结果完全相反，则返回 nil 表示不确定
+                if new ~= current then
+                    return nil
+                end
+            end
+        end
+    end
+    return current
+end
+
+--- 获取特定类型的字面量值
+function m.getLiteral(status, source, type)
+    local newStatus = m.status(status)
+    m.searchInfer(newStatus, source)
+    for _, infer in ipairs(newStatus.results) do
+        if infer.value ~= nil then
+            if type == nil or infer.type == type then
+                return infer.value
+            end
+        end
+    end
+    return nil
+end
+
+--- 是否包含某种类型
+function m.hasType(status, source, type)
+    m.searchInfer(status, source)
+    for refer in ipairs(status.results) do
+        local infer = infers[i]
+        if infer.type == type then
+            return true
+        end
+    end
+    return false
+end
+
+function m.isSameValue(status, a, b)
+    local statusA = m.status(status)
+    m.getInfers(statusA, a)
+    local statusB = m.status(status)
+    m.getInfers(statusB, b)
+    local infers = {}
+    for _, infer in ipairs(statusA.results) do
+        local literal = infer.value
+        if literal then
+            infers[literal] = false
+        end
+    end
+    for _, infer in ipairs(statusB.results) do
+        local literal = infer.value
+        if literal then
+            if infers[literal] == nil then
+                return false
+            end
+            infers[literal] = true
+        end
+    end
+    for k, v in pairs(infers) do
+        if v == false then
+            return false
+        end
+    end
+    return true
+end
+
 function m.inferCheckLiteral(status, source)
     if source.type == 'string' then
-        return m.allocInfer {
+        status.results = m.allocInfer {
             type   = 'string',
             value  = source[1],
             source = source,
         }
+        return true
     elseif source.type == 'nil' then
-        return m.allocInfer {
+        status.results = m.allocInfer {
             type   = 'nil',
             value  = NIL,
             source = source,
         }
+        return true
     elseif source.type == 'boolean' then
-        return m.allocInfer {
+        status.results = m.allocInfer {
             type   = 'boolean',
             value  = source[1],
             source = source,
         }
+        return true
     elseif source.type == 'number' then
         if mathType(source[1]) == 'integer' then
-            return m.allocInfer {
+            status.results = m.allocInfer {
                 type   = 'integer',
                 value  = source[1],
                 source = source,
             }
+            return true
         else
-            return m.allocInfer {
+            status.results = m.allocInfer {
                 type   = 'number',
                 value  = source[1],
                 source = source,
             }
+            return true
         end
     elseif source.type == 'integer' then
-        return m.allocInfer {
+        status.results = m.allocInfer {
             type   = 'integer',
             source = source,
         }
+        return true
     elseif source.type == 'table' then
-        return m.allocInfer {
+        status.results = m.allocInfer {
             type   = 'table',
             source = source,
         }
+        return true
     elseif source.type == 'function' then
-        return m.allocInfer {
+        status.results = m.allocInfer {
             type   = 'function',
             source = source,
         }
+        return true
     elseif source.type == '...' then
-        return m.allocInfer {
+        status.results = m.allocInfer {
             type   = '...',
+            source = source,
+        }
+        return true
+    end
+end
+
+function m.inferCheckUnary(status, source)
+    if source.type ~= 'unary' then
+        return
+    end
+    local op = source.op
+    if op.type == 'not' then
+        local checkTrue = m.checkTrue(status, source[1])
+        local value = nil
+        if checkTrue == true then
+            value = false
+        elseif checkTrue == false then
+            value = true
+        end
+        status.results = m.allocInfer {
+            type   = 'boolean',
+            value  = value,
+            source = source,
+        }
+        return true
+    elseif op.type == '#' then
+        status.results = m.allocInfer {
+            type   = 'integer',
+            source = source,
+        }
+        return true
+    elseif op.type == '~' then
+        local l = m.getLiteral(status, source[1], 'integer')
+        status.results = m.allocInfer {
+            type   = 'integer',
+            value  = l and ~l or nil,
+            source = source,
+        }
+        return true
+    elseif op.type == '-' then
+        local v = m.getLiteral(status, source[1], 'integer')
+        if v then
+            status.results = m.allocInfer {
+                type   = 'integer',
+                value  = - v,
+                source = source,
+            }
+            return true
+        end
+        v = m.getLiteral(status, source[1], 'number')
+        status.results = m.allocInfer {
+            type   = 'number',
+            value  = v and -v or nil,
+            source = source,
+        }
+        return true
+    end
+end
+
+local function mathCheck(status, a, b)
+    local v1  = m.getLiteral(status, a, 'integer') or m.getLiteral(status, a, 'number')
+    local v2  = m.getLiteral(status, b, 'integer') or m.getLiteral(status, a, 'number')
+    local int = m.hasType(status, a, 'integer')
+            and m.hasType(status, b, 'integer')
+            and not m.hasType(status, a, 'number')
+            and not m.hasType(status, b, 'number')
+    return int and 'integer' or 'number', v1, v2
+end
+
+function m.inferCheckBinary(status, source)
+    if source.type ~= 'binary' then
+        return
+    end
+    local op = source.op
+    if op.type == 'and' then
+        local isTrue = m.checkTrue(status, source[1])
+        if isTrue == true then
+            m.searchInfer(status, source[2])
+            return true
+        elseif isTrue == false then
+            m.searchInfer(status, source[1])
+            return true
+        else
+            m.searchInfer(status, source[1])
+            m.searchInfer(status, source[2])
+            return true
+        end
+    elseif op.type == 'or' then
+        local isTrue = m.checkTrue(status, source[1])
+        if isTrue == true then
+            m.getInfers(status, source[1])
+            return true
+        elseif isTrue == false then
+            m.getInfers(status, source[2])
+            return true
+        else
+            m.searchInfer(status, source[1])
+            m.searchInfer(status, source[2])
+            return true
+        end
+    elseif op.type == '==' then
+        local value = m.isSameValue(status, source[1], source[2])
+        if value ~= nil then
+            status.results = m.allocInfer {
+                type   = 'boolean',
+                value  = value,
+                source = source,
+            }
+            return true
+        end
+        --local isSame = m.isSameDef(status, source[1], source[2])
+        --if isSame == true then
+        --    value = true
+        --else
+        --    value = nil
+        --end
+        status.results = m.allocInfer {
+            type   = 'boolean',
+            value  = value,
+            source = source,
+        }
+        return true
+    elseif op.type == '~=' then
+        local value = m.isSameValue(status, source[1], source[2])
+        if value ~= nil then
+            status.results = m.allocInfer {
+                type   = 'boolean',
+                value  = not value,
+                source = source,
+            }
+            return true
+        end
+        --local isSame = m.isSameDef(status, source[1], source[2])
+        --if isSame == true then
+        --    value = false
+        --else
+        --    value = nil
+        --end
+        status.results = m.allocInfer {
+            type   = 'boolean',
+            value  = value,
+            source = source,
+        }
+        return true
+    elseif op.type == '<=' then
+        local v1 = m.getLiteral(status, source[1], 'integer') or m.getLiteral(status, source[1], 'number')
+        local v2 = m.getLiteral(status, source[2], 'integer') or m.getLiteral(source[2], 'number')
+        local v
+        if v1 and v2 then
+            v = v1 <= v2
+        end
+        return alloc {
+            type   = 'boolean',
+            value  = v,
+            source = source,
+        }
+    elseif op.type == '>=' then
+        local v1 = vm.getLiteral(source[1], 'integer') or vm.getLiteral(source[1], 'number')
+        local v2 = vm.getLiteral(source[2], 'integer') or vm.getLiteral(source[2], 'number')
+        local v
+        if v1 and v2 then
+            v = v1 >= v2
+        end
+        return alloc {
+            type   = 'boolean',
+            value  = v,
+            source = source,
+        }
+    elseif op.type == '<' then
+        local v1 = vm.getLiteral(source[1], 'integer') or vm.getLiteral(source[1], 'number')
+        local v2 = vm.getLiteral(source[2], 'integer') or vm.getLiteral(source[2], 'number')
+        local v
+        if v1 and v2 then
+            v = v1 < v2
+        end
+        return alloc {
+            type   = 'boolean',
+            value  = v,
+            source = source,
+        }
+    elseif op.type == '>' then
+        local v1 = vm.getLiteral(source[1], 'integer') or vm.getLiteral(source[1], 'number')
+        local v2 = vm.getLiteral(source[2], 'integer') or vm.getLiteral(source[2], 'number')
+        local v
+        if v1 and v2 then
+            v = v1 > v2
+        end
+        return alloc {
+            type   = 'boolean',
+            value  = v,
+            source = source,
+        }
+    elseif op.type == '|' then
+        local v1 = vm.getLiteral(source[1], 'integer')
+        local v2 = vm.getLiteral(source[2], 'integer')
+        local v
+        if v1 and v2 then
+            v = v1 | v2
+        end
+        return alloc {
+            type   = 'integer',
+            value  = v,
+            source = source,
+        }
+    elseif op.type == '~' then
+        local v1 = vm.getLiteral(source[1], 'integer')
+        local v2 = vm.getLiteral(source[2], 'integer')
+        local v
+        if v1 and v2 then
+            v = v1 ~ v2
+        end
+        return alloc {
+            type   = 'integer',
+            value  = v,
+            source = source,
+        }
+    elseif op.type == '&' then
+        local v1 = vm.getLiteral(source[1], 'integer')
+        local v2 = vm.getLiteral(source[2], 'integer')
+        local v
+        if v1 and v2 then
+            v = v1 & v2
+        end
+        return alloc {
+            type   = 'integer',
+            value  = v,
+            source = source,
+        }
+    elseif op.type == '<<' then
+        local v1 = vm.getLiteral(source[1], 'integer')
+        local v2 = vm.getLiteral(source[2], 'integer')
+        local v
+        if v1 and v2 then
+            v = v1 << v2
+        end
+        return alloc {
+            type   = 'integer',
+            value  = v,
+            source = source,
+        }
+    elseif op.type == '>>' then
+        local v1 = vm.getLiteral(source[1], 'integer')
+        local v2 = vm.getLiteral(source[2], 'integer')
+        local v
+        if v1 and v2 then
+            v = v1 >> v2
+        end
+        return alloc {
+            type   = 'integer',
+            value  = v,
+            source = source,
+        }
+    elseif op.type == '..' then
+        local v1 = vm.getLiteral(source[1], 'string')
+        local v2 = vm.getLiteral(source[2], 'string')
+        local v
+        if v1 and v2 then
+            v = v1 .. v2
+        end
+        return alloc {
+            type   = 'string',
+            value  = v,
+            source = source,
+        }
+    elseif op.type == '^' then
+        local v1 = vm.getLiteral(source[1], 'integer') or vm.getLiteral(source[1], 'number')
+        local v2 = vm.getLiteral(source[2], 'integer') or vm.getLiteral(source[2], 'number')
+        local v
+        if v1 and v2 then
+            v = v1 ^ v2
+        end
+        return alloc {
+            type   = 'number',
+            value  = v,
+            source = source,
+        }
+    elseif op.type == '/' then
+        local v1 = vm.getLiteral(source[1], 'integer') or vm.getLiteral(source[1], 'number')
+        local v2 = vm.getLiteral(source[2], 'integer') or vm.getLiteral(source[2], 'number')
+        local v
+        if v1 and v2 then
+            v = v1 > v2
+        end
+        return alloc {
+            type   = 'number',
+            value  = v,
+            source = source,
+        }
+    -- 其他数学运算根据2侧的值决定，当2侧的值均为整数时返回整数
+    elseif op.type == '+' then
+        local int, v1, v2 = mathCheck(source[1], source[2])
+        return alloc {
+            type   = int,
+            value  = (v1 and v2) and (v1 + v2) or nil,
+            source = source,
+        }
+    elseif op.type == '-' then
+        local int, v1, v2 = mathCheck(source[1], source[2])
+        return alloc {
+            type   = int,
+            value  = (v1 and v2) and (v1 - v2) or nil,
+            source = source,
+        }
+    elseif op.type == '*' then
+        local int, v1, v2 = mathCheck(source[1], source[2])
+        return alloc {
+            type   = int,
+            value  = (v1 and v2) and (v1 * v2) or nil,
+            source = source,
+        }
+    elseif op.type == '%' then
+        local int, v1, v2 = mathCheck(source[1], source[2])
+        return alloc {
+            type   = int,
+            value  = (v1 and v2) and (v1 % v2) or nil,
+            source = source,
+        }
+    elseif op.type == '//' then
+        local int, v1, v2 = mathCheck(source[1], source[2])
+        return alloc {
+            type   = int,
+            value  = (v1 and v2) and (v1 // v2) or nil,
             source = source,
         }
     end
@@ -1978,8 +2394,81 @@ function m.inferByDef(status, obj)
     m.searchRefs(newStatus, obj, 'def')
     for _, src in ipairs(newStatus.results) do
         local inferStatus = m.status(status)
-        local infers = m.searchInfer(inferStatus, src)
+        m.searchInfer(inferStatus, src)
+        for _, infer in ipairs(inferStatus.results) do
+            status.results[#status.results+1] = infer
+        end
+    end
+end
 
+function m.inferByCall(status, source)
+    if #status.results ~= 0 then
+        return
+    end
+    if not source.parent then
+        return
+    end
+    if source.parent.type ~= 'call' then
+        return
+    end
+    if source.parent.node == source then
+        status.results[#status.results+1] = {
+            type   = 'function',
+            source = source,
+        }
+        return
+    end
+end
+
+function m.inferByGetTable(status, source)
+    if #status.results ~= 0 then
+        return
+    end
+    local next = source.next
+    if not next then
+        return
+    end
+    if next.type == 'getfield'
+    or next.type == 'getindex'
+    or next.type == 'getmethod'
+    or next.type == 'setfield'
+    or next.type == 'setindex'
+    or next.type == 'setmethod' then
+        status.results[#status.results+1] = {
+            type   = 'table',
+            source = source,
+        }
+    end
+end
+
+function m.inferByUnary(status, source)
+    if #status.results ~= 0 then
+        return
+    end
+    local parent = source.parent
+    if not parent or parent.type ~= 'unary' then
+        return
+    end
+    local op = parent.op
+    if op.type == '#' then
+        status.results[#status.results+1] = {
+            type   = 'string',
+            source = source
+        }
+        status.results[#status.results+1] = {
+            type   = 'table',
+            source = source
+        }
+    elseif op.type == '~' then
+        status.results[#status.results+1] = {
+            type   = 'integer',
+            source = source
+        }
+    elseif op.type == '-' then
+        status.results[#status.results+1] = {
+            type   = 'number',
+            source = source
+        }
     end
 end
 
@@ -2010,30 +2499,31 @@ function m.searchInfer(status, obj)
         return
     end
 
-    local results = m.inferCheckLiteral(status, obj)
-                 --or m.inferCheckUnary(obj)
-                 --or m.inferCheckBinary(obj)
-                 --or m.inferCheckLibraryTypes(obj)
-                 --or m.inferCheckLibrary(obj)
-                 --or m.inferCheckSpecialReturn(obj)
-                 --or m.inferCheckLibraryReturn(obj)
-    if results then
-        m.cleanInfers(results)
-        for i = 1, #results do
-            status.results[#status.results+1] = results[i]
-        end
+    local checked = m.inferCheckLiteral(status, obj)
+                 or m.inferCheckUnary(status, obj)
+                 --or m.inferCheckBinary(status, obj)
+                 --or m.inferCheckLibraryTypes(status, obj)
+                 --or m.inferCheckLibrary(status, obj)
+                 --or m.inferCheckSpecialReturn(status, obj)
+                 --or m.inferCheckLibraryReturn(status, obj)
+    if checked then
+        m.cleanInfers(status.results)
         if makeCache then
             makeCache(status.results)
         end
         return
     end
 
-    --inferByLibraryArg(status, obj)
+    if status.index > 1 then
+        return
+    end
+
+    --m.inferByLibraryArg(status, obj)
     m.inferByDef(status, obj)
     --m.inferBySet(status, obj)
-    --m.inferByCall(status, obj)
-    --m.inferByGetTable(status, obj)
-    --m.inferByUnary(status, obj)
+    m.inferByCall(status, obj)
+    m.inferByGetTable(status, obj)
+    m.inferByUnary(status, obj)
     --m.inferByBinary(status, obj)
     --m.inferByCallReturn(status, obj)
     --m.inferByPCallReturn(status, obj)

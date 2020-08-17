@@ -1,5 +1,6 @@
 local vm      = require 'vm.vm'
 local guide   = require 'parser.guide'
+local util    = require 'utility'
 
 NIL = setmetatable({'<nil>'}, { __tostring = function () return 'nil' end })
 
@@ -26,5 +27,11 @@ function vm.getInfers(source)
     if not source then
         return
     end
-    return guide.requestInfer(source, vm.interface)
+    local clock = os.clock()
+    local infers = guide.requestInfer(source, vm.interface)
+    local passed = os.clock() - clock
+    if passed > 0.1 then
+        log.warn(('Request infer takes [%.3f]sec! %s'):format(passed, util.dump(source, { deep = 1 })))
+    end
+    return infers
 end

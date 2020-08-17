@@ -26,8 +26,6 @@ local function asValue(source, title)
     if vm.hasType(source, 'table') then
         cont = buildTable(source)
     end
-    --vm.eachDef(source, function (src)
-    --end)
     local pack = {}
     pack[#pack+1] = title
     pack[#pack+1] = name .. ':'

@@ -167,7 +167,7 @@ end
 local function buildFunction(results, source, oop, data)
     local snipType = config.config.completion.callSnippet
     if snipType == 'Disable' or snipType == 'Both' then
-        results[#results+1] = data
+        results[data.label] = data
     end
     if snipType == 'Both' or snipType == 'Replace' then
         local snipData = util.deepCopy(data)
@@ -181,7 +181,7 @@ local function buildFunction(results, source, oop, data)
                 description = buildDesc(source),
             }
         end)
-        results[#results+1] = snipData
+        results[snipData.label] = snipData
     end
 end
 
@@ -229,7 +229,7 @@ local function checkLocal(ast, word, offset, results)
     end
 end
 
-local function checkFieldThen(src, used, word, start, parent, oop, results)
+local function checkFieldThen(src, results, word, start, parent, oop, results)
     local key = vm.getKeyName(src)
     if not key or key:sub(1, 1) ~= 's' then
         return
@@ -238,15 +238,12 @@ local function checkFieldThen(src, used, word, start, parent, oop, results)
         return
     end
     local name = key:sub(3)
-    if used[name] then
-        return
-    end
-    used[name] = true
     if not matchKey(word, name) then
         return
     end
+    local value = guide.getObjectValue(src) or src
     local kind = ckind.Field
-    if vm.hasType(src, 'function') then
+    if value.type == 'function' then
         if oop then
             kind = ckind.Method
         else
@@ -262,38 +259,38 @@ local function checkFieldThen(src, used, word, start, parent, oop, results)
                 }
             end),
         })
+    end
+    if oop then
+        return
+    end
+    local literal = guide.getLiteral(value)
+    if literal ~= nil then
+        kind = ckind.Enum
     else
-        if oop then
+        if results[name] then
             return
         end
-        local literal = guide.getLiteral(src)
-        if literal ~= nil then
-            kind = ckind.Enum
-        end
-        results[#results+1] = {
-            label = name,
-            kind  = kind,
-            id    = stack(function ()
-                return {
-                    detail      = buildDetail(src),
-                    description = buildDesc(src),
-                }
-            end)
-        }
     end
+    results[name] = {
+        label = name,
+        kind  = kind,
+        id    = stack(function ()
+            return {
+                detail      = buildDetail(src),
+                description = buildDesc(src),
+            }
+        end)
+    }
 end
 
 local function checkField(word, start, parent, oop, results)
-    local used = {}
-    if parent.ref then
-        for _, src in ipairs(parent.ref) do
-            checkFieldThen(src, used, word, start, parent, oop, results)
-        end
-    end
+    local fields = {}
     vm.eachField(parent, function (src)
-        checkFieldThen(src, used, word, start, parent, oop, results)
+        checkFieldThen(src, fields, word, start, parent, oop, fields)
     end)
-    return used
+    for _, result in pairs(fields) do
+        results[#results+1] = result
+    end
 end
 
 local function checkTableField(ast, word, start, results)

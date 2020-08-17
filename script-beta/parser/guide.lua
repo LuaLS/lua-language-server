@@ -16,6 +16,8 @@ local pairs        = pairs
 local setmetatable = setmetatable
 local assert       = assert
 local select       = select
+local osClock      = os.clock
+local DEVELOP      = DEVELOP
 
 local _ENV = nil
 
@@ -2776,6 +2778,10 @@ function m.searchInfer(status, obj)
             status.results[#status.results+1] = cache[i]
         end
         return
+    end
+
+    if DEVELOP then
+        status.cache.clock = status.cache.clock or osClock()
     end
 
     local checked = m.inferCheckLiteral(status, obj)

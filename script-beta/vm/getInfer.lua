@@ -18,7 +18,22 @@ end
 
 function vm.getType(source)
     local infers = vm.getInfers(source)
-    return guide.viewInfer(infers)
+    return guide.viewInferType(infers)
+end
+
+function vm.getLiteral(source)
+    local infers = vm.getInfers(source)
+    local literals = {}
+    local mark = {}
+    for _, infer in ipairs(infers) do
+        local value = infer.value
+        if value and not mark[value] then
+            mark[value] = true
+            literals[#literals+1] = util.viewLiteral(value)
+        end
+    end
+    table.sort(literals)
+    return table.concat(literals, '|')
 end
 
 --- 获取对象的值
@@ -29,9 +44,8 @@ function vm.getInfers(source)
     end
     local clock = os.clock()
     local infers = guide.requestInfer(source, vm.interface)
-    local passed = os.clock() - clock
-    if passed > 0.1 then
-        log.warn(('Request infer takes [%.3f]sec! %s'):format(passed, util.dump(source, { deep = 1 })))
+    if os.clock() - clock > 0.1 then
+        log.warn(('Request infer takes [%.3f]sec! %s %s'):format(os.clock() - clock, guide.getRoot(source).uri, util.dump(source, { deep = 1 })))
     end
     return infers
 end

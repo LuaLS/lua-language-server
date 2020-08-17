@@ -19,36 +19,15 @@ end
 local function asValue(source, title)
     local name    = buildName(source)
     local class   = 'any'
-    local type    = 'any'
-    local literal = ''
-    local cont
     local infers = vm.getInfers(source)
-    if infers then
-        for _, value in ipairs(infers) do
-            local src = value.source
-            local tp  = value.type
-            class = guide.mergeTypes {class, vm.getClass(src)}
-            type  = guide.mergeTypes {type, tp}
-            local sl = guide.getLiteral(src)
-            if sl then
-                literal = guide.mergeTypes {literal, util.viewLiteral(sl)}
-            end
-            if tp == 'table' then
-                cont = buildTable(src)
-            end
-        end
+    local type    = vm.getType(source)
+    local literal = vm.getLiteral(source)
+    local cont
+    if vm.hasType(source, 'table') then
+        cont = buildTable(source)
     end
-    vm.eachDef(source, function (src)
-        class   = guide.mergeTypes {class, vm.getClass(src)}
-        type    = guide.mergeTypes {type, vm.getType(src)}
-        local sl = guide.getLiteral(src)
-        if sl then
-            literal = guide.mergeTypes {literal, util.viewLiteral(sl)}
-        end
-        if type == 'table' then
-            cont = buildTable(src)
-        end
-    end)
+    --vm.eachDef(source, function (src)
+    --end)
     local pack = {}
     pack[#pack+1] = title
     pack[#pack+1] = name .. ':'

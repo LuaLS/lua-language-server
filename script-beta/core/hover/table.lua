@@ -38,7 +38,7 @@ local function getField(src)
     end
     local tp = vm.getType(src)
     local class = vm.getClass(src)
-    local literal = guide.getLiteral(src)
+    local literal = vm.getLiteral(src)
     local key = getKey(src)
     if type(literal) == 'string' and #literal >= 50 then
         literal = literal:sub(1, 47) .. '...'

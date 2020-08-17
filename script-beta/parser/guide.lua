@@ -1899,12 +1899,9 @@ function m.mergeTypes(infers)
     return tableConcat(types, '|')
 end
 
-function m.viewInfer(infers)
+function m.viewInferType(infers)
     if not infers then
         return 'any'
-    end
-    if type(infers) ~= 'table' then
-        return infers or 'any'
     end
     local mark = {}
     local types = {}

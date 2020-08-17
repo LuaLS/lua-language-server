@@ -1,6 +1,17 @@
 local guide = require 'parser.guide'
 local vm    = require 'vm'
 
+local function mergeTypes(returns)
+    if type(returns) == 'string' then
+        return returns
+    end
+    local types = {}
+    for _, rtn in ipairs(returns) do
+        types[#types+1] = rtn.type
+    end
+    return guide.mergeTypes(types)
+end
+
 local function asLibrary(source)
     if not source.returns then
         return nil
@@ -21,9 +32,9 @@ local function asLibrary(source)
     local lines = {}
     for i = 1, #returns do
         if i == 1 then
-            lines[i] = ('  -> %s'):format(guide.viewInfer(returns[i]))
+            lines[i] = ('  -> %s'):format(mergeTypes(returns[i]))
         else
-            lines[i] = ('% 3d. %s'):format(i, guide.viewInfer(returns[i]))
+            lines[i] = ('% 3d. %s'):format(i, mergeTypes(returns[i]))
         end
     end
     return table.concat(lines, '\n')
@@ -47,9 +58,9 @@ local function asFunction(source)
     local lines = {}
     for i = 1, #returns do
         if i == 1 then
-            lines[i] = ('  -> %s'):format(guide.viewInfer(returns[i]))
+            lines[i] = ('  -> %s'):format(mergeTypes(returns[i]))
         else
-            lines[i] = ('% 3d. %s'):format(i, guide.viewInfer(returns[i]))
+            lines[i] = ('% 3d. %s'):format(i, mergeTypes(returns[i]))
         end
     end
     return table.concat(lines, '\n')

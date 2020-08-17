@@ -152,7 +152,7 @@ local function buildFunctionSnip(source)
 end
 
 local function buildDetail(source)
-    local types = vm.getType(source)
+    local types = vm.getInferType(source)
     return types
 end
 

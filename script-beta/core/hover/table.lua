@@ -12,7 +12,7 @@ local function getKey(src)
         if class then
             return ('[%s]'):format(class)
         end
-        local tp = vm.getType(src.index)
+        local tp = vm.getInferType(src.index)
         if tp then
             return ('[%s]'):format(tp)
         end
@@ -36,9 +36,9 @@ local function getField(src)
     or src.parent.type == 'getindex' then
         src = src.parent
     end
-    local tp = vm.getType(src)
+    local tp = vm.getInferType(src)
     local class = vm.getClass(src)
-    local literal = vm.getLiteral(src)
+    local literal = vm.getInferLiteral(src)
     local key = getKey(src)
     if type(literal) == 'string' and #literal >= 50 then
         literal = literal:sub(1, 47) .. '...'

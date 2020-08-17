@@ -6,6 +6,19 @@ NIL = setmetatable({'<nil>'}, { __tostring = function () return 'nil' end })
 
 --- 是否包含某种类型
 function vm.hasType(source, type)
+    local defs = vm.getDefs(source)
+    for i = 1, #defs do
+        local def = defs[i]
+        local value = guide.getObjectValue(def) or def
+        if value.type == type then
+            return true
+        end
+    end
+    return false
+end
+
+--- 是否包含某种类型
+function vm.hasInferType(source, type)
     local infers = vm.getInfers(source)
     for i = 1, #infers do
         local infer = infers[i]
@@ -16,12 +29,12 @@ function vm.hasType(source, type)
     return false
 end
 
-function vm.getType(source)
+function vm.getInferType(source)
     local infers = vm.getInfers(source)
     return guide.viewInferType(infers)
 end
 
-function vm.getLiteral(source)
+function vm.getInferLiteral(source)
     local infers = vm.getInfers(source)
     local literals = {}
     local mark = {}

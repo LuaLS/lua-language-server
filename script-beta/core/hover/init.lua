@@ -75,7 +75,7 @@ end
 
 local function getHover(source)
     vm.setSearchLevel(5)
-    local isFunction = vm.hasType(source, 'function')
+    local isFunction = vm.hasInferType(source, 'function')
     if isFunction then
         return getHoverAsFunction(source)
     else

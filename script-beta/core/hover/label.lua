@@ -19,11 +19,11 @@ end
 local function asValue(source, title)
     local name    = buildName(source)
     local infers  = vm.getInfers(source)
-    local type    = vm.getType(source)
+    local type    = vm.getInferType(source)
     local class   = vm.getClass(source)
-    local literal = vm.getLiteral(source)
+    local literal = vm.getInferLiteral(source)
     local cont
-    if vm.hasType(source, 'table') then
+    if vm.hasInferType(source, 'table') then
         cont = buildTable(source)
     end
     local pack = {}

@@ -10,9 +10,9 @@ local function asFunction(source, oop)
         local arg = source.args[i]
         local name = arg.name or guide.getName(arg)
         if name then
-            args[i] = ('%s: %s'):format(name, vm.getType(arg))
+            args[i] = ('%s: %s'):format(name, vm.getInferType(arg))
         else
-            args[i] = ('%s'):format(vm.getType(arg))
+            args[i] = ('%s'):format(vm.getInferType(arg))
         end
     end
     local methodDef

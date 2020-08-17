@@ -2541,6 +2541,10 @@ function m.inferByDef(status, obj)
 end
 
 local function inferBySetOfLocal(status, source)
+    if status.cache[source] then
+        return
+    end
+    status.cache[source] = true
     if source.ref then
         local newStatus = m.status(status)
         for _, ref in ipairs(source.ref) do

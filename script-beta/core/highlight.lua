@@ -11,11 +11,22 @@ local function eachRef(source, callback)
     end
 end
 
+local function eachLocal(source, callback)
+    callback(source)
+    if source.ref then
+        for _, ref in ipairs(source.ref) do
+            callback(ref)
+        end
+    end
+end
+
 local function find(source, uri, callback)
-    if     source.type == 'local'
-    or     source.type == 'getlocal'
-    or     source.type == 'setlocal'
-    or     source.type == 'field'
+    if     source.type == 'local' then
+        eachLocal(source, callback)
+    elseif source.type == 'getlocal'
+    or     source.type == 'setlocal' then
+        eachLocal(source.node, callback)
+    elseif     source.type == 'field'
     or     source.type == 'method'
     or     source.type == 'getindex'
     or     source.type == 'setindex'

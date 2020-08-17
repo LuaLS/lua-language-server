@@ -29,7 +29,7 @@ local function asValue(source, title)
             local tp  = value.type
             class = guide.mergeTypes {class, vm.getClass(src)}
             type  = guide.mergeTypes {type, tp}
-            local sl = vm.getLiteral(src)
+            local sl = guide.getLiteral(src)
             if sl then
                 literal = guide.mergeTypes {literal, util.viewLiteral(sl)}
             end
@@ -41,7 +41,7 @@ local function asValue(source, title)
     vm.eachDef(source, function (src)
         class   = guide.mergeTypes {class, vm.getClass(src)}
         type    = guide.mergeTypes {type, vm.getType(src)}
-        local sl = vm.getLiteral(src)
+        local sl = guide.getLiteral(src)
         if sl then
             literal = guide.mergeTypes {literal, util.viewLiteral(sl)}
         end

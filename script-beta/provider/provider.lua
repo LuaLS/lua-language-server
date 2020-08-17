@@ -362,7 +362,7 @@ proto.on('completionItem/resolve', function (item)
     if globalVersion ~= files.globalVersion then
         return item
     end
-    await.setPriority(1000)
+    --await.setPriority(1000)
     local resolved = core.resolve(id)
     if not resolved then
         return nil

@@ -2,9 +2,10 @@ local vm    = require 'vm'
 local ws    = require 'workspace'
 local furi  = require 'file-uri'
 local files = require 'files'
+local guide = require 'parser.guide'
 
 local function asString(source)
-    local literal = vm.getLiteral(source)
+    local literal = guide.getLiteral(source)
     if type(literal) ~= 'string' then
         return nil
     end

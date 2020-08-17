@@ -16,6 +16,7 @@ local findSource = require 'core.find-source'
 local await      = require 'await'
 
 local stackID = 0
+local resolveID = 0
 local stacks = {}
 local function stack(callback)
     stackID = stackID + 1
@@ -32,6 +33,11 @@ local function resolveStack(id)
     if not callback then
         return nil
     end
+    -- 当进行新的 resolve 时，放弃当前的 resolve
+    resolveID = resolveID + 1
+    await.setDelayer(function ()
+        return resolveID
+    end)
     return callback()
 end
 
@@ -260,7 +266,7 @@ local function checkFieldThen(src, used, word, start, parent, oop, results)
         if oop then
             return
         end
-        local literal = vm.getLiteral(src)
+        local literal = guide.getLiteral(src)
         if literal ~= nil then
             kind = ckind.Enum
         end

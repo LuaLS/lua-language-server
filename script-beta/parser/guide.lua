@@ -2122,8 +2122,10 @@ function m.inferCheckUnary(status, source)
 end
 
 local function mathCheck(status, a, b)
-    local v1  = m.getInferLiteral(status, a, 'integer') or m.getInferLiteral(status, a, 'number')
-    local v2  = m.getInferLiteral(status, b, 'integer') or m.getInferLiteral(status, a, 'number')
+    local v1 = m.getInferLiteral(status, a, 'integer')
+            or m.getInferLiteral(status, a, 'number')
+    local v2 = m.getInferLiteral(status, b, 'integer')
+            or m.getInferLiteral(status, a, 'number')
     local int = m.hasType(status, a, 'integer')
             and m.hasType(status, b, 'integer')
             and not m.hasType(status, a, 'number')
@@ -2207,8 +2209,10 @@ function m.inferCheckBinary(status, source)
         }
         return true
     elseif op.type == '<=' then
-        local v1 = m.getInferLiteral(status, source[1], 'integer') or m.getInferLiteral(status, source[1], 'number')
-        local v2 = m.getInferLiteral(status, source[2], 'integer') or m.getInferLiteral(source[2], 'number')
+        local v1 = m.getInferLiteral(status, source[1], 'integer')
+                or m.getInferLiteral(status, source[1], 'number')
+        local v2 = m.getInferLiteral(status, source[2], 'integer')
+                or m.getInferLiteral(source[2], 'number')
         local v
         if v1 and v2 then
             v = v1 <= v2
@@ -2220,8 +2224,10 @@ function m.inferCheckBinary(status, source)
         }
         return true
     elseif op.type == '>=' then
-        local v1 = m.getInferLiteral(status, source[1], 'integer') or m.getInferLiteral(status, source[1], 'number')
-        local v2 = m.getInferLiteral(status, source[2], 'integer') or m.getInferLiteral(status, source[2], 'number')
+        local v1 = m.getInferLiteral(status, source[1], 'integer')
+                or m.getInferLiteral(status, source[1], 'number')
+        local v2 = m.getInferLiteral(status, source[2], 'integer')
+                or m.getInferLiteral(status, source[2], 'number')
         local v
         if v1 and v2 then
             v = v1 >= v2
@@ -2233,8 +2239,10 @@ function m.inferCheckBinary(status, source)
         }
         return true
     elseif op.type == '<' then
-        local v1 = m.getInferLiteral(status, source[1], 'integer') or m.getInferLiteral(status, source[1], 'number')
-        local v2 = m.getInferLiteral(status, source[2], 'integer') or m.getInferLiteral(status, source[2], 'number')
+        local v1 = m.getInferLiteral(status, source[1], 'integer')
+                or m.getInferLiteral(status, source[1], 'number')
+        local v2 = m.getInferLiteral(status, source[2], 'integer')
+                or m.getInferLiteral(status, source[2], 'number')
         local v
         if v1 and v2 then
             v = v1 < v2
@@ -2246,8 +2254,10 @@ function m.inferCheckBinary(status, source)
         }
         return true
     elseif op.type == '>' then
-        local v1 = m.getInferLiteral(status, source[1], 'integer') or m.getInferLiteral(status, source[1], 'number')
-        local v2 = m.getInferLiteral(source[2], 'integer') or m.getInferLiteral(status, source[2], 'number')
+        local v1 = m.getInferLiteral(status, source[1], 'integer')
+                or m.getInferLiteral(status, source[1], 'number')
+        local v2 = m.getInferLiteral(source[2], 'integer')
+                or m.getInferLiteral(status, source[2], 'number')
         local v
         if v1 and v2 then
             v = v1 > v2
@@ -2337,8 +2347,10 @@ function m.inferCheckBinary(status, source)
         }
         return true
     elseif op.type == '^' then
-        local v1 = m.getInferLiteral(status, source[1], 'integer') or m.getInferLiteral(status, source[1], 'number')
-        local v2 = m.getInferLiteral(source[2], 'integer') or m.getInferLiteral(status, source[2], 'number')
+        local v1 = m.getInferLiteral(status, source[1], 'integer')
+                or m.getInferLiteral(status, source[1], 'number')
+        local v2 = m.getInferLiteral(source[2], 'integer')
+                or m.getInferLiteral(status, source[2], 'number')
         local v
         if v1 and v2 then
             v = v1 ^ v2
@@ -2350,8 +2362,10 @@ function m.inferCheckBinary(status, source)
         }
         return true
     elseif op.type == '/' then
-        local v1 = m.getInferLiteral(status, source[1], 'integer') or m.getInferLiteral(status, source[1], 'number')
-        local v2 = m.getInferLiteral(status, source[2], 'integer') or m.getInferLiteral(status, source[2], 'number')
+        local v1 = m.getInferLiteral(status, source[1], 'integer')
+                or m.getInferLiteral(status, source[1], 'number')
+        local v2 = m.getInferLiteral(status, source[2], 'integer')
+                or m.getInferLiteral(status, source[2], 'number')
         local v
         if v1 and v2 then
             v = v1 > v2
@@ -2515,7 +2529,7 @@ function m.inferByDef(status, obj)
     if status.index > 1 then
         return
     end
-    local newStatus = m.status(status)
+    local newStatus = m.status(nil, status.interface)
     m.searchRefs(newStatus, obj, 'def')
     for _, src in ipairs(newStatus.results) do
         local inferStatus = m.status(status)
@@ -2691,7 +2705,7 @@ function m.inferByCallReturn(status, source)
         return
     end
     local node = source.vararg.node
-    local newStatus = m.status(status)
+    local newStatus = m.status(nil, status.interface)
     m.searchRefs(newStatus, node, 'def')
     local index = source.index
     for _, src in ipairs(newStatus.results) do
@@ -2721,7 +2735,7 @@ function m.inferByPCallReturn(status, source)
     else
         return
     end
-    local newStatus = m.status(status)
+    local newStatus = m.status(nil, status.interface)
     m.searchRefs(newStatus, func, 'def')
     for _, src in ipairs(newStatus.results) do
         if src.value and src.value.type == 'function' then

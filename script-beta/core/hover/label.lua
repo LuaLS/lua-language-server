@@ -18,9 +18,9 @@ end
 
 local function asValue(source, title)
     local name    = buildName(source)
-    local class   = 'any'
-    local infers = vm.getInfers(source)
+    local infers  = vm.getInfers(source)
     local type    = vm.getType(source)
+    local class   = vm.getClass(source)
     local literal = vm.getLiteral(source)
     local cont
     if vm.hasType(source, 'table') then
@@ -34,12 +34,12 @@ local function asValue(source, title)
     if cont then
         type = nil
     end
-    if class == 'any' then
-        pack[#pack+1] = type
-    else
+    if class then
         pack[#pack+1] = class
+    else
+        pack[#pack+1] = type
     end
-    if literal ~= '' then
+    if literal then
         pack[#pack+1] = '='
         pack[#pack+1] = literal
     end

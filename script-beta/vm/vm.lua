@@ -33,24 +33,6 @@ function m.lock(tp, source)
     end
 end
 
---- 获取link的uri
-function m.getLinkUris(call)
-    local workspace = require 'workspace'
-    local func = call.node
-    local name = func.special
-    if name == 'require' then
-        local args = call.args
-        if not args[1] then
-            return nil
-        end
-        local literal = guide.getLiteral(args[1])
-        if type(literal) ~= 'string' then
-            return nil
-        end
-        return workspace.findUrisByRequirePath(literal, true)
-    end
-end
-
 function m.isSet(src)
     local tp = src.type
     if tp == 'setglobal'

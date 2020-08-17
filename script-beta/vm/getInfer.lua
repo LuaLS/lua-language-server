@@ -32,6 +32,9 @@ function vm.getLiteral(source)
             literals[#literals+1] = util.viewLiteral(value)
         end
     end
+    if #literals == 0 then
+        return nil
+    end
     table.sort(literals)
     return table.concat(literals, '|')
 end

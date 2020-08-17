@@ -1862,24 +1862,23 @@ function m.allocInfer(o)
     end
 end
 
-function m.mergeTypes(infers)
-    local types = {}
+function m.mergeTypes(types)
+    local results = {}
     local mark = {}
-    for i = 1, #infers do
-        for tp in infers[i]:gmatch '[^|]+' do
-            if not mark[tp] and tp ~= 'any' then
-                mark[tp] = true
-                types[#types+1] = tp
-            end
+    for i = 1, #types do
+        local tp = types[i]
+        if not mark[tp] and tp ~= 'any' then
+            mark[tp] = true
+            results[#results+1] = tp
         end
     end
-    if #types == 0 then
+    if #results == 0 then
         return 'any'
     end
-    if #types == 1 then
-        return types[1]
+    if #results == 1 then
+        return results[1]
     end
-    tableSort(types, function (a, b)
+    tableSort(results, function (a, b)
         local sa = TypeSort[a]
         local sb = TypeSort[b]
         if sa and sb then
@@ -1896,7 +1895,7 @@ function m.mergeTypes(infers)
         end
         return false
     end)
-    return tableConcat(types, '|')
+    return tableConcat(results, '|')
 end
 
 function m.viewInferType(infers)

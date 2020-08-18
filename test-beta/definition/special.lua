@@ -51,6 +51,7 @@ setmetatable(api, { __index = mt })
 api:<?method1?>()
 ]]
 
+-- TODO 不支持从方法内部找外部的赋值
 --TEST [[
 --local mt
 --function mt:x()
@@ -62,6 +63,7 @@ api:<?method1?>()
 --obj:x()
 --]]
 
+-- TODO 不支持从方法内部找外部的赋值
 --TEST [[
 --local mt
 --function mt:x()
@@ -72,6 +74,7 @@ api:<?method1?>()
 --obj:x()
 --]]
 
+-- TODO 不支持从方法内部找外部的赋值
 --TEST [[
 --local mt
 --function mt:x()
@@ -97,28 +100,27 @@ local obj = sm({}, mt)
 obj:<?method1?>()
 ]]
 
--- TODO
---TEST [[
---local mt = {}
---function mt:<!x!>()
---end
---
---local obj = setmetatable({}, {__index = mt})
---function obj:x()
---end
---
---mt:<?x?>()
---]]
+TEST [[
+local mt = {}
+function mt:<!x!>()
+end
 
--- TODO 通过代码执行顺序来判断
---TEST [[
---local mt = {}
---function mt:x()
---end
---
---local obj = setmetatable({}, {__index = mt})
---function obj:<!x!>()
---end
---
---obj:<?x?>()
---]]
+local obj = setmetatable({}, {__index = mt})
+function obj:x()
+end
+
+mt:<?x?>()
+]]
+
+-- TODO 通过代码执行顺序来判断?
+TEST [[
+local mt = {}
+function mt:<!x!>()
+end
+
+local obj = setmetatable({}, {__index = mt})
+function obj:<!x!>()
+end
+
+obj:<?x?>()
+]]

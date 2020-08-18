@@ -124,12 +124,12 @@ t.<?insert?>()
 --y.<?insert?>()
 --]]
 
---TEST[[
---local t = {
---    <!insert!> = 1,
---}
---local y = {
---    insert = 1,
---}
---t.<?insert?>()
---]]
+TEST[[
+local t = {
+    <!insert!> = 1,
+}
+local y = {
+    insert = 1,
+}
+t.<?insert?>()
+]]

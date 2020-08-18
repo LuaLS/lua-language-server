@@ -1417,7 +1417,7 @@ function m.checkSameSimpleAsTableField(status, ref, start, queue)
 end
 
 function m.checkSearchLevel(status)
-    -- TODO
+    -- TODO 限制向前搜索的次数
     do return false end
     status.cache.back = status.cache.back or 0
     if status.cache.back >= (status.interface.searchLevel or 0) then
@@ -1851,8 +1851,6 @@ function m.searchRefOfValue(status, obj)
 end
 
 function m.allocInfer(o)
-    -- TODO
-    assert(o.type)
     if type(o.type) == 'table' then
         local infers = {}
         for i = 1, #o.type do

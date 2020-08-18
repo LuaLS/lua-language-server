@@ -273,7 +273,7 @@ function string.lower(string)
   -> string
 ]]
 
--- TODO 不根据传入值推测参数类型
+-- 不根据传入值推测参数类型
 TEST [[
 local function x(a, ...)
 end

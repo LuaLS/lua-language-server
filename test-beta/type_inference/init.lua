@@ -225,35 +225,35 @@ TEST 'function' [[
 ]]
 
 -- 不根据对方函数内的使用情况来推测
---TEST 'number' [[
---local function x(a)
---    _ = a + 1
---end
---local b
---x(<?b?>)
---]]
+TEST 'any' [[
+local function x(a)
+    _ = a + 1
+end
+local b
+x(<?b?>)
+]]
 
---TEST 'number' [[
---local function x(a, ...)
---    local _, <?b?>, _ = ...
---end
---x(nil, 'xx', 1, true)
---]]
+TEST 'any' [[
+local function x(a, ...)
+    local _, <?b?>, _ = ...
+end
+x(nil, 'xx', 1, true)
+]]
 
 -- 引用不跨越参数
---TEST 'number' [[
---local function x(a, ...)
---    return true, 'ss', ...
---end
---local _, _, _, <?b?>, _ = x(nil, true, 1, 'yy')
---]]
+TEST 'any' [[
+local function x(a, ...)
+    return true, 'ss', ...
+end
+local _, _, _, <?b?>, _ = x(nil, true, 1, 'yy')
+]]
 
--- 暂不支持这些特殊情况，之后用其他语法定义
+-- TODO 暂不支持这些特殊情况，之后用其他语法定义
 --TEST 'integer' [[
 --for <?i?> in ipairs(t) do
 --end
 --]]
---
---TEST 'any' [[
---local <?x?> = next()
---]]
+
+TEST 'any' [[
+local <?x?> = next()
+]]

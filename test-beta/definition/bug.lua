@@ -100,3 +100,17 @@ TEST [[
 local a = os.clock()
 local <?<!b!>?> = os.clock()
 ]]
+
+TEST [[
+local mt = {}
+
+function mt:<!add!>(a, b)
+end
+
+local function init()
+    return mt
+end
+
+local t = init()
+t:<?add?>()
+]]

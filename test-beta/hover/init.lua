@@ -125,13 +125,10 @@ obj.<?xxx?>()
 ]]
 "function obj.xxx()"
 
--- 不不同调用方式推断定义
---TEST [[
---obj.<?xxx?>()
---]]
---[[function obj.xxx()
---  -> any
---]]
+TEST [[
+obj.<?xxx?>()
+]]
+[[global obj.xxx: any]]
 
 TEST [[
 local <?x?> = 1
@@ -217,6 +214,7 @@ local obj: class {
 }
 ]]
 
+-- TODO 支持自定义的函数库
 --TEST[[
 --local fs = require 'bee.filesystem'
 --local <?root?> = fs.current_path()
@@ -296,23 +294,22 @@ function x()
   -> any
 ]]
 
--- TODO 暂不支持跨越函数调用的函数field
---TEST [[
---local mt = {}
---
---function mt:add(a, b)
---end
---
---local function init()
---    return mt
---end
---
---local t = init()
---t:<?add?>()
---]]
---[[
---function mt:add(a: any, b: any)
---]]
+TEST [[
+local mt = {}
+
+function mt:add(a, b)
+end
+
+local function init()
+    return mt
+end
+
+local t = init()
+t:<?add?>()
+]]
+[[
+function mt:add(a: any, b: any)
+]]
 --
 --TEST [[
 --local mt = {}

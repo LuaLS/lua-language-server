@@ -602,6 +602,8 @@ function m.getSimpleName(obj)
         return m.getKeyName(key)
     elseif obj.type == 'table' then
         return ('t|%p'):format(obj)
+    elseif obj.type == 'select' then
+        return ('v|%p'):format(obj)
     end
     return m.getKeyName(obj)
 end
@@ -893,6 +895,9 @@ local function buildSimpleList(obj, max)
         or     cur.type == 'getglobal' then
             list[i] = cur
             break
+        elseif cur.type == 'select' then
+            list[i] = cur
+            break
         elseif cur.type == 'function'
         or     cur.type == 'main' then
             break
@@ -916,7 +921,8 @@ function m.getSimple(obj, max)
     or obj.type == 'setlocal'
     or obj.type == 'setglobal'
     or obj.type == 'getglobal'
-    or obj.type == 'tableindex' then
+    or obj.type == 'tableindex'
+    or obj.type == 'select' then
         simpleList = buildSimpleList(obj, max)
     elseif obj.type == 'field'
     or     obj.type == 'method' then

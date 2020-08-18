@@ -167,7 +167,7 @@ end
 local function buildFunction(results, source, oop, data)
     local snipType = config.config.completion.callSnippet
     if snipType == 'Disable' or snipType == 'Both' then
-        results[data.label] = data
+        results[#results+1] = data
     end
     if snipType == 'Both' or snipType == 'Replace' then
         local snipData = util.deepCopy(data)
@@ -181,7 +181,7 @@ local function buildFunction(results, source, oop, data)
                 description = buildDesc(source),
             }
         end)
-        results[snipData.label] = snipData
+        results[#results+1] = snipData
     end
 end
 
@@ -229,7 +229,7 @@ local function checkLocal(ast, word, offset, results)
     end
 end
 
-local function checkFieldThen(src, results, word, start, parent, oop, results)
+local function checkFieldThen(src, word, start, parent, oop, results, used)
     local key = vm.getKeyName(src)
     if not key or key:sub(1, 1) ~= 's' then
         return
@@ -237,6 +237,10 @@ local function checkFieldThen(src, results, word, start, parent, oop, results)
     if isSameSource(src, start) then
         return
     end
+    if used[key] then
+        return
+    end
+    used[key] = true
     local name = key:sub(3)
     if not matchKey(word, name) then
         return
@@ -259,6 +263,7 @@ local function checkFieldThen(src, results, word, start, parent, oop, results)
                 }
             end),
         })
+        return
     end
     if oop then
         return
@@ -266,12 +271,8 @@ local function checkFieldThen(src, results, word, start, parent, oop, results)
     local literal = guide.getLiteral(value)
     if literal ~= nil then
         kind = ckind.Enum
-    else
-        if results[name] then
-            return
-        end
     end
-    results[name] = {
+    results[#results+1] = {
         label = name,
         kind  = kind,
         id    = stack(function ()
@@ -284,13 +285,10 @@ local function checkFieldThen(src, results, word, start, parent, oop, results)
 end
 
 local function checkField(word, start, parent, oop, results)
-    local fields = {}
+    local used = {}
     vm.eachField(parent, function (src)
-        checkFieldThen(src, fields, word, start, parent, oop, fields)
+        checkFieldThen(src, word, start, parent, oop, results, used)
     end)
-    for _, result in pairs(fields) do
-        results[#results+1] = result
-    end
 end
 
 local function checkTableField(ast, word, start, results)

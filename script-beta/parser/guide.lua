@@ -1263,8 +1263,9 @@ function m.checkSameSimpleInCallInSameFile(status, func, args, index)
     m.searchRefs(newStatus, func, 'def')
     local results = {}
     for _, def in ipairs(newStatus.results) do
-        if def.type == 'function' then
-            local returns = def.returns
+        local value = m.getObjectValue(def) or def
+        if value.type == 'function' then
+            local returns = value.returns
             if returns then
                 for _, ret in ipairs(returns) do
                     local exp = ret[index]
@@ -1304,7 +1305,6 @@ function m.checkSameSimpleInCall(status, ref, start, queue, mode)
             obj   = obj,
             start = start,
             force = true,
-            call  = true,
         }
     end
     for _, obj in ipairs(newStatus.results) do
@@ -1312,7 +1312,6 @@ function m.checkSameSimpleInCall(status, ref, start, queue, mode)
             obj   = obj,
             start = start,
             force = true,
-            call  = true,
         }
     end
 end
@@ -1488,13 +1487,9 @@ function m.checkSameSimpleAsSetValue(status, ref, start, queue)
     end
 end
 
-function m.pushResult(status, mode, ref, isCall)
+function m.pushResult(status, mode, ref, simple)
     local results = status.results
     if mode == 'def' then
-        if isCall then
-            results[#results+1] = ref
-            return
-        end
         if ref.type == 'setglobal'
         or ref.type == 'setlocal'
         or ref.type == 'local' then
@@ -1511,12 +1506,12 @@ function m.pushResult(status, mode, ref, isCall)
             if ref.node.special == 'rawset' then
                 results[#results+1] = ref
             end
+        elseif ref.parent.type == 'return' then
+            if m.getParentFunction(ref) ~= m.getParentFunction(simple.first) then
+                results[#results+1] = ref
+            end
         end
     elseif mode == 'ref' then
-        if isCall then
-            results[#results+1] = ref
-            return
-        end
         if ref.type == 'setfield'
         or ref.type == 'getfield'
         or ref.type == 'tablefield' then
@@ -1573,7 +1568,6 @@ function m.checkSameSimple(status, simple, data, mode, results, queue)
     local ref    = data.obj
     local start  = data.start
     local force  = data.force
-    local isCall = data.call
     for i = start, #simple do
         local sm = simple[i]
         if sm ~= '*' and not force and m.getSimpleName(ref) ~= sm then
@@ -1589,7 +1583,7 @@ function m.checkSameSimple(status, simple, data, mode, results, queue)
         -- 穿透赋值
         m.searchSameFieldsInValue(status, ref, i, queue, cmode)
         -- 检查形如 a = f() 的分支情况，需要业务层传入 interface.call
-        m.checkSameSimpleInCall(status, ref, i, queue, mode)
+        m.checkSameSimpleInCall(status, ref, i, queue, cmode)
         if cmode ~= 'def' then
             -- 检查形如 { a = f } 的情况
             m.checkSameSimpleAsTableField(status, ref, i, queue)
@@ -1607,9 +1601,8 @@ function m.checkSameSimple(status, simple, data, mode, results, queue)
         if not ref then
             return
         end
-        isCall = false
     end
-    m.pushResult(status, mode, ref, isCall)
+    m.pushResult(status, mode, ref, simple)
 end
 
 function m.searchSameFields(status, simple, mode)
@@ -1649,13 +1642,6 @@ function m.searchSameFields(status, simple, mode)
             obj   = first,
             start = 1,
         }
-        if first then
-            if #simple > 1 then
-                m.checkSameSimpleInCall(status, first, 1, queue, 'ref')
-            else
-                m.checkSameSimpleInCall(status, first, 1, queue, mode)
-            end
-        end
     end
     for i = 1, 999 do
         local data = queue[i]
@@ -1688,7 +1674,7 @@ function m.getCallerInSameFile(status, func)
     return calls
 end
 
-function  m.getCallerCrossFiles(status, main)
+function m.getCallerCrossFiles(status, main)
     if status.interface.link then
         return status.interface.link(main.uri)
     end

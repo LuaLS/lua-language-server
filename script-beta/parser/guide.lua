@@ -1359,10 +1359,11 @@ function m.checkCallMark(status, a, mark)
     if not status.cache.callMark then
         status.cache.callMark = {}
     end
-    if status.cache.callMark[a] then
-        return true
+    if mark then
+        status.cache.callMark[a] = mark
+    else
+        return status.cache.callMark[a]
     end
-    status.cache.callMark[a] = mark
     return false
 end
 
@@ -1370,10 +1371,11 @@ function m.checkReturnMark(status, a, mark)
     if not status.cache.returnMark then
         status.cache.returnMark = {}
     end
-    if status.cache.returnMark[a] then
-        return true
+    if mark then
+        status.cache.returnMark[a] = mark
+    else
+        return status.cache.returnMark[a]
     end
-    status.cache.returnMark[a] = mark
     return false
 end
 
@@ -1506,7 +1508,8 @@ function m.pushResult(status, mode, ref, simple)
             if ref.node.special == 'rawset' then
                 results[#results+1] = ref
             end
-        elseif ref.parent.type == 'return' then
+        end
+        if ref.parent.type == 'return' then
             if m.getParentFunction(ref) ~= m.getParentFunction(simple.first) then
                 results[#results+1] = ref
             end
@@ -1536,6 +1539,9 @@ function m.pushResult(status, mode, ref, simple)
             or ref.node.special == 'rawget' then
                 results[#results+1] = ref
             end
+        end
+        if ref.parent.type == 'return' then
+            results[#results+1] = ref
         end
     elseif mode == 'field' then
         if ref.type == 'setfield'

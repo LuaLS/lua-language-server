@@ -310,24 +310,24 @@ t:<?add?>()
 [[
 function mt:add(a: any, b: any)
 ]]
---
---TEST [[
---local mt = {}
---mt.__index = mt
---
---function mt:add(a, b)
---end
---
---local function init()
---    return setmetatable({}, mt)
---end
---
---local t = init()
---t:<?add?>()
---]]
---[[
---function mt:add(a: any, b: any)
---]]
+
+TEST [[
+local mt = {}
+mt.__index = mt
+
+function mt:add(a, b)
+end
+
+local function init()
+    return setmetatable({}, mt)
+end
+
+local t = init()
+t:<?add?>()
+]]
+[[
+function mt:add(a: any, b: any)
+]]
 
 TEST [[
 local <?t?> = - 1000
@@ -532,6 +532,7 @@ end
 (1) function F(b: any)
 ]]
 
+-- 不根据参数推断
 --TEST[[
 --function a(v)
 --    print(<?v?>)
@@ -598,6 +599,7 @@ function next(table: table, index: any)
   2. value: any
 ]]
 
+-- TODO 暂未实现
 --TEST[[
 --local <?n?> = pairs()
 --]]

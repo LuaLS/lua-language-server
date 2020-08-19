@@ -448,9 +448,6 @@ end
     },
 }
 
--- TODO
-do return end
-
 TEST [[
 collectgarbage('$')
 ]]
@@ -520,6 +517,9 @@ collectgarbage('$')
         additionalTextEdits = EXISTS,
     },
 }
+
+-- TODO
+do return end
 
 TEST [[
 collectgarbage($)

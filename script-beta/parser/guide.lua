@@ -1106,15 +1106,11 @@ function m.checkSameSimpleInValueInMetaTable(status, mt, start, queue)
         }
     end
 end
-
-function m.checkSameSimpleInValueOfCallMetaTable(status, call, start, queue)
-    if not call or call.type ~= 'call' then
-        return
-    end
-    local func = call.node
+function m.checkSameSimpleInValueOfSetMetaTable(status, func, start, queue)
     if not func or func.special ~= 'setmetatable' then
         return
     end
+    local call = func.parent
     local args = call.args
     local obj = args[1]
     local mt = args[2]
@@ -1130,14 +1126,6 @@ function m.checkSameSimpleInValueOfCallMetaTable(status, call, start, queue)
     end
 end
 
-function m.checkSameSimpleInValueOfSetMetaTable(status, value, start, queue)
-    if value.type ~= 'select' then
-        return
-    end
-    local call = value.vararg
-    m.checkSameSimpleInValueOfCallMetaTable(status, call, start, queue)
-end
-
 function m.checkSameSimpleInArg1OfSetMetaTable(status, obj, start, queue)
     local args = obj.parent
     if not args or args.type ~= 'callargs' then
@@ -1150,27 +1138,6 @@ function m.checkSameSimpleInArg1OfSetMetaTable(status, obj, start, queue)
     if mt then
         m.checkSameSimpleInValueInMetaTable(status, mt, start, queue)
     end
-end
-
-function m.checkSameSimpleInBranch(status, ref, start, queue)
-    -- 根据赋值扩大搜索范围
-    local value = m.getObjectValue(ref)
-    if value then
-        -- 检查赋值是字面量表的情况
-        m.checkSameSimpleInValueOfTable(status, value, start, queue)
-        -- 检查赋值是 setmetatable 调用的情况
-        m.checkSameSimpleInValueOfSetMetaTable(status, value, start, queue)
-    end
-
-    if ref.type == 'call' then
-        -- 检查赋值是 setmetatable 调用的情况
-        m.checkSameSimpleInValueOfCallMetaTable(status, ref, start, queue)
-    end
-
-    -- 检查自己是字面量表的情况
-    m.checkSameSimpleInValueOfTable(status, ref, start, queue)
-    -- 检查自己作为 setmetatable 第一个参数的情况
-    m.checkSameSimpleInArg1OfSetMetaTable(status, ref, start, queue)
 end
 
 function m.searchSameMethodCrossSelf(ref, mark)
@@ -1287,6 +1254,9 @@ function m.checkSameSimpleInCall(status, ref, start, queue, mode)
     if m.checkCallMark(status, func.parent, true) then
         return
     end
+    -- 检查赋值是 semetatable() 的情况
+    m.checkSameSimpleInValueOfSetMetaTable(status, func, start, queue)
+    -- 检查赋值是 func() 的情况
     local objs = m.checkSameSimpleInCallInSameFile(status, func, args, index)
     if status.interface.call then
         local cobjs = status.interface.call(func, args, index)
@@ -1396,6 +1366,10 @@ function m.searchSameFieldsInValue(status, ref, start, queue, mode)
             force = true,
         }
     end
+    -- 检查形如 a = f() 的分支情况，需要业务层传入 interface.call
+    m.checkSameSimpleInCall(status, value, start, queue, mode)
+    -- 检查自己是字面量表的情况
+    m.checkSameSimpleInValueOfTable(status, value, start, queue)
 end
 
 function m.checkSameSimpleAsTableField(status, ref, start, queue)
@@ -1588,8 +1562,10 @@ function m.checkSameSimple(status, simple, data, mode, results, queue)
         m.searchSameFieldsCrossMethod(status, ref, i, queue)
         -- 穿透赋值
         m.searchSameFieldsInValue(status, ref, i, queue, cmode)
-        -- 检查形如 a = f() 的分支情况，需要业务层传入 interface.call
-        m.checkSameSimpleInCall(status, ref, i, queue, cmode)
+        -- 检查自己是字面量表的情况
+        m.checkSameSimpleInValueOfTable(status, ref, i, queue)
+        -- 检查自己作为 setmetatable 第一个参数的情况
+        m.checkSameSimpleInArg1OfSetMetaTable(status, ref, i, queue)
         if cmode ~= 'def' then
             -- 检查形如 { a = f } 的情况
             m.checkSameSimpleAsTableField(status, ref, i, queue)
@@ -1601,8 +1577,6 @@ function m.checkSameSimple(status, simple, data, mode, results, queue)
         if i == #simple then
             break
         end
-        -- 检查形如 a = {} 的分支情况
-        m.checkSameSimpleInBranch(status, ref, i, queue)
         ref = m.getNextRef(ref)
         if not ref then
             return
@@ -1639,8 +1613,12 @@ function m.searchSameFields(status, simple, mode)
                 -- 检查全局变量的分支情况，需要业务层传入 interface.global
                 m.checkSameSimpleInGlobal(status, simple[1], 1, queue)
             else
-                -- local _ENV 的情况
-                m.checkSameSimpleInBranch(status, first, 0, queue)
+                simple.global = nil
+                tableInsert(simple, 1, 'l|_ENV')
+                queue[#queue+1] = {
+                    obj   = first,
+                    start = 1,
+                }
             end
         end
     else

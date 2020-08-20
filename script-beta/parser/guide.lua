@@ -1126,6 +1126,12 @@ function m.checkSameSimpleInValueOfSetMetaTable(status, func, start, queue)
     end
 end
 
+function m.checkSameSimpleInValueOfCallMetaTable(status, call, start, queue)
+    if call.type == 'call' then
+        m.checkSameSimpleInValueOfSetMetaTable(status, call.node, start, queue)
+    end
+end
+
 function m.checkSameSimpleInArg1OfSetMetaTable(status, obj, start, queue)
     local args = obj.parent
     if not args or args.type ~= 'callargs' then
@@ -1366,7 +1372,7 @@ function m.searchSameFieldsInValue(status, ref, start, queue, mode)
             force = true,
         }
     end
-    -- 检查形如 a = f() 的分支情况，需要业务层传入 interface.call
+    -- 检查形如 a = f() 的分支情况
     m.checkSameSimpleInCall(status, value, start, queue, mode)
     -- 检查自己是字面量表的情况
     m.checkSameSimpleInValueOfTable(status, value, start, queue)
@@ -1566,6 +1572,8 @@ function m.checkSameSimple(status, simple, data, mode, results, queue)
         m.checkSameSimpleInValueOfTable(status, ref, i, queue)
         -- 检查自己作为 setmetatable 第一个参数的情况
         m.checkSameSimpleInArg1OfSetMetaTable(status, ref, i, queue)
+        -- 检查自己作为 setmetatable 调用的情况
+        m.checkSameSimpleInValueOfCallMetaTable(status, ref, i, queue)
         if cmode ~= 'def' then
             -- 检查形如 { a = f } 的情况
             m.checkSameSimpleAsTableField(status, ref, i, queue)

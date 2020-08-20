@@ -1142,6 +1142,9 @@ function m.checkSameSimpleInArg1OfSetMetaTable(status, obj, start, queue)
     end
     local mt = args[2]
     if mt then
+        if m.checkValueMark(status, obj, mt) then
+            return
+        end
         m.checkSameSimpleInValueInMetaTable(status, mt, start, queue)
     end
 end

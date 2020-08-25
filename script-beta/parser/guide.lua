@@ -1082,6 +1082,9 @@ function m.getObjectValue(obj)
             return obj.args[3]
         end
     end
+    if obj.type == 'select' then
+        return obj
+    end
     return nil
 end
 
@@ -1375,10 +1378,15 @@ function m.searchSameFieldsInValue(status, ref, start, queue, mode)
             force = true,
         }
     end
+    queue[#queue+1] = {
+        obj   = value,
+        start = start,
+        force = true,
+    }
     -- 检查形如 a = f() 的分支情况
     m.checkSameSimpleInCall(status, value, start, queue, mode)
     -- 检查自己是字面量表的情况
-    m.checkSameSimpleInValueOfTable(status, value, start, queue)
+    --m.checkSameSimpleInValueOfTable(status, value, start, queue)
 end
 
 function m.checkSameSimpleAsTableField(status, ref, start, queue)
@@ -1491,6 +1499,8 @@ function m.pushResult(status, mode, ref, simple)
             if ref.node.special == 'rawset' then
                 results[#results+1] = ref
             end
+        elseif ref.type == 'table' then
+            results[#results+1] = ref
         end
         if ref.parent.type == 'return' then
             if m.getParentFunction(ref) ~= m.getParentFunction(simple.first) then
@@ -1516,6 +1526,8 @@ function m.pushResult(status, mode, ref, simple)
         or     ref.type == 'getlocal' then
             results[#results+1] = ref
         elseif ref.type == 'function' then
+            results[#results+1] = ref
+        elseif ref.type == 'table' then
             results[#results+1] = ref
         elseif ref.type == 'call' then
             if ref.node.special == 'rawset'
@@ -1544,6 +1556,8 @@ function m.pushResult(status, mode, ref, simple)
         or     ref.type == 'setlocal'
         or     ref.type == 'getlocal' then
             results[#results+1] = ref
+        elseif ref.type == 'table' then
+            results[#results+1] = ref
         elseif ref.type == 'call' then
             if ref.node.special == 'rawset'
             or ref.node.special == 'rawget' then
@@ -1557,6 +1571,9 @@ function m.checkSameSimple(status, simple, data, mode, results, queue)
     local ref    = data.obj
     local start  = data.start
     local force  = data.force
+    if start > #simple then
+        return
+    end
     for i = start, #simple do
         local sm = simple[i]
         if sm ~= '*' and not force and m.getSimpleName(ref) ~= sm then

@@ -79,6 +79,8 @@ return function (uri, offset)
         elseif src.type == 'getmethod'
         or     src.type == 'setmethod' then
             src = src.method
+        elseif src.type == 'table' and src.parent.type ~= 'return' then
+            return
         end
         results[#results+1] = {
             target = src,

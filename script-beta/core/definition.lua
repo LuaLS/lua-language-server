@@ -118,6 +118,9 @@ return function (uri, offset)
     vm.setSearchLevel(10)
     vm.eachDef(source, function (src)
         src = src.field or src.method or src.index or src
+        if src.type == 'table' and src.parent.type ~= 'return' then
+            return
+        end
         results[#results+1] = {
             target = src,
             uri    = guide.getRoot(src).uri,

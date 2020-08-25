@@ -448,6 +448,14 @@ end
     },
 }
 
+-- TODO
+do return end
+
+TEST [[
+collectgarbage($)
+]]
+(EXISTS)
+
 TEST [[
 collectgarbage('$')
 ]]
@@ -517,14 +525,6 @@ collectgarbage('$')
         additionalTextEdits = EXISTS,
     },
 }
-
--- TODO
-do return end
-
-TEST [[
-collectgarbage($)
-]]
-(EXISTS)
 
 TEST [[
 io.read($)

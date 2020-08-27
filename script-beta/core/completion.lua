@@ -745,6 +745,11 @@ local function trySymbol(ast, text, offset, results)
     end
 end
 
+local function tryCallArg(ast, text, offset, results)
+    local parent, oop = findParent(ast, text, offset)
+
+end
+
 local function completion(uri, offset)
     local ast = files.getAst(uri)
     local text = files.getText(uri)
@@ -754,6 +759,7 @@ local function completion(uri, offset)
     if ast then
         tryWord(ast, text, offset, results)
         trySymbol(ast, text, offset, results)
+        tryCallArg(ast, text, offset, results)
     else
         local word = findWord(text, offset)
         if word then

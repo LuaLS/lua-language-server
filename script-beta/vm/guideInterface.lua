@@ -65,15 +65,11 @@ vm.interface = {}
 vm.interface.searchLevel = 0
 
 function vm.interface.call(func, args, index)
-    local lib = vm.getLibrary(func)
-    if not lib then
-        return nil
-    end
     await.delay()
-    if lib.name == 'require' and index == 1 then
+    if func.special == 'require' and index == 1 then
         return m.require(args, index)
     end
-    if lib.name == 'dofile' then
+    if func.special == 'dofile' then
         return m.dofile(args, index)
     end
 end

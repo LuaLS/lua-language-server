@@ -1391,7 +1391,7 @@ end
 
 function m.checkSameSimpleAsTableField(status, ref, start, queue)
     local parent = ref.parent
-    if parent.type ~= 'tablefield' then
+    if not parent or parent.type ~= 'tablefield' then
         return
     end
     if m.checkValueMark(status, parent, ref) then
@@ -1420,7 +1420,7 @@ function m.checkSearchLevel(status)
 end
 
 function m.checkSameSimpleAsReturn(status, ref, start, queue)
-    if ref.parent.type ~= 'return' then
+    if not ref.parent or ref.parent.type ~= 'return' then
         return
     end
     if ref.parent.parent.type ~= 'main' then
@@ -1447,6 +1447,9 @@ function m.checkSameSimpleAsSetValue(status, ref, start, queue)
         return
     end
     local parent = ref.parent
+    if not parent then
+        return
+    end
     if m.getObjectValue(parent) ~= ref then
         return
     end
@@ -1501,8 +1504,10 @@ function m.pushResult(status, mode, ref, simple)
             end
         elseif ref.type == 'table' then
             results[#results+1] = ref
+        elseif ref.library then
+            results[#results+1] = ref
         end
-        if ref.parent.type == 'return' then
+        if ref.parent and ref.parent.type == 'return' then
             if m.getParentFunction(ref) ~= m.getParentFunction(simple.first) then
                 results[#results+1] = ref
             end
@@ -1534,6 +1539,8 @@ function m.pushResult(status, mode, ref, simple)
             or ref.node.special == 'rawget' then
                 results[#results+1] = ref
             end
+        elseif ref.library then
+            results[#results+1] = ref
         end
         if ref.parent.type == 'return' then
             results[#results+1] = ref
@@ -1563,6 +1570,8 @@ function m.pushResult(status, mode, ref, simple)
             or ref.node.special == 'rawget' then
                 results[#results+1] = ref
             end
+        elseif ref.library then
+            results[#results+1] = ref
         end
     end
 end
@@ -2420,111 +2429,6 @@ function m.inferCheckBinary(status, source)
     end
 end
 
-function m.inferCheckLibraryTypes(status, source)
-    if type(source.type) ~= 'table' then
-        return false
-    end
-    for i = 1, #source.type do
-        status.results[#status.results+1] = {
-            type = source.type[i],
-            source = source,
-        }
-    end
-    return true
-end
-
-function m.inferCheckLibrary(status, source)
-    local lib = status.interface.library and status.interface.library(source)
-    if not lib then
-        return false
-    end
-    status.results = m.allocInfer {
-        type   = lib.type,
-        value  = lib.value,
-        source = lib,
-    }
-    return true
-end
-
-function m.inferCheckLibraryReturn(status, source)
-    if source.type ~= 'select' then
-        return nil
-    end
-    local index = source.index
-    local call = source.vararg
-    if call.type ~= 'call' then
-        return nil
-    end
-    local func = call.node
-    local lib = status.interface.library and status.interface.library(func)
-    if not lib then
-        return nil
-    end
-    if lib.type ~= 'function' then
-        return nil
-    end
-    if not lib.returns then
-        return nil
-    end
-    local rtn = lib.returns[index]
-    if not rtn then
-        return nil
-    end
-    if not rtn.type then
-        return nil
-    end
-    if rtn.type == '...' or rtn.type == 'any' then
-        return
-    end
-    status.results = m.allocInfer {
-        type   = rtn.type,
-        value  = rtn.value,
-        source = rtn,
-    }
-    return true
-end
-
-function m.inferByLibraryArg(status, source)
-    local args = source.parent
-    if not args then
-        return
-    end
-    if args.type ~= 'callargs' then
-        return
-    end
-    local call = args.parent
-    if not call then
-        return
-    end
-    local func = call.node
-    local index
-    for i = 1, #args do
-        if args[i] == source then
-            index = i
-            break
-        end
-    end
-    if not index then
-        return
-    end
-    local lib = status.interface.library and status.interface.library(func)
-    local arg = lib and lib.args and lib.args[index]
-    if not arg then
-        return
-    end
-    if not arg.type then
-        return
-    end
-    if arg.type == '...' or arg.type == 'any' then
-        return
-    end
-    status.results[#status.results+1] = {
-        type   = arg.type,
-        value  = arg.value,
-        source = arg,
-    }
-end
-
 function m.inferByDef(status, obj)
     if status.index > 1 then
         return
@@ -2789,9 +2693,6 @@ function m.searchInfer(status, obj)
     local checked = m.inferCheckLiteral(status, obj)
                  or m.inferCheckUnary(status, obj)
                  or m.inferCheckBinary(status, obj)
-                 or m.inferCheckLibraryTypes(status, obj)
-                 or m.inferCheckLibrary(status, obj)
-                 or m.inferCheckLibraryReturn(status, obj)
     if checked then
         m.cleanInfers(status.results)
         if makeCache then
@@ -2800,7 +2701,6 @@ function m.searchInfer(status, obj)
         return
     end
 
-    m.inferByLibraryArg(status, obj)
     m.inferByDef(status, obj)
     m.inferBySet(status, obj)
     m.inferByCall(status, obj)

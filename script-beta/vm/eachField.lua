@@ -25,10 +25,6 @@ local function eachField(source)
 
     await.delay()
     local results = guide.requestFields(source, vm.interface)
-    local lib = vm.getLibrary(source)
-    if lib then
-        eachFieldInLibrary(source, lib, results)
-    end
     if source.special == '_G' then
         eachFieldOfLibrary(results)
     end

@@ -6,17 +6,6 @@ local await = require 'await'
 
 local m = {}
 
-function m.searchLibrary(source, results)
-    if not source then
-        return
-    end
-    local lib = vm.getLibrary(source)
-    if not lib then
-        return
-    end
-    vm.mergeResults(results, { lib })
-end
-
 function m.eachDef(source, results)
     results = results or {}
     local lock = vm.lock('eachDef', source)
@@ -32,8 +21,6 @@ function m.eachDef(source, results)
         log.warn('requestDefinition', count, os.clock() - clock, guide.getRoot(source).uri, util.dump(source, { deep = 1 }))
     end
     vm.mergeResults(results, myResults)
-    m.searchLibrary(source, results)
-    m.searchLibrary(guide.getObjectValue(source), results)
 
     lock()
 

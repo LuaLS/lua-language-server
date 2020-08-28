@@ -1,6 +1,7 @@
-local guide = require 'parser.guide'
-local vm    = require 'vm.vm'
-local files = require 'files'
+local guide   = require 'parser.guide'
+local vm      = require 'vm.vm'
+local files   = require 'files'
+local library = require 'library'
 
 local function getGlobalsOfFile(uri)
     local globals = {}
@@ -22,6 +23,12 @@ local function getGlobalsOfFile(uri)
     return globals
 end
 
+local function insertLibrary(results, name)
+    if name:sub(1, 2) == 's|' then
+        results[#results+1] = library.global[name:sub(3)]
+    end
+end
+
 local function getGlobals(name)
     local results = {}
     for uri in files:eachFile() do
@@ -33,6 +40,7 @@ local function getGlobals(name)
             end
         end
     end
+    insertLibrary(results, name)
     return results
 end
 

@@ -1,8 +1,8 @@
-local vm    = require 'vm.vm'
-local files = require 'files'
-local ws    = require 'workspace'
-local guide = require 'parser.guide'
-local await = require 'await'
+local vm      = require 'vm.vm'
+local files   = require 'files'
+local ws      = require 'workspace'
+local guide   = require 'parser.guide'
+local await   = require 'await'
 
 local m = {}
 
@@ -101,11 +101,6 @@ function vm.interface.cache(source, mode)
             sourceCache[i] = results[i]
         end
     end
-end
-
-function vm.interface.library(source)
-    await.delay()
-    return vm.getLibrary(source)
 end
 
 function vm.setSearchLevel(n)

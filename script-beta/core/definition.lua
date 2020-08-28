@@ -59,7 +59,7 @@ local function checkRequire(source, offset)
     local call = callargs.parent
     local func = call.node
     local literal = guide.getLiteral(source)
-    local lib = vm.getLibrary(func)
+    local lib = func.special
     if not lib then
         return nil
     end

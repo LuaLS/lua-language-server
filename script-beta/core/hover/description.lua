@@ -14,7 +14,7 @@ local function asString(source)
         local result
         local call = parent.parent
         local node = call.node
-        local lib = vm.getLibrary(node)
+        local lib = node.special
         if not lib then
             return
         end

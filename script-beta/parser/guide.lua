@@ -597,6 +597,9 @@ function m.getKeyName(obj)
 end
 
 function m.getSimpleName(obj)
+    if obj.library then
+        return ('s|%s'):format(obj.name)
+    end
     if obj.type == 'call' then
         local key = obj.args[2]
         return m.getKeyName(key)
@@ -604,6 +607,8 @@ function m.getSimpleName(obj)
         return ('t|%p'):format(obj)
     elseif obj.type == 'select' then
         return ('v|%p'):format(obj)
+    elseif obj.type == 'string' then
+        return ('z|%p'):format(obj)
     end
     return m.getKeyName(obj)
 end
@@ -870,6 +875,9 @@ local function buildSimpleList(obj, max)
         if i == limit then
             return nil
         end
+        while cur.type == 'paren' do
+            cur = cur.exp
+        end
         if cur.type == 'setfield'
         or cur.type == 'getfield'
         or cur.type == 'setmethod'
@@ -896,6 +904,9 @@ local function buildSimpleList(obj, max)
             list[i] = cur
             break
         elseif cur.type == 'select' then
+            list[i] = cur
+            break
+        elseif cur.type == 'string' then
             list[i] = cur
             break
         elseif cur.type == 'function'
@@ -1139,6 +1150,22 @@ end
 function m.checkSameSimpleInValueOfCallMetaTable(status, call, start, queue)
     if call.type == 'call' then
         m.checkSameSimpleInValueOfSetMetaTable(status, call.node, start, queue)
+    end
+end
+
+function m.checkSameSimpleInSpecialBranch(status, obj, start, queue)
+    if not status.interface.index then
+        return
+    end
+    local results = status.interface.index(obj)
+    if not results then
+        return
+    end
+    for _, res in ipairs(results) do
+        queue[#queue+1] = {
+            obj   = res,
+            start = start + 1,
+        }
     end
 end
 
@@ -1610,6 +1637,8 @@ function m.checkSameSimple(status, simple, data, mode, results, queue)
         m.checkSameSimpleInArg1OfSetMetaTable(status, ref, i, queue)
         -- 检查自己作为 setmetatable 调用的情况
         m.checkSameSimpleInValueOfCallMetaTable(status, ref, i, queue)
+        -- 检查自己是特殊分支的情况
+        m.checkSameSimpleInSpecialBranch(status, ref, i, queue)
         if cmode ~= 'def' then
             -- 检查形如 { a = f } 的情况
             m.checkSameSimpleAsTableField(status, ref, i, queue)

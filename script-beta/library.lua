@@ -258,10 +258,13 @@ end
 local function markLibrary(library)
     for _, lib in pairs(library) do
         lib.library = true
-        lib.start = 0
-        lib.finish = 0
+        lib.fields  = {}
         if lib.child then
-            markLibrary(lib.child)
+            for _, child in util.sortPairs(lib.child) do
+                table.insert(lib.fields, child)
+                child.library = true
+                child.parent = library
+            end
         end
     end
 end
@@ -269,11 +272,11 @@ end
 local function init()
     local lang = require 'language'
     local id = lang.id
-    m.global  = util.container()
-    m.library = util.container()
-    m.object  = util.container()
-    m.other   = util.container()
-    m.custom  = util.container()
+    m.global  = {}
+    m.library = {}
+    m.object  = {}
+    m.other   = {}
+    m.custom  = {}
 
     for libPath in (ROOT / 'libs'):list_directory() do
         local libName = libPath:filename():string()
@@ -281,7 +284,7 @@ local function init()
             local libs
             local buf = util.loadFile(path:string())
             if buf then
-                libs = util.container()
+                libs = {}
                 xpcall(lni, log.error, buf, path:string(), {libs})
                 fix(libs)
             end

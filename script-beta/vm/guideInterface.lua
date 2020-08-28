@@ -3,6 +3,7 @@ local files   = require 'files'
 local ws      = require 'workspace'
 local guide   = require 'parser.guide'
 local await   = require 'await'
+local library = require 'library'
 
 local m = {}
 
@@ -65,11 +66,12 @@ vm.interface = {}
 vm.interface.searchLevel = 0
 
 function vm.interface.call(func, args, index)
-    await.delay()
     if func.special == 'require' and index == 1 then
+        await.delay()
         return m.require(args, index)
     end
     if func.special == 'dofile' then
+        await.delay()
         return m.dofile(args, index)
     end
 end
@@ -82,6 +84,15 @@ end
 function vm.interface.link(uri)
     await.delay()
     return vm.getLinksTo(uri)
+end
+
+function vm.interface.index(obj)
+    local tp = obj.type
+    local lib = library.object[tp]
+    if not lib then
+        return nil
+    end
+    return lib.fields
 end
 
 function vm.interface.cache(source, mode)

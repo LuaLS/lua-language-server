@@ -1070,6 +1070,13 @@ function m.getObjectValue(obj)
     while obj.type == 'paren' do
         obj = obj.exp
     end
+    if obj.library
+    or obj.type == 'boolean'
+    or obj.type == 'number'
+    or obj.type == 'integer'
+    or obj.type == 'string' then
+        return obj
+    end
     if obj.value then
         return obj.value
     end

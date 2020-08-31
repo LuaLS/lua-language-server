@@ -36,6 +36,10 @@ function m.require(args, index)
             end
         end
     end
+
+    local lib = library.library[reqName]
+    results[#results+1] = lib
+
     return results
 end
 
@@ -87,12 +91,17 @@ function vm.interface.link(uri)
 end
 
 function vm.interface.index(obj)
+    if obj.library then
+        return obj.fields
+    end
+
     local tp = obj.type
     local lib = library.object[tp]
-    if not lib then
-        return nil
+    if lib then
+        return lib.fields
     end
-    return lib.fields
+
+    return nil
 end
 
 function vm.interface.cache(source, mode)

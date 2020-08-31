@@ -2,6 +2,11 @@
 
 ![build](https://github.com/sumneko/lua-language-server/workflows/build/badge.svg)
 
+## Install In VSCode
+https://marketplace.visualstudio.com/items?itemName=sumneko.lua
+
+![avatar](https://github.com/sumneko/vscode-lua/raw/master/images//Install%20In%20VSCode.gif)
+
 ## Feature
 
 - [x] Goto Definition

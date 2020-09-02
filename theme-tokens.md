@@ -1,4 +1,4 @@
-## Syntaxes Tokens
+## Syntax Tokens
 
 Preview in `Dark+` of VSCode
 
@@ -39,3 +39,17 @@ Preview in `Dark+` of VSCode
 | `support.function.library.lua`                 | ![avatar](https://github.com/sumneko/vscode-lua/blob/master/images/tokens/support.function.library.lua.jpg?raw=true)                 |
 | `keyword.operator.lua`                         | ![avatar](https://github.com/sumneko/vscode-lua/blob/master/images/tokens/keyword.operator.lua.jpg?raw=true)                         |
 | `variable.other.lua`                           | ![avatar](https://github.com/sumneko/vscode-lua/blob/master/images/tokens/variable.other.lua.jpg?raw=true)                           |
+
+## Semantic Tokens
+
+Preview in `Dark+` of VSCode
+
+| semantic token          | fallen syntax token        | preview                                                                                                       |
+| :----                   | :----                      | :----                                                                                                         |
+| `namespace.static`      | `support.function.lua`     | ![avatar](https://github.com/sumneko/vscode-lua/blob/master/images/tokens/namespace.static.jpg?raw=true)      |
+| `namespace.readonly`    | `constant.language.lua`    | ![avatar](https://github.com/sumneko/vscode-lua/blob/master/images/tokens/namespace.readonly.jpg?raw=true)    |
+| `namespace.deprecated`  | `entity.name.label`        | ![avatar](https://github.com/sumneko/vscode-lua/blob/master/images/tokens/namespace.deprecated.jpg?raw=true)  |
+| `parameter.declaration` | `variable.parameter`       | ![avatar](https://github.com/sumneko/vscode-lua/blob/master/images/tokens/parameter.declaration.jpg?raw=true) |
+| `property.declaration`  | `entity.other.attribute`   | ![avatar](https://github.com/sumneko/vscode-lua/blob/master/images/tokens/property.declaration.jpg?raw=true)  |
+| `variable`              | `variable.other.lua`       | ![avatar](https://github.com/sumneko/vscode-lua/blob/master/images/tokens/variable.jpg?raw=true)              |
+| `interface.declaration` | `entity.name.function.lua` | ![avatar](https://github.com/sumneko/vscode-lua/blob/master/images/tokens/interface.declaration.jpg?raw=true) |

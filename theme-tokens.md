@@ -1,5 +1,7 @@
 ## Syntax Tokens
 
+Provide by custom [tmLanguage file](https://github.com/sumneko/vscode-lua/blob/master/syntaxes/lua.tmLanguage.json)
+
 Preview in `Dark+` of VSCode
 
 | token                                          | preview                                                                                                                              |

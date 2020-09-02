@@ -28,7 +28,7 @@ local function enable(lsp)
         registrations = {
             {
                 id = 'semantic',
-                method = 'textDocument/semanticTokens',
+                method = 'textDocument/semanticTokens/full',
                 registerOptions = {
                     legend = {
                         tokenTypes = toArray(TokenTypes),
@@ -52,7 +52,7 @@ local function disable()
         unregisterations = {
             {
                 id = 'semantic',
-                method = 'textDocument/semanticTokens',
+                method = 'textDocument/semanticTokens/full',
             },
         }
     })

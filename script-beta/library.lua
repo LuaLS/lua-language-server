@@ -98,6 +98,7 @@ local function insertGlobal(tbl, key, value)
         child = {},
         value = value,
     }
+    value.library = tbl[key]
     return true
 end
 
@@ -199,6 +200,7 @@ local function insertChild(tbl, name, key, value)
         name  = key,
         value = value,
     }
+    value.library = tbl[name].child[key]
 end
 
 local function mergeParent(alllibs, name, lib, libName)

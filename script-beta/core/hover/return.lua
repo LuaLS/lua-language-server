@@ -68,6 +68,8 @@ end
 
 return function (source)
     if source.type == 'library' then
+        return asLibrary(source.value)
+    elseif source.library then
         return asLibrary(source)
     end
     if source.type == 'function' then

@@ -1080,8 +1080,7 @@ function m.getObjectValue(obj)
     while obj.type == 'paren' do
         obj = obj.exp
     end
-    if obj.type == 'library'
-    or obj.type == 'boolean'
+    if obj.type == 'boolean'
     or obj.type == 'number'
     or obj.type == 'integer'
     or obj.type == 'string' then
@@ -2736,8 +2735,8 @@ function m.searchInfer(status, obj)
         status.cache.clock = status.cache.clock or osClock()
     end
 
-    local checked = m.inferCheckLiteral(status, obj)
-                 or m.inferCheckLibrary(status, obj)
+    local checked = m.inferCheckLibrary(status, obj)
+                 or m.inferCheckLiteral(status, obj)
                  or m.inferCheckUnary(status, obj)
                  or m.inferCheckBinary(status, obj)
     if checked then

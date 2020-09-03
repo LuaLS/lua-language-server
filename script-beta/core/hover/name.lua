@@ -57,6 +57,8 @@ end
 
 local function buildName(source, oop)
     if source.type == 'library' then
+        return asLibrary(source.value, oop) or ''
+    elseif source.library then
         return asLibrary(source, oop) or ''
     end
     if source.type == 'local'

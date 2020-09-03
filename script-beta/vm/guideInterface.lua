@@ -96,6 +96,13 @@ function vm.interface.index(obj)
     end
 
     local tp = obj.type
+    if tp == 'getglobal' and obj.node.special == '_G' then
+        obj = library.global[obj[1]]
+        if not obj then
+            return nil
+        end
+        tp = obj.type
+    end
     local lib = library.object[tp]
     if lib then
         return lib.fields

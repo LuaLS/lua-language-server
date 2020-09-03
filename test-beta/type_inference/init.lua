@@ -212,9 +212,9 @@ end
 --x(1)
 --]]
 
-TEST 'table' [[
-setmetatable(<?b?>)
-]]
+--TEST 'table' [[
+--setmetatable(<?b?>)
+--]]
 
 TEST 'function' [[
 string.<?sub?>()

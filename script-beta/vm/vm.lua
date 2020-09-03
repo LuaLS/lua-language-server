@@ -100,7 +100,7 @@ function m.getKeyName(source)
     if not source then
         return nil
     end
-    if source.library then
+    if source.type == 'library' then
         return 's|' .. source.name
     end
     if source.type == 'call' then

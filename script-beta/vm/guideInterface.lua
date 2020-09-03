@@ -91,17 +91,17 @@ function vm.interface.link(uri)
 end
 
 function vm.interface.index(obj)
-    if obj.library then
+    if obj.type == 'library' then
         return obj.fields
     end
 
     local tp = obj.type
     if tp == 'getglobal' and obj.node.special == '_G' then
-        obj = library.global[obj[1]]
-        if not obj then
+        local lib = library.global[obj[1]]
+        if not lib then
             return nil
         end
-        tp = obj.type
+        tp = lib.value.type
     end
     local lib = library.object[tp]
     if lib then

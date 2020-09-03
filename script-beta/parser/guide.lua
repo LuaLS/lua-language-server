@@ -597,9 +597,6 @@ function m.getKeyName(obj)
 end
 
 function m.getSimpleName(obj)
-    if obj.library then
-        return ('s|%s'):format(obj.name)
-    end
     if obj.type == 'call' then
         local key = obj.args[2]
         return m.getKeyName(key)
@@ -609,6 +606,8 @@ function m.getSimpleName(obj)
         return ('v|%p'):format(obj)
     elseif obj.type == 'string' then
         return ('z|%p'):format(obj)
+    elseif obj.type == 'library' then
+        return ('s|%s'):format(obj.name)
     end
     return m.getKeyName(obj)
 end
@@ -1081,7 +1080,7 @@ function m.getObjectValue(obj)
     while obj.type == 'paren' do
         obj = obj.exp
     end
-    if obj.library
+    if obj.type == 'library'
     or obj.type == 'boolean'
     or obj.type == 'number'
     or obj.type == 'integer'
@@ -1538,7 +1537,7 @@ function m.pushResult(status, mode, ref, simple)
             end
         elseif ref.type == 'table' then
             results[#results+1] = ref
-        elseif ref.library then
+        elseif ref.type == 'library' then
             results[#results+1] = ref
         end
         if ref.parent and ref.parent.type == 'return' then
@@ -1573,7 +1572,7 @@ function m.pushResult(status, mode, ref, simple)
             or ref.node.special == 'rawget' then
                 results[#results+1] = ref
             end
-        elseif ref.library then
+        elseif ref.type == 'library' then
             results[#results+1] = ref
         end
         if ref.parent.type == 'return' then
@@ -1604,7 +1603,7 @@ function m.pushResult(status, mode, ref, simple)
             or ref.node.special == 'rawget' then
                 results[#results+1] = ref
             end
-        elseif ref.library then
+        elseif ref.type == 'library' then
             results[#results+1] = ref
         end
     end
@@ -2111,6 +2110,17 @@ function m.inferCheckLiteral(status, source)
         }
         return true
     end
+end
+
+function m.inferCheckLibrary(status, source)
+    if source.type ~= 'library' then
+        return
+    end
+    status.results = m.allocInfer {
+        type   = source.value.type,
+        source = source,
+    }
+    return true
 end
 
 function m.inferCheckUnary(status, source)
@@ -2727,6 +2737,7 @@ function m.searchInfer(status, obj)
     end
 
     local checked = m.inferCheckLiteral(status, obj)
+                 or m.inferCheckLibrary(status, obj)
                  or m.inferCheckUnary(status, obj)
                  or m.inferCheckBinary(status, obj)
     if checked then

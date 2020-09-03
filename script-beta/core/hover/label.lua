@@ -89,13 +89,6 @@ local function asField(source)
     return asValue(source, 'field')
 end
 
-local function asLibrary(source)
-    local lib = source.library
-    if lib.type == 'function' then
-        return asFunction(source)
-    end
-end
-
 local function asString(source)
     local str = source[1]
     if type(str) ~= 'string' then

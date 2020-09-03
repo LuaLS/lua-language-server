@@ -67,7 +67,7 @@ local function asFunction(source)
 end
 
 return function (source)
-    if source.library then
+    if source.type == 'library' then
         return asLibrary(source)
     end
     if source.type == 'function' then

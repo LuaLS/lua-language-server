@@ -272,11 +272,11 @@ end
 local function init()
     local lang = require 'language'
     local id = lang.id
-    m.global  = {}
-    m.library = {}
-    m.object  = {}
-    m.other   = {}
-    m.custom  = {}
+    m.global  = util.container()
+    m.library = util.container()
+    m.object  = util.container()
+    m.other   = util.container()
+    m.custom  = util.container()
 
     for libPath in (ROOT / 'libs'):list_directory() do
         local libName = libPath:filename():string()
@@ -284,7 +284,7 @@ local function init()
             local libs
             local buf = util.loadFile(path:string())
             if buf then
-                libs = {}
+                libs = util.container()
                 xpcall(lni, log.error, buf, path:string(), {libs})
                 fix(libs)
             end

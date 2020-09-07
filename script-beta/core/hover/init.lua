@@ -24,7 +24,10 @@ local function getHoverAsFunction(source)
             if labels[label] == 1 then
                 protos = protos + 1
             end
-        else
+        elseif value.type == 'table'
+        or     value.type == 'boolean'
+        or     value.type == 'string'
+        or     value.type == 'number' then
             other = other + 1
         end
     end

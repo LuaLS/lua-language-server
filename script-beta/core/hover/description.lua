@@ -13,8 +13,8 @@ local function asString(source)
     if parent and parent.type == 'callargs' then
         local result
         local call = parent.parent
-        local node = call.node
-        local lib = node.special
+        local func = call.node
+        local lib = vm.getLibrary(func)
         if not lib then
             return
         end

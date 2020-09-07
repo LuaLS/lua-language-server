@@ -4,7 +4,7 @@ local guide   = require 'parser.guide'
 local function getLibrary(source)
     local defs = vm.getDefs(source)
     for _, def in ipairs(defs) do
-        if def.library then
+        if def.type == 'library' then
             return def
         end
     end

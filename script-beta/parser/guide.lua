@@ -1464,11 +1464,10 @@ function m.checkSameSimpleAsTableField(status, ref, start, queue)
 end
 
 function m.checkSearchLevel(status)
-    -- TODO 限制向前搜索的次数
-    do return false end
     status.cache.back = status.cache.back or 0
     if status.cache.back >= (status.interface.searchLevel or 0) then
-        return true
+        -- TODO 限制向前搜索的次数
+        --return true
     end
     status.cache.back = status.cache.back + 1
     return false

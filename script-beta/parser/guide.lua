@@ -1612,10 +1612,7 @@ function m.pushResult(status, mode, ref, simple)
         or     ref.type == 'tableindex' then
             results[#results+1] = ref
         elseif ref.type == 'setglobal'
-        or     ref.type == 'getglobal'
-        or     ref.type == 'local'
-        or     ref.type == 'setlocal'
-        or     ref.type == 'getlocal' then
+        or     ref.type == 'getglobal' then
             results[#results+1] = ref
         elseif ref.type == 'table' then
             results[#results+1] = ref

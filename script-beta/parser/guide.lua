@@ -196,7 +196,11 @@ function m.getRoot(obj)
     for _ = 1, 1000 do
         local parent = obj.parent
         if not parent then
-            return obj
+            if obj.type == 'main' then
+                return obj
+            else
+                return nil
+            end
         end
         obj = parent
     end

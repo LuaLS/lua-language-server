@@ -7,8 +7,8 @@ local findSource = require 'core.find-source'
 local function sortResults(results)
     -- 先按照顺序排序
     table.sort(results, function (a, b)
-        local u1 = guide.getRoot(a).uri
-        local u2 = guide.getRoot(b).uri
+        local u1 = guide.getRoot(a.target).uri
+        local u2 = guide.getRoot(b.target).uri
         if u1 == u2 then
             return a.target.start < b.target.start
         else
@@ -18,9 +18,10 @@ local function sortResults(results)
     -- 如果2个结果处于嵌套状态，则取范围小的那个
     local lf, lu
     for i = #results, 1, -1 do
-        local res = results[i].target
-        local f   = res.finish
-        local uri = guide.getRoot(res).uri
+        local res  = results[i].target
+        local f    = res.finish
+        local root = guide.getRoot(res)
+        local uri  = root and root.uri
         if lf and f > lf and uri == lu then
             table.remove(results, i)
         else
@@ -117,13 +118,17 @@ return function (uri, offset)
 
     vm.setSearchLevel(10)
     vm.eachDef(source, function (src)
+        local root = guide.getRoot(src)
+        if not root then
+            return
+        end
         src = src.field or src.method or src.index or src
         if src.type == 'table' and src.parent.type ~= 'return' then
             return
         end
         results[#results+1] = {
             target = src,
-            uri    = guide.getRoot(src).uri,
+            uri    = files.getOriginUri(root.uri),
             source = source,
         }
     end)

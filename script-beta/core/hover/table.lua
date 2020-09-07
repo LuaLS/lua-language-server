@@ -109,7 +109,6 @@ end
 return function (source)
     local literals = {}
     local classes = {}
-    local intValue = true
     vm.eachField(source, function (src)
         local key, class, literal = getField(src)
         if not classes[key] then
@@ -120,11 +119,6 @@ return function (source)
         end
         classes[key][#classes[key]+1] = class
         literals[key][#literals[key]+1] = literal
-        if class ~= 'integer'
-        or not literals[key]
-        or #literals[key] ~= 1 then
-            intValue = false
-        end
     end)
     for key, class in pairs(classes) do
         classes[key] = guide.mergeTypes(class)
@@ -135,6 +129,13 @@ return function (source)
     end
     if not next(classes) then
         return '{}'
+    end
+    local intValue = true
+    for key, class in pairs(classes) do
+        if class ~= 'integer' or not tonumber(literals[key]) then
+            intValue = false
+            break
+        end
     end
     if intValue then
         return buildAsConst(classes, literals)

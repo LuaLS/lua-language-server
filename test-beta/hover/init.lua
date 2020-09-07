@@ -681,6 +681,22 @@ local t: {
 }
 ]]
 
+TEST [[
+local <?t?> = {
+    b = 1,
+    c = 2,
+    d = 3,
+}
+g.e = t.b
+]]
+[[
+local t: {
+    b: integer = 1,
+    c: integer = 2,
+    d: integer = 3,
+}
+]]
+
 --TEST[[
 -----@class Class
 --local <?x?> = class()

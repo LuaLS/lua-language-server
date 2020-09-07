@@ -1596,7 +1596,7 @@ function m.pushResult(status, mode, ref, simple)
         elseif ref.type == 'library' then
             results[#results+1] = ref
         end
-        if ref.parent.type == 'return' then
+        if ref.parent and ref.parent.type == 'return' then
             results[#results+1] = ref
         end
     elseif mode == 'field' then
@@ -1656,7 +1656,7 @@ function m.checkSameSimple(status, simple, data, mode, results, queue)
         m.checkSameSimpleInValueOfCallMetaTable(status, ref, i, queue)
         -- 检查自己是特殊分支的情况
         m.checkSameSimpleInSpecialBranch(status, ref, i, queue)
-        if cmode ~= 'def' then
+        if cmode == 'ref' then
             -- 检查形如 { a = f } 的情况
             m.checkSameSimpleAsTableField(status, ref, i, queue)
             -- 检查形如 return m 的情况

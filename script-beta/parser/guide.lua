@@ -753,10 +753,33 @@ local function stepRefOfLabel(label, mode)
     return results
 end
 
+local function getRefsByName(refs, name)
+    if not refs then
+        return nil
+    end
+    if #refs <= 100 then
+        return refs
+    else
+        if not refs.cache then
+            local cache = {}
+            refs.cache = cache
+            for i = 1, #refs do
+                local ref = refs[i]
+                local key = m.getSimpleName(ref)
+                if not cache[key] then
+                    cache[key] = {}
+                end
+                cache[key][#cache[key]+1] = ref
+            end
+        end
+        return refs.cache[name]
+    end
+end
+
 local function stepRefOfGlobal(obj, mode)
     local results = {}
     local name = m.getKeyName(obj)
-    local refs = obj.node.ref
+    local refs = getRefsByName(obj.node.ref, name) or {}
     for i = 1, #refs do
         local ref = refs[i]
         if m.getKeyName(ref) == name then
@@ -843,13 +866,13 @@ local function convertSimpleList(list)
     for i = #list, 1, -1 do
         local c = list[i]
         if c.special == '_G' then
-            simple.global = true
+            simple.global = list[i+1]
         else
             simple[#simple+1] = m.getSimpleName(c)
         end
         if c.type == 'getglobal'
         or c.type == 'setglobal' then
-            simple.global = true
+            simple.global = c
         end
         if #simple <= 1 then
             if simple.global then
@@ -1658,16 +1681,13 @@ end
 
 function m.searchSameFields(status, simple, mode)
     local first = simple.first
-    local fref = first and first.ref
+    local refs = getRefsByName(first.ref, m.getSimpleName(simple.global or first)) or {}
     local queue = {}
-    if fref then
-        for i = 1, #fref do
-            local ref = fref[i]
-            queue[i] = {
-                obj   = ref,
-                start = 1,
-            }
-        end
+    for i = 1, #refs do
+        queue[i] = {
+            obj   = refs[i],
+            start = 1,
+        }
     end
     -- 对初始对象进行预处理
     if simple.global then

@@ -186,6 +186,9 @@ local function buildFunction(results, source, oop, data)
 end
 
 local function isSameSource(source, pos)
+    if source.type == 'library' then
+        return false
+    end
     if source.type == 'field'
     or source.type == 'method' then
         source = source.parent

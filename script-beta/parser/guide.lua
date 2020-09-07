@@ -1952,7 +1952,7 @@ function m.viewInferType(infers)
     local mark = {}
     local types = {}
     for i = 1, #infers do
-        local tp = infers[i].type
+        local tp = infers[i].type or 'any'
         if not mark[tp] and tp ~= 'any' then
             types[#types+1] = tp
         end
@@ -2633,6 +2633,20 @@ function m.inferByBinary(status, source)
     end
 end
 
+local function mergeLibraryFunctionReturns(status, source, index)
+    local returns = source.returns
+    if not returns then
+        return
+    end
+    local rtn = returns[index]
+    if rtn then
+        status.results[#status.results+1] = {
+            type   = rtn.type,
+            source = rtn,
+        }
+    end
+end
+
 local function mergeFunctionReturns(status, source, index)
     local returns = source.returns
     if not returns then
@@ -2663,7 +2677,11 @@ function m.inferByCallReturn(status, source)
     local index = source.index
     for _, src in ipairs(newStatus.results) do
         if src.value and src.value.type == 'function' then
-            mergeFunctionReturns(status, src.value, index)
+            if src.type == 'library' then
+                mergeLibraryFunctionReturns(status, src.value, index)
+            else
+                mergeFunctionReturns(status, src.value, index)
+            end
         end
     end
 end
@@ -2692,7 +2710,11 @@ function m.inferByPCallReturn(status, source)
     m.searchRefs(newStatus, func, 'def')
     for _, src in ipairs(newStatus.results) do
         if src.value and src.value.type == 'function' then
-            mergeFunctionReturns(status, src.value, index)
+            if src.type == 'library' then
+                mergeLibraryFunctionReturns(status, src.value, index)
+            else
+                mergeFunctionReturns(status, src.value, index)
+            end
         end
     end
 end

@@ -2,6 +2,11 @@ local vm    = require 'vm.vm'
 local guide = require 'parser.guide'
 
 local function getClass(source, classes, deep)
+    local lib = vm.getLibrary(source)
+    if lib then
+        classes[#classes+1] = lib.name
+        return
+    end
     if deep > 3 then
         return
     end

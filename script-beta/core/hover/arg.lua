@@ -5,7 +5,7 @@ local function mergeTypesInLibrary(types)
     if type(types) == 'table' then
         return table.concat(types, '|')
     else
-        return types
+        return types or 'any'
     end
 end
 

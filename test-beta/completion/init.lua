@@ -826,6 +826,8 @@ end
 TEST [[
 print(io.$)
 ]]
+(EXISTS)
+
 require 'config' .config.runtime.version = 'Lua 5.4'
 --TEST [[
 --local $

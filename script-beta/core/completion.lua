@@ -748,9 +748,85 @@ local function trySymbol(ast, text, offset, results)
     end
 end
 
-local function tryCallArg(ast, text, offset, results)
-    local parent, oop = findParent(ast, text, offset)
+local function getCallEnums(source, index)
+    if source.type == 'library' and source.value.type == 'function' then
+        local func = source.value
+        if not func then
+            return nil
+        end
+        if not func.args then
+            return nil
+        end
+        if not func.enums then
+            return nil
+        end
+        local arg = func.args[index]
+        if not arg then
+            return nil
+        end
+        local argName = arg.name
+        if not argName then
+            return nil
+        end
+        local enums = {}
+        for _, enum in ipairs(func.enums) do
+            if enum.name == argName then
+                enums[#enums+1] = {
+                    label       = enum.enum,
+                    description = enum.description,
+                }
+            end
+        end
+        return enums
+    end
+end
 
+local function mergeEnums(a, b)
+    local mark = {}
+    for _, enum in ipairs(a) do
+        mark[enum.label] = true
+    end
+    for _, enum in ipairs(b) do
+        if not mark[enum.label] then
+            mark[enum.label] = true
+            a[#a+1] = enum
+        end
+    end
+end
+
+local function findCall(ast, text, offset)
+    local call
+    guide.eachSourceContain(ast.ast, offset, function (src)
+        if src.type == 'call' then
+            if not call or call.start < src.start then
+                call = src
+            end
+        end
+    end)
+    return call
+end
+
+local function tryCallArg(ast, text, offset, results)
+    local call = findCall(ast, text, offset)
+    if not call then
+        return
+    end
+    local myResults = {}
+    local argIndex = 1
+    local defs = vm.getDefs(call.node)
+    for _, def in ipairs(defs) do
+        local enums = getCallEnums(def, argIndex)
+        if enums then
+            mergeEnums(myResults, enums)
+        end
+    end
+    for _, enum in ipairs(myResults) do
+        results[#results+1] = {
+            label       = enum.label,
+            description = enum.description,
+            kind        = ckind.EnumMember,
+        }
+    end
 end
 
 local function completion(uri, offset)

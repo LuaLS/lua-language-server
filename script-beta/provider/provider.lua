@@ -328,6 +328,10 @@ proto.on('textDocument/completion', function (params)
             sortText         = ('%04d'):format(i),
             insertText       = res.insertText,
             insertTextFormat = res.insertTextFormat,
+            documentation    = res.description and {
+                value = res.description,
+                kind  = 'markdown',
+            },
         }
         if res.id then
             if easy and os.clock() - clock < 0.05 then

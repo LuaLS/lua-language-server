@@ -45,6 +45,7 @@ function TEST(script)
             assert(result == nil)
             return
         end
+        assert(result ~= nil)
         for _, item in ipairs(result) do
             core.resolve(item.id)
             for k in pairs(item) do
@@ -448,13 +449,13 @@ end
     },
 }
 
--- TODO
-do return end
-
 TEST [[
 collectgarbage($)
 ]]
 (EXISTS)
+
+-- TODO
+do return end
 
 TEST [[
 collectgarbage('$')

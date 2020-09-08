@@ -51,7 +51,8 @@ function TEST(script)
             for k in pairs(item) do
                 if  k ~= 'label'
                 and k ~= 'kind'
-                and k ~= 'textEdit' then
+                and k ~= 'textEdit'
+                and k ~= 'description' then
                     item[k] = nil
                 end
             end
@@ -461,72 +462,80 @@ collectgarbage('$')
 ]]
 {
     {
-        label = "'collect'",
-        kind = CompletionItemKind.EnumMember,
-        textEdit = {
+        label       = "'collect'",
+        kind        = CompletionItemKind.EnumMember,
+        description = EXISTS,
+        textEdit    = {
             start   = 16,
             finish  = 17,
             newText = "'collect'",
         },
     },
     {
-        label = "'stop'",
-        kind = CompletionItemKind.EnumMember,
-        textEdit = {
+        label       = "'stop'",
+        kind        = CompletionItemKind.EnumMember,
+        description = EXISTS,
+        textEdit    = {
             start   = 16,
             finish  = 17,
             newText = "'stop'",
         },
     },
     {
-        label = "'restart'",
-        kind = CompletionItemKind.EnumMember,
-        textEdit = {
+        label       = "'restart'",
+        kind        = CompletionItemKind.EnumMember,
+        description = EXISTS,
+        textEdit    = {
             start   = 16,
             finish  = 17,
             newText = "'restart'",
         },
     },
     {
-        label = "'count'",
-        kind = CompletionItemKind.EnumMember,
-        textEdit = {
+        label       = "'count'",
+        kind        = CompletionItemKind.EnumMember,
+        description = EXISTS,
+        textEdit    = {
             start   = 16,
             finish  = 17,
             newText = "'count'",
         },
     },
     {
-        label = "'step'",
-        kind = CompletionItemKind.EnumMember,
-        textEdit = {
+        label       = "'step'",
+        kind        = CompletionItemKind.EnumMember,
+        description = EXISTS,
+        textEdit    = {
             start   = 16,
             finish  = 17,
             newText = "'step'",
         },
     },
     {
-        label = "'setpause'",
-        kind = CompletionItemKind.EnumMember,
-        textEdit = {
+        label       = "'setpause'",
+        kind        = CompletionItemKind.EnumMember,
+        description = EXISTS,
+        textEdit    = {
             start   = 16,
             finish  = 17,
             newText = "'setpause'",
         },
     },
     {
-        label = "'setstepmul'",
-        kind = CompletionItemKind.EnumMember,
-        textEdit = {
+        label       = "'setstepmul'",
+        kind        = CompletionItemKind.EnumMember,
+        description = EXISTS,
+        textEdit    = {
             start   = 16,
             finish  = 17,
             newText = "'setstepmul'",
         },
     },
     {
-        label = "'isrunning'",
-        kind = CompletionItemKind.EnumMember,
-        textEdit = {
+        label       = "'isrunning'",
+        kind        = CompletionItemKind.EnumMember,
+        description = EXISTS,
+        textEdit    = {
             start   = 16,
             finish  = 17,
             newText = "'isrunning'",
@@ -534,34 +543,39 @@ collectgarbage('$')
     },
 }
 
--- TODO
-do return end
-
 TEST [[
 io.read($)
 ]]
 {
     {
-        label = '"n"',
-        kind = CompletionItemKind.EnumMember,
-        documentation = EXISTS,
+        label       = '"n"',
+        kind        = CompletionItemKind.EnumMember,
+        description = EXISTS,
     },
     {
-        label = '"a"',
-        kind = CompletionItemKind.EnumMember,
-        documentation = EXISTS,
+        label       = '"a"',
+        kind        = CompletionItemKind.EnumMember,
+        description = EXISTS,
     },
     {
-        label = '"l"',
-        kind = CompletionItemKind.EnumMember,
-        documentation = EXISTS,
+        label       = '"l"',
+        kind        = CompletionItemKind.EnumMember,
+        description = EXISTS,
     },
     {
-        label = '"L"',
-        kind = CompletionItemKind.EnumMember,
-        documentation = EXISTS,
+        label       = '"L"',
+        kind        = CompletionItemKind.EnumMember,
+        description = EXISTS,
     },
 }
+
+TEST [[
+io.open('', $)
+]]
+(EXISTS)
+
+-- TODO
+do return end
 
 TEST [[
 local function f(a, $)
@@ -840,26 +854,26 @@ else$
     {
         label = 'select',
         kind = CompletionItemKind.Function,
-        documentation = EXISTS,
+        description = EXISTS,
         detail = EXISTS,
     },
     {
         label = 'select()',
         kind = CompletionItemKind.Snippet,
-        documentation = EXISTS,
+        description = EXISTS,
         detail = EXISTS,
         insertText = EXISTS,
     },
     {
         label = 'setmetatable',
         kind = CompletionItemKind.Function,
-        documentation = EXISTS,
+        description = EXISTS,
         detail = EXISTS,
     },
     {
         label = 'setmetatable()',
         kind = CompletionItemKind.Snippet,
-        documentation = EXISTS,
+        description = EXISTS,
         detail = EXISTS,
         insertText = EXISTS,
     },
@@ -890,13 +904,13 @@ xpcal$
     {
         label = 'xpcall',
         kind = CompletionItemKind.Function,
-        documentation = EXISTS,
+        description = EXISTS,
         detail = EXISTS,
     },
     {
         label = 'xpcall()',
         kind = CompletionItemKind.Snippet,
-        documentation = EXISTS,
+        description = EXISTS,
         detail = EXISTS,
         insertText = EXISTS,
     },
@@ -912,13 +926,13 @@ mt:f$
     {
         label = 'f',
         kind = CompletionItemKind.Method,
-        documentation = EXISTS,
+        description = EXISTS,
         detail = EXISTS,
     },
     {
         label = 'f()',
         kind = CompletionItemKind.Snippet,
-        documentation = EXISTS,
+        description = EXISTS,
         detail = EXISTS,
         insertText = 'f(${1:a: any}, ${2:b: any}, ${3:c: any})',
     },
@@ -1204,26 +1218,26 @@ end
     {
         label = 'select',
         kind = CompletionItemKind.Function,
-        documentation = EXISTS,
+        description = EXISTS,
         detail = EXISTS,
     },
     {
         label = 'select()',
         kind = CompletionItemKind.Snippet,
-        documentation = EXISTS,
+        description = EXISTS,
         detail = EXISTS,
         insertText = EXISTS,
     },
     {
         label = 'setmetatable',
         kind = CompletionItemKind.Function,
-        documentation = EXISTS,
+        description = EXISTS,
         detail = EXISTS,
     },
     {
         label = 'setmetatable()',
         kind = CompletionItemKind.Snippet,
-        documentation = EXISTS,
+        description = EXISTS,
         detail = EXISTS,
         insertText = EXISTS,
     },
@@ -1449,7 +1463,7 @@ zzz$
         label = 'zzzzz',
         kind = CompletionItemKind.Function,
         detail = '(function)(4 prototypes)',
-        documentation = {
+        description = {
             kind = 'markdown',
             value = [[
 ```lua
@@ -1469,7 +1483,7 @@ JustTest
         kind = CompletionItemKind.Snippet,
         detail = '(function)(4 prototypes)',
         insertText = EXISTS,
-        documentation = EXISTS,
+        description = EXISTS,
     }
 }
 
@@ -1483,7 +1497,7 @@ zz$
         label = 'zzz',
         kind = CompletionItemKind.Enum,
         detail = '(number) = 1',
-        documentation = {
+        description = {
             kind = 'markdown',
             value = 'abc',
         }
@@ -1502,11 +1516,11 @@ f($)
     {
         label = "'选项1'",
         kind = CompletionItemKind.EnumMember,
-        documentation = '注释1',
+        description = '注释1',
     },
     {
         label = "'选项2'",
         kind = CompletionItemKind.EnumMember,
-        documentation = '注释2',
+        description = '注释2',
     },
 }

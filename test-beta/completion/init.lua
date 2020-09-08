@@ -33,6 +33,12 @@ end
 
 rawset(_G, 'TEST', true)
 
+local cared = {
+    ['label']    = true,
+    ['kind']     = true,
+    ['textEdit'] = true,
+}
+
 function TEST(script)
     return function (expect)
         files.removeAll()
@@ -47,12 +53,12 @@ function TEST(script)
         end
         assert(result ~= nil)
         for _, item in ipairs(result) do
-            core.resolve(item.id)
+            local r = core.resolve(item.id)
+            for k, v in pairs(r or {}) do
+                item[k] = v
+            end
             for k in pairs(item) do
-                if  k ~= 'label'
-                and k ~= 'kind'
-                and k ~= 'textEdit'
-                and k ~= 'description' then
+                if  not cared[k] then
                     item[k] = nil
                 end
             end
@@ -475,7 +481,6 @@ collectgarbage('$')
     {
         label       = "'collect'",
         kind        = CompletionItemKind.EnumMember,
-        description = EXISTS,
         textEdit    = {
             start   = 16,
             finish  = 17,
@@ -485,7 +490,6 @@ collectgarbage('$')
     {
         label       = "'stop'",
         kind        = CompletionItemKind.EnumMember,
-        description = EXISTS,
         textEdit    = {
             start   = 16,
             finish  = 17,
@@ -495,7 +499,6 @@ collectgarbage('$')
     {
         label       = "'restart'",
         kind        = CompletionItemKind.EnumMember,
-        description = EXISTS,
         textEdit    = {
             start   = 16,
             finish  = 17,
@@ -505,7 +508,6 @@ collectgarbage('$')
     {
         label       = "'count'",
         kind        = CompletionItemKind.EnumMember,
-        description = EXISTS,
         textEdit    = {
             start   = 16,
             finish  = 17,
@@ -515,7 +517,6 @@ collectgarbage('$')
     {
         label       = "'step'",
         kind        = CompletionItemKind.EnumMember,
-        description = EXISTS,
         textEdit    = {
             start   = 16,
             finish  = 17,
@@ -525,7 +526,6 @@ collectgarbage('$')
     {
         label       = "'setpause'",
         kind        = CompletionItemKind.EnumMember,
-        description = EXISTS,
         textEdit    = {
             start   = 16,
             finish  = 17,
@@ -535,7 +535,6 @@ collectgarbage('$')
     {
         label       = "'setstepmul'",
         kind        = CompletionItemKind.EnumMember,
-        description = EXISTS,
         textEdit    = {
             start   = 16,
             finish  = 17,
@@ -545,7 +544,6 @@ collectgarbage('$')
     {
         label       = "'isrunning'",
         kind        = CompletionItemKind.EnumMember,
-        description = EXISTS,
         textEdit    = {
             start   = 16,
             finish  = 17,
@@ -561,22 +559,18 @@ io.read($)
     {
         label       = '"n"',
         kind        = CompletionItemKind.EnumMember,
-        description = EXISTS,
     },
     {
         label       = '"a"',
         kind        = CompletionItemKind.EnumMember,
-        description = EXISTS,
     },
     {
         label       = '"l"',
         kind        = CompletionItemKind.EnumMember,
-        description = EXISTS,
     },
     {
         label       = '"L"',
         kind        = CompletionItemKind.EnumMember,
-        description = EXISTS,
     },
 }
 
@@ -621,26 +615,22 @@ self.results.list[#$] = 1
     },
 }
 
--- TODO
-do return end
-
 TEST [[
 self.results.list[#self.re$]
 ]]
 {
     {
-        label = 'self.results.list+1',
+        label = '#self.results.list+1',
         kind = CompletionItemKind.Snippet,
         textEdit = {
-            start = 20,
+            start = 19,
             finish = 27,
-            newText = 'self.results.list+1] = ',
+            newText = '#self.results.list+1] = ',
         },
     },
     {
         label = 'results',
         kind = CompletionItemKind.Field,
-        detail = EXISTS,
     },
 }
 
@@ -649,20 +639,22 @@ fff[#ff$]
 ]]
 {
     {
-        label = 'fff+1',
+        label = '#fff+1',
         kind = CompletionItemKind.Snippet,
         textEdit = {
-            start = 6,
+            start = 5,
             finish = 8,
-            newText = 'fff+1] = ',
+            newText = '#fff+1] = ',
         },
     },
     {
         label = 'fff',
         kind = CompletionItemKind.Field,
-        detail = EXISTS,
     }
 }
+
+-- TODO
+do return end
 
 TEST [[
 local _ = fff.kkk[#$]
@@ -880,26 +872,22 @@ else$
     {
         label = 'select',
         kind = CompletionItemKind.Function,
-        description = EXISTS,
         detail = EXISTS,
     },
     {
         label = 'select()',
         kind = CompletionItemKind.Snippet,
-        description = EXISTS,
         detail = EXISTS,
         insertText = EXISTS,
     },
     {
         label = 'setmetatable',
         kind = CompletionItemKind.Function,
-        description = EXISTS,
         detail = EXISTS,
     },
     {
         label = 'setmetatable()',
         kind = CompletionItemKind.Snippet,
-        description = EXISTS,
         detail = EXISTS,
         insertText = EXISTS,
     },
@@ -930,13 +918,11 @@ xpcal$
     {
         label = 'xpcall',
         kind = CompletionItemKind.Function,
-        description = EXISTS,
         detail = EXISTS,
     },
     {
         label = 'xpcall()',
         kind = CompletionItemKind.Snippet,
-        description = EXISTS,
         detail = EXISTS,
         insertText = EXISTS,
     },
@@ -952,13 +938,11 @@ mt:f$
     {
         label = 'f',
         kind = CompletionItemKind.Method,
-        description = EXISTS,
         detail = EXISTS,
     },
     {
         label = 'f()',
         kind = CompletionItemKind.Snippet,
-        description = EXISTS,
         detail = EXISTS,
         insertText = 'f(${1:a: any}, ${2:b: any}, ${3:c: any})',
     },
@@ -1244,26 +1228,22 @@ end
     {
         label = 'select',
         kind = CompletionItemKind.Function,
-        description = EXISTS,
         detail = EXISTS,
     },
     {
         label = 'select()',
         kind = CompletionItemKind.Snippet,
-        description = EXISTS,
         detail = EXISTS,
         insertText = EXISTS,
     },
     {
         label = 'setmetatable',
         kind = CompletionItemKind.Function,
-        description = EXISTS,
         detail = EXISTS,
     },
     {
         label = 'setmetatable()',
         kind = CompletionItemKind.Snippet,
-        description = EXISTS,
         detail = EXISTS,
         insertText = EXISTS,
     },

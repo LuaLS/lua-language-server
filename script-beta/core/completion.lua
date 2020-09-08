@@ -157,7 +157,12 @@ end
 
 local function buildDetail(source)
     local types = vm.getInferType(source)
-    return types
+    local literals = vm.getInferLiteral(source)
+    if literals then
+        return types .. ' = ' .. literals
+    else
+        return types
+    end
 end
 
 local function buildDesc(source)

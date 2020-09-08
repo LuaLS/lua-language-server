@@ -258,7 +258,7 @@ proto.on('textDocument/rename', function (params)
     end
     local lines  = files.getLines(uri)
     local text   = files.getText(uri)
-    local offset = define.offset(lines, text, params.position)
+    local offset = define.offsetOfWord(lines, text, params.position)
     local result = core.rename(uri, offset, params.newName)
     if not result then
         return nil

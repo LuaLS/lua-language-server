@@ -15,6 +15,21 @@ function m.offset(lines, text, position)
     return offset - 1
 end
 
+--- 获取 position 对应的光标位置(根据附近的单词)
+---@param lines table
+---@param text string
+---@param position position
+---@return integer
+function m.offsetOfWord(lines, text, position)
+    local row    = position.line + 1
+    local start  = guide.lineRange(lines, row)
+    local offset = utf8.offset(text, position.character + 1, start)    if offset > #text
+    or text:sub(offset-1, offset):match '[%w_][^%w_]' then
+        offset = offset - 1
+    end
+    return offset
+end
+
 --- 将光标位置转化为 position
 ---@alias position table
 ---@param lines table

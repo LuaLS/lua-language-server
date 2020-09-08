@@ -4,7 +4,11 @@ local guide = require 'parser.guide'
 local function getClass(source, classes, deep)
     local lib = vm.getLibrary(source)
     if lib then
-        classes[#classes+1] = lib.name
+        if lib.value.type == 'table' then
+            classes[#classes+1] = lib.value.name
+        else
+            classes[#classes+1] = lib.value.type
+        end
         return
     end
     if deep > 3 then

@@ -504,6 +504,35 @@ global utf8: utf8 {
 ]]
 
 TEST [[
+print(io.<?stderr?>)
+]]
+[[
+global io.stderr: FILE*
+]]
+
+TEST [[
+print(<?io?>)
+]]
+[[
+global io: io {
+    close: function,
+    flush: function,
+    input: function,
+    lines: function,
+    open: function,
+    output: function,
+    popen: function,
+    read: function,
+    stderr: FILE*,
+    stdin: FILE*,
+    stdout: FILE*,
+    tmpfile: function,
+    type: function,
+    write: function,
+}
+]]
+
+TEST [[
 local <?sssss?> = require 'utf8'
 ]]
 [[

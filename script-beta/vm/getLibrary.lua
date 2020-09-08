@@ -2,6 +2,9 @@ local vm      = require 'vm.vm'
 local guide   = require 'parser.guide'
 
 local function getLibrary(source)
+    if source.type == 'library' then
+        return source
+    end
     local defs = vm.getDefs(source)
     for _, def in ipairs(defs) do
         if def.type == 'library' then

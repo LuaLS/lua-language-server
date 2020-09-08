@@ -846,7 +846,7 @@ local function getCallArgInfo(call, text, offset)
             return index, arg
         end
     end
-    return nil, nil
+    return #call.args + 1, nil
 end
 
 local function tryCallArg(ast, text, offset, results)

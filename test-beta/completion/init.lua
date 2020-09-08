@@ -298,6 +298,17 @@ while true d$
 }
 
 TEST [[
+results$
+]]
+(nil)
+
+TEST [[
+results$
+local results
+]]
+(EXISTS)
+
+TEST [[
 t.a = {}
 t.b = {}
 t.$
@@ -574,9 +585,6 @@ io.open('', $)
 ]]
 (EXISTS)
 
--- TODO
-do return end
-
 TEST [[
 local function f(a, $)
 end
@@ -597,6 +605,9 @@ self.results.list[#$]
         },
     },
 }
+
+-- TODO
+do return end
 
 TEST [[
 self.results.list[#self.re$]

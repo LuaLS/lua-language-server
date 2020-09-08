@@ -85,8 +85,7 @@ local function findSymbol(text, offset)
             goto CONTINUE
         end
         if char == '.'
-        or char == ':'
-        or char == '#' then
+        or char == ':' then
             return char, i
         else
             return nil
@@ -328,13 +327,13 @@ local function checkTableField(ast, word, start, results)
     end)
 end
 
-local function checkCommon(word, text, results)
+local function checkCommon(word, text, offset, results)
     local used = {}
     for _, result in ipairs(results) do
         used[result.label] = true
     end
-    for str in text:gmatch '[%a_][%w_]*' do
-        if not used[str] and str ~= word then
+    for str, pos in text:gmatch '([%a_][%w_]*)()' do
+        if not used[str] and pos - 1 ~= offset then
             used[str] = true
             if matchKey(word, str) then
                 results[#results+1] = {
@@ -696,6 +695,20 @@ local function checkUri(word, text, results)
     
 end
 
+local function checkLenPlusOne(ast, text, offset, results)
+    guide.eachSourceContain(ast.ast, offset, function (source)
+        
+    end)
+end
+
+local function trySpecial(ast, text, offset, results)
+    if isInString(ast.ast, offset) then
+        return
+    end
+    -- x[#x+1]
+    checkLenPlusOne(ast, text, offset, results)
+end
+
 local function tryWord(ast, text, offset, results)
     local finish = skipSpace(text, offset)
     local word, start = findWord(text, finish)
@@ -731,7 +744,7 @@ local function tryWord(ast, text, offset, results)
             end
         end
         if not hasSpace then
-            checkCommon(word, text, results)
+            checkCommon(word, text, offset, results)
         end
     end
 end
@@ -875,13 +888,14 @@ local function completion(uri, offset)
     clearStack()
     vm.setSearchLevel(3)
     if ast then
+        trySpecial(ast, text, offset, results)
         tryWord(ast, text, offset, results)
         trySymbol(ast, text, offset, results)
         tryCallArg(ast, text, offset, results)
     else
         local word = findWord(text, offset)
         if word then
-            checkCommon(word, text, results)
+            checkCommon(word, text, offset, results)
         end
     end
 

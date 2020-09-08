@@ -697,7 +697,10 @@ end
 
 local function checkLenPlusOne(ast, text, offset, results)
     guide.eachSourceContain(ast.ast, offset, function (source)
-        
+        if source.type == 'getindex'
+        or source.type == 'setindex' then
+            local pos
+        end
     end)
 end
 

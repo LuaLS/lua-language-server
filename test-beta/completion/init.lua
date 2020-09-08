@@ -465,7 +465,7 @@ end
 {
     {
         label = 'fff',
-        kind = CompletionItemKind.Field,
+        kind = CompletionItemKind.Variable,
     },
 }
 
@@ -683,9 +683,6 @@ fff.kkk[#$].yy
     },
 }
 
--- TODO
-do return end
-
 TEST [[
 local t = {
     a = 1,
@@ -786,12 +783,10 @@ end
     {
         label = 'a',
         kind = CompletionItemKind.Field,
-        detail = EXISTS,
     },
     {
         label = 'b',
         kind = CompletionItemKind.Field,
-        detail = EXISTS,
     },
 }
 
@@ -805,7 +800,7 @@ local ask = 1
 TEST [[
 local add
 
-function f(a$)
+function f(ad$)
     local _ = add
 end
 ]]
@@ -828,6 +823,9 @@ end
 ]]
 (nil)
 
+TEST [[
+print(io.$)
+]]
 require 'config' .config.runtime.version = 'Lua 5.4'
 --TEST [[
 --local $

@@ -688,6 +688,15 @@ local function checkProvideLocal(ast, word, start, results)
             }
         end
     end)
+    guide.eachSourceType(block, 'getlocal', function (source)
+        if source.start > start
+        and matchKey(word, source[1]) then
+            results[#results+1] = {
+                label = source[1],
+                kind  = ckind.Variable,
+            }
+        end
+    end)
 end
 
 local function isAfterLocal(text, start)
@@ -748,6 +757,14 @@ local function checkLenPlusOne(ast, text, offset, results)
     end)
 end
 
+local function isFuncArg(ast, offset)
+    return guide.eachSourceContain(ast.ast, offset, function (source)
+        if source.type == 'funcargs' then
+            return true
+        end
+    end)
+end
+
 local function trySpecial(ast, text, offset, results)
     if isInString(ast.ast, offset) then
         return
@@ -773,6 +790,8 @@ local function tryWord(ast, text, offset, results)
             if not hasSpace then
                 checkField(word, start, parent, oop, results)
             end
+        elseif isFuncArg(ast, offset) then
+            checkProvideLocal(ast, word, start, results)
         else
             local afterLocal = isAfterLocal(text, start)
             local stop = checkKeyWord(ast, text, start, word, hasSpace, afterLocal, results)

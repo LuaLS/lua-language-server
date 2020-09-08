@@ -219,9 +219,11 @@ local function renameGlobal(source, newname, callback)
 end
 
 local function ofLocal(source, newname, callback)
-    local results = guide.requestReference(source)
-    for i = 1, #results do
-        renameLocal(results[i], newname, callback)
+    renameLocal(source, newname, callback)
+    if source.ref then
+        for _, ref in ipairs(source.ref) do
+            renameLocal(ref, newname, callback)
+        end
     end
 end
 

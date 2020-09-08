@@ -864,7 +864,6 @@ t.$
     {
         label = '__index',
         kind = CompletionItemKind.Field,
-        detail = EXISTS,
     }
 }
 
@@ -876,37 +875,6 @@ else$
 ]]
 {
     {
-        label = 'elseaaa',
-        kind = CompletionItemKind.Variable,
-    },
-    {
-        label = 'ELSE',
-        kind = CompletionItemKind.Enum,
-        detail = EXISTS,
-    },
-    {
-        label = 'select',
-        kind = CompletionItemKind.Function,
-        detail = EXISTS,
-    },
-    {
-        label = 'select()',
-        kind = CompletionItemKind.Snippet,
-        detail = EXISTS,
-        insertText = EXISTS,
-    },
-    {
-        label = 'setmetatable',
-        kind = CompletionItemKind.Function,
-        detail = EXISTS,
-    },
-    {
-        label = 'setmetatable()',
-        kind = CompletionItemKind.Snippet,
-        detail = EXISTS,
-        insertText = EXISTS,
-    },
-    {
         label = 'else',
         kind = CompletionItemKind.Keyword,
     },
@@ -917,9 +885,35 @@ else$
     {
         label = 'elseif .. then',
         kind = CompletionItemKind.Snippet,
-        insertText = EXISTS,
-    }
+    },
+    {
+        label = 'elseaaa',
+        kind = CompletionItemKind.Variable,
+    },
+    {
+        label = 'ELSE',
+        kind = CompletionItemKind.Enum,
+    },
+    {
+        label = 'select',
+        kind = CompletionItemKind.Function,
+    },
+    {
+        label = 'select()',
+        kind = CompletionItemKind.Snippet,
+    },
+    {
+        label = 'setmetatable',
+        kind = CompletionItemKind.Function,
+    },
+    {
+        label = 'setmetatable()',
+        kind = CompletionItemKind.Snippet,
+    },
 }
+
+-- TODO
+do return end
 
 TEST [[
 local xpcal
@@ -933,12 +927,10 @@ xpcal$
     {
         label = 'xpcall',
         kind = CompletionItemKind.Function,
-        detail = EXISTS,
     },
     {
         label = 'xpcall()',
         kind = CompletionItemKind.Snippet,
-        detail = EXISTS,
         insertText = EXISTS,
     },
 }
@@ -953,7 +945,6 @@ mt:f$
     {
         label = 'f',
         kind = CompletionItemKind.Method,
-        detail = EXISTS,
     },
     {
         label = 'f()',

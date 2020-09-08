@@ -713,21 +713,37 @@ local function checkLenPlusOne(ast, text, offset, results)
             if not matchKey(writingText, nodeText) then
                 return
             end
-            local eq = text:find('%s*%=', source.node.finish)
-            local label = text:match('%#[ \t]*', pos) .. nodeText .. '+1'
-            local newText = label .. ']'
-            if not eq then
-                newText = newText .. ' = '
+            if source.parent == guide.getParentBlock(source) then
+                -- state
+                local label = text:match('%#[ \t]*', pos) .. nodeText .. '+1'
+                local eq = text:find('%s*%=', source.node.finish)
+                local newText = label .. ']'
+                if not eq then
+                    newText = newText .. ' = '
+                end
+                results[#results+1] = {
+                    label    = label,
+                    kind     = ckind.Snippet,
+                    textEdit = {
+                        start   = pos,
+                        finish  = source.finish,
+                        newText = newText,
+                    },
+                }
+            else
+                -- exp
+                local label = text:match('%#[ \t]*', pos) .. nodeText
+                local newText = label .. ']'
+                results[#results+1] = {
+                    label    = label,
+                    kind     = ckind.Snippet,
+                    textEdit = {
+                        start   = pos,
+                        finish  = source.finish,
+                        newText = newText,
+                    },
+                }
             end
-            results[#results+1] = {
-                label    = label,
-                kind     = ckind.Snippet,
-                textEdit = {
-                    start   = pos,
-                    finish  = source.finish,
-                    newText = newText,
-                },
-            }
         end
     end)
 end

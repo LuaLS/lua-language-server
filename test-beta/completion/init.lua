@@ -653,23 +653,38 @@ fff[#ff$]
     }
 }
 
--- TODO
-do return end
-
 TEST [[
 local _ = fff.kkk[#$]
 ]]
 {
     {
-        label = 'fff.kkk',
+        label = '#fff.kkk',
         kind = CompletionItemKind.Snippet,
         textEdit = {
-            start = 20,
+            start = 19,
             finish = 20,
-            newText = 'fff.kkk]',
+            newText = '#fff.kkk]',
         },
     },
 }
+
+TEST [[
+fff.kkk[#$].yy
+]]
+{
+    {
+        label = '#fff.kkk',
+        kind = CompletionItemKind.Snippet,
+        textEdit = {
+            start = 9,
+            finish = 10,
+            newText = '#fff.kkk]',
+        },
+    },
+}
+
+-- TODO
+do return end
 
 TEST [[
 local t = {

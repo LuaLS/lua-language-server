@@ -699,7 +699,30 @@ local function checkLenPlusOne(ast, text, offset, results)
     guide.eachSourceContain(ast.ast, offset, function (source)
         if source.type == 'getindex'
         or source.type == 'setindex' then
-            local pos
+            local _, pos = text:find('%s*%[%s*%#', source.node.finish)
+            if not pos then
+                return
+            end
+            local nodeText = text:sub(source.node.start, source.node.finish)
+            local writingText = trim(text:sub(pos + 1, offset - 1)) or ''
+            if not matchKey(writingText, nodeText) then
+                return
+            end
+            local eq = text:find('%s*%=', source.node.finish)
+            local label = text:match('%#[ \t]*', pos) .. nodeText .. '+1'
+            local newText = label .. ']'
+            if not eq then
+                newText = newText .. ' = '
+            end
+            results[#results+1] = {
+                label    = label,
+                kind     = ckind.Snippet,
+                textEdit = {
+                    start   = pos,
+                    finish  = source.finish,
+                    newText = newText,
+                },
+            }
         end
     end)
 end

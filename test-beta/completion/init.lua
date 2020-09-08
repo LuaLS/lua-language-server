@@ -49,7 +49,9 @@ function TEST(script)
         for _, item in ipairs(result) do
             core.resolve(item.id)
             for k in pairs(item) do
-                if k ~= 'label' and k ~= 'kind' then
+                if  k ~= 'label'
+                and k ~= 'kind'
+                and k ~= 'textEdit' then
                     item[k] = nil
                 end
             end
@@ -454,78 +456,86 @@ collectgarbage($)
 ]]
 (EXISTS)
 
--- TODO
-do return end
-
 TEST [[
 collectgarbage('$')
 ]]
 {
     {
-        label = 'collect',
-        filterText = 'collect',
+        label = "'collect'",
         kind = CompletionItemKind.EnumMember,
-        documentation = EXISTS,
-        textEdit = EXISTS,
-        additionalTextEdits = EXISTS,
+        textEdit = {
+            start   = 16,
+            finish  = 17,
+            newText = "'collect'",
+        },
     },
     {
-        label = 'stop',
-        filterText = 'stop',
+        label = "'stop'",
         kind = CompletionItemKind.EnumMember,
-        documentation = EXISTS,
-        textEdit = EXISTS,
-        additionalTextEdits = EXISTS,
+        textEdit = {
+            start   = 16,
+            finish  = 17,
+            newText = "'stop'",
+        },
     },
     {
-        label = 'restart',
-        filterText = 'restart',
+        label = "'restart'",
         kind = CompletionItemKind.EnumMember,
-        documentation = EXISTS,
-        textEdit = EXISTS,
-        additionalTextEdits = EXISTS,
+        textEdit = {
+            start   = 16,
+            finish  = 17,
+            newText = "'restart'",
+        },
     },
     {
-        label = 'count',
-        filterText = 'count',
+        label = "'count'",
         kind = CompletionItemKind.EnumMember,
-        documentation = EXISTS,
-        textEdit = EXISTS,
-        additionalTextEdits = EXISTS,
+        textEdit = {
+            start   = 16,
+            finish  = 17,
+            newText = "'count'",
+        },
     },
     {
-        label = 'step',
-        filterText = 'step',
+        label = "'step'",
         kind = CompletionItemKind.EnumMember,
-        documentation = EXISTS,
-        textEdit = EXISTS,
-        additionalTextEdits = EXISTS,
+        textEdit = {
+            start   = 16,
+            finish  = 17,
+            newText = "'step'",
+        },
     },
     {
-        label = 'setpause',
-        filterText = 'setpause',
+        label = "'setpause'",
         kind = CompletionItemKind.EnumMember,
-        documentation = EXISTS,
-        textEdit = EXISTS,
-        additionalTextEdits = EXISTS,
+        textEdit = {
+            start   = 16,
+            finish  = 17,
+            newText = "'setpause'",
+        },
     },
     {
-        label = 'setstepmul',
-        filterText = 'setstepmul',
+        label = "'setstepmul'",
         kind = CompletionItemKind.EnumMember,
-        documentation = EXISTS,
-        textEdit = EXISTS,
-        additionalTextEdits = EXISTS,
+        textEdit = {
+            start   = 16,
+            finish  = 17,
+            newText = "'setstepmul'",
+        },
     },
     {
-        label = 'isrunning',
-        filterText = 'isrunning',
+        label = "'isrunning'",
         kind = CompletionItemKind.EnumMember,
-        documentation = EXISTS,
-        textEdit = EXISTS,
-        additionalTextEdits = EXISTS,
+        textEdit = {
+            start   = 16,
+            finish  = 17,
+            newText = "'isrunning'",
+        },
     },
 }
+
+-- TODO
+do return end
 
 TEST [[
 io.read($)

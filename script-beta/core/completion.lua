@@ -14,6 +14,7 @@ local util       = require 'utility'
 local markdown   = require 'provider.markdown'
 local findSource = require 'core.find-source'
 local await      = require 'await'
+local parser     = require 'parser'
 
 local stackID = 0
 local resolveID = 0
@@ -39,6 +40,10 @@ local function resolveStack(id)
         return resolveID
     end)
     return callback()
+end
+
+local function trim(str)
+    return str:match '^%s*(%S+)%s*$'
 end
 
 local function isSpace(char)
@@ -774,6 +779,7 @@ local function getCallEnums(source, index)
                 enums[#enums+1] = {
                     label       = enum.enum,
                     description = enum.description,
+                    kind        = ckind.EnumMember,
                 }
             end
         end
@@ -781,15 +787,40 @@ local function getCallEnums(source, index)
     end
 end
 
-local function mergeEnums(a, b)
+local function tryLabelInString(label, arg)
+    if not arg or arg.type ~= 'string' then
+        return label
+    end
+    local str = parser:grammar(label, 'String')
+    if not str then
+        return label
+    end
+    if not matchKey(arg[1], str[1]) then
+        return nil
+    end
+    return util.viewString(str[1], arg[2])
+end
+
+local function mergeEnums(a, b, text, arg)
     local mark = {}
     for _, enum in ipairs(a) do
         mark[enum.label] = true
     end
     for _, enum in ipairs(b) do
-        if not mark[enum.label] then
-            mark[enum.label] = true
-            a[#a+1] = enum
+        local label = tryLabelInString(enum.label, arg)
+        if label and not mark[label] then
+            mark[label] = true
+            local result = {
+                label       = label,
+                kind        = ckind.EnumMember,
+                description = enum.description,
+                textEdit    = arg and {
+                    start   = arg.start,
+                    finish  = arg.finish,
+                    newText = label,
+                },
+            }
+            a[#a+1] = result
         end
     end
 end
@@ -806,26 +837,34 @@ local function findCall(ast, text, offset)
     return call
 end
 
+local function getCallArgInfo(call, text, offset)
+    if not call.args then
+        return 1, nil
+    end
+    for index, arg in ipairs(call.args) do
+        if arg.start <= offset and arg.finish >= offset then
+            return index, arg
+        end
+    end
+    return nil, nil
+end
+
 local function tryCallArg(ast, text, offset, results)
     local call = findCall(ast, text, offset)
     if not call then
         return
     end
     local myResults = {}
-    local argIndex = 1
+    local argIndex, arg = getCallArgInfo(call, text, offset)
     local defs = vm.getDefs(call.node)
     for _, def in ipairs(defs) do
         local enums = getCallEnums(def, argIndex)
         if enums then
-            mergeEnums(myResults, enums)
+            mergeEnums(myResults, enums, text, arg)
         end
     end
     for _, enum in ipairs(myResults) do
-        results[#results+1] = {
-            label       = enum.label,
-            description = enum.description,
-            kind        = ckind.EnumMember,
-        }
+        results[#results+1] = enum
     end
 end
 

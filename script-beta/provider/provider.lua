@@ -328,6 +328,15 @@ proto.on('textDocument/completion', function (params)
             sortText         = ('%04d'):format(i),
             insertText       = res.insertText,
             insertTextFormat = res.insertTextFormat,
+            textEdit         = res.textEdit and {
+                range   = define.range(
+                    lines,
+                    text,
+                    res.textEdit.start,
+                    res.textEdit.finish
+                ),
+                newText = res.textEdit.newText,
+            },
             documentation    = res.description and {
                 value = res.description,
                 kind  = 'markdown',

@@ -1737,8 +1737,8 @@ end
 
 local function close()
     State     = nil
-    PushError = nil
-    PushDiag  = nil
+    PushError = function () end
+    PushDiag  = function () end
 end
 
 return {

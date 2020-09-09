@@ -141,7 +141,7 @@ local function buildFunctionSnip(source, oop)
     local defs = vm.getDefs(source)
     local args = ''
     for _, def in ipairs(defs) do
-        local defArgs = getArg(def)
+        local defArgs = getArg(def, oop)
         if defArgs ~= '' then
             args = defArgs
             break

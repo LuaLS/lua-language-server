@@ -1563,6 +1563,8 @@ function m.pushResult(status, mode, ref, simple)
             if ref.node.special == 'rawset' then
                 results[#results+1] = ref
             end
+        elseif ref.type == 'function' then
+            results[#results+1] = ref
         elseif ref.type == 'table' then
             results[#results+1] = ref
         elseif ref.type == 'library' then
@@ -1620,6 +1622,8 @@ function m.pushResult(status, mode, ref, simple)
             results[#results+1] = ref
         elseif ref.type == 'setglobal'
         or     ref.type == 'getglobal' then
+            results[#results+1] = ref
+        elseif ref.type == 'function' then
             results[#results+1] = ref
         elseif ref.type == 'table' then
             results[#results+1] = ref
@@ -2501,13 +2505,17 @@ function m.inferByDef(status, obj)
     if status.index > 1 then
         return
     end
+    local mark = {}
     local newStatus = m.status(nil, status.interface)
     m.searchRefs(newStatus, obj, 'def')
     for _, src in ipairs(newStatus.results) do
         local inferStatus = m.status(status)
         m.searchInfer(inferStatus, src)
         for _, infer in ipairs(inferStatus.results) do
-            status.results[#status.results+1] = infer
+            if not mark[infer.source] then
+                mark[infer.source] = true
+                status.results[#status.results+1] = infer
+            end
         end
     end
 end

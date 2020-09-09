@@ -31,6 +31,10 @@ local function getKey(src)
 end
 
 local function getField(src)
+    if src.type == 'table'
+    or src.type == 'function' then
+        return nil
+    end
     if src.parent.type == 'tableindex'
     or src.parent.type == 'setindex'
     or src.parent.type == 'getindex' then
@@ -111,6 +115,9 @@ return function (source)
     local classes = {}
     vm.eachField(source, function (src)
         local key, class, literal = getField(src)
+        if not key then
+            return
+        end
         if not classes[key] then
             classes[key] = {}
         end

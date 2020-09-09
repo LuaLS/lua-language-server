@@ -424,9 +424,12 @@ local function checkProvideLocal(ast, word, start, results)
     if not block then
         return
     end
+    local used = {}
     guide.eachSourceType(block, 'getglobal', function (source)
         if source.start > start
+        and not used[source[1]]
         and matchKey(word, source[1]) then
+            used[source[1]] = true
             results[#results+1] = {
                 label = source[1],
                 kind  = ckind.Variable,
@@ -435,7 +438,9 @@ local function checkProvideLocal(ast, word, start, results)
     end)
     guide.eachSourceType(block, 'getlocal', function (source)
         if source.start > start
+        and not used[source[1]]
         and matchKey(word, source[1]) then
+            used[source[1]] = true
             results[#results+1] = {
                 label = source[1],
                 kind  = ckind.Variable,

@@ -315,6 +315,25 @@ local results
 (EXISTS)
 
 TEST [[
+local a$
+
+local function f(fff)
+    fff = ast
+    fff = ast
+    fff = ast
+    fff = ast
+    fff = ast
+    fff = ast
+end
+]]
+{
+    {
+        label = 'ast',
+        kind = CompletionItemKind.Variable,
+    }
+}
+
+TEST [[
 t.a = {}
 t.b = {}
 t.$

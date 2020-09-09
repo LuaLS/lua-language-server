@@ -111,6 +111,7 @@ return function (uri, offset)
                 target = {
                     start  = 0,
                     finish = 0,
+                    uri    = uri,
                 }
             }
         end

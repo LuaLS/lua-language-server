@@ -60,6 +60,12 @@ local function eq(a, b)
     return a == b
 end
 
+local Cared = {
+    ['label']    = true,
+    ['kind']     = true,
+    ['textEdit'] = true,
+}
+
 function TEST(data)
     files.removeAll()
 
@@ -76,14 +82,26 @@ function TEST(data)
         files.setText(uri, script)
     end
 
-    local result = core.completion(mainUri, pos)
     local expect = data.completion
-    if expect then
-        assert(result)
-        assert(eq(expect, result))
-    else
+    local result = core.completion(mainUri, pos)
+    if not expect then
         assert(result == nil)
+        return
     end
+    assert(result ~= nil)
+    for _, item in ipairs(result) do
+        local r = core.resolve(item.id)
+        for k, v in pairs(r or {}) do
+            item[k] = v
+        end
+        for k in pairs(item) do
+            if  not Cared[k] then
+                item[k] = nil
+            end
+        end
+    end
+    assert(result)
+    assert(eq(expect, result))
 end
 
 if require'bee.platform'.OS == 'Windows' then
@@ -109,27 +127,21 @@ TEST {
     completion = {
         {
             label = 'abc',
-            filterText = 'abc',
             kind = CompletionItemKind.Reference,
             documentation = 'abc.lua',
             textEdit = EXISTS,
-            additionalTextEdits = EXISTS,
         },
         {
             label = 'abc.aaa',
-            filterText = 'abc.aaa',
             kind = CompletionItemKind.Reference,
             documentation = 'abc/aaa.lua',
             textEdit = EXISTS,
-            additionalTextEdits = EXISTS,
         },
         {
             label = 'abcde',
-            filterText = 'abcde',
             kind = CompletionItemKind.Reference,
             documentation = 'xxx/abcde.lua',
             textEdit = EXISTS,
-            additionalTextEdits = EXISTS,
         },
     }
 }

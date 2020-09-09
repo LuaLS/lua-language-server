@@ -16,6 +16,7 @@ local findSource = require 'core.find-source'
 local await      = require 'await'
 local parser     = require 'parser'
 local keyWordMap = require 'core.keyword'
+local workspace  = require 'workspace'
 
 local stackID = 0
 local resolveID = 0
@@ -455,8 +456,38 @@ local function isAfterLocal(text, start)
     return word == 'local'
 end
 
-local function checkUri(word, text, results)
-    
+local function checkUri(ast, text, offset, results)
+    local uris = guide.eachSourceContain(ast.ast, offset, function (source)
+        if source.type ~= 'string' then
+            return
+        end
+        local callargs = source.parent
+        if callargs.type ~= 'callargs' then
+            return
+        end
+        if callargs[1] ~= source then
+            return
+        end
+        local call = callargs.parent
+        local func = call.node
+        local literal = guide.getLiteral(source)
+        local lib = vm.getLibrary(func)
+        if not lib then
+            return
+        end
+        if     lib.name == 'require' then
+           return  workspace.findUrisByRequirePath(literal, false)
+        elseif lib.name == 'dofile'
+        or     lib.name == 'loadfile' then
+            return workspace.findUrisByFilePath(literal, false)
+        end
+    end)
+    if not uris then
+        return
+    end
+    for _, uri in ipairs(uris) do
+
+    end
 end
 
 local function checkLenPlusOne(ast, text, offset, results)
@@ -532,7 +563,7 @@ local function tryWord(ast, text, offset, results)
     local hasSpace = finish ~= offset
     if isInString(ast, offset) then
         if not hasSpace then
-            checkUri(word, text, results)
+            checkUri(ast, text, offset, results)
         end
     else
         local parent, oop = findParent(ast, text, start - 1)

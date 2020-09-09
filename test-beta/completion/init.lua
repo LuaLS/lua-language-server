@@ -33,7 +33,7 @@ end
 
 rawset(_G, 'TEST', true)
 
-local cared = {
+local Cared = {
     ['label']    = true,
     ['kind']     = true,
     ['textEdit'] = true,
@@ -58,7 +58,7 @@ function TEST(script)
                 item[k] = v
             end
             for k in pairs(item) do
-                if  not cared[k] then
+                if  not Cared[k] then
                     item[k] = nil
                 end
             end
@@ -912,8 +912,7 @@ else$
     },
 }
 
--- TODO
-do return end
+Cared['insertText'] = true
 
 TEST [[
 local xpcal
@@ -934,6 +933,9 @@ xpcal$
         insertText = EXISTS,
     },
 }
+
+-- TODO
+do return end
 
 TEST [[
 function mt:f(a, b, c)

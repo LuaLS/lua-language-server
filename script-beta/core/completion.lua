@@ -135,16 +135,17 @@ local function findParent(ast, text, offset)
     return nil, nil
 end
 
-local function buildFunctionSnip(source)
+local function buildFunctionSnip(source, oop)
     local name = getName(source):gsub('^.-[$.:]', '')
-    local args = vm.eachDef(source, function (src)
-        if src.type == 'function' then
-            local args = getArg(src)
-            if args ~= '' then
-                return args
-            end
+    local defs = vm.getDefs(source)
+    local args = ''
+    for _, def in ipairs(defs) do
+        local defArgs = getArg(def)
+        if defArgs ~= '' then
+            args = defArgs
+            break
         end
-    end) or ''
+    end
     local id = 0
     args = args:gsub('[^,]+', function (arg)
         id = id + 1
@@ -182,7 +183,7 @@ local function buildFunction(results, source, oop, data)
         local snipData = util.deepCopy(data)
         snipData.kind = ckind.Snippet
         snipData.label = snipData.label .. '()'
-        snipData.insertText = buildFunctionSnip(source)
+        snipData.insertText = buildFunctionSnip(source, oop)
         snipData.insertTextFormat = 2
         snipData.id  = stack(function ()
             return {

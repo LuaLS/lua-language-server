@@ -817,6 +817,9 @@ function m.getStepRef(obj, mode)
     or obj.type == 'setglobal' then
         return stepRefOfGlobal(obj, mode)
     end
+    if obj.type == 'library' then
+        return { obj }
+    end
     return nil
 end
 

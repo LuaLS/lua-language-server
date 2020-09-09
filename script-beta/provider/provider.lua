@@ -156,7 +156,7 @@ proto.on('textDocument/hover', function (params)
     end
     local lines  = files.getLines(uri)
     local text   = files.getText(uri)
-    local offset = define.offset(lines, text, params.position)
+    local offset = define.offsetOfWord(lines, text, params.position)
     local hover = core.byUri(uri, offset)
     if not hover then
         return nil
@@ -181,7 +181,7 @@ proto.on('textDocument/definition', function (params)
     end
     local lines  = files.getLines(uri)
     local text   = files.getText(uri)
-    local offset = define.offset(lines, text, params.position)
+    local offset = define.offsetOfWord(lines, text, params.position)
     local result = core(uri, offset)
     if not result then
         return nil
@@ -210,7 +210,7 @@ proto.on('textDocument/references', function (params)
     end
     local lines  = files.getLines(uri)
     local text   = files.getText(uri)
-    local offset = define.offset(lines, text, params.position)
+    local offset = define.offsetOfWord(lines, text, params.position)
     local result = core(uri, offset)
     if not result then
         return nil
@@ -235,7 +235,7 @@ proto.on('textDocument/documentHighlight', function (params)
     end
     local lines  = files.getLines(uri)
     local text   = files.getText(uri)
-    local offset = define.offset(lines, text, params.position)
+    local offset = define.offsetOfWord(lines, text, params.position)
     local result = core(uri, offset)
     if not result then
         return nil
@@ -287,7 +287,7 @@ proto.on('textDocument/prepareRename', function (params)
     end
     local lines  = files.getLines(uri)
     local text   = files.getText(uri)
-    local offset = define.offset(lines, text, params.position)
+    local offset = define.offsetOfWord(lines, text, params.position)
     local result = core.prepareRename(uri, offset)
     if not result then
         return nil

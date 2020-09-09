@@ -15,6 +15,7 @@ m.ignoreMatcher = nil
 m.preloadVersion = 0
 m.uri = ''
 m.path = ''
+m.requireCache = {}
 
 --- 初始化工作区
 function m.init(name, uri)

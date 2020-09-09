@@ -18,7 +18,7 @@ function m.eachDef(source, results)
     local clock = os.clock()
     local myResults, count = guide.requestDefinition(source, vm.interface)
     if DEVELOP and os.clock() - clock > 0.1 then
-        log.warn('requestDefinition', count, os.clock() - clock, guide.getRoot(source).uri, util.dump(source, { deep = 1 }))
+        log.warn('requestDefinition', count, os.clock() - clock, guide.getUri(source), util.dump(source, { deep = 1 }))
     end
     vm.mergeResults(results, myResults)
 

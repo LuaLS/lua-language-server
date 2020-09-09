@@ -207,6 +207,17 @@ function m.getRoot(obj)
     error('guide.getRoot overstack')
 end
 
+function m.getUri(obj)
+    if obj.uri then
+        return obj.uri
+    end
+    local root = m.getRoot(obj)
+    if root then
+        return root.uri
+    end
+    return ''
+end
+
 --- 寻找函数的不定参数，返回不定参在第几个参数上，以及该参数对象。
 --- 如果函数是主函数，则返回`0, nil`。
 ---@return table

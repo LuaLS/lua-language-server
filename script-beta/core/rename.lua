@@ -174,7 +174,7 @@ local function renameField(source, newname, callback)
         end
         callback(source, source.start, source.finish, newname)
     elseif parent.type == 'setmethod' then
-        local uri = guide.getRoot(source).uri
+        local uri = guide.getUri(source)
         local text = files.getText(uri)
         local func = parent.value
         -- function mt:name () end --> mt['newname'] = function (self) end
@@ -377,7 +377,7 @@ function m.rename(uri, pos, newname)
             start  = start,
             finish = finish,
             text   = text,
-            uri    = guide.getRoot(target).uri,
+            uri    = guide.getUri(target),
         }
     end)
 

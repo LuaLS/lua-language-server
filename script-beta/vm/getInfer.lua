@@ -61,7 +61,7 @@ function vm.getInfers(source)
     local clock = os.clock()
     local infers = guide.requestInfer(source, vm.interface)
     if os.clock() - clock > 0.1 then
-        log.warn(('Request infer takes [%.3f]sec! %s %s'):format(os.clock() - clock, guide.getRoot(source).uri, util.dump(source, { deep = 1 })))
+        log.warn(('Request infer takes [%.3f]sec! %s %s'):format(os.clock() - clock, guide.getUri(source), util.dump(source, { deep = 1 })))
     end
     return infers
 end

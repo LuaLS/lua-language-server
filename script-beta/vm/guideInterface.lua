@@ -26,7 +26,7 @@ function m.require(args, index)
         return nil
     end
     local results = {}
-    local myUri = guide.getRoot(args[1]).uri
+    local myUri = guide.getUri(args[1])
     local uris = ws.findUrisByRequirePath(reqName, true)
     for _, uri in ipairs(uris) do
         if not files.eq(myUri, uri) then
@@ -49,7 +49,7 @@ function m.dofile(args, index)
         return
     end
     local results = {}
-    local myUri = guide.getRoot(args[1]).uri
+    local myUri = guide.getUri(args[1])
     local uris = ws.findUrisByFilePath(reqName, true)
     for _, uri in ipairs(uris) do
         if not files.eq(myUri, uri) then

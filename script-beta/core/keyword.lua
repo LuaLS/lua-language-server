@@ -16,9 +16,9 @@ local keyWordMap = {
                 kind  = ckind.Snippet,
                 insertTextFormat = 2,
                 insertText = [[
-    do
-        $0
-    end]],
+do
+    $0
+end]],
             }
         end
         return true
@@ -65,18 +65,18 @@ local keyWordMap = {
                 kind  = ckind.Snippet,
                 insertTextFormat = 2,
                 insertText = [[
-    ${1:key, value} in ${2:pairs(${3:t})} do
-        $0
-    end]]
+${1:key, value} in ${2:pairs(${3:t})} do
+    $0
+end]]
             }
             results[#results+1] = {
                 label = 'for i = ..',
                 kind  = ckind.Snippet,
                 insertTextFormat = 2,
                 insertText = [[
-    ${1:i} = ${2:1}, ${3:10, 1} do
-        $0
-    end]]
+${1:i} = ${2:1}, ${3:10, 1} do
+    $0
+end]]
             }
         else
             results[#results+1] = {
@@ -84,18 +84,18 @@ local keyWordMap = {
                 kind  = ckind.Snippet,
                 insertTextFormat = 2,
                 insertText = [[
-    for ${1:key, value} in ${2:pairs(${3:t})} do
-        $0
-    end]]
+for ${1:key, value} in ${2:pairs(${3:t})} do
+    $0
+end]]
             }
             results[#results+1] = {
                 label = 'for i = ..',
                 kind  = ckind.Snippet,
                 insertTextFormat = 2,
                 insertText = [[
-    for ${1:i} = ${2:1}, ${3:10, 1} do
-        $0
-    end]]
+for ${1:i} = ${2:1}, ${3:10, 1} do
+    $0
+end]]
             }
         end
         return true
@@ -107,9 +107,9 @@ local keyWordMap = {
                 kind  = ckind.Snippet,
                 insertTextFormat = 2,
                 insertText = [[
-    $1($2)
-        $0
-    end]]
+$1($2)
+    $0
+end]]
             }
         else
             results[#results+1] = {
@@ -117,9 +117,9 @@ local keyWordMap = {
                 kind  = ckind.Snippet,
                 insertTextFormat = 2,
                 insertText = [[
-    function $1($2)
-        $0
-    end]]
+function $1($2)
+    $0
+end]]
             }
         end
         return true
@@ -132,9 +132,9 @@ local keyWordMap = {
                 kind  = ckind.Snippet,
                 insertTextFormat = 2,
                 insertText = [[
-    $1 then
-        $0
-    end]]
+$1 then
+    $0
+end]]
             }
         else
             results[#results+1] = {
@@ -142,9 +142,9 @@ local keyWordMap = {
                 kind  = ckind.Snippet,
                 insertTextFormat = 2,
                 insertText = [[
-    if $1 then
-        $0
-    end]]
+if $1 then
+    $0
+end]]
             }
         end
         return true
@@ -156,9 +156,9 @@ local keyWordMap = {
                 kind  = ckind.Snippet,
                 insertTextFormat = 2,
                 insertText = [[
-    ${1:pairs(${2:t})} do
-        $0
-    end]]
+${1:pairs(${2:t})} do
+    $0
+end]]
             }
         else
             results[#results+1] = {
@@ -166,9 +166,9 @@ local keyWordMap = {
                 kind  = ckind.Snippet,
                 insertTextFormat = 2,
                 insertText = [[
-    in ${1:pairs(${2:t})} do
-        $0
-    end]]
+in ${1:pairs(${2:t})} do
+    $0
+end]]
             }
         end
         return true
@@ -180,9 +180,9 @@ local keyWordMap = {
                 kind  = ckind.Snippet,
                 insertTextFormat = 2,
                 insertText = [[
-    function $1($2)
-        $0
-    end]]
+function $1($2)
+    $0
+end]]
             }
         else
             results[#results+1] = {
@@ -190,9 +190,9 @@ local keyWordMap = {
                 kind  = ckind.Snippet,
                 insertTextFormat = 2,
                 insertText = [[
-    local function $1($2)
-        $0
-    end]]
+local function $1($2)
+    $0
+end]]
             }
         end
         return false
@@ -214,9 +214,9 @@ local keyWordMap = {
                 kind  = ckind.Snippet,
                 insertTextFormat = 2,
                 insertText = [[
-    repeat
-        $0
-    until $1]]
+repeat
+    $0
+until $1]]
             }
         end
         return true
@@ -242,9 +242,9 @@ local keyWordMap = {
                 kind  = ckind.Snippet,
                 insertTextFormat = 2,
                 insertText = [[
-    ${1:true} do
-        $0
-    end]]
+${1:true} do
+    $0
+end]]
             }
         else
             results[#results+1] = {
@@ -252,9 +252,9 @@ local keyWordMap = {
                 kind  = ckind.Snippet,
                 insertTextFormat = 2,
                 insertText = [[
-    while ${1:true} do
-        $0
-    end]]
+while ${1:true} do
+    $0
+end]]
             }
         end
         return true

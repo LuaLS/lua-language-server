@@ -32,7 +32,7 @@ local function asString(source)
                     path = path:sub(#ws.path + 1)
                 end
                 path = path:gsub('^[/\\]*', '')
-                result[i] = ('[%s](%s)'):format(path, uri)
+                result[i] = ('* [%s](%s)'):format(path, uri)
             end
             table.sort(result)
             return table.concat(result, '\n')

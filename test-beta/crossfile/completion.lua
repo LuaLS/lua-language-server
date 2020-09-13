@@ -126,21 +126,28 @@ TEST {
     },
     completion = {
         {
+            label = 'aaa',
+            kind = CompletionItemKind.Reference,
+            textEdit = EXISTS,
+        },
+        {
             label = 'abc',
             kind = CompletionItemKind.Reference,
-            documentation = 'abc.lua',
             textEdit = EXISTS,
         },
         {
             label = 'abc.aaa',
             kind = CompletionItemKind.Reference,
-            documentation = 'abc/aaa.lua',
             textEdit = EXISTS,
         },
         {
             label = 'abcde',
             kind = CompletionItemKind.Reference,
-            documentation = 'xxx/abcde.lua',
+            textEdit = EXISTS,
+        },
+        {
+            label = 'xxx.abcde',
+            kind = CompletionItemKind.Reference,
             textEdit = EXISTS,
         },
     }

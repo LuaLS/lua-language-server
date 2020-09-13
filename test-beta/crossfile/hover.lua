@@ -85,7 +85,7 @@ TEST {
     },
     hover = {
         label = '1 个字节',
-        description = [[[a.lua](file:///a.lua)]],
+        description = [[* [a.lua](file:///a.lua)]],
     }
 }
 

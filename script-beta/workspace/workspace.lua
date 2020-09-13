@@ -7,6 +7,7 @@ local glob       = require 'glob'
 local platform   = require 'bee.platform'
 local await      = require 'await'
 local diagnostic = require 'provider.diagnostic'
+local rpath      = require 'workspace.require-path'
 
 local m = {}
 m.type = 'workspace'
@@ -193,12 +194,14 @@ end
 
 function m.getRelativePath(uri)
     local path = furi.decode(uri)
-    return fs.relative(fs.path(path), fs.path(m.path)):string()
+    local relative = fs.relative(fs.path(path), fs.path(m.path)):string()
+    return relative:gsub('^[/\\]+', '')
 end
 
 function m.reload()
     m.preloadVersion = m.preloadVersion + 1
     files.removeAll()
+    rpath.flush()
     await.create(function ()
         await.setDelayer(function ()
             return m.preloadVersion

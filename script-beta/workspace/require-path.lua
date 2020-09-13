@@ -22,11 +22,34 @@ local function getOnePath(path, searcher)
 end
 
 function m.getVisiblePath(path, searchers)
+    path = path:gsub('^[/\\]+', '')
     if not m.cache[path] then
         local result = {}
         m.cache[path] = result
-        for _, searcher in ipairs(searchers) do
-        end
+        local pos = 1
+        repeat
+            local cutedPath = path:sub(pos)
+            local head
+            if pos > 1 then
+                head = path:sub(1, pos - 1)
+            end
+            pos = path:match('[/\\]+()', pos)
+            for _, searcher in ipairs(searchers) do
+                local expect = getOnePath(cutedPath, searcher)
+                if expect then
+                    if head then
+                        searcher = head .. searcher
+                    end
+                    result[#result+1] = {
+                        searcher = searcher,
+                        expect   = expect,
+                    }
+                end
+            end
+            if not pos then
+                break
+            end
+        until not pos
     end
     return m.cache[path]
 end

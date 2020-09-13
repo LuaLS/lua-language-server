@@ -17,6 +17,8 @@ local await      = require 'await'
 local parser     = require 'parser'
 local keyWordMap = require 'core.keyword'
 local workspace  = require 'workspace'
+local furi       = require 'file-uri'
+local rpath      = require 'workspace.require-path'
 
 local stackID = 0
 local resolveID = 0
@@ -457,7 +459,8 @@ local function isAfterLocal(text, start)
 end
 
 local function checkUri(ast, text, offset, results)
-    local uris = guide.eachSourceContain(ast.ast, offset, function (source)
+    local collect = {}
+    guide.eachSourceContain(ast.ast, offset, function (source)
         if source.type ~= 'string' then
             return
         end
@@ -476,17 +479,48 @@ local function checkUri(ast, text, offset, results)
             return
         end
         if     lib.name == 'require' then
-           return  workspace.findUrisByRequirePath(literal, false)
+            for uri in files.eachFile() do
+                local path = workspace.getRelativePath(uri)
+                local infos = rpath.getVisiblePath(path, config.config.runtime.path)
+                for _, info in ipairs(infos) do
+                    if matchKey(literal, info.expect) then
+                        if not collect[info.expect] then
+                            collect[info.expect] = {
+                                textEdit = {
+                                    start  = source.start + #source[2],
+                                    finish = source.finish - #source[2],
+                                }
+                            }
+                        end
+                        -- TODO 翻译
+                        collect[info.expect][#collect[info.expect]+1] = ([=[* (%s)[%s] （假设搜索路径包含 `%s`）]=]):format(
+                            path,
+                            files.getOriginUri(uri),
+                            info.searcher
+                        )
+                    end
+                end
+            end
         elseif lib.name == 'dofile'
         or     lib.name == 'loadfile' then
             return workspace.findUrisByFilePath(literal, false)
         end
     end)
-    if not uris then
-        return
-    end
-    for _, uri in ipairs(uris) do
-
+    for label, infos in util.sortPairs(collect) do
+        local mark = {}
+        local des  = {}
+        for _, info in ipairs(infos) do
+            if not mark[info] then
+                mark[info] = true
+                des[#des+1] = info
+            end
+        end
+        results[#results+1] = {
+            label = label,
+            kind  = ckind.Reference,
+            description = table.concat(des, '\n'),
+            textEdit = infos.textEdit,
+        }
     end
 end
 

@@ -18,7 +18,7 @@ local function getFileLinks(uri)
         if not args[1] or args[1].type ~= 'string' then
             return
         end
-        local uris = ws.findUrisByRequirePath(args[1][1], true)
+        local uris = ws.findUrisByRequirePath(args[1][1])
         for _, u in ipairs(uris) do
             u = files.asKey(u)
             if not links[u] then

@@ -521,3 +521,24 @@ TEST {
         },
     }
 }
+
+TEST {
+    {
+        path = [[abc/init.lua]],
+        content = ''
+    },
+    {
+        path = 'main.lua',
+        content = [[
+            dofile 'ab$'
+        ]],
+        main = true,
+    },
+    completion = {
+        {
+            label = [[abc\init.lua]],
+            kind = CompletionItemKind.Reference,
+            textEdit = EXISTS,
+        },
+    }
+}

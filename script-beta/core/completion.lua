@@ -512,7 +512,29 @@ local function checkUri(ast, text, offset, results)
             end
         elseif lib.name == 'dofile'
         or     lib.name == 'loadfile' then
-            return workspace.findUrisByFilePath(literal, false)
+            for uri in files.eachFile() do
+                uri = files.getOriginUri(uri)
+                if files.eq(myUri, uri) then
+                    goto CONTINUE
+                end
+                local path = workspace.getRelativePath(uri)
+                if matchKey(literal, path) then
+                    if not collect[path] then
+                        collect[path] = {
+                            textEdit = {
+                                start  = source.start + #source[2],
+                                finish = source.finish - #source[2],
+                            }
+                        }
+                    end
+                    -- TODO 翻译
+                    collect[path][#collect[path]+1] = ([=[[%s](%s)]=]):format(
+                        path,
+                        uri
+                    )
+                end
+                ::CONTINUE::
+            end
         end
     end)
     for label, infos in util.sortPairs(collect) do

@@ -64,10 +64,10 @@ local function checkRequire(source, offset)
         return nil
     end
     if     lib.name == 'require' then
-        return workspace.findUrisByRequirePath(literal, true)
+        return workspace.findUrisByRequirePath(literal)
     elseif lib.name == 'dofile'
     or     lib.name == 'loadfile' then
-        return workspace.findUrisByFilePath(literal, true)
+        return workspace.findUrisByFilePath(literal)
     end
     return nil
 end

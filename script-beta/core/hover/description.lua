@@ -19,10 +19,10 @@ local function asString(source)
             return
         end
         if     lib.name == 'require' then
-            result = ws.findUrisByRequirePath(literal, true)
+            result = ws.findUrisByRequirePath(literal)
         elseif lib.name == 'dofile'
         or     lib.name == 'loadfile' then
-            result = ws.findUrisByFilePath(literal, true)
+            result = ws.findUrisByFilePath(literal)
         end
         if result and #result > 0 then
             for i, uri in ipairs(result) do

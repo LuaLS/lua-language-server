@@ -22,7 +22,7 @@ m.requireCache = {}
 function m.init(name, uri)
     m.name = name
     m.uri  = uri
-    m.path = furi.decode(uri)
+    m.path = m.normalize(furi.decode(uri))
     log.info('Workspace inited: ', uri)
     local logPath = ROOT / 'log' / (uri:gsub('[/:]+', '_') .. '.log')
     log.info('Log path: ', logPath)
@@ -145,26 +145,16 @@ end
 
 --- 查找符合指定file path的所有uri
 ---@param path string
----@param whole boolean
-function m.findUrisByFilePath(path, whole)
+function m.findUrisByFilePath(path)
     local results = {}
     for uri in files.eachFile() do
         local pathLen = #path
         local uriLen  = #uri
-        if whole then
-            local seg = uri:sub(uriLen - pathLen, uriLen - pathLen)
-            if seg == '/' or seg == '\\' or seg == '' then
-                local see = uri:sub(uriLen - pathLen + 1, uriLen)
-                if files.eq(see, path) then
-                    results[#results+1] = uri
-                end
-            end
-        else
-            for i = uriLen, uriLen - pathLen + 1, -1 do
-                local see = uri:sub(i - pathLen + 1, i)
-                if files.eq(see, path) then
-                    results[#results+1] = uri
-                end
+        local seg = uri:sub(uriLen - pathLen, uriLen - pathLen)
+        if seg == '/' or seg == '\\' or seg == '' then
+            local see = uri:sub(uriLen - pathLen + 1, uriLen)
+            if files.eq(see, path) then
+                results[#results+1] = uri
             end
         end
     end
@@ -174,14 +164,14 @@ end
 --- 查找符合指定require path的所有uri
 ---@param path string
 ---@param whole boolean
-function m.findUrisByRequirePath(path, whole)
+function m.findUrisByRequirePath(path)
     local results = {}
     local mark = {}
     local input = path:gsub('%.', '/')
                       :gsub('%%', '%%%%')
     for _, luapath in ipairs(config.config.runtime.path) do
         local part = luapath:gsub('%?', input)
-        local uris = m.findUrisByFilePath(part, whole)
+        local uris = m.findUrisByFilePath(part)
         for _, uri in ipairs(uris) do
             if not mark[uri] then
                 mark[uri] = true
@@ -192,13 +182,22 @@ function m.findUrisByRequirePath(path, whole)
     return results
 end
 
+function m.normalize(path)
+    if platform.OS == 'Windows' then
+        path = path:gsub('[/\\]+', '\\')
+    else
+        path = path:gsub('[/\\]+', '/')
+    end
+    return path:gsub('^[/\\]+', '')
+end
+
 function m.getRelativePath(uri)
     local path = furi.decode(uri)
-    local _, pos = path:lower():find(m.path:lower(), 1, true)
+    local _, pos = m.normalize(path):lower():find(m.path:lower(), 1, true)
     if pos then
-        return path:sub(pos + 1):gsub('^[/\\]+', '')
+        return m.normalize(path:sub(pos + 1))
     else
-        return path:gsub('^[/\\]+', '')
+        return m.normalize(path)
     end
 end
 

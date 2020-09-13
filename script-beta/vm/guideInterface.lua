@@ -27,7 +27,7 @@ function m.require(args, index)
     end
     local results = {}
     local myUri = guide.getUri(args[1])
-    local uris = ws.findUrisByRequirePath(reqName, true)
+    local uris = ws.findUrisByRequirePath(reqName)
     for _, uri in ipairs(uris) do
         if not files.eq(myUri, uri) then
             local ast = files.getAst(uri)
@@ -50,7 +50,7 @@ function m.dofile(args, index)
     end
     local results = {}
     local myUri = guide.getUri(args[1])
-    local uris = ws.findUrisByFilePath(reqName, true)
+    local uris = ws.findUrisByFilePath(reqName)
     for _, uri in ipairs(uris) do
         if not files.eq(myUri, uri) then
             local ast = files.getAst(uri)

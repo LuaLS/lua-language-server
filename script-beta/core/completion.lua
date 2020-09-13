@@ -493,7 +493,7 @@ local function checkUri(ast, text, offset, results)
                             }
                         end
                         -- TODO 翻译
-                        collect[info.expect][#collect[info.expect]+1] = ([=[* (%s)[%s] （假设搜索路径包含 `%s`）]=]):format(
+                        collect[info.expect][#collect[info.expect]+1] = ([=[* [%s](%s) （假设搜索路径包含 `%s`）]=]):format(
                             path,
                             files.getOriginUri(uri),
                             info.searcher
@@ -581,7 +581,8 @@ local function isFuncArg(ast, offset)
 end
 
 local function trySpecial(ast, text, offset, results)
-    if isInString(ast.ast, offset) then
+    if isInString(ast, offset) then
+        checkUri(ast, text, offset, results)
         return
     end
     -- x[#x+1]
@@ -596,9 +597,6 @@ local function tryWord(ast, text, offset, results)
     end
     local hasSpace = finish ~= offset
     if isInString(ast, offset) then
-        if not hasSpace then
-            checkUri(ast, text, offset, results)
-        end
     else
         local parent, oop = findParent(ast, text, start - 1)
         if parent then

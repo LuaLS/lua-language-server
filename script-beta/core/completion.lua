@@ -203,7 +203,7 @@ local function isSameSource(ast, source, pos)
     if source.type == 'library' then
         return false
     end
-    if guide.getUri(source) ~= guide.getUri(ast.ast) then
+    if not files.eq(guide.getUri(source), guide.getUri(ast.ast)) then
         return false
     end
     if source.type == 'field'
@@ -463,6 +463,7 @@ end
 
 local function checkUri(ast, text, offset, results)
     local collect = {}
+    local myUri = guide.getUri(ast.ast)
     guide.eachSourceContain(ast.ast, offset, function (source)
         if source.type ~= 'string' then
             return
@@ -484,6 +485,9 @@ local function checkUri(ast, text, offset, results)
         if     lib.name == 'require' then
             for uri in files.eachFile() do
                 uri = files.getOriginUri(uri)
+                if files.eq(myUri, uri) then
+                    goto CONTINUE
+                end
                 local path = workspace.getRelativePath(uri)
                 local infos = rpath.getVisiblePath(path, config.config.runtime.path)
                 for _, info in ipairs(infos) do
@@ -504,6 +508,7 @@ local function checkUri(ast, text, offset, results)
                         )
                     end
                 end
+                ::CONTINUE::
             end
         elseif lib.name == 'dofile'
         or     lib.name == 'loadfile' then

@@ -199,8 +199,11 @@ local function buildFunction(results, source, oop, data)
     end
 end
 
-local function isSameSource(source, pos)
+local function isSameSource(ast, source, pos)
     if source.type == 'library' then
+        return false
+    end
+    if guide.getUri(source) ~= guide.getUri(ast.ast) then
         return false
     end
     if source.type == 'field'
@@ -213,7 +216,7 @@ end
 local function checkLocal(ast, word, offset, results)
     local locals = guide.getVisibleLocals(ast.ast, offset)
     for name, source in pairs(locals) do
-        if isSameSource(source, offset) then
+        if isSameSource(ast, source, offset) then
             goto CONTINUE
         end
         if not matchKey(word, name) then
@@ -246,12 +249,12 @@ local function checkLocal(ast, word, offset, results)
     end
 end
 
-local function checkFieldThen(src, word, start, parent, oop, results, used)
+local function checkFieldThen(ast, src, word, start, parent, oop, results, used)
     local key = vm.getKeyName(src)
     if not key or key:sub(1, 1) ~= 's' then
         return
     end
-    if isSameSource(src, start) then
+    if isSameSource(ast, src, start) then
         return
     end
     if used[key] then
@@ -301,10 +304,10 @@ local function checkFieldThen(src, word, start, parent, oop, results, used)
     }
 end
 
-local function checkField(word, start, parent, oop, results)
+local function checkField(ast, word, start, parent, oop, results)
     local used = {}
     vm.eachField(parent, function (src)
-        checkFieldThen(src, word, start, parent, oop, results, used)
+        checkFieldThen(ast, src, word, start, parent, oop, results, used)
     end)
 end
 
@@ -602,7 +605,7 @@ local function tryWord(ast, text, offset, results)
         local parent, oop = findParent(ast, text, start - 1)
         if parent then
             if not hasSpace then
-                checkField(word, start, parent, oop, results)
+                checkField(ast, word, start, parent, oop, results)
             end
         elseif isFuncArg(ast, offset) then
             checkProvideLocal(ast, word, start, results)
@@ -619,7 +622,7 @@ local function tryWord(ast, text, offset, results)
                     checkLocal(ast, word, start, results)
                     checkTableField(ast, word, start, results)
                     local env = guide.getLocal(ast.ast, '_ENV', start)
-                    checkField(word, start, env, false, results)
+                    checkField(ast, word, start, env, false, results)
                 end
             end
         end
@@ -641,7 +644,7 @@ local function trySymbol(ast, text, offset, results)
     or symbol == ':' then
         local parent, oop = findParent(ast, text, start)
         if parent then
-            checkField('', start, parent, oop, results)
+            checkField(ast, '', start, parent, oop, results)
         end
     end
 end

@@ -2,6 +2,7 @@ local guide   = require 'parser.guide'
 local vm      = require 'vm.vm'
 local files   = require 'files'
 local library = require 'library'
+local util    = require 'utility'
 
 local function getGlobalsOfFile(uri)
     local globals = {}
@@ -34,9 +35,17 @@ local function getGlobals(name)
     for uri in files:eachFile() do
         local cache = files.getCache(uri)
         cache.globals = cache.globals or getGlobalsOfFile(uri)
-        if cache.globals[name] then
-            for _, source in ipairs(cache.globals[name]) do
-                results[#results+1] = source
+        if name == '*' then
+            for _, sources in util.sortPairs(cache.globals) do
+                for _, source in ipairs(sources) do
+                    results[#results+1] = source
+                end
+            end
+        else
+            if cache.globals[name] then
+                for _, source in ipairs(cache.globals[name]) do
+                    results[#results+1] = source
+                end
             end
         end
     end

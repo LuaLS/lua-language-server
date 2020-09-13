@@ -884,7 +884,7 @@ local function convertSimpleList(list)
     for i = #list, 1, -1 do
         local c = list[i]
         if c.special == '_G' then
-            simple.global = list[i+1]
+            simple.global = list[i+1] or c
         else
             simple[#simple+1] = m.getSimpleName(c)
         end

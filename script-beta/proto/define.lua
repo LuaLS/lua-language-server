@@ -23,7 +23,8 @@ end
 function m.offsetOfWord(lines, text, position)
     local row    = position.line + 1
     local start  = guide.lineRange(lines, row)
-    local offset = utf8.offset(text, position.character + 1, start)    if offset > #text
+    local offset = utf8.offset(text, position.character + 1, start)
+    if offset > #text
     or text:sub(offset-1, offset):match '[%w_][^%w_]' then
         offset = offset - 1
     end
@@ -42,7 +43,7 @@ function m.position(lines, text, offset)
     if start < 1 then
         start = 1
     end
-    local ucol     = util.utf8Len(text, start, start + col - 1, true)
+    local ucol     = util.utf8Len(text, start, start + col - 1)
     if row < 1 then
         row = 1
     end

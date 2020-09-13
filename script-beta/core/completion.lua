@@ -480,6 +480,7 @@ local function checkUri(ast, text, offset, results)
         end
         if     lib.name == 'require' then
             for uri in files.eachFile() do
+                uri = files.getOriginUri(uri)
                 local path = workspace.getRelativePath(uri)
                 local infos = rpath.getVisiblePath(path, config.config.runtime.path)
                 for _, info in ipairs(infos) do
@@ -495,7 +496,7 @@ local function checkUri(ast, text, offset, results)
                         -- TODO 翻译
                         collect[info.expect][#collect[info.expect]+1] = ([=[* [%s](%s) （假设搜索路径包含 `%s`）]=]):format(
                             path,
-                            files.getOriginUri(uri),
+                            uri,
                             info.searcher
                         )
                     end

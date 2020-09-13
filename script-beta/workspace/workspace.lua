@@ -194,8 +194,12 @@ end
 
 function m.getRelativePath(uri)
     local path = furi.decode(uri)
-    local relative = fs.relative(fs.path(path), fs.path(m.path)):string()
-    return relative:gsub('^[/\\]+', '')
+    local _, pos = path:lower():find(m.path:lower(), 1, true)
+    if pos then
+        return path:sub(pos + 1):gsub('^[/\\]+', '')
+    else
+        return path:gsub('^[/\\]+', '')
+    end
 end
 
 function m.reload()

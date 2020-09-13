@@ -361,17 +361,14 @@ TEST {
         {
             label = 'a',
             kind = CompletionItemKind.Enum,
-            detail = '(number) = 1',
         },
         {
             label = 'b',
             kind = CompletionItemKind.Enum,
-            detail = '(number) = 2',
         },
         {
             label = 'c',
             kind = CompletionItemKind.Enum,
-            detail = '(number) = 3',
         },
     }
 }
@@ -406,7 +403,6 @@ TEST {
         {
             label = 'zabcdef',
             kind = CompletionItemKind.Enum,
-            detail = '(number) = 1',
         },
     }
 }
@@ -441,7 +437,6 @@ TEST {
         {
             label = 'zabcdef',
             kind = CompletionItemKind.Enum,
-            detail = '(number) = 1',
         },
     }
 }
@@ -479,11 +474,8 @@ TEST {
     completion = {
         {
             label = 'xxx',
-            filterText = 'xxx',
             kind = CompletionItemKind.Reference,
-            documentation = 'xxx.lua',
             textEdit = EXISTS,
-            additionalTextEdits = EXISTS,
         },
     }
 }
@@ -503,11 +495,8 @@ TEST {
     completion = {
         {
             label = [[xx'xx]],
-            filterText = [[xx'xx]],
             kind = CompletionItemKind.Reference,
-            documentation = [[xx'xx.lua]],
             textEdit = EXISTS,
-            additionalTextEdits = EXISTS,
         },
     }
 }
@@ -527,11 +516,8 @@ TEST {
     completion = {
         {
             label = [[xx]=]xx]],
-            filterText = [[xx]=]xx]],
             kind = CompletionItemKind.Reference,
-            documentation = [[xx]=]xx.lua]],
             textEdit = EXISTS,
-            additionalTextEdits = EXISTS,
         },
     }
 }

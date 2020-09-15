@@ -45,7 +45,7 @@ local function main()
     test 'rename'
     test 'hover'
     test 'completion'
-    --test 'signature'
+    test 'signature'
     --test 'document_symbol'
     test 'crossfile'
     test 'full'

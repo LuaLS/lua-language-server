@@ -1,6 +1,5 @@
-local parser = require 'parser'
-local core = require 'core'
-local buildVM = require 'vm'
+local core = require 'core.signature'
+local files = require 'files'
 
 rawset(_G, 'TEST', true)
 
@@ -8,10 +7,9 @@ function TEST(script)
     return function (expect)
         local pos = script:find('$', 1, true)
         local new_script = script:gsub('%$', '')
-        local ast = parser:parse(new_script, 'lua', 'Lua 5.3')
-        local vm = buildVM(ast)
-        assert(vm)
-        local hovers = core.signature(vm, pos)
+        files.removeAll()
+        files.setText('', new_script)
+        local hovers = core('', pos)
         if hovers then
             assert(expect)
             local hover = hovers[#hovers]

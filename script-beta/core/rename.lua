@@ -283,7 +283,7 @@ local function rename(source, newname, callback)
         return ofLocal(source, newname, callback)
     elseif source.type == 'setlocal'
     or     source.type == 'getlocal' then
-        return ofLocal(source, newname, callback)
+        return ofLocal(source.node, newname, callback)
     elseif source.type == 'field'
     or     source.type == 'method'
     or     source.type == 'index' then

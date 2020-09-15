@@ -377,7 +377,7 @@ function m.rename(uri, pos, newname)
             start  = start,
             finish = finish,
             text   = text,
-            uri    = guide.getUri(target),
+            uri    = files.getOriginUri(guide.getUri(target)),
         }
     end)
 

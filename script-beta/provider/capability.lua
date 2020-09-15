@@ -18,9 +18,9 @@ m.initer = {
     --documentSymbolProvider = true,
     documentHighlightProvider = true,
     --codeActionProvider = true,
-    --signatureHelpProvider = {
-    --    triggerCharacters = { '(', ',' },
-    --},
+    signatureHelpProvider = {
+        triggerCharacters = { '(', ',' },
+    },
     --workspace = {
     --    workspaceFolders = {
     --        supported = true,

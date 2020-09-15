@@ -387,3 +387,21 @@ proto.on('completionItem/resolve', function (item)
     }
     return item
 end)
+
+proto.on('textDocument/signatureHelp', function (params)
+    if not config.config.signatureHelp.enable then
+        return nil
+    end
+    local uri = params.textDocument.uri
+    if not files.exists(uri) then
+        return nil
+    end
+    local lines  = files.getLines(uri)
+    local text   = files.getText(uri)
+    local offset = define.offset(lines, text, params.position)
+    local core = require 'core.signature'
+    local results = core(uri, offset)
+    if not results then
+        return nil
+    end
+end)

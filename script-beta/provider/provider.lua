@@ -404,4 +404,5 @@ proto.on('textDocument/signatureHelp', function (params)
     if not results then
         return nil
     end
+    return nil
 end)

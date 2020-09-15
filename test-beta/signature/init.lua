@@ -5,7 +5,7 @@ rawset(_G, 'TEST', true)
 
 function TEST(script)
     return function (expect)
-        local pos = script:find('$', 1, true)
+        local pos = script:find('$', 1, true) - 1
         local new_script = script:gsub('%$', '')
         files.removeAll()
         files.setText('', new_script)
@@ -16,7 +16,7 @@ function TEST(script)
 
             local label = hover.label:gsub('^[\r\n]*(.-)[\r\n]*$', '%1'):gsub('\r\n', '\n')
             expect.label = expect.label:gsub('^[\r\n]*(.-)[\r\n]*$', '%1'):gsub('\r\n', '\n')
-            local arg = hover.argLabel
+            local arg = hover.match
 
             assert(expect.label == label)
             assert(expect.arg[1] == arg[1])
@@ -87,7 +87,7 @@ TEST [[
 ]]
 {
     label = [[
-function *string:sub(i: integer [, j: integer(-1)])
+function string:sub(i: integer [, j: integer(-1)])
   -> string
 ]],
     arg = {22, 31},

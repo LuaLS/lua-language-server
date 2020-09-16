@@ -9,6 +9,7 @@ local workspace = require 'workspace'
 local config    = require 'config'
 local library   = require 'library'
 local markdown  = require 'provider.markdown'
+local client    = require 'provider.client'
 
 local function updateConfig()
     local configs = proto.awaitRequest('workspace/configuration', {
@@ -77,6 +78,7 @@ end)
 
 proto.on('initialized', function (params)
     updateConfig()
+    client.init(params)
     proto.awaitRequest('client/registerCapability', {
         registrations = {
             -- 监视文件变化

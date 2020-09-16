@@ -1,8 +1,12 @@
-local vm    = require 'vm'
-local ws    = require 'workspace'
-local furi  = require 'file-uri'
-local files = require 'files'
-local guide = require 'parser.guide'
+local vm       = require 'vm'
+local ws       = require 'workspace'
+local furi     = require 'file-uri'
+local files    = require 'files'
+local guide    = require 'parser.guide'
+local markdown = require 'provider.markdown'
+local config   = require 'config'
+local client   = require 'provider.client'
+local lang     = require 'language'
 
 local function asString(source)
     local literal = guide.getLiteral(source)
@@ -40,12 +44,53 @@ local function asString(source)
     end
 end
 
+local function getDocFormater()
+    local version = config.config.runtime.version
+    if client.client() == 'vscode' then
+        if version == 'Lua 5.1' then
+            return 'HOVER_NATIVE_DOCUMENT_LUA51'
+        elseif version == 'Lua 5.2' then
+            return 'HOVER_NATIVE_DOCUMENT_LUA52'
+        elseif version == 'Lua 5.3' then
+            return 'HOVER_NATIVE_DOCUMENT_LUA53'
+        elseif version == 'Lua 5.4' then
+            return 'HOVER_NATIVE_DOCUMENT_LUA54'
+        elseif version == 'LuaJIT' then
+            return 'HOVER_NATIVE_DOCUMENT_LUAJIT'
+        end
+    else
+        if version == 'Lua 5.1' then
+            return 'HOVER_DOCUMENT_LUA51'
+        elseif version == 'Lua 5.2' then
+            return 'HOVER_DOCUMENT_LUA52'
+        elseif version == 'Lua 5.3' then
+            return 'HOVER_DOCUMENT_LUA53'
+        elseif version == 'Lua 5.4' then
+            return 'HOVER_DOCUMENT_LUA54'
+        elseif version == 'LuaJIT' then
+            return 'HOVER_DOCUMENT_LUAJIT'
+        end
+    end
+end
+
 local function tryLibrary(source)
     local lib = vm.getLibrary(source)
     if not lib then
-        return
+        return nil
     end
-    return lib.value.description
+    local fmt = getDocFormater()
+    local md = markdown()
+    if lib.value.description then
+        md:add('markdown', lib.value.description:gsub('%(doc%:(.-)%)', function (tag)
+            if fmt then
+                return '(' .. lang.script(fmt, tag) .. ')'
+            end
+        end))
+    end
+    if lib.value.doc and fmt then
+        md:add('markdown', ('[%s](%s)'):format(lang.script.HOVER_VIEW_DOCUMENTS, lang.script(fmt, 'pdf-' .. lib.value.doc)))
+    end
+    return md:string()
 end
 
 return function (source)

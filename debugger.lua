@@ -3,19 +3,22 @@ if not DEVELOP then
 end
 
 local fs = require 'bee.filesystem'
-local extensionPath = fs.path(os.getenv 'USERPROFILE' or '') / '.vscode' / 'extensions'
-log.debug('Search extensions at:', extensionPath:string())
-if not fs.is_directory(extensionPath) then
-    log.debug('Extension path is not a directory.')
-    return
-end
-
 local luaDebugs = {}
-for path in extensionPath:list_directory() do
-    if fs.is_directory(path) then
-        local name = path:filename():string()
-        if name:find('actboy168.lua-debug-', 1, true) then
-            luaDebugs[#luaDebugs+1] = name
+
+for _, vscodePath in ipairs {'.vscode', '.vscode-insiders'} do
+    local extensionPath = fs.path(os.getenv 'USERPROFILE' or '') / vscodePath / 'extensions'
+    log.debug('Search extensions at:', extensionPath:string())
+    if not fs.is_directory(extensionPath) then
+        log.debug('Extension path is not a directory.')
+        return
+    end
+
+    for path in extensionPath:list_directory() do
+        if fs.is_directory(path) then
+            local name = path:filename():string()
+            if name:find('actboy168.lua-debug-', 1, true) then
+                luaDebugs[#luaDebugs+1] = path:string()
+            end
         end
     end
 end
@@ -37,13 +40,13 @@ table.sort(luaDebugs, function (a, b)
     return getVer(a) > getVer(b)
 end)
 
-local debugPath = extensionPath / luaDebugs[1]
+local debugPath = luaDebugs[1]
 local cpath = "/runtime/win64/lua54/?.dll"
 local path  = "/script/?.lua"
 
 local function tryDebugger()
-    local entry = assert(package.searchpath('debugger', debugPath:string() .. path))
-    local root = debugPath:string()
+    local entry = assert(package.searchpath('debugger', debugPath .. path))
+    local root = debugPath
     local addr = ("127.0.0.1:%d"):format(DBGPORT)
     local dbg = loadfile(entry)(root)
     dbg:start(addr)

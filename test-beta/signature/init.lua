@@ -111,10 +111,9 @@ TEST [[
 ]]
 {
     label = [[
-function string:sub(i: integer [, j: integer(-1)])
-  -> string
+function string:sub(i: integer, j: integer)
 ]],
-    arg = {22, 31},
+    arg = {21, 30},
 }
 
 TEST [[
@@ -128,7 +127,12 @@ end
 
 f(1, 'string$')
 ]]
-(nil)
+{
+    label = [[
+function f(a: any, b: any, c: any)
+]],
+    arg = {20, 25},
+}
 
 TEST [[
 pcall(function () $ end)

@@ -4,11 +4,18 @@ local vm         = require 'vm'
 local hoverLabel = require 'core.hover.label'
 local hoverDesc  = require 'core.hover.description'
 
-local function findNearCall(ast, pos)
+local function findNearCall(uri, ast, pos)
+    local text = files.getText(uri)
+    -- 检查 `f()$` 的情况，注意要区别于 `f($`
+    if text:sub(pos, pos) == ')' then
+        return nil
+    end
+
     local nearCall
     guide.eachSourceContain(ast.ast, pos, function (src)
         if src.type == 'call'
-        or src.type == 'table' then
+        or src.type == 'table'
+        or src.type == 'function' then
             if not nearCall or nearCall.start < src.start then
                 nearCall = src
             end
@@ -85,7 +92,7 @@ return function (uri, pos)
     if not ast then
         return nil
     end
-    local call = findNearCall(ast, pos)
+    local call = findNearCall(uri, ast, pos)
     if not call then
         return nil
     end

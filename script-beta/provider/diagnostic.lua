@@ -168,35 +168,29 @@ function m.doDiagnostic(uri)
     m.cache[uri] = full
 
     proto.notify('textDocument/publishDiagnostics', {
-        uri = uri,
+        uri = files.getOriginUri(uri),
         diagnostics = full,
     })
 end
 
 function m.refresh(uri)
+    if not m._start then
+        return
+    end
     await.create(function ()
-        await.delay(function ()
-            return files.globalVersion
+        -- 一旦文件的版本发生变化，就放弃这次诊断
+        await.setDelayer(function ()
+            return files.getVersion(uri)
         end)
-        if uri then
-            m.doDiagnostic(uri)
-        end
-        if not m._start then
-            return
-        end
-        await.delay(function ()
-            return files.globalVersion
-        end)
+        await.delay()
         local clock = os.clock()
         if uri then
             m.doDiagnostic(uri)
         end
         for destUri in files.eachFile() do
             if destUri ~= uri then
+                await.delay()
                 m.doDiagnostic(files.getOriginUri(destUri))
-                await.delay(function ()
-                    return files.globalVersion
-                end)
             end
         end
         local passed = os.clock() - clock
@@ -221,14 +215,7 @@ files.watch(function (env, uri)
     if env == 'remove' then
         m.clear(uri)
     elseif env == 'update' then
-        await.create(function ()
-            -- 一旦文件的版本发生变化，就放弃这次诊断
-            await.setDelayer(function ()
-                return files.getVersion(uri)
-            end)
-            await.delay()
-            m.doDiagnostic(uri)
-        end)
+        m.refresh(uri)
     end
 end)
 

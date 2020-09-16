@@ -9,6 +9,7 @@ local util   = require 'utility'
 
 local m = {}
 m._start = false
+m._diagID = 0
 m.cache = {}
 
 local function concat(t, sep)
@@ -183,27 +184,26 @@ function m.refresh(uri)
             return files.getVersion(uri)
         end)
         await.delay()
-        local clock = os.clock()
         if uri then
             m.doDiagnostic(uri)
         end
-        for destUri in files.eachFile() do
-            if destUri ~= uri then
-                await.delay()
-                m.doDiagnostic(destUri)
-            end
-        end
-        local passed = os.clock() - clock
-        log.info(('Finish diagnostics, takes [%.3f] sec.'):format(passed))
+        m.diagnosticsAll()
     end)
 end
 
 function m.diagnosticsAll()
-    local clock = os.clock()
-    for uri in files.eachFile() do
-        m.doDiagnostic(uri)
-    end
-    log.debug('全文诊断耗时：', os.clock() - clock)
+    await.create(function ()
+        m._diagID = m._diagID + 1
+        await.setDelayer(function ()
+            return m._diagID
+        end)
+        local clock = os.clock()
+        for uri in files.eachFile() do
+            await.delay()
+            m.doDiagnostic(uri)
+        end
+        log.debug('全文诊断耗时：', os.clock() - clock)
+    end)
 end
 
 function m.start()

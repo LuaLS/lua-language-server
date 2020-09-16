@@ -43,6 +43,8 @@ local function updateConfig()
         library.reload()
     end
     if not util.equal(oldConfig.diagnostics, newConfig.diagnostics) then
+        local diagnostics = require 'provider.diagnostic'
+        diagnostics.diagnosticsAll()
     end
     if not util.equal(oldConfig.plugin, newConfig.plugin) then
     end

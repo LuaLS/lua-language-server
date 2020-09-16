@@ -95,9 +95,13 @@ function TEST(data)
             item[k] = v
         end
         for k in pairs(item) do
-            if  not Cared[k] then
+            if not Cared[k] then
                 item[k] = nil
             end
+        end
+        if item['description'] then
+            item['description'] = item['description']
+                : gsub('\r\n', '\n')
         end
     end
     assert(result)
@@ -539,6 +543,37 @@ TEST {
             label = [[abc\init.lua]],
             kind = CompletionItemKind.Reference,
             textEdit = EXISTS,
+        },
+    }
+}
+
+Cared['description'] = true
+TEST {
+    {
+        path = [[a.lua]],
+        content = [[
+            local m = {}
+
+            return m
+        ]]
+    },
+    {
+        path = 'main.lua',
+        content = [[
+            local z = require 'a'
+
+            z$
+        ]],
+        main = true,
+    },
+    completion = {
+        {
+            label = 'z',
+            kind = CompletionItemKind.Variable,
+            description = [[
+```lua
+local z: {}
+```]]
         },
     }
 }

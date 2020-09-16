@@ -1001,6 +1001,109 @@ mt:f$
     },
 }
 
+-- TODO
+do return end
+TEST [[
+local function f()
+    if a then
+    else$
+end
+]]
+{
+    {
+        label = 'select',
+        kind = CompletionItemKind.Function,
+        detail = EXISTS,
+    },
+    {
+        label = 'select()',
+        kind = CompletionItemKind.Snippet,
+        detail = EXISTS,
+        insertText = EXISTS,
+    },
+    {
+        label = 'setmetatable',
+        kind = CompletionItemKind.Function,
+        detail = EXISTS,
+    },
+    {
+        label = 'setmetatable()',
+        kind = CompletionItemKind.Snippet,
+        detail = EXISTS,
+        insertText = EXISTS,
+    },
+    {
+        label = 'else',
+        kind = CompletionItemKind.Keyword,
+    },
+    {
+        label = 'elseif',
+        kind = CompletionItemKind.Keyword,
+    },
+    {
+        label = 'elseif .. then',
+        kind = CompletionItemKind.Snippet,
+        insertText = EXISTS,
+    },
+}
+
+TEST [[
+local t = {
+    ['a.b.c'] = {}
+}
+
+t.$
+]]
+{
+    {
+        label = 'a.b.c',
+        kind = CompletionItemKind.Field,
+        detail = EXISTS,
+        textEdit = {
+            start = 37,
+            finish = 36,
+            newText = '["a.b.c"]',
+        },
+        additionalTextEdits = {
+            {
+                start = 36,
+                finish = 36,
+                newText = '',
+            }
+        }
+    }
+}
+
+TEST [[
+_ENV['z.b.c'] = {}
+
+z$
+]]
+{
+    {
+        label = 'z.b.c',
+        kind = CompletionItemKind.Field,
+        detail = EXISTS,
+        textEdit = {
+            start = 22,
+            finish = 21,
+            newText = '_ENV["z.b.c"]',
+        },
+        additionalTextEdits = {
+            {
+                start = 21,
+                finish = 21,
+                newText = '',
+            }
+        }
+    }
+}
+
+TEST [[
+io.close(1, $)
+]]
+(nil)
+
 do return end
 TEST [[
 ---@$
@@ -1272,50 +1375,6 @@ mt.$
 }
 
 TEST [[
-local function f()
-    if a then
-    else$
-end
-]]
-{
-    {
-        label = 'select',
-        kind = CompletionItemKind.Function,
-        detail = EXISTS,
-    },
-    {
-        label = 'select()',
-        kind = CompletionItemKind.Snippet,
-        detail = EXISTS,
-        insertText = EXISTS,
-    },
-    {
-        label = 'setmetatable',
-        kind = CompletionItemKind.Function,
-        detail = EXISTS,
-    },
-    {
-        label = 'setmetatable()',
-        kind = CompletionItemKind.Snippet,
-        detail = EXISTS,
-        insertText = EXISTS,
-    },
-    {
-        label = 'else',
-        kind = CompletionItemKind.Keyword,
-    },
-    {
-        label = 'elseif',
-        kind = CompletionItemKind.Keyword,
-    },
-    {
-        label = 'elseif .. then',
-        kind = CompletionItemKind.Snippet,
-        insertText = EXISTS,
-    },
-}
-
-TEST [[
 ---@param x string | "'AAA'" | "'BBB'" | "'CCC'"
 function f(y, x)
 end
@@ -1443,63 +1502,6 @@ end
 f(function ()
     $
 end)
-]]
-(nil)
-
-TEST [[
-local t = {
-    ['a.b.c'] = {}
-}
-
-t.$
-]]
-{
-    {
-        label = 'a.b.c',
-        kind = CompletionItemKind.Field,
-        detail = EXISTS,
-        textEdit = {
-            start = 37,
-            finish = 36,
-            newText = '["a.b.c"]',
-        },
-        additionalTextEdits = {
-            {
-                start = 36,
-                finish = 36,
-                newText = '',
-            }
-        }
-    }
-}
-
-TEST [[
-_ENV['z.b.c'] = {}
-
-z$
-]]
-{
-    {
-        label = 'z.b.c',
-        kind = CompletionItemKind.Field,
-        detail = EXISTS,
-        textEdit = {
-            start = 22,
-            finish = 21,
-            newText = '_ENV["z.b.c"]',
-        },
-        additionalTextEdits = {
-            {
-                start = 21,
-                finish = 21,
-                newText = '',
-            }
-        }
-    }
-}
-
-TEST [[
-io.close(1, $)
 ]]
 (nil)
 

@@ -2742,7 +2742,11 @@ end
 
 function m.inferByCallReturn(status, source)
     if source.type ~= 'select' then
-        return
+        if source.value and source.value.type == 'select' then
+            source = source.value
+        else
+            return
+        end
     end
     if not source.vararg or source.vararg.type ~= 'call' then
         return
@@ -2752,7 +2756,11 @@ end
 
 function m.inferByPCallReturn(status, source)
     if source.type ~= 'select' then
-        return
+        if source.value and source.value.type == 'select' then
+            source = source.value
+        else
+            return
+        end
     end
     local call = source.vararg
     if not call or call.type ~= 'call' then
@@ -2805,6 +2813,9 @@ function m.searchInfer(status, obj)
         obj = obj.exp
     end
     obj = m.getObjectValue(obj) or obj
+    if obj.type == 'select' then
+        obj = obj.parent
+    end
 
     local cache, makeCache
     if status.interface.cache then

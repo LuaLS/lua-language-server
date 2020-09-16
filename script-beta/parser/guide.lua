@@ -2522,7 +2522,7 @@ end
 
 function m.inferByDef(status, obj)
     if status.index > 3 then
-        return
+        --return
     end
     local mark = {}
     local newStatus = m.status(nil, status.interface)

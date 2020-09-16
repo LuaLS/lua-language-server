@@ -2312,7 +2312,7 @@ function m.inferCheckBinary(status, source)
         local v1 = m.getInferLiteral(status, source[1], 'integer')
                 or m.getInferLiteral(status, source[1], 'number')
         local v2 = m.getInferLiteral(status, source[2], 'integer')
-                or m.getInferLiteral(source[2], 'number')
+                or m.getInferLiteral(status, source[2], 'number')
         local v
         if v1 and v2 then
             v = v1 <= v2
@@ -2356,7 +2356,7 @@ function m.inferCheckBinary(status, source)
     elseif op.type == '>' then
         local v1 = m.getInferLiteral(status, source[1], 'integer')
                 or m.getInferLiteral(status, source[1], 'number')
-        local v2 = m.getInferLiteral(source[2], 'integer')
+        local v2 = m.getInferLiteral(status, source[2], 'integer')
                 or m.getInferLiteral(status, source[2], 'number')
         local v
         if v1 and v2 then

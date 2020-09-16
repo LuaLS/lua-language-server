@@ -48,9 +48,14 @@ local function asFunction(source)
     for _, rtn in ipairs(source.returns) do
         for i = 1, #rtn do
             local values = vm.getInfers(rtn[i])
-            returns[#returns+1] = values
+            if returns[i] then
+                for _, value in ipairs(values) do
+                    returns[i][#returns[i]+1] = value
+                end
+            else
+                returns[i] = values
+            end
         end
-        break
     end
     if #returns == 0 then
         return nil

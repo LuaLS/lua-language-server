@@ -695,6 +695,17 @@ local x: nil
 ]]
 
 TEST [[
+local function <?f?>()
+    return 1
+    return nil
+end
+]]
+[[
+function f()
+  -> integer|nil
+]]
+
+TEST [[
 local <?t?> = {
     b = 1,
     c = 2,

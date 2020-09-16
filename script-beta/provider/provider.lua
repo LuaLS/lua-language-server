@@ -419,6 +419,10 @@ proto.on('textDocument/signatureHelp', function (params)
             label           = result.label,
             parameters      = parameters,
             activeParameter = result.index - 1,
+            documentation   = result.description and {
+                value = result.description,
+                kind  = 'markdown',
+            },
         }
     end
     return {

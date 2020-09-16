@@ -2,7 +2,7 @@ local files      = require 'files'
 local guide      = require 'parser.guide'
 local vm         = require 'vm'
 local hoverLabel = require 'core.hover.label'
-local hoverArg   = require 'core.hover.arg'
+local hoverDesc  = require 'core.hover.description'
 
 local function findNearCall(ast, pos)
     local nearCall
@@ -44,9 +44,10 @@ local function makeOneSignature(source, oop, index)
         end
     end
     return {
-        label  = label,
-        params = params,
-        index  = index,
+        label       = label,
+        params      = params,
+        index       = index,
+        description = hoverDesc(source),
     }
 end
 

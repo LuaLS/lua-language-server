@@ -5,6 +5,9 @@ local function getLibrary(source)
     if source.type == 'library' then
         return source
     end
+    if source.library then
+        return source.library
+    end
     local defs = vm.getDefs(source)
     for _, def in ipairs(defs) do
         if def.type == 'library' then

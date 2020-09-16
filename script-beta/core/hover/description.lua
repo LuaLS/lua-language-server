@@ -45,7 +45,7 @@ local function tryLibrary(source)
     if not lib then
         return
     end
-    return lib.description
+    return lib.value.description
 end
 
 return function (source)

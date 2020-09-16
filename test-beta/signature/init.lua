@@ -83,6 +83,30 @@ mt:f($
 }
 
 TEST [[
+local function x(a, b)
+    return 1
+end
+
+x($
+]]
+{
+    label = "function x(a: any, b: any)",
+    arg = {12, 17},
+}
+
+TEST [[
+local function x(a, ...)
+    return 1
+end
+
+x(1, 2, 3, $
+]]
+{
+    label = "function x(a: any, ...)",
+    arg = {20, 22},
+}
+
+TEST [[
 (''):sub($
 ]]
 {

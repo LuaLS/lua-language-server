@@ -25,6 +25,8 @@ end
 
 local function makeOneSignature(source, oop, index)
     local label = hoverLabel(source, oop)
+    -- 去掉返回值
+    label = label:gsub('%s*->.+', '')
     local params = {}
     local i = 0
     for start, finish in label:gmatch '[%(%)%,]%s*().-()%s*%f[%(%)%,]' do
@@ -32,6 +34,14 @@ local function makeOneSignature(source, oop, index)
         params[i] = {
             label = {start, finish-1},
         }
+    end
+    -- 不定参数
+    if index > i and i > 0 then
+        local lastLabel = params[i].label
+        local text = label:sub(lastLabel[1], lastLabel[2])
+        if text == '...' then
+            index = i
+        end
     end
     return {
         label  = label,

@@ -2521,7 +2521,7 @@ function m.inferCheckBinary(status, source)
 end
 
 function m.inferByDef(status, obj)
-    if status.index > 1 then
+    if status.index > 3 then
         return
     end
     local mark = {}

@@ -113,7 +113,7 @@ proto.on('shutdown', function ()
     return true
 end)
 
-proto.on('workspace/configuration', function ()
+proto.on('workspace/didChangeConfiguration', function ()
     updateConfig()
 end)
 

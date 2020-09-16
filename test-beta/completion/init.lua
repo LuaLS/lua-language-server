@@ -207,6 +207,20 @@ t.ab$
 }
 
 TEST [[
+local t = {
+    abc = 1,
+}
+local n = t.abc
+t.ab$
+]]
+{
+    {
+        label = 'abc',
+        kind = CompletionItemKind.Enum,
+    }
+}
+
+TEST [[
 local mt = {}
 mt.ggg = 1
 function mt:get(a, b)

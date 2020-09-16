@@ -249,18 +249,7 @@ local function checkLocal(ast, word, offset, results)
     end
 end
 
-local function checkFieldThen(ast, src, word, start, parent, oop, results, used)
-    local key = vm.getKeyName(src)
-    if not key or key:sub(1, 1) ~= 's' then
-        return
-    end
-    if isSameSource(ast, src, start) then
-        return
-    end
-    if used[key] then
-        return
-    end
-    used[key] = true
+local function checkFieldThen(ast, key, src, word, start, parent, oop, results)
     local name = key:sub(3)
     if not matchKey(word, name) then
         return
@@ -305,10 +294,32 @@ local function checkFieldThen(ast, src, word, start, parent, oop, results, used)
 end
 
 local function checkField(ast, word, start, parent, oop, results)
-    local used = {}
+    local fields = {}
     vm.eachField(parent, function (src)
-        checkFieldThen(ast, src, word, start, parent, oop, results, used)
+        local key = vm.getKeyName(src)
+        if not key or key:sub(1, 1) ~= 's' then
+            return
+        end
+        if isSameSource(ast, src, start) then
+            return
+        end
+        local last = fields[key]
+        if not last then
+            fields[key] = src
+            return
+        end
+        if src.type == 'tablefield'
+        or src.type == 'setfield'
+        or src.type == 'tableindex'
+        or src.type == 'setindex'
+        or src.type == 'setmethod' then
+            fields[key] = src
+            return
+        end
     end)
+    for key, src in util.sortPairs(fields) do
+        checkFieldThen(ast, key, src, word, start, parent, oop, results)
+    end
 end
 
 local function checkTableField(ast, word, start, results)

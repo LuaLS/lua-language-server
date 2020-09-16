@@ -65,7 +65,7 @@ local function updateConfig()
 end
 
 proto.on('initialize', function (params)
-    --log.debug(util.dump(params))
+    client.init(params)
     if params.workspaceFolders then
         local name = params.workspaceFolders[1].name
         local uri  = params.workspaceFolders[1].uri
@@ -78,7 +78,6 @@ end)
 
 proto.on('initialized', function (params)
     updateConfig()
-    client.init(params)
     proto.awaitRequest('client/registerCapability', {
         registrations = {
             -- 监视文件变化

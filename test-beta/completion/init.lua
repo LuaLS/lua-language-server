@@ -634,6 +634,22 @@ self.results.list[#$]
 }
 
 TEST [[
+self.results.list[#$]
+local n = 1
+]]
+{
+    {
+        label = '#self.results.list+1',
+        kind = CompletionItemKind.Snippet,
+        textEdit = {
+            start = 19,
+            finish = 20,
+            newText = '#self.results.list+1] = ',
+        },
+    },
+}
+
+TEST [[
 self.results.list[#$] = 1
 ]]
 {

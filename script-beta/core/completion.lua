@@ -582,7 +582,7 @@ local function checkLenPlusOne(ast, text, offset, results)
             if source.parent == guide.getParentBlock(source) then
                 -- state
                 local label = text:match('%#[ \t]*', pos) .. nodeText .. '+1'
-                local eq = text:find('^%s*%=', source.node.finish)
+                local eq = text:find('^%s*%]?%s*%=', source.finish)
                 local newText = label .. ']'
                 if not eq then
                     newText = newText .. ' = '

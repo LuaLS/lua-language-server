@@ -1950,8 +1950,12 @@ end
 function m.mergeTypes(types)
     local results = {}
     local mark = {}
+    local hasAny
     for i = 1, #types do
         local tp = types[i]
+        if tp == 'any' then
+            hasAny = true
+        end
         if not mark[tp] and tp ~= 'any' then
             mark[tp] = true
             results[#results+1] = tp
@@ -1961,7 +1965,11 @@ function m.mergeTypes(types)
         return 'any'
     end
     if #results == 1 then
-        return results[1]
+        if results[1] == 'nil' and hasAny then
+            return 'any'
+        else
+            return results[1]
+        end
     end
     tableSort(results, function (a, b)
         local sa = TypeSort[a]
@@ -1991,7 +1999,7 @@ function m.viewInferType(infers)
     local types = {}
     for i = 1, #infers do
         local tp = infers[i].type or 'any'
-        if not mark[tp] and tp ~= 'any' then
+        if not mark[tp] then
             types[#types+1] = tp
         end
         mark[tp] = true
@@ -2699,8 +2707,15 @@ local function mergeFunctionReturns(status, source, index)
         if rtn[index] then
             local newStatus = m.status(status)
             m.searchInfer(newStatus, rtn[index])
-            for _, infer in ipairs(newStatus.results) do
-                status.results[#status.results+1] = infer
+            if #newStatus.results == 0 then
+                status.results[#status.results+1] = {
+                    type   = 'any',
+                    source = rtn[index],
+                }
+            else
+                for _, infer in ipairs(newStatus.results) do
+                    status.results[#status.results+1] = infer
+                end
             end
         end
     end

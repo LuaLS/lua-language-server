@@ -172,6 +172,22 @@ end
 <?y?> = x()
 ]]
 
+TEST 'integer|nil' [[
+local function x()
+    return 1
+    return nil
+end
+<?y?> = x()
+]]
+
+TEST 'any' [[
+local function x()
+    return a
+    return nil
+end
+<?y?> = x()
+]]
+
 TEST 'integer' [[
 local function x()
     return 1

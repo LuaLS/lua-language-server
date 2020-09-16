@@ -404,5 +404,24 @@ proto.on('textDocument/signatureHelp', function (params)
     if not results then
         return nil
     end
-    return nil
+    local infos = {}
+    for i, result in ipairs(results) do
+        local parameters = {}
+        for j, param in ipairs(result.params) do
+            parameters[j] = {
+                label = {
+                    param.label[1] - 1,
+                    param.label[2],
+                }
+            }
+        end
+        infos[i] = {
+            label           = result.label,
+            parameters      = parameters,
+            activeParameter = result.index - 1,
+        }
+    end
+    return {
+        signatures = infos,
+    }
 end)

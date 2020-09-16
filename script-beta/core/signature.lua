@@ -25,21 +25,18 @@ end
 
 local function makeOneSignature(source, oop, index)
     local label = hoverLabel(source, oop)
+    local params = {}
     local i = 0
-    local match
     for start, finish in label:gmatch '[%(%)%,]%s*().-()%s*%f[%(%)%,]' do
         i = i + 1
-        if i == index then
-            match = {start, finish-1}
-            break
-        end
-    end
-    if not match then
-        return nil
+        params[i] = {
+            label = {start, finish-1},
+        }
     end
     return {
-        label = label,
-        match = match,
+        label  = label,
+        params = params,
+        index  = index,
     }
 end
 

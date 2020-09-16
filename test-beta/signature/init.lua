@@ -16,7 +16,7 @@ function TEST(script)
 
             local label = hover.label:gsub('^[\r\n]*(.-)[\r\n]*$', '%1'):gsub('\r\n', '\n')
             expect.label = expect.label:gsub('^[\r\n]*(.-)[\r\n]*$', '%1'):gsub('\r\n', '\n')
-            local arg = hover.match
+            local arg = hover.params[hover.index].label
 
             assert(expect.label == label)
             assert(expect.arg[1] == arg[1])
@@ -116,6 +116,7 @@ table.unpack {$}
 ]]
 (nil)
 
+do return end
 TEST [[
 ---@type fun(x: number, y: number):boolean
 local zzzz

@@ -2705,17 +2705,36 @@ local function mergeFunctionReturns(status, source, index)
     for i = 1, #returns do
         local rtn = returns[i]
         if rtn[index] then
-            local newStatus = m.status(status)
-            m.searchInfer(newStatus, rtn[index])
-            if #newStatus.results == 0 then
-                status.results[#status.results+1] = {
-                    type   = 'any',
-                    source = rtn[index],
-                }
+            if rtn[index].type == 'call' then
+                m.inferByCallReturnAndIndex(status, rtn[index], index)
             else
-                for _, infer in ipairs(newStatus.results) do
-                    status.results[#status.results+1] = infer
+                local newStatus = m.status(status)
+                m.searchInfer(newStatus, rtn[index])
+                if #newStatus.results == 0 then
+                    status.results[#status.results+1] = {
+                        type   = 'any',
+                        source = rtn[index],
+                    }
+                else
+                    for _, infer in ipairs(newStatus.results) do
+                        status.results[#status.results+1] = infer
+                    end
                 end
+            end
+        end
+    end
+end
+
+function m.inferByCallReturnAndIndex(status, call, index)
+    local node = call.node
+    local newStatus = m.status(nil, status.interface)
+    m.searchRefs(newStatus, node, 'def')
+    for _, src in ipairs(newStatus.results) do
+        if src.value and src.value.type == 'function' then
+            if src.type == 'library' then
+                mergeLibraryFunctionReturns(status, src.value, index)
+            else
+                mergeFunctionReturns(status, src.value, index)
             end
         end
     end
@@ -2728,19 +2747,7 @@ function m.inferByCallReturn(status, source)
     if not source.vararg or source.vararg.type ~= 'call' then
         return
     end
-    local node = source.vararg.node
-    local newStatus = m.status(nil, status.interface)
-    m.searchRefs(newStatus, node, 'def')
-    local index = source.index
-    for _, src in ipairs(newStatus.results) do
-        if src.value and src.value.type == 'function' then
-            if src.type == 'library' then
-                mergeLibraryFunctionReturns(status, src.value, index)
-            else
-                mergeFunctionReturns(status, src.value, index)
-            end
-        end
-    end
+    m.inferByCallReturnAndIndex(status, source.vararg, source.index)
 end
 
 function m.inferByPCallReturn(status, source)

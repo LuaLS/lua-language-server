@@ -220,6 +220,14 @@ local function f(<?a?>, b)
 end
 ]]
 
+TEST 'string' [[
+local function f()
+    return string.sub()
+end
+
+local <?x?> = f()
+]]
+
 -- 不根据调用者的输入参数来推测
 --TEST 'number' [[
 --local function x(a)

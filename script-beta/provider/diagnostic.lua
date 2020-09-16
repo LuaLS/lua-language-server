@@ -110,7 +110,7 @@ function m.clear(uri)
     end
     m.cache[uri] = nil
     proto.notify('textDocument/publishDiagnostics', {
-        uri = uri,
+        uri = files.getOriginUri(uri),
         diagnostics = {},
     })
 end
@@ -190,7 +190,7 @@ function m.refresh(uri)
         for destUri in files.eachFile() do
             if destUri ~= uri then
                 await.delay()
-                m.doDiagnostic(files.getOriginUri(destUri))
+                m.doDiagnostic(destUri)
             end
         end
         local passed = os.clock() - clock

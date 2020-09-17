@@ -1122,6 +1122,9 @@ function m.getObjectValue(obj)
     while obj.type == 'paren' do
         obj = obj.exp
     end
+    if obj.library then
+        return nil
+    end
     if obj.type == 'boolean'
     or obj.type == 'number'
     or obj.type == 'integer'
@@ -1696,8 +1699,9 @@ function m.checkSameSimple(status, simple, data, mode, results, queue)
         end
     end
     m.pushResult(status, mode, ref, simple)
-    if ref.value then
-        m.pushResult(status, mode, ref.value, simple)
+    local value = m.getObjectValue(ref)
+    if value then
+        m.pushResult(status, mode, value, simple)
     end
 end
 

@@ -1103,10 +1103,10 @@ t['$']
         label = 'a.b.c',
         kind = CompletionItemKind.Field,
         textEdit = {
-            start = 37,
-            finish = 36,
+            start = 38,
+            finish = 37,
             newText = 'a.b.c',
-        },
+        }
     }
 }
 

@@ -139,6 +139,24 @@ local function findParent(ast, text, offset)
     return nil, nil
 end
 
+local function findParentInStringIndex(ast, text, offset)
+    local near
+    guide.eachSourceContain(ast.ast, offset, function (source)
+        if not near or near.start < source.start then
+            near = source
+        end
+    end)
+    if not near or near.type ~= 'string' then
+        return
+    end
+    local parent = near.parent
+    if parent.index ~= near then
+        return
+    end
+    -- index不可能是oop模式
+    return parent.node, false
+end
+
 local function buildFunctionSnip(source, oop)
     local name = getName(source):gsub('^.-[$.:]', '')
     local defs = vm.getDefs(source)
@@ -249,6 +267,46 @@ local function checkLocal(ast, word, offset, results)
     end
 end
 
+local function checkFieldFromFieldToIndex(name, parent, word, start, offset)
+    if name:match '^[%a_][%w_]*$' then
+        return nil
+    end
+    local textEdit, additionalTextEdits
+    local uri = guide.getUri(parent)
+    local text = files.getText(uri)
+    local wordStart
+    if word == '' then
+        wordStart = text:match('()%S', start + 1) or (offset + 1)
+    else
+        wordStart = offset - #word + 1
+    end
+    textEdit = {
+        start   = wordStart,
+        finish  = offset,
+        newText = ('[%q]'):format(name),
+    }
+    local nxt = parent.next
+    local dotStart
+    if nxt.type == 'setfield'
+    or nxt.type == 'getfield'
+    or nxt.type == 'tablefield' then
+        dotStart = nxt.dot.start
+    elseif nxt.type == 'setmethod'
+    or     nxt.type == 'getmethod' then
+        dotStart = nxt.colon.start
+    end
+    if dotStart then
+        additionalTextEdits = {
+            {
+                start   = dotStart,
+                finish  = dotStart,
+                newText = '',
+            }
+        }
+    end
+    return textEdit, additionalTextEdits
+end
+
 local function checkFieldThen(ast, key, src, word, start, offset, parent, oop, results)
     local name = key:sub(3)
     if not matchKey(word, name) then
@@ -282,39 +340,15 @@ local function checkFieldThen(ast, key, src, word, start, offset, parent, oop, r
         kind = ckind.Enum
     end
     local textEdit, additionalTextEdits
-    if not name:match '^[%a_][%w_]*$' then
-        local uri = guide.getUri(parent)
-        local text = files.getText(uri)
-        local wordStart
-        if word == '' then
-            wordStart = text:match('()%S', start + 1) or (offset + 1)
-        else
-            wordStart = offset - #word + 1
-        end
+    if parent.next and parent.next.index then
+        local str = parent.next.index
         textEdit = {
-            start   = wordStart,
+            start   = str.start + #str[2],
             finish  = offset,
-            newText = ('[%q]'):format(name),
+            newText = name,
         }
-        local nxt = parent.next
-        local dotStart
-        if nxt.type == 'setfield'
-        or nxt.type == 'getfield'
-        or nxt.type == 'tablefield' then
-            dotStart = nxt.dot.start
-        elseif nxt.type == 'setmethod'
-        or     nxt.type == 'getmethod' then
-            dotStart = nxt.colon.start
-        end
-        if dotStart then
-            additionalTextEdits = {
-                {
-                    start   = dotStart,
-                    finish  = dotStart,
-                    newText = '',
-                }
-            }
-        end
+    else
+        textEdit, additionalTextEdits = checkFieldFromFieldToIndex(name, parent, word, start, offset)
     end
     results[#results+1] = {
         label    = name,
@@ -668,6 +702,15 @@ local function trySpecial(ast, text, offset, results)
     checkLenPlusOne(ast, text, offset, results)
 end
 
+local function tryIndex(ast, text, offset, results)
+    local parent, oop = findParentInStringIndex(ast, text, offset)
+    if not parent then
+        return
+    end
+    local word = parent.next.index[1]
+    checkField(ast, word, offset, offset, parent, oop, results)
+end
+
 local function tryWord(ast, text, offset, results)
     local finish = skipSpace(text, offset)
     local word, start = findWord(text, finish)
@@ -848,6 +891,7 @@ local function completion(uri, offset)
     if ast then
         trySpecial(ast, text, offset, results)
         tryWord(ast, text, offset, results)
+        tryIndex(ast, text, offset, results)
         trySymbol(ast, text, offset, results)
         tryCallArg(ast, text, offset, results)
     else

@@ -286,23 +286,27 @@ local function checkFieldFromFieldToIndex(name, parent, word, start, offset)
         newText = ('[%q]'):format(name),
     }
     local nxt = parent.next
-    local dotStart
-    if nxt.type == 'setfield'
-    or nxt.type == 'getfield'
-    or nxt.type == 'tablefield' then
-        dotStart = nxt.dot.start
-    elseif nxt.type == 'setmethod'
-    or     nxt.type == 'getmethod' then
-        dotStart = nxt.colon.start
-    end
-    if dotStart then
-        additionalTextEdits = {
-            {
-                start   = dotStart,
-                finish  = dotStart,
-                newText = '',
+    if nxt then
+        local dotStart
+        if nxt.type == 'setfield'
+        or nxt.type == 'getfield'
+        or nxt.type == 'tablefield' then
+            dotStart = nxt.dot.start
+        elseif nxt.type == 'setmethod'
+        or     nxt.type == 'getmethod' then
+            dotStart = nxt.colon.start
+        end
+        if dotStart then
+            additionalTextEdits = {
+                {
+                    start   = dotStart,
+                    finish  = dotStart,
+                    newText = '',
+                }
             }
-        }
+        end
+    else
+        textEdit.newText = '_ENV' .. textEdit.newText
     end
     return textEdit, additionalTextEdits
 end

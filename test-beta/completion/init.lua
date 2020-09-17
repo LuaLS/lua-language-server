@@ -1110,8 +1110,6 @@ t['$']
     }
 }
 
--- TODO
-do return end
 TEST [[
 _ENV['z.b.c'] = {}
 
@@ -1121,19 +1119,15 @@ z$
     {
         label = 'z.b.c',
         kind = CompletionItemKind.Field,
-        detail = EXISTS,
         textEdit = {
-            start = 22,
+            start = 21,
             finish = 21,
             newText = '_ENV["z.b.c"]',
         },
-        additionalTextEdits = {
-            {
-                start = 21,
-                finish = 21,
-                newText = '',
-            }
-        }
+    },
+    {
+        label = 'z',
+        kind = CompletionItemKind.Text,
     }
 }
 

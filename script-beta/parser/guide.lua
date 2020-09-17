@@ -1105,7 +1105,7 @@ function m.searchFields(status, obj, key, interface)
         return results
     else
         local newStatus = m.status(status, interface)
-        local simple = m.getSimple(obj, 1)
+        local simple = m.getSimple(obj)
         if not simple then
             return {}
         end

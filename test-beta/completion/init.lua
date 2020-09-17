@@ -1065,6 +1065,51 @@ t.$
     }
 }
 
+TEST [[
+local t = {
+    ['a.b.c'] = {}
+}
+
+t.   $
+]]
+{
+    {
+        label = 'a.b.c',
+        kind = CompletionItemKind.Field,
+        textEdit = {
+            start = 40,
+            finish = 39,
+            newText = '["a.b.c"]',
+        },
+        additionalTextEdits = {
+            {
+                start   = 36,
+                finish  = 36,
+                newText = '',
+            },
+        },
+    }
+}
+
+TEST [[
+local t = {
+    ['a.b.c'] = {}
+}
+
+t['$']
+]]
+{
+    {
+        label = 'a.b.c',
+        kind = CompletionItemKind.Field,
+        textEdit = {
+            start = 37,
+            finish = 36,
+            newText = 'a.b.c',
+        },
+    }
+}
+
 -- TODO
 do return end
 TEST [[

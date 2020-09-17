@@ -283,26 +283,34 @@ local function checkFieldThen(ast, key, src, word, start, offset, parent, oop, r
     end
     local textEdit, additionalTextEdits
     if not name:match '^[%a_][%w_]*$' then
-        local nxt = parent.next
-        local dotPos
-        if nxt.type == 'setfield'
-        or nxt.type == 'getfield'
-        or nxt.type == 'tablefield' then
-            dotPos = nxt.dot.start
-        elseif nxt.type == 'getmethod'
-        or     nxt.type == 'setmethod' then
-            dotPos = nxt.colon.start
+        local uri = guide.getUri(parent)
+        local text = files.getText(uri)
+        local wordStart
+        if word == '' then
+            wordStart = text:match('()%S', start + 1) or (offset + 1)
+        else
+            wordStart = offset - #word + 1
         end
         textEdit = {
-            start   = start + 1,
+            start   = wordStart,
             finish  = offset,
             newText = ('[%q]'):format(name),
         }
-        if dotPos then
+        local nxt = parent.next
+        local dotStart
+        if nxt.type == 'setfield'
+        or nxt.type == 'getfield'
+        or nxt.type == 'tablefield' then
+            dotStart = nxt.dot.start
+        elseif nxt.type == 'setmethod'
+        or     nxt.type == 'getmethod' then
+            dotStart = nxt.colon.start
+        end
+        if dotStart then
             additionalTextEdits = {
                 {
-                    start   = dotPos,
-                    finish  = start,
+                    start   = dotStart,
+                    finish  = dotStart,
                     newText = '',
                 }
             }

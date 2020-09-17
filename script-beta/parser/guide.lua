@@ -1696,6 +1696,9 @@ function m.checkSameSimple(status, simple, data, mode, results, queue)
         end
     end
     m.pushResult(status, mode, ref, simple)
+    if ref.value then
+        m.pushResult(status, mode, ref.value, simple)
+    end
 end
 
 function m.searchSameFields(status, simple, mode)

@@ -9,6 +9,8 @@ local findSource = require 'core.find-source'
 local Forcing
 
 local function askForcing(str)
+    -- TODO 总是可以替换
+    do return true end
     if TEST then
         return true
     end
@@ -51,6 +53,8 @@ local function askForcing(str)
 end
 
 local function askForMultiChange(results, newname)
+    -- TODO 总是可以替换
+    do return true end
     if TEST then
         return true
     end

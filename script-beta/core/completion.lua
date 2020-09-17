@@ -249,7 +249,7 @@ local function checkLocal(ast, word, offset, results)
     end
 end
 
-local function checkFieldThen(ast, key, src, word, start, parent, oop, results)
+local function checkFieldThen(ast, key, src, word, start, offset, parent, oop, results)
     local name = key:sub(3)
     if not matchKey(word, name) then
         return
@@ -281,10 +281,39 @@ local function checkFieldThen(ast, key, src, word, start, parent, oop, results)
     if literal ~= nil then
         kind = ckind.Enum
     end
+    local textEdit, additionalTextEdits
+    if not name:match '^[%a_][%w_]*$' then
+        local nxt = parent.next
+        local dotPos
+        if nxt.type == 'setfield'
+        or nxt.type == 'getfield'
+        or nxt.type == 'tablefield' then
+            dotPos = nxt.dot.start
+        elseif nxt.type == 'getmethod'
+        or     nxt.type == 'setmethod' then
+            dotPos = nxt.colon.start
+        end
+        textEdit = {
+            start   = start + 1,
+            finish  = offset,
+            newText = ('[%q]'):format(name),
+        }
+        if dotPos then
+            additionalTextEdits = {
+                {
+                    start   = dotPos,
+                    finish  = start,
+                    newText = '',
+                }
+            }
+        end
+    end
     results[#results+1] = {
-        label = name,
-        kind  = kind,
-        id    = stack(function ()
+        label    = name,
+        kind     = kind,
+        textEdit = textEdit,
+        additionalTextEdits = additionalTextEdits,
+        id       = stack(function ()
             return {
                 detail      = buildDetail(src),
                 description = buildDesc(src),
@@ -293,7 +322,7 @@ local function checkFieldThen(ast, key, src, word, start, parent, oop, results)
     }
 end
 
-local function checkField(ast, word, start, parent, oop, results)
+local function checkField(ast, word, start, offset, parent, oop, results)
     local fields = {}
     vm.eachField(parent, function (src)
         local key = vm.getKeyName(src)
@@ -318,7 +347,7 @@ local function checkField(ast, word, start, parent, oop, results)
         end
     end)
     for key, src in util.sortPairs(fields) do
-        checkFieldThen(ast, key, src, word, start, parent, oop, results)
+        checkFieldThen(ast, key, src, word, start, offset, parent, oop, results)
     end
 end
 
@@ -643,7 +672,7 @@ local function tryWord(ast, text, offset, results)
         local parent, oop = findParent(ast, text, start - 1)
         if parent then
             if not hasSpace then
-                checkField(ast, word, start, parent, oop, results)
+                checkField(ast, word, start, offset, parent, oop, results)
             end
         elseif isFuncArg(ast, offset) then
             checkProvideLocal(ast, word, start, results)
@@ -660,7 +689,7 @@ local function tryWord(ast, text, offset, results)
                     checkLocal(ast, word, start, results)
                     checkTableField(ast, word, start, results)
                     local env = guide.getLocal(ast.ast, '_ENV', start)
-                    checkField(ast, word, start, env, false, results)
+                    checkField(ast, word, start, offset, env, false, results)
                 end
             end
         end
@@ -682,7 +711,7 @@ local function trySymbol(ast, text, offset, results)
     or symbol == ':' then
         local parent, oop = findParent(ast, text, start)
         if parent then
-            checkField(ast, '', start, parent, oop, results)
+            checkField(ast, '', start, offset, parent, oop, results)
         end
     end
 end

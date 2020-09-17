@@ -34,9 +34,10 @@ end
 rawset(_G, 'TEST', true)
 
 local Cared = {
-    ['label']    = true,
-    ['kind']     = true,
-    ['textEdit'] = true,
+    ['label']               = true,
+    ['kind']                = true,
+    ['textEdit']            = true,
+    ['additionalTextEdits'] = true,
 }
 
 function TEST(script)
@@ -58,7 +59,7 @@ function TEST(script)
                 item[k] = v
             end
             for k in pairs(item) do
-                if  not Cared[k] then
+                if not Cared[k] then
                     item[k] = nil
                 end
             end
@@ -962,7 +963,6 @@ else$
 }
 
 Cared['insertText'] = true
-
 TEST [[
 local xpcal
 xpcal$
@@ -1000,9 +1000,8 @@ mt:f$
         insertText = 'f(${1:a: any}, ${2:b: any}, ${3:c: any})',
     },
 }
+Cared['insertText'] = false
 
--- TODO
-do return end
 TEST [[
 local function f()
     if a then
@@ -1010,28 +1009,6 @@ local function f()
 end
 ]]
 {
-    {
-        label = 'select',
-        kind = CompletionItemKind.Function,
-        detail = EXISTS,
-    },
-    {
-        label = 'select()',
-        kind = CompletionItemKind.Snippet,
-        detail = EXISTS,
-        insertText = EXISTS,
-    },
-    {
-        label = 'setmetatable',
-        kind = CompletionItemKind.Function,
-        detail = EXISTS,
-    },
-    {
-        label = 'setmetatable()',
-        kind = CompletionItemKind.Snippet,
-        detail = EXISTS,
-        insertText = EXISTS,
-    },
     {
         label = 'else',
         kind = CompletionItemKind.Keyword,
@@ -1043,7 +1020,22 @@ end
     {
         label = 'elseif .. then',
         kind = CompletionItemKind.Snippet,
-        insertText = EXISTS,
+    },
+    {
+        label = 'select',
+        kind = CompletionItemKind.Function,
+    },
+    {
+        label = 'select()',
+        kind = CompletionItemKind.Snippet,
+    },
+    {
+        label = 'setmetatable',
+        kind = CompletionItemKind.Function,
+    },
+    {
+        label = 'setmetatable()',
+        kind = CompletionItemKind.Snippet,
     },
 }
 
@@ -1058,7 +1050,6 @@ t.$
     {
         label = 'a.b.c',
         kind = CompletionItemKind.Field,
-        detail = EXISTS,
         textEdit = {
             start = 37,
             finish = 36,
@@ -1066,14 +1057,16 @@ t.$
         },
         additionalTextEdits = {
             {
-                start = 36,
-                finish = 36,
+                start   = 36,
+                finish  = 36,
                 newText = '',
-            }
-        }
+            },
+        },
     }
 }
 
+-- TODO
+do return end
 TEST [[
 _ENV['z.b.c'] = {}
 

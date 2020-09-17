@@ -151,4 +151,10 @@ m.MessageType = {
     Log     = 4,
 }
 
+m.FileChangeType = {
+    Created = 1,
+    Changed = 2,
+    Deleted = 3,
+}
+
 return m

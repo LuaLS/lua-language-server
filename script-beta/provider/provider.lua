@@ -119,6 +119,10 @@ proto.on('workspace/didChangeConfiguration', function ()
 end)
 
 proto.on('workspace/didChangeWatchedFiles', function (params)
+    for _, change in ipairs(params.changes) do
+        if change.type == define.FileChangeType.Created then
+        end
+    end
 end)
 
 proto.on('textDocument/didOpen', function (params)
@@ -340,6 +344,20 @@ proto.on('textDocument/completion', function (params)
                 ),
                 newText = res.textEdit.newText,
             },
+            additionalTextEdits = res.additionalTextEdits and (function ()
+                local t = {}
+                for j, edit in ipairs(res.additionalTextEdits) do
+                    t[j] = {
+                        range   = define.range(
+                            lines,
+                            text,
+                            edit.start,
+                            edit.finish
+                        )
+                    }
+                end
+                return t
+            end)(),
             documentation    = res.description and {
                 value = res.description,
                 kind  = 'markdown',

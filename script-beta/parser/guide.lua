@@ -972,6 +972,7 @@ function m.getSimple(obj, max)
     or obj.type == 'setlocal'
     or obj.type == 'setglobal'
     or obj.type == 'getglobal'
+    or obj.type == 'tablefield'
     or obj.type == 'tableindex'
     or obj.type == 'select' then
         simpleList = buildSimpleList(obj, max)

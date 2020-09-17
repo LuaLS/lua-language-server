@@ -737,6 +737,24 @@ local t: {
 }
 ]]
 
+TEST [[
+local t = {
+    v = {
+        b = 1,
+        c = 2,
+        d = 3,
+    }
+}
+print(t.<?v?>)
+]]
+[[
+field t.v: {
+    b: integer = 1,
+    c: integer = 2,
+    d: integer = 3,
+}
+]]
+
 --TEST[[
 -----@class Class
 --local <?x?> = class()

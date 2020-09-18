@@ -1014,6 +1014,16 @@ function m.copyStatusResults(a, b)
     end
 end
 
+function m.isGlobal(source)
+    if source.type == 'setglobal'
+    or source.type == 'getglobal' then
+        if source.node.tag == '_ENV' then
+            return true
+        end
+    end
+    return false
+end
+
 --- 根据函数的调用参数，获取：调用，参数索引
 function m.getCallAndArgIndex(callarg)
     local callargs = callarg.parent

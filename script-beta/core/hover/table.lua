@@ -118,15 +118,14 @@ local function clearClasses(classes)
     local anyClasses = {}
     local strClasses = {}
     for key, class in pairs(classes) do
-        if key:sub(1, 1) ~= '[' then
-            util.array2hash(class, knownClasses)
-        elseif key == '[any]' then
+        if key == '[any]' then
             util.array2hash(class, anyClasses)
             goto CONTINUE
         elseif key == '[string]' then
             util.array2hash(class, strClasses)
             goto CONTINUE
         end
+        util.array2hash(class, knownClasses)
         ::CONTINUE::
     end
     for c in pairs(knownClasses) do

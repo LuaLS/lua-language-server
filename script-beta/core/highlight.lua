@@ -209,7 +209,6 @@ return function (uri, offset)
             or     target.type == 'nil' then
                 kind   = define.DocumentHighlightKind.Text
             else
-                log.warn('Unknow target.type:', target.type)
                 return
             end
             if mark[target] then

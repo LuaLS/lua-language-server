@@ -21,7 +21,6 @@ local furi       = require 'file-uri'
 local rpath      = require 'workspace.require-path'
 
 local stackID = 0
-local resolveID = 0
 local stacks = {}
 local function stack(callback)
     stackID = stackID + 1
@@ -38,12 +37,10 @@ local function resolveStack(id)
     if not callback then
         return nil
     end
+
     -- 当进行新的 resolve 时，放弃当前的 resolve
-    resolveID = resolveID + 1
-    await.setDelayer(function ()
-        return resolveID
-    end)
-    return callback()
+    await.close('completion.resove')
+    return await.await(callback, 'completion.resove')
 end
 
 local function trim(str)

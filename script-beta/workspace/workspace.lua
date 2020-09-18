@@ -13,7 +13,6 @@ local m = {}
 m.type = 'workspace'
 m.ignoreVersion = -1
 m.ignoreMatcher = nil
-m.preloadVersion = 0
 m.uri = ''
 m.path = ''
 m.requireCache = {}
@@ -202,15 +201,10 @@ function m.getRelativePath(uri)
 end
 
 function m.reload()
-    m.preloadVersion = m.preloadVersion + 1
     files.removeAll()
     rpath.flush()
-    await.create(function ()
-        await.setDelayer(function ()
-            return m.preloadVersion
-        end)
-        m.awaitPreload()
-    end)
+    await.close 'preload'
+    await.call(m.awaitPreload, 'preload')
 end
 
 return m

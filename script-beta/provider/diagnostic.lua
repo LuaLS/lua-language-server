@@ -9,7 +9,6 @@ local util   = require 'utility'
 
 local m = {}
 m._start = false
-m._diagID = 0
 m.cache = {}
 
 local function concat(t, sep)
@@ -178,32 +177,26 @@ function m.refresh(uri)
     if not m._start then
         return
     end
-    await.create(function ()
+    await.call(function ()
         -- 一旦文件的版本发生变化，就放弃这次诊断
-        await.setDelayer(function ()
-            return files.getVersion(uri)
-        end)
         await.delay()
         if uri then
             m.doDiagnostic(uri)
         end
         m.diagnosticsAll()
-    end)
+    end, 'files.version')
 end
 
 function m.diagnosticsAll()
-    await.create(function ()
-        m._diagID = m._diagID + 1
-        await.setDelayer(function ()
-            return m._diagID
-        end)
+    await.close 'diagnosticsAll'
+    await.call(function ()
         local clock = os.clock()
         for uri in files.eachFile() do
             await.delay()
             m.doDiagnostic(uri)
         end
         log.debug('全文诊断耗时：', os.clock() - clock)
-    end)
+    end, 'files.version', 'diagnosticsAll')
 end
 
 function m.start()

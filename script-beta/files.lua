@@ -5,6 +5,7 @@ local furi     = require 'file-uri'
 local parser   = require 'parser'
 local proto    = require 'proto'
 local lang     = require 'language'
+local await    = require 'await'
 
 local m = {}
 
@@ -88,6 +89,7 @@ function m.setText(uri, text)
     file.cache = {}
     file.version = file.version + 1
     m.globalVersion = m.globalVersion + 1
+    await.close('files.version')
     m.onWatch('update', originUri)
 end
 
@@ -131,12 +133,14 @@ function m.remove(uri)
     m.fileMap[uri] = nil
 
     m.globalVersion = m.globalVersion + 1
+    await.close('files.version')
     m.onWatch('remove', originUri)
 end
 
 --- 移除所有文件
 function m.removeAll()
     m.globalVersion = m.globalVersion + 1
+    await.close('files.version')
     for uri in pairs(m.fileMap) do
         m.fileMap[uri] = nil
         m.onWatch('remove', uri)

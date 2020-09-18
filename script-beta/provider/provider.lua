@@ -100,7 +100,7 @@ proto.on('initialized', function (params)
             }
         }
     })
-    await.create(workspace.awaitPreload)
+    await.call(workspace.awaitPreload)
     return true
 end)
 

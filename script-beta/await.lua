@@ -1,12 +1,12 @@
-local timer  = require 'timer'
+local timer = require 'timer'
+local util  = require 'utility'
 
 ---@class await
 local m = {}
 m.type = 'await'
 
-m.coTracker  = setmetatable({}, { __mode = 'k' })
-m.coPriority = setmetatable({}, { __mode = 'k' })
-m.coDelayer  = setmetatable({}, { __mode = 'k' })
+m.coMap = setmetatable({}, { __mode = 'k' })
+m.idMap = {}
 m.delayQueue = {}
 m.delayQueueIndex = 1
 
@@ -25,40 +25,85 @@ function m.checkResult(co, ...)
 end
 
 --- 创建一个任务
-function m.create(callback, ...)
+function m.call(callback, ...)
     local co = coroutine.create(callback)
-    m.coTracker[co] = true
-    return m.checkResult(co, coroutine.resume(co, ...))
+    local closers = {}
+    m.coMap[co] = {
+        closers  = closers,
+        priority = false,
+    }
+    for i = 1, select('#', ...) do
+        local id = select(i, ...)
+        if not id then
+            break
+        end
+        m.setID(id, co)
+    end
+
+    local currentCo = coroutine.running()
+    local current = m.coMap[currentCo]
+    if current then
+        for closer in pairs(current.closers) do
+            closers[closer] = true
+            closer(co)
+        end
+    end
+    return m.checkResult(co, coroutine.resume(co))
 end
 
---- 对当前任务设置一个延迟检查器，当延迟前后检查器的返回值不同时，放弃此任务
-function m.setDelayer(callback)
-    local co = coroutine.running()
-    m.coDelayer[co] = callback
+--- 创建一个任务，并挂起当前线程，当任务完成后再延续当前线程/若任务被关闭，则返回nil
+function m.await(callback, ...)
+    return m.wait(function (waker, ...)
+        m.call(function ()
+            local returnNil <close> = util.defer(waker)
+            waker(callback())
+        end, ...)
+    end, ...)
+end
+
+--- 设置一个可继承的关闭器，在设置时，以及创建子协程时会调用
+function m.setCloser(callback, co)
+    co = co or coroutine.running()
+    local current = m.coMap[co]
+    current[callback] = true
+    callback(co)
+end
+
+--- 设置一个id，用于批量关闭任务
+function m.setID(id, co)
+    co = co or coroutine.running()
+    if not m.idMap[id] then
+        m.idMap[id] = setmetatable({}, { __mode = 'k' })
+    end
+    m.idMap[id][co] = true
+end
+
+--- 根据id批量关闭任务
+function m.close(id)
+    local map = m.idMap[id]
+    if not map then
+        return
+    end
+    for co in pairs(map) do
+        map[co] = nil
+        coroutine.close(co)
+    end
 end
 
 --- 休眠一段时间
 ---@param time number
-function m.sleep(time, getVersion)
+function m.sleep(time)
     if not coroutine.isyieldable() then
         if m.errorHandle then
             m.errorHandle(debug.traceback('Cannot yield'))
         end
         return
     end
-    local version = getVersion and getVersion()
     local co = coroutine.running()
-    local delayer = m.coDelayer[co]
-    local dVersion = delayer and delayer()
     timer.wait(time, function ()
-        if  version == (getVersion and getVersion())
-        and dVersion == (delayer and delayer()) then
-            return m.checkResult(co, coroutine.resume(co))
-        else
-            coroutine.close(co)
-        end
+        return m.checkResult(co, coroutine.resume(co))
     end)
-    return coroutine.yield(getVersion)
+    return coroutine.yield()
 end
 
 --- 等待直到唤醒
@@ -68,49 +113,35 @@ function m.wait(callback, ...)
         return
     end
     local co = coroutine.running()
+    local waked
     callback(function (...)
+        if waked then
+            return
+        end
+        waked = true
         return m.checkResult(co, coroutine.resume(co, ...))
-    end)
-    return coroutine.yield(...)
+    end, ...)
+    return coroutine.yield()
 end
 
 --- 延迟
-function m.delay(getVersion)
+function m.delay()
     if not coroutine.isyieldable() then
         return
     end
     local co = coroutine.running()
+    local current = m.coMap[co]
     -- TODO
-    if m.coPriority[co] then
+    if current.priority then
         return
     end
-    local version = getVersion and getVersion()
-    local delayer = m.coDelayer[co]
-    local dVersion = delayer and delayer()
     m.delayQueue[#m.delayQueue+1] = function ()
-        if  version == (getVersion and getVersion())
-        and dVersion == (delayer and delayer()) then
-            return m.checkResult(co, coroutine.resume(co))
-        else
-            coroutine.close(co)
+        if coroutine.status(co) ~= 'suspended' then
+            return
         end
+        return m.checkResult(co, coroutine.resume(co))
     end
     return coroutine.yield()
-end
-
-local function getCo(waker)
-    local co
-    for i = 1, 100 do
-        local n, v = debug.getupvalue(waker, i)
-        if not n then
-            return nil
-        end
-        if n == 'co' then
-            co = v
-            break
-        end
-    end
-    return co
 end
 
 --- 步进
@@ -134,7 +165,7 @@ function m.step()
 end
 
 function m.setPriority(n)
-    m.coPriority[coroutine.running()] = n
+    m.coMap[coroutine.running()].priority = true
 end
 
 return m

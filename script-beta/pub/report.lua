@@ -11,7 +11,7 @@ end)
 
 pub.on('proto', function (params)
     local proto = require 'proto'
-    await.create(function ()
+    await.call(function ()
         if params.method then
             proto.doMethod(params)
         else

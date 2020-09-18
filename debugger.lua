@@ -53,7 +53,7 @@ local function tryDebugger()
     log.debug('Debugger startup, listen port:', DBGPORT)
     log.debug('Debugger args:', addr, root, path, cpath)
     if DBGWAIT then
-        dbg:wait()
+        dbg:event('wait')
     end
     return dbg
 end

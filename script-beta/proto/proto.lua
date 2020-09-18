@@ -90,7 +90,7 @@ function m.doMethod(proto)
         end
         return
     end
-    await.create(function ()
+    await.call(function ()
         --log.debug('Start method:', method)
         local clock = os.clock()
         local ok = true

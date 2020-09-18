@@ -48,7 +48,7 @@
 			"type": "lua",
 			"request": "attach",
 			"stopOnEntry": true,
-			"address": "127.0.0.1:11413",
+			"address": "127.0.0.1:11414",
 			"outputCapture": [
 			]
 		},

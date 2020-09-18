@@ -56,7 +56,7 @@ function m.reportTask()
     local normal    = 0
     local dead      = 0
 
-    for co in pairs(await.coTracker) do
+    for co in pairs(await.coMap) do
         total = total + 1
         local status = coroutine.status(co)
         if status == 'running' then

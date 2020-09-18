@@ -111,23 +111,9 @@ function vm.interface.index(obj)
     return nil
 end
 
-function vm.interface.cache(source, mode)
+function vm.interface.cache()
     await.delay()
-    local cache = vm.getCache('cache')
-    if not cache[mode] then
-        cache[mode] = {}
-    end
-    local sourceCache = cache[mode][source]
-    if sourceCache then
-        return sourceCache
-    end
-    sourceCache = {}
-    cache[mode][source] = sourceCache
-    return nil, function (results)
-        for i = 1, #results do
-            sourceCache[i] = results[i]
-        end
-    end
+    return vm.getCache('cache')
 end
 
 function vm.setSearchLevel(n)

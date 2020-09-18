@@ -1879,16 +1879,49 @@ function m.cleanResults(results)
     end
 end
 
+--function m.getRefCache(status, obj, mode)
+--    if not status.interface.cache then
+--        return
+--    end
+--    if obj.type == 'getglobal'
+--    or obj.type == 'setglobal' then
+--        local name = m.getKeyName(obj)
+--        return status.interface.cache(name, mode, status.index == 1)
+--    else
+--        return status.interface.cache(obj, mode, status.index == 1)
+--    end
+--end
+
 function m.getRefCache(status, obj, mode)
-    if not status.interface.cache then
-        return
+    local cache, globalCache
+    if status.index == 1 then
+        globalCache = status.interface.cache and status.interface.cache() or {}
     end
+    cache = status.cache.refCache or {}
+    status.cache.refCache = cache
     if obj.type == 'getglobal'
     or obj.type == 'setglobal' then
-        local name = m.getKeyName(obj)
-        return status.interface.cache(name, mode)
-    else
-        return status.interface.cache(obj, mode)
+        obj = m.getKeyName(obj)
+    end
+    if not cache[mode] then
+        cache[mode] = {}
+    end
+    if globalCache and not globalCache[mode] then
+        globalCache[mode] = {}
+    end
+    local sourceCache = globalCache and globalCache[mode][obj] or cache[mode][obj]
+    if sourceCache then
+        return sourceCache
+    end
+    sourceCache = {}
+    cache[mode][obj] = sourceCache
+    if globalCache then
+        globalCache[mode][obj] = sourceCache
+    end
+    return nil, function (results)
+        for i = 1, #results do
+            sourceCache[i] = results[i]
+        end
     end
 end
 
@@ -2825,10 +2858,7 @@ function m.searchInfer(status, obj)
         obj = obj.parent
     end
 
-    local cache, makeCache
-    if status.interface.cache then
-        cache, makeCache = status.interface.cache(obj, 'infer')
-    end
+    local cache, makeCache = m.getRefCache(status, obj, 'infer')
     if cache then
         for i = 1, #cache do
             status.results[#status.results+1] = cache[i]

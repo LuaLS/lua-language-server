@@ -26,14 +26,19 @@ local function find(source, uri, callback)
     elseif source.type == 'getlocal'
     or     source.type == 'setlocal' then
         eachLocal(source.node, callback)
-    elseif     source.type == 'field'
+    elseif source.type == 'field'
     or     source.type == 'method'
     or     source.type == 'getindex'
     or     source.type == 'setindex'
     or     source.type == 'tableindex'
     or     source.type == 'goto'
-    or     source.type == 'label' then
+    or     source.type == 'label'
+    or     source.type == 'getglobal'
+    or     source.type == 'setglobal' then
         eachRef(source, callback)
+    elseif source.type == 'string'
+    and    source.parent.index == source then
+        eachRef(source.parent, callback)
     elseif source.type == 'string'
     or     source.type == 'boolean'
     or     source.type == 'number'
@@ -82,36 +87,55 @@ local function makeIf(source, text, callback)
     return false
 end
 
-local function findKeyword(source, text, offset, callback)
-    if source.type == 'do'
-    or source.type == 'function'
-    or source.type == 'loop'
-    or source.type == 'in'
-    or source.type == 'while'
-    or source.type == 'repeat' then
-        local ok
-        for i = 1, #source.keyword, 2 do
-            local start  = source.keyword[i]
-            local finish = source.keyword[i+1]
-            if offset >= start and offset <= finish then
-                ok = true
-                break
-            end
-        end
-        if ok then
+local function findKeyWord(ast, text, offset, callback)
+    guide.eachSourceContain(ast.ast, offset, function (source)
+        if source.type == 'do'
+        or source.type == 'function'
+        or source.type == 'loop'
+        or source.type == 'in'
+        or source.type == 'while'
+        or source.type == 'repeat' then
+            local ok
             for i = 1, #source.keyword, 2 do
                 local start  = source.keyword[i]
                 local finish = source.keyword[i+1]
-                callback(start, finish)
+                if offset >= start and offset <= finish then
+                    ok = true
+                    break
+                end
+            end
+            if ok then
+                for i = 1, #source.keyword, 2 do
+                    local start  = source.keyword[i]
+                    local finish = source.keyword[i+1]
+                    callback(start, finish)
+                end
+            end
+        elseif source.type == 'if' then
+            local ok = checkInIf(source, text, offset)
+            if ok then
+                makeIf(source, text, callback)
             end
         end
-    elseif source.type == 'if' then
-        local ok = checkInIf(source, text, offset)
-        if ok then
-            makeIf(source, text, callback)
-        end
-    end
+    end)
 end
+
+local accept = {
+    ['label']      = true,
+    ['goto']       = true,
+    ['local']      = true,
+    ['setlocal']   = true,
+    ['getlocal']   = true,
+    ['field']      = true,
+    ['method']     = true,
+    ['tablefield'] = true,
+    ['setglobal']  = true,
+    ['getglobal']  = true,
+    ['string']     = true,
+    ['boolean']    = true,
+    ['number']     = true,
+    ['nil']        = true,
+}
 
 return function (uri, offset)
     local ast = files.getAst(uri)
@@ -122,7 +146,8 @@ return function (uri, offset)
     local results = {}
     local mark = {}
 
-    guide.eachSourceContain(ast.ast, offset, function (source)
+    local source = findSource(ast, offset, accept)
+    if source then
         find(source, uri, function (target)
             local kind
             if     target.type == 'getfield' then
@@ -149,6 +174,12 @@ return function (uri, offset)
                 end
             elseif target.type == 'method' then
                 if target.parent.type == 'getmethod' then
+                    kind   = define.DocumentHighlightKind.Read
+                else
+                    kind   = define.DocumentHighlightKind.Write
+                end
+            elseif target.type == 'index' then
+                if target.parent.type == 'getindex' then
                     kind   = define.DocumentHighlightKind.Read
                 else
                     kind   = define.DocumentHighlightKind.Write
@@ -191,14 +222,16 @@ return function (uri, offset)
                 kind   = kind,
             }
         end)
-        findKeyword(source, text, offset, function (start, finish)
-            results[#results+1] = {
-                start  = start,
-                finish = finish,
-                kind   = define.DocumentHighlightKind.Write
-            }
-        end)
+    end
+
+    findKeyWord(ast, text, offset, function (start, finish)
+        results[#results+1] = {
+            start  = start,
+            finish = finish,
+            kind   = define.DocumentHighlightKind.Write
+        }
     end)
+
     if #results == 0 then
         return nil
     end

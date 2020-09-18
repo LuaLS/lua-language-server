@@ -53,6 +53,9 @@ end
 
 --- 创建一个任务，并挂起当前线程，当任务完成后再延续当前线程/若任务被关闭，则返回nil
 function m.await(callback, ...)
+    if not coroutine.isyieldable() then
+        return callback(...)
+    end
     return m.wait(function (waker, ...)
         m.call(function ()
             local returnNil <close> = util.defer(waker)

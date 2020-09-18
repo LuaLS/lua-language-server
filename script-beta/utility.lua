@@ -13,6 +13,7 @@ local mathType     = math.type
 local mathCeil     = math.ceil
 local getmetatable = getmetatable
 local mathAbs      = math.abs
+local mathRandom   = math.random
 local ioOpen       = io.open
 local utf8Len      = utf8.len
 local mathHuge     = math.huge
@@ -466,6 +467,61 @@ function m.utf8Len(str, start, finish)
         return len
     end
     return 1 + m.utf8Len(str, start, pos-1) + m.utf8Len(str, pos+1, finish)
+end
+
+function m.revertTable(t)
+    local len = #t
+    if len <= 1 then
+        return t
+    end
+    for x = 1, len // 2 do
+        local y = len - x + 1
+        t[x], t[y] = t[y], t[x]
+    end
+    return t
+end
+
+function m.randomSortTable(t, max)
+    local len = #t
+    if len <= 1 then
+        return t
+    end
+    if not max or max > len then
+        max = len
+    end
+    for x = 1, max do
+        local y = mathRandom(len)
+        t[x], t[y] = t[y], t[x]
+    end
+    return t
+end
+
+function m.tableMultiRemove(t, index)
+    local mark = {}
+    for i = 1, #index do
+        local v = index[i]
+        mark[v] = true
+    end
+    local offset = 0
+    local me = 1
+    local len = #t
+    while true do
+        local it = me + offset
+        if it > len then
+            for i = me, len do
+                t[i] = nil
+            end
+            break
+        end
+        if mark[it] then
+            offset = offset + 1
+        else
+            if me ~= it then
+                t[me] = t[it]
+            end
+            me = me + 1
+        end
+    end
 end
 
 return m

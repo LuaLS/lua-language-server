@@ -18,18 +18,23 @@ return function (uri, callback)
         if not key then
             return
         end
+        if config.config.diagnostics.globals[key] then
+            return
+        end
         if globalCache[key] == nil then
-            local defs = vm.getDefs(src)
-            -- 这里要处理跨文件的情况
-            globalCache[key] = #defs > 0
+            globalCache[key] = false
+            local refs = vm.getGlobals(key)
+            for _, ref in pairs(refs) do
+                if vm.isSet(ref) then
+                    globalCache[key] = true
+                    break
+                end
+            end
         end
         if globalCache[key] then
             return
         end
         if library.global[key] then
-            return
-        end
-        if config.config.diagnostics.globals[key] then
             return
         end
         local message = lang.script('DIAG_UNDEF_GLOBAL', key)

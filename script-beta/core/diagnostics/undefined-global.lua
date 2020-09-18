@@ -11,7 +11,7 @@ return function (uri, callback)
         return
     end
 
-    local globalCache = {}
+    local globalCache = vm.getCache('undefined-global')
     -- 遍历全局变量，检查所有没有 set 模式的全局变量
     guide.eachSourceType(ast.ast, 'getglobal', function (src)
         local key = guide.getName(src)

@@ -113,6 +113,7 @@ end
 return function (source)
     local literals = {}
     local classes = {}
+    local knownClasses = {}
     vm.eachField(source, function (src)
         local key, class, literal = getField(src)
         if not key then
@@ -130,9 +131,18 @@ return function (source)
     for key, class in pairs(classes) do
         classes[key] = guide.mergeTypes(class)
         literals[key] = mergeLiteral(literals[key])
+        if key ~= '[any]' then
+            for i = 1, #class do
+                knownClasses[#knownClasses+1] = class[i]
+            end
+        end
     end
-    if classes['[any]'] == 'any' then
-        classes['[any]'] = nil
+    if classes['[any]'] then
+        if classes['[any]'] == 'any' then
+            classes['[any]'] = nil
+        elseif classes['[any]'] == guide.mergeTypes(knownClasses) then
+            classes['[any]'] = nil
+        end
     end
     if not next(classes) then
         return '{}'

@@ -524,4 +524,20 @@ function m.tableMultiRemove(t, index)
     end
 end
 
+function m.hash2array(h, a)
+    a = a or {}
+    for k in pairs(h) do
+        a[#a+1] = k
+    end
+    return a
+end
+
+function m.array2hash(a, h)
+    h = h or {}
+    for _, v in ipairs(a) do
+        h[v] = true
+    end
+    return h
+end
+
 return m

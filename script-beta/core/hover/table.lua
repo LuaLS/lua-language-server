@@ -110,13 +110,44 @@ local function mergeLiteral(literals)
     return table.concat(results, '|')
 end
 
+local function clearClasses(classes)
+    local knownClasses = {
+        ['any'] = true,
+        ['nil'] = true,
+    }
+    local anyClasses = {}
+    local strClasses = {}
+    for key, class in pairs(classes) do
+        if key:sub(1, 1) ~= '[' then
+            util.array2hash(class, knownClasses)
+        elseif key == '[any]' then
+            util.array2hash(class, anyClasses)
+            goto CONTINUE
+        elseif key == '[string]' then
+            util.array2hash(class, strClasses)
+            goto CONTINUE
+        end
+        ::CONTINUE::
+    end
+    for c in pairs(knownClasses) do
+        anyClasses[c] = nil
+        strClasses[c] = nil
+    end
+    if next(anyClasses) then
+        classes['[any]'] = util.hash2array(anyClasses)
+    else
+        classes['[any]'] = nil
+    end
+    if next(strClasses) then
+        classes['[string]'] = util.hash2array(strClasses)
+    else
+        classes['[string]'] = nil
+    end
+end
+
 return function (source)
     local literals = {}
     local classes = {}
-    local UnknownClasses = {}
-    local knownClasses = {
-        ['any'] = true
-    }
     vm.eachField(source, function (src)
         local key, class, literal = getField(src)
         if not key then
@@ -131,31 +162,12 @@ return function (source)
         classes[key][#classes[key]+1] = class
         literals[key][#literals[key]+1] = literal
     end)
+
+    clearClasses(classes)
+
     for key, class in pairs(classes) do
         literals[key] = mergeLiteral(literals[key])
         classes[key] = guide.mergeTypes(class)
-        if key == '[any]' then
-            for i = 1, #class do
-                UnknownClasses[class[i]] = true
-            end
-        else
-            for i = 1, #class do
-                knownClasses[class[i]] = true
-            end
-        end
-    end
-
-    for class in pairs(knownClasses) do
-        UnknownClasses[class] = nil
-    end
-    if next(UnknownClasses) then
-        local class = {}
-        for c in pairs(UnknownClasses) do
-            class[#class+1] = c
-        end
-        classes['[any]'] = guide.mergeTypes(class)
-    else
-        classes['[any]'] = nil
     end
 
     if not next(classes) then

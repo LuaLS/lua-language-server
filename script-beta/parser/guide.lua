@@ -1859,10 +1859,13 @@ function m.searchRefsAsFunctionSet(status, obj, mode)
     or parent.type == 'setglobal'
     or parent.type == 'setfield'
     or parent.type == 'setmethod'
-    or parent.type == 'setindex'
-    or parent.type == 'tableindex'
     or parent.type == 'tablefield' then
         m.searchRefs(status, parent, mode)
+    elseif parent.type == 'setindex'
+    or     parent.type == 'tableindex' then
+        if parent.index == obj then
+            m.searchRefs(status, parent, mode)
+        end
     end
 end
 

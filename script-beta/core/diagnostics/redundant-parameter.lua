@@ -62,14 +62,10 @@ return function (uri, callback)
 
         local func = source.node
         local funcArgs
-        if not vm.hasType(func, 'function') then
-            return
-        end
         local defs = vm.getDefs(func)
         for _, def in ipairs(defs) do
-            local value = guide.getObjectValue(def) or def
-            if value.type == 'function' then
-                local args = countFuncArgs(value)
+            if def.type == 'function' then
+                local args = countFuncArgs(def)
                 if not funcArgs or args > funcArgs then
                     funcArgs = args
                 end

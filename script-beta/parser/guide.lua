@@ -1890,15 +1890,26 @@ function m.cleanResults(results)
 end
 
 --function m.getRefCache(status, obj, mode)
---    if not status.interface.cache then
+--    local cache = status.interface.cache and status.interface.cache()
+--    if not cache then
 --        return
 --    end
---    if obj.type == 'getglobal'
---    or obj.type == 'setglobal' then
---        local name = m.getKeyName(obj)
---        return status.interface.cache(name, mode, status.index == 1)
---    else
---        return status.interface.cache(obj, mode, status.index == 1)
+--    if m.isGlobal(obj) then
+--        obj = m.getKeyName(obj)
+--    end
+--    if not cache[mode] then
+--        cache[mode] = {}
+--    end
+--    local sourceCache = cache[mode][obj]
+--    if sourceCache then
+--        return sourceCache
+--    end
+--    sourceCache = {}
+--    cache[mode][obj] = sourceCache
+--    return nil, function (results)
+--        for i = 1, #results do
+--            sourceCache[i] = results[i]
+--        end
 --    end
 --end
 
@@ -1909,8 +1920,7 @@ function m.getRefCache(status, obj, mode)
     end
     cache = status.cache.refCache or {}
     status.cache.refCache = cache
-    if obj.type == 'getglobal'
-    or obj.type == 'setglobal' then
+    if m.isGlobal(obj) then
         obj = m.getKeyName(obj)
     end
     if not cache[mode] then

@@ -19,6 +19,11 @@ local function eachFieldOfLibrary(results)
 end
 
 local function eachField(source)
+    local unlock = vm.lock('eachField', source)
+    if not unlock then
+        return
+    end
+
     while source.type == 'paren' do
         source = source.exp
     end
@@ -31,25 +36,30 @@ local function eachField(source)
     if library.object[source.type] then
         eachFieldInLibrary(source, library.object[source.type], results)
     end
+
+    unlock()
     return results
 end
 
+function vm.getFields(source)
+    if guide.isGlobal(source) then
+        local name = guide.getKeyName(source)
+        local cache =  vm.getCache('eachFieldOfGlobal')[name]
+                    or vm.getCache('eachField')[source]
+                    or eachField(source)
+        vm.getCache('eachFieldOfGlobal')[name] = cache
+        return cache
+    else
+        local cache =  vm.getCache('eachField')[source]
+                    or eachField(source)
+        vm.getCache('eachField')[source] = cache
+        return cache
+    end
+end
+
 function vm.eachField(source, callback)
-    local cache = vm.getCache('eachField')[source]
-    if cache ~= nil then
-        for i = 1, #cache do
-            callback(cache[i])
-        end
-        return
-    end
-    local unlock = vm.lock('eachField', source)
-    if not unlock then
-        return
-    end
-    cache = eachField(source)
-    vm.getCache('eachField')[source] = cache
-    unlock()
-    for i = 1, #cache do
-        callback(cache[i])
+    local results = vm.getFields(source)
+    for i = 1, #results do
+        callback(results[i])
     end
 end

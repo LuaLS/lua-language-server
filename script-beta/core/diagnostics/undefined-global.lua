@@ -23,8 +23,7 @@ return function (uri, callback)
         if library.global[key] then
             return
         end
-        local sets = vm.getGlobalSets(guide.getKeyName(src))
-        if #sets > 0 then
+        if #vm.getGlobalSets(guide.getKeyName(src)) > 0 then
             return
         end
         local message = lang.script('DIAG_UNDEF_GLOBAL', key)

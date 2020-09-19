@@ -25,9 +25,19 @@ local function getRefs(source, results)
 end
 
 function vm.getRefs(source)
-    local cache = vm.getCache('eachRef')[source] or getRefs(source)
-    vm.getCache('eachRef')[source] = cache
-    return cache
+    if guide.isGlobal(source) then
+        local name = guide.getKeyName(source)
+        local cache =  vm.getCache('eachRefOfGlobal')[name]
+                    or vm.getCache('eachRef')[source]
+                    or getRefs(source)
+        vm.getCache('eachRefOfGlobal')[name] = cache
+        return cache
+    else
+        local cache =  vm.getCache('eachRef')[source]
+                    or getRefs(source)
+        vm.getCache('eachRef')[source] = cache
+        return cache
+    end
 end
 
 function vm.eachRef(source, callback)

@@ -28,9 +28,19 @@ function m.eachDef(source, results)
 end
 
 function vm.getDefs(source)
-    local cache = vm.getCache('eachDef')[source] or m.eachDef(source)
-    vm.getCache('eachDef')[source] = cache
-    return cache
+    if guide.isGlobal(source) then
+        local name = guide.getKeyName(source)
+        local cache =  vm.getCache('eachDefOfGlobal')[name]
+                    or vm.getCache('eachDef')[source]
+                    or m.eachDef(source)
+        vm.getCache('eachDefOfGlobal')[name] = cache
+        return cache
+    else
+        local cache =  vm.getCache('eachDef')[source]
+                    or m.eachDef(source)
+        vm.getCache('eachDef')[source] = cache
+        return cache
+    end
 end
 
 function vm.eachDef(source, callback)

@@ -38,7 +38,9 @@ local function getField(src)
     if src.parent.type == 'tableindex'
     or src.parent.type == 'setindex'
     or src.parent.type == 'getindex' then
-        src = src.parent
+        if src.parent.index == src then
+            src = src.parent
+        end
     end
     local tp = vm.getInferType(src)
     local class = vm.getClass(src)

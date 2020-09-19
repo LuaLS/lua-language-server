@@ -188,6 +188,9 @@ function m.refresh(uri)
 end
 
 function m.diagnosticsAll()
+    if not m._start then
+        return
+    end
     await.close 'diagnosticsAll'
     await.call(function ()
         local clock = os.clock()

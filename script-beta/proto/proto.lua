@@ -5,6 +5,7 @@ local pub        = require 'pub'
 local jsonrpc    = require 'jsonrpc'
 local ErrorCodes = require 'define.ErrorCodes'
 local timer      = require 'timer'
+local json       = require 'json'
 
 local reqCounter = util.counter()
 
@@ -30,10 +31,9 @@ function m.response(id, res)
         log.error('Response id is nil!', util.dump(res))
         return
     end
-    -- res 可能是nil，为了转成json时保留nil，使用 container 容器
-    local data = util.container()
+    local data  = {}
     data.id     = id
-    data.result = res
+    data.result = res == nil and json.null or res
     local buf = jsonrpc.encode(data)
     --log.debug('Response', id, #buf)
     io.stdout:write(buf)

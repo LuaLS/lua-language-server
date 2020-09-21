@@ -42,14 +42,13 @@ local function getField(src)
             src = src.parent
         end
     end
-    local tp = vm.getInferType(src)
-    local class = vm.getClass(src)
-    local literal = vm.getInferLiteral(src)
-    local key = getKey(src)
+    local tp = vm.getInferType(src, 'simple')
+    local class = vm.getClass(src, 'simple')
+    local literal = vm.getInferLiteral(src, 'simple')
     if type(literal) == 'string' and #literal >= 50 then
         literal = literal:sub(1, 47) .. '...'
     end
-    return key, class or tp, literal
+    return class or tp, literal
 end
 
 local function buildAsHash(classes, literals)
@@ -150,10 +149,11 @@ return function (source)
     local literals = {}
     local classes = {}
     vm.eachField(source, function (src)
-        local key, class, literal = getField(src)
+        local key = getKey(src)
         if not key then
             return
         end
+        local class, literal = getField(src)
         if not classes[key] then
             classes[key] = {}
         end

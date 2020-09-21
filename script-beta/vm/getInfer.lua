@@ -29,13 +29,13 @@ function vm.hasInferType(source, type)
     return false
 end
 
-function vm.getInferType(source)
-    local infers = vm.getInfers(source)
+function vm.getInferType(source, simple)
+    local infers = vm.getInfers(source, simple)
     return guide.viewInferType(infers)
 end
 
-function vm.getInferLiteral(source)
-    local infers = vm.getInfers(source)
+function vm.getInferLiteral(source, simple)
+    local infers = vm.getInfers(source, simple)
     local literals = {}
     local mark = {}
     for _, infer in ipairs(infers) do
@@ -54,12 +54,12 @@ end
 
 --- 获取对象的值
 --- 会尝试穿透函数调用
-function vm.getInfers(source)
+function vm.getInfers(source, simple)
     if not source then
         return
     end
     local clock = os.clock()
-    local infers = guide.requestInfer(source, vm.interface)
+    local infers = guide.requestInfer(source, vm.interface, simple)
     if os.clock() - clock > 0.1 then
         log.warn(('Request infer takes [%.3f]sec! %s %s'):format(os.clock() - clock, guide.getUri(source), util.dump(source, { deep = 1 })))
     end

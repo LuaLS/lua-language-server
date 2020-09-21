@@ -6,8 +6,8 @@ local await = require 'await'
 
 local m = {}
 
-function m.eachDef(source, results)
-    results = results or {}
+function m.eachDef(source, simple)
+    local results = {}
     local lock = vm.lock('eachDef', source)
     if not lock then
         return results
@@ -16,7 +16,7 @@ function m.eachDef(source, results)
     await.delay()
 
     local clock = os.clock()
-    local myResults, count = guide.requestDefinition(source, vm.interface)
+    local myResults, count = guide.requestDefinition(source, vm.interface, simple)
     if DEVELOP and os.clock() - clock > 0.1 then
         log.warn('requestDefinition', count, os.clock() - clock, guide.getUri(source), util.dump(source, { deep = 1 }))
     end
@@ -27,7 +27,7 @@ function m.eachDef(source, results)
     return results
 end
 
-function vm.getDefs(source)
+function vm.getDefs(source, simple)
     if guide.isGlobal(source) then
         local name = guide.getKeyName(source)
         local cache =  vm.getCache('eachDefOfGlobal')[name]
@@ -35,6 +35,8 @@ function vm.getDefs(source)
                     or m.eachDef(source)
         vm.getCache('eachDefOfGlobal')[name] = cache
         return cache
+    elseif simple then
+        return m.eachDef(source, simple)
     else
         local cache =  vm.getCache('eachDef')[source]
                     or m.eachDef(source)

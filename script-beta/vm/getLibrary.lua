@@ -1,14 +1,14 @@
 local vm      = require 'vm.vm'
 local guide   = require 'parser.guide'
 
-local function getLibrary(source)
+local function getLibrary(source, simple)
     if source.type == 'library' then
         return source
     end
     if source.library then
         return source.library
     end
-    local defs = vm.getDefs(source)
+    local defs = vm.getDefs(source, simple)
     for _, def in ipairs(defs) do
         if def.type == 'library' then
             return def
@@ -17,7 +17,10 @@ local function getLibrary(source)
     return nil
 end
 
-function vm.getLibrary(source)
+function vm.getLibrary(source, simple)
+    if simple then
+        return getLibrary(source, simple) or false
+    end
     local cache = vm.getCache('getLibrary')[source]
     if cache ~= nil then
         return cache

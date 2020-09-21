@@ -87,10 +87,13 @@ function m.close(id)
     if not map then
         return
     end
+    local count = 0
     for co in pairs(map) do
         map[co] = nil
         coroutine.close(co)
+        count = count + 1
     end
+    log.debug('Close await:', count)
 end
 
 --- 休眠一段时间

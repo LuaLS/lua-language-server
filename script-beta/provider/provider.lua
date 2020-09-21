@@ -383,7 +383,10 @@ proto.on('textDocument/completion', function (params)
         end
         items[i] = item
     end
-    return items
+    return {
+        isIncomplete = false,
+        items        = items,
+    }
 end)
 
 proto.on('completionItem/resolve', function (item)

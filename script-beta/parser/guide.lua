@@ -994,6 +994,7 @@ function m.status(parentStatus, interface)
         interface = parentStatus and parentStatus.interface   or {},
         locks     = parentStatus and parentStatus.locks       or {},
         index     = parentStatus and (parentStatus.index + 1) or 1,
+        simple    = parentStatus and parentStatus.simple,
         results   = {},
     }
     status.lock = status.locks[status.index] or {}
@@ -1692,7 +1693,7 @@ function m.checkSameSimple(status, simple, data, mode, results, queue)
         m.checkSameSimpleInValueOfCallMetaTable(status, ref, i, queue)
         -- 检查自己是特殊分支的情况
         m.checkSameSimpleInSpecialBranch(status, ref, i, queue)
-        if cmode == 'ref' then
+        if cmode == 'ref' and not status.simple then
             -- 检查形如 { a = f } 的情况
             m.checkSameSimpleAsTableField(status, ref, i, queue)
             -- 检查形如 return m 的情况
@@ -2881,7 +2882,10 @@ function m.searchInfer(status, obj)
         obj = obj.parent
     end
 
-    local cache, makeCache = m.getRefCache(status, obj, 'infer')
+    local cache, makeCache
+    if not status.simple then
+        cache, makeCache = m.getRefCache(status, obj, 'infer')
+    end
     if cache then
         for i = 1, #cache do
             status.results[#status.results+1] = cache[i]
@@ -2905,7 +2909,9 @@ function m.searchInfer(status, obj)
         return
     end
 
-    m.inferByDef(status, obj)
+    if not status.simple then
+        m.inferByDef(status, obj)
+    end
     m.inferBySet(status, obj)
     m.inferByCall(status, obj)
     m.inferByGetTable(status, obj)
@@ -2923,8 +2929,9 @@ end
 --- 与 `return function` 形式。
 --- 不穿透 `setmetatable` ，考虑由
 --- 业务层进行反向 def 搜索。
-function m.requestReference(obj, interface)
+function m.requestReference(obj, interface, simple)
     local status = m.status(nil, interface)
+    status.simple = simple
     -- 根据 field 搜索引用
     m.searchRefs(status, obj, 'ref')
 
@@ -2940,8 +2947,9 @@ end
 --- 请求对象的定义，包括 `a.b.c` 形式
 --- 与 `return function` 形式。
 --- 穿透 `setmetatable` 。
-function m.requestDefinition(obj, interface)
+function m.requestDefinition(obj, interface, simple)
     local status = m.status(nil, interface)
+    status.simple = simple
     -- 根据 field 搜索定义
     m.searchRefs(status, obj, 'def')
 
@@ -2954,8 +2962,9 @@ function m.requestFields(obj, interface)
 end
 
 --- 请求对象的类型推测
-function m.requestInfer(obj, interface)
+function m.requestInfer(obj, interface, simple)
     local status = m.status(nil, interface)
+    status.simple = simple
     m.searchInfer(status, obj)
 
     return status.results, status.cache.count

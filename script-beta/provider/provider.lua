@@ -10,6 +10,8 @@ local config    = require 'config'
 local library   = require 'library'
 local markdown  = require 'provider.markdown'
 local client    = require 'provider.client'
+local furi      = require 'file-uri'
+local pub       = require 'pub'
 
 local function updateConfig()
     local configs = proto.awaitRequest('workspace/configuration', {
@@ -120,7 +122,26 @@ end)
 
 proto.on('workspace/didChangeWatchedFiles', function (params)
     for _, change in ipairs(params.changes) do
-        if change.type == define.FileChangeType.Created then
+        local uri = change.uri
+        -- TODO 创建文件与删除文件直接重新扫描（文件改名、文件夹删除等情况太复杂了）
+        if change.type == define.FileChangeType.Created
+        or change.type == define.FileChangeType.Deleted then
+            workspace.reload()
+            break
+        elseif change.type == define.FileChangeType.Changed then
+            -- 如果文件处于关闭状态，则立即更新；否则等待didChange协议来更新
+            if files.isLua(uri) and not files.isOpen(uri) then
+                files.setText(uri, pub.awaitTask('loadFile', uri))
+            else
+                local path = furi.decode(uri)
+                local filename = path:filename():string()
+                -- 排除类文件发生更改需要重新扫描
+                if files.eq(filename, '.gitignore')
+                or files.eq(filename, '.gitmodules') then
+                    workspace.reload()
+                    break
+                end
+            end
         end
     end
 end)

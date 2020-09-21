@@ -465,14 +465,3 @@ local function
         valueRange = {9, 22},
     }
 }
-
--- 临时
-local fs = require 'bee.filesystem'
-local function testIfExit(path)
-    local buf = io.load(fs.path(path))
-    if buf then
-        TEST(buf)(EXISTS)
-    end
-end
-testIfExit[[D:\Github\lua\testes\coroutine.lua]]
-testIfExit[[D:\Github\War3-lua-map\scripts\game\init.lua]]

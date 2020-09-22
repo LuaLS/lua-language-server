@@ -1,3 +1,4 @@
+local platform = require 'bee.platform'
 local m = {}
 
 m.cache = {}
@@ -35,6 +36,11 @@ function m.getVisiblePath(path, searchers)
             end
             pos = path:match('[/\\]+()', pos)
             for _, searcher in ipairs(searchers) do
+                if platform.OS == 'Windows' then
+                    searcher = searcher:gsub('[/\\]+', '\\')
+                else
+                    searcher = searcher:gsub('[/\\]+', '/')
+                end
                 local expect = getOnePath(cutedPath, searcher)
                 if expect then
                     if head then

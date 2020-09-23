@@ -2,6 +2,7 @@ local files = require 'files'
 local guide = require 'parser.guide'
 local skind = require 'define.SymbolKind'
 local lname = require 'core.hover.name'
+local util  = require 'utility'
 
 local function buildFunction(source, symbols)
     local name = lname(source)
@@ -29,11 +30,58 @@ local function buildFunction(source, symbols)
     }
 end
 
+local function buildValue(source, symbols)
+    local name  = lname(source)
+    local valueRange
+    local details = {}
+    if source.type == 'local' then
+        details[1] = 'local '
+    end
+    details[2] = name
+    if source.value then
+        local literal = source.value[1]
+        if source.value.type == 'boolean' then
+            details[3] = ': boolean'
+            if literal ~= nil then
+                details[4] = ' = '
+                details[5] = util.viewLiteral(source.value[1])
+            end
+        elseif source.value.type == 'string' then
+            details[3] = ': string'
+            if literal ~= nil then
+                details[4] = ' = '
+                details[5] = util.viewLiteral(source.value[1])
+            end
+        elseif source.value.type == 'number' then
+            details[3] = ': number'
+            if literal ~= nil then
+                details[4] = ' = '
+                details[5] = util.viewLiteral(source.value[1])
+            end
+        elseif source.value.type == 'table' then
+            details[3] = ': {}'
+        end
+        valueRange = { source.value.start, source.value.finish }
+    else
+        valueRange = { source.start, source.finish }
+    end
+    symbols[#symbols+1] = {
+        name           = name,
+        detail         = table.concat(details),
+        kind           = skind.Variable,
+        range          = { source.start, source.finish },
+        selectionRange = { source.start, source.finish },
+        valueRange     = valueRange,
+    }
+end
+
 local function buildSet(source, used, symbols)
     local value = source.value
-    if value.type == 'function' then
+    if value and value.type == 'function' then
         used[value] = true
         buildFunction(source, symbols)
+    else
+        buildValue(source, symbols)
     end
 end
 
@@ -63,6 +111,35 @@ local function buildSource(source, used, symbols)
     end
 end
 
+local function packChild(symbols, finish)
+    local t
+    while true do
+        local symbol = symbols[#symbols]
+        if not symbol then
+            break
+        end
+        if symbol.valueRange[1] > finish then
+            break
+        end
+        symbols[#symbols] = nil
+        symbol.children = packChild(symbols, symbol.valueRange[2])
+        if not t then
+            t = {}
+        end
+        t[#t+1] = symbol
+    end
+    return t
+end
+
+local function packSymbols(symbols)
+    -- 按照start位置反向排序
+    table.sort(symbols, function (a, b)
+        return a.range[1] > b.range[1]
+    end)
+    -- 处理嵌套
+    return packChild(symbols, math.maxinteger)
+end
+
 return function (uri)
     local ast = files.getAst(uri)
     if not ast then
@@ -75,5 +152,7 @@ return function (uri)
         buildSource(source, used, symbols)
     end)
 
-    return symbols
+    local packedSymbols = packSymbols(symbols)
+
+    return packedSymbols
 end

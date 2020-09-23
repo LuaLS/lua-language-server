@@ -255,7 +255,7 @@ local z
     },
     [4] = {
         name = 'z',
-        detail = '',
+        detail = 'local z',
         kind = SymbolKind.Variable,
         range = {102, 102},
         selectionRange = {102, 102},

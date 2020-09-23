@@ -56,6 +56,10 @@ local function asLibrary(source, oop)
 end
 
 local function buildName(source, oop)
+    if oop == nil then
+        oop =  source.type == 'setmethod'
+            or source.type == 'getmethod'
+    end
     if source.type == 'library' then
         return asLibrary(source.value, oop) or ''
     elseif source.library then

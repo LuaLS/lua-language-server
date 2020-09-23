@@ -145,4 +145,6 @@ function m.getCache(name)
     return m.cache[name]
 end
 
+m.flushCache()
+
 return m

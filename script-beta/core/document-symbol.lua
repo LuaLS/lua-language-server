@@ -213,6 +213,10 @@ return function (uri)
         buildSource(source, used, symbols)
     end)
 
+    if #symbols == 0 then
+        return nil
+    end
+
     local packedSymbols = packSymbols(symbols)
 
     return packedSymbols

@@ -13,6 +13,7 @@ local client    = require 'provider.client'
 local furi      = require 'file-uri'
 local pub       = require 'pub'
 local fs        = require 'bee.filesystem'
+local lang      = require 'language'
 
 local function updateConfig()
     local configs = proto.awaitRequest('workspace/configuration', {
@@ -474,4 +475,53 @@ proto.on('textDocument/signatureHelp', function (params)
     return {
         signatures = infos,
     }
+end)
+
+proto.on('textDocument/documentSymbol', function (params)
+    local core = require 'core.document-symbol'
+    await.close('textDocument/documentSymbol')
+    await.setID('textDocument/documentSymbol')
+    local uri   = params.textDocument.uri
+    local lines = files.getLines(uri)
+    local text  = files.getText(uri)
+    while not lines or not text do
+        await.sleep(0.1)
+        lines = files.getLines(uri)
+        text  = files.getText(uri)
+    end
+
+    local symbols = core(uri)
+    if not symbols then
+        return nil
+    end
+
+    local function convert(symbol)
+        await.delay()
+        symbol.range = define.range(
+            lines,
+            text,
+            symbol.range[1],
+            symbol.range[2]
+        )
+        symbol.selectionRange = define.range(
+            lines,
+            text,
+            symbol.selectionRange[1],
+            symbol.selectionRange[2]
+        )
+        if symbol.name == '' then
+            symbol.name = lang.script.SYMBOL_ANONYMOUS
+        end
+        if symbol.children then
+            for _, child in ipairs(symbol.children) do
+                convert(child)
+            end
+        end
+    end
+
+    for _, symbol in ipairs(symbols) do
+        convert(symbol)
+    end
+
+    return symbols
 end)

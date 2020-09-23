@@ -64,14 +64,6 @@ function m.await(callback, ...)
     end, ...)
 end
 
---- 设置一个可继承的关闭器，在设置时，以及创建子协程时会调用
-function m.setCloser(callback, co)
-    co = co or coroutine.running()
-    local current = m.coMap[co]
-    current[callback] = true
-    callback(co)
-end
-
 --- 设置一个id，用于批量关闭任务
 function m.setID(id, co)
     co = co or coroutine.running()

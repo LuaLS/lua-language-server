@@ -15,7 +15,7 @@ m.initer = {
     renameProvider = {
         prepareProvider = true,
     },
-    --documentSymbolProvider = true,
+    documentSymbolProvider = true,
     documentHighlightProvider = true,
     --codeActionProvider = true,
     signatureHelpProvider = {

@@ -273,7 +273,7 @@ local t = {
 {
     [1] = {
         name = 't',
-        detail = EXISTS,
+        detail = 'local t: {a = ..., b = ..., c = ...}',
         kind = SymbolKind.Variable,
         range = {7, 7},
         selectionRange = {7, 7},
@@ -358,30 +358,54 @@ g = 1
         range = {1, 22},
         selectionRange = {16, 16},
         valueRange = {1, 22},
+    },
+    [2] = {
+        name = 'g',
+        detail = 'setlocal g: number = 1',
+        kind = SymbolKind.Variable,
+        range = {25, 25},
+        selectionRange = {25, 25},
+        valueRange = {29, 29},
     }
 }
 
 TEST[[
-function f(...)
+function f(a, b, ...)
     local x = ...
     print(x.a)
 end
 ]]{
     [1] = {
         name = 'f',
-        detail = 'function f(...)',
+        detail = 'function f(a, b, ...)',
         kind = SymbolKind.Function,
-        range = {1, 52},
+        range = {1, 58},
         selectionRange = {10, 10},
-        valueRange = {1, 52},
+        valueRange = {1, 58},
         children = {
             [1] = {
+                name = 'a',
+                detail = 'param a',
+                kind = SymbolKind.TypeParameter,
+                range = {12, 12},
+                selectionRange = {12, 12},
+                valueRange = {12, 12},
+            },
+            [2] = {
+                name = 'b',
+                detail = 'param b',
+                kind = SymbolKind.TypeParameter,
+                range = {15, 15},
+                selectionRange = {15, 15},
+                valueRange = {15, 15},
+            },
+            [3] = {
                 name = 'x',
-                detail = EXISTS,
+                detail = 'local x',
                 kind = SymbolKind.Variable,
-                range = {27, 27},
-                selectionRange = {27, 27},
-                valueRange = {31, 33},
+                range = {33, 33},
+                selectionRange = {33, 33},
+                valueRange = {37, 39},
             }
         }
     },
@@ -420,18 +444,10 @@ local function
 ]]{
     [1] = {
         name = 'x',
-        detail = EXISTS,
+        detail = 'local x',
         kind = SymbolKind.Variable,
         range = {7, 7},
         selectionRange = {7, 7},
         valueRange = {7, 7},
     },
-    [2] = {
-        name = '',
-        detail = EXISTS,
-        kind = SymbolKind.Function,
-        range = {9, 22},
-        selectionRange = {22, 22},
-        valueRange = {9, 22},
-    }
 }

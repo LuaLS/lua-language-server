@@ -3,6 +3,22 @@ local guide = require 'parser.guide'
 local skind = require 'define.SymbolKind'
 local lname = require 'core.hover.name'
 local util  = require 'utility'
+local await = require 'await'
+
+local function buildFunctionParams(func)
+    if not func.args then
+        return ''
+    end
+    local params = {}
+    for i, arg in ipairs(func.args) do
+        if arg.type == '...' then
+            params[i] = '...'
+        else
+            params[i] = arg[1] or ''
+        end
+    end
+    return table.concat(params, ', ')
+end
 
 local function buildFunction(source, symbols)
     local name = lname(source)
@@ -22,7 +38,7 @@ local function buildFunction(source, symbols)
     end
     symbols[#symbols+1] = {
         name           = name,
-        detail         = ('function %s()'):format(name or ''),
+        detail         = ('function %s(%s)'):format(name or '', buildFunctionParams(func)),
         kind           = kind,
         range          = range,
         selectionRange = { source.start, source.finish },
@@ -30,12 +46,50 @@ local function buildFunction(source, symbols)
     }
 end
 
+local function buildTable(tbl)
+    local buf = {}
+    for i = 1, 3 do
+        local field = tbl[i]
+        if not field then
+            break
+        end
+        if field.type == 'tablefield' then
+            buf[i] = ('%s = ...'):format(field.field[1])
+        end
+    end
+    return table.concat(buf, ', ')
+end
+
 local function buildValue(source, symbols)
     local name  = lname(source)
-    local valueRange
+    local range, valueRange, kind
     local details = {}
     if source.type == 'local' then
-        details[1] = 'local '
+        if source.parent.type == 'funcargs' then
+            details[1] = 'param '
+            range      = { source.start, source.finish }
+            kind       = skind.TypeParameter
+        else
+            details[1] = 'local '
+            range      = { source.start, source.finish }
+            kind       = skind.Variable
+        end
+    elseif source.type == 'setlocal' then
+        details[1] = 'setlocal '
+        range      = { source.start, source.finish }
+        kind       = skind.Variable
+    elseif source.type == 'setglobal' then
+        details[1] = 'global '
+        range      = { source.start, source.finish }
+        kind       = skind.Constant
+    elseif source.type == 'tablefield' then
+        details[1] = 'field '
+        range      = { source.field.start, source.field.finish }
+        kind       = skind.Class
+    else
+        details[1] = 'field '
+        range      = { source.field.start, source.field.finish }
+        kind       = skind.Field
     end
     details[2] = name
     if source.value then
@@ -59,18 +113,20 @@ local function buildValue(source, symbols)
                 details[5] = util.viewLiteral(source.value[1])
             end
         elseif source.value.type == 'table' then
-            details[3] = ': {}'
+            details[3] = ': {'
+            details[4] = buildTable(source.value)
+            details[5] = '}'
         end
         valueRange = { source.value.start, source.value.finish }
     else
-        valueRange = { source.start, source.finish }
+        valueRange = range
     end
     symbols[#symbols+1] = {
         name           = name,
         detail         = table.concat(details),
-        kind           = skind.Variable,
-        range          = { source.start, source.finish },
-        selectionRange = { source.start, source.finish },
+        kind           = kind,
+        range          = range,
+        selectionRange = range,
         valueRange     = valueRange,
     }
 end
@@ -102,16 +158,21 @@ end
 
 local function buildSource(source, used, symbols)
     if     source.type == 'local'
+    or     source.type == 'setlocal'
     or     source.type == 'setglobal'
     or     source.type == 'setfield'
-    or     source.type == 'setmethod' then
+    or     source.type == 'setmethod'
+    or     source.type == 'tablefield' then
+        await.delay()
         buildSet(source, used, symbols)
     elseif source.type == 'function' then
+        await.delay()
         buildAnonymousFunction(source, used, symbols)
     end
 end
 
 local function packChild(symbols, finish)
+    await.delay()
     local t
     while true do
         local symbol = symbols[#symbols]

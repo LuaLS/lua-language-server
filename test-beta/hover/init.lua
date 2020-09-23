@@ -755,6 +755,17 @@ field t.v: {
 }
 ]]
 
+TEST [[
+local <?t?> = {
+    f = io.open(),
+}
+]]
+[[
+local t: {
+    f: FILE*,
+}
+]]
+
 --TEST[[
 -----@class Class
 --local <?x?> = class()

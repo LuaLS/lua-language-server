@@ -2755,10 +2755,19 @@ local function mergeLibraryFunctionReturns(status, source, index)
     end
     local rtn = returns[index]
     if rtn then
-        status.results[#status.results+1] = {
-            type   = rtn.type,
-            source = rtn,
-        }
+        if type(rtn.type) == 'table' then
+            for _, tp in ipairs(rtn.type) do
+                status.results[#status.results+1] = {
+                    type   = tp,
+                    source = rtn,
+                }
+            end
+        else
+            status.results[#status.results+1] = {
+                type   = rtn.type,
+                source = rtn,
+            }
+        end
     end
 end
 
@@ -2806,6 +2815,10 @@ function m.inferByCallReturnAndIndex(status, call, index)
 end
 
 function m.inferByCallReturn(status, source)
+    if source.type == 'call' then
+        m.inferByCallReturnAndIndex(status, source, 1)
+        return
+    end
     if source.type ~= 'select' then
         if source.value and source.value.type == 'select' then
             source = source.value
@@ -2877,9 +2890,12 @@ function m.searchInfer(status, obj)
     while obj.type == 'paren' do
         obj = obj.exp
     end
-    obj = m.getObjectValue(obj) or obj
-    if obj.type == 'select' then
-        obj = obj.parent
+    while true do
+        local value = m.getObjectValue(obj)
+        if not value or value == obj then
+            break
+        end
+        obj = value
     end
 
     local cache, makeCache

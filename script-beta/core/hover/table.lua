@@ -111,6 +111,23 @@ local function mergeLiteral(literals)
     return table.concat(results, '|')
 end
 
+local function mergeTypes(types)
+    local results = {}
+    local mark = {
+        -- 讲道理table的keyvalue不会是nil
+        ['nil'] = true,
+    }
+    for _, tv in ipairs(types) do
+        for tp in tv:gmatch '[^|]+' do
+            if not mark[tp] then
+                mark[tp] = true
+                results[#results+1] = tp
+            end
+        end
+    end
+    return guide.mergeTypes(results)
+end
+
 local function clearClasses(classes)
     local knownClasses = {
         ['any'] = true,
@@ -168,7 +185,7 @@ return function (source)
 
     for key, class in pairs(classes) do
         literals[key] = mergeLiteral(literals[key])
-        classes[key] = guide.mergeTypes(class)
+        classes[key] = mergeTypes(class)
     end
 
     if not next(classes) then

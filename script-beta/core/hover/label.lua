@@ -95,7 +95,7 @@ local function asString(source)
         return ''
     end
     local len = #str
-    local charLen = utf8.len(str, 1, -1, true)
+    local charLen = util.utf8Len(str, 1, -1)
     -- TODO 翻译
     if len == charLen then
         return ('%d 个字节'):format(len)

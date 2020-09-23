@@ -1,4 +1,5 @@
-local m = require 'lpeglabel'
+local m    = require 'lpeglabel'
+local util = require 'utility'
 
 local row
 local fl
@@ -19,7 +20,7 @@ local function rowcol_utf8(str, n)
     row = 1
     fl = 1
     ROWCOL:match(str:sub(1, n))
-    return row, utf8.len(str, fl, n)
+    return row, util.utf8Len(str, fl, n)
 end
 
 local function position(str, _row, _col)

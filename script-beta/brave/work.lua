@@ -1,11 +1,11 @@
 local brave   = require 'brave.brave'
-local jsonrpc = require 'jsonrpc'
 local parser  = require 'parser'
 local fs      = require 'bee.filesystem'
 local furi    = require 'file-uri'
 local util    = require 'utility'
 
 brave.on('loadProto', function ()
+    local jsonrpc = require 'jsonrpc'
     while true do
         local proto = jsonrpc.decode(io.read, log.error)
         --log.debug('loaded proto', proto.method)

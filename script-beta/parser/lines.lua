@@ -1,5 +1,4 @@
 local m = require 'lpeglabel'
-local utf8Len = utf8.len
 
 _ENV = nil
 

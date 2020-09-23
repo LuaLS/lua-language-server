@@ -12,6 +12,7 @@ local markdown  = require 'provider.markdown'
 local client    = require 'provider.client'
 local furi      = require 'file-uri'
 local pub       = require 'pub'
+local fs        = require 'bee.filesystem'
 
 local function updateConfig()
     local configs = proto.awaitRequest('workspace/configuration', {
@@ -134,7 +135,7 @@ proto.on('workspace/didChangeWatchedFiles', function (params)
                 files.setText(uri, pub.awaitTask('loadFile', uri))
             else
                 local path = furi.decode(uri)
-                local filename = path:filename():string()
+                local filename = fs.path(path):filename():string()
                 -- 排除类文件发生更改需要重新扫描
                 if files.eq(filename, '.gitignore')
                 or files.eq(filename, '.gitmodules') then

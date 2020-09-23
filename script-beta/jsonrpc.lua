@@ -1,6 +1,7 @@
 local json  = require 'json'
 local pcall = pcall
 local tonumber = tonumber
+local log = require 'brave.log'
 
 _ENV = nil
 

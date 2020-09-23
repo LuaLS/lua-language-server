@@ -7,11 +7,13 @@ description = 'The pattern which matches exactly one UTF-8 byte sequence, assumi
 [codes]
 description = [[
 --------
+Returns values so that the construction
 ```lua
 for p, c in utf8.codes(s) do
     body
 end
 ```
+will iterate over all UTF-8 characters in string s, with p being the position (in bytes) and c the code point of each character. It raises an error if it meets any invalid byte sequence.  
 ]]
 
 ["codes Lua 5.4"]

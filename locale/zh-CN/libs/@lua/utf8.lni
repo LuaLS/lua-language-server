@@ -7,21 +7,25 @@ description = '用于精确匹配到一个 UTF-8 字节序列的模式，它假�
 [codes]
 description = [[
 --------
+返回一系列的值，可以让
 ```lua
 for p, c in utf8.codes(s) do
     body
 end
 ```
+迭代出字符串 s 中所有的字符。 这里的 p 是位置（按字节数）而 c 是每个字符的编号。 如果处理到一个不合法的字节序列，将抛出一个错误。
 ]]
 
 ["codes Lua 5.4"]
 description = [[
 --------
+返回一系列的值，可以让
 ```lua
 for p, c in utf8.codes(s) do
     body
 end
 ```
+迭代出字符串 s 中所有的字符。 这里的 p 是位置（按字节数）而 c 是每个字符的编号。 如果处理到一个不合法的字节序列，将抛出一个错误。
 ]]
 
 [codepoint]

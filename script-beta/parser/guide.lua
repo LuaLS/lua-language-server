@@ -2780,7 +2780,10 @@ local function mergeFunctionReturns(status, source, index)
         local rtn = returns[i]
         if rtn[index] then
             if rtn[index].type == 'call' then
-                m.inferByCallReturnAndIndex(status, rtn[index], index)
+                if not m.checkReturnMark(status, rtn[index]) then
+                    m.checkReturnMark(status, rtn[index], true)
+                    m.inferByCallReturnAndIndex(status, rtn[index], index)
+                end
             else
                 local newStatus = m.status(status)
                 m.searchInfer(newStatus, rtn[index])
@@ -2808,7 +2811,9 @@ function m.inferByCallReturnAndIndex(status, call, index)
             if src.type == 'library' then
                 mergeLibraryFunctionReturns(status, src.value, index)
             else
-                mergeFunctionReturns(status, src.value, index)
+                if not m.checkReturnMark(status, src.value, true) then
+                    mergeFunctionReturns(status, src.value, index)
+                end
             end
         end
     end

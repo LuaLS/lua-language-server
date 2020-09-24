@@ -281,3 +281,14 @@ local _, _, _, <?b?>, _ = x(nil, true, 1, 'yy')
 TEST 'any' [[
 local <?x?> = next()
 ]]
+
+TEST 'any' [[
+local a, b
+function a()
+    return b()
+end
+function b()
+    return a()
+end
+local <?x?> = a()
+]]

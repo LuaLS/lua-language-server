@@ -73,6 +73,57 @@ local function getDocFormater()
     end
 end
 
+local function buildLibEnum(enum)
+    local line = {}
+    if enum.default then
+        line[#line+1] = '  ->'
+    else
+        line[#line+1] = '   |'
+    end
+    line[#line+1] = enum.enum
+    if enum.description then
+        line[#line+1] = '--'
+        line[#line+1] = enum.description
+    end
+    return table.concat(line, ' ')
+end
+
+local function getArgType(value, name)
+    if not value.args then
+        return ''
+    end
+    for _, arg in ipairs(value.args) do
+        if arg.name == name then
+            if type(arg.type) == 'table' then
+                return ' ' .. table.concat(arg.type, '|')
+            else
+                return arg.type and (' ' .. arg.type) or ''
+            end
+        end
+    end
+    return ''
+end
+
+local function buildLibEnums(value)
+    local results = {}
+    local sorts = {}
+
+    for _, enum in ipairs(value.enums) do
+        local name = enum.name
+        if not results[name] then
+            results[name] = { name .. ':' .. getArgType(value, name) }
+            sorts[#sorts+1] = name
+        end
+        results[name][#results[name]+1] = buildLibEnum(enum)
+    end
+
+    local lines = {}
+    for _, name in ipairs(sorts) do
+        lines[#lines+1] = table.concat(results[name], '\n')
+    end
+    return table.concat(lines, '\n\n')
+end
+
 local function tryLibrary(source)
     local lib = vm.getLibrary(source)
     if not lib then
@@ -81,11 +132,16 @@ local function tryLibrary(source)
     local fmt = getDocFormater()
     local md = markdown()
     if lib.value.description then
+        md:add('markdown', '-------------')
         md:add('markdown', lib.value.description:gsub('%(doc%:(.-)%)', function (tag)
             if fmt then
                 return '(' .. lang.script(fmt, tag) .. ')'
             end
         end))
+    end
+    if lib.value.enums then
+        md:add('markdown', '-------------')
+        md:add('lua', buildLibEnums(lib.value))
     end
     if lib.value.doc and fmt then
         md:add('markdown', ('[%s](%s)'):format(lang.script.HOVER_VIEW_DOCUMENTS, lang.script(fmt, 'pdf-' .. lib.value.doc)))

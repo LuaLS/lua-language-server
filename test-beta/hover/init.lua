@@ -766,6 +766,16 @@ local t: {
 }
 ]]
 
+TEST [[
+io.<?popen?>()
+]]
+[[
+```lua
+function io.popen(prog: string, mode: string)
+  -> any
+  2. error_message: string
+]]
+
 --TEST[[
 -----@class Class
 --local <?x?> = class()

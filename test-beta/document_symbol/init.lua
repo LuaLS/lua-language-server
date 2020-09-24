@@ -273,7 +273,7 @@ local t = {
 {
     [1] = {
         name = 't',
-        detail = 'local t: {a = ..., b = ..., c = ...}',
+        detail = 'local t: {a, b, c}',
         kind = SymbolKind.Variable,
         range = {7, 7},
         selectionRange = {7, 7},
@@ -282,7 +282,7 @@ local t = {
             [1] = {
                 name = 'a',
                 detail = 'field a: number = 1',
-                kind = SymbolKind.Class,
+                kind = SymbolKind.Property,
                 range = {17, 17},
                 selectionRange = {17, 17},
                 valueRange = {21, 21},
@@ -290,7 +290,7 @@ local t = {
             [2] = {
                 name = 'b',
                 detail = 'field b: number = 2',
-                kind = SymbolKind.Class,
+                kind = SymbolKind.Property,
                 range = {28, 28},
                 selectionRange = {28, 28},
                 valueRange = {32, 32},
@@ -298,7 +298,7 @@ local t = {
             [3] = {
                 name = 'c',
                 detail = 'field c: number = 3',
-                kind = SymbolKind.Class,
+                kind = SymbolKind.Property,
                 range = {39, 39},
                 selectionRange = {39, 39},
                 valueRange = {43, 43},
@@ -317,7 +317,7 @@ local t = {
 {
     [1] = {
         name = 't',
-        detail = EXISTS,
+        detail = 'local t: {a}',
         kind = SymbolKind.Variable,
         range = {7, 7},
         selectionRange = {7, 7},
@@ -325,8 +325,8 @@ local t = {
         children = {
             [1] = {
                 name = 'a',
-                detail = EXISTS,
-                kind = SymbolKind.Class,
+                detail = 'field a: {b}',
+                kind = SymbolKind.Property,
                 range = {17, 17},
                 selectionRange = {17, 17},
                 valueRange = {21, 42},
@@ -334,7 +334,7 @@ local t = {
                     [1] = {
                         name = 'b',
                         detail = EXISTS,
-                        kind = SymbolKind.Class,
+                        kind = SymbolKind.Property,
                         range = {31, 31},
                         selectionRange = {31, 31},
                         valueRange = {35, 35},
@@ -386,7 +386,7 @@ end
             [1] = {
                 name = 'a',
                 detail = 'param a',
-                kind = SymbolKind.TypeParameter,
+                kind = SymbolKind.Constant,
                 range = {12, 12},
                 selectionRange = {12, 12},
                 valueRange = {12, 12},
@@ -394,7 +394,7 @@ end
             [2] = {
                 name = 'b',
                 detail = 'param b',
-                kind = SymbolKind.TypeParameter,
+                kind = SymbolKind.Constant,
                 range = {15, 15},
                 selectionRange = {15, 15},
                 valueRange = {15, 15},
@@ -421,7 +421,7 @@ local v = t
 ]]{
     [1] = {
         name = 't',
-        detail = EXISTS,
+        detail = 'local t: {a, b}',
         kind = SymbolKind.Variable,
         range = {7, 7},
         selectionRange = {7, 7},
@@ -430,7 +430,7 @@ local v = t
     },
     [2] = {
         name = 'v',
-        detail = EXISTS,
+        detail = 'local v',
         kind = SymbolKind.Variable,
         range = {44, 44},
         selectionRange = {44, 44},

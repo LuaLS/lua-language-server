@@ -54,7 +54,7 @@ local function buildTable(tbl)
             break
         end
         if field.type == 'tablefield' then
-            buf[i] = ('%s = ...'):format(field.field[1])
+            buf[i] = ('%s'):format(field.field[1])
         end
     end
     return table.concat(buf, ', ')
@@ -68,7 +68,7 @@ local function buildValue(source, symbols)
         if source.parent.type == 'funcargs' then
             details[1] = 'param '
             range      = { source.start, source.finish }
-            kind       = skind.TypeParameter
+            kind       = skind.Constant
         else
             details[1] = 'local '
             range      = { source.start, source.finish }
@@ -85,7 +85,7 @@ local function buildValue(source, symbols)
     elseif source.type == 'tablefield' then
         details[1] = 'field '
         range      = { source.field.start, source.field.finish }
-        kind       = skind.Class
+        kind       = skind.Property
     else
         details[1] = 'field '
         range      = { source.field.start, source.field.finish }

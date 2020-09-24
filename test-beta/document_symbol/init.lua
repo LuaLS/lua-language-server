@@ -209,7 +209,6 @@ local z
         kind = SymbolKind.Variable,
         range = {7, 11},
         selectionRange = {7, 7},
-        valueRange = {11, 11},
     },
     [2] = {
         name = 'f',
@@ -225,7 +224,6 @@ local z
                 kind = SymbolKind.Variable,
                 range = {42, 48},
                 selectionRange = {42, 42},
-                valueRange = {46, 48},
             },
             [2] = {
                 name = 'y',
@@ -251,7 +249,6 @@ local z
         kind = SymbolKind.Variable,
         range = {87, 94},
         selectionRange = {87, 87},
-        valueRange = {91, 94},
     },
     [4] = {
         name = 'z',
@@ -259,7 +256,6 @@ local z
         kind = SymbolKind.Variable,
         range = {102, 102},
         selectionRange = {102, 102},
-        valueRange = {102, 102},
     },
 }
 
@@ -285,7 +281,6 @@ local t = {
                 kind = SymbolKind.Property,
                 range = {17, 21},
                 selectionRange = {17, 17},
-                valueRange = {21, 21},
             },
             [2] = {
                 name = 'b',
@@ -293,7 +288,6 @@ local t = {
                 kind = SymbolKind.Property,
                 range = {28, 32},
                 selectionRange = {28, 28},
-                valueRange = {32, 32},
             },
             [3] = {
                 name = 'c',
@@ -301,7 +295,6 @@ local t = {
                 kind = SymbolKind.Property,
                 range = {39, 43},
                 selectionRange = {39, 39},
-                valueRange = {43, 43},
             },
         }
     }
@@ -337,7 +330,6 @@ local t = {
                         kind = SymbolKind.Property,
                         range = {31, 35},
                         selectionRange = {31, 31},
-                        valueRange = {35, 35},
                     }
                 }
             },
@@ -365,7 +357,6 @@ g = 1
         kind = SymbolKind.Variable,
         range = {25, 29},
         selectionRange = {25, 25},
-        valueRange = {29, 29},
     }
 }
 
@@ -389,7 +380,6 @@ end
                 kind = SymbolKind.Constant,
                 range = {12, 12},
                 selectionRange = {12, 12},
-                valueRange = {12, 12},
             },
             [2] = {
                 name = 'b',
@@ -397,7 +387,6 @@ end
                 kind = SymbolKind.Constant,
                 range = {15, 15},
                 selectionRange = {15, 15},
-                valueRange = {15, 15},
             },
             [3] = {
                 name = 'x',
@@ -405,7 +394,6 @@ end
                 kind = SymbolKind.Variable,
                 range = {33, 39},
                 selectionRange = {33, 33},
-                valueRange = {37, 39},
             }
         }
     },
@@ -434,7 +422,6 @@ local v = t
         kind = SymbolKind.Variable,
         range = {44, 48},
         selectionRange = {44, 44},
-        valueRange = {48, 48},
     },
 }
 
@@ -448,6 +435,37 @@ local function
         kind = SymbolKind.Variable,
         range = {7, 7},
         selectionRange = {7, 7},
-        valueRange = {7, 7},
     },
+}
+
+TEST [[
+local a, b = {
+    x = 1,
+    y = 1,
+    z = 1,
+}, {
+    x = 1,
+    y = 1,
+    z = 1,
+}
+
+]]{
+    [1] = {
+        name = 'a',
+        detail = 'local a: {x, y, z}',
+        kind = SymbolKind.Variable,
+        range = {7, 49},
+        selectionRange = {7, 7},
+        valueRange = {14, 49},
+        children = EXISTS,
+    },
+    [2] = {
+        name = 'b',
+        detail = 'local b: {x, y, z}',
+        kind = SymbolKind.Variable,
+        range = {10, 87},
+        selectionRange = {10, 10},
+        valueRange = {52, 87},
+        children = EXISTS,
+    }
 }

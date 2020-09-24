@@ -571,3 +571,12 @@ end
         }
     }
 }
+
+TEST [[
+local a = f {
+    x = function ()
+    end
+}
+]]
+{
+}

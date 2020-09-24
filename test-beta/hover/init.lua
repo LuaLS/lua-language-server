@@ -232,14 +232,14 @@ TEST [[
 string.<?sub?>()
 ]]
 [[
-function string.sub(string, i: integer, j: integer)
+function string.sub(string, i: integer [, j: integer])
   -> string
 ]]
 
 TEST[[
 ('xx'):<?sub?>()
 ]]
-[[function string:sub(i: integer, j: integer)
+[[function string:sub(i: integer [, j: integer])
   -> string]]
 
 TEST [[
@@ -258,7 +258,7 @@ TEST [[
 <?load?>()
 ]]
 [=[
-function load(chunk: string|function, chunkname: string, mode: string, env: table)
+function load(chunk: string|function [, chunkname: string [, mode: string [, env: table]]])
   -> function
   2. error_message: string
 ]=]
@@ -623,7 +623,7 @@ TEST[[
 <?next?>()
 ]]
 [[
-function next(table: table, index: any)
+function next(table: table [, index: any])
   -> key: any
   2. value: any
 ]]
@@ -770,9 +770,9 @@ TEST [[
 io.<?popen?>()
 ]]
 [[
-function io.popen(prog: string, mode: string)
+function io.popen(prog: string [, mode: string])
   -> FILE*|nil
-  2. error_message: string?
+  2.[error_message: string]
 ]]
 
 --TEST[[

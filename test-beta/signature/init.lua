@@ -111,7 +111,7 @@ TEST [[
 ]]
 {
     label = [[
-function string:sub(i: integer, j: integer)
+function string:sub(i: integer [, j: integer])
 ]],
     arg = {21, 30},
 }

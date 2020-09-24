@@ -18,9 +18,14 @@ local function asLibrary(source)
         local name = rtn.name
         local tp = rtn.type and mergeTypes(rtn.type) or 'any'
         if i == 1 then
-            line[#line+1] = '  -> '
+            line[#line+1] = '  ->'
         else
-            line[#line+1] = ('% 3d. '):format(i)
+            line[#line+1] = ('% 3d.'):format(i)
+        end
+        if rtn.optional then
+            line[#line+1] = '['
+        else
+            line[#line+1] = ' '
         end
         if name then
             line[#line+1] = ('%s: %s'):format(name, tp)
@@ -28,7 +33,7 @@ local function asLibrary(source)
             line[#line+1] = tp
         end
         if rtn.optional then
-            line[#line+1] = ' ?'
+            line[#line+1] = ']'
         end
         returns[i] = table.concat(line)
     end

@@ -2037,21 +2037,9 @@ function m.mergeTypes(types)
         end
     end
     tableSort(results, function (a, b)
-        local sa = TypeSort[a]
-        local sb = TypeSort[b]
-        if sa and sb then
-            return sa < sb
-        end
-        if not sa and not sb then
-            return a < b
-        end
-        if sa and not sb then
-            return true
-        end
-        if not sa and sb then
-            return false
-        end
-        return false
+        local sa = TypeSort[a] or 100
+        local sb = TypeSort[b] or 100
+        return sa < sb
     end)
     return tableConcat(results, '|')
 end

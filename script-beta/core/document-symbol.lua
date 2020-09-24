@@ -42,7 +42,7 @@ local function buildFunction(source, symbols)
     end
     symbols[#symbols+1] = {
         name           = name,
-        detail         = ('function %s(%s)'):format(name or '', buildFunctionParams(func)),
+        detail         = ('function (%s)'):format(buildFunctionParams(func)),
         kind           = kind,
         range          = range,
         selectionRange = { source.start, source.finish },
@@ -70,62 +70,61 @@ local function buildValue(source, symbols)
     local details = {}
     if source.type == 'local' then
         if source.parent.type == 'funcargs' then
-            details[1] = 'param '
+            details[1] = 'param'
             range      = { source.start, source.finish }
             sRange     = { source.start, source.finish }
             kind       = skind.Constant
         else
-            details[1] = 'local '
+            details[1] = 'local'
             range      = { source.start, source.finish }
             sRange     = { source.start, source.finish }
             kind       = skind.Variable
         end
     elseif source.type == 'setlocal' then
-        details[1] = 'setlocal '
+        details[1] = 'setlocal'
         range      = { source.start, source.finish }
         sRange     = { source.start, source.finish }
         kind       = skind.Variable
     elseif source.type == 'setglobal' then
-        details[1] = 'global '
+        details[1] = 'global'
         range      = { source.start, source.finish }
         sRange     = { source.start, source.finish }
-        kind       = skind.Constant
+        kind       = skind.Class
     elseif source.type == 'tablefield' then
-        details[1] = 'field '
+        details[1] = 'field'
         range      = { source.field.start, source.field.finish }
         sRange     = { source.field.start, source.field.finish }
         kind       = skind.Property
     else
-        details[1] = 'field '
+        details[1] = 'field'
         range      = { source.field.start, source.field.finish }
         sRange     = { source.field.start, source.field.finish }
         kind       = skind.Field
     end
-    details[2] = name
     if source.value then
         local literal = source.value[1]
         if source.value.type == 'boolean' then
-            details[3] = ': boolean'
+            details[2] = ' boolean'
             if literal ~= nil then
-                details[4] = ' = '
-                details[5] = util.viewLiteral(source.value[1])
+                details[3] = ' = '
+                details[4] = util.viewLiteral(source.value[1])
             end
         elseif source.value.type == 'string' then
-            details[3] = ': string'
+            details[2] = ' string'
             if literal ~= nil then
-                details[4] = ' = '
-                details[5] = util.viewLiteral(source.value[1])
+                details[3] = ' = '
+                details[4] = util.viewLiteral(source.value[1])
             end
         elseif source.value.type == 'number' then
-            details[3] = ': number'
+            details[2] = ' number'
             if literal ~= nil then
-                details[4] = ' = '
-                details[5] = util.viewLiteral(source.value[1])
+                details[3] = ' = '
+                details[4] = util.viewLiteral(source.value[1])
             end
         elseif source.value.type == 'table' then
-            details[3] = ': {'
-            details[4] = buildTable(source.value)
-            details[5] = '}'
+            details[2] = ' {'
+            details[3] = buildTable(source.value)
+            details[4] = '}'
             valueRange = { source.value.start, source.value.finish }
         elseif source.value.type == 'select' then
             if source.value.vararg and source.value.vararg.type == 'call' then

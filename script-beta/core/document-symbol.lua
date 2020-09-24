@@ -123,6 +123,10 @@ local function buildValue(source, symbols)
             details[4] = buildTable(source.value)
             details[5] = '}'
             valueRange = { source.value.start, source.value.finish }
+        elseif source.value.type == 'select' then
+            if source.value.vararg and source.value.vararg.type == 'call' then
+                valueRange = { source.value.start, source.value.finish }
+            end
         end
         range      = { range[1], source.value.finish }
     end
@@ -176,24 +180,6 @@ local function buildSource(source, used, symbols)
     end
 end
 
-local function packValues(values)
-    local root = {
-        valueRange = { 0, math.maxinteger },
-    }
-    local stacks = { root }
-    await.delay()
-    await.delay()
-    for _, value in ipairs(values) do
-        local parent = stacks[#stacks]
-        while value.valueRange[1] > parent.valueRange[2] do
-            stacks[#stacks] = nil
-            parent = stacks[#stacks]
-        end
-        stacks[#stacks+1] = value
-    end
-    return root
-end
-
 local function packChild(ranges, symbols)
     await.delay()
     table.sort(symbols, function (a, b)
@@ -206,26 +192,29 @@ local function packChild(ranges, symbols)
     }
     local stacks = { root }
     for _, symbol in ipairs(symbols) do
-        -- 向后看，找出当前可能生效的区间
-        local nextRange
-        while #ranges > 0
-        and   symbol.selectionRange[1] >= ranges[#ranges].valueRange[1] do
-            nextRange = ranges[#ranges]
-            ranges[#ranges] = nil
-        end
-        if nextRange then
-            stacks[#stacks+1] = nextRange
-        end
         local parent = stacks[#stacks]
-        if parent == symbol then
-            -- function f() end 的情况，selectionRange 在 valueRange 内部，
-            -- 当前区间置为上一层
-            parent = stacks[#stacks-1]
-        end
         -- 移除已经超出生效范围的区间
         while symbol.selectionRange[1] > parent.valueRange[2] do
             stacks[#stacks] = nil
             parent = stacks[#stacks]
+        end
+        -- 向后看，找出当前可能生效的区间
+        local nextRange
+        while #ranges > 0
+        and   symbol.selectionRange[1] >= ranges[#ranges].valueRange[1] do
+            if symbol.selectionRange[1] <= ranges[#ranges].valueRange[2] then
+                nextRange = ranges[#ranges]
+            end
+            ranges[#ranges] = nil
+        end
+        if nextRange then
+            stacks[#stacks+1] = nextRange
+            parent = nextRange
+        end
+        if parent == symbol then
+            -- function f() end 的情况，selectionRange 在 valueRange 内部，
+            -- 当前区间置为上一层
+            parent = stacks[#stacks-1]
         end
         -- 把自己放到当前区间中
         if not parent.children then
@@ -262,10 +251,6 @@ return function (uri)
     guide.eachSource(ast.ast, function (source)
         buildSource(source, used, symbols)
     end)
-
-    if #symbols == 0 then
-        return nil
-    end
 
     local packedSymbols = packSymbols(symbols)
 

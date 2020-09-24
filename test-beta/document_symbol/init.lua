@@ -469,3 +469,105 @@ local a, b = {
         children = EXISTS,
     }
 }
+
+TEST [[
+local function x()
+end
+
+local function f()
+    local c
+end
+]]
+{
+    [1] = {
+        name = 'x',
+        detail = 'function x()',
+        kind = SymbolKind.Function,
+        range = {1, 22},
+        selectionRange = {16, 16},
+        valueRange = {1, 22},
+    },
+    [2] = {
+        name = 'f',
+        detail = 'function f()',
+        kind = SymbolKind.Function,
+        range = {25, 58},
+        selectionRange = {40, 40},
+        valueRange = {25, 58},
+        children = {
+            [1] = {
+                name = 'c',
+                detail = 'local c',
+                kind = SymbolKind.Variable,
+                range = {54, 54},
+                selectionRange = {54, 54},
+            },
+        },
+    }
+}
+
+TEST [[
+local t = f({
+    k = 1
+})
+]]
+{
+    [1] = {
+        name = 't',
+        detail = 'local t',
+        kind = SymbolKind.Variable,
+        range = {7, 26},
+        selectionRange = {7, 7},
+        valueRange = {11, 26},
+        children = {
+            [1] = {
+                name = 'k',
+                detail = 'field k: number = 1',
+                kind = SymbolKind.Property,
+                range = {19, 23},
+                selectionRange = {19, 19},
+            }
+        }
+    }
+}
+
+TEST [[
+local t = {}
+
+local function f(a, b)
+end
+]]
+{
+    [1] = {
+        name = 't',
+        detail = 'local t: {}',
+        kind = SymbolKind.Variable,
+        range = {7, 12},
+        selectionRange = {7, 7},
+        valueRange = {11, 12},
+    },
+    [2] = {
+        name = 'f',
+        detail = 'function f(a, b)',
+        kind = SymbolKind.Function,
+        range = {15, 40},
+        selectionRange = {30, 30},
+        valueRange = {15, 40},
+        children = {
+            [1] = {
+                name = 'a',
+                detail = 'param a',
+                kind = SymbolKind.Constant,
+                range = {32, 32},
+                selectionRange = {32, 32},
+            },
+            [2] = {
+                name = 'b',
+                detail = 'param b',
+                kind = SymbolKind.Constant,
+                range = {35, 35},
+                selectionRange = {35, 35},
+            }
+        }
+    }
+}

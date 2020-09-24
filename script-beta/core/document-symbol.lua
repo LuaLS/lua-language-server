@@ -26,7 +26,7 @@ local function buildFunction(source, symbols)
     local range, kind
     if func.start > source.finish then
         -- a = function()
-        range = { source.start, source.finish }
+        range = { source.start, func.finish }
     else
         -- function f()
         range = { func.start, func.finish }
@@ -62,33 +62,39 @@ end
 
 local function buildValue(source, symbols)
     local name  = lname(source)
-    local range, valueRange, kind
+    local range, sRange, valueRange, kind
     local details = {}
     if source.type == 'local' then
         if source.parent.type == 'funcargs' then
             details[1] = 'param '
             range      = { source.start, source.finish }
+            sRange     = { source.start, source.finish }
             kind       = skind.Constant
         else
             details[1] = 'local '
             range      = { source.start, source.finish }
+            sRange     = { source.start, source.finish }
             kind       = skind.Variable
         end
     elseif source.type == 'setlocal' then
         details[1] = 'setlocal '
         range      = { source.start, source.finish }
+        sRange     = { source.start, source.finish }
         kind       = skind.Variable
     elseif source.type == 'setglobal' then
         details[1] = 'global '
         range      = { source.start, source.finish }
+        sRange     = { source.start, source.finish }
         kind       = skind.Constant
     elseif source.type == 'tablefield' then
         details[1] = 'field '
         range      = { source.field.start, source.field.finish }
+        sRange     = { source.field.start, source.field.finish }
         kind       = skind.Property
     else
         details[1] = 'field '
         range      = { source.field.start, source.field.finish }
+        sRange     = { source.field.start, source.field.finish }
         kind       = skind.Field
     end
     details[2] = name
@@ -117,6 +123,7 @@ local function buildValue(source, symbols)
             details[4] = buildTable(source.value)
             details[5] = '}'
         end
+        range      = { range[1], source.value.finish }
         valueRange = { source.value.start, source.value.finish }
     else
         valueRange = range
@@ -126,7 +133,7 @@ local function buildValue(source, symbols)
         detail         = table.concat(details),
         kind           = kind,
         range          = range,
-        selectionRange = range,
+        selectionRange = sRange,
         valueRange     = valueRange,
     }
 end
@@ -195,7 +202,7 @@ end
 local function packSymbols(symbols)
     -- 按照start位置反向排序
     table.sort(symbols, function (a, b)
-        return a.range[1] > b.range[1]
+        return a.selectionRange[1] > b.selectionRange[1]
     end)
     -- 处理嵌套
     return packChild(symbols, math.maxinteger)

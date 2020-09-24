@@ -23,6 +23,10 @@ end
 local function buildFunction(source, symbols)
     local name = lname(source)
     local func = source.value
+    if source.type == 'tablefield'
+    or source.type == 'setfield' then
+        source = source.field
+    end
     local range, kind
     if func.start > source.finish then
         -- a = function()

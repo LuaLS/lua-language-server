@@ -579,4 +579,22 @@ local a = f {
 }
 ]]
 {
+    [1] = {
+        name = 'a',
+        detail = 'local a',
+        kind = SymbolKind.Variable,
+        range = {7, 43},
+        selectionRange = {7, 7},
+        valueRange = {11, 43},
+        children = {
+            [1] = {
+                name = 'x',
+                detail = 'function x()',
+                kind = SymbolKind.Function,
+                range = {19, 41},
+                selectionRange = {19, 19},
+                valueRange = {23, 41},
+            }
+        }
+    }
 }

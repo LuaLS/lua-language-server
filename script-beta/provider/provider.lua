@@ -479,8 +479,6 @@ end)
 
 proto.on('textDocument/documentSymbol', function (params)
     local core = require 'core.document-symbol'
-    await.close('textDocument/documentSymbol')
-    await.setID('textDocument/documentSymbol')
     local uri   = params.textDocument.uri
     local lines = files.getLines(uri)
     local text  = files.getText(uri)

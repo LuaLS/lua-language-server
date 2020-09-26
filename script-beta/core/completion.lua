@@ -552,7 +552,7 @@ local function checkUri(ast, text, offset, results)
             return
         end
         local callargs = source.parent
-        if callargs.type ~= 'callargs' then
+        if not callargs or callargs.type ~= 'callargs' then
             return
         end
         if callargs[1] ~= source then

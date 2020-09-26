@@ -540,8 +540,11 @@ proto.on('textDocument/codeAction', function (params)
 end)
 
 proto.on('workspace/executeCommand', function (params)
-    if params.command == 'lua.removeSpace' then
+    if     params.command == 'lua.removeSpace' then
         local core = require 'core.command.removeSpace'
+        return core(params.arguments[1])
+    elseif params.command == 'lua.solve' then
+        local core = require 'core.command.solve'
         return core(params.arguments[1])
     end
 end)

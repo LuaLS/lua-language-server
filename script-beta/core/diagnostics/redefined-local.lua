@@ -10,7 +10,7 @@ return function (uri, callback)
     guide.eachSourceType(ast.ast, 'local', function (source)
         local name = source[1]
         if name == '_'
-        or name == '_ENV' then
+        or name == ast.ENVMode then
             return
         end
         local exist = guide.getLocal(source, name, source.start-1)

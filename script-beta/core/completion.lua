@@ -303,7 +303,12 @@ local function checkFieldFromFieldToIndex(name, parent, word, start, offset)
             }
         end
     else
-        textEdit.newText = '_ENV' .. textEdit.newText
+        if config.runtime.version == 'Lua 5.1'
+        or config.runtime.version == 'LuaJIT' then
+            textEdit.newText = '_G' .. textEdit.newText
+        else
+            textEdit.newText = '_ENV' .. textEdit.newText
+        end
     end
     return textEdit, additionalTextEdits
 end
@@ -740,7 +745,7 @@ local function tryWord(ast, text, offset, results)
                 else
                     checkLocal(ast, word, start, results)
                     checkTableField(ast, word, start, results)
-                    local env = guide.getLocal(ast.ast, '_ENV', start)
+                    local env = guide.getENV(ast.ast, start)
                     checkField(ast, word, start, offset, env, false, results)
                 end
             end

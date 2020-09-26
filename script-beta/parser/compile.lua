@@ -49,11 +49,9 @@ local vmMap = {
             end
         else
             obj.type = 'getglobal'
-            if ENVMode == '_ENV' then
-                local node = guide.getLocal(obj, '_ENV', obj.start)
-                if node then
-                    addRef(node, obj)
-                end
+            local node = guide.getLocal(obj, ENVMode, obj.start)
+            if node then
+                addRef(node, obj)
             end
             local name = obj[1]
             if specials[name] then
@@ -205,11 +203,9 @@ local vmMap = {
             end
         else
             obj.type = 'setglobal'
-            if ENVMode == '_ENV' then
-                local node = guide.getLocal(obj, '_ENV', obj.start)
-                if node then
-                    addRef(node, obj)
-                end
+            local node = guide.getLocal(obj, ENVMode, obj.start)
+            if node then
+                addRef(node, obj)
             end
         end
     end,
@@ -400,17 +396,15 @@ local vmMap = {
     end,
     ['main'] = function (obj)
         Block = obj
-        if ENVMode == '_ENV' then
-            Compile({
-                type   = 'local',
-                start  = 0,
-                finish = 0,
-                effect = 0,
-                tag    = '_ENV',
-                special= '_G',
-                [1]    = '_ENV',
-            }, obj)
-        end
+        Compile({
+            type   = 'local',
+            start  = 0,
+            finish = 0,
+            effect = 0,
+            tag    = '_ENV',
+            special= '_G',
+            [1]    = ENVMode,
+        }, obj)
         --- _ENV 是上值，不计入局部变量计数
         LocalCount = 0
         CompileBlock(obj, obj)
@@ -531,7 +525,7 @@ return function (self, lua, mode, version)
     end
     pushError = state.pushError
     if version == 'Lua 5.1' or version == 'LuaJIT' then
-        ENVMode = 'fenv'
+        ENVMode = '@fenv'
     else
         ENVMode = '_ENV'
     end
@@ -540,6 +534,7 @@ return function (self, lua, mode, version)
     LocalCount = 0
     Version = version
     Root = state.ast
+    state.ENVMode = ENVMode
     if type(state.ast) == 'table' then
         Compile(state.ast)
     end

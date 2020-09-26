@@ -47,7 +47,7 @@ local function updateConfig()
     local newOther  = config.other
     if not util.equal(oldConfig.runtime, newConfig.runtime) then
         library.reload()
-        diagnostics.diagnosticsAll()
+        workspace.reload()
     end
     if not util.equal(oldConfig.diagnostics, newConfig.diagnostics) then
         diagnostics.diagnosticsAll()

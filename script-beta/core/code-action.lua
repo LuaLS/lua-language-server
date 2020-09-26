@@ -3,6 +3,7 @@ local lang    = require 'language'
 local define  = require 'proto.define'
 local guide   = require 'parser.guide'
 local library = require 'library'
+local util    = require 'utility'
 
 local function disableDiagnostic(code, results)
     results[#results+1] = {
@@ -79,9 +80,68 @@ local function solveUndefinedGlobal(uri, diag, results)
     end)
 end
 
+local function solveLowercaseGlobal(uri, diag, results)
+    local ast    = files.getAst(uri)
+    local text   = files.getText(uri)
+    local lines  = files.getLines(uri)
+    local offset = define.offsetOfWord(lines, text, diag.range.start)
+    guide.eachSourceContain(ast.ast, offset, function (source)
+        if source.type ~= 'setglobal' then
+            return
+        end
+
+        local name = guide.getName(source)
+        markGlobal(name, results)
+    end)
+end
+
+local function findSyntax(uri, diag)
+    local ast    = files.getAst(uri)
+    local text   = files.getText(uri)
+    local lines  = files.getLines(uri)
+    for _, err in ipairs(ast.errs) do
+        if err.type:lower():gsub('_', '-') == diag.code then
+            local range = define.range(lines, text, err.start, err.finish)
+            if util.equal(range, diag.range) then
+                return err
+            end
+        end
+    end
+    return nil
+end
+
+local function solveSyntaxByChangeVersion(err, results)
+    if type(err.version) == 'table' then
+        for _, version in ipairs(err.version) do
+            changeVersion(version, results)
+        end
+    else
+        changeVersion(err.version, results)
+    end
+end
+
+local function solveSyntax(uri, diag, results)
+    local err    = findSyntax(uri, diag)
+    if not err then
+        return
+    end
+    if err.version then
+        solveSyntaxByChangeVersion(err, results)
+    end
+end
+
 local function solveDiagnostic(uri, diag, results)
-    if diag.code == 'undefined-global' then
+    if diag.source == lang.script.DIAG_SYNTAX_CHECK then
+        solveSyntax(uri, diag, results)
+        return
+    end
+    if not diag.code then
+        return
+    end
+    if     diag.code == 'undefined-global' then
         solveUndefinedGlobal(uri, diag, results)
+    elseif diag.code == 'lowercase-global' then
+        solveLowercaseGlobal(uri, diag, results)
     end
     disableDiagnostic(diag.code, results)
 end
@@ -94,8 +154,8 @@ return function (uri, range, diagnostics)
 
     local results = {}
 
-    for _, data in ipairs(diagnostics) do
-        solveDiagnostic(uri, data, results)
+    for _, diag in ipairs(diagnostics) do
+        solveDiagnostic(uri, diag, results)
     end
 
     return results

@@ -218,6 +218,11 @@ function m.getUri(obj)
     return ''
 end
 
+function m.getENV(source, start)
+    return m.getLocal(source, '_ENV', start)
+        or m.getLabel(source, '@env', start)
+end
+
 --- 寻找函数的不定参数，返回不定参在第几个参数上，以及该参数对象。
 --- 如果函数是主函数，则返回`0, nil`。
 ---@return table
@@ -631,7 +636,7 @@ function m.getENV(ast)
     if ast.type ~= 'main' then
         return nil
     end
-    return ast.locals[1]
+    return ast.locals and ast.locals[1]
 end
 
 --- 测试 a 到 b 的路径（不经过函数，不考虑 goto），
@@ -794,7 +799,7 @@ end
 local function stepRefOfGlobal(obj, mode)
     local results = {}
     local name = m.getKeyName(obj)
-    local refs = getRefsByName(obj.node.ref, name) or {}
+    local refs = getRefsByName(obj.node and obj.node.ref, name) or {}
     for i = 1, #refs do
         local ref = refs[i]
         if m.getKeyName(ref) == name then
@@ -894,7 +899,7 @@ local function convertSimpleList(list)
         end
         if #simple <= 1 then
             if simple.global then
-                simple.first = m.getLocal(c, '_ENV', c.start)
+                simple.first = m.getENV(c, c.start)
             elseif c.type == 'setlocal'
             or     c.type == 'getlocal' then
                 simple.first = c.node
@@ -1018,7 +1023,7 @@ end
 function m.isGlobal(source)
     if source.type == 'setglobal'
     or source.type == 'getglobal' then
-        if source.node.tag == '_ENV' then
+        if source.node and source.node.tag == '_ENV' then
             return true
         end
     end
@@ -1718,6 +1723,9 @@ end
 
 function m.searchSameFields(status, simple, mode)
     local first = simple.first
+    if not first then
+        return
+    end
     local refs = getRefsByName(first.ref, m.getSimpleName(simple.global or first)) or {}
     local queue = {}
     for i = 1, #refs do

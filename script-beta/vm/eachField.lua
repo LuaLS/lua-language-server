@@ -26,6 +26,9 @@ local function eachField(source)
 
     while source.type == 'paren' do
         source = source.exp
+        if not source then
+            return
+        end
     end
 
     await.delay()

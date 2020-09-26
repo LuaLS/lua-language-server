@@ -50,6 +50,7 @@ local function buildSyntaxError(uri, err)
     end
 
     return {
+        code     = err.type:lower():gsub('_', '-'),
         range    = define.range(lines, text, err.start, err.finish),
         severity = define.DiagnosticSeverity.Error,
         source   = lang.script.DIAG_SYNTAX_CHECK,

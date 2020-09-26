@@ -120,13 +120,59 @@ local function solveSyntaxByChangeVersion(err, results)
     end
 end
 
+local function solveSyntaxByAddDoEnd(uri, err, results)
+    local text   = files.getText(uri)
+    local lines  = files.getLines(uri)
+    results[#results+1] = {
+        title = lang.script.ACTION_ADD_DO_END,
+        kind = 'quickfix',
+        edit = {
+            changes = {
+                [uri] = {
+                    {
+                        range   = define.range(lines, text, err.start, err.finish),
+                        newText = ('do %s end'):format(text:sub(err.start, err.finish)),
+                    },
+                }
+            }
+        }
+    }
+end
+
+local function solveSyntaxByFix(uri, err, results)
+    local text    = files.getText(uri)
+    local lines   = files.getLines(uri)
+    local changes = {}
+    for _, fix in ipairs(err.fix) do
+        changes[#changes+1] = {
+            range = define.range(lines, text, fix.start, fix.finish),
+            newText = fix.text,
+        }
+    end
+    results[#results+1] = {
+        title = lang.script['ACTION_' .. err.fix.title],
+        kind  = 'quickfix',
+        edit = {
+            changes = {
+                [uri] = changes,
+            }
+        }
+    }
+end
+
 local function solveSyntax(uri, diag, results)
-    local err    = findSyntax(uri, diag)
+    local err = findSyntax(uri, diag)
     if not err then
         return
     end
     if err.version then
         solveSyntaxByChangeVersion(err, results)
+    end
+    if err.type == 'ACTION_AFTER_BREAK' or err.type == 'ACTION_AFTER_RETURN' then
+        solveSyntaxByAddDoEnd(uri, err, results)
+    end
+    if err.fix then
+        solveSyntaxByFix(uri, err, results)
     end
 end
 

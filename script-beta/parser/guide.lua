@@ -922,6 +922,9 @@ local function buildSimpleList(obj, max)
         end
         while cur.type == 'paren' do
             cur = cur.exp
+            if not cur then
+                return nil
+            end
         end
         if cur.type == 'setfield'
         or cur.type == 'getfield'
@@ -1137,6 +1140,9 @@ end
 function m.getObjectValue(obj)
     while obj.type == 'paren' do
         obj = obj.exp
+        if not obj then
+            return nil
+        end
     end
     if obj.library then
         return nil
@@ -2890,6 +2896,9 @@ end
 function m.searchInfer(status, obj)
     while obj.type == 'paren' do
         obj = obj.exp
+        if not obj then
+            return
+        end
     end
     while true do
         local value = m.getObjectValue(obj)

@@ -117,6 +117,9 @@ function m.wait(callback, ...)
             return
         end
         waked = true
+        if coroutine.status(co) == 'dead' then
+            return
+        end
         return m.checkResult(co, coroutine.resume(co, ...))
     end, ...)
     return coroutine.yield()

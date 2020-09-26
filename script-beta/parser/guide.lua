@@ -219,8 +219,11 @@ function m.getUri(obj)
 end
 
 function m.getENV(source, start)
+    if not start then
+        start = 1
+    end
     return m.getLocal(source, '_ENV', start)
-        or m.getLabel(source, '@env', start)
+        or m.getLocal(source, '@env', start)
 end
 
 --- 寻找函数的不定参数，返回不定参在第几个参数上，以及该参数对象。
@@ -630,13 +633,6 @@ function m.getSimpleName(obj)
         return ('s|%s'):format(obj.name)
     end
     return m.getKeyName(obj)
-end
-
-function m.getENV(ast)
-    if ast.type ~= 'main' then
-        return nil
-    end
-    return ast.locals and ast.locals[1]
 end
 
 --- 测试 a 到 b 的路径（不经过函数，不考虑 goto），

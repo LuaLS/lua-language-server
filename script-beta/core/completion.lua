@@ -303,8 +303,8 @@ local function checkFieldFromFieldToIndex(name, parent, word, start, offset)
             }
         end
     else
-        if config.runtime.version == 'Lua 5.1'
-        or config.runtime.version == 'LuaJIT' then
+        if config.config.runtime.version == 'Lua 5.1'
+        or config.config.runtime.version == 'LuaJIT' then
             textEdit.newText = '_G' .. textEdit.newText
         else
             textEdit.newText = '_ENV' .. textEdit.newText

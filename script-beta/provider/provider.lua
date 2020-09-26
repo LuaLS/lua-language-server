@@ -16,6 +16,7 @@ local fs        = require 'bee.filesystem'
 local lang      = require 'language'
 
 local function updateConfig()
+    local diagnostics = require 'provider.diagnostic'
     local configs = proto.awaitRequest('workspace/configuration', {
         items = {
             {
@@ -46,9 +47,9 @@ local function updateConfig()
     local newOther  = config.other
     if not util.equal(oldConfig.runtime, newConfig.runtime) then
         library.reload()
+        diagnostics.diagnosticsAll()
     end
     if not util.equal(oldConfig.diagnostics, newConfig.diagnostics) then
-        local diagnostics = require 'provider.diagnostic'
         diagnostics.diagnosticsAll()
     end
     if not util.equal(oldConfig.plugin, newConfig.plugin) then

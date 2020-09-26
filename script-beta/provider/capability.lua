@@ -17,7 +17,7 @@ m.initer = {
     },
     documentSymbolProvider = true,
     documentHighlightProvider = true,
-    --codeActionProvider = true,
+    codeActionProvider = true,
     signatureHelpProvider = {
         triggerCharacters = { '(', ',' },
     },

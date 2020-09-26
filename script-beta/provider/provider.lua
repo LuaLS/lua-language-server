@@ -523,3 +523,17 @@ proto.on('textDocument/documentSymbol', function (params)
 
     return symbols
 end)
+
+proto.on('textDocument/codeAction', function (params)
+    local core        = require 'core.code-action'
+    local uri         = params.textDocument.uri
+    local range       = params.range
+    local diagnostics = params.context.diagnostics
+    local results     = core(uri, range, diagnostics)
+
+    if not results or #results == 0 then
+        return nil
+    end
+
+    return results
+end)

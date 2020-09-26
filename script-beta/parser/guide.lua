@@ -501,20 +501,28 @@ function m.offsetOf(lines, row, col)
     end
 end
 
-function m.lineContent(lines, text, row)
+function m.lineContent(lines, text, row, ignoreNL)
     local line = lines[row]
     if not line then
         return ''
     end
-    return text:sub(line.start, line.finish)
+    if ignoreNL then
+        return text:sub(line.start, line.range)
+    else
+        return text:sub(line.start, line.finish)
+    end
 end
 
-function m.lineRange(lines, row)
+function m.lineRange(lines, row, ignoreNL)
     local line = lines[row]
     if not line then
         return 0, 0
     end
-    return line.start, line.finish
+    if ignoreNL then
+        return line.start, line.range
+    else
+        return line.start, line.finish
+    end
 end
 
 function m.getNameOfLiteral(obj)

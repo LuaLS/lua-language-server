@@ -21,6 +21,12 @@ m.initer = {
     signatureHelpProvider = {
         triggerCharacters = { '(', ',' },
     },
+    executeCommandProvider = {
+        commands = {
+            'lua.removeSpace',
+            'lua.solve',
+        },
+    },
     --workspace = {
     --    workspaceFolders = {
     --        supported = true,
@@ -29,13 +35,6 @@ m.initer = {
     --},
     --documentOnTypeFormattingProvider = {
     --    firstTriggerCharacter = '}',
-    --},
-    --executeCommandProvider = {
-    --    commands = {
-    --        'config',
-    --        'removeSpace',
-    --        'solve',
-    --    },
     --},
 }
 

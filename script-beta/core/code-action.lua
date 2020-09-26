@@ -176,6 +176,62 @@ local function solveSyntax(uri, diag, results)
     end
 end
 
+local function solveNewlineCall(uri, diag, results)
+    local text    = files.getText(uri)
+    local lines   = files.getLines(uri)
+    results[#results+1] = {
+        title = lang.script.ACTION_ADD_SEMICOLON,
+        kind = 'quickfix',
+        edit = {
+            changes = {
+                [uri] = {
+                    {
+                        range = {
+                            start   = diag.range.start,
+                            ['end'] = diag.range.start,
+                        },
+                        newText = ';',
+                    }
+                }
+            }
+        }
+    }
+end
+
+local function solveAmbiguity1(uri, diag, results)
+    results[#results+1] = {
+        title = lang.script.ACTION_ADD_BRACKETS,
+        kind = 'quickfix',
+        command = {
+            title = lang.script.COMMAND_ADD_BRACKETS,
+            command = 'lua.solve',
+            arguments = {
+                {
+                    name = 'ambiguity-1',
+                    uri = uri,
+                    range = diag.range,
+                }
+            }
+        },
+    }
+end
+
+local function solveTrailingSpace(uri, diag, results)
+    results[#results+1] = {
+        title = lang.script.ACTION_REMOVE_SPACE,
+        kind = 'quickfix',
+        command = {
+            title = lang.script.COMMAND_REMOVE_SPACE,
+            command = 'lua.removeSpace',
+            arguments = {
+                {
+                    uri = uri,
+                }
+            }
+        },
+    }
+end
+
 local function solveDiagnostic(uri, diag, results)
     if diag.source == lang.script.DIAG_SYNTAX_CHECK then
         solveSyntax(uri, diag, results)
@@ -188,6 +244,12 @@ local function solveDiagnostic(uri, diag, results)
         solveUndefinedGlobal(uri, diag, results)
     elseif diag.code == 'lowercase-global' then
         solveLowercaseGlobal(uri, diag, results)
+    elseif diag.code == 'newline-call' then
+        solveNewlineCall(uri, diag, results)
+    elseif diag.code == 'ambiguity-1' then
+        solveAmbiguity1(uri, diag, results)
+    elseif diag.code == 'trailing-space' then
+        solveTrailingSpace(uri, diag, results)
     end
     disableDiagnostic(diag.code, results)
 end

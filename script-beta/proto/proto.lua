@@ -13,6 +13,7 @@ local m = {}
 
 m.ability = {}
 m.waiting = {}
+m.holdon  = {}
 
 function m.getMethodName(proto)
     if proto.method:sub(1, 2) == '$/' then
@@ -31,6 +32,8 @@ function m.response(id, res)
         log.error('Response id is nil!', util.dump(res))
         return
     end
+    assert(m.holdon[id])
+    m.holdon[id] = nil
     local data  = {}
     data.id     = id
     data.result = res == nil and json.null or res
@@ -89,6 +92,9 @@ function m.doMethod(proto)
             m.responseErr(proto.id, ErrorCodes.MethodNotFound, method)
         end
         return
+    end
+    if proto.id then
+        m.holdon[proto.id] = method
     end
     await.call(function ()
         --log.debug('Start method:', method)

@@ -548,10 +548,10 @@ function m.getName(obj)
     elseif tp == 'getfield'
     or     tp == 'setfield'
     or     tp == 'tablefield' then
-        return obj.field[1]
+        return obj.field and obj.field[1]
     elseif tp == 'getmethod'
     or     tp == 'setmethod' then
-        return obj.method[1]
+        return obj.method and obj.method[1]
     elseif tp == 'getindex'
     or     tp == 'setindex'
     or     tp == 'tableindex' then

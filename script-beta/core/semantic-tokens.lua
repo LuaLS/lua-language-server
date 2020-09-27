@@ -57,6 +57,35 @@ Care['getlocal'] = function (source, results)
         }
         return
     end
+    -- 2. 特殊变量
+    if source[1] == '_ENV'
+    or source[1] == 'self' then
+        return
+    end
+    -- 3. 不是函数的局部变量
+    local hasFunc
+    for _, def in ipairs(vm.getDefs(loc)) do
+        if def.type == 'function'
+        or (def.type == 'library' and def.value.type == 'function') then
+            hasFunc = true
+            break
+        end
+    end
+    if hasFunc then
+        results[#results+1] = {
+            start      = source.start,
+            finish     = source.finish,
+            type       = TokenTypes.interface,
+            modifieres = TokenModifiers.declaration,
+        }
+        return
+    end
+    -- 4. 其他
+    results[#results+1] = {
+        start      = source.start,
+        finish     = source.finish,
+        type       = TokenTypes.variable,
+    }
 end
 Care['setlocal'] = Care['getlocal']
 

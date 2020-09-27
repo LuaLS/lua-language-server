@@ -775,6 +775,49 @@ function io.popen(prog: string [, mode: string])
   2.[error_message: string]
 ]]
 
+TEST [[
+<?_G?>
+]]
+[[
+global _G: _G {
+    _G: _G,
+    _VERSION: string,
+    arg: arg,
+    assert: function,
+    collectgarbage: function,
+    coroutine: coroutine,
+    debug: debug,
+    dofile: function,
+    error: function,
+    getmetatable: function,
+    io: io,
+    ipairs: function,
+    load: function,
+    loadfile: function,
+    math: math,
+    next: function,
+    os: os,
+    package: package,
+    pairs: function,
+    pcall: function,
+    print: function,
+    rawequal: function,
+    rawget: function,
+    rawlen: function,
+    rawset: function,
+    require: function,
+    select: function,
+    setmetatable: function,
+    string: string,
+    table: table,
+    tonumber: function,
+    tostring: function,
+    type: function,
+    utf8: utf8,
+    xpcall: function,
+}
+]]
+
 --TEST[[
 -----@class Class
 --local <?x?> = class()

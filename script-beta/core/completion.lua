@@ -373,6 +373,11 @@ end
 local function checkField(ast, word, start, offset, parent, oop, results)
     local fields = {}
     vm.eachField(parent, function (src)
+        if src.type == 'library' then
+            if src.name:sub(1, 1) == '@' then
+                return
+            end
+        end
         local key = vm.getKeyName(src)
         if not key or key:sub(1, 1) ~= 's' then
             return

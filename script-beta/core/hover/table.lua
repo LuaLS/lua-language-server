@@ -3,6 +3,11 @@ local util     = require 'utility'
 local guide    = require 'parser.guide'
 
 local function getKey(src)
+    if src.type == 'library' then
+        if src.name:sub(1, 1) == '@' then
+            return
+        end
+    end
     local key = vm.getKeyName(src)
     if not key or #key <= 2 then
         if not src.index then
@@ -35,11 +40,13 @@ local function getField(src)
     or src.type == 'function' then
         return nil
     end
-    if src.parent.type == 'tableindex'
-    or src.parent.type == 'setindex'
-    or src.parent.type == 'getindex' then
-        if src.parent.index == src then
-            src = src.parent
+    if src.parent then
+        if src.parent.type == 'tableindex'
+        or src.parent.type == 'setindex'
+        or src.parent.type == 'getindex' then
+            if src.parent.index == src then
+                src = src.parent
+            end
         end
     end
     local tp = vm.getInferType(src, 'simple')

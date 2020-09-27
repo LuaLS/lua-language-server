@@ -8,7 +8,9 @@ local function eachFieldInLibrary(source, lib, results)
         return
     end
     for _, value in pairs(lib.child) do
-        results[#results+1] = value
+        if value.name:sub(1, 1) ~= '@' then
+            results[#results+1] = value
+        end
     end
 end
 

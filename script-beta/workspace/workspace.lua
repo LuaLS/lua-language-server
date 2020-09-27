@@ -146,6 +146,7 @@ end
 ---@param path string
 function m.findUrisByFilePath(path)
     local results = {}
+    local posts = {}
     for uri in files.eachFile() do
         local pathLen = #path
         local uriLen  = #uri
@@ -154,10 +155,11 @@ function m.findUrisByFilePath(path)
             local see = uri:sub(uriLen - pathLen + 1, uriLen)
             if files.eq(see, path) then
                 results[#results+1] = uri
+                posts[uri] = uri:sub(1, uriLen - pathLen)
             end
         end
     end
-    return results
+    return results, posts
 end
 
 --- 查找符合指定require path的所有uri
@@ -166,19 +168,21 @@ end
 function m.findUrisByRequirePath(path)
     local results = {}
     local mark = {}
+    local searchers = {}
     local input = path:gsub('%.', '/')
                       :gsub('%%', '%%%%')
     for _, luapath in ipairs(config.config.runtime.path) do
         local part = luapath:gsub('%?', input)
-        local uris = m.findUrisByFilePath(part)
+        local uris, posts = m.findUrisByFilePath(part)
         for _, uri in ipairs(uris) do
             if not mark[uri] then
                 mark[uri] = true
                 results[#results+1] = uri
+                searchers[uri] = posts[uri] .. luapath
             end
         end
     end
-    return results
+    return results, searchers
 end
 
 function m.normalize(path)

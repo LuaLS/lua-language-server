@@ -7,6 +7,7 @@ local markdown = require 'provider.markdown'
 local config   = require 'config'
 local client   = require 'provider.client'
 local lang     = require 'language'
+local platform = require 'bee.platform'
 
 local function asString(source)
     local literal = guide.getLiteral(source)
@@ -15,7 +16,7 @@ local function asString(source)
     end
     local parent = source.parent
     if parent and parent.type == 'callargs' then
-        local result
+        local result, searchers
         local call = parent.parent
         local func = call.node
         local lib = vm.getLibrary(func)
@@ -23,20 +24,27 @@ local function asString(source)
             return
         end
         if     lib.name == 'require' then
-            result = ws.findUrisByRequirePath(literal)
+            result, searchers = ws.findUrisByRequirePath(literal)
         elseif lib.name == 'dofile'
         or     lib.name == 'loadfile' then
             result = ws.findUrisByFilePath(literal)
         end
         if result and #result > 0 then
             for i, uri in ipairs(result) do
+                local searcher = searchers and furi.decode(searchers[uri])
                 uri = files.getOriginUri(uri)
                 local path = furi.decode(uri)
                 if files.eq(path:sub(1, #ws.path), ws.path) then
                     path = path:sub(#ws.path + 1)
                 end
                 path = path:gsub('^[/\\]*', '')
-                result[i] = ('* [%s](%s)'):format(path, uri)
+                if searcher then
+                    searcher = ws.normalize(searcher)
+                    searcher = searcher:sub(#ws.path + 1)
+                    result[i] = ('* [%s](%s) （假设搜索路径包含 `%s`）'):format(path, uri, searcher)
+                else
+                    result[i] = ('* [%s](%s)'):format(path, uri)
+                end
             end
             table.sort(result)
             return table.concat(result, '\n')

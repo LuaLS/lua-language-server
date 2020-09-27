@@ -39,8 +39,8 @@ local function asString(source)
                 end
                 path = path:gsub('^[/\\]*', '')
                 if searcher then
-                    searcher = ws.normalize(searcher)
                     searcher = searcher:sub(#ws.path + 1)
+                    searcher = ws.normalize(searcher)
                     result[i] = ('* [%s](%s) （假设搜索路径包含 `%s`）'):format(path, uri, searcher)
                 else
                     result[i] = ('* [%s](%s)'):format(path, uri)

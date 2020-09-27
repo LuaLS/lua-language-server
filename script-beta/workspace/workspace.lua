@@ -155,7 +155,7 @@ function m.findUrisByFilePath(path)
             local see = uri:sub(uriLen - pathLen + 1, uriLen)
             if files.eq(see, path) then
                 results[#results+1] = uri
-                posts[uri] = uri:sub(1, uriLen - pathLen)
+                posts[uri] = files.getOriginUri(uri):sub(1, uriLen - pathLen)
             end
         end
     end

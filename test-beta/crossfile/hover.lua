@@ -91,7 +91,7 @@ TEST {
 
 TEST {
     {
-        path = 'folder/a.lua',
+        path = 'Folder/a.lua',
         content = '',
     },
     {
@@ -100,7 +100,7 @@ TEST {
     },
     hover = {
         label = '1 个字节',
-        description = [[* [folder\a.lua](file:///folder/a.lua) （假设搜索路径包含 `folder\?.lua`）]],
+        description = [[* [Folder\a.lua](file:///Folder/a.lua) （假设搜索路径包含 `Folder\?.lua`）]],
     }
 }
 

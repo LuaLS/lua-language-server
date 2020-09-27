@@ -1,20 +1,56 @@
 local files    = require 'files'
-local symbol   = require 'core.symbol'
 local guide    = require 'parser.guide'
 local matchKey = require 'core.matchkey'
+local skind    = require 'define.SymbolKind'
+
+local function buildSource(uri, source, key, results)
+    if     source.type == 'local'
+    or     source.type == 'setlocal'
+    or     source.type == 'setglobal' then
+        local name = source[1]
+        if matchKey(key, name) then
+            results[#results+1] = {
+                name  = name,
+                kind  = skind.Variable,
+                uri   = uri,
+                range = { source.start, source.finish },
+            }
+        end
+    elseif source.type == 'setfield'
+    or     source.type == 'tablefield' then
+        local field = source.field
+        local name  = field[1]
+        if matchKey(key, name) then
+            results[#results+1] = {
+                name  = name,
+                kind  = skind.Field,
+                uri   = uri,
+                range = { field.start, field.finish },
+            }
+        end
+    elseif source.type == 'setmethod' then
+        local method = source.method
+        local name  = method[1]
+        if matchKey(key, name) then
+            results[#results+1] = {
+                name  = name,
+                kind  = skind.Method,
+                uri   = uri,
+                range = { method.start, method.finish },
+            }
+        end
+    end
+end
 
 local function searchFile(uri, key, results)
-    local symbols = symbol(uri)
-    if not symbols then
+    local ast = files.getAst(uri)
+    if not ast then
         return
     end
 
-    for _, res in ipairs(symbols) do
-        if res.name ~= '' and matchKey(key, res.name) then
-            res.uri = uri
-            results[#results+1] = res
-        end
-    end
+    guide.eachSource(ast.ast, function (source)
+        buildSource(uri, source, key, results)
+    end)
 end
 
 return function (key)

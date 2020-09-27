@@ -572,9 +572,6 @@ proto.on('workspace/symbol', function (params)
             )
         )
         symbol.uri = nil
-        symbol.detail = nil
-        symbol.selectionRange = nil
-        symbol.valueRange = nil
     end
 
     for _, symbol in ipairs(symbols) do

@@ -151,7 +151,7 @@ end
     [1] = {
         name = 'mt:add',
         detail = 'function ()',
-        kind = SymbolKind.Field,
+        kind = SymbolKind.Method,
         range = {1, 21},
         selectionRange = {10, 15},
         valueRange = {1, 21},

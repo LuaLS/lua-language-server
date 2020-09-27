@@ -892,7 +892,9 @@ local function convertSimpleList(list)
     local simple = {}
     for i = #list, 1, -1 do
         local c = list[i]
-        if c.special == '_G' then
+        if  c.special == '_G'
+        and c.type ~= 'getglobal'
+        and c.type ~= 'setglobal' then
             simple.global = list[i+1] or c
         else
             simple[#simple+1] = m.getSimpleName(c)

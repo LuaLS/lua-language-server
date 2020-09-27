@@ -118,6 +118,7 @@ print(<!Log!>)
 print(_VERSION)
 print(<!y!>)
 print(Z)
+print(_G)
 Z = 1
 ]]
 

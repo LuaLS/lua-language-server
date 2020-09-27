@@ -6,21 +6,21 @@ local TokenModifiers = require 'define.TokenModifiers'
 local vm             = require 'vm'
 
 local Care = {}
-Care['setglobal'] = function (source)
-    return {
+Care['setglobal'] = function (source, results)
+    results[#results+1] = {
         start      = source.start,
         finish     = source.finish,
         type       = TokenTypes.namespace,
         modifieres = TokenModifiers.deprecated,
     }
 end
-Care['getglobal'] = function (source)
+Care['getglobal'] = function (source, results)
     local lib = vm.getLibrary(source, 'simple')
     if lib then
         if source[1] == '_G' then
             return
         else
-            return {
+            results[#results+1] =  {
                 start      = source.start,
                 finish     = source.finish,
                 type       = TokenTypes.namespace,
@@ -28,7 +28,7 @@ Care['getglobal'] = function (source)
             }
         end
     else
-        return {
+        results[#results+1] =  {
             start      = source.start,
             finish     = source.finish,
             type       = TokenTypes.namespace,
@@ -36,6 +36,29 @@ Care['getglobal'] = function (source)
         }
     end
 end
+Care['tablefield'] = function (source, results)
+    local field = source.field
+    results[#results+1] = {
+        start      = field.start,
+        finish     = field.finish,
+        type       = TokenTypes.property,
+        modifieres = TokenModifiers.declaration,
+    }
+end
+Care['getlocal'] = function (source, results)
+    local loc = source.node
+    -- 1. 函数的参数
+    if loc.parent and loc.parent.type == 'funcargs' then
+        results[#results+1] = {
+            start      = source.start,
+            finish     = source.finish,
+            type       = TokenTypes.parameter,
+            modifieres = TokenModifiers.declaration,
+        }
+        return
+    end
+end
+Care['setlocal'] = Care['getlocal']
 
 local function buildTokens(results, lines)
     local tokens = {}
@@ -73,7 +96,7 @@ return function (uri, start, finish)
     end
 
     local results = {}
-    local index = 0
+    local count = 0
     guide.eachSource(ast.ast, function (source)
         local method = Care[source.type]
         if not method then
@@ -82,13 +105,9 @@ return function (uri, start, finish)
         if source.start > finish or source.finish < start then
             return
         end
-        local result = method(source)
-        if not result then
-            return
-        end
-        index = index + 1
-        results[index] = result
-        if index % 100 == 0 then
+        method(source, results)
+        count = count + 1
+        if count % 100 == 0 then
             await.delay()
         end
     end)

@@ -2,7 +2,16 @@ local guide    = require 'parser.guide'
 local vm       = require 'vm'
 
 local function asLocal(source)
-    return guide.getName(source)
+    local name = guide.getName(source)
+    if not source.attrs then
+        return name
+    end
+    local label = {}
+    label[#label+1] = name
+    for _, attr in ipairs(source.attrs) do
+        label[#label+1] = ('<%s>'):format(attr[1])
+    end
+    return table.concat(label, ' ')
 end
 
 local function asMethod(source)

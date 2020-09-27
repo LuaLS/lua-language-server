@@ -2042,6 +2042,7 @@ function m.mergeTypes(types)
     local results = {}
     local mark = {}
     local hasAny
+    -- 这里把 any 去掉
     for i = 1, #types do
         local tp = types[i]
         if tp == 'any' then
@@ -2055,11 +2056,21 @@ function m.mergeTypes(types)
     if #results == 0 then
         return 'any'
     end
+    -- 只有显性的 nil 与 any 时，取 any
     if #results == 1 then
         if results[1] == 'nil' and hasAny then
             return 'any'
         else
             return results[1]
+        end
+    end
+    -- 同时包含 number 与 integer 时，去掉 integer
+    if mark['number'] and mark['integer'] then
+        for i = 1, #results do
+            if results[i] == 'integer' then
+                tableRemove(results, i)
+                break
+            end
         end
     end
     tableSort(results, function (a, b)

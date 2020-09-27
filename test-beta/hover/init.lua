@@ -818,6 +818,24 @@ global _G: _G {
 }
 ]]
 
+TEST [[
+local x
+x = 1
+x = 1.0
+
+print(<?x?>)
+]]
+[[
+local x: number = 1
+]]
+
+TEST [[
+local <?x?> <close> = 1
+]]
+[[
+local x <close>: integer = 1
+]]
+
 --TEST[[
 -----@class Class
 --local <?x?> = class()
@@ -1180,12 +1198,6 @@ global _G: _G {
 --local x: any
 --]]
 --
---TEST [[
---local <?x?> <close> <const> = 1
---]]
---[[
---local x <close> <const>: number = 1
---]]
 --
 --TEST [[
 -----@param x number {optional = 'after'}

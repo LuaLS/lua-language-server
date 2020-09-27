@@ -1129,6 +1129,12 @@ function m.searchFields(status, obj, key, interface)
             end
         end
         return results
+    elseif obj.type == 'library' then
+        local results = {}
+        for i = 1, #obj.fields do
+            results[i] = obj.fields[i]
+        end
+        return results
     else
         local newStatus = m.status(status, interface)
         local simple = m.getSimple(obj)

@@ -56,7 +56,7 @@ local function asGlobal(source)
 end
 
 local function asLibrary(source)
-    
+    return asValue(source, 'global')
 end
 
 local function isGlobalField(source)

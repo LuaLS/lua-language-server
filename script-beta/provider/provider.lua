@@ -548,3 +548,7 @@ proto.on('workspace/executeCommand', function (params)
         return core(params.arguments[1])
     end
 end)
+
+proto.on('workspaceSymbolProvider', function (params)
+    
+end)

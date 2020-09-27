@@ -16,6 +16,7 @@ m.initer = {
         prepareProvider = true,
     },
     documentSymbolProvider = true,
+    workspaceSymbolProvider = true,
     documentHighlightProvider = true,
     codeActionProvider = true,
     signatureHelpProvider = {

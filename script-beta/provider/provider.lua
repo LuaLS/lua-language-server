@@ -1,6 +1,7 @@
 local util      = require 'utility'
 local cap       = require 'provider.capability'
 local completion= require 'provider.completion'
+local semantic  = require 'provider.semantic-tokens'
 local await     = require 'await'
 local files     = require 'files'
 local proto     = require 'proto.proto'
@@ -66,6 +67,11 @@ local function updateConfig()
         completion.enable()
     else
         completion.disable()
+    end
+    if newConfig.color.mode == 'Semantic' then
+        semantic.enable()
+    else
+        semantic.disable()
     end
 end
 
@@ -579,4 +585,45 @@ proto.on('workspace/symbol', function (params)
     end
 
     return symbols
+end)
+
+
+proto.on('textDocument/semanticTokens/full', function (params)
+    local core = require 'core.semantic-tokens'
+    local uri = params.textDocument.uri
+    log.debug('semanticTokens/full', uri)
+    local text  = files.getText(uri)
+    while not text do
+        await.sleep(0.1)
+        text  = files.getText(uri)
+    end
+    local results = core(uri, 0, #text)
+    if not results or #results == 0 then
+        return nil
+    end
+    return {
+        data = results
+    }
+end)
+
+proto.on('textDocument/semanticTokens/range', function (params)
+    local core = require 'core.semantic-tokens'
+    local uri = params.textDocument.uri
+    log.debug('semanticTokens/range', uri)
+    local lines = files.getLines(uri)
+    local text  = files.getText(uri)
+    while not lines or not text do
+        await.sleep(0.1)
+        lines = files.getLines(uri)
+        text  = files.getText(uri)
+    end
+    local start  = define.offset(lines, text, params.range.start)
+    local finish = define.offset(lines, text, params.range['end'])
+    local results = core(uri, start, finish)
+    if not results or #results == 0 then
+        return nil
+    end
+    return {
+        data = results
+    }
 end)

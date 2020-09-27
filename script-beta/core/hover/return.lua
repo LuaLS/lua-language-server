@@ -68,8 +68,10 @@ local function asFunction(source)
         for n = 1, #rtn do
             local values = vm.getInfers(rtn[n])
             for _, value in ipairs(values) do
-                for tp in value.type:gmatch '[^|]+' do
-                    types[#types+1] = tp
+                if value.type then
+                    for tp in value.type:gmatch '[^|]+' do
+                        types[#types+1] = tp
+                    end
                 end
             end
         end

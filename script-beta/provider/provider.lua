@@ -511,6 +511,7 @@ proto.on('textDocument/documentSymbol', function (params)
         if symbol.name == '' then
             symbol.name = lang.script.SYMBOL_ANONYMOUS
         end
+        symbol.valueRange = nil
         if symbol.children then
             for _, child in ipairs(symbol.children) do
                 convert(child)
@@ -549,6 +550,36 @@ proto.on('workspace/executeCommand', function (params)
     end
 end)
 
-proto.on('workspaceSymbolProvider', function (params)
-    
+proto.on('workspace/symbol', function (params)
+    local core = require 'core.workspace-symbol'
+
+    await.close('workspace/symbol')
+    await.setID('workspace/symbol')
+
+    local symbols = core(params.query)
+    if not symbols or #symbols == 0 then
+        return nil
+    end
+
+    local function convert(symbol)
+        symbol.location = define.location(
+            symbol.uri,
+            define.range(
+                files.getLines(symbol.uri),
+                files.getText(symbol.uri),
+                symbol.range[1],
+                symbol.range[2]
+            )
+        )
+        symbol.uri = nil
+        symbol.detail = nil
+        symbol.selectionRange = nil
+        symbol.valueRange = nil
+    end
+
+    for _, symbol in ipairs(symbols) do
+        convert(symbol)
+    end
+
+    return symbols
 end)

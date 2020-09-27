@@ -1136,6 +1136,11 @@ io.close(1, $)
 ]]
 (nil)
 
+TEST [[
+io$
+]]
+(EXISTS)
+
 do return end
 TEST [[
 ---@$

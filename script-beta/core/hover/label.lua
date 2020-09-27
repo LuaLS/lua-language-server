@@ -55,6 +55,10 @@ local function asGlobal(source)
     return asValue(source, 'global')
 end
 
+local function asLibrary(source)
+    
+end
+
 local function isGlobalField(source)
     if source.type == 'field'
     or source.type == 'method' then
@@ -124,5 +128,7 @@ return function (source, oop)
         return asField(source)
     elseif source.type == 'string' then
         return asString(source)
+    elseif source.type == 'library' then
+        return asLibrary(source)
     end
 end

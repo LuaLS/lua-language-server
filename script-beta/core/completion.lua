@@ -313,11 +313,7 @@ local function checkFieldFromFieldToIndex(name, parent, word, start, offset)
     return textEdit, additionalTextEdits
 end
 
-local function checkFieldThen(ast, key, src, word, start, offset, parent, oop, results)
-    local name = key:sub(3)
-    if not matchKey(word, name) then
-        return
-    end
+local function checkFieldThen(name, src, word, start, offset, parent, oop, results)
     local value = guide.getObjectValue(src) or src
     local kind = ckind.Field
     if value.type == 'function' then
@@ -385,9 +381,13 @@ local function checkField(ast, word, start, offset, parent, oop, results)
         if isSameSource(ast, src, start) then
             return
         end
-        local last = fields[key]
+        local name = key:sub(3)
+        if not matchKey(word, name) then
+            return
+        end
+        local last = fields[name]
         if not last then
-            fields[key] = src
+            fields[name] = src
             return
         end
         if src.type == 'tablefield'
@@ -395,12 +395,12 @@ local function checkField(ast, word, start, offset, parent, oop, results)
         or src.type == 'tableindex'
         or src.type == 'setindex'
         or src.type == 'setmethod' then
-            fields[key] = src
+            fields[name] = src
             return
         end
     end)
-    for key, src in util.sortPairs(fields) do
-        checkFieldThen(ast, key, src, word, start, offset, parent, oop, results)
+    for name, src in util.sortPairs(fields) do
+        checkFieldThen(name, src, word, start, offset, parent, oop, results)
     end
 end
 

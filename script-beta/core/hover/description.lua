@@ -132,7 +132,6 @@ local function tryLibrary(source)
     local fmt = getDocFormater()
     local md = markdown()
     if lib.value.description then
-        md:add('markdown', '-------------')
         md:add('markdown', lib.value.description:gsub('%(doc%:(.-)%)', function (tag)
             if fmt then
                 return '(' .. lang.script(fmt, tag) .. ')'

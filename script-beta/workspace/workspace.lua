@@ -18,8 +18,7 @@ m.path = ''
 m.requireCache = {}
 
 --- 初始化工作区
-function m.init(name, uri)
-    m.name = name
+function m.init(uri)
     m.uri  = uri
     m.path = m.normalize(furi.decode(uri))
     log.info('Workspace inited: ', uri)

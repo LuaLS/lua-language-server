@@ -4,8 +4,9 @@ local define  = require 'proto.define'
 local guide   = require 'parser.guide'
 local library = require 'library'
 local util    = require 'utility'
+local sp      = require 'bee.subprocess'
 
-local function disableDiagnostic(code, results)
+local function disableDiagnostic(uri, code, results)
     results[#results+1] = {
         title   = lang.script('ACTION_DISABLE_DIAG', code),
         kind    = 'quickfix',
@@ -17,13 +18,14 @@ local function disableDiagnostic(code, results)
                     key    = 'Lua.diagnostics.disable',
                     action = 'add',
                     value  = code,
+                    uri    = uri,
                 }
             }
         }
     }
 end
 
-local function markGlobal(name, results)
+local function markGlobal(uri, name, results)
     results[#results+1] = {
         title   = lang.script('ACTION_MARK_GLOBAL', name),
         kind    = 'quickfix',
@@ -35,13 +37,14 @@ local function markGlobal(name, results)
                     key    = 'Lua.diagnostics.globals',
                     action = 'add',
                     value  = name,
+                    uri    = uri,
                 }
             }
         }
     }
 end
 
-local function changeVersion(version, results)
+local function changeVersion(uri, version, results)
     results[#results+1] = {
         title   = lang.script('ACTION_RUNTIME_VERSION', version),
         kind    = 'quickfix',
@@ -53,6 +56,7 @@ local function changeVersion(version, results)
                     key    = 'Lua.runtime.version',
                     action = 'set',
                     value  = version,
+                    uri    = uri,
                 }
             }
         },
@@ -70,11 +74,11 @@ local function solveUndefinedGlobal(uri, diag, results)
         end
 
         local name = guide.getName(source)
-        markGlobal(name, results)
+        markGlobal(uri, name, results)
 
         if library.other[name] then
             for _, version in ipairs(library.other[name]) do
-                changeVersion(version, results)
+                changeVersion(uri, version, results)
             end
         end
     end)
@@ -204,11 +208,11 @@ local function solveAmbiguity1(uri, diag, results)
         kind = 'quickfix',
         command = {
             title = lang.script.COMMAND_ADD_BRACKETS,
-            command = 'lua.solve',
+            command = 'lua.solve:' .. sp:get_id(),
             arguments = {
                 {
-                    name = 'ambiguity-1',
-                    uri = uri,
+                    name  = 'ambiguity-1',
+                    uri   = uri,
                     range = diag.range,
                 }
             }
@@ -222,7 +226,7 @@ local function solveTrailingSpace(uri, diag, results)
         kind = 'quickfix',
         command = {
             title = lang.script.COMMAND_REMOVE_SPACE,
-            command = 'lua.removeSpace',
+            command = 'lua.removeSpace:' .. sp:get_id(),
             arguments = {
                 {
                     uri = uri,
@@ -251,7 +255,7 @@ local function solveDiagnostic(uri, diag, results)
     elseif diag.code == 'trailing-space' then
         solveTrailingSpace(uri, diag, results)
     end
-    disableDiagnostic(diag.code, results)
+    disableDiagnostic(uri, diag.code, results)
 end
 
 return function (uri, range, diagnostics)

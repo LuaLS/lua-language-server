@@ -77,10 +77,8 @@ end
 
 proto.on('initialize', function (params)
     client.init(params)
-    if params.workspaceFolders then
-        local name = params.workspaceFolders[1].name
-        local uri  = params.workspaceFolders[1].uri
-        workspace.init(name, uri)
+    if params.rootUri then
+        workspace.init(params.rootUri)
     end
     return {
         capabilities = cap.initer,
@@ -547,10 +545,11 @@ proto.on('textDocument/codeAction', function (params)
 end)
 
 proto.on('workspace/executeCommand', function (params)
-    if     params.command == 'lua.removeSpace' then
+    local command = params.command:gsub(':.+', '')
+    if     command == 'lua.removeSpace' then
         local core = require 'core.command.removeSpace'
         return core(params.arguments[1])
-    elseif params.command == 'lua.solve' then
+    elseif command == 'lua.solve' then
         local core = require 'core.command.solve'
         return core(params.arguments[1])
     end

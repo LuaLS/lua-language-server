@@ -1,3 +1,5 @@
+local sp = require 'bee.subprocess'
+
 local m = {}
 
 m.initer = {
@@ -24,8 +26,8 @@ m.initer = {
     },
     executeCommandProvider = {
         commands = {
-            'lua.removeSpace',
-            'lua.solve',
+            'lua.removeSpace:' .. sp:get_id(),
+            'lua.solve:' .. sp:get_id(),
         },
     },
     --workspace = {

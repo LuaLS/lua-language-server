@@ -30,12 +30,6 @@ m.initer = {
             'lua.solve:' .. sp:get_id(),
         },
     },
-    --workspace = {
-    --    workspaceFolders = {
-    --        supported = true,
-    --        changeNotifications = true,
-    --    }
-    --},
     --documentOnTypeFormattingProvider = {
     --    firstTriggerCharacter = '}',
     --},

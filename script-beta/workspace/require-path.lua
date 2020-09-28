@@ -1,4 +1,6 @@
 local platform = require 'bee.platform'
+local files    = require 'files'
+local furi     = require 'file-uri'
 local m = {}
 
 m.cache = {}
@@ -24,10 +26,15 @@ end
 
 function m.getVisiblePath(path, searchers)
     path = path:gsub('^[/\\]+', '')
+    local uri = furi.encode(path)
+    local libraryPath = files.getLibraryPath(uri)
     if not m.cache[path] then
         local result = {}
         m.cache[path] = result
         local pos = 1
+        if libraryPath then
+            pos = #libraryPath + 2
+        end
         repeat
             local cutedPath = path:sub(pos)
             local head

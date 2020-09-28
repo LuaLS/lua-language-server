@@ -110,7 +110,7 @@ function m.reportProto()
     end
 
     local lines = {}
-    lines[#lines+1] = '    --------------- Cache ---------------'
+    lines[#lines+1] = '    --------------- Proto ---------------'
     lines[#lines+1] = ('        Holdon:   %d'):format(holdon)
     lines[#lines+1] = ('        Waiting:  %d'):format(waiting)
     return table.concat(lines, '\n')

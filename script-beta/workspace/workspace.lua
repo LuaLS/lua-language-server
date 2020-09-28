@@ -11,8 +11,9 @@ local rpath      = require 'workspace.require-path'
 
 local m = {}
 m.type = 'workspace'
-m.ignoreVersion = -1
-m.ignoreMatcher = nil
+m.nativeVersion = -1
+m.libraryVersion = -1
+m.nativeMatcher = nil
 m.uri = ''
 m.path = ''
 m.requireCache = {}
@@ -28,9 +29,9 @@ function m.init(uri)
 end
 
 --- 创建排除文件匹配器
-function m.getIgnoreMatcher()
-    if m.ignoreVersion == config.version then
-        return m.ignoreMatcher
+function m.getNativeMatcher(option, interface)
+    if m.nativeVersion == config.version then
+        return m.nativeMatcher
     end
 
     local pattern = {}
@@ -72,21 +73,78 @@ function m.getIgnoreMatcher()
         pattern[#pattern+1] = path
     end
 
-    m.ignoreMatcher = glob.gitignore(pattern)
+    m.nativeMatcher = glob.gitignore(pattern, option, interface)
 
-    if platform.OS == "Windows" then
-        m.ignoreMatcher:setOption 'ignoreCase'
+    m.nativeVersion = config.version
+    return m.nativeMatcher
+end
+
+--- 创建代码库筛选器
+function m.getLibraryMatchers(option)
+    if m.libraryVersion == config.version then
+        return m.libraryMatchers
     end
 
-    m.ignoreVersion = config.version
-    return m.ignoreMatcher
+    m.libraryMatchers = {}
+    for path, pattern in pairs(config.config.workspace.library) do
+        local nPath = fs.absolute(fs.path(path)):string()
+        local matcher = glob.gitignore(pattern, option)
+        if platform.OS == 'Windows' then
+            matcher:setOption 'ignoreCase'
+        end
+        log.debug('getLibraryMatchers', path, nPath)
+        m.libraryMatchers[#m.libraryMatchers+1] = {
+            path    = nPath,
+            matcher = matcher
+        }
+    end
+
+    m.libraryVersion = config.version
+    return m.libraryMatchers
 end
 
 --- 文件是否被忽略
 function m.isIgnored(uri)
     local path = furi.decode(uri)
-    local ignore = m.getIgnoreMatcher()
+    local ignore = m.getNativeMatcher()
     return ignore(path)
+end
+
+local function interfaceFactory(root)
+    return {
+        type = function (path)
+            if fs.is_directory(fs.path(root .. '/' .. path)) then
+                return 'directory'
+            else
+                return 'file'
+            end
+        end,
+        list = function (path)
+            local paths = {}
+            for fullpath in fs.path(root .. '/' .. path):list_directory() do
+                paths[#paths+1] = fullpath:string()
+            end
+            return paths
+        end
+    }
+end
+
+local function loadFileFactory(root, progress, isLibrary)
+    return function (path)
+        local uri = furi.encode(root .. '/' .. path)
+        if not files.isLua(uri) then
+            return
+        end
+        progress.max = progress.max + 1
+        pub.task('loadFile', uri, function (text)
+            progress.read = progress.read + 1
+            --log.info(('Preload file at: %s , size = %.3f KB'):format(uri, #text / 1000.0))
+            if isLibrary then
+                files.setLibraryPath(uri, root)
+            end
+            files.setText(uri, text)
+        end)
+    end
 end
 
 --- 预读工作区内所有文件
@@ -94,44 +152,32 @@ function m.awaitPreload()
     if not m.uri then
         return
     end
-    local max = 0
-    local read = 0
+    local progress = {
+        max  = 0,
+        read = 0,
+    }
     log.info('Preload start.')
-    local ignore = m.getIgnoreMatcher()
-
-    ignore:setInterface('type', function (path)
-        if fs.is_directory(fs.path(m.path .. '/' .. path)) then
-            return 'directory'
-        else
-            return 'file'
+    local matcherOption = {
+        ignoreCase = true
+    }
+    local nativeInterface = interfaceFactory(m.path)
+    local nativeLoader    = loadFileFactory(m.path, progress)
+    local native          = m.getNativeMatcher(matcherOption, nativeInterface)
+    local librarys        = m.getLibraryMatchers(matcherOption)
+    native:scan(nativeLoader)
+    for _, library in ipairs(librarys) do
+        local libraryInterface = interfaceFactory(library.path)
+        local libraryLoader    = loadFileFactory(library.path, progress, true)
+        for k, v in pairs(libraryInterface) do
+            library.matcher:setInterface(k, v)
         end
-    end)
+        library.matcher:scan(libraryLoader)
+    end
 
-    ignore:setInterface('list', function (path)
-        local paths = {}
-        for fullpath in fs.path(m.path .. '/' .. path):list_directory() do
-            paths[#paths+1] = fullpath:string()
-        end
-        return paths
-    end)
-
-    ignore:scan(function (path)
-        local uri = furi.encode(m.path .. '/' .. path)
-        if not files.isLua(uri) then
-            return
-        end
-        max = max + 1
-        pub.task('loadFile', uri, function (text)
-            read = read + 1
-            --log.info(('Preload file at: %s , size = %.3f KB'):format(uri, #text / 1000.0))
-            files.setText(uri, text)
-        end)
-    end)
-
-    log.info(('Found %d files.'):format(max))
+    log.info(('Found %d files.'):format(progress.max))
     while true do
-        log.info(('Loaded %d/%d files'):format(read, max))
-        if read >= max then
+        log.info(('Loaded %d/%d files'):format(progress.read, progress.max))
+        if progress.read >= progress.max then
             break
         end
         await.sleep(0.1)

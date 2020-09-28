@@ -10,6 +10,7 @@ local await    = require 'await'
 local m = {}
 
 m.openMap = {}
+m.libraryMap = {}
 m.fileMap = {}
 m.watchList = {}
 m.notifyCache = {}
@@ -47,6 +48,30 @@ function m.isOpen(uri)
         uri = uri:lower()
     end
     return m.openMap[uri] == true
+end
+
+--- 标记为库文件
+function m.setLibraryPath(uri, libraryPath)
+    if platform.OS == 'Windows' then
+        uri = uri:lower()
+    end
+    m.libraryMap[uri] = libraryPath
+end
+
+--- 是否是库文件
+function m.isLibrary(uri)
+    if platform.OS == 'Windows' then
+        uri = uri:lower()
+    end
+    return m.libraryMap[uri] ~= nil
+end
+
+--- 获取库文件的根目录
+function m.getLibraryPath(uri)
+    if platform.OS == 'Windows' then
+        uri = uri:lower()
+    end
+    return m.libraryMap[uri]
 end
 
 --- 是否存在

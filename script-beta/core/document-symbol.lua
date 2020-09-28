@@ -26,6 +26,9 @@ local function buildFunction(source, symbols)
     if source.type == 'tablefield'
     or source.type == 'setfield' then
         source = source.field
+        if not source then
+            return
+        end
     end
     local range, kind
     if func.start > source.finish then

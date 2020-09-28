@@ -173,7 +173,7 @@ end
 --- @param lsp LSP
 --- @param params table
 return function (lsp, params)
-    local name = params.command
+    local name = params.command:gsub(':.+', '')
     if not command[name] then
         return
     end

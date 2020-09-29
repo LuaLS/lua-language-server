@@ -192,18 +192,18 @@ function m.getAst(uri)
     if not file then
         return nil
     end
-    if #file.text >= config.config.workspace.maxPreload * 1000 then
-        if not m.notifyCache['maxPreload'] then
-            m.notifyCache['maxPreload'] = {}
+    if #file.text >= config.config.workspace.preloadFileSize * 1000 then
+        if not m.notifyCache['preloadFileSize'] then
+            m.notifyCache['preloadFileSize'] = {}
         end
-        if not m.notifyCache['maxPreload'][uri] then
-            m.notifyCache['maxPreload'][uri] = true
+        if not m.notifyCache['preloadFileSize'][uri] then
+            m.notifyCache['preloadFileSize'][uri] = true
             local ws = require 'workspace'
             proto.notify('window/showMessage', {
                 type = 3,
                 message = lang.script('WORKSPACE_SKIP_LARGE_FILE'
                     , ws.getRelativePath(file.uri)
-                    , config.config.workspace.maxPreload
+                    , config.config.workspace.preloadFileSize
                     , #file.text / 1000
                 ),
             })

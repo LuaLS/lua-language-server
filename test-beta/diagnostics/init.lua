@@ -560,6 +560,15 @@ local <!t!> = {}
 <!t!>[1] = 1
 ]]
 
+TEST [[
+T1 = 1
+_ENV.T2 = 2
+_G.T3 = 2
+print(T1)
+print(T2)
+print(T3)
+]]
+
 --TEST [[
 -----@class <!Class!>
 -----@class <!Class!>

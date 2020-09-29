@@ -4,14 +4,34 @@ local files   = require 'files'
 local library = require 'library'
 local util    = require 'utility'
 
+local function searchG(ref, results)
+    
+end
+
+local function searchEnvRef(ref, results)
+    if     ref.type == 'setglobal'
+    or     ref.type == 'getglobal' then
+        results[#results+1] = ref
+        searchG(ref, results)
+    elseif ref.type == 'getlocal' then
+        results[#results+1] = ref.next
+        searchG(ref.next, results)
+    end
+end
+
 local function getGlobalsOfFile(uri)
     local globals = {}
     local ast = files.getAst(uri)
     if not ast then
         return globals
     end
+    local results = {}
     local env = guide.getENV(ast.ast)
-    local results = guide.requestFields(env)
+    if env.ref then
+        for _, ref in ipairs(env.ref) do
+            searchEnvRef(ref, results)
+        end
+    end
     for _, res in ipairs(results) do
         local name = guide.getSimpleName(res)
         if name then

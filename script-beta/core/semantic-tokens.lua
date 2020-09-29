@@ -64,7 +64,7 @@ Care['getlocal'] = function (source, results)
     end
     -- 3. 不是函数的局部变量
     local hasFunc
-    for _, def in ipairs(vm.getDefs(loc)) do
+    for _, def in ipairs(vm.getDefs(loc, 'simple')) do
         if def.type == 'function'
         or (def.type == 'library' and def.value.type == 'function') then
             hasFunc = true

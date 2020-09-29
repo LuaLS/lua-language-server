@@ -6,7 +6,7 @@ package.path  = package.path
       .. ';' .. rootPath .. '\\test-beta\\?\\init.lua'
 local fs = require 'bee.filesystem'
 ROOT = fs.path(rootPath)
-LANG = 'en-US'
+LANG = 'zh-CN'
 
 collectgarbage 'generational'
 

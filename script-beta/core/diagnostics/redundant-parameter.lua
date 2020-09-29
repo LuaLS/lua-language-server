@@ -6,10 +6,11 @@ local define = require 'proto.define'
 local await  = require 'await'
 
 local function countLibraryArgs(source)
-    local func = vm.getLibrary(source, 'simple')
-    if not func then
+    local lib = vm.getLibrary(source, 'simple')
+    if not lib then
         return nil
     end
+    local func = lib.value
     local result = 0
     if not func.args then
         return result

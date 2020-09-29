@@ -186,11 +186,39 @@ local function buildDetail(source)
     end
 end
 
+local function getSnip(source)
+    local context = config.config.completion.displayContext
+    if context <= 0 then
+        return nil
+    end
+    local defs = vm.getRefs(source, 'simple')
+    for _, def in ipairs(defs) do
+        if def ~= source and def.type == 'function' then
+            local uri = guide.getUri(def)
+            local text = files.getText(uri)
+            local lines = files.getLines(uri)
+            if not text then
+                return nil
+            end
+            local row = guide.positionOf(lines, def.start)
+            local firstRow = lines[row]
+            local lastRow = lines[math.min(row + context - 1, #lines)]
+            local snip = text:sub(firstRow.start, lastRow.finish)
+            return snip
+        end
+    end
+end
+
 local function buildDesc(source)
     local hover = getHover.get(source)
     local md = markdown()
     md:add('lua', hover.label)
     md:add('md',  hover.description)
+    local snip = getSnip(source)
+    if snip then
+        md:add('md', '-------------')
+        md:add('lua', snip)
+    end
     return md:string()
 end
 

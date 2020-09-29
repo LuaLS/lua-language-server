@@ -3,7 +3,7 @@ mt.__index = mt
 mt.__name = 'markdown'
 
 function mt:add(language, text)
-    if not text then
+    if not text or #text == 0 then
         return
     end
     if language == 'md' then

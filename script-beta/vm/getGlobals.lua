@@ -4,8 +4,34 @@ local files   = require 'files'
 local library = require 'library'
 local util    = require 'utility'
 
+local function searchRawset(ref, results)
+    if guide.getKeyName(ref) ~= 's|rawset' then
+        return
+    end
+    local call = ref.parent
+    if call.type ~= 'call' or call.node ~= ref then
+        return
+    end
+    if not call.args then
+        return
+    end
+    local arg1 = call.args[1]
+    if arg1.special ~= '_G' then
+        -- 不会吧不会吧，不会真的有人写成 `rawset(_G._G._G, 'xxx', value)` 吧
+        return
+    end
+    results[#results+1] = call
+end
+
 local function searchG(ref, results)
-    
+    while ref and guide.getKeyName(ref) == 's|_G' do
+        results[#results+1] = ref
+        ref = ref.next
+    end
+    if ref then
+        results[#results+1] = ref
+        searchRawset(ref, results)
+    end
 end
 
 local function searchEnvRef(ref, results)
@@ -32,7 +58,12 @@ local function getGlobalsOfFile(uri)
             searchEnvRef(ref, results)
         end
     end
+    local mark = {}
     for _, res in ipairs(results) do
+        if mark[res] then
+            goto CONTINUE
+        end
+        mark[res] = true
         local name = guide.getSimpleName(res)
         if name then
             if not globals[name] then
@@ -40,6 +71,7 @@ local function getGlobalsOfFile(uri)
             end
             globals[name][#globals[name]+1] = res
         end
+        ::CONTINUE::
     end
     return globals
 end

@@ -75,6 +75,6 @@ function vm.getGlobalSets(name)
             cache[#cache+1] = source
         end
     end
-    vm.getCache('getGlobals')[name] = cache
+    vm.getCache('getGlobalDefs')[name] = cache
     return cache
 end

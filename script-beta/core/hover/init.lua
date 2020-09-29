@@ -95,6 +95,7 @@ local accept = {
     ['field']     = true,
     ['method']    = true,
     ['string']    = true,
+    ['number']    = true,
 }
 
 local function getHoverByUri(uri, offset)

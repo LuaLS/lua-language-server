@@ -368,6 +368,11 @@ local s = <?'abc中文'?>
 [[9 个字节，5 个字符]]
 
 TEST [[
+local n = <?0xff?>
+]]
+[[255]]
+
+TEST [[
 local <?t?> = {
     a = 1,
     b = 2,

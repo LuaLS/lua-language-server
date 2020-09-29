@@ -6,6 +6,8 @@ local vm          = require 'vm'
 local util        = require 'utility'
 local guide       = require 'parser.guide'
 local lang        = require 'language'
+local config      = require 'config'
+local files       = require 'files'
 
 local function asFunction(source, oop)
     local name = buildName(source, oop)
@@ -108,6 +110,29 @@ local function asString(source)
     end
 end
 
+local function formatNumber(n)
+    local str = ('%.10f'):format(n)
+    str = str:gsub('%.?0*$', '')
+    return str
+end
+
+local function asNumber(source)
+    if not config.config.hover.viewNumber then
+        return nil
+    end
+    local num = source[1]
+    if type(num) ~= 'number' then
+        return nil
+    end
+    local uri  = guide.getUri(source)
+    local text = files.getText(uri)
+    local raw = text:sub(source.start, source.finish)
+    if not raw or not raw:find '[^%-%d%.]' then
+        return nil
+    end
+    return formatNumber(num)
+end
+
 return function (source, oop)
     if source.type == 'function' then
         return asFunction(source, oop)
@@ -128,6 +153,8 @@ return function (source, oop)
         return asField(source)
     elseif source.type == 'string' then
         return asString(source)
+    elseif source.type == 'number' then
+        return asNumber(source)
     elseif source.type == 'library' then
         return asLibrary(source)
     end

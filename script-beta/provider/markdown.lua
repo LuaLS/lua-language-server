@@ -6,10 +6,10 @@ function mt:add(language, text)
     if not text then
         return
     end
-    if language == 'lua' then
-        self[#self+1] = ('```lua\n%s\n```'):format(text)
+    if language == 'md' then
+        self[#self+1] = text
     else
-        self[#self+1] = text .. '\n'
+        self[#self+1] = ('```%s\n%s\n```'):format(language, text)
     end
 end
 

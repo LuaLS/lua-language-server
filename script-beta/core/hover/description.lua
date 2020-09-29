@@ -9,11 +9,7 @@ local client   = require 'provider.client'
 local lang     = require 'language'
 local platform = require 'bee.platform'
 
-local function asString(source)
-    local literal = guide.getLiteral(source)
-    if type(literal) ~= 'string' then
-        return nil
-    end
+local function asStringInRequire(source, literal)
     local parent = source.parent
     if parent and parent.type == 'callargs' then
         local result, searchers
@@ -47,9 +43,37 @@ local function asString(source)
                 end
             end
             table.sort(result)
-            return table.concat(result, '\n')
+            local md = markdown()
+            md:add('md', table.concat(result, '\n'))
+            return md:string()
         end
     end
+end
+
+local function asStringView(source, literal)
+    -- 内部包含转义符？
+    local rawLen = source.finish - source.start - 2 * #source[2] + 1
+    if  config.config.hover.viewString
+    and (source[2] == '"' or source[2] == "'")
+    and rawLen > #literal then
+        local view = literal
+        local max = config.config.hover.viewStringMax
+        if #view > max then
+            view = view:sub(1, max) .. '...'
+        end
+        local md = markdown()
+        md:add('txt', view)
+        return md:string()
+    end
+end
+
+local function asString(source)
+    local literal = guide.getLiteral(source)
+    if type(literal) ~= 'string' then
+        return nil
+    end
+    return asStringInRequire(source, literal)
+        or asStringView(source, literal)
 end
 
 local function getDocFormater()
@@ -140,18 +164,18 @@ local function tryLibrary(source)
     local fmt = getDocFormater()
     local md = markdown()
     if lib.value.description then
-        md:add('markdown', lib.value.description:gsub('%(doc%:(.-)%)', function (tag)
+        md:add('md', lib.value.description:gsub('%(doc%:(.-)%)', function (tag)
             if fmt then
                 return '(' .. lang.script(fmt, tag) .. ')'
             end
         end))
     end
     if lib.value.enums then
-        md:add('markdown', '-------------')
+        md:add('md', '-------------')
         md:add('lua', buildLibEnums(lib.value))
     end
     if lib.value.doc and fmt then
-        md:add('markdown', ('[%s](%s)'):format(lang.script.HOVER_VIEW_DOCUMENTS, lang.script(fmt, 'pdf-' .. lib.value.doc)))
+        md:add('md', ('[%s](%s)'):format(lang.script.HOVER_VIEW_DOCUMENTS, lang.script(fmt, 'pdf-' .. lib.value.doc)))
     end
     return md:string()
 end

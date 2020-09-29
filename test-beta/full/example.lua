@@ -6,7 +6,7 @@ local config = require 'config'
 
 -- 临时
 local function testIfExit(path)
-    config.config.workspace.maxPreload = 1000000000
+    config.config.workspace.preloadFileSize = 1000000000
     local buf = util.loadFile(path:string())
     if buf then
         local vm

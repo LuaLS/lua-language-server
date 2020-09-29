@@ -23,11 +23,7 @@ return function (lsp, params)
     log.info(table.dump(params))
     log.debug('ProcessID', sp.get_id())
 
-    if params.workspaceFolders and params.workspaceFolders ~= json.null then
-        for _, folder in ipairs(params.workspaceFolders) do
-            --lsp:addWorkspace(folder.name, folder.uri)
-        end
-    elseif params.rootUri and params.rootUri ~= json.null then
+    if params.rootUri and params.rootUri ~= json.null then
         lsp:addWorkspace('root', params.rootUri)
     end
 

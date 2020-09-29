@@ -32,7 +32,7 @@ end
 
 local function getGlobals(name)
     local results = {}
-    for uri in files:eachFile() do
+    for uri in files.eachFile() do
         local cache = files.getCache(uri)
         cache.globals = cache.globals or getGlobalsOfFile(uri)
         if name == '*' then

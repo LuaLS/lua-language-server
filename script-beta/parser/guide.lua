@@ -1766,6 +1766,14 @@ function m.searchSameFields(status, simple, mode)
             if first.tag == '_ENV' then
                 -- 检查全局变量的分支情况，需要业务层传入 interface.global
                 m.checkSameSimpleInGlobal(status, simple[1], 1, queue)
+                if first.ref then
+                    for _, ref in ipairs(first.ref) do
+                        queue[#queue+1] = {
+                            obj   = ref,
+                            start = 1,
+                        }
+                    end
+                end
             else
                 simple.global = nil
                 tableInsert(simple, 1, 'l|_ENV')

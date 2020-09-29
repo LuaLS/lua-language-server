@@ -201,8 +201,7 @@ function m.getAst(uri)
             local ws = require 'workspace'
             proto.notify('window/showMessage', {
                 type = 3,
-                -- TODO 翻译
-                message = lang.script('已跳过过大的文件：{}。当前设置的大小限制为：{} KB，该文件大小为：{} KB'
+                message = lang.script('WORKSPACE_SKIP_LARGE_FILE'
                     , ws.getRelativePath(file.uri)
                     , config.config.workspace.maxPreload
                     , #file.text / 1000

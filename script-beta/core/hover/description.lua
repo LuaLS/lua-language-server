@@ -41,7 +41,7 @@ local function asString(source)
                 if searcher then
                     searcher = searcher:sub(#ws.path + 1)
                     searcher = ws.normalize(searcher)
-                    result[i] = ('* [%s](%s) （假设搜索路径包含 `%s`）'):format(path, uri, searcher)
+                    result[i] = ('* [%s](%s) %s'):format(path, uri, lang.script('HOVER_USE_LUA_PATH', searcher))
                 else
                     result[i] = ('* [%s](%s)'):format(path, uri)
                 end

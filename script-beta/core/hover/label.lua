@@ -5,6 +5,7 @@ local buildTable  = require 'core.hover.table'
 local vm          = require 'vm'
 local util        = require 'utility'
 local guide       = require 'parser.guide'
+local lang        = require 'language'
 
 local function asFunction(source, oop)
     local name = buildName(source, oop)
@@ -100,11 +101,10 @@ local function asString(source)
     end
     local len = #str
     local charLen = util.utf8Len(str, 1, -1)
-    -- TODO 翻译
     if len == charLen then
-        return ('%d 个字节'):format(len)
+        return lang.script('HOVER_STRING_BYTES', len)
     else
-        return ('%d 个字节，%d 个字符'):format(len, charLen)
+        return lang.script('HOVER_STRING_CHARACTERS', len, charLen)
     end
 end
 

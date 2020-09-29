@@ -19,6 +19,7 @@ local keyWordMap = require 'core.keyword'
 local workspace  = require 'workspace'
 local furi       = require 'file-uri'
 local rpath      = require 'workspace.require-path'
+local lang       = require 'language'
 
 local stackID = 0
 local stacks = {}
@@ -593,11 +594,10 @@ local function checkUri(ast, text, offset, results)
                                 }
                             }
                         end
-                        -- TODO 翻译
-                        collect[info.expect][#collect[info.expect]+1] = ([=[* [%s](%s) （假设搜索路径包含 `%s`）]=]):format(
+                        collect[info.expect][#collect[info.expect]+1] = ([=[* [%s](%s) %s]=]):format(
                             path,
                             uri,
-                            info.searcher
+                            lang.script('HOVER_USE_LUA_PATH', info.searcher)
                         )
                     end
                 end
@@ -620,7 +620,6 @@ local function checkUri(ast, text, offset, results)
                             }
                         }
                     end
-                    -- TODO 翻译
                     collect[path][#collect[path]+1] = ([=[[%s](%s)]=]):format(
                         path,
                         uri

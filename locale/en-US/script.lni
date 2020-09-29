@@ -43,6 +43,8 @@ MWS_UCONFIG_FAILED      = 'Saving user setting failed.'
 MWS_UCONFIG_UPDATED     = 'User setting updated.'
 MWS_WCONFIG_UPDATED     = 'Workspace setting updated.'
 
+WORKSPACE_SKIP_LARGE_FILE = 'Too large file: {} skipped. The currently set size limit is: {} KB, and the file size is: {} KB.'
+
 PARSER_CRASH            = 'Parser crashed! Last words:{}'
 PARSER_UNKNOWN          = 'Unknown syntax error...'
 PARSER_MISS_NAME        = '<name> expected.'
@@ -82,6 +84,7 @@ PARSER_ERR_DO_AS_THEN   = 'Should use `do` .'
 PARSER_MISS_END         = 'Miss corresponding `end` .'
 PARSER_ERR_COMMENT_PREFIX = 'Lua should use `--` for annotations.'
 PARSER_MISS_SEP_IN_TABLE = 'Miss symbol `,` or `;` .'
+PARSER_SET_CONST        = 'Assignment to const variable.'
 
 SYMBOL_ANONYMOUS        = '<Anonymous>'
 
@@ -100,9 +103,13 @@ HOVER_NATIVE_DOCUMENT_LUA53     = 'command:extension.lua.doc?["en-us/53/manual.h
 HOVER_NATIVE_DOCUMENT_LUA54     = 'command:extension.lua.doc?["en-us/54/manual.html/{}"]'
 HOVER_NATIVE_DOCUMENT_LUAJIT    = 'command:extension.lua.doc?["en-us/51/manual.html/{}"]'
 
-HOVER_MULTI_PROTOTYPE   = '({} prototypes)'
-HOVER_STRING_BYTES      = '{} bytes'
-HOVER_STRING_CHARACTERS = '{} bytes, {} characters'
+HOVER_MULTI_PROTOTYPE      = '({} prototypes)'
+HOVER_STRING_BYTES         = '{} bytes'
+HOVER_STRING_CHARACTERS    = '{} bytes, {} characters'
+HOVER_MULTI_DEF_PROTO      = '({} definitions, {} prototypes)'
+HOVER_MULTI_PROTO_NOT_FUNC = '({} non functional definition)'
+
+HOVER_USE_LUA_PATH      = '(Suppose the search path contains `{}`)'
 
 ACTION_DISABLE_DIAG     = 'Disable diagnostics ({}).'
 ACTION_MARK_GLOBAL      = 'Mark `{}` as defined global.'

@@ -120,8 +120,12 @@ local function interfaceFactory(root)
             end
         end,
         list = function (path)
+            local fullPath = fs.path(root .. '/' .. path)
+            if not fs.exists(fullPath) then
+                return nil
+            end
             local paths = {}
-            for fullpath in fs.path(root .. '/' .. path):list_directory() do
+            for fullpath in fullPath:list_directory() do
                 paths[#paths+1] = fullpath:string()
             end
             return paths

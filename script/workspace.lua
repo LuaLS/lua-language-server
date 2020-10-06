@@ -58,6 +58,12 @@ function mt:buildScanPattern()
                 pattern[#pattern+1] = line
             end
         end
+        buf = io.load(self.root / '.git' / 'info' / 'exclude' )
+        if buf then
+            for line in buf:gmatch '[^\r\n]+' do
+                pattern[#pattern+1] = line
+            end
+        end
     end
     -- config.workspace.library
     for path in pairs(config.config.workspace.library) do

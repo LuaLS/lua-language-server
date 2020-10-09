@@ -126,12 +126,9 @@ return function (uri, start, finish)
 
     local results = {}
     local count = 0
-    guide.eachSource(ast.ast, function (source)
+    guide.eachSourceBetween(ast.ast, start, finish, function (source)
         local method = Care[source.type]
         if not method then
-            return
-        end
-        if source.start > finish or source.finish < start then
             return
         end
         method(source, results)

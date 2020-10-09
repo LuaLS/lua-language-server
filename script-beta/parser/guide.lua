@@ -339,6 +339,14 @@ function m.isInRange(source, offset)
     return (source.vstart or source.start) <= offset and (source.range or source.finish) >= offset - 1
 end
 
+function m.isBetween(source, start, finish)
+    return source.start <= finish and source.finish >= start - 1
+end
+
+function m.isBetweenRange(source, start, finish)
+    return (source.vstart or source.start) <= finish and (source.range or source.finish) >= start - 1
+end
+
 --- 添加child
 function m.addChilds(list, obj, map)
     local keys = map[obj.type]
@@ -371,6 +379,32 @@ function m.eachSourceContain(ast, offset, callback)
             mark[obj] = true
             if m.isInRange(obj, offset) then
                 if m.isContain(obj, offset) then
+                    local res = callback(obj)
+                    if res ~= nil then
+                        return res
+                    end
+                end
+                m.addChilds(list, obj, m.childMap)
+            end
+        end
+    end
+end
+
+--- 遍历所有在某个范围内的source
+function m.eachSourceBetween(ast, start, finish, callback)
+    local list = { ast }
+    local mark = {}
+    while true do
+        local len = #list
+        if len == 0 then
+            return
+        end
+        local obj = list[len]
+        list[len] = nil
+        if not mark[obj] then
+            mark[obj] = true
+            if m.isBetweenRange(obj, start, finish) then
+                if m.isBetween(obj, start, finish) then
                     local res = callback(obj)
                     if res ~= nil then
                         return res

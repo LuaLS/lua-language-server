@@ -98,11 +98,13 @@ local function buildValue(source, symbols)
         range      = { source.field.start, source.field.finish }
         sRange     = { source.field.start, source.field.finish }
         kind       = skind.Property
-    else
+    elseif source.type == 'setfield' then
         details[1] = 'field'
         range      = { source.field.start, source.field.finish }
         sRange     = { source.field.start, source.field.finish }
         kind       = skind.Field
+    else
+        return
     end
     if source.value then
         local literal = source.value[1]

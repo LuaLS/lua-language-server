@@ -95,7 +95,7 @@ local function solveLowercaseGlobal(uri, diag, results)
         end
 
         local name = guide.getName(source)
-        markGlobal(name, results)
+        markGlobal(uri, name, results)
     end)
 end
 

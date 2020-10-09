@@ -94,11 +94,17 @@ local function buildValue(source, symbols)
         sRange     = { source.start, source.finish }
         kind       = skind.Class
     elseif source.type == 'tablefield' then
+        if not source.field then
+            return
+        end
         details[1] = 'field'
         range      = { source.field.start, source.field.finish }
         sRange     = { source.field.start, source.field.finish }
         kind       = skind.Property
     elseif source.type == 'setfield' then
+        if not source.field then
+            return
+        end
         details[1] = 'field'
         range      = { source.field.start, source.field.finish }
         sRange     = { source.field.start, source.field.finish }

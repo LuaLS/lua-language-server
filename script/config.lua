@@ -91,7 +91,7 @@ end
 
 local ConfigTemplate = {
     runtime = {
-        version         = {'Lua 5.3', String},
+        version         = {'Lua 5.4', String},
         library         = {{},        Str2Hash ';'},
         path            = {{
                                 "?.lua",

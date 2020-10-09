@@ -558,21 +558,21 @@ collectgarbage('$')
         },
     },
     {
-        label       = "'setpause'",
+        label       = "'incremental'",
         kind        = CompletionItemKind.EnumMember,
         textEdit    = {
             start   = 16,
             finish  = 17,
-            newText = "'setpause'",
+            newText = "'incremental'",
         },
     },
     {
-        label       = "'setstepmul'",
+        label       = "'generational'",
         kind        = CompletionItemKind.EnumMember,
         textEdit    = {
             start   = 16,
             finish  = 17,
-            newText = "'setstepmul'",
+            newText = "'generational'",
         },
     },
     {

@@ -819,6 +819,7 @@ global _G: _G {
     tostring: function,
     type: function,
     utf8: utf8,
+    warn: function,
     xpcall: function,
 }
 ]]

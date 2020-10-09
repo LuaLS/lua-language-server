@@ -17,9 +17,9 @@ local setmetatable = setmetatable
 local assert       = assert
 local select       = select
 local osClock      = os.clock
-local DEVELOP      = DEVELOP
+local DEVELOP      = _G.DEVELOP
 
-local _ENV = nil
+_ENV = nil
 
 local m = {}
 

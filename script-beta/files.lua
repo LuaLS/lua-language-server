@@ -6,6 +6,7 @@ local parser   = require 'parser'
 local proto    = require 'proto'
 local lang     = require 'language'
 local await    = require 'await'
+local timer    = require 'timer'
 
 local m = {}
 
@@ -112,6 +113,7 @@ function m.setText(uri, text)
     file.ast   = nil
     file.lines = nil
     file.cache = {}
+    file.cacheActiveTime = math.huge
     file.version = file.version + 1
     m.globalVersion = m.globalVersion + 1
     await.close('files.version')
@@ -232,6 +234,7 @@ function m.getAst(uri)
             return nil
         end
     end
+    file.cacheActiveTime = timer.clock()
     return file.ast
 end
 
@@ -280,6 +283,7 @@ function m.getCache(uri)
     if not file then
         return nil
     end
+    file.cacheActiveTime = timer.clock()
     return file.cache
 end
 
@@ -337,5 +341,26 @@ function m.onWatch(ev, ...)
         callback(ev, ...)
     end
 end
+
+local function init()
+    --TODO 可以清空文件缓存，之后看要不要启用吧
+    --timer.loop(10, function ()
+    --    local list = {}
+    --    for _, file in pairs(m.fileMap) do
+    --        if timer.clock() - file.cacheActiveTime > 10.0 then
+    --            file.cacheActiveTime = math.huge
+    --            file.ast = nil
+    --            file.cache = {}
+    --            list[#list+1] = file.uri
+    --        end
+    --    end
+    --    if #list > 0 then
+    --        log.info('Flush file caches:', #list, '\n', table.concat(list, '\n'))
+    --        collectgarbage()
+    --    end
+    --end)
+end
+
+xpcall(init, log.error)
 
 return m

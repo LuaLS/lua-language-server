@@ -4,6 +4,7 @@ local await          = require 'await'
 local TokenTypes     = require 'define.TokenTypes'
 local TokenModifiers = require 'define.TokenModifiers'
 local vm             = require 'vm'
+local util           = require 'utility'
 
 local Care = {}
 Care['setglobal'] = function (source, results)
@@ -89,14 +90,16 @@ Care['getlocal'] = function (source, results)
 end
 Care['setlocal'] = Care['getlocal']
 
-local function buildTokens(results, lines)
+local function buildTokens(results, text, lines)
     local tokens = {}
     local lastLine = 0
     local lastStartChar = 0
     for i, source in ipairs(results) do
         local row, col = guide.positionOf(lines, source.start)
+        local start    = guide.lineRange(lines, row)
+        local ucol     = util.utf8Len(text, start, start + col - 1)
         local line = row - 1
-        local startChar = col - 1
+        local startChar = ucol - 1
         local deltaLine = line - lastLine
         local deltaStartChar
         if deltaLine == 0 then
@@ -120,6 +123,7 @@ end
 return function (uri, start, finish)
     local ast   = files.getAst(uri)
     local lines = files.getLines(uri)
+    local text  = files.getText(uri)
     if not ast then
         return nil
     end
@@ -142,7 +146,7 @@ return function (uri, start, finish)
         return a.start < b.start
     end)
 
-    local tokens = buildTokens(results, lines)
+    local tokens = buildTokens(results, text, lines)
 
     return tokens
 end

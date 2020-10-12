@@ -112,7 +112,7 @@ function m.getKeyName(source)
         local special = m.getSpecial(source.node)
         if special == 'rawset'
         or special == 'rawget' then
-            return guide.getKeyName(source.args[2])
+            return guide.getKeyNameOfLiteral(source.args[2])
         end
     end
     return guide.getKeyName(source)

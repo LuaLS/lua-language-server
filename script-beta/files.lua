@@ -170,7 +170,7 @@ function m.removeAll()
         m.fileMap[uri] = nil
         m.onWatch('remove', uri)
     end
-    m.notifyCache = {}
+    --m.notifyCache = {}
 end
 
 --- 遍历文件
@@ -195,18 +195,22 @@ function m.getAst(uri)
     if #file.text >= config.config.workspace.preloadFileSize * 1000 then
         if not m.notifyCache['preloadFileSize'] then
             m.notifyCache['preloadFileSize'] = {}
+            m.notifyCache['skipLargeFileCount'] = 0
         end
         if not m.notifyCache['preloadFileSize'][uri] then
             m.notifyCache['preloadFileSize'][uri] = true
-            local ws = require 'workspace'
-            proto.notify('window/showMessage', {
-                type = 3,
-                message = lang.script('WORKSPACE_SKIP_LARGE_FILE'
-                    , ws.getRelativePath(file.uri)
-                    , config.config.workspace.preloadFileSize
-                    , #file.text / 1000
-                ),
-            })
+            m.notifyCache['skipLargeFileCount'] = m.notifyCache['skipLargeFileCount'] + 1
+            if m.notifyCache['skipLargeFileCount'] <= 3 then
+                local ws = require 'workspace'
+                proto.notify('window/showMessage', {
+                    type = 3,
+                    message = lang.script('WORKSPACE_SKIP_LARGE_FILE'
+                        , ws.getRelativePath(file.uri)
+                        , config.config.workspace.preloadFileSize
+                        , #file.text / 1000
+                    ),
+                })
+            end
         end
         file.ast = nil
         return nil

@@ -1,15 +1,20 @@
 local guide     = require 'parser.guide'
 local util      = require 'utility'
 local files     = require 'files'
+local timer     = require 'timer'
 
-local setmetatable = setmetatable
-local assert       = assert
-local require      = require
-local type         = type
-local running      = coroutine.running
-local ipairs       = ipairs
+local setmetatable   = setmetatable
+local assert         = assert
+local require        = require
+local type           = type
+local running        = coroutine.running
+local ipairs         = ipairs
+local log            = log
+local xpcall         = xpcall
+local mathHuge       = math.huge
+local collectgarbage = collectgarbage
 
-_ENV = nil
+local _ENV = nil
 
 ---@class vm
 local m = {}
@@ -131,6 +136,7 @@ function m.flushCache()
     end
     m.cacheVersion = files.globalVersion
     m.cache = {}
+    m.cacheActiveTime = mathHuge
     m.locked = setmetatable({}, { __mode = 'k' })
     m.cacheTracker[m.cache] = true
 end
@@ -139,12 +145,26 @@ function m.getCache(name)
     if m.cacheVersion ~= files.globalVersion then
         m.flushCache()
     end
+    m.cacheActiveTime = timer.clock()
     if not m.cache[name] then
         m.cache[name] = {}
     end
     return m.cache[name]
 end
 
-m.flushCache()
+local function init()
+    m.flushCache()
+
+    -- 可以在一段时间不活动后清空缓存，不过目前看起来没有必要
+    --timer.loop(1, function ()
+    --    if timer.clock() - m.cacheActiveTime > 10.0 then
+    --        log.info('Flush cache: Inactive')
+    --        m.flushCache()
+    --        collectgarbage()
+    --    end
+    --end)
+end
+
+xpcall(init, log.error)
 
 return m

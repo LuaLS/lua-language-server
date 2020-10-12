@@ -610,7 +610,7 @@ function m.getKeyNameOfLiteral(obj)
         if s then
             return 's|' .. s
         else
-            return s
+            return 's'
         end
     elseif tp == 'number' then
         local n = obj[1]
@@ -631,6 +631,9 @@ function m.getKeyNameOfLiteral(obj)
 end
 
 function m.getKeyName(obj)
+    if not obj then
+        return nil
+    end
     local tp = obj.type
     if tp == 'getglobal'
     or tp == 'setglobal' then

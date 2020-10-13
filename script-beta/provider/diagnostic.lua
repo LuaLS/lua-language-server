@@ -149,6 +149,7 @@ function m.diagnostics(uri)
 end
 
 function m.doDiagnostic(uri)
+    uri = uri:lower()
     if files.isLibrary(uri) then
         return
     end

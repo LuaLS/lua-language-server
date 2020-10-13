@@ -116,7 +116,7 @@ function vm.getGlobals(name)
 end
 
 function vm.getGlobalSets(name)
-    local cache = vm.getCache('getGlobalDefs')[name]
+    local cache = vm.getCache('getGlobalSets')[name]
     if cache ~= nil then
         return cache
     end
@@ -127,6 +127,6 @@ function vm.getGlobalSets(name)
             cache[#cache+1] = source
         end
     end
-    vm.getCache('getGlobalDefs')[name] = cache
+    vm.getCache('getGlobalSets')[name] = cache
     return cache
 end

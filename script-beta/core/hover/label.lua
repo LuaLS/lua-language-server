@@ -126,6 +126,9 @@ local function asNumber(source)
     end
     local uri  = guide.getUri(source)
     local text = files.getText(uri)
+    if not text then
+        return nil
+    end
     local raw = text:sub(source.start, source.finish)
     if not raw or not raw:find '[^%-%d%.]' then
         return nil

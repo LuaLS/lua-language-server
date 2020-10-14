@@ -62,10 +62,10 @@ type = 'string'
 name = 'code'
 type = 'integer'
 [[.enums]]
-type = 'type'
+name = 'type'
 enum = '"exit"'
 ``````````
-type = 'type'
+name = 'type'
 enum = '"signal"'
 
 ['execute Lua 5.1']

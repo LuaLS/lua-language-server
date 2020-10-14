@@ -6,6 +6,7 @@ local files  = require 'files'
 local config = require 'config'
 local core   = require 'core.diagnostics'
 local util   = require 'utility'
+local ws     = require 'workspace'
 
 local m = {}
 m._start = false
@@ -106,6 +107,7 @@ local function merge(a, b)
 end
 
 function m.clear(uri)
+    uri = uri:lower()
     if not m.cache[uri] then
         return
     end
@@ -217,6 +219,10 @@ files.watch(function (env, uri)
         m.clear(uri)
     elseif env == 'update' then
         m.refresh(uri)
+    elseif env == 'close' then
+        if ws.isIgnored(uri) then
+            m.clear(uri)
+        end
     end
 end)
 

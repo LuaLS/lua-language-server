@@ -6,7 +6,6 @@ local config     = require 'config'
 local glob       = require 'glob'
 local platform   = require 'bee.platform'
 local await      = require 'await'
-local diagnostic = require 'provider.diagnostic'
 local rpath      = require 'workspace.require-path'
 
 local m = {}
@@ -188,6 +187,8 @@ function m.awaitPreload()
     end
 
     log.info('Preload finish.')
+
+    local diagnostic = require 'provider.diagnostic'
     diagnostic.start()
 end
 

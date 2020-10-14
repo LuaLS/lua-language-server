@@ -148,7 +148,7 @@ local function findParentInStringIndex(ast, text, offset)
         return
     end
     local parent = near.parent
-    if parent.index ~= near then
+    if not parent or parent.index ~= near then
         return
     end
     -- index不可能是oop模式

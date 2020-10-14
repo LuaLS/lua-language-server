@@ -1,7 +1,7 @@
 local guide     = require 'parser.guide'
 
 return function (ast, offset, accept)
-    local len = 999
+    local len = math.huge
     local result
     guide.eachSourceContain(ast.ast, offset, function (source)
         if source.finish - source.start < len and accept[source.type] then

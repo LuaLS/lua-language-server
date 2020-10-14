@@ -107,13 +107,13 @@ local function merge(a, b)
 end
 
 function m.clear(uri)
-    uri = uri:lower()
-    if not m.cache[uri] then
+    local luri = uri:lower()
+    if not m.cache[luri] then
         return
     end
-    m.cache[uri] = nil
+    m.cache[luri] = nil
     proto.notify('textDocument/publishDiagnostics', {
-        uri = files.getOriginUri(uri),
+        uri = files.getOriginUri(luri) or uri,
         diagnostics = {},
     })
 end
@@ -214,15 +214,11 @@ function m.start()
     m.diagnosticsAll()
 end
 
-files.watch(function (env, uri)
-    if env == 'remove' then
+files.watch(function (ev, uri)
+    if ev == 'remove' then
         m.clear(uri)
-    elseif env == 'update' then
+    elseif ev == 'update' then
         m.refresh(uri)
-    elseif env == 'close' then
-        if ws.isIgnored(uri) then
-            m.clear(uri)
-        end
     end
 end)
 

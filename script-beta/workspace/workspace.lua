@@ -261,4 +261,10 @@ function m.reload()
     await.call(m.awaitPreload, 'preload')
 end
 
+files.watch(function (ev, uri)
+    if ev == 'close' and m.isIgnored(uri) then
+        files.remove(uri)
+    end
+end)
+
 return m

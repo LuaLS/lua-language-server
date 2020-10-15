@@ -96,6 +96,8 @@ to the userdata `u` plus a boolean,
 
 [setcstacklimit]
 description = [[
+### **Deprecated in `Lua 5.4.2`**
+
 Sets a new limit for the C stack. This limit controls how deeply nested calls can go in Lua, with the intent of avoiding a stack overflow.
 
 In case of success, this function returns the old limit. In case of error, it returns `false`.

@@ -154,6 +154,7 @@ type = 'boolean'
 
 [setcstacklimit]
 version = 'Lua 5.4'
+deprecated = true
 [[.args]]
 name = 'limit'
 type = 'integer'

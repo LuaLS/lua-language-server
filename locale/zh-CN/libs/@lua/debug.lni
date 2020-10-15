@@ -92,6 +92,8 @@ description = '返回关联在 `u` 上的第 `n` 个 `Lua` 值，以及一个布
 
 [setcstacklimit]
 description = [[
+### **已在 `Lua 5.4.2` 中废弃**
+
 设置新的C栈限制。该限制控制Lua中嵌套调用的深度，以避免堆栈溢出。
 
 如果设置成功，该函数返回之前的限制；否则返回`false`。

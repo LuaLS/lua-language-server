@@ -352,9 +352,10 @@ local function checkFieldThen(name, src, word, start, offset, parent, oop, resul
             kind = ckind.Function
         end
         buildFunction(results, src, oop, {
-            label = name,
-            kind  = kind,
-            id    = stack(function ()
+            label      = name,
+            kind       = kind,
+            deprecated = value.deprecated,
+            id         = stack(function ()
                 return {
                     detail      = buildDetail(src),
                     description = buildDesc(src),
@@ -382,11 +383,11 @@ local function checkFieldThen(name, src, word, start, offset, parent, oop, resul
         textEdit, additionalTextEdits = checkFieldFromFieldToIndex(name, parent, word, start, offset)
     end
     results[#results+1] = {
-        label    = name,
-        kind     = kind,
-        textEdit = textEdit,
+        label      = name,
+        kind       = kind,
+        textEdit   = textEdit,
         additionalTextEdits = additionalTextEdits,
-        id       = stack(function ()
+        id         = stack(function ()
             return {
                 detail      = buildDetail(src),
                 description = buildDesc(src),

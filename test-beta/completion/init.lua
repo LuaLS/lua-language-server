@@ -38,6 +38,7 @@ local Cared = {
     ['kind']                = true,
     ['textEdit']            = true,
     ['additionalTextEdits'] = true,
+    ['deprecated']          = true,
 }
 
 function TEST(script)
@@ -1140,6 +1141,22 @@ TEST [[
 io$
 ]]
 (EXISTS)
+
+TEST [[
+debug.setcsta$
+]]
+{
+    {
+        label = 'setcstacklimit',
+        kind = CompletionItemKind.Function,
+        deprecated = true,
+    },
+    {
+        label = 'setcstacklimit()',
+        kind = CompletionItemKind.Snippet,
+        deprecated = true,
+    },
+}
 
 do return end
 TEST [[

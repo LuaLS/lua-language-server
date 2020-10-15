@@ -360,6 +360,7 @@ proto.on('textDocument/completion', function (params)
         local item = {
             label            = res.label,
             kind             = res.kind,
+            deprecated       = res.deprecated,
             sortText         = ('%04d'):format(i),
             insertText       = res.insertText,
             insertTextFormat = res.insertTextFormat,

@@ -1,5 +1,3 @@
-local emmy = require 'parser.emmy'
-
 local tonumber    = tonumber
 local stringChar  = string.char
 local utf8Char    = utf8.char
@@ -14,6 +12,7 @@ _ENV = nil
 local State
 local PushError
 local PushDiag
+local PushComment
 
 -- goto 单独处理
 local RESERVED = {
@@ -256,6 +255,13 @@ local Defs = {
             start  = pos,
             finish = pos + 4,
             [1]    = false,
+        }
+    end,
+    ShortComment = function (start, text, finish)
+        PushComment {
+            start  = start,
+            finish = finish - 1,
+            text   = text,
         }
     end,
     LongComment = function (beforeEq, afterEq, str, missPos)
@@ -1724,21 +1730,18 @@ local Defs = {
     end,
 }
 
---for k, v in pairs(emmy.ast) do
---    Defs[k] = v
---end
-
 local function init(state)
-    State     = state
-    PushError = state.pushError
-    PushDiag  = state.pushDiag
-    emmy.init(State)
+    State       = state
+    PushError   = state.pushError
+    PushDiag    = state.pushDiag
+    PushComment = state.pushComment
 end
 
 local function close()
-    State     = nil
-    PushError = function (_) end
-    PushDiag  = function (_) end
+    State       = nil
+    PushError   = function (...) end
+    PushDiag    = function (...) end
+    PushComment = function (...) end
 end
 
 return {

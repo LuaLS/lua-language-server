@@ -1,6 +1,5 @@
 local re = require 'parser.relabel'
 local m = require 'lpeglabel'
-local emmy = require 'parser.emmy'
 local ast = require 'parser.ast'
 
 local scriptBuf = ''
@@ -93,15 +92,13 @@ LongComment     <-  ('--[' {} {:eq: '='* :} {} '['
                     )
                 ->  CLongComment
 CommentClose    <-  ']' =eq ']'
-ShortComment    <-  (!%nl .)*
+ShortComment    <-  ({} {(!%nl .)*} {})
+                ->  ShortComment
 ]]
 
 grammar 'Sp' [[
-Sp  <-  (EmmyLua / Comment / %nl / %s)*
-Sps <-  (EmmyLua / Comment / %nl / %s)+
-
--- 占位
-EmmyLua <- !. .
+Sp  <-  (Comment / %nl / %s)*
+Sps <-  (Comment / %nl / %s)+
 ]]
 
 grammar 'Common' [[
@@ -521,8 +518,6 @@ FuncName    <-  {| Single (Sp SuffixWithoutCall)* |}
             ->  Simple
             /   {} -> MissName %nil
 ]]
-
---grammar 'EmmyLua' (emmy.grammar)
 
 grammar 'Lua' [[
 Lua         <-  Head?

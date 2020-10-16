@@ -39,6 +39,9 @@ Care['getglobal'] = function (source, results)
 end
 Care['tablefield'] = function (source, results)
     local field = source.field
+    if not field then
+        return
+    end
     results[#results+1] = {
         start      = field.start,
         finish     = field.finish,

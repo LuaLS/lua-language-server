@@ -29,6 +29,9 @@ local function asField(source)
 end
 
 local function asTableField(source)
+    if not source.field then
+        return
+    end
     return guide.getName(source.field)
 end
 

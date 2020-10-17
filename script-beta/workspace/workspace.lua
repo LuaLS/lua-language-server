@@ -16,6 +16,9 @@ m.nativeMatcher = nil
 m.uri = ''
 m.path = ''
 m.requireCache = {}
+m.matchOption = {
+    ignoreCase = platform.OS == 'Windows',
+}
 
 --- 初始化工作区
 function m.init(uri)
@@ -27,12 +30,36 @@ function m.init(uri)
     log.init(ROOT, logPath)
 end
 
+local function interfaceFactory(root)
+    return {
+        type = function (path)
+            if fs.is_directory(fs.path(root .. '/' .. path)) then
+                return 'directory'
+            else
+                return 'file'
+            end
+        end,
+        list = function (path)
+            local fullPath = fs.path(root .. '/' .. path)
+            if not fs.exists(fullPath) then
+                return nil
+            end
+            local paths = {}
+            for fullpath in fullPath:list_directory() do
+                paths[#paths+1] = fullpath:string()
+            end
+            return paths
+        end
+    }
+end
+
 --- 创建排除文件匹配器
-function m.getNativeMatcher(option, interface)
+function m.getNativeMatcher()
     if m.nativeVersion == config.version then
         return m.nativeMatcher
     end
 
+    local interface = interfaceFactory(m.path)
     local pattern = {}
     -- config.workspace.ignoreDir
     for path in pairs(config.config.workspace.ignoreDir) do
@@ -72,7 +99,7 @@ function m.getNativeMatcher(option, interface)
         pattern[#pattern+1] = path
     end
 
-    m.nativeMatcher = glob.gitignore(pattern, option, interface)
+    m.nativeMatcher = glob.gitignore(pattern, m.matchOption, interface)
 
     m.nativeVersion = config.version
     return m.nativeMatcher
@@ -109,29 +136,6 @@ function m.isIgnored(uri)
     return ignore(path)
 end
 
-local function interfaceFactory(root)
-    return {
-        type = function (path)
-            if fs.is_directory(fs.path(root .. '/' .. path)) then
-                return 'directory'
-            else
-                return 'file'
-            end
-        end,
-        list = function (path)
-            local fullPath = fs.path(root .. '/' .. path)
-            if not fs.exists(fullPath) then
-                return nil
-            end
-            local paths = {}
-            for fullpath in fullPath:list_directory() do
-                paths[#paths+1] = fullpath:string()
-            end
-            return paths
-        end
-    }
-end
-
 local function loadFileFactory(root, progress, isLibrary)
     return function (path)
         local uri = furi.encode(root .. '/' .. path)
@@ -160,13 +164,9 @@ function m.awaitPreload()
         read = 0,
     }
     log.info('Preload start.')
-    local matcherOption = {
-        ignoreCase = true
-    }
-    local nativeInterface = interfaceFactory(m.path)
     local nativeLoader    = loadFileFactory(m.path, progress)
-    local native          = m.getNativeMatcher(matcherOption, nativeInterface)
-    local librarys        = m.getLibraryMatchers(matcherOption)
+    local native          = m.getNativeMatcher()
+    local librarys        = m.getLibraryMatchers(m.matchOption)
     native:scan(nativeLoader)
     for _, library in ipairs(librarys) do
         local libraryInterface = interfaceFactory(library.path)

@@ -16,7 +16,7 @@ local specials = {
 _ENV = nil
 
 local LocalLimit = 200
-local pushError, Compile, CompileBlock, Block, GoToTag, ENVMode, Compiled, LocalCount, Version, Root
+local pushError, Compile, CompileBlock, Block, GoToTag, ENVMode, Compiled, LocalCount, Version, Root, Options
 
 local function addRef(node, obj)
     if not node.ref then
@@ -56,6 +56,11 @@ local vmMap = {
             local name = obj[1]
             if specials[name] then
                 addSpecial(name, obj)
+            elseif Options and Options.special then
+                local asName = Options.special[name]
+                if specials[asName] then
+                    addSpecial(asName, obj)
+                end
             end
         end
         return obj
@@ -518,7 +523,7 @@ local function PostCompile()
     end
 end
 
-return function (self, lua, mode, version)
+return function (self, lua, mode, version, options)
     local state, err = self:parse(lua, mode, version)
     if not state then
         return nil, err
@@ -534,6 +539,7 @@ return function (self, lua, mode, version)
     LocalCount = 0
     Version = version
     Root = state.ast
+    Options = options
     state.ENVMode = ENVMode
     if type(state.ast) == 'table' then
         Compile(state.ast)

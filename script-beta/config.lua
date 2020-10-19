@@ -102,6 +102,7 @@ local ConfigTemplate = {
                                 "?/init.lua",
                                 "?/?.lua"
                             },        Array(String)},
+        special         = {{},        Hash(String, String)},
     },
     diagnostics = {
         enable          = {true, Boolean},

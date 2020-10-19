@@ -219,7 +219,13 @@ function m.getAst(uri)
     end
     if file.ast == nil then
         local clock = os.clock()
-        local state, err = parser:compile(file.text, 'lua', config.config.runtime.version)
+        local state, err = parser:compile(file.text
+            , 'lua'
+            , config.config.runtime.version
+            , {
+                special = config.config.runtime.special,
+            }
+        )
         local passed = os.clock() - clock
         if passed > 0.1 then
             log.warn(('Compile [%s] takes [%.3f] sec, size [%.3f] kb.'):format(uri, passed, #file.text / 1000))

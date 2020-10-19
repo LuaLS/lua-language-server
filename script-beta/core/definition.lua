@@ -80,6 +80,9 @@ local function convertIndex(source)
     or source.type == 'boolean'
     or source.type == 'number' then
         local parent = source.parent
+        if not parent then
+            return
+        end
         if parent.type == 'setindex'
         or parent.type == 'getindex'
         or parent.type == 'tableindex' then

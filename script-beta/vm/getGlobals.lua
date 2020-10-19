@@ -3,6 +3,7 @@ local vm      = require 'vm.vm'
 local files   = require 'files'
 local library = require 'library'
 local util    = require 'utility'
+local config  = require 'config'
 
 local function searchRawset(ref, results)
     if guide.getKeyName(ref) ~= 's|rawset' then
@@ -78,7 +79,10 @@ end
 
 local function insertLibrary(results, name)
     if name:sub(1, 2) == 's|' then
-        results[#results+1] = library.global[name:sub(3)]
+        local libname = name:sub(3)
+        results[#results+1] = library.global[libname]
+        local asName = config.config.runtime.special[libname]
+        results[#results+1] = library.global[asName]
     end
 end
 

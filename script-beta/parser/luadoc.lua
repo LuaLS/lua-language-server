@@ -1,5 +1,7 @@
 local m          = require 'lpeglabel'
 local re         = require 'parser.relabel'
+local lines      = require 'parser.lines'
+local guide      = require 'parser.guide'
 
 local TokenTypes, TokenStarts, TokenFinishs, TokenContents
 local Ci, Offset, pushError
@@ -669,6 +671,58 @@ local function buildLuaDoc(comment)
     return result
 end
 
+local function isNextLine(lns, binded, doc)
+    if not binded then
+        return false
+    end
+    local lastDoc = binded[#binded]
+    local lastRow = guide.positionOf(lns, lastDoc.start)
+    local newRow  = guide.positionOf(lns, doc.start)
+    return newRow - lastRow == 1
+end
+
+local function bindDoc(state, lns, binded)
+    if not binded then
+        return
+    end
+    local lastDoc = binded[#binded]
+    if not lastDoc then
+        return
+    end
+    local row = guide.positionOf(lns, lastDoc.start)
+    local start, finish = guide.lineRange(lns, row + 1)
+    if start >= finish then
+        -- 空行
+        return
+    end
+    guide.eachSourceBetween(state.ast, start, finish, function (src)
+        if src.type == 'local'
+        or src.type == 'setlocal'
+        or src.type == 'setglobal'
+        or src.type == 'setfield'
+        or src.type == 'setmethod'
+        or src.type == 'setindex'
+        or src.type == 'tablefield'
+        or src.type == 'tableindex'
+        or src.type == 'function' then
+            src.docs = binded
+        end
+    end)
+end
+
+local function bindDocs(state)
+    local lns = lines(nil, state.lua)
+    local binded
+    for _, doc in ipairs(state.ast.docs) do
+        if not isNextLine(lns, binded, doc) then
+            bindDoc(state, binded)
+            binded = {}
+        end
+        binded[#binded+1] = doc
+    end
+    bindDoc(state, lns, binded)
+end
+
 return function (_, state)
     local ast = state.ast
     local comments = state.comms
@@ -695,4 +749,6 @@ return function (_, state)
             end
         end
     end
+
+    bindDocs(state)
 end

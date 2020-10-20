@@ -138,10 +138,15 @@ local function findParent(ast, text, offset)
 end
 
 local function findParentInStringIndex(ast, text, offset)
-    local near
+    local near, nearStart
     guide.eachSourceContain(ast.ast, offset, function (source)
-        if not near or near.start < source.start then
+        local start = guide.getStartFinish(source)
+        if not start then
+            return
+        end
+        if not nearStart or nearStart < start then
             near = source
+            nearStart = start
         end
     end)
     if not near or near.type ~= 'string' then

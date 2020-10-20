@@ -274,7 +274,7 @@ TEST [[
 ---@type <!Class!>
 ---@type <!Class!>
 ]]
-do return end
+
 TEST [[
 ---@class Class
 local <?t?>

@@ -9,6 +9,20 @@ TEST [[
 ]]
 
 TEST [[
+---@class Class
+local <?<!t!>?>
+---@type Class
+local x
+]]
+
+TEST [[
+---@class Class
+local <!t!>
+---@type Class
+local <?<!x!>?>
+]]
+
+TEST [[
 ---@class A
 local mt = {}
 function mt:<!cast!>()

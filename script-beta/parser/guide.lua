@@ -1390,17 +1390,17 @@ function m.checkSameSimpleInSpecialBranch(status, obj, start, queue)
     end
 end
 
-function m.checkSameSimpleByBindDocs(status, obj, start, queue)
+function m.checkSameSimpleByBindDocs(status, obj, start, queue, mode)
     if not obj.bindDocs then
         return
     end
     local results = {}
     for _, doc in ipairs(obj.bindDocs) do
         if     doc.type == 'doc.class' then
-            results = stepRefOfDocType(status, doc.class, 'ref')
+            results = stepRefOfDocType(status, doc.class, mode)
         elseif doc.type == 'doc.type' then
             for _, piece in ipairs(doc.types) do
-                local pieceResult = stepRefOfDocType(status, piece, 'ref')
+                local pieceResult = stepRefOfDocType(status, piece, mode)
                 for _, res in ipairs(pieceResult) do
                     results[#results+1] = res
                 end
@@ -1894,7 +1894,7 @@ function m.checkSameSimple(status, simple, data, mode, results, queue)
         -- 检查自己是特殊变量的分支的情况
         m.checkSameSimpleInSpecialBranch(status, ref, i, queue)
         -- 检查 doc
-        m.checkSameSimpleByBindDocs(status, ref, i, queue)
+        m.checkSameSimpleByBindDocs(status, ref, i, queue, cmode)
         if cmode == 'ref' and not status.simple then
             -- 检查形如 { a = f } 的情况
             m.checkSameSimpleAsTableField(status, ref, i, queue)

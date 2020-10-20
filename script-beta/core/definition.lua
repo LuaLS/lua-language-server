@@ -43,6 +43,10 @@ local accept = {
     ['string']      = true,
     ['boolean']     = true,
     ['number']      = true,
+
+    ['doc.type.name']    = true,
+    ['doc.class.name']   = true,
+    ['doc.extends.name'] = true,
 }
 
 local function checkRequire(source, offset)

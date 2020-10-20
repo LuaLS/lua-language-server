@@ -705,7 +705,10 @@ local function bindDoc(state, lns, binded)
         or src.type == 'tablefield'
         or src.type == 'tableindex'
         or src.type == 'function' then
-            src.docs = binded
+            src.bindDocs = binded
+            for _, doc in ipairs(binded) do
+                doc.bind = src
+            end
         end
     end)
 end
@@ -715,7 +718,7 @@ local function bindDocs(state)
     local binded
     for _, doc in ipairs(state.ast.docs) do
         if not isNextLine(lns, binded, doc) then
-            bindDoc(state, binded)
+            bindDoc(state, lns, binded)
             binded = {}
         end
         binded[#binded+1] = doc
@@ -748,6 +751,10 @@ return function (_, state)
                 ast.finish = doc.finish
             end
         end
+    end
+
+    if #ast.docs == 0 then
+        return
     end
 
     bindDocs(state)

@@ -48,7 +48,6 @@ function TEST(script)
         end
         assert(founded(target, positions))
     else
-        local results = core('', pos)
         assert(#target == 0)
     end
 end
@@ -279,12 +278,12 @@ TEST [[
 ---@class Class
 local <?t?>
 ---@type Class
-local <!t!>
+local <!x!>
 ]]
 
 TEST [[
 ---@class Class
 local <!t!>
 ---@type Class
-local <?t?>
+local <?x?>
 ]]

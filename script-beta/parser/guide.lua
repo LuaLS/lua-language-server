@@ -205,6 +205,18 @@ function m.getBreakBlock(obj)
     error('guide.getBreakBlock overstack')
 end
 
+--- 寻找doc的主体
+function m.getDocState(obj)
+    for _ = 1, 1000 do
+        local parent = obj.parent
+        if parent.type == 'doc' then
+            return obj
+        end
+        obj = parent
+    end
+    error('guide.getDocState overstack')
+end
+
 --- 寻找根区块
 function m.getRoot(obj)
     for _ = 1, 1000 do
@@ -1378,6 +1390,39 @@ function m.checkSameSimpleInSpecialBranch(status, obj, start, queue)
     end
 end
 
+function m.checkSameSimpleByBindDocs(status, obj, start, queue)
+    if not obj.bindDocs then
+        return
+    end
+    local results = {}
+    for _, doc in ipairs(obj.bindDocs) do
+        if     doc.type == 'doc.class' then
+            results = stepRefOfDocType(status, doc.class, 'ref')
+        elseif doc.type == 'doc.type' then
+            for _, piece in ipairs(doc.types) do
+                local pieceResult = stepRefOfDocType(status, piece, 'ref')
+                for _, res in ipairs(pieceResult) do
+                    results[#results+1] = res
+                end
+            end
+        end
+    end
+    local mark = {}
+    for _, res in ipairs(results) do
+        local ref = m.getDocState(res)
+        if not mark[ref] then
+            mark[ref] = true
+            if ref.bind then
+                queue[#queue+1] = {
+                    obj   = ref.bind,
+                    start = start,
+                    force = true,
+                }
+            end
+        end
+    end
+end
+
 function m.checkSameSimpleInArg1OfSetMetaTable(status, obj, start, queue)
     local args = obj.parent
     if not args or args.type ~= 'callargs' then
@@ -1846,8 +1891,10 @@ function m.checkSameSimple(status, simple, data, mode, results, queue)
         m.checkSameSimpleInArg1OfSetMetaTable(status, ref, i, queue)
         -- 检查自己作为 setmetatable 调用的情况
         m.checkSameSimpleInValueOfCallMetaTable(status, ref, i, queue)
-        -- 检查自己是特殊分支的情况
+        -- 检查自己是特殊变量的分支的情况
         m.checkSameSimpleInSpecialBranch(status, ref, i, queue)
+        -- 检查 doc
+        m.checkSameSimpleByBindDocs(status, ref, i, queue)
         if cmode == 'ref' and not status.simple then
             -- 检查形如 { a = f } 的情况
             m.checkSameSimpleAsTableField(status, ref, i, queue)

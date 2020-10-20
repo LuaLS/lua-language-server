@@ -142,6 +142,9 @@ local ConfigTemplate = {
     color = {
         mode            = {'Semantic', String},
     },
+    luadoc = {
+        enable          = {true, Boolean},
+    },
     plugin = {
         enable          = {false, Boolean},
         path            = {'.vscode/lua-plugin/*.lua', String},

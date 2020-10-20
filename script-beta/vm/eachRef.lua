@@ -5,7 +5,7 @@ local await  = require 'await'
 
 local function getRefs(source, simple)
     local results = {}
-    local lock = vm.lock('eachDef', source)
+    local lock = vm.lock('eachRef', source)
     if not lock then
         return results
     end

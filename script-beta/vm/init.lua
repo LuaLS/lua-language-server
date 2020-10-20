@@ -1,5 +1,6 @@
 local vm = require 'vm.vm'
 require 'vm.getGlobals'
+require 'vm.getDocs'
 require 'vm.getLibrary'
 require 'vm.getInfer'
 require 'vm.getClass'

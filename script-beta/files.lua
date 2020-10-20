@@ -234,6 +234,9 @@ function m.getAst(uri)
             state.uri = file.uri
             state.ast.uri = file.uri
             file.ast = state
+            if config.config.luadoc.enable then
+                parser:luadoc(state)
+            end
         else
             log.error(err)
             file.ast = false
@@ -345,6 +348,14 @@ end
 function m.onWatch(ev, ...)
     for _, callback in ipairs(m.watchList) do
         callback(ev, ...)
+    end
+end
+
+function m.flushCache()
+    for _, file in pairs(m.fileMap) do
+        file.cacheActiveTime = math.huge
+        file.ast = nil
+        file.cache = {}
     end
 end
 

@@ -48,6 +48,10 @@ local accept = {
     ['setglobal']   = true,
     ['getglobal']   = true,
     ['function']    = true,
+
+    ['doc.type.name']    = true,
+    ['doc.class.name']   = true,
+    ['doc.extends.name'] = true,
 }
 
 return function (uri, offset)

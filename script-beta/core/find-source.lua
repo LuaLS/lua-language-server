@@ -4,9 +4,10 @@ return function (ast, offset, accept)
     local len = math.huge
     local result
     guide.eachSourceContain(ast.ast, offset, function (source)
-        if source.finish - source.start < len and accept[source.type] then
+        local start, finish = guide.getStartFinish(source)
+        if finish - start < len and accept[source.type] then
             result = source
-            len = source.finish - source.start
+            len = finish - start
         end
     end)
     return result

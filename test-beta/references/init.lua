@@ -48,6 +48,7 @@ function TEST(script)
         end
         assert(founded(target, positions))
     else
+        local results = core('', pos)
         assert(#target == 0)
     end
 end
@@ -262,14 +263,14 @@ local <!t!>
 <!t!>.<!f!> = <?t?>
 ]]
 
---TEST [[
------@class <!Class!>
------@type <?Class?>
------@type <!Class!>
---]]
---
---TEST [[
------@class <?Class?>
------@type <!Class!>
------@type <!Class!>
---]]
+TEST [[
+---@class <!Class!>
+---@type <?Class?>
+---@type <!Class!>
+]]
+
+TEST [[
+---@class <?Class?>
+---@type <!Class!>
+---@type <!Class!>
+]]

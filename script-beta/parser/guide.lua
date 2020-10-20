@@ -44,7 +44,7 @@ local breakBlockTypes = {
 }
 
 m.childMap = {
-    ['main']        = {'#'},
+    ['main']        = {'#', 'docs'},
     ['repeat']      = {'#', 'filter'},
     ['while']       = {'filter', '#'},
     ['in']          = {'keys', '#'},
@@ -75,7 +75,21 @@ m.childMap = {
     ['getfield']    = {'node', 'field'},
     ['list']        = {'#'},
     ['binary']      = {1, 2},
-    ['unary']       = {1}
+    ['unary']       = {1},
+
+    ['doc']                = {'#'},
+    ['doc.class']          = {'class', 'extends'},
+    ['doc.type']           = {'#types', '#enums'},
+    ['doc.alias']          = {'alias', 'extends'},
+    ['doc.param']          = {'param', 'extends'},
+    ['doc.return']         = {'#returns'},
+    ['doc.field']          = {'field', 'extends'},
+    ['doc.generic']        = {'#generics'},
+    ['doc.generic.object'] = {'generic', 'extends'},
+    ['doc.vararg']         = {'vararg'},
+    ['doc.type.table']     = {'key', 'value'},
+    ['doc.type.function']  = {'#args', '#returns'},
+    ['doc.overload']       = {'overload'},
 }
 
 m.actionMap = {
@@ -327,24 +341,70 @@ function m.getLabel(block, name)
     error('guide.getLocal overstack')
 end
 
+function m.getStartFinish(source)
+    local start  = source.start
+    local finish = source.finish
+    if not start then
+        local first = source[1]
+        if not first then
+            return nil, nil
+        end
+        local last  = source[#source]
+        start  = first.start
+        finish = last.finish
+    end
+    return start, finish
+end
+
+function m.getRange(source)
+    local start  = source.vstart or source.start
+    local finish = source.range  or source.finish
+    if not start then
+        local first = source[1]
+        if not first then
+            return nil, nil
+        end
+        local last  = source[#source]
+        start  = first.vstart or first.start
+        finish = last.range   or last.finish
+    end
+    return start, finish
+end
+
 --- 判断source是否包含offset
 function m.isContain(source, offset)
-    return source.start <= offset and source.finish >= offset - 1
+    local start, finish = m.getStartFinish(source)
+    if not start then
+        return false
+    end
+    return start <= offset and finish >= offset - 1
 end
 
 --- 判断offset在source的影响范围内
 ---
 --- 主要针对赋值等语句时，key包含value
 function m.isInRange(source, offset)
-    return (source.vstart or source.start) <= offset and (source.range or source.finish) >= offset - 1
+    local start, finish = m.getRange(source)
+    if not start then
+        return false
+    end
+    return start <= offset and finish >= offset - 1
 end
 
-function m.isBetween(source, start, finish)
-    return source.start <= finish and source.finish >= start - 1
+function m.isBetween(source, tStart, tFinish)
+    local start, finish = m.getStartFinish(source)
+    if not start then
+        return false
+    end
+    return start <= tFinish and finish >= tStart - 1
 end
 
-function m.isBetweenRange(source, start, finish)
-    return (source.vstart or source.start) <= finish and (source.range or source.finish) >= start - 1
+function m.isBetweenRange(source, tStart, tFinish)
+    local start, finish = m.getRange(source)
+    if not start then
+        return false
+    end
+    return start <= tFinish and finish >= tStart - 1
 end
 
 --- 添加child
@@ -357,8 +417,14 @@ function m.addChilds(list, obj, map)
                 for i = 1, #obj do
                     list[#list+1] = obj[i]
                 end
-            else
+            elseif obj[key] then
                 list[#list+1] = obj[key]
+            elseif type(key) == 'string'
+            and key:sub(1, 1) == '#' then
+                key = key:sub(2)
+                for i = 1, #obj[key] do
+                    list[#list+1] = obj[key][i]
+                end
             end
         end
     end
@@ -856,7 +922,27 @@ local function stepRefOfGlobal(obj, mode)
     return results
 end
 
-function m.getStepRef(obj, mode)
+local function stepRefOfDocType(status, obj, mode)
+    local results = {}
+    local name = obj[1]
+    if not name or not status.interface.docType then
+        return results
+    end
+    local docs = status.interface.docType(name)
+    for i = 1, #docs do
+        local doc = docs[i]
+        if mode == 'def' then
+            if doc.type == 'doc.class.name' then
+                results[#results+1] = doc
+            end
+        else
+            results[#results+1] = doc
+        end
+    end
+    return results
+end
+
+function m.getStepRef(status, obj, mode)
     if obj.type == 'getlocal'
     or obj.type == 'setlocal' then
         return stepRefOfLocal(obj.node, mode)
@@ -876,6 +962,11 @@ function m.getStepRef(obj, mode)
     end
     if obj.type == 'library' then
         return { obj }
+    end
+    if obj.type == 'doc.class.name'
+    or obj.type == 'doc.type.name'
+    or obj.type == 'doc.extends.name' then
+        return stepRefOfDocType(status, obj, mode)
     end
     return nil
 end
@@ -1074,6 +1165,10 @@ function m.isGlobal(source)
         end
     end
     return false
+end
+
+function m.isDoc(source)
+    return source.type:sub(1, 4) == 'doc.'
 end
 
 --- 根据函数的调用参数，获取：调用，参数索引
@@ -2024,7 +2119,7 @@ function m.searchRefs(status, obj, mode)
     end
 
     -- 检查单步引用
-    local res = m.getStepRef(obj, mode)
+    local res = m.getStepRef(status, obj, mode)
     if res then
         for i = 1, #res do
             status.results[#status.results+1] = res[i]

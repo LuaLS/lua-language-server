@@ -62,6 +62,9 @@ local function updateConfig()
     then
         workspace.reload()
     end
+    if not util.equal(oldConfig.luadoc, newConfig.luadoc) then
+        files.flushCache()
+    end
 
     if newConfig.completion.enable then
         completion.enable()

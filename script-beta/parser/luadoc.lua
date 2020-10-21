@@ -229,14 +229,10 @@ local function nextSymbolOrError(symbol)
     return false
 end
 
-local function parseTypeUnitTable()
+local function parseTypeUnitGeneric(typeUnit)
     if not checkToken('symbol', '<', 1) then
         return nil
     end
-    local typeUnit = {
-        type   = 'doc.type.table',
-        start  = getStart(),
-    }
     if not nextSymbolOrError('<') then
         return nil
     end
@@ -249,6 +245,7 @@ local function parseTypeUnitTable()
         return nil
     end
     nextSymbolOrError('>')
+    typeUnit.generic= true
     typeUnit.key    = key
     typeUnit.value  = value
     typeUnit.finish = getFinish()
@@ -324,9 +321,7 @@ end
 
 local function parseTypeUnit(parent, content)
     local typeUnit
-    if content == 'table' then
-        typeUnit = parseTypeUnitTable()
-    elseif content == 'fun' then
+    if content == 'fun' then
         typeUnit = parseTypeUnitFunction()
     end
     if not typeUnit then
@@ -345,6 +340,8 @@ local function parseTypeUnit(parent, content)
         nextToken()
         typeUnit.array = true
         typeUnit.finish = getFinish()
+    else
+        parseTypeUnitGeneric(typeUnit)
     end
     return typeUnit
 end

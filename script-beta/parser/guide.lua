@@ -21,6 +21,10 @@ local DEVELOP      = _G.DEVELOP
 local log          = log
 local debug        = debug
 
+local function logWarn(...)
+    log.warn(...)
+end
+
 _ENV = nil
 
 local m = {}
@@ -2203,7 +2207,7 @@ function m.searchRefs(status, obj, mode)
             error('status.depth overflow')
         elseif DEVELOP then
             --log.warn(debug.traceback('status.depth overflow'))
-            log.warn('status.depth overflow')
+            logWarn('status.depth overflow')
         end
     end
 
@@ -2462,17 +2466,60 @@ function m.inferCheckLibrary(status, source)
     return true
 end
 
+local function getDocTypeUnitName(unit)
+    local typeName
+    if unit.type == 'doc.type.name' then
+        typeName = unit[1]
+    elseif unit.type == 'doc.type.function' then
+        typeName = 'function'
+    end
+    if unit.array then
+        typeName = typeName .. '[]'
+    elseif unit.generic then
+        typeName = ('%s<%s, %s>'):format(
+            typeName,
+            m.viewInferType(m.getDocTypeNames(unit.key)),
+            m.viewInferType(m.getDocTypeNames(unit.value))
+        )
+    end
+    return typeName
+end
+
+function m.getDocTypeNames(doc)
+    local results = {}
+    for _, unit in ipairs(doc.types) do
+        local typeName = getDocTypeUnitName(unit)
+        results[#results+1] = {
+            type   = typeName,
+            source = unit,
+        }
+    end
+    for _, enum in ipairs(doc.enums) do
+        results[#results+1] = {
+            type   = enum[1],
+            source = enum,
+        }
+    end
+    return results
+end
+
 function m.inferByDoc(status, source)
     local binds = source.bindDocs
     if not binds then
         return
     end
+    status.results = {}
     for _, doc in ipairs(binds) do
         if doc.type == 'doc.class' then
-            status.results = m.allocInfer {
+            status.results[#status.results+1] = {
                 type   = doc.class[1],
                 source = doc,
             }
+        elseif doc.type == 'doc.type' then
+            local results = m.getDocTypeNames(doc)
+            for _, res in ipairs(results) do
+                status.results[#status.results+1] = res
+            end
         end
     end
 end

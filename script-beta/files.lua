@@ -95,6 +95,9 @@ end
 ---@param uri string
 ---@param text string
 function m.setText(uri, text)
+    if not text then
+        return
+    end
     local originUri = uri
     if platform.OS == 'Windows' then
         uri = uri:lower()

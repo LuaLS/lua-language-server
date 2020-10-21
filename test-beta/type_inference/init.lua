@@ -298,8 +298,32 @@ TEST 'class' [[
 local <?x?>
 ]]
 
-do return end
 TEST 'string' [[
 ---@type string
+local <?x?>
+]]
+
+TEST 'string[]' [[
+---@type string[]
+local <?x?>
+]]
+
+TEST 'string|table' [[
+---@type string | table
+local <?x?>
+]]
+
+TEST '"enum1"|"enum2"' [[
+---@type '"enum1"' | '"enum2"'
+local <?x?>
+]]
+
+TEST 'function' [[
+---@type fun()
+local <?x?>
+]]
+
+TEST 'table<string, number>' [[
+---@type table<string, number>
 local <?x?>
 ]]

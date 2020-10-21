@@ -1408,18 +1408,21 @@ function m.checkSameSimpleByBindDocs(status, obj, start, queue, mode)
         end
     end
     local mark = {}
+    local newStatus = m.status(status)
     for _, res in ipairs(results) do
-        local ref = m.getDocState(res)
+        local source = m.getDocState(res)
+        local ref = source.bind
         if not mark[ref] then
             mark[ref] = true
-            if ref.bind then
-                queue[#queue+1] = {
-                    obj   = ref.bind,
-                    start = start,
-                    force = true,
-                }
-            end
+            m.searchRefs(newStatus, ref, mode)
         end
+    end
+    for _, res in ipairs(newStatus.results) do
+        queue[#queue+1] = {
+            obj   = res,
+            start = start,
+            force = true,
+        }
     end
 end
 

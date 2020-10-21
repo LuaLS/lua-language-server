@@ -2164,8 +2164,6 @@ function m.getRefCache(status, obj, mode)
 end
 
 function m.searchRefs(status, obj, mode)
-    status.depth = status.depth + 1
-
     local cache, makeCache = m.getRefCache(status, obj, mode)
     if cache then
         for i = 1, #cache do
@@ -2174,6 +2172,7 @@ function m.searchRefs(status, obj, mode)
         return
     end
 
+    status.depth = status.depth + 1
     -- 检查单步引用
     local res = m.getStepRef(status, obj, mode)
     if res then
@@ -2182,7 +2181,7 @@ function m.searchRefs(status, obj, mode)
         end
     end
     -- 检查simple
-    if status.depth <= 10 then
+    if status.depth <= 5 then
         local simple = m.getSimple(obj)
         if simple then
             m.searchSameFields(status, simple, mode)
@@ -2194,7 +2193,7 @@ function m.searchRefs(status, obj, mode)
             log.warn(debug.traceback('status.depth overflow'))
         end
     end
-
+ 
     status.depth = status.depth - 1
 
     m.cleanResults(status.results)

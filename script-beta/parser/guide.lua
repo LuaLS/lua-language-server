@@ -18,6 +18,8 @@ local assert       = assert
 local select       = select
 local osClock      = os.clock
 local DEVELOP      = _G.DEVELOP
+local log          = log
+local debug        = debug
 
 _ENV = nil
 
@@ -1394,6 +1396,9 @@ function m.checkSameSimpleByBindDocs(status, obj, start, queue, mode)
     if not obj.bindDocs then
         return
     end
+    if status.cache.searchingBindedDoc then
+        return
+    end
     local results = {}
     for _, doc in ipairs(obj.bindDocs) do
         if     doc.type == 'doc.class' then
@@ -1409,6 +1414,7 @@ function m.checkSameSimpleByBindDocs(status, obj, start, queue, mode)
     end
     local mark = {}
     local newStatus = m.status(status)
+    newStatus.cache.searchingBindedDoc = true
     for _, res in ipairs(results) do
         local source = m.getDocState(res)
         local ref = source.bind
@@ -2181,8 +2187,12 @@ function m.searchRefs(status, obj, mode)
         if simple then
             m.searchSameFields(status, simple, mode)
         end
-    elseif m.debugMode then
-        error('stack overflow')
+    else
+        if m.debugMode then
+            error('status.depth overflow')
+        elseif DEVELOP then
+            log.warn(debug.traceback('status.depth overflow'))
+        end
     end
 
     status.depth = status.depth - 1

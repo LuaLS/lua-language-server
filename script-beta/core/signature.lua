@@ -79,11 +79,12 @@ local function makeSignatures(call, pos)
         index = 1
     end
     local signs = {}
-    vm.eachDef(node, function (src)
+    local defs = vm.getDefs(node, 'simple')
+    for _, src in ipairs(defs) do
         if src.type == 'function' then
             signs[#signs+1] = makeOneSignature(src, oop, index)
         end
-    end)
+    end
     return signs
 end
 

@@ -85,7 +85,7 @@ function m.close(id)
         coroutine.close(co)
         count = count + 1
     end
-    log.debug('Close await:', count)
+    log.debug('Close await:', id, count)
 end
 
 --- 休眠一段时间

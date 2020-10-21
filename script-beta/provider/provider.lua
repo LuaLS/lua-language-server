@@ -452,6 +452,8 @@ proto.on('textDocument/signatureHelp', function (params)
     if not files.exists(uri) then
         return nil
     end
+    await.close('signatureHelp')
+    await.setID('signatureHelp')
     local lines  = files.getLines(uri)
     local text   = files.getText(uri)
     local offset = define.offset(lines, text, params.position)

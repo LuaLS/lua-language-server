@@ -76,6 +76,7 @@ end
 local obj = setmetatable({}, mt)
 ]]
 
+do return end
 TEST [[
 ---@alias <!B A!>
 ---@type <?B?>

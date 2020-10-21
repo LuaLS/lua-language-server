@@ -4,25 +4,26 @@ local guide   = require 'parser.guide'
 local vm      = require 'vm.vm'
 
 local function getTypesOfFile(uri)
-    local classes = {}
+    local types = {}
     local ast = files.getAst(uri)
     if not ast or not ast.ast.docs then
-        return classes
+        return types
     end
     guide.eachSource(ast.ast.docs, function (src)
         if src.type == 'doc.type.name'
         or src.type == 'doc.class.name'
-        or src.type == 'doc.extends.name' then
+        or src.type == 'doc.extends.name'
+        or src.type == 'doc.alias.name' then
             local name = src[1]
             if name then
-                if not classes[name] then
-                    classes[name] = {}
+                if not types[name] then
+                    types[name] = {}
                 end
-                classes[name][#classes[name]+1] = src
+                types[name][#types[name]+1] = src
             end
         end
     end)
-    return classes
+    return types
 end
 
 local function getDocTypes(name)

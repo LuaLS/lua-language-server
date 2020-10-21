@@ -78,7 +78,7 @@ local obj = setmetatable({}, mt)
 
 do return end
 TEST [[
----@alias <!B A!>
+---@alias <!B!> A
 ---@type <?B?>
 ]]
 
@@ -87,6 +87,7 @@ TEST [[
 ---@param a <?Class?>
 ]]
 
+do return end
 TEST [[
 ---@class Class
 ---@field <!name string!>

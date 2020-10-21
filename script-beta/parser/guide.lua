@@ -979,7 +979,8 @@ function m.getStepRef(status, obj, mode)
     end
     if obj.type == 'doc.class.name'
     or obj.type == 'doc.type.name'
-    or obj.type == 'doc.extends.name' then
+    or obj.type == 'doc.extends.name'
+    or obj.type == 'doc.alias.name' then
         return stepRefOfDocType(status, obj, mode)
     end
     return nil
@@ -1556,6 +1557,9 @@ function m.checkSameSimpleInCallInSameFile(status, func, args, index)
 end
 
 function m.checkSameSimpleInCall(status, ref, start, queue, mode)
+    if status.simple then
+        return
+    end
     local func, args, index = m.getCallValue(ref)
     if not func then
         return
@@ -1563,6 +1567,11 @@ function m.checkSameSimpleInCall(status, ref, start, queue, mode)
     if m.checkCallMark(status, func.parent, true) then
         return
     end
+    status.cache.crossCallCount = status.cache.crossCallCount or 0
+    if status.cache.crossCallCount >= 5 then
+        return
+    end
+    status.cache.crossCallCount = status.cache.crossCallCount + 1
     -- 检查赋值是 semetatable() 的情况
     m.checkSameSimpleInValueOfSetMetaTable(status, func, start, queue)
     -- 检查赋值是 func() 的情况
@@ -1586,6 +1595,7 @@ function m.checkSameSimpleInCall(status, ref, start, queue, mode)
             force = true,
         }
     end
+    status.cache.crossCallCount = status.cache.crossCallCount - 1
     for _, obj in ipairs(newStatus.results) do
         queue[#queue+1] = {
             obj   = obj,
@@ -1681,10 +1691,8 @@ function m.searchSameFieldsInValue(status, ref, start, queue, mode)
         force = true,
     }
     -- 检查形如 a = f() 的分支情况
-    if mode ~= 'field'
-    and not status.simple then
-        m.checkSameSimpleInCall(status, value, start, queue, mode)
-    end
+    m.checkSameSimpleInCall(status, value, start, queue, mode)
+
     -- 检查自己是字面量表的情况
     --m.checkSameSimpleInValueOfTable(status, value, start, queue)
 end

@@ -52,6 +52,7 @@ local accept = {
     ['doc.type.name']    = true,
     ['doc.class.name']   = true,
     ['doc.extends.name'] = true,
+    ['doc.alias.name']   = true,
 }
 
 return function (uri, offset)

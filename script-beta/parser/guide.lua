@@ -946,7 +946,8 @@ local function stepRefOfDocType(status, obj, mode)
     for i = 1, #docs do
         local doc = docs[i]
         if mode == 'def' then
-            if doc.type == 'doc.class.name' then
+            if doc.type == 'doc.class.name'
+            or doc.type == 'doc.alias.name' then
                 results[#results+1] = doc
             end
         else

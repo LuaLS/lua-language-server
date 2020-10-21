@@ -1681,7 +1681,10 @@ function m.searchSameFieldsInValue(status, ref, start, queue, mode)
         force = true,
     }
     -- 检查形如 a = f() 的分支情况
-    m.checkSameSimpleInCall(status, value, start, queue, mode)
+    if mode ~= 'field'
+    and not status.simple then
+        m.checkSameSimpleInCall(status, value, start, queue, mode)
+    end
     -- 检查自己是字面量表的情况
     --m.checkSameSimpleInValueOfTable(status, value, start, queue)
 end
@@ -2181,7 +2184,7 @@ function m.searchRefs(status, obj, mode)
         end
     end
     -- 检查simple
-    if status.depth <= 5 then
+    if status.depth <= 10 then
         local simple = m.getSimple(obj)
         if simple then
             m.searchSameFields(status, simple, mode)
@@ -2190,10 +2193,11 @@ function m.searchRefs(status, obj, mode)
         if m.debugMode then
             error('status.depth overflow')
         elseif DEVELOP then
-            log.warn(debug.traceback('status.depth overflow'))
+            --log.warn(debug.traceback('status.depth overflow'))
+            log.warn('status.depth overflow')
         end
     end
- 
+
     status.depth = status.depth - 1
 
     m.cleanResults(status.results)

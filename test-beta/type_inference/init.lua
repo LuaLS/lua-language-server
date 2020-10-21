@@ -292,3 +292,14 @@ function b()
 end
 local <?x?> = a()
 ]]
+
+TEST 'class' [[
+---@class class
+local <?x?>
+]]
+
+do return end
+TEST 'string' [[
+---@type string
+local <?x?>
+]]

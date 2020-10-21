@@ -2462,6 +2462,21 @@ function m.inferCheckLibrary(status, source)
     return true
 end
 
+function m.inferByDoc(status, source)
+    local binds = source.bindDocs
+    if not binds then
+        return
+    end
+    for _, doc in ipairs(binds) do
+        if doc.type == 'doc.class' then
+            status.results = m.allocInfer {
+                type   = doc.class[1],
+                source = doc,
+            }
+        end
+    end
+end
+
 function m.inferCheckUnary(status, source)
     if source.type ~= 'unary' then
         return
@@ -3150,7 +3165,8 @@ function m.searchInfer(status, obj)
         status.cache.clock = status.cache.clock or osClock()
     end
 
-    local checked = m.inferCheckLibrary(status, obj)
+    local checked = m.inferByDoc(status, obj)
+                 or m.inferCheckLibrary(status, obj)
                  or m.inferCheckLiteral(status, obj)
                  or m.inferCheckUnary(status, obj)
                  or m.inferCheckBinary(status, obj)

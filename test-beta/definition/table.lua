@@ -133,3 +133,27 @@ local y = {
 }
 t.<?insert?>()
 ]]
+
+TEST [[
+local function f()
+    local t = {}
+    t.field1 = {
+        <!x!> = 1,
+        y = 1,
+        z = 1,
+    }
+    t.field2 = {
+        x = 1,
+        y = 1,
+        z = 1,
+    }
+    t.field3 = {
+        x = 1,
+        y = 1,
+        z = 1,
+    }
+    return t
+end
+local t = f()
+t.field1.<?x?>
+]]

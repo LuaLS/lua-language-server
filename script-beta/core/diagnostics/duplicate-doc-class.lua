@@ -10,7 +10,7 @@ return function (uri, callback)
         return
     end
 
-    if not state.ast.focs then
+    if not state.ast.docs then
         return
     end
 
@@ -23,8 +23,8 @@ return function (uri, callback)
                 local docs = vm.getDocTypes(name)
                 cache[name] = {}
                 for _, otherDoc in ipairs(docs) do
-                    if otherDoc.type == 'doc.class'
-                    or otherDoc.type == 'doc.alias' then
+                    if otherDoc.type == 'doc.class.name'
+                    or otherDoc.type == 'doc.alias.name' then
                         cache[name][#cache[name]+1] = {
                             start  = otherDoc.start,
                             finish = otherDoc.finish,

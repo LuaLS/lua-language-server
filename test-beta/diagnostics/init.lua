@@ -617,12 +617,12 @@ TEST [[
 table.insert({}, 1, 2, <!3!>)
 ]]
 
-do return end
 TEST [[
 ---@class <!Class!>
 ---@class <!Class!>
 ]]
 
+do return end
 TEST [[
 ---@class A : <!B!>
 ]]

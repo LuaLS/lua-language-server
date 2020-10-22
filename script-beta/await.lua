@@ -9,6 +9,7 @@ m.coMap = setmetatable({}, { __mode = 'k' })
 m.idMap = {}
 m.delayQueue = {}
 m.delayQueueIndex = 1
+m._enable = true
 
 --- 设置错误处理器
 ---@param errHandle function {comment = '当有错误发生时，会以错误堆栈为参数调用该函数'}
@@ -127,6 +128,9 @@ end
 
 --- 延迟
 function m.delay()
+    if not m._enable then
+        return
+    end
     if not coroutine.isyieldable() then
         return
     end
@@ -167,6 +171,14 @@ end
 
 function m.setPriority(n)
     m.coMap[coroutine.running()].priority = true
+end
+
+function m.enable()
+    m._enable = true
+end
+
+function m.disable()
+    m._enable = false
 end
 
 return m

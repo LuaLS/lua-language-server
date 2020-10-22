@@ -7,6 +7,14 @@ local lang = require 'language'
 local config = require 'config'
 local uric = require 'uri'
 
+local function utf8Len(str, start, finish)
+    local len, pos = utf8.len(str, start, finish, true)
+    if len then
+        return len
+    end
+    return 1 + utf8Len(str, start, pos-1) + utf8Len(str, pos+1, finish)
+end
+
 local OriginTypes = {
     ['any']      = true,
     ['nil']      = true,
@@ -322,7 +330,7 @@ local function hoverAsString(source)
         return nil
     end
     local len = #str
-    local charLen = utf8.len(str, 1, -1, true)
+    local charLen = utf8Len(str, 1, -1)
     local lines = {}
     if len == charLen then
         lines[#lines+1] = lang.script('HOVER_STRING_BYTES', len)

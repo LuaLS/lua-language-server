@@ -114,13 +114,13 @@ local function findSyntax(uri, diag)
     return nil
 end
 
-local function solveSyntaxByChangeVersion(err, results)
+local function solveSyntaxByChangeVersion(uri, err, results)
     if type(err.version) == 'table' then
         for _, version in ipairs(err.version) do
-            changeVersion(version, results)
+            changeVersion(uri, version, results)
         end
     else
-        changeVersion(err.version, results)
+        changeVersion(uri, err.version, results)
     end
 end
 
@@ -170,7 +170,7 @@ local function solveSyntax(uri, diag, results)
         return
     end
     if err.version then
-        solveSyntaxByChangeVersion(err, results)
+        solveSyntaxByChangeVersion(uri, err, results)
     end
     if err.type == 'ACTION_AFTER_BREAK' or err.type == 'ACTION_AFTER_RETURN' then
         solveSyntaxByAddDoEnd(uri, err, results)

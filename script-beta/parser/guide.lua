@@ -1548,7 +1548,6 @@ function m.checkSameSimpleInCallInSameFile(status, func, args, index)
     local newStatus = m.status(status)
     m.searchRefs(newStatus, func, 'def')
     local results = {}
-    local mark = {}
     for _, def in ipairs(newStatus.results) do
         local value = m.getObjectValue(def) or def
         if value.type == 'function' then
@@ -1556,8 +1555,7 @@ function m.checkSameSimpleInCallInSameFile(status, func, args, index)
             if returns then
                 for _, ret in ipairs(returns) do
                     local exp = ret[index]
-                    if exp and not mark[exp] then
-                        mark[exp] = true
+                    if exp then
                         results[#results+1] = exp
                     end
                 end
@@ -1594,6 +1592,7 @@ function m.checkSameSimpleInCall(status, ref, start, queue, mode)
             end
         end
     end
+    m.cleanResults(objs)
     local newStatus = m.status(status)
     for _, obj in ipairs(objs) do
         m.searchRefs(newStatus, obj, mode)

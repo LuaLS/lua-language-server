@@ -1,6 +1,6 @@
-local core = require 'core.document-symbol'
-local files = require 'files'
-local SymbolKind = require 'define.SymbolKind'
+local core   = require 'core.document-symbol'
+local files  = require 'files'
+local define = require 'proto.define'
 
 rawset(_G, 'TEST', true)
 
@@ -62,7 +62,7 @@ A = 1
     [1] = {
         name = 'A',
         detail = 'global number = 1',
-        kind = SymbolKind.Class,
+        kind = define.SymbolKind.Class,
         range = {1, 5},
         selectionRange = {1, 1},
     }
@@ -76,7 +76,7 @@ end
     [1] = {
         name = 'f',
         detail = 'function ()',
-        kind = SymbolKind.Function,
+        kind = define.SymbolKind.Function,
         range = {1, 22},
         selectionRange = {16, 16},
         valueRange = {1, 22},
@@ -91,7 +91,7 @@ end
     [1] = {
         name = 'f',
         detail = 'function ()',
-        kind = SymbolKind.Function,
+        kind = define.SymbolKind.Function,
         range = {1, 16},
         selectionRange = {10, 10},
         valueRange = {1, 16},
@@ -106,7 +106,7 @@ end
     [1] = {
         name = '',
         detail = 'function ()',
-        kind = SymbolKind.Function,
+        kind = define.SymbolKind.Function,
         range = {8, 22},
         selectionRange = {8, 8},
         valueRange = {8, 22},
@@ -121,7 +121,7 @@ end
     [1] = {
         name = 'f',
         detail = 'function ()',
-        kind = SymbolKind.Function,
+        kind = define.SymbolKind.Function,
         range = {1, 19},
         selectionRange = {1, 1},
         valueRange = {5, 19},
@@ -136,7 +136,7 @@ end
     [1] = {
         name = 'f',
         detail = 'function ()',
-        kind = SymbolKind.Function,
+        kind = define.SymbolKind.Function,
         range = {7, 25},
         selectionRange = {7, 7},
         valueRange = {11, 25},
@@ -151,7 +151,7 @@ end
     [1] = {
         name = 'mt:add',
         detail = 'function ()',
-        kind = SymbolKind.Method,
+        kind = define.SymbolKind.Method,
         range = {1, 21},
         selectionRange = {10, 15},
         valueRange = {1, 21},
@@ -172,7 +172,7 @@ end
     [1] = {
         name = 'A',
         detail = 'function ()',
-        kind = SymbolKind.Function,
+        kind = define.SymbolKind.Function,
         range = {1, 68},
         selectionRange = {10, 10},
         valueRange = {1, 68},
@@ -180,7 +180,7 @@ end
             [1] = {
                 name = 'A1',
                 detail = 'function ()',
-                kind = SymbolKind.Function,
+                kind = define.SymbolKind.Function,
                 range = {18, 38},
                 selectionRange = {27, 28},
                 valueRange = {18, 38},
@@ -188,7 +188,7 @@ end
             [2] = {
                 name = 'A2',
                 detail = 'function ()',
-                kind = SymbolKind.Function,
+                kind = define.SymbolKind.Function,
                 range = {44, 64},
                 selectionRange = {53, 54},
                 valueRange = {44, 64},
@@ -198,7 +198,7 @@ end
     [2] = {
         name = 'B',
         detail = 'function ()',
-        kind = SymbolKind.Function,
+        kind = define.SymbolKind.Function,
         range = {70, 85},
         selectionRange = {79, 79},
         valueRange = {70, 85},
@@ -219,14 +219,14 @@ local z
     [1] = {
         name = 'x',
         detail = 'local number = 1',
-        kind = SymbolKind.Variable,
+        kind = define.SymbolKind.Variable,
         range = {7, 11},
         selectionRange = {7, 7},
     },
     [2] = {
         name = 'f',
         detail = 'function ()',
-        kind = SymbolKind.Function,
+        kind = define.SymbolKind.Function,
         range = {13, 79},
         selectionRange = {28, 28},
         valueRange = {13, 79},
@@ -234,14 +234,14 @@ local z
             [1] = {
                 name = 'x',
                 detail = 'local string = "x"',
-                kind = SymbolKind.Variable,
+                kind = define.SymbolKind.Variable,
                 range = {42, 48},
                 selectionRange = {42, 42},
             },
             [2] = {
                 name = 'y',
                 detail = 'local {}',
-                kind = SymbolKind.Variable,
+                kind = define.SymbolKind.Variable,
                 range = {60, 65},
                 selectionRange = {60, 60},
                 valueRange = {64, 65},
@@ -249,7 +249,7 @@ local z
             --[3] = {
             --    name = 'z',
             --    detail = 'global z: number = 1',
-            --    kind = SymbolKind.Object,
+            --    kind = define.SymbolKind.Object,
             --    range = {71, 71},
             --    selectionRange = {71, 71},
             --    valueRange = {75, 75},
@@ -259,14 +259,14 @@ local z
     [3] = {
         name = 'y',
         detail = 'local boolean = true',
-        kind = SymbolKind.Variable,
+        kind = define.SymbolKind.Variable,
         range = {87, 94},
         selectionRange = {87, 87},
     },
     [4] = {
         name = 'z',
         detail = 'local',
-        kind = SymbolKind.Variable,
+        kind = define.SymbolKind.Variable,
         range = {102, 102},
         selectionRange = {102, 102},
     },
@@ -283,7 +283,7 @@ local t = {
     [1] = {
         name = 't',
         detail = 'local {a, b, c}',
-        kind = SymbolKind.Variable,
+        kind = define.SymbolKind.Variable,
         range = {7, 46},
         selectionRange = {7, 7},
         valueRange = {11, 46},
@@ -291,21 +291,21 @@ local t = {
             [1] = {
                 name = 'a',
                 detail = 'field number = 1',
-                kind = SymbolKind.Property,
+                kind = define.SymbolKind.Property,
                 range = {17, 21},
                 selectionRange = {17, 17},
             },
             [2] = {
                 name = 'b',
                 detail = 'field number = 2',
-                kind = SymbolKind.Property,
+                kind = define.SymbolKind.Property,
                 range = {28, 32},
                 selectionRange = {28, 28},
             },
             [3] = {
                 name = 'c',
                 detail = 'field number = 3',
-                kind = SymbolKind.Property,
+                kind = define.SymbolKind.Property,
                 range = {39, 43},
                 selectionRange = {39, 39},
             },
@@ -324,7 +324,7 @@ local t = {
     [1] = {
         name = 't',
         detail = 'local {a}',
-        kind = SymbolKind.Variable,
+        kind = define.SymbolKind.Variable,
         range = {7, 44},
         selectionRange = {7, 7},
         valueRange = {11, 44},
@@ -332,7 +332,7 @@ local t = {
             [1] = {
                 name = 'a',
                 detail = 'field {b}',
-                kind = SymbolKind.Property,
+                kind = define.SymbolKind.Property,
                 range = {17, 42},
                 selectionRange = {17, 17},
                 valueRange = {21, 42},
@@ -340,7 +340,7 @@ local t = {
                     [1] = {
                         name = 'b',
                         detail = EXISTS,
-                        kind = SymbolKind.Property,
+                        kind = define.SymbolKind.Property,
                         range = {31, 35},
                         selectionRange = {31, 31},
                     }
@@ -359,7 +359,7 @@ g = 1
     [1] = {
         name = 'g',
         detail = 'function ()',
-        kind = SymbolKind.Function,
+        kind = define.SymbolKind.Function,
         range = {1, 22},
         selectionRange = {16, 16},
         valueRange = {1, 22},
@@ -367,7 +367,7 @@ g = 1
     [2] = {
         name = 'g',
         detail = 'setlocal number = 1',
-        kind = SymbolKind.Variable,
+        kind = define.SymbolKind.Variable,
         range = {25, 29},
         selectionRange = {25, 25},
     }
@@ -382,7 +382,7 @@ end
     [1] = {
         name = 'f',
         detail = 'function (a, b, ...)',
-        kind = SymbolKind.Function,
+        kind = define.SymbolKind.Function,
         range = {1, 58},
         selectionRange = {10, 10},
         valueRange = {1, 58},
@@ -390,21 +390,21 @@ end
             [1] = {
                 name = 'a',
                 detail = 'param',
-                kind = SymbolKind.Constant,
+                kind = define.SymbolKind.Constant,
                 range = {12, 12},
                 selectionRange = {12, 12},
             },
             [2] = {
                 name = 'b',
                 detail = 'param',
-                kind = SymbolKind.Constant,
+                kind = define.SymbolKind.Constant,
                 range = {15, 15},
                 selectionRange = {15, 15},
             },
             [3] = {
                 name = 'x',
                 detail = 'local',
-                kind = SymbolKind.Variable,
+                kind = define.SymbolKind.Variable,
                 range = {33, 39},
                 selectionRange = {33, 33},
             }
@@ -423,7 +423,7 @@ local v = t
     [1] = {
         name = 't',
         detail = 'local {a, b}',
-        kind = SymbolKind.Variable,
+        kind = define.SymbolKind.Variable,
         range = {7, 35},
         selectionRange = {7, 7},
         valueRange = {11, 35},
@@ -432,7 +432,7 @@ local v = t
     [2] = {
         name = 'v',
         detail = 'local',
-        kind = SymbolKind.Variable,
+        kind = define.SymbolKind.Variable,
         range = {44, 48},
         selectionRange = {44, 44},
     },
@@ -445,7 +445,7 @@ local function
     [1] = {
         name = 'x',
         detail = 'local',
-        kind = SymbolKind.Variable,
+        kind = define.SymbolKind.Variable,
         range = {7, 7},
         selectionRange = {7, 7},
     },
@@ -466,7 +466,7 @@ local a, b = {
     [1] = {
         name = 'a',
         detail = 'local {x, y, z}',
-        kind = SymbolKind.Variable,
+        kind = define.SymbolKind.Variable,
         range = {7, 49},
         selectionRange = {7, 7},
         valueRange = {14, 49},
@@ -475,7 +475,7 @@ local a, b = {
     [2] = {
         name = 'b',
         detail = 'local {x, y, z}',
-        kind = SymbolKind.Variable,
+        kind = define.SymbolKind.Variable,
         range = {10, 87},
         selectionRange = {10, 10},
         valueRange = {52, 87},
@@ -495,7 +495,7 @@ end
     [1] = {
         name = 'x',
         detail = 'function ()',
-        kind = SymbolKind.Function,
+        kind = define.SymbolKind.Function,
         range = {1, 22},
         selectionRange = {16, 16},
         valueRange = {1, 22},
@@ -503,7 +503,7 @@ end
     [2] = {
         name = 'f',
         detail = 'function ()',
-        kind = SymbolKind.Function,
+        kind = define.SymbolKind.Function,
         range = {25, 58},
         selectionRange = {40, 40},
         valueRange = {25, 58},
@@ -511,7 +511,7 @@ end
             [1] = {
                 name = 'c',
                 detail = 'local',
-                kind = SymbolKind.Variable,
+                kind = define.SymbolKind.Variable,
                 range = {54, 54},
                 selectionRange = {54, 54},
             },
@@ -528,7 +528,7 @@ local t = f({
     [1] = {
         name = 't',
         detail = 'local',
-        kind = SymbolKind.Variable,
+        kind = define.SymbolKind.Variable,
         range = {7, 26},
         selectionRange = {7, 7},
         valueRange = {11, 26},
@@ -536,7 +536,7 @@ local t = f({
             [1] = {
                 name = 'k',
                 detail = 'field number = 1',
-                kind = SymbolKind.Property,
+                kind = define.SymbolKind.Property,
                 range = {19, 23},
                 selectionRange = {19, 19},
             }
@@ -554,7 +554,7 @@ end
     [1] = {
         name = 't',
         detail = 'local {}',
-        kind = SymbolKind.Variable,
+        kind = define.SymbolKind.Variable,
         range = {7, 12},
         selectionRange = {7, 7},
         valueRange = {11, 12},
@@ -562,7 +562,7 @@ end
     [2] = {
         name = 'f',
         detail = 'function (a, b)',
-        kind = SymbolKind.Function,
+        kind = define.SymbolKind.Function,
         range = {15, 40},
         selectionRange = {30, 30},
         valueRange = {15, 40},
@@ -570,14 +570,14 @@ end
             [1] = {
                 name = 'a',
                 detail = 'param',
-                kind = SymbolKind.Constant,
+                kind = define.SymbolKind.Constant,
                 range = {32, 32},
                 selectionRange = {32, 32},
             },
             [2] = {
                 name = 'b',
                 detail = 'param',
-                kind = SymbolKind.Constant,
+                kind = define.SymbolKind.Constant,
                 range = {35, 35},
                 selectionRange = {35, 35},
             }
@@ -595,7 +595,7 @@ local a = f {
     [1] = {
         name = 'a',
         detail = 'local',
-        kind = SymbolKind.Variable,
+        kind = define.SymbolKind.Variable,
         range = {7, 43},
         selectionRange = {7, 7},
         valueRange = {11, 43},
@@ -603,7 +603,7 @@ local a = f {
             [1] = {
                 name = 'x',
                 detail = 'function ()',
-                kind = SymbolKind.Function,
+                kind = define.SymbolKind.Function,
                 range = {19, 41},
                 selectionRange = {19, 19},
                 valueRange = {23, 41},

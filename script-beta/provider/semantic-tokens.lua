@@ -1,6 +1,5 @@
 local proto          = require 'proto'
-local tokenTypes     = require 'define.TokenTypes'
-local tokenModifiers = require 'define.TokenModifiers'
+local define         = require 'proto.define'
 local client         = require 'provider.client'
 
 local isEnable = false
@@ -32,8 +31,8 @@ local function enable()
                 method = 'textDocument/semanticTokens/full',
                 registerOptions = {
                     legend = {
-                        tokenTypes     = toArray(tokenTypes),
-                        tokenModifiers = toArray(tokenModifiers),
+                        tokenTypes     = toArray(define.TokenTypes),
+                        tokenModifiers = toArray(define.TokenModifiers),
                     },
                     range = true,
                     full  = false,

@@ -1,4 +1,4 @@
-local ckind      = require 'define.CompletionItemKind'
+local define     = require 'proto.define'
 local guide      = require 'parser.guide'
 
 local keyWordMap = {
@@ -6,14 +6,14 @@ local keyWordMap = {
         if hasSpace then
             results[#results+1] = {
                 label = 'do .. end',
-                kind  = ckind.Snippet,
+                kind  = define.CompletionItemKind.Snippet,
                 insertTextFormat = 2,
                 insertText = [[$0 end]],
             }
         else
             results[#results+1] = {
                 label = 'do .. end',
-                kind  = ckind.Snippet,
+                kind  = define.CompletionItemKind.Snippet,
                 insertTextFormat = 2,
                 insertText = [[
 do
@@ -42,14 +42,14 @@ end]],
         if hasSpace then
             results[#results+1] = {
                 label = 'elseif .. then',
-                kind  = ckind.Snippet,
+                kind  = define.CompletionItemKind.Snippet,
                 insertTextFormat = 2,
                 insertText = [[$1 then]],
             }
         else
             results[#results+1] = {
                 label = 'elseif .. then',
-                kind  = ckind.Snippet,
+                kind  = define.CompletionItemKind.Snippet,
                 insertTextFormat = 2,
                 insertText = [[elseif $1 then]],
             }
@@ -62,7 +62,7 @@ end]],
         if hasSpace then
             results[#results+1] = {
                 label = 'for .. in',
-                kind  = ckind.Snippet,
+                kind  = define.CompletionItemKind.Snippet,
                 insertTextFormat = 2,
                 insertText = [[
 ${1:key, value} in ${2:pairs(${3:t})} do
@@ -71,7 +71,7 @@ end]]
             }
             results[#results+1] = {
                 label = 'for i = ..',
-                kind  = ckind.Snippet,
+                kind  = define.CompletionItemKind.Snippet,
                 insertTextFormat = 2,
                 insertText = [[
 ${1:i} = ${2:1}, ${3:10, 1} do
@@ -81,7 +81,7 @@ end]]
         else
             results[#results+1] = {
                 label = 'for .. in',
-                kind  = ckind.Snippet,
+                kind  = define.CompletionItemKind.Snippet,
                 insertTextFormat = 2,
                 insertText = [[
 for ${1:key, value} in ${2:pairs(${3:t})} do
@@ -90,7 +90,7 @@ end]]
             }
             results[#results+1] = {
                 label = 'for i = ..',
-                kind  = ckind.Snippet,
+                kind  = define.CompletionItemKind.Snippet,
                 insertTextFormat = 2,
                 insertText = [[
 for ${1:i} = ${2:1}, ${3:10, 1} do
@@ -104,7 +104,7 @@ end]]
         if hasSpace then
             results[#results+1] = {
                 label = 'function ()',
-                kind  = ckind.Snippet,
+                kind  = define.CompletionItemKind.Snippet,
                 insertTextFormat = 2,
                 insertText = [[
 $1($2)
@@ -114,7 +114,7 @@ end]]
         else
             results[#results+1] = {
                 label = 'function ()',
-                kind  = ckind.Snippet,
+                kind  = define.CompletionItemKind.Snippet,
                 insertTextFormat = 2,
                 insertText = [[
 function $1($2)
@@ -129,7 +129,7 @@ end]]
         if hasSpace then
             results[#results+1] = {
                 label = 'if .. then',
-                kind  = ckind.Snippet,
+                kind  = define.CompletionItemKind.Snippet,
                 insertTextFormat = 2,
                 insertText = [[
 $1 then
@@ -139,7 +139,7 @@ end]]
         else
             results[#results+1] = {
                 label = 'if .. then',
-                kind  = ckind.Snippet,
+                kind  = define.CompletionItemKind.Snippet,
                 insertTextFormat = 2,
                 insertText = [[
 if $1 then
@@ -153,7 +153,7 @@ end]]
         if hasSpace then
             results[#results+1] = {
                 label = 'in ..',
-                kind  = ckind.Snippet,
+                kind  = define.CompletionItemKind.Snippet,
                 insertTextFormat = 2,
                 insertText = [[
 ${1:pairs(${2:t})} do
@@ -163,7 +163,7 @@ end]]
         else
             results[#results+1] = {
                 label = 'in ..',
-                kind  = ckind.Snippet,
+                kind  = define.CompletionItemKind.Snippet,
                 insertTextFormat = 2,
                 insertText = [[
 in ${1:pairs(${2:t})} do
@@ -177,7 +177,7 @@ end]]
         if hasSpace then
             results[#results+1] = {
                 label = 'local function',
-                kind  = ckind.Snippet,
+                kind  = define.CompletionItemKind.Snippet,
                 insertTextFormat = 2,
                 insertText = [[
 function $1($2)
@@ -187,7 +187,7 @@ end]]
         else
             results[#results+1] = {
                 label = 'local function',
-                kind  = ckind.Snippet,
+                kind  = define.CompletionItemKind.Snippet,
                 insertTextFormat = 2,
                 insertText = [[
 local function $1($2)
@@ -204,14 +204,14 @@ end]]
         if hasSpace then
             results[#results+1] = {
                 label = 'repeat .. until',
-                kind  = ckind.Snippet,
+                kind  = define.CompletionItemKind.Snippet,
                 insertTextFormat = 2,
                 insertText = [[$0 until $1]]
             }
         else
             results[#results+1] = {
                 label = 'repeat .. until',
-                kind  = ckind.Snippet,
+                kind  = define.CompletionItemKind.Snippet,
                 insertTextFormat = 2,
                 insertText = [[
 repeat
@@ -225,7 +225,7 @@ until $1]]
         if not hasSpace then
             results[#results+1] = {
                 label = 'do return end',
-                kind  = ckind.Snippet,
+                kind  = define.CompletionItemKind.Snippet,
                 insertTextFormat = 2,
                 insertText = [[do return $1end]]
             }
@@ -239,7 +239,7 @@ until $1]]
         if hasSpace then
             results[#results+1] = {
                 label = 'while .. do',
-                kind  = ckind.Snippet,
+                kind  = define.CompletionItemKind.Snippet,
                 insertTextFormat = 2,
                 insertText = [[
 ${1:true} do
@@ -249,7 +249,7 @@ end]]
         else
             results[#results+1] = {
                 label = 'while .. do',
-                kind  = ckind.Snippet,
+                kind  = define.CompletionItemKind.Snippet,
                 insertTextFormat = 2,
                 insertText = [[
 while ${1:true} do

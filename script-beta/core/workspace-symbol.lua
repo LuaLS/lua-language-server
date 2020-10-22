@@ -1,7 +1,7 @@
 local files    = require 'files'
 local guide    = require 'parser.guide'
 local matchKey = require 'core.matchkey'
-local skind    = require 'define.SymbolKind'
+local define   = require 'proto.define'
 
 local function buildSource(uri, source, key, results)
     if     source.type == 'local'
@@ -11,7 +11,7 @@ local function buildSource(uri, source, key, results)
         if matchKey(key, name) then
             results[#results+1] = {
                 name  = name,
-                kind  = skind.Variable,
+                kind  = define.SymbolKind.Variable,
                 uri   = uri,
                 range = { source.start, source.finish },
             }
@@ -23,7 +23,7 @@ local function buildSource(uri, source, key, results)
         if matchKey(key, name) then
             results[#results+1] = {
                 name  = name,
-                kind  = skind.Field,
+                kind  = define.SymbolKind.Field,
                 uri   = uri,
                 range = { field.start, field.finish },
             }
@@ -34,7 +34,7 @@ local function buildSource(uri, source, key, results)
         if matchKey(key, name) then
             results[#results+1] = {
                 name  = name,
-                kind  = skind.Method,
+                kind  = define.SymbolKind.Method,
                 uri   = uri,
                 range = { method.start, method.finish },
             }

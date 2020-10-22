@@ -1,9 +1,9 @@
 local await  = require 'await'
-local files = require 'files'
-local guide = require 'parser.guide'
-local skind = require 'define.SymbolKind'
-local lname = require 'core.hover.name'
-local util  = require 'utility'
+local files  = require 'files'
+local guide  = require 'parser.guide'
+local define = require 'proto.define'
+local lname  = require 'core.hover.name'
+local util   = require 'utility'
 
 local function buildFunctionParams(func)
     if not func.args then
@@ -39,9 +39,9 @@ local function buildFunction(source, symbols)
         range = { func.start, func.finish }
     end
     if source.type == 'setmethod' then
-        kind = skind.Method
+        kind = define.SymbolKind.Method
     else
-        kind = skind.Function
+        kind = define.SymbolKind.Function
     end
     symbols[#symbols+1] = {
         name           = name,
@@ -76,23 +76,23 @@ local function buildValue(source, symbols)
             details[1] = 'param'
             range      = { source.start, source.finish }
             sRange     = { source.start, source.finish }
-            kind       = skind.Constant
+            kind       = define.SymbolKind.Constant
         else
             details[1] = 'local'
             range      = { source.start, source.finish }
             sRange     = { source.start, source.finish }
-            kind       = skind.Variable
+            kind       = define.SymbolKind.Variable
         end
     elseif source.type == 'setlocal' then
         details[1] = 'setlocal'
         range      = { source.start, source.finish }
         sRange     = { source.start, source.finish }
-        kind       = skind.Variable
+        kind       = define.SymbolKind.Variable
     elseif source.type == 'setglobal' then
         details[1] = 'global'
         range      = { source.start, source.finish }
         sRange     = { source.start, source.finish }
-        kind       = skind.Class
+        kind       = define.SymbolKind.Class
     elseif source.type == 'tablefield' then
         if not source.field then
             return
@@ -100,7 +100,7 @@ local function buildValue(source, symbols)
         details[1] = 'field'
         range      = { source.field.start, source.field.finish }
         sRange     = { source.field.start, source.field.finish }
-        kind       = skind.Property
+        kind       = define.SymbolKind.Property
     elseif source.type == 'setfield' then
         if not source.field then
             return
@@ -108,7 +108,7 @@ local function buildValue(source, symbols)
         details[1] = 'field'
         range      = { source.field.start, source.field.finish }
         sRange     = { source.field.start, source.field.finish }
-        kind       = skind.Field
+        kind       = define.SymbolKind.Field
     else
         return
     end
@@ -172,7 +172,7 @@ local function buildAnonymousFunction(source, used, symbols)
     symbols[#symbols+1] = {
         name           = '',
         detail         = 'function ()',
-        kind           = skind.Function,
+        kind           = define.SymbolKind.Function,
         range          = { source.start, source.finish },
         selectionRange = { source.start, source.start },
         valueRange     = { source.start, source.finish },

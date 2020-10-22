@@ -1,6 +1,6 @@
-local core  = require 'core.completion'
-local files = require 'files'
-local CompletionItemKind = require 'define.CompletionItemKind'
+local core   = require 'core.completion'
+local files  = require 'files'
+local define = require 'proto.define'
 local config = require 'config'
 
 local EXISTS = {'EXISTS'}
@@ -80,7 +80,7 @@ za$
 {
     {
         label = 'zabcde',
-        kind = CompletionItemKind.Variable,
+        kind = define.CompletionItemKind.Variable,
     }
 }
 
@@ -92,11 +92,11 @@ zabcde$
 {
     {
         label = 'zabcdefg',
-        kind = CompletionItemKind.Variable,
+        kind = define.CompletionItemKind.Variable,
     },
     {
         label = 'zabcde',
-        kind = CompletionItemKind.Variable,
+        kind = define.CompletionItemKind.Variable,
     },
 }
 
@@ -108,11 +108,11 @@ local zabcde
 {
     {
         label = 'zabcdefg',
-        kind = CompletionItemKind.Variable,
+        kind = define.CompletionItemKind.Variable,
     },
     {
         label = 'zabcde',
-        kind = CompletionItemKind.Text,
+        kind = define.CompletionItemKind.Text,
     },
 }
 
@@ -123,7 +123,7 @@ zace$
 {
     {
         label = 'zabcde',
-        kind = CompletionItemKind.Variable,
+        kind = define.CompletionItemKind.Variable,
     }
 }
 
@@ -135,11 +135,11 @@ zac$
 {
     {
         label = 'zabc',
-        kind = CompletionItemKind.Variable,
+        kind = define.CompletionItemKind.Variable,
     },
     {
         label = 'ZABC',
-        kind = CompletionItemKind.Field,
+        kind = define.CompletionItemKind.Field,
     },
 }
 
@@ -149,11 +149,11 @@ ass$
 {
     {
         label = 'assert',
-        kind  = CompletionItemKind.Function,
+        kind  = define.CompletionItemKind.Function,
     },
     {
         label = 'assert()',
-        kind  = CompletionItemKind.Snippet,
+        kind  = define.CompletionItemKind.Snippet,
     },
 }
 
@@ -165,11 +165,11 @@ ff$
 {
     {
         label = 'ffff',
-        kind  = CompletionItemKind.Function,
+        kind  = define.CompletionItemKind.Function,
     },
     {
         label = 'ffff()',
-        kind  = CompletionItemKind.Snippet,
+        kind  = define.CompletionItemKind.Snippet,
     }
 }
 
@@ -180,7 +180,7 @@ z$
 {
     {
         label = 'zabc',
-        kind = CompletionItemKind.Variable,
+        kind = define.CompletionItemKind.Variable,
     }
 }
 
@@ -191,7 +191,7 @@ z$
 {
     {
         label = 'zabc',
-        kind = CompletionItemKind.Variable,
+        kind = define.CompletionItemKind.Variable,
     }
 }
 
@@ -204,7 +204,7 @@ t.ab$
 {
     {
         label = 'abc',
-        kind = CompletionItemKind.Enum,
+        kind = define.CompletionItemKind.Enum,
     }
 }
 
@@ -218,7 +218,7 @@ t.ab$
 {
     {
         label = 'abc',
-        kind = CompletionItemKind.Enum,
+        kind = define.CompletionItemKind.Enum,
     }
 }
 
@@ -233,15 +233,15 @@ mt:g$
 {
     {
         label = 'get',
-        kind = CompletionItemKind.Method,
+        kind = define.CompletionItemKind.Method,
     },
     {
         label = 'get()',
-        kind = CompletionItemKind.Snippet,
+        kind = define.CompletionItemKind.Snippet,
     },
     {
         label = 'ggg',
-        kind  = CompletionItemKind.Text,
+        kind  = define.CompletionItemKind.Text,
     }
 }
 
@@ -251,19 +251,19 @@ loc$
 {
     {
         label = 'local',
-        kind = CompletionItemKind.Keyword,
+        kind = define.CompletionItemKind.Keyword,
     },
     {
         label = 'local function',
-        kind = CompletionItemKind.Snippet,
+        kind = define.CompletionItemKind.Snippet,
     },
     {
         label = 'collectgarbage',
-        kind = CompletionItemKind.Function,
+        kind = define.CompletionItemKind.Function,
     },
     {
         label = 'collectgarbage()',
-        kind = CompletionItemKind.Snippet,
+        kind = define.CompletionItemKind.Snippet,
     },
 }
 
@@ -273,35 +273,35 @@ do$
 {
     {
         label = 'do',
-        kind = CompletionItemKind.Keyword,
+        kind = define.CompletionItemKind.Keyword,
     },
     {
         label = 'do .. end',
-        kind = CompletionItemKind.Snippet,
+        kind = define.CompletionItemKind.Snippet,
     },
     {
         label = 'dofile',
-        kind  = CompletionItemKind.Function,
+        kind  = define.CompletionItemKind.Function,
     },
     {
         label = 'dofile()',
-        kind  = CompletionItemKind.Snippet,
+        kind  = define.CompletionItemKind.Snippet,
     },
     {
         label = 'load',
-        kind  = CompletionItemKind.Function,
+        kind  = define.CompletionItemKind.Function,
     },
     {
         label = 'load()',
-        kind  = CompletionItemKind.Snippet,
+        kind  = define.CompletionItemKind.Snippet,
     },
     {
         label = 'loadfile',
-        kind  = CompletionItemKind.Function,
+        kind  = define.CompletionItemKind.Function,
     },
     {
         label = 'loadfile()',
-        kind  = CompletionItemKind.Snippet,
+        kind  = define.CompletionItemKind.Snippet,
     },
 }
 
@@ -311,11 +311,11 @@ while true d$
 {
     {
         label = 'do',
-        kind = CompletionItemKind.Keyword,
+        kind = define.CompletionItemKind.Keyword,
     },
     {
         label = 'do .. end',
-        kind = CompletionItemKind.Snippet,
+        kind = define.CompletionItemKind.Snippet,
     },
 }
 
@@ -345,7 +345,7 @@ end
 {
     {
         label = 'ast',
-        kind = CompletionItemKind.Variable,
+        kind = define.CompletionItemKind.Variable,
     }
 }
 
@@ -357,11 +357,11 @@ t.$
 {
     {
         label = 'a',
-        kind = CompletionItemKind.Field,
+        kind = define.CompletionItemKind.Field,
     },
     {
         label = 'b',
-        kind = CompletionItemKind.Field,
+        kind = define.CompletionItemKind.Field,
     },
 }
 
@@ -373,11 +373,11 @@ t.   $
 {
     {
         label = 'a',
-        kind = CompletionItemKind.Field,
+        kind = define.CompletionItemKind.Field,
     },
     {
         label = 'b',
-        kind = CompletionItemKind.Field,
+        kind = define.CompletionItemKind.Field,
     },
 }
 
@@ -390,11 +390,11 @@ t:$
 {
     {
         label = 'b',
-        kind = CompletionItemKind.Method,
+        kind = define.CompletionItemKind.Method,
     },
     {
         label = 'b()',
-        kind = CompletionItemKind.Snippet,
+        kind = define.CompletionItemKind.Snippet,
     },
 }
 
@@ -408,7 +408,7 @@ xxx()
 {
     {
         label = 'a',
-        kind = CompletionItemKind.Field,
+        kind = define.CompletionItemKind.Field,
     },
 }
 
@@ -435,31 +435,31 @@ local t = {
 {
     {
         label = 'xxxx',
-        kind = CompletionItemKind.Variable,
+        kind = define.CompletionItemKind.Variable,
     },
     {
         label = 'xxyy',
-        kind = CompletionItemKind.Property,
+        kind = define.CompletionItemKind.Property,
     },
     {
         label = 'xxzz',
-        kind = CompletionItemKind.Property,
+        kind = define.CompletionItemKind.Property,
     },
     {
         label = 'next',
-        kind = CompletionItemKind.Function,
+        kind = define.CompletionItemKind.Function,
     },
     {
         label = 'next()',
-        kind = CompletionItemKind.Snippet,
+        kind = define.CompletionItemKind.Snippet,
     },
     {
         label = 'xpcall',
-        kind = CompletionItemKind.Function,
+        kind = define.CompletionItemKind.Function,
     },
     {
         label = 'xpcall()',
-        kind = CompletionItemKind.Snippet,
+        kind = define.CompletionItemKind.Snippet,
     },
 }
 
@@ -472,23 +472,23 @@ print(fff)
 {
     {
         label = 'function',
-        kind = CompletionItemKind.Keyword,
+        kind = define.CompletionItemKind.Keyword,
     },
     {
         label = 'function ()',
-        kind = CompletionItemKind.Snippet,
+        kind = define.CompletionItemKind.Snippet,
     },
     {
         label = 'fff',
-        kind = CompletionItemKind.Variable,
+        kind = define.CompletionItemKind.Variable,
     },
     {
         label = 'ff2',
-        kind = CompletionItemKind.Text,
+        kind = define.CompletionItemKind.Text,
     },
     {
         label = 'faa',
-        kind = CompletionItemKind.Text,
+        kind = define.CompletionItemKind.Text,
     },
 }
 
@@ -500,7 +500,7 @@ end
 {
     {
         label = 'fff',
-        kind = CompletionItemKind.Variable,
+        kind = define.CompletionItemKind.Variable,
     },
 }
 
@@ -515,7 +515,7 @@ collectgarbage('$')
 {
     {
         label       = "'collect'",
-        kind        = CompletionItemKind.EnumMember,
+        kind        = define.CompletionItemKind.EnumMember,
         textEdit    = {
             start   = 16,
             finish  = 17,
@@ -524,7 +524,7 @@ collectgarbage('$')
     },
     {
         label       = "'stop'",
-        kind        = CompletionItemKind.EnumMember,
+        kind        = define.CompletionItemKind.EnumMember,
         textEdit    = {
             start   = 16,
             finish  = 17,
@@ -533,7 +533,7 @@ collectgarbage('$')
     },
     {
         label       = "'restart'",
-        kind        = CompletionItemKind.EnumMember,
+        kind        = define.CompletionItemKind.EnumMember,
         textEdit    = {
             start   = 16,
             finish  = 17,
@@ -542,7 +542,7 @@ collectgarbage('$')
     },
     {
         label       = "'count'",
-        kind        = CompletionItemKind.EnumMember,
+        kind        = define.CompletionItemKind.EnumMember,
         textEdit    = {
             start   = 16,
             finish  = 17,
@@ -551,7 +551,7 @@ collectgarbage('$')
     },
     {
         label       = "'step'",
-        kind        = CompletionItemKind.EnumMember,
+        kind        = define.CompletionItemKind.EnumMember,
         textEdit    = {
             start   = 16,
             finish  = 17,
@@ -560,7 +560,7 @@ collectgarbage('$')
     },
     {
         label       = "'incremental'",
-        kind        = CompletionItemKind.EnumMember,
+        kind        = define.CompletionItemKind.EnumMember,
         textEdit    = {
             start   = 16,
             finish  = 17,
@@ -569,7 +569,7 @@ collectgarbage('$')
     },
     {
         label       = "'generational'",
-        kind        = CompletionItemKind.EnumMember,
+        kind        = define.CompletionItemKind.EnumMember,
         textEdit    = {
             start   = 16,
             finish  = 17,
@@ -578,7 +578,7 @@ collectgarbage('$')
     },
     {
         label       = "'isrunning'",
-        kind        = CompletionItemKind.EnumMember,
+        kind        = define.CompletionItemKind.EnumMember,
         textEdit    = {
             start   = 16,
             finish  = 17,
@@ -593,19 +593,19 @@ io.read($)
 {
     {
         label       = '"n"',
-        kind        = CompletionItemKind.EnumMember,
+        kind        = define.CompletionItemKind.EnumMember,
     },
     {
         label       = '"a"',
-        kind        = CompletionItemKind.EnumMember,
+        kind        = define.CompletionItemKind.EnumMember,
     },
     {
         label       = '"l"',
-        kind        = CompletionItemKind.EnumMember,
+        kind        = define.CompletionItemKind.EnumMember,
     },
     {
         label       = '"L"',
-        kind        = CompletionItemKind.EnumMember,
+        kind        = define.CompletionItemKind.EnumMember,
     },
 }
 
@@ -626,7 +626,7 @@ self.results.list[#$]
 {
     {
         label = '#self.results.list+1',
-        kind = CompletionItemKind.Snippet,
+        kind = define.CompletionItemKind.Snippet,
         textEdit = {
             start = 19,
             finish = 20,
@@ -642,7 +642,7 @@ local n = 1
 {
     {
         label = '#self.results.list+1',
-        kind = CompletionItemKind.Snippet,
+        kind = define.CompletionItemKind.Snippet,
         textEdit = {
             start = 19,
             finish = 20,
@@ -657,7 +657,7 @@ self.results.list[#$] = 1
 {
     {
         label = '#self.results.list+1',
-        kind = CompletionItemKind.Snippet,
+        kind = define.CompletionItemKind.Snippet,
         textEdit = {
             start = 19,
             finish = 20,
@@ -672,7 +672,7 @@ self.results.list[#self.re$]
 {
     {
         label = '#self.results.list+1',
-        kind = CompletionItemKind.Snippet,
+        kind = define.CompletionItemKind.Snippet,
         textEdit = {
             start = 19,
             finish = 27,
@@ -681,7 +681,7 @@ self.results.list[#self.re$]
     },
     {
         label = 'results',
-        kind = CompletionItemKind.Field,
+        kind = define.CompletionItemKind.Field,
     },
 }
 
@@ -691,7 +691,7 @@ fff[#ff$]
 {
     {
         label = '#fff+1',
-        kind = CompletionItemKind.Snippet,
+        kind = define.CompletionItemKind.Snippet,
         textEdit = {
             start = 5,
             finish = 8,
@@ -700,7 +700,7 @@ fff[#ff$]
     },
     {
         label = 'fff',
-        kind = CompletionItemKind.Field,
+        kind = define.CompletionItemKind.Field,
     }
 }
 
@@ -710,7 +710,7 @@ local _ = fff.kkk[#$]
 {
     {
         label = '#fff.kkk',
-        kind = CompletionItemKind.Snippet,
+        kind = define.CompletionItemKind.Snippet,
         textEdit = {
             start = 19,
             finish = 20,
@@ -725,7 +725,7 @@ fff.kkk[#$].yy
 {
     {
         label = '#fff.kkk',
-        kind = CompletionItemKind.Snippet,
+        kind = define.CompletionItemKind.Snippet,
         textEdit = {
             start = 9,
             finish = 10,
@@ -777,7 +777,7 @@ xxxx$
 {
     {
         label = 'xxxx',
-        kind = CompletionItemKind.Variable,
+        kind = define.CompletionItemKind.Variable,
     },
 }
 
@@ -789,11 +789,11 @@ xxxx$
 {
     {
         label = 'xxxx',
-        kind = CompletionItemKind.Variable,
+        kind = define.CompletionItemKind.Variable,
     },
     {
         label = 'XXXX',
-        kind = CompletionItemKind.Variable,
+        kind = define.CompletionItemKind.Variable,
     },
 }
 
@@ -806,7 +806,7 @@ xx$
 {
     {
         label = 'xxxxx',
-        kind = CompletionItemKind.Text,
+        kind = define.CompletionItemKind.Text,
     },
 }
 
@@ -817,7 +817,7 @@ tbl[ind$]
 {
     {
         label = 'index',
-        kind = CompletionItemKind.Variable,
+        kind = define.CompletionItemKind.Variable,
     },
 }
 
@@ -833,11 +833,11 @@ end
 {
     {
         label = 'a',
-        kind = CompletionItemKind.Field,
+        kind = define.CompletionItemKind.Field,
     },
     {
         label = 'b',
-        kind = CompletionItemKind.Field,
+        kind = define.CompletionItemKind.Field,
     },
 }
 
@@ -858,7 +858,7 @@ end
 {
     {
         label = 'add',
-        kind = CompletionItemKind.Variable,
+        kind = define.CompletionItemKind.Variable,
     },
 }
 
@@ -886,11 +886,11 @@ require 'config' .config.runtime.version = 'Lua 5.4'
 --{
 --    {
 --        label = '<toclose>',
---        kind = CompletionItemKind.Keyword,
+--        kind = define.CompletionItemKind.Keyword,
 --    },
 --    {
 --        label = '<const>',
---        kind = CompletionItemKind.Keyword,
+--        kind = define.CompletionItemKind.Keyword,
 --    },
 --}
 --
@@ -900,7 +900,7 @@ require 'config' .config.runtime.version = 'Lua 5.4'
 --{
 --    {
 --        label = '<toclose>',
---        kind = CompletionItemKind.Keyword,
+--        kind = define.CompletionItemKind.Keyword,
 --    }
 --}
 
@@ -914,7 +914,7 @@ t.$
 {
     {
         label = '__index',
-        kind = CompletionItemKind.Field,
+        kind = define.CompletionItemKind.Field,
     }
 }
 
@@ -927,39 +927,39 @@ else$
 {
     {
         label = 'else',
-        kind = CompletionItemKind.Keyword,
+        kind = define.CompletionItemKind.Keyword,
     },
     {
         label = 'elseif',
-        kind = CompletionItemKind.Keyword,
+        kind = define.CompletionItemKind.Keyword,
     },
     {
         label = 'elseif .. then',
-        kind = CompletionItemKind.Snippet,
+        kind = define.CompletionItemKind.Snippet,
     },
     {
         label = 'elseaaa',
-        kind = CompletionItemKind.Variable,
+        kind = define.CompletionItemKind.Variable,
     },
     {
         label = 'ELSE',
-        kind = CompletionItemKind.Enum,
+        kind = define.CompletionItemKind.Enum,
     },
     {
         label = 'select',
-        kind = CompletionItemKind.Function,
+        kind = define.CompletionItemKind.Function,
     },
     {
         label = 'select()',
-        kind = CompletionItemKind.Snippet,
+        kind = define.CompletionItemKind.Snippet,
     },
     {
         label = 'setmetatable',
-        kind = CompletionItemKind.Function,
+        kind = define.CompletionItemKind.Function,
     },
     {
         label = 'setmetatable()',
-        kind = CompletionItemKind.Snippet,
+        kind = define.CompletionItemKind.Snippet,
     },
 }
 
@@ -971,15 +971,15 @@ xpcal$
 {
     {
         label = 'xpcal',
-        kind = CompletionItemKind.Variable,
+        kind = define.CompletionItemKind.Variable,
     },
     {
         label = 'xpcall',
-        kind = CompletionItemKind.Function,
+        kind = define.CompletionItemKind.Function,
     },
     {
         label = 'xpcall()',
-        kind = CompletionItemKind.Snippet,
+        kind = define.CompletionItemKind.Snippet,
         insertText = EXISTS,
     },
 }
@@ -993,11 +993,11 @@ mt:f$
 {
     {
         label = 'f',
-        kind = CompletionItemKind.Method,
+        kind = define.CompletionItemKind.Method,
     },
     {
         label = 'f()',
-        kind = CompletionItemKind.Snippet,
+        kind = define.CompletionItemKind.Snippet,
         insertText = 'f(${1:a: any}, ${2:b: any}, ${3:c: any})',
     },
 }
@@ -1012,31 +1012,31 @@ end
 {
     {
         label = 'else',
-        kind = CompletionItemKind.Keyword,
+        kind = define.CompletionItemKind.Keyword,
     },
     {
         label = 'elseif',
-        kind = CompletionItemKind.Keyword,
+        kind = define.CompletionItemKind.Keyword,
     },
     {
         label = 'elseif .. then',
-        kind = CompletionItemKind.Snippet,
+        kind = define.CompletionItemKind.Snippet,
     },
     {
         label = 'select',
-        kind = CompletionItemKind.Function,
+        kind = define.CompletionItemKind.Function,
     },
     {
         label = 'select()',
-        kind = CompletionItemKind.Snippet,
+        kind = define.CompletionItemKind.Snippet,
     },
     {
         label = 'setmetatable',
-        kind = CompletionItemKind.Function,
+        kind = define.CompletionItemKind.Function,
     },
     {
         label = 'setmetatable()',
-        kind = CompletionItemKind.Snippet,
+        kind = define.CompletionItemKind.Snippet,
     },
 }
 
@@ -1050,7 +1050,7 @@ t.$
 {
     {
         label = 'a.b.c',
-        kind = CompletionItemKind.Field,
+        kind = define.CompletionItemKind.Field,
         textEdit = {
             start = 37,
             finish = 36,
@@ -1076,7 +1076,7 @@ t.   $
 {
     {
         label = 'a.b.c',
-        kind = CompletionItemKind.Field,
+        kind = define.CompletionItemKind.Field,
         textEdit = {
             start = 40,
             finish = 39,
@@ -1102,7 +1102,7 @@ t['$']
 {
     {
         label = 'a.b.c',
-        kind = CompletionItemKind.Field,
+        kind = define.CompletionItemKind.Field,
         textEdit = {
             start = 38,
             finish = 37,
@@ -1119,7 +1119,7 @@ z$
 {
     {
         label = 'z.b.c',
-        kind = CompletionItemKind.Field,
+        kind = define.CompletionItemKind.Field,
         textEdit = {
             start = 21,
             finish = 21,
@@ -1128,7 +1128,7 @@ z$
     },
     {
         label = 'z',
-        kind = CompletionItemKind.Text,
+        kind = define.CompletionItemKind.Text,
     }
 }
 
@@ -1148,12 +1148,12 @@ debug.setcsta$
 {
     {
         label = 'setcstacklimit',
-        kind = CompletionItemKind.Function,
+        kind = define.CompletionItemKind.Function,
         deprecated = true,
     },
     {
         label = 'setcstacklimit()',
-        kind = CompletionItemKind.Snippet,
+        kind = define.CompletionItemKind.Snippet,
         deprecated = true,
     },
 }
@@ -1170,7 +1170,7 @@ TEST [[
 {
     {
         label = 'class',
-        kind = CompletionItemKind.Keyword
+        kind = define.CompletionItemKind.Keyword
     }
 }
 
@@ -1181,11 +1181,11 @@ TEST [[
 {
     {
         label = 'ZABC',
-        kind = CompletionItemKind.Class,
+        kind = define.CompletionItemKind.Class,
     },
     {
         label = 'ZBBC',
-        kind = CompletionItemKind.Class,
+        kind = define.CompletionItemKind.Class,
     },
 }
 
@@ -1197,7 +1197,7 @@ local abcd
 {
     {
         label = 'zabc',
-        kind = CompletionItemKind.Class,
+        kind = define.CompletionItemKind.Class,
     },
 }
 
@@ -1216,7 +1216,7 @@ local abcd
 {
     {
         label = 'zabc',
-        kind = CompletionItemKind.Class,
+        kind = define.CompletionItemKind.Class,
     }
 }
 
@@ -1227,7 +1227,7 @@ TEST [[
 {
     {
         label = 'zabc',
-        kind = CompletionItemKind.Class,
+        kind = define.CompletionItemKind.Class,
     },
 }
 
@@ -1238,11 +1238,11 @@ TEST [[
 {
     {
         label = 'Class',
-        kind = CompletionItemKind.Class,
+        kind = define.CompletionItemKind.Class,
     },
     {
         label = 'function',
-        kind = CompletionItemKind.Class,
+        kind = define.CompletionItemKind.Class,
     },
 }
 
@@ -1254,7 +1254,7 @@ end
 {
     {
         label = 'a, b, c',
-        kind = CompletionItemKind.Snippet,
+        kind = define.CompletionItemKind.Snippet,
         insertText = [[
 a any
 ---@param b any
@@ -1262,15 +1262,15 @@ a any
     },
     {
         label = 'a',
-        kind = CompletionItemKind.Interface,
+        kind = define.CompletionItemKind.Interface,
     },
     {
         label = 'b',
-        kind = CompletionItemKind.Interface,
+        kind = define.CompletionItemKind.Interface,
     },
     {
         label = 'c',
-        kind = CompletionItemKind.Interface,
+        kind = define.CompletionItemKind.Interface,
     },
 }
 
@@ -1284,7 +1284,7 @@ end
 {
     {
         label = 'a, b, c',
-        kind = CompletionItemKind.Snippet,
+        kind = define.CompletionItemKind.Snippet,
         insertText = [[
 a any
 ---@param b any
@@ -1292,15 +1292,15 @@ a any
     },
     {
         label = 'a',
-        kind = CompletionItemKind.Interface,
+        kind = define.CompletionItemKind.Interface,
     },
     {
         label = 'b',
-        kind = CompletionItemKind.Interface,
+        kind = define.CompletionItemKind.Interface,
     },
     {
         label = 'c',
-        kind = CompletionItemKind.Interface,
+        kind = define.CompletionItemKind.Interface,
     },
 }
 
@@ -1312,7 +1312,7 @@ end
 {
     {
         label = 'a, b, c',
-        kind = CompletionItemKind.Snippet,
+        kind = define.CompletionItemKind.Snippet,
         insertText = [[
 a any
 ---@param b any
@@ -1320,15 +1320,15 @@ a any
     },
     {
         label = 'a',
-        kind = CompletionItemKind.Interface,
+        kind = define.CompletionItemKind.Interface,
     },
     {
         label = 'b',
-        kind = CompletionItemKind.Interface,
+        kind = define.CompletionItemKind.Interface,
     },
     {
         label = 'c',
-        kind = CompletionItemKind.Interface,
+        kind = define.CompletionItemKind.Interface,
     },
 }
 
@@ -1340,15 +1340,15 @@ function f(x$)
 {
     {
         label = 'xyz, xxx',
-        kind = CompletionItemKind.Snippet,
+        kind = define.CompletionItemKind.Snippet,
     },
     {
         label = 'xyz',
-        kind = CompletionItemKind.Interface,
+        kind = define.CompletionItemKind.Interface,
     },
     {
         label = 'xxx',
-        kind = CompletionItemKind.Interface,
+        kind = define.CompletionItemKind.Interface,
     },
 }
 
@@ -1360,15 +1360,15 @@ function f($
 {
     {
         label = 'xyz, xxx',
-        kind = CompletionItemKind.Snippet,
+        kind = define.CompletionItemKind.Snippet,
     },
     {
         label = 'xyz',
-        kind = CompletionItemKind.Interface,
+        kind = define.CompletionItemKind.Interface,
     },
     {
         label = 'xxx',
-        kind = CompletionItemKind.Interface,
+        kind = define.CompletionItemKind.Interface,
     },
 }
 
@@ -1380,15 +1380,15 @@ function f($)
 {
     {
         label = 'xyz, xxx',
-        kind = CompletionItemKind.Snippet,
+        kind = define.CompletionItemKind.Snippet,
     },
     {
         label = 'xyz',
-        kind = CompletionItemKind.Interface,
+        kind = define.CompletionItemKind.Interface,
     },
     {
         label = 'xxx',
-        kind = CompletionItemKind.Interface,
+        kind = define.CompletionItemKind.Interface,
     },
 }
 
@@ -1400,11 +1400,11 @@ end
 {
     {
         label = 'type',
-        kind = CompletionItemKind.Keyword,
+        kind = define.CompletionItemKind.Keyword,
     },
     {
         label = 'return',
-        kind = CompletionItemKind.Keyword,
+        kind = define.CompletionItemKind.Keyword,
     }
 }
 
@@ -1418,12 +1418,12 @@ mt.$
 {
     {
         label = 'id',
-        kind = CompletionItemKind.Field,
+        kind = define.CompletionItemKind.Field,
         detail = EXISTS,
     },
     {
         label = 'name',
-        kind = CompletionItemKind.Field,
+        kind = define.CompletionItemKind.Field,
         detail = EXISTS,
     },
 }
@@ -1438,15 +1438,15 @@ f(1, $)
 {
     {
         label = "'AAA'",
-        kind = CompletionItemKind.EnumMember,
+        kind = define.CompletionItemKind.EnumMember,
     },
     {
         label = "'BBB'",
-        kind = CompletionItemKind.EnumMember,
+        kind = define.CompletionItemKind.EnumMember,
     },
     {
         label = "'CCC'",
-        kind = CompletionItemKind.EnumMember,
+        kind = define.CompletionItemKind.EnumMember,
     }
 }
 
@@ -1460,15 +1460,15 @@ f(1,$)
 {
     {
         label = "'AAA'",
-        kind = CompletionItemKind.EnumMember,
+        kind = define.CompletionItemKind.EnumMember,
     },
     {
         label = "'BBB'",
-        kind = CompletionItemKind.EnumMember,
+        kind = define.CompletionItemKind.EnumMember,
     },
     {
         label = "'CCC'",
-        kind = CompletionItemKind.EnumMember,
+        kind = define.CompletionItemKind.EnumMember,
     }
 }
 
@@ -1482,15 +1482,15 @@ f($)
 {
     {
         label = "'AAA'",
-        kind = CompletionItemKind.EnumMember,
+        kind = define.CompletionItemKind.EnumMember,
     },
     {
         label = "'BBB'",
-        kind = CompletionItemKind.EnumMember,
+        kind = define.CompletionItemKind.EnumMember,
     },
     {
         label = "'CCC'",
-        kind = CompletionItemKind.EnumMember,
+        kind = define.CompletionItemKind.EnumMember,
     }
 }
 
@@ -1505,15 +1505,15 @@ f($)
 {
     {
         label = "'AAA'",
-        kind = CompletionItemKind.EnumMember,
+        kind = define.CompletionItemKind.EnumMember,
     },
     {
         label = "'BBB'",
-        kind = CompletionItemKind.EnumMember,
+        kind = define.CompletionItemKind.EnumMember,
     },
     {
         label = "'CCC'",
-        kind = CompletionItemKind.EnumMember,
+        kind = define.CompletionItemKind.EnumMember,
     }
 }
 
@@ -1528,21 +1528,21 @@ f('$')
     {
         label = "AAA",
         filterText = 'AAA',
-        kind = CompletionItemKind.EnumMember,
+        kind = define.CompletionItemKind.EnumMember,
         textEdit = EXISTS,
         additionalTextEdits = EXISTS,
     },
     {
         label = "BBB",
         filterText = 'BBB',
-        kind = CompletionItemKind.EnumMember,
+        kind = define.CompletionItemKind.EnumMember,
         textEdit = EXISTS,
         additionalTextEdits = EXISTS,
     },
     {
         label = "CCC",
         filterText = 'CCC',
-        kind = CompletionItemKind.EnumMember,
+        kind = define.CompletionItemKind.EnumMember,
         textEdit = EXISTS,
         additionalTextEdits = EXISTS,
     }
@@ -1576,7 +1576,7 @@ zzz$
 {
     {
         label = 'zzzzz',
-        kind = CompletionItemKind.Function,
+        kind = define.CompletionItemKind.Function,
         detail = '(function)(4 prototypes)',
         description = {
             kind = 'markdown',
@@ -1595,7 +1595,7 @@ JustTest
     },
     {
         label = 'zzzzz()',
-        kind = CompletionItemKind.Snippet,
+        kind = define.CompletionItemKind.Snippet,
         detail = '(function)(4 prototypes)',
         insertText = EXISTS,
         description = EXISTS,
@@ -1610,7 +1610,7 @@ zz$
 {
     {
         label = 'zzz',
-        kind = CompletionItemKind.Enum,
+        kind = define.CompletionItemKind.Enum,
         detail = '(number) = 1',
         description = {
             kind = 'markdown',
@@ -1630,12 +1630,12 @@ f($)
 {
     {
         label = "'选项1'",
-        kind = CompletionItemKind.EnumMember,
+        kind = define.CompletionItemKind.EnumMember,
         description = '注释1',
     },
     {
         label = "'选项2'",
-        kind = CompletionItemKind.EnumMember,
+        kind = define.CompletionItemKind.EnumMember,
         description = '注释2',
     },
 }

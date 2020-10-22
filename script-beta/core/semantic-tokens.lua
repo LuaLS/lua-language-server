@@ -1,8 +1,7 @@
 local files          = require 'files'
 local guide          = require 'parser.guide'
 local await          = require 'await'
-local TokenTypes     = require 'define.TokenTypes'
-local TokenModifiers = require 'define.TokenModifiers'
+local define         = require 'proto.define'
 local vm             = require 'vm'
 local util           = require 'utility'
 
@@ -11,8 +10,8 @@ Care['setglobal'] = function (source, results)
     results[#results+1] = {
         start      = source.start,
         finish     = source.finish,
-        type       = TokenTypes.namespace,
-        modifieres = TokenModifiers.deprecated,
+        type       = define.TokenTypes.namespace,
+        modifieres = define.TokenTypes.deprecated,
     }
 end
 Care['getglobal'] = function (source, results)
@@ -24,16 +23,16 @@ Care['getglobal'] = function (source, results)
             results[#results+1] =  {
                 start      = source.start,
                 finish     = source.finish,
-                type       = TokenTypes.namespace,
-                modifieres = TokenModifiers.static,
+                type       = define.TokenTypes.namespace,
+                modifieres = define.TokenTypes.static,
             }
         end
     else
         results[#results+1] =  {
             start      = source.start,
             finish     = source.finish,
-            type       = TokenTypes.namespace,
-            modifieres = TokenModifiers.deprecated,
+            type       = define.TokenTypes.namespace,
+            modifieres = define.TokenTypes.deprecated,
         }
     end
 end
@@ -45,8 +44,8 @@ Care['tablefield'] = function (source, results)
     results[#results+1] = {
         start      = field.start,
         finish     = field.finish,
-        type       = TokenTypes.property,
-        modifieres = TokenModifiers.declaration,
+        type       = define.TokenTypes.property,
+        modifieres = define.TokenTypes.declaration,
     }
 end
 Care['getlocal'] = function (source, results)
@@ -56,8 +55,8 @@ Care['getlocal'] = function (source, results)
         results[#results+1] = {
             start      = source.start,
             finish     = source.finish,
-            type       = TokenTypes.parameter,
-            modifieres = TokenModifiers.declaration,
+            type       = define.TokenTypes.parameter,
+            modifieres = define.TokenTypes.declaration,
         }
         return
     end
@@ -79,8 +78,8 @@ Care['getlocal'] = function (source, results)
         results[#results+1] = {
             start      = source.start,
             finish     = source.finish,
-            type       = TokenTypes.interface,
-            modifieres = TokenModifiers.declaration,
+            type       = define.TokenTypes.interface,
+            modifieres = define.TokenTypes.declaration,
         }
         return
     end
@@ -88,7 +87,7 @@ Care['getlocal'] = function (source, results)
     results[#results+1] = {
         start      = source.start,
         finish     = source.finish,
-        type       = TokenTypes.variable,
+        type       = define.TokenTypes.variable,
     }
 end
 Care['setlocal'] = Care['getlocal']

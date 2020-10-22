@@ -3,7 +3,7 @@ local util       = require 'utility'
 local await      = require 'await'
 local pub        = require 'pub'
 local jsonrpc    = require 'jsonrpc'
-local ErrorCodes = require 'define.ErrorCodes'
+local define     = require 'proto.define'
 local timer      = require 'timer'
 local json       = require 'json'
 
@@ -89,7 +89,7 @@ function m.doMethod(proto)
             log.warn('Recieved unknown proto: ' .. method)
         end
         if proto.id then
-            m.responseErr(proto.id, ErrorCodes.MethodNotFound, method)
+            m.responseErr(proto.id, define.ErrorCodes.MethodNotFound, method)
         end
         return
     end
@@ -114,7 +114,7 @@ function m.doMethod(proto)
             if ok then
                 m.response(proto.id, res)
             else
-                m.responseErr(proto.id, ErrorCodes.InternalError, res)
+                m.responseErr(proto.id, define.ErrorCodes.InternalError, res)
             end
         end)
         ok, res = xpcall(abil, log.error, proto.params)

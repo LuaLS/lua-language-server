@@ -1,4 +1,4 @@
-local ckind      = require 'define.CompletionItemKind'
+local define     = require 'proto.define'
 local files      = require 'files'
 local guide      = require 'parser.guide'
 local matchKey   = require 'core.matchKey'
@@ -234,7 +234,7 @@ local function buildFunction(results, source, oop, data)
     end
     if snipType == 'Both' or snipType == 'Replace' then
         local snipData = util.deepCopy(data)
-        snipData.kind = ckind.Snippet
+        snipData.kind = define.CompletionItemKind.Snippet
         snipData.label = snipData.label .. '()'
         snipData.insertText = buildFunctionSnip(source, oop)
         snipData.insertTextFormat = 2
@@ -274,7 +274,7 @@ local function checkLocal(ast, word, offset, results)
         if vm.hasType(source, 'function') then
             buildFunction(results, source, false, {
                 label  = name,
-                kind   = ckind.Function,
+                kind   = define.CompletionItemKind.Function,
                 id     = stack(function ()
                     return {
                         detail      = buildDetail(source),
@@ -285,7 +285,7 @@ local function checkLocal(ast, word, offset, results)
         else
             results[#results+1] = {
                 label  = name,
-                kind   = ckind.Variable,
+                kind   = define.CompletionItemKind.Variable,
                 id     = stack(function ()
                     return {
                         detail      = buildDetail(source),
@@ -349,12 +349,12 @@ end
 
 local function checkFieldThen(name, src, word, start, offset, parent, oop, results)
     local value = guide.getObjectValue(src) or src
-    local kind = ckind.Field
+    local kind = define.CompletionItemKind.Field
     if value.type == 'function' then
         if oop then
-            kind = ckind.Method
+            kind = define.CompletionItemKind.Method
         else
-            kind = ckind.Function
+            kind = define.CompletionItemKind.Function
         end
         buildFunction(results, src, oop, {
             label      = name,
@@ -374,7 +374,7 @@ local function checkFieldThen(name, src, word, start, offset, parent, oop, resul
     end
     local literal = guide.getLiteral(value)
     if literal ~= nil then
-        kind = ckind.Enum
+        kind = define.CompletionItemKind.Enum
     end
     local textEdit, additionalTextEdits
     if parent.next and parent.next.index then
@@ -462,7 +462,7 @@ local function checkTableField(ast, word, start, results)
             used[key] = true
             results[#results+1] = {
                 label = key,
-                kind  = ckind.Property,
+                kind  = define.CompletionItemKind.Property,
             }
         end
     end)
@@ -482,7 +482,7 @@ local function checkCommon(word, text, offset, results)
             if matchKey(word, str) then
                 results[#results+1] = {
                     label = str,
-                    kind  = ckind.Text,
+                    kind  = define.CompletionItemKind.Text,
                 }
             end
         end
@@ -527,7 +527,7 @@ local function checkKeyWord(ast, text, start, word, hasSpace, afterLocal, result
                 if not hasSpace then
                     local item = {
                         label = key,
-                        kind  = ckind.Keyword,
+                        kind  = define.CompletionItemKind.Keyword,
                     }
                     if extra then
                         table.insert(results, #results, item)
@@ -566,7 +566,7 @@ local function checkProvideLocal(ast, word, start, results)
             used[source[1]] = true
             results[#results+1] = {
                 label = source[1],
-                kind  = ckind.Variable,
+                kind  = define.CompletionItemKind.Variable,
             }
         end
     end)
@@ -577,7 +577,7 @@ local function checkProvideLocal(ast, word, start, results)
             used[source[1]] = true
             results[#results+1] = {
                 label = source[1],
-                kind  = ckind.Variable,
+                kind  = define.CompletionItemKind.Variable,
             }
         end
     end)
@@ -674,7 +674,7 @@ local function checkUri(ast, text, offset, results)
         end
         results[#results+1] = {
             label = label,
-            kind  = ckind.Reference,
+            kind  = define.CompletionItemKind.Reference,
             description = table.concat(des, '\n'),
             textEdit = infos.textEdit,
         }
@@ -704,7 +704,7 @@ local function checkLenPlusOne(ast, text, offset, results)
                 end
                 results[#results+1] = {
                     label    = label,
-                    kind     = ckind.Snippet,
+                    kind     = define.CompletionItemKind.Snippet,
                     textEdit = {
                         start   = pos,
                         finish  = source.finish,
@@ -717,7 +717,7 @@ local function checkLenPlusOne(ast, text, offset, results)
                 local newText = label .. ']'
                 results[#results+1] = {
                     label    = label,
-                    kind     = ckind.Snippet,
+                    kind     = define.CompletionItemKind.Snippet,
                     textEdit = {
                         start   = pos,
                         finish  = source.finish,
@@ -837,7 +837,7 @@ local function getCallEnums(source, index)
                 enums[#enums+1] = {
                     label       = enum.enum,
                     description = enum.description,
-                    kind        = ckind.EnumMember,
+                    kind        = define.CompletionItemKind.EnumMember,
                 }
             end
         end
@@ -870,7 +870,7 @@ local function mergeEnums(a, b, text, arg)
             mark[label] = true
             local result = {
                 label       = label,
-                kind        = ckind.EnumMember,
+                kind        = define.CompletionItemKind.EnumMember,
                 description = enum.description,
                 textEdit    = arg and {
                     start   = arg.start,

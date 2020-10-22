@@ -1,5 +1,5 @@
-local util = require 'utility'
-local DiagnosticDefaultSeverity = require 'define.DiagnosticDefaultSeverity'
+local util   = require 'utility'
+local define = require 'proto.define'
 
 local m = {}
 m.version = 0
@@ -109,7 +109,7 @@ local ConfigTemplate = {
         globals         = {{},   Str2Hash ';'},
         disable         = {{},   Str2Hash ';'},
         severity        = {
-            util.deepCopy(DiagnosticDefaultSeverity),
+            util.deepCopy(define.DiagnosticDefaultSeverity),
             Hash(String, String),
         },
     },

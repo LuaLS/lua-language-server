@@ -1987,10 +1987,8 @@ function m.searchSameFields(status, simple, mode)
             start = 1,
         }
     end
-    local i = 0
     local max = 0
-    while max <= 9999 do
-        i = i + 1
+    for i = 1, 1e6 do
         local data = queue[i]
         if not data then
             return
@@ -2000,6 +1998,10 @@ function m.searchSameFields(status, simple, mode)
             max = max + 1
             status.cache.count = status.cache.count + 1
             m.checkSameSimple(status, simple, data, mode, status.results, queue)
+            if max >= 10000 then
+                logWarn('Queue too large!')
+                break
+            end
         end
     end
 end
@@ -2203,7 +2205,7 @@ function m.searchRefs(status, obj, mode)
         end
     end
     -- 检查simple
-    if status.depth <= 10 then
+    if status.depth <= 100 then
         local simple = m.getSimple(obj)
         if simple then
             m.searchSameFields(status, simple, mode)

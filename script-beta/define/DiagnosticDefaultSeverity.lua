@@ -8,14 +8,15 @@ return {
     ['trailing-space']      = 'Hint',
     ['redefined-local']     = 'Hint',
     ['newline-call']        = 'Information',
+    ['newfield-call']       = 'Warning',
     ['redundant-parameter'] = 'Hint',
     ['ambiguity-1']         = 'Warning',
     ['lowercase-global']    = 'Information',
     ['undefined-env-child'] = 'Information',
     ['duplicate-index']     = 'Warning',
-    ['duplicate-method']    = 'Warning',
     ['empty-block']         = 'Hint',
     ['redundant-value']     = 'Hint',
-    ['emmy-lua']            = 'Warning',
     ['set-const']           = 'Error',
+
+    ['duplicate-doc-class'] = 'Warning',
 }

@@ -677,6 +677,10 @@ function m.getName(obj)
     elseif tp == 'field'
     or     tp == 'method' then
         return obj[1]
+    elseif tp == 'doc.class' then
+        return obj.class[1]
+    elseif tp == 'doc.alias' then
+        return obj.alias[1]
     end
     return m.getNameOfLiteral(obj)
 end

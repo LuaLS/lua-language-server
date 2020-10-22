@@ -25,7 +25,8 @@
         "locale/",
         "libs/",
         "3rd",
-        ".vscode"
+        ".vscode",
+        "script",
     ],
     "Lua.workspace.library": {
         "E:/Github/test" : true,

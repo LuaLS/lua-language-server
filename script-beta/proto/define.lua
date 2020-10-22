@@ -129,7 +129,9 @@ m.DiagnosticDefaultSeverity = {
     ['duplicate-index']     = 'Warning',
     ['empty-block']         = 'Hint',
     ['redundant-value']     = 'Hint',
-    ['emmy-lua']            = 'Warning',
+    ['set-const']           = 'Error',
+
+    ['duplicate-doc-class'] = 'Warning',
 }
 
 --- 诊断报告标签

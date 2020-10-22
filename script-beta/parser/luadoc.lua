@@ -194,9 +194,9 @@ local function parseClass(parent)
     nextToken()
     if not checkToken('symbol', ':') then
         pushError {
-            type   = 'LUADOC_MISS_EXTENSION_SYMBOL',
-            start  = getFinish(),
-            finish = getFinish(),
+            type   = 'LUADOC_MISS_EXTENDS_SYMBOL',
+            start  = result.finish + 1,
+            finish = getStart() - 1,
         }
         return result
     end

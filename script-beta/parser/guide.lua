@@ -1988,8 +1988,8 @@ function m.searchSameFields(status, simple, mode)
         }
     end
     local i = 0
-    local see = 0
-    while see <= 999 do
+    local max = 0
+    while max <= 9999 do
         i = i + 1
         local data = queue[i]
         if not data then
@@ -1997,7 +1997,7 @@ function m.searchSameFields(status, simple, mode)
         end
         if not status.lock[data.obj] then
             status.lock[data.obj] = true
-            see = see + 1
+            max = max + 1
             status.cache.count = status.cache.count + 1
             m.checkSameSimple(status, simple, data, mode, status.results, queue)
         end

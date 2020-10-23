@@ -2,8 +2,20 @@ local await  = require 'await'
 local files  = require 'files'
 local guide  = require 'parser.guide'
 local define = require 'proto.define'
-local lname  = require 'core.hover.name'
 local util   = require 'utility'
+
+local function buildName(source, text)
+    if source.type == 'setmethod'
+    or source.type == 'getmethod' then
+        return text:sub(source.start, source.method.finish)
+    end
+    if source.type == 'setfield'
+    or source.type == 'tablefield'
+    or source.type == 'getfield' then
+        return text:sub(source.start, source.field.finish)
+    end
+    return text:sub(source.start, source.finish)
+end
 
 local function buildFunctionParams(func)
     if not func.args then
@@ -20,8 +32,8 @@ local function buildFunctionParams(func)
     return table.concat(params, ', ')
 end
 
-local function buildFunction(source, symbols)
-    local name = lname(source)
+local function buildFunction(source, text, symbols)
+    local name = buildName(source, text)
     local func = source.value
     if source.type == 'tablefield'
     or source.type == 'setfield' then
@@ -67,8 +79,8 @@ local function buildTable(tbl)
     return table.concat(buf, ', ')
 end
 
-local function buildValue(source, symbols)
-    local name  = lname(source)
+local function buildValue(source, text, symbols)
+    local name  = buildName(source, text)
     local range, sRange, valueRange, kind
     local details = {}
     if source.type == 'local' then
@@ -154,13 +166,13 @@ local function buildValue(source, symbols)
     }
 end
 
-local function buildSet(source, used, symbols)
+local function buildSet(source, text, used, symbols)
     local value = source.value
     if value and value.type == 'function' then
         used[value] = true
-        buildFunction(source, symbols)
+        buildFunction(source, text, symbols)
     else
-        buildValue(source, symbols)
+        buildValue(source, text, symbols)
     end
 end
 
@@ -179,7 +191,7 @@ local function buildAnonymousFunction(source, used, symbols)
     }
 end
 
-local function buildSource(source, used, symbols)
+local function buildSource(source, text, used, symbols)
     if     source.type == 'local'
     or     source.type == 'setlocal'
     or     source.type == 'setglobal'
@@ -187,7 +199,7 @@ local function buildSource(source, used, symbols)
     or     source.type == 'setmethod'
     or     source.type == 'tablefield' then
         await.delay()
-        buildSet(source, used, symbols)
+        buildSet(source, text, used, symbols)
     elseif source.type == 'function' then
         await.delay()
         buildAnonymousFunction(source, used, symbols)
@@ -200,10 +212,11 @@ local function makeSymbol(uri)
         return nil
     end
 
+    local text = files.getText(uri)
     local symbols = {}
     local used = {}
     guide.eachSource(ast.ast, function (source)
-        buildSource(source, used, symbols)
+        buildSource(source, text, used, symbols)
     end)
 
     return symbols
@@ -270,12 +283,16 @@ local function packSymbols(symbols)
 end
 
 return function (uri)
+    local clock = os.clock()
     local symbols = makeSymbol(uri)
     if not symbols then
         return nil
     end
+    log.debug('doc#1', uri, os.clock() - clock)
 
+    local clock = os.clock()
     local packedSymbols = packSymbols(symbols)
+    log.debug('doc#2', uri, os.clock() - clock)
 
     return packedSymbols
 end

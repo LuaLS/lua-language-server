@@ -129,7 +129,6 @@ m.DiagnosticDefaultSeverity = {
     ['duplicate-index']     = 'Warning',
     ['empty-block']         = 'Hint',
     ['redundant-value']     = 'Hint',
-    ['set-const']           = 'Error',
 
     ['duplicate-doc-class'] = 'Warning',
 }

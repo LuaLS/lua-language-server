@@ -692,6 +692,10 @@ local function bindDoc(state, lns, binded)
         -- 空行
         return
     end
+    local bindSources = {}
+    for _, doc in ipairs(binded) do
+        doc.bindSources = bindSources
+    end
     guide.eachSourceBetween(state.ast, start, finish, function (src)
         if src.type == 'local'
         or src.type == 'setlocal'
@@ -703,9 +707,7 @@ local function bindDoc(state, lns, binded)
         or src.type == 'tableindex'
         or src.type == 'function' then
             src.bindDocs = binded
-            for _, doc in ipairs(binded) do
-                doc.bind = src
-            end
+            bindSources[#bindSources+1] = src
         end
     end)
 end

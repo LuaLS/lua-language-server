@@ -1426,11 +1426,13 @@ function m.checkSameSimpleByBindDocs(status, obj, start, queue, mode)
     local newStatus = m.status(status)
     newStatus.cache.searchingBindedDoc = true
     for _, res in ipairs(results) do
-        local source = m.getDocState(res)
-        local ref = source.bind
-        if not mark[ref] then
-            mark[ref] = true
-            m.searchRefs(newStatus, ref, mode)
+        local doc = m.getDocState(res)
+        local refs = doc.bindSources
+        for _, ref in ipairs(refs) do
+            if not mark[ref] then
+                mark[ref] = true
+                m.searchRefs(newStatus, ref, mode)
+            end
         end
     end
     for _, res in ipairs(newStatus.results) do

@@ -11,7 +11,7 @@ Care['setglobal'] = function (source, results)
         start      = source.start,
         finish     = source.finish,
         type       = define.TokenTypes.namespace,
-        modifieres = define.TokenTypes.deprecated,
+        modifieres = define.TokenModifiers.deprecated,
     }
 end
 Care['getglobal'] = function (source, results)
@@ -24,7 +24,7 @@ Care['getglobal'] = function (source, results)
                 start      = source.start,
                 finish     = source.finish,
                 type       = define.TokenTypes.namespace,
-                modifieres = define.TokenTypes.static,
+                modifieres = define.TokenModifiers.static,
             }
         end
     else
@@ -32,7 +32,7 @@ Care['getglobal'] = function (source, results)
             start      = source.start,
             finish     = source.finish,
             type       = define.TokenTypes.namespace,
-            modifieres = define.TokenTypes.deprecated,
+            modifieres = define.TokenModifiers.deprecated,
         }
     end
 end
@@ -45,7 +45,7 @@ Care['tablefield'] = function (source, results)
         start      = field.start,
         finish     = field.finish,
         type       = define.TokenTypes.property,
-        modifieres = define.TokenTypes.declaration,
+        modifieres = define.TokenModifiers.declaration,
     }
 end
 Care['getlocal'] = function (source, results)
@@ -56,7 +56,7 @@ Care['getlocal'] = function (source, results)
             start      = source.start,
             finish     = source.finish,
             type       = define.TokenTypes.parameter,
-            modifieres = define.TokenTypes.declaration,
+            modifieres = define.TokenModifiers.declaration,
         }
         return
     end
@@ -79,7 +79,7 @@ Care['getlocal'] = function (source, results)
             start      = source.start,
             finish     = source.finish,
             type       = define.TokenTypes.interface,
-            modifieres = define.TokenTypes.declaration,
+            modifieres = define.TokenModifiers.declaration,
         }
         return
     end

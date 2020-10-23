@@ -686,15 +686,16 @@ local function bindDoc(state, lns, binded)
     if not lastDoc then
         return
     end
+    local bindSources = {}
+    for _, doc in ipairs(binded) do
+        doc.bindGroup = binded
+        doc.bindSources = bindSources
+    end
     local row = guide.positionOf(lns, lastDoc.start)
     local start, finish = guide.lineRange(lns, row + 1)
     if start >= finish then
         -- 空行
         return
-    end
-    local bindSources = {}
-    for _, doc in ipairs(binded) do
-        doc.bindSources = bindSources
     end
     guide.eachSourceBetween(state.ast, start, finish, function (src)
         if src.type == 'local'

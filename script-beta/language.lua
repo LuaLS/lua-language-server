@@ -101,6 +101,9 @@ local function loadLang(name, language)
         end,
         __call = function (self, key, ...)
             local str = self[key]
+            if not ... then
+                return str
+            end
             local suc, res
             if type(...) == 'table' then
                 suc, res = pcall(formatAsTable, str, ...)

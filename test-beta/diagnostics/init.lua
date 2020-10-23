@@ -494,6 +494,14 @@ m:open()
 ]]
 
 TEST [[
+local m = {}
+function m:open()
+end
+
+m.open('ok')
+]]
+
+TEST [[
 <!if true then
 end!>
 ]]

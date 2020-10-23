@@ -36,14 +36,14 @@ end
 
 local function countFuncArgs(source)
     local result = 0
+    if source.parent and source.parent.type == 'setmethod' then
+        result = result + 1
+    end
     if not source.args then
         return result
     end
     if source.args[#source.args].type == '...' then
         return math.maxinteger
-    end
-    if source.parent and source.parent.type == 'setmethod' then
-        result = result + 1
     end
     result = result + #source.args
     return result

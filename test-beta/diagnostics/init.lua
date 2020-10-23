@@ -640,7 +640,6 @@ TEST [[
 ---@class <!C : D!>
 ---@class <!D : A!>
 ]]
-do return end
 
 TEST [[
 ---@class A : B

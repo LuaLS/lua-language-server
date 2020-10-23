@@ -16,7 +16,11 @@ return function (uri, callback)
 
     local cache = {}
     guide.eachSource(state.ast.docs, function (source)
-        if source.type:sub(-5) ~= '.name' then
+        if  source.type ~= 'doc.extends.name'
+        and source.type ~= 'doc.type.name' then
+            return
+        end
+        if source.parent.type == 'doc.class' then
             return
         end
         local name = source[1]

@@ -131,6 +131,7 @@ m.DiagnosticDefaultSeverity = {
     ['redundant-value']     = 'Hint',
 
     ['duplicate-doc-class'] = 'Warning',
+    ['undefined-doc-class'] = 'Warning',
     ['undefined-doc-name']  = 'Warning',
     ['circle-doc-class']    = 'Warning',
 }

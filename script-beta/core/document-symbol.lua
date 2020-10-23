@@ -176,14 +176,23 @@ local function buildSet(source, text, used, symbols)
     end
 end
 
-local function buildAnonymousFunction(source, used, symbols)
+local function buildAnonymousFunction(source, text, used, symbols)
     if used[source] then
         return
     end
     used[source] = true
+    local head = ''
+    local parent = source.parent
+    if parent.type == 'return' then
+        head = 'return '
+    elseif parent.type == 'callargs' then
+        local call = parent.parent
+        local node = call.node
+        head = buildName(node, text) .. ' -> '
+    end
     symbols[#symbols+1] = {
         name           = '',
-        detail         = 'function ()',
+        detail         = ('%sfunction (%s)'):format(head, buildFunctionParams(source)),
         kind           = define.SymbolKind.Function,
         range          = { source.start, source.finish },
         selectionRange = { source.start, source.start },
@@ -202,7 +211,7 @@ local function buildSource(source, text, used, symbols)
         buildSet(source, text, used, symbols)
     elseif source.type == 'function' then
         await.delay()
-        buildAnonymousFunction(source, used, symbols)
+        buildAnonymousFunction(source, text, used, symbols)
     end
 end
 

@@ -105,7 +105,7 @@ end
 {
     [1] = {
         name = '',
-        detail = 'function ()',
+        detail = 'return function ()',
         kind = define.SymbolKind.Function,
         range = {8, 22},
         selectionRange = {8, 8},
@@ -609,5 +609,22 @@ local a = f {
                 valueRange = {23, 41},
             }
         }
+    }
+}
+
+TEST [[
+table.sort(t, function (a, b)
+    return false
+end)
+]]
+{
+    [1] = {
+        name = '',
+        detail = 'table.sort -> function (a, b)',
+        kind = define.SymbolKind.Function,
+        range = {15, 50},
+        selectionRange = {15, 15},
+        valueRange = {15, 50},
+        children = EXISTS,
     }
 }

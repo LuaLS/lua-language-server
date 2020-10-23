@@ -630,11 +630,11 @@ TEST [[
 ---@class <!Class!>
 ]]
 
-do return end
 TEST [[
 ---@class A : <!B!>
 ]]
 
+do return end
 TEST [[
 ---@class <!A : B!>
 ---@class <!B : C!>

@@ -131,6 +131,7 @@ m.DiagnosticDefaultSeverity = {
     ['redundant-value']     = 'Hint',
 
     ['duplicate-doc-class'] = 'Warning',
+    ['undefined-doc-name']  = 'Warning',
 }
 
 --- 诊断报告标签

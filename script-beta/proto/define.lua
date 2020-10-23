@@ -132,6 +132,7 @@ m.DiagnosticDefaultSeverity = {
 
     ['duplicate-doc-class'] = 'Warning',
     ['undefined-doc-name']  = 'Warning',
+    ['circle-doc-class']    = 'Warning',
 }
 
 --- 诊断报告标签

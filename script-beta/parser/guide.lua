@@ -255,7 +255,7 @@ function m.getENV(source, start)
         start = 1
     end
     return m.getLocal(source, '_ENV', start)
-        or m.getLocal(source, '@env', start)
+        or m.getLocal(source, '@fenv', start)
 end
 
 --- 寻找函数的不定参数，返回不定参在第几个参数上，以及该参数对象。

@@ -214,7 +214,6 @@ end
 
 --- 查找符合指定require path的所有uri
 ---@param path string
----@param whole boolean
 function m.findUrisByRequirePath(path)
     local results = {}
     local mark = {}

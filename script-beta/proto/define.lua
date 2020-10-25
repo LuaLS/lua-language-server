@@ -137,6 +137,7 @@ m.DiagnosticDefaultSeverity = {
     ['undefined-doc-param'] = 'Warning',
     ['duplicate-doc-param'] = 'Warning',
     ['doc-field-no-class']  = 'Warning',
+    ['duplicate-doc-field'] = 'Warning',
 }
 
 --- 诊断报告标签

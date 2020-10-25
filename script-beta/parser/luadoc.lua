@@ -720,6 +720,7 @@ local function bindDocs(state)
         if not isNextLine(lns, binded, doc) then
             bindDoc(state, lns, binded)
             binded = {}
+            state.ast.docs.groups[#state.ast.docs.groups+1] = binded
         end
         binded[#binded+1] = doc
     end
@@ -735,6 +736,7 @@ return function (_, state)
     ast.docs = {
         type   = 'doc',
         parent = ast,
+        groups = {},
     }
 
     pushError = state.pushError

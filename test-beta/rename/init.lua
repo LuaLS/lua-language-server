@@ -163,3 +163,43 @@ a()
 function a:b() end
 a:b()
 ]]
+
+-- TODO
+do return end
+TEST ('class1', 'class2') [[
+---@class1
+
+---@type class1
+
+---@param x class1
+]] [[
+---@class2
+
+---@type class2
+
+---@param x class2
+]]
+
+TEST ('alias1', 'alias2') [[
+---@alias alias1 class
+
+---@type alias1
+
+---@param x alias1
+]] [[
+---@alias alias2 class
+
+---@type alias2
+
+---@param x alias2
+]]
+
+TEST ('arg1', 'arg2') [[
+---@param arg1 number
+function f(arg1)
+end
+]] [[
+---@param arg2 number
+function f(arg2)
+end
+]]

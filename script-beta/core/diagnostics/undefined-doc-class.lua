@@ -4,6 +4,19 @@ local lang    = require 'language'
 local define  = require 'proto.define'
 local vm      = require 'vm'
 
+local builtin = {
+    ['any']      = true,
+    ['nil']      = true,
+    ['boolean']  = true,
+    ['number']   = true,
+    ['integer']  = true,
+    ['thread']   = true,
+    ['table']    = true,
+    ['file']     = true,
+    ['string']   = true,
+    ['function'] = true,
+}
+
 return function (uri, callback)
     local state = files.getAst(uri)
     if not state then
@@ -22,6 +35,9 @@ return function (uri, callback)
                 goto CONTINUE
             end
             local name = ext[1]
+            if builtin[name] then
+                goto CONTINUE
+            end
             local docs = vm.getDocTypes(name)
             if cache[name] == nil then
                 cache[name] = false

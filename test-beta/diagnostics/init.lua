@@ -714,7 +714,7 @@ TEST [[
 
 TEST [[
 ---@class Class
----@field <!x!> Class
+---@field x Class
 ---@field <!x!> Class
 ]]
 

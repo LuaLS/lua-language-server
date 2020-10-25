@@ -66,6 +66,9 @@ function mt:position(row, col, code)
     end
     local pos
     if code == 'utf8' then
+        if start > finish then
+            return finish
+        end
         pos = utf8.offset(self.buf, col, start) or finish
     else
         pos = start + col - 1

@@ -2514,6 +2514,21 @@ function m.getDocTypeNames(doc)
 end
 
 function m.inferByDoc(status, source)
+    while source.type == 'select' or source.type == 'call' do
+        local parent = source.parent
+        if parent.type == 'local'
+        or parent.type == 'setlocal'
+        or parent.type == 'setglobal'
+        or parent.type == 'setfield'
+        or parent.type == 'setmethod'
+        or parent.type == 'setindex'
+        or parent.type == 'tablefield'
+        or parent.type == 'tableindex' then
+            source = parent
+        else
+            break
+        end
+    end
     local binds = source.bindDocs
     if not binds then
         return
@@ -3222,8 +3237,7 @@ function m.searchInfer(status, obj)
         status.cache.clock = status.cache.clock or osClock()
     end
 
-    local checked = m.inferByDoc(status, obj)
-                 or m.inferCheckLibrary(status, obj)
+    local checked = m.inferCheckLibrary(status, obj)
                  or m.inferCheckLiteral(status, obj)
                  or m.inferCheckUnary(status, obj)
                  or m.inferCheckBinary(status, obj)
@@ -3235,6 +3249,7 @@ function m.searchInfer(status, obj)
         return
     end
 
+    m.inferByDoc(status, obj)
     if not status.simple then
         m.inferByDef(status, obj)
     end

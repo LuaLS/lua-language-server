@@ -1,6 +1,18 @@
 local vm    = require 'vm.vm'
 local guide = require 'parser.guide'
 
+local function lookUpDocClass(source)
+    local docs = source.bindDocs
+    if not docs then
+        return
+    end
+    for _, doc in ipairs(docs) do
+        if doc.type == 'doc.class' then
+            return guide.getName(doc)
+        end
+    end
+end
+
 local function getClass(source, classes, deep, simple)
     local lib = vm.getLibrary(source, simple)
     if lib then
@@ -9,6 +21,11 @@ local function getClass(source, classes, deep, simple)
         else
             classes[#classes+1] = lib.value.type
         end
+        return
+    end
+    local docClass = lookUpDocClass(source)
+    if docClass then
+        classes[#classes+1] = docClass
         return
     end
     if deep > 3 then

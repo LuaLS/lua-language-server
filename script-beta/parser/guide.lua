@@ -2513,7 +2513,7 @@ function m.getDocTypeNames(doc)
     return results
 end
 
-function m.inferByDoc(status, source)
+function m.inferCheckDoc(status, source)
     while source.type == 'select' or source.type == 'call' do
         local parent = source.parent
         if parent.type == 'local'
@@ -2545,8 +2545,18 @@ function m.inferByDoc(status, source)
             for _, res in ipairs(results) do
                 status.results[#status.results+1] = res
             end
+        elseif doc.type == 'doc.param' then
+            if  source.type == 'local'
+            and m.getName(source) == doc.param[1]
+            and source.parent.type == 'funcargs' then
+                status.results[#status.results+1] = {
+                    type   = m.viewInferType(m.getDocTypeNames(doc.extends)),
+                    source = doc,
+                }
+            end
         end
     end
+    return true
 end
 
 function m.inferCheckUnary(status, source)
@@ -3237,7 +3247,8 @@ function m.searchInfer(status, obj)
         status.cache.clock = status.cache.clock or osClock()
     end
 
-    local checked = m.inferCheckLibrary(status, obj)
+    local checked = m.inferCheckDoc(status, obj)
+                 or m.inferCheckLibrary(status, obj)
                  or m.inferCheckLiteral(status, obj)
                  or m.inferCheckUnary(status, obj)
                  or m.inferCheckBinary(status, obj)
@@ -3249,7 +3260,6 @@ function m.searchInfer(status, obj)
         return
     end
 
-    m.inferByDoc(status, obj)
     if not status.simple then
         m.inferByDef(status, obj)
     end

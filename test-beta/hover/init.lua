@@ -914,7 +914,6 @@ local x: Class {
 }
 ]]
 
-do return end
 TEST [[
 ---@class Class
 local mt = {}
@@ -924,7 +923,7 @@ function f(<?t?>)
 end
 ]]
 [[
-local t: Class {}
+local t: Class
 ]]
 
 TEST [[
@@ -937,23 +936,10 @@ function f(t)
 end
 ]]
 [[
-local t: *Class {}
+local t: Class
 ]]
 
-TEST [[
----@class Class
-local mt = {}
-
----@param t Class
-function f(t)
-end
-
-f(<?s?>)
-]]
-[[
-global s: Class {}
-]]
-
+do return end
 TEST [[
 ---@class Class
 

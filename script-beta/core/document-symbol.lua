@@ -7,12 +7,16 @@ local util   = require 'utility'
 local function buildName(source, text)
     if source.type == 'setmethod'
     or source.type == 'getmethod' then
-        return text:sub(source.start, source.method.finish)
+        if source.method then
+            return text:sub(source.start, source.method.finish)
+        end
     end
     if source.type == 'setfield'
     or source.type == 'tablefield'
     or source.type == 'getfield' then
-        return text:sub(source.start, source.field.finish)
+        if source.field then
+            return text:sub(source.start, source.field.finish)
+        end
     end
     return text:sub(source.start, source.finish)
 end

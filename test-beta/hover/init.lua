@@ -1009,7 +1009,6 @@ local <?r?> = f(1)
 local r: integer = 1
 ]]
 
-do return end
 TEST [[
 ---@param x number
 ---@param y boolean
@@ -1028,19 +1027,21 @@ end
 f(1, 2, 3)
 ]]
 [[
-local x: *Class = 2
+local x: Class
 ]]
 
 TEST [[
 ---@vararg Class
 local function f(...)
-    local _, <?x?> = ...
+    local <?t?> = {...}
 end
+f(1, 2, 3)
 ]]
 [[
-local x: *Class {}
+local t: Class[]
 ]]
 
+do return end
 TEST [[
 ---@type string[]
 local <?x?>

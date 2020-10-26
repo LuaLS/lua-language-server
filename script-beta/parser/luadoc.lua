@@ -728,7 +728,8 @@ local function bindDoc(state, lns, binded)
         or src.type == 'setindex'
         or src.type == 'tablefield'
         or src.type == 'tableindex'
-        or src.type == 'function' then
+        or src.type == 'function'
+        or src.type == '...' then
             src.bindDocs = binded
             bindSources[#bindSources+1] = src
         end

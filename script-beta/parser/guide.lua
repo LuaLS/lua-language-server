@@ -2414,6 +2414,22 @@ function m.isSameValue(status, a, b)
     return true
 end
 
+function m.inferCheckLiteralTableWithDocVararg(status, source)
+    if #source ~= 1 then
+        return
+    end
+    local vararg = source[1]
+    if vararg.type ~= 'varargs' then
+        return
+    end
+    local results = m.getVarargDocType(source)
+    status.results[#status.results+1] = {
+        type   = m.viewInferType(results) .. '[]',
+        source = source,
+    }
+    return true
+end
+
 function m.inferCheckLiteral(status, source)
     if source.type == 'string' then
         status.results = m.allocInfer {
@@ -2459,6 +2475,9 @@ function m.inferCheckLiteral(status, source)
         }
         return true
     elseif source.type == 'table' then
+        if m.inferCheckLiteralTableWithDocVararg(status, source) then
+            return true
+        end
         status.results = m.allocInfer {
             type   = 'table',
             source = source,
@@ -2552,7 +2571,45 @@ function m.inferCheckDoc(status, source)
     end
 end
 
+function m.getVarargDocType(source)
+    local func = m.getParentFunction(source)
+    if not func then
+        return
+    end
+    if not func.args then
+        return
+    end
+    for _, arg in ipairs(func.args) do
+        if arg.type == '...' then
+            if arg.bindDocs then
+                for _, doc in ipairs(arg.bindDocs) do
+                    if doc.type == 'doc.vararg' then
+                        return m.getDocTypeNames(doc.vararg)
+                    end
+                end
+            end
+        end
+    end
+end
+
+function m.inferCheckUpDocOfVararg(status, source)
+    if not source.vararg then
+        return
+    end
+    local results = m.getVarargDocType(source)
+    if not results then
+        return
+    end
+    for _, res in ipairs(results) do
+        status.results[#status.results+1] = res
+    end
+    return true
+end
+
 function m.inferCheckUpDoc(status, source)
+    if m.inferCheckUpDocOfVararg(status, source) then
+        return true
+    end
     while source.type == 'select' or source.type == 'call' do
         local parent = source.parent
         if parent.type == 'local'

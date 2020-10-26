@@ -678,6 +678,27 @@ local function isNextLine(lns, binded, doc)
     return newRow - lastRow == 1
 end
 
+local function bindGeneric(binded)
+    local generics = {}
+    for _, doc in ipairs(binded) do
+        if     doc.type == 'doc.generic' then
+            for _, obj in ipairs(doc.generics) do
+                local name = obj.generic[1]
+                generics[name] = {}
+            end
+        elseif doc.type == 'doc.param'
+        or     doc.type == 'doc.return' then
+            guide.eachSourceType(doc, 'doc.type.name', function (src)
+                local name = src[1]
+                if generics[name] then
+                    generics[name][#generics[name]+1] = src
+                    src.typeGeneric = generics
+                end
+            end)
+        end
+    end
+end
+
 local function bindDoc(state, lns, binded)
     if not binded then
         return
@@ -691,6 +712,7 @@ local function bindDoc(state, lns, binded)
         doc.bindGroup = binded
         doc.bindSources = bindSources
     end
+    bindGeneric(binded)
     local row = guide.positionOf(lns, lastDoc.start)
     local start, finish = guide.lineRange(lns, row + 1)
     if start >= finish then

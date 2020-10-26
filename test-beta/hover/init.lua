@@ -973,6 +973,18 @@ function f()
   2. C
 ]]
 
+TEST [[
+---@generic T
+---@param x T
+---@return T
+local function <?f?>(x)
+end
+]]
+[[
+function f(x: <T>)
+  -> <T>
+]]
+
 do return end
 TEST [[
 ---@generic T
@@ -984,7 +996,7 @@ end
 local <?r?> = f(1)
 ]]
 [[
-local r: number
+local r: integer
 ]]
 
 TEST [[

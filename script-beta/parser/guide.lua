@@ -2483,6 +2483,9 @@ local function getDocTypeUnitName(unit)
     elseif unit.type == 'doc.type.function' then
         typeName = 'function'
     end
+    if unit.typeGeneric then
+        typeName = ('<%s>'):format(typeName)
+    end
     if unit.array then
         typeName = typeName .. '[]'
     elseif unit.generic then

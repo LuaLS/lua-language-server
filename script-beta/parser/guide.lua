@@ -3123,7 +3123,32 @@ local function mergeLibraryFunctionReturns(status, source, index)
     end
 end
 
+local function mergeFunctionReturnsByDoc(status, source, index)
+    if not source.bindDocs then
+        return
+    end
+    local returns = {}
+    for _, doc in ipairs(source.bindDocs) do
+        if doc.type == 'doc.return' then
+            for _, rtn in ipairs(doc.returns) do
+                returns[#returns+1] = rtn
+            end
+        end
+    end
+    local rtn = returns[index]
+    if not rtn then
+        return
+    end
+    local results = m.getDocTypeNames(rtn)
+    for _, res in ipairs(results) do
+        status.results[#status.results+1] = res
+    end
+end
+
 local function mergeFunctionReturns(status, source, index)
+    if mergeFunctionReturnsByDoc(status, source, index) then
+        return
+    end
     local returns = source.returns
     if not returns then
         return

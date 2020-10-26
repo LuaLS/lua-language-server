@@ -985,7 +985,17 @@ function f(x: <T>)
   -> <T>
 ]]
 
-do return end
+TEST [[
+---@return number
+local function f()
+end
+
+local <?r?> = f()
+]]
+[[
+local r: number
+]]
+
 TEST [[
 ---@generic T
 ---@param x T
@@ -999,6 +1009,7 @@ local <?r?> = f(1)
 local r: integer
 ]]
 
+do return end
 TEST [[
 ---@param x number
 ---@param y boolean

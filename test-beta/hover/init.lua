@@ -939,7 +939,6 @@ end
 local t: Class
 ]]
 
-do return end
 TEST [[
 ---@class Class
 
@@ -948,7 +947,7 @@ for <?k?> in pairs(t) do
 end
 ]]
 [[
-local k<key>: Class {}
+local k: Class
 ]]
 
 TEST [[
@@ -959,9 +958,10 @@ for k, <?v?> in pairs(t) do
 end
 ]]
 [[
-local v<value>: *Class {}
+local v: Class
 ]]
 
+do return end
 TEST [[
 ---@return A|B
 ---@return C

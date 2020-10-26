@@ -2546,13 +2546,17 @@ function m.inferCheckDoc(status, source)
                 status.results[#status.results+1] = res
             end
         elseif doc.type == 'doc.param' then
+            -- function (x) 的情况
             if  source.type == 'local'
-            and m.getName(source) == doc.param[1]
-            and source.parent.type == 'funcargs' then
-                status.results[#status.results+1] = {
-                    type   = m.viewInferType(m.getDocTypeNames(doc.extends)),
-                    source = doc,
-                }
+            and m.getName(source) == doc.param[1] then
+                if source.parent.type == 'funcargs'
+                or source.parent.type == 'in'
+                or source.parent.type == 'loop' then
+                    status.results[#status.results+1] = {
+                        type   = m.viewInferType(m.getDocTypeNames(doc.extends)),
+                        source = doc,
+                    }
+                end
             end
         end
     end

@@ -19,6 +19,16 @@ local function asFunction(source, oop)
     return table.concat(lines, '\n')
 end
 
+local function asDocFunction(source)
+    local name = ''
+    local arg  = buildArg(source)
+    local rtn  = buildReturn(source)
+    local lines = {}
+    lines[1] = ('function %s(%s)'):format(name, arg)
+    lines[2] = rtn
+    return table.concat(lines, '\n')
+end
+
 local function asValue(source, title)
     local name    = buildName(source)
     local infers  = vm.getInfers(source)
@@ -160,5 +170,7 @@ return function (source, oop)
         return asNumber(source)
     elseif source.type == 'library' then
         return asLibrary(source)
+    elseif source.type == 'doc.type.function' then
+        return asDocFunction(source)
     end
 end

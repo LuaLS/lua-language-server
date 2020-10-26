@@ -82,6 +82,19 @@ local function asFunction(source, oop)
     end
 end
 
+local function asDocFunction(source)
+    if not source.args then
+        return ''
+    end
+    local args = {}
+    for i = 1, #source.args do
+        local arg = source.args[i]
+        local name = arg.name[1]
+        args[i] = ('%s: %s'):format(name, vm.getInferType(arg.extends))
+    end
+    return table.concat(args, ', ')
+end
+
 return function (source, oop)
     if source.type == 'library' then
         return asLibrary(source.value, oop)
@@ -90,6 +103,9 @@ return function (source, oop)
     end
     if source.type == 'function' then
         return asFunction(source, oop)
+    end
+    if source.type == 'doc.type.function' then
+        return asDocFunction(source)
     end
     return ''
 end

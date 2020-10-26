@@ -4,9 +4,11 @@ local lang    = require 'language'
 local define  = require 'proto.define'
 local vm      = require 'vm'
 
+-- TODO
 local builtin = {
     ['any']      = true,
     ['nil']      = true,
+    ['void']     = true,
     ['boolean']  = true,
     ['number']   = true,
     ['integer']  = true,

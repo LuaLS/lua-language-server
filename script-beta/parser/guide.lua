@@ -3303,6 +3303,15 @@ local function mergeFunctionReturns(status, source, index, call)
     end
 end
 
+local function mergeDocTypeFunctionReturns(status, source, index)
+    if not source.bindDocs then
+        return
+    end
+    for _, doc in ipairs(source.bindDocs) do
+        
+    end
+end
+
 function m.inferByCallReturnAndIndex(status, call, index)
     local node = call.node
     local newStatus = m.status(nil, status.interface)
@@ -3317,6 +3326,7 @@ function m.inferByCallReturnAndIndex(status, call, index)
                 end
             end
         end
+        mergeDocTypeFunctionReturns(status, src, index)
     end
 end
 

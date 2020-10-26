@@ -1105,44 +1105,36 @@ local <?x?>
 local x: table<ClassA, ClassB>
 ]]
 
-TEST [[
----@type table<ClassA, ClassB>
-local t
-for _, <?x?> in pairs(t) do
-end
-]]
-[[
-local x: *ClassB
-]]
+--TEST [[
+-----@type table<ClassA, ClassB>
+--local t
+--for _, <?x?> in pairs(t) do
+--end
+--]]
+--[[
+--local x: *ClassB
+--]]
 
-TEST [[
----@type table<ClassA, ClassB>
-local t
-for <?k?>, v in pairs(t) do
-end
-]]
-[[
-local k: *ClassA
-]]
+--TEST [[
+-----@type table<ClassA, ClassB>
+--local t
+--for <?k?>, v in pairs(t) do
+--end
+--]]
+--[[
+--local k: *ClassA
+--]]
 
 TEST [[
 ---@type fun(x: number, y: number):boolean
 local <?f?>
 ]]
 [[
-function f(x: number, y: number)
+function (x: number, y: number)
   -> boolean
 ]]
 
-TEST [[
----@type fun(x: number, y: number):boolean
-local f
-f(<?a?>)
-]]
-[[
-global a: number
-]]
-
+do return end
 TEST [[
 ---@type fun(x: number, y: number):boolean
 local f

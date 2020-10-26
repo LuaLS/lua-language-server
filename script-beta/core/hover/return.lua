@@ -120,6 +120,22 @@ local function asFunction(source)
     return table.concat(returns, '\n')
 end
 
+local function asDocFunction(source)
+    if not source.returns then
+        return ''
+    end
+    local returns = {}
+    for i, rtn in ipairs(source.returns) do
+        local rtnText = vm.getInferType(rtn)
+        if i == 1 then
+            returns[#returns+1] = ('  -> %s'):format(rtnText)
+        else
+            returns[#returns+1] = ('% 3d. %s'):format(i, rtnText)
+        end
+    end
+    return table.concat(returns, '\n')
+end
+
 return function (source)
     if source.type == 'library' then
         return asLibrary(source.value)
@@ -128,5 +144,8 @@ return function (source)
     end
     if source.type == 'function' then
         return asFunction(source)
+    end
+    if source.type == 'doc.type.function' then
+        return asDocFunction(source)
     end
 end

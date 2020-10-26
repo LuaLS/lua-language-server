@@ -20,10 +20,12 @@ local function getHoverAsFunction(source)
     for _, value in ipairs(values) do
         if value.type == 'function' then
             local label = getLabel(value.source, oop)
-            defs = defs + 1
-            labels[label] = (labels[label] or 0) + 1
-            if labels[label] == 1 then
-                protos = protos + 1
+            if label then
+                defs = defs + 1
+                labels[label] = (labels[label] or 0) + 1
+                if labels[label] == 1 then
+                    protos = protos + 1
+                end
             end
         elseif value.type == 'table'
         or     value.type == 'boolean'

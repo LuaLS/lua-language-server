@@ -1006,7 +1006,7 @@ end
 local <?r?> = f(1)
 ]]
 [[
-local r: integer
+local r: integer = 1
 ]]
 
 do return end

@@ -223,6 +223,20 @@ function m.getDocState(obj)
     error('guide.getDocState overstack')
 end
 
+--- 寻找所在父类型
+function m.getParentType(obj, want)
+    for _ = 1, 1000 do
+        obj = obj.parent
+        if not obj then
+            return nil
+        end
+        if want == obj.type then
+            return obj
+        end
+    end
+    error('guide.getParentType overstack')
+end
+
 --- 寻找根区块
 function m.getRoot(obj)
     for _ = 1, 1000 do
@@ -2476,7 +2490,7 @@ function m.inferCheckLibrary(status, source)
     return true
 end
 
-local function getDocTypeUnitName(unit)
+local function getDocTypeUnitName(unit, genericCallback)
     local typeName
     if unit.type == 'doc.type.name' then
         typeName = unit[1]
@@ -2484,7 +2498,12 @@ local function getDocTypeUnitName(unit)
         typeName = 'function'
     end
     if unit.typeGeneric then
-        typeName = ('<%s>'):format(typeName)
+        if genericCallback then
+            typeName = genericCallback(typeName, unit)
+                    or ('<%s>'):format(typeName)
+        else
+            typeName = ('<%s>'):format(typeName)
+        end
     end
     if unit.array then
         typeName = typeName .. '[]'
@@ -2498,10 +2517,10 @@ local function getDocTypeUnitName(unit)
     return typeName
 end
 
-function m.getDocTypeNames(doc)
+function m.getDocTypeNames(doc, genericCallback)
     local results = {}
     for _, unit in ipairs(doc.types) do
-        local typeName = getDocTypeUnitName(unit)
+        local typeName = getDocTypeUnitName(unit, genericCallback)
         results[#results+1] = {
             type   = typeName,
             source = unit,
@@ -3123,7 +3142,7 @@ local function mergeLibraryFunctionReturns(status, source, index)
     end
 end
 
-local function mergeFunctionReturnsByDoc(status, source, index)
+local function mergeFunctionReturnsByDoc(status, source, index, call)
     if not source.bindDocs then
         return
     end
@@ -3139,14 +3158,38 @@ local function mergeFunctionReturnsByDoc(status, source, index)
     if not rtn then
         return
     end
-    local results = m.getDocTypeNames(rtn)
+    local results = m.getDocTypeNames(rtn, function (typeName, typeUnit)
+        if not source.args or not call.args then
+            return
+        end
+        local name = typeUnit[1]
+        local generics = typeUnit.typeGeneric[name]
+        if not generics then
+            return
+        end
+        local first = generics[1]
+        if not first or first == typeUnit then
+            return
+        end
+        local docParam = m.getParentType(first, 'doc.param')
+        local paramName = docParam.param[1]
+        for i, arg in ipairs(source.args) do
+            if arg[1] == paramName then
+                local callArg = call.args[i]
+                if not callArg then
+                    return
+                end
+                return m.viewInferType(m.searchInfer(status, callArg))
+            end
+        end
+    end)
     for _, res in ipairs(results) do
         status.results[#status.results+1] = res
     end
 end
 
-local function mergeFunctionReturns(status, source, index)
-    if mergeFunctionReturnsByDoc(status, source, index) then
+local function mergeFunctionReturns(status, source, index, call)
+    if mergeFunctionReturnsByDoc(status, source, index, call) then
         return
     end
     local returns = source.returns
@@ -3189,7 +3232,7 @@ function m.inferByCallReturnAndIndex(status, call, index)
                 mergeLibraryFunctionReturns(status, src.value, index)
             else
                 if not m.checkReturnMark(status, src.value, true) then
-                    mergeFunctionReturns(status, src.value, index)
+                    mergeFunctionReturns(status, src.value, index, call)
                 end
             end
         end

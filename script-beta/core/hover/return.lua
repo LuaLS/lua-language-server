@@ -43,18 +43,49 @@ local function asLibrary(source)
     return table.concat(returns, '\n')
 end
 
-local function asFunction(source)
+local function getReturnDualByDoc(source)
+    local docs = source.bindDocs
+    if not docs then
+        return
+    end
+    local dual
+    for _, doc in ipairs(docs) do
+        if doc.type == 'doc.return' then
+            for _, rtn in ipairs(doc.returns) do
+                if not dual then
+                    dual = {}
+                end
+                dual[#dual+1] = { rtn }
+            end
+        end
+    end
+    return dual
+end
+
+local function getReturnDualByGrammar(source)
     if not source.returns then
         return nil
     end
-    local dual = {}
+    local dual
     for _, rtn in ipairs(source.returns) do
+        if not dual then
+            dual = {}
+        end
         for n = 1, #rtn do
             if not dual[n] then
                 dual[n] = {}
             end
             dual[n][#dual[n]+1] = rtn[n]
         end
+    end
+    return dual
+end
+
+local function asFunction(source)
+    local dual = getReturnDualByDoc(source)
+            or   getReturnDualByGrammar(source)
+    if not dual then
+        return
     end
     local returns = {}
     for i, rtn in ipairs(dual) do

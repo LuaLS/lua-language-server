@@ -14,6 +14,7 @@ local builtin = {
     ['table']    = true,
     ['file']     = true,
     ['string']   = true,
+    ['userdata'] = true,
     ['function'] = true,
 }
 

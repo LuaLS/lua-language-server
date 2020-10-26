@@ -961,7 +961,6 @@ end
 local v: Class
 ]]
 
-do return end
 TEST [[
 ---@return A|B
 ---@return C
@@ -970,9 +969,11 @@ end
 ]]
 [[
 function f()
-  -> A|B, C
+  -> A|B
+  2. C
 ]]
 
+do return end
 TEST [[
 ---@generic T
 ---@param x T

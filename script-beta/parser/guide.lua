@@ -2514,6 +2514,23 @@ function m.getDocTypeNames(doc)
 end
 
 function m.inferCheckDoc(status, source)
+    if source.type == 'doc.class' then
+        status.results[#status.results+1] = {
+            type   = source.class[1],
+            source = source,
+        }
+        return true
+    end
+    if source.type == 'doc.type' then
+        local results = m.getDocTypeNames(source)
+        for _, res in ipairs(results) do
+            status.results[#status.results+1] = res
+        end
+        return true
+    end
+end
+
+function m.inferCheckUpDoc(status, source)
     while source.type == 'select' or source.type == 'call' do
         local parent = source.parent
         if parent.type == 'local'
@@ -2540,11 +2557,13 @@ function m.inferCheckDoc(status, source)
                 type   = doc.class[1],
                 source = doc,
             }
+            return true
         elseif doc.type == 'doc.type' then
             local results = m.getDocTypeNames(doc)
             for _, res in ipairs(results) do
                 status.results[#status.results+1] = res
             end
+            return true
         elseif doc.type == 'doc.param' then
             -- function (x) 的情况
             if  source.type == 'local'
@@ -2556,11 +2575,11 @@ function m.inferCheckDoc(status, source)
                         type   = m.viewInferType(m.getDocTypeNames(doc.extends)),
                         source = doc,
                     }
+                    return true
                 end
             end
         end
     end
-    return true
 end
 
 function m.inferCheckUnary(status, source)
@@ -3252,6 +3271,7 @@ function m.searchInfer(status, obj)
     end
 
     local checked = m.inferCheckDoc(status, obj)
+                 or m.inferCheckUpDoc(status, obj)
                  or m.inferCheckLibrary(status, obj)
                  or m.inferCheckLiteral(status, obj)
                  or m.inferCheckUnary(status, obj)

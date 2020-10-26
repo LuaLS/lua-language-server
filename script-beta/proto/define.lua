@@ -11,7 +11,7 @@ local m = {}
 function m.offset(lines, text, position)
     local row    = position.line + 1
     local start  = guide.lineRange(lines, row)
-    if start > #text then
+    if start <= 0 or start > #text then
         return #text + 1
     end
     local offset = utf8.offset(text, position.character + 1, start)
@@ -26,7 +26,7 @@ end
 function m.offsetOfWord(lines, text, position)
     local row    = position.line + 1
     local start  = guide.lineRange(lines, row)
-    if start > #text then
+    if start <= 0 or start > #text then
         return #text + 1
     end
     local offset = utf8.offset(text, position.character + 1, start)

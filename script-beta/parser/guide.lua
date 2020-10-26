@@ -2661,6 +2661,30 @@ function m.inferCheckUpDoc(status, source)
     end
 end
 
+function m.inferCheckFieldDoc(status, source)
+    -- 检查 string[] 的情况
+    if source.type == 'getindex' then
+        local node = source.node
+        if not node then
+            return
+        end
+        local newStatus = m.status(status)
+        m.searchInfer(newStatus, node)
+        local ok
+        for _, infer in ipairs(newStatus.results) do
+            local src = infer.source
+            if src.array then
+                ok = true
+                status.results[#status.results+1] = {
+                    type   = infer.type:gsub('%[%]$', ''),
+                    source = source,
+                }
+            end
+        end
+        return ok
+    end
+end
+
 function m.inferCheckUnary(status, source)
     if source.type ~= 'unary' then
         return
@@ -3400,6 +3424,7 @@ function m.searchInfer(status, obj)
 
     local checked = m.inferCheckDoc(status, obj)
                  or m.inferCheckUpDoc(status, obj)
+                 or m.inferCheckFieldDoc(status, obj)
                  or m.inferCheckLibrary(status, obj)
                  or m.inferCheckLiteral(status, obj)
                  or m.inferCheckUnary(status, obj)

@@ -86,6 +86,11 @@ TEST [[
 ---@param a <?Class?>
 ]]
 
+TEST [[
+---@param f <!fun():void!>
+function t(<?<!f!>?>) end
+]]
+
 -- TODO
 do return end
 TEST [[

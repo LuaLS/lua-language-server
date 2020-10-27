@@ -960,21 +960,28 @@ end
 
 local function stepRefOfDocType(status, obj, mode)
     local results = {}
-    local name = obj[1]
-    if not name or not status.interface.docType then
-        return results
-    end
-    local docs = status.interface.docType(name)
-    for i = 1, #docs do
-        local doc = docs[i]
-        if mode == 'def' then
-            if doc.type == 'doc.class.name'
-            or doc.type == 'doc.alias.name' then
+    if obj.type == 'doc.class.name'
+    or obj.type == 'doc.type.name'
+    or obj.type == 'doc.alias.name'
+    or obj.type == 'doc.extends.name' then
+        local name = obj[1]
+        if not name or not status.interface.docType then
+            return results
+        end
+        local docs = status.interface.docType(name)
+        for i = 1, #docs do
+            local doc = docs[i]
+            if mode == 'def' then
+                if doc.type == 'doc.class.name'
+                or doc.type == 'doc.alias.name' then
+                    results[#results+1] = doc
+                end
+            else
                 results[#results+1] = doc
             end
-        else
-            results[#results+1] = doc
         end
+    else
+        results[#results+1] = obj
     end
     return results
 end
@@ -1456,12 +1463,21 @@ function m.checkSameSimpleByBindDocs(status, obj, start, queue, mode)
     newStatus.cache.searchingBindedDoc = true
     for _, res in ipairs(results) do
         local doc = m.getDocState(res)
-        local refs = doc.bindSources
-        for _, ref in ipairs(refs) do
-            if not mark[ref] then
-                mark[ref] = true
-                m.searchRefs(newStatus, ref, mode)
+        if doc.type == 'doc.class'
+        or doc.type == 'doc.type' then
+            local refs = doc.bindSources
+            for _, ref in ipairs(refs) do
+                if not mark[ref] then
+                    mark[ref] = true
+                    m.searchRefs(newStatus, ref, mode)
+                end
             end
+        else
+            queue[#queue+1] = {
+                obj   = res,
+                start = start,
+                force = true,
+            }
         end
     end
     for _, res in ipairs(newStatus.results) do
@@ -1853,6 +1869,8 @@ function m.pushResult(status, mode, ref, simple)
             results[#results+1] = ref
         elseif ref.type == 'library' then
             results[#results+1] = ref
+        elseif ref.type == 'doc.type.function' then
+            results[#results+1] = ref
         end
         if ref.parent and ref.parent.type == 'return' then
             if m.getParentFunction(ref) ~= m.getParentFunction(simple.first) then
@@ -1888,6 +1906,8 @@ function m.pushResult(status, mode, ref, simple)
             end
         elseif ref.type == 'library' then
             results[#results+1] = ref
+        elseif ref.type == 'doc.type.function' then
+            results[#results+1] = ref
         end
         if ref.parent and ref.parent.type == 'return' then
             results[#results+1] = ref
@@ -1917,6 +1937,8 @@ function m.pushResult(status, mode, ref, simple)
                 results[#results+1] = ref
             end
         elseif ref.type == 'library' then
+            results[#results+1] = ref
+        elseif ref.type == 'doc.type.function' then
             results[#results+1] = ref
         end
     end
@@ -2672,10 +2694,10 @@ function m.inferCheckUpDoc(status, source)
                 if source.parent.type == 'funcargs'
                 or source.parent.type == 'in'
                 or source.parent.type == 'loop' then
-                    status.results[#status.results+1] = {
-                        type   = m.viewInferType(m.getDocTypeNames(doc.extends)),
-                        source = doc,
-                    }
+                    local results = m.getDocTypeNames(doc.extends)
+                    for _, res in ipairs(results) do
+                        status.results[#status.results+1] = res
+                    end
                     return true
                 end
             end

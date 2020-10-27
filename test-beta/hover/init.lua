@@ -1130,7 +1130,7 @@ TEST [[
 local <?f?>
 ]]
 [[
-function (x: number, y: number)
+function f(x: number, y: number)
   -> boolean
 ]]
 
@@ -1159,7 +1159,7 @@ local t = {f = f}
 t:<?f?>()
 ]]
 [[
-function (a: any, b: any)
+function f(a: any, b: any)
 ]]
 
 TEST [[
@@ -1197,6 +1197,17 @@ local <?x?> = f()
 [[
 local x: integer
 ]]
+
+TEST [[
+---@overload fun(y: boolean)
+---@param x number
+---@param y boolean
+---@param z string
+function <?f?>(x, y, z) end
+]]
+[=[
+function f(x: number, y: boolean, z: string)
+]=]
 
 do return end
 TEST [[

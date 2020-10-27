@@ -20,7 +20,7 @@ local function asFunction(source, oop)
 end
 
 local function asDocFunction(source)
-    local name = ''
+    local name = buildName(source)
     local arg  = buildArg(source)
     local rtn  = buildReturn(source)
     local lines = {}

@@ -1,6 +1,8 @@
 local guide    = require 'parser.guide'
 local vm       = require 'vm'
 
+local buildName
+
 local function asLocal(source)
     local name = guide.getName(source)
     if not source.attrs then
@@ -67,7 +69,21 @@ local function asLibrary(source, oop)
     end
 end
 
-local function buildName(source, oop)
+local function asDocFunction(source)
+    local doc = guide.getParentType(source, 'doc.type')
+    if not doc or not doc.bindSources then
+        return ''
+    end
+    for _, src in ipairs(doc.bindSources) do
+        local name = buildName(src)
+        if name ~= '' then
+            return name
+        end
+    end
+    return ''
+end
+
+function buildName(source, oop)
     if oop == nil then
         oop =  source.type == 'setmethod'
             or source.type == 'getmethod'
@@ -96,6 +112,9 @@ local function buildName(source, oop)
     end
     if source.type == 'tablefield' then
         return asTableField(source) or ''
+    end
+    if source.type == 'doc.type.function' then
+        return asDocFunction(source)
     end
     local parent = source.parent
     if parent then

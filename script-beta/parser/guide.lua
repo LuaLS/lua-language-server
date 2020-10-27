@@ -3308,7 +3308,19 @@ local function mergeDocTypeFunctionReturns(status, source, index)
         return
     end
     for _, doc in ipairs(source.bindDocs) do
-        
+        if doc.type == 'doc.type' then
+            for _, typeUnit in ipairs(doc.types) do
+                if typeUnit.type == 'doc.type.function' then
+                    local rtn = typeUnit.returns[index]
+                    if rtn then
+                        local results = m.getDocTypeNames(rtn)
+                        for _, res in ipairs(results) do
+                            status.results[#status.results+1] = res
+                        end
+                    end
+                end
+            end
+        end
     end
 end
 

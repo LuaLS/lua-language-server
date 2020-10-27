@@ -1134,7 +1134,6 @@ function (x: number, y: number)
   -> boolean
 ]]
 
-do return end
 TEST [[
 ---@type fun(x: number, y: number):boolean
 local f

@@ -195,6 +195,9 @@ end
 --- 查找符合指定file path的所有uri
 ---@param path string
 function m.findUrisByFilePath(path)
+    if type(path) ~= 'string' then
+        return {}
+    end
     local results = {}
     local posts = {}
     for uri in files.eachFile() do
@@ -215,6 +218,9 @@ end
 --- 查找符合指定require path的所有uri
 ---@param path string
 function m.findUrisByRequirePath(path)
+    if type(path) ~= 'string' then
+        return {}
+    end
     local results = {}
     local mark = {}
     local searchers = {}

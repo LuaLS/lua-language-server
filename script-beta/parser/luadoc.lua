@@ -720,6 +720,9 @@ local function bindDoc(state, lns, binded)
         return
     end
     guide.eachSourceBetween(state.ast, start, finish, function (src)
+        if src.start and src.start < start then
+            return
+        end
         if src.type == 'local'
         or src.type == 'setlocal'
         or src.type == 'setglobal'

@@ -1159,8 +1159,7 @@ local t = {f = f}
 t:<?f?>()
 ]]
 [[
-function f(b: any)
-  -> any
+function (a: any, b: any)
 ]]
 
 TEST [[
@@ -1169,9 +1168,7 @@ local function f(<?names?>)
 end
 ]]
 [[
-local names: {
-    [*integer]: string,
-}
+local names: string[]
 ]]
 
 TEST [[
@@ -1198,10 +1195,10 @@ end
 local <?x?> = f()
 ]]
 [[
-local x: any
+local x: integer
 ]]
 
-
+do return end
 TEST [[
 ---@param x number {optional = 'after'}
 ---@param y boolean {optional = 'self'}

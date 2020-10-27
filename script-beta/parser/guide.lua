@@ -3268,6 +3268,9 @@ local function mergeLibraryFunctionReturns(status, source, index)
 end
 
 local function mergeFunctionReturnsByDoc(status, source, index, call)
+    if not source or source.type ~= 'function' then
+        return
+    end
     if not source.bindDocs then
         return
     end
@@ -3308,15 +3311,16 @@ local function mergeFunctionReturnsByDoc(status, source, index, call)
             end
         end
     end)
+    if #results == 0 then
+        return
+    end
     for _, res in ipairs(results) do
         status.results[#status.results+1] = res
     end
+    return true
 end
 
 local function mergeFunctionReturns(status, source, index, call)
-    if mergeFunctionReturnsByDoc(status, source, index, call) then
-        return
-    end
     local returns = source.returns
     if not returns then
         return
@@ -3372,17 +3376,26 @@ function m.inferByCallReturnAndIndex(status, call, index)
     local node = call.node
     local newStatus = m.status(nil, status.interface)
     m.searchRefs(newStatus, node, 'def')
+    local hasDocReturn
     for _, src in ipairs(newStatus.results) do
-        if src.value and src.value.type == 'function' then
-            if src.type == 'library' then
-                mergeLibraryFunctionReturns(status, src.value, index)
-            else
-                if not m.checkReturnMark(status, src.value, true) then
-                    mergeFunctionReturns(status, src.value, index, call)
+        if mergeDocTypeFunctionReturns(status, src, index) then
+            hasDocReturn = true
+        elseif mergeFunctionReturnsByDoc(status, src.value, index, call) then
+            hasDocReturn = true
+        end
+    end
+    if not hasDocReturn then
+        for _, src in ipairs(newStatus.results) do
+            if src.value and src.value.type == 'function' then
+                if src.type == 'library' then
+                    mergeLibraryFunctionReturns(status, src.value, index)
+                else
+                    if not m.checkReturnMark(status, src.value, true) then
+                        mergeFunctionReturns(status, src.value, index, call)
+                    end
                 end
             end
         end
-        mergeDocTypeFunctionReturns(status, src, index)
     end
 end
 

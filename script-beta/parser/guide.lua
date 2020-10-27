@@ -1434,6 +1434,21 @@ function m.checkSameSimpleByBindDocs(status, obj, start, queue, mode)
                     results[#results+1] = res
                 end
             end
+        elseif doc.type == 'doc.param' then
+            -- function (x) 的情况
+            if  obj.type == 'local'
+            and m.getName(obj) == doc.param[1] then
+                if obj.parent.type == 'funcargs'
+                or obj.parent.type == 'in'
+                or obj.parent.type == 'loop' then
+                    for _, piece in ipairs(doc.extends.types) do
+                        local pieceResult = stepRefOfDocType(status, piece, mode)
+                        for _, res in ipairs(pieceResult) do
+                            results[#results+1] = res
+                        end
+                    end
+                end
+            end
         end
     end
     local mark = {}
@@ -2610,8 +2625,8 @@ function m.inferCheckUpDoc(status, source)
     if m.inferCheckUpDocOfVararg(status, source) then
         return true
     end
-    while source.type == 'select' or source.type == 'call' do
-        local parent = source.parent
+    local parent = source.parent
+    if parent then
         if parent.type == 'local'
         or parent.type == 'setlocal'
         or parent.type == 'setglobal'
@@ -2621,8 +2636,6 @@ function m.inferCheckUpDoc(status, source)
         or parent.type == 'tablefield'
         or parent.type == 'tableindex' then
             source = parent
-        else
-            break
         end
     end
     local binds = source.bindDocs
@@ -2636,6 +2649,15 @@ function m.inferCheckUpDoc(status, source)
                 type   = doc.class[1],
                 source = doc,
             }
+            -- ---@class Class
+            -- local x = { field = 1 }
+            -- 这种情况下，将字面量表接受为Class的定义
+            if source.value and source.value.type == 'table' then
+                status.results[#status.results+1] = {
+                    type   = source.value.type,
+                    source = source.value,
+                }
+            end
             return true
         elseif doc.type == 'doc.type' then
             local results = m.getDocTypeNames(doc)

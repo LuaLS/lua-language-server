@@ -936,7 +936,7 @@ function f(t)
 end
 ]]
 [[
-local t: Class
+local t: Class {}
 ]]
 
 TEST [[

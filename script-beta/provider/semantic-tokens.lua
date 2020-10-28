@@ -28,14 +28,14 @@ local function enable()
         registrations = {
             {
                 id = 'semantic-tokens',
-                method = 'textDocument/semanticTokens/full',
+                method = 'textDocument/semanticTokens',
                 registerOptions = {
                     legend = {
                         tokenTypes     = toArray(define.TokenTypes),
                         tokenModifiers = toArray(define.TokenModifiers),
                     },
                     range = true,
-                    full  = false,
+                    full  = true,
                 },
             },
         }
@@ -52,7 +52,7 @@ local function disable()
         unregisterations = {
             {
                 id = 'semantic-tokens',
-                method = 'textDocument/semanticTokens/full',
+                method = 'textDocument/semanticTokens',
             },
         }
     })

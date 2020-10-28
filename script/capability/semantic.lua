@@ -28,14 +28,14 @@ local function enable(lsp)
         registrations = {
             {
                 id = 'semantic',
-                method = 'textDocument/semanticTokens/full',
+                method = 'textDocument/semanticTokens',
                 registerOptions = {
                     legend = {
                         tokenTypes = toArray(TokenTypes),
                         tokenModifiers = toArray(TokenModifiers),
                     },
-                    rangeProvider = false,
-                    documentProvider = false,
+                    range = false,
+                    full = true,
                 },
             },
         }
@@ -52,7 +52,7 @@ local function disable()
         unregisterations = {
             {
                 id = 'semantic',
-                method = 'textDocument/semanticTokens/full',
+                method = 'textDocument/semanticTokens',
             },
         }
     })

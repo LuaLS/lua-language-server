@@ -1456,6 +1456,8 @@ function m.checkSameSimpleByBindDocs(status, obj, start, queue, mode)
                     end
                 end
             end
+        elseif doc.type == 'doc.overload' then
+            results[#results+1] = doc.overload
         end
     end
     local mark = {}

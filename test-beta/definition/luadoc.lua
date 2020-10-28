@@ -91,6 +91,16 @@ TEST [[
 function t(<?<!f!>?>) end
 ]]
 
+TEST [[
+---@overload <!fun(y: boolean)!>
+---@param x number
+---@param y boolean
+---@param z string
+function <!f!>(x, y, z) end
+
+print(<?f?>)
+]]
+
 -- TODO
 do return end
 TEST [[

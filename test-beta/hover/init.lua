@@ -1198,17 +1198,6 @@ local <?x?> = f()
 local x: integer
 ]]
 
-TEST [[
----@overload fun(y: boolean)
----@param x number
----@param y boolean
----@param z string
-function <?f?>(x, y, z) end
-]]
-[=[
-function f(x: number, y: boolean, z: string)
-]=]
-
 do return end
 TEST [[
 ---@param x number {optional = 'after'}

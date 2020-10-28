@@ -1492,6 +1492,7 @@ function m.checkSameSimpleByBindDocs(status, obj, start, queue, mode)
             force = true,
         }
     end
+    return true
 end
 
 function m.checkSameSimpleInArg1OfSetMetaTable(status, obj, start, queue)
@@ -1966,27 +1967,29 @@ function m.checkSameSimple(status, simple, data, mode, results, queue)
         if i < #simple then
             cmode = 'ref'
         end
-        -- 穿透 self:func 与 mt:func
-        m.searchSameFieldsCrossMethod(status, ref, i, queue)
-        -- 穿透赋值
-        m.searchSameFieldsInValue(status, ref, i, queue, cmode)
-        -- 检查自己是字面量表的情况
-        m.checkSameSimpleInValueOfTable(status, ref, i, queue)
-        -- 检查自己作为 setmetatable 第一个参数的情况
-        m.checkSameSimpleInArg1OfSetMetaTable(status, ref, i, queue)
-        -- 检查自己作为 setmetatable 调用的情况
-        m.checkSameSimpleInValueOfCallMetaTable(status, ref, i, queue)
-        -- 检查自己是特殊变量的分支的情况
-        m.checkSameSimpleInSpecialBranch(status, ref, i, queue)
         -- 检查 doc
-        m.checkSameSimpleByBindDocs(status, ref, i, queue, cmode)
-        if cmode == 'ref' and not status.simple then
-            -- 检查形如 { a = f } 的情况
-            m.checkSameSimpleAsTableField(status, ref, i, queue)
-            -- 检查形如 return m 的情况
-            m.checkSameSimpleAsReturn(status, ref, i, queue)
-            -- 检查形如 a = f 的情况
-            m.checkSameSimpleAsSetValue(status, ref, i, queue)
+        local hasDoc = m.checkSameSimpleByBindDocs(status, ref, i, queue, cmode)
+        if not hasDoc then
+            -- 穿透 self:func 与 mt:func
+            m.searchSameFieldsCrossMethod(status, ref, i, queue)
+            -- 穿透赋值
+            m.searchSameFieldsInValue(status, ref, i, queue, cmode)
+            -- 检查自己是字面量表的情况
+            m.checkSameSimpleInValueOfTable(status, ref, i, queue)
+            -- 检查自己作为 setmetatable 第一个参数的情况
+            m.checkSameSimpleInArg1OfSetMetaTable(status, ref, i, queue)
+            -- 检查自己作为 setmetatable 调用的情况
+            m.checkSameSimpleInValueOfCallMetaTable(status, ref, i, queue)
+            -- 检查自己是特殊变量的分支的情况
+            m.checkSameSimpleInSpecialBranch(status, ref, i, queue)
+            if cmode == 'ref' and not status.simple then
+                -- 检查形如 { a = f } 的情况
+                m.checkSameSimpleAsTableField(status, ref, i, queue)
+                -- 检查形如 return m 的情况
+                m.checkSameSimpleAsReturn(status, ref, i, queue)
+                -- 检查形如 a = f 的情况
+                m.checkSameSimpleAsSetValue(status, ref, i, queue)
+            end
         end
         if i == #simple then
             break

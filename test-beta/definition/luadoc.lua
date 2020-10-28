@@ -101,6 +101,18 @@ function <!f!>(x, y, z) end
 print(<?f?>)
 ]]
 
+TEST [[
+local function f()
+    return 1
+end
+
+---@class Class
+local <!mt!>
+
+---@type Class
+local <?<!x!>?> = f()
+]]
+
 -- TODO
 do return end
 TEST [[

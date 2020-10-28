@@ -215,6 +215,9 @@ end
 function m.getDocState(obj)
     for _ = 1, 1000 do
         local parent = obj.parent
+        if not parent then
+            return obj
+        end
         if parent.type == 'doc' then
             return obj
         end

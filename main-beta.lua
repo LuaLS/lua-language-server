@@ -19,5 +19,5 @@ xpcall(dofile, log.debug, rootPath .. '/debugger.lua')
 local service = require 'service'
 
 -- TODO
-ALL_DEEP = true
+--ALL_DEEP = true
 service.start()

@@ -77,9 +77,6 @@ end
 --- 获取对象的值
 --- 会尝试穿透函数调用
 function vm.getInfers(source, deep)
-    if ALL_DEEP then
-        deep = 'deep'
-    end
     if guide.isGlobal(source) then
         local name = guide.getKeyName(source)
         local cache =  vm.getCache('getInfersOfGlobal')[name]

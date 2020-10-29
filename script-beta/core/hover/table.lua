@@ -173,6 +173,7 @@ return function (source)
     local literals = {}
     local classes = {}
     local clock = os.clock()
+    local timeUp
     for _, src in ipairs(vm.getFields(source, 'deep')) do
         local key = getKey(src)
         if not key then
@@ -184,10 +185,12 @@ return function (source)
         if not literals[key] then
             literals[key] = {}
         end
-        if os.clock() - clock <= 1 then
+        if os.clock() - clock <= 5 then
             local class, literal = getField(src)
             classes[key][#classes[key]+1] = class
             literals[key][#literals[key]+1] = literal
+        else
+            timeUp = true
         end
         ::CONTINUE::
     end
@@ -210,9 +213,15 @@ return function (source)
             break
         end
     end
+    local result
     if intValue then
-        return buildAsConst(classes, literals)
+        result = buildAsConst(classes, literals)
     else
-        return buildAsHash(classes, literals)
+        result = buildAsHash(classes, literals)
     end
+    -- TODO
+    if timeUp then
+        result = '\n-- TODO: Too much time has been spent, type inference has been abandoned. Optimize later.\n' .. result
+    end
+    return result
 end

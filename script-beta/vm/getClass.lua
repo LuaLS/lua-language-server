@@ -11,8 +11,8 @@ local function lookUpDocClass(source)
     end
 end
 
-local function getClass(source, classes, deep, simple)
-    local lib = vm.getLibrary(source, simple)
+local function getClass(source, classes, depth, deep)
+    local lib = vm.getLibrary(source, deep)
     if lib then
         if lib.value.type == 'table' then
             classes[#classes+1] = lib.value.name
@@ -26,11 +26,11 @@ local function getClass(source, classes, deep, simple)
         classes[#classes+1] = docClass
         return
     end
-    if deep > 3 then
+    if depth > 3 then
         return
     end
     local value = guide.getObjectValue(source) or source
-    if simple and value == source then
+    if deep and value == source then
         if value and value.type == 'string' then
             classes[#classes+1] = value[1]
         end
@@ -56,13 +56,13 @@ local function getClass(source, classes, deep, simple)
         return
     end
     vm.eachMeta(source, function (mt)
-        getClass(mt, classes, deep + 1, simple)
+        getClass(mt, classes, depth + 1, deep)
     end)
 end
 
-function vm.getClass(source, simple)
+function vm.getClass(source, deep)
     local classes = {}
-    getClass(source, classes, 1, simple)
+    getClass(source, classes, 1, deep)
     if #classes == 0 then
         return nil
     end

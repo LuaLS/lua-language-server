@@ -233,9 +233,9 @@ end
 
 local function ofField(source, newname, callback)
     local key = guide.getKeyName(source)
-    vm.eachRef(source, function (src)
+    for _, src in ipairs(vm.getRefs(source, 'deep')) do
         if vm.getKeyName(src) ~= key then
-            return
+            goto CONTINUE
         end
         if     src.type == 'tablefield'
         or     src.type == 'getfield'
@@ -253,30 +253,31 @@ local function ofField(source, newname, callback)
             local quo = src[2]
             local text = util.viewString(newname, quo)
             callback(src, src.start, src.finish, text)
-            return
+            goto CONTINUE
         elseif src.type == 'field'
         or     src.type == 'method' then
             local suc = renameField(src, newname, callback)
             if not suc then
-                return false
+                goto CONTINUE
             end
         elseif src.type == 'setglobal'
         or     src.type == 'getglobal' then
             local suc = renameGlobal(src, newname, callback)
             if not suc then
-                return false
+                goto CONTINUE
             end
         end
-    end)
+        ::CONTINUE::
+    end
 end
 
 local function ofLabel(source, newname, callback)
     if not isValidName(newname) and not askForcing(newname)then
         return false
     end
-    vm.eachRef(source, function (src)
+    for _, src in ipairs(vm.getRefs(source, 'deep')) do
         callback(src, src.start, src.finish, newname)
-    end)
+    end
 end
 
 local function rename(source, newname, callback)

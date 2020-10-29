@@ -64,13 +64,3 @@ function vm.getFields(source, deep)
         return cache
     end
 end
-
-function vm.eachField(source, callback)
-    local results = vm.getFields(source)
-    if not results then
-        return
-    end
-    for i = 1, #results do
-        callback(results[i])
-    end
-end

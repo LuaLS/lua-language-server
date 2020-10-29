@@ -162,7 +162,7 @@ end
 
 local function buildFunctionSnip(source, oop)
     local name = getName(source):gsub('^.-[$.:]', '')
-    local defs = vm.getDefs(source)
+    local defs = vm.getDefs(source, 'deep')
     local args = ''
     for _, def in ipairs(defs) do
         local defArgs = getArg(def, oop)
@@ -182,8 +182,8 @@ local function buildFunctionSnip(source, oop)
 end
 
 local function buildDetail(source)
-    local types = vm.getInferType(source)
-    local literals = vm.getInferLiteral(source)
+    local types = vm.getInferType(source, 'deep')
+    local literals = vm.getInferLiteral(source, 'deep')
     if literals then
         return types .. ' = ' .. literals
     else
@@ -196,7 +196,7 @@ local function getSnip(source)
     if context <= 0 then
         return nil
     end
-    local defs = vm.getRefs(source)
+    local defs = vm.getRefs(source, 'deep')
     for _, def in ipairs(defs) do
         if def ~= source and def.type == 'function' then
             local uri = guide.getUri(def)
@@ -403,27 +403,27 @@ end
 
 local function checkField(ast, word, start, offset, parent, oop, results)
     local fields = {}
-    vm.eachField(parent, function (src)
+    for _, src in ipairs(vm.getFields(parent, 'deep')) do
         if src.type == 'library' then
             if src.name:sub(1, 1) == '@' then
-                return
+                goto CONTINUE
             end
         end
         local key = vm.getKeyName(src)
         if not key or key:sub(1, 1) ~= 's' then
-            return
+            goto CONTINUE
         end
         if isSameSource(ast, src, start) then
-            return
+            goto CONTINUE
         end
         local name = key:sub(3)
         if not matchKey(word, name) then
-            return
+            goto CONTINUE
         end
         local last = fields[name]
         if not last then
             fields[name] = src
-            return
+            goto CONTINUE
         end
         if src.type == 'tablefield'
         or src.type == 'setfield'
@@ -431,9 +431,10 @@ local function checkField(ast, word, start, offset, parent, oop, results)
         or src.type == 'setindex'
         or src.type == 'setmethod' then
             fields[name] = src
-            return
+            goto CONTINUE
         end
-    end)
+        ::CONTINUE::
+    end
     for name, src in util.sortPairs(fields) do
         checkFieldThen(name, src, word, start, offset, parent, oop, results)
     end
@@ -914,7 +915,7 @@ local function tryCallArg(ast, text, offset, results)
     end
     local myResults = {}
     local argIndex, arg = getCallArgInfo(call, text, offset)
-    local defs = vm.getDefs(call.node)
+    local defs = vm.getDefs(call.node, 'deep')
     for _, def in ipairs(defs) do
         local enums = getCallEnums(def, argIndex)
         if enums then

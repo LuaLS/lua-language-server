@@ -43,10 +43,3 @@ function vm.getDefs(source, deep)
         return cache
     end
 end
-
-function vm.eachDef(source, callback)
-    local results = vm.getDefs(source)
-    for i = 1, #results do
-        callback(results[i])
-    end
-end

@@ -1,6 +1,7 @@
 local vm       = require 'vm'
 local util     = require 'utility'
 local guide    = require 'parser.guide'
+local config   = require 'config'
 
 local function getKey(src)
     if src.type == 'library' then
@@ -35,7 +36,7 @@ local function getKey(src)
     return ('[%s]'):format(key)
 end
 
-local function getField(src)
+local function getField(src, marker)
     if src.type == 'table'
     or src.type == 'function' then
         return nil
@@ -49,9 +50,41 @@ local function getField(src)
             end
         end
     end
-    local tp = vm.getInferType(src)
-    local class = vm.getClass(src)
-    local literal = vm.getInferLiteral(src)
+    local value = guide.getObjectValue(src) or src
+    if not value then
+        return 'any'
+    end
+    if value.library then
+        return value.type, util.viewLiteral(value.value)
+    end
+    if value.type == 'boolean' then
+        return value.type, util.viewLiteral(value[1])
+    end
+    if value.type == 'number'
+    or value.type == 'integer' then
+        if math.tointeger(value[1]) then
+            if config.config.runtime.version == 'Lua 5.3'
+            or config.config.runtime.version == 'Lua 5.4' then
+                return 'integer', util.viewLiteral(value[1])
+            end
+        end
+        return value.type, util.viewLiteral(value[1])
+    end
+    if value.type == 'table'
+    or value.type == 'function' then
+        return value.type
+    end
+    if value.type == 'string' then
+        local literal = value[1]
+        if type(literal) == 'string' and #literal >= 50 then
+            literal = literal:sub(1, 47) .. '...'
+        end
+        return value.type, util.viewLiteral(literal)
+    end
+    marker()
+    local tp      = vm.getInferType(value)
+    local class   = vm.getClass(value)
+    local literal = vm.getInferLiteral(value)
     if type(literal) == 'string' and #literal >= 50 then
         literal = literal:sub(1, 47) .. '...'
     end
@@ -174,9 +207,13 @@ return function (source)
     local classes = {}
     local clock = os.clock()
     local timeUp
+    local mark = {}
     for _, src in ipairs(vm.getFields(source, 'deep')) do
         local key = getKey(src)
         if not key then
+            goto CONTINUE
+        end
+        if mark[key] then
             goto CONTINUE
         end
         if not classes[key] then
@@ -185,8 +222,13 @@ return function (source)
         if not literals[key] then
             literals[key] = {}
         end
-        if os.clock() - clock <= 5 then
-            local class, literal = getField(src)
+        if TEST or os.clock() - clock <= 5 then
+            local class, literal = getField(src, function ()
+                mark[key] = true
+            end)
+            if literal == 'nil' then
+                literal = nil
+            end
             classes[key][#classes[key]+1] = class
             literals[key][#literals[key]+1] = literal
         else

@@ -34,13 +34,15 @@ end
 
 function vm.eachMetaValue(source, callback)
     vm.eachMeta(source, function (mt)
-        vm.eachField(mt, function (src)
+        for _, src in ipairs(vm.getFields(mt)) do
             if vm.getKeyName(src) == 's|__index' then
                 if src.value then
-                    vm.eachField(src.value, callback)
+                    for _, valueSrc in ipairs(vm.getFields(src.value)) do
+                        callback(valueSrc)
+                    end
                 end
             end
-        end)
+        end
     end)
 end
 

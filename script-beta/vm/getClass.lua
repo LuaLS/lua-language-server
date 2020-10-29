@@ -35,10 +35,10 @@ local function getClass(source, classes, depth, deep)
             classes[#classes+1] = value[1]
         end
     else
-        vm.eachField(value, function (src)
+        for _, src in ipairs(vm.getFields(value)) do
             local key = vm.getKeyName(src)
             if not key then
-                return
+                goto CONTINUE
             end
             local lkey = key:lower()
             if lkey == 's|type'
@@ -50,7 +50,8 @@ local function getClass(source, classes, depth, deep)
                     classes[#classes+1] = value[1]
                 end
             end
-        end)
+            ::CONTINUE::
+        end
     end
     if #classes ~= 0 then
         return

@@ -42,10 +42,3 @@ function vm.getRefs(source, deep)
         return cache
     end
 end
-
-function vm.eachRef(source, callback)
-    local results = vm.getRefs(source)
-    for i = 1, #results do
-        callback(results[i])
-    end
-end

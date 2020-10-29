@@ -1180,15 +1180,14 @@ function m.status(parentStatus, interface)
         cache     = parentStatus and parentStatus.cache       or {
             count = 0,
         },
-        depth     = parentStatus and parentStatus.depth       or 0,
+        depth     = parentStatus and (parentStatus.depth + 1) or 1,
         interface = parentStatus and parentStatus.interface   or {},
         locks     = parentStatus and parentStatus.locks       or {},
-        index     = parentStatus and (parentStatus.index + 1) or 1,
-        simple    = parentStatus and parentStatus.simple,
+        simple    = parentStatus and (parentStatus.simple or parentStatus.depth > 1),
         results   = {},
     }
-    status.lock = status.locks[status.index] or {}
-    status.locks[status.index] = status.lock
+    status.lock = status.locks[status.depth] or {}
+    status.locks[status.depth] = status.lock
     if interface then
         for k, v in pairs(interface) do
             status.interface[k] = v
@@ -2218,7 +2217,7 @@ end
 
 function m.getRefCache(status, obj, mode)
     local cache, globalCache
-    if status.index == 1 then
+    if status.depth == 1 then
         globalCache = status.interface.cache and status.interface.cache() or {}
     end
     cache = status.cache.refCache or {}
@@ -2257,7 +2256,6 @@ function m.searchRefs(status, obj, mode)
         return
     end
 
-    status.depth = status.depth + 1
     -- 检查单步引用
     local res = m.getStepRef(status, obj, mode)
     if res then
@@ -2279,8 +2277,6 @@ function m.searchRefs(status, obj, mode)
             logWarn('status.depth overflow')
         end
     end
-
-    status.depth = status.depth - 1
 
     m.cleanResults(status.results)
 
@@ -3090,14 +3086,11 @@ function m.inferCheckBinary(status, source)
 end
 
 function m.inferByDef(status, obj)
-    if status.index > 3 then
-        --return
-    end
     local mark = {}
-    local newStatus = m.status(nil, status.interface)
+    local newStatus = m.status(status, status.interface)
     m.searchRefs(newStatus, obj, 'def')
     for _, src in ipairs(newStatus.results) do
-        local inferStatus = m.status(status)
+        local inferStatus = m.status(newStatus)
         m.searchInfer(inferStatus, src)
         for _, infer in ipairs(inferStatus.results) do
             if not mark[infer.source] then

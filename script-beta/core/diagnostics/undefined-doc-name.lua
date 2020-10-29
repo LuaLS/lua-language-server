@@ -6,18 +6,19 @@ local vm      = require 'vm'
 
 -- TODO
 local builtin = {
-    ['any']      = true,
-    ['nil']      = true,
-    ['void']     = true,
-    ['boolean']  = true,
-    ['number']   = true,
-    ['integer']  = true,
-    ['thread']   = true,
-    ['table']    = true,
-    ['file']     = true,
-    ['string']   = true,
-    ['userdata'] = true,
-    ['function'] = true,
+    ['any']           = true,
+    ['nil']           = true,
+    ['void']          = true,
+    ['boolean']       = true,
+    ['number']        = true,
+    ['integer']       = true,
+    ['thread']        = true,
+    ['table']         = true,
+    ['file']          = true,
+    ['string']        = true,
+    ['userdata']      = true,
+    ['lightuserdata'] = true,
+    ['function']      = true,
 }
 
 return function (uri, callback)

@@ -49,9 +49,9 @@ local function getField(src)
             end
         end
     end
-    local tp = vm.getInferType(src, 'simple')
-    local class = vm.getClass(src, 'simple')
-    local literal = vm.getInferLiteral(src, 'simple')
+    local tp = vm.getInferType(src)
+    local class = vm.getClass(src)
+    local literal = vm.getInferLiteral(src)
     if type(literal) == 'string' and #literal >= 50 then
         literal = literal:sub(1, 47) .. '...'
     end

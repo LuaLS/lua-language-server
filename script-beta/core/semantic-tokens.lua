@@ -15,7 +15,7 @@ Care['setglobal'] = function (source, results)
     }
 end
 Care['getglobal'] = function (source, results)
-    local lib = vm.getLibrary(source, 'simple')
+    local lib = vm.getLibrary(source)
     if lib then
         if source[1] == '_G' then
             return
@@ -67,7 +67,7 @@ Care['getlocal'] = function (source, results)
     end
     -- 3. 不是函数的局部变量
     local hasFunc
-    for _, def in ipairs(vm.getDefs(loc, 'simple')) do
+    for _, def in ipairs(vm.getDefs(loc)) do
         if def.type == 'function'
         or (def.type == 'library' and def.value.type == 'function') then
             hasFunc = true

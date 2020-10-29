@@ -6,7 +6,7 @@ local define = require 'proto.define'
 local await  = require 'await'
 
 local function countLibraryArgs(source)
-    local lib = vm.getLibrary(source, 'simple')
+    local lib = vm.getLibrary(source)
     if not lib then
         return nil
     end
@@ -63,7 +63,7 @@ return function (uri, callback)
 
         local func = source.node
         local funcArgs
-        local defs = vm.getDefs(func, 'simple')
+        local defs = vm.getDefs(func)
         for _, def in ipairs(defs) do
             if def.type == 'function' then
                 local args = countFuncArgs(def)

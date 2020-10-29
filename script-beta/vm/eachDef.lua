@@ -4,9 +4,7 @@ local files = require 'files'
 local util  = require 'utility'
 local await = require 'await'
 
-local m = {}
-
-function m.eachDef(source, simple)
+local function eachDef(source, simple)
     local results = {}
     local lock = vm.lock('eachDef', source)
     if not lock then
@@ -27,19 +25,19 @@ function m.eachDef(source, simple)
     return results
 end
 
-function vm.getDefs(source, simple)
+function vm.getDefs(source, deep)
     if guide.isGlobal(source) then
         local name = guide.getKeyName(source)
         local cache =  vm.getCache('eachDefOfGlobal')[name]
                     or vm.getCache('eachDef')[source]
-                    or m.eachDef(source)
+                    or eachDef(source, deep)
         vm.getCache('eachDefOfGlobal')[name] = cache
         return cache
-    elseif simple then
-        return m.eachDef(source, simple)
+    elseif deep then
+        return eachDef(source, deep)
     else
         local cache =  vm.getCache('eachDef')[source]
-                    or m.eachDef(source)
+                    or eachDef(source, deep)
         vm.getCache('eachDef')[source] = cache
         return cache
     end

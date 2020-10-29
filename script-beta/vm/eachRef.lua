@@ -3,7 +3,7 @@ local guide  = require 'parser.guide'
 local util   = require 'utility'
 local await  = require 'await'
 
-local function getRefs(source, simple)
+local function getRefs(source, deep)
     local results = {}
     local lock = vm.lock('eachRef', source)
     if not lock then
@@ -13,7 +13,7 @@ local function getRefs(source, simple)
     await.delay()
 
     local clock = os.clock()
-    local myResults, count = guide.requestReference(source, vm.interface, simple)
+    local myResults, count = guide.requestReference(source, vm.interface, deep)
     if DEVELOP and os.clock() - clock > 0.1 then
         log.warn('requestReference', count, os.clock() - clock, guide.getUri(source), util.dump(source, { deep = 1 }))
     end
@@ -24,19 +24,19 @@ local function getRefs(source, simple)
     return results
 end
 
-function vm.getRefs(source, simple)
+function vm.getRefs(source, deep)
     if guide.isGlobal(source) then
         local name = guide.getKeyName(source)
         local cache =  vm.getCache('eachRefOfGlobal')[name]
                     or vm.getCache('eachRef')[source]
-                    or getRefs(source)
+                    or getRefs(source, deep)
         vm.getCache('eachRefOfGlobal')[name] = cache
         return cache
-    elseif simple then
-        return getRefs(source, simple)
+    elseif deep then
+        return getRefs(source, deep)
     else
         local cache =  vm.getCache('eachRef')[source]
-                    or getRefs(source)
+                    or getRefs(source, deep)
         vm.getCache('eachRef')[source] = cache
         return cache
     end

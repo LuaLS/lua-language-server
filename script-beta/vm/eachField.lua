@@ -20,7 +20,7 @@ local function eachFieldOfLibrary(results)
     end
 end
 
-local function eachField(source)
+local function eachField(source, deep)
     local unlock = vm.lock('eachField', source)
     if not unlock then
         return
@@ -34,7 +34,7 @@ local function eachField(source)
     end
 
     await.delay()
-    local results = guide.requestFields(source, vm.interface)
+    local results = guide.requestFields(source, vm.interface, deep)
     if source.special == '_G' then
         eachFieldOfLibrary(results)
     end
@@ -46,17 +46,19 @@ local function eachField(source)
     return results
 end
 
-function vm.getFields(source)
+function vm.getFields(source, deep)
     if guide.isGlobal(source) then
         local name = guide.getKeyName(source)
         local cache =  vm.getCache('eachFieldOfGlobal')[name]
                     or vm.getCache('eachField')[source]
-                    or eachField(source)
+                    or eachField(source, deep)
         vm.getCache('eachFieldOfGlobal')[name] = cache
         return cache
+    elseif deep then
+        return eachField(source, deep)
     else
         local cache =  vm.getCache('eachField')[source]
-                    or eachField(source)
+                    or eachField(source, deep)
         vm.getCache('eachField')[source] = cache
         return cache
     end

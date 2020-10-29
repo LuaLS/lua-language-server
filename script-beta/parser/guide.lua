@@ -1183,9 +1183,12 @@ function m.status(parentStatus, interface)
         depth     = parentStatus and (parentStatus.depth + 1) or 1,
         interface = parentStatus and parentStatus.interface   or {},
         locks     = parentStatus and parentStatus.locks       or {},
-        simple    = parentStatus and (parentStatus.simple or parentStatus.depth > 1),
+        deep      = parentStatus and parentStatus.deep,
         results   = {},
     }
+    if status.depth >= 3 then
+        status.deep = false
+    end
     status.lock = status.locks[status.depth] or {}
     status.locks[status.depth] = status.lock
     if interface then
@@ -1297,7 +1300,7 @@ function m.checkSameSimpleInValueOfTable(status, value, start, queue)
     end
 end
 
-function m.searchFields(status, obj, key, interface)
+function m.searchFields(status, obj, key, interface, deep)
     if obj.type == 'table' then
         local keyName = key and ('s|' .. key)
         local results = {}
@@ -1316,6 +1319,7 @@ function m.searchFields(status, obj, key, interface)
         return results
     else
         local newStatus = m.status(status, interface)
+        --newStatus.deep = deep
         local simple = m.getSimple(obj)
         if not simple then
             return {}
@@ -1981,7 +1985,7 @@ function m.checkSameSimple(status, simple, data, mode, results, queue)
             m.checkSameSimpleInValueOfCallMetaTable(status, ref, i, queue)
             -- 检查自己是特殊变量的分支的情况
             m.checkSameSimpleInSpecialBranch(status, ref, i, queue)
-            if cmode == 'ref' and not status.simple then
+            if cmode == 'ref' and status.deep then
                 -- 检查形如 { a = f } 的情况
                 m.checkSameSimpleAsTableField(status, ref, i, queue)
                 -- 检查形如 return m 的情况
@@ -3086,6 +3090,13 @@ function m.inferCheckBinary(status, source)
 end
 
 function m.inferByDef(status, obj)
+    if not status.cache.inferedDef then
+        status.cache.inferedDef = {}
+    end
+    if status.cache.inferedDef[obj] then
+        return
+    end
+    status.cache.inferedDef[obj] = true
     local mark = {}
     local newStatus = m.status(status, status.interface)
     m.searchRefs(newStatus, obj, 'def')
@@ -3488,7 +3499,7 @@ function m.searchInfer(status, obj)
     end
 
     local cache, makeCache
-    if not status.simple then
+    if status.deep then
         cache, makeCache = m.getRefCache(status, obj, 'infer')
     end
     if cache then
@@ -3517,9 +3528,7 @@ function m.searchInfer(status, obj)
         return
     end
 
-    if not status.simple then
-        m.inferByDef(status, obj)
-    end
+    m.inferByDef(status, obj)
     m.inferBySet(status, obj)
     m.inferByCall(status, obj)
     m.inferByGetTable(status, obj)
@@ -3537,9 +3546,9 @@ end
 --- 与 `return function` 形式。
 --- 不穿透 `setmetatable` ，考虑由
 --- 业务层进行反向 def 搜索。
-function m.requestReference(obj, interface, simple)
+function m.requestReference(obj, interface, deep)
     local status = m.status(nil, interface)
-    status.simple = simple
+    status.deep = deep
     -- 根据 field 搜索引用
     m.searchRefs(status, obj, 'ref')
 
@@ -3555,9 +3564,9 @@ end
 --- 请求对象的定义，包括 `a.b.c` 形式
 --- 与 `return function` 形式。
 --- 穿透 `setmetatable` 。
-function m.requestDefinition(obj, interface, simple)
+function m.requestDefinition(obj, interface, deep)
     local status = m.status(nil, interface)
-    status.simple = simple
+    status.deep = deep
     -- 根据 field 搜索定义
     m.searchRefs(status, obj, 'def')
 
@@ -3565,14 +3574,14 @@ function m.requestDefinition(obj, interface, simple)
 end
 
 --- 请求对象的域
-function m.requestFields(obj, interface)
-    return m.searchFields(nil, obj, nil, interface)
+function m.requestFields(obj, interface, deep)
+    return m.searchFields(nil, obj, nil, interface, deep)
 end
 
 --- 请求对象的类型推测
-function m.requestInfer(obj, interface, simple)
+function m.requestInfer(obj, interface, deep)
     local status = m.status(nil, interface)
-    status.simple = simple
+    status.deep = deep
     m.searchInfer(status, obj)
 
     return status.results, status.cache.count

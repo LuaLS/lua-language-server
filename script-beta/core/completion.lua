@@ -196,7 +196,7 @@ local function getSnip(source)
     if context <= 0 then
         return nil
     end
-    local defs = vm.getRefs(source, 'simple')
+    local defs = vm.getRefs(source)
     for _, def in ipairs(defs) do
         if def ~= source and def.type == 'function' then
             local uri = guide.getUri(def)

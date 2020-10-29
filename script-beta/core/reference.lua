@@ -71,10 +71,10 @@ return function (uri, offset)
 
     local results = {}
     vm.setSearchLevel(10)
-    vm.eachRef(source, function (src)
+    for _, src in ipairs(vm.getRefs(source, 'deep')) do
         local root = guide.getRoot(src)
         if not root then
-            return
+            goto CONTINUE
         end
         if     src.type == 'setfield'
         or     src.type == 'getfield'
@@ -88,13 +88,14 @@ return function (uri, offset)
         or     src.type == 'setmethod' then
             src = src.method
         elseif src.type == 'table' and src.parent.type ~= 'return' then
-            return
+            goto CONTINUE
         end
         results[#results+1] = {
             target = src,
             uri    = files.getOriginUri(root.uri),
         }
-    end)
+        ::CONTINUE::
+    end
 
     if #results == 0 then
         return nil

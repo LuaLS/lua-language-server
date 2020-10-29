@@ -36,7 +36,7 @@ local function asValue(source, title)
     local class   = vm.getClass(source)
     local literal = vm.getInferLiteral(source)
     local cont
-    if vm.hasInferType(source, 'table') then
+    if vm.hasInferType(source, 'table', 'deep') then
         cont = buildTable(source)
     end
     local pack = {}

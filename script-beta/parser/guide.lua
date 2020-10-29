@@ -1186,7 +1186,7 @@ function m.status(parentStatus, interface)
         deep      = parentStatus and parentStatus.deep,
         results   = {},
     }
-    if status.depth >= 3 then
+    if status.depth >= 5 then
         status.deep = false
     end
     status.lock = status.locks[status.depth] or {}
@@ -1319,7 +1319,7 @@ function m.searchFields(status, obj, key, interface, deep)
         return results
     else
         local newStatus = m.status(status, interface)
-        --newStatus.deep = deep
+        newStatus.deep = deep
         local simple = m.getSimple(obj)
         if not simple then
             return {}
@@ -2221,7 +2221,8 @@ end
 
 function m.getRefCache(status, obj, mode)
     local cache, globalCache
-    if status.depth == 1 then
+    if  status.depth == 1
+    and status.deep then
         globalCache = status.interface.cache and status.interface.cache() or {}
     end
     cache = status.cache.refCache or {}

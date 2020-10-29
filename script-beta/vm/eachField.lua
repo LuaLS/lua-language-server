@@ -51,15 +51,15 @@ function vm.getFields(source, deep)
         local name = guide.getKeyName(source)
         local cache =  vm.getCache('eachFieldOfGlobal')[name]
                     or vm.getCache('eachField')[source]
-                    or eachField(source, deep)
+                    or eachField(source, 'deep')
         vm.getCache('eachFieldOfGlobal')[name] = cache
         return cache
-    elseif not deep then
-        return eachField(source, deep)
     else
         local cache =  vm.getCache('eachField')[source]
                     or eachField(source, deep)
-        vm.getCache('eachField')[source] = cache
+        if deep then
+            vm.getCache('eachField')[source] = cache
+        end
         return cache
     end
 end

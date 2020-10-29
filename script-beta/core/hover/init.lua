@@ -8,7 +8,7 @@ local findSource = require 'core.find-source'
 local lang       = require 'language'
 
 local function getHoverAsFunction(source)
-    local values = vm.getInfers(source)
+    local values = vm.getInfers(source, 'deep')
     local desc   = getDesc(source)
     local labels = {}
     local defs = 0

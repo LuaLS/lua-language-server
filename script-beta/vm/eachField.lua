@@ -47,12 +47,16 @@ local function eachField(source, deep)
 end
 
 function vm.getFields(source, deep)
+    if ALL_DEEP then
+        deep = 'deep'
+    end
     if guide.isGlobal(source) then
         local name = guide.getKeyName(source)
         local cache =  vm.getCache('eachFieldOfGlobal')[name]
                     or vm.getCache('eachField')[source]
                     or eachField(source, 'deep')
         vm.getCache('eachFieldOfGlobal')[name] = cache
+        vm.getCache('eachField')[source] = cache
         return cache
     else
         local cache =  vm.getCache('eachField')[source]

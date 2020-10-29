@@ -1,11 +1,9 @@
 // Just some comment
 {
-    "Lua.diagnostics.globals": [ // Just some comment
-        // Just some comment
+    "Lua.diagnostics.globals": [
         "ERR",
         "OUT",
         "IN",
-        // Just some comment
         "log",
         "ac",
         "_G",

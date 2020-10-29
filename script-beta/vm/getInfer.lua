@@ -1,6 +1,7 @@
 local vm      = require 'vm.vm'
 local guide   = require 'parser.guide'
 local util    = require 'utility'
+local await   = require 'await'
 
 NIL = setmetatable({'<nil>'}, { __tostring = function () return 'nil' end })
 
@@ -52,16 +53,47 @@ function vm.getInferLiteral(source, deep)
     return table.concat(literals, '|')
 end
 
+local function getInfers(source, deep)
+    local results = {}
+    local lock = vm.lock('getInfers', source)
+    if not lock then
+        return results
+    end
+
+    await.delay()
+
+    local clock = os.clock()
+    local myResults, count = guide.requestInfer(source, vm.interface, deep)
+    if DEVELOP and os.clock() - clock > 0.1 then
+        log.warn('requestInfer', count, os.clock() - clock, guide.getUri(source), util.dump(source, { deep = 1 }))
+    end
+    vm.mergeResults(results, myResults)
+
+    lock()
+
+    return results
+end
+
 --- 获取对象的值
 --- 会尝试穿透函数调用
 function vm.getInfers(source, deep)
-    if not source then
-        return
+    if ALL_DEEP then
+        deep = 'deep'
     end
-    local clock = os.clock()
-    local infers = guide.requestInfer(source, vm.interface, deep)
-    if os.clock() - clock > 0.1 then
-        log.warn(('Request infer takes [%.3f]sec! %s %s'):format(os.clock() - clock, guide.getUri(source), util.dump(source, { deep = 1 })))
+    if guide.isGlobal(source) then
+        local name = guide.getKeyName(source)
+        local cache =  vm.getCache('getInfersOfGlobal')[name]
+                    or vm.getCache('getInfers')[source]
+                    or getInfers(source, 'deep')
+        vm.getCache('getInfersOfGlobal')[name] = cache
+        vm.getCache('getInfers')[source] = cache
+        return cache
+    else
+        local cache =  vm.getCache('getInfers')[source]
+                    or getInfers(source, deep)
+        if deep then
+            vm.getCache('getInfers')[source] = cache
+        end
+        return cache
     end
-    return infers
 end

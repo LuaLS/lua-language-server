@@ -172,20 +172,23 @@ end
 return function (source)
     local literals = {}
     local classes = {}
+    local clock = os.clock()
     for _, src in ipairs(vm.getFields(source, 'deep')) do
         local key = getKey(src)
         if not key then
             goto CONTINUE
         end
-        local class, literal = getField(src)
         if not classes[key] then
             classes[key] = {}
         end
         if not literals[key] then
             literals[key] = {}
         end
-        classes[key][#classes[key]+1] = class
-        literals[key][#literals[key]+1] = literal
+        if os.clock() - clock <= 1 then
+            local class, literal = getField(src)
+            classes[key][#classes[key]+1] = class
+            literals[key][#literals[key]+1] = literal
+        end
         ::CONTINUE::
     end
 

@@ -172,10 +172,10 @@ end
 return function (source)
     local literals = {}
     local classes = {}
-    vm.eachField(source, function (src)
+    for _, src in ipairs(vm.getFields(source, 'deep')) do
         local key = getKey(src)
         if not key then
-            return
+            goto CONTINUE
         end
         local class, literal = getField(src)
         if not classes[key] then
@@ -186,7 +186,8 @@ return function (source)
         end
         classes[key][#classes[key]+1] = class
         literals[key][#literals[key]+1] = literal
-    end)
+        ::CONTINUE::
+    end
 
     clearClasses(classes)
 

@@ -5,8 +5,8 @@ local util    = require 'utility'
 NIL = setmetatable({'<nil>'}, { __tostring = function () return 'nil' end })
 
 --- 是否包含某种类型
-function vm.hasType(source, type)
-    local defs = vm.getDefs(source)
+function vm.hasType(source, type, deep)
+    local defs = vm.getDefs(source, deep)
     for i = 1, #defs do
         local def = defs[i]
         local value = guide.getObjectValue(def) or def
@@ -18,8 +18,8 @@ function vm.hasType(source, type)
 end
 
 --- 是否包含某种类型
-function vm.hasInferType(source, type)
-    local infers = vm.getInfers(source)
+function vm.hasInferType(source, type, deep)
+    local infers = vm.getInfers(source, deep)
     for i = 1, #infers do
         local infer = infers[i]
         if infer.type == type then

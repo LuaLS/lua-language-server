@@ -54,7 +54,7 @@ function vm.getFields(source, deep)
                     or eachField(source, deep)
         vm.getCache('eachFieldOfGlobal')[name] = cache
         return cache
-    elseif deep then
+    elseif not deep then
         return eachField(source, deep)
     else
         local cache =  vm.getCache('eachField')[source]

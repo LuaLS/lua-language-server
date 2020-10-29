@@ -33,7 +33,7 @@ function vm.getDefs(source, deep)
                     or eachDef(source, deep)
         vm.getCache('eachDefOfGlobal')[name] = cache
         return cache
-    elseif deep then
+    elseif not deep then
         return eachDef(source, deep)
     else
         local cache =  vm.getCache('eachDef')[source]

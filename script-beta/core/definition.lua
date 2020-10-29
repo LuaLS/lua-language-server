@@ -125,21 +125,22 @@ return function (uri, offset)
     end
 
     vm.setSearchLevel(10)
-    vm.eachDef(source, function (src)
+    for _, src in ipairs(vm.getDefs(source, 'deep')) do
         local root = guide.getRoot(src)
         if not root then
-            return
+            goto CONTINUE
         end
         src = src.field or src.method or src.index or src
         if src.type == 'table' and src.parent.type ~= 'return' then
-            return
+            goto CONTINUE
         end
         results[#results+1] = {
             target = src,
             uri    = files.getOriginUri(root.uri),
             source = source,
         }
-    end)
+        ::CONTINUE::
+    end
 
     if #results == 0 then
         return nil

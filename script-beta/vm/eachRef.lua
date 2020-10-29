@@ -32,7 +32,7 @@ function vm.getRefs(source, deep)
                     or getRefs(source, deep)
         vm.getCache('eachRefOfGlobal')[name] = cache
         return cache
-    elseif deep then
+    elseif not deep then
         return getRefs(source, deep)
     else
         local cache =  vm.getCache('eachRef')[source]

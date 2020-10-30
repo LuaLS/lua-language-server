@@ -36,20 +36,7 @@ local function getKey(src)
     return ('[%s]'):format(key)
 end
 
-local function getField(src, marker)
-    if src.type == 'table'
-    or src.type == 'function' then
-        return nil
-    end
-    if src.parent then
-        if src.parent.type == 'tableindex'
-        or src.parent.type == 'setindex'
-        or src.parent.type == 'getindex' then
-            if src.parent.index == src then
-                src = src.parent
-            end
-        end
-    end
+local function getFieldFast(src)
     local value = guide.getObjectValue(src) or src
     if not value then
         return 'any'
@@ -81,14 +68,46 @@ local function getField(src, marker)
         end
         return value.type, util.viewLiteral(literal)
     end
-    marker()
-    local tp      = vm.getInferType(value)
-    local class   = vm.getClass(value)
-    local literal = vm.getInferLiteral(value)
+end
+
+local function getFieldFull(src)
+    local tp      = vm.getInferType(src)
+    local class   = vm.getClass(src)
+    local literal = vm.getInferLiteral(src)
     if type(literal) == 'string' and #literal >= 50 then
         literal = literal:sub(1, 47) .. '...'
     end
     return class or tp, literal
+end
+
+local function getField(src, timeUp, mark, key)
+    if src.type == 'table'
+    or src.type == 'function' then
+        return nil
+    end
+    if src.parent then
+        if src.parent.type == 'tableindex'
+        or src.parent.type == 'setindex'
+        or src.parent.type == 'getindex' then
+            if src.parent.index == src then
+                src = src.parent
+            end
+        end
+    end
+    local tp, literal
+    tp, literal = getFieldFast(src)
+    if tp then
+        return tp, literal
+    end
+    if timeUp or mark[key] then
+        return nil
+    end
+    mark[key] = true
+    tp, literal = getFieldFull(src)
+    if tp then
+        return tp, literal
+    end
+    return nil
 end
 
 local function buildAsHash(classes, literals)
@@ -213,27 +232,21 @@ return function (source)
         if not key then
             goto CONTINUE
         end
-        if mark[key] then
-            goto CONTINUE
-        end
         if not classes[key] then
             classes[key] = {}
         end
         if not literals[key] then
             literals[key] = {}
         end
-        if TEST or os.clock() - clock <= 5 then
-            local class, literal = getField(src, function ()
-                mark[key] = true
-            end)
-            if literal == 'nil' then
-                literal = nil
-            end
-            classes[key][#classes[key]+1] = class
-            literals[key][#literals[key]+1] = literal
-        else
+        if not TEST and os.clock() - clock > 5 then
             timeUp = true
         end
+        local class, literal = getField(src, timeUp, mark, key)
+        if literal == 'nil' then
+            literal = nil
+        end
+        classes[key][#classes[key]+1] = class
+        literals[key][#literals[key]+1] = literal
         ::CONTINUE::
     end
 

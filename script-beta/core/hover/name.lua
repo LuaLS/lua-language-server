@@ -17,14 +17,14 @@ local function asLocal(source)
 end
 
 local function asMethod(source)
-    local class = vm.getClass(source.node)
+    local class = vm.getClass(source.node, 'deep')
     local node = class or guide.getName(source.node) or '?'
     local method = guide.getName(source)
     return ('%s:%s'):format(node, method)
 end
 
 local function asField(source)
-    local class = vm.getClass(source.node)
+    local class = vm.getClass(source.node, 'deep')
     local node = class or guide.getName(source.node) or '?'
     local method = guide.getName(source)
     return ('%s.%s'):format(node, method)

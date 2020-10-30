@@ -19,13 +19,13 @@ local select       = select
 local osClock      = os.clock
 local DEVELOP      = _G.DEVELOP
 local log          = log
-local debug        = debug
+local _G           = _G
 
 local function logWarn(...)
     log.warn(...)
 end
 
-_ENV = nil
+local _ENV = nil
 
 local m = {}
 
@@ -3529,7 +3529,9 @@ function m.searchInfer(status, obj)
         return
     end
 
-    m.inferByDef(status, obj)
+    if status.deep then
+        m.inferByDef(status, obj)
+    end
     m.inferBySet(status, obj)
     m.inferByCall(status, obj)
     m.inferByGetTable(status, obj)

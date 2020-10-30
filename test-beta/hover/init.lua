@@ -181,7 +181,7 @@ local <?obj?> = setmetatable({}, mt)
 ]]
 [[
 local obj: class {
-    __index: class,
+    __index: table,
     name: string = "class",
 }
 ]]
@@ -196,7 +196,7 @@ local <?obj?> = setmetatable({}, mt)
 [[
 local obj: class {
     TYPE: string = "class",
-    __index: class,
+    __index: table,
 }
 ]]
 
@@ -210,7 +210,7 @@ local <?obj?> = setmetatable({}, mt)
 [[
 local obj: class {
     Class: string = "class",
-    __index: class,
+    __index: table,
 }
 ]]
 
@@ -487,7 +487,7 @@ local <?self?> = setmetatable({
 ]]
 [[
 local self: obj {
-    __index: obj,
+    __index: table,
     __name: string = "obj",
     id: integer = 1,
     remove: function,

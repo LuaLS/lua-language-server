@@ -30,7 +30,7 @@ local function getClass(source, classes, depth, deep)
         return
     end
     local value = guide.getObjectValue(source) or source
-    if deep and value == source then
+    if not deep then
         if value and value.type == 'string' then
             classes[#classes+1] = value[1]
         end

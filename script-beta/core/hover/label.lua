@@ -31,10 +31,10 @@ end
 
 local function asValue(source, title)
     local name    = buildName(source)
-    local infers  = vm.getInfers(source)
-    local type    = vm.getInferType(source)
-    local class   = vm.getClass(source)
-    local literal = vm.getInferLiteral(source)
+    local infers  = vm.getInfers(source, 'deep')
+    local type    = vm.getInferType(source, 'deep')
+    local class   = vm.getClass(source, 'deep')
+    local literal = vm.getInferLiteral(source, 'deep')
     local cont
     if vm.hasInferType(source, 'table', 'deep') then
         cont = buildTable(source)

@@ -30,7 +30,7 @@ function TEST(wanted)
         files.setText('', newScript)
         local source = getSource(pos)
         assert(source)
-        local result = vm.getInferType(source)
+        local result = vm.getInferType(source, 'deep')
         assert(wanted == result)
     end
 end

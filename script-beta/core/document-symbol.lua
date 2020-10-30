@@ -296,16 +296,12 @@ local function packSymbols(symbols)
 end
 
 return function (uri)
-    local clock = os.clock()
     local symbols = makeSymbol(uri)
     if not symbols then
         return nil
     end
-    log.debug('doc#1', uri, os.clock() - clock)
 
-    local clock = os.clock()
     local packedSymbols = packSymbols(symbols)
-    log.debug('doc#2', uri, os.clock() - clock)
 
     return packedSymbols
 end

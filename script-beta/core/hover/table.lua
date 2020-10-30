@@ -227,7 +227,8 @@ return function (source)
     local clock = os.clock()
     local timeUp
     local mark = {}
-    for _, src in ipairs(vm.getFields(source, 'deep')) do
+    local fields = vm.getFields(source, 'deep')
+    for _, src in ipairs(fields) do
         local key = getKey(src)
         if not key then
             goto CONTINUE
@@ -238,7 +239,7 @@ return function (source)
         if not literals[key] then
             literals[key] = {}
         end
-        if not TEST and os.clock() - clock > 5 then
+        if not TEST and os.clock() - clock > 3 then
             timeUp = true
         end
         local class, literal = getField(src, timeUp, mark, key)
@@ -276,7 +277,7 @@ return function (source)
     end
     -- TODO
     if timeUp then
-        result = '\n-- TODO: Too much time has been spent, type inference has been abandoned. Optimize later.\n' .. result
+        result = '\n--出于性能考虑，已禁用了部分类型推断。\n' .. result
     end
     return result
 end

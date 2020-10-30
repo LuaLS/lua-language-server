@@ -85,6 +85,10 @@ proto.on('initialize', function (params)
     end
     return {
         capabilities = cap.initer,
+        serverInfo   = {
+            name    = 'sumneko.lua',
+            version = 'beta',
+        },
     }
 end)
 

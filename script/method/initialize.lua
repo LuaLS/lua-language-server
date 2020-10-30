@@ -28,6 +28,10 @@ return function (lsp, params)
     end
 
     local server = {
+        serverInfo   = {
+            name    = 'sumneko.lua',
+            version = 'alpha',
+        },
         capabilities = {
             hoverProvider = true,
             definitionProvider = true,

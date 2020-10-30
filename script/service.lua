@@ -783,7 +783,10 @@ function mt:_loadProto()
         if not ok then
             break
         end
+        local null = json.null
+        json.null = nil
         local suc, proto = xpcall(json.decode, log.error, protoStream)
+        json.null = null
         if not suc then
             break
         end

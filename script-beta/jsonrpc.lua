@@ -49,7 +49,10 @@ function m.decode(reader, errHandle)
     if not content then
         return nil
     end
+    local null = json.null
+    json.null = nil
     local suc, res = pcall(json.decode, content)
+    json.null = null
     if not suc then
         errHandle('Proto parse error: ' .. res)
         return nil

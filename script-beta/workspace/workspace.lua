@@ -159,6 +159,8 @@ function m.awaitPreload()
     if not m.uri then
         return
     end
+    await.close 'preload'
+    await.setID 'preload'
     local progress = {
         max  = 0,
         read = 0,
@@ -185,6 +187,11 @@ function m.awaitPreload()
         end
         await.sleep(0.1)
     end
+
+    --for i = 1, 100 do
+    --    await.sleep(0.1)
+    --    log.info('sleep', i)
+    --end
 
     log.info('Preload finish.')
 
@@ -262,8 +269,7 @@ end
 function m.reload()
     files.removeAll()
     rpath.flush()
-    await.close 'preload'
-    await.call(m.awaitPreload, 'preload')
+    await.call(m.awaitPreload)
 end
 
 files.watch(function (ev, uri)

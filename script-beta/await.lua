@@ -100,6 +100,9 @@ function m.sleep(time)
     end
     local co = coroutine.running()
     timer.wait(time, function ()
+        if coroutine.status(co) == 'dead' then
+            return
+        end
         return m.checkResult(co, coroutine.resume(co))
     end)
     return coroutine.yield()

@@ -955,7 +955,7 @@ local function getLuaDocByContain(ast, offset)
         if not src.start then
             return
         end
-        if range > offset - src.start then
+        if range >= offset - src.start then
             range = offset - src.start
             result = src
         end
@@ -1005,6 +1005,17 @@ local function tryLuaDocBySource(source, results)
                 end
             end
         end
+    elseif source.type == 'doc.type.name' then
+        for _, doc in ipairs(vm.getDocTypes '*') do
+            if  (doc.type == 'doc.class.name' or doc.type == 'doc.alias.name')
+            and doc.parent ~= source.parent
+            and matchKey(source[1], doc[1]) then
+                results[#results+1] = {
+                    label       = doc[1],
+                    kind        = define.CompletionItemKind.Class,
+                }
+            end
+        end
     end
 end
 
@@ -1013,6 +1024,15 @@ local function tryLuaDocByErr(err, docState, results)
         for _, doc in ipairs(vm.getDocTypes '*') do
             if  doc.type == 'doc.class.name'
             and doc.parent ~= docState then
+                results[#results+1] = {
+                    label       = doc[1],
+                    kind        = define.CompletionItemKind.Class,
+                }
+            end
+        end
+    elseif err.type == 'LUADOC_MISS_TYPE_NAME' then
+        for _, doc in ipairs(vm.getDocTypes '*') do
+            if  (doc.type == 'doc.class.name' or doc.type == 'doc.alias.name') then
                 results[#results+1] = {
                     label       = doc[1],
                     kind        = define.CompletionItemKind.Class,

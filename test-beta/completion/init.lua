@@ -1188,14 +1188,8 @@ TEST [[
 ---@class ZABC
 ---@class ZBBC : $
 ]]
-{
-    {
-        label = 'ZABC',
-        kind = define.CompletionItemKind.Class,
-    },
-}
+(EXISTS)
 
-do return end
 TEST [[
 ---@class zabc
 local abcd
@@ -1253,6 +1247,7 @@ TEST [[
     },
 }
 
+do return end
 TEST [[
 ---@param $
 function f(a, b, c)

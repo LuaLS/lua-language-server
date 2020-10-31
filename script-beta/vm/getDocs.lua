@@ -3,6 +3,30 @@ local util    = require 'utility'
 local guide   = require 'parser.guide'
 local vm      = require 'vm.vm'
 
+local builtin = {}
+for _, name in ipairs {
+    'any'          ,
+    'nil'          ,
+    'void'         ,
+    'boolean'      ,
+    'number'       ,
+    'integer'      ,
+    'thread'       ,
+    'table'        ,
+    'file'         ,
+    'string'       ,
+    'userdata'     ,
+    'lightuserdata',
+    'function'     ,
+} do
+    builtin[#builtin+1] = {
+        type   = 'doc.class.name',
+        start  = 0,
+        finish = 0,
+        [1]    = name,
+    }
+end
+
 local function getTypesOfFile(uri)
     local types = {}
     local ast = files.getAst(uri)
@@ -43,6 +67,11 @@ local function getDocTypes(name)
                     results[#results+1] = source
                 end
             end
+        end
+    end
+    for _, source in ipairs(builtin) do
+        if name == '*' or name == source[1] then
+            results[#results+1] = source
         end
     end
     return results

@@ -36,13 +36,16 @@ local function asValue(source, title)
     local class   = vm.getClass(source, 'deep')
     local literal = vm.getInferLiteral(source, 'deep')
     local cont
-    if vm.hasInferType(source, 'table', 'deep') then
-        cont = buildTable(source)
+    if type ~= 'string' then
+        if #vm.getFields(source, 'deep') > 0
+        or vm.hasInferType(source, 'table', 'deep') then
+            cont = buildTable(source)
+        end
     end
     local pack = {}
     pack[#pack+1] = title
     pack[#pack+1] = name .. ':'
-    if cont then
+    if cont and type == 'table' then
         type = nil
     end
     if class then

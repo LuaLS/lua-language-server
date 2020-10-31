@@ -113,16 +113,16 @@ local <!mt!>
 local <?<!x!>?> = f()
 ]]
 
--- TODO
-do return end
 TEST [[
 ---@class Class
----@field <!name string!>
+---@field <!name!> string
 ---@field id integer
 local mt = {}
 mt.<?name?>
 ]]
 
+-- TODO
+do return end
 TEST [[
 ---@class loli
 local unit

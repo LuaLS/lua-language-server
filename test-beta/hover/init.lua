@@ -512,7 +512,15 @@ TEST [[
 print(io.<?stderr?>)
 ]]
 [[
-global io.stderr: FILE*
+global io.stderr: FILE* {
+    close: function,
+    flush: function,
+    lines: function,
+    read: function,
+    seek: function,
+    setvbuf: function,
+    write: function,
+}
 ]]
 
 TEST [[
@@ -1235,49 +1243,17 @@ function f(x: number?, y: boolean?)
   2. string?
 ]]
 
-do return end
 TEST [[
----@param x number {optional = 'after'}
----@param y boolean {optional = 'self'}
----@param z string
-function <?f?>(x, y, z) end
+---@class Class
+---@field x number
+---@field y number
+---@field z string
+local <?t?>
 ]]
-[=[
-function f([x: number [, y: boolean], z: string])
-]=]
-
-TEST [[
----@return string {name = 'key'}
----@return string {name = 'value'}
-function <?f?>() end
+[[
+local t: Class {
+    x: number,
+    y: number,
+    z: string,
+}
 ]]
-[=[
-function f()
-  -> key: string, value: string
-]=]
-
-TEST [[
----@return        {name = 'x', optional = 'after'}
----@return string {name = 'y', optional = 'self'}
----@return string {name = 'z'}
-function <?f?>() end
-]]
-[=[
-function f()
-  -> [x: any [, y: string], z: string]
-]=]
-
-TEST [[
----@return        {name = 'x', optional = 'after'}
----@return string {name = 'y', optional = 'self'}
----@return string {name = 'z'}
-function f()
-    return function (a, b)
-    end
-end
-
-<?f2?> = f()
-]]
-[=[
-function f2(a: any, b: any)
-]=]

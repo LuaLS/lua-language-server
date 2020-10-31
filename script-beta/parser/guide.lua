@@ -698,6 +698,8 @@ function m.getName(obj)
         return obj.class[1]
     elseif tp == 'doc.alias' then
         return obj.alias[1]
+    elseif tp == 'doc.field' then
+        return obj.field[1]
     end
     return m.getNameOfLiteral(obj)
 end
@@ -765,6 +767,12 @@ function m.getKeyName(obj)
     elseif tp == 'field'
     or     tp == 'method' then
         return 's|' .. obj[1]
+    elseif tp == 'doc.class' then
+        return 's|' .. obj.class[1]
+    elseif tp == 'doc.alias' then
+        return 's|' .. obj.alias[1]
+    elseif tp == 'doc.field' then
+        return 's|' .. obj.field[1]
     end
     return m.getKeyNameOfLiteral(obj)
 end
@@ -1313,8 +1321,10 @@ function m.searchFields(status, obj, key, interface, deep)
         return results
     elseif obj.type == 'library' then
         local results = {}
-        for i = 1, #obj.fields do
-            results[i] = obj.fields[i]
+        if obj.fields then
+            for i = 1, #obj.fields do
+                results[i] = obj.fields[i]
+            end
         end
         return results
     else
@@ -1464,6 +1474,8 @@ function m.checkSameSimpleByBindDocs(status, obj, start, queue, mode)
             end
         elseif doc.type == 'doc.overload' then
             results[#results+1] = doc.overload
+        elseif doc.type == 'doc.field' then
+            results[#results+1] = doc
         end
     end
     local mark = {}
@@ -1481,11 +1493,18 @@ function m.checkSameSimpleByBindDocs(status, obj, start, queue, mode)
                 end
             end
         end
-        queue[#queue+1] = {
-            obj   = res,
-            start = start,
-            force = true,
-        }
+        if res.type == 'doc.type.function' then
+            queue[#queue+1] = {
+                obj   = res,
+                start = start,
+                force = true,
+            }
+        elseif res.type == 'doc.field' then
+            queue[#queue+1] = {
+                obj   = res,
+                start = start + 1,
+            }
+        end
     end
     for _, res in ipairs(newStatus.results) do
         queue[#queue+1] = {
@@ -1877,7 +1896,8 @@ function m.pushResult(status, mode, ref, simple)
             results[#results+1] = ref
         elseif ref.type == 'library' then
             results[#results+1] = ref
-        elseif ref.type == 'doc.type.function' then
+        elseif ref.type == 'doc.type.function'
+        or     ref.type == 'doc.field' then
             results[#results+1] = ref
         end
         if ref.parent and ref.parent.type == 'return' then
@@ -1914,7 +1934,8 @@ function m.pushResult(status, mode, ref, simple)
             end
         elseif ref.type == 'library' then
             results[#results+1] = ref
-        elseif ref.type == 'doc.type.function' then
+        elseif ref.type == 'doc.type.function'
+            or ref.type == 'doc.field' then
             results[#results+1] = ref
         end
         if ref.parent and ref.parent.type == 'return' then
@@ -1946,7 +1967,8 @@ function m.pushResult(status, mode, ref, simple)
             end
         elseif ref.type == 'library' then
             results[#results+1] = ref
-        elseif ref.type == 'doc.type.function' then
+        elseif ref.type == 'doc.type.function'
+            or ref.type == 'doc.field' then
             results[#results+1] = ref
         end
     end
@@ -2609,6 +2631,13 @@ function m.inferCheckDoc(status, source)
     end
     if source.type == 'doc.type' then
         local results = m.getDocTypeNames(source)
+        for _, res in ipairs(results) do
+            status.results[#status.results+1] = res
+        end
+        return true
+    end
+    if source.type == 'doc.field' then
+        local results = m.getDocTypeNames(source.extends)
         for _, res in ipairs(results) do
             status.results[#status.results+1] = res
         end

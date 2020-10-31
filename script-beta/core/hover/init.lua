@@ -8,7 +8,7 @@ local findSource = require 'core.find-source'
 local lang       = require 'language'
 
 local function getHoverAsFunction(source)
-    local values = vm.getInfers(source, 'deep')
+    local values = vm.getDefs(source, 'deep')
     local desc   = getDesc(source)
     local labels = {}
     local defs = 0
@@ -18,8 +18,9 @@ local function getHoverAsFunction(source)
              or source.type == 'getmethod'
              or source.type == 'setmethod'
     for _, value in ipairs(values) do
-        if value.type == 'function' then
-            local label = getLabel(value.source, oop)
+        if value.type == 'function'
+        or value.type == 'doc.type.function' then
+            local label = getLabel(value, oop)
             if label then
                 defs = defs + 1
                 labels[label] = (labels[label] or 0) + 1

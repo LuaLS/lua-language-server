@@ -1198,6 +1198,22 @@ local <?x?> = f()
 local x: integer
 ]]
 
+TEST [[
+---@overload fun(y: boolean)
+---@param x number
+---@param y boolean
+---@param z string
+function f(x, y, z) end
+
+print(<?f?>)
+]]
+[[
+(2 个定义，2 个原型)
+(1) function (y: boolean)
+
+(1) function f(x: number, y: boolean, z: string)
+]]
+
 do return end
 TEST [[
 ---@param x number {optional = 'after'}

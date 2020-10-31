@@ -1480,13 +1480,12 @@ function m.checkSameSimpleByBindDocs(status, obj, start, queue, mode)
                     m.searchRefs(newStatus, ref, mode)
                 end
             end
-        else
-            queue[#queue+1] = {
-                obj   = res,
-                start = start,
-                force = true,
-            }
         end
+        queue[#queue+1] = {
+            obj   = res,
+            start = start,
+            force = true,
+        }
     end
     for _, res in ipairs(newStatus.results) do
         queue[#queue+1] = {
@@ -2709,6 +2708,14 @@ function m.inferCheckUpDoc(status, source)
                     end
                     return true
                 end
+            end
+        elseif doc.type == 'doc.overload' then
+            if source.value and source.value.type == 'function' then
+                local typeName = getDocTypeUnitName(doc.overload)
+                status.results[#status.results+1] = {
+                    type   = typeName,
+                    source = doc.overload,
+                }
             end
         end
     end

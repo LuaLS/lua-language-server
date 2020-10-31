@@ -453,6 +453,10 @@ local function parseParam()
     end
     result.start = getStart()
     result.extends = parseType(result)
+    if checkToken('symbol', '?', 1) then
+        nextToken()
+        result.optional = true
+    end
     if not result.extends then
         pushError {
             type   = 'LUADOC_MISS_PARAM_EXTENDS',
@@ -477,6 +481,10 @@ local function parseReturn()
         end
         if not result.start then
             result.start = docType.start
+        end
+        if checkToken('symbol', '?', 1) then
+            nextToken()
+            docType.optional = true
         end
         result.returns[#result.returns+1] = docType
         if not checkToken('symbol', ',', 1) then

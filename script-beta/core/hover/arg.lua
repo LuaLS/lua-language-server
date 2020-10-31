@@ -56,6 +56,18 @@ local function asLibrary(source, oop)
     return table.concat(args)
 end
 
+local function optionalArg(arg)
+    if not arg.bindDocs then
+        return false
+    end
+    local name = arg[1]
+    for _, doc in ipairs(arg.bindDocs) do
+        if doc.type == 'doc.param' and doc.param[1] == name then
+            return doc.optional
+        end
+    end
+end
+
 local function asFunction(source, oop)
     if not source.args then
         return ''
@@ -65,7 +77,11 @@ local function asFunction(source, oop)
         local arg = source.args[i]
         local name = arg.name or guide.getName(arg)
         if name then
-            args[i] = ('%s: %s'):format(name, vm.getInferType(arg))
+            args[i] = ('%s: %s%s'):format(
+                name,
+                vm.getInferType(arg),
+                optionalArg(arg) and '?' or ''
+            )
         else
             args[i] = ('%s'):format(vm.getInferType(arg))
         end

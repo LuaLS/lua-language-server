@@ -1222,6 +1222,19 @@ function f(x: boolean?)
   -> boolean?
 ]]
 
+TEST [[
+---@param x number?
+---@param y boolean?
+---@return table?, string?
+local function <?f?>(x, y)
+end
+]]
+[[
+function f(x: number?, y: boolean?)
+  -> table?
+  2. string?
+]]
+
 do return end
 TEST [[
 ---@param x number {optional = 'after'}

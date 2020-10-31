@@ -52,6 +52,7 @@ Symbol              <-  ({} {
                         /   '>'
                         /   '('
                         /   ')'
+                        /   '?'
                         } {})
                     ->  Symbol
 ]], {
@@ -291,6 +292,10 @@ local function  parseTypeUnitFunction()
         if not arg.extends then
             break
         end
+        if checkToken('symbol', '?', 1) then
+            nextToken()
+            arg.optional = true
+        end
         arg.finish = getFinish()
         typeUnit.args[#typeUnit.args+1] = arg
         if checkToken('symbol', ',', 1) then
@@ -303,9 +308,13 @@ local function  parseTypeUnitFunction()
     if checkToken('symbol', ':', 1) then
         nextToken()
         while true do
-            local rtn = parseType(arg)
+            local rtn = parseType(typeUnit)
             if not rtn then
                 break
+            end
+            if checkToken('symbol', '?', 1) then
+                nextToken()
+                rtn.optional = true
             end
             typeUnit.returns[#typeUnit.returns+1] = rtn
             if checkToken('symbol', ',', 1) then

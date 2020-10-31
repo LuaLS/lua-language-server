@@ -90,7 +90,11 @@ local function asDocFunction(source)
     for i = 1, #source.args do
         local arg = source.args[i]
         local name = arg.name[1]
-        args[i] = ('%s: %s'):format(name, vm.getInferType(arg.extends))
+        args[i] = ('%s: %s%s'):format(
+            name,
+            vm.getInferType(arg.extends),
+            arg.optional and '?' or ''
+        )
     end
     return table.concat(args, ', ')
 end

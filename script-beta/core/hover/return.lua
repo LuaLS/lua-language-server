@@ -126,7 +126,10 @@ local function asDocFunction(source)
     end
     local returns = {}
     for i, rtn in ipairs(source.returns) do
-        local rtnText = vm.getInferType(rtn)
+        local rtnText = ('%s%s'):format(
+            vm.getInferType(rtn),
+            rtn.optional and '?' or ''
+        )
         if i == 1 then
             returns[#returns+1] = ('  -> %s'):format(rtnText)
         else

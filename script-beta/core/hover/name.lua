@@ -71,6 +71,7 @@ end
 
 local function asDocFunction(source)
     local doc = guide.getParentType(source, 'doc.type')
+            or  guide.getParentType(source, 'doc.overload')
     if not doc or not doc.bindSources then
         return ''
     end

@@ -948,44 +948,77 @@ local function tryLuaDocCate(line, results)
     end
 end
 
-local function tryLuaDocClass(ast, text, offset, results)
-    local ok = guide.eachSourceContain(ast.ast.docs, offset, function (src)
-        if src.type == 'doc.extends.name' then
-            local myName = src[1]
-            local classDoc = src.parent.class
+local function getLuaDocByContain(ast, offset)
+    local result
+    local range = math.huge
+    guide.eachSourceContain(ast.ast.docs, offset, function (src)
+        if not src.start then
+            return
+        end
+        if range > offset - src.start then
+            range = offset - src.start
+            result = src
+        end
+    end)
+    return result
+end
+
+local function getLuaDocByErr(ast, text, start, offset)
+    local targetError
+    for _, err in ipairs(ast.errs) do
+        if  err.finish <= offset
+        and err.start >= start  then
+            if not text:sub(err.finish + 1, offset):find '%S' then
+                targetError = err
+                break
+            end
+        end
+    end
+    if not targetError then
+        return nil
+    end
+    local targetDoc
+    for i = #ast.ast.docs, 1, -1 do
+        local doc = ast.ast.docs[i]
+        if doc.finish <= targetError.start then
+            targetDoc = doc
+            break
+        end
+    end
+    if not targetDoc then
+        return nil
+    end
+    return targetError, targetDoc
+end
+
+local function tryLuaDocBySource(source, results)
+    if source.type == 'doc.extends.name' then
+        if source.parent.type == 'doc.class' then
             for _, doc in ipairs(vm.getDocTypes '*') do
                 if  doc.type == 'doc.class.name'
-                and classDoc ~= doc
-                and matchKey(myName, doc[1]) then
+                and doc.parent ~= source.parent
+                and matchKey(source[1], doc[1]) then
                     results[#results+1] = {
                         label       = doc[1],
                         kind        = define.CompletionItemKind.Class,
                     }
                 end
             end
-            return true
         end
-    end)
-    if ok then
-        return
     end
-    local symbol, soffset = findSymbol(text, offset)
-    if symbol == ':' then
-        local woffset = skipSpace(text, soffset - 1)
-        guide.eachSourceContain(ast.ast.docs, woffset, function (src)
-            if src.type == 'doc.class.name' then
-                for _, doc in ipairs(vm.getDocTypes '*') do
-                    if  doc.type == 'doc.class.name'
-                    and src ~= doc then
-                        results[#results+1] = {
-                            label       = doc[1],
-                            kind        = define.CompletionItemKind.Class,
-                        }
-                    end
-                end
-                return true
+end
+
+local function tryLuaDocByErr(err, docState, results)
+    if err.type == 'LUADOC_MISS_CLASS_EXTENDS_NAME' then
+        for _, doc in ipairs(vm.getDocTypes '*') do
+            if  doc.type == 'doc.class.name'
+            and doc.parent ~= docState then
+                results[#results+1] = {
+                    label       = doc[1],
+                    kind        = define.CompletionItemKind.Class,
+                }
             end
-        end)
+        end
     end
 end
 
@@ -1006,9 +1039,14 @@ local function tryLuaDoc(ast, text, offset, results)
         tryLuaDocCate(line, results)
         return
     end
-    if cate == 'class' then
-        tryLuaDocClass(ast, text, offset, results)
+    local source = getLuaDocByContain(ast, offset)
+    if source then
+        tryLuaDocBySource(source, results)
         return
+    end
+    local err, doc = getLuaDocByErr(ast, text, ln.start, offset)
+    if err then
+        tryLuaDocByErr(err, doc, results)
     end
 end
 

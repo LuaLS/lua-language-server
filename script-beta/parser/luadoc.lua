@@ -204,7 +204,7 @@ local function parseClass(parent)
     result.extends = parseName('doc.extends.name', result)
     if not result.extends then
         pushError {
-            type   = 'LUADOC_MISS_EXTENDS_NAME',
+            type   = 'LUADOC_MISS_CLASS_EXTENDS_NAME',
             start  = getFinish(),
             finish = getFinish(),
         }
@@ -569,7 +569,7 @@ local function parseGeneric()
             object.extends = parseName('doc.extends.name', object)
             if not object.extends then
                 pushError {
-                    type   = 'LUADOC_MISS_EXTENDS_NAME',
+                    type   = 'LUADOC_MISS_GENERIC_EXTENDS_NAME',
                     start  = getFinish(),
                     finish = getFinish(),
                 }

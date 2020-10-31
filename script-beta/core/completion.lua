@@ -936,11 +936,79 @@ local function isInComment(ast, offset)
     return false
 end
 
-local function tryLuaDoc(ast, text, offset, results)
-    if text:sub(offset - 3, offset) == '---@' then
-        for _, docType in ipairs {'class', 'type', 'alias', 'param', 'return', 'field', 'generic', 'vararg', 'overload'} do
-            
+local function tryLuaDocCate(line, results)
+    local word = line:sub(5)
+    for _, docType in ipairs {'class', 'type', 'alias', 'param', 'return', 'field', 'generic', 'vararg', 'overload'} do
+        if matchKey(word, docType) then
+            results[#results+1] = {
+                label       = docType,
+                kind        = define.CompletionItemKind.Event,
+            }
         end
+    end
+end
+
+local function tryLuaDocClass(ast, text, offset, results)
+    local ok = guide.eachSourceContain(ast.ast.docs, offset, function (src)
+        if src.type == 'doc.extends.name' then
+            local myName = src[1]
+            local classDoc = src.parent.class
+            for _, doc in ipairs(vm.getDocTypes '*') do
+                if  doc.type == 'doc.class.name'
+                and classDoc ~= doc
+                and matchKey(myName, doc[1]) then
+                    results[#results+1] = {
+                        label       = doc[1],
+                        kind        = define.CompletionItemKind.Class,
+                    }
+                end
+            end
+            return true
+        end
+    end)
+    if ok then
+        return
+    end
+    local symbol, soffset = findSymbol(text, offset)
+    if symbol == ':' then
+        local woffset = skipSpace(text, soffset - 1)
+        guide.eachSourceContain(ast.ast.docs, woffset, function (src)
+            if src.type == 'doc.class.name' then
+                for _, doc in ipairs(vm.getDocTypes '*') do
+                    if  doc.type == 'doc.class.name'
+                    and src ~= doc then
+                        results[#results+1] = {
+                            label       = doc[1],
+                            kind        = define.CompletionItemKind.Class,
+                        }
+                    end
+                end
+                return true
+            end
+        end)
+    end
+end
+
+local function tryLuaDoc(ast, text, offset, results)
+    local lines = files.getLines(ast.uri)
+    local row = guide.positionOf(lines, offset)
+    local ln = lines[row]
+    local line = text:sub(ln.start, offset)
+    if not line then
+        return
+    end
+    if line:sub(1, 4) ~= '---@' then
+        return
+    end
+    -- 尝试 ---@$
+    local cate = line:match('%a*', 5)
+    if #cate + 4 >= #line then
+        tryLuaDocCate(line, results)
+        return
+    end
+    if cate == 'class' then
+        tryLuaDocClass(ast, text, offset, results)
+        return
     end
 end
 

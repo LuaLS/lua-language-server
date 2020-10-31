@@ -1163,14 +1163,13 @@ TEST [[
 ]]
 (EXISTS)
 
-do return end
 TEST [[
 ---@cl$
 ]]
 {
     {
         label = 'class',
-        kind = define.CompletionItemKind.Keyword
+        kind = define.CompletionItemKind.Event
     }
 }
 
@@ -1183,12 +1182,20 @@ TEST [[
         label = 'ZABC',
         kind = define.CompletionItemKind.Class,
     },
+}
+
+TEST [[
+---@class ZABC
+---@class ZBBC : $
+]]
+{
     {
-        label = 'ZBBC',
+        label = 'ZABC',
         kind = define.CompletionItemKind.Class,
     },
 }
 
+do return end
 TEST [[
 ---@class zabc
 local abcd

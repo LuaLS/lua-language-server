@@ -1158,12 +1158,12 @@ debug.setcsta$
     },
 }
 
-do return end
 TEST [[
 ---@$
 ]]
 (EXISTS)
 
+do return end
 TEST [[
 ---@cl$
 ]]

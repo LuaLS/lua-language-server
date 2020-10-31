@@ -927,6 +927,23 @@ local function tryCallArg(ast, text, offset, results)
     end
 end
 
+local function isInComment(ast, offset)
+    for _, comm in ipairs(ast.comms) do
+        if offset >= comm.start and offset <= comm.finish then
+            return true
+        end
+    end
+    return false
+end
+
+local function tryLuaDoc(ast, text, offset, results)
+    if text:sub(offset - 3, offset) == '---@' then
+        for _, docType in ipairs {'class', 'type', 'alias', 'param', 'return', 'field', 'generic', 'vararg', 'overload'} do
+            
+        end
+    end
+end
+
 local function completion(uri, offset)
     local ast = files.getAst(uri)
     local text = files.getText(uri)
@@ -934,11 +951,15 @@ local function completion(uri, offset)
     clearStack()
     vm.setSearchLevel(3)
     if ast then
-        trySpecial(ast, text, offset, results)
-        tryWord(ast, text, offset, results)
-        tryIndex(ast, text, offset, results)
-        trySymbol(ast, text, offset, results)
-        tryCallArg(ast, text, offset, results)
+        if isInComment(ast, offset) then
+            tryLuaDoc(ast, text, offset, results)
+        else
+            trySpecial(ast, text, offset, results)
+            tryWord(ast, text, offset, results)
+            tryIndex(ast, text, offset, results)
+            trySymbol(ast, text, offset, results)
+            tryCallArg(ast, text, offset, results)
+        end
     else
         local word = findWord(text, offset)
         if word then

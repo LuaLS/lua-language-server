@@ -1210,7 +1210,6 @@ print(<?f?>)
 [[
 (2 个定义，2 个原型)
 (1) function (y: boolean)
-
 (1) function f(x: number, y: boolean, z: string)
 ]]
 

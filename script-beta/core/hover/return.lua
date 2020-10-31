@@ -121,8 +121,8 @@ local function asFunction(source)
 end
 
 local function asDocFunction(source)
-    if not source.returns then
-        return ''
+    if not source.returns or #source.returns == 0 then
+        return nil
     end
     local returns = {}
     for i, rtn in ipairs(source.returns) do

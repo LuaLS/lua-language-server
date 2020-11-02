@@ -121,6 +121,12 @@ local mt = {}
 mt.<?name?>
 ]]
 
+TEST [[
+---@alias <!A!> string
+
+---@type <?A?>
+]]
+
 -- TODO
 do return end
 TEST [[

@@ -1257,3 +1257,29 @@ local t: Class {
     z: string,
 }
 ]]
+
+TEST [[
+---@class A
+
+---@type <?A?>
+]]
+[[
+class A
+]]
+
+TEST [[
+---@type string | "'enum1'" | "'enum2'"
+local <?t?>
+]]
+[[
+local t: string|'enum1'|'enum2'
+]]
+
+TEST [[
+---@alias A string | "'enum1'" | "'enum2'"
+
+---@type <?A?>
+]]
+[[
+展开为 string|'enum1'|'enum2'
+]]

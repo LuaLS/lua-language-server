@@ -29,6 +29,19 @@ local function asDocFunction(source)
     return table.concat(lines, '\n')
 end
 
+local function asDocTypeName(source)
+    for _, doc in ipairs(vm.getDocTypes(source[1])) do
+        if doc.type == 'doc.class.name' then
+            return 'class ' .. source[1]
+        end
+        if doc.type == 'doc.alias.name' then
+            local extends = doc.parent.extends
+            -- TODO
+            return '展开为 ' .. vm.getInferType(extends)
+        end
+    end
+end
+
 local function asValue(source, title)
     local name    = buildName(source)
     local infers  = vm.getInfers(source, 'deep')
@@ -175,5 +188,7 @@ return function (source, oop)
         return asLibrary(source)
     elseif source.type == 'doc.type.function' then
         return asDocFunction(source)
+    elseif source.type == 'doc.type.name' then
+        return asDocTypeName(source)
     end
 end

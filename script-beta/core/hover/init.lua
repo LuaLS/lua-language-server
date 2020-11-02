@@ -79,7 +79,20 @@ local function getHoverAsValue(source)
     }
 end
 
+local function getHoverAsDocName(source)
+    local label = getLabel(source)
+    local desc  = getDesc(source)
+    return {
+        label       = label,
+        source      = source,
+        description = desc,
+    }
+end
+
 local function getHover(source)
+    if source.type == 'doc.type.name' then
+        return getHoverAsDocName(source)
+    end
     vm.setSearchLevel(5)
     local isFunction = vm.hasInferType(source, 'function', 'deep')
     if isFunction then
@@ -90,15 +103,16 @@ local function getHover(source)
 end
 
 local accept = {
-    ['local']     = true,
-    ['setlocal']  = true,
-    ['getlocal']  = true,
-    ['setglobal'] = true,
-    ['getglobal'] = true,
-    ['field']     = true,
-    ['method']    = true,
-    ['string']    = true,
-    ['number']    = true,
+    ['local']         = true,
+    ['setlocal']      = true,
+    ['getlocal']      = true,
+    ['setglobal']     = true,
+    ['getglobal']     = true,
+    ['field']         = true,
+    ['method']        = true,
+    ['string']        = true,
+    ['number']        = true,
+    ['doc.type.name'] = true,
 }
 
 local function getHoverByUri(uri, offset)

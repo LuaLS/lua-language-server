@@ -50,7 +50,12 @@ function TEST(script, ...)
     files.removeAll()
     local new_script, target = catch_target(script, ...)
     files.setText('', new_script)
-    local datas = core('') or {}
+    local datas = {}
+    core('', function (results)
+        for _, res in ipairs(results) do
+            datas[#datas+1] = res
+        end
+    end)
     local results = {}
     for i, data in ipairs(datas) do
         results[i] = { data.start, data.finish }

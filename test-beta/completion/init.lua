@@ -1346,6 +1346,7 @@ a any
     },
 }
 
+do return end
 TEST [[
 ---@param xyz Class
 ---@param xxx Class

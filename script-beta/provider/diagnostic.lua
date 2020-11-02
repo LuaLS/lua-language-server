@@ -133,22 +133,19 @@ function m.syntaxErrors(uri, ast)
     return results
 end
 
-function m.diagnostics(uri)
+function m.diagnostics(uri, diags)
     if not m._start then
-        return m.cache[uri]
+        return
     end
 
-    local diags = core(uri)
-    if not diags then
-        return nil
-    end
-
-    local results = {}
-    for _, diag in ipairs(diags) do
-        results[#results+1] = buildDiagnostic(uri, diag)
-    end
-
-    return results
+    core(uri, function (results)
+        if #results == 0 then
+            return
+        end
+        for i = 1, #results do
+            diags[#diags+1] = buildDiagnostic(uri, results[i])
+        end
+    end)
 end
 
 function m.doDiagnostic(uri)
@@ -163,22 +160,45 @@ function m.doDiagnostic(uri)
     end
 
     local syntax = m.syntaxErrors(uri, ast)
-    local diagnostics = m.diagnostics(uri)
-    local full = merge(syntax, diagnostics)
-    if not full then
-        m.clear(uri)
-        return
+    local diags = {}
+    if syntax then
+        for _, err in ipairs(syntax) do
+            diags[#diags+1] = err
+        end
     end
 
-    if util.equal(m.cache[uri], full) then
-        return
-    end
-    m.cache[uri] = full
+    local function pushResult()
+        local full = merge(syntax, diags)
+        if not full then
+            m.clear(uri)
+            return
+        end
 
-    proto.notify('textDocument/publishDiagnostics', {
-        uri = files.getOriginUri(uri),
-        diagnostics = full,
-    })
+        if util.equal(m.cache, full) then
+            return
+        end
+        m.cache[uri] = full
+
+        proto.notify('textDocument/publishDiagnostics', {
+            uri = files.getOriginUri(uri),
+            diagnostics = full,
+        })
+    end
+
+    if await.hasID 'diagnosticsAll' then
+        m.checkStepResult = nil
+    else
+        local clock = os.clock()
+        m.checkStepResult = function ()
+            if os.clock() - clock >= 0.2 then
+                pushResult()
+                clock = os.clock()
+            end
+        end
+    end
+
+    m.diagnostics(uri, diags)
+    pushResult()
 end
 
 function m.refresh(uri)
@@ -219,7 +239,13 @@ function m.start()
     m.diagnosticsAll()
 end
 
-function m.onDelay()
+function m.checkStepResult()
+    if await.hasID 'diagnosticsAll' then
+        return
+    end
+end
+
+function m.checkWorkspaceDiag()
     if not await.hasID 'diagnosticsAll' then
         return
     end
@@ -255,7 +281,10 @@ end)
 
 await.watch(function (ev, co)
     if ev == 'delay' then
-        return m.onDelay()
+        if m.checkStepResult then
+            m.checkStepResult()
+        end
+        return m.checkWorkspaceDiag()
     end
 end)
 

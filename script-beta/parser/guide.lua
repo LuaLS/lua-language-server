@@ -2489,7 +2489,7 @@ function m.inferCheckLiteralTableWithDocVararg(status, source)
     if vararg.type ~= 'varargs' then
         return
     end
-    local results = m.getVarargDocType(source)
+    local results = m.getVarargDocType(status, source)
     status.results[#status.results+1] = {
         type   = m.viewInferType(results) .. '[]',
         source = source,
@@ -2576,10 +2576,22 @@ function m.inferCheckLibrary(status, source)
     return true
 end
 
-local function getDocTypeUnitName(unit, genericCallback)
+local function getDocAliasExtends(status, name)
+    if not status.interface.docType then
+        return nil
+    end
+    for _, doc in ipairs(status.interface.docType(name)) do
+        if doc.type == 'doc.alias.name' then
+            return m.viewInferType(m.getDocTypeNames(status, doc.parent.extends))
+        end
+    end
+    return nil
+end
+
+local function getDocTypeUnitName(status, unit, genericCallback)
     local typeName
     if unit.type == 'doc.type.name' then
-        typeName = unit[1]
+        typeName = getDocAliasExtends(status, unit[1]) or unit[1]
     elseif unit.type == 'doc.type.function' then
         typeName = 'function'
     end
@@ -2596,17 +2608,17 @@ local function getDocTypeUnitName(unit, genericCallback)
     elseif unit.generic then
         typeName = ('%s<%s, %s>'):format(
             typeName,
-            m.viewInferType(m.getDocTypeNames(unit.key)),
-            m.viewInferType(m.getDocTypeNames(unit.value))
+            m.viewInferType(m.getDocTypeNames(status, unit.key)),
+            m.viewInferType(m.getDocTypeNames(status, unit.value))
         )
     end
     return typeName
 end
 
-function m.getDocTypeNames(doc, genericCallback)
+function m.getDocTypeNames(status, doc, genericCallback)
     local results = {}
     for _, unit in ipairs(doc.types) do
-        local typeName = getDocTypeUnitName(unit, genericCallback)
+        local typeName = getDocTypeUnitName(status, unit, genericCallback)
         results[#results+1] = {
             type   = typeName,
             source = unit,
@@ -2630,14 +2642,14 @@ function m.inferCheckDoc(status, source)
         return true
     end
     if source.type == 'doc.type' then
-        local results = m.getDocTypeNames(source)
+        local results = m.getDocTypeNames(status, source)
         for _, res in ipairs(results) do
             status.results[#status.results+1] = res
         end
         return true
     end
     if source.type == 'doc.field' then
-        local results = m.getDocTypeNames(source.extends)
+        local results = m.getDocTypeNames(status, source.extends)
         for _, res in ipairs(results) do
             status.results[#status.results+1] = res
         end
@@ -2645,7 +2657,7 @@ function m.inferCheckDoc(status, source)
     end
 end
 
-function m.getVarargDocType(source)
+function m.getVarargDocType(status, source)
     local func = m.getParentFunction(source)
     if not func then
         return
@@ -2658,7 +2670,7 @@ function m.getVarargDocType(source)
             if arg.bindDocs then
                 for _, doc in ipairs(arg.bindDocs) do
                     if doc.type == 'doc.vararg' then
-                        return m.getDocTypeNames(doc.vararg)
+                        return m.getDocTypeNames(status, doc.vararg)
                     end
                 end
             end
@@ -2670,7 +2682,7 @@ function m.inferCheckUpDocOfVararg(status, source)
     if not source.vararg then
         return
     end
-    local results = m.getVarargDocType(source)
+    local results = m.getVarargDocType(status, source)
     if not results then
         return
     end
@@ -2719,7 +2731,7 @@ function m.inferCheckUpDoc(status, source)
             end
             return true
         elseif doc.type == 'doc.type' then
-            local results = m.getDocTypeNames(doc)
+            local results = m.getDocTypeNames(status, doc)
             for _, res in ipairs(results) do
                 status.results[#status.results+1] = res
             end
@@ -2731,7 +2743,7 @@ function m.inferCheckUpDoc(status, source)
                 if source.parent.type == 'funcargs'
                 or source.parent.type == 'in'
                 or source.parent.type == 'loop' then
-                    local results = m.getDocTypeNames(doc.extends)
+                    local results = m.getDocTypeNames(status, doc.extends)
                     for _, res in ipairs(results) do
                         status.results[#status.results+1] = res
                     end
@@ -2740,7 +2752,7 @@ function m.inferCheckUpDoc(status, source)
             end
         elseif doc.type == 'doc.overload' then
             if source.value and source.value.type == 'function' then
-                local typeName = getDocTypeUnitName(doc.overload)
+                local typeName = getDocTypeUnitName(status, doc.overload)
                 status.results[#status.results+1] = {
                     type   = typeName,
                     source = doc.overload,
@@ -3335,7 +3347,7 @@ local function mergeFunctionReturnsByDoc(status, source, index, call)
     if not rtn then
         return
     end
-    local results = m.getDocTypeNames(rtn, function (typeName, typeUnit)
+    local results = m.getDocTypeNames(status, rtn, function (typeName, typeUnit)
         if not source.args or not call.args then
             return
         end
@@ -3410,7 +3422,7 @@ local function mergeDocTypeFunctionReturns(status, source, index)
                 if typeUnit.type == 'doc.type.function' then
                     local rtn = typeUnit.returns[index]
                     if rtn then
-                        local results = m.getDocTypeNames(rtn)
+                        local results = m.getDocTypeNames(status, rtn)
                         for _, res in ipairs(results) do
                             status.results[#status.results+1] = res
                         end

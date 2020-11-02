@@ -1283,3 +1283,13 @@ TEST [[
 [[
 展开为 string|'enum1'|'enum2'
 ]]
+
+TEST [[
+---@alias A string | "'enum1'" | "'enum2'"
+
+---@type A
+local <?t?>
+]]
+[[
+local t: string|'enum1'|'enum2'
+]]

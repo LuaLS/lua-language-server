@@ -9,6 +9,7 @@ m.coMap = setmetatable({}, { __mode = 'k' })
 m.idMap = {}
 m.delayQueue = {}
 m.delayQueueIndex = 1
+m.watchList = {}
 m._enable = true
 
 --- 设置错误处理器
@@ -89,6 +90,11 @@ function m.close(id)
     log.debug('Close await:', id, count)
 end
 
+function m.hasID(id, co)
+    co = co or coroutine.running()
+    return m.idMap[id] and m.idMap[id][co] ~= nil
+end
+
 --- 休眠一段时间
 ---@param time number
 function m.sleep(time)
@@ -139,6 +145,9 @@ function m.delay()
     end
     local co = coroutine.running()
     local current = m.coMap[co]
+    if m.onWatch('delay', co) == false then
+        return
+    end
     -- TODO
     if current.priority then
         return
@@ -182,6 +191,20 @@ end
 
 function m.disable()
     m._enable = false
+end
+
+--- 注册事件
+function m.watch(callback)
+    m.watchList[#m.watchList+1] = callback
+end
+
+function m.onWatch(ev, ...)
+    for _, callback in ipairs(m.watchList) do
+        local res = callback(ev, ...)
+        if res ~= nil then
+            return res
+        end
+    end
 end
 
 return m

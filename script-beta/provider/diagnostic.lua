@@ -11,6 +11,7 @@ local ws     = require 'workspace'
 local m = {}
 m._start = false
 m.cache = {}
+m.sleepRest = 0.0
 
 local function concat(t, sep)
     if type(t) ~= 'table' then
@@ -203,10 +204,11 @@ function m.diagnosticsAll()
     await.close 'diagnosticsAll'
     await.call(function ()
         await.sleep(delay)
+        m.diagnosticsAllClock = os.clock()
         local clock = os.clock()
         for uri in files.eachFile() do
-            await.delay()
             m.doDiagnostic(uri)
+            await.delay()
         end
         log.debug('全文诊断耗时：', os.clock() - clock)
     end, 'files.version', 'diagnosticsAll')
@@ -217,6 +219,30 @@ function m.start()
     m.diagnosticsAll()
 end
 
+function m.onDelay()
+    if not await.hasID 'diagnosticsAll' then
+        return
+    end
+    local currentClock = os.clock()
+    local passed = currentClock - m.diagnosticsAllClock
+    local speedRate = config.config.diagnostics.workspaceRate
+    if speedRate <= 0 or speedRate >= 100 then
+        return
+    end
+    local sleepTime = passed * (100 - speedRate) / speedRate + m.sleepRest
+    m.sleepRest = 0.0
+    if sleepTime < 0.001 then
+        return
+    end
+    if sleepTime > 0.1 then
+        m.sleepRest = sleepTime - 0.1
+        sleepTime = 0.1
+    end
+    await.sleep(sleepTime)
+    m.diagnosticsAllClock = os.clock()
+    return false
+end
+
 files.watch(function (ev, uri)
     if ev == 'remove' then
         m.clear(uri)
@@ -224,6 +250,12 @@ files.watch(function (ev, uri)
         m.refresh(uri)
     elseif ev == 'open' then
         m.doDiagnostic(uri)
+    end
+end)
+
+await.watch(function (ev, co)
+    if ev == 'delay' then
+        return m.onDelay()
     end
 end)
 

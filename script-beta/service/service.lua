@@ -4,6 +4,7 @@ local await  = require 'await'
 local timer  = require 'timer'
 local proto  = require 'proto'
 local vm     = require 'vm'
+local config = require 'config'
 
 local m = {}
 m.type = 'service'
@@ -133,13 +134,23 @@ function m.report()
 end
 
 function m.startTimer()
+    local clock = os.clock()
     while true do
         ::CONTINUE::
         pub.step()
         if await.step() then
+            local passed = os.clock() - clock
+            local cpu = config.config.misc.backGroundCPU
+            if cpu >= 1 and cpu < 100 then
+                local sleepRate = (100 - cpu) / cpu
+                local extraSleep = math.min(passed * sleepRate, 0.1)
+                thread.sleep(extraSleep)
+            end
+            clock = os.clock()
             goto CONTINUE
         end
         thread.sleep(0.001)
+        clock = os.clock()
         timer.update()
     end
 end

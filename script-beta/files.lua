@@ -358,8 +358,23 @@ function m.flushCache()
     for _, file in pairs(m.fileMap) do
         file.cacheActiveTime = math.huge
         file.ast = nil
+        file.lines = nil
         file.cache = {}
     end
+end
+
+function m.flushFileCache(uri)
+    if platform.OS == 'Windows' then
+        uri = uri:lower()
+    end
+    local file = m.fileMap[uri]
+    if not file then
+        return
+    end
+    file.cacheActiveTime = math.huge
+    file.ast = nil
+    file.lines = nil
+    file.cache = {}
 end
 
 local function init()

@@ -6,7 +6,7 @@ ROOT = fs.path(rootPath)
 LANG = LANG or 'en-US'
 
 debug.setcstacklimit(200)
-collectgarbage('generational', 10, 50)
+collectgarbage('generational', 10, 100)
 --collectgarbage('incremental', 120, 120, 0)
 
 log = require 'log'

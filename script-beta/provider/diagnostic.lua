@@ -258,6 +258,7 @@ function m.checkWorkspaceDiag()
     local sleepTime = passed * (100 - speedRate) / speedRate + m.sleepRest
     m.sleepRest = 0.0
     if sleepTime < 0.001 then
+        m.sleepRest = m.sleepRest + sleepTime
         return
     end
     if sleepTime > 0.1 then

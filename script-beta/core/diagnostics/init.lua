@@ -41,11 +41,17 @@ return function (uri, response)
         return nil
     end
 
+    local isOpen = files.isOpen(uri)
+
     for _, name in ipairs(diagList) do
         local level = define.DiagnosticDefaultSeverity[name]
+        if not isOpen and level == 'Hint' then
+            goto CONTINUE
+        end
         await.delay()
         local results = {}
         check(uri, name, level, results)
         response(results)
+        ::CONTINUE::
     end
 end

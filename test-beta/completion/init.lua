@@ -417,6 +417,18 @@ TEST [[
 ]]
 (EXISTS)
 
+TEST [[
+local zzz
+
+return 'aa' .. zz$
+]]
+{
+    {
+        label = 'zzz',
+        kind = define.CompletionItemKind.Variable,
+    },
+}
+
 TEST 'local s = "a:$"' (nil)
 
 TEST 'debug.$'

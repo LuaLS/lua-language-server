@@ -114,6 +114,10 @@ local function findParent(ast, text, offset)
         end
         local oop
         if char == '.' then
+            -- `..` 的情况
+            if text:sub(i-1, i-1) == '.' then
+                return nil, nil
+            end
             oop = false
         elseif char == ':' then
             oop = true

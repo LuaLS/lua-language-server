@@ -149,9 +149,6 @@ local ConfigTemplate = {
         enable          = {false, Boolean},
         path            = {'.vscode/lua-plugin/*.lua', String},
     },
-    misc = {
-        backGroundCPU   = {10, Integer},
-    }
 }
 
 local OtherTemplate = {

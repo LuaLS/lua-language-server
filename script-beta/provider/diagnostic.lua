@@ -185,8 +185,6 @@ function m.refresh(uri)
         return
     end
     await.call(function ()
-        -- 一旦文件的版本发生变化，就放弃这次诊断
-        await.delay()
         if uri then
             m.doDiagnostic(uri)
         end
@@ -198,8 +196,13 @@ function m.diagnosticsAll()
     if not m._start then
         return
     end
+    local delay = config.config.diagnostics.workspaceDelay / 1000
+    if delay < 0 then
+        return
+    end
     await.close 'diagnosticsAll'
     await.call(function ()
+        await.sleep(delay)
         local clock = os.clock()
         for uri in files.eachFile() do
             await.delay()
@@ -219,6 +222,8 @@ files.watch(function (ev, uri)
         m.clear(uri)
     elseif ev == 'update' then
         m.refresh(uri)
+    elseif ev == 'open' then
+        m.doDiagnostic(uri)
     end
 end)
 

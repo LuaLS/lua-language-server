@@ -112,6 +112,7 @@ local ConfigTemplate = {
             util.deepCopy(define.DiagnosticDefaultSeverity),
             Hash(String, String),
         },
+        workspaceDelay  = {0,    Integer},
     },
     workspace = {
         ignoreDir       = {{},      Str2Hash ';'},

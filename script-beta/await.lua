@@ -100,7 +100,7 @@ function m.sleep(time)
     end
     local co = coroutine.running()
     timer.wait(time, function ()
-        if coroutine.status(co) == 'dead' then
+        if coroutine.status(co) ~= 'suspended' then
             return
         end
         return m.checkResult(co, coroutine.resume(co))
@@ -121,7 +121,7 @@ function m.wait(callback, ...)
             return
         end
         waked = true
-        if coroutine.status(co) == 'dead' then
+        if coroutine.status(co) ~= 'suspended' then
             return
         end
         return m.checkResult(co, coroutine.resume(co, ...))

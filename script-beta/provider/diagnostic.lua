@@ -223,12 +223,12 @@ function m.onDelay()
     if not await.hasID 'diagnosticsAll' then
         return
     end
-    local currentClock = os.clock()
-    local passed = currentClock - m.diagnosticsAllClock
     local speedRate = config.config.diagnostics.workspaceRate
     if speedRate <= 0 or speedRate >= 100 then
         return
     end
+    local currentClock = os.clock()
+    local passed = currentClock - m.diagnosticsAllClock
     local sleepTime = passed * (100 - speedRate) / speedRate + m.sleepRest
     m.sleepRest = 0.0
     if sleepTime < 0.001 then

@@ -539,6 +539,7 @@ return function (self, lua, mode, version, options)
     LocalCount = 0
     Version = version
     Root = state.ast
+    Root.state = state
     Options = options
     state.ENVMode = ENVMode
     if type(state.ast) == 'table' then

@@ -87,7 +87,8 @@ local function findSymbol(text, offset)
             goto CONTINUE
         end
         if char == '.'
-        or char == ':' then
+        or char == ':'
+        or char == '(' then
             return char, i
         else
             return nil
@@ -588,6 +589,50 @@ local function checkProvideLocal(ast, word, start, results)
     end)
 end
 
+local function checkFunctionArgByDocParam(ast, word, start, results)
+    local func = guide.eachSourceContain(ast.ast, start, function (source)
+        if source.type == 'function' then
+            return source
+        end
+    end)
+    if not func then
+        return
+    end
+    local docs = func.bindDocs
+    if not docs then
+        return
+    end
+    local params = {}
+    for _, doc in ipairs(docs) do
+        if doc.type == 'doc.param' then
+            params[#params+1] = doc
+        end
+    end
+    local firstArg = func.args and func.args[1]
+    if not firstArg
+    or firstArg.start <= start and firstArg.finish >= start then
+        local firstParam = params[1]
+        if firstParam and matchKey(word, firstParam.param[1]) then
+            local label = {}
+            for _, param in ipairs(params) do
+                label[#label+1] = param.param[1]
+            end
+            results[#results+1] = {
+                label = table.concat(label, ', '),
+                kind  = define.CompletionItemKind.Snippet,
+            }
+        end
+    end
+    for _, doc in ipairs(params) do
+        if matchKey(word, doc.param[1]) then
+            results[#results+1] = {
+                label = doc.param[1],
+                kind  = define.CompletionItemKind.Interface,
+            }
+        end
+    end
+end
+
 local function isAfterLocal(text, start)
     local pos = skipSpace(text, start-1)
     local word = findWord(text, pos)
@@ -776,6 +821,7 @@ local function tryWord(ast, text, offset, results)
             end
         elseif isFuncArg(ast, offset) then
             checkProvideLocal(ast, word, start, results)
+            checkFunctionArgByDocParam(ast, word, start, results)
         else
             local afterLocal = isAfterLocal(text, start)
             local stop = checkKeyWord(ast, text, start, word, hasSpace, afterLocal, results)
@@ -813,6 +859,9 @@ local function trySymbol(ast, text, offset, results)
         if parent then
             checkField(ast, '', start, offset, parent, oop, results)
         end
+    end
+    if symbol == '(' then
+        checkFunctionArgByDocParam(ast, '', start, results)
     end
 end
 

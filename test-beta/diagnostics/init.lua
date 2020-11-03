@@ -50,6 +50,7 @@ function TEST(script, ...)
     files.removeAll()
     local new_script, target = catch_target(script, ...)
     files.setText('', new_script)
+    files.open('')
     local datas = {}
     core('', function (results)
         for _, res in ipairs(results) do

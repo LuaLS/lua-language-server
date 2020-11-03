@@ -7,6 +7,8 @@ local glob       = require 'glob'
 local platform   = require 'bee.platform'
 local await      = require 'await'
 local rpath      = require 'workspace.require-path'
+local proto      = require 'proto.proto'
+local lang       = require 'language'
 
 local m = {}
 m.type = 'workspace'
@@ -142,6 +144,19 @@ local function loadFileFactory(root, progress, isLibrary)
         if not files.isLua(uri) then
             return
         end
+        if progress.preload >= config.config.workspace.maxPreload then
+            if not m.hasHitMaxPreload then
+                m.hasHitMaxPreload = true
+                proto.notify('window/showMessage', {
+                    type = 3,
+                    message = lang.script('MWS_MAX_PRELOAD', config.config.workspace.maxPreload),
+                })
+            end
+            return
+        end
+        if not isLibrary then
+            progress.preload = progress.preload + 1
+        end
         progress.max = progress.max + 1
         pub.task('loadFile', uri, function (text)
             progress.read = progress.read + 1
@@ -162,8 +177,9 @@ function m.awaitPreload()
     await.close 'preload'
     await.setID 'preload'
     local progress = {
-        max  = 0,
-        read = 0,
+        max     = 0,
+        read    = 0,
+        preload = 0,
     }
     log.info('Preload start.')
     local nativeLoader    = loadFileFactory(m.path, progress)

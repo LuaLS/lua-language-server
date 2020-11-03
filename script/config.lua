@@ -108,6 +108,8 @@ local ConfigTemplate = {
             table.deepCopy(DiagnosticDefaultSeverity),
             Hash(String, String),
         },
+        workspaceDelay  = {0,    Integer},
+        workspaceRate   = {100,  Integer},
     },
     workspace = {
         ignoreDir       = {{},      Str2Hash ';'},

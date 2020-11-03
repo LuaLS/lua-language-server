@@ -931,17 +931,17 @@ local function tryCallArg(ast, text, offset, results)
     end
 end
 
-local function isInComment(ast, offset)
+local function getComment(ast, offset)
     for _, comm in ipairs(ast.comms) do
         if offset >= comm.start and offset <= comm.finish then
-            return true
+            return comm
         end
     end
-    return false
+    return nil
 end
 
 local function tryLuaDocCate(line, results)
-    local word = line:sub(5)
+    local word = line:sub(3)
     for _, docType in ipairs {'class', 'type', 'alias', 'param', 'return', 'field', 'generic', 'vararg', 'overload'} do
         if matchKey(word, docType) then
             results[#results+1] = {
@@ -1046,31 +1046,53 @@ local function tryLuaDocByErr(err, docState, results)
     end
 end
 
+local function tryLuaDocFeatures(line, text, ast, lines, offset, results)
+    if trim(line) == '---@param' then
+        local func = guide.eachSourceBetween(ast.ast, offset, math.huge, function (source)
+            if source.type == 'function' then
+                return source
+            end
+        end)
+        if not func or not func.args then
+            return
+        end
+        results[#results+1] = {
+            label      = table.concat(func.args, ', '),
+            kind       = define.CompletionItemKind.Snippet,
+        }
+    end
+end
+
 local function tryLuaDoc(ast, text, offset, results)
-    local lines = files.getLines(ast.uri)
-    local row = guide.positionOf(lines, offset)
-    local ln = lines[row]
-    local line = text:sub(ln.start, offset)
+    local comm = getComment(ast, offset)
+    local line = text:sub(comm.start, offset)
     if not line then
         return
     end
-    if line:sub(1, 4) ~= '---@' then
+    if line:sub(1, 2) ~= '-@' then
         return
     end
     -- 尝试 ---@$
-    local cate = line:match('%a*', 5)
-    if #cate + 4 >= #line then
+    local cate = line:match('%a*', 3)
+    if #cate + 2 >= #line then
         tryLuaDocCate(line, results)
         return
     end
+    -- 尝试一些其他特征
+    --if tryLuaDocFeatures(line, text, ast, lines, offset, results) then
+    --    return
+    --end
+    -- 根据输入中的source来补全
     local source = getLuaDocByContain(ast, offset)
     if source then
         tryLuaDocBySource(source, results)
         return
     end
-    local err, doc = getLuaDocByErr(ast, text, ln.start, offset)
+    -- 根据附近的错误消息来补全
+    local err, doc = getLuaDocByErr(ast, text, comm.start, offset)
     if err then
         tryLuaDocByErr(err, doc, results)
+        return
     end
 end
 
@@ -1081,7 +1103,7 @@ local function completion(uri, offset)
     clearStack()
     vm.setSearchLevel(3)
     if ast then
-        if isInComment(ast, offset) then
+        if getComment(ast, offset) then
             tryLuaDoc(ast, text, offset, results)
         else
             trySpecial(ast, text, offset, results)

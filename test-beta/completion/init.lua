@@ -1557,25 +1557,19 @@ f('$')
 ]]
 {
     {
-        label = "AAA",
-        filterText = 'AAA',
+        label = "'AAA'",
         kind = define.CompletionItemKind.EnumMember,
         textEdit = EXISTS,
-        additionalTextEdits = EXISTS,
     },
     {
-        label = "BBB",
-        filterText = 'BBB',
+        label = "'BBB'",
         kind = define.CompletionItemKind.EnumMember,
         textEdit = EXISTS,
-        additionalTextEdits = EXISTS,
     },
     {
-        label = "CCC",
-        filterText = 'CCC',
+        label = "'CCC'",
         kind = define.CompletionItemKind.EnumMember,
         textEdit = EXISTS,
-        additionalTextEdits = EXISTS,
     }
 }
 

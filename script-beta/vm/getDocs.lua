@@ -77,6 +77,28 @@ local function getDocTypes(name)
     return results
 end
 
+function vm.getDocEnums(doc, mark, results)
+    mark = mark or {}
+    if mark[doc] then
+        return nil
+    end
+    mark[doc] = true
+    results = results or {}
+    for _, enum in ipairs(doc.enums) do
+        results[#results+1] = enum
+    end
+    for _, unit in ipairs(doc.types) do
+        if unit.type == 'doc.type.name' then
+            for _, other in ipairs(vm.getDocTypes(unit[1])) do
+                if other.type == 'doc.alias.name' then
+                    vm.getDocEnums(other.parent.extends, mark, results)
+                end
+            end
+        end
+    end
+    return results
+end
+
 function vm.getDocTypes(name)
     local cache = vm.getCache('getDocTypes')[name]
     if cache ~= nil then

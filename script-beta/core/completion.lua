@@ -897,6 +897,26 @@ local function getCallEnums(source, index)
         end
         return enums
     end
+    if source.type == 'function' and source.bindDocs then
+        local arg = source.args and source.args[index]
+        if not arg then
+            return
+        end
+        for _, doc in ipairs(source.bindDocs) do
+            if  doc.type == 'doc.param'
+            and doc.param[1] == arg[1] then
+                local enums = {}
+                for _, enum in ipairs(vm.getDocEnums(doc.extends)) do
+                    enums[#enums+1] = {
+                        label       = enum[1],
+                        description = nil,
+                        kind        = define.CompletionItemKind.EnumMember,
+                    }
+                end
+                return enums
+            end
+        end
+    end
 end
 
 local function tryLabelInString(label, arg)

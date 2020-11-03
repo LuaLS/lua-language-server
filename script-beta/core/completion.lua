@@ -959,7 +959,8 @@ local function getLuaDocByContain(ast, offset)
         if not src.start then
             return
         end
-        if range >= offset - src.start then
+        if  range  >= offset - src.start
+        and offset <= src.finish then
             range = offset - src.start
             result = src
         end
@@ -989,13 +990,10 @@ local function getLuaDocByErr(ast, text, start, offset)
             break
         end
     end
-    if not targetDoc then
-        return nil
-    end
     return targetError, targetDoc
 end
 
-local function tryLuaDocBySource(source, results)
+local function tryLuaDocBySource(ast, offset, source, results)
     if source.type == 'doc.extends.name' then
         if source.parent.type == 'doc.class' then
             for _, doc in ipairs(vm.getDocTypes '*') do
@@ -1020,10 +1018,27 @@ local function tryLuaDocBySource(source, results)
                 }
             end
         end
+    elseif source.type == 'doc.param.name' then
+        local func = guide.eachSourceBetween(ast.ast, offset, math.huge, function (src)
+            if src.type == 'function' and src.start > offset then
+                return src
+            end
+        end)
+        if not func or not func.args then
+            return
+        end
+        for i, arg in ipairs(func.args) do
+            if matchKey(source[1], arg[1]) then
+                results[#results+1] = {
+                    label  = arg[1],
+                    kind   = define.CompletionItemKind.Interface,
+                }
+            end
+        end
     end
 end
 
-local function tryLuaDocByErr(err, docState, results)
+local function tryLuaDocByErr(ast, offset, err, docState, results)
     if err.type == 'LUADOC_MISS_CLASS_EXTENDS_NAME' then
         for _, doc in ipairs(vm.getDocTypes '*') do
             if  doc.type == 'doc.class.name'
@@ -1043,24 +1058,40 @@ local function tryLuaDocByErr(err, docState, results)
                 }
             end
         end
-    end
-end
-
-local function tryLuaDocFeatures(line, text, ast, lines, offset, results)
-    if trim(line) == '---@param' then
-        local func = guide.eachSourceBetween(ast.ast, offset, math.huge, function (source)
-            if source.type == 'function' then
-                return source
+    elseif err.type == 'LUADOC_MISS_PARAM_NAME' then
+        local func = guide.eachSourceBetween(ast.ast, offset, math.huge, function (src)
+            if src.type == 'function' and src.start > offset then
+                return src
             end
         end)
         if not func or not func.args then
             return
         end
+        local label = {}
+        local insertText = {}
+        for i, arg in ipairs(func.args) do
+            label[i] = arg[1]
+            if i == 1 then
+                insertText[i] = ('%s any'):format(arg[1])
+            else
+                insertText[i] = ('---@param %s any'):format(arg[1])
+            end
+        end
         results[#results+1] = {
-            label      = table.concat(func.args, ', '),
+            label      = table.concat(label, ', '),
             kind       = define.CompletionItemKind.Snippet,
+            insertText = table.concat(insertText, '\n'),
         }
+        for i, arg in ipairs(func.args) do
+            results[#results+1] = {
+                label  = arg[1],
+                kind   = define.CompletionItemKind.Interface,
+            }
+        end
     end
+end
+
+local function tryLuaDocFeatures(line, ast, comm, offset, results)
 end
 
 local function tryLuaDoc(ast, text, offset, results)
@@ -1079,19 +1110,19 @@ local function tryLuaDoc(ast, text, offset, results)
         return
     end
     -- 尝试一些其他特征
-    --if tryLuaDocFeatures(line, text, ast, lines, offset, results) then
-    --    return
-    --end
+    if tryLuaDocFeatures(line, ast, comm, offset, results) then
+        return
+    end
     -- 根据输入中的source来补全
     local source = getLuaDocByContain(ast, offset)
     if source then
-        tryLuaDocBySource(source, results)
+        tryLuaDocBySource(ast, offset, source, results)
         return
     end
     -- 根据附近的错误消息来补全
     local err, doc = getLuaDocByErr(ast, text, comm.start, offset)
     if err then
-        tryLuaDocByErr(err, doc, results)
+        tryLuaDocByErr(ast, offset, err, doc, results)
         return
     end
 end

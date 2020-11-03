@@ -1259,7 +1259,7 @@ TEST [[
     },
 }
 
-do return end
+Cared['insertText'] = true
 TEST [[
 ---@param $
 function f(a, b, c)
@@ -1284,6 +1284,18 @@ a any
     },
     {
         label = 'c',
+        kind = define.CompletionItemKind.Interface,
+    },
+}
+
+TEST [[
+---@param aa$
+function f(aaa, bbb, ccc)
+end
+]]
+{
+    {
+        label = 'aaa',
         kind = define.CompletionItemKind.Interface,
     },
 }
@@ -1345,6 +1357,13 @@ a any
         kind = define.CompletionItemKind.Interface,
     },
 }
+
+TEST [[
+---@param aaa $
+function f(aaa, bbb, ccc)
+end
+]]
+(EXISTS)
 
 do return end
 TEST [[

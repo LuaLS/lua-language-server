@@ -451,7 +451,8 @@ local function parseParam()
         }
         return nil
     end
-    result.start = getStart()
+    result.start  = result.param.start
+    result.finish = getFinish()
     result.extends = parseType(result)
     if checkToken('symbol', '?', 1) then
         nextToken()
@@ -463,7 +464,7 @@ local function parseParam()
             start  = getFinish(),
             finish = getFinish(),
         }
-        return nil
+        return result
     end
     result.finish = getFinish()
     return result

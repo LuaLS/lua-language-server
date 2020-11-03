@@ -161,11 +161,6 @@ function m.doDiagnostic(uri)
 
     local syntax = m.syntaxErrors(uri, ast)
     local diags = {}
-    if syntax then
-        for _, err in ipairs(syntax) do
-            diags[#diags+1] = err
-        end
-    end
 
     local function pushResult()
         local full = merge(syntax, diags)

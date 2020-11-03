@@ -664,7 +664,7 @@ local function convertTokens()
     end
 end
 
-local function buildLuaDoc(comment)
+local function buildLuaDoc(comment, nextComment)
     Offset = comment.start + 1
     local text = comment.text
     if text:sub(1, 1) ~= '-' then
@@ -686,6 +686,20 @@ local function buildLuaDoc(comment)
     else
         doc = text:sub(3)
     end
+
+    local finish = comment.start + #doc + 2
+    while true do
+        local nextComm = nextComment('peek')
+        if nextComm and nextComm.text:sub(1, 2) == '-|' then
+            nextComment()
+            local hold = nextComm.start - finish + 1
+            doc = doc .. (' '):rep(hold) .. nextComm.text:sub(2)
+            finish = nextComm.finish + 1
+        else
+            break
+        end
+    end
+
     parseTokens(doc)
     local result = convertTokens()
     if result then
@@ -699,7 +713,7 @@ local function isNextLine(lns, binded, doc)
         return false
     end
     local lastDoc = binded[#binded]
-    local lastRow = guide.positionOf(lns, lastDoc.start)
+    local lastRow = guide.positionOf(lns, lastDoc.finish)
     local newRow  = guide.positionOf(lns, doc.start)
     return newRow - lastRow == 1
 end
@@ -739,7 +753,7 @@ local function bindDoc(state, lns, binded)
         doc.bindSources = bindSources
     end
     bindGeneric(binded)
-    local row = guide.positionOf(lns, lastDoc.start)
+    local row = guide.positionOf(lns, lastDoc.finish)
     local start, finish = guide.lineRange(lns, row + 1)
     if start >= finish then
         -- 空行
@@ -793,8 +807,21 @@ return function (_, state)
 
     pushError = state.pushError
 
-    for _, comment in ipairs(comments) do
-        local doc = buildLuaDoc(comment)
+    local ci = 1
+    local function nextComment(peek)
+        local comment = comments[ci]
+        if not peek then
+            ci = ci + 1
+        end
+        return comment
+    end
+
+    while true do
+        local comment = nextComment()
+        if not comment then
+            break
+        end
+        local doc = buildLuaDoc(comment, nextComment)
         if doc then
             ast.docs[#ast.docs+1] = doc
             doc.parent = ast.docs

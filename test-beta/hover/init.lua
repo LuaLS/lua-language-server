@@ -1293,3 +1293,13 @@ local <?t?>
 [[
 local t: string|'enum1'|'enum2'
 ]]
+
+TEST [[
+---@type string
+---| "'enum1'"
+---| "'enum2'"
+local <?t?>
+]]
+[[
+local t: string|'enum1'|'enum2'
+]]

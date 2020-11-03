@@ -1584,7 +1584,6 @@ end)
 ]]
 (nil)
 
-do return end
 TEST [[
 --- JustTest
 ---@overload fun(list:table):string
@@ -1603,31 +1602,16 @@ zzz$
     {
         label = 'zzzzz',
         kind = define.CompletionItemKind.Function,
-        detail = '(function)(4 prototypes)',
-        description = {
-            kind = 'markdown',
-            value = [[
-```lua
-function zzzzz(list: table, sep: string, i: number, j: number)
-  -> string
-```
-JustTest
-```lua
-
-```
-
-]]
-        },
     },
     {
         label = 'zzzzz()',
         kind = define.CompletionItemKind.Snippet,
-        detail = '(function)(4 prototypes)',
         insertText = EXISTS,
-        description = EXISTS,
     }
 }
 
+Cared['detail'] = true
+Cared['description'] = true
 TEST [[
 --- abc
 zzz = 1
@@ -1637,14 +1621,16 @@ zz$
     {
         label = 'zzz',
         kind = define.CompletionItemKind.Enum,
-        detail = '(number) = 1',
-        description = {
-            kind = 'markdown',
-            value = 'abc',
-        }
+        detail = 'integer = 1',
+        description = [[
+```lua
+global zzz: integer = 1
+```
+ abc]],
     }
 }
 
+do return end
 TEST [[
 ---@param x string
 ---| "'选项1'" # 注释1

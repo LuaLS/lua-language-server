@@ -667,8 +667,16 @@ end
 local function buildLuaDoc(comment)
     Offset = comment.start + 1
     local text = comment.text
-    if text:sub(1, 2) ~= '-@' then
+    if text:sub(1, 1) ~= '-' then
         return
+    end
+    if text:sub(2, 2) ~= '@' then
+        return {
+            type    = 'doc.comment',
+            start   = comment.start,
+            finish  = comment.finish,
+            comment = comment,
+        }
     end
     local finishPos = text:find('@', 3)
     local doc, lastComment

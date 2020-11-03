@@ -180,9 +180,28 @@ local function tryLibrary(source)
     return md:string()
 end
 
+local function tryDocComment(source)
+    if not source.bindDocs then
+        return
+    end
+    local lines = {}
+    for _, doc in ipairs(source.bindDocs) do
+        if doc.type == 'doc.comment' then
+            lines[#lines+1] = doc.comment.text:sub(2)
+        end
+    end
+    if #lines == 0 then
+        return
+    end
+    local md = markdown()
+    md:add('md', table.concat(lines, '\n'))
+    return md:string()
+end
+
 return function (source)
     if source.type == 'string' then
         return asString(source)
     end
     return tryLibrary(source)
+        or tryDocComment(source)
 end

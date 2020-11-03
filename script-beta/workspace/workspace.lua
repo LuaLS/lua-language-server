@@ -283,7 +283,7 @@ function m.getRelativePath(uri)
 end
 
 function m.reload()
-    files.removeAll()
+    files.removeAllClosed()
     rpath.flush()
     await.call(m.awaitPreload)
 end

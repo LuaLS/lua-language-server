@@ -182,6 +182,21 @@ function m.removeAll()
     --m.notifyCache = {}
 end
 
+--- 移除所有关闭的文件
+function m.removeAllClosed()
+    m.globalVersion = m.globalVersion + 1
+    await.close('files.version')
+    for uri in pairs(m.fileMap) do
+        if not m.openMap[uri] then
+            m.fileMap[uri]  = nil
+            m.astMap[uri]   = nil
+            m.linesMap[uri] = nil
+            m.onWatch('remove', uri)
+        end
+    end
+    --m.notifyCache = {}
+end
+
 --- 遍历文件
 function m.eachFile()
     return pairs(m.fileMap)

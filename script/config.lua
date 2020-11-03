@@ -115,7 +115,7 @@ local ConfigTemplate = {
         ignoreDir       = {{},      Str2Hash ';'},
         ignoreSubmodules= {true,    Boolean},
         useGitIgnore    = {true,    Boolean},
-        maxPreload      = {300,     Integer},
+        maxPreload      = {1000,    Integer},
         preloadFileSize = {100,     Integer},
         library         = {{},      Hash(
                                         String,

@@ -20,20 +20,21 @@ local function readProtoHead(reader, errHandle)
     local head = {}
     while true do
         local line = reader 'L'
+        if line == nil then
+            break
+        end
         if line == '\r\n' then
             break
-        else
-            local k, v = line:match '^([^:]+)%s*%:%s*(.+)\r\n$'
-            if k then
-                if k == 'Content-Length' then
-                    v = tonumber(v)
-                end
-                head[k] = v
-            else
-                errHandle('Proto header error:', head)
-                break
-            end
         end
+        local k, v = line:match '^([^:]+)%s*%:%s*(.+)\r\n$'
+        if not k then
+            errHandle('Proto header error:', head)
+            break
+        end
+        if k == 'Content-Length' then
+            v = tonumber(v)
+        end
+        head[k] = v
     end
     return head
 end

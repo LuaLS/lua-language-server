@@ -988,6 +988,9 @@ local function tryCallArg(ast, text, offset, results)
     end
     local myResults = {}
     local argIndex, arg = getCallArgInfo(call, text, offset)
+    if arg and arg.type == 'function' then
+        return
+    end
     local defs = vm.getDefs(call.node, 'deep')
     for _, def in ipairs(defs) do
         local enums = getCallEnums(def, argIndex)

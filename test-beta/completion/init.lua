@@ -1584,6 +1584,7 @@ end)
 ]]
 (nil)
 
+do return end
 TEST [[
 --- JustTest
 ---@overload fun(list:table):string

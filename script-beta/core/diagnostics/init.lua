@@ -16,11 +16,15 @@ table.sort(diagList, function (a, b)
     return (diagLevel[a] or 0) < (diagLevel[b] or 0)
 end)
 
-local function check(uri, name, level, results)
+local function check(uri, name, results)
     if config.config.diagnostics.disable[name] then
         return
     end
-    level = config.config.diagnostics.severity[name] or level
+    local level =  config.config.diagnostics.severity[name]
+                or define.DiagnosticDefaultSeverity[name]
+    if level == 'Hint' and not files.isOpen(uri) then
+        return
+    end
     local severity = define.DiagnosticSeverity[level]
     local clock = os.clock()
     require('core.diagnostics.' .. name)(uri, function (result)
@@ -44,14 +48,9 @@ return function (uri, response)
     local isOpen = files.isOpen(uri)
 
     for _, name in ipairs(diagList) do
-        local level = define.DiagnosticDefaultSeverity[name]
-        if not isOpen and level == 'Hint' then
-            goto CONTINUE
-        end
         await.delay()
         local results = {}
-        check(uri, name, level, results)
+        check(uri, name, results)
         response(results)
-        ::CONTINUE::
     end
 end

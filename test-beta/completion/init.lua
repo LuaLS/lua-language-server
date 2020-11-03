@@ -1433,11 +1433,11 @@ end
 {
     {
         label = 'type',
-        kind = define.CompletionItemKind.Keyword,
+        kind = define.CompletionItemKind.Event,
     },
     {
         label = 'return',
-        kind = define.CompletionItemKind.Keyword,
+        kind = define.CompletionItemKind.Event,
     }
 }
 
@@ -1452,12 +1452,10 @@ mt.$
     {
         label = 'id',
         kind = define.CompletionItemKind.Field,
-        detail = EXISTS,
     },
     {
         label = 'name',
         kind = define.CompletionItemKind.Field,
-        detail = EXISTS,
     },
 }
 

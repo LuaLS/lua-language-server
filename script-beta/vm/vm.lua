@@ -14,7 +14,7 @@ local xpcall         = xpcall
 local mathHuge       = math.huge
 local collectgarbage = collectgarbage
 
-local _ENV = nil
+_ENV = nil
 
 ---@class vm
 local m = {}

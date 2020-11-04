@@ -25,7 +25,7 @@ local function logWarn(...)
     log.warn(...)
 end
 
-local _ENV = nil
+_ENV = nil
 
 local m = {}
 
@@ -810,7 +810,7 @@ end
 ---@return table|nil pathB
 function m.getPath(a, b, sameFunction)
     --- 首先测试双方在同一个函数内
-    if not sameFunction and m.getParentFunction(a) ~= m.getParentFunction(b) then
+    if sameFunction and m.getParentFunction(a) ~= m.getParentFunction(b) then
         return false
     end
     local mode

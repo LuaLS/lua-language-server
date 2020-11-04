@@ -181,6 +181,10 @@ local function tryLibrary(source)
 end
 
 local function tryDocComment(source)
+    if source.type == 'field'
+    or source.type == 'method' then
+        source = source.parent
+    end
     if not source.bindDocs then
         return
     end

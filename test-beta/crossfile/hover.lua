@@ -253,8 +253,6 @@ local t: {
     },
 }
 
--- 先屏蔽掉 emmy
-do return end
 TEST {
     {
         path = 'a.lua',
@@ -271,7 +269,7 @@ TEST {
     hover = {
         label = [[function f(x: number)]],
         name = 'f',
-        description = 'abc',
+        description = ' abc',
         args = EXISTS,
     }
 }
@@ -289,12 +287,13 @@ TEST {
         ]],
     },
     hover = {
-        label = [[global x: number = 1]],
+        label = [[global x: integer = 1]],
         name = 'x',
-        description = 'abc',
+        description = ' abc',
     }
 }
 
+do return end
 TEST {
     {
         path = 'a.lua',

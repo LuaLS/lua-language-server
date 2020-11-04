@@ -144,7 +144,6 @@ table.unpack {$}
 ]]
 (nil)
 
-do return end
 TEST [[
 ---@type fun(x: number, y: number):boolean
 local zzzz
@@ -153,7 +152,6 @@ zzzz($)
 {
     label = [[
 function zzzz(x: number, y: number)
-  -> boolean
 ]],
     arg = {15, 23},
 }

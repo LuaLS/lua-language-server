@@ -35,9 +35,6 @@ function TEST(wanted)
     end
 end
 
-config.config.runtime.version = 'Lua 5.4'
-config.config.intelliSense.searchDepth = 5
-
 TEST 'string' [[
 local <?var?> = '111'
 ]]

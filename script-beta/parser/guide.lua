@@ -1181,8 +1181,6 @@ function m.getSimple(obj, max)
     return simpleList
 end
 
-m.Version = 53
-
 function m.status(parentStatus, interface)
     local status = {
         cache     = parentStatus and parentStatus.cache       or {
@@ -1194,7 +1192,7 @@ function m.status(parentStatus, interface)
         deep      = parentStatus and parentStatus.deep,
         results   = {},
     }
-    local searchDepth = interface and interface.searchDepth or 0
+    local searchDepth = interface and interface.getSearchDepth() or 0
     if status.depth >= searchDepth then
         status.deep = false
     end

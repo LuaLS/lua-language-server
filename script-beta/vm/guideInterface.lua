@@ -4,6 +4,7 @@ local ws      = require 'workspace'
 local guide   = require 'parser.guide'
 local await   = require 'await'
 local library = require 'library'
+local config  = require 'config'
 
 local m = {}
 
@@ -121,14 +122,6 @@ function vm.interface.cache()
     return vm.getCache('cache')
 end
 
-function vm.setSearchLevel(n)
-    -- 只有在搜索等级由低变高时，才需要清空缓存
-    if n > vm.interface.searchLevel then
-        --vm.flushCache()
-    end
-    vm.interface.searchLevel = n
-end
-
-function vm.setSearchDepth(n)
-    vm.interface.setSearchDepth = n
+function vm.interface.getSearchDepth()
+    return config.config.intelliSense.searchDepth
 end

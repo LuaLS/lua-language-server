@@ -68,7 +68,6 @@ local function updateConfig()
     end
     if not util.equal(oldConfig.intelliSense, newConfig.intelliSense) then
         files.flushCache()
-        vm.setSearchDepth(newConfig.intelliSense.searchDepth)
     end
 
     if newConfig.completion.enable then

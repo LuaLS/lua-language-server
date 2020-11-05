@@ -37,6 +37,10 @@ local function main()
         print(('测试[%s]用时[%.3f]'):format(name, os.clock() - clock))
     end
 
+    local config = require 'config'
+    config.config.runtime.version = 'Lua 5.4'
+    config.config.intelliSense.searchDepth = 5
+
     test 'references'
     test 'definition'
     test 'type_inference'

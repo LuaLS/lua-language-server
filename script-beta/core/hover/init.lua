@@ -93,7 +93,6 @@ local function getHover(source)
     if source.type == 'doc.type.name' then
         return getHoverAsDocName(source)
     end
-    vm.setSearchLevel(5)
     local isFunction = vm.hasInferType(source, 'function', 'deep')
     if isFunction then
         return getHoverAsFunction(source)

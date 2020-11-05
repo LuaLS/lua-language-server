@@ -1219,7 +1219,6 @@ local function completion(uri, offset)
     local text = files.getText(uri)
     local results = {}
     clearStack()
-    vm.setSearchLevel(3)
     if ast then
         if getComment(ast, offset) then
             tryLuaDoc(ast, text, offset, results)

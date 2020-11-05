@@ -124,7 +124,6 @@ return function (uri, offset)
         end
     end
 
-    vm.setSearchLevel(10)
     for _, src in ipairs(vm.getDefs(source, 'deep')) do
         local root = guide.getRoot(src)
         if not root then

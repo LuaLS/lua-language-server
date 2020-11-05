@@ -153,6 +153,9 @@ function m.doDiagnostic(uri)
     if files.isLibrary(uri) then
         return
     end
+
+    await.delay()
+
     local ast = files.getAst(uri)
     if not ast then
         m.clear(uri)

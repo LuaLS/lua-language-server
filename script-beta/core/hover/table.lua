@@ -73,12 +73,12 @@ end
 
 local function getFieldFull(src)
     local tp      = vm.getInferType(src)
-    local class   = vm.getClass(src)
+    --local class   = vm.getClass(src)
     local literal = vm.getInferLiteral(src)
     if type(literal) == 'string' and #literal >= 50 then
         literal = literal:sub(1, 47) .. '...'
     end
-    return class or tp, literal
+    return tp, literal
 end
 
 local function getField(src, timeUp, mark, key)
@@ -228,7 +228,13 @@ return function (source)
     local clock = os.clock()
     local timeUp
     local mark = {}
-    local fields = vm.getFields(source, 'deep')
+    local fields
+    if  source.special == '_G'
+    and config.config.intelliSense.fastGlobal then
+        fields = vm.getGlobals('*', 'fast')
+    else
+        fields = vm.getFields(source, 'deep')
+    end
     for _, src in ipairs(fields) do
         local key = getKey(src)
         if not key then

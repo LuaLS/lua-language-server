@@ -451,7 +451,12 @@ local function checkField(ast, word, start, offset, parent, oop, results)
 end
 
 local function checkGlobal(ast, word, start, offset, parent, oop, results)
-    local refs = vm.getGlobals('*', 'fast')
+    local refs
+    if config.config.intelliSense.fastGlobal then
+        refs = vm.getGlobals('*', 'fast')
+    else
+        refs = vm.getGlobals('*')
+    end
     checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, results)
 end
 

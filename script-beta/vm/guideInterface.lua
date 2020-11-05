@@ -128,3 +128,7 @@ function vm.setSearchLevel(n)
     end
     vm.interface.searchLevel = n
 end
+
+function vm.setSearchDepth(n)
+    vm.interface.setSearchDepth = n
+end

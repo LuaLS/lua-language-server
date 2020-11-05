@@ -1194,7 +1194,8 @@ function m.status(parentStatus, interface)
         deep      = parentStatus and parentStatus.deep,
         results   = {},
     }
-    if status.depth >= 5 then
+    local searchDepth = interface and interface.searchDepth or 0
+    if status.depth >= searchDepth then
         status.deep = false
     end
     status.lock = status.locks[status.depth] or {}

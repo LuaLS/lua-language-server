@@ -240,7 +240,7 @@ return function (source)
         if not literals[key] then
             literals[key] = {}
         end
-        if not TEST and os.clock() - clock > 3 then
+        if not TEST and os.clock() - clock > config.config.hover.fieldInfer / 1000.0 then
             timeUp = true
         end
         local class, literal = getField(src, timeUp, mark, key)

@@ -140,6 +140,7 @@ local ConfigTemplate = {
         viewString      = {true,      Boolean},
         viewStringMax   = {1000,      Integer},
         viewNumber      = {true,      Boolean},
+        fieldInfer      = {3000,      Integer},
     },
     color = {
         mode            = {'Semantic', String},
@@ -150,6 +151,10 @@ local ConfigTemplate = {
     plugin = {
         enable          = {false, Boolean},
         path            = {'.vscode/lua-plugin/*.lua', String},
+    },
+    intelliSense = {
+        searchDepth     = {0,         Integer},
+        fastGlobal      = {true,      Boolean},
     },
 }
 

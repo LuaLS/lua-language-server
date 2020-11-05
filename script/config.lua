@@ -105,7 +105,7 @@ local ConfigTemplate = {
         globals         = {{},   Str2Hash ';'},
         disable         = {{},   Str2Hash ';'},
         severity        = {
-            table.deepCopy(DiagnosticDefaultSeverity),
+            util.deepCopy(define.DiagnosticDefaultSeverity),
             Hash(String, String),
         },
         workspaceDelay  = {0,    Integer},
@@ -127,6 +127,7 @@ local ConfigTemplate = {
         callSnippet     = {'Disable', String},
         keywordSnippet  = {'Replace', String},
         displayContext  = {6,         Integer},
+        fastGlobal      = {true,      Boolean},
     },
     signatureHelp = {
         enable          = {true,      Boolean},
@@ -136,13 +137,20 @@ local ConfigTemplate = {
         viewString      = {true,      Boolean},
         viewStringMax   = {1000,      Integer},
         viewNumber      = {true,      Boolean},
+        fieldInfer      = {3000,      Integer},
     },
     color = {
         mode            = {'Semantic', String},
     },
+    luadoc = {
+        enable          = {true, Boolean},
+    },
     plugin = {
         enable          = {false, Boolean},
         path            = {'.vscode/lua-plugin/*.lua', String},
+    },
+    intelliSense = {
+        searchDepth     = {0, Integer},
     },
 }
 

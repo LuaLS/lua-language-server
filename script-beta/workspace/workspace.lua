@@ -94,6 +94,13 @@ function m.getNativeMatcher()
                 pattern[#pattern+1] = line
             end
         end
+        buf = pub.awaitTask('loadFile', furi.encode(m.path .. '/.git/info/exclude'))
+        if buf then
+            for line in buf:gmatch '[^\r\n]+' do
+                log.info('Ignore by .git/info/exclude:', line)
+                pattern[#pattern+1] = line
+            end
+        end
     end
     -- config.workspace.library
     for path in pairs(config.config.workspace.library) do

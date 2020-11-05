@@ -2,6 +2,7 @@ local vm       = require 'vm'
 local util     = require 'utility'
 local guide    = require 'parser.guide'
 local config   = require 'config'
+local lang     = require 'language'
 
 local function getKey(src)
     if src.type == 'library' then
@@ -275,9 +276,9 @@ return function (source)
     else
         result = buildAsHash(classes, literals)
     end
-    -- TODO
     if timeUp then
         result = '\n--出于性能考虑，已禁用了部分类型推断。\n' .. result
+        result = ('\n--%s\n%s'):format(lang.script.HOVER_TABLE_TIME_UP, result)
     end
     return result
 end

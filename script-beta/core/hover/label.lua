@@ -36,8 +36,7 @@ local function asDocTypeName(source)
         end
         if doc.type == 'doc.alias.name' then
             local extends = doc.parent.extends
-            -- TODO
-            return '展开为 ' .. vm.getInferType(extends)
+            return lang.script('HOVER_EXTENDS', vm.getInferType(extends))
         end
     end
 end

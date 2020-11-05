@@ -105,7 +105,7 @@ local ConfigTemplate = {
         globals         = {{},   Str2Hash ';'},
         disable         = {{},   Str2Hash ';'},
         severity        = {
-            util.deepCopy(define.DiagnosticDefaultSeverity),
+            table.deepCopy(DiagnosticDefaultSeverity),
             Hash(String, String),
         },
         workspaceDelay  = {0,    Integer},

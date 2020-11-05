@@ -52,6 +52,17 @@ DIAG_LUADOC_MISS_VARARG_TYPE          = '<vararg type> expected.'
 DIAG_LUADOC_MISS_FUN_AFTER_OVERLOAD   = '`fun` expected.'
 DIAG_LUADOC_MISS_CATE_NAME            = '<doc name> expected.'
 
+DIAG_CIRCLE_DOC_CLASS                 = 'Circularly inherited classes.'
+DIAG_DOC_FIELD_NO_CLASS               = 'The field must be defined after the class.'
+DIAG_DUPLICATE_DOC_CLASS              = 'Duplicate defined class.'
+DIAG_DUPLICATE_DOC_FIELD              = 'Duplicate defined fields.
+
+'
+DIAG_DUPLICATE_DOC_PARAM              = 'Duplicate params.'
+DIAG_UNDEFINED_DOC_CLASS              = 'Undefined class.'
+DIAG_UNDEFINED_DOC_NAME               = 'Undefined type or alias.'
+DIAG_UNDEFINED_DOC_PARAM              = 'Undefined param.'
+
 MWS_NOT_SUPPORT         = '{} dose not support multi workspace for now, I may need to restart to support the new workspace ...'
 MWS_RESTART             = 'Restart'
 MWS_NOT_COMPLETE        = 'Workspace is not complete yet. You may try again later...'

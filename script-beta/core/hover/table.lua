@@ -229,6 +229,7 @@ return function (source)
     local timeUp
     local mark = {}
     local fields = vm.getFields(source, 'deep')
+    local keyCount = 0
     for _, src in ipairs(fields) do
         local key = getKey(src)
         if not key then
@@ -236,6 +237,7 @@ return function (source)
         end
         if not classes[key] then
             classes[key] = {}
+            keyCount = keyCount + 1
         end
         if not literals[key] then
             literals[key] = {}
@@ -249,6 +251,9 @@ return function (source)
         end
         classes[key][#classes[key]+1] = class
         literals[key][#literals[key]+1] = literal
+        if keyCount >= 1000 then
+            break
+        end
         ::CONTINUE::
     end
 

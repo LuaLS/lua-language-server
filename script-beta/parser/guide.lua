@@ -2617,6 +2617,9 @@ end
 
 function m.getDocTypeNames(status, doc, genericCallback)
     local results = {}
+    if not doc then
+        return results
+    end
     for _, unit in ipairs(doc.types) do
         local typeName = getDocTypeUnitName(status, unit, genericCallback)
         results[#results+1] = {

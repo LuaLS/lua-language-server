@@ -228,13 +228,7 @@ return function (source)
     local clock = os.clock()
     local timeUp
     local mark = {}
-    local fields
-    if  source.special == '_G'
-    and config.config.intelliSense.fastGlobal then
-        fields = vm.getGlobals('*', 'fast')
-    else
-        fields = vm.getFields(source, 'deep')
-    end
+    local fields = vm.getFields(source, 'deep')
     for _, src in ipairs(fields) do
         local key = getKey(src)
         if not key then

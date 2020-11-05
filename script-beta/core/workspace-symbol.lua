@@ -2,6 +2,7 @@ local files    = require 'files'
 local guide    = require 'parser.guide'
 local matchKey = require 'core.matchkey'
 local define   = require 'proto.define'
+local await    = require 'await'
 
 local function buildSource(uri, source, key, results)
     if     source.type == 'local'
@@ -58,6 +59,10 @@ return function (key)
 
     for uri in files.eachFile() do
         searchFile(files.getOriginUri(uri), key, results)
+        if #results > 1000 then
+            break
+        end
+        await.delay()
     end
 
     return results

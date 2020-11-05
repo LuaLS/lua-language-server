@@ -450,16 +450,6 @@ local function checkField(ast, word, start, offset, parent, oop, results)
     checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, results)
 end
 
-local function checkGlobal(ast, word, start, offset, parent, oop, results)
-    local refs
-    if config.config.intelliSense.fastGlobal then
-        refs = vm.getGlobals('*', 'fast')
-    else
-        refs = vm.getGlobals('*')
-    end
-    checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, results)
-end
-
 local function checkTableField(ast, word, start, results)
     local source = guide.eachSourceContain(ast.ast, start, function (source)
         if  source.start == start
@@ -850,7 +840,7 @@ local function tryWord(ast, text, offset, results)
                     checkLocal(ast, word, start, results)
                     checkTableField(ast, word, start, results)
                     local env = guide.getENV(ast.ast, start)
-                    checkGlobal(ast, word, start, offset, env, false, results)
+                    checkField(ast, word, start, offset, env, false, results)
                 end
             end
         end

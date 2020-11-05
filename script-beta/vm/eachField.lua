@@ -2,6 +2,7 @@ local vm      = require 'vm.vm'
 local guide   = require 'parser.guide'
 local library = require 'library'
 local await   = require 'await'
+local config  = require 'config'
 
 local function eachFieldInLibrary(source, lib, results)
     if not lib or not lib.child then
@@ -47,6 +48,9 @@ local function eachField(source, deep)
 end
 
 function vm.getFields(source, deep)
+    if source.special == '_G' then
+        return vm.getGlobals '*'
+    end
     if guide.isGlobal(source) then
         local name = guide.getKeyName(source)
         local cache =  vm.getCache('eachFieldOfGlobal')[name]

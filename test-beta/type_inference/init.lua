@@ -327,3 +327,7 @@ TEST 'table<string, number>' [[
 ---@type table<string, number>
 local <?x?>
 ]]
+
+TEST 'table' [[
+self.<?t?>[#self.t+1] = {}
+]]

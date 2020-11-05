@@ -3218,6 +3218,10 @@ function m.inferByGetTable(status, source)
     if #status.results ~= 0 then
         return
     end
+    if source.type == 'field'
+    or source.type == 'method' then
+        source = source.parent
+    end
     local next = source.next
     if not next then
         return

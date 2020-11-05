@@ -1192,16 +1192,16 @@ function m.status(parentStatus, interface)
         deep      = parentStatus and parentStatus.deep,
         results   = {},
     }
-    local searchDepth = interface and interface.getSearchDepth() or 0
-    if status.depth >= searchDepth then
-        status.deep = false
-    end
     status.lock = status.locks[status.depth] or {}
     status.locks[status.depth] = status.lock
     if interface then
         for k, v in pairs(interface) do
             status.interface[k] = v
         end
+    end
+    local searchDepth = status.interface.getSearchDepth and status.interface.getSearchDepth() or 0
+    if status.depth >= searchDepth then
+        status.deep = false
     end
     return status
 end

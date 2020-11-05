@@ -83,6 +83,10 @@ local function insertLibrary(results, name)
         results[#results+1] = library.global[libname]
         local asName = config.config.runtime.special[libname]
         results[#results+1] = library.global[asName]
+    elseif name == '*' then
+        for _, lib in pairs(library.global) do
+            results[#results+1] = lib
+        end
     end
 end
 

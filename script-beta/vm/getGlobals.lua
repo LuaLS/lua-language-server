@@ -86,15 +86,24 @@ local function insertLibrary(results, name)
     end
 end
 
-local function getGlobals(name)
+local function getGlobals(name, fast)
     local results = {}
+    local mark = {}
     for uri in files.eachFile() do
         local cache = files.getCache(uri)
         cache.globals = cache.globals or getGlobalsOfFile(uri)
         if name == '*' then
-            for _, sources in util.sortPairs(cache.globals) do
-                for _, source in ipairs(sources) do
-                    results[#results+1] = source
+            for destName, sources in util.sortPairs(cache.globals) do
+                if not fast or not mark[destName] then
+                    if fast then
+                        mark[destName] = true
+                    end
+                    for _, source in ipairs(sources) do
+                        results[#results+1] = source
+                        if fast then
+                            break
+                        end
+                    end
                 end
             end
         else
@@ -109,13 +118,15 @@ local function getGlobals(name)
     return results
 end
 
-function vm.getGlobals(name)
+function vm.getGlobals(name, fast)
     local cache = vm.getCache('getGlobals')[name]
     if cache ~= nil then
         return cache
     end
-    cache = getGlobals(name)
-    vm.getCache('getGlobals')[name] = cache
+    cache = getGlobals(name, fast)
+    if not fast then
+        vm.getCache('getGlobals')[name] = cache
+    end
     return cache
 end
 

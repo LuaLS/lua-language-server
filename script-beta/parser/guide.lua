@@ -2083,7 +2083,7 @@ function m.searchSameFields(status, simple, mode)
             max = max + 1
             status.cache.count = status.cache.count + 1
             m.checkSameSimple(status, simple, data, mode, status.results, queue)
-            if max >= (m.searchMax or 10000) then
+            if max >= 10000 then
                 logWarn('Queue too large!')
                 break
             end

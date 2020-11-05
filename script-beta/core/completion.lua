@@ -406,9 +406,9 @@ local function checkFieldThen(name, src, word, start, offset, parent, oop, resul
     }
 end
 
-local function checkField(ast, word, start, offset, parent, oop, results)
+local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, results)
     local fields = {}
-    for _, src in ipairs(vm.getFields(parent, 'deep')) do
+    for _, src in ipairs(refs) do
         if src.type == 'library' then
             if src.name:sub(1, 1) == '@' then
                 goto CONTINUE
@@ -443,6 +443,16 @@ local function checkField(ast, word, start, offset, parent, oop, results)
     for name, src in util.sortPairs(fields) do
         checkFieldThen(name, src, word, start, offset, parent, oop, results)
     end
+end
+
+local function checkField(ast, word, start, offset, parent, oop, results)
+    local refs = vm.getFields(parent, 'deep')
+    checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, results)
+end
+
+local function checkGlobal(ast, word, start, offset, parent, oop, results)
+    local refs = vm.getGlobals('*', 'fast')
+    checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, results)
 end
 
 local function checkTableField(ast, word, start, results)
@@ -835,7 +845,7 @@ local function tryWord(ast, text, offset, results)
                     checkLocal(ast, word, start, results)
                     checkTableField(ast, word, start, results)
                     local env = guide.getENV(ast.ast, start)
-                    checkField(ast, word, start, offset, env, false, results)
+                    checkGlobal(ast, word, start, offset, env, false, results)
                 end
             end
         end
@@ -1205,10 +1215,6 @@ local function completion(uri, offset)
     local results = {}
     clearStack()
     vm.setSearchLevel(3)
-    guide.searchMax = 1000
-    local _ <close> = util.defer(function ()
-        guide.searchMax = nil
-    end)
     if ast then
         if getComment(ast, offset) then
             tryLuaDoc(ast, text, offset, results)

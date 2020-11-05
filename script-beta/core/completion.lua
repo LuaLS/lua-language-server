@@ -1205,6 +1205,10 @@ local function completion(uri, offset)
     local results = {}
     clearStack()
     vm.setSearchLevel(3)
+    guide.searchMax = 1000
+    local _ <close> = util.defer(function ()
+        guide.searchMax = nil
+    end)
     if ast then
         if getComment(ast, offset) then
             tryLuaDoc(ast, text, offset, results)

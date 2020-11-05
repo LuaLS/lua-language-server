@@ -203,7 +203,7 @@ function m.eachFile()
 end
 
 function m.compileAst(uri, text)
-    if #text >= config.config.workspace.preloadFileSize * 1000 then
+    if not m.isOpen(uri) and #text >= config.config.workspace.preloadFileSize * 1000 then
         if not m.notifyCache['preloadFileSize'] then
             m.notifyCache['preloadFileSize'] = {}
             m.notifyCache['skipLargeFileCount'] = 0

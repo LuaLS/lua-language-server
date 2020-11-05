@@ -277,7 +277,6 @@ return function (source)
         result = buildAsHash(classes, literals)
     end
     if timeUp then
-        result = '\n--出于性能考虑，已禁用了部分类型推断。\n' .. result
         result = ('\n--%s\n%s'):format(lang.script.HOVER_TABLE_TIME_UP, result)
     end
     return result

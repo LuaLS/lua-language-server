@@ -127,7 +127,6 @@ local ConfigTemplate = {
         callSnippet     = {'Disable', String},
         keywordSnippet  = {'Replace', String},
         displayContext  = {6,         Integer},
-        fastGlobal      = {true,      Boolean},
     },
     signatureHelp = {
         enable          = {true,      Boolean},
@@ -150,7 +149,8 @@ local ConfigTemplate = {
         path            = {'.vscode/lua-plugin/*.lua', String},
     },
     intelliSense = {
-        searchDepth     = {0, Integer},
+        searchDepth     = {0,         Integer},
+        fastGlobal      = {true,      Boolean},
     },
 }
 

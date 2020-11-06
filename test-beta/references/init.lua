@@ -263,6 +263,12 @@ local <!t!>
 ]]
 
 TEST [[
+_G.<?xxx?> = 1
+
+print(<!xxx!>)
+]]
+
+TEST [[
 ---@class <!Class!>
 ---@type <?Class?>
 ---@type <!Class!>

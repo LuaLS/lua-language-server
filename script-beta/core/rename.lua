@@ -231,43 +231,60 @@ local function ofLocal(source, newname, callback)
     end
 end
 
+local function ofFieldThen(key, src, newname, callback)
+    if vm.getKeyName(src) ~= key then
+        return
+    end
+    if     src.type == 'tablefield'
+    or     src.type == 'getfield'
+    or     src.type == 'setfield' then
+        src = src.field
+    elseif src.type == 'tableindex'
+    or     src.type == 'getindex'
+    or     src.type == 'setindex' then
+        src = src.index
+    elseif src.type == 'getmethod'
+    or     src.type == 'setmethod' then
+        src = src.method
+    end
+    if src.type == 'string' then
+        local quo = src[2]
+        local text = util.viewString(newname, quo)
+        callback(src, src.start, src.finish, text)
+        return
+    elseif src.type == 'field'
+    or     src.type == 'method' then
+        local suc = renameField(src, newname, callback)
+        if not suc then
+            return
+        end
+    elseif src.type == 'setglobal'
+    or     src.type == 'getglobal' then
+        local suc = renameGlobal(src, newname, callback)
+        if not suc then
+            return
+        end
+    end
+end
+
 local function ofField(source, newname, callback)
     local key = guide.getKeyName(source)
+    local node
+    if source.type == 'tablefield'
+    or source.type == 'tableindex' then
+        node = source.parent
+    else
+        node = source.node
+    end
+    for _, src in ipairs(vm.getFields(node, 'deep')) do
+        ofFieldThen(key, src, newname, callback)
+    end
+end
+
+local function ofGlobal(source, newname, callback)
+    local key = guide.getKeyName(source)
     for _, src in ipairs(vm.getRefs(source, 'deep')) do
-        if vm.getKeyName(src) ~= key then
-            goto CONTINUE
-        end
-        if     src.type == 'tablefield'
-        or     src.type == 'getfield'
-        or     src.type == 'setfield' then
-            src = src.field
-        elseif src.type == 'tableindex'
-        or     src.type == 'getindex'
-        or     src.type == 'setindex' then
-            src = src.index
-        elseif src.type == 'getmethod'
-        or     src.type == 'setmethod' then
-            src = src.method
-        end
-        if src.type == 'string' then
-            local quo = src[2]
-            local text = util.viewString(newname, quo)
-            callback(src, src.start, src.finish, text)
-            goto CONTINUE
-        elseif src.type == 'field'
-        or     src.type == 'method' then
-            local suc = renameField(src, newname, callback)
-            if not suc then
-                goto CONTINUE
-            end
-        elseif src.type == 'setglobal'
-        or     src.type == 'getglobal' then
-            local suc = renameGlobal(src, newname, callback)
-            if not suc then
-                goto CONTINUE
-            end
-        end
-        ::CONTINUE::
+        ofFieldThen(key, src, newname, callback)
     end
 end
 
@@ -292,11 +309,10 @@ local function rename(source, newname, callback)
     elseif source.type == 'field'
     or     source.type == 'method'
     or     source.type == 'index' then
-        return ofField(source, newname, callback)
-    elseif source.type == 'tablefield'
-    or     source.type == 'setglobal'
+        return ofField(source.parent, newname, callback)
+    elseif source.type == 'setglobal'
     or     source.type == 'getglobal' then
-        return ofField(source, newname, callback)
+        return ofGlobal(source, newname, callback)
     elseif source.type == 'string'
     or     source.type == 'number'
     or     source.type == 'boolean' then

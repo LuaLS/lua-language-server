@@ -5,60 +5,13 @@ local library = require 'library'
 local util    = require 'utility'
 local config  = require 'config'
 
-local function searchRawset(ref, results)
-    if guide.getKeyName(ref) ~= 's|rawset' then
-        return
-    end
-    local call = ref.parent
-    if call.type ~= 'call' or call.node ~= ref then
-        return
-    end
-    if not call.args then
-        return
-    end
-    local arg1 = call.args[1]
-    if arg1.special ~= '_G' then
-        -- 不会吧不会吧，不会真的有人写成 `rawset(_G._G._G, 'xxx', value)` 吧
-        return
-    end
-    results[#results+1] = call
-end
-
-local function searchG(ref, results)
-    while ref and guide.getKeyName(ref) == 's|_G' do
-        results[#results+1] = ref
-        ref = ref.next
-    end
-    if ref then
-        results[#results+1] = ref
-        searchRawset(ref, results)
-    end
-end
-
-local function searchEnvRef(ref, results)
-    if     ref.type == 'setglobal'
-    or     ref.type == 'getglobal' then
-        results[#results+1] = ref
-        searchG(ref, results)
-    elseif ref.type == 'getlocal' then
-        results[#results+1] = ref.next
-        searchG(ref.next, results)
-    end
-end
-
 local function getGlobalsOfFile(uri)
     local globals = {}
     local ast = files.getAst(uri)
     if not ast then
         return globals
     end
-    local results = {}
-    local env = guide.getENV(ast.ast)
-    if env.ref then
-        for _, ref in ipairs(env.ref) do
-            searchEnvRef(ref, results)
-        end
-    end
+    local results = guide.findGlobals(ast.ast)
     local mark = {}
     for _, res in ipairs(results) do
         if mark[res] then

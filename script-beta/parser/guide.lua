@@ -1115,7 +1115,8 @@ local function buildSimpleList(obj, max)
         or     cur.type == 'getglobal' then
             list[i] = cur
             break
-        elseif cur.type == 'select' then
+        elseif cur.type == 'select'
+        or     cur.type == 'table' then
             list[i] = cur
             break
         elseif cur.type == 'string' then
@@ -1146,7 +1147,8 @@ function m.getSimple(obj, max)
     or obj.type == 'getglobal'
     or obj.type == 'tablefield'
     or obj.type == 'tableindex'
-    or obj.type == 'select' then
+    or obj.type == 'select'
+    or obj.type == 'table' then
         simpleList = buildSimpleList(obj, max)
     elseif obj.type == 'field'
     or     obj.type == 'method' then
@@ -1287,38 +1289,14 @@ function m.checkSameSimpleInValueOfTable(status, value, start, queue)
     end
 end
 
-function m.searchFields(status, obj, key, interface, deep)
-    if obj.type == 'table' then
-        local keyName = key and ('s|' .. key)
-        local results = {}
-        for i = 1, #obj do
-            local field = obj[i]
-            if not keyName or keyName == m.getSimpleName(field) then
-                results[#results+1] = field
-            end
-        end
-        return results
-    elseif obj.type == 'library' then
-        local results = {}
-        if obj.fields then
-            for i = 1, #obj.fields do
-                results[i] = obj.fields[i]
-            end
-        end
-        return results
-    else
-        local newStatus = m.status(status, interface)
-        newStatus.deep = deep
-        local simple = m.getSimple(obj)
-        if not simple then
-            return {}
-        end
-        simple[#simple+1] = key and ('s|' .. key) or '*'
-        m.searchSameFields(newStatus, simple, 'field')
-        local results = newStatus.results
-        m.cleanResults(results)
-        return results
+function m.searchFields(status, obj, key)
+    local simple = m.getSimple(obj)
+    if not simple then
+        return
     end
+    simple[#simple+1] = key and ('s|' .. key) or '*'
+    m.searchSameFields(status, simple, 'field')
+    m.cleanResults(status.results)
 end
 
 function m.getObjectValue(obj)
@@ -1356,13 +1334,11 @@ function m.getObjectValue(obj)
 end
 
 function m.checkSameSimpleInValueInMetaTable(status, mt, start, queue)
-    local indexes = m.searchFields(status, mt, '__index')
-    if not indexes then
-        return
-    end
+    local newStatus = m.status(status)
+    m.searchFields(newStatus, mt, '__index')
     local refsStatus = m.status(status)
-    for i = 1, #indexes do
-        local indexValue = m.getObjectValue(indexes[i])
+    for i = 1, #newStatus.results do
+        local indexValue = m.getObjectValue(newStatus.results[i])
         if indexValue then
             m.searchRefs(refsStatus, indexValue, 'ref')
         end
@@ -3644,7 +3620,12 @@ end
 
 --- 请求对象的域
 function m.requestFields(obj, interface, deep)
-    return m.searchFields(nil, obj, nil, interface, deep)
+    local status = m.status(nil, interface)
+    status.deep = deep
+
+    m.searchFields(status, obj)
+
+    return status.results, status.cache.count
 end
 
 --- 请求对象的类型推测

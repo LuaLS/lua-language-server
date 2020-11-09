@@ -1401,6 +1401,7 @@ function m.checkSameSimpleByBindDocs(status, obj, start, queue, mode)
     if status.cache.searchingBindedDoc then
         return
     end
+    local skipInfer = false
     local results = {}
     for _, doc in ipairs(obj.bindDocs) do
         if     doc.type == 'doc.class' then
@@ -1447,6 +1448,7 @@ function m.checkSameSimpleByBindDocs(status, obj, start, queue, mode)
                     m.searchRefs(newStatus, ref, mode)
                 end
             end
+            skipInfer = true
         end
         if res.type == 'doc.type.function' then
             queue[#queue+1] = {
@@ -1468,7 +1470,7 @@ function m.checkSameSimpleByBindDocs(status, obj, start, queue, mode)
             force = true,
         }
     end
-    return true
+    return skipInfer
 end
 
 function m.checkSameSimpleInArg1OfSetMetaTable(status, obj, start, queue)
@@ -1775,9 +1777,6 @@ function m.searchSameFieldsInValue(status, ref, start, queue, mode)
     }
     -- 检查形如 a = f() 的分支情况
     m.checkSameSimpleInCall(status, value, start, queue, mode)
-
-    -- 检查自己是字面量表的情况
-    --m.checkSameSimpleInValueOfTable(status, value, start, queue)
 end
 
 function m.checkSameSimpleAsTableField(status, ref, start, queue)
@@ -1994,8 +1993,8 @@ function m.checkSameSimple(status, simple, data, mode, queue)
             cmode = 'ref'
         end
         -- 检查 doc
-        local hasDoc = m.checkSameSimpleByBindDocs(status, ref, i, queue, cmode)
-        if not hasDoc then
+        local skipInfer = m.checkSameSimpleByBindDocs(status, ref, i, queue, cmode)
+        if not skipInfer then
             -- 穿透 self:func 与 mt:func
             m.searchSameFieldsCrossMethod(status, ref, i, queue)
             -- 穿透赋值

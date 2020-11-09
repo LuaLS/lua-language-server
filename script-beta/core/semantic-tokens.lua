@@ -100,6 +100,13 @@ Care['getlocal'] = function (source, results)
     }
 end
 Care['setlocal'] = Care['getlocal']
+Care['doc.return.name'] = function (source, results)
+    results[#results+1] = {
+        start  = source.start,
+        finish = source.finish,
+        type   = define.TokenTypes.parameter,
+    }
+end
 
 local function buildTokens(results, text, lines)
     local tokens = {}

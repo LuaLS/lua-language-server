@@ -483,6 +483,7 @@ local function parseReturn()
         if not result.start then
             result.start = docType.start
         end
+        docType.name = parseName('doc.return.name', docType)
         if checkToken('symbol', '?', 1) then
             nextToken()
             docType.optional = true

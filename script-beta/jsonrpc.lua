@@ -1,7 +1,8 @@
-local json  = require 'json'
-local pcall = pcall
+local json     = require 'json'
+local pcall    = pcall
 local tonumber = tonumber
-local log = require 'brave.log'
+local util     = require 'utility'
+local log      = require 'brave.log'
 
 _ENV = nil
 
@@ -28,7 +29,7 @@ local function readProtoHead(reader, errHandle)
         end
         local k, v = line:match '^([^:]+)%s*%:%s*(.+)\r\n$'
         if not k then
-            errHandle('Proto header error:', head)
+            errHandle('Proto header error:', line)
             break
         end
         if k == 'Content-Length' then
@@ -43,7 +44,7 @@ function m.decode(reader, errHandle)
     local head = readProtoHead(reader, errHandle)
     local len = head['Content-Length']
     if not len then
-        errHandle('Proto header error:', head)
+        errHandle('Proto header error:', util.dump(head))
         return nil
     end
     local content = reader(len)

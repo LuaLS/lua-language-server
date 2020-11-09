@@ -50,22 +50,7 @@ Care['tablefield'] = function (source, results)
 end
 Care['getlocal'] = function (source, results)
     local loc = source.node
-    -- 1. 函数的参数
-    if loc.parent and loc.parent.type == 'funcargs' then
-        results[#results+1] = {
-            start      = source.start,
-            finish     = source.finish,
-            type       = define.TokenTypes.parameter,
-            modifieres = define.TokenModifiers.declaration,
-        }
-        return
-    end
-    -- 2. 特殊变量
-    if source[1] == '_ENV'
-    or source[1] == 'self' then
-        return
-    end
-    -- 3. 不是函数的局部变量
+    -- 1. 值为函数的局部变量
     local hasFunc
     local node = loc.node
     if node then
@@ -87,7 +72,27 @@ Care['getlocal'] = function (source, results)
         }
         return
     end
-    -- 4. 其他
+    -- 2. 对象
+    if  source.parent.type == 'getmethod'
+    and source.parent.node == source then
+        return
+    end
+    -- 3. 函数的参数
+    if loc.parent and loc.parent.type == 'funcargs' then
+        results[#results+1] = {
+            start      = source.start,
+            finish     = source.finish,
+            type       = define.TokenTypes.parameter,
+            modifieres = define.TokenModifiers.declaration,
+        }
+        return
+    end
+    -- 4. 特殊变量
+    if source[1] == '_ENV'
+    or source[1] == 'self' then
+        return
+    end
+    -- 5. 其他
     results[#results+1] = {
         start      = source.start,
         finish     = source.finish,

@@ -115,7 +115,7 @@ function m.getNativeMatcher()
 end
 
 --- 创建代码库筛选器
-function m.getLibraryMatchers(option)
+function m.getLibraryMatchers()
     if m.libraryVersion == config.version then
         return m.libraryMatchers
     end
@@ -123,7 +123,7 @@ function m.getLibraryMatchers(option)
     m.libraryMatchers = {}
     for path, pattern in pairs(config.config.workspace.library) do
         local nPath = fs.absolute(fs.path(path)):string()
-        local matcher = glob.gitignore(pattern, option)
+        local matcher = glob.gitignore(pattern, m.matchOption)
         if platform.OS == 'Windows' then
             matcher:setOption 'ignoreCase'
         end
@@ -142,6 +142,13 @@ end
 function m.isIgnored(uri)
     local path = furi.decode(uri)
     local ignore = m.getNativeMatcher()
+    return ignore(path)
+end
+
+--- 文件是否作为库被加载
+function m.isLibrary(uri)
+    local path = furi.decode(uri)
+    local ignore = m.getLibraryMatchers()
     return ignore(path)
 end
 
@@ -191,7 +198,7 @@ function m.awaitPreload()
     log.info('Preload start.')
     local nativeLoader    = loadFileFactory(m.path, progress)
     local native          = m.getNativeMatcher()
-    local librarys        = m.getLibraryMatchers(m.matchOption)
+    local librarys        = m.getLibraryMatchers()
     native:scan(nativeLoader)
     for _, library in ipairs(librarys) do
         local libraryInterface = interfaceFactory(library.path)
@@ -296,7 +303,9 @@ function m.reload()
 end
 
 files.watch(function (ev, uri)
-    if ev == 'close' and m.isIgnored(uri) then
+    if  ev == 'close'
+    and m.isIgnored(uri)
+    and not m.isLibrary(uri) then
         files.remove(uri)
     end
 end)

@@ -148,8 +148,12 @@ end
 --- 文件是否作为库被加载
 function m.isLibrary(uri)
     local path = furi.decode(uri)
-    local ignore = m.getLibraryMatchers()
-    return ignore(path)
+    for _, library in ipairs(m.getLibraryMatchers()) do
+        if library.matcher(path) then
+            return true
+        end
+    end
+    return false
 end
 
 local function loadFileFactory(root, progress, isLibrary)

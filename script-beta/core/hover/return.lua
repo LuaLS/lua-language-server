@@ -108,7 +108,8 @@ local function asFunction(source)
         end
         if #types > 0 or rtn[1] then
             local tp = mergeTypes(types) or 'any'
-            line[#line+1] = ('%s%s'):format(
+            line[#line+1] = ('%s%s%s'):format(
+                rtn[1].name and (rtn[1].name[1] .. ': ') or '',
                 tp,
                 rtn[1].optional and '?' or ''
             )

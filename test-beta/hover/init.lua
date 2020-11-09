@@ -1244,6 +1244,17 @@ function f(x: number?, y: boolean?)
 ]]
 
 TEST [[
+---@return table first, string second?
+local function <?f?>(x, y)
+end
+]]
+[[
+function f(x: any, y: any)
+  -> first: table
+  2. second: string?
+]]
+
+TEST [[
 ---@class Class
 ---@field x number
 ---@field y number

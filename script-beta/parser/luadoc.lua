@@ -567,15 +567,7 @@ local function parseGeneric()
         end
         if checkToken('symbol', ':', 1) then
             nextToken()
-            object.extends = parseName('doc.extends.name', object)
-            if not object.extends then
-                pushError {
-                    type   = 'LUADOC_MISS_GENERIC_EXTENDS_NAME',
-                    start  = getFinish(),
-                    finish = getFinish(),
-                }
-                return nil
-            end
+            object.extends = parseType(object)
         end
         object.finish = getFinish()
         result.generics[#result.generics+1] = object

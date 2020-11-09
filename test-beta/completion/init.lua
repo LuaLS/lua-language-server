@@ -158,6 +158,32 @@ ass$
 }
 
 TEST [[
+local assert = 1
+ass$
+]]
+{
+    {
+        label = 'assert',
+        kind  = define.CompletionItemKind.Variable,
+    },
+}
+
+TEST [[
+local assert = 1
+_G.ass$
+]]
+{
+    {
+        label = 'assert',
+        kind  = define.CompletionItemKind.Function,
+    },
+    {
+        label = 'assert()',
+        kind  = define.CompletionItemKind.Snippet,
+    },
+}
+
+TEST [[
 local function ffff(a, b)
 end
 ff$

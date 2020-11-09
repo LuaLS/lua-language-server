@@ -406,7 +406,7 @@ local function checkFieldThen(name, src, word, start, offset, parent, oop, resul
     }
 end
 
-local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, results)
+local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, results, locals)
     local fields = {}
     for _, src in ipairs(refs) do
         if src.type == 'library' then
@@ -422,6 +422,9 @@ local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, res
             goto CONTINUE
         end
         local name = key:sub(3)
+        if locals and locals[name] then
+            goto CONTINUE
+        end
         if not matchKey(word, name) then
             goto CONTINUE
         end
@@ -448,6 +451,12 @@ end
 local function checkField(ast, word, start, offset, parent, oop, results)
     local refs = vm.getFields(parent, 'deep')
     checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, results)
+end
+
+local function checkGlobal(ast, word, start, offset, parent, oop, results)
+    local locals = guide.getVisibleLocals(ast.ast, offset)
+    local refs = vm.getFields(parent, 'deep')
+    checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, results, locals)
 end
 
 local function checkTableField(ast, word, start, results)
@@ -840,7 +849,7 @@ local function tryWord(ast, text, offset, results)
                     checkLocal(ast, word, start, results)
                     checkTableField(ast, word, start, results)
                     local env = guide.getENV(ast.ast, start)
-                    checkField(ast, word, start, offset, env, false, results)
+                    checkGlobal(ast, word, start, offset, env, false, results)
                 end
             end
         end

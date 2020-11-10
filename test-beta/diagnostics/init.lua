@@ -733,3 +733,8 @@ TEST [[
 local f
 f()
 ]]
+
+TEST [[
+---@class c
+c = {}
+]]

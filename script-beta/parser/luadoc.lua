@@ -4,7 +4,7 @@ local lines      = require 'parser.lines'
 local guide      = require 'parser.guide'
 
 local TokenTypes, TokenStarts, TokenFinishs, TokenContents
-local Ci, Offset, pushError
+local Ci, Offset, pushError, Ct
 local parseType
 local Parser = re.compile([[
 Main                <-  (Token / Sp)*
@@ -111,7 +111,12 @@ Symbol              <-  ({} {
     end,
 })
 
+local function trim(str)
+    return str:match '^%s*(%S+)%s*$'
+end
+
 local function parseTokens(text, offset)
+    Ct = offset
     Ci = 0
     Offset = offset
     TokenTypes    = {}
@@ -629,6 +634,12 @@ local function parseResume()
     local result = {
         type = 'doc.resume'
     }
+
+    if checkToken('symbol', '>', 1) then
+        nextToken()
+        result.default = true
+    end
+
     local tp = peekToken()
     if tp ~= 'string' then
         pushError {

@@ -294,7 +294,6 @@ TEST {
     }
 }
 
-do return end
 TEST {
     {
         path = 'a.lua',
@@ -312,10 +311,7 @@ TEST {
     hover = {
         label = 'function f(x: string)',
         name = 'f',
-        args = EXISTS,
-        rawEnum = EXISTS,
-        enum = [[
-
+        description = [[
 x: string
    | '选项1' -- 注释1
    |>'选项2' -- 注释2]]

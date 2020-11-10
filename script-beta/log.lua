@@ -48,9 +48,6 @@ local function pushLog(level, ...)
     if not m.path then
         return
     end
-    if m.size > m.maxSize then
-        return
-    end
     local t = tablePack(...)
     for i = 1, t.n do
         t[i] = tostring(t[i])
@@ -87,6 +84,9 @@ function m.raw(thd, level, msg, source, currentline, clock)
     if level == 'error' then
         ioStdErr:write(msg .. '\n')
     end
+    if m.size > m.maxSize then
+        return
+    end
     init_log_file()
     if not m.file then
         return ''
@@ -103,10 +103,12 @@ function m.raw(thd, level, msg, source, currentline, clock)
     else
         buf = ('[%s.%03.f][%s]%s[#%d:%s:%s]: %s\n'):format(timestr, ms * 1000, level, agl, thd, trimSrc(source), currentline, msg)
     end
-    m.file:write(buf)
     m.size = m.size + #buf
     if m.size > m.maxSize then
+        m.file:write(buf:sub(1, m.size - m.maxSize))
         m.file:write('[REACH MAX SIZE]')
+    else
+        m.file:write(buf)
     end
     return buf
 end

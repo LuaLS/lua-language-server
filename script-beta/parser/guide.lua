@@ -1780,6 +1780,9 @@ function m.searchSameFieldsInValue(status, ref, start, queue, mode)
 end
 
 function m.checkSameSimpleAsTableField(status, ref, start, queue)
+    if not status.deep then
+        return
+    end
     local parent = ref.parent
     if not parent or parent.type ~= 'tablefield' then
         return
@@ -1809,6 +1812,9 @@ function m.checkSearchLevel(status)
 end
 
 function m.checkSameSimpleAsReturn(status, ref, start, queue)
+    if not status.deep then
+        return
+    end
     if not ref.parent or ref.parent.type ~= 'return' then
         return
     end
@@ -2007,7 +2013,7 @@ function m.checkSameSimple(status, simple, data, mode, queue)
             m.checkSameSimpleInValueOfCallMetaTable(status, ref, i, queue)
             -- 检查自己是特殊变量的分支的情况
             m.checkSameSimpleInSpecialBranch(status, ref, i, queue)
-            if cmode == 'ref' and status.deep then
+            if cmode == 'ref' then
                 -- 检查形如 { a = f } 的情况
                 m.checkSameSimpleAsTableField(status, ref, i, queue)
                 -- 检查形如 return m 的情况

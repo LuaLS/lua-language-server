@@ -1,6 +1,7 @@
-local files = require 'files'
-local furi  = require 'file-uri'
-local core  = require 'core.hover'
+local files  = require 'files'
+local furi   = require 'file-uri'
+local core   = require 'core.hover'
+local config = require 'config'
 
 rawset(_G, 'TEST', true)
 

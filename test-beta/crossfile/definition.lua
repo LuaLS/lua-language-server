@@ -1,6 +1,7 @@
-local files = require 'files'
-local furi  = require 'file-uri'
-local core  = require 'core.definition'
+local files  = require 'files'
+local furi   = require 'file-uri'
+local core   = require 'core.definition'
+local config = require 'config'
 
 rawset(_G, 'TEST', true)
 
@@ -557,6 +558,31 @@ TEST {
         ]]
     },
 }
+
+config.config.intelliSense.searchDepth = 0
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            local t = GlobalTable
+
+            t.settings = {
+                <!test!> = 1
+            }
+        ]],
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            local b = GlobalTable.settings
+
+            print(b.<?test?>)
+        ]]
+    },
+}
+
+config.config.intelliSense.searchDepth = 5
 
 TEST {
     {

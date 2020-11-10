@@ -2625,6 +2625,14 @@ function m.getDocTypeNames(status, doc, genericCallback)
             source = enum,
         }
     end
+    if doc.resumes then
+        for _, resume in ipairs(doc.resumes) do
+            results[#results+1] = {
+                type   = resume[1],
+                source = resume,
+            }
+        end
+    end
     return results
 end
 

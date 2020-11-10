@@ -53,6 +53,7 @@ Symbol              <-  ({} {
                         /   '('
                         /   ')'
                         /   '?'
+                        /   '#'
                         } {})
                     ->  Symbol
 ]], {
@@ -110,8 +111,9 @@ Symbol              <-  ({} {
     end,
 })
 
-local function parseTokens(text)
+local function parseTokens(text, offset)
     Ci = 0
+    Offset = offset
     TokenTypes    = {}
     TokenStarts   = {}
     TokenFinishs  = {}
@@ -623,6 +625,26 @@ local function parseOverload()
     return result
 end
 
+local function parseResume()
+    local result = {
+        type = 'doc.resume'
+    }
+    local tp = peekToken()
+    if tp ~= 'string' then
+        pushError {
+            type   = 'LUADOC_MISS_STRING',
+            start  = getFinish(),
+            finish = getFinish(),
+        }
+        return nil
+    end
+    local _, str = nextToken()
+    result[1] = str
+    result.start = getStart()
+    result.finish = getFinish()
+    return result
+end
+
 local function convertTokens()
     local tp, text = nextToken()
     if not tp then
@@ -658,7 +680,6 @@ local function convertTokens()
 end
 
 local function buildLuaDoc(comment, nextComment)
-    Offset = comment.start + 1
     local text = comment.text
     if text:sub(1, 1) ~= '-' then
         return
@@ -680,24 +701,30 @@ local function buildLuaDoc(comment, nextComment)
         doc = text:sub(3)
     end
 
-    local finish = comment.start + #doc + 2
+    parseTokens(doc, comment.start + 1)
+    local result = convertTokens()
+    if result then
+        result.comment = lastComment
+    end
+
     while true do
         local nextComm = nextComment('peek')
         if nextComm and nextComm.text:sub(1, 2) == '-|' then
             nextComment()
-            local hold = nextComm.start - finish + 1
-            doc = doc .. (' '):rep(hold) .. nextComm.text:sub(2)
-            finish = nextComm.finish + 1
+            if not result.resumes then
+                result.resumes = {}
+            end
+            parseTokens(nextComm.text:sub(3), nextComm.start + 1)
+            local resume = parseResume()
+            if resume then
+                result.resumes[#result.resumes+1] = resume
+                result.finish = resume.finish
+            end
         else
             break
         end
     end
 
-    parseTokens(doc)
-    local result = convertTokens()
-    if result then
-        result.comment = lastComment
-    end
     return result
 end
 

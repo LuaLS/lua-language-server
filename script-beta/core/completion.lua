@@ -923,7 +923,7 @@ local function getCallEnums(source, index)
                 for _, enum in ipairs(vm.getDocEnums(doc.extends)) do
                     enums[#enums+1] = {
                         label       = enum[1],
-                        description = nil,
+                        description = enum.comment,
                         kind        = define.CompletionItemKind.EnumMember,
                     }
                 end

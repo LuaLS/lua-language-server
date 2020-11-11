@@ -1656,7 +1656,6 @@ global zzz: integer = 1
     }
 }
 
-do return end
 TEST [[
 ---@param x string
 ---| "'选项1'" # 注释1

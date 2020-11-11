@@ -4,7 +4,7 @@ local lines      = require 'parser.lines'
 local guide      = require 'parser.guide'
 
 local TokenTypes, TokenStarts, TokenFinishs, TokenContents
-local Ci, Offset, pushError, Ct
+local Ci, Offset, pushError, Ct, NextComment
 local parseType
 local Parser = re.compile([[
 Main                <-  (Token / Sp)*
@@ -53,7 +53,6 @@ Symbol              <-  ({} {
                         /   '('
                         /   ')'
                         /   '?'
-                        /   '#'
                         } {})
                     ->  Symbol
 ]], {
@@ -362,6 +361,32 @@ local function parseTypeUnit(parent, content)
     return typeUnit
 end
 
+local function parseResume()
+    local result = {
+        type = 'doc.resume'
+    }
+
+    if checkToken('symbol', '>', 1) then
+        nextToken()
+        result.default = true
+    end
+
+    local tp = peekToken()
+    if tp ~= 'string' then
+        pushError {
+            type   = 'LUADOC_MISS_STRING',
+            start  = getFinish(),
+            finish = getFinish(),
+        }
+        return nil
+    end
+    local _, str = nextToken()
+    result[1] = str
+    result.start = getStart()
+    result.finish = getFinish()
+    return result
+end
+
 function parseType(parent)
     if not peekToken() then
         pushError {
@@ -412,6 +437,27 @@ function parseType(parent)
         nextToken()
     end
     result.finish = getFinish()
+
+    while true do
+        local nextComm = NextComment('peek')
+        if nextComm and nextComm.text:sub(1, 2) == '-|' then
+            NextComment()
+            if not result.resumes then
+                result.resumes = {}
+            end
+            local finishPos = nextComm.text:find('#', 3) or #nextComm.text
+            parseTokens(nextComm.text:sub(3, finishPos), nextComm.start + 1)
+            local resume = parseResume()
+            if resume then
+                resume.comment = nextComm.text:match('#%s*(.+)', 3)
+                result.resumes[#result.resumes+1] = resume
+                result.finish = resume.finish
+            end
+        else
+            break
+        end
+    end
+
     if #result.types == 0 and #result.enums == 0 then
         return nil
     end
@@ -630,32 +676,6 @@ local function parseOverload()
     return result
 end
 
-local function parseResume()
-    local result = {
-        type = 'doc.resume'
-    }
-
-    if checkToken('symbol', '>', 1) then
-        nextToken()
-        result.default = true
-    end
-
-    local tp = peekToken()
-    if tp ~= 'string' then
-        pushError {
-            type   = 'LUADOC_MISS_STRING',
-            start  = getFinish(),
-            finish = getFinish(),
-        }
-        return nil
-    end
-    local _, str = nextToken()
-    result[1] = str
-    result.start = getStart()
-    result.finish = getFinish()
-    return result
-end
-
 local function convertTokens()
     local tp, text = nextToken()
     if not tp then
@@ -690,7 +710,7 @@ local function convertTokens()
     end
 end
 
-local function buildLuaDoc(comment, nextComment)
+local function buildLuaDoc(comment)
     local text = comment.text
     if text:sub(1, 1) ~= '-' then
         return
@@ -716,24 +736,6 @@ local function buildLuaDoc(comment, nextComment)
     local result = convertTokens()
     if result then
         result.comment = lastComment
-    end
-
-    while true do
-        local nextComm = nextComment('peek')
-        if nextComm and nextComm.text:sub(1, 2) == '-|' then
-            nextComment()
-            if not result.resumes then
-                result.resumes = {}
-            end
-            parseTokens(nextComm.text:sub(3), nextComm.start + 1)
-            local resume = parseResume()
-            if resume then
-                result.resumes[#result.resumes+1] = resume
-                result.finish = resume.finish
-            end
-        else
-            break
-        end
     end
 
     return result
@@ -839,7 +841,7 @@ return function (_, state)
     pushError = state.pushError
 
     local ci = 1
-    local function nextComment(peek)
+    NextComment = function (peek)
         local comment = comments[ci]
         if not peek then
             ci = ci + 1
@@ -848,11 +850,11 @@ return function (_, state)
     end
 
     while true do
-        local comment = nextComment()
+        local comment = NextComment()
         if not comment then
             break
         end
-        local doc = buildLuaDoc(comment, nextComment)
+        local doc = buildLuaDoc(comment)
         if doc then
             ast.docs[#ast.docs+1] = doc
             doc.parent = ast.docs

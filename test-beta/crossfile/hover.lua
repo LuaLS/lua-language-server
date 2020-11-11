@@ -309,15 +309,17 @@ TEST {
         ]]
     },
     hover = {
-        label = 'function f(x: string)',
+        label = "function f(x: string|'选项1'|'选项2')",
         name = 'f',
         description = [[
+```lua
 x: string
-   | '选项1' -- 注释1
-   |>'选项2' -- 注释2]]
+  | '选项1' -- 注释1
+  |>'选项2' -- 注释2
+```]]
     }
 }
-
+do return end
 TEST {
     {
         path = 'a.lua',
@@ -336,16 +338,15 @@ TEST {
     hover = {
         label = 'function f(x: option)',
         name = 'f',
-        args = EXISTS,
-        rawEnum = EXISTS,
-        enum = [[
-
+        description = [[
+```lua
 x: option
-   | '选项1' -- 注释1
-   |>'选项2' -- 注释2]]
+  | '选项1' -- 注释1
+  |>'选项2' -- 注释2
+```]]
     }
 }
-
+do return end
 TEST {
     {
         path = 'a.lua',

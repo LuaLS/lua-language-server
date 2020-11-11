@@ -180,14 +180,7 @@ local function tryLibrary(source)
     return md:string()
 end
 
-local function tryDocComment(source)
-    if source.type == 'field'
-    or source.type == 'method' then
-        source = source.parent
-    end
-    if not source.bindDocs then
-        return
-    end
+local function getBindComment(source)
     local lines = {}
     for _, doc in ipairs(source.bindDocs) do
         if doc.type == 'doc.comment' then
@@ -197,10 +190,62 @@ local function tryDocComment(source)
         end
     end
     if #lines == 0 then
+        return nil
+    end
+    return table.concat(lines, '\n')
+end
+
+local function buildEnumChunk(docType, name)
+    local enums = vm.getDocEnums(docType)
+    if #enums == 0 then
         return
     end
+    local types = {}
+    for _, tp in ipairs(docType.types) do
+        types[#types+1] = tp[1]
+    end
+    local lines = {}
+    lines[#lines+1] = ('%s: %s'):format(name, table.concat(types))
+    for _, enum in ipairs(enums) do
+        lines[#lines+1] = ('  |%s%s%s'):format(
+            enum.default and '>' or ' ',
+            enum[1],
+            enum.comment and (' -- %s'):format(enum.comment) or ''
+        )
+    end
+    return table.concat(lines, '\n')
+end
+
+local function getBindEnums(source)
+    local chunks = {}
+    for _, doc in ipairs(source.bindDocs) do
+        if doc.type == 'doc.param' then
+            chunks[#chunks+1] = buildEnumChunk(doc.extends, doc.param[1])
+        end
+    end
+    if #chunks == 0 then
+        return nil
+    end
+    return table.concat(chunks, '\n\n')
+end
+
+local function tryDocComment(source)
+    if source.type == 'field'
+    or source.type == 'method' then
+        source = source.parent
+    end
+    if not source.bindDocs then
+        return
+    end
+    local comment = getBindComment(source)
+    local enums   = getBindEnums(source)
     local md = markdown()
-    md:add('md', table.concat(lines, '\n'))
+    if comment then
+        md:add('md', comment)
+    end
+    if enums then
+        md:add('lua', enums)
+    end
     return md:string()
 end
 

@@ -87,6 +87,11 @@ function vm.getDocEnums(doc, mark, results)
     for _, enum in ipairs(doc.enums) do
         results[#results+1] = enum
     end
+    if doc.resumes then
+        for _, resume in ipairs(doc.resumes) do
+            results[#results+1] = resume
+        end
+    end
     for _, unit in ipairs(doc.types) do
         if unit.type == 'doc.type.name' then
             for _, other in ipairs(vm.getDocTypes(unit[1])) do

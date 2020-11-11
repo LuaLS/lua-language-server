@@ -2,6 +2,7 @@ local lni    = require 'lni'
 local fs     = require 'bee.filesystem'
 local config = require 'config'
 local util   = require 'utility'
+local lang   = require 'language'
 
 local m = {}
 
@@ -277,8 +278,55 @@ local function markLibrary(library)
     end
 end
 
+local function compileSingleMetaDoc(script)
+    local middleBuf = {}
+    middleBuf[#middleBuf+1] = [[
+local COMPILE_BUF = {}
+function PUSH(text)
+    COMPILE_BUF[#COMPILE_BUF+1] = text
+end
+]]
+    local last = 1
+    for start, lua, finish in script:gmatch '()%-%-%-%#([^\n\r]*)()' do
+        middleBuf[#middleBuf+1] = ('PUSH [===[%s]===]'):format(script:sub(last, start - 1))
+        middleBuf[#middleBuf+1] = lua
+        last = finish
+    end
+    middleBuf[#middleBuf+1] = ('PUSH [===[%s]===]'):format(script:sub(last))
+    middleBuf[#middleBuf+1] = 'return table.concat(COMPILE_BUF)'
+    local middleScript = table.concat(middleBuf, '\n')
+    local env = setmetatable({}, { __index = _ENV })
+    if config.config.runtime.version == 'LuaJIT' then
+        env.VERSION = 5.1
+        env.JIT = true
+    else
+        env.VERSION = tonumber(config.config.runtime.version:sub(-3))
+        env.JIT = false
+    end
+    util.saveFile((ROOT / 'log' / 'middleScript.lua'):string(), middleScript)
+    return assert(load(middleScript, middleScript, 't', env))()
+end
+
+local function compileMetaDoc()
+    local langID  = lang.id
+    local version = config.config.runtime.version
+    local metaDir = ROOT / 'meta' / config.config.runtime.meta:gsub('%$%{(.-)%}', {
+        version  = version,
+        language = langID,
+    })
+    if fs.exists(metaDir) then
+        return
+    end
+    fs.create_directory(metaDir)
+    local templateDir = ROOT / 'meta' / 'template'
+    for fullpath in templateDir:list_directory() do
+        local filename = fullpath:filename()
+        local metaDoc = compileSingleMetaDoc(util.loadFile(fullpath:string()))
+        util.saveFile((metaDir / filename):string(), metaDoc)
+    end
+end
+
 local function init()
-    local lang = require 'language'
     local id = lang.id
     m.global  = util.container()
     m.library = util.container()
@@ -313,6 +361,8 @@ local function init()
     markLibrary(m.object)
     markLibrary(m.other)
     markLibrary(m.custom)
+
+    compileMetaDoc()
 end
 
 function m.reload()

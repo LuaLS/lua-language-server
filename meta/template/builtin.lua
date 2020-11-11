@@ -6,7 +6,7 @@
 ---@class integer: number
 ---#else
 ---@alias integer number
----#endif
+---#end
 ---@class thread: any
 ---@class table: any
 ---@class file: any

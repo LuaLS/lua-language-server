@@ -25,6 +25,7 @@
         "3rd",
         ".vscode",
         "script",
+        "meta",
     ],
     "Lua.workspace.library": {
         "E:/Github/test" : true,

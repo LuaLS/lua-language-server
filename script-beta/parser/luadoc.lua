@@ -53,6 +53,7 @@ Symbol              <-  ({} {
                         /   '('
                         /   ')'
                         /   '?'
+                        /   '...'
                         } {})
                     ->  Symbol
 ]], {
@@ -430,6 +431,19 @@ function parseType(parent)
             if not result.start then
                 result.start = typeEnum.start
             end
+        elseif tp == 'symbol' and content == '...' then
+            nextToken()
+            local vararg = {
+                type   = 'doc.type.name',
+                start  = getStart(),
+                finish = getFinish(),
+                parent = result,
+                [1]    = content,
+            }
+            result.types[#result.types+1] = vararg
+            if not result.start then
+                result.start = vararg.start
+            end
         end
         if not checkToken('symbol', '|', 1) then
             break
@@ -678,6 +692,14 @@ local function parseOverload()
     return result
 end
 
+local function parseDeprecated()
+    return {
+        type   = 'doc.deprecated',
+        start  = getFinish(),
+        finish = getFinish(),
+    }
+end
+
 local function convertTokens()
     local tp, text = nextToken()
     if not tp then
@@ -709,6 +731,8 @@ local function convertTokens()
         return parseVararg()
     elseif text == 'overload' then
         return parseOverload()
+    elseif text == 'deprecated' then
+        return parseDeprecated()
     end
 end
 

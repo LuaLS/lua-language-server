@@ -44,6 +44,9 @@ return function (uri, callback)
             return
         end
         local name = source[1]
+        if name == '...' then
+            return
+        end
         if hasNameOfClassOrAlias(name)
         or hasNameOfGeneric(name, source) then
             return

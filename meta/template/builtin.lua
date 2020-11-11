@@ -1,0 +1,16 @@
+---@class any
+---@class nil: any
+---@class boolean: any
+---@class number: any
+---#if VERSION >= 5.3 then
+---@class integer: number
+---#else
+---@alias integer number
+---#endif
+---@class thread: any
+---@class table: any
+---@class file: any
+---@class string: any
+---@class userdata: any
+---@class lightuserdata: userdata
+---@class function:any

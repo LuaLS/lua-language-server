@@ -738,3 +738,13 @@ TEST [[
 ---@class c
 c = {}
 ]]
+
+TEST [[
+---@generic T: any
+---@param v T
+---@param message any
+---@return T
+function assert(v, message)
+    return v, message
+end
+]]

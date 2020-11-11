@@ -4,8 +4,6 @@ local tonumber = tonumber
 local util     = require 'utility'
 local log      = require 'brave.log'
 
-_ENV = nil
-
 ---@class jsonrpc
 local m = {}
 m.type = 'jsonrpc'
@@ -22,7 +20,10 @@ local function readProtoHead(reader, errHandle)
     while true do
         local line = reader 'L'
         if line == nil then
-            break
+            -- 说明管道已经关闭了
+            log.warn('stdin closed!')
+            os.exit(true)
+            return nil
         end
         if line == '\r\n' then
             break

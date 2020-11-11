@@ -3554,10 +3554,7 @@ function m.searchInfer(status, obj)
         obj = value
     end
 
-    local cache, makeCache
-    if status.deep then
-        cache, makeCache = m.getRefCache(status, obj, 'infer')
-    end
+    local cache, makeCache = m.getRefCache(status, obj, 'infer')
     if cache then
         for i = 1, #cache do
             status.results[#status.results+1] = cache[i]
@@ -3568,6 +3565,14 @@ function m.searchInfer(status, obj)
     if DEVELOP then
         status.cache.clock = status.cache.clock or osClock()
     end
+
+    if not status.cache.lockInfer then
+        status.cache.lockInfer = {}
+    end
+    if status.cache.lockInfer[obj] then
+        return
+    end
+    status.cache.lockInfer[obj] = true
 
     local checked = m.inferCheckDoc(status, obj)
                  or m.inferCheckUpDoc(status, obj)

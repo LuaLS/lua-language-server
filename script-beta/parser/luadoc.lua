@@ -146,10 +146,16 @@ local function checkToken(tp, content, offset)
 end
 
 local function getStart()
+    if Ci == 0 then
+        return Offset
+    end
     return TokenStarts[Ci] + Offset
 end
 
 local function getFinish()
+    if Ci == 0 then
+        return Offset
+    end
     return TokenFinishs[Ci] + Offset
 end
 
@@ -395,6 +401,7 @@ function parseType(parent)
         enums   = {},
         resumes = {},
     }
+    result.start = getStart()
     while true do
         local tp, content = peekToken()
         if not tp then

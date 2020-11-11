@@ -748,3 +748,13 @@ function assert(v, message)
     return v, message
 end
 ]]
+
+TEST [[
+---@type string
+---|
+]]
+
+TEST [[
+---@type
+---| 'xx'
+]]

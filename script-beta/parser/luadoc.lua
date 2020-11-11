@@ -388,19 +388,12 @@ local function parseResume()
 end
 
 function parseType(parent)
-    if not peekToken() then
-        pushError {
-            type   = 'LUADOC_MISS_TYPE_NAME',
-            start  = getFinish(),
-            finish = getFinish(),
-        }
-        return nil
-    end
     local result = {
-        type   = 'doc.type',
-        parent = parent,
-        types  = {},
-        enums  = {},
+        type    = 'doc.type',
+        parent  = parent,
+        types   = {},
+        enums   = {},
+        resumes = {},
     }
     while true do
         local tp, content = peekToken()
@@ -442,9 +435,6 @@ function parseType(parent)
         local nextComm = NextComment('peek')
         if nextComm and nextComm.text:sub(1, 2) == '-|' then
             NextComment()
-            if not result.resumes then
-                result.resumes = {}
-            end
             local finishPos = nextComm.text:find('#', 3) or #nextComm.text
             parseTokens(nextComm.text:sub(3, finishPos), nextComm.start + 1)
             local resume = parseResume()
@@ -458,7 +448,12 @@ function parseType(parent)
         end
     end
 
-    if #result.types == 0 and #result.enums == 0 then
+    if #result.types == 0 and #result.enums == 0 and #result.resumes == 0 then
+        pushError {
+            type   = 'LUADOC_MISS_TYPE_NAME',
+            start  = getFinish(),
+            finish = getFinish(),
+        }
         return nil
     end
     return result

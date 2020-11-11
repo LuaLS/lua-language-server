@@ -319,7 +319,7 @@ x: string
 ```]]
     }
 }
-do return end
+
 TEST {
     {
         path = 'a.lua',
@@ -336,7 +336,7 @@ TEST {
         ]]
     },
     hover = {
-        label = 'function f(x: option)',
+        label = "function f(x: '选项1'|'选项2')",
         name = 'f',
         description = [[
 ```lua
@@ -346,6 +346,65 @@ x: option
 ```]]
     }
 }
+
+TEST {
+    {
+        path = 'a.lua',
+        content = '',
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            ---@alias option
+            ---|   "'选项1'" # 注释1
+            ---| > "'选项2'" # 注释2
+            ---@return option x
+            function <?f?>() end
+        ]]
+    },
+    hover = {
+        label = [[
+function f()
+  -> x: '选项1'|'选项2']],
+        name = 'f',
+        description = [[
+```lua
+x: option
+  | '选项1' -- 注释1
+  |>'选项2' -- 注释2
+```]]
+    }
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = '',
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            ---@alias option
+            ---|   "'选项1'" # 注释1
+            ---| > "'选项2'" # 注释2
+            ---@return option
+            function <?f?>() end
+        ]]
+    },
+    hover = {
+        label = [[
+function f()
+  -> '选项1'|'选项2']],
+        name = 'f',
+        description = [[
+```lua
+(return 1): option
+  | '选项1' -- 注释1
+  |>'选项2' -- 注释2
+```]]
+    }
+}
+
 do return end
 TEST {
     {

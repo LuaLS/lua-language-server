@@ -207,8 +207,8 @@ local function buildEnumChunk(docType, name)
     local lines = {}
     lines[#lines+1] = ('%s: %s'):format(name, table.concat(types))
     for _, enum in ipairs(enums) do
-        lines[#lines+1] = ('  |%s%s%s'):format(
-            enum.default and '>' or ' ',
+        lines[#lines+1] = ('   %s %s%s'):format(
+            enum.default and '->' or ' |',
             enum[1],
             enum.comment and (' -- %s'):format(enum.comment) or ''
         )

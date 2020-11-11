@@ -1358,7 +1358,7 @@ a any
 
 TEST [[
 ---@param $
-function mt:f(a, b, c)
+function mt:f(a, b, c, ...)
 end
 ]]
 {

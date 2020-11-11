@@ -1156,11 +1156,13 @@ local function tryLuaDocByErr(ast, offset, err, docState, results)
         local label = {}
         local insertText = {}
         for i, arg in ipairs(func.args) do
-            label[i] = arg[1]
-            if i == 1 then
-                insertText[i] = ('%s any'):format(arg[1])
-            else
-                insertText[i] = ('---@param %s any'):format(arg[1])
+            if arg[1] then
+                label[#label+1] = arg[1]
+                if i == 1 then
+                    insertText[i] = ('%s any'):format(arg[1])
+                else
+                    insertText[i] = ('---@param %s any'):format(arg[1])
+                end
             end
         end
         results[#results+1] = {
@@ -1169,10 +1171,12 @@ local function tryLuaDocByErr(ast, offset, err, docState, results)
             insertText = table.concat(insertText, '\n'),
         }
         for i, arg in ipairs(func.args) do
-            results[#results+1] = {
-                label  = arg[1],
-                kind   = define.CompletionItemKind.Interface,
-            }
+            if arg[1] then
+                results[#results+1] = {
+                    label  = arg[1],
+                    kind   = define.CompletionItemKind.Interface,
+                }
+            end
         end
     end
 end

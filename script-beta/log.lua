@@ -120,7 +120,7 @@ function m.init(root, path)
         m.file = nil
         local file = ioOpen(m.path, 'rb')
         if file then
-            lastBuf = file:read 'a'
+            lastBuf = file:read(m.maxSize)
             file:close()
         end
     end

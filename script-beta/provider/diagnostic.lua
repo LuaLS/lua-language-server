@@ -119,6 +119,12 @@ function m.clear(uri)
     })
 end
 
+function m.clearAll()
+    for luri in pairs(m.cache) do
+        m.clear(luri)
+    end
+end
+
 function m.syntaxErrors(uri, ast)
     if #ast.errs == 0 then
         return nil
@@ -149,6 +155,9 @@ function m.diagnostics(uri, diags)
 end
 
 function m.doDiagnostic(uri)
+    if not config.config.diagnostics.enable then
+        return
+    end
     uri = uri:lower()
     if files.isLibrary(uri) then
         return
@@ -212,6 +221,10 @@ function m.refresh(uri)
 end
 
 function m.diagnosticsAll()
+    if not config.config.diagnostics.enable then
+        m.clearAll()
+        return
+    end
     if not m._start then
         return
     end

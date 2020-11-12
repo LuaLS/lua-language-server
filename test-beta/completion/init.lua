@@ -1296,9 +1296,38 @@ end
         label = 'a, b, c',
         kind = define.CompletionItemKind.Snippet,
         insertText = [[
-a any
----@param b any
----@param c any]]
+a ${1:any}
+---@param b ${2:any}
+---@param c ${0:any}]]
+    },
+    {
+        label = 'a',
+        kind = define.CompletionItemKind.Interface,
+    },
+    {
+        label = 'b',
+        kind = define.CompletionItemKind.Interface,
+    },
+    {
+        label = 'c',
+        kind = define.CompletionItemKind.Interface,
+    },
+}
+
+TEST [[
+---@param $
+function f(a, b, c) end
+
+function f2(a) end
+]]
+{
+    {
+        label = 'a, b, c',
+        kind = define.CompletionItemKind.Snippet,
+        insertText = [[
+a ${1:any}
+---@param b ${2:any}
+---@param c ${0:any}]]
     },
     {
         label = 'a',
@@ -1338,9 +1367,9 @@ end
         label = 'a, b, c',
         kind = define.CompletionItemKind.Snippet,
         insertText = [[
-a any
----@param b any
----@param c any]]
+a ${1:any}
+---@param b ${2:any}
+---@param c ${0:any}]]
     },
     {
         label = 'a',
@@ -1366,9 +1395,9 @@ end
         label = 'a, b, c',
         kind = define.CompletionItemKind.Snippet,
         insertText = [[
-a any
----@param b any
----@param c any]]
+a ${1:any}
+---@param b ${2:any}
+---@param c ${0:any}]]
     },
     {
         label = 'a',
@@ -1464,7 +1493,11 @@ end
     {
         label = 'return',
         kind = define.CompletionItemKind.Event,
-    }
+    },
+    {
+        label = 'deprecated',
+        kind = define.CompletionItemKind.Event,
+    },
 }
 
 TEST [[

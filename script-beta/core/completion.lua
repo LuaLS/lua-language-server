@@ -1116,11 +1116,16 @@ local function tryLuaDocBySource(ast, offset, source, results)
             end
         end
     elseif source.type == 'doc.param.name' then
-        local func = guide.eachSourceBetween(ast.ast, offset, math.huge, function (src)
+        local funcs = {}
+        guide.eachSourceBetween(ast.ast, offset, math.huge, function (src)
             if src.type == 'function' and src.start > offset then
-                return src
+                funcs[#funcs+1] = src
             end
         end)
+        table.sort(funcs, function (a, b)
+            return a.start < b.start
+        end)
+        local func = funcs[1]
         if not func or not func.args then
             return
         end
@@ -1156,30 +1161,43 @@ local function tryLuaDocByErr(ast, offset, err, docState, results)
             end
         end
     elseif err.type == 'LUADOC_MISS_PARAM_NAME' then
-        local func = guide.eachSourceBetween(ast.ast, offset, math.huge, function (src)
+        local funcs = {}
+        guide.eachSourceBetween(ast.ast, offset, math.huge, function (src)
             if src.type == 'function' and src.start > offset then
-                return src
+                funcs[#funcs+1] = src
             end
         end)
+        table.sort(funcs, function (a, b)
+            return a.start < b.start
+        end)
+        local func = funcs[1]
         if not func or not func.args then
             return
         end
         local label = {}
         local insertText = {}
+        local max = 0
+        for _, arg in ipairs(func.args) do
+            if arg[1] then
+                max = max + 1
+            end
+        end
         for i, arg in ipairs(func.args) do
             if arg[1] then
                 label[#label+1] = arg[1]
+                local index = i == max and 0 or i
                 if i == 1 then
-                    insertText[i] = ('%s any'):format(arg[1])
+                    insertText[i] = ('%s ${%d:any}'):format(arg[1], index)
                 else
-                    insertText[i] = ('---@param %s any'):format(arg[1])
+                    insertText[i] = ('---@param %s ${%d:any}'):format(arg[1], index)
                 end
             end
         end
         results[#results+1] = {
-            label      = table.concat(label, ', '),
-            kind       = define.CompletionItemKind.Snippet,
-            insertText = table.concat(insertText, '\n'),
+            label            = table.concat(label, ', '),
+            kind             = define.CompletionItemKind.Snippet,
+            insertTextFormat = 2,
+            insertText       = table.concat(insertText, '\n'),
         }
         for i, arg in ipairs(func.args) do
             if arg[1] then

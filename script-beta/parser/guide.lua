@@ -2701,13 +2701,28 @@ function m.inferCheckUpDoc(status, source)
     if parent then
         if parent.type == 'local'
         or parent.type == 'setlocal'
-        or parent.type == 'setglobal'
-        or parent.type == 'setfield'
-        or parent.type == 'setmethod'
-        or parent.type == 'setindex'
-        or parent.type == 'tablefield'
-        or parent.type == 'tableindex' then
+        or parent.type == 'setglobal' then
             source = parent
+        end
+        if parent.type == 'setfield'
+        or parent.type == 'tablefield' then
+            if parent.field == source
+            or parent.value == source then
+                source = parent
+            end
+        end
+        if parent.type == 'setmethod' then
+            if parent.method == source
+            or parent.value == source then
+                source = parent
+            end
+        end
+        if parent.type == 'setindex'
+        or parent.type == 'tableindex' then
+            if parent.index == source
+            or parent.value == source then
+                source = parent
+            end
         end
     end
     local binds = source.bindDocs

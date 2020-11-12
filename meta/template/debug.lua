@@ -12,3 +12,10 @@ function debug.getfenv(o) end
 ---@return string mask
 ---@return integer count
 function debug.gethook(co) end
+
+---@alias infowhat '"nSltufL"'
+---@alias finfo
+---| '""'
+
+---@overload fun(f: integer|function, what: infowhat?):finfo
+function debug.getinfo1(thread, f, what) end

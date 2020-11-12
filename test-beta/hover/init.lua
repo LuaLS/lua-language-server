@@ -1324,3 +1324,16 @@ local <?t?>
 [[
 local t: string|'enum1'|'enum2'
 ]]
+
+TEST [[
+---@class c
+t = {}
+
+---@overload fun()
+function <?t?>.f() end
+]]
+[[
+global t: c {
+    f: function,
+}
+]]

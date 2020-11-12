@@ -15,23 +15,20 @@ function m.encode(pack)
     return buf
 end
 
-local function readProtoHead(reader, errHandle)
+local function readProtoHead(reader)
     local head = {}
     while true do
         local line = reader 'L'
         if line == nil then
             -- 说明管道已经关闭了
-            log.warn('stdin closed!')
-            os.exit(true)
-            return nil
+            return nil, 'Disconnected!'
         end
         if line == '\r\n' then
             break
         end
         local k, v = line:match '^([^:]+)%s*%:%s*(.+)\r\n$'
         if not k then
-            errHandle('Proto header error:', line)
-            break
+            return nil, 'Proto header error: ' .. line
         end
         if k == 'Content-Length' then
             v = tonumber(v)
@@ -42,23 +39,24 @@ local function readProtoHead(reader, errHandle)
 end
 
 function m.decode(reader, errHandle)
-    local head = readProtoHead(reader, errHandle)
+    local head, err = readProtoHead(reader, errHandle)
+    if not head then
+        return nil, err
+    end
     local len = head['Content-Length']
     if not len then
-        errHandle('Proto header error:', util.dump(head))
-        return nil
+        return nil, 'Proto header error: ' .. util.dump(head)
     end
     local content = reader(len)
     if not content then
-        return nil
+        return nil, 'Proto read error'
     end
     local null = json.null
     json.null = nil
     local suc, res = pcall(json.decode, content)
     json.null = null
     if not suc then
-        errHandle('Proto parse error: ' .. res)
-        return nil
+        return nil, 'Proto parse error: ' .. res
     end
     return res
 end

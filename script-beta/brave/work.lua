@@ -3,15 +3,19 @@ local parser  = require 'parser'
 local fs      = require 'bee.filesystem'
 local furi    = require 'file-uri'
 local util    = require 'utility'
+local thread  = require 'bee.thread'
 
 brave.on('loadProto', function ()
     local jsonrpc = require 'jsonrpc'
     while true do
-        local proto = jsonrpc.decode(io.read, log.error)
+        local proto, err = jsonrpc.decode(io.read, log.error)
         --log.debug('loaded proto', proto.method)
-        if proto then
-            brave.push('proto', proto)
+        if not proto then
+            brave.push('protoerror', err)
+            return
         end
+        brave.push('proto', proto)
+        thread.sleep(0.001)
     end
 end)
 

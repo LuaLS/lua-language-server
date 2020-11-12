@@ -19,3 +19,8 @@ pub.on('proto', function (params)
         end
     end)
 end)
+
+pub.on('protoerror', function (err)
+    log.warn('Load proto error:', err)
+    os.exit(true)
+end)

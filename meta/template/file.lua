@@ -7,9 +7,11 @@ local file = {}
 ---|>'"l"'
 ---| '"L"'
 
----@return boolean suc?
----@return '"exit"'|'"signal"'?
----@return integer code?
+---@alias exitcode | '"exit"'|'"signal"'
+
+---@return boolean  suc?
+---@return exitcode exitcode?
+---@return integer  code?
 function file:close() end
 
 function file:flush() end

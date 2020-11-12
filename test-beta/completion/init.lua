@@ -1298,7 +1298,7 @@ end
         insertText = [[
 a ${1:any}
 ---@param b ${2:any}
----@param c ${0:any}]]
+---@param c ${3:any}]]
     },
     {
         label = 'a',
@@ -1327,7 +1327,7 @@ function f2(a) end
         insertText = [[
 a ${1:any}
 ---@param b ${2:any}
----@param c ${0:any}]]
+---@param c ${3:any}]]
     },
     {
         label = 'a',
@@ -1369,7 +1369,7 @@ end
         insertText = [[
 a ${1:any}
 ---@param b ${2:any}
----@param c ${0:any}]]
+---@param c ${3:any}]]
     },
     {
         label = 'a',
@@ -1397,7 +1397,7 @@ end
         insertText = [[
 a ${1:any}
 ---@param b ${2:any}
----@param c ${0:any}]]
+---@param c ${3:any}]]
     },
     {
         label = 'a',

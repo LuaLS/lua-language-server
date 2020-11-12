@@ -1176,20 +1176,13 @@ local function tryLuaDocByErr(ast, offset, err, docState, results)
         end
         local label = {}
         local insertText = {}
-        local max = 0
-        for _, arg in ipairs(func.args) do
-            if arg[1] then
-                max = max + 1
-            end
-        end
         for i, arg in ipairs(func.args) do
             if arg[1] then
                 label[#label+1] = arg[1]
-                local index = i == max and 0 or i
                 if i == 1 then
-                    insertText[i] = ('%s ${%d:any}'):format(arg[1], index)
+                    insertText[i] = ('%s ${%d:any}'):format(arg[1], i)
                 else
-                    insertText[i] = ('---@param %s ${%d:any}'):format(arg[1], index)
+                    insertText[i] = ('---@param %s ${%d:any}'):format(arg[1], i)
                 end
             end
         end

@@ -218,12 +218,14 @@ end
 
 local function getBindEnums(source)
     local chunks = {}
+    local returnIndex = 0
     for _, doc in ipairs(source.bindDocs) do
         if doc.type == 'doc.param' then
             chunks[#chunks+1] = buildEnumChunk(doc.extends, doc.param[1])
         elseif doc.type == 'doc.return' then
-            for n, rtn in ipairs(doc.returns) do
-                chunks[#chunks+1] = buildEnumChunk(rtn, rtn.name and rtn.name[1] or ('(return %d)'):format(n))
+            for _, rtn in ipairs(doc.returns) do
+                returnIndex = returnIndex + 1
+                chunks[#chunks+1] = buildEnumChunk(rtn, rtn.name and rtn.name[1] or ('(return %d)'):format(returnIndex))
             end
         end
     end

@@ -1028,7 +1028,18 @@ end
 
 local function tryLuaDocCate(line, results)
     local word = line:sub(3)
-    for _, docType in ipairs {'class', 'type', 'alias', 'param', 'return', 'field', 'generic', 'vararg', 'overload'} do
+    for _, docType in ipairs {
+        'class',
+        'type',
+        'alias',
+        'param',
+        'return',
+        'field',
+        'generic',
+        'vararg',
+        'overload',
+        'deprecated'
+    } do
         if matchKey(word, docType) then
             results[#results+1] = {
                 label       = docType,

@@ -9,7 +9,6 @@
 ---#end
 ---@class thread: any
 ---@class table: any
----@class file: any
 ---@class string: any
 ---@class userdata: any
 ---@class lightuserdata: userdata

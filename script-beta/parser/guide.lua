@@ -1463,6 +1463,7 @@ function m.checkSameSimpleByBindDocs(status, obj, start, queue, mode)
             }
         end
     end
+    newStatus.cache.searchingBindedDoc = nil
     for _, res in ipairs(newStatus.results) do
         queue[#queue+1] = {
             obj   = res,

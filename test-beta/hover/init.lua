@@ -1337,3 +1337,15 @@ global t: c {
     f: function,
 }
 ]]
+
+TEST [[
+---@class c
+t = {}
+
+---@overload fun()
+function t.<?f?>() end
+]]
+[[
+(2 个定义，1 个原型)
+(2) function c.f()
+]]

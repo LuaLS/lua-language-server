@@ -315,7 +315,7 @@ local function compileMetaDoc()
         language = langID,
     })
     if fs.exists(m.metapath) then
-        return
+        --return
     end
     fs.create_directory(m.metapath)
     local templateDir = ROOT / 'meta' / 'template'

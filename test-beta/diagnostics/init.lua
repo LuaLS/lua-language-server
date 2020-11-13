@@ -720,6 +720,18 @@ TEST [[
 
 TEST [[
 ---@class Class
+
+---@field <!x Class!>
+]]
+
+TEST [[
+---@class Class
+---
+---@field x Class
+]]
+
+TEST [[
+---@class Class
 ---@field x Class
 ---@field <!x!> Class
 ]]

@@ -35,6 +35,12 @@ function io.input(file) end
 ---@return fun():string|number
 function io.lines(filename, ...) end
 
+---@param filename string
+---@param mode openmode
+---@return file?
+---@return string errmsg?
+function io.open(filename, mode) end
+
 ---@overload fun():file
 ---@param file string|file
 function io.output(file) end

@@ -23,19 +23,18 @@ return function (uri, callback)
         for _, other in ipairs(bindGroup) do
             if other.type == 'doc.class' then
                 ok = true
-            elseif other == doc then
-                if not ok then
-                    callback {
-                        start   = doc.start,
-                        finish  = doc.finish,
-                        message = lang.script('DIAG_DOC_FIELD_NO_CLASS'),
-                    }
-                end
-                goto CONTINUE
-            elseif other.type == 'doc.field' then
-            else
-                ok = false
+                break
             end
+            if other == doc then
+                break
+            end
+        end
+        if not ok then
+            callback {
+                start   = doc.start,
+                finish  = doc.finish,
+                message = lang.script('DIAG_DOC_FIELD_NO_CLASS'),
+            }
         end
         ::CONTINUE::
     end

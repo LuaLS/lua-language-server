@@ -145,7 +145,7 @@ function setmetatable(table, metatable) end
 
 ---@param e string|number
 ---@param base integer?
----@return number|nil
+---@return number?
 function tonumber(e, base) end
 
 ---@param v any

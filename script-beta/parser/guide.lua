@@ -806,8 +806,8 @@ end
 ---@param a table
 ---@param b table
 ---@return string|boolean mode
----@return table|nil pathA
----@return table|nil pathB
+---@return table pathA?
+---@return table pathB?
 function m.getPath(a, b, sameFunction)
     --- 首先测试双方在同一个函数内
     if sameFunction and m.getParentFunction(a) ~= m.getParentFunction(b) then

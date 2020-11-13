@@ -7,27 +7,19 @@ local util           = require 'utility'
 
 local Care = {}
 Care['setglobal'] = function (source, results)
-    results[#results+1] = {
-        start      = source.start,
-        finish     = source.finish,
-        type       = define.TokenTypes.namespace,
-        modifieres = define.TokenModifiers.deprecated,
-    }
+    local isLib = vm.isGlobalLibraryName(source[1])
+    if not isLib then
+        results[#results+1] = {
+            start      = source.start,
+            finish     = source.finish,
+            type       = define.TokenTypes.namespace,
+            modifieres = define.TokenModifiers.deprecated,
+        }
+    end
 end
 Care['getglobal'] = function (source, results)
-    local lib = vm.getLibrary(source)
-    if lib then
-        if source[1] == '_G' then
-            return
-        else
-            results[#results+1] =  {
-                start      = source.start,
-                finish     = source.finish,
-                type       = define.TokenTypes.namespace,
-                modifieres = define.TokenModifiers.static,
-            }
-        end
-    else
+    local isLib = vm.isGlobalLibraryName(source[1])
+    if not isLib then
         results[#results+1] =  {
             start      = source.start,
             finish     = source.finish,

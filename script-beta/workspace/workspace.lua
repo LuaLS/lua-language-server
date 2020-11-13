@@ -9,6 +9,7 @@ local await      = require 'await'
 local rpath      = require 'workspace.require-path'
 local proto      = require 'proto.proto'
 local lang       = require 'language'
+local library    = require 'library'
 
 local m = {}
 m.type = 'workspace'
@@ -120,8 +121,15 @@ function m.getLibraryMatchers()
         return m.libraryMatchers
     end
 
-    m.libraryMatchers = {}
+    local librarys = {}
     for path, pattern in pairs(config.config.workspace.library) do
+        librarys[path] = pattern
+    end
+    if library.metapath then
+        librarys[library.metapath] = true
+    end
+    m.libraryMatchers = {}
+    for path, pattern in pairs(librarys) do
         local nPath = fs.absolute(fs.path(path)):string()
         local matcher = glob.gitignore(pattern, m.matchOption)
         if platform.OS == 'Windows' then

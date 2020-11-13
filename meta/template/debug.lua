@@ -80,10 +80,10 @@ function debug.getuservalue(u, n) end
 ---@return integer|boolean
 function debug.setcstacklimit(limit) end
 
----@generic ANY
----@param object ANY
+---@generic T
+---@param object T
 ---@param env table
----@return ANY object
+---@return T object
 function debug.setfenv(object, env) end
 
 ---@alias hookmask
@@ -106,10 +106,10 @@ function debug.sethook(thread, hook, mask, count) end
 ---@return string name
 function debug.setlocal(thread, level, index, value) end
 
----@generic ANY
----@param value ANY
+---@generic T
+---@param value T
 ---@param meta table
----@return ANY value
+---@return T value
 function debug.setmetatable(value, meta) end
 
 ---@param f function

@@ -1,10 +1,10 @@
 ---@type table
 arg = {}
 
----@generic ANY
----@param v ANY
+---@generic T
+---@param v T
 ---@param message any
----@return ANY
+---@return T
 function assert(v, message) end
 
 ---@alias cgopt54
@@ -42,10 +42,9 @@ function getfenv(f) end
 ---@return table metatable
 function getmetatable(object) end
 
----@generic TABLE: table
----@param t TABLE
+---@param t table
 ---@return fun(t: table, i: integer?):integer, any iterator
----@return TABLE t
+---@return table t
 ---@return integer i
 function ipairs(t) end
 
@@ -90,10 +89,9 @@ function module(name, ...) end
 ---@return any value
 function next(table, index) end
 
----@generic TABLE: table
----@param t TABLE
+---@param t table
 ---@return function next
----@return TABLE
+---@return table
 ---@return nil
 function pairs(t)
     return next
@@ -122,11 +120,10 @@ function rawget(table, index) end
 ---@return integer len
 function rawlen(v) end
 
----@generic TABLE table
----@param table TABLE
+---@param table table
 ---@param index any
 ---@param value any
----@return TABLE
+---@return table
 function rawset(table, index, value) end
 
 ---@param index integer|'"#"'
@@ -141,10 +138,9 @@ function select(index, ...) end
 ---@return function
 function setfenv(f, table) end
 
----@generic TABLE: table
----@param table TABLE
+---@param table table
 ---@param metatable table
----@return TABLE
+---@return table
 function setmetatable(table, metatable) end
 
 ---@param e string|number

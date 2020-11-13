@@ -1129,8 +1129,8 @@ local function tryLuaDocBySource(ast, offset, source, results)
         if not func or not func.args then
             return
         end
-        for i, arg in ipairs(func.args) do
-            if matchKey(source[1], arg[1]) then
+        for _, arg in ipairs(func.args) do
+            if arg[1] and matchKey(source[1], arg[1]) then
                 results[#results+1] = {
                     label  = arg[1],
                     kind   = define.CompletionItemKind.Interface,

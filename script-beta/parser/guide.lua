@@ -1394,6 +1394,23 @@ function m.checkSameSimpleInSpecialBranch(status, obj, start, queue)
     end
 end
 
+function m.checkSameSimpleByDocType(status, doc)
+    if status.cache.searchingBindedDoc then
+        return
+    end
+    if doc.type ~= 'doc.type' then
+        return
+    end
+    local results = {}
+    for _, piece in ipairs(doc.types) do
+        local pieceResult = stepRefOfDocType(status, piece, 'def')
+        for _, res in ipairs(pieceResult) do
+            results[#results+1] = res
+        end
+    end
+    return results
+end
+
 function m.checkSameSimpleByBindDocs(status, obj, start, queue, mode)
     if not obj.bindDocs then
         return
@@ -1405,14 +1422,9 @@ function m.checkSameSimpleByBindDocs(status, obj, start, queue, mode)
     local results = {}
     for _, doc in ipairs(obj.bindDocs) do
         if     doc.type == 'doc.class' then
-            results = stepRefOfDocType(status, doc.class, mode)
+            results[#results+1] = doc
         elseif doc.type == 'doc.type' then
-            for _, piece in ipairs(doc.types) do
-                local pieceResult = stepRefOfDocType(status, piece, mode)
-                for _, res in ipairs(pieceResult) do
-                    results[#results+1] = res
-                end
-            end
+            results[#results+1] = doc
         elseif doc.type == 'doc.param' then
             -- function (x) 的情况
             if  obj.type == 'local'
@@ -1420,12 +1432,7 @@ function m.checkSameSimpleByBindDocs(status, obj, start, queue, mode)
                 if obj.parent.type == 'funcargs'
                 or obj.parent.type == 'in'
                 or obj.parent.type == 'loop' then
-                    for _, piece in ipairs(doc.extends.types) do
-                        local pieceResult = stepRefOfDocType(status, piece, mode)
-                        for _, res in ipairs(pieceResult) do
-                            results[#results+1] = res
-                        end
-                    end
+                    results[#results+1] = doc.extends
                 end
             end
         elseif doc.type == 'doc.overload' then
@@ -1434,20 +1441,14 @@ function m.checkSameSimpleByBindDocs(status, obj, start, queue, mode)
             results[#results+1] = doc
         end
     end
-    local mark = {}
-    local newStatus = m.status(status)
-    newStatus.cache.searchingBindedDoc = true
     for _, res in ipairs(results) do
-        local doc = m.getDocState(res)
-        if doc.type == 'doc.class'
-        or doc.type == 'doc.type' then
-            local refs = doc.bindSources
-            for _, ref in ipairs(refs) do
-                if not mark[ref] then
-                    mark[ref] = true
-                    m.searchRefs(newStatus, ref, mode)
-                end
-            end
+        if res.type == 'doc.class'
+        or res.type == 'doc.type' then
+            queue[#queue+1] = {
+                obj   = res,
+                start = start,
+                force = true,
+            }
             skipInfer = true
         end
         if res.type == 'doc.type.function' then
@@ -1463,7 +1464,26 @@ function m.checkSameSimpleByBindDocs(status, obj, start, queue, mode)
             }
         end
     end
-    newStatus.cache.searchingBindedDoc = nil
+    return skipInfer
+end
+
+function m.checkSameSimpleOfRefByDocSource(status, obj, start, queue, mode)
+    if status.cache.searchingBindedDoc then
+        return
+    end
+    if not obj.bindSources then
+        return
+    end
+    status.cache.searchingBindedDoc = true
+    local mark = {}
+    local newStatus = m.status(status)
+    for _, ref in ipairs(obj.bindSources) do
+        if not mark[ref] then
+            mark[ref] = true
+            m.searchRefs(newStatus, ref, mode)
+        end
+    end
+    status.cache.searchingBindedDoc = nil
     for _, res in ipairs(newStatus.results) do
         queue[#queue+1] = {
             obj   = res,
@@ -1471,7 +1491,56 @@ function m.checkSameSimpleByBindDocs(status, obj, start, queue, mode)
             force = true,
         }
     end
-    return skipInfer
+end
+
+function m.checkSameSimpleByDoc(status, obj, start, queue, mode)
+    if obj.type == 'doc.class.name'
+    or obj.type == 'doc.type.name' then
+        obj = m.getDocState(obj)
+    end
+    if obj.type == 'doc.class' then
+        local classStart
+        for _, doc in ipairs(obj.bindGroup) do
+            if doc == obj then
+                classStart = true
+            elseif doc.type == 'doc.class' then
+                classStart = false
+            end
+            if classStart and doc.type == 'doc.field' then
+                queue[#queue+1] = {
+                    obj   = doc,
+                    start = start + 1,
+                }
+            end
+        end
+        m.checkSameSimpleOfRefByDocSource(status, obj, start, queue, mode)
+        if mode == 'ref' then
+            local pieceResult = stepRefOfDocType(status, obj.class, 'ref')
+            for _, res in ipairs(pieceResult) do
+                queue[#queue+1] = {
+                    obj   = res,
+                    start = start,
+                    force = true,
+                }
+            end
+        end
+        return true
+    elseif obj.type == 'doc.type' then
+        for _, piece in ipairs(obj.types) do
+            local pieceResult = stepRefOfDocType(status, piece, 'def')
+            for _, res in ipairs(pieceResult) do
+                queue[#queue+1] = {
+                    obj   = res,
+                    start = start,
+                    force = true,
+                }
+            end
+        end
+        if mode == 'ref' then
+            m.checkSameSimpleOfRefByDocSource(status, obj, start, queue, mode)
+        end
+        return true
+    end
 end
 
 function m.checkSameSimpleInArg1OfSetMetaTable(status, obj, start, queue)
@@ -1576,19 +1645,76 @@ function m.searchSameFieldsCrossMethod(status, ref, start, queue)
     end
 end
 
+local function checkSameSimpleAndMergeFunctionReturnsByDoc(status, results, source, index, call)
+    if not source or source.type ~= 'function' then
+        return
+    end
+    if not source.bindDocs then
+        return
+    end
+    local returns = {}
+    for _, doc in ipairs(source.bindDocs) do
+        if doc.type == 'doc.return' then
+            for _, rtn in ipairs(doc.returns) do
+                returns[#returns+1] = rtn
+            end
+        end
+    end
+    local rtn = returns[index]
+    if not rtn then
+        return
+    end
+    local types = m.checkSameSimpleByDocType(status, rtn)
+    if not types then
+        return
+    end
+    for _, res in ipairs(types) do
+        results[#results+1] = res
+    end
+    return true
+end
+
+local function checkSameSimpleAndMergeDocTypeFunctionReturns(status, results, source, index)
+    if not source.bindDocs then
+        return
+    end
+    for _, doc in ipairs(source.bindDocs) do
+        if doc.type == 'doc.type' then
+            for _, typeUnit in ipairs(doc.types) do
+                if typeUnit.type == 'doc.type.function' then
+                    local rtn = typeUnit.returns[index]
+                    if rtn then
+                        local types = m.checkSameSimpleByDocType(status, rtn)
+                        if types then
+                            for _, res in ipairs(types) do
+                                results[#results+1] = res
+                            end
+                            return true
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
 function m.checkSameSimpleInCallInSameFile(status, func, args, index)
     local newStatus = m.status(status)
     m.searchRefs(newStatus, func, 'def')
     local results = {}
     for _, def in ipairs(newStatus.results) do
-        local value = m.getObjectValue(def) or def
-        if value.type == 'function' then
-            local returns = value.returns
-            if returns then
-                for _, ret in ipairs(returns) do
-                    local exp = ret[index]
-                    if exp then
-                        results[#results+1] = exp
+        local hasDocReturn = checkSameSimpleAndMergeDocTypeFunctionReturns(status, results, def, index)
+                        or   checkSameSimpleAndMergeFunctionReturnsByDoc(status, results, def, index)
+        if not hasDocReturn then
+            local value = m.getObjectValue(def) or def
+            if value.type == 'function' then
+                local returns = value.returns
+                if returns then
+                    for _, ret in ipairs(returns) do
+                        local exp = ret[index]
+                        if exp then
+                            results[#results+1] = exp
+                        end
                     end
                 end
             end
@@ -2001,6 +2127,7 @@ function m.checkSameSimple(status, simple, data, mode, queue)
         end
         -- 检查 doc
         local skipInfer = m.checkSameSimpleByBindDocs(status, ref, i, queue, cmode)
+                    or    m.checkSameSimpleByDoc(status, ref, i, queue, cmode)
         if not skipInfer then
             -- 穿透 self:func 与 mt:func
             m.searchSameFieldsCrossMethod(status, ref, i, queue)
@@ -3402,6 +3529,27 @@ local function mergeFunctionReturnsByDoc(status, source, index, call)
     return true
 end
 
+local function mergeDocTypeFunctionReturns(status, source, index)
+    if not source.bindDocs then
+        return
+    end
+    for _, doc in ipairs(source.bindDocs) do
+        if doc.type == 'doc.type' then
+            for _, typeUnit in ipairs(doc.types) do
+                if typeUnit.type == 'doc.type.function' then
+                    local rtn = typeUnit.returns[index]
+                    if rtn then
+                        local results = m.getDocTypeNames(status, rtn)
+                        for _, res in ipairs(results) do
+                            status.results[#status.results+1] = res
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
 local function mergeFunctionReturns(status, source, index, call)
     local returns = source.returns
     if not returns then
@@ -3426,27 +3574,6 @@ local function mergeFunctionReturns(status, source, index, call)
                 else
                     for _, infer in ipairs(newStatus.results) do
                         status.results[#status.results+1] = infer
-                    end
-                end
-            end
-        end
-    end
-end
-
-local function mergeDocTypeFunctionReturns(status, source, index)
-    if not source.bindDocs then
-        return
-    end
-    for _, doc in ipairs(source.bindDocs) do
-        if doc.type == 'doc.type' then
-            for _, typeUnit in ipairs(doc.types) do
-                if typeUnit.type == 'doc.type.function' then
-                    local rtn = typeUnit.returns[index]
-                    if rtn then
-                        local results = m.getDocTypeNames(status, rtn)
-                        for _, res in ipairs(results) do
-                            status.results[#status.results+1] = res
-                        end
                     end
                 end
             end

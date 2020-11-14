@@ -1349,3 +1349,31 @@ function t.<?f?>() end
 (2 个定义，1 个原型)
 (2) function c.f()
 ]]
+
+TEST [[
+---@class C
+---@field field any
+
+---@type C
+local <?c?>
+]]
+[[
+local c: C {
+    field: any,
+}
+]]
+
+TEST [[
+---@class C
+---@field field any
+
+---@return C
+local function f() end
+
+local <?c?> = f()
+]]
+[[
+local c: C {
+    field: any,
+}
+]]

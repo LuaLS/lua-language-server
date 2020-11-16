@@ -788,6 +788,11 @@ function m.getSimpleName(obj)
         return ('z|%p'):format(obj)
     elseif obj.type == 'library' then
         return ('s|%s'):format(obj.name)
+    elseif obj.type == 'doc.class.name'
+    or     obj.type == 'doc.type.name' then
+        return ('c|%s'):format(obj[1])
+    elseif obj.type == 'doc.class' then
+        return ('c|%s'):format(obj.class[1])
     end
     return m.getKeyName(obj)
 end
@@ -1121,6 +1126,11 @@ local function buildSimpleList(obj, max)
         elseif cur.type == 'string' then
             list[i] = cur
             break
+        elseif cur.type == 'doc.class.name'
+        or     cur.type == 'doc.type.name'
+        or     cur.type == 'doc.class' then
+            list[i] = cur
+            break
         elseif cur.type == 'function'
         or     cur.type == 'main' then
             break
@@ -1147,7 +1157,10 @@ function m.getSimple(obj, max)
     or obj.type == 'tablefield'
     or obj.type == 'tableindex'
     or obj.type == 'select'
-    or obj.type == 'table' then
+    or obj.type == 'table'
+    or obj.type == 'doc.class.name'
+    or obj.type == 'doc.class'
+    or obj.type == 'doc.type.name' then
         simpleList = buildSimpleList(obj, max)
     elseif obj.type == 'field'
     or     obj.type == 'method' then
@@ -2017,6 +2030,38 @@ function m.checkSameSimpleAsSetValue(status, ref, start, queue)
     end
 end
 
+function m.checkSameSimpleInString(status, ref, start, queue, mode)
+    -- 特殊处理 ('xxx').xxx 的形式
+    if ref.type ~= 'string' then
+        return
+    end
+    if not status.interface.docType then
+        return
+    end
+    if status.cache.searchingBindedDoc then
+        return
+    end
+    local newStatus = m.status(status)
+    local docs = status.interface.docType(ref.type)
+    local mark = {}
+    for i = 1, #docs do
+        local doc = docs[i]
+        m.searchFields(newStatus, doc)
+    end
+    for _, res in ipairs(newStatus.results) do
+        if mark[res] then
+            goto CONTINUE
+        end
+        mark[res] = true
+        queue[#queue+1] = {
+            obj   = res,
+            start = start + 1,
+        }
+        ::CONTINUE::
+    end
+    return true
+end
+
 function m.pushResult(status, mode, ref, simple)
     local results = status.results
     if mode == 'def' then
@@ -2153,6 +2198,8 @@ function m.checkSameSimple(status, simple, data, mode, queue)
             m.checkSameSimpleInValueOfCallMetaTable(status, ref, i, queue)
             -- 检查自己是特殊变量的分支的情况
             m.checkSameSimpleInSpecialBranch(status, ref, i, queue)
+            -- 检查自己是字面量字符串的分支情况
+            m.checkSameSimpleInString(status, ref, i, queue, cmode)
             if cmode == 'ref' then
                 -- 检查形如 { a = f } 的情况
                 m.checkSameSimpleAsTableField(status, ref, i, queue)

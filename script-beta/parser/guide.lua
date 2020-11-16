@@ -3730,7 +3730,9 @@ function m.cleanInfers(infers)
         local infer = infers[i]
         if infer.source.type == 'doc.class'
         or infer.source.type == 'doc.type.name' then
-            hasDoc = true
+            if infer.type ~= 'any' then
+                hasDoc = true
+            end
         end
     end
     if hasDoc then

@@ -200,7 +200,7 @@ end
 _, <?y?> = pcall(x)
 ]]
 
-TEST 'table' [[
+TEST 'os' [[
 local <?os?> = require 'os'
 ]]
 

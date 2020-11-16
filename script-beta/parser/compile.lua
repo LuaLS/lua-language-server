@@ -212,6 +212,15 @@ local vmMap = {
             if node then
                 addRef(node, obj)
             end
+            local name = obj[1]
+            if specials[name] then
+                addSpecial(name, obj)
+            elseif Options and Options.special then
+                local asName = Options.special[name]
+                if specials[asName] then
+                    addSpecial(asName, obj)
+                end
+            end
         end
     end,
     ['local'] = function (obj)

@@ -60,6 +60,12 @@ function vm.getLibraryName(source, deep)
     if lib then
         return lib.name
     end
+    local defs = vm.getDefs(source, deep)
+    for _, def in ipairs(defs) do
+        if def.special then
+            return def.special
+        end
+    end
     return nil
 end
 

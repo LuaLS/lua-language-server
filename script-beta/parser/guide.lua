@@ -243,13 +243,12 @@ end
 --- 寻找根区块
 function m.getRoot(obj)
     for _ = 1, 1000 do
+        if obj.type == 'main' then
+            return obj
+        end
         local parent = obj.parent
         if not parent then
-            if obj.type == 'main' then
-                return obj
-            else
-                return nil
-            end
+            return nil
         end
         obj = parent
     end
@@ -1812,11 +1811,24 @@ local function searchEnvRef(ref, results)
 end
 
 function m.findGlobals(ast)
+    local root = m.getRoot(ast)
     local results = {}
-    local env = m.getENV(ast)
+    local env = m.getENV(root)
     if env.ref then
         for _, ref in ipairs(env.ref) do
             searchEnvRef(ref, results)
+        end
+    end
+    return results
+end
+
+function m.findGlobalsOfName(ast, name)
+    local root = m.getRoot(ast)
+    local results = {}
+    local globals = m.findGlobals(root)
+    for _, global in ipairs(globals) do
+        if m.getKeyName(global) == name then
+            results[#results+1] = global
         end
     end
     return results
@@ -1830,7 +1842,7 @@ function m.checkSameSimpleInGlobal(status, name, source, start, queue)
     if status.interface.global then
         objs = status.interface.global(name)
     else
-        objs = m.findGlobals(m.getRoot(source))
+        objs = m.findGlobalsOfName(source, name)
     end
     if objs then
         for _, obj in ipairs(objs) do

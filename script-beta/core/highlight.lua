@@ -11,6 +11,17 @@ local function eachRef(source, callback)
     end
 end
 
+local function eachField(source, callback)
+    local isGlobal = guide.isGlobal(source)
+    local results = guide.requestReference(source)
+    for i = 1, #results do
+        local res = results[i]
+        if isGlobal == guide.isGlobal(res) then
+            callback(res)
+        end
+    end
+end
+
 local function eachLocal(source, callback)
     callback(source)
     if source.ref then
@@ -27,18 +38,21 @@ local function find(source, uri, callback)
     or     source.type == 'setlocal' then
         eachLocal(source.node, callback)
     elseif source.type == 'field'
-    or     source.type == 'method'
-    or     source.type == 'getindex'
+    or     source.type == 'method' then
+        eachField(source.parent, callback)
+    elseif source.type == 'getindex'
     or     source.type == 'setindex'
-    or     source.type == 'tableindex'
-    or     source.type == 'goto'
-    or     source.type == 'label'
-    or     source.type == 'getglobal'
-    or     source.type == 'setglobal' then
+    or     source.type == 'tableindex' then
+        eachField(source, callback)
+    elseif source.type == 'setglobal'
+    or     source.type == 'getglobal' then
+        eachField(source, callback)
+    elseif source.type == 'goto'
+    or     source.type == 'label' then
         eachRef(source, callback)
     elseif source.type == 'string'
     and    source.parent.index == source then
-        eachRef(source.parent, callback)
+        eachField(source.parent, callback)
     elseif source.type == 'string'
     or     source.type == 'boolean'
     or     source.type == 'number'

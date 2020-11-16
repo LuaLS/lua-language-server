@@ -632,6 +632,14 @@ table.insert({}, 1, 2, <!3!>)
 ]]
 
 TEST [[
+while true do
+    break
+    <!print()
+    print()!>
+end
+]]
+
+TEST [[
 ---@class <!Class!>
 ---@class <!Class!>
 ]]

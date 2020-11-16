@@ -10,15 +10,14 @@ return function (uri, callback)
     if not ast then
         return
     end
-    -- 只检查局部函数与全局函数
+    -- 只检查局部函数
     guide.eachSourceType(ast.ast, 'function', function (source)
         local parent = source.parent
         if not parent then
             return
         end
         if  parent.type ~= 'local'
-        and parent.type ~= 'setlocal'
-        and parent.type ~= 'setglobal' then
+        and parent.type ~= 'setlocal' then
             return
         end
         local hasGet

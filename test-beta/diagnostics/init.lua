@@ -332,13 +332,13 @@ TEST [[
 <!local function f() end!>
 ]]
 
-TEST [[
-F = <!function () end!>
-]]
-
-TEST [[
-<!function F() end!>
-]]
+--TEST [[
+--F = <!function () end!>
+--]]
+--
+--TEST [[
+--<!function F() end!>
+--]]
 
 config.config.diagnostics.disable['unused-local'] = false
 config.config.diagnostics.disable['unused-function'] = true

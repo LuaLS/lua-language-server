@@ -5,6 +5,7 @@ local proto      = require 'proto'
 local define     = require 'proto.define'
 local util       = require 'utility'
 local findSource = require 'core.find-source'
+local ws         = require 'workspace'
 
 local Forcing
 
@@ -389,15 +390,20 @@ function m.rename(uri, pos, newname)
     local mark = {}
 
     rename(source, newname, function (target, start, finish, text)
-        if mark[start] then
+        local turi = files.getOriginUri(guide.getUri(target))
+        local uid = turi .. start
+        if mark[uid] then
             return
         end
-        mark[start] = true
+        mark[uid] = true
+        if ws.isLibrary(turi) then
+            return
+        end
         results[#results+1] = {
             start  = start,
             finish = finish,
             text   = text,
-            uri    = files.getOriginUri(guide.getUri(target)),
+            uri    = turi,
         }
     end)
 

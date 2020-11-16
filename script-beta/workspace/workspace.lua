@@ -125,8 +125,8 @@ function m.getLibraryMatchers()
     for path, pattern in pairs(config.config.workspace.library) do
         librarys[path] = pattern
     end
-    if library.metapath then
-        librarys[library.metapath] = true
+    if library.metaPath then
+        librarys[library.metaPath] = true
     end
     m.libraryMatchers = {}
     for path, pattern in pairs(librarys) do
@@ -151,17 +151,6 @@ function m.isIgnored(uri)
     local path = furi.decode(uri)
     local ignore = m.getNativeMatcher()
     return ignore(path)
-end
-
---- 文件是否作为库被加载
-function m.isLibrary(uri)
-    local path = furi.decode(uri)
-    for _, library in ipairs(m.getLibraryMatchers()) do
-        if library.matcher(path) then
-            return true
-        end
-    end
-    return false
 end
 
 local function loadFileFactory(root, progress, isLibrary)
@@ -317,7 +306,7 @@ end
 files.watch(function (ev, uri)
     if  ev == 'close'
     and m.isIgnored(uri)
-    and not m.isLibrary(uri) then
+    and not files.isLibrary(uri) then
         files.remove(uri)
     end
 end)

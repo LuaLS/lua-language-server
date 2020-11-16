@@ -7,6 +7,7 @@ package.path  = package.path
 local fs = require 'bee.filesystem'
 ROOT = fs.path(rootPath)
 LANG = 'zh-CN'
+TEST = true
 
 collectgarbage 'generational'
 
@@ -15,7 +16,6 @@ log.init(ROOT, ROOT / 'log' / 'test.log')
 log.debug('测试开始')
 ac = {}
 
-require 'utility'
 --dofile((ROOT / 'build_package.lua'):string())
 
 local function loadAllLibs()
@@ -25,6 +25,18 @@ local function loadAllLibs()
     assert(require 'bee.socket')
     assert(require 'lni')
     assert(require 'lpeglabel')
+end
+
+local function loadDocMetas()
+    local files   = require 'files'
+    local library = require 'library'
+    local furi    = require 'file-uri'
+    local fsu     = require 'fs-utility'
+    for _, path in ipairs(library.metaPaths) do
+        local uri = furi.encode(path)
+        files.setText(uri, fsu.loadFile(path))
+        files.setLibraryPath(uri, library.metaPath)
+    end
 end
 
 local function main()
@@ -40,6 +52,7 @@ local function main()
     local config = require 'config'
     config.config.runtime.version = 'Lua 5.4'
     config.config.intelliSense.searchDepth = 5
+    loadDocMetas()
 
     test 'references'
     test 'definition'

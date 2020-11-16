@@ -1498,6 +1498,10 @@ end
         label = 'deprecated',
         kind = define.CompletionItemKind.Event,
     },
+    {
+        label = 'meta',
+        kind = define.CompletionItemKind.Event,
+    },
 }
 
 TEST [[

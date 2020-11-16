@@ -310,19 +310,23 @@ end
 local function compileMetaDoc()
     local langID  = lang.id
     local version = config.config.runtime.version
-    m.metapath = ROOT / 'meta' / config.config.runtime.meta:gsub('%$%{(.-)%}', {
+    local metapath = ROOT / 'meta' / config.config.runtime.meta:gsub('%$%{(.-)%}', {
         version  = version,
         language = langID,
     })
-    if fs.exists(m.metapath) then
+    if fs.exists(metapath) then
         --return
     end
-    fs.create_directory(m.metapath)
+    m.metaPath = metapath:string()
+    m.metaPaths = {}
+    fs.create_directory(metapath)
     local templateDir = ROOT / 'meta' / 'template'
     for fullpath in templateDir:list_directory() do
         local filename = fullpath:filename()
         local metaDoc = compileSingleMetaDoc(util.loadFile(fullpath:string()))
-        util.saveFile((m.metapath / filename):string(), metaDoc)
+        local filepath = metapath / filename
+        util.saveFile(filepath:string(), metaDoc)
+        m.metaPaths[#m.metaPaths+1] = filepath:string()
     end
 end
 
@@ -373,7 +377,7 @@ local function initFromMetaDoc()
 end
 
 local function init()
-    if DEVELOP then
+    if DEVELOP or TEST then
         initFromMetaDoc()
     else
         initFromLni()

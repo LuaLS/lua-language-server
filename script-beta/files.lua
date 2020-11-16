@@ -174,10 +174,12 @@ function m.removeAll()
     m.globalVersion = m.globalVersion + 1
     await.close('files.version')
     for uri in pairs(m.fileMap) do
-        m.fileMap[uri]  = nil
-        m.astMap[uri]   = nil
-        m.linesMap[uri] = nil
-        m.onWatch('remove', uri)
+        if not m.libraryMap[uri] then
+            m.fileMap[uri]  = nil
+            m.astMap[uri]   = nil
+            m.linesMap[uri] = nil
+            m.onWatch('remove', uri)
+        end
     end
     --m.notifyCache = {}
 end
@@ -187,7 +189,8 @@ function m.removeAllClosed()
     m.globalVersion = m.globalVersion + 1
     await.close('files.version')
     for uri in pairs(m.fileMap) do
-        if not m.openMap[uri] then
+        if  not m.openMap[uri]
+        and not m.libraryMap[uri] then
             m.fileMap[uri]  = nil
             m.astMap[uri]   = nil
             m.linesMap[uri] = nil

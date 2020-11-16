@@ -120,11 +120,10 @@ function debug.setmetatable(value, meta) end
 ---@return string name
 function debug.setupvalue(f, up, value) end
 
----@generic USERDATA
----@param udata USERDATA
+---@param udata userdata
 ---@param value any
 ---@param n integer
----@return USERDATA udata
+---@return userdata udata
 function debug.setuservalue(udata, value, n) end
 
 ---@param thread thread

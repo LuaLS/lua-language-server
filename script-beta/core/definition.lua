@@ -64,14 +64,14 @@ local function checkRequire(source, offset)
     local call = callargs.parent
     local func = call.node
     local literal = guide.getLiteral(source)
-    local lib = vm.getLibrary(func)
-    if not lib then
+    local libName = vm.getLibraryName(func)
+    if not libName then
         return nil
     end
-    if     lib.name == 'require' then
+    if     libName == 'require' then
         return workspace.findUrisByRequirePath(literal)
-    elseif lib.name == 'dofile'
-    or     lib.name == 'loadfile' then
+    elseif libName == 'dofile'
+    or     libName == 'loadfile' then
         return workspace.findUrisByFilePath(literal)
     end
     return nil

@@ -15,14 +15,14 @@ local function asStringInRequire(source, literal)
         local result, searchers
         local call = parent.parent
         local func = call.node
-        local lib = vm.getLibrary(func)
-        if not lib then
+        local libName = vm.getLibraryName(func)
+        if not libName then
             return
         end
-        if     lib.name == 'require' then
+        if     libName == 'require' then
             result, searchers = ws.findUrisByRequirePath(literal)
-        elseif lib.name == 'dofile'
-        or     lib.name == 'loadfile' then
+        elseif libName == 'dofile'
+        or     libName == 'loadfile' then
             result = ws.findUrisByFilePath(literal)
         end
         if result and #result > 0 then

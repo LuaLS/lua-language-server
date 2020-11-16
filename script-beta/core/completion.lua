@@ -670,11 +670,11 @@ local function checkUri(ast, text, offset, results)
         local call = callargs.parent
         local func = call.node
         local literal = guide.getLiteral(source)
-        local lib = vm.getLibrary(func)
-        if not lib then
+        local libName = vm.getLibraryName(func)
+        if not libName then
             return
         end
-        if     lib.name == 'require' then
+        if     libName == 'require' then
             for uri in files.eachFile() do
                 uri = files.getOriginUri(uri)
                 if files.eq(myUri, uri) then
@@ -701,8 +701,8 @@ local function checkUri(ast, text, offset, results)
                 end
                 ::CONTINUE::
             end
-        elseif lib.name == 'dofile'
-        or     lib.name == 'loadfile' then
+        elseif libName == 'dofile'
+        or     libName == 'loadfile' then
             for uri in files.eachFile() do
                 uri = files.getOriginUri(uri)
                 if files.eq(myUri, uri) then

@@ -55,6 +55,14 @@ function vm.getLibrary(source, deep)
     end
 end
 
+function vm.getLibraryName(source, deep)
+    local lib = vm.getLibrary(source, deep)
+    if lib then
+        return lib.name
+    end
+    return nil
+end
+
 local globalLibraryNames = {
     'arg', 'assert', 'collectgarbage', 'dofile', '_G', 'getfenv',
     'getmetatable', 'ipairs', 'load', 'loadfile', 'loadstring',

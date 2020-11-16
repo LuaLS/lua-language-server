@@ -58,3 +58,5 @@ function os.time(date) end
 
 ---@return string
 function os.tmpname() end
+
+return os

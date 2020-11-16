@@ -98,3 +98,5 @@ function string.unpack(fmt, s, pos) end
 ---@param s string
 ---@return string
 function string.upper(s) end
+
+return string

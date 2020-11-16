@@ -147,3 +147,5 @@ function math.type(x) end
 ---@param n integer
 ---@return boolean
 function math.ult(m, n) end
+
+return math

@@ -23,3 +23,5 @@ function package.searchpath(name, path, sep, rep) end
 
 ---@param module table
 function package.seeall(module) end
+
+return package

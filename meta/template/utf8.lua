@@ -34,3 +34,5 @@ function utf8.len(s, i, j, lax) end
 ---@param i integer
 ---@return integer p
 function utf8.offset(s, n, i) end
+
+return utf8

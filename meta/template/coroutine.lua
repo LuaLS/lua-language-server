@@ -39,3 +39,5 @@ function coroutine.wrap(f) end
 
 ---@return ...
 function coroutine.yield(...) end
+
+return coroutine

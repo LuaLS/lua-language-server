@@ -53,3 +53,5 @@ function bit32.rrotate(x, distp) end
 ---@param distp integer
 ---@return integer
 function bit32.rshift(x, distp) end
+
+return bit32

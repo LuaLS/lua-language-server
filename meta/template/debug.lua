@@ -141,3 +141,5 @@ function debug.upvalueid(f, n) end
 ---@param f2 function
 ---@param n2 integer
 function debug.upvaluejoin(f1, n1, f2, n2) end
+
+return debug

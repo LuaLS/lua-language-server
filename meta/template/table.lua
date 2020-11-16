@@ -42,3 +42,5 @@ function table.sort(list, comp) end
 ---@param i integer?
 ---@param j integer?
 function table.unpack(list, i, j) end
+
+return table

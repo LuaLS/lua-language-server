@@ -74,3 +74,5 @@ function io.type(file) end
 ---@return file
 ---@return string errmsg?
 function io.write(...) end
+
+return io

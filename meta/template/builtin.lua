@@ -1,3 +1,5 @@
+---@meta
+
 ---@class any
 ---@class nil: any
 ---@class boolean: any

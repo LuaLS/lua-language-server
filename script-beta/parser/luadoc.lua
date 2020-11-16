@@ -700,6 +700,14 @@ local function parseDeprecated()
     }
 end
 
+local function parseMeta()
+    return {
+        type   = 'doc.meta',
+        start  = getFinish(),
+        finish = getFinish(),
+    }
+end
+
 local function convertTokens()
     local tp, text = nextToken()
     if not tp then
@@ -733,6 +741,8 @@ local function convertTokens()
         return parseOverload()
     elseif text == 'deprecated' then
         return parseDeprecated()
+    elseif text == 'meta' then
+        return parseMeta()
     end
 end
 

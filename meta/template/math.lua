@@ -1,3 +1,5 @@
+---@meta
+
 ---@class math
 ---@field huge       number
 ---@field maxinteger integer

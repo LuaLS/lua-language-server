@@ -34,7 +34,9 @@ local function asStringInRequire(source, literal)
                     path = path:sub(#ws.path + 1)
                 end
                 path = path:gsub('^[/\\]*', '')
-                if searcher then
+                if vm.isMetaFile(uri) then
+                    result[i] = ('* [[meta]](%s)'):format(uri)
+                elseif searcher then
                     searcher = searcher:sub(#ws.path + 1)
                     searcher = ws.normalize(searcher)
                     result[i] = ('* [%s](%s) %s'):format(path, uri, lang.script('HOVER_USE_LUA_PATH', searcher))

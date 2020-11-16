@@ -111,3 +111,25 @@ function vm.getDocTypes(name)
     vm.getCache('getDocTypes')[name] = cache
     return cache
 end
+
+function vm.isMetaFile(uri)
+    local status = files.getAst(uri)
+    if not status then
+        return false
+    end
+    local cache = files.getCache(uri)
+    if cache.isMeta ~= nil then
+        return cache.isMeta
+    end
+    cache.isMeta = false
+    if not status.ast.docs then
+        return false
+    end
+    for _, doc in ipairs(status.ast.docs) do
+        if doc.type == 'doc.meta' then
+            cache.isMeta = true
+            return true
+        end
+    end
+    return false
+end

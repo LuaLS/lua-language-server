@@ -1,3 +1,5 @@
+---@meta
+
 ---@class bit32
 bit32 = {}
 

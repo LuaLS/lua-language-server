@@ -1,3 +1,5 @@
+---@meta
+
 ---@type table
 arg = {}
 

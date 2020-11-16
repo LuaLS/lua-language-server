@@ -1,3 +1,5 @@
+---@meta
+
 ---@class io
 ---@field stdin  file
 ---@field stdout file

@@ -1,3 +1,5 @@
+---@meta
+
 ---@class package
 ---@field conifg    string
 ---@field cpath     string

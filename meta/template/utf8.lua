@@ -1,3 +1,5 @@
+---@meta
+
 ---@class utf8
 utf8 = {}
 

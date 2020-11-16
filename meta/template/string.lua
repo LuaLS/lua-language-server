@@ -1,3 +1,5 @@
+---@meta
+
 ---@class string
 string = {}
 

@@ -692,11 +692,17 @@ local function checkUri(ast, text, offset, results)
                                 }
                             }
                         end
-                        collect[info.expect][#collect[info.expect]+1] = ([=[* [%s](%s) %s]=]):format(
-                            path,
-                            uri,
-                            lang.script('HOVER_USE_LUA_PATH', info.searcher)
-                        )
+                        if vm.isMetaFile(uri) then
+                            collect[info.expect][#collect[info.expect]+1] = ([=[* [[meta]](%s)]=]):format(
+                                uri
+                            )
+                        else
+                            collect[info.expect][#collect[info.expect]+1] = ([=[* [%s](%s) %s]=]):format(
+                                path,
+                                uri,
+                                lang.script('HOVER_USE_LUA_PATH', info.searcher)
+                            )
+                        end
                     end
                 end
                 ::CONTINUE::
@@ -1038,7 +1044,8 @@ local function tryLuaDocCate(line, results)
         'generic',
         'vararg',
         'overload',
-        'deprecated'
+        'deprecated',
+        'meta',
     } do
         if matchKey(word, docType) then
             results[#results+1] = {

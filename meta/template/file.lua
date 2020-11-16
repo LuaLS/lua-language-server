@@ -1,3 +1,5 @@
+---@meta
+
 ---@class file
 local file = {}
 

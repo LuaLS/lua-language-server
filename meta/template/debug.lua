@@ -34,14 +34,14 @@ function debug.getfenv(o) end
 function debug.gethook(co) end
 
 ---@alias infowhat string
----| '"n"' # `name` 和 `namewhat`
----| '"S"' # `source`，`short_src`，`linedefined`，`lastlinedefined`，和 `what`
----| '"l"' # `currentline`
----| '"t"' # `istailcall`
----| '"u"' # `nups`，`nparams` 和 `isvararg`
----| '"f"' # `func`
----| '"r"' # `ftransfer` 和 `ntransfer`
----| '"L"' # `activelines`
+---|+'"n"' # `name` 和 `namewhat`
+---|+'"S"' # `source`，`short_src`，`linedefined`，`lalinedefined`，和 `what`
+---|+'"l"' # `currentline`
+---|+'"t"' # `istailcall`
+---|+'"u"' # `nups`，`nparams` 和 `isvararg`
+---|+'"f"' # `func`
+---|+'"r"' # `ftransfer` 和 `ntransfer`
+---|+'"L"' # `activelines`
 
 ---@overload fun(f: integer|function, what: infowhat?):debuginfo
 ---@param thread thread
@@ -88,10 +88,10 @@ function debug.setcstacklimit(limit) end
 ---@return T object
 function debug.setfenv(object, env) end
 
----@alias hookmask
----| '"c"'
----| '"r"'
----| '"l"'
+---@alias hookmask string
+---|+'"c"'
+---|+'"r"'
+---|+'"l"'
 
 ---@overload fun(hook: function, mask: hookmask, count: integer?)
 ---@param thread thread

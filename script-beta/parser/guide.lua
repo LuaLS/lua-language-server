@@ -2766,10 +2766,12 @@ function m.getDocTypeNames(status, doc, genericCallback)
         }
     end
     for _, resume in ipairs(doc.resumes) do
-        results[#results+1] = {
-            type   = resume[1],
-            source = resume,
-        }
+        if not resume.additional then
+            results[#results+1] = {
+                type   = resume[1],
+                source = resume,
+            }
+        end
     end
     return results
 end

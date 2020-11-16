@@ -54,6 +54,7 @@ Symbol              <-  ({} {
                         /   ')'
                         /   '?'
                         /   '...'
+                        /   '+'
                         } {})
                     ->  Symbol
 ]], {
@@ -376,6 +377,11 @@ local function parseResume()
     if checkToken('symbol', '>', 1) then
         nextToken()
         result.default = true
+    end
+
+    if checkToken('symbol', '+', 1) then
+        nextToken()
+        result.additional = true
     end
 
     local tp = peekToken()

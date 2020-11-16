@@ -210,7 +210,9 @@ local function buildEnumChunk(docType, name)
     lines[#lines+1] = ('%s: %s'):format(name, table.concat(types))
     for _, enum in ipairs(enums) do
         lines[#lines+1] = ('   %s %s%s'):format(
-            enum.default and '->' or ' |',
+               (enum.default    and '->')
+            or (enum.additional and '+>')
+            or ' |',
             enum[1],
             enum.comment and (' -- %s'):format(enum.comment) or ''
         )
@@ -219,17 +221,29 @@ local function buildEnumChunk(docType, name)
 end
 
 local function getBindEnums(source)
+    local mark = {}
     local chunks = {}
     local returnIndex = 0
     for _, doc in ipairs(source.bindDocs) do
         if doc.type == 'doc.param' then
-            chunks[#chunks+1] = buildEnumChunk(doc.extends, doc.param[1])
+            local name = doc.param[1]
+            if mark[name] then
+                goto CONTINUE
+            end
+            mark[name] = true
+            chunks[#chunks+1] = buildEnumChunk(doc.extends, name)
         elseif doc.type == 'doc.return' then
             for _, rtn in ipairs(doc.returns) do
                 returnIndex = returnIndex + 1
-                chunks[#chunks+1] = buildEnumChunk(rtn, rtn.name and rtn.name[1] or ('(return %d)'):format(returnIndex))
+                local name = rtn.name and rtn.name[1] or ('(return %d)'):format(returnIndex)
+                if mark[name] then
+                    goto CONTINUE
+                end
+                mark[name] = true
+                chunks[#chunks+1] = buildEnumChunk(rtn, name)
             end
         end
+        ::CONTINUE::
     end
     if #chunks == 0 then
         return nil

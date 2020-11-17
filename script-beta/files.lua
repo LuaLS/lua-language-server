@@ -77,6 +77,10 @@ function m.getLibraryPath(uri)
     return m.libraryMap[uri]
 end
 
+function m.flushAllLibrary()
+    m.libraryMap = {}
+end
+
 --- 是否存在
 ---@return boolean
 function m.exists(uri)

@@ -937,10 +937,6 @@ local function stepRefOfDocType(status, obj, mode)
     or obj.type == 'doc.type.name'
     or obj.type == 'doc.alias.name'
     or obj.type == 'doc.extends.name' then
-        if obj.array
-        or obj.generic then
-            return results
-        end
         local name = obj[1]
         if not name or not status.interface.docType then
             return results
@@ -2581,7 +2577,9 @@ function m.viewInferType(infers)
         local infer = infers[i]
         if infer.source.type == 'doc.class'
         or infer.source.type == 'doc.class.name'
-        or infer.source.type == 'doc.type.name' then
+        or infer.source.type == 'doc.type.name'
+        or infer.source.type == 'doc.type.array'
+        or infer.source.type == 'doc.type.generic' then
             if infer.type ~= 'any' then
                 hasDoc = true
                 break
@@ -2594,6 +2592,8 @@ function m.viewInferType(infers)
             if infer.source.type == 'doc.class'
             or infer.source.type == 'doc.class.name'
             or infer.source.type == 'doc.type.name'
+            or infer.source.type == 'doc.type.array'
+            or infer.source.type == 'doc.type.generic'
             or infer.source.type == 'doc.type.enum' then
                 local tp = infer.type or 'any'
                 if not mark[tp] then
@@ -2812,6 +2812,14 @@ local function getDocTypeUnitName(status, unit, genericCallback)
         typeName = getDocAliasExtends(status, unit[1]) or unit[1]
     elseif unit.type == 'doc.type.function' then
         typeName = 'function'
+    elseif unit.type == 'doc.type.array' then
+        typeName = getDocTypeUnitName(status, unit.node, genericCallback) .. '[]'
+    elseif unit.type == 'doc.type.generic' then
+        typeName = ('%s<%s, %s>'):format(
+            getDocTypeUnitName(status, unit.node,  genericCallback),
+            m.viewInferType(m.getDocTypeNames(status, unit.key,   genericCallback)),
+            m.viewInferType(m.getDocTypeNames(status, unit.value, genericCallback))
+        )
     end
     if unit.typeGeneric then
         if genericCallback then
@@ -2820,15 +2828,6 @@ local function getDocTypeUnitName(status, unit, genericCallback)
         else
             typeName = ('<%s>'):format(typeName)
         end
-    end
-    if unit.array then
-        typeName = typeName .. '[]'
-    elseif unit.generic then
-        typeName = ('%s<%s, %s>'):format(
-            typeName,
-            m.viewInferType(m.getDocTypeNames(status, unit.key)),
-            m.viewInferType(m.getDocTypeNames(status, unit.value))
-        )
     end
     return typeName
 end
@@ -3018,11 +3017,11 @@ function m.inferCheckFieldDoc(status, source)
         local ok
         for _, infer in ipairs(newStatus.results) do
             local src = infer.source
-            if src.array then
+            if src.type == 'doc.type.array' then
                 ok = true
                 status.results[#status.results+1] = {
                     type   = infer.type:gsub('%[%]$', ''),
-                    source = source,
+                    source = src.node,
                 }
             end
         end

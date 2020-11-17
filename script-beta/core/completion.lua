@@ -352,6 +352,21 @@ local function checkFieldFromFieldToIndex(name, parent, word, start, offset)
     return textEdit, additionalTextEdits
 end
 
+local function isDeprecated(value)
+    if value.deprecated then
+        return true
+    end
+    if not value.bindDocs then
+        return false
+    end
+    for _, doc in ipairs(value.bindDocs) do
+        if doc.type == 'doc.deprecated' then
+            return true
+        end
+    end
+    return false
+end
+
 local function checkFieldThen(name, src, word, start, offset, parent, oop, results)
     local value = guide.getObjectValue(src) or src
     local kind = define.CompletionItemKind.Field
@@ -364,7 +379,7 @@ local function checkFieldThen(name, src, word, start, offset, parent, oop, resul
         buildFunction(results, src, oop, {
             label      = name,
             kind       = kind,
-            deprecated = value.deprecated,
+            deprecated = isDeprecated(value) or nil,
             id         = stack(function ()
                 return {
                     detail      = buildDetail(src),
@@ -680,6 +695,9 @@ local function checkUri(ast, text, offset, results)
                 if files.eq(myUri, uri) then
                     goto CONTINUE
                 end
+                if vm.isMetaFile(uri) then
+                    goto CONTINUE
+                end
                 local path = workspace.getRelativePath(uri)
                 local infos = rpath.getVisiblePath(path, config.config.runtime.path)
                 for _, info in ipairs(infos) do
@@ -692,17 +710,11 @@ local function checkUri(ast, text, offset, results)
                                 }
                             }
                         end
-                        if vm.isMetaFile(uri) then
-                            collect[info.expect][#collect[info.expect]+1] = ([=[* [[meta]](%s)]=]):format(
-                                uri
-                            )
-                        else
-                            collect[info.expect][#collect[info.expect]+1] = ([=[* [%s](%s) %s]=]):format(
-                                path,
-                                uri,
-                                lang.script('HOVER_USE_LUA_PATH', info.searcher)
-                            )
-                        end
+                        collect[info.expect][#collect[info.expect]+1] = ([=[* [%s](%s) %s]=]):format(
+                            path,
+                            uri,
+                            lang.script('HOVER_USE_LUA_PATH', info.searcher)
+                        )
                     end
                 end
                 ::CONTINUE::
@@ -712,6 +724,9 @@ local function checkUri(ast, text, offset, results)
             for uri in files.eachFile() do
                 uri = files.getOriginUri(uri)
                 if files.eq(myUri, uri) then
+                    goto CONTINUE
+                end
+                if vm.isMetaFile(uri) then
                     goto CONTINUE
                 end
                 local path = workspace.getRelativePath(uri)
@@ -918,15 +933,36 @@ local function getCallEnums(source, index)
         return enums
     end
     if source.type == 'function' and source.bindDocs then
-        local arg = source.args and source.args[index]
-        if not arg then
+        if not source.args then
             return
+        end
+        local arg
+        if index <= #source.args then
+            arg = source.args[index]
+        else
+            local lastArg = source.args[#source.args]
+            if lastArg.type == '...' then
+                arg = lastArg
+            else
+                return
+            end
         end
         for _, doc in ipairs(source.bindDocs) do
             if  doc.type == 'doc.param'
             and doc.param[1] == arg[1] then
                 local enums = {}
                 for _, enum in ipairs(vm.getDocEnums(doc.extends)) do
+                    enums[#enums+1] = {
+                        label       = enum[1],
+                        description = enum.comment,
+                        kind        = define.CompletionItemKind.EnumMember,
+                    }
+                end
+                return enums
+            elseif doc.type == 'doc.vararg'
+            and    arg.type == '...' then
+                local enums = {}
+                for _, enum in ipairs(vm.getDocEnums(doc.vararg)) do
                     enums[#enums+1] = {
                         label       = enum[1],
                         description = enum.comment,

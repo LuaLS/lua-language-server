@@ -329,6 +329,26 @@ do$
         label = 'loadfile()',
         kind  = define.CompletionItemKind.Snippet,
     },
+    {
+        label = 'loadstring',
+        kind  = define.CompletionItemKind.Function,
+        deprecated = true,
+    },
+    {
+        label = 'loadstring()',
+        kind  = define.CompletionItemKind.Snippet,
+        deprecated = true,
+    },
+    {
+        label = 'module',
+        kind  = define.CompletionItemKind.Function,
+        deprecated = true,
+    },
+    {
+        label = 'module()',
+        kind  = define.CompletionItemKind.Snippet,
+        deprecated = true,
+    },
 }
 
 TEST [[
@@ -850,7 +870,7 @@ xx$
 
 TEST [[
 local index
-tbl[ind$]
+tbl[inde$]
 ]]
 {
     {
@@ -1271,16 +1291,12 @@ TEST [[
 }
 
 TEST [[
----@class Class
----@param x C$
+---@class ZClass
+---@param x ZC$
 ]]
 {
     {
-        label = 'Class',
-        kind = define.CompletionItemKind.Class,
-    },
-    {
-        label = 'function',
+        label = 'ZClass',
         kind = define.CompletionItemKind.Class,
     },
 }

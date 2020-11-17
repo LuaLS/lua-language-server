@@ -1161,6 +1161,7 @@ function m.getSimple(obj, max)
     or obj.type == 'tableindex'
     or obj.type == 'select'
     or obj.type == 'table'
+    or obj.type == 'string'
     or obj.type == 'doc.class.name'
     or obj.type == 'doc.class'
     or obj.type == 'doc.type.name' then

@@ -10,6 +10,7 @@ arg = {}
 function assert(v, message) end
 
 ---@alias cgopt54
+---|>'"collect"'
 ---| '"stop"'
 ---| '"restart"'
 ---| '"count"'

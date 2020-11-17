@@ -1,5 +1,6 @@
-local core = require 'core.definition'
+local core  = require 'core.definition'
 local files = require 'files'
+local vm    = require 'vm'
 
 rawset(_G, 'TEST', true)
 
@@ -46,7 +47,9 @@ function TEST(script)
     if results then
         local positions = {}
         for i, result in ipairs(results) do
-            positions[i] = { result.target.start, result.target.finish }
+            if not vm.isMetaFile(result.uri) then
+                positions[i] = { result.target.start, result.target.finish }
+            end
         end
         assert(founded(target, positions))
     else

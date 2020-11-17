@@ -536,9 +536,9 @@ global io: io {
     output: function,
     popen: function,
     read: function,
-    stderr: FILE*,
-    stdin: FILE*,
-    stdout: FILE*,
+    stderr: file,
+    stdin: file,
+    stdout: file,
     tmpfile: function,
     type: function,
     write: function,
@@ -636,7 +636,7 @@ TEST[[
 <?next?>()
 ]]
 [[
-function next(table: table [, index: any])
+function next(table: table, index: any?)
   -> key: any
   2. value: any
 ]]
@@ -775,7 +775,7 @@ local <?t?> = {
 ]]
 [[
 local t: {
-    f: FILE*,
+    f: file,
 }
 ]]
 
@@ -783,9 +783,9 @@ TEST [[
 io.<?popen?>()
 ]]
 [[
-function io.popen(prog: string [, mode: string])
-  -> FILE*|nil
-  2.[error_message: string]
+function io.popen(prog: string, mode: "r"|"w"?)
+  -> file?
+  2. errmsg: string?
 ]]
 
 TEST [[

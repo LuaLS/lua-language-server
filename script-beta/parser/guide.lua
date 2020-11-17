@@ -1552,6 +1552,10 @@ function m.checkSameSimpleByDoc(status, obj, start, queue, mode)
             m.checkSameSimpleOfRefByDocSource(status, obj, start, queue, mode)
         end
         return true
+    elseif obj.type == 'doc.field' then
+        if mode ~= 'field' then
+            return m.checkSameSimpleByDoc(status, obj.extends, start, queue, mode)
+        end
     end
 end
 

@@ -1,6 +1,6 @@
 ---@meta
 
----@class utf8
+---@class utf8*
 ---@field charpattern string
 utf8 = {}
 

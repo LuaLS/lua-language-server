@@ -1,6 +1,6 @@
 ---@meta
 
----@class package
+---@class package*
 ---@field conifg    string
 ---@field cpath     string
 ---@field loaded    table

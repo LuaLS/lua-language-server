@@ -12,7 +12,7 @@ Sp                  <-  %s+
 X16                 <-  [a-fA-F0-9]
 Word                <-  [a-zA-Z0-9_]
 Token               <-  Name / String / Symbol
-Name                <-  ({} {[a-zA-Z_] [a-zA-Z0-9_.]*} {})
+Name                <-  ({} {[a-zA-Z_] [a-zA-Z0-9_.*]*} {})
                     ->  Name
 String              <-  ({} StringDef {})
                     ->  String

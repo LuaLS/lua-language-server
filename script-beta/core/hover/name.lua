@@ -20,6 +20,9 @@ local function asField(source, oop)
     local class = vm.getClass(source.node, 'deep')
     local node = class or guide.getName(source.node) or '?'
     local method = guide.getName(source)
+    if node:sub(-1) == '*' then
+        node = node:sub(1, -2)
+    end
     if oop then
         return ('%s:%s'):format(node, method)
     else

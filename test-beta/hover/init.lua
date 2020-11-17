@@ -498,7 +498,7 @@ TEST [[
 print(<?utf8?>)
 ]]
 [[
-global utf8: utf8 {
+global utf8: utf8* {
     char: function,
     charpattern: string,
     codepoint: function,
@@ -512,7 +512,7 @@ TEST [[
 print(io.<?stderr?>)
 ]]
 [[
-global io.stderr: file {
+global io.stderr: file* {
     close: function,
     flush: function,
     lines: function,
@@ -527,7 +527,7 @@ TEST [[
 print(<?io?>)
 ]]
 [[
-global io: io {
+global io: io* {
     close: function,
     flush: function,
     input: function,
@@ -536,9 +536,9 @@ global io: io {
     output: function,
     popen: function,
     read: function,
-    stderr: file,
-    stdin: file,
-    stdout: file,
+    stderr: file*,
+    stdin: file*,
+    stdout: file*,
     tmpfile: function,
     type: function,
     write: function,
@@ -549,7 +549,7 @@ TEST [[
 local <?sssss?> = require 'utf8'
 ]]
 [[
-local sssss: utf8 {
+local sssss: utf8* {
     char: function,
     charpattern: string,
     codepoint: function,
@@ -775,7 +775,7 @@ local <?t?> = {
 ]]
 [[
 local t: {
-    f: file,
+    f: file*,
 }
 ]]
 
@@ -784,7 +784,7 @@ io.<?popen?>()
 ]]
 [[
 function io.popen(prog: string, mode: "r"|"w"?)
-  -> file?
+  -> file*?
   2. errmsg: string?
 ]]
 
@@ -793,21 +793,25 @@ TEST [[
 ]]
 [[
 global _G: _G {
-    _G: table,
+    _G: _G,
     _VERSION: string = "Lua 5.4",
     arg: table,
     assert: function,
+    bit32: table,
     collectgarbage: function,
     coroutine: table,
     debug: table,
     dofile: function,
     error: function,
+    getfenv: function,
     getmetatable: function,
     io: table,
     ipairs: function,
     load: function,
     loadfile: function,
+    loadstring: function,
     math: table,
+    module: function,
     next: function,
     os: table,
     package: table,
@@ -820,12 +824,14 @@ global _G: _G {
     rawset: function,
     require: function,
     select: function,
+    setfenv: function,
     setmetatable: function,
     string: table,
     table: table,
     tonumber: function,
     tostring: function,
     type: function,
+    unpack: function,
     utf8: table,
     warn: function,
     xpcall: function,

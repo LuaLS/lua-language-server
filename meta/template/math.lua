@@ -1,6 +1,6 @@
 ---@meta
 
----@class math
+---@class math*
 ---@field huge       number
 ---@field maxinteger integer
 ---@field mininteger integer

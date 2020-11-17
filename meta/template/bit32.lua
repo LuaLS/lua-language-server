@@ -1,6 +1,6 @@
 ---@meta
 
----@class bit32
+---@class bit32*
 bit32 = {}
 
 ---@param x integer

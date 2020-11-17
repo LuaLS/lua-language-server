@@ -1,6 +1,6 @@
 ---@meta
 
----@class file
+---@class file*
 local file = {}
 
 ---@alias readmode number

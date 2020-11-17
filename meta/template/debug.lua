@@ -1,6 +1,6 @@
 ---@meta
 
----@class debug
+---@class debug*
 debug = {}
 
 ---@class debuginfo

@@ -1,6 +1,6 @@
 ---@meta
 
----@class os
+---@class os*
 os = {}
 
 ---@return number

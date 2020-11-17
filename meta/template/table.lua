@@ -1,5 +1,6 @@
 ---@meta
 
+---@class table*
 table = {}
 
 ---@param list table

@@ -1,6 +1,6 @@
 ---@meta
 
----@class string
+---@class string*
 string = {}
 
 ---@param s string

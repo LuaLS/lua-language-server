@@ -937,6 +937,10 @@ local function stepRefOfDocType(status, obj, mode)
     or obj.type == 'doc.type.name'
     or obj.type == 'doc.alias.name'
     or obj.type == 'doc.extends.name' then
+        if obj.array
+        or obj.generic then
+            return results
+        end
         local name = obj[1]
         if not name or not status.interface.docType then
             return results
@@ -1075,6 +1079,9 @@ local function convertSimpleList(list)
         end
         simple[#simple+1] = m.getSimpleName(c)
         ::CONTINUE::
+    end
+    if simple.mode == 'global' and #simple == 0 then
+        simple[1] = 's|_G'
     end
     return simple
 end
@@ -2046,7 +2053,7 @@ function m.checkSameSimpleInString(status, ref, start, queue, mode)
         return
     end
     local newStatus = m.status(status)
-    local docs = status.interface.docType(ref.type)
+    local docs = status.interface.docType('string*')
     local mark = {}
     for i = 1, #docs do
         local doc = docs[i]
@@ -2586,7 +2593,8 @@ function m.viewInferType(infers)
             local infer = infers[i]
             if infer.source.type == 'doc.class'
             or infer.source.type == 'doc.class.name'
-            or infer.source.type == 'doc.type.name' then
+            or infer.source.type == 'doc.type.name'
+            or infer.source.type == 'doc.type.enum' then
                 local tp = infer.type or 'any'
                 if not mark[tp] then
                     types[#types+1] = tp

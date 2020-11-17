@@ -1,6 +1,6 @@
 ---@meta
 
----@class coroutine
+---@class coroutine*
 coroutine = {}
 
 ---@param f function

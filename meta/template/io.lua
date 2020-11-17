@@ -1,9 +1,9 @@
 ---@meta
 
----@class io
----@field stdin  file
----@field stdout file
----@field stderr file
+---@class io*
+---@field stdin  file*
+---@field stdout file*
+---@field stderr file*
 io = {}
 
 ---@alias openmode
@@ -20,7 +20,7 @@ io = {}
 ---| '"w+b"'
 ---| '"a+b"'
 
----@param file file?
+---@param file file*?
 ---@return boolean  suc?
 ---@return exitcode exitcode?
 ---@return integer  code?
@@ -28,8 +28,8 @@ function io.close(file) end
 
 function io.flush() end
 
----@overload fun():file
----@param file string|file
+---@overload fun():file*
+---@param file string|file*
 function io.input(file) end
 
 ---@param filename string?
@@ -39,12 +39,12 @@ function io.lines(filename, ...) end
 
 ---@param filename string
 ---@param mode openmode
----@return file?
+---@return file*?
 ---@return string errmsg?
 function io.open(filename, mode) end
 
----@overload fun():file
----@param file string|file
+---@overload fun():file*
+---@param file string|file*
 function io.output(file) end
 
 ---@alias popenmode
@@ -53,7 +53,7 @@ function io.output(file) end
 
 ---@param prog string
 ---@param mode popenmode?
----@return file?
+---@return file*?
 ---@return string errmsg?
 function io.popen(prog, mode) end
 
@@ -62,18 +62,18 @@ function io.popen(prog, mode) end
 ---@return ...
 function io.read(...) end
 
----@return file
+---@return file*
 function io.tmpfile() end
 
 ---@alias filetype
 ---| '"file"'
 ---| '"closed file"'
 ---| 'nil'
----@param file file
+---@param file file*
 ---@return filetype
 function io.type(file) end
 
----@return file
+---@return file*
 ---@return string errmsg?
 function io.write(...) end
 

@@ -2575,11 +2575,12 @@ function m.viewInferType(infers)
     local hasDoc
     for i = 1, #infers do
         local infer = infers[i]
-        if infer.source.type == 'doc.class'
-        or infer.source.type == 'doc.class.name'
-        or infer.source.type == 'doc.type.name'
-        or infer.source.type == 'doc.type.array'
-        or infer.source.type == 'doc.type.generic' then
+        local src = infer.source
+        if src.type == 'doc.class'
+        or src.type == 'doc.class.name'
+        or src.type == 'doc.type.name'
+        or src.type == 'doc.type.array'
+        or src.type == 'doc.type.generic' then
             if infer.type ~= 'any' then
                 hasDoc = true
                 break
@@ -2589,12 +2590,14 @@ function m.viewInferType(infers)
     if hasDoc then
         for i = 1, #infers do
             local infer = infers[i]
-            if infer.source.type == 'doc.class'
-            or infer.source.type == 'doc.class.name'
-            or infer.source.type == 'doc.type.name'
-            or infer.source.type == 'doc.type.array'
-            or infer.source.type == 'doc.type.generic'
-            or infer.source.type == 'doc.type.enum' then
+            local src = infer.source
+            if src.type == 'doc.class'
+            or src.type == 'doc.class.name'
+            or src.type == 'doc.type.name'
+            or src.type == 'doc.type.array'
+            or src.type == 'doc.type.generic'
+            or src.type == 'doc.type.enum'
+            or src.type == 'doc.resume' then
                 local tp = infer.type or 'any'
                 if not mark[tp] then
                     types[#types+1] = tp

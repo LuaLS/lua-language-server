@@ -2565,12 +2565,39 @@ function m.viewInferType(infers)
     end
     local mark = {}
     local types = {}
+    local hasDoc
     for i = 1, #infers do
-        local tp = infers[i].type or 'any'
-        if not mark[tp] then
-            types[#types+1] = tp
+        local infer = infers[i]
+        if infer.source.type == 'doc.class'
+        or infer.source.type == 'doc.class.name'
+        or infer.source.type == 'doc.type.name' then
+            if infer.type ~= 'any' then
+                hasDoc = true
+                break
+            end
         end
-        mark[tp] = true
+    end
+    if hasDoc then
+        for i = 1, #infers do
+            local infer = infers[i]
+            if infer.source.type == 'doc.class'
+            or infer.source.type == 'doc.class.name'
+            or infer.source.type == 'doc.type.name' then
+                local tp = infer.type or 'any'
+                if not mark[tp] then
+                    types[#types+1] = tp
+                end
+                mark[tp] = true
+            end
+        end
+    else
+        for i = 1, #infers do
+            local tp = infers[i].type or 'any'
+            if not mark[tp] then
+                types[#types+1] = tp
+            end
+            mark[tp] = true
+        end
     end
     return m.mergeTypes(types)
 end
@@ -3725,37 +3752,15 @@ function m.inferByPCallReturn(status, source)
 end
 
 function m.cleanInfers(infers)
-    local hasDoc
-    for i = 1, #infers do
+    local mark = {}
+    for i = #infers, 1, -1 do
         local infer = infers[i]
-        if infer.source.type == 'doc.class'
-        or infer.source.type == 'doc.type.name' then
-            if infer.type ~= 'any' then
-                hasDoc = true
-            end
-        end
-    end
-    if hasDoc then
-        for i = #infers, 1, -1 do
-            local infer = infers[i]
-            if infer.source.type == 'doc.class'
-            or infer.source.type == 'doc.type.name' then
-            else
-                infers[i] = infers[#infers]
-                infers[#infers] = nil
-            end
-        end
-    else
-        local mark = {}
-        for i = #infers, 1, -1 do
-            local infer = infers[i]
-            local key = ('%s|%p'):format(infer.type, infer.source)
-            if mark[key] then
-                infers[i] = infers[#infers]
-                infers[#infers] = nil
-            else
-                mark[key] = true
-            end
+        local key = ('%s|%p'):format(infer.type, infer.source)
+        if mark[key] then
+            infers[i] = infers[#infers]
+            infers[#infers] = nil
+        else
+            mark[key] = true
         end
     end
 end

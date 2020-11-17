@@ -232,14 +232,14 @@ TEST [[
 string.<?sub?>()
 ]]
 [[
-function string.sub(string, i: integer [, j: integer])
+function string.sub(s: string, i: integer, j: integer?)
   -> string
 ]]
 
 TEST[[
 ('xx'):<?sub?>()
 ]]
-[[function string:sub(i: integer [, j: integer])
+[[function string:sub(i: integer, j: integer?)
   -> string]]
 
 TEST [[
@@ -258,7 +258,7 @@ TEST [[
 <?load?>()
 ]]
 [=[
-function load(chunk: string|function [, chunkname: string [, mode: string [, env: table]]])
+function load(chunk: string|function, chunkname: string?, mode: "b"|"t"|"bt"?, env: table?)
   -> function
   2. error_message: string
 ]=]
@@ -267,7 +267,7 @@ TEST [[
 string.<?lower?>()
 ]]
 [[
-function string.lower(string)
+function string.lower(s: string)
   -> string
 ]]
 
@@ -512,7 +512,7 @@ TEST [[
 print(io.<?stderr?>)
 ]]
 [[
-global io.stderr: FILE* {
+global io.stderr: file {
     close: function,
     flush: function,
     lines: function,

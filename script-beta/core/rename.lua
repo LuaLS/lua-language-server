@@ -396,7 +396,7 @@ function m.rename(uri, pos, newname)
             return
         end
         mark[uid] = true
-        if ws.isLibrary(turi) then
+        if files.isLibrary(turi) then
             return
         end
         results[#results+1] = {

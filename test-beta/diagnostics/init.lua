@@ -466,7 +466,7 @@ f(1, 2, 3)
 ]]
 
 TEST [[
-<!unpack!>(1)
+unpack(1)
 ]]
 
 TEST [[

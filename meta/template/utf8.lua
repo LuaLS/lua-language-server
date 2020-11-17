@@ -1,14 +1,13 @@
 ---@meta
 
 ---@class utf8
+---@field charpattern string
 utf8 = {}
 
 ---@param code integer
 ---@vararg integer
 ---@return string
 function utf8.char(code, ...) end
-
-utf8.charpattern = '[\0-\x7F\xC2-\xF4][\x80-\xBF]*'
 
 ---@param s string
 ---@param lax boolean?

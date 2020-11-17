@@ -3,6 +3,7 @@ local guide   = require 'parser.guide'
 local lang    = require 'language'
 local config  = require 'config'
 local library = require 'library'
+local vm      = require 'vm'
 
 local function isDocClass(source)
     if not source.bindDocs then
@@ -45,6 +46,9 @@ return function (uri, callback)
         end
         -- 如果赋值被标记为 doc.class ,则认为是允许的
         if isDocClass(source) then
+            return
+        end
+        if vm.isGlobalLibraryName(name) then
             return
         end
         callback {

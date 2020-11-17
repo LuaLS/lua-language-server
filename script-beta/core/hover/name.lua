@@ -16,18 +16,15 @@ local function asLocal(source)
     return table.concat(label, ' ')
 end
 
-local function asMethod(source)
+local function asField(source, oop)
     local class = vm.getClass(source.node, 'deep')
     local node = class or guide.getName(source.node) or '?'
     local method = guide.getName(source)
-    return ('%s:%s'):format(node, method)
-end
-
-local function asField(source)
-    local class = vm.getClass(source.node, 'deep')
-    local node = class or guide.getName(source.node) or '?'
-    local method = guide.getName(source)
-    return ('%s.%s'):format(node, method)
+    if oop then
+        return ('%s:%s'):format(node, method)
+    else
+        return ('%s.%s'):format(node, method)
+    end
 end
 
 local function asTableField(source)
@@ -105,11 +102,11 @@ function buildName(source, oop)
     end
     if source.type == 'setmethod'
     or source.type == 'getmethod' then
-        return asMethod(source) or ''
+        return asField(source, true) or ''
     end
     if source.type == 'setfield'
     or source.type == 'getfield' then
-        return asField(source) or ''
+        return asField(source, oop) or ''
     end
     if source.type == 'tablefield' then
         return asTableField(source) or ''

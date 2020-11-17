@@ -866,6 +866,21 @@ function a(b: table)
   -> any
 ]]
 
+TEST [[
+local <?t?> = {
+    a = true
+}
+
+local t2 = {
+    [t.a] = function () end,
+}
+]]
+[[
+local t: {
+    a: boolean = true,
+}
+]]
+
 TEST[[
 ---@class Class
 local <?x?> = class()

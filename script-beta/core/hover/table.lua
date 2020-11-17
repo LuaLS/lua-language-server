@@ -87,11 +87,16 @@ local function getField(src, timeUp, mark, key)
         return nil
     end
     if src.parent then
-        if src.parent.type == 'tableindex'
-        or src.parent.type == 'setindex'
-        or src.parent.type == 'getindex' then
-            if src.parent.index == src then
-                src = src.parent
+        if src.type == 'string'
+        or src.type == 'boolean'
+        or src.type == 'number'
+        or src.type == 'integer' then
+            if src.parent.type == 'tableindex'
+            or src.parent.type == 'setindex'
+            or src.parent.type == 'getindex' then
+                if src.parent.index == src then
+                    src = src.parent
+                end
             end
         end
     end
@@ -189,37 +194,9 @@ local function mergeTypes(types)
 end
 
 local function clearClasses(classes)
-    local knownClasses = {
-        ['any'] = true,
-        ['nil'] = true,
-    }
-    local anyClasses = {}
-    local strClasses = {}
-    for key, class in pairs(classes) do
-        if key == '[any]' then
-            util.array2hash(class, anyClasses)
-            goto CONTINUE
-        elseif key == '[string]' then
-            util.array2hash(class, strClasses)
-            goto CONTINUE
-        end
-        util.array2hash(class, knownClasses)
-        ::CONTINUE::
-    end
-    for c in pairs(knownClasses) do
-        anyClasses[c] = nil
-        strClasses[c] = nil
-    end
-    if next(anyClasses) then
-        classes['[any]'] = util.hash2array(anyClasses)
-    else
-        classes['[any]'] = nil
-    end
-    if next(strClasses) then
-        classes['[string]'] = util.hash2array(strClasses)
-    else
-        classes['[string]'] = nil
-    end
+    classes['[nil]'] = nil
+    classes['[any]'] = nil
+    classes['[string]'] = nil
 end
 
 return function (source)

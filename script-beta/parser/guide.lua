@@ -778,7 +778,7 @@ end
 
 function m.getSimpleName(obj)
     if obj.type == 'call' then
-        local key = obj.args[2]
+        local key = obj.args and obj.args[2]
         return m.getKeyName(key)
     elseif obj.type == 'table' then
         return ('t|%p'):format(obj)

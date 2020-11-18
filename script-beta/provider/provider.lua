@@ -85,9 +85,7 @@ end
 proto.on('initialize', function (params)
     client.init(params)
     library.init()
-    if params.rootUri then
-        workspace.init(params.rootUri)
-    end
+    workspace.init(params.rootUri)
     return {
         capabilities = cap.initer,
         serverInfo   = {

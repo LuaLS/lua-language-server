@@ -10,14 +10,13 @@ local rpath      = require 'workspace.require-path'
 local proto      = require 'proto.proto'
 local lang       = require 'language'
 local library    = require 'library'
+local sp         = require 'bee.subprocess'
 
 local m = {}
 m.type = 'workspace'
 m.nativeVersion = -1
 m.libraryVersion = -1
 m.nativeMatcher = nil
-m.uri = ''
-m.path = ''
 m.requireCache = {}
 m.matchOption = {
     ignoreCase = platform.OS == 'Windows',
@@ -25,9 +24,12 @@ m.matchOption = {
 
 --- 初始化工作区
 function m.init(uri)
+    log.info('Workspace inited: ', uri)
+    if not uri then
+        return
+    end
     m.uri  = uri
     m.path = m.normalize(furi.decode(uri))
-    log.info('Workspace inited: ', uri)
     local logPath = ROOT / 'log' / (uri:gsub('[/:]+', '_') .. '.log')
     log.info('Log path: ', logPath)
     log.init(ROOT, logPath)
@@ -48,9 +50,11 @@ local function interfaceFactory(root)
                 return nil
             end
             local paths = {}
-            for fullpath in fullPath:list_directory() do
-                paths[#paths+1] = fullpath:string()
-            end
+            pcall(function ()
+                for fullpath in fullPath:list_directory() do
+                    paths[#paths+1] = fullpath:string()
+                end
+            end)
             return paths
         end
     }
@@ -58,6 +62,9 @@ end
 
 --- 创建排除文件匹配器
 function m.getNativeMatcher()
+    if not m.path then
+        return nil
+    end
     if m.nativeVersion == config.version then
         return m.nativeMatcher
     end
@@ -150,6 +157,9 @@ end
 function m.isIgnored(uri)
     local path = furi.decode(uri)
     local ignore = m.getNativeMatcher()
+    if not ignore then
+        return false
+    end
     return ignore(path)
 end
 
@@ -186,9 +196,6 @@ end
 
 --- 预读工作区内所有文件
 function m.awaitPreload()
-    if not m.uri then
-        return
-    end
     await.close 'preload'
     await.setID 'preload'
     local progress = {
@@ -200,7 +207,9 @@ function m.awaitPreload()
     local nativeLoader    = loadFileFactory(m.path, progress)
     local native          = m.getNativeMatcher()
     local librarys        = m.getLibraryMatchers()
-    native:scan(nativeLoader)
+    if native then
+        native:scan(nativeLoader)
+    end
     for _, library in ipairs(librarys) do
         local libraryInterface = interfaceFactory(library.path)
         local libraryLoader    = loadFileFactory(library.path, progress, true)

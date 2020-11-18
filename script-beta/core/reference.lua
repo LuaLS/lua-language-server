@@ -75,6 +75,9 @@ return function (uri, offset)
         if not root then
             goto CONTINUE
         end
+        if vm.isMetaFile(root.uri) then
+            goto CONTINUE
+        end
         if     src.type == 'setfield'
         or     src.type == 'getfield'
         or     src.type == 'tablefield' then

@@ -24,13 +24,13 @@ end
 local function eachField(source, deep)
     local unlock = vm.lock('eachField', source)
     if not unlock then
-        return
+        return {}
     end
 
     while source.type == 'paren' do
         source = source.exp
         if not source then
-            return
+            return {}
         end
     end
 

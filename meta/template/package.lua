@@ -23,8 +23,8 @@ function package.loadlib(libname, funcname) end
 
 ---@param name string
 ---@param path string
----@param sep string?
----@param rep string?
+---@param sep? string
+---@param rep? string
 ---@return string filename?
 ---@return string errmsg?
 function package.searchpath(name, path, sep, rep) end

@@ -20,7 +20,7 @@ io = {}
 ---| '"w+b"'
 ---| '"a+b"'
 
----@param file file*?
+---@param file? file*
 ---@return boolean  suc?
 ---@return exitcode exitcode?
 ---@return integer  code?
@@ -38,7 +38,7 @@ function io.input(file) end
 function io.lines(filename, ...) end
 
 ---@param filename string
----@param mode openmode
+---@param mode     openmode
 ---@return file*?
 ---@return string errmsg?
 function io.open(filename, mode) end
@@ -51,8 +51,8 @@ function io.output(file) end
 ---| '"r"'
 ---| '"w"'
 
----@param prog string
----@param mode popenmode?
+---@param prog  string
+---@param mode? popenmode
 ---@return file*?
 ---@return string errmsg?
 function io.popen(prog, mode) end

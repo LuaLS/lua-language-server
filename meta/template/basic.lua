@@ -22,18 +22,18 @@ function assert(v, message) end
 ---| '"isrunning"'    # ---#DES 'cgopt.isrunning'
 
 ---#DES 'collectgarbage'
----@param opt cgopt?
+---@param opt? cgopt
 ---@return any
 function collectgarbage(opt, ...) end
 
 ---#DES 'dofile'
----@param filename string?
+---@param filename? string
 ---@return any
 function dofile(filename) end
 
 ---#DES 'error'
 ---@param message any
----@param level integer?
+---@param level?  integer
 function error(message, level) end
 
 ---#DES '_G'
@@ -44,7 +44,7 @@ _G = {}
 ---#if VERSION >= 5.2 then
 ---@deprecated
 ---#end
----@param f function?
+---@param f? function
 ---@return table
 function getfenv(f) end
 
@@ -55,7 +55,7 @@ function getmetatable(object) end
 
 ---#DES 'ipairs'
 ---@param t table
----@return fun(t: table, i: integer?):integer, any iterator
+---@return fun(t: table, i?: integer):integer, any iterator
 ---@return table t
 ---@return integer i
 function ipairs(t) end
@@ -66,18 +66,18 @@ function ipairs(t) end
 ---|>'"bt"' # ---#DES 'loadmode.bt'
 
 ---#DES 'load'
----@param chunk string|function
----@param chunkname string?
----@param mode loadmode?
----@param env table?
+---@param chunk      string|function
+---@param chunkname? string
+---@param mode?      loadmode
+---@param env?       table
 ---@return function
 ---@return string error_message
 function load(chunk, chunkname, mode, env) end
 
 ---#DES 'loadfile'
----@param filename string?
----@param mode loadmode?
----@param env table?
+---@param filename? string
+---@param mode?     loadmode
+---@param env?      table
 ---@return function
 ---@return string error_message
 function loadfile(filename, mode, env) end
@@ -86,8 +86,8 @@ function loadfile(filename, mode, env) end
 ---#if VERSION >= 5.2 then
 ---@deprecated
 ---#end
----@param text string
----@param chunkname string?
+---@param text       string
+---@param chunkname? string
 ---@return function
 ---@return string error_message
 function loadstring(text, chunkname) end
@@ -100,8 +100,8 @@ function loadstring(text, chunkname) end
 function module(name, ...) end
 
 ---#DES 'next'
----@param table table
----@param index any?
+---@param table  table
+---@param index? any
 ---@return any key
 ---@return any value
 function next(table, index) end
@@ -116,8 +116,8 @@ function pairs(t)
 end
 
 ---#DES 'pcall'
----@param f function
----@param arg1 any?
+---@param f     function
+---@param arg1? any
 ---@return boolean success
 ---@return any result
 ---@return ...
@@ -159,20 +159,20 @@ function select(index, ...) end
 ---#if VERSION >= 5.2 then
 ---@deprecated
 ---#end
----@param f function|integer
+---@param f     function|integer
 ---@param table table
 ---@return function
 function setfenv(f, table) end
 
 ---#DES 'setmetatable'
----@param table table
+---@param table     table
 ---@param metatable table
 ---@return table
 function setmetatable(table, metatable) end
 
 ---#DES 'tonumber'
----@param e string|number
----@param base integer?
+---@param e     string|number
+---@param base? integer
 ---@return number?
 function tonumber(e, base) end
 
@@ -212,9 +212,9 @@ _VERSION = 'Lua 5.4'
 function warn(message, ...) end
 
 ---#DES 'xpcall'
----@param f function
----@param msgh function
----@param arg1 any?
+---@param f     function
+---@param msgh  function
+---@param arg1? any
 ---@return boolean success
 ---@return any result
 ---@return ...
@@ -225,6 +225,6 @@ function xpcall(f, msgh, arg1, ...) end
 ---@deprecated
 ---#end
 ---@param list table
----@param i integer?
----@param j integer?
+---@param i?   integer
+---@param j?   integer
 function unpack(list, i, j) end

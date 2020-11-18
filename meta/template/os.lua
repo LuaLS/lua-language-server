@@ -6,8 +6,8 @@ os = {}
 ---@return number
 function os.clock() end
 
----@param format string?
----@param time integer?
+---@param format? string
+---@param time?   integer
 ---@return string
 function os.date(format, time) end
 
@@ -38,7 +38,7 @@ function os.remove(filename) end
 ---@param oldname string
 ---@param newname string
 ---@return boolean suc
----@return string errmsg?
+---@return string  errmsg?
 function os.rename(oldname, newname) end
 
 ---@alias localecategory

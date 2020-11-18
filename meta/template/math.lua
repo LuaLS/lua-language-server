@@ -70,8 +70,8 @@ function math.frexp(x) end
 ---@return number
 function math.ldexp(m, e) end
 
----@param x number
----@param base integer?
+---@param x     number
+---@param base? integer
 ---@return number
 function math.log(x, base) end
 
@@ -110,8 +110,8 @@ function math.rad(x) end
 ---@return integer
 function math.random(m, n) end
 
----@param x integer?
----@param y integer?
+---@param x? integer
+---@param y? integer
 function math.randomseed(x, y) end
 
 ---@param x number

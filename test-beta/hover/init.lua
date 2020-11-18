@@ -232,14 +232,14 @@ TEST [[
 string.<?sub?>()
 ]]
 [[
-function string.sub(s: string, i: integer, j: integer?)
+function string.sub(s: string, i: integer, j?: integer)
   -> string
 ]]
 
 TEST[[
 ('xx'):<?sub?>()
 ]]
-[[function string:sub(i: integer, j: integer?)
+[[function string:sub(i: integer, j?: integer)
   -> string]]
 
 TEST [[
@@ -258,7 +258,7 @@ TEST [[
 <?load?>()
 ]]
 [=[
-function load(chunk: string|function, chunkname: string?, mode: "b"|"t"|"bt"?, env: table?)
+function load(chunk: string|function, chunkname?: string, mode?: "b"|"t"|"bt", env?: table)
   -> function
   2. error_message: string
 ]=]
@@ -636,7 +636,7 @@ TEST[[
 <?next?>()
 ]]
 [[
-function next(table: table, index: any?)
+function next(table: table, index?: any)
   -> key: any
   2. value: any
 ]]
@@ -783,9 +783,9 @@ TEST [[
 io.<?popen?>()
 ]]
 [[
-function io.popen(prog: string, mode: "r"|"w"?)
+function io.popen(prog: string, mode?: "r"|"w")
   -> file*?
-  2. errmsg: string?
+  2. errmsg?: string
 ]]
 
 TEST [[
@@ -1253,23 +1253,23 @@ print(<?f?>)
 ]]
 
 TEST [[
----@type fun(x: boolean?):boolean?
+---@type fun(x?: boolean):boolean?
 local <?f?>
 ]]
 [[
-function f(x: boolean?)
+function f(x?: boolean)
   -> boolean?
 ]]
 
 TEST [[
----@param x number?
----@param y boolean?
+---@param x? number
+---@param y? boolean
 ---@return table?, string?
 local function <?f?>(x, y)
 end
 ]]
 [[
-function f(x: number?, y: boolean?)
+function f(x?: number, y?: boolean)
   -> table?
   2. string?
 ]]
@@ -1282,7 +1282,7 @@ end
 [[
 function f(x: any, y: any)
   -> first: table
-  2. second: string?
+  2. second?: string
 ]]
 
 TEST [[

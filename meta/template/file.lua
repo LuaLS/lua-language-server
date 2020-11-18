@@ -31,10 +31,10 @@ function file:read(...) end
 ---|>'"cur"'
 ---| '"end"'
 
----@param whence seekwhence?
----@param offset integer?
+---@param whence? seekwhence
+---@param offset? integer
 ---@return integer offset
----@return string errmsg?
+---@return string  errmsg?
 function file:seek(whence, offset) end
 
 ---@alias vbuf

@@ -316,6 +316,10 @@ local function  parseTypeUnitFunction()
         if not arg.start then
             arg.start = arg.name.start
         end
+        if checkToken('symbol', '?', 1) then
+            nextToken()
+            arg.optional = true
+        end
         arg.finish = getFinish()
         if not nextSymbolOrError(':') then
             break
@@ -323,10 +327,6 @@ local function  parseTypeUnitFunction()
         arg.extends = parseType(arg)
         if not arg.extends then
             break
-        end
-        if checkToken('symbol', '?', 1) then
-            nextToken()
-            arg.optional = true
         end
         arg.finish = getFinish()
         typeUnit.args[#typeUnit.args+1] = arg
@@ -545,13 +545,13 @@ local function parseParam()
         }
         return nil
     end
-    result.start  = result.param.start
-    result.finish = getFinish()
-    result.extends = parseType(result)
     if checkToken('symbol', '?', 1) then
         nextToken()
         result.optional = true
     end
+    result.start  = result.param.start
+    result.finish = getFinish()
+    result.extends = parseType(result)
     if not result.extends then
         pushError {
             type   = 'LUADOC_MISS_PARAM_EXTENDS',

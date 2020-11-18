@@ -27,7 +27,7 @@ function debug.debug() end
 ---@return table
 function debug.getfenv(o) end
 
----@param co thread?
+---@param co? thread
 ---@return function hook
 ---@return string mask
 ---@return integer count
@@ -43,17 +43,17 @@ function debug.gethook(co) end
 ---|+'"r"' # `ftransfer` 和 `ntransfer`
 ---|+'"L"' # `activelines`
 
----@overload fun(f: integer|function, what: infowhat?):debuginfo
+---@overload fun(f: integer|function, what?: infowhat):debuginfo
 ---@param thread thread
----@param f integer|function
----@param what infowhat?
+---@param f      integer|function
+---@param what?  infowhat
 ---@return debuginfo
 function debug.getinfo(thread, f, what) end
 
 ---@overload fun(f: integer|function, index: integer):string, any
 ---@param thread thread
----@param f integer|function
----@param index integer
+---@param f      integer|function
+---@param index  integer
 ---@return string name
 ---@return any value
 function debug.getlocal(thread, f, index) end
@@ -65,7 +65,7 @@ function debug.getmetatable(object) end
 ---@return table
 function debug.getregistry() end
 
----@param f integer|function
+---@param f  integer|function
 ---@param up integer
 ---@return string name
 ---@return any value
@@ -84,7 +84,7 @@ function debug.setcstacklimit(limit) end
 
 ---@generic T
 ---@param object T
----@param env table
+---@param env    table
 ---@return T object
 function debug.setfenv(object, env) end
 
@@ -93,42 +93,42 @@ function debug.setfenv(object, env) end
 ---|+'"r"'
 ---|+'"l"'
 
----@overload fun(hook: function, mask: hookmask, count: integer?)
+---@overload fun(hook: function, mask: hookmask, count?: integer)
 ---@param thread thread
----@param hook function
----@param mask hookmask
----@param count integer?
+---@param hook   function
+---@param mask   hookmask
+---@param count? integer
 function debug.sethook(thread, hook, mask, count) end
 
 ---@overload fun(level: integer, index: integer, value: any):string
 ---@param thread thread
----@param level integer
----@param index integer
----@param value any
+---@param level  integer
+---@param index  integer
+---@param value  any
 ---@return string name
 function debug.setlocal(thread, level, index, value) end
 
 ---@generic T
 ---@param value T
----@param meta table
+---@param meta  table
 ---@return T value
 function debug.setmetatable(value, meta) end
 
----@param f function
----@param up integer
+---@param f     function
+---@param up    integer
 ---@param value any
 ---@return string name
 function debug.setupvalue(f, up, value) end
 
 ---@param udata userdata
 ---@param value any
----@param n integer
+---@param n     integer
 ---@return userdata udata
 function debug.setuservalue(udata, value, n) end
 
----@param thread thread
----@param message any?
----@param level integer?
+---@param thread   thread
+---@param message? any
+---@param level?   integer
 ---@return string message
 function debug.traceback(thread, message, level) end
 

@@ -3,9 +3,9 @@
 ---@class string*
 string = {}
 
----@param s string
----@param i integer?
----@param j integer?
+---@param s  string
+---@param i? integer
+---@param j? integer
 ---@return integer
 ---@return ...
 function string.byte(s, i, j) end
@@ -16,15 +16,15 @@ function string.byte(s, i, j) end
 ---@return ...
 function string.char(byte, ...) end
 
----@param f function
----@param strip boolean?
+---@param f      function
+---@param strip? boolean
 ---@return string
 function string.dump(f, strip) end
 
----@param s string
+---@param s       string
 ---@param pattern string
----@param init integer?
----@param plain boolean?
+---@param init?   integer
+---@param plain?  boolean
 ---@return integer start
 ---@return integer end
 ---@return ... captured
@@ -35,16 +35,16 @@ function string.find(s, pattern, init, plain) end
 ---@return string
 function string.format(s, ...) end
 
----@param s string
+---@param s       string
 ---@param pattern string
----@param init integer?
+---@param init?   integer
 ---@return fun():string, ...
 function string.gmatch(s, pattern, init) end
 
----@param s string
+---@param s       string
 ---@param pattern string
----@param repl string|table|function
----@param n integer
+---@param repl    string|table|function
+---@param n       integer
 ---@return string
 ---@return integer count
 function string.gsub(s, pattern, repl, n) end
@@ -57,15 +57,15 @@ function string.len(s) end
 ---@return string
 function string.lower(s) end
 
----@param s string
+---@param s       string
 ---@param pattern string
----@param init integer?
+---@param init?   integer
 ---@return string captured
 function string.match(s, pattern, init) end
 
 ---@param fmt string
----@param v1 string
----@param v2 string?
+---@param v1  string
+---@param v2? string
 ---@vararg string
 ---@return string binary
 function string.pack(fmt, v1, v2, ...) end
@@ -74,9 +74,9 @@ function string.pack(fmt, v1, v2, ...) end
 ---@return integer
 function string.packsize(fmt) end
 
----@param s string
----@param n integer
----@param sep string?
+---@param s    string
+---@param n    integer
+---@param sep? string
 ---@return string
 function string.rep(s, n, sep) end
 
@@ -84,15 +84,15 @@ function string.rep(s, n, sep) end
 ---@return string
 function string.reverse(s) end
 
----@param s string
----@param i integer
----@param j integer?
+---@param s  string
+---@param i  integer
+---@param j? integer
 ---@return string
 function string.sub(s, i, j) end
 
----@param fmt string
----@param s string
----@param pos integer?
+---@param fmt  string
+---@param s    string
+---@param pos? integer
 ---@return ...
 ---@return integer offset
 function string.unpack(fmt, s, pos) end

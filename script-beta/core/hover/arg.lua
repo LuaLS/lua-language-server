@@ -77,10 +77,10 @@ local function asFunction(source, oop)
         local arg = source.args[i]
         local name = arg.name or guide.getName(arg)
         if name then
-            args[i] = ('%s: %s%s'):format(
+            args[i] = ('%s%s: %s'):format(
                 name,
-                vm.getInferType(arg),
-                optionalArg(arg) and '?' or ''
+                optionalArg(arg) and '?' or '',
+                vm.getInferType(arg)
             )
         else
             args[i] = ('%s'):format(vm.getInferType(arg))
@@ -106,10 +106,10 @@ local function asDocFunction(source)
     for i = 1, #source.args do
         local arg = source.args[i]
         local name = arg.name[1]
-        args[i] = ('%s: %s%s'):format(
+        args[i] = ('%s%s: %s'):format(
             name,
-            vm.getInferType(arg.extends),
-            arg.optional and '?' or ''
+            arg.optional and '?' or '',
+            vm.getInferType(arg.extends)
         )
     end
     return table.concat(args, ', ')

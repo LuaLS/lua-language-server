@@ -12,14 +12,14 @@ arg = {}
 function assert(v, message) end
 
 ---@alias cgopt
----|>'"collect"'      # ---#DES 'cgopt.collect'
----| '"stop"'         # ---#DES 'cgopt.stop'
----| '"restart"'      # ---#DES 'cgopt.restart'
----| '"count"'        # ---#DES 'cgopt.count'
----| '"step"'         # ---#DES 'cgopt.step'
----| '"incremental"'  # ---#DES 'cgopt.incremental'
----| '"generational"' # ---#DES 'cgopt.generational'
----| '"isrunning"'    # ---#DES 'cgopt.isrunning'
+---|>'"collect"'      # ---#DESENUM 'cgopt.collect'
+---| '"stop"'         # ---#DESENUM 'cgopt.stop'
+---| '"restart"'      # ---#DESENUM 'cgopt.restart'
+---| '"count"'        # ---#DESENUM 'cgopt.count'
+---| '"step"'         # ---#DESENUM 'cgopt.step'
+---| '"incremental"'  # ---#DESENUM 'cgopt.incremental'
+---| '"generational"' # ---#DESENUM 'cgopt.generational'
+---| '"isrunning"'    # ---#DESENUM 'cgopt.isrunning'
 
 ---#DES 'collectgarbage'
 ---@param opt? cgopt
@@ -61,9 +61,9 @@ function getmetatable(object) end
 function ipairs(t) end
 
 ---@alias loadmode
----| '"b"'  # ---#DES 'loadmode.b'
----| '"t"'  # ---#DES 'loadmode.t'
----|>'"bt"' # ---#DES 'loadmode.bt'
+---| '"b"'  # ---#DESENUM 'loadmode.b'
+---| '"t"'  # ---#DESENUM 'loadmode.t'
+---|>'"bt"' # ---#DESENUM 'loadmode.bt'
 
 ---#DES 'load'
 ---@param chunk      string|function

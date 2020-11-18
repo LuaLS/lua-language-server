@@ -325,6 +325,14 @@ local function convertLink(text)
     end)
 end
 
+local function createViewDocument(name)
+    local fmt = getDocFormater()
+    if not fmt then
+        return nil
+    end
+    return ('[%s](%s)'):format(lang.script.HOVER_VIEW_DOCUMENTS, lang.script(fmt, 'pdf-' .. name))
+end
+
 local function compileSingleMetaDoc(script, metaLang)
     local middleBuf = {}
     local compileBuf = {}
@@ -347,18 +355,27 @@ local function compileSingleMetaDoc(script, metaLang)
             if not des then
                 des = ('Miss locale <%s>'):format(name)
             end
-            if name:find('.', 1, true) then
-                compileBuf[#compileBuf+1] = convertLink(des)
+            compileBuf[#compileBuf+1] = '---\n'
+            for line in util.eachLine(des) do
+                compileBuf[#compileBuf+1] = '---'
+                compileBuf[#compileBuf+1] = convertLink(line)
                 compileBuf[#compileBuf+1] = '\n'
-            else
-                compileBuf[#compileBuf+1] = '---\n'
-                for line in util.eachLine(des) do
-                    compileBuf[#compileBuf+1] = '---'
-                    compileBuf[#compileBuf+1] = convertLink(line)
-                    compileBuf[#compileBuf+1] = '\n'
-                end
-                compileBuf[#compileBuf+1] = '---\n'
             end
+            local viewDocument = createViewDocument(name)
+            if viewDocument then
+                compileBuf[#compileBuf+1] = '---\n---'
+                compileBuf[#compileBuf+1] = viewDocument
+                compileBuf[#compileBuf+1] = '\n'
+            end
+            compileBuf[#compileBuf+1] = '---\n'
+        end,
+        DESENUM = function (name)
+            local des = metaLang[name]
+            if not des then
+                des = ('Miss locale <%s>'):format(name)
+            end
+            compileBuf[#compileBuf+1] = convertLink(des)
+            compileBuf[#compileBuf+1] = '\n'
         end,
     }, { __index = _ENV })
 

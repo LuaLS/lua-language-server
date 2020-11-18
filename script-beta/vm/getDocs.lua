@@ -133,3 +133,41 @@ function vm.isMetaFile(uri)
     end
     return false
 end
+
+function vm.getValidVersions(doc)
+    if doc.type ~= 'doc.version' then
+        return
+    end
+    local valids = {
+        ['Lua 5.1'] = false,
+        ['Lua 5.2'] = false,
+        ['Lua 5.3'] = false,
+        ['Lua 5.4'] = false,
+        ['LuaJIT']  = false,
+    }
+    for _, version in ipairs(doc.versions) do
+        if version.ge and type(version.version) == 'number' then
+            for ver in pairs(valids) do
+                local verNumber = tonumber(ver:sub(-3))
+                if verNumber and verNumber >= version.version then
+                    valids[ver] = true
+                end
+            end
+        elseif version.le and type(version.version) == 'number' then
+            for ver in pairs(valids) do
+                local verNumber = tonumber(ver:sub(-3))
+                if verNumber and verNumber <= version.version then
+                    valids[ver] = true
+                end
+            end
+        elseif type(version.version) == 'number' then
+            valids[('Lua %.1f'):format(version.version)] = true
+        elseif 'JIT' == version.version then
+            valids['LuaJIT'] = true
+        end
+    end
+    if valids['Lua 5.1'] then
+        valids['LuaJIT'] = true
+    end
+    return valids
+end

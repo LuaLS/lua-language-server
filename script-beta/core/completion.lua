@@ -367,29 +367,10 @@ local function isDeprecated(value)
         if doc.type == 'doc.deprecated' then
             return true
         elseif doc.type == 'doc.version' then
-            local ver, jit
-            if config.config.runtime.version == 'LuaJIT' then
-                ver = 5.1
-                jit = true
-            else
-                ver = tonumber(config.config.runtime.version:sub(-3))
-                jit = false
-                if not ver then
-                    return true
-                end
+            local valids = vm.getValidVersions(doc)
+            if not valids[config.config.runtime.version] then
+                return true
             end
-            for _, version in ipairs(doc.versions) do
-                if version.ge and ver >= version.version then
-                    return false
-                elseif version.le and ver <= version.version then
-                    return false
-                elseif ver == version.version then
-                    return false
-                elseif jit and 'JIT' == version.version then
-                    return false
-                end
-            end
-            return true
         end
     end
     return false

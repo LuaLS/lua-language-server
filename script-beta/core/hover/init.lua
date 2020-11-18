@@ -28,11 +28,13 @@ local function getHoverAsFunction(source)
                     protos = protos + 1
                 end
             end
+            desc = desc or getDesc(value)
         elseif value.type == 'table'
         or     value.type == 'boolean'
         or     value.type == 'string'
         or     value.type == 'number' then
             other = other + 1
+            desc = desc or getDesc(value)
         end
     end
 

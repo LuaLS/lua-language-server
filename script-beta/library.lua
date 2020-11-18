@@ -3,6 +3,7 @@ local fs     = require 'bee.filesystem'
 local config = require 'config'
 local util   = require 'utility'
 local lang   = require 'language'
+local client = require 'provider.client'
 
 local m = {}
 
@@ -278,6 +279,52 @@ local function markLibrary(library)
     end
 end
 
+local function getDocFormater()
+    local version = config.config.runtime.version
+    if client.client() == 'vscode' then
+        if version == 'Lua 5.1' then
+            return 'HOVER_NATIVE_DOCUMENT_LUA51'
+        elseif version == 'Lua 5.2' then
+            return 'HOVER_NATIVE_DOCUMENT_LUA52'
+        elseif version == 'Lua 5.3' then
+            return 'HOVER_NATIVE_DOCUMENT_LUA53'
+        elseif version == 'Lua 5.4' then
+            return 'HOVER_NATIVE_DOCUMENT_LUA54'
+        elseif version == 'LuaJIT' then
+            return 'HOVER_NATIVE_DOCUMENT_LUAJIT'
+        end
+    else
+        if version == 'Lua 5.1' then
+            return 'HOVER_DOCUMENT_LUA51'
+        elseif version == 'Lua 5.2' then
+            return 'HOVER_DOCUMENT_LUA52'
+        elseif version == 'Lua 5.3' then
+            return 'HOVER_DOCUMENT_LUA53'
+        elseif version == 'Lua 5.4' then
+            return 'HOVER_DOCUMENT_LUA54'
+        elseif version == 'LuaJIT' then
+            return 'HOVER_DOCUMENT_LUAJIT'
+        end
+    end
+end
+
+local function convertLink(text)
+    local fmt = getDocFormater()
+    return text:gsub('%$([%.%w]+)', function (name)
+        if fmt then
+            return ('[%s](%s)'):format(name, lang.script(fmt, 'pdf-' .. name))
+        else
+            return ('`%s`'):format(name)
+        end
+    end):gsub('§([%.%w]+)', function (name)
+        if fmt then
+            return ('[§%s](%s)'):format(name, lang.script(fmt, name))
+        else
+            return ('`%s`'):format(name)
+        end
+    end)
+end
+
 local function compileSingleMetaDoc(script, metaLang)
     local middleBuf = {}
     local compileBuf = {}
@@ -301,13 +348,13 @@ local function compileSingleMetaDoc(script, metaLang)
                 des = ('Miss locale <%s>'):format(name)
             end
             if name:find('.', 1, true) then
-                compileBuf[#compileBuf+1] = des
+                compileBuf[#compileBuf+1] = convertLink(des)
                 compileBuf[#compileBuf+1] = '\n'
             else
                 compileBuf[#compileBuf+1] = '---\n'
                 for line in util.eachLine(des) do
                     compileBuf[#compileBuf+1] = '---'
-                    compileBuf[#compileBuf+1] = line
+                    compileBuf[#compileBuf+1] = convertLink(line)
                     compileBuf[#compileBuf+1] = '\n'
                 end
                 compileBuf[#compileBuf+1] = '---\n'
@@ -423,10 +470,8 @@ local function init()
     end
 end
 
-function m.reload()
+function m.init()
     init()
 end
-
-init()
 
 return m

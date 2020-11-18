@@ -48,7 +48,7 @@ local function updateConfig()
     local newConfig = config.config
     local newOther  = config.other
     if not util.equal(oldConfig.runtime, newConfig.runtime) then
-        library.reload()
+        library.init()
         workspace.reload()
     end
     if not util.equal(oldConfig.diagnostics, newConfig.diagnostics) then
@@ -84,6 +84,7 @@ end
 
 proto.on('initialize', function (params)
     client.init(params)
+    library.init()
     if params.rootUri then
         workspace.init(params.rootUri)
     end

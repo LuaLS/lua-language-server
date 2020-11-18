@@ -8,6 +8,7 @@ local config   = require 'config'
 local client   = require 'provider.client'
 local lang     = require 'language'
 local platform = require 'bee.platform'
+local library  = require 'library'
 
 local function asStringInRequire(source, literal)
     local parent = source.parent

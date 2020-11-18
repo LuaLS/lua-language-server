@@ -434,7 +434,11 @@ local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, res
             goto CONTINUE
         end
         if isSameSource(ast, src, start) then
-            goto CONTINUE
+            -- 由于fastGlobal的优化，全局变量只会找出一个值，有可能找出自己
+            -- 所以遇到自己的时候重新找一下有没有其他定义
+            if #vm.getRefs(src) <= 1 then
+                goto CONTINUE
+            end
         end
         local name = key:sub(3)
         if locals and locals[name] then

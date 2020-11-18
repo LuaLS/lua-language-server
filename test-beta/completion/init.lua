@@ -1201,6 +1201,11 @@ io$
 (EXISTS)
 
 TEST [[
+loadfile$
+]]
+(EXISTS)
+
+TEST [[
 debug.setcsta$
 ]]
 {

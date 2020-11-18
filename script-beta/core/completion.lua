@@ -366,6 +366,30 @@ local function isDeprecated(value)
     for _, doc in ipairs(value.bindDocs) do
         if doc.type == 'doc.deprecated' then
             return true
+        elseif doc.type == 'doc.version' then
+            local ver, jit
+            if config.config.runtime.version == 'LuaJIT' then
+                ver = 5.1
+                jit = true
+            else
+                ver = tonumber(config.config.runtime.version:sub(-3))
+                jit = false
+                if not ver then
+                    return true
+                end
+            end
+            for _, version in ipairs(doc.versions) do
+                if version.ge and ver >= version.version then
+                    return false
+                elseif version.le and ver <= version.version then
+                    return false
+                elseif ver == version.version then
+                    return false
+                elseif jit and 'JIT' == version.version then
+                    return false
+                end
+            end
+            return true
         end
     end
     return false
@@ -437,14 +461,14 @@ local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, res
         if not key or key:sub(1, 1) ~= 's' then
             goto CONTINUE
         end
+        local name = key:sub(3)
         if isSameSource(ast, src, start) then
             -- 由于fastGlobal的优化，全局变量只会找出一个值，有可能找出自己
             -- 所以遇到自己的时候重新找一下有没有其他定义
-            if #vm.getRefs(src) <= 1 then
+            if #vm.getGlobals(name) <= 1 then
                 goto CONTINUE
             end
         end
-        local name = key:sub(3)
         if locals and locals[name] then
             goto CONTINUE
         end
@@ -1090,6 +1114,7 @@ local function tryLuaDocCate(line, results)
         'overload',
         'deprecated',
         'meta',
+        'version',
     } do
         if matchKey(word, docType) then
             results[#results+1] = {

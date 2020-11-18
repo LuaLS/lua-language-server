@@ -12,7 +12,7 @@ Sp                  <-  %s+
 X16                 <-  [a-fA-F0-9]
 Word                <-  [a-zA-Z0-9_]
 Token               <-  Name / String / Symbol
-Name                <-  ({} {[a-zA-Z_] [a-zA-Z0-9_.*]*} {})
+Name                <-  ({} {[a-zA-Z0-9_] [a-zA-Z0-9_.*]*} {})
                     ->  Name
 String              <-  ({} StringDef {})
                     ->  String
@@ -733,6 +733,59 @@ local function parseMeta()
     }
 end
 
+local function parseVersion()
+    local result = {
+        type     = 'doc.version',
+        versions = {},
+    }
+    while true do
+        local tp, text = nextToken()
+        if not tp then
+            pushError {
+                type  = 'LUADOC_MISS_VERSION',
+                start  = getStart(),
+                finish = getFinish(),
+            }
+            break
+        end
+        if not result.start then
+            result.start = getStart()
+        end
+        local version = {
+            type   = 'doc.version.unit',
+            start  = getStart(),
+        }
+        if tp == 'symbol' then
+            if text == '>' then
+                version.ge = true
+            elseif text == '<' then
+                version.le = true
+            end
+            tp, text = nextToken()
+        end
+        if tp ~= 'name' then
+            pushError {
+                type  = 'LUADOC_MISS_VERSION',
+                start  = getStart(),
+                finish = getFinish(),
+            }
+            break
+        end
+        version.version = tonumber(text) or text
+        version.finish = getFinish()
+        result.versions[#result.versions+1] = version
+        if not checkToken('symbol', ',', 1) then
+            break
+        end
+        nextToken()
+    end
+    if #result.versions == 0 then
+        return nil
+    end
+    result.finish = getFinish()
+    return result
+end
+
 local function convertTokens()
     local tp, text = nextToken()
     if not tp then
@@ -768,6 +821,8 @@ local function convertTokens()
         return parseDeprecated()
     elseif text == 'meta' then
         return parseMeta()
+    elseif text == 'version' then
+        return parseVersion()
     end
 end
 

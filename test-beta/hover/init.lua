@@ -793,7 +793,7 @@ TEST [[
 ]]
 [[
 global _G: _G {
-    _G: _G,
+    _G: table,
     _VERSION: string = "Lua 5.4",
     arg: table,
     assert: function,

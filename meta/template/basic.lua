@@ -40,7 +40,7 @@ function error(message, level) end
 ---@class _G
 _G = {}
 
----#ALIVE '5.1'
+---@version 5.1
 ---#DES 'getfenv'
 ---@param f? function
 ---@return table
@@ -80,7 +80,7 @@ function load(chunk, chunkname, mode, env) end
 ---@return string error_message
 function loadfile(filename, mode, env) end
 
----#ALIVE '5.1'
+---@version 5.1
 ---#DES 'loadstring'
 ---@param text       string
 ---@param chunkname? string
@@ -88,7 +88,7 @@ function loadfile(filename, mode, env) end
 ---@return string error_message
 function loadstring(text, chunkname) end
 
----#ALIVE '5.1'
+---@version 5.1
 ---#DES 'module'
 ---@param name string
 function module(name, ...) end
@@ -149,7 +149,7 @@ function rawset(table, index, value) end
 ---@return any
 function select(index, ...) end
 
----#ALIVE '5.1'
+---@version 5.1
 ---#DES 'setfenv'
 ---@param f     function|integer
 ---@param table table
@@ -199,7 +199,7 @@ _VERSION = 'Lua 5.3'
 _VERSION = 'Lua 5.4'
 ---#end
 
----#ALIVE '>5.4'
+---@version >5.4
 ---#DES 'warn'
 ---@param message string
 function warn(message, ...) end
@@ -213,7 +213,7 @@ function warn(message, ...) end
 ---@return ...
 function xpcall(f, msgh, arg1, ...) end
 
----#ALIVE '5.1'
+---@version 5.1
 ---#DES 'unpack'
 ---@param list table
 ---@param i?   integer

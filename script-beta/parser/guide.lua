@@ -1078,6 +1078,7 @@ local function convertSimpleList(list)
     end
     if simple.mode == 'global' and #simple == 0 then
         simple[1] = 's|_G'
+        simple.node = list[#list]
     end
     return simple
 end

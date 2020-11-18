@@ -40,10 +40,8 @@ function error(message, level) end
 ---@class _G
 _G = {}
 
+---#ALIVE '5.1'
 ---#DES 'getfenv'
----#if VERSION >= 5.2 then
----@deprecated
----#end
 ---@param f? function
 ---@return table
 function getfenv(f) end
@@ -82,20 +80,16 @@ function load(chunk, chunkname, mode, env) end
 ---@return string error_message
 function loadfile(filename, mode, env) end
 
+---#ALIVE '5.1'
 ---#DES 'loadstring'
----#if VERSION >= 5.2 then
----@deprecated
----#end
 ---@param text       string
 ---@param chunkname? string
 ---@return function
 ---@return string error_message
 function loadstring(text, chunkname) end
 
+---#ALIVE '5.1'
 ---#DES 'module'
----#if VERSION >= 5.2 then
----@deprecated
----#end
 ---@param name string
 function module(name, ...) end
 
@@ -155,10 +149,8 @@ function rawset(table, index, value) end
 ---@return any
 function select(index, ...) end
 
+---#ALIVE '5.1'
 ---#DES 'setfenv'
----#if VERSION >= 5.2 then
----@deprecated
----#end
 ---@param f     function|integer
 ---@param table table
 ---@return function
@@ -207,6 +199,7 @@ _VERSION = 'Lua 5.3'
 _VERSION = 'Lua 5.4'
 ---#end
 
+---#ALIVE '>5.4'
 ---#DES 'warn'
 ---@param message string
 function warn(message, ...) end
@@ -220,10 +213,8 @@ function warn(message, ...) end
 ---@return ...
 function xpcall(f, msgh, arg1, ...) end
 
+---#ALIVE '5.1'
 ---#DES 'unpack'
----#if VERSION >= 5.2 then
----@deprecated
----#end
 ---@param list table
 ---@param i?   integer
 ---@param j?   integer

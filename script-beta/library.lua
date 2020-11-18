@@ -345,12 +345,22 @@ local function compileSingleMetaDoc(script, metaLang)
     end
     middleBuf[#middleBuf+1] = ('PUSH [===[%s]===]'):format(script:sub(last))
     local middleScript = table.concat(middleBuf, '\n')
+    local version, jit
+    if config.config.runtime.version == 'LuaJIT' then
+        version = 5.1
+        jit = true
+    else
+        version = tonumber(config.config.runtime.version:sub(-3))
+        jit = false
+    end
 
     local env = setmetatable({
-        PUSH = function (text)
+        VERSION = version,
+        JIT     = jit,
+        PUSH    = function (text)
             compileBuf[#compileBuf+1] = text
         end,
-        DES = function (name)
+        DES     = function (name)
             local des = metaLang[name]
             if not des then
                 des = ('Miss locale <%s>'):format(name)
@@ -377,15 +387,34 @@ local function compileSingleMetaDoc(script, metaLang)
             compileBuf[#compileBuf+1] = convertLink(des)
             compileBuf[#compileBuf+1] = '\n'
         end,
+        ALIVE   = function (str)
+            local isAlive
+            for piece in str:gmatch '[^%,]+' do
+                if piece:sub(1, 1) == '>' then
+                    local alive = tonumber(piece:sub(2))
+                    if not alive or version >= alive then
+                        isAlive = true
+                        break
+                    end
+                elseif piece:sub(1, 1) == '<' then
+                    local alive = tonumber(piece:sub(2))
+                    if not alive or version <= alive then
+                        isAlive = true
+                        break
+                    end
+                else
+                    local alive = tonumber(piece)
+                    if not alive or version == alive then
+                        isAlive = true
+                        break
+                    end
+                end
+            end
+            if not isAlive then
+                compileBuf[#compileBuf+1] = '---@deprecated\n'
+            end
+        end,
     }, { __index = _ENV })
-
-    if config.config.runtime.version == 'LuaJIT' then
-        env.VERSION = 5.1
-        env.JIT = true
-    else
-        env.VERSION = tonumber(config.config.runtime.version:sub(-3))
-        env.JIT = false
-    end
 
     util.saveFile((ROOT / 'log' / 'middleScript.lua'):string(), middleScript)
 

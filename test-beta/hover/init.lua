@@ -1275,7 +1275,7 @@ function f(x?: number, y?: boolean)
 ]]
 
 TEST [[
----@return table first, string second?
+---@return table first, string? second
 local function <?f?>(x, y)
 end
 ]]

@@ -17,13 +17,13 @@ function os.date(format, time) end
 function os.difftime(t2, t1) end
 
 ---@param command string
----@return boolean  suc?
----@return exitcode exitcode?
----@return integer  code?
+---@return boolean?  suc
+---@return exitcode? exitcode
+---@return integer?  code
 function os.execute(command) end
 
----@param code boolean|integer?
----@param close boolean?
+---@param code?  boolean|integer
+---@param close? boolean
 function os.exit(code, close) end
 
 ---@param varname string
@@ -32,13 +32,13 @@ function os.getenv(varname) end
 
 ---@param filename string
 ---@return boolean suc
----@return string errmsg?
+---@return string? errmsg
 function os.remove(filename) end
 
 ---@param oldname string
 ---@param newname string
 ---@return boolean suc
----@return string  errmsg?
+---@return string? errmsg
 function os.rename(oldname, newname) end
 
 ---@alias localecategory
@@ -49,12 +49,12 @@ function os.rename(oldname, newname) end
 ---| '"numeric"'
 ---| '"time"'
 
----@param locale string|nil
----@param category localecategory?
+---@param locale    string|nil
+---@param category? localecategory
 ---@return string localecategory
 function os.setlocale(locale, category) end
 
----@param date table?
+---@param date? table
 ---@return integer
 function os.time(date) end
 

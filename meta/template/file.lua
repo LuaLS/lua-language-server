@@ -11,9 +11,9 @@ local file = {}
 
 ---@alias exitcode | '"exit"'|'"signal"'
 
----@return boolean  suc?
----@return exitcode exitcode?
----@return integer  code?
+---@return boolean?  suc
+---@return exitcode? exitcode
+---@return integer?  code
 function file:close() end
 
 function file:flush() end
@@ -34,7 +34,7 @@ function file:read(...) end
 ---@param whence? seekwhence
 ---@param offset? integer
 ---@return integer offset
----@return string  errmsg?
+---@return string? errmsg
 function file:seek(whence, offset) end
 
 ---@alias vbuf
@@ -47,5 +47,5 @@ function file:setvbuf(mode, size) end
 
 ---@vararg string|number
 ---@return file?
----@return string errmsg?
+---@return string? errmsg
 function file:write(...) end

@@ -27,7 +27,7 @@ function utf8.codepoint(s, i, j, lax) end
 ---@param j?   integer
 ---@param lax? boolean
 ---@return integer?
----@return integer errpos?
+---@return integer? errpos
 function utf8.len(s, i, j, lax) end
 
 ---@param s string

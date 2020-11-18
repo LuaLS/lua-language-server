@@ -21,9 +21,9 @@ io = {}
 ---| '"a+b"'
 
 ---@param file? file*
----@return boolean  suc?
----@return exitcode exitcode?
----@return integer  code?
+---@return boolean?  suc
+---@return exitcode? exitcode
+---@return integer?  code
 function io.close(file) end
 
 function io.flush() end
@@ -40,7 +40,7 @@ function io.lines(filename, ...) end
 ---@param filename string
 ---@param mode     openmode
 ---@return file*?
----@return string errmsg?
+---@return string? errmsg
 function io.open(filename, mode) end
 
 ---@overload fun():file*
@@ -54,7 +54,7 @@ function io.output(file) end
 ---@param prog  string
 ---@param mode? popenmode
 ---@return file*?
----@return string errmsg?
+---@return string? errmsg
 function io.popen(prog, mode) end
 
 ---@vararg readmode
@@ -74,7 +74,7 @@ function io.tmpfile() end
 function io.type(file) end
 
 ---@return file*
----@return string errmsg?
+---@return string? errmsg
 function io.write(...) end
 
 return io

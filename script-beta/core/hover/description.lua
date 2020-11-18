@@ -11,6 +11,7 @@ local platform = require 'bee.platform'
 local library  = require 'library'
 
 local function asStringInRequire(source, literal)
+    local rootPath = ws.path or ''
     local parent = source.parent
     if parent and parent.type == 'callargs' then
         local result, searchers
@@ -31,14 +32,14 @@ local function asStringInRequire(source, literal)
                 local searcher = searchers and furi.decode(searchers[uri])
                 uri = files.getOriginUri(uri)
                 local path = furi.decode(uri)
-                if files.eq(path:sub(1, #ws.path), ws.path) then
-                    path = path:sub(#ws.path + 1)
+                if files.eq(path:sub(1, #rootPath), rootPath) then
+                    path = path:sub(#rootPath + 1)
                 end
                 path = path:gsub('^[/\\]*', '')
                 if vm.isMetaFile(uri) then
                     result[i] = ('* [[meta]](%s)'):format(uri)
                 elseif searcher then
-                    searcher = searcher:sub(#ws.path + 1)
+                    searcher = searcher:sub(#rootPath + 1)
                     searcher = ws.normalize(searcher)
                     result[i] = ('* [%s](%s) %s'):format(path, uri, lang.script('HOVER_USE_LUA_PATH', searcher))
                 else

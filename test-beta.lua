@@ -32,6 +32,7 @@ local function loadDocMetas()
     local library = require 'library'
     local furi    = require 'file-uri'
     local fsu     = require 'fs-utility'
+    library.init()
     for _, path in ipairs(library.metaPaths) do
         local uri = furi.encode(path)
         files.setText(uri, fsu.loadFile(path))

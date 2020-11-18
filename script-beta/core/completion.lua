@@ -208,7 +208,10 @@ local function getSnip(source)
             local text = files.getText(uri)
             local lines = files.getLines(uri)
             if not text then
-                return nil
+                goto CONTINUE
+            end
+            if vm.isMetaFile(uri) then
+                goto CONTINUE
             end
             local row = guide.positionOf(lines, def.start)
             local firstRow = lines[row]
@@ -216,6 +219,7 @@ local function getSnip(source)
             local snip = text:sub(firstRow.start, lastRow.finish)
             return snip
         end
+        ::CONTINUE::
     end
 end
 

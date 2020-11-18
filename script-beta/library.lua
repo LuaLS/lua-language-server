@@ -278,14 +278,10 @@ local function markLibrary(library)
     end
 end
 
-local function compileSingleMetaDoc(script)
+local function compileSingleMetaDoc(script, metaLang)
     local middleBuf = {}
-    middleBuf[#middleBuf+1] = [[
-local COMPILE_BUF = {}
-function PUSH(text)
-    COMPILE_BUF[#COMPILE_BUF+1] = text
-end
-]]
+    local compileBuf = {}
+
     local last = 1
     for start, lua, finish in script:gmatch '()%-%-%-%#([^\n\r]*)()' do
         middleBuf[#middleBuf+1] = ('PUSH [===[%s]===]'):format(script:sub(last, start - 1))
@@ -293,9 +289,32 @@ end
         last = finish
     end
     middleBuf[#middleBuf+1] = ('PUSH [===[%s]===]'):format(script:sub(last))
-    middleBuf[#middleBuf+1] = 'return table.concat(COMPILE_BUF)'
     local middleScript = table.concat(middleBuf, '\n')
-    local env = setmetatable({}, { __index = _ENV })
+
+    local env = setmetatable({
+        PUSH = function (text)
+            compileBuf[#compileBuf+1] = text
+        end,
+        DES = function (name)
+            local des = metaLang[name]
+            if not des then
+                des = ('Miss locale <%s>'):format(name)
+            end
+            if name:find('.', 1, true) then
+                compileBuf[#compileBuf+1] = des
+                compileBuf[#compileBuf+1] = '\n'
+            else
+                compileBuf[#compileBuf+1] = '---\n'
+                for line in util.eachLine(des) do
+                    compileBuf[#compileBuf+1] = '---'
+                    compileBuf[#compileBuf+1] = line
+                    compileBuf[#compileBuf+1] = '\n'
+                end
+                compileBuf[#compileBuf+1] = '---\n'
+            end
+        end,
+    }, { __index = _ENV })
+
     if config.config.runtime.version == 'LuaJIT' then
         env.VERSION = 5.1
         env.JIT = true
@@ -303,8 +322,21 @@ end
         env.VERSION = tonumber(config.config.runtime.version:sub(-3))
         env.JIT = false
     end
+
     util.saveFile((ROOT / 'log' / 'middleScript.lua'):string(), middleScript)
-    return assert(load(middleScript, middleScript, 't', env))()
+
+    assert(load(middleScript, middleScript, 't', env))()
+    return table.concat(compileBuf)
+end
+
+local function loadMetaLocale(langID, result)
+    result = result or {}
+    local path = (ROOT / 'locale' / langID / 'meta.lni'):string()
+    local lniContent = util.loadFile(path)
+    if lniContent then
+        xpcall(lni, log.error, lniContent, path, {result})
+    end
+    return result
 end
 
 local function compileMetaDoc()
@@ -317,13 +349,20 @@ local function compileMetaDoc()
     if fs.exists(metapath) then
         --return
     end
+
+    local metaLang = loadMetaLocale('en-US')
+    if langID ~= 'en-US' then
+        loadMetaLocale(langID, metaLang)
+    end
+    --log.debug('metaLang:', util.dump(metaLang))
+
     m.metaPath = metapath:string()
     m.metaPaths = {}
     fs.create_directory(metapath)
     local templateDir = ROOT / 'meta' / 'template'
     for fullpath in templateDir:list_directory() do
         local filename = fullpath:filename()
-        local metaDoc = compileSingleMetaDoc(util.loadFile(fullpath:string()))
+        local metaDoc = compileSingleMetaDoc(util.loadFile(fullpath:string()), metaLang)
         local filepath = metapath / filename
         util.saveFile(filepath:string(), metaDoc)
         m.metaPaths[#m.metaPaths+1] = filepath:string()

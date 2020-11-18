@@ -17,10 +17,18 @@ local mathRandom   = math.random
 local ioOpen       = io.open
 local utf8Len      = utf8.len
 local mathHuge     = math.huge
+local inf          = 1 / 0
+local nan          = 0 / 0
 
 _ENV = nil
 
 local function formatNumber(n)
+    if n == inf
+    or n == -inf
+    or n == nan
+    or n ~= n then -- IEEE 标准中，NAN 不等于自己。但是某些实现中没有遵守这个规则
+        return ('%q'):format(n)
+    end
     local str = ('%.10f'):format(n)
     str = str:gsub('%.?0*$', '')
     return str
@@ -524,20 +532,28 @@ function m.tableMultiRemove(t, index)
     end
 end
 
-function m.hash2array(h, a)
-    a = a or {}
-    for k in pairs(h) do
-        a[#a+1] = k
+function m.eachLine(text)
+    local offset = 1
+    local lineCount = 0
+    return function ()
+        if offset > #text then
+            return nil
+        end
+        lineCount = lineCount + 1
+        local nl = text:find('[\r\n]', offset)
+        if not nl then
+            local lastLine = text:sub(offset)
+            offset = #text + 1
+            return lastLine
+        end
+        local line = text:sub(offset, nl - 1)
+        if text:sub(nl, nl + 1) == '\r\n' then
+            offset = nl + 2
+        else
+            offset = nl + 1
+        end
+        return line
     end
-    return a
-end
-
-function m.array2hash(a, h)
-    h = h or {}
-    for _, v in ipairs(a) do
-        h[v] = true
-    end
-    return h
 end
 
 return m

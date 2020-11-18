@@ -1,5 +1,11 @@
 ---@meta
 
+---#DES 'require'
+---@param modname string
+---@return any
+---@return any loaderdata
+function require(modname) end
+
 ---@class package*
 ---@field conifg    string
 ---@field cpath     string

@@ -1994,7 +1994,7 @@ end
 
 function m.checkSameSimpleAsReturn(status, ref, start, queue)
     if not status.deep then
-        --return
+        return
     end
     if not ref.parent or ref.parent.type ~= 'return' then
         return

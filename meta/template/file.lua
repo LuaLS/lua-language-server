@@ -16,7 +16,7 @@ local file = {}
 ---|>'"*l"' # ---#DESENUM 'readmode.l'
 ---#if JIT then
 ---| '"*L"' # ---#DESENUM 'readmode.L'
----#endif
+---#end
 ---#end
 
 ---@alias exitcode | '"exit"'|'"signal"'

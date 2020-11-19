@@ -18,12 +18,12 @@ debug = {}
 ---#if VERSION >= 5.2 then
 ---@field nparams         integer
 ---@field isvararg        boolean
----#endif
+---#end
 ---@field func            function
 ---#if VERSION >= 5.4 then
 ---@field ftransfer       integer
 ---@field ntransfer       integer
----#endif
+---#end
 ---@field activelines     table
 
 ---#DES 'debug.debug'
@@ -55,7 +55,7 @@ function debug.gethook(co) end
 ---|+'"f"'     # ---#DESENUM 'infowhat.f'
 ---#if VERSION >= 5.4 then
 ---|+'"r"'     # ---#DESENUM 'infowhat.r'
----#endif
+---#end
 ---|+'"L"'     # ---#DESENUM 'infowhat.L'
 
 ---#DES 'debug.getinfo'
@@ -112,7 +112,7 @@ function debug.getuservalue(u, n) end
 ---@param u userdata
 ---@return any
 function debug.getuservalue(u) end
----#endif
+---#end
 
 ---#DES 'debug.setcstacklimit'
 ---@deprecated

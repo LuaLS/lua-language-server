@@ -18,7 +18,7 @@ function coroutine.isyieldable(co) end
 ---#DES 'coroutine.isyieldable'
 ---@return boolean
 function coroutine.isyieldable() end
----#endif
+---#end
 
 ---@version >5.4
 ---#DES 'coroutine.close'

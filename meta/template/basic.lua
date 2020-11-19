@@ -108,7 +108,7 @@ function loadfile(filename) end
 ---@return function
 ---@return string   error_message
 function loadfile(filename, mode, env) end
----#endif
+---#end
 
 ---@version 5.1
 ---#DES 'loadstring'
@@ -251,7 +251,7 @@ function xpcall(f, err) end
 ---@return any result
 ---@return ...
 function xpcall(f, msgh, arg1, ...) end
----#endif
+---#end
 
 ---@version 5.1
 ---#DES 'unpack'

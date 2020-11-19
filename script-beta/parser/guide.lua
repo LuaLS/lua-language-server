@@ -1215,7 +1215,11 @@ function m.isGlobal(source)
         end
     end
     if source.type == 'field' then
-        local node = source.parent.node
+        source = source.parent
+    end
+    if source.type == 'getfield'
+    or source.type == 'setfield' then
+        local node = source.node
         if node and node.special == '_G' then
             return true
         end

@@ -425,6 +425,9 @@ local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, res
         if isSameSource(ast, src, start) then
             -- 由于fastGlobal的优化，全局变量只会找出一个值，有可能找出自己
             -- 所以遇到自己的时候重新找一下有没有其他定义
+            if not guide.isGlobal(src) then
+                goto CONTINUE
+            end
             if #vm.getGlobals(key) <= 1 then
                 goto CONTINUE
             end
@@ -438,14 +441,19 @@ local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, res
         end
         local last = fields[name]
         if not last then
-            fields[name] = src
+            if guide.isGlobal(src) then
+                fields[name] = vm.getDefs(src, 'deep')[1] or src
+            else
+                fields[name] = src
+            end
             goto CONTINUE
         end
         if src.type == 'tablefield'
         or src.type == 'setfield'
         or src.type == 'tableindex'
         or src.type == 'setindex'
-        or src.type == 'setmethod' then
+        or src.type == 'setmethod'
+        or src.type == 'setglobal' then
             fields[name] = src
             goto CONTINUE
         end

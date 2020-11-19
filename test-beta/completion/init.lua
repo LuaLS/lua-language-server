@@ -1201,9 +1201,36 @@ io$
 (EXISTS)
 
 TEST [[
-loadfile$
+loadstring$
 ]]
-(EXISTS)
+{
+    {
+        label = 'loadstring',
+        kind  = define.CompletionItemKind.Function,
+        deprecated = true,
+    },
+    {
+        label = 'loadstring()',
+        kind  = define.CompletionItemKind.Snippet,
+        deprecated = true,
+    },
+}
+
+TEST [[
+function loadstring()
+end
+loadstring$
+]]
+{
+    {
+        label = 'loadstring',
+        kind  = define.CompletionItemKind.Function,
+    },
+    {
+        label = 'loadstring()',
+        kind  = define.CompletionItemKind.Snippet,
+    },
+}
 
 TEST [[
 debug.setcsta$

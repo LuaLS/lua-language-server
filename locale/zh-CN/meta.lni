@@ -143,3 +143,111 @@ coroutine                   = ''
 "costatus.suspended"        = 挂起或是还没有开始运行。
 "costatus.normal"           = 是活动的，但并不在运行。
 "costatus.dead"             = 运行完主体函数或因错误停止。
+
+debug                       = ''
+"debug.debug"               = 进入一个用户交互模式，运行用户输入的每个字符串。
+"debug.getfenv"             = 返回对象 `o` 的环境。
+"debug.gethook"             = 返回三个表示线程钩子设置的值： 当前钩子函数，当前钩子掩码，当前钩子计数 。
+"debug.getinfo"             = 返回关于一个函数信息的表。
+"debug.getlocal<5.1"        = 返回在栈的 `level` 层处函数的索引为 `index` 的局部变量的名字和值。
+"debug.getlocal>5.2"        = 返回在栈的 `f` 层处函数的索引为 `index` 的局部变量的名字和值。
+"debug.getmetatable"        = 返回给定 `value` 的元表。
+"debug.getregistry"         = 返回注册表。
+"debug.getupvalue"          = 返回函数 `f` 的第 `up` 个上值的名字和值。
+"debug.getuservalue<5.3"    = 返回关联在 `u` 上的 `Lua` 值。
+"debug.getuservalue>5.4"    = 返回关联在 `u` 上的第 `n` 个 `Lua` 值，以及一个布尔，`false`表示值不存在。
+"debug.setcstacklimit"      = [[
+### **已在 `Lua 5.4.2` 中废弃**
+
+设置新的C栈限制。该限制控制Lua中嵌套调用的深度，以避免堆栈溢出。
+
+如果设置成功，该函数返回之前的限制；否则返回`false`。
+]]
+"debug.setfenv"             = 将 `table` 设置为 `object` 的环境。
+"debug.sethook"             = 将一个函数作为钩子函数设入。
+"debug.setlocal"            = 将 `value` 赋给 栈上第 `level` 层函数的第 `local` 个局部变量。
+"debug.setmetatable"        = 将 `value` 的元表设为 `table` （可以是 `nil`）。
+"debug.setupvalue"          = 将 `value` 设为函数 `f` 的第 `up` 个上值。
+"debug.setuservalue<5.3"    = 将 `value` 设为 `udata` 的关联值。
+"debug.setuservalue>5.4"    = 将 `value` 设为 `udata` 的第 `n` 个关联值。
+"debug.traceback"           = 返回调用栈的栈回溯信息。 字符串可选项 `message` 被添加在栈回溯信息的开头。
+"debug.upvalueid"           = 返回指定函数第 `n` 个上值的唯一标识符（一个轻量用户数据）。
+"debug.upvaluejoin"         = 让 Lua 闭包 `f1` 的第 `n1` 个上值 引用 `Lua` 闭包 `f2` 的第 `n2` 个上值。
+"infowhat.n"                = `name` 和 `namewhat`
+"infowhat.S"                = `source`，`short_src`，`linedefined`，`lalinedefined`，和 `what`
+"infowhat.l"                = `currentline`
+"infowhat.t"                = `istailcall`
+"infowhat.u<5.1"            = `nups`
+"infowhat.u>5.2"            = `nups`、`nparams` 和 `isvararg`
+"infowhat.f"                = `func`
+"infowhat.r"                = `ftransfer` 和 `ntransfer`
+"infowhat.L"                = `activelines`
+"hookmask.c"                = 每当 Lua 调用一个函数时，调用钩子。
+"hookmask.r"                = 每当 Lua 从一个函数内返回时，调用钩子。
+"hookmask.l"                = 每当 Lua 进入新的一行时，调用钩子。
+
+file                        = ''
+"file:close"                = 关闭 `file`。
+"file:flush"                = 将写入的数据保存到 `file` 中。
+"file:lines"                = [[
+------
+```lua
+for c in file:lines(...) do
+    body
+end
+```
+]]
+"file:read"                 = 读文件 `file`， 指定的格式决定了要读什么。
+"file:seek"                 = 设置及获取基于文件开头处计算出的位置。
+"file:setvbuf"              = 设置输出文件的缓冲模式。
+"file:write"                = 将参数的值逐个写入 `file`。
+"readmode.n"                = 读取一个数字，根据 Lua 的转换文法返回浮点数或整数。
+"readmode.a"                = 从当前位置开始读取整个文件。
+"readmode.l"                = 读取一行并忽略行结束标记。
+"readmode.L"                = 读取一行并保留行结束标记。
+"seekwhence.set"            = 基点为 0 （文件开头）。
+"seekwhence.cur"            = 基点为当前位置。
+"seekwhence.end"            = 基点为文件尾。
+"vbuf.no"                   = 不缓冲；输出操作立刻生效。
+"vbuf.full"                 = 完全缓冲；只有在缓存满或调用 flush 时才做输出操作。
+"vbuf.line"                 = 行缓冲；输出将缓冲到每次换行前。
+
+io                          = ''
+"io.stdin"                  = 标准输入。
+"io.stdout"                 = 标准输出。
+"io.stderr"                 = 标准错误。
+"io.close"                  = 关闭 `file` 或默认输出文件。
+"io.flush"                  = 将写入的数据保存到默认输出文件中。
+"io.input"                  = 设置 `file` 为默认输入文件。
+"io.lines"                  = [[
+------
+```lua
+for c in io.lines(filename, ...) do
+    body
+end
+```
+]]
+"io.open"                   = 用字符串 `mode` 指定的模式打开一个文件。
+"io.output"                 = 设置 `file` 为默认输出文件。
+"io.popen"                  = 用一个分离进程开启程序 `prog` 。
+"io.read"                   = 读文件 `file`， 指定的格式决定了要读什么。
+"io.tempfile"               = 如果成功，返回一个临时文件的句柄。
+"io.type"                   = 检查 `obj` 是否是合法的文件句柄。
+"io.write"                  = 将参数的值逐个写入默认输出文件。
+"openmode.r"                = 读模式。
+"openmode.w"                = 写模式。
+"openmode.a"                = 追加模式。
+"openmode.r+"               = 更新模式，所有之前的数据都保留。
+"openmode.w+"               = 更新模式，所有之前的数据都删除。
+"openmode.a+"               = 追加更新模式，所有之前的数据都保留，只允许在文件尾部做写入。
+"openmode.rb"               = 读模式。（二进制方式）
+"openmode.wb"               = 写模式。（二进制方式）
+"openmode.ab"               = 追加模式。（二进制方式）
+"openmode.r+b"              = 更新模式，所有之前的数据都保留。（二进制方式）
+"openmode.w+b"              = 更新模式，所有之前的数据都删除。（二进制方式）
+"openmode.a+b"              = 追加更新模式，所有之前的数据都保留，只允许在文件尾部做写入。（二进制方式）
+"popenmode.r"               = 从这个程序中读取数据。（二进制方式）
+"popenmode.w"               = 向这个程序写入输入。（二进制方式）
+"filetype.file"             = 是一个打开的文件句柄。
+"filetype.closed file"      = 是一个关闭的文件句柄。
+"filetype.nil"              = 不是文件句柄。

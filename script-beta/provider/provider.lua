@@ -87,7 +87,7 @@ proto.on('initialize', function (params)
     library.init()
     workspace.init(params.rootUri)
     return {
-        capabilities = cap.initer,
+        capabilities = cap.getIniter(),
         serverInfo   = {
             name    = 'sumneko.lua',
             version = 'beta',

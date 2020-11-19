@@ -442,14 +442,14 @@ local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, res
         if not key or key:sub(1, 1) ~= 's' then
             goto CONTINUE
         end
-        local name = key:sub(3)
         if isSameSource(ast, src, start) then
             -- 由于fastGlobal的优化，全局变量只会找出一个值，有可能找出自己
             -- 所以遇到自己的时候重新找一下有没有其他定义
-            if #vm.getGlobals(name) <= 1 then
+            if #vm.getGlobals(key) <= 1 then
                 goto CONTINUE
             end
         end
+        local name = key:sub(3)
         if locals and locals[name] then
             goto CONTINUE
         end

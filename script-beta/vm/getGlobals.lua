@@ -83,16 +83,16 @@ local function getAnyGlobalsFast()
     return results
 end
 
-function vm.getGlobals(name)
-    if name == '*' and config.config.intelliSense.fastGlobal then
+function vm.getGlobals(key)
+    if key == '*' and config.config.intelliSense.fastGlobal then
         return getAnyGlobalsFast()
     end
-    local cache = vm.getCache('getGlobals')[name]
+    local cache = vm.getCache('getGlobals')[key]
     if cache ~= nil then
         return cache
     end
-    cache = getGlobals(name)
-    vm.getCache('getGlobals')[name] = cache
+    cache = getGlobals(key)
+    vm.getCache('getGlobals')[key] = cache
     return cache
 end
 

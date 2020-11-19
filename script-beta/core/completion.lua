@@ -431,6 +431,8 @@ local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, res
             end
             if #vm.getGlobals(key) <= 1 then
                 goto CONTINUE
+            else
+                src = vm.getGlobalSets(key)[1] or src
             end
         end
         local name = key:sub(3)
@@ -442,13 +444,7 @@ local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, res
         end
         local last = fields[name]
         if not last then
-            -- TODO
-            if guide.isGlobal(src) then
-                --fields[name] = vm.getGlobalSets(key)[1] or src
-                fields[name] = src
-            else
-                fields[name] = src
-            end
+            fields[name] = src
             goto CONTINUE
         end
         if src.type == 'tablefield'

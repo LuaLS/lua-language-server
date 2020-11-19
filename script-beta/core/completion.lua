@@ -203,6 +203,7 @@ local function getSnip(source)
     end
     local defs = vm.getRefs(source, 'deep')
     for _, def in ipairs(defs) do
+        def = guide.getObjectValue(def) or def
         if def ~= source and def.type == 'function' then
             local uri = guide.getUri(def)
             local text = files.getText(uri)
@@ -442,7 +443,7 @@ local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, res
         local last = fields[name]
         if not last then
             if guide.isGlobal(src) then
-                fields[name] = vm.getDefs(src, 'deep')[1] or src
+                fields[name] = vm.getGlobalSets(key)[1] or src
             else
                 fields[name] = src
             end
@@ -1050,6 +1051,7 @@ local function tryCallArg(ast, text, offset, results)
     end
     local defs = vm.getDefs(call.node, 'deep')
     for _, def in ipairs(defs) do
+        def = guide.getObjectValue(def) or def
         local enums = getCallEnums(def, argIndex)
         if enums then
             mergeEnums(myResults, enums, text, arg)

@@ -26,13 +26,8 @@ end
 
 function vm.getRefs(source, deep)
     if guide.isGlobal(source) then
-        local name = guide.getKeyName(source)
-        local cache =  vm.getCache('eachRefOfGlobal')[name]
-                    or vm.getCache('eachRef')[source]
-                    or getRefs(source, 'deep')
-        vm.getCache('eachRefOfGlobal')[name] = cache
-        vm.getCache('eachRef')[source] = cache
-        return cache
+        local key = guide.getKeyName(source)
+        return vm.getGlobals(key)
     else
         local cache =  vm.getCache('eachRef')[source]
                     or getRefs(source, deep)

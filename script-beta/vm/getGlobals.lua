@@ -96,18 +96,18 @@ function vm.getGlobals(key)
     return cache
 end
 
-function vm.getGlobalSets(name)
-    local cache = vm.getCache('getGlobalSets')[name]
+function vm.getGlobalSets(key)
+    local cache = vm.getCache('getGlobalSets')[key]
     if cache ~= nil then
         return cache
     end
     cache = {}
-    local refs = getGlobals(name)
+    local refs = getGlobals(key)
     for _, source in ipairs(refs) do
         if vm.isSet(source) then
             cache[#cache+1] = source
         end
     end
-    vm.getCache('getGlobalSets')[name] = cache
+    vm.getCache('getGlobalSets')[key] = cache
     return cache
 end

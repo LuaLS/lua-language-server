@@ -1476,8 +1476,6 @@ function m.checkSameSimpleByBindDocs(status, obj, start, queue, mode)
                     results[#results+1] = doc.extends
                 end
             end
-        elseif doc.type == 'doc.overload' then
-            results[#results+1] = doc.overload
         elseif doc.type == 'doc.field' then
             results[#results+1] = doc
         end
@@ -3045,14 +3043,6 @@ function m.inferCheckUpDoc(status, source)
                     end
                     return true
                 end
-            end
-        elseif doc.type == 'doc.overload' then
-            if source.value and source.value.type == 'function' then
-                local typeName = getDocTypeUnitName(status, doc.overload)
-                status.results[#status.results+1] = {
-                    type   = typeName,
-                    source = doc.overload,
-                }
             end
         end
     end

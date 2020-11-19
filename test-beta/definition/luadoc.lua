@@ -92,7 +92,7 @@ function t(<?<!f!>?>) end
 ]]
 
 TEST [[
----@overload <!fun(y: boolean)!>
+---@overload fun(y: boolean)
 ---@param x number
 ---@param y boolean
 ---@param z string

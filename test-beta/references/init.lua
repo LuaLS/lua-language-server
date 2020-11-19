@@ -242,18 +242,21 @@ print(t.<!a!>)
 ]]
 
 TEST [[
+local <!f!>
 local <!t!> = <?f?>
 ]]
 
 TEST [[
+local <!f!>
 a.<!t!> = <?f?>
 ]]
 
 TEST [[
-<!t!>.<!f!> = <?t?>
+<!t!>.f = <?t?>
 ]]
 
 TEST [[
+local <!f!>
 local <?t?> = <!f!>
 ]]
 

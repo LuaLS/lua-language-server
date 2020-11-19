@@ -65,6 +65,9 @@ return function (uri, callback)
         local funcArgs
         local defs = vm.getDefs(func)
         for _, def in ipairs(defs) do
+            if def.value then
+                def = def.value
+            end
             if def.type == 'function' then
                 local args = countFuncArgs(def)
                 if not funcArgs or args > funcArgs then

@@ -7,6 +7,18 @@ local util       = require 'utility'
 local findSource = require 'core.find-source'
 local lang       = require 'language'
 
+local function eachFunctionAndOverload(value, callback)
+    callback(value)
+    if not value.bindDocs then
+        return
+    end
+    for _, doc in ipairs(value.bindDocs) do
+        if doc.type == 'doc.overload' then
+            callback(doc.overload)
+        end
+    end
+end
+
 local function getHoverAsFunction(source)
     local values = vm.getDefs(source, 'deep')
     local desc   = getDesc(source)
@@ -17,24 +29,32 @@ local function getHoverAsFunction(source)
     local oop = source.type == 'method'
              or source.type == 'getmethod'
              or source.type == 'setmethod'
-    for _, value in ipairs(values) do
-        if value.type == 'function'
-        or value.type == 'doc.type.function' then
-            local label = getLabel(value, oop)
-            if label then
-                defs = defs + 1
-                labels[label] = (labels[label] or 0) + 1
-                if labels[label] == 1 then
-                    protos = protos + 1
+    local mark = {}
+    for _, def in ipairs(values) do
+        def = guide.getObjectValue(def) or def
+        if def.type == 'function'
+        or def.type == 'doc.type.function' then
+            eachFunctionAndOverload(def, function (value)
+                if mark[value] then
+                    return
                 end
-            end
-            desc = desc or getDesc(value)
-        elseif value.type == 'table'
-        or     value.type == 'boolean'
-        or     value.type == 'string'
-        or     value.type == 'number' then
+                mark[value] =true
+                local label = getLabel(value, oop)
+                if label then
+                    defs = defs + 1
+                    labels[label] = (labels[label] or 0) + 1
+                    if labels[label] == 1 then
+                        protos = protos + 1
+                    end
+                end
+                desc = desc or getDesc(value)
+            end)
+        elseif def.type == 'table'
+        or     def.type == 'boolean'
+        or     def.type == 'string'
+        or     def.type == 'number' then
             other = other + 1
-            desc = desc or getDesc(value)
+            desc = desc or getDesc(def)
         end
     end
 

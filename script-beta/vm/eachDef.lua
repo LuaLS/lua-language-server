@@ -27,13 +27,8 @@ end
 
 function vm.getDefs(source, deep)
     if guide.isGlobal(source) then
-        local name = guide.getKeyName(source)
-        local cache =  vm.getCache('eachDefOfGlobal')[name]
-                    or vm.getCache('eachDef')[source]
-                    or eachDef(source, 'deep')
-        vm.getCache('eachDefOfGlobal')[name] = cache
-        vm.getCache('eachDef')[source] = cache
-        return cache
+        local key = guide.getKeyName(source)
+        return vm.getGlobalSets(key)
     else
         local cache =  vm.getCache('eachDef')[source]
                     or eachDef(source, deep)

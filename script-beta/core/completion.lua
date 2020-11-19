@@ -411,8 +411,9 @@ local function checkFieldThen(name, src, word, start, offset, parent, oop, resul
     }
 end
 
-local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, results, locals)
+local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, results, locals, isGlobal)
     local fields = {}
+    local count = 0
     for _, src in ipairs(refs) do
         if src.type == 'library' then
             if src.name:sub(1, 1) == '@' then
@@ -426,7 +427,7 @@ local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, res
         if isSameSource(ast, src, start) then
             -- 由于fastGlobal的优化，全局变量只会找出一个值，有可能找出自己
             -- 所以遇到自己的时候重新找一下有没有其他定义
-            if not guide.isGlobal(src) then
+            if not isGlobal then
                 goto CONTINUE
             end
             if #vm.getGlobals(key) <= 1 then
@@ -439,12 +440,13 @@ local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, res
         if locals and locals[name] then
             goto CONTINUE
         end
-        if not matchKey(word, name) then
+        if not matchKey(word, name, count >= 100) then
             goto CONTINUE
         end
         local last = fields[name]
         if not last then
             fields[name] = src
+            count = count + 1
             goto CONTINUE
         end
         if src.type == 'tablefield'
@@ -470,8 +472,8 @@ end
 
 local function checkGlobal(ast, word, start, offset, parent, oop, results)
     local locals = guide.getVisibleLocals(ast.ast, offset)
-    local refs = vm.getFields(parent, 'deep')
-    checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, results, locals)
+    local refs = vm.getGlobalSets '*'
+    checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, results, locals, 'global')
 end
 
 local function checkTableField(ast, word, start, results)

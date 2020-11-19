@@ -1,4 +1,4 @@
-return function (me, other)
+return function (me, other, fast)
     if me == other then
         return true
     end
@@ -12,6 +12,9 @@ return function (me, other)
     local lOther = other:lower()
     if lMe == lOther:sub(1, #lMe) then
         return true
+    end
+    if fast and me:sub(1, 1) ~= other:sub(1, 1) then
+        return false
     end
     local chars = {}
     for i = 1, #lOther do

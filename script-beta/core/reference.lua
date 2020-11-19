@@ -78,6 +78,13 @@ return function (uri, offset)
         if vm.isMetaFile(root.uri) then
             goto CONTINUE
         end
+        if  (   src.type == 'doc.class.name'
+            or  src.type == 'doc.type.name'
+            )
+        and source.type ~= 'doc.type.name'
+        and source.type ~= 'doc.class.name' then
+            goto CONTINUE
+        end
         if     src.type == 'setfield'
         or     src.type == 'getfield'
         or     src.type == 'tablefield' then

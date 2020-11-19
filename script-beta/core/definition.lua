@@ -133,6 +133,11 @@ return function (uri, offset)
         if src.type == 'table' and src.parent.type ~= 'return' then
             goto CONTINUE
         end
+        if  src.type == 'doc.class.name'
+        and source.type ~= 'doc.type.name'
+        and source.type ~= 'doc.extends.name' then
+            goto CONTINUE
+        end
         results[#results+1] = {
             target = src,
             uri    = files.getOriginUri(root.uri),

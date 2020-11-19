@@ -52,7 +52,7 @@ local function main()
 
     local config = require 'config'
     config.config.runtime.version = 'Lua 5.4'
-    config.config.intelliSense.searchDepth = 5
+    --config.config.intelliSense.searchDepth = 5
     loadDocMetas()
 
     test 'references'

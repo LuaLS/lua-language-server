@@ -1277,17 +1277,37 @@ function m.getNextRef(ref)
         or nextRef.type == 'getindex' then
             return nextRef
         end
-    else
-        -- 穿透 rawget 与 rawset
-        local call, index = m.getCallAndArgIndex(ref)
-        if call then
-            if call.node.special == 'rawset' and index == 1 then
-                return call
-            end
-            if call.node.special == 'rawget' and index == 1 then
-                return call
+    end
+    -- 穿透 rawget 与 rawset
+    local call, index = m.getCallAndArgIndex(ref)
+    if call then
+        if call.node.special == 'rawset' and index == 1 then
+            return call
+        end
+        if call.node.special == 'rawget' and index == 1 then
+            return call
+        end
+    end
+    -- doc.type.array
+    if ref.type == 'doc.type' then
+        local arrays = {}
+        for _, typeUnit in ipairs(ref.types) do
+            if typeUnit.type == 'doc.type.array' then
+                arrays[#arrays+1] = typeUnit.node
             end
         end
+        -- 返回一个 dummy
+        -- TODO 用弱表维护唯一性？
+        return {
+            type    = 'doc.type',
+            start   = ref.start,
+            finish  = ref.finish,
+            types   = arrays,
+            parent  = ref.parent,
+            array   = true,
+            enums   = {},
+            resumes = {},
+        }
     end
 
     return nil
@@ -1942,7 +1962,7 @@ end
 
 function m.checkSameSimpleAsTableField(status, ref, start, queue)
     if not status.deep then
-        return
+        --return
     end
     local parent = ref.parent
     if not parent or parent.type ~= 'tablefield' then
@@ -1974,7 +1994,7 @@ end
 
 function m.checkSameSimpleAsReturn(status, ref, start, queue)
     if not status.deep then
-        return
+        --return
     end
     if not ref.parent or ref.parent.type ~= 'return' then
         return
@@ -2097,6 +2117,7 @@ function m.pushResult(status, mode, ref, simple)
         elseif ref.type == 'library' then
             results[#results+1] = ref
         elseif ref.type == 'doc.type.function'
+        or     ref.type == 'doc.class.name'
         or     ref.type == 'doc.field' then
             results[#results+1] = ref
         end
@@ -2135,7 +2156,8 @@ function m.pushResult(status, mode, ref, simple)
         elseif ref.type == 'library' then
             results[#results+1] = ref
         elseif ref.type == 'doc.type.function'
-            or ref.type == 'doc.field' then
+        or     ref.type == 'doc.class.name'
+        or     ref.type == 'doc.field' then
             results[#results+1] = ref
         end
         if ref.parent and ref.parent.type == 'return' then
@@ -2168,10 +2190,25 @@ function m.pushResult(status, mode, ref, simple)
         elseif ref.type == 'library' then
             results[#results+1] = ref
         elseif ref.type == 'doc.type.function'
-            or ref.type == 'doc.field' then
+        or     ref.type == 'doc.class.name'
+        or     ref.type == 'doc.field' then
             results[#results+1] = ref
         end
     end
+end
+
+function m.checkSameSimpleName(ref, sm)
+    if sm == '*' then
+        return true
+    end
+    if m.getSimpleName(ref) == sm then
+        return true
+    end
+    if  ref.type == 'doc.type'
+    and ref.array == true then
+        return true
+    end
+    return false
 end
 
 function m.checkSameSimple(status, simple, data, mode, queue)
@@ -2183,7 +2220,7 @@ function m.checkSameSimple(status, simple, data, mode, queue)
     end
     for i = start, #simple do
         local sm = simple[i]
-        if sm ~= '*' and not force and m.getSimpleName(ref) ~= sm then
+        if not force and not m.checkSameSimpleName(ref, sm) then
             return
         end
         force = false
@@ -3414,8 +3451,11 @@ local function inferBySetOfLocal(status, source)
         return
     end
     status.cache[source] = true
+    local newStatus = m.status(status)
+    if source.value then
+        m.searchInfer(newStatus, source.value)
+    end
     if source.ref then
-        local newStatus = m.status(status)
         for _, ref in ipairs(source.ref) do
             if ref.type == 'setlocal' then
                 break

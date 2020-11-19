@@ -442,8 +442,10 @@ local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, res
         end
         local last = fields[name]
         if not last then
+            -- TODO
             if guide.isGlobal(src) then
-                fields[name] = vm.getGlobalSets(key)[1] or src
+                --fields[name] = vm.getGlobalSets(key)[1] or src
+                fields[name] = src
             else
                 fields[name] = src
             end

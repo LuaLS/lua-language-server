@@ -108,11 +108,13 @@ function m.setText(uri, text)
     if platform.OS == 'Windows' then
         uri = uri:lower()
     end
+    local create
     if not m.fileMap[uri] then
         m.fileMap[uri] = {
             uri = originUri,
             version = 0,
         }
+        create = true
     end
     local file = m.fileMap[uri]
     if file.text == text then
@@ -126,6 +128,9 @@ function m.setText(uri, text)
     file.version = file.version + 1
     m.globalVersion = m.globalVersion + 1
     await.close('files.version')
+    if create then
+        m.onWatch('create', originUri)
+    end
     m.onWatch('update', originUri)
 end
 

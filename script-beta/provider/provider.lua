@@ -193,6 +193,8 @@ proto.on('textDocument/didChange', function (params)
 end)
 
 proto.on('textDocument/hover', function (params)
+    await.close 'hover'
+    await.setID 'hover'
     local core = require 'core.hover'
     local doc    = params.textDocument
     local uri    = doc.uri

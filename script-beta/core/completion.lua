@@ -431,7 +431,7 @@ local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, res
             end
             if #vm.getGlobals(key) <= 1 then
                 goto CONTINUE
-            else
+            elseif not guide.isSet(src) then
                 src = vm.getGlobalSets(key)[1] or src
             end
         end

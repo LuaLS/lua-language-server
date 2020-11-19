@@ -394,3 +394,20 @@ TEST {
         ]]
     },
 }
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            local <?t?> = require 'b'
+            return <!t!>
+        ]]
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            local <!t!> = require 'a'
+            return <!t!>
+        ]]
+    },
+}

@@ -128,9 +128,15 @@ local function fastGetAnyGlobals()
     local results = {}
     local mark = {}
     for uri in files.eachFile() do
-        local cache = files.getCache(uri)
-        cache.globals = cache.globals or getGlobalsOfFile(uri)
-        for destName, sources in util.sortPairs(cache.globals) do
+        --local globalSets = getGlobalsOfFile(uri)
+        --for destName, sources in util.sortPairs(globalSets) do
+        --    if not mark[destName] then
+        --        mark[destName] = true
+        --        results[#results+1] = sources[1]
+        --    end
+        --end
+        local globals = getGlobalsOfFile(uri)
+        for destName, sources in util.sortPairs(globals) do
             if not mark[destName] then
                 mark[destName] = true
                 results[#results+1] = sources[1]
@@ -145,9 +151,8 @@ local function fastGetAnyGlobalSets()
     local results = {}
     local mark = {}
     for uri in files.eachFile() do
-        local cache = files.getCache(uri)
-        cache.globalSets = cache.globalSets or getGlobalSetsOfFile(uri)
-        for destName, sources in util.sortPairs(cache.globalSets) do
+        local globals = getGlobalSetsOfFile(uri)
+        for destName, sources in util.sortPairs(globals) do
             if not mark[destName] then
                 mark[destName] = true
                 results[#results+1] = sources[1]

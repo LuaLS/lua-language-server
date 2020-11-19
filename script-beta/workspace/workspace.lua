@@ -290,6 +290,9 @@ end
 function m.normalize(path)
     if platform.OS == 'Windows' then
         path = path:gsub('[/\\]+', '\\')
+                   :gsub('^%a+%:', function (str)
+                        return str:upper()
+                   end)
     else
         path = path:gsub('[/\\]+', '/')
     end

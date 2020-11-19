@@ -161,6 +161,23 @@ function m.delay()
     return coroutine.yield()
 end
 
+local function warnStepTime(passed, waker)
+    if passed < 1 then
+        log.warn(('Await step takes [%.3f] sec.'):format(passed))
+        return
+    end
+    for i = 1, 100 do
+        local name, v = debug.getupvalue(waker, i)
+        if not name then
+            return
+        end
+        if name == 'co' then
+            log.warn(debug.traceback(v, ('[fire]Await step takes [%.3f] sec.'):format(passed)))
+            return
+        end
+    end
+end
+
 --- 步进
 function m.step()
     local waker = m.delayQueue[m.delayQueueIndex]
@@ -171,7 +188,7 @@ function m.step()
         waker()
         local passed = os.clock() - clock
         if passed > 0.1 then
-            log.warn(('Await step takes [%.3f] sec.'):format(passed))
+            warnStepTime(passed, waker)
         end
         return true
     else

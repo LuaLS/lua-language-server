@@ -2904,6 +2904,13 @@ function m.getDocTypeNames(status, doc, genericCallback)
 end
 
 function m.inferCheckDoc(status, source)
+    if source.type == 'doc.class.name' then
+        status.results[#status.results+1] = {
+            type   = source[1],
+            source = source,
+        }
+        return true
+    end
     if source.type == 'doc.class' then
         status.results[#status.results+1] = {
             type   = source.class[1],

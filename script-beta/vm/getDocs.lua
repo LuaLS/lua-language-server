@@ -2,6 +2,7 @@ local files   = require 'files'
 local util    = require 'utility'
 local guide   = require 'parser.guide'
 local vm      = require 'vm.vm'
+local config  = require 'config'
 
 local function getTypesOfFile(uri)
     local types = {}
@@ -141,4 +142,37 @@ function vm.getValidVersions(doc)
         valids['LuaJIT'] = true
     end
     return valids
+end
+
+local function isDeprecated(value)
+    if not value.bindDocs then
+        return false
+    end
+    for _, doc in ipairs(value.bindDocs) do
+        if doc.type == 'doc.deprecated' then
+            return true
+        elseif doc.type == 'doc.version' then
+            local valids = vm.getValidVersions(doc)
+            if not valids[config.config.runtime.version] then
+                return true
+            end
+        end
+    end
+    return false
+end
+
+function vm.isDeprecated(value)
+    if isDeprecated(value) then
+        return true
+    end
+    local defs = vm.getDefs(value, 'deep')
+    if #defs == 0 then
+        return false
+    end
+    for _, def in ipairs(defs) do
+        if not isDeprecated(def) then
+            return false
+        end
+    end
+    return true
 end

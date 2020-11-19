@@ -356,26 +356,6 @@ local function checkFieldFromFieldToIndex(name, parent, word, start, offset)
     return textEdit, additionalTextEdits
 end
 
-local function isDeprecated(value)
-    if value.deprecated then
-        return true
-    end
-    if not value.bindDocs then
-        return false
-    end
-    for _, doc in ipairs(value.bindDocs) do
-        if doc.type == 'doc.deprecated' then
-            return true
-        elseif doc.type == 'doc.version' then
-            local valids = vm.getValidVersions(doc)
-            if not valids[config.config.runtime.version] then
-                return true
-            end
-        end
-    end
-    return false
-end
-
 local function checkFieldThen(name, src, word, start, offset, parent, oop, results)
     local value = guide.getObjectValue(src) or src
     local kind = define.CompletionItemKind.Field
@@ -388,7 +368,7 @@ local function checkFieldThen(name, src, word, start, offset, parent, oop, resul
         buildFunction(results, src, oop, {
             label      = name,
             kind       = kind,
-            deprecated = isDeprecated(value) or nil,
+            deprecated = vm.isDeprecated(value) or nil,
             id         = stack(function ()
                 return {
                     detail      = buildDetail(src),

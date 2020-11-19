@@ -17,14 +17,27 @@ function assert(v, message) end
 ---| '"restart"'      # ---#DESENUM 'cgopt.restart'
 ---| '"count"'        # ---#DESENUM 'cgopt.count'
 ---| '"step"'         # ---#DESENUM 'cgopt.step'
+---| '"isrunning"'    # ---#DESENUM 'cgopt.isrunning'
+---#if VERSION >= 5.4 then
 ---| '"incremental"'  # ---#DESENUM 'cgopt.incremental'
 ---| '"generational"' # ---#DESENUM 'cgopt.generational'
----| '"isrunning"'    # ---#DESENUM 'cgopt.isrunning'
+---#else
+---| '"setpause"'     # ---#DESENUM 'cgopt.setpause'
+---| '"setstepmul"'   # ---#DESENUM 'cgopt.setstepmul'
+---#end
 
+---#if VERSION >= 5.4 then
 ---#DES 'collectgarbage'
 ---@param opt? cgopt
 ---@return any
 function collectgarbage(opt, ...) end
+---#else
+---#DES 'collectgarbage'
+---@param opt? cgopt
+---@param arg? integer
+---@return any
+function collectgarbage(opt, arg) end
+---#end
 
 ---#DES 'dofile'
 ---@param filename? string
@@ -63,22 +76,39 @@ function ipairs(t) end
 ---| '"t"'  # ---#DESENUM 'loadmode.t'
 ---|>'"bt"' # ---#DESENUM 'loadmode.bt'
 
----#DES 'load'
+---#if VERSION <= 5.1 then
+---#DES 'load<5.1'
+---@param func       function
+---@param chunkname? string
+---@return function
+---@return string   error_message
+function load(func, chunkname) end
+---#else
+---#DES 'load>5.2'
 ---@param chunk      string|function
 ---@param chunkname? string
 ---@param mode?      loadmode
 ---@param env?       table
 ---@return function
----@return string error_message
+---@return string   error_message
 function load(chunk, chunkname, mode, env) end
+---#end
 
+---#if VERSION <= 5.1 then
+---#DES 'loadfile'
+---@param filename? string
+---@return function
+---@return string   error_message
+function loadfile(filename) end
+---#else
 ---#DES 'loadfile'
 ---@param filename? string
 ---@param mode?     loadmode
 ---@param env?      table
 ---@return function
----@return string error_message
+---@return string   error_message
 function loadfile(filename, mode, env) end
+---#endif
 
 ---@version 5.1
 ---#DES 'loadstring'
@@ -204,7 +234,16 @@ _VERSION = 'Lua 5.4'
 ---@param message string
 function warn(message, ...) end
 
----#DES 'xpcall'
+---#if VERSION == 5.1 and not JIT then
+---#DES 'xpcall=5.1'
+---@param f     function
+---@param err   function
+---@return boolean success
+---@return any result
+---@return ...
+function xpcall(f, err) end
+---#else
+---#DES 'xpcall>5.1'
 ---@param f     function
 ---@param msgh  function
 ---@param arg1? any
@@ -212,6 +251,7 @@ function warn(message, ...) end
 ---@return any result
 ---@return ...
 function xpcall(f, msgh, arg1, ...) end
+---#endif
 
 ---@version 5.1
 ---#DES 'unpack'

@@ -6,8 +6,8 @@ assert              = 如果其参数 `v` 的值为假（`nil` 或 `false`），
 "cgopt.restart"     = 重启垃圾收集器的自动运行。
 "cgopt.count "      = 以 K 字节数为单位返回 Lua 使用的总内存数。
 "cgopt.step"        = 单步运行垃圾收集器。 步长“大小”由 `arg` 控制。
-"cgopt.setpause"    = 将 `arg` 设为收集器的 *间歇率* （参见 §2.5）。
-"cgopt.setstepmul"  = 将 `arg` 设为收集器的 *步进倍率* （参见 §2.5）。
+"cgopt.setpause"    = 将 `arg` 设为收集器的 *间歇率* 。
+"cgopt.setstepmul"  = 将 `arg` 设为收集器的 *步进倍率* 。
 "cgopt.incremental" = 改变收集器模式为增量模式。
 "cgopt.generational"= 改变收集器模式为分代模式。
 "cgopt.isrunning"   = 返回表示收集器是否在工作的布尔值。
@@ -31,12 +31,13 @@ ipairs              = [[
 "loadmode.b"        = 只能是二进制代码块。
 "loadmode.t"        = 只能是文本代码块。
 "loadmode.bt"       = 可以是二进制也可以是文本。
-load                = [[
+"load<5.1"          = 使用 `func` 分段加载代码块。 每次调用 `func` 必须返回一个字符串用于连接前文。
+"load>5.2"          = [[
 加载一个代码块。
 
 如果 `chunk` 是一个字符串，代码块指这个字符串。 如果 `chunk` 是一个函数， `load` 不断地调用它获取代码块的片断。 每次对 `chunk` 的调用都必须返回一个字符串紧紧连接在上次调用的返回串之后。 当返回空串、`nil`、或是不返回值时，都表示代码块结束。
 ]]
-loadfile            = 和 $load 类似， 不过是从文件 `filename` 或标准输入（如果文件名未提供）中获取代码块。
+loadfile            = 从文件 `filename` 或标准输入（如果文件名未提供）中获取代码块。
 loadstring          = 使用给定字符串加载代码块。
 module              = 创建一个模块。
 next                = [[
@@ -83,7 +84,62 @@ tostring            = [[
 type                = [[
 将参数的类型编码为一个字符串返回。 函数可能的返回值有 `"nil"` （一个字符串，而不是 `nil` 值）， `"number"`， `"string"`， `"boolean"`， `"table"`， `"function"`， `"thread"`， `"userdata"`。
 ]]
-_VERSION            = 一个包含有当前解释器版本号的全局变量（并非函数）。 当前这个变量的值为 `"Lua 5.3"`。
-warn                = ''
-xpcall              = 这个函数和 `pcall` 类似。 不过它可以额外设置一个消息处理器 `msgh`。
-unpack              = ''
+_VERSION            = 一个包含有当前解释器版本号的全局变量（并非函数）。
+warn                = 使用所有参数组成的字符串消息来发送警告。
+"xpcall=5.1"        = 这个函数和 `pcall` 类似。 不过它可以额外设置一个消息处理器 `err`。
+"xpcall>5.2"        = 这个函数和 `pcall` 类似。 不过它可以额外设置一个消息处理器 `msgh`。
+unpack              = [[
+返回给定 `list` 中的所有元素。 改函数等价于
+```lua
+return list[i], list[i+1], ···, list[j]
+```
+]]
+
+bit32               = ''
+"bit32.arshift"     = [[
+返回 `x` 向右位移 `disp` 位的结果。`disp` 为负时向左位移。这是算数位移操作，左侧的空位使用 `x` 的高位填充，右侧空位使用 `0` 填充。
+]]
+"bit32.band"        = 返回参数按位与的结果。
+"bit32.bnot"        = [[
+返回 `x` 按位取反的结果。
+
+```lua
+assert(bit32.bnot(x) == (-1 - x) % 2^32)
+```
+]]
+"bit32.bor"         = 返回参数按位或的结果。
+"bit32.btest"       = 参数按位与的结果不为0时，返回 `true` 。
+"bit32.bxor"        = 返回参数按位异或的结果。
+"bit32.extract"     = 返回 `n` 中第 `field` 到第 `field + width - 1` 位组成的结果。
+"bit32.replace"     = 返回 `v` 的第 `field` 到第 `field + width - 1` 位替换 `n` 的对应位后的结果。
+"bit32.lrotate"     = 返回 `x` 向左旋转 `disp` 位的结果。`disp` 为负时向右旋转。
+"bit32.lshift"      = [[
+返回 `x` 向左位移 `disp` 位的结果。`disp` 为负时向右位移。空位总是使用 `0` 填充。
+
+```lua
+assert(bit32.lshift(b, disp) == (b * 2^disp) % 2^32)
+```
+]]
+"bit32.rrotate"     = 返回 `x` 向右旋转 `disp` 位的结果。`disp` 为负时向左旋转。
+"bit32.rshift"      = [[
+返回 `x` 向右位移 `disp` 位的结果。`disp` 为负时向左位移。空位总是使用 `0` 填充。
+
+```lua
+assert(bit32.lshift(b, disp) == (b * 2^disp) % 2^32)
+```
+]]
+
+coroutine                   = ''
+"coroutine.create"          = 创建一个主体函数为 `f` 的新协程。 f 必须是一个 Lua 的函数。 返回这个新协程，它是一个类型为 `"thread"` 的对象。
+"coroutine.isyieldable"     = 如果正在运行的协程可以让出，则返回真。
+"coroutine.isyieldable>5.4" = 如果协程 `co` 可以让出，则返回真。`co` 默认为正在运行的协程。
+"coroutine.close"           = 关闭协程 `co`，并关闭它所有等待 *to-be-closed* 的变量，并将协程状态设为 `dead` 。
+"coroutine.resume"          = 开始或继续协程 `co` 的运行。
+"coroutine.running"         = 返回当前正在运行的协程加一个布尔量。 如果当前运行的协程是主线程，其为真。
+"coroutine.status"          = 以字符串形式返回协程 `co` 的状态。
+"coroutine.wrap"            = 创建一个主体函数为 `f` 的新协程。 f 必须是一个 Lua 的函数。 返回一个函数， 每次调用该函数都会延续该协程。
+"coroutine.yield"           = 挂起正在调用的协程的执行。
+"costatus.running"          = 正在运行。
+"costatus.suspended"        = 挂起或是还没有开始运行。
+"costatus.normal"           = 是活动的，但并不在运行。
+"costatus.dead"             = 运行完主体函数或因错误停止。

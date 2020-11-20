@@ -251,3 +251,51 @@ end
 "filetype.file"             = 是一个打开的文件句柄。
 "filetype.closed file"      = 是一个关闭的文件句柄。
 "filetype.nil"              = 不是文件句柄。
+
+math                        = ''
+"math.abs"                  = 返回 `x` 的绝对值。
+"math.acos"                 = 返回 `x` 的反余弦值（用弧度表示）。
+"math.asin"                 = 返回 `x` 的反正弦值（用弧度表示）。
+"math.atan<5.2"             = 返回 `x` 的反正切值（用弧度表示）。
+"math.atan>5.3"             = 返回 `y/x` 的反正切值（用弧度表示）。
+"math.atan2"                = 返回 `y/x` 的反正切值（用弧度表示）。
+"math.ceil"                 = 返回不小于 `x` 的最小整数值。
+"math.cos"                  = 返回 `x` 的余弦（假定参数是弧度）。
+"math.cosh"                 = 返回 `x` 的双曲余弦（假定参数是弧度）。
+"math.deg"                  = 将角 `x` 从弧度转换为角度。
+"math.exp"                  = 返回 `e^x` 的值 （e 为自然对数的底）。
+"math.floor"                = 返回不大于 `x` 的最大整数值。
+"math.fmod"                 = 返回 `x` 除以 `y`，将商向零圆整后的余数。
+"math.frexp"                = 将 `x` 分解为尾数与指数，返回值符合 `x = m * (2 ^ e)` 。`e` 是一个整数，`m` 是 [0.5, 1) 之间的规格化小数 (`x` 为0时 `m` 为0)。
+"math.huge"                 = 一个比任何数字值都大的浮点数。
+"math.ldexp"                = 返回 `m * (2 ^ e)` 。
+"math.log<5.1"              = 返回 `x` 的自然对数。
+"math.log>5.2"              = 回以指定底的 `x` 的对数。
+"math.log10"                = 返回 `x` 的以10为底的对数。
+"math.max"                  = 返回参数中最大的值， 大小由 Lua 操作 `<` 决定。
+"math.maxinteger"           = 最大值的整数。
+"math.min"                  = 返回参数中最小的值， 大小由 Lua 操作 `<` 决定。
+"math.mininteger"           = 最小值的整数。
+"math.modf"                 = 返回 `x` 的整数部分和小数部分。
+"math.pi"                   = *π* 的值。
+"math.pow"                  = 返回 `x ^ y` 。
+"math.rad"                  = 将角 `x` 从角度转换为弧度。
+"math.random"               = [[
+* `math.random()`: 返回 [0,1) 区间内一致分布的浮点伪随机数。
+* `math.random(n)`: 返回 [1, n] 区间内一致分布的整数伪随机数。
+* `math.random(m, n)`: 返回 [m, n] 区间内一致分布的整数伪随机数。
+]]
+"math.randomseed<5.3"       = 把 `x` 设为伪随机数发生器的“种子”： 相同的种子产生相同的随机数列。
+"math.randomseed>5.4"       = [[
+* `math.randomseed(x, y)`: 将 `x` 与 `y` 连接为128位的种子来重新初始化伪随机生成器。
+* `math.randomseed(x)`: 等同于 `math.randomseed(x, 0)` 。
+* `math.randomseed()`: Generates a seed with a weak attempt for randomness.（不会翻）
+]]
+"math.sin"                  = 返回 `x` 的正弦值（假定参数是弧度）。
+"math.sinh"                 = 返回 `x` 的双曲正弦值（假定参数是弧度）。
+"math.sqrt"                 = 返回 `x` 的平方根。
+"math.tan"                  = 返回 `x` 的正切值（假定参数是弧度）。
+"math.tanh"                 = 返回 `x` 的双曲正切值（假定参数是弧度）。
+"math.tointeger"            = 如果 `x` 可以转换为一个整数， 返回该整数。
+"math.type"                 = 如果 `x` 是整数，返回 `"integer"`， 如果它是浮点数，返回 `"float"`， 如果 `x` 不是数字，返回 `nil`。
+"math.ult"                  = 如果整数 `m` 和 `n` 以无符号整数形式比较， `m` 在 `n` 之下，返回布尔真否则返回假。

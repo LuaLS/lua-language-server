@@ -84,6 +84,10 @@ local function asDocFunction(source)
     return ''
 end
 
+local function asDocField(source)
+    return source.field[1]
+end
+
 function buildName(source, oop)
     if oop == nil then
         oop =  source.type == 'setmethod'
@@ -116,6 +120,9 @@ function buildName(source, oop)
     end
     if source.type == 'doc.type.function' then
         return asDocFunction(source)
+    end
+    if source.type == 'doc.field' then
+        return asDocField(source)
     end
     local parent = source.parent
     if parent then

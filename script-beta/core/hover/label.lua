@@ -121,6 +121,28 @@ local function asField(source)
     return asValue(source, 'field')
 end
 
+local function asDocField(source)
+    local name  = source.field[1]
+    local class
+    for _, doc in ipairs(source.bindGroup) do
+        if doc.type == 'doc.class' then
+            class = doc
+            break
+        end
+    end
+    if not class then
+        return ('field ?.%s: %s'):format(
+            name,
+            vm.getInferType(source.extends)
+        )
+    end
+    return ('field %s.%s: %s'):format(
+        class.class[1],
+        name,
+        vm.getInferType(source.extends)
+    )
+end
+
 local function asString(source)
     local str = source[1]
     if type(str) ~= 'string' then
@@ -189,5 +211,7 @@ return function (source, oop)
         return asDocFunction(source)
     elseif source.type == 'doc.type.name' then
         return asDocTypeName(source)
+    elseif source.type == 'doc.field' then
+        return asDocField(source)
     end
 end

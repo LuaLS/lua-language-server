@@ -1761,3 +1761,15 @@ f($)
         description = '注释2',
     },
 }
+
+TEST [[
+utf8.charpatter$
+]]
+{
+    {
+        label       = 'charpattern',
+        detail      = 'string',
+        kind        = define.CompletionItemKind.Field,
+        description = EXISTS,
+    }
+}

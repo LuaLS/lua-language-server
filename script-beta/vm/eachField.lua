@@ -1,25 +1,6 @@
 local vm      = require 'vm.vm'
 local guide   = require 'parser.guide'
-local library = require 'library'
 local await   = require 'await'
-local config  = require 'config'
-
-local function eachFieldInLibrary(source, lib, results)
-    if not lib or not lib.child then
-        return
-    end
-    for _, value in pairs(lib.child) do
-        if value.name:sub(1, 1) ~= '@' then
-            results[#results+1] = value
-        end
-    end
-end
-
-local function eachFieldOfLibrary(results)
-    for _, lib in pairs(library.global) do
-        results[#results+1] = lib
-    end
-end
 
 local function eachField(source, deep)
     local unlock = vm.lock('eachField', source)
@@ -36,12 +17,6 @@ local function eachField(source, deep)
 
     await.delay()
     local results = guide.requestFields(source, vm.interface, deep)
-    if source.special == '_G' then
-        eachFieldOfLibrary(results)
-    end
-    if library.object[source.type] then
-        eachFieldInLibrary(source, library.object[source.type], results)
-    end
 
     unlock()
     return results

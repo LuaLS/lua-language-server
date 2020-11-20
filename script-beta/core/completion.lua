@@ -3,7 +3,6 @@ local files      = require 'files'
 local guide      = require 'parser.guide'
 local matchKey   = require 'core.matchkey'
 local vm         = require 'vm'
-local library    = require 'library'
 local getLabel   = require 'core.hover.label'
 local getName    = require 'core.hover.name'
 local getArg     = require 'core.hover.arg'
@@ -259,9 +258,6 @@ local function buildFunction(results, source, oop, data)
 end
 
 local function isSameSource(ast, source, pos)
-    if source.type == 'library' then
-        return false
-    end
     if not files.eq(guide.getUri(source), guide.getUri(ast.ast)) then
         return false
     end
@@ -369,7 +365,7 @@ local function checkFieldThen(name, src, word, start, offset, parent, oop, resul
         buildFunction(results, src, oop, {
             label      = name,
             kind       = kind,
-            deprecated = vm.isDeprecated(value) or nil,
+            deprecated = vm.isDeprecated(src) or nil,
             id         = stack(function ()
                 return {
                     detail      = buildDetail(src),
@@ -415,11 +411,6 @@ local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, res
     local fields = {}
     local count = 0
     for _, src in ipairs(refs) do
-        if src.type == 'library' then
-            if src.name:sub(1, 1) == '@' then
-                goto CONTINUE
-            end
-        end
         local key = vm.getKeyName(src)
         if not key or key:sub(1, 1) ~= 's' then
             goto CONTINUE
@@ -903,37 +894,6 @@ local function trySymbol(ast, text, offset, results)
 end
 
 local function getCallEnums(source, index)
-    if source.type == 'library' and source.value.type == 'function' then
-        local func = source.value
-        if not func then
-            return nil
-        end
-        if not func.args then
-            return nil
-        end
-        if not func.enums then
-            return nil
-        end
-        local arg = func.args[index]
-        if not arg then
-            return nil
-        end
-        local argName = arg.name
-        if not argName then
-            return nil
-        end
-        local enums = {}
-        for _, enum in ipairs(func.enums) do
-            if enum.name == argName then
-                enums[#enums+1] = {
-                    label       = enum.enum,
-                    description = enum.description,
-                    kind        = define.CompletionItemKind.EnumMember,
-                }
-            end
-        end
-        return enums
-    end
     if source.type == 'function' and source.bindDocs then
         if not source.args then
             return

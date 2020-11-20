@@ -2,7 +2,6 @@ local files   = require 'files'
 local lang    = require 'language'
 local define  = require 'proto.define'
 local guide   = require 'parser.guide'
-local library = require 'library'
 local util    = require 'utility'
 local sp      = require 'bee.subprocess'
 
@@ -76,11 +75,7 @@ local function solveUndefinedGlobal(uri, diag, results)
         local name = guide.getName(source)
         markGlobal(uri, name, results)
 
-        if library.other[name] then
-            for _, version in ipairs(library.other[name]) do
-                changeVersion(uri, version, results)
-            end
-        end
+        -- TODO check other version
     end)
 end
 

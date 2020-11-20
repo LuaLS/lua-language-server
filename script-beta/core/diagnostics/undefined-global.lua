@@ -1,7 +1,6 @@
 local files   = require 'files'
 local vm      = require 'vm'
 local lang    = require 'language'
-local library = require 'library'
 local config  = require 'config'
 local guide   = require 'parser.guide'
 
@@ -20,15 +19,13 @@ return function (uri, callback)
         if config.config.diagnostics.globals[key] then
             return
         end
-        if library.global[key] then
-            return
-        end
         if #vm.getGlobalSets(guide.getKeyName(src)) > 0 then
             return
         end
         local message = lang.script('DIAG_UNDEF_GLOBAL', key)
-        local otherVersion  = library.other[key]
-        local customVersion = library.custom[key]
+        -- TODO check other version
+        local otherVersion
+        local customVersion
         if otherVersion then
             message = ('%s(%s)'):format(message, lang.script('DIAG_DEFINED_VERSION', table.concat(otherVersion, '/'), config.config.runtime.version))
         elseif customVersion then

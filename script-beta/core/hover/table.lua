@@ -5,11 +5,6 @@ local config   = require 'config'
 local lang     = require 'language'
 
 local function getKey(src)
-    if src.type == 'library' then
-        if src.name:sub(1, 1) == '@' then
-            return
-        end
-    end
     local key = vm.getKeyName(src)
     if not key or #key <= 2 then
         if not src.index then
@@ -41,9 +36,6 @@ local function getFieldFast(src)
     local value = guide.getObjectValue(src) or src
     if not value then
         return 'any'
-    end
-    if value.library then
-        return value.type, util.viewLiteral(value.value)
     end
     if value.type == 'boolean' then
         return value.type, util.viewLiteral(value[1])

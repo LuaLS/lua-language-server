@@ -48,8 +48,7 @@ Care['getlocal'] = function (source, results)
     if node then
         for _, ref in ipairs(node.ref) do
             local def = ref.value
-            if def.type == 'function'
-            or (def.type == 'library' and def.value.type == 'function') then
+            if def.type == 'function' then
                 hasFunc = true
                 break
             end

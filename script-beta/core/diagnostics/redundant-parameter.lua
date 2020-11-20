@@ -5,23 +5,6 @@ local lang   = require 'language'
 local define = require 'proto.define'
 local await  = require 'await'
 
-local function countLibraryArgs(source)
-    local lib = vm.getLibrary(source)
-    if not lib then
-        return nil
-    end
-    local func = lib.value
-    local result = 0
-    if not func.args then
-        return result
-    end
-    if func.args[#func.args].type == '...' then
-        return math.maxinteger
-    end
-    result = result + #func.args
-    return result
-end
-
 local function countCallArgs(source)
     local result = 0
     if not source.args then
@@ -76,7 +59,6 @@ return function (uri, callback)
             end
         end
 
-        funcArgs = funcArgs or countLibraryArgs(func)
         if not funcArgs then
             return
         end

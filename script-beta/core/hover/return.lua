@@ -8,41 +8,6 @@ local function mergeTypes(returns)
     return guide.mergeTypes(returns)
 end
 
-local function asLibrary(source)
-    if not source.returns then
-        return nil
-    end
-    local returns = {}
-    for i, rtn in ipairs(source.returns) do
-        local line = {}
-        local name = rtn.name
-        local tp = rtn.type and mergeTypes(rtn.type) or 'any'
-        if i == 1 then
-            line[#line+1] = '  ->'
-        else
-            line[#line+1] = ('% 3d.'):format(i)
-        end
-        if rtn.optional then
-            line[#line+1] = '['
-        else
-            line[#line+1] = ' '
-        end
-        if name then
-            line[#line+1] = ('%s: %s'):format(name, tp)
-        else
-            line[#line+1] = tp
-        end
-        if rtn.optional then
-            line[#line+1] = ']'
-        end
-        returns[i] = table.concat(line)
-    end
-    if #returns == 0 then
-        return nil
-    end
-    return table.concat(returns, '\n')
-end
-
 local function getReturnDualByDoc(source)
     local docs = source.bindDocs
     if not docs then
@@ -151,11 +116,6 @@ local function asDocFunction(source)
 end
 
 return function (source)
-    if source.type == 'library' then
-        return asLibrary(source.value)
-    elseif source.library then
-        return asLibrary(source)
-    end
     if source.type == 'function' then
         return asFunction(source)
     end

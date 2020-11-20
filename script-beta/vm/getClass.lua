@@ -12,15 +12,6 @@ local function lookUpDocClass(source)
 end
 
 local function getClass(source, classes, depth, deep)
-    local lib = vm.getLibrary(source, deep)
-    if lib then
-        if lib.value.type == 'table' then
-            classes[#classes+1] = lib.value.name
-        else
-            classes[#classes+1] = lib.value.type
-        end
-        return
-    end
     local docClass = lookUpDocClass(source)
     if docClass then
         classes[#classes+1] = docClass

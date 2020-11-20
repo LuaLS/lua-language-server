@@ -786,8 +786,6 @@ function m.getSimpleName(obj)
         return ('v|%p'):format(obj)
     elseif obj.type == 'string' then
         return ('z|%p'):format(obj)
-    elseif obj.type == 'library' then
-        return ('s|%s'):format(obj.name)
     elseif obj.type == 'doc.class.name'
     or     obj.type == 'doc.type.name' then
         return ('c|%s'):format(obj[1])
@@ -972,9 +970,6 @@ function m.getStepRef(status, obj, mode)
     end
     if obj.type == 'goto' then
         return stepRefOfLabel(obj.node, mode)
-    end
-    if obj.type == 'library' then
-        return { obj }
     end
     if obj.type == 'doc.class.name'
     or obj.type == 'doc.type.name'
@@ -1346,9 +1341,6 @@ function m.getObjectValue(obj)
         if not obj then
             return nil
         end
-    end
-    if obj.library then
-        return nil
     end
     if obj.type == 'boolean'
     or obj.type == 'number'
@@ -2116,8 +2108,6 @@ function m.pushResult(status, mode, ref, simple)
             results[#results+1] = ref
         elseif ref.type == 'table' then
             results[#results+1] = ref
-        elseif ref.type == 'library' then
-            results[#results+1] = ref
         elseif ref.type == 'doc.type.function'
         or     ref.type == 'doc.class.name'
         or     ref.type == 'doc.field' then
@@ -2155,8 +2145,6 @@ function m.pushResult(status, mode, ref, simple)
             or ref.node.special == 'rawget' then
                 results[#results+1] = ref
             end
-        elseif ref.type == 'library' then
-            results[#results+1] = ref
         elseif ref.type == 'doc.type.function'
         or     ref.type == 'doc.class.name'
         or     ref.type == 'doc.field' then
@@ -2189,8 +2177,6 @@ function m.pushResult(status, mode, ref, simple)
             or ref.node.special == 'rawget' then
                 results[#results+1] = ref
             end
-        elseif ref.type == 'library' then
-            results[#results+1] = ref
         elseif ref.type == 'doc.type.function'
         or     ref.type == 'doc.class.name'
         or     ref.type == 'doc.field' then
@@ -2825,17 +2811,6 @@ function m.inferCheckLiteral(status, source)
         }
         return true
     end
-end
-
-function m.inferCheckLibrary(status, source)
-    if source.type ~= 'library' then
-        return
-    end
-    status.results = m.allocInfer {
-        type   = source.value.type,
-        source = source,
-    }
-    return true
 end
 
 local function getDocAliasExtends(status, name)
@@ -3598,29 +3573,6 @@ function m.inferByBinary(status, source)
     end
 end
 
-local function mergeLibraryFunctionReturns(status, source, index)
-    local returns = source.returns
-    if not returns then
-        return
-    end
-    local rtn = returns[index]
-    if rtn then
-        if type(rtn.type) == 'table' then
-            for _, tp in ipairs(rtn.type) do
-                status.results[#status.results+1] = {
-                    type   = tp,
-                    source = rtn,
-                }
-            end
-        else
-            status.results[#status.results+1] = {
-                type   = rtn.type,
-                source = rtn,
-            }
-        end
-    end
-end
-
 local function mergeFunctionReturnsByDoc(status, source, index, call)
     if not source or source.type ~= 'function' then
         return
@@ -3741,12 +3693,8 @@ function m.inferByCallReturnAndIndex(status, call, index)
     if not hasDocReturn then
         for _, src in ipairs(newStatus.results) do
             if src.value and src.value.type == 'function' then
-                if src.type == 'library' then
-                    mergeLibraryFunctionReturns(status, src.value, index)
-                else
-                    if not m.checkReturnMark(status, src.value, true) then
-                        mergeFunctionReturns(status, src.value, index, call)
-                    end
+                if not m.checkReturnMark(status, src.value, true) then
+                    mergeFunctionReturns(status, src.value, index, call)
                 end
             end
         end
@@ -3799,11 +3747,7 @@ function m.inferByPCallReturn(status, source)
     m.searchRefs(newStatus, func, 'def')
     for _, src in ipairs(newStatus.results) do
         if src.value and src.value.type == 'function' then
-            if src.type == 'library' then
-                mergeLibraryFunctionReturns(status, src.value, index)
-            else
-                mergeFunctionReturns(status, src.value, index)
-            end
+            mergeFunctionReturns(status, src.value, index)
         end
     end
 end
@@ -3860,7 +3804,6 @@ function m.searchInfer(status, obj)
     local checked = m.inferCheckDoc(status, obj)
                  or m.inferCheckUpDoc(status, obj)
                  or m.inferCheckFieldDoc(status, obj)
-                 or m.inferCheckLibrary(status, obj)
                  or m.inferCheckLiteral(status, obj)
                  or m.inferCheckUnary(status, obj)
                  or m.inferCheckBinary(status, obj)

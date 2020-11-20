@@ -2,7 +2,6 @@ local files   = require 'files'
 local guide   = require 'parser.guide'
 local lang    = require 'language'
 local config  = require 'config'
-local library = require 'library'
 local vm      = require 'vm'
 
 local function isDocClass(source)
@@ -26,9 +25,6 @@ return function (uri, callback)
 
     local definedGlobal = {}
     for name in pairs(config.config.diagnostics.globals) do
-        definedGlobal[name] = true
-    end
-    for name in pairs(library.global) do
         definedGlobal[name] = true
     end
 

@@ -83,10 +83,6 @@ local function asGlobal(source)
     return asValue(source, 'global')
 end
 
-local function asLibrary(source)
-    return asValue(source, 'global')
-end
-
 local function isGlobalField(source)
     if source.type == 'field'
     or source.type == 'method' then
@@ -205,8 +201,6 @@ return function (source, oop)
         return asString(source)
     elseif source.type == 'number' then
         return asNumber(source)
-    elseif source.type == 'library' then
-        return asLibrary(source)
     elseif source.type == 'doc.type.function' then
         return asDocFunction(source)
     elseif source.type == 'doc.type.name' then

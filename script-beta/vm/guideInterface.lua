@@ -3,7 +3,6 @@ local files   = require 'files'
 local ws      = require 'workspace'
 local guide   = require 'parser.guide'
 local await   = require 'await'
-local library = require 'library'
 local config  = require 'config'
 
 local m = {}
@@ -37,9 +36,6 @@ function m.require(args, index)
             end
         end
     end
-
-    local lib = library.library[reqName]
-    results[#results+1] = lib
 
     return results
 end
@@ -97,23 +93,6 @@ function vm.interface.link(uri)
 end
 
 function vm.interface.index(obj)
-    if obj.type == 'library' then
-        return obj.fields
-    end
-
-    local tp = obj.type
-    if tp == 'getglobal' and obj.node.special == '_G' then
-        local lib = library.global[obj[1]]
-        if not lib then
-            return nil
-        end
-        tp = lib.value.type
-    end
-    local lib = library.object[tp]
-    if lib then
-        return lib.fields
-    end
-
     return nil
 end
 

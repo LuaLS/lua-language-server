@@ -41,34 +41,6 @@ local function asGlobal(source)
     return guide.getName(source)
 end
 
-local function asLibrary(source, oop)
-    local p
-    if oop then
-        if source.parent then
-            for _, parent in ipairs(source.parent) do
-                if parent.type == 'object' then
-                    p = parent.name .. ':'
-                    break
-                end
-            end
-        end
-    else
-        if source.parent then
-            for _, parent in ipairs(source.parent) do
-                if parent.type == 'global' then
-                    p = parent.name .. '.'
-                    break
-                end
-            end
-        end
-    end
-    if p then
-        return ('%s%s'):format(p, source.name)
-    else
-        return source.name
-    end
-end
-
 local function asDocFunction(source)
     local doc = guide.getParentType(source, 'doc.type')
             or  guide.getParentType(source, 'doc.overload')
@@ -92,11 +64,6 @@ function buildName(source, oop)
     if oop == nil then
         oop =  source.type == 'setmethod'
             or source.type == 'getmethod'
-    end
-    if source.type == 'library' then
-        return asLibrary(source.value, oop) or ''
-    elseif source.library then
-        return asLibrary(source, oop) or ''
     end
     if source.type == 'local'
     or source.type == 'getlocal'

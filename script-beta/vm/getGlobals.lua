@@ -1,7 +1,6 @@
 local guide   = require 'parser.guide'
 local vm      = require 'vm.vm'
 local files   = require 'files'
-local library = require 'library'
 local util    = require 'utility'
 local config  = require 'config'
 
@@ -67,19 +66,6 @@ local function getGlobalSetsOfFile(uri)
     return globals
 end
 
-local function insertLibrary(results, name)
-    if name:sub(1, 2) == 's|' then
-        local libname = name:sub(3)
-        results[#results+1] = library.global[libname]
-        local asName = config.config.runtime.special[libname]
-        results[#results+1] = library.global[asName]
-    elseif name == '*' then
-        for _, lib in pairs(library.global) do
-            results[#results+1] = lib
-        end
-    end
-end
-
 local function getGlobals(name)
     local results = {}
     for uri in files.eachFile() do
@@ -98,7 +84,6 @@ local function getGlobals(name)
             end
         end
     end
-    insertLibrary(results, name)
     return results
 end
 
@@ -120,7 +105,6 @@ local function getGlobalSets(name)
             end
         end
     end
-    insertLibrary(results, name)
     return results
 end
 
@@ -143,7 +127,6 @@ local function fastGetAnyGlobals()
             end
         end
     end
-    insertLibrary(results, '*')
     return results
 end
 
@@ -159,7 +142,6 @@ local function fastGetAnyGlobalSets()
             end
         end
     end
-    insertLibrary(results, '*')
     return results
 end
 

@@ -32,7 +32,20 @@ local function getKey(src)
     return ('[%s]'):format(key)
 end
 
+local function getFieldFull(src)
+    local tp      = vm.getInferType(src)
+    --local class   = vm.getClass(src)
+    local literal = vm.getInferLiteral(src)
+    if type(literal) == 'string' and #literal >= 50 then
+        literal = literal:sub(1, 47) .. '...'
+    end
+    return tp, literal
+end
+
 local function getFieldFast(src)
+    if src.bindDocs then
+        return getFieldFull(src)
+    end
     local value = guide.getObjectValue(src) or src
     if not value then
         return 'any'
@@ -61,16 +74,6 @@ local function getFieldFast(src)
         end
         return value.type, util.viewLiteral(literal)
     end
-end
-
-local function getFieldFull(src)
-    local tp      = vm.getInferType(src)
-    --local class   = vm.getClass(src)
-    local literal = vm.getInferLiteral(src)
-    if type(literal) == 'string' and #literal >= 50 then
-        literal = literal:sub(1, 47) .. '...'
-    end
-    return tp, literal
 end
 
 local function getField(src, timeUp, mark, key)

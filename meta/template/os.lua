@@ -20,13 +20,12 @@ function os.date(format, time) end
 ---@return integer
 function os.difftime(t2, t1) end
 
+---#DES 'os.execute'
 ---#if VERSION <= 5.1 then
----#DES 'os.execute<5.1'
 ---@param command  string
 ---@return integer code
 function os.execute(command) end
 ---#else
----#DES 'os.execute>5.2'
 ---@param command string
 ---@return boolean?  suc
 ---@return exitcode? exitcode

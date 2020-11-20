@@ -299,3 +299,96 @@ math                        = ''
 "math.tointeger"            = 如果 `x` 可以转换为一个整数， 返回该整数。
 "math.type"                 = 如果 `x` 是整数，返回 `"integer"`， 如果它是浮点数，返回 `"float"`， 如果 `x` 不是数字，返回 `nil`。
 "math.ult"                  = 如果整数 `m` 和 `n` 以无符号整数形式比较， `m` 在 `n` 之下，返回布尔真否则返回假。
+
+os                          = ''
+"os.clock"                  = 返回程序使用的按秒计 CPU 时间的近似值。
+"os.date"                   = 返回一个包含日期及时刻的字符串或表。 格式化方法取决于所给字符串 `format`。
+"os.difftime"               = 返回以秒计算的时刻 `t1` 到 `t2` 的差值。
+"os.execute"                = 调用系统解释器执行 `command`。
+"os.exit<5.1"               = 调用 C 函数 `exit` 终止宿主程序。
+"os.exit>5.2"               = 调用 ISO C 函数 `exit` 终止宿主程序。
+"os.getenv"                 = 返回进程环境变量 `varname` 的值。
+"os.remove"                 = 删除指定名字的文件。
+"os.rename"                 = 将名字为 `oldname` 的文件或目录更名为 `newname`。
+"os.setlocale"              = 设置程序的当前区域。
+"os.time"                   = 当不传参数时，返回当前时刻。 如果传入一张表，就返回由这张表表示的时刻。
+"os.tmpname"                = 返回一个可用于临时文件的文件名字符串。
+
+package                     = ''
+"package.config"            = 一个描述有一些为包管理准备的编译期配置信息的串。
+"package.cpath"             = 这个路径被 `require` 在 C 加载器中做搜索时用到。
+"package.loaded"            = 用于 `require` 控制哪些模块已经被加载的表。
+"package.loaders"           = 用于 `require` 控制如何加载模块的表。
+"package.loadlib"           = 让宿主程序动态链接 C 库 `libname` 。
+"package.path"              = 这个路径被 `require` 在 Lua 加载器中做搜索时用到。
+"package.preload"           = 保存有一些特殊模块的加载器。
+"package.searchers"         = 用于 `require` 控制如何加载模块的表。
+"package.searchpath"        = 在指定 `path` 中搜索指定的 `name` 。
+"package.seeall"            = 给 `module` 设置一个元表，该元表的 `__index` 域为全局环境，这样模块便会继承全局环境的值。可作为 `module` 函数的选项。
+
+string                      = ''
+"string.byte"               = 返回字符 `s[i]`， `s[i+1]`， ...　，`s[j]` 的内部数字编码。
+"string.char"               = 接收零或更多的整数。 返回和参数数量相同长度的字符串。 其中每个字符的内部编码值等于对应的参数值。
+"string.dump"               = 返回包含有以二进制方式表示的（一个 *二进制代码块* ）指定函数的字符串。
+"string.find"               = 查找第一个字符串中匹配到的 `pattern`（参见 §6.4.1）。
+"string.format"             = 返回不定数量参数的格式化版本，格式化串为第一个参数。
+"string.gmatch"             = [[
+返回一个迭代器函数。 每次调用这个函数都会继续以 `pattern` （参见　§6.4.1） 对 s 做匹配，并返回所有捕获到的值。
+
+下面这个例子会循环迭代字符串 s 中所有的单词， 并逐行打印：
+```lua
+    s = "hello world from Lua"
+    for w in string.gmatch(s, "%a+") do
+        print(w)
+    end
+```
+]]
+"string.gsub"               = 将字符串 s 中，所有的（或是在 n 给出时的前 n 个） pattern （参见 §6.4.1）都替换成 repl ，并返回其副本。
+"string.len"                = 返回其长度。
+"string.lower"              = 将其中的大写字符都转为小写后返回其副本。
+"string.match"              = 在字符串 s 中找到第一个能用 pattern （参见 §6.4.1）匹配到的部分。 如果能找到，match 返回其中的捕获物； 否则返回 nil 。
+"string.pack"               = 返回一个打包了（即以二进制形式序列化） v1, v2 等值的二进制字符串。 字符串 fmt 为打包格式（参见 §6.4.2）。
+"string.packsize"           = 返回以指定格式用 $string.pack 打包的字符串的长度。 格式化字符串中不可以有变长选项 's' 或 'z' （参见 §6.4.2）。
+"string.rep"                = 返回 n 个字符串 s 以字符串 sep 为分割符连在一起的字符串。 默认的 sep 值为空字符串（即没有分割符）。 如果 n 不是正数则返回空串。
+"string.reverse"            = 返回字符串 s 的翻转串。
+"string.sub"                = 返回字符串的子串， 该子串从 `i` 开始到 `j` 为止。
+"string.unpack"             = 返回以格式 fmt （参见 §6.4.2） 打包在字符串 s （参见 string.pack） 中的值。
+"string.upper"              = 接收一个字符串，将其中的小写字符都转为大写后返回其副本。
+
+table                       = ''
+"table.concat"              = 提供一个列表，其所有元素都是字符串或数字，返回字符串 `list[i]..sep..list[i+1] ··· sep..list[j]`。
+"table.insert"              = 在 `list` 的位置 `pos` 处插入元素 `value`。
+"table.maxn"                = 返回给定表的最大正数索引，如果表没有正数索引，则返回零。
+"table.move"                = [[
+将元素从表 `a1` 移到表 `a2`。
+```lua
+a2[t],··· = a1[f],···,a1[e]
+return a2
+```
+]]
+"table.pack"                = 返回用所有参数以键 `1`,`2`, 等填充的新表， 并将 `"n"` 这个域设为参数的总数。
+"table.remove"              = 移除 `list` 中 `pos` 位置上的元素，并返回这个被移除的值。
+"table.sort"                = 在表内从 `list[1]` 到 `list[#list]` *原地* 对其间元素按指定次序排序。
+"table.unpack"              = [[
+返回列表中的元素。 这个函数等价于
+```lua
+    return list[i], list[i+1], ···, list[j]
+```
+i 默认为 1 ，j 默认为 #list。
+]]
+
+utf8                        = ''
+"utf8.char"                 = 接收零或多个整数， 将每个整数转换成对应的 UTF-8 字节序列，并返回这些序列连接到一起的字符串。
+"utf8.charpattern"          = 用于精确匹配到一个 UTF-8 字节序列的模式，它假定处理的对象是一个合法的 UTF-8 字符串。
+"utf8.codes"                = [[
+返回一系列的值，可以让
+```lua
+for p, c in utf8.codes(s) do
+    body
+end
+```
+迭代出字符串 s 中所有的字符。 这里的 p 是位置（按字节数）而 c 是每个字符的编号。 如果处理到一个不合法的字节序列，将抛出一个错误。
+]]
+"utf8.codepoint"            = 以整数形式返回 `s` 中 从位置 `i` 到 `j` 间（包括两端） 所有字符的编号。
+"utf8.len"                  = 返回字符串 `s` 中 从位置 `i` 到 `j` 间 （包括两端） UTF-8 字符的个数。
+"utf8.offset"               = 返回编码在 `s` 中的第 `n` 个字符的开始位置（按字节数） （从位置 `i` 处开始统计）。

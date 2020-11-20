@@ -96,13 +96,14 @@ function string.pack(fmt, v1, v2, ...) end
 ---@return integer
 function string.packsize(fmt) end
 
----#DES 'string.rep'
 ---#if VERSION <= 5.1 then
+---#DES 'string.rep<5.1'
 ---@param s    string
 ---@param n    integer
 ---@return string
 function string.rep(s, n) end
 ---#else
+---#DES 'string.rep>5.2'
 ---@param s    string
 ---@param n    integer
 ---@param sep? string

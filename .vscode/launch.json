@@ -3,31 +3,6 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-			"name": "测试",
-			"type": "lua",
-			"request": "launch",
-			"stopOnEntry": false,
-			"program": "${workspaceRoot}/test.lua",
-			"arg": [
-			],
-			"consoleCoding": "utf8",
-			"sourceCoding": "utf8",
-			"luaexe": "${workspaceFolder}/bin/Windows/lua-language-server.exe",
-			"outputCapture": [
-				"print",
-				"stderr",
-			],
-		},
-		{
-			"name": "附加",
-			"type": "lua",
-			"request": "attach",
-			"stopOnEntry": true,
-			"address": "127.0.0.1:11411",
-			"outputCapture": [
-			]
-		},
-		{
 			"name": "🍺测试-beta",
 			"type": "lua",
 			"request": "launch",

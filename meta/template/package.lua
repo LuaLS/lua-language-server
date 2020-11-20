@@ -1,12 +1,17 @@
 ---@meta
 
----#DES 'require'
+---#if VERSION >=5.4 then
+---#DES 'require>5.4'
 ---@param modname string
 ---@return any
----#if VERSION >=5.4 then
 ---@return any loaderdata
----#end
 function require(modname) end
+---#else
+---#DES 'require<5.3'
+---@param modname string
+---@return any
+function require(modname) end
+---#end
 
 ---#DES 'package'
 ---@class package*
@@ -15,7 +20,6 @@ function require(modname) end
 ---@field loaded    table
 ---@field path      string
 ---@field preload   table
----#end
 package = {}
 
 ---@version <5.1

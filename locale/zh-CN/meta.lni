@@ -315,6 +315,8 @@ os                          = ''
 "os.tmpname"                = 返回一个可用于临时文件的文件名字符串。
 
 package                     = ''
+"require<5.3"               = 加载一个模块，返回该模块的返回值（`nil`时为`true`）。
+"require>5.4"               = 加载一个模块，返回该模块的返回值（`nil`时为`true`）与搜索器返回的加载数据。默认搜索器的加载数据指示了加载位置，对于文件来说就是文件路径。
 "package.config"            = 一个描述有一些为包管理准备的编译期配置信息的串。
 "package.cpath"             = 这个路径被 `require` 在 C 加载器中做搜索时用到。
 "package.loaded"            = 用于 `require` 控制哪些模块已经被加载的表。

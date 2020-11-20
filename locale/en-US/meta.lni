@@ -337,6 +337,8 @@ os                          = ''
 "os.tmpname"                = Returns a string with a file name that can be used for a temporary file.
 
 package                     = ''
+"require<5.3"               = Loads the given module, returns any value returned by the given module(`true` when `nil`).
+"require>5.4"               = Loads the given module, returns any value returned by the searcher(`true` when `nil`). Besides that value, also returns as a second result the loader data returned by the searcher, which indicates how `require` found the module. (For instance, if the module came from a file, this loader data is the file path.)
 "package.config"            = A string describing some compile-time configurations for packages.
 "package.cpath"             = The path used by `require` to search for a C loader.
 "package.loaded"            = A table used by `require` to control which modules are already loaded.

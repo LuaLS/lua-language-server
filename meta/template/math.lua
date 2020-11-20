@@ -2,11 +2,15 @@
 
 ---@DES 'math'
 ---@class math*
+---@DES 'math.huge'
 ---@field huge       number
 ---#if VERSION >= 5.3 then
+---@DES 'math.maxinteger'
 ---@field maxinteger integer
+---@DES 'math.mininteger'
 ---@field mininteger integer
 ---#end
+---@DES 'math.pi'
 ---@field pi         number
 math = {}
 

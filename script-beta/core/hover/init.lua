@@ -94,6 +94,15 @@ local function getHoverAsValue(source)
              or source.type == 'setmethod'
     local label = getLabel(source, oop)
     local desc  = getDesc(source)
+    if not desc then
+        local values = vm.getDefs(source, 'deep')
+        for _, def in ipairs(values) do
+            desc = getDesc(def)
+            if desc then
+                break
+            end
+        end
+    end
     return {
         label       = label,
         source      = source,

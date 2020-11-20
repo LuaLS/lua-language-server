@@ -184,13 +184,17 @@ local function tryLibrary(source)
     return md:string()
 end
 
-local function getBindComment(source)
+local function getBindComment(docGroup, base)
     local lines = {}
-    for _, doc in ipairs(source.bindDocs) do
+    for _, doc in ipairs(docGroup) do
         if doc.type == 'doc.comment' then
             lines[#lines+1] = doc.comment.text:sub(2)
-        elseif #lines > 0 then
+        elseif #lines > 0 and not base then
             break
+        elseif doc == base then
+            break
+        else
+            lines = {}
         end
     end
     if #lines == 0 then
@@ -222,11 +226,11 @@ local function buildEnumChunk(docType, name)
     return table.concat(lines, '\n')
 end
 
-local function getBindEnums(source)
+local function getBindEnums(docGroup)
     local mark = {}
     local chunks = {}
     local returnIndex = 0
-    for _, doc in ipairs(source.bindDocs) do
+    for _, doc in ipairs(docGroup) do
         if doc.type == 'doc.param' then
             local name = doc.param[1]
             if mark[name] then
@@ -253,12 +257,23 @@ local function getBindEnums(source)
     return table.concat(chunks, '\n\n')
 end
 
+local function tryDocFieldUpComment(source)
+    if source.type ~= 'doc.field' then
+        return
+    end
+    if not source.bindGroup then
+        return
+    end
+    local comment = getBindComment(source.bindGroup, source)
+    return comment
+end
+
 local function tryDocComment(source)
     if not source.bindDocs then
         return
     end
-    local comment = getBindComment(source)
-    local enums   = getBindEnums(source)
+    local comment = getBindComment(source.bindDocs)
+    local enums   = getBindEnums(source.bindDocs)
     local md = markdown()
     if comment then
         md:add('md', comment)
@@ -292,5 +307,6 @@ return function (source)
     end
     return tryLibrary(source)
         or tryDocOverloadToComment(source)
+        or tryDocFieldUpComment(source)
         or tryDocComment(source)
 end

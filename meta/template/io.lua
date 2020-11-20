@@ -2,8 +2,11 @@
 
 ---#DES 'io'
 ---@class io*
+---#DES 'io.stdin'
 ---@field stdin  file*
+---#DES 'io.stdout'
 ---@field stdout file*
+---#DES 'io.stderr'
 ---@field stderr file*
 io = {}
 

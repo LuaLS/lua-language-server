@@ -3,6 +3,7 @@
 ---@version >5.3
 ---#DES 'utf8'
 ---@class utf8*
+---#DES 'utf8.charpattern'
 ---@field charpattern string
 utf8 = {}
 

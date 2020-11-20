@@ -3,11 +3,11 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-			"name": "🍺测试-beta",
+			"name": "🍺测试",
 			"type": "lua",
 			"request": "launch",
 			"stopOnEntry": false,
-			"program": "${workspaceRoot}/test-beta.lua",
+			"program": "${workspaceRoot}/test.lua",
 			"luaexe": "${workspaceFolder}/bin/Windows/lua-language-server.exe",
 			"arg": [
 			],
@@ -19,7 +19,7 @@
 			],
 		},
 		{
-			"name": "附加-beta",
+			"name": "附加",
 			"type": "lua",
 			"request": "attach",
 			"stopOnEntry": true,

@@ -155,7 +155,7 @@ end
 
 --- 文件是否被忽略
 function m.isIgnored(uri)
-    local path = furi.decode(uri)
+    local path = m.getRelativePath(uri)
     local ignore = m.getNativeMatcher()
     if not ignore then
         return false

@@ -617,6 +617,15 @@ collectgarbage('$')
         },
     },
     {
+        label       = "'isrunning'",
+        kind        = define.CompletionItemKind.EnumMember,
+        textEdit    = {
+            start   = 16,
+            finish  = 17,
+            newText = "'isrunning'",
+        },
+    },
+    {
         label       = "'incremental'",
         kind        = define.CompletionItemKind.EnumMember,
         textEdit    = {
@@ -632,15 +641,6 @@ collectgarbage('$')
             start   = 16,
             finish  = 17,
             newText = "'generational'",
-        },
-    },
-    {
-        label       = "'isrunning'",
-        kind        = define.CompletionItemKind.EnumMember,
-        textEdit    = {
-            start   = 16,
-            finish  = 17,
-            newText = "'isrunning'",
         },
     },
 }
@@ -758,7 +758,7 @@ fff[#ff$]
     },
     {
         label = 'fff',
-        kind = define.CompletionItemKind.Field,
+        kind = define.CompletionItemKind.Text,
     }
 }
 

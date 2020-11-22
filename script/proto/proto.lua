@@ -131,6 +131,7 @@ function m.doResponse(proto)
     m.waiting[id] = nil
     if proto.error then
         log.warn(('Response error [%d]: %s'):format(proto.error.code, proto.error.message))
+        resume(nil)
         return
     end
     resume(proto.result)

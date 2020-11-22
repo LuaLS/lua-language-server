@@ -243,7 +243,7 @@ function warn(message, ...) end
 ---@return ...
 function xpcall(f, err) end
 ---#else
----#DES 'xpcall>5.1'
+---#DES 'xpcall>5.2'
 ---@param f     function
 ---@param msgh  function
 ---@param arg1? any

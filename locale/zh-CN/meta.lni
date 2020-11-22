@@ -2,9 +2,9 @@
 arg                 = 独立版Lua的启动参数。
 assert              = 如果其参数 `v` 的值为假（`nil` 或 `false`）， 它就调用 $error； 否则，返回所有的参数。 在错误情况时， `message` 指那个错误对象； 如果不提供这个参数，参数默认为 `"assertion failed!"` 。
 "cgopt.collect"     = 做一次完整的垃圾收集循环。
-"cgopt.stop  "      = 停止垃圾收集器的运行。
+"cgopt.stop"        = 停止垃圾收集器的运行。
 "cgopt.restart"     = 重启垃圾收集器的自动运行。
-"cgopt.count "      = 以 K 字节数为单位返回 Lua 使用的总内存数。
+"cgopt.count"       = 以 K 字节数为单位返回 Lua 使用的总内存数。
 "cgopt.step"        = 单步运行垃圾收集器。 步长“大小”由 `arg` 控制。
 "cgopt.setpause"    = 将 `arg` 设为收集器的 *间歇率* 。
 "cgopt.setstepmul"  = 将 `arg` 设为收集器的 *步进倍率* 。
@@ -231,7 +231,7 @@ end
 "io.output"                 = 设置 `file` 为默认输出文件。
 "io.popen"                  = 用一个分离进程开启程序 `prog` 。
 "io.read"                   = 读文件 `file`， 指定的格式决定了要读什么。
-"io.tempfile"               = 如果成功，返回一个临时文件的句柄。
+"io.tmpfile"                = 如果成功，返回一个临时文件的句柄。
 "io.type"                   = 检查 `obj` 是否是合法的文件句柄。
 "io.write"                  = 将参数的值逐个写入默认输出文件。
 "openmode.r"                = 读模式。

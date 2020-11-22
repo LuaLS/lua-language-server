@@ -2,9 +2,9 @@
 arg                 = Command-line arguments of Lua Standalone.
 assert              = Raises an error if the value of its argument v is false (i.e., `nil` or `false`); otherwise, returns all its arguments. In case of error, `message` is the error object; when absent, it defaults to `"assertion failed!"`
 "cgopt.collect"     = Performs a full garbage-collection cycle.
-"cgopt.stop  "      = Stops automatic execution.
+"cgopt.stop"        = Stops automatic execution.
 "cgopt.restart"     = Restarts automatic execution.
-"cgopt.count "      = Returns the total memory in Kbytes.
+"cgopt.count"       = Returns the total memory in Kbytes.
 "cgopt.step"        = Performs a garbage-collection step.
 "cgopt.setpause"    = Set `pause`.
 "cgopt.setstepmul"  = Set `step multiplier`.
@@ -253,7 +253,7 @@ end
 "io.output"                 = Sets `file` as the default output file.
 "io.popen"                  = Starts program prog in a separated process.
 "io.read"                   = Reads the `file`, according to the given formats, which specify what to read.
-"io.tempfile"               = In case of success, returns a handle for a temporary file.
+"io.tmpfile"               = In case of success, returns a handle for a temporary file.
 "io.type"                   = Checks whether `obj` is a valid file handle.
 "io.write"                  = Writes the value of each of its arguments to default output file.
 "openmode.r"                = Read mode.

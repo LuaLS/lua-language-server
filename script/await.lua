@@ -58,10 +58,10 @@ function m.await(callback, ...)
     if not coroutine.isyieldable() then
         return callback(...)
     end
-    return m.wait(function (waker, ...)
+    return m.wait(function (resume, ...)
         m.call(function ()
-            local returnNil <close> = util.defer(waker)
-            waker(callback())
+            local returnNil <close> = util.defer(resume)
+            resume(callback())
         end, ...)
     end, ...)
 end
@@ -121,12 +121,12 @@ function m.wait(callback, ...)
         return
     end
     local co = coroutine.running()
-    local waked
+    local resumed
     callback(function (...)
-        if waked then
+        if resumed then
             return
         end
-        waked = true
+        resumed = true
         if coroutine.status(co) ~= 'suspended' then
             return
         end
@@ -180,15 +180,15 @@ end
 
 --- 步进
 function m.step()
-    local waker = m.delayQueue[m.delayQueueIndex]
-    if waker then
+    local resume = m.delayQueue[m.delayQueueIndex]
+    if resume then
         m.delayQueue[m.delayQueueIndex] = false
         m.delayQueueIndex = m.delayQueueIndex + 1
         local clock = os.clock()
-        waker()
+        resume()
         local passed = os.clock() - clock
         if passed > 0.1 then
-            warnStepTime(passed, waker)
+            warnStepTime(passed, resume)
         end
         return true
     else

@@ -76,8 +76,8 @@ function m.awaitRequest(name, params)
     }
     --log.debug('Request', name, #buf)
     io.stdout:write(buf)
-    return await.wait(function (waker)
-        m.waiting[id] = waker
+    return await.wait(function (resume)
+        m.waiting[id] = resume
     end)
 end
 
@@ -123,8 +123,8 @@ end
 
 function m.doResponse(proto)
     local id = proto.id
-    local waker = m.waiting[id]
-    if not waker then
+    local resume = m.waiting[id]
+    if not resume then
         log.warn('Response id not found: ' .. util.dump(proto))
         return
     end
@@ -133,7 +133,7 @@ function m.doResponse(proto)
         log.warn(('Response error [%d]: %s'):format(proto.error.code, proto.error.message))
         return
     end
-    waker(proto.result)
+    resume(proto.result)
 end
 
 function m.listen()

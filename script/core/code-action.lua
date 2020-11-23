@@ -253,7 +253,7 @@ local function solveDiagnostic(uri, diag, results)
     disableDiagnostic(uri, diag.code, results)
 end
 
-return function (uri, range, diagnostics)
+return function (uri, start, finish, diagnostics)
     local ast = files.getAst(uri)
     if not ast then
         return nil

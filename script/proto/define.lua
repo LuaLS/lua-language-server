@@ -76,6 +76,13 @@ function m.range(lines, text, offset1, offset2)
     return range
 end
 
+--- convert `range` to `offsetStart` and `offsetFinish`
+function m.unrange(lines, text, range)
+    local start  = m.offset(lines, text, range.start)
+    local finish = m.offset(lines, text, range['end'])
+    return start, finish
+end
+
 ---@alias location table
 ---@param uri string
 ---@param range range

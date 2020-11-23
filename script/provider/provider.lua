@@ -549,7 +549,14 @@ proto.on('textDocument/codeAction', function (params)
     local uri         = params.textDocument.uri
     local range       = params.range
     local diagnostics = params.context.diagnostics
-    local results     = core(uri, range, diagnostics)
+    local text        = files.getText(uri)
+    local lines       = files.getLines(uri)
+    if not text or not lines then
+        return nil
+    end
+
+    local start, finish = define.unrange(lines, text, range)
+    local results = core(uri, start, finish, diagnostics)
 
     if not results or #results == 0 then
         return nil

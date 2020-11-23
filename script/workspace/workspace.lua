@@ -304,7 +304,12 @@ function m.getRelativePath(uri)
     if not m.path then
         return m.normalize(path)
     end
-    local _, pos = m.normalize(path):lower():find(m.path:lower(), 1, true)
+    local _, pos
+    if platform.OS == 'Windows' then
+        _, pos = m.normalize(path):lower():find(m.path:lower(), 1, true)
+    else
+        _, pos = m.normalize(path):find(m.path, 1, true)
+    end
     if pos then
         return m.normalize(path:sub(pos + 1))
     else

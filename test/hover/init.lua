@@ -857,6 +857,14 @@ local x <close>: integer = 1
 ]]
 
 TEST [[
+local x <close> = 1
+print(<?x?>)
+]]
+[[
+local x <close>: integer = 1
+]]
+
+TEST [[
 local function <?a?>(b)
     return (b.c and a(b.c) or b)
 end

@@ -65,10 +65,12 @@ function buildName(source, oop)
         oop =  source.type == 'setmethod'
             or source.type == 'getmethod'
     end
-    if source.type == 'local'
-    or source.type == 'getlocal'
-    or source.type == 'setlocal' then
+    if source.type == 'local' then
         return asLocal(source) or ''
+    end
+    if source.type == 'getlocal'
+    or source.type == 'setlocal' then
+        return asLocal(source.node) or ''
     end
     if source.type == 'setglobal'
     or source.type == 'getglobal' then

@@ -320,6 +320,7 @@ end
 function m.reload()
     files.flushAllLibrary()
     files.removeAllClosed()
+    files.flushCache()
     rpath.flush()
     await.call(m.awaitPreload)
 end

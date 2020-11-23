@@ -11,7 +11,7 @@ function vm.getLibraryName(source, deep)
 end
 
 local globalLibraryNames = {
-    'arg', 'assert', 'collectgarbage', 'dofile', '_G', 'getfenv',
+    'arg', 'assert', 'error', 'collectgarbage', 'dofile', '_G', 'getfenv',
     'getmetatable', 'ipairs', 'load', 'loadfile', 'loadstring',
     'module', 'next', 'pairs', 'pcall', 'print', 'rawequal',
     'rawget', 'rawlen', 'rawset', 'select', 'setfenv',

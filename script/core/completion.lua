@@ -39,8 +39,8 @@ local function resolveStack(id)
     end
 
     -- 当进行新的 resolve 时，放弃当前的 resolve
-    await.close('completion.resove')
-    return await.await(callback, 'completion.resove')
+    await.close('completion.resolve')
+    return await.await(callback, 'completion.resolve')
 end
 
 local function trim(str)

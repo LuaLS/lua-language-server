@@ -396,6 +396,7 @@ local function checkFieldThen(name, src, word, start, offset, parent, oop, resul
     results[#results+1] = {
         label      = name,
         kind       = kind,
+        deprecated = vm.isDeprecated(src) or nil,
         textEdit   = textEdit,
         additionalTextEdits = additionalTextEdits,
         id         = stack(function ()

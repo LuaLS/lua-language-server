@@ -1217,6 +1217,17 @@ loadstring$
 }
 
 TEST [[
+bit32$
+]]
+{
+    {
+        label = 'bit32',
+        kind  = define.CompletionItemKind.Field,
+        deprecated = true,
+    },
+}
+
+TEST [[
 function loadstring()
 end
 loadstring$

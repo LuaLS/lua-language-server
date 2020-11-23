@@ -108,7 +108,7 @@ local function merge(a, b)
 end
 
 function m.clear(uri)
-    local luri = uri:lower()
+    local luri = files.asKey(uri)
     if not m.cache[luri] then
         return
     end
@@ -158,7 +158,7 @@ function m.doDiagnostic(uri)
     if not config.config.diagnostics.enable then
         return
     end
-    uri = uri:lower()
+    uri = files.asKey(uri)
     if files.isLibrary(uri) then
         return
     end

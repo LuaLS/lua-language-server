@@ -85,6 +85,7 @@ local function buildDiagnostic(uri, diag)
         message  = diag.message,
         code     = diag.code,
         tags     = diag.tags,
+        data     = diag.data,
         relatedInformation = relatedInformation,
     }
 end

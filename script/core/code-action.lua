@@ -74,9 +74,13 @@ local function solveUndefinedGlobal(uri, diag, results)
 
         local name = guide.getName(source)
         markGlobal(uri, name, results)
-
-        -- TODO check other version
     end)
+
+    if diag.data and diag.data.versions then
+        for _, version in ipairs(diag.data.versions) do
+            changeVersion(uri, version, results)
+        end
+    end
 end
 
 local function solveLowercaseGlobal(uri, diag, results)

@@ -122,7 +122,9 @@ local function loadLang(name, language)
     })
 end
 
-return setmetatable({}, {
+return setmetatable({
+    id = 'en-us',
+}, {
     __index = function (self, name)
         local tbl = loadLang(name, self.id)
         self[name] = tbl

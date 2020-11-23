@@ -43,6 +43,7 @@ end
 local function main()
     debug.setcstacklimit(1000)
     require 'parser.guide'.debugMode = true
+    require 'language' 'zh-cn'
     local function test(name)
         local clock = os.clock()
         print(('测试[%s]...'):format(name))

@@ -162,14 +162,5 @@ local function isDeprecated(value)
 end
 
 function vm.isDeprecated(value)
-    local defs = vm.getDefs(value, 'deep')
-    if #defs == 0 then
-        return false
-    end
-    for _, def in ipairs(defs) do
-        if not isDeprecated(def) then
-            return false
-        end
-    end
-    return true
+    return isDeprecated(value)
 end

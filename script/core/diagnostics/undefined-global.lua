@@ -3,6 +3,7 @@ local vm      = require 'vm'
 local lang    = require 'language'
 local config  = require 'config'
 local guide   = require 'parser.guide'
+local define  = require 'proto.define'
 
 return function (uri, callback)
     local ast = files.getAst(uri)
@@ -19,22 +20,39 @@ return function (uri, callback)
         if config.config.diagnostics.globals[key] then
             return
         end
-        if #vm.getGlobalSets(guide.getKeyName(src)) > 0 then
+        if #vm.getGlobalSets(guide.getKeyName(src)) == 0 then
+            local message = lang.script('DIAG_UNDEF_GLOBAL', key)
+            callback {
+                start   = src.start,
+                finish  = src.finish,
+                message = message,
+            }
             return
         end
-        local message = lang.script('DIAG_UNDEF_GLOBAL', key)
-        -- TODO check other version
-        local otherVersion
-        local customVersion
-        if otherVersion then
-            message = ('%s(%s)'):format(message, lang.script('DIAG_DEFINED_VERSION', table.concat(otherVersion, '/'), config.config.runtime.version))
-        elseif customVersion then
-            message = ('%s(%s)'):format(message, lang.script('DIAG_DEFINED_CUSTOM', table.concat(customVersion, '/')))
+        if not vm.isDeprecated(src, 'deep') then
+            return
         end
+
+        do return end
+
         callback {
             start   = src.start,
             finish  = src.finish,
-            message = message,
+            tags    = { define.DiagnosticTag.Deprecated },
+            message = 'adsad',
         }
+
+        do return end
+
+        local defs = vm.getDefs(src, 'deep')
+        local versions = {}
+        for _, def in ipairs(defs) do
+            
+        end
+        -- TODO check other version
+        local otherVersion
+        if otherVersion then
+            message = ('%s(%s)'):format(message, lang.script('DIAG_DEFINED_VERSION', table.concat(otherVersion, '/'), config.config.runtime.version))
+        end
     end)
 end

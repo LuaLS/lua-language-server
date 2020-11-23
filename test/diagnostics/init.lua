@@ -465,9 +465,9 @@ local f = load('')
 f(1, 2, 3)
 ]]
 
-TEST [[
-unpack(1)
-]]
+--TEST [[
+--<!unpack!>(1)
+--]]
 
 TEST [[
 X = table[<!x!>]

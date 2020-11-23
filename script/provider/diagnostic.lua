@@ -159,7 +159,8 @@ function m.doDiagnostic(uri)
         return
     end
     uri = files.asKey(uri)
-    if files.isLibrary(uri) then
+    if (files.isLibrary(uri) or ws.isIgnored(uri))
+    and not files.isOpen(uri) then
         return
     end
 

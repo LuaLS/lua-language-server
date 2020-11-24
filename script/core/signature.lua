@@ -79,7 +79,7 @@ local function makeSignatures(call, pos)
         index = 1
     end
     local signs = {}
-    local defs = vm.getDefs(node, 'deep')
+    local defs = vm.getDefs(node, 0)
     for _, src in ipairs(defs) do
         if src.type == 'function'
         or src.type == 'doc.type.function' then

@@ -559,8 +559,6 @@ TEST {
     },
 }
 
-config.config.intelliSense.searchDepth = 0
-
 TEST {
     {
         path = 'a.lua',
@@ -581,8 +579,6 @@ TEST {
         ]]
     },
 }
-
-config.config.intelliSense.searchDepth = 5
 
 TEST {
     {

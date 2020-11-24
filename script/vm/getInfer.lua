@@ -2,6 +2,7 @@ local vm      = require 'vm.vm'
 local guide   = require 'parser.guide'
 local util    = require 'utility'
 local await   = require 'await'
+local config  = require 'config'
 
 NIL = setmetatable({'<nil>'}, { __tostring = function () return 'nil' end })
 
@@ -60,6 +61,8 @@ local function getInfers(source, deep)
         return results
     end
 
+    deep = config.config.intelliSense.searchDepth + (deep or 0)
+
     await.delay()
 
     local clock = os.clock()
@@ -74,23 +77,27 @@ local function getInfers(source, deep)
     return results
 end
 
+local function getInfersBySource(source, deep)
+    deep = deep or -999
+    local cache =  vm.getCache('getInfers')[source]
+    if not cache or cache.deep < deep then
+        cache = getInfers(source, deep)
+        cache.deep = deep
+        vm.getCache('getInfers')[source] = cache
+    end
+    return cache
+end
+
 --- 获取对象的值
 --- 会尝试穿透函数调用
 function vm.getInfers(source, deep)
     if guide.isGlobal(source) then
         local name = guide.getKeyName(source)
         local cache =  vm.getCache('getInfersOfGlobal')[name]
-                    or vm.getCache('getInfers')[source]
-                    or getInfers(source, 'deep')
+                    or getInfersBySource(source, deep)
         vm.getCache('getInfersOfGlobal')[name] = cache
-        vm.getCache('getInfers')[source] = cache
         return cache
     else
-        local cache =  vm.getCache('getInfers')[source]
-                    or getInfers(source, deep)
-        if deep then
-            vm.getCache('getInfers')[source] = cache
-        end
-        return cache
+        return getInfersBySource(source, deep)
     end
 end

@@ -1,10 +1,11 @@
-local vm    = require 'vm.vm'
-local guide = require 'parser.guide'
-local files = require 'files'
-local util  = require 'utility'
-local await = require 'await'
+local vm     = require 'vm.vm'
+local guide  = require 'parser.guide'
+local files  = require 'files'
+local util   = require 'utility'
+local await  = require 'await'
+local config = require 'config'
 
-local function eachDef(source, deep)
+local function getDefs(source, deep)
     local results = {}
     local lock = vm.lock('eachDef', source)
     if not lock then
@@ -12,6 +13,8 @@ local function eachDef(source, deep)
     end
 
     await.delay()
+
+    deep = config.config.intelliSense.searchDepth + (deep or 0)
 
     local clock = os.clock()
     local myResults, count = guide.requestDefinition(source, vm.interface, deep)
@@ -26,13 +29,15 @@ local function eachDef(source, deep)
 end
 
 function vm.getDefs(source, deep)
+    deep = deep or -999
     if guide.isGlobal(source) then
         local key = guide.getKeyName(source)
         return vm.getGlobalSets(key)
     else
         local cache =  vm.getCache('eachDef')[source]
-                    or eachDef(source, deep)
-        if deep then
+        if not cache or cache.deep < deep then
+            cache = getDefs(source, deep)
+            cache.deep = deep
             vm.getCache('eachDef')[source] = cache
         end
         return cache

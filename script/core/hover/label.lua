@@ -43,14 +43,14 @@ end
 
 local function asValue(source, title)
     local name    = buildName(source)
-    local infers  = vm.getInfers(source, 'deep')
-    local type    = vm.getInferType(source, 'deep')
-    local class   = vm.getClass(source, 'deep')
-    local literal = vm.getInferLiteral(source, 'deep')
+    local infers  = vm.getInfers(source, 0)
+    local type    = vm.getInferType(source, 0)
+    local class   = vm.getClass(source, 0)
+    local literal = vm.getInferLiteral(source, 0)
     local cont
     if type ~= 'string' and not type:find('%[%]$') then
-        if #vm.getFields(source, 'deep') > 0
-        or vm.hasInferType(source, 'table', 'deep') then
+        if #vm.getFields(source, 0) > 0
+        or vm.hasInferType(source, 'table', 0) then
             cont = buildTable(source)
         end
     end

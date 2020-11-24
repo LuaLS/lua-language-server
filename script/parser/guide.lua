@@ -1169,12 +1169,13 @@ function m.getSimple(obj, max)
     return simpleList
 end
 
-function m.status(parentStatus, interface)
+function m.status(parentStatus, interface, deep)
     local status = {
         cache     = parentStatus and parentStatus.cache       or {
             count = 0,
         },
-        depth     = parentStatus and (parentStatus.depth + 1) or 1,
+        depth     = parentStatus and (parentStatus.depth + 1) or 0,
+        searchDeep= parentStatus and parentStatus.searchDeep  or deep or -999,
         interface = parentStatus and parentStatus.interface   or {},
         locks     = parentStatus and parentStatus.locks       or {},
         deep      = parentStatus and parentStatus.deep,
@@ -1187,10 +1188,7 @@ function m.status(parentStatus, interface)
             status.interface[k] = v
         end
     end
-    local searchDepth = status.interface.getSearchDepth and status.interface.getSearchDepth() or 0
-    if status.depth >= searchDepth then
-        status.deep = false
-    end
+    status.deep = status.depth <= status.searchDeep
     return status
 end
 
@@ -1923,12 +1921,11 @@ function m.checkReturnMark(status, a, mark)
     if not status.cache.returnMark then
         status.cache.returnMark = {}
     end
+    local result = status.cache.returnMark[a]
     if mark then
         status.cache.returnMark[a] = mark
-    else
-        return status.cache.returnMark[a]
     end
-    return false
+    return result
 end
 
 function m.searchSameFieldsInValue(status, ref, start, queue, mode)
@@ -2332,6 +2329,9 @@ function m.getCallerCrossFiles(status, main)
 end
 
 function m.searchRefsAsFunctionReturn(status, obj, mode)
+    if not status.deep then
+        return
+    end
     if mode == 'def' then
         return
     end
@@ -3659,8 +3659,7 @@ local function mergeFunctionReturns(status, source, index, call)
         local rtn = returns[i]
         if rtn[index] then
             if rtn[index].type == 'call' then
-                if not m.checkReturnMark(status, rtn[index]) then
-                    m.checkReturnMark(status, rtn[index], true)
+                if not m.checkReturnMark(status, rtn[index], true) then
                     m.inferByCallReturnAndIndex(status, rtn[index], index)
                 end
             else
@@ -3683,7 +3682,7 @@ end
 
 function m.inferByCallReturnAndIndex(status, call, index)
     local node = call.node
-    local newStatus = m.status(nil, status.interface)
+    local newStatus = m.status(status, status.interface)
     m.searchRefs(newStatus, node, 'def')
     local hasDocReturn
     for _, src in ipairs(newStatus.results) do
@@ -3746,7 +3745,7 @@ function m.inferByPCallReturn(status, source)
     else
         return
     end
-    local newStatus = m.status(nil, status.interface)
+    local newStatus = m.status(status, status.interface)
     m.searchRefs(newStatus, func, 'def')
     for _, src in ipairs(newStatus.results) do
         if src.value and src.value.type == 'function' then
@@ -3839,8 +3838,7 @@ end
 --- 不穿透 `setmetatable` ，考虑由
 --- 业务层进行反向 def 搜索。
 function m.requestReference(obj, interface, deep)
-    local status = m.status(nil, interface)
-    status.deep = deep
+    local status = m.status(nil, interface, deep)
     -- 根据 field 搜索引用
     m.searchRefs(status, obj, 'ref')
 
@@ -3857,8 +3855,7 @@ end
 --- 与 `return function` 形式。
 --- 穿透 `setmetatable` 。
 function m.requestDefinition(obj, interface, deep)
-    local status = m.status(nil, interface)
-    status.deep = deep
+    local status = m.status(nil, interface, deep)
     -- 根据 field 搜索定义
     m.searchRefs(status, obj, 'def')
 
@@ -3867,8 +3864,7 @@ end
 
 --- 请求对象的域
 function m.requestFields(obj, interface, deep)
-    local status = m.status(nil, interface)
-    status.deep = deep
+    local status = m.status(nil, interface, deep)
 
     m.searchFields(status, obj)
 
@@ -3877,8 +3873,7 @@ end
 
 --- 请求对象的类型推测
 function m.requestInfer(obj, interface, deep)
-    local status = m.status(nil, interface)
-    status.deep = deep
+    local status = m.status(nil, interface, deep)
     m.searchInfer(status, obj)
 
     return status.results, status.cache.count

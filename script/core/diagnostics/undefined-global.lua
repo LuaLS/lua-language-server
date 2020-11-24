@@ -29,12 +29,12 @@ return function (uri, callback)
             }
             return
         end
-        if not vm.isDeprecated(src, 'deep') then
+        if not vm.isDeprecated(src, 0) then
             return
         end
 
         local message = lang.script('DIAG_UNDEF_GLOBAL', key)
-        local defs = vm.getDefs(src, 'deep')
+        local defs = vm.getDefs(src, 0)
         local validVersions
         for _, def in ipairs(defs) do
             if def.bindDocs then

@@ -19,7 +19,7 @@ end
 local function asField(source, oop)
     local class
     if source.node.type ~= 'getglobal' then
-        class = vm.getClass(source.node, 'deep')
+        class = vm.getClass(source.node, 0)
     end
     local node = class or guide.getName(source.node) or '?'
     local method = guide.getName(source)

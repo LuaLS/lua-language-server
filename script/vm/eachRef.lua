@@ -2,6 +2,7 @@ local vm     = require 'vm.vm'
 local guide  = require 'parser.guide'
 local util   = require 'utility'
 local await  = require 'await'
+local config = require 'config'
 
 local function getRefs(source, deep)
     local results = {}
@@ -11,6 +12,8 @@ local function getRefs(source, deep)
     end
 
     await.delay()
+
+    deep = config.config.intelliSense.searchDepth + (deep or 0)
 
     local clock = os.clock()
     local myResults, count = guide.requestReference(source, vm.interface, deep)
@@ -25,13 +28,15 @@ local function getRefs(source, deep)
 end
 
 function vm.getRefs(source, deep)
+    deep = deep or -999
     if guide.isGlobal(source) then
         local key = guide.getKeyName(source)
         return vm.getGlobals(key)
     else
         local cache =  vm.getCache('eachRef')[source]
-                    or getRefs(source, deep)
-        if deep then
+        if not cache or cache.deep < deep then
+            cache = getRefs(source, deep)
+            cache.deep = deep
             vm.getCache('eachRef')[source] = cache
         end
         return cache

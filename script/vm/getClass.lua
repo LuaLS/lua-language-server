@@ -2,7 +2,7 @@ local vm    = require 'vm.vm'
 local guide = require 'parser.guide'
 
 local function lookUpDocClass(source)
-    local infers = vm.getInfers(source, 'deep')
+    local infers = vm.getInfers(source, 0)
     for _, infer in ipairs(infers) do
         if infer.source.type == 'doc.class'
         or infer.source.type == 'doc.type' then

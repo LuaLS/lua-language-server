@@ -166,7 +166,7 @@ end
 
 local function buildFunctionSnip(source, oop)
     local name = getName(source):gsub('^.-[$.:]', '')
-    local defs = vm.getDefs(source, 'deep')
+    local defs = vm.getDefs(source, 0)
     local args = ''
     for _, def in ipairs(defs) do
         local defArgs = getArg(def, oop)
@@ -186,8 +186,8 @@ local function buildFunctionSnip(source, oop)
 end
 
 local function buildDetail(source)
-    local types = vm.getInferType(source, 'deep')
-    local literals = vm.getInferLiteral(source, 'deep')
+    local types = vm.getInferType(source, 0)
+    local literals = vm.getInferLiteral(source, 0)
     if literals then
         return types .. ' = ' .. literals
     else
@@ -200,7 +200,7 @@ local function getSnip(source)
     if context <= 0 then
         return nil
     end
-    local defs = vm.getRefs(source, 'deep')
+    local defs = vm.getRefs(source, 0)
     for _, def in ipairs(defs) do
         def = guide.getObjectValue(def) or def
         if def ~= source and def.type == 'function' then
@@ -452,7 +452,7 @@ local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, res
 end
 
 local function checkField(ast, word, start, offset, parent, oop, results)
-    local refs = vm.getFields(parent, 'deep')
+    local refs = vm.getFields(parent, 0)
     checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, results)
 end
 
@@ -1004,7 +1004,7 @@ local function tryCallArg(ast, text, offset, results)
     if arg and arg.type == 'function' then
         return
     end
-    local defs = vm.getDefs(call.node, 'deep')
+    local defs = vm.getDefs(call.node, 0)
     for _, def in ipairs(defs) do
         def = guide.getObjectValue(def) or def
         local enums = getCallEnums(def, argIndex)

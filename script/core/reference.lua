@@ -70,7 +70,7 @@ return function (uri, offset)
     end
 
     local results = {}
-    for _, src in ipairs(vm.getRefs(source, 'deep')) do
+    for _, src in ipairs(vm.getRefs(source, 0)) do
         local root = guide.getRoot(src)
         if not root then
             goto CONTINUE

@@ -200,7 +200,7 @@ return function (source)
     local clock = os.clock()
     local timeUp
     local mark = {}
-    local fields = vm.getFields(source, 'deep')
+    local fields = vm.getFields(source, 0)
     local keyCount = 0
     for _, src in ipairs(fields) do
         local key = getKey(src)

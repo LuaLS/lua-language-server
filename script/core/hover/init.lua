@@ -20,7 +20,7 @@ local function eachFunctionAndOverload(value, callback)
 end
 
 local function getHoverAsFunction(source)
-    local values = vm.getDefs(source, 'deep')
+    local values = vm.getDefs(source, 0)
     local desc   = getDesc(source)
     local labels = {}
     local defs = 0
@@ -95,7 +95,7 @@ local function getHoverAsValue(source)
     local label = getLabel(source, oop)
     local desc  = getDesc(source)
     if not desc then
-        local values = vm.getDefs(source, 'deep')
+        local values = vm.getDefs(source, 0)
         for _, def in ipairs(values) do
             desc = getDesc(def)
             if desc then
@@ -124,7 +124,7 @@ local function getHover(source)
     if source.type == 'doc.type.name' then
         return getHoverAsDocName(source)
     end
-    local isFunction = vm.hasInferType(source, 'function', 'deep')
+    local isFunction = vm.hasInferType(source, 'function', 0)
     if isFunction then
         return getHoverAsFunction(source)
     else

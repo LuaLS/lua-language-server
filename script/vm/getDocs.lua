@@ -163,7 +163,7 @@ end
 
 function vm.isDeprecated(value, deep)
     if deep then
-        local defs = vm.getDefs(value, 'deep')
+        local defs = vm.getDefs(value, 0)
         if #defs == 0 then
             return false
         end

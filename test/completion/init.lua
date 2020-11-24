@@ -1236,12 +1236,10 @@ loadstring$
     {
         label = 'loadstring',
         kind  = define.CompletionItemKind.Function,
-        deprecated = true,
     },
     {
         label = 'loadstring()',
         kind  = define.CompletionItemKind.Snippet,
-        deprecated = true,
     },
 }
 

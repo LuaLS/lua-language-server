@@ -417,16 +417,7 @@ local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, res
             goto CONTINUE
         end
         if isSameSource(ast, src, start) then
-            -- 由于fastGlobal的优化，全局变量只会找出一个值，有可能找出自己
-            -- 所以遇到自己的时候重新找一下有没有其他定义
-            if not isGlobal then
-                goto CONTINUE
-            end
-            if #vm.getGlobals(key) <= 1 then
-                goto CONTINUE
-            elseif not vm.isSet(src) then
-                src = vm.getGlobalSets(key)[1] or src
-            end
+            goto CONTINUE
         end
         local name = key:sub(3)
         if locals and locals[name] then
@@ -439,6 +430,9 @@ local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, res
         if not last then
             fields[name] = src
             count = count + 1
+            goto CONTINUE
+        end
+        if vm.isDeprecated(src) then
             goto CONTINUE
         end
         if src.type == 'tablefield'

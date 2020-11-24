@@ -146,35 +146,34 @@ local function fastGetAnyGlobalSets()
 end
 
 function vm.getGlobals(key)
-    if key == '*' and config.config.intelliSense.fastGlobal then
-        local cache = vm.getCache('fastGetAnyGlobals')[key]
-        if cache ~= nil then
-            return cache
-        end
-        cache = fastGetAnyGlobals()
-        vm.getCache('fastGetAnyGlobals')[key] = cache
-        return cache
-    else
-        local cache = vm.getCache('getGlobals')[key]
-        if cache ~= nil then
-            return cache
-        end
-        cache = getGlobals(key)
-        vm.getCache('getGlobals')[key] = cache
+    --if key == '*' and config.config.intelliSense.fastGlobal then
+    --    local cache = vm.getCache('fastGetAnyGlobals')[key]
+    --    if cache ~= nil then
+    --        return cache
+    --    end
+    --    cache = fastGetAnyGlobals()
+    --    vm.getCache('fastGetAnyGlobals')[key] = cache
+    --    return cache
+    --end
+    local cache = vm.getCache('getGlobals')[key]
+    if cache ~= nil then
         return cache
     end
+    cache = getGlobals(key)
+    vm.getCache('getGlobals')[key] = cache
+    return cache
 end
 
 function vm.getGlobalSets(key)
-    if key == '*' and config.config.intelliSense.fastGlobal then
-        local cache = vm.getCache('fastGetAnyGlobalSets')[key]
-        if cache ~= nil then
-            return cache
-        end
-        cache = fastGetAnyGlobalSets()
-        vm.getCache('fastGetAnyGlobalSets')[key] = cache
-        return cache
-    end
+    --if key == '*' and config.config.intelliSense.fastGlobal then
+    --    local cache = vm.getCache('fastGetAnyGlobalSets')[key]
+    --    if cache ~= nil then
+    --        return cache
+    --    end
+    --    cache = fastGetAnyGlobalSets()
+    --    vm.getCache('fastGetAnyGlobalSets')[key] = cache
+    --    return cache
+    --end
     local cache = vm.getCache('getGlobalSets')[key]
     if cache ~= nil then
         return cache

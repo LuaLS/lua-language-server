@@ -78,17 +78,22 @@ local function asString(source)
 end
 
 local function getBindComment(docGroup, base)
-    local lines = {}
+    local continue
+    local lines
     for _, doc in ipairs(docGroup) do
         if doc.type == 'doc.comment' then
+            if not continue then
+                continue = true
+                lines = {}
+            end
             lines[#lines+1] = doc.comment.text:sub(2)
         elseif doc == base then
             break
         else
-            lines = {}
+            continue = false
         end
     end
-    if #lines == 0 then
+    if not lines or #lines == 0 then
         return nil
     end
     return table.concat(lines, '\n')

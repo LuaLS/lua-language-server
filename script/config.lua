@@ -147,7 +147,6 @@ local ConfigTemplate = {
     },
     intelliSense = {
         searchDepth     = {0,         Integer},
-        fastGlobal      = {true,      Boolean},
     },
 }
 

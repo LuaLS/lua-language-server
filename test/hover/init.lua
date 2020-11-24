@@ -1426,3 +1426,10 @@ local function f(<?callback?>) end
 [[
 function (x: integer, ...)
 ]]
+
+TEST [[
+local <?x?> --- @type boolean
+]]
+[[
+local x: boolean
+]]

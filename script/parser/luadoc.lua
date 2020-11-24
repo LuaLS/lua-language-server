@@ -920,13 +920,10 @@ local function bindDoc(state, lns, binded)
     end
     bindGeneric(binded)
     local row = guide.positionOf(lns, lastDoc.finish)
-    local start, finish = guide.lineRange(lns, row + 1)
-    if start >= finish then
-        -- 空行
-        return
-    end
-    guide.eachSourceBetween(state.ast, start, finish, function (src)
-        if src.start and src.start < start then
+    local cstart, _  = guide.lineRange(lns, row)
+    local _, nfinish = guide.lineRange(lns, row + 1)
+    guide.eachSourceBetween(state.ast, cstart, nfinish, function (src)
+        if src.start and src.start < cstart then
             return
         end
         if src.type == 'local'

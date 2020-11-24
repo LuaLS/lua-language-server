@@ -814,7 +814,7 @@ global _G: _G {
     module: function,
     next: function,
     os: os*,
-    package: table,
+    package: package*,
     pairs: function,
     pcall: function,
     print: function,

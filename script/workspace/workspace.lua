@@ -173,7 +173,7 @@ local function loadFileFactory(root, progress, isLibrary)
         if not files.isLua(uri) then
             return
         end
-        if progress.preload >= config.config.workspace.maxPreload then
+        if not isLibrary and progress.preload >= config.config.workspace.maxPreload then
             if not m.hasHitMaxPreload then
                 m.hasHitMaxPreload = true
                 proto.notify('window/showMessage', {

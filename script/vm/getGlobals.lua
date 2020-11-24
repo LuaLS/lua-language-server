@@ -84,6 +84,16 @@ local function getGlobals(name)
             end
         end
     end
+    for key in pairs(config.config.diagnostics.globals) do
+        if name == '*' or name == key then
+            results[#results+1] = {
+                type   = 'dummy',
+                start  = 0,
+                finish = 0,
+                [1]    = key
+            }
+        end
+    end
     return results
 end
 
@@ -103,6 +113,16 @@ local function getGlobalSets(name)
                     results[#results+1] = source
                 end
             end
+        end
+    end
+    for key in pairs(config.config.diagnostics.globals) do
+        if name == '*' or name == key then
+            results[#results+1] = {
+                type   = 'dummy',
+                start  = 0,
+                finish = 0,
+                [1]    = key
+            }
         end
     end
     return results

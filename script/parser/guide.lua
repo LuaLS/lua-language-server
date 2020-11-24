@@ -772,6 +772,8 @@ function m.getKeyName(obj)
         return 's|' .. obj.alias[1]
     elseif tp == 'doc.field' then
         return 's|' .. obj.field[1]
+    elseif tp == 'dummy' then
+        return 's|' .. obj[1]
     end
     return m.getKeyNameOfLiteral(obj)
 end

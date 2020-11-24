@@ -189,7 +189,7 @@ function m.doDiagnostic(uri)
             return
         end
 
-        if util.equal(m.cache, full) then
+        if util.equal(m.cache[uri], full) then
             return
         end
         m.cache[uri] = full

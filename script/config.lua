@@ -182,22 +182,26 @@ function m.setConfig(config, other)
                 local region = ConfigTemplate[c]
                 if region then
                     local info = region[k]
-                    local suc, v = info[2](v)
-                    if suc then
-                        m.config[c][k] = v
-                    else
-                        m.config[c][k] = info[1]
+                    if info then
+                        local suc, v = info[2](v)
+                        if suc then
+                            m.config[c][k] = v
+                        else
+                            m.config[c][k] = info[1]
+                        end
                     end
                 end
             end
         end
         for k, v in pairs(other) do
             local info = OtherTemplate[k]
-            local suc, v = info[2](v)
-            if suc then
-                m.other[k] = v
-            else
-                m.other[k] = info[1]
+            if info then
+                local suc, v = info[2](v)
+                if suc then
+                    m.other[k] = v
+                else
+                    m.other[k] = info[1]
+                end
             end
         end
         log.debug('Config update: ', util.dump(m.config), util.dump(m.other))

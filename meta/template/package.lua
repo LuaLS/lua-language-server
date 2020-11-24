@@ -15,15 +15,15 @@ function require(modname) end
 
 ---#DES 'package'
 ---@class package*
----@DES 'package.config'
+---#DES 'package.config'
 ---@field conifg    string
----@DES 'package.cpath'
+---#DES 'package.cpath'
 ---@field cpath     string
----@DES 'package.loaded'
+---#DES 'package.loaded'
 ---@field loaded    table
----@DES 'package.path'
+---#DES 'package.path'
 ---@field path      string
----@DES 'package.preload'
+---#DES 'package.preload'
 ---@field preload   table
 package = {}
 

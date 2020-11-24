@@ -82,8 +82,6 @@ local function getBindComment(docGroup, base)
     for _, doc in ipairs(docGroup) do
         if doc.type == 'doc.comment' then
             lines[#lines+1] = doc.comment.text:sub(2)
-        elseif #lines > 0 and not base then
-            break
         elseif doc == base then
             break
         else

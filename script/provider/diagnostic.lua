@@ -97,11 +97,17 @@ local function merge(a, b)
     local t = {}
     if a then
         for i = 1, #a do
+            if #t >= 100 then
+                break
+            end
             t[#t+1] = a[i]
         end
     end
     if b then
         for i = 1, #b do
+            if #t >= 100 then
+                break
+            end
             t[#t+1] = b[i]
         end
     end

@@ -304,31 +304,47 @@ local function  parseTypeUnitFunction()
             type   = 'doc.type.arg',
             parent = typeUnit,
         }
-        arg.name = parseName('doc.type.name', arg)
-        if not arg.name then
-            pushError {
-                type   = 'LUADOC_MISS_ARG_NAME',
-                start  = getFinish(),
-                finish = getFinish(),
-            }
-            break
-        end
-        if not arg.start then
-            arg.start = arg.name.start
-        end
-        if checkToken('symbol', '?', 1) then
+        if checkToken('symbol', '...', 1) then
             nextToken()
-            arg.optional = true
+            local vararg = {
+                type   = 'doc.type.name',
+                start  = getStart(),
+                finish = getFinish(),
+                parent = arg,
+                [1]    = '...',
+            }
+            arg.name   = vararg
+            if not arg.start then
+                arg.start = arg.name.start
+            end
+            arg.finish = getFinish()
+        else
+            arg.name = parseName('doc.type.name', arg)
+            if not arg.name then
+                pushError {
+                    type   = 'LUADOC_MISS_ARG_NAME',
+                    start  = getFinish(),
+                    finish = getFinish(),
+                }
+                break
+            end
+            if not arg.start then
+                arg.start = arg.name.start
+            end
+            if checkToken('symbol', '?', 1) then
+                nextToken()
+                arg.optional = true
+            end
+            arg.finish = getFinish()
+            if not nextSymbolOrError(':') then
+                break
+            end
+            arg.extends = parseType(arg)
+            if not arg.extends then
+                break
+            end
+            arg.finish = getFinish()
         end
-        arg.finish = getFinish()
-        if not nextSymbolOrError(':') then
-            break
-        end
-        arg.extends = parseType(arg)
-        if not arg.extends then
-            break
-        end
-        arg.finish = getFinish()
         typeUnit.args[#typeUnit.args+1] = arg
         if checkToken('symbol', ',', 1) then
             nextToken()

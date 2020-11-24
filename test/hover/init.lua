@@ -1418,3 +1418,11 @@ local c: C {
     field: any,
 }
 ]]
+
+TEST [[
+---@param callback fun(x: integer, ...)
+local function f(<?callback?>) end
+]]
+[[
+function (x: integer, ...)
+]]

@@ -831,7 +831,8 @@ local function buildLuaDoc(comment)
     if text:sub(1, 1) ~= '-' then
         return
     end
-    if text:sub(2, 2) ~= '@' then
+    local _, startPos = text:find('%s*@', 2)
+    if not startPos then
         return {
             type    = 'doc.comment',
             start   = comment.start,
@@ -839,16 +840,16 @@ local function buildLuaDoc(comment)
             comment = comment,
         }
     end
-    local finishPos = text:find('@', 3)
+    local finishPos = text:find('@', startPos + 1)
     local doc, lastComment
     if finishPos then
-        doc = text:sub(3, finishPos - 1)
+        doc = text:sub(startPos + 1, finishPos - 1)
         lastComment = text:sub(finishPos)
     else
-        doc = text:sub(3)
+        doc = text:sub(startPos + 1)
     end
 
-    parseTokens(doc, comment.start + 1)
+    parseTokens(doc, comment.start + startPos - 1)
     local result = convertTokens()
     if result then
         result.comment = lastComment

@@ -252,9 +252,7 @@ function m.compileAst(uri, text)
     if state then
         state.uri = uri
         state.ast.uri = uri
-        if config.config.luadoc.enable then
-            parser:luadoc(state)
-        end
+        parser:luadoc(state)
         return state
     else
         log.error(err)

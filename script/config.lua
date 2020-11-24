@@ -96,7 +96,6 @@ end
 local ConfigTemplate = {
     runtime = {
         version         = {'Lua 5.4', String},
-        library         = {{},        Str2Hash ';'},
         path            = {{
                                 "?.lua",
                                 "?/init.lua",
@@ -145,13 +144,6 @@ local ConfigTemplate = {
     },
     color = {
         mode            = {'Semantic', String},
-    },
-    luadoc = {
-        enable          = {true, Boolean},
-    },
-    plugin = {
-        enable          = {false, Boolean},
-        path            = {'.vscode/lua-plugin/*.lua', String},
     },
     intelliSense = {
         searchDepth     = {0,         Integer},

@@ -63,9 +63,6 @@ local function updateConfig()
     then
         workspace.reload()
     end
-    if not util.equal(oldConfig.luadoc, newConfig.luadoc) then
-        files.flushCache()
-    end
     if not util.equal(oldConfig.intelliSense, newConfig.intelliSense) then
         files.flushCache()
     end

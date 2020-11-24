@@ -526,6 +526,7 @@ TEST {
     }
 }
 
+if require 'bee.platform'.OS == 'Windows' then
 TEST {
     {
         path = [[abc/init.lua]],
@@ -546,6 +547,28 @@ TEST {
         },
     }
 }
+else
+TEST {
+    {
+        path = [[abc/init.lua]],
+        content = ''
+    },
+    {
+        path = 'main.lua',
+        content = [[
+            dofile 'ab$'
+        ]],
+        main = true,
+    },
+    completion = {
+        {
+            label = [[abc/init.lua]],
+            kind = CompletionItemKind.Reference,
+            textEdit = EXISTS,
+        },
+    }
+}
+end
 
 Cared['description'] = true
 TEST {

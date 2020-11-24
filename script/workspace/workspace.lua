@@ -98,15 +98,19 @@ function m.getNativeMatcher()
         local buf = pub.awaitTask('loadFile', furi.encode(m.path .. '/.gitignore'))
         if buf then
             for line in buf:gmatch '[^\r\n]+' do
-                log.info('Ignore by .gitignore:', line)
-                pattern[#pattern+1] = line
+                if line:sub(1, 1) ~= '#' then
+                    log.info('Ignore by .gitignore:', line)
+                    pattern[#pattern+1] = line
+                end
             end
         end
         buf = pub.awaitTask('loadFile', furi.encode(m.path .. '/.git/info/exclude'))
         if buf then
             for line in buf:gmatch '[^\r\n]+' do
-                log.info('Ignore by .git/info/exclude:', line)
-                pattern[#pattern+1] = line
+                if line:sub(1, 1) ~= '#' then
+                    log.info('Ignore by .git/info/exclude:', line)
+                    pattern[#pattern+1] = line
+                end
             end
         end
     end

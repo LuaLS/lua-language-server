@@ -8,10 +8,6 @@ local luaDebugs = {}
 for _, vscodePath in ipairs {'.vscode', '.vscode-insiders'} do
     local extensionPath = fs.path(os.getenv 'USERPROFILE' or '') / vscodePath / 'extensions'
     log.debug('Search extensions at:', extensionPath:string())
-    if not fs.is_directory(extensionPath) then
-        log.debug('Extension path is not a directory.')
-        return
-    end
 
     for path in extensionPath:list_directory() do
         if fs.is_directory(path) then

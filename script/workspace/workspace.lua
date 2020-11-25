@@ -134,10 +134,10 @@ function m.getLibraryMatchers()
 
     local librarys = {}
     for path, pattern in pairs(config.config.workspace.library) do
-        librarys[path] = pattern
+        librarys[m.normalize(path)] = pattern
     end
     if library.metaPath then
-        librarys[library.metaPath] = true
+        librarys[m.normalize(library.metaPath)] = true
     end
     m.libraryMatchers = {}
     for path, pattern in pairs(librarys) do
@@ -294,11 +294,13 @@ end
 function m.normalize(path)
     if platform.OS == 'Windows' then
         path = path:gsub('[/\\]+', '\\')
+                   :gsub('[/\\]+$', '')
                    :gsub('^%a+%:', function (str)
                         return str:upper()
                    end)
     else
         path = path:gsub('[/\\]+', '/')
+                   :gsub('[/\\]+$', '')
     end
     return path:gsub('^[/\\]+', '')
 end

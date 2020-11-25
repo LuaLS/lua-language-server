@@ -5,15 +5,17 @@ end
 local fs = require 'bee.filesystem'
 local luaDebugs = {}
 
-for _, vscodePath in ipairs {'.vscode', '.vscode-insiders'} do
-    local extensionPath = fs.path(os.getenv 'USERPROFILE' or '') / vscodePath / 'extensions'
+for _, vscodePath in ipairs {'.vscode', '.vscode-insiders', '.vscode-server-insiders'} do
+    local extensionPath = fs.path(os.getenv 'USERPROFILE' or os.getenv 'HOME') / vscodePath / 'extensions'
     log.debug('Search extensions at:', extensionPath:string())
 
-    for path in extensionPath:list_directory() do
-        if fs.is_directory(path) then
-            local name = path:filename():string()
-            if name:find('actboy168.lua-debug-', 1, true) then
-                luaDebugs[#luaDebugs+1] = path:string()
+    if fs.exists(extensionPath) then
+        for path in extensionPath:list_directory() do
+            if fs.is_directory(path) then
+                local name = path:filename():string()
+                if name:find('actboy168.lua-debug-', 1, true) then
+                    luaDebugs[#luaDebugs+1] = path:string()
+                end
             end
         end
     end
@@ -37,7 +39,7 @@ table.sort(luaDebugs, function (a, b)
 end)
 
 local debugPath = luaDebugs[1]
-local cpath = "/runtime/win64/lua54/?.dll"
+local cpath = "/runtime/win64/lua54/?.dll;/runtime/win64/lua54/?.so"
 local path  = "/script/?.lua"
 
 local function tryDebugger()

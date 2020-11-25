@@ -33,6 +33,7 @@ function m.getVisiblePath(path, searchers)
         m.cache[path] = result
         local pos = 1
         if libraryPath then
+            libraryPath = libraryPath:gsub('^[/\\]+', '')
             pos = #libraryPath + 2
         end
         repeat

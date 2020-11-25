@@ -44,9 +44,11 @@ function m.getVisiblePath(path, searchers)
             pos = path:match('[/\\]+()', pos)
             for _, searcher in ipairs(searchers) do
                 if platform.OS == 'Windows' then
-                    searcher = searcher:gsub('[/\\]+', '\\')
+                    searcher = searcher :gsub('[/\\]+', '\\')
+                                        :gsub('^[/\\]+', '')
                 else
-                    searcher = searcher:gsub('[/\\]+', '/')
+                    searcher = searcher :gsub('[/\\]+', '/')
+                                        :gsub('^[/\\]+', '')
                 end
                 local expect = getOnePath(cutedPath, searcher)
                 if expect then

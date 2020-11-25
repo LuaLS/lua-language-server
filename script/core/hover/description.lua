@@ -38,6 +38,7 @@ local function asStringInRequire(source, literal)
                 elseif searcher then
                     searcher = searcher:sub(#rootPath + 1)
                     searcher = ws.normalize(searcher)
+                    searcher = searcher:gsub('^[/\\]+', '')
                     result[i] = ('* [%s](%s) %s'):format(path, uri, lang.script('HOVER_USE_LUA_PATH', searcher))
                 else
                     result[i] = ('* [%s](%s)'):format(path, uri)

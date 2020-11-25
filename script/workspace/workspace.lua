@@ -320,9 +320,9 @@ function m.getRelativePath(uri)
         _, pos = m.normalize(path):find(m.path, 1, true)
     end
     if pos then
-        return m.normalize(path:sub(pos + 1))
+        return m.normalize(path:sub(pos + 1)):gsub('^[/\\]+', '')
     else
-        return m.normalize(path)
+        return m.normalize(path):gsub('^[/\\]+', '')
     end
 end
 

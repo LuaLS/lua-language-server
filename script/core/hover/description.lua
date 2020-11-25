@@ -26,7 +26,7 @@ local function asStringInRequire(source, literal)
         end
         if result and #result > 0 then
             for i, uri in ipairs(result) do
-                local searcher = searchers and furi.decode(searchers[uri])
+                local searcher = searchers and searchers[uri]
                 uri = files.getOriginUri(uri)
                 local path = furi.decode(uri)
                 if files.eq(path:sub(1, #rootPath), rootPath) then

@@ -253,13 +253,15 @@ function m.findUrisByFilePath(path)
     local posts = {}
     for uri in files.eachFile() do
         local pathLen = #path
-        local uriLen  = #uri
-        local seg = uri:sub(uriLen - pathLen, uriLen - pathLen)
+        local curPath = furi.decode(files.getOriginUri(uri))
+        local curLen  = #curPath
+        local seg = curPath:sub(curLen - pathLen, curLen - pathLen)
         if seg == '/' or seg == '\\' or seg == '' then
-            local see = uri:sub(uriLen - pathLen + 1, uriLen)
+            local see = curPath:sub(curLen - pathLen + 1, curLen)
             if files.eq(see, path) then
                 results[#results+1] = uri
-                posts[uri] = files.getOriginUri(uri):sub(1, uriLen - pathLen)
+                local post = curPath:sub(1, curLen - pathLen)
+                posts[uri] = post:gsub('^[/\\]+', '')
             end
         end
     end
@@ -278,7 +280,7 @@ function m.findUrisByRequirePath(path)
     local input = path:gsub('%.', '/')
                       :gsub('%%', '%%%%')
     for _, luapath in ipairs(config.config.runtime.path) do
-        local part = luapath:gsub('%?', input)
+        local part = m.normalize(luapath:gsub('%?', input))
         local uris, posts = m.findUrisByFilePath(part)
         for _, uri in ipairs(uris) do
             if not mark[uri] then
@@ -302,13 +304,14 @@ function m.normalize(path)
         path = path:gsub('[/\\]+', '/')
                    :gsub('[/\\]+$', '')
     end
-    return path:gsub('^[/\\]+', '')
+    return path
 end
 
 function m.getRelativePath(uri)
     local path = furi.decode(uri)
     if not m.path then
-        return m.normalize(path)
+        local relative = m.normalize(path)
+        return relative:gsub('^[/\\]+', '')
     end
     local _, pos
     if platform.OS == 'Windows' then

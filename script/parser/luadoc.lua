@@ -842,6 +842,19 @@ local function convertTokens()
     end
 end
 
+local function trimTailComment(text)
+    if text:sub(1, 1) == '@' then
+        return text:sub(2)
+    end
+    if text:sub(1, 1) == '#' then
+        return text:sub(2)
+    end
+    if text:sub(1, 2) == '--' then
+        return text:sub(3)
+    end
+    return text
+end
+
 local function buildLuaDoc(comment)
     local text = comment.text
     if text:sub(1, 1) ~= '-' then
@@ -868,7 +881,7 @@ local function buildLuaDoc(comment)
                 type   = 'doc.tailcomment',
                 start  = cstart + comment.start - 1,
                 finish = comment.finish,
-                text   = text:sub(cstart),
+                text   = trimTailComment(text:sub(cstart)),
             }
         end
     end

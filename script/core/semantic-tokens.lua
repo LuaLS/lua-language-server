@@ -98,6 +98,13 @@ Care['doc.return.name'] = function (source, results)
         type   = define.TokenTypes.parameter,
     }
 end
+Care['doc.tailcomment'] = function (source, results)
+    results[#results+1] = {
+        start  = source.start,
+        finish = source.finish,
+        type   = define.TokenTypes.comment,
+    }
+end
 
 local function buildTokens(results, text, lines)
     local tokens = {}

@@ -856,19 +856,21 @@ local function buildLuaDoc(comment)
             comment = comment,
         }
     end
-    local finishPos = text:find('@', startPos + 1)
-    local doc, lastComment
-    if finishPos then
-        doc = text:sub(startPos + 1, finishPos - 1)
-        lastComment = text:sub(finishPos)
-    else
-        doc = text:sub(startPos + 1)
-    end
+
+    local doc = text:sub(startPos + 1)
 
     parseTokens(doc, comment.start + startPos - 1)
     local result = convertTokens()
     if result then
-        result.comment = lastComment
+        local cstart = text:find('%S', result.finish - comment.start + 2)
+        if cstart and cstart < comment.finish then
+            result.comment = {
+                type   = 'doc.tailcomment',
+                start  = cstart + comment.start - 1,
+                finish = comment.finish,
+                text   = text:sub(cstart),
+            }
+        end
     end
 
     return result

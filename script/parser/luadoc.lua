@@ -905,25 +905,9 @@ local function bindGeneric(binded)
     end
 end
 
-local function bindDoc(state, lns, binded)
-    if not binded then
-        return
-    end
-    local lastDoc = binded[#binded]
-    if not lastDoc then
-        return
-    end
-    local bindSources = {}
-    for _, doc in ipairs(binded) do
-        doc.bindGroup = binded
-        doc.bindSources = bindSources
-    end
-    bindGeneric(binded)
-    local row = guide.positionOf(lns, lastDoc.finish)
-    local cstart, _  = guide.lineRange(lns, row)
-    local _, nfinish = guide.lineRange(lns, row + 1)
-    guide.eachSourceBetween(state.ast, cstart, nfinish, function (src)
-        if src.start and src.start < cstart then
+local function bindDocsBetween(state, binded, bindSources, start, finish)
+    guide.eachSourceBetween(state.ast, start, finish, function (src)
+        if src.start and src.start < start then
             return
         end
         if src.type == 'local'
@@ -940,6 +924,29 @@ local function bindDoc(state, lns, binded)
             bindSources[#bindSources+1] = src
         end
     end)
+end
+
+local function bindDoc(state, lns, binded)
+    if not binded then
+        return
+    end
+    local lastDoc = binded[#binded]
+    if not lastDoc then
+        return
+    end
+    local bindSources = {}
+    for _, doc in ipairs(binded) do
+        doc.bindGroup = binded
+        doc.bindSources = bindSources
+    end
+    bindGeneric(binded)
+    local row = guide.positionOf(lns, lastDoc.finish)
+    local cstart, cfinish  = guide.lineRange(lns, row)
+    local nstart, nfinish = guide.lineRange(lns, row + 1)
+    bindDocsBetween(state, binded, bindSources, cstart, cfinish)
+    if #bindSources == 0 then
+        bindDocsBetween(state, binded, bindSources, nstart, nfinish)
+    end
 end
 
 local function bindDocs(state)

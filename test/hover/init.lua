@@ -1433,3 +1433,11 @@ local <?x?> --- @type boolean
 [[
 local x: boolean
 ]]
+
+TEST [[
+local x --- @type boolean
+local <?y?>
+]]
+[[
+local y: any
+]]

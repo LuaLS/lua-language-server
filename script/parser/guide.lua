@@ -1554,6 +1554,16 @@ function m.checkSameSimpleByDoc(status, obj, start, queue, mode)
                     force = true,
                 }
             end
+            if obj.extends then
+                local pieceResult = stepRefOfDocType(status, obj.extends, 'def')
+                for _, res in ipairs(pieceResult) do
+                    queue[#queue+1] = {
+                        obj   = res,
+                        start = start,
+                        force = true,
+                    }
+                end
+            end
         end
         return true
     elseif obj.type == 'doc.type' then

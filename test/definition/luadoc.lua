@@ -127,6 +127,17 @@ TEST [[
 ---@type <?A?>
 ]]
 
+TEST [[
+---@class X
+---@field <!a!> string
+
+---@class Y:X
+
+---@type Y
+local y
+y.<?a?>
+]]
+
 -- TODO
 do return end
 TEST [[

@@ -198,11 +198,38 @@ local function tryDocOverloadToComment(source)
     end
 end
 
+local function tyrDocParamComment(source)
+    if source.type == 'setlocal'
+    or source.type == 'getlocal' then
+        source = source.node
+    end
+    if source.type ~= 'local' then
+        return
+    end
+    if source.parent.type ~= 'funcargs' then
+        return
+    end
+    if not source.bindDocs then
+        return
+    end
+    for _, doc in ipairs(source.bindDocs) do
+        if doc.type == 'doc.param' then
+            if doc.param[1] == source[1] then
+                if doc.comment then
+                    return doc.comment.text
+                end
+                break
+            end
+        end
+    end
+end
+
 return function (source)
     if source.type == 'string' then
         return asString(source)
     end
     return tryDocOverloadToComment(source)
         or tryDocFieldUpComment(source)
+        or tyrDocParamComment(source)
         or tryDocComment(source)
 end

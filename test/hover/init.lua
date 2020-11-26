@@ -1441,11 +1441,3 @@ local <?y?>
 [[
 local y: any
 ]]
-
-TEST [[
----@param x string this is comment
-function f(<?x?>) end
-]]
-[[
-local x: string
-]]

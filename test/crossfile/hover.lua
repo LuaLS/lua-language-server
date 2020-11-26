@@ -422,7 +422,6 @@ function f()
     }
 }
 
-do return end
 TEST {
     {
         path = 'a.lua',
@@ -431,18 +430,13 @@ TEST {
     {
         path = 'b.lua',
         content = [[
-            ---@param x string {comment = 'aaaa'}
-            ---@param y string {comment = 'bbbb'}
-            local function <?f?>(x, y) end
+---@param x string this is comment
+function f(<?x?>) end
         ]]
     },
     hover = {
-        label = 'function f(x: string, y: string)',
-        name = 'f',
-        args = EXISTS,
-        description = [[
-+ `x`*(string)*: aaaa
-
-+ `y`*(string)*: bbbb]]
+        label = 'local x: string',
+        name  = 'x',
+        description = 'this is comment',
     }
 }

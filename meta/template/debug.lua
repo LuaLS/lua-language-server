@@ -43,20 +43,20 @@ function debug.getfenv(o) end
 function debug.gethook(co) end
 
 ---@alias infowhat string
----|+'"n"'     # ---#DESENUM 'infowhat.n'
----|+'"S"'     # ---#DESENUM 'infowhat.S'
----|+'"l"'     # ---#DESENUM 'infowhat.l'
----|+'"t"'     # ---#DESENUM 'infowhat.t'
+---|+'"n"'     # ---#DESTAIL 'infowhat.n'
+---|+'"S"'     # ---#DESTAIL 'infowhat.S'
+---|+'"l"'     # ---#DESTAIL 'infowhat.l'
+---|+'"t"'     # ---#DESTAIL 'infowhat.t'
 ---#if VERSION <= 5.1 then
----|+'"u<5.1"' # ---#DESENUM 'infowhat.u<5.1'
+---|+'"u<5.1"' # ---#DESTAIL 'infowhat.u<5.1'
 ---#else
----|+'"u>5.2"' # ---#DESENUM 'infowhat.u>5.2'
+---|+'"u>5.2"' # ---#DESTAIL 'infowhat.u>5.2'
 ---#end
----|+'"f"'     # ---#DESENUM 'infowhat.f'
+---|+'"f"'     # ---#DESTAIL 'infowhat.f'
 ---#if VERSION >= 5.4 then
----|+'"r"'     # ---#DESENUM 'infowhat.r'
+---|+'"r"'     # ---#DESTAIL 'infowhat.r'
 ---#end
----|+'"L"'     # ---#DESENUM 'infowhat.L'
+---|+'"L"'     # ---#DESTAIL 'infowhat.L'
 
 ---#DES 'debug.getinfo'
 ---@overload fun(f: integer|function, what?: infowhat):debuginfo
@@ -129,9 +129,9 @@ function debug.setcstacklimit(limit) end
 function debug.setfenv(object, env) end
 
 ---@alias hookmask string
----|+'"c"' # ---#DESENUM 'hookmask.c'
----|+'"r"' # ---#DESENUM 'hookmask.r'
----|+'"l"' # ---#DESENUM 'hookmask.l'
+---|+'"c"' # ---#DESTAIL 'hookmask.c'
+---|+'"r"' # ---#DESTAIL 'hookmask.r'
+---|+'"l"' # ---#DESTAIL 'hookmask.l'
 
 ---#DES 'debug.sethook'
 ---@overload fun(hook: function, mask: hookmask, count?: integer)

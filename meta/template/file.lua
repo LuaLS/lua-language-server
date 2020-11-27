@@ -6,16 +6,16 @@ local file = {}
 
 ---@alias readmode number
 ---#if VERSION >= 5.3 then
----| '"n"'  # ---#DESENUM 'readmode.n'
----| '"a"'  # ---#DESENUM 'readmode.a'
----|>'"l"'  # ---#DESENUM 'readmode.l'
----| '"L"'  # ---#DESENUM 'readmode.L'
+---| '"n"'  # ---#DESTAIL 'readmode.n'
+---| '"a"'  # ---#DESTAIL 'readmode.a'
+---|>'"l"'  # ---#DESTAIL 'readmode.l'
+---| '"L"'  # ---#DESTAIL 'readmode.L'
 ---#else
----| '"*n"' # ---#DESENUM 'readmode.n'
----| '"*a"' # ---#DESENUM 'readmode.a'
----|>'"*l"' # ---#DESENUM 'readmode.l'
+---| '"*n"' # ---#DESTAIL 'readmode.n'
+---| '"*a"' # ---#DESTAIL 'readmode.a'
+---|>'"*l"' # ---#DESTAIL 'readmode.l'
 ---#if JIT then
----| '"*L"' # ---#DESENUM 'readmode.L'
+---| '"*L"' # ---#DESTAIL 'readmode.L'
 ---#end
 ---#end
 
@@ -41,9 +41,9 @@ function file:lines(...) end
 function file:read(...) end
 
 ---@alias seekwhence
----| '"set"' # ---#DESENUM 'seekwhence.set'
----|>'"cur"' # ---#DESENUM 'seekwhence.cur'
----| '"end"' # ---#DESENUM 'seekwhence.end'
+---| '"set"' # ---#DESTAIL 'seekwhence.set'
+---|>'"cur"' # ---#DESTAIL 'seekwhence.cur'
+---| '"end"' # ---#DESTAIL 'seekwhence.end'
 
 ---#DES 'file:seek'
 ---@param whence? seekwhence
@@ -53,9 +53,9 @@ function file:read(...) end
 function file:seek(whence, offset) end
 
 ---@alias vbuf
----| '"no"'   # ---#DESENUM 'vbuf.no'
----| '"full"' # ---#DESENUM 'vbuf.full'
----| '"line"' # ---#DESENUM 'vbuf.line'
+---| '"no"'   # ---#DESTAIL 'vbuf.no'
+---| '"full"' # ---#DESTAIL 'vbuf.full'
+---| '"line"' # ---#DESTAIL 'vbuf.line'
 
 ---#DES 'file:setvbuf'
 ---@param mode vbuf

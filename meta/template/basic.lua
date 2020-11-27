@@ -12,18 +12,18 @@ arg = {}
 function assert(v, message) end
 
 ---@alias cgopt
----|>'"collect"'      # ---#DESENUM 'cgopt.collect'
----| '"stop"'         # ---#DESENUM 'cgopt.stop'
----| '"restart"'      # ---#DESENUM 'cgopt.restart'
----| '"count"'        # ---#DESENUM 'cgopt.count'
----| '"step"'         # ---#DESENUM 'cgopt.step'
----| '"isrunning"'    # ---#DESENUM 'cgopt.isrunning'
+---|>'"collect"'      # ---#DESTAIL 'cgopt.collect'
+---| '"stop"'         # ---#DESTAIL 'cgopt.stop'
+---| '"restart"'      # ---#DESTAIL 'cgopt.restart'
+---| '"count"'        # ---#DESTAIL 'cgopt.count'
+---| '"step"'         # ---#DESTAIL 'cgopt.step'
+---| '"isrunning"'    # ---#DESTAIL 'cgopt.isrunning'
 ---#if VERSION >= 5.4 then
----| '"incremental"'  # ---#DESENUM 'cgopt.incremental'
----| '"generational"' # ---#DESENUM 'cgopt.generational'
+---| '"incremental"'  # ---#DESTAIL 'cgopt.incremental'
+---| '"generational"' # ---#DESTAIL 'cgopt.generational'
 ---#else
----| '"setpause"'     # ---#DESENUM 'cgopt.setpause'
----| '"setstepmul"'   # ---#DESENUM 'cgopt.setstepmul'
+---| '"setpause"'     # ---#DESTAIL 'cgopt.setpause'
+---| '"setstepmul"'   # ---#DESTAIL 'cgopt.setstepmul'
 ---#end
 
 ---#if VERSION >= 5.4 then
@@ -72,9 +72,9 @@ function getmetatable(object) end
 function ipairs(t) end
 
 ---@alias loadmode
----| '"b"'  # ---#DESENUM 'loadmode.b'
----| '"t"'  # ---#DESENUM 'loadmode.t'
----|>'"bt"' # ---#DESENUM 'loadmode.bt'
+---| '"b"'  # ---#DESTAIL 'loadmode.b'
+---| '"t"'  # ---#DESTAIL 'loadmode.t'
+---|>'"bt"' # ---#DESTAIL 'loadmode.bt'
 
 ---#if VERSION <= 5.1 then
 ---#DES 'load<5.1'

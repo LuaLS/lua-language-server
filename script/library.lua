@@ -107,7 +107,7 @@ local function compileSingleMetaDoc(script, metaLang)
             end
             compileBuf[#compileBuf+1] = '---\n'
         end,
-        DESENUM = function (name)
+        DESTAIL = function (name)
             local des = metaLang[name]
             if not des then
                 des = ('Miss locale <%s>'):format(name)

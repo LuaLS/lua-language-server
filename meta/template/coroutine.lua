@@ -43,10 +43,10 @@ function coroutine.running() end
 ---#DES 'coroutine.status'
 ---@param co thread
 ---@return
----| '"running"'   # ---#DESENUM 'costatus.running'
----| '"suspended"' # ---#DESENUM 'costatus.suspended'
----| '"normal"'    # ---#DESENUM 'costatus.normal'
----| '"dead"'      # ---#DESENUM 'costatus.dead'
+---| '"running"'   # ---#DESTAIL 'costatus.running'
+---| '"suspended"' # ---#DESTAIL 'costatus.suspended'
+---| '"normal"'    # ---#DESTAIL 'costatus.normal'
+---| '"dead"'      # ---#DESTAIL 'costatus.dead'
 function coroutine.status(co) end
 
 ---#DES 'coroutine.wrap'

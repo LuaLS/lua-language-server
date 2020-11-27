@@ -11,18 +11,18 @@
 io = {}
 
 ---@alias openmode
----|>'"r"'   # ---#DESENUM 'openmode.r'
----| '"w"'   # ---#DESENUM 'openmode.w'
----| '"a"'   # ---#DESENUM 'openmode.a'
----| '"r+"'  # ---#DESENUM 'openmode.r+'
----| '"w+"'  # ---#DESENUM 'openmode.w+'
----| '"a+"'  # ---#DESENUM 'openmode.a+'
----| '"rb"'  # ---#DESENUM 'openmode.rb'
----| '"wb"'  # ---#DESENUM 'openmode.wb'
----| '"ab"'  # ---#DESENUM 'openmode.ab'
----| '"r+b"' # ---#DESENUM 'openmode.r+b'
----| '"w+b"' # ---#DESENUM 'openmode.w+b'
----| '"a+b"' # ---#DESENUM 'openmode.a+b'
+---|>'"r"'   # ---#DESTAIL 'openmode.r'
+---| '"w"'   # ---#DESTAIL 'openmode.w'
+---| '"a"'   # ---#DESTAIL 'openmode.a'
+---| '"r+"'  # ---#DESTAIL 'openmode.r+'
+---| '"w+"'  # ---#DESTAIL 'openmode.w+'
+---| '"a+"'  # ---#DESTAIL 'openmode.a+'
+---| '"rb"'  # ---#DESTAIL 'openmode.rb'
+---| '"wb"'  # ---#DESTAIL 'openmode.wb'
+---| '"ab"'  # ---#DESTAIL 'openmode.ab'
+---| '"r+b"' # ---#DESTAIL 'openmode.r+b'
+---| '"w+b"' # ---#DESTAIL 'openmode.w+b'
+---| '"a+b"' # ---#DESTAIL 'openmode.a+b'
 
 ---#DES 'io.close'
 ---@param file? file*
@@ -58,8 +58,8 @@ function io.open(filename, mode) end
 function io.output(file) end
 
 ---@alias popenmode
----| '"r"' # ---#DESENUM 'popenmode.r'
----| '"w"' # ---#DESENUM 'popenmode.w'
+---| '"r"' # ---#DESTAIL 'popenmode.r'
+---| '"w"' # ---#DESTAIL 'popenmode.w'
 
 ---#DES 'io.popen'
 ---@param prog  string
@@ -79,9 +79,9 @@ function io.read(...) end
 function io.tmpfile() end
 
 ---@alias filetype
----| '"file"'        # ---#DESENUM 'filetype.file'
----| '"closed file"' # ---#DESENUM 'filetype.closed file'
----| 'nil'           # ---#DESENUM 'filetype.nil'
+---| '"file"'        # ---#DESTAIL 'filetype.file'
+---| '"closed file"' # ---#DESTAIL 'filetype.closed file'
+---| 'nil'           # ---#DESTAIL 'filetype.nil'
 
 ---#DES 'io.type'
 ---@param file file*

@@ -165,15 +165,64 @@ local function tryDocFieldUpComment(source)
     return comment
 end
 
+local function getBindParamComments(bindDocs)
+    local comments = {}
+    for _, doc in ipairs(bindDocs) do
+        if doc.type == 'doc.param' then
+            if doc.comment then
+                comments[#comments+1] = ('@*param* `%s` -- %s'):format(
+                    doc.param[1],
+                    doc.comment.text
+                )
+            end
+        end
+    end
+    if #comments == 0 then
+        return nil
+    end
+    return table.concat(comments, '\n\n')
+end
+
+local function getBindReturnComments(bindDocs)
+    local comments = {}
+    local index = 0
+    for _, doc in ipairs(bindDocs) do
+        if doc.type == 'doc.return' then
+            for _, rtn in ipairs(doc.returns) do
+                index = index + 1
+                if doc.comment then
+                    local name = rtn.name and rtn.name[1] or ('#' .. index)
+                    comments[#comments+1] = ('@*return* `%s` -- %s'):format(
+                        name,
+                        doc.comment.text
+                    )
+                end
+            end
+        end
+    end
+    if #comments == 0 then
+        return nil
+    end
+    return table.concat(comments, '\n\n')
+end
+
 local function tryDocComment(source)
     if not source.bindDocs then
         return
     end
     local comment = getBindComment(source.bindDocs)
+    local params  = getBindParamComments(source.bindDocs)
+    local returns = getBindReturnComments(source.bindDocs)
     local enums   = getBindEnums(source.bindDocs)
     local md = markdown()
     if comment then
         md:add('md', comment)
+    end
+    if params then
+        md:add('md', params)
+    end
+    if returns then
+        md:add('md', returns)
     end
     if enums then
         md:add('lua', enums)

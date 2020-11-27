@@ -440,3 +440,35 @@ function f(<?x?>) end
         description = 'this is comment',
     }
 }
+
+TEST {
+    {
+        path = 'a.lua',
+        content = '',
+    },
+    {
+        path = 'b.lua',
+        content = [[
+---@param x string this is comment
+---@param y table -- comment 1
+---@return boolean name #comment 2
+---@return number @comment 3
+function <?f?>(x, y) end
+        ]]
+    },
+    hover = {
+        label = [[
+function f(x: string, y: table)
+  -> name: boolean
+  2. number]],
+        name  = 'f',
+        description = [[
+@*param* `x` -- this is comment
+
+@*param* `y` --  comment 1
+
+@*return* `name` -- comment 2
+
+@*return* `#2` -- comment 3]],
+    }
+}

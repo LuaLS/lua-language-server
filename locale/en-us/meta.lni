@@ -73,7 +73,7 @@ Sets the real value of `table[index]` to `value`, without using the `__newindex`
 This function returns `table`.
 ]]
 select              = If `index` is a number, returns all arguments after argument number `index`; a negative number indexes from the end (`-1` is the last argument). Otherwise, `index` must be the string `"#"`, and `select` returns the total number of extra arguments it received.
-setfenv             = ''
+setfenv             = 'Sets the environment to be used by the given function. '
 setmetatable        = [[
 Sets the metatable for the given table. If `metatable` is `nil`, removes the metatable of the given table. If the original metatable has a `__metatable` field, raises an error.
 

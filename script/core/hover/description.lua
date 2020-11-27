@@ -138,7 +138,7 @@ local function getBindEnums(docGroup)
         elseif doc.type == 'doc.return' then
             for _, rtn in ipairs(doc.returns) do
                 returnIndex = returnIndex + 1
-                local name = rtn.name and rtn.name[1] or ('(return %d)'):format(returnIndex)
+                local name = rtn.name and rtn.name[1] or ('return #%d'):format(returnIndex)
                 if mark[name] then
                     goto CONTINUE
                 end

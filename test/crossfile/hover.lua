@@ -415,7 +415,7 @@ function f()
         name = 'f',
         description = [[
 ```lua
-(return 1): option
+return #1: option
     | '选项1' -- 注释1
    -> '选项2' -- 注释2
 ```]]

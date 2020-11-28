@@ -198,6 +198,7 @@ function m.doDiagnostic(uri)
             uri = files.getOriginUri(uri),
             diagnostics = full,
         })
+        log.debug('publishDiagnostics', uri, #full)
     end
 
     if await.hasID 'diagnosticsAll' then

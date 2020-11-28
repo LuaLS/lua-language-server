@@ -87,7 +87,7 @@ function m.close(id)
         coroutine.close(co)
         count = count + 1
     end
-    log.debug('Close await:', id, count)
+    --log.debug('Close await:', id, count)
 end
 
 function m.hasID(id, co)

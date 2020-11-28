@@ -472,3 +472,24 @@ function f(x: string, y: table)
 @*return* `#2` -- comment 3]],
     }
 }
+
+TEST {
+    {
+        path = 'a.lua',
+        content = '',
+    },
+    {
+        path = 'b.lua',
+        content = [[
+---Comment
+---@param x string
+---@return string # this is comment
+function f(<?x?>) end
+        ]]
+    },
+    hover = {
+        label = [[local x: string]],
+        name  = 'x',
+        description = '',
+    }
+}

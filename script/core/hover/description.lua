@@ -78,7 +78,14 @@ local function asString(source)
         or asStringView(source, literal)
 end
 
-local function getBindComment(docGroup, base)
+local function getBindComment(source, docGroup, base)
+    if source.type == 'setlocal'
+    or source.type == 'getlocal' then
+        source = source.node
+    end
+    if source.parent.type == 'funcargs' then
+        return
+    end
     local continue
     local lines
     for _, doc in ipairs(docGroup) do
@@ -123,7 +130,22 @@ local function buildEnumChunk(docType, name)
     return table.concat(lines, '\n')
 end
 
-local function getBindEnums(docGroup)
+local function isFunction(source)
+    if source.type == 'function' then
+        return true
+    end
+    local value = guide.getObjectValue(source)
+    if not value then
+        return false
+    end
+    return value.type == 'function'
+end
+
+local function getBindEnums(source, docGroup)
+    if not isFunction(source) then
+        return
+    end
+
     local mark = {}
     local chunks = {}
     local returnIndex = 0
@@ -161,11 +183,15 @@ local function tryDocFieldUpComment(source)
     if not source.bindGroup then
         return
     end
-    local comment = getBindComment(source.bindGroup, source)
+    local comment = getBindComment(source, source.bindGroup, source)
     return comment
 end
 
-local function getBindParamComments(bindDocs)
+local function getBindParamComments(source, bindDocs)
+    if not isFunction(source) then
+        return
+    end
+
     local comments = {}
     for _, doc in ipairs(bindDocs) do
         if doc.type == 'doc.param' then
@@ -183,7 +209,11 @@ local function getBindParamComments(bindDocs)
     return table.concat(comments, '\n\n')
 end
 
-local function getBindReturnComments(bindDocs)
+local function getBindReturnComments(source, bindDocs)
+    if not isFunction(source) then
+        return
+    end
+
     local comments = {}
     local index = 0
     for _, doc in ipairs(bindDocs) do
@@ -210,10 +240,10 @@ local function tryDocComment(source)
     if not source.bindDocs then
         return
     end
-    local comment = getBindComment(source.bindDocs)
-    local params  = getBindParamComments(source.bindDocs)
-    local returns = getBindReturnComments(source.bindDocs)
-    local enums   = getBindEnums(source.bindDocs)
+    local comment = getBindComment(source, source.bindDocs)
+    local params  = getBindParamComments(source, source.bindDocs)
+    local returns = getBindReturnComments(source, source.bindDocs)
+    local enums   = getBindEnums(source, source.bindDocs)
     local md = markdown()
     if comment then
         md:add('md', comment)

@@ -891,21 +891,33 @@ local function checkEqualEnum(ast, text, offset, results)
     if not start then
         return
     end
+    local eqOrNeq
     if text:sub(start - 1, start - 1) == '='
     or text:sub(start - 1, start - 1) == '~' then
         start = start - 1
+        eqOrNeq = true
     end
     start = skipSpace(text, start - 1)
     local source = guide.eachSourceContain(ast.ast, start, function (source)
+        if source.finish ~= start then
+            return
+        end
         if source.type == 'getlocal'
         or source.type == 'setlocal'
         or source.type == 'local'
         or source.type == 'getglobal'
         or source.type == 'getfield'
-        or source.type == 'getindex' then
+        or source.type == 'getindex'
+        or source.type == 'call' then
             return source
         end
     end)
+    if not source then
+        return
+    end
+    if source.type == 'call' and not eqOrNeq then
+        return
+    end
     checkEqualEnumLeft(ast, text, offset, source, results)
 end
 

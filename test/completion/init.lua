@@ -1881,3 +1881,13 @@ local t = type()
 print(t == $)
 ]]
 (EXISTS)
+
+TEST [[
+if type(arg) == '$'
+]]
+(EXISTS)
+
+TEST [[
+if type(arg) == $
+]]
+(EXISTS)

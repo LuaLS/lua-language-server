@@ -64,6 +64,6 @@ function file:setvbuf(mode, size) end
 
 ---#DES 'file:write'
 ---@vararg string|number
----@return file?
+---@return file*?
 ---@return string? errmsg
 function file:write(...) end

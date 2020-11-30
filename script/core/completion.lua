@@ -857,7 +857,8 @@ end
 local function checkTypingEnum(ast, text, offset, infers, str, results)
     local enums = {}
     for _, infer in ipairs(infers) do
-        if infer.source.type == 'doc.type.enum' then
+        if infer.source.type == 'doc.type.enum'
+        or infer.source.type == 'doc.resume' then
             enums[#enums+1] = {
                 label       = infer.source[1],
                 description = infer.source.comment and infer.source.comment.text,
@@ -915,6 +916,9 @@ local function checkEqualEnumInString(ast, text, offset, results)
             or source.op.type == '~=' then
                 return source[1]
             end
+        end
+        if not source.start then
+            return
         end
         if  source.start <= offset
         and source.finish >= offset then

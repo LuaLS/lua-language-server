@@ -2828,13 +2828,16 @@ function m.inferCheckLiteral(status, source)
     end
 end
 
-local function getDocAliasExtends(status, name)
+local function getDocAliasExtends(status, typeUnit)
     if not status.interface.docType then
         return nil
     end
-    for _, doc in ipairs(status.interface.docType(name)) do
+    if typeUnit.type ~= 'doc.type.name' then
+        return nil
+    end
+    for _, doc in ipairs(status.interface.docType(typeUnit[1])) do
         if doc.type == 'doc.alias.name' then
-            return m.viewInferType(m.getDocTypeNames(status, doc.parent.extends))
+            return doc.parent.extends
         end
     end
     return nil
@@ -2843,7 +2846,7 @@ end
 local function getDocTypeUnitName(status, unit, genericCallback)
     local typeName
     if unit.type == 'doc.type.name' then
-        typeName = getDocAliasExtends(status, unit[1]) or unit[1]
+        typeName = unit[1]
     elseif unit.type == 'doc.type.function' then
         typeName = 'function'
     elseif unit.type == 'doc.type.array' then
@@ -2872,11 +2875,19 @@ function m.getDocTypeNames(status, doc, genericCallback)
         return results
     end
     for _, unit in ipairs(doc.types) do
-        local typeName = getDocTypeUnitName(status, unit, genericCallback)
-        results[#results+1] = {
-            type   = typeName,
-            source = unit,
-        }
+        local alias = getDocAliasExtends(status, unit)
+        if alias then
+            local aliasResults = m.getDocTypeNames(status, alias, genericCallback)
+            for _, res in ipairs(aliasResults) do
+                results[#results+1] = res
+            end
+        else
+            local typeName = getDocTypeUnitName(status, unit, genericCallback)
+            results[#results+1] = {
+                type   = typeName,
+                source = unit,
+            }
+        end
     end
     for _, enum in ipairs(doc.enums) do
         results[#results+1] = {

@@ -1874,3 +1874,10 @@ x = '$'
         textEdit = EXISTS,
     },
 }
+
+TEST [[
+local t = type()
+
+print(t == $)
+]]
+(EXISTS)

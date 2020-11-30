@@ -76,9 +76,13 @@ function m.awaitRequest(name, params)
     }
     --log.debug('Request', name, #buf)
     io.stdout:write(buf)
-    return await.wait(function (resume)
+    local result, error = await.wait(function (resume)
         m.waiting[id] = resume
     end)
+    if error then
+        log.warn(('Response of [%s] error [%d]: %s'):format(name, error.code, error.message))
+    end
+    return result
 end
 
 function m.doMethod(proto)
@@ -130,8 +134,7 @@ function m.doResponse(proto)
     end
     m.waiting[id] = nil
     if proto.error then
-        log.warn(('Response error [%d]: %s'):format(proto.error.code, proto.error.message))
-        resume(nil)
+        resume(nil, proto.error)
         return
     end
     resume(proto.result)

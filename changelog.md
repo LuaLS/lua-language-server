@@ -3,7 +3,9 @@
 ## 1.2.2
 
 * `NEW` provides change logs, I think it's good idea for people knowing what's new ~~(bugs)~~
+* `NEW` meta files of LuaJIT
 * `CHG` now I think it's a bad idea as it took me nearly an hour to complete the logs started from version `1.0.0`
+* `FIX` closing ignored or library file dose not clean diagnostics
 
 ## 1.2.1
 `2020-11-27`

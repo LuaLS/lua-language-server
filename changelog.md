@@ -4,6 +4,7 @@
 
 * `NEW` provides change logs, I think it's good idea for people knowing what's new ~~(bugs)~~
 * `NEW` meta files of LuaJIT
+* `NEW` support completion of `type(o) == ?`
 * `CHG` now I think it's a bad idea as it took me nearly an hour to complete the logs started from version `1.0.0`
 * `FIX` closing ignored or library file dose not clean diagnostics
 

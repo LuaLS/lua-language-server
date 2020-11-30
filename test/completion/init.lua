@@ -1784,3 +1784,93 @@ utf8.charpatter$
         description = EXISTS,
     }
 }
+
+TEST [[
+---@type "'a'"|"'b'"|"'c'"
+local x
+
+print(x == $)
+]]
+{
+    {
+        label  = "'a'",
+        kind   = define.CompletionItemKind.EnumMember,
+    },
+    {
+        label  = "'b'",
+        kind   = define.CompletionItemKind.EnumMember,
+    },
+    {
+        label  = "'c'",
+        kind   = define.CompletionItemKind.EnumMember,
+    },
+}
+
+TEST [[
+---@type "'a'"|"'b'"|"'c'"
+local x
+
+x = $
+]]
+{
+    {
+        label  = "'a'",
+        kind   = define.CompletionItemKind.EnumMember,
+    },
+    {
+        label  = "'b'",
+        kind   = define.CompletionItemKind.EnumMember,
+    },
+    {
+        label  = "'c'",
+        kind   = define.CompletionItemKind.EnumMember,
+    },
+}
+
+TEST [[
+---@type "'a'"|"'b'"|"'c'"
+local x
+
+print(x == '$')
+]]
+{
+    {
+        label  = "'a'",
+        kind   = define.CompletionItemKind.EnumMember,
+        textEdit = EXISTS,
+    },
+    {
+        label  = "'b'",
+        kind   = define.CompletionItemKind.EnumMember,
+        textEdit = EXISTS,
+    },
+    {
+        label  = "'c'",
+        kind   = define.CompletionItemKind.EnumMember,
+        textEdit = EXISTS,
+    },
+}
+
+TEST [[
+---@type "'a'"|"'b'"|"'c'"
+local x
+
+x = '$'
+]]
+{
+    {
+        label  = "'a'",
+        kind   = define.CompletionItemKind.EnumMember,
+        textEdit = EXISTS,
+    },
+    {
+        label  = "'b'",
+        kind   = define.CompletionItemKind.EnumMember,
+        textEdit = EXISTS,
+    },
+    {
+        label  = "'c'",
+        kind   = define.CompletionItemKind.EnumMember,
+        textEdit = EXISTS,
+    },
+}

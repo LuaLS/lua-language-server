@@ -97,6 +97,20 @@ local function findSymbol(text, offset)
     return nil
 end
 
+local function findTargetSymbol(text, offset, symbol)
+    offset = skipSpace(text, offset)
+    for i = offset, 1, -1 do
+        local char = text:sub(i - #symbol + 1, i)
+        if char == symbol then
+            return i - #symbol + 1
+        else
+            return nil
+        end
+        ::CONTINUE::
+    end
+    return nil
+end
+
 local function findAnyPos(text, offset)
     for i = offset, 1, -1 do
         if not isSpace(text:sub(i, i)) then
@@ -802,6 +816,126 @@ local function checkLenPlusOne(ast, text, offset, results)
     end)
 end
 
+local function tryLabelInString(label, source)
+    if not source or source.type ~= 'string' then
+        return label
+    end
+    local str = parser:grammar(label, 'String')
+    if not str then
+        return label
+    end
+    if not matchKey(source[1], str[1]) then
+        return nil
+    end
+    return util.viewString(str[1], source[2])
+end
+
+local function mergeEnums(a, b, source)
+    local mark = {}
+    for _, enum in ipairs(a) do
+        mark[enum.label] = true
+    end
+    for _, enum in ipairs(b) do
+        local label = tryLabelInString(enum.label, source)
+        if label and not mark[label] then
+            mark[label] = true
+            local result = {
+                label       = label,
+                kind        = define.CompletionItemKind.EnumMember,
+                description = enum.description,
+                textEdit    = source and {
+                    start   = source.start,
+                    finish  = source.finish,
+                    newText = label,
+                },
+            }
+            a[#a+1] = result
+        end
+    end
+end
+
+local function checkTypingEnum(ast, text, offset, infers, str, results)
+    local enums = {}
+    for _, infer in ipairs(infers) do
+        if infer.source.type == 'doc.type.enum' then
+            enums[#enums+1] = {
+                label       = infer.source[1],
+                description = infer.source.comment and infer.source.comment.text,
+                kind        = define.CompletionItemKind.EnumMember,
+            }
+        end
+    end
+    local myResults = {}
+    mergeEnums(myResults, enums, str)
+    for _, res in ipairs(myResults) do
+        results[#results+1] = res
+    end
+end
+
+local function checkEqualEnumLeft(ast, text, offset, source, results)
+    if not source then
+        return
+    end
+    local str = guide.eachSourceContain(ast.ast, offset, function (src)
+        if src.type == 'string' then
+            return src
+        end
+    end)
+    local infers = vm.getInfers(source, 0)
+    checkTypingEnum(ast, text, offset, infers, str, results)
+end
+
+local function checkEqualEnum(ast, text, offset, results)
+    local start =  findTargetSymbol(text, offset, '=')
+    if not start then
+        return
+    end
+    if text:sub(start - 1, start - 1) == '='
+    or text:sub(start - 1, start - 1) == '~' then
+        start = start - 1
+    end
+    start = skipSpace(text, start - 1)
+    local source = guide.eachSourceContain(ast.ast, start, function (source)
+        if source.type == 'getlocal'
+        or source.type == 'setlocal'
+        or source.type == 'local'
+        or source.type == 'getglobal'
+        or source.type == 'getfield'
+        or source.type == 'getindex' then
+            return source
+        end
+    end)
+    checkEqualEnumLeft(ast, text, offset, source, results)
+end
+
+local function checkEqualEnumInString(ast, text, offset, results)
+    local source = guide.eachSourceContain(ast.ast, offset, function (source)
+        if source.type == 'binary' then
+            if source.op.type == '=='
+            or source.op.type == '~=' then
+                return source[1]
+            end
+        end
+        if  source.start <= offset
+        and source.finish >= offset then
+            local parent = source.parent
+            if not parent then
+                return
+            end
+            if parent.type == 'local' then
+                return parent
+            end
+            if parent.type == 'setlocal'
+            or parent.type == 'setglobal'
+            or parent.type == 'setfield'
+            or parent.type == 'setindex' then
+                return parent.node
+            end
+        end
+    end)
+    checkEqualEnumLeft(ast, text, offset, source, results)
+end
+
 local function isFuncArg(ast, offset)
     return guide.eachSourceContain(ast.ast, offset, function (source)
         if source.type == 'funcargs' then
@@ -813,10 +947,13 @@ end
 local function trySpecial(ast, text, offset, results)
     if isInString(ast, offset) then
         checkUri(ast, text, offset, results)
+        checkEqualEnumInString(ast, text, offset, results)
         return
     end
     -- x[#x+1]
     checkLenPlusOne(ast, text, offset, results)
+    -- type(o) ==
+    checkEqualEnum(ast, text, offset, results)
 end
 
 local function tryIndex(ast, text, offset, results)
@@ -932,44 +1069,6 @@ local function getCallEnums(source, index)
     end
 end
 
-local function tryLabelInString(label, arg)
-    if not arg or arg.type ~= 'string' then
-        return label
-    end
-    local str = parser:grammar(label, 'String')
-    if not str then
-        return label
-    end
-    if not matchKey(arg[1], str[1]) then
-        return nil
-    end
-    return util.viewString(str[1], arg[2])
-end
-
-local function mergeEnums(a, b, text, arg)
-    local mark = {}
-    for _, enum in ipairs(a) do
-        mark[enum.label] = true
-    end
-    for _, enum in ipairs(b) do
-        local label = tryLabelInString(enum.label, arg)
-        if label and not mark[label] then
-            mark[label] = true
-            local result = {
-                label       = label,
-                kind        = define.CompletionItemKind.EnumMember,
-                description = enum.description,
-                textEdit    = arg and {
-                    start   = arg.start,
-                    finish  = arg.finish,
-                    newText = label,
-                },
-            }
-            a[#a+1] = result
-        end
-    end
-end
-
 local function findCall(ast, text, offset)
     local call
     guide.eachSourceContain(ast.ast, offset, function (src)
@@ -1009,7 +1108,7 @@ local function tryCallArg(ast, text, offset, results)
         def = guide.getObjectValue(def) or def
         local enums = getCallEnums(def, argIndex)
         if enums then
-            mergeEnums(myResults, enums, text, arg)
+            mergeEnums(myResults, enums, arg)
         end
     end
     for _, enum in ipairs(myResults) do

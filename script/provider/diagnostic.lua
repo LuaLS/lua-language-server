@@ -302,7 +302,8 @@ files.watch(function (ev, uri)
     elseif ev == 'open' then
         m.doDiagnostic(uri)
     elseif ev == 'close' then
-        if files.isLibrary(uri) then
+        if files.isLibrary(uri)
+        or ws.isIgnored(uri) then
             m.clear(uri)
         end
     end

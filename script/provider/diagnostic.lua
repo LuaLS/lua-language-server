@@ -124,6 +124,7 @@ function m.clear(uri)
         uri = files.getOriginUri(luri) or uri,
         diagnostics = {},
     })
+    log.debug('clearDiagnostics', files.getOriginUri(uri))
 end
 
 function m.clearAll()
@@ -198,7 +199,9 @@ function m.doDiagnostic(uri)
             uri = files.getOriginUri(uri),
             diagnostics = full,
         })
-        log.debug('publishDiagnostics', uri, #full)
+        if #full > 0 then
+            log.debug('publishDiagnostics', files.getOriginUri(uri), #full)
+        end
     end
 
     if await.hasID 'diagnosticsAll' then
@@ -215,6 +218,7 @@ function m.doDiagnostic(uri)
 
     m.diagnostics(uri, diags)
     pushResult()
+    m.checkStepResult = nil
 end
 
 function m.refresh(uri)

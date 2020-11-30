@@ -807,6 +807,7 @@ global _G: _G {
     getmetatable: function,
     io: io*,
     ipairs: function,
+    jit: jit*,
     load: function,
     loadfile: function,
     loadstring: function,

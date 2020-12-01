@@ -1179,12 +1179,9 @@ function m.status(parentStatus, interface, deep)
         depth     = parentStatus and (parentStatus.depth + 1) or 0,
         searchDeep= parentStatus and parentStatus.searchDeep  or deep or -999,
         interface = parentStatus and parentStatus.interface   or {},
-        locks     = parentStatus and parentStatus.locks       or {},
         deep      = parentStatus and parentStatus.deep,
         results   = {},
     }
-    status.lock = status.locks[status.depth] or {}
-    status.locks[status.depth] = status.lock
     if interface then
         for k, v in pairs(interface) do
             status.interface[k] = v
@@ -2297,13 +2294,14 @@ function m.searchSameFields(status, simple, mode)
         }
     end
     local max = 0
+    local lock = {}
     for i = 1, 1e6 do
         local data = queue[i]
         if not data then
             return
         end
-        if not status.lock[data.obj] then
-            status.lock[data.obj] = true
+        if not lock[data.obj] then
+            lock[data.obj] = true
             max = max + 1
             status.cache.count = status.cache.count + 1
             m.checkSameSimple(status, simple, data, mode, queue)

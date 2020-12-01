@@ -1,6 +1,7 @@
 # changelog
 
-## 1.2.2
+## 1.3.0
+`2020-12-1`
 
 * `NEW` provides change logs, I think it's good idea for people knowing what's new ~~(bugs)~~
 * `NEW` meta files of LuaJIT

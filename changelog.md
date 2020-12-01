@@ -7,6 +7,8 @@
 * `NEW` support completion of `type(o) == ?`
 * `CHG` now I think it's a bad idea as it took me nearly an hour to complete the logs started from version `1.0.0`
 * `FIX` closing ignored or library file dose not clean diagnostics
+* `FIX` searching of `t.f1` when `t.f1 = t.f2`
+* `FIX` missing signature help of global function
 
 ## 1.2.1
 `2020-11-27`

@@ -160,3 +160,17 @@ TEST [[
 ('abc'):format(f($))
 ]]
 (nil)
+
+TEST [[
+function Foo(param01, param02)
+
+end
+
+Foo($)
+]]
+{
+    label = [[
+function Foo(param01: any, param02: any)
+]],
+    arg = {14, 25},
+}

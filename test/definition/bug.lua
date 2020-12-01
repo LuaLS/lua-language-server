@@ -129,3 +129,20 @@ end
 local t = init()
 t:<?add?>()
 ]]
+
+TEST [[
+local t = {}
+t.<!f1!> = 1
+t.<!f2!> = t.f1
+
+print(t.<?f2?>)
+]]
+
+TEST [[
+local t = {}
+t.<!f1!> = 1
+t.<!f2!> = t.f1
+t.<!f1!> = t.f2
+
+print(t.<?f2?>)
+]]

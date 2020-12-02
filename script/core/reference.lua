@@ -69,13 +69,15 @@ return function (uri, offset)
         return nil
     end
 
+    local metaSource = vm.isMetaFile(uri)
+
     local results = {}
     for _, src in ipairs(vm.getRefs(source, 5)) do
         local root = guide.getRoot(src)
         if not root then
             goto CONTINUE
         end
-        if vm.isMetaFile(root.uri) then
+        if not metaSource and vm.isMetaFile(root.uri) then
             goto CONTINUE
         end
         if  (   src.type == 'doc.class.name'

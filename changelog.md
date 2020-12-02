@@ -4,6 +4,7 @@
 * `NEW` setting `hover.previewFields`: limit how many fields are shown in table hover
 * `NEW` fully support `---@type Object[]`
 * `CHG` resolve infer of `string|table`
+* `CHG` `unused-local` ignored local with `---@class`
 
 ## 1.3.0
 `2020-12-1`

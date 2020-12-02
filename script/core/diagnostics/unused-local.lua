@@ -38,12 +38,24 @@ local function isMyTable(loc)
     return false
 end
 
-local function isClose(source)
+local function isToBeClosed(source)
     if not source.attrs then
         return false
     end
     for _, attr in ipairs(source.attrs) do
         if attr[1] == 'close' then
+            return true
+        end
+    end
+    return false
+end
+
+local function isDocClass(source)
+    if not source.bindDocs then
+        return false
+    end
+    for _, doc in ipairs(source.bindDocs) do
+        if doc.type == 'doc.class' then
             return true
         end
     end
@@ -61,7 +73,10 @@ return function (uri, callback)
         or name == ast.ENVMode then
             return
         end
-        if isClose(source) then
+        if isToBeClosed(source) then
+            return
+        end
+        if isDocClass(source) then
             return
         end
         local data = hasGet(source)

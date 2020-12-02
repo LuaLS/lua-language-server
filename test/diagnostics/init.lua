@@ -778,3 +778,8 @@ TEST [[
 ---@type
 ---| 'xx'
 ]]
+
+TEST [[
+---@class class
+local t
+]]

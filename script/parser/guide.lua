@@ -1565,8 +1565,9 @@ function m.checkSameSimpleByDoc(status, obj, start, queue, mode)
                 force = true,
             }
         end
-        if mode == 'ref' then
-            m.checkSameSimpleOfRefByDocSource(status, m.getDocState(obj), start, queue, mode)
+        local state = m.getDocState(obj)
+        if state.type == 'doc.type' and mode == 'ref' then
+            m.checkSameSimpleOfRefByDocSource(status, state, start, queue, mode)
         end
         return true
     elseif obj.type == 'doc.field' then

@@ -296,3 +296,9 @@ local <!t!>
 ---@type Class
 local <?x?>
 ]]
+
+-- BUG
+TEST [[
+---@return <?any?>
+function f() end
+]]

@@ -82,23 +82,7 @@ function vm.interface.global(name)
     return vm.getGlobals(name)
 end
 
-local basicTypes = {
-    ['any']           = true,
-    ['nil']           = true,
-    ['boolean']       = true,
-    ['number']        = true,
-    ['integer']       = true,
-    ['thread']        = true,
-    ['table']         = true,
-    ['string']        = true,
-    ['userdata']      = true,
-    ['lightuserdata'] = true,
-    ['function']      = true,
-}
 function vm.interface.docType(name)
-    if basicTypes[name] then
-        return vm.getDocClass(name)
-    end
     await.delay()
     return vm.getDocTypes(name)
 end

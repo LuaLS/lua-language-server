@@ -1442,3 +1442,20 @@ local <?y?>
 [[
 local y: any
 ]]
+
+TEST [[
+---@class Object
+---@field a string
+
+---@type Object[]
+local t
+
+local <?v?> = t[1]
+
+print(v.a)
+]]
+[[
+local v: Object {
+    a: string,
+}
+]]

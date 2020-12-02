@@ -198,6 +198,41 @@ local function loadFileFactory(root, progress, isLibrary)
     end
 end
 
+local function testProgress()
+    local client = require 'provider.client'
+    proto.notify('$/progress', {
+        token = client.info.workDoneToken,
+        value = {
+            kind        = 'begin',
+            title       = '测试标题',
+            cancellable = false,
+            message     = '测试描述',
+            percentage  = 0,
+        }
+    })
+    for i = 1, 100 do
+        await.sleep(0.1)
+        log.info('sleep', i)
+        proto.notify('$/progress', {
+            token = client.info.workDoneToken,
+            value = {
+                kind        = 'report',
+                cancellable = false,
+                message     = '测试描述',
+                percentage  = i,
+            }
+        })
+    end
+    await.sleep(0.1)
+    proto.notify('$/progress', {
+        token = client.info.workDoneToken,
+        value = {
+            kind        = 'end',
+            message     = '测试描述',
+        }
+    })
+end
+
 --- 预读工作区内所有文件
 function m.awaitPreload()
     await.close 'preload'
@@ -232,10 +267,7 @@ function m.awaitPreload()
         await.sleep(0.1)
     end
 
-    --for i = 1, 100 do
-    --    await.sleep(0.1)
-    --    log.info('sleep', i)
-    --end
+    --testProgress()
 
     log.info('Preload finish.')
 

@@ -74,6 +74,9 @@ local function getFieldFast(src)
         end
         return value.type, util.viewLiteral(literal)
     end
+    if value.type == 'doc.field' then
+        return vm.getInferType(value)
+    end
 end
 
 local function getField(src, timeUp, mark, key)

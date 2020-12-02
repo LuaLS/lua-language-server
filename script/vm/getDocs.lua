@@ -84,6 +84,22 @@ function vm.getDocTypes(name)
     return cache
 end
 
+function vm.getDocClass(name)
+    local cache = vm.getCache('getDocClass')[name]
+    if cache ~= nil then
+        return cache
+    end
+    cache = {}
+    local results = getDocTypes(name)
+    for _, doc in ipairs(results) do
+        if doc.type == 'doc.class.name' then
+            cache[#cache+1] = doc
+        end
+    end
+    vm.getCache('getDocClass')[name] = cache
+    return cache
+end
+
 function vm.isMetaFile(uri)
     local status = files.getAst(uri)
     if not status then

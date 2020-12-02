@@ -17,12 +17,13 @@
 ## 1.2.1
 `2020-11-27`
 
-* `NEW` hover shows comments from `---@param` and `---@return`: [#135](https://github.com/sumneko/lua-language-server/issues/135)
 * `FIX` syntaxes tokens: [#272](https://github.com/sumneko/lua-language-server/issues/272)
 
 ## 1.2.0
 `2020-11-27`
 
+* `NEW` hover shows comments from `---@param` and `---@return`: [#135](https://github.com/sumneko/lua-language-server/issues/135)
+* `NEW` support `LuaDoc` as tail comment
 * `FIX` `---@class` inheritance
 * `FIX` missed syntaxes token: `punctuation.definition.parameters.finish.lua`
 

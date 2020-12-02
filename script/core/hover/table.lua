@@ -111,7 +111,7 @@ local function getField(src, timeUp, mark, key)
     return nil
 end
 
-local function buildAsHash(classes, literals)
+local function buildAsHash(classes, literals, reachMax)
     local keys = {}
     for k in pairs(classes) do
         keys[#keys+1] = k
@@ -128,11 +128,14 @@ local function buildAsHash(classes, literals)
             lines[#lines+1] = ('    %s: %s,'):format(key, class)
         end
     end
+    if reachMax then
+        lines[#lines+1] = '    ...'
+    end
     lines[#lines+1] = '}'
     return table.concat(lines, '\n')
 end
 
-local function buildAsConst(classes, literals)
+local function buildAsConst(classes, literals, reachMax)
     local keys = {}
     for k in pairs(classes) do
         keys[#keys+1] = k
@@ -150,6 +153,9 @@ local function buildAsConst(classes, literals)
         else
             lines[#lines+1] = ('    %s: %s,'):format(key, class)
         end
+    end
+    if reachMax then
+        lines[#lines+1] = '    ...'
     end
     lines[#lines+1] = '}'
     return table.concat(lines, '\n')
@@ -195,6 +201,9 @@ local function clearClasses(classes)
 end
 
 return function (source)
+    if config.config.hover.previewFields <= 0 then
+        return 'table'
+    end
     local literals = {}
     local classes = {}
     local clock = os.clock()
@@ -202,6 +211,7 @@ return function (source)
     local mark = {}
     local fields = vm.getFields(source, 0)
     local keyCount = 0
+    local reachMax
     for _, src in ipairs(fields) do
         local key = getKey(src)
         if not key then
@@ -223,7 +233,8 @@ return function (source)
         end
         classes[key][#classes[key]+1] = class
         literals[key][#literals[key]+1] = literal
-        if keyCount >= 1000 then
+        if keyCount >= config.config.hover.previewFields then
+            reachMax = true
             break
         end
         ::CONTINUE::
@@ -249,9 +260,9 @@ return function (source)
     end
     local result
     if intValue then
-        result = buildAsConst(classes, literals)
+        result = buildAsConst(classes, literals, reachMax)
     else
-        result = buildAsHash(classes, literals)
+        result = buildAsHash(classes, literals, reachMax)
     end
     if timeUp then
         result = ('\n--%s\n%s'):format(lang.script.HOVER_TABLE_TIME_UP, result)

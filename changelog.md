@@ -1,5 +1,8 @@
 # changelog
 
+## 1.3.1
+* `NEW` setting `hover.previewFields`: limit how many fields are shown in table hover
+
 ## 1.3.0
 `2020-12-1`
 

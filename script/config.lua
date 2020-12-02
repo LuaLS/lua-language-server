@@ -141,6 +141,7 @@ local ConfigTemplate = {
         viewStringMax   = {1000,      Integer},
         viewNumber      = {true,      Boolean},
         fieldInfer      = {3000,      Integer},
+        previewFields   = {100,       Integer},
     },
     color = {
         mode            = {'Semantic', String},

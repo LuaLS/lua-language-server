@@ -19,7 +19,7 @@ local file = {}
 ---#end
 ---#end
 
----@alias exitcode | '"exit"'|'"signal"'
+---@alias exitcode '"exit"'|'"signal"'
 
 ---#DES 'file:close'
 ---@return boolean?  suc

@@ -329,3 +329,16 @@ local <?x?>
 TEST 'table' [[
 self.<?t?>[#self.t+1] = {}
 ]]
+
+TEST 'string' [[
+---@type string[]
+local x
+local <?y?> = x[1]
+]]
+
+TEST 'string' [[
+---@return string[]
+local function f() end
+local x = f()
+local <?y?> = x[1]
+]]

@@ -14,7 +14,7 @@ function m.offset(lines, text, position)
     if start <= 0 or start > #text then
         return #text + 1
     end
-    local offset = utf8.offset(text, position.character + 1, start)
+    local offset = utf8.offset(text, position.character + 1, start) or (#text + 1)
     return offset - 1
 end
 
@@ -29,7 +29,7 @@ function m.offsetOfWord(lines, text, position)
     if start <= 0 or start > #text then
         return #text + 1
     end
-    local offset = utf8.offset(text, position.character + 1, start)
+    local offset = utf8.offset(text, position.character + 1, start) or (#text + 1)
     if offset > #text
     or text:sub(offset-1, offset):match '[%w_][^%w_]' then
         offset = offset - 1

@@ -1284,27 +1284,6 @@ function m.getNextRef(ref)
             return call
         end
     end
-    -- doc.type.array
-    if ref.type == 'doc.type' then
-        local arrays = {}
-        for _, typeUnit in ipairs(ref.types) do
-            if typeUnit.type == 'doc.type.array' then
-                arrays[#arrays+1] = typeUnit.node
-            end
-        end
-        -- 返回一个 dummy
-        -- TODO 用弱表维护唯一性？
-        return {
-            type    = 'doc.type',
-            start   = ref.start,
-            finish  = ref.finish,
-            types   = arrays,
-            parent  = ref.parent,
-            array   = true,
-            enums   = {},
-            resumes = {},
-        }
-    end
 
     return nil
 end
@@ -1409,18 +1388,17 @@ function m.checkSameSimpleInValueOfCallMetaTable(status, call, start, queue)
 end
 
 function m.checkSameSimpleInSpecialBranch(status, obj, start, queue)
-    if not status.interface.index then
-        return
-    end
-    local results = status.interface.index(obj)
-    if not results then
-        return
-    end
-    for _, res in ipairs(results) do
-        queue[#queue+1] = {
-            obj   = res,
-            start = start + 1,
-        }
+    if status.interface.index then
+        local results = status.interface.index(obj)
+        if not results then
+            return
+        end
+        for _, res in ipairs(results) do
+            queue[#queue+1] = {
+                obj   = res,
+                start = start + 1,
+            }
+        end
     end
 end
 
@@ -1523,10 +1501,10 @@ end
 
 function m.checkSameSimpleByDoc(status, obj, start, queue, mode)
     if obj.type == 'doc.class.name'
-    or obj.type == 'doc.type.name' then
-        obj = m.getDocState(obj)
-    end
-    if obj.type == 'doc.class' then
+    or obj.type == 'doc.class' then
+        if obj.type == 'doc.class.name' then
+            obj = m.getDocState(obj)
+        end
         local classStart
         for _, doc in ipairs(obj.bindGroup) do
             if doc == obj then
@@ -1578,10 +1556,30 @@ function m.checkSameSimpleByDoc(status, obj, start, queue, mode)
             m.checkSameSimpleOfRefByDocSource(status, obj, start, queue, mode)
         end
         return true
+    elseif obj.type == 'doc.type.name' then
+        local pieceResult = stepRefOfDocType(status, obj, 'def')
+        for _, res in ipairs(pieceResult) do
+            queue[#queue+1] = {
+                obj   = res,
+                start = start,
+                force = true,
+            }
+        end
+        if mode == 'ref' then
+            m.checkSameSimpleOfRefByDocSource(status, m.getDocState(obj), start, queue, mode)
+        end
+        return true
     elseif obj.type == 'doc.field' then
         if mode ~= 'field' then
             return m.checkSameSimpleByDoc(status, obj.extends, start, queue, mode)
         end
+    elseif obj.type == 'doc.type.array' then
+        queue[#queue+1] = {
+            obj   = obj.node,
+            start = start + 1,
+            force = true,
+        }
+        return true
     end
 end
 
@@ -3047,30 +3045,6 @@ function m.inferCheckUpDoc(status, source)
     end
 end
 
-function m.inferCheckFieldDoc(status, source)
-    -- 检查 string[] 的情况
-    if source.type == 'getindex' then
-        local node = source.node
-        if not node then
-            return
-        end
-        local newStatus = m.status(status)
-        m.searchInfer(newStatus, node)
-        local ok
-        for _, infer in ipairs(newStatus.results) do
-            local src = infer.source
-            if src.type == 'doc.type.array' then
-                ok = true
-                status.results[#status.results+1] = {
-                    type   = infer.type:gsub('%[%]$', ''),
-                    source = src.node,
-                }
-            end
-        end
-        return ok
-    end
-end
-
 function m.inferCheckUnary(status, source)
     if source.type ~= 'unary' then
         return
@@ -3826,7 +3800,6 @@ function m.searchInfer(status, obj)
 
     local checked = m.inferCheckDoc(status, obj)
                  or m.inferCheckUpDoc(status, obj)
-                 or m.inferCheckFieldDoc(status, obj)
                  or m.inferCheckLiteral(status, obj)
                  or m.inferCheckUnary(status, obj)
                  or m.inferCheckBinary(status, obj)

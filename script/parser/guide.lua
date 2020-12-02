@@ -2551,6 +2551,7 @@ function m.allocInfer(o)
                 type   = o.type[i],
                 value  = o.value,
                 source = o.source,
+                level  = o.level
             }
         end
         return infers
@@ -2752,6 +2753,7 @@ function m.inferCheckLiteralTableWithDocVararg(status, source)
     status.results[#status.results+1] = {
         type   = m.viewInferType(results) .. '[]',
         source = source,
+        level  = 100,
     }
     return true
 end
@@ -2762,6 +2764,7 @@ function m.inferCheckLiteral(status, source)
             type   = 'string',
             value  = source[1],
             source = source,
+            level  = 100,
         }
         return true
     elseif source.type == 'nil' then
@@ -2769,6 +2772,7 @@ function m.inferCheckLiteral(status, source)
             type   = 'nil',
             value  = NIL,
             source = source,
+            level  = 100,
         }
         return true
     elseif source.type == 'boolean' then
@@ -2776,6 +2780,7 @@ function m.inferCheckLiteral(status, source)
             type   = 'boolean',
             value  = source[1],
             source = source,
+            level  = 100,
         }
         return true
     elseif source.type == 'number' then
@@ -2784,6 +2789,7 @@ function m.inferCheckLiteral(status, source)
                 type   = 'integer',
                 value  = source[1],
                 source = source,
+                level  = 100,
             }
             return true
         else
@@ -2791,6 +2797,7 @@ function m.inferCheckLiteral(status, source)
                 type   = 'number',
                 value  = source[1],
                 source = source,
+                level  = 100,
             }
             return true
         end
@@ -2798,6 +2805,7 @@ function m.inferCheckLiteral(status, source)
         status.results = m.allocInfer {
             type   = 'integer',
             source = source,
+            level  = 100,
         }
         return true
     elseif source.type == 'table' then
@@ -2807,18 +2815,21 @@ function m.inferCheckLiteral(status, source)
         status.results = m.allocInfer {
             type   = 'table',
             source = source,
+            level  = 100,
         }
         return true
     elseif source.type == 'function' then
         status.results = m.allocInfer {
             type   = 'function',
             source = source,
+            level  = 100,
         }
         return true
     elseif source.type == '...' then
         status.results = m.allocInfer {
             type   = '...',
             source = source,
+            level  = 100,
         }
         return true
     end
@@ -2882,6 +2893,7 @@ function m.getDocTypeNames(status, doc, genericCallback)
             results[#results+1] = {
                 type   = typeName,
                 source = unit,
+                level  = 100,
             }
         end
     end
@@ -2889,6 +2901,7 @@ function m.getDocTypeNames(status, doc, genericCallback)
         results[#results+1] = {
             type   = enum[1],
             source = enum,
+            level  = 100,
         }
     end
     for _, resume in ipairs(doc.resumes) do
@@ -2896,6 +2909,7 @@ function m.getDocTypeNames(status, doc, genericCallback)
             results[#results+1] = {
                 type   = resume[1],
                 source = resume,
+                level  = 100,
             }
         end
     end
@@ -2907,6 +2921,7 @@ function m.inferCheckDoc(status, source)
         status.results[#status.results+1] = {
             type   = source[1],
             source = source,
+            level  = 100,
         }
         return true
     end
@@ -2914,6 +2929,7 @@ function m.inferCheckDoc(status, source)
         status.results[#status.results+1] = {
             type   = source.class[1],
             source = source,
+            level  = 100,
         }
         return true
     end
@@ -3010,6 +3026,7 @@ function m.inferCheckUpDoc(status, source)
             status.results[#status.results+1] = {
                 type   = doc.class[1],
                 source = doc,
+                level  = 100,
             }
             -- ---@class Class
             -- local x = { field = 1 }
@@ -3018,6 +3035,7 @@ function m.inferCheckUpDoc(status, source)
                 status.results[#status.results+1] = {
                     type   = source.value.type,
                     source = source.value,
+                    level  = 100,
                 }
             end
             return true
@@ -3062,12 +3080,14 @@ function m.inferCheckUnary(status, source)
             type   = 'boolean',
             value  = value,
             source = source,
+            level  = 100,
         }
         return true
     elseif op.type == '#' then
         status.results = m.allocInfer {
             type   = 'integer',
             source = source,
+            level  = 100,
         }
         return true
     elseif op.type == '~' then
@@ -3076,6 +3096,7 @@ function m.inferCheckUnary(status, source)
             type   = 'integer',
             value  = l and ~l or nil,
             source = source,
+            level  = 100,
         }
         return true
     elseif op.type == '-' then
@@ -3085,6 +3106,7 @@ function m.inferCheckUnary(status, source)
                 type   = 'integer',
                 value  = - v,
                 source = source,
+                level  = 100,
             }
             return true
         end
@@ -3093,6 +3115,7 @@ function m.inferCheckUnary(status, source)
             type   = 'number',
             value  = v and -v or nil,
             source = source,
+            level  = 100,
         }
         return true
     end
@@ -3148,6 +3171,7 @@ function m.inferCheckBinary(status, source)
                 type   = 'boolean',
                 value  = value,
                 source = source,
+                level  = 100,
             }
             return true
         end
@@ -3161,6 +3185,7 @@ function m.inferCheckBinary(status, source)
             type   = 'boolean',
             value  = value,
             source = source,
+            level  = 100,
         }
         return true
     elseif op.type == '~=' then
@@ -3170,6 +3195,7 @@ function m.inferCheckBinary(status, source)
                 type   = 'boolean',
                 value  = not value,
                 source = source,
+                level  = 100,
             }
             return true
         end
@@ -3183,6 +3209,7 @@ function m.inferCheckBinary(status, source)
             type   = 'boolean',
             value  = value,
             source = source,
+            level  = 100,
         }
         return true
     elseif op.type == '<=' then
@@ -3198,6 +3225,7 @@ function m.inferCheckBinary(status, source)
             type   = 'boolean',
             value  = v,
             source = source,
+            level  = 100,
         }
         return true
     elseif op.type == '>=' then
@@ -3213,6 +3241,7 @@ function m.inferCheckBinary(status, source)
             type   = 'boolean',
             value  = v,
             source = source,
+            level  = 100,
         }
         return true
     elseif op.type == '<' then
@@ -3228,6 +3257,7 @@ function m.inferCheckBinary(status, source)
             type   = 'boolean',
             value  = v,
             source = source,
+            level  = 100,
         }
         return true
     elseif op.type == '>' then
@@ -3243,6 +3273,7 @@ function m.inferCheckBinary(status, source)
             type   = 'boolean',
             value  = v,
             source = source,
+            level  = 100,
         }
         return true
     elseif op.type == '|' then
@@ -3256,6 +3287,7 @@ function m.inferCheckBinary(status, source)
             type   = 'integer',
             value  = v,
             source = source,
+            level  = 100,
         }
         return true
     elseif op.type == '~' then
@@ -3269,6 +3301,7 @@ function m.inferCheckBinary(status, source)
             type   = 'integer',
             value  = v,
             source = source,
+            level  = 100,
         }
         return true
     elseif op.type == '&' then
@@ -3282,6 +3315,7 @@ function m.inferCheckBinary(status, source)
             type   = 'integer',
             value  = v,
             source = source,
+            level  = 100,
         }
         return true
     elseif op.type == '<<' then
@@ -3295,6 +3329,7 @@ function m.inferCheckBinary(status, source)
             type   = 'integer',
             value  = v,
             source = source,
+            level  = 100,
         }
         return true
     elseif op.type == '>>' then
@@ -3308,6 +3343,7 @@ function m.inferCheckBinary(status, source)
             type   = 'integer',
             value  = v,
             source = source,
+            level  = 100,
         }
         return true
     elseif op.type == '..' then
@@ -3321,6 +3357,7 @@ function m.inferCheckBinary(status, source)
             type   = 'string',
             value  = v,
             source = source,
+            level  = 100,
         }
         return true
     elseif op.type == '^' then
@@ -3336,6 +3373,7 @@ function m.inferCheckBinary(status, source)
             type   = 'number',
             value  = v,
             source = source,
+            level  = 100,
         }
         return true
     elseif op.type == '/' then
@@ -3351,6 +3389,7 @@ function m.inferCheckBinary(status, source)
             type   = 'number',
             value  = v,
             source = source,
+            level  = 100,
         }
         return true
     -- 其他数学运算根据2侧的值决定，当2侧的值均为整数时返回整数
@@ -3360,6 +3399,7 @@ function m.inferCheckBinary(status, source)
             type   = int,
             value  = (v1 and v2) and (v1 + v2) or nil,
             source = source,
+            level  = 100,
         }
         return true
     elseif op.type == '-' then
@@ -3368,6 +3408,7 @@ function m.inferCheckBinary(status, source)
             type   = int,
             value  = (v1 and v2) and (v1 - v2) or nil,
             source = source,
+            level  = 100,
         }
         return true
     elseif op.type == '*' then
@@ -3376,6 +3417,7 @@ function m.inferCheckBinary(status, source)
             type   = int,
             value  = (v1 and v2) and (v1 * v2) or nil,
             source = source,
+            level  = 100,
         }
         return true
     elseif op.type == '%' then
@@ -3384,6 +3426,7 @@ function m.inferCheckBinary(status, source)
             type   = int,
             value  = (v1 and v2) and (v1 % v2) or nil,
             source = source,
+            level  = 100,
         }
         return true
     elseif op.type == '//' then
@@ -3392,6 +3435,7 @@ function m.inferCheckBinary(status, source)
             type   = int,
             value  = (v1 and v2) and (v1 // v2) or nil,
             source = source,
+            level  = 100,
         }
         return true
     end
@@ -3455,9 +3499,6 @@ function m.inferBySet(status, source)
 end
 
 function m.inferByCall(status, source)
-    if #status.results ~= 0 then
-        return
-    end
     if not source.parent then
         return
     end
@@ -3468,15 +3509,13 @@ function m.inferByCall(status, source)
         status.results[#status.results+1] = {
             type   = 'function',
             source = source,
+            level  = 10,
         }
         return
     end
 end
 
 function m.inferByGetTable(status, source)
-    if #status.results ~= 0 then
-        return
-    end
     if source.type == 'field'
     or source.type == 'method' then
         source = source.parent
@@ -3487,21 +3526,29 @@ function m.inferByGetTable(status, source)
     end
     if next.type == 'getfield'
     or next.type == 'getindex'
-    or next.type == 'getmethod'
+    or next.type == 'setmethod'
     or next.type == 'setfield'
-    or next.type == 'setindex'
-    or next.type == 'setmethod' then
+    or next.type == 'setindex' then
         status.results[#status.results+1] = {
             type   = 'table',
             source = source,
+            level  = 10,
+        }
+    elseif next.type == 'getmethod' then
+        status.results[#status.results+1] = {
+            type   = 'table',
+            source = source,
+            level  = 5,
+        }
+        status.results[#status.results+1] = {
+            type   = 'string',
+            source = source,
+            level  = 5,
         }
     end
 end
 
 function m.inferByUnary(status, source)
-    if #status.results ~= 0 then
-        return
-    end
     local parent = source.parent
     if not parent or parent.type ~= 'unary' then
         return
@@ -3510,29 +3557,30 @@ function m.inferByUnary(status, source)
     if op.type == '#' then
         status.results[#status.results+1] = {
             type   = 'string',
-            source = source
+            source = source,
+            level  = 5,
         }
         status.results[#status.results+1] = {
             type   = 'table',
-            source = source
+            source = source,
+            level  = 5,
         }
     elseif op.type == '~' then
         status.results[#status.results+1] = {
             type   = 'integer',
-            source = source
+            source = source,
+            level  = 10,
         }
     elseif op.type == '-' then
         status.results[#status.results+1] = {
             type   = 'number',
-            source = source
+            source = source,
+            level  = 10,
         }
     end
 end
 
 function m.inferByBinary(status, source)
-    if #status.results ~= 0 then
-        return
-    end
     local parent = source.parent
     if not parent or parent.type ~= 'binary' then
         return
@@ -3551,6 +3599,7 @@ function m.inferByBinary(status, source)
         status.results[#status.results+1] = {
             type   = 'number',
             source = source,
+            level  = 10,
         }
     elseif op.type == '|'
     or     op.type == '~'
@@ -3562,11 +3611,13 @@ function m.inferByBinary(status, source)
         status.results[#status.results+1] = {
             type   = 'integer',
             source = source,
+            level  = 10,
         }
     elseif op.type == '..' then
         status.results[#status.results+1] = {
             type   = 'string',
             source = source,
+            level  = 10,
         }
     end
 end
@@ -3664,6 +3715,7 @@ local function mergeFunctionReturns(status, source, index, call)
                     status.results[#status.results+1] = {
                         type   = 'any',
                         source = rtn[index],
+                        level  = 0,
                     }
                 else
                     for _, infer in ipairs(newStatus.results) do
@@ -3749,10 +3801,24 @@ function m.inferByPCallReturn(status, source)
     end
 end
 
-function m.cleanInfers(infers)
+function m.cleanInfers(infers, obj)
+    local level = 0
+    if obj.type ~= 'select' then
+        for i = 1, #infers do
+            local infer = infers[i]
+            if infer.level > level then
+                level = infer.level
+            end
+        end
+    end
     local mark = {}
     for i = #infers, 1, -1 do
         local infer = infers[i]
+        if infer.level < level then
+            infers[i] = infers[#infers]
+            infers[#infers] = nil
+            goto CONTINUE
+        end
         local key = ('%s|%p'):format(infer.type, infer.source)
         if mark[key] then
             infers[i] = infers[#infers]
@@ -3760,6 +3826,7 @@ function m.cleanInfers(infers)
         else
             mark[key] = true
         end
+        ::CONTINUE::
     end
 end
 
@@ -3804,7 +3871,7 @@ function m.searchInfer(status, obj)
                  or m.inferCheckUnary(status, obj)
                  or m.inferCheckBinary(status, obj)
     if checked then
-        m.cleanInfers(status.results)
+        m.cleanInfers(status.results, obj)
         if makeCache then
             makeCache(status.results)
         end
@@ -3821,7 +3888,7 @@ function m.searchInfer(status, obj)
     m.inferByBinary(status, obj)
     m.inferByCallReturn(status, obj)
     m.inferByPCallReturn(status, obj)
-    m.cleanInfers(status.results)
+    m.cleanInfers(status.results, obj)
     if makeCache then
         makeCache(status.results)
     end

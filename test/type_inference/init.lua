@@ -342,3 +342,25 @@ local function f() end
 local x = f()
 local <?y?> = x[1]
 ]]
+
+TEST 'table' [[
+local <?t?>
+print(t.sub())
+]]
+
+TEST 'string|table' [[
+local <?t?>
+print(t:sub())
+]]
+
+TEST 'string' [[
+local <?t?>
+print(t:sub())
+print(t .. 'a')
+]]
+
+TEST 'string' [[
+local <?t?>
+print(#t)
+print(t .. 'a')
+]]

@@ -1748,6 +1748,8 @@ zz$
 ```lua
 global zzz: integer = 1
 ```
+---
+
  abc]],
     }
 }

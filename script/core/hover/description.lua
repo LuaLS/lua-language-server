@@ -196,7 +196,7 @@ local function getBindParamComments(source, bindDocs)
     for _, doc in ipairs(bindDocs) do
         if doc.type == 'doc.param' then
             if doc.comment then
-                comments[#comments+1] = ('@*param* `%s` -- %s'):format(
+                comments[#comments+1] = ('@*param* `%s` — %s'):format(
                     doc.param[1],
                     doc.comment.text
                 )
@@ -222,7 +222,7 @@ local function getBindReturnComments(source, bindDocs)
                 index = index + 1
                 if doc.comment then
                     local name = rtn.name and rtn.name[1] or ('#' .. index)
-                    comments[#comments+1] = ('@*return* `%s` -- %s'):format(
+                    comments[#comments+1] = ('@*return* `%s` — %s'):format(
                         name,
                         doc.comment.text
                     )
@@ -244,7 +244,11 @@ local function tryDocComment(source)
     local params  = getBindParamComments(source, source.bindDocs)
     local returns = getBindReturnComments(source, source.bindDocs)
     local enums   = getBindEnums(source, source.bindDocs)
+    if not comment and not params and not returns and not enums then
+        return
+    end
     local md = markdown()
+    md:add('md', "---")
     if comment then
         md:add('md', comment)
     end

@@ -569,7 +569,6 @@ function f()
 @*return* — comment]]
 }}
 
-
 TEST {{ path = 'a.lua', content = '', }, {
     path = 'b.lua',
     content = [[
@@ -585,4 +584,23 @@ function f()
   2. string]],
     name = 'f',
     description = nil
+}}
+
+TEST {{ path = 'a.lua', content = '', }, {
+    path = 'b.lua',
+    content = [[
+        ---comment1
+        ---comment2
+        function <?f?>() end
+    ]]
+},
+hover = {
+    label = "function f()",
+    name = 'f',
+    description =  [[
+---
+
+comment1
+
+comment2]]
 }}

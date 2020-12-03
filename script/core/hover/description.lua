@@ -190,10 +190,10 @@ end
 local function getFunctionComment(source)
     local docGroup = source.bindDocs
 
-    local has_return_comment = false
+    local hasReturnComment = false
     for _, doc in ipairs(docGroup) do
         if doc.type == 'doc.return' and doc.comment then
-            has_return_comment = true
+            hasReturnComment = true
             break
         end
     end
@@ -210,7 +210,7 @@ local function getFunctionComment(source)
                 )
             end
         elseif doc.type == 'doc.return' then
-            if has_return_comment then
+            if hasReturnComment then
                 local name = {}
                 for _, rtn in ipairs(doc.returns) do
                     if rtn.name then
@@ -235,7 +235,7 @@ local function getFunctionComment(source)
     end
     comments = table.concat(comments, "\n\n")
 
-    local enums   = getBindEnums(source, docGroup)
+    local enums = getBindEnums(source, docGroup)
     if comments == "" and not enums then
         return
     end

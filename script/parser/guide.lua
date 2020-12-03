@@ -927,6 +927,9 @@ local function stepRefOfLabel(label, mode)
         return results
     end
     local refs = label.ref
+    if not refs then
+        return results
+    end
     for i = 1, #refs do
         local ref = refs[i]
         results[#results+1] = ref

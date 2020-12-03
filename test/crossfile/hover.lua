@@ -481,7 +481,7 @@ function f(x: string, y: table)
 
 @*return* `name` — comment 2
 
-@*return* `#2` — comment 3]],
+@*return* — comment 3]],
     }
 }
 

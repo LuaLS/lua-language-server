@@ -187,81 +187,81 @@ local function tryDocFieldUpComment(source)
     return comment
 end
 
-local function getBindParamComments(source, bindDocs)
-    if not isFunction(source) then
-        return
+local function getFunctionComment(source)
+    local docGroup = source.bindDocs
+
+    local has_return_comment = false
+    for _, doc in ipairs(docGroup) do
+        if doc.type == 'doc.return' and doc.comment then
+            has_return_comment = true
+            break
+        end
     end
 
     local comments = {}
-    for _, doc in ipairs(bindDocs) do
-        if doc.type == 'doc.param' then
+    for _, doc in ipairs(docGroup) do
+        if doc.type == 'doc.comment' then
+            comments[#comments+1] = doc.comment.text:sub(2)
+        elseif doc.type == 'doc.param' then
             if doc.comment then
                 comments[#comments+1] = ('@*param* `%s` — %s'):format(
                     doc.param[1],
                     doc.comment.text
                 )
             end
-        end
-    end
-    if #comments == 0 then
-        return nil
-    end
-    return table.concat(comments, '\n\n')
-end
-
-local function getBindReturnComments(source, bindDocs)
-    if not isFunction(source) then
-        return
-    end
-
-    local comments = {}
-    local index = 0
-    for _, doc in ipairs(bindDocs) do
-        if doc.type == 'doc.return' then
-            for _, rtn in ipairs(doc.returns) do
-                index = index + 1
-                if doc.comment then
-                    local name = rtn.name and rtn.name[1] or ('#' .. index)
+        elseif doc.type == 'doc.return' then
+            if has_return_comment and doc.comment then
+                local name = {}
+                for _, rtn in ipairs(doc.returns) do
+                    if rtn.name then
+                        name[#name+1] = rtn.name[1]
+                    end
+                end
+                if #name == 0 then
+                    comments[#comments+1] = ('@*return* — %s'):format(
+                        doc.comment.text
+                    )
+                else
                     comments[#comments+1] = ('@*return* `%s` — %s'):format(
-                        name,
+                        table.concat(name, ','),
                         doc.comment.text
                     )
                 end
             end
         end
     end
-    if #comments == 0 then
-        return nil
+    comments = table.concat(comments, "\n\n")
+
+    local enums   = getBindEnums(source, docGroup)
+    if comments == "" and not enums then
+        return
     end
-    return table.concat(comments, '\n\n')
+    local md = markdown()
+    md:add('md', "---")
+    if comments ~= "" then
+        md:add('md', comments)
+    end
+    if enums then
+        md:add('lua', enums)
+    end
+    return md:string()
 end
 
 local function tryDocComment(source)
     if not source.bindDocs then
         return
     end
-    local comment = getBindComment(source, source.bindDocs)
-    local params  = getBindParamComments(source, source.bindDocs)
-    local returns = getBindReturnComments(source, source.bindDocs)
-    local enums   = getBindEnums(source, source.bindDocs)
-    if not comment and not params and not returns and not enums then
-        return
-    end
-    local md = markdown()
-    md:add('md', "---")
-    if comment then
+    if not isFunction(source) then
+        local comment = getBindComment(source, source.bindDocs)
+        if not comment then
+            return
+        end
+        local md = markdown()
+        md:add('md', "---")
         md:add('md', comment)
+        return md:string()
     end
-    if params then
-        md:add('md', params)
-    end
-    if returns then
-        md:add('md', returns)
-    end
-    if enums then
-        md:add('lua', enums)
-    end
-    return md:string()
+    return getFunctionComment(source)
 end
 
 local function tryDocOverloadToComment(source)

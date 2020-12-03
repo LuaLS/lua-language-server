@@ -105,6 +105,15 @@ Care['doc.tailcomment'] = function (source, results)
         type   = define.TokenTypes.comment,
     }
 end
+Care['doc.type.name'] = function (source, results)
+    if source.typeGeneric then
+        results[#results+1] = {
+            start  = source.start,
+            finish = source.finish,
+            type   = define.TokenTypes.macro,
+        }
+    end
+end
 
 local function buildTokens(results, text, lines)
     local tokens = {}

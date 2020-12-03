@@ -5,6 +5,7 @@
 * `NEW` fully supports `---@type Object[]`
 * `CHG` resolves infer of `string|table`
 * `CHG` `unused-local` ignores local with `---@class`
+* `CHG` locale file format changes to `lua`
 
 ## 1.3.0
 `2020-12-1`

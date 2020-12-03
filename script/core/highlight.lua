@@ -12,6 +12,9 @@ local function eachRef(source, callback)
 end
 
 local function eachField(source, callback)
+    if not source then
+        return
+    end
     local isGlobal = guide.isGlobal(source)
     local results = guide.requestReference(source)
     for i = 1, #results do
@@ -51,6 +54,7 @@ local function find(source, uri, callback)
     or     source.type == 'label' then
         eachRef(source, callback)
     elseif source.type == 'string'
+    and    source.parent
     and    source.parent.index == source then
         eachField(source.parent, callback)
     elseif source.type == 'string'

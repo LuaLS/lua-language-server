@@ -1,6 +1,6 @@
-local fs   = require 'bee.filesystem'
-local lni  = require 'lni'
-local util = require 'utility'
+local fs      = require 'bee.filesystem'
+local util    = require 'utility'
+local lloader = require 'locale-loader'
 
 local function supportLanguage()
     local list = {}
@@ -32,12 +32,12 @@ local function getLanguage(id)
 end
 
 local function loadFileByLanguage(name, language)
-    local path = ROOT / 'locale' / language / (name .. '.lni')
+    local path = ROOT / 'locale' / language / (name .. '.lua')
     local buf = util.loadFile(path:string())
     if not buf then
         return {}
     end
-    local suc, tbl = xpcall(lni, log.error, buf, path:string())
+    local suc, tbl = xpcall(lloader, log.error, buf, path:string())
     if not suc then
         return {}
     end

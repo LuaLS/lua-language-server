@@ -1,9 +1,9 @@
-local lni    = require 'lni'
-local fs     = require 'bee.filesystem'
-local config = require 'config'
-local util   = require 'utility'
-local lang   = require 'language'
-local client = require 'provider.client'
+local fs      = require 'bee.filesystem'
+local config  = require 'config'
+local util    = require 'utility'
+local lang    = require 'language'
+local client  = require 'provider.client'
+local lloader = require 'locale-loader'
 
 local m = {}
 
@@ -152,10 +152,10 @@ end
 
 local function loadMetaLocale(langID, result)
     result = result or {}
-    local path = (ROOT / 'locale' / langID / 'meta.lni'):string()
-    local lniContent = util.loadFile(path)
-    if lniContent then
-        xpcall(lni, log.error, lniContent, path, {result})
+    local path = (ROOT / 'locale' / langID / 'meta.lua'):string()
+    local localeContent = util.loadFile(path)
+    if localeContent then
+        xpcall(lloader, log.error, localeContent, path, result)
     end
     return result
 end

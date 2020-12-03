@@ -1,6 +1,7 @@
 # changelog
 
 ## 1.4.0
+`2020-12-3`
 * `NEW` setting `hover.previewFields`: limit how many fields are shown in table hover
 * `NEW` fully supports `---@type Object[]`
 * `NEW` supports `---@see`

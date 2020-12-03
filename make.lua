@@ -13,17 +13,6 @@ lm:import '3rd/bee.lua/make.lua'
 
 lm.rootdir = '3rd/'
 
-lm:shared_library 'lni' {
-    deps = platform.OS == "Windows" and "lua54" or "lua",
-    sources = {
-        'lni/src/main.cpp',
-    },
-    links = {
-        platform.OS == "Linux" and "stdc++",
-    },
-    visibility = 'default',
-}
-
 lm:shared_library 'lpeglabel' {
     deps = platform.OS == "Windows" and "lua54" or "lua",
     sources = 'lpeglabel/*.c',
@@ -52,7 +41,6 @@ lm:build 'install' {
     '$luamake', 'lua', 'make/install.lua', lm.plat,
     deps = {
         'lua',
-        'lni',
         'lpeglabel',
         'bee',
         'bootstrap',

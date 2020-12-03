@@ -24,7 +24,6 @@ local function loadAllLibs()
     assert(require 'bee.subprocess')
     assert(require 'bee.thread')
     assert(require 'bee.socket')
-    assert(require 'lni')
     assert(require 'lpeglabel')
 end
 

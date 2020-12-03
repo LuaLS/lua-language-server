@@ -10,7 +10,6 @@ local exe = platform == 'msvc' and ".exe" or ""
 local dll = platform == 'msvc' and ".dll" or ".so"
 
 fs.create_directories(output)
-fs.copy_file(bindir / 'lni'..dll,       output / 'lni'..dll, true)
 fs.copy_file(bindir / 'lpeglabel'..dll, output / 'lpeglabel'..dll, true)
 fs.copy_file(bindir / 'bee'..dll,       output / 'bee'..dll, true)
 fs.copy_file(bindir / 'lua'..exe,       output / 'lua-language-server'..exe, true)

@@ -210,22 +210,25 @@ local function getFunctionComment(source)
                 )
             end
         elseif doc.type == 'doc.return' then
-            if has_return_comment and doc.comment then
+            if has_return_comment then
                 local name = {}
                 for _, rtn in ipairs(doc.returns) do
                     if rtn.name then
                         name[#name+1] = rtn.name[1]
                     end
                 end
-                if #name == 0 then
-                    comments[#comments+1] = ('@*return* — %s'):format(
-                        doc.comment.text
-                    )
+                if doc.comment then
+                    if #name == 0 then
+                        comments[#comments+1] = ('@*return* — %s'):format(doc.comment.text)
+                    else
+                        comments[#comments+1] = ('@*return* `%s` — %s'):format(table.concat(name, ','), doc.comment.text)
+                    end
                 else
-                    comments[#comments+1] = ('@*return* `%s` — %s'):format(
-                        table.concat(name, ','),
-                        doc.comment.text
-                    )
+                    if #name == 0 then
+                        comments[#comments+1] = '@*return*'
+                    else
+                        comments[#comments+1] = ('@*return* `%s`'):format(table.concat(name, ','))
+                    end
                 end
             end
         end

@@ -485,23 +485,104 @@ function f(x: string, y: table)
     }
 }
 
-TEST {
-    {
-        path = 'a.lua',
-        content = '',
-    },
-    {
-        path = 'b.lua',
-        content = [[
+TEST {{ path = 'a.lua', content = '', }, {
+    path = 'b.lua',
+    content = [[
 ---Comment
 ---@param x string
 ---@return string # this is comment
 function f(<?x?>) end
         ]]
-    },
-    hover = {
-        label = [[local x: string]],
-        name  = 'x',
-        description = nil,
-    }
-}
+},
+hover = {
+    label = [[local x: string]],
+    name  = 'x',
+    description = nil,
+}}
+
+
+TEST {{ path = 'a.lua', content = '', }, {
+    path = 'b.lua',
+    content = [[
+            ---comment1
+            ---@param arg1 integer
+            ---@param arg2 integer comment2
+            ---@return boolean
+            ---comment3
+            function <?f?>(arg1, arg2) end
+    ]]
+},
+hover = {
+    label = [[
+function f(arg1: integer, arg2: integer)
+  -> boolean]],
+    name = 'f',
+    description = [[
+---
+
+comment1
+
+@*param* `arg2` — comment2
+
+comment3]]
+}}
+
+
+TEST {{ path = 'a.lua', content = '', }, {
+    path = 'b.lua',
+    content = [[
+            ---@return boolean, string #comment
+            function <?f?>() end
+    ]]
+},
+hover = {
+    label = [[
+function f()
+  -> boolean
+  2. string]],
+    name = 'f',
+    description = [[
+---
+
+@*return* — comment]]
+}}
+
+TEST {{ path = 'a.lua', content = '', }, {
+    path = 'b.lua',
+    content = [[
+        ---@return boolean
+        ---@return string #comment
+        function <?f?>() end
+    ]]
+},
+hover = {
+    label = [[
+function f()
+  -> boolean
+  2. string]],
+    name = 'f',
+    description = [[
+---
+
+@*return*
+
+@*return* — comment]]
+}}
+
+
+TEST {{ path = 'a.lua', content = '', }, {
+    path = 'b.lua',
+    content = [[
+        ---@return boolean
+        ---@return string
+        function <?f?>() end
+    ]]
+},
+hover = {
+    label = [[
+function f()
+  -> boolean
+  2. string]],
+    name = 'f',
+    description = nil
+}}

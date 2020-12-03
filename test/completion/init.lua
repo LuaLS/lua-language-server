@@ -1893,3 +1893,10 @@ TEST [[
 if type(arg) == $
 ]]
 (EXISTS)
+
+TEST [[
+---@type string
+local s
+s.$
+]]
+(EXISTS)

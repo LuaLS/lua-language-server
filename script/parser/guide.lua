@@ -2075,9 +2075,23 @@ function m.checkSameSimpleAsSetValue(status, ref, start, queue)
     end
 end
 
+local function hasTypeName(doc, name)
+    if doc.type ~= 'doc.type' then
+        return false
+    end
+    for _, tunit in ipairs(doc.types) do
+        if  tunit.type == 'doc.type.name'
+        and tunit[1] == name then
+            return true
+        end
+    end
+    return false
+end
+
 function m.checkSameSimpleInString(status, ref, start, queue, mode)
     -- 特殊处理 ('xxx').xxx 的形式
-    if ref.type ~= 'string' then
+    if  ref.type ~= 'string'
+    and not hasTypeName(ref, 'string') then
         return
     end
     if not status.interface.docType then
@@ -2241,6 +2255,8 @@ function m.checkSameSimple(status, simple, data, mode, queue)
         -- 检查 doc
         local skipInfer = m.checkSameSimpleByBindDocs(status, ref, i, queue, cmode)
                     or    m.checkSameSimpleByDoc(status, ref, i, queue, cmode)
+        -- 检查自己是字符串的分支情况
+        m.checkSameSimpleInString(status, ref, i, queue, cmode)
         if not skipInfer then
             -- 穿透 self:func 与 mt:func
             m.searchSameFieldsCrossMethod(status, ref, i, queue)
@@ -2254,8 +2270,6 @@ function m.checkSameSimple(status, simple, data, mode, queue)
             m.checkSameSimpleInValueOfCallMetaTable(status, ref, i, queue)
             -- 检查自己是特殊变量的分支的情况
             m.checkSameSimpleInSpecialBranch(status, ref, i, queue)
-            -- 检查自己是字面量字符串的分支情况
-            m.checkSameSimpleInString(status, ref, i, queue, cmode)
             if cmode == 'ref' then
                 -- 检查形如 { a = f } 的情况
                 m.checkSameSimpleAsTableField(status, ref, i, queue)

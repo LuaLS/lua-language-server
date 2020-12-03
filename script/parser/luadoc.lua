@@ -55,6 +55,7 @@ Symbol              <-  ({} {
                         /   '?'
                         /   '...'
                         /   '+'
+                        /   '#'
                         } {})
                     ->  Symbol
 ]], {
@@ -802,6 +803,24 @@ local function parseVersion()
     return result
 end
 
+local function parseSee()
+    local result = {
+        type     = 'doc.see',
+    }
+    result.name = parseName('doc.see.name', result)
+    if not result.name then
+        return nil
+    end
+    result.start = result.name.start
+    result.finish = result.name.finish
+    if checkToken('symbol', '#', 1) then
+        nextToken()
+        result.field = parseName('doc.see.field', result)
+        result.finish = getFinish()
+    end
+    return result
+end
+
 local function convertTokens()
     local tp, text = nextToken()
     if not tp then
@@ -839,6 +858,8 @@ local function convertTokens()
         return parseMeta()
     elseif text == 'version' then
         return parseVersion()
+    elseif text == 'see' then
+        return parseSee()
     end
 end
 

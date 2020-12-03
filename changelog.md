@@ -3,6 +3,7 @@
 ## 1.4.0
 * `NEW` setting `hover.previewFields`: limit how many fields are shown in table hover
 * `NEW` fully supports `---@type Object[]`
+* `NEW` supports `---@see`
 * `CHG` resolves infer of `string|table`
 * `CHG` `unused-local` ignores local with `---@class`
 * `CHG` locale file format changes to `lua`

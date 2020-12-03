@@ -138,8 +138,16 @@ local y
 y.<?a?>
 ]]
 
--- TODO
-do return end
+TEST [[
+---@class <!loli!>
+local <!unit!>
+
+function unit:pants()
+end
+
+---@see <?loli?>
+]]
+
 TEST [[
 ---@class loli
 local unit

@@ -48,6 +48,8 @@ local accept = {
     ['doc.class.name']   = true,
     ['doc.extends.name'] = true,
     ['doc.alias.name']   = true,
+    ['doc.see.name']     = true,
+    ['doc.see.field']    = true,
 }
 
 local function checkRequire(source, offset)
@@ -135,7 +137,8 @@ return function (uri, offset)
         end
         if  src.type == 'doc.class.name'
         and source.type ~= 'doc.type.name'
-        and source.type ~= 'doc.extends.name' then
+        and source.type ~= 'doc.extends.name'
+        and source.type ~= 'doc.see.name' then
             goto CONTINUE
         end
         results[#results+1] = {

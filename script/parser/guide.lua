@@ -96,6 +96,7 @@ m.childMap = {
     ['doc.type.table']     = {'key', 'value', 'comment'},
     ['doc.type.function']  = {'#args', '#returns', 'comment'},
     ['doc.overload']       = {'overload', 'comment'},
+    ['doc.see']            = {'name', 'field'},
 }
 
 m.actionMap = {
@@ -764,7 +765,8 @@ function m.getKeyName(obj)
     or     tp == 'tableindex' then
         return m.getKeyNameOfLiteral(obj.index)
     elseif tp == 'field'
-    or     tp == 'method' then
+    or     tp == 'method'
+    or     tp == 'doc.see.field' then
         return 's|' .. obj[1]
     elseif tp == 'doc.class' then
         return 's|' .. obj.class[1]
@@ -789,7 +791,8 @@ function m.getSimpleName(obj)
     elseif obj.type == 'string' then
         return ('z|%p'):format(obj)
     elseif obj.type == 'doc.class.name'
-    or     obj.type == 'doc.type.name' then
+    or     obj.type == 'doc.type.name'
+    or     obj.type == 'doc.see.name' then
         return ('c|%s'):format(obj[1])
     elseif obj.type == 'doc.class' then
         return ('c|%s'):format(obj.class[1])
@@ -936,7 +939,8 @@ local function stepRefOfDocType(status, obj, mode)
     if obj.type == 'doc.class.name'
     or obj.type == 'doc.type.name'
     or obj.type == 'doc.alias.name'
-    or obj.type == 'doc.extends.name' then
+    or obj.type == 'doc.extends.name'
+    or obj.type == 'doc.see.name' then
         local name = obj[1]
         if not name or not status.interface.docType then
             return results
@@ -1129,9 +1133,13 @@ local function buildSimpleList(obj, max)
             break
         elseif cur.type == 'doc.class.name'
         or     cur.type == 'doc.type.name'
-        or     cur.type == 'doc.class' then
+        or     cur.type == 'doc.class'
+        or     cur.type == 'doc.see.name' then
             list[i] = cur
             break
+        elseif cur.type == 'doc.see.field' then
+            list[i] = cur
+            cur = cur.parent.name
         elseif cur.type == 'function'
         or     cur.type == 'main' then
             break
@@ -1162,7 +1170,9 @@ function m.getSimple(obj, max)
     or obj.type == 'string'
     or obj.type == 'doc.class.name'
     or obj.type == 'doc.class'
-    or obj.type == 'doc.type.name' then
+    or obj.type == 'doc.type.name'
+    or obj.type == 'doc.see.name'
+    or obj.type == 'doc.see.field' then
         simpleList = buildSimpleList(obj, max)
     elseif obj.type == 'field'
     or     obj.type == 'method' then
@@ -1556,7 +1566,8 @@ function m.checkSameSimpleByDoc(status, obj, start, queue, mode)
             m.checkSameSimpleOfRefByDocSource(status, obj, start, queue, mode)
         end
         return true
-    elseif obj.type == 'doc.type.name' then
+    elseif obj.type == 'doc.type.name'
+    or     obj.type == 'doc.see.name' then
         local pieceResult = stepRefOfDocType(status, obj, 'def')
         for _, res in ipairs(pieceResult) do
             queue[#queue+1] = {

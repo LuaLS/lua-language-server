@@ -1156,6 +1156,7 @@ local function tryLuaDocCate(line, results)
         'deprecated',
         'meta',
         'version',
+        'see',
     } do
         if matchKey(word, docType) then
             results[#results+1] = {

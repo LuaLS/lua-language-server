@@ -1477,15 +1477,15 @@ local v: Object {
 }
 ]]
 
---TEST [[
------@class C
------@field x string
---local t
---
---local <?v?> = assert(t)
---]]
---[[
---local v: C {
---    x: string,
---}
---]]
+TEST [[
+---@class C
+---@field x string
+local t
+
+local <?v?> = assert(t)
+]]
+[[
+local v: C {
+    x: string,
+}
+]]

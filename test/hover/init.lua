@@ -1476,3 +1476,16 @@ local v: Object {
     a: string,
 }
 ]]
+
+--TEST [[
+-----@class C
+-----@field x string
+--local t
+--
+--local <?v?> = assert(t)
+--]]
+--[[
+--local v: C {
+--    x: string,
+--}
+--]]

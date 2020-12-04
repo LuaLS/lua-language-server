@@ -1418,7 +1418,41 @@ function m.checkSameSimpleInSpecialBranch(status, obj, start, queue)
     end
 end
 
-function m.checkSameSimpleByDocType(status, doc)
+local function stepRefOfGeneric(status, typeUnit, args, mode)
+    if not args then
+        return nil
+    end
+    local results = {}
+    local myName = typeUnit[1]
+    for _, typeName in ipairs(typeUnit.typeGeneric[myName]) do
+        if typeName == typeUnit then
+            goto CONTINUE
+        end
+        local doc = m.getDocState(typeName)
+        if doc.type ~= 'doc.param' then
+            goto CONTINUE
+        end
+        if not doc.bindSources then
+            goto CONTINUE
+        end
+        local paramName = doc.param[1]
+        for _, source in ipairs(doc.bindSources) do
+            if  source.type == 'local'
+            and source[1] == paramName
+            and source.parent.type == 'funcargs' then
+                for index, arg in ipairs(source.parent) do
+                    if arg == source then
+                        results[#results+1] = args[index]
+                    end
+                end
+            end
+        end
+        ::CONTINUE::
+    end
+    return results
+end
+
+function m.checkSameSimpleByDocType(status, doc, args)
     if status.cache.searchingBindedDoc then
         return
     end
@@ -1427,9 +1461,16 @@ function m.checkSameSimpleByDocType(status, doc)
     end
     local results = {}
     for _, piece in ipairs(doc.types) do
-        local pieceResult = stepRefOfDocType(status, piece, 'def')
-        for _, res in ipairs(pieceResult) do
-            results[#results+1] = res
+        if piece.typeGeneric then
+            local pieceResult = stepRefOfGeneric(status, piece, args, 'def')
+            for _, res in ipairs(pieceResult) do
+                results[#results+1] = res
+            end
+        else
+            local pieceResult = stepRefOfDocType(status, piece, 'def')
+            for _, res in ipairs(pieceResult) do
+                results[#results+1] = res
+            end
         end
     end
     return results
@@ -1703,7 +1744,7 @@ function m.searchSameFieldsCrossMethod(status, ref, start, queue)
     end
 end
 
-local function checkSameSimpleAndMergeFunctionReturnsByDoc(status, results, source, index, call)
+local function checkSameSimpleAndMergeFunctionReturnsByDoc(status, results, source, index, args)
     if not source or source.type ~= 'function' then
         return
     end
@@ -1722,7 +1763,7 @@ local function checkSameSimpleAndMergeFunctionReturnsByDoc(status, results, sour
     if not rtn then
         return
     end
-    local types = m.checkSameSimpleByDocType(status, rtn)
+    local types = m.checkSameSimpleByDocType(status, rtn, args)
     if not types then
         return
     end
@@ -1765,7 +1806,7 @@ function m.checkSameSimpleInCallInSameFile(status, func, args, index)
     m.searchRefs(newStatus, func, 'def')
     for _, def in ipairs(newStatus.results) do
         local hasDocReturn = checkSameSimpleAndMergeDocTypeFunctionReturns(status, results, def, index)
-                        or   checkSameSimpleAndMergeFunctionReturnsByDoc(status, results, def, index)
+                        or   checkSameSimpleAndMergeFunctionReturnsByDoc(status, results, def, index, args)
         if not hasDocReturn then
             local value = m.getObjectValue(def) or def
             if value.type == 'function' then
@@ -2157,6 +2198,11 @@ function m.pushResult(status, mode, ref, simple)
                 results[#results+1] = ref
             end
         end
+        if  m.isLiteral(ref)
+        and ref.parent.type == 'callargs'
+        and ref ~= simple.node then
+            results[#results+1] = ref
+        end
     elseif mode == 'ref' then
         if ref.type == 'setfield'
         or ref.type == 'getfield'
@@ -2190,6 +2236,11 @@ function m.pushResult(status, mode, ref, simple)
             results[#results+1] = ref
         end
         if ref.parent and ref.parent.type == 'return' then
+            results[#results+1] = ref
+        end
+        if  m.isLiteral(ref)
+        and ref.parent.type == 'callargs'
+        and ref ~= simple.node then
             results[#results+1] = ref
         end
     elseif mode == 'field' then
@@ -2644,6 +2695,7 @@ function m.viewInferType(infers)
     local mark = {}
     local types = {}
     local hasDoc
+    local generic
     for i = 1, #infers do
         local infer = infers[i]
         local src = infer.source
@@ -2652,7 +2704,10 @@ function m.viewInferType(infers)
         or src.type == 'doc.type.name'
         or src.type == 'doc.type.array'
         or src.type == 'doc.type.generic' then
-            if infer.type ~= 'any' then
+            if src.typeGeneric then
+                generic = infer
+            end
+            if infer.type ~= 'any' and not src.typeGeneric then
                 hasDoc = true
                 break
             end
@@ -2678,12 +2733,20 @@ function m.viewInferType(infers)
         end
     else
         for i = 1, #infers do
-            local tp = infers[i].type or 'any'
+            local infer = infers[i]
+            if infer.source.typeGeneric then
+                goto CONTINUE
+            end
+            local tp = infer.type or 'any'
             if not mark[tp] then
                 types[#types+1] = tp
             end
             mark[tp] = true
+            ::CONTINUE::
         end
+    end
+    if #types == 0 and generic then
+        types[#types+1] = generic.type
     end
     return m.mergeTypes(types)
 end
@@ -2882,33 +2945,28 @@ local function getDocAliasExtends(status, typeUnit)
     return nil
 end
 
-local function getDocTypeUnitName(status, unit, genericCallback)
+local function getDocTypeUnitName(status, unit)
     local typeName
     if unit.type == 'doc.type.name' then
         typeName = unit[1]
     elseif unit.type == 'doc.type.function' then
         typeName = 'function'
     elseif unit.type == 'doc.type.array' then
-        typeName = getDocTypeUnitName(status, unit.node, genericCallback) .. '[]'
+        typeName = getDocTypeUnitName(status, unit.node) .. '[]'
     elseif unit.type == 'doc.type.generic' then
         typeName = ('%s<%s, %s>'):format(
-            getDocTypeUnitName(status, unit.node,  genericCallback),
-            m.viewInferType(m.getDocTypeNames(status, unit.key,   genericCallback)),
-            m.viewInferType(m.getDocTypeNames(status, unit.value, genericCallback))
+            getDocTypeUnitName(status, unit.node),
+            m.viewInferType(m.getDocTypeNames(status, unit.key)),
+            m.viewInferType(m.getDocTypeNames(status, unit.value))
         )
     end
     if unit.typeGeneric then
-        if genericCallback then
-            typeName = genericCallback(typeName, unit)
-                    or ('<%s>'):format(typeName)
-        else
-            typeName = ('<%s>'):format(typeName)
-        end
+        typeName = ('<%s>'):format(typeName)
     end
     return typeName
 end
 
-function m.getDocTypeNames(status, doc, genericCallback)
+function m.getDocTypeNames(status, doc)
     local results = {}
     if not doc then
         return results
@@ -2916,12 +2974,12 @@ function m.getDocTypeNames(status, doc, genericCallback)
     for _, unit in ipairs(doc.types) do
         local alias = getDocAliasExtends(status, unit)
         if alias then
-            local aliasResults = m.getDocTypeNames(status, alias, genericCallback)
+            local aliasResults = m.getDocTypeNames(status, alias)
             for _, res in ipairs(aliasResults) do
                 results[#results+1] = res
             end
         else
-            local typeName = getDocTypeUnitName(status, unit, genericCallback)
+            local typeName = getDocTypeUnitName(status, unit)
             results[#results+1] = {
                 type   = typeName,
                 source = unit,
@@ -3673,31 +3731,7 @@ local function mergeFunctionReturnsByDoc(status, source, index, call)
     if not rtn then
         return
     end
-    local results = m.getDocTypeNames(status, rtn, function (typeName, typeUnit)
-        if not source.args or not call.args then
-            return
-        end
-        local name = typeUnit[1]
-        local generics = typeUnit.typeGeneric[name]
-        if not generics then
-            return
-        end
-        local first = generics[1]
-        if not first or first == typeUnit then
-            return
-        end
-        local docParam = m.getParentType(first, 'doc.param')
-        local paramName = docParam.param[1]
-        for i, arg in ipairs(source.args) do
-            if arg[1] == paramName then
-                local callArg = call.args[i]
-                if not callArg then
-                    return
-                end
-                return m.viewInferType(m.searchInfer(status, callArg))
-            end
-        end
-    end)
+    local results = m.getDocTypeNames(status, rtn)
     if #results == 0 then
         return
     end

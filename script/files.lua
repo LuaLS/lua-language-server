@@ -242,7 +242,8 @@ function m.compileAst(uri, text)
         , 'lua'
         , config.config.runtime.version
         , {
-            special = config.config.runtime.special,
+            special     = config.config.runtime.special,
+            unicodeName = config.config.runtime.unicodeName,
         }
     )
     local passed = os.clock() - clock

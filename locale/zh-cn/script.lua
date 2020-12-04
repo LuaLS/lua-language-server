@@ -96,6 +96,7 @@ PARSER_MISS_END         = '缺少对应的`end`。'
 PARSER_ERR_COMMENT_PREFIX = 'Lua应使用`--`来进行注释。'
 PARSER_MISS_SEP_IN_TABLE = '需要用`,`或`;`进行分割。'
 PARSER_SET_CONST         = '不能对常量赋值。'
+PARSER_UNICODE_NAME      = '包含了 Unicode 字符。'
 
 PARSER_LUADOC_MISS_CLASS_NAME           = '缺少类名称。'
 PARSER_LUADOC_MISS_EXTENDS_SYMBOL       = '缺少符号 `:`。'

@@ -1,5 +1,8 @@
 # changelog
 
+## 1.5.0
+* `NEW` setting `runtime.unicodeName`
+
 ## 1.4.0
 `2020-12-3`
 * `NEW` setting `hover.previewFields`: limit how many fields are shown in table hover

@@ -562,6 +562,13 @@ local Defs = {
                 finish = finish - 1,
             }
         end
+        if not State.options.unicodeName and str:find '[\x80-\xff]' then
+            PushError {
+                type   = 'UNICODE_NAME',
+                start  = start,
+                finish = finish - 1,
+            }
+        end
         return {
             type   = 'name',
             start  = start,

@@ -1,6 +1,6 @@
 local ast = require 'parser.ast'
 
-return function (self, lua, mode, version)
+return function (self, lua, mode, version, options)
     local errs  = {}
     local diags = {}
     local comms = {}
@@ -11,6 +11,7 @@ return function (self, lua, mode, version)
         errs = errs,
         diags = diags,
         comms = comms,
+        options = options,
         pushError = function (err)
             if err.finish < err.start then
                 err.finish = err.start

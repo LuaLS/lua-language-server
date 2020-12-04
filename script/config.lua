@@ -103,6 +103,7 @@ local ConfigTemplate = {
                             },        Array(String)},
         special         = {{},        Hash(String, String)},
         meta            = {'${version} ${language}', String},
+        unicodeName     = {false,     Boolean},
     },
     diagnostics = {
         enable          = {true, Boolean},

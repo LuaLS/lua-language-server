@@ -533,7 +533,7 @@ local function PostCompile()
 end
 
 return function (self, lua, mode, version, options)
-    local state, err = self:parse(lua, mode, version)
+    local state, err = self:parse(lua, mode, version, options)
     if not state then
         return nil, err
     end

@@ -57,6 +57,7 @@ defs.Reserved = function (_, _, str)
 end
 defs.None = function () end
 defs.np = m.Cp() / function (n) return n+1 end
+defs.NameBody = m.R('az', 'AZ', '__', '\x80\xff') * m.R('09', 'az', 'AZ', '__', '\x80\xff')^0
 
 m.setmaxstack(1000)
 
@@ -285,7 +286,7 @@ Float16Exp  <-  [pP] [+-]? [0-9]+
 grammar 'Name' [[
 Name        <-  Sp ({} NameBody {})
             ->  Name
-NameBody    <-  {[a-zA-Z_] [a-zA-Z0-9_]*}
+NameBody    <-  {%NameBody}
 FreeName    <-  Sp ({} {NameBody=>NotReserved} {})
             ->  Name
 KeyWord     <-  Sp NameBody=>Reserved

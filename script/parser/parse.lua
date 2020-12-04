@@ -42,7 +42,7 @@ return function (self, lua, mode, version, options)
     if not suc then
         return nil, res
     end
-    if not res then
+    if not res and err then
         state.pushError(err)
     end
     state.ast = res

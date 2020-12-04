@@ -4,6 +4,7 @@
 * `NEW` setting `runtime.unicodeName`
 * `NEW` fully supports `---@generic T`
 * `FIX` [#274](https://github.com/sumneko/lua-language-server/issues/274)
+* `FIX` [#279](https://github.com/sumneko/lua-language-server/issues/279)
 
 ## 1.4.0
 `2020-12-3`

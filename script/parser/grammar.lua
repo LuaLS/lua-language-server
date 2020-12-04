@@ -258,7 +258,7 @@ StringClose <-  ']' =eq ']'
 ]]
 
 grammar 'Number' [[
-Number      <-  Sp ({} {NumberDef} {}) -> Number
+Number      <-  Sp ({} {'-'? NumberDef} {}) -> Number
                 NumberSuffix?
                 ErrNumber?
 NumberDef   <-  Number16 / Number10
@@ -533,6 +533,9 @@ return function (self, lua, mode)
     if not r then
         local err = errorpos(pos)
         return nil, err
+    end
+    if type(r) ~= 'table' then
+        return nil
     end
 
     return r

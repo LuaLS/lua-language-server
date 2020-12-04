@@ -163,6 +163,25 @@ local function solveSyntaxByFix(uri, err, results)
     }
 end
 
+local function solveSyntaxUnicodeName(uri, err, results)
+    results[#results+1] = {
+        title   = lang.script('ACTION_RUNTIME_UNICODE_NAME'),
+        kind    = 'quickfix',
+        command = {
+            title     = lang.script.COMMAND_UNICODE_NAME,
+            command   = 'lua.config',
+            arguments = {
+                {
+                    key    = 'Lua.runtime.unicodeName',
+                    action = 'set',
+                    value  = true,
+                    uri    = uri,
+                }
+            }
+        },
+    }
+end
+
 local function solveSyntax(uri, diag, results)
     local err = findSyntax(uri, diag)
     if not err then
@@ -173,6 +192,9 @@ local function solveSyntax(uri, diag, results)
     end
     if err.type == 'ACTION_AFTER_BREAK' or err.type == 'ACTION_AFTER_RETURN' then
         solveSyntaxByAddDoEnd(uri, err, results)
+    end
+    if err.type == 'UNICODE_NAME' then
+        solveSyntaxUnicodeName(uri, err, results)
     end
     if err.fix then
         solveSyntaxByFix(uri, err, results)

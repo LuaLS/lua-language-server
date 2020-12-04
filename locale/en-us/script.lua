@@ -163,6 +163,7 @@ ACTION_FIX_THEN_AS_DO   = 'Modify to `then` .'
 ACTION_FIX_DO_AS_THEN   = 'Modify to `do` .'
 ACTION_ADD_END          = 'Add `end` (infer the addition location ny indentations).'
 ACTION_FIX_COMMENT_PREFIX = 'Modify to `--` .'
+ACTION_RUNTIME_UNICODE_NAME = 'Allow Unicode characters.'
 
 COMMAND_DISABLE_DIAG    = 'Disable diagnostics'
 COMMAND_MARK_GLOBAL     = 'Mark defined global'
@@ -170,6 +171,7 @@ COMMAND_REMOVE_SPACE    = 'Clear all postemptive spaces'
 COMMAND_ADD_BRACKETS    = 'Add brackets'
 COMMAND_RUNTIME_VERSION = 'Change runtime version'
 COMMAND_OPEN_LIBRARY    = 'Load globals from 3rd library'
+COMMAND_UNICODE_NAME    = 'Allow Unicode characters.'
 
 DEBUG_MEMORY_LEAK       = "{} I'm sorry for the serious memory leak. The language service will be restarted soon."
 DEBUG_RESTART_NOW       = 'Restart now'

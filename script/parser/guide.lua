@@ -29,6 +29,8 @@ _ENV = nil
 
 local m = {}
 
+m.ANY = {}
+
 local blockTypes = {
     ['while']       = true,
     ['in']          = true,
@@ -660,48 +662,58 @@ function m.lineRange(lines, row, ignoreNL)
     end
 end
 
-function m.getNameOfLiteral(obj)
+function m.getKeyTypeOfLiteral(obj)
     if not obj then
         return nil
     end
     local tp = obj.type
-    if tp == 'string' then
-        return obj[1]
+    if tp == 'field'
+    or     tp == 'method' then
+        return 'string'
+    elseif tp == 'string' then
+        return 'string'
+    elseif tp == 'number' then
+        return 'number'
+    elseif tp == 'boolean' then
+        return 'boolean'
     end
-    return nil
 end
 
-function m.getName(obj)
+function m.getKeyType(obj)
+    if not obj then
+        return nil
+    end
     local tp = obj.type
     if tp == 'getglobal'
     or tp == 'setglobal' then
-        return obj[1]
+        return 'string'
     elseif tp == 'local'
     or     tp == 'getlocal'
     or     tp == 'setlocal' then
-        return obj[1]
+        return 'local'
     elseif tp == 'getfield'
     or     tp == 'setfield'
     or     tp == 'tablefield' then
-        return obj.field and obj.field[1]
+        return 'string'
     elseif tp == 'getmethod'
     or     tp == 'setmethod' then
-        return obj.method and obj.method[1]
+        return 'string'
     elseif tp == 'getindex'
     or     tp == 'setindex'
     or     tp == 'tableindex' then
-        return m.getNameOfLiteral(obj.index)
+        return m.getKeyTypeOfLiteral(obj.index)
     elseif tp == 'field'
-    or     tp == 'method' then
-        return obj[1]
+    or     tp == 'method'
+    or     tp == 'doc.see.field' then
+        return 'string'
     elseif tp == 'doc.class' then
-        return obj.class[1]
+        return 'string'
     elseif tp == 'doc.alias' then
-        return obj.alias[1]
+        return 'string'
     elseif tp == 'doc.field' then
-        return obj.field[1]
+        return 'string'
     end
-    return m.getNameOfLiteral(obj)
+    return m.getKeyTypeOfLiteral(obj)
 end
 
 function m.getKeyNameOfLiteral(obj)
@@ -711,30 +723,22 @@ function m.getKeyNameOfLiteral(obj)
     local tp = obj.type
     if tp == 'field'
     or     tp == 'method' then
-        return 's|' .. obj[1]
+        return obj[1]
     elseif tp == 'string' then
         local s = obj[1]
         if s then
-            return 's|' .. s
-        else
-            return 's'
+            return s
         end
     elseif tp == 'number' then
         local n = obj[1]
         if n then
-            return ('n|%s'):format(util.viewLiteral(obj[1]))
-        else
-            return 'n'
+            return ('%s'):format(util.viewLiteral(obj[1]))
         end
     elseif tp == 'boolean' then
         local b = obj[1]
         if b then
-            return 'b|' .. tostring(b)
-        else
-            return 'b'
+            return tostring(b)
         end
-    else
-        return 'x'
     end
 end
 
@@ -745,21 +749,21 @@ function m.getKeyName(obj)
     local tp = obj.type
     if tp == 'getglobal'
     or tp == 'setglobal' then
-        return 's|' .. obj[1]
+        return obj[1]
     elseif tp == 'local'
     or     tp == 'getlocal'
     or     tp == 'setlocal' then
-        return 'l|' .. obj[1]
+        return obj[1]
     elseif tp == 'getfield'
     or     tp == 'setfield'
     or     tp == 'tablefield' then
         if obj.field then
-            return 's|' .. obj.field[1]
+            return obj.field[1]
         end
     elseif tp == 'getmethod'
     or     tp == 'setmethod' then
         if obj.method then
-            return 's|' .. obj.method[1]
+            return obj.method[1]
         end
     elseif tp == 'getindex'
     or     tp == 'setindex'
@@ -768,15 +772,13 @@ function m.getKeyName(obj)
     elseif tp == 'field'
     or     tp == 'method'
     or     tp == 'doc.see.field' then
-        return 's|' .. obj[1]
+        return obj[1]
     elseif tp == 'doc.class' then
-        return 's|' .. obj.class[1]
+        return obj.class[1]
     elseif tp == 'doc.alias' then
-        return 's|' .. obj.alias[1]
+        return obj.alias[1]
     elseif tp == 'doc.field' then
-        return 's|' .. obj.field[1]
-    elseif tp == 'dummy' then
-        return 's|' .. obj[1]
+        return obj.field[1]
     end
     return m.getKeyNameOfLiteral(obj)
 end
@@ -786,17 +788,17 @@ function m.getSimpleName(obj)
         local key = obj.args and obj.args[2]
         return m.getKeyName(key)
     elseif obj.type == 'table' then
-        return ('t|%p'):format(obj)
+        return ('%p'):format(obj)
     elseif obj.type == 'select' then
-        return ('v|%p'):format(obj)
+        return ('%p'):format(obj)
     elseif obj.type == 'string' then
-        return ('z|%p'):format(obj)
+        return ('%p'):format(obj)
     elseif obj.type == 'doc.class.name'
     or     obj.type == 'doc.type.name'
     or     obj.type == 'doc.see.name' then
-        return ('c|%s'):format(obj[1])
+        return ('%s'):format(obj[1])
     elseif obj.type == 'doc.class' then
-        return ('c|%s'):format(obj.class[1])
+        return ('%s'):format(obj.class[1])
     end
     return m.getKeyName(obj)
 end
@@ -1078,11 +1080,11 @@ local function convertSimpleList(list)
                 simple.node = c
             end
         end
-        simple[#simple+1] = m.getSimpleName(c)
+        simple[#simple+1] = m.getSimpleName(c) or m.ANY
         ::CONTINUE::
     end
     if simple.mode == 'global' and #simple == 0 then
-        simple[1] = 's|_G'
+        simple[1] = '_G'
         simple.node = list[#list]
     end
     return simple
@@ -1320,7 +1322,7 @@ function m.searchFields(status, obj, key)
     if not simple then
         return
     end
-    simple[#simple+1] = key and ('s|' .. key) or '*'
+    simple[#simple+1] = key or m.ANY
     m.searchSameFields(status, simple, 'field')
     m.cleanResults(status.results)
 end
@@ -1450,7 +1452,7 @@ function m.checkSameSimpleByBindDocs(status, obj, start, queue, mode)
         elseif doc.type == 'doc.param' then
             -- function (x) 的情况
             if  obj.type == 'local'
-            and m.getName(obj) == doc.param[1] then
+            and m.getKeyName(obj) == doc.param[1] then
                 if obj.parent.type == 'funcargs'
                 or obj.parent.type == 'in'
                 or obj.parent.type == 'loop' then
@@ -1830,7 +1832,7 @@ function m.checkSameSimpleInCall(status, ref, start, queue, mode)
 end
 
 local function searchRawset(ref, results)
-    if m.getKeyName(ref) ~= 's|rawset' then
+    if m.getKeyName(ref) ~= 'rawset' then
         return
     end
     local call = ref.parent
@@ -1849,7 +1851,7 @@ local function searchRawset(ref, results)
 end
 
 local function searchG(ref, results)
-    while ref and m.getKeyName(ref) == 's|_G' do
+    while ref and m.getKeyName(ref) == '_G' do
         results[#results+1] = ref
         ref = ref.next
     end
@@ -2223,7 +2225,7 @@ function m.pushResult(status, mode, ref, simple)
 end
 
 function m.checkSameSimpleName(ref, sm)
-    if sm == '*' then
+    if sm == m.ANY then
         return true
     end
     if m.getSimpleName(ref) == sm then
@@ -3078,7 +3080,7 @@ function m.inferCheckUpDoc(status, source)
         elseif doc.type == 'doc.param' then
             -- function (x) 的情况
             if  source.type == 'local'
-            and m.getName(source) == doc.param[1] then
+            and m.getKeyName(source) == doc.param[1] then
                 if source.parent.type == 'funcargs'
                 or source.parent.type == 'in'
                 or source.parent.type == 'loop' then
@@ -3849,7 +3851,7 @@ function m.cleanInfers(infers, obj)
             infers[#infers] = nil
             goto CONTINUE
         end
-        local key = ('%s|%p'):format(infer.type, infer.source)
+        local key = ('%p'):format(infer.type, infer.source)
         if mark[key] then
             infers[i] = infers[#infers]
             infers[#infers] = nil

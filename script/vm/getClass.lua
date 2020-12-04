@@ -32,10 +32,10 @@ local function getClass(source, classes, depth, deep)
                 goto CONTINUE
             end
             local lkey = key:lower()
-            if lkey == 's|type'
-            or lkey == 's|__name'
-            or lkey == 's|name'
-            or lkey == 's|class' then
+            if lkey == 'type'
+            or lkey == '__name'
+            or lkey == 'name'
+            or lkey == 'class' then
                 local value = guide.getObjectValue(src)
                 if value and value.type == 'string' then
                     classes[#classes+1] = value[1]

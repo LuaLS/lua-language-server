@@ -18,7 +18,7 @@ return function (uri, callback)
     for _, doc in ipairs(state.ast.docs) do
         if doc.type == 'doc.class'
         or doc.type == 'doc.alias' then
-            local name = guide.getName(doc)
+            local name = guide.getKeyName(doc)
             if not cache[name] then
                 local docs = vm.getDocTypes(name)
                 cache[name] = {}

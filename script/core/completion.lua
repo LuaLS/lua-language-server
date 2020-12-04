@@ -426,14 +426,13 @@ local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, res
     local fields = {}
     local count = 0
     for _, src in ipairs(refs) do
-        local key = vm.getKeyName(src)
-        if not key or key:sub(1, 1) ~= 's' then
+        local name = vm.getKeyName(src)
+        if not name or vm.getKeyType(src) ~= 'string' then
             goto CONTINUE
         end
         if isSameSource(ast, src, start) then
             goto CONTINUE
         end
-        local name = key:sub(3)
         if locals and locals[name] then
             goto CONTINUE
         end

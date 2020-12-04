@@ -6,7 +6,7 @@ local lang     = require 'language'
 
 local function getKey(src)
     local key = vm.getKeyName(src)
-    if not key or #key <= 2 then
+    if not key or #key <= 0 then
         if not src.index then
             return '[any]'
         end
@@ -20,9 +20,7 @@ local function getKey(src)
         end
         return '[any]'
     end
-    local ktype = key:sub(1, 2)
-    key = key:sub(3)
-    if ktype == 's|' then
+    if guide.getKeyType(src) == 'string' then
         if key:match '^[%a_][%w_]*$' then
             return key
         else

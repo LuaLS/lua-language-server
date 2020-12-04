@@ -72,7 +72,7 @@ local function solveUndefinedGlobal(uri, diag, results)
             return
         end
 
-        local name = guide.getName(source)
+        local name = guide.getKeyName(source)
         markGlobal(uri, name, results)
     end)
 
@@ -93,7 +93,7 @@ local function solveLowercaseGlobal(uri, diag, results)
             return
         end
 
-        local name = guide.getName(source)
+        local name = guide.getKeyName(source)
         markGlobal(uri, name, results)
     end)
 end

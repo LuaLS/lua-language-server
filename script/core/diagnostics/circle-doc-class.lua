@@ -19,7 +19,7 @@ return function (uri, callback)
             if not doc.extends then
                 goto CONTINUE
             end
-            local myName = guide.getName(doc)
+            local myName = guide.getKeyName(doc)
             local list = { doc }
             local mark = {}
             for i = 1, 999 do

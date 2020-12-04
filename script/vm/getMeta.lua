@@ -35,7 +35,7 @@ end
 function vm.eachMetaValue(source, callback)
     vm.eachMeta(source, function (mt)
         for _, src in ipairs(vm.getFields(mt)) do
-            if vm.getKeyName(src) == 's|__index' then
+            if vm.getKeyName(src) == '__index' then
                 if src.value then
                     for _, valueSrc in ipairs(vm.getFields(src.value)) do
                         callback(valueSrc)

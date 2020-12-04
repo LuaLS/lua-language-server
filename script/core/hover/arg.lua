@@ -20,7 +20,7 @@ local function asFunction(source, oop)
     local args = {}
     for i = 1, #source.args do
         local arg = source.args[i]
-        local name = arg.name or guide.getName(arg)
+        local name = arg.name or guide.getKeyName(arg)
         if name then
             args[i] = ('%s%s: %s'):format(
                 name,

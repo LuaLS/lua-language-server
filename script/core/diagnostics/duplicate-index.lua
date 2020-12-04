@@ -26,8 +26,7 @@ return function (uri, callback)
         end
 
         for name, defs in pairs(mark) do
-            local sname = name:match '^.|(.+)$'
-            if #defs > 1 and sname then
+            if #defs > 1 and name then
                 local related = {}
                 for i = 1, #defs do
                     local def = defs[i]
@@ -43,7 +42,7 @@ return function (uri, callback)
                         start   = def.start,
                         finish  = def.finish,
                         related = related,
-                        message = lang.script('DIAG_DUPLICATE_INDEX', sname),
+                        message = lang.script('DIAG_DUPLICATE_INDEX', name),
                         level   = define.DiagnosticSeverity.Hint,
                         tags    = { define.DiagnosticTag.Unnecessary },
                     }
@@ -54,7 +53,7 @@ return function (uri, callback)
                         start   = def.start,
                         finish  = def.finish,
                         related = related,
-                        message = lang.script('DIAG_DUPLICATE_INDEX', sname),
+                        message = lang.script('DIAG_DUPLICATE_INDEX', name),
                     }
                 end
             end

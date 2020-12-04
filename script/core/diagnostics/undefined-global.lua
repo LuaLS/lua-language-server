@@ -13,7 +13,7 @@ return function (uri, callback)
 
     -- 遍历全局变量，检查所有没有 set 模式的全局变量
     guide.eachSourceType(ast.ast, 'getglobal', function (src)
-        local key = guide.getName(src)
+        local key = guide.getKeyName(src)
         if not key then
             return
         end

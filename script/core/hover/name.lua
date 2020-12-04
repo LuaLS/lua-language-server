@@ -4,7 +4,7 @@ local vm       = require 'vm'
 local buildName
 
 local function asLocal(source)
-    local name = guide.getName(source)
+    local name = guide.getKeyName(source)
     if not source.attrs then
         return name
     end
@@ -21,8 +21,8 @@ local function asField(source, oop)
     if source.node.type ~= 'getglobal' then
         class = vm.getClass(source.node, 0)
     end
-    local node = class or guide.getName(source.node) or '?'
-    local method = guide.getName(source)
+    local node = class or guide.getKeyName(source.node) or '?'
+    local method = guide.getKeyName(source)
     if oop then
         return ('%s:%s'):format(node, method)
     else
@@ -34,11 +34,11 @@ local function asTableField(source)
     if not source.field then
         return
     end
-    return guide.getName(source.field)
+    return guide.getKeyName(source.field)
 end
 
 local function asGlobal(source)
-    return guide.getName(source)
+    return guide.getKeyName(source)
 end
 
 local function asDocFunction(source)

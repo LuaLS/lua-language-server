@@ -115,6 +115,20 @@ function m.getKeyName(source)
     return guide.getKeyName(source)
 end
 
+function m.getKeyType(source)
+    if not source then
+        return nil
+    end
+    if source.type == 'call' then
+        local special = m.getSpecial(source.node)
+        if special == 'rawset'
+        or special == 'rawget' then
+            return guide.getKeyTypeOfLiteral(source.args[2])
+        end
+    end
+    return guide.getKeyType(source)
+end
+
 function m.mergeResults(a, b)
     for _, r in ipairs(b) do
         if not a[r] then

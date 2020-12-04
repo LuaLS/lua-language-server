@@ -2078,6 +2078,110 @@ function m.checkSameSimpleAsSetValue(status, ref, start, queue)
     end
 end
 
+local function getDocTypeGenericName(docType)
+    if docType.type ~= 'doc.type' then
+        return nil
+    end
+
+    local docTypeName = docType.types[1]
+    if not docTypeName then
+        return nil
+    end
+
+    if not docTypeName.typeGeneric then
+        return nil
+    end
+
+    if docTypeName.typeGeneric[docTypeName[1]] then
+        return docTypeName[1]
+    else
+        return nil
+    end
+end
+
+function m.getGenericReturnIndexFromCallArg(defNode, callarg)
+    if defNode.type ~= 'function' or (not defNode.bindDocs) then
+        return
+    end
+
+    local callRef, argIndex = m.getCallAndArgIndex(callarg)
+    if not callRef then
+        return
+    end
+
+    local generics = nil
+    local paramDocType = nil
+    local returns = nil
+    local curArgIndex = 1
+    for _, bindDoc in ipairs(defNode.bindDocs) do
+        if bindDoc.type == 'doc.generic' then
+            generics = bindDoc.generics
+        elseif bindDoc.type == 'doc.param'  then
+            if argIndex == curArgIndex then
+                paramDocType = bindDoc.extends
+            end
+            curArgIndex = curArgIndex + 1
+        elseif bindDoc.type == 'doc.return' then
+            returns = bindDoc.returns
+        end
+    end
+
+    if not generics or not paramDocType or not returns then
+        return
+    end
+
+    local paramGenericName = getDocTypeGenericName(paramDocType)
+    if not paramGenericName then
+        return
+    end
+
+    local tmpIndex = nil
+    for index, returnDocType in ipairs(returns) do
+        local returnGenericName = getDocTypeGenericName(returnDocType)
+        if returnGenericName == paramGenericName then
+            tmpIndex = index
+        end
+    end
+
+    return tmpIndex
+end
+
+--[[
+---@generic T
+---@param type1 T
+---@return T
+function foobar(type1)
+    return {}
+end
+local a = foobar(f)
+]]
+--上述从 f 穿透到 a
+function m.checkSameSimpleGeneric(status, ref, start, queue)
+    if not ref.parent or ref.parent.type ~= 'callargs' then
+        return
+    end
+
+    local callRef = ref.parent.parent;
+    local callNodeRef = callRef.node
+
+    local defNodeStatus = m.status(status)
+    m.searchRefs(defNodeStatus, callNodeRef, 'def')
+    for _, defNode in ipairs(defNodeStatus.results) do
+        local returnIndex = m.getGenericReturnIndexFromCallArg(defNode, ref)
+        if returnIndex == 1 then
+            local newStatus = m.status(status)
+            m.searchRefs(newStatus, callRef.parent.parent, 'ref')
+            for _, res in ipairs(newStatus.results) do
+                queue[#queue+1] = {
+                    obj   = res,
+                    start = start,
+                    force = true,
+                }
+            end
+        end
+    end
+end
+
 local function hasTypeName(doc, name)
     if doc.type ~= 'doc.type' then
         return false
@@ -2280,6 +2384,8 @@ function m.checkSameSimple(status, simple, data, mode, queue)
                 m.checkSameSimpleAsReturn(status, ref, i, queue)
                 -- 检查形如 a = f 的情况
                 m.checkSameSimpleAsSetValue(status, ref, i, queue)
+                -- 检查 generic 穿透的情况
+                m.checkSameSimpleGeneric(status, ref, i, queue)
             end
         end
         if i == #simple then

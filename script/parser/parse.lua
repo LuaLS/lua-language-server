@@ -11,7 +11,7 @@ return function (self, lua, mode, version, options)
         errs = errs,
         diags = diags,
         comms = comms,
-        options = options,
+        options = options or {},
         pushError = function (err)
             if err.finish < err.start then
                 err.finish = err.start

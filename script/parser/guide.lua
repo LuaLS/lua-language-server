@@ -733,8 +733,9 @@ function m.getKeyNameOfLiteral(obj)
         else
             return 'b'
         end
+    else
+        return 'x'
     end
-    return nil
 end
 
 function m.getKeyName(obj)

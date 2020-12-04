@@ -1459,3 +1459,20 @@ local v: Object {
     a: string,
 }
 ]]
+
+TEST [[
+---@class Object
+---@field a string
+
+---@type Object[]
+local t
+
+local <?v?> = t[i]
+
+print(v.a)
+]]
+[[
+local v: Object {
+    a: string,
+}
+]]

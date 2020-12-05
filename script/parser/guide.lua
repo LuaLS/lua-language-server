@@ -2695,7 +2695,6 @@ function m.viewInferType(infers)
     local mark = {}
     local types = {}
     local hasDoc
-    local generic
     for i = 1, #infers do
         local infer = infers[i]
         local src = infer.source
@@ -2704,10 +2703,7 @@ function m.viewInferType(infers)
         or src.type == 'doc.type.name'
         or src.type == 'doc.type.array'
         or src.type == 'doc.type.generic' then
-            if src.typeGeneric then
-                generic = infer
-            end
-            if infer.type ~= 'any' and not src.typeGeneric then
+            if infer.type ~= 'any' then
                 hasDoc = true
                 break
             end
@@ -2744,9 +2740,6 @@ function m.viewInferType(infers)
             mark[tp] = true
             ::CONTINUE::
         end
-    end
-    if #types == 0 and generic then
-        types[#types+1] = generic.type
     end
     return m.mergeTypes(types)
 end
@@ -3868,6 +3861,7 @@ function m.inferByPCallReturn(status, source)
 end
 
 function m.cleanInfers(infers, obj)
+    -- kick lower level infers
     local level = 0
     if obj.type ~= 'select' then
         for i = 1, #infers do
@@ -3877,6 +3871,7 @@ function m.cleanInfers(infers, obj)
             end
         end
     end
+    -- merge infers
     local mark = {}
     for i = #infers, 1, -1 do
         local infer = infers[i]
@@ -3893,6 +3888,16 @@ function m.cleanInfers(infers, obj)
             mark[key] = true
         end
         ::CONTINUE::
+    end
+    -- kick doc.generic
+    if #infers > 1 then
+        for i = #infers, 1, -1 do
+            local infer = infers[i]
+            if infer.source.typeGeneric then
+                infers[i] = infers[#infers]
+                infers[#infers] = nil
+            end
+        end
     end
 end
 

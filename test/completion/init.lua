@@ -1900,3 +1900,19 @@ local s
 s.$
 ]]
 (EXISTS)
+
+TEST [[
+---@class C
+local t
+
+local vvv = assert(t)
+vvv$
+]]
+{
+    {
+        label  = 'vvv',
+        detail = 'C',
+        kind   = define.CompletionItemKind.Variable,
+        description = EXISTS,
+    },
+}

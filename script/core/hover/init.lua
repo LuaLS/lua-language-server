@@ -143,6 +143,7 @@ local accept = {
     ['string']        = true,
     ['number']        = true,
     ['doc.type.name'] = true,
+    ['function']      = true,
 }
 
 local function getHoverByUri(uri, offset)

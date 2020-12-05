@@ -26,6 +26,12 @@ end
 "function x(a: any, b: any)"
 
 TEST [[
+local <?function?> x(a, b)
+end
+]]
+"function x(a: any, b: any)"
+
+TEST [[
 local function x(a, b)
 end
 <?x?>()

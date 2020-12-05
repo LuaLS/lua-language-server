@@ -3,11 +3,6 @@ local files      = require 'files'
 local vm         = require 'vm'
 local findSource = require 'core.find-source'
 
-local function isValidFunction(source, offset)
-    -- 必须点在 `function` 这个单词上才能查找函数引用
-    return offset >= source.start and offset < source.start + #'function'
-end
-
 local function sortResults(results)
     -- 先按照顺序排序
     table.sort(results, function (a, b)
@@ -63,9 +58,6 @@ return function (uri, offset)
 
     local source = findSource(ast, offset, accept)
     if not source then
-        return nil
-    end
-    if source.type == 'function' and not isValidFunction(source, offset) and not TEST then
         return nil
     end
 

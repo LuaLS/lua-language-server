@@ -373,6 +373,7 @@ proto.on('textDocument/completion', function (params)
             insertText       = res.insertText,
             insertTextFormat = res.insertTextFormat,
             commitCharacters = res.commitCharacters,
+            command          = res.command,
             textEdit         = res.textEdit and {
                 range   = define.range(
                     lines,

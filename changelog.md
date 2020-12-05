@@ -2,6 +2,7 @@
 
 ## 1.6.0
 * `NEW` auto require local modules
+* `NEW` hover function by keyword `function`
 
 ## 1.5.0
 `2020-12-5`

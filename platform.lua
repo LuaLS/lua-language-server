@@ -29,8 +29,9 @@ cpath:    %s
 ))
 end
 
+local currentPath = debug.getinfo(1, 'S').source:sub(2)
 local fs = require 'bee.filesystem'
-local rootPath = fs.path(exePath):parent_path():parent_path():remove_filename():string()
+local rootPath = fs.path(currentPath):remove_filename():string()
 if dll == '.dll' then
     rootPath = rootPath:gsub('/', '\\')
     package.path  = rootPath .. script .. '\\?.lua'

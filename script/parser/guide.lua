@@ -1697,10 +1697,10 @@ function m.searchSameMethod(ref, mark)
 end
 
 function m.searchSameFieldsCrossMethod(status, ref, start, queue)
-    local mark = status.cache.crossMethodMark
+    local mark = status.crossMethodMark
     if not mark then
         mark = {}
-        status.cache.crossMethodMark = mark
+        status.crossMethodMark = mark
     end
     local method = m.searchSameMethod(ref, mark)
                 or m.searchSameMethodCrossSelf(ref, mark)

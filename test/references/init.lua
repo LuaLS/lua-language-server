@@ -302,3 +302,24 @@ TEST [[
 ---@return <?any?>
 function f() end
 ]]
+
+TEST [[
+---@class Dog
+local mt = {}
+function mt:<?eat?>()
+end
+
+---@class Master
+local mt2 = {}
+function mt2:init()
+    ---@type Dog
+    local foo = self:doSomething()
+    ---@type Dog
+    self.dog = getDog()
+end
+function mt2:feed()
+    self.dog:<!eat!>()
+end
+function mt2:doSomething()
+end
+]]

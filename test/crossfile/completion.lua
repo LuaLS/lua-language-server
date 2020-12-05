@@ -630,7 +630,7 @@ function (a: any, b: any)
 ```]],
             additionalTextEdits = {
                 {
-                    start   = 0,
+                    start   = 1,
                     finish  = 0,
                     newText = 'local myfunc = require "myfunc"\n'
                 }

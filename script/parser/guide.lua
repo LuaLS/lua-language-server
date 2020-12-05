@@ -1189,7 +1189,7 @@ end
 
 function m.status(parentStatus, interface, deep)
     local status = {
-        cache     = parentStatus and parentStatus.cache       or {
+        share     = parentStatus and parentStatus.share       or {
             count = 0,
         },
         depth     = parentStatus and (parentStatus.depth + 1) or 0,
@@ -1453,7 +1453,7 @@ local function stepRefOfGeneric(status, typeUnit, args, mode)
 end
 
 function m.checkSameSimpleByDocType(status, doc, args)
-    if status.cache.searchingBindedDoc then
+    if status.share.searchingBindedDoc then
         return
     end
     if doc.type ~= 'doc.type' then
@@ -1480,7 +1480,7 @@ function m.checkSameSimpleByBindDocs(status, obj, start, queue, mode)
     if not obj.bindDocs then
         return
     end
-    if status.cache.searchingBindedDoc then
+    if status.share.searchingBindedDoc then
         return
     end
     local skipInfer = false
@@ -1531,13 +1531,13 @@ function m.checkSameSimpleByBindDocs(status, obj, start, queue, mode)
 end
 
 function m.checkSameSimpleOfRefByDocSource(status, obj, start, queue, mode)
-    if status.cache.searchingBindedDoc then
+    if status.share.searchingBindedDoc then
         return
     end
     if not obj.bindSources then
         return
     end
-    status.cache.searchingBindedDoc = true
+    status.share.searchingBindedDoc = true
     local mark = {}
     local newStatus = m.status(status)
     for _, ref in ipairs(obj.bindSources) do
@@ -1546,7 +1546,7 @@ function m.checkSameSimpleOfRefByDocSource(status, obj, start, queue, mode)
             m.searchRefs(newStatus, ref, mode)
         end
     end
-    status.cache.searchingBindedDoc = nil
+    status.share.searchingBindedDoc = nil
     for _, res in ipairs(newStatus.results) do
         queue[#queue+1] = {
             obj   = res,
@@ -1833,11 +1833,11 @@ function m.checkSameSimpleInCall(status, ref, start, queue, mode)
     if m.checkCallMark(status, func.parent, true) then
         return
     end
-    status.cache.crossCallCount = status.cache.crossCallCount or 0
-    if status.cache.crossCallCount >= 5 then
+    status.share.crossCallCount = status.share.crossCallCount or 0
+    if status.share.crossCallCount >= 5 then
         return
     end
-    status.cache.crossCallCount = status.cache.crossCallCount + 1
+    status.share.crossCallCount = status.share.crossCallCount + 1
     -- 检查赋值是 semetatable() 的情况
     m.checkSameSimpleInValueOfSetMetaTable(status, func, start, queue)
     -- 检查赋值是 func() 的情况
@@ -1862,7 +1862,7 @@ function m.checkSameSimpleInCall(status, ref, start, queue, mode)
             force = true,
         }
     end
-    status.cache.crossCallCount = status.cache.crossCallCount - 1
+    status.share.crossCallCount = status.share.crossCallCount - 1
     for _, obj in ipairs(newStatus.results) do
         queue[#queue+1] = {
             obj   = obj,
@@ -1959,37 +1959,37 @@ function m.checkSameSimpleInGlobal(status, name, source, start, queue)
 end
 
 function m.checkValueMark(status, a, b)
-    if not status.cache.valueMark then
-        status.cache.valueMark = {}
+    if not status.share.valueMark then
+        status.share.valueMark = {}
     end
-    if status.cache.valueMark[a]
-    or status.cache.valueMark[b] then
+    if status.share.valueMark[a]
+    or status.share.valueMark[b] then
         return true
     end
-    status.cache.valueMark[a] = true
-    status.cache.valueMark[b] = true
+    status.share.valueMark[a] = true
+    status.share.valueMark[b] = true
     return false
 end
 
 function m.checkCallMark(status, a, mark)
-    if not status.cache.callMark then
-        status.cache.callMark = {}
+    if not status.share.callMark then
+        status.share.callMark = {}
     end
     if mark then
-        status.cache.callMark[a] = mark
+        status.share.callMark[a] = mark
     else
-        return status.cache.callMark[a]
+        return status.share.callMark[a]
     end
     return false
 end
 
 function m.checkReturnMark(status, a, mark)
-    if not status.cache.returnMark then
-        status.cache.returnMark = {}
+    if not status.share.returnMark then
+        status.share.returnMark = {}
     end
-    local result = status.cache.returnMark[a]
+    local result = status.share.returnMark[a]
     if mark then
-        status.cache.returnMark[a] = mark
+        status.share.returnMark[a] = mark
     end
     return result
 end
@@ -2043,12 +2043,12 @@ function m.checkSameSimpleAsTableField(status, ref, start, queue)
 end
 
 function m.checkSearchLevel(status)
-    status.cache.back = status.cache.back or 0
-    if status.cache.back >= (status.interface.searchLevel or 0) then
+    status.share.back = status.share.back or 0
+    if status.share.back >= (status.interface.searchLevel or 0) then
         -- TODO 限制向前搜索的次数
         --return true
     end
-    status.cache.back = status.cache.back + 1
+    status.share.back = status.share.back + 1
     return false
 end
 
@@ -2141,7 +2141,7 @@ function m.checkSameSimpleInString(status, ref, start, queue, mode)
     if not status.interface.docType then
         return
     end
-    if status.cache.searchingBindedDoc then
+    if status.share.searchingBindedDoc then
         return
     end
     local newStatus = m.status(status)
@@ -2384,7 +2384,7 @@ function m.searchSameFields(status, simple, mode)
         if not lock[data.obj] then
             lock[data.obj] = true
             max = max + 1
-            status.cache.count = status.cache.count + 1
+            status.share.count = status.share.count + 1
             m.checkSameSimple(status, simple, data, mode, queue)
             if max >= 10000 then
                 logWarn('Queue too large!')
@@ -2553,8 +2553,8 @@ function m.getRefCache(status, obj, mode)
     and status.deep then
         globalCache = status.interface.cache and status.interface.cache() or {}
     end
-    cache = status.cache.refCache or {}
-    status.cache.refCache = cache
+    cache = status.share.refCache or {}
+    status.share.refCache = cache
     if m.isGlobal(obj) then
         obj = m.getKeyName(obj)
     end
@@ -3525,13 +3525,13 @@ function m.inferCheckBinary(status, source)
 end
 
 function m.inferByDef(status, obj)
-    if not status.cache.inferedDef then
-        status.cache.inferedDef = {}
+    if not status.share.inferedDef then
+        status.share.inferedDef = {}
     end
-    if status.cache.inferedDef[obj] then
+    if status.share.inferedDef[obj] then
         return
     end
-    status.cache.inferedDef[obj] = true
+    status.share.inferedDef[obj] = true
     local mark = {}
     local newStatus = m.status(status, status.interface)
     m.searchRefs(newStatus, obj, 'def')
@@ -3548,10 +3548,10 @@ function m.inferByDef(status, obj)
 end
 
 local function inferBySetOfLocal(status, source)
-    if status.cache[source] then
+    if status.share[source] then
         return
     end
-    status.cache[source] = true
+    status.share[source] = true
     local newStatus = m.status(status)
     if source.value then
         m.searchInfer(newStatus, source.value)
@@ -3925,16 +3925,16 @@ function m.searchInfer(status, obj)
     end
 
     if DEVELOP then
-        status.cache.clock = status.cache.clock or osClock()
+        status.share.clock = status.share.clock or osClock()
     end
 
-    if not status.cache.lockInfer then
-        status.cache.lockInfer = {}
+    if not status.share.lockInfer then
+        status.share.lockInfer = {}
     end
-    if status.cache.lockInfer[obj] then
+    if status.share.lockInfer[obj] then
         return
     end
-    status.cache.lockInfer[obj] = true
+    status.share.lockInfer[obj] = true
 
     local checked = m.inferCheckDoc(status, obj)
                  or m.inferCheckUpDoc(status, obj)
@@ -3977,10 +3977,10 @@ function m.requestReference(obj, interface, deep)
     m.searchRefsAsFunction(status, obj, 'ref')
 
     if m.debugMode then
-        print('count:', status.cache.count)
+        print('count:', status.share.count)
     end
 
-    return status.results, status.cache.count
+    return status.results, status.share.count
 end
 
 --- 请求对象的定义，包括 `a.b.c` 形式
@@ -3991,7 +3991,7 @@ function m.requestDefinition(obj, interface, deep)
     -- 根据 field 搜索定义
     m.searchRefs(status, obj, 'def')
 
-    return status.results, status.cache.count
+    return status.results, status.share.count
 end
 
 --- 请求对象的域
@@ -4000,7 +4000,7 @@ function m.requestFields(obj, interface, deep)
 
     m.searchFields(status, obj)
 
-    return status.results, status.cache.count
+    return status.results, status.share.count
 end
 
 --- 请求对象的类型推测
@@ -4008,7 +4008,7 @@ function m.requestInfer(obj, interface, deep)
     local status = m.status(nil, interface, deep)
     m.searchInfer(status, obj)
 
-    return status.results, status.cache.count
+    return status.results, status.share.count
 end
 
 return m

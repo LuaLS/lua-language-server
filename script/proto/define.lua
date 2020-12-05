@@ -49,7 +49,7 @@ function m.position(lines, text, offset)
     if start < 1 then
         start = 1
     end
-    if col <= finish then
+    if col <= finish - start + 1 then
         local ucol     = util.utf8Len(text, start, start + col - 1)
         if row < 1 then
             row = 1
@@ -57,6 +57,11 @@ function m.position(lines, text, offset)
         return {
             line      = row - 1,
             character = ucol,
+        }
+    elseif col == 1 then
+        return {
+            line      = row - 1,
+            character = 0,
         }
     else
         return {

@@ -372,6 +372,7 @@ proto.on('textDocument/completion', function (params)
             sortText         = ('%04d'):format(i),
             insertText       = res.insertText,
             insertTextFormat = res.insertTextFormat,
+            commitCharacters = res.commitCharacters,
             textEdit         = res.textEdit and {
                 range   = define.range(
                     lines,

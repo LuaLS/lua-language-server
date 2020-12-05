@@ -384,6 +384,7 @@ local function checkModule(ast, word, offset, results)
             results[#results+1] = {
                 label  = stemName,
                 kind   = define.CompletionItemKind.Variable,
+                commitCharacters = {'.'},
                 id     = stack(function ()
                     return {
                         detail      = buildDetail(targetSource),

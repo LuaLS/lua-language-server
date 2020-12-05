@@ -1,19 +1,19 @@
-return function (me, other, fast)
-    if me == other then
+return function (input, other, fast)
+    if input == other then
         return true
     end
-    if me == '' then
+    if input == '' then
         return true
     end
-    if #me > #other then
+    if #input > #other then
         return false
     end
-    local lMe = me:lower()
+    local lMe = input:lower()
     local lOther = other:lower()
     if lMe == lOther:sub(1, #lMe) then
         return true
     end
-    if fast and me:sub(1, 1) ~= other:sub(1, 1) then
+    if fast and input:sub(1, 1) ~= other:sub(1, 1) then
         return false
     end
     local chars = {}

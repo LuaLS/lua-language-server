@@ -600,3 +600,44 @@ local z: {}
         },
     }
 }
+
+Cared['detail'] = true
+Cared['additionalTextEdits'] = true
+TEST {
+    {
+        path = 'myfunc.lua',
+        content = [[
+            return function (a, b)
+            end
+        ]]
+    },
+    {
+        path = 'main.lua',
+        main = true,
+        content = [[
+            myfun$
+        ]],
+    },
+    completion = {
+        {
+            label = 'myfunc',
+            kind  = CompletionItemKind.Variable,
+            detail = 'function',
+            description = [[
+从 [myfunc.lua](file:///myfunc.lua) 中导入
+```lua
+function (a: any, b: any)
+```]],
+            additionalTextEdits = {
+                {
+                    start   = 0,
+                    finish  = 0,
+                    newText = 'local myfunc = require "myfunc"\n'
+                }
+            }
+        }
+    }
+}
+
+Cared['detail'] = nil
+Cared['additionalTextEdits'] = nil

@@ -1,5 +1,8 @@
 # changelog
 
+## 1.6.0
+* `NEW` auto require local modules
+
 ## 1.5.0
 `2020-12-5`
 * `NEW` setting `runtime.unicodeName`

@@ -44,19 +44,26 @@ end
 ---@param offset integer
 ---@return position
 function m.position(lines, text, offset)
-    local row, col = guide.positionOf(lines, offset)
-    local start    = guide.lineRange(lines, row)
+    local row, col      = guide.positionOf(lines, offset)
+    local start, finish = guide.lineRange(lines, row, true)
     if start < 1 then
         start = 1
     end
-    local ucol     = util.utf8Len(text, start, start + col - 1)
-    if row < 1 then
-        row = 1
+    if col <= finish then
+        local ucol     = util.utf8Len(text, start, start + col - 1)
+        if row < 1 then
+            row = 1
+        end
+        return {
+            line      = row - 1,
+            character = ucol,
+        }
+    else
+        return {
+            line      = row,
+            character = 0,
+        }
     end
-    return {
-        line      = row - 1,
-        character = ucol,
-    }
 end
 
 --- 将起点与终点位置转化为 range

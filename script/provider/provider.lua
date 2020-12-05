@@ -390,7 +390,8 @@ proto.on('textDocument/completion', function (params)
                             text,
                             edit.start,
                             edit.finish
-                        )
+                        ),
+                        newText = edit.newText,
                     }
                 end
                 return t
@@ -414,6 +415,7 @@ proto.on('textDocument/completion', function (params)
                 easy = false
                 item.data = {
                     version = files.globalVersion,
+                    uri     = uri,
                     id      = res.id,
                 }
             end
@@ -432,7 +434,8 @@ proto.on('completionItem/resolve', function (item)
         return item
     end
     local globalVersion = item.data.version
-    local id = item.data.id
+    local id            = item.data.id
+    local uri           = item.data.uri
     if globalVersion ~= files.globalVersion then
         return item
     end
@@ -441,11 +444,28 @@ proto.on('completionItem/resolve', function (item)
     if not resolved then
         return nil
     end
+    local lines  = files.getLines(uri)
+    local text   = files.getText(uri)
     item.detail = resolved.detail
     item.documentation = resolved.description and {
         value = resolved.description,
         kind  = 'markdown',
     }
+    item.additionalTextEdits = resolved.additionalTextEdits and (function ()
+        local t = {}
+        for j, edit in ipairs(resolved.additionalTextEdits) do
+            t[j] = {
+                range   = define.range(
+                    lines,
+                    text,
+                    edit.start,
+                    edit.finish
+                ),
+                newText = edit.newText,
+            }
+        end
+        return t
+    end)()
     return item
 end)
 

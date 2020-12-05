@@ -271,6 +271,36 @@ local function buildFunction(results, source, oop, data)
     end
 end
 
+local function buildInsertRequire(ast, targetName, targetUri)
+    local uri   = guide.getUri(ast.ast)
+    local lines = files.getLines(uri)
+    local text  = files.getText(uri)
+    local start = 1
+    for i = 1, #lines do
+        local ln = lines[i]
+        local lnText = text:sub(ln.start, ln.finish)
+        if not lnText:find('require', 1, true) then
+            start = ln.start
+            break
+        end
+    end
+    local path = furi.decode(targetUri)
+    local visiblePaths = rpath.getVisiblePath(path, config.config.runtime.path)
+    if #visiblePaths == 0 then
+        return nil
+    end
+    table.sort(visiblePaths, function (a, b)
+        return #a.expect < #b.expect
+    end)
+    return {
+        {
+            start   = start,
+            finish  = start - 1,
+            newText = ('local %s = require %q\n'):format(targetName, visiblePaths[1].expect)
+        }
+    }
+end
+
 local function isSameSource(ast, source, pos)
     if not files.eq(guide.getUri(source), guide.getUri(ast.ast)) then
         return false
@@ -312,6 +342,58 @@ local function checkLocal(ast, word, offset, results)
                         description = buildDesc(source),
                     }
                 end),
+            }
+        end
+        ::CONTINUE::
+    end
+end
+
+local function checkModule(ast, word, offset, results)
+    local locals = guide.getVisibleLocals(ast.ast, offset)
+    for uri in files.eachFile() do
+        if files.eq(uri, guide.getUri(ast.ast)) then
+            goto CONTINUE
+        end
+        local originUri = files.getOriginUri(uri)
+        local path = furi.decode(originUri)
+        local fileName = path:match '[^/\\]*$'
+        local stemName = fileName:gsub('%..+', '')
+        if not locals[stemName]
+        and matchKey(word, stemName) then
+            local targetAst = files.getAst(uri)
+            if not targetAst then
+                goto CONTINUE
+            end
+            local targetReturns = targetAst.ast.returns
+            if not targetReturns then
+                goto CONTINUE
+            end
+            local targetSource = targetReturns[1] and targetReturns[1][1]
+            if not targetSource then
+                goto CONTINUE
+            end
+            if  targetSource.type ~= 'getlocal'
+            and targetSource.type ~= 'table'
+            and targetSource.type ~= 'function' then
+                goto CONTINUE
+            end
+            if  targetSource.type == 'getlocal'
+            and vm.isDeprecated(targetSource.node) then
+                goto CONTINUE
+            end
+            results[#results+1] = {
+                label  = stemName,
+                kind   = define.CompletionItemKind.Variable,
+                id     = stack(function ()
+                    return {
+                        detail      = buildDetail(targetSource),
+                        description = lang.script('COMPLETION_IMPORT_FROM', ('[%s](%s)'):format(
+                            fileName, originUri
+                        ))
+                            .. '\n' .. buildDesc(targetSource),
+                        additionalTextEdits = buildInsertRequire(ast, stemName, uri),
+                    }
+                end)
             }
         end
         ::CONTINUE::
@@ -1011,6 +1093,7 @@ local function tryWord(ast, text, offset, results)
                     checkTableField(ast, word, start, results)
                     local env = guide.getENV(ast.ast, start)
                     checkGlobal(ast, word, start, offset, env, false, results)
+                    checkModule(ast, word, start, results)
                 end
             end
         end

@@ -172,5 +172,7 @@ COMMAND_RUNTIME_VERSION = '修改运行版本'
 COMMAND_OPEN_LIBRARY    = '加载第三方库中的全局变量'
 COMMAND_UNICODE_NAME    = '允许使用 Unicode 字符'
 
+COMPLETION_IMPORT_FROM  = '从 {} 中导入'
+
 DEBUG_MEMORY_LEAK       = '{} 很抱歉发生了严重的内存泄漏，语言服务即将重启。'
 DEBUG_RESTART_NOW       = '立即重启'

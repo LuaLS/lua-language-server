@@ -989,6 +989,9 @@ function m.getStepRef(status, obj, mode)
     or obj.type == 'doc.alias.name' then
         return stepRefOfDocType(status, obj, mode)
     end
+    if obj.type == 'function' then
+        return { obj }
+    end
     return nil
 end
 

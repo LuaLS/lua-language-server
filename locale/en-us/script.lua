@@ -173,5 +173,7 @@ COMMAND_RUNTIME_VERSION = 'Change runtime version'
 COMMAND_OPEN_LIBRARY    = 'Load globals from 3rd library'
 COMMAND_UNICODE_NAME    = 'Allow Unicode characters.'
 
+COMPLETION_IMPORT_FROM  = 'Import from {}'
+
 DEBUG_MEMORY_LEAK       = "{} I'm sorry for the serious memory leak. The language service will be restarted soon."
 DEBUG_RESTART_NOW       = 'Restart now'

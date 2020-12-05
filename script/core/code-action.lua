@@ -279,6 +279,34 @@ local function solveDiagnostic(uri, diag, results)
     disableDiagnostic(uri, diag.code, results)
 end
 
+local function checkSwapParams(results, uri, start, finish)
+    local ast = files.getAst(uri)
+    if not ast then
+        return
+    end
+    local result = guide.eachSourceBetween(ast.ast, start, finish, function (source)
+        if source.type == 'callargs' then
+            return {
+                node = source.parent.node,
+                args = source,
+            }
+        end
+        if source.type == 'funcargs' then
+            return {
+                node = source.parent,
+                args = source,
+            }
+        end
+    end)
+    if not result then
+        return
+    end
+end
+
+local function checkExtractAsFunction(results, uri, start, finish)
+
+end
+
 return function (uri, start, finish, diagnostics)
     local ast = files.getAst(uri)
     if not ast then
@@ -290,6 +318,9 @@ return function (uri, start, finish, diagnostics)
     for _, diag in ipairs(diagnostics) do
         solveDiagnostic(uri, diag, results)
     end
+
+    checkSwapParams(results, uri, start, finish)
+    checkExtractAsFunction(results, uri, start, finish)
 
     return results
 end

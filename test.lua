@@ -68,6 +68,7 @@ local function main()
     test 'completion'
     test 'signature'
     test 'document_symbol'
+    test 'code_action'
     test 'crossfile'
     test 'full'
     --test 'other'

@@ -36,6 +36,7 @@ return function (self, lua, mode, version, options)
             comms[#comms+1] = comment
         end
     }
+    local clock = os.clock()
     ast.init(state)
     local suc, res, err = xpcall(self.grammar, debug.traceback, self, lua, mode)
     ast.close()
@@ -46,5 +47,6 @@ return function (self, lua, mode, version, options)
         state.pushError(err)
     end
     state.ast = res
+    state.parseClock = os.clock() - clock
     return state
 end

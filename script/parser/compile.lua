@@ -1,5 +1,6 @@
 local guide = require 'parser.guide'
 local type = type
+local os   = os
 
 local specials = {
     ['_G']           = true,
@@ -537,6 +538,7 @@ return function (self, lua, mode, version, options)
     if not state then
         return nil, err
     end
+    local clock = os.clock()
     pushError = state.pushError
     if version == 'Lua 5.1' or version == 'LuaJIT' then
         ENVMode = '@fenv'
@@ -557,6 +559,7 @@ return function (self, lua, mode, version, options)
         Compile(state.ast)
     end
     PostCompile()
+    state.compileClock = os.clock() - clock
     Compiled = nil
     GoToTag = nil
     return state

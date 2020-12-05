@@ -80,11 +80,15 @@ local function makeSignatures(call, pos)
     end
     local signs = {}
     local defs = vm.getDefs(node, 0)
+    local mark = {}
     for _, src in ipairs(defs) do
         src = guide.getObjectValue(src) or src
         if src.type == 'function'
         or src.type == 'doc.type.function' then
-            signs[#signs+1] = makeOneSignature(src, oop, index)
+            if not mark[src] then
+                mark[src] = true
+                signs[#signs+1] = makeOneSignature(src, oop, index)
+            end
         end
     end
     return signs

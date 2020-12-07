@@ -1,7 +1,7 @@
 local files = require 'files'
 local core = require 'core.completion'
 local furi = require 'file-uri'
-local platform = require 'platform'
+local platform = require 'bee.platform'
 
 rawset(_G, 'TEST', true)
 

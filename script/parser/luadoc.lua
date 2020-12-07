@@ -878,10 +878,7 @@ end
 
 local function buildLuaDoc(comment)
     local text = comment.text
-    if text:sub(1, 1) ~= '-' then
-        return
-    end
-    local _, startPos = text:find('%s*@', 2)
+    local _, startPos = text:find('^%-%s*@')
     if not startPos then
         return {
             type    = 'doc.comment',

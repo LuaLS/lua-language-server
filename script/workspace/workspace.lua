@@ -6,7 +6,6 @@ local config     = require 'config'
 local glob       = require 'glob'
 local platform   = require 'bee.platform'
 local await      = require 'await'
-local rpath      = require 'workspace.require-path'
 local proto      = require 'proto.proto'
 local lang       = require 'language'
 local library    = require 'library'
@@ -359,6 +358,7 @@ function m.getRelativePath(uri)
 end
 
 function m.reload()
+    local rpath = require 'workspace.require-path'
     files.flushAllLibrary()
     files.removeAllClosed()
     files.flushCache()

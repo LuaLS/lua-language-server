@@ -271,7 +271,7 @@ local function buildFunction(results, source, oop, data)
     end
 end
 
-local function buildInsertRequire(ast, targetName, targetUri)
+local function buildInsertRequire(ast, targetUri, stemName)
     local uri   = guide.getUri(ast.ast)
     local lines = files.getLines(uri)
     local text  = files.getText(uri)
@@ -285,7 +285,7 @@ local function buildInsertRequire(ast, targetName, targetUri)
         end
     end
     local path = furi.decode(targetUri)
-    local visiblePaths = rpath.getVisiblePath(path, config.config.runtime.path)
+    local visiblePaths = rpath.getVisiblePath(path, config.config.runtime.path, true)
     if #visiblePaths == 0 then
         return nil
     end
@@ -296,7 +296,7 @@ local function buildInsertRequire(ast, targetName, targetUri)
         {
             start   = start,
             finish  = start - 1,
-            newText = ('local %s = require %q\n'):format(targetName, visiblePaths[1].expect)
+            newText = ('local %s = require %q\n'):format(stemName, visiblePaths[1].expect)
         }
     }
 end
@@ -389,10 +389,11 @@ local function checkModule(ast, word, offset, results)
                     return {
                         detail      = buildDetail(targetSource),
                         description = lang.script('COMPLETION_IMPORT_FROM', ('[%s](%s)'):format(
-                            fileName, originUri
+                            workspace.getRelativePath(originUri),
+                            originUri
                         ))
                             .. '\n' .. buildDesc(targetSource),
-                        additionalTextEdits = buildInsertRequire(ast, stemName, uri),
+                        additionalTextEdits = buildInsertRequire(ast, uri, stemName),
                     }
                 end)
             }

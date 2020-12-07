@@ -1,6 +1,7 @@
 local platform = require 'bee.platform'
 local files    = require 'files'
 local furi     = require 'file-uri'
+local workspace = require "workspace"
 local m = {}
 
 m.cache = {}
@@ -24,7 +25,7 @@ local function getOnePath(path, searcher)
     return nil
 end
 
-function m.getVisiblePath(path, searchers)
+function m.getVisiblePath(path, searchers, strict)
     path = path:gsub('^[/\\]+', '')
     local uri = furi.encode(path)
     local libraryPath = files.getLibraryPath(uri)
@@ -35,6 +36,8 @@ function m.getVisiblePath(path, searchers)
         if libraryPath then
             libraryPath = libraryPath:gsub('^[/\\]+', '')
             pos = #libraryPath + 2
+        else
+            path = workspace.getRelativePath(uri)
         end
         repeat
             local cutedPath = path:sub(pos)
@@ -62,10 +65,7 @@ function m.getVisiblePath(path, searchers)
                     }
                 end
             end
-            if not pos then
-                break
-            end
-        until not pos
+        until not pos or strict
     end
     return m.cache[path]
 end

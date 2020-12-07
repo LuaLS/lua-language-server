@@ -639,5 +639,42 @@ function (a: any, b: any)
     }
 }
 
+
+TEST {
+    {
+        path = 'dir/myfunc.lua',
+        content = [[
+            return function (a, b)
+            end
+        ]]
+    },
+    {
+        path = 'main.lua',
+        main = true,
+        content = [[
+            myfun$
+        ]],
+    },
+    completion = {
+        {
+            label = 'myfunc',
+            kind  = CompletionItemKind.Variable,
+            detail = 'function',
+            description = [[
+从 [dir\myfunc.lua](file:///dir/myfunc.lua) 中导入
+```lua
+function (a: any, b: any)
+```]],
+            additionalTextEdits = {
+                {
+                    start   = 1,
+                    finish  = 0,
+                    newText = 'local myfunc = require "dir.myfunc"\n'
+                }
+            }
+        }
+    }
+}
+
 Cared['detail'] = nil
 Cared['additionalTextEdits'] = nil

@@ -141,7 +141,9 @@ function m.syntaxErrors(uri, ast)
     local results = {}
 
     for _, err in ipairs(ast.errs) do
-        results[#results+1] = buildSyntaxError(uri, err)
+        if not config.config.diagnostics.disable[err.type:lower():gsub('_', '-')] then
+            results[#results+1] = buildSyntaxError(uri, err)
+        end
     end
 
     return results

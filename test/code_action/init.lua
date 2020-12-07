@@ -53,12 +53,18 @@ print(<?a?>, b, c)
 ]]
 {
     {
-        title = '将其改为 `print` 的第 2 个参数',
+        title = lang.script('ACTION_SWAP_PARAMS', {
+            node  = 'print',
+            index = 2,
+        }),
         kind  = 'refactor.rewrite',
         edit  = EXISTS,
     },
     {
-        title = '将其改为 `print` 的第 3 个参数',
+        title = lang.script('ACTION_SWAP_PARAMS', {
+            node  = 'print',
+            index = 3,
+        }),
         kind  = 'refactor.rewrite',
         edit  = EXISTS,
     },
@@ -69,12 +75,18 @@ local function f(<?a?>, b, c) end
 ]]
 {
     {
-        title = '将其改为 `f` 的第 2 个参数',
+        title = lang.script('ACTION_SWAP_PARAMS', {
+            node  = 'f',
+            index = 2,
+        }),
         kind  = 'refactor.rewrite',
         edit  = EXISTS,
     },
     {
-        title = '将其改为 `f` 的第 3 个参数',
+        title = lang.script('ACTION_SWAP_PARAMS', {
+            node  = 'f',
+            index = 3,
+        }),
         kind  = 'refactor.rewrite',
         edit  = EXISTS,
     },
@@ -85,12 +97,18 @@ return function(<?a?>, b, c) end
 ]]
 {
     {
-        title = '将其改为 `<匿名函数>` 的第 2 个参数',
+        title = lang.script('ACTION_SWAP_PARAMS', {
+            node  = lang.script.SYMBOL_ANONYMOUS,
+            index = 2,
+        }),
         kind  = 'refactor.rewrite',
         edit  = EXISTS,
     },
     {
-        title = '将其改为 `<匿名函数>` 的第 3 个参数',
+        title = lang.script('ACTION_SWAP_PARAMS', {
+            node  = lang.script.SYMBOL_ANONYMOUS,
+            index = 3,
+        }),
         kind  = 'refactor.rewrite',
         edit  = EXISTS,
     },

@@ -923,14 +923,13 @@ local function mergeEnums(a, b, source)
         if label and not mark[label] then
             mark[label] = true
             local result = {
-                label            = label,
-                kind             = define.CompletionItemKind.EnumMember,
-                description      = enum.description,
-                insertTextFormat = 2,
-                textEdit         = source and {
-                    start        = source.start,
-                    finish       = source.finish,
-                    newText      = label,
+                label       = label,
+                kind        = define.CompletionItemKind.EnumMember,
+                description = enum.description,
+                textEdit    = source and {
+                    start   = source.start,
+                    finish  = source.finish,
+                    newText = label,
                 },
             }
             a[#a+1] = result

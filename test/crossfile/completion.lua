@@ -1,6 +1,7 @@
 local files = require 'files'
 local core = require 'core.completion'
 local furi = require 'file-uri'
+local platform = require 'platform'
 
 rawset(_G, 'TEST', true)
 
@@ -601,6 +602,7 @@ local z: {}
     }
 }
 
+if platform.OS == 'Windows' then
 Cared['detail'] = true
 Cared['additionalTextEdits'] = true
 TEST {
@@ -678,3 +680,4 @@ function (a: any, b: any)
 
 Cared['detail'] = nil
 Cared['additionalTextEdits'] = nil
+end

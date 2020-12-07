@@ -164,6 +164,7 @@ ACTION_FIX_DO_AS_THEN   = 'Modify to `do` .'
 ACTION_ADD_END          = 'Add `end` (infer the addition location ny indentations).'
 ACTION_FIX_COMMENT_PREFIX = 'Modify to `--` .'
 ACTION_RUNTIME_UNICODE_NAME = 'Allow Unicode characters.'
+ACTION_SWAP_PARAMS      = 'Change to parameter {index} or `{node}`'
 
 COMMAND_DISABLE_DIAG    = 'Disable diagnostics'
 COMMAND_MARK_GLOBAL     = 'Mark defined global'

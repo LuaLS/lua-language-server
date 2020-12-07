@@ -163,6 +163,7 @@ ACTION_FIX_DO_AS_THEN   = '改为 `do` 。'
 ACTION_ADD_END          = '添加 `end` （根据缩进推测添加位置）。'
 ACTION_FIX_COMMENT_PREFIX = '改为 `--` 。'
 ACTION_RUNTIME_UNICODE_NAME = '允许使用 Unicode 字符。'
+ACTION_SWAP_PARAMS      = '将其改为 `{node}` 的第 {index} 个参数'
 
 COMMAND_DISABLE_DIAG    = '禁用诊断'
 COMMAND_MARK_GLOBAL     = '标记全局变量'

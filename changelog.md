@@ -3,6 +3,7 @@
 ## 1.6.0
 * `NEW` auto require local modules
 * `NEW` hover function by keyword `function`
+* `NEW` code action: swap params
 * `CHG` unbind the relative path between binaries and scripts
 
 ## 1.5.0

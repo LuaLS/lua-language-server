@@ -29,6 +29,9 @@ local function formatNumber(n)
     or n ~= n then -- IEEE 标准中，NAN 不等于自己。但是某些实现中没有遵守这个规则
         return ('%q'):format(n)
     end
+    if mathType(n) == 'integer' then
+        return tostring(n)
+    end
     local str = ('%.10f'):format(n)
     str = str:gsub('%.?0*$', '')
     return str
@@ -554,6 +557,33 @@ function m.eachLine(text)
         end
         return line
     end
+end
+
+function m.sortByScore(tbl, callbacks)
+    if type(callbacks) ~= 'table' then
+        callbacks = { callbacks }
+    end
+    local size = #callbacks
+    local scoreCache = {}
+    for i = 1, size do
+        scoreCache[i] = {}
+    end
+    tableSort(tbl, function (a, b)
+        for i = 1, size do
+            local callback = callbacks[i]
+            local cache    = scoreCache[i]
+            local sa       = cache[a] or callback(a)
+            local sb       = cache[b] or callback(b)
+            cache[a] = sa
+            cache[b] = sb
+            if sa > sb then
+                return true
+            elseif sa < sb then
+                return false
+            end
+        end
+        return false
+    end)
 end
 
 return m

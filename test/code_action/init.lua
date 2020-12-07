@@ -4,17 +4,47 @@ local lang  = require 'language'
 
 rawset(_G, 'TEST', true)
 
+local EXISTS = {}
+
+local function eq(a, b)
+    if a == EXISTS and b ~= nil then
+        return true
+    end
+    if b == EXISTS and a ~= nil then
+        return true
+    end
+    local tp1, tp2 = type(a), type(b)
+    if tp1 ~= tp2 then
+        return false
+    end
+    if tp1 == 'table' then
+        local mark = {}
+        for k in pairs(a) do
+            if not eq(a[k], b[k]) then
+                return false
+            end
+            mark[k] = true
+        end
+        for k in pairs(b) do
+            if not mark[k] then
+                return false
+            end
+        end
+        return true
+    end
+    return a == b
+end
+
 function TEST(script)
     return function (expect)
         files.removeAll()
         local start  = script:find('<?', 1, true)
         local finish = script:find('?>', 1, true)
-        local pos = (start + finish) // 2 + 1
         local new_script = script:gsub('<[!?]', '  '):gsub('[!?]>', '  ')
         files.setText('', new_script)
-        local results = core('', pos)
+        local results = core('', start, finish)
         assert(results)
-        assert(expect == results)
+        assert(eq(expect, results))
     end
 end
 
@@ -23,14 +53,45 @@ print(<?a?>, b, c)
 ]]
 {
     {
-        title = lang.script.ACTION_SWAP_PARAMS,
+        title = '将其改为 `print` 的第 2 个参数',
         kind  = 'refactor.rewrite',
-        edit  = {
-            change = {
-                ['file:///.lua'] = {
-                    
-                }
-            }
-        }
-    }
+        edit  = EXISTS,
+    },
+    {
+        title = '将其改为 `print` 的第 3 个参数',
+        kind  = 'refactor.rewrite',
+        edit  = EXISTS,
+    },
+}
+
+TEST [[
+local function f(<?a?>, b, c) end
+]]
+{
+    {
+        title = '将其改为 `f` 的第 2 个参数',
+        kind  = 'refactor.rewrite',
+        edit  = EXISTS,
+    },
+    {
+        title = '将其改为 `f` 的第 3 个参数',
+        kind  = 'refactor.rewrite',
+        edit  = EXISTS,
+    },
+}
+
+TEST [[
+return function(<?a?>, b, c) end
+]]
+{
+    {
+        title = '将其改为 `<匿名函数>` 的第 2 个参数',
+        kind  = 'refactor.rewrite',
+        edit  = EXISTS,
+    },
+    {
+        title = '将其改为 `<匿名函数>` 的第 3 个参数',
+        kind  = 'refactor.rewrite',
+        edit  = EXISTS,
+    },
 }

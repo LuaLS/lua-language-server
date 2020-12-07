@@ -4,6 +4,7 @@ local define  = require 'proto.define'
 local guide   = require 'parser.guide'
 local util    = require 'utility'
 local sp      = require 'bee.subprocess'
+local vm      = require 'vm'
 
 local function disableDiagnostic(uri, code, results)
     results[#results+1] = {
@@ -133,7 +134,8 @@ local function solveSyntaxByAddDoEnd(uri, err, results)
             changes = {
                 [uri] = {
                     {
-                        range   = define.range(lines, text, err.start, err.finish),
+                        start   = err.start,
+                        finish  = err.finish,
                         newText = ('do %s end'):format(text:sub(err.start, err.finish)),
                     },
                 }
@@ -148,7 +150,8 @@ local function solveSyntaxByFix(uri, err, results)
     local changes = {}
     for _, fix in ipairs(err.fix) do
         changes[#changes+1] = {
-            range = define.range(lines, text, fix.start, fix.finish),
+            start   = fix.start,
+            finish  = fix.finish,
             newText = fix.text,
         }
     end
@@ -279,27 +282,91 @@ local function solveDiagnostic(uri, diag, results)
     disableDiagnostic(uri, diag.code, results)
 end
 
+local function checkQuickFix(results, uri, diagnostics)
+    if not diagnostics then
+        return
+    end
+    for _, diag in ipairs(diagnostics) do
+        solveDiagnostic(uri, diag, results)
+    end
+end
+
 local function checkSwapParams(results, uri, start, finish)
-    local ast = files.getAst(uri)
+    local ast  = files.getAst(uri)
+    local text = files.getText(uri)
     if not ast then
         return
     end
-    local result = guide.eachSourceBetween(ast.ast, start, finish, function (source)
-        if source.type == 'callargs' then
-            return {
-                node = source.parent.node,
-                args = source,
-            }
-        end
-        if source.type == 'funcargs' then
-            return {
-                node = source.parent,
-                args = source,
+    local args = {}
+    guide.eachSourceBetween(ast.ast, start, finish, function (source)
+        if source.type == 'callargs'
+        or source.type == 'funcargs' then
+            local targetIndex
+            for index, arg in ipairs(source) do
+                if arg.start - 1 <= finish and arg.finish >= start then
+                    -- should select only one param
+                    if targetIndex then
+                        return
+                    end
+                    targetIndex = index
+                end
+            end
+            if not targetIndex then
+                return
+            end
+            local node
+            if source.type == 'callargs' then
+                node = text:sub(source.parent.node.start, source.parent.node.finish)
+            elseif source.type == 'funcargs' then
+                local var = source.parent.parent
+                if vm.isSet(var) then
+                    node = text:sub(var.start, var.finish)
+                else
+                    node = lang.script.SYMBOL_ANONYMOUS
+                end
+            end
+            args[#args+1] = {
+                source = source,
+                index  = targetIndex,
+                node   = node,
             }
         end
     end)
-    if not result then
+    if #args == 0 then
         return
+    end
+    table.sort(args, function (a, b)
+        return a.source.start > b.source.start
+    end)
+    local target = args[1]
+    uri = files.getOriginUri(uri)
+    local myArg = target.source[target.index]
+    for i, targetArg in ipairs(target.source) do
+        if i ~= target.index then
+            results[#results+1] = {
+                title = lang.script('ACTION_SWAP_PARAMS', {
+                    node  = target.node,
+                    index = i,
+                }),
+                kind = 'refactor.rewrite',
+                edit = {
+                    changes = {
+                        [uri] = {
+                            {
+                                start   = myArg.start,
+                                finish  = myArg.finish,
+                                newText = text:sub(targetArg.start, targetArg.finish),
+                            },
+                            {
+                                start   = targetArg.start,
+                                finish  = targetArg.finish,
+                                newText = text:sub(myArg.start, myArg.finish),
+                            },
+                        }
+                    }
+                }
+            }
+        end
     end
 end
 
@@ -315,10 +382,7 @@ return function (uri, start, finish, diagnostics)
 
     local results = {}
 
-    for _, diag in ipairs(diagnostics) do
-        solveDiagnostic(uri, diag, results)
-    end
-
+    checkQuickFix(results, uri, diagnostics)
     checkSwapParams(results, uri, start, finish)
     checkExtractAsFunction(results, uri, start, finish)
 

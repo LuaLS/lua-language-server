@@ -581,6 +581,20 @@ proto.on('textDocument/codeAction', function (params)
         return nil
     end
 
+    for _, res in ipairs(results) do
+        if res.edit then
+            for turi, changes in pairs(res.edit.changes) do
+                local ttext  = files.getText(turi)
+                local tlines = files.getLines(turi)
+                for _, change in ipairs(changes) do
+                    change.range = define.range(tlines, ttext, change.start, change.finish)
+                    change.start  = nil
+                    change.finish = nil
+                end
+            end
+        end
+    end
+
     return results
 end)
 

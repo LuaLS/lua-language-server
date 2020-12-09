@@ -823,3 +823,23 @@ TEST [[
 ---@class class
 local t
 ]]
+
+TEST [[
+---@class Foo
+---@field field1 integer
+local mt = {}
+function mt:Constructor()
+    self.field2 = 1
+end
+function mt:method1() return 1 end
+function mt.method2() return 2 end
+
+---@type Foo
+local v
+print(v.field1 + 1)
+print(v.field2 + 1)
+print(<!v.field3!> + 1)
+print(v:method1())
+print(v.method2())
+print(<!v:method3!>())
+]]

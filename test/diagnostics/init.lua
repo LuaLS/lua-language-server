@@ -842,4 +842,7 @@ print(<!v.field3!> + 1)
 print(v:method1())
 print(v.method2())
 print(<!v:method3!>())
+
+local v1 = {}
+print(v1.abc)
 ]]

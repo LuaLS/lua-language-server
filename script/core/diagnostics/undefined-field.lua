@@ -11,11 +11,25 @@ return function (uri, callback)
         return
     end
 
+    local function is_G(src)
+        if not src then
+            return false
+        end
+        while src.node ~= nil and src.type == 'getfield' and src.field[1] == '_G' do
+            src = src.node
+        end
+        return src.type == 'getglobal' and src.special == '_G'
+    end
+
     local function checkUndefinedField(src)
         local fieldName = guide.getKeyName(src)
+        if is_G(src)then
+            return
+        end
         local refs = vm.getFields(src.node, 0)
 
         local fields = {}
+        local empty = true
         for _, ref in ipairs(refs) do
             if ref.type == 'getfield' or ref.type == 'getmethod' then
                 goto CONTINUE
@@ -25,7 +39,13 @@ return function (uri, callback)
                 goto CONTINUE
             end
             fields[name] = true
+            empty = false
             ::CONTINUE::
+        end
+
+        -- 没找到任何 field，跳过检查
+        if empty then
+            return
         end
 
         if not fields[fieldName] then

@@ -834,6 +834,10 @@ end
 function mt:method1() return 1 end
 function mt.method2() return 2 end
 
+---@class Bar: Foo
+---@field field4 integer
+local mt2 = {}
+
 ---@type Foo
 local v
 print(v.field1 + 1)
@@ -842,6 +846,16 @@ print(<!v.field3!> + 1)
 print(v:method1())
 print(v.method2())
 print(<!v:method3!>())
+
+---@type Bar
+local v2
+print(v2.field1 + 1)
+print(v2.field2 + 1)
+print(<!v2.field3!> + 1)
+print(v2.field4 + 1)
+print(v2:method1())
+print(v2.method2())
+print(<!v2:method3!>())
 
 local v1 = {}
 print(v1.abc)

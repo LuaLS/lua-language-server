@@ -857,6 +857,11 @@ print(v2:method1())
 print(v2.method2())
 print(<!v2:method3!>())
 
-local v1 = {}
-print(v1.abc)
+local v3 = {}
+print(v3.abc)
+
+---@class Bar2
+local mt3
+function mt3:method() return 1 end
+print(mt3:method())
 ]]

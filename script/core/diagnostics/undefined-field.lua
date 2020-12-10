@@ -21,11 +21,28 @@ return function (uri, callback)
         return src.type == 'getglobal' and src.special == '_G'
     end
 
+    local function canInfer2Class(src)
+        local className = vm.getClass(src, 0)
+        if not className then
+            local inferType = vm.getInferType(src, 0)
+            if inferType ~= 'any' and inferType ~= 'table' then
+                className = inferType
+            end
+        end
+
+        return className and className ~= 'table'
+    end
+
     local function checkUndefinedField(src)
         local fieldName = guide.getKeyName(src)
         if is_G(src)then
             return
         end
+
+        if not canInfer2Class(src.node) then
+            return
+        end
+    
         local refs = vm.getFields(src.node, 0)
 
         local fields = {}

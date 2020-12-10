@@ -36,6 +36,7 @@ DIAG_SET_CONST          = '不能对常量赋值。'
 DIAG_SET_FOR_STATE      = '修改了循环变量。'
 DIAG_CODE_AFTER_BREAK   = '无法执行到 `break` 后的代码。'
 DIAG_UNBALANCED_ASSIGNMENTS = '由于值的数量不够而被赋值为了 `nil` 。在Lua中, `x, y = 1` 等价于 `x, y = 1, nil` 。'
+DIAG_REQUIRE_LIKE       = '你可以在设置中将 `{}` 视为 `require`。'
 
 DIAG_CIRCLE_DOC_CLASS                 = '循环继承的类。'
 DIAG_DOC_FIELD_NO_CLASS               = '字段必须定义在类之后。'

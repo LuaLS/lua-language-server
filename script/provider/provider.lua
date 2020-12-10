@@ -371,7 +371,7 @@ proto.on('textDocument/completion', function (params)
             deprecated       = res.deprecated,
             sortText         = ('%04d'):format(i),
             insertText       = res.insertText,
-            insertTextFormat = res.insertTextFormat,
+            insertTextFormat = 2,
             commitCharacters = res.commitCharacters,
             command          = res.command,
             textEdit         = res.textEdit and {

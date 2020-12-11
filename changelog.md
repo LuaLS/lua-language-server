@@ -6,6 +6,7 @@
 * `NEW` code action: swap params
 * `CHG` unbind the relative path between binaries and scripts
 * `CHG` `LuaDoc` also catchs `--` (no need `---`)
+* `CHG` rename doc
 
 ## 1.5.0
 `2020-12-5`

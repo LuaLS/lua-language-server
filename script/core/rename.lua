@@ -230,6 +230,15 @@ local function ofLocal(source, newname, callback)
             renameLocal(ref, newname, callback)
         end
     end
+    if  source.parent.type == 'funcargs'
+    and source.bindDocs then
+        for _, doc in ipairs(source.bindDocs) do
+            if doc.type == 'doc.param'
+            and doc.param[1] == source[1] then
+                callback(doc.param, doc.param.start, doc.param.finish, newname)
+            end
+        end
+    end
 end
 
 local function ofFieldThen(key, src, newname, callback)
@@ -298,6 +307,35 @@ local function ofLabel(source, newname, callback)
     end
 end
 
+local function ofDocTypeName(source, newname, callback)
+    for _, doc in ipairs(vm.getDocTypes(source[1])) do
+        if doc.type == 'doc.class.name'
+        or doc.type == 'doc.type.name'
+        or doc.type == 'doc.alias.name' then
+            callback(doc, doc.start, doc.finish, newname)
+        end
+    end
+end
+
+local function ofDocParamName(source, newname, callback)
+    callback(source, source.start, source.finish, newname)
+    local doc = guide.getDocState(source)
+    if doc.bindSources then
+        for _, src in ipairs(doc.bindSources) do
+            if src.type == 'local'
+            and src.parent.type == 'funcargs'
+            and src[1] == source[1] then
+                renameLocal(src, newname, callback)
+                if src.ref then
+                    for _, ref in ipairs(src.ref) do
+                        renameLocal(ref, newname, callback)
+                    end
+                end
+            end
+        end
+    end
+end
+
 local function rename(source, newname, callback)
     if source.type == 'label'
     or source.type == 'goto' then
@@ -314,6 +352,12 @@ local function rename(source, newname, callback)
     elseif source.type == 'setglobal'
     or     source.type == 'getglobal' then
         return ofGlobal(source, newname, callback)
+    elseif source.type == 'doc.class.name'
+    or     source.type == 'doc.type.name'
+    or     source.type == 'doc.alias.name' then
+        return ofDocTypeName(source, newname, callback)
+    elseif source.type == 'doc.param.name' then
+        return ofDocParamName(source, newname, callback)
     elseif source.type == 'string'
     or     source.type == 'number'
     or     source.type == 'boolean' then
@@ -340,7 +384,11 @@ local function prepareRename(source)
     or source.type == 'method'
     or source.type == 'tablefield'
     or source.type == 'setglobal'
-    or source.type == 'getglobal' then
+    or source.type == 'getglobal'
+    or source.type == 'doc.class.name'
+    or source.type == 'doc.type.name'
+    or source.type == 'doc.alias.name'
+    or source.type == 'doc.param.name' then
         return source, source[1]
     elseif source.type == 'string'
     or     source.type == 'number'
@@ -373,6 +421,11 @@ local accept = {
     ['string']     = true,
     ['boolean']    = true,
     ['number']     = true,
+
+    ['doc.class.name'] = true,
+    ['doc.type.name']  = true,
+    ['doc.alias.name'] = true,
+    ['doc.param.name'] = true,
 }
 
 local m = {}

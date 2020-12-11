@@ -370,9 +370,77 @@ local function checkSwapParams(results, uri, start, finish)
     end
 end
 
-local function checkExtractAsFunction(results, uri, start, finish)
-
-end
+--local function checkExtractAsFunction(results, uri, start, finish)
+--    local ast = files.getAst(uri)
+--    local text = files.getText(uri)
+--    local funcs = {}
+--    guide.eachSourceContain(ast.ast, start, function (source)
+--        if source.type == 'function'
+--        or source.type == 'main' then
+--            funcs[#funcs+1] = source
+--        end
+--    end)
+--    table.sort(funcs, function (a, b)
+--        return a.start > b.start
+--    end)
+--    local func = funcs[1]
+--    if not func then
+--        return
+--    end
+--    if #func == 0 then
+--        return
+--    end
+--    if func.finish < finish then
+--        return
+--    end
+--    local actions = {}
+--    for i = 1, #func do
+--        local action = func[i]
+--        if  action.start  < start
+--        and action.finish > start then
+--            return
+--        end
+--        if  action.start  < finish
+--        and action.finish > finish then
+--            return
+--        end
+--        if  action.finish >= start
+--        and action.start  <= finish then
+--            actions[#actions+1] = action
+--        end
+--    end
+--    if text:sub(start, actions[1].start - 1):find '[%C%S]' then
+--        return
+--    end
+--    if text:sub(actions[1].finish + 1, finish):find '[%C%S]' then
+--        return
+--    end
+--    while func do
+--        local funcName = getExtractFuncName(uri, actions[1].start)
+--        local funcParams = getExtractFuncParams(uri, actions[1].start)
+--        results[#results+1] = {
+--            title = lang.script('ACTION_EXTRACT'),
+--            kind = 'refactor.extract',
+--            edit = {
+--                changes = {
+--                    [uri] = {
+--                        {
+--                            start   = actions[1].start,
+--                            finish  = actions[1].start - 1,
+--                            newText = text:sub(targetArg.start, targetArg.finish),
+--                        },
+--                        {
+--                            start   = targetArg.start,
+--                            finish  = targetArg.finish,
+--                            newText = text:sub(myArg.start, myArg.finish),
+--                        },
+--                    }
+--                }
+--            }
+--        }
+--        func = guide.getParentFunction(func)
+--    end
+--end
 
 return function (uri, start, finish, diagnostics)
     local ast = files.getAst(uri)
@@ -384,7 +452,7 @@ return function (uri, start, finish, diagnostics)
 
     checkQuickFix(results, uri, diagnostics)
     checkSwapParams(results, uri, start, finish)
-    checkExtractAsFunction(results, uri, start, finish)
+    --checkExtractAsFunction(results, uri, start, finish)
 
     return results
 end

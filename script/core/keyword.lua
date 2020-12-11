@@ -2,7 +2,7 @@ local define     = require 'proto.define'
 local guide      = require 'parser.guide'
 
 local keyWordMap = {
-    {'do', function (hasSpace, results)
+    {'do', function (hasSpace, isExp, results)
         if hasSpace then
             results[#results+1] = {
                 label = 'do .. end',
@@ -38,7 +38,7 @@ end]],
     {'and'},
     {'break'},
     {'else'},
-    {'elseif', function (hasSpace, results)
+    {'elseif', function (hasSpace, isExp, results)
         if hasSpace then
             results[#results+1] = {
                 label = 'elseif .. then',
@@ -58,7 +58,7 @@ end]],
     end},
     {'end'},
     {'false'},
-    {'for', function (hasSpace, results)
+    {'for', function (hasSpace, isExp, results)
         if hasSpace then
             results[#results+1] = {
                 label = 'for .. in',
@@ -100,13 +100,16 @@ end]]
         end
         return true
     end},
-    {'function', function (hasSpace, results)
+    {'function', function (hasSpace, isExp, results)
         if hasSpace then
             results[#results+1] = {
                 label = 'function ()',
                 kind  = define.CompletionItemKind.Snippet,
                 insertTextFormat = 2,
-                insertText = [[
+                insertText = isExp and [[
+($1)
+    $0
+end]] or [[
 $1($2)
     $0
 end]]
@@ -116,7 +119,10 @@ end]]
                 label = 'function ()',
                 kind  = define.CompletionItemKind.Snippet,
                 insertTextFormat = 2,
-                insertText = [[
+                insertText = isExp and [[
+function ($1)
+    $0
+end]] or [[
 function $1($2)
     $0
 end]]
@@ -125,7 +131,7 @@ end]]
         return true
     end},
     {'goto'},
-    {'if', function (hasSpace, results)
+    {'if', function (hasSpace, isExp, results)
         if hasSpace then
             results[#results+1] = {
                 label = 'if .. then',
@@ -149,7 +155,7 @@ end]]
         end
         return true
     end},
-    {'in', function (hasSpace, results)
+    {'in', function (hasSpace, isExp, results)
         if hasSpace then
             results[#results+1] = {
                 label = 'in ..',
@@ -173,7 +179,7 @@ end]]
         end
         return true
     end},
-    {'local', function (hasSpace, results)
+    {'local', function (hasSpace, isExp, results)
         if hasSpace then
             results[#results+1] = {
                 label = 'local function',
@@ -200,7 +206,7 @@ end]]
     {'nil'},
     {'not'},
     {'or'},
-    {'repeat', function (hasSpace, results)
+    {'repeat', function (hasSpace, isExp, results)
         if hasSpace then
             results[#results+1] = {
                 label = 'repeat .. until',
@@ -221,7 +227,7 @@ until $1]]
         end
         return true
     end},
-    {'return', function (hasSpace, results)
+    {'return', function (hasSpace, isExp, results)
         if not hasSpace then
             results[#results+1] = {
                 label = 'do return end',
@@ -235,7 +241,7 @@ until $1]]
     {'then'},
     {'true'},
     {'until'},
-    {'while', function (hasSpace, results)
+    {'while', function (hasSpace, isExp, results)
         if hasSpace then
             results[#results+1] = {
                 label = 'while .. do',

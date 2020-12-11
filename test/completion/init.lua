@@ -1059,6 +1059,42 @@ mt:f$
         insertText = 'f(${1:a: any}, ${2:b: any}, ${3:c: any})',
     },
 }
+
+TEST [[
+function$
+]]
+{
+    {
+        label = 'function',
+        kind  = define.CompletionItemKind.Keyword,
+    },
+    {
+        label = 'function ()',
+        kind  = define.CompletionItemKind.Snippet,
+        insertText = [[
+function $1($2)
+    $0
+end]],
+    },
+}
+
+TEST [[
+local t = function$
+]]
+{
+    {
+        label = 'function',
+        kind  = define.CompletionItemKind.Keyword,
+    },
+    {
+        label = 'function ()',
+        kind  = define.CompletionItemKind.Snippet,
+        insertText = [[
+function ($1)
+    $0
+end]],
+    },
+}
 Cared['insertText'] = false
 
 TEST [[

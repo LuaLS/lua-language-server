@@ -1952,3 +1952,18 @@ vvv$
         description = EXISTS,
     },
 }
+
+--TEST [[
+-----@param callback fun(x: number, y: number):string
+--local function f(callback)
+--
+--f($)
+--]]
+--{
+--    {
+--        label  = 'fun(x: number, y: number):string',
+--        detail = 'function',
+--        kind   = define.CompletionItemKind.Function,
+--        description = EXISTS,
+--    },
+--}

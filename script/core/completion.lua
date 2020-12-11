@@ -1167,6 +1167,15 @@ local function getCallEnums(source, index)
                         kind        = define.CompletionItemKind.EnumMember,
                     }
                 end
+                for _, unit in ipairs(vm.getDocTypes(doc.extends)) do
+                    if unit.type == 'doc.type.function' then
+                        enums[#enums+1] = {
+                            label       = guide.getDocTypeUnitName(nil, unit),
+                            description = doc.comment,
+                            kind        = define.CompletionItemKind.Function,
+                        }
+                    end
+                end
                 return enums
             elseif doc.type == 'doc.vararg'
             and    arg.type == '...' then

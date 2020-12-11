@@ -2941,17 +2941,17 @@ local function getDocAliasExtends(status, typeUnit)
     return nil
 end
 
-local function getDocTypeUnitName(status, unit)
+function m.getDocTypeUnitName(status, unit)
     local typeName
     if unit.type == 'doc.type.name' then
         typeName = unit[1]
     elseif unit.type == 'doc.type.function' then
         typeName = 'function'
     elseif unit.type == 'doc.type.array' then
-        typeName = getDocTypeUnitName(status, unit.node) .. '[]'
+        typeName = m.getDocTypeUnitName(status, unit.node) .. '[]'
     elseif unit.type == 'doc.type.generic' then
         typeName = ('%s<%s, %s>'):format(
-            getDocTypeUnitName(status, unit.node),
+            m.getDocTypeUnitName(status, unit.node),
             m.viewInferType(m.getDocTypeNames(status, unit.key)),
             m.viewInferType(m.getDocTypeNames(status, unit.value))
         )
@@ -2975,7 +2975,7 @@ function m.getDocTypeNames(status, doc)
                 results[#results+1] = res
             end
         else
-            local typeName = getDocTypeUnitName(status, unit)
+            local typeName = m.getDocTypeUnitName(status, unit)
             results[#results+1] = {
                 type   = typeName,
                 source = unit,

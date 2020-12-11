@@ -11,55 +11,69 @@ return function (uri, callback)
         return
     end
 
-    local function getDocClassFromInfer(src)
+    local function getAllDocClassFromInfer(src)
         local infers = vm.getInfers(src, 0)
 
         if not infers then
             return nil
         end
 
+        local allDocClass = {}
         for i = 1, #infers do
             local infer = infers[i]
             if infer.type ~= '_G' then
                 local inferSource = infer.source
                 if inferSource.type == 'doc.class' then
-                    return inferSource
+                    allDocClass[#allDocClass+1] = inferSource
                 elseif inferSource.type == 'doc.class.name' then
-                    return inferSource.parent
+                    allDocClass[#allDocClass+1] = inferSource.parent
                 end
             end
         end
 
-        return nil
+        return allDocClass
+    end
+
+    ---@param allDocClass table int
+    local function getAllFieldsFromAllDocClass(allDocClass)
+        local fields = {}
+        local empty = true
+        for _, docClass in ipairs(allDocClass) do
+            local refs = vm.getFields(docClass)
+
+            for _, ref in ipairs(refs) do
+                if ref.type == 'getfield' or ref.type == 'getmethod' then
+                    goto CONTINUE
+                end
+                local name = vm.getKeyName(ref)
+                if not name or vm.getKeyType(ref) ~= 'string' then
+                    goto CONTINUE
+                end
+                fields[name] = true
+                empty = false
+                ::CONTINUE::
+            end
+        end
+       
+        if empty then
+            return nil
+        else
+            return fields
+        end
     end
 
     local function checkUndefinedField(src)
         local fieldName = guide.getKeyName(src)
 
-        local docClass = getDocClassFromInfer(src.node)
-        if not docClass then
+        local allDocClass = getAllDocClassFromInfer(src.node)
+        if (not allDocClass) or (#allDocClass == 0) then
             return
         end
 
-        local refs = vm.getFields(docClass)
-
-        local fields = {}
-        local empty = true
-        for _, ref in ipairs(refs) do
-            if ref.type == 'getfield' or ref.type == 'getmethod' then
-                goto CONTINUE
-            end
-            local name = vm.getKeyName(ref)
-            if not name or vm.getKeyType(ref) ~= 'string' then
-                goto CONTINUE
-            end
-            fields[name] = true
-            empty = false
-            ::CONTINUE::
-        end
+        local fields = getAllFieldsFromAllDocClass(allDocClass)
 
         -- 没找到任何 field，跳过检查
-        if empty then
+        if not fields then
             return
         end
 

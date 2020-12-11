@@ -824,6 +824,7 @@ TEST [[
 local t
 ]]
 
+-- checkUndefinedField 通用
 TEST [[
 ---@class Foo
 ---@field field1 integer
@@ -864,4 +865,60 @@ print(v3.abc)
 local mt3
 function mt3:method() return 1 end
 print(mt3:method())
+]]
+
+-- checkUndefinedField 通过type找到class
+TEST [[
+---@class Foo
+local Foo
+function Foo:method1() end
+
+---@type Foo
+local v
+v:method1()
+<!v:method2!>() -- doc.class.name
+]]
+
+-- checkUndefinedField 通过type找到class，涉及到 class 继承版
+TEST [[
+---@class Foo
+local Foo
+function Foo:method1() end
+---@class Bar: Foo
+local Bar
+function Bar:method3() end
+
+---@type Bar
+local v
+v:method1()
+<!v:method2!>() -- doc.class.name
+v:method3()
+]]
+
+-- checkUndefinedField 类名和类变量同名，类变量被直接使用
+TEST [[
+---@class Foo
+local Foo
+function Foo:method1() end
+<!Foo:method2!>() -- doc.class
+<!Foo:method2!>() -- doc.class
+]]
+
+-- checkUndefinedField 没有@class的不检测
+TEST [[
+local Foo
+function Foo:method1()
+    return Foo:method2() -- table
+end
+]]
+
+-- checkUndefinedField 类名和类变量不同名，类变量被直接使用、使用self
+TEST [[
+---@class Foo
+local mt
+function mt:method1()
+    <!mt.method2!>() -- doc.class
+    self.method1()
+    return <!self.method2!>() -- doc.class.name
+end
 ]]

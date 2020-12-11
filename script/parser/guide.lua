@@ -1242,6 +1242,10 @@ function m.isDoc(source)
     return source.type:sub(1, 4) == 'doc.'
 end
 
+function m.isDocClass(source)
+    return source.type == 'doc.class'
+end
+
 --- 根据函数的调用参数，获取：调用，参数索引
 function m.getCallAndArgIndex(callarg)
     local callargs = callarg.parent

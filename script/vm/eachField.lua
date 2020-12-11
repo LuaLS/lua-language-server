@@ -45,6 +45,11 @@ function vm.getFields(source, deep)
                     or getFieldsBySource(source, deep)
         vm.getCache('eachFieldOfGlobal')[name] = cache
         return cache
+    elseif guide.isDocClass(source) then
+        local cache =  vm.getCache('eachFieldOfDocClass')[source]
+                    or getFieldsBySource(source, deep)
+        vm.getCache('eachFieldOfDocClass')[source] = cache
+        return cache
     else
         return getFieldsBySource(source, deep)
     end

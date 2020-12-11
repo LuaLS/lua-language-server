@@ -11,39 +11,37 @@ return function (uri, callback)
         return
     end
 
-    local function is_G(src)
-        if not src then
-            return false
-        end
-        while src.node ~= nil and src.type == 'getfield' and src.field[1] == '_G' do
-            src = src.node
-        end
-        return src.type == 'getglobal' and src.special == '_G'
-    end
+    local function getDocClassFromInfer(src)
+        local infers = vm.getInfers(src, 0)
 
-    local function canInfer2Class(src)
-        local className = vm.getClass(src, 0)
-        if not className then
-            local inferType = vm.getInferType(src, 0)
-            if inferType ~= 'any' and inferType ~= 'table' then
-                className = inferType
+        if not infers then
+            return nil
+        end
+
+        for i = 1, #infers do
+            local infer = infers[i]
+            if infer.type ~= '_G' then
+                local inferSource = infer.source
+                if inferSource.type == 'doc.class' then
+                    return inferSource
+                elseif inferSource.type == 'doc.class.name' then
+                    return inferSource.parent
+                end
             end
         end
 
-        return className and className ~= 'table'
+        return nil
     end
 
     local function checkUndefinedField(src)
         local fieldName = guide.getKeyName(src)
-        if is_G(src)then
+
+        local docClass = getDocClassFromInfer(src.node)
+        if not docClass then
             return
         end
 
-        if not canInfer2Class(src.node) then
-            return
-        end
-    
-        local refs = vm.getFields(src.node, 0)
+        local refs = vm.getFields(docClass)
 
         local fields = {}
         local empty = true

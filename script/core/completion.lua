@@ -6,6 +6,7 @@ local vm         = require 'vm'
 local getLabel   = require 'core.hover.label'
 local getName    = require 'core.hover.name'
 local getArg     = require 'core.hover.arg'
+local getReturn  = require 'core.hover.return'
 local getDesc    = require 'core.hover.description'
 local getHover   = require 'core.hover'
 local config     = require 'config'
@@ -939,8 +940,9 @@ local function mergeEnums(a, b, source)
             mark[label] = true
             local result = {
                 label       = label,
-                kind        = define.CompletionItemKind.EnumMember,
+                kind        = enum.kind,
                 description = enum.description,
+                insertText  = enum.insertText,
                 textEdit    = source and {
                     start   = source.start,
                     finish  = source.finish,
@@ -1140,6 +1142,17 @@ local function trySymbol(ast, text, offset, results)
     end
 end
 
+local function buildInsertDocFunction(doc)
+    local args = {}
+    for i, arg in ipairs(doc.args) do
+        args[i] = ('${%d:%s}'):format(i, arg.name[1])
+    end
+    return ([[
+function (%s)
+    $0
+end]]):format(table.concat(args, ', '))
+end
+
 local function getCallEnums(source, index)
     if source.type == 'function' and source.bindDocs then
         if not source.args then
@@ -1167,12 +1180,14 @@ local function getCallEnums(source, index)
                         kind        = define.CompletionItemKind.EnumMember,
                     }
                 end
-                for _, unit in ipairs(vm.getDocTypes(doc.extends)) do
+                for _, unit in ipairs(vm.getDocTypeUnits(doc.extends)) do
                     if unit.type == 'doc.type.function' then
+                        local text = files.getText(guide.getUri(unit))
                         enums[#enums+1] = {
-                            label       = guide.getDocTypeUnitName(nil, unit),
+                            label       = text:sub(unit.start, unit.finish),
                             description = doc.comment,
                             kind        = define.CompletionItemKind.Function,
+                            insertText  = buildInsertDocFunction(unit),
                         }
                     end
                 end

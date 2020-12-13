@@ -1953,17 +1953,21 @@ vvv$
     },
 }
 
---TEST [[
------@param callback fun(x: number, y: number):string
---local function f(callback)
---
---f($)
---]]
---{
---    {
---        label  = 'fun(x: number, y: number):string',
---        detail = 'function',
---        kind   = define.CompletionItemKind.Function,
---        description = EXISTS,
---    },
---}
+Cared['insertText'] = true
+TEST [[
+---@param callback fun(x: number, y: number):string
+local function f(callback) end
+
+f($)
+]]
+{
+    {
+        label  = 'fun(x: number, y: number):string',
+        kind   = define.CompletionItemKind.Function,
+        insertText = [[
+function (${1:x}, ${2:y})
+    $0
+end]],
+    },
+}
+Cared['insertText'] = nil

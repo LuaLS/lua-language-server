@@ -2,6 +2,7 @@
 
 ## 1.6.0
 * `NEW` completion: auto require local modules
+* `NEW` completion: support delegate
 * `NEW` hover: show function by keyword `function`
 * `NEW` code action: swap params
 * `CHG` standalone: unbind the relative path between binaries and scripts

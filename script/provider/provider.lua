@@ -206,6 +206,7 @@ proto.on('textDocument/hover', function (params)
     end
     local md = markdown()
     md:add('lua', hover.label)
+    md:add('md', "---")
     md:add('md',  hover.description)
     return {
         contents = {

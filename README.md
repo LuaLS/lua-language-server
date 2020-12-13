@@ -1,6 +1,9 @@
 # lua-language-server
 
 ![build](https://github.com/sumneko/lua-language-server/workflows/build/badge.svg)
+![version](https://vsmarketplacebadge.apphb.com/version-short/sumneko.lua.svg)
+![installs](https://vsmarketplacebadge.apphb.com/installs-short/sumneko.lua.svg)
+![downloads](https://vsmarketplacebadge.apphb.com/downloads-short/sumneko.lua.svg)
 
 ## Install In VSCode
 https://marketplace.visualstudio.com/items?itemName=sumneko.lua

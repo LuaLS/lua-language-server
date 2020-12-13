@@ -9,6 +9,7 @@
 * `CHG` hover: `LuaDoc` also catchs `--` (no need `---`)
 * `CHG` rename: support doc
 * `CHG` completion: keyword considers expression
+* `FIX` [#297](https://github.com/sumneko/lua-language-server/issues/297)
 
 ## 1.5.0
 `2020-12-5`

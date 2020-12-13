@@ -1401,9 +1401,14 @@ function m.checkSameSimpleInValueOfSetMetaTable(status, func, start, queue)
 end
 
 function m.checkSameSimpleInValueOfCallMetaTable(status, call, start, queue)
+    if status.crossMetaTableMark then
+        return
+    end
+    status.crossMetaTableMark = true
     if call.type == 'call' then
         m.checkSameSimpleInValueOfSetMetaTable(status, call.node, start, queue)
     end
+    status.crossMetaTableMark = false
 end
 
 function m.checkSameSimpleInSpecialBranch(status, obj, start, queue)

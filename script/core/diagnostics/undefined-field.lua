@@ -69,7 +69,7 @@ return function (uri, callback)
                 ::CONTINUE::
             end
         end
-       
+
         if empty then
             return nil
         else

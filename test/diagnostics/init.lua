@@ -824,6 +824,10 @@ TEST [[
 local t
 ]]
 
+TEST [[
+local _ <close> = function () end
+]]
+
 -- checkUndefinedField 通用
 TEST [[
 ---@class Foo

@@ -6,6 +6,7 @@ local vm         = require 'vm'
 local getLabel   = require 'core.hover.label'
 local getName    = require 'core.hover.name'
 local getArg     = require 'core.hover.arg'
+local getReturn  = require 'core.hover.return'
 local getDesc    = require 'core.hover.description'
 local getHover   = require 'core.hover'
 local config     = require 'config'
@@ -35,6 +36,7 @@ end
 local function resolveStack(id)
     local callback = stacks[id]
     if not callback then
+        log.warn('Unknown resolved id', id)
         return nil
     end
 
@@ -87,7 +89,9 @@ local function findSymbol(text, offset)
         end
         if char == '.'
         or char == ':'
-        or char == '(' then
+        or char == '('
+        or char == ','
+        or char == '=' then
             return char, i
         else
             return nil
@@ -286,7 +290,7 @@ local function buildInsertRequire(ast, targetUri, stemName)
     end
     local path = furi.decode(targetUri)
     local visiblePaths = rpath.getVisiblePath(path, config.config.runtime.path, true)
-    if #visiblePaths == 0 then
+    if not visiblePaths or #visiblePaths == 0 then
         return nil
     end
     table.sort(visiblePaths, function (a, b)
@@ -619,6 +623,8 @@ end
 
 local function checkKeyWord(ast, text, start, word, hasSpace, afterLocal, results)
     local snipType = config.config.completion.keywordSnippet
+    local symbol = findSymbol(text, start - 1)
+    local isExp = symbol == '(' or symbol == ',' or symbol == '='
     for _, data in ipairs(keyWordMap) do
         local key = data[1]
         local eq
@@ -630,40 +636,50 @@ local function checkKeyWord(ast, text, start, word, hasSpace, afterLocal, result
         if afterLocal and key ~= 'function' then
             eq = false
         end
-        if eq then
-            local replaced
-            local extra
-            if snipType == 'Both' or snipType == 'Replace' then
-                local func = data[2]
-                if func then
-                    replaced = func(hasSpace, results)
-                    extra = true
-                end
+        if not eq then
+            goto CONTINUE
+        end
+        if isExp then
+            if  key ~= 'nil'
+            and key ~= 'true'
+            and key ~= 'false'
+            and key ~= 'function' then
+                goto CONTINUE
             end
-            if snipType == 'Both' then
-                replaced = false
+        end
+        local replaced
+        local extra
+        if snipType == 'Both' or snipType == 'Replace' then
+            local func = data[2]
+            if func then
+                replaced = func(hasSpace, isExp, results)
+                extra = true
             end
-            if not replaced then
-                if not hasSpace then
-                    local item = {
-                        label = key,
-                        kind  = define.CompletionItemKind.Keyword,
-                    }
-                    if extra then
-                        table.insert(results, #results, item)
-                    else
-                        results[#results+1] = item
-                    end
-                end
-            end
-            local checkStop = data[3]
-            if checkStop then
-                local stop = checkStop(ast, start)
-                if stop then
-                    return true
+        end
+        if snipType == 'Both' then
+            replaced = false
+        end
+        if not replaced then
+            if not hasSpace then
+                local item = {
+                    label = key,
+                    kind  = define.CompletionItemKind.Keyword,
+                }
+                if extra then
+                    table.insert(results, #results, item)
+                else
+                    results[#results+1] = item
                 end
             end
         end
+        local checkStop = data[3]
+        if checkStop then
+            local stop = checkStop(ast, start)
+            if stop then
+                return true
+            end
+        end
+        ::CONTINUE::
     end
 end
 
@@ -924,8 +940,9 @@ local function mergeEnums(a, b, source)
             mark[label] = true
             local result = {
                 label       = label,
-                kind        = define.CompletionItemKind.EnumMember,
+                kind        = enum.kind,
                 description = enum.description,
+                insertText  = enum.insertText,
                 textEdit    = source and {
                     start   = source.start,
                     finish  = source.finish,
@@ -1125,6 +1142,17 @@ local function trySymbol(ast, text, offset, results)
     end
 end
 
+local function buildInsertDocFunction(doc)
+    local args = {}
+    for i, arg in ipairs(doc.args) do
+        args[i] = ('${%d:%s}'):format(i, arg.name[1])
+    end
+    return ([[
+function (%s)
+    $0
+end]]):format(table.concat(args, ', '))
+end
+
 local function getCallEnums(source, index)
     if source.type == 'function' and source.bindDocs then
         if not source.args then
@@ -1151,6 +1179,17 @@ local function getCallEnums(source, index)
                         description = enum.comment,
                         kind        = define.CompletionItemKind.EnumMember,
                     }
+                end
+                for _, unit in ipairs(vm.getDocTypeUnits(doc.extends)) do
+                    if unit.type == 'doc.type.function' then
+                        local text = files.getText(guide.getUri(unit))
+                        enums[#enums+1] = {
+                            label       = text:sub(unit.start, unit.finish),
+                            description = doc.comment,
+                            kind        = define.CompletionItemKind.Function,
+                            insertText  = buildInsertDocFunction(unit),
+                        }
+                    end
                 end
                 return enums
             elseif doc.type == 'doc.vararg'

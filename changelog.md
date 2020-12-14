@@ -1,11 +1,19 @@
 # changelog
 
+## 1.7.0
+* `CHG` diagnostic: `unused-function` ignores function with `<close>`
+
 ## 1.6.0
-* `NEW` auto require local modules
-* `NEW` hover function by keyword `function`
+`2020-12-14`
+* `NEW` completion: auto require local modules
+* `NEW` completion: support delegate
+* `NEW` hover: show function by keyword `function`
 * `NEW` code action: swap params
-* `CHG` unbind the relative path between binaries and scripts
-* `CHG` `LuaDoc` also catchs `--` (no need `---`)
+* `CHG` standalone: unbind the relative path between binaries and scripts
+* `CHG` hover: `LuaDoc` also catchs `--` (no need `---`)
+* `CHG` rename: support doc
+* `CHG` completion: keyword considers expression
+* `FIX` [#297](https://github.com/sumneko/lua-language-server/issues/297)
 
 ## 1.5.0
 `2020-12-5`

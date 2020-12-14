@@ -240,7 +240,6 @@ local function getFunctionComment(source)
         return
     end
     local md = markdown()
-    md:add('md', "---")
     if comments ~= "" then
         md:add('md', comments)
     end

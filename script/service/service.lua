@@ -4,6 +4,7 @@ local await  = require 'await'
 local timer  = require 'timer'
 local proto  = require 'proto'
 local vm     = require 'vm'
+local util   = require 'utility'
 
 local m = {}
 m.type = 'service'
@@ -145,6 +146,7 @@ function m.startTimer()
 end
 
 function m.start()
+    util.enableCloseFunction()
     await.setErrorHandle(log.error)
     pub.recruitBraves(4)
     proto.listen()

@@ -1059,6 +1059,42 @@ mt:f$
         insertText = 'f(${1:a: any}, ${2:b: any}, ${3:c: any})',
     },
 }
+
+TEST [[
+function$
+]]
+{
+    {
+        label = 'function',
+        kind  = define.CompletionItemKind.Keyword,
+    },
+    {
+        label = 'function ()',
+        kind  = define.CompletionItemKind.Snippet,
+        insertText = [[
+function $1($2)
+    $0
+end]],
+    },
+}
+
+TEST [[
+local t = function$
+]]
+{
+    {
+        label = 'function',
+        kind  = define.CompletionItemKind.Keyword,
+    },
+    {
+        label = 'function ()',
+        kind  = define.CompletionItemKind.Snippet,
+        insertText = [[
+function ($1)
+    $0
+end]],
+    },
+}
 Cared['insertText'] = false
 
 TEST [[
@@ -1916,3 +1952,22 @@ vvv$
         description = EXISTS,
     },
 }
+
+Cared['insertText'] = true
+TEST [[
+---@param callback fun(x: number, y: number):string
+local function f(callback) end
+
+f($)
+]]
+{
+    {
+        label  = 'fun(x: number, y: number):string',
+        kind   = define.CompletionItemKind.Function,
+        insertText = [[
+function (${1:x}, ${2:y})
+    $0
+end]],
+    },
+}
+Cared['insertText'] = nil

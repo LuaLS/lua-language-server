@@ -113,3 +113,15 @@ return function(<?a?>, b, c) end
         edit  = EXISTS,
     },
 }
+
+--TEST [[
+--<?print(1)
+--print(2)?>
+--]]
+--{
+--    {
+--        title = lang.script.ACTION_EXTRACT,
+--        kind  = 'refactor.extract',
+--        edit  = EXISTS,
+--    },
+--}

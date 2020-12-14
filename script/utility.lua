@@ -8,7 +8,7 @@ local ipairs       = ipairs
 local next         = next
 local rawset       = rawset
 local move         = table.move
-local setmetatable = setmetatable
+local setmetatable = debug.setmetatable
 local mathType     = math.type
 local mathCeil     = math.ceil
 local getmetatable = getmetatable
@@ -406,6 +406,10 @@ end
 local deferMT = { __close = function (self) self[1]() end }
 function m.defer(callback)
     return setmetatable({ callback }, deferMT)
+end
+
+function m.enableCloseFunction()
+    setmetatable(function () end, { __close = function (f) f() end })
 end
 
 local esc = {

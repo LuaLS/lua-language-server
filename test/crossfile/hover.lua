@@ -288,8 +288,6 @@ TEST {
         label = [[function f(x: number)]],
         name = 'f',
         description = [[
----
-
  abc]],
         args = EXISTS,
     }
@@ -335,7 +333,6 @@ TEST {
         label = "function f(x: string|'选项1'|'选项2')",
         name = 'f',
         description = [[
----
 ```lua
 x: string
     | '选项1' -- 注释1
@@ -363,7 +360,6 @@ TEST {
         label = "function f(x: '选项1'|'选项2')",
         name = 'f',
         description = [[
----
 ```lua
 x: option
     | '选项1' -- 注释1
@@ -393,7 +389,6 @@ function f()
   -> x: '选项1'|'选项2']],
         name = 'f',
         description = [[
----
 ```lua
 x: option
     | '选项1' -- 注释1
@@ -423,7 +418,6 @@ function f()
   -> '选项1'|'选项2']],
         name = 'f',
         description = [[
----
 ```lua
 return #1: option
     | '选项1' -- 注释1
@@ -473,8 +467,6 @@ function f(x: string, y: table)
   2. number]],
         name  = 'f',
         description = [[
----
-
 @*param* `x` — this is comment
 
 @*param* `y` —  comment 1
@@ -518,8 +510,6 @@ function f(arg1: integer, arg2: integer)
   -> boolean]],
     name = 'f',
     description = [[
----
-
 comment1
 
 @*param* `arg2` — comment2
@@ -542,8 +532,6 @@ function f()
   2. string]],
     name = 'f',
     description = [[
----
-
 @*return* — comment]]
 }}
 
@@ -562,8 +550,6 @@ function f()
   2. string]],
     name = 'f',
     description = [[
----
-
 @*return*
 
 @*return* — comment]]
@@ -598,8 +584,6 @@ hover = {
     label = "function f()",
     name = 'f',
     description =  [[
----
-
 comment1
 
 comment2]]

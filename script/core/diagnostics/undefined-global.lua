@@ -30,7 +30,7 @@ return function (uri, callback)
         if config.config.runtime.special[key] then
             return
         end
-        if #vm.getGlobalSets(guide.getKeyName(src)) == 0 then
+        if #vm.getGlobalSets(key) == 0 then
             local message = lang.script('DIAG_UNDEF_GLOBAL', key)
             if requireLike[key:lower()] then
                 message = ('%s(%s)'):format(message, lang.script('DIAG_REQUIRE_LIKE', key))

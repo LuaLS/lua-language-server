@@ -140,6 +140,7 @@ m.DiagnosticDefaultSeverity = {
     ['unused-local']            = 'Hint',
     ['unused-function']         = 'Hint',
     ['undefined-global']        = 'Warning',
+    ['undefined-field']         = 'Warning',
     ['global-in-nil-env']       = 'Warning',
     ['unused-label']            = 'Hint',
     ['unused-vararg']           = 'Hint',

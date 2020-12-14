@@ -2,6 +2,7 @@
 
 ## 1.7.0
 * `CHG` diagnostic: `unused-function` ignores function with `<close>`
+* `CHG` semantic: not cover local call
 * `FIX` semantic: tokens may not be updated correctly
 * `FIX` [#291](https://github.com/sumneko/lua-language-server/issues/291)
 

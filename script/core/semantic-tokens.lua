@@ -83,7 +83,12 @@ Care['getlocal'] = function (source, results)
     or source[1] == 'self' then
         return
     end
-    -- 5. 其他
+    -- 5. 函数调用
+    if  source.parent.type == 'call'
+    and source.parent.node == source then
+        return
+    end
+    -- 6. 其他
     results[#results+1] = {
         start      = source.start,
         finish     = source.finish,

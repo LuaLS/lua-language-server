@@ -652,9 +652,6 @@ proto.on('textDocument/semanticTokens/full', function (params)
         text  = files.getText(uri)
     end
     local results = core(uri, 0, #text)
-    if not results or #results == 0 then
-        return nil
-    end
     return {
         data = results
     }

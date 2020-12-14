@@ -1,5 +1,8 @@
 # changelog
 
+## 1.7.0
+* `CHG` diagnostic: `unused-function` ignores function with `<close>`
+
 ## 1.6.0
 `2020-12-14`
 * `NEW` completion: auto require local modules

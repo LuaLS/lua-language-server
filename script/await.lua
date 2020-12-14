@@ -60,7 +60,7 @@ function m.await(callback, ...)
     end
     return m.wait(function (resume, ...)
         m.call(function ()
-            local returnNil <close> = util.defer(resume)
+            local returnNil <close> = resume
             resume(callback())
         end, ...)
     end, ...)

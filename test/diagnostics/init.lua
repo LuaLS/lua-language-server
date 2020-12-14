@@ -823,3 +823,7 @@ TEST [[
 ---@class class
 local t
 ]]
+
+TEST [[
+local _ <close> = function () end
+]]

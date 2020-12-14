@@ -106,7 +106,7 @@ function m.doMethod(proto)
         local ok = true
         local res
         -- 任务可能在执行过程中被中断，通过close来捕获
-        local response <close> = util.defer(function ()
+        local response <close> = function ()
             local passed = os.clock() - clock
             if passed > 0.2 then
                 log.debug(('Method [%s] takes [%.3f]sec.'):format(method, passed))
@@ -120,7 +120,7 @@ function m.doMethod(proto)
             else
                 m.responseErr(proto.id, define.ErrorCodes.InternalError, res)
             end
-        end)
+        end
         ok, res = xpcall(abil, log.error, proto.params)
     end)
 end

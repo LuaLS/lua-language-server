@@ -5,6 +5,18 @@ local define  = require 'proto.define'
 local lang    = require 'language'
 local await   = require 'await'
 
+local function isToBeClosed(source)
+    if not source.attrs then
+        return false
+    end
+    for _, attr in ipairs(source.attrs) do
+        if attr[1] == 'close' then
+            return true
+        end
+    end
+    return false
+end
+
 return function (uri, callback)
     local ast = files.getAst(uri)
     if not ast then
@@ -18,6 +30,9 @@ return function (uri, callback)
         end
         if  parent.type ~= 'local'
         and parent.type ~= 'setlocal' then
+            return
+        end
+        if isToBeClosed(source) then
             return
         end
         local hasGet

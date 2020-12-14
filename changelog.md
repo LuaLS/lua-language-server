@@ -2,6 +2,7 @@
 
 ## 1.7.0
 * `CHG` diagnostic: `unused-function` ignores function with `<close>`
+* `FIX` semantic: tokens may not be updated correctly
 
 ## 1.6.0
 `2020-12-14`

@@ -674,9 +674,6 @@ proto.on('textDocument/semanticTokens/range', function (params)
     local start  = define.offset(lines, text, params.range.start)
     local finish = define.offset(lines, text, params.range['end'])
     local results = core(uri, start, finish)
-    if not results or #results == 0 then
-        return nil
-    end
     return {
         data = results
     }

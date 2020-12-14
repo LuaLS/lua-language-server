@@ -1,3 +1,4 @@
+---@type vm
 local vm      = require 'vm.vm'
 
 function vm.getLibraryName(source, deep)

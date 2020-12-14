@@ -44,6 +44,11 @@ local parser = m.P {
 }
 
 ---@class gitignore
+---@field pattern string[]
+---@field options table
+---@field errors table[]
+---@field matcher table
+---@field interface function[]
 local mt = {}
 mt.__index = mt
 mt.__name = 'gitignore'

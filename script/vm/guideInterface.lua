@@ -1,3 +1,4 @@
+---@type vm
 local vm      = require 'vm.vm'
 local files   = require 'files'
 local ws      = require 'workspace'

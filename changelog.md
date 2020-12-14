@@ -1,6 +1,7 @@
 # changelog
 
 ## 1.6.0
+`2020-12-14`
 * `NEW` completion: auto require local modules
 * `NEW` completion: support delegate
 * `NEW` hover: show function by keyword `function`

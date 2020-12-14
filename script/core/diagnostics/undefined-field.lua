@@ -18,15 +18,30 @@ return function (uri, callback)
             return nil
         end
 
+        local mark = {}
+        local function addTo(allDocClass, src)
+            if not mark[src] then
+                allDocClass[#allDocClass+1] = src
+                mark[src] = true
+            end
+        end
+
         local allDocClass = {}
         for i = 1, #infers do
             local infer = infers[i]
             if infer.type ~= '_G' then
                 local inferSource = infer.source
                 if inferSource.type == 'doc.class' then
-                    allDocClass[#allDocClass+1] = inferSource
+                    addTo(allDocClass, inferSource)
                 elseif inferSource.type == 'doc.class.name' then
-                    allDocClass[#allDocClass+1] = inferSource.parent
+                    addTo(allDocClass, inferSource.parent)
+                elseif inferSource.type == 'doc.type.name' then
+                    local docTypes = vm.getDocTypes(inferSource[1])
+                    for _, docType in ipairs(docTypes) do
+                        if docType.type == 'doc.class.name' then
+                            addTo(allDocClass, docType.parent)
+                        end
+                    end
                 end
             end
         end

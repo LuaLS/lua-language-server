@@ -94,11 +94,19 @@ return function (uri, callback)
 
         if not fields[fieldName] then
             local message = lang.script('DIAG_UNDEF_FIELD', fieldName)
-            callback {
-                start   = src.start,
-                finish  = src.finish,
-                message = message,
-            }
+            if src.type == 'getfield' then
+                callback {
+                    start   = src.field.start,
+                    finish  = src.field.finish,
+                    message = message,
+                }
+            elseif src.type == 'getmethod' then
+                callback {
+                    start   = src.method.start,
+                    finish  = src.method.finish,
+                    message = message,
+                }
+            end
         end
     end
     guide.eachSourceType(ast.ast, 'getfield', checkUndefinedField);

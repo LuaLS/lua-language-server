@@ -35,5 +35,5 @@
     "Lua.awakened.cat": true,
     "Lua.develop.enable": true,
     "Lua.develop.debuggerPort": 11413,
-    "Lua.intelliSense.searchDepth": 5
+    "Lua.intelliSense.searchDepth": 0
 }

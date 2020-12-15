@@ -9,7 +9,7 @@ local m = {}
 
 local function getDocFormater()
     local version = config.config.runtime.version
-    if client.client() == 'vscode' then
+    if client.isVSCode() then
         if version == 'Lua 5.1' then
             return 'HOVER_NATIVE_DOCUMENT_LUA51'
         elseif version == 'Lua 5.2' then
@@ -58,6 +58,7 @@ local function createViewDocument(name)
     if not fmt then
         return nil
     end
+    name = name:match '[%w_%.]+'
     return ('[%s](%s)'):format(lang.script.HOVER_VIEW_DOCUMENTS, lang.script(fmt, 'pdf-' .. name))
 end
 

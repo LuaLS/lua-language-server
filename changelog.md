@@ -9,6 +9,7 @@
 * `CHG` language client: update to [7.0.0](https://github.com/microsoft/vscode-languageserver-node/commit/20681d7632bb129def0c751be73cf76bd01f2f3a)
 * `FIX` semantic: tokens may not be updated correctly
 * `FIX` completion: require path broken
+* `FIX` hover: document uri
 * `FIX` [#291](https://github.com/sumneko/lua-language-server/issues/291)
 
 ## 1.6.0

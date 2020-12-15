@@ -12,6 +12,22 @@ function m.client(newClient)
     end
 end
 
+function m.isVSCode()
+    if not m._client then
+        return false
+    end
+    if m._isvscode == nil then
+        local lname = m._client:lower()
+        if lname:find 'vscode'
+        or lname:find 'visual studio code' then
+            m._isvscode = true
+        else
+            m._isvscode = false
+        end
+    end
+    return m._isvscode
+end
+
 function m.init(t)
     log.debug('Client init', util.dump(t))
     m.info = t

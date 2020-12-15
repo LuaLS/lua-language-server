@@ -12,6 +12,7 @@
 * `FIX` completion: require path broken
 * `FIX` hover: document uri
 * `FIX` [#291](https://github.com/sumneko/lua-language-server/issues/291)
+* `FIX` [#294](https://github.com/sumneko/lua-language-server/issues/294)
 
 ## 1.6.0
 `2020-12-14`

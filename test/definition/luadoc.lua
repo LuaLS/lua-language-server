@@ -157,3 +157,15 @@ end
 
 ---@see loli#<?pants?>
 ]]
+
+TEST [[
+---@class AAAA
+---@field a AAAA
+AAAA = {};
+
+function AAAA:<!SSDF!>()
+    
+end
+
+AAAA.a.<?SSDF?>
+]]

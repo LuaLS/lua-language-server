@@ -2312,9 +2312,13 @@ function m.pushResult(status, mode, ref, simple)
         or     ref.type == 'getmethod' then
             results[#results+1] = ref
         elseif ref.type == 'setindex'
-        or     ref.type == 'getindex'
         or     ref.type == 'tableindex' then
             results[#results+1] = ref
+        elseif ref.type == 'getindex' then
+            -- do not trust `t[1]`
+            if ref.index.type == 'string' then
+                results[#results+1] = ref
+            end
         elseif ref.type == 'setglobal'
         or     ref.type == 'getglobal' then
             results[#results+1] = ref
@@ -2440,11 +2444,16 @@ function m.searchSameFields(status, simple, mode)
         }
     end
     local max = 0
-    local lock = {}
+    local locks = {}
     for i = 1, 1e6 do
         local data = queue[i]
         if not data then
             return
+        end
+        local lock = locks[data.start]
+        if not lock then
+            lock = {}
+            locks[data.start] = lock
         end
         if not lock[data.obj] then
             lock[data.obj] = true

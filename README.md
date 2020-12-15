@@ -127,3 +127,4 @@ Please [help me][en-US] improve the quality of `en-US`.
 * [Allen Shaw](https://github.com/shuxiao9058)
 * [Bartel](https://github.com/Letrab)
 * [Ruin0x11](https://github.com/Ruin0x11)
+* [uhziel](https://github.com/uhziel)

@@ -14,15 +14,33 @@ end
 
 log.info('Telemetry Token:', token)
 
-local function pushClientInfo(link)
+local function getClientName()
     nonil.enable()
     local clientName    = client.info.clientInfo.name
     local clientVersion = client.info.clientInfo.version
     nonil.disable()
+    return table.concat({clientName, clientVersion}, ' ')
+end
+
+local function pushClientInfo(link)
     link:write(string.pack('zzz'
         , 'pulse'
         , token
-        , table.concat({clientName, clientVersion}, ' ')
+        , getClientName()
+    ))
+end
+
+local function pushErrorLog(link)
+    if not log.firstError then
+        return
+    end
+    local err = log.firstError
+    log.firstError = nil
+    link:write(string.pack('zzzz'
+        , 'error'
+        , token
+        , getClientName()
+        , ('%q'):format(err)
     ))
 end
 
@@ -33,6 +51,7 @@ timer.wait(5, function ()
         end
         local link = net.connect('tcp', '119.45.194.183', 11577)
         pushClientInfo(link)
+        pushErrorLog(link)
     end)()
     timer.loop(1, function ()
         if not config.config.telemetry.enable then

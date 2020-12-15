@@ -83,6 +83,9 @@ end
 function m.raw(thd, level, msg, source, currentline, clock)
     if level == 'error' then
         ioStdErr:write(msg .. '\n')
+        if not m.firstError then
+            m.firstError = msg
+        end
     end
     if m.size > m.maxSize then
         return

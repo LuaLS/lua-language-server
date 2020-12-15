@@ -12,7 +12,9 @@ if not token then
     util.saveFile(tokenPath, token)
 end
 
-local function pushClient(link)
+log.info('Telemetry Token:', token)
+
+local function pushClientInfo(link)
     nonil.enable()
     local clientName    = client.info.clientInfo.name
     local clientVersion = client.info.clientInfo.version
@@ -30,7 +32,12 @@ timer.wait(5, function ()
             return
         end
         local link = net.connect('tcp', '119.45.194.183', 11577)
-        pushClient(link)
-        net.update()
+        pushClientInfo(link)
     end)()
+    timer.loop(1, function ()
+        if not config.config.telemetry.enable then
+            return
+        end
+        net.update()
+    end)
 end)

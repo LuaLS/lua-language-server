@@ -1,8 +1,12 @@
 # changelog
 
 ## 1.7.0
+* `NEW` telemetry:
+    + [What data will be sent](https://github.com/sumneko/lua-language-server/blob/master/script/service/telemetry.lua)
+    + [How to use this data](https://github.com/sumneko/lua-telemetry-server/tree/master/method)
 * `CHG` diagnostic: `unused-function` ignores function with `<close>`
 * `CHG` semantic: not cover local call
+* `CHG` language client: update to [7.0.0](https://github.com/microsoft/vscode-languageserver-node/commit/20681d7632bb129def0c751be73cf76bd01f2f3a)
 * `FIX` semantic: tokens may not be updated correctly
 * `FIX` completion: require path broken
 * `FIX` [#291](https://github.com/sumneko/lua-language-server/issues/291)

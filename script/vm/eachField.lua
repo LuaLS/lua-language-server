@@ -4,7 +4,7 @@ local guide   = require 'parser.guide'
 local await   = require 'await'
 local config  = require 'config'
 
-local function getFields(source, deep)
+local function getFields(source, deep, filterKey)
     local unlock = vm.lock('eachField', source)
     if not unlock then
         return {}
@@ -19,18 +19,19 @@ local function getFields(source, deep)
     deep = config.config.intelliSense.searchDepth + (deep or 0)
 
     await.delay()
-    local results = guide.requestFields(source, vm.interface, deep)
+    local results = guide.requestFields(source, vm.interface, deep, filterKey)
 
     unlock()
     return results
 end
 
-local function getFieldsBySource(source, deep)
+local function getFieldsBySource(source, deep, filterKey)
     deep = deep or -999
     local cache = vm.getCache('eachField')[source]
     if not cache or cache.deep < deep then
-        cache = getFields(source, deep)
+        cache = getFields(source, deep, filterKey)
         cache.deep = deep
+        cache.filterKey = filterKey
         vm.getCache('eachField')[source] = cache
     end
     return cache
@@ -46,12 +47,18 @@ function vm.getFields(source, deep)
                     or getFieldsBySource(source, deep)
         vm.getCache('eachFieldOfGlobal')[name] = cache
         return cache
-    elseif guide.isDocClass(source) then
-        local cache =  vm.getCache('eachFieldOfDocClass')[source]
-                    or getFieldsBySource(source, deep)
-        vm.getCache('eachFieldOfDocClass')[source] = cache
-        return cache
     else
         return getFieldsBySource(source, deep)
     end
+end
+
+function vm.getFieldsOfDocClassAnyNotGet(source, deep)
+    if not guide.isDocClass(source) then
+        return {}
+    end
+
+    local cache = vm.getCache('eachFieldOfDocClass')[source]
+        or getFieldsBySource(source, deep, guide.ANYNOTGET)
+    vm.getCache('eachFieldOfDocClass')[source] = cache
+    return cache
 end

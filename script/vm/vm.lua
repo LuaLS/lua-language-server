@@ -39,42 +39,11 @@ function m.lock(tp, source)
 end
 
 function m.isSet(src)
-    local tp = src.type
-    if tp == 'setglobal'
-    or tp == 'local'
-    or tp == 'setlocal'
-    or tp == 'setfield'
-    or tp == 'setmethod'
-    or tp == 'setindex'
-    or tp == 'tablefield'
-    or tp == 'tableindex' then
-        return true
-    end
-    if tp == 'call' then
-        local special = m.getSpecial(src.node)
-        if special == 'rawset' then
-            return true
-        end
-    end
-    return false
+    return guide.isSet(src)
 end
 
 function m.isGet(src)
-    local tp = src.type
-    if tp == 'getglobal'
-    or tp == 'getlocal'
-    or tp == 'getfield'
-    or tp == 'getmethod'
-    or tp == 'getindex' then
-        return true
-    end
-    if tp == 'call' then
-        local special = m.getSpecial(src.node)
-        if special == 'rawget' then
-            return true
-        end
-    end
-    return false
+    return guide.isGet(src)
 end
 
 function m.getArgInfo(source)
@@ -95,10 +64,7 @@ function m.getArgInfo(source)
 end
 
 function m.getSpecial(source)
-    if not source then
-        return nil
-    end
-    return source.special
+    return guide.getSpecial(source)
 end
 
 function m.getKeyName(source)

@@ -9,7 +9,7 @@ local tokenPath = (ROOT / 'log' / 'token'):string()
 local token = util.loadFile(tokenPath)
 if not token then
     token = ('%016X'):format(math.random(0, math.maxinteger))
-    util.saveFile(token)
+    util.saveFile(tokenPath, token)
 end
 
 local function pushClient(link)

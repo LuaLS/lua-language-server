@@ -29,7 +29,9 @@ _ENV = nil
 
 local m = {}
 
-m.ANY = {}
+m.ANY = {"ANY"}
+
+m.ANYNOTGET = {"ANYNOTGET"}
 
 local blockTypes = {
     ['while']       = true,
@@ -1246,6 +1248,52 @@ function m.isDocClass(source)
     return source.type == 'doc.class'
 end
 
+function m.isSet(source)
+    local tp = source.type
+    if tp == 'setglobal'
+    or tp == 'local'
+    or tp == 'setlocal'
+    or tp == 'setfield'
+    or tp == 'setmethod'
+    or tp == 'setindex'
+    or tp == 'tablefield'
+    or tp == 'tableindex' then
+        return true
+    end
+    if tp == 'call' then
+        local special = m.getSpecial(source.node)
+        if special == 'rawset' then
+            return true
+        end
+    end
+    return false
+end
+
+function m.isGet(source)
+    local tp = source.type
+    if tp == 'getglobal'
+    or tp == 'getlocal'
+    or tp == 'getfield'
+    or tp == 'getmethod'
+    or tp == 'getindex' then
+        return true
+    end
+    if tp == 'call' then
+        local special = m.getSpecial(source.node)
+        if special == 'rawget' then
+            return true
+        end
+    end
+    return false
+end
+
+function m.getSpecial(source)
+    if not source then
+        return nil
+    end
+    return source.special
+end
+
 --- 根据函数的调用参数，获取：调用，参数索引
 function m.getCallAndArgIndex(callarg)
     local callargs = callarg.parent
@@ -2291,6 +2339,11 @@ function m.checkSameSimpleName(ref, sm)
     if sm == m.ANY then
         return true
     end
+
+    if sm == m.ANYNOTGET and not m.isGet(ref) then
+        return true
+    end
+
     if m.getSimpleName(ref) == sm then
         return true
     end
@@ -4007,10 +4060,11 @@ function m.requestDefinition(obj, interface, deep)
 end
 
 --- 请求对象的域
-function m.requestFields(obj, interface, deep)
+---@param filterKey nil|string|table nil表fields不做限制;string表fields必须同名;table取值为guild.ANYSET表fields必须满足isSet()
+function m.requestFields(obj, interface, deep, filterKey)
     local status = m.status(nil, interface, deep)
 
-    m.searchFields(status, obj)
+    m.searchFields(status, obj, filterKey)
 
     return status.results, status.share.count
 end

@@ -113,6 +113,10 @@ local ConfigTemplate = {
             util.deepCopy(define.DiagnosticDefaultSeverity),
             Hash(String, String),
         },
+        neededFileStatus = {
+            util.deepCopy(define.DiagnosticDefaultNeededFileStatus),
+            Hash(String, String),
+        },
         workspaceDelay  = {0,    Integer},
         workspaceRate   = {100,  Integer},
     },

@@ -168,6 +168,45 @@ m.DiagnosticDefaultSeverity = {
     ['duplicate-doc-field']     = 'Warning',
 }
 
+-- 文件状态
+m.FileStatus = {
+    Any     = 1,
+    Opened  = 2,
+}
+
+--- 诊断类型与需要的文件状态(可以控制只分析打开的文件、还是所有文件)
+m.DiagnosticDefaultNeededFileStatus = {
+    ['unused-local']            = 'Opened',
+    ['unused-function']         = 'Opened',
+    ['undefined-global']        = 'Any',
+    ['undefined-field']         = 'Opened',
+    ['global-in-nil-env']       = 'Any',
+    ['unused-label']            = 'Opened',
+    ['unused-vararg']           = 'Opened',
+    ['trailing-space']          = 'Opened',
+    ['redefined-local']         = 'Opened',
+    ['newline-call']            = 'Any',
+    ['newfield-call']           = 'Any',
+    ['redundant-parameter']     = 'Opened',
+    ['ambiguity-1']             = 'Any',
+    ['lowercase-global']        = 'Any',
+    ['undefined-env-child']     = 'Any',
+    ['duplicate-index']         = 'Any',
+    ['empty-block']             = 'Opened',
+    ['redundant-value']         = 'Opened',
+    ['code-after-break']        = 'Opened',
+    ['unbalanced-assignments']  = 'Any',
+
+    ['duplicate-doc-class']     = 'Any',
+    ['undefined-doc-class']     = 'Any',
+    ['undefined-doc-name']      = 'Any',
+    ['circle-doc-class']        = 'Any',
+    ['undefined-doc-param']     = 'Any',
+    ['duplicate-doc-param']     = 'Any',
+    ['doc-field-no-class']      = 'Any',
+    ['duplicate-doc-field']     = 'Any',
+}
+
 --- 诊断报告标签
 m.DiagnosticTag = {
     Unnecessary = 1,
@@ -219,13 +258,6 @@ m.CompletionItemKind = {
     Event = 23,
     Operator = 24,
     TypeParameter = 25,
-}
-
-m.DiagnosticSeverity = {
-    Error       = 1,
-    Warning     = 2,
-    Information = 3,
-    Hint        = 4,
 }
 
 m.ErrorCodes = {

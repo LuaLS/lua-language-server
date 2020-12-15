@@ -29,7 +29,7 @@ return function (uri, callback)
         local allDocClass = {}
         for i = 1, #infers do
             local infer = infers[i]
-            if infer.type ~= '_G' then
+            if infer.type ~= '_G' and infer.type ~= 'any' then
                 local inferSource = infer.source
                 if inferSource.type == 'doc.class' then
                     addTo(allDocClass, inferSource)
@@ -49,12 +49,11 @@ return function (uri, callback)
         return allDocClass
     end
 
-    ---@param allDocClass table int
     local function getAllFieldsFromAllDocClass(allDocClass)
         local fields = {}
         local empty = true
         for _, docClass in ipairs(allDocClass) do
-            local refs = vm.getFields(docClass)
+            local refs = vm.getFields(docClass, 0)
 
             for _, ref in ipairs(refs) do
                 if ref.type == 'getfield' or ref.type == 'getmethod' then

@@ -31,8 +31,9 @@ local function getFieldsBySource(source, deep, filterKey)
     if not cache or cache.deep < deep then
         cache = getFields(source, deep, filterKey)
         cache.deep = deep
-        cache.filterKey = filterKey
-        vm.getCache('eachField')[source] = cache
+        if not filterKey then
+            vm.getCache('eachField')[source] = cache
+        end
     end
     return cache
 end

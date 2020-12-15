@@ -150,6 +150,9 @@ local ConfigTemplate = {
     intelliSense = {
         searchDepth     = {0,         Integer},
     },
+    telemetry = {
+        enable          = {true,      Boolean},
+    }
 }
 
 local OtherTemplate = {

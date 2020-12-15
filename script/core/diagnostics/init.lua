@@ -22,8 +22,14 @@ local function check(uri, name, results)
     end
     local level =  config.config.diagnostics.severity[name]
                 or define.DiagnosticDefaultSeverity[name]
-    if level == 'Hint' and not files.isOpen(uri) then
-        return
+    if not files.isOpen(uri) then
+        if level == 'Hint' then
+            return
+        end
+        -- TODO
+        if name == 'undefined-field' then
+            return
+        end
     end
     local severity = define.DiagnosticSeverity[level]
     local clock = os.clock()

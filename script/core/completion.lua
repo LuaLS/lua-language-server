@@ -806,8 +806,9 @@ local function checkUri(ast, text, offset, results)
                         if not collect[info.expect] then
                             collect[info.expect] = {
                                 textEdit = {
-                                    start  = source.start + #source[2],
-                                    finish = source.finish - #source[2],
+                                    start   = source.start + #source[2],
+                                    finish  = source.finish - #source[2],
+                                    newText = info.expect,
                                 }
                             }
                         end
@@ -835,8 +836,9 @@ local function checkUri(ast, text, offset, results)
                     if not collect[path] then
                         collect[path] = {
                             textEdit = {
-                                start  = source.start + #source[2],
-                                finish = source.finish - #source[2],
+                                start   = source.start + #source[2],
+                                finish  = source.finish - #source[2],
+                                newText = path,
                             }
                         }
                     end

@@ -1,3 +1,4 @@
+---@type vm
 local vm      = require 'vm.vm'
 local guide   = require 'parser.guide'
 local await   = require 'await'

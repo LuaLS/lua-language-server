@@ -847,20 +847,20 @@ local mt2 = {}
 local v
 print(v.field1 + 1)
 print(v.field2 + 1)
-print(<!v.field3!> + 1)
+print(v.<!field3!> + 1)
 print(v:method1())
 print(v.method2())
-print(<!v:method3!>())
+print(v:<!method3!>())
 
 ---@type Bar
 local v2
 print(v2.field1 + 1)
 print(v2.field2 + 1)
-print(<!v2.field3!> + 1)
+print(v2.<!field3!> + 1)
 print(v2.field4 + 1)
 print(v2:method1())
 print(v2.method2())
-print(<!v2:method3!>())
+print(v2:<!method3!>())
 
 local v3 = {}
 print(v3.abc)
@@ -880,7 +880,7 @@ function Foo:method1() end
 ---@type Foo
 local v
 v:method1()
-<!v:method2!>() -- doc.class.name
+v:<!method2!>() -- doc.class.name
 ]]
 
 -- checkUndefinedField 通过type找到class，涉及到 class 继承版
@@ -895,7 +895,7 @@ function Bar:method3() end
 ---@type Bar
 local v
 v:method1()
-<!v:method2!>() -- doc.class.name
+v:<!method2!>() -- doc.class.name
 v:method3()
 ]]
 
@@ -904,8 +904,8 @@ TEST [[
 ---@class Foo
 local Foo
 function Foo:method1() end
-<!Foo:method2!>() -- doc.class
-<!Foo:method2!>() -- doc.class
+Foo:<!method2!>() -- doc.class
+Foo:<!method2!>() -- doc.class
 ]]
 
 -- checkUndefinedField 没有@class的不检测
@@ -921,9 +921,9 @@ TEST [[
 ---@class Foo
 local mt
 function mt:method1()
-    <!mt.method2!>() -- doc.class
+    mt.<!method2!>() -- doc.class
     self.method1()
-    return <!self.method2!>() -- doc.class.name
+    return self.<!method2!>() -- doc.class.name
 end
 ]]
 

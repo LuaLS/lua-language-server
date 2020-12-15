@@ -19,7 +19,7 @@ end
 local parser = m.P {
     'Main',
     ['Sp']          = m.S(' \t')^0,
-    ['Slash']       = m.S('/\\')^1,
+    ['Slash']       = m.S('/')^1,
     ['Main']        = m.Ct(m.V'Sp' * m.P'{' * m.V'Pattern' * (',' * expect(m.V'Pattern', 'Miss exp after ","'))^0 * m.P'}')
                     + m.Ct(m.V'Pattern')
                     + m.T'Main Failed'
@@ -35,12 +35,20 @@ local parser = m.P {
                     + object('?',    m.P'?')
                     + object('[]',   m.V'Range')
                     ,
-    ['Char']        = object('char', (1 - m.S',{}[]*?/\\')^1),
+    ['SimpleChar']  = m.P(1) - m.S',{}[]*?/',
+    ['EscChar']     = m.P'\\' / '' * m.P(1),
+    ['Char']        = object('char', m.Cs((m.V'EscChar' + m.V'SimpleChar')^1)),
     ['FSymbol']     = object('**', m.P'**'),
     ['Range']       = m.P'[' * m.Ct(m.V'RangeUnit'^0) * m.P']'^-1,
     ['RangeUnit']   = m.Ct(- m.P']' * m.C(m.P(1)) * (m.P'-' * - m.P']' * m.C(m.P(1)))^-1),
 }
 
+---@class gitignore
+---@field pattern string[]
+---@field options table
+---@field errors table[]
+---@field matcher table
+---@field interface function[]
 local mt = {}
 mt.__index = mt
 mt.__name = 'gitignore'
@@ -170,7 +178,9 @@ function mt:scan(callback)
                 if type(result) == 'table' then
                     for _, path in ipairs(result) do
                         local filename = path:match '([^/\\]+)[/\\]*$'
-                        if filename then
+                        if  filename
+                        and filename ~= '.'
+                        and filename ~= '..' then
                             list[#list+1] = current .. '/' .. filename
                         end
                     end
@@ -185,6 +195,7 @@ function mt:__call(path)
     if self.options.ignoreCase then
         path = path:lower()
     end
+    path = path:gsub('^[/\\]+', '')
     return self:finishMatch(path)
 end
 

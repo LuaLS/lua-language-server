@@ -1,6 +1,7 @@
 local files   = require 'files'
 local util    = require 'utility'
 local guide   = require 'parser.guide'
+---@type vm
 local vm      = require 'vm.vm'
 local config  = require 'config'
 

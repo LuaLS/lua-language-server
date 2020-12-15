@@ -367,7 +367,7 @@ end
 ---@param uri string
 ---@return boolean
 function m.isLua(uri)
-    local ext = uri:match '%.([^%.%/%\\]-)$'
+    local ext = uri:match '%.([^%.%/%\\]+)$'
     if not ext then
         return false
     end

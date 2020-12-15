@@ -53,7 +53,7 @@ return function (uri, callback)
         local fields = {}
         local empty = true
         for _, docClass in ipairs(allDocClass) do
-            local refs = vm.getFields(docClass, 0)
+            local refs = vm.getFields(docClass)
 
             for _, ref in ipairs(refs) do
                 if ref.type == 'getfield' or ref.type == 'getmethod' then

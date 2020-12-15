@@ -22,8 +22,12 @@ local function getClientName()
     return table.concat({clientName, clientVersion}, ' ')
 end
 
+local function send(link, msg)
+    link:write(('s4'):pack(msg))
+end
+
 local function pushClientInfo(link)
-    link:write(string.pack('zzz'
+    send(link, string.pack('zzz'
         , 'pulse'
         , token
         , getClientName()
@@ -36,7 +40,7 @@ local function pushErrorLog(link)
     end
     local err = log.firstError
     log.firstError = nil
-    link:write(string.pack('zzzz'
+    send(link, string.pack('zzzz'
         , 'error'
         , token
         , getClientName()
@@ -45,7 +49,7 @@ local function pushErrorLog(link)
 end
 
 timer.wait(5, function ()
-    timer.loop(60, function ()
+    timer.loop(5, function ()
         if not config.config.telemetry.enable then
             return
         end
@@ -58,5 +62,6 @@ timer.wait(5, function ()
             return
         end
         net.update()
+        log.error('test error')
     end)
 end)

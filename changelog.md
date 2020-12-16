@@ -1,6 +1,7 @@
 # changelog
 
 ## 1.7.0
+`2020-12-16`
 * `NEW` diagnostic: `undefined-field`
 * `NEW` telemetry:
     + [What data will be sent](https://github.com/sumneko/lua-language-server/blob/master/script/service/telemetry.lua)

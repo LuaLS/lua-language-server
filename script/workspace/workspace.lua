@@ -144,16 +144,18 @@ function m.getLibraryMatchers()
     end
     m.libraryMatchers = {}
     for path, pattern in pairs(librarys) do
-        local nPath = fs.absolute(fs.path(path)):string()
-        local matcher = glob.gitignore(pattern, m.matchOption)
-        if platform.OS == 'Windows' then
-            matcher:setOption 'ignoreCase'
+        if fs.exists(fs.path(path)) then
+            local nPath = fs.absolute(fs.path(path)):string()
+            local matcher = glob.gitignore(pattern, m.matchOption)
+            if platform.OS == 'Windows' then
+                matcher:setOption 'ignoreCase'
+            end
+            log.debug('getLibraryMatchers', path, nPath)
+            m.libraryMatchers[#m.libraryMatchers+1] = {
+                path    = nPath,
+                matcher = matcher
+            }
         end
-        log.debug('getLibraryMatchers', path, nPath)
-        m.libraryMatchers[#m.libraryMatchers+1] = {
-            path    = nPath,
-            matcher = matcher
-        }
     end
 
     m.libraryVersion = config.version

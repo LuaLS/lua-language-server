@@ -210,9 +210,12 @@ function m.removeAllClosed()
 end
 
 --- 遍历文件
---- TODO: 协程不安全
 function m.eachFile()
-    return pairs(m.fileMap)
+    local map = {}
+    for uri, file in pairs(m.fileMap) do
+        map[uri] = file
+    end
+    return pairs(map)
 end
 
 function m.compileAst(uri, text)

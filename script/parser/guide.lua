@@ -714,6 +714,8 @@ function m.getKeyType(obj)
         return 'string'
     elseif tp == 'doc.field' then
         return 'string'
+    elseif tp == 'dummy' then
+        return 'string'
     end
     return m.getKeyTypeOfLiteral(obj)
 end
@@ -781,6 +783,8 @@ function m.getKeyName(obj)
         return obj.alias[1]
     elseif tp == 'doc.field' then
         return obj.field[1]
+    elseif tp == 'dummy' then
+        return obj[1]
     end
     return m.getKeyNameOfLiteral(obj)
 end

@@ -3290,9 +3290,6 @@ local function mathCheck(status, a, b)
             or m.getInferLiteral(status, a, 'number')
     v1 = tonumber(v1)
     v2 = tonumber(v2)
-    if not v1 or not v2 then
-        return nil
-    end
     local int = m.hasType(status, a, 'integer')
             and m.hasType(status, b, 'integer')
             and not m.hasType(status, a, 'number')

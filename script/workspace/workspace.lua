@@ -37,11 +37,15 @@ end
 local function interfaceFactory(root)
     return {
         type = function (path)
-            if fs.is_directory(fs.path(root .. '/' .. path)) then
-                return 'directory'
-            else
-                return 'file'
-            end
+            local result
+            pcall(function ()
+                if fs.is_directory(fs.path(root .. '/' .. path)) then
+                    result = 'directory'
+                else
+                    result = 'file'
+                end
+            end)
+            return result
         end,
         list = function (path)
             local fullPath = fs.path(root .. '/' .. path)

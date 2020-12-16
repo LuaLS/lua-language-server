@@ -1,5 +1,8 @@
 # changelog
 
+## 1.7.1
+* `FIX` scan workspace may fails
+
 ## 1.7.0
 `2020-12-16`
 * `NEW` diagnostic: `undefined-field`

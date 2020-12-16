@@ -319,6 +319,10 @@ return [[
 ]]
 ]=]
 
+TEST [[
+local _ <close> = function () end
+]]
+
 config.config.diagnostics.disable['unused-local'] = true
 TEST [[
 local f = <!function () end!>
@@ -822,10 +826,6 @@ TEST [[
 TEST [[
 ---@class class
 local t
-]]
-
-TEST [[
-local _ <close> = function () end
 ]]
 
 -- checkUndefinedField 通用

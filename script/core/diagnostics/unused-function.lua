@@ -32,7 +32,7 @@ return function (uri, callback)
         and parent.type ~= 'setlocal' then
             return
         end
-        if isToBeClosed(source) then
+        if isToBeClosed(parent) then
             return
         end
         local hasGet

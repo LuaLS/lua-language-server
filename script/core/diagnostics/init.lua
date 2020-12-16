@@ -23,7 +23,8 @@ local function check(uri, name, results)
     local level =  config.config.diagnostics.severity[name]
                 or define.DiagnosticDefaultSeverity[name]
 
-    local neededFileStatus = define.DiagnosticDefaultNeededFileStatus[name]
+    local neededFileStatus =  config.config.diagnostics.neededFileStatus[name]
+        or define.DiagnosticDefaultNeededFileStatus[name]
     if neededFileStatus == 'Opened' and not files.isOpen(uri) then
         return
     end

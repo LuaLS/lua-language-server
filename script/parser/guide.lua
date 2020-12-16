@@ -2263,7 +2263,7 @@ function m.pushResult(status, mode, ref, simple)
             end
         end
         if  m.isLiteral(ref)
-        and ref.parent.type == 'callargs'
+        and ref.parent and ref.parent.type == 'callargs'
         and ref ~= simple.node then
             results[#results+1] = ref
         end

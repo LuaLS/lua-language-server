@@ -210,6 +210,7 @@ function m.removeAllClosed()
 end
 
 --- 遍历文件
+--- TODO: 协程不安全
 function m.eachFile()
     return pairs(m.fileMap)
 end

@@ -90,13 +90,13 @@ return function (uri, callback)
 
         if not fields[fieldName] then
             local message = lang.script('DIAG_UNDEF_FIELD', fieldName)
-            if src.type == 'getfield' then
+            if src.type == 'getfield' and src.field then
                 callback {
                     start   = src.field.start,
                     finish  = src.field.finish,
                     message = message,
                 }
-            elseif src.type == 'getmethod' then
+            elseif src.type == 'getmethod' and src.method then
                 callback {
                     start   = src.method.start,
                     finish  = src.method.finish,

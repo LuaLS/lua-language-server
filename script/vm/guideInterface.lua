@@ -22,7 +22,7 @@ function m.searchFileReturn(results, ast, index)
 end
 
 function m.require(args, index)
-    local reqName = args[1] and args[1][1]
+    local reqName = args and args[1] and args[1][1]
     if not reqName then
         return nil
     end

@@ -2320,7 +2320,7 @@ function m.pushResult(status, mode, ref, simple)
             results[#results+1] = ref
         elseif ref.type == 'getindex' then
             -- do not trust `t[1]`
-            if ref.index.type == 'string' then
+            if ref.index and ref.index.type == 'string' then
                 results[#results+1] = ref
             end
         elseif ref.type == 'setglobal'

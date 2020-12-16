@@ -2,6 +2,8 @@
 
 ## 1.7.1
 * `FIX` scan workspace may fails
+* `FIX` quickfix: `newline-call` failed
+* `FIX` a lot of other runtime errors
 
 ## 1.7.0
 `2020-12-16`

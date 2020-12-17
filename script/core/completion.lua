@@ -1149,10 +1149,10 @@ local function buildInsertDocFunction(doc)
     for i, arg in ipairs(doc.args) do
         args[i] = ('${%d:%s}'):format(i, arg.name[1])
     end
-    return ([[
-function (%s)
-    $0
-end]]):format(table.concat(args, ', '))
+    return ("\z
+function (%s)\
+\t$0\
+end"):format(table.concat(args, ', '))
 end
 
 local function getCallEnums(source, index)

@@ -17,7 +17,7 @@ local function getOnePath(path, searcher)
     local start        = stemSearcher:match '()%?' or 1
     for pos = start, #stemPath do
         local word = stemPath:sub(start, pos)
-        local newSearcher = stemSearcher:gsub('%?', word)
+        local newSearcher = stemSearcher:gsub('%?', (word:gsub('%%', '%%%%')))
         if newSearcher == stemPath then
             return word
         end

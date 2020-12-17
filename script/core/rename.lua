@@ -117,6 +117,9 @@ local function isValidName(str)
 end
 
 local function isValidGlobal(str)
+    if not str then
+        return false
+    end
     for s in str:gmatch '[^%.]*' do
         if not isValidName(trim(s)) then
             return false
@@ -431,6 +434,9 @@ local accept = {
 local m = {}
 
 function m.rename(uri, pos, newname)
+    if not newname then
+        return nil
+    end
     local ast = files.getAst(uri)
     if not ast then
         return nil

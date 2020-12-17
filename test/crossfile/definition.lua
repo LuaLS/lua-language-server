@@ -615,3 +615,28 @@ TEST {
         ]]
     },
 }
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            local lib = {}
+
+            function lib:fn1()
+                return self
+            end
+            
+            function lib:<!fn2!>()
+            end
+            
+            return lib:fn1()
+        ]]
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            local app = require 'a'
+            print(app.<?fn2?>)
+        ]]
+    },
+}

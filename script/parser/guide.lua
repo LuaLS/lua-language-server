@@ -792,8 +792,16 @@ end
 
 function m.getSimpleName(obj)
     if obj.type == 'call' then
-        local key = obj.args and obj.args[2]
-        return m.getKeyName(key)
+        local node = obj.node
+        if not node then
+            return
+        end
+        if node.special == 'rawset'
+        or node.special == 'rawget' then
+            local key = obj.args and obj.args[2]
+            return m.getKeyName(key)
+        end
+        return ('%p'):format(obj)
     elseif obj.type == 'table' then
         return ('%p'):format(obj)
     elseif obj.type == 'select' then
@@ -1141,7 +1149,8 @@ local function buildSimpleList(obj, max)
             list[i] = cur
             break
         elseif cur.type == 'select'
-        or     cur.type == 'table' then
+        or     cur.type == 'table'
+        or     cur.type == 'call' then
             list[i] = cur
             break
         elseif cur.type == 'string' then
@@ -1182,6 +1191,7 @@ function m.getSimple(obj, max)
     or obj.type == 'tablefield'
     or obj.type == 'tableindex'
     or obj.type == 'select'
+    or obj.type == 'call'
     or obj.type == 'table'
     or obj.type == 'string'
     or obj.type == 'doc.class.name'
@@ -1410,6 +1420,8 @@ function m.getObjectValue(obj)
     if obj.type == 'call' then
         if obj.node.special == 'rawset' then
             return obj.args[3]
+        else
+            return obj
         end
     end
     if obj.type == 'select' then

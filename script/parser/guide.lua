@@ -2668,6 +2668,9 @@ function m.getRefCache(status, obj, mode)
 end
 
 function m.searchRefs(status, obj, mode)
+    if not obj then
+        return
+    end
     local cache, makeCache = m.getRefCache(status, obj, mode)
     if cache then
         for i = 1, #cache do

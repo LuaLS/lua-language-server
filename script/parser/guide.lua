@@ -2209,6 +2209,13 @@ function m.checkSameSimpleInString(status, ref, start, queue, mode)
     if status.share.searchingBindedDoc then
         return
     end
+    if not status.share.markString then
+        status.share.markString = {}
+    end
+    if status.share.markString[ref] then
+        return
+    end
+    status.share.markString[ref] = true
     local newStatus = m.status(status)
     local docs = status.interface.docType('string*')
     local mark = {}
@@ -2227,6 +2234,7 @@ function m.checkSameSimpleInString(status, ref, start, queue, mode)
         }
         ::CONTINUE::
     end
+    status.share.markString[ref] = nil
     return true
 end
 

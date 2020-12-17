@@ -146,3 +146,9 @@ t.<!f1!> = t.f2
 
 print(t.<?f2?>)
 ]]
+
+TEST [[
+---@type string
+string.xx = ''
+string.xx:<?format?>()
+]]

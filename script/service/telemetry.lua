@@ -54,8 +54,11 @@ timer.wait(5, function ()
             return
         end
         local link = net.connect('tcp', '119.45.194.183', 11577)
-        pushClientInfo(link)
-        pushErrorLog(link)
+        function link:on_connect()
+            pushClientInfo(link)
+            pushErrorLog(link)
+            self:close()
+        end
     end)()
     timer.loop(1, function ()
         if not config.config.telemetry.enable then

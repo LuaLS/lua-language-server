@@ -109,7 +109,7 @@ end
 
 local function buildEnumChunk(docType, name)
     local enums = vm.getDocEnums(docType)
-    if #enums == 0 then
+    if not enums or #enums == 0 then
         return
     end
     local types = {}

@@ -179,6 +179,9 @@ function m.getBlock(obj)
         if blockTypes[tp] then
             return obj
         end
+        if obj == obj.parent then
+            error('obj == obj.parent?', obj.type)
+        end
         obj = obj.parent
     end
     error('guide.getBlock overstack')

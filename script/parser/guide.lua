@@ -4025,6 +4025,9 @@ function m.searchInfer(status, obj)
         end
         obj = value
     end
+    if not obj then
+        return
+    end
 
     local cache, makeCache = m.getRefCache(status, obj, 'infer')
     if cache then

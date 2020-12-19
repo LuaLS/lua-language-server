@@ -1499,10 +1499,10 @@ function m.checkSameSimpleInSpecialBranch(status, obj, start, queue)
 end
 
 local function stepRefOfGeneric(status, typeUnit, args, mode)
-    if not args then
-        return nil
-    end
     local results = {}
+    if not args then
+        return results
+    end
     local myName = typeUnit[1]
     for _, typeName in ipairs(typeUnit.typeGeneric[myName]) do
         if typeName == typeUnit then

@@ -3946,6 +3946,9 @@ function m.inferByPCallReturn(status, source)
     if not call or call.type ~= 'call' then
         return
     end
+    if not call.args then
+        return
+    end
     local node = call.node
     local specialName = node.special
     local func, index

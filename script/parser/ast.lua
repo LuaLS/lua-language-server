@@ -1133,7 +1133,7 @@ local Defs = {
     end,
     LocalName = function (name, attrs)
         if not name then
-            return name
+            return
         end
         name.attrs = attrs
         return name

@@ -6,16 +6,16 @@ local hoverDesc  = require 'core.hover.description'
 
 local function findNearCall(uri, ast, pos)
     local text = files.getText(uri)
-    -- 检查 `f()$` 的情况，注意要区别于 `f($`
-    if text:sub(pos, pos) == ')' then
-        return nil
-    end
-
     local nearCall
     guide.eachSourceContain(ast.ast, pos, function (src)
         if src.type == 'call'
         or src.type == 'table'
         or src.type == 'function' then
+            -- call()$
+            if  src.finish <= pos
+            and text:sub(src.finish, src.finish) == ')' then
+                return
+            end
             if not nearCall or nearCall.start < src.start then
                 nearCall = src
             end

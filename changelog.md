@@ -2,6 +2,7 @@
 
 ## 1.7.3
 * `FIX` luadoc: typo of `package.config`
+* `FIX` [#310](https://github.com/sumneko/lua-language-server/issues/310)
 
 ## 1.7.2
 `2020-12-17`

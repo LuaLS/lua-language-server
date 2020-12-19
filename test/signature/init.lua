@@ -174,3 +174,19 @@ function Foo(param01: any, param02: any)
 ]],
     arg = {14, 25},
 }
+
+TEST [[
+function f1(a, b)
+end
+
+function f2(c, d)
+end
+
+f2(f1(),$)
+]]
+{
+    label = [[
+function f2(c: any, d: any)
+]],
+    arg = {21, 26},
+}

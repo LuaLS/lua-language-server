@@ -1,5 +1,8 @@
 # changelog
 
+## 1.7.3
+* `FIX` luadoc: typo of `package.config`
+
 ## 1.7.2
 `2020-12-17`
 * `CHG` completion: use custom tabsize

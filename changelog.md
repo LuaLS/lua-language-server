@@ -1,5 +1,9 @@
 # changelog
 
+## 1.7.4
+`2020-12-20`
+* `FIX` workspace: preload may failed
+
 ## 1.7.3
 `2020-12-20`
 * `FIX` luadoc: typo of `package.config`

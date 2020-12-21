@@ -181,7 +181,7 @@ function mt:scan(callback)
                         if  filename
                         and filename ~= '.'
                         and filename ~= '..' then
-                            list[#list+1] = current .. '/' .. filename
+                            list[#list+1] = path
                         end
                     end
                 end

@@ -35,19 +35,11 @@ function m.init(uri)
 end
 
 local function interfaceFactory(root)
-    -- TODO: need flush!!!
-    local mark = {}
     return {
         type = function (path)
             local result
             pcall(function ()
-                local abspath = fs.absolute(fs.path(root .. '/' .. path))
-                local abskey  = abspath:string():lower()
-                if mark[abskey] then
-                    --return nil
-                end
-                mark[abskey] = true
-                if fs.is_directory(abspath) then
+                if fs.is_directory(path) then
                     result = 'directory'
                 else
                     result = 'file'

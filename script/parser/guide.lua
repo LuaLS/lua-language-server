@@ -668,6 +668,10 @@ function m.lineRange(lines, row, ignoreNL)
     end
 end
 
+function m.lineData(lines, row)
+    return lines[row]
+end
+
 function m.getKeyTypeOfLiteral(obj)
     if not obj then
         return nil

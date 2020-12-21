@@ -36,7 +36,7 @@ local function pushClientInfo(link)
 end
 
 local function pushPlatformInfo(link)
-    send(link, string.pack('zzz'
+    send(link, string.pack('zzzzz'
         , 'platform'
         , token
         , ('%s %s'):format(platform.OS, platform.Arch)

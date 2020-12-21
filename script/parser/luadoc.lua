@@ -917,8 +917,9 @@ local function isNextLine(lns, binded, doc)
         return false
     end
     local lastDoc = binded[#binded]
-    local _, lastDocStartCol, lastDocStartLine = guide.positionOf(lns, lastDoc.originalComment.start)
-    if haveCodeBeforeDocInCurLine(lastDocStartLine, lastDocStartCol) then
+    local lastDocStartRow, lastDocStartCol = guide.positionOf(lns, lastDoc.originalComment.start)
+    local lastDocStartLineData = guide.lineData(lns, lastDocStartRow)
+    if haveCodeBeforeDocInCurLine(lastDocStartLineData, lastDocStartCol) then
         return false
     end
 

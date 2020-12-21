@@ -588,20 +588,21 @@ end
 ---@param lines table
 ---@return integer {name = 'row'}
 ---@return integer {name = 'col'}
+---@return table {name = 'line'} 命中那一行的细节信息
 function m.positionOf(lines, offset)
     if offset < 1 then
-        return 0, 0
+        return 0, 0, nil
     end
     local lastLine = lines[#lines]
     if offset > lastLine.finish then
-        return #lines, lastLine.finish - lastLine.start + 1
+        return #lines, lastLine.finish - lastLine.start + 1, lastLine
     end
     local min = 1
     local max = #lines
     for _ = 1, 100 do
         if max <= min then
             local line = lines[min]
-            return min, offset - line.start + 1
+            return min, offset - line.start + 1, line
         end
         local row = (max - min) // 2 + min
         local line = lines[row]
@@ -610,7 +611,7 @@ function m.positionOf(lines, offset)
         elseif offset > line.finish then
             min = row + 1
         else
-            return row, offset - line.start + 1
+            return row, offset - line.start + 1, line
         end
     end
     error('Stack overflow!')

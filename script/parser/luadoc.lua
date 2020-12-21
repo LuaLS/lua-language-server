@@ -907,11 +907,21 @@ local function buildLuaDoc(comment)
     return result
 end
 
+---当前行在注释doc前是否有代码
+local function haveCodeBeforeDocInCurLine(lineData, docStartCol)
+    return docStartCol > lineData.sp + lineData.tab + 3
+end
+
 local function isNextLine(lns, binded, doc)
     if not binded then
         return false
     end
     local lastDoc = binded[#binded]
+    local _, lastDocStartCol, lastDocStartLine = guide.positionOf(lns, lastDoc.originalComment.start)
+    if haveCodeBeforeDocInCurLine(lastDocStartLine, lastDocStartCol) then
+        return false
+    end
+
     local lastRow = guide.positionOf(lns, lastDoc.finish)
     local newRow  = guide.positionOf(lns, doc.start)
     return newRow - lastRow == 1
@@ -1034,6 +1044,7 @@ return function (_, state)
             if ast.finish < doc.finish then
                 ast.finish = doc.finish
             end
+            doc.originalComment = comment
         end
     end
 

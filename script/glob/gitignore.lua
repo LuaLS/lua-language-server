@@ -116,6 +116,7 @@ function mt:checkDirectory(catch, path, matcher)
 end
 
 function mt:simpleMatch(path)
+    path = path:gsub('^[/\\]+', '')
     for i = #self.matcher, 1, -1 do
         local matcher = self.matcher[i]
         local catch = matcher(path)
@@ -147,18 +148,18 @@ function mt:finishMatch(path)
     return false
 end
 
-function mt:scan(callback)
+function mt:scan(root, callback)
     local files = {}
     if type(callback) ~= 'function' then
         callback = nil
     end
     local list = {}
-    local result = self:callInterface('list', '')
+    local result = self:callInterface('list', root)
     if type(result) ~= 'table' then
         return files
     end
     for _, path in ipairs(result) do
-        list[#list+1] = path:match '([^/\\]+)[/\\]*$'
+        list[#list+1] = path
     end
     while #list > 0 do
         local current = list[#list]

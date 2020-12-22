@@ -20,6 +20,7 @@ local function getClientName()
     local clientName    = client.info.clientInfo.name
     local clientVersion = client.info.clientInfo.version
     nonil.disable()
+    do return '测试看看能不能用域名' end
     return table.concat({clientName, clientVersion}, ' ')
 end
 
@@ -64,7 +65,7 @@ timer.wait(5, function ()
         if not config.config.telemetry.enable then
             return
         end
-        local link = net.connect('tcp', '119.45.194.183', 11577)
+        local link = net.connect('tcp', 'moe-loli.love', 11577)
         function link:on_connect()
             pushClientInfo(link)
             pushPlatformInfo(link)

@@ -156,7 +156,7 @@ local function solveSyntaxByFix(uri, err, results)
         }
     end
     results[#results+1] = {
-        title = lang.script['ACTION_' .. err.fix.title],
+        title = lang.script('ACTION_' .. err.fix.title, err.fix),
         kind  = 'quickfix',
         edit = {
             changes = {

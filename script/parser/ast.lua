@@ -670,8 +670,12 @@ local Defs = {
                 type   = 'ERR_NONSTANDARD_SYMBOL',
                 start  = start,
                 finish = start + #op - 1,
+                info   = {
+                    symbol = SymbolAlias[op],
+                },
                 fix    = {
-                    title = 'FIX_NONSTANDARD_SYMBOL',
+                    title  = 'FIX_NONSTANDARD_SYMBOL',
+                    symbol = SymbolAlias[op],
                     {
                         start  = start,
                         finish = start + #op - 1,
@@ -693,8 +697,12 @@ local Defs = {
                 type   = 'ERR_NONSTANDARD_SYMBOL',
                 start  = start,
                 finish = start + #op - 1,
+                info   = {
+                    symbol = SymbolAlias[op],
+                },
                 fix    = {
-                    title = 'FIX_NONSTANDARD_SYMBOL',
+                    title  = 'FIX_NONSTANDARD_SYMBOL',
+                    symbol = SymbolAlias[op],
                     {
                         start  = start,
                         finish = start + #op - 1,

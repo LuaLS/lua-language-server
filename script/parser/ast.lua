@@ -945,6 +945,19 @@ local Defs = {
             finish = start,
         }
     end,
+    ASSIGN = function (start, symbol)
+        if State.options.nonstandardSymbol and State.options.nonstandardSymbol[symbol] then
+        else
+            PushError {
+                type    = 'UNSUPPORT_SYMBOL',
+                start   = start,
+                finish  = start + #symbol - 1,
+                info    = {
+                    version = 'Lua',
+                }
+            }
+        end
+    end,
     DOT = function (start)
         return {
             type   = '.',

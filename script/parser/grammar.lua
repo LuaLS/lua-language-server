@@ -222,9 +222,11 @@ COLON       <-  Sp ({} ':' !':')
             ->  COLON
 LABEL       <-  Sp '::'
 ASSIGN      <-  Sp '=' !'='
+            /   Sp ({} {'+=' / '-=' / '*=' / '\='})
+            ->  ASSIGN
 AssignOrEQ  <-  Sp ({} '==' {})
             ->  ErrAssign
-            /   Sp '='
+            /   ASSIGN
 
 DirtyBR     <-  BR     / {} -> MissBR
 DirtyTR     <-  TR     / {} -> MissTR

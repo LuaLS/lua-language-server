@@ -76,7 +76,7 @@ local <!x!>
 ]]
 
 TEST [[
-local x <close>
+local x <close> = print
 ]]
 
 TEST [[
@@ -319,8 +319,14 @@ return [[
 ]]
 ]=]
 
+config.config.diagnostics.disable['close-non-object'] = true
 TEST [[
 local _ <close> = function () end
+]]
+
+config.config.diagnostics.disable['close-non-object'] = nil
+TEST [[
+local _ <close> = <!1!>
 ]]
 
 config.config.diagnostics.disable['unused-local'] = true

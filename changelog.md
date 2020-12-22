@@ -2,6 +2,7 @@
 
 ## 1.8.0
 * `NEW` runtime: support nonstandard symbol
+* `NEW` diagnostic: `close-non-object`
 
 ## 1.7.4
 `2020-12-20`

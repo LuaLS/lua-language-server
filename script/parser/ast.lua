@@ -363,6 +363,33 @@ local Defs = {
         }
     end,
     String = function (start, quote, str, finish)
+        if quote == '`' then
+            if State.options.nonstandardSymbol and State.options.nonstandardSymbol['`'] then
+            else
+                PushError {
+                    type   = 'ERR_NONSTANDARD_SYMBOL',
+                    start  = start,
+                    finish = finish - 1,
+                    info   = {
+                        symbol = '"',
+                    },
+                    fix    = {
+                        title  = 'FIX_NONSTANDARD_SYMBOL',
+                        symbol = '"',
+                        {
+                            start  = start,
+                            finish = start,
+                            text   = '"',
+                        },
+                        {
+                            start  = finish - 1,
+                            finish = finish - 1,
+                            text   = '"',
+                        },
+                    }
+                }
+            end
+        end
         return {
             type   = 'string',
             start  = start,
@@ -1509,6 +1536,16 @@ local Defs = {
             finish = pos,
             info = {
                 symbol = "'"
+            }
+        }
+    end,
+    MissQuote3 = function (pos)
+        PushError {
+            type = 'MISS_SYMBOL',
+            start = pos,
+            finish = pos,
+            info = {
+                symbol = "`"
             }
         }
     end,

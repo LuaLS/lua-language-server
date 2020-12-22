@@ -257,6 +257,9 @@ StringDef   <-  {'"'}
             /   {"'"}
                 {~(Esc / !%nl !"'" .)*~} -> 1
                 ("'" / {} -> MissQuote2)
+            /   {'`'}
+                {(!%nl !'`' .)*} -> 1
+                ('`' / {} -> MissQuote3)
             /   ('[' {} {:eq: '='* :} {} '[' %nl?
                 {(!StringClose .)*} -> 1
                 (StringClose / {}))

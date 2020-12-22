@@ -48,6 +48,13 @@ local VersionOp = {
     ['//'] = {'Lua 5.3', 'Lua 5.4'},
 }
 
+local SymbolAlias = {
+    ['||'] = 'or',
+    ['&&'] = 'and',
+    ['!='] = '~=',
+    ['!']  = 'not',
+}
+
 local function checkOpVersion(op)
     local versions = VersionOp[op.type]
     if not versions then
@@ -305,38 +312,54 @@ local Defs = {
         end
     end,
     CLongComment = function (start1, finish1, start2, finish2)
-        PushError {
-            type   = 'ERR_C_LONG_COMMENT',
+        if State.options.nonstandardSymbol and State.options.nonstandardSymbol['/**/'] then
+        else
+            PushError {
+                type   = 'ERR_C_LONG_COMMENT',
+                start  = start1,
+                finish = finish2 - 1,
+                fix    = {
+                    title = 'FIX_C_LONG_COMMENT',
+                    {
+                        start  = start1,
+                        finish = finish1 - 1,
+                        text   = '--[[',
+                    },
+                    {
+                        start  = start2,
+                        finish = finish2 - 1,
+                        text   =  '--]]'
+                    },
+                }
+            }
+        end
+        return {
+            type   = 'nonstandardSymbol.comment',
             start  = start1,
             finish = finish2 - 1,
-            fix    = {
-                title = 'FIX_C_LONG_COMMENT',
-                {
-                    start  = start1,
-                    finish = finish1 - 1,
-                    text   = '--[[',
-                },
-                {
-                    start  = start2,
-                    finish = finish2 - 1,
-                    text   =  '--]]'
-                },
-            }
         }
     end,
-    CCommentPrefix = function (start, finish)
-        PushError {
-            type   = 'ERR_COMMENT_PREFIX',
-            start  = start,
-            finish = finish - 1,
-            fix    = {
-                title = 'FIX_COMMENT_PREFIX',
-                {
-                    start  = start,
-                    finish = finish - 1,
-                    text   = '--',
-                },
+    CCommentPrefix = function (start, finish, commentFinish)
+        if State.options.nonstandardSymbol and State.options.nonstandardSymbol['//'] then
+        else
+            PushError {
+                type   = 'ERR_COMMENT_PREFIX',
+                start  = start,
+                finish = finish - 1,
+                fix    = {
+                    title = 'FIX_COMMENT_PREFIX',
+                    {
+                        start  = start,
+                        finish = finish - 1,
+                        text   = '--',
+                    },
+                }
             }
+        end
+        return {
+            type   = 'nonstandardSymbol.comment',
+            start  = start,
+            finish = commentFinish - 1,
         }
     end,
     String = function (start, quote, str, finish)
@@ -642,6 +665,22 @@ local Defs = {
         return call
     end,
     BinaryOp = function (start, op)
+        if SymbolAlias[op] then
+            PushError {
+                type   = 'ERR_NONSTANDARD_SYMBOL',
+                start  = start,
+                finish = start + #op - 1,
+                fix    = {
+                    title = 'FIX_NONSTANDARD_SYMBOL',
+                    {
+                        start  = start,
+                        finish = start + #op - 1,
+                        text   = SymbolAlias[op],
+                    },
+                }
+            }
+            op = SymbolAlias[op]
+        end
         return {
             type   = op,
             start  = start,
@@ -649,6 +688,22 @@ local Defs = {
         }
     end,
     UnaryOp = function (start, op)
+        if SymbolAlias[op] then
+            PushError {
+                type   = 'ERR_NONSTANDARD_SYMBOL',
+                start  = start,
+                finish = start + #op - 1,
+                fix    = {
+                    title = 'FIX_NONSTANDARD_SYMBOL',
+                    {
+                        start  = start,
+                        finish = start + #op - 1,
+                        text   = SymbolAlias[op],
+                    },
+                }
+            }
+            op = SymbolAlias[op]
+        end
         return {
             type   = op,
             start  = start,
@@ -1355,6 +1410,20 @@ local Defs = {
             untilA , untilB  - 1,
         }
         return block
+    end,
+    RTContinue = function (_, pos, ...)
+        if State.options.nonstandardSymbol and State.options.nonstandardSymbol['continue'] then
+            return pos, ...
+        else
+            return false
+        end
+    end,
+    Continue = function (start, finish)
+        return {
+            type   = 'nonstandardSymbol.continue',
+            start  = start,
+            finish = finish - 1,
+        }
     end,
     Lua = function (start, actions, finish)
         actions.type   = 'main'

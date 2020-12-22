@@ -120,6 +120,14 @@ Care['doc.type.name'] = function (source, results)
     end
 end
 
+Care['nonstandardSymbol.comment'] = function (source, results)
+    results[#results+1] = {
+        start  = source.start,
+        finish = source.finish,
+        type   = define.TokenTypes.comment,
+    }
+end
+
 local function buildTokens(results, text, lines)
     local tokens = {}
     local lastLine = 0

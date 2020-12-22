@@ -248,6 +248,7 @@ function m.compileAst(uri, text)
         , {
             special     = config.config.runtime.special,
             unicodeName = config.config.runtime.unicodeName,
+            alias       = config.config.runtime.alias,
         }
     )
     local passed = os.clock() - clock

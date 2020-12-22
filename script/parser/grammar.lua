@@ -124,6 +124,7 @@ NOT         <-  Sp 'not'      Cut
 OR          <-  Sp {'or'}     Cut
 RETURN      <-  Sp 'return'   Cut
 TRUE        <-  Sp 'true'     Cut
+CONTINUE    <-  Sp 'continue' Cut
 
 DO          <-  Sp {} 'do'       {} Cut
             /   Sp({} 'then'     {} Cut) -> ErrDo
@@ -186,9 +187,9 @@ UnaryList   <-  NOT
             /   '~' !'='
 POWER       <-  Sp {'^'}
 
-BinaryOp    <-( Sp {} {'or'} Cut
-            /   Sp {} {'and'} Cut
-            /   Sp {} {'<=' / '>=' / '<'!'<' / '>'!'>' / '~=' / '=='}
+BinaryOp    <-( Sp {} {'or' / '||'} Cut
+            /   Sp {} {'and' / '&&'} Cut
+            /   Sp {} {'<=' / '>=' / '<'!'<' / '>'!'>' / '~=' / '==' / '!='}
             /   Sp {} ({} '=' {}) -> ErrEQ
             /   Sp {} ({} '!=' {}) -> ErrUEQ
             /   Sp {} {'|'}
@@ -200,7 +201,7 @@ BinaryOp    <-( Sp {} {'or'} Cut
             /   Sp {} {'*' / '//' / '/' / '%'}
             /   Sp {} {'^'}
             )-> BinaryOp
-UnaryOp     <-( Sp {} {'not' Cut / '#' / '~' !'=' / '-' !'-'}
+UnaryOp     <-( Sp {} {'not' Cut / '#' / '~' !'=' / '-' !'-' / '!' !'='}
             )-> UnaryOp
 
 PL          <-  Sp '('
@@ -408,11 +409,12 @@ CrtAction   <-  Semicolon
             /   LocalFunction
             /   Local
             /   Set
+            /   Continue
             /   Call
             /   ExpInAction
 UnkAction   <-  ({} {Word+})
             ->  UnknownAction
-            /   ({} '//' {} (LongComment / ShortComment))
+            /   ({} '//' {} (LongComment / ShortComment) {})
             ->  CCommentPrefix
             /   ({} {. (!Sps !CrtAction .)*})
             ->  UnknownAction
@@ -430,6 +432,10 @@ Do          <-  Sp ({}
 
 Break       <-  Sp ({} BREAK {})
             ->  Break
+
+Continue    <-  Sp ({} CONTINUE {})
+            =>  RTContinue
+            ->  Continue
 
 Return      <-  Sp ({} RETURN ReturnExpList {})
             ->  Return

@@ -1422,7 +1422,7 @@ function m.getObjectValue(obj)
     end
     if obj.type == 'field'
     or obj.type == 'method' then
-        return obj.parent.value
+        return obj.parent and obj.parent.value
     end
     if obj.type == 'call' then
         if obj.node.special == 'rawset' then
@@ -3576,8 +3576,8 @@ function m.inferCheckBinary(status, source)
         local v2 = m.getInferLiteral(status, source[2], 'integer')
                 or m.getInferLiteral(status, source[2], 'number')
         local v
-        if v1 and v2 then
-            v = v1 > v2
+        if v1 and v2 and v2 ~= 0 then
+            v = v1 / v2
         end
         status.results = m.allocInfer {
             type   = 'number',
@@ -3618,7 +3618,7 @@ function m.inferCheckBinary(status, source)
         local int, v1, v2 = mathCheck(status, source[1], source[2])
         status.results = m.allocInfer {
             type   = int,
-            value  = (v1 and v2) and (v1 % v2) or nil,
+            value  = (v1 and v2 and v2 ~= 0) and (v1 % v2) or nil,
             source = source,
             level  = 100,
         }
@@ -3627,7 +3627,7 @@ function m.inferCheckBinary(status, source)
         local int, v1, v2 = mathCheck(status, source[1], source[2])
         status.results = m.allocInfer {
             type   = int,
-            value  = (v1 and v2) and (v1 // v2) or nil,
+            value  = (v1 and v2 and v2 ~= 0) and (v1 // v2) or nil,
             source = source,
             level  = 100,
         }

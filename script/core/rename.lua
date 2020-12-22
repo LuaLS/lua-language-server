@@ -113,6 +113,9 @@ local function trim(str)
 end
 
 local function isValidName(str)
+    if not str then
+        return false
+    end
     return str:match '^[%a_][%w_]*$'
 end
 

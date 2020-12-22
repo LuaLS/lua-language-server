@@ -20,7 +20,6 @@ local function getClientName()
     local clientName    = client.info.clientInfo.name
     local clientVersion = client.info.clientInfo.version
     nonil.disable()
-    do return '测试看看能不能用域名' end
     return table.concat({clientName, clientVersion}, ' ')
 end
 

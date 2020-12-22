@@ -693,23 +693,26 @@ local Defs = {
     end,
     BinaryOp = function (start, op)
         if SymbolAlias[op] then
-            PushError {
-                type   = 'ERR_NONSTANDARD_SYMBOL',
-                start  = start,
-                finish = start + #op - 1,
-                info   = {
-                    symbol = SymbolAlias[op],
-                },
-                fix    = {
-                    title  = 'FIX_NONSTANDARD_SYMBOL',
-                    symbol = SymbolAlias[op],
-                    {
-                        start  = start,
-                        finish = start + #op - 1,
-                        text   = SymbolAlias[op],
+            if State.options.nonstandardSymbol and State.options.nonstandardSymbol[op] then
+            else
+                PushError {
+                    type   = 'ERR_NONSTANDARD_SYMBOL',
+                    start  = start,
+                    finish = start + #op - 1,
+                    info   = {
+                        symbol = SymbolAlias[op],
                     },
+                    fix    = {
+                        title  = 'FIX_NONSTANDARD_SYMBOL',
+                        symbol = SymbolAlias[op],
+                        {
+                            start  = start,
+                            finish = start + #op - 1,
+                            text   = SymbolAlias[op],
+                        },
+                    }
                 }
-            }
+            end
             op = SymbolAlias[op]
         end
         return {
@@ -720,23 +723,26 @@ local Defs = {
     end,
     UnaryOp = function (start, op)
         if SymbolAlias[op] then
-            PushError {
-                type   = 'ERR_NONSTANDARD_SYMBOL',
-                start  = start,
-                finish = start + #op - 1,
-                info   = {
-                    symbol = SymbolAlias[op],
-                },
-                fix    = {
-                    title  = 'FIX_NONSTANDARD_SYMBOL',
-                    symbol = SymbolAlias[op],
-                    {
-                        start  = start,
-                        finish = start + #op - 1,
-                        text   = SymbolAlias[op],
+            if State.options.nonstandardSymbol and State.options.nonstandardSymbol[op] then
+            else
+                PushError {
+                    type   = 'ERR_NONSTANDARD_SYMBOL',
+                    start  = start,
+                    finish = start + #op - 1,
+                    info   = {
+                        symbol = SymbolAlias[op],
                     },
+                    fix    = {
+                        title  = 'FIX_NONSTANDARD_SYMBOL',
+                        symbol = SymbolAlias[op],
+                        {
+                            start  = start,
+                            finish = start + #op - 1,
+                            text   = SymbolAlias[op],
+                        },
+                    }
                 }
-            }
+            end
             op = SymbolAlias[op]
         end
         return {

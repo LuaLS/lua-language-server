@@ -145,12 +145,23 @@ function m.startTimer()
     end
 end
 
+function m.testVersion()
+    local stack = debug.setcstacklimit(201)
+    if debug.setcstacklimit(stack) == 201 then
+        proto.notify('window/showMessage', {
+            type = 2,
+            message = 'It seems to be running in Lua 5.4.0 or Lua 5.4.1 . Please upgrade to Lua 5.4.2 or above. Otherwise, it may encounter weird "C stack overflow", resulting in failure to work properly',
+        })
+    end
+end
+
 function m.start()
     util.enableCloseFunction()
     await.setErrorHandle(log.error)
     pub.recruitBraves(4)
     proto.listen()
     m.report()
+    m.testVersion()
 
     require 'provider'
 

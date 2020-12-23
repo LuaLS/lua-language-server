@@ -18,6 +18,7 @@ local assert       = assert
 local select       = select
 local osClock      = os.clock
 local tonumber     = tonumber
+local tointeger    = math.tointeger
 local DEVELOP      = _G.DEVELOP
 local log          = log
 local _G           = _G
@@ -3411,6 +3412,8 @@ function m.inferCheckBinary(status, source)
                 or m.getInferLiteral(status, source[1], 'number')
         local v2 = m.getInferLiteral(status, source[2], 'integer')
                 or m.getInferLiteral(status, source[2], 'number')
+        v1 = tonumber(v1)
+        v2 = tonumber(v2)
         local v
         if v1 and v2 then
             v = v1 <= v2
@@ -3427,6 +3430,8 @@ function m.inferCheckBinary(status, source)
                 or m.getInferLiteral(status, source[1], 'number')
         local v2 = m.getInferLiteral(status, source[2], 'integer')
                 or m.getInferLiteral(status, source[2], 'number')
+        v1 = tonumber(v1)
+        v2 = tonumber(v2)
         local v
         if v1 and v2 then
             v = v1 >= v2
@@ -3443,6 +3448,8 @@ function m.inferCheckBinary(status, source)
                 or m.getInferLiteral(status, source[1], 'number')
         local v2 = m.getInferLiteral(status, source[2], 'integer')
                 or m.getInferLiteral(status, source[2], 'number')
+        v1 = tonumber(v1)
+        v2 = tonumber(v2)
         local v
         if v1 and v2 then
             v = v1 < v2
@@ -3459,6 +3466,8 @@ function m.inferCheckBinary(status, source)
                 or m.getInferLiteral(status, source[1], 'number')
         local v2 = m.getInferLiteral(status, source[2], 'integer')
                 or m.getInferLiteral(status, source[2], 'number')
+        v1 = tonumber(v1)
+        v2 = tonumber(v2)
         local v
         if v1 and v2 then
             v = v1 > v2
@@ -3473,6 +3482,8 @@ function m.inferCheckBinary(status, source)
     elseif op.type == '|' then
         local v1 = m.getInferLiteral(status, source[1], 'integer')
         local v2 = m.getInferLiteral(status, source[2], 'integer')
+        v1 = tointeger(v1)
+        v2 = tointeger(v2)
         local v
         if v1 and v2 then
             v = v1 | v2
@@ -3487,6 +3498,8 @@ function m.inferCheckBinary(status, source)
     elseif op.type == '~' then
         local v1 = m.getInferLiteral(status, source[1], 'integer')
         local v2 = m.getInferLiteral(status, source[2], 'integer')
+        v1 = tointeger(v1)
+        v2 = tointeger(v2)
         local v
         if v1 and v2 then
             v = v1 ~ v2
@@ -3501,6 +3514,8 @@ function m.inferCheckBinary(status, source)
     elseif op.type == '&' then
         local v1 = m.getInferLiteral(status, source[1], 'integer')
         local v2 = m.getInferLiteral(status, source[2], 'integer')
+        v1 = tointeger(v1)
+        v2 = tointeger(v2)
         local v
         if v1 and v2 then
             v = v1 & v2
@@ -3515,6 +3530,8 @@ function m.inferCheckBinary(status, source)
     elseif op.type == '<<' then
         local v1 = m.getInferLiteral(status, source[1], 'integer')
         local v2 = m.getInferLiteral(status, source[2], 'integer')
+        v1 = tointeger(v1)
+        v2 = tointeger(v2)
         local v
         if v1 and v2 then
             v = v1 << v2
@@ -3529,6 +3546,8 @@ function m.inferCheckBinary(status, source)
     elseif op.type == '>>' then
         local v1 = m.getInferLiteral(status, source[1], 'integer')
         local v2 = m.getInferLiteral(status, source[2], 'integer')
+        v1 = tointeger(v1)
+        v2 = tointeger(v2)
         local v
         if v1 and v2 then
             v = v1 >> v2
@@ -3543,6 +3562,8 @@ function m.inferCheckBinary(status, source)
     elseif op.type == '..' then
         local v1 = m.getInferLiteral(status, source[1], 'string')
         local v2 = m.getInferLiteral(status, source[2], 'string')
+        v1 = type(v1) == 'string' and v1 or nil
+        v2 = type(v2) == 'string' and v2 or nil
         local v
         if v1 and v2 then
             v = v1 .. v2
@@ -3559,6 +3580,8 @@ function m.inferCheckBinary(status, source)
                 or m.getInferLiteral(status, source[1], 'number')
         local v2 = m.getInferLiteral(status, source[2], 'integer')
                 or m.getInferLiteral(status, source[2], 'number')
+        v1 = tonumber(v1)
+        v2 = tonumber(v2)
         local v
         if v1 and v2 then
             v = v1 ^ v2
@@ -3575,6 +3598,8 @@ function m.inferCheckBinary(status, source)
                 or m.getInferLiteral(status, source[1], 'number')
         local v2 = m.getInferLiteral(status, source[2], 'integer')
                 or m.getInferLiteral(status, source[2], 'number')
+        v1 = tonumber(v1)
+        v2 = tonumber(v2)
         local v
         if v1 and v2 and v2 ~= 0 then
             v = v1 / v2

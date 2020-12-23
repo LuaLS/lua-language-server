@@ -1762,13 +1762,18 @@ function m.searchSameFieldsCrossMethod(status, ref, start, queue)
         mark = {}
         status.crossMethodMark = mark
     end
+    local oldMarkMethod = mark['method']
     local method = m.searchSameMethod(ref, mark)
                 or m.searchSameMethodCrossSelf(ref, mark)
     if not method then
         return
     end
+    local newMarkMethod = mark['method']
     local methodStatus = m.status(status)
     m.searchRefs(methodStatus, method, 'ref')
+    if not oldMarkMethod and newMarkMethod then
+        methodStatus.results[#methodStatus.results + 1] = method
+    end
     for _, md in ipairs(methodStatus.results) do
         queue[#queue+1] = {
             obj   = md,

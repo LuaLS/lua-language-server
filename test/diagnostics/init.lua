@@ -945,3 +945,21 @@ v2 = v
 v2:method1()
 v2:method2() -- 这个感觉实际应该报错更合适
 ]]
+
+TEST [[
+---@class Foo
+Foo = {}
+function Foo:Constructor()
+    self.bar1 = 1
+end
+
+---@class Foo2: Foo
+local Foo2 = {}
+function Foo2:Constructor()
+    self.bar2 = 1
+end
+
+---@type Foo2
+local v
+print(v.bar1)
+]]

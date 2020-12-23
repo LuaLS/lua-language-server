@@ -945,3 +945,12 @@ v2 = v
 v2:method1()
 v2:method2() -- 这个感觉实际应该报错更合适
 ]]
+
+TEST [[
+---@type table
+T1 = {}
+print(T1.f1)
+---@type table*
+T2 = {}
+print(T2.<!f2!>)
+]]

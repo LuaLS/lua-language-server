@@ -29,7 +29,7 @@ return function (uri, callback)
         local allDocClass = {}
         for i = 1, #infers do
             local infer = infers[i]
-            if infer.type ~= '_G' and infer.type ~= 'any' then
+            if infer.type ~= '_G' and infer.type ~= 'any' and infer.type ~= 'table' then
                 local inferSource = infer.source
                 if inferSource.type == 'doc.class' then
                     addTo(allDocClass, inferSource)

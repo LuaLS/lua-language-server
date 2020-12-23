@@ -1771,7 +1771,7 @@ function m.searchSameFieldsCrossMethod(status, ref, start, queue)
     local newMarkMethod = mark['method']
     local methodStatus = m.status(status)
     m.searchRefs(methodStatus, method, 'ref')
-    if not oldMarkMethod and newMarkMethod then
+    if (not oldMarkMethod) and newMarkMethod and (next(methodStatus.results) == nil) then
         methodStatus.results[#methodStatus.results + 1] = method
     end
     for _, md in ipairs(methodStatus.results) do

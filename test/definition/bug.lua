@@ -152,3 +152,20 @@ TEST [[
 string.xx = ''
 string.xx:<?format?>()
 ]]
+
+TEST [[
+---@class Foo
+Foo = {}
+function Foo:Constructor()
+    self.<!bar1!> = 1
+end
+
+---@class Foo2: Foo
+Foo2 = {}
+function Foo2:Constructor()
+end
+
+---@type Foo2
+local v
+v.<?bar1?>
+]]

@@ -1767,18 +1767,18 @@ function m.searchSameMethodCrossSelf(ref, mark)
 end
 
 function m.searchSameMethod(ref, mark)
-    if mark['method'] then
-        return nil
-    end
     local nxt = ref.next
     if not nxt then
         return nil
     end
-    if nxt.type == 'setmethod' then
-        mark['method'] = true
-        return ref
+    if nxt.type ~= 'setmethod' then
+        return nil
     end
-    return nil
+    if mark[ref] then
+        return nil
+    end
+    mark[ref] = true
+    return ref
 end
 
 function m.searchSameFieldsCrossMethod(status, ref, start, queue)
@@ -1795,6 +1795,7 @@ function m.searchSameFieldsCrossMethod(status, ref, start, queue)
     local methodStatus = m.status(status)
     m.searchRefs(methodStatus, method, 'ref')
     for _, md in ipairs(methodStatus.results) do
+        mark[md] = true
         queue[#queue+1] = {
             obj   = md,
             start = start,

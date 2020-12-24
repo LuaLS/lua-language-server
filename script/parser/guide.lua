@@ -1478,6 +1478,27 @@ function m.checkSameSimpleInSpecialBranch(status, obj, start, queue)
     end
 end
 
+local function toValidGenericType(status, obj)
+    if obj.type ~= 'string' then
+        return obj
+    end
+
+    if not status.interface.docType then
+        return obj
+    end
+
+    local docs = status.interface.docType(obj[1])
+    for i = 1, #docs do
+        local doc = docs[i]
+        if doc.type == 'doc.class.name'
+        or doc.type == 'doc.alias.name' then
+            return doc
+        end
+    end
+
+    return obj
+end
+
 local function stepRefOfGeneric(status, typeUnit, args, mode)
     if not args then
         return nil
@@ -1502,7 +1523,7 @@ local function stepRefOfGeneric(status, typeUnit, args, mode)
             and source.parent.type == 'funcargs' then
                 for index, arg in ipairs(source.parent) do
                     if arg == source then
-                        results[#results+1] = args[index]
+                        results[#results+1] = toValidGenericType(status, args[index])
                     end
                 end
             end

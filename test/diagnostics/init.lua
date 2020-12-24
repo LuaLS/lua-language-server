@@ -945,3 +945,19 @@ v2 = v
 v2:method1()
 v2:method2() -- 这个感觉实际应该报错更合适
 ]]
+
+TEST [[
+---@generic T
+---@param arg1 T
+---@return T
+function Generic(arg1) return arg1 end
+
+---@class Foo
+---@field bar1 integer
+local Foo = {}
+
+local v1 = Generic("Foo")
+print(v1.bar1)
+local v2 = Generic(Foo)
+print(v2.bar1)
+]]

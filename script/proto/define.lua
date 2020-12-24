@@ -157,6 +157,7 @@ m.DiagnosticDefaultSeverity = {
     ['redundant-value']         = 'Hint',
     ['code-after-break']        = 'Hint',
     ['unbalanced-assignments']  = 'Warning',
+    ['close-non-object']        = 'Warning',
 
     ['duplicate-doc-class']     = 'Warning',
     ['undefined-doc-class']     = 'Warning',
@@ -196,6 +197,7 @@ m.DiagnosticDefaultNeededFileStatus = {
     ['redundant-value']         = 'Opened',
     ['code-after-break']        = 'Opened',
     ['unbalanced-assignments']  = 'Any',
+    ['close-non-object']        = 'Any',
 
     ['duplicate-doc-class']     = 'Any',
     ['undefined-doc-class']     = 'Any',

@@ -12,7 +12,9 @@ return function (uri, callback)
     end
 
     local function getAllDocClassFromInfer(src)
+        tracy.ZoneBeginN('undefined-field getInfers')
         local infers = vm.getInfers(src, 0)
+        tracy.ZoneEnd()
 
         if not infers then
             return nil
@@ -29,7 +31,7 @@ return function (uri, callback)
         local allDocClass = {}
         for i = 1, #infers do
             local infer = infers[i]
-            if infer.type ~= '_G' and infer.type ~= 'any' then
+            if infer.type ~= '_G' and infer.type ~= 'any' and infer.type ~= 'table' then
                 local inferSource = infer.source
                 if inferSource.type == 'doc.class' then
                     addTo(allDocClass, inferSource)
@@ -90,13 +92,13 @@ return function (uri, callback)
 
         if not fields[fieldName] then
             local message = lang.script('DIAG_UNDEF_FIELD', fieldName)
-            if src.type == 'getfield' then
+            if src.type == 'getfield' and src.field then
                 callback {
                     start   = src.field.start,
                     finish  = src.field.finish,
                     message = message,
                 }
-            elseif src.type == 'getmethod' then
+            elseif src.type == 'getmethod' and src.method then
                 callback {
                     start   = src.method.start,
                     finish  = src.method.finish,

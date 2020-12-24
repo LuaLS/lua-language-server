@@ -19,6 +19,7 @@ local utf8Len      = utf8.len
 local mathHuge     = math.huge
 local inf          = 1 / 0
 local nan          = 0 / 0
+local utf8         = utf8
 
 _ENV = nil
 
@@ -477,11 +478,18 @@ function m.viewLiteral(v)
 end
 
 function m.utf8Len(str, start, finish)
-    local len, pos = utf8Len(str, start, finish, true)
-    if len then
-        return len
+    local len = 0
+    for _ = 1, 10000 do
+        local clen, pos = utf8Len(str, start, finish, true)
+        if clen then
+            len = len + clen
+            break
+        else
+            len = len + 1 + utf8Len(str, start, pos - 1, true)
+            start = pos + 1
+        end
     end
-    return 1 + m.utf8Len(str, start, pos-1) + m.utf8Len(str, pos+1, finish)
+    return len
 end
 
 function m.revertTable(t)

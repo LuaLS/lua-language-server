@@ -22,7 +22,7 @@ local function countFuncArgs(source)
     if source.parent and source.parent.type == 'setmethod' then
         result = result + 1
     end
-    if not source.args then
+    if not source.args or #source.args == 0 then
         return result
     end
     if source.args[#source.args].type == '...' then

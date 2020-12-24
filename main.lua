@@ -14,10 +14,10 @@ log.init(ROOT, ROOT / 'log' / 'service.log')
 log.info('Lua Lsp startup, root: ', ROOT)
 log.debug('ROOT:', ROOT:string())
 
+require 'tracy'
+
 xpcall(dofile, log.debug, rootPath .. '/debugger.lua')
 
 local service = require 'service'
 
--- TODO
---ALL_DEEP = true
 service.start()

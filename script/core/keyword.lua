@@ -15,10 +15,10 @@ local keyWordMap = {
                 label = 'do .. end',
                 kind  = define.CompletionItemKind.Snippet,
                 insertTextFormat = 2,
-                insertText = [[
-do
-    $0
-end]],
+                insertText = "\z
+do\
+\t$0\
+end",
             }
         end
         return true
@@ -64,38 +64,38 @@ end]],
                 label = 'for .. in',
                 kind  = define.CompletionItemKind.Snippet,
                 insertTextFormat = 2,
-                insertText = [[
-${1:key, value} in ${2:pairs(${3:t})} do
-    $0
-end]]
+                insertText = "\z
+${1:key, value} in ${2:pairs(${3:t})} do\
+\t$0\
+end"
             }
             results[#results+1] = {
                 label = 'for i = ..',
                 kind  = define.CompletionItemKind.Snippet,
                 insertTextFormat = 2,
-                insertText = [[
-${1:i} = ${2:1}, ${3:10, 1} do
-    $0
-end]]
+                insertText = "\z
+${1:i} = ${2:1}, ${3:10, 1} do\
+\t$0\
+end"
             }
         else
             results[#results+1] = {
                 label = 'for .. in',
                 kind  = define.CompletionItemKind.Snippet,
                 insertTextFormat = 2,
-                insertText = [[
-for ${1:key, value} in ${2:pairs(${3:t})} do
-    $0
-end]]
+                insertText = "\z
+for ${1:key, value} in ${2:pairs(${3:t})} do\
+\t$0\
+end"
             }
             results[#results+1] = {
                 label = 'for i = ..',
                 kind  = define.CompletionItemKind.Snippet,
                 insertTextFormat = 2,
-                insertText = [[
-for ${1:i} = ${2:1}, ${3:10, 1} do
-    $0
-end]]
+                insertText = "\z
+for ${1:i} = ${2:1}, ${3:10, 1} do\
+\t$0\
+end"
             }
         end
         return true
@@ -106,26 +106,26 @@ end]]
                 label = 'function ()',
                 kind  = define.CompletionItemKind.Snippet,
                 insertTextFormat = 2,
-                insertText = isExp and [[
-($1)
-    $0
-end]] or [[
-$1($2)
-    $0
-end]]
+                insertText = isExp and "\z
+($1)\
+\t$0\
+end" or "\z
+$1($2)\
+\t$0\
+end"
             }
         else
             results[#results+1] = {
                 label = 'function ()',
                 kind  = define.CompletionItemKind.Snippet,
                 insertTextFormat = 2,
-                insertText = isExp and [[
-function ($1)
-    $0
-end]] or [[
-function $1($2)
-    $0
-end]]
+                insertText = isExp and "\z
+function ($1)\
+\t$0\
+end" or "\z
+function $1($2)\
+\t$0\
+end"
             }
         end
         return true
@@ -137,20 +137,20 @@ end]]
                 label = 'if .. then',
                 kind  = define.CompletionItemKind.Snippet,
                 insertTextFormat = 2,
-                insertText = [[
-$1 then
-    $0
-end]]
+                insertText = "\z
+$1 then\
+\t$0\
+end"
             }
         else
             results[#results+1] = {
                 label = 'if .. then',
                 kind  = define.CompletionItemKind.Snippet,
                 insertTextFormat = 2,
-                insertText = [[
-if $1 then
-    $0
-end]]
+                insertText = "\z
+if $1 then\
+\t$0\
+end"
             }
         end
         return true
@@ -161,20 +161,20 @@ end]]
                 label = 'in ..',
                 kind  = define.CompletionItemKind.Snippet,
                 insertTextFormat = 2,
-                insertText = [[
-${1:pairs(${2:t})} do
-    $0
-end]]
+                insertText = "\z
+${1:pairs(${2:t})} do\
+\t$0\
+end"
             }
         else
             results[#results+1] = {
                 label = 'in ..',
                 kind  = define.CompletionItemKind.Snippet,
                 insertTextFormat = 2,
-                insertText = [[
-in ${1:pairs(${2:t})} do
-    $0
-end]]
+                insertText = "\z
+in ${1:pairs(${2:t})} do\
+\t$0\
+end"
             }
         end
         return true
@@ -185,20 +185,20 @@ end]]
                 label = 'local function',
                 kind  = define.CompletionItemKind.Snippet,
                 insertTextFormat = 2,
-                insertText = [[
-function $1($2)
-    $0
-end]]
+                insertText = "\z
+function $1($2)\
+\t$0\
+end"
             }
         else
             results[#results+1] = {
                 label = 'local function',
                 kind  = define.CompletionItemKind.Snippet,
                 insertTextFormat = 2,
-                insertText = [[
-local function $1($2)
-    $0
-end]]
+                insertText = "\z
+local function $1($2)\
+\t$0\
+end"
             }
         end
         return false
@@ -219,10 +219,10 @@ end]]
                 label = 'repeat .. until',
                 kind  = define.CompletionItemKind.Snippet,
                 insertTextFormat = 2,
-                insertText = [[
-repeat
-    $0
-until $1]]
+                insertText = "\z
+repeat\
+\t$0\
+until $1"
             }
         end
         return true
@@ -247,20 +247,20 @@ until $1]]
                 label = 'while .. do',
                 kind  = define.CompletionItemKind.Snippet,
                 insertTextFormat = 2,
-                insertText = [[
-${1:true} do
-    $0
-end]]
+                insertText = "\z
+${1:true} do\
+\t$0\
+end"
             }
         else
             results[#results+1] = {
                 label = 'while .. do',
                 kind  = define.CompletionItemKind.Snippet,
                 insertTextFormat = 2,
-                insertText = [[
-while ${1:true} do
-    $0
-end]]
+                insertText = "\z
+while ${1:true} do\
+\t$0\
+end"
             }
         end
         return true

@@ -58,6 +58,12 @@ end
 defs.None = function () end
 defs.np = m.Cp() / function (n) return n+1 end
 defs.NameBody = m.R('az', 'AZ', '__', '\x80\xff') * m.R('09', 'az', 'AZ', '__', '\x80\xff')^0
+defs.NoNil = function (o)
+    if o == nil then
+        return
+    end
+    return o
+end
 
 m.setmaxstack(1000)
 
@@ -118,6 +124,7 @@ NOT         <-  Sp 'not'      Cut
 OR          <-  Sp {'or'}     Cut
 RETURN      <-  Sp 'return'   Cut
 TRUE        <-  Sp 'true'     Cut
+CONTINUE    <-  Sp 'continue' Cut
 
 DO          <-  Sp {} 'do'       {} Cut
             /   Sp({} 'then'     {} Cut) -> ErrDo
@@ -180,9 +187,9 @@ UnaryList   <-  NOT
             /   '~' !'='
 POWER       <-  Sp {'^'}
 
-BinaryOp    <-( Sp {} {'or'} Cut
-            /   Sp {} {'and'} Cut
-            /   Sp {} {'<=' / '>=' / '<'!'<' / '>'!'>' / '~=' / '=='}
+BinaryOp    <-( Sp {} {'or' / '||'} Cut
+            /   Sp {} {'and' / '&&'} Cut
+            /   Sp {} {'<=' / '>=' / '<'!'<' / '>'!'>' / '~=' / '==' / '!='}
             /   Sp {} ({} '=' {}) -> ErrEQ
             /   Sp {} ({} '!=' {}) -> ErrUEQ
             /   Sp {} {'|'}
@@ -194,7 +201,7 @@ BinaryOp    <-( Sp {} {'or'} Cut
             /   Sp {} {'*' / '//' / '/' / '%'}
             /   Sp {} {'^'}
             )-> BinaryOp
-UnaryOp     <-( Sp {} {'not' Cut / '#' / '~' !'=' / '-' !'-'}
+UnaryOp     <-( Sp {} {'not' Cut / '#' / '~' !'=' / '-' !'-' / '!' !'='}
             )-> UnaryOp
 
 PL          <-  Sp '('
@@ -215,9 +222,11 @@ COLON       <-  Sp ({} ':' !':')
             ->  COLON
 LABEL       <-  Sp '::'
 ASSIGN      <-  Sp '=' !'='
+            /   Sp ({} {'+=' / '-=' / '*=' / '\='})
+            ->  ASSIGN
 AssignOrEQ  <-  Sp ({} '==' {})
             ->  ErrAssign
-            /   Sp '='
+            /   ASSIGN
 
 DirtyBR     <-  BR     / {} -> MissBR
 DirtyTR     <-  TR     / {} -> MissTR
@@ -250,6 +259,9 @@ StringDef   <-  {'"'}
             /   {"'"}
                 {~(Esc / !%nl !"'" .)*~} -> 1
                 ("'" / {} -> MissQuote2)
+            /   {'`'}
+                {(!%nl !'`' .)*} -> 1
+                ('`' / {} -> MissQuote3)
             /   ('[' {} {:eq: '='* :} {} '[' %nl?
                 {(!StringClose .)*} -> 1
                 (StringClose / {}))
@@ -321,7 +333,7 @@ Single      <-  FreeName
 Suffix      <-  SuffixWithoutCall
             /   ({} PL SuffixCall DirtyPR {})
             ->  Call
-SuffixCall  <-  Sp ({} {| (COMMA / Exp)+ |} {})
+SuffixCall  <-  Sp ({} {| (COMMA / Exp->NoNil)+ |} {})
             ->  PackExpList
             /   %nil
 SuffixWithoutCall
@@ -359,7 +371,7 @@ TableField  <-  COMMA
             /   SEMICOLON
             /   NewIndex
             /   NewField
-            /   Exp
+            /   Exp->NoNil
 Index       <-  BL DirtyExp DirtyBR
 NewIndex    <-  Sp ({} Index NeedAssign DirtyExp {})
             ->  NewIndex
@@ -402,11 +414,12 @@ CrtAction   <-  Semicolon
             /   LocalFunction
             /   Local
             /   Set
+            /   Continue
             /   Call
             /   ExpInAction
 UnkAction   <-  ({} {Word+})
             ->  UnknownAction
-            /   ({} '//' {} (LongComment / ShortComment))
+            /   ({} '//' {} (LongComment / ShortComment) {})
             ->  CCommentPrefix
             /   ({} {. (!Sps !CrtAction .)*})
             ->  UnknownAction
@@ -425,10 +438,14 @@ Do          <-  Sp ({}
 Break       <-  Sp ({} BREAK {})
             ->  Break
 
+Continue    <-  Sp ({} CONTINUE {})
+            =>  RTContinue
+            ->  Continue
+
 Return      <-  Sp ({} RETURN ReturnExpList {})
             ->  Return
 ReturnExpList 
-            <-  Sp {| Exp (Sp ',' MaybeExp)* |}
+            <-  Sp {| Exp->NoNil (Sp ',' MaybeExp)* |}
             /   Sp {| !Exp !',' |}
             /   ExpList
 
@@ -461,7 +478,7 @@ LoopBody    <-  FOR LoopArgs NeedDo
                     {} {| (!END Action)* |}
                 NeedEnd
 LoopArgs    <-  MustName AssignOrEQ
-                ({} {| (COMMA / !DO !END Exp)* |} {})
+                ({} {| (COMMA / !DO !END Exp->NoNil)* |} {})
             ->  PackLoopArgs
 
 In          <-  InBody
@@ -469,9 +486,9 @@ In          <-  InBody
 InBody      <-  FOR InNameList NeedIn InExpList NeedDo
                     {} {| (!END Action)* |}
                 NeedEnd
-InNameList  <-  ({} {| (COMMA / !IN !DO !END Name)* |} {})
+InNameList  <-  ({} {| (COMMA / !IN !DO !END Name->NoNil)* |} {})
             ->  PackInNameList
-InExpList   <-  ({} {| (COMMA / !DO !DO !END Exp)*  |} {})
+InExpList   <-  ({} {| (COMMA / !DO !DO !END Exp->NoNil)*  |} {})
             ->  PackInExpList
 
 While       <-  WhileBody

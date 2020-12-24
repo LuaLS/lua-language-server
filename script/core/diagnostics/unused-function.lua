@@ -4,6 +4,7 @@ local vm      = require 'vm'
 local define  = require 'proto.define'
 local lang    = require 'language'
 local await   = require 'await'
+local client  = require 'provider.client'
 
 local function isToBeClosed(source)
     if not source.attrs then
@@ -32,7 +33,7 @@ return function (uri, callback)
         and parent.type ~= 'setlocal' then
             return
         end
-        if isToBeClosed(source) then
+        if isToBeClosed(parent) then
             return
         end
         local hasGet
@@ -44,12 +45,21 @@ return function (uri, callback)
             end
         end
         if not hasGet then
-            callback {
-                start   = source.start,
-                finish  = source.finish,
-                tags    = { define.DiagnosticTag.Unnecessary },
-                message = lang.script.DIAG_UNUSED_FUNCTION,
-            }
+            if client.isVSCode() then
+                callback {
+                    start   = source.start,
+                    finish  = source.finish,
+                    tags    = { define.DiagnosticTag.Unnecessary },
+                    message = lang.script.DIAG_UNUSED_FUNCTION,
+                }
+            else
+                callback {
+                    start   = source.keyword[1],
+                    finish  = source.keyword[2],
+                    tags    = { define.DiagnosticTag.Unnecessary },
+                    message = lang.script.DIAG_UNUSED_FUNCTION,
+                }
+            end
         end
     end)
 end

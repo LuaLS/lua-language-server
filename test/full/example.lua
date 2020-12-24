@@ -52,6 +52,8 @@ local function testIfExit(path)
         print(('基准诊断测试[%s]单次耗时：%.10f'):format(path:filename():string(), need))
     end
 end
+
+require 'tracy' .enable()
 testIfExit(ROOT / 'test' / 'example' / 'vm.txt')
 testIfExit(ROOT / 'test' / 'example' / 'largeGlobal.txt')
 testIfExit(ROOT / 'test' / 'example' / 'guide.txt')

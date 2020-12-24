@@ -1,6 +1,35 @@
 # changelog
 
+## 1.8.0
+`2020-12-23`
+* `NEW` runtime: support nonstandard symbol
+* `NEW` diagnostic: `close-non-object`
+* `FIX` [#318](https://github.com/sumneko/lua-language-server/issues/318)
+
+## 1.7.4
+`2020-12-20`
+* `FIX` workspace: preload may failed
+
+## 1.7.3
+`2020-12-20`
+* `FIX` luadoc: typo of `package.config`
+* `FIX` [#310](https://github.com/sumneko/lua-language-server/issues/310)
+
+## 1.7.2
+`2020-12-17`
+* `CHG` completion: use custom tabsize
+* `FIX` [#307](https://github.com/sumneko/lua-language-server/issues/307)
+* `FIX` a lot of runtime errors
+
+## 1.7.1
+`2020-12-16`
+* `NEW` setting: `diagnostics.neededFileStatus`
+* `FIX` scan workspace may fails
+* `FIX` quickfix: `newline-call` failed
+* `FIX` a lot of other runtime errors
+
 ## 1.7.0
+`2020-12-16`
 * `NEW` diagnostic: `undefined-field`
 * `NEW` telemetry:
     + [What data will be sent](https://github.com/sumneko/lua-language-server/blob/master/script/service/telemetry.lua)

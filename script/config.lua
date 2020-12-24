@@ -95,15 +95,16 @@ end
 
 local ConfigTemplate = {
     runtime = {
-        version         = {'Lua 5.4', String},
-        path            = {{
-                                "?.lua",
-                                "?/init.lua",
-                                "?/?.lua"
-                            },        Array(String)},
-        special         = {{},        Hash(String, String)},
-        meta            = {'${version} ${language}', String},
-        unicodeName     = {false,     Boolean},
+        version           = {'Lua 5.4', String},
+        path              = {{
+                                  "?.lua",
+                                  "?/init.lua",
+                                  "?/?.lua"
+                              },        Array(String)},
+        special           = {{},        Hash(String, String)},
+        meta              = {'${version} ${language}', String},
+        unicodeName       = {false,     Boolean},
+        nonstandardSymbol = {{},        Str2Hash ';'},
     },
     diagnostics = {
         enable          = {true, Boolean},

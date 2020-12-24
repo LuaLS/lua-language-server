@@ -76,8 +76,9 @@ local function buildTable(tbl)
         if not field then
             break
         end
-        if field.type == 'tablefield' then
-            buf[i] = ('%s'):format(field.field[1])
+        if  field.type == 'tablefield'
+        and field.field then
+            buf[#buf+1] = ('%s'):format(field.field[1])
         end
     end
     return table.concat(buf, ', ')

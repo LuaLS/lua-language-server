@@ -211,7 +211,11 @@ end
 
 --- 遍历文件
 function m.eachFile()
-    return pairs(m.fileMap)
+    local map = {}
+    for uri, file in pairs(m.fileMap) do
+        map[uri] = file
+    end
+    return pairs(map)
 end
 
 function m.compileAst(uri, text)
@@ -242,8 +246,9 @@ function m.compileAst(uri, text)
         , 'lua'
         , config.config.runtime.version
         , {
-            special     = config.config.runtime.special,
-            unicodeName = config.config.runtime.unicodeName,
+            special           = config.config.runtime.special,
+            unicodeName       = config.config.runtime.unicodeName,
+            nonstandardSymbol = config.config.runtime.nonstandardSymbol,
         }
     )
     local passed = os.clock() - clock

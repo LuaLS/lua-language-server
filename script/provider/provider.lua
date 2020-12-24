@@ -42,6 +42,11 @@ local function updateConfig()
         exclude      = configs[3],
     }
 
+    if not updated then
+        log.warn('No config?', util.dump(configs))
+        return
+    end
+
     local oldConfig = util.deepCopy(config.config)
     local oldOther  = util.deepCopy(config.other)
     config.setConfig(updated, other)
@@ -206,7 +211,10 @@ proto.on('textDocument/hover', function (params)
     end
     local md = markdown()
     md:add('lua', hover.label)
-    md:add('md', "---")
+    if  hover.label and #hover.label > 0
+    and hover.description and #hover.description > 0 then
+        md:add('md', "---")
+    end
     md:add('md',  hover.description)
     return {
         contents = {

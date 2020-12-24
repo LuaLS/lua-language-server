@@ -64,6 +64,9 @@ end
 local function buildDiagnostic(uri, diag)
     local lines = files.getLines(uri)
     local text  = files.getText(uri)
+    if not text or not lines then
+        return
+    end
 
     local relatedInformation
     if diag.related then

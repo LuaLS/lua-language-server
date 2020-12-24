@@ -51,6 +51,9 @@ local function getDocTypes(name)
 end
 
 function vm.getDocEnums(doc, mark, results)
+    if not doc then
+        return nil
+    end
     mark = mark or {}
     if mark[doc] then
         return nil

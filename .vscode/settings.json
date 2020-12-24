@@ -11,9 +11,11 @@
         "ID",
         "DEVELOP",
         "DBGPORT",
-        "DBGWAIT"
+        "DBGWAIT",
+        "tracy"
     ],
     "Lua.diagnostics.disable": [
+        "close-non-object"
     ],
     "Lua.runtime.version": "Lua 5.4",
     // Just some comment
@@ -35,5 +37,10 @@
     "Lua.awakened.cat": true,
     "Lua.develop.enable": true,
     "Lua.develop.debuggerPort": 11413,
-    "Lua.intelliSense.searchDepth": 0
+    "Lua.intelliSense.searchDepth": 0,
+    "Lua.runtime.path": [
+        "?.lua",
+        "script/?.lua",
+        "script/?/init.lua"
+    ]
 }

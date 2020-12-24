@@ -156,7 +156,7 @@ local function solveSyntaxByFix(uri, err, results)
         }
     end
     results[#results+1] = {
-        title = lang.script['ACTION_' .. err.fix.title],
+        title = lang.script('ACTION_' .. err.fix.title, err.fix),
         kind  = 'quickfix',
         edit = {
             changes = {
@@ -207,6 +207,7 @@ end
 local function solveNewlineCall(uri, diag, results)
     local text    = files.getText(uri)
     local lines   = files.getLines(uri)
+    local start   = define.unrange(lines, text, diag.range)
     results[#results+1] = {
         title = lang.script.ACTION_ADD_SEMICOLON,
         kind = 'quickfix',
@@ -214,10 +215,8 @@ local function solveNewlineCall(uri, diag, results)
             changes = {
                 [uri] = {
                     {
-                        range = {
-                            start   = diag.range.start,
-                            ['end'] = diag.range.start,
-                        },
+                        start  = start,
+                        finish = start,
                         newText = ';',
                     }
                 }

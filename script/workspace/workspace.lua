@@ -34,30 +34,32 @@ function m.init(uri)
     log.init(ROOT, logPath)
 end
 
-local function interfaceFactory(root)
-    return {
-        type = function (path)
-            if fs.is_directory(fs.path(root .. '/' .. path)) then
-                return 'directory'
+local globInteferFace = {
+    type = function (path)
+        local result
+        pcall(function ()
+            if fs.is_directory(fs.path(path)) then
+                result = 'directory'
             else
-                return 'file'
+                result = 'file'
             end
-        end,
-        list = function (path)
-            local fullPath = fs.path(root .. '/' .. path)
-            if not fs.exists(fullPath) then
-                return nil
-            end
-            local paths = {}
-            pcall(function ()
-                for fullpath in fullPath:list_directory() do
-                    paths[#paths+1] = fullpath:string()
-                end
-            end)
-            return paths
+        end)
+        return result
+    end,
+    list = function (path)
+        local fullPath = fs.path(path)
+        if not fs.exists(fullPath) then
+            return nil
         end
-    }
-end
+        local paths = {}
+        pcall(function ()
+            for fullpath in fullPath:list_directory() do
+                paths[#paths+1] = fullpath:string()
+            end
+        end)
+        return paths
+    end
+}
 
 --- 创建排除文件匹配器
 function m.getNativeMatcher()
@@ -68,7 +70,6 @@ function m.getNativeMatcher()
         return m.nativeMatcher
     end
 
-    local interface = interfaceFactory(m.path)
     local pattern = {}
     -- config.workspace.ignoreDir
     for path in pairs(config.config.workspace.ignoreDir) do
@@ -119,7 +120,7 @@ function m.getNativeMatcher()
         pattern[#pattern+1] = path
     end
 
-    m.nativeMatcher = glob.gitignore(pattern, m.matchOption, interface)
+    m.nativeMatcher = glob.gitignore(pattern, m.matchOption, globInteferFace)
 
     m.nativeVersion = config.version
     return m.nativeMatcher
@@ -140,16 +141,18 @@ function m.getLibraryMatchers()
     end
     m.libraryMatchers = {}
     for path, pattern in pairs(librarys) do
-        local nPath = fs.absolute(fs.path(path)):string()
-        local matcher = glob.gitignore(pattern, m.matchOption)
-        if platform.OS == 'Windows' then
-            matcher:setOption 'ignoreCase'
+        if fs.exists(fs.path(path)) then
+            local nPath = fs.absolute(fs.path(path)):string()
+            local matcher = glob.gitignore(pattern, m.matchOption, globInteferFace)
+            if platform.OS == 'Windows' then
+                matcher:setOption 'ignoreCase'
+            end
+            log.debug('getLibraryMatchers', path, nPath)
+            m.libraryMatchers[#m.libraryMatchers+1] = {
+                path    = nPath,
+                matcher = matcher
+            }
         end
-        log.debug('getLibraryMatchers', path, nPath)
-        m.libraryMatchers[#m.libraryMatchers+1] = {
-            path    = nPath,
-            matcher = matcher
-        }
     end
 
     m.libraryVersion = config.version
@@ -168,7 +171,7 @@ end
 
 local function loadFileFactory(root, progress, isLibrary)
     return function (path)
-        local uri = furi.encode(root .. '/' .. path)
+        local uri = furi.encode(path)
         if not files.isLua(uri) then
             return
         end
@@ -246,15 +249,11 @@ function m.awaitPreload()
     local native          = m.getNativeMatcher()
     local librarys        = m.getLibraryMatchers()
     if native then
-        native:scan(nativeLoader)
+        native:scan(m.path, nativeLoader)
     end
     for _, library in ipairs(librarys) do
-        local libraryInterface = interfaceFactory(library.path)
-        local libraryLoader    = loadFileFactory(library.path, progress, true)
-        for k, v in pairs(libraryInterface) do
-            library.matcher:setInterface(k, v)
-        end
-        library.matcher:scan(libraryLoader)
+        local libraryLoader = loadFileFactory(library.path, progress, true)
+        library.matcher:scan(library.path, libraryLoader)
     end
 
     log.info(('Found %d files.'):format(progress.max))

@@ -4,7 +4,8 @@ local config = require 'config'
 local await  = require 'await'
 
 -- 把耗时最长的诊断放到最后面
-local diagLevel = {
+local diagSort = {
+    ['undefined-field'] = 99,
     ['redundant-parameter'] = 100,
 }
 
@@ -13,7 +14,7 @@ for k in pairs(define.DiagnosticDefaultSeverity) do
     diagList[#diagList+1] = k
 end
 table.sort(diagList, function (a, b)
-    return (diagLevel[a] or 0) < (diagLevel[b] or 0)
+    return (diagSort[a] or 0) < (diagSort[b] or 0)
 end)
 
 local function check(uri, name, results)
@@ -23,7 +24,8 @@ local function check(uri, name, results)
     local level =  config.config.diagnostics.severity[name]
                 or define.DiagnosticDefaultSeverity[name]
 
-    local neededFileStatus = define.DiagnosticDefaultNeededFileStatus[name]
+    local neededFileStatus =  config.config.diagnostics.neededFileStatus[name]
+        or define.DiagnosticDefaultNeededFileStatus[name]
     if neededFileStatus == 'Opened' and not files.isOpen(uri) then
         return
     end

@@ -17,6 +17,8 @@ local setmetatable = setmetatable
 local assert       = assert
 local select       = select
 local osClock      = os.clock
+local tonumber     = tonumber
+local tointeger    = math.tointeger
 local DEVELOP      = _G.DEVELOP
 local log          = log
 local _G           = _G
@@ -177,6 +179,9 @@ function m.getBlock(obj)
         local tp = obj.type
         if blockTypes[tp] then
             return obj
+        end
+        if obj == obj.parent then
+            error('obj == obj.parent?', obj.type)
         end
         obj = obj.parent
     end
@@ -664,6 +669,10 @@ function m.lineRange(lines, row, ignoreNL)
     end
 end
 
+function m.lineData(lines, row)
+    return lines[row]
+end
+
 function m.getKeyTypeOfLiteral(obj)
     if not obj then
         return nil
@@ -713,6 +722,8 @@ function m.getKeyType(obj)
     elseif tp == 'doc.alias' then
         return 'string'
     elseif tp == 'doc.field' then
+        return 'string'
+    elseif tp == 'dummy' then
         return 'string'
     end
     return m.getKeyTypeOfLiteral(obj)
@@ -781,14 +792,24 @@ function m.getKeyName(obj)
         return obj.alias[1]
     elseif tp == 'doc.field' then
         return obj.field[1]
+    elseif tp == 'dummy' then
+        return obj[1]
     end
     return m.getKeyNameOfLiteral(obj)
 end
 
 function m.getSimpleName(obj)
     if obj.type == 'call' then
-        local key = obj.args and obj.args[2]
-        return m.getKeyName(key)
+        local node = obj.node
+        if not node then
+            return
+        end
+        if node.special == 'rawset'
+        or node.special == 'rawget' then
+            local key = obj.args and obj.args[2]
+            return m.getKeyName(key)
+        end
+        return ('%p'):format(obj)
     elseif obj.type == 'table' then
         return ('%p'):format(obj)
     elseif obj.type == 'select' then
@@ -1136,7 +1157,8 @@ local function buildSimpleList(obj, max)
             list[i] = cur
             break
         elseif cur.type == 'select'
-        or     cur.type == 'table' then
+        or     cur.type == 'table'
+        or     cur.type == 'call' then
             list[i] = cur
             break
         elseif cur.type == 'string' then
@@ -1177,6 +1199,7 @@ function m.getSimple(obj, max)
     or obj.type == 'tablefield'
     or obj.type == 'tableindex'
     or obj.type == 'select'
+    or obj.type == 'call'
     or obj.type == 'table'
     or obj.type == 'string'
     or obj.type == 'doc.class.name'
@@ -1400,11 +1423,13 @@ function m.getObjectValue(obj)
     end
     if obj.type == 'field'
     or obj.type == 'method' then
-        return obj.parent.value
+        return obj.parent and obj.parent.value
     end
     if obj.type == 'call' then
         if obj.node.special == 'rawset' then
             return obj.args[3]
+        else
+            return obj
         end
     end
     if obj.type == 'select' then
@@ -1500,10 +1525,10 @@ local function toValidGenericType(status, obj)
 end
 
 local function stepRefOfGeneric(status, typeUnit, args, mode)
-    if not args then
-        return nil
-    end
     local results = {}
+    if not args then
+        return results
+    end
     local myName = typeUnit[1]
     for _, typeName in ipairs(typeUnit.typeGeneric[myName]) do
         if typeName == typeUnit then
@@ -1763,18 +1788,18 @@ function m.searchSameMethodCrossSelf(ref, mark)
 end
 
 function m.searchSameMethod(ref, mark)
-    if mark['method'] then
-        return nil
-    end
     local nxt = ref.next
     if not nxt then
         return nil
     end
-    if nxt.type == 'setmethod' then
-        mark['method'] = true
-        return ref
+    if nxt.type ~= 'setmethod' then
+        return nil
     end
-    return nil
+    if mark[ref] then
+        return nil
+    end
+    mark[ref] = true
+    return ref
 end
 
 function m.searchSameFieldsCrossMethod(status, ref, start, queue)
@@ -1791,6 +1816,7 @@ function m.searchSameFieldsCrossMethod(status, ref, start, queue)
     local methodStatus = m.status(status)
     m.searchRefs(methodStatus, method, 'ref')
     for _, md in ipairs(methodStatus.results) do
+        mark[md] = true
         queue[#queue+1] = {
             obj   = md,
             start = start,
@@ -2225,6 +2251,13 @@ function m.checkSameSimpleInString(status, ref, start, queue, mode)
     if status.share.searchingBindedDoc then
         return
     end
+    if not status.share.markString then
+        status.share.markString = {}
+    end
+    if status.share.markString[ref] then
+        return
+    end
+    status.share.markString[ref] = true
     local newStatus = m.status(status)
     local docs = status.interface.docType('string*')
     local mark = {}
@@ -2243,6 +2276,7 @@ function m.checkSameSimpleInString(status, ref, start, queue, mode)
         }
         ::CONTINUE::
     end
+    status.share.markString[ref] = nil
     return true
 end
 
@@ -2280,7 +2314,7 @@ function m.pushResult(status, mode, ref, simple)
             end
         end
         if  m.isLiteral(ref)
-        and ref.parent.type == 'callargs'
+        and ref.parent and ref.parent.type == 'callargs'
         and ref ~= simple.node then
             results[#results+1] = ref
         end
@@ -2337,7 +2371,7 @@ function m.pushResult(status, mode, ref, simple)
             results[#results+1] = ref
         elseif ref.type == 'getindex' then
             -- do not trust `t[1]`
-            if ref.index.type == 'string' then
+            if ref.index and ref.index.type == 'string' then
                 results[#results+1] = ref
             end
         elseif ref.type == 'setglobal'
@@ -2676,6 +2710,9 @@ function m.getRefCache(status, obj, mode)
 end
 
 function m.searchRefs(status, obj, mode)
+    if not obj then
+        return
+    end
     local cache, makeCache = m.getRefCache(status, obj, mode)
     if cache then
         for i = 1, #cache do
@@ -3304,6 +3341,8 @@ local function mathCheck(status, a, b)
             or m.getInferLiteral(status, a, 'number')
     local v2 = m.getInferLiteral(status, b, 'integer')
             or m.getInferLiteral(status, a, 'number')
+    v1 = tonumber(v1)
+    v2 = tonumber(v2)
     local int = m.hasType(status, a, 'integer')
             and m.hasType(status, b, 'integer')
             and not m.hasType(status, a, 'number')
@@ -3395,6 +3434,8 @@ function m.inferCheckBinary(status, source)
                 or m.getInferLiteral(status, source[1], 'number')
         local v2 = m.getInferLiteral(status, source[2], 'integer')
                 or m.getInferLiteral(status, source[2], 'number')
+        v1 = tonumber(v1)
+        v2 = tonumber(v2)
         local v
         if v1 and v2 then
             v = v1 <= v2
@@ -3411,6 +3452,8 @@ function m.inferCheckBinary(status, source)
                 or m.getInferLiteral(status, source[1], 'number')
         local v2 = m.getInferLiteral(status, source[2], 'integer')
                 or m.getInferLiteral(status, source[2], 'number')
+        v1 = tonumber(v1)
+        v2 = tonumber(v2)
         local v
         if v1 and v2 then
             v = v1 >= v2
@@ -3427,6 +3470,8 @@ function m.inferCheckBinary(status, source)
                 or m.getInferLiteral(status, source[1], 'number')
         local v2 = m.getInferLiteral(status, source[2], 'integer')
                 or m.getInferLiteral(status, source[2], 'number')
+        v1 = tonumber(v1)
+        v2 = tonumber(v2)
         local v
         if v1 and v2 then
             v = v1 < v2
@@ -3443,6 +3488,8 @@ function m.inferCheckBinary(status, source)
                 or m.getInferLiteral(status, source[1], 'number')
         local v2 = m.getInferLiteral(status, source[2], 'integer')
                 or m.getInferLiteral(status, source[2], 'number')
+        v1 = tonumber(v1)
+        v2 = tonumber(v2)
         local v
         if v1 and v2 then
             v = v1 > v2
@@ -3457,6 +3504,8 @@ function m.inferCheckBinary(status, source)
     elseif op.type == '|' then
         local v1 = m.getInferLiteral(status, source[1], 'integer')
         local v2 = m.getInferLiteral(status, source[2], 'integer')
+        v1 = tointeger(v1)
+        v2 = tointeger(v2)
         local v
         if v1 and v2 then
             v = v1 | v2
@@ -3471,6 +3520,8 @@ function m.inferCheckBinary(status, source)
     elseif op.type == '~' then
         local v1 = m.getInferLiteral(status, source[1], 'integer')
         local v2 = m.getInferLiteral(status, source[2], 'integer')
+        v1 = tointeger(v1)
+        v2 = tointeger(v2)
         local v
         if v1 and v2 then
             v = v1 ~ v2
@@ -3485,6 +3536,8 @@ function m.inferCheckBinary(status, source)
     elseif op.type == '&' then
         local v1 = m.getInferLiteral(status, source[1], 'integer')
         local v2 = m.getInferLiteral(status, source[2], 'integer')
+        v1 = tointeger(v1)
+        v2 = tointeger(v2)
         local v
         if v1 and v2 then
             v = v1 & v2
@@ -3499,6 +3552,8 @@ function m.inferCheckBinary(status, source)
     elseif op.type == '<<' then
         local v1 = m.getInferLiteral(status, source[1], 'integer')
         local v2 = m.getInferLiteral(status, source[2], 'integer')
+        v1 = tointeger(v1)
+        v2 = tointeger(v2)
         local v
         if v1 and v2 then
             v = v1 << v2
@@ -3513,6 +3568,8 @@ function m.inferCheckBinary(status, source)
     elseif op.type == '>>' then
         local v1 = m.getInferLiteral(status, source[1], 'integer')
         local v2 = m.getInferLiteral(status, source[2], 'integer')
+        v1 = tointeger(v1)
+        v2 = tointeger(v2)
         local v
         if v1 and v2 then
             v = v1 >> v2
@@ -3527,6 +3584,8 @@ function m.inferCheckBinary(status, source)
     elseif op.type == '..' then
         local v1 = m.getInferLiteral(status, source[1], 'string')
         local v2 = m.getInferLiteral(status, source[2], 'string')
+        v1 = type(v1) == 'string' and v1 or nil
+        v2 = type(v2) == 'string' and v2 or nil
         local v
         if v1 and v2 then
             v = v1 .. v2
@@ -3543,6 +3602,8 @@ function m.inferCheckBinary(status, source)
                 or m.getInferLiteral(status, source[1], 'number')
         local v2 = m.getInferLiteral(status, source[2], 'integer')
                 or m.getInferLiteral(status, source[2], 'number')
+        v1 = tonumber(v1)
+        v2 = tonumber(v2)
         local v
         if v1 and v2 then
             v = v1 ^ v2
@@ -3559,9 +3620,11 @@ function m.inferCheckBinary(status, source)
                 or m.getInferLiteral(status, source[1], 'number')
         local v2 = m.getInferLiteral(status, source[2], 'integer')
                 or m.getInferLiteral(status, source[2], 'number')
+        v1 = tonumber(v1)
+        v2 = tonumber(v2)
         local v
-        if v1 and v2 then
-            v = v1 > v2
+        if v1 and v2 and v2 ~= 0 then
+            v = v1 / v2
         end
         status.results = m.allocInfer {
             type   = 'number',
@@ -3602,7 +3665,7 @@ function m.inferCheckBinary(status, source)
         local int, v1, v2 = mathCheck(status, source[1], source[2])
         status.results = m.allocInfer {
             type   = int,
-            value  = (v1 and v2) and (v1 % v2) or nil,
+            value  = (v1 and v2 and v2 ~= 0) and (v1 % v2) or nil,
             source = source,
             level  = 100,
         }
@@ -3611,7 +3674,7 @@ function m.inferCheckBinary(status, source)
         local int, v1, v2 = mathCheck(status, source[1], source[2])
         status.results = m.allocInfer {
             type   = int,
-            value  = (v1 and v2) and (v1 // v2) or nil,
+            value  = (v1 and v2 and v2 ~= 0) and (v1 // v2) or nil,
             source = source,
             level  = 100,
         }
@@ -3934,6 +3997,9 @@ function m.inferByPCallReturn(status, source)
     if not call or call.type ~= 'call' then
         return
     end
+    if not call.args then
+        return
+    end
     local node = call.node
     local specialName = node.special
     local func, index
@@ -4009,6 +4075,9 @@ function m.searchInfer(status, obj)
             break
         end
         obj = value
+    end
+    if not obj then
+        return
     end
 
     local cache, makeCache = m.getRefCache(status, obj, 'infer')

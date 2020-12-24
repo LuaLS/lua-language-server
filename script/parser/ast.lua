@@ -48,6 +48,13 @@ local VersionOp = {
     ['//'] = {'Lua 5.3', 'Lua 5.4'},
 }
 
+local SymbolAlias = {
+    ['||'] = 'or',
+    ['&&'] = 'and',
+    ['!='] = '~=',
+    ['!']  = 'not',
+}
+
 local function checkOpVersion(op)
     local versions = VersionOp[op.type]
     if not versions then
@@ -305,41 +312,84 @@ local Defs = {
         end
     end,
     CLongComment = function (start1, finish1, start2, finish2)
-        PushError {
-            type   = 'ERR_C_LONG_COMMENT',
+        if State.options.nonstandardSymbol and State.options.nonstandardSymbol['/**/'] then
+        else
+            PushError {
+                type   = 'ERR_C_LONG_COMMENT',
+                start  = start1,
+                finish = finish2 - 1,
+                fix    = {
+                    title = 'FIX_C_LONG_COMMENT',
+                    {
+                        start  = start1,
+                        finish = finish1 - 1,
+                        text   = '--[[',
+                    },
+                    {
+                        start  = start2,
+                        finish = finish2 - 1,
+                        text   =  '--]]'
+                    },
+                }
+            }
+        end
+        return {
+            type   = 'nonstandardSymbol.comment',
             start  = start1,
             finish = finish2 - 1,
-            fix    = {
-                title = 'FIX_C_LONG_COMMENT',
-                {
-                    start  = start1,
-                    finish = finish1 - 1,
-                    text   = '--[[',
-                },
-                {
-                    start  = start2,
-                    finish = finish2 - 1,
-                    text   =  '--]]'
-                },
-            }
         }
     end,
-    CCommentPrefix = function (start, finish)
-        PushError {
-            type   = 'ERR_COMMENT_PREFIX',
-            start  = start,
-            finish = finish - 1,
-            fix    = {
-                title = 'FIX_COMMENT_PREFIX',
-                {
-                    start  = start,
-                    finish = finish - 1,
-                    text   = '--',
-                },
+    CCommentPrefix = function (start, finish, commentFinish)
+        if State.options.nonstandardSymbol and State.options.nonstandardSymbol['//'] then
+        else
+            PushError {
+                type   = 'ERR_COMMENT_PREFIX',
+                start  = start,
+                finish = finish - 1,
+                fix    = {
+                    title = 'FIX_COMMENT_PREFIX',
+                    {
+                        start  = start,
+                        finish = finish - 1,
+                        text   = '--',
+                    },
+                }
             }
+        end
+        return {
+            type   = 'nonstandardSymbol.comment',
+            start  = start,
+            finish = commentFinish - 1,
         }
     end,
     String = function (start, quote, str, finish)
+        if quote == '`' then
+            if State.options.nonstandardSymbol and State.options.nonstandardSymbol['`'] then
+            else
+                PushError {
+                    type   = 'ERR_NONSTANDARD_SYMBOL',
+                    start  = start,
+                    finish = finish - 1,
+                    info   = {
+                        symbol = '"',
+                    },
+                    fix    = {
+                        title  = 'FIX_NONSTANDARD_SYMBOL',
+                        symbol = '"',
+                        {
+                            start  = start,
+                            finish = start,
+                            text   = '"',
+                        },
+                        {
+                            start  = finish - 1,
+                            finish = finish - 1,
+                            text   = '"',
+                        },
+                    }
+                }
+            end
+        end
         return {
             type   = 'string',
             start  = start,
@@ -642,6 +692,29 @@ local Defs = {
         return call
     end,
     BinaryOp = function (start, op)
+        if SymbolAlias[op] then
+            if State.options.nonstandardSymbol and State.options.nonstandardSymbol[op] then
+            else
+                PushError {
+                    type   = 'ERR_NONSTANDARD_SYMBOL',
+                    start  = start,
+                    finish = start + #op - 1,
+                    info   = {
+                        symbol = SymbolAlias[op],
+                    },
+                    fix    = {
+                        title  = 'FIX_NONSTANDARD_SYMBOL',
+                        symbol = SymbolAlias[op],
+                        {
+                            start  = start,
+                            finish = start + #op - 1,
+                            text   = SymbolAlias[op],
+                        },
+                    }
+                }
+            end
+            op = SymbolAlias[op]
+        end
         return {
             type   = op,
             start  = start,
@@ -649,6 +722,29 @@ local Defs = {
         }
     end,
     UnaryOp = function (start, op)
+        if SymbolAlias[op] then
+            if State.options.nonstandardSymbol and State.options.nonstandardSymbol[op] then
+            else
+                PushError {
+                    type   = 'ERR_NONSTANDARD_SYMBOL',
+                    start  = start,
+                    finish = start + #op - 1,
+                    info   = {
+                        symbol = SymbolAlias[op],
+                    },
+                    fix    = {
+                        title  = 'FIX_NONSTANDARD_SYMBOL',
+                        symbol = SymbolAlias[op],
+                        {
+                            start  = start,
+                            finish = start + #op - 1,
+                            text   = SymbolAlias[op],
+                        },
+                    }
+                }
+            end
+            op = SymbolAlias[op]
+        end
         return {
             type   = op,
             start  = start,
@@ -854,6 +950,19 @@ local Defs = {
             start  = start,
             finish = start,
         }
+    end,
+    ASSIGN = function (start, symbol)
+        if State.options.nonstandardSymbol and State.options.nonstandardSymbol[symbol] then
+        else
+            PushError {
+                type    = 'UNSUPPORT_SYMBOL',
+                start   = start,
+                finish  = start + #symbol - 1,
+                info    = {
+                    version = 'Lua',
+                }
+            }
+        end
     end,
     DOT = function (start)
         return {
@@ -1133,7 +1242,7 @@ local Defs = {
     end,
     LocalName = function (name, attrs)
         if not name then
-            return name
+            return
         end
         name.attrs = attrs
         return name
@@ -1197,7 +1306,7 @@ local Defs = {
             return
         end
         if not name then
-            return nil
+            return
         end
         name.type = 'label'
         return name
@@ -1216,7 +1325,7 @@ local Defs = {
             return
         end
         if not name then
-            return nil
+            return
         end
         name.type = 'goto'
         return name
@@ -1356,6 +1465,20 @@ local Defs = {
         }
         return block
     end,
+    RTContinue = function (_, pos, ...)
+        if State.options.nonstandardSymbol and State.options.nonstandardSymbol['continue'] then
+            return pos, ...
+        else
+            return false
+        end
+    end,
+    Continue = function (start, finish)
+        return {
+            type   = 'nonstandardSymbol.continue',
+            start  = start,
+            finish = finish - 1,
+        }
+    end,
     Lua = function (start, actions, finish)
         actions.type   = 'main'
         actions.start  = start
@@ -1432,6 +1555,16 @@ local Defs = {
             finish = pos,
             info = {
                 symbol = "'"
+            }
+        }
+    end,
+    MissQuote3 = function (pos)
+        PushError {
+            type = 'MISS_SYMBOL',
+            start = pos,
+            finish = pos,
+            info = {
+                symbol = "`"
             }
         }
     end,

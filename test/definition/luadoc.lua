@@ -169,3 +169,31 @@ end
 
 AAAA.a.<?SSDF?>
 ]]
+
+TEST [[
+---@class Cat
+local <!m!> ---hahaha
+---@class Dog
+local 	m2
+---@type Cat
+local <?<!v!>?>
+]]
+
+TEST [[
+---@class Cat
+local <!m!> --hahaha
+---@class Dog
+local 	m2
+---@type Cat
+local <?<!v!>?>
+]]
+
+TEST [[
+---@class Cat
+ local <!m!> ---hahaha
+
+  ---@class Dog
+   local 	m2
+	 ---@type Cat
+	 	 local <?<!v!>?>
+]]

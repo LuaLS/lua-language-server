@@ -35,7 +35,7 @@
             "type": "shell",
             "label": "Compile",
             "windows": {
-                "command": "chcp 65001 && ${workspaceFolder}/3rd/luamake/luamake rebuild.bat"
+                "command": "chcp 65001 && ${workspaceFolder}/3rd/luamake/luamake rebuild"
             },
             "linux": {
                 "command": "${workspaceFolder}/3rd/luamake/luamake rebuild"

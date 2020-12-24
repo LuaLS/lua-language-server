@@ -1071,10 +1071,10 @@ function$
     {
         label = 'function ()',
         kind  = define.CompletionItemKind.Snippet,
-        insertText = [[
-function $1($2)
-    $0
-end]],
+        insertText = "\z
+function $1($2)\
+\t$0\
+end",
     },
 }
 
@@ -1089,10 +1089,10 @@ local t = function$
     {
         label = 'function ()',
         kind  = define.CompletionItemKind.Snippet,
-        insertText = [[
-function ($1)
-    $0
-end]],
+        insertText = "\z
+function ($1)\
+\t$0\
+end",
     },
 }
 Cared['insertText'] = false
@@ -1964,10 +1964,10 @@ f($)
     {
         label  = 'fun(x: number, y: number):string',
         kind   = define.CompletionItemKind.Function,
-        insertText = [[
-function (${1:x}, ${2:y})
-    $0
-end]],
+        insertText = "\z
+function (${1:x}, ${2:y})\
+\t$0\
+end",
     },
 }
 Cared['insertText'] = nil

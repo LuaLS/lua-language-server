@@ -16,7 +16,7 @@ function require(modname) end
 ---#DES 'package'
 ---@class package*
 ---#DES 'package.config'
----@field conifg    string
+---@field config    string
 ---#DES 'package.cpath'
 ---@field cpath     string
 ---#DES 'package.loaded'

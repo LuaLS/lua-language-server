@@ -12,7 +12,9 @@ return function (uri, callback)
     end
 
     local function getAllDocClassFromInfer(src)
+        tracy.ZoneBeginN('undefined-field getInfers')
         local infers = vm.getInfers(src, 0)
+        tracy.ZoneEnd()
 
         if not infers then
             return nil

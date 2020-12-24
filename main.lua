@@ -14,7 +14,7 @@ log.init(ROOT, ROOT / 'log' / 'service.log')
 log.info('Lua Lsp startup, root: ', ROOT)
 log.debug('ROOT:', ROOT:string())
 
-require 'tracy' .disable()
+require 'tracy'
 
 xpcall(dofile, log.debug, rootPath .. '/debugger.lua')
 

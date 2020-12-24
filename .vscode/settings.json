@@ -11,7 +11,8 @@
         "ID",
         "DEVELOP",
         "DBGPORT",
-        "DBGWAIT"
+        "DBGWAIT",
+        "tracy"
     ],
     "Lua.diagnostics.disable": [
         "close-non-object"

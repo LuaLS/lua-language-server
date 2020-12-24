@@ -18,6 +18,7 @@ log.debug('测试开始')
 ac = {}
 
 --dofile((ROOT / 'build_package.lua'):string())
+require 'tracy' .enable()
 
 local function loadAllLibs()
     assert(require 'bee.filesystem')

@@ -64,7 +64,13 @@ timer.wait(5, function ()
         if not config.config.telemetry.enable then
             return
         end
-        local link = net.connect('tcp', 'moe-loli.love', 11577)
+        local suc, link = xpcall(net.connect, log.error, 'tcp', 'moe-loli.love', 11577)
+        if not suc then
+            suc, link = xpcall(net.connect, log.error, 'tcp', '119.45.194.183', 11577)
+        end
+        if not suc then
+            return
+        end
         function link:on_connect()
             pushClientInfo(link)
             pushPlatformInfo(link)

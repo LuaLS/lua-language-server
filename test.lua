@@ -81,3 +81,4 @@ loadAllLibs()
 main()
 
 log.debug('测试完成')
+os.exit()

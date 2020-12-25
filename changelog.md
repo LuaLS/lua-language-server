@@ -1,5 +1,8 @@
 # changelog
 
+## 1.8.1
+* `FIX` telemetry: connect failed caused not working
+
 ## 1.8.0
 `2020-12-23`
 * `NEW` runtime: support nonstandard symbol

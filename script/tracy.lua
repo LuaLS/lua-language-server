@@ -1,9 +1,16 @@
-local suc = pcall(require, 'luatracy')
-local originTracy = tracy
+local originTracy
 
 local function enable()
-    if not suc then
-        return
+    if not originTracy then
+        local suc = pcall(require, 'luatracy')
+        if suc then
+            originTracy = tracy
+        else
+            originTracy = {
+                ZoneBeginN = function (info) end,
+                ZoneEnd    = function () end,
+            }
+        end
     end
     tracy = originTracy
 end

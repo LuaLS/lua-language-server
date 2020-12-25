@@ -2,6 +2,8 @@ local setmetatable = setmetatable
 local mathMax      = math.max
 local mathFloor    = math.floor
 local osClock      = os.clock
+local xpcall       = xpcall
+local logError     = log.error
 
 _ENV = nil
 
@@ -43,7 +45,7 @@ local function mWakeup(self)
     end
     self._running = false
     if self._onTimer then
-        self:_onTimer()
+        xpcall(self._onTimer, logError, self)
     end
     if self._removed then
         return

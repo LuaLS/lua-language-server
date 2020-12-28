@@ -10,11 +10,11 @@
 			"program": "${workspaceRoot}/test.lua",
 			"luaexe": "${workspaceFolder}/bin/Windows/lua-language-server",
 			"linux": {
-                "luaexe": "${workspaceFolder}/bin/Linux/lua-language-server"
+				"luaexe": "${workspaceFolder}/bin/Linux/lua-language-server"
 			},
 			"osx": {
-                "luaexe": "${workspaceFolder}/bin/macOS/lua-language-server"
-            },
+				"luaexe": "${workspaceFolder}/bin/macOS/lua-language-server"
+			},
 			"arg": [
 			],
 			"consoleCoding": "utf8",

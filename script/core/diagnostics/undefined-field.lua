@@ -55,7 +55,7 @@ return function (uri, callback)
         local fields = {}
         local empty = true
         for _, docClass in ipairs(allDocClass) do
-            local refs = vm.getFieldsOfDocClassAnyNotGet(docClass)
+            local refs = vm.getDefFields(docClass)
 
             for _, ref in ipairs(refs) do
                 local name = vm.getKeyName(ref)

@@ -29,9 +29,7 @@ end
 
 local m = {}
 
-m.ANY = {"ANY"}
-
-m.ANYNOTGET = {"ANYNOTGET"}
+m.ANY = {"<ANY>"}
 
 local blockTypes = {
     ['while']       = true,
@@ -1401,6 +1399,16 @@ function m.searchFields(status, obj, key)
     m.cleanResults(status.results)
 end
 
+function m.searchDefFields(status, obj, key)
+    local simple = m.getSimple(obj)
+    if not simple then
+        return
+    end
+    simple[#simple+1] = key or m.ANY
+    m.searchSameFields(status, simple, 'deffield')
+    m.cleanResults(status.results)
+end
+
 function m.getObjectValue(obj)
     while obj.type == 'paren' do
         obj = obj.exp
@@ -1436,7 +1444,7 @@ end
 
 function m.checkSameSimpleInValueInMetaTable(status, mt, start, pushQueue)
     local newStatus = m.status(status)
-    m.searchFields(newStatus, mt, '__index')
+    m.searchDefFields(newStatus, mt, '__index')
     local refsStatus = m.status(status)
     for i = 1, #newStatus.results do
         local indexValue = m.getObjectValue(newStatus.results[i])
@@ -1684,7 +1692,8 @@ function m.checkSameSimpleByDoc(status, obj, start, pushQueue, mode)
         end
         return true
     elseif obj.type == 'doc.field' then
-        if mode ~= 'field' then
+        if  mode ~= 'field'
+        and mode ~= 'deffield' then
             return m.checkSameSimpleByDoc(status, obj.extends, start, pushQueue, mode)
         end
     elseif obj.type == 'doc.type.array' then
@@ -2309,6 +2318,30 @@ function m.pushResult(status, mode, ref, simple)
         or     ref.type == 'doc.field' then
             results[#results+1] = ref
         end
+    elseif mode == 'deffield' then
+        if ref.type == 'setfield'
+        or ref.type == 'tablefield' then
+            results[#results+1] = ref
+        elseif ref.type == 'setmethod' then
+            results[#results+1] = ref
+        elseif ref.type == 'setindex'
+        or     ref.type == 'tableindex' then
+            results[#results+1] = ref
+        elseif ref.type == 'setglobal' then
+            results[#results+1] = ref
+        elseif ref.type == 'function' then
+            results[#results+1] = ref
+        elseif ref.type == 'table' then
+            results[#results+1] = ref
+        elseif ref.type == 'call' then
+            if ref.node.special == 'rawset' then
+                results[#results+1] = ref
+            end
+        elseif ref.type == 'doc.type.function'
+        or     ref.type == 'doc.class.name'
+        or     ref.type == 'doc.field' then
+            results[#results+1] = ref
+        end
     end
 end
 
@@ -2317,7 +2350,7 @@ function m.checkSameSimpleName(ref, sm)
         return true
     end
 
-    if sm == m.ANYNOTGET and not m.isGet(ref) then
+    if sm == m.ANY_DEF and m.isSet(ref) then
         return true
     end
 
@@ -2663,13 +2696,16 @@ function m.searchRefs(status, obj, mode)
     end
 
     -- 检查单步引用
+    tracy.ZoneBeginN('searchRefs getStepRef')
     local res = m.getStepRef(status, obj, mode)
     if res then
         for i = 1, #res do
             status.results[#status.results+1] = res[i]
         end
     end
+    tracy.ZoneEnd()
     -- 检查simple
+    tracy.ZoneBeginN('searchRefs searchSameFields')
     if status.depth <= 100 then
         local simple = m.getSimple(obj)
         if simple then
@@ -2683,6 +2719,7 @@ function m.searchRefs(status, obj, mode)
             logWarn('status.depth overflow')
         end
     end
+    tracy.ZoneEnd()
 
     m.cleanResults(status.results)
 
@@ -4103,12 +4140,22 @@ function m.requestDefinition(obj, interface, deep)
     return status.results, status.share.count
 end
 
---- 请求对象的域
----@param filterKey nil|string|table nil表fields不做限制;string表fields必须同名;table取值为guild.ANYSET表fields必须满足isSet()
+--- 请求对象的字段
+---@param filterKey nil|string|table
 function m.requestFields(obj, interface, deep, filterKey)
     local status = m.status(nil, interface, deep)
 
     m.searchFields(status, obj, filterKey)
+
+    return status.results, status.share.count
+end
+
+--- 请求对象的定义字段
+---@param filterKey nil|string|table
+function m.requestDefFields(obj, interface, deep, filterKey)
+    local status = m.status(nil, interface, deep)
+
+    m.searchDefFields(status, obj, filterKey)
 
     return status.results, status.share.count
 end

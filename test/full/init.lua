@@ -11,3 +11,4 @@ end
 require 'full.normal'
 require 'full.example'
 require 'full.dirty'
+require 'full.self'

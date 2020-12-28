@@ -82,4 +82,5 @@ loadAllLibs()
 main()
 
 log.debug('测试完成')
+require 'bee.thread'.sleep(1)
 os.exit()

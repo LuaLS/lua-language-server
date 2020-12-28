@@ -1744,7 +1744,7 @@ function m.checkSameSimpleInArg1OfSetMetaTable(status, obj, start, queue)
     end
 end
 
-function m.searchSameMethodCrossSelf(ref, mark)
+function m.searchSameMethodOutSelf(ref, mark)
     local selfNode
     if ref.tag == 'self' then
         selfNode = ref
@@ -1762,11 +1762,16 @@ function m.searchSameMethodCrossSelf(ref, mark)
             return nil
         end
         mark[selfNode] = true
-        return selfNode.method.node
+        local method = selfNode.method.node
+        if mark[method] then
+            return nil
+        end
+        mark[method] = true
+        return method
     end
 end
 
-function m.searchSameMethod(ref, mark)
+function m.searchSameMethodIntoSelf(ref, mark)
     local nxt = ref.next
     if not nxt then
         return nil
@@ -1778,7 +1783,19 @@ function m.searchSameMethod(ref, mark)
         return nil
     end
     mark[ref] = true
-    return ref
+    local value = nxt.value
+    if not value or value.type ~= 'function' then
+        return nil
+    end
+    local selfRef = value.locals and value.locals[1]
+    if not selfRef or selfRef.tag ~= 'self' then
+        return nil
+    end
+    if mark[selfRef] then
+        return nil
+    end
+    mark[selfRef] = true
+    return selfRef
 end
 
 function m.searchSameFieldsCrossMethod(status, ref, start, queue)
@@ -1787,46 +1804,33 @@ function m.searchSameFieldsCrossMethod(status, ref, start, queue)
         mark = {}
         status.crossMethodMark = mark
     end
-    local method = m.searchSameMethod(ref, mark)
-                or m.searchSameMethodCrossSelf(ref, mark)
-    if not method then
+    local selfRef = m.searchSameMethodIntoSelf(ref, mark)
+    if selfRef then
+        -- 如果自己是method，则只检查自己内部的self引用
+        local results = m.getStepRef(status, selfRef, 'ref')
+        for _, res in ipairs(results) do
+            queue[#queue+1] = {
+                start = start,
+                obj   = res,
+                force = true,
+            }
+        end
         return
     end
-    local methodStatus = m.status(status)
-    m.searchRefs(methodStatus, method, 'ref')
-    for _, md in ipairs(methodStatus.results) do
-        mark[md] = true
-        queue[#queue+1] = {
-            obj   = md,
-            start = start,
-            force = true,
-        }
-        local nxt = md.next
-        if not nxt then
-            goto CONTINUE
+    local method = m.searchSameMethodOutSelf(ref, mark)
+    if method then
+        -- 如果自己是self，则找出父级的method，以及父级method的引用
+        local newStatus = m.status(status)
+        m.searchRefs(newStatus, method, 'ref')
+        for _, res in ipairs(newStatus.results) do
+            mark[res] = true
+            queue[#queue+1] = {
+                start = start,
+                obj   = res,
+                force = true,
+            }
         end
-        if nxt.type == 'setmethod' then
-            local func = nxt.value
-            if not func then
-                goto CONTINUE
-            end
-            local selfNode = func.locals and func.locals[1]
-            if not selfNode or not selfNode.ref then
-                goto CONTINUE
-            end
-            if mark[selfNode] then
-                goto CONTINUE
-            end
-            mark[selfNode] = true
-            for _, selfRef in ipairs(selfNode.ref) do
-                queue[#queue+1] = {
-                    obj   = selfRef,
-                    start = start,
-                    force = true,
-                }
-            end
-        end
-        ::CONTINUE::
+        return
     end
 end
 

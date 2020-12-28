@@ -99,6 +99,7 @@ m.childMap = {
     ['doc.vararg']         = {'vararg', 'comment'},
     ['doc.type.table']     = {'key', 'value', 'comment'},
     ['doc.type.function']  = {'#args', '#returns', 'comment'},
+    ['doc.type.typeliteral']  = {'node'},
     ['doc.overload']       = {'overload', 'comment'},
     ['doc.see']            = {'name', 'field'},
 }
@@ -1487,6 +1488,25 @@ function m.checkSameSimpleInSpecialBranch(status, obj, start, pushQueue)
     end
 end
 
+local function appendValidGenericType(results, status, typeName, obj)
+    if typeName.parent.type == 'doc.type.typeliteral' then
+        if obj.type == 'string' and status.interface.docType then
+            local docs = status.interface.docType(obj[1])
+            for i = 1, #docs do
+                local doc = docs[i]
+                if doc.type == 'doc.class.name'
+                or doc.type == 'doc.alias.name' then
+                    results[#results+1] = doc
+                    break
+                end
+            end
+        end
+    else
+        -- 发现没有使用 `T`，则沿用既有逻辑直接返回实参
+        results[#results+1] = obj
+    end
+end
+
 local function stepRefOfGeneric(status, typeUnit, args, mode)
     local results = {}
     if not args then
@@ -1511,7 +1531,7 @@ local function stepRefOfGeneric(status, typeUnit, args, mode)
             and source.parent.type == 'funcargs' then
                 for index, arg in ipairs(source.parent) do
                     if arg == source then
-                        results[#results+1] = args[index]
+                        appendValidGenericType(results, status, typeName, args[index])
                     end
                 end
             end

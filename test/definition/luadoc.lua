@@ -197,3 +197,59 @@ TEST [[
 	 ---@type Cat
 	 	 local <?<!v!>?>
 ]]
+
+TEST [[
+---@class Foo
+local Foo = {}
+function Foo:<!bar1!>() end
+
+---@generic T
+---@param arg1 T
+---@return T
+function Generic(arg1) print(arg1) end
+
+local v1 = Generic(Foo)
+print(v1.<?bar1?>)
+]]
+
+TEST [[
+---@class Foo
+local Foo = {}
+function Foo:bar1() end
+
+---@generic T
+---@param arg1 T
+---@return T
+function Generic(arg1) print(arg1) end
+
+local v1 = Generic("Foo")
+print(v1.<?bar1?>)
+]]
+
+TEST [[
+---@class Foo
+local Foo = {}
+function Foo:bar1() end
+
+---@generic T
+---@param arg1 `T`
+---@return T
+function Generic(arg1) print(arg1) end
+
+local v1 = Generic(Foo)
+print(v1.<?bar1?>)
+]]
+
+TEST [[
+---@class Foo
+local Foo = {}
+function Foo:<!bar1!>() end
+
+---@generic T
+---@param arg1 `T`
+---@return T
+function Generic(arg1) print(arg1) end
+
+local v1 = Generic("Foo")
+print(v1.<?bar1?>)
+]]

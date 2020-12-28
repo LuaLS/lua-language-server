@@ -350,8 +350,7 @@ TEST [[
 --<!function F() end!>
 --]]
 
-config.config.diagnostics.disable['unused-local'] = false
-config.config.diagnostics.disable['unused-function'] = true
+config.config.diagnostics.disable['unused-local'] = nil
 TEST [[
 local mt, x
 function mt:m()
@@ -833,7 +832,7 @@ TEST [[
 ---@class class
 local t
 ]]
-
+---[==[
 -- checkUndefinedField 通用
 TEST [[
 ---@class Foo
@@ -960,7 +959,7 @@ print(T1.f1)
 T2 = {}
 print(T2.<!f2!>)
 ]]
-
+--]==]
 TEST [[
 ---@overload fun(...)
 local function f() end

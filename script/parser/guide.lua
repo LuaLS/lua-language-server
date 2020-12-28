@@ -2165,6 +2165,9 @@ function m.checkSameSimpleAsReturn(status, ref, start, queue)
 end
 
 function m.checkSameSimpleAsSetValue(status, ref, start, queue)
+    if not status.deep then
+        --return
+    end
     if ref.type == 'select' then
         return
     end

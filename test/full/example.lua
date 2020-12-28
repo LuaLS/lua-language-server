@@ -41,6 +41,7 @@ local function testIfExit(path)
         local lines = parser:lines(buf)
         for i = 1, max do
             files.removeAll()
+            files.open('')
             files.setText('', buf)
             diag('', function () end)
             local passed = os.clock() - clock

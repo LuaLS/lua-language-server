@@ -960,3 +960,10 @@ print(T1.f1)
 T2 = {}
 print(T2.<!f2!>)
 ]]
+
+TEST [[
+---@overload fun(...)
+local function f() end
+
+f(1)
+]]

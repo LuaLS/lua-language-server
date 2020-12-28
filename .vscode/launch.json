@@ -9,6 +9,12 @@
 			"stopOnEntry": false,
 			"program": "${workspaceRoot}/test.lua",
 			"luaexe": "${workspaceFolder}/bin/Windows/lua-language-server.exe",
+			"linux": {
+				"luaexe": "${workspaceFolder}/bin/Linux/lua-language-server"
+			},
+			"osx": {
+				"luaexe": "${workspaceFolder}/bin/macOS/lua-language-server"
+			},
 			"arg": [
 			],
 			"consoleCoding": "utf8",

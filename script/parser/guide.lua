@@ -27,8 +27,6 @@ local function logWarn(...)
     log.warn(...)
 end
 
-_ENV = nil
-
 local m = {}
 
 m.ANY = {"ANY"}
@@ -1382,16 +1380,13 @@ function m.getNextRef(ref)
     return nil
 end
 
-function m.checkSameSimpleInValueOfTable(status, value, start, queue)
+function m.checkSameSimpleInValueOfTable(status, value, start, pushQueue)
     if value.type ~= 'table' then
         return
     end
     for i = 1, #value do
         local field = value[i]
-        queue[#queue+1] = {
-            obj   = field,
-            start = start + 1,
-        }
+        pushQueue(field, start + 1)
     end
 end
 
@@ -1438,7 +1433,7 @@ function m.getObjectValue(obj)
     return nil
 end
 
-function m.checkSameSimpleInValueInMetaTable(status, mt, start, queue)
+function m.checkSameSimpleInValueInMetaTable(status, mt, start, pushQueue)
     local newStatus = m.status(status)
     m.searchFields(newStatus, mt, '__index')
     local refsStatus = m.status(status)
@@ -1450,14 +1445,10 @@ function m.checkSameSimpleInValueInMetaTable(status, mt, start, queue)
     end
     for i = 1, #refsStatus.results do
         local obj = refsStatus.results[i]
-        queue[#queue+1] = {
-            obj   = obj,
-            start = start,
-            force = true,
-        }
+        pushQueue(obj, start, true)
     end
 end
-function m.checkSameSimpleInValueOfSetMetaTable(status, func, start, queue)
+function m.checkSameSimpleInValueOfSetMetaTable(status, func, start, pushQueue)
     if not func or func.special ~= 'setmetatable' then
         return
     end
@@ -1466,39 +1457,32 @@ function m.checkSameSimpleInValueOfSetMetaTable(status, func, start, queue)
     local obj = args[1]
     local mt = args[2]
     if obj then
-        queue[#queue+1] = {
-            obj   = obj,
-            start = start,
-            force = true,
-        }
+        pushQueue(obj, start, true)
     end
     if mt then
-        m.checkSameSimpleInValueInMetaTable(status, mt, start, queue)
+        m.checkSameSimpleInValueInMetaTable(status, mt, start, pushQueue)
     end
 end
 
-function m.checkSameSimpleInValueOfCallMetaTable(status, call, start, queue)
+function m.checkSameSimpleInValueOfCallMetaTable(status, call, start, pushQueue)
     if status.crossMetaTableMark then
         return
     end
     status.crossMetaTableMark = true
     if call.type == 'call' then
-        m.checkSameSimpleInValueOfSetMetaTable(status, call.node, start, queue)
+        m.checkSameSimpleInValueOfSetMetaTable(status, call.node, start, pushQueue)
     end
     status.crossMetaTableMark = false
 end
 
-function m.checkSameSimpleInSpecialBranch(status, obj, start, queue)
+function m.checkSameSimpleInSpecialBranch(status, obj, start, pushQueue)
     if status.interface.index then
         local results = status.interface.index(obj)
         if not results then
             return
         end
         for _, res in ipairs(results) do
-            queue[#queue+1] = {
-                obj   = res,
-                start = start + 1,
-            }
+            pushQueue(obj, start + 1)
         end
     end
 end
@@ -1561,7 +1545,7 @@ function m.checkSameSimpleByDocType(status, doc, args)
     return results
 end
 
-function m.checkSameSimpleByBindDocs(status, obj, start, queue, mode)
+function m.checkSameSimpleByBindDocs(status, obj, start, pushQueue, mode)
     if not obj.bindDocs then
         return
     end
@@ -1592,30 +1576,19 @@ function m.checkSameSimpleByBindDocs(status, obj, start, queue, mode)
     for _, res in ipairs(results) do
         if res.type == 'doc.class'
         or res.type == 'doc.type' then
-            queue[#queue+1] = {
-                obj   = res,
-                start = start,
-                force = true,
-            }
+            pushQueue(res, start, true)
             skipInfer = true
         end
         if res.type == 'doc.type.function' then
-            queue[#queue+1] = {
-                obj   = res,
-                start = start,
-                force = true,
-            }
+            pushQueue(res, start, true)
         elseif res.type == 'doc.field' then
-            queue[#queue+1] = {
-                obj   = res,
-                start = start + 1,
-            }
+            pushQueue(res, start + 1)
         end
     end
     return skipInfer
 end
 
-function m.checkSameSimpleOfRefByDocSource(status, obj, start, queue, mode)
+function m.checkSameSimpleOfRefByDocSource(status, obj, start, pushQueue, mode)
     if status.share.searchingBindedDoc then
         return
     end
@@ -1633,15 +1606,11 @@ function m.checkSameSimpleOfRefByDocSource(status, obj, start, queue, mode)
     end
     status.share.searchingBindedDoc = nil
     for _, res in ipairs(newStatus.results) do
-        queue[#queue+1] = {
-            obj   = res,
-            start = start,
-            force = true,
-        }
+        pushQueue(res, start, true)
     end
 end
 
-function m.checkSameSimpleByDoc(status, obj, start, queue, mode)
+function m.checkSameSimpleByDoc(status, obj, start, pushQueue, mode)
     if obj.type == 'doc.class.name'
     or obj.type == 'doc.class' then
         if obj.type == 'doc.class.name' then
@@ -1655,30 +1624,19 @@ function m.checkSameSimpleByDoc(status, obj, start, queue, mode)
                 classStart = false
             end
             if classStart and doc.type == 'doc.field' then
-                queue[#queue+1] = {
-                    obj   = doc,
-                    start = start + 1,
-                }
+                pushQueue(doc, start + 1)
             end
         end
-        m.checkSameSimpleOfRefByDocSource(status, obj, start, queue, mode)
+        m.checkSameSimpleOfRefByDocSource(status, obj, start, pushQueue, mode)
         if mode == 'ref' then
             local pieceResult = stepRefOfDocType(status, obj.class, 'ref')
             for _, res in ipairs(pieceResult) do
-                queue[#queue+1] = {
-                    obj   = res,
-                    start = start,
-                    force = true,
-                }
+                pushQueue(res, start, true)
             end
             if obj.extends then
                 local pieceResult = stepRefOfDocType(status, obj.extends, 'def')
                 for _, res in ipairs(pieceResult) do
-                    queue[#queue+1] = {
-                        obj   = res,
-                        start = start,
-                        force = true,
-                    }
+                    pushQueue(res, start, true)
                 end
             end
         end
@@ -1687,47 +1645,35 @@ function m.checkSameSimpleByDoc(status, obj, start, queue, mode)
         for _, piece in ipairs(obj.types) do
             local pieceResult = stepRefOfDocType(status, piece, 'def')
             for _, res in ipairs(pieceResult) do
-                queue[#queue+1] = {
-                    obj   = res,
-                    start = start,
-                    force = true,
-                }
+                pushQueue(res, start, true)
             end
         end
         if mode == 'ref' then
-            m.checkSameSimpleOfRefByDocSource(status, obj, start, queue, mode)
+            m.checkSameSimpleOfRefByDocSource(status, obj, start, pushQueue, mode)
         end
         return true
     elseif obj.type == 'doc.type.name'
     or     obj.type == 'doc.see.name' then
         local pieceResult = stepRefOfDocType(status, obj, 'def')
         for _, res in ipairs(pieceResult) do
-            queue[#queue+1] = {
-                obj   = res,
-                start = start,
-                force = true,
-            }
+            pushQueue(res, start, true)
         end
         local state = m.getDocState(obj)
         if state.type == 'doc.type' and mode == 'ref' then
-            m.checkSameSimpleOfRefByDocSource(status, state, start, queue, mode)
+            m.checkSameSimpleOfRefByDocSource(status, state, start, pushQueue, mode)
         end
         return true
     elseif obj.type == 'doc.field' then
         if mode ~= 'field' then
-            return m.checkSameSimpleByDoc(status, obj.extends, start, queue, mode)
+            return m.checkSameSimpleByDoc(status, obj.extends, start, pushQueue, mode)
         end
     elseif obj.type == 'doc.type.array' then
-        queue[#queue+1] = {
-            obj   = obj.node,
-            start = start + 1,
-            force = true,
-        }
+        pushQueue(obj.node, start + 1, true)
         return true
     end
 end
 
-function m.checkSameSimpleInArg1OfSetMetaTable(status, obj, start, queue)
+function m.checkSameSimpleInArg1OfSetMetaTable(status, obj, start, pushQueue)
     local args = obj.parent
     if not args or args.type ~= 'callargs' then
         return
@@ -1740,7 +1686,7 @@ function m.checkSameSimpleInArg1OfSetMetaTable(status, obj, start, queue)
         if m.checkValueMark(status, obj, mt) then
             return
         end
-        m.checkSameSimpleInValueInMetaTable(status, mt, start, queue)
+        m.checkSameSimpleInValueInMetaTable(status, mt, start, pushQueue)
     end
 end
 
@@ -1798,7 +1744,10 @@ function m.searchSameMethodIntoSelf(ref, mark)
     return selfRef
 end
 
-function m.searchSameFieldsCrossMethod(status, ref, start, queue)
+function m.searchSameFieldsCrossMethod(status, ref, start, pushQueue)
+    if status.share.crossMethodLock then
+        return
+    end
     local mark = status.crossMethodMark
     if not mark then
         mark = {}
@@ -1806,29 +1755,27 @@ function m.searchSameFieldsCrossMethod(status, ref, start, queue)
     end
     local selfRef = m.searchSameMethodIntoSelf(ref, mark)
     if selfRef then
+        tracy.ZoneBeginN 'searchSameFieldsCrossMethod'
+        local _ <close> = tracy.ZoneEnd
         -- 如果自己是method，则只检查自己内部的self引用
         local results = m.getStepRef(status, selfRef, 'ref')
         for _, res in ipairs(results) do
-            queue[#queue+1] = {
-                start = start,
-                obj   = res,
-                force = true,
-            }
+            pushQueue(res, start, true)
         end
         return
     end
     local method = m.searchSameMethodOutSelf(ref, mark)
     if method then
+        tracy.ZoneBeginN 'searchSameFieldsCrossMethod'
+        local _ <close> = tracy.ZoneEnd
         -- 如果自己是self，则找出父级的method，以及父级method的引用
         local newStatus = m.status(status)
+        newStatus.crossMethodLock = true
         m.searchRefs(newStatus, method, 'ref')
+        newStatus.crossMethodLock = false
         for _, res in ipairs(newStatus.results) do
             mark[res] = true
-            queue[#queue+1] = {
-                start = start,
-                obj   = res,
-                force = true,
-            }
+            pushQueue(res, start, true)
         end
         return
     end
@@ -1915,7 +1862,7 @@ function m.checkSameSimpleInCallInSameFile(status, func, args, index)
     return results
 end
 
-function m.checkSameSimpleInCall(status, ref, start, queue, mode)
+function m.checkSameSimpleInCall(status, ref, start, pushQueue, mode)
     local func, args, index = m.getCallValue(ref)
     if not func then
         return
@@ -1929,7 +1876,7 @@ function m.checkSameSimpleInCall(status, ref, start, queue, mode)
     end
     status.share.crossCallCount = status.share.crossCallCount + 1
     -- 检查赋值是 semetatable() 的情况
-    m.checkSameSimpleInValueOfSetMetaTable(status, func, start, queue)
+    m.checkSameSimpleInValueOfSetMetaTable(status, func, start, pushQueue)
     -- 检查赋值是 func() 的情况
     local objs = m.checkSameSimpleInCallInSameFile(status, func, args, index)
     if status.interface.call then
@@ -1946,19 +1893,11 @@ function m.checkSameSimpleInCall(status, ref, start, queue, mode)
     local newStatus = m.status(status)
     for _, obj in ipairs(objs) do
         m.searchRefs(newStatus, obj, mode)
-        queue[#queue+1] = {
-            obj   = obj,
-            start = start,
-            force = true,
-        }
+        pushQueue(obj, start, true)
     end
     status.share.crossCallCount = status.share.crossCallCount - 1
     for _, obj in ipairs(newStatus.results) do
-        queue[#queue+1] = {
-            obj   = obj,
-            start = start,
-            force = true,
-        }
+        pushQueue(obj, start, true)
     end
 end
 
@@ -2027,7 +1966,7 @@ function m.findGlobalsOfName(ast, name)
     return results
 end
 
-function m.checkSameSimpleInGlobal(status, name, source, start, queue)
+function m.checkSameSimpleInGlobal(status, name, source, start, pushQueue)
     if not name then
         return
     end
@@ -2039,11 +1978,7 @@ function m.checkSameSimpleInGlobal(status, name, source, start, queue)
     end
     if objs then
         for _, obj in ipairs(objs) do
-            queue[#queue+1] = {
-                obj   = obj,
-                start = start,
-                force = true,
-            }
+            pushQueue(obj, start, true)
         end
     end
 end
@@ -2084,7 +2019,7 @@ function m.checkReturnMark(status, a, mark)
     return result
 end
 
-function m.searchSameFieldsInValue(status, ref, start, queue, mode)
+function m.searchSameFieldsInValue(status, ref, start, pushQueue, mode)
     local value = m.getObjectValue(ref)
     if not value then
         return
@@ -2095,22 +2030,14 @@ function m.searchSameFieldsInValue(status, ref, start, queue, mode)
     local newStatus = m.status(status)
     m.searchRefs(newStatus, value, mode)
     for _, res in ipairs(newStatus.results) do
-        queue[#queue+1] = {
-            obj   = res,
-            start = start,
-            force = true,
-        }
+        pushQueue(res, start, true)
     end
-    queue[#queue+1] = {
-        obj   = value,
-        start = start,
-        force = true,
-    }
+    pushQueue(value, start, true)
     -- 检查形如 a = f() 的分支情况
-    m.checkSameSimpleInCall(status, value, start, queue, mode)
+    m.checkSameSimpleInCall(status, value, start, pushQueue, mode)
 end
 
-function m.checkSameSimpleAsTableField(status, ref, start, queue)
+function m.checkSameSimpleAsTableField(status, ref, start, pushQueue)
     if not status.deep then
         --return
     end
@@ -2124,11 +2051,7 @@ function m.checkSameSimpleAsTableField(status, ref, start, queue)
     local newStatus = m.status(status)
     m.searchRefs(newStatus, parent.field, 'ref')
     for _, res in ipairs(newStatus.results) do
-        queue[#queue+1] = {
-            obj   = res,
-            start = start,
-            force = true,
-        }
+        pushQueue(res, start, true)
     end
 end
 
@@ -2142,7 +2065,7 @@ function m.checkSearchLevel(status)
     return false
 end
 
-function m.checkSameSimpleAsReturn(status, ref, start, queue)
+function m.checkSameSimpleAsReturn(status, ref, start, pushQueue)
     if not status.deep then
         return
     end
@@ -2159,16 +2082,12 @@ function m.checkSameSimpleAsReturn(status, ref, start, queue)
     m.searchRefsAsFunctionReturn(newStatus, ref, 'ref')
     for _, res in ipairs(newStatus.results) do
         if not m.checkCallMark(status, res) then
-            queue[#queue+1] = {
-                obj   = res,
-                start = start,
-                force = true,
-            }
+            pushQueue(res, start, true)
         end
     end
 end
 
-function m.checkSameSimpleAsSetValue(status, ref, start, queue)
+function m.checkSameSimpleAsSetValue(status, ref, start, pushQueue)
     if not status.deep then
         --return
     end
@@ -2204,11 +2123,7 @@ function m.checkSameSimpleAsSetValue(status, ref, start, queue)
     local newStatus = m.status(status)
     m.searchRefs(newStatus, obj, 'ref')
     for _, res in ipairs(newStatus.results) do
-        queue[#queue+1] = {
-            obj   = res,
-            start = start,
-            force = true,
-        }
+        pushQueue(res, start, true)
     end
 end
 
@@ -2225,7 +2140,7 @@ local function hasTypeName(doc, name)
     return false
 end
 
-function m.checkSameSimpleInString(status, ref, start, queue, mode)
+function m.checkSameSimpleInString(status, ref, start, pushQueue, mode)
     -- 特殊处理 ('xxx').xxx 的形式
     if  ref.type ~= 'string'
     and not hasTypeName(ref, 'string') then
@@ -2256,10 +2171,7 @@ function m.checkSameSimpleInString(status, ref, start, queue, mode)
             goto CONTINUE
         end
         mark[res] = true
-        queue[#queue+1] = {
-            obj   = res,
-            start = start + 1,
-        }
+        pushQueue(res, start + 1)
         ::CONTINUE::
     end
     status.share.markString[ref] = nil
@@ -2399,10 +2311,7 @@ function m.checkSameSimpleName(ref, sm)
     return false
 end
 
-function m.checkSameSimple(status, simple, data, mode, queue)
-    local ref    = data.obj
-    local start  = data.start
-    local force  = data.force
+function m.checkSameSimple(status, simple, ref, start, force, mode, pushQueue)
     if start > #simple then
         return
     end
@@ -2417,30 +2326,30 @@ function m.checkSameSimple(status, simple, data, mode, queue)
             cmode = 'ref'
         end
         -- 检查 doc
-        local skipInfer = m.checkSameSimpleByBindDocs(status, ref, i, queue, cmode)
-                    or    m.checkSameSimpleByDoc(status, ref, i, queue, cmode)
+        local skipInfer = m.checkSameSimpleByBindDocs(status, ref, i, pushQueue, cmode)
+                    or    m.checkSameSimpleByDoc(status, ref, i, pushQueue, cmode)
         -- 检查自己是字符串的分支情况
-        m.checkSameSimpleInString(status, ref, i, queue, cmode)
+        m.checkSameSimpleInString(status, ref, i, pushQueue, cmode)
         if not skipInfer then
             -- 穿透 self:func 与 mt:func
-            m.searchSameFieldsCrossMethod(status, ref, i, queue)
+            m.searchSameFieldsCrossMethod(status, ref, i, pushQueue)
             -- 穿透赋值
-            m.searchSameFieldsInValue(status, ref, i, queue, cmode)
+            m.searchSameFieldsInValue(status, ref, i, pushQueue, cmode)
             -- 检查自己是字面量表的情况
-            m.checkSameSimpleInValueOfTable(status, ref, i, queue)
+            m.checkSameSimpleInValueOfTable(status, ref, i, pushQueue)
             -- 检查自己作为 setmetatable 第一个参数的情况
-            m.checkSameSimpleInArg1OfSetMetaTable(status, ref, i, queue)
+            m.checkSameSimpleInArg1OfSetMetaTable(status, ref, i, pushQueue)
             -- 检查自己作为 setmetatable 调用的情况
-            m.checkSameSimpleInValueOfCallMetaTable(status, ref, i, queue)
+            m.checkSameSimpleInValueOfCallMetaTable(status, ref, i, pushQueue)
             -- 检查自己是特殊变量的分支的情况
-            m.checkSameSimpleInSpecialBranch(status, ref, i, queue)
+            m.checkSameSimpleInSpecialBranch(status, ref, i, pushQueue)
             if cmode == 'ref' then
                 -- 检查形如 { a = f } 的情况
-                m.checkSameSimpleAsTableField(status, ref, i, queue)
+                m.checkSameSimpleAsTableField(status, ref, i, pushQueue)
                 -- 检查形如 return m 的情况
-                m.checkSameSimpleAsReturn(status, ref, i, queue)
+                m.checkSameSimpleAsReturn(status, ref, i, pushQueue)
                 -- 检查形如 a = f 的情况
-                m.checkSameSimpleAsSetValue(status, ref, i, queue)
+                m.checkSameSimpleAsSetValue(status, ref, i, pushQueue)
             end
         end
         if i == #simple then
@@ -2459,48 +2368,51 @@ function m.checkSameSimple(status, simple, data, mode, queue)
 end
 
 function m.searchSameFields(status, simple, mode)
-    local queue = {}
+    local queues = {}
+    local starts = {}
+    local forces = {}
+    local queueLen = 0
+    local function pushQueue(obj, start, force)
+        queueLen = queueLen + 1
+        queues[queueLen] = obj
+        starts[queueLen] = start
+        forces[queueLen] = force
+    end
     if simple.mode == 'global' then
         -- 全局变量开头
-        m.checkSameSimpleInGlobal(status, simple[1], simple.node, 1, queue)
+        m.checkSameSimpleInGlobal(status, simple[1], simple.node, 1, pushQueue)
     elseif simple.mode == 'local' then
         -- 局部变量开头
-        queue[1] = {
-            obj   = simple.node,
-            start = 1,
-        }
+        pushQueue(simple.node, 1)
         local refs = simple.node.ref
         if refs then
             for i = 1, #refs do
-                queue[#queue+1] = {
-                    obj   = refs[i],
-                    start = 1,
-                }
+                pushQueue(refs[i], 1)
             end
         end
     else
-        queue[1] = {
-            obj   = simple.node,
-            start = 1,
-        }
+        pushQueue(simple.node, 1)
     end
     local max = 0
     local locks = {}
     for i = 1, 1e6 do
-        local data = queue[i]
-        if not data then
+        if queueLen <= 0 then
             return
         end
-        local lock = locks[data.start]
+        local obj   = queues[queueLen]
+        local start = starts[queueLen]
+        local force = forces[queueLen]
+        queueLen = queueLen - 1
+        local lock = locks[start]
         if not lock then
             lock = {}
-            locks[data.start] = lock
+            locks[start] = lock
         end
-        if not lock[data.obj] then
-            lock[data.obj] = true
+        if not lock[obj] then
+            lock[obj] = true
             max = max + 1
             status.share.count = status.share.count + 1
-            m.checkSameSimple(status, simple, data, mode, queue)
+            m.checkSameSimple(status, simple, obj, start, force, mode, pushQueue)
             if max >= 10000 then
                 logWarn('Queue too large!')
                 break
@@ -3678,7 +3590,9 @@ function m.inferByDef(status, obj)
     status.share.inferedDef[obj] = true
     local mark = {}
     local newStatus = m.status(status, status.interface)
+    tracy.ZoneBeginN('inferByDef searchRefs')
     m.searchRefs(newStatus, obj, 'def')
+    tracy.ZoneEnd()
     for _, src in ipairs(newStatus.results) do
         local inferStatus = m.status(newStatus)
         m.searchInfer(inferStatus, src)
@@ -4100,7 +4014,9 @@ function m.searchInfer(status, obj)
     end
 
     if status.deep then
+        tracy.ZoneBeginN('inferByDef')
         m.inferByDef(status, obj)
+        tracy.ZoneEnd()
     end
     m.inferBySet(status, obj)
     m.inferByCall(status, obj)

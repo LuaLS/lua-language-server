@@ -2367,10 +2367,32 @@ function m.checkSameSimple(status, simple, ref, start, force, mode, pushQueue)
     end
 end
 
+local queuesPool = {}
+local startsPool = {}
+local forcesPool = {}
+local poolSize = 0
+
+local function allocQueue()
+    if poolSize <= 0 then
+        return {}, {}, {}
+    else
+        local queues = queuesPool[poolSize]
+        local starts = startsPool[poolSize]
+        local forces = forcesPool[poolSize]
+        poolSize = poolSize - 1
+        return queues, starts, forces
+    end
+end
+
+local function deallocQueue(queues, starts, forces)
+    poolSize = poolSize + 1
+    queuesPool[poolSize] = queues
+    startsPool[poolSize] = starts
+    forcesPool[poolSize] = forces
+end
+
 function m.searchSameFields(status, simple, mode)
-    local queues = {}
-    local starts = {}
-    local forces = {}
+    local queues, starts, forces = allocQueue()
     local queueLen = 0
     local function pushQueue(obj, start, force)
         queueLen = queueLen + 1
@@ -2397,7 +2419,7 @@ function m.searchSameFields(status, simple, mode)
     local locks = {}
     for i = 1, 1e6 do
         if queueLen <= 0 then
-            return
+            break
         end
         local obj   = queues[queueLen]
         local start = starts[queueLen]
@@ -2419,6 +2441,7 @@ function m.searchSameFields(status, simple, mode)
             end
         end
     end
+    deallocQueue(queues, starts, forces)
 end
 
 function m.getCallerInSameFile(status, func)

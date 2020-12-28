@@ -1919,15 +1919,22 @@ function m.checkSameSimpleInCall(status, ref, start, pushQueue, mode)
         end
     end
     m.cleanResults(objs)
-    local newStatus = m.status(status)
+    local mark = {}
     for _, obj in ipairs(objs) do
+        if mark[obj] then
+            goto CONTINUE
+        end
+        local newStatus = m.status(status)
         m.searchRefs(newStatus, obj, mode)
         pushQueue(obj, start, true)
+        mark[obj] = true
+        for _, obj in ipairs(newStatus.results) do
+            pushQueue(obj, start, true)
+            mark[obj] = true
+        end
+        ::CONTINUE::
     end
     status.share.crossCallCount = status.share.crossCallCount - 1
-    for _, obj in ipairs(newStatus.results) do
-        pushQueue(obj, start, true)
-    end
 end
 
 local function searchRawset(ref, results)
@@ -2651,12 +2658,9 @@ end
 --end
 
 function m.getRefCache(status, obj, mode)
-    local cache, globalCache
-    if  status.depth == 1
-    and status.deep then
-        globalCache = status.interface.cache and status.interface.cache() or {}
-    end
-    cache = status.share.refCache or {}
+    local isDeep    = status.deep and status.depth == 1
+    local cache     = status.share.refCache or {}
+    local deepCache = status.interface.cache and status.interface.cache() or {}
     status.share.refCache = cache
     if m.isGlobal(obj) then
         obj = m.getKeyName(obj)
@@ -2664,21 +2668,41 @@ function m.getRefCache(status, obj, mode)
     if not cache[mode] then
         cache[mode] = {}
     end
-    if globalCache and not globalCache[mode] then
-        globalCache[mode] = {}
+    if not deepCache[mode] then
+        deepCache[mode] = {}
     end
-    local sourceCache = globalCache and globalCache[mode][obj] or cache[mode][obj]
+    local sourceCache
+    if isDeep then
+        sourceCache = deepCache[mode][obj]
+    else
+        sourceCache = cache[mode][obj]
+    end
     if sourceCache then
         return sourceCache
     end
     sourceCache = {}
     cache[mode][obj] = sourceCache
-    if globalCache then
-        globalCache[mode][obj] = sourceCache
+    if isDeep then
+        deepCache[mode][obj] = sourceCache
     end
     return nil, function (results)
         for i = 1, #results do
             sourceCache[i] = results[i]
+        end
+        if not isDeep then
+            return
+        end
+        if mode == 'ref'
+        or mode == 'def' then
+            for i = 1, #results do
+                local res = results[i]
+                if not deepCache[mode][res] then
+                    cache[mode][res] = sourceCache
+                    if isDeep then
+                        deepCache[mode][res] = sourceCache
+                    end
+                end
+            end
         end
     end
 end

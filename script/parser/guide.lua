@@ -1221,6 +1221,7 @@ function m.status(parentStatus, interface, deep)
         searchDeep= parentStatus and parentStatus.searchDeep  or deep or -999,
         interface = parentStatus and parentStatus.interface   or {},
         deep      = parentStatus and parentStatus.deep,
+        clock     = parentStatus and parentStatus.clock       or osClock(),
         results   = {},
     }
     if interface then
@@ -2506,6 +2507,18 @@ function m.searchSameFields(status, simple, mode)
             lock[obj] = true
             max = max + 1
             status.share.count = status.share.count + 1
+            if status.share.count % 10000 == 0 then
+                if TEST then
+                    print('####', status.share.count, osClock() - status.clock)
+                end
+                if status.interface and status.interface.pulse then
+                    status.interface.pulse()
+                end
+            end
+            if status.share.count >= 100000 then
+                logWarn('Count too large!')
+                break
+            end
             m.checkSameSimple(status, simple, obj, start, force, mode, pushQueue)
             if max >= 10000 then
                 logWarn('Queue too large!')
@@ -2513,7 +2526,7 @@ function m.searchSameFields(status, simple, mode)
             end
         end
     end
-    deallocQueue(queues, starts, forces)
+    --deallocQueue(queues, starts, forces)
 end
 
 function m.getCallerInSameFile(status, func)

@@ -9,6 +9,7 @@ local fs = require 'bee.filesystem'
 ROOT = fs.path(rootPath)
 LANG = 'zh-CN'
 TEST = true
+DEVELOP = true
 
 collectgarbage 'generational'
 

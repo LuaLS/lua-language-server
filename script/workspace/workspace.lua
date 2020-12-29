@@ -191,8 +191,9 @@ local function loadFileFactory(root, progress, isLibrary)
         progress.max = progress.max + 1
         pub.task('loadFile', uri, function (text)
             progress.read = progress.read + 1
-            --log.info(('Preload file at: %s , size = %.3f KB'):format(uri, #text / 1000.0))
+            log.info(('Preload file at: %s , size = %.3f KB'):format(uri, #text / 1000.0))
             if isLibrary then
+                log.info('++++As library of:', root)
                 files.setLibraryPath(uri, root)
             end
             files.setText(uri, text)
@@ -249,10 +250,12 @@ function m.awaitPreload()
     local native          = m.getNativeMatcher()
     local librarys        = m.getLibraryMatchers()
     if native then
+        log.info('Scan files at:', m.path)
         native:scan(m.path, nativeLoader)
     end
     for _, library in ipairs(librarys) do
         local libraryLoader = loadFileFactory(library.path, progress, true)
+        log.info('Scan library at:', library.path)
         library.matcher:scan(library.path, libraryLoader)
     end
 

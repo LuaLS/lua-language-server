@@ -878,7 +878,7 @@ end
 ]]
 [[
 function a(b: table)
-  -> any
+  -> table
 ]]
 
 TEST [[

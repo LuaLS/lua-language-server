@@ -1350,6 +1350,10 @@ function m.getCallValue(source)
     else
         return
     end
+    if call.node.special == 'pcall'
+    or call.node.special == 'xpcall' then
+        return call.args[1], call.args, index - 1
+    end
     return call.node, call.args, index
 end
 
@@ -1688,7 +1692,7 @@ function m.checkSameSimpleByDoc(status, obj, start, pushQueue, mode)
         end
         local state = m.getDocState(obj)
         if state.type == 'doc.type' and mode == 'ref' then
-            m.checkSameSimpleOfRefByDocSource(status, state, start, pushQueue, mode)
+            m.checkSameSimpleOfRefByDocSource(status, state, start - (obj.arrayLevel or 0), pushQueue, mode)
         end
         return true
     elseif obj.type == 'doc.field' then
@@ -1900,13 +1904,13 @@ function m.checkSameSimpleInCall(status, ref, start, pushQueue, mode)
         return
     end
     status.share.crossCallCount = status.share.crossCallCount or 0
-    if status.share.crossCallCount >= 5 then
-        return
-    end
-    status.share.crossCallCount = status.share.crossCallCount + 1
     -- 检查赋值是 semetatable() 的情况
     m.checkSameSimpleInValueOfSetMetaTable(status, func, start, pushQueue)
     -- 检查赋值是 func() 的情况
+    if status.share.crossCallCount >= 2 then
+        return
+    end
+    status.share.crossCallCount = status.share.crossCallCount + 1
     local objs = m.checkSameSimpleInCallInSameFile(status, func, args, index)
     if status.interface.call then
         local cobjs = status.interface.call(func, args, index)
@@ -2311,18 +2315,12 @@ function m.pushResult(status, mode, ref, simple)
         elseif ref.type == 'setglobal'
         or     ref.type == 'getglobal' then
             results[#results+1] = ref
-        elseif ref.type == 'function' then
-            results[#results+1] = ref
-        elseif ref.type == 'table' then
-            results[#results+1] = ref
         elseif ref.type == 'call' then
             if ref.node.special == 'rawset'
             or ref.node.special == 'rawget' then
                 results[#results+1] = ref
             end
-        elseif ref.type == 'doc.type.function'
-        or     ref.type == 'doc.class.name'
-        or     ref.type == 'doc.field' then
+        elseif ref.type == 'doc.field' then
             results[#results+1] = ref
         end
     elseif mode == 'deffield' then
@@ -2336,17 +2334,11 @@ function m.pushResult(status, mode, ref, simple)
             results[#results+1] = ref
         elseif ref.type == 'setglobal' then
             results[#results+1] = ref
-        elseif ref.type == 'function' then
-            results[#results+1] = ref
-        elseif ref.type == 'table' then
-            results[#results+1] = ref
         elseif ref.type == 'call' then
             if ref.node.special == 'rawset' then
                 results[#results+1] = ref
             end
-        elseif ref.type == 'doc.type.function'
-        or     ref.type == 'doc.class.name'
-        or     ref.type == 'doc.field' then
+        elseif ref.type == 'doc.field' then
             results[#results+1] = ref
         end
     end
@@ -3700,10 +3692,18 @@ function m.inferByDef(status, obj)
     for _, src in ipairs(newStatus.results) do
         local inferStatus = m.status(newStatus)
         m.searchInfer(inferStatus, src)
-        for _, infer in ipairs(inferStatus.results) do
-            if not mark[infer.source] then
-                mark[infer.source] = true
-                status.results[#status.results+1] = infer
+        if #inferStatus.results == 0 then
+            status.results[#status.results+1] = {
+                type   = 'any',
+                source = src,
+                level  = 0,
+            }
+        else
+            for _, infer in ipairs(inferStatus.results) do
+                if not mark[infer.source] then
+                    mark[infer.source] = true
+                    status.results[#status.results+1] = infer
+                end
             end
         end
     end
@@ -3731,7 +3731,7 @@ local function inferBySetOfLocal(status, source)
     end
 end
 
-function m.inferBySet(status, source)
+function m.inferByLocalRef(status, source)
     if #status.results ~= 0 then
         return
     end
@@ -4117,18 +4117,16 @@ function m.searchInfer(status, obj)
         return
     end
 
+    m.inferByLocalRef(status, obj)
     if status.deep then
         tracy.ZoneBeginN('inferByDef')
         m.inferByDef(status, obj)
         tracy.ZoneEnd()
     end
-    m.inferBySet(status, obj)
     m.inferByCall(status, obj)
     m.inferByGetTable(status, obj)
     m.inferByUnary(status, obj)
     m.inferByBinary(status, obj)
-    m.inferByCallReturn(status, obj)
-    m.inferByPCallReturn(status, obj)
     m.cleanInfers(status.results, obj)
     if makeCache then
         makeCache(status.results)

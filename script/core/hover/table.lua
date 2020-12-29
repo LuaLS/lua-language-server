@@ -31,9 +31,10 @@ local function getKey(src)
 end
 
 local function getFieldFull(src)
-    local tp      = vm.getInferType(src)
+    local value   = guide.getObjectValue(src) or src
+    local tp      = vm.getInferType(value, 0)
     --local class   = vm.getClass(src)
-    local literal = vm.getInferLiteral(src)
+    local literal = vm.getInferLiteral(value)
     if type(literal) == 'string' and #literal >= 50 then
         literal = literal:sub(1, 47) .. '...'
     end

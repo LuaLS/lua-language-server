@@ -257,6 +257,7 @@ local function parseTypeUnitArray(node)
         finish = getFinish(),
         node   = node,
     }
+    node.arrayLevel = (node.arrayLevel or 0) + 1
     return result
 end
 

@@ -970,6 +970,9 @@ local function checkTypingEnum(ast, text, offset, infers, str, results)
     end
     local myResults = {}
     mergeEnums(myResults, enums, str)
+    table.sort(myResults, function (a, b)
+        return a.label < b.label
+    end)
     for _, res in ipairs(myResults) do
         results[#results+1] = res
     end

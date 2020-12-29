@@ -1815,6 +1815,7 @@ function m.searchSameFieldsCrossMethod(status, ref, start, pushQueue)
 end
 
 local function checkSameSimpleAndMergeFunctionReturnsByDoc(status, results, source, index, args)
+    source = m.getObjectValue(source) or source
     if not source or source.type ~= 'function' then
         return
     end
@@ -2243,6 +2244,7 @@ function m.pushResult(status, mode, ref, simple)
             results[#results+1] = ref
         elseif ref.type == 'doc.type.function'
         or     ref.type == 'doc.class.name'
+        or     ref.type == 'doc.alias.name'
         or     ref.type == 'doc.field' then
             results[#results+1] = ref
         end
@@ -2285,6 +2287,7 @@ function m.pushResult(status, mode, ref, simple)
             end
         elseif ref.type == 'doc.type.function'
         or     ref.type == 'doc.class.name'
+        or     ref.type == 'doc.alias.name'
         or     ref.type == 'doc.field' then
             results[#results+1] = ref
         end
@@ -3151,6 +3154,13 @@ function m.inferCheckDoc(status, source)
     end
     if source.type == 'doc.field' then
         local results = m.getDocTypeNames(status, source.extends)
+        for _, res in ipairs(results) do
+            status.results[#status.results+1] = res
+        end
+        return true
+    end
+    if source.type == 'doc.alias.name' then
+        local results = m.getDocTypeNames(status, m.getDocState(source).extends)
         for _, res in ipairs(results) do
             status.results[#status.results+1] = res
         end

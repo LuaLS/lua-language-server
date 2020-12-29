@@ -1264,7 +1264,7 @@ end
 local <?x?> = f()
 ]]
 [[
-local x: integer
+local x: any
 ]]
 
 TEST [[

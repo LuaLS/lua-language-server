@@ -2702,7 +2702,7 @@ function m.viewInferType(infers)
         or src.type == 'doc.class.name'
         or src.type == 'doc.type.name'
         or src.type == 'doc.type.array'
-        or src.type == 'doc.type.generic' then
+        or src.type == 'doc.type.table' then
             if infer.type ~= 'any' then
                 hasDoc = true
                 break
@@ -2717,7 +2717,7 @@ function m.viewInferType(infers)
             or src.type == 'doc.class.name'
             or src.type == 'doc.type.name'
             or src.type == 'doc.type.array'
-            or src.type == 'doc.type.generic'
+            or src.type == 'doc.type.table'
             or src.type == 'doc.type.enum'
             or src.type == 'doc.resume' then
                 local tp = infer.type or 'any'
@@ -2946,7 +2946,7 @@ local function getDocTypeUnitName(status, unit)
         typeName = 'function'
     elseif unit.type == 'doc.type.array' then
         typeName = getDocTypeUnitName(status, unit.node) .. '[]'
-    elseif unit.type == 'doc.type.generic' then
+    elseif unit.type == 'doc.type.table' then
         typeName = ('%s<%s, %s>'):format(
             getDocTypeUnitName(status, unit.node),
             m.viewInferType(m.getDocTypeNames(status, unit.key)),

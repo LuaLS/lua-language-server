@@ -95,7 +95,7 @@ m.childMap = {
     ['doc.generic']        = {'#generics', 'comment'},
     ['doc.generic.object'] = {'generic', 'extends', 'comment'},
     ['doc.vararg']         = {'vararg', 'comment'},
-    ['doc.type.table']     = {'key', 'value', 'comment'},
+    ['doc.type.table']     = {'node', 'key', 'value', 'comment'},
     ['doc.type.function']  = {'#args', '#returns', 'comment'},
     ['doc.type.typeliteral']  = {'node'},
     ['doc.overload']       = {'overload', 'comment'},
@@ -165,6 +165,21 @@ function m.getParentFunction(obj)
         end
     end
     return nil
+end
+
+--- 寻找父的table类型 doc.type.table
+function m.getParentDocTypeTable(obj)
+    for _ = 1, 1000 do
+        local parent = obj.parent
+        if not parent then
+            return nil
+        end
+        if parent.type == 'doc.type.table' then
+            return obj
+        end
+        obj = parent
+    end
+    error('guide.getParentDocTypeTable overstack')
 end
 
 --- 寻找所在区块
@@ -1686,9 +1701,12 @@ function m.checkSameSimpleByDoc(status, obj, start, pushQueue, mode)
         for _, res in ipairs(pieceResult) do
             pushQueue(res, start, true)
         end
-        local state = m.getDocState(obj)
-        if state.type == 'doc.type' and mode == 'ref' then
-            m.checkSameSimpleOfRefByDocSource(status, state, start, pushQueue, mode)
+        local parentDocTypeTable = m.getParentDocTypeTable(obj)
+        if not parentDocTypeTable then
+            local state = m.getDocState(obj)
+            if state.type == 'doc.type' and mode == 'ref' then
+                m.checkSameSimpleOfRefByDocSource(status, state, start, pushQueue, mode)
+            end
         end
         return true
     elseif obj.type == 'doc.field' then
@@ -1698,6 +1716,10 @@ function m.checkSameSimpleByDoc(status, obj, start, pushQueue, mode)
         end
     elseif obj.type == 'doc.type.array' then
         pushQueue(obj.node, start + 1, true)
+        return true
+    elseif obj.type == 'doc.type.table' then
+        pushQueue(obj.node, start + 1, true)
+        pushQueue(obj.value, start + 1, true)
         return true
     end
 end
@@ -2812,7 +2834,7 @@ function m.viewInferType(infers)
         or src.type == 'doc.class.name'
         or src.type == 'doc.type.name'
         or src.type == 'doc.type.array'
-        or src.type == 'doc.type.generic' then
+        or src.type == 'doc.type.table' then
             if infer.type ~= 'any' then
                 hasDoc = true
                 break
@@ -2827,7 +2849,7 @@ function m.viewInferType(infers)
             or src.type == 'doc.class.name'
             or src.type == 'doc.type.name'
             or src.type == 'doc.type.array'
-            or src.type == 'doc.type.generic'
+            or src.type == 'doc.type.table'
             or src.type == 'doc.type.enum'
             or src.type == 'doc.resume' then
                 local tp = infer.type or 'any'
@@ -3056,7 +3078,7 @@ function m.getDocTypeUnitName(status, unit)
         typeName = 'function'
     elseif unit.type == 'doc.type.array' then
         typeName = m.getDocTypeUnitName(status, unit.node) .. '[]'
-    elseif unit.type == 'doc.type.generic' then
+    elseif unit.type == 'doc.type.table' then
         typeName = ('%s<%s, %s>'):format(
             m.getDocTypeUnitName(status, unit.node),
             m.viewInferType(m.getDocTypeNames(status, unit.key)),

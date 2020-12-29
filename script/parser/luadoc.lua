@@ -260,30 +260,36 @@ local function parseTypeUnitArray(node)
     return result
 end
 
-local function parseTypeUnitGeneric(node)
+local function parseTypeUnitTable(parent, node)
     if not checkToken('symbol', '<', 1) then
         return nil
     end
     if not nextSymbolOrError('<') then
         return nil
     end
-    local key = parseType(node)
+
+    local result = {
+        type   = 'doc.type.table',
+        start  = node.start,
+        node   = node,
+        parent = parent,
+    }
+
+    local key = parseType(result)
     if not key or not nextSymbolOrError(',') then
         return nil
     end
-    local value = parseType(node)
+    local value = parseType(result)
     if not value then
         return nil
     end
     nextSymbolOrError('>')
-    local result = {
-        type   = 'doc.type.generic',
-        start  = node.start,
-        finish = getFinish(),
-        node   = node,
-        key    = key,
-        value  = value,
-    }
+    
+    node.parent = result;
+    result.finish = getFinish()
+    result.key = key
+    result.value = value
+
     return result
 end
 
@@ -397,7 +403,7 @@ local function parseTypeUnit(parent, content)
     result.parent = parent
     while true do
         local newResult = parseTypeUnitArray(result)
-                    or    parseTypeUnitGeneric(result)
+                    or    parseTypeUnitTable(parent, result)
         if not newResult then
             break
         end

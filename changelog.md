@@ -1,8 +1,11 @@
 # changelog
 
-## 1.8.1
+## 1.8.2
 `2020-12-29`
 * `CHG` performance optimization
+
+## 1.8.1
+`2020-12-24`
 * `FIX` telemetry: connect failed caused not working
 
 ## 1.8.0

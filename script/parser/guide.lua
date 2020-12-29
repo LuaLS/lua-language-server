@@ -2493,6 +2493,9 @@ function m.searchSameFields(status, simple, mode)
         local obj   = queues[queueLen]
         local start = starts[queueLen]
         local force = forces[queueLen]
+        queues[queueLen] = nil
+        starts[queueLen] = nil
+        forces[queueLen] = nil
         queueLen = queueLen - 1
         local lock = locks[start]
         if not lock then
@@ -2510,7 +2513,7 @@ function m.searchSameFields(status, simple, mode)
             end
         end
     end
-    --deallocQueue(queues, starts, forces)
+    deallocQueue(queues, starts, forces)
 end
 
 function m.getCallerInSameFile(status, func)

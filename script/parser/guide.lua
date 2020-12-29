@@ -27,6 +27,8 @@ local function logWarn(...)
     log.warn(...)
 end
 
+---@class guide
+---@field debugMode boolean
 local m = {}
 
 m.ANY = {"<ANY>"}
@@ -2367,10 +2369,6 @@ function m.checkSameSimpleName(ref, sm)
         return true
     end
 
-    if sm == m.ANY_DEF and m.isSet(ref) then
-        return true
-    end
-
     if m.getSimpleName(ref) == sm then
         return true
     end
@@ -2515,10 +2513,10 @@ function m.searchSameFields(status, simple, mode)
                     status.interface.pulse()
                 end
             end
-            if status.share.count >= 100000 then
-                logWarn('Count too large!')
-                break
-            end
+            --if status.share.count >= 100000 then
+            --    logWarn('Count too large!')
+            --    break
+            --end
             m.checkSameSimple(status, simple, obj, start, force, mode, pushQueue)
             if max >= 10000 then
                 logWarn('Queue too large!')

@@ -1,6 +1,7 @@
 # changelog
 
 ## 1.8.1
+* `CHG` performance optimization
 * `FIX` telemetry: connect failed caused not working
 
 ## 1.8.0

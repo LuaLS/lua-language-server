@@ -1642,6 +1642,20 @@ function m.checkSameSimpleOfRefByDocSource(status, obj, start, pushQueue, mode)
     end
 end
 
+local function getArrayLevel(obj)
+    local level = 0
+    while true do
+        local parent = obj.parent
+        if parent.type == 'doc.type.array' then
+            level = level + 1
+        else
+            break
+        end
+        obj = parent
+    end
+    return level
+end
+
 function m.checkSameSimpleByDoc(status, obj, start, pushQueue, mode)
     if obj.type == 'doc.class.name'
     or obj.type == 'doc.class' then
@@ -1692,7 +1706,7 @@ function m.checkSameSimpleByDoc(status, obj, start, pushQueue, mode)
         end
         local state = m.getDocState(obj)
         if state.type == 'doc.type' and mode == 'ref' then
-            m.checkSameSimpleOfRefByDocSource(status, state, start - (obj.arrayLevel or 0), pushQueue, mode)
+            m.checkSameSimpleOfRefByDocSource(status, state, start - getArrayLevel(obj), pushQueue, mode)
         end
         return true
     elseif obj.type == 'doc.field' then

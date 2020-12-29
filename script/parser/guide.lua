@@ -2510,7 +2510,7 @@ function m.searchSameFields(status, simple, mode)
             end
         end
     end
-    deallocQueue(queues, starts, forces)
+    --deallocQueue(queues, starts, forces)
 end
 
 function m.getCallerInSameFile(status, func)

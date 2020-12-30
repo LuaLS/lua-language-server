@@ -54,6 +54,7 @@ local function updateConfig()
     if not util.equal(oldConfig.runtime, newConfig.runtime) then
         library.init()
         workspace.reload()
+        semantic.refresh()
     end
     if not util.equal(oldConfig.diagnostics, newConfig.diagnostics) then
         diagnostics.diagnosticsAll()
@@ -66,6 +67,7 @@ local function updateConfig()
     or not util.equal(oldOther.exclude, newOther.exclude)
     then
         workspace.reload()
+        semantic.refresh()
     end
     if not util.equal(oldConfig.intelliSense, newConfig.intelliSense) then
         files.flushCache()

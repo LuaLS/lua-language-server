@@ -1512,6 +1512,14 @@ local function tryLuaDoc(ast, text, offset, results)
     end
 end
 
+local function tryComment(ast, text, offset, results)
+    local word = findWord(text, offset)
+    if not word then
+        return
+    end
+    checkCommon(word, text, offset, results)
+end
+
 local function completion(uri, offset)
     local ast = files.getAst(uri)
     local text = files.getText(uri)
@@ -1520,6 +1528,7 @@ local function completion(uri, offset)
     if ast then
         if getComment(ast, offset) then
             tryLuaDoc(ast, text, offset, results)
+            tryComment(ast, text, offset, results)
         else
             trySpecial(ast, text, offset, results)
             tryWord(ast, text, offset, results)

@@ -3,6 +3,7 @@
 ## 1.8.3
 * `NEW` specify path of `log` and `meta` by `--logpath=xxx` and `--metapath=XXX` in command line
 * `NEW` completion: worksapce word
+* `NEW` completion: show words in comment
 * `CHG` got arg after script name: `lua-language-server.exe main.lua --logpath=D:\log --metapath=D:\meta --develop=false`
 * `FIX` runtime errors
 

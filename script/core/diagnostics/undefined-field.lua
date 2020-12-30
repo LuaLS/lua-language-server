@@ -11,7 +11,7 @@ return function (uri, callback)
         return
     end
 
-    local cache = {}
+    local cache = vm.getCache 'undefined-field'
 
     local function getAllDocClassFromInfer(src)
         local infers = cache[src]

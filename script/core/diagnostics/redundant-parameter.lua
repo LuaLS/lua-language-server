@@ -81,7 +81,7 @@ return function (uri, callback)
         return
     end
 
-    local cache = {}
+    local cache = vm.getCache 'redundant-parameter'
 
     guide.eachSourceType(ast.ast, 'call', function (source)
         local callArgs = countCallArgs(source)

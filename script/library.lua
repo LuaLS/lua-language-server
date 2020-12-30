@@ -164,15 +164,16 @@ end
 local function compileMetaDoc()
     local langID  = lang.id
     local version = config.config.runtime.version
-    local metapath = ROOT / 'meta' / config.config.runtime.meta:gsub('%$%{(.-)%}', {
+    local metapath = fs.path(METAPATH) / config.config.runtime.meta:gsub('%$%{(.-)%}', {
         version  = version,
         language = langID,
     })
+    fs.create_directories(metapath:parent_path())
     if fs.exists(metapath) then
         --return
     end
 
-    local metaLang = loadMetaLocale('en-US')
+    local metaLang = loadMetaLocale('en-US')    
     if langID ~= 'en-US' then
         loadMetaLocale(langID, metaLang)
     end

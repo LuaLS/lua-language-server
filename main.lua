@@ -13,6 +13,8 @@ local function loadArgs()
             value = false
         elseif tonumber(value) then
             value = tonumber(value)
+        elseif value:sub(1, 1) == '"' and value:sub(-1, -1) == '"' then
+            value = value:sub(2, -2)
         end
         _G[key:upper()] = value
     end
@@ -20,7 +22,6 @@ end
 
 loadArgs()
 
-LANG     = LANG     or 'en-US'
 LOGPATH  = LOGPATH  or (ROOT:string() .. '/log')
 METAPATH = METAPATH or (ROOT:string() .. '/meta')
 

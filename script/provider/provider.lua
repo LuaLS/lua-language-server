@@ -35,17 +35,16 @@ local function updateConfig()
             }
         },
     })
+    if not configs or not configs[1] then
+        log.warn('No config?', util.dump(configs))
+        return
+    end
 
     local updated = configs[1]
     local other   = {
         associations = configs[2],
         exclude      = configs[3],
     }
-
-    if not updated then
-        log.warn('No config?', util.dump(configs))
-        return
-    end
 
     local oldConfig = util.deepCopy(config.config)
     local oldOther  = util.deepCopy(config.other)

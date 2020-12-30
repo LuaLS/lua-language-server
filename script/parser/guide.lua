@@ -1471,6 +1471,9 @@ function m.checkSameSimpleInValueOfSetMetaTable(status, func, start, pushQueue)
     local call = func.parent
     local args = call.args
     local obj = args[1]
+    if not args then
+        return
+    end
     local mt = args[2]
     if obj then
         pushQueue(obj, start, true)
@@ -2312,6 +2315,7 @@ function m.pushResult(status, mode, ref, simple)
             results[#results+1] = ref
         end
         if  m.isLiteral(ref)
+        and ref.parent
         and ref.parent.type == 'callargs'
         and ref ~= simple.node then
             results[#results+1] = ref

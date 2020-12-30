@@ -169,7 +169,7 @@ local function compileMetaDoc()
         language = langID,
     })
 
-    local metaLang = loadMetaLocale('en-US')    
+    local metaLang = loadMetaLocale('en-US')
     if langID ~= 'en-US' then
         loadMetaLocale(langID, metaLang)
     end

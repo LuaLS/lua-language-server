@@ -32,7 +32,15 @@ function m.getIniter()
         documentSymbolProvider = true,
         workspaceSymbolProvider = true,
         documentHighlightProvider = true,
-        codeActionProvider = true,
+        codeActionProvider = {
+            codeActionKinds = {
+                '',
+                'quickfix',
+                'refactor.rewrite',
+                'refactor.extract',
+            },
+            resolveProvider = false,
+        },
         signatureHelpProvider = {
             triggerCharacters = { '(', ',' },
         },

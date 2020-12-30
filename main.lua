@@ -6,7 +6,7 @@ ROOT = fs.path(rootPath)
 
 local function loadArgs()
     for _, v in ipairs(arg) do
-        local key, value = v:match '([%w_]+)%=(.+)'
+        local key, value = v:match '^%-%-([%w_]+)%=(.+)'
         if value == 'true' then
             value = true
         elseif value == 'false' then
@@ -14,7 +14,7 @@ local function loadArgs()
         elseif tonumber(value) then
             value = tonumber(value)
         end
-        _G[key] = value
+        _G[key:upper()] = value
     end
 end
 

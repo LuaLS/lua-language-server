@@ -1,8 +1,8 @@
 # changelog
 
 ## 1.8.3
-* `NEW` specify path of `log` and `meta` by `LOGPATH="xxx"` and `METAPATH="XXX"` in command line
-* `CHG` got arg after script name: `lua-language-server.exe main.lua LANG="zhCN" LOGPATH="/log"`
+* `NEW` specify path of `log` and `meta` by `--logpath=xxx` and `--metapath=XXX` in command line
+* `CHG` got arg after script name: `lua-language-server.exe main.lua --logpath=D:\log --metapath=D:\meta --develop=false`
 * `FIX` runtime errors
 
 ## 1.8.2

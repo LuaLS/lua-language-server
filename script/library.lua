@@ -168,10 +168,6 @@ local function compileMetaDoc()
         version  = version,
         language = langID,
     })
-    fs.create_directories(metapath:parent_path())
-    if fs.exists(metapath) then
-        --return
-    end
 
     local metaLang = loadMetaLocale('en-US')    
     if langID ~= 'en-US' then
@@ -181,7 +177,7 @@ local function compileMetaDoc()
 
     m.metaPath = metapath:string()
     m.metaPaths = {}
-    fs.create_directory(metapath)
+    fs.create_directories(metapath)
     local templateDir = ROOT / 'meta' / 'template'
     for fullpath in templateDir:list_directory() do
         local filename = fullpath:filename()

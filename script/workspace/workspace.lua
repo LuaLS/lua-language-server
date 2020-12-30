@@ -66,7 +66,7 @@ function m.getNativeMatcher()
     if not m.path then
         return nil
     end
-    if m.nativeVersion == config.version then
+    if m.nativeMatcher then
         return m.nativeMatcher
     end
 
@@ -128,7 +128,7 @@ end
 
 --- 创建代码库筛选器
 function m.getLibraryMatchers()
-    if m.libraryVersion == config.version then
+    if m.libraryMatchers then
         return m.libraryMatchers
     end
 
@@ -244,6 +244,8 @@ end
 function m.awaitPreload()
     await.close 'preload'
     await.setID 'preload'
+    m.libraryMatchers = nil
+    m.nativeMatcher   = nil
     local progress = {
         max     = 0,
         read    = 0,

@@ -191,12 +191,16 @@ local function loadFileFactory(root, progress, isLibrary)
         progress.max = progress.max + 1
         pub.task('loadFile', uri, function (text)
             progress.read = progress.read + 1
-            log.info(('Preload file at: %s , size = %.3f KB'):format(uri, #text / 1000.0))
-            if isLibrary then
-                log.info('++++As library of:', root)
-                files.setLibraryPath(uri, root)
+            if text then
+                log.info(('Preload file at: %s , size = %.3f KB'):format(uri, #text / 1000.0))
+                if isLibrary then
+                    log.info('++++As library of:', root)
+                    files.setLibraryPath(uri, root)
+                end
+                files.setText(uri, text)
+            else
+                files.remove(uri)
             end
-            files.setText(uri, text)
         end)
     end
 end

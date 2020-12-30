@@ -600,14 +600,41 @@ local function checkCommon(word, text, offset, results)
     for _, data in ipairs(keyWordMap) do
         used[data[1]] = true
     end
-    for str, pos in text:gmatch '([%a_][%w_]*)()' do
-        if not used[str] and pos - 1 ~= offset then
-            used[str] = true
-            if matchKey(word, str) then
-                results[#results+1] = {
-                    label = str,
-                    kind  = define.CompletionItemKind.Text,
-                }
+    if config.config.completion.workspaceWord then
+        for uri in files.eachFile() do
+            local cache = files.getCache(uri)
+            if not cache.commonWords then
+                cache.commonWords = {}
+                local mark = {}
+                for str in files.getText(uri):gmatch '([%a_][%w_]*)' do
+                    if not mark[str] then
+                        mark[str] = true
+                        cache.commonWords[#cache.commonWords+1] = str
+                    end
+                end
+            end
+            for _, str in ipairs(cache.commonWords) do
+                if not used[str] and str ~= word then
+                    used[str] = true
+                    if matchKey(word, str) then
+                        results[#results+1] = {
+                            label = str,
+                            kind  = define.CompletionItemKind.Text,
+                        }
+                    end
+                end
+            end
+        end
+    else
+        for str in text:gmatch '([%a_][%w_]*)' do
+            if not used[str] and str ~= word then
+                used[str] = true
+                if matchKey(word, str) then
+                    results[#results+1] = {
+                        label = str,
+                        kind  = define.CompletionItemKind.Text,
+                    }
+                end
             end
         end
     end

@@ -72,6 +72,7 @@ end
 
 config.config.completion.callSnippet    = 'Both'
 config.config.completion.keywordSnippet = 'Both'
+config.config.completion.workspaceWord  = false
 
 TEST [[
 local zabcde
@@ -371,7 +372,7 @@ results$
 (nil)
 
 TEST [[
-results$
+result$
 local results
 ]]
 (EXISTS)
@@ -1220,10 +1221,6 @@ z$
             newText = '_ENV["z.b.c"]',
         },
     },
-    {
-        label = 'z',
-        kind = define.CompletionItemKind.Text,
-    }
 }
 
 TEST [[

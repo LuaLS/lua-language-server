@@ -915,6 +915,7 @@ local function buildLuaDoc(comment)
             type    = 'doc.comment',
             start   = comment.start,
             finish  = comment.finish,
+            range   = comment.finish,
             comment = comment,
         }
     end
@@ -924,6 +925,7 @@ local function buildLuaDoc(comment)
     parseTokens(doc, comment.start + startPos - 1)
     local result = convertTokens()
     if result then
+        result.range = comment.finish
         local cstart = text:find('%S', result.finish - comment.start + 2)
         if cstart and cstart < comment.finish then
             result.comment = {
@@ -935,7 +937,17 @@ local function buildLuaDoc(comment)
         end
     end
 
-    return result
+    if result then
+        return result
+    end
+
+    return {
+        type    = 'doc.comment',
+        start   = comment.start,
+        finish  = comment.finish,
+        range   = comment.finish,
+        comment = comment,
+    }
 end
 
 ---当前行在注释doc前是否有代码

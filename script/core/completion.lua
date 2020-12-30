@@ -1296,6 +1296,15 @@ local function getComment(ast, offset)
     return nil
 end
 
+local function getLuaDoc(ast, offset)
+    for _, doc in ipairs(ast.ast.docs) do
+        if offset >= doc.start and offset <= doc.range then
+            return doc
+        end
+    end
+    return nil
+end
+
 local function tryLuaDocCate(line, results)
     local word = line:sub(3)
     for _, docType in ipairs {
@@ -1377,6 +1386,7 @@ local function tryLuaDocBySource(ast, offset, source, results)
                 end
             end
         end
+        return true
     elseif source.type == 'doc.type.name' then
         for _, doc in ipairs(vm.getDocTypes '*') do
             if  (doc.type == 'doc.class.name' or doc.type == 'doc.alias.name')
@@ -1388,6 +1398,7 @@ local function tryLuaDocBySource(ast, offset, source, results)
                 }
             end
         end
+        return true
     elseif source.type == 'doc.param.name' then
         local funcs = {}
         guide.eachSourceBetween(ast.ast, offset, math.huge, function (src)
@@ -1410,7 +1421,9 @@ local function tryLuaDocBySource(ast, offset, source, results)
                 }
             end
         end
+        return true
     end
+    return false
 end
 
 local function tryLuaDocByErr(ast, offset, err, docState, results)
@@ -1476,45 +1489,48 @@ local function tryLuaDocByErr(ast, offset, err, docState, results)
     end
 end
 
-local function tryLuaDocFeatures(line, ast, comm, offset, results)
-end
-
 local function tryLuaDoc(ast, text, offset, results)
-    local comm = getComment(ast, offset)
-    local line = text:sub(comm.start, offset)
+    local doc = getLuaDoc(ast, offset)
+    local line = text:sub(doc.start, offset)
     if not line then
         return
     end
-    if line:sub(1, 2) ~= '-@' then
-        return
+    -- 尝试 ---
+    if line:sub(1, 1) == '-' then
+
     end
-    -- 尝试 ---@$
-    local cate = line:match('%a*', 3)
-    if #cate + 2 >= #line then
-        tryLuaDocCate(line, results)
-        return
-    end
-    -- 尝试一些其他特征
-    if tryLuaDocFeatures(line, ast, comm, offset, results) then
-        return
+    if doc.type == 'doc.comment' then
+        -- 尝试 ---@$
+        local cate = line:match('^-@(%a*)')
+        if cate and #cate + 2 >= #line then
+            tryLuaDocCate(line, results)
+            return
+        end
     end
     -- 根据输入中的source来补全
     local source = getLuaDocByContain(ast, offset)
     if source then
-        tryLuaDocBySource(ast, offset, source, results)
-        return
+        local suc = tryLuaDocBySource(ast, offset, source, results)
+        if suc then
+            return
+        end
     end
     -- 根据附近的错误消息来补全
-    local err, doc = getLuaDocByErr(ast, text, comm.start, offset)
+    local err, expectDoc = getLuaDocByErr(ast, text, doc.start, offset)
     if err then
-        tryLuaDocByErr(ast, offset, err, doc, results)
+        tryLuaDocByErr(ast, offset, err, expectDoc, results)
         return
     end
 end
 
 local function tryComment(ast, text, offset, results)
     local word = findWord(text, offset)
+    local doc  = getLuaDoc(ast, offset)
+    local line = text:sub(doc.start, offset)
     if not word then
+        return
+    end
+    if doc and doc.type ~= 'doc.comment' then
         return
     end
     checkCommon(word, text, offset, results)

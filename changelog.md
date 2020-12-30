@@ -1,5 +1,8 @@
 # changelog
 
+## 1.8.3
+* `FIX` runtime errors
+
 ## 1.8.2
 `2020-12-29`
 * `CHG` performance optimization

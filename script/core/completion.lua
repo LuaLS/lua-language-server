@@ -1489,20 +1489,90 @@ local function tryLuaDocByErr(ast, offset, err, docState, results)
     end
 end
 
-local function tryLuaDoc(ast, text, offset, results)
-    local doc = getLuaDoc(ast, offset)
-    local line = text:sub(doc.start, offset)
-    if not line then
+local function buildLuaDocOfFunction(func)
+    local index = 1
+    local buf = {}
+    buf[#buf+1] = '${1:comment}'
+    local args = {}
+    local returns = {}
+    if func.args then
+        for _, arg in ipairs(func.args) do
+            args[#args+1] = vm.getInferType(arg)
+        end
+    end
+    if func.returns then
+        for _, rtns in ipairs(func.returns) do
+            for n = 1, #rtns do
+                if not returns[n] then
+                    returns[n] = vm.getInferType(rtns[n])
+                end
+            end
+        end
+    end
+    for n, arg in ipairs(args) do
+        index = index + 1
+        buf[#buf+1] = ('---@param %s ${%d:%s}'):format(
+            func.args[n][1],
+            index,
+            arg
+        )
+    end
+    for _, rtn in ipairs(returns) do
+        index = index + 1
+        buf[#buf+1] = ('---@return ${%d:%s}'):format(
+            index,
+            rtn
+        )
+    end
+    local insertText = table.concat(buf, '\n')
+    return insertText
+end
+
+local function tryLuaDocOfFunction(doc, results)
+    if not doc.bindSources then
         return
     end
-    -- 尝试 ---
-    if line:sub(1, 1) == '-' then
+    local func
+    for _, source in ipairs(doc.bindSources) do
+        if source.type == 'function' then
+            func = source
+            break
+        end
+    end
+    if not func then
+        return
+    end
+    for _, otherDoc in ipairs(doc.bindGroup) do
+        if otherDoc.type == 'doc.param'
+        or otherDoc.type == 'doc.return' then
+            return
+        end
+    end
+    local insertText = buildLuaDocOfFunction(func)
+    results[#results+1] = {
+        label   = '@param;@return',
+        kind    = define.CompletionItemKind.Snippet,
+        insertTextFormat = 2,
+        filterText   = '---',
+        insertText   = insertText
+    }
+end
 
+local function tryLuaDoc(ast, text, offset, results)
+    local doc = getLuaDoc(ast, offset)
+    if not doc then
+        return
     end
     if doc.type == 'doc.comment' then
+        local line = text:sub(doc.start, doc.range)
+        -- 尝试 ---$
+        if line == '-' then
+            tryLuaDocOfFunction(doc, results)
+            return
+        end
         -- 尝试 ---@$
-        local cate = line:match('^-@(%a*)')
-        if cate and #cate + 2 >= #line then
+        local cate = line:match('^-@(%a*)$')
+        if cate then
             tryLuaDocCate(line, results)
             return
         end

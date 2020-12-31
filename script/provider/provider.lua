@@ -380,6 +380,7 @@ proto.on('textDocument/completion', function (params)
             kind             = res.kind,
             deprecated       = res.deprecated,
             sortText         = ('%04d'):format(i),
+            filterText       = res.filterText,
             insertText       = res.insertText,
             insertTextFormat = 2,
             commitCharacters = res.commitCharacters,

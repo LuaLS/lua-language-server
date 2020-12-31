@@ -1967,4 +1967,26 @@ function (${1:x}, ${2:y})\
 end",
     },
 }
+
+TEST [[
+---$
+local function f(a, b, c)
+    return a + 1, b .. '', c[1]
+end
+]]
+{
+    {
+        label  = '@param;@return',
+        kind   = define.CompletionItemKind.Snippet,
+        insertText = "\z
+${1:comment}\
+---@param a ${2:number}\
+---@param b ${3:string}\
+---@param c ${4:table}\
+---@return ${5:number}\
+---@return ${6:string}\
+---@return ${7:any}",
+    },
+}
+
 Cared['insertText'] = nil

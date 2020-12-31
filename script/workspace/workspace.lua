@@ -29,7 +29,7 @@ function m.init(uri)
     end
     m.uri  = uri
     m.path = m.normalize(furi.decode(uri))
-    local logPath = ROOT / 'log' / (uri:gsub('[/:]+', '_') .. '.log')
+    local logPath = fs.path(LOGPATH) / (uri:gsub('[/:]+', '_') .. '.log')
     log.info('Log path: ', logPath)
     log.init(ROOT, logPath)
 end

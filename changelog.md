@@ -1,5 +1,8 @@
 # changelog
 
+## 1.9.1
+* `CHG` supports `~` in command line
+
 ## 1.9.0
 `2020-12-31`
 * `NEW` YEAR! Peace and love!

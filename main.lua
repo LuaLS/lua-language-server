@@ -2,7 +2,18 @@ local currentPath = debug.getinfo(1, 'S').source:sub(2)
 local rootPath = currentPath:gsub('[/\\]*[^/\\]-$', '')
 loadfile((rootPath == '' and '.' or rootPath) .. '/platform.lua')('script')
 local fs = require 'bee.filesystem'
-ROOT = fs.path(rootPath)
+
+local function expanduser(path)
+    if path:sub(1, 1) == '~' then
+        local home = os.getenv('HOME')
+        if not home then -- has to be Windows
+            home = os.getenv 'USERPROFILE' or (os.getenv 'HOMEDRIVE' .. os.getenv 'HOMEPATH')
+        end
+        return home .. path:sub(2)
+    else
+        return path
+    end
+end
 
 local function loadArgs()
     for _, v in ipairs(arg) do
@@ -22,8 +33,9 @@ end
 
 loadArgs()
 
-LOGPATH  = LOGPATH  or (ROOT:string() .. '/log')
-METAPATH = METAPATH or (ROOT:string() .. '/meta')
+ROOT     = fs.path(expanduser(rootPath))
+LOGPATH  = LOGPATH  and expanduser(LOGPATH)  or (ROOT:string() .. '/log')
+METAPATH = METAPATH and expanduser(METAPATH) or (ROOT:string() .. '/meta')
 
 debug.setcstacklimit(200)
 collectgarbage('generational', 10, 100)

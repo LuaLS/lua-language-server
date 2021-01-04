@@ -2,6 +2,7 @@
 
 ## 1.9.1
 * `CHG` supports `~` in command line
+* `FIX` [#339](https://github.com/sumneko/lua-language-server/issues/339)
 
 ## 1.9.0
 `2020-12-31`

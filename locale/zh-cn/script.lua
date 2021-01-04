@@ -38,6 +38,7 @@ DIAG_CODE_AFTER_BREAK   = '无法执行到 `break` 后的代码。'
 DIAG_UNBALANCED_ASSIGNMENTS = '由于值的数量不够而被赋值为了 `nil` 。在Lua中, `x, y = 1` 等价于 `x, y = 1, nil` 。'
 DIAG_REQUIRE_LIKE       = '你可以在设置中将 `{}` 视为 `require`。'
 DIAG_COSE_NON_OBJECT    = '无法 close 此类型的值。（除非给此类型设置 `__close` 元方法）'
+DIAG_COUNT_DOWN_LOOP    = '你的意思是 `{}` 吗？'
 
 DIAG_CIRCLE_DOC_CLASS                 = '循环继承的类。'
 DIAG_DOC_FIELD_NO_CLASS               = '字段必须定义在类之后。'

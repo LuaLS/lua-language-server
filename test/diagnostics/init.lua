@@ -966,3 +966,15 @@ local function f() end
 
 f(1)
 ]]
+
+TEST [[
+for i = <!10, 1!> do
+    print(i)
+end
+]]
+
+TEST [[
+for i = <!10, 1, 5!> do
+    print(i)
+end
+]]

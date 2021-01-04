@@ -135,7 +135,14 @@ m.DiagnosticSeverity = {
     Hint        = 4,
 }
 
+---@alias DiagnosticDefaultSeverity
+---| '"Hint"'
+---| '"Information"'
+---| '"Warning"'
+---| '"Error"'
+
 --- 诊断类型与默认等级
+---@type table<string, DiagnosticDefaultSeverity>
 m.DiagnosticDefaultSeverity = {
     ['unused-local']            = 'Hint',
     ['unused-function']         = 'Hint',
@@ -158,6 +165,7 @@ m.DiagnosticDefaultSeverity = {
     ['code-after-break']        = 'Hint',
     ['unbalanced-assignments']  = 'Warning',
     ['close-non-object']        = 'Warning',
+    ['count-down-loop']         = 'Warning',
 
     ['duplicate-doc-class']     = 'Warning',
     ['undefined-doc-class']     = 'Warning',
@@ -169,6 +177,10 @@ m.DiagnosticDefaultSeverity = {
     ['duplicate-doc-field']     = 'Warning',
 }
 
+---@alias DiagnosticDefaultNeededFileStatus
+---| '"Any"'
+---| '"Opened"'
+
 -- 文件状态
 m.FileStatus = {
     Any     = 1,
@@ -176,6 +188,7 @@ m.FileStatus = {
 }
 
 --- 诊断类型与需要的文件状态(可以控制只分析打开的文件、还是所有文件)
+---@type table<string, DiagnosticDefaultNeededFileStatus>
 m.DiagnosticDefaultNeededFileStatus = {
     ['unused-local']            = 'Opened',
     ['unused-function']         = 'Opened',
@@ -198,6 +211,7 @@ m.DiagnosticDefaultNeededFileStatus = {
     ['code-after-break']        = 'Opened',
     ['unbalanced-assignments']  = 'Any',
     ['close-non-object']        = 'Any',
+    ['count-down-loop']         = 'Any',
 
     ['duplicate-doc-class']     = 'Any',
     ['undefined-doc-class']     = 'Any',

@@ -61,11 +61,20 @@ end",
     {'for', function (hasSpace, isExp, results)
         if hasSpace then
             results[#results+1] = {
-                label = 'for .. in',
+                label = 'for .. ipairs',
                 kind  = define.CompletionItemKind.Snippet,
                 insertTextFormat = 2,
                 insertText = "\z
-${1:key, value} in ${2:pairs(${3:t})} do\
+${1:index}, ${2:value} in ipairs(${3:t}) do\
+\t$0\
+end"
+            }
+            results[#results+1] = {
+                label = 'for .. pairs',
+                kind  = define.CompletionItemKind.Snippet,
+                insertTextFormat = 2,
+                insertText = "\z
+${1:key}, ${2:value} in pairs(${3:t})}do\
 \t$0\
 end"
             }
@@ -80,11 +89,20 @@ end"
             }
         else
             results[#results+1] = {
-                label = 'for .. in',
+                label = 'for .. ipairs',
                 kind  = define.CompletionItemKind.Snippet,
                 insertTextFormat = 2,
                 insertText = "\z
-for ${1:key, value} in ${2:pairs(${3:t})} do\
+for ${1:index}, ${2:value} in ipairs(${3:t}) do\
+\t$0\
+end"
+            }
+            results[#results+1] = {
+                label = 'for .. pairs',
+                kind  = define.CompletionItemKind.Snippet,
+                insertTextFormat = 2,
+                insertText = "\z
+for ${1:key}, ${2:value} in pairs(${3:t}) do\
 \t$0\
 end"
             }

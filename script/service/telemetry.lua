@@ -60,7 +60,7 @@ local function pushErrorLog(link)
 end
 
 timer.wait(5, function ()
-    timer.loop(60, function ()
+    timer.loop(300, function ()
         if not config.config.telemetry.enable then
             return
         end

@@ -9,6 +9,14 @@ local Care = {
             kind   = 'region',
         }
         results[#results+1] = folding
+        if source.bindDocs then
+            results[#results+1] = {
+                start        = source.bindDocs[1].start,
+                finish       = source.bindDocs[#source.bindDocs].finish,
+                kind         = 'comment',
+                hideLastLine = true,
+            }
+        end
     end,
     ['do'] = function (source, text, results)
         local folding = {
@@ -95,6 +103,15 @@ local Care = {
             start  = source.start,
             finish = source.finish,
             kind   = 'comment',
+        }
+        results[#results+1] = folding
+    end,
+    ['doc.class'] = function (source, text, results)
+        local folding = {
+            start        = source.start,
+            finish       = source.bindGroup[#source.bindGroup].finish,
+            kind         = 'comment',
+            hideLastLine = true,
         }
         results[#results+1] = folding
     end,

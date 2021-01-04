@@ -2,7 +2,7 @@
 
 ## 1.10.0
 * `NEW` workspace: supports `.dll`(`.so`) in `require`
-* `NEW` folding: 
+* `NEW` folding: `---@class` and docs of function
 * `CHG` supports `~` in command line
 * `CHG` completion: improve workspace words
 * `FIX` [#339](https://github.com/sumneko/lua-language-server/issues/339)

@@ -49,7 +49,8 @@ function m.getIniter()
                 'lua.removeSpace:' .. sp:get_id(),
                 'lua.solve:' .. sp:get_id(),
             },
-        }
+        },
+        foldingRangeProvider = true,
         --documentOnTypeFormattingProvider = {
         --    firstTriggerCharacter = '}',
         --},

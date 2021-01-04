@@ -266,28 +266,35 @@ local Defs = {
     end,
     ShortComment = function (start, text, finish)
         PushComment {
+            type   = 'comment.short',
             start  = start,
             finish = finish - 1,
             text   = text,
         }
     end,
-    LongComment = function (beforeEq, afterEq, str, missPos)
-        if missPos then
+    LongComment = function (start, beforeEq, afterEq, str, close, finish)
+        PushComment {
+            type   = 'comment.long',
+            start  = start,
+            finish = finish - 1,
+            text   = '',
+        }
+        if not close then
             local endSymbol = ']' .. ('='):rep(afterEq-beforeEq) .. ']'
             local s, _, w = str:find('(%][%=]*%])[%c%s]*$')
             if s then
                 PushError {
                     type   = 'ERR_LCOMMENT_END',
-                    start  = missPos - #str + s - 1,
-                    finish = missPos - #str + s + #w - 2,
+                    start  = finish - #str + s - 1,
+                    finish = finish - #str + s + #w - 2,
                     info   = {
                         symbol = endSymbol,
                     },
                     fix    = {
                         title = 'FIX_LCOMMENT_END',
                         {
-                            start  = missPos - #str + s - 1,
-                            finish = missPos - #str + s + #w - 2,
+                            start  = finish - #str + s - 1,
+                            finish = finish - #str + s + #w - 2,
                             text   = endSymbol,
                         }
                     },
@@ -295,16 +302,16 @@ local Defs = {
             end
             PushError {
                 type   = 'MISS_SYMBOL',
-                start  = missPos,
-                finish = missPos,
+                start  = finish,
+                finish = finish,
                 info   = {
                     symbol = endSymbol,
                 },
                 fix    = {
                     title = 'ADD_LCOMMENT_END',
                     {
-                        start  = missPos,
-                        finish = missPos,
+                        start  = finish,
+                        finish = finish,
                         text   = endSymbol,
                     }
                 },
@@ -334,9 +341,9 @@ local Defs = {
             }
         end
         PushComment {
+            type     = 'comment.clong',
             start    = start1,
             finish   = finish2 - 1,
-            semantic = true,
             text     = '',
         }
     end,
@@ -358,9 +365,9 @@ local Defs = {
             }
         end
         PushComment {
+            type     = 'comment.cshort',
             start    = start,
             finish   = commentFinish - 1,
-            semantic = true,
             text     = '',
         }
     end,

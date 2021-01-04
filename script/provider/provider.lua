@@ -685,3 +685,32 @@ proto.on('textDocument/semanticTokens/range', function (params)
         data = results
     }
 end)
+
+proto.on('textDocument/foldingRange', function (params)
+    local core    = require 'core.folding'
+    local uri     = params.textDocument.uri
+    local lines   = files.getLines(uri)
+    local text    = files.getText(uri)
+    if not lines or not text then
+        return nil
+    end
+    local regions = core(uri)
+    if not regions then
+        return nil
+    end
+
+    local results = {}
+    for _, region in ipairs(regions) do
+        local startLine = define.position(lines, text, region.start).line
+        local endLine   = define.position(lines, text, region.finish).line - 1
+        if startLine < endLine then
+            results[#results+1] = {
+                startLine      = startLine,
+                endLine        = endLine,
+                kind           = region.kind,
+            }
+        end
+    end
+
+    return results
+end)

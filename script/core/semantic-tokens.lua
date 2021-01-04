@@ -188,7 +188,7 @@ return function (uri, start, finish)
     end)
 
     for _, comm in ipairs(ast.comms) do
-        if comm.semantic then
+        if comm.type == 'comment.cshort' then
             results[#results+1] = {
                 start  = comm.start,
                 finish = comm.finish,

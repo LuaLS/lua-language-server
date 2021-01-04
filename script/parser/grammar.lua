@@ -88,9 +88,9 @@ end
 grammar 'Comment' [[
 Comment         <-  LongComment
                 /   '--' ShortComment
-LongComment     <-  ('--[' {} {:eq: '='* :} {} '[' 
+LongComment     <-  ({} '--[' {} {:eq: '='* :} {} '[' 
                     {(!CommentClose .)*}
-                    (CommentClose / {}))
+                    ((CommentClose / %nil) {}))
                 ->  LongComment
                 /   (
                     {} '/*' {}
@@ -98,7 +98,7 @@ LongComment     <-  ('--[' {} {:eq: '='* :} {} '['
                     {} '*/' {}
                     )
                 ->  CLongComment
-CommentClose    <-  ']' =eq ']'
+CommentClose    <-  {']' =eq ']'}
 ShortComment    <-  ({} {(!%nl .)*} {})
                 ->  ShortComment
 ]]

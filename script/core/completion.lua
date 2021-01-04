@@ -1158,6 +1158,11 @@ local function tryWord(ast, text, offset, results)
     end
     local hasSpace = finish ~= offset
     if isInString(ast, offset) then
+        if not hasSpace then
+            if #results == 0 then
+                checkCommon(ast, word, text, offset, results)
+            end
+        end
     else
         local parent, oop = findParent(ast, text, start - 1)
         if parent then

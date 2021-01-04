@@ -5,6 +5,7 @@
 * `NEW` folding: `---@class` and docs of function
 * `CHG` supports `~` in command line
 * `CHG` completion: improve workspace words
+* `CHG` completion: show words in string
 * `FIX` [#339](https://github.com/sumneko/lua-language-server/issues/339)
 
 ## 1.9.0

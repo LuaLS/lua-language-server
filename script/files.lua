@@ -10,19 +10,20 @@ local timer    = require 'timer'
 
 local m = {}
 
-m.openMap = {}
-m.libraryMap = {}
-m.fileMap = {}
-m.watchList = {}
-m.notifyCache = {}
-m.assocVersion = -1
-m.assocMatcher = nil
+m.openMap       = {}
+m.libraryMap    = {}
+m.fileMap       = {}
+m.dllMap        = {}
+m.watchList     = {}
+m.notifyCache   = {}
+m.assocVersion  = -1
+m.assocMatcher  = nil
 m.globalVersion = 0
 m.linesMap = setmetatable({}, { __mode = 'v' })
 m.astMap   = setmetatable({}, { __mode = 'v' })
 
 --- 打开文件
----@param uri string
+---@param uri uri
 function m.open(uri)
     local originUri = uri
     if platform.OS == 'Windows' then
@@ -33,7 +34,7 @@ function m.open(uri)
 end
 
 --- 关闭文件
----@param uri string
+---@param uri uri
 function m.close(uri)
     local originUri = uri
     if platform.OS == 'Windows' then
@@ -44,7 +45,7 @@ function m.close(uri)
 end
 
 --- 是否打开
----@param uri string
+---@param uri uri
 ---@return boolean
 function m.isOpen(uri)
     if platform.OS == 'Windows' then
@@ -98,7 +99,7 @@ function m.asKey(uri)
 end
 
 --- 设置文件文本
----@param uri string
+---@param uri uri
 ---@param text string
 function m.setText(uri, text)
     if not text then
@@ -147,7 +148,7 @@ function m.getVersion(uri)
 end
 
 --- 获取文件文本
----@param uri string
+---@param uri uri
 ---@return string text
 function m.getText(uri)
     if platform.OS == 'Windows' then
@@ -161,7 +162,7 @@ function m.getText(uri)
 end
 
 --- 移除文件
----@param uri string
+---@param uri uri
 function m.remove(uri)
     local originUri = uri
     if platform.OS == 'Windows' then
@@ -218,6 +219,16 @@ function m.eachFile()
     return pairs(map)
 end
 
+--- Pairs dll files
+---@return function
+function m.eachDll()
+    local map = {}
+    for uri, file in pairs(m.dllMap) do
+        map[uri] = file
+    end
+    return pairs(map)
+end
+
 function m.compileAst(uri, text)
     if not m.isOpen(uri) and #text >= config.config.workspace.preloadFileSize * 1000 then
         if not m.notifyCache['preloadFileSize'] then
@@ -267,7 +278,7 @@ function m.compileAst(uri, text)
 end
 
 --- 获取文件语法树
----@param uri string
+---@param uri uri
 ---@return table ast
 function m.getAst(uri)
     if platform.OS == 'Windows' then
@@ -290,7 +301,7 @@ function m.getAst(uri)
 end
 
 --- 获取文件行信息
----@param uri string
+---@param uri uri
 ---@return table lines
 function m.getLines(uri)
     if platform.OS == 'Windows' then
@@ -313,7 +324,7 @@ function m.getOriginUri(uri)
     if platform.OS == 'Windows' then
         uri = uri:lower()
     end
-    local file = m.fileMap[uri]
+    local file = m.fileMap[uri] or m.dllMap[uri]
     if not file then
         return nil
     end
@@ -369,7 +380,7 @@ function m.getAssoc()
 end
 
 --- 判断是否是Lua文件
----@param uri string
+---@param uri uri
 ---@return boolean
 function m.isLua(uri)
     local ext = uri:match '%.([^%.%/%\\]+)$'
@@ -382,6 +393,89 @@ function m.isLua(uri)
     local matcher = m.getAssoc()
     local path = furi.decode(uri)
     return matcher(path)
+end
+
+--- Does the uri look like a `Dynamic link library` ?
+---@param uri uri
+---@return boolean
+function m.isDll(uri)
+    local ext = uri:match '%.([^%.%/%\\]+)$'
+    if not ext then
+        return false
+    end
+    if platform.OS == 'Windows' then
+        if m.eq(ext, 'dll') then
+            return true
+        end
+    else
+        if m.eq(ext, 'so') then
+            return true
+        end
+    end
+    return false
+end
+
+--- Save dll, makes opens and words, discard content
+---@param uri uri
+---@param content string
+function m.saveDll(uri, content)
+    if not content then
+        return
+    end
+    local luri = uri
+    if platform.OS == 'Windows' then
+        luri = uri:lower()
+    end
+    local file = {
+        uri   = uri,
+        opens = {},
+        words = {},
+    }
+    for word in content:gmatch 'luaopen_([%w_]+)' do
+        file.opens[#file.opens+1] = word:gsub('_', '.')
+    end
+    if #file.opens == 0 then
+        return
+    end
+    local mark = {}
+    for word in content:gmatch '(%a[%w_]+)\0' do
+        if word:sub(1, 3) ~= 'lua' then
+            if not mark[word] then
+                mark[word] = true
+                file.words[#file.words+1] = word
+            end
+        end
+    end
+
+    m.dllMap[luri] = file
+end
+
+---
+---@param uri uri
+---@return string[]|nil
+function m.getDllOpens(uri)
+    if platform.OS == 'Windows' then
+        uri = uri:lower()
+    end
+    local file = m.dllMap[uri]
+    if not file then
+        return nil
+    end
+    return file.opens
+end
+
+---
+---@param uri uri
+---@return string[]|nil
+function m.getDllWords(uri)
+    if platform.OS == 'Windows' then
+        uri = uri:lower()
+    end
+    local file = m.dllMap[uri]
+    if not file then
+        return nil
+    end
+    return file.words
 end
 
 --- 注册事件

@@ -1,6 +1,7 @@
 # changelog
 
-## 1.9.1
+## 1.10.0
+* `NEW` workspace: supports `.dll`(`.so`) in `require`
 * `CHG` supports `~` in command line
 * `FIX` [#339](https://github.com/sumneko/lua-language-server/issues/339)
 

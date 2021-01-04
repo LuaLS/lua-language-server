@@ -625,6 +625,20 @@ local function checkCommon(word, text, offset, results)
                 end
             end
         end
+        for uri in files.eachDll() do
+            local words = files.getDllWords(uri) or {}
+            for _, str in ipairs(words) do
+                if not used[str] and str ~= word then
+                    used[str] = true
+                    if matchKey(word, str) then
+                        results[#results+1] = {
+                            label = str,
+                            kind  = define.CompletionItemKind.Text,
+                        }
+                    end
+                end
+            end
+        end
     else
         for str in text:gmatch '([%a_][%w_]*)' do
             if not used[str] and str ~= word then
@@ -847,6 +861,27 @@ local function checkUri(ast, text, offset, results)
                     end
                 end
                 ::CONTINUE::
+            end
+            for uri in files.eachDll() do
+                local opens = files.getDllOpens(uri) or {}
+                local path = workspace.getRelativePath(uri)
+                for _, open in ipairs(opens) do
+                    if matchKey(literal, open) then
+                        if not collect[open] then
+                            collect[open] = {
+                                textEdit = {
+                                    start   = source.start + #source[2],
+                                    finish  = source.finish - #source[2],
+                                    newText = open,
+                                }
+                            }
+                        end
+                        collect[open][#collect[open]+1] = ([=[* [%s](%s)]=]):format(
+                            path,
+                            uri
+                        )
+                    end
+                end
             end
         elseif libName == 'dofile'
         or     libName == 'loadfile' then

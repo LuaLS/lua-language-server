@@ -172,36 +172,48 @@ end
 local function loadFileFactory(root, progress, isLibrary)
     return function (path)
         local uri = furi.encode(path)
-        if not files.isLua(uri) then
-            return
-        end
-        if not isLibrary and progress.preload >= config.config.workspace.maxPreload then
-            if not m.hasHitMaxPreload then
-                m.hasHitMaxPreload = true
-                proto.notify('window/showMessage', {
-                    type = 3,
-                    message = lang.script('MWS_MAX_PRELOAD', config.config.workspace.maxPreload),
-                })
-            end
-            return
-        end
-        if not isLibrary then
-            progress.preload = progress.preload + 1
-        end
-        progress.max = progress.max + 1
-        pub.task('loadFile', uri, function (text)
-            progress.read = progress.read + 1
-            if text then
-                log.info(('Preload file at: %s , size = %.3f KB'):format(uri, #text / 1000.0))
-                if isLibrary then
-                    log.info('++++As library of:', root)
-                    files.setLibraryPath(uri, root)
+        if files.isLua(uri) then
+            if not isLibrary and progress.preload >= config.config.workspace.maxPreload then
+                if not m.hasHitMaxPreload then
+                    m.hasHitMaxPreload = true
+                    proto.notify('window/showMessage', {
+                        type = 3,
+                        message = lang.script('MWS_MAX_PRELOAD', config.config.workspace.maxPreload),
+                    })
                 end
-                files.setText(uri, text)
-            else
-                files.remove(uri)
+                return
             end
-        end)
+            if not isLibrary then
+                progress.preload = progress.preload + 1
+            end
+            progress.max = progress.max + 1
+            pub.task('loadFile', uri, function (text)
+                progress.read = progress.read + 1
+                if text then
+                    log.info(('Preload file at: %s , size = %.3f KB'):format(uri, #text / 1000.0))
+                    if isLibrary then
+                        log.info('++++As library of:', root)
+                        files.setLibraryPath(uri, root)
+                    end
+                    files.setText(uri, text)
+                else
+                    files.remove(uri)
+                end
+            end)
+        end
+        if files.isDll(uri) then
+            progress.max = progress.max + 1
+            pub.task('loadFile', uri, function (content)
+                progress.read = progress.read + 1
+                if content then
+                    log.info(('Preload file at: %s , size = %.3f KB'):format(uri, #content / 1000.0))
+                    if isLibrary then
+                        log.info('++++As library of:', root)
+                    end
+                    files.saveDll(uri, content)
+                end
+            end)
+        end
     end
 end
 
@@ -316,6 +328,15 @@ function m.findUrisByRequirePath(path)
     local results = {}
     local mark = {}
     local searchers = {}
+    for uri in files.eachDll() do
+        local opens = files.getDllOpens(uri) or {}
+        for _, open in ipairs(opens) do
+            if open == path then
+                results[#results+1] = uri
+            end
+        end
+    end
+
     local input = path:gsub('%.', '/')
                       :gsub('%%', '%%%%')
     for _, luapath in ipairs(config.config.runtime.path) do

@@ -1,5 +1,7 @@
 local platform = require 'bee.platform'
 
+---@class uri: string
+
 local escPatt = '[^%w%-%.%_%~%/]'
 
 local function esc(c)
@@ -20,7 +22,7 @@ local m = {}
 
 --- path -> uri
 ---@param path string
----@return string uri
+---@return uri uri
 function m.encode(path)
     local authority = ''
     if platform.OS == 'Windows' then
@@ -62,7 +64,7 @@ end
 -- file://server/share/some/path  --> \\server\share\some\path
 
 --- uri -> path
----@param uri string
+---@param uri uri
 ---@return string path
 function m.decode(uri)
     local scheme, authority, path = uri:match('([^:]*):?/?/?([^/]*)(.*)')

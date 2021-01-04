@@ -1640,7 +1640,7 @@ local function tryComment(ast, text, offset, results)
     if doc and doc.type ~= 'doc.comment' then
         return
     end
-    checkCommon(word, text, offset, results)
+    checkCommon(ast, word, text, offset, results)
 end
 
 local function completion(uri, offset)
@@ -1662,7 +1662,7 @@ local function completion(uri, offset)
     else
         local word = findWord(text, offset)
         if word then
-            checkCommon(word, text, offset, results)
+            checkCommon(ast, word, text, offset, results)
         end
     end
 

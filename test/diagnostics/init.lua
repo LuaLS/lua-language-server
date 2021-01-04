@@ -115,6 +115,21 @@ local <!x!>
 <!x!> = <!function () end!>
 ]]
 
+TEST([[
+<!local function x()
+end!>
+<!local function y()
+    x()
+end!>
+]],
+[[
+local function x()
+end
+local function <!y!>()
+    x()
+end
+]]
+)
 
 TEST [[
 print(<!x!>)

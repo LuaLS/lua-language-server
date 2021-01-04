@@ -23,25 +23,33 @@ return function (uri, callback)
     if not ast then
         return
     end
-    -- 只检查局部函数
-    guide.eachSourceType(ast.ast, 'function', function (source)
+
+    local cache = {}
+    local function checkFunction(source)
+        if cache[source] ~= nil then
+            return cache[source]
+        end
+        cache[source] = false
         local parent = source.parent
         if not parent then
-            return
+            return false
         end
         if  parent.type ~= 'local'
         and parent.type ~= 'setlocal' then
-            return
+            return false
         end
         if isToBeClosed(parent) then
-            return
+            return false
         end
         local hasGet
         local refs = vm.getRefs(source)
         for _, src in ipairs(refs) do
             if vm.isGet(src) then
-                hasGet = true
-                break
+                local func = guide.getParentFunction(src)
+                if not checkFunction(func) then
+                    hasGet = true
+                    break
+                end
             end
         end
         if not hasGet then
@@ -60,6 +68,14 @@ return function (uri, callback)
                     message = lang.script.DIAG_UNUSED_FUNCTION,
                 }
             end
+            cache[source] = true
+            return true
         end
+        return false
+    end
+
+    -- 只检查局部函数
+    guide.eachSourceType(ast.ast, 'function', function (source)
+        checkFunction(source)
     end)
 end

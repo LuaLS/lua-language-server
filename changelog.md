@@ -3,11 +3,12 @@
 ## 1.10.0
 * `NEW` workspace: supports `.dll`(`.so`) in `require`
 * `NEW` folding: `---@class`, `--#region` and docs of function
-* `NEW` dianostic: `count-down-loop`
+* `NEW` diagnostic: `count-down-loop`
 * `CHG` supports `~` in command line
 * `CHG` completion: improve workspace words
 * `CHG` completion: show words in string
 * `CHG` completion: split `for .. in` to `for .. ipairs` and `for ..pairs`
+* `CHG` diagnostic: `unused-function` checks recursive
 * `FIX` [#339](https://github.com/sumneko/lua-language-server/issues/339)
 
 ## 1.9.0

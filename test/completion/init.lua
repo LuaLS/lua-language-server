@@ -1990,3 +1990,17 @@ ${1:comment}\
 }
 
 Cared['insertText'] = nil
+
+TEST [[
+--$
+]]
+{
+    {
+        label = '#region',
+        kind  = define.CompletionItemKind.Snippet,
+    },
+    {
+        label = '#endregion',
+        kind  = define.CompletionItemKind.Snippet,
+    }
+}

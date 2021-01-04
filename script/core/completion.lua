@@ -1332,7 +1332,7 @@ end
 
 local function getComment(ast, offset)
     for _, comm in ipairs(ast.comms) do
-        if offset >= comm.start and offset <= comm.finish then
+        if offset >= comm.start - 2 and offset <= comm.finish then
             return comm
         end
     end
@@ -1643,6 +1643,20 @@ local function tryComment(ast, text, offset, results)
     local word = findWord(text, offset)
     local doc  = getLuaDoc(ast, offset)
     if not word then
+        local comment = getComment(ast, offset)
+        if comment.type == 'comment.short'
+        or comment.type == 'comment.cshort' then
+            if comment.text == '' then
+                results[#results+1] = {
+                    label = '#region',
+                    kind  = define.CompletionItemKind.Snippet,
+                }
+                results[#results+1] = {
+                    label = '#endregion',
+                    kind  = define.CompletionItemKind.Snippet,
+                }
+            end
+        end
         return
     end
     if doc and doc.type ~= 'doc.comment' then

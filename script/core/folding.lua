@@ -90,6 +90,31 @@ local Care = {
         }
         results[#results+1] = folding
     end,
+    ['comment.short'] = function (source, text, results, status)
+        local ltext = source.text:lower()
+        if ltext:sub(1, #'region') == 'region'
+        or ltext:sub(1, #'#region') == '#region' then
+            if not status.regions then
+                status.regions = {}
+            end
+            status.regions[#status.regions+1] = source
+        elseif ltext:sub(1, #'endregion') == 'endregion'
+        or     ltext:sub(1, #'#endregion') == '#endregion' then
+            if not status.regions then
+                status.regions = {}
+            end
+            local start = table.remove(status.regions)
+            if not start then
+                return
+            end
+            results[#results+1] = {
+                start        = start.start,
+                finish       = source.finish,
+                kind         = 'region',
+                hideLastLine = true,
+            }
+        end
+    end,
     ['comment.long'] = function (source, text, results)
         local folding = {
             start  = source.start,
@@ -124,6 +149,7 @@ return function (uri)
         return nil
     end
     local regions = {}
+    local status = {}
 
     guide.eachSource(ast.ast, function (source)
         local tp = source.type
@@ -134,7 +160,7 @@ return function (uri)
     for _, source in ipairs(ast.comms) do
         local tp = source.type
         if Care[tp] then
-            Care[tp](source, text, regions)
+            Care[tp](source, text, regions, status)
         end
     end
 

@@ -1718,7 +1718,7 @@ function m.checkSameSimpleByDoc(status, obj, start, pushQueue, mode)
         pushQueue(obj.node, start + 1, true)
         return true
     elseif obj.type == 'doc.type.table' then
-        pushQueue(obj.node, start + 1, true)
+        pushQueue(obj.node, start, true)
         pushQueue(obj.value, start + 1, true)
         return true
     end
@@ -2178,6 +2178,72 @@ function m.checkSameSimpleAsSetValue(status, ref, start, pushQueue)
     end
 end
 
+local function getTableAndIndexIfIsForPairsKeyOrValue(ref)
+    if ref.type ~= 'local' then
+        return
+    end
+
+    if not ref.parent or ref.parent.type ~= 'in' then
+        return
+    end
+
+    if not ref.value or ref.value.type ~= 'select' then
+        return
+    end
+
+    local rootSelectObj = ref.value
+    if rootSelectObj.index ~= 1 and rootSelectObj.index ~= 2 then
+        return
+    end
+
+    if not rootSelectObj.vararg or rootSelectObj.vararg.type ~= 'call' then
+        return
+    end
+    local rootCallObj = rootSelectObj.vararg
+
+    if not rootCallObj.node or rootCallObj.node.type ~= 'call' then
+        return
+    end
+    local pairsCallObj = rootCallObj.node
+
+    if not pairsCallObj.node or pairsCallObj.node.type ~= 'getglobal'
+        or (pairsCallObj.node[1] ~= 'pairs' and pairsCallObj.node[1] ~= 'ipairs') then
+        return
+    end
+
+    if not pairsCallObj.args or not pairsCallObj.args[1] then
+        return
+    end
+    local tableObj = pairsCallObj.args[1]
+
+    return tableObj, rootSelectObj.index
+end
+
+function m.checkSameSimpleAsKeyOrValueInForParis(status, ref, start, pushQueue)
+    local tableObj, index = getTableAndIndexIfIsForPairsKeyOrValue(ref)
+    if not tableObj then
+        return
+    end
+
+    local newStatus = m.status(status)
+    m.searchRefs(newStatus, tableObj, 'def')
+    for _, def in ipairs(newStatus.results) do
+        if def.bindDocs then
+            for _, binddoc in ipairs(def.bindDocs) do
+                if binddoc.type == 'doc.type' then
+                    if binddoc.types[1] and binddoc.types[1].type == 'doc.type.table' then
+                        if index == 1 then
+                            pushQueue(binddoc.types[1].key, start, true)
+                        elseif index == 2 then
+                            pushQueue(binddoc.types[1].value, start, true)
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
 local function hasTypeName(doc, name)
     if doc.type ~= 'doc.type' then
         return false
@@ -2425,6 +2491,8 @@ function m.checkSameSimple(status, simple, ref, start, force, mode, pushQueue)
                 m.checkSameSimpleAsReturn(status, ref, i, pushQueue)
                 -- 检查形如 a = f 的情况
                 m.checkSameSimpleAsSetValue(status, ref, i, pushQueue)
+                -- 检查形如 for k,v in pairs()/ipairs() do end 的情况
+                m.checkSameSimpleAsKeyOrValueInForParis(status, ref, i, pushQueue)
             end
         end
         if i == #simple then

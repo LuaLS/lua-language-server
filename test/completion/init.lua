@@ -1221,10 +1221,6 @@ z$
             newText = '_ENV["z.b.c"]',
         },
     },
-    {
-        label = 'z',
-        kind = define.CompletionItemKind.Text,
-    },
 }
 
 TEST [[

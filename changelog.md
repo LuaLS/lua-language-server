@@ -1,6 +1,7 @@
 # changelog
 
 ## 1.10.0
+`2021-1-4`
 * `NEW` workspace: supports `.dll`(`.so`) in `require`
 * `NEW` folding: `---@class`, `--#region` and docs of function
 * `NEW` diagnostic: `count-down-loop`

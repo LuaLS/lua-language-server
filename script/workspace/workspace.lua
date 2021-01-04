@@ -13,11 +13,11 @@ local sp         = require 'bee.subprocess'
 
 local m = {}
 m.type = 'workspace'
-m.nativeVersion = -1
+m.nativeVersion  = -1
 m.libraryVersion = -1
-m.nativeMatcher = nil
-m.requireCache = {}
-m.matchOption = {
+m.nativeMatcher  = nil
+m.requireCache   = {}
+m.matchOption    = {
     ignoreCase = platform.OS == 'Windows',
 }
 
@@ -133,7 +133,7 @@ function m.getLibraryMatchers()
     end
 
     local librarys = {}
-    for path, pattern in pairs(config.config.workspace.library) do
+    for path in pairs(config.config.workspace.library) do
         librarys[m.normalize(path)] = true
     end
     if library.metaPath then

@@ -1631,6 +1631,9 @@ local function tryLuaDoc(ast, text, offset, results)
 end
 
 local function tryComment(ast, text, offset, results)
+    if #results > 0 then
+        return
+    end
     local word = findWord(text, offset)
     local doc  = getLuaDoc(ast, offset)
     if not word then

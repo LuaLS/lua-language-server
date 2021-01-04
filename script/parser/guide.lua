@@ -1470,10 +1470,10 @@ function m.checkSameSimpleInValueOfSetMetaTable(status, func, start, pushQueue)
     end
     local call = func.parent
     local args = call.args
-    local obj = args[1]
     if not args then
         return
     end
+    local obj = args[1]
     local mt = args[2]
     if obj then
         pushQueue(obj, start, true)

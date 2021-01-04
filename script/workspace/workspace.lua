@@ -134,16 +134,16 @@ function m.getLibraryMatchers()
 
     local librarys = {}
     for path, pattern in pairs(config.config.workspace.library) do
-        librarys[m.normalize(path)] = pattern
+        librarys[m.normalize(path)] = true
     end
     if library.metaPath then
         librarys[m.normalize(library.metaPath)] = true
     end
     m.libraryMatchers = {}
-    for path, pattern in pairs(librarys) do
+    for path in pairs(librarys) do
         if fs.exists(fs.path(path)) then
             local nPath = fs.absolute(fs.path(path)):string()
-            local matcher = glob.gitignore(pattern, m.matchOption, globInteferFace)
+            local matcher = glob.gitignore(true, m.matchOption, globInteferFace)
             if platform.OS == 'Windows' then
                 matcher:setOption 'ignoreCase'
             end

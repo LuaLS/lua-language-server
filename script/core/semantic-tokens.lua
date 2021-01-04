@@ -187,6 +187,16 @@ return function (uri, start, finish)
         end
     end)
 
+    for _, comm in ipairs(ast.comms) do
+        if comm.semantic then
+            results[#results+1] = {
+                start  = comm.start,
+                finish = comm.finish,
+                type   = define.TokenTypes.comment,
+            }
+        end
+    end
+
     table.sort(results, function (a, b)
         return a.start < b.start
     end)

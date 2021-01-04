@@ -48,11 +48,40 @@ local function countOverLoadArgs(source, doc)
     return result
 end
 
+local function getFuncArgs(func)
+    local funcArgs
+    local defs = vm.getDefs(func)
+    for _, def in ipairs(defs) do
+        if def.value then
+            def = def.value
+        end
+        if def.type == 'function' then
+            local args = countFuncArgs(def)
+            if not funcArgs or args > funcArgs then
+                funcArgs = args
+            end
+            if def.bindDocs then
+                for _, doc in ipairs(def.bindDocs) do
+                    if doc.type == 'doc.overload' then
+                        args = countOverLoadArgs(def, doc)
+                        if not funcArgs or args > funcArgs then
+                            funcArgs = args
+                        end
+                    end
+                end
+            end
+        end
+    end
+    return funcArgs
+end
+
 return function (uri, callback)
     local ast = files.getAst(uri)
     if not ast then
         return
     end
+
+    local cache = vm.getCache 'redundant-parameter'
 
     guide.eachSourceType(ast.ast, 'call', function (source)
         local callArgs = countCallArgs(source)
@@ -61,27 +90,12 @@ return function (uri, callback)
         end
 
         local func = source.node
-        local funcArgs
-        local defs = vm.getDefs(func)
-        for _, def in ipairs(defs) do
-            if def.value then
-                def = def.value
-            end
-            if def.type == 'function' then
-                local args = countFuncArgs(def)
-                if not funcArgs or args > funcArgs then
-                    funcArgs = args
-                end
-                if def.bindDocs then
-                    for _, doc in ipairs(def.bindDocs) do
-                        if doc.type == 'doc.overload' then
-                            args = countOverLoadArgs(def, doc)
-                            if not funcArgs or args > funcArgs then
-                                funcArgs = args
-                            end
-                        end
-                    end
-                end
+        local funcArgs = cache[func]
+        if funcArgs == nil then
+            funcArgs = getFuncArgs(func) or false
+            local refs = vm.getRefs(func, 0)
+            for _, ref in ipairs(refs) do
+                cache[ref] = funcArgs
             end
         end
 

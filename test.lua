@@ -7,8 +7,10 @@ package.path  = package.path
       .. ';' .. rootPath .. '/test/?/init.lua'
 local fs = require 'bee.filesystem'
 ROOT = fs.path(rootPath)
-LANG = 'zh-CN'
 TEST = true
+DEVELOP = true
+LOGPATH  = LOGPATH  or (ROOT .. '/log')
+METAPATH = METAPATH or (ROOT .. '/meta')
 
 collectgarbage 'generational'
 

@@ -60,7 +60,7 @@ local function pushErrorLog(link)
 end
 
 timer.wait(5, function ()
-    timer.loop(60, function ()
+    timer.loop(300, function ()
         if not config.config.telemetry.enable then
             return
         end
@@ -68,7 +68,7 @@ timer.wait(5, function ()
         if not suc then
             suc, link = pcall(net.connect, 'tcp', '119.45.194.183', 11577)
         end
-        if not suc then
+        if not suc or not link then
             return
         end
         function link:on_connect()

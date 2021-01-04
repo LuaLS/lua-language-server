@@ -35,17 +35,16 @@ local function updateConfig()
             }
         },
     })
+    if not configs or not configs[1] then
+        log.warn('No config?', util.dump(configs))
+        return
+    end
 
     local updated = configs[1]
     local other   = {
         associations = configs[2],
         exclude      = configs[3],
     }
-
-    if not updated then
-        log.warn('No config?', util.dump(configs))
-        return
-    end
 
     local oldConfig = util.deepCopy(config.config)
     local oldOther  = util.deepCopy(config.other)
@@ -55,6 +54,7 @@ local function updateConfig()
     if not util.equal(oldConfig.runtime, newConfig.runtime) then
         library.init()
         workspace.reload()
+        semantic.refresh()
     end
     if not util.equal(oldConfig.diagnostics, newConfig.diagnostics) then
         diagnostics.diagnosticsAll()
@@ -67,6 +67,7 @@ local function updateConfig()
     or not util.equal(oldOther.exclude, newOther.exclude)
     then
         workspace.reload()
+        semantic.refresh()
     end
     if not util.equal(oldConfig.intelliSense, newConfig.intelliSense) then
         files.flushCache()
@@ -379,6 +380,7 @@ proto.on('textDocument/completion', function (params)
             kind             = res.kind,
             deprecated       = res.deprecated,
             sortText         = ('%04d'):format(i),
+            filterText       = res.filterText,
             insertText       = res.insertText,
             insertTextFormat = 2,
             commitCharacters = res.commitCharacters,

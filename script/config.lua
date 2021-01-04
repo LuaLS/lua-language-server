@@ -137,6 +137,7 @@ local ConfigTemplate = {
         callSnippet     = {'Disable', String},
         keywordSnippet  = {'Replace', String},
         displayContext  = {6,         Integer},
+        workspaceWord   = {true,      Boolean},
     },
     signatureHelp = {
         enable          = {true,      Boolean},

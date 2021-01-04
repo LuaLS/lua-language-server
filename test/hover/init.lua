@@ -878,7 +878,7 @@ end
 ]]
 [[
 function a(b: table)
-  -> any
+  -> table
 ]]
 
 TEST [[
@@ -1264,7 +1264,7 @@ end
 local <?x?> = f()
 ]]
 [[
-local x: integer
+local x: any
 ]]
 
 TEST [[

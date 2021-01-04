@@ -592,7 +592,8 @@ local function checkTableField(ast, word, start, results)
     end)
 end
 
-local function checkCommon(word, text, offset, results)
+local function checkCommon(ast, word, text, offset, results)
+    local myUri = ast.uri
     local used = {}
     for _, result in ipairs(results) do
         used[result.label] = true
@@ -614,7 +615,8 @@ local function checkCommon(word, text, offset, results)
                 end
             end
             for _, str in ipairs(cache.commonWords) do
-                if not used[str] and str ~= word then
+                if  not used[str]
+                and (str ~= word or not files.eq(myUri, uri)) then
                     used[str] = true
                     if matchKey(word, str) then
                         results[#results+1] = {
@@ -640,8 +642,8 @@ local function checkCommon(word, text, offset, results)
             end
         end
     else
-        for str in text:gmatch '([%a_][%w_]*)' do
-            if not used[str] and str ~= word then
+        for str, pos in text:gmatch '([%a_][%w_]*)()' do
+            if not used[str] and pos - 1 ~= offset then
                 used[str] = true
                 if matchKey(word, str) then
                     results[#results+1] = {
@@ -1184,7 +1186,7 @@ local function tryWord(ast, text, offset, results)
             end
         end
         if not hasSpace then
-            checkCommon(word, text, offset, results)
+            checkCommon(ast, word, text, offset, results)
         end
     end
 end

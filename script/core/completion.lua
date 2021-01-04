@@ -1633,7 +1633,6 @@ end
 local function tryComment(ast, text, offset, results)
     local word = findWord(text, offset)
     local doc  = getLuaDoc(ast, offset)
-    local line = text:sub(doc.start, offset)
     if not word then
         return
     end

@@ -607,7 +607,7 @@ local function checkCommon(ast, word, text, offset, results)
             if not cache.commonWords then
                 cache.commonWords = {}
                 local mark = {}
-                for str in files.getText(uri):gmatch '([%a_][%w_]*)' do
+                for str in files.getText(uri):gmatch '([%a_][%w_]+)' do
                     if not mark[str] then
                         mark[str] = true
                         cache.commonWords[#cache.commonWords+1] = str
@@ -615,7 +615,8 @@ local function checkCommon(ast, word, text, offset, results)
                 end
             end
             for _, str in ipairs(cache.commonWords) do
-                if  not used[str]
+                if  #str >= 3
+                and not used[str]
                 and (str ~= word or not files.eq(myUri, uri)) then
                     used[str] = true
                     if matchKey(word, str) then
@@ -630,7 +631,7 @@ local function checkCommon(ast, word, text, offset, results)
         for uri in files.eachDll() do
             local words = files.getDllWords(uri) or {}
             for _, str in ipairs(words) do
-                if not used[str] and str ~= word then
+                if #str >= 3 and not used[str] and str ~= word then
                     used[str] = true
                     if matchKey(word, str) then
                         results[#results+1] = {
@@ -642,8 +643,8 @@ local function checkCommon(ast, word, text, offset, results)
             end
         end
     else
-        for str, pos in text:gmatch '([%a_][%w_]*)()' do
-            if not used[str] and pos - 1 ~= offset then
+        for str, pos in text:gmatch '([%a_][%w_]+)()' do
+            if #str >= 3 and not used[str] and pos - 1 ~= offset then
                 used[str] = true
                 if matchKey(word, str) then
                     results[#results+1] = {

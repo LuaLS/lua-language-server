@@ -317,3 +317,16 @@ for k, v in pairs(v1) do
     print(v.bar1)
 end
 ]]
+
+TEST [[
+---@class Foo
+local Foo = {}
+function Foo:<!bar1!>() end
+
+---@type table<number, table<number, Foo>>
+local v1
+for i, v in ipairs(v1) do
+    local v2 = v[1]
+    print(v2.<?bar1?>)
+end
+]]

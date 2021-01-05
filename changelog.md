@@ -2,6 +2,7 @@
 
 ## 1.11.0
 * `NEW` `Lua.runtime.plugin`
+* `NEW` intelli-scense: improved `m.f = function (self) end` from `self` to `m`
 * `CHG` performance optimization
 * `CHG` completion: improve performance of workspace words
 * `FIX` hover: tail comments may be cutted

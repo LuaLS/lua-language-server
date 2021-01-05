@@ -1506,6 +1506,29 @@ function m.checkSameSimpleInSpecialBranch(status, obj, start, pushQueue)
     end
 end
 
+function m.checkSameSimpleInParamSelf(status, obj, start, pushQueue)
+    if obj.type ~= 'getlocal' or obj[1] ~= 'self' then
+        return
+    end
+    local node = obj.node
+    if node.tag == 'self' then
+        return
+    end
+    if node.parent.type ~= 'funcargs' then
+        return
+    end
+    local func = node.parent.parent
+    if func.type ~= 'function' or func.parent.type ~= 'setfield' then
+        return
+    end
+    local fieldNode = func.parent.node
+    local newStatus = m.status(status)
+    m.searchRefs(newStatus, fieldNode, 'ref')
+    for _, ref in ipairs(newStatus.results) do
+        pushQueue(ref, start, true)
+    end
+end
+
 local function appendValidGenericType(results, status, typeName, obj)
     if typeName.parent.type == 'doc.type.typeliteral' then
         if obj.type == 'string' and status.interface.docType then
@@ -2415,6 +2438,8 @@ function m.checkSameSimple(status, simple, ref, start, force, mode, pushQueue)
             m.checkSameSimpleInValueOfCallMetaTable(status, ref, i, pushQueue)
             -- 检查自己是特殊变量的分支的情况
             m.checkSameSimpleInSpecialBranch(status, ref, i, pushQueue)
+            -- self 的特殊处理
+            m.checkSameSimpleInParamSelf(status, ref, i, pushQueue)
             if cmode == 'ref' then
                 -- 检查形如 { a = f } 的情况
                 m.checkSameSimpleAsTableField(status, ref, i, pushQueue)

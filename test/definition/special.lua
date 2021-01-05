@@ -124,3 +124,13 @@ end
 
 obj:<?x?>()
 ]]
+
+TEST [[
+local mt = {}
+
+mt.<!xx!> = 1
+
+mt.yy = function (self)
+    print(self.<?xx?>)
+end
+]]

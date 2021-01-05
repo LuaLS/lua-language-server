@@ -94,7 +94,11 @@ local function getBindComment(source, docGroup, base)
                 continue = true
                 lines = {}
             end
-            lines[#lines+1] = doc.comment.text:sub(2)
+            if doc.comment.text:sub(1, 1) == '-' then
+                lines[#lines+1] = doc.comment.text:sub(2)
+            else
+                lines[#lines+1] = doc.comment.text
+            end
         elseif doc == base then
             break
         else

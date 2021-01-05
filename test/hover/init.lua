@@ -1510,3 +1510,10 @@ local v: C {
     x: string,
 }
 ]]
+
+TEST [[
+local <?x?>--测试
+]]
+[[
+local x: any
+]]

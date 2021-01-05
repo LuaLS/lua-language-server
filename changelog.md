@@ -1,6 +1,8 @@
 # changelog
 
 ## 1.11.0
+* `CHG` completion: improve performance of workspace words
+* `FIX` hover: tail comments may be cutted
 * `FIX` runtime errors
 
 ## 1.10.0

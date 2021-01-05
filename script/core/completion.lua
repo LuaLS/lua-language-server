@@ -601,23 +601,30 @@ local function checkCommon(ast, word, text, offset, results)
     for _, data in ipairs(keyWordMap) do
         used[data[1]] = true
     end
-    if config.config.completion.workspaceWord then
+    if config.config.completion.workspaceWord and #word >= 2 then
+        local myHead = word:sub(1, 2)
         for uri in files.eachFile() do
+            if myUri and files.eq(myUri, uri) then
+                goto CONTINUE
+            end
             local cache = files.getCache(uri)
             if not cache.commonWords then
                 cache.commonWords = {}
                 local mark = {}
                 for str in files.getText(uri):gmatch '([%a_][%w_]+)' do
-                    if not mark[str] then
+                    if #str >= 3 and not mark[str] then
                         mark[str] = true
-                        cache.commonWords[#cache.commonWords+1] = str
+                        local head = str:sub(1, 2)
+                        if not cache.commonWords[head] then
+                            cache.commonWords[head] = {}
+                        end
+                        cache.commonWords[head][#cache.commonWords[head]+1] = str
                     end
                 end
             end
-            for _, str in ipairs(cache.commonWords) do
-                if  #str >= 3
-                and not used[str]
-                and (str ~= word or (myUri and not files.eq(myUri, uri))) then
+            for _, str in ipairs(cache.commonWords[myHead] or {}) do
+                if  not used[str]
+                and str ~= word then
                     used[str] = true
                     if matchKey(word, str) then
                         results[#results+1] = {
@@ -627,6 +634,7 @@ local function checkCommon(ast, word, text, offset, results)
                     end
                 end
             end
+            ::CONTINUE::
         end
         for uri in files.eachDll() do
             local words = files.getDllWords(uri) or {}
@@ -642,16 +650,15 @@ local function checkCommon(ast, word, text, offset, results)
                 end
             end
         end
-    else
-        for str, pos in text:gmatch '([%a_][%w_]+)()' do
-            if #str >= 3 and not used[str] and pos - 1 ~= offset then
-                used[str] = true
-                if matchKey(word, str) then
-                    results[#results+1] = {
-                        label = str,
-                        kind  = define.CompletionItemKind.Text,
-                    }
-                end
+    end
+    for str, pos in text:gmatch '([%a_][%w_]+)()' do
+        if #str >= 3 and not used[str] and pos - 1 ~= offset then
+            used[str] = true
+            if matchKey(word, str) then
+                results[#results+1] = {
+                    label = str,
+                    kind  = define.CompletionItemKind.Text,
+                }
             end
         end
     end

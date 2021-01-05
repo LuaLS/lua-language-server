@@ -1663,12 +1663,20 @@ function m.checkSameSimpleOfRefByDocSource(status, obj, start, pushQueue, mode)
     end
 end
 
-local function getArrayLevel(obj)
+local function getArrayOrTableLevel(obj)
     local level = 0
     while true do
         local parent = obj.parent
         if parent.type == 'doc.type.array' then
             level = level + 1
+        elseif parent.type == 'doc.type.table' then
+            if obj.type == 'doc.type' then
+                level = level + 1
+            -- else 只存在 obj.type == 'doc.type.name' 的情况，即 table<k,v> 中的 table，这种是不需要再增加层级的
+            end
+        elseif parent.type == 'doc.type' and parent.parent and parent.parent.type == 'doc.type.table' then
+            level = level + 1
+            parent = parent.parent
         else
             break
         end
@@ -1725,12 +1733,10 @@ function m.checkSameSimpleByDoc(status, obj, start, pushQueue, mode)
         for _, res in ipairs(pieceResult) do
             pushQueue(res, start, true)
         end
-        local parentDocTypeTable = m.getParentDocTypeTable(obj)
-        if not parentDocTypeTable then
-            local state = m.getDocState(obj)
-            if state.type == 'doc.type' and mode == 'ref' then
-                m.checkSameSimpleOfRefByDocSource(status, state, start - getArrayLevel(obj), pushQueue, mode)
-            end
+
+        local state = m.getDocState(obj)
+        if state.type == 'doc.type' and mode == 'ref' then
+            m.checkSameSimpleOfRefByDocSource(status, state, start - getArrayOrTableLevel(obj), pushQueue, mode)
         end
         return true
     elseif obj.type == 'doc.field' then

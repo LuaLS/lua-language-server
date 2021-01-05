@@ -16,6 +16,11 @@ local function getTypesOfFile(uri)
         or src.type == 'doc.class.name'
         or src.type == 'doc.extends.name'
         or src.type == 'doc.alias.name' then
+            if src.type == 'doc.type.name' then
+                if guide.getParentDocTypeTable(src) then
+                    return
+                end
+            end
             local name = src[1]
             if name then
                 if not types[name] then

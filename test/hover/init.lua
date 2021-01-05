@@ -1171,7 +1171,7 @@ TEST [[
 local <?x?>
 ]]
 [[
-local x: table<ClassA, ClassB> {}
+local x: table<ClassA, ClassB>
 ]]
 
 --TEST [[

@@ -105,6 +105,7 @@ local ConfigTemplate = {
         meta              = {'${version} ${language}', String},
         unicodeName       = {false,     Boolean},
         nonstandardSymbol = {{},        Str2Hash ';'},
+        plugin            = {'.vscode/lua/plugin.lua', String},
     },
     diagnostics = {
         enable          = {true, Boolean},

@@ -15,6 +15,7 @@ local furi      = require 'file-uri'
 local pub       = require 'pub'
 local fs        = require 'bee.filesystem'
 local lang      = require 'language'
+local plugin    = require 'plugin'
 
 local function updateConfig()
     local diagnostics = require 'provider.diagnostic'
@@ -55,14 +56,12 @@ local function updateConfig()
         library.init()
         workspace.reload()
         semantic.refresh()
+        plugin.init()
     end
     if not util.equal(oldConfig.diagnostics, newConfig.diagnostics) then
         diagnostics.diagnosticsAll()
     end
-    if not util.equal(oldConfig.plugin, newConfig.plugin) then
-    end
     if not util.equal(oldConfig.workspace, newConfig.workspace)
-    or not util.equal(oldConfig.plugin, newConfig.plugin)
     or not util.equal(oldOther.associations, newOther.associations)
     or not util.equal(oldOther.exclude, newOther.exclude)
     then

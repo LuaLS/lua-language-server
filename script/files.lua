@@ -7,6 +7,8 @@ local proto    = require 'proto'
 local lang     = require 'language'
 local await    = require 'await'
 local timer    = require 'timer'
+local plugin   = require 'plugin'
+local util     = require 'utility'
 
 local m = {}
 
@@ -116,6 +118,10 @@ function m.setText(uri, text)
             version = 0,
         }
         create = true
+    end
+    local suc, newText = plugin.dispatch('OnSetText', originUri, text)
+    if suc then
+        text = newText
     end
     local file = m.fileMap[uri]
     if file.text == text then

@@ -1,6 +1,7 @@
 # changelog
 
 ## 1.11.0
+`2021-1-5`
 * `NEW` `Lua.runtime.plugin`
 * `NEW` intelli-scense: improved `m.f = function (self) end` from `self` to `m`
 * `CHG` performance optimization

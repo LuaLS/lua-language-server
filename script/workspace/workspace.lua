@@ -29,7 +29,7 @@ function m.init(uri)
     end
     m.uri  = uri
     m.path = m.normalize(furi.decode(uri))
-    local logPath = ROOT / 'log' / (uri:gsub('[/:]+', '_') .. '.log')
+    local logPath = fs.path(LOGPATH) / (uri:gsub('[/:]+', '_') .. '.log')
     log.info('Log path: ', logPath)
     log.init(ROOT, logPath)
 end
@@ -66,7 +66,7 @@ function m.getNativeMatcher()
     if not m.path then
         return nil
     end
-    if m.nativeVersion == config.version then
+    if m.nativeMatcher then
         return m.nativeMatcher
     end
 
@@ -128,7 +128,7 @@ end
 
 --- 创建代码库筛选器
 function m.getLibraryMatchers()
-    if m.libraryVersion == config.version then
+    if m.libraryMatchers then
         return m.libraryMatchers
     end
 
@@ -172,31 +172,48 @@ end
 local function loadFileFactory(root, progress, isLibrary)
     return function (path)
         local uri = furi.encode(path)
-        if not files.isLua(uri) then
-            return
-        end
-        if not isLibrary and progress.preload >= config.config.workspace.maxPreload then
-            if not m.hasHitMaxPreload then
-                m.hasHitMaxPreload = true
-                proto.notify('window/showMessage', {
-                    type = 3,
-                    message = lang.script('MWS_MAX_PRELOAD', config.config.workspace.maxPreload),
-                })
+        if files.isLua(uri) then
+            if not isLibrary and progress.preload >= config.config.workspace.maxPreload then
+                if not m.hasHitMaxPreload then
+                    m.hasHitMaxPreload = true
+                    proto.notify('window/showMessage', {
+                        type = 3,
+                        message = lang.script('MWS_MAX_PRELOAD', config.config.workspace.maxPreload),
+                    })
+                end
+                return
             end
-            return
-        end
-        if not isLibrary then
-            progress.preload = progress.preload + 1
-        end
-        progress.max = progress.max + 1
-        pub.task('loadFile', uri, function (text)
-            progress.read = progress.read + 1
-            --log.info(('Preload file at: %s , size = %.3f KB'):format(uri, #text / 1000.0))
-            if isLibrary then
-                files.setLibraryPath(uri, root)
+            if not isLibrary then
+                progress.preload = progress.preload + 1
             end
-            files.setText(uri, text)
-        end)
+            progress.max = progress.max + 1
+            pub.task('loadFile', uri, function (text)
+                progress.read = progress.read + 1
+                if text then
+                    log.info(('Preload file at: %s , size = %.3f KB'):format(uri, #text / 1000.0))
+                    if isLibrary then
+                        log.info('++++As library of:', root)
+                        files.setLibraryPath(uri, root)
+                    end
+                    files.setText(uri, text)
+                else
+                    files.remove(uri)
+                end
+            end)
+        end
+        if files.isDll(uri) then
+            progress.max = progress.max + 1
+            pub.task('loadFile', uri, function (content)
+                progress.read = progress.read + 1
+                if content then
+                    log.info(('Preload file at: %s , size = %.3f KB'):format(uri, #content / 1000.0))
+                    if isLibrary then
+                        log.info('++++As library of:', root)
+                    end
+                    files.saveDll(uri, content)
+                end
+            end)
+        end
     end
 end
 
@@ -239,6 +256,8 @@ end
 function m.awaitPreload()
     await.close 'preload'
     await.setID 'preload'
+    m.libraryMatchers = nil
+    m.nativeMatcher   = nil
     local progress = {
         max     = 0,
         read    = 0,
@@ -249,10 +268,12 @@ function m.awaitPreload()
     local native          = m.getNativeMatcher()
     local librarys        = m.getLibraryMatchers()
     if native then
+        log.info('Scan files at:', m.path)
         native:scan(m.path, nativeLoader)
     end
     for _, library in ipairs(librarys) do
         local libraryLoader = loadFileFactory(library.path, progress, true)
+        log.info('Scan library at:', library.path)
         library.matcher:scan(library.path, libraryLoader)
     end
 
@@ -307,6 +328,15 @@ function m.findUrisByRequirePath(path)
     local results = {}
     local mark = {}
     local searchers = {}
+    for uri in files.eachDll() do
+        local opens = files.getDllOpens(uri) or {}
+        for _, open in ipairs(opens) do
+            if open == path then
+                results[#results+1] = uri
+            end
+        end
+    end
+
     local input = path:gsub('%.', '/')
                       :gsub('%%', '%%%%')
     for _, luapath in ipairs(config.config.runtime.path) do

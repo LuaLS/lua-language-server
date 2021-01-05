@@ -105,3 +105,7 @@ end
 function vm.interface.getSearchDepth()
     return config.config.intelliSense.searchDepth
 end
+
+function vm.interface.pulse()
+    await.delay()
+end

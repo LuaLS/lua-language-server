@@ -1,6 +1,27 @@
 # changelog
 
+## 1.10.0
+* `NEW` workspace: supports `.dll`(`.so`) in `require`
+* `CHG` supports `~` in command line
+* `CHG` completion: improve workspace words
+* `FIX` [#339](https://github.com/sumneko/lua-language-server/issues/339)
+
+## 1.9.0
+`2020-12-31`
+* `NEW` YEAR! Peace and love!
+* `NEW` specify path of `log` and `meta` by `--logpath=xxx` and `--metapath=XXX` in command line
+* `NEW` completion: worksapce word
+* `NEW` completion: show words in comment
+* `NEW` completion: generate function documentation
+* `CHG` got arg after script name: `lua-language-server.exe main.lua --logpath=D:\log --metapath=D:\meta --develop=false`
+* `FIX` runtime errors
+
+## 1.8.2
+`2020-12-29`
+* `CHG` performance optimization
+
 ## 1.8.1
+`2020-12-24`
 * `FIX` telemetry: connect failed caused not working
 
 ## 1.8.0

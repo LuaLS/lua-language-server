@@ -5,7 +5,7 @@ local client = require 'provider.client'
 local m = {}
 
 local function allWords()
-    local str = [[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.:('"[,#*@|= ]]
+    local str = [[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.:('"[,#*@|=- ]]
     local list = {}
     for c in str:gmatch '.' do
         list[#list+1] = c
@@ -32,7 +32,15 @@ function m.getIniter()
         documentSymbolProvider = true,
         workspaceSymbolProvider = true,
         documentHighlightProvider = true,
-        codeActionProvider = true,
+        codeActionProvider = {
+            codeActionKinds = {
+                '',
+                'quickfix',
+                'refactor.rewrite',
+                'refactor.extract',
+            },
+            resolveProvider = false,
+        },
         signatureHelpProvider = {
             triggerCharacters = { '(', ',' },
         },

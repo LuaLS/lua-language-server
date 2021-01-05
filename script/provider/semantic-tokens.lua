@@ -1,6 +1,7 @@
 local proto          = require 'proto'
 local define         = require 'proto.define'
 local client         = require 'provider.client'
+local json           = require "json"
 
 local isEnable = false
 
@@ -58,7 +59,13 @@ local function disable()
     })
 end
 
+local function refresh()
+    log.debug('Refresh semantic tokens.')
+    proto.notify('workspace/semanticTokens/refresh', json.null)
+end
+
 return {
-    enable = enable,
+    enable  = enable,
     disable = disable,
+    refresh = refresh,
 }

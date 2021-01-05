@@ -333,10 +333,11 @@ local Defs = {
                 }
             }
         end
-        return {
-            type   = 'nonstandardSymbol.comment',
-            start  = start1,
-            finish = finish2 - 1,
+        PushComment {
+            start    = start1,
+            finish   = finish2 - 1,
+            semantic = true,
+            text     = '',
         }
     end,
     CCommentPrefix = function (start, finish, commentFinish)
@@ -356,10 +357,11 @@ local Defs = {
                 }
             }
         end
-        return {
-            type   = 'nonstandardSymbol.comment',
-            start  = start,
-            finish = commentFinish - 1,
+        PushComment {
+            start    = start,
+            finish   = commentFinish - 1,
+            semantic = true,
+            text     = '',
         }
     end,
     String = function (start, quote, str, finish)

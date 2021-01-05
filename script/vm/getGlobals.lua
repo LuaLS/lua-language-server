@@ -238,5 +238,3 @@ files.watch(function (ev, uri)
         end
     end
 end)
-
-require 'tracy'.enable()

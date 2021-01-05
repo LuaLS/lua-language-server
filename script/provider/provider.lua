@@ -353,6 +353,7 @@ end)
 proto.on('textDocument/completion', function (params)
     --log.info(util.dump(params))
     local core = require 'core.completion'
+    --log.debug('textDocument/completion')
     --log.debug('completion:', params.context and params.context.triggerKind, params.context and params.context.triggerCharacter)
     local uri  = params.textDocument.uri
     if not files.exists(uri) then

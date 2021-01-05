@@ -103,6 +103,7 @@ function m.setText(uri, text)
     if not text then
         return
     end
+    --log.debug('setText', uri)
     local originUri = uri
     uri = getUriKey(uri)
     local create
@@ -284,7 +285,12 @@ function m.compileAst(uri, text)
     if state then
         state.uri = uri
         state.ast.uri = uri
+        local clock = os.clock()
         parser:luadoc(state)
+        local passed = os.clock() - clock
+        if passed > 0.1 then
+            log.warn(('Parse LuaDoc of [%s] takes [%.3f] sec, size [%.3f] kb.'):format(uri, passed, #text / 1000))
+        end
         return state
     else
         log.error(err)

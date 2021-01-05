@@ -13,7 +13,9 @@ function m.dispatch(event, ...)
     if type(method) ~= 'function' then
         return false
     end
+    tracy.ZoneBeginN('plugin dispatch:' .. event)
     local suc, res1, res2 = xpcall(method, log.error, ...)
+    tracy.ZoneEnd()
     if suc then
         return true, res1, res2
     end

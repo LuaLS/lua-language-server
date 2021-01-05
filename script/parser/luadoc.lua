@@ -992,28 +992,43 @@ local function bindGeneric(binded)
     end
 end
 
-local function bindDocsBetween(state, binded, bindSources, start, finish)
-    guide.eachSourceBetween(state.ast, start, finish, function (src)
-        if src.start and src.start < start then
-            return
+local function bindDocsBetween(sources, binded, bindSources, start, finish)
+    -- 用二分法找到第一个
+    local max = #sources
+    local index
+    local left  = 1
+    local right = max
+    for _ = 1, 1000 do
+        index = left + (right - left) // 2
+        if index <= left then
+            index = left
+            break
+        elseif index >= right then
+            index = right
+            break
         end
-        if src.type == 'local'
-        or src.type == 'setlocal'
-        or src.type == 'setglobal'
-        or src.type == 'setfield'
-        or src.type == 'setmethod'
-        or src.type == 'setindex'
-        or src.type == 'tablefield'
-        or src.type == 'tableindex'
-        or src.type == 'function'
-        or src.type == '...' then
-            src.bindDocs = binded
-            bindSources[#bindSources+1] = src
+        local src = sources[index]
+        if src.start < start then
+            left = index
+        else
+            right = index
         end
-    end)
+    end
+    for i = index - 1, max do
+        local src = sources[i]
+        if src then
+            if src.start > finish then
+                break
+            end
+            if src.start >= start then
+                src.bindDocs = binded
+                bindSources[#bindSources+1] = src
+            end
+        end
+    end
 end
 
-local function bindDoc(state, lns, binded)
+local function bindDoc(sources, lns, binded)
     if not binded then
         return
     end
@@ -1030,24 +1045,42 @@ local function bindDoc(state, lns, binded)
     local row = guide.positionOf(lns, lastDoc.finish)
     local cstart, cfinish  = guide.lineRange(lns, row)
     local nstart, nfinish = guide.lineRange(lns, row + 1)
-    bindDocsBetween(state, binded, bindSources, cstart, cfinish)
+    bindDocsBetween(sources, binded, bindSources, cstart, cfinish)
     if #bindSources == 0 then
-        bindDocsBetween(state, binded, bindSources, nstart, nfinish)
+        bindDocsBetween(sources, binded, bindSources, nstart, nfinish)
     end
 end
 
 local function bindDocs(state)
     local lns = lines(nil, state.lua)
+    local sources = {}
+    guide.eachSource(state.ast, function (src)
+        if src.type == 'local'
+        or src.type == 'setlocal'
+        or src.type == 'setglobal'
+        or src.type == 'setfield'
+        or src.type == 'setmethod'
+        or src.type == 'setindex'
+        or src.type == 'tablefield'
+        or src.type == 'tableindex'
+        or src.type == 'function'
+        or src.type == '...' then
+            sources[#sources+1] = src
+        end
+    end)
+    table.sort(sources, function (a, b)
+        return a.start < b.start
+    end)
     local binded
     for _, doc in ipairs(state.ast.docs) do
         if not isNextLine(lns, binded, doc) then
-            bindDoc(state, lns, binded)
+            bindDoc(sources, lns, binded)
             binded = {}
             state.ast.docs.groups[#state.ast.docs.groups+1] = binded
         end
         binded[#binded+1] = doc
     end
-    bindDoc(state, lns, binded)
+    bindDoc(sources, lns, binded)
 end
 
 return function (_, state)

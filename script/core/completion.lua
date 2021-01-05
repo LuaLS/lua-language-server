@@ -604,6 +604,9 @@ local function checkCommon(ast, word, text, offset, results)
     if config.config.completion.workspaceWord and #word >= 2 then
         local myHead = word:sub(1, 2)
         for uri in files.eachFile() do
+            if #results >= 100 then
+                break
+            end
             if myUri and files.eq(myUri, uri) then
                 goto CONTINUE
             end
@@ -623,6 +626,9 @@ local function checkCommon(ast, word, text, offset, results)
                 end
             end
             for _, str in ipairs(cache.commonWords[myHead] or {}) do
+                if #results >= 100 then
+                    break
+                end
                 if  not used[str]
                 and str ~= word then
                     used[str] = true
@@ -637,8 +643,14 @@ local function checkCommon(ast, word, text, offset, results)
             ::CONTINUE::
         end
         for uri in files.eachDll() do
+            if #results >= 100 then
+                break
+            end
             local words = files.getDllWords(uri) or {}
             for _, str in ipairs(words) do
+                if #results >= 100 then
+                    break
+                end
                 if #str >= 3 and not used[str] and str ~= word then
                     used[str] = true
                     if matchKey(word, str) then
@@ -652,6 +664,9 @@ local function checkCommon(ast, word, text, offset, results)
         end
     end
     for str, pos in text:gmatch '([%a_][%w_]+)()' do
+        if #results >= 100 then
+            break
+        end
         if #str >= 3 and not used[str] and pos - 1 ~= offset then
             used[str] = true
             if matchKey(word, str) then
@@ -1216,7 +1231,9 @@ local function trySymbol(ast, text, offset, results)
     or symbol == ':' then
         local parent, oop = findParent(ast, text, start)
         if parent then
+            tracy.ZoneBeginN 'completion.trySymbol'
             checkField(ast, '', start, offset, parent, oop, results)
+            tracy.ZoneEnd()
         end
     end
     if symbol == '(' then
@@ -1673,10 +1690,15 @@ local function tryComment(ast, text, offset, results)
 end
 
 local function completion(uri, offset)
+    tracy.ZoneBeginN 'completion.getAst'
     local ast = files.getAst(uri)
+    tracy.ZoneEnd()
+    tracy.ZoneBeginN 'completion.getText'
     local text = files.getText(uri)
+    tracy.ZoneEnd()
     local results = {}
     clearStack()
+    tracy.ZoneBeginN 'completion'
     if ast then
         if getComment(ast, offset) then
             tryLuaDoc(ast, text, offset, results)
@@ -1694,6 +1716,7 @@ local function completion(uri, offset)
             checkCommon(ast, word, text, offset, results)
         end
     end
+    tracy.ZoneEnd()
 
     if #results == 0 then
         return nil

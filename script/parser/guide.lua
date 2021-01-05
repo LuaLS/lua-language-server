@@ -2535,9 +2535,9 @@ function m.searchSameFields(status, simple, mode)
             max = max + 1
             status.share.count = status.share.count + 1
             if status.share.count % 10000 == 0 then
-                if TEST then
-                    print('####', status.share.count, osClock() - status.clock)
-                end
+                --if TEST then
+                --    print('####', status.share.count, osClock() - status.clock)
+                --end
                 if status.interface and status.interface.pulse then
                     status.interface.pulse()
                 end
@@ -4212,7 +4212,7 @@ function m.requestReference(obj, interface, deep)
     m.searchRefsAsFunction(status, obj, 'ref')
 
     if m.debugMode then
-        print('count:', status.share.count)
+        --print('count:', status.share.count)
     end
 
     return status.results, status.share.count

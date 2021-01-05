@@ -17,6 +17,7 @@ m.nativeVersion  = -1
 m.libraryVersion = -1
 m.nativeMatcher  = nil
 m.requireCache   = {}
+m.cache          = {}
 m.matchOption    = {
     ignoreCase = platform.OS == 'Windows',
 }
@@ -258,6 +259,7 @@ function m.awaitPreload()
     await.setID 'preload'
     m.libraryMatchers = nil
     m.nativeMatcher   = nil
+    m.cache           = {}
     local progress = {
         max     = 0,
         read    = 0,
@@ -411,6 +413,14 @@ function m.getRelativePath(uri)
     else
         return m.normalize(path):gsub('^[/\\]+', '')
     end
+end
+
+--- 获取工作区等级的缓存
+function m.getCache(name)
+    if not m.cache[name] then
+        m.cache[name] = {}
+    end
+    return m.cache[name]
 end
 
 function m.reload()

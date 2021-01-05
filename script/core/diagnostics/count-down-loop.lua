@@ -17,6 +17,10 @@ return function (uri, callback)
         if maxNumer ~= 1 then
             return
         end
+        local minNumber = source.loc and source.loc.value and source.loc.value.type == 'number' and tonumber(source.loc.value[1])
+        if minNumber and minNumber <= 1 then
+            return
+        end
         if not source.step then
             callback {
                 start  = source.loc.value.start,

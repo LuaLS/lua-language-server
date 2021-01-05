@@ -593,7 +593,7 @@ local function checkTableField(ast, word, start, results)
 end
 
 local function checkCommon(ast, word, text, offset, results)
-    local myUri = ast.uri
+    local myUri = ast and ast.uri
     local used = {}
     for _, result in ipairs(results) do
         used[result.label] = true
@@ -617,7 +617,7 @@ local function checkCommon(ast, word, text, offset, results)
             for _, str in ipairs(cache.commonWords) do
                 if  #str >= 3
                 and not used[str]
-                and (str ~= word or not files.eq(myUri, uri)) then
+                and (str ~= word or (myUri and not files.eq(myUri, uri))) then
                     used[str] = true
                     if matchKey(word, str) then
                         results[#results+1] = {

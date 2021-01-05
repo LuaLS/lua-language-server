@@ -32,7 +32,7 @@ local function getFileLinks(uri)
     tracy.ZoneEnd()
     return links
 end
-require 'tracy'.enable()
+
 local function getLinksTo(uri)
     uri = files.asKey(uri)
     local links = {}

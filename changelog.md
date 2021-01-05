@@ -2,6 +2,7 @@
 
 ## 1.11.0
 * `NEW` `Lua.runtime.plugin`
+* `CHG` performance optimization
 * `CHG` completion: improve performance of workspace words
 * `FIX` hover: tail comments may be cutted
 * `FIX` runtime errors

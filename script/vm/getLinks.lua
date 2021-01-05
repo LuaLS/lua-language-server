@@ -10,6 +10,7 @@ local function getFileLinks(uri)
     if not ast then
         return links
     end
+    tracy.ZoneBeginN('getFileLinks')
     guide.eachSpecialOf(ast.ast, 'require', function (source)
         local call = source.parent
         if not call or call.type ~= 'call' then
@@ -28,9 +29,10 @@ local function getFileLinks(uri)
             links[u][#links[u]+1] = call
         end
     end)
+    tracy.ZoneEnd()
     return links
 end
-
+require 'tracy'.enable()
 local function getLinksTo(uri)
     uri = files.asKey(uri)
     local links = {}

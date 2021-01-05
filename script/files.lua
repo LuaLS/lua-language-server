@@ -360,7 +360,7 @@ end
 --- 判断文件名相等
 function m.eq(a, b)
     if platform.OS == 'Windows' then
-        return a:lower() == b:lower()
+        return a:lower():gsub('[/\\]+', '/') == b:lower():gsub('[/\\]+', '/')
     else
         return a == b
     end

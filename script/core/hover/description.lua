@@ -205,7 +205,11 @@ local function getFunctionComment(source)
     local comments = {}
     for _, doc in ipairs(docGroup) do
         if doc.type == 'doc.comment' then
-            comments[#comments+1] = doc.comment.text:sub(2)
+            if doc.comment.text:sub(1, 1) == '-' then
+                comments[#comments+1] = doc.comment.text:sub(2)
+            else
+                comments[#comments+1] = doc.comment.text
+            end
         elseif doc.type == 'doc.param' then
             if doc.comment then
                 comments[#comments+1] = ('@*param* `%s` — %s'):format(

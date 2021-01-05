@@ -12,6 +12,8 @@ local specials = {
     ['loadfile']     = true,
     ['pcall']        = true,
     ['xpcall']       = true,
+    ['pairs']        = true,
+    ['ipairs']       = true,
 }
 
 _ENV = nil

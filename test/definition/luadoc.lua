@@ -300,6 +300,7 @@ function Foo:<!bar1!>() end
 
 ---@type table<number, Foo>
 local v1
+local ipairs = ipairs
 for i, v in ipairs(v1) do
     print(v.<?bar1?>)
 end

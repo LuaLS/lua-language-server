@@ -2206,8 +2206,8 @@ local function getTableAndIndexIfIsForPairsKeyOrValue(ref)
     end
     local pairsCallObj = rootCallObj.node
 
-    if not pairsCallObj.node or pairsCallObj.node.type ~= 'getglobal'
-        or (pairsCallObj.node[1] ~= 'pairs' and pairsCallObj.node[1] ~= 'ipairs') then
+    if not pairsCallObj.node
+        or (pairsCallObj.node.special ~= 'pairs' and pairsCallObj.node.special ~= 'ipairs') then
         return
     end
 

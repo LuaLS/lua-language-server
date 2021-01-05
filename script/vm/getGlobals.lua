@@ -221,12 +221,20 @@ files.watch(function (ev, uri)
         if globalSubscribe[uri] then
             for _, name in ipairs(globalSubscribe[uri]) do
                 getGlobalCache[name] = nil
+                getGlobalCache['*'] = nil
             end
         end
         if globalSetsSubscribe[uri] then
             for _, name in ipairs(globalSetsSubscribe[uri]) do
                 getGlobalSetsCache[name] = nil
+                getGlobalSetsCache['*'] = nil
             end
+        end
+        for name in pairs(getGlobalsOfFile(uri)) do
+            getGlobalCache[name] = nil
+        end
+        for name in pairs(getGlobalSetsOfFile(uri)) do
+            getGlobalSetsCache[name] = nil
         end
     end
 end)

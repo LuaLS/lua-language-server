@@ -16,8 +16,12 @@ local function getGlobalsOfFile(uri)
     if not ast then
         return globals
     end
+    tracy.ZoneBeginN 'getGlobalsOfFile'
     local results = guide.findGlobals(ast.ast)
     local mark = {}
+    if not globals['*'] then
+        globals['*'] = {}
+    end
     for _, res in ipairs(results) do
         if mark[res] then
             goto CONTINUE
@@ -29,9 +33,11 @@ local function getGlobalsOfFile(uri)
                 globals[name] = {}
             end
             globals[name][#globals[name]+1] = res
+            globals['*'][#globals['*']+1] = res
         end
         ::CONTINUE::
     end
+    tracy.ZoneEnd()
     return globals
 end
 
@@ -46,8 +52,12 @@ local function getGlobalSetsOfFile(uri)
     if not ast then
         return globals
     end
+    tracy.ZoneBeginN 'getGlobalSetsOfFile'
     local results = guide.findGlobals(ast.ast)
     local mark = {}
+    if not globals['*'] then
+        globals['*'] = {}
+    end
     for _, res in ipairs(results) do
         if mark[res] then
             goto CONTINUE
@@ -60,72 +70,88 @@ local function getGlobalSetsOfFile(uri)
                     globals[name] = {}
                 end
                 globals[name][#globals[name]+1] = res
+                globals['*'][#globals['*']+1] = res
             end
         end
         ::CONTINUE::
     end
+    tracy.ZoneEnd()
     return globals
 end
 
 local function getGlobals(name)
+    local globalCache = vm.getCache 'getGlobals'
+    if globalCache[name] then
+        return globalCache[name]
+    end
+    tracy.ZoneBeginN 'getGlobals #2'
     local results = {}
-    for uri in files.eachFile() do
-        local globals = getGlobalsOfFile(uri)
-        if name == '*' then
-            for _, sources in util.sortPairs(globals) do
-                for _, source in ipairs(sources) do
-                    results[#results+1] = source
-                end
-            end
-        else
-            if globals[name] then
-                for _, source in ipairs(globals[name]) do
-                    results[#results+1] = source
-                end
+    local n = 0
+    local uris = files.getAllUris()
+    for i = 1, #uris do
+        local globals = getGlobalsOfFile(uris[i])[name]
+        if globals then
+            for j = 1, #globals do
+                n = n + 1
+                results[n] = globals[j]
             end
         end
     end
+    local dummyCache = vm.getCache 'globalDummy'
     for key in pairs(config.config.diagnostics.globals) do
         if name == '*' or name == key then
-            results[#results+1] = {
-                type   = 'dummy',
-                start  = 0,
-                finish = 0,
-                [1]    = key
-            }
+            if not dummyCache[key] then
+                dummyCache[key] = {
+                    type   = 'dummy',
+                    start  = 0,
+                    finish = 0,
+                    [1]    = key
+                }
+            end
+            n = n + 1
+            results[n] = dummyCache[key]
         end
     end
+    globalCache[name] = results
+    tracy.ZoneEnd()
     return results
 end
 
 local function getGlobalSets(name)
+    local globalCache = vm.getCache 'getGlobalSets'
+    if globalCache[name] then
+        return globalCache[name]
+    end
+    tracy.ZoneBeginN 'getGlobalSets #2'
     local results = {}
-    for uri in files.eachFile() do
-        local globals = getGlobalSetsOfFile(uri)
-        if name == '*' then
-            for _, sources in util.sortPairs(globals) do
-                for _, source in ipairs(sources) do
-                    results[#results+1] = source
-                end
-            end
-        else
-            if globals[name] then
-                for _, source in ipairs(globals[name]) do
-                    results[#results+1] = source
-                end
+    local n = 0
+    local uris = files.getAllUris()
+    for i = 1, #uris do
+        local globals = getGlobalSetsOfFile(uris[i])[name]
+        if globals then
+            for j = 1, #globals do
+                n = n + 1
+                results[n] = globals[j]
             end
         end
     end
+    local dummyCache = vm.getCache 'globalDummy'
     for key in pairs(config.config.diagnostics.globals) do
         if name == '*' or name == key then
-            results[#results+1] = {
-                type   = 'dummy',
-                start  = 0,
-                finish = 0,
-                [1]    = key
-            }
+            if not dummyCache[key] then
+                dummyCache[key] = {
+                    type   = 'dummy',
+                    start  = 0,
+                    finish = 0,
+                    [1]    = key
+                }
+            end
+            n = n + 1
+            results[n] = dummyCache[key]
         end
     end
+    globalCache[name] = results
+    tracy.ZoneEnd()
     return results
 end
 
@@ -181,14 +207,11 @@ function vm.getGlobalSets(key)
     if cache ~= nil then
         return cache
     end
+    tracy.ZoneBeginN('getGlobalSets')
     cache = getGlobalSets(key)
     vm.getCache('getGlobalSets')[key] = cache
+    tracy.ZoneEnd()
     return cache
 end
 
-files.watch(function (ev, uri)
-    if ev == 'update' then
-        getGlobalsOfFile(uri)
-        getGlobalSetsOfFile(uri)
-    end
-end)
+require 'tracy'.enable()

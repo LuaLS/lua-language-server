@@ -24,13 +24,23 @@ m.globalVersion = 0
 m.linesMap = setmetatable({}, { __mode = 'v' })
 m.astMap   = setmetatable({}, { __mode = 'v' })
 
+local uriMap = {}
+local function getUriKey(uri)
+    if not uriMap[uri] then
+        if platform.OS == 'Windows' then
+            uriMap[uri] = uri:lower()
+        else
+            uriMap[uri] = uri
+        end
+    end
+    return uriMap[uri]
+end
+
 --- 打开文件
 ---@param uri uri
 function m.open(uri)
     local originUri = uri
-    if platform.OS == 'Windows' then
-        uri = uri:lower()
-    end
+    uri = getUriKey(uri)
     m.openMap[uri] = true
     m.onWatch('open', originUri)
 end
@@ -39,9 +49,7 @@ end
 ---@param uri uri
 function m.close(uri)
     local originUri = uri
-    if platform.OS == 'Windows' then
-        uri = uri:lower()
-    end
+    uri = getUriKey(uri)
     m.openMap[uri] = nil
     m.onWatch('close', originUri)
 end
@@ -50,33 +58,25 @@ end
 ---@param uri uri
 ---@return boolean
 function m.isOpen(uri)
-    if platform.OS == 'Windows' then
-        uri = uri:lower()
-    end
+    uri = getUriKey(uri)
     return m.openMap[uri] == true
 end
 
 --- 标记为库文件
 function m.setLibraryPath(uri, libraryPath)
-    if platform.OS == 'Windows' then
-        uri = uri:lower()
-    end
+    uri = getUriKey(uri)
     m.libraryMap[uri] = libraryPath
 end
 
 --- 是否是库文件
 function m.isLibrary(uri)
-    if platform.OS == 'Windows' then
-        uri = uri:lower()
-    end
+    uri = getUriKey(uri)
     return m.libraryMap[uri] ~= nil
 end
 
 --- 获取库文件的根目录
 function m.getLibraryPath(uri)
-    if platform.OS == 'Windows' then
-        uri = uri:lower()
-    end
+    uri = getUriKey(uri)
     return m.libraryMap[uri]
 end
 
@@ -87,16 +87,12 @@ end
 --- 是否存在
 ---@return boolean
 function m.exists(uri)
-    if platform.OS == 'Windows' then
-        uri = uri:lower()
-    end
+    uri = getUriKey(uri)
     return m.fileMap[uri] ~= nil
 end
 
 function m.asKey(uri)
-    if platform.OS == 'Windows' then
-        uri = uri:lower()
-    end
+    uri = getUriKey(uri)
     return uri
 end
 
@@ -108,9 +104,7 @@ function m.setText(uri, text)
         return
     end
     local originUri = uri
-    if platform.OS == 'Windows' then
-        uri = uri:lower()
-    end
+    uri = getUriKey(uri)
     local create
     if not m.fileMap[uri] then
         m.fileMap[uri] = {
@@ -118,6 +112,7 @@ function m.setText(uri, text)
             version = 0,
         }
         create = true
+        m._pairsCache = nil
     end
     local suc, newText = plugin.dispatch('OnSetText', originUri, text)
     if suc then
@@ -143,9 +138,7 @@ end
 
 --- 获取文件版本
 function m.getVersion(uri)
-    if platform.OS == 'Windows' then
-        uri = uri:lower()
-    end
+    uri = getUriKey(uri)
     local file = m.fileMap[uri]
     if not file then
         return nil
@@ -157,9 +150,7 @@ end
 ---@param uri uri
 ---@return string text
 function m.getText(uri)
-    if platform.OS == 'Windows' then
-        uri = uri:lower()
-    end
+    uri = getUriKey(uri)
     local file = m.fileMap[uri]
     if not file then
         return nil
@@ -171,14 +162,13 @@ end
 ---@param uri uri
 function m.remove(uri)
     local originUri = uri
-    if platform.OS == 'Windows' then
-        uri = uri:lower()
-    end
+    uri = getUriKey(uri)
     local file = m.fileMap[uri]
     if not file then
         return
     end
     m.fileMap[uri] = nil
+    m._pairsCache = nil
 
     m.globalVersion = m.globalVersion + 1
     await.close('files.version')
@@ -189,6 +179,7 @@ end
 function m.removeAll()
     m.globalVersion = m.globalVersion + 1
     await.close('files.version')
+    m._pairsCache = nil
     for uri in pairs(m.fileMap) do
         if not m.libraryMap[uri] then
             m.fileMap[uri]  = nil
@@ -204,6 +195,7 @@ end
 function m.removeAllClosed()
     m.globalVersion = m.globalVersion + 1
     await.close('files.version')
+    m._pairsCache = nil
     for uri in pairs(m.fileMap) do
         if  not m.openMap[uri]
         and not m.libraryMap[uri] then
@@ -216,13 +208,30 @@ function m.removeAllClosed()
     --m.notifyCache = {}
 end
 
+--- 获取一个包含所有文件uri的数组
+---@return uri[]
+function m.getAllUris()
+    local files = m._pairsCache
+    local i = 0
+    if not files then
+        files = {}
+        m._pairsCache = files
+        for uri in pairs(m.fileMap) do
+            i = i + 1
+            files[i] = uri
+        end
+    end
+    return m._pairsCache
+end
+
 --- 遍历文件
 function m.eachFile()
-    local map = {}
-    for uri, file in pairs(m.fileMap) do
-        map[uri] = file
+    local files = m.getAllUris()
+    local i = 0
+    return function ()
+        i = i + 1
+        return files[i]
     end
-    return pairs(map)
 end
 
 --- Pairs dll files
@@ -287,9 +296,7 @@ end
 ---@param uri uri
 ---@return table ast
 function m.getAst(uri)
-    if platform.OS == 'Windows' then
-        uri = uri:lower()
-    end
+    uri = getUriKey(uri)
     if uri ~= '' and not m.isLua(uri) then
         return nil
     end
@@ -310,9 +317,7 @@ end
 ---@param uri uri
 ---@return table lines
 function m.getLines(uri)
-    if platform.OS == 'Windows' then
-        uri = uri:lower()
-    end
+    uri = getUriKey(uri)
     local file = m.fileMap[uri]
     if not file then
         return nil
@@ -327,9 +332,7 @@ end
 
 --- 获取原始uri
 function m.getOriginUri(uri)
-    if platform.OS == 'Windows' then
-        uri = uri:lower()
-    end
+    uri = getUriKey(uri)
     local file = m.fileMap[uri] or m.dllMap[uri]
     if not file then
         return nil
@@ -338,22 +341,18 @@ function m.getOriginUri(uri)
 end
 
 function m.getUri(uri)
-    if platform.OS == 'Windows' then
-        uri = uri:lower()
-    end
+    uri = getUriKey(uri)
     return uri
 end
 
 --- 获取文件的自定义缓存信息（在文件内容更新后自动失效）
 function m.getCache(uri)
-    if platform.OS == 'Windows' then
-        uri = uri:lower()
-    end
+    uri = getUriKey(uri)
     local file = m.fileMap[uri]
     if not file then
         return nil
     end
-    file.cacheActiveTime = timer.clock()
+    --file.cacheActiveTime = timer.clock()
     return file.cache
 end
 
@@ -428,10 +427,7 @@ function m.saveDll(uri, content)
     if not content then
         return
     end
-    local luri = uri
-    if platform.OS == 'Windows' then
-        luri = uri:lower()
-    end
+    local luri = getUriKey(uri)
     local file = {
         uri   = uri,
         opens = {},
@@ -460,9 +456,7 @@ end
 ---@param uri uri
 ---@return string[]|nil
 function m.getDllOpens(uri)
-    if platform.OS == 'Windows' then
-        uri = uri:lower()
-    end
+    uri = getUriKey(uri)
     local file = m.dllMap[uri]
     if not file then
         return nil
@@ -474,9 +468,7 @@ end
 ---@param uri uri
 ---@return string[]|nil
 function m.getDllWords(uri)
-    if platform.OS == 'Windows' then
-        uri = uri:lower()
-    end
+    uri = getUriKey(uri)
     local file = m.dllMap[uri]
     if not file then
         return nil
@@ -505,9 +497,7 @@ function m.flushCache()
 end
 
 function m.flushFileCache(uri)
-    if platform.OS == 'Windows' then
-        uri = uri:lower()
-    end
+    uri = getUriKey(uri)
     local file = m.fileMap[uri]
     if not file then
         return

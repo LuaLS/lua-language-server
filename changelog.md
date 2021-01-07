@@ -1,6 +1,7 @@
 # changelog
 
 ## 1.11.2
+`2021-1-7`
 * `FIX` [#345](https://github.com/sumneko/lua-language-server/issues/345): not works with unexpect args
 * `FIX` [#346](https://github.com/sumneko/lua-language-server/issues/346): dont modify the cache
 

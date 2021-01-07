@@ -244,11 +244,13 @@ proto.on('textDocument/definition', function (params)
         if targetUri then
             local targetLines = files.getLines(targetUri)
             local targetText  = files.getText(targetUri)
-            response[i] = define.locationLink(targetUri
-                , define.range(targetLines, targetText, info.target.start, info.target.finish)
-                , define.range(targetLines, targetText, info.target.start, info.target.finish)
-                , define.range(lines,       text,       info.source.start, info.source.finish)
-            )
+            if targetLines then
+                response[i] = define.locationLink(targetUri
+                    , define.range(targetLines, targetText, info.target.start, info.target.finish)
+                    , define.range(targetLines, targetText, info.target.start, info.target.finish)
+                    , define.range(lines,       text,       info.source.start, info.source.finish)
+                )
+            end
         end
     end
     return response

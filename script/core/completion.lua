@@ -1272,14 +1272,14 @@ local function getCallEnums(source, index)
             if  doc.type == 'doc.param'
             and doc.param[1] == arg[1] then
                 local enums = {}
-                for _, enum in ipairs(vm.getDocEnums(doc.extends)) do
+                for _, enum in ipairs(vm.getDocEnums(doc.extends) or {}) do
                     enums[#enums+1] = {
                         label       = enum[1],
                         description = enum.comment,
                         kind        = define.CompletionItemKind.EnumMember,
                     }
                 end
-                for _, unit in ipairs(vm.getDocTypeUnits(doc.extends)) do
+                for _, unit in ipairs(vm.getDocTypeUnits(doc.extends) or {}) do
                     if unit.type == 'doc.type.function' then
                         local text = files.getText(guide.getUri(unit))
                         enums[#enums+1] = {

@@ -1,5 +1,8 @@
 # changelog
 
+## 1.11.2
+* `FIX` [#346](https://github.com/sumneko/lua-language-server/issues/346): dont modify the cache
+
 ## 1.11.1
 `2021-1-5`
 * `CHG` performance optimization

@@ -18,6 +18,9 @@ end
 local function loadArgs()
     for _, v in ipairs(arg) do
         local key, value = v:match '^%-%-([%w_]+)%=(.+)'
+        if not key then
+            goto CONTINUE
+        end
         if value == 'true' then
             value = true
         elseif value == 'false' then
@@ -28,6 +31,7 @@ local function loadArgs()
             value = value:sub(2, -2)
         end
         _G[key:upper()] = value
+        ::CONTINUE::
     end
 end
 

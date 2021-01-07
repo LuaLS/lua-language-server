@@ -17,7 +17,7 @@ local function getFileLinks(uri)
             return
         end
         local args = call.args
-        if not args[1] or args[1].type ~= 'string' then
+        if not args or not args[1] or args[1].type ~= 'string' then
             return
         end
         local uris = ws.findUrisByRequirePath(args[1][1])

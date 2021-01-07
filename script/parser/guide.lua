@@ -1952,7 +1952,7 @@ function m.checkSameSimpleInCall(status, ref, start, pushQueue, mode)
     m.checkSameSimpleInValueOfSetMetaTable(status, func, start, pushQueue)
     -- 检查赋值是 func() 的情况
     if status.share.crossCallCount >= 2 then
-        return
+        --return
     end
     status.share.crossCallCount = status.share.crossCallCount + 1
     local objs = m.checkSameSimpleInCallInSameFile(status, func, args, index)

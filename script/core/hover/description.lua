@@ -28,22 +28,20 @@ local function asStringInRequire(source, literal)
             for i, uri in ipairs(result) do
                 local searcher = searchers and searchers[uri]
                 uri = files.getOriginUri(uri)
-                if uri then
-                    local path = furi.decode(uri)
-                    if files.eq(path:sub(1, #rootPath), rootPath) then
-                        path = path:sub(#rootPath + 1)
-                    end
-                    path = path:gsub('^[/\\]*', '')
-                    if vm.isMetaFile(uri) then
-                        result[i] = ('* [[meta]](%s)'):format(uri)
-                    elseif searcher then
-                        searcher = searcher:sub(#rootPath + 1)
-                        searcher = ws.normalize(searcher)
-                        searcher = searcher:gsub('^[/\\]+', '')
-                        result[i] = ('* [%s](%s) %s'):format(path, uri, lang.script('HOVER_USE_LUA_PATH', searcher))
-                    else
-                        result[i] = ('* [%s](%s)'):format(path, uri)
-                    end
+                local path = furi.decode(uri)
+                if files.eq(path:sub(1, #rootPath), rootPath) then
+                    path = path:sub(#rootPath + 1)
+                end
+                path = path:gsub('^[/\\]*', '')
+                if vm.isMetaFile(uri) then
+                    result[i] = ('* [[meta]](%s)'):format(uri)
+                elseif searcher then
+                    searcher = searcher:sub(#rootPath + 1)
+                    searcher = ws.normalize(searcher)
+                    searcher = searcher:gsub('^[/\\]+', '')
+                    result[i] = ('* [%s](%s) %s'):format(path, uri, lang.script('HOVER_USE_LUA_PATH', searcher))
+                else
+                    result[i] = ('* [%s](%s)'):format(path, uri)
                 end
             end
             table.sort(result)

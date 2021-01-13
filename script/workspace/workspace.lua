@@ -255,8 +255,10 @@ end
 
 --- 预读工作区内所有文件
 function m.awaitPreload()
+    local diagnostic = require 'provider.diagnostic'
     await.close 'preload'
     await.setID 'preload'
+    diagnostic.pause()
     m.libraryMatchers = nil
     m.nativeMatcher   = nil
     m.cache           = {}
@@ -292,7 +294,6 @@ function m.awaitPreload()
 
     log.info('Preload finish.')
 
-    local diagnostic = require 'provider.diagnostic'
     diagnostic.start()
 end
 

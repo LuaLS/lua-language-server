@@ -268,6 +268,11 @@ function m.start()
     m.diagnosticsAll()
 end
 
+function m.pause()
+    m._start = false
+    await.close 'diagnosticsAll'
+end
+
 function m.checkStepResult()
     if await.hasID 'diagnosticsAll' then
         return

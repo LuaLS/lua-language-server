@@ -182,15 +182,23 @@ proto.on('textDocument/didClose', function (params)
 end)
 
 proto.on('textDocument/didChange', function (params)
-    local doc    = params.textDocument
-    local change = params.contentChanges
-    local uri    = doc.uri
-    local text   = change[1].text
-    if files.isLua(uri) or files.isOpen(uri) then
-        --log.debug('didChange:', uri)
-        files.setText(uri, text)
-        --log.debug('setText:', #text)
+    local doc     = params.textDocument
+    local changes = params.contentChanges
+    local uri     = doc.uri
+    if not files.isLua(uri) and not files.isOpen(uri) then
+        return
     end
+    local text = files.getText(uri) or ''
+    for _, change in ipairs(changes) do
+        if change.range then
+            local lines = files.getLines(uri)
+            local start, finish = define.unrange(lines, text, change.range)
+            text = text:sub(1, start) .. change.text .. text:sub(finish + 1)
+        else
+            text = change.text
+        end
+    end
+    files.setText(uri, text)
 end)
 
 proto.on('textDocument/hover', function (params)

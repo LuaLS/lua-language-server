@@ -89,6 +89,11 @@ function m.range(lines, text, offset1, offset2)
 end
 
 --- convert `range` to `offsetStart` and `offsetFinish`
+---@param lines table
+---@param text  string
+---@param range table
+---@return integer start
+---@return integer finish
 function m.unrange(lines, text, range)
     local start  = m.offset(lines, text, range.start)
     local finish = m.offset(lines, text, range['end'])

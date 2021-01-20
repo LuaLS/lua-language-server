@@ -97,7 +97,7 @@ m.childMap = {
     ['doc.generic']        = {'#generics', 'comment'},
     ['doc.generic.object'] = {'generic', 'extends', 'comment'},
     ['doc.vararg']         = {'vararg', 'comment'},
-    ['doc.type.table']     = {'key', 'value', 'comment'},
+    ['doc.type.table']     = {'node', 'key', 'value', 'comment'},
     ['doc.type.function']  = {'#args', '#returns', 'comment'},
     ['doc.type.typeliteral']  = {'node'},
     ['doc.overload']       = {'overload', 'comment'},
@@ -167,6 +167,21 @@ function m.getParentFunction(obj)
         end
     end
     return nil
+end
+
+--- 寻找父的table类型 doc.type.table
+function m.getParentDocTypeTable(obj)
+    for _ = 1, 1000 do
+        local parent = obj.parent
+        if not parent then
+            return nil
+        end
+        if parent.type == 'doc.type.table' then
+            return obj
+        end
+        obj = parent
+    end
+    error('guide.getParentDocTypeTable overstack')
 end
 
 --- 寻找所在区块
@@ -1671,12 +1686,20 @@ function m.checkSameSimpleOfRefByDocSource(status, obj, start, pushQueue, mode)
     end
 end
 
-local function getArrayLevel(obj)
+local function getArrayOrTableLevel(obj)
     local level = 0
     while true do
         local parent = obj.parent
         if parent.type == 'doc.type.array' then
             level = level + 1
+        elseif parent.type == 'doc.type.table' then
+            if obj.type == 'doc.type' then
+                level = level + 1
+            -- else 只存在 obj.type == 'doc.type.name' 的情况，即 table<k,v> 中的 table，这种是不需要再增加层级的
+            end
+        elseif parent.type == 'doc.type' and parent.parent and parent.parent.type == 'doc.type.table' then
+            level = level + 1
+            parent = parent.parent
         else
             break
         end
@@ -1733,9 +1756,10 @@ function m.checkSameSimpleByDoc(status, obj, start, pushQueue, mode)
         for _, res in ipairs(pieceResult) do
             pushQueue(res, start, true)
         end
+
         local state = m.getDocState(obj)
         if state.type == 'doc.type' and mode == 'ref' then
-            m.checkSameSimpleOfRefByDocSource(status, state, start - getArrayLevel(obj), pushQueue, mode)
+            m.checkSameSimpleOfRefByDocSource(status, state, start - getArrayOrTableLevel(obj), pushQueue, mode)
         end
         return true
     elseif obj.type == 'doc.field' then
@@ -1745,6 +1769,10 @@ function m.checkSameSimpleByDoc(status, obj, start, pushQueue, mode)
         end
     elseif obj.type == 'doc.type.array' then
         pushQueue(obj.node, start + 1, true)
+        return true
+    elseif obj.type == 'doc.type.table' then
+        pushQueue(obj.node, start, true)
+        pushQueue(obj.value, start + 1, true)
         return true
     end
 end
@@ -2211,6 +2239,72 @@ function m.checkSameSimpleAsSetValue(status, ref, start, pushQueue)
     end
 end
 
+local function getTableAndIndexIfIsForPairsKeyOrValue(ref)
+    if ref.type ~= 'local' then
+        return
+    end
+
+    if not ref.parent or ref.parent.type ~= 'in' then
+        return
+    end
+
+    if not ref.value or ref.value.type ~= 'select' then
+        return
+    end
+
+    local rootSelectObj = ref.value
+    if rootSelectObj.index ~= 1 and rootSelectObj.index ~= 2 then
+        return
+    end
+
+    if not rootSelectObj.vararg or rootSelectObj.vararg.type ~= 'call' then
+        return
+    end
+    local rootCallObj = rootSelectObj.vararg
+
+    if not rootCallObj.node or rootCallObj.node.type ~= 'call' then
+        return
+    end
+    local pairsCallObj = rootCallObj.node
+
+    if not pairsCallObj.node
+        or (pairsCallObj.node.special ~= 'pairs' and pairsCallObj.node.special ~= 'ipairs') then
+        return
+    end
+
+    if not pairsCallObj.args or not pairsCallObj.args[1] then
+        return
+    end
+    local tableObj = pairsCallObj.args[1]
+
+    return tableObj, rootSelectObj.index
+end
+
+function m.checkSameSimpleAsKeyOrValueInForParis(status, ref, start, pushQueue)
+    local tableObj, index = getTableAndIndexIfIsForPairsKeyOrValue(ref)
+    if not tableObj then
+        return
+    end
+
+    local newStatus = m.status(status)
+    m.searchRefs(newStatus, tableObj, 'def')
+    for _, def in ipairs(newStatus.results) do
+        if def.bindDocs then
+            for _, binddoc in ipairs(def.bindDocs) do
+                if binddoc.type == 'doc.type' then
+                    if binddoc.types[1] and binddoc.types[1].type == 'doc.type.table' then
+                        if index == 1 then
+                            pushQueue(binddoc.types[1].key, start, true)
+                        elseif index == 2 then
+                            pushQueue(binddoc.types[1].value, start, true)
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
 local function hasTypeName(doc, name)
     if doc.type ~= 'doc.type' then
         return false
@@ -2447,6 +2541,8 @@ function m.checkSameSimple(status, simple, ref, start, force, mode, pushQueue)
                 m.checkSameSimpleAsReturn(status, ref, i, pushQueue)
                 -- 检查形如 a = f 的情况
                 m.checkSameSimpleAsSetValue(status, ref, i, pushQueue)
+                -- 检查形如 for k,v in pairs()/ipairs() do end 的情况
+                m.checkSameSimpleAsKeyOrValueInForParis(status, ref, i, pushQueue)
             end
         end
         if i == #simple then
@@ -2888,7 +2984,7 @@ function m.viewInferType(infers)
         or src.type == 'doc.class.name'
         or src.type == 'doc.type.name'
         or src.type == 'doc.type.array'
-        or src.type == 'doc.type.generic' then
+        or src.type == 'doc.type.table' then
             if infer.type ~= 'any' then
                 hasDoc = true
                 break
@@ -2903,7 +2999,7 @@ function m.viewInferType(infers)
             or src.type == 'doc.class.name'
             or src.type == 'doc.type.name'
             or src.type == 'doc.type.array'
-            or src.type == 'doc.type.generic'
+            or src.type == 'doc.type.table'
             or src.type == 'doc.type.enum'
             or src.type == 'doc.resume' then
                 local tp = infer.type or 'any'
@@ -3132,7 +3228,7 @@ function m.getDocTypeUnitName(status, unit)
         typeName = 'function'
     elseif unit.type == 'doc.type.array' then
         typeName = m.getDocTypeUnitName(status, unit.node) .. '[]'
-    elseif unit.type == 'doc.type.generic' then
+    elseif unit.type == 'doc.type.table' then
         typeName = ('%s<%s, %s>'):format(
             m.getDocTypeUnitName(status, unit.node),
             m.viewInferType(m.getDocTypeNames(status, unit.key)),

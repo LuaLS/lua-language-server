@@ -253,3 +253,91 @@ function Generic(arg1) print(arg1) end
 local v1 = Generic("Foo")
 print(v1.<?bar1?>)
 ]]
+
+TEST [[
+---@class Foo
+local Foo = {}
+function Foo:<!bar1!>() end
+
+---@type table<number, Foo>
+local v1
+print(v1[1].<?bar1?>)
+]]
+
+TEST [[
+---@class Foo
+local Foo = {}
+function Foo:<!bar1!>() end
+
+---@class Foo2
+local Foo2 = {}
+function Foo2:bar1() end
+
+---@type Foo2<number, Foo>
+local v1
+print(v1[1].<?bar1?>)
+]]
+
+--TODO 得扩展 simple 的信息才能识别这种情况了
+--TEST [[
+-----@class Foo
+--local Foo = {}
+--function Foo:bar1() end
+--
+-----@class Foo2
+--local Foo2 = {}
+--function Foo2:<!bar1!>() end
+--
+-----@type Foo2<number, Foo>
+--local v1
+--print(v1.<?bar1?>)
+--]]
+
+TEST [[
+---@class Foo
+local Foo = {}
+function Foo:<!bar1!>() end
+
+---@type table<number, Foo>
+local v1
+local ipairs = ipairs
+for i, v in ipairs(v1) do
+    print(v.<?bar1?>)
+end
+]]
+
+TEST [[
+---@class Foo
+local Foo = {}
+function Foo:<!bar1!>() end
+
+---@type table<Foo, Foo>
+local v1
+for k, v in pairs(v1) do
+    print(k.<?bar1?>)
+    print(v.bar1)
+end
+]]
+
+TEST [[
+---@class Foo
+local Foo = {}
+function Foo:<!bar1!>() end
+
+---@type table<number, table<number, Foo>>
+local v1
+for i, v in ipairs(v1) do
+    local v2 = v[1]
+    print(v2.<?bar1?>)
+end
+]]
+
+TEST [[
+---@class Foo
+local Foo = {}
+function Foo:<!bar1!>() end
+
+---@type table<number, table<number, Foo>>
+local v1
+print(v1[1][1].<?bar1?>)
+]]

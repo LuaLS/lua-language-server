@@ -1,5 +1,9 @@
 # changelog
 
+## 1.12.0
+* `NEW` [#340](https://github.com/sumneko/lua-language-server/pull/340): supports `---@type table<string, number>`
+* `FIX` [#355](https://github.com/sumneko/lua-language-server/pull/355)
+
 ## 1.11.2
 `2021-1-7`
 * `FIX` [#345](https://github.com/sumneko/lua-language-server/issues/345): not works with unexpect args

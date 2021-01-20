@@ -1,6 +1,7 @@
 local currentPath = debug.getinfo(1, 'S').source:sub(2)
 local rootPath = currentPath:gsub('[/\\]*[^/\\]-$', '')
-loadfile((rootPath == '' and '.' or rootPath) .. '/platform.lua')('script')
+rootPath = (rootPath == '' and '.' or rootPath)
+loadfile(rootPath .. '/platform.lua')('script')
 local fs = require 'bee.filesystem'
 
 local function expanduser(path)

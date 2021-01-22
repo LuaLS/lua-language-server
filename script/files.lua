@@ -98,18 +98,9 @@ function m.asKey(uri)
     return uri
 end
 
-function m.setDiffInfo(uri, info)
-    uri = getUriKey(uri)
-    local file = m.fileMap[uri]
-    if not file then
-        return
-    end
-    file._diffInfo = info
-end
-
-local function pluginOnSetText(uri, text)
-    m.setDiffInfo(uri, nil)
-    local suc, result = plugin.dispatch('OnSetText', uri, text)
+local function pluginOnSetText(file, text)
+    file._diffInfo = nil
+    local suc, result = plugin.dispatch('OnSetText', file.uri, text)
     if not suc then
         return text
     end
@@ -119,7 +110,7 @@ local function pluginOnSetText(uri, text)
         local diffs
         suc, result, diffs = xpcall(smerger.mergeDiff, log.warn, text, result)
         if suc then
-            m.setDiffInfo(diffs)
+            file._diffInfo = diffs
             return result
         end
     end
@@ -145,8 +136,8 @@ function m.setText(uri, text)
         create = true
         m._pairsCache = nil
     end
-    local newText = pluginOnSetText(originUri, text)
     local file = m.fileMap[uri]
+    local newText = pluginOnSetText(file, text)
     if file.text == newText then
         return
     end
@@ -391,6 +382,12 @@ function m.getUri(uri)
     return uri
 end
 
+function m.getFile(uri)
+    uri = getUriKey(uri)
+    return m.fileMap[uri]
+        or m.dllMap[uri]
+end
+
 ---@alias position table
 
 --- 获取 position 对应的光标位置
@@ -398,9 +395,10 @@ end
 ---@param position position
 ---@return integer
 function m.offset(uri, position)
+    local file  = m.getFile(uri)
     local lines = m.getLines(uri)
     local text  = m.getText(uri)
-    if not lines then
+    if not file then
         return 0
     end
     local row    = position.line + 1
@@ -409,6 +407,9 @@ function m.offset(uri, position)
         return #text + 1
     end
     local offset = utf8.offset(text, position.character + 1, start) or (#text + 1)
+    if file._diffInfo then
+        offset = smerger.getOffset(file._diffInfo, offset)
+    end
     return offset - 1
 end
 
@@ -417,9 +418,10 @@ end
 ---@param position position
 ---@return integer
 function m.offsetOfWord(uri, position)
+    local file  = m.getFile(uri)
     local lines = m.getLines(uri)
     local text  = m.getText(uri)
-    if not lines then
+    if not file then
         return 0
     end
     local row    = position.line + 1
@@ -432,6 +434,9 @@ function m.offsetOfWord(uri, position)
     or text:sub(offset-1, offset):match '[%w_][^%w_]' then
         offset = offset - 1
     end
+    if file._diffInfo then
+        offset = smerger.getOffset(file._diffInfo, offset)
+    end
     return offset
 end
 
@@ -440,13 +445,17 @@ end
 ---@param offset integer
 ---@return position
 function m.position(uri, offset)
+    local file  = m.getFile(uri)
     local lines = m.getLines(uri)
     local text  = m.getText(uri)
-    if not lines then
+    if not file then
         return {
             line      = 0,
             character = 0,
         }
+    end
+    if file._diffInfo then
+        offset = smerger.getOffsetBack(file._diffInfo, offset)
     end
     local row, col      = guide.positionOf(lines, offset)
     local start, finish = guide.lineRange(lines, row, true)

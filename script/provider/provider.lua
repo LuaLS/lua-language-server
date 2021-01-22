@@ -188,7 +188,7 @@ proto.on('textDocument/didChange', function (params)
     if not files.isLua(uri) and not files.isOpen(uri) then
         return
     end
-    local text = files.getText(uri) or ''
+    local text = files.getOriginText(uri) or ''
     for _, change in ipairs(changes) do
         if change.range then
             local lines = files.getLines(uri)

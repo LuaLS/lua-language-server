@@ -116,14 +116,15 @@ function m.setText(uri, text)
         m._pairsCache = nil
     end
     local suc, newText = plugin.dispatch('OnSetText', originUri, text)
-    if suc then
-        text = newText
+    if not suc then
+        newText = text
     end
     local file = m.fileMap[uri]
-    if file.text == text then
+    if file.text == newText then
         return
     end
-    file.text  = text
+    file.text       = newText
+    file.originText = text
     m.linesMap[uri] = nil
     m.astMap[uri] = nil
     file.cache = {}
@@ -157,6 +158,18 @@ function m.getText(uri)
         return nil
     end
     return file.text
+end
+
+--- 获取文件原始文本
+---@param uri uri
+---@return string text
+function m.getOriginText(uri)
+    uri = getUriKey(uri)
+    local file = m.fileMap[uri]
+    if not file then
+        return nil
+    end
+    return file.originText
 end
 
 --- 移除文件

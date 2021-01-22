@@ -108,7 +108,7 @@ function m.setDiffInfo(uri, info)
 end
 
 local function pluginOnSetText(uri, text)
-    m.setDiffInfo(nil)
+    m.setDiffInfo(uri, nil)
     local suc, result = plugin.dispatch('OnSetText', uri, text)
     if not suc then
         return text

@@ -1370,7 +1370,7 @@ function m.getCallValue(source)
     end
     if call.node.special == 'pcall'
     or call.node.special == 'xpcall' then
-        return call.args[1], call.args, index - 1
+        return call.args and call.args[1], call.args, index - 1
     end
     return call.node, call.args, index
 end

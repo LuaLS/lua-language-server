@@ -10,6 +10,7 @@ local timer    = require 'timer'
 local plugin   = require 'plugin'
 local util     = require 'utility'
 local guide    = require 'parser.guide'
+local smerger  = require 'string-merger'
 
 local m = {}
 
@@ -97,6 +98,34 @@ function m.asKey(uri)
     return uri
 end
 
+function m.setDiffInfo(uri, info)
+    uri = getUriKey(uri)
+    local file = m.fileMap[uri]
+    if not file then
+        return
+    end
+    file._diffInfo = info
+end
+
+local function pluginOnSetText(uri, text)
+    m.setDiffInfo(nil)
+    local suc, result = plugin.dispatch('OnSetText', uri, text)
+    if not suc then
+        return text
+    end
+    if type(result) == 'string' then
+        return result
+    elseif type(result) == 'table' then
+        local diffs
+        suc, result, diffs = xpcall(smerger.mergeDiff, log.warn, text, result)
+        if suc then
+            m.setDiffInfo(diffs)
+            return result
+        end
+    end
+    return text
+end
+
 --- 设置文件文本
 ---@param uri uri
 ---@param text string
@@ -116,10 +145,7 @@ function m.setText(uri, text)
         create = true
         m._pairsCache = nil
     end
-    local suc, newText = plugin.dispatch('OnSetText', originUri, text)
-    if not suc then
-        newText = text
-    end
+    local newText = pluginOnSetText(originUri, text)
     local file = m.fileMap[uri]
     if file.text == newText then
         return

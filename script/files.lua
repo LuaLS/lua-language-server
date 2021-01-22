@@ -9,6 +9,7 @@ local await    = require 'await'
 local timer    = require 'timer'
 local plugin   = require 'plugin'
 local util     = require 'utility'
+local guide    = require 'parser.guide'
 
 local m = {}
 
@@ -362,6 +363,117 @@ end
 function m.getUri(uri)
     uri = getUriKey(uri)
     return uri
+end
+
+---@alias position table
+
+--- 获取 position 对应的光标位置
+---@param uri uri
+---@param position position
+---@return integer
+function m.offset(uri, position)
+    local lines = m.getLines(uri)
+    local text  = m.getText(uri)
+    if not lines then
+        return 0
+    end
+    local row    = position.line + 1
+    local start  = guide.lineRange(lines, row)
+    if start <= 0 or start > #text then
+        return #text + 1
+    end
+    local offset = utf8.offset(text, position.character + 1, start) or (#text + 1)
+    return offset - 1
+end
+
+--- 获取 position 对应的光标位置(根据附近的单词)
+---@param uri uri
+---@param position position
+---@return integer
+function m.offsetOfWord(uri, position)
+    local lines = m.getLines(uri)
+    local text  = m.getText(uri)
+    if not lines then
+        return 0
+    end
+    local row    = position.line + 1
+    local start  = guide.lineRange(lines, row)
+    if start <= 0 or start > #text then
+        return #text + 1
+    end
+    local offset = utf8.offset(text, position.character + 1, start) or (#text + 1)
+    if offset > #text
+    or text:sub(offset-1, offset):match '[%w_][^%w_]' then
+        offset = offset - 1
+    end
+    return offset
+end
+
+--- 将光标位置转化为 position
+---@param uri uri
+---@param offset integer
+---@return position
+function m.position(uri, offset)
+    local lines = m.getLines(uri)
+    local text  = m.getText(uri)
+    if not lines then
+        return {
+            line      = 0,
+            character = 0,
+        }
+    end
+    local row, col      = guide.positionOf(lines, offset)
+    local start, finish = guide.lineRange(lines, row, true)
+    if start < 1 then
+        start = 1
+    end
+    if col <= finish - start + 1 then
+        local ucol     = util.utf8Len(text, start, start + col - 1)
+        if row < 1 then
+            row = 1
+        end
+        return {
+            line      = row - 1,
+            character = ucol,
+        }
+    elseif col == 1 then
+        return {
+            line      = row - 1,
+            character = 0,
+        }
+    else
+        return {
+            line      = row,
+            character = 0,
+        }
+    end
+end
+
+--- 将起点与终点位置转化为 range
+---@alias range table
+---@param uri     uri
+---@param offset1 integer
+---@param offset2 integer
+function m.range(uri, offset1, offset2)
+    local range = {
+        start   = m.position(uri, offset1),
+        ['end'] = m.position(uri, offset2),
+    }
+    if range.start.character > 0 then
+        range.start.character = range.start.character - 1
+    end
+    return range
+end
+
+--- convert `range` to `offsetStart` and `offsetFinish`
+---@param uri   table
+---@param range table
+---@return integer start
+---@return integer finish
+function m.unrange(uri, range)
+    local start  = m.offset(uri, range.start)
+    local finish = m.offset(uri, range['end'])
+    return start, finish
 end
 
 --- 获取文件的自定义缓存信息（在文件内容更新后自动失效）

@@ -32,7 +32,7 @@ return function (data)
                 goto NEXT_LINE
             end
             textEdit[#textEdit+1] = {
-                range = define.range(lines, text, start, finish),
+                range = files.range(uri, start, finish),
                 newText = '',
             }
             goto NEXT_LINE

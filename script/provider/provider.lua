@@ -191,8 +191,7 @@ proto.on('textDocument/didChange', function (params)
     local text = files.getOriginText(uri) or ''
     for _, change in ipairs(changes) do
         if change.range then
-            local lines = files.getLines(uri)
-            local start, finish = define.unrange(lines, text, change.range)
+            local start, finish = files.unrange(uri, change.range)
             text = text:sub(1, start) .. change.text .. text:sub(finish + 1)
         else
             text = change.text
@@ -210,9 +209,7 @@ proto.on('textDocument/hover', function (params)
     if not files.exists(uri) then
         return nil
     end
-    local lines  = files.getLines(uri)
-    local text   = files.getText(uri)
-    local offset = define.offsetOfWord(lines, text, params.position)
+    local offset = files.offsetOfWord(uri, params.position)
     local hover = core.byUri(uri, offset)
     if not hover then
         return nil
@@ -229,7 +226,7 @@ proto.on('textDocument/hover', function (params)
             value = md:string(),
             kind  = 'markdown',
         },
-        range = define.range(lines, text, hover.source.start, hover.source.finish),
+        range = files.range(uri, hover.source.start, hover.source.finish),
     }
 end)
 
@@ -241,7 +238,7 @@ proto.on('textDocument/definition', function (params)
     end
     local lines  = files.getLines(uri)
     local text   = files.getText(uri)
-    local offset = define.offsetOfWord(lines, text, params.position)
+    local offset = files.offsetOfWord(uri, params.position)
     local result = core(uri, offset)
     if not result then
         return nil
@@ -251,12 +248,11 @@ proto.on('textDocument/definition', function (params)
         local targetUri = info.uri
         if targetUri then
             local targetLines = files.getLines(targetUri)
-            local targetText  = files.getText(targetUri)
             if targetLines then
                 response[i] = define.locationLink(targetUri
-                    , define.range(targetLines, targetText, info.target.start, info.target.finish)
-                    , define.range(targetLines, targetText, info.target.start, info.target.finish)
-                    , define.range(lines,       text,       info.source.start, info.source.finish)
+                    , files.range(targetUri, info.target.start, info.target.finish)
+                    , files.range(targetUri, info.target.start, info.target.finish)
+                    , files.range(uri,       info.source.start, info.source.finish)
                 )
             end
         end
@@ -272,7 +268,7 @@ proto.on('textDocument/references', function (params)
     end
     local lines  = files.getLines(uri)
     local text   = files.getText(uri)
-    local offset = define.offsetOfWord(lines, text, params.position)
+    local offset = files.offsetOfWord(uri, params.position)
     local result = core(uri, offset)
     if not result then
         return nil
@@ -280,10 +276,8 @@ proto.on('textDocument/references', function (params)
     local response = {}
     for i, info in ipairs(result) do
         local targetUri = info.uri
-        local targetLines = files.getLines(targetUri)
-        local targetText  = files.getText(targetUri)
         response[i] = define.location(targetUri
-            , define.range(targetLines, targetText, info.target.start, info.target.finish)
+            , files.range(targetUri, info.target.start, info.target.finish)
         )
     end
     return response
@@ -295,9 +289,7 @@ proto.on('textDocument/documentHighlight', function (params)
     if not files.exists(uri) then
         return nil
     end
-    local lines  = files.getLines(uri)
-    local text   = files.getText(uri)
-    local offset = define.offsetOfWord(lines, text, params.position)
+    local offset = files.offsetOfWord(uri, params.position)
     local result = core(uri, offset)
     if not result then
         return nil
@@ -305,7 +297,7 @@ proto.on('textDocument/documentHighlight', function (params)
     local response = {}
     for _, info in ipairs(result) do
         response[#response+1] = {
-            range = define.range(lines, text, info.start, info.finish),
+            range = files.range(uri, info.start, info.finish),
             kind  = info.kind,
         }
     end
@@ -318,9 +310,7 @@ proto.on('textDocument/rename', function (params)
     if not files.exists(uri) then
         return nil
     end
-    local lines  = files.getLines(uri)
-    local text   = files.getText(uri)
-    local offset = define.offsetOfWord(lines, text, params.position)
+    local offset = files.offsetOfWord(uri, params.position)
     local result = core.rename(uri, offset, params.newName)
     if not result then
         return nil
@@ -330,12 +320,10 @@ proto.on('textDocument/rename', function (params)
     }
     for _, info in ipairs(result) do
         local ruri   = info.uri
-        local rlines = files.getLines(ruri)
-        local rtext  = files.getText(ruri)
         if not workspaceEdit.changes[ruri] then
             workspaceEdit.changes[ruri] = {}
         end
-        local textEdit = define.textEdit(define.range(rlines, rtext, info.start, info.finish), info.text)
+        local textEdit = define.textEdit(files.range(ruri, info.start, info.finish), info.text)
         workspaceEdit.changes[ruri][#workspaceEdit.changes[ruri]+1] = textEdit
     end
     return workspaceEdit
@@ -347,15 +335,13 @@ proto.on('textDocument/prepareRename', function (params)
     if not files.exists(uri) then
         return nil
     end
-    local lines  = files.getLines(uri)
-    local text   = files.getText(uri)
-    local offset = define.offsetOfWord(lines, text, params.position)
+    local offset = files.offsetOfWord(uri, params.position)
     local result = core.prepareRename(uri, offset)
     if not result then
         return nil
     end
     return {
-        range       = define.range(lines, text, result.start, result.finish),
+        range       = files.range(uri, result.start, result.finish),
         placeholder = result.text,
     }
 end)
@@ -371,9 +357,7 @@ proto.on('textDocument/completion', function (params)
     end
     await.setPriority(1000)
     local clock  = os.clock()
-    local lines  = files.getLines(uri)
-    local text   = files.getText(uri)
-    local offset = define.offset(lines, text, params.position)
+    local offset = files.offsetOfWord(uri, params.position)
     local result = core.completion(uri, offset)
     local passed = os.clock() - clock
     if passed > 0.1 then
@@ -396,9 +380,8 @@ proto.on('textDocument/completion', function (params)
             commitCharacters = res.commitCharacters,
             command          = res.command,
             textEdit         = res.textEdit and {
-                range   = define.range(
-                    lines,
-                    text,
+                range   = files.range(
+                    uri,
                     res.textEdit.start,
                     res.textEdit.finish
                 ),
@@ -408,9 +391,8 @@ proto.on('textDocument/completion', function (params)
                 local t = {}
                 for j, edit in ipairs(res.additionalTextEdits) do
                     t[j] = {
-                        range   = define.range(
-                            lines,
-                            text,
+                        range   = files.range(
+                            uri,
                             edit.start,
                             edit.finish
                         ),
@@ -467,8 +449,6 @@ proto.on('completionItem/resolve', function (item)
     if not resolved then
         return nil
     end
-    local lines  = files.getLines(uri)
-    local text   = files.getText(uri)
     item.detail = resolved.detail
     item.documentation = resolved.description and {
         value = resolved.description,
@@ -478,9 +458,8 @@ proto.on('completionItem/resolve', function (item)
         local t = {}
         for j, edit in ipairs(resolved.additionalTextEdits) do
             t[j] = {
-                range   = define.range(
-                    lines,
-                    text,
+                range   = files.range(
+                    uri,
                     edit.start,
                     edit.finish
                 ),
@@ -502,9 +481,7 @@ proto.on('textDocument/signatureHelp', function (params)
     end
     await.close('signatureHelp')
     await.setID('signatureHelp')
-    local lines  = files.getLines(uri)
-    local text   = files.getText(uri)
-    local offset = define.offset(lines, text, params.position)
+    local offset = files.offsetOfWord(uri, params.position)
     local core = require 'core.signature'
     local results = core(uri, offset)
     if not results then
@@ -539,12 +516,8 @@ end)
 proto.on('textDocument/documentSymbol', function (params)
     local core = require 'core.document-symbol'
     local uri   = params.textDocument.uri
-    local lines = files.getLines(uri)
-    local text  = files.getText(uri)
-    while not lines or not text do
+    while not files.getLines(uri) do
         await.sleep(0.1)
-        lines = files.getLines(uri)
-        text  = files.getText(uri)
     end
 
     local symbols = core(uri)
@@ -554,15 +527,13 @@ proto.on('textDocument/documentSymbol', function (params)
 
     local function convert(symbol)
         await.delay()
-        symbol.range = define.range(
-            lines,
-            text,
+        symbol.range = files.range(
+            uri,
             symbol.range[1],
             symbol.range[2]
         )
-        symbol.selectionRange = define.range(
-            lines,
-            text,
+        symbol.selectionRange = files.range(
+            uri,
             symbol.selectionRange[1],
             symbol.selectionRange[2]
         )
@@ -595,7 +566,7 @@ proto.on('textDocument/codeAction', function (params)
         return nil
     end
 
-    local start, finish = define.unrange(lines, text, range)
+    local start, finish = files.unrange(uri, range)
     local results = core(uri, start, finish, diagnostics)
 
     if not results or #results == 0 then
@@ -605,10 +576,8 @@ proto.on('textDocument/codeAction', function (params)
     for _, res in ipairs(results) do
         if res.edit then
             for turi, changes in pairs(res.edit.changes) do
-                local ttext  = files.getText(turi)
-                local tlines = files.getLines(turi)
                 for _, change in ipairs(changes) do
-                    change.range = define.range(tlines, ttext, change.start, change.finish)
+                    change.range = files.range(turi, change.start, change.finish)
                     change.start  = nil
                     change.finish = nil
                 end
@@ -644,9 +613,8 @@ proto.on('workspace/symbol', function (params)
     local function convert(symbol)
         symbol.location = define.location(
             symbol.uri,
-            define.range(
-                files.getLines(symbol.uri),
-                files.getText(symbol.uri),
+            files.range(
+                symbol.uri,
                 symbol.range[1],
                 symbol.range[2]
             )
@@ -681,15 +649,11 @@ proto.on('textDocument/semanticTokens/range', function (params)
     local core = require 'core.semantic-tokens'
     local uri = params.textDocument.uri
     log.debug('semanticTokens/range', uri)
-    local lines = files.getLines(uri)
-    local text  = files.getText(uri)
-    while not lines or not text do
+    while not files.getLines(uri) do
         await.sleep(0.1)
-        lines = files.getLines(uri)
-        text  = files.getText(uri)
     end
-    local start  = define.offset(lines, text, params.range.start)
-    local finish = define.offset(lines, text, params.range['end'])
+    local start  = files.offsetOfWord(uri, params.range.start)
+    local finish = files.offsetOfWord(uri, params.range['end'])
     local results = core(uri, start, finish)
     return {
         data = results
@@ -711,8 +675,8 @@ proto.on('textDocument/foldingRange', function (params)
 
     local results = {}
     for _, region in ipairs(regions) do
-        local startLine = define.position(lines, text, region.start).line
-        local endLine   = define.position(lines, text, region.finish).line
+        local startLine = files.position(uri, region.start).line
+        local endLine   = files.position(uri, region.finish).line
         if not region.hideLastLine then
             endLine = endLine - 1
         end

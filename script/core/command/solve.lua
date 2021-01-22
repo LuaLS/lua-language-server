@@ -35,8 +35,8 @@ return function (data)
         return
     end
 
-    local start  = define.offsetOfWord(lines, text, data.range.start)
-    local finish = define.offsetOfWord(lines, text, data.range['end'])
+    local start  = files.offsetOfWord(uri, data.range.start)
+    local finish = files.offsetOfWord(uri, data.range['end'])
 
     local result = guide.eachSourceContain(ast.ast, start, function (source)
         if source.start ~= start
@@ -86,7 +86,7 @@ return function (data)
             changes = {
                 [uri] = {
                     {
-                        range   = define.range(lines, text, result.start, result.finish),
+                        range   = files.range(uri, result.start, result.finish),
                         newText = ('(%s)'):format(text:sub(result.start, result.finish)),
                     }
                 },

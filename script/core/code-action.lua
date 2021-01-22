@@ -65,9 +65,7 @@ end
 
 local function solveUndefinedGlobal(uri, diag, results)
     local ast    = files.getAst(uri)
-    local text   = files.getText(uri)
-    local lines  = files.getLines(uri)
-    local offset = define.offsetOfWord(lines, text, diag.range.start)
+    local offset = files.offsetOfWord(uri, diag.range.start)
     guide.eachSourceContain(ast.ast, offset, function (source)
         if source.type ~= 'getglobal' then
             return
@@ -86,9 +84,7 @@ end
 
 local function solveLowercaseGlobal(uri, diag, results)
     local ast    = files.getAst(uri)
-    local text   = files.getText(uri)
-    local lines  = files.getLines(uri)
-    local offset = define.offsetOfWord(lines, text, diag.range.start)
+    local offset = files.offsetOfWord(uri, diag.range.start)
     guide.eachSourceContain(ast.ast, offset, function (source)
         if source.type ~= 'setglobal' then
             return
@@ -100,12 +96,10 @@ local function solveLowercaseGlobal(uri, diag, results)
 end
 
 local function findSyntax(uri, diag)
-    local ast    = files.getAst(uri)
-    local text   = files.getText(uri)
-    local lines  = files.getLines(uri)
+    local ast = files.getAst(uri)
     for _, err in ipairs(ast.errs) do
         if err.type:lower():gsub('_', '-') == diag.code then
-            local range = define.range(lines, text, err.start, err.finish)
+            local range = files.range(uri, err.start, err.finish)
             if util.equal(range, diag.range) then
                 return err
             end
@@ -205,9 +199,7 @@ local function solveSyntax(uri, diag, results)
 end
 
 local function solveNewlineCall(uri, diag, results)
-    local text    = files.getText(uri)
-    local lines   = files.getLines(uri)
-    local start   = define.unrange(lines, text, diag.range)
+    local start   = files.unrange(uri, diag.range)
     results[#results+1] = {
         title = lang.script.ACTION_ADD_SEMICOLON,
         kind = 'quickfix',

@@ -46,14 +46,14 @@ local function buildSyntaxError(uri, err)
             end
             relatedInformation[#relatedInformation+1] = {
                 message  = rmessage,
-                location = define.location(uri, define.range(lines, text, rel.start, rel.finish)),
+                location = define.location(uri, files.range(uri, rel.start, rel.finish)),
             }
         end
     end
 
     return {
         code     = err.type:lower():gsub('_', '-'),
-        range    = define.range(lines, text, err.start, err.finish),
+        range    = files.range(uri, err.start, err.finish),
         severity = define.DiagnosticSeverity.Error,
         source   = lang.script.DIAG_SYNTAX_CHECK,
         message  = message,
@@ -73,16 +73,15 @@ local function buildDiagnostic(uri, diag)
         relatedInformation = {}
         for _, rel in ipairs(diag.related) do
             local rtext  = files.getText(rel.uri)
-            local rlines = files.getLines(rel.uri)
             relatedInformation[#relatedInformation+1] = {
                 message  = rel.message or rtext:sub(rel.start, rel.finish),
-                location = define.location(rel.uri, define.range(rlines, rtext, rel.start, rel.finish))
+                location = define.location(rel.uri, files.range(rel.uri, rel.start, rel.finish))
             }
         end
     end
 
     return {
-        range    = define.range(lines, text, diag.start, diag.finish),
+        range    = files.range(uri, diag.start, diag.finish),
         source   = lang.script.DIAG_DIAGNOSTICS,
         severity = diag.level,
         message  = diag.message,

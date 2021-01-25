@@ -691,3 +691,8 @@ proto.on('textDocument/foldingRange', function (params)
 
     return results
 end)
+
+proto.on('window/workDoneProgress/cancel', function (params)
+    local progress = require 'progress'
+    progress.cancel(params.token)
+end)

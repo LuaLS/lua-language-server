@@ -229,11 +229,12 @@ function m.awaitPreload()
     local diagnostic = require 'provider.diagnostic'
     await.close 'preload'
     await.setID 'preload'
+    await.sleep(0.1)
     diagnostic.pause()
     m.libraryMatchers = nil
     m.nativeMatcher   = nil
     m.cache           = {}
-    local progressBar <close> = progress.create('正在加载文件', 0)
+    local progressBar <close> = progress.create(lang.script.WORKSPACE_LOADING)
     local progressData = {
         max     = 0,
         read    = 0,

@@ -16,11 +16,12 @@ mt._title      = nil
 mt._message    = nil
 mt._removed    = false
 mt._clock      = 0.0
-mt._delay      = 1.0
+mt._delay      = 0.0
 mt._percentage = nil
 mt._showed     = false
 mt._dirty      = true
 mt._updated    = 0.0
+mt._onCancel   = nil
 
 ---移除进度条
 function mt:remove()
@@ -64,31 +65,56 @@ function mt:setPercentage(per)
     self:_update()
 end
 
+---取消事件
+function mt:onCancel(callback)
+    self._onCancel = callback
+    self:_update()
+end
+
 function mt:_update()
     if self._removed then
-        return
-    end
-    if not self._showed then
         return
     end
     if not self._dirty then
         return
     end
+    self._dirty = false
+    if  not self._showed
+    and self._clock + self._delay <= os.clock() then
+        self._showed  = true
+        self._updated = os.clock()
+        proto.request('window/workDoneProgress/create', {
+            token = self._token,
+        })
+        proto.notify('$/progress', {
+            token = self._token,
+            value = {
+                kind        = 'begin',
+                title       = self._title,
+                cancellable = self._onCancel ~= nil,
+                message     = self._message,
+                percentage  = self._percentage,
+            }
+        })
+        log.info('Create progress:', self._token, self._title)
+        return
+    end
+    if not self._showed then
+        return
+    end
     if os.clock() - self._updated < 0.05 then
         return
     end
-    self._dirty = false
     self._updated = os.clock()
     proto.notify('$/progress', {
         token = self._token,
         value = {
             kind        = 'report',
-            cancellable = false,
             message     = self._message,
             percentage  = self._percentage,
         }
     })
-    log.info('Report progress:', self._token, self._title, self._message)
+    log.info('Report progress:', self._token, self._title, self._message, self._percentage)
 end
 
 function mt:__close()
@@ -97,29 +123,9 @@ function mt:__close()
 end
 
 function m.update()
-    local clock = os.clock()
     ---@param prog progress
-    for token, prog in pairs(m.map) do
+    for _, prog in pairs(m.map) do
         if prog._removed then
-            goto CONTINUE
-        end
-        if  not prog._showed
-        and prog._clock + prog._delay <= clock then
-            prog._showed = true
-            proto.request('window/workDoneProgress/create', {
-                token = token,
-            })
-            proto.notify('$/progress', {
-                token = token,
-                value = {
-                    kind        = 'begin',
-                    title       = prog._title,
-                    cancellable = false,
-                    message     = prog._message,
-                    percentage  = prog._percentage,
-                }
-            })
-            log.info('Create progress:', token, prog._title)
             goto CONTINUE
         end
         prog:_update()
@@ -141,6 +147,16 @@ function m.create(title, delay)
     m.map[prog._token] = prog
 
     return prog
+end
+
+---取消一个进度条
+function m.cancel(token)
+    local prog = m.map[token]
+    if not prog then
+        return
+    end
+    xpcall(prog._onCancel, log.error, prog)
+    prog:remove()
 end
 
 timer.loop(0.1, m.update)

@@ -1,12 +1,13 @@
-local await  = require 'await'
-local proto  = require 'proto.proto'
-local define = require 'proto.define'
-local lang   = require 'language'
-local files  = require 'files'
-local config = require 'config'
-local core   = require 'core.diagnostics'
-local util   = require 'utility'
-local ws     = require 'workspace'
+local await    = require 'await'
+local proto    = require 'proto.proto'
+local define   = require 'proto.define'
+local lang     = require 'language'
+local files    = require 'files'
+local config   = require 'config'
+local core     = require 'core.diagnostics'
+local util     = require 'utility'
+local ws       = require 'workspace'
+local progress = require "progress"
 
 local m = {}
 m._start = false
@@ -254,10 +255,24 @@ function m.diagnosticsAll()
         await.sleep(delay)
         m.diagnosticsAllClock = os.clock()
         local clock = os.clock()
-        for uri in files.eachFile() do
+        local bar <close> = progress.create(lang.script.WORKSPACE_DIAGNOSTIC)
+        local cancelled
+        bar:onCancel(function ()
+            log.debug('Cancel workspace diagnostics')
+            cancelled = true
+        end)
+        local uris = files.getAllUris()
+        for i, uri in ipairs(uris) do
+            bar:setMessage(('%d/%d'):format(i, #uris))
+            bar:setPercentage(i / #uris * 100)
             m.doDiagnostic(uri)
             await.delay()
+            if cancelled then
+                log.debug('Break workspace diagnostics')
+                break
+            end
         end
+        bar:remove()
         log.debug('全文诊断耗时：', os.clock() - clock)
     end, 'files.version', 'diagnosticsAll')
 end

@@ -547,6 +547,7 @@ local Defs = {
                 finish = finish - 1,
                 [1]    = n,
             }
+            State.LastRaw = number
             return State.LastNumber
         else
             PushError {
@@ -560,12 +561,13 @@ local Defs = {
                 finish = finish - 1,
                 [1]    = 0,
             }
+            State.LastRaw = number
             return State.LastNumber
         end
     end,
     FFINumber = function (start, symbol)
         local lastNumber = State.LastNumber
-        if mathType(lastNumber[1]) == 'float' then
+        if State.LastRaw:find('.', 1, true) then
             PushError {
                 type = 'UNKNOWN_SYMBOL',
                 start = start,

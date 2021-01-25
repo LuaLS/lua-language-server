@@ -22,7 +22,6 @@ local function concat(t, sep)
 end
 
 local function buildSyntaxError(uri, err)
-    local lines   = files.getLines(uri)
     local text    = files.getText(uri)
     local message = lang.script('PARSER_'..err.type, err.info)
 
@@ -63,9 +62,7 @@ local function buildSyntaxError(uri, err)
 end
 
 local function buildDiagnostic(uri, diag)
-    local lines = files.getLines(uri)
-    local text  = files.getText(uri)
-    if not text or not lines then
+    if files.exists(uri) then
         return
     end
 

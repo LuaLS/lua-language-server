@@ -120,7 +120,6 @@ end
 
 local function solveSyntaxByAddDoEnd(uri, err, results)
     local text   = files.getText(uri)
-    local lines  = files.getLines(uri)
     results[#results+1] = {
         title = lang.script.ACTION_ADD_DO_END,
         kind = 'quickfix',
@@ -139,8 +138,6 @@ local function solveSyntaxByAddDoEnd(uri, err, results)
 end
 
 local function solveSyntaxByFix(uri, err, results)
-    local text    = files.getText(uri)
-    local lines   = files.getLines(uri)
     local changes = {}
     for _, fix in ipairs(err.fix) do
         changes[#changes+1] = {

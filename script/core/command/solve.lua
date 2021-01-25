@@ -28,7 +28,6 @@ local literalMap = {
 
 return function (data)
     local uri   = data.uri
-    local lines = files.getLines(uri)
     local text  = files.getText(uri)
     local ast   = files.getAst(uri)
     if not ast then

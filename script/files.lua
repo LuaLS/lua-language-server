@@ -14,17 +14,18 @@ local smerger  = require 'string-merger'
 
 local m = {}
 
-m.openMap       = {}
-m.libraryMap    = {}
-m.fileMap       = {}
-m.dllMap        = {}
-m.watchList     = {}
-m.notifyCache   = {}
-m.assocVersion  = -1
-m.assocMatcher  = nil
-m.globalVersion = 0
-m.linesMap = setmetatable({}, { __mode = 'v' })
-m.astMap   = setmetatable({}, { __mode = 'v' })
+m.openMap        = {}
+m.libraryMap     = {}
+m.fileMap        = {}
+m.dllMap         = {}
+m.watchList      = {}
+m.notifyCache    = {}
+m.assocVersion   = -1
+m.assocMatcher   = nil
+m.globalVersion  = 0
+m.linesMap       = setmetatable({}, { __mode = 'v' })
+m.originLinesMap = setmetatable({}, { __mode = 'v' })
+m.astMap         = setmetatable({}, { __mode = 'v' })
 
 local uriMap = {}
 local function getUriKey(uri)
@@ -365,6 +366,11 @@ function m.getLines(uri)
         m.linesMap[uri] = lines
     end
     return lines
+end
+
+
+function m.getOriginLines(uri)
+    
 end
 
 --- 获取原始uri

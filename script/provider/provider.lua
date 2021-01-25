@@ -236,8 +236,6 @@ proto.on('textDocument/definition', function (params)
     if not files.exists(uri) then
         return nil
     end
-    local lines  = files.getLines(uri)
-    local text   = files.getText(uri)
     local offset = files.offsetOfWord(uri, params.position)
     local result = core(uri, offset)
     if not result then
@@ -247,8 +245,7 @@ proto.on('textDocument/definition', function (params)
     for i, info in ipairs(result) do
         local targetUri = info.uri
         if targetUri then
-            local targetLines = files.getLines(targetUri)
-            if targetLines then
+            if files.exists(targetUri) then
                 response[i] = define.locationLink(targetUri
                     , files.range(targetUri, info.target.start, info.target.finish)
                     , files.range(targetUri, info.target.start, info.target.finish)
@@ -266,8 +263,6 @@ proto.on('textDocument/references', function (params)
     if not files.exists(uri) then
         return nil
     end
-    local lines  = files.getLines(uri)
-    local text   = files.getText(uri)
     local offset = files.offsetOfWord(uri, params.position)
     local result = core(uri, offset)
     if not result then
@@ -516,7 +511,7 @@ end)
 proto.on('textDocument/documentSymbol', function (params)
     local core = require 'core.document-symbol'
     local uri   = params.textDocument.uri
-    while not files.getLines(uri) do
+    while not files.exists(uri) do
         await.sleep(0.1)
     end
 
@@ -560,9 +555,7 @@ proto.on('textDocument/codeAction', function (params)
     local uri         = params.textDocument.uri
     local range       = params.range
     local diagnostics = params.context.diagnostics
-    local text        = files.getText(uri)
-    local lines       = files.getLines(uri)
-    if not text or not lines then
+    if files.exists(uri) then
         return nil
     end
 
@@ -649,7 +642,7 @@ proto.on('textDocument/semanticTokens/range', function (params)
     local core = require 'core.semantic-tokens'
     local uri = params.textDocument.uri
     log.debug('semanticTokens/range', uri)
-    while not files.getLines(uri) do
+    while not files.exists(uri) do
         await.sleep(0.1)
     end
     local start  = files.offsetOfWord(uri, params.range.start)
@@ -663,9 +656,7 @@ end)
 proto.on('textDocument/foldingRange', function (params)
     local core    = require 'core.folding'
     local uri     = params.textDocument.uri
-    local lines   = files.getLines(uri)
-    local text    = files.getText(uri)
-    if not lines or not text then
+    if not files.exists(uri) then
         return nil
     end
     local regions = core(uri)

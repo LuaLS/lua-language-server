@@ -10,6 +10,8 @@ local proto      = require 'proto.proto'
 local lang       = require 'language'
 local library    = require 'library'
 local sp         = require 'bee.subprocess'
+local timer      = require 'timer'
+local progress   = require 'progress'
 
 local m = {}
 m.type = 'workspace'
@@ -170,11 +172,11 @@ function m.isIgnored(uri)
     return ignore(path)
 end
 
-local function loadFileFactory(root, progress, isLibrary)
+local function loadFileFactory(root, progressData, isLibrary)
     return function (path)
         local uri = furi.encode(path)
         if files.isLua(uri) then
-            if not isLibrary and progress.preload >= config.config.workspace.maxPreload then
+            if not isLibrary and progressData.preload >= config.config.workspace.maxPreload then
                 if not m.hasHitMaxPreload then
                     m.hasHitMaxPreload = true
                     proto.notify('window/showMessage', {
@@ -185,11 +187,13 @@ local function loadFileFactory(root, progress, isLibrary)
                 return
             end
             if not isLibrary then
-                progress.preload = progress.preload + 1
+                progressData.preload = progressData.preload + 1
             end
-            progress.max = progress.max + 1
+            progressData.max = progressData.max + 1
+            progressData:update()
             pub.task('loadFile', uri, function (text)
-                progress.read = progress.read + 1
+                progressData.read = progressData.read + 1
+                progressData:update()
                 if text then
                     log.info(('Preload file at: %s , size = %.3f KB'):format(uri, #text / 1000.0))
                     if isLibrary then
@@ -203,9 +207,11 @@ local function loadFileFactory(root, progress, isLibrary)
             end)
         end
         if files.isDll(uri) then
-            progress.max = progress.max + 1
+            progressData.max = progressData.max + 1
+            progressData:update()
             pub.task('loadFile', uri, function (content)
-                progress.read = progress.read + 1
+                progressData.read = progressData.read + 1
+                progressData:update()
                 if content then
                     log.info(('Preload file at: %s , size = %.3f KB'):format(uri, #content / 1000.0))
                     if isLibrary then
@@ -218,41 +224,6 @@ local function loadFileFactory(root, progress, isLibrary)
     end
 end
 
-local function testProgress()
-    local client = require 'provider.client'
-    proto.notify('$/progress', {
-        token = client.info.workDoneToken,
-        value = {
-            kind        = 'begin',
-            title       = '测试标题',
-            cancellable = false,
-            message     = '测试描述',
-            percentage  = 0,
-        }
-    })
-    for i = 1, 100 do
-        await.sleep(0.1)
-        log.info('sleep', i)
-        proto.notify('$/progress', {
-            token = client.info.workDoneToken,
-            value = {
-                kind        = 'report',
-                cancellable = false,
-                message     = '测试描述',
-                percentage  = i,
-            }
-        })
-    end
-    await.sleep(0.1)
-    proto.notify('$/progress', {
-        token = client.info.workDoneToken,
-        value = {
-            kind        = 'end',
-            message     = '测试描述',
-        }
-    })
-end
-
 --- 预读工作区内所有文件
 function m.awaitPreload()
     local diagnostic = require 'provider.diagnostic'
@@ -262,13 +233,18 @@ function m.awaitPreload()
     m.libraryMatchers = nil
     m.nativeMatcher   = nil
     m.cache           = {}
-    local progress = {
+    local progressBar <close> = progress.create('正在加载文件', 0)
+    local progressData = {
         max     = 0,
         read    = 0,
         preload = 0,
+        update  = function (self)
+            progressBar:setMessage(('%d/%d'):format(self.read, self.max))
+            progressBar:setPercentage(self.read / self.max * 100)
+        end
     }
     log.info('Preload start.')
-    local nativeLoader    = loadFileFactory(m.path, progress)
+    local nativeLoader    = loadFileFactory(m.path, progressData)
     local native          = m.getNativeMatcher()
     local librarys        = m.getLibraryMatchers()
     if native then
@@ -276,21 +252,21 @@ function m.awaitPreload()
         native:scan(m.path, nativeLoader)
     end
     for _, library in ipairs(librarys) do
-        local libraryLoader = loadFileFactory(library.path, progress, true)
+        local libraryLoader = loadFileFactory(library.path, progressData, true)
         log.info('Scan library at:', library.path)
         library.matcher:scan(library.path, libraryLoader)
     end
 
-    log.info(('Found %d files.'):format(progress.max))
+    log.info(('Found %d files.'):format(progressData.max))
     while true do
-        log.info(('Loaded %d/%d files'):format(progress.read, progress.max))
-        if progress.read >= progress.max then
+        log.info(('Loaded %d/%d files'):format(progressData.read, progressData.max))
+        progressData:update()
+        if progressData.read >= progressData.max then
             break
         end
         await.sleep(0.1)
     end
-
-    --testProgress()
+    progressBar:remove()
 
     log.info('Preload finish.')
 

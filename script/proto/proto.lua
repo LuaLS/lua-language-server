@@ -68,7 +68,7 @@ function m.notify(name, params)
 end
 
 function m.awaitRequest(name, params)
-    local id = reqCounter()
+    local id  = reqCounter()
     local buf = jsonrpc.encode {
         id     = id,
         method = name,
@@ -83,6 +83,25 @@ function m.awaitRequest(name, params)
         log.warn(('Response of [%s] error [%d]: %s'):format(name, error.code, error.message))
     end
     return result
+end
+
+function m.request(name, params, callback)
+    local id  = reqCounter()
+    local buf = jsonrpc.encode {
+        id     = id,
+        method = name,
+        params = params,
+    }
+    --log.debug('Request', name, #buf)
+    io.stdout:write(buf)
+    m.waiting[id] = function (result, error)
+        if error then
+            log.warn(('Response of [%s] error [%d]: %s'):format(name, error.code, error.message))
+        end
+        if callback then
+            callback(result)
+        end
+    end
 end
 
 function m.doMethod(proto)

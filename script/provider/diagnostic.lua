@@ -238,6 +238,55 @@ function m.refresh(uri)
     end, 'files.version')
 end
 
+local function askForDisable()
+    if m.dontAskedForDisable then
+        return
+    end
+    local item = proto.awaitRequest('window/showMessageRequest', {
+        type    = define.MessageType.Info,
+        message = '你可以在设置中延迟或禁用工作目录诊断',
+        actions = {
+            {
+                title = '不再提醒',
+            },
+            {
+                title = '空闲时进行工作区诊断（延迟30秒）',
+            },
+            {
+                title = '禁用工作区诊断',
+            },
+        }
+    })
+    if not item then
+        return
+    end
+    if     item.title == '不再提醒' then
+        m.dontAskedForDisable = true
+    elseif item.title == '空闲时进行工作区诊断（延迟30秒）' then
+        proto.request('workspace/executeCommand', {
+            command   = 'lua.config',
+            arguments = {
+                {
+                    key    = 'Lua.diagnostics.workspaceDelay',
+                    action = 'set',
+                    value  = 30000,
+                }
+            }
+        })
+    elseif item.title == '禁用工作区诊断' then
+        proto.request('workspace/executeCommand', {
+            command   = 'lua.config',
+            arguments = {
+                {
+                    key    = 'Lua.diagnostics.workspaceDelay',
+                    action = 'set',
+                    value  = -1,
+                }
+            }
+        })
+    end
+end
+
 function m.diagnosticsAll()
     if not config.config.diagnostics.enable then
         m.clearAll()
@@ -255,11 +304,12 @@ function m.diagnosticsAll()
         await.sleep(delay)
         m.diagnosticsAllClock = os.clock()
         local clock = os.clock()
-        local bar <close> = progress.create(lang.script.WORKSPACE_DIAGNOSTIC)
+        local bar <close> = progress.create(lang.script.WORKSPACE_DIAGNOSTIC, 1)
         local cancelled
         bar:onCancel(function ()
             log.debug('Cancel workspace diagnostics')
             cancelled = true
+            --askForDisable()
         end)
         local uris = files.getAllUris()
         for i, uri in ipairs(uris) do

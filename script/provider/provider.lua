@@ -191,7 +191,9 @@ proto.on('textDocument/didChange', function (params)
     local text = files.getOriginText(uri) or ''
     for _, change in ipairs(changes) do
         if change.range then
-            local start, finish = files.unrange(uri, change.range)
+            local start, finish = files.unrange(uri, change.range, true)
+            start  = files.diffedOffsetBack(uri, start)
+            finish = files.diffedOffsetBack(uri, finish)
             text = text:sub(1, start) .. change.text .. text:sub(finish + 1)
         else
             text = change.text

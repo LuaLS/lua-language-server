@@ -370,7 +370,17 @@ end
 
 
 function m.getOriginLines(uri)
-    
+    uri = getUriKey(uri)
+    local file = m.fileMap[uri]
+    if not file then
+        return nil
+    end
+    local lines = m.originLinesMap[uri]
+    if not lines then
+        lines = parser:lines(file.originText)
+        m.originLinesMap[uri] = lines
+    end
+    return lines
 end
 
 --- 获取原始uri
@@ -397,7 +407,7 @@ end
 ---@alias position table
 
 --- 获取 position 对应的光标位置
----@param uri uri
+---@param uri      uri
 ---@param position position
 ---@return integer
 function m.offset(uri, position)
@@ -406,6 +416,10 @@ function m.offset(uri, position)
     local text  = m.getText(uri)
     if not file then
         return 0
+    end
+    if file._diffInfo then
+        lines = m.getOriginLines(uri)
+        text  = m.getOriginText(uri)
     end
     local row    = position.line + 1
     local start  = guide.lineRange(lines, row)
@@ -430,20 +444,54 @@ function m.offsetOfWord(uri, position)
     if not file then
         return 0
     end
+    if file._diffInfo then
+        lines = m.getOriginLines(uri)
+        text  = m.getOriginText(uri)
+    end
     local row    = position.line + 1
     local start  = guide.lineRange(lines, row)
     if start <= 0 or start > #text then
         return #text + 1
     end
     local offset = utf8.offset(text, position.character + 1, start) or (#text + 1)
+    if file._diffInfo then
+        offset = smerger.getOffset(file._diffInfo, offset)
+    end
     if offset > #text
     or text:sub(offset-1, offset):match '[%w_][^%w_]' then
         offset = offset - 1
     end
-    if file._diffInfo then
-        offset = smerger.getOffset(file._diffInfo, offset)
-    end
     return offset
+end
+
+--- 将应用差异前的offset转换为应用差异后的offset
+---@param uri    uri
+---@param offset integer
+---@return integer
+function m.diffedOffset(uri, offset)
+    local file = m.getFile(uri)
+    if not file then
+        return offset
+    end
+    if not file._diffInfo then
+        return offset
+    end
+    return smerger.getOffset(file._diffInfo, offset)
+end
+
+--- 将应用差异后的offset转换为应用差异前的offset
+---@param uri    uri
+---@param offset integer
+---@return integer
+function m.diffedOffsetBack(uri, offset)
+    local file = m.getFile(uri)
+    if not file then
+        return offset
+    end
+    if not file._diffInfo then
+        return offset
+    end
+    return smerger.getOffsetBack(file._diffInfo, offset)
 end
 
 --- 将光标位置转化为 position
@@ -462,6 +510,8 @@ function m.position(uri, offset)
     end
     if file._diffInfo then
         offset = smerger.getOffsetBack(file._diffInfo, offset)
+        lines  = m.getOriginLines(uri)
+        text   = m.getOriginText(uri)
     end
     local row, col      = guide.positionOf(lines, offset)
     local start, finish = guide.lineRange(lines, row, true)

@@ -1492,6 +1492,11 @@ function m.checkSameSimpleInValueOfSetMetaTable(status, func, start, pushQueue)
     local mt = args[2]
     if obj then
         pushQueue(obj, start, true)
+        local newStatus = m.status(status)
+        m.searchRefs(newStatus, obj, 'def')
+        for _, def in ipairs(newStatus.results) do
+            pushQueue(def, start, true)
+        end
     end
     if mt then
         m.checkSameSimpleInValueInMetaTable(status, mt, start, pushQueue)

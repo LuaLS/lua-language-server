@@ -364,3 +364,8 @@ local <?t?>
 print(#t)
 print(t .. 'a')
 ]]
+
+TEST 'table' [[
+local t = {}
+local <?v?> = setmetatable(t)
+]]

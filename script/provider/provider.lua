@@ -352,7 +352,7 @@ proto.on('textDocument/completion', function (params)
     end
     await.setPriority(1000)
     local clock  = os.clock()
-    local offset = files.offsetOfWord(uri, params.position)
+    local offset = files.offset(uri, params.position)
     local result = core.completion(uri, offset)
     local passed = os.clock() - clock
     if passed > 0.1 then

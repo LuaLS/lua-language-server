@@ -430,10 +430,12 @@ function m.offset(uri, position)
     end
     local row    = position.line + 1
     local start  = guide.lineRange(lines, row)
+    local offset
     if start <= 0 or start > #text then
-        return #text + 1
+        offset = #text + 2
+    else
+        offset = utf8.offset(text, position.character + 1, start) or (#text + 1)
     end
-    local offset = utf8.offset(text, position.character + 1, start) or (#text + 1)
     if file._diffInfo then
         offset = smerger.getOffset(file._diffInfo, offset)
     end
@@ -457,10 +459,12 @@ function m.offsetOfWord(uri, position)
     end
     local row    = position.line + 1
     local start  = guide.lineRange(lines, row)
+    local offset
     if start <= 0 or start > #text then
-        return #text + 1
+        offset = #text + 2
+    else
+        offset = utf8.offset(text, position.character + 1, start) or (#text + 1)
     end
-    local offset = utf8.offset(text, position.character + 1, start) or (#text + 1)
     if file._diffInfo then
         offset = smerger.getOffset(file._diffInfo, offset)
     end
@@ -499,6 +503,17 @@ function m.diffedOffsetBack(uri, offset)
         return offset
     end
     return smerger.getOffsetBack(file._diffInfo, offset)
+end
+
+function m.clearDiff(uri)
+    uri = m.getUri(uri)
+    local file = m.fileMap[uri]
+    if not file then
+        return
+    end
+    file._diffInfo  = nil
+    file.text       = file.originText
+    m.linesMap[uri] = m.originLinesMap[uri]
 end
 
 --- 将光标位置转化为 position

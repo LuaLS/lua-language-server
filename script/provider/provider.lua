@@ -191,12 +191,11 @@ proto.on('textDocument/didChange', function (params)
     if not files.isLua(uri) and not files.isOpen(uri) then
         return
     end
-    local text = files.getOriginText(uri) or ''
+    files.clearDiff(uri)
+    local text = files.getText(uri) or ''
     for _, change in ipairs(changes) do
         if change.range then
             local start, finish = files.unrange(uri, change.range)
-            start  = files.diffedOffsetBack(uri, start)
-            finish = files.diffedOffsetBack(uri, finish)
             text = text:sub(1, start) .. change.text .. text:sub(finish + 1)
         else
             text = change.text

@@ -1,6 +1,7 @@
 # changelog
 
 ## 1.12.0
+`2021-1-26`
 * `NEW` progress
 * `NEW` [#340](https://github.com/sumneko/lua-language-server/pull/340): supports `---@type table<string, number>`
 * `FIX` [#355](https://github.com/sumneko/lua-language-server/pull/355)

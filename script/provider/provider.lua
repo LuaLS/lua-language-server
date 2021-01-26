@@ -52,11 +52,11 @@ local function updateConfig()
     config.setConfig(updated, other)
     local newConfig = config.config
     local newOther  = config.other
+
     if not util.equal(oldConfig.runtime, newConfig.runtime) then
         library.init()
         workspace.reload()
         semantic.refresh()
-        plugin.init()
     end
     if not util.equal(oldConfig.diagnostics, newConfig.diagnostics) then
         diagnostics.diagnosticsAll()
@@ -169,6 +169,9 @@ proto.on('textDocument/didOpen', function (params)
     local uri   = doc.uri
     local text  = doc.text
     files.open(uri)
+    while not plugin.isReady() do
+        await.sleep(0.1)
+    end
     files.setText(uri, text)
 end)
 
@@ -191,7 +194,7 @@ proto.on('textDocument/didChange', function (params)
     local text = files.getOriginText(uri) or ''
     for _, change in ipairs(changes) do
         if change.range then
-            local start, finish = files.unrange(uri, change.range, true)
+            local start, finish = files.unrange(uri, change.range)
             start  = files.diffedOffsetBack(uri, start)
             finish = files.diffedOffsetBack(uri, finish)
             text = text:sub(1, start) .. change.text .. text:sub(finish + 1)

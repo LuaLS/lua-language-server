@@ -403,10 +403,12 @@ end
 
 function m.reload()
     local rpath = require 'workspace.require-path'
+    local plugin     = require 'plugin'
     files.flushAllLibrary()
     files.removeAllClosed()
     files.flushCache()
     rpath.flush()
+    plugin.init()
     await.call(m.awaitPreload)
 end
 

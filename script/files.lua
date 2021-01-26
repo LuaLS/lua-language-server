@@ -11,6 +11,7 @@ local plugin   = require 'plugin'
 local util     = require 'utility'
 local guide    = require 'parser.guide'
 local smerger  = require 'string-merger'
+local plugin   = require 'plugin'
 
 local m = {}
 
@@ -145,6 +146,7 @@ function m.setText(uri, text)
     file.text       = newText
     file.originText = text
     m.linesMap[uri] = nil
+    m.originLinesMap[uri] = nil
     m.astMap[uri] = nil
     file.cache = {}
     file.cacheActiveTime = math.huge
@@ -155,6 +157,11 @@ function m.setText(uri, text)
         m.onWatch('create', originUri)
     end
     m.onWatch('update', originUri)
+    if DEVELOP then
+        if text ~= newText then
+            util.saveFile(LOGPATH .. '/diffed.lua', newText)
+        end
+    end
 end
 
 --- 获取文件版本

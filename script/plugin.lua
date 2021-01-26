@@ -22,6 +22,10 @@ function m.dispatch(event, ...)
     return false
 end
 
+function m.isReady()
+    return m.interface ~= nil
+end
+
 function m.init()
     local ws    = require 'workspace'
     m.interface = {}

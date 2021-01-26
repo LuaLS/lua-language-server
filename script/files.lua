@@ -465,12 +465,12 @@ function m.offsetOfWord(uri, position)
     else
         offset = utf8.offset(text, position.character + 1, start) or (#text + 1)
     end
-    if file._diffInfo then
-        offset = smerger.getOffset(file._diffInfo, offset)
-    end
     if offset > #text
     or text:sub(offset-1, offset):match '[%w_][^%w_]' then
         offset = offset - 1
+    end
+    if file._diffInfo then
+        offset = smerger.getOffset(file._diffInfo, offset)
     end
     return offset
 end

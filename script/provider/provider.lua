@@ -559,7 +559,7 @@ proto.on('textDocument/codeAction', function (params)
     local uri         = params.textDocument.uri
     local range       = params.range
     local diagnostics = params.context.diagnostics
-    if files.exists(uri) then
+    if not files.exists(uri) then
         return nil
     end
 

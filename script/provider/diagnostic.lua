@@ -62,7 +62,7 @@ local function buildSyntaxError(uri, err)
 end
 
 local function buildDiagnostic(uri, diag)
-    if files.exists(uri) then
+    if not files.exists(uri) then
         return
     end
 

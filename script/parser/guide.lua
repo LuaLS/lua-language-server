@@ -2141,8 +2141,10 @@ function m.searchSameFieldsInValue(status, ref, start, pushQueue, mode)
     if not value then
         return
     end
-    if m.checkValueMark(status, ref, value) then
-        return
+    if mode == 'ref' then
+        if m.checkValueMark(status, ref, value) then
+            return
+        end
     end
     local newStatus = m.status(status)
     m.searchRefs(newStatus, value, mode)

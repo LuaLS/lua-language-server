@@ -571,6 +571,33 @@ TEST {
 }
 end
 
+TEST {
+    {
+        path    = 'a.lua',
+        content = [[
+            local t = {
+                x = 1,
+            }
+            return t
+        ]]
+    },
+    {
+        path    = 'b.lua',
+        main    = true,
+        content = [[
+            local t = require 'a'
+            local v = setmetatable({}, {__index = t})
+            v.$
+        ]]
+    },
+    completion = {
+        {
+            label  = 'x',
+            kind   = CompletionItemKind.Enum,
+        }
+    }
+}
+
 Cared['description'] = true
 TEST {
     {

@@ -5,6 +5,7 @@
 * `NEW` [#340](https://github.com/sumneko/lua-language-server/pull/340): supports `---@type table<string, number>`
 * `FIX` [#355](https://github.com/sumneko/lua-language-server/pull/355)
 * `FIX` [#359](https://github.com/sumneko/lua-language-server/issues/359)
+* `FIX` [#361](https://github.com/sumneko/lua-language-server/issues/361)
 
 ## 1.11.2
 `2021-1-7`

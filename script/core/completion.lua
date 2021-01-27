@@ -522,7 +522,7 @@ local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, res
         if isSameSource(ast, src, start) then
             goto CONTINUE
         end
-        if locals and locals[name] then
+        if isGlobal and locals and locals[name] then
             goto CONTINUE
         end
         if not matchKey(word, name, count >= 100) then
@@ -553,20 +553,20 @@ local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, res
     end
 end
 
-local function checkField(ast, word, start, offset, parent, oop, results)
-    local refs
-    if guide.isGlobal(parent) then
-        refs = vm.getDefFields(parent, 0)
-    else
-        refs = vm.getFields(parent, 0)
-    end
-    checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, results)
-end
-
 local function checkGlobal(ast, word, start, offset, parent, oop, results)
     local locals = guide.getVisibleLocals(ast.ast, offset)
     local refs = vm.getGlobalSets '*'
     checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, results, locals, 'global')
+end
+
+local function checkField(ast, word, start, offset, parent, oop, results)
+    if parent.tag == '_ENV' or parent.special == '_G' then
+        local refs = vm.getGlobalSets '*'
+        checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, results)
+    else
+        local refs = vm.getFields(parent, 0)
+        checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, results)
+    end
 end
 
 local function checkTableField(ast, word, start, results)

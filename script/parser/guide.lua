@@ -1411,7 +1411,23 @@ function m.checkSameSimpleInValueOfTable(status, value, start, pushQueue)
     end
 end
 
+function m.checkStatusDepth(status)
+    if status.depth <= 20 then
+        return true
+    end
+    if m.debugMode then
+        error('status.depth overflow')
+    elseif DEVELOP then
+        --log.warn(debug.traceback('status.depth overflow'))
+        logWarn('status.depth overflow')
+    end
+    return false
+end
+
 function m.searchFields(status, obj, key)
+    if not m.checkStatusDepth(status) then
+        return
+    end
     local simple = m.getSimple(obj)
     if not simple then
         return
@@ -1422,6 +1438,9 @@ function m.searchFields(status, obj, key)
 end
 
 function m.searchDefFields(status, obj, key)
+    if not m.checkStatusDepth(status) then
+        return
+    end
     local simple = m.getSimple(obj)
     if not simple then
         return
@@ -2912,17 +2931,10 @@ function m.searchRefs(status, obj, mode)
     tracy.ZoneEnd()
     -- 检查simple
     tracy.ZoneBeginN('searchRefs searchSameFields')
-    if status.depth <= 20 then
+    if m.checkStatusDepth(status) then
         local simple = m.getSimple(obj)
         if simple then
             m.searchSameFields(status, simple, mode)
-        end
-    else
-        if m.debugMode then
-            error('status.depth overflow')
-        elseif DEVELOP then
-            --log.warn(debug.traceback('status.depth overflow'))
-            logWarn('status.depth overflow')
         end
     end
     tracy.ZoneEnd()

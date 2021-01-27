@@ -359,6 +359,7 @@ function m.getAst(uri)
     if not ast then
         ast = m.compileAst(uri, file.text)
         m.astMap[uri] = ast
+        await.delay()
     end
     file.cacheActiveTime = timer.clock()
     return ast

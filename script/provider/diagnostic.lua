@@ -154,6 +154,10 @@ function m.diagnostics(uri, diags)
         return
     end
 
+    if not ws.isReady() then
+        return
+    end
+
     core(uri, function (results)
         if #results == 0 then
             return
@@ -372,9 +376,13 @@ files.watch(function (ev, uri)
     if ev == 'remove' then
         m.clear(uri)
     elseif ev == 'update' then
-        m.refresh(uri)
+        if ws.isReady() then
+            m.refresh(uri)
+        end
     elseif ev == 'open' then
-        m.doDiagnostic(uri)
+        if ws.isReady() then
+            m.doDiagnostic(uri)
+        end
     elseif ev == 'close' then
         if files.isLibrary(uri)
         or ws.isIgnored(uri) then

@@ -425,6 +425,10 @@ function m.awaitReady()
     end
 end
 
+function m.isReady()
+    return m.ready == true
+end
+
 files.watch(function (ev, uri)
     if  ev == 'close'
     and m.isIgnored(uri)

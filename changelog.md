@@ -1,6 +1,7 @@
 # changelog
 
 ## 1.12.2
+`2021-1-27`
 * `CHG` performance optimization
 * `FIX` modifying the code before loading finish makes confusion
 * `FIX` signature: not works

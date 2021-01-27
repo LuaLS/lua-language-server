@@ -49,7 +49,7 @@ local function asValue(source, title)
     local literal = vm.getInferLiteral(source, 0)
     local cont
     if not vm.hasInferType(source, 'string', 0) and not type:find('%[%]$') then
-        if #vm.getDefFields(source, 0) > 0
+        if #vm.getFields(source, 0) > 0
         or vm.hasInferType(source, 'table', 0) then
             cont = buildTable(source)
         end

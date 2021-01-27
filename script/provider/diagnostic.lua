@@ -176,6 +176,9 @@ function m.doDiagnostic(uri)
 
     await.delay()
 
+    local prog <close> = progress.create('正在诊断', 0.5)
+    prog:setMessage(ws.getRelativePath(files.getOriginUri(uri)))
+
     local ast = files.getAst(uri)
     if not ast then
         m.clear(uri)

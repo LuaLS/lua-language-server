@@ -98,7 +98,7 @@ proto.on('initialize', function (params)
 end)
 
 proto.on('initialized', function (params)
-    local _ <close> = progress.create('正在初始化...', 1)
+    local _ <close> = progress.create('正在初始化...', 0.5)
     updateConfig()
     proto.awaitRequest('client/registerCapability', {
         registrations = {
@@ -218,8 +218,8 @@ end)
 proto.on('textDocument/hover', function (params)
     await.close 'hover'
     await.setID 'hover'
-    local _ <close> = progress.create('正在处理悬浮提示...', 1)
     workspace.awaitReady()
+    local _ <close> = progress.create('正在处理悬浮提示...', 0.5)
     local core = require 'core.hover'
     local doc    = params.textDocument
     local uri    = doc.uri
@@ -248,8 +248,8 @@ proto.on('textDocument/hover', function (params)
 end)
 
 proto.on('textDocument/definition', function (params)
-    local _ <close> = progress.create('正在处理转到定义...', 1)
     workspace.awaitReady()
+    local _ <close> = progress.create('正在处理转到定义...', 0.5)
     local core   = require 'core.definition'
     local uri    = params.textDocument.uri
     if not files.exists(uri) then
@@ -277,8 +277,8 @@ proto.on('textDocument/definition', function (params)
 end)
 
 proto.on('textDocument/references', function (params)
-    local _ <close> = progress.create('正在处理转到引用...', 1)
     workspace.awaitReady()
+    local _ <close> = progress.create('正在处理转到引用...', 0.5)
     local core   = require 'core.reference'
     local uri    = params.textDocument.uri
     if not files.exists(uri) then
@@ -321,8 +321,8 @@ proto.on('textDocument/documentHighlight', function (params)
 end)
 
 proto.on('textDocument/rename', function (params)
-    local _ <close> = progress.create('正在处理重命名...', 1)
     workspace.awaitReady()
+    local _ <close> = progress.create('正在处理重命名...', 0.5)
     local core = require 'core.rename'
     local uri  = params.textDocument.uri
     if not files.exists(uri) then
@@ -365,8 +365,8 @@ proto.on('textDocument/prepareRename', function (params)
 end)
 
 proto.on('textDocument/completion', function (params)
-    local _ <close> = progress.create('正在处理自动完成...', 1)
     workspace.awaitReady()
+    local _ <close> = progress.create('正在处理自动完成...', 0.5)
     --log.info(util.dump(params))
     local core  = require 'core.completion'
     --log.debug('textDocument/completion')
@@ -490,8 +490,8 @@ proto.on('textDocument/signatureHelp', function (params)
     if not config.config.signatureHelp.enable then
         return nil
     end
-    local _ <close> = progress.create('正在处理参数提示...', 1)
     workspace.awaitReady()
+    local _ <close> = progress.create('正在处理参数提示...', 0.5)
     local uri = params.textDocument.uri
     if not files.exists(uri) then
         return nil
@@ -531,8 +531,8 @@ proto.on('textDocument/signatureHelp', function (params)
 end)
 
 proto.on('textDocument/documentSymbol', function (params)
-    local _ <close> = progress.create('正在处理文件符号...', 1)
     local core = require 'core.document-symbol'
+    local _ <close> = progress.create('正在处理文件符号...', 0.5)
     local uri   = params.textDocument.uri
     while not files.exists(uri) do
         await.sleep(0.1)
@@ -616,8 +616,8 @@ proto.on('workspace/executeCommand', function (params)
 end)
 
 proto.on('workspace/symbol', function (params)
-    local _ <close> = progress.create('正在处理工作区符号...', 1)
     workspace.awaitReady()
+    local _ <close> = progress.create('正在处理工作区符号...', 0.5)
     local core = require 'core.workspace-symbol'
 
     await.close('workspace/symbol')
@@ -649,8 +649,8 @@ end)
 
 
 proto.on('textDocument/semanticTokens/full', function (params)
-    local _ <close> = progress.create('正在处理全量语义着色...', 1)
     workspace.awaitReady()
+    local _ <close> = progress.create('正在处理全量语义着色...', 0.5)
     local core = require 'core.semantic-tokens'
     local uri = params.textDocument.uri
     log.debug('semanticTokens/full', uri)
@@ -666,8 +666,8 @@ proto.on('textDocument/semanticTokens/full', function (params)
 end)
 
 proto.on('textDocument/semanticTokens/range', function (params)
-    local _ <close> = progress.create('正在处理差量语义着色...', 1)
     workspace.awaitReady()
+    local _ <close> = progress.create('正在处理差量语义着色...', 0.5)
     local core = require 'core.semantic-tokens'
     local uri = params.textDocument.uri
     log.debug('semanticTokens/range', uri)

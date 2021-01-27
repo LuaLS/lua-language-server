@@ -11,7 +11,7 @@ local plugin   = require 'plugin'
 local util     = require 'utility'
 local guide    = require 'parser.guide'
 local smerger  = require 'string-merger'
-local plugin   = require 'plugin'
+local progress = require "progress"
 
 local m = {}
 
@@ -289,6 +289,7 @@ function m.eachDll()
 end
 
 function m.compileAst(uri, text)
+    local ws = require 'workspace'
     if not m.isOpen(uri) and #text >= config.config.workspace.preloadFileSize * 1000 then
         if not m.notifyCache['preloadFileSize'] then
             m.notifyCache['preloadFileSize'] = {}
@@ -298,11 +299,10 @@ function m.compileAst(uri, text)
             m.notifyCache['preloadFileSize'][uri] = true
             m.notifyCache['skipLargeFileCount'] = m.notifyCache['skipLargeFileCount'] + 1
             if m.notifyCache['skipLargeFileCount'] <= 3 then
-                local ws = require 'workspace'
                 proto.notify('window/showMessage', {
                     type = 3,
                     message = lang.script('WORKSPACE_SKIP_LARGE_FILE'
-                        , ws.getRelativePath(uri)
+                        , ws.getRelativePath(m.getOriginUri(uri))
                         , config.config.workspace.preloadFileSize
                         , #text / 1000
                     ),
@@ -311,6 +311,8 @@ function m.compileAst(uri, text)
         end
         return nil
     end
+    local prog <close> = progress.create('正在编译', 0.5)
+    prog:setMessage(ws.getRelativePath(m.getOriginUri(uri)))
     local clock = os.clock()
     local state, err = parser:compile(text
         , 'lua'

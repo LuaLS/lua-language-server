@@ -593,8 +593,8 @@ local function checkTableField(ast, word, start, results)
     end)
 end
 
-local function checkCommon(ast, word, text, offset, results)
-    local myUri = ast and ast.uri
+local function checkCommon(myUri, word, text, offset, results)
+    results.enableCommon = true
     local used = {}
     for _, result in ipairs(results) do
         used[result.label] = true
@@ -1184,7 +1184,7 @@ local function tryWord(ast, text, offset, results)
     if isInString(ast, offset) then
         if not hasSpace then
             if #results == 0 then
-                checkCommon(ast, word, text, offset, results)
+                checkCommon(ast.uri, word, text, offset, results)
             end
         end
     else
@@ -1215,7 +1215,7 @@ local function tryWord(ast, text, offset, results)
             end
         end
         if not hasSpace then
-            checkCommon(ast, word, text, offset, results)
+            checkCommon(ast.uri, word, text, offset, results)
         end
     end
 end
@@ -1687,7 +1687,7 @@ local function tryComment(ast, text, offset, results)
     if doc and doc.type ~= 'doc.comment' then
         return
     end
-    checkCommon(ast, word, text, offset, results)
+    checkCommon(ast.uri, word, text, offset, results)
 end
 
 local function makeCache(uri, offset, results)
@@ -1698,7 +1698,7 @@ local function makeCache(uri, offset, results)
     end
     local text  = files.getText(uri)
     local word = findWord(text, offset)
-    if not word or #word <= 2 then
+    if not word then
         cache.results = nil
         return
     end
@@ -1714,23 +1714,41 @@ local function getCache(uri, offset)
     end
     local text  = files.getText(uri)
     local word = findWord(text, offset)
-    if not word or #word <= 2 then
+    if not word then
         return nil
     end
     if word:sub(1, #cache.word) ~= cache.word then
         return nil
     end
+
+    if cache.results.enableCommon then
+        local results = cache.results
+        for i = #results, 1, -1 do
+            local res = results[i]
+            if res.type == define.CompletionItemKind.Text then
+                results[i] = results[#results]
+                results[#results] = nil
+            end
+        end
+        checkCommon(nil, word, text, offset, results)
+    end
+
     return cache.results
 end
 
+local function clearCache()
+    local cache = workspace.getCache 'completion'
+    cache.results = nil
+end
+
 local function completion(uri, offset)
-    tracy.ZoneBeginN 'completion.getAst'
+    local results = getCache(uri, offset)
+    if results then
+        return results
+    end
     local ast = files.getAst(uri)
-    tracy.ZoneEnd()
-    tracy.ZoneBeginN 'completion.getText'
     local text = files.getText(uri)
-    tracy.ZoneEnd()
-    local results = {}
+    results = {}
     clearStack()
     tracy.ZoneBeginN 'completion'
     if ast then
@@ -1747,39 +1765,38 @@ local function completion(uri, offset)
     else
         local word = findWord(text, offset)
         if word then
-            checkCommon(ast, word, text, offset, results)
+            checkCommon(nil, word, text, offset, results)
         end
     end
     tracy.ZoneEnd()
 
     if #results == 0 then
+        clearCache()
         return nil
     end
+    makeCache(uri, offset, results)
     return results
 end
 
 local function resolve(id)
-    return resolveStack(id)
-end
-
-local function resolveCache(item)
+    local item = resolveStack(id)
     local cache = workspace.getCache 'completion'
-    if not cache.results then
-        return
-    end
-    for i, res in ipairs(cache.results) do
-        if res.data and res.data.id == item.data.id then
-            item.data.id = nil
-            cache.results[i] = item
-            break
+    if cache.results then
+        for _, res in ipairs(cache.results) do
+            if res.data and res.data.id == item.data.id then
+                for k, v in pairs(item) do
+                    res[k] = v
+                end
+                res.data = nil
+                break
+            end
         end
     end
+    return item
 end
 
 return {
     completion   = completion,
     resolve      = resolve,
-    makeCache    = makeCache,
-    getCache     = getCache,
-    resolveCache = resolveCache,
+    clearCache   = clearCache,
 }

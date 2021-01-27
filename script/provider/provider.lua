@@ -361,26 +361,17 @@ proto.on('textDocument/completion', function (params)
     --log.debug('completion:', params.context and params.context.triggerKind, params.context and params.context.triggerCharacter)
     local uri  = params.textDocument.uri
     if not files.exists(uri) then
-        core.makeCache(nil)
         return nil
-    end
-    local offset = files.offset(uri, params.position)
-    local cache  = core.getCache(uri, offset)
-    if cache then
-        return {
-            isIncomplete = false,
-            items        = cache,
-        }
     end
     await.setPriority(1000)
     local clock  = os.clock()
+    local offset = files.offset(uri, params.position)
     local result = core.completion(uri, offset)
     local passed = os.clock() - clock
     if passed > 0.1 then
         log.warn(('Completion takes %.3f sec.'):format(passed))
     end
     if not result then
-        core.makeCache(nil)
         return nil
     end
     local easy = false
@@ -443,7 +434,6 @@ proto.on('textDocument/completion', function (params)
         end
         items[i] = item
     end
-    core.makeCache(uri, offset, items)
     return {
         isIncomplete = false,
         items        = items,
@@ -481,7 +471,6 @@ proto.on('completionItem/resolve', function (item)
         end
         return t
     end)()
-    core.resolveCache(item)
     return item
 end)
 

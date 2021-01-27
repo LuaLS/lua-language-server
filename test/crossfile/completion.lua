@@ -84,12 +84,14 @@ function TEST(data)
     end
 
     local expect = data.completion
+    core.clearCache()
     local result = core.completion(mainUri, pos)
     if not expect then
         assert(result == nil)
         return
     end
     assert(result ~= nil)
+    result.enableCommon = nil
     for _, item in ipairs(result) do
         local r = core.resolve(item.id)
         for k, v in pairs(r or {}) do

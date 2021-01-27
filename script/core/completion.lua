@@ -1709,7 +1709,7 @@ local function makeCache(uri, offset, results)
     end
     cache.results = results
     cache.offset  = offset
-    cache.word    = word
+    cache.word    = word:lower()
 end
 
 local function getCache(uri, offset)
@@ -1722,7 +1722,7 @@ local function getCache(uri, offset)
     if not word then
         return nil
     end
-    if word:sub(1, #cache.word) ~= cache.word then
+    if word:sub(1, #cache.word):lower() ~= cache.word then
         return nil
     end
 

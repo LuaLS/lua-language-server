@@ -78,7 +78,6 @@ function mt:_update()
     if not self._dirty then
         return
     end
-    self._dirty = false
     if  not self._showed
     and self._clock + self._delay <= os.clock() then
         self._showed  = true
@@ -97,6 +96,7 @@ function mt:_update()
             }
         })
         log.info('Create progress:', self._token, self._title)
+        self._dirty = false
         return
     end
     if not self._showed then
@@ -105,6 +105,7 @@ function mt:_update()
     if os.clock() - self._updated < 0.05 then
         return
     end
+    self._dirty = false
     self._updated = os.clock()
     proto.notify('$/progress', {
         token = self._token,

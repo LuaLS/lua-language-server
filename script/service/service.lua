@@ -135,12 +135,12 @@ end
 
 function m.startTimer()
     while true do
-        ::CONTINUE::
         pub.step()
         if await.step() then
             goto CONTINUE
         end
         thread.sleep(0.001)
+        ::CONTINUE::
         timer.update()
     end
 end

@@ -2141,6 +2141,9 @@ function m.checkReturnMark(status, a, mark)
 end
 
 function m.searchSameFieldsInValue(status, ref, start, pushQueue, mode)
+    if status.share.inBeSetValue and status.share.inBeSetValue > 0 then
+        return
+    end
     local value = m.getObjectValue(ref)
     if not value then
         return
@@ -2241,11 +2244,13 @@ function m.checkSameSimpleAsSetValue(status, ref, start, pushQueue)
     if not obj then
         return
     end
+    status.share.inBeSetValue = (status.share.inBeSetValue or 0) + 1
     local newStatus = m.status(status)
     m.searchRefs(newStatus, obj, 'ref')
     for _, res in ipairs(newStatus.results) do
         pushQueue(res, start, true)
     end
+    status.share.inBeSetValue = (status.share.inBeSetValue or 0) - 1
 end
 
 local function getTableAndIndexIfIsForPairsKeyOrValue(ref)
@@ -2331,6 +2336,9 @@ function m.checkSameSimpleInString(status, ref, start, pushQueue, mode)
     -- 特殊处理 ('xxx').xxx 的形式
     if  ref.type ~= 'string'
     and not hasTypeName(ref, 'string') then
+        return
+    end
+    if status.depth > 5 then
         return
     end
     if not status.interface.docType then
@@ -2904,7 +2912,7 @@ function m.searchRefs(status, obj, mode)
     tracy.ZoneEnd()
     -- 检查simple
     tracy.ZoneBeginN('searchRefs searchSameFields')
-    if status.depth <= 10 then
+    if status.depth <= 20 then
         local simple = m.getSimple(obj)
         if simple then
             m.searchSameFields(status, simple, mode)
@@ -4377,6 +4385,10 @@ function m.requestInfer(obj, interface, deep)
     m.searchInfer(status, obj)
 
     return status.results, status.share.count
+end
+
+function m.debugView(obj)
+    return require 'files'.position(m.getUri(obj), obj.start)
 end
 
 return m

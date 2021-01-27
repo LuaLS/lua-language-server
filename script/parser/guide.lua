@@ -1518,7 +1518,15 @@ function m.checkSameSimpleInValueOfSetMetaTable(status, func, start, pushQueue)
         end
     end
     if mt then
+        if not status.share.markMetaTable then
+            status.share.markMetaTable = {}
+        end
+        if status.share.markMetaTable[mt] then
+            return
+        end
+        status.share.markMetaTable[mt] = true
         m.checkSameSimpleInValueInMetaTable(status, mt, start, pushQueue)
+        status.share.markMetaTable[mt] = nil
     end
 end
 

@@ -190,7 +190,25 @@ local function fastGetAnyGlobalSets()
     return results
 end
 
+local function checkNeedUpdate()
+    local getGlobalCache      = ws.getCache 'getGlobals'
+    local getGlobalSetsCache  = ws.getCache 'getGlobalSets'
+    local needUpdateGlobals   = ws.getCache 'needUpdateGlobals'
+    for uri in pairs(needUpdateGlobals) do
+        needUpdateGlobals[uri] = nil
+        if files.exists(uri) then
+            for name in pairs(getGlobalsOfFile(uri)) do
+                getGlobalCache[name] = nil
+            end
+            for name in pairs(getGlobalSetsOfFile(uri)) do
+                getGlobalSetsCache[name] = nil
+            end
+        end
+    end
+end
+
 function vm.getGlobals(key)
+    checkNeedUpdate()
     local cache = ws.getCache('getGlobals')[key]
     if cache ~= nil then
         return cache
@@ -201,6 +219,7 @@ function vm.getGlobals(key)
 end
 
 function vm.getGlobalSets(key)
+    checkNeedUpdate()
     local cache = ws.getCache('getGlobalSets')[key]
     if cache ~= nil then
         return cache
@@ -218,6 +237,7 @@ files.watch(function (ev, uri)
         local globalSetsSubscribe = ws.getCache 'globalSetsSubscribe'
         local getGlobalCache      = ws.getCache 'getGlobals'
         local getGlobalSetsCache  = ws.getCache 'getGlobalSets'
+        local needUpdateGlobals   = ws.getCache 'needUpdateGlobals'
         uri = files.asKey(uri)
         if globalSubscribe[uri] then
             for _, name in ipairs(globalSubscribe[uri]) do
@@ -231,12 +251,6 @@ files.watch(function (ev, uri)
                 getGlobalSetsCache['*'] = nil
             end
         end
-        -- TODO
-        for name in pairs(getGlobalsOfFile(uri)) do
-            getGlobalCache[name] = nil
-        end
-        for name in pairs(getGlobalSetsOfFile(uri)) do
-            getGlobalSetsCache[name] = nil
-        end
+        needUpdateGlobals[uri] = true
     end
 end)

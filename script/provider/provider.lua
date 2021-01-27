@@ -347,22 +347,31 @@ end)
 
 proto.on('textDocument/completion', function (params)
     --log.info(util.dump(params))
-    local core = require 'core.completion'
+    local core  = require 'core.completion'
     --log.debug('textDocument/completion')
     --log.debug('completion:', params.context and params.context.triggerKind, params.context and params.context.triggerCharacter)
     local uri  = params.textDocument.uri
     if not files.exists(uri) then
+        core.makeCache(nil)
         return nil
+    end
+    local offset = files.offset(uri, params.position)
+    local cache  = core.getCache(uri, offset)
+    if cache then
+        return {
+            isIncomplete = false,
+            items        = cache,
+        }
     end
     await.setPriority(1000)
     local clock  = os.clock()
-    local offset = files.offset(uri, params.position)
     local result = core.completion(uri, offset)
     local passed = os.clock() - clock
     if passed > 0.1 then
         log.warn(('Completion takes %.3f sec.'):format(passed))
     end
     if not result then
+        core.makeCache(nil)
         return nil
     end
     local easy = false
@@ -418,7 +427,6 @@ proto.on('textDocument/completion', function (params)
             else
                 easy = false
                 item.data = {
-                    version = files.globalVersion,
                     uri     = uri,
                     id      = res.id,
                 }
@@ -426,6 +434,7 @@ proto.on('textDocument/completion', function (params)
         end
         items[i] = item
     end
+    core.makeCache(uri, offset, items)
     return {
         isIncomplete = false,
         items        = items,
@@ -437,12 +446,8 @@ proto.on('completionItem/resolve', function (item)
     if not item.data then
         return item
     end
-    local globalVersion = item.data.version
     local id            = item.data.id
     local uri           = item.data.uri
-    if globalVersion ~= files.globalVersion then
-        return item
-    end
     --await.setPriority(1000)
     local resolved = core.resolve(id)
     if not resolved then
@@ -467,6 +472,7 @@ proto.on('completionItem/resolve', function (item)
         end
         return t
     end)()
+    core.resolveCache(item)
     return item
 end)
 

@@ -1690,6 +1690,39 @@ local function tryComment(ast, text, offset, results)
     checkCommon(ast, word, text, offset, results)
 end
 
+local function makeCache(uri, offset, results)
+    local cache = workspace.getCache 'completion'
+    if not uri then
+        cache.results = nil
+        return
+    end
+    local text  = files.getText(uri)
+    local word = findWord(text, offset)
+    if not word or #word <= 2 then
+        cache.results = nil
+        return
+    end
+    cache.results = results
+    cache.offset  = offset
+    cache.word    = word
+end
+
+local function getCache(uri, offset)
+    local cache = workspace.getCache 'completion'
+    if not cache.results then
+        return nil
+    end
+    local text  = files.getText(uri)
+    local word = findWord(text, offset)
+    if not word or #word <= 2 then
+        return nil
+    end
+    if word:sub(1, #cache.word) ~= cache.word then
+        return nil
+    end
+    return cache.results
+end
+
 local function completion(uri, offset)
     tracy.ZoneBeginN 'completion.getAst'
     local ast = files.getAst(uri)
@@ -1729,7 +1762,24 @@ local function resolve(id)
     return resolveStack(id)
 end
 
+local function resolveCache(item)
+    local cache = workspace.getCache 'completion'
+    if not cache.results then
+        return
+    end
+    for i, res in ipairs(cache.results) do
+        if res.data and res.data.id == item.data.id then
+            item.data.id = nil
+            cache.results[i] = item
+            break
+        end
+    end
+end
+
 return {
-    completion = completion,
-    resolve    = resolve,
+    completion   = completion,
+    resolve      = resolve,
+    makeCache    = makeCache,
+    getCache     = getCache,
+    resolveCache = resolveCache,
 }

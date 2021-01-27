@@ -1,4 +1,5 @@
 local guide   = require 'parser.guide'
+local await   = require "await"
 ---@type vm
 local vm      = require 'vm.vm'
 local files   = require 'files'
@@ -230,11 +231,17 @@ files.watch(function (ev, uri)
                 getGlobalSetsCache['*'] = nil
             end
         end
-        for name in pairs(getGlobalsOfFile(uri)) do
-            getGlobalCache[name] = nil
-        end
-        for name in pairs(getGlobalSetsOfFile(uri)) do
-            getGlobalSetsCache[name] = nil
-        end
+        await.call(function ()
+            local id = 'refreshNewGlobals:' .. uri
+            await.close(id)
+            await.setID(id)
+            await.sleep(1.0)
+            for name in pairs(getGlobalsOfFile(uri)) do
+                getGlobalCache[name] = nil
+            end
+            for name in pairs(getGlobalSetsOfFile(uri)) do
+                getGlobalSetsCache[name] = nil
+            end
+        end)
     end
 end)

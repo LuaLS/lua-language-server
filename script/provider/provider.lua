@@ -120,7 +120,7 @@ proto.on('initialized', function (params)
             }
         }
     })
-    await.call(workspace.awaitPreload)
+    workspace.awaitReload()
     return true
 end)
 
@@ -216,6 +216,7 @@ end)
 proto.on('textDocument/hover', function (params)
     await.close 'hover'
     await.setID 'hover'
+    workspace.awaitReady()
     local core = require 'core.hover'
     local doc    = params.textDocument
     local uri    = doc.uri
@@ -244,6 +245,7 @@ proto.on('textDocument/hover', function (params)
 end)
 
 proto.on('textDocument/definition', function (params)
+    workspace.awaitReady()
     local core   = require 'core.definition'
     local uri    = params.textDocument.uri
     if not files.exists(uri) then
@@ -271,6 +273,7 @@ proto.on('textDocument/definition', function (params)
 end)
 
 proto.on('textDocument/references', function (params)
+    workspace.awaitReady()
     local core   = require 'core.reference'
     local uri    = params.textDocument.uri
     if not files.exists(uri) then
@@ -313,6 +316,7 @@ proto.on('textDocument/documentHighlight', function (params)
 end)
 
 proto.on('textDocument/rename', function (params)
+    workspace.awaitReady()
     local core = require 'core.rename'
     local uri  = params.textDocument.uri
     if not files.exists(uri) then
@@ -355,6 +359,7 @@ proto.on('textDocument/prepareRename', function (params)
 end)
 
 proto.on('textDocument/completion', function (params)
+    workspace.awaitReady()
     --log.info(util.dump(params))
     local core  = require 'core.completion'
     --log.debug('textDocument/completion')
@@ -478,6 +483,7 @@ proto.on('textDocument/signatureHelp', function (params)
     if not config.config.signatureHelp.enable then
         return nil
     end
+    workspace.awaitReady()
     local uri = params.textDocument.uri
     if not files.exists(uri) then
         return nil
@@ -601,6 +607,7 @@ proto.on('workspace/executeCommand', function (params)
 end)
 
 proto.on('workspace/symbol', function (params)
+    workspace.awaitReady()
     local core = require 'core.workspace-symbol'
 
     await.close('workspace/symbol')
@@ -632,6 +639,7 @@ end)
 
 
 proto.on('textDocument/semanticTokens/full', function (params)
+    workspace.awaitReady()
     local core = require 'core.semantic-tokens'
     local uri = params.textDocument.uri
     log.debug('semanticTokens/full', uri)
@@ -647,6 +655,7 @@ proto.on('textDocument/semanticTokens/full', function (params)
 end)
 
 proto.on('textDocument/semanticTokens/range', function (params)
+    workspace.awaitReady()
     local core = require 'core.semantic-tokens'
     local uri = params.textDocument.uri
     log.debug('semanticTokens/range', uri)

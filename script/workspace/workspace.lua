@@ -402,14 +402,27 @@ function m.getCache(name)
 end
 
 function m.reload()
+    await.call(m.awaitReload)
+end
+
+function m.awaitReload()
     local rpath = require 'workspace.require-path'
     local plugin     = require 'plugin'
+    m.ready = false
     files.flushAllLibrary()
     files.removeAllClosed()
     files.flushCache()
     rpath.flush()
     plugin.init()
-    await.call(m.awaitPreload)
+    m.awaitPreload()
+    m.ready = true
+end
+
+---等待工作目录加载完成
+function m.awaitReady()
+    while not m.ready do
+        await.sleep(0.1)
+    end
 end
 
 files.watch(function (ev, uri)

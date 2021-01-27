@@ -2141,7 +2141,7 @@ function m.searchSameFieldsInValue(status, ref, start, pushQueue, mode)
     if not value then
         return
     end
-    if mode == 'ref' then
+    if mode == 'ref' or mode == 'def' or mode == 'field' then
         if m.checkValueMark(status, ref, value) then
             return
         end

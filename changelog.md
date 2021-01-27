@@ -1,5 +1,8 @@
 # changelog
 
+## 1.12.2
+* `FIX` performance issue
+
 ## 1.12.1
 `2021-1-27`
 * `FIX` endless loop

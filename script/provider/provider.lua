@@ -149,7 +149,10 @@ proto.on('workspace/didChangeWatchedFiles', function (params)
         elseif change.type == define.FileChangeType.Changed then
             -- 如果文件处于关闭状态，则立即更新；否则等待didChange协议来更新
             if files.isLua(uri) and not files.isOpen(uri) then
-                files.setText(uri, pub.awaitTask('loadFile', uri))
+                while not plugin.isReady() do
+                    await.sleep(0.1)
+                end
+                files.setText(uri, pub.awaitTask('loadFile', uri), false)
             else
                 local path = furi.decode(uri)
                 local filename = fs.path(path):filename():string()
@@ -170,9 +173,12 @@ proto.on('textDocument/didOpen', function (params)
     local text  = doc.text
     files.open(uri)
     while not plugin.isReady() do
+        if not files.isOpen(uri) then
+            return
+        end
         await.sleep(0.1)
     end
-    files.setText(uri, text)
+    files.setText(uri, text, true)
 end)
 
 proto.on('textDocument/didClose', function (params)
@@ -188,8 +194,11 @@ proto.on('textDocument/didChange', function (params)
     local doc     = params.textDocument
     local changes = params.contentChanges
     local uri     = doc.uri
-    if not files.isLua(uri) and not files.isOpen(uri) then
-        return
+    while not plugin.isReady() or not files.exists(uri) do
+        if not files.isLua(uri) and not files.isOpen(uri) then
+            return
+        end
+        await.sleep(0.1)
     end
     files.clearDiff(uri)
     local text = files.getText(uri) or ''
@@ -201,7 +210,7 @@ proto.on('textDocument/didChange', function (params)
             text = change.text
         end
     end
-    files.setText(uri, text)
+    files.setText(uri, text, true)
 end)
 
 proto.on('textDocument/hover', function (params)

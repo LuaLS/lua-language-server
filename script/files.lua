@@ -122,7 +122,7 @@ end
 --- 设置文件文本
 ---@param uri uri
 ---@param text string
-function m.setText(uri, text)
+function m.setText(uri, text, isTrust)
     if not text then
         return
     end
@@ -139,11 +139,15 @@ function m.setText(uri, text)
         m._pairsCache = nil
     end
     local file = m.fileMap[uri]
+    if file.trusted and not isTrust then
+        return
+    end
     local newText = pluginOnSetText(file, text)
     if file.text == newText then
         return
     end
     file.text       = newText
+    file.trusted    = isTrust
     file.originText = text
     m.linesMap[uri] = nil
     m.originLinesMap[uri] = nil

@@ -200,7 +200,7 @@ local function loadFileFactory(root, progressData, isLibrary)
                         log.info('++++As library of:', root)
                         files.setLibraryPath(uri, root)
                     end
-                    files.setText(uri, text)
+                    files.setText(uri, text, false)
                 else
                     files.remove(uri)
                 end

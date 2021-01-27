@@ -1787,6 +1787,10 @@ function m.checkSameSimpleInArg1OfSetMetaTable(status, obj, start, pushQueue)
     if not args or args.type ~= 'callargs' then
         return
     end
+    local callNode = args.parent.node
+    if callNode.special ~= 'setmetatable' then
+        return
+    end
     if args[1] ~= obj then
         return
     end
@@ -2141,10 +2145,8 @@ function m.searchSameFieldsInValue(status, ref, start, pushQueue, mode)
     if not value then
         return
     end
-    if mode == 'ref' or mode == 'def' or mode == 'field' then
-        if m.checkValueMark(status, ref, value) then
-            return
-        end
+    if not m.checkValueMark(status, ref, value) then
+        --return
     end
     local newStatus = m.status(status)
     m.searchRefs(newStatus, value, mode)
@@ -2902,7 +2904,7 @@ function m.searchRefs(status, obj, mode)
     tracy.ZoneEnd()
     -- 检查simple
     tracy.ZoneBeginN('searchRefs searchSameFields')
-    if status.depth <= 100 then
+    if status.depth <= 10 then
         local simple = m.getSimple(obj)
         if simple then
             m.searchSameFields(status, simple, mode)

@@ -119,7 +119,7 @@ function mt:_update()
 end
 
 function mt:__close()
-    log.info('Close progress:', self._token, self._message)
+    log.info('Close progress:', self._token, self._title, self._message)
     self:remove()
 end
 

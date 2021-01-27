@@ -13,7 +13,7 @@ return function (input, other, fast)
     if lMe == lOther:sub(1, #lMe) then
         return true
     end
-    if (fast or #input == 1) and input:sub(1, 1) ~= other:sub(1, 1) then
+    if fast and input:sub(1, 1) ~= other:sub(1, 1) then
         return false
     end
     local chars = {}

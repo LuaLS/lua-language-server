@@ -554,7 +554,12 @@ local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, res
 end
 
 local function checkField(ast, word, start, offset, parent, oop, results)
-    local refs = vm.getFields(parent, 0)
+    local refs
+    if guide.isGlobal(parent) then
+        refs = vm.getDefFields(parent, 0)
+    else
+        refs = vm.getFields(parent, 0)
+    end
     checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, results)
 end
 
@@ -1781,13 +1786,13 @@ end
 local function resolve(id)
     local item = resolveStack(id)
     local cache = workspace.getCache 'completion'
-    if cache.results then
+    if item and cache.results then
         for _, res in ipairs(cache.results) do
-            if res.data and res.data.id == item.data.id then
+            if res and res.id == id then
                 for k, v in pairs(item) do
                     res[k] = v
                 end
-                res.data = nil
+                res.id = nil
                 break
             end
         end

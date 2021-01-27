@@ -2340,10 +2340,14 @@ function m.checkSameSimpleInString(status, ref, start, pushQueue, mode)
     if not status.share.markString then
         status.share.markString = {}
     end
-    if status.share.markString[ref] then
+    local marked = ref
+    if ref.type == 'string' then
+        marked = 'string'
+    end
+    if status.share.markString[marked] then
         return
     end
-    status.share.markString[ref] = true
+    status.share.markString[marked] = true
     local newStatus = m.status(status)
     local docs = status.interface.docType('string*')
     local mark = {}
@@ -2359,7 +2363,7 @@ function m.checkSameSimpleInString(status, ref, start, pushQueue, mode)
         pushQueue(res, start + 1)
         ::CONTINUE::
     end
-    status.share.markString[ref] = nil
+    status.share.markString[marked] = nil
     return true
 end
 

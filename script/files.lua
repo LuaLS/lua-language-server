@@ -438,7 +438,7 @@ function m.offset(uri, position)
     if start <= 0 or start > #text then
         offset = #text + 2
     else
-        offset = utf8.offset(text, position.character + 1, start) or (#text + 1)
+        offset = utf8.offset(text, position.character + 1, start) or (#text + 2)
     end
     if file._diffInfo then
         offset = smerger.getOffset(file._diffInfo, offset)
@@ -467,7 +467,7 @@ function m.offsetOfWord(uri, position)
     if start <= 0 or start > #text then
         offset = #text + 2
     else
-        offset = utf8.offset(text, position.character + 1, start) or (#text + 1)
+        offset = utf8.offset(text, position.character + 1, start) or (#text + 2)
     end
     if offset > #text
     or text:sub(offset-1, offset):match '[%w_][^%w_]' then
@@ -476,7 +476,7 @@ function m.offsetOfWord(uri, position)
     if file._diffInfo then
         offset = smerger.getOffset(file._diffInfo, offset)
     end
-    return offset
+    return offset - 1
 end
 
 --- 将应用差异前的offset转换为应用差异后的offset

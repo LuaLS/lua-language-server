@@ -2,6 +2,8 @@
 
 ## 1.12.2
 * `CHG` performance optimization
+* `FIX` modifying the code before loading finish makes confusion
+* `FIX` signature: not works
 
 ## 1.12.1
 `2021-1-27`

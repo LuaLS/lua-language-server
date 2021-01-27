@@ -1703,7 +1703,7 @@ local function makeCache(uri, offset, results)
     end
     local text  = files.getText(uri)
     local word = findWord(text, offset)
-    if not word then
+    if not word or #word < 2 then
         cache.results = nil
         return
     end
@@ -1730,7 +1730,7 @@ local function getCache(uri, offset)
         local results = cache.results
         for i = #results, 1, -1 do
             local res = results[i]
-            if res.type == define.CompletionItemKind.Text then
+            if res.kind == define.CompletionItemKind.Text then
                 results[i] = results[#results]
                 results[#results] = nil
             end
@@ -1779,6 +1779,7 @@ local function completion(uri, offset)
         clearCache()
         return nil
     end
+
     makeCache(uri, offset, results)
     return results
 end

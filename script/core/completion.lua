@@ -553,7 +553,7 @@ local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, res
 end
 
 local function checkField(ast, word, start, offset, parent, oop, results)
-    local refs = vm.getFields(parent, 0)
+    local refs = vm.getDefFields(parent, 0)
     checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, results)
 end
 

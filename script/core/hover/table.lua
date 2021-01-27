@@ -211,7 +211,7 @@ return function (source)
     local clock = os.clock()
     local timeUp
     local mark = {}
-    local fields = vm.getFields(source, 0)
+    local fields = vm.getDefFields(source, 0)
     local keyCount = 0
     local reachMax
     for _, src in ipairs(fields) do

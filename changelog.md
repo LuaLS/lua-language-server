@@ -1,7 +1,7 @@
 # changelog
 
 ## 1.12.2
-* `FIX` performance issue
+* `CHG` performance optimization
 
 ## 1.12.1
 `2021-1-27`

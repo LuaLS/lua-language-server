@@ -27,7 +27,7 @@ local function getClass(source, classes, depth, deep)
             classes[#classes+1] = value[1]
         end
     else
-        for _, src in ipairs(vm.getFields(value)) do
+        for _, src in ipairs(vm.getDefFields(value)) do
             local key = vm.getKeyName(src)
             if not key then
                 goto CONTINUE

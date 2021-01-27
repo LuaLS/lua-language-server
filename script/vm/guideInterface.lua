@@ -78,9 +78,13 @@ function vm.interface.call(func, args, index)
     end
 end
 
-function vm.interface.global(name)
+function vm.interface.global(name, onlyDef)
     await.delay()
-    return vm.getGlobals(name)
+    if onlyDef then
+        return vm.getGlobalSets(name)
+    else
+        return vm.getGlobals(name)
+    end
 end
 
 function vm.interface.docType(name)

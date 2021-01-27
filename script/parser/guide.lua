@@ -2083,7 +2083,7 @@ function m.findGlobalsOfName(ast, name)
     return results
 end
 
-function m.checkSameSimpleInGlobal(status, name, source, start, pushQueue)
+function m.checkSameSimpleInGlobal(status, name, source, mode, start, pushQueue)
     if not name then
         return
     end
@@ -2511,6 +2511,12 @@ function m.checkSameSimpleName(ref, sm)
     return false
 end
 
+function m.isValidSetRef(ref)
+    if m.isSet(ref) then
+        return true
+    end
+end
+
 function m.checkSameSimple(status, simple, ref, start, force, mode, pushQueue)
     if start > #simple then
         return
@@ -2522,15 +2528,22 @@ function m.checkSameSimple(status, simple, ref, start, force, mode, pushQueue)
         end
         force = false
         local cmode = mode
+        local skipSearch
         if i < #simple then
             cmode = 'ref'
+        else
+            if mode == 'deffield' then
+                if not m.isSet(ref) then
+                    skipSearch = true
+                end
+            end
         end
         -- 检查 doc
         local skipInfer = m.checkSameSimpleByBindDocs(status, ref, i, pushQueue, cmode)
                     or    m.checkSameSimpleByDoc(status, ref, i, pushQueue, cmode)
         -- 检查自己是字符串的分支情况
         m.checkSameSimpleInString(status, ref, i, pushQueue, cmode)
-        if not skipInfer then
+        if not skipInfer and not skipSearch then
             -- 穿透 self:func 与 mt:func
             m.searchSameFieldsCrossMethod(status, ref, i, pushQueue)
             -- 穿透赋值
@@ -2606,7 +2619,7 @@ function m.searchSameFields(status, simple, mode)
     end
     if simple.mode == 'global' then
         -- 全局变量开头
-        m.checkSameSimpleInGlobal(status, simple[1], simple.node, 1, pushQueue)
+        m.checkSameSimpleInGlobal(status, simple[1], simple.node, mode, 1, pushQueue)
     elseif simple.mode == 'local' then
         -- 局部变量开头
         pushQueue(simple.node, 1)

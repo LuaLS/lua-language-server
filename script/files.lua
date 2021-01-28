@@ -145,10 +145,10 @@ function m.setText(uri, text, isTrust)
     if file.trusted and not isTrust then
         return
     end
-    local newText = pluginOnSetText(file, text)
-    if file.text == newText then
+    if file.text == text then
         return
     end
+    local newText = pluginOnSetText(file, text)
     file.text       = newText
     file.trusted    = isTrust
     file.originText = text

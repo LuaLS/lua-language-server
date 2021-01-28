@@ -453,14 +453,14 @@ function m.offset(uri, position)
     local start  = guide.lineRange(lines, row)
     local offset
     if start <= 0 or start > #text then
-        offset = #text + 2
+        offset = #text
     else
-        offset = utf8.offset(text, position.character + 1, start) or (#text + 2)
+        offset = utf8.offset(text, position.character + 1, start) or #text
     end
     if file._diffInfo then
         offset = smerger.getOffset(file._diffInfo, offset)
     end
-    return offset - 1
+    return offset
 end
 
 --- 获取 position 对应的光标位置(根据附近的单词)
@@ -482,9 +482,9 @@ function m.offsetOfWord(uri, position)
     local start  = guide.lineRange(lines, row)
     local offset
     if start <= 0 or start > #text then
-        offset = #text + 2
+        offset = #text
     else
-        offset = utf8.offset(text, position.character + 1, start) or (#text + 2)
+        offset = utf8.offset(text, position.character + 1, start) or #text
     end
     if offset > #text
     or text:sub(offset-1, offset):match '[%w_][^%w_]' then
@@ -493,7 +493,7 @@ function m.offsetOfWord(uri, position)
     if file._diffInfo then
         offset = smerger.getOffset(file._diffInfo, offset)
     end
-    return offset - 1
+    return offset
 end
 
 --- 将应用差异前的offset转换为应用差异后的offset

@@ -1,6 +1,7 @@
 # changelog
 
 ## 1.13.0
+`2021-1-28`
 * `NEW` VSCode: status bar
 * `NEW` options in some window
 * `CHG` performance optimization

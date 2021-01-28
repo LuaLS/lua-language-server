@@ -213,7 +213,7 @@ proto.on('textDocument/didChange', function (params)
     for _, change in ipairs(changes) do
         if change.range then
             local start, finish = files.unrange(uri, change.range)
-            text = text:sub(1, start) .. change.text .. text:sub(finish + 1)
+            text = text:sub(1, start - 1) .. change.text .. text:sub(finish)
         else
             text = change.text
         end

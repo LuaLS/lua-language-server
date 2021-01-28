@@ -1,6 +1,9 @@
 # changelog
 
-## 1.12.3
+## 1.13.0
+* `NEW` VSCode: status bar
+* `NEW` options in some window
+* `CHG` performance optimization
 * `FIX` endless loop
 
 ## 1.12.2

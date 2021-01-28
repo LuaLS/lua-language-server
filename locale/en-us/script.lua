@@ -186,3 +186,27 @@ COMPLETION_IMPORT_FROM  = 'Import from {}'
 
 DEBUG_MEMORY_LEAK       = "{} I'm sorry for the serious memory leak. The language service will be restarted soon."
 DEBUG_RESTART_NOW       = 'Restart now'
+
+WINDOW_COMPILING                 = 'Compiling'
+WINDOW_DIAGNOSING                = 'Diagnosing'
+WINDOW_INITIALIZING              = 'Initializing...'
+WINDOW_PROCESSING_HOVER          = 'Processing hover...'
+WINDOW_PROCESSING_DEFINITION     = 'Processing definition...'
+WINDOW_PROCESSING_REFERENCE      = 'Processing reference...'
+WINDOW_PROCESSING_RENAME         = 'Processing rename...'
+WINDOW_PROCESSING_COMPLETION     = 'Processing completion...'
+WINDOW_PROCESSING_SIGNATURE      = 'Processing signature help...'
+WINDOW_PROCESSING_SYMBOL         = 'Processing file symbols...'
+WINDOW_PROCESSING_WS_SYMBOL      = 'Processing workspace symbols...'
+WINDOW_PROCESSING_SEMANTIC_FULL  = 'Processing full semantic tokens...'
+WINDOW_PROCESSING_SEMANTIC_RANGE = 'Processing incremental semantic tokens...'
+WINDOW_INCREASE_UPPER_LIMIT      = 'Increase upper limit'
+WINDOW_CLOSE                     = 'Close'
+WINDOW_SETTING_WS_DIAGNOSTIC     = 'You can delay or disable workspace diagnostics in settings'
+WINDOW_DONT_SHOW_AGAIN           = "Don't show again"
+WINDOW_DELAY_WS_DIAGNOSTIC       = 'Idle time diagnosis (delay {} seconds)'
+WINDOW_DISABLE_DIAGNOSTIC        = 'Disable workspace diagnostics'
+WINDOW_LUA_STATUS                = [[
+Cached files: {ast}/{max}
+Memory usage: {mem:.f}M
+]]

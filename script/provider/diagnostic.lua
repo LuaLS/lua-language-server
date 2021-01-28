@@ -299,9 +299,6 @@ function m.diagnosticsAll()
     if delay < 0 then
         return
     end
-    if m.diagnosticsAllVersion == files.globalVersion then
-        return
-    end
     await.close 'diagnosticsAll'
     await.call(function ()
         await.sleep(delay)
@@ -326,7 +323,6 @@ function m.diagnosticsAll()
             end
         end
         bar:remove()
-        m.diagnosticsAllVersion = files.globalVersion
         log.debug('全文诊断耗时：', os.clock() - clock)
     end, 'files.version', 'diagnosticsAll')
 end

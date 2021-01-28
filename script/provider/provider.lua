@@ -104,7 +104,7 @@ end)
 
 proto.on('initialized', function (params)
     files.init()
-    local _ <close> = progress.create('正在初始化...', 0.5)
+    local _ <close> = progress.create(lang.script.WINDOW_INITIALIZING, 0.5)
     updateConfig()
     proto.awaitRequest('client/registerCapability', {
         registrations = {
@@ -225,7 +225,7 @@ proto.on('textDocument/hover', function (params)
     await.close 'hover'
     await.setID 'hover'
     workspace.awaitReady()
-    local _ <close> = progress.create('正在处理悬浮提示...', 0.5)
+    local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_HOVER, 0.5)
     local core = require 'core.hover'
     local doc    = params.textDocument
     local uri    = doc.uri
@@ -255,7 +255,7 @@ end)
 
 proto.on('textDocument/definition', function (params)
     workspace.awaitReady()
-    local _ <close> = progress.create('正在处理转到定义...', 0.5)
+    local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_DEFINITION, 0.5)
     local core   = require 'core.definition'
     local uri    = params.textDocument.uri
     if not files.exists(uri) then
@@ -284,7 +284,7 @@ end)
 
 proto.on('textDocument/references', function (params)
     workspace.awaitReady()
-    local _ <close> = progress.create('正在处理转到引用...', 0.5)
+    local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_REFERENCE, 0.5)
     local core   = require 'core.reference'
     local uri    = params.textDocument.uri
     if not files.exists(uri) then
@@ -328,7 +328,7 @@ end)
 
 proto.on('textDocument/rename', function (params)
     workspace.awaitReady()
-    local _ <close> = progress.create('正在处理重命名...', 0.5)
+    local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_RENAME, 0.5)
     local core = require 'core.rename'
     local uri  = params.textDocument.uri
     if not files.exists(uri) then
@@ -372,7 +372,7 @@ end)
 
 proto.on('textDocument/completion', function (params)
     workspace.awaitReady()
-    local _ <close> = progress.create('正在处理自动完成...', 0.5)
+    local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_COMPLETION, 0.5)
     --log.info(util.dump(params))
     local core  = require 'core.completion'
     --log.debug('textDocument/completion')
@@ -497,7 +497,7 @@ proto.on('textDocument/signatureHelp', function (params)
         return nil
     end
     workspace.awaitReady()
-    local _ <close> = progress.create('正在处理参数提示...', 0.5)
+    local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SIGNATURE, 0.5)
     local uri = params.textDocument.uri
     if not files.exists(uri) then
         return nil
@@ -538,7 +538,7 @@ end)
 
 proto.on('textDocument/documentSymbol', function (params)
     local core = require 'core.document-symbol'
-    local _ <close> = progress.create('正在处理文件符号...', 0.5)
+    local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SYMBOL, 0.5)
     local uri   = params.textDocument.uri
     while not files.exists(uri) do
         await.sleep(0.1)
@@ -623,7 +623,7 @@ end)
 
 proto.on('workspace/symbol', function (params)
     workspace.awaitReady()
-    local _ <close> = progress.create('正在处理工作区符号...', 0.5)
+    local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_WS_SYMBOL, 0.5)
     local core = require 'core.workspace-symbol'
 
     await.close('workspace/symbol')
@@ -656,7 +656,7 @@ end)
 
 proto.on('textDocument/semanticTokens/full', function (params)
     workspace.awaitReady()
-    local _ <close> = progress.create('正在处理全量语义着色...', 0.5)
+    local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SEMANTIC_FULL, 0.5)
     local core = require 'core.semantic-tokens'
     local uri = params.textDocument.uri
     log.debug('semanticTokens/full', uri)
@@ -673,7 +673,7 @@ end)
 
 proto.on('textDocument/semanticTokens/range', function (params)
     workspace.awaitReady()
-    local _ <close> = progress.create('正在处理差量语义着色...', 0.5)
+    local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SEMANTIC_RANGE, 0.5)
     local core = require 'core.semantic-tokens'
     local uri = params.textDocument.uri
     log.debug('semanticTokens/range', uri)
@@ -719,6 +719,5 @@ proto.on('textDocument/foldingRange', function (params)
 end)
 
 proto.on('window/workDoneProgress/cancel', function (params)
-    local progress = require 'progress'
     progress.cancel(params.token)
 end)

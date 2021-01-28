@@ -186,7 +186,7 @@ function m.doDiagnostic(uri)
         return
     end
 
-    local prog <close> = progress.create('正在诊断', 0.5)
+    local prog <close> = progress.create(lang.script.WINDOW_DIAGNOSING, 0.5)
     prog:setMessage(ws.getRelativePath(files.getOriginUri(uri)))
 
     local syntax = m.syntaxErrors(uri, ast)
@@ -246,36 +246,38 @@ local function askForDisable()
     if m.dontAskedForDisable then
         return
     end
+    local delay = 30
+    local delayTitle = lang.script('WINDOW_DELAY_WS_DIAGNOSTIC', delay)
     local item = proto.awaitRequest('window/showMessageRequest', {
         type    = define.MessageType.Info,
-        message = '你可以在设置中延迟或禁用工作目录诊断',
+        message = lang.script.WINDOW_SETTING_WS_DIAGNOSTIC,
         actions = {
             {
-                title = '不再提醒',
+                title = lang.script.WINDOW_DONT_SHOW_AGAIN,
             },
             {
-                title = '空闲时进行工作区诊断（延迟30秒）',
+                title = delayTitle,
             },
             {
-                title = '禁用工作区诊断',
+                title = lang.script.WINDOW_DISABLE_DIAGNOSTIC,
             },
         }
     })
     if not item then
         return
     end
-    if     item.title == '不再提醒' then
+    if     item.title == lang.script.WINDOW_DONT_SHOW_AGAIN then
         m.dontAskedForDisable = true
-    elseif item.title == '空闲时再进行诊断（延迟30秒）' then
+    elseif item.title == delayTitle then
         proto.notify('$/command', {
             command   = 'lua.config',
             data      = {
                 key    = 'Lua.diagnostics.workspaceDelay',
                 action = 'set',
-                value  = 30000,
+                value  = delay * 1000,
             }
         })
-    elseif item.title == '禁用工作区诊断' then
+    elseif item.title == lang.script.WINDOW_DISABLE_DIAGNOSTIC then
         proto.notify('workspace/executeCommand', {
             command   = 'lua.config',
             data      = {

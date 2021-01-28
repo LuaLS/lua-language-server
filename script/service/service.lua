@@ -6,6 +6,7 @@ local proto  = require 'proto'
 local vm     = require 'vm'
 local util   = require 'utility'
 local files  = require 'files'
+local lang   = require 'language'
 
 local m = {}
 m.type = 'service'
@@ -156,11 +157,11 @@ function m.reportStatus()
         else
             info.text = '😺Lua'
         end
-        info.tooltip = ('已缓存文件：%d/%d\n内存占用：%.fM'):format(
-            files.astCount,
-            files.fileCount,
-            collectgarbage('count') / 1000
-        )
+        info.tooltip = lang.script('WINDOW_LUA_STATUS', {
+            ast = files.astCount,
+            max = files.fileCount,
+            mem = collectgarbage('count') / 1000,
+        })
         proto.notify('$/status/report', info)
     end)()
 end

@@ -316,7 +316,7 @@ function m.compileAst(uri, text)
         end
         return nil
     end
-    local prog <close> = progress.create('正在编译', 0.5)
+    local prog <close> = progress.create(lang.script.WINDOW_COMPILING, 0.5)
     prog:setMessage(ws.getRelativePath(m.getOriginUri(uri)))
     local clock = os.clock()
     local state, err = parser:compile(text

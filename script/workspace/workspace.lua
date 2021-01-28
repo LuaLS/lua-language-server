@@ -185,17 +185,17 @@ local function loadFileFactory(root, progressData, isLibrary)
                         message = lang.script('MWS_MAX_PRELOAD', config.config.workspace.maxPreload),
                         actions = {
                             {
-                                title = '增加上限',
+                                title = lang.script.WINDOW_INCREASE_UPPER_LIMIT,
                             },
                             {
-                                title = '关闭',
+                                title = lang.script.WINDOW_CLOSE,
                             }
                         }
                     })
                     if not item then
                         return
                     end
-                    if item.title == '增加上限' then
+                    if item.title == lang.script.WINDOW_INCREASE_UPPER_LIMIT then
                         proto.notify('$/command', {
                             command   = 'lua.config',
                             data      = {

@@ -185,3 +185,27 @@ COMPLETION_IMPORT_FROM  = '从 {} 中导入'
 
 DEBUG_MEMORY_LEAK       = '{} 很抱歉发生了严重的内存泄漏，语言服务即将重启。'
 DEBUG_RESTART_NOW       = '立即重启'
+
+WINDOW_COMPILING                 = '正在编译'
+WINDOW_DIAGNOSING                = '正在诊断'
+WINDOW_INITIALIZING              = '正在初始化...'
+WINDOW_PROCESSING_HOVER          = '正在处理悬浮提示...'
+WINDOW_PROCESSING_DEFINITION     = '正在处理转到定义...'
+WINDOW_PROCESSING_REFERENCE      = '正在处理转到引用...'
+WINDOW_PROCESSING_RENAME         = '正在处理重命名...'
+WINDOW_PROCESSING_COMPLETION     = '正在处理自动完成...'
+WINDOW_PROCESSING_SIGNATURE      = '正在处理参数提示...'
+WINDOW_PROCESSING_SYMBOL         = '正在处理文件符号...'
+WINDOW_PROCESSING_WS_SYMBOL      = '正在处理工作区符号...'
+WINDOW_PROCESSING_SEMANTIC_FULL  = '正在处理全量语义着色...'
+WINDOW_PROCESSING_SEMANTIC_RANGE = '正在处理差量语义着色...'
+WINDOW_INCREASE_UPPER_LIMIT      = '增加上限'
+WINDOW_CLOSE                     = '关闭'
+WINDOW_SETTING_WS_DIAGNOSTIC     = '你可以在设置中延迟或禁用工作目录诊断'
+WINDOW_DONT_SHOW_AGAIN           = '不再提醒'
+WINDOW_DELAY_WS_DIAGNOSTIC       = '空闲时诊断（延迟{}秒）'
+WINDOW_DISABLE_DIAGNOSTIC        = '禁用工作区诊断'
+WINDOW_LUA_STATUS                = [[
+已缓存文件：{ast}/{max}
+内存占用：{mem:.f}M
+]]

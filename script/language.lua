@@ -134,6 +134,9 @@ return setmetatable({
         local language = getLanguage(id)
         log.info(('VSC language: %s'):format(id))
         log.info(('LS  language: %s'):format(language))
+        for k in pairs(self) do
+            self[k] = nil
+        end
         self.id = language
     end,
 })

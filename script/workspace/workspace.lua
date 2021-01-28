@@ -12,6 +12,7 @@ local library    = require 'library'
 local sp         = require 'bee.subprocess'
 local timer      = require 'timer'
 local progress   = require 'progress'
+local define     = require "proto.define"
 
 local m = {}
 m.type = 'workspace'
@@ -179,10 +180,31 @@ local function loadFileFactory(root, progressData, isLibrary)
             if not isLibrary and progressData.preload >= config.config.workspace.maxPreload then
                 if not m.hasHitMaxPreload then
                     m.hasHitMaxPreload = true
-                    proto.notify('window/showMessage', {
-                        type = 3,
+                    local item = proto.awaitRequest('window/showMessageRequest', {
+                        type    = define.MessageType.Info,
                         message = lang.script('MWS_MAX_PRELOAD', config.config.workspace.maxPreload),
+                        actions = {
+                            {
+                                title = '增加上限',
+                            },
+                            {
+                                title = '关闭',
+                            }
+                        }
                     })
+                    if not item then
+                        return
+                    end
+                    if item.title == '增加上限' then
+                        proto.notify('$/command', {
+                            command   = 'lua.config',
+                            data      = {
+                                key    = 'Lua.workspace.maxPreload',
+                                action = 'set',
+                                value  = config.config.workspace.maxPreload * 2,
+                            }
+                        })
+                    end
                 end
                 return
             end
@@ -409,6 +431,7 @@ function m.awaitReload()
     local rpath = require 'workspace.require-path'
     local plugin     = require 'plugin'
     m.ready = false
+    m.hasHitMaxPreload = false
     files.flushAllLibrary()
     files.removeAllClosed()
     files.flushCache()

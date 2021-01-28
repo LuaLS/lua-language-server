@@ -266,26 +266,22 @@ local function askForDisable()
     end
     if     item.title == '不再提醒' then
         m.dontAskedForDisable = true
-    elseif item.title == '空闲时进行工作区诊断（延迟30秒）' then
-        proto.request('workspace/executeCommand', {
+    elseif item.title == '空闲时再进行诊断（延迟30秒）' then
+        proto.notify('$/command', {
             command   = 'lua.config',
-            arguments = {
-                {
-                    key    = 'Lua.diagnostics.workspaceDelay',
-                    action = 'set',
-                    value  = 30000,
-                }
+            data      = {
+                key    = 'Lua.diagnostics.workspaceDelay',
+                action = 'set',
+                value  = 30000,
             }
         })
     elseif item.title == '禁用工作区诊断' then
-        proto.request('workspace/executeCommand', {
+        proto.notify('workspace/executeCommand', {
             command   = 'lua.config',
-            arguments = {
-                {
-                    key    = 'Lua.diagnostics.workspaceDelay',
-                    action = 'set',
-                    value  = -1,
-                }
+            data      = {
+                key    = 'Lua.diagnostics.workspaceDelay',
+                action = 'set',
+                value  = -1,
             }
         })
     end
@@ -313,7 +309,7 @@ function m.diagnosticsAll()
         bar:onCancel(function ()
             log.debug('Cancel workspace diagnostics')
             cancelled = true
-            --askForDisable()
+            askForDisable()
         end)
         local uris = files.getAllUris()
         for i, uri in ipairs(uris) do

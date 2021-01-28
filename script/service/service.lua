@@ -5,6 +5,7 @@ local timer  = require 'timer'
 local proto  = require 'proto'
 local vm     = require 'vm'
 local util   = require 'utility'
+local files  = require 'files'
 
 local m = {}
 m.type = 'service'
@@ -137,12 +138,31 @@ function m.startTimer()
     while true do
         pub.step()
         if await.step() then
+            m.working = true
             goto CONTINUE
         end
+        m.working = false
         thread.sleep(0.001)
         ::CONTINUE::
         timer.update()
     end
+end
+
+function m.reportStatus()
+    timer.loop(0.1, function ()
+        local info = {}
+        if m.working then
+            info.text = '$(loading~spin)Lua'
+        else
+            info.text = 'Lua'
+        end
+        info.tooltip = ('已缓存文件：%d/%d\n内存占用：%.fM'):format(
+            files.astCount,
+            files.fileCount,
+            collectgarbage('count') / 1000
+        )
+        proto.notify('$/status', info)
+    end)()
 end
 
 function m.testVersion()
@@ -162,6 +182,7 @@ function m.start()
     pub.recruitBraves(4)
     proto.listen()
     m.report()
+    m.reportStatus()
     m.testVersion()
 
     require 'provider'

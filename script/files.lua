@@ -790,11 +790,6 @@ function m.init()
     --        collectgarbage()
     --    end
     --end)
-    --local prog = progress.create('已缓存文件')
-
-    --timer.loop(0.1, function ()
-    --    prog:setMessage(('%s/%s'):format(m.astCount, m.fileCount))
-    --end)()
 end
 
 return m

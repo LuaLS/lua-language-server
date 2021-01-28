@@ -17,7 +17,6 @@ collectgarbage 'generational'
 log = require 'log'
 log.init(ROOT, ROOT / 'log' / 'test.log')
 log.debug('测试开始')
-ac = {}
 
 --dofile((ROOT / 'build_package.lua'):string())
 require 'tracy'

@@ -98,6 +98,7 @@ proto.on('initialize', function (params)
 end)
 
 proto.on('initialized', function (params)
+    files.init()
     local _ <close> = progress.create('正在初始化...', 0.5)
     updateConfig()
     proto.awaitRequest('client/registerCapability', {

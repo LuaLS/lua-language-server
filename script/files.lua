@@ -24,6 +24,8 @@ m.notifyCache    = {}
 m.assocVersion   = -1
 m.assocMatcher   = nil
 m.globalVersion  = 0
+m.fileCount      = 0
+m.astCount       = 0
 m.linesMap       = setmetatable({}, { __mode = 'v' })
 m.originLinesMap = setmetatable({}, { __mode = 'v' })
 m.astMap         = setmetatable({}, { __mode = 'v' })
@@ -135,6 +137,7 @@ function m.setText(uri, text, isTrust)
             uri = originUri,
             version = 0,
         }
+        m.fileCount = m.fileCount + 1
         create = true
         m._pairsCache = nil
     end
@@ -226,6 +229,7 @@ function m.removeAll()
     m._pairsCache = nil
     for uri in pairs(m.fileMap) do
         if not m.libraryMap[uri] then
+            m.fileCount     = m.fileCount - 1
             m.fileMap[uri]  = nil
             m.astMap[uri]   = nil
             m.linesMap[uri] = nil
@@ -243,6 +247,7 @@ function m.removeAllClosed()
     for uri in pairs(m.fileMap) do
         if  not m.openMap[uri]
         and not m.libraryMap[uri] then
+            m.fileCount     = m.fileCount - 1
             m.fileMap[uri]  = nil
             m.astMap[uri]   = nil
             m.linesMap[uri] = nil
@@ -336,6 +341,15 @@ function m.compileAst(uri, text)
         if passed > 0.1 then
             log.warn(('Parse LuaDoc of [%s] takes [%.3f] sec, size [%.3f] kb.'):format(uri, passed, #text / 1000))
         end
+        m.astCount = m.astCount + 1
+        local removed
+        setmetatable(state, {__gc = function ()
+            if removed then
+                return
+            end
+            removed = true
+            m.astCount = m.astCount - 1
+        end})
         return state
     else
         log.error(err)
@@ -759,7 +773,7 @@ function m.flushFileCache(uri)
     file.cache = {}
 end
 
-local function init()
+function m.init()
     --TODO 可以清空文件缓存，之后看要不要启用吧
     --timer.loop(10, function ()
     --    local list = {}
@@ -776,8 +790,11 @@ local function init()
     --        collectgarbage()
     --    end
     --end)
-end
+    --local prog = progress.create('已缓存文件')
 
-xpcall(init, log.error)
+    --timer.loop(0.1, function ()
+    --    prog:setMessage(('%s/%s'):format(m.astCount, m.fileCount))
+    --end)()
+end
 
 return m

@@ -1,5 +1,8 @@
 # changelog
 
+## 1.12.3
+* `FIX` endless loop
+
 ## 1.12.2
 `2021-1-27`
 * `CHG` performance optimization

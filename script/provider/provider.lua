@@ -384,7 +384,7 @@ proto.on('textDocument/completion', function (params)
     await.setPriority(1000)
     local clock  = os.clock()
     local offset = files.offset(uri, params.position)
-    local result = core.completion(uri, offset)
+    local result = core.completion(uri, offset - 1)
     local passed = os.clock() - clock
     if passed > 0.1 then
         log.warn(('Completion takes %.3f sec.'):format(passed))
@@ -506,7 +506,7 @@ proto.on('textDocument/signatureHelp', function (params)
     await.setID('signatureHelp')
     local offset = files.offsetOfWord(uri, params.position)
     local core = require 'core.signature'
-    local results = core(uri, offset)
+    local results = core(uri, offset - 1)
     if not results then
         return nil
     end

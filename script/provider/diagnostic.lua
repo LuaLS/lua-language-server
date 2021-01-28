@@ -278,7 +278,7 @@ local function askForDisable()
             }
         })
     elseif item.title == lang.script.WINDOW_DISABLE_DIAGNOSTIC then
-        proto.notify('workspace/executeCommand', {
+        proto.notify('$/command', {
             command   = 'lua.config',
             data      = {
                 key    = 'Lua.diagnostics.workspaceDelay',

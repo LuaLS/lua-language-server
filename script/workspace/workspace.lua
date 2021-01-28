@@ -201,7 +201,7 @@ local function loadFileFactory(root, progressData, isLibrary)
                             data      = {
                                 key    = 'Lua.workspace.maxPreload',
                                 action = 'set',
-                                value  = config.config.workspace.maxPreload * 2,
+                                value  = config.config.workspace.maxPreload + math.max(1000, config.config.workspace.maxPreload),
                             }
                         })
                     end

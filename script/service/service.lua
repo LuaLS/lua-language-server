@@ -154,7 +154,7 @@ function m.reportStatus()
         if m.working then
             info.text = '$(loading~spin)Lua'
         else
-            info.text = 'Lua'
+            info.text = '😺Lua'
         end
         info.tooltip = ('已缓存文件：%d/%d\n内存占用：%.fM'):format(
             files.astCount,

@@ -157,6 +157,10 @@ local ConfigTemplate = {
     intelliSense = {
         searchDepth     = {0,         Integer},
     },
+    window              = {
+        statusBar       = {true,      Boolean},
+        progressBar     = {true,      Boolean},
+    },
     telemetry = {
         enable          = {true,      Boolean},
     }

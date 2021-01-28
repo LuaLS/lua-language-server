@@ -1,6 +1,7 @@
-local proto = require 'proto.proto'
-local util  = require 'utility'
-local timer = require "timer"
+local proto  = require 'proto.proto'
+local util   = require 'utility'
+local timer  = require "timer"
+local config = require 'config'
 
 local nextToken = util.counter()
 
@@ -80,8 +81,11 @@ function mt:_update()
     end
     if  not self._showed
     and self._clock + self._delay <= os.clock() then
-        self._showed  = true
         self._updated = os.clock()
+        self._dirty = false
+        if not config.config.window.progressBar then
+            return
+        end
         proto.request('window/workDoneProgress/create', {
             token = self._token,
         })
@@ -95,11 +99,15 @@ function mt:_update()
                 percentage  = self._percentage,
             }
         })
+        self._showed  = true
         log.info('Create progress:', self._token, self._title)
-        self._dirty = false
         return
     end
     if not self._showed then
+        return
+    end
+    if not config.config.window.progressBar then
+        self:remove()
         return
     end
     if os.clock() - self._updated < 0.05 then

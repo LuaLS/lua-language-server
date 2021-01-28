@@ -161,7 +161,7 @@ function m.reportStatus()
             files.fileCount,
             collectgarbage('count') / 1000
         )
-        proto.notify('$/status', info)
+        proto.notify('$/status/report', info)
     end)()
 end
 

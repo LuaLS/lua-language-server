@@ -83,6 +83,11 @@ local function updateConfig()
     else
         semantic.disable()
     end
+    if newConfig.window.statusBar then
+        proto.notify('$/status/show')
+    else
+        proto.notify('$/status/hide')
+    end
 end
 
 proto.on('initialize', function (params)

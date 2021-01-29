@@ -44,7 +44,7 @@ local function enable()
             },
         }
     })
-    if config.other.semantic ~= true and not dontShowAgain then
+    if config.other.semantic == 'configuredByTheme' and not dontShowAgain then
         local item = proto.awaitRequest('window/showMessageRequest', {
             type    = define.MessageType.Info,
             message = lang.script.WINDOW_CHECK_SEMANTIC,

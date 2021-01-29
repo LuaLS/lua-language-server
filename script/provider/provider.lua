@@ -726,3 +726,25 @@ end)
 proto.on('window/workDoneProgress/cancel', function (params)
     progress.cancel(params.token)
 end)
+
+proto.on('didChangeVisibleRanges', function (params)
+    log.debug(util.dump(params))
+    proto.notify('$/decorations/create', {
+        uri   = params.uri,
+        edits = {
+            {
+                newText = ': 你猜猜我是啥类型',
+                range   = {
+                    start = {
+                        line      = params.ranges[1]['end'].line - 2,
+                        character = params.ranges[1]['end'].character - 5,
+                    },
+                    ['end'] = {
+                        line      = params.ranges[1]['end'].line - 2,
+                        character = params.ranges[1]['end'].character - 5,
+                    },
+                },
+            }
+        }
+    })
+end)

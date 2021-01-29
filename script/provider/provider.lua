@@ -34,7 +34,11 @@ local function updateConfig()
             {
                 scopeUri = workspace.uri,
                 section = 'files.exclude',
-            }
+            },
+            {
+                scopeUri = workspace.uri,
+                section = 'editor.semanticHighlighting.enabled',
+            },
         },
     })
     if not configs or not configs[1] then
@@ -46,6 +50,7 @@ local function updateConfig()
     local other   = {
         associations = configs[2],
         exclude      = configs[3],
+        semantic     = configs[4],
     }
 
     local oldConfig = util.deepCopy(config.config)

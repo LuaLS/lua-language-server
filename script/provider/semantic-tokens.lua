@@ -2,6 +2,8 @@ local proto          = require 'proto'
 local define         = require 'proto.define'
 local client         = require 'provider.client'
 local json           = require "json"
+local config         = require 'config'
+local lang           = require 'language'
 
 local isEnable = false
 
@@ -16,6 +18,7 @@ local function toArray(map)
     return array
 end
 
+local dontShowAgain = false
 local function enable()
     if isEnable then
         return
@@ -41,6 +44,36 @@ local function enable()
             },
         }
     })
+    if config.other.semantic ~= true and not dontShowAgain then
+        local item = proto.awaitRequest('window/showMessageRequest', {
+            type    = define.MessageType.Info,
+            message = lang.script.WINDOW_CHECK_SEMANTIC,
+            actions = {
+                {
+                    title = lang.script.WINDOW_APPLY_SETTING,
+                },
+                {
+                    title = lang.script.WINDOW_DONT_SHOW_AGAIN,
+                },
+            }
+        })
+        if item then
+            if item.title == lang.script.WINDOW_APPLY_SETTING then
+                proto.notify('$/command', {
+                    command   = 'lua.config',
+                    data      = {
+                        key    = 'editor.semanticHighlighting.enabled',
+                        action = 'set',
+                        value  = true,
+                        global = true,
+                    }
+                })
+            end
+            if item.title == lang.script.WINDOW_DONT_SHOW_AGAIN then
+                dontShowAgain = true
+            end
+        end
+    end
 end
 
 local function disable()

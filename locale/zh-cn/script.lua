@@ -202,10 +202,12 @@ WINDOW_PROCESSING_SEMANTIC_RANGE = '正在处理差量语义着色...'
 WINDOW_INCREASE_UPPER_LIMIT      = '增加上限'
 WINDOW_CLOSE                     = '关闭'
 WINDOW_SETTING_WS_DIAGNOSTIC     = '你可以在设置中延迟或禁用工作目录诊断'
-WINDOW_DONT_SHOW_AGAIN           = '不再提醒'
+WINDOW_DONT_SHOW_AGAIN           = '不再提示'
 WINDOW_DELAY_WS_DIAGNOSTIC       = '空闲时诊断（延迟{}秒）'
 WINDOW_DISABLE_DIAGNOSTIC        = '禁用工作区诊断'
 WINDOW_LUA_STATUS                = [[
 已缓存文件：{ast}/{max}
 内存占用：{mem:.f}M
 ]]
+WINDOW_APPLY_SETTING             = '应用设置'
+WINDOW_CHECK_SEMANTIC            = '如果你正在使用市场中的颜色主题，你可能需要同时修改 `editor.semanticHighlighting.enabled` 选项为 `true` 才会使语义着色生效。'

@@ -168,7 +168,8 @@ local ConfigTemplate = {
 
 local OtherTemplate = {
     associations = {{}, Hash(String, String)},
-    exclude =      {{}, Hash(String, Boolean)},
+    exclude      = {{}, Hash(String, Boolean)},
+    semantic     = {'', Or(Boolean, String)},
 }
 
 local function init()

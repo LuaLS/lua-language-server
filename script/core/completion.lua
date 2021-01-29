@@ -398,7 +398,7 @@ local function checkModule(ast, word, offset, results)
                             originUri
                         ))
                             .. '\n' .. buildDesc(targetSource),
-                        additionalTextEdits = buildInsertRequire(ast, uri, stemName),
+                        additionalTextEdits = buildInsertRequire(ast, originUri, stemName),
                     }
                 end)
             }

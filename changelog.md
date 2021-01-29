@@ -1,5 +1,10 @@
 # changelog
 
+## 1.13.1
+* `NEW` help semantic color with market theme
+* `FIX` VSCode setting
+* `FIX` [#368](https://github.com/sumneko/lua-language-server/issues/368)
+
 ## 1.13.0
 `2021-1-28`
 * `NEW` VSCode: status bar

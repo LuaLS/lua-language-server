@@ -736,23 +736,26 @@ proto.on('$/didChangeVisibleRanges', function (params)
     end
 
     -- compute type-hint
-    for _, range in ipairs(params.ranges) do
-        local start, finish = files.unrange(uri, range)
-        local piece = typeHint(uri, start, finish)
-        if piece then
-            for _, edit in ipairs(piece) do
-                edits[#edits+1] = {
-                    newText = edit.newText,
-                    range   = files.range(uri, edit.start, edit.finish)
-                }
+    if config.config.typeHint.enable then
+        local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_TYPE_HINT, 0.5)
+        for _, range in ipairs(params.ranges) do
+            local start, finish = files.unrange(uri, range)
+            local piece = typeHint(uri, start, finish)
+            if piece then
+                for _, edit in ipairs(piece) do
+                    edits[#edits+1] = {
+                        newText = edit.newText,
+                        range   = files.range(uri, edit.start, edit.finish)
+                    }
+                end
             end
         end
+        if #edits == 0 then
+            return
+        end
+        proto.notify('$/typeHint', {
+            uri   = uri,
+            edits = edits,
+        })
     end
-    if #edits == 0 then
-        return
-    end
-    proto.notify('$/typeHint', {
-        uri   = uri,
-        edits = edits,
-    })
 end)

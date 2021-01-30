@@ -33,7 +33,7 @@ return function (uri, start, finish)
         end
         edits[#edits+1] = {
             newText = (':%s'):format(infer),
-            start   = src.finish,
+            start   = src.finish + 1,
             finish  = src.finish,
         }
     end)

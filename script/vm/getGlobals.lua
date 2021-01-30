@@ -194,14 +194,20 @@ local function checkNeedUpdate()
     local getGlobalCache      = ws.getCache 'getGlobals'
     local getGlobalSetsCache  = ws.getCache 'getGlobalSets'
     local needUpdateGlobals   = ws.getCache 'needUpdateGlobals'
+    local uris = {}
     for uri in pairs(needUpdateGlobals) do
-        needUpdateGlobals[uri] = nil
-        if files.exists(uri) then
-            for name in pairs(getGlobalsOfFile(uri)) do
-                getGlobalCache[name] = nil
-            end
-            for name in pairs(getGlobalSetsOfFile(uri)) do
-                getGlobalSetsCache[name] = nil
+        uris[#uris+1] = uri
+    end
+    for _, uri in ipairs(uris) do
+        if needUpdateGlobals[uri] then
+            needUpdateGlobals[uri] = nil
+            if files.exists(uri) then
+                for name in pairs(getGlobalsOfFile(uri)) do
+                    getGlobalCache[name] = nil
+                end
+                for name in pairs(getGlobalSetsOfFile(uri)) do
+                    getGlobalSetsCache[name] = nil
+                end
             end
         end
     end

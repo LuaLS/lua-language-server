@@ -207,6 +207,7 @@ WINDOW_DONT_SHOW_AGAIN           = '不再提示'
 WINDOW_DELAY_WS_DIAGNOSTIC       = '空闲时诊断（延迟{}秒）'
 WINDOW_DISABLE_DIAGNOSTIC        = '禁用工作区诊断'
 WINDOW_LUA_STATUS                = [[
+工作区：{ws}
 已缓存文件：{ast}/{max}
 内存占用：{mem:.f}M
 ]]

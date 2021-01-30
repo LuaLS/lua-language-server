@@ -208,6 +208,7 @@ WINDOW_DONT_SHOW_AGAIN           = "Don't show again"
 WINDOW_DELAY_WS_DIAGNOSTIC       = 'Idle time diagnosis (delay {} seconds)'
 WINDOW_DISABLE_DIAGNOSTIC        = 'Disable workspace diagnostics'
 WINDOW_LUA_STATUS                = [[
+Workspace   : {ws}
 Cached files: {ast}/{max}
 Memory usage: {mem:.f}M
 ]]

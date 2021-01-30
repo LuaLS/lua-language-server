@@ -1,5 +1,8 @@
 # changelog
 
+## 1.14
+* `NEW` flush cache after 5 min
+
 ## 1.13.1
 * `NEW` help semantic color with market theme
 * `FIX` VSCode setting

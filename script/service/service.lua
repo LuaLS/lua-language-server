@@ -7,6 +7,7 @@ local vm     = require 'vm'
 local util   = require 'utility'
 local files  = require 'files'
 local lang   = require 'language'
+local ws     = require 'workspace'
 
 local m = {}
 m.type = 'service'
@@ -140,20 +141,40 @@ function m.startTimer()
         pub.step()
         if await.step() then
             m.working = true
+            m.sleeping = false
             goto CONTINUE
         end
-        m.working = false
+        if m.working then
+            m.working = false
+            m.idleClock = os.clock()
+        end
         thread.sleep(0.001)
         ::CONTINUE::
         timer.update()
     end
 end
 
+function m.checkSleep()
+    timer.loop(10, function ()
+        if not m.working and not m.sleeping and os.clock() - m.idleClock >= 300 then
+            m.sleeping = true
+            files.flushCache()
+            vm.flushCache()
+            ws.flushCache()
+            collectgarbage()
+            collectgarbage()
+        end
+    end)
+end
+
 function m.reportStatus()
+    local lastInfo
     timer.loop(0.1, function ()
         local info = {}
         if m.working then
             info.text = '$(loading~spin)Lua'
+        elseif m.sleeping then
+            info.text = "💤Lua"
         else
             info.text = '😺Lua'
         end
@@ -162,6 +183,10 @@ function m.reportStatus()
             max = files.fileCount,
             mem = collectgarbage('count') / 1000,
         })
+        if util.equal(lastInfo, info) then
+            return
+        end
+        lastInfo = info
         proto.notify('$/status/report', info)
     end)()
 end
@@ -183,6 +208,7 @@ function m.start()
     pub.recruitBraves(4)
     proto.listen()
     m.report()
+    m.checkSleep()
     m.reportStatus()
     m.testVersion()
 

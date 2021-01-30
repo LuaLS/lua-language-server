@@ -423,6 +423,10 @@ function m.getCache(name)
     return m.cache[name]
 end
 
+function m.flushCache()
+    m.cache = {}
+end
+
 function m.reload()
     await.call(m.awaitReload)
 end

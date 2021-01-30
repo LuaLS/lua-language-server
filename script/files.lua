@@ -381,11 +381,12 @@ function m.getAst(uri)
 end
 
 ---设置文件的当前可见范围
----@param uri    uri
----@param ranges range[]
-function m.setVisibles(uri, ranges)
-    uri = m.getUri(uri)
+---@param originUri uri
+---@param ranges    range[]
+function m.setVisibles(originUri, ranges)
+    local uri = m.getUri(originUri)
     m.visible[uri] = ranges
+    m.onWatch('updateVisible', originUri)
 end
 
 ---获取文件的当前可见范围

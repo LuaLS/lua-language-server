@@ -734,15 +734,17 @@ end)
 -- Hint
 do
     local function updateHint(uri)
+        local awaitID = 'hint:' .. uri
+        await.close(awaitID)
         if not config.config.hint.enable then
             return
         end
+        await.setID(awaitID)
+        workspace.awaitReady()
         local visibles = files.getVisibles(uri)
         if not visibles then
             return
         end
-        await.close('hint')
-        await.setID('hint')
         local edits = {}
         local hint = require 'core.hint'
         local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_HINT, 0.5)
@@ -765,8 +767,7 @@ do
     end
 
     files.watch(function (ev, uri)
-        if ev == 'create'
-        or ev == 'update'
+        if ev == 'update'
         or ev == 'updateVisible' then
             await.call(function ()
                 updateHint(uri)

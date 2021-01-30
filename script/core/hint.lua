@@ -2,7 +2,7 @@ local files = require 'files'
 local guide = require 'parser.guide'
 local vm    = require 'vm'
 
-return function (uri, start, finish)
+local function typeHint(uri, start, finish)
     local ast = files.getAst(uri)
     if not ast then
         return nil
@@ -33,9 +33,13 @@ return function (uri, start, finish)
         end
         edits[#edits+1] = {
             newText = (':%s'):format(infer),
-            start   = src.finish + 1,
+            start   = src.finish,
             finish  = src.finish,
         }
     end)
     return edits
 end
+
+return {
+    typeHint = typeHint,
+}

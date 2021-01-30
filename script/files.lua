@@ -21,6 +21,7 @@ m.fileMap        = {}
 m.dllMap         = {}
 m.watchList      = {}
 m.notifyCache    = {}
+m.visible        = {}
 m.assocVersion   = -1
 m.assocMatcher   = nil
 m.globalVersion  = 0
@@ -379,6 +380,38 @@ function m.getAst(uri)
     return ast
 end
 
+---设置文件的当前可见范围
+---@param uri    uri
+---@param ranges range[]
+function m.setVisibles(uri, ranges)
+    uri = m.getUri(uri)
+    m.visible[uri] = ranges
+end
+
+---获取文件的当前可见范围
+---@param uri uri
+---@return table[]
+function m.getVisibles(uri)
+    uri = m.getUri(uri)
+    local file = m.fileMap[uri]
+    if not file then
+        return nil
+    end
+    local ranges = m.visible[uri]
+    if not ranges or #ranges == 0 then
+        return nil
+    end
+    local visibles = {}
+    for i, range in ipairs(ranges) do
+        local start, finish = m.unrange(uri, range)
+        visibles[i] = {
+            start  = start,
+            finish = finish,
+        }
+    end
+    return visibles
+end
+
 --- 获取文件行信息
 ---@param uri uri
 ---@return table lines
@@ -395,7 +428,6 @@ function m.getLines(uri)
     end
     return lines
 end
-
 
 function m.getOriginLines(uri)
     uri = getUriKey(uri)

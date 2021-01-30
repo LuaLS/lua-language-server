@@ -95,6 +95,41 @@ local function updateConfig()
     end
 end
 
+local function updateTypeHint(uri, visibles, edits)
+    if not config.config.typeHint.enable then
+        return
+    end
+    local hint = require 'core.hint'
+    local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_TYPE_HINT, 0.5)
+    for _, visible in ipairs(visibles) do
+        local piece = hint.typeHint(uri, visible.start, visible.finish)
+        if piece then
+            for _, edit in ipairs(piece) do
+                edits[#edits+1] = {
+                    newText = edit.newText,
+                    range   = files.range(uri, edit.start, edit.finish)
+                }
+            end
+        end
+    end
+end
+
+local function updateHint(uri)
+    local visibles = files.getVisibles(uri)
+    if not visibles then
+        return
+    end
+    local edits = {}
+    updateTypeHint(uri, visibles, edits)
+    if #edits == 0 then
+        return
+    end
+    proto.notify('$/hint', {
+        uri   = uri,
+        edits = edits,
+    })
+end
+
 proto.on('initialize', function (params)
     client.init(params)
     library.init()
@@ -728,34 +763,6 @@ proto.on('window/workDoneProgress/cancel', function (params)
 end)
 
 proto.on('$/didChangeVisibleRanges', function (params)
-    local typeHint = require 'core.type-hint'
-    local edits = {}
-    local uri   = params.uri
-    while not files.exists(uri) do
-        await.sleep(0.1)
-    end
-
-    -- compute type-hint
-    if config.config.typeHint.enable then
-        local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_TYPE_HINT, 0.5)
-        for _, range in ipairs(params.ranges) do
-            local start, finish = files.unrange(uri, range)
-            local piece = typeHint(uri, start, finish)
-            if piece then
-                for _, edit in ipairs(piece) do
-                    edits[#edits+1] = {
-                        newText = edit.newText,
-                        range   = files.range(uri, edit.start, edit.finish)
-                    }
-                end
-            end
-        end
-        if #edits == 0 then
-            return
-        end
-        proto.notify('$/typeHint', {
-            uri   = uri,
-            edits = edits,
-        })
-    end
+    files.setVisibles(params.uri, params.ranges)
+    updateHint(params.uri)
 end)

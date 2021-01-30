@@ -1,7 +1,7 @@
 # changelog
 
 ## 1.14.0
-* `NEW` hint: disabled by default
+* `NEW` hint
 * `NEW` flush cache after 5 min
 
 ## 1.13.1

@@ -154,8 +154,10 @@ local ConfigTemplate = {
     color = {
         mode            = {'Semantic', String},
     },
-    typeHint = {
-        enable          = {true,     Boolean},
+    hint = {
+        enable          = {true,      Boolean},
+        paramType       = {true,      Boolean},
+        setType         = {false,     Boolean},
     },
     intelliSense = {
         searchDepth     = {0,         Integer},

@@ -1,6 +1,7 @@
-local files = require 'files'
-local guide = require 'parser.guide'
-local vm    = require 'vm'
+local files  = require 'files'
+local guide  = require 'parser.guide'
+local vm     = require 'vm'
+local config = require 'config'
 
 local function typeHint(uri, start, finish)
     local ast = files.getAst(uri)
@@ -23,6 +24,15 @@ local function typeHint(uri, start, finish)
         -- 排除掉 xx = function 与 xx = {}
         if source.value and (source.value.type == 'function' or source.value.type == 'table') then
             return
+        end
+        if source.parent.type == 'funcargs' then
+            if not config.config.hint.paramType then
+                return
+            end
+        else
+            if not config.config.hint.setType then
+                return
+            end
         end
         local infer = vm.getInferType(source, 0)
         local src = source

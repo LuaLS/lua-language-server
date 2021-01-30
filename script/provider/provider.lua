@@ -734,7 +734,7 @@ end)
 -- Hint
 do
     local function updateTypeHint(uri, visibles, edits)
-        if not config.config.typeHint.enable then
+        if not config.config.hint.enable then
             return
         end
         local hint = require 'core.hint'
@@ -759,9 +759,6 @@ do
         end
         local edits = {}
         updateTypeHint(uri, visibles, edits)
-        if #edits == 0 then
-            return
-        end
         proto.notify('$/hint', {
             uri   = uri,
             edits = edits,

@@ -3,12 +3,11 @@ local guide  = require 'parser.guide'
 local vm     = require 'vm'
 local config = require 'config'
 
-local function typeHint(uri, start, finish)
+local function typeHint(uri, edits, start, finish)
     local ast = files.getAst(uri)
     if not ast then
-        return nil
+        return
     end
-    local edits = {}
     guide.eachSourceBetween(ast.ast, start, finish, function (source)
         if  source.type ~= 'local'
         and source.type ~= 'setglobal'
@@ -47,9 +46,77 @@ local function typeHint(uri, start, finish)
             finish  = src.finish,
         }
     end)
-    return edits
 end
 
-return {
-    typeHint = typeHint,
-}
+local function getArgNames(func)
+    if not func.args or #func.args == 0 then
+        return nil
+    end
+    local names = {}
+    for _, arg in ipairs(func.args) do
+        if arg.type == '...' then
+            break
+        end
+        names[#names+1] = arg[1] or ''
+    end
+    if #names == 0 then
+        return nil
+    end
+    return names
+end
+
+local function paramName(uri, edits, start, finish)
+    if not config.config.hint.paramName then
+        return
+    end
+    local ast = files.getAst(uri)
+    if not ast then
+        return
+    end
+    guide.eachSourceBetween(ast.ast, start, finish, function (source)
+        if source.type ~= 'call' then
+            return
+        end
+        if not source.args then
+            return
+        end
+        local defs = vm.getDefs(source.node, 0)
+        if not defs then
+            return
+        end
+        local args
+        for _, def in ipairs(defs) do
+            if def.value then
+                def = def.value
+            end
+            if def.type == 'function' then
+                args = getArgNames(def)
+                if args then
+                    break
+                end
+            end
+        end
+        if not args then
+            return
+        end
+        if source.node and source.node.type == 'getmethod' then
+            table.remove(args, 1)
+        end
+        for i, arg in ipairs(source.args) do
+            if args[i] and args[i] ~= '' then
+                edits[#edits+1] = {
+                    newText = ('%s:'):format(args[i]),
+                    start   = arg.start,
+                    finish  = arg.start - 1,
+                }
+            end
+        end
+    end)
+end
+
+return function (uri, start, finish)
+    local edits = {}
+    typeHint(uri, edits, start, finish)
+    paramName(uri, edits, start, finish)
+    return edits
+end

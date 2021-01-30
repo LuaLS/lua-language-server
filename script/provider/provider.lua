@@ -733,14 +733,21 @@ end)
 
 -- Hint
 do
-    local function updateTypeHint(uri, visibles, edits)
+    local function updateHint(uri)
         if not config.config.hint.enable then
             return
         end
+        local visibles = files.getVisibles(uri)
+        if not visibles then
+            return
+        end
+        await.close('hint')
+        await.setID('hint')
+        local edits = {}
         local hint = require 'core.hint'
         local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_TYPE_HINT, 0.5)
         for _, visible in ipairs(visibles) do
-            local piece = hint.typeHint(uri, visible.start, visible.finish)
+            local piece = hint(uri, visible.start, visible.finish)
             if piece then
                 for _, edit in ipairs(piece) do
                     edits[#edits+1] = {
@@ -750,15 +757,7 @@ do
                 end
             end
         end
-    end
 
-    local function updateHint(uri)
-        local visibles = files.getVisibles(uri)
-        if not visibles then
-            return
-        end
-        local edits = {}
-        updateTypeHint(uri, visibles, edits)
         proto.notify('$/hint', {
             uri   = uri,
             edits = edits,
@@ -769,7 +768,9 @@ do
         if ev == 'create'
         or ev == 'update'
         or ev == 'updateVisible' then
-            updateHint(uri)
+            await.call(function ()
+                updateHint(uri)
+            end)
         end
     end)
 end

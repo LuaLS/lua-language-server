@@ -158,6 +158,7 @@ local ConfigTemplate = {
         enable          = {true,      Boolean},
         paramType       = {true,      Boolean},
         setType         = {false,     Boolean},
+        paramName       = {true,      Boolean},
     },
     intelliSense = {
         searchDepth     = {0,         Integer},

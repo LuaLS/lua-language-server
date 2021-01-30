@@ -3,8 +3,6 @@
 ## 1.14.0
 * `NEW` hint
 * `NEW` flush cache after 5 min
-
-## 1.13.1
 * `NEW` help semantic color with market theme
 * `FIX` VSCode setting
 * `FIX` [#368](https://github.com/sumneko/lua-language-server/issues/368)

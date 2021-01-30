@@ -103,12 +103,19 @@ local function paramName(uri, edits, start, finish)
             table.remove(args, 1)
         end
         for i, arg in ipairs(source.args) do
-            if args[i] and args[i] ~= '' then
-                edits[#edits+1] = {
-                    newText = ('%s:'):format(args[i]),
-                    start   = arg.start,
-                    finish  = arg.start - 1,
-                }
+            if arg.type == 'nil'
+            or arg.type == 'number'
+            or arg.type == 'string'
+            or arg.type == 'boolean'
+            or arg.type == 'table'
+            or arg.type == 'function' then
+                if args[i] and args[i] ~= '' then
+                    edits[#edits+1] = {
+                        newText = ('%s:'):format(args[i]),
+                        start   = arg.start,
+                        finish  = arg.start - 1,
+                    }
+                end
             end
         end
     end)

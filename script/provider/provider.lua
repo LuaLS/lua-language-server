@@ -727,24 +727,32 @@ proto.on('window/workDoneProgress/cancel', function (params)
     progress.cancel(params.token)
 end)
 
-proto.on('didChangeVisibleRanges', function (params)
-    log.debug(util.dump(params))
-    proto.notify('$/decorations/create', {
-        uri   = params.uri,
-        edits = {
-            {
-                newText = ': 你猜猜我是啥类型',
-                range   = {
-                    start = {
-                        line      = params.ranges[1]['end'].line - 2,
-                        character = params.ranges[1]['end'].character - 5,
-                    },
-                    ['end'] = {
-                        line      = params.ranges[1]['end'].line - 2,
-                        character = params.ranges[1]['end'].character - 5,
-                    },
-                },
-            }
-        }
+proto.on('$/didChangeVisibleRanges', function (params)
+    local typeHint = require 'core.type-hint'
+    local edits = {}
+    local uri   = params.uri
+    while not files.exists(uri) do
+        await.sleep(0.1)
+    end
+
+    -- compute type-hint
+    for _, range in ipairs(params.ranges) do
+        local start, finish = files.unrange(uri, range)
+        local piece = typeHint(uri, start, finish)
+        if piece then
+            for _, edit in ipairs(piece) do
+                edits[#edits+1] = {
+                    newText = edit.newText,
+                    range   = files.range(uri, edit.start, edit.finish)
+                }
+            end
+        end
+    end
+    if #edits == 0 then
+        return
+    end
+    proto.notify('$/typeHint', {
+        uri   = uri,
+        edits = edits,
     })
 end)

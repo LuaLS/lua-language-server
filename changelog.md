@@ -1,6 +1,7 @@
 # changelog
 
-## 1.14
+## 1.14.0
+* `NEW` type hint: disabled by default
 * `NEW` flush cache after 5 min
 
 ## 1.13.1

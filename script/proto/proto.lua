@@ -17,7 +17,7 @@ m.holdon  = {}
 
 function m.getMethodName(proto)
     if proto.method:sub(1, 2) == '$/' then
-        return proto.method:sub(3), true
+        return proto.method, true
     else
         return proto.method, false
     end

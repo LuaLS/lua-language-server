@@ -280,6 +280,14 @@ function m.eachFile()
     local i = 0
     return function ()
         i = i + 1
+        local uri = files[i]
+        while not m.fileMap[uri] do
+            i = i + 1
+            uri = files[i]
+            if not uri then
+                return nil
+            end
+        end
         return files[i]
     end
 end

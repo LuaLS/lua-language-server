@@ -745,7 +745,7 @@ do
         await.setID('hint')
         local edits = {}
         local hint = require 'core.hint'
-        local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_TYPE_HINT, 0.5)
+        local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_HINT, 0.5)
         for _, visible in ipairs(visibles) do
             local piece = hint(uri, visible.start, visible.finish)
             if piece then

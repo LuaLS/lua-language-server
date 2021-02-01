@@ -139,6 +139,7 @@ function m.isLiteral(obj)
         or tp == 'string'
         or tp == 'number'
         or tp == 'table'
+        or tp == 'function'
 end
 
 --- 获取字面量

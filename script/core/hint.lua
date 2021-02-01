@@ -34,6 +34,9 @@ local function typeHint(uri, edits, start, finish)
             end
         end
         local infer = vm.getInferType(source, 0)
+        if infer == 'any' then
+            return
+        end
         local src = source
         if source.type == 'tablefield' then
             src = source.field

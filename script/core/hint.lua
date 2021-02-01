@@ -35,7 +35,7 @@ local function typeHint(uri, edits, start, finish)
         end
         local infer = vm.getInferType(source, 0)
         if infer == 'any'
-        or infer == 'any' then
+        or infer == 'nil' then
             return
         end
         local src = source

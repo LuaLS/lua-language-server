@@ -157,7 +157,7 @@ local ConfigTemplate = {
     hint = {
         enable          = {true,      Boolean},
         paramType       = {true,      Boolean},
-        setType         = {false,     Boolean},
+        setType         = {true,     Boolean},
         paramName       = {true,      Boolean},
     },
     intelliSense = {

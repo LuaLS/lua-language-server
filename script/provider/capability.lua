@@ -58,8 +58,8 @@ function m.getIniter()
                     filters = {
                         {
                             pattern = {
-                                glob = '**/*.lua',
-                                matches = 'file',
+                                glob = '**',
+                                --matches = 'file',
                                 options = platform.OS == 'Windows',
                             }
                         }
@@ -69,8 +69,8 @@ function m.getIniter()
                     filters = {
                         {
                             pattern = {
-                                glob = '**/*.lua',
-                                matches = 'file',
+                                glob = '**',
+                                --matches = 'file',
                                 options = platform.OS == 'Windows',
                             }
                         }
@@ -80,8 +80,8 @@ function m.getIniter()
                     filters = {
                         {
                             pattern = {
-                                glob = '**/*.lua',
-                                matches = 'file',
+                                glob = '**',
+                                --matches = 'file',
                                 options = platform.OS == 'Windows',
                             }
                         }

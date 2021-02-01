@@ -33,6 +33,9 @@ local function typeHint(uri, edits, start, finish)
                 return
             end
         end
+        if source.value and guide.isLiteral(source.value) then
+            return
+        end
         local infer = vm.getInferType(source, 0)
         if infer == 'any'
         or infer == 'nil' then

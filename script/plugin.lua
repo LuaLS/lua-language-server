@@ -1,6 +1,7 @@
 local config = require 'config'
 local fs     = require 'bee.filesystem'
 local fsu    = require 'fs-utility'
+local await = require "await"
 
 ---@class plugin
 local m = {}
@@ -24,6 +25,12 @@ end
 
 function m.isReady()
     return m.interface ~= nil
+end
+
+function m.awaitReady()
+    while m.interface == nil do
+        await.sleep(0.1)
+    end
 end
 
 function m.init()

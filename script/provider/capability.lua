@@ -1,6 +1,7 @@
-local sp     = require 'bee.subprocess'
-local nonil  = require 'without-check-nil'
-local client = require 'provider.client'
+local sp       = require 'bee.subprocess'
+local nonil    = require 'without-check-nil'
+local client   = require 'provider.client'
+local platform = require 'bee.platform'
 
 local m = {}
 
@@ -51,6 +52,43 @@ function m.getIniter()
             },
         },
         foldingRangeProvider = true,
+        workspace = {
+            fileOperations = {
+                didCreate = {
+                    filters = {
+                        {
+                            pattern = {
+                                glob = '**/*.lua',
+                                matches = 'file',
+                                options = platform.OS == 'Windows',
+                            }
+                        }
+                    }
+                },
+                didDelete = {
+                    filters = {
+                        {
+                            pattern = {
+                                glob = '**/*.lua',
+                                matches = 'file',
+                                options = platform.OS == 'Windows',
+                            }
+                        }
+                    }
+                },
+                didRename = {
+                    filters = {
+                        {
+                            pattern = {
+                                glob = '**/*.lua',
+                                matches = 'file',
+                                options = platform.OS == 'Windows',
+                            }
+                        }
+                    }
+                },
+            },
+        }
         --documentOnTypeFormattingProvider = {
         --    firstTriggerCharacter = '}',
         --},

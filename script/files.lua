@@ -217,8 +217,11 @@ function m.remove(uri)
     end
     m.fileMap[uri] = nil
     m._pairsCache = nil
+    m.flushFileCache(uri)
 
+    m.fileCount     = m.fileCount - 1
     m.globalVersion = m.globalVersion + 1
+
     await.close('files.version')
     m.onWatch('remove', originUri)
 end
@@ -797,6 +800,7 @@ function m.flushCache()
     for uri, file in pairs(m.fileMap) do
         file.cacheActiveTime = math.huge
         m.linesMap[uri] = nil
+        m.originLinesMap[uri] = nil
         m.astMap[uri] = nil
         file.cache = {}
     end
@@ -810,6 +814,7 @@ function m.flushFileCache(uri)
     end
     file.cacheActiveTime = math.huge
     m.linesMap[uri] = nil
+    m.originLinesMap[uri] = nil
     m.astMap[uri] = nil
     file.cache = {}
 end

@@ -111,27 +111,32 @@ proto.on('initialized', function (params)
     files.init()
     local _ <close> = progress.create(lang.script.WINDOW_INITIALIZING, 0.5)
     updateConfig()
-    proto.awaitRequest('client/registerCapability', {
-        registrations = {
-            -- 监视文件变化
-            {
-                id = '0',
-                method = 'workspace/didChangeWatchedFiles',
-                registerOptions = {
-                    watchers = {
-                        {
-                            globPattern = '**/',
-                            kind = 1 | 2 | 4,
-                        }
-                    },
+    local registrations = {}
+
+    -- 监视文件变化
+    if not client.info.capabilities.workspace.fileOperations then
+        registrations[#registrations+1] = {
+            id = 'workspace/didChangeWatchedFiles',
+            method = 'workspace/didChangeWatchedFiles',
+            registerOptions = {
+                watchers = {
+                    {
+                        globPattern = '**/',
+                        kind = 1 | 2 | 4,
+                    }
                 },
             },
-            -- 配置变化
-            {
-                id = '1',
-                method = 'workspace/didChangeConfiguration',
-            }
         }
+    end
+
+    -- 监视配置变化
+    registrations[#registrations+1] = {
+        id = 'workspace/didChangeConfiguration',
+        method = 'workspace/didChangeConfiguration',
+    }
+
+    proto.awaitRequest('client/registerCapability', {
+        registrations = registrations
     })
     workspace.awaitReload()
     return true
@@ -162,9 +167,7 @@ proto.on('workspace/didChangeWatchedFiles', function (params)
         elseif change.type == define.FileChangeType.Changed then
             -- 如果文件处于关闭状态，则立即更新；否则等待didChange协议来更新
             if files.isLua(uri) and not files.isOpen(uri) then
-                while not plugin.isReady() do
-                    await.sleep(0.1)
-                end
+                plugin.awaitReady()
                 files.setText(uri, pub.awaitTask('loadFile', uri), false)
             else
                 local path = furi.decode(uri)
@@ -180,16 +183,41 @@ proto.on('workspace/didChangeWatchedFiles', function (params)
     end
 end)
 
+proto.on('workspace/didCreateFiles', function (params)
+    log.debug('workspace/didCreateFiles', util.dump(params))
+    plugin.awaitReady()
+    for _, file in ipairs(params.files) do
+        if files.isLua(file.uri) then
+            files.setText(file.uri, pub.awaitTask('loadFile', file.uri), false)
+        end
+    end
+end)
+
+proto.on('workspace/didDeleteFiles', function (params)
+    log.debug('workspace/didDeleteFiles', util.dump(params))
+    for _, file in ipairs(params.files) do
+        files.remove(file.uri)
+    end
+end)
+
+proto.on('workspace/didRenameFiles', function (params)
+    log.debug('workspace/didRenameFiles', util.dump(params))
+    plugin.awaitReady()
+    for _, file in ipairs(params.files) do
+        local text = files.getOriginText(file.oldUri)
+        files.remove(file.oldUri)
+        files.setText(file.newUri, text, false)
+    end
+end)
+
 proto.on('textDocument/didOpen', function (params)
     local doc   = params.textDocument
     local uri   = doc.uri
     local text  = doc.text
     files.open(uri)
-    while not plugin.isReady() do
-        if not files.isOpen(uri) then
-            return
-        end
-        await.sleep(0.1)
+    plugin.awaitReady()
+    if not files.isOpen(uri) then
+        return
     end
     files.setText(uri, text, true)
 end)
@@ -207,11 +235,9 @@ proto.on('textDocument/didChange', function (params)
     local doc     = params.textDocument
     local changes = params.contentChanges
     local uri     = doc.uri
-    while not plugin.isReady() or not files.exists(uri) do
-        if not files.isLua(uri) and not files.isOpen(uri) then
-            return
-        end
-        await.sleep(0.1)
+    plugin.awaitReady()
+    if not files.isLua(uri) and not files.isOpen(uri) then
+        return
     end
     files.clearDiff(uri)
     local text = files.getText(uri) or ''

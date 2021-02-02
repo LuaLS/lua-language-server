@@ -1378,8 +1378,7 @@ local function getLuaDoc(ast, offset)
     return nil
 end
 
-local function tryLuaDocCate(line, results)
-    local word = line:sub(3)
+local function tryLuaDocCate(word, results)
     for _, docType in ipairs {
         'class',
         'type',
@@ -1644,9 +1643,9 @@ local function tryLuaDoc(ast, text, offset, results)
             return
         end
         -- 尝试 ---@$
-        local cate = line:match('^-@(%a*)$')
+        local cate = line:match('^-?%s*@(%a*)$')
         if cate then
-            tryLuaDocCate(line, results)
+            tryLuaDocCate(cate, results)
             return
         end
     end

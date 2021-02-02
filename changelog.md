@@ -5,6 +5,7 @@
 * `NEW` flush cache after 5 min
 * `NEW` `VSCode` help semantic color with market theme
 * `CHG` create/delete/rename files no longer reload workspace (only if client supports file operation protocol)
+* `CHG` `LuaDoc`: compatible with `--@`
 * `FIX` `VSCode` settings
 * `FIX` [#368](https://github.com/sumneko/lua-language-server/issues/368)
 

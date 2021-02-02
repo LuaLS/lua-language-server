@@ -261,7 +261,7 @@ function m.awaitLoadFile(uri)
     local native          = m.getNativeMatcher()
     if native then
         log.info('Scan files at:', m.path)
-        native:scan(uri, nativeLoader)
+        native:scan(furi.decode(uri), nativeLoader)
     end
 end
 

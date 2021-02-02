@@ -521,6 +521,29 @@ comment3]]
 TEST {{ path = 'a.lua', content = '', }, {
     path = 'b.lua',
     content = [[
+            ---@param arg3 integer comment3
+            ---@overload fun(arg3)
+            ---@param arg1 integer comment1
+            ---@param arg2 integer comment2
+            ---@return boolean
+            function <?f?>(arg1, arg2) end
+    ]]
+},
+hover = {
+    label = EXISTS,
+    name = 'f',
+    description = [[
+@*param* `arg3` — comment3
+---
+@*param* `arg1` — comment1
+
+@*param* `arg2` — comment2]]
+}}
+
+
+TEST {{ path = 'a.lua', content = '', }, {
+    path = 'b.lua',
+    content = [[
             ---@return boolean, string #comment
             function <?f?>() end
     ]]

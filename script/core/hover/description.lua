@@ -240,6 +240,8 @@ local function getFunctionComment(source)
                     end
                 end
             end
+        elseif doc.type == 'doc.overload' then
+            comments[#comments+1] = '---'
         end
     end
     comments = table.concat(comments, "\n\n")

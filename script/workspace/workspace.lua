@@ -246,6 +246,25 @@ local function loadFileFactory(root, progressData, isLibrary)
     end
 end
 
+function m.awaitLoadFile(uri)
+    local progressBar <close> = progress.create(lang.script.WORKSPACE_LOADING)
+    local progressData = {
+        max     = 0,
+        read    = 0,
+        preload = 0,
+        update  = function (self)
+            progressBar:setMessage(('%d/%d'):format(self.read, self.max))
+            progressBar:setPercentage(self.read / self.max * 100)
+        end
+    }
+    local nativeLoader    = loadFileFactory(m.path, progressData)
+    local native          = m.getNativeMatcher()
+    if native then
+        log.info('Scan files at:', m.path)
+        native:scan(uri, nativeLoader)
+    end
+end
+
 --- 预读工作区内所有文件
 function m.awaitPreload()
     local diagnostic = require 'provider.diagnostic'

@@ -157,11 +157,17 @@ end)
 proto.on('workspace/didChangeWatchedFiles', function (params)
     for _, change in ipairs(params.changes) do
         local uri = change.uri
-        -- TODO 创建文件与删除文件直接重新扫描（文件改名、文件夹删除等情况太复杂了）
-        if change.type == define.FileChangeType.Created
-        or change.type == define.FileChangeType.Deleted then
-            workspace.reload()
-            break
+        if     change.type == define.FileChangeType.Created then
+            log.debug('FileChangeType.Created', uri)
+            workspace.awaitLoadFile(uri)
+        elseif change.type == define.FileChangeType.Deleted then
+            log.debug('FileChangeType.Deleted', uri)
+            files.remove(uri)
+            local childs = files.getChildFiles(uri)
+            for _, curi in ipairs(childs) do
+                log.debug('FileChangeType.Deleted.Child', curi)
+                files.remove(curi)
+            end
         elseif change.type == define.FileChangeType.Changed then
             -- 如果文件处于关闭状态，则立即更新；否则等待didChange协议来更新
             if files.isLua(uri) and not files.isOpen(uri) then

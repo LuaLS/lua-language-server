@@ -14,6 +14,44 @@ local function allWords()
     return list
 end
 
+local function testFileEvents(initer)
+    initer.fileOperations = {
+        didCreate = {
+            filters = {
+                {
+                    pattern = {
+                        glob = '**',
+                        --matches = 'file',
+                        options = platform.OS == 'Windows',
+                    }
+                }
+            }
+        },
+        didDelete = {
+            filters = {
+                {
+                    pattern = {
+                        glob = '**',
+                        --matches = 'file',
+                        options = platform.OS == 'Windows',
+                    }
+                }
+            }
+        },
+        didRename = {
+            filters = {
+                {
+                    pattern = {
+                        glob = '**',
+                        --matches = 'file',
+                        options = platform.OS == 'Windows',
+                    }
+                }
+            }
+        },
+    }
+end
+
 function m.getIniter()
     local initer = {
         -- 文本同步方式
@@ -52,47 +90,13 @@ function m.getIniter()
             },
         },
         foldingRangeProvider = true,
-        workspace = {
-            fileOperations = {
-                didCreate = {
-                    filters = {
-                        {
-                            pattern = {
-                                glob = '**',
-                                --matches = 'file',
-                                options = platform.OS == 'Windows',
-                            }
-                        }
-                    }
-                },
-                didDelete = {
-                    filters = {
-                        {
-                            pattern = {
-                                glob = '**',
-                                --matches = 'file',
-                                options = platform.OS == 'Windows',
-                            }
-                        }
-                    }
-                },
-                didRename = {
-                    filters = {
-                        {
-                            pattern = {
-                                glob = '**',
-                                --matches = 'file',
-                                options = platform.OS == 'Windows',
-                            }
-                        }
-                    }
-                },
-            },
-        }
+        workspace = {}
         --documentOnTypeFormattingProvider = {
         --    firstTriggerCharacter = '}',
         --},
     }
+
+    --testFileEvents()
 
     nonil.enable()
     if not client.info.capabilities.textDocument.completion.dynamicRegistration then

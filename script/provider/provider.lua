@@ -114,20 +114,18 @@ proto.on('initialized', function (params)
     local registrations = {}
 
     -- 监视文件变化
-    if not client.info.capabilities.workspace.fileOperations then
-        registrations[#registrations+1] = {
-            id = 'workspace/didChangeWatchedFiles',
-            method = 'workspace/didChangeWatchedFiles',
-            registerOptions = {
-                watchers = {
-                    {
-                        globPattern = '**/',
-                        kind = 1 | 2 | 4,
-                    }
-                },
+    registrations[#registrations+1] = {
+        id = 'workspace/didChangeWatchedFiles',
+        method = 'workspace/didChangeWatchedFiles',
+        registerOptions = {
+            watchers = {
+                {
+                    globPattern = '**/',
+                    kind = 1 | 2 | 4,
+                }
             },
-        }
-    end
+        },
+    }
 
     -- 监视配置变化
     registrations[#registrations+1] = {

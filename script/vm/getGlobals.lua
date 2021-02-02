@@ -8,6 +8,9 @@ local config  = require 'config'
 local ws      = require 'workspace'
 
 local function getGlobalsOfFile(uri)
+    if not files.exists(uri) then
+        return {}
+    end
     local cache = files.getCache(uri)
     if cache.globals then
         return cache.globals
@@ -47,6 +50,9 @@ local function getGlobalsOfFile(uri)
 end
 
 local function getGlobalSetsOfFile(uri)
+    if not files.exists(uri) then
+        return {}
+    end
     local cache = files.getCache(uri)
     if cache.globalSets then
         return cache.globalSets

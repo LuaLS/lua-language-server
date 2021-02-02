@@ -11,6 +11,7 @@ local ws     = require 'workspace'
 
 local m = {}
 m.type = 'service'
+m.idleClock = 0.0
 
 local function countMemory()
     local mems = {}

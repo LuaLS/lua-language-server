@@ -1,3 +1,4 @@
+---#if not JIT then DISABLE() end
 ---@meta
 
 ---@version JIT

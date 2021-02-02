@@ -8,6 +8,7 @@
 * `CHG` `LuaDoc`: compatible with `--@`
 * `FIX` `VSCode` settings
 * `FIX` [#368](https://github.com/sumneko/lua-language-server/issues/368)
+* `FIX` [#371](https://github.com/sumneko/lua-language-server/issues/371)
 
 ## 1.13.0
 `2021-1-28`

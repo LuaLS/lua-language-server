@@ -1,3 +1,4 @@
+---#if not JIT then DISABLE() end
 ---@meta
 
 ---@class ffi.namespace*: table

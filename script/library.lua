@@ -83,6 +83,7 @@ local function compileSingleMetaDoc(script, metaLang)
         jit = false
     end
 
+    local disable = false
     local env = setmetatable({
         VERSION = version,
         JIT     = jit,
@@ -143,11 +144,17 @@ local function compileSingleMetaDoc(script, metaLang)
                 compileBuf[#compileBuf+1] = '---@deprecated\n'
             end
         end,
+        DISABLE = function ()
+            disable = true
+        end,
     }, { __index = _ENV })
 
     util.saveFile((ROOT / 'log' / 'middleScript.lua'):string(), middleScript)
 
     assert(load(middleScript, middleScript, 't', env))()
+    if disable then
+        return nil
+    end
     return table.concat(compileBuf)
 end
 
@@ -183,8 +190,12 @@ local function compileMetaDoc()
         local filename = fullpath:filename()
         local metaDoc = compileSingleMetaDoc(util.loadFile(fullpath:string()), metaLang)
         local filepath = metapath / filename
-        util.saveFile(filepath:string(), metaDoc)
-        m.metaPaths[#m.metaPaths+1] = filepath:string()
+        if metaDoc then
+            util.saveFile(filepath:string(), metaDoc)
+            m.metaPaths[#m.metaPaths+1] = filepath:string()
+        else
+            fs.remove(filepath)
+        end
     end
 end
 

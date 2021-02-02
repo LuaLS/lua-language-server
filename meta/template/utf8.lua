@@ -1,3 +1,4 @@
+---#if VERSION <= 5.2 then DISABLE() end
 ---@meta
 
 ---@version >5.3

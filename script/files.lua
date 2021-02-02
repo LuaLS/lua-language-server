@@ -206,6 +206,20 @@ function m.getOriginText(uri)
     return file.originText
 end
 
+function m.getChildFiles(uri)
+    uri = getUriKey(uri)
+    local results = {}
+    local uris = m.getAllUris()
+    for _, curi in ipairs(uris) do
+        if  #curi > #uri
+        and curi:sub(1, #uri) == uri
+        and curi:sub(#uri+1, #uri+1):match '[/\\]' then
+            results[#results+1] = curi
+        end
+    end
+    return results
+end
+
 --- 移除文件
 ---@param uri uri
 function m.remove(uri)

@@ -197,6 +197,10 @@ proto.on('workspace/didDeleteFiles', function (params)
     log.debug('workspace/didDeleteFiles', util.dump(params))
     for _, file in ipairs(params.files) do
         files.remove(file.uri)
+        local childs = files.getChildFiles(file.uri)
+        for _, uri in ipairs(childs) do
+            files.remove(uri)
+        end
     end
 end)
 
@@ -205,8 +209,21 @@ proto.on('workspace/didRenameFiles', function (params)
     plugin.awaitReady()
     for _, file in ipairs(params.files) do
         local text = files.getOriginText(file.oldUri)
-        files.remove(file.oldUri)
-        files.setText(file.newUri, text, false)
+        if text then
+            files.remove(file.oldUri)
+            files.setText(file.newUri, text, false)
+        end
+        local childs = files.getChildFiles(file.oldUri)
+        for _, uri in ipairs(childs) do
+            local ctext = files.getOriginText(uri)
+            if ctext then
+                local ouri = files.getOriginUri(uri)
+                local tail = ouri:sub(#file.oldUri)
+                local nuri = file.newUri .. tail
+                files.remove(uri)
+                files.setText(nuri, text, false)
+            end
+        end
     end
 end)
 

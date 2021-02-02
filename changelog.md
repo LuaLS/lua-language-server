@@ -1,16 +1,17 @@
 # changelog
 
 ## 1.14.0
-* `NEW` hint
+* `NEW` `VSCode` hint
 * `NEW` flush cache after 5 min
-* `NEW` help semantic color with market theme
-* `FIX` VSCode setting
+* `NEW` `VSCode` help semantic color with market theme
+* `CHG` create/delete/rename files no longer reload workspace (only if client supports file operation protocol)
+* `FIX` `VSCode` settings
 * `FIX` [#368](https://github.com/sumneko/lua-language-server/issues/368)
 
 ## 1.13.0
 `2021-1-28`
-* `NEW` VSCode: status bar
-* `NEW` options in some window
+* `NEW` `VSCode` status bar
+* `NEW` `VSCode` options in some window
 * `CHG` performance optimization
 * `FIX` endless loop
 

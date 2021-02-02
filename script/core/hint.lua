@@ -20,8 +20,7 @@ local function typeHint(uri, edits, start, finish)
         if source[1] == '_' then
             return
         end
-        -- 排除掉 xx = function 与 xx = {}
-        if source.value and (source.value.type == 'function' or source.value.type == 'table') then
+        if source.value and guide.isLiteral(source.value) then
             return
         end
         if source.parent.type == 'funcargs' then
@@ -34,6 +33,10 @@ local function typeHint(uri, edits, start, finish)
             end
         end
         local infer = vm.getInferType(source, 0)
+        if infer == 'any'
+        or infer == 'nil' then
+            return
+        end
         local src = source
         if source.type == 'tablefield' then
             src = source.field

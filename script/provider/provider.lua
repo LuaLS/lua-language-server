@@ -199,6 +199,7 @@ proto.on('workspace/didDeleteFiles', function (params)
         files.remove(file.uri)
         local childs = files.getChildFiles(file.uri)
         for _, uri in ipairs(childs) do
+            log.debug('workspace/didDeleteFiles#child', uri)
             files.remove(uri)
         end
     end
@@ -220,6 +221,7 @@ proto.on('workspace/didRenameFiles', function (params)
                 local ouri = files.getOriginUri(uri)
                 local tail = ouri:sub(#file.oldUri)
                 local nuri = file.newUri .. tail
+                log.debug('workspace/didRenameFiles#child', ouri, nuri)
                 files.remove(uri)
                 files.setText(nuri, text, false)
             end

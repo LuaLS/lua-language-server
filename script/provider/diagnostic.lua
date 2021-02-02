@@ -373,6 +373,7 @@ end
 files.watch(function (ev, uri)
     if ev == 'remove' then
         m.clear(uri)
+        m.refresh(uri)
     elseif ev == 'update' then
         if ws.isReady() then
             m.refresh(uri)

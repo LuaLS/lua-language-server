@@ -12,7 +12,6 @@ local function allWords()
 end
 
 local function enable()
-    -- TODO 检查客户端是否支持动态注册自动完成
     if isEnable then
         return
     end

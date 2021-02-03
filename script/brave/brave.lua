@@ -43,12 +43,7 @@ end
 function m.start()
     m.push('mem', collectgarbage 'count')
     while true do
-        local suc, name, id, params = m.taskpad:pop()
-        if not suc then
-            -- 找不到工作的勇者，只好睡觉
-            thread.sleep(0.01)
-            goto CONTINUE
-        end
+        local name, id, params = m.taskpad:bpop()
         local ability = m.ability[name]
         -- TODO
         if not ability then

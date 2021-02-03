@@ -71,6 +71,18 @@ local function getArgNames(func)
     return names
 end
 
+local function hasLiteralArgInCall(call)
+    if not call.args then
+        return false
+    end
+    for _, arg in ipairs(call.args) do
+        if guide.isLiteral(arg) then
+            return true
+        end
+    end
+    return false
+end
+
 local function paramName(uri, edits, start, finish)
     if not config.config.hint.paramName then
         return
@@ -83,7 +95,7 @@ local function paramName(uri, edits, start, finish)
         if source.type ~= 'call' then
             return
         end
-        if not source.args then
+        if not hasLiteralArgInCall(source) then
             return
         end
         local defs = vm.getDefs(source.node, 0)
@@ -109,12 +121,7 @@ local function paramName(uri, edits, start, finish)
             table.remove(args, 1)
         end
         for i, arg in ipairs(source.args) do
-            if arg.type == 'nil'
-            or arg.type == 'number'
-            or arg.type == 'string'
-            or arg.type == 'boolean'
-            or arg.type == 'table'
-            or arg.type == 'function' then
+            if guide.isLiteral(arg) then
                 if args[i] and args[i] ~= '' then
                     edits[#edits+1] = {
                         newText = ('%s:'):format(args[i]),

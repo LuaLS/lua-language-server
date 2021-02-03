@@ -48,8 +48,6 @@ local function tryDebugger()
     local addr = ("127.0.0.1:%d"):format(DBGPORT)
     local dbg = loadfile(entry)(root)
     dbg:start(addr)
-    -- TODO
-    dbg:event('enable_update', true)
     log.debug('Debugger startup, listen port:', DBGPORT)
     log.debug('Debugger args:', addr, root, path, cpath)
     if DBGWAIT then

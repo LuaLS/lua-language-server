@@ -46,7 +46,7 @@ function m.start()
         local suc, name, id, params = m.taskpad:pop()
         if not suc then
             -- 找不到工作的勇者，只好睡觉
-            thread.sleep(0.001)
+            thread.sleep(0.01)
             goto CONTINUE
         end
         local ability = m.ability[name]

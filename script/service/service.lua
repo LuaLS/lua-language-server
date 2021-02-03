@@ -149,7 +149,7 @@ function m.startTimer()
             m.working = false
             m.idleClock = os.clock()
         end
-        thread.sleep(0.001)
+        thread.sleep(0.01)
         ::CONTINUE::
         timer.update()
     end

@@ -101,6 +101,7 @@ function m.getIniter()
     nonil.enable()
     if not client.info.capabilities.textDocument.completion.dynamicRegistration then
         initer.completionProvider = {
+            resolveProvider = true,
             triggerCharacters = allWords(),
         }
     end

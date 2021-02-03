@@ -43,7 +43,7 @@ LOGPATH  = LOGPATH  and expanduser(LOGPATH)  or (ROOT:string() .. '/log')
 METAPATH = METAPATH and expanduser(METAPATH) or (ROOT:string() .. '/meta')
 
 debug.setcstacklimit(200)
-collectgarbage('generational', 10, 100)
+collectgarbage('generational', 10, 50)
 --collectgarbage('incremental', 120, 120, 0)
 
 log = require 'log'

@@ -640,3 +640,25 @@ TEST {
         ]]
     },
 }
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            local m = {}
+
+            function m.<!f!>()
+            end
+
+            return setmetatable(m, {})
+        ]],
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            local m = require 'a'
+
+            m.<?f?>()
+        ]]
+    }
+}

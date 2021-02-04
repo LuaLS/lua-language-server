@@ -2650,10 +2650,22 @@ function m.searchSameFields(status, simple, mode)
     local queues, starts, forces = allocQueue()
     local queueLen = 0
     local function pushQueue(obj, start, force)
+        if obj.type == 'getlocal'
+        or obj.type == 'setlocal' then
+            obj = obj.node
+        end
         queueLen = queueLen + 1
         queues[queueLen] = obj
         starts[queueLen] = start
         forces[queueLen] = force
+        if obj.type == 'local' and obj.ref then
+            for _, ref in ipairs(obj.ref) do
+                queueLen = queueLen + 1
+                queues[queueLen] = ref
+                starts[queueLen] = start
+                forces[queueLen] = force
+            end
+        end
     end
     if simple.mode == 'global' then
         -- 全局变量开头
@@ -2661,12 +2673,6 @@ function m.searchSameFields(status, simple, mode)
     elseif simple.mode == 'local' then
         -- 局部变量开头
         pushQueue(simple.node, 1)
-        local refs = simple.node.ref
-        if refs then
-            for i = 1, #refs do
-                pushQueue(refs[i], 1)
-            end
-        end
     else
         pushQueue(simple.node, 1)
     end
@@ -4409,7 +4415,7 @@ function m.requestInfer(obj, interface, deep)
 end
 
 function m.debugView(obj)
-    return require 'files'.position(m.getUri(obj), obj.start)
+    return require 'files'.position(m.getUri(obj), obj.start), m.getUri(obj)
 end
 
 return m

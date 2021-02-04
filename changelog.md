@@ -1,6 +1,7 @@
 # changelog
 
 ## 1.14.2
+* `FIX` [#356](https://github.com/sumneko/lua-language-server/issues/356)
 * `FIX` [#375](https://github.com/sumneko/lua-language-server/issues/375)
 * `FIX` [#376](https://github.com/sumneko/lua-language-server/issues/376)
 

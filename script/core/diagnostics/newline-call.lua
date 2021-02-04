@@ -4,10 +4,10 @@ local lang  = require 'language'
 
 return function (uri, callback)
     local ast = files.getAst(uri)
-    if not ast then
+    local lines = files.getLines(uri)
+    if not ast or not lines then
         return
     end
-    local lines = files.getLines(uri)
 
     guide.eachSourceType(ast.ast, 'call', function (source)
         local node = source.node

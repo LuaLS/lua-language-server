@@ -81,6 +81,9 @@ end
 ---@return integer
 function m.getOffset(info, offset)
     local diff = getNearDiff(info, offset, 'start')
+    if not diff then
+        return offset
+    end
     if offset <= diff.finish then
         return diff.cstart
     end
@@ -93,6 +96,9 @@ end
 ---@return integer
 function m.getOffsetBack(info, offset)
     local diff = getNearDiff(info, offset, 'cstart')
+    if not diff then
+        return offset
+    end
     if offset <= diff.cfinish then
         return diff.start
     end

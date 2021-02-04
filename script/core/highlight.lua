@@ -229,6 +229,9 @@ return function (uri, offset)
             else
                 return
             end
+            if not target then
+                return
+            end
             if mark[target] then
                 return
             end

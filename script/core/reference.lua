@@ -93,9 +93,13 @@ return function (uri, offset)
         elseif src.type == 'table' and src.parent.type ~= 'return' then
             goto CONTINUE
         end
+        local ouri = files.getOriginUri(root.uri)
+        if not ouri then
+            goto CONTINUE
+        end
         results[#results+1] = {
             target = src,
-            uri    = files.getOriginUri(root.uri),
+            uri    = ouri,
         }
         ::CONTINUE::
     end

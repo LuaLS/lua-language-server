@@ -43,6 +43,9 @@ local function typeHint(uri, edits, start, finish)
         elseif source.type == 'tableindex' then
             src = source.index
         end
+        if not src then
+            return
+        end
         edits[#edits+1] = {
             newText = (':%s'):format(infer),
             start   = src.finish,

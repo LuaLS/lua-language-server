@@ -84,6 +84,9 @@ function vm.getDocEnums(doc, mark, results)
 end
 
 function vm.getDocTypeUnits(doc, mark, results)
+    if not doc then
+        return nil
+    end
     mark = mark or {}
     if mark[doc] then
         return nil

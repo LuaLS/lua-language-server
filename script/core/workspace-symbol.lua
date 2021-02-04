@@ -20,8 +20,8 @@ local function buildSource(uri, source, key, results)
     elseif source.type == 'setfield'
     or     source.type == 'tablefield' then
         local field = source.field
-        local name  = field[1]
-        if matchKey(key, name) then
+        local name  = field and field[1]
+        if name and matchKey(key, name) then
             results[#results+1] = {
                 name  = name,
                 kind  = define.SymbolKind.Field,
@@ -31,8 +31,8 @@ local function buildSource(uri, source, key, results)
         end
     elseif source.type == 'setmethod' then
         local method = source.method
-        local name  = method[1]
-        if matchKey(key, name) then
+        local name   = method and method[1]
+        if name and matchKey(key, name) then
             results[#results+1] = {
                 name  = name,
                 kind  = define.SymbolKind.Method,

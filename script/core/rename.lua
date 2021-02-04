@@ -453,6 +453,9 @@ function m.rename(uri, pos, newname)
 
     rename(source, newname, function (target, start, finish, text)
         local turi = files.getOriginUri(guide.getUri(target))
+        if not turi then
+            return
+        end
         local uid = turi .. start
         if mark[uid] then
             return

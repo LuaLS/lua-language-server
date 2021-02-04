@@ -222,11 +222,11 @@ end
 
 local function makeSymbol(uri)
     local ast = files.getAst(uri)
-    if not ast then
+    local text = files.getText(uri)
+    if not ast or not text then
         return nil
     end
 
-    local text = files.getText(uri)
     local symbols = {}
     local used = {}
     guide.eachSource(ast.ast, function (source)

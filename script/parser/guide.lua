@@ -1473,7 +1473,7 @@ function m.getObjectValue(obj)
     end
     if obj.type == 'call' then
         if obj.node.special == 'rawset' then
-            return obj.args[3]
+            return obj.args and obj.args[3]
         else
             return obj
         end

@@ -229,8 +229,11 @@ function m.remove(uri)
     if not file then
         return
     end
-    m.fileMap[uri] = nil
-    m._pairsCache = nil
+    m.fileMap[uri]        = nil
+    m.astMap[uri]         = nil
+    m.linesMap[uri]       = nil
+    m.originLinesMap[uri] = nil
+    m._pairsCache         = nil
     m.flushFileCache(uri)
 
     m.fileCount     = m.fileCount - 1

@@ -4,27 +4,6 @@ local lang    = require 'language'
 local define  = require 'proto.define'
 local vm      = require 'vm'
 
-local function hasNameOfClassOrAlias(name)
-    local docs = vm.getDocTypes(name)
-    for _, otherDoc in ipairs(docs) do
-        if otherDoc.type == 'doc.class.name'
-        or otherDoc.type == 'doc.alias.name' then
-            return true
-        end
-    end
-    return false
-end
-
-local function hasNameOfGeneric(name, source)
-    if not source.typeGeneric then
-        return false
-    end
-    if not source.typeGeneric[name] then
-        return false
-    end
-    return true
-end
-
 return function (uri, callback)
     local state = files.getAst(uri)
     if not state then
@@ -33,6 +12,33 @@ return function (uri, callback)
 
     if not state.ast.docs then
         return
+    end
+
+    local classCache = {}
+    local function hasNameOfClassOrAlias(name)
+        if classCache[name] ~= nil then
+            return classCache[name]
+        end
+        local docs = vm.getDocTypes(name)
+        for _, otherDoc in ipairs(docs) do
+            if otherDoc.type == 'doc.class.name'
+            or otherDoc.type == 'doc.alias.name' then
+                classCache[name] = true
+                return true
+            end
+        end
+        classCache[name] = false
+        return false
+    end
+
+    local function hasNameOfGeneric(name, source)
+        if not source.typeGeneric then
+            return false
+        end
+        if not source.typeGeneric[name] then
+            return false
+        end
+        return true
     end
 
     guide.eachSource(state.ast.docs, function (source)

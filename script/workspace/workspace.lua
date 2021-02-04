@@ -434,6 +434,12 @@ function m.getRelativePath(uri)
     end
 end
 
+function m.isWorkspaceUri(uri)
+    local luri = files.getUri(uri)
+    local ruri = files.getUri(m.uri)
+    return luri:sub(1, #ruri) == ruri
+end
+
 --- 获取工作区等级的缓存
 function m.getCache(name)
     if not m.cache[name] then

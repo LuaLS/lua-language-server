@@ -157,6 +157,9 @@ end)
 proto.on('workspace/didChangeWatchedFiles', function (params)
     for _, change in ipairs(params.changes) do
         local uri = change.uri
+        if not workspace.isWorkspaceUri(uri) then
+            goto CONTINUE
+        end
         if     change.type == define.FileChangeType.Created then
             log.debug('FileChangeType.Created', uri)
             workspace.awaitLoadFile(uri)
@@ -184,6 +187,7 @@ proto.on('workspace/didChangeWatchedFiles', function (params)
                 end
             end
         end
+        ::CONTINUE::
     end
 end)
 

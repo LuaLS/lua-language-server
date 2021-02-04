@@ -2905,9 +2905,6 @@ function m.getRefCache(status, obj, mode)
         for i = 1, #results do
             sourceCache[i] = results[i]
         end
-        if not isDeep then
-            return
-        end
         if mode == 'ref'
         or mode == 'def' then
             for i = 1, #results do

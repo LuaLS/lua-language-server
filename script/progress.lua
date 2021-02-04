@@ -40,7 +40,7 @@ function mt:remove()
                 kind = 'end',
             }
         })
-        log.info('Remove progress:', token, self._title)
+        --log.info('Remove progress:', token, self._title)
     end
 end
 
@@ -100,7 +100,7 @@ function mt:_update()
             }
         })
         self._showed  = true
-        log.info('Create progress:', self._token, self._title)
+        --log.info('Create progress:', self._token, self._title)
         return
     end
     if not self._showed then
@@ -123,11 +123,11 @@ function mt:_update()
             percentage  = self._percentage,
         }
     })
-    log.info('Report progress:', self._token, self._title, self._message, self._percentage)
+    --log.info('Report progress:', self._token, self._title, self._message, self._percentage)
 end
 
 function mt:__close()
-    log.info('Close progress:', self._token, self._title, self._message)
+    --log.info('Close progress:', self._token, self._title, self._message)
     self:remove()
 end
 

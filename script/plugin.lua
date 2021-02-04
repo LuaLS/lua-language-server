@@ -1,7 +1,7 @@
 local config = require 'config'
 local fs     = require 'bee.filesystem'
 local fsu    = require 'fs-utility'
-local await = require "await"
+local await  = require "await"
 
 ---@class plugin
 local m = {}
@@ -20,7 +20,7 @@ function m.dispatch(event, ...)
     if suc then
         return true, res1, res2
     end
-    return false
+    return false, res1
 end
 
 function m.isReady()

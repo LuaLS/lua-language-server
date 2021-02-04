@@ -107,16 +107,23 @@ local function pluginOnSetText(file, text)
     file._diffInfo = nil
     local suc, result = plugin.dispatch('OnSetText', file.uri, text)
     if not suc then
+        if DEVELOP and result then
+            util.saveFile(LOGPATH .. '/diffed.lua', tostring(result))
+        end
         return text
     end
     if type(result) == 'string' then
         return result
     elseif type(result) == 'table' then
         local diffs
-        suc, result, diffs = xpcall(smerger.mergeDiff, log.warn, text, result)
+        suc, result, diffs = xpcall(smerger.mergeDiff, log.error, text, result)
         if suc then
             file._diffInfo = diffs
             return result
+        else
+            if DEVELOP and result then
+                util.saveFile(LOGPATH .. '/diffed.lua', tostring(result))
+            end
         end
     end
     return text

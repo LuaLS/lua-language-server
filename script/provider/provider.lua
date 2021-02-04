@@ -173,7 +173,9 @@ proto.on('workspace/didChangeWatchedFiles', function (params)
             end
         elseif change.type == define.FileChangeType.Changed then
             -- 如果文件处于关闭状态，则立即更新；否则等待didChange协议来更新
-            if files.isLua(uri) and not files.isOpen(uri) then
+            if  files.isLua(uri)
+            and not files.isOpen(uri)
+            and not workspace.isIgnored(uri) then
                 plugin.awaitReady()
                 files.setText(uri, pub.awaitTask('loadFile', uri), false)
             else

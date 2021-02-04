@@ -1643,6 +1643,7 @@ function m.checkSameSimpleByDocType(status, doc, args)
             local pieceResult = stepRefOfGeneric(status, piece, args, 'def')
             for _, res in ipairs(pieceResult) do
                 results[#results+1] = res
+                status.hasGenericResult = true
             end
         else
             local pieceResult = stepRefOfDocType(status, piece, 'def')
@@ -2179,12 +2180,19 @@ function m.searchSameFieldsInValue(status, ref, start, pushQueue, mode)
     if not m.checkValueMark(status, ref, value) then
         --return
     end
-    local newStatus = m.status(status)
-    m.searchRefs(newStatus, value, mode)
-    for _, res in ipairs(newStatus.results) do
-        pushQueue(res, start, true)
+    if not status.share.tempValueMark then
+        status.share.tempValueMark = {}
     end
-    pushQueue(value, start, true)
+    if not status.share.tempValueMark[value] then
+        status.share.tempValueMark[value] = true
+        local newStatus = m.status(status)
+        m.searchRefs(newStatus, value, mode)
+        status.share.tempValueMark[value] = nil
+        for _, res in ipairs(newStatus.results) do
+            pushQueue(res, start, true)
+        end
+        pushQueue(value, start, true)
+    end
     -- 检查形如 a = f() 的分支情况
     m.checkSameSimpleInCall(status, value, start, pushQueue, mode)
 end
@@ -2874,49 +2882,40 @@ end
 --end
 
 function m.getRefCache(status, obj, mode)
-    local isDeep    = status.deep and status.depth == 1
-    local cache     = status.share.refCache or {}
-    local deepCache = status.interface.cache and status.interface.cache() or {}
-    status.share.refCache = cache
+    local globalCache = status.interface.cache and status.interface.cache() or {}
     if m.isGlobal(obj) then
         obj = m.getKeyName(obj)
     end
-    if not cache[mode] then
-        cache[mode] = {}
+    if not globalCache[mode] then
+        globalCache[mode] = {}
     end
-    if not deepCache[mode] then
-        deepCache[mode] = {}
-    end
-    local sourceCache
-    if isDeep then
-        sourceCache = deepCache[mode][obj]
-    else
-        sourceCache = cache[mode][obj]
-    end
+    local sourceCache = globalCache[mode][obj]
     if sourceCache then
         return sourceCache
     end
     sourceCache = {}
-    cache[mode][obj] = sourceCache
-    if isDeep then
-        deepCache[mode][obj] = sourceCache
-    end
-    return nil, function (results)
+    globalCache[mode][obj] = sourceCache
+    return nil, function ()
+        if status.hasGenericResult then
+            globalCache[mode][obj] = nil
+            return
+        end
+        local results = status.results
         for i = 1, #results do
             sourceCache[i] = results[i]
         end
-        if mode == 'ref'
-        or mode == 'def' then
-            for i = 1, #results do
-                local res = results[i]
-                if not deepCache[mode][res] then
-                    cache[mode][res] = sourceCache
-                    if isDeep then
-                        deepCache[mode][res] = sourceCache
-                    end
-                end
-            end
-        end
+        --if mode == 'ref'
+        --or mode == 'def' then
+        --    for i = 1, #results do
+        --        local res = results[i]
+        --        if not globalCache[mode][res] then
+        --            cache[mode][res] = sourceCache
+        --            if isDeep then
+        --                globalCache[mode][res] = sourceCache
+        --            end
+        --        end
+        --    end
+        --end
     end
 end
 
@@ -2954,7 +2953,7 @@ function m.searchRefs(status, obj, mode)
     m.cleanResults(status.results)
 
     if makeCache then
-        makeCache(status.results)
+        makeCache()
     end
 end
 
@@ -4333,7 +4332,7 @@ function m.searchInfer(status, obj)
     if checked then
         m.cleanInfers(status.results, obj)
         if makeCache then
-            makeCache(status.results)
+            makeCache()
         end
         return
     end
@@ -4350,7 +4349,7 @@ function m.searchInfer(status, obj)
     m.inferByBinary(status, obj)
     m.cleanInfers(status.results, obj)
     if makeCache then
-        makeCache(status.results)
+        makeCache()
     end
 end
 

@@ -135,16 +135,15 @@ Care['nonstandardSymbol.continue'] = function (source, results)
     }
 end
 
-local function buildTokens(results, text, lines)
+local function buildTokens(uri, results)
     local tokens = {}
     local lastLine = 0
     local lastStartChar = 0
     for i, source in ipairs(results) do
-        local row, col = guide.positionOf(lines, source.start)
-        local start    = guide.lineRange(lines, row)
-        local ucol     = util.utf8Len(text, start, start + col - 1)
-        local line = row - 1
-        local startChar = ucol - 1
+        local startPos  = files.position(uri, source.start)
+        local finishPos = files.position(uri, source.finish)
+        local line      = startPos.line
+        local startChar = startPos.character - 1
         local deltaLine = line - lastLine
         local deltaStartChar
         if deltaLine == 0 then
@@ -158,7 +157,7 @@ local function buildTokens(results, text, lines)
         local len = i * 5 - 5
         tokens[len + 1] = deltaLine
         tokens[len + 2] = deltaStartChar
-        tokens[len + 3] = source.finish - source.start + 1 -- length
+        tokens[len + 3] = finishPos.character - startPos.character + 1 -- length
         tokens[len + 4] = source.type
         tokens[len + 5] = source.modifieres or 0
     end
@@ -201,7 +200,7 @@ return function (uri, start, finish)
         return a.start < b.start
     end)
 
-    local tokens = buildTokens(results, text, lines)
+    local tokens = buildTokens(uri, results)
 
     return tokens
 end

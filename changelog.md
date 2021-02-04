@@ -5,6 +5,7 @@
 * `FIX` [#375](https://github.com/sumneko/lua-language-server/issues/375)
 * `FIX` [#376](https://github.com/sumneko/lua-language-server/issues/376)
 * `FIX` [#378](https://github.com/sumneko/lua-language-server/issues/378)
+* `FIX` [#379](https://github.com/sumneko/lua-language-server/issues/379)
 
 ## 1.14.1
 `2021-2-2`

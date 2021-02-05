@@ -175,7 +175,7 @@ proto.on('workspace/didChangeWatchedFiles', function (params)
             -- 如果文件处于关闭状态，则立即更新；否则等待didChange协议来更新
             if  files.isLua(uri)
             and not files.isOpen(uri)
-            and not workspace.isIgnored(uri) then
+            and (not workspace.isIgnored(uri) or files.isLibrary(uri)) then
                 plugin.awaitReady()
                 files.setText(uri, pub.awaitTask('loadFile', uri), false)
             else
@@ -813,6 +813,9 @@ do
                     }
                 end
             end
+        end
+        if #edits == 0 then
+            log.debug('hints 0', util.dump(visibles))
         end
 
         proto.notify('$/hint', {

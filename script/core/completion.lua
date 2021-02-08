@@ -1707,7 +1707,7 @@ local function makeCache(uri, offset, results)
         return
     end
     cache.results = results
-    cache.offset  = offset
+    cache.start   = offset - #word + 1
     cache.word    = word:lower()
 end
 
@@ -1717,11 +1717,8 @@ local function getCache(uri, offset)
         return nil
     end
     local text  = files.getText(uri)
-    local word = findWord(text, offset)
-    if not word then
-        return nil
-    end
-    if word:sub(1, #cache.word):lower() ~= cache.word then
+    local word = text:sub(cache.start, offset)
+    if word:lower() ~= cache.word then
         return nil
     end
 

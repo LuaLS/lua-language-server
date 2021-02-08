@@ -15,7 +15,6 @@ brave.on('loadProto', function ()
             return
         end
         brave.push('proto', proto)
-        thread.sleep(0.01)
     end
 end)
 

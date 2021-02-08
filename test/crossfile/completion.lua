@@ -1,7 +1,8 @@
-local files = require 'files'
-local core = require 'core.completion'
-local furi = require 'file-uri'
+local files    = require 'files'
+local core     = require 'core.completion'
+local furi     = require 'file-uri'
 local platform = require 'bee.platform'
+local util     = require 'utility'
 
 rawset(_G, 'TEST', true)
 
@@ -67,6 +68,16 @@ local Cared = {
     ['textEdit'] = true,
 }
 
+local function removeMetas(results)
+    local removes = {}
+    for i, res in ipairs(results) do
+        if res.description and res.description:find 'meta' then
+            removes[#removes+1] = i
+        end
+    end
+    util.tableMultiRemove(results, removes)
+end
+
 function TEST(data)
     files.removeAll()
 
@@ -92,6 +103,7 @@ function TEST(data)
     end
     assert(result ~= nil)
     result.enableCommon = nil
+    removeMetas(result)
     for _, item in ipairs(result) do
         local r = core.resolve(item.id)
         for k, v in pairs(r or {}) do

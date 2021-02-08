@@ -2720,7 +2720,7 @@ function m.searchSameFields(status, simple, mode)
             --    break
             --end
             m.checkSameSimple(status, simple, obj, start, force, mode, pushQueue)
-            if max >= 10000 then
+            if max >= 100000 then
                 logWarn('Queue too large!')
                 break
             end

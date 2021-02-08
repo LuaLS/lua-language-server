@@ -6,7 +6,7 @@ local platform = require 'bee.platform'
 local m = {}
 
 local function allWords()
-    local str = [[.:('"[,#*@|=- ]]
+    local str = [[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.:('"[,#*@|=- ]]
     local list = {}
     for c in str:gmatch '.' do
         list[#list+1] = c

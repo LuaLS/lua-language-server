@@ -78,31 +78,67 @@ end
 ---根据转换前的位置获取转换后的位置
 ---@param info   string.merger.infos
 ---@param offset integer
----@return integer
+---@return integer start
+---@return integer finish
 function m.getOffset(info, offset)
     local diff = getNearDiff(info, offset, 'start')
     if not diff then
-        return offset
+        return offset, offset
     end
     if offset <= diff.finish then
-        return diff.cstart
+        local start, finish
+        if offset == diff.start then
+            start = diff.cstart
+        end
+        if offset == diff.finish then
+            finish = diff.cfinish
+        end
+        if not start or not finish then
+            local soff = offset - diff.start
+            local pos = math.min(diff.cstart + soff, diff.cfinish)
+            start  = start or pos
+            finish = finish or pos
+        end
+        if start > finish then
+            start = finish
+        end
+        return start, finish
     end
-    return offset - diff.finish + diff.cfinish
+    local pos = offset - diff.finish + diff.cfinish
+    return pos, pos
 end
 
 ---根据转换后的位置获取转换前的位置
 ---@param info   string.merger.infos
 ---@param offset integer
----@return integer
+---@return integer start
+---@return integer finish
 function m.getOffsetBack(info, offset)
     local diff = getNearDiff(info, offset, 'cstart')
     if not diff then
-        return offset
+        return offset, offset
     end
     if offset <= diff.cfinish then
-        return diff.start
+        local start, finish
+        if offset == diff.cstart then
+            start = diff.start
+        end
+        if offset == diff.cfinish then
+            finish = diff.finish
+        end
+        if not start or not finish then
+            local soff = offset - diff.cstart
+            local pos = math.min(diff.start + soff, diff.finish)
+            start  = start or pos
+            finish = finish or pos
+        end
+        if start > finish then
+            start = finish
+        end
+        return start, finish
     end
-    return offset - diff.cfinish + diff.finish
+    local pos = offset - diff.cfinish + diff.finish
+    return pos, pos
 end
 
 return m

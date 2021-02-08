@@ -505,8 +505,9 @@ end
 --- 获取 position 对应的光标位置
 ---@param uri      uri
 ---@param position position
+---@param isFinish? boolean
 ---@return integer
-function m.offset(uri, position)
+function m.offset(uri, position, isFinish)
     local file  = m.getFile(uri)
     local lines = m.getLines(uri)
     local text  = m.getText(uri)
@@ -526,7 +527,12 @@ function m.offset(uri, position)
         offset = utf8.offset(text, position.character + 1, start) or #text
     end
     if file._diffInfo then
-        offset = smerger.getOffset(file._diffInfo, offset)
+        local start, finish = smerger.getOffset(file._diffInfo, offset)
+        if isFinish then
+            offset = finish
+        else
+            offset = start
+        end
     end
     return offset
 end
@@ -567,14 +573,15 @@ end
 --- 将应用差异前的offset转换为应用差异后的offset
 ---@param uri    uri
 ---@param offset integer
----@return integer
+---@return integer start
+---@return integer finish
 function m.diffedOffset(uri, offset)
     local file = m.getFile(uri)
     if not file then
-        return offset
+        return offset, offset
     end
     if not file._diffInfo then
-        return offset
+        return offset, offset
     end
     return smerger.getOffset(file._diffInfo, offset)
 end
@@ -582,14 +589,15 @@ end
 --- 将应用差异后的offset转换为应用差异前的offset
 ---@param uri    uri
 ---@param offset integer
----@return integer
+---@return integer start
+---@return integer finish
 function m.diffedOffsetBack(uri, offset)
     local file = m.getFile(uri)
     if not file then
-        return offset
+        return offset, offset
     end
     if not file._diffInfo then
-        return offset
+        return offset, offset
     end
     return smerger.getOffsetBack(file._diffInfo, offset)
 end
@@ -608,8 +616,9 @@ end
 --- 将光标位置转化为 position
 ---@param uri uri
 ---@param offset integer
+---@param isFinish? boolean
 ---@return position
-function m.position(uri, offset)
+function m.position(uri, offset, isFinish)
     local file  = m.getFile(uri)
     local lines = m.getLines(uri)
     local text  = m.getText(uri)
@@ -620,7 +629,12 @@ function m.position(uri, offset)
         }
     end
     if file._diffInfo then
-        offset = smerger.getOffsetBack(file._diffInfo, offset)
+        local start, finish = smerger.getOffsetBack(file._diffInfo, offset)
+        if isFinish then
+            offset = finish
+        else
+            offset = start
+        end
         lines  = m.getOriginLines(uri)
         text   = m.getOriginText(uri)
     end
@@ -658,8 +672,8 @@ end
 ---@param offset2 integer
 function m.range(uri, offset1, offset2)
     local range = {
-        start   = m.position(uri, offset1),
-        ['end'] = m.position(uri, offset2),
+        start   = m.position(uri, offset1, false),
+        ['end'] = m.position(uri, offset2, true),
     }
     if range.start.character > 0 then
         range.start.character = range.start.character - 1
@@ -673,8 +687,8 @@ end
 ---@return integer start
 ---@return integer finish
 function m.unrange(uri, range)
-    local start  = m.offset(uri, range.start)
-    local finish = m.offset(uri, range['end'])
+    local start  = m.offset(uri, range.start, true)
+    local finish = m.offset(uri, range['end'], false)
     return start, finish
 end
 

@@ -23,6 +23,8 @@ local DEVELOP      = _G.DEVELOP
 local log          = log
 local _G           = _G
 
+---@class parser.guide.object
+
 local function logWarn(...)
     log.warn(...)
 end
@@ -132,6 +134,8 @@ local TypeSort = {
 local NIL = setmetatable({'<nil>'}, { __tostring = function () return 'nil' end })
 
 --- 是否是字面量
+---@param obj parser.guide.object
+---@return boolean
 function m.isLiteral(obj)
     local tp = obj.type
     return tp == 'nil'
@@ -143,6 +147,8 @@ function m.isLiteral(obj)
 end
 
 --- 获取字面量
+---@param obj parser.guide.object
+---@return any
 function m.getLiteral(obj)
     local tp = obj.type
     if     tp == 'boolean' then
@@ -156,6 +162,8 @@ function m.getLiteral(obj)
 end
 
 --- 寻找父函数
+---@param obj parser.guide.object
+---@return parser.guide.object
 function m.getParentFunction(obj)
     for _ = 1, 1000 do
         obj = obj.parent
@@ -171,6 +179,8 @@ function m.getParentFunction(obj)
 end
 
 --- 寻找父的table类型 doc.type.table
+---@param obj parser.guide.object
+---@return parser.guide.object
 function m.getParentDocTypeTable(obj)
     for _ = 1, 1000 do
         local parent = obj.parent
@@ -186,6 +196,8 @@ function m.getParentDocTypeTable(obj)
 end
 
 --- 寻找所在区块
+---@param obj parser.guide.object
+---@return parser.guide.object
 function m.getBlock(obj)
     for _ = 1, 1000 do
         if not obj then
@@ -204,6 +216,8 @@ function m.getBlock(obj)
 end
 
 --- 寻找所在父区块
+---@param obj parser.guide.object
+---@return parser.guide.object
 function m.getParentBlock(obj)
     for _ = 1, 1000 do
         obj = obj.parent
@@ -219,6 +233,8 @@ function m.getParentBlock(obj)
 end
 
 --- 寻找所在可break的父区块
+---@param obj parser.guide.object
+---@return parser.guide.object
 function m.getBreakBlock(obj)
     for _ = 1, 1000 do
         obj = obj.parent
@@ -237,6 +253,8 @@ function m.getBreakBlock(obj)
 end
 
 --- 寻找doc的主体
+---@param obj parser.guide.object
+---@return parser.guide.object
 function m.getDocState(obj)
     for _ = 1, 1000 do
         local parent = obj.parent
@@ -252,6 +270,8 @@ function m.getDocState(obj)
 end
 
 --- 寻找所在父类型
+---@param obj parser.guide.object
+---@return parser.guide.object
 function m.getParentType(obj, want)
     for _ = 1, 1000 do
         obj = obj.parent
@@ -266,6 +286,8 @@ function m.getParentType(obj, want)
 end
 
 --- 寻找根区块
+---@param obj parser.guide.object
+---@return parser.guide.object
 function m.getRoot(obj)
     for _ = 1, 1000 do
         if obj.type == 'main' then
@@ -280,6 +302,8 @@ function m.getRoot(obj)
     error('guide.getRoot overstack')
 end
 
+---@param obj parser.guide.object
+---@return string
 function m.getUri(obj)
     if obj.uri then
         return obj.uri
@@ -1230,7 +1254,13 @@ function m.getSimple(obj, max)
     return simpleList
 end
 
+---Create a new status
+---@param parentStatus parser.guide.status
+---@param interface    table
+---@param deep         boolean
+---@return parser.guide.status
 function m.status(parentStatus, interface, deep)
+    ---@class parser.guide.status
     local status = {
         share     = parentStatus and parentStatus.share       or {
             count = 0,
@@ -1452,6 +1482,8 @@ function m.searchDefFields(status, obj, key)
     m.cleanResults(status.results)
 end
 
+---@param obj parser.guide.object
+---@return parser.guide.object
 function m.getObjectValue(obj)
     while obj.type == 'paren' do
         obj = obj.exp

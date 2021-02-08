@@ -1234,6 +1234,7 @@ function m.status(parentStatus, interface, deep)
     local status = {
         share     = parentStatus and parentStatus.share       or {
             count = 0,
+            cacheLock = {},
         },
         depth     = parentStatus and (parentStatus.depth + 1) or 0,
         searchDeep= parentStatus and parentStatus.searchDeep  or deep or -999,
@@ -2882,6 +2883,7 @@ end
 --end
 
 function m.getRefCache(status, obj, mode)
+    local isDeep = status.deep
     local globalCache = status.interface.cache and status.interface.cache() or {}
     if m.isGlobal(obj) then
         obj = m.getKeyName(obj)
@@ -2893,29 +2895,36 @@ function m.getRefCache(status, obj, mode)
     if sourceCache then
         return sourceCache
     end
-    sourceCache = {}
-    globalCache[mode][obj] = sourceCache
+    if not status.share.cacheLock[mode] then
+        status.share.cacheLock[mode] = {}
+    end
+    if status.share.cacheLock[mode][obj] then
+        return {}
+    end
+    status.share.cacheLock[mode][obj] = {}
     return nil, function ()
         if status.hasGenericResult then
-            globalCache[mode][obj] = nil
+            status.share.cacheLock[mode][obj] = nil
             return
         end
+        sourceCache = {}
         local results = status.results
         for i = 1, #results do
             sourceCache[i] = results[i]
         end
-        --if mode == 'ref'
-        --or mode == 'def' then
-        --    for i = 1, #results do
-        --        local res = results[i]
-        --        if not globalCache[mode][res] then
-        --            cache[mode][res] = sourceCache
-        --            if isDeep then
-        --                globalCache[mode][res] = sourceCache
-        --            end
-        --        end
-        --    end
-        --end
+        globalCache[mode][obj] = sourceCache
+        if not isDeep then
+            return
+        end
+        if mode == 'ref'
+        or mode == 'def' then
+            for i = 1, #results do
+                local res = results[i]
+                if not globalCache[mode][res] then
+                    globalCache[mode][res] = sourceCache
+                end
+            end
+        end
     end
 end
 

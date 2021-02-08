@@ -155,7 +155,7 @@ local ConfigTemplate = {
         mode            = {'Semantic', String},
     },
     hint = {
-        enable          = {true,      Boolean},
+        enable          = {false,     Boolean},
         paramType       = {true,      Boolean},
         setType         = {false,     Boolean},
         paramName       = {true,      Boolean},

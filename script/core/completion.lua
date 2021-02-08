@@ -869,7 +869,7 @@ local function checkUri(ast, text, offset, results)
                     goto CONTINUE
                 end
                 if vm.isMetaFile(uri) then
-                    goto CONTINUE
+                    --goto CONTINUE
                 end
                 local path = workspace.getRelativePath(uri)
                 local infos = rpath.getVisiblePath(path, config.config.runtime.path)

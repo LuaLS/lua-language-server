@@ -18,6 +18,13 @@ brave.on('loadProto', function ()
     end
 end)
 
+brave.on('timer', function (time)
+    while true do
+        thread.sleep(time)
+        brave.push('wakeup')
+    end
+end)
+
 brave.on('compile', function (text)
     local state, err = parser:compile(text, 'lua', 'Lua 5.4')
     if not state then

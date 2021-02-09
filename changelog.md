@@ -1,5 +1,8 @@
 # changelog
 
+## 1.15.0
+* `CHG` main thread no longer loop sleeps, see [#329](https://github.com/sumneko/lua-language-server/issues/329) [#386](https://github.com/sumneko/lua-language-server/issues/386)
+
 ## 1.14.3
 `2021-2-8`
 * `CHG` hint: disabled by default, see [#380](https://github.com/sumneko/lua-language-server/issues/380)

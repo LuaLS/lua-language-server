@@ -1,6 +1,8 @@
 # changelog
 
 ## 1.15.0
+`2021-2-9`
+* `NEW` LUNAR YEAR, BE HAPPY!
 * `CHG` diagnostic: when there are too many errors, the main errors will be displayed first
 * `CHG` main thread no longer loop sleeps, see [#329](https://github.com/sumneko/lua-language-server/issues/329) [#386](https://github.com/sumneko/lua-language-server/issues/386)
 * `CHG` improve performance

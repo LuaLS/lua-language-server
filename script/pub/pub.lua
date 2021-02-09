@@ -20,7 +20,7 @@ DBGWAIT = %s
 
 collectgarbage 'generational'
 
-log         = require 'brave.log'
+log = require 'brave.log'
 
 xpcall(dofile, log.error, %q)
 local brave = require 'brave'

@@ -139,7 +139,7 @@ end
 
 function m.startTimer()
     while true do
-        pub.step(m.working)
+        pub.step(not m.working)
         if await.step() then
             m.working = true
             m.sleeping = false

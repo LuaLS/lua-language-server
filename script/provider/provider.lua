@@ -814,9 +814,6 @@ do
                 end
             end
         end
-        if #edits == 0 then
-            log.debug('hints 0', util.dump(visibles))
-        end
 
         proto.notify('$/hint', {
             uri   = uri,

@@ -2690,11 +2690,21 @@ end
 function m.searchSameFields(status, simple, mode)
     local queues, starts, forces = allocQueue()
     local queueLen = 0
+    local locks = {}
     local function pushQueue(obj, start, force)
         if obj.type == 'getlocal'
         or obj.type == 'setlocal' then
             obj = obj.node
         end
+        local lock = locks[start]
+        if not lock then
+            lock = {}
+            locks[start] = lock
+        end
+        if lock[obj] then
+            return
+        end
+        lock[obj] = true
         queueLen = queueLen + 1
         queues[queueLen] = obj
         starts[queueLen] = start
@@ -2718,7 +2728,6 @@ function m.searchSameFields(status, simple, mode)
         pushQueue(simple.node, 1)
     end
     local max = 0
-    local locks = {}
     for i = 1, 1e6 do
         if queueLen <= 0 then
             break
@@ -2730,32 +2739,24 @@ function m.searchSameFields(status, simple, mode)
         starts[queueLen] = nil
         forces[queueLen] = nil
         queueLen = queueLen - 1
-        local lock = locks[start]
-        if not lock then
-            lock = {}
-            locks[start] = lock
-        end
-        if not lock[obj] then
-            lock[obj] = true
-            max = max + 1
-            status.share.count = status.share.count + 1
-            if status.share.count % 10000 == 0 then
-                --if TEST then
-                --    print('####', status.share.count, osClock() - status.clock)
-                --end
-                if status.interface and status.interface.pulse then
-                    status.interface.pulse()
-                end
-            end
-            --if status.share.count >= 100000 then
-            --    logWarn('Count too large!')
-            --    break
+        max = max + 1
+        status.share.count = status.share.count + 1
+        if status.share.count % 10000 == 0 then
+            --if TEST then
+            --    print('####', status.share.count, osClock() - status.clock)
             --end
-            m.checkSameSimple(status, simple, obj, start, force, mode, pushQueue)
-            if max >= 100000 then
-                logWarn('Queue too large!')
-                break
+            if status.interface and status.interface.pulse then
+                status.interface.pulse()
             end
+        end
+        --if status.share.count >= 100000 then
+        --    logWarn('Count too large!')
+        --    break
+        --end
+        m.checkSameSimple(status, simple, obj, start, force, mode, pushQueue)
+        if max >= 100000 then
+            logWarn('Queue too large!')
+            break
         end
     end
     --deallocQueue(queues, starts, forces)

@@ -1,5 +1,8 @@
 local thread = require 'bee.thread'
 
+local taskPad = thread.channel('taskpad')
+local waiter  = thread.channel('waiter')
+
 ---@class pub_brave
 local m = {}
 m.type = 'brave'
@@ -8,13 +11,11 @@ m.queue = {}
 
 --- 注册成为勇者
 function m.register(id)
-    m.taskpad = thread.channel('taskpad' .. id)
-    m.waiter  = thread.channel('waiter'  .. id)
-    m.id      = id
+    m.id = id
 
     if #m.queue > 0 then
         for _, info in ipairs(m.queue) do
-            m.waiter:push(info.name, info.params)
+            waiter:push(m.id, info.name, info.params)
         end
     end
     m.queue = nil
@@ -29,8 +30,8 @@ end
 
 --- 报告
 function m.push(name, params)
-    if m.waiter then
-        m.waiter:push(name, params)
+    if m.id then
+        waiter:push(m.id, name, params)
     else
         m.queue[#m.queue+1] = {
             name   = name,
@@ -43,19 +44,19 @@ end
 function m.start()
     m.push('mem', collectgarbage 'count')
     while true do
-        local name, id, params = m.taskpad:bpop()
+        local name, id, params = taskPad:bpop()
         local ability = m.ability[name]
         -- TODO
         if not ability then
-            m.waiter:push(id)
+            waiter:push(m.id, id)
             log.error('Brave can not handle this work: ' .. name)
             goto CONTINUE
         end
         local ok, res = xpcall(ability, log.error, params)
         if ok then
-            m.waiter:push(id, res)
+            waiter:push(m.id, id, res)
         else
-            m.waiter:push(id)
+            waiter:push(m.id, id)
         end
         m.push('mem', collectgarbage 'count')
         ::CONTINUE::

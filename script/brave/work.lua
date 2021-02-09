@@ -15,7 +15,13 @@ brave.on('loadProto', function ()
             return
         end
         brave.push('proto', proto)
-        thread.sleep(0.01)
+    end
+end)
+
+brave.on('timer', function (time)
+    while true do
+        thread.sleep(time)
+        brave.push('wakeup')
     end
 end)
 

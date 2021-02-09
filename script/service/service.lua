@@ -138,19 +138,22 @@ function m.report()
 end
 
 function m.startTimer()
+    pub.task('timer', 1)
     while true do
-        pub.step()
+        pub.step(not m.working)
         if await.step() then
-            m.working = true
             m.sleeping = false
-            goto CONTINUE
+            if not m.working then
+                m.working = true
+                m.reportStatus()
+            end
+        else
+            if m.working then
+                m.working = false
+                m.idleClock = os.clock()
+                m.reportStatus()
+            end
         end
-        if m.working then
-            m.working = false
-            m.idleClock = os.clock()
-        end
-        thread.sleep(0.001)
-        ::CONTINUE::
         timer.update()
     end
 end
@@ -165,32 +168,30 @@ function m.checkSleep()
             collectgarbage()
             collectgarbage()
         end
+        m.reportStatus()
     end)
 end
 
 function m.reportStatus()
-    local lastInfo
-    timer.loop(0.1, function ()
-        local info = {}
-        if m.working then
-            info.text = '$(loading~spin)Lua'
-        elseif m.sleeping then
-            info.text = "💤Lua"
-        else
-            info.text = '😺Lua'
-        end
-        info.tooltip = lang.script('WINDOW_LUA_STATUS', {
-            ws  = ws.path or '',
-            ast = files.astCount,
-            max = files.fileCount,
-            mem = collectgarbage('count') / 1000,
-        })
-        if util.equal(lastInfo, info) then
-            return
-        end
-        lastInfo = info
-        proto.notify('$/status/report', info)
-    end)()
+    local info = {}
+    if m.working then
+        info.text = '$(loading~spin)Lua'
+    elseif m.sleeping then
+        info.text = "💤Lua"
+    else
+        info.text = '😺Lua'
+    end
+    info.tooltip = lang.script('WINDOW_LUA_STATUS', {
+        ws  = ws.path or '',
+        ast = files.astCount,
+        max = files.fileCount,
+        mem = collectgarbage('count') / 1000,
+    })
+    if util.equal(m.lastInfo, info) then
+        return
+    end
+    m.lastInfo = info
+    proto.notify('$/status/report', info)
 end
 
 function m.testVersion()

@@ -14,7 +14,7 @@ function m.register(id)
 
     if #m.queue > 0 then
         for _, info in ipairs(m.queue) do
-            m.waiter:push(info.name, info.params)
+            m.waiter:push(m.id, info.name, info.params)
         end
     end
     m.queue = nil
@@ -30,7 +30,7 @@ end
 --- 报告
 function m.push(name, params)
     if m.waiter then
-        m.waiter:push(name, params)
+        m.waiter:push(m.id, name, params)
     else
         m.queue[#m.queue+1] = {
             name   = name,
@@ -47,15 +47,15 @@ function m.start()
         local ability = m.ability[name]
         -- TODO
         if not ability then
-            m.waiter:push(id)
+            m.waiter:push(m.id, id)
             log.error('Brave can not handle this work: ' .. name)
             goto CONTINUE
         end
         local ok, res = xpcall(ability, log.error, params)
         if ok then
-            m.waiter:push(id, res)
+            m.waiter:push(m.id, id, res)
         else
-            m.waiter:push(id)
+            m.waiter:push(m.id, id)
         end
         m.push('mem', collectgarbage 'count')
         ::CONTINUE::

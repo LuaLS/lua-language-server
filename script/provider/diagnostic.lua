@@ -90,25 +90,34 @@ local function buildDiagnostic(uri, diag)
     }
 end
 
-local function merge(a, b)
+local function mergeSyntaxAndDiags(a, b)
     if not a and not b then
         return nil
     end
+    local count = 0
     local t = {}
     if a then
         for i = 1, #a do
-            if #t >= 100 then
-                break
+            local severity = a[i].severity
+            if severity == define.DiagnosticSeverity.Hint
+            or severity == define.DiagnosticSeverity.Information then
+                t[#t+1] = a[i]
+            elseif count < 10000 then
+                count = count + 1
+                t[#t+1] = a[i]
             end
-            t[#t+1] = a[i]
         end
     end
     if b then
         for i = 1, #b do
-            if #t >= 100 then
-                break
+            local severity = b[i].severity
+            if severity == define.DiagnosticSeverity.Hint
+            or severity == define.DiagnosticSeverity.Information then
+                t[#t+1] = b[i]
+            elseif count < 10000 then
+                count = count + 1
+                t[#t+1] = b[i]
             end
-            t[#t+1] = b[i]
         end
     end
     return t
@@ -191,9 +200,10 @@ function m.doDiagnostic(uri)
 
     local syntax = m.syntaxErrors(uri, ast)
     local diags = {}
-
     local function pushResult()
-        local full = merge(syntax, diags)
+        tracy.ZoneBeginN 'mergeSyntaxAndDiags'
+        local _ <close> = tracy.ZoneEnd
+        local full = mergeSyntaxAndDiags(syntax, diags)
         if not full then
             m.clear(uri)
             return

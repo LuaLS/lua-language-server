@@ -143,14 +143,12 @@ function m.startTimer()
         if await.step() then
             m.working = true
             m.sleeping = false
-            goto CONTINUE
+        else
+            if m.working then
+                m.working = false
+                m.idleClock = os.clock()
+            end
         end
-        if m.working then
-            m.working = false
-            m.idleClock = os.clock()
-        end
-        thread.sleep(0.001)
-        ::CONTINUE::
         timer.update()
     end
 end

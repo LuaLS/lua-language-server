@@ -1,9 +1,10 @@
 # changelog
 
 ## 1.15.1
+`2021-2-18`
 * `CHG` diagnostic: `unused-local` excludes `doc.param`
 * `CHG` definition: excludes values, see [#391](https://github.com/sumneko/lua-language-server/issues/391)
-* `FIX` not work on Linux and macOS
+* `FIX` not works on Linux and macOS
 
 ## 1.15.0
 `2021-2-9`

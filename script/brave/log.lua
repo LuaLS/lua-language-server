@@ -1,11 +1,12 @@
 local brave          = require 'brave'
+local time           = require 'bee.time'
 
 local tablePack      = table.pack
 local tostring       = tostring
 local tableConcat    = table.concat
 local debugTraceBack = debug.traceback
 local debugGetInfo   = debug.getinfo
-local osClock        = os.clock
+local monotonic      = time.monotonic
 
 _ENV = nil
 
@@ -24,7 +25,7 @@ local function pushLog(level, ...)
         msg   = str,
         src   = info.source,
         line  = info.currentline,
-        clock = osClock(),
+        clock = monotonic(),
     })
     return str
 end

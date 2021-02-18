@@ -1,4 +1,5 @@
 local platform = require 'bee.platform'
+local unicode  = require 'bee.unicode'
 local config   = require 'config'
 local glob     = require 'glob'
 local furi     = require 'file-uri'
@@ -152,6 +153,11 @@ function m.setText(uri, text, isTrust)
     local file = m.fileMap[uri]
     if file.trusted and not isTrust then
         return
+    end
+    if not isTrust then
+        if config.config.runtime.sourceCoding == 'ansi' then
+            text = unicode.a2u(text)
+        end
     end
     if file.originText == text then
         return

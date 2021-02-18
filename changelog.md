@@ -1,5 +1,8 @@
 # changelog
 
+## 1.16.0
+* `NEW` source coding supports `ansi`
+
 ## 1.15.1
 `2021-2-18`
 * `CHG` diagnostic: `unused-local` excludes `doc.param`

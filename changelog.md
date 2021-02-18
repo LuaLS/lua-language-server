@@ -2,6 +2,7 @@
 
 ## 1.16.0
 * `NEW` file encoding supports `ansi`
+* `FIX` missed syntax error `f() = 1`
 
 ## 1.15.1
 `2021-2-18`

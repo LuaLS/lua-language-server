@@ -508,7 +508,7 @@ LocalAttr   <-  {| (Sp '<' Sp MustName Sp LocalAttrEnd)+ |}
 LocalAttrEnd<-  '>' / {} -> MissGT
 Local       <-  Sp ({} LOCAL LocalNameList ((AssignOrEQ ExpList) / %nil) {})
             ->  Local
-Set         <-  Sp ({} SimpleList AssignOrEQ ExpList {})
+Set         <-  Sp ({} SimpleList AssignOrEQ {} ExpList {})
             ->  Set
 LocalNameList
             <-  {| LocalName (Sp ',' LocalName)* |}

@@ -1179,7 +1179,7 @@ local Defs = {
         end
         return args
     end,
-    Set = function (start, keys, values, finish)
+    Set = function (start, keys, eqFinish, values, finish)
         for i = 1, #keys do
             local key = keys[i]
             if key.type == 'getname' then
@@ -1191,6 +1191,15 @@ local Defs = {
             elseif key.type == 'getindex' then
                 key.type = 'setindex'
                 key.value = getValue(values, i)
+            else
+                PushError {
+                    type   = 'UNEXPECT_SYMBOL',
+                    start  = eqFinish - 1,
+                    finish = eqFinish - 1,
+                    info   = {
+                        symbol = '=',
+                    }
+                }
             end
             if key.value then
                 key.range = key.value.finish

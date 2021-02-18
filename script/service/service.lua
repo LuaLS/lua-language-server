@@ -8,6 +8,7 @@ local util   = require 'utility'
 local files  = require 'files'
 local lang   = require 'language'
 local ws     = require 'workspace'
+local time   = require 'bee.time'
 
 local m = {}
 m.type = 'service'
@@ -150,7 +151,7 @@ function m.startTimer()
         else
             if m.working then
                 m.working = false
-                m.idleClock = os.clock()
+                m.idleClock = time.monotonic()
                 m.reportStatus()
             end
         end
@@ -160,7 +161,7 @@ end
 
 function m.checkSleep()
     timer.loop(10, function ()
-        if not m.working and not m.sleeping and os.clock() - m.idleClock >= 300 then
+        if not m.working and not m.sleeping and time.monotonic() - m.idleClock >= 300000 then
             m.sleeping = true
             files.flushCache()
             vm.flushCache()

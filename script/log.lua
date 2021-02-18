@@ -1,7 +1,7 @@
-local fs = require 'bee.filesystem'
+local fs             = require 'bee.filesystem'
+local time           = require 'bee.time'
 
-local osTime         = os.time
-local osClock        = os.clock
+local monotonic      = time.monotonic
 local osDate         = os.date
 local ioOpen         = io.open
 local tablePack      = table.pack
@@ -17,7 +17,7 @@ _ENV = nil
 local m = {}
 
 m.file = nil
-m.startTime = osTime() - osClock()
+m.startTime = time.time() - monotonic()
 m.size = 0
 m.maxSize = 100 * 1024 * 1024
 
@@ -57,7 +57,7 @@ local function pushLog(level, ...)
         str = str .. '\n' .. debugTraceBack(nil, 3)
     end
     local info = debugGetInfo(3, 'Sl')
-    return m.raw(0, level, str, info.source, info.currentline, osClock())
+    return m.raw(0, level, str, info.source, info.currentline, monotonic())
 end
 
 function m.info(...)
@@ -94,7 +94,7 @@ function m.raw(thd, level, msg, source, currentline, clock)
     if not m.file then
         return ''
     end
-    local sec, ms = mathModf(m.startTime + clock)
+    local sec, ms = mathModf((m.startTime + clock) / 1000)
     local timestr = osDate('%H:%M:%S', sec)
     local agl = ''
     if #level < 5 then

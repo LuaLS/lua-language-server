@@ -1,7 +1,8 @@
+local time         = require 'bee.time'
 local setmetatable = setmetatable
 local mathMax      = math.max
 local mathFloor    = math.floor
-local osClock      = os.clock
+local monotonic    = time.monotonic
 local xpcall       = xpcall
 local logError     = log.error
 
@@ -202,15 +203,15 @@ function m.clock()
     return curFrame / 1000.0
 end
 
-local lastClock = osClock()
+local lastClock = monotonic()
 function m.update()
-    local currentClock = osClock()
+    local currentClock = monotonic()
     local delta = currentClock - lastClock
     lastClock = currentClock
     if curIndex ~= 0 then
         curFrame = curFrame - 1
     end
-    maxFrame = maxFrame + delta * 1000.0
+    maxFrame = maxFrame + delta
     while curFrame < maxFrame do
         curFrame = curFrame + 1
         onTick()

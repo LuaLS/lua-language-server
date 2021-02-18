@@ -1,5 +1,4 @@
 local platform = require 'bee.platform'
-local unicode  = require 'bee.unicode'
 local config   = require 'config'
 local glob     = require 'glob'
 local furi     = require 'file-uri'
@@ -13,6 +12,12 @@ local util     = require 'utility'
 local guide    = require 'parser.guide'
 local smerger  = require 'string-merger'
 local progress = require "progress"
+
+local unicode
+
+if platform.OS == 'Windows' then
+    unicode  = require 'bee.unicode'
+end
 
 local m = {}
 
@@ -154,7 +159,7 @@ function m.setText(uri, text, isTrust)
     if file.trusted and not isTrust then
         return
     end
-    if not isTrust then
+    if not isTrust and unicode then
         if config.config.runtime.sourceCoding == 'ansi' then
             text = unicode.a2u(text)
         end

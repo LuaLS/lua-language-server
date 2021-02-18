@@ -1,5 +1,8 @@
 # changelog
 
+## 1.15.1
+* `CHG` diagnostic: `unused-local` excludes `doc.param`
+
 ## 1.15.0
 `2021-2-9`
 * `NEW` LUNAR YEAR, BE HAPPY!

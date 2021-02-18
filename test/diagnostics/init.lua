@@ -999,3 +999,9 @@ for i = 1, 1 do
     print(i)
 end
 ]]
+
+TEST [[
+---@param a number
+return function (a)
+end
+]]

@@ -62,6 +62,20 @@ local function isDocClass(source)
     return false
 end
 
+local function isDocParam(source)
+    if not source.bindDocs then
+        return false
+    end
+    for _, doc in ipairs(source.bindDocs) do
+        if doc.type == 'doc.param' then
+            if doc.param[1] == source[1] then
+                return true
+            end
+        end
+    end
+    return false
+end
+
 return function (uri, callback)
     local ast = files.getAst(uri)
     if not ast then
@@ -77,6 +91,9 @@ return function (uri, callback)
             return
         end
         if isDocClass(source) then
+            return
+        end
+        if isDocParam(source) then
             return
         end
         local data = hasGet(source)

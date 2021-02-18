@@ -126,7 +126,19 @@ return function (uri, offset)
         end
     end
 
-    for _, src in ipairs(vm.getDefs(source, 0)) do
+    local defs = vm.getDefs(source, 0)
+    local values = {}
+    for _, src in ipairs(defs) do
+        local value = guide.getObjectValue(src)
+        if value and value ~= src then
+            values[value] = true
+        end
+    end
+
+    for _, src in ipairs(defs) do
+        if values[src] then
+            goto CONTINUE
+        end
         local root = guide.getRoot(src)
         if not root then
             goto CONTINUE

@@ -2,6 +2,7 @@
 
 ## 1.15.1
 * `CHG` diagnostic: `unused-local` excludes `doc.param`
+* `CHG` definition: excludes values, see [#391](https://github.com/sumneko/lua-language-server/issues/391)
 
 ## 1.15.0
 `2021-2-9`

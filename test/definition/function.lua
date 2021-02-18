@@ -22,3 +22,8 @@ function <!x!>()
 end
 <?x?>()
 ]]
+
+TEST [[
+local <!f!> = function () end
+<?f?>()
+]]

@@ -160,7 +160,7 @@ function m.setText(uri, text, isTrust)
         return
     end
     if not isTrust and unicode then
-        if config.config.runtime.sourceCoding == 'ansi' then
+        if config.config.runtime.fileEncoding == 'ansi' then
             text = unicode.a2u(text)
         end
     end

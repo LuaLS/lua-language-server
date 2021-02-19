@@ -530,6 +530,7 @@ function parseType(parent)
         nextToken()
     end
     result.finish = getFinish()
+    result.firstFinish = result.finish
 
     while true do
         local nextComm = NextComment('peek')
@@ -615,6 +616,7 @@ local function parseParam()
         return result
     end
     result.finish = getFinish()
+    result.firstFinish = result.extends.firstFinish
     return result
 end
 
@@ -932,7 +934,7 @@ local function buildLuaDoc(comment)
     local result = convertTokens()
     if result then
         result.range = comment.finish
-        local cstart = text:find('%S', result.finish - comment.start + 2)
+        local cstart = text:find('%S', (result.firstFinish or result.finish) - comment.start + 2)
         if cstart and cstart < comment.finish then
             result.comment = {
                 type   = 'doc.tailcomment',

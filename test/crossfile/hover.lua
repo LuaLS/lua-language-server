@@ -613,3 +613,25 @@ comment1
 
 comment2]]
 }}
+
+TEST {{ path = 'a.lua', content = '', }, {
+    path = 'b.lua',
+    content = [[
+        ---@param a boolean # xxx
+        ---| 'true'  # ttt
+        ---| 'false' # fff
+        local function <?f?>(a)
+        end
+    ]]
+},
+hover = {
+    label = "function f(a: boolean|true|false)",
+    name = 'f',
+    description =  [[
+@*param* `a` —  xxx
+```lua
+a: boolean
+    | true -- ttt
+    | false -- fff
+```]]
+}}

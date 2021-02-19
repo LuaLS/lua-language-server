@@ -5,6 +5,7 @@
 * `CHG` rename `table*` to `tablelib`
 * `FIX` missed syntax error `f() = 1`
 * `FIX` missed global `bit` in `LuaJIT`
+* `FIX` [#349](https://github.com/sumneko/lua-language-server/issues/349)
 
 ## 1.15.1
 `2021-2-18`

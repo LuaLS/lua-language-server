@@ -2428,7 +2428,7 @@ function m.checkSameSimpleInString(status, ref, start, pushQueue, mode)
     end
     status.share.markString[marked] = true
     local newStatus = m.status(status)
-    local docs = status.interface.docType('string*')
+    local docs = status.interface.docType('stringlib')
     local mark = {}
     for i = 1, #docs do
         local doc = docs[i]

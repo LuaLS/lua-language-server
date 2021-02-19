@@ -504,7 +504,7 @@ TEST [[
 print(<?utf8?>)
 ]]
 [[
-global utf8: utf8* {
+global utf8: utf8lib {
     char: function,
     charpattern: string,
     codepoint: function,
@@ -533,7 +533,7 @@ TEST [[
 print(<?io?>)
 ]]
 [[
-global io: io* {
+global io: iolib {
     close: function,
     flush: function,
     input: function,
@@ -555,7 +555,7 @@ TEST [[
 local <?sssss?> = require 'utf8'
 ]]
 [[
-local sssss: utf8* {
+local sssss: utf8lib {
     char: function,
     charpattern: string,
     codepoint: function,
@@ -804,22 +804,22 @@ global _G: _G {
     arg: table,
     assert: function,
     collectgarbage: function,
-    coroutine: coroutine*,
-    debug: debug*,
+    coroutine: coroutinelib,
+    debug: debuglib,
     dofile: function,
     error: function,
     getfenv: function,
     getmetatable: function,
-    io: io*,
+    io: iolib,
     ipairs: function,
     load: function,
     loadfile: function,
     loadstring: function,
-    math: math*,
+    math: mathlib,
     module: function,
     next: function,
-    os: os*,
-    package: package*,
+    os: oslib,
+    package: packagelib,
     pairs: function,
     pcall: function,
     print: function,
@@ -831,13 +831,13 @@ global _G: _G {
     select: function,
     setfenv: function,
     setmetatable: function,
-    string: string*,
-    table: table*,
+    string: stringlib,
+    table: tablelib,
     tonumber: function,
     tostring: function,
     type: function,
     unpack: function,
-    utf8: utf8*,
+    utf8: utf8lib,
     warn: function,
     xpcall: function,
 }

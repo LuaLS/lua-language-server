@@ -139,7 +139,7 @@ TEST 'number' [[
 <?x?> = a + b
 ]]
 
-TEST 'table*' [[
+TEST 'tablelib' [[
 <?table?>()
 ]]
 
@@ -200,7 +200,7 @@ end
 _, <?y?> = pcall(x)
 ]]
 
-TEST 'os*' [[
+TEST 'oslib' [[
 local <?os?> = require 'os'
 ]]
 

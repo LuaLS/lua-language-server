@@ -62,7 +62,6 @@ local function testIfExit(path)
     end
 end
 
-require 'tracy' .enable()
 testIfExit(ROOT / 'test' / 'example' / 'vm.txt')
 testIfExit(ROOT / 'test' / 'example' / 'largeGlobal.txt')
 testIfExit(ROOT / 'test' / 'example' / 'guide.txt')

@@ -2,8 +2,10 @@
 ---@meta
 
 ---@version JIT
----@class bit*
+---@class bitlib
 local bit = {}
+
+---@alias bit* bitlib
 
 ---@param x integer
 ---@return integer y

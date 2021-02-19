@@ -1,8 +1,10 @@
 ---@meta
 
 ---#DES 'table'
----@class table*
+---@class tablelib
 table = {}
+
+---@alias table* tablelib
 
 ---#DES 'table.concat'
 ---@param list table

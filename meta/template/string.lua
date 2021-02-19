@@ -1,8 +1,10 @@
 ---@meta
 
 ---#DES 'string'
----@class string*
+---@class stringlib
 string = {}
+
+---@alias string* stringlib
 
 ---#DES 'string.byte'
 ---@param s  string

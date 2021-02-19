@@ -1,8 +1,10 @@
 ---@meta
 
 ---#DES 'debug'
----@class debug*
+---@class debuglib
 debug = {}
+
+---@alias debug* debuglib
 
 ---@class debuginfo
 ---@field name            string

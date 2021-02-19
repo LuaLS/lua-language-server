@@ -2,6 +2,7 @@
 
 ## 1.16.0
 * `NEW` file encoding supports `ansi`
+* `CHG` rename `table*` to `tablelib`
 * `FIX` missed syntax error `f() = 1`
 
 ## 1.15.1

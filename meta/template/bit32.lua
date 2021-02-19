@@ -3,8 +3,10 @@
 
 ---@version 5.2
 ---#DES 'bit32'
----@class bit32*
+---@class bit32lib
 bit32 = {}
+
+---@alias bit32* bit32lib
 
 ---#DES 'bit32.arshift'
 ---@param x    integer

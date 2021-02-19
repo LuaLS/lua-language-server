@@ -14,11 +14,13 @@ local cb
 ---@class ffi.VLS*:   userdata
 
 ---@version JIT
----@class ffi*
+---@class ffilib
 ---@field C    ffi.namespace*
 ---@field os   string
 ---@field arch string
 local ffi = {}
+
+---@alias ffi* ffilib
 
 ---@param def string
 function ffi.cdef(def) end

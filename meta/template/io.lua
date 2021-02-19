@@ -1,7 +1,7 @@
 ---@meta
 
 ---#DES 'io'
----@class io*
+---@class iolib
 ---#DES 'io.stdin'
 ---@field stdin  file*
 ---#DES 'io.stdout'
@@ -9,6 +9,8 @@
 ---#DES 'io.stderr'
 ---@field stderr file*
 io = {}
+
+---@alias io* iolib
 
 ---@alias openmode
 ---|>'"r"'   # ---#DESTAIL 'openmode.r'

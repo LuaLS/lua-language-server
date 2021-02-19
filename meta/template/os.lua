@@ -1,8 +1,10 @@
 ---@meta
 
 ---#DES 'os'
----@class os*
+---@class oslib
 os = {}
+
+---@alias os* oslib
 
 ---#DES 'os.clock'
 ---@return number

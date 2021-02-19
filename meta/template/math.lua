@@ -1,7 +1,7 @@
 ---@meta
 
 ---#DES 'math'
----@class math*
+---@class mathlib
 ---#DES 'math.huge'
 ---@field huge       number
 ---#if VERSION >= 5.3 then
@@ -13,6 +13,8 @@
 ---#DES 'math.pi'
 ---@field pi         number
 math = {}
+
+---@alias math* mathlib
 
 ---#DES 'math.abs'
 ---@param x number

@@ -2,12 +2,14 @@
 ---@meta
 
 ---@version JIT
----@class jit*
+---@class jitlib
 ---@field version     string
 ---@field version_num number
 ---@field os          string
 ---@field arch        string
 jit = {}
+
+---@alias jit* jitlib
 
 ---@overload fun()
 ---@param func       function|boolean

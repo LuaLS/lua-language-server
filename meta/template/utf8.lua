@@ -3,10 +3,12 @@
 
 ---@version >5.3
 ---#DES 'utf8'
----@class utf8*
+---@class utf8lib
 ---#DES 'utf8.charpattern'
 ---@field charpattern string
 utf8 = {}
+
+---@alias utf8* utf8lib
 
 ---#DES 'utf8.char'
 ---@param code integer

@@ -2006,3 +2006,48 @@ TEST [[
         kind  = define.CompletionItemKind.Snippet,
     }
 }
+
+Cared['description'] = nil
+Cared['detail'] = nil
+TEST [[
+---@class cc
+---@field aaa number # a1
+---@field bbb number # a2
+
+---@param x cc
+local function f(x) end
+
+f({
+    $
+})
+]]
+{
+    {
+        label = 'aaa',
+        kind  = define.CompletionItemKind.Property,
+    },
+    {
+        label = 'bbb',
+        kind  = define.CompletionItemKind.Property,
+    },
+}
+
+TEST [[
+---@class cc
+---@field aaa number # a1
+---@field bbb number # a2
+
+---@param x cc
+local function f(x) end
+
+f({
+    aaa = 1,
+    $
+})
+]]
+{
+    {
+        label = 'bbb',
+        kind  = define.CompletionItemKind.Property,
+    },
+}

@@ -2,6 +2,7 @@
 
 ## 1.16.0
 * `NEW` file encoding supports `ansi`
+* `NEW` completion: supports interface, see [#384](https://github.com/sumneko/lua-language-server/issues/384)
 * `CHG` rename `table*` to `tablelib`
 * `FIX` missed syntax error `f() = 1`
 * `FIX` missed global `bit` in `LuaJIT`

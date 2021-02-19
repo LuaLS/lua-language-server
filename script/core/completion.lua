@@ -1337,6 +1337,83 @@ local function getCallArgInfo(call, text, offset)
     return #call.args + 1, nil
 end
 
+local function findNearestSource(ast, offset)
+    local source
+    guide.eachSourceContain(ast.ast, offset, function (src)
+        source = src
+    end)
+    return source
+end
+
+local function getFuncParamByCallIndex(func, index)
+    if not func.args or #func.args == 0 then
+        return nil
+    end
+    if func.parent.type == 'setmethod' then
+        return func.args[index - 1]
+    end
+    return func.args[index]
+end
+
+local function checkTableLiteralField(ast, text, offset, call, funcs, index, results)
+    local source = findNearestSource(ast, offset)
+    if  source.type ~= 'table'
+    and source.parent.type ~= 'table' then
+        return
+    end
+    if call.node and call.node.type == 'getmethod' then
+        index = index + 1
+    end
+    local mark = {}
+    local fields = {}
+    local tbl = source
+    if source.type ~= 'table' then
+        tbl = source.parent
+    end
+    for _, field in ipairs(vm.getDefFields(tbl, 0)) do
+        local name = guide.getKeyName(field)
+        mark[name] = true
+    end
+    for _, func in ipairs(funcs) do
+        local param = getFuncParamByCallIndex(func, index)
+        if not param then
+            goto CONTINUE
+        end
+        local defs = vm.getDefFields(param, 0)
+        for _, field in ipairs(defs) do
+            local name = guide.getKeyName(field)
+            if not mark[name] then
+                mark[name] = true
+                fields[#fields+1] = field
+            end
+        end
+        ::CONTINUE::
+    end
+    table.sort(fields, function (a, b)
+        return guide.getKeyName(a) < guide.getKeyName(b)
+    end)
+    -- {$}
+    if source.type == 'table'
+    or source.type == 'getlocal'
+    or source.type == 'getglobal' then
+        for _, field in ipairs(fields) do
+            if matchKey(guide.getKeyName(source) or '', guide.getKeyName(field)) then
+                results[#results+1] = {
+                    label = guide.getKeyName(field),
+                    kind  = define.CompletionItemKind.Property,
+                    insertText = ('%s = $0,'):format(guide.getKeyName(field)),
+                    id    = stack(function ()
+                        return {
+                            detail      = buildDetail(field),
+                            description = buildDesc(field),
+                        }
+                    end),
+                }
+            end
+        end
+    end
+end
+
 local function tryCallArg(ast, text, offset, results)
     local call = findCall(ast, text, offset)
     if not call then
@@ -1358,6 +1435,7 @@ local function tryCallArg(ast, text, offset, results)
     for _, enum in ipairs(myResults) do
         results[#results+1] = enum
     end
+    checkTableLiteralField(ast, text, offset, call, defs, argIndex, results)
 end
 
 local function getComment(ast, offset)
@@ -1770,10 +1848,10 @@ local function completion(uri, offset)
             tryComment(ast, text, offset, results)
         else
             trySpecial(ast, text, offset, results)
+            tryCallArg(ast, text, offset, results)
             tryWord(ast, text, offset, results)
             tryIndex(ast, text, offset, results)
             trySymbol(ast, text, offset, results)
-            tryCallArg(ast, text, offset, results)
         end
     else
         local word = findWord(text, offset)

@@ -1,18 +1,10 @@
-local sp       = require 'bee.subprocess'
-local nonil    = require 'without-check-nil'
-local client   = require 'provider.client'
-local platform = require 'bee.platform'
+local sp         = require 'bee.subprocess'
+local nonil      = require 'without-check-nil'
+local client     = require 'provider.client'
+local platform   = require 'bee.platform'
+local completion = require 'provider.completion'
 
 local m = {}
-
-local function allWords()
-    local str = [[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.:('"[,#*@|=- ]]
-    local list = {}
-    for c in str:gmatch '.' do
-        list[#list+1] = c
-    end
-    return list
-end
 
 local function testFileEvents(initer)
     initer.fileOperations = {
@@ -102,7 +94,7 @@ function m.getIniter()
     if not client.info.capabilities.textDocument.completion.dynamicRegistration then
         initer.completionProvider = {
             resolveProvider = true,
-            triggerCharacters = allWords(),
+            triggerCharacters = completion.allWords(),
         }
     end
     nonil.disable()

@@ -3,7 +3,7 @@
 
 ---@version JIT
 ---@class bitlib
-local bit = {}
+bit = {}
 
 ---@alias bit* bitlib
 

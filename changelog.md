@@ -4,6 +4,7 @@
 * `NEW` file encoding supports `ansi`
 * `CHG` rename `table*` to `tablelib`
 * `FIX` missed syntax error `f() = 1`
+* `FIX` missed global `bit` in `LuaJIT`
 
 ## 1.15.1
 `2021-2-18`

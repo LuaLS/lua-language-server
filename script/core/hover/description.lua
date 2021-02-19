@@ -106,6 +106,12 @@ local function getBindComment(source, docGroup, base)
             continue = false
         end
     end
+    if source.comment then
+        if not lines then
+            lines = {}
+        end
+        lines[#lines+1] = source.comment.text
+    end
     if not lines or #lines == 0 then
         return nil
     end

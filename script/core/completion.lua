@@ -1709,6 +1709,7 @@ local function makeCache(uri, offset, results)
     cache.results = results
     cache.offset  = offset
     cache.word    = word:lower()
+    cache.length  = #word
 end
 
 local function getCache(uri, offset)
@@ -1723,6 +1724,14 @@ local function getCache(uri, offset)
     end
     if word:sub(1, #cache.word):lower() ~= cache.word then
         return nil
+    end
+
+    local ext = #word - cache.length
+    cache.length = #word
+    for _, result in ipairs(cache.results) do
+        if result.textEdit then
+            result.textEdit.finish = result.textEdit.finish + ext
+        end
     end
 
     if cache.results.enableCommon then

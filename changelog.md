@@ -3,6 +3,7 @@
 ## 1.16.0
 * `NEW` file encoding supports `ansi`
 * `NEW` completion: supports interface, see [#384](https://github.com/sumneko/lua-language-server/issues/384)
+* `NEW` `LuaDoc`: supports multiple class inheritance: `---@class Food: Burger, Pizza, Pie, Pasta`
 * `CHG` rename `table*` to `tablelib`
 * `CHG` `LuaDoc`: revert compatible with `--@`, see [#392](https://github.com/sumneko/lua-language-server/issues/392)
 * `CHG` improve performance

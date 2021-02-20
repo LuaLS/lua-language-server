@@ -341,3 +341,16 @@ function Foo:<!bar1!>() end
 local v1
 print(v1[1][1].<?bar1?>)
 ]]
+
+TEST [[
+---@class X
+
+---@class Y
+---@field <!a!> string
+
+---@class Z:X, Y
+
+---@type Z
+local z
+z.<?a?>
+]]

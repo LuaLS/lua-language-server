@@ -28,21 +28,23 @@ return function (uri, callback)
                     goto CONTINUE
                 end
                 if current.extends then
-                    local newName = current.extends[1]
-                    if newName == myName then
-                        callback {
-                            start   = doc.start,
-                            finish  = doc.finish,
-                            message = lang.script('DIAG_CIRCLE_DOC_CLASS', myName)
-                        }
-                        goto CONTINUE
-                    end
-                    if not mark[newName] then
-                        mark[newName] = true
-                        local docs = vm.getDocTypes(newName)
-                        for _, otherDoc in ipairs(docs) do
-                            if otherDoc.type == 'doc.class.name' then
-                                list[#list+1] = otherDoc.parent
+                    for _, extend in ipairs(current.extends) do
+                        local newName = extend[1]
+                        if newName == myName then
+                            callback {
+                                start   = doc.start,
+                                finish  = doc.finish,
+                                message = lang.script('DIAG_CIRCLE_DOC_CLASS', myName)
+                            }
+                            goto CONTINUE
+                        end
+                        if not mark[newName] then
+                            mark[newName] = true
+                            local docs = vm.getDocTypes(newName)
+                            for _, otherDoc in ipairs(docs) do
+                                if otherDoc.type == 'doc.class.name' then
+                                    list[#list+1] = otherDoc.parent
+                                end
                             end
                         end
                     end

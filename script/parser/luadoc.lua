@@ -208,8 +208,7 @@ local function parseClass(parent)
     if not peekToken() then
         return result
     end
-    nextToken()
-    if not checkToken('symbol', ':') then
+    if not checkToken('symbol', ':', 1) then
         pushError {
             type   = 'LUADOC_MISS_EXTENDS_SYMBOL',
             start  = result.finish + 1,
@@ -217,16 +216,27 @@ local function parseClass(parent)
         }
         return result
     end
-    result.extends = parseName('doc.extends.name', result)
-    if not result.extends then
-        pushError {
-            type   = 'LUADOC_MISS_CLASS_EXTENDS_NAME',
-            start  = getFinish(),
-            finish = getFinish(),
-        }
-        return result
+    nextToken()
+
+    result.extends = {}
+
+    while true do
+        local extend = parseName('doc.extends.name', result)
+        if not extend then
+            pushError {
+                type   = 'LUADOC_MISS_CLASS_EXTENDS_NAME',
+                start  = getFinish(),
+                finish = getFinish(),
+            }
+            return result
+        end
+        result.extends[#result.extends+1] = extend
+        result.finish = getFinish()
+        if not checkToken('symbol', ',', 1) then
+            break
+        end
+        nextToken()
     end
-    result.finish = getFinish()
     return result
 end
 
@@ -285,7 +295,7 @@ local function parseTypeUnitTable(parent, node)
         return nil
     end
     nextSymbolOrError('>')
-    
+
     node.parent = result;
     result.finish = getFinish()
     result.key = key

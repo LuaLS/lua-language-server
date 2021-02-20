@@ -20,28 +20,29 @@ return function (uri, callback)
     }
     for _, doc in ipairs(state.ast.docs) do
         if doc.type == 'doc.class' then
-            local ext = doc.extends
-            if not ext then
+            if not doc.extends then
                 goto CONTINUE
             end
-            local name = ext[1]
-            local docs = vm.getDocTypes(name)
-            if cache[name] == nil then
-                cache[name] = false
-                for _, otherDoc in ipairs(docs) do
-                    if otherDoc.type == 'doc.class.name' then
-                        cache[name] = true
-                        break
+            for _, ext in ipairs(doc.extends) do
+                local name = ext[1]
+                local docs = vm.getDocTypes(name)
+                if cache[name] == nil then
+                    cache[name] = false
+                    for _, otherDoc in ipairs(docs) do
+                        if otherDoc.type == 'doc.class.name' then
+                            cache[name] = true
+                            break
+                        end
                     end
                 end
-            end
-            if not cache[name] then
-                callback {
-                    start   = ext.start,
-                    finish  = ext.finish,
-                    related = cache,
-                    message = lang.script('DIAG_UNDEFINED_DOC_CLASS', name)
-                }
+                if not cache[name] then
+                    callback {
+                        start   = ext.start,
+                        finish  = ext.finish,
+                        related = cache,
+                        message = lang.script('DIAG_UNDEFINED_DOC_CLASS', name)
+                    }
+                end
             end
         end
         ::CONTINUE::

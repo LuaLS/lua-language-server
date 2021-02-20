@@ -90,7 +90,7 @@ m.childMap = {
     ['unary']       = {1},
 
     ['doc']                = {'#'},
-    ['doc.class']          = {'class', 'extends', 'comment'},
+    ['doc.class']          = {'class', '#extends', 'comment'},
     ['doc.type']           = {'#types', '#enums', 'name', 'comment'},
     ['doc.alias']          = {'alias', 'extends', 'comment'},
     ['doc.param']          = {'param', 'extends', 'comment'},
@@ -505,8 +505,10 @@ function m.addChilds(list, obj, map)
             elseif type(key) == 'string'
             and key:sub(1, 1) == '#' then
                 key = key:sub(2)
-                for i = 1, #obj[key] do
-                    list[#list+1] = obj[key][i]
+                if obj[key] then
+                    for i = 1, #obj[key] do
+                        list[#list+1] = obj[key][i]
+                    end
                 end
             end
         end
@@ -1813,9 +1815,11 @@ function m.checkSameSimpleByDoc(status, obj, start, pushQueue, mode)
                 pushQueue(res, start, true)
             end
             if obj.extends then
-                local pieceResult = stepRefOfDocType(status, obj.extends, 'def')
-                for _, res in ipairs(pieceResult) do
-                    pushQueue(res, start, true)
+                for _, ext in ipairs(obj.extends) do
+                    local pieceResult = stepRefOfDocType(status, ext, 'def')
+                    for _, res in ipairs(pieceResult) do
+                        pushQueue(res, start, true)
+                    end
                 end
             end
         end

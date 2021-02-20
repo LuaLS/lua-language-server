@@ -1013,6 +1013,20 @@ local function stepRefOfDocType(status, obj, mode)
         if not name or not status.interface.docType then
             return results
         end
+        if name == 'nil'
+        or name == 'any'
+        or name == 'boolean'
+        or name == 'string'
+        or name == 'table'
+        or name == 'number'
+        or name == 'integer'
+        or name == 'function'
+        or name == 'table'
+        or name == 'thread'
+        or name == 'userdata'
+        or name == 'lightuserdata' then
+            mode = 'def'
+        end
         local docs = status.interface.docType(name)
         for i = 1, #docs do
             local doc = docs[i]

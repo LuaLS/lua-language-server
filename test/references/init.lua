@@ -299,7 +299,7 @@ local <?x?>
 
 -- BUG
 TEST [[
----@return <?string?>
+---@return <?xxx?>
 function f() end
 ]]
 

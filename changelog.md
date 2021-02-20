@@ -1,6 +1,7 @@
 # changelog
 
 ## 1.16.0
+`2021-2-20`
 * `NEW` file encoding supports `ansi`
 * `NEW` completion: supports interface, see [#384](https://github.com/sumneko/lua-language-server/issues/384)
 * `NEW` `LuaDoc`: supports multiple class inheritance: `---@class Food: Burger, Pizza, Pie, Pasta`

@@ -970,7 +970,7 @@ TEST [[
 ---@type table
 T1 = {}
 print(T1.f1)
----@type table*
+---@type tablelib
 T2 = {}
 print(T2.<!f2!>)
 ]]

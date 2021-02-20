@@ -530,11 +530,11 @@ proto.on('completionItem/resolve', function (item)
     if not resolved then
         return nil
     end
-    item.detail = resolved.detail
+    item.detail = resolved.detail or item.detail
     item.documentation = resolved.description and {
         value = resolved.description,
         kind  = 'markdown',
-    }
+    } or item.documentation
     item.additionalTextEdits = resolved.additionalTextEdits and (function ()
         local t = {}
         for j, edit in ipairs(resolved.additionalTextEdits) do
@@ -548,7 +548,7 @@ proto.on('completionItem/resolve', function (item)
             }
         end
         return t
-    end)()
+    end)() or item.additionalTextEdits
     return item
 end)
 

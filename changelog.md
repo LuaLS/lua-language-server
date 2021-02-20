@@ -5,6 +5,7 @@
 * `NEW` completion: supports interface, see [#384](https://github.com/sumneko/lua-language-server/issues/384)
 * `CHG` rename `table*` to `tablelib`
 * `CHG` `LuaDoc`: revert compatible with `--@`, see [#392](https://github.com/sumneko/lua-language-server/issues/392)
+* `CHG` improve performance
 * `FIX` missed syntax error `f() = 1`
 * `FIX` missed global `bit` in `LuaJIT`
 * `FIX` completion: may insert error text when continuous inputing

@@ -14,7 +14,10 @@ return function (uri, callback)
         return
     end
 
-    local cache = {}
+    local cache = {
+        ['any'] = true,
+        ['nil'] = true,
+    }
     for _, doc in ipairs(state.ast.docs) do
         if doc.type == 'doc.class' then
             local ext = doc.extends

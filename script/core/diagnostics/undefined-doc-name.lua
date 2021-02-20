@@ -14,7 +14,10 @@ return function (uri, callback)
         return
     end
 
-    local classCache = {}
+    local classCache = {
+        ['any'] = true,
+        ['nil'] = true,
+    }
     local function hasNameOfClassOrAlias(name)
         if classCache[name] ~= nil then
             return classCache[name]

@@ -35,6 +35,10 @@ end
 
 local function getDocTypes(name)
     local results = {}
+    if name == 'any'
+    or name == 'nil' then
+        return results
+    end
     for uri in files.eachFile() do
         local cache = files.getCache(uri)
         cache.classes = cache.classes or getTypesOfFile(uri)

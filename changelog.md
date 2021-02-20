@@ -11,6 +11,7 @@
 * `FIX` completion: may insert error text when continuous inputing
 * `FIX` completion: may insert error text after resolve
 * `FIX` [#349](https://github.com/sumneko/lua-language-server/issues/349)
+* `FIX` [#396](https://github.com/sumneko/lua-language-server/issues/396)
 
 ## 1.15.1
 `2021-2-18`

@@ -2051,3 +2051,13 @@ f({
         kind  = define.CompletionItemKind.Property,
     },
 }
+
+TEST [[
+---@return string
+local function f() end
+
+local s = f()
+
+s.$
+]]
+(EXISTS)

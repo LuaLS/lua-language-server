@@ -4,6 +4,7 @@
 * `NEW` file encoding supports `ansi`
 * `NEW` completion: supports interface, see [#384](https://github.com/sumneko/lua-language-server/issues/384)
 * `CHG` rename `table*` to `tablelib`
+* `CHG` `LuaDoc`: revert compatible with `--@`, [#392](see https://github.com/sumneko/lua-language-server/issues/392)
 * `FIX` missed syntax error `f() = 1`
 * `FIX` missed global `bit` in `LuaJIT`
 * `FIX` completion: may insert error text when continuous inputing

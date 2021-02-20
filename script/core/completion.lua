@@ -1721,7 +1721,7 @@ local function tryLuaDoc(ast, text, offset, results)
             return
         end
         -- 尝试 ---@$
-        local cate = line:match('^-?%s*@(%a*)$')
+        local cate = line:match('^-%s*@(%a*)$')
         if cate then
             tryLuaDocCate(cate, results)
             return

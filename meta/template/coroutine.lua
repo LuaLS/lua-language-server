@@ -4,8 +4,6 @@
 ---@class coroutinelib
 coroutine = {}
 
----@alias coroutine* coroutinelib
-
 ---#DES 'coroutine.create'
 ---@param f function
 ---@return thread

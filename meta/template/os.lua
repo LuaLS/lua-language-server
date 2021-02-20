@@ -4,8 +4,6 @@
 ---@class oslib
 os = {}
 
----@alias os* oslib
-
 ---#DES 'os.clock'
 ---@return number
 function os.clock() end

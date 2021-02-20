@@ -4,8 +4,6 @@
 ---@class stringlib
 string = {}
 
----@alias string* stringlib
-
 ---#DES 'string.byte'
 ---@param s  string
 ---@param i? integer

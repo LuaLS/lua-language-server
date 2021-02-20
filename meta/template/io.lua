@@ -10,8 +10,6 @@
 ---@field stderr file*
 io = {}
 
----@alias io* iolib
-
 ---@alias openmode
 ---|>'"r"'   # ---#DESTAIL 'openmode.r'
 ---| '"w"'   # ---#DESTAIL 'openmode.w'

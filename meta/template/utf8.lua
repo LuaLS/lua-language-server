@@ -8,8 +8,6 @@
 ---@field charpattern string
 utf8 = {}
 
----@alias utf8* utf8lib
-
 ---#DES 'utf8.char'
 ---@param code integer
 ---@vararg integer

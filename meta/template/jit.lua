@@ -9,8 +9,6 @@
 ---@field arch        string
 jit = {}
 
----@alias jit* jitlib
-
 ---@overload fun()
 ---@param func       function|boolean
 ---@param recursive? boolean

@@ -27,8 +27,6 @@ function require(modname) end
 ---@field preload   table
 package = {}
 
----@alias package* packagelib
-
 ---@version <5.1
 ---#DES 'package.loaders'
 package.loaders = {}

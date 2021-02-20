@@ -20,8 +20,6 @@ local cb
 ---@field arch string
 local ffi = {}
 
----@alias ffi* ffilib
-
 ---@param def string
 function ffi.cdef(def) end
 

@@ -14,8 +14,6 @@
 ---@field pi         number
 math = {}
 
----@alias math* mathlib
-
 ---#DES 'math.abs'
 ---@param x number
 ---@return number

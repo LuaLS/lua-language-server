@@ -4,8 +4,6 @@
 ---@class tablelib
 table = {}
 
----@alias table* tablelib
-
 ---#DES 'table.concat'
 ---@param list table
 ---@param sep? string

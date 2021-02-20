@@ -5,8 +5,6 @@
 ---@class bitlib
 bit = {}
 
----@alias bit* bitlib
-
 ---@param x integer
 ---@return integer y
 function bit.tobit(x) end

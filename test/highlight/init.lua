@@ -39,7 +39,7 @@ function TEST(script)
     for _, enter in ipairs(target) do
         local start, finish = enter.start, enter.finish
         files.removeAll()
-        local pos = (start + finish) // 2 + 1
+        local pos = (start + finish) // 2
         local new_script = script:gsub('<[!?~]', '  '):gsub('[!?~]>', '  ')
         files.setText('', new_script)
 

@@ -3,6 +3,7 @@
 ## 1.16.1
 * `FIX` signature: parameters may be misplaced
 * `FIX` completion: interface in nested table
+* `FIX` completion: interface not show after `,`
 * `FIX` [#400](https://github.com/sumneko/lua-language-server/issues/400)
 * `FIX` runtime errors
 

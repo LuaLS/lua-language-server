@@ -99,11 +99,33 @@ local function makeSignatures(call, pos)
     return signs
 end
 
+local function isSpace(char)
+    if char == ' '
+    or char == '\n'
+    or char == '\r'
+    or char == '\t' then
+        return true
+    end
+    return false
+end
+
+local function skipSpace(text, offset)
+    for i = offset, 1, -1 do
+        local char = text:sub(i, i)
+        if not isSpace(char) then
+            return i
+        end
+    end
+    return 0
+end
+
 return function (uri, pos)
     local ast = files.getAst(uri)
     if not ast then
         return nil
     end
+    local text = files.getText(uri)
+    pos = skipSpace(text, pos)
     local call = findNearCall(uri, ast, pos)
     if not call then
         return nil

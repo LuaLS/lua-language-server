@@ -460,7 +460,7 @@ function m.isContain(source, offset)
     if not start then
         return false
     end
-    return start <= offset and finish >= offset - 1
+    return start <= offset and finish >= offset
 end
 
 --- 判断offset在source的影响范围内
@@ -471,7 +471,7 @@ function m.isInRange(source, offset)
     if not start then
         return false
     end
-    return start <= offset and finish >= offset - 1
+    return start <= offset and finish >= offset
 end
 
 function m.isBetween(source, tStart, tFinish)
@@ -479,7 +479,7 @@ function m.isBetween(source, tStart, tFinish)
     if not start then
         return false
     end
-    return start <= tFinish and finish >= tStart - 1
+    return start <= tFinish and finish >= tStart
 end
 
 function m.isBetweenRange(source, tStart, tFinish)
@@ -487,7 +487,7 @@ function m.isBetweenRange(source, tStart, tFinish)
     if not start then
         return false
     end
-    return start <= tFinish and finish >= tStart - 1
+    return start <= tFinish and finish >= tStart
 end
 
 --- 添加child

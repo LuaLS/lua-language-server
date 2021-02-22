@@ -1410,7 +1410,6 @@ local function checkTableLiteralField(ast, text, offset, call, funcs, index, res
                     id    = stack(function ()
                         return {
                             detail      = buildDetail(field),
-                            description = buildDesc(field),
                         }
                     end),
                 }

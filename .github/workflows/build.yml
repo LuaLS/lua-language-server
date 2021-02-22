@@ -16,7 +16,7 @@ jobs:
     - if: runner.os != 'Linux'
       run: luamake
     - if: runner.os == 'Linux'
-      run: luamake -gcc gcc-8 -gxx g++-8
+      run: luamake -gcc gcc-9 -gxx g++-9
     - uses: actions/upload-artifact@v1.0.0
       with:
         name: lua-language-server

@@ -6,6 +6,7 @@ local getDesc    = require 'core.hover.description'
 local util       = require 'utility'
 local findSource = require 'core.find-source'
 local lang       = require 'language'
+local markdown   = require 'provider.markdown'
 
 local function eachFunctionAndOverload(value, callback)
     callback(value)

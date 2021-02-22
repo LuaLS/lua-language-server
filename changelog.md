@@ -6,6 +6,7 @@
 * `FIX` completion: interface not show after `,`
 * `FIX` [#400](https://github.com/sumneko/lua-language-server/issues/400)
 * `FIX` [#402](https://github.com/sumneko/lua-language-server/issues/402)
+* `FIX` [#403](https://github.com/sumneko/lua-language-server/issues/403)
 * `FIX` runtime errors
 
 ## 1.16.0

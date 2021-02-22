@@ -308,10 +308,7 @@ TEST {
     hover = {
         label = [[global x: integer = 1]],
         name = 'x',
-        description = [[
----
-
- abc]],
+        description = ' abc',
     }
 }
 
@@ -627,11 +624,63 @@ TEST {{ path = 'a.lua', content = '', }, {
 hover = {
     label = "function f(a: boolean|true|false)",
     name = 'f',
-    description =  [[
+    description = [[
 @*param* `a` —  xxx
 ```lua
 a: boolean
     | true -- ttt
     | false -- fff
 ```]]
+}}
+
+TEST {{ path = 'a.lua', content = '', }, {
+    path = 'b.lua',
+    content = [[
+---AAA
+---@class A
+
+---@type A
+local <?x?>
+    ]]
+},
+hover = {
+    label = 'local x: A',
+    name  = 'x',
+    description = 'AAA'
+}}
+
+TEST {{ path = 'a.lua', content = '', }, {
+    path = 'b.lua',
+    content = [[
+---AAA
+---@class A
+---BBB
+---@field n string
+local <?x?>
+    ]]
+},
+hover = {
+    label = [[
+local x: A {
+    n: string,
+}]],
+    name  = 'x',
+    description = 'AAA'
+}}
+
+TEST {{ path = 'a.lua', content = '', }, {
+    path = 'b.lua',
+    content = [[
+---AAA
+---@class A
+
+---BBB
+---@type A
+local <?x?>
+    ]]
+},
+hover = {
+    label = 'local x: A',
+    name  = 'x',
+    description = 'BBB'
 }}

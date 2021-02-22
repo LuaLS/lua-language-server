@@ -245,12 +245,10 @@ local function buildDesc(source)
     local hover = getHover.get(source)
     local md = markdown()
     md:add('lua', hover.label)
+    md:splitLine()
     md:add('md',  hover.description)
-    local snip = getSnip(source)
-    if snip then
-        md:add('md', '-------------')
-        md:add('lua', snip)
-    end
+    md:splitLine()
+    md:add('lua', getSnip(source))
     return md:string()
 end
 

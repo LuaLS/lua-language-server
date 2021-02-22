@@ -104,6 +104,9 @@ local function getBindComment(source, docGroup, base)
             break
         else
             continue = false
+            if doc.type == 'doc.field' then
+                lines = nil
+            end
         end
     end
     if source.comment then
@@ -266,19 +269,33 @@ local function getFunctionComment(source)
     return md:string()
 end
 
+local function tryDocClassComment(source)
+    for _, def in ipairs(vm.getDefs(source, 0)) do
+        if def.type == 'doc.class.name' then
+            local class = guide.getDocState(def)
+            local comment = getBindComment(class, class.bindGroup, class)
+            if comment then
+                return comment
+            end
+        end
+    end
+    if source.bindDocs then
+        for _, doc in ipairs(source.bindDocs) do
+            if doc.type == 'doc.class' then
+                local comment = getBindComment(doc, source.bindDocs, doc)
+                return comment
+            end
+        end
+    end
+end
+
 local function tryDocComment(source)
     if not source.bindDocs then
         return
     end
     if not isFunction(source) then
         local comment = getBindComment(source, source.bindDocs)
-        if not comment then
-            return
-        end
-        local md = markdown()
-        md:add('md', "---")
-        md:add('md', comment)
-        return md:string()
+        return comment
     end
     return getFunctionComment(source)
 end
@@ -334,4 +351,5 @@ return function (source)
         or tryDocFieldUpComment(source)
         or tyrDocParamComment(source)
         or tryDocComment(source)
+        or tryDocClassComment(source)
 end

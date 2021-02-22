@@ -1370,6 +1370,9 @@ local function checkTableLiteralField(ast, text, offset, call, funcs, index, res
     if source.type ~= 'table' then
         tbl = source.parent
     end
+    if tbl.parent ~= call.args then
+        return
+    end
     for _, field in ipairs(vm.getDefFields(tbl, 0)) do
         local name = guide.getKeyName(field)
         if name then
@@ -1403,7 +1406,7 @@ local function checkTableLiteralField(ast, text, offset, call, funcs, index, res
                 results[#results+1] = {
                     label = guide.getKeyName(field),
                     kind  = define.CompletionItemKind.Property,
-                    insertText = ('%s = $0,'):format(guide.getKeyName(field)),
+                    insertText = ('%s = $0'):format(guide.getKeyName(field)),
                     id    = stack(function ()
                         return {
                             detail      = buildDetail(field),

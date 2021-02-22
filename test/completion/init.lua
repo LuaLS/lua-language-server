@@ -2053,6 +2053,22 @@ f({
 }
 
 TEST [[
+---@class cc
+---@field aaa number # a1
+---@field bbb number # a2
+
+---@param x cc
+local function f(x) end
+
+f({
+    {
+        $
+    }
+})
+]]
+(nil)
+
+TEST [[
 ---@return string
 local function f() end
 

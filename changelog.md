@@ -1,5 +1,8 @@
 # changelog
 
+## 1.16.1
+* `FIX` runtime errors
+
 ## 1.16.0
 `2021-2-20`
 * `NEW` file encoding supports `ansi`

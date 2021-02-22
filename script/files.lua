@@ -39,6 +39,9 @@ m.astMap         = setmetatable({}, { __mode = 'v' })
 
 local uriMap = {}
 local function getUriKey(uri)
+    if not uri then
+        return nil
+    end
     if not uriMap[uri] then
         if platform.OS == 'Windows' then
             uriMap[uri] = uri:lower()

@@ -2941,6 +2941,9 @@ function m.getRefCache(status, obj, mode)
     if m.isGlobal(obj) then
         obj = m.getKeyName(obj)
     end
+    if not obj then
+        return {}
+    end
     if not globalCache[mode] then
         globalCache[mode] = {}
     end

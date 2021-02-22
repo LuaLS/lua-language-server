@@ -435,6 +435,9 @@ function m.getRelativePath(uri)
 end
 
 function m.isWorkspaceUri(uri)
+    if not m.uri then
+        return false
+    end
     local luri = files.getUri(uri)
     local ruri = files.getUri(m.uri)
     return luri:sub(1, #ruri) == ruri

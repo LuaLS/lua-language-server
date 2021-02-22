@@ -1358,7 +1358,7 @@ end
 local function checkTableLiteralField(ast, text, offset, call, funcs, index, results)
     local source = findNearestSource(ast, offset)
     if  source.type ~= 'table'
-    and source.parent.type ~= 'table' then
+    and (not source.parent or source.parent.type ~= 'table') then
         return
     end
     if call.node and call.node.type == 'getmethod' then
@@ -1372,7 +1372,9 @@ local function checkTableLiteralField(ast, text, offset, call, funcs, index, res
     end
     for _, field in ipairs(vm.getDefFields(tbl, 0)) do
         local name = guide.getKeyName(field)
-        mark[name] = true
+        if name then
+            mark[name] = true
+        end
     end
     for _, func in ipairs(funcs) do
         local param = getFuncParamByCallIndex(func, index)

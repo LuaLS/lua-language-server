@@ -8,10 +8,30 @@ os = {}
 ---@return number
 function os.clock() end
 
+---@class osdate
+---#DES 'osdate.year'
+---@field year  integer
+---#DES 'osdate.month'
+---@field month integer
+---#DES 'osdate.day'
+---@field day   integer
+---#DES 'osdate.hour'
+---@field hour  integer
+---#DES 'osdate.min'
+---@field min   integer
+---#DES 'osdate.sec'
+---@field sec   integer
+---#DES 'osdate.wday'
+---@field wday  integer
+---#DES 'osdate.yday'
+---@field yday  integer
+---#DES 'osdate.isdst'
+---@field isdst boolean
+
 ---#DES 'os.date'
 ---@param format? string
 ---@param time?   integer
----@return string
+---@return string|osdate
 function os.date(format, time) end
 
 ---#DES 'os.difftime'

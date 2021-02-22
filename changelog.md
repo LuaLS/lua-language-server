@@ -1,6 +1,7 @@
 # changelog
 
 ## 1.16.1
+`2021-2-22`
 * `FIX` signature: parameters may be misplaced
 * `FIX` completion: interface in nested table
 * `FIX` completion: interface not show after `,`

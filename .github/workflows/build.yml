@@ -2,11 +2,11 @@ name: build
 on: push
 jobs:
   compile:
-    runs-on: ${{ matrix.os }}-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [windows, ubuntu, macos]
+        os: [windows-latest, ubuntu-16.04, macos-latest]
     steps:
     - uses: actions/checkout@v1
       with:

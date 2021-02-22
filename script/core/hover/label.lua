@@ -57,7 +57,10 @@ local function asValue(source, title)
     local pack = {}
     pack[#pack+1] = title
     pack[#pack+1] = name .. ':'
-    if cont and type == 'table' then
+    if  cont
+    and (  type == 'table'
+        or type == 'any'
+        or type == 'nil') then
         type = nil
     end
     if class then

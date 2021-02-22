@@ -1515,3 +1515,14 @@ local <?x?>--测试
 [[
 local x: any
 ]]
+
+TEST [[
+---@type any
+local <?t?>
+t.a = 1
+]]
+[[
+local t: {
+    a: integer = 1,
+}
+]]

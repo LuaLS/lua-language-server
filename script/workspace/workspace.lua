@@ -472,6 +472,7 @@ end
 
 ---等待工作目录加载完成
 function m.awaitReady()
+    -- TODO maintain order
     while not m.ready do
         await.sleep(0.1)
     end

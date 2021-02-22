@@ -28,6 +28,7 @@ function m.isReady()
 end
 
 function m.awaitReady()
+    -- TODO maintain order
     while m.interface == nil do
         await.sleep(0.1)
     end

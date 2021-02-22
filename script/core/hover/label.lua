@@ -127,10 +127,8 @@ local function asDocField(source)
         end
     end
     local infers = {}
-    for _, ext in ipairs(source.extends) do
-        for _, infer in ipairs(vm.getInfers(ext) or {}) do
-            infers[#infers+1] = infer
-        end
+    for _, infer in ipairs(vm.getInfers(source.extends) or {}) do
+        infers[#infers+1] = infer
     end
     if not class then
         return ('field ?.%s: %s'):format(

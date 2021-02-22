@@ -2093,3 +2093,25 @@ local s = f()
 s.$
 ]]
 (EXISTS)
+
+Cared['description'] = true
+TEST [[
+---@class cc
+---@field aaa number
+---@field bbb number
+
+---@type cc
+local t
+print(t.aa$)
+]]
+{
+    {
+        label = 'aaa',
+        kind  = define.CompletionItemKind.Field,
+        description = [[
+```lua
+field cc.aaa: number
+```]]
+    },
+}
+Cared['description'] = nil

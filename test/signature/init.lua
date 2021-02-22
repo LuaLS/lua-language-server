@@ -190,3 +190,16 @@ function f2(c: any, d: any)
 ]],
     arg = {21, 26},
 }
+
+TEST [[
+local function f(a, b, c)
+end
+
+f({},$)
+]]
+{
+    label = [[
+function f(a: any, b: any, c: any)
+]],
+    arg = {20, 25},
+}

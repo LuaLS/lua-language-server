@@ -2,6 +2,7 @@
 
 ## 1.16.1
 * `FIX` signature: parameters may be misplaced
+* `FIX` [#400](https://github.com/sumneko/lua-language-server/issues/400)
 * `FIX` runtime errors
 
 ## 1.16.0

@@ -11,9 +11,14 @@ local function findNearCall(uri, ast, pos)
         if src.type == 'call'
         or src.type == 'table'
         or src.type == 'function' then
-            -- call()$
+            -- call(),$
             if  src.finish <= pos
             and text:sub(src.finish, src.finish) == ')' then
+                return
+            end
+            -- {},$
+            if  src.finish <= pos
+            and text:sub(src.finish, src.finish) == '}' then
                 return
             end
             if not nearCall or nearCall.start < src.start then

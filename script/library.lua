@@ -39,16 +39,26 @@ end
 local function convertLink(text)
     local fmt = getDocFormater()
     return text:gsub('%$([%.%w]+)', function (name)
+        local lastDot = ''
+        if name:sub(-1) == '.' then
+            name = name:sub(1, -2)
+            lastDot = '.'
+        end
         if fmt then
-            return ('[%s](%s)'):format(name, lang.script(fmt, 'pdf-' .. name))
+            return ('[%s](%s)'):format(name, lang.script(fmt, 'pdf-' .. name)) .. lastDot
         else
-            return ('`%s`'):format(name)
+            return ('`%s`'):format(name) .. lastDot
         end
     end):gsub('§([%.%w]+)', function (name)
+        local lastDot = ''
+        if name:sub(-1) == '.' then
+            name = name:sub(1, -2)
+            lastDot = '.'
+        end
         if fmt then
-            return ('[§%s](%s)'):format(name, lang.script(fmt, name))
+            return ('[§%s](%s)'):format(name, lang.script(fmt, name)) .. lastDot
         else
-            return ('`%s`'):format(name)
+            return ('`%s`'):format(name) .. lastDot
         end
     end)
 end
@@ -59,6 +69,9 @@ local function createViewDocument(name)
         return nil
     end
     name = name:match '[%w_%.]+'
+    if name:sub(-1) == '.' then
+        name = name:sub(1, -2)
+    end
     return ('[%s](%s)'):format(lang.script.HOVER_VIEW_DOCUMENTS, lang.script(fmt, 'pdf-' .. name))
 end
 

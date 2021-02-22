@@ -1,6 +1,7 @@
 # changelog
 
 ## 1.16.1
+* `FIX` signature: parameters may be misplaced
 * `FIX` runtime errors
 
 ## 1.16.0

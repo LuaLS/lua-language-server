@@ -564,7 +564,7 @@ proto.on('textDocument/signatureHelp', function (params)
     end
     await.close('signatureHelp')
     await.setID('signatureHelp')
-    local offset = files.offsetOfWord(uri, params.position)
+    local offset = files.offset(uri, params.position)
     local core = require 'core.signature'
     local results = core(uri, offset - 1)
     if not results then

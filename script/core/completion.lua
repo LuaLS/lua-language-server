@@ -1387,7 +1387,7 @@ local function checkTableLiteralField(ast, text, offset, call, funcs, index, res
         local defs = vm.getDefFields(param, 0)
         for _, field in ipairs(defs) do
             local name = guide.getKeyName(field)
-            if not mark[name] then
+            if name and not mark[name] then
                 mark[name] = true
                 fields[#fields+1] = field
             end

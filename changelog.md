@@ -2,6 +2,7 @@
 
 ## 1.16.2
 * `NEW` diagnostic: `duplicate-set-field`
+* `NEW` diagnostic: `no-implicit-any`, disabled by default
 * `FIX` [#406](https://github.com/sumneko/lua-language-server/issues/406)
 
 ## 1.16.1

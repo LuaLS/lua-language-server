@@ -24,11 +24,17 @@ local function check(uri, name, results)
     local level =  config.config.diagnostics.severity[name]
                 or define.DiagnosticDefaultSeverity[name]
 
-    local neededFileStatus =  config.config.diagnostics.neededFileStatus[name]
-        or define.DiagnosticDefaultNeededFileStatus[name]
+    local neededFileStatus =   config.config.diagnostics.neededFileStatus[name]
+                            or define.DiagnosticDefaultNeededFileStatus[name]
+
+    if neededFileStatus == 'None' then
+        return
+    end
+
     if neededFileStatus == 'Opened' and not files.isOpen(uri) then
         return
     end
+
     local severity = define.DiagnosticSeverity[level]
     local clock = os.clock()
     require('core.diagnostics.' .. name)(uri, function (result)

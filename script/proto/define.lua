@@ -75,6 +75,7 @@ m.DiagnosticDefaultSeverity = {
     ['unbalanced-assignments']  = 'Warning',
     ['close-non-object']        = 'Warning',
     ['count-down-loop']         = 'Warning',
+    ['no-implicit-any']         = 'Information',
 
     ['duplicate-doc-class']     = 'Warning',
     ['undefined-doc-class']     = 'Warning',
@@ -89,6 +90,7 @@ m.DiagnosticDefaultSeverity = {
 ---@alias DiagnosticDefaultNeededFileStatus
 ---| '"Any"'
 ---| '"Opened"'
+---| '"None"'
 
 -- 文件状态
 m.FileStatus = {
@@ -122,6 +124,7 @@ m.DiagnosticDefaultNeededFileStatus = {
     ['unbalanced-assignments']  = 'Any',
     ['close-non-object']        = 'Any',
     ['count-down-loop']         = 'Any',
+    ['no-implicit-any']         = 'None',
 
     ['duplicate-doc-class']     = 'Any',
     ['undefined-doc-class']     = 'Any',

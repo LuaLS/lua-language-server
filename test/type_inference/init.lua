@@ -369,3 +369,19 @@ TEST 'table' [[
 local t = {}
 local <?v?> = setmetatable(t)
 ]]
+
+TEST [[CCC]] [[
+---@class CCC
+
+---@type table<string, CCC>
+local t = {}
+
+print(t.<?a?>)
+]]
+
+TEST '"aaa"|"bbb"' [[
+---@type table<string, '"aaa"'|'"bbb"'>
+local t = {}
+
+print(t.<?a?>)
+]]

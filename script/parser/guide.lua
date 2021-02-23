@@ -2494,6 +2494,10 @@ function m.pushResult(status, mode, ref, simple)
         or     ref.type == 'doc.alias.name'
         or     ref.type == 'doc.field' then
             results[#results+1] = ref
+        elseif ref.type == 'doc.type' then
+            if #ref.enums > 0 or #ref.resumes > 0 then
+                results[#results+1] = ref
+            end
         end
         if ref.parent and ref.parent.type == 'return' then
             if m.getParentFunction(ref) ~= m.getParentFunction(simple.node) then
@@ -2537,6 +2541,10 @@ function m.pushResult(status, mode, ref, simple)
         or     ref.type == 'doc.alias.name'
         or     ref.type == 'doc.field' then
             results[#results+1] = ref
+        elseif ref.type == 'doc.type' then
+            if #ref.enums > 0 or #ref.resumes > 0 then
+                results[#results+1] = ref
+            end
         end
         if ref.parent and ref.parent.type == 'return' then
             results[#results+1] = ref

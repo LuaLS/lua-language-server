@@ -439,7 +439,7 @@ t[any] = any
 ]]
 [[
 local t: {
-    [integer]: integer = 1,
+    [number]: integer = 1,
 }
 ]]
 
@@ -1524,5 +1524,17 @@ t.a = 1
 [[
 local t: {
     a: integer = 1,
+}
+]]
+
+TEST [[
+---@return number
+local function f() end
+local <?u?> = f()
+print(u.x)
+]]
+[[
+local u: number {
+    x: any,
 }
 ]]

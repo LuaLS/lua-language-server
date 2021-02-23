@@ -2937,6 +2937,11 @@ end
 
 function m.getRefCache(status, obj, mode)
     local isDeep = status.deep
+    if mode == 'infer' then
+        if not isDeep then
+            return nil, nil
+        end
+    end
     local globalCache = status.interface.cache and status.interface.cache() or {}
     if m.isGlobal(obj) then
         obj = m.getKeyName(obj)

@@ -1,5 +1,8 @@
 # changelog
 
+## 1.16.2
+* `FIX` [#406](https://github.com/sumneko/lua-language-server/issues/406)
+
 ## 1.16.1
 `2021-2-22`
 * `FIX` signature: parameters may be misplaced

@@ -1102,10 +1102,22 @@ local function checkEqualEnum(ast, text, offset, results)
         or source.type == 'setlocal'
         or source.type == 'local'
         or source.type == 'getglobal'
+        or source.type == 'setglobal'
         or source.type == 'getfield'
+        or source.type == 'setfield'
         or source.type == 'getindex'
+        or source.type == 'setindex'
+        or source.type == 'tablefield'
+        or source.type == 'tableindex'
         or source.type == 'call' then
             return source
+        end
+        local parent = source.parent
+        if parent then
+            if parent.type == 'tablefield'
+            or parent.type == 'tableindex' then
+                return source
+            end
         end
     end)
     if not source then

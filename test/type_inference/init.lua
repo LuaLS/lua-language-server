@@ -370,7 +370,7 @@ local t = {}
 local <?v?> = setmetatable(t)
 ]]
 
-TEST [[CCC]] [[
+TEST 'CCC' [[
 ---@class CCC
 
 ---@type table<string, CCC>

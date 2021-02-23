@@ -2115,3 +2115,45 @@ field cc.aaa: number
     },
 }
 Cared['description'] = nil
+
+TEST [[
+---@type table<string, "'a'"|"'b'"|"'c'">
+local x
+
+x.a = $
+]]
+{
+    {
+        label  = "'a'",
+        kind   = define.CompletionItemKind.EnumMember,
+    },
+    {
+        label  = "'b'",
+        kind   = define.CompletionItemKind.EnumMember,
+    },
+    {
+        label  = "'c'",
+        kind   = define.CompletionItemKind.EnumMember,
+    },
+}
+
+TEST [[
+---@type table<string, "'a'"|"'b'"|"'c'">
+local x = {
+    a = $
+}
+]]
+{
+    {
+        label  = "'a'",
+        kind   = define.CompletionItemKind.EnumMember,
+    },
+    {
+        label  = "'b'",
+        kind   = define.CompletionItemKind.EnumMember,
+    },
+    {
+        label  = "'c'",
+        kind   = define.CompletionItemKind.EnumMember,
+    },
+}

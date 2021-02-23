@@ -646,8 +646,8 @@ x = (x + y) or 0
 
 TEST [[
 local t = {}
-t.a = 1
-t.a = 2
+<!t.a!> = 1
+<!t.a!> = 2
 return t
 ]]
 
@@ -1004,4 +1004,30 @@ TEST [[
 ---@param a number
 return function (a)
 end
+]]
+
+TEST [[
+local m = {}
+
+function <!m:fff!>()
+end
+
+function <!m:fff!>()
+end
+
+return m
+]]
+
+TEST [[
+local m = {}
+
+function m:fff()
+end
+
+do
+    function m:fff()
+    end
+end
+
+return m
 ]]

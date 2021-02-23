@@ -646,8 +646,8 @@ x = (x + y) or 0
 
 TEST [[
 local t = {}
-<!t.a!> = 1
-<!t.a!> = 2
+t.a = 1
+t.a = 2
 return t
 ]]
 

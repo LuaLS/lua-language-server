@@ -31,11 +31,8 @@ return function (uri, callback)
                     goto CONTINUE
                 end
                 local value = guide.getObjectValue(nxt)
-                if value then
-                    if value.type == 'boolean'
-                    or value.type == 'nil' then
-                        goto CONTINUE
-                    end
+                if not value or value.type ~= 'function' then
+                    goto CONTINUE
                 end
                 if not sets[name] then
                     sets[name] = {}

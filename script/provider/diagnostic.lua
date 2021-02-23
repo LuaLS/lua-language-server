@@ -44,9 +44,10 @@ local function buildSyntaxError(uri, err)
             else
                 rmessage = text:sub(rel.start, rel.finish)
             end
+            local relUri = files.getOriginUri(rel.uri)
             relatedInformation[#relatedInformation+1] = {
                 message  = rmessage,
-                location = define.location(uri, files.range(uri, rel.start, rel.finish)),
+                location = define.location(relUri, files.range(relUri, rel.start, rel.finish)),
             }
         end
     end

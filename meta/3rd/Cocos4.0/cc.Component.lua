@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Component :cc.Ref
 local Component={ }

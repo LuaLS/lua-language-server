@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Grid3DAction :cc.GridAction
 local Grid3DAction={ }

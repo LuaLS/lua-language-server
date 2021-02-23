@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.ProtectedNode :cc.Node
 local ProtectedNode={ }

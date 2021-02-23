@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Lens3D :cc.Grid3DAction
 local Lens3D={ }

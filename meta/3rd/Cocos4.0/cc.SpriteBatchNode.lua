@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.SpriteBatchNode :cc.Node@all parent class: Node,TextureProtocol
 local SpriteBatchNode={ }

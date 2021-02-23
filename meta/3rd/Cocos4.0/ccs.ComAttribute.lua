@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.ComAttribute :cc.Component
 local ComAttribute={ }

@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.ControlHuePicker :cc.Control
 local ControlHuePicker={ }

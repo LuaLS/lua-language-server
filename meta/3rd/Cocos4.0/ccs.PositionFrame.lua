@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.PositionFrame :ccs.Frame
 local PositionFrame={ }

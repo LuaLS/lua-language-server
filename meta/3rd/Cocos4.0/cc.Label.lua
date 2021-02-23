@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Label :cc.Node@all parent class: Node,LabelProtocol,BlendProtocol
 local Label={ }

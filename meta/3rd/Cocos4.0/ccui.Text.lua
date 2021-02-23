@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccui.Text :ccui.Widget@all parent class: Widget,BlendProtocol
 local Text={ }

@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccb.TextureBackend :cc.Ref
 local TextureBackend={ }

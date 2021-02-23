@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.RotateBy :cc.ActionInterval
 local RotateBy={ }

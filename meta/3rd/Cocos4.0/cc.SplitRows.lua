@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.SplitRows :cc.TiledGrid3DAction
 local SplitRows={ }

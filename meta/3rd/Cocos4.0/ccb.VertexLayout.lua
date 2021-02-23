@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccb.VertexLayout 
 local VertexLayout={ }

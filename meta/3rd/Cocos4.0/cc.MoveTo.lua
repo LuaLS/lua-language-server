@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.MoveTo :cc.MoveBy
 local MoveTo={ }

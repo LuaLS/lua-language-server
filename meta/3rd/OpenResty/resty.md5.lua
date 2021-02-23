@@ -1,3 +1,4 @@
+---@meta
 resty_md5={}
 function resty_md5.final(self) end
 function resty_md5.new(self) end

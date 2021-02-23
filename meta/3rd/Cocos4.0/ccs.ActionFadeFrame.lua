@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.ActionFadeFrame :ccs.ActionFrame
 local ActionFadeFrame={ }

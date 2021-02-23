@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.TableViewCell :cc.Node
 local TableViewCell={ }

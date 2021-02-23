@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Sprite3DMaterial :cc.Material
 local Sprite3DMaterial={ }

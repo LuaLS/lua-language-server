@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.PUParticleSystem3D :cc.ParticleSystem3D
 local PUParticleSystem3D={ }

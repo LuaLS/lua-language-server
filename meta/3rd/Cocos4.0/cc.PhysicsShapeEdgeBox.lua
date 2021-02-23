@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.PhysicsShapeEdgeBox :cc.PhysicsShapeEdgePolygon
 local PhysicsShapeEdgeBox={ }

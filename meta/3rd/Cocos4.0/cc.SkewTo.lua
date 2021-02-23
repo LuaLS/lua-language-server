@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.SkewTo :cc.ActionInterval
 local SkewTo={ }

@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.DirectionLight :cc.BaseLight
 local DirectionLight={ }

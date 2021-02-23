@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccui.TabHeader :ccui.AbstractCheckButton
 local TabHeader={ }

@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccui.Slider :ccui.Widget
 local Slider={ }

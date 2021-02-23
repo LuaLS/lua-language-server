@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.TextureFrame :ccs.Frame
 local TextureFrame={ }

@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccb.ProgramState :cc.Ref
 local ProgramState={ }

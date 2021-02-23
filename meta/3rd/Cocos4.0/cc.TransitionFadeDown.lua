@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.TransitionFadeDown :cc.TransitionFadeTR
 local TransitionFadeDown={ }

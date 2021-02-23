@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Twirl :cc.Grid3DAction
 local Twirl={ }

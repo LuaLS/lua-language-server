@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccui.LayoutParameter :cc.Ref
 local LayoutParameter={ }

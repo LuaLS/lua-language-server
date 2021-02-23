@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.GLView :cc.Ref
 local GLView={ }

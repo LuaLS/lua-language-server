@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.PhysicsJointFixed :cc.PhysicsJoint
 local PhysicsJointFixed={ }

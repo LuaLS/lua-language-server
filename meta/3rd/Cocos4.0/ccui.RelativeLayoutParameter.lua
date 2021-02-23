@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccui.RelativeLayoutParameter :ccui.LayoutParameter
 local RelativeLayoutParameter={ }

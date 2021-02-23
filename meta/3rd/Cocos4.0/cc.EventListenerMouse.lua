@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.EventListenerMouse :cc.EventListener
 local EventListenerMouse={ }

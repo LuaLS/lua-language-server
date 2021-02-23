@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.ScaleFrame :ccs.Frame
 local ScaleFrame={ }

@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccui.Layout :ccui.Widget@all parent class: Widget,LayoutProtocol
 local Layout={ }

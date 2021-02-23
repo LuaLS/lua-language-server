@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.EventKeyboard :cc.Event
 local EventKeyboard={ }

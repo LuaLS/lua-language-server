@@ -1,3 +1,4 @@
+---@meta
 resty_core_regex={}
 function resty_core_regex.collect_captures() end
 function resty_core_regex.set_buf_grow_ratio(ratio) end

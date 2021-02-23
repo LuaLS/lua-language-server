@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.MoveBy :cc.ActionInterval
 local MoveBy={ }

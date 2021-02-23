@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.ParticleGalaxy :cc.ParticleSystemQuad
 local ParticleGalaxy={ }

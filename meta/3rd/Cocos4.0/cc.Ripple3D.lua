@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Ripple3D :cc.Grid3DAction
 local Ripple3D={ }

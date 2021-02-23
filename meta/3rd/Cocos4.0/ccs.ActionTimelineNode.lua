@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.ActionTimelineNode :cc.Node
 local ActionTimelineNode={ }

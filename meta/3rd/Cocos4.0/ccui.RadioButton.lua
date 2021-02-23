@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccui.RadioButton :ccui.AbstractCheckButton
 local RadioButton={ }

@@ -1,3 +1,4 @@
+---@meta
 resty_limit_req={}
 function resty_limit_req.set_rate(self, rate) end
 function resty_limit_req.uncommit(self, key) end

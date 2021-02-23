@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.TMXLayerInfo :cc.Ref
 local TMXLayerInfo={ }

@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.TransitionJumpZoom :cc.TransitionScene
 local TransitionJumpZoom={ }

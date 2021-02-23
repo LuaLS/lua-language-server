@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccui.Scale9Sprite :cc.Sprite
 local Scale9Sprite={ }

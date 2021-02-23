@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.JumpBy :cc.ActionInterval
 local JumpBy={ }

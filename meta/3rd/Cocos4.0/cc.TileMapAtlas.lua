@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.TileMapAtlas :cc.AtlasNode
 local TileMapAtlas={ }

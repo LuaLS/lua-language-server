@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Show :cc.ActionInstant
 local Show={ }

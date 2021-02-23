@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.Armature :cc.Node@all parent class: Node,BlendProtocol
 local Armature={ }

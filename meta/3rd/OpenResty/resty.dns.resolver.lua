@@ -1,3 +1,4 @@
+---@meta
 resty_dns_resolver={}
 resty_dns_resolver.SECTION_NS=2
 resty_dns_resolver.SECTION_AN=1

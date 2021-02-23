@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Physics3DShape :cc.Ref
 local Physics3DShape={ }

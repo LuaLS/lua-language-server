@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.FadeTo :cc.ActionInterval
 local FadeTo={ }

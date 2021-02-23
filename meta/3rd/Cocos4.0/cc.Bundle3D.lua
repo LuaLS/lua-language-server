@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Bundle3D 
 local Bundle3D={ }

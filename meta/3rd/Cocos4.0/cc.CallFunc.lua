@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.CallFunc :cc.ActionInstant
 local CallFunc={ }

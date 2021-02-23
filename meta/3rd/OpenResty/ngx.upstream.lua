@@ -1,3 +1,4 @@
+---@meta
 ngx_upstream={}
 function ngx_upstream.get_backup_peers() end
 function ngx_upstream.get_servers() end

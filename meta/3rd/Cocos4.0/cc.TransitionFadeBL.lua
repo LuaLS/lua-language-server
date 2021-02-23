@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.TransitionFadeBL :cc.TransitionFadeTR
 local TransitionFadeBL={ }

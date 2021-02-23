@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.TransitionProgress :cc.TransitionScene
 local TransitionProgress={ }

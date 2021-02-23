@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.ParticleData 
 local ParticleData={ }

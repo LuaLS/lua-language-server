@@ -1,3 +1,4 @@
+---@meta
 resty_upstream_healthcheck={}
 function resty_upstream_healthcheck.status_page() end
 resty_upstream_healthcheck._VERSION="0.05"

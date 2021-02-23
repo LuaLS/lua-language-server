@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.BatchNode :cc.Node
 local BatchNode={ }

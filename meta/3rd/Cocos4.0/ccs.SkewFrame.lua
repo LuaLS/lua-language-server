@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.SkewFrame :ccs.Frame
 local SkewFrame={ }

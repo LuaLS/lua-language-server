@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Pass :cc.Ref
 local Pass={ }

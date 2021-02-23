@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Sprite :cc.Node@all parent class: Node,TextureProtocol
 local Sprite={ }

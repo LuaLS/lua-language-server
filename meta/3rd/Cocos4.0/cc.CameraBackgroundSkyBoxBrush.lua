@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.CameraBackgroundSkyBoxBrush :cc.CameraBackgroundBrush
 local CameraBackgroundSkyBoxBrush={ }

@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.EaseQuinticActionIn :cc.ActionEase
 local EaseQuinticActionIn={ }

@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.LabelAtlas :cc.AtlasNode@all parent class: AtlasNode,LabelProtocol
 local LabelAtlas={ }

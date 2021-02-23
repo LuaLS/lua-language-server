@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.AlphaFrame :ccs.Frame
 local AlphaFrame={ }

@@ -1,3 +1,4 @@
+---@meta
 resty_sha384={}
 function resty_sha384.final(self) end
 function resty_sha384.new(self) end

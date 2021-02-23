@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.PhysicsJointRatchet :cc.PhysicsJoint
 local PhysicsJointRatchet={ }

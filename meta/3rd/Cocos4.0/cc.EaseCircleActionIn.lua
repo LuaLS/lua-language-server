@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.EaseCircleActionIn :cc.ActionEase
 local EaseCircleActionIn={ }

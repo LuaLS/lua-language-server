@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.EaseBackInOut :cc.ActionEase
 local EaseBackInOut={ }

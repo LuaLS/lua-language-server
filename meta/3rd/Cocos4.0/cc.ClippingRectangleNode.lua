@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.ClippingRectangleNode :cc.Node
 local ClippingRectangleNode={ }

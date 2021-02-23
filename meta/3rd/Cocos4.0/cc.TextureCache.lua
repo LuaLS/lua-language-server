@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.TextureCache :cc.Ref
 local TextureCache={ }

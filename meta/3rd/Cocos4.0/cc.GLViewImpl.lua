@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.GLViewImpl :cc.GLView
 local GLViewImpl={ }

@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.ParticleSystem3D :cc.Node@all parent class: Node,BlendProtocol
 local ParticleSystem3D={ }

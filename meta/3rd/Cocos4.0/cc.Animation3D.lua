@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Animation3D :cc.Ref
 local Animation3D={ }

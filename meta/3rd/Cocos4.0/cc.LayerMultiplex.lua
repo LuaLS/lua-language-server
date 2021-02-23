@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.LayerMultiplex :cc.Layer
 local LayerMultiplex={ }

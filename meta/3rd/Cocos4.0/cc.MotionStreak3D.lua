@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.MotionStreak3D :cc.Node@all parent class: Node,TextureProtocol
 local MotionStreak3D={ }

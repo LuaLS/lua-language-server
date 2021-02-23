@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.PhysicsJointDistance :cc.PhysicsJoint
 local PhysicsJointDistance={ }

@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.ScaleBy :cc.ScaleTo
 local ScaleBy={ }

@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccui.HBox :ccui.Layout
 local HBox={ }

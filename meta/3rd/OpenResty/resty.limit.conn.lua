@@ -1,3 +1,4 @@
+---@meta
 resty_limit_conn={}
 function resty_limit_conn.set_conn(self, conn) end
 function resty_limit_conn.uncommit(self, key) end

@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.EaseRateAction :cc.ActionEase
 local EaseRateAction={ }

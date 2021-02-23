@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.SpriteDisplayData :ccs.DisplayData
 local SpriteDisplayData={ }

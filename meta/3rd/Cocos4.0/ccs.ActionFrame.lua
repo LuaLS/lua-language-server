@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.ActionFrame :cc.Ref
 local ActionFrame={ }

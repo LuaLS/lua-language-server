@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.ArmatureDataManager :cc.Ref
 local ArmatureDataManager={ }

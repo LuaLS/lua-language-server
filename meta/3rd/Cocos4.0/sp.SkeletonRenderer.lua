@@ -1,3 +1,4 @@
+---@meta
 
 ---@class sp.SkeletonRenderer :cc.Node@all parent class: Node,BlendProtocol
 local SkeletonRenderer={ }

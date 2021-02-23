@@ -1,3 +1,4 @@
+---@meta
 resty_memcached={}
 function resty_memcached.cas(self, key, value, cas_uniq, exptime, flags) end
 function resty_memcached.new(self, opts) end

@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccui.Widget :cc.ProtectedNode@all parent class: ProtectedNode,LayoutParameterProtocol
 local Widget={ }

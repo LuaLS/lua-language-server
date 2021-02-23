@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Action :cc.Ref
 local Action={ }

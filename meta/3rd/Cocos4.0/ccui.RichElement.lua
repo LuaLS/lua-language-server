@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccui.RichElement :cc.Ref
 local RichElement={ }

@@ -1,3 +1,4 @@
+---@meta
 
 ---@class sp.SkeletonAnimation :sp.SkeletonRenderer
 local SkeletonAnimation={ }

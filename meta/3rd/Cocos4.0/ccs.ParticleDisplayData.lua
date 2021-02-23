@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.ParticleDisplayData :ccs.DisplayData
 local ParticleDisplayData={ }

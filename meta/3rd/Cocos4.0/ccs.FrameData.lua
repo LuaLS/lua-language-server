@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.FrameData :ccs.BaseData
 local FrameData={ }

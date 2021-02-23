@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.RotationSkewFrame :ccs.SkewFrame
 local RotationSkewFrame={ }

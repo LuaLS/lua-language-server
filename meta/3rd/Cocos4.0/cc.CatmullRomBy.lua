@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.CatmullRomBy :cc.CardinalSplineBy
 local CatmullRomBy={ }

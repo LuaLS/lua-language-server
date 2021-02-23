@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccui.Button :ccui.Widget
 local Button={ }

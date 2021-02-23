@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccb.Texture2DBackend :ccb.TextureBackend
 local Texture2DBackend={ }

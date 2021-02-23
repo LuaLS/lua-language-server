@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Application 
 local Application={ }

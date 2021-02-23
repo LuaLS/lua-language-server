@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.TintTo :cc.ActionInterval
 local TintTo={ }

@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Skeleton3D :cc.Ref
 local Skeleton3D={ }

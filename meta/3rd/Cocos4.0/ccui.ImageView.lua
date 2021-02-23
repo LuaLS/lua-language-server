@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccui.ImageView :ccui.Widget@all parent class: Widget,BlendProtocol
 local ImageView={ }

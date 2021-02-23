@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.RenderState :cc.Ref
 local RenderState={ }

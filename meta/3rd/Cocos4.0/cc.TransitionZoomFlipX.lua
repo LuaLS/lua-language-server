@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.TransitionZoomFlipX :cc.TransitionSceneOriented
 local TransitionZoomFlipX={ }

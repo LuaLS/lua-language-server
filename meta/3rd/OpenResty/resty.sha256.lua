@@ -1,3 +1,4 @@
+---@meta
 resty_sha256={}
 function resty_sha256.final(self) end
 function resty_sha256.new(self) end

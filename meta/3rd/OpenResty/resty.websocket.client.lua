@@ -1,3 +1,4 @@
+---@meta
 resty_websocket_client={}
 function resty_websocket_client.send_text(self, data) end
 function resty_websocket_client.new(self, opts) end

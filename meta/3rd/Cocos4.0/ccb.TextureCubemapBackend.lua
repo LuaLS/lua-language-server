@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccb.TextureCubemapBackend :ccb.TextureBackend
 local TextureCubemapBackend={ }

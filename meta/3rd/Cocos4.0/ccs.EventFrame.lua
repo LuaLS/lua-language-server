@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.EventFrame :ccs.Frame
 local EventFrame={ }

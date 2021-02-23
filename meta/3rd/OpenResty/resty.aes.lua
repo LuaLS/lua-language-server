@@ -1,3 +1,4 @@
+---@meta
 resty_aes={}
 function resty_aes.cipher() end
 resty_aes.hash={}

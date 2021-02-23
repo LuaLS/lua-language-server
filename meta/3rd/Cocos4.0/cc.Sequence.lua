@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Sequence :cc.ActionInterval
 local Sequence={ }

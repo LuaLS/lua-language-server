@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.ComponentLua :cc.Component
 local ComponentLua={ }

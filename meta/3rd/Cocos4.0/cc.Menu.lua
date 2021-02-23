@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Menu :cc.Layer
 local Menu={ }

@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.EaseOut :cc.EaseRateAction
 local EaseOut={ }

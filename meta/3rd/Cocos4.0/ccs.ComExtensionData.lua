@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.ComExtensionData :cc.Component
 local ComExtensionData={ }

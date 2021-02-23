@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.GridAction :cc.ActionInterval
 local GridAction={ }

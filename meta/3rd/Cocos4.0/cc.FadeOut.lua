@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.FadeOut :cc.FadeTo
 local FadeOut={ }

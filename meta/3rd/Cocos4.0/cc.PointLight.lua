@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.PointLight :cc.BaseLight
 local PointLight={ }

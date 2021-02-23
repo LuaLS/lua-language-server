@@ -1,3 +1,4 @@
+---@meta
 resty_signal={}
 function resty_signal.kill(pid, sig) end
 function resty_signal.signum(name) end

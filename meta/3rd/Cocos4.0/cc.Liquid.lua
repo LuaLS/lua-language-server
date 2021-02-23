@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Liquid :cc.Grid3DAction
 local Liquid={ }

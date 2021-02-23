@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Touch :cc.Ref
 local Touch={ }

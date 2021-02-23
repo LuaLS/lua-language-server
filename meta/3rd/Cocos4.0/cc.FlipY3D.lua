@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.FlipY3D :cc.FlipX3D
 local FlipY3D={ }

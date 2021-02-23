@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Material :cc.Ref
 local Material={ }

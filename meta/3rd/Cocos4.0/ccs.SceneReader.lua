@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.SceneReader 
 local SceneReader={ }

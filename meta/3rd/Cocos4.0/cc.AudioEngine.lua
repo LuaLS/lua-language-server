@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.AudioEngine 
 local AudioEngine={ }

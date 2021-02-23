@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.ProgressTimer :cc.Node
 local ProgressTimer={ }

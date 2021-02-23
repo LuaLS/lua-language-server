@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.PhysicsJointPin :cc.PhysicsJoint
 local PhysicsJointPin={ }

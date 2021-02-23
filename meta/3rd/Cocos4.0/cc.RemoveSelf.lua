@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.RemoveSelf :cc.ActionInstant
 local RemoveSelf={ }

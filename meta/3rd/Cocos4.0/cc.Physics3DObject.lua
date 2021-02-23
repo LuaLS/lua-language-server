@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Physics3DObject :cc.Ref
 local Physics3DObject={ }

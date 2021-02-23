@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.ParticleSystem :cc.Node@all parent class: Node,TextureProtocol,PlayableProtocol
 local ParticleSystem={ }

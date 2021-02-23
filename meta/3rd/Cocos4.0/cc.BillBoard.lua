@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.BillBoard :cc.Sprite
 local BillBoard={ }

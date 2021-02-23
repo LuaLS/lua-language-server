@@ -1,3 +1,4 @@
+---@meta
 resty_lrucache={}
 function resty_lrucache.delete(self, key) end
 function resty_lrucache.new(size) end

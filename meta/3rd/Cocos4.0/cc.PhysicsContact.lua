@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.PhysicsContact :cc.EventCustom
 local PhysicsContact={ }

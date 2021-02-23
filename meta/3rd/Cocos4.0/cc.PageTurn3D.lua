@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.PageTurn3D :cc.Grid3DAction
 local PageTurn3D={ }

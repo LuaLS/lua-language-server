@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.EaseQuarticActionInOut :cc.ActionEase
 local EaseQuarticActionInOut={ }

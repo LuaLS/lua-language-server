@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.EaseCubicActionIn :cc.ActionEase
 local EaseCubicActionIn={ }

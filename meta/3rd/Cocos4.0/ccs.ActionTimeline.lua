@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.ActionTimeline :cc.Action@all parent class: Action,PlayableProtocol
 local ActionTimeline={ }

@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.PhysicsContactPreSolve 
 local PhysicsContactPreSolve={ }

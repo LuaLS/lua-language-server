@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.BlendFuncFrame :ccs.Frame
 local BlendFuncFrame={ }

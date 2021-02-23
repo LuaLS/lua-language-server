@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.FileUtils 
 local FileUtils={ }

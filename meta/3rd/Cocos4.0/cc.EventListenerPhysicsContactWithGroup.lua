@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.EventListenerPhysicsContactWithGroup :cc.EventListenerPhysicsContact
 local EventListenerPhysicsContactWithGroup={ }

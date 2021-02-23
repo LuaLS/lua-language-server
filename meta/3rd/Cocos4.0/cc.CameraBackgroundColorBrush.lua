@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.CameraBackgroundColorBrush :cc.CameraBackgroundDepthBrush
 local CameraBackgroundColorBrush={ }

@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccui.LoadingBar :ccui.Widget
 local LoadingBar={ }

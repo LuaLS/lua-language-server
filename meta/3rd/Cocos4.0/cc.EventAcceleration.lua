@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.EventAcceleration :cc.Event
 local EventAcceleration={ }

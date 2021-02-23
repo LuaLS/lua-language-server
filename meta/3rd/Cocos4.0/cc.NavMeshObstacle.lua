@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.NavMeshObstacle :cc.Component
 local NavMeshObstacle={ }

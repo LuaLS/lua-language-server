@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Animate :cc.ActionInterval
 local Animate={ }

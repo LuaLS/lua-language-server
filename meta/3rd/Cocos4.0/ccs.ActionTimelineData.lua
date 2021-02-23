@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.ActionTimelineData :cc.Ref
 local ActionTimelineData={ }

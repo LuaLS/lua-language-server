@@ -1,3 +1,4 @@
+---@meta
 ngx_re={}
 function ngx_re.opt(option, value) end
 function ngx_re.split(subj, regex, opts, ctx, max, res) end

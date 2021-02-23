@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.ParticleSystemQuad :cc.ParticleSystem
 local ParticleSystemQuad={ }

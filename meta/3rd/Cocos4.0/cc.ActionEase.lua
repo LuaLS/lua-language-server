@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.ActionEase :cc.ActionInterval
 local ActionEase={ }

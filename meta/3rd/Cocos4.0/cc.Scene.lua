@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Scene :cc.Node
 local Scene={ }

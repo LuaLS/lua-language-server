@@ -1,3 +1,4 @@
+---@meta
 resty_mysql={}
 function resty_mysql.read_result() end
 function resty_mysql.new(self) end

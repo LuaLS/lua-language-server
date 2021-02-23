@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.DisplayManager :cc.Ref
 local DisplayManager={ }

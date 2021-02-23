@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Sprite3DCache 
 local Sprite3DCache={ }

@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.ActionInstant :cc.FiniteTimeAction
 local ActionInstant={ }

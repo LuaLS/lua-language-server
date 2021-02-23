@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.TransitionPageTurn :cc.TransitionScene
 local TransitionPageTurn={ }

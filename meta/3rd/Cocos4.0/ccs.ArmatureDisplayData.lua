@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.ArmatureDisplayData :ccs.DisplayData
 local ArmatureDisplayData={ }

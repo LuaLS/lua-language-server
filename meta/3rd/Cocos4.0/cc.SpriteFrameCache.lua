@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.SpriteFrameCache :cc.Ref
 local SpriteFrameCache={ }

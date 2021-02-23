@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Waves :cc.Grid3DAction
 local Waves={ }

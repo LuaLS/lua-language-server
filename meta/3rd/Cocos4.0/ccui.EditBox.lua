@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccui.EditBox :ccui.Widget@all parent class: Widget,IMEDelegate
 local EditBox={ }

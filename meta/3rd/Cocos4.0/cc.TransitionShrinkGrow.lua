@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.TransitionShrinkGrow :cc.TransitionScene@all parent class: TransitionScene,TransitionEaseScene
 local TransitionShrinkGrow={ }

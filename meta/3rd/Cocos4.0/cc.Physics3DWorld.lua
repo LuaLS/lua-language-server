@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Physics3DWorld :cc.Ref
 local Physics3DWorld={ }

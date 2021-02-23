@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.EventListenerFocus :cc.EventListener
 local EventListenerFocus={ }

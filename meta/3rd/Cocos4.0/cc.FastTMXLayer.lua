@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.FastTMXLayer :cc.Node
 local FastTMXLayer={ }

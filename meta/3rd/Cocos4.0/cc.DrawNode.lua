@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.DrawNode :cc.Node
 local DrawNode={ }

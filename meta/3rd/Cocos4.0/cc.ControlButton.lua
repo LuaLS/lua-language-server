@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.ControlButton :cc.Control
 local ControlButton={ }

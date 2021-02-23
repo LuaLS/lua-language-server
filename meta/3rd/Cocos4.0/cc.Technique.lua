@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Technique :cc.Ref
 local Technique={ }

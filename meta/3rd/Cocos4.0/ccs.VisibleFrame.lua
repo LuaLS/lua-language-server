@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.VisibleFrame :ccs.Frame
 local VisibleFrame={ }

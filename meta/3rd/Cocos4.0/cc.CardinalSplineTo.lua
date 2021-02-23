@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.CardinalSplineTo :cc.ActionInterval
 local CardinalSplineTo={ }

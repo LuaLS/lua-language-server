@@ -1,3 +1,4 @@
+---@meta
 resty_upload={}
 function resty_upload.read(self) end
 function resty_upload.set_timeout(self, timeout) end

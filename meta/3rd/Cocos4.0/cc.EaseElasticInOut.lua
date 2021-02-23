@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.EaseElasticInOut :cc.EaseElastic
 local EaseElasticInOut={ }

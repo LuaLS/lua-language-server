@@ -1,3 +1,4 @@
+---@meta
 ngx_base64={}
 function ngx_base64.encode_base64url(s) end
 function ngx_base64.decode_base64url(s) end

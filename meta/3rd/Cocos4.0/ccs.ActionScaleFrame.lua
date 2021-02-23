@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.ActionScaleFrame :ccs.ActionFrame
 local ActionScaleFrame={ }

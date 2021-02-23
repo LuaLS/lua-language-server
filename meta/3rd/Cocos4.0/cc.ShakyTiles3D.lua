@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.ShakyTiles3D :cc.TiledGrid3DAction
 local ShakyTiles3D={ }

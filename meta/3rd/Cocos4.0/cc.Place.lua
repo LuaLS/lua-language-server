@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Place :cc.ActionInstant
 local Place={ }

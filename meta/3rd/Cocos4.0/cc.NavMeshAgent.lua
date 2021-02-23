@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.NavMeshAgent :cc.Component
 local NavMeshAgent={ }

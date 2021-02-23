@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.EaseExponentialInOut :cc.ActionEase
 local EaseExponentialInOut={ }

@@ -1,3 +1,4 @@
+---@meta
 ---@class real
 ---@class handle
 ---@class agent
@@ -134,7 +135,6 @@
 ---@class unitcategory
 ---@class pathingflag
 ---@class commandbuttoneffect
----@meta
 
 ---'common'
 ---@class common

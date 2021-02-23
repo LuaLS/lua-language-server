@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccui.TabControl :ccui.Widget
 local TabControl={ }

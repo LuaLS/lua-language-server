@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.PhysicsShapeEdgeChain :cc.PhysicsShape
 local PhysicsShapeEdgeChain={ }

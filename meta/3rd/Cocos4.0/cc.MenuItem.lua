@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.MenuItem :cc.Node
 local MenuItem={ }

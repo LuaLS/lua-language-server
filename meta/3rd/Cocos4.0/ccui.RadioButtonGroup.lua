@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccui.RadioButtonGroup :ccui.Widget
 local RadioButtonGroup={ }

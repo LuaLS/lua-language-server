@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.Bone :cc.Node
 local Bone={ }

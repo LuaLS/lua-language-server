@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.TMXObjectGroup :cc.Ref
 local TMXObjectGroup={ }

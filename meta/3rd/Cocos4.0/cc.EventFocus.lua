@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.EventFocus :cc.Event
 local EventFocus={ }

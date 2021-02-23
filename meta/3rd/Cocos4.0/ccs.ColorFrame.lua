@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.ColorFrame :ccs.Frame
 local ColorFrame={ }

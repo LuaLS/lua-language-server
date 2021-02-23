@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccui.LayoutComponent :cc.Component
 local LayoutComponent={ }

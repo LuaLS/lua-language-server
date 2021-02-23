@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.ActionTintFrame :ccs.ActionFrame
 local ActionTintFrame={ }

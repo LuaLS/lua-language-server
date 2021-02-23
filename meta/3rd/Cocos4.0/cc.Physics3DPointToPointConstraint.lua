@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Physics3DPointToPointConstraint :cc.Physics3DConstraint
 local Physics3DPointToPointConstraint={ }

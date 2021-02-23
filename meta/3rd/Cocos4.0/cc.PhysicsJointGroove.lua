@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.PhysicsJointGroove :cc.PhysicsJoint
 local PhysicsJointGroove={ }

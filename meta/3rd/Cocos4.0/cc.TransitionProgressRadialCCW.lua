@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.TransitionProgressRadialCCW :cc.TransitionProgress
 local TransitionProgressRadialCCW={ }

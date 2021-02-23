@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Control :cc.Layer
 local Control={ }

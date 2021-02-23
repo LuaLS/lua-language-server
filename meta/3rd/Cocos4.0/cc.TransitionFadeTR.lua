@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.TransitionFadeTR :cc.TransitionScene@all parent class: TransitionScene,TransitionEaseScene
 local TransitionFadeTR={ }

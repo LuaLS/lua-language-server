@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.PhysicsShapeCircle :cc.PhysicsShape
 local PhysicsShapeCircle={ }

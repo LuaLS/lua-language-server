@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccui.VideoPlayer :ccui.Widget
 local VideoPlayer={ }

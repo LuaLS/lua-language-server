@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.TextureData :cc.Ref
 local TextureData={ }

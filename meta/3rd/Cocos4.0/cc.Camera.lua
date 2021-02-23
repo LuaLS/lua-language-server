@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Camera :cc.Node
 local Camera={ }

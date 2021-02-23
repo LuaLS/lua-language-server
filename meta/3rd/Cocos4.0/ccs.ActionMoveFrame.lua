@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.ActionMoveFrame :ccs.ActionFrame
 local ActionMoveFrame={ }

@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Terrain :cc.Node
 local Terrain={ }

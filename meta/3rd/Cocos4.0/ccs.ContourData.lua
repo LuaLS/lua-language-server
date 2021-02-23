@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.ContourData :cc.Ref
 local ContourData={ }

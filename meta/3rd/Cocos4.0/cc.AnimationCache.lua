@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.AnimationCache :cc.Ref
 local AnimationCache={ }

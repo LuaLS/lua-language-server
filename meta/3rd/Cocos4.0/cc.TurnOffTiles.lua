@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.TurnOffTiles :cc.TiledGrid3DAction
 local TurnOffTiles={ }

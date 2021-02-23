@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.EventListenerAssetsManagerEx :cc.EventListenerCustom
 local EventListenerAssetsManagerEx={ }

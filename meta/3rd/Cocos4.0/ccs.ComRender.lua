@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.ComRender :cc.Component
 local ComRender={ }

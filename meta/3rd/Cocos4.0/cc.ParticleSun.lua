@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.ParticleSun :cc.ParticleSystemQuad
 local ParticleSun={ }

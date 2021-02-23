@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.ParallaxNode :cc.Node
 local ParallaxNode={ }

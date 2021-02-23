@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.ActionObject :cc.Ref
 local ActionObject={ }

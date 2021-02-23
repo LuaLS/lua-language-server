@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccui.RichElementNewLine :ccui.RichElement
 local RichElementNewLine={ }

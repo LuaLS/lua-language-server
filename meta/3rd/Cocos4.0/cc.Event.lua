@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Event :cc.Ref
 local Event={ }

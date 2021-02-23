@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.Skin :cc.Sprite
 local Skin={ }

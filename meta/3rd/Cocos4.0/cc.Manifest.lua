@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Manifest :cc.Ref
 local Manifest={ }

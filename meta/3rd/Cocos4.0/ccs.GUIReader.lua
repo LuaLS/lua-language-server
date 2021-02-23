@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.GUIReader :cc.Ref
 local GUIReader={ }

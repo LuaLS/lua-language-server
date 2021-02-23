@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.SpriteFrame :cc.Ref
 local SpriteFrame={ }

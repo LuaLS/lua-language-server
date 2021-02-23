@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.PhysicsShape :cc.Ref
 local PhysicsShape={ }

@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccui.ScrollView :ccui.Layout
 local ScrollView={ }

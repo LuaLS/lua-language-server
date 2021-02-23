@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.PlayableFrame :ccs.Frame
 local PlayableFrame={ }

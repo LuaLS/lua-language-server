@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.TransitionSlideInT :cc.TransitionSlideInL
 local TransitionSlideInT={ }

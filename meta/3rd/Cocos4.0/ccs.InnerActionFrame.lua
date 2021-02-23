@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.InnerActionFrame :ccs.Frame
 local InnerActionFrame={ }

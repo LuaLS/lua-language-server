@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Ref 
 local Ref={ }

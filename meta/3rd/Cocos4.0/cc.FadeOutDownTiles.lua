@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.FadeOutDownTiles :cc.FadeOutUpTiles
 local FadeOutDownTiles={ }

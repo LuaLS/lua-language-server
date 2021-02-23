@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.DisplayData :cc.Ref
 local DisplayData={ }

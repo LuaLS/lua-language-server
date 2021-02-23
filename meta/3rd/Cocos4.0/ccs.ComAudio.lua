@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.ComAudio :cc.Component@all parent class: Component,PlayableProtocol
 local ComAudio={ }

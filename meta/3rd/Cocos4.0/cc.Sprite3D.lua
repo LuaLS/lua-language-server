@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Sprite3D :cc.Node@all parent class: Node,BlendProtocol
 local Sprite3D={ }

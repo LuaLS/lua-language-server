@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Image :cc.Ref
 local Image={ }

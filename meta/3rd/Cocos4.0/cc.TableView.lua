@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.TableView :ccui.ScrollView@all parent class: ScrollView,ScrollViewDelegate
 local TableView={ }

@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.ActionManagerEx :cc.Ref
 local ActionManagerEx={ }

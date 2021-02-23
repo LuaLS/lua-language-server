@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.ShuffleTiles :cc.TiledGrid3DAction
 local ShuffleTiles={ }

@@ -1,3 +1,4 @@
+---@meta
 resty_redis={}
 function resty_redis.lrange() end
 function resty_redis.new(self) end

@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.ComController :cc.Component@all parent class: Component,InputDelegate
 local ComController={ }

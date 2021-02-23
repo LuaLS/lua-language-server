@@ -1,3 +1,4 @@
+---@meta
 resty_string={}
 function resty_string.to_hex(s) end
 resty_string._VERSION="0.11"

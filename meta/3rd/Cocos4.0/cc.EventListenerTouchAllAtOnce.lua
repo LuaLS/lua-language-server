@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.EventListenerTouchAllAtOnce :cc.EventListener
 local EventListenerTouchAllAtOnce={ }

@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Repeat :cc.ActionInterval
 local Repeat={ }

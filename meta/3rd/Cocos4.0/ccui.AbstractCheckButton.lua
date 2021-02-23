@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccui.AbstractCheckButton :ccui.Widget
 local AbstractCheckButton={ }

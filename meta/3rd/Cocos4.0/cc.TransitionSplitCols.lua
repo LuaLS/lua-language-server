@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.TransitionSplitCols :cc.TransitionScene@all parent class: TransitionScene,TransitionEaseScene
 local TransitionSplitCols={ }

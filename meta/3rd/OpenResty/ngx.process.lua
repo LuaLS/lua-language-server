@@ -1,3 +1,4 @@
+---@meta
 ngx_process={}
 function ngx_process.get_master_pid() end
 function ngx_process.enable_privileged_agent() end

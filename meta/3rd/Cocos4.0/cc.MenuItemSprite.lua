@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.MenuItemSprite :cc.MenuItem
 local MenuItemSprite={ }

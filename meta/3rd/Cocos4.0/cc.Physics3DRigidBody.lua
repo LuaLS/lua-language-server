@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Physics3DRigidBody :cc.Physics3DObject
 local Physics3DRigidBody={ }

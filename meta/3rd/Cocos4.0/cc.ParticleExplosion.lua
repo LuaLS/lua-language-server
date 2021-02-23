@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.ParticleExplosion :cc.ParticleSystemQuad
 local ParticleExplosion={ }

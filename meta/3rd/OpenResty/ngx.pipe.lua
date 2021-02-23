@@ -1,3 +1,4 @@
+---@meta
 ngx_pipe={}
 ngx_pipe._gc_ref_c_opt="-c"
 function ngx_pipe.spawn() end

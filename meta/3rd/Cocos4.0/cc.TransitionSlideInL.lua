@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.TransitionSlideInL :cc.TransitionScene@all parent class: TransitionScene,TransitionEaseScene
 local TransitionSlideInL={ }

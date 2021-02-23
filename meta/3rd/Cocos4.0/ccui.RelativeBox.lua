@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccui.RelativeBox :ccui.Layout
 local RelativeBox={ }

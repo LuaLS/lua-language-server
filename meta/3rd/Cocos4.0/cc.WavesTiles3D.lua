@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.WavesTiles3D :cc.TiledGrid3DAction
 local WavesTiles3D={ }

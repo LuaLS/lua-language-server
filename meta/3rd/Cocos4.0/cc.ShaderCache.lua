@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.ShaderCache :cc.Ref
 local ShaderCache={ }

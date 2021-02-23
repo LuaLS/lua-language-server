@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccui.VBox :ccui.Layout
 local VBox={ }

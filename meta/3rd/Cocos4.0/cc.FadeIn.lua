@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.FadeIn :cc.FadeTo
 local FadeIn={ }

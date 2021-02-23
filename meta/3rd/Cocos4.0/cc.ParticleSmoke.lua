@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.ParticleSmoke :cc.ParticleSystemQuad
 local ParticleSmoke={ }

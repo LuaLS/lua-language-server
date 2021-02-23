@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.TMXTiledMap :cc.Node
 local TMXTiledMap={ }

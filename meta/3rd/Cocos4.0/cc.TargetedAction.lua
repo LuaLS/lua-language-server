@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.TargetedAction :cc.ActionInterval
 local TargetedAction={ }

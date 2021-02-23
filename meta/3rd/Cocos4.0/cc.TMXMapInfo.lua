@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.TMXMapInfo 
 local TMXMapInfo={ }

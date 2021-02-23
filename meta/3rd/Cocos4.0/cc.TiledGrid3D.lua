@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.TiledGrid3D :cc.GridBase
 local TiledGrid3D={ }

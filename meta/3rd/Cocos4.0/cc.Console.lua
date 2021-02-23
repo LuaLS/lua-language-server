@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Console :cc.Ref
 local Console={ }

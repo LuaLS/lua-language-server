@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccui.TextBMFont :ccui.Widget
 local TextBMFont={ }

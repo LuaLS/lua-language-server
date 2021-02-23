@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.SpotLight :cc.BaseLight
 local SpotLight={ }

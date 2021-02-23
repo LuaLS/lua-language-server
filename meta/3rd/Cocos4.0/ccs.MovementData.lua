@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.MovementData :cc.Ref
 local MovementData={ }

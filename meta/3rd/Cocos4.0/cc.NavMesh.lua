@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.NavMesh :cc.Ref
 local NavMesh={ }

@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.BoneNode :cc.Node@all parent class: Node,BlendProtocol
 local BoneNode={ }

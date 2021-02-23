@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.BezierTo :cc.BezierBy
 local BezierTo={ }

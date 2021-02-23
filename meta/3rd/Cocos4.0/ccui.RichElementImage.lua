@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccui.RichElementImage :ccui.RichElement
 local RichElementImage={ }

@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.StopGrid :cc.ActionInstant
 local StopGrid={ }

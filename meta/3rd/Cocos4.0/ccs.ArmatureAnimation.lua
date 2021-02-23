@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.ArmatureAnimation 
 local ArmatureAnimation={ }

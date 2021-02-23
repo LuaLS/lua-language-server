@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Node :cc.Ref
 local Node={ }

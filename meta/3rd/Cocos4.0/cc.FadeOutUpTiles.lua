@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.FadeOutUpTiles :cc.FadeOutTRTiles
 local FadeOutUpTiles={ }

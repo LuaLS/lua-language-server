@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.FlipX :cc.ActionInstant
 local FlipX={ }

@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.Frame :cc.Ref
 local Frame={ }

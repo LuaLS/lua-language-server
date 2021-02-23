@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccui.RichText :ccui.Widget
 local RichText={ }

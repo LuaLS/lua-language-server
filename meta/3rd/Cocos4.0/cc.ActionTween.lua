@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.ActionTween :cc.ActionInterval
 local ActionTween={ }

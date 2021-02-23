@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.ZOrderFrame :ccs.Frame
 local ZOrderFrame={ }

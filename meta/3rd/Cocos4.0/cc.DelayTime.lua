@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.DelayTime :cc.ActionInterval
 local DelayTime={ }

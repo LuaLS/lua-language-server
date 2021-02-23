@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.TransitionFlipX :cc.TransitionSceneOriented
 local TransitionFlipX={ }

@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.ControlStepper :cc.Control
 local ControlStepper={ }

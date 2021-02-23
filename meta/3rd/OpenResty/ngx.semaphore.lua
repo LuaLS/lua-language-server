@@ -1,3 +1,4 @@
+---@meta
 ngx_semaphore={}
 function ngx_semaphore.count(self) end
 function ngx_semaphore.new(n) end

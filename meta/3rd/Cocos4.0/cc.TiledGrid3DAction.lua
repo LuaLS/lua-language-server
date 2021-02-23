@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.TiledGrid3DAction :cc.GridAction
 local TiledGrid3DAction={ }

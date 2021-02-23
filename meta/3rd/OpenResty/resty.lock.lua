@@ -1,3 +1,4 @@
+---@meta
 resty_lock={}
 function resty_lock.expire(self, time) end
 function resty_lock.unlock(self) end

@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.ActionRotationFrame :ccs.ActionFrame
 local ActionRotationFrame={ }

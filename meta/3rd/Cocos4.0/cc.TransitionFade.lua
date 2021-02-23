@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.TransitionFade :cc.TransitionScene
 local TransitionFade={ }

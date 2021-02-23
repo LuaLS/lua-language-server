@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.ToggleVisibility :cc.ActionInstant
 local ToggleVisibility={ }

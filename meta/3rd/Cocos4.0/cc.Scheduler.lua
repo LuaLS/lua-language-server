@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Scheduler :cc.Ref
 local Scheduler={ }

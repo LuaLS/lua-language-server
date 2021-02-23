@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.PhysicsJointGear :cc.PhysicsJoint
 local PhysicsJointGear={ }

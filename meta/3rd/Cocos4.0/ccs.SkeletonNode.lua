@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.SkeletonNode :ccs.BoneNode
 local SkeletonNode={ }

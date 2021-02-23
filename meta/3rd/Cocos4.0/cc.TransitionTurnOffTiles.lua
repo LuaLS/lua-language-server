@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.TransitionTurnOffTiles :cc.TransitionScene@all parent class: TransitionScene,TransitionEaseScene
 local TransitionTurnOffTiles={ }

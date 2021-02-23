@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.TransitionSplitRows :cc.TransitionSplitCols
 local TransitionSplitRows={ }

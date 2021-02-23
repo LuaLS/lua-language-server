@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Shaky3D :cc.Grid3DAction
 local Shaky3D={ }

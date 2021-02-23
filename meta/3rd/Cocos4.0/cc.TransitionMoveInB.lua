@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.TransitionMoveInB :cc.TransitionMoveInL
 local TransitionMoveInB={ }

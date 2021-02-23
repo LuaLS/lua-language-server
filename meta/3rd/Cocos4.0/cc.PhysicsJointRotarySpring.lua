@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.PhysicsJointRotarySpring :cc.PhysicsJoint
 local PhysicsJointRotarySpring={ }

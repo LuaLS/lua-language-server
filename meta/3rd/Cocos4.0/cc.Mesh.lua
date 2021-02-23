@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Mesh :cc.Ref
 local Mesh={ }

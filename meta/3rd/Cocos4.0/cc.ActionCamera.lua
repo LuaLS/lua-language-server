@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.ActionCamera :cc.ActionInterval
 local ActionCamera={ }

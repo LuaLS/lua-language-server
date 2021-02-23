@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.JumpTiles3D :cc.TiledGrid3DAction
 local JumpTiles3D={ }

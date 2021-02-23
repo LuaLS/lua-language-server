@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.ProgressFromTo :cc.ActionInterval
 local ProgressFromTo={ }

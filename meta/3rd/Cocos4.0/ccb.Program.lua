@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccb.Program :cc.Ref
 local Program={ }

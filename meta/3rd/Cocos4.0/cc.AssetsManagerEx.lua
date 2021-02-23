@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.AssetsManagerEx :cc.Ref
 local AssetsManagerEx={ }

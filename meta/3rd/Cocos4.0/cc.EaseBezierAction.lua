@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.EaseBezierAction :cc.ActionEase
 local EaseBezierAction={ }

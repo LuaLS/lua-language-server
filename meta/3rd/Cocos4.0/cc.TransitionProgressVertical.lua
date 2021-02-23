@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.TransitionProgressVertical :cc.TransitionProgress
 local TransitionProgressVertical={ }

@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.TMXTilesetInfo :cc.Ref
 local TMXTilesetInfo={ }

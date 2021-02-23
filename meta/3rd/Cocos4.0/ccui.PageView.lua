@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccui.PageView :ccui.ListView
 local PageView={ }

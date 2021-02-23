@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.ScaleTo :cc.ActionInterval
 local ScaleTo={ }

@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccui.LinearLayoutParameter :ccui.LayoutParameter
 local LinearLayoutParameter={ }

@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.TextureCube :cc.Ref
 local TextureCube={ }

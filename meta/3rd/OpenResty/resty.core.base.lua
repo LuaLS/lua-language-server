@@ -1,3 +1,4 @@
+---@meta
 resty_core_base={}
 function resty_core_base.new_tab() end
 resty_core_base.FFI_ERROR=-1

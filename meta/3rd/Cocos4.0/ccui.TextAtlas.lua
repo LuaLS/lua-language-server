@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccui.TextAtlas :ccui.Widget
 local TextAtlas={ }

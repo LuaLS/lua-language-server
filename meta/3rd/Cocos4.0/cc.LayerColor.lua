@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.LayerColor :cc.Layer@all parent class: Layer,BlendProtocol
 local LayerColor={ }

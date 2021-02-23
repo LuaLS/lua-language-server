@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.TintBy :cc.ActionInterval
 local TintBy={ }

@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.ActionInterval :cc.FiniteTimeAction
 local ActionInterval={ }

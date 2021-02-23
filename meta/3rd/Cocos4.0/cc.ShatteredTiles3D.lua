@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.ShatteredTiles3D :cc.TiledGrid3DAction
 local ShatteredTiles3D={ }

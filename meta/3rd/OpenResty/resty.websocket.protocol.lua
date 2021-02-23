@@ -1,3 +1,4 @@
+---@meta
 resty_websocket_protocol={}
 function resty_websocket_protocol.build_frame() end
 function resty_websocket_protocol.new_tab() end

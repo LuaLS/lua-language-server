@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Spawn :cc.ActionInterval
 local Spawn={ }

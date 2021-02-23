@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.PhysicsJointRotaryLimit :cc.PhysicsJoint
 local PhysicsJointRotaryLimit={ }

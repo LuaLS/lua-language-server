@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Blink :cc.ActionInterval
 local Blink={ }

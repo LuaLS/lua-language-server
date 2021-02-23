@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.OrbitCamera :cc.ActionCamera
 local OrbitCamera={ }

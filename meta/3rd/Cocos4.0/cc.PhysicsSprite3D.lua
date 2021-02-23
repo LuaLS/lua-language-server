@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.PhysicsSprite3D :cc.Sprite3D
 local PhysicsSprite3D={ }

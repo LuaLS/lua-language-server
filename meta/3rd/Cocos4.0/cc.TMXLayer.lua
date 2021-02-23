@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.TMXLayer :cc.SpriteBatchNode
 local TMXLayer={ }

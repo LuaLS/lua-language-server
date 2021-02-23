@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.BezierBy :cc.ActionInterval
 local BezierBy={ }

@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.BoneData :ccs.BaseData
 local BoneData={ }

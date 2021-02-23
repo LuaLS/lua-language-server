@@ -1,3 +1,4 @@
+---@meta
 ngx_errlog={}
 function ngx_errlog.get_sys_filter_level() end
 function ngx_errlog.set_filter_level(level) end

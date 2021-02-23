@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.ControlColourPicker :cc.Control
 local ControlColourPicker={ }

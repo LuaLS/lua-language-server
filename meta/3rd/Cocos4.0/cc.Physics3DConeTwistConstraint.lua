@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Physics3DConeTwistConstraint :cc.Physics3DConstraint
 local Physics3DConeTwistConstraint={ }

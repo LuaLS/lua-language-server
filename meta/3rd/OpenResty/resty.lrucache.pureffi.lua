@@ -1,3 +1,4 @@
+---@meta
 resty_lrucache_pureffi={}
 function resty_lrucache_pureffi.delete(self, key) end
 function resty_lrucache_pureffi.new(size, load_factor) end

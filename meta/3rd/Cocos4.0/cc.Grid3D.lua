@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Grid3D :cc.GridBase
 local Grid3D={ }

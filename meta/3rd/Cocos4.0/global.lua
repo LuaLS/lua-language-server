@@ -1,3 +1,4 @@
+---@meta
 
 ---require emmylua 0.3.36
 

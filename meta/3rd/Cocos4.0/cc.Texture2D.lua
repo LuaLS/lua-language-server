@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Texture2D :cc.Ref
 local Texture2D={ }

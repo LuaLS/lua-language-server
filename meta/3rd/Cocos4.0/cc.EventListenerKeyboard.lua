@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.EventListenerKeyboard :cc.EventListener
 local EventListenerKeyboard={ }

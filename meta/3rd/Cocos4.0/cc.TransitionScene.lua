@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.TransitionScene :cc.Scene
 local TransitionScene={ }

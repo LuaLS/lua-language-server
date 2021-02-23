@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Physics3DHingeConstraint :cc.Physics3DConstraint
 local Physics3DHingeConstraint={ }

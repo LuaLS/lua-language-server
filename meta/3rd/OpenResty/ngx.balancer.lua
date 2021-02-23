@@ -1,3 +1,4 @@
+---@meta
 ngx_balancer={}
 function ngx_balancer.set_current_peer(addr, port) end
 function ngx_balancer.set_timeouts(connect_timeout, send_timeout, read_timeout) end

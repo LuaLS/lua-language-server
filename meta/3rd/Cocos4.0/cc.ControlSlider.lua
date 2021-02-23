@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.ControlSlider :cc.Control
 local ControlSlider={ }

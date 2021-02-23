@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.EventDispatcher :cc.Ref
 local EventDispatcher={ }

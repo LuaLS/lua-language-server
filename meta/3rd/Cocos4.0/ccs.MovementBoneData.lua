@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.MovementBoneData :cc.Ref
 local MovementBoneData={ }

@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.LayerGradient :cc.LayerColor
 local LayerGradient={ }

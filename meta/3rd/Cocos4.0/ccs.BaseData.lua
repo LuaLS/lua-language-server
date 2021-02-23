@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.BaseData :cc.Ref
 local BaseData={ }

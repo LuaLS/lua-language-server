@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Physics3DSliderConstraint :cc.Physics3DConstraint
 local Physics3DSliderConstraint={ }

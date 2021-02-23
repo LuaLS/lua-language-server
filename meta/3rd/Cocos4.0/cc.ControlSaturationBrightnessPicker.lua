@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.ControlSaturationBrightnessPicker :cc.Control
 local ControlSaturationBrightnessPicker={ }

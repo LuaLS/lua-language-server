@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.MenuItemFont :cc.MenuItemLabel
 local MenuItemFont={ }

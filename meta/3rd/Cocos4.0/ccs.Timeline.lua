@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.Timeline :cc.Ref
 local Timeline={ }

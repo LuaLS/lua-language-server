@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.ActionFloat :cc.ActionInterval
 local ActionFloat={ }

@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Skybox :cc.Node
 local Skybox={ }

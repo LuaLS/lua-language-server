@@ -1,3 +1,4 @@
+---@meta
 ngx_ssl={}
 function ngx_ssl.set_der_priv_key(data) end
 function ngx_ssl.parse_pem_priv_key(pem) end

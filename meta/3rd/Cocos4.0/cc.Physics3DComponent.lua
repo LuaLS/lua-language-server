@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Physics3DComponent :cc.Component
 local Physics3DComponent={ }

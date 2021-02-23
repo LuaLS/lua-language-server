@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.ParticleBatchNode :cc.Node@all parent class: Node,TextureProtocol
 local ParticleBatchNode={ }

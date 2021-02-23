@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.FlipX3D :cc.Grid3DAction
 local FlipX3D={ }

@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.ReuseGrid :cc.ActionInstant
 local ReuseGrid={ }

@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Physics3D6DofConstraint :cc.Physics3DConstraint
 local Physics3D6DofConstraint={ }

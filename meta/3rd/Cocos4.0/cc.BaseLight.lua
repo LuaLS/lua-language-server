@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.BaseLight :cc.Node
 local BaseLight={ }

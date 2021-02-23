@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccs.AnimationData :cc.Ref
 local AnimationData={ }

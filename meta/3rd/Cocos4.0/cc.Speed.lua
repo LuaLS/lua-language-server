@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.Speed :cc.Action
 local Speed={ }

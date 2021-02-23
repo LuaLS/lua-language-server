@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.EventListenerTouchOneByOne :cc.EventListener
 local EventListenerTouchOneByOne={ }

@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccui.TextField :ccui.Widget
 local TextField={ }

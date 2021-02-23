@@ -1,3 +1,4 @@
+---@meta
 resty_sha224={}
 function resty_sha224.final(self) end
 function resty_sha224.new(self) end

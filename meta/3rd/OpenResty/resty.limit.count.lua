@@ -1,3 +1,4 @@
+---@meta
 resty_limit_count={}
 function resty_limit_count.uncommit(self, key) end
 function resty_limit_count.incoming(self, key, commit) end

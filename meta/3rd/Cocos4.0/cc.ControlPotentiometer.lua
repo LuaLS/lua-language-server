@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.ControlPotentiometer :cc.Control
 local ControlPotentiometer={ }

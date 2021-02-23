@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.PolygonInfo 
 local PolygonInfo={ }

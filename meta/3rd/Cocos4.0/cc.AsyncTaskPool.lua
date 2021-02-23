@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.AsyncTaskPool 
 local AsyncTaskPool={ }

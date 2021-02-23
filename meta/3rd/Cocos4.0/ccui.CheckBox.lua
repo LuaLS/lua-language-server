@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccui.CheckBox :ccui.AbstractCheckButton
 local CheckBox={ }

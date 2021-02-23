@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.AttachNode :cc.Node
 local AttachNode={ }

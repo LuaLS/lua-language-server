@@ -1,3 +1,4 @@
+---@meta
 
 ---@class ccui.RichElementCustomNode :ccui.RichElement
 local RichElementCustomNode={ }

@@ -1,3 +1,4 @@
+---@meta
 
 ---@class cc.LayerRadialGradient :cc.Layer
 local LayerRadialGradient={ }

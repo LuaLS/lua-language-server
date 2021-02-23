@@ -101,6 +101,14 @@ local function findSymbol(text, offset)
     return nil
 end
 
+local function findNearestSource(ast, offset)
+    local source
+    guide.eachSourceContain(ast.ast, offset, function (src)
+        source = src
+    end)
+    return source
+end
+
 local function findTargetSymbol(text, offset, symbol)
     offset = skipSpace(text, offset)
     for i = offset, 1, -1 do
@@ -1094,34 +1102,12 @@ local function checkEqualEnum(ast, text, offset, results)
         eqOrNeq = true
     end
     start = skipSpace(text, start - 1)
-    local source = guide.eachSourceContain(ast.ast, start, function (source)
-        if source.finish ~= start then
-            return
-        end
-        if source.type == 'getlocal'
-        or source.type == 'setlocal'
-        or source.type == 'local'
-        or source.type == 'getglobal'
-        or source.type == 'setglobal'
-        or source.type == 'getfield'
-        or source.type == 'setfield'
-        or source.type == 'getindex'
-        or source.type == 'setindex'
-        or source.type == 'tablefield'
-        or source.type == 'tableindex'
-        or source.type == 'call' then
-            return source
-        end
-        local parent = source.parent
-        if parent then
-            if parent.type == 'tablefield'
-            or parent.type == 'tableindex' then
-                return source
-            end
-        end
-    end)
+    local source = findNearestSource(ast, start)
     if not source then
         return
+    end
+    if source.type == 'callargs' then
+        source = source.parent
     end
     if source.type == 'call' and not eqOrNeq then
         return
@@ -1345,14 +1331,6 @@ local function getCallArgInfo(call, text, offset)
         end
     end
     return #call.args + 1, nil
-end
-
-local function findNearestSource(ast, offset)
-    local source
-    guide.eachSourceContain(ast.ast, offset, function (src)
-        source = src
-    end)
-    return source
 end
 
 local function getFuncParamByCallIndex(func, index)

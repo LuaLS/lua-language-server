@@ -30,6 +30,13 @@ return function (uri, callback)
                 if not name then
                     goto CONTINUE
                 end
+                local value = guide.getObjectValue(nxt)
+                if value then
+                    if value.type == 'boolean'
+                    or value.type == 'nil' then
+                        goto CONTINUE
+                    end
+                end
                 if not sets[name] then
                     sets[name] = {}
                 end

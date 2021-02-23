@@ -1031,3 +1031,21 @@ end
 
 return m
 ]]
+
+TEST [[
+local m = {}
+
+m.x = true
+m.x = false
+
+return m
+]]
+
+TEST [[
+local m = {}
+
+m.x = io.open()
+m.x = nil
+
+return m
+]]

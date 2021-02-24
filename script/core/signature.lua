@@ -21,7 +21,7 @@ local function findNearCall(uri, ast, pos)
             and text:sub(src.finish, src.finish) == '}' then
                 return
             end
-            if not nearCall or nearCall.start < src.start then
+            if not nearCall or nearCall.start <= src.start then
                 nearCall = src
             end
         end

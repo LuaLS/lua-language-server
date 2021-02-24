@@ -203,3 +203,14 @@ function f(a: any, b: any, c: any)
 ]],
     arg = {20, 25},
 }
+
+TEST [[
+for _ in pairs($) do
+end
+]]
+{
+    label = [[
+function pairs(t: table)
+]],
+    arg = {16, 23},
+}

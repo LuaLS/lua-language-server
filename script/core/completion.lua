@@ -874,9 +874,6 @@ local function checkUri(ast, text, offset, results)
                 if files.eq(myUri, uri) then
                     goto CONTINUE
                 end
-                if vm.isMetaFile(uri) then
-                    --goto CONTINUE
-                end
                 local path = workspace.getRelativePath(uri)
                 local infos = rpath.getVisiblePath(path, config.config.runtime.path)
                 for _, info in ipairs(infos) do
@@ -890,11 +887,15 @@ local function checkUri(ast, text, offset, results)
                                 }
                             }
                         end
-                        collect[info.expect][#collect[info.expect]+1] = ([=[* [%s](%s) %s]=]):format(
-                            path,
-                            uri,
-                            lang.script('HOVER_USE_LUA_PATH', info.searcher)
-                        )
+                        if vm.isMetaFile(uri) then
+                            collect[info.expect][#collect[info.expect]+1] = ('* [[meta]](%s)'):format(uri)
+                        else
+                            collect[info.expect][#collect[info.expect]+1] = ([=[* [%s](%s) %s]=]):format(
+                                path,
+                                uri,
+                                lang.script('HOVER_USE_LUA_PATH', info.searcher)
+                            )
+                        end
                     end
                 end
                 ::CONTINUE::

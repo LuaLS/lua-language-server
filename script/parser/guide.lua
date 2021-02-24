@@ -2004,6 +2004,22 @@ local function checkSameSimpleAndMergeFunctionReturnsByDoc(status, results, sour
     return true
 end
 
+local function checkSameSimpleAndMergeDocFunctionReturn(status, results, docFunc, index)
+    if docFunc.type ~= 'doc.type.function' then
+        return
+    end
+    local rtn = docFunc.returns[index]
+    if rtn then
+        local types = m.checkSameSimpleByDocType(status, rtn)
+        if types then
+            for _, res in ipairs(types) do
+                results[#results+1] = res
+            end
+            return true
+        end
+    end
+end
+
 local function checkSameSimpleAndMergeDocTypeFunctionReturns(status, results, source, index)
     if not source.bindDocs then
         return
@@ -2011,17 +2027,8 @@ local function checkSameSimpleAndMergeDocTypeFunctionReturns(status, results, so
     for _, doc in ipairs(source.bindDocs) do
         if doc.type == 'doc.type' then
             for _, typeUnit in ipairs(doc.types) do
-                if typeUnit.type == 'doc.type.function' then
-                    local rtn = typeUnit.returns[index]
-                    if rtn then
-                        local types = m.checkSameSimpleByDocType(status, rtn)
-                        if types then
-                            for _, res in ipairs(types) do
-                                results[#results+1] = res
-                            end
-                            return true
-                        end
-                    end
+                if checkSameSimpleAndMergeDocFunctionReturn(status, results, typeUnit, index) then
+                    return true
                 end
             end
         end
@@ -2031,13 +2038,14 @@ end
 function m.checkSameSimpleInCallInSameFile(status, func, args, index)
     local results = {}
     if func.special then
-        return results
+        --return results
     end
     local newStatus = m.status(status)
     m.searchRefs(newStatus, func, 'def')
     for _, def in ipairs(newStatus.results) do
         local hasDocReturn = checkSameSimpleAndMergeDocTypeFunctionReturns(status, results, def, index)
                         or   checkSameSimpleAndMergeFunctionReturnsByDoc(status, results, def, index, args)
+                        or   checkSameSimpleAndMergeDocFunctionReturn(status, results, def, index, args)
         if not hasDocReturn then
             local value = m.getObjectValue(def) or def
             if value.type == 'function' then
@@ -2665,6 +2673,8 @@ function m.checkSameSimple(status, simple, ref, start, force, mode, pushQueue)
             m.checkSameSimpleInSpecialBranch(status, ref, i, pushQueue)
             -- self 的特殊处理
             m.checkSameSimpleInParamSelf(status, ref, i, pushQueue)
+            -- 自己是 call 的情况
+            m.checkSameSimpleInCall(status, ref, i, pushQueue, cmode)
             if cmode == 'ref' then
                 -- 检查形如 { a = f } 的情况
                 m.checkSameSimpleAsTableField(status, ref, i, pushQueue)

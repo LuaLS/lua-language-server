@@ -385,3 +385,8 @@ local t = {}
 
 print(t.<?a?>)
 ]]
+
+TEST 'integer' [[
+for <?i?> in ipairs() do
+end
+]]

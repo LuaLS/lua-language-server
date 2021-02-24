@@ -120,6 +120,9 @@ function m.getNativeMatcher()
     end
     -- config.workspace.library
     for path in pairs(config.config.workspace.library) do
+        path = path:gsub('${(.-)}', {
+            meta = (ROOT / 'meta' / '3rd'):string(),
+        })
         log.info('Ignore by library:', path)
         pattern[#pattern+1] = path
     end
@@ -138,6 +141,9 @@ function m.getLibraryMatchers()
 
     local librarys = {}
     for path in pairs(config.config.workspace.library) do
+        path = path:gsub('${(.-)}', {
+            meta = (ROOT / 'meta' / '3rd'):string(),
+        })
         librarys[m.normalize(path)] = true
     end
     if library.metaPath then

@@ -390,3 +390,18 @@ TEST 'integer' [[
 for <?i?> in ipairs() do
 end
 ]]
+
+-- TODO
+--TEST 'string' [[
+-----@type table<string, boolean>
+--local t
+--for <?k?>, v in ipairs(t) do
+--end
+--]]
+--
+--TEST 'boolean' [[
+-----@type table<string, boolean>
+--local t
+--for k, <?v?> in ipairs(t) do
+--end
+--]]

@@ -6,6 +6,7 @@
 * `CHG` completion: improve field and table
 * `CHG` improve infer cross `ipairs`
 * `CHG` cache globals when loading
+* `CHG` completion: remove trigger character `\n` for now, see [#401](https://github.com/sumneko/lua-language-server/issues/401)
 * `FIX` diagnositc: may open file with wrong uri case
 * `FIX` [#406](https://github.com/sumneko/lua-language-server/issues/406)
 

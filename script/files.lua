@@ -266,6 +266,7 @@ end
 
 --- 移除所有文件
 function m.removeAll()
+    local ws = require 'workspace.workspace'
     m.globalVersion = m.globalVersion + 1
     await.close('files.version')
     m._pairsCache = nil
@@ -278,6 +279,7 @@ function m.removeAll()
             m.onWatch('remove', uri)
         end
     end
+    ws.flushCache()
     --m.notifyCache = {}
 end
 

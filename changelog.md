@@ -4,6 +4,7 @@
 * `NEW` diagnostic: `duplicate-set-field`
 * `NEW` diagnostic: `no-implicit-any`, disabled by default
 * `CHG` completion: improve field and table
+* `CHG` cache globals when loading
 * `FIX` diagnositc: may open file with wrong uri case
 * `FIX` [#406](https://github.com/sumneko/lua-language-server/issues/406)
 

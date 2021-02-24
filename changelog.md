@@ -1,6 +1,7 @@
 # changelog
 
-## 1.16.2
+## 1.17.0
+`2021-2-24`
 * `NEW` diagnostic: `duplicate-set-field`
 * `NEW` diagnostic: `no-implicit-any`, disabled by default
 * `CHG` completion: improve field and table

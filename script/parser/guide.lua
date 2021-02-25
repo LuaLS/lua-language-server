@@ -1510,7 +1510,9 @@ function m.getObjectValue(obj)
     if obj.type == 'boolean'
     or obj.type == 'number'
     or obj.type == 'integer'
-    or obj.type == 'string' then
+    or obj.type == 'string'
+    or obj.type == 'doc.type.table'
+    or obj.type == 'doc.type.arrary' then
         return obj
     end
     if obj.value then
@@ -1645,6 +1647,35 @@ local function appendValidGenericType(results, status, typeName, obj)
     end
 end
 
+local function stepRefOfGenericCrossTable(status, doc, typeName)
+    for _, typeUnit in ipairs(doc.extends.types) do
+        if typeUnit.type == 'doc.type.table' then
+            for _, where in ipairs {'key', 'value'} do
+                local childTypes = typeUnit[where].types
+                for _, childName in ipairs(childTypes) do
+                    if childName[1] == typeName[1] then
+                        return function (obj)
+                            local childStatus = m.status(status)
+                            m.searchRefs(childStatus, obj, 'def')
+                            for _, res in ipairs(childStatus.results) do
+                                if res.type == 'doc.type.table' then
+                                    return res[where]
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+            return function (obj)
+                return nil
+            end
+        end
+    end
+    return function (obj)
+        return obj
+    end
+end
+
 local function stepRefOfGeneric(status, typeUnit, args, mode)
     local results = {}
     if not args then
@@ -1662,6 +1693,7 @@ local function stepRefOfGeneric(status, typeUnit, args, mode)
         if not doc.bindSources then
             goto CONTINUE
         end
+        local crossTable = stepRefOfGenericCrossTable(status, doc, typeName)
         local paramName = doc.param[1]
         for _, source in ipairs(doc.bindSources) do
             if  source.type == 'local'
@@ -1669,7 +1701,7 @@ local function stepRefOfGeneric(status, typeUnit, args, mode)
             and source.parent.type == 'funcargs' then
                 for index, arg in ipairs(source.parent) do
                     if arg == source then
-                        appendValidGenericType(results, status, typeName, args[index])
+                        appendValidGenericType(results, status, typeName, crossTable(args[index]))
                     end
                 end
             end
@@ -2500,7 +2532,9 @@ function m.pushResult(status, mode, ref, simple)
         elseif ref.type == 'doc.type.function'
         or     ref.type == 'doc.class.name'
         or     ref.type == 'doc.alias.name'
-        or     ref.type == 'doc.field' then
+        or     ref.type == 'doc.field'
+        or     ref.type == 'doc.type.table'
+        or     ref.type == 'doc.type.array' then
             results[#results+1] = ref
         elseif ref.type == 'doc.type' then
             if #ref.enums > 0 or #ref.resumes > 0 then
@@ -2547,7 +2581,9 @@ function m.pushResult(status, mode, ref, simple)
         elseif ref.type == 'doc.type.function'
         or     ref.type == 'doc.class.name'
         or     ref.type == 'doc.alias.name'
-        or     ref.type == 'doc.field' then
+        or     ref.type == 'doc.field'
+        or     ref.type == 'doc.type.table'
+        or     ref.type == 'doc.type.array' then
             results[#results+1] = ref
         elseif ref.type == 'doc.type' then
             if #ref.enums > 0 or #ref.resumes > 0 then

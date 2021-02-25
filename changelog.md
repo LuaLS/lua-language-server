@@ -1,5 +1,8 @@
 # changelog
 
+## 1.17.1
+* `CHG` intelli-scense: improve infer cross `table<K, V>`, which `K` and `V` is generic.
+
 ## 1.17.0
 `2021-2-24`
 * `NEW` diagnostic: `duplicate-set-field`

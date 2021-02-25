@@ -3122,6 +3122,7 @@ function m.viewInferType(infers)
     local mark = {}
     local types = {}
     local hasDoc
+    local hasDocTable
     for i = 1, #infers do
         local infer = infers[i]
         local src = infer.source
@@ -3132,7 +3133,10 @@ function m.viewInferType(infers)
         or src.type == 'doc.type.table' then
             if infer.type ~= 'any' then
                 hasDoc = true
-                break
+            end
+            if src.type == 'doc.type.array'
+            or src.type == 'doc.type.table' then
+                hasDocTable = true
             end
         end
     end
@@ -3148,11 +3152,15 @@ function m.viewInferType(infers)
             or src.type == 'doc.type.enum'
             or src.type == 'doc.resume' then
                 local tp = infer.type or 'any'
+                if hasDocTable and tp == 'table' then
+                    goto CONTINUE
+                end
                 if not mark[tp] then
                     types[#types+1] = tp
                 end
                 mark[tp] = true
             end
+            ::CONTINUE::
         end
     else
         for i = 1, #infers do

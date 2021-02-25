@@ -1538,3 +1538,18 @@ local u: number {
     x: any,
 }
 ]]
+
+TEST [[
+---@generic K, V
+---@param t table<K, V>
+---@return K
+---@return V
+local function next(t) end
+
+---@type table<string, boolean>
+local t
+local k, v = next(<?t?>)
+]]
+[[
+local t: table<string, boolean>
+]]

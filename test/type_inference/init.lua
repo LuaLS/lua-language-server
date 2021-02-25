@@ -391,17 +391,58 @@ for <?i?> in ipairs() do
 end
 ]]
 
--- TODO
+TEST 'table<string, boolean>' [[
+---@generic K, V
+---@param t table<K, V>
+---@return K
+---@return V
+local function next(t) end
+
+---@type table<string, boolean>
+local t
+local k, v = next(<?t?>)
+]]
+
+--TEST 'string' [[
+-----@generic K, V
+-----@param t table<K, V>
+-----@return K
+-----@return V
+--local function next(t) end
+--
+-----@type table<string, boolean>
+--local t
+--local <?k?>, v = next(t)
+--]]
+--
+--TEST 'boolean' [[
+-----@generic K, V
+-----@param t table<K, V>
+-----@return K
+-----@return V
+--local function next(t) end
+--
+-----@type table<string, boolean>
+--local t
+--local k, <?v?> = next(t)
+--]]
+--
+--TEST 'boolean' [[
+-----@type table<string, boolean>
+--local t
+--local k, <?v?> = next(t)
+--]]
+--
 --TEST 'string' [[
 -----@type table<string, boolean>
 --local t
---for <?k?>, v in ipairs(t) do
+--for <?k?>, v in pairs(t) do
 --end
 --]]
 --
 --TEST 'boolean' [[
 -----@type table<string, boolean>
 --local t
---for k, <?v?> in ipairs(t) do
+--for k, <?v?> in pairs(t) do
 --end
 --]]

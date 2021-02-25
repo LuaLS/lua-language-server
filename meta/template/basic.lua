@@ -124,20 +124,20 @@ function loadstring(text, chunkname) end
 function module(name, ...) end
 
 ---#DES 'next'
----@param table  table
----@param index? any
----@return any key
----@return any value
+---@generic K, V
+---@param table table<K, V>
+---@param index? K
+---@return K
+---@return V
 function next(table, index) end
 
 ---#DES 'paris'
----@param t table
----@return function next
----@return table
+---@generic T: table, K, V
+---@param t T
+---@return fun(table: table<K, V>, index: K):K, V
+---@return T
 ---@return nil
-function pairs(t)
-    return next
-end
+function pairs(t) end
 
 ---#DES 'pcall'
 ---@param f     function

@@ -1,5 +1,4 @@
 local lm = require 'luamake'
-local platform = require "bee.platform"
 
 lm.arch = 'x64'
 
@@ -13,14 +12,12 @@ lm:import '3rd/bee.lua/make.lua'
 
 lm.rootdir = '3rd/'
 
-lm:shared_library 'lpeglabel' {
-    deps = platform.OS == "Windows" and "lua54" or "lua",
+lm:lua_dll 'lpeglabel' {
     sources = 'lpeglabel/*.c',
     visibility = 'default',
     defines = {
         'MAXRECLEVEL=1000',
     },
-    ldflags = platform.OS == "Windows" and "/EXPORT:luaopen_lpeglabel",
 }
 
 lm:build 'install' {

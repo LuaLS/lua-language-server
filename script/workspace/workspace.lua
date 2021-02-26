@@ -19,6 +19,7 @@ m.type = 'workspace'
 m.nativeVersion  = -1
 m.libraryVersion = -1
 m.nativeMatcher  = nil
+m.waitingReady   = {}
 m.requireCache   = {}
 m.cache          = {}
 m.matchOption    = {
@@ -477,14 +478,21 @@ function m.awaitReload()
     plugin.init()
     m.awaitPreload()
     m.ready = true
+    local waiting = m.waitingReady
+    m.waitingReady = {}
+    for _, waker in ipairs(waiting) do
+        waker()
+    end
 end
 
 ---等待工作目录加载完成
 function m.awaitReady()
-    -- TODO maintain order
-    while not m.ready do
-        await.sleep(0.1)
+    if m.isReady() then
+        return
     end
+    await.wait(function (waker)
+        m.waitingReady[#m.waitingReady+1] = waker
+    end)
 end
 
 function m.isReady()

@@ -5,6 +5,7 @@ local await  = require "await"
 
 ---@class plugin
 local m = {}
+m.waitingReady = {}
 
 function m.dispatch(event, ...)
     if not m.interface then
@@ -28,10 +29,12 @@ function m.isReady()
 end
 
 function m.awaitReady()
-    -- TODO maintain order
-    while m.interface == nil do
-        await.sleep(0.1)
+    if m.isReady() then
+        return
     end
+    await.wait(function (waker)
+        m.waitingReady[#m.waitingReady+1] = waker
+    end)
 end
 
 function m.init()
@@ -55,6 +58,11 @@ function m.init()
         return
     end
     xpcall(f, log.error, f)
+    local waiting = m.waitingReady
+    m.waitingReady = {}
+    for _, waker in ipairs(waiting) do
+        waker()
+    end
 end
 
 return m

@@ -1,8 +1,8 @@
 # changelog
 
 ## 1.17.1
-* `CHG` intelli-scense: improve infer cross `table<K, V>`, which `K` and `V` is generic.
-* `CHG` intelli-scense: improve infer cross `pairs`
+* `CHG` intelli-scense: improve infer across `table<K, V>` and `V[]`.
+* `CHG` intelli-scense: improve infer across `pairs` and `ipairs`
 * `FIX` [#398](https://github.com/sumneko/lua-language-server/issues/398)
 
 ## 1.17.0

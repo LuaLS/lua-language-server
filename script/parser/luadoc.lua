@@ -256,7 +256,7 @@ local function nextSymbolOrError(symbol)
     return false
 end
 
-local function parseTypeUnitArray(node)
+local function parseTypeUnitArray(parent, node)
     if not checkToken('symbol', '[]', 1) then
         return nil
     end
@@ -266,6 +266,7 @@ local function parseTypeUnitArray(node)
         start  = node.start,
         finish = getFinish(),
         node   = node,
+        parent = parent,
     }
     node.parent = result
     return result
@@ -413,7 +414,7 @@ local function parseTypeUnit(parent, content)
     end
     result.parent = parent
     while true do
-        local newResult = parseTypeUnitArray(result)
+        local newResult = parseTypeUnitArray(parent, result)
                     or    parseTypeUnitTable(parent, result)
         if not newResult then
             break

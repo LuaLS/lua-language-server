@@ -99,6 +99,7 @@ m.childMap = {
     ['doc.generic']        = {'#generics', 'comment'},
     ['doc.generic.object'] = {'generic', 'extends', 'comment'},
     ['doc.vararg']         = {'vararg', 'comment'},
+    ['doc.type.array']     = {'node'},
     ['doc.type.table']     = {'node', 'key', 'value', 'comment'},
     ['doc.type.function']  = {'#args', '#returns', 'comment'},
     ['doc.type.typeliteral']  = {'node'},
@@ -1670,6 +1671,16 @@ local function stepRefOfGenericCrossTable(status, doc, typeName)
             return function (obj)
                 return nil
             end
+        elseif typeUnit.type == 'doc.type.array' then
+            return function (obj)
+                local childStatus = m.status(status)
+                m.searchRefs(childStatus, obj, 'def')
+                for _, res in ipairs(childStatus.results) do
+                    if res.type == 'doc.type.array' then
+                        return res.node
+                    end
+                end
+            end
         end
     end
     return function (obj)
@@ -1702,6 +1713,7 @@ local function stepRefOfGeneric(status, typeUnit, args, mode)
         end
         local docArg = m.getParentType(typeName, 'doc.type.arg')
                    or  m.getParentType(typeName, 'doc.param')
+                   or  m.getParentType(typeName, 'doc.type.array')
         if not docArg then
             goto CONTINUE
         end

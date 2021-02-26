@@ -23,20 +23,6 @@ lm:shared_library 'lpeglabel' {
     ldflags = platform.OS == "Windows" and "/EXPORT:luaopen_lpeglabel",
 }
 
-if platform.OS == "Windows" then
-    lm:executable 'rcedit' {
-        sources = 'rcedit/src/*.cc',
-        defines = {
-            '_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING'
-        },
-        flags = {
-            '/wd4477',
-            '/wd4244',
-            '/wd4267',
-        }
-    }
-end
-
 lm:build 'install' {
     '$luamake', 'lua', 'make/install.lua', lm.plat,
     deps = {
@@ -44,7 +30,6 @@ lm:build 'install' {
         'lpeglabel',
         'bee',
         'bootstrap',
-        platform.OS == "Windows" and "rcedit"
     }
 }
 

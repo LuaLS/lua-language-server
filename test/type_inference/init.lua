@@ -436,6 +436,42 @@ local <?r?> = f(true)
 ]]
 
 TEST 'string' [[
+---@generic K, V
+---@type fun(arg: table<K, V>):K, V
+local f
+
+---@type table<string, boolean>
+local t
+
+local <?k?>, v = f(t)
+]]
+
+TEST 'boolean' [[
+---@generic K, V
+---@type fun(arg: table<K, V>):K, V
+local f
+
+---@type table<string, boolean>
+local t
+
+local k, <?v?> = f(t)
+]]
+
+TEST 'function' [[
+---@return fun()
+local function f() end
+
+local <?r?> = f()
+]]
+
+TEST 'table<string, boolean>' [[
+---@return table<string, boolean>
+local function f() end
+
+local <?r?> = f()
+]]
+
+TEST 'string' [[
 ---@generic T: table, K, V
 ---@param t T
 ---@return fun(table: table<K, V>, index: K):K, V

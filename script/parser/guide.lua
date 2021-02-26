@@ -3512,6 +3512,17 @@ function m.inferCheckDoc(status, source)
         end
         return true
     end
+    if source.type == 'doc.type.function'
+    or source.type == 'doc.type.table'
+    or source.type == 'doc.type.array' then
+        local typeName = m.getDocTypeUnitName(status, source)
+        status.results[#status.results+1] = {
+            type   = typeName,
+            source = source,
+            level  = 100,
+        }
+        return true
+    end
     if source.type == 'doc.field' then
         local results = m.getDocTypeNames(status, source.extends)
         for _, res in ipairs(results) do

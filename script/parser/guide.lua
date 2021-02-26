@@ -1677,6 +1677,19 @@ local function stepRefOfGenericCrossTable(status, doc, typeName)
     end
 end
 
+local function getIteratorArg(status, args, index)
+    local call = args.parent
+    local node = call.node
+    if not node.iterator then
+        return nil
+    end
+    if node.type ~= 'call' then
+        return nil
+    end
+    local results = m.checkSameSimpleInCallInSameFile(status, node.node, node.args, index + 1)
+    return results[1]
+end
+
 local function stepRefOfGeneric(status, typeUnit, args, mode)
     local results = {}
     if not args then
@@ -1723,7 +1736,13 @@ local function stepRefOfGeneric(status, typeUnit, args, mode)
             end
         end
 
-        appendValidGenericType(results, status, typeName, crossTable(args[genericIndex]))
+        local callArg = args[genericIndex]
+                    or  getIteratorArg(status, args, genericIndex)
+
+        if not callArg then
+            goto CONTINUE
+        end
+        appendValidGenericType(results, status, typeName, crossTable(callArg))
         ::CONTINUE::
     end
     return results

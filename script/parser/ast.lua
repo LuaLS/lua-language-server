@@ -1447,6 +1447,7 @@ local Defs = {
             call.node = func
             call.start = func.start
             func.next = call
+            func.iterator = true
             values = { call }
             keys.range = call.finish
         end

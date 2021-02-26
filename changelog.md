@@ -2,6 +2,7 @@
 
 ## 1.17.1
 * `CHG` intelli-scense: improve infer cross `table<K, V>`, which `K` and `V` is generic.
+* `CHG` intelli-scense: improve infer cross `pairs`
 * `FIX` [#398](https://github.com/sumneko/lua-language-server/issues/398)
 
 ## 1.17.0

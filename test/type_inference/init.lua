@@ -472,15 +472,63 @@ local <?r?> = f()
 ]]
 
 TEST 'string' [[
+---@generic K, V
+---@return fun(arg: table<K, V>):K, V
+local function f() end
+
+local f2 = f()
+
+---@type table<string, boolean>
+local t
+
+local <?k?>, v = f2(t)
+]]
+
+TEST 'string' [[
 ---@generic T: table, K, V
 ---@param t T
 ---@return fun(table: table<K, V>, index: K):K, V
 ---@return T
 ---@return nil
-function pairs(t) end
+local function pairs(t) end
+
+local f = pairs(t)
 
 ---@type table<string, boolean>
 local t
+
+for <?k?>, v in f, t do
+end
+]]
+
+TEST 'boolean' [[
+---@generic T: table, K, V
+---@param t T
+---@return fun(table: table<K, V>, index: K):K, V
+---@return T
+---@return nil
+local function pairs(t) end
+
+local f = pairs(t)
+
+---@type table<string, boolean>
+local t
+
+for k, <?v?> in f, t do
+end
+]]
+
+TEST 'string' [[
+---@generic T: table, K, V
+---@param t T
+---@return fun(table: table<K, V>, index: K):K, V
+---@return T
+---@return nil
+local function pairs(t) end
+
+---@type table<string, boolean>
+local t
+
 for <?k?>, v in pairs(t) do
 end
 ]]
@@ -491,10 +539,11 @@ TEST 'boolean' [[
 ---@return fun(table: table<K, V>, index: K):K, V
 ---@return T
 ---@return nil
-function pairs(t) end
+local function pairs(t) end
 
 ---@type table<string, boolean>
 local t
+
 for k, <?v?> in pairs(t) do
 end
 ]]

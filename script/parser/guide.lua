@@ -1687,26 +1687,43 @@ local function stepRefOfGeneric(status, typeUnit, args, mode)
         if typeName == typeUnit then
             goto CONTINUE
         end
-        local doc = m.getDocState(typeName)
-        if doc.type ~= 'doc.param' then
+        local docArg = m.getParentType(typeName, 'doc.type.arg')
+                   or  m.getParentType(typeName, 'doc.param')
+        if not docArg then
             goto CONTINUE
         end
+        local doc = m.getDocState(docArg)
         if not doc.bindSources then
             goto CONTINUE
         end
-        local crossTable = stepRefOfGenericCrossTable(status, doc, typeName)
-        local paramName = doc.param[1]
-        for _, source in ipairs(doc.bindSources) do
-            if  source.type == 'local'
-            and source[1] == paramName
-            and source.parent.type == 'funcargs' then
-                for index, arg in ipairs(source.parent) do
-                    if arg == source then
-                        appendValidGenericType(results, status, typeName, crossTable(args[index]))
+        local crossTable = stepRefOfGenericCrossTable(status, docArg, typeName)
+
+        -- find out param index
+        local genericIndex
+        if docArg.type == 'doc.param' then
+            local paramName = docArg.param[1]
+            for _, source in ipairs(doc.bindSources) do
+                if  source.type == 'local'
+                and source[1] == paramName
+                and source.parent.type == 'funcargs' then
+                    for index, arg in ipairs(source.parent) do
+                        if arg == source then
+                            genericIndex = index
+                            break
+                        end
                     end
                 end
             end
+        elseif docArg.type == 'doc.type.arg' then
+            for index, arg in ipairs(docArg.parent.args) do
+                if arg == docArg then
+                    genericIndex = index
+                    break
+                end
+            end
         end
+
+        appendValidGenericType(results, status, typeName, crossTable(args[genericIndex]))
         ::CONTINUE::
     end
     return results
@@ -2037,13 +2054,13 @@ local function checkSameSimpleAndMergeFunctionReturnsByDoc(status, results, sour
     return true
 end
 
-local function checkSameSimpleAndMergeDocFunctionReturn(status, results, docFunc, index)
+local function checkSameSimpleAndMergeDocFunctionReturn(status, results, docFunc, index, args)
     if docFunc.type ~= 'doc.type.function' then
         return
     end
     local rtn = docFunc.returns[index]
     if rtn then
-        local types = m.checkSameSimpleByDocType(status, rtn)
+        local types = m.checkSameSimpleByDocType(status, rtn, args)
         if types then
             for _, res in ipairs(types) do
                 results[#results+1] = res

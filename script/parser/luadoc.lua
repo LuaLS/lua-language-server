@@ -998,7 +998,8 @@ local function bindGeneric(binded)
                 generics[name] = {}
             end
         elseif doc.type == 'doc.param'
-        or     doc.type == 'doc.return' then
+        or     doc.type == 'doc.return'
+        or     doc.type == 'doc.type' then
             guide.eachSourceType(doc, 'doc.type.name', function (src)
                 local name = src[1]
                 if generics[name] then

@@ -427,6 +427,14 @@ local t
 local k, <?v?> = next(t)
 ]]
 
+TEST 'boolean' [[
+---@generic K
+---@type fun(arg: K):K
+local f
+
+local <?r?> = f(true)
+]]
+
 TEST 'string' [[
 ---@generic T: table, K, V
 ---@param t T

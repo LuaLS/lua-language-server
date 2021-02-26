@@ -210,7 +210,7 @@ end
 ]]
 {
     label = [[
-function pairs(t: table)
+function pairs(t: <T>)
 ]],
-    arg = {16, 23},
+    arg = {16, 21},
 }

@@ -638,15 +638,6 @@ local <?n?> = rawlen()
 local n: integer
 ]]
 
-TEST[[
-<?next?>()
-]]
-[[
-function next(table: table, index?: any)
-  -> key: any
-  2. value: any
-]]
-
 -- TODO 暂未实现
 --TEST[[
 --local <?n?> = pairs()

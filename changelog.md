@@ -1,6 +1,7 @@
 # changelog
 
 ## 1.17.1
+`2021-3-1`
 * `CHG` intelli-scense: improve infer across `table<K, V>` and `V[]`.
 * `CHG` intelli-scense: improve infer across `pairs` and `ipairs`
 * `FIX` hover: shows nothing when hovering unknown function

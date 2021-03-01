@@ -431,9 +431,6 @@ proto.on('textDocument/prepareRename', function (params)
 end)
 
 proto.on('textDocument/completion', function (params)
-    await.close('completion')
-    await.setID('completion')
-    await.sleep(0.01)
     workspace.awaitReady()
     local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_COMPLETION, 0.5)
     --log.info(util.dump(params))
@@ -827,6 +824,7 @@ do
     files.watch(function (ev, uri)
         if ev == 'update'
         or ev == 'updateVisible' then
+            await.delay()
             await.call(function ()
                 updateHint(uri)
             end)

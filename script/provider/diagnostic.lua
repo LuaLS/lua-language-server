@@ -246,6 +246,7 @@ function m.refresh(uri)
         return
     end
     await.call(function ()
+        await.delay()
         if uri then
             m.doDiagnostic(uri)
         end

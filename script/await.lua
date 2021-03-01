@@ -81,13 +81,10 @@ function m.close(id)
     if not map then
         return
     end
-    local count = 0
     for co in pairs(map) do
         map[co] = nil
         coroutine.close(co)
-        count = count + 1
     end
-    --log.debug('Close await:', id, count)
 end
 
 function m.hasID(id, co)

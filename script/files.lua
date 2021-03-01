@@ -387,7 +387,7 @@ function m.compileAst(uri, text)
     if passed > 0.1 then
         log.warn(('Compile [%s] takes [%.3f] sec, size [%.3f] kb.'):format(uri, passed, #text / 1000))
     end
-    await.delay()
+    --await.delay()
     if state then
         state.uri = uri
         state.ast.uri = uri
@@ -429,7 +429,7 @@ function m.getAst(uri)
     if not ast then
         ast = m.compileAst(uri, file.text)
         m.astMap[uri] = ast
-        await.delay()
+        --await.delay()
     end
     file.cacheActiveTime = timer.clock()
     return ast

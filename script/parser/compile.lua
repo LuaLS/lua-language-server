@@ -540,7 +540,7 @@ return function (self, lua, mode, version, options)
     if not state then
         return nil, err
     end
-    if options.delay then
+    if options and options.delay then
         options.delay()
     end
     local clock = os.clock()

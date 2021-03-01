@@ -69,6 +69,9 @@ end
 --- 设置一个id，用于批量关闭任务
 function m.setID(id, co)
     co = co or coroutine.running()
+    if not coroutine.isyieldable(co) then
+        return
+    end
     if not m.idMap[id] then
         m.idMap[id] = setmetatable({}, { __mode = 'k' })
     end

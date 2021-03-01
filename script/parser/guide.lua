@@ -3198,6 +3198,20 @@ function m.mergeTypes(types)
     return tableConcat(results, '|')
 end
 
+function m.getClassExtends(class)
+    if class.type == 'doc.class.name' then
+        class = class.parent
+    end
+    if not class.extends then
+        return nil
+    end
+    local names = {}
+    for _, ext in ipairs(class.extends) do
+        names[#names+1] = ext[1]
+    end
+    return names
+end
+
 function m.viewInferType(infers)
     if not infers then
         return 'any'
@@ -3237,9 +3251,25 @@ function m.viewInferType(infers)
                 if hasDocTable and tp == 'table' then
                     goto CONTINUE
                 end
-                types[tp] = true
+                if types[tp] == nil then
+                    types[tp] = true
+                end
+            end
+            if src.type == 'doc.class'
+            or src.type == 'doc.class.name' then
+                local extends = m.getClassExtends(src)
+                if extends then
+                    for _, tp in ipairs(extends) do
+                        types[tp] = false
+                    end
+                end
             end
             ::CONTINUE::
+        end
+        for k, v in pairs(types) do
+            if not v then
+                types[k] = nil
+            end
         end
     else
         for i = 1, #infers do

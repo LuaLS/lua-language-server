@@ -562,3 +562,16 @@ local t
 for _, <?v?> in ipairs(t) do
 end
 ]]
+
+TEST 'E' [[
+---@class A
+---@class B: A
+---@class C: B
+---@class D: C
+---@class E: D
+local m
+
+function m:f()
+    return <?self?>
+end
+]]

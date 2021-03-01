@@ -1562,3 +1562,12 @@ local self: E {
     f: function,
 }
 ]]
+
+TEST [[
+local f
+
+<?f?>()
+]]
+[[
+local f: any
+]]

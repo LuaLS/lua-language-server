@@ -20,6 +20,28 @@ local function eachFunctionAndOverload(value, callback)
     end
 end
 
+local function getHoverAsValue(source)
+    local oop = source.type == 'method'
+             or source.type == 'getmethod'
+             or source.type == 'setmethod'
+    local label = getLabel(source, oop)
+    local desc  = getDesc(source)
+    if not desc then
+        local values = vm.getDefs(source, 0)
+        for _, def in ipairs(values) do
+            desc = getDesc(def)
+            if desc then
+                break
+            end
+        end
+    end
+    return {
+        label       = label,
+        source      = source,
+        description = desc,
+    }
+end
+
 local function getHoverAsFunction(source)
     local values = vm.getDefs(source, 0)
     local desc   = getDesc(source)
@@ -59,6 +81,10 @@ local function getHoverAsFunction(source)
         end
     end
 
+    if defs == 0 then
+        return getHoverAsValue(source)
+    end
+
     if defs == 1 and other == 0 then
         return {
             label       = next(labels),
@@ -82,28 +108,6 @@ local function getHoverAsFunction(source)
         lines[#lines+1] = next(labels)
     end
     local label = table.concat(lines, '\n')
-    return {
-        label       = label,
-        source      = source,
-        description = desc,
-    }
-end
-
-local function getHoverAsValue(source)
-    local oop = source.type == 'method'
-             or source.type == 'getmethod'
-             or source.type == 'setmethod'
-    local label = getLabel(source, oop)
-    local desc  = getDesc(source)
-    if not desc then
-        local values = vm.getDefs(source, 0)
-        for _, def in ipairs(values) do
-            desc = getDesc(def)
-            if desc then
-                break
-            end
-        end
-    end
     return {
         label       = label,
         source      = source,

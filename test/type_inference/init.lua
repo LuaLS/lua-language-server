@@ -87,7 +87,7 @@ TEST 'table' [[
 local <?t?> = {}
 ]]
 
-TEST 'function' [[
+TEST 'any' [[
 <?x?>()
 ]]
 

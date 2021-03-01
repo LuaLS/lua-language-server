@@ -3,6 +3,7 @@
 ## 1.17.1
 * `CHG` intelli-scense: improve infer across `table<K, V>` and `V[]`.
 * `CHG` intelli-scense: improve infer across `pairs` and `ipairs`
+* `FIX` hover: shows nothing when hovering unknown function
 * `FIX` [#398](https://github.com/sumneko/lua-language-server/issues/398)
 * `FIX` [#421](https://github.com/sumneko/lua-language-server/issues/421)
 * `FIX` [#422](https://github.com/sumneko/lua-language-server/issues/422)

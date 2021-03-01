@@ -4609,7 +4609,7 @@ function m.searchInfer(status, obj)
         m.inferByDef(status, obj)
         tracy.ZoneEnd()
     end
-    m.inferByCall(status, obj)
+    --m.inferByCall(status, obj)
     m.inferByGetTable(status, obj)
     m.inferByUnary(status, obj)
     m.inferByBinary(status, obj)

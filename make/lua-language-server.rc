@@ -1,0 +1,2 @@
+#include "Windows.h"
+10086 ICON "make/icon.ico"

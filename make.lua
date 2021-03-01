@@ -8,7 +8,9 @@ if lm.plat == "macos" then
     }
 end
 
-lm:import '3rd/bee.lua/make.lua'
+lm:import("3rd/bee.lua/make.lua", {
+    EXE_RESOURCE = "../../make/lua-language-server.rc"
+})
 
 lm.rootdir = '3rd/'
 

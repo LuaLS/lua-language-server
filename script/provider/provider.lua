@@ -429,7 +429,7 @@ proto.on('textDocument/prepareRename', function (params)
         placeholder = result.text,
     }
 end)
-require 'tracy'.enable()
+
 proto.on('textDocument/completion', function (params)
     await.close('completion')
     await.setID('completion')
@@ -724,7 +724,6 @@ proto.on('textDocument/semanticTokens/full', function (params)
     local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SEMANTIC_FULL, 0.5)
     local core = require 'core.semantic-tokens'
     local uri = params.textDocument.uri
-    log.debug('semanticTokens/full', uri)
     local text  = files.getText(uri)
     while not text do
         await.sleep(0.1)
@@ -741,7 +740,6 @@ proto.on('textDocument/semanticTokens/range', function (params)
     local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SEMANTIC_RANGE, 0.5)
     local core = require 'core.semantic-tokens'
     local uri = params.textDocument.uri
-    log.debug('semanticTokens/range', uri)
     while not files.exists(uri) do
         await.sleep(0.1)
     end

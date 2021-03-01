@@ -1544,3 +1544,21 @@ local k, v = next(<?t?>)
 [[
 local t: table<string, boolean>
 ]]
+
+TEST [[
+---@class A
+---@class B: A
+---@class C: B
+---@class D: C
+---@class E: D
+local m
+
+function m:f()
+    return <?self?>
+end
+]]
+[[
+local self: E {
+    f: function,
+}
+]]

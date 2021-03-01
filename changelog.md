@@ -4,6 +4,7 @@
 * `CHG` intelli-scense: improve infer across `table<K, V>` and `V[]`.
 * `CHG` intelli-scense: improve infer across `pairs` and `ipairs`
 * `FIX` [#398](https://github.com/sumneko/lua-language-server/issues/398)
+* `FIX` [#421](https://github.com/sumneko/lua-language-server/issues/421)
 
 ## 1.17.0
 `2021-2-24`

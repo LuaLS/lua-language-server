@@ -3663,7 +3663,8 @@ function m.inferCheckUpDoc(status, source)
         return
     end
     status.results = {}
-    for _, doc in ipairs(binds) do
+    for i = #binds, 1, -1 do
+        local doc = binds[i]
         if doc.type == 'doc.class' then
             status.results[#status.results+1] = {
                 type   = doc.class[1],

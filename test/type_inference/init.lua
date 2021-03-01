@@ -568,6 +568,7 @@ TEST 'E' [[
 ---@class B: A
 ---@class C: B
 ---@class D: C
+
 ---@class E: D
 local m
 

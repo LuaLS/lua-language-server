@@ -7,9 +7,10 @@ local function lookUpDocClass(source)
     for _, infer in ipairs(infers) do
         if infer.source.type == 'doc.class'
         or infer.source.type == 'doc.type' then
-            return infer.type
+            return guide.viewInferType(infers)
         end
     end
+    return nil
 end
 
 local function getClass(source, classes, depth, deep)

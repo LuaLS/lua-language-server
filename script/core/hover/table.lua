@@ -189,7 +189,7 @@ local function mergeTypes(types)
         for tp in tv:gmatch '[^|]+' do
             if not mark[tp] then
                 mark[tp] = true
-                results[#results+1] = tp
+                results[tp] = true
             end
         end
     end

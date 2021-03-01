@@ -66,12 +66,12 @@ local function asFunction(source)
             for _, value in ipairs(values) do
                 if value.type then
                     for tp in value.type:gmatch '[^|]+' do
-                        types[#types+1] = tp
+                        types[tp] = true
                     end
                 end
             end
         end
-        if #types > 0 or rtn[1] then
+        if next(types) or rtn[1] then
             local tp = mergeTypes(types) or 'any'
             if rtn[1].name then
                 line[#line+1] = ('%s%s: %s'):format(

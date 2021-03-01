@@ -3160,22 +3160,21 @@ function m.allocInfer(o)
 end
 
 function m.mergeTypes(types)
-    local results = {}
-    local mark = {}
-    local hasAny
-    -- 这里把 any 去掉
-    for i = 1, #types do
-        local tp = types[i]
-        if tp == 'any' then
-            hasAny = true
-        end
-        if not mark[tp] and tp ~= 'any' then
-            mark[tp] = true
-            results[#results+1] = tp
-        end
-    end
-    if #results == 0 then
+    local hasAny = types['any']
+
+    types['any'] = nil
+
+    if not next(types) then
         return 'any'
+    end
+    -- 同时包含 number 与 integer 时，去掉 integer
+    if types['number'] and types['integer'] then
+        types['integer'] = nil
+    end
+
+    local results = {}
+    for tp in pairs(types) do
+        results[#results+1] = tp
     end
     -- 只有显性的 nil 与 any 时，取 any
     if #results == 1 then
@@ -3185,15 +3184,7 @@ function m.mergeTypes(types)
             return results[1]
         end
     end
-    -- 同时包含 number 与 integer 时，去掉 integer
-    if mark['number'] and mark['integer'] then
-        for i = 1, #results do
-            if results[i] == 'integer' then
-                tableRemove(results, i)
-                break
-            end
-        end
-    end
+
     tableSort(results, function (a, b)
         local sa = TypeSort[a] or 100
         local sb = TypeSort[b] or 100
@@ -3203,6 +3194,7 @@ function m.mergeTypes(types)
             return sa < sb
         end
     end)
+
     return tableConcat(results, '|')
 end
 
@@ -3210,7 +3202,6 @@ function m.viewInferType(infers)
     if not infers then
         return 'any'
     end
-    local mark = {}
     local types = {}
     local hasDoc
     local hasDocTable
@@ -3246,10 +3237,7 @@ function m.viewInferType(infers)
                 if hasDocTable and tp == 'table' then
                     goto CONTINUE
                 end
-                if not mark[tp] then
-                    types[#types+1] = tp
-                end
-                mark[tp] = true
+                types[tp] = true
             end
             ::CONTINUE::
         end
@@ -3260,10 +3248,7 @@ function m.viewInferType(infers)
                 goto CONTINUE
             end
             local tp = infer.type or 'any'
-            if not mark[tp] then
-                types[#types+1] = tp
-            end
-            mark[tp] = true
+            types[tp] = true
             ::CONTINUE::
         end
     end

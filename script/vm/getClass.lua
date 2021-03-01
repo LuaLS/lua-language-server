@@ -15,7 +15,7 @@ end
 local function getClass(source, classes, depth, deep)
     local docClass = lookUpDocClass(source)
     if docClass then
-        classes[#classes+1] = docClass
+        classes[docClass] = true
         return
     end
     if depth > 3 then
@@ -24,7 +24,7 @@ local function getClass(source, classes, depth, deep)
     local value = guide.getObjectValue(source) or source
     if not deep then
         if value and value.type == 'string' then
-            classes[#classes+1] = value[1]
+            classes[value[1]] = true
         end
     else
         for _, src in ipairs(vm.getDefFields(value)) do
@@ -39,13 +39,13 @@ local function getClass(source, classes, depth, deep)
             or lkey == 'class' then
                 local value = guide.getObjectValue(src)
                 if value and value.type == 'string' then
-                    classes[#classes+1] = value[1]
+                    classes[value[1]] = true
                 end
             end
             ::CONTINUE::
         end
     end
-    if #classes ~= 0 then
+    if next(classes) then
         return
     end
     vm.eachMeta(source, function (mt)
@@ -56,7 +56,7 @@ end
 function vm.getClass(source, deep)
     local classes = {}
     getClass(source, classes, 1, deep)
-    if #classes == 0 then
+    if not next(classes) then
         return nil
     end
     return guide.mergeTypes(classes)

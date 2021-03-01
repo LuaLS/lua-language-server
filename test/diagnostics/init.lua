@@ -1049,3 +1049,16 @@ m.x = nil
 
 return m
 ]]
+
+TEST [[
+---@class A
+---@field a boolean
+
+---@return A
+local function f() end
+
+local r = f()
+r.x = 1
+
+return r.x
+]]

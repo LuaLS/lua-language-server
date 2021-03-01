@@ -1852,6 +1852,53 @@ function m.checkSameSimpleOfRefByDocSource(status, obj, start, pushQueue, mode)
     end
 end
 
+function m.checkSameSimpleOfRefByDocReturn(status, obj, start, pushQueue, mode)
+    if status.share.searchingBindedDoc then
+        return
+    end
+    if not obj.bindSources then
+        return
+    end
+    local index = 0
+    for _, doc in ipairs(obj.bindGroup) do
+        if doc.type == 'doc.return' then
+            index = index + 1
+            if doc == obj then
+                break
+            end
+        end
+    end
+    status.share.searchingBindedDoc = true
+    local mark = {}
+    local newStatus = m.status(status)
+    for _, ref in ipairs(obj.bindSources) do
+        if not mark[ref] then
+            mark[ref] = true
+            m.searchRefs(newStatus, ref, mode)
+        end
+    end
+    status.share.searchingBindedDoc = nil
+    for _, res in ipairs(newStatus.results) do
+        local call = res.parent
+        if call.type == 'call' then
+            if index == 1 then
+                local sel = call.parent
+                if sel.type == 'select' and sel.index == index then
+                    pushQueue(sel.parent, start, true)
+                end
+            else
+                if call.extParent then
+                    for _, sel in ipairs(call.extParent) do
+                        if sel.type == 'select' and sel.index == index then
+                            pushQueue(sel.parent, start, true)
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
 local function getArrayOrTableLevel(obj)
     local level = 0
     while true do
@@ -1925,9 +1972,14 @@ function m.checkSameSimpleByDoc(status, obj, start, pushQueue, mode)
             pushQueue(res, start, true)
         end
 
-        local state = m.getDocState(obj)
-        if state.type == 'doc.type' and mode == 'ref' then
-            m.checkSameSimpleOfRefByDocSource(status, state, start - getArrayOrTableLevel(obj), pushQueue, mode)
+        if mode == 'ref' then
+            local state = m.getDocState(obj)
+            if state.type == 'doc.type' then
+                m.checkSameSimpleOfRefByDocSource(status, state, start - getArrayOrTableLevel(obj), pushQueue, mode)
+            end
+            if state.type == 'doc.return' then
+                m.checkSameSimpleOfRefByDocReturn(status, state, start - getArrayOrTableLevel(obj), pushQueue, mode)
+            end
         end
         return true
     elseif obj.type == 'doc.field' then

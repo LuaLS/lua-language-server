@@ -323,3 +323,28 @@ end
 function mt2:doSomething()
 end
 ]]
+
+TEST [[
+---@class A
+local a = {}
+a.<?x?> = 1
+
+---@return A
+local function f() end
+
+local b = f()
+return b.<!x!>
+]]
+
+TEST [[
+---@class A
+local a = {}
+a.<?x?> = 1
+
+---@return table
+---@return A
+local function f() end
+
+local a, b = f()
+return a.x, b.<!x!>
+]]

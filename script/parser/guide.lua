@@ -130,6 +130,8 @@ local TypeSort = {
     ['number']   = 4,
     ['table']    = 5,
     ['function'] = 6,
+    ['true']     = 101,
+    ['false']    = 102,
     ['nil']      = 999,
 }
 
@@ -3195,7 +3197,11 @@ function m.mergeTypes(types)
     tableSort(results, function (a, b)
         local sa = TypeSort[a] or 100
         local sb = TypeSort[b] or 100
-        return sa < sb
+        if sa == sb then
+            return a < b
+        else
+            return sa < sb
+        end
     end)
     return tableConcat(results, '|')
 end

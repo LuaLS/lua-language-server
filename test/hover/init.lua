@@ -264,7 +264,7 @@ TEST [[
 <?load?>()
 ]]
 [=[
-function load(chunk: string|function, chunkname?: string, mode?: "b"|"t"|"bt", env?: table)
+function load(chunk: string|function, chunkname?: string, mode?: "b"|"bt"|"t", env?: table)
   -> function
   2. error_message: string
 ]=]

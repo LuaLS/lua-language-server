@@ -429,8 +429,11 @@ proto.on('textDocument/prepareRename', function (params)
         placeholder = result.text,
     }
 end)
-
+require 'tracy'.enable()
 proto.on('textDocument/completion', function (params)
+    await.close('completion')
+    await.setID('completion')
+    await.sleep(0.01)
     workspace.awaitReady()
     local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_COMPLETION, 0.5)
     --log.info(util.dump(params))
@@ -452,6 +455,8 @@ proto.on('textDocument/completion', function (params)
     if not result then
         return nil
     end
+    tracy.ZoneBeginN 'completion make'
+    local _ <close> = tracy.ZoneEnd
     local easy = false
     local items = {}
     for i, res in ipairs(result) do

@@ -1827,15 +1827,19 @@ local function clearCache()
 end
 
 local function completion(uri, offset)
+    tracy.ZoneBeginN 'completion cache'
     local results = getCache(uri, offset)
+    tracy.ZoneEnd()
     if results then
         return results
     end
+    tracy.ZoneBeginN 'completion #1'
     local ast = files.getAst(uri)
     local text = files.getText(uri)
     results = {}
     clearStack()
-    tracy.ZoneBeginN 'completion'
+    tracy.ZoneEnd()
+    tracy.ZoneBeginN 'completion #2'
     if ast then
         if getComment(ast, offset) then
             tryLuaDoc(ast, text, offset, results)
@@ -1860,7 +1864,9 @@ local function completion(uri, offset)
         return nil
     end
 
+    tracy.ZoneBeginN 'completion #3'
     makeCache(uri, offset, results)
+    tracy.ZoneEnd()
     return results
 end
 

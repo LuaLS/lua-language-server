@@ -34,7 +34,7 @@ function m.init(t)
     nonil.enable()
     m.client(t.clientInfo.name)
     nonil.disable()
-    lang(t.locale)
+    lang(LOCALE or t.locale)
 end
 
 return m

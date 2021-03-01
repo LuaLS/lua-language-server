@@ -11,7 +11,8 @@
         "DEVELOP",
         "DBGPORT",
         "DBGWAIT",
-        "tracy"
+        "tracy",
+        "LOCALE"
     ],
     "Lua.diagnostics.disable": [
         "close-non-object"

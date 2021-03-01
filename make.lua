@@ -1,4 +1,5 @@
-local lm = require 'luamake'
+local lm       = require 'luamake'
+local platform = require 'bee.platform'
 
 lm.arch = 'x64'
 
@@ -28,7 +29,7 @@ lm:build 'install' {
         'lua',
         'lpeglabel',
         'bee',
-        'bootstrap',
+        platform.OS == "Windows" and 'bootstrap',
     }
 }
 

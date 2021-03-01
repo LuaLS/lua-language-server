@@ -61,6 +61,7 @@ local function main()
     --config.config.intelliSense.searchDepth = 5
     loadDocMetas()
 
+    test 'basic'
     test 'references'
     test 'definition'
     test 'type_inference'

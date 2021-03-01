@@ -29,7 +29,7 @@ lm:build 'install' {
         'lua',
         'lpeglabel',
         'bee',
-        platform.OS == "Windows" and 'bootstrap',
+        'bootstrap',
     }
 }
 

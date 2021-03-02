@@ -65,9 +65,10 @@ function getfenv(f) end
 function getmetatable(object) end
 
 ---#DES 'ipairs'
----@param t table
----@return fun(t: table, i?: integer):integer, any iterator
----@return table t
+---@generic T: table, V
+---@param t T
+---@return fun(table: V[], i?: integer):integer, V
+---@return T
 ---@return integer i
 function ipairs(t) end
 

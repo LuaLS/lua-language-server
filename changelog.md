@@ -1,5 +1,8 @@
 # changelog
 
+## 1.18.0
+* `FIX` [#435](https://github.com/sumneko/lua-language-server/issues/435)
+
 ## 1.17.2
 `2021-3-2`
 * `FIX` running in Windows

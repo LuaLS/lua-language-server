@@ -1,6 +1,7 @@
 # changelog
 
 ## 1.17.2
+`2021-3-2`
 * `FIX` running in Windows
 
 ## 1.17.1

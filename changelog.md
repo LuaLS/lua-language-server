@@ -1,5 +1,8 @@
 # changelog
 
+## 1.17.2
+* `FIX` running in Windows
+
 ## 1.17.1
 `2021-3-1`
 * `CHG` intelli-scense: improve infer across `table<K, V>` and `V[]`.

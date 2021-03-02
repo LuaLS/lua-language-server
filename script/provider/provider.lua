@@ -786,6 +786,42 @@ proto.on('$/didChangeVisibleRanges', function (params)
     files.setVisibles(params.uri, params.ranges)
 end)
 
+proto.on('$/status/click', function ()
+    do return end
+    local titleDiagnostic = '进行工作区诊断'
+    local titleRestart    = '重启语言服务'
+    local result = proto.awaitRequest('window/showMessageRequest', {
+        type    = define.MessageType.Info,
+        message = '点击',
+        actions = {
+            {
+                title = titleDiagnostic,
+            },
+            {
+                title = titleRestart,
+            },
+        },
+    })
+    if not result then
+        return
+    end
+    if result.title == titleDiagnostic then
+        local diagnostic = require 'provider.diagnostic'
+        diagnostic.diagnosticsAll()
+        proto.notify('window/showMessage', {
+            type     = define.MessageType.Info,
+            message  = '诊断完成',
+        })
+    end
+    if result.title == titleRestart then
+        proto.notify('$/command', {
+            command   = 'extension.lua.doc',
+            data      = 'en-us/51/manual.html',
+        })
+        --os.exit(true)
+    end
+end)
+
 -- Hint
 do
     local function updateHint(uri)

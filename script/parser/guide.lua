@@ -1652,14 +1652,6 @@ local function appendValidGenericType(results, status, typeName, obj)
 end
 
 local function stepRefOfGenericCrossTable(status, doc, typeName)
-    local mark = status.share.genericCrossTableMark
-    if not mark then
-        mark = {}
-        status.share.genericCrossTableMark = mark
-    end
-    if mark[doc] then
-        return nil
-    end
     for _, typeUnit in ipairs(doc.extends.types) do
         if typeUnit.type == 'doc.type.table' then
             for _, where in ipairs {'key', 'value'} do
@@ -1668,9 +1660,7 @@ local function stepRefOfGenericCrossTable(status, doc, typeName)
                     if childName[1] == typeName[1] then
                         return function (obj)
                             local childStatus = m.status(status)
-                            mark[doc] = true
                             m.searchRefs(childStatus, obj, 'def')
-                            mark[doc] = nil
                             for _, res in ipairs(childStatus.results) do
                                 if res.type == 'doc.type.table' then
                                     return res[where]
@@ -1694,9 +1684,7 @@ local function stepRefOfGenericCrossTable(status, doc, typeName)
         elseif typeUnit.type == 'doc.type.array' then
             return function (obj)
                 local childStatus = m.status(status)
-                mark[doc] = true
                 m.searchRefs(childStatus, obj, 'def')
-                mark[doc] = nil
                 for _, res in ipairs(childStatus.results) do
                     if res.type == 'doc.type.array' then
                         return res.node

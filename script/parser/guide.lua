@@ -1665,6 +1665,14 @@ local function stepRefOfGenericCrossTable(status, doc, typeName)
                                 if res.type == 'doc.type.table' then
                                     return res[where]
                                 end
+                                if res.type == 'doc.type.array' then
+                                    if where == 'key' then
+                                        return status.interface and status.interface.docType('integer')[1]
+                                    end
+                                    if where == 'value' then
+                                        return res.node
+                                    end
+                                end
                             end
                         end
                     end

@@ -182,7 +182,6 @@ function m.setText(uri, text, isTrust)
     file.version = file.version + 1
     m.globalVersion = m.globalVersion + 1
     await.close('files.version')
-    await.close('compile:' .. uri)
     if create then
         m.onWatch('create', originUri)
     end
@@ -347,7 +346,6 @@ function m.eachDll()
 end
 
 function m.compileAst(uri, text)
-    await.setID('compile:' .. uri)
     local ws = require 'workspace'
     if not m.isOpen(uri) and #text >= config.config.workspace.preloadFileSize * 1000 then
         if not m.notifyCache['preloadFileSize'] then

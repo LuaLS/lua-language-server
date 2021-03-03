@@ -6,6 +6,7 @@
 * `FIX` completion: `detail` disappears during continuous input
 * `FIX` [#435](https://github.com/sumneko/lua-language-server/issues/435)
 * `FIX` [#436](https://github.com/sumneko/lua-language-server/issues/436)
+* `FIX` [#437](https://github.com/sumneko/lua-language-server/issues/437)
 
 ## 1.17.2
 `2021-3-2`

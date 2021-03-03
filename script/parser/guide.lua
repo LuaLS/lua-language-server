@@ -2183,17 +2183,33 @@ local function checkSameSimpleAndMergeDocTypeFunctionReturns(status, results, so
 end
 
 function m.checkSameSimpleInCallInSameFile(status, func, args, index)
-    local results = {}
+    if not status.share.callResultsCache then
+        status.share.callResultsCache = {}
+    end
+    local cache = status.share.callResultsCache[func]
+    if not cache then
+        cache = {}
+        status.share.callResultsCache[func] = cache
+    end
+    local results = cache[index]
+    if results then
+        return results
+    end
+    results = {}
     if func.special then
         --return results
     end
     local newStatus = m.status(status)
     m.searchRefs(newStatus, func, 'def')
+    local hasDocReturn
     for _, def in ipairs(newStatus.results) do
-        local hasDocReturn = checkSameSimpleAndMergeDocTypeFunctionReturns(status, results, def, index)
-                        or   checkSameSimpleAndMergeFunctionReturnsByDoc(status, results, def, index, args)
-                        or   checkSameSimpleAndMergeDocFunctionReturn(status, results, def, index, args)
-        if not hasDocReturn then
+        hasDocReturn =   checkSameSimpleAndMergeDocTypeFunctionReturns(status, results, def, index)
+                    or   checkSameSimpleAndMergeFunctionReturnsByDoc(status, results, def, index, args)
+                    or   checkSameSimpleAndMergeDocFunctionReturn(status, results, def, index, args)
+                    or   hasDocReturn
+    end
+    if not hasDocReturn then
+        for _, def in ipairs(newStatus.results) do
             local value = m.getObjectValue(def) or def
             if value.type == 'function' then
                 local returns = value.returns
@@ -2207,6 +2223,8 @@ function m.checkSameSimpleInCallInSameFile(status, func, args, index)
                 end
             end
         end
+        -- generic cannot cache
+        cache[index] = results
     end
     return results
 end

@@ -1787,7 +1787,6 @@ function m.checkSameSimpleByDocType(status, doc, args)
             local pieceResult = stepRefOfGeneric(status, piece, args, 'def')
             for _, res in ipairs(pieceResult) do
                 results[#results+1] = res
-                status.hasGenericResult = true
             end
         else
             local pieceResult = stepRefOfDocType(status, piece, 'def')
@@ -3151,10 +3150,6 @@ function m.getRefCache(status, obj, mode)
     end
     status.share.cacheLock[mode][obj] = {}
     return nil, function ()
-        if status.hasGenericResult then
-            status.share.cacheLock[mode][obj] = nil
-            return
-        end
         sourceCache = {}
         local results = status.results
         for i = 1, #results do

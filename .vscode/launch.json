@@ -17,6 +17,7 @@
 			},
 			"arg": [
 			],
+			"luaVersion": "latest",
 			"consoleCoding": "utf8",
 			"sourceCoding": "utf8",
 			"outputCapture": [

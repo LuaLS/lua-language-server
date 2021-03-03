@@ -1,5 +1,8 @@
 # changelog
 
+## 1.17.4
+* `FIX` [#438](https://github.com/sumneko/lua-language-server/issues/438)
+
 ## 1.17.3
 `2021-3-3`
 * `CHG` intelli-scense: treat `V[]` as `table<integer, V>` in `pairs`

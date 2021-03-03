@@ -359,7 +359,7 @@ local function checkLocal(ast, word, offset, results)
 end
 
 local function checkModule(ast, word, offset, results)
-    local locals = guide.getVisibleLocals(ast.ast, offset)
+    local locals  = guide.getVisibleLocals(ast.ast, offset)
     for uri in files.eachFile() do
         if files.eq(uri, guide.getUri(ast.ast)) then
             goto CONTINUE
@@ -368,7 +368,9 @@ local function checkModule(ast, word, offset, results)
         local path = furi.decode(originUri)
         local fileName = path:match '[^/\\]*$'
         local stemName = fileName:gsub('%..+', '')
-        if not locals[stemName]
+        if  not locals[stemName]
+        and #vm.getGlobalSets(stemName) == 0
+        and not config.config.diagnostics.globals[stemName]
         and stemName:match '^[%a_][%w_]*$'
         and matchKey(word, stemName) then
             local targetAst = files.getAst(uri)

@@ -460,6 +460,7 @@ proto.on('textDocument/completion', function (params)
         local item = {
             label            = res.label,
             kind             = res.kind,
+            detail           = res.detail,
             deprecated       = res.deprecated,
             sortText         = ('%04d'):format(i),
             filterText       = res.filterText,

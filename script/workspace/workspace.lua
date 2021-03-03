@@ -328,7 +328,10 @@ function m.findUrisByFilePath(path)
     if type(path) ~= 'string' then
         return {}
     end
-    local lpath = path:lower():gsub('[/\\]+', '/')
+    local lpath = path:gsub('[/\\]+', '/')
+    if platform.OS == 'Windows' then
+        lpath = lpath:lower()
+    end
     local vm    = require 'vm'
     local resultCache = vm.getCache 'findUrisByRequirePath.result'
     if resultCache[path] then

@@ -1,7 +1,8 @@
-local files  = require 'files'
-local furi   = require 'file-uri'
-local core   = require 'core.definition'
-local config = require 'config'
+local files    = require 'files'
+local furi     = require 'file-uri'
+local core     = require 'core.definition'
+local config   = require 'config'
+local platform = require 'bee.platform'
 
 rawset(_G, 'TEST', true)
 
@@ -662,3 +663,59 @@ TEST {
         ]]
     }
 }
+
+local originOS = platform.OS
+platform.OS = 'Linux'
+
+TEST {
+    {
+        path = 'test.lua',
+        content = [[
+            return {
+                <!x!> = 1,
+            }
+        ]],
+    },
+    {
+        path = 'Test.lua',
+        content = [[
+            return {
+                x = 1,
+            }
+        ]],
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            local t = require 'test'
+            print(t.<?x?>)
+        ]]
+    }
+}
+
+TEST {
+    {
+        path = 'test.lua',
+        content = [[
+            return {
+                x = 1,
+            }
+        ]],
+    },
+    {
+        path = 'Test.lua',
+        content = [[
+            return {
+                <!x!> = 1,
+            }
+        ]],
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            local t = require 'Test'
+            print(t.<?x?>)
+        ]]
+    }
+}
+platform.OS = originOS

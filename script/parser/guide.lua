@@ -644,7 +644,7 @@ function m.positionOf(lines, offset)
     end
     local lastLine = lines[#lines]
     if offset > lastLine.finish then
-        return #lines, lastLine.finish - lastLine.start + 1
+        return #lines, offset - lastLine.start
     end
     local min = 1
     local max = #lines

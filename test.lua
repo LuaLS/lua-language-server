@@ -73,6 +73,7 @@ local function main()
     test 'signature'
     test 'document_symbol'
     test 'code_action'
+    test 'type_formatting'
     test 'crossfile'
     test 'full'
     --test 'other'

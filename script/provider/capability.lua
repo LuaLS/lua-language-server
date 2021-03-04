@@ -82,6 +82,10 @@ function m.getIniter()
             },
         },
         foldingRangeProvider = true,
+        documentOnTypeFormattingProvider = {
+            firstTriggerCharacter = '\n',
+            moreTriggerCharacter  = nil, -- string[]
+        },
         workspace = {}
         --documentOnTypeFormattingProvider = {
         --    firstTriggerCharacter = '}',

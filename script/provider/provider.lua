@@ -825,6 +825,45 @@ proto.on('$/status/click', function ()
     end
 end)
 
+proto.on('textDocument/onTypeFormatting', function (params)
+    workspace.awaitReady()
+    local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_TYPE_FORMATTING, 0.5)
+    local ch     = params.ch
+    local uri    = params.textDocument.uri
+    if not files.exists(uri) then
+        return nil
+    end
+    local core   = require 'core.type-formatting'
+    local offset = files.offset(uri, params.position)
+    local edits  = core(uri, offset, ch)
+    if #edits == 0 then
+        return nil
+    end
+    local results = {}
+    for i, edit in ipairs(edits) do
+        results[i] = {
+            range   = files.range(uri, edit.start, edit.finish),
+            newText = edit.text,
+        }
+    end
+    results = {
+        {
+            range = {
+                ['start'] = {
+                    line = 1,
+                    character = 5,
+                },
+                ['end'] = {
+                    line = 1,
+                    character = 5,
+                },
+            },
+            newText = '\nend',
+        }
+    }
+    return results
+end)
+
 -- Hint
 do
     local function updateHint(uri)

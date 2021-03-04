@@ -40,6 +40,15 @@ end
 function m.init()
     local ws    = require 'workspace'
     m.interface = {}
+
+    local _ <close> = function ()
+        local waiting = m.waitingReady
+        m.waitingReady = {}
+        for _, waker in ipairs(waiting) do
+            waker()
+        end
+    end
+
     local pluginPath = fs.path(config.config.runtime.plugin)
     if pluginPath:is_relative() then
         if not ws.path then
@@ -58,11 +67,6 @@ function m.init()
         return
     end
     xpcall(f, log.error, f)
-    local waiting = m.waitingReady
-    m.waitingReady = {}
-    for _, waker in ipairs(waiting) do
-        waker()
-    end
 end
 
 return m

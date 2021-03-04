@@ -243,6 +243,7 @@ proto.on('textDocument/didOpen', function (params)
     local doc   = params.textDocument
     local uri   = doc.uri
     local text  = doc.text
+    log.debug('didOpen', uri)
     files.open(uri)
     plugin.awaitReady()
     if not files.isOpen(uri) then
@@ -254,6 +255,7 @@ end)
 proto.on('textDocument/didClose', function (params)
     local doc   = params.textDocument
     local uri   = doc.uri
+    log.debug('didClose', uri)
     files.close(uri)
     if not files.isLua(uri) then
         files.remove(uri)

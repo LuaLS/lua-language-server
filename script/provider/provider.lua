@@ -861,7 +861,7 @@ proto.on('textDocument/onTypeFormatting', function (params)
             newText = '\nend',
         }
     }
-    return results
+    --return results
 end)
 
 -- Hint

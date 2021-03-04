@@ -17,5 +17,4 @@ fs.copy_file(bindir / 'lua'..exe,       output / 'lua-language-server'..exe, tru
 if platform == 'msvc' then
     fs.copy_file(bindir / 'lua54'..dll, output / 'lua54'..dll, true)
     require 'msvc'.copy_vcrt('x64', output)
-    require 'msvc'.copy_ucrt('x64', output)
 end

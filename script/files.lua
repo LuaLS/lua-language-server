@@ -406,7 +406,7 @@ function m.compileAst(uri, text)
         end})
         return state
     else
-        log.error(err)
+        log.error('Compile failed:', m.getOriginUri(uri), err)
         return nil
     end
 end

@@ -1,7 +1,7 @@
 # changelog
 
 ## 1.18.0
-* `CHG` `Windows`: dose not provide `ucrt` any more.
+* `CHG` `Windows`: dose not provide `ucrt` any more
 
 ## 1.17.4
 `2021-3-4`

@@ -1596,6 +1596,10 @@ end
         label = 'meta',
         kind = define.CompletionItemKind.Event,
     },
+    {
+        label = 'diagnostic',
+        kind = define.CompletionItemKind.Event,
+    }
 }
 
 TEST [[

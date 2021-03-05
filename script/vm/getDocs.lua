@@ -238,3 +238,84 @@ function vm.isDeprecated(value, deep)
         return isDeprecated(value)
     end
 end
+
+local function makeDiagRange(uri, doc, results)
+    local lines  = files.getLines(uri)
+    local names
+    if doc.names then
+        names = {}
+        for i, nameUnit in ipairs(doc.names) do
+            names[i] = nameUnit[1]
+        end
+    end
+    local row = guide.positionOf(lines, doc.start)
+    if doc.mode == 'disable-next-line' then
+        if lines[row+1] then
+            results[#results+1] = {
+                mode   = 'disable',
+                names  = names,
+                offset = lines[row+1].start,
+                source = doc,
+            }
+            results[#results+1] = {
+                mode   = 'enable',
+                names  = names,
+                offset = lines[row+1].finish,
+                source = doc,
+            }
+        end
+    elseif doc.mode == 'disable-line' then
+        results[#results+1] = {
+            mode   = 'disable',
+            names  = names,
+            offset = lines[row].start,
+            source = doc,
+        }
+        results[#results+1] = {
+            mode   = 'enable',
+            names  = names,
+            offset = lines[row].finish,
+            source = doc,
+        }
+    elseif doc.mode == 'disable' then
+        if lines[row+1] then
+            results[#results+1] = {
+                mode   = 'disable',
+                names  = names,
+                offset = lines[row+1].start,
+                source = doc,
+            }
+        end
+    elseif doc.mode == 'enable' then
+        if lines[row+1] then
+            results[#results+1] = {
+                mode   = 'enable',
+                names  = names,
+                offset = lines[row+1].start,
+                source = doc,
+            }
+        end
+    end
+end
+
+function vm.isDiagDisabledAt(uri, offset, name)
+    local status = files.getAst(uri)
+    if not status then
+        return false
+    end
+    if not status.ast.docs then
+        return false
+    end
+    local cache = files.getCache(uri)
+    if not cache.diagnosticRanges then
+        cache.diagnosticRanges = {}
+        for _, doc in ipairs(status.ast.docs) do
+            if doc.type == 'doc.diagnostic' then
+                makeDiagRange(uri, doc, cache.diagnosticRanges)
+            end
+        end
+        table.sort(cache.diagnosticRanges, function (a, b)
+            return a.offset < b.offset
+        end)
+    end
+end

@@ -637,8 +637,8 @@ end
 
 --- 获取偏移对应的坐标
 ---@param lines table
----@return integer {name = 'row'}
----@return integer {name = 'col'}
+---@return integer row
+---@return integer col
 function m.positionOf(lines, offset)
     if offset < 1 then
         return 0, 0

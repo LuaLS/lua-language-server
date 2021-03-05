@@ -106,6 +106,8 @@ PARSER_MISS_SEP_IN_TABLE = 'Miss symbol `,` or `;` .'
 PARSER_SET_CONST         = 'Assignment to const variable.'
 PARSER_UNICODE_NAME      = 'Contains Unicode characters.'
 PARSER_ERR_NONSTANDARD_SYMBOL = 'Lua should use `{symbol}` .'
+PARSER_MISS_SPACE_BETWEEN = 'Spaces must be left between symbols.'
+
 
 PARSER_LUADOC_MISS_CLASS_NAME           = '<class name> expected.'
 PARSER_LUADOC_MISS_EXTENDS_SYMBOL       = '`:` expected.'
@@ -175,6 +177,7 @@ ACTION_FIX_COMMENT_PREFIX = 'Modify to `--` .'
 ACTION_FIX_NONSTANDARD_SYMBOL = 'Modify to `{symbol}` .'
 ACTION_RUNTIME_UNICODE_NAME = 'Allow Unicode characters.'
 ACTION_SWAP_PARAMS      = 'Change to parameter {index} or `{node}`'
+ACTION_FIX_INSERT_SPACE = 'Insert space.'
 
 COMMAND_DISABLE_DIAG    = 'Disable diagnostics'
 COMMAND_MARK_GLOBAL     = 'Mark defined global'

@@ -505,7 +505,9 @@ RepeatBody  <-  REPEAT
 
 LocalAttr   <-  {| (Sp '<' Sp MustName Sp LocalAttrEnd)+ |}
             ->  LocalAttr
-LocalAttrEnd<-  '>' / {} -> MissGT
+LocalAttrEnd<-  ({} '>' &'=') -> MissSpaceBetween
+            /   '>'
+            /   {} -> MissGT
 Local       <-  Sp ({} LOCAL LocalNameList ((AssignOrEQ ExpList) / %nil) {})
             ->  Local
 Set         <-  Sp ({} SimpleList AssignOrEQ {} ExpList {})

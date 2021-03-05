@@ -1889,6 +1889,21 @@ local Defs = {
         }
         return start, finish
     end,
+    MissSpaceBetween = function (start)
+        PushError {
+            type   = 'MISS_SPACE_BETWEEN',
+            start  = start,
+            finish = start + 1,
+            fix = {
+                title = 'FIX_INSERT_SPACE',
+                {
+                    start   = start + 1,
+                    finish  = start,
+                    text    = ' ',
+                }
+            }
+        }
+    end
 }
 
 local function init(state)

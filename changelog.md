@@ -2,6 +2,7 @@
 
 ## 1.18.0
 * `CHG` `Windows`: dose not provide `ucrt` any more
+* `FIX` missed syntax error `local a <const>= 1`
 
 ## 1.17.4
 `2021-3-4`

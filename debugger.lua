@@ -46,9 +46,11 @@ local function tryDebugger()
     local entry = assert(package.searchpath('debugger', debugPath .. path))
     local root = debugPath
     local addr = ("127.0.0.1:%d"):format(DBGPORT)
-    local dbg = loadfile(entry)()
-    dbg:init { root = root, latest = true }
-    dbg:start(addr)
+    local dbg = loadfile(entry)(root)
+    dbg:start {
+        address = addr,
+        latest  = true,
+    }
     log.debug('Debugger startup, listen port:', DBGPORT)
     log.debug('Debugger args:', addr, root, path, cpath)
     if DBGWAIT then

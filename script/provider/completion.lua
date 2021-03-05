@@ -4,7 +4,7 @@ local isEnable = false
 
 local function allWords()
     local str = [[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.:('"[,#*@|=-{ ]]
-    local list = {'\t'}
+    local list = {'\t', '\n'}
     for c in str:gmatch '.' do
         list[#list+1] = c
     end

@@ -12,7 +12,7 @@ Sp                  <-  %s+
 X16                 <-  [a-fA-F0-9]
 Word                <-  [a-zA-Z0-9_]
 Token               <-  Name / String / Symbol
-Name                <-  ({} {[a-zA-Z0-9_] [a-zA-Z0-9_.*]*} {})
+Name                <-  ({} {[a-zA-Z0-9_] [a-zA-Z0-9_.*-]*} {})
                     ->  Name
 String              <-  ({} StringDef {})
                     ->  String
@@ -871,6 +871,49 @@ local function parseSee()
     return result
 end
 
+local function parseDiagnostic()
+    local result = {
+        type = 'doc.diagnostic',
+    }
+    local nextTP, mode = nextToken()
+    if nextTP ~= 'name' then
+        pushError {
+            type   = 'LUADOC_MISS_DIAG_MODE',
+            start  = getFinish(),
+            finish = getFinish(),
+        }
+        return nil
+    end
+    result.mode   = mode
+    result.start  = getStart()
+    result.finish = getFinish()
+
+    if checkToken('symbol', ':', 1) then
+        nextToken()
+        result.names = {}
+        while true do
+            local name = parseName('doc.diagnostic.name', result)
+            if not name then
+                pushError {
+                    type   = 'LUADOC_MISS_DIAG_NAME',
+                    start  = getFinish(),
+                    finish = getFinish(),
+                }
+                return result
+            end
+            result.names[#result.names+1] = name
+            if not checkToken('symbol', ',', 1) then
+                break
+            end
+            nextToken()
+        end
+    end
+
+    result.finish = getFinish()
+
+    return result
+end
+
 local function convertTokens()
     local tp, text = nextToken()
     if not tp then
@@ -878,7 +921,7 @@ local function convertTokens()
     end
     if tp ~= 'name' then
         pushError {
-            type  = 'LUADOC_MISS_CATE_NAME',
+            type   = 'LUADOC_MISS_CATE_NAME',
             start  = getStart(),
             finish = getFinish(),
         }
@@ -910,6 +953,8 @@ local function convertTokens()
         return parseVersion()
     elseif text == 'see' then
         return parseSee()
+    elseif text == 'diagnostic' then
+        return parseDiagnostic()
     end
 end
 

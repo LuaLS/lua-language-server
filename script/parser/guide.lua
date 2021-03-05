@@ -105,7 +105,8 @@ m.childMap = {
     ['doc.type.typeliteral']  = {'node'},
     ['doc.type.arg']       = {'extends'},
     ['doc.overload']       = {'overload', 'comment'},
-    ['doc.see']            = {'name', 'field'},
+    ['doc.see']            = {'name', 'field', 'comment'},
+    ['doc.diagnostic']     = {'#names', 'comment'},
 }
 
 m.actionMap = {

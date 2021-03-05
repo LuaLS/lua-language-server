@@ -21,6 +21,13 @@ local furi       = require 'file-uri'
 local rpath      = require 'workspace.require-path'
 local lang       = require 'language'
 
+local DiagnosticModes = {
+    'disable-next-line',
+    'disable-line',
+    'disable',
+    'enable',
+}
+
 local stackID = 0
 local stacks = {}
 local function stack(callback)
@@ -1467,6 +1474,7 @@ local function tryLuaDocCate(word, results)
         'meta',
         'version',
         'see',
+        'diagnostic',
     } do
         if matchKey(word, docType) then
             results[#results+1] = {
@@ -1568,6 +1576,35 @@ local function tryLuaDocBySource(ast, offset, source, results)
             end
         end
         return true
+    elseif source.type == 'doc.diagnostic' then
+        for _, mode in ipairs(DiagnosticModes) do
+            if matchKey(source.mode, mode) then
+                results[#results+1] = {
+                    label    = mode,
+                    kind     = define.CompletionItemKind.Enum,
+                    textEdit = {
+                        start   = source.start,
+                        finish  = source.start + #source.mode - 1,
+                        newText = mode,
+                    },
+                }
+            end
+        end
+        return true
+    elseif source.type == 'doc.diagnostic.name' then
+        for name in pairs(define.DiagnosticDefaultSeverity) do
+            if matchKey(source[1], name) then
+                results[#results+1] = {
+                    label = name,
+                    kind  = define.CompletionItemKind.Value,
+                    textEdit = {
+                        start   = source.start,
+                        finish  = source.start + #source[1] - 1,
+                        newText = name,
+                    },
+                }
+            end
+        end
     end
     return false
 end
@@ -1631,6 +1668,20 @@ local function tryLuaDocByErr(ast, offset, err, docState, results)
                     kind   = define.CompletionItemKind.Interface,
                 }
             end
+        end
+    elseif err.type == 'LUADOC_MISS_DIAG_MODE' then
+        for _, mode in ipairs(DiagnosticModes) do
+            results[#results+1] = {
+                label = mode,
+                kind  = define.CompletionItemKind.Enum,
+            }
+        end
+    elseif err.type == 'LUADOC_MISS_DIAG_NAME' then
+        for name in pairs(define.DiagnosticDefaultSeverity) do
+            results[#results+1] = {
+                label = name,
+                kind  = define.CompletionItemKind.Value,
+            }
         end
     end
 end

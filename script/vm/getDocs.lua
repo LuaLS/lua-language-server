@@ -245,7 +245,8 @@ local function makeDiagRange(uri, doc, results)
     if doc.names then
         names = {}
         for i, nameUnit in ipairs(doc.names) do
-            names[i] = nameUnit[1]
+            local name = nameUnit[1]
+            names[name] = true
         end
     end
     local row = guide.positionOf(lines, doc.start)
@@ -318,4 +319,26 @@ function vm.isDiagDisabledAt(uri, offset, name)
             return a.offset < b.offset
         end)
     end
+    if #cache.diagnosticRanges == 0 then
+        return false
+    end
+    local stack = {}
+    for _, range in ipairs(cache.diagnosticRanges) do
+        if range.offset <= offset then
+            if not range.names or range.names[name] then
+                if range.mode == 'disable' then
+                    stack[#stack+1] = range
+                elseif range.mode == 'enable' then
+                    stack[#stack] = nil
+                end
+            end
+        else
+            break
+        end
+    end
+    local current = stack[#stack]
+    if not current then
+        return false
+    end
+    return true
 end

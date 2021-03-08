@@ -2,6 +2,7 @@ local files  = require 'files'
 local define = require 'proto.define'
 local config = require 'config'
 local await  = require 'await'
+local vm     = require "vm.vm"
 
 -- 把耗时最长的诊断放到最后面
 local diagSort = {
@@ -38,6 +39,9 @@ local function check(uri, name, results)
     local severity = define.DiagnosticSeverity[level]
     local clock = os.clock()
     require('core.diagnostics.' .. name)(uri, function (result)
+        if vm.isDiagDisabledAt(uri, result.start, name) then
+            return
+        end
         result.level = severity or result.level
         result.code  = name
         results[#results+1] = result

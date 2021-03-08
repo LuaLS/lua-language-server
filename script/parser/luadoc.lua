@@ -887,6 +887,16 @@ local function parseDiagnostic()
     result.mode   = mode
     result.start  = getStart()
     result.finish = getFinish()
+    if  mode ~= 'disable-next-line'
+    and mode ~= 'disable-line'
+    and mode ~= 'disable'
+    and mode ~= 'enable' then
+        pushError {
+            type   = 'LUADOC_ERROR_DIAG_NAME',
+            start  = result.start,
+            finish = result.finish,
+        }
+    end
 
     if checkToken('symbol', ':', 1) then
         nextToken()
@@ -902,16 +912,6 @@ local function parseDiagnostic()
                 return result
             end
             result.names[#result.names+1] = name
-            if name  ~= 'disable-next-line'
-            and name ~= 'disable-line'
-            and name ~= 'disable'
-            and name ~= 'enable' then
-                pushError {
-                    type   = 'LUADOC_ERROR_DIAG_NAME',
-                    start  = name.start,
-                    finish = name.finish,
-                }
-            end
             if not checkToken('symbol', ',', 1) then
                 break
             end

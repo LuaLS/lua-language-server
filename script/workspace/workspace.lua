@@ -187,7 +187,7 @@ local function loadFileFactory(root, progressData, isLibrary)
             if not isLibrary and progressData.preload >= config.config.workspace.maxPreload then
                 if not m.hasHitMaxPreload then
                     m.hasHitMaxPreload = true
-                    local item = proto.awaitRequest('window/showMessageRequest', {
+                    proto.request('window/showMessageRequest', {
                         type    = define.MessageType.Info,
                         message = lang.script('MWS_MAX_PRELOAD', config.config.workspace.maxPreload),
                         actions = {
@@ -198,20 +198,21 @@ local function loadFileFactory(root, progressData, isLibrary)
                                 title = lang.script.WINDOW_CLOSE,
                             }
                         }
-                    })
-                    if not item then
-                        return
-                    end
-                    if item.title == lang.script.WINDOW_INCREASE_UPPER_LIMIT then
-                        proto.notify('$/command', {
-                            command   = 'lua.config',
-                            data      = {
-                                key    = 'Lua.workspace.maxPreload',
-                                action = 'set',
-                                value  = config.config.workspace.maxPreload + math.max(1000, config.config.workspace.maxPreload),
-                            }
-                        })
-                    end
+                    }, function (item)
+                        if not item then
+                            return
+                        end
+                        if item.title == lang.script.WINDOW_INCREASE_UPPER_LIMIT then
+                            proto.notify('$/command', {
+                                command   = 'lua.config',
+                                data      = {
+                                    key    = 'Lua.workspace.maxPreload',
+                                    action = 'set',
+                                    value  = config.config.workspace.maxPreload + math.max(1000, config.config.workspace.maxPreload),
+                                }
+                            })
+                        end
+                    end)
                 end
                 return
             end

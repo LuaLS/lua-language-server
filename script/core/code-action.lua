@@ -437,7 +437,7 @@ local function checkJsonToLua(results, uri, start, finish)
         return
     end
     local jsonFinish
-    for i = finish, jsonStart + 1, -1 do
+    for i = math.min(finish, #text), jsonStart + 1, -1 do
         local char = text:sub(i, i)
         if char == ']'
         or char == '}' then

@@ -599,12 +599,10 @@ proto.on('textDocument/signatureHelp', function (params)
 end)
 
 proto.on('textDocument/documentSymbol', function (params)
+    workspace.awaitReady()
     local core = require 'core.document-symbol'
     local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SYMBOL, 0.5)
     local uri   = params.textDocument.uri
-    while not files.exists(uri) do
-        await.sleep(0.1)
-    end
 
     local symbols = core(uri)
     if not symbols then
@@ -722,9 +720,8 @@ proto.on('textDocument/semanticTokens/full', function (params)
     local core = require 'core.semantic-tokens'
     local uri = params.textDocument.uri
     local text  = files.getText(uri)
-    while not text do
-        await.sleep(0.1)
-        text  = files.getText(uri)
+    if not text then
+        return nil
     end
     local results = core(uri, 0, #text)
     return {
@@ -737,9 +734,6 @@ proto.on('textDocument/semanticTokens/range', function (params)
     local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SEMANTIC_RANGE, 0.5)
     local core = require 'core.semantic-tokens'
     local uri = params.textDocument.uri
-    while not files.exists(uri) do
-        await.sleep(0.1)
-    end
     local start  = files.offsetOfWord(uri, params.range.start)
     local finish = files.offsetOfWord(uri, params.range['end'])
     local results = core(uri, start, finish)

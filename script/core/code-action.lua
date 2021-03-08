@@ -430,6 +430,44 @@ end
 --    end
 --end
 
+local function checkJsonToLua(results, uri, start, finish)
+    local text = files.getText(uri)
+    local jsonStart = text:match ('()[%{%[]', start)
+    if not jsonStart then
+        return
+    end
+    local jsonFinish
+    for i = finish, jsonStart + 1, -1 do
+        local char = text:sub(i, i)
+        if char == ']'
+        or char == '}' then
+            jsonFinish = i
+            break
+        end
+    end
+    if not jsonFinish then
+        return
+    end
+    if not text:sub(jsonStart, jsonFinish):find '"%s*%:' then
+        return
+    end
+    results[#results+1] = {
+        title = lang.script.ACTION_JSON_TO_LUA,
+        kind = 'refactor.rewrite',
+        command = {
+            title = lang.script.COMMAND_JSON_TO_LUA,
+            command = 'lua.jsonToLua:' .. sp:get_id(),
+            arguments = {
+                {
+                    uri    = uri,
+                    start  = jsonStart,
+                    finish = jsonFinish,
+                }
+            }
+        },
+    }
+end
+
 return function (uri, start, finish, diagnostics)
     local ast = files.getAst(uri)
     if not ast then
@@ -441,6 +479,7 @@ return function (uri, start, finish, diagnostics)
     checkQuickFix(results, uri, diagnostics)
     checkSwapParams(results, uri, start, finish)
     --checkExtractAsFunction(results, uri, start, finish)
+    checkJsonToLua(results, uri, start, finish)
 
     return results
 end

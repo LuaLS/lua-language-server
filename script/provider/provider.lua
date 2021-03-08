@@ -678,6 +678,9 @@ proto.on('workspace/executeCommand', function (params)
     elseif command == 'lua.solve' then
         local core = require 'core.command.solve'
         return core(params.arguments[1])
+    elseif command == 'lua.jsonToLua' then
+        local core = require 'core.command.jsonToLua'
+        return core(params.arguments[1])
     end
 end)
 

@@ -79,6 +79,7 @@ function m.getIniter()
             commands = {
                 'lua.removeSpace:' .. sp:get_id(),
                 'lua.solve:'       .. sp:get_id(),
+                'lua.jsonToLua:'   .. sp:get_id(),
             },
         },
         foldingRangeProvider = true,

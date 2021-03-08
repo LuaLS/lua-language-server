@@ -539,8 +539,10 @@ function m.offset(uri, position, isFinish)
     local row    = position.line + 1
     local start  = guide.lineRange(lines, row)
     local offset
-    if start <= 0 or start > #text then
-        offset = math.maxinteger
+    if start <= 0 then
+        offset = 0
+    elseif start > #text then
+        offset = start
     else
         offset = utf8.offset(text, position.character + 1, start) or #text
     end

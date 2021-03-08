@@ -1095,3 +1095,7 @@ TEST [[
 ---@diagnostic enable
 x = 1
 ]]
+
+TEST [[
+---@diagnostic disable-next-line: <!xxx!>
+]]

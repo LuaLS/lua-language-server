@@ -198,7 +198,7 @@ local function findParentInStringIndex(ast, text, offset)
 end
 
 local function buildFunctionSnip(source, oop)
-    local name = getName(source):gsub('^.-[$.:]', '')
+    local name = getName(source):gsub('^.+[$.:]', '')
     local defs = vm.getDefs(source, 0)
     local args = ''
     for _, def in ipairs(defs) do

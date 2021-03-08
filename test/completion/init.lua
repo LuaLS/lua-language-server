@@ -2203,3 +2203,25 @@ local x = {
         kind   = define.CompletionItemKind.EnumMember,
     },
 }
+
+Cared['insertText'] = true
+TEST [[
+---@class A.B.C
+local m
+
+function m.f()
+end
+
+m.f$
+]]{
+    {
+        label  = "f",
+        kind   = define.CompletionItemKind.Function,
+    },
+    {
+        label  = "f()",
+        kind   = define.CompletionItemKind.Snippet,
+        insertText = 'f()',
+    },
+}
+Cared['insertText'] = nil

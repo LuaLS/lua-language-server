@@ -44,6 +44,25 @@ local function Str2Hash(sep)
     end
 end
 
+local function Array2Hash(checker)
+    return function (tbl)
+        if type(tbl) ~= 'table' then
+            return false
+        end
+        local t = {}
+        if #tbl > 0 then
+            for _, k in ipairs(tbl) do
+                t[k] = true
+            end
+        else
+            for k, v in pairs(tbl) do
+                t[k] = v
+            end
+        end
+        return true, t
+    end
+end
+
 local function Array(checker)
     return function (tbl)
         if type(tbl) ~= 'table' then
@@ -129,10 +148,7 @@ local ConfigTemplate = {
         useGitIgnore    = {true,    Boolean},
         maxPreload      = {1000,    Integer},
         preloadFileSize = {100,     Integer},
-        library         = {{},      Hash(
-                                        String,
-                                        Or(Boolean, Array(String))
-                                    )}
+        library         = {{},      Array2Hash(String)},
     },
     completion = {
         enable          = {true,      Boolean},

@@ -892,7 +892,7 @@ local function parseDiagnostic()
     and mode ~= 'disable'
     and mode ~= 'enable' then
         pushError {
-            type   = 'LUADOC_ERROR_DIAG_NAME',
+            type   = 'LUADOC_ERROR_DIAG_MODE',
             start  = result.start,
             finish = result.finish,
         }

@@ -49,6 +49,7 @@ DIAG_DUPLICATE_DOC_PARAM              = 'Duplicate params.'
 DIAG_UNDEFINED_DOC_CLASS              = 'Undefined class.'
 DIAG_UNDEFINED_DOC_NAME               = 'Undefined type or alias.'
 DIAG_UNDEFINED_DOC_PARAM              = 'Undefined param.'
+DIAG_UNKNOWN_DIAG_CODE                = 'Unknown diagnostic code.'
 
 MWS_NOT_SUPPORT         = '{} dose not support multi workspace for now, I may need to restart to support the new workspace ...'
 MWS_RESTART             = 'Restart'
@@ -126,6 +127,8 @@ PARSER_LUADOC_MISS_GENERIC_EXTENDS_NAME = '<generic extends name> expected.'
 PARSER_LUADOC_MISS_VARARG_TYPE          = '<vararg type> expected.'
 PARSER_LUADOC_MISS_FUN_AFTER_OVERLOAD   = '`fun` expected.'
 PARSER_LUADOC_MISS_CATE_NAME            = '<doc name> expected.'
+PARSER_LUADOC_MISS_DIAG_MODE            = '<diagnostic mode> expected.'
+PARSER_LUADOC_ERROR_DIAG_MODE           = '<diagnostic mode> incorrect.'
 
 SYMBOL_ANONYMOUS        = '<Anonymous>'
 

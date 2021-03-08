@@ -49,6 +49,7 @@ DIAG_DUPLICATE_DOC_PARAM              = '重复指向的参数。'
 DIAG_UNDEFINED_DOC_CLASS              = '未定义的类。'
 DIAG_UNDEFINED_DOC_NAME               = '未定义的类型或别名。'
 DIAG_UNDEFINED_DOC_PARAM              = '指向了未定义的参数。'
+DIAG_UNKNOWN_DIAG_CODE                = '未知的诊断代号。'
 
 MWS_NOT_SUPPORT         = '{} 目前还不支持多工作目录，我可能需要重启才能支持新的工作目录...'
 MWS_RESTART             = '重启'
@@ -125,6 +126,8 @@ PARSER_LUADOC_MISS_GENERIC_EXTENDS_NAME = '缺少泛型要继承的类名称。'
 PARSER_LUADOC_MISS_VARARG_TYPE          = '缺少不定参的类型定义。'
 PARSER_LUADOC_MISS_FUN_AFTER_OVERLOAD   = '缺少关键字 `fun`。'
 PARSER_LUADOC_MISS_CATE_NAME            = '缺少文档类型名称。'
+PARSER_LUADOC_MISS_DIAG_MODE            = '缺少诊断模式'
+PARSER_LUADOC_ERROR_DIAG_MODE           = '诊断模式不正确'
 
 SYMBOL_ANONYMOUS        = '<匿名函数>'
 

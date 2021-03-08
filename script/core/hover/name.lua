@@ -64,40 +64,41 @@ function buildName(source, oop)
     if oop == nil then
         oop =  source.type == 'setmethod'
             or source.type == 'getmethod'
+            or nil
     end
     if source.type == 'local' then
-        return asLocal(source) or ''
+        return asLocal(source) or '', oop
     end
     if source.type == 'getlocal'
     or source.type == 'setlocal' then
-        return asLocal(source.node) or ''
+        return asLocal(source.node) or '', oop
     end
     if source.type == 'setglobal'
     or source.type == 'getglobal' then
-        return asGlobal(source) or ''
+        return asGlobal(source) or '', oop
     end
     if source.type == 'setmethod'
     or source.type == 'getmethod' then
-        return asField(source, true) or ''
+        return asField(source, oop) or '', oop
     end
     if source.type == 'setfield'
     or source.type == 'getfield' then
-        return asField(source, oop) or ''
+        return asField(source, oop) or '', oop
     end
     if source.type == 'tablefield' then
-        return asTableField(source) or ''
+        return asTableField(source) or '', oop
     end
     if source.type == 'doc.type.function' then
-        return asDocFunction(source)
+        return asDocFunction(source), oop
     end
     if source.type == 'doc.field' then
-        return asDocField(source)
+        return asDocField(source), oop
     end
     local parent = source.parent
     if parent then
         return buildName(parent, oop)
     end
-    return ''
+    return '', oop
 end
 
 return buildName

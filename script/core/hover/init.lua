@@ -24,7 +24,7 @@ local function getHoverAsValue(source)
     local oop = source.type == 'method'
              or source.type == 'getmethod'
              or source.type == 'setmethod'
-    local label = getLabel(source, oop)
+    local label = getLabel(source)
     local desc  = getDesc(source)
     if not desc then
         local values = vm.getDefs(source, 0)
@@ -62,7 +62,7 @@ local function getHoverAsFunction(source)
                     return
                 end
                 mark[value] =true
-                local label = getLabel(value, oop)
+                local label = getLabel(value)
                 if label then
                     defs = defs + 1
                     labels[label] = (labels[label] or 0) + 1

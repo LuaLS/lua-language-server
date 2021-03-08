@@ -245,7 +245,7 @@ function string.sub(s: string, i: integer, j?: integer)
 TEST[[
 ('xx'):<?sub?>()
 ]]
-[[function string:sub(i: integer, j?: integer)
+[[function string.sub(s: string, i: integer, j?: integer)
   -> string]]
 
 TEST [[

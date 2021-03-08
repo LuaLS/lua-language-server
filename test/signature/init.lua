@@ -214,3 +214,16 @@ function pairs(t: <T>)
 ]],
     arg = {16, 21},
 }
+
+TEST [[
+function m:f()
+end
+
+m.f($)
+]]
+{
+    label = [[
+function m.f(self: table)
+]],
+    arg = {14, 24},
+}

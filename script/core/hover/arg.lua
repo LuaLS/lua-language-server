@@ -14,29 +14,31 @@ local function optionalArg(arg)
 end
 
 local function asFunction(source, oop)
-    if not source.args then
-        return ''
-    end
     local args = {}
-    for i = 1, #source.args do
-        local arg = source.args[i]
-        local name = arg.name or guide.getKeyName(arg)
-        if name then
-            args[i] = ('%s%s: %s'):format(
-                name,
-                optionalArg(arg) and '?' or '',
-                vm.getInferType(arg)
-            )
-        else
-            args[i] = ('%s'):format(vm.getInferType(arg))
-        end
-    end
     local methodDef
     local parent = source.parent
     if parent and parent.type == 'setmethod' then
         methodDef = true
     end
-    if not methodDef and oop then
+    if methodDef then
+        args[#args+1] = ('self: %s'):format(vm.getInferType(parent.node))
+    end
+    if source.args then
+        for i = 1, #source.args do
+            local arg = source.args[i]
+            local name = arg.name or guide.getKeyName(arg)
+            if name then
+                args[#args+1] = ('%s%s: %s'):format(
+                    name,
+                    optionalArg(arg) and '?' or '',
+                    vm.getInferType(arg)
+                )
+            else
+                args[#args+1] = ('%s'):format(vm.getInferType(arg))
+            end
+        end
+    end
+    if oop then
         return table.concat(args, ', ', 2)
     else
         return table.concat(args, ', ')

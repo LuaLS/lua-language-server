@@ -7,6 +7,7 @@
 * `FIX` missed syntax error `local a <const>= 1`
 * `FIX` workspace: preload blocked when hitting `Lua.workspace.maxPreload`
 * `FIX` [#443](https://github.com/sumneko/lua-language-server/issues/443)
+* `FIX` [#445](https://github.com/sumneko/lua-language-server/issues/445)
 
 ## 1.17.4
 `2021-3-4`

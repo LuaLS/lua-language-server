@@ -10,9 +10,10 @@ local config      = require 'config'
 local files       = require 'files'
 
 local function asFunction(source, oop)
-    local name = buildName(source, oop)
-    local arg  = buildArg(source, oop)
-    local rtn  = buildReturn(source)
+    local name
+    name, oop   = buildName(source, oop)
+    local arg   = buildArg(source, oop)
+    local rtn   = buildReturn(source)
     local lines = {}
     lines[1] = ('function %s(%s)'):format(name, arg)
     lines[2] = rtn

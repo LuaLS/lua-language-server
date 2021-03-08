@@ -25,15 +25,20 @@ local function encode_newline()
 end
 
 local encode_map = {}
-for k ,v in next, json.encode_map do
+local encode_string = json._encode_string
+for k ,v in next, json._encode_map do
     encode_map[k] = v
 end
-
-local encode_string = json.encode_map.string
 
 local function encode(v)
     local res = encode_map[type(v)](v)
     statusQue[#statusQue+1] = res
+end
+
+function encode_map.string(v)
+    statusQue[#statusQue+1] = '"'
+    statusQue[#statusQue+1] = encode_string(v)
+    return '"'
 end
 
 function encode_map.table(t)
@@ -62,15 +67,17 @@ function encode_map.table(t)
         statusDep = statusDep + 1
         encode_newline()
         local k = key[1]
+        statusQue[#statusQue+1] = '"'
         statusQue[#statusQue+1] = encode_string(k)
-        statusQue[#statusQue+1] = ": "
+        statusQue[#statusQue+1] = '": '
         encode(t[k])
         for i = 2, #key do
             local k = key[i]
             statusQue[#statusQue+1] = ","
             encode_newline()
+            statusQue[#statusQue+1] = '"'
             statusQue[#statusQue+1] = encode_string(k)
-            statusQue[#statusQue+1] = ": "
+            statusQue[#statusQue+1] = '": '
             encode(t[k])
         end
         statusDep = statusDep - 1

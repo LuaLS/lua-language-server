@@ -256,7 +256,26 @@ until $1"
         end
         return false
     end},
-    {'then'},
+    {'then', function (hasSpace, isExp, results, text, start)
+        local first = text:match('%S+%s+(%S+)', start)
+        if first == 'end'
+        or first == 'else'
+        or first == 'elseif' then
+            return false
+        end
+        if not hasSpace then
+            results[#results+1] = {
+                label = 'then .. end',
+                kind  = define.CompletionItemKind.Snippet,
+                insertTextFormat = 2,
+                insertText = '\z
+then\
+\t$0\
+end'
+            }
+        end
+        return true
+    end},
     {'true'},
     {'until'},
     {'while', function (hasSpace, isExp, results)

@@ -3,6 +3,7 @@
 ## 1.18.0
 * `NEW` `LuaDoc`: supports `---@diagnostic disable`
 * `NEW` code-action: convert JSON to Lua
+* `NEW` completion: provide `then .. end` snippet
 * `CHG` `Windows`: dose not provide `ucrt` any more
 * `CHG` `Lua.workspace.library`: use `path[]` instead of `<path, true>`
 * `FIX` missed syntax error `local a <const>= 1`

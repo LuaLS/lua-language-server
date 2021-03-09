@@ -2225,3 +2225,50 @@ m.f$
     },
 }
 Cared['insertText'] = nil
+
+TEST [[
+if true then$
+]]
+{
+    {
+        label = 'then',
+        kind  = define.CompletionItemKind.Keyword,
+    },
+    {
+        label = 'then .. end',
+        kind  = define.CompletionItemKind.Snippet,
+    }
+}
+
+TEST [[
+if true then$
+end
+]]
+{
+    {
+        label = 'then',
+        kind  = define.CompletionItemKind.Keyword,
+    },
+}
+
+TEST [[
+if true then$
+else
+]]
+{
+    {
+        label = 'then',
+        kind  = define.CompletionItemKind.Keyword,
+    },
+}
+
+TEST [[
+if true then$
+elseif
+]]
+{
+    {
+        label = 'then',
+        kind  = define.CompletionItemKind.Keyword,
+    },
+}

@@ -739,7 +739,7 @@ local function checkKeyWord(ast, text, start, word, hasSpace, afterLocal, result
         if snipType == 'Both' or snipType == 'Replace' then
             local func = data[2]
             if func then
-                replaced = func(hasSpace, isExp, results)
+                replaced = func(hasSpace, isExp, results, text, start)
                 extra = true
             end
         end
@@ -752,7 +752,7 @@ local function checkKeyWord(ast, text, start, word, hasSpace, afterLocal, result
                     label = key,
                     kind  = define.CompletionItemKind.Keyword,
                 }
-                if extra then
+                if #results > 0 and extra then
                     table.insert(results, #results, item)
                 else
                     results[#results+1] = item

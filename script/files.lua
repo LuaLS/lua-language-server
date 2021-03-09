@@ -703,12 +703,9 @@ end
 ---@param offset2 integer
 function m.range(uri, offset1, offset2)
     local range = {
-        start   = m.position(uri, offset1, false),
+        start   = m.position(uri, offset1 - 1, false),
         ['end'] = m.position(uri, offset2, true),
     }
-    if range.start.character > 0 then
-        range.start.character = range.start.character - 1
-    end
     return range
 end
 

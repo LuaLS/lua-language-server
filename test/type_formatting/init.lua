@@ -91,3 +91,13 @@ if true then$end
         },
     }
 }
+
+TEST [[
+if true then
+    $
+end
+]]
+{
+    ch = '\n',
+    edits = {}
+}

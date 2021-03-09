@@ -2,6 +2,7 @@
 
 ## 1.19.0
 * `CHG` semantic-tokens: improve colors of `const` and `close`
+* `CHG` type-formating: improve execution conditions
 
 ## 1.18.0
 `2021-3-9`

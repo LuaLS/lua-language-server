@@ -14,7 +14,7 @@ local function insertIndentation(uri, offset, edits)
 end
 
 local function findForward(text, offset, ...)
-    local pos = text:match('^%s*()', offset)
+    local pos = text:match('^[ \t]*()', offset)
     for _, symbol in ipairs { ... } do
         if text:sub(pos, pos + #symbol - 1) == symbol then
             return pos, symbol

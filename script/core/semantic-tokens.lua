@@ -83,12 +83,35 @@ Care['getlocal'] = function (source, results)
     or source[1] == 'self' then
         return
     end
-    -- 5. 函数调用
+    -- 5. const 变量
+    if loc.attrs then
+        for _, attr in ipairs(loc.attrs) do
+            local name = attr[1]
+            if name == 'const' then
+                results[#results+1] = {
+                    start      = source.start,
+                    finish     = source.finish,
+                    type       = define.TokenTypes.variable,
+                    modifieres = define.TokenModifiers.static,
+                }
+                return
+            elseif name == 'close' then
+                results[#results+1] = {
+                    start      = source.start,
+                    finish     = source.finish,
+                    type       = define.TokenTypes.variable,
+                    modifieres = define.TokenModifiers.abstract,
+                }
+                return
+            end
+        end
+    end
+    -- 6. 函数调用
     if  source.parent.type == 'call'
     and source.parent.node == source then
         return
     end
-    -- 6. 其他
+    -- 7. 其他
     results[#results+1] = {
         start      = source.start,
         finish     = source.finish,
@@ -96,6 +119,30 @@ Care['getlocal'] = function (source, results)
     }
 end
 Care['setlocal'] = Care['getlocal']
+Care['local'] = function (source, results)
+    if source.attrs then
+        for _, attr in ipairs(source.attrs) do
+            local name = attr[1]
+            if name == 'const' then
+                results[#results+1] = {
+                    start      = source.start,
+                    finish     = source.finish,
+                    type       = define.TokenTypes.variable,
+                    modifieres = define.TokenModifiers.static,
+                }
+                return
+            elseif name == 'close' then
+                results[#results+1] = {
+                    start      = source.start,
+                    finish     = source.finish,
+                    type       = define.TokenTypes.variable,
+                    modifieres = define.TokenModifiers.abstract,
+                }
+                return
+            end
+        end
+    end
+end
 Care['doc.return.name'] = function (source, results)
     results[#results+1] = {
         start  = source.start,

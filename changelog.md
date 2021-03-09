@@ -1,5 +1,8 @@
 # changelog
 
+## 1.19.0
+* `CHG` semantic-tokens: improve colors of `const` and `close`
+
 ## 1.18.0
 `2021-3-9`
 * `NEW` `LuaDoc`: supports `---@diagnostic disable`

@@ -281,6 +281,7 @@ proto.on('textDocument/didChange', function (params)
         end
         files.setRawText(uri, text)
     end
+    files.setRawText(uri, '')
     files.setText(uri, text, true)
 end)
 

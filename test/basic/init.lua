@@ -104,6 +104,7 @@ for _, change in ipairs(changes) do
     else
         text = change.text
     end
+    files.setRawText('', text)
 end
 
 assert(text == [[

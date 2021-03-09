@@ -279,6 +279,7 @@ proto.on('textDocument/didChange', function (params)
         else
             text = change.text
         end
+        files.setRawText(uri, text)
     end
     files.setText(uri, text, true)
 end)

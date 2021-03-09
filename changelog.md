@@ -1,6 +1,7 @@
 # changelog
 
 ## 1.18.0
+`2021-3-9`
 * `NEW` `LuaDoc`: supports `---@diagnostic disable`
 * `NEW` code-action: convert JSON to Lua
 * `NEW` completion: provide `then .. end` snippet

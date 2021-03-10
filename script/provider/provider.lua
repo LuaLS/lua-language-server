@@ -288,8 +288,8 @@ end)
 proto.on('textDocument/hover', function (params)
     await.close 'hover'
     await.setID 'hover'
-    local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_HOVER, 0.5)
     workspace.awaitReady()
+    local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_HOVER, 0.5)
     local core = require 'core.hover'
     local doc    = params.textDocument
     local uri    = doc.uri
@@ -315,8 +315,8 @@ proto.on('textDocument/hover', function (params)
 end)
 
 proto.on('textDocument/definition', function (params)
-    local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_DEFINITION, 0.5)
     workspace.awaitReady()
+    local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_DEFINITION, 0.5)
     local core   = require 'core.definition'
     local uri    = params.textDocument.uri
     if not files.exists(uri) then
@@ -344,8 +344,8 @@ proto.on('textDocument/definition', function (params)
 end)
 
 proto.on('textDocument/references', function (params)
-    local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_REFERENCE, 0.5)
     workspace.awaitReady()
+    local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_REFERENCE, 0.5)
     local core   = require 'core.reference'
     local uri    = params.textDocument.uri
     if not files.exists(uri) then
@@ -388,8 +388,8 @@ proto.on('textDocument/documentHighlight', function (params)
 end)
 
 proto.on('textDocument/rename', function (params)
-    local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_RENAME, 0.5)
     workspace.awaitReady()
+    local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_RENAME, 0.5)
     local core = require 'core.rename'
     local uri  = params.textDocument.uri
     if not files.exists(uri) then
@@ -432,8 +432,10 @@ proto.on('textDocument/prepareRename', function (params)
 end)
 
 proto.on('textDocument/completion', function (params)
-    local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_COMPLETION, 0.5)
+    await.close 'completion'
+    await.setID 'completion'
     workspace.awaitReady()
+    local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_COMPLETION, 0.5)
     --log.info(util.dump(params))
     local core  = require 'core.completion'
     --log.debug('textDocument/completion')
@@ -560,8 +562,8 @@ proto.on('textDocument/signatureHelp', function (params)
     if not config.config.signatureHelp.enable then
         return nil
     end
-    local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SIGNATURE, 0.5)
     workspace.awaitReady()
+    local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SIGNATURE, 0.5)
     local uri = params.textDocument.uri
     if not files.exists(uri) then
         return nil
@@ -601,8 +603,8 @@ proto.on('textDocument/signatureHelp', function (params)
 end)
 
 proto.on('textDocument/documentSymbol', function (params)
-    local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SYMBOL, 0.5)
     workspace.awaitReady()
+    local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SYMBOL, 0.5)
     local core = require 'core.document-symbol'
     local uri   = params.textDocument.uri
 
@@ -687,8 +689,8 @@ proto.on('workspace/executeCommand', function (params)
 end)
 
 proto.on('workspace/symbol', function (params)
-    local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_WS_SYMBOL, 0.5)
     workspace.awaitReady()
+    local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_WS_SYMBOL, 0.5)
     local core = require 'core.workspace-symbol'
 
     await.close('workspace/symbol')
@@ -720,8 +722,8 @@ end)
 
 
 proto.on('textDocument/semanticTokens/full', function (params)
-    local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SEMANTIC_FULL, 0.5)
     workspace.awaitReady()
+    local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SEMANTIC_FULL, 0.5)
     local core = require 'core.semantic-tokens'
     local uri = params.textDocument.uri
     local text  = files.getText(uri)
@@ -735,8 +737,8 @@ proto.on('textDocument/semanticTokens/full', function (params)
 end)
 
 proto.on('textDocument/semanticTokens/range', function (params)
-    local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SEMANTIC_RANGE, 0.5)
     workspace.awaitReady()
+    local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SEMANTIC_RANGE, 0.5)
     local core = require 'core.semantic-tokens'
     local uri = params.textDocument.uri
     local start  = files.offsetOfWord(uri, params.range.start)
@@ -822,8 +824,8 @@ proto.on('$/status/click', function ()
 end)
 
 proto.on('textDocument/onTypeFormatting', function (params)
-    local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_TYPE_FORMATTING, 0.5)
     workspace.awaitReady()
+    local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_TYPE_FORMATTING, 0.5)
     local ch     = params.ch
     local uri    = params.textDocument.uri
     if not files.exists(uri) then

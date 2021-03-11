@@ -1,6 +1,7 @@
 # changelog
 
 ## 1.19.0
+* `CHG` text-document-synchronization: refactored
 * `FIX` missed syntax error `function m['x']() end`
 
 ## 1.18.1

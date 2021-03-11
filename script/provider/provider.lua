@@ -17,6 +17,7 @@ local fs        = require 'bee.filesystem'
 local lang      = require 'language'
 local plugin    = require 'plugin'
 local progress  = require 'progress'
+local tm        = require 'text-merger'
 
 local function updateConfig()
     local diagnostics = require 'provider.diagnostic'
@@ -270,18 +271,8 @@ proto.on('textDocument/didChange', function (params)
     if not files.isLua(uri) and not files.isOpen(uri) then
         return
     end
-    files.clearDiff(uri)
-    local text = files.getText(uri) or ''
-    for _, change in ipairs(changes) do
-        if change.range then
-            local start, finish = files.unrange(uri, change.range)
-            text = text:sub(1, start - 1) .. change.text .. text:sub(finish)
-        else
-            text = change.text
-        end
-        files.setRawText(uri, text)
-    end
-    files.setRawText(uri, '')
+    log.debug('changes', util.dump(changes))
+    local text = tm(uri, changes)
     files.setText(uri, text, true)
 end)
 

@@ -46,6 +46,9 @@ local function mergeRows(rows, change)
     local endChar   = change.range['end'].character
 
     local insertRows = splitRows(change.text)
+    local newEndLine = startLine + #insertRows - 1
+    local left       = getLeft(rows[startLine], startChar)
+    local right      = getRight(rows[endLine],  endChar)
     -- 先把双方的行数调整成一致
     local delta = #insertRows - (endLine - startLine + 1)
     if delta ~= 0 then
@@ -58,9 +61,6 @@ local function mergeRows(rows, change)
         end
     end
     -- 先处理第一行和最后一行
-    local newEndLine = startLine + #insertRows - 1
-    local left  = getLeft(rows[startLine],   startChar)
-    local right = getRight(rows[newEndLine], endChar)
     if startLine == newEndLine then
         rows[startLine]  = left .. insertRows[1] .. right
     else

@@ -172,3 +172,48 @@ end
         text = "p",
     },
 }
+
+TEST [[
+print(12345)
+]] [[
+print(123
+45)
+]] {
+    [1] = {
+        range = {
+            ["end"] = {
+                character = 9,
+                line = 0,
+            },
+            start = {
+                character = 9,
+                line = 0,
+            },
+        },
+        rangeLength = 0,
+        text = "\
+",
+    },
+}
+
+TEST [[
+print(123
+45)
+]] [[
+print(12345)
+]] {
+    [1] = {
+        range = {
+            ["end"] = {
+                character = 0,
+                line = 1,
+            },
+            start = {
+                character = 9,
+                line = 0,
+            },
+        },
+        rangeLength = 2,
+        text = "",
+    },
+}

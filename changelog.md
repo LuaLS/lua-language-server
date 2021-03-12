@@ -1,6 +1,8 @@
 # changelog
 
 ## 1.19.0
+* `NEW` VSCode: new setting `Lua.misc.parameters`
+* `CHG` improve performance
 * `CHG` text-document-synchronization: refactored
 * `FIX` missed syntax error `function m['x']() end`
 

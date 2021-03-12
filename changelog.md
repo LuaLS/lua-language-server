@@ -2,6 +2,7 @@
 
 ## 1.19.0
 * `NEW` VSCode: new setting `Lua.misc.parameters`
+* `NEW` quick fix: disable diagnostic in line/file
 * `CHG` improve performance
 * `CHG` text-document-synchronization: refactored
 * `FIX` missed syntax error `function m['x']() end`

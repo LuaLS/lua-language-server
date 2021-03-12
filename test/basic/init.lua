@@ -1,15 +1,31 @@
 local files = require 'files'
+local tm    = require 'text-merger'
 
-local text = [[
+local function TEST(source)
+    return function (expect)
+        return function (changes)
+            files.removeAll()
+            files.setText('', source)
+            local text = tm('', changes)
+            assert(text == expect)
+        end
+    end
+end
+
+TEST [[
 
 
 function Test(self)
 
 end
-]]
-files.setText('', text)
+]][[
 
-local changes = {
+
+function Test(self)
+
+end
+
+asser]]{
     [1] = {
         range = {
             ["end"] = {
@@ -97,21 +113,107 @@ local changes = {
     },
 }
 
-for _, change in ipairs(changes) do
-    if change.range then
-        local start, finish = files.unrange('', change.range)
-        text = text:sub(1, start - 1) .. change.text .. text:sub(finish)
-    else
-        text = change.text
-    end
-    files.setRawText('', text)
+TEST [[
+local mt = {}
+
+function mt['xxx']()
+    
+
+    
 end
+]] [[
+local mt = {}
 
-assert(text == [[
-
-
-function Test(self)
-
+function mt['xxx']()
+    
 end
+]] {
+    [1] = {
+        range = {
+            ["end"] = {
+                character = 4,
+                line = 5,
+            },
+            start = {
+                character = 4,
+                line = 3,
+            },
+        },
+        rangeLength = 8,
+        text = "",
+    },
+}
 
-asser]])
+TEST [[
+local mt = {}
+
+function mt['xxx']()
+    
+end
+]] [[
+local mt = {}
+
+function mt['xxx']()
+    p
+end
+]] {
+    [1] = {
+        range = {
+            ["end"] = {
+                character = 4,
+                line = 3,
+            },
+            start = {
+                character = 4,
+                line = 3,
+            },
+        },
+        rangeLength = 0,
+        text = "p",
+    },
+}
+
+TEST [[
+print(12345)
+]] [[
+print(123
+45)
+]] {
+    [1] = {
+        range = {
+            ["end"] = {
+                character = 9,
+                line = 0,
+            },
+            start = {
+                character = 9,
+                line = 0,
+            },
+        },
+        rangeLength = 0,
+        text = "\
+",
+    },
+}
+
+TEST [[
+print(123
+45)
+]] [[
+print(12345)
+]] {
+    [1] = {
+        range = {
+            ["end"] = {
+                character = 0,
+                line = 1,
+            },
+            start = {
+                character = 9,
+                line = 0,
+            },
+        },
+        rangeLength = 2,
+        text = "",
+    },
+}

@@ -19,6 +19,7 @@ if platform.OS == 'Windows' then
     unicode  = require 'bee.unicode'
 end
 
+---@class files
 local m = {}
 
 m.openMap        = {}
@@ -204,6 +205,24 @@ function m.setRawText(uri, text)
     m.linesMap[uri]       = nil
     m.originLinesMap[uri] = nil
     m.astMap[uri]         = nil
+end
+
+function m.getCachedRows(uri)
+    uri = getUriKey(uri)
+    local file = m.fileMap[uri]
+    if not file then
+        return nil
+    end
+    return file.rows
+end
+
+function m.setCachedRows(uri, rows)
+    uri = getUriKey(uri)
+    local file = m.fileMap[uri]
+    if not file then
+        return
+    end
+    file.rows = rows
 end
 
 --- 获取文件版本
@@ -631,17 +650,6 @@ function m.diffedOffsetBack(uri, offset)
         return offset, offset
     end
     return smerger.getOffsetBack(file._diffInfo, offset)
-end
-
-function m.clearDiff(uri)
-    uri = m.getUri(uri)
-    local file = m.fileMap[uri]
-    if not file then
-        return
-    end
-    file._diffInfo  = nil
-    file.text       = file.originText
-    m.linesMap[uri] = m.originLinesMap[uri]
 end
 
 --- 将光标位置转化为 position

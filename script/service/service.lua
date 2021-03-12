@@ -141,16 +141,15 @@ end
 function m.startTimer()
     pub.task('timer', 1)
     while true do
-        pub.step(not m.working)
+        pub.step(not m.workingClock)
         if await.step() then
             m.sleeping = false
-            if not m.working then
-                m.working = true
-                m.reportStatus()
+            if not m.workingClock then
+                m.workingClock = time.monotonic()
             end
         else
-            if m.working then
-                m.working = false
+            if m.workingClock then
+                m.workingClock = nil
                 m.idleClock = time.monotonic()
                 m.reportStatus()
             end
@@ -159,9 +158,9 @@ function m.startTimer()
     end
 end
 
-function m.checkSleep()
+function m.pulse()
     timer.loop(10, function ()
-        if not m.working and not m.sleeping and time.monotonic() - m.idleClock >= 300000 then
+        if not m.workingClock and not m.sleeping and time.monotonic() - m.idleClock >= 300000 then
             m.sleeping = true
             files.flushCache()
             vm.flushCache()
@@ -171,11 +170,14 @@ function m.checkSleep()
         end
         m.reportStatus()
     end)
+    timer.loop(0.1, function ()
+        m.reportStatus()
+    end)
 end
 
 function m.reportStatus()
     local info = {}
-    if m.working then
+    if m.workingClock and time.monotonic() - m.workingClock > 100 then
         info.text = '$(loading~spin)Lua'
     elseif m.sleeping then
         info.text = "💤Lua"
@@ -212,7 +214,7 @@ function m.start()
     pub.recruitBraves(4)
     proto.listen()
     m.report()
-    m.checkSleep()
+    m.pulse()
     m.reportStatus()
     m.testVersion()
 

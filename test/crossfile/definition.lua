@@ -564,9 +564,7 @@ TEST {
     {
         path = 'a.lua',
         content = [[
-            local t = GlobalTable
-
-            t.settings = {
+            GlobalTable.settings = {
                 <!test!> = 1
             }
         ]],

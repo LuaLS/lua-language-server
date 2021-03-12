@@ -2404,6 +2404,7 @@ function m.searchSameFieldsInValue(status, ref, start, pushQueue, mode)
     if not m.checkValueMark(status, ref, value) then
         --return
     end
+    status.share.inSetValue = (status.share.inSetValue or 0) + 1
     if not status.share.tempValueMark then
         status.share.tempValueMark = {}
     end
@@ -2417,6 +2418,7 @@ function m.searchSameFieldsInValue(status, ref, start, pushQueue, mode)
         end
         pushQueue(value, start, true)
     end
+    status.share.inSetValue = (status.share.inSetValue or 0) - 1
     -- 检查形如 a = f() 的分支情况
     m.checkSameSimpleInCall(status, value, start, pushQueue, mode)
 end
@@ -2474,6 +2476,9 @@ end
 function m.checkSameSimpleAsSetValue(status, ref, start, pushQueue)
     if not status.deep then
         --return
+    end
+    if status.share.inSetValue and status.share.inSetValue > 0 then
+        return
     end
     if ref.type == 'select' then
         return

@@ -271,7 +271,7 @@ proto.on('textDocument/didChange', function (params)
     if not files.isLua(uri) and not files.isOpen(uri) then
         return
     end
-    log.debug('changes', util.dump(changes))
+    --log.debug('changes', util.dump(changes))
     local text = tm(uri, changes)
     files.setText(uri, text, true)
 end)

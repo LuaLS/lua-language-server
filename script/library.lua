@@ -5,6 +5,7 @@ local lang    = require 'language'
 local client  = require 'provider.client'
 local lloader = require 'locale-loader'
 local fsu     = require 'fs-utility'
+local define  = require "proto.define"
 
 local m = {}
 
@@ -76,7 +77,7 @@ local function createViewDocument(name)
     return ('[%s](%s)'):format(lang.script.HOVER_VIEW_DOCUMENTS, lang.script(fmt, 'pdf-' .. name))
 end
 
-local function compileSingleMetaDoc(script, metaLang)
+local function compileSingleMetaDoc(script, metaLang, status)
     if not script then
         return nil
     end
@@ -170,7 +171,7 @@ local function compileSingleMetaDoc(script, metaLang)
     util.saveFile((ROOT / 'log' / 'middleScript.lua'):string(), middleScript)
 
     assert(load(middleScript, middleScript, 't', env))()
-    if disable then
+    if disable and status == 'default' then
         return nil
     end
     return table.concat(compileBuf)
@@ -205,13 +206,14 @@ local function compileMetaDoc()
     fs.create_directories(metaPath)
     local out = fsu.dummyFS()
     local templateDir = ROOT / 'meta' / 'template'
-    for libName, status in pairs(config.config.runtime.builtin) do
-        if status ~= 'enable' then
+    for libName, status in pairs(define.BuiltIn) do
+        status = config.config.runtime.builtin[libName] or status
+        if status == 'disable' then
             goto CONTINUE
         end
         libName = libName .. '.lua'
         local libPath = templateDir / libName
-        local metaDoc = compileSingleMetaDoc(fsu.loadFile(libPath), metaLang)
+        local metaDoc = compileSingleMetaDoc(fsu.loadFile(libPath), metaLang, status)
         if metaDoc then
             local outPath = metaPath / libName
             out:saveFile(libName, metaDoc)

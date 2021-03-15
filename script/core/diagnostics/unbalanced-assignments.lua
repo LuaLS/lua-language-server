@@ -1,7 +1,7 @@
 local files  = require 'files'
 local define = require 'proto.define'
 local lang   = require 'language'
-local guide  = require 'parser.guide'
+local guide  = require 'core.guide'
 
 return function (uri, callback, code)
     local ast = files.getAst(uri)

@@ -1,6 +1,6 @@
 local vm       = require 'vm'
 local util     = require 'utility'
-local guide    = require 'parser.guide'
+local guide    = require 'core.guide'
 local config   = require 'config'
 local lang     = require 'language'
 

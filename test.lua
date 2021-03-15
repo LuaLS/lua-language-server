@@ -46,7 +46,7 @@ end
 
 local function main()
     debug.setcstacklimit(1000)
-    require 'parser.guide'.debugMode = true
+    require 'core.guide'.debugMode = true
     require 'language' 'zh-cn'
     require 'utility'.enableCloseFunction()
     local function test(name)

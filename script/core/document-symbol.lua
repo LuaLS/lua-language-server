@@ -1,6 +1,6 @@
 local await  = require 'await'
 local files  = require 'files'
-local guide  = require 'parser.guide'
+local guide  = require 'core.guide'
 local define = require 'proto.define'
 local util   = require 'utility'
 

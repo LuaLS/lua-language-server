@@ -1,4 +1,4 @@
-local guide = require 'parser.guide'
+local guide = require 'core.guide'
 ---@type vm
 local vm    = require 'vm.vm'
 local files = require 'files'

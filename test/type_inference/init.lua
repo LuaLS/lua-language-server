@@ -1,7 +1,7 @@
 local files  = require 'files'
 local config = require 'config'
 local vm     = require 'vm'
-local guide  = require 'parser.guide'
+local guide  = require 'core.guide'
 
 rawset(_G, 'TEST', true)
 

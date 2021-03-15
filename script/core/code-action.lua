@@ -1,7 +1,7 @@
 local files   = require 'files'
 local lang    = require 'language'
 local define  = require 'proto.define'
-local guide   = require 'parser.guide'
+local guide   = require 'core.guide'
 local util    = require 'utility'
 local sp      = require 'bee.subprocess'
 local vm      = require 'vm'

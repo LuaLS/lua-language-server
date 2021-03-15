@@ -1,6 +1,6 @@
 local files      = require 'files'
 local vm         = require 'vm'
-local guide      = require 'parser.guide'
+local guide      = require 'core.guide'
 local proto      = require 'proto'
 local define     = require 'proto.define'
 local util       = require 'utility'

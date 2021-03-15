@@ -1,5 +1,5 @@
 local files      = require 'files'
-local guide      = require 'parser.guide'
+local guide      = require 'core.guide'
 local vm         = require 'vm'
 local getLabel   = require 'core.hover.label'
 local getDesc    = require 'core.hover.description'

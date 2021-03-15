@@ -1,5 +1,5 @@
 local define     = require 'proto.define'
-local guide      = require 'parser.guide'
+local guide      = require 'core.guide'
 
 local keyWordMap = {
     {'do', function (hasSpace, isExp, results)

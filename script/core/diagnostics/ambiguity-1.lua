@@ -1,5 +1,5 @@
 local files = require 'files'
-local guide = require 'parser.guide'
+local guide = require 'core.guide'
 local lang  = require 'language'
 
 local opMap = {

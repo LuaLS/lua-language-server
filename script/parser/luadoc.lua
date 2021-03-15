@@ -1,7 +1,7 @@
 local m          = require 'lpeglabel'
 local re         = require 'parser.relabel'
 local lines      = require 'parser.lines'
-local guide      = require 'parser.guide'
+local guide      = require 'core.guide'
 
 local TokenTypes, TokenStarts, TokenFinishs, TokenContents
 local Ci, Offset, pushError, Ct, NextComment

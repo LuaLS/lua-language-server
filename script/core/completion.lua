@@ -1,6 +1,6 @@
 local define       = require 'proto.define'
 local files        = require 'files'
-local guide        = require 'parser.guide'
+local guide        = require 'core.guide'
 local matchKey     = require 'core.matchkey'
 local vm           = require 'vm'
 local getLabel     = require 'core.hover.label'

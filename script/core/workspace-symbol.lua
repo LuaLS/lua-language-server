@@ -1,5 +1,5 @@
 local files    = require 'files'
-local guide    = require 'parser.guide'
+local guide    = require 'core.guide'
 local matchKey = require 'core.matchkey'
 local define   = require 'proto.define'
 local await    = require 'await'

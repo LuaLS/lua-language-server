@@ -1,4 +1,4 @@
-local guide      = require 'parser.guide'
+local guide      = require 'core.guide'
 local files      = require 'files'
 local vm         = require 'vm'
 local define     = require 'proto.define'

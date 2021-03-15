@@ -1,4 +1,4 @@
-local guide      = require 'parser.guide'
+local guide      = require 'core.guide'
 local workspace  = require 'workspace'
 local files      = require 'files'
 local vm         = require 'vm'

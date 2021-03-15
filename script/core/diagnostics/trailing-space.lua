@@ -1,6 +1,6 @@
 local files = require 'files'
 local lang  = require 'language'
-local guide = require 'parser.guide'
+local guide = require 'core.guide'
 
 local function isInString(ast, offset)
     local result = false

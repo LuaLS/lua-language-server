@@ -1,6 +1,6 @@
 ---@type vm
 local vm    = require 'vm.vm'
-local guide = require 'parser.guide'
+local guide = require 'core.guide'
 
 local function lookUpDocClass(source)
     local infers = vm.getInfers(source, 0)

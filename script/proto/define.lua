@@ -1,4 +1,4 @@
-local guide = require 'parser.guide'
+local guide = require 'core.guide'
 local util  = require 'utility'
 
 local m = {}

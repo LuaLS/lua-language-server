@@ -2,7 +2,7 @@
 local vm      = require 'vm.vm'
 local files   = require 'files'
 local ws      = require 'workspace'
-local guide   = require 'parser.guide'
+local guide   = require 'core.guide'
 local await   = require 'await'
 local config  = require 'config'
 

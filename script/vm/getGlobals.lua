@@ -1,4 +1,4 @@
-local guide   = require 'parser.guide'
+local guide   = require 'core.guide'
 local await   = require "await"
 ---@type vm
 local vm      = require 'vm.vm'

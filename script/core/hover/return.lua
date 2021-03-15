@@ -1,4 +1,4 @@
-local guide = require 'parser.guide'
+local guide = require 'core.guide'
 local vm    = require 'vm'
 
 local function mergeTypes(returns)

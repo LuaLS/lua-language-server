@@ -1,6 +1,6 @@
 local files        = require 'files'
 local lookBackward = require 'core.look-backward'
-local guide        = require 'parser.guide'
+local guide        = require 'core.guide'
 
 local function insertIndentation(uri, offset, edits)
     local lines  = files.getLines(uri)

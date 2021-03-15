@@ -2,7 +2,7 @@ local files   = require 'files'
 local vm      = require 'vm'
 local lang    = require 'language'
 local config  = require 'config'
-local guide   = require 'parser.guide'
+local guide   = require 'core.guide'
 local define  = require 'proto.define'
 
 return function (uri, callback)

@@ -1,5 +1,5 @@
 local files  = require 'files'
-local guide  = require 'parser.guide'
+local guide  = require 'core.guide'
 local vm     = require 'vm'
 local lang   = require 'language'
 

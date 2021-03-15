@@ -4,6 +4,7 @@ local util    = require 'utility'
 local lang    = require 'language'
 local client  = require 'provider.client'
 local lloader = require 'locale-loader'
+local fsu     = require 'fs-utility'
 
 local m = {}
 
@@ -76,6 +77,10 @@ local function createViewDocument(name)
 end
 
 local function compileSingleMetaDoc(script, metaLang)
+    if not script then
+        return nil
+    end
+
     local middleBuf = {}
     local compileBuf = {}
 
@@ -184,7 +189,7 @@ end
 local function compileMetaDoc()
     local langID  = lang.id
     local version = config.config.runtime.version
-    local metapath = fs.path(METAPATH) / config.config.runtime.meta:gsub('%$%{(.-)%}', {
+    local metaPath = fs.path(METAPATH) / config.config.runtime.meta:gsub('%$%{(.-)%}', {
         version  = version,
         language = langID,
     })
@@ -195,21 +200,26 @@ local function compileMetaDoc()
     end
     --log.debug('metaLang:', util.dump(metaLang))
 
-    m.metaPath = metapath:string()
+    m.metaPath = metaPath:string()
     m.metaPaths = {}
-    fs.create_directories(metapath)
+    fs.create_directories(metaPath)
+    local out = fsu.dummyFS()
     local templateDir = ROOT / 'meta' / 'template'
-    for fullpath in templateDir:list_directory() do
-        local filename = fullpath:filename()
-        local metaDoc = compileSingleMetaDoc(util.loadFile(fullpath:string()), metaLang)
-        local filepath = metapath / filename
-        if metaDoc then
-            util.saveFile(filepath:string(), metaDoc)
-            m.metaPaths[#m.metaPaths+1] = filepath:string()
-        else
-            fs.remove(filepath)
+    for libName, status in pairs(config.config.runtime.builtin) do
+        if status ~= 'enable' then
+            goto CONTINUE
         end
+        libName = libName .. '.lua'
+        local libPath = templateDir / libName
+        local metaDoc = compileSingleMetaDoc(fsu.loadFile(libPath), metaLang)
+        if metaDoc then
+            local outPath = metaPath / libName
+            out:saveFile(libName, metaDoc)
+            m.metaPaths[#m.metaPaths+1] = outPath:string()
+        end
+        ::CONTINUE::
     end
+    fsu.fileSync(out, metaPath)
 end
 
 local function initFromMetaDoc()

@@ -4,8 +4,9 @@
 * `NEW` VSCode: new setting `Lua.misc.parameters`
 * `NEW` quick fix: disable diagnostic in line/file
 * `CHG` intelli-scense: search from generic param to return
-* `CHG` improve performance
 * `CHG` text-document-synchronization: refactored
+* `CHG` diagnostic: improve `newline-call`
+* `CHG` improve performance
 * `FIX` missed syntax error `function m['x']() end`
 
 ## 1.18.1

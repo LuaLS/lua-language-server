@@ -230,13 +230,19 @@ _ENV = nil
 
 config.config.diagnostics.disable['undefined-env-child'] = nil
 TEST [[
-print()
-<!('string')!>:sub(1, 1)
+<!print()
+('string')!>:sub(1, 1)
 ]]
 
 TEST [[
 print()
 ('string')
+]]
+
+TEST [[
+pairs
+{}
+{}
 ]]
 
 TEST [[
@@ -356,14 +362,6 @@ local f;f = <!function () end!>
 TEST [[
 <!local function f() end!>
 ]]
-
---TEST [[
---F = <!function () end!>
---]]
---
---TEST [[
---<!function F() end!>
---]]
 
 config.config.diagnostics.disable['unused-local'] = nil
 TEST [[

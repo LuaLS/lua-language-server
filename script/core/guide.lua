@@ -1399,6 +1399,10 @@ function m.getCallAndArgIndex(callarg)
         end
     end
     local call = callargs.parent
+    local node = call.node
+    if node.type == 'getmethod' then
+        index = index + 1
+    end
     return call, index
 end
 
@@ -2584,6 +2588,69 @@ function m.checkSameSimpleAsKeyOrValueInForParis(status, ref, start, pushQueue)
     end
 end
 
+---
+---@param func core.guide.object
+---@param argIndex integer
+---@return integer?
+local function findGenericFromArgIndexToReturnIndex(func, argIndex)
+    if not func.bindDocs then
+        return nil
+    end
+    local paramType
+    for _, doc in ipairs(func.bindDocs) do
+        if doc.type == 'doc.param' then
+            if doc.extends.paramIndex == argIndex then
+                paramType = doc.extends
+                break
+            end
+        end
+    end
+    if not paramType then
+        return nil
+    end
+    for _, typeUnit in ipairs(paramType.types) do
+        if typeUnit.typeGeneric then
+            local generic = typeUnit.typeGeneric[typeUnit[1]]
+            if generic then
+                for _, typeName in ipairs(generic) do
+                    local docType = typeName.parent
+                    if docType.returnIndex then
+                        return docType.returnIndex
+                    end
+                end
+            end
+        end
+    end
+    return nil
+end
+
+function m.checkSameSimpleAsCallArg(status, ref, start, pushQueue)
+    local call, index = m.getCallAndArgIndex(ref)
+    if not call then
+        return
+    end
+    local newStatus = m.status(status)
+    m.searchRefs(newStatus, call.node, 'def')
+    for _, func in ipairs(newStatus.results) do
+        local rindex = findGenericFromArgIndexToReturnIndex(func, index)
+        if rindex then
+            if rindex == 1 then
+                if call.parent.type == 'select' then
+                    pushQueue(call.parent.parent, start, true)
+                end
+            else
+                if call.extParent then
+                    for _, slt in ipairs(call.extParent) do
+                        if slt.index == rindex then
+                            pushQueue(slt.parent, start, true)
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
 local function hasTypeName(doc, name)
     if doc.type == 'doc.type' then
         for _, tunit in ipairs(doc.types) do
@@ -2858,6 +2925,8 @@ function m.checkSameSimple(status, simple, ref, start, force, mode, pushQueue)
                 m.checkSameSimpleAsSetValue(status, ref, i, pushQueue)
                 -- 检查形如 for k,v in pairs()/ipairs() do end 的情况
                 m.checkSameSimpleAsKeyOrValueInForParis(status, ref, i, pushQueue)
+                -- 检查自己是函数参数的情况（泛型） local x = call(V)
+                m.checkSameSimpleAsCallArg(status, ref, i, pushQueue)
             end
         end
         if i == #simple then

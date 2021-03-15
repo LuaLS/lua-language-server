@@ -1103,6 +1103,47 @@ local function bindDocsBetween(sources, binded, bindSources, start, finish)
     end
 end
 
+local function bindParamAndReturnIndex(binded)
+    local func
+    for _, source in ipairs(binded[1].bindSources) do
+        if source.type == 'function' then
+            func = source
+            break
+        end
+    end
+    if not func then
+        return
+    end
+    if not func.args then
+        return
+    end
+    local paramIndex = 0
+    local parent = func.parent
+    if parent.type == 'setmethod' then
+        paramIndex = paramIndex + 1
+    end
+    local paramMap = {}
+    for _, param in ipairs(func.args) do
+        paramIndex = paramIndex + 1
+        if param[1] then
+            paramMap[param[1]] = paramIndex
+        end
+    end
+    local returnIndex = 0
+    for _, doc in ipairs(binded) do
+        if doc.type == 'doc.param' then
+            if doc.extends then
+                doc.extends.paramIndex = paramMap[doc.param[1]]
+            end
+        elseif doc.type == 'doc.return' then
+            for _, rtn in ipairs(doc.returns) do
+                returnIndex = returnIndex + 1
+                rtn.returnIndex = returnIndex
+            end
+        end
+    end
+end
+
 local function bindDoc(sources, lns, binded)
     if not binded then
         return
@@ -1124,6 +1165,7 @@ local function bindDoc(sources, lns, binded)
     if #bindSources == 0 then
         bindDocsBetween(sources, binded, bindSources, nstart, nfinish)
     end
+    bindParamAndReturnIndex(binded)
 end
 
 local function bindDocs(state)

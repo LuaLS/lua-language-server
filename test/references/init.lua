@@ -348,3 +348,41 @@ local function f() end
 local a, b = f()
 return a.x, b.<!x!>
 ]]
+
+TEST [[
+---@class Dog
+local Dog = {}
+function Dog:<?eat?>()
+end
+
+---@generic T
+---@param type1 T
+---@return T
+function foobar(type1)
+    return {}
+end
+
+local v1 = foobar(Dog)
+v1:<!eat!>()
+]]
+
+TEST [[
+---@class Dog
+local Dog = {}
+function Dog:<?eat?>()
+end
+
+---@class Master
+local Master = {}
+
+---@generic T
+---@param type1 string
+---@param type2 T
+---@return T
+function Master:foobar(type1, type2)
+    return {}
+end
+
+local v1 = Master:foobar("", Dog)
+v1.<!eat!>()
+]]

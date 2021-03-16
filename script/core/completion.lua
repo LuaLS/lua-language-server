@@ -1322,11 +1322,17 @@ local function checkTableLiteralField(ast, text, offset, call, funcs, index, res
         return guide.getKeyName(a) < guide.getKeyName(b)
     end)
     -- {$}
-    if source.type == 'table'
-    or source.type == 'getlocal'
-    or source.type == 'getglobal' then
+    local left = lookBackward.findWord(text, offset)
+    if not left then
+        local pos = lookBackward.findAnyPos(text, offset)
+        local char = text:sub(pos, pos)
+        if char == '{' or char == ',' or char == ';' then
+            left = ''
+        end
+    end
+    if left then
         for _, field in ipairs(fields) do
-            if matchKey(guide.getKeyName(source) or '', guide.getKeyName(field)) then
+            if matchKey(left, guide.getKeyName(field)) then
                 results[#results+1] = {
                     label = guide.getKeyName(field),
                     kind  = define.CompletionItemKind.Property,

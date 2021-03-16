@@ -5,7 +5,7 @@ local api = {
     split      = require 'parser.split',
     calcline   = require 'parser.calcline',
     lines      = require 'parser.lines',
-    guide      = require 'core.guide',
+    guide      = require 'parser.guide',
     luadoc     = require 'parser.luadoc',
 }
 

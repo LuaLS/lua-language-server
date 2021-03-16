@@ -299,8 +299,6 @@ grammar 'Name' [[
 Name        <-  Sp ({} NameBody {})
             ->  Name
 NameBody    <-  {%NameBody}
-FreeName    <-  Sp ({} {NameBody=>NotReserved} {})
-            ->  Name
 KeyWord     <-  Sp NameBody=>Reserved
 MustName    <-  Name / DirtyName
 DirtyName   <-  {} -> DirtyName
@@ -311,9 +309,10 @@ Exp         <-  (UnUnit BinUnit*)
             ->  Binary
 BinUnit     <-  (BinaryOp UnUnit?)
             ->  SubBinary
-UnUnit      <-  ExpUnit
+UnUnit      <-  Number
             /   (UnaryOp+ (ExpUnit / MissExp))
             ->  Unary
+            /   ExpUnit
 ExpUnit     <-  Nil
             /   Boolean
             /   String
@@ -328,7 +327,7 @@ Simple      <-  {| Prefix (Sp Suffix)* |}
 Prefix      <-  Sp ({} PL DirtyExp DirtyPR {})
             ->  Paren
             /   Single
-Single      <-  FreeName
+Single      <-  Name
             ->  Single
 Suffix      <-  SuffixWithoutCall
             /   ({} PL SuffixCall DirtyPR {})
@@ -356,7 +355,7 @@ CallStart   <-  PL
             /   "'"
             /   '[' '='* '['
 
-DirtyExp    <-  Exp
+DirtyExp    <-  !THEN !DO !END Exp
             /   {} -> DirtyExp
 MaybeExp    <-  Exp / MissExp
 MissExp     <-  {} -> MissExp
@@ -445,9 +444,8 @@ Continue    <-  Sp ({} CONTINUE {})
 Return      <-  Sp ({} RETURN ReturnExpList {})
             ->  Return
 ReturnExpList 
-            <-  Sp {| Exp->NoNil (Sp ',' MaybeExp)* |}
-            /   Sp {| !Exp !',' |}
-            /   ExpList
+            <-  Sp !END !ELSEIF !ELSE {| Exp (Sp ',' MaybeExp)* |}
+            /   Sp {| %nil |}
 
 Label       <-  Sp ({} LABEL MustName DirtyLabel {})
             ->  Label

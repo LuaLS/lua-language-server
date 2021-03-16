@@ -2373,3 +2373,25 @@ f(1, {}, {}, {
         kind  = define.CompletionItemKind.Property,
     }
 }
+
+--TEST [[
+-----@class C
+-----@field x number
+-----@field y number
+--
+-----@type C
+--local t = {
+--    $
+--}
+--
+--]]
+--{
+--    {
+--        label = 'x',
+--        kind  = define.CompletionItemKind.Property,
+--    },
+--    {
+--        label = 'y',
+--        kind  = define.CompletionItemKind.Property,
+--    }
+--}

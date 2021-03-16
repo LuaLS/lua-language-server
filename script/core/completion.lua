@@ -1284,7 +1284,47 @@ local function getFuncParamByCallIndex(func, index)
     return func.args[index]
 end
 
-local function checkTableLiteralField(ast, text, offset, call, funcs, index, results)
+local function checkTableLiteralField(ast, text, offset, tbl, fields, results)
+    local mark = {}
+    for _, field in ipairs(vm.getDefFields(tbl, 0)) do
+        local name = guide.getKeyName(field)
+        if name then
+            mark[name] = true
+        end
+    end
+    table.sort(fields, function (a, b)
+        return guide.getKeyName(a) < guide.getKeyName(b)
+    end)
+    -- {$}
+    local left = lookBackward.findWord(text, offset)
+    if not left then
+        local pos = lookBackward.findAnyPos(text, offset)
+        local char = text:sub(pos, pos)
+        if char == '{' or char == ',' or char == ';' then
+            left = ''
+        end
+    end
+    if left then
+        for _, field in ipairs(fields) do
+            local name = guide.getKeyName(field)
+            if not mark[name] and matchKey(left, guide.getKeyName(field)) then
+                results[#results+1] = {
+                    label = guide.getKeyName(field),
+                    kind  = define.CompletionItemKind.Property,
+                    insertText = ('%s = $0'):format(guide.getKeyName(field)),
+                    id    = stack(function ()
+                        return {
+                            detail      = buildDetail(field),
+                            description = buildDesc(field),
+                        }
+                    end),
+                }
+            end
+        end
+    end
+end
+
+local function checkTableLiteralFieldByCall(ast, text, offset, call, funcs, index, results)
     local source = findNearestSource(ast, offset)
     if  source.type ~= 'table'
     and (not source.parent or source.parent.type ~= 'table') then
@@ -1302,12 +1342,6 @@ local function checkTableLiteralField(ast, text, offset, call, funcs, index, res
     if tbl.parent ~= call.args then
         return
     end
-    for _, field in ipairs(vm.getDefFields(tbl, 0)) do
-        local name = guide.getKeyName(field)
-        if name then
-            mark[name] = true
-        end
-    end
     for _, func in ipairs(funcs) do
         local param = getFuncParamByCallIndex(func, index)
         if not param then
@@ -1323,35 +1357,7 @@ local function checkTableLiteralField(ast, text, offset, call, funcs, index, res
         end
         ::CONTINUE::
     end
-    table.sort(fields, function (a, b)
-        return guide.getKeyName(a) < guide.getKeyName(b)
-    end)
-    -- {$}
-    local left = lookBackward.findWord(text, offset)
-    if not left then
-        local pos = lookBackward.findAnyPos(text, offset)
-        local char = text:sub(pos, pos)
-        if char == '{' or char == ',' or char == ';' then
-            left = ''
-        end
-    end
-    if left then
-        for _, field in ipairs(fields) do
-            if matchKey(left, guide.getKeyName(field)) then
-                results[#results+1] = {
-                    label = guide.getKeyName(field),
-                    kind  = define.CompletionItemKind.Property,
-                    insertText = ('%s = $0'):format(guide.getKeyName(field)),
-                    id    = stack(function ()
-                        return {
-                            detail      = buildDetail(field),
-                            description = buildDesc(field),
-                        }
-                    end),
-                }
-            end
-        end
-    end
+    checkTableLiteralField(ast, text, offset, tbl, fields, results)
 end
 
 local function tryCallArg(ast, text, offset, results)
@@ -1375,7 +1381,7 @@ local function tryCallArg(ast, text, offset, results)
     for _, enum in ipairs(myResults) do
         results[#results+1] = enum
     end
-    checkTableLiteralField(ast, text, offset, call, defs, argIndex, results)
+    checkTableLiteralFieldByCall(ast, text, offset, call, defs, argIndex, results)
 end
 
 local function getComment(ast, offset)

@@ -2349,3 +2349,27 @@ f(1, {
         kind  = define.CompletionItemKind.Property,
     }
 }
+
+TEST [[
+---@class C
+---@field x number
+---@field y number
+
+---@vararg C
+local function f(x, ...)
+end
+
+f(1, {}, {}, {
+    $
+})
+]]
+{
+    {
+        label = 'x',
+        kind  = define.CompletionItemKind.Property,
+    },
+    {
+        label = 'y',
+        kind  = define.CompletionItemKind.Property,
+    }
+}

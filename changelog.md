@@ -5,6 +5,7 @@
 * `NEW` new setting `Lua.runtime.builtin`, used to disable some built-in libraries
 * `NEW` quick fix: disable diagnostic in line/file
 * `CHG` intelli-scense: search from generic param to return
+* `CHG` intelli-scense: search across vararg
 * `CHG` text-document-synchronization: refactored
 * `CHG` diagnostic: improve `newline-call`
 * `CHG` improve performance

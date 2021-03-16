@@ -92,6 +92,11 @@ function t(<?<!f!>?>) end
 ]]
 
 TEST [[
+---@vararg <!fun():void!>
+function f(<?...?>) end
+]]
+
+TEST [[
 ---@overload fun(y: boolean)
 ---@param x number
 ---@param y boolean

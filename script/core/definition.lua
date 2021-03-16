@@ -43,6 +43,7 @@ local accept = {
     ['string']      = true,
     ['boolean']     = true,
     ['number']      = true,
+    ['...']         = true,
 
     ['doc.type.name']    = true,
     ['doc.class.name']   = true,

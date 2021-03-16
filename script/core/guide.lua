@@ -1220,6 +1220,9 @@ local function buildSimpleList(obj, max)
         elseif cur.type == 'string' then
             list[i] = cur
             break
+        elseif cur.type == '...' then
+            list[i] = cur
+            break
         elseif cur.type == 'doc.class.name'
         or     cur.type == 'doc.type.name'
         or     cur.type == 'doc.class'
@@ -1258,6 +1261,7 @@ function m.getSimple(obj, max)
     or obj.type == 'call'
     or obj.type == 'table'
     or obj.type == 'string'
+    or obj.type == '...'
     or obj.type == 'doc.class.name'
     or obj.type == 'doc.class'
     or obj.type == 'doc.type.name'
@@ -1825,11 +1829,16 @@ function m.checkSameSimpleByBindDocs(status, obj, start, pushQueue, mode)
             end
         elseif doc.type == 'doc.field' then
             results[#results+1] = doc
+        elseif doc.type == 'doc.vararg' then
+            if obj.type == '...' then
+                results[#results+1] = doc
+            end
         end
     end
     for _, res in ipairs(results) do
         if res.type == 'doc.class'
-        or res.type == 'doc.type' then
+        or res.type == 'doc.type'
+        or res.type == 'doc.vararg' then
             pushQueue(res, start, true)
             skipInfer = true
         end
@@ -2006,6 +2015,8 @@ function m.checkSameSimpleByDoc(status, obj, start, pushQueue, mode)
         pushQueue(obj.node, start, true)
         pushQueue(obj.value, start + 1, true)
         return true
+    elseif obj.type == 'doc.vararg' then
+        pushQueue(obj.vararg, start, true)
     end
 end
 

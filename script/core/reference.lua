@@ -43,6 +43,7 @@ local accept = {
     ['setglobal']   = true,
     ['getglobal']   = true,
     ['function']    = true,
+    ['...']         = true,
 
     ['doc.type.name']    = true,
     ['doc.class.name']   = true,

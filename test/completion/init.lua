@@ -1759,6 +1759,35 @@ f('$')
 }
 
 TEST [[
+---this is
+---a multi line
+---comment
+---@alias XXXX
+---comment 1
+---comment 1
+---| '1'
+---comment 2
+---comment 2
+---| '2'
+
+---@param x XXXX
+local function f(x)
+end
+
+f($)
+]]
+{
+    {
+        label = '1',
+        kind  = define.CompletionItemKind.EnumMember,
+    },
+    {
+        label = '2',
+        kind  = define.CompletionItemKind.EnumMember,
+    },
+}
+
+TEST [[
 ---@param x function | 'function () end'
 function f(x)
 end

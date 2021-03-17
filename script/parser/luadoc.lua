@@ -455,6 +455,7 @@ local function parseResume()
     return result
 end
 
+local LastType
 function parseType(parent)
     local result = {
         type    = 'doc.type',
@@ -543,22 +544,44 @@ function parseType(parent)
     result.finish = getFinish()
     result.firstFinish = result.finish
 
-    while true do
-        local nextComm = NextComment('peek')
-        if nextComm and nextComm.text:sub(1, 2) == '-|' then
-            NextComment()
-            local finishPos = nextComm.text:find('#', 3) or #nextComm.text
-            parseTokens(nextComm.text:sub(3, finishPos), nextComm.start + 1)
-            local resume = parseResume()
-            if resume then
-                resume.comment = nextComm.text:match('#%s*(.+)', 3)
-                result.resumes[#result.resumes+1] = resume
-                result.finish = resume.finish
+    local function pushResume()
+        local comments
+        for i = 0, 100 do
+            local nextComm = NextComment(i,'peek')
+            if not nextComm then
+                return false
             end
-        else
-            break
+            if nextComm.text:sub(1, 2) == '-@' then
+                return false
+            else
+                if nextComm.text:sub(1, 2) == '-|' then
+                    NextComment(i)
+                    local finishPos = nextComm.text:find('#', 3) or #nextComm.text
+                    parseTokens(nextComm.text:sub(3, finishPos), nextComm.start + 1)
+                    local resume = parseResume()
+                    if resume then
+                        if comments then
+                            resume.comment = table.concat(comments, '\n')
+                        else
+                            resume.comment = nextComm.text:match('#%s*(.+)', 3)
+                        end
+                        result.resumes[#result.resumes+1] = resume
+                        result.finish = resume.finish
+                    end
+                    comments = nil
+                    return true
+                else
+                    if not comments then
+                        comments = {}
+                    end
+                    comments[#comments+1] = nextComm.text:sub(2)
+                end
+            end
         end
+        return false
     end
+
+    while pushResume() do end
 
     if #result.types == 0 and #result.enums == 0 and #result.resumes == 0 then
         pushError {
@@ -1215,10 +1238,10 @@ return function (_, state)
     pushError = state.pushError
 
     local ci = 1
-    NextComment = function (peek)
-        local comment = comments[ci]
+    NextComment = function (offset, peek)
+        local comment = comments[ci + (offset or 0)]
         if not peek then
-            ci = ci + 1
+            ci = ci + 1 + (offset or 0)
         end
         return comment
     end

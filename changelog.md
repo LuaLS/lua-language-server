@@ -5,6 +5,36 @@
 * `NEW` new setting `Lua.runtime.builtin`, used to disable some built-in libraries
 * `NEW` quick fix: disable diagnostic in line/file
 * `NEW` completion: field in table
+```lua
+---@class A
+---@field x number
+---@field y number
+---@field z number
+
+---@type A
+local t = {
+    -- provide `x`, `y` and `z` here
+}
+```
+* `NEW` `LuaDoc`: supports multi-line comment before resume
+```lua
+---this is
+---a multi line
+---comment
+---@alias XXXX
+---comment 1
+---comment 1
+---| '1'
+---comment 2
+---comment 2
+---| '2'
+
+---@param x XXXX
+local function f(x)
+end
+
+f( -- view comments of `1` and `2` in completion
+```
 * `CHG` intelli-scense: search from generic param to return
 * `CHG` intelli-scense: search across vararg
 * `CHG` text-document-synchronization: refactored

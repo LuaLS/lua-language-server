@@ -6,6 +6,7 @@ local guide    = require 'core.guide'
 local markdown = require 'provider.markdown'
 local config   = require 'config'
 local lang     = require 'language'
+local util     = require 'utility'
 
 local function asStringInRequire(source, literal)
     local rootPath = ws.path or ''
@@ -121,6 +122,28 @@ local function getBindComment(source, docGroup, base)
     return table.concat(lines, '\n')
 end
 
+local function tryDocClassComment(source)
+    for _, def in ipairs(vm.getDefs(source, 0)) do
+        if def.type == 'doc.class.name'
+        or def.type == 'doc.alias.name' then
+            local class = guide.getDocState(def)
+            local comment = getBindComment(class, class.bindGroup, class)
+            if comment then
+                return comment
+            end
+        end
+    end
+    if source.bindDocs then
+        for _, doc in ipairs(source.bindDocs) do
+            if doc.type == 'doc.class'
+            or doc.type == 'doc.alias' then
+                local comment = getBindComment(doc, source.bindDocs, doc)
+                return comment
+            end
+        end
+    end
+end
+
 local function buildEnumChunk(docType, name)
     local enums = vm.getDocEnums(docType)
     if not enums or #enums == 0 then
@@ -131,6 +154,14 @@ local function buildEnumChunk(docType, name)
         types[#types+1] = tp[1]
     end
     local lines = {}
+    for _, typeUnit in ipairs(docType.types) do
+        local comment = tryDocClassComment(typeUnit)
+        if comment then
+            for line in util.eachLine(comment) do
+                lines[#lines+1] = ('-- %s'):format(line)
+            end
+        end
+    end
     lines[#lines+1] = ('%s: %s'):format(name, table.concat(types))
     for _, enum in ipairs(enums) do
         lines[#lines+1] = ('   %s %s%s'):format(
@@ -138,7 +169,7 @@ local function buildEnumChunk(docType, name)
             or (enum.additional and '+>')
             or ' |',
             enum[1],
-            enum.comment and (' -- %s'):format(enum.comment) or ''
+            enum.comment and (' -- %s'):format(enum.comment:gsub('[\r\n]+', ' ')) or ''
         )
     end
     return table.concat(lines, '\n')
@@ -224,7 +255,7 @@ local function getFunctionComment(source)
             if doc.comment then
                 comments[#comments+1] = ('@*param* `%s` — %s'):format(
                     doc.param[1],
-                    doc.comment.text
+                    doc.comment.text:gsub('[\r\n]+', ' ')
                 )
             end
         elseif doc.type == 'doc.return' then
@@ -237,9 +268,9 @@ local function getFunctionComment(source)
                 end
                 if doc.comment then
                     if #name == 0 then
-                        comments[#comments+1] = ('@*return* — %s'):format(doc.comment.text)
+                        comments[#comments+1] = ('@*return* — %s'):format(doc.comment.text:gsub('[\r\n]+', ' '))
                     else
-                        comments[#comments+1] = ('@*return* `%s` — %s'):format(table.concat(name, ','), doc.comment.text)
+                        comments[#comments+1] = ('@*return* `%s` — %s'):format(table.concat(name, ','), doc.comment.text:gsub('[\r\n]+', ' '))
                     end
                 else
                     if #name == 0 then
@@ -267,26 +298,6 @@ local function getFunctionComment(source)
         md:add('lua', enums)
     end
     return md:string()
-end
-
-local function tryDocClassComment(source)
-    for _, def in ipairs(vm.getDefs(source, 0)) do
-        if def.type == 'doc.class.name' then
-            local class = guide.getDocState(def)
-            local comment = getBindComment(class, class.bindGroup, class)
-            if comment then
-                return comment
-            end
-        end
-    end
-    if source.bindDocs then
-        for _, doc in ipairs(source.bindDocs) do
-            if doc.type == 'doc.class' then
-                local comment = getBindComment(doc, source.bindDocs, doc)
-                return comment
-            end
-        end
-    end
 end
 
 local function tryDocComment(source)

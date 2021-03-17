@@ -86,7 +86,7 @@ TEST {
     },
     hover = {
         label = '1 个字节',
-        description = [[* [a.lua](file:///a.lua) （假设搜索路径包含 `?.lua`）]],
+        description = [[* [a.lua](file:///a.lua) （搜索路径： `?.lua`）]],
     }
 }
 
@@ -102,7 +102,7 @@ TEST {
     },
     hover = {
         label = '1 个字节',
-        description = [[* [Folder\a.lua](file:///Folder/a.lua) （假设搜索路径包含 `Folder\?.lua`）]],
+        description = [[* [Folder\a.lua](file:///Folder/a.lua) （搜索路径： `Folder\?.lua`）]],
     }
 }
 else
@@ -117,7 +117,7 @@ TEST {
     },
     hover = {
         label = '1 个字节',
-        description = [[* [Folder/a.lua](file:///Folder/a.lua) （假设搜索路径包含 `Folder/?.lua`）]],
+        description = [[* [Folder/a.lua](file:///Folder/a.lua) （搜索路径： `Folder/?.lua`）]],
     }
 }
 end

@@ -4,6 +4,7 @@
 * `NEW` VSCode: new setting `Lua.misc.parameters`
 * `NEW` new setting `Lua.runtime.builtin`, used to disable some built-in libraries
 * `NEW` quick fix: disable diagnostic in line/file
+* `NEW` completion: field in table
 * `CHG` intelli-scense: search from generic param to return
 * `CHG` intelli-scense: search across vararg
 * `CHG` text-document-synchronization: refactored

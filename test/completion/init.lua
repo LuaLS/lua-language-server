@@ -2374,24 +2374,43 @@ f(1, {}, {}, {
     }
 }
 
---TEST [[
------@class C
------@field x number
------@field y number
---
------@type C
---local t = {
---    $
---}
---
---]]
---{
---    {
---        label = 'x',
---        kind  = define.CompletionItemKind.Property,
---    },
---    {
---        label = 'y',
---        kind  = define.CompletionItemKind.Property,
---    }
---}
+TEST [[
+---@class C
+---@field x number
+---@field y number
+
+---@type C
+local t = {
+    $
+}
+
+]]
+{
+    {
+        label = 'x',
+        kind  = define.CompletionItemKind.Property,
+    },
+    {
+        label = 'y',
+        kind  = define.CompletionItemKind.Property,
+    }
+}
+
+TEST [[
+---@class C
+---@field x number
+---@field y number
+
+---@type C
+local t = {
+    x$
+}
+
+]]
+{
+    include = true,
+    {
+        label = 'x',
+        kind  = define.CompletionItemKind.Property,
+    },
+}

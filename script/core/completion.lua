@@ -1286,10 +1286,13 @@ end
 
 local function checkTableLiteralField(ast, text, offset, tbl, fields, results)
     local mark = {}
-    for _, field in ipairs(vm.getDefFields(tbl, 0)) do
-        local name = guide.getKeyName(field)
-        if name then
-            mark[name] = true
+    for _, field in ipairs(tbl) do
+        if field.type == 'tablefield'
+        or field.type == 'tableindex' then
+            local name = guide.getKeyName(field)
+            if name then
+                mark[name] = true
+            end
         end
     end
     table.sort(fields, function (a, b)
@@ -1326,6 +1329,9 @@ end
 
 local function checkTableLiteralFieldByCall(ast, text, offset, call, funcs, index, results)
     local source = findNearestSource(ast, offset)
+    if not source then
+        return
+    end
     if  source.type ~= 'table'
     and (not source.parent or source.parent.type ~= 'table') then
         return
@@ -1382,6 +1388,32 @@ local function tryCallArg(ast, text, offset, results)
         results[#results+1] = enum
     end
     checkTableLiteralFieldByCall(ast, text, offset, call, defs, argIndex, results)
+end
+
+local function tryTable(ast, text, offset, results)
+    local source = findNearestSource(ast, offset)
+    if not source then
+        return
+    end
+    if  source.type ~= 'table'
+    and (not source.parent or source.parent.type ~= 'table') then
+        return
+    end
+    local mark = {}
+    local fields = {}
+    local tbl = source
+    if source.type ~= 'table' then
+        tbl = source.parent
+    end
+    local defs = vm.getDefFields(tbl, 0)
+    for _, field in ipairs(defs) do
+        local name = guide.getKeyName(field)
+        if name and not mark[name] then
+            mark[name] = true
+            fields[#fields+1] = field
+        end
+    end
+    checkTableLiteralField(ast, text, offset, tbl, fields, results)
 end
 
 local function getComment(ast, offset)
@@ -1843,6 +1875,7 @@ local function completion(uri, offset)
         else
             trySpecial(ast, text, offset, results)
             tryCallArg(ast, text, offset, results)
+            tryTable(ast, text, offset, results)
             tryWord(ast, text, offset, results)
             tryIndex(ast, text, offset, results)
             trySymbol(ast, text, offset, results)

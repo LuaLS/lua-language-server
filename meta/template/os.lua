@@ -97,7 +97,7 @@ function os.rename(oldname, newname) end
 function os.setlocale(locale, category) end
 
 ---#DES 'os.time'
----@param date? table
+---@param date? osdate
 ---@return integer
 function os.time(date) end
 

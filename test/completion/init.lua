@@ -2356,6 +2356,22 @@ elseif
 }
 
 TEST [[
+do
+    if true then$
+end
+]]
+{
+    {
+        label = 'then',
+        kind  = define.CompletionItemKind.Keyword,
+    },
+    {
+        label = 'then .. end',
+        kind  = define.CompletionItemKind.Snippet,
+    }
+}
+
+TEST [[
 ---@class C
 ---@field x number
 ---@field y number

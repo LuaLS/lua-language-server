@@ -39,6 +39,7 @@ f( -- view comments of `1` and `2` in completion
 * `CHG` intelli-scense: search across vararg
 * `CHG` text-document-synchronization: refactored
 * `CHG` diagnostic: improve `newline-call`
+* `CHG` completion: improve `then .. end`
 * `CHG` improve performance
 * `FIX` missed syntax error `function m['x']() end`
 

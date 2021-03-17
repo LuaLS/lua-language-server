@@ -1,5 +1,6 @@
 local define     = require 'proto.define'
 local guide      = require 'core.guide'
+local files      = require 'files'
 
 local keyWordMap = {
     {'do', function (hasSpace, isExp, results)
@@ -256,12 +257,20 @@ until $1"
         end
         return false
     end},
-    {'then', function (hasSpace, isExp, results, text, start)
-        local first = text:match('%S+%s+(%S+)', start)
+    ---@param text string
+    {'then', function (hasSpace, isExp, results, text, start, uri)
+        local lines = files.getLines(uri)
+        local pos, first = text:match('%S+%s+()(%S+)', start)
         if first == 'end'
         or first == 'else'
         or first == 'elseif' then
-            return false
+            local startRow  = guide.positionOf(lines, start)
+            local finishRow = guide.positionOf(lines, pos)
+            local startSp   = text:match('^%s*', lines[startRow].start)
+            local finishSp  = text:match('^%s*', lines[finishRow].start)
+            if startSp == finishSp then
+                return false
+            end
         end
         if not hasSpace then
             results[#results+1] = {

@@ -665,7 +665,7 @@ local function checkKeyWord(ast, text, start, word, hasSpace, afterLocal, result
         if snipType == 'Both' or snipType == 'Replace' then
             local func = data[2]
             if func then
-                replaced = func(hasSpace, isExp, results, text, start)
+                replaced = func(hasSpace, isExp, results, text, start, guide.getUri(ast.ast))
                 extra = true
             end
         end

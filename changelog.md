@@ -4,6 +4,7 @@
 * `NEW` VSCode: new setting `Lua.misc.parameters`
 * `NEW` new setting `Lua.runtime.builtin`, used to disable some built-in libraries
 * `NEW` quick fix: disable diagnostic in line/file
+* `NEW` setting: `Lua.runtime.path` supports absolute path
 * `NEW` completion: field in table
 ```lua
 ---@class A

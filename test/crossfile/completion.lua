@@ -3,6 +3,7 @@ local core     = require 'core.completion'
 local furi     = require 'file-uri'
 local platform = require 'bee.platform'
 local util     = require 'utility'
+local config   = require 'config'
 
 rawset(_G, 'TEST', true)
 
@@ -356,6 +357,64 @@ TEST {
         },
     }
 }
+
+
+local originRuntimePath = config.config.runtime.path
+config.config.runtime.path = {
+    '?/1.lua',
+}
+
+TEST {
+    {
+        path = 'D:/xxxx/1.lua',
+        content = '',
+    },
+    {
+        path = 'main.lua',
+        content = 'require "x$"',
+        main = true,
+    },
+    completion = {
+        {
+            label = 'D:.xxxx',
+            kind = CompletionItemKind.Reference,
+            textEdit = EXISTS,
+        },
+        {
+            label = 'xxxx',
+            kind = CompletionItemKind.Reference,
+            textEdit = EXISTS,
+        },
+    }
+}
+
+config.config.runtime.path = originRuntimePath
+
+local originRuntimePath = config.config.runtime.path
+config.config.runtime.path = {
+    'd:/?/1.lua',
+}
+
+TEST {
+    {
+        path = 'd:/xxxx/1.lua',
+        content = '',
+    },
+    {
+        path = 'main.lua',
+        content = 'require "x$"',
+        main = true,
+    },
+    completion = {
+        {
+            label = 'xxxx',
+            kind = CompletionItemKind.Reference,
+            textEdit = EXISTS,
+        },
+    }
+}
+
+config.config.runtime.path = originRuntimePath
 
 TEST {
     {

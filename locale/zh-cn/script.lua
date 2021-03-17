@@ -152,7 +152,7 @@ HOVER_STRING_CHARACTERS    = '{} 个字节，{} 个字符'
 HOVER_MULTI_DEF_PROTO      = '({} 个定义，{} 个原型)'
 HOVER_MULTI_PROTO_NOT_FUNC = '({} 个非函数定义)'
 
-HOVER_USE_LUA_PATH      = '（假设搜索路径包含 `{}`）'
+HOVER_USE_LUA_PATH      = '（搜索路径： `{}`）'
 HOVER_EXTENDS           = '展开为 {}'
 HOVER_TABLE_TIME_UP     = '出于性能考虑，已禁用了部分类型推断。'
 

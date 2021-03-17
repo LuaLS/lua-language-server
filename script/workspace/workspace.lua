@@ -330,6 +330,10 @@ function m.findUrisByFilePath(path)
         return {}
     end
     local lpath = path:gsub('[/\\]+', '/')
+    if lpath:match('^[/\\]')
+    or lpath:match('^%a+%:') then
+        lpath = furi.encode(lpath)
+    end
     if platform.OS == 'Windows' then
         lpath = lpath:lower()
     end
@@ -471,14 +475,12 @@ function m.reload()
 end
 
 function m.awaitReload()
-    local rpath = require 'workspace.require-path'
     local plugin     = require 'plugin'
     m.ready = false
     m.hasHitMaxPreload = false
     files.flushAllLibrary()
     files.removeAllClosed()
     files.flushCache()
-    rpath.flush()
     plugin.init()
     m.awaitPreload()
     m.ready = true

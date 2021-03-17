@@ -717,3 +717,45 @@ TEST {
     }
 }
 platform.OS = originOS
+
+local originRuntimePath = config.config.runtime.path
+config.config.runtime.path = {
+    '?/1.lua',
+}
+TEST {
+    {
+        path = 'd:\\xxxx\\1.lua',
+        content = [[
+            return <!function () end!>
+        ]],
+    },
+    {
+        path = 'main.lua',
+        content = [[
+            local <!f!> = require 'xxxx'
+            print(<?f?>)
+        ]],
+    },
+}
+config.config.runtime.path = originRuntimePath
+
+local originRuntimePath = config.config.runtime.path
+config.config.runtime.path = {
+    'd:/?/1.lua',
+}
+TEST {
+    {
+        path = 'd:\\xxxx\\1.lua',
+        content = [[
+            return <!function () end!>
+        ]],
+    },
+    {
+        path = 'main.lua',
+        content = [[
+            local <!f!> = require 'xxxx'
+            print(<?f?>)
+        ]],
+    },
+}
+config.config.runtime.path = originRuntimePath

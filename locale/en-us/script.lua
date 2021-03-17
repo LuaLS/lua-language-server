@@ -153,7 +153,7 @@ HOVER_STRING_CHARACTERS    = '{} bytes, {} characters'
 HOVER_MULTI_DEF_PROTO      = '({} definitions, {} prototypes)'
 HOVER_MULTI_PROTO_NOT_FUNC = '({} non functional definition)'
 
-HOVER_USE_LUA_PATH      = '(Suppose the search path contains `{}`)'
+HOVER_USE_LUA_PATH      = '(Search path: `{}`)'
 HOVER_EXTENDS           = 'Expand to {}'
 HOVER_TABLE_TIME_UP     = 'Partial type inference has been disabled for performance reasons.'
 

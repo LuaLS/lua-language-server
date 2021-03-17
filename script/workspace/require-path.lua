@@ -18,7 +18,7 @@ local function getOnePath(path, searcher)
     for pos = start, #stemPath do
         local word = stemPath:sub(start, pos)
         local newSearcher = stemSearcher:gsub('%?', (word:gsub('%%', '%%%%')))
-        if newSearcher == stemPath then
+        if files.eq(newSearcher, stemPath) then
             return word
         end
     end
@@ -32,21 +32,26 @@ function m.getVisiblePath(path, searchers, strict)
     if not m.cache[path] then
         local result = {}
         m.cache[path] = result
-        local pos = 1
         if libraryPath then
             libraryPath = libraryPath:gsub('^[/\\]+', '')
-            pos = #libraryPath + 2
-        else
-            path = workspace.getRelativePath(uri)
         end
-        repeat
-            local cutedPath = path:sub(pos)
+        for _, searcher in ipairs(searchers) do
+            local isAbsolute = searcher:match '^[/\\]'
+                            or searcher:match '^%a+%:'
+            local cutedPath = path
             local head
-            if pos > 1 then
-                head = path:sub(1, pos - 1)
+            local pos = 1
+            if not isAbsolute then
+                if libraryPath then
+                    pos = #libraryPath + 2
+                else
+                    path = workspace.getRelativePath(uri)
+                end
             end
-            pos = path:match('[/\\]+()', pos)
-            for _, searcher in ipairs(searchers) do
+            repeat
+                cutedPath = path:sub(pos)
+                head = path:sub(1, pos - 1)
+                pos = path:match('[/\\]+()', pos)
                 if platform.OS == 'Windows' then
                     searcher = searcher :gsub('[/\\]+', '\\')
                                         :gsub('^[/\\]+', '')
@@ -64,8 +69,8 @@ function m.getVisiblePath(path, searchers, strict)
                         expect   = expect,
                     }
                 end
-            end
-        until not pos or strict
+            until not pos or strict
+        end
     end
     return m.cache[path]
 end
@@ -73,5 +78,12 @@ end
 function m.flush()
     m.cache = {}
 end
+
+files.watch(function (ev)
+    if ev == 'create'
+    or ev == 'remove' then
+        m.flush()
+    end
+end)
 
 return m

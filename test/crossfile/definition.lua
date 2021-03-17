@@ -724,7 +724,7 @@ config.config.runtime.path = {
 }
 TEST {
     {
-        path = 'd:\\xxxx\\1.lua',
+        path = 'd:/xxxx/1.lua',
         content = [[
             return <!function () end!>
         ]],
@@ -745,7 +745,7 @@ config.config.runtime.path = {
 }
 TEST {
     {
-        path = 'd:\\xxxx\\1.lua',
+        path = 'd:/xxxx/1.lua',
         content = [[
             return <!function () end!>
         ]],

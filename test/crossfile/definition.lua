@@ -741,11 +741,11 @@ config.config.runtime.path = originRuntimePath
 
 local originRuntimePath = config.config.runtime.path
 config.config.runtime.path = {
-    'd:/?/1.lua',
+    'D:/?/1.lua',
 }
 TEST {
     {
-        path = 'd:/xxxx/1.lua',
+        path = 'D:/xxxx/1.lua',
         content = [[
             return <!function () end!>
         ]],

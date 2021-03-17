@@ -15,8 +15,6 @@ fsu.scanDirectory(ROOT, function (path)
     files.open(uri)
 end)
 
-config.config.diagnostics.disable['undefined-field'] = true
-config.config.diagnostics.disable['redundant-parameter'] = true
 diag.start()
 
 local clock = os.clock()

@@ -346,6 +346,9 @@ function m.findUrisByFilePath(path)
     local results = {}
     local posts = {}
     for uri in files.eachFile() do
+        if platform.OS ~= 'Windows' then
+            uri = files.getOriginUri(uri)
+        end
         if not uri:find(lpath, 1, true) then
             goto CONTINUE
         end
@@ -424,9 +427,6 @@ function m.normalize(path)
         path = path:gsub('[/\\]+', '/')
                    :gsub('[/\\]+$', '')
     end
-    path = path:gsub('^%a+%:', function (str)
-         return str:upper()
-    end)
     return path
 end
 

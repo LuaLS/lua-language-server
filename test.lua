@@ -44,23 +44,23 @@ local function loadDocMetas()
     end
 end
 
-local function main()
-    debug.setcstacklimit(1000)
-    require 'core.guide'.debugMode = true
-    require 'language' 'zh-cn'
-    require 'utility'.enableCloseFunction()
-    local function test(name)
-        local clock = os.clock()
-        print(('测试[%s]...'):format(name))
-        require(name)
-        print(('测试[%s]用时[%.3f]'):format(name, os.clock() - clock))
+local function test(name)
+    local clock = os.clock()
+    print(('测试[%s]...'):format(name))
+    local originRequire = require
+    require = function (n, ...)
+        local v, p = originRequire(n, ...)
+        if p and p:find 'test/' then
+            package.loaded[n] = nil
+        end
+        return v, p
     end
+    require(name)
+    require = originRequire
+    print(('测试[%s]用时[%.3f]'):format(name, os.clock() - clock))
+end
 
-    local config = require 'config'
-    config.config.runtime.version = 'Lua 5.4'
-    --config.config.intelliSense.searchDepth = 5
-    loadDocMetas()
-
+local function testAll()
     test 'basic'
     test 'references'
     test 'definition'
@@ -75,8 +75,28 @@ local function main()
     test 'code_action'
     test 'type_formatting'
     test 'crossfile'
-    test 'full'
     --test 'other'
+end
+
+local function main()
+    debug.setcstacklimit(1000)
+    require 'core.guide'.debugMode = true
+    require 'language' 'zh-cn'
+    require 'utility'.enableCloseFunction()
+
+    local config = require 'config'
+    config.config.runtime.version = 'Lua 5.4'
+    --config.config.intelliSense.searchDepth = 5
+    loadDocMetas()
+
+    require 'bee.platform'.OS = 'Windows'
+    testAll()
+    require 'bee.platform'.OS = 'Linux'
+    testAll()
+    require 'bee.platform'.OS = 'macOS'
+    testAll()
+
+    test 'full'
 
     print('测试完成')
 end

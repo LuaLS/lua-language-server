@@ -198,8 +198,7 @@ function mt:scan(path, callback)
             break
         end
         list[#list] = nil
-        local stem = self:getRelativePath(current)
-        if not self:simpleMatch(stem) then
+        if not self:simpleMatch(current) then
             check(current)
         end
     end
@@ -220,18 +219,18 @@ return function (pattern, options, interface)
         interface = {},
     }, mt)
 
+    if type(options) == 'table' then
+        for op, val in pairs(options) do
+            self:setOption(op, val)
+        end
+    end
+
     if type(pattern) == 'table' then
         for _, pat in ipairs(pattern) do
             self:addPattern(pat)
         end
     else
         self:addPattern(pattern)
-    end
-
-    if type(options) == 'table' then
-        for op, val in pairs(options) do
-            self:setOption(op, val)
-        end
     end
 
     if type(interface) == 'table' then

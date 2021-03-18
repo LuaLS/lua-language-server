@@ -157,9 +157,6 @@ function m.getLibraryMatchers()
             local nPath = fs.absolute(fs.path(path)):string()
             local matcher = glob.gitignore(true, m.matchOption, globInteferFace)
             matcher:setOption('root', path)
-            if platform.OS == 'Windows' then
-                matcher:setOption 'ignoreCase'
-            end
             log.debug('getLibraryMatchers', path, nPath)
             m.libraryMatchers[#m.libraryMatchers+1] = {
                 path    = nPath,

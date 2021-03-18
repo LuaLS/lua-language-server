@@ -2459,3 +2459,13 @@ local t = {
         kind  = define.CompletionItemKind.Property,
     },
 }
+
+TEST [[
+if $ then
+]]
+(nil)
+
+TEST [[
+elseif $ then
+]]
+(nil)

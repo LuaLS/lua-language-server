@@ -634,10 +634,19 @@ local function isInString(ast, offset)
     end)
 end
 
-local function checkKeyWord(ast, text, start, word, hasSpace, afterLocal, results)
+local function checkKeyWord(ast, text, start, offset, word, hasSpace, afterLocal, results)
     local snipType = config.config.completion.keywordSnippet
     local symbol = lookBackward.findSymbol(text, start - 1)
     local isExp = symbol == '(' or symbol == ',' or symbol == '='
+    local info = {
+        hasSpace = hasSpace,
+        isExp    = isExp,
+        text     = text,
+        start    = start,
+        uri      = guide.getUri(ast.ast),
+        offset   = offset,
+        ast      = ast,
+    }
     for _, data in ipairs(keyWordMap) do
         local key = data[1]
         local eq
@@ -665,7 +674,7 @@ local function checkKeyWord(ast, text, start, word, hasSpace, afterLocal, result
         if snipType == 'Both' or snipType == 'Replace' then
             local func = data[2]
             if func then
-                replaced = func(hasSpace, isExp, results, text, start, guide.getUri(ast.ast))
+                replaced = func(info, results)
                 extra = true
             end
         end
@@ -687,7 +696,7 @@ local function checkKeyWord(ast, text, start, word, hasSpace, afterLocal, result
         end
         local checkStop = data[3]
         if checkStop then
-            local stop = checkStop(ast, start)
+            local stop = checkStop(info)
             if stop then
                 return true
             end
@@ -1135,7 +1144,7 @@ local function tryWord(ast, text, offset, results)
             checkFunctionArgByDocParam(ast, word, start, results)
         else
             local afterLocal = isAfterLocal(text, start)
-            local stop = checkKeyWord(ast, text, start, word, hasSpace, afterLocal, results)
+            local stop = checkKeyWord(ast, text, start, offset, word, hasSpace, afterLocal, results)
             if stop then
                 return
             end

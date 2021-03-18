@@ -3,8 +3,8 @@ local guide      = require 'core.guide'
 local files      = require 'files'
 
 local keyWordMap = {
-    {'do', function (hasSpace, isExp, results)
-        if hasSpace then
+    {'do', function (info, results)
+        if info.hasSpace then
             results[#results+1] = {
                 label = 'do .. end',
                 kind  = define.CompletionItemKind.Snippet,
@@ -23,13 +23,13 @@ end",
             }
         end
         return true
-    end, function (ast, start)
-        return guide.eachSourceContain(ast.ast, start, function (source)
+    end, function (info)
+        return guide.eachSourceContain(info.ast.ast, info.start, function (source)
             if source.type == 'while'
             or source.type == 'in'
             or source.type == 'loop' then
                 for i = 1, #source.keyword do
-                    if start == source.keyword[i] then
+                    if info.start == source.keyword[i] then
                         return true
                     end
                 end
@@ -39,8 +39,12 @@ end",
     {'and'},
     {'break'},
     {'else'},
-    {'elseif', function (hasSpace, isExp, results)
-        if hasSpace then
+    {'elseif', function (info, results)
+        if info.text:find('^%s*then', info.offset + 1)
+        or info.text:find('^%s*do', info.offset + 1) then
+            return false
+        end
+        if info.hasSpace then
             results[#results+1] = {
                 label = 'elseif .. then',
                 kind  = define.CompletionItemKind.Snippet,
@@ -59,8 +63,8 @@ end",
     end},
     {'end'},
     {'false'},
-    {'for', function (hasSpace, isExp, results)
-        if hasSpace then
+    {'for', function (info, results)
+        if info.hasSpace then
             results[#results+1] = {
                 label = 'for .. ipairs',
                 kind  = define.CompletionItemKind.Snippet,
@@ -119,13 +123,13 @@ end"
         end
         return true
     end},
-    {'function', function (hasSpace, isExp, results)
-        if hasSpace then
+    {'function', function (info, results)
+        if info.hasSpace then
             results[#results+1] = {
                 label = 'function ()',
                 kind  = define.CompletionItemKind.Snippet,
                 insertTextFormat = 2,
-                insertText = isExp and "\z
+                insertText = info.isExp and "\z
 ($1)\
 \t$0\
 end" or "\z
@@ -138,7 +142,7 @@ end"
                 label = 'function ()',
                 kind  = define.CompletionItemKind.Snippet,
                 insertTextFormat = 2,
-                insertText = isExp and "\z
+                insertText = info.isExp and "\z
 function ($1)\
 \t$0\
 end" or "\z
@@ -150,8 +154,12 @@ end"
         return true
     end},
     {'goto'},
-    {'if', function (hasSpace, isExp, results)
-        if hasSpace then
+    {'if', function (info, results)
+        if info.text:find('^%s*then', info.offset + 1)
+        or info.text:find('^%s*do', info.offset + 1) then
+            return false
+        end
+        if info.hasSpace then
             results[#results+1] = {
                 label = 'if .. then',
                 kind  = define.CompletionItemKind.Snippet,
@@ -174,8 +182,12 @@ end"
         end
         return true
     end},
-    {'in', function (hasSpace, isExp, results)
-        if hasSpace then
+    {'in', function (info, results)
+        if info.text:find('^%s*then', info.offset + 1)
+        or info.text:find('^%s*do', info.offset + 1) then
+            return false
+        end
+        if info.hasSpace then
             results[#results+1] = {
                 label = 'in ..',
                 kind  = define.CompletionItemKind.Snippet,
@@ -198,8 +210,8 @@ end"
         end
         return true
     end},
-    {'local', function (hasSpace, isExp, results)
-        if hasSpace then
+    {'local', function (info, results)
+        if info.hasSpace then
             results[#results+1] = {
                 label = 'local function',
                 kind  = define.CompletionItemKind.Snippet,
@@ -225,8 +237,8 @@ end"
     {'nil'},
     {'not'},
     {'or'},
-    {'repeat', function (hasSpace, isExp, results)
-        if hasSpace then
+    {'repeat', function (info, results)
+        if info.hasSpace then
             results[#results+1] = {
                 label = 'repeat .. until',
                 kind  = define.CompletionItemKind.Snippet,
@@ -246,8 +258,8 @@ until $1"
         end
         return true
     end},
-    {'return', function (hasSpace, isExp, results)
-        if not hasSpace then
+    {'return', function (info, results)
+        if not info.hasSpace then
             results[#results+1] = {
                 label = 'do return end',
                 kind  = define.CompletionItemKind.Snippet,
@@ -257,22 +269,21 @@ until $1"
         end
         return false
     end},
-    ---@param text string
-    {'then', function (hasSpace, isExp, results, text, start, uri)
-        local lines = files.getLines(uri)
-        local pos, first = text:match('%S+%s+()(%S+)', start)
+    {'then', function (info, results)
+        local lines = files.getLines(info.uri)
+        local pos, first = info.text:match('%S+%s+()(%S+)', info.start)
         if first == 'end'
         or first == 'else'
         or first == 'elseif' then
-            local startRow  = guide.positionOf(lines, start)
+            local startRow  = guide.positionOf(lines, info.start)
             local finishRow = guide.positionOf(lines, pos)
-            local startSp   = text:match('^%s*', lines[startRow].start)
-            local finishSp  = text:match('^%s*', lines[finishRow].start)
+            local startSp   = info.text:match('^%s*', lines[startRow].start)
+            local finishSp  = info.text:match('^%s*', lines[finishRow].start)
             if startSp == finishSp then
                 return false
             end
         end
-        if not hasSpace then
+        if not info.hasSpace then
             results[#results+1] = {
                 label = 'then .. end',
                 kind  = define.CompletionItemKind.Snippet,
@@ -287,8 +298,8 @@ end'
     end},
     {'true'},
     {'until'},
-    {'while', function (hasSpace, isExp, results)
-        if hasSpace then
+    {'while', function (info, results)
+        if info.hasSpace then
             results[#results+1] = {
                 label = 'while .. do',
                 kind  = define.CompletionItemKind.Snippet,

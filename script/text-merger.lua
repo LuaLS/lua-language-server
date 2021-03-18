@@ -10,6 +10,9 @@ local function splitRows(text)
 end
 
 local function getLeft(text, char)
+    if not text then
+        return ''
+    end
     local left
     local length = util.utf8Len(text)
 
@@ -25,6 +28,9 @@ local function getLeft(text, char)
 end
 
 local function getRight(text, char)
+    if not text then
+        return ''
+    end
     local right
     local length = util.utf8Len(text)
 

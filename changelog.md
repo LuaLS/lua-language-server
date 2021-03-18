@@ -2,6 +2,7 @@
 
 ## 1.19.1
 * `FIX` `LuaDoc`: parsing resumes may wrong
+* `FIX` runtime errors
 
 ## 1.19.0
 `2021-3-18`

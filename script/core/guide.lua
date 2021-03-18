@@ -2606,7 +2606,7 @@ local function findGenericFromArgIndexToReturnIndex(func, argIndex)
     local paramType
     for _, doc in ipairs(func.bindDocs) do
         if doc.type == 'doc.param' then
-            if doc.extends.paramIndex == argIndex then
+            if doc.extends and doc.extends.paramIndex == argIndex then
                 paramType = doc.extends
                 break
             end

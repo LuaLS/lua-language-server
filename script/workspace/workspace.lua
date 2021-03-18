@@ -129,6 +129,7 @@ function m.getNativeMatcher()
     end
 
     m.nativeMatcher = glob.gitignore(pattern, m.matchOption, globInteferFace)
+    m.nativeMatcher:setOption('root', m.path)
 
     m.nativeVersion = config.version
     return m.nativeMatcher
@@ -155,6 +156,7 @@ function m.getLibraryMatchers()
         if fs.exists(fs.path(path)) then
             local nPath = fs.absolute(fs.path(path)):string()
             local matcher = glob.gitignore(true, m.matchOption, globInteferFace)
+            matcher:setOption('root', path)
             if platform.OS == 'Windows' then
                 matcher:setOption 'ignoreCase'
             end

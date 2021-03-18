@@ -116,7 +116,7 @@ function mt:checkDirectory(catch, path, matcher)
 end
 
 function mt:simpleMatch(path)
-    path = path:gsub('^[/\\]+', '')
+    path = self:getRelativePath(path)
     for i = #self.matcher, 1, -1 do
         local matcher = self.matcher[i]
         local catch = matcher(path)
@@ -148,48 +148,66 @@ function mt:finishMatch(path)
     return false
 end
 
-function mt:scan(root, callback)
+function mt:getRelativePath(path)
+    local root = self.options.root or ''
+    if self.options.ignoreCase then
+        path = path:lower()
+        root = root:lower()
+    end
+    path = path:gsub('^[/\\]+', ''):gsub('[/\\]+', '/')
+    root = root:gsub('^[/\\]+', ''):gsub('[/\\]+', '/')
+    if path:sub(1, #root) == root then
+        path = path:sub(#root + 1)
+        path = path:gsub('^[/\\]+', '')
+    end
+    return path
+end
+
+function mt:scan(path, callback)
     local files = {}
     if type(callback) ~= 'function' then
         callback = nil
     end
-    local list = { root }
+    local list = {}
+
+    local function check(current)
+        local fileType = self:callInterface('type', current)
+        if fileType == 'file' then
+            if callback then
+                callback(current)
+            end
+            files[#files+1] = current
+        elseif fileType == 'directory' then
+            local result = self:callInterface('list', current)
+            if type(result) == 'table' then
+                for _, path in ipairs(result) do
+                    local filename = path:match '([^/\\]+)[/\\]*$'
+                    if  filename
+                    and filename ~= '.'
+                    and filename ~= '..' then
+                        list[#list+1] = path
+                    end
+                end
+            end
+        end
+    end
+    check(path)
     while #list > 0 do
         local current = list[#list]
         if not current then
             break
         end
         list[#list] = nil
-        if not self:simpleMatch(current) then
-            local fileType = self:callInterface('type', current)
-            if fileType == 'file' then
-                if callback then
-                    callback(current)
-                end
-                files[#files+1] = current
-            elseif fileType == 'directory' then
-                local result = self:callInterface('list', current)
-                if type(result) == 'table' then
-                    for _, path in ipairs(result) do
-                        local filename = path:match '([^/\\]+)[/\\]*$'
-                        if  filename
-                        and filename ~= '.'
-                        and filename ~= '..' then
-                            list[#list+1] = path
-                        end
-                    end
-                end
-            end
+        local stem = self:getRelativePath(current)
+        if not self:simpleMatch(stem) then
+            check(current)
         end
     end
     return files
 end
 
 function mt:__call(path)
-    if self.options.ignoreCase then
-        path = path:lower()
-    end
-    path = path:gsub('^[/\\]+', '')
+    path = self:getRelativePath(path)
     return self:finishMatch(path)
 end
 

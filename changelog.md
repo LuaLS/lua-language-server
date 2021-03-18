@@ -43,6 +43,7 @@ f( -- view comments of `1` and `2` in completion
 * `CHG` completion: improve `then .. end`
 * `CHG` improve performance
 * `FIX` missed syntax error `function m['x']() end`
+* `FIX` [#452](https://github.com/sumneko/lua-language-server/issues/452)
 
 ## 1.18.1
 `2021-3-10`

@@ -4,7 +4,7 @@ local lines      = require 'parser.lines'
 local guide      = require 'core.guide'
 
 local TokenTypes, TokenStarts, TokenFinishs, TokenContents
-local Ci, Offset, pushError, Ct, NextComment
+local Ci, Offset, pushError, Ct, NextComment, Lines
 local parseType
 local Parser = re.compile([[
 Main                <-  (Token / Sp)*
@@ -544,6 +544,8 @@ function parseType(parent)
     result.finish = getFinish()
     result.firstFinish = result.finish
 
+    local row = guide.positionOf(Lines, result.finish)
+
     local function pushResume()
         local comments
         for i = 0, 100 do
@@ -551,11 +553,16 @@ function parseType(parent)
             if not nextComm then
                 return false
             end
+            local line = Lines[row + i + 1]
+            if line.finish < nextComm.start then
+                return false
+            end
             if nextComm.text:sub(1, 2) == '-@' then
                 return false
             else
                 if nextComm.text:sub(1, 2) == '-|' then
                     NextComment(i)
+                    row = row + i + 1
                     local finishPos = nextComm.text:find('#', 3) or #nextComm.text
                     parseTokens(nextComm.text:sub(3, finishPos), nextComm.start + 1)
                     local resume = parseResume()
@@ -1192,7 +1199,6 @@ local function bindDoc(sources, lns, binded)
 end
 
 local function bindDocs(state)
-    local lns = lines(nil, state.lua)
     local sources = {}
     guide.eachSource(state.ast, function (src)
         if src.type == 'local'
@@ -1213,14 +1219,14 @@ local function bindDocs(state)
     end)
     local binded
     for _, doc in ipairs(state.ast.docs) do
-        if not isNextLine(lns, binded, doc) then
-            bindDoc(sources, lns, binded)
+        if not isNextLine(Lines, binded, doc) then
+            bindDoc(sources, Lines, binded)
             binded = {}
             state.ast.docs.groups[#state.ast.docs.groups+1] = binded
         end
         binded[#binded+1] = doc
     end
-    bindDoc(sources, lns, binded)
+    bindDoc(sources, Lines, binded)
 end
 
 return function (_, state)
@@ -1236,6 +1242,8 @@ return function (_, state)
     }
 
     pushError = state.pushError
+
+    Lines = lines(nil, state.lua)
 
     local ci = 1
     NextComment = function (offset, peek)

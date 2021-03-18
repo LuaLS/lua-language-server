@@ -1,5 +1,8 @@
 # changelog
 
+## 1.19.1
+* `FIX` `LuaDoc`: parsing resumes may wrong
+
 ## 1.19.0
 `2021-3-18`
 * `NEW` VSCode: new setting `Lua.misc.parameters`

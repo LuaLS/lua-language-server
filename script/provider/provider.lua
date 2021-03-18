@@ -137,7 +137,7 @@ proto.on('initialized', function (params)
     proto.awaitRequest('client/registerCapability', {
         registrations = registrations
     })
-    workspace.awaitReload()
+    workspace.reload()
     return true
 end)
 

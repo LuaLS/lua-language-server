@@ -253,6 +253,7 @@ local function loadFileFactory(root, progressData, isLibrary)
                 end
             end)
         end
+        await.delay()
     end
 end
 

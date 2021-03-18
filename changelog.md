@@ -41,6 +41,7 @@ f( -- view comments of `1` and `2` in completion
 * `CHG` text-document-synchronization: refactored
 * `CHG` diagnostic: improve `newline-call`
 * `CHG` completion: improve `then .. end`
+* `CHG` improve initialization speed
 * `CHG` improve performance
 * `FIX` missed syntax error `function m['x']() end`
 * `FIX` [#452](https://github.com/sumneko/lua-language-server/issues/452)

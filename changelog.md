@@ -1,6 +1,7 @@
 # changelog
 
 ## 1.19.0
+`2021-3-18`
 * `NEW` VSCode: new setting `Lua.misc.parameters`
 * `NEW` new setting `Lua.runtime.builtin`, used to disable some built-in libraries
 * `NEW` quick fix: disable diagnostic in line/file

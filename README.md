@@ -74,7 +74,7 @@ https://marketplace.visualstudio.com/items?itemName=sumneko.lua
 
 If you find any mistakes, please [tell me][issues] or use [Pull Requests][@meta] to fix them directly.
 
-如果你发现了任何错误，请[告诉我][issues]或使用[Pull Requests][@lua]来直接修复。
+如果你发现了任何错误，请[告诉我][issues]或使用[Pull Requests][@meta]来直接修复。
 
 [issues]: https://github.com/sumneko/lua-language-server/issues
 [@meta]: https://github.com/sumneko/lua-language-server/tree/master/meta/template

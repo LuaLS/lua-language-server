@@ -2108,41 +2108,25 @@ function m.searchSameMethodIntoSelf(ref, mark)
 end
 
 function m.searchSameFieldsCrossMethod(status, ref, start, pushQueue)
-    if not status.share.crossMethodLock then
-        status.share.crossMethodLock = {}
-    end
-    if status.share.crossMethodLock[ref] then
-        return
-    end
     local mark = status.crossMethodMark
     if not mark then
         mark = {}
         status.crossMethodMark = mark
+    end
+    if mark[ref] then
+        return
     end
     local selfRef = m.searchSameMethodIntoSelf(ref, mark)
     if selfRef then
         tracy.ZoneBeginN 'searchSameFieldsCrossMethod'
         local _ <close> = tracy.ZoneEnd
         -- 如果自己是method，则只检查自己内部的self引用
-        local results = m.getStepRef(status, selfRef, 'ref')
-        for _, res in ipairs(results) do
-            pushQueue(res, start, true)
-        end
+        pushQueue(selfRef, start, true)
         return
     end
     local method = m.searchSameMethodOutSelf(ref, mark)
     if method then
-        tracy.ZoneBeginN 'searchSameFieldsCrossMethod'
-        local _ <close> = tracy.ZoneEnd
-        -- 如果自己是self，则找出父级的method，以及父级method的引用
-        local newStatus = m.status(status)
-        newStatus.share.crossMethodLock[ref] = true
-        m.searchRefs(newStatus, method, 'ref')
-        newStatus.share.crossMethodLock[ref] = false
-        for _, res in ipairs(newStatus.results) do
-            mark[res] = true
-            pushQueue(res, start, true)
-        end
+        pushQueue(method, start, true)
         return
     end
 end
@@ -2366,7 +2350,8 @@ function m.findGlobalsOfName(ast, name)
     return results
 end
 
-function m.checkSameSimpleInGlobal(status, name, source, mode, start, pushQueue)
+function m.checkSameSimpleInGlobal(status, source)
+    local name = m.getKeyName(source)
     if not name then
         return
     end
@@ -2376,11 +2361,7 @@ function m.checkSameSimpleInGlobal(status, name, source, mode, start, pushQueue)
     else
         objs = m.findGlobalsOfName(source, name)
     end
-    if objs then
-        for _, obj in ipairs(objs) do
-            pushQueue(obj, start, true)
-        end
-    end
+    return objs
 end
 
 function m.checkValueMark(status, a, b)
@@ -3021,10 +3002,24 @@ function m.searchSameFields(status, simple, mode)
                 forces[queueLen] = force
             end
         end
+        if m.isGlobal(obj) then
+            local refs = m.checkSameSimpleInGlobal(status, obj)
+            if refs then
+                for _, ref in ipairs(refs) do
+                    if not lock[ref] then
+                        lock[ref] = true
+                        queueLen = queueLen + 1
+                        queues[queueLen] = ref
+                        starts[queueLen] = start
+                        forces[queueLen] = force
+                    end
+                end
+            end
+        end
     end
     if simple.mode == 'global' then
         -- 全局变量开头
-        m.checkSameSimpleInGlobal(status, simple[1], simple.node, mode, 1, pushQueue)
+        pushQueue(simple.node, 1)
     elseif simple.mode == 'local' then
         -- 局部变量开头
         pushQueue(simple.node, 1)

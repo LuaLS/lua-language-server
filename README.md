@@ -72,12 +72,12 @@ https://marketplace.visualstudio.com/items?itemName=sumneko.lua
 - [x] Lua 5.4
 - [x] LuaJIT
 
-If you find any mistakes, please [tell me][issues] or use [Pull Requests][@lua] to fix them directly.
+If you find any mistakes, please [tell me][issues] or use [Pull Requests][@meta] to fix them directly.
 
 如果你发现了任何错误，请[告诉我][issues]或使用[Pull Requests][@lua]来直接修复。
 
 [issues]: https://github.com/sumneko/lua-language-server/issues
-[@lua]: https://github.com/sumneko/lua-language-server/tree/master/libs/%40lua
+[@meta]: https://github.com/sumneko/lua-language-server/tree/master/meta/template
 
 ## Locale
 
@@ -86,7 +86,7 @@ If you find any mistakes, please [tell me][issues] or use [Pull Requests][@lua] 
 
 Please [help me][en-US] improve the quality of `en-US`.
 
-[en-US]: https://github.com/sumneko/lua-language-server/tree/master/locale/en-US
+[en-US]: https://github.com/sumneko/lua-language-server/tree/master/locale/en-us
 
 ## Build
 

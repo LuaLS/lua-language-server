@@ -2046,7 +2046,7 @@ function m.checkSameSimpleInArg1OfSetMetaTable(status, obj, start, pushQueue)
     end
     local mt = args[2]
     if mt then
-        if m.hasValueMark(status, 'set', mt) then
+        if m.hasValueMark(status, mt) then
             return
         end
         m.checkSameSimpleInValueInMetaTable(status, mt, start, pushQueue)
@@ -2372,21 +2372,14 @@ function m.checkSameSimpleInGlobal(status, source)
     return objs
 end
 
-function m.hasValueMark(status, mode, value)
+function m.hasValueMark(status, value)
     if not status.share.valueMark then
-        status.share.valueMark = {
-            set = {},
-            get = {},
-        }
+        status.share.valueMark = {}
     end
-    if status.share.valueMark[mode][value] then
+    if status.share.valueMark[value] then
         return true
     end
-    if mode == 'set' then
-        status.share.valueMark['get'][value] = true
-    else
-        status.share.valueMark['set'][value] = true
-    end
+    status.share.valueMark[value] = true
     return false
 end
 
@@ -2421,7 +2414,7 @@ function m.searchSameFieldsInValue(status, ref, start, pushQueue, mode)
     if not value then
         return
     end
-    if m.hasValueMark(status, 'set', value) then
+    if m.hasValueMark(status, value) then
         return
     end
     status.share.inSetValue = (status.share.inSetValue or 0) + 1
@@ -2451,7 +2444,7 @@ function m.checkSameSimpleAsTableField(status, ref, start, pushQueue)
     if not parent or parent.type ~= 'tablefield' then
         return
     end
-    if m.hasValueMark(status, 'set', ref) then
+    if m.hasValueMark(status, ref) then
         return
     end
     local newStatus = m.status(status)
@@ -2510,7 +2503,7 @@ function m.checkSameSimpleAsSetValue(status, ref, start, pushQueue)
     if m.getObjectValue(parent) ~= ref then
         return
     end
-    if m.hasValueMark(status, 'get', ref) then
+    if m.hasValueMark(status, ref) then
         return
     end
     if m.checkSearchLevel(status) then
@@ -2648,6 +2641,10 @@ function m.checkSameSimpleAsCallArg(status, ref, start, pushQueue)
     if call.parent.type ~= 'select' then
         return
     end
+    if (status.share.inSetValue or 0) > 0 then
+        return
+    end
+    status.share.inBeSetValue = (status.share.inBeSetValue or 0) + 1
     local newStatus = m.status(status)
     m.searchRefs(newStatus, call.node, 'def')
     for _, func in ipairs(newStatus.results) do
@@ -2666,6 +2663,7 @@ function m.checkSameSimpleAsCallArg(status, ref, start, pushQueue)
             end
         end
     end
+    status.share.inBeSetValue = (status.share.inBeSetValue or 0) - 1
 end
 
 local function hasTypeName(doc, name)

@@ -1545,6 +1545,14 @@ function m.getObjectValue(obj)
 end
 
 function m.checkSameSimpleInValueInMetaTable(status, mt, start, pushQueue)
+    local cache, makeCache = m.getRefCache(status, mt, '__index')
+    if cache then
+        for _, obj in ipairs(cache) do
+            pushQueue(obj, start, true)
+        end
+        return
+    end
+    cache = {}
     local newStatus = m.status(status)
     m.searchDefFields(newStatus, mt, '__index')
     local refsStatus = m.status(status)
@@ -1557,6 +1565,10 @@ function m.checkSameSimpleInValueInMetaTable(status, mt, start, pushQueue)
     for i = 1, #refsStatus.results do
         local obj = refsStatus.results[i]
         pushQueue(obj, start, true)
+        cache[i] = obj
+    end
+    if makeCache then
+        makeCache(cache)
     end
 end
 function m.checkSameSimpleInValueOfSetMetaTable(status, func, start, pushQueue)
@@ -2096,7 +2108,10 @@ function m.searchSameMethodIntoSelf(ref, mark)
 end
 
 function m.searchSameFieldsCrossMethod(status, ref, start, pushQueue)
-    if status.share.crossMethodLock then
+    if not status.share.crossMethodLock then
+        status.share.crossMethodLock = {}
+    end
+    if status.share.crossMethodLock[ref] then
         return
     end
     local mark = status.crossMethodMark
@@ -2121,9 +2136,9 @@ function m.searchSameFieldsCrossMethod(status, ref, start, pushQueue)
         local _ <close> = tracy.ZoneEnd
         -- 如果自己是self，则找出父级的method，以及父级method的引用
         local newStatus = m.status(status)
-        newStatus.crossMethodLock = true
+        newStatus.share.crossMethodLock[ref] = true
         m.searchRefs(newStatus, method, 'ref')
-        newStatus.crossMethodLock = false
+        newStatus.share.crossMethodLock[ref] = false
         for _, res in ipairs(newStatus.results) do
             mark[res] = true
             pushQueue(res, start, true)
@@ -2636,15 +2651,16 @@ function m.checkSameSimpleAsCallArg(status, ref, start, pushQueue)
     if not call then
         return
     end
+    if call.parent.type ~= 'select' then
+        return
+    end
     local newStatus = m.status(status)
     m.searchRefs(newStatus, call.node, 'def')
     for _, func in ipairs(newStatus.results) do
         local rindex = findGenericFromArgIndexToReturnIndex(func, index)
         if rindex then
             if rindex == 1 then
-                if call.parent.type == 'select' then
-                    pushQueue(call.parent.parent, start, true)
-                end
+                pushQueue(call.parent.parent, start, true)
             else
                 if call.extParent then
                     for _, slt in ipairs(call.extParent) do
@@ -3231,9 +3247,8 @@ function m.getRefCache(status, obj, mode)
         return {}
     end
     status.share.cacheLock[mode][obj] = {}
-    return nil, function ()
+    return nil, function (results)
         sourceCache = {}
-        local results = status.results
         for i = 1, #results do
             sourceCache[i] = results[i]
         end
@@ -3287,7 +3302,7 @@ function m.searchRefs(status, obj, mode)
     m.cleanResults(status.results)
 
     if makeCache then
-        makeCache()
+        makeCache(status.results)
     end
 end
 
@@ -4705,7 +4720,7 @@ function m.searchInfer(status, obj)
     if checked then
         m.cleanInfers(status.results, obj)
         if makeCache then
-            makeCache()
+            makeCache(status.results)
         end
         return
     end
@@ -4722,7 +4737,7 @@ function m.searchInfer(status, obj)
     m.inferByBinary(status, obj)
     m.cleanInfers(status.results, obj)
     if makeCache then
-        makeCache()
+        makeCache(status.results)
     end
 end
 

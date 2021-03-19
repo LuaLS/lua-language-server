@@ -2046,7 +2046,7 @@ function m.checkSameSimpleInArg1OfSetMetaTable(status, obj, start, pushQueue)
     end
     local mt = args[2]
     if mt then
-        if m.checkValueMark(status, obj, mt) then
+        if m.hasValueMark(status, 'set', mt) then
             return
         end
         m.checkSameSimpleInValueInMetaTable(status, mt, start, pushQueue)
@@ -2372,16 +2372,21 @@ function m.checkSameSimpleInGlobal(status, source)
     return objs
 end
 
-function m.checkValueMark(status, a, b)
+function m.hasValueMark(status, mode, value)
     if not status.share.valueMark then
-        status.share.valueMark = {}
+        status.share.valueMark = {
+            set = {},
+            get = {},
+        }
     end
-    if status.share.valueMark[a]
-    or status.share.valueMark[b] then
+    if status.share.valueMark[mode][value] then
         return true
     end
-    status.share.valueMark[a] = true
-    status.share.valueMark[b] = true
+    if mode == 'set' then
+        status.share.valueMark['get'][value] = true
+    else
+        status.share.valueMark['set'][value] = true
+    end
     return false
 end
 
@@ -2416,8 +2421,8 @@ function m.searchSameFieldsInValue(status, ref, start, pushQueue, mode)
     if not value then
         return
     end
-    if not m.checkValueMark(status, ref, value) then
-        --return
+    if m.hasValueMark(status, 'set', value) then
+        return
     end
     status.share.inSetValue = (status.share.inSetValue or 0) + 1
     if not status.share.tempValueMark then
@@ -2446,7 +2451,7 @@ function m.checkSameSimpleAsTableField(status, ref, start, pushQueue)
     if not parent or parent.type ~= 'tablefield' then
         return
     end
-    if m.checkValueMark(status, parent, ref) then
+    if m.hasValueMark(status, 'set', ref) then
         return
     end
     local newStatus = m.status(status)
@@ -2505,7 +2510,7 @@ function m.checkSameSimpleAsSetValue(status, ref, start, pushQueue)
     if m.getObjectValue(parent) ~= ref then
         return
     end
-    if m.checkValueMark(status, ref, parent) then
+    if m.hasValueMark(status, 'get', ref) then
         return
     end
     if m.checkSearchLevel(status) then

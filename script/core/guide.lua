@@ -2267,11 +2267,18 @@ function m.checkSameSimpleInCall(status, ref, start, pushQueue, mode)
         end
     end
     m.cleanResults(objs)
+    if not status.share.callFuncMark then
+        status.share.callFuncMark = {}
+    end
     local mark = {}
     for _, obj in ipairs(objs) do
         if mark[obj] then
             goto CONTINUE
         end
+        if status.share.callFuncMark[obj] then
+            goto CONTINUE
+        end
+        status.share.callFuncMark[obj] = true
         local newStatus = m.status(status)
         m.searchRefs(newStatus, obj, mode)
         pushQueue(obj, start, true)
@@ -2280,6 +2287,7 @@ function m.checkSameSimpleInCall(status, ref, start, pushQueue, mode)
             pushQueue(obj, start, true)
             mark[obj] = true
         end
+        status.share.callFuncMark[obj] = nil
         ::CONTINUE::
     end
     status.share.crossCallCount = status.share.crossCallCount - 1

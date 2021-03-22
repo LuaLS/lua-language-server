@@ -2254,6 +2254,9 @@ function m.checkSameSimpleInCall(status, ref, start, pushQueue, mode)
     if status.share.inBeSetValue and status.share.inBeSetValue > 0 then
         return
     end
+    if status.share.inSetValue and status.share.inSetValue > 5 then
+        return
+    end
     local func, args, index = m.getCallValue(ref)
     if not func then
         return
@@ -2261,14 +2264,9 @@ function m.checkSameSimpleInCall(status, ref, start, pushQueue, mode)
     if m.checkCallMark(status, func.parent, true) then
         return
     end
-    status.share.crossCallCount = status.share.crossCallCount or 0
+    status.share.inSetValue = (status.share.inSetValue or 0) + 1
     -- 检查赋值是 semetatable() 的情况
     m.checkSameSimpleInValueOfSetMetaTable(status, func, start, pushQueue)
-    -- 检查赋值是 func() 的情况
-    if status.share.crossCallCount >= 2 then
-        --return
-    end
-    status.share.crossCallCount = status.share.crossCallCount + 1
     local objs = m.checkSameSimpleInCallInSameFile(status, func, args, index)
     if status.interface.call then
         local cobjs = status.interface.call(func, args, index)
@@ -2304,7 +2302,7 @@ function m.checkSameSimpleInCall(status, ref, start, pushQueue, mode)
         status.share.callFuncMark[obj] = nil
         ::CONTINUE::
     end
-    status.share.crossCallCount = status.share.crossCallCount - 1
+    status.share.inSetValue = (status.share.inSetValue or 0) - 1
 end
 
 local function searchRawset(ref, results)
@@ -2424,6 +2422,9 @@ function m.searchSameFieldsInValue(status, ref, start, pushQueue, mode)
     if status.share.inBeSetValue and status.share.inBeSetValue > 0 then
         return
     end
+    if status.share.inSetValue and status.share.inSetValue > 5 then
+        return
+    end
     local value = m.getObjectValue(ref)
     if not value then
         return
@@ -2505,6 +2506,9 @@ function m.checkSameSimpleAsSetValue(status, ref, start, pushQueue)
         --return
     end
     if status.share.inSetValue and status.share.inSetValue > 0 then
+        return
+    end
+    if status.share.inBeSetValue and status.share.inBeSetValue > 5 then
         return
     end
     if ref.type == 'select' then
@@ -2656,6 +2660,9 @@ function m.checkSameSimpleAsCallArg(status, ref, start, pushQueue)
         return
     end
     if (status.share.inSetValue or 0) > 0 then
+        return
+    end
+    if status.share.inBeSetValue and status.share.inBeSetValue > 5 then
         return
     end
     status.share.inBeSetValue = (status.share.inBeSetValue or 0) + 1
@@ -3078,7 +3085,7 @@ function m.searchSameFields(status, simple, mode)
         --    break
         --end
         m.checkSameSimple(status, simple, obj, start, force, mode, pushQueue)
-        if max >= 100000 then
+        if max >= 10000 then
             logWarn('Queue too large!')
             break
         end

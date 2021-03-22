@@ -2251,6 +2251,9 @@ function m.checkSameSimpleInCallInSameFile(status, func, args, index)
 end
 
 function m.checkSameSimpleInCall(status, ref, start, pushQueue, mode)
+    if status.share.inBeSetValue and status.share.inBeSetValue > 0 then
+        return
+    end
     local func, args, index = m.getCallValue(ref)
     if not func then
         return

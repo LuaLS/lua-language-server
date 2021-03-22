@@ -2107,7 +2107,10 @@ function m.searchSameMethodIntoSelf(ref, mark)
     return selfRef
 end
 
-function m.searchSameFieldsCrossMethod(status, ref, start, pushQueue)
+function m.searchSameFieldsCrossMethod(status, ref, start, pushQueue, mode)
+    if status.share.crossMethodMark2 then
+        return
+    end
     local mark = status.crossMethodMark
     if not mark then
         mark = {}
@@ -2121,7 +2124,15 @@ function m.searchSameFieldsCrossMethod(status, ref, start, pushQueue)
         tracy.ZoneBeginN 'searchSameFieldsCrossMethod'
         local _ <close> = tracy.ZoneEnd
         -- 如果自己是method，则只检查自己内部的self引用
-        pushQueue(selfRef, start, true)
+        status.share.inBeSetValue = (status.share.inBeSetValue or 0) + 1
+        status.share.crossMethodMark2 = true
+        local newStatus = m.status(status)
+        m.searchRefs(newStatus, selfRef, mode)
+        for _, res in ipairs(newStatus.results) do
+            pushQueue(res, start, true)
+        end
+        status.share.inBeSetValue = (status.share.inBeSetValue or 0) - 1
+        status.share.crossMethodMark2 = nil
         return
     end
     local method = m.searchSameMethodOutSelf(ref, mark)
@@ -2916,7 +2927,7 @@ function m.checkSameSimple(status, simple, ref, start, force, mode, pushQueue)
         m.checkSameSimpleInString(status, ref, i, pushQueue, cmode)
         if not skipInfer and not skipSearch then
             -- 穿透 self:func 与 mt:func
-            m.searchSameFieldsCrossMethod(status, ref, i, pushQueue)
+            m.searchSameFieldsCrossMethod(status, ref, i, pushQueue, cmode)
             -- 穿透赋值
             m.searchSameFieldsInValue(status, ref, i, pushQueue, cmode)
             -- 检查自己是字面量表的情况

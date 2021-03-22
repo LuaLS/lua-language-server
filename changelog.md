@@ -1,7 +1,8 @@
 # changelog
 
 ## 1.19.1
-* `FIX` `LuaDoc`: parsing resumes may wrong
+* `FIX` `LuaDoc`: parsing resumes may wrong*
+* `FIX` [#458](https://github.com/sumneko/lua-language-server/issues/458)
 * `FIX` runtime errors
 
 ## 1.19.0

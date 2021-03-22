@@ -654,6 +654,7 @@ local Defs = {
     GetIndex = function (start, index, finish)
         local obj = {
             type   = 'getindex',
+            bstart = start,
             start  = start,
             finish = finish - 1,
             index  = index,
@@ -1021,8 +1022,8 @@ local Defs = {
             name.value = actions
             PushError {
                 type = 'INDEX_IN_FUNC_NAME',
-                start = name.index.start,
-                finish = name.index.finish,
+                start = name.bstart,
+                finish = name.finish,
             }
         end
         name.range = actions.finish

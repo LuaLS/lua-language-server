@@ -1,9 +1,9 @@
 # changelog
 
 ## 1.19.1
-* `FIX` `LuaDoc`: parsing resumes may wrong*
+* `CHG` improve performance
+* `FIX` [#457](https://github.com/sumneko/lua-language-server/issues/457)
 * `FIX` [#458](https://github.com/sumneko/lua-language-server/issues/458)
-* `FIX` runtime errors
 
 ## 1.19.0
 `2021-3-18`

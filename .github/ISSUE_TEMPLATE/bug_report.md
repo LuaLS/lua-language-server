@@ -30,3 +30,6 @@ If applicable, add screenshots to help explain your problem.
 
 **Additional context**
 Add any other context about the problem here.
+
+**Provide logs**
+Find the log at https://github.com/sumneko/lua-language-server/wiki/Default-log-path

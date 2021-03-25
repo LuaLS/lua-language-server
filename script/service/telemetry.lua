@@ -5,6 +5,9 @@ local client   = require 'provider.client'
 local nonil    = require 'without-check-nil'
 local util     = require 'utility'
 local platform = require 'bee.platform'
+local proto    = require 'proto.proto'
+local lang     = require 'language'
+local define   = require 'proto.define'
 
 local tokenPath = (ROOT / 'log' / 'token'):string()
 local token = util.loadFile(tokenPath)
@@ -85,3 +88,63 @@ timer.wait(5, function ()
         net.update()
     end)
 end)
+
+local m = {}
+
+function m.updateConfig()
+    if config.config.telemetry.enable ~= nil then
+        return
+    end
+    if m.hasShowedMessage then
+        return
+    end
+    m.hasShowedMessage = true
+
+    if client.isVSCode() then
+        local enableTitle  = lang.script.WINDOW_TELEMETRY_ENABLE
+        local disableTitle = lang.script.WINDOW_TELEMETRY_DISABLE
+        local item = proto.awaitRequest('window/showMessageRequest', {
+            message = lang.script.WINDOW_TELEMETRY_HINT,
+            type    = define.MessageType.Info,
+            actions = {
+                {
+                    title = enableTitle,
+                },
+                {
+                    title = disableTitle,
+                },
+            }
+        })
+        if not item then
+            return
+        end
+        if item.title == enableTitle then
+            proto.notify('$/command', {
+                command   = 'lua.config',
+                data      = {
+                    key    = 'Lua.telemetry.enable',
+                    action = 'set',
+                    value  = true,
+                    global = true,
+                }
+            })
+        elseif item.title == disableTitle then
+            proto.notify('$/command', {
+                command   = 'lua.config',
+                data      = {
+                    key    = 'Lua.telemetry.enable',
+                    action = 'set',
+                    value  = false,
+                    global = true,
+                }
+            })
+        end
+    else
+        proto.notify('window/showMessage', {
+            message = lang.script.WINDOW_TELEMETRY_HINT,
+            type    = define.MessageType.Info,
+        })
+    end
+end
+
+return m

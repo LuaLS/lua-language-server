@@ -21,7 +21,7 @@ local tm        = require 'text-merger'
 
 local function updateConfig()
     local diagnostics = require 'provider.diagnostic'
-    local vm          = require 'vm'
+    local telemetry   = require 'service.telemetry'
     local configs = proto.awaitRequest('workspace/configuration', {
         items = {
             {
@@ -94,6 +94,7 @@ local function updateConfig()
     else
         proto.notify('$/status/hide')
     end
+    telemetry.updateConfig()
 end
 
 proto.on('initialize', function (params)

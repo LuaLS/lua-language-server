@@ -22,6 +22,13 @@ local function String(v)
     return true, tostring(v)
 end
 
+local function Nil(v)
+    if type(v) == 'nil' then
+        return true, nil
+    end
+    return false
+end
+
 local function Str2Hash(sep)
     return function (v)
         if type(v) == 'string' then
@@ -186,7 +193,7 @@ local ConfigTemplate = {
         progressBar     = {true,      Boolean},
     },
     telemetry = {
-        enable          = {true,      Boolean},
+        enable          = {nil,       Or(Boolean, Nil)},
     }
 }
 

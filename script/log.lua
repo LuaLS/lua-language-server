@@ -22,9 +22,9 @@ m.size = 0
 m.maxSize = 100 * 1024 * 1024
 
 local function trimSrc(src)
-    src = src:sub(m.prefixLen + 3, -5)
-    src = src:gsub('^[/\\]+', '')
-    src = src:gsub('[\\/]+', '.')
+    if src:sub(1, 1) == '@' then
+        src = src:sub(2)
+    end
     return src
 end
 

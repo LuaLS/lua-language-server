@@ -41,3 +41,18 @@ else
     package.path  = rootPath .. script .. '/?.lua'
           .. ';' .. rootPath .. script .. '/?/init.lua'
 end
+
+package.searchers[2] = function (name)
+    local filename, err = package.searchpath(name, package.path)
+    if not filename then
+        return err
+    end
+    local f = io.open(filename)
+    local buf = f:read '*a'
+    f:close()
+    local init, err = load(buf, '@' .. name)
+    if not init then
+        return err
+    end
+    return init, filename
+end

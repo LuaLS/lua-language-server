@@ -130,3 +130,4 @@ Please [help me][en-US] improve the quality of `en-US`.
 * [uhziel](https://github.com/uhziel)
 * [火凌之](https://github.com/PhoenixZeng)
 * [CppCXY](https://github.com/CppCXY)
+* [Ketho](https://github.com/Ketho)

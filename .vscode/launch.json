@@ -32,6 +32,12 @@
 			"stopOnEntry": true,
 			"address": "127.0.0.1:11427",
 			"outputCapture": [
+			],
+			"sourceMaps": [
+				[
+					"./*",
+					"${workspaceFolder}/*"
+				]
 			]
 		},
 	]

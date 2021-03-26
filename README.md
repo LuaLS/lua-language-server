@@ -131,3 +131,7 @@ Please [help me][en-US] improve the quality of `en-US`.
 * [火凌之](https://github.com/PhoenixZeng)
 * [CppCXY](https://github.com/CppCXY)
 * [Ketho](https://github.com/Ketho)
+
+## Telemetry
+
+This language server collects usage data and sends it to the development team to help improve the extension. Read our [privacy policy](https://github.com/sumneko/lua-language-server/wiki/Privacy-Policy) to learn more and how to disable any telemetry.

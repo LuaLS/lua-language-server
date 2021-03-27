@@ -76,7 +76,7 @@ local function mergeRows(rows, change)
     -- 修改中间的每一行
     for i = 2, #insertRows - 1 do
         local currentLine = startLine + i - 1
-        local insertText  = insertRows[i]
+        local insertText  = insertRows[i] or ''
         rows[currentLine] = insertText
     end
 end

@@ -226,6 +226,6 @@ WINDOW_LUA_STATUS                = [[
 ]]
 WINDOW_APPLY_SETTING             = '应用设置'
 WINDOW_CHECK_SEMANTIC            = '如果你正在使用市场中的颜色主题，你可能需要同时修改 `editor.semanticHighlighting.enabled` 选项为 `true` 才会使语义着色生效。'
-WINDOW_TELEMETRY_HINT            = '发送匿名的使用数据与错误报告，帮助我们进一步完善此插件。在[此处](https://github.com/sumneko/lua-language-server/wiki/%E9%9A%90%E7%A7%81%E5%A3%B0%E6%98%8E)阅读我们的隐私声明。'
-WINDOW_TELEMETRY_ENABLE          = '启用遥测'
-WINDOW_TELEMETRY_DISABLE         = '禁用遥测'
+WINDOW_TELEMETRY_HINT            = '请允许发送匿名的使用数据与错误报告，帮助我们进一步完善此插件。在[此处](https://github.com/sumneko/lua-language-server/wiki/%E9%9A%90%E7%A7%81%E5%A3%B0%E6%98%8E)阅读我们的隐私声明。'
+WINDOW_TELEMETRY_ENABLE          = '允许'
+WINDOW_TELEMETRY_DISABLE         = '禁止'

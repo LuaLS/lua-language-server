@@ -1,6 +1,7 @@
 # changelog
 
 ## 1.20.0
+`2021-3-27`
 * `CHG` telemetry: change to opt-in, see [#462](https://github.com/sumneko/lua-language-server/issues/462) and [Privacy-Policy](https://github.com/sumneko/lua-language-server/wiki/Privacy-Policy)
 * `FIX` [#467](https://github.com/sumneko/lua-language-server/issues/467)
 

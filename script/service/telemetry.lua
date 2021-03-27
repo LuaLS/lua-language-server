@@ -67,7 +67,7 @@ timer.wait(5, function ()
         if not config.config.telemetry.enable then
             return
         end
-        local suc, link = pcall(net.connect, 'tcp', 'moe-loli.love', 11577)
+        local suc, link = pcall(net.connect, 'tcp', 'moe-moe.love', 11577)
         if not suc then
             suc, link = pcall(net.connect, 'tcp', '119.45.194.183', 11577)
         end

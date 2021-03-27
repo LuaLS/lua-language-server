@@ -684,3 +684,35 @@ hover = {
     name  = 'x',
     description = 'BBB'
 }}
+
+TEST {{ path = 'a.lua', content = '', }, {
+    path = 'b.lua',
+    content = [[
+---AAA
+G.<?A?> = 1
+
+---BBB
+G.A = 1
+    ]]
+},
+hover = {
+    label = 'global G.A: integer = 1',
+    name  = 'G.A',
+    description = 'AAA'
+}}
+
+TEST {{ path = 'a.lua', content = '', }, {
+    path = 'b.lua',
+    content = [[
+---AAA
+G.A = 1
+
+---BBB
+G.<?A?> = 1
+    ]]
+},
+hover = {
+    label = 'global G.A: integer = 1',
+    name  = 'G.A',
+    description = 'BBB'
+}}

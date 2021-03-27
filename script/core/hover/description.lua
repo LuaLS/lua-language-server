@@ -358,6 +358,9 @@ return function (source)
     if source.type == 'string' then
         return asString(source)
     end
+    if source.type == 'field' then
+        source = source.parent
+    end
     return tryDocOverloadToComment(source)
         or tryDocFieldUpComment(source)
         or tyrDocParamComment(source)

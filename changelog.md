@@ -1,6 +1,7 @@
 # changelog
 
 ## 1.20.1
+* `FIX` telemetry window blocks initializing
 * `FIX` [#468](https://github.com/sumneko/lua-language-server/issues/468)
 
 ## 1.20.0

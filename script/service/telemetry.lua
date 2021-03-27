@@ -8,6 +8,7 @@ local platform = require 'bee.platform'
 local proto    = require 'proto.proto'
 local lang     = require 'language'
 local define   = require 'proto.define'
+local await    = require 'await'
 
 local tokenPath = (ROOT / 'log' / 'token'):string()
 local token = util.loadFile(tokenPath)
@@ -100,51 +101,53 @@ function m.updateConfig()
     end
     m.hasShowedMessage = true
 
-    if client.isVSCode() then
-        local enableTitle  = lang.script.WINDOW_TELEMETRY_ENABLE
-        local disableTitle = lang.script.WINDOW_TELEMETRY_DISABLE
-        local item = proto.awaitRequest('window/showMessageRequest', {
-            message = lang.script.WINDOW_TELEMETRY_HINT,
-            type    = define.MessageType.Info,
-            actions = {
-                {
-                    title = enableTitle,
-                },
-                {
-                    title = disableTitle,
-                },
-            }
-        })
-        if not item then
-            return
-        end
-        if item.title == enableTitle then
-            proto.notify('$/command', {
-                command   = 'lua.config',
-                data      = {
-                    key    = 'Lua.telemetry.enable',
-                    action = 'set',
-                    value  = true,
-                    global = true,
+    await.call(function ()
+        if client.isVSCode() then
+            local enableTitle  = lang.script.WINDOW_TELEMETRY_ENABLE
+            local disableTitle = lang.script.WINDOW_TELEMETRY_DISABLE
+            local item = proto.awaitRequest('window/showMessageRequest', {
+                message = lang.script.WINDOW_TELEMETRY_HINT,
+                type    = define.MessageType.Info,
+                actions = {
+                    {
+                        title = enableTitle,
+                    },
+                    {
+                        title = disableTitle,
+                    },
                 }
             })
-        elseif item.title == disableTitle then
-            proto.notify('$/command', {
-                command   = 'lua.config',
-                data      = {
-                    key    = 'Lua.telemetry.enable',
-                    action = 'set',
-                    value  = false,
-                    global = true,
-                }
+            if not item then
+                return
+            end
+            if item.title == enableTitle then
+                proto.notify('$/command', {
+                    command   = 'lua.config',
+                    data      = {
+                        key    = 'Lua.telemetry.enable',
+                        action = 'set',
+                        value  = true,
+                        global = true,
+                    }
+                })
+            elseif item.title == disableTitle then
+                proto.notify('$/command', {
+                    command   = 'lua.config',
+                    data      = {
+                        key    = 'Lua.telemetry.enable',
+                        action = 'set',
+                        value  = false,
+                        global = true,
+                    }
+                })
+            end
+        else
+            proto.notify('window/showMessage', {
+                message = lang.script.WINDOW_TELEMETRY_HINT,
+                type    = define.MessageType.Info,
             })
         end
-    else
-        proto.notify('window/showMessage', {
-            message = lang.script.WINDOW_TELEMETRY_HINT,
-            type    = define.MessageType.Info,
-        })
-    end
+    end)
 end
 
 return m

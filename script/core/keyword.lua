@@ -79,7 +79,7 @@ end"
                 kind  = define.CompletionItemKind.Snippet,
                 insertTextFormat = 2,
                 insertText = "\z
-${1:key}, ${2:value} in pairs(${3:t})}do\
+${1:key}, ${2:value} in pairs(${3:t}) do\
 \t$0\
 end"
             }

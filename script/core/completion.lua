@@ -1282,9 +1282,6 @@ local function getFuncParamByCallIndex(func, index)
     if not func.args or #func.args == 0 then
         return nil
     end
-    if func.parent.type == 'setmethod' then
-        return func.args[index - 1]
-    end
     if index > #func.args then
         if func.args[#func.args].type == '...' then
             return func.args[#func.args]

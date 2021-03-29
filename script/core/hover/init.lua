@@ -21,9 +21,6 @@ local function eachFunctionAndOverload(value, callback)
 end
 
 local function getHoverAsValue(source)
-    local oop = source.type == 'method'
-             or source.type == 'getmethod'
-             or source.type == 'setmethod'
     local label = getLabel(source)
     local desc  = getDesc(source)
     if not desc then
@@ -49,9 +46,6 @@ local function getHoverAsFunction(source)
     local defs = 0
     local protos = 0
     local other = 0
-    local oop = source.type == 'method'
-             or source.type == 'getmethod'
-             or source.type == 'setmethod'
     local mark = {}
     for _, def in ipairs(values) do
         def = guide.getObjectValue(def) or def

@@ -1429,6 +1429,16 @@ function m.getCallValue(source)
     or call.node.special == 'xpcall' then
         return call.args and call.args[1], call.args, index - 1
     end
+    if call.node.type == 'getmethod' then
+        local args = {}
+        args[1] = call.node.node
+        if call.args then
+            for _, arg in ipairs(call.args) do
+                args[#args+1] = arg
+            end
+        end
+        return call.node, args, index
+    end
     return call.node, call.args, index
 end
 

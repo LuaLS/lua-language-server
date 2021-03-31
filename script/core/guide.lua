@@ -570,10 +570,10 @@ end
 
 --- 遍历所有指定类型的source
 function m.eachSourceType(ast, type, callback)
-    local cache = ast.typeCache
+    local cache = ast._typeCache
     if not cache then
         cache = {}
-        ast.typeCache = cache
+        ast._typeCache = cache
         m.eachSource(ast, function (source)
             local tp = source.type
             if not tp then
@@ -2239,7 +2239,6 @@ function m.checkSameSimpleInCallInSameFile(status, func, args, index)
                 end
             end
         end
-        -- generic cannot cache
         cache[index] = results
     end
     return results

@@ -18,6 +18,7 @@ local lang      = require 'language'
 local plugin    = require 'plugin'
 local progress  = require 'progress'
 local tm        = require 'text-merger'
+local vm        = require 'vm'
 
 local function updateConfig()
     local diagnostics = require 'provider.diagnostic'
@@ -288,6 +289,7 @@ proto.on('textDocument/hover', function (params)
     if not files.exists(uri) then
         return nil
     end
+    vm.flushCache()
     local offset = files.offsetOfWord(uri, params.position)
     local hover = core.byUri(uri, offset)
     if not hover then
@@ -314,6 +316,7 @@ proto.on('textDocument/definition', function (params)
     if not files.exists(uri) then
         return nil
     end
+    vm.flushCache()
     local offset = files.offsetOfWord(uri, params.position)
     local result = core(uri, offset)
     if not result then
@@ -343,6 +346,7 @@ proto.on('textDocument/references', function (params)
     if not files.exists(uri) then
         return nil
     end
+    vm.flushCache()
     local offset = files.offsetOfWord(uri, params.position)
     local result = core(uri, offset)
     if not result then
@@ -364,6 +368,7 @@ proto.on('textDocument/documentHighlight', function (params)
     if not files.exists(uri) then
         return nil
     end
+    vm.flushCache()
     local offset = files.offsetOfWord(uri, params.position)
     local result = core(uri, offset)
     if not result then
@@ -387,6 +392,7 @@ proto.on('textDocument/rename', function (params)
     if not files.exists(uri) then
         return nil
     end
+    vm.flushCache()
     local offset = files.offsetOfWord(uri, params.position)
     local result = core.rename(uri, offset, params.newName)
     if not result then
@@ -412,6 +418,7 @@ proto.on('textDocument/prepareRename', function (params)
     if not files.exists(uri) then
         return nil
     end
+    vm.flushCache()
     local offset = files.offsetOfWord(uri, params.position)
     local result = core.prepareRename(uri, offset)
     if not result then

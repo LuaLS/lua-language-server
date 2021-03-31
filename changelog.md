@@ -1,5 +1,8 @@
 # changelog
 
+## 1.21.0
+* `CHG` `LuaDoc`: supports `---@param self TYPE`
+
 ## 1.20.1
 `2021-3-27`
 * `FIX` telemetry window blocks initializing

@@ -6,7 +6,6 @@ local mathType    = math.type
 local tableRemove = table.remove
 local pairs       = pairs
 local tableSort   = table.sort
-local tableInsert = table.insert
 
 _ENV = nil
 
@@ -702,14 +701,6 @@ local Defs = {
                 finish = call.finish,
             }
         end
-        if  call.type == 'call'
-        and call.node
-        and call.node.type == 'getmethod' then
-            if not call.args then
-                call.args = {}
-            end
-            tableInsert(call.args, 1, call.node)
-        end
         return call
     end,
     BinaryOp = function (start, op)
@@ -1026,11 +1017,6 @@ local Defs = {
         elseif name.type == 'getmethod' then
             name.type = 'setmethod'
             name.value = actions
-            if not args then
-                args = {}
-                actions.args = args
-            end
-            tableInsert(args, 1, name.node)
         elseif name.type == 'getindex' then
             name.type = 'setfield'
             name.value = actions

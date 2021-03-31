@@ -38,10 +38,18 @@ local function check(uri, name, results)
 
     local severity = define.DiagnosticSeverity[level]
     local clock = os.clock()
+    local mark = {}
     require('core.diagnostics.' .. name)(uri, function (result)
         if vm.isDiagDisabledAt(uri, result.start, name) then
             return
         end
+        if result.start == 0 then
+            return
+        end
+        if mark[result.start] then
+            return
+        end
+        mark[result.start] = true
         result.level = severity or result.level
         result.code  = name
         results[#results+1] = result

@@ -98,6 +98,9 @@ return function (uri, callback)
         if delta <= 0 then
             return
         end
+        if callArgs == 1 and source.node.type == 'getmethod' then
+            return
+        end
         for i = #source.args - delta + 1, #source.args do
             local arg = source.args[i]
             if arg then

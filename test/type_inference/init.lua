@@ -630,3 +630,27 @@ function Cls:new() return self end
 
 local <?test?> = Cls:new()
 ]]
+
+TEST 'Cls' [[
+---@class Cls
+local Cls = {}
+
+---@generic T
+---@param self T
+---@return T
+function Cls.new(self) return self end
+
+local <?test?> = Cls.new(Cls)
+]]
+
+TEST 'Cls' [[
+---@class Cls
+local Cls = {}
+
+---@generic T
+---@param self T
+---@return T
+function Cls:new() return self end
+
+local <?test?> = Cls.new(Cls)
+]]

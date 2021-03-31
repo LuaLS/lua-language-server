@@ -1515,7 +1515,11 @@ end
         insertText = [[
 a ${1:any}
 ---@param b ${2:any}
----@param c ${3:any}]]
+---@param c ${3:any}]],
+    },
+    {
+        label = 'self',
+        kind = define.CompletionItemKind.Interface,
     },
     {
         label = 'a',

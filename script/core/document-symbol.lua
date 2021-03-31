@@ -26,12 +26,16 @@ local function buildFunctionParams(func)
         return ''
     end
     local params = {}
-    for i, arg in ipairs(func.args) do
-        if arg.type == '...' then
-            params[i] = '...'
-        else
-            params[i] = arg[1] or ''
+    for _, arg in ipairs(func.args) do
+        if arg.dummy then
+            goto CONTINUE
         end
+        if arg.type == '...' then
+            params[#params+1] = '...'
+        else
+            params[#params+1] = arg[1] or ''
+        end
+        ::CONTINUE::
     end
     return table.concat(params, ', ')
 end
@@ -172,6 +176,9 @@ local function buildValue(source, text, symbols)
 end
 
 local function buildSet(source, text, used, symbols)
+    if source.dummy then
+        return
+    end
     local value = source.value
     if value and value.type == 'function' then
         used[value] = true

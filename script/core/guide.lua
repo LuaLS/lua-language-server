@@ -1749,12 +1749,11 @@ local function stepRefOfGeneric(status, typeUnit, args, mode)
         if docArg.type == 'doc.param' then
             local paramName = docArg.param[1]
             for _, source in ipairs(doc.bindSources) do
-                if  source.type == 'local'
-                and source[1] == paramName
-                and source.parent.type == 'funcargs' then
-                    for index, arg in ipairs(source.parent) do
-                        if arg == source then
-                            genericIndex = index
+                if  source.type == 'function'
+                and source.args then
+                    for i, arg in ipairs(source.args) do
+                        if arg[1] == paramName then
+                            genericIndex = i
                             break
                         end
                     end
@@ -3042,6 +3041,15 @@ function m.searchSameFields(status, simple, mode)
                         forces[queueLen] = force
                     end
                 end
+            end
+        end
+        if obj.mirror then
+            if not lock[obj.mirror] then
+                lock[obj.mirror] = true
+                queueLen = queueLen + 1
+                queues[queueLen] = obj.mirror
+                starts[queueLen] = start
+                forces[queueLen] = force
             end
         end
     end

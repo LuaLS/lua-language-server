@@ -196,10 +196,10 @@ local function renameField(source, newname, callback)
         callback(source, func.start, parent.finish, newstr)
         local pl = text:find('(', parent.finish, true)
         if pl then
-            if func.args then
-                callback(source, pl + 1, pl, 'self, ')
-            else
+            if text:find('^%s*%)', pl + 1) then
                 callback(source, pl + 1, pl, 'self')
+            else
+                callback(source, pl + 1, pl, 'self, ')
             end
         end
     end

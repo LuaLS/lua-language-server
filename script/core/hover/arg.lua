@@ -26,6 +26,9 @@ local function asFunction(source, oop)
     if source.args then
         for i = 1, #source.args do
             local arg = source.args[i]
+            if arg.dummy then
+                goto CONTINUE
+            end
             local name = arg.name or guide.getKeyName(arg)
             if name then
                 args[#args+1] = ('%s%s: %s'):format(
@@ -36,6 +39,7 @@ local function asFunction(source, oop)
             else
                 args[#args+1] = ('%s'):format(vm.getInferType(arg))
             end
+            ::CONTINUE::
         end
     end
     if oop then

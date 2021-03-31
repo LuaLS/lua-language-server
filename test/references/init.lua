@@ -386,3 +386,51 @@ end
 local v1 = Master:foobar("", Dog)
 v1.<!eat!>()
 ]]
+
+TEST [[
+---@class A
+local <?A?>
+
+---@generic T
+---@param self T
+---@return T
+function m.f(self) end
+
+local <!b!> = m.f(<!A!>)
+]]
+
+TEST [[
+---@class A
+local <?A?>
+
+---@generic T
+---@param self T
+---@return T
+function m:f() end
+
+local <!b!> = m.f(<!A!>)
+]]
+
+TEST [[
+---@class A
+local <?A?>
+
+---@generic T
+---@param self T
+---@return T
+function <!A!>.f(self) end
+
+local <!b!> = <!A!>:f()
+]]
+
+TEST [[
+---@class A
+local <?A?>
+
+---@generic T
+---@param self T
+---@return T
+function <!A!>:f() end
+
+local <!b!> = <!A!>:f()
+]]

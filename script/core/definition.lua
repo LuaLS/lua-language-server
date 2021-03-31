@@ -137,6 +137,9 @@ return function (uri, offset)
     end
 
     for _, src in ipairs(defs) do
+        if src.dummy then
+            goto CONTINUE
+        end
         if values[src] then
             goto CONTINUE
         end

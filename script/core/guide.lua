@@ -3003,11 +3003,7 @@ function m.searchSameFields(status, simple, mode)
     local queues, starts, forces = allocQueue()
     local queueLen = 0
     local locks = {}
-    local function pushQueue(obj, start, force)
-        if obj.type == 'getlocal'
-        or obj.type == 'setlocal' then
-            obj = obj.node
-        end
+    local function appendQueue(obj, start, force)
         local lock = locks[start]
         if not lock then
             lock = {}
@@ -3021,28 +3017,6 @@ function m.searchSameFields(status, simple, mode)
         queues[queueLen] = obj
         starts[queueLen] = start
         forces[queueLen] = force
-        if obj.type == 'local' and obj.ref then
-            for _, ref in ipairs(obj.ref) do
-                queueLen = queueLen + 1
-                queues[queueLen] = ref
-                starts[queueLen] = start
-                forces[queueLen] = force
-            end
-        end
-        if m.isGlobal(obj) then
-            local refs = m.checkSameSimpleInGlobal(status, obj)
-            if refs then
-                for _, ref in ipairs(refs) do
-                    if not lock[ref] then
-                        lock[ref] = true
-                        queueLen = queueLen + 1
-                        queues[queueLen] = ref
-                        starts[queueLen] = start
-                        forces[queueLen] = force
-                    end
-                end
-            end
-        end
         if obj.mirror then
             if not lock[obj.mirror] then
                 lock[obj.mirror] = true
@@ -3050,6 +3024,26 @@ function m.searchSameFields(status, simple, mode)
                 queues[queueLen] = obj.mirror
                 starts[queueLen] = start
                 forces[queueLen] = force
+            end
+        end
+    end
+    local function pushQueue(obj, start, force)
+        if obj.type == 'getlocal'
+        or obj.type == 'setlocal' then
+            obj = obj.node
+        end
+        appendQueue(obj, start, force)
+        if obj.type == 'local' and obj.ref then
+            for _, ref in ipairs(obj.ref) do
+                appendQueue(ref, start, force)
+            end
+        end
+        if m.isGlobal(obj) then
+            local refs = m.checkSameSimpleInGlobal(status, obj)
+            if refs then
+                for _, ref in ipairs(refs) do
+                    appendQueue(ref, start, force)
+                end
             end
         end
     end

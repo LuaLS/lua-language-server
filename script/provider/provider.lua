@@ -41,6 +41,10 @@ local function updateConfig()
                 scopeUri = workspace.uri,
                 section = 'editor.semanticHighlighting.enabled',
             },
+            {
+                scopeUri = workspace.uri,
+                section = 'editor.acceptSuggestionOnEnter',
+            },
         },
     })
     if not configs or not configs[1] then
@@ -50,9 +54,10 @@ local function updateConfig()
 
     local updated = configs[1]
     local other   = {
-        associations = configs[2],
-        exclude      = configs[3],
-        semantic     = configs[4],
+        associations            = configs[2],
+        exclude                 = configs[3],
+        semantic                = configs[4],
+        acceptSuggestionOnEnter = configs[5],
     }
 
     local oldConfig = util.deepCopy(config.config)
@@ -442,6 +447,13 @@ proto.on('textDocument/completion', function (params)
     local uri  = params.textDocument.uri
     if not files.exists(uri) then
         return nil
+    end
+    if config.other.acceptSuggestionOnEnter ~= 'off' then
+        if params.context.triggerCharacter == '\n'
+        or params.context.triggerCharacter == '{'
+        or params.context.triggerCharacter == ',' then
+            return
+        end
     end
     await.setPriority(1000)
     local clock  = os.clock()

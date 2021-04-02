@@ -2,6 +2,7 @@
 
 ## 1.21.0
 * `CHG` `LuaDoc`: supports `---@param self TYPE`
+* `CHG` completion: does not show suggests after `\n`, `{` and `,`, unless your setting `editor.acceptSuggestionOnEnter` is `off`
 
 ## 1.20.1
 `2021-3-27`

@@ -4,6 +4,7 @@ local client         = require 'provider.client'
 local json           = require "json"
 local config         = require 'config'
 local lang           = require 'language'
+local nonil          = require 'without-check-nil'
 
 local isEnable = false
 
@@ -23,9 +24,11 @@ local function enable()
     if isEnable then
         return
     end
-    if not client.info.capabilities.textDocument.semanticTokens then
+    nonil.enable()
+    if not client.info.capabilities.textDocument.semanticTokens.dynamicRegistration then
         return
     end
+    nonil.disable()
     isEnable = true
     log.debug('Enable semantic tokens.')
     proto.awaitRequest('client/registerCapability', {
@@ -80,6 +83,11 @@ local function disable()
     if not isEnable then
         return
     end
+    nonil.enable()
+    if not client.info.capabilities.textDocument.semanticTokens.dynamicRegistration then
+        return
+    end
+    nonil.disable()
     isEnable = false
     log.debug('Disable semantic tokens.')
     proto.awaitRequest('client/unregisterCapability', {

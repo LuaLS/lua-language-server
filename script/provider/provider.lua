@@ -19,6 +19,7 @@ local plugin    = require 'plugin'
 local progress  = require 'progress'
 local tm        = require 'text-merger'
 local vm        = require 'vm'
+local nonil     = require 'without-check-nil'
 
 local function updateConfig()
     local diagnostics = require 'provider.diagnostic'
@@ -121,29 +122,38 @@ proto.on('initialized', function (params)
     updateConfig()
     local registrations = {}
 
-    -- 监视文件变化
-    registrations[#registrations+1] = {
-        id = 'workspace/didChangeWatchedFiles',
-        method = 'workspace/didChangeWatchedFiles',
-        registerOptions = {
-            watchers = {
-                {
-                    globPattern = '**/',
-                    kind = 1 | 2 | 4,
-                }
+    nonil.enable()
+    if client.info.capabilities.workspace.didChangeWatchedFiles.dynamicRegistration then
+        -- 监视文件变化
+        registrations[#registrations+1] = {
+            id = 'workspace/didChangeWatchedFiles',
+            method = 'workspace/didChangeWatchedFiles',
+            registerOptions = {
+                watchers = {
+                    {
+                        globPattern = '**/',
+                        kind = 1 | 2 | 4,
+                    }
+                },
             },
-        },
-    }
+        }
+    end
 
-    -- 监视配置变化
-    registrations[#registrations+1] = {
-        id = 'workspace/didChangeConfiguration',
-        method = 'workspace/didChangeConfiguration',
-    }
+    if client.info.capabilities.workspace.didChangeConfiguration.dynamicRegistration then
+        -- 监视配置变化
+        registrations[#registrations+1] = {
+            id = 'workspace/didChangeConfiguration',
+            method = 'workspace/didChangeConfiguration',
+        }
+    end
 
-    proto.awaitRequest('client/registerCapability', {
-        registrations = registrations
-    })
+    nonil.disable()
+
+    if #registrations ~= 0 then
+        proto.awaitRequest('client/registerCapability', {
+            registrations = registrations
+        })
+    end
     workspace.reload()
     return true
 end)

@@ -198,9 +198,10 @@ local ConfigTemplate = {
 }
 
 local OtherTemplate = {
-    associations = {{}, Hash(String, String)},
-    exclude      = {{}, Hash(String, Boolean)},
-    semantic     = {'', Or(Boolean, String)},
+    associations            = {{},   Hash(String, String)},
+    exclude                 = {{},   Hash(String, Boolean)},
+    semantic                = {'',   Or(Boolean, String)},
+    acceptSuggestionOnEnter = {'on', String},
 }
 
 local function init()

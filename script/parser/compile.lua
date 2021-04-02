@@ -1,6 +1,8 @@
-local guide = require 'core.guide'
-local type  = type
-local os    = os
+local guide       = require 'parser.guide'
+local type        = type
+local tableInsert = table.insert
+local pairs       = pairs
+local os          = os
 
 local specials = {
     ['_G']           = true,
@@ -73,6 +75,24 @@ local vmMap = {
     end,
     ['call'] = function (obj)
         Compile(obj.node, obj)
+        if obj.node and obj.node.type == 'getmethod' then
+            if not obj.args then
+                obj.args = {
+                    type   = 'callargs',
+                    start  = obj.start,
+                    finish = obj.finish,
+                    parent = obj,
+                }
+            end
+            local newNode = {}
+            for k, v in pairs(obj.node.node) do
+                newNode[k] = v
+            end
+            newNode.mirror = obj.node.node
+            newNode.dummy  = true
+            obj.node.node.mirror = newNode
+            tableInsert(obj.args, 1, newNode)
+        end
         Compile(obj.args, obj)
     end,
     ['callargs'] = function (obj)
@@ -126,15 +146,24 @@ local vmMap = {
         Compile(obj.node, obj)
         Compile(obj.method, obj)
         local value = obj.value
-        value.localself = {
+        local localself = {
             type   = 'local',
             start  = 0,
             finish = 0,
             method = obj,
             effect = obj.finish,
             tag    = 'self',
+            dummy  = true,
             [1]    = 'self',
         }
+        if not value.args then
+            value.args = {
+                type   = 'funcargs',
+                start  = obj.start,
+                finish = obj.finish,
+            }
+        end
+        tableInsert(value.args, 1, localself)
         Compile(value, obj)
     end,
     ['function'] = function (obj)
@@ -142,10 +171,6 @@ local vmMap = {
         local LastLocalCount = LocalCount
         Block = obj
         LocalCount = 0
-        if obj.localself then
-            Compile(obj.localself, obj)
-            obj.localself = nil
-        end
         Compile(obj.args, obj)
         for i = 1, #obj do
             Compile(obj[i], obj)

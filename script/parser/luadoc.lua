@@ -1148,10 +1148,6 @@ local function bindParamAndReturnIndex(binded)
         return
     end
     local paramIndex = 0
-    local parent = func.parent
-    if parent.type == 'setmethod' then
-        paramIndex = paramIndex + 1
-    end
     local paramMap = {}
     for _, param in ipairs(func.args) do
         paramIndex = paramIndex + 1

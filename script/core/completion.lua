@@ -1282,9 +1282,6 @@ local function getFuncParamByCallIndex(func, index)
     if not func.args or #func.args == 0 then
         return nil
     end
-    if func.parent.type == 'setmethod' then
-        return func.args[index - 1]
-    end
     if index > #func.args then
         if func.args[#func.args].type == '...' then
             return func.args[#func.args]
@@ -1630,12 +1627,12 @@ local function tryLuaDocByErr(ast, offset, err, docState, results)
         local label = {}
         local insertText = {}
         for i, arg in ipairs(func.args) do
-            if arg[1] then
+            if arg[1] and not arg.dummy then
                 label[#label+1] = arg[1]
-                if i == 1 then
-                    insertText[i] = ('%s ${%d:any}'):format(arg[1], i)
+                if #label == 1 then
+                    insertText[#insertText+1] = ('%s ${%d:any}'):format(arg[1], #label)
                 else
-                    insertText[i] = ('---@param %s ${%d:any}'):format(arg[1], i)
+                    insertText[#insertText+1] = ('---@param %s ${%d:any}'):format(arg[1], #label)
                 end
             end
         end

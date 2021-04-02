@@ -167,6 +167,9 @@ return function (uri, offset)
     local source = findSource(ast, offset, accept)
     if source then
         find(source, uri, function (target)
+            if target.dummy then
+                return
+            end
             local kind
             if     target.type == 'getfield' then
                 target = target.field

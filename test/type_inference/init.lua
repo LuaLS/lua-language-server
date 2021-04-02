@@ -606,3 +606,76 @@ function m:f()
     return <?self?>
 end
 ]]
+
+TEST 'Cls' [[
+---@class Cls
+local Cls = {}
+
+---@generic T
+---@param self T
+---@return T
+function Cls.new(self) return self end
+
+local <?test?> = Cls:new()
+]]
+
+TEST 'Cls' [[
+---@class Cls
+local Cls = {}
+
+---@generic T
+---@param self T
+---@return T
+function Cls:new() return self end
+
+local <?test?> = Cls:new()
+]]
+
+TEST 'Cls' [[
+---@class Cls
+local Cls = {}
+
+---@generic T
+---@param self T
+---@return T
+function Cls.new(self) return self end
+
+local <?test?> = Cls.new(Cls)
+]]
+
+TEST 'Cls' [[
+---@class Cls
+local Cls = {}
+
+---@generic T
+---@param self T
+---@return T
+function Cls:new() return self end
+
+local <?test?> = Cls.new(Cls)
+]]
+
+TEST 'Rct' [[
+---@class Obj
+local Obj = {}
+
+---@generic T
+---@param self T
+---@return T
+function Obj.new(self) return self end
+
+
+---@class Pnt:Obj
+local Pnt = {x = 0, y = 0}
+
+
+---@class Rct:Pnt
+local Rct = {w = 0, h = 0}
+
+
+local <?test?> = Rct.new(Rct)
+
+-- local test = Rct:new()
+
+return test
+]]

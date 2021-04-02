@@ -66,6 +66,9 @@ return function (uri, offset)
 
     local results = {}
     for _, src in ipairs(vm.getRefs(source, 5)) do
+        if src.dummy then
+            goto CONTINUE
+        end
         local root = guide.getRoot(src)
         if not root then
             goto CONTINUE

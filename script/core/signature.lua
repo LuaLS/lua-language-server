@@ -69,8 +69,13 @@ local function makeSignatures(call, pos)
              or node.type == 'getmethod'
              or node.type == 'setmethod'
     local index
-    local args = call.args
-    if args then
+    if call.args then
+        local args = {}
+        for _, arg in ipairs(call.args) do
+            if not arg.dummy then
+                args[#args+1] = arg
+            end
+        end
         for i, arg in ipairs(args) do
             if arg.start <= pos and arg.finish >= pos then
                 index = i

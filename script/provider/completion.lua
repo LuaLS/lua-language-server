@@ -1,4 +1,6 @@
-local proto = require 'proto'
+local proto  = require 'proto'
+local nonil  = require 'without-check-nil'
+local client = require 'provider.client'
 
 local isEnable = false
 
@@ -15,6 +17,11 @@ local function enable()
     if isEnable then
         return
     end
+    nonil.enable()
+    if not client.info.capabilities.textDocument.completion.dynamicRegistration then
+        return
+    end
+    nonil.disable()
     isEnable = true
     log.debug('Enable completion.')
     proto.awaitRequest('client/registerCapability', {
@@ -35,6 +42,11 @@ local function disable()
     if not isEnable then
         return
     end
+    nonil.enable()
+    if not client.info.capabilities.textDocument.completion.dynamicRegistration then
+        return
+    end
+    nonil.disable()
     isEnable = false
     log.debug('Disable completion.')
     proto.awaitRequest('client/unregisterCapability', {

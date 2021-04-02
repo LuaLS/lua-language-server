@@ -10,18 +10,12 @@ local function countCallArgs(source)
     if not source.args then
         return 0
     end
-    if source.node and source.node.type == 'getmethod' then
-        result = result + 1
-    end
     result = result + #source.args
     return result
 end
 
 local function countFuncArgs(source)
     local result = 0
-    if source.parent and source.parent.type == 'setmethod' then
-        result = result + 1
-    end
     if not source.args or #source.args == 0 then
         return result
     end
@@ -34,9 +28,6 @@ end
 
 local function countOverLoadArgs(source, doc)
     local result = 0
-    if source.parent and source.parent.type == 'setmethod' then
-        result = result + 1
-    end
     local func = doc.overload
     if not func.args or #func.args == 0 then
         return result
@@ -105,6 +96,9 @@ return function (uri, callback)
 
         local delta = callArgs - funcArgs
         if delta <= 0 then
+            return
+        end
+        if callArgs == 1 and source.node.type == 'getmethod' then
             return
         end
         for i = #source.args - delta + 1, #source.args do

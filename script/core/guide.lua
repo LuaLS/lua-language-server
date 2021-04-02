@@ -570,10 +570,10 @@ end
 
 --- 遍历所有指定类型的source
 function m.eachSourceType(ast, type, callback)
-    local cache = ast.typeCache
+    local cache = ast._typeCache
     if not cache then
         cache = {}
-        ast.typeCache = cache
+        ast._typeCache = cache
         m.eachSource(ast, function (source)
             local tp = source.type
             if not tp then
@@ -1399,10 +1399,6 @@ function m.getCallAndArgIndex(callarg)
         end
     end
     local call = callargs.parent
-    local node = call.node
-    if node.type == 'getmethod' then
-        index = index + 1
-    end
     return call, index
 end
 
@@ -1753,12 +1749,11 @@ local function stepRefOfGeneric(status, typeUnit, args, mode)
         if docArg.type == 'doc.param' then
             local paramName = docArg.param[1]
             for _, source in ipairs(doc.bindSources) do
-                if  source.type == 'local'
-                and source[1] == paramName
-                and source.parent.type == 'funcargs' then
-                    for index, arg in ipairs(source.parent) do
-                        if arg == source then
-                            genericIndex = index
+                if  source.type == 'function'
+                and source.args then
+                    for i, arg in ipairs(source.args) do
+                        if arg[1] == paramName then
+                            genericIndex = i
                             break
                         end
                     end
@@ -2244,7 +2239,6 @@ function m.checkSameSimpleInCallInSameFile(status, func, args, index)
                 end
             end
         end
-        -- generic cannot cache
         cache[index] = results
     end
     return results
@@ -3008,11 +3002,7 @@ function m.searchSameFields(status, simple, mode)
     local queues, starts, forces = allocQueue()
     local queueLen = 0
     local locks = {}
-    local function pushQueue(obj, start, force)
-        if obj.type == 'getlocal'
-        or obj.type == 'setlocal' then
-            obj = obj.node
-        end
+    local function appendQueue(obj, start, force)
         local lock = locks[start]
         if not lock then
             lock = {}
@@ -3026,25 +3016,32 @@ function m.searchSameFields(status, simple, mode)
         queues[queueLen] = obj
         starts[queueLen] = start
         forces[queueLen] = force
-        if obj.type == 'local' and obj.ref then
-            for _, ref in ipairs(obj.ref) do
+        if obj.mirror then
+            if not lock[obj.mirror] then
+                lock[obj.mirror] = true
                 queueLen = queueLen + 1
-                queues[queueLen] = ref
+                queues[queueLen] = obj.mirror
                 starts[queueLen] = start
                 forces[queueLen] = force
+            end
+        end
+    end
+    local function pushQueue(obj, start, force)
+        if obj.type == 'getlocal'
+        or obj.type == 'setlocal' then
+            obj = obj.node
+        end
+        appendQueue(obj, start, force)
+        if obj.type == 'local' and obj.ref then
+            for _, ref in ipairs(obj.ref) do
+                appendQueue(ref, start, force)
             end
         end
         if m.isGlobal(obj) then
             local refs = m.checkSameSimpleInGlobal(status, obj)
             if refs then
                 for _, ref in ipairs(refs) do
-                    if not lock[ref] then
-                        lock[ref] = true
-                        queueLen = queueLen + 1
-                        queues[queueLen] = ref
-                        starts[queueLen] = start
-                        forces[queueLen] = force
-                    end
+                    appendQueue(ref, start, force)
                 end
             end
         end

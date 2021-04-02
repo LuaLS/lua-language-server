@@ -15,7 +15,8 @@
         "LOCALE"
     ],
     "Lua.diagnostics.disable": [
-        "close-non-object"
+        "close-non-object",
+        "undefined-field"
     ],
     "Lua.runtime.version": "Lua 5.4",
     // Just some comment

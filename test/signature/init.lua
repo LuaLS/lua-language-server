@@ -227,3 +227,18 @@ function m.f(self: table)
 ]],
     arg = {14, 24},
 }
+
+TEST [[
+---@alias nnn table<number, string>
+
+---@param x nnn
+local function f(x, y, z) end
+
+f($)
+]]
+{
+    label = [[
+function f(x: table<number, string>, y: any, z: any)
+]],
+    arg = {12, 35},
+}

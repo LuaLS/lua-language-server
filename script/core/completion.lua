@@ -1333,7 +1333,7 @@ local function checkTableLiteralField(ast, text, offset, tbl, fields, results)
     end
 end
 
-local function checkTableLiteralFieldByCall(ast, text, offset, call, funcs, index, results)
+local function checkTableLiteralFieldByCall(ast, text, offset, call, defs, index, results)
     local source = findNearestSource(ast, offset)
     if not source then
         return
@@ -1354,7 +1354,8 @@ local function checkTableLiteralFieldByCall(ast, text, offset, call, funcs, inde
     if tbl.parent ~= call.args then
         return
     end
-    for _, func in ipairs(funcs) do
+    for _, def in ipairs(defs) do
+        local func = guide.getObjectValue(def) or def
         local param = getFuncParamByCallIndex(func, index)
         if not param then
             goto CONTINUE
@@ -1397,6 +1398,7 @@ local function tryCallArg(ast, text, offset, results)
 end
 
 local function tryTable(ast, text, offset, results)
+    offset = lookBackward.skipSpace(text, offset)
     local source = findNearestSource(ast, offset)
     if not source then
         return

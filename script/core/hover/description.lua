@@ -244,22 +244,33 @@ local function getFunctionComment(source)
     end
 
     local comments = {}
+    local isComment = true
     for _, doc in ipairs(docGroup) do
         if doc.type == 'doc.comment' then
+            if not isComment then
+                comments[#comments+1] = '\n'
+            end
+            isComment = true
             if doc.comment.text:sub(1, 1) == '-' then
                 comments[#comments+1] = doc.comment.text:sub(2)
             else
                 comments[#comments+1] = doc.comment.text
             end
+            comments[#comments+1] = '\n'
         elseif doc.type == 'doc.param' then
             if doc.comment then
+                isComment = false
+                comments[#comments+1] = '\n'
                 comments[#comments+1] = ('@*param* `%s` — %s'):format(
                     doc.param[1],
                     doc.comment.text:gsub('[\r\n]+', ' ')
                 )
+                comments[#comments+1] = '\n'
             end
         elseif doc.type == 'doc.return' then
             if hasReturnComment then
+                isComment = false
+                comments[#comments+1] = '\n'
                 local name = {}
                 for _, rtn in ipairs(doc.returns) do
                     if rtn.name then
@@ -279,24 +290,27 @@ local function getFunctionComment(source)
                         comments[#comments+1] = ('@*return* `%s`'):format(table.concat(name, ','))
                     end
                 end
+                comments[#comments+1] = '\n'
             end
         elseif doc.type == 'doc.overload' then
             comments[#comments+1] = '---'
         end
     end
-    comments = table.concat(comments, "\n\n")
+    if comments[1] == '\n' then
+        table.remove(comments, 1)
+    end
+    if comments[#comments] == '\n' then
+        table.remove(comments)
+    end
+    comments = table.concat(comments)
 
     local enums = getBindEnums(source, docGroup)
-    if comments == "" and not enums then
+    if comments == '' and not enums then
         return
     end
     local md = markdown()
-    if comments ~= "" then
-        md:add('md', comments)
-    end
-    if enums then
-        md:add('lua', enums)
-    end
+    md:add('md', comments)
+    md:add('lua', enums)
     return md:string()
 end
 

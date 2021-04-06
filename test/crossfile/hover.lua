@@ -531,9 +531,7 @@ hover = {
     name = 'f',
     description = [[
 @*param* `arg3` — comment3
-
 ---
-
 @*param* `arg1` — comment1
 
 @*param* `arg2` — comment2]]
@@ -607,7 +605,6 @@ hover = {
     name = 'f',
     description =  [[
 comment1
-
 comment2]]
 }}
 

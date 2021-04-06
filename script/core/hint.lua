@@ -8,6 +8,7 @@ local function typeHint(uri, edits, start, finish)
     if not ast then
         return
     end
+    local mark = {}
     guide.eachSourceBetween(ast.ast, start, finish, function (source)
         if  source.type ~= 'local'
         and source.type ~= 'setglobal'
@@ -46,6 +47,10 @@ local function typeHint(uri, edits, start, finish)
         if not src then
             return
         end
+        if mark[src] then
+            return
+        end
+        mark[src] = true
         edits[#edits+1] = {
             newText = (':%s'):format(infer),
             start   = src.finish,
@@ -94,6 +99,7 @@ local function paramName(uri, edits, start, finish)
     if not ast then
         return
     end
+    local mark = {}
     guide.eachSourceBetween(ast.ast, start, finish, function (source)
         if source.type ~= 'call' then
             return
@@ -124,7 +130,8 @@ local function paramName(uri, edits, start, finish)
             table.remove(args, 1)
         end
         for i, arg in ipairs(source.args) do
-            if guide.isLiteral(arg) then
+            if not mark[arg] and guide.isLiteral(arg) then
+                mark[arg] = true
                 if args[i] and args[i] ~= '' then
                     edits[#edits+1] = {
                         newText = ('%s:'):format(args[i]),

@@ -2506,3 +2506,10 @@ TEST [[
 elseif $ then
 ]]
 (nil)
+
+TEST [[
+---@type iolib
+local t = {
+    $
+]]
+(EXISTS)

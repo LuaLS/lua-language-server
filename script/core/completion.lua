@@ -1397,6 +1397,7 @@ local function tryCallArg(ast, text, offset, results)
 end
 
 local function tryTable(ast, text, offset, results)
+    offset = lookBackward.skipSpace(text, offset)
     local source = findNearestSource(ast, offset)
     if not source then
         return

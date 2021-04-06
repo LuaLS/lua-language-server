@@ -68,7 +68,12 @@ Care['getlocal'] = function (source, results)
     and source.parent.node == source then
         return
     end
-    -- 3. 函数的参数
+    -- 3. 特殊变量
+    if source[1] == '_ENV'
+    or source[1] == 'self' then
+        return
+    end
+    -- 4. 函数的参数
     if loc.parent and loc.parent.type == 'funcargs' then
         results[#results+1] = {
             start      = source.start,
@@ -76,11 +81,6 @@ Care['getlocal'] = function (source, results)
             type       = define.TokenTypes.parameter,
             modifieres = define.TokenModifiers.declaration,
         }
-        return
-    end
-    -- 4. 特殊变量
-    if source[1] == '_ENV'
-    or source[1] == 'self' then
         return
     end
     -- 5. const 变量

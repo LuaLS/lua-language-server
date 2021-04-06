@@ -1,5 +1,9 @@
 # changelog
 
+## 1.20.3
+`FIX` [#479](https://github.com/sumneko/lua-language-server/issues/479)
+`FIX` [#483](https://github.com/sumneko/lua-language-server/issues/483)
+
 ## 1.20.2
 `2021-4-2`
 * `CHG` `LuaDoc`: supports `---@param self TYPE`

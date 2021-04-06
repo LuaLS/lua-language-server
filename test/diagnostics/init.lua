@@ -1097,3 +1097,18 @@ x = 1
 TEST [[
 ---@diagnostic disable-next-line: <!xxx!>
 ]]
+
+TEST [[
+local mt = {}
+
+function mt:a(x)
+    return self, x
+end
+
+function mt:b(y)
+    self:a(1):b(2)
+    return y
+end
+
+return mt
+]]

@@ -2646,6 +2646,9 @@ local function findGenericFromArgIndexToReturnIndex(func, argIndex)
 end
 
 function m.checkSameSimpleAsCallArg(status, ref, start, pushQueue)
+    if not status.deep then
+        return
+    end
     local call, index = m.getCallAndArgIndex(ref)
     if not call then
         return

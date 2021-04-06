@@ -2513,3 +2513,14 @@ local t = {
     $
 ]]
 (EXISTS)
+
+TEST [[
+---@class A
+---@field a '"hello"'|'"world"'
+
+---@param t A
+function api(t) end
+
+api({$})
+]]
+(EXISTS)

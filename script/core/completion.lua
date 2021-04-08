@@ -1519,6 +1519,11 @@ local function tryLuaDocBySource(ast, offset, source, results)
                     results[#results+1] = {
                         label       = doc[1],
                         kind        = define.CompletionItemKind.Class,
+                        textEdit    = doc[1]:find '[^%w_]' and {
+                            start   = source.start,
+                            finish  = offset,
+                            newText = doc[1],
+                        },
                     }
                 end
             end
@@ -1532,6 +1537,11 @@ local function tryLuaDocBySource(ast, offset, source, results)
                 results[#results+1] = {
                     label       = doc[1],
                     kind        = define.CompletionItemKind.Class,
+                    textEdit    = doc[1]:find '[^%w_]' and {
+                        start   = source.start,
+                        finish  = offset,
+                        newText = doc[1],
+                    },
                 }
             end
         end

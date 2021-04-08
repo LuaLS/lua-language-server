@@ -2524,3 +2524,20 @@ function api(t) end
 api({$})
 ]]
 (EXISTS)
+
+TEST [[
+---@class AAA.BBB
+
+---@type AAA.$
+]]
+{
+    {
+        label = 'AAA.BBB',
+        kind  = define.CompletionItemKind.Class,
+        textEdit    = {
+            start   = 29,
+            finish  = 32,
+            newText = 'AAA.BBB',
+        },
+    }
+}

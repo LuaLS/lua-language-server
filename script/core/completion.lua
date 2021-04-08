@@ -1700,12 +1700,15 @@ local function buildLuaDocOfFunction(func)
         end
     end
     for n, arg in ipairs(args) do
-        index = index + 1
-        buf[#buf+1] = ('---@param %s ${%d:%s}'):format(
-            func.args[n][1],
-            index,
-            arg
-        )
+        local funcArg = func.args[n]
+        if funcArg[1] and not funcArg.dummy then
+            index = index + 1
+            buf[#buf+1] = ('---@param %s ${%d:%s}'):format(
+                funcArg[1],
+                index,
+                arg
+            )
+        end
     end
     for _, rtn in ipairs(returns) do
         index = index + 1

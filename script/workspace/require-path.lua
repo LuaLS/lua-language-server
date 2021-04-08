@@ -61,11 +61,12 @@ function m.getVisiblePath(path, searchers, strict)
                 end
                 local expect = getOnePath(cutedPath, searcher)
                 if expect then
+                    local mySearcher = searcher
                     if head then
-                        searcher = head .. searcher
+                        mySearcher = head .. searcher
                     end
                     result[#result+1] = {
-                        searcher = searcher,
+                        searcher = mySearcher,
                         expect   = expect,
                     }
                 end

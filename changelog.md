@@ -1,5 +1,11 @@
 # changelog
 
+## 1.20.4
+`NEW` diagnostic: `deprecated`
+`FIX` [#464](https://github.com/sumneko/lua-language-server/issues/464)
+`FIX` [#497](https://github.com/sumneko/lua-language-server/issues/497)
+`FIX` [#502](https://github.com/sumneko/lua-language-server/issues/502)
+
 ## 1.20.3
 `2021-4-6`
 `FIX` [#479](https://github.com/sumneko/lua-language-server/issues/479)

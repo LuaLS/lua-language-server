@@ -105,7 +105,8 @@ local function getBindComment(source, docGroup, base)
             break
         else
             continue = false
-            if doc.type == 'doc.field' then
+            if doc.type == 'doc.field'
+            or doc.type == 'doc.class' then
                 lines = nil
             end
         end

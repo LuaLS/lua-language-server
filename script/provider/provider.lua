@@ -458,7 +458,7 @@ proto.on('textDocument/completion', function (params)
     if not files.exists(uri) then
         return nil
     end
-    if config.other.acceptSuggestionOnEnter ~= 'off' then
+    if params.context and config.other.acceptSuggestionOnEnter ~= 'off' then
         if params.context.triggerCharacter == '\n'
         or params.context.triggerCharacter == '{'
         or params.context.triggerCharacter == ',' then

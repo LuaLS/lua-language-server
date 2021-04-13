@@ -87,7 +87,6 @@ function m.getIniter()
             firstTriggerCharacter = '\n',
             moreTriggerCharacter  = nil, -- string[]
         },
-        workspace = {}
         --documentOnTypeFormattingProvider = {
         --    firstTriggerCharacter = '}',
         --},

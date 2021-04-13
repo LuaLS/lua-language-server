@@ -2,6 +2,9 @@ local core   = require 'core.diagnostics'
 local files  = require 'files'
 local config = require 'config'
 local util   = require 'utility'
+local define = require 'proto.define'
+
+config.config.diagnostics.neededFileStatus['deprecated'] = 'Any'
 
 rawset(_G, 'TEST', true)
 

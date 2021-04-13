@@ -36,5 +36,40 @@ end
 TEST [[
 local <?x?>
 ]] {
-    id = 'l9x',
+    id = '9',
+}
+
+TEST [[
+local x
+print(<?x?>)
+]] {
+    id = '7',
+}
+
+TEST [[
+local x
+<?x?> = 1
+]] {
+    id = '7',
+}
+
+TEST [[
+print(<?X?>)
+]] {
+    id     = '"X"',
+    global = true,
+}
+
+TEST [[
+print(<?X?>)
+]] {
+    id     = '"X"',
+    global = true,
+}
+
+TEST [[
+local x
+print(x.y.<?z?>)
+]] {
+    id     = '7|"y"|"z"',
 }

@@ -6,6 +6,7 @@ local vm     = require "vm.vm"
 
 -- 把耗时最长的诊断放到最后面
 local diagSort = {
+    ['deprecated'] = 98,
     ['undefined-field'] = 99,
     ['redundant-parameter'] = 100,
 }

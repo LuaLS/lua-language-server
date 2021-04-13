@@ -2,6 +2,7 @@ local linker = require 'core.linker'
 local files  = require 'files'
 local util   = require 'utility'
 local guide  = require 'core.guide'
+local glob = require "glob"
 
 local function getSource(pos)
     local ast = files.getAst('')
@@ -72,4 +73,42 @@ local x
 print(x.y.<?z?>)
 ]] {
     id     = '7|"y"|"z"',
+}
+
+TEST [[
+local x
+function x:<?f?>() end
+]] {
+    id     = '7|"f"',
+}
+
+TEST [[
+print(X.Y.<?Z?>)
+]] {
+    id     = '"X"|"Y"|"Z"',
+    global = true,
+}
+
+TEST [[
+function x:<?f?>() end
+]] {
+    id     = '"x"|"f"',
+    global = true,
+}
+
+TEST [[
+{
+    <?x?> = 1,
+}
+]] {
+    id     = '1|"x"',
+    tfield = true,
+}
+
+TEST [[
+return <?X?>
+]] {
+    id      = '"X"',
+    global  = true,
+    freturn = true,
 }

@@ -1,21 +1,32 @@
 local guide = require 'parser.guide'
-local glob = require "glob.glob"
+local util  = require 'utility'
 
 local function getKey(source)
     if     source.type == 'local' then
-        return tostring(source.start)
+        return tostring(source.start), nil
     elseif source.type == 'setlocal'
     or     source.type == 'getlocal' then
-        return tostring(source.node.start)
+        return tostring(source.node.start), nil
     elseif source.type == 'setglobal'
-    or     source.type == 'getglobal'
-    or     source.type == 'field'
+    or     source.type == 'getglobal' then
+        return ('%q'):format(source[1] or ''), nil
+    elseif source.type == 'field'
     or     source.type == 'method' then
-        return ('%q'):format(source[1])
+        return ('%q'):format(source[1] or ''), source.parent.node
+    elseif source.type == 'getfield'
+    or     source.type == 'setfield' then
+        return ('%q'):format(source.field and source.field[1] or ''), source.node
+    elseif source.type == 'tablefield' then
+        return ('%q'):format(source.field and source.field[1] or ''), source.parent
+    elseif source.type == 'getmethod'
+    or     source.type == 'setmethod' then
+        return ('%q'):format(source.method and source.method[1] or ''), source.node
+    elseif source.type == 'table' then
+        return source.start, nil
     end
 end
 
-local function isGlobal(source)
+local function checkGlobal(source)
     if source.type == 'setglobal'
     or source.type == 'getglobal' then
         return true
@@ -23,24 +34,57 @@ local function isGlobal(source)
     return nil
 end
 
----创建source的链接信息
-local function createLink(source)
+local function checkTableField(source)
+    if source.type == 'table' then
+        return true
+    end
+    return nil
+end
+
+local function checkFileReturn(source)
+    if  source.parent
+    and source.parent.type == 'return'
+    and source.parent.parent.type == 'main' then
+        return true
+    end
+    return nil
+end
+
+local function getID(source)
+    if source.type == 'field'
+    or source.type == 'method' then
+        source = source.parent
+    end
     local current = source
     local idList = {}
     while true do
-        local id = getKey(current)
+        local id, node = getKey(current)
         if not id then
             break
         end
         idList[#idList+1] = id
         source = current
-        current = current.parent
+        if not node then
+            break
+        end
+        current = node
     end
+    util.revertTable(idList)
     local id = table.concat(idList, '|')
-    local global = isGlobal(source)
+    return id, current
+end
+
+---创建source的链接信息
+local function createLink(source)
+    local id, node = getID(source)
     return {
         id     = id,
-        global = global,
+        -- 全局变量
+        global  = checkGlobal(node),
+        -- 字面量表中的字段
+        tfield  = checkTableField(node),
+        -- 文件的返回值
+        freturn = checkFileReturn(node),
     }
 end
 

@@ -2,7 +2,6 @@ local json     = require 'json'
 local pcall    = pcall
 local tonumber = tonumber
 local util     = require 'utility'
-local log      = require 'brave.log'
 
 ---@class jsonrpc
 local m = {}

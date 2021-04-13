@@ -713,3 +713,21 @@ hover = {
     name  = 'G.A',
     description = 'BBB'
 }}
+
+TEST {{ path = 'a.lua', content = '', }, {
+    path = 'b.lua',
+    content = [[
+---I am the class description.
+---@class Food
+---@field firstField number
+---@field secondField number
+local food = {}
+
+food.<?firstField?> = 0
+food.secondField = 2
+]]
+},
+hover = {
+    label = 'field Food.firstField: integer = 0',
+    name  = 'food.firstField',
+}}

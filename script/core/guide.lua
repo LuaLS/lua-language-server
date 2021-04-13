@@ -290,8 +290,13 @@ end
 ---@param obj parser.guide.object
 ---@return parser.guide.object
 function m.getRoot(obj)
+    local source = obj
+    if source._root then
+        return source._root
+    end
     for _ = 1, 1000 do
         if obj.type == 'main' then
+            source._root = obj
             return obj
         end
         local parent = obj.parent

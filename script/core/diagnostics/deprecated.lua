@@ -4,6 +4,7 @@ local lang    = require 'language'
 local guide   = require 'core.guide'
 local config  = require 'config'
 local define  = require 'proto.define'
+local await   = require 'await'
 
 return function (uri, callback)
     local ast = files.getAst(uri)
@@ -30,6 +31,8 @@ return function (uri, callback)
                 return
             end
         end
+
+        await.delay()
 
         if not vm.isDeprecated(src, 0) then
             return

@@ -19,13 +19,13 @@
             "type": "shell",
             "label": "PreCompile",
             "windows": {
-                "command": "chcp 65001 && msvc_x64.bat"
+                "command": "chcp 65001 && compile\\install.bat"
             },
             "linux": {
-                "command": "ninja -f ninja/linux.ninja"
+                "command": "compile/install.sh"
             },
             "osx": {
-                "command": "ninja -f ninja/macos.ninja"
+                "command": "compile/install.sh"
             },
             "options": {
                 "cwd": "${workspaceFolder}/3rd/luamake"

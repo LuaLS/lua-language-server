@@ -37,24 +37,28 @@ local function TEST(script)
 end
 
 CARE['id'] = true
+CARE['loc'] = true
 TEST [[
 local <?x?>
 ]] {
-    id = '9',
+    id  = '9',
+    loc = true,
 }
 
 TEST [[
 local x
 print(<?x?>)
 ]] {
-    id = '7',
+    id  = '7',
+    loc = true,
 }
 
 TEST [[
 local x
 <?x?> = 1
 ]] {
-    id = '7',
+    id  = '7',
+    loc = true,
 }
 
 CARE['global'] = true
@@ -76,14 +80,16 @@ TEST [[
 local x
 print(x.y.<?z?>)
 ]] {
-    id     = '7|"y"|"z"',
+    id  = '7|"y"|"z"',
+    loc = true,
 }
 
 TEST [[
 local x
 function x:<?f?>() end
 ]] {
-    id     = '7|"f"',
+    id  = '7|"f"',
+    loc = true,
 }
 
 TEST [[

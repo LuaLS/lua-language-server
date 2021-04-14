@@ -1,0 +1,16 @@
+ast -> linkers = {
+    globals = {
+        ['"X"|"Y"|"Z"'] = {src1, src2, src3},
+        ['"X"|"Y"']     = {src4, src5, src6},
+        ['"X"']         = {src7, src8, src9},
+    },
+    locals = {
+        ['7']     = {src10},
+        ['7|"x"'] = {src11},
+    },
+    tfield = {
+        ['11|"k"'] = {src12},
+    },
+}
+
+

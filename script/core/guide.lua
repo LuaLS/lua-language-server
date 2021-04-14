@@ -21,145 +21,39 @@ m.isLiteral         = guide.isLiteral
 ---@param status guide.status
 ---@param mode   guide.searchmode
 ---@param ref    parser.guide.object
----@param simple table
-function m.pushResult(status, mode, ref, simple)
+function m.pushResult(status, mode, ref)
     local results = status.results
     if mode == 'def' then
-        if ref.type == 'setglobal'
+        if ref.type == 'local'
         or ref.type == 'setlocal'
-        or ref.type == 'local' then
-            results[#results+1] = ref
-        elseif ref.type == 'setfield'
-        or     ref.type == 'tablefield' then
-            results[#results+1] = ref
-        elseif ref.type == 'setmethod' then
-            results[#results+1] = ref
-        elseif ref.type == 'setindex'
-        or     ref.type == 'tableindex' then
-            results[#results+1] = ref
-        elseif ref.type == 'call' then
-            if ref.node.special == 'rawset' then
-                results[#results+1] = ref
-            end
-        elseif ref.type == 'function' then
-            results[#results+1] = ref
-        elseif ref.type == 'table' then
-            results[#results+1] = ref
-        elseif ref.type == 'doc.type.function'
-        or     ref.type == 'doc.class.name'
-        or     ref.type == 'doc.alias.name'
-        or     ref.type == 'doc.field'
-        or     ref.type == 'doc.type.table'
-        or     ref.type == 'doc.type.array' then
-            results[#results+1] = ref
-        elseif ref.type == 'doc.type' then
-            if #ref.enums > 0 or #ref.resumes > 0 then
-                results[#results+1] = ref
-            end
-        end
-        if ref.parent and ref.parent.type == 'return' then
-            if m.getParentFunction(ref) ~= m.getParentFunction(simple.node) then
-                results[#results+1] = ref
-            end
-        end
-        if  m.isLiteral(ref)
-        and ref.parent and ref.parent.type == 'callargs'
-        and ref ~= simple.node then
+        or ref.type == 'setglobal'
+        or ref.type == 'label'
+        or ref.type == 'setfield'
+        or ref.type == 'setmethod'
+        or ref.type == 'setindex'
+        or ref.type == 'tableindex'
+        or ref.type == 'tablefield' then
             results[#results+1] = ref
         end
     elseif mode == 'ref' then
-        if ref.type == 'setfield'
+        if ref.type == 'local'
+        or ref.type == 'setlocal'
+        or ref.type == 'getlocal'
+        or ref.type == 'setglobal'
+        or ref.type == 'getglobal'
+        or ref.type == 'label'
+        or ref.type == 'goto'
+        or ref.type == 'setfield'
         or ref.type == 'getfield'
+        or ref.type == 'setmethod'
+        or ref.type == 'getmethod'
+        or ref.type == 'setindex'
+        or ref.type == 'getindex'
+        or ref.type == 'tableindex'
         or ref.type == 'tablefield' then
-            results[#results+1] = ref
-        elseif ref.type == 'setmethod'
-        or     ref.type == 'getmethod' then
-            results[#results+1] = ref
-        elseif ref.type == 'setindex'
-        or     ref.type == 'getindex'
-        or     ref.type == 'tableindex' then
-            results[#results+1] = ref
-        elseif ref.type == 'setglobal'
-        or     ref.type == 'getglobal'
-        or     ref.type == 'local'
-        or     ref.type == 'setlocal'
-        or     ref.type == 'getlocal' then
-            results[#results+1] = ref
-        elseif ref.type == 'function' then
-            results[#results+1] = ref
-        elseif ref.type == 'table' then
-            results[#results+1] = ref
-        elseif ref.type == 'call' then
-            if ref.node.special == 'rawset'
-            or ref.node.special == 'rawget' then
-                results[#results+1] = ref
-            end
-        elseif ref.type == 'doc.type.function'
-        or     ref.type == 'doc.class.name'
-        or     ref.type == 'doc.alias.name'
-        or     ref.type == 'doc.field'
-        or     ref.type == 'doc.type.table'
-        or     ref.type == 'doc.type.array' then
-            results[#results+1] = ref
-        elseif ref.type == 'doc.type' then
-            if #ref.enums > 0 or #ref.resumes > 0 then
-                results[#results+1] = ref
-            end
-        end
-        if ref.parent and ref.parent.type == 'return' then
-            results[#results+1] = ref
-        end
-        if  guide.isLiteral(ref)
-        and ref.parent
-        and ref.parent.type == 'callargs'
-        and ref ~= simple.node then
             results[#results+1] = ref
         end
     elseif mode == 'field' then
-        if ref.type == 'setfield'
-        or ref.type == 'getfield'
-        or ref.type == 'tablefield' then
-            results[#results+1] = ref
-        elseif ref.type == 'setmethod'
-        or     ref.type == 'getmethod' then
-            results[#results+1] = ref
-        elseif ref.type == 'setindex'
-        or     ref.type == 'tableindex' then
-            results[#results+1] = ref
-        elseif ref.type == 'getindex' then
-            -- do not trust `t[1]`
-            if ref.index and ref.index.type == 'string' then
-                results[#results+1] = ref
-            end
-        elseif ref.type == 'setglobal'
-        or     ref.type == 'getglobal' then
-            results[#results+1] = ref
-        elseif ref.type == 'call' then
-            if ref.node.special == 'rawset'
-            or ref.node.special == 'rawget' then
-                results[#results+1] = ref
-            end
-        elseif ref.type == 'doc.field' then
-            results[#results+1] = ref
-        end
-    elseif mode == 'deffield' then
-        if ref.type == 'setfield'
-        or ref.type == 'tablefield' then
-            results[#results+1] = ref
-        elseif ref.type == 'setmethod' then
-            results[#results+1] = ref
-        elseif ref.type == 'setindex'
-        or     ref.type == 'tableindex' then
-            results[#results+1] = ref
-        elseif ref.type == 'setglobal' then
-            results[#results+1] = ref
-        elseif ref.type == 'call' then
-            if ref.node.special == 'rawset' then
-                results[#results+1] = ref
-            end
-        elseif ref.type == 'doc.field' then
-            results[#results+1] = ref
-        end
     end
 end
 
@@ -237,9 +131,9 @@ function m.status(parentStatus, interface, deep)
 end
 
 --- 请求对象的引用
----@param obj parser.guide.object
+---@param obj       parser.guide.object
 ---@param interface table
----@param deep integer
+---@param deep      integer
 ---@return parser.guide.object[]
 ---@return integer
 function m.requestReference(obj, interface, deep)

@@ -12,7 +12,9 @@ local function getSource(pos)
         or source.type == 'setglobal'
         or source.type == 'getglobal'
         or source.type == 'field'
-        or source.type == 'method' then
+        or source.type == 'method'
+        or source.type == 'label'
+        or source.type == 'goto' then
             return source
         end
     end)
@@ -136,5 +138,17 @@ end
 }
 
 TEST [[
+::<?label?>::
+goto label
+]] {
+    id      = '5',
+    loc     = true,
+}
 
-]]
+TEST [[
+::label::
+goto <?label?>
+]] {
+    id      = '3',
+    loc     = true,
+}

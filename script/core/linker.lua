@@ -1,6 +1,10 @@
 local util  = require 'utility'
 local guide = require 'parser.guide'
 
+---获取语法树单元的key
+---@param source parser.guide.object
+---@return string? key
+---@return parser.guide.object? node
 local function getKey(source)
     if     source.type == 'local' then
         return tostring(source.start), nil
@@ -23,7 +27,15 @@ local function getKey(source)
         return ('%q'):format(source.method and source.method[1] or ''), source.node
     elseif source.type == 'table' then
         return source.start, nil
+    elseif source.type == 'label' then
+        return source.start, nil
+    elseif source.type == 'goto' then
+        if source.node then
+            return source.node.start, nil
+        end
+        return nil, nil
     end
+    return nil, nil
 end
 
 local function checkGlobal(source)
@@ -38,6 +50,10 @@ local function checkLocal(source)
     if source.type == 'local'
     or source.type == 'setlocal'
     or source.type == 'getlocal' then
+        return true
+    end
+    if source.type == 'label'
+    or source.type == 'goto' then
         return true
     end
     return nil
@@ -67,6 +83,10 @@ local function checkFunctionReturn(source)
 end
 
 local IDList = {}
+---获取语法树单元的字符串ID
+---@param source parser.guide.object
+---@return string? id
+---@return parser.guide.object?
 local function getID(source)
     if source.type == 'field'
     or source.type == 'method' then
@@ -86,6 +106,9 @@ local function getID(source)
             break
         end
         current = node
+    end
+    if index == 0 then
+        return nil
     end
     for i = index + 1, #IDList do
         IDList[i] = nil

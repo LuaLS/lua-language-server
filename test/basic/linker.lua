@@ -2,7 +2,6 @@ local linker = require 'core.linker'
 local files  = require 'files'
 local util   = require 'utility'
 local guide  = require 'core.guide'
-local glob = require "glob"
 
 local function getSource(pos)
     local ast = files.getAst('')
@@ -19,6 +18,7 @@ local function getSource(pos)
     end)
 end
 
+local CARE = {}
 local function TEST(script)
     return function (expect)
         files.removeAll()
@@ -30,10 +30,13 @@ local function TEST(script)
         local source = getSource(pos)
         assert(source)
         local result = linker.getLink(source)
-        assert(util.equal(result, expect))
+        for key in pairs(CARE) do
+            assert(result[key] == expect[key])
+        end
     end
 end
 
+CARE['id'] = true
 TEST [[
 local <?x?>
 ]] {
@@ -54,6 +57,7 @@ local x
     id = '7',
 }
 
+CARE['global'] = true
 TEST [[
 print(<?X?>)
 ]] {
@@ -96,6 +100,7 @@ function x:<?f?>() end
     global = true,
 }
 
+CARE['tfield'] = true
 TEST [[
 {
     <?x?> = 1,
@@ -105,10 +110,25 @@ TEST [[
     tfield = true,
 }
 
+CARE['freturn'] = true
 TEST [[
 return <?X?>
 ]] {
     id      = '"X"',
     global  = true,
-    freturn = true,
+    freturn = 0,
 }
+
+TEST [[
+function f()
+    return <?X?>
+end
+]] {
+    id      = '"X"',
+    global  = true,
+    freturn = 1,
+}
+
+TEST [[
+
+]]

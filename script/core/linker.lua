@@ -1,4 +1,3 @@
-local guide = require 'parser.guide'
 local util  = require 'utility'
 
 local function getKey(source)
@@ -41,11 +40,18 @@ local function checkTableField(source)
     return nil
 end
 
-local function checkFileReturn(source)
+local function checkFunctionReturn(source)
     if  source.parent
-    and source.parent.type == 'return'
-    and source.parent.parent.type == 'main' then
-        return true
+    and source.parent.type == 'return' then
+        if source.parent.parent.type == 'main' then
+            return 0
+        elseif source.parent.parent.type == 'function' then
+            for i = 1, #source.parent do
+                if source.parent[i] == source then
+                    return i
+                end
+            end
+        end
     end
     return nil
 end
@@ -83,8 +89,8 @@ local function createLink(source)
         global  = checkGlobal(node),
         -- 字面量表中的字段
         tfield  = checkTableField(node),
-        -- 文件的返回值
-        freturn = checkFileReturn(node),
+        -- 返回值，文件返回值总是0，函数返回值为第几个返回值
+        freturn = checkFunctionReturn(node),
     }
 end
 

@@ -14,9 +14,6 @@ local function getKey(source)
     elseif source.type == 'setglobal'
     or     source.type == 'getglobal' then
         return ('%q'):format(source[1] or ''), nil
-    elseif source.type == 'field'
-    or     source.type == 'method' then
-        return ('%q'):format(source[1] or ''), source.parent.node
     elseif source.type == 'getfield'
     or     source.type == 'setfield' then
         return ('%q'):format(source.field and source.field[1] or ''), source.node
@@ -82,6 +79,41 @@ local function checkFunctionReturn(source)
     return nil
 end
 
+local TempList = {}
+
+---前进
+---@param source parser.guide.object
+---@return parser.guide.object[]
+local function checkForward(source)
+    local list = TempList
+    if source.value then
+        list[#list+1] = source.value
+    end
+    if #list == 0 then
+        return nil
+    else
+        TempList = {}
+        return list
+    end
+end
+
+---后退
+---@param source parser.guide.object
+---@return parser.guide.object[]
+local function checkBackward(source)
+    local list   = TempList
+    local parent = source.parent
+    if parent.value == source then
+        list[#list+1] = parent
+    end
+    if #list == 0 then
+        return nil
+    else
+        TempList = {}
+        return list
+    end
+end
+
 local IDList = {}
 ---获取语法树单元的字符串ID
 ---@param source parser.guide.object
@@ -90,7 +122,7 @@ local IDList = {}
 local function getID(source)
     if source.type == 'field'
     or source.type == 'method' then
-        source = source.parent
+        return nil, nil
     end
     local current = source
     local index = 0
@@ -130,6 +162,12 @@ end
 ---@field tfield boolean
 -- 返回值，文件返回值总是0，函数返回值为第几个返回值
 ---@field freturn integer
+-- 前进的关联单元
+---@field forward parser.guide.object[]
+-- 后退的关联单元
+---@field backward parser.guide.object[]
+-- 缓存的关联links
+---@field _links link[]
 
 ---创建source的链接信息
 ---@param source parser.guide.object
@@ -140,16 +178,14 @@ local function createLink(source)
         return nil
     end
     return {
-        id      = id,
-        source  = source,
-        -- 局部变量
-        loc     = checkLocal(node),
-        -- 全局变量
-        global  = checkGlobal(node),
-        -- 字面量表中的字段
-        tfield  = checkTableField(node),
-        -- 返回值，文件返回值总是0，函数返回值为第几个返回值
-        freturn = checkFunctionReturn(node),
+        id       = id,
+        source   = source,
+        loc      = checkLocal(node),
+        global   = checkGlobal(node),
+        tfield   = checkTableField(node),
+        freturn  = checkFunctionReturn(node),
+        forward  = checkForward(source),
+        backward = checkBackward(source),
     }
 end
 
@@ -160,7 +196,7 @@ local function insertLinker(linkers, tp, link)
         list[id] = {}
     end
     list[id][#list[id]+1] = link
-    link._linker = list[id]
+    link._links = list[id]
 end
 
 local m = {}
@@ -172,7 +208,7 @@ function m.getLinkersBySource(source)
     if not source._link then
         source._link = createLink(source)
     end
-    return source._link and source._link._linker
+    return source._link and source._link._links
 end
 
 ---获取source的链接信息

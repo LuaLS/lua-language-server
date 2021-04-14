@@ -96,6 +96,16 @@ local <?a?> = 1
 ]]
 
 TEST [[
+local <!a!>
+local <?b?> = <!a!>
+]]
+
+TEST [[
+local <?a?>
+local <!b!> = <!a!>
+]]
+
+TEST [[
 local t = {
     <!a!> = 1
 }

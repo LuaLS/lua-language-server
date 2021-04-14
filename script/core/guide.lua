@@ -85,17 +85,67 @@ end
 
 ---搜索对象的引用
 ---@param status guide.status
----@param obj    parser.guide.object
+---@param source parser.guide.object
 ---@param mode   guide.searchmode
-function m.searchRefs(status, obj, mode)
-    local root = guide.getRoot(obj)
+function m.searchRefs(status, source, mode)
+    if source.type == 'field'
+    or source.type == 'method' then
+        source = source.parent
+    end
+    local root = guide.getRoot(source)
     linker.compileLinks(root)
 
-    local links = linker.getLinkersBySource(obj)
-    if links then
-        for _, link in ipairs(links) do
-            m.pushResult(status, mode, link.source)
+    if not linker.getLink(source) then
+        return
+    end
+
+    ---@type link[]
+    local queue   = {}
+    ---@type string
+    local expects = {}
+    local index   = 0
+
+    local function pushQueue(expect, link)
+        index = index + 1
+        queue[index]   = link
+        expects[index] = expect
+    end
+
+    local function pushQueueWithID(obj)
+        local link = linker.getLink(obj)
+        if not link then
+            return
         end
+        pushQueue(link.id, link)
+    end
+
+    pushQueueWithID(source)
+
+    for _ = 1, 1000 do
+        if index <= 0 then
+            break
+        end
+        local link   = queue[index]
+        local expect = expects[index]
+        index = index - 1
+        local links = linker.getLinkersBySource(link.source)
+        if not links then
+            goto CONTINUE
+        end
+        for _, eachLink in ipairs(links) do
+            m.pushResult(status, mode, eachLink.source)
+            if eachLink.forward then
+                for _, forwardSources in ipairs(eachLink.forward) do
+                    pushQueueWithID(forwardSources)
+                end
+            end
+            if eachLink.backward then
+                for _, backSources in ipairs(eachLink.backward) do
+                    pushQueueWithID(backSources)
+                end
+            end
+        end
+        ::CONTINUE::
     end
 end
 

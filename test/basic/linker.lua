@@ -11,8 +11,14 @@ local function getSource(pos)
         or source.type == 'setlocal'
         or source.type == 'setglobal'
         or source.type == 'getglobal'
-        or source.type == 'field'
-        or source.type == 'method'
+        or source.type == 'setfield'
+        or source.type == 'getfield'
+        or source.type == 'setmethod'
+        or source.type == 'getmethod'
+        or source.type == 'tablefield'
+        or source.type == 'setindex'
+        or source.type == 'getindex'
+        or source.type == 'tableindex'
         or source.type == 'label'
         or source.type == 'goto' then
             return source

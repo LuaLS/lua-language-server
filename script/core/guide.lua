@@ -121,6 +121,24 @@ function m.searchRefs(status, source, mode)
 
     pushQueueWithID(source)
 
+    local function checkForward(link)
+        if not link.forward then
+            return
+        end
+        for _, forwardSources in ipairs(link.forward) do
+            pushQueueWithID(forwardSources)
+        end
+    end
+
+    local function checkBackward(link)
+        if not link.backward then
+            return
+        end
+        for _, backSources in ipairs(link.backward) do
+            pushQueueWithID(backSources)
+        end
+    end
+
     for _ = 1, 1000 do
         if index <= 0 then
             break
@@ -134,16 +152,8 @@ function m.searchRefs(status, source, mode)
         end
         for _, eachLink in ipairs(links) do
             m.pushResult(status, mode, eachLink.source)
-            if eachLink.forward then
-                for _, forwardSources in ipairs(eachLink.forward) do
-                    pushQueueWithID(forwardSources)
-                end
-            end
-            if eachLink.backward then
-                for _, backSources in ipairs(eachLink.backward) do
-                    pushQueueWithID(backSources)
-                end
-            end
+            checkForward(eachLink)
+            checkBackward(eachLink)
         end
         ::CONTINUE::
     end

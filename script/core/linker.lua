@@ -147,11 +147,15 @@ local function getID(source)
     end
     util.revertTable(IDList)
     local id = table.concat(IDList, '|')
-    return id, current
+    local parentID = table.concat(IDList, '|', 1, -2)
+    return id, current, parentID
 end
 
 ---@class link
+-- 当前节点的id
 ---@field id     string
+-- 父节点的id
+---@field parentID string
 -- 语法树单元
 ---@field source parser.guide.object
 -- 是否是局部变量
@@ -173,13 +177,14 @@ end
 ---@param source parser.guide.object
 ---@return link
 local function createLink(source)
-    local id, node = getID(source)
+    local id, node, parentID = getID(source)
     if not id then
         return nil
     end
     return {
         id       = id,
         source   = source,
+        parentID = parentID,
         loc      = checkLocal(node),
         global   = checkGlobal(node),
         tfield   = checkTableField(node),

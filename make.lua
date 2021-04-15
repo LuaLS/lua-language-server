@@ -1,7 +1,6 @@
 local lm       = require 'luamake'
-local platform = require 'bee.platform'
 
-lm.arch = 'x64'
+lm.target = 'x64'
 
 if lm.plat == "macos" then
     lm.flags = {

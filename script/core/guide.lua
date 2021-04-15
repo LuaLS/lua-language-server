@@ -139,6 +139,12 @@ function m.searchRefs(status, source, mode)
         end
     end
 
+    ---@param link link
+    local function checkParentID(link)
+        local id = link.id
+        local parentID = link.parentID
+    end
+
     for _ = 1, 1000 do
         if index <= 0 then
             break
@@ -155,6 +161,7 @@ function m.searchRefs(status, source, mode)
             checkForward(eachLink)
             checkBackward(eachLink)
         end
+        checkParentID(link)
         ::CONTINUE::
     end
 end

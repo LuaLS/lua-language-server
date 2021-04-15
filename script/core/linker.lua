@@ -147,7 +147,10 @@ local function getID(source)
     end
     util.revertTable(IDList)
     local id = table.concat(IDList, '|')
-    local parentID = table.concat(IDList, '|', 1, -2)
+    local parentID
+    if #IDList > 1 then
+        parentID = table.concat(IDList, '|', 1, -2)
+    end
     return id, current, parentID
 end
 

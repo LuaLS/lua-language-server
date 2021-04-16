@@ -35,30 +35,22 @@ local function getKey(source)
     return nil, nil
 end
 
-local function checkGlobal(source)
+local function checkMode(source)
     if source.type == 'setglobal'
     or source.type == 'getglobal' then
-        return true
+        return 'g:'
     end
-    return nil
-end
-
-local function checkLocal(source)
     if source.type == 'local'
     or source.type == 'setlocal'
     or source.type == 'getlocal' then
-        return true
+        return 'l:'
     end
     if source.type == 'label'
     or source.type == 'goto' then
-        return true
+        return 'l:'
     end
-    return nil
-end
-
-local function checkTableField(source)
     if source.type == 'table' then
-        return true
+        return 'l:'
     end
     return nil
 end
@@ -145,11 +137,15 @@ local function getID(source)
     for i = index + 1, #IDList do
         IDList[i] = nil
     end
+    local mode = checkMode(current)
+    if mode then
+        IDList[#IDList+1] = mode
+    end
     util.revertTable(IDList)
     local id = table.concat(IDList, '|')
     local parentID
-    if #IDList > 1 then
-        parentID = table.concat(IDList, '|', 1, -2)
+    if index > 1 then
+        parentID = table.concat(IDList, '|', 1, index)
     end
     return id, current, parentID
 end
@@ -161,12 +157,6 @@ end
 ---@field parentID string
 -- 语法树单元
 ---@field source parser.guide.object
--- 是否是局部变量
----@field loc    boolean
--- 是否是全局变量
----@field global boolean
--- 是否是字面量表中的字段
----@field tfield boolean
 -- 返回值，文件返回值总是0，函数返回值为第几个返回值
 ---@field freturn integer
 -- 前进的关联单元
@@ -188,17 +178,14 @@ local function createLink(source)
         id       = id,
         source   = source,
         parentID = parentID,
-        loc      = checkLocal(node),
-        global   = checkGlobal(node),
-        tfield   = checkTableField(node),
         freturn  = checkFunctionReturn(node),
         forward  = checkForward(source),
         backward = checkBackward(source),
     }
 end
 
-local function insertLinker(linkers, tp, link)
-    local list = linkers[tp]
+local function insertLinker(linkers, mode, link)
+    local list = linkers[mode]
     local id   = link.id
     if not list[id] then
         list[id] = {}
@@ -212,11 +199,28 @@ local m = {}
 ---根据语法树单元获取关联的link列表
 ---@param source parser.guide.object
 ---@return link[]?
-function m.getLinkersBySource(source)
+function m.getLinksBySource(source)
     if not source._link then
         source._link = createLink(source)
     end
     return source._link and source._link._links
+end
+
+---根据ID来获取所有的link
+---@param source parser.guide.object
+---@param mode string
+---@param id string
+---@return link[]?
+function m.getLinksByID(source, mode, id)
+    local root = guide.getRoot(source)
+    if not root._linkers then
+        return nil
+    end
+    local linkers = root._linkers[mode]
+    if not linkers then
+        return nil
+    end
+    return linkers[id]
 end
 
 ---获取source的链接信息
@@ -237,24 +241,14 @@ function m.compileLinks(source)
     if root._linkers then
         return root._linkers
     end
-    local linkers = {
-        loc    = {},
-        global = {},
-        tfield = {},
-    }
+    local linkers = {}
     guide.eachSource(root, function (src)
         local link = m.getLink(src)
         if not link then
             return
         end
-        if link.global then
-            insertLinker(linkers, 'global', link)
-        end
-        if link.loc then
-            insertLinker(linkers, 'loc', link)
-        end
-        if link.tfield then
-            insertLinker(linkers, 'tfield', link)
+        if link.mode then
+            insertLinker(linkers, link.mode, link)
         end
     end)
     root._linkers = linkers

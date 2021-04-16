@@ -105,44 +105,52 @@ function m.searchRefs(status, source, mode)
     local expects = {}
     local index   = 0
 
-    local function pushQueue(expect, link)
+    ---添加到队列
+    ---@param id string
+    ---@param expect string
+    local function pushQueue(id, expect)
         index = index + 1
-        queue[index]   = link
+        queue[index]   = id
         expects[index] = expect
     end
 
-    local function pushQueueWithID(obj)
+    local function pushQueueOfSource(obj, expect)
         local link = linker.getLink(obj)
         if not link then
             return
         end
-        pushQueue(link.id, link)
+        pushQueue(link.id, expect or link.id)
     end
 
-    pushQueueWithID(source)
+    pushQueueOfSource(source)
 
-    local function checkForward(link)
+    local function checkForward(link, expect)
         if not link.forward then
             return
         end
         for _, forwardSources in ipairs(link.forward) do
-            pushQueueWithID(forwardSources)
+            pushQueueOfSource(forwardSources, expect)
         end
     end
 
-    local function checkBackward(link)
+    local function checkBackward(link, expect)
         if not link.backward then
             return
         end
         for _, backSources in ipairs(link.backward) do
-            pushQueueWithID(backSources)
+            pushQueueOfSource(backSources, expect)
         end
     end
 
     ---@param link link
-    local function checkParentID(link)
-        local id = link.id
+    ---@param expect string
+    local function checkParentID(link, expect)
         local parentID = link.parentID
+        if not parentID then
+            return
+        end
+        expect      = expect:sub(#parentID + 2)
+        pushQueue(parentID, expect)
     end
 
     for _ = 1, 1000 do
@@ -152,16 +160,22 @@ function m.searchRefs(status, source, mode)
         local link   = queue[index]
         local expect = expects[index]
         index = index - 1
-        local links = linker.getLinkersBySource(link.source)
+        local links = linker.getLinksBySource(link.source)
         if not links then
             goto CONTINUE
         end
         for _, eachLink in ipairs(links) do
-            m.pushResult(status, mode, eachLink.source)
-            checkForward(eachLink)
-            checkBackward(eachLink)
+            if expect == eachLink.id
+            or expect == '*' then
+                m.pushResult(status, mode, eachLink.source)
+                checkForward(eachLink,  '*')
+                checkBackward(eachLink, '*')
+            else
+                checkForward(eachLink,  expect)
+                checkBackward(eachLink, expect)
+            end
         end
-        checkParentID(link)
+        checkParentID(link, expect)
         ::CONTINUE::
     end
 end

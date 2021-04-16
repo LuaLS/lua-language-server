@@ -33,7 +33,7 @@ end
 
 function TEST(script)
     files.removeAll()
-    local target = catch_target(script)
+    local expect = catch_target(script)
     local start  = script:find('<[?~]')
     local finish = script:find('[?~]>')
     local pos = (start + finish) // 2 + 1
@@ -46,9 +46,9 @@ function TEST(script)
         for i, result in ipairs(results) do
             positions[i] = { result.target.start, result.target.finish }
         end
-        assert(founded(target, positions))
+        assert(founded(expect, positions))
     else
-        assert(#target == 0)
+        assert(#expect == 0)
     end
 end
 

@@ -45,83 +45,79 @@ local function TEST(script)
 end
 
 CARE['id'] = true
-CARE['loc'] = true
 TEST [[
 local <?x?>
 ]] {
-    id  = '9',
-    loc = true,
+    id   = 'l:9',
 }
 
 TEST [[
 local x
 print(<?x?>)
 ]] {
-    id  = '7',
-    loc = true,
+    id   = '7',
+    mode = 'local',
 }
 
 TEST [[
 local x
 <?x?> = 1
 ]] {
-    id  = '7',
-    loc = true,
-}
-
-CARE['global'] = true
-TEST [[
-print(<?X?>)
-]] {
-    id     = '"X"',
-    global = true,
+    id   = '7',
+    mode = 'local',
 }
 
 TEST [[
 print(<?X?>)
 ]] {
-    id     = '"X"',
-    global = true,
+    id   = '"X"',
+    mode = 'global',
+}
+
+TEST [[
+print(<?X?>)
+]] {
+    id   = '"X"',
+    mode = 'global',
 }
 
 TEST [[
 local x
 print(x.y.<?z?>)
 ]] {
-    id  = '7|"y"|"z"',
-    loc = true,
+    id   = '7|"y"|"z"',
+    mode = 'local',
 }
 
 TEST [[
 local x
 function x:<?f?>() end
 ]] {
-    id  = '7|"f"',
-    loc = true,
+    id   = '7|"f"',
+    mode = 'local',
 }
 
 TEST [[
 print(X.Y.<?Z?>)
 ]] {
-    id     = '"X"|"Y"|"Z"',
-    global = true,
+    id   = '"X"|"Y"|"Z"',
+    mode = 'global',
 }
 
 TEST [[
 function x:<?f?>() end
 ]] {
-    id     = '"x"|"f"',
-    global = true,
+    id   = '"x"|"f"',
+    mode = 'global',
 }
 
-CARE['tfield'] = true
 TEST [[
 {
     <?x?> = 1,
 }
 ]] {
-    id     = '1|"x"',
-    tfield = true,
+    id   = '1|"x"',
+    mode = 'table',
 }
 
 CARE['freturn'] = true
@@ -129,7 +125,7 @@ TEST [[
 return <?X?>
 ]] {
     id      = '"X"',
-    global  = true,
+    mode    = 'global',
     freturn = 0,
 }
 
@@ -139,7 +135,7 @@ function f()
 end
 ]] {
     id      = '"X"',
-    global  = true,
+    mode    = 'global',
     freturn = 1,
 }
 
@@ -148,7 +144,7 @@ TEST [[
 goto label
 ]] {
     id      = '5',
-    loc     = true,
+    mode    = 'local',
 }
 
 TEST [[
@@ -156,5 +152,5 @@ TEST [[
 goto <?label?>
 ]] {
     id      = '3',
-    loc     = true,
+    mode    = 'local',
 }

@@ -251,7 +251,7 @@ end
 ---@param root parser.guide.object
 ---@param id string
 ---@return string
-function m.getForwardID(root, id)
+function m.getNextID(root, id)
     root = guide.getRoot(root)
     local linkers = root._linkers
     if not linkers then

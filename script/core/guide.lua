@@ -106,30 +106,33 @@ function m.searchRefs(status, source, mode)
 
     local search
 
-    local function seachSource(obj, expect, flag)
+    local function seachSource(obj, field, flag)
         local link = linker.getLink(obj)
         if not link then
             return
         end
-        search(link.id, expect or link.id, flag)
+        local id = link.id
+        if field then
+            id = id .. field
+        end
+        search(id, nil, flag)
     end
 
-    local function checkForward(link, expect, flag)
+    local function checkForward(link, field, flag)
         if not link.forward then
             return
         end
-        local forwardID = linker.getForwardID(root, expect)
         for _, forwardSources in ipairs(link.forward) do
-            seachSource(forwardSources, expect, flag)
+            seachSource(forwardSources, field, flag)
         end
     end
 
-    local function checkBackward(link, expect, flag)
+    local function checkBackward(link, field, flag)
         if not link.backward then
             return
         end
         for _, backSources in ipairs(link.backward) do
-            seachSource(backSources, expect, flag)
+            seachSource(backSources, field, flag)
         end
     end
 
@@ -145,24 +148,39 @@ function m.searchRefs(status, source, mode)
     end
 
     local stackCount = 0
-    search = function (expect, flag)
-        local links = linker.getLinksByID(root, expect)
-        if links then
+    local mark = {}
+    search = function (id, field, flag)
+        if mark[id] then
+            return
+        end
+        mark[id] = true
+        local links = linker.getLinksByID(root, id)
+        if not links then
             return
         end
         stackCount = stackCount + 1
+        if stackCount >= 10 then
+            error('stack overflow')
+        end
         flag = flag or 0
         for _, eachLink in ipairs(links) do
-            if expect == eachLink.id
-            or expect == '' then
+            if field == nil then
                 m.pushResult(status, mode, eachLink.source)
             end
             if flag & SEARCH_FLAG.backward == 0 then
-                checkForward(eachLink,  expect, SEARCH_FLAG.forward)
+                checkForward(eachLink,  field, flag | SEARCH_FLAG.forward)
             end
             if flag & SEARCH_FLAG.forward  == 0 then
-                checkBackward(eachLink, expect, SEARCH_FLAG.backward)
+                checkBackward(eachLink, field, flag | SEARCH_FLAG.backward)
             end
+        end
+        local lastID = linker.getLastID(root, id)
+        if lastID then
+            local newField = id:sub(#lastID + 1)
+            if field then
+                newField = newField .. field
+            end
+            search(lastID, newField, flag)
         end
         --checkLastID(id, expect)
         stackCount = stackCount - 1

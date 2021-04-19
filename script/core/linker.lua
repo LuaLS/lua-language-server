@@ -147,19 +147,16 @@ local function getID(source)
     end
     util.revertTable(IDList)
     local id = table.concat(IDList, '|')
-    local lastID, nextID
+    local lastID
     if index > 1 then
         lastID = table.concat(IDList, '|', 1, index)
-        nextID = table.concat(IDList, '|', 3)
     end
-    return id, current, lastID, nextID
+    return id, current, lastID
 end
 
 ---@class link
 -- 当前节点的id
 ---@field id     string
--- 下个节点的id
----@field nextID string
 -- 上个节点的id
 ---@field lastID string
 -- 语法树单元
@@ -177,7 +174,7 @@ end
 ---@param source parser.guide.object
 ---@return link
 local function createLink(source)
-    local id, node, lastID, nextID = getID(source)
+    local id, node, lastID = getID(source)
     if not id then
         return nil
     end
@@ -185,7 +182,6 @@ local function createLink(source)
         id       = id,
         source   = source,
         lastID   = lastID,
-        nextID   = nextID,
         freturn  = checkFunctionReturn(node),
         forward  = checkForward(source),
         backward = checkBackward(source),
@@ -203,9 +199,6 @@ local function insertLinker(linkers, link)
     link._links = idMap[id]
     if link.lastID then
         linkers.lastIDMap[id] = link.lastID
-    end
-    if link.nextID then
-        linkers.nextIDMap[id] = link.nextID
     end
 end
 
@@ -247,19 +240,6 @@ function m.getLastID(root, id)
     return linkers.lastIDMap[id]
 end
 
----根据ID来获取前进的ID
----@param root parser.guide.object
----@param id string
----@return string
-function m.getNextID(root, id)
-    root = guide.getRoot(root)
-    local linkers = root._linkers
-    if not linkers then
-        return nil
-    end
-    return linkers.nextIDMap[id]
-end
-
 ---获取source的链接信息
 ---@param source parser.guide.object
 ---@return link
@@ -281,7 +261,6 @@ function m.compileLinks(source)
     local linkers = {
         idMap     = {},
         lastIDMap = {},
-        nextIDMap = {},
     }
     guide.eachSource(root, function (src)
         local link = m.getLink(src)

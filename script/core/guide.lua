@@ -136,17 +136,6 @@ function m.searchRefs(status, source, mode)
         end
     end
 
-    ---@param id string
-    ---@param expect string
-    local function checkLastID(id, expect)
-        local lastID = linker.getLastID(root, id)
-        if not lastID then
-            return
-        end
-        expect = expect:sub(#lastID + 2)
-        pushQueue(lastID, expect)
-    end
-
     local stackCount = 0
     local mark = {}
     search = function (id, field, flag)
@@ -167,12 +156,12 @@ function m.searchRefs(status, source, mode)
             if field == nil then
                 m.pushResult(status, mode, eachLink.source)
             end
-            if flag & SEARCH_FLAG.backward == 0 then
+            --if flag & SEARCH_FLAG.backward == 0 then
                 checkForward(eachLink,  field, flag | SEARCH_FLAG.forward)
-            end
-            if flag & SEARCH_FLAG.forward  == 0 then
+            --end
+            --if flag & SEARCH_FLAG.forward  == 0 then
                 checkBackward(eachLink, field, flag | SEARCH_FLAG.backward)
-            end
+            --end
         end
         local lastID = linker.getLastID(root, id)
         if lastID then

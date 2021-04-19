@@ -48,67 +48,59 @@ CARE['id'] = true
 TEST [[
 local <?x?>
 ]] {
-    id   = 'l:9',
+    id   = 'l|9',
 }
 
 TEST [[
 local x
 print(<?x?>)
 ]] {
-    id   = '7',
-    mode = 'local',
+    id   = 'l|7',
 }
 
 TEST [[
 local x
 <?x?> = 1
 ]] {
-    id   = '7',
-    mode = 'local',
+    id   = 'l|7',
 }
 
 TEST [[
 print(<?X?>)
 ]] {
-    id   = '"X"',
-    mode = 'global',
+    id   = 'g|"X"',
 }
 
 TEST [[
 print(<?X?>)
 ]] {
-    id   = '"X"',
-    mode = 'global',
+    id   = 'g|"X"',
 }
 
 TEST [[
 local x
 print(x.y.<?z?>)
 ]] {
-    id   = '7|"y"|"z"',
-    mode = 'local',
+    id   = 'l|7|"y"|"z"',
 }
 
 TEST [[
 local x
 function x:<?f?>() end
 ]] {
-    id   = '7|"f"',
-    mode = 'local',
+    id   = 'l|7|"f"',
 }
 
 TEST [[
 print(X.Y.<?Z?>)
 ]] {
-    id   = '"X"|"Y"|"Z"',
-    mode = 'global',
+    id   = 'g|"X"|"Y"|"Z"',
 }
 
 TEST [[
 function x:<?f?>() end
 ]] {
-    id   = '"x"|"f"',
-    mode = 'global',
+    id   = 'g|"x"|"f"',
 }
 
 TEST [[
@@ -116,16 +108,14 @@ TEST [[
     <?x?> = 1,
 }
 ]] {
-    id   = '1|"x"',
-    mode = 'table',
+    id   = 'l|1|"x"',
 }
 
 CARE['freturn'] = true
 TEST [[
 return <?X?>
 ]] {
-    id      = '"X"',
-    mode    = 'global',
+    id      = 'g|"X"',
     freturn = 0,
 }
 
@@ -134,8 +124,7 @@ function f()
     return <?X?>
 end
 ]] {
-    id      = '"X"',
-    mode    = 'global',
+    id      = 'g|"X"',
     freturn = 1,
 }
 
@@ -143,14 +132,12 @@ TEST [[
 ::<?label?>::
 goto label
 ]] {
-    id      = '5',
-    mode    = 'local',
+    id      = 'l|5',
 }
 
 TEST [[
 ::label::
 goto <?label?>
 ]] {
-    id      = '3',
-    mode    = 'local',
+    id      = 'l|3',
 }

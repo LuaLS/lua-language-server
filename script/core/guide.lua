@@ -99,37 +99,22 @@ function m.searchRefs(status, source, mode)
         return
     end
 
-    ---@type link[]
-    local queue   = {}
-    ---@type string
-    local expects = {}
-    local index   = 0
+    local search
 
-    ---添加到队列
-    ---@param id string
-    ---@param expect string
-    local function pushQueue(id, expect)
-        index = index + 1
-        queue[index]   = id
-        expects[index] = expect
-    end
-
-    local function pushQueueOfSource(obj, expect)
+    local function seachSource(obj, expect)
         local link = linker.getLink(obj)
         if not link then
             return
         end
-        pushQueue(link.id, expect or link.id)
+        search(link.id, expect or link.id)
     end
-
-    pushQueueOfSource(source)
 
     local function checkForward(link, expect)
         if not link.forward then
             return
         end
         for _, forwardSources in ipairs(link.forward) do
-            pushQueueOfSource(forwardSources, expect)
+            seachSource(forwardSources, expect)
         end
     end
 
@@ -138,46 +123,47 @@ function m.searchRefs(status, source, mode)
             return
         end
         for _, backSources in ipairs(link.backward) do
-            pushQueueOfSource(backSources, expect)
+            seachSource(backSources, expect)
         end
     end
 
-    ---@param link link
+    ---@param id string
     ---@param expect string
-    local function checkParentID(link, expect)
-        local parentID = link.parentID
-        if not parentID then
+    local function checkLastID(id, expect)
+        local lastID = linker.getLastID(root, id)
+        if not lastID then
             return
         end
-        expect      = expect:sub(#parentID + 2)
-        pushQueue(parentID, expect)
+        expect = expect:sub(#lastID + 2)
+        pushQueue(lastID, expect)
     end
 
-    for _ = 1, 1000 do
-        if index <= 0 then
-            break
-        end
-        local link   = queue[index]
-        local expect = expects[index]
-        index = index - 1
-        local links = linker.getLinksBySource(link.source)
+    local stackCount = 0
+    search = function (id, expect)
+        local links = linker.getLinksByID(root, id)
         if not links then
-            goto CONTINUE
+            return
         end
+        if stackCount > 10 then
+            return
+        end
+        stackCount = stackCount + 1
         for _, eachLink in ipairs(links) do
             if expect == eachLink.id
-            or expect == '*' then
+            or expect == '' then
                 m.pushResult(status, mode, eachLink.source)
-                checkForward(eachLink,  '*')
-                checkBackward(eachLink, '*')
+                checkBackward(eachLink, '')
+                checkForward(eachLink,  '')
             else
-                checkForward(eachLink,  expect)
                 checkBackward(eachLink, expect)
+                checkForward(eachLink,  expect)
             end
         end
-        checkParentID(link, expect)
-        ::CONTINUE::
+        --checkLastID(id, expect)
+        stackCount = stackCount - 1
     end
+
+    seachSource(source)
 end
 
 ---@class guide.status

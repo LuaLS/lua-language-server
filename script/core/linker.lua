@@ -38,19 +38,19 @@ end
 local function checkMode(source)
     if source.type == 'setglobal'
     or source.type == 'getglobal' then
-        return 'g:'
+        return 'g'
     end
     if source.type == 'local'
     or source.type == 'setlocal'
     or source.type == 'getlocal' then
-        return 'l:'
+        return 'l'
     end
     if source.type == 'label'
     or source.type == 'goto' then
-        return 'l:'
+        return 'l'
     end
     if source.type == 'table' then
-        return 'l:'
+        return 'l'
     end
     return nil
 end
@@ -80,6 +80,10 @@ local function checkForward(source)
     local list = TempList
     if source.value then
         list[#list+1] = source.value
+    elseif source.type == 'table' then
+        for _, keyvalue in ipairs(source) do
+            list[#list+1] = keyvalue
+        end
     end
     if #list == 0 then
         return nil
@@ -143,18 +147,21 @@ local function getID(source)
     end
     util.revertTable(IDList)
     local id = table.concat(IDList, '|')
-    local parentID
+    local lastID, nextID
     if index > 1 then
-        parentID = table.concat(IDList, '|', 1, index)
+        lastID = table.concat(IDList, '|', 1, index)
+        nextID = table.concat(IDList, '|', 3)
     end
-    return id, current, parentID
+    return id, current, lastID, nextID
 end
 
 ---@class link
 -- 当前节点的id
 ---@field id     string
--- 父节点的id
----@field parentID string
+-- 下个节点的id
+---@field nextID string
+-- 上个节点的id
+---@field lastID string
 -- 语法树单元
 ---@field source parser.guide.object
 -- 返回值，文件返回值总是0，函数返回值为第几个返回值
@@ -170,28 +177,36 @@ end
 ---@param source parser.guide.object
 ---@return link
 local function createLink(source)
-    local id, node, parentID = getID(source)
+    local id, node, lastID, nextID = getID(source)
     if not id then
         return nil
     end
     return {
         id       = id,
         source   = source,
-        parentID = parentID,
+        lastID   = lastID,
+        nextID   = nextID,
         freturn  = checkFunctionReturn(node),
         forward  = checkForward(source),
         backward = checkBackward(source),
     }
 end
 
-local function insertLinker(linkers, mode, link)
-    local list = linkers[mode]
-    local id   = link.id
-    if not list[id] then
-        list[id] = {}
+---@param link link
+local function insertLinker(linkers, link)
+    local idMap     = linkers.idMap
+    local id        = link.id
+    if not idMap[id] then
+        idMap[id] = {}
     end
-    list[id][#list[id]+1] = link
-    link._links = list[id]
+    idMap[id][#idMap[id]+1] = link
+    link._links = idMap[id]
+    if link.lastID then
+        linkers.lastIDMap[id] = link.lastID
+    end
+    if link.nextID then
+        linkers.nextIDMap[id] = link.nextID
+    end
 end
 
 local m = {}
@@ -207,20 +222,42 @@ function m.getLinksBySource(source)
 end
 
 ---根据ID来获取所有的link
----@param source parser.guide.object
----@param mode string
+---@param root parser.guide.object
 ---@param id string
 ---@return link[]?
-function m.getLinksByID(source, mode, id)
-    local root = guide.getRoot(source)
-    if not root._linkers then
-        return nil
-    end
-    local linkers = root._linkers[mode]
+function m.getLinksByID(root, id)
+    root = guide.getRoot(root)
+    local linkers = root._linkers
     if not linkers then
         return nil
     end
-    return linkers[id]
+    return linkers.idMap[id]
+end
+
+---根据ID来获取上个节点的ID
+---@param root parser.guide.object
+---@param id string
+---@return string
+function m.getLastID(root, id)
+    root = guide.getRoot(root)
+    local linkers = root._linkers
+    if not linkers then
+        return nil
+    end
+    return linkers.lastIDMap[id]
+end
+
+---根据ID来获取前进的ID
+---@param root parser.guide.object
+---@param id string
+---@return string
+function m.getForwardID(root, id)
+    root = guide.getRoot(root)
+    local linkers = root._linkers
+    if not linkers then
+        return nil
+    end
+    return linkers.nextIDMap[id]
 end
 
 ---获取source的链接信息
@@ -241,15 +278,17 @@ function m.compileLinks(source)
     if root._linkers then
         return root._linkers
     end
-    local linkers = {}
+    local linkers = {
+        idMap     = {},
+        lastIDMap = {},
+        nextIDMap = {},
+    }
     guide.eachSource(root, function (src)
         local link = m.getLink(src)
         if not link then
             return
         end
-        if link.mode then
-            insertLinker(linkers, link.mode, link)
-        end
+        insertLinker(linkers, link)
     end)
     root._linkers = linkers
     return linkers

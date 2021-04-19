@@ -1,16 +1,48 @@
 ast -> linkers = {
-    globals = {
-        ['"X"|"Y"|"Z"'] = {src1, src2, src3},
-        ['"X"|"Y"']     = {src4, src5, src6},
-        ['"X"']         = {src7, src8, src9},
-    },
-    locals = {
-        ['7']     = {src10},
-        ['7|"x"'] = {src11},
-    },
-    tfield = {
-        ['11|"k"'] = {src12},
-    },
+    ['g|"X"|"Y"|"Z"'] = {src1, src2, src3},
+    ['g|"X"|"Y"']     = {src4, src5, src6},
+    ['g|"X"']         = {src7, src8, src9},
+    ['l|7']           = {src10},
+    ['l|7|"x"']       = {src11},
+    ['l|11|"k"']      = {src12},
 }
 
+```lua
+x.y.<?z?> = <!f!>
 
+<?g?> = x.y.z
+
+t.<!z!> = 1
+x.y = t
+
+x = {
+    y = {
+        <!z!> = 1
+    }
+}
+```
+
+expect:   'l|x|y|z'
+forward:  'l|x|y|z' -> f
+backward: 'l|x|y|z' -> g
+last:     'l|x|y' + 'z'
+
+expect:   'l|x|y' + '|z'
+forward:  'l|t' + '|z' -> 'l|t|z' -> t.z
+backward: nil
+last:     'l|x' + '|y|z'
+
+expect:   'l|x' + '|y|z'
+forward:  'l|0' + '|y|z' -> 'l|0|y|z'
+backward: nil
+last:     nil
+
+expect:   'l|0|y|z'
+forward:  nil
+backward: nil
+last:     'l|0|y' + '|z'
+
+expect:   'l|0|y' + '|z'
+forward:  'l|1'+ '|z' -> 'l|1|z' -> field z
+backward: nil
+last:     'l|0' + '|y|z'

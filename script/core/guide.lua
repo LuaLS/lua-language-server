@@ -4,6 +4,11 @@ local guide  = require 'parser.guide'
 local osClock = os.clock
 local pairs   = pairs
 
+local SEARCH_FLAG = {
+    ['forward']  = 1 << 0,
+    ['backward'] = 1 << 1,
+}
+
 local m = {}
 
 -- TODO: compatible
@@ -101,29 +106,30 @@ function m.searchRefs(status, source, mode)
 
     local search
 
-    local function seachSource(obj, expect)
+    local function seachSource(obj, expect, flag)
         local link = linker.getLink(obj)
         if not link then
             return
         end
-        search(link.id, expect or link.id)
+        search(link.id, expect or link.id, flag)
     end
 
-    local function checkForward(link, expect)
+    local function checkForward(link, expect, flag)
         if not link.forward then
             return
         end
+        local forwardID = linker.getForwardID(root, expect)
         for _, forwardSources in ipairs(link.forward) do
-            seachSource(forwardSources, expect)
+            seachSource(forwardSources, expect, flag)
         end
     end
 
-    local function checkBackward(link, expect)
+    local function checkBackward(link, expect, flag)
         if not link.backward then
             return
         end
         for _, backSources in ipairs(link.backward) do
-            seachSource(backSources, expect)
+            seachSource(backSources, expect, flag)
         end
     end
 
@@ -139,24 +145,23 @@ function m.searchRefs(status, source, mode)
     end
 
     local stackCount = 0
-    search = function (id, expect)
-        local links = linker.getLinksByID(root, id)
-        if not links then
-            return
-        end
-        if stackCount > 10 then
+    search = function (expect, flag)
+        local links = linker.getLinksByID(root, expect)
+        if links then
             return
         end
         stackCount = stackCount + 1
+        flag = flag or 0
         for _, eachLink in ipairs(links) do
             if expect == eachLink.id
             or expect == '' then
                 m.pushResult(status, mode, eachLink.source)
-                checkBackward(eachLink, '')
-                checkForward(eachLink,  '')
-            else
-                checkBackward(eachLink, expect)
-                checkForward(eachLink,  expect)
+            end
+            if flag & SEARCH_FLAG.backward == 0 then
+                checkForward(eachLink,  expect, SEARCH_FLAG.forward)
+            end
+            if flag & SEARCH_FLAG.forward  == 0 then
+                checkBackward(eachLink, expect, SEARCH_FLAG.backward)
             end
         end
         --checkLastID(id, expect)

@@ -114,7 +114,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
     end
 
-    local function getReturnSetByFunc(func, index)
+    local function getCallSelectByReturnIndex(func, index)
         local call = func.parent
         if call.type ~= 'call' then
             return nil
@@ -157,7 +157,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         local newStatus = m.status(status)
         m.searchRefs(newStatus, func, 'ref')
         for _, ref in ipairs(newStatus.results) do
-            local set = getReturnSetByFunc(ref, link.freturn)
+            local set = getCallSelectByReturnIndex(ref, link.freturn)
             local setID = linker.getID(set)
             search(setID)
         end
@@ -181,8 +181,31 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
     end
 
+    local function checkSpecial(link, field)
+        local special = link.special
+        if not special then
+            return
+        end
+        if special.call then
+            local newStatus = m.status(status)
+            m.searchRefs(newStatus, special.call.node, 'def')
+            for _, res in ipairs(newStatus.results) do
+                local returns = linker.getSpecial(res, 'returns')
+                if returns and returns[special.index] then
+                    for _, rtn in ipairs(returns[special.index]) do
+                        searchSource(rtn, field)
+                    end
+                end
+            end
+        end
+        if special.returns then
+            local newStatus = m.status(status)
+            m.searchRefs(newStatus, special.call.node, 'def')
+        end
+    end
+
     local stackCount = 0
-    local mark = {}
+    local mark = status.mark
     search = function (id, field)
         if not id then
             return
@@ -203,8 +226,9 @@ function m.searchRefsByID(status, uri, expect, mode)
             if field == nil then
                 m.pushResult(status, mode, eachLink.source)
             end
-            checkForward(eachLink,  field)
-            checkBackward(eachLink, field)
+            checkForward(eachLink,    field)
+            checkBackward(eachLink,   field)
+            checkSpecial(eachLink,    field)
         end
         checkLastID(id, field)
         stackCount = stackCount - 1
@@ -243,10 +267,7 @@ end
 ---@return guide.status
 function m.status(parentStatus, interface, deep)
     local status = {
-        share     = parentStatus and parentStatus.share       or {
-            count = 0,
-        },
-        interface = parentStatus and parentStatus.interface   or {},
+        mark      = parentStatus and parentStatus.mark or {},
         results   = {},
     }
     return status

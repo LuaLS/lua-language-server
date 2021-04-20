@@ -215,6 +215,50 @@ local function checkBackward(source)
     end
 end
 
+local function checkSpecial(source)
+    local list = TempList
+    -- 接收 call 的返回值
+    if source.type == 'select' then
+        local index = source.index
+        local call  = source.vararg
+        if call.type == 'call' then
+            list.call = {
+                node  = call.node,
+                index = index,
+            }
+        end
+    end
+    -- func 的返回值
+    if source.type == 'function' then
+        local returns = {}
+        list.returns = returns
+        if source.bindDocs then
+            local index = 0
+            for _, doc in ipairs(source.bindDocs) do
+                if doc.type == 'doc.return' then
+                    for _, rtn in ipairs(doc.returns) do
+                        index = index + 1
+                        if not returns[index] then
+                            returns[index] = {}
+                        end
+                        if rtn.types then
+                            for _, typeUnit in ipairs(rtn.types) do
+                                returns[index][#returns[index]+1] = typeUnit
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+    if not next(list) then
+        return nil
+    else
+        TempList = {}
+        return list
+    end
+end
+
 local IDList = {}
 ---获取语法树单元的字符串ID
 ---@param source parser.guide.object
@@ -275,8 +319,8 @@ end
 ---@field forward parser.guide.object[]
 -- 后退的关联单元
 ---@field backward parser.guide.object[]
--- 缓存的关联links
----@field _links link[]
+-- 缓存的特殊数据
+---@field special table
 
 ---创建source的链接信息
 ---@param source parser.guide.object
@@ -293,6 +337,7 @@ local function createLink(source)
         freturn   = checkFunctionReturn(node),
         forward   = checkForward(source),
         backward  = checkBackward(source),
+        special   = checkSpecial(source),
     }
 end
 
@@ -304,23 +349,12 @@ local function insertLinker(linkers, link)
         idMap[id] = {}
     end
     idMap[id][#idMap[id]+1] = link
-    link._links = idMap[id]
     if link.lastID then
         linkers.lastIDMap[id] = link.lastID
     end
 end
 
 local m = {}
-
----根据语法树单元获取关联的link列表
----@param source parser.guide.object
----@return link[]?
-function m.getLinksBySource(source)
-    if not source._link then
-        source._link = createLink(source)
-    end
-    return source._link and source._link._links
-end
 
 ---根据ID来获取所有的link
 ---@param root parser.guide.object
@@ -359,6 +393,8 @@ function m.getLink(source)
 end
 
 ---获取source的ID
+---@param source parser.guide.object
+---@return string
 function m.getID(source)
     if not source then
         return nil
@@ -368,6 +404,24 @@ function m.getID(source)
         return nil
     end
     return link.id
+end
+
+---获取source的special
+---@param source parser.guide.object
+---@return table
+function m.getSpecial(source, key)
+    if not source then
+        return nil
+    end
+    local link = m.getLink(source)
+    if not link then
+        return nil
+    end
+    local special = link.special
+    if not special then
+        return nil
+    end
+    return special[key]
 end
 
 ---编译整个文件的link

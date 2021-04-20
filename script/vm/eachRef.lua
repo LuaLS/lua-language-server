@@ -1,9 +1,9 @@
 ---@type vm
-local vm     = require 'vm.vm'
-local guide  = require 'core.guide'
-local util   = require 'utility'
-local await  = require 'await'
-local config = require 'config'
+local vm       = require 'vm.vm'
+local searcher = require 'core.searcher'
+local util     = require 'utility'
+local await    = require 'await'
+local config   = require 'config'
 
 local function getRefs(source, deep)
     local results = {}
@@ -17,9 +17,9 @@ local function getRefs(source, deep)
     deep = config.config.intelliSense.searchDepth + (deep or 0)
 
     local clock = os.clock()
-    local myResults, count = guide.requestReference(source, vm.interface, deep)
+    local myResults, count = searcher.requestReference(source, vm.interface, deep)
     if DEVELOP and os.clock() - clock > 0.1 then
-        log.warn('requestReference', count, os.clock() - clock, guide.getUri(source), util.dump(source, { deep = 1 }))
+        log.warn('requestReference', count, os.clock() - clock, searcher.getUri(source), util.dump(source, { deep = 1 }))
     end
     vm.mergeResults(results, myResults)
 
@@ -30,8 +30,8 @@ end
 
 function vm.getRefs(source, deep)
     deep = deep or -999
-    if guide.isGlobal(source) then
-        local key = guide.getKeyName(source)
+    if searcher.isGlobal(source) then
+        local key = searcher.getKeyName(source)
         if not key then
             return {}
         end

@@ -1,5 +1,5 @@
 local files  = require 'files'
-local guide  = require 'core.guide'
+local searcher  = require 'core.searcher'
 local vm     = require 'vm'
 local lang   = require 'language'
 local define = require 'proto.define'
@@ -74,7 +74,7 @@ return function (uri, callback)
 
     local cache = vm.getCache 'redundant-parameter'
 
-    guide.eachSourceType(ast.ast, 'call', function (source)
+    searcher.eachSourceType(ast.ast, 'call', function (source)
         local callArgs = countCallArgs(source)
         if callArgs == 0 then
             return

@@ -1,8 +1,8 @@
-local await  = require 'await'
-local files  = require 'files'
-local guide  = require 'core.guide'
-local define = require 'proto.define'
-local util   = require 'utility'
+local await    = require 'await'
+local files    = require 'files'
+local searcher = require 'core.searcher'
+local define   = require 'proto.define'
+local util     = require 'utility'
 
 local function buildName(source, text)
     if source.type == 'setmethod'

@@ -1,5 +1,5 @@
 local files   = require 'files'
-local guide   = require 'core.guide'
+local searcher   = require 'core.searcher'
 local lang    = require 'language'
 local define  = require 'proto.define'
 
@@ -11,7 +11,7 @@ return function (uri, callback)
         return
     end
 
-    guide.eachSourceType(ast.ast, 'if', function (source)
+    searcher.eachSourceType(ast.ast, 'if', function (source)
         for _, block in ipairs(source) do
             if #block > 0 then
                 return
@@ -24,7 +24,7 @@ return function (uri, callback)
             message = lang.script.DIAG_EMPTY_BLOCK,
         }
     end)
-    guide.eachSourceType(ast.ast, 'loop', function (source)
+    searcher.eachSourceType(ast.ast, 'loop', function (source)
         if #source > 0 then
             return
         end
@@ -35,7 +35,7 @@ return function (uri, callback)
             message = lang.script.DIAG_EMPTY_BLOCK,
         }
     end)
-    guide.eachSourceType(ast.ast, 'in', function (source)
+    searcher.eachSourceType(ast.ast, 'in', function (source)
         if #source > 0 then
             return
         end

@@ -1,7 +1,7 @@
 local linker = require 'core.linker'
 local files  = require 'files'
 local util   = require 'utility'
-local guide  = require 'core.guide'
+local guide  = require 'parser.guide'
 
 local function getSource(pos)
     local ast = files.getAst('')

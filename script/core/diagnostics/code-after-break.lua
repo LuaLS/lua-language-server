@@ -1,7 +1,7 @@
-local files  = require 'files'
-local guide  = require 'core.guide'
-local lang   = require 'language'
-local define = require 'proto.define'
+local files    = require 'files'
+local searcher = require 'core.searcher'
+local lang     = require 'language'
+local define   = require 'proto.define'
 
 return function (uri, callback)
     local state = files.getAst(uri)
@@ -10,7 +10,7 @@ return function (uri, callback)
     end
 
     local mark = {}
-    guide.eachSourceType(state.ast, 'break', function (source)
+    searcher.eachSourceType(state.ast, 'break', function (source)
         local list = source.parent
         if mark[list] then
             return

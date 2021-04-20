@@ -1,4 +1,4 @@
-local guide      = require 'core.guide'
+local searcher   = require 'core.searcher'
 local workspace  = require 'workspace'
 local files      = require 'files'
 local vm         = require 'vm'
@@ -7,8 +7,8 @@ local findSource = require 'core.find-source'
 local function sortResults(results)
     -- 先按照顺序排序
     table.sort(results, function (a, b)
-        local u1 = guide.getUri(a.target)
-        local u2 = guide.getUri(b.target)
+        local u1 = searcher.getUri(a.target)
+        local u2 = searcher.getUri(b.target)
         if u1 == u2 then
             return a.target.start < b.target.start
         else
@@ -20,7 +20,7 @@ local function sortResults(results)
     for i = #results, 1, -1 do
         local res  = results[i].target
         local f    = res.finish
-        local uri = guide.getUri(res)
+        local uri = searcher.getUri(res)
         if lf and f > lf and uri == lu then
             table.remove(results, i)
         else
@@ -66,7 +66,7 @@ local function checkRequire(source, offset)
     end
     local call = callargs.parent
     local func = call.node
-    local literal = guide.getLiteral(source)
+    local literal = searcher.getLiteral(source)
     local libName = vm.getLibraryName(func)
     if not libName then
         return nil
@@ -130,7 +130,7 @@ return function (uri, offset)
     local defs = vm.getDefs(source, 0)
     local values = {}
     for _, src in ipairs(defs) do
-        local value = guide.getObjectValue(src)
+        local value = searcher.getObjectValue(src)
         if value and value ~= src then
             values[value] = true
         end
@@ -143,7 +143,7 @@ return function (uri, offset)
         if values[src] then
             goto CONTINUE
         end
-        local root = guide.getRoot(src)
+        local root = searcher.getRoot(src)
         if not root then
             goto CONTINUE
         end

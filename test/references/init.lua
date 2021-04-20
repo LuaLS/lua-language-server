@@ -1,4 +1,4 @@
-local core = require 'core.reference'
+local core  = require 'core.reference'
 local files = require 'files'
 
 local function catch_target(script)

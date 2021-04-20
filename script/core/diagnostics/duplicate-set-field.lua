@@ -1,8 +1,7 @@
 local files   = require 'files'
-local guide   = require 'core.guide'
+local searcher   = require 'core.searcher'
 local lang    = require 'language'
 local define  = require 'proto.define'
-local vm      = require 'vm'
 
 return function (uri, callback)
     local ast = files.getAst(uri)
@@ -10,7 +9,7 @@ return function (uri, callback)
         return
     end
 
-    guide.eachSourceType(ast.ast, 'local', function (source)
+    searcher.eachSourceType(ast.ast, 'local', function (source)
         if not source.ref then
             return
         end
@@ -26,11 +25,11 @@ return function (uri, callback)
             if nxt.type == 'setfield'
             or nxt.type == 'setmethod'
             or nxt.type == 'setindex' then
-                local name = guide.getKeyName(nxt)
+                local name = searcher.getKeyName(nxt)
                 if not name then
                     goto CONTINUE
                 end
-                local value = guide.getObjectValue(nxt)
+                local value = searcher.getObjectValue(nxt)
                 if not value or value.type ~= 'function' then
                     goto CONTINUE
                 end
@@ -47,7 +46,7 @@ return function (uri, callback)
             end
             local blocks = {}
             for _, value in ipairs(values) do
-                local block = guide.getBlock(value)
+                local block = searcher.getBlock(value)
                 if not blocks[block] then
                     blocks[block] = {}
                 end

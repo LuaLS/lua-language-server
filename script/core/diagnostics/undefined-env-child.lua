@@ -1,5 +1,5 @@
 local files  = require 'files'
-local guide  = require 'core.guide'
+local searcher  = require 'core.searcher'
 local vm     = require 'vm'
 local lang   = require 'language'
 
@@ -8,12 +8,12 @@ return function (uri, callback)
     if not ast then
         return
     end
-    guide.eachSourceType(ast.ast, 'getglobal', function (source)
+    searcher.eachSourceType(ast.ast, 'getglobal', function (source)
         -- 单独验证自己是否在重载过的 _ENV 中有定义
         if source.node.tag == '_ENV' then
             return
         end
-        local defs = guide.requestDefinition(source)
+        local defs = searcher.requestDefinition(source)
         if #defs > 0 then
             return
         end

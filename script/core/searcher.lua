@@ -4,19 +4,6 @@ local files  = require 'files'
 
 local m = {}
 
--- TODO: compatible
-m.getRoot           = guide.getRoot
-m.eachSource        = guide.eachSource
-m.eachSourceType    = guide.eachSourceType
-m.eachSourceContain = guide.eachSourceContain
-m.eachSourceBetween = guide.eachSourceBetween
-m.getStartFinish    = guide.getStartFinish
-m.isLiteral         = guide.isLiteral
-m.positionOf        = guide.positionOf
-m.offsetOf          = guide.offsetOf
-m.lineRange         = guide.lineRange
-m.lineData          = guide.lineData
-
 ---@alias guide.searchmode '"ref"'|'"def"'|'"field"'
 
 ---添加结果
@@ -68,7 +55,7 @@ function m.getUri(obj)
     if obj.uri then
         return obj.uri
     end
-    local root = m.getRoot(obj)
+    local root = guide.getRoot(obj)
     if root then
         return root.uri
     end
@@ -225,6 +212,8 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
         stackCount = stackCount - 1
     end
+
+    search(expect)
 
 end
 

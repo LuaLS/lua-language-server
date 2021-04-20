@@ -1,5 +1,5 @@
 local files      = require 'files'
-local guide      = require 'core.guide'
+local searcher   = require 'core.searcher'
 local vm         = require 'vm'
 local hoverLabel = require 'core.hover.label'
 local hoverDesc  = require 'core.hover.description'
@@ -7,7 +7,7 @@ local hoverDesc  = require 'core.hover.description'
 local function findNearCall(uri, ast, pos)
     local text = files.getText(uri)
     local nearCall
-    guide.eachSourceContain(ast.ast, pos, function (src)
+    searcher.eachSourceContain(ast.ast, pos, function (src)
         if src.type == 'call'
         or src.type == 'table'
         or src.type == 'function' then
@@ -96,7 +96,7 @@ local function makeSignatures(call, pos)
     local defs = vm.getDefs(node, 0)
     local mark = {}
     for _, src in ipairs(defs) do
-        src = guide.getObjectValue(src) or src
+        src = searcher.getObjectValue(src) or src
         if src.type == 'function'
         or src.type == 'doc.type.function' then
             if not mark[src] then

@@ -1,11 +1,11 @@
-local guide      = require 'core.guide'
+local searcher   = require 'core.searcher'
 local files      = require 'files'
 local vm         = require 'vm'
 local define     = require 'proto.define'
 local findSource = require 'core.find-source'
 
 local function eachRef(source, callback)
-    local results = guide.requestReference(source)
+    local results = searcher.requestReference(source)
     for i = 1, #results do
         callback(results[i])
     end
@@ -15,11 +15,11 @@ local function eachField(source, callback)
     if not source then
         return
     end
-    local isGlobal = guide.isGlobal(source)
-    local results = guide.requestReference(source)
+    local isGlobal = searcher.isGlobal(source)
+    local results = searcher.requestReference(source)
     for i = 1, #results do
         local res = results[i]
-        if isGlobal == guide.isGlobal(res) then
+        if isGlobal == searcher.isGlobal(res) then
             callback(res)
         end
     end
@@ -106,7 +106,7 @@ local function makeIf(source, text, callback)
 end
 
 local function findKeyWord(ast, text, offset, callback)
-    guide.eachSourceContain(ast.ast, offset, function (source)
+    searcher.eachSourceContain(ast.ast, offset, function (source)
         if source.type == 'do'
         or source.type == 'function'
         or source.type == 'loop'

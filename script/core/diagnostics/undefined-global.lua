@@ -2,7 +2,7 @@ local files   = require 'files'
 local vm      = require 'vm'
 local lang    = require 'language'
 local config  = require 'config'
-local guide   = require 'core.guide'
+local searcher   = require 'core.searcher'
 local define  = require 'proto.define'
 
 local requireLike = {
@@ -19,8 +19,8 @@ return function (uri, callback)
     end
 
     -- 遍历全局变量，检查所有没有 set 模式的全局变量
-    guide.eachSourceType(ast.ast, 'getglobal', function (src)
-        local key = guide.getKeyName(src)
+    searcher.eachSourceType(ast.ast, 'getglobal', function (src)
+        local key = searcher.getKeyName(src)
         if not key then
             return
         end

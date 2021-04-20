@@ -4,7 +4,7 @@ local buildReturn = require 'core.hover.return'
 local buildTable  = require 'core.hover.table'
 local vm          = require 'vm'
 local util        = require 'utility'
-local guide       = require 'core.guide'
+local searcher       = require 'core.searcher'
 local lang        = require 'language'
 local config      = require 'config'
 local files       = require 'files'
@@ -139,13 +139,13 @@ local function asDocField(source)
     if not class then
         return ('field ?.%s: %s'):format(
             name,
-            guide.viewInferType(infers)
+            searcher.viewInferType(infers)
         )
     end
     return ('field %s.%s: %s'):format(
         class.class[1],
         name,
-        guide.viewInferType(infers)
+        searcher.viewInferType(infers)
     )
 end
 
@@ -177,7 +177,7 @@ local function asNumber(source)
     if type(num) ~= 'number' then
         return nil
     end
-    local uri  = guide.getUri(source)
+    local uri  = searcher.getUri(source)
     local text = files.getText(uri)
     if not text then
         return nil

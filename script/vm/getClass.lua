@@ -1,13 +1,13 @@
 ---@type vm
-local vm    = require 'vm.vm'
-local guide = require 'core.guide'
+local vm       = require 'vm.vm'
+local searcher = require 'core.searcher'
 
 local function lookUpDocClass(source)
     local infers = vm.getInfers(source, 0)
     for _, infer in ipairs(infers) do
         if infer.source.type == 'doc.class'
         or infer.source.type == 'doc.type' then
-            return guide.viewInferType(infers)
+            return searcher.viewInferType(infers)
         end
     end
     return nil
@@ -22,7 +22,7 @@ local function getClass(source, classes, depth, deep)
     if depth > 3 then
         return
     end
-    local value = guide.getObjectValue(source) or source
+    local value = searcher.getObjectValue(source) or source
     if not deep then
         if value and value.type == 'string' then
             classes[value[1]] = true
@@ -38,7 +38,7 @@ local function getClass(source, classes, depth, deep)
             or lkey == '__name'
             or lkey == 'name'
             or lkey == 'class' then
-                local value = guide.getObjectValue(src)
+                local value = searcher.getObjectValue(src)
                 if value and value.type == 'string' then
                     classes[value[1]] = true
                 end
@@ -60,5 +60,5 @@ function vm.getClass(source, deep)
     if not next(classes) then
         return nil
     end
-    return guide.mergeTypes(classes)
+    return searcher.mergeTypes(classes)
 end

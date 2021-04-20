@@ -1,6 +1,6 @@
 local vm       = require 'vm'
 local util     = require 'utility'
-local guide    = require 'core.guide'
+local searcher    = require 'core.searcher'
 local config   = require 'config'
 local lang     = require 'language'
 
@@ -20,7 +20,7 @@ local function getKey(src)
         end
         return '[any]'
     end
-    if guide.getKeyType(src) == 'string' then
+    if searcher.getKeyType(src) == 'string' then
         if key:match '^[%a_][%w_]*$' then
             return key
         else
@@ -31,7 +31,7 @@ local function getKey(src)
 end
 
 local function getFieldFull(src)
-    local value   = guide.getObjectValue(src) or src
+    local value   = searcher.getObjectValue(src) or src
     local tp      = vm.getInferType(value, 0)
     --local class   = vm.getClass(src)
     local literal = vm.getInferLiteral(value)
@@ -45,7 +45,7 @@ local function getFieldFast(src)
     if src.bindDocs then
         return getFieldFull(src)
     end
-    local value = guide.getObjectValue(src) or src
+    local value = searcher.getObjectValue(src) or src
     if not value then
         return 'any'
     end
@@ -193,7 +193,7 @@ local function mergeTypes(types)
             end
         end
     end
-    return guide.mergeTypes(results)
+    return searcher.mergeTypes(results)
 end
 
 local function clearClasses(classes)

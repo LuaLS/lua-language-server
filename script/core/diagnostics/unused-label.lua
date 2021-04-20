@@ -1,5 +1,5 @@
 local files  = require 'files'
-local guide  = require 'core.guide'
+local searcher  = require 'core.searcher'
 local define = require 'proto.define'
 local lang   = require 'language'
 
@@ -9,7 +9,7 @@ return function (uri, callback)
         return
     end
 
-    guide.eachSourceType(ast.ast, 'label', function (source)
+    searcher.eachSourceType(ast.ast, 'label', function (source)
         if not source.ref then
             callback {
                 start   = source.start,

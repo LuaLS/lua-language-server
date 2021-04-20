@@ -1,6 +1,6 @@
 ---@type vm
 local vm      = require 'vm.vm'
-local guide   = require 'core.guide'
+local searcher= require 'core.searcher'
 local await   = require 'await'
 local config  = require 'config'
 
@@ -19,7 +19,7 @@ local function getFields(source, deep, filterKey)
     deep = config.config.intelliSense.searchDepth + (deep or 0)
 
     await.delay()
-    local results = guide.requestFields(source, vm.interface, deep, filterKey)
+    local results = searcher.requestFields(source, vm.interface, deep, filterKey)
 
     unlock()
     return results
@@ -40,7 +40,7 @@ local function getDefFields(source, deep, filterKey)
     deep = config.config.intelliSense.searchDepth + (deep or 0)
 
     await.delay()
-    local results = guide.requestDefFields(source, vm.interface, deep, filterKey)
+    local results = searcher.requestDefFields(source, vm.interface, deep, filterKey)
 
     unlock()
     return results
@@ -76,8 +76,8 @@ function vm.getFields(source, deep)
     if source.special == '_G' then
         return vm.getGlobals '*'
     end
-    if guide.isGlobal(source) then
-        local name = guide.getKeyName(source)
+    if searcher.isGlobal(source) then
+        local name = searcher.getKeyName(source)
         if not name then
             return {}
         end
@@ -94,8 +94,8 @@ function vm.getDefFields(source, deep)
     if source.special == '_G' then
         return vm.getGlobalSets '*'
     end
-    if guide.isGlobal(source) then
-        local name = guide.getKeyName(source)
+    if searcher.isGlobal(source) then
+        local name = searcher.getKeyName(source)
         if not name then
             return {}
         end

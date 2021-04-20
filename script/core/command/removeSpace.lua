@@ -1,11 +1,10 @@
-local files  = require 'files'
-local define = require 'proto.define'
-local guide  = require 'core.guide'
-local proto  = require 'proto'
-local lang   = require 'language'
+local files    = require 'files'
+local searcher = require 'core.searcher'
+local proto    = require 'proto'
+local lang     = require 'language'
 
 local function isInString(ast, offset)
-    return guide.eachSourceContain(ast.ast, offset, function (source)
+    return searcher.eachSourceContain(ast.ast, offset, function (source)
         if source.type == 'string' then
             return true
         end
@@ -23,10 +22,10 @@ return function (data)
 
     local textEdit = {}
     for i = 1, #lines do
-        local line = guide.lineContent(lines, text, i, true)
+        local line = searcher.lineContent(lines, text, i, true)
         local pos  = line:find '[ \t]+$'
         if pos then
-            local start, finish = guide.lineRange(lines, i, true)
+            local start, finish = searcher.lineRange(lines, i, true)
             start = start + pos - 1
             if isInString(ast, start) then
                 goto NEXT_LINE

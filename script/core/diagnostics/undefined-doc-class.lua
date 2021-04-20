@@ -1,5 +1,5 @@
 local files   = require 'files'
-local guide   = require 'core.guide'
+local searcher   = require 'core.searcher'
 local lang    = require 'language'
 local define  = require 'proto.define'
 local vm      = require 'vm'

@@ -1,5 +1,5 @@
 local files          = require 'files'
-local guide          = require 'core.guide'
+local searcher       = require 'core.searcher'
 local await          = require 'await'
 local define         = require 'proto.define'
 local vm             = require 'vm'
@@ -221,7 +221,7 @@ return function (uri, start, finish)
 
     local results = {}
     local count = 0
-    guide.eachSourceBetween(ast.ast, start, finish, function (source)
+    searcher.eachSourceBetween(ast.ast, start, finish, function (source)
         local method = Care[source.type]
         if not method then
             return

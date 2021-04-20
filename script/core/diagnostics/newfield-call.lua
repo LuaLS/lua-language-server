@@ -1,5 +1,5 @@
 local files = require 'files'
-local guide = require 'core.guide'
+local searcher = require 'core.searcher'
 local lang  = require 'language'
 
 return function (uri, callback)
@@ -11,15 +11,15 @@ return function (uri, callback)
     local lines = files.getLines(uri)
     local text  = files.getText(uri)
 
-    guide.eachSourceType(ast.ast, 'table', function (source)
+    searcher.eachSourceType(ast.ast, 'table', function (source)
         for i = 1, #source do
             local field = source[i]
             if field.type == 'call' then
                 local func = field.node
                 local args = field.args
                 if args then
-                    local funcLine = guide.positionOf(lines, func.finish)
-                    local argsLine = guide.positionOf(lines, args.start)
+                    local funcLine = searcher.positionOf(lines, func.finish)
+                    local argsLine = searcher.positionOf(lines, args.start)
                     if argsLine > funcLine then
                         callback {
                             start   = field.start,

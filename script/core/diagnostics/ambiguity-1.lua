@@ -1,6 +1,6 @@
-local files = require 'files'
-local guide = require 'core.guide'
-local lang  = require 'language'
+local files    = require 'files'
+local searcher = require 'core.searcher'
+local lang     = require 'language'
 
 local opMap = {
     ['+']  = true,
@@ -30,7 +30,7 @@ return function (uri, callback)
         return
     end
     local text = files.getText(uri)
-    guide.eachSourceType(ast.ast, 'binary', function (source)
+    searcher.eachSourceType(ast.ast, 'binary', function (source)
         if source.op.type ~= 'or' then
             return
         end

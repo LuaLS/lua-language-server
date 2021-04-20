@@ -1,8 +1,7 @@
-local files   = require 'files'
-local guide   = require 'core.guide'
-local lang    = require 'language'
-local define  = require 'proto.define'
-local vm      = require 'vm'
+local files    = require 'files'
+local searcher = require 'core.searcher'
+local lang     = require 'language'
+local vm       = require 'vm'
 
 return function (uri, callback)
     local state = files.getAst(uri)
@@ -18,7 +17,7 @@ return function (uri, callback)
     for _, doc in ipairs(state.ast.docs) do
         if doc.type == 'doc.class'
         or doc.type == 'doc.alias' then
-            local name = guide.getKeyName(doc)
+            local name = searcher.getKeyName(doc)
             if not cache[name] then
                 local docs = vm.getDocTypes(name)
                 cache[name] = {}
@@ -28,7 +27,7 @@ return function (uri, callback)
                         cache[name][#cache[name]+1] = {
                             start  = otherDoc.start,
                             finish = otherDoc.finish,
-                            uri    = guide.getUri(otherDoc),
+                            uri    = searcher.getUri(otherDoc),
                         }
                     end
                 end

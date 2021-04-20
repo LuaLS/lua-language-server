@@ -2,7 +2,7 @@
 local vm      = require 'vm.vm'
 local files   = require 'files'
 local ws      = require 'workspace'
-local guide   = require 'core.guide'
+local searcher   = require 'core.searcher'
 local await   = require 'await'
 local config  = require 'config'
 
@@ -27,7 +27,7 @@ function m.require(args, index)
         return nil
     end
     local results = {}
-    local myUri = guide.getUri(args[1])
+    local myUri = searcher.getUri(args[1])
     local uris = ws.findUrisByRequirePath(reqName)
     for _, uri in ipairs(uris) do
         if not files.eq(myUri, uri) then
@@ -47,7 +47,7 @@ function m.dofile(args, index)
         return
     end
     local results = {}
-    local myUri = guide.getUri(args[1])
+    local myUri = searcher.getUri(args[1])
     local uris = ws.findUrisByFilePath(reqName)
     for _, uri in ipairs(uris) do
         if not files.eq(myUri, uri) then

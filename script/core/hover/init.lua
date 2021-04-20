@@ -1,5 +1,5 @@
 local files      = require 'files'
-local guide      = require 'core.guide'
+local searcher      = require 'core.searcher'
 local vm         = require 'vm'
 local getLabel   = require 'core.hover.label'
 local getDesc    = require 'core.hover.description'
@@ -48,7 +48,7 @@ local function getHoverAsFunction(source)
     local other = 0
     local mark = {}
     for _, def in ipairs(values) do
-        def = guide.getObjectValue(def) or def
+        def = searcher.getObjectValue(def) or def
         if def.type == 'function'
         or def.type == 'doc.type.function' then
             eachFunctionAndOverload(def, function (value)

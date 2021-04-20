@@ -1,5 +1,5 @@
-local files = require "files"
-local guide = require "core.guide"
+local files    = require "files"
+local searcher = require "core.searcher"
 
 local Care = {
     ['function'] = function (source, text, results)
@@ -151,7 +151,7 @@ return function (uri)
     local regions = {}
     local status = {}
 
-    guide.eachSource(ast.ast, function (source)
+    searcher.eachSource(ast.ast, function (source)
         local tp = source.type
         if Care[tp] then
             Care[tp](source, text, regions)

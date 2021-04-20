@@ -1,8 +1,8 @@
-local files   = require 'files'
-local guide   = require 'core.guide'
-local lang    = require 'language'
-local define  = require 'proto.define'
-local vm      = require 'vm'
+local files    = require 'files'
+local searcher = require 'core.searcher'
+local lang     = require 'language'
+local define   = require 'proto.define'
+local vm       = require 'vm'
 
 return function (uri, callback)
     local ast = files.getAst(uri)
@@ -10,7 +10,7 @@ return function (uri, callback)
         return
     end
 
-    guide.eachSourceType(ast.ast, 'table', function (source)
+    searcher.eachSourceType(ast.ast, 'table', function (source)
         local mark = {}
         for _, obj in ipairs(source) do
             if obj.type == 'tablefield'

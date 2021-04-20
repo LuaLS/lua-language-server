@@ -1,6 +1,6 @@
-local files = require "files"
-local guide = require "core.guide"
-local lang  = require 'language'
+local files    = require "files"
+local searcher = require "core.searcher"
+local lang     = require 'language'
 
 return function (uri, callback)
     local state = files.getAst(uri)
@@ -9,7 +9,7 @@ return function (uri, callback)
         return
     end
 
-    guide.eachSourceType(state.ast, 'loop', function (source)
+    searcher.eachSourceType(state.ast, 'loop', function (source)
         if not source.loc or not source.loc.value then
             return
         end

@@ -1,8 +1,7 @@
-local files  = require 'files'
-local define = require 'proto.define'
-local guide  = require 'core.guide'
-local proto  = require 'proto'
-local lang   = require 'language'
+local files    = require 'files'
+local searcher = require 'core.searcher'
+local proto    = require 'proto'
+local lang     = require 'language'
 
 local opMap = {
     ['+']  = true,

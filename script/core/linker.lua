@@ -126,38 +126,21 @@ local function checkFunctionReturn(source)
     return nil
 end
 
-local TempList1 = {}
-local TempList2 = {}
+local TempList = {}
 
 ---前进
 ---@param source parser.guide.object
 ---@return parser.guide.object[]
 local function checkForward(source)
-    local list1 = TempList1
-    local list2 = TempList2
+    local list = TempList
     local parent = source.parent
     if source.value then
         -- x = y : x -> y
-        list1[#list1+1] = source.value
+        list[#list+1] = source.value
     elseif source.type == 'table' then
         -- x = {y = 1} : x -> x.y
         for _, keyvalue in ipairs(source) do
-            list1[#list1+1] = keyvalue
-        end
-    elseif source.type == 'doc.type.name'
-    or     source.type == 'doc.class.name'
-    or     source.type == 'doc.alias.name' then
-        list2[#list2+1] = function ()
-            return vm.getDocNames(source[1], 'class')
-        end
-        list2[#list2+1] = function ()
-            return vm.getDocNames(source[1], 'type')
-        end
-        list2[#list2+1] = function ()
-            return vm.getDocNames(source[1], 'alias')
-        end
-        list2[#list2+1] = function ()
-            return vm.getDocNames(source[1], 'extends')
+            list[#list+1] = keyvalue
         end
     end
     -- mt:f -> self
@@ -167,52 +150,41 @@ local function checkForward(source)
         if func then
             local self = func.locals[1]
             if self.tag == 'self' then
-                list1[#list1+1] = self
+                list[#list+1] = self
             end
         end
     end
-    if #list1 == 0 then
-        list1 = nil
+    if #list == 0 then
+        return nil
     else
-        TempList1 = {}
+        TempList = {}
+        return list
     end
-    if #list2 == 0 then
-        list2 = nil
-    else
-        TempList2 = {}
-    end
-    return list1, list2
 end
 
 ---后退
 ---@param source parser.guide.object
 ---@return parser.guide.object[]
 local function checkBackward(source)
-    local list1  = TempList1
-    local list2 = TempList2
+    local list  = TempList
     local parent = source.parent
     if parent.value == source then
-        list1[#list1+1] = parent
+        list[#list+1] = parent
     end
     -- self -> mt:xx
     if source.tag == 'self' then
         local func = guide.getParentFunction(source)
         local setmethod = func.parent
         if setmethod and setmethod.type == 'setmethod' then
-            list1[#list1+1] = setmethod.node
+            list[#list+1] = setmethod.node
         end
     end
-    if #list1 == 0 then
-        list1 = nil
+    if #list == 0 then
+        return nil
     else
-        TempList1 = {}
+        TempList = {}
+        return list
     end
-    if #list2 == 0 then
-        list2 = nil
-    else
-        TempList2 = {}
-    end
-    return list1, list2
 end
 
 local IDList = {}
@@ -275,10 +247,6 @@ end
 ---@field forward parser.guide.object[]
 -- 后退的关联单元
 ---@field backward parser.guide.object[]
--- 前进的关联函数，调用此函数获取单元
----@field fforward function[]
--- 后退的关联函数，调用此函数获取单元
----@field fbackward function[]
 -- 缓存的关联links
 ---@field _links link[]
 
@@ -290,17 +258,13 @@ local function createLink(source)
     if not id then
         return nil
     end
-    local forward,  fforward  = checkForward(source)
-    local backward, fbackward = checkBackward(source)
     return {
         id        = id,
         source    = source,
         lastID    = lastID,
         freturn   = checkFunctionReturn(node),
-        forward   = forward,
-        fforward  = fforward,
-        backward  = backward,
-        fbackward = fbackward,
+        forward   = checkForward(source),
+        backward  = checkBackward(source),
     }
 end
 

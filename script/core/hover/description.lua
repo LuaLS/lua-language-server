@@ -2,7 +2,7 @@ local vm       = require 'vm'
 local ws       = require 'workspace'
 local furi     = require 'file-uri'
 local files    = require 'files'
-local guide    = require 'core.guide'
+local searcher    = require 'core.searcher'
 local markdown = require 'provider.markdown'
 local config   = require 'config'
 local lang     = require 'language'
@@ -72,7 +72,7 @@ local function asStringView(source, literal)
 end
 
 local function asString(source)
-    local literal = guide.getLiteral(source)
+    local literal = searcher.getLiteral(source)
     if type(literal) ~= 'string' then
         return nil
     end
@@ -127,7 +127,7 @@ local function tryDocClassComment(source)
     for _, def in ipairs(vm.getDefs(source, 0)) do
         if def.type == 'doc.class.name'
         or def.type == 'doc.alias.name' then
-            local class = guide.getDocState(def)
+            local class = searcher.getDocState(def)
             local comment = getBindComment(class, class.bindGroup, class)
             if comment then
                 return comment
@@ -180,7 +180,7 @@ local function isFunction(source)
     if source.type == 'function' then
         return true
     end
-    local value = guide.getObjectValue(source)
+    local value = searcher.getObjectValue(source)
     if not value then
         return false
     end

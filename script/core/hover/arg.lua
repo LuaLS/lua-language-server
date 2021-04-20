@@ -1,4 +1,4 @@
-local guide = require 'core.guide'
+local searcher = require 'core.searcher'
 local vm    = require 'vm'
 
 local function optionalArg(arg)
@@ -29,7 +29,7 @@ local function asFunction(source, oop)
             if arg.dummy then
                 goto CONTINUE
             end
-            local name = arg.name or guide.getKeyName(arg)
+            local name = arg.name or searcher.getKeyName(arg)
             if name then
                 args[#args+1] = ('%s%s: %s'):format(
                     name,

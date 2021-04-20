@@ -1,6 +1,6 @@
 ---@type vm
 local vm      = require 'vm.vm'
-local guide   = require 'core.guide'
+local searcher= require 'core.searcher'
 local util    = require 'utility'
 local await   = require 'await'
 local config  = require 'config'
@@ -12,7 +12,7 @@ function vm.hasType(source, type, deep)
     local defs = vm.getDefs(source, deep)
     for i = 1, #defs do
         local def = defs[i]
-        local value = guide.getObjectValue(def) or def
+        local value = searcher.getObjectValue(def) or def
         if value.type == type then
             return true
         end
@@ -34,7 +34,7 @@ end
 
 function vm.getInferType(source, deep)
     local infers = vm.getInfers(source, deep)
-    return guide.viewInferType(infers)
+    return searcher.viewInferType(infers)
 end
 
 function vm.getInferLiteral(source, deep)
@@ -67,9 +67,9 @@ local function getInfers(source, deep)
     await.delay()
 
     local clock = os.clock()
-    local myResults, count = guide.requestInfer(source, vm.interface, deep)
+    local myResults, count = searcher.requestInfer(source, vm.interface, deep)
     if DEVELOP and os.clock() - clock > 0.1 then
-        log.warn('requestInfer', count, os.clock() - clock, guide.getUri(source), util.dump(source, { deep = 1 }))
+        log.warn('requestInfer', count, os.clock() - clock, searcher.getUri(source), util.dump(source, { deep = 1 }))
     end
     vm.mergeResults(results, myResults)
 
@@ -92,8 +92,8 @@ end
 --- 获取对象的值
 --- 会尝试穿透函数调用
 function vm.getInfers(source, deep)
-    if guide.isGlobal(source) then
-        local name = guide.getKeyName(source)
+    if searcher.isGlobal(source) then
+        local name = searcher.getKeyName(source)
         local cache =  vm.getCache('getInfersOfGlobal')[name]
                     or getInfersBySource(source, deep)
         vm.getCache('getInfersOfGlobal')[name] = cache

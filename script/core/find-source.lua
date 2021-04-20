@@ -1,4 +1,4 @@
-local guide     = require 'core.guide'
+local guide     = require 'parser.guide'
 
 local function isValidFunctionPos(source, offset)
     for i = 1, #source.keyword // 2 do

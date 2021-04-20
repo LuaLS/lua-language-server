@@ -1,5 +1,5 @@
 local files   = require 'files'
-local guide   = require 'core.guide'
+local searcher   = require 'core.searcher'
 local lang    = require 'language'
 local define  = require 'proto.define'
 local vm      = require 'vm'
@@ -10,7 +10,7 @@ return function (uri, callback)
         return
     end
 
-    guide.eachSource(ast.ast, function (source)
+    searcher.eachSource(ast.ast, function (source)
         if  source.type ~= 'local'
         and source.type ~= 'setlocal'
         and source.type ~= 'setglobal'

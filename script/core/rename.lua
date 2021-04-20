@@ -1,6 +1,6 @@
 local files      = require 'files'
 local vm         = require 'vm'
-local guide      = require 'core.guide'
+local searcher   = require 'core.searcher'
 local proto      = require 'proto'
 local define     = require 'proto.define'
 local util       = require 'utility'
@@ -185,7 +185,7 @@ local function renameField(source, newname, callback)
         end
         callback(source, source.start, source.finish, newname)
     elseif parent.type == 'setmethod' then
-        local uri = guide.getUri(source)
+        local uri = searcher.getUri(source)
         local text = files.getText(uri)
         local func = parent.value
         -- function mt:name () end --> mt['newname'] = function (self) end
@@ -284,7 +284,7 @@ local function ofFieldThen(key, src, newname, callback)
 end
 
 local function ofField(source, newname, callback)
-    local key = guide.getKeyName(source)
+    local key = searcher.getKeyName(source)
     local node
     if source.type == 'tablefield'
     or source.type == 'tableindex' then
@@ -298,7 +298,7 @@ local function ofField(source, newname, callback)
 end
 
 local function ofGlobal(source, newname, callback)
-    local key = guide.getKeyName(source)
+    local key = searcher.getKeyName(source)
     for _, src in ipairs(vm.getRefs(source, 0)) do
         ofFieldThen(key, src, newname, callback)
     end
@@ -325,7 +325,7 @@ end
 
 local function ofDocParamName(source, newname, callback)
     callback(source, source.start, source.finish, newname)
-    local doc = guide.getDocState(source)
+    local doc = searcher.getDocState(source)
     if doc.bindSources then
         for _, src in ipairs(doc.bindSources) do
             if src.type == 'local'
@@ -452,7 +452,7 @@ function m.rename(uri, pos, newname)
     local mark = {}
 
     rename(source, newname, function (target, start, finish, text)
-        local turi = files.getOriginUri(guide.getUri(target))
+        local turi = files.getOriginUri(searcher.getUri(target))
         if not turi then
             return
         end

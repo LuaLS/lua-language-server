@@ -1,10 +1,10 @@
-local guide    = require 'core.guide'
+local searcher    = require 'core.searcher'
 local vm       = require 'vm'
 
 local buildName
 
 local function asLocal(source)
-    local name = guide.getKeyName(source)
+    local name = searcher.getKeyName(source)
     if not source.attrs then
         return name
     end
@@ -21,8 +21,8 @@ local function asField(source, oop)
     if source.node.type ~= 'getglobal' then
         class = vm.getClass(source.node, 0)
     end
-    local node = class or guide.getKeyName(source.node) or '?'
-    local method = guide.getKeyName(source)
+    local node = class or searcher.getKeyName(source.node) or '?'
+    local method = searcher.getKeyName(source)
     if oop then
         return ('%s:%s'):format(node, method)
     else
@@ -34,16 +34,16 @@ local function asTableField(source)
     if not source.field then
         return
     end
-    return guide.getKeyName(source.field)
+    return searcher.getKeyName(source.field)
 end
 
 local function asGlobal(source)
-    return guide.getKeyName(source)
+    return searcher.getKeyName(source)
 end
 
 local function asDocFunction(source)
-    local doc = guide.getParentType(source, 'doc.type')
-            or  guide.getParentType(source, 'doc.overload')
+    local doc = searcher.getParentType(source, 'doc.type')
+            or  searcher.getParentType(source, 'doc.overload')
     if not doc or not doc.bindSources then
         return ''
     end

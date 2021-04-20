@@ -265,7 +265,7 @@ files.watch(function (ev, uri)
         end
         needUpdateGlobals[uri] = true
     elseif ev == 'create' then
-        getGlobalsOfFile(uri)
-        getGlobalSetsOfFile(uri)
+        --getGlobalsOfFile(uri)
+        --getGlobalSetsOfFile(uri)
     end
 end)

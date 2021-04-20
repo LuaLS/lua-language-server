@@ -1,6 +1,6 @@
 local define       = require 'proto.define'
 local files        = require 'files'
-local guide        = require 'core.guide'
+local searcher     = require 'core.searcher'
 local matchKey     = require 'core.matchkey'
 local vm           = require 'vm'
 local getLabel     = require 'core.hover.label'
@@ -59,7 +59,7 @@ end
 
 local function findNearestSource(ast, offset)
     local source
-    guide.eachSourceContain(ast.ast, offset, function (src)
+    searcher.eachSourceContain(ast.ast, offset, function (src)
         source = src
     end)
     return source
@@ -87,7 +87,7 @@ local function findParent(ast, text, offset)
         if not anyPos then
             return nil, nil
         end
-        local parent = guide.eachSourceContain(ast.ast, anyPos, function (source)
+        local parent = searcher.eachSourceContain(ast.ast, anyPos, function (source)
             if source.finish == anyPos then
                 return source
             end
@@ -102,8 +102,8 @@ end
 
 local function findParentInStringIndex(ast, text, offset)
     local near, nearStart
-    guide.eachSourceContain(ast.ast, offset, function (source)
-        local start = guide.getStartFinish(source)
+    searcher.eachSourceContain(ast.ast, offset, function (source)
+        local start = searcher.getStartFinish(source)
         if not start then
             return
         end
@@ -161,9 +161,9 @@ local function getSnip(source)
     end
     local defs = vm.getRefs(source, 0)
     for _, def in ipairs(defs) do
-        def = guide.getObjectValue(def) or def
+        def = searcher.getObjectValue(def) or def
         if def ~= source and def.type == 'function' then
-            local uri = guide.getUri(def)
+            local uri = searcher.getUri(def)
             local text = files.getText(uri)
             local lines = files.getLines(uri)
             if not text then
@@ -172,7 +172,7 @@ local function getSnip(source)
             if vm.isMetaFile(uri) then
                 goto CONTINUE
             end
-            local row = guide.positionOf(lines, def.start)
+            local row = searcher.positionOf(lines, def.start)
             local firstRow = lines[row]
             local lastRow = lines[math.min(row + context - 1, #lines)]
             local snip = text:sub(firstRow.start, lastRow.finish)
@@ -215,7 +215,7 @@ local function buildFunction(results, source, oop, data)
 end
 
 local function buildInsertRequire(ast, targetUri, stemName)
-    local uri   = guide.getUri(ast.ast)
+    local uri   = searcher.getUri(ast.ast)
     local lines = files.getLines(uri)
     local text  = files.getText(uri)
     local start = 1
@@ -245,7 +245,7 @@ local function buildInsertRequire(ast, targetUri, stemName)
 end
 
 local function isSameSource(ast, source, pos)
-    if not files.eq(guide.getUri(source), guide.getUri(ast.ast)) then
+    if not files.eq(searcher.getUri(source), searcher.getUri(ast.ast)) then
         return false
     end
     if source.type == 'field'
@@ -256,7 +256,7 @@ local function isSameSource(ast, source, pos)
 end
 
 local function checkLocal(ast, word, offset, results)
-    local locals = guide.getVisibleLocals(ast.ast, offset)
+    local locals = searcher.getVisibleLocals(ast.ast, offset)
     for name, source in pairs(locals) do
         if isSameSource(ast, source, offset) then
             goto CONTINUE
@@ -292,9 +292,9 @@ local function checkLocal(ast, word, offset, results)
 end
 
 local function checkModule(ast, word, offset, results)
-    local locals  = guide.getVisibleLocals(ast.ast, offset)
+    local locals  = searcher.getVisibleLocals(ast.ast, offset)
     for uri in files.eachFile() do
-        if files.eq(uri, guide.getUri(ast.ast)) then
+        if files.eq(uri, searcher.getUri(ast.ast)) then
             goto CONTINUE
         end
         local originUri = files.getOriginUri(uri)
@@ -353,7 +353,7 @@ local function checkFieldFromFieldToIndex(name, parent, word, start, offset)
         return nil
     end
     local textEdit, additionalTextEdits
-    local uri = guide.getUri(parent)
+    local uri = searcher.getUri(parent)
     local text = files.getText(uri)
     local wordStart
     if word == '' then
@@ -398,7 +398,7 @@ local function checkFieldFromFieldToIndex(name, parent, word, start, offset)
 end
 
 local function checkFieldThen(name, src, word, start, offset, parent, oop, results)
-    local value = guide.getObjectValue(src) or src
+    local value = searcher.getObjectValue(src) or src
     local kind = define.CompletionItemKind.Field
     if value.type == 'function' then
         if oop then
@@ -422,7 +422,7 @@ local function checkFieldThen(name, src, word, start, offset, parent, oop, resul
     if oop then
         return
     end
-    local literal = guide.getLiteral(value)
+    local literal = searcher.getLiteral(value)
     if literal ~= nil then
         kind = define.CompletionItemKind.Enum
     end
@@ -495,7 +495,7 @@ local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, res
 end
 
 local function checkGlobal(ast, word, start, offset, parent, oop, results)
-    local locals = guide.getVisibleLocals(ast.ast, offset)
+    local locals = searcher.getVisibleLocals(ast.ast, offset)
     local refs = vm.getGlobalSets '*'
     checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, results, locals, 'global')
 end
@@ -511,7 +511,7 @@ local function checkField(ast, word, start, offset, parent, oop, results)
 end
 
 local function checkTableField(ast, word, start, results)
-    local source = guide.eachSourceContain(ast.ast, start, function (source)
+    local source = searcher.eachSourceContain(ast.ast, start, function (source)
         if  source.start == start
         and source.parent
         and source.parent.type == 'table' then
@@ -522,7 +522,7 @@ local function checkTableField(ast, word, start, results)
         return
     end
     local used = {}
-    guide.eachSourceType(ast.ast, 'tablefield', function (src)
+    searcher.eachSourceType(ast.ast, 'tablefield', function (src)
         if not src.field then
             return
         end
@@ -627,7 +627,7 @@ local function checkCommon(myUri, word, text, offset, results)
 end
 
 local function isInString(ast, offset)
-    return guide.eachSourceContain(ast.ast, offset, function (source)
+    return searcher.eachSourceContain(ast.ast, offset, function (source)
         if source.type == 'string' then
             return true
         end
@@ -643,7 +643,7 @@ local function checkKeyWord(ast, text, start, offset, word, hasSpace, afterLocal
         isExp    = isExp,
         text     = text,
         start    = start,
-        uri      = guide.getUri(ast.ast),
+        uri      = searcher.getUri(ast.ast),
         offset   = offset,
         ast      = ast,
     }
@@ -707,7 +707,7 @@ end
 
 local function checkProvideLocal(ast, word, start, results)
     local block
-    guide.eachSourceContain(ast.ast, start, function (source)
+    searcher.eachSourceContain(ast.ast, start, function (source)
         if source.type == 'function'
         or source.type == 'main' then
             block = source
@@ -717,7 +717,7 @@ local function checkProvideLocal(ast, word, start, results)
         return
     end
     local used = {}
-    guide.eachSourceType(block, 'getglobal', function (source)
+    searcher.eachSourceType(block, 'getglobal', function (source)
         if source.start > start
         and not used[source[1]]
         and matchKey(word, source[1]) then
@@ -728,7 +728,7 @@ local function checkProvideLocal(ast, word, start, results)
             }
         end
     end)
-    guide.eachSourceType(block, 'getlocal', function (source)
+    searcher.eachSourceType(block, 'getlocal', function (source)
         if source.start > start
         and not used[source[1]]
         and matchKey(word, source[1]) then
@@ -742,7 +742,7 @@ local function checkProvideLocal(ast, word, start, results)
 end
 
 local function checkFunctionArgByDocParam(ast, word, start, results)
-    local func = guide.eachSourceContain(ast.ast, start, function (source)
+    local func = searcher.eachSourceContain(ast.ast, start, function (source)
         if source.type == 'function' then
             return source
         end
@@ -793,8 +793,8 @@ end
 
 local function checkUri(ast, text, offset, results)
     local collect = {}
-    local myUri = guide.getUri(ast.ast)
-    guide.eachSourceContain(ast.ast, offset, function (source)
+    local myUri = searcher.getUri(ast.ast)
+    searcher.eachSourceContain(ast.ast, offset, function (source)
         if source.type ~= 'string' then
             return
         end
@@ -807,7 +807,7 @@ local function checkUri(ast, text, offset, results)
         end
         local call = callargs.parent
         local func = call.node
-        local literal = guide.getLiteral(source)
+        local literal = searcher.getLiteral(source)
         local libName = vm.getLibraryName(func)
         if not libName then
             return
@@ -914,7 +914,7 @@ local function checkUri(ast, text, offset, results)
 end
 
 local function checkLenPlusOne(ast, text, offset, results)
-    guide.eachSourceContain(ast.ast, offset, function (source)
+    searcher.eachSourceContain(ast.ast, offset, function (source)
         if source.type == 'getindex'
         or source.type == 'setindex' then
             local _, pos = text:find('%s*%[%s*%#', source.node.finish)
@@ -926,7 +926,7 @@ local function checkLenPlusOne(ast, text, offset, results)
             if not matchKey(writingText, nodeText) then
                 return
             end
-            if source.parent == guide.getParentBlock(source) then
+            if source.parent == searcher.getParentBlock(source) then
                 -- state
                 local label = text:match('%#[ \t]*', pos) .. nodeText .. '+1'
                 local eq = text:find('^%s*%]?%s*%=', source.finish)
@@ -1026,7 +1026,7 @@ local function checkEqualEnumLeft(ast, text, offset, source, results)
     if not source then
         return
     end
-    local str = guide.eachSourceContain(ast.ast, offset, function (src)
+    local str = searcher.eachSourceContain(ast.ast, offset, function (src)
         if src.type == 'string' then
             return src
         end
@@ -1061,7 +1061,7 @@ local function checkEqualEnum(ast, text, offset, results)
 end
 
 local function checkEqualEnumInString(ast, text, offset, results)
-    local source = guide.eachSourceContain(ast.ast, offset, function (source)
+    local source = searcher.eachSourceContain(ast.ast, offset, function (source)
         if source.type == 'binary' then
             if source.op.type == '=='
             or source.op.type == '~=' then
@@ -1092,7 +1092,7 @@ local function checkEqualEnumInString(ast, text, offset, results)
 end
 
 local function isFuncArg(ast, offset)
-    return guide.eachSourceContain(ast.ast, offset, function (source)
+    return searcher.eachSourceContain(ast.ast, offset, function (source)
         if source.type == 'funcargs' then
             return true
         end
@@ -1154,7 +1154,7 @@ local function tryWord(ast, text, offset, results)
                 else
                     checkLocal(ast, word, start, results)
                     checkTableField(ast, word, start, results)
-                    local env = guide.getENV(ast.ast, start)
+                    local env = searcher.getENV(ast.ast, start)
                     checkGlobal(ast, word, start, offset, env, false, results)
                     checkModule(ast, word, start, results)
                 end
@@ -1228,7 +1228,7 @@ local function getCallEnums(source, index)
                 end
                 for _, unit in ipairs(vm.getDocTypeUnits(doc.extends) or {}) do
                     if unit.type == 'doc.type.function' then
-                        local text = files.getText(guide.getUri(unit))
+                        local text = files.getText(searcher.getUri(unit))
                         enums[#enums+1] = {
                             label       = text:sub(unit.start, unit.finish),
                             description = doc.comment,
@@ -1256,7 +1256,7 @@ end
 
 local function findCall(ast, text, offset)
     local call
-    guide.eachSourceContain(ast.ast, offset, function (src)
+    searcher.eachSourceContain(ast.ast, offset, function (src)
         if src.type == 'call' then
             if not call or call.start < src.start then
                 call = src
@@ -1295,14 +1295,14 @@ local function checkTableLiteralField(ast, text, offset, tbl, fields, results)
     for _, field in ipairs(tbl) do
         if field.type == 'tablefield'
         or field.type == 'tableindex' then
-            local name = guide.getKeyName(field)
+            local name = searcher.getKeyName(field)
             if name then
                 mark[name] = true
             end
         end
     end
     table.sort(fields, function (a, b)
-        return guide.getKeyName(a) < guide.getKeyName(b)
+        return searcher.getKeyName(a) < searcher.getKeyName(b)
     end)
     -- {$}
     local left = lookBackward.findWord(text, offset)
@@ -1315,12 +1315,12 @@ local function checkTableLiteralField(ast, text, offset, tbl, fields, results)
     end
     if left then
         for _, field in ipairs(fields) do
-            local name = guide.getKeyName(field)
-            if not mark[name] and matchKey(left, guide.getKeyName(field)) then
+            local name = searcher.getKeyName(field)
+            if not mark[name] and matchKey(left, searcher.getKeyName(field)) then
                 results[#results+1] = {
-                    label = guide.getKeyName(field),
+                    label = searcher.getKeyName(field),
                     kind  = define.CompletionItemKind.Property,
-                    insertText = ('%s = $0'):format(guide.getKeyName(field)),
+                    insertText = ('%s = $0'):format(searcher.getKeyName(field)),
                     id    = stack(function ()
                         return {
                             detail      = buildDetail(field),
@@ -1355,14 +1355,14 @@ local function checkTableLiteralFieldByCall(ast, text, offset, call, defs, index
         return
     end
     for _, def in ipairs(defs) do
-        local func = guide.getObjectValue(def) or def
+        local func = searcher.getObjectValue(def) or def
         local param = getFuncParamByCallIndex(func, index)
         if not param then
             goto CONTINUE
         end
         local defs = vm.getDefFields(param, 0)
         for _, field in ipairs(defs) do
-            local name = guide.getKeyName(field)
+            local name = searcher.getKeyName(field)
             if name and not mark[name] then
                 mark[name] = true
                 fields[#fields+1] = field
@@ -1385,7 +1385,7 @@ local function tryCallArg(ast, text, offset, results)
     end
     local defs = vm.getDefs(call.node, 0)
     for _, def in ipairs(defs) do
-        def = guide.getObjectValue(def) or def
+        def = searcher.getObjectValue(def) or def
         local enums = getCallEnums(def, argIndex)
         if enums then
             mergeEnums(myResults, enums, arg)
@@ -1415,7 +1415,7 @@ local function tryTable(ast, text, offset, results)
     end
     local defs = vm.getDefFields(tbl, 0)
     for _, field in ipairs(defs) do
-        local name = guide.getKeyName(field)
+        local name = searcher.getKeyName(field)
         if name and not mark[name] then
             mark[name] = true
             fields[#fields+1] = field
@@ -1471,7 +1471,7 @@ end
 local function getLuaDocByContain(ast, offset)
     local result
     local range = math.huge
-    guide.eachSourceContain(ast.ast.docs, offset, function (src)
+    searcher.eachSourceContain(ast.ast.docs, offset, function (src)
         if not src.start then
             return
         end
@@ -1548,7 +1548,7 @@ local function tryLuaDocBySource(ast, offset, source, results)
         return true
     elseif source.type == 'doc.param.name' then
         local funcs = {}
-        guide.eachSourceBetween(ast.ast, offset, math.huge, function (src)
+        searcher.eachSourceBetween(ast.ast, offset, math.huge, function (src)
             if src.type == 'function' and src.start > offset then
                 funcs[#funcs+1] = src
             end
@@ -1624,7 +1624,7 @@ local function tryLuaDocByErr(ast, offset, err, docState, results)
         end
     elseif err.type == 'LUADOC_MISS_PARAM_NAME' then
         local funcs = {}
-        guide.eachSourceBetween(ast.ast, offset, math.huge, function (src)
+        searcher.eachSourceBetween(ast.ast, offset, math.huge, function (src)
             if src.type == 'function' and src.start > offset then
                 funcs[#funcs+1] = src
             end

@@ -1,10 +1,10 @@
 local files = require 'files'
 local lang  = require 'language'
-local guide = require 'core.guide'
+local searcher = require 'core.searcher'
 
 local function isInString(ast, offset)
     local result = false
-    guide.eachSourceType(ast, 'string', function (source)
+    searcher.eachSourceType(ast, 'string', function (source)
         if offset >= source.start and offset <= source.finish then
             result = true
         end

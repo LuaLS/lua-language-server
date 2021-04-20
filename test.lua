@@ -80,7 +80,7 @@ end
 
 local function main()
     debug.setcstacklimit(1000)
-    require 'core.guide'.debugMode = true
+    require 'core.searcher'.debugMode = true
     require 'language' 'zh-cn'
     require 'utility'.enableCloseFunction()
 

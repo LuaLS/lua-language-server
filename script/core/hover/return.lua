@@ -1,11 +1,11 @@
-local guide = require 'core.guide'
+local searcher = require 'core.searcher'
 local vm    = require 'vm'
 
 local function mergeTypes(returns)
     if type(returns) == 'string' then
         return returns
     end
-    return guide.mergeTypes(returns)
+    return searcher.mergeTypes(returns)
 end
 
 local function getReturnDualByDoc(source)

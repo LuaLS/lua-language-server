@@ -1,7 +1,7 @@
-local guide = require 'core.guide'
+local searcher = require 'core.searcher'
 ---@type vm
-local vm    = require 'vm.vm'
-local files = require 'files'
+local vm       = require 'vm.vm'
+local files    = require 'files'
 
 local function getFileLinks(uri)
     local ws    = require 'workspace'
@@ -11,7 +11,7 @@ local function getFileLinks(uri)
         return links
     end
     tracy.ZoneBeginN('getFileLinks')
-    guide.eachSpecialOf(ast.ast, 'require', function (source)
+    searcher.eachSpecialOf(ast.ast, 'require', function (source)
         local call = source.parent
         if not call or call.type ~= 'call' then
             return

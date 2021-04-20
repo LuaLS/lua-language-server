@@ -1,7 +1,6 @@
-local files  = require 'files'
-local guide  = require 'core.guide'
-local lang   = require 'language'
-local define = require 'proto.define'
+local files    = require 'files'
+local searcher = require 'core.searcher'
+local lang     = require 'language'
 
 return function (uri, callback)
     local state = files.getAst(uri)
@@ -9,7 +8,7 @@ return function (uri, callback)
         return
     end
 
-    guide.eachSourceType(state.ast, 'local', function (source)
+    searcher.eachSourceType(state.ast, 'local', function (source)
         if not source.attrs then
             return
         end

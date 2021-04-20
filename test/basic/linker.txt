@@ -46,3 +46,29 @@ expect:   'l|0|y' + '|z'
 forward:  'l|1'+ '|z' -> 'l|1|z' -> field z
 backward: nil
 last:     'l|0' + '|y|z'
+
+
+```lua
+a = {
+    b = {
+        <?c?> = 1,
+    }
+}
+
+print(a.b.<!c!>)
+```
+
+expect:   't|3|c'
+forward:  nil
+backward: nil
+last:     't|3' + '|c'
+
+expect:   't|3' + '|c'
+forward:  nil
+backward: 't|2|b' + '|c'
+last:     nil
+
+expect:   't|2|b|c'
+forward:  nil
+backward: 't|2|b' + '|c'
+last:     nil

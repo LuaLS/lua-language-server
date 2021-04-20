@@ -108,12 +108,24 @@ function m.searchRefs(status, source, mode)
 
     local search
 
+    local function checkLastID(id, field, flag)
+        local lastID = linker.getLastID(root, id)
+        if lastID then
+            local newField = id:sub(#lastID + 1)
+            if field then
+                newField = newField .. field
+            end
+            search(lastID, newField, flag)
+        end
+    end
+
     local function searchSource(obj, field, flag)
         local link = linker.getLink(obj)
         if not link then
             return
         end
         local id = link.id
+        checkLastID(id, field, flag)
         if field then
             id = id .. field
         end
@@ -186,17 +198,6 @@ function m.searchRefs(status, source, mode)
         end
     end
 
-    local function checkLastID(id, field, flag)
-        local lastID = linker.getLastID(root, id)
-        if lastID then
-            local newField = id:sub(#lastID + 1)
-            if field then
-                newField = newField .. field
-            end
-            search(lastID, newField, flag)
-        end
-    end
-
     local stackCount = 0
     local mark = {}
     search = function (id, field, flag)
@@ -220,7 +221,6 @@ function m.searchRefs(status, source, mode)
             checkForward(eachLink,  field, flag | SEARCH_FLAG.forward)
             checkBackward(eachLink, field, flag | SEARCH_FLAG.backward)
         end
-        checkLastID(id, field, flag)
         stackCount = stackCount - 1
     end
 

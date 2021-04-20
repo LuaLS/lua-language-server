@@ -108,7 +108,7 @@ TEST [[
     <?x?> = 1,
 }
 ]] {
-    id   = 'l|1|"x"',
+    id   = 't|1|"x"',
 }
 
 CARE['freturn'] = true

@@ -37,7 +37,8 @@ function m.pushResult(status, mode, ref)
         or ref.type == 'setmethod'
         or ref.type == 'setindex'
         or ref.type == 'tableindex'
-        or ref.type == 'tablefield' then
+        or ref.type == 'tablefield'
+        or ref.type == 'function' then
             results[#results+1] = ref
         end
     elseif mode == 'ref' then
@@ -55,7 +56,8 @@ function m.pushResult(status, mode, ref)
         or ref.type == 'setindex'
         or ref.type == 'getindex'
         or ref.type == 'tableindex'
-        or ref.type == 'tablefield' then
+        or ref.type == 'tablefield'
+        or ref.type == 'function' then
             results[#results+1] = ref
         end
     elseif mode == 'field' then
@@ -106,7 +108,7 @@ function m.searchRefs(status, source, mode)
 
     local search
 
-    local function seachSource(obj, field, flag)
+    local function searchSource(obj, field, flag)
         local link = linker.getLink(obj)
         if not link then
             return
@@ -118,12 +120,60 @@ function m.searchRefs(status, source, mode)
         search(id, nil, flag)
     end
 
+    local function getReturnSetByFunc(func, index)
+        local call = func.parent
+        if call.type ~= 'call' then
+            return nil
+        end
+        if index == 0 then
+            return nil
+        end
+        if index == 1 then
+            return call.parent
+        else
+            for _, sel in ipairs(call.extParent) do
+                if sel.index == index then
+                    return sel
+                end
+            end
+        end
+        return nil
+    end
+
+    local function searchFunction(obj)
+        if obj.type ~= 'function' then
+            return
+        end
+        local link = linker.getLink(obj)
+        if not link then
+            return
+        end
+        if not link.freturn then
+            return
+        end
+        local func = guide.getParentFunction(obj)
+        if not func or func.type ~= 'function' then
+            return
+        end
+        local newStatus = m.status(status)
+        m.searchRefs(newStatus, func, 'ref')
+        for _, ref in ipairs(newStatus.results) do
+            local set = getReturnSetByFunc(ref, link.freturn)
+            if set then
+                local id = linker.getID(set)
+                if id then
+                    search(id)
+                end
+            end
+        end
+    end
+
     local function checkForward(link, field, flag)
         if not link.forward then
             return
         end
         for _, forwardSources in ipairs(link.forward) do
-            seachSource(forwardSources, field, flag)
+            searchSource(forwardSources, field, flag)
         end
     end
 
@@ -132,7 +182,18 @@ function m.searchRefs(status, source, mode)
             return
         end
         for _, backSources in ipairs(link.backward) do
-            seachSource(backSources, field, flag)
+            searchSource(backSources, field, flag)
+        end
+    end
+
+    local function checkLastID(id, field, flag)
+        local lastID = linker.getLastID(root, id)
+        if lastID then
+            local newField = id:sub(#lastID + 1)
+            if field then
+                newField = newField .. field
+            end
+            search(lastID, newField, flag)
         end
     end
 
@@ -156,26 +217,15 @@ function m.searchRefs(status, source, mode)
             if field == nil then
                 m.pushResult(status, mode, eachLink.source)
             end
-            --if flag & SEARCH_FLAG.backward == 0 then
-                checkForward(eachLink,  field, flag | SEARCH_FLAG.forward)
-            --end
-            --if flag & SEARCH_FLAG.forward  == 0 then
-                checkBackward(eachLink, field, flag | SEARCH_FLAG.backward)
-            --end
+            checkForward(eachLink,  field, flag | SEARCH_FLAG.forward)
+            checkBackward(eachLink, field, flag | SEARCH_FLAG.backward)
         end
-        local lastID = linker.getLastID(root, id)
-        if lastID then
-            local newField = id:sub(#lastID + 1)
-            if field then
-                newField = newField .. field
-            end
-            search(lastID, newField, flag)
-        end
-        --checkLastID(id, expect)
+        checkLastID(id, field, flag)
         stackCount = stackCount - 1
     end
 
-    seachSource(source)
+    searchSource(source)
+    searchFunction(source)
 end
 
 ---@class guide.status

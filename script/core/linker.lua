@@ -22,6 +22,27 @@ local function getKey(source)
     elseif source.type == 'getmethod'
     or     source.type == 'setmethod' then
         return ('%q'):format(source.method and source.method[1] or ''), source.node
+    elseif source.type == 'setindex'
+    or     source.type == 'getindex' then
+        local index = source.index
+        if not index then
+            return '', source.node
+        end
+        if index.type == 'string' then
+            return ('%q'):format(index[1] or ''), source.node
+        else
+            return '', source.node
+        end
+    elseif source.type == 'tableindex' then
+        local index = source.index
+        if not index then
+            return '', source.parent
+        end
+        if index.type == 'string' then
+            return ('%q'):format(index[1] or ''), source.parent
+        else
+            return '', source.parent
+        end
     elseif source.type == 'table' then
         return source.start, nil
     elseif source.type == 'label' then
@@ -31,6 +52,10 @@ local function getKey(source)
             return source.node.start, nil
         end
         return nil, nil
+    elseif source.type == 'function' then
+        return source.start, nil
+    elseif source.type == 'select' then
+        return ('%d:%d'):format(source.start, source.index)
     end
     return nil, nil
 end
@@ -40,19 +65,13 @@ local function checkMode(source)
     or source.type == 'getglobal' then
         return 'g'
     end
-    if source.type == 'local'
-    or source.type == 'setlocal'
-    or source.type == 'getlocal' then
-        return 'l'
-    end
-    if source.type == 'label'
-    or source.type == 'goto' then
-        return 'l'
-    end
     if source.type == 'table' then
-        return 'l'
+        return 't'
     end
-    return nil
+    if source.type == 'select' then
+        return 's'
+    end
+    return 'l'
 end
 
 local function checkFunctionReturn(source)
@@ -248,6 +267,15 @@ function m.getLink(source)
         source._link = createLink(source)
     end
     return source._link
+end
+
+---获取source的ID
+function m.getID(source)
+    local link = m.getLink(source)
+    if not link then
+        return nil
+    end
+    return link.id
 end
 
 ---编译整个文件的link

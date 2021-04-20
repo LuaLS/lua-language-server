@@ -4,11 +4,6 @@ local guide  = require 'parser.guide'
 local osClock = os.clock
 local pairs   = pairs
 
-local SEARCH_FLAG = {
-    ['forward']  = 1 << 0,
-    ['backward'] = 1 << 1,
-}
-
 local m = {}
 
 -- TODO: compatible
@@ -112,28 +107,28 @@ function m.searchRefs(status, source, mode)
 
     local search
 
-    local function checkLastID(id, field, flag)
+    local function checkLastID(id, field)
         local lastID = linker.getLastID(root, id)
         if lastID then
             local newField = id:sub(#lastID + 1)
             if field then
                 newField = newField .. field
             end
-            search(lastID, newField, flag)
+            search(lastID, newField)
         end
     end
 
-    local function searchSource(obj, field, flag)
+    local function searchSource(obj, field)
         local link = linker.getLink(obj)
         if not link then
             return
         end
         local id = link.id
-        checkLastID(id, field, flag)
+        checkLastID(id, field)
         if field then
             id = id .. field
         end
-        search(id, nil, flag)
+        search(id)
     end
 
     local function getReturnSetByFunc(func, index)
@@ -184,27 +179,27 @@ function m.searchRefs(status, source, mode)
         end
     end
 
-    local function checkForward(link, field, flag)
+    local function checkForward(link, field)
         if not link.forward then
             return
         end
         for _, forwardSources in ipairs(link.forward) do
-            searchSource(forwardSources, field, flag)
+            searchSource(forwardSources, field)
         end
     end
 
-    local function checkBackward(link, field, flag)
+    local function checkBackward(link, field)
         if not link.backward then
             return
         end
         for _, backSources in ipairs(link.backward) do
-            searchSource(backSources, field, flag)
+            searchSource(backSources, field)
         end
     end
 
     local stackCount = 0
     local mark = {}
-    search = function (id, field, flag)
+    search = function (id, field)
         if mark[id] then
             return
         end
@@ -217,13 +212,12 @@ function m.searchRefs(status, source, mode)
         if stackCount >= 10 then
             error('stack overflow')
         end
-        flag = flag or 0
         for _, eachLink in ipairs(links) do
             if field == nil then
                 m.pushResult(status, mode, eachLink.source)
             end
-            checkForward(eachLink,  field, flag | SEARCH_FLAG.forward)
-            checkBackward(eachLink, field, flag | SEARCH_FLAG.backward)
+            checkForward(eachLink,  field)
+            checkBackward(eachLink, field)
         end
         stackCount = stackCount - 1
     end

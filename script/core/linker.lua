@@ -95,6 +95,9 @@ local function checkMode(source)
     if source.type == 'select' then
         return 's'
     end
+    if source.type == 'function' then
+        return 'f'
+    end
     if source.type == 'doc.class.name' then
         return 'dc'
     end

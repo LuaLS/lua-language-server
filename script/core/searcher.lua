@@ -128,7 +128,12 @@ function m.searchRefsByID(status, uri, expect, mode)
         return nil
     end
 
-    local function searchFunction(obj)
+    local function searchFunction(id)
+        local funcs = linker.getLinksByID(root, id)
+        if not funcs then
+            return
+        end
+        local obj = funcs[1].source
         if obj.type ~= 'function' then
             return
         end
@@ -157,34 +162,20 @@ function m.searchRefsByID(status, uri, expect, mode)
     end
 
     local function checkForward(link, field)
-        if link.forward then
-            for _, forwardSources in ipairs(link.forward) do
-                searchSource(forwardSources, field)
-            end
+        if not link.forward then
+            return
         end
-        if link.fforward then
-            for _, func in ipairs(link.fforward) do
-                local forwards = func()
-                for _, forwardSources in ipairs(forwards) do
-                    searchSource(forwardSources, field)
-                end
-            end
+        for _, forwardSources in ipairs(link.forward) do
+            searchSource(forwardSources, field)
         end
     end
 
     local function checkBackward(link, field)
-        if link.backward then
-            for _, backSources in ipairs(link.backward) do
-                searchSource(backSources, field)
-            end
+        if not link.backward then
+            return
         end
-        if link.fbackward then
-            for _, func in ipairs(link.fbackward) do
-                local backwards = func()
-                for _, backSources in ipairs(backwards) do
-                    searchSource(backSources, field)
-                end
-            end
+        for _, backSources in ipairs(link.backward) do
+            searchSource(backSources, field)
         end
     end
 
@@ -214,7 +205,8 @@ function m.searchRefsByID(status, uri, expect, mode)
     end
 
     search(expect)
-
+    checkLastID(expect)
+    searchFunction(expect)
 end
 
 ---搜索对象的引用

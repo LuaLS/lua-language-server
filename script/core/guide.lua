@@ -1,8 +1,6 @@
 local linker = require 'core.linker'
 local guide  = require 'parser.guide'
-
-local osClock = os.clock
-local pairs   = pairs
+local files  = require 'files'
 
 local m = {}
 
@@ -89,21 +87,13 @@ function m.isGlobal(source)
     return false
 end
 
----搜索对象的引用
----@param status guide.status
----@param source parser.guide.object
----@param mode   guide.searchmode
-function m.searchRefs(status, source, mode)
-    if source.type == 'field'
-    or source.type == 'method' then
-        source = source.parent
-    end
-    local root = guide.getRoot(source)
-    linker.compileLinks(root)
-
-    if not linker.getLink(source) then
+function m.searchRefsByID(status, uri, expect, mode)
+    local ast = files.getAst(uri)
+    if not ast then
         return
     end
+    local root = ast.ast
+    linker.compileLinks(root)
 
     local search
 
@@ -180,20 +170,34 @@ function m.searchRefs(status, source, mode)
     end
 
     local function checkForward(link, field)
-        if not link.forward then
-            return
+        if link.forward then
+            for _, forwardSources in ipairs(link.forward) do
+                searchSource(forwardSources, field)
+            end
         end
-        for _, forwardSources in ipairs(link.forward) do
-            searchSource(forwardSources, field)
+        if link.fforward then
+            for _, func in ipairs(link.fforward) do
+                local forwards = func()
+                for _, forwardSources in ipairs(forwards) do
+                    searchSource(forwardSources, field)
+                end
+            end
         end
     end
 
     local function checkBackward(link, field)
-        if not link.backward then
-            return
+        if link.backward then
+            for _, backSources in ipairs(link.backward) do
+                searchSource(backSources, field)
+            end
         end
-        for _, backSources in ipairs(link.backward) do
-            searchSource(backSources, field)
+        if link.fbackward then
+            for _, func in ipairs(link.fbackward) do
+                local backwards = func()
+                for _, backSources in ipairs(backwards) do
+                    searchSource(backSources, field)
+                end
+            end
         end
     end
 
@@ -222,8 +226,24 @@ function m.searchRefs(status, source, mode)
         stackCount = stackCount - 1
     end
 
-    searchSource(source)
-    searchFunction(source)
+end
+
+---搜索对象的引用
+---@param status guide.status
+---@param source parser.guide.object
+---@param mode   guide.searchmode
+function m.searchRefs(status, source, mode)
+    if source.type == 'field'
+    or source.type == 'method' then
+        source = source.parent
+    end
+    local uri = guide.getUri(source)
+    local id  = linker.getID(source)
+    if not id then
+        return
+    end
+
+    m.searchRefsByID(status, uri, id, mode)
 end
 
 ---@class guide.status
@@ -239,21 +259,10 @@ function m.status(parentStatus, interface, deep)
     local status = {
         share     = parentStatus and parentStatus.share       or {
             count = 0,
-            cacheLock = {},
         },
-        depth     = parentStatus and (parentStatus.depth + 1) or 0,
-        searchDeep= parentStatus and parentStatus.searchDeep  or deep or -999,
         interface = parentStatus and parentStatus.interface   or {},
-        deep      = parentStatus and parentStatus.deep,
-        clock     = parentStatus and parentStatus.clock       or osClock(),
         results   = {},
     }
-    if interface then
-        for k, v in pairs(interface) do
-            status.interface[k] = v
-        end
-    end
-    status.deep = status.depth <= status.searchDeep
     return status
 end
 

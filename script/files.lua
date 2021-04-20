@@ -9,7 +9,7 @@ local await    = require 'await'
 local timer    = require 'timer'
 local plugin   = require 'plugin'
 local util     = require 'utility'
-local guide    = require 'core.guide'
+local guide    = require 'parser.guide'
 local smerger  = require 'string-merger'
 local progress = require "progress"
 

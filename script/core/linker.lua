@@ -1,5 +1,6 @@
 local util  = require 'utility'
 local guide = require 'parser.guide'
+local vm    = require 'vm.vm'
 
 ---是否是全局变量（包括 _G.XXX 形式）
 ---@param source parser.guide.object
@@ -79,6 +80,10 @@ local function getKey(source)
         return source.start, nil
     elseif source.type == 'select' then
         return ('%d:%d'):format(source.start, source.index)
+    elseif source.type == 'doc.class.name'
+    or     source.type == 'doc.type.name'
+    or     source.type == 'doc.alias.name' then
+        return source[1], nil
     end
     return nil, nil
 end
@@ -89,6 +94,15 @@ local function checkMode(source)
     end
     if source.type == 'select' then
         return 's'
+    end
+    if source.type == 'doc.class.name' then
+        return 'dc'
+    end
+    if source.type == 'doc.type.name' then
+        return 'dt'
+    end
+    if source.type == 'doc.alias.name' then
+        return 'da'
     end
     if isGlobal(source) then
         return 'g'
@@ -112,21 +126,38 @@ local function checkFunctionReturn(source)
     return nil
 end
 
-local TempList = {}
+local TempList1 = {}
+local TempList2 = {}
 
 ---前进
 ---@param source parser.guide.object
 ---@return parser.guide.object[]
 local function checkForward(source)
-    local list = TempList
+    local list1 = TempList1
+    local list2 = TempList2
     local parent = source.parent
     if source.value then
         -- x = y : x -> y
-        list[#list+1] = source.value
+        list1[#list1+1] = source.value
     elseif source.type == 'table' then
         -- x = {y = 1} : x -> x.y
         for _, keyvalue in ipairs(source) do
-            list[#list+1] = keyvalue
+            list1[#list1+1] = keyvalue
+        end
+    elseif source.type == 'doc.type.name'
+    or     source.type == 'doc.class.name'
+    or     source.type == 'doc.alias.name' then
+        list2[#list2+1] = function ()
+            return vm.getDocNames(source[1], 'class')
+        end
+        list2[#list2+1] = function ()
+            return vm.getDocNames(source[1], 'type')
+        end
+        list2[#list2+1] = function ()
+            return vm.getDocNames(source[1], 'alias')
+        end
+        list2[#list2+1] = function ()
+            return vm.getDocNames(source[1], 'extends')
         end
     end
     -- mt:f -> self
@@ -136,41 +167,52 @@ local function checkForward(source)
         if func then
             local self = func.locals[1]
             if self.tag == 'self' then
-                list[#list+1] = self
+                list1[#list1+1] = self
             end
         end
     end
-    if #list == 0 then
-        return nil
+    if #list1 == 0 then
+        list1 = nil
     else
-        TempList = {}
-        return list
+        TempList1 = {}
     end
+    if #list2 == 0 then
+        list2 = nil
+    else
+        TempList2 = {}
+    end
+    return list1, list2
 end
 
 ---后退
 ---@param source parser.guide.object
 ---@return parser.guide.object[]
 local function checkBackward(source)
-    local list   = TempList
+    local list1  = TempList1
+    local list2 = TempList2
     local parent = source.parent
     if parent.value == source then
-        list[#list+1] = parent
+        list1[#list1+1] = parent
     end
     -- self -> mt:xx
     if source.tag == 'self' then
         local func = guide.getParentFunction(source)
         local setmethod = func.parent
         if setmethod and setmethod.type == 'setmethod' then
-            list[#list+1] = setmethod.node
+            list1[#list1+1] = setmethod.node
         end
     end
-    if #list == 0 then
-        return nil
+    if #list1 == 0 then
+        list1 = nil
     else
-        TempList = {}
-        return list
+        TempList1 = {}
     end
+    if #list2 == 0 then
+        list2 = nil
+    else
+        TempList2 = {}
+    end
+    return list1, list2
 end
 
 local IDList = {}
@@ -233,6 +275,10 @@ end
 ---@field forward parser.guide.object[]
 -- 后退的关联单元
 ---@field backward parser.guide.object[]
+-- 前进的关联函数，调用此函数获取单元
+---@field fforward function[]
+-- 后退的关联函数，调用此函数获取单元
+---@field fbackward function[]
 -- 缓存的关联links
 ---@field _links link[]
 
@@ -244,13 +290,17 @@ local function createLink(source)
     if not id then
         return nil
     end
+    local forward,  fforward  = checkForward(source)
+    local backward, fbackward = checkBackward(source)
     return {
-        id       = id,
-        source   = source,
-        lastID   = lastID,
-        freturn  = checkFunctionReturn(node),
-        forward  = checkForward(source),
-        backward = checkBackward(source),
+        id        = id,
+        source    = source,
+        lastID    = lastID,
+        freturn   = checkFunctionReturn(node),
+        forward   = forward,
+        fforward  = fforward,
+        backward  = backward,
+        fbackward = fbackward,
     }
 end
 

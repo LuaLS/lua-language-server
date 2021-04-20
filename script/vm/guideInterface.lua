@@ -87,9 +87,9 @@ function vm.interface.global(name, onlyDef)
     end
 end
 
-function vm.interface.docType(name)
+function vm.interface.doc(name, type)
     await.delay()
-    return vm.getDocTypes(name)
+    return vm.getDocNames(name, type)
 end
 
 function vm.interface.link(uri)

@@ -1,39 +1,52 @@
 local files   = require 'files'
 local util    = require 'utility'
-local guide   = require 'core.guide'
+local guide   = require 'parser.guide'
 ---@type vm
 local vm      = require 'vm.vm'
 local config  = require 'config'
 
-local function getTypesOfFile(uri)
-    local types = {}
+local typeMap = {
+    ['doc.type.name']    = 'type',
+    ['doc.class.name']   = 'class',
+    ['doc.extends.name'] = 'extends',
+    ['doc.alias.name']   = 'alias',
+}
+
+local function getNamesOfFile(uri)
+    local names = {
+        type    = {},
+        class   = {},
+        extends = {},
+        alias   = {},
+    }
     local ast = files.getAst(uri)
     if not ast or not ast.ast.docs then
-        return types
+        return names
     end
     guide.eachSource(ast.ast.docs, function (src)
-        if src.type == 'doc.type.name'
-        or src.type == 'doc.class.name'
-        or src.type == 'doc.extends.name'
-        or src.type == 'doc.alias.name' then
-            if src.type == 'doc.type.name' then
-                if guide.getParentDocTypeTable(src) then
-                    return
-                end
-            end
-            local name = src[1]
-            if name then
-                if not types[name] then
-                    types[name] = {}
-                end
-                types[name][#types[name]+1] = src
-            end
+        local type = typeMap[src.type]
+        if not type then
+            return
         end
+        --if src.type == 'doc.type.name' then
+        --    if guide.getParentDocTypeTable(src) then
+        --        return
+        --    end
+        --end
+        local name = src[1]
+        if not name then
+            return
+        end
+        local list = names[type]
+        if not list[name] then
+            list[name] = {}
+        end
+        list[name][#list[name]+1] = src
     end)
-    return types
+    return names
 end
 
-local function getDocTypes(name)
+local function getDocNames(name, type)
     local results = {}
     if name == 'any'
     or name == 'nil' then
@@ -41,16 +54,16 @@ local function getDocTypes(name)
     end
     for uri in files.eachFile() do
         local cache = files.getCache(uri)
-        cache.classes = cache.classes or getTypesOfFile(uri)
+        cache = cache or getNamesOfFile(uri)
         if name == '*' then
-            for _, sources in util.sortPairs(cache.classes) do
+            for _, sources in util.sortPairs(cache[type]) do
                 for _, source in ipairs(sources) do
                     results[#results+1] = source
                 end
             end
         else
-            if cache.classes[name] then
-                for _, source in ipairs(cache.classes[name]) do
+            if cache[type][name] then
+                for _, source in ipairs(cache[type][name]) do
                     results[#results+1] = source
                 end
             end
@@ -119,29 +132,14 @@ function vm.getDocTypeUnits(doc, mark, results)
     return results
 end
 
-function vm.getDocTypes(name)
-    local cache = vm.getCache('getDocTypes')[name]
+function vm.getDocNames(name, type)
+    local cacheName = 'docNames:' .. type
+    local cache = vm.getCache(cacheName)[name]
     if cache ~= nil then
         return cache
     end
-    cache = getDocTypes(name)
-    vm.getCache('getDocTypes')[name] = cache
-    return cache
-end
-
-function vm.getDocClass(name)
-    local cache = vm.getCache('getDocClass')[name]
-    if cache ~= nil then
-        return cache
-    end
-    cache = {}
-    local results = getDocTypes(name)
-    for _, doc in ipairs(results) do
-        if doc.type == 'doc.class.name' then
-            cache[#cache+1] = doc
-        end
-    end
-    vm.getCache('getDocClass')[name] = cache
+    cache = getDocNames(name, type)
+    vm.getCache(cacheName)[name] = cache
     return cache
 end
 

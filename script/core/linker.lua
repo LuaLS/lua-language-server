@@ -98,14 +98,11 @@ local function checkMode(source)
     if source.type == 'function' then
         return 'f'
     end
-    if source.type == 'doc.class.name' then
-        return 'dc'
-    end
-    if source.type == 'doc.type.name' then
-        return 'dt'
-    end
-    if source.type == 'doc.alias.name' then
-        return 'da'
+    if source.type == 'doc.class.name'
+    or source.type == 'doc.type.name'
+    or source.type == 'doc.alias.name'
+    or source.type == 'doc.extends.name' then
+        return 'd'
     end
     if isGlobal(source) then
         return 'g'
@@ -140,11 +137,6 @@ local function checkForward(source)
     if source.value then
         -- x = y : x -> y
         list[#list+1] = source.value
-    elseif source.type == 'table' then
-        -- x = {y = 1} : x -> x.y
-        for _, keyvalue in ipairs(source) do
-            list[#list+1] = keyvalue
-        end
     end
     -- mt:f -> self
     if  parent.type == 'setmethod'
@@ -154,6 +146,21 @@ local function checkForward(source)
             local self = func.locals[1]
             if self.tag == 'self' then
                 list[#list+1] = self
+            end
+        end
+    end
+    -- source 绑定的 @class/@type
+    local bindDocs = source.bindDocs
+    if bindDocs then
+        for _, doc in ipairs(bindDocs) do
+            if doc.type == 'doc.class' then
+                list[#list+1] = doc.class
+            elseif doc.type == 'doc.type' then
+                if doc.types then
+                    for _, typeUnit in ipairs(doc.types) do
+                        list[#list+1] = typeUnit
+                    end
+                end
             end
         end
     end
@@ -180,6 +187,24 @@ local function checkBackward(source)
         local setmethod = func.parent
         if setmethod and setmethod.type == 'setmethod' then
             list[#list+1] = setmethod.node
+        end
+    end
+    if parent.parent and parent.parent.type == 'doc' then
+        -- @class 绑定的 source
+        if source.type == 'doc.class.name' then
+            if parent.type == 'doc.class' then
+                for _, src in ipairs(parent.bindSources) do
+                    list[#list+1] = src
+                end
+            end
+        end
+        -- @type 绑定的 source
+        if source.type == 'doc.type.name' then
+            if parent.type == 'doc.type' and parent.parent.type == 'doc' then
+                for _, src in ipairs(parent.bindSources) do
+                    list[#list+1] = src
+                end
+            end
         end
     end
     if #list == 0 then
@@ -335,6 +360,9 @@ end
 
 ---获取source的ID
 function m.getID(source)
+    if not source then
+        return nil
+    end
     local link = m.getLink(source)
     if not link then
         return nil

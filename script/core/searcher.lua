@@ -22,7 +22,9 @@ function m.pushResult(status, mode, ref)
         or ref.type == 'setindex'
         or ref.type == 'tableindex'
         or ref.type == 'tablefield'
-        or ref.type == 'function' then
+        or ref.type == 'function'
+        or ref.type == 'doc.class.name'
+        or ref.type == 'doc.alias.name' then
             results[#results+1] = ref
         end
     elseif mode == 'ref' then
@@ -41,7 +43,11 @@ function m.pushResult(status, mode, ref)
         or ref.type == 'getindex'
         or ref.type == 'tableindex'
         or ref.type == 'tablefield'
-        or ref.type == 'function' then
+        or ref.type == 'function'
+        or ref.type == 'doc.class.name'
+        or ref.type == 'doc.type.name'
+        or ref.type == 'doc.alias.name'
+        or ref.type == 'doc.extends.name' then
             results[#results+1] = ref
         end
     elseif mode == 'field' then
@@ -101,11 +107,11 @@ function m.searchRefsByID(status, uri, expect, mode)
             return
         end
         local id = link.id
-        checkLastID(id, field)
+        search(id, field)
         if field then
             id = id .. field
+            search(id)
         end
-        search(id)
     end
 
     local function getReturnSetByFunc(func, index)
@@ -152,12 +158,8 @@ function m.searchRefsByID(status, uri, expect, mode)
         m.searchRefs(newStatus, func, 'ref')
         for _, ref in ipairs(newStatus.results) do
             local set = getReturnSetByFunc(ref, link.freturn)
-            if set then
-                local id = linker.getID(set)
-                if id then
-                    search(id)
-                end
-            end
+            local setID = linker.getID(set)
+            search(setID)
         end
     end
 
@@ -182,6 +184,9 @@ function m.searchRefsByID(status, uri, expect, mode)
     local stackCount = 0
     local mark = {}
     search = function (id, field)
+        if not id then
+            return
+        end
         if mark[id] then
             return
         end
@@ -201,11 +206,11 @@ function m.searchRefsByID(status, uri, expect, mode)
             checkForward(eachLink,  field)
             checkBackward(eachLink, field)
         end
+        checkLastID(id, field)
         stackCount = stackCount - 1
     end
 
     search(expect)
-    checkLastID(expect)
     searchFunction(expect)
 end
 

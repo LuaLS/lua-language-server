@@ -19,6 +19,10 @@ m.eachSourceContain = guide.eachSourceContain
 m.eachSourceBetween = guide.eachSourceBetween
 m.getStartFinish    = guide.getStartFinish
 m.isLiteral         = guide.isLiteral
+m.positionOf        = guide.positionOf
+m.offsetOf          = guide.offsetOf
+m.lineRange         = guide.lineRange
+m.lineData          = guide.lineData
 
 ---@alias guide.searchmode '"ref"'|'"def"'|'"field"'
 

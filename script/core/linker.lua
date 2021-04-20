@@ -1,6 +1,29 @@
 local util  = require 'utility'
 local guide = require 'parser.guide'
 
+---是否是全局变量（包括 _G.XXX 形式）
+---@param source parser.guide.object
+---@return boolean
+local function isGlobal(source)
+    if source.type == 'setglobal'
+    or source.type == 'getglobal' then
+        if source.node and source.node.tag == '_ENV' then
+            return true
+        end
+    end
+    if source.type == 'field' then
+        source = source.parent
+    end
+    if source.type == 'getfield'
+    or source.type == 'setfield' then
+        local node = source.node
+        if node and node.special == '_G' then
+            return true
+        end
+    end
+    return false
+end
+
 ---获取语法树单元的key
 ---@param source parser.guide.object
 ---@return string? key
@@ -61,15 +84,14 @@ local function getKey(source)
 end
 
 local function checkMode(source)
-    if source.type == 'setglobal'
-    or source.type == 'getglobal' then
-        return 'g'
-    end
     if source.type == 'table' then
         return 't'
     end
     if source.type == 'select' then
         return 's'
+    end
+    if isGlobal(source) then
+        return 'g'
     end
     return 'l'
 end
@@ -97,11 +119,25 @@ local TempList = {}
 ---@return parser.guide.object[]
 local function checkForward(source)
     local list = TempList
+    local parent = source.parent
     if source.value then
+        -- x = y : x -> y
         list[#list+1] = source.value
     elseif source.type == 'table' then
+        -- x = {y = 1} : x -> x.y
         for _, keyvalue in ipairs(source) do
             list[#list+1] = keyvalue
+        end
+    end
+    -- mt:f -> self
+    if  parent.type == 'setmethod'
+    and parent.node == source then
+        local func = parent.value
+        if func then
+            local self = func.locals[1]
+            if self.tag == 'self' then
+                list[#list+1] = self
+            end
         end
     end
     if #list == 0 then
@@ -120,6 +156,14 @@ local function checkBackward(source)
     local parent = source.parent
     if parent.value == source then
         list[#list+1] = parent
+    end
+    -- self -> mt:xx
+    if source.tag == 'self' then
+        local func = guide.getParentFunction(source)
+        local setmethod = func.parent
+        if setmethod and setmethod.type == 'setmethod' then
+            list[#list+1] = setmethod.node
+        end
     end
     if #list == 0 then
         return nil
@@ -150,6 +194,9 @@ local function getID(source)
         IDList[index] = id
         source = current
         if not node then
+            break
+        end
+        if node.special == '_G' then
             break
         end
         current = node

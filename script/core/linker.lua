@@ -3,10 +3,9 @@ local guide = require 'parser.guide'
 local vm    = require 'vm.vm'
 
 local Linkers
-
-local function pushLastID(id, lastID)
-    Linkers.lastIDMap[id] = lastID
-end
+local LastIDCache = {}
+local SPLIT_CHAR = '\x1F'
+local SPLIT_REGEX = SPLIT_CHAR .. '.-$'
 
 ---是否是全局变量（包括 _G.XXX 形式）
 ---@param source parser.guide.object
@@ -85,7 +84,7 @@ local function getKey(source)
     elseif source.type == 'function' then
         return source.start, nil
     elseif source.type == 'select' then
-        return ('%d:%d'):format(source.start, source.index)
+        return ('%d%s%d'):format(source.start, SPLIT_CHAR, source.index)
     elseif source.type == 'doc.class.name'
     or     source.type == 'doc.type.name'
     or     source.type == 'doc.alias.name' then
@@ -100,33 +99,33 @@ end
 
 local function checkMode(source)
     if source.type == 'table' then
-        return 't'
+        return 't:'
     end
     if source.type == 'select' then
-        return 's'
+        return 's:'
     end
     if source.type == 'function' then
-        return 'f'
+        return 'f:'
     end
     if source.type == 'doc.class.name'
     or source.type == 'doc.type.name'
     or source.type == 'doc.alias.name'
     or source.type == 'doc.extends.name' then
-        return 'dn'
+        return 'dn:'
     end
     if source.type == 'doc.class' then
-        return 'dc'
+        return 'dc:'
     end
     if source.type == 'doc.type' then
-        return 'dt'
+        return 'dt:'
     end
     if source.type == 'doc.alias' then
-        return 'da'
+        return 'da:'
     end
     if isGlobal(source) then
-        return 'g'
+        return 'g:'
     end
-    return 'l'
+    return 'l:'
 end
 
 local IDList = {}
@@ -170,21 +169,12 @@ local function getID(source)
         IDList[i] = nil
     end
     local mode = checkMode(current)
-    if mode then
-        IDList[#IDList+1] = mode
+    if not mode then
+        source._id = false
+        return nil
     end
     util.revertTable(IDList)
-    local id = table.concat(IDList, '|')
-    if index > 1 then
-        local lastID = table.concat(IDList, '|', 1, index)
-        pushLastID(id, lastID)
-    end
-    do
-        local lastID = id:gsub(':%d+$', '')
-        if id ~= lastID then
-            pushLastID(id, lastID)
-        end
-    end
+    local id = mode .. table.concat(IDList, SPLIT_CHAR)
     source._id = id
     return id
 end
@@ -275,7 +265,8 @@ local function checkBackward(source, id)
         if source.returnIndex then
             for _, src in ipairs(parent.bindSources) do
                 if src.type == 'function' then
-                    list[#list+1] = ('%s:%s'):format(getID(src), source.returnIndex)
+                    local fullID = ('%s%s%s'):format(getID(src), SPLIT_CHAR, source.returnIndex)
+                    list[#list+1] = fullID
                 end
             end
         end
@@ -284,7 +275,7 @@ local function checkBackward(source, id)
     if parent.type == 'call' and parent.node == source then
         local sel = parent.parent
         if sel.type == 'select' then
-            list[#list+1] = ('s|%d'):format(sel.start)
+            list[#list+1] = ('s:%d'):format(sel.start)
         end
     end
     if #list == 0 then
@@ -323,15 +314,16 @@ end
 
 ---@param link link
 local function insertLinker(link)
-    local idMap     = Linkers.idMap
-    local id        = link.id
-    if not idMap[id] then
-        idMap[id] = {}
+    local id = link.id
+    if not Linkers[id] then
+        Linkers[id] = {}
     end
-    idMap[id][#idMap[id]+1] = link
+    Linkers[id][#Linkers[id]+1] = link
 end
 
 local m = {}
+
+m.SPLIT_CHAR = SPLIT_CHAR
 
 ---根据ID来获取所有的link
 ---@param root parser.guide.object
@@ -343,20 +335,23 @@ function m.getLinksByID(root, id)
     if not linkers then
         return nil
     end
-    return linkers.idMap[id]
+    return linkers[id]
 end
 
 ---根据ID来获取上个节点的ID
----@param root parser.guide.object
 ---@param id string
 ---@return string
-function m.getLastID(root, id)
-    root = guide.getRoot(root)
-    local linkers = root._linkers
-    if not linkers then
+function m.getLastID(id)
+    if LastIDCache[id] then
+        return LastIDCache[id] or nil
+    end
+    local lastID, count = id:gsub(SPLIT_REGEX, '')
+    if count == 0 then
+        LastIDCache[id] = false
         return nil
     end
-    return linkers.lastIDMap[id]
+    LastIDCache[id] = lastID
+    return lastID
 end
 
 ---获取source的链接信息
@@ -402,10 +397,7 @@ function m.compileLinks(source)
     if root._linkers then
         return root._linkers
     end
-    Linkers = {
-        idMap     = {},
-        lastIDMap = {},
-    }
+    Linkers = {}
     root._linkers = Linkers
     guide.eachSource(root, function (src)
         local link = m.getLink(src)

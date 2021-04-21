@@ -107,7 +107,7 @@ function m.searchRefsByID(status, uri, expect, mode)
     local search
 
     local function checkLastID(id, field)
-        local lastID = linker.getLastID(root, id)
+        local lastID = linker.getLastID(id)
         if lastID then
             local newField = id:sub(#lastID + 1)
             if field then
@@ -166,7 +166,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         if not parentID then
             return
         end
-        search(parentID, ':' .. returnIndex)
+        search(parentID, linker.SPLIT_CHAR .. returnIndex)
     end
 
     local function checkForward(link, field)

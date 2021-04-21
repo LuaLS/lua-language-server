@@ -39,6 +39,9 @@ local function TEST(script)
         assert(source)
         linker.compileLinks(source)
         local result = linker.getLink(source)
+
+        expect['id'] = expect['id']:gsub('|', '\x1F')
+
         for key in pairs(CARE) do
             assert(result[key] == expect[key])
         end
@@ -49,59 +52,59 @@ CARE['id'] = true
 TEST [[
 local <?x?>
 ]] {
-    id   = 'l|9',
+    id   = 'l:9',
 }
 
 TEST [[
 local x
 print(<?x?>)
 ]] {
-    id   = 'l|7',
+    id   = 'l:7',
 }
 
 TEST [[
 local x
 <?x?> = 1
 ]] {
-    id   = 'l|7',
+    id   = 'l:7',
 }
 
 TEST [[
 print(<?X?>)
 ]] {
-    id   = 'g|"X"',
+    id   = 'g:"X"',
 }
 
 TEST [[
 print(<?X?>)
 ]] {
-    id   = 'g|"X"',
+    id   = 'g:"X"',
 }
 
 TEST [[
 local x
 print(x.y.<?z?>)
 ]] {
-    id   = 'l|7|"y"|"z"',
+    id   = 'l:7|"y"|"z"',
 }
 
 TEST [[
 local x
 function x:<?f?>() end
 ]] {
-    id   = 'l|7|"f"',
+    id   = 'l:7|"f"',
 }
 
 TEST [[
 print(X.Y.<?Z?>)
 ]] {
-    id   = 'g|"X"|"Y"|"Z"',
+    id   = 'g:"X"|"Y"|"Z"',
 }
 
 TEST [[
 function x:<?f?>() end
 ]] {
-    id   = 'g|"x"|"f"',
+    id   = 'g:"x"|"f"',
 }
 
 TEST [[
@@ -109,13 +112,13 @@ TEST [[
     <?x?> = 1,
 }
 ]] {
-    id   = 't|1|"x"',
+    id   = 't:1|"x"',
 }
 
 TEST [[
 return <?X?>
 ]] {
-    id      = 'g|"X"',
+    id      = 'g:"X"',
 }
 
 TEST [[
@@ -123,7 +126,7 @@ function f()
     return <?X?>
 end
 ]] {
-    id      = 'g|"X"',
+    id      = 'g:"X"',
     freturn = 1,
 }
 
@@ -131,12 +134,12 @@ TEST [[
 ::<?label?>::
 goto label
 ]] {
-    id      = 'l|5',
+    id      = 'l:5',
 }
 
 TEST [[
 ::label::
 goto <?label?>
 ]] {
-    id      = 'l|3',
+    id      = 'l:3',
 }

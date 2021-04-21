@@ -112,12 +112,10 @@ TEST [[
     id   = 't|1|"x"',
 }
 
-CARE['freturn'] = true
 TEST [[
 return <?X?>
 ]] {
     id      = 'g|"X"',
-    freturn = 0,
 }
 
 TEST [[

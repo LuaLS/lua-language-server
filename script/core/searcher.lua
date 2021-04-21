@@ -2,6 +2,22 @@ local linker = require 'core.linker'
 local guide  = require 'parser.guide'
 local files  = require 'files'
 
+local function checkFunctionReturn(source)
+    if  source.parent
+    and source.parent.type == 'return' then
+        if source.parent.parent.type == 'main' then
+            return 0
+        elseif source.parent.parent.type == 'function' then
+            for i = 1, #source.parent do
+                if source.parent[i] == source then
+                    return i
+                end
+            end
+        end
+    end
+    return nil
+end
+
 local m = {}
 
 ---@alias guide.searchmode '"ref"'|'"def"'|'"field"'
@@ -101,12 +117,17 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
     end
 
-    local function searchSource(obj, field)
-        local link = linker.getLink(obj)
-        if not link then
-            return
+    local function searchSource(idOrObj, field)
+        local id
+        if type(idOrObj) == 'string' then
+            id = idOrObj
+        else
+            local link = linker.getLink(idOrObj)
+            if not link then
+                return
+            end
+            id = link.id
         end
-        local id = link.id
         search(id, field)
         if field then
             id = id .. field
@@ -143,24 +164,19 @@ function m.searchRefsByID(status, uri, expect, mode)
         if obj.type ~= 'function' then
             return
         end
-        local link = linker.getLink(obj)
-        if not link then
-            return
-        end
-        if not link.freturn then
+        local returnIndex = checkFunctionReturn(obj)
+        if not returnIndex then
             return
         end
         local func = guide.getParentFunction(obj)
         if not func or func.type ~= 'function' then
             return
         end
-        local newStatus = m.status(status)
-        m.searchRefs(newStatus, func, 'ref')
-        for _, ref in ipairs(newStatus.results) do
-            local set = getCallSelectByReturnIndex(ref, link.freturn)
-            local setID = linker.getID(set)
-            search(setID)
+        local parentID = linker.getID(func)
+        if not parentID then
+            return
         end
+        search(parentID, ':' .. returnIndex)
     end
 
     local function checkForward(link, field)
@@ -214,21 +230,20 @@ function m.searchRefsByID(status, uri, expect, mode)
             return
         end
         mark[id] = true
-        local links = linker.getLinksByID(root, id)
-        if not links then
-            return
-        end
         stackCount = stackCount + 1
-        if stackCount >= 100 then
-            error('stack overflow')
-        end
-        for _, eachLink in ipairs(links) do
-            if field == nil then
-                m.pushResult(status, mode, eachLink.source)
+        local links = linker.getLinksByID(root, id)
+        if links then
+            if stackCount >= 20 then
+                error('stack overflow')
             end
-            checkForward(eachLink,    field)
-            checkBackward(eachLink,   field)
-            checkSpecial(eachLink,    field)
+            for _, eachLink in ipairs(links) do
+                if field == nil then
+                    m.pushResult(status, mode, eachLink.source)
+                end
+                checkForward(eachLink,    field)
+                checkBackward(eachLink,   field)
+                --checkSpecial(eachLink,    field)
+            end
         end
         checkLastID(id, field)
         stackCount = stackCount - 1

@@ -125,28 +125,12 @@ local function checkMode(source)
     return 'l'
 end
 
-local function checkFunctionReturn(source)
-    if  source.parent
-    and source.parent.type == 'return' then
-        if source.parent.parent.type == 'main' then
-            return 0
-        elseif source.parent.parent.type == 'function' then
-            for i = 1, #source.parent do
-                if source.parent[i] == source then
-                    return i
-                end
-            end
-        end
-    end
-    return nil
-end
-
 local TempList = {}
 
 ---前进
 ---@param source parser.guide.object
 ---@return parser.guide.object[]
-local function checkForward(source)
+local function checkForward(source, id)
     local list = TempList
     local parent = source.parent
     if source.value then
@@ -196,7 +180,7 @@ end
 ---后退
 ---@param source parser.guide.object
 ---@return parser.guide.object[]
-local function checkBackward(source)
+local function checkBackward(source, id)
     local list  = TempList
     local parent = source.parent
     if parent.value == source then
@@ -222,6 +206,13 @@ local function checkBackward(source)
             for _, src in ipairs(source.bindSources) do
                 list[#list+1] = src
             end
+        end
+    end
+    -- 将函数返回值映射到call的返回值接收上
+    if parent.type == 'call' and parent.node == source then
+        local sel = parent.parent
+        if sel.type == 'select' then
+            list[#list+1] = ('s|%d'):format(sel.start)
         end
     end
     if #list == 0 then
@@ -276,10 +267,13 @@ local function getID(source)
         local lastID = table.concat(IDList, '|', 1, index)
         pushLastID(id, lastID)
     end
-    if mode == 's' then
-        pushLastID(id, id:gsub(':%d+$', ''))
+    do
+        local lastID = id:gsub(':%d+$', '')
+        if id ~= lastID then
+            pushLastID(id, lastID)
+        end
     end
-    return id, current
+    return id
 end
 
 ---@class link
@@ -287,8 +281,6 @@ end
 ---@field id     string
 -- 语法树单元
 ---@field source parser.guide.object
--- 返回值，文件返回值总是0，函数返回值为第几个返回值
----@field freturn integer
 -- 前进的关联单元
 ---@field forward parser.guide.object[]
 -- 后退的关联单元
@@ -300,16 +292,15 @@ end
 ---@param source parser.guide.object
 ---@return link
 local function createLink(source)
-    local id, node = getID(source)
+    local id = getID(source)
     if not id then
         return nil
     end
     return {
         id        = id,
         source    = source,
-        freturn   = checkFunctionReturn(node),
-        forward   = checkForward(source),
-        backward  = checkBackward(source),
+        forward   = checkForward(source,  id),
+        backward  = checkBackward(source, id),
     }
 end
 

@@ -200,7 +200,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
         if special.returns then
             local newStatus = m.status(status)
-            m.searchRefs(newStatus, special.call.node, 'def')
+            --m.searchRefs(newStatus, special.call.node, 'def')
         end
     end
 
@@ -219,7 +219,7 @@ function m.searchRefsByID(status, uri, expect, mode)
             return
         end
         stackCount = stackCount + 1
-        if stackCount >= 10 then
+        if stackCount >= 100 then
             error('stack overflow')
         end
         for _, eachLink in ipairs(links) do
@@ -247,8 +247,10 @@ function m.searchRefs(status, source, mode)
     or source.type == 'method' then
         source = source.parent
     end
-    local uri = guide.getUri(source)
-    local id  = linker.getID(source)
+    local root = guide.getRoot(source)
+    linker.compileLinks(root)
+    local uri  = guide.getUri(source)
+    local id   = linker.getID(source)
     if not id then
         return
     end

@@ -2,6 +2,12 @@ local util  = require 'utility'
 local guide = require 'parser.guide'
 local vm    = require 'vm.vm'
 
+local Linkers
+
+local function pushLastID(id, lastID)
+    Linkers.lastIDMap[id] = lastID
+end
+
 ---是否是全局变量（包括 _G.XXX 形式）
 ---@param source parser.guide.object
 ---@return boolean
@@ -84,6 +90,10 @@ local function getKey(source)
     or     source.type == 'doc.type.name'
     or     source.type == 'doc.alias.name' then
         return source[1], nil
+    elseif source.type == 'doc.class'
+    or     source.type == 'doc.type'
+    or     source.type == 'doc.alias' then
+        return source.start, nil
     end
     return nil, nil
 end
@@ -102,7 +112,12 @@ local function checkMode(source)
     or source.type == 'doc.type.name'
     or source.type == 'doc.alias.name'
     or source.type == 'doc.extends.name' then
-        return 'd'
+        return 'dn'
+    end
+    if source.type == 'doc.class'
+    or source.type == 'doc.type'
+    or source.type == 'doc.alias' then
+        return 'ds'
     end
     if isGlobal(source) then
         return 'g'
@@ -153,16 +168,22 @@ local function checkForward(source)
     local bindDocs = source.bindDocs
     if bindDocs then
         for _, doc in ipairs(bindDocs) do
-            if doc.type == 'doc.class' then
-                list[#list+1] = doc.class
-            elseif doc.type == 'doc.type' then
-                if doc.types then
-                    for _, typeUnit in ipairs(doc.types) do
-                        list[#list+1] = typeUnit
-                    end
-                end
+            if doc.type == 'doc.class'
+            or doc.type == 'doc.type' then
+                list[#list+1] = doc
             end
         end
+    end
+    -- 分解 @type
+    if source.type == 'doc.type' then
+        for _, typeUnit in ipairs(source.types) do
+            list[#list+1] = typeUnit
+        end
+    end
+    -- 分解 @class
+    if source.type == 'doc.class' then
+        list[#list+1] = source.class
+        list[#list+1] = source.extends
     end
     if #list == 0 then
         return nil
@@ -189,69 +210,21 @@ local function checkBackward(source)
             list[#list+1] = setmethod.node
         end
     end
-    if parent.parent and parent.parent.type == 'doc' then
-        -- @class 绑定的 source
-        if source.type == 'doc.class.name' then
-            if parent.type == 'doc.class' then
-                for _, src in ipairs(parent.bindSources) do
-                    list[#list+1] = src
-                end
-            end
-        end
-        -- @type 绑定的 source
-        if source.type == 'doc.type.name' then
-            if parent.type == 'doc.type' and parent.parent.type == 'doc' then
-                for _, src in ipairs(parent.bindSources) do
-                    list[#list+1] = src
-                end
+    -- name 映射回 class 与 type
+    if source.type == 'doc.class.name'
+    or source.type == 'doc.type.name' then
+        list[#list+1] = parent
+    end
+    -- class 与 type 绑定的 source
+    if source.type == 'doc.class'
+    or source.type == 'doc.type' then
+        if source.bindSources then
+            for _, src in ipairs(source.bindSources) do
+                list[#list+1] = src
             end
         end
     end
     if #list == 0 then
-        return nil
-    else
-        TempList = {}
-        return list
-    end
-end
-
-local function checkSpecial(source)
-    local list = TempList
-    -- 接收 call 的返回值
-    if source.type == 'select' then
-        local index = source.index
-        local call  = source.vararg
-        if call.type == 'call' then
-            list.call = {
-                node  = call.node,
-                index = index,
-            }
-        end
-    end
-    -- func 的返回值
-    if source.type == 'function' then
-        local returns = {}
-        list.returns = returns
-        if source.bindDocs then
-            local index = 0
-            for _, doc in ipairs(source.bindDocs) do
-                if doc.type == 'doc.return' then
-                    for _, rtn in ipairs(doc.returns) do
-                        index = index + 1
-                        if not returns[index] then
-                            returns[index] = {}
-                        end
-                        if rtn.types then
-                            for _, typeUnit in ipairs(rtn.types) do
-                                returns[index][#returns[index]+1] = typeUnit
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end
-    if not next(list) then
         return nil
     else
         TempList = {}
@@ -299,18 +272,19 @@ local function getID(source)
     end
     util.revertTable(IDList)
     local id = table.concat(IDList, '|')
-    local lastID
     if index > 1 then
-        lastID = table.concat(IDList, '|', 1, index)
+        local lastID = table.concat(IDList, '|', 1, index)
+        pushLastID(id, lastID)
     end
-    return id, current, lastID
+    if mode == 's' then
+        pushLastID(id, id:gsub(':%d+$', ''))
+    end
+    return id, current
 end
 
 ---@class link
 -- 当前节点的id
 ---@field id     string
--- 上个节点的id
----@field lastID string
 -- 语法树单元
 ---@field source parser.guide.object
 -- 返回值，文件返回值总是0，函数返回值为第几个返回值
@@ -326,32 +300,27 @@ end
 ---@param source parser.guide.object
 ---@return link
 local function createLink(source)
-    local id, node, lastID = getID(source)
+    local id, node = getID(source)
     if not id then
         return nil
     end
     return {
         id        = id,
         source    = source,
-        lastID    = lastID,
         freturn   = checkFunctionReturn(node),
         forward   = checkForward(source),
         backward  = checkBackward(source),
-        special   = checkSpecial(source),
     }
 end
 
 ---@param link link
-local function insertLinker(linkers, link)
-    local idMap     = linkers.idMap
+local function insertLinker(link)
+    local idMap     = Linkers.idMap
     local id        = link.id
     if not idMap[id] then
         idMap[id] = {}
     end
     idMap[id][#idMap[id]+1] = link
-    if link.lastID then
-        linkers.lastIDMap[id] = link.lastID
-    end
 end
 
 local m = {}
@@ -386,10 +355,10 @@ end
 ---@param source parser.guide.object
 ---@return link
 function m.getLink(source)
-    if not source._link then
-        source._link = createLink(source)
+    if source._link == nil then
+        source._link = createLink(source) or false
     end
-    return source._link
+    return source._link or nil
 end
 
 ---获取source的ID
@@ -432,19 +401,19 @@ function m.compileLinks(source)
     if root._linkers then
         return root._linkers
     end
-    local linkers = {
+    Linkers = {
         idMap     = {},
         lastIDMap = {},
     }
+    root._linkers = Linkers
     guide.eachSource(root, function (src)
         local link = m.getLink(src)
         if not link then
             return
         end
-        insertLinker(linkers, link)
+        insertLinker(link)
     end)
-    root._linkers = linkers
-    return linkers
+    return Linkers
 end
 
 return m

@@ -37,6 +37,7 @@ local function TEST(script)
         files.setText('', newScript)
         local source = getSource(pos)
         assert(source)
+        linker.compileLinks(source)
         local result = linker.getLink(source)
         for key in pairs(CARE) do
             assert(result[key] == expect[key])

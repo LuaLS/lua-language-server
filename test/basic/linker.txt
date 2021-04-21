@@ -72,3 +72,17 @@ expect:   't|2|b|c'
 forward:  nil
 backward: 't|2|b' + '|c'
 last:     nil
+
+```lua
+---@return <?A?>
+local function f()
+end
+
+local <!x!> = f()
+```
+
+'d|A'
+'f|1:1'
+'f|1' + ':1'
+'l|1' + ':1'
+'s|1' + ':1'

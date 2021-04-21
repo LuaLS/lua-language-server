@@ -166,7 +166,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         if not parentID then
             return
         end
-        search(parentID, linker.SPLIT_CHAR .. returnIndex)
+        search(parentID, linker.SPLIT_CHAR .. linker.INDEX_CHAR .. returnIndex)
     end
 
     local function checkForward(link, field)

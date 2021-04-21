@@ -6,6 +6,7 @@ local Linkers
 local LastIDCache = {}
 local SPLIT_CHAR = '\x1F'
 local SPLIT_REGEX = SPLIT_CHAR .. '.-$'
+local INDEX_CHAR = '\x1E'
 
 ---是否是全局变量（包括 _G.XXX 形式）
 ---@param source parser.guide.object
@@ -84,7 +85,7 @@ local function getKey(source)
     elseif source.type == 'function' then
         return source.start, nil
     elseif source.type == 'select' then
-        return ('%d%s%d'):format(source.start, SPLIT_CHAR, source.index)
+        return ('%d%s%s%d'):format(source.start, SPLIT_CHAR, INDEX_CHAR, source.index)
     elseif source.type == 'doc.class.name'
     or     source.type == 'doc.type.name'
     or     source.type == 'doc.alias.name' then
@@ -265,7 +266,7 @@ local function checkBackward(source, id)
         if source.returnIndex then
             for _, src in ipairs(parent.bindSources) do
                 if src.type == 'function' then
-                    local fullID = ('%s%s%s'):format(getID(src), SPLIT_CHAR, source.returnIndex)
+                    local fullID = ('%s%s%s%s'):format(getID(src), SPLIT_CHAR, INDEX_CHAR, source.returnIndex)
                     list[#list+1] = fullID
                 end
             end
@@ -324,6 +325,7 @@ end
 local m = {}
 
 m.SPLIT_CHAR = SPLIT_CHAR
+m.INDEX_CHAR = INDEX_CHAR
 
 ---根据ID来获取所有的link
 ---@param root parser.guide.object

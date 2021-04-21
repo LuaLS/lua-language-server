@@ -6,7 +6,8 @@ local Linkers
 local LastIDCache = {}
 local SPLIT_CHAR = '\x1F'
 local SPLIT_REGEX = SPLIT_CHAR .. '[^' .. SPLIT_CHAR .. ']+$'
-local INDEX_CHAR = '\x1E'
+local RETURN_INDEX_CHAR = '#'
+local PARAM_INDEX_CHAR = '@'
 
 ---是否是全局变量（包括 _G.XXX 形式）
 ---@param source parser.guide.object
@@ -85,14 +86,15 @@ local function getKey(source)
     elseif source.type == 'function' then
         return source.start, nil
     elseif source.type == 'select' then
-        return ('%d%s%s%d'):format(source.start, SPLIT_CHAR, INDEX_CHAR, source.index)
+        return ('%d%s%s%d'):format(source.start, SPLIT_CHAR, RETURN_INDEX_CHAR, source.index)
     elseif source.type == 'doc.class.name'
     or     source.type == 'doc.type.name'
     or     source.type == 'doc.alias.name' then
         return source[1], nil
     elseif source.type == 'doc.class'
     or     source.type == 'doc.type'
-    or     source.type == 'doc.alias' then
+    or     source.type == 'doc.alias'
+    or     source.type == 'doc.param' then
         return source.start, nil
     end
     return nil, nil
@@ -119,6 +121,9 @@ local function checkMode(source)
     end
     if source.type == 'doc.type' then
         return 'dt:'
+    end
+    if source.type == 'doc.param' then
+        return 'dp:'
     end
     if source.type == 'doc.alias' then
         return 'da:'
@@ -185,7 +190,10 @@ local TempList = {}
 ---前进
 ---@param source parser.guide.object
 ---@return parser.guide.object[]
-local function checkForward(source, id)
+local function checkForward(source)
+    if not source then
+        return
+    end
     local list = TempList
     local parent = source.parent
     if source.value then
@@ -235,7 +243,10 @@ end
 ---后退
 ---@param source parser.guide.object
 ---@return parser.guide.object[]
-local function checkBackward(source, id)
+local function checkBackward(source)
+    if not source then
+        return
+    end
     local list  = TempList
     local parent = source.parent
     if parent.value == source then
@@ -266,7 +277,7 @@ local function checkBackward(source, id)
         if source.returnIndex then
             for _, src in ipairs(parent.bindSources) do
                 if src.type == 'function' then
-                    local fullID = ('%s%s%s%s'):format(getID(src), SPLIT_CHAR, INDEX_CHAR, source.returnIndex)
+                    local fullID = ('%s%s%s%s'):format(getID(src), SPLIT_CHAR, RETURN_INDEX_CHAR, source.returnIndex)
                     list[#list+1] = fullID
                 end
             end
@@ -278,6 +289,29 @@ local function checkBackward(source, id)
         if sel.type == 'select' then
             list[#list+1] = ('s:%d'):format(sel.start)
         end
+    end
+    -- 将调用参数映射到函数调用上
+    if parent.type == 'callargs' then
+        for i = 1, #parent do
+            if parent[i] == source then
+                local call = parent.parent
+                local node = call.node
+                local nodeID = getID(node)
+                if not nodeID then
+                    break
+                end
+                list[#list+1] = ('%s%s%s%s'):format(
+                    nodeID,
+                    SPLIT_CHAR,
+                    PARAM_INDEX_CHAR,
+                    i
+                )
+                break
+            end
+        end
+    end
+    if source.type == 'doc.param' then
+        print(source)
     end
     if #list == 0 then
         return nil
@@ -298,18 +332,15 @@ end
 ---@field backward parser.guide.object[]
 
 ---创建source的链接信息
----@param source parser.guide.object
+---@param id string
+---@param source? parser.guide.object
 ---@return link
-local function createLink(source)
-    local id = getID(source)
-    if not id then
-        return nil
-    end
+local function createLink(id, source)
     return {
         id        = id,
         source    = source,
-        forward   = checkForward(source,  id),
-        backward  = checkBackward(source, id),
+        forward   = checkForward(source),
+        backward  = checkBackward(source),
     }
 end
 
@@ -325,7 +356,8 @@ end
 local m = {}
 
 m.SPLIT_CHAR = SPLIT_CHAR
-m.INDEX_CHAR = INDEX_CHAR
+m.RETURN_INDEX_CHAR = RETURN_INDEX_CHAR
+m.PARAM_INDEX_CHAR = PARAM_INDEX_CHAR
 
 ---根据ID来获取所有的link
 ---@param root parser.guide.object
@@ -360,8 +392,12 @@ end
 ---@param source parser.guide.object
 ---@return link
 function m.getLink(source)
+    local id = getID(source)
+    if not id then
+        return nil
+    end
     if source._link == nil then
-        source._link = createLink(source) or false
+        source._link = createLink(id, source) or false
     end
     return source._link or nil
 end

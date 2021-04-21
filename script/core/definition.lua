@@ -3,6 +3,7 @@ local workspace  = require 'workspace'
 local files      = require 'files'
 local vm         = require 'vm'
 local findSource = require 'core.find-source'
+local guide      = require 'parser.guide'
 
 local function sortResults(results)
     -- 先按照顺序排序
@@ -143,7 +144,7 @@ return function (uri, offset)
         if values[src] then
             goto CONTINUE
         end
-        local root = searcher.getRoot(src)
+        local root = guide.getRoot(src)
         if not root then
             goto CONTINUE
         end

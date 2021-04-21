@@ -82,7 +82,23 @@ local <!x!> = f()
 ```
 
 'd|A'
-'f|1:1'
-'f|1' + ':1'
-'l|1' + ':1'
-'s|1' + ':1'
+'f|1|#1'
+'f|1' + '|#1'
+'l|1' + '|#1'
+'s|1' + '|#1'
+
+```lua
+---@generic T
+---@param a T
+---@return T
+local function f(a) end
+
+local <?c?>
+
+local <!v!> = f(c)
+```
+
+'l1'
+'l2|@1'
+'f|1|@1'
+'f|1|#1'

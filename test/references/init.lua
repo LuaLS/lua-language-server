@@ -359,6 +359,21 @@ local a, b = f()
 return a.x, b.<!x!>
 ]]
 
+-- TODO 支持泛型
+do return end
+TEST [[
+---@class Dog
+local <?Dog?> = {}
+
+---@generic T
+---@param type1 T
+---@return T
+function foobar(type1)
+end
+
+local <!v1!> = foobar(<!Dog!>)
+]]
+
 TEST [[
 ---@class Dog
 local Dog = {}

@@ -96,6 +96,43 @@ function m.isGlobal(source)
     return false
 end
 
+---@param obj parser.guide.object
+---@return parser.guide.object?
+function m.getObjectValue(obj)
+    while obj.type == 'paren' do
+        obj = obj.exp
+        if not obj then
+            return nil
+        end
+    end
+    if obj.type == 'boolean'
+    or obj.type == 'number'
+    or obj.type == 'integer'
+    or obj.type == 'string'
+    or obj.type == 'doc.type.table'
+    or obj.type == 'doc.type.arrary' then
+        return obj
+    end
+    if obj.value then
+        return obj.value
+    end
+    if obj.type == 'field'
+    or obj.type == 'method' then
+        return obj.parent and obj.parent.value
+    end
+    if obj.type == 'call' then
+        if obj.node.special == 'rawset' then
+            return obj.args and obj.args[3]
+        else
+            return obj
+        end
+    end
+    if obj.type == 'select' then
+        return obj
+    end
+    return nil
+end
+
 function m.searchRefsByID(status, uri, expect, mode)
     local ast = files.getAst(uri)
     if not ast then
@@ -124,26 +161,6 @@ function m.searchRefsByID(status, uri, expect, mode)
         search(id)
     end
 
-    local function getCallSelectByReturnIndex(func, index)
-        local call = func.parent
-        if call.type ~= 'call' then
-            return nil
-        end
-        if index == 0 then
-            return nil
-        end
-        if index == 1 then
-            return call.parent
-        else
-            for _, sel in ipairs(call.extParent) do
-                if sel.index == index then
-                    return sel
-                end
-            end
-        end
-        return nil
-    end
-
     local function searchFunction(id)
         local funcs = linker.getLinksByID(root, id)
         if not funcs then
@@ -165,7 +182,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         if not parentID then
             return
         end
-        search(parentID, linker.SPLIT_CHAR .. linker.INDEX_CHAR .. returnIndex)
+        search(parentID, linker.SPLIT_CHAR .. linker.RETURN_INDEX_CHAR .. returnIndex)
     end
 
     local function checkForward(link, field)
@@ -265,6 +282,20 @@ function m.requestReference(obj, interface, deep)
     local status = m.status(nil, interface, deep)
     -- 根据 field 搜索引用
     m.searchRefs(status, obj, 'ref')
+
+    return status.results, 0
+end
+
+--- 请求对象的定义
+---@param obj       parser.guide.object
+---@param interface table
+---@param deep      integer
+---@return parser.guide.object[]
+---@return integer
+function m.requestDefinition(obj, interface, deep)
+    local status = m.status(nil, interface, deep)
+    -- 根据 field 搜索引用
+    m.searchRefs(status, obj, 'def')
 
     return status.results, 0
 end

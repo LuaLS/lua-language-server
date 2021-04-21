@@ -114,10 +114,14 @@ local function checkMode(source)
     or source.type == 'doc.extends.name' then
         return 'dn'
     end
-    if source.type == 'doc.class'
-    or source.type == 'doc.type'
-    or source.type == 'doc.alias' then
-        return 'ds'
+    if source.type == 'doc.class' then
+        return 'dc'
+    end
+    if source.type == 'doc.type' then
+        return 'dt'
+    end
+    if source.type == 'doc.alias' then
+        return 'da'
     end
     if isGlobal(source) then
         return 'g'
@@ -125,113 +129,21 @@ local function checkMode(source)
     return 'l'
 end
 
-local TempList = {}
-
----前进
----@param source parser.guide.object
----@return parser.guide.object[]
-local function checkForward(source, id)
-    local list = TempList
-    local parent = source.parent
-    if source.value then
-        -- x = y : x -> y
-        list[#list+1] = source.value
-    end
-    -- mt:f -> self
-    if  parent.type == 'setmethod'
-    and parent.node == source then
-        local func = parent.value
-        if func then
-            local self = func.locals[1]
-            if self.tag == 'self' then
-                list[#list+1] = self
-            end
-        end
-    end
-    -- source 绑定的 @class/@type
-    local bindDocs = source.bindDocs
-    if bindDocs then
-        for _, doc in ipairs(bindDocs) do
-            if doc.type == 'doc.class'
-            or doc.type == 'doc.type' then
-                list[#list+1] = doc
-            end
-        end
-    end
-    -- 分解 @type
-    if source.type == 'doc.type' then
-        for _, typeUnit in ipairs(source.types) do
-            list[#list+1] = typeUnit
-        end
-    end
-    -- 分解 @class
-    if source.type == 'doc.class' then
-        list[#list+1] = source.class
-        list[#list+1] = source.extends
-    end
-    if #list == 0 then
-        return nil
-    else
-        TempList = {}
-        return list
-    end
-end
-
----后退
----@param source parser.guide.object
----@return parser.guide.object[]
-local function checkBackward(source, id)
-    local list  = TempList
-    local parent = source.parent
-    if parent.value == source then
-        list[#list+1] = parent
-    end
-    -- self -> mt:xx
-    if source.tag == 'self' then
-        local func = guide.getParentFunction(source)
-        local setmethod = func.parent
-        if setmethod and setmethod.type == 'setmethod' then
-            list[#list+1] = setmethod.node
-        end
-    end
-    -- name 映射回 class 与 type
-    if source.type == 'doc.class.name'
-    or source.type == 'doc.type.name' then
-        list[#list+1] = parent
-    end
-    -- class 与 type 绑定的 source
-    if source.type == 'doc.class'
-    or source.type == 'doc.type' then
-        if source.bindSources then
-            for _, src in ipairs(source.bindSources) do
-                list[#list+1] = src
-            end
-        end
-    end
-    -- 将函数返回值映射到call的返回值接收上
-    if parent.type == 'call' and parent.node == source then
-        local sel = parent.parent
-        if sel.type == 'select' then
-            list[#list+1] = ('s|%d'):format(sel.start)
-        end
-    end
-    if #list == 0 then
-        return nil
-    else
-        TempList = {}
-        return list
-    end
-end
-
 local IDList = {}
 ---获取语法树单元的字符串ID
 ---@param source parser.guide.object
 ---@return string? id
----@return parser.guide.object?
 local function getID(source)
+    if not source then
+        return nil
+    end
+    if source._id ~= nil then
+        return source._id or nil
+    end
     if source.type == 'field'
     or source.type == 'method' then
-        return nil, nil
+        source._id = false
+        return nil
     end
     local current = source
     local index = 0
@@ -242,7 +154,6 @@ local function getID(source)
         end
         index = index + 1
         IDList[index] = id
-        source = current
         if not node then
             break
         end
@@ -252,6 +163,7 @@ local function getID(source)
         current = node
     end
     if index == 0 then
+        source._id = false
         return nil
     end
     for i = index + 1, #IDList do
@@ -273,7 +185,114 @@ local function getID(source)
             pushLastID(id, lastID)
         end
     end
+    source._id = id
     return id
+end
+
+local TempList = {}
+
+---前进
+---@param source parser.guide.object
+---@return parser.guide.object[]
+local function checkForward(source, id)
+    local list = TempList
+    local parent = source.parent
+    if source.value then
+        -- x = y : x -> y
+        list[#list+1] = getID(source.value)
+    end
+    -- mt:f -> self
+    if  parent.type == 'setmethod'
+    and parent.node == source then
+        local func = parent.value
+        if func then
+            local self = func.locals[1]
+            if self.tag == 'self' then
+                list[#list+1] = getID(self)
+            end
+        end
+    end
+    -- source 绑定的 @class/@type
+    local bindDocs = source.bindDocs
+    if bindDocs then
+        for _, doc in ipairs(bindDocs) do
+            if doc.type == 'doc.class'
+            or doc.type == 'doc.type' then
+                list[#list+1] = getID(doc)
+            end
+        end
+    end
+    -- 分解 @type
+    if source.type == 'doc.type' then
+        for _, typeUnit in ipairs(source.types) do
+            list[#list+1] = getID(typeUnit)
+        end
+    end
+    -- 分解 @class
+    if source.type == 'doc.class' then
+        list[#list+1] = getID(source.class)
+        list[#list+1] = getID(source.extends)
+    end
+    if #list == 0 then
+        return nil
+    else
+        TempList = {}
+        return list
+    end
+end
+
+---后退
+---@param source parser.guide.object
+---@return parser.guide.object[]
+local function checkBackward(source, id)
+    local list  = TempList
+    local parent = source.parent
+    if parent.value == source then
+        list[#list+1] = getID(parent)
+    end
+    -- self -> mt:xx
+    if source.tag == 'self' then
+        local func = guide.getParentFunction(source)
+        local setmethod = func.parent
+        if setmethod and setmethod.type == 'setmethod' then
+            list[#list+1] = getID(setmethod.node)
+        end
+    end
+    -- name 映射回 class 与 type
+    if source.type == 'doc.class.name'
+    or source.type == 'doc.type.name' then
+        list[#list+1] = getID(parent)
+    end
+    -- class 与 type 绑定的 source
+    if source.type == 'doc.class'
+    or source.type == 'doc.type' then
+        if source.bindSources then
+            for _, src in ipairs(source.bindSources) do
+                list[#list+1] = getID(src)
+            end
+        end
+        -- 将 @return 映射到函数返回值上
+        if source.returnIndex then
+            for _, src in ipairs(parent.bindSources) do
+                if src.type == 'function' then
+                    list[#list+1] = ('%s:%s'):format(getID(src), source.returnIndex)
+                end
+            end
+        end
+    end
+    -- 将函数返回值映射到call的返回值接收上
+    if parent.type == 'call' and parent.node == source then
+        local sel = parent.parent
+        if sel.type == 'select' then
+            list[#list+1] = ('s|%d'):format(sel.start)
+        end
+    end
+    if #list == 0 then
+        return nil
+    else
+        TempList = {}
+        return list
+    end
 end
 
 ---@class link
@@ -285,8 +304,6 @@ end
 ---@field forward parser.guide.object[]
 -- 后退的关联单元
 ---@field backward parser.guide.object[]
--- 缓存的特殊数据
----@field special table
 
 ---创建source的链接信息
 ---@param source parser.guide.object
@@ -356,14 +373,7 @@ end
 ---@param source parser.guide.object
 ---@return string
 function m.getID(source)
-    if not source then
-        return nil
-    end
-    local link = m.getLink(source)
-    if not link then
-        return nil
-    end
-    return link.id
+    return getID(source)
 end
 
 ---获取source的special

@@ -117,17 +117,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
     end
 
-    local function searchSource(idOrObj, field)
-        local id
-        if type(idOrObj) == 'string' then
-            id = idOrObj
-        else
-            local link = linker.getLink(idOrObj)
-            if not link then
-                return
-            end
-            id = link.id
-        end
+    local function searchID(id, field)
         search(id, field)
         if field then
             id = id .. field
@@ -183,8 +173,8 @@ function m.searchRefsByID(status, uri, expect, mode)
         if not link.forward then
             return
         end
-        for _, forwardSources in ipairs(link.forward) do
-            searchSource(forwardSources, field)
+        for _, id in ipairs(link.forward) do
+            searchID(id, field)
         end
     end
 
@@ -192,31 +182,8 @@ function m.searchRefsByID(status, uri, expect, mode)
         if not link.backward then
             return
         end
-        for _, backSources in ipairs(link.backward) do
-            searchSource(backSources, field)
-        end
-    end
-
-    local function checkSpecial(link, field)
-        local special = link.special
-        if not special then
-            return
-        end
-        if special.call then
-            local newStatus = m.status(status)
-            m.searchRefs(newStatus, special.call.node, 'def')
-            for _, res in ipairs(newStatus.results) do
-                local returns = linker.getSpecial(res, 'returns')
-                if returns and returns[special.index] then
-                    for _, rtn in ipairs(returns[special.index]) do
-                        searchSource(rtn, field)
-                    end
-                end
-            end
-        end
-        if special.returns then
-            local newStatus = m.status(status)
-            --m.searchRefs(newStatus, special.call.node, 'def')
+        for _, id in ipairs(link.backward) do
+            searchID(id, field)
         end
     end
 
@@ -242,7 +209,6 @@ function m.searchRefsByID(status, uri, expect, mode)
                 end
                 checkForward(eachLink,    field)
                 checkBackward(eachLink,   field)
-                --checkSpecial(eachLink,    field)
             end
         end
         checkLastID(id, field)

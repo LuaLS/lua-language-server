@@ -1144,21 +1144,21 @@ local function bindParamAndReturnIndex(binded)
     if not func then
         return
     end
-    if not func.args then
-        return
-    end
-    local paramIndex = 0
-    local paramMap = {}
-    for _, param in ipairs(func.args) do
-        paramIndex = paramIndex + 1
-        if param[1] then
-            paramMap[param[1]] = paramIndex
+    local paramMap
+    if func.args then
+        local paramIndex = 0
+        paramMap = {}
+        for _, param in ipairs(func.args) do
+            paramIndex = paramIndex + 1
+            if param[1] then
+                paramMap[param[1]] = paramIndex
+            end
         end
     end
     local returnIndex = 0
     for _, doc in ipairs(binded) do
         if doc.type == 'doc.param' then
-            if doc.extends then
+            if paramMap and doc.extends then
                 doc.extends.paramIndex = paramMap[doc.param[1]]
             end
         elseif doc.type == 'doc.return' then

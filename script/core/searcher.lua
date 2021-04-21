@@ -118,11 +118,10 @@ function m.searchRefsByID(status, uri, expect, mode)
     end
 
     local function searchID(id, field)
-        search(id, field)
         if field then
             id = id .. field
-            search(id)
         end
+        search(id)
     end
 
     local function getCallSelectByReturnIndex(func, index)
@@ -200,7 +199,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         stackCount = stackCount + 1
         local links = linker.getLinksByID(root, id)
         if links then
-            if stackCount >= 20 then
+            if stackCount >= 100 then
                 error('stack overflow')
             end
             for _, eachLink in ipairs(links) do

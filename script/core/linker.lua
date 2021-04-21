@@ -5,7 +5,7 @@ local vm    = require 'vm.vm'
 local Linkers
 local LastIDCache = {}
 local SPLIT_CHAR = '\x1F'
-local SPLIT_REGEX = SPLIT_CHAR .. '.-$'
+local SPLIT_REGEX = SPLIT_CHAR .. '[^' .. SPLIT_CHAR .. ']+$'
 local INDEX_CHAR = '\x1E'
 
 ---是否是全局变量（包括 _G.XXX 形式）

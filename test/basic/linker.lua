@@ -38,7 +38,9 @@ local function TEST(script)
         local source = getSource(pos)
         assert(source)
         linker.compileLinks(source)
-        local result = linker.getLink(source)
+        local result = {
+            id = linker.getID(source),
+        }
 
         expect['id'] = expect['id']:gsub('|', '\x1F')
 
@@ -127,7 +129,6 @@ function f()
 end
 ]] {
     id      = 'g:"X"',
-    freturn = 1,
 }
 
 TEST [[

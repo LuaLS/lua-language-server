@@ -33,6 +33,7 @@ function m.pushResult(status, mode, ref)
         return
     end
     local results = status.results
+    local parent = ref.parent
     if mode == 'def' then
         if ref.type == 'local'
         or ref.type == 'setlocal'
@@ -47,6 +48,11 @@ function m.pushResult(status, mode, ref)
         or ref.type == 'doc.class.name'
         or ref.type == 'doc.alias.name' then
             results[#results+1] = ref
+        end
+        if parent.type == 'return' then
+            if linker.getID(ref) ~= status.id then
+                results[#results+1] = ref
+            end
         end
     elseif mode == 'ref' then
         if ref.type == 'local'
@@ -146,6 +152,8 @@ function m.searchRefsByID(status, uri, expect, mode)
     local root = ast.ast
     linker.compileLinks(root)
 
+    status.id = expect
+
     local mark = status.mark
     local queueIDs    = {}
     local queueFields = {}
@@ -180,12 +188,12 @@ function m.searchRefsByID(status, uri, expect, mode)
     end
 
     local function searchFunction(id)
-        local funcs = linker.getLinksByID(root, id)
-        if not funcs then
+        local link = linker.getLinkByID(root, id)
+        if not link or not link.sources then
             return
         end
-        local obj = funcs[1].source
-        if obj.type ~= 'function' then
+        local obj = link.sources[1]
+        if not obj or obj.type ~= 'function' then
             return
         end
         local returnIndex = checkFunctionReturn(obj)
@@ -203,27 +211,6 @@ function m.searchRefsByID(status, uri, expect, mode)
         search(parentID, linker.SPLIT_CHAR .. linker.RETURN_INDEX_CHAR .. returnIndex)
     end
 
-    local function checkForward(link, field)
-        if not link.forward then
-            return
-        end
-        for _, id in ipairs(link.forward) do
-            searchID(id, field)
-        end
-    end
-
-    local function checkBackward(link, field)
-        if not link.backward then
-            return
-        end
-        if mode == 'def' and not field then
-            return
-        end
-        for _, id in ipairs(link.backward) do
-            searchID(id, field)
-        end
-    end
-
     search(expect)
     searchFunction(expect)
 
@@ -235,14 +222,22 @@ function m.searchRefsByID(status, uri, expect, mode)
         local field = queueFields[index]
         index = index - 1
 
-        local links = linker.getLinksByID(root, id)
-        if links then
-            for _, eachLink in ipairs(links) do
-                if field == nil then
-                    m.pushResult(status, mode, eachLink.source)
+        local link = linker.getLinkByID(root, id)
+        if link then
+            if field == nil and link.sources then
+                for _, source in ipairs(link.sources) do
+                    m.pushResult(status, mode, source)
                 end
-                checkForward(eachLink,    field)
-                checkBackward(eachLink,   field)
+            end
+            if link.forward then
+                for _, forwardID in ipairs(link.forward) do
+                    searchID(forwardID, field)
+                end
+            end
+            if link.backward and (mode == 'ref' or field) then
+                for _, backwardID in ipairs(link.backward) do
+                    searchID(backwardID, field)
+                end
             end
         end
         checkLastID(id, field)

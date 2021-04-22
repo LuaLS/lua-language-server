@@ -211,6 +211,14 @@ local function checkForward(source)
             end
         end
     end
+    -- self -> mt:xx
+    if source.tag == 'self' then
+        local func = guide.getParentFunction(source)
+        local setmethod = func.parent
+        if setmethod and setmethod.type == 'setmethod' then
+            list[#list+1] = getID(setmethod.node)
+        end
+    end
     -- source 绑定的 @class/@type
     local bindDocs = source.bindDocs
     if bindDocs then
@@ -232,6 +240,20 @@ local function checkForward(source)
         list[#list+1] = getID(source.class)
         list[#list+1] = getID(source.extends)
     end
+    -- 将call的返回值接收映射到函数返回值上
+    if source.type == 'select' then
+        local call = source.vararg
+        if call.type == 'call' then
+            local node = call.node
+            local callID = ('%s%s%s%s'):format(
+                getID(node),
+                SPLIT_CHAR,
+                RETURN_INDEX_CHAR,
+                source.index
+            )
+            list[#list+1] = callID
+        end
+    end
     if #list == 0 then
         return nil
     else
@@ -251,14 +273,6 @@ local function checkBackward(source)
     local parent = source.parent
     if parent.value == source then
         list[#list+1] = getID(parent)
-    end
-    -- self -> mt:xx
-    if source.tag == 'self' then
-        local func = guide.getParentFunction(source)
-        local setmethod = func.parent
-        if setmethod and setmethod.type == 'setmethod' then
-            list[#list+1] = getID(setmethod.node)
-        end
     end
     -- name 映射回 class 与 type
     if source.type == 'doc.class.name'

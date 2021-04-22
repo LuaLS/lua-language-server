@@ -2,6 +2,8 @@ local linker = require 'core.linker'
 local guide  = require 'parser.guide'
 local files  = require 'files'
 
+local UNI_CHAR = '~'
+
 local function checkFunctionReturn(source)
     if  source.parent
     and source.parent.type == 'return' then
@@ -141,7 +143,20 @@ function m.searchRefsByID(status, uri, expect, mode)
     local root = ast.ast
     linker.compileLinks(root)
 
-    local search
+    local mark = status.mark
+    local queueIDs    = {}
+    local queueFields = {}
+    local index       = 0
+
+    local function search(id, field)
+        if mark[id] then
+            return
+        end
+        mark[id] = true
+        index = index + 1
+        queueIDs[index]    = id
+        queueFields[index] = field
+    end
 
     local function checkLastID(id, field)
         local lastID = linker.getLastID(id)
@@ -198,27 +213,27 @@ function m.searchRefsByID(status, uri, expect, mode)
         if not link.backward then
             return
         end
+        if mode == 'def' and not field then
+            return
+        end
         for _, id in ipairs(link.backward) do
             searchID(id, field)
         end
     end
 
-    local stackCount = 0
-    local mark = status.mark
-    search = function (id, field)
-        if not id then
+    search(expect)
+    searchFunction(expect)
+
+    for _ = 1, 1000 do
+        if index <= 0 then
             return
         end
-        if mark[id] then
-            return
-        end
-        mark[id] = true
-        stackCount = stackCount + 1
+        local id    = queueIDs[index]
+        local field = queueFields[index]
+        index = index - 1
+
         local links = linker.getLinksByID(root, id)
         if links then
-            if stackCount >= 100 then
-                error('stack overflow')
-            end
             for _, eachLink in ipairs(links) do
                 if field == nil then
                     m.pushResult(status, mode, eachLink.source)
@@ -228,11 +243,8 @@ function m.searchRefsByID(status, uri, expect, mode)
             end
         end
         checkLastID(id, field)
-        stackCount = stackCount - 1
     end
-
-    search(expect)
-    searchFunction(expect)
+    error('too large')
 end
 
 ---搜索对象的引用

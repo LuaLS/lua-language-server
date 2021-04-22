@@ -2,7 +2,7 @@ local util  = require 'utility'
 local guide = require 'parser.guide'
 local vm    = require 'vm.vm'
 
-local Linkers
+local Linkers, CreateLink
 local LastIDCache = {}
 local SPLIT_CHAR = '\x1F'
 local SPLIT_REGEX = SPLIT_CHAR .. '[^' .. SPLIT_CHAR .. ']+$'
@@ -254,6 +254,33 @@ local function checkForward(source)
             list[#list+1] = callID
         end
     end
+    -- 将函数的返回值映射到具体的返回值上
+    if source.type == 'function' then
+        if source.returns then
+            local returns = {}
+            for _, rtn in ipairs(source.returns) do
+                for index, rtnObj in ipairs(rtn) do
+                    if not returns[index] then
+                        returns[index] = {}
+                    end
+                    returns[index][#returns[index]+1] = rtnObj
+                end
+            end
+            for index, rtnObjs in ipairs(returns) do
+                local id = ('%s%s%s%s'):format(
+                    getID(source),
+                    SPLIT_CHAR,
+                    RETURN_INDEX_CHAR,
+                    index
+                )
+                local link = CreateLink(id)
+                link.forward = {}
+                for _, rtnObj in ipairs(rtnObjs) do
+                    link.forward[#link.forward+1] = getID(rtnObj)
+                end
+            end
+        end
+    end
     if #list == 0 then
         return nil
     else
@@ -335,6 +362,15 @@ local function checkBackward(source)
     end
 end
 
+---@param link link
+local function insertLinker(link)
+    local id = link.id
+    if not Linkers[id] then
+        Linkers[id] = {}
+    end
+    Linkers[id][#Linkers[id]+1] = link
+end
+
 ---@class link
 -- 当前节点的id
 ---@field id     string
@@ -349,22 +385,15 @@ end
 ---@param id string
 ---@param source? parser.guide.object
 ---@return link
-local function createLink(id, source)
-    return {
+function CreateLink(id, source)
+    local link = {
         id        = id,
         source    = source,
         forward   = checkForward(source),
         backward  = checkBackward(source),
     }
-end
-
----@param link link
-local function insertLinker(link)
-    local id = link.id
-    if not Linkers[id] then
-        Linkers[id] = {}
-    end
-    Linkers[id][#Linkers[id]+1] = link
+    insertLinker(link)
+    return link
 end
 
 local m = {}
@@ -411,7 +440,7 @@ function m.getLink(source)
         return nil
     end
     if source._link == nil then
-        source._link = createLink(id, source) or false
+        source._link = CreateLink(id, source) or false
     end
     return source._link or nil
 end
@@ -452,11 +481,7 @@ function m.compileLinks(source)
     Linkers = {}
     root._linkers = Linkers
     guide.eachSource(root, function (src)
-        local link = m.getLink(src)
-        if not link then
-            return
-        end
-        insertLinker(link)
+        m.getLink(src)
     end)
     return Linkers
 end

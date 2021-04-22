@@ -29,6 +29,9 @@ local m = {}
 ---@param mode   guide.searchmode
 ---@param ref    parser.guide.object
 function m.pushResult(status, mode, ref)
+    if not ref then
+        return
+    end
     local results = status.results
     if mode == 'def' then
         if ref.type == 'local'

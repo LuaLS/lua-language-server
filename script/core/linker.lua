@@ -247,7 +247,7 @@ end
 ---前进
 ---@param source parser.guide.object
 ---@return parser.guide.object[]
-local function checkForward(source)
+local function compileLink(source)
     local id   = getID(source)
     local parent = source.parent
     if not parent then
@@ -256,17 +256,7 @@ local function checkForward(source)
     if source.value then
         -- x = y : x -> y
         pushForward(id, getID(source.value))
-    end
-    -- mt:f -> self
-    if  parent.type == 'setmethod'
-    and parent.node == source then
-        local func = parent.value
-        if func then
-            local self = func.locals[1]
-            if self.tag == 'self' then
-                pushForward(id, getID(self))
-            end
-        end
+        pushBackward(getID(source.value), id)
     end
     -- self -> mt:xx
     if source.tag == 'self' then
@@ -274,6 +264,7 @@ local function checkForward(source)
         local setmethod = func.parent
         if setmethod and setmethod.type == 'setmethod' then
             pushForward(id, getID(setmethod.node))
+            pushBackward(getID(setmethod.node), id)
         end
     end
     -- source 绑定的 @class/@type
@@ -283,6 +274,7 @@ local function checkForward(source)
             if doc.type == 'doc.class'
             or doc.type == 'doc.type' then
                 pushForward(id, getID(doc))
+                pushBackward(getID(doc), id)
             end
         end
     end
@@ -290,12 +282,32 @@ local function checkForward(source)
     if source.type == 'doc.type' then
         for _, typeUnit in ipairs(source.types) do
             pushForward(id, getID(typeUnit))
+            pushBackward(getID(typeUnit), id)
+        end
+    end
+    -- 分解 @return
+    if source.type == 'doc.return' then
+        for _, src in ipairs(source.bindSources) do
+            if src.type == 'function' then
+                for _, rtn in ipairs(source.returns) do
+                    local fullID = ('%s%s%s%s'):format(
+                        getID(src),
+                        SPLIT_CHAR,
+                        RETURN_INDEX_CHAR,
+                        rtn.returnIndex
+                    )
+                    pushForward(getID(rtn), fullID)
+                    pushBackward(fullID, getID(rtn))
+                end
+            end
         end
     end
     -- 分解 @class
     if source.type == 'doc.class' then
         pushForward(id, getID(source.class))
         pushForward(id, getID(source.extends))
+        pushBackward(getID(source.class), id)
+        pushBackward(getID(source.extends), id)
     end
     -- 将call的返回值接收映射到函数返回值上
     if source.type == 'select' then
@@ -309,17 +321,21 @@ local function checkForward(source)
                 source.index
             )
             pushForward(id, callID)
+            pushBackward(callID, id)
             -- 将setmetatable映射到 param1 以及 param2.__index 上
             if node.special == 'setmetatable' and source.index == 1 then
                 local tblID  = getID(call.args and call.args[1])
                 local metaID = getID(call.args and call.args[2])
                 pushForward(id, tblID)
+                pushBackward(tblID, id)
                 if metaID then
-                    pushForward(id, ('%s%s%q'):format(
+                    local indexID = ('%s%s%q'):format(
                         metaID,
                         SPLIT_CHAR,
                         '__index'
-                    ))
+                    )
+                    pushForward(id, indexID)
+                    pushBackward(indexID, id)
                 end
             end
         end
@@ -345,81 +361,12 @@ local function checkForward(source)
                 )
                 for _, rtnObj in ipairs(rtnObjs) do
                     pushForward(returnID, getID(rtnObj))
-                end
-            end
-        end
-    end
-end
-
----后退
----@param source parser.guide.object
----@return parser.guide.object[]
-local function checkBackward(source)
-    local id = getID(source)
-    local parent = source.parent
-    if not parent then
-        return
-    end
-    if parent.value == source then
-        pushBackward(id, getID(parent))
-    end
-    -- name 映射回 class 与 type
-    if source.type == 'doc.class.name'
-    or source.type == 'doc.type.name' then
-        pushBackward(id, getID(parent))
-    end
-    -- class 与 type 绑定的 source
-    if source.type == 'doc.class'
-    or source.type == 'doc.type' then
-        if source.bindSources then
-            for _, src in ipairs(source.bindSources) do
-                pushBackward(id, getID(src))
-            end
-        end
-        -- 将 @return 映射到函数返回值上
-        if source.returnIndex then
-            for _, src in ipairs(parent.bindSources) do
-                if src.type == 'function' then
-                    local fullID = ('%s%s%s%s'):format(getID(src), SPLIT_CHAR, RETURN_INDEX_CHAR, source.returnIndex)
-                    pushBackward(id, fullID)
-                end
-            end
-        end
-    end
-    -- 将函数返回值映射到call的返回值接收上
-    if source.type == 'call' then
-        local sel = source.parent
-        if sel.type == 'select' then
-            local nodeID = getID(source.node)
-            if nodeID then
-                local returnID = ('%s%s%s%s'):format(
-                    nodeID,
-                    SPLIT_CHAR,
-                    RETURN_INDEX_CHAR,
-                    sel.index
-                )
-                pushBackward(returnID, getID(sel))
-            end
-        end
-        if source.extParent then
-            local nodeID = getID(source.node)
-            if nodeID then
-                for _, extParent in ipairs(source.extParent) do
-                    if extParent.type == 'select' then
-                        local returnID = ('%s%s%s%s'):format(
-                            nodeID,
-                            SPLIT_CHAR,
-                            RETURN_INDEX_CHAR,
-                            extParent.index
-                        )
-                        pushBackward(returnID, getID(extParent))
+                    if rtnObj.type == 'function' then
+                        pushBackward(getID(rtnObj), returnID)
                     end
                 end
             end
         end
-    end
-    if source.type == 'doc.param' then
-        print(source)
     end
 end
 
@@ -520,8 +467,7 @@ function m.compileLinks(source)
         if id then
             pushSource(id, src)
         end
-        checkForward(src)
-        checkBackward(src)
+        compileLink(src)
     end)
     return Linkers
 end

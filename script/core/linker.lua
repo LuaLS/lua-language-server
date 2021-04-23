@@ -2,6 +2,7 @@ local util  = require 'utility'
 local guide = require 'parser.guide'
 local vm    = require 'vm.vm'
 local split = require "parser.split"
+local telemetry = require "service.telemetry"
 
 local Linkers, GetLink
 local LastIDCache = {}
@@ -101,6 +102,7 @@ local function getKey(source)
                 return '', tbl
             end
         end
+        return source.start, nil
     elseif source.type == 'doc.class.name'
     or     source.type == 'doc.type.name'
     or     source.type == 'doc.alias.name' then
@@ -123,6 +125,9 @@ local function checkMode(source)
     end
     if source.type == 'function' then
         return 'f:'
+    end
+    if source.type == 'call' then
+        return 'c:'
     end
     if source.type == 'doc.class.name'
     or source.type == 'doc.type.name'
@@ -244,11 +249,28 @@ local function pushBackward(id, backwardID)
     link.backward[#link.backward+1] = backwardID
 end
 
+local function eachParentSelect(call, callback)
+    if call.type ~= 'call' then
+        return
+    end
+    if call.parent.type == 'select' then
+        callback(call.parent, call.parent.index)
+    end
+    if not call.extParent then
+        return
+    end
+    for _, sel in ipairs(call.extParent) do
+        if sel.type == 'select' then
+            callback(sel, sel.index)
+        end
+    end
+end
+
 ---前进
 ---@param source parser.guide.object
 ---@return parser.guide.object[]
 local function compileLink(source)
-    local id   = getID(source)
+    local id = getID(source)
     local parent = source.parent
     if not parent then
         return
@@ -259,10 +281,13 @@ local function compileLink(source)
         pushBackward(getID(source.value), id)
     end
     -- self -> mt:xx
-    if source.tag == 'self' then
+    if source.type == 'local' and source[1] == 'self' then
         local func = guide.getParentFunction(source)
         local setmethod = func.parent
-        if setmethod and setmethod.type == 'setmethod' then
+        -- guess `self`
+        if setmethod and ( setmethod.type == 'setmethod'
+                        or setmethod.type == 'setfield'
+                        or setmethod.type == 'setindex') then
             pushForward(id, getID(setmethod.node))
             pushBackward(getID(setmethod.node), id)
         end
@@ -309,35 +334,49 @@ local function compileLink(source)
         pushBackward(getID(source.class), id)
         pushBackward(getID(source.extends), id)
     end
-    -- 将call的返回值接收映射到函数返回值上
-    if source.type == 'select' then
-        local call = source.vararg
-        if call.type == 'call' then
-            local node = call.node
+    if source.type == 'call' then
+        local node = source.node
+        local nodeID = getID(node)
+        -- 将call的返回值接收映射到函数返回值上
+        eachParentSelect(source, function (sel)
+            local selectID = getID(sel)
             local callID = ('%s%s%s%s'):format(
-                getID(node),
+                nodeID,
                 SPLIT_CHAR,
                 RETURN_INDEX_CHAR,
-                source.index
+                sel.index
             )
+            pushForward(selectID, callID)
+            pushBackward(callID, selectID)
+            if sel.index == 1 then
+                pushForward(id, callID)
+                pushBackward(callID, id)
+            end
+        end)
+        -- 将setmetatable映射到 param1 以及 param2.__index 上
+        if node.special == 'setmetatable' then
+            local callID = ('%s%s%s%s'):format(
+                nodeID,
+                SPLIT_CHAR,
+                RETURN_INDEX_CHAR,
+                1
+            )
+            local tblID  = getID(source.args and source.args[1])
+            local metaID = getID(source.args and source.args[2])
+            local indexID
+            if metaID then
+                indexID = ('%s%s%q'):format(
+                    metaID,
+                    SPLIT_CHAR,
+                    '__index'
+                )
+            end
             pushForward(id, callID)
             pushBackward(callID, id)
-            -- 将setmetatable映射到 param1 以及 param2.__index 上
-            if node.special == 'setmetatable' and source.index == 1 then
-                local tblID  = getID(call.args and call.args[1])
-                local metaID = getID(call.args and call.args[2])
-                pushForward(id, tblID)
-                pushBackward(tblID, id)
-                if metaID then
-                    local indexID = ('%s%s%q'):format(
-                        metaID,
-                        SPLIT_CHAR,
-                        '__index'
-                    )
-                    pushForward(id, indexID)
-                    pushBackward(indexID, id)
-                end
-            end
+            pushForward(callID, tblID)
+            pushForward(callID, indexID)
+            pushBackward(tblID, callID)
+            --pushBackward(indexID, callID)
         end
     end
     -- 将函数的返回值映射到具体的返回值上
@@ -361,7 +400,8 @@ local function compileLink(source)
                 )
                 for _, rtnObj in ipairs(rtnObjs) do
                     pushForward(returnID, getID(rtnObj))
-                    if rtnObj.type == 'function' then
+                    if rtnObj.type == 'function'
+                    or rtnObj.type == 'call' then
                         pushBackward(getID(rtnObj), returnID)
                     end
                 end

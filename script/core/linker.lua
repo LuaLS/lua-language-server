@@ -1,6 +1,7 @@
 local util  = require 'utility'
 local guide = require 'parser.guide'
 local vm    = require 'vm.vm'
+local split = require "parser.split"
 
 local Linkers, GetLink
 local LastIDCache = {}
@@ -22,13 +23,6 @@ local function isGlobal(source)
     if source.type == 'field' then
         source = source.parent
     end
-    --if source.type == 'getfield'
-    --or source.type == 'setfield' then
-    --    local node = source.node
-    --    if node and node.special == '_G' then
-    --        return true
-    --    end
-    --end
     if source.special == '_G' then
         return true
     end
@@ -220,7 +214,10 @@ end
 ---@param id string
 ---@param forwardID string
 local function pushForward(id, forwardID)
-    if not forwardID or forwardID == '' or id == forwardID then
+    if not id
+    or not forwardID
+    or forwardID == ''
+    or id == forwardID then
         return
     end
     local link = GetLink(id)
@@ -234,7 +231,10 @@ end
 ---@param id string
 ---@param backwardID string
 local function pushBackward(id, backwardID)
-    if not backwardID or backwardID == '' or id == backwardID then
+    if not id
+    or not backwardID
+    or backwardID == ''
+    or id == backwardID then
         return
     end
     local link = GetLink(id)
@@ -250,6 +250,9 @@ end
 local function checkForward(source)
     local id   = getID(source)
     local parent = source.parent
+    if not parent then
+        return
+    end
     if source.value then
         -- x = y : x -> y
         pushForward(id, getID(source.value))
@@ -308,7 +311,16 @@ local function checkForward(source)
             pushForward(id, callID)
             -- 将setmetatable映射到 param1 以及 param2.__index 上
             if node.special == 'setmetatable' and source.index == 1 then
-                pushForward(id, getID())
+                local tblID  = getID(call.args and call.args[1])
+                local metaID = getID(call.args and call.args[2])
+                pushForward(id, tblID)
+                if metaID then
+                    pushForward(id, ('%s%s%q'):format(
+                        metaID,
+                        SPLIT_CHAR,
+                        '__index'
+                    ))
+                end
             end
         end
     end
@@ -345,6 +357,9 @@ end
 local function checkBackward(source)
     local id = getID(source)
     local parent = source.parent
+    if not parent then
+        return
+    end
     if parent.value == source then
         pushBackward(id, getID(parent))
     end
@@ -372,29 +387,34 @@ local function checkBackward(source)
         end
     end
     -- 将函数返回值映射到call的返回值接收上
-    if parent.type == 'call' and parent.node == source then
-        local sel = parent.parent
+    if source.type == 'call' then
+        local sel = source.parent
         if sel.type == 'select' then
-            pushBackward(id, ('s:%d'):format(sel.start))
-        end
-    end
-    -- 将调用参数映射到函数调用上
-    if parent.type == 'callargs' then
-        for i = 1, #parent do
-            if parent[i] == source then
-                local call = parent.parent
-                local node = call.node
-                local nodeID = getID(node)
-                if not nodeID then
-                    break
-                end
-                pushBackward(id, ('%s%s%s%s'):format(
+            local nodeID = getID(source.node)
+            if nodeID then
+                local returnID = ('%s%s%s%s'):format(
                     nodeID,
                     SPLIT_CHAR,
-                    PARAM_INDEX_CHAR,
-                    i
-                ))
-                break
+                    RETURN_INDEX_CHAR,
+                    sel.index
+                )
+                pushBackward(returnID, getID(sel))
+            end
+        end
+        if source.extParent then
+            local nodeID = getID(source.node)
+            if nodeID then
+                for _, extParent in ipairs(source.extParent) do
+                    if extParent.type == 'select' then
+                        local returnID = ('%s%s%s%s'):format(
+                            nodeID,
+                            SPLIT_CHAR,
+                            RETURN_INDEX_CHAR,
+                            extParent.index
+                        )
+                        pushBackward(returnID, getID(extParent))
+                    end
+                end
             end
         end
     end
@@ -497,10 +517,9 @@ function m.compileLinks(source)
     root._linkers = Linkers
     guide.eachSource(root, function (src)
         local id = getID(src)
-        if not id then
-            return
+        if id then
+            pushSource(id, src)
         end
-        pushSource(id, src)
         checkForward(src)
         checkBackward(src)
     end)

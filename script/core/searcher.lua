@@ -27,55 +27,66 @@ local m = {}
 ---添加结果
 ---@param status guide.status
 ---@param mode   guide.searchmode
----@param ref    parser.guide.object
-function m.pushResult(status, mode, ref)
-    if not ref then
+---@param source parser.guide.object
+function m.pushResult(status, mode, source)
+    if not source then
         return
     end
     local results = status.results
-    local parent = ref.parent
+    local parent = source.parent
     if mode == 'def' then
-        if ref.type == 'local'
-        or ref.type == 'setlocal'
-        or ref.type == 'setglobal'
-        or ref.type == 'label'
-        or ref.type == 'setfield'
-        or ref.type == 'setmethod'
-        or ref.type == 'setindex'
-        or ref.type == 'tableindex'
-        or ref.type == 'tablefield'
-        or ref.type == 'function'
-        or ref.type == 'doc.class.name'
-        or ref.type == 'doc.alias.name' then
-            results[#results+1] = ref
+        if source.type == 'local'
+        or source.type == 'setlocal'
+        or source.type == 'setglobal'
+        or source.type == 'label'
+        or source.type == 'setfield'
+        or source.type == 'setmethod'
+        or source.type == 'setindex'
+        or source.type == 'tableindex'
+        or source.type == 'tablefield'
+        or source.type == 'function'
+        or source.type == 'doc.class.name'
+        or source.type == 'doc.alias.name' then
+            results[#results+1] = source
+        end
+        if source.type == 'call' then
+            if source.node.special == 'rawset' then
+                results[#results+1] = source
+            end
         end
         if parent.type == 'return' then
-            if linker.getID(ref) ~= status.id then
-                results[#results+1] = ref
+            if linker.getID(source) ~= status.id then
+                results[#results+1] = source
             end
         end
     elseif mode == 'ref' then
-        if ref.type == 'local'
-        or ref.type == 'setlocal'
-        or ref.type == 'getlocal'
-        or ref.type == 'setglobal'
-        or ref.type == 'getglobal'
-        or ref.type == 'label'
-        or ref.type == 'goto'
-        or ref.type == 'setfield'
-        or ref.type == 'getfield'
-        or ref.type == 'setmethod'
-        or ref.type == 'getmethod'
-        or ref.type == 'setindex'
-        or ref.type == 'getindex'
-        or ref.type == 'tableindex'
-        or ref.type == 'tablefield'
-        or ref.type == 'function'
-        or ref.type == 'doc.class.name'
-        or ref.type == 'doc.type.name'
-        or ref.type == 'doc.alias.name'
-        or ref.type == 'doc.extends.name' then
-            results[#results+1] = ref
+        if source.type == 'local'
+        or source.type == 'setlocal'
+        or source.type == 'getlocal'
+        or source.type == 'setglobal'
+        or source.type == 'getglobal'
+        or source.type == 'label'
+        or source.type == 'goto'
+        or source.type == 'setfield'
+        or source.type == 'getfield'
+        or source.type == 'setmethod'
+        or source.type == 'getmethod'
+        or source.type == 'setindex'
+        or source.type == 'getindex'
+        or source.type == 'tableindex'
+        or source.type == 'tablefield'
+        or source.type == 'function'
+        or source.type == 'doc.class.name'
+        or source.type == 'doc.type.name'
+        or source.type == 'doc.alias.name'
+        or source.type == 'doc.extends.name' then
+            results[#results+1] = source
+        end
+        if source.type == 'call' then
+            if source.node.special == 'rawset'
+            or source.node.special == 'rawget' then
+                results[#results+1] = source
+            end
         end
     elseif mode == 'field' then
     end

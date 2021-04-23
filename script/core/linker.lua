@@ -22,12 +22,15 @@ local function isGlobal(source)
     if source.type == 'field' then
         source = source.parent
     end
-    if source.type == 'getfield'
-    or source.type == 'setfield' then
-        local node = source.node
-        if node and node.special == '_G' then
-            return true
-        end
+    --if source.type == 'getfield'
+    --or source.type == 'setfield' then
+    --    local node = source.node
+    --    if node and node.special == '_G' then
+    --        return true
+    --    end
+    --end
+    if source.special == '_G' then
+        return true
     end
     return false
 end
@@ -87,6 +90,23 @@ local function getKey(source)
         return source.start, nil
     elseif source.type == 'select' then
         return ('%d%s%s%d'):format(source.start, SPLIT_CHAR, RETURN_INDEX_CHAR, source.index)
+    elseif source.type == 'call' then
+        local node = source.node
+        if node.special == 'rawget'
+        or node.special == 'rawset' then
+            if not source.args then
+                return nil, nil
+            end
+            local tbl, key = source.args[1], source.args[2]
+            if not tbl or not key then
+                return nil, nil
+            end
+            if key.type == 'string' then
+                return ('%q'):format(key[1] or ''), tbl
+            else
+                return '', tbl
+            end
+        end
     elseif source.type == 'doc.class.name'
     or     source.type == 'doc.type.name'
     or     source.type == 'doc.alias.name' then
@@ -162,10 +182,10 @@ local function getID(source)
         if not node then
             break
         end
-        if node.special == '_G' then
+        current = node
+        if current.special == '_G' then
             break
         end
-        current = node
     end
     if index == 0 then
         source._id = false

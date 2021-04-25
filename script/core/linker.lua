@@ -105,12 +105,14 @@ local function getKey(source)
         return source.start, nil
     elseif source.type == 'doc.class.name'
     or     source.type == 'doc.type.name'
-    or     source.type == 'doc.alias.name' then
+    or     source.type == 'doc.alias.name'
+    or     source.type == 'doc.extends.name' then
         return source[1], nil
     elseif source.type == 'doc.class'
     or     source.type == 'doc.type'
     or     source.type == 'doc.alias'
-    or     source.type == 'doc.param' then
+    or     source.type == 'doc.param'
+    or     source.type == 'doc.type.function' then
         return source.start, nil
     end
     return nil, nil
@@ -146,6 +148,9 @@ local function checkMode(source)
     end
     if source.type == 'doc.alias' then
         return 'da:'
+    end
+    if source.type == 'doc.type.function' then
+        return 'df:'
     end
     if isGlobal(source) then
         return 'g:'
@@ -292,47 +297,38 @@ local function compileLink(source)
             pushBackward(getID(setmethod.node), id)
         end
     end
-    -- source 绑定的 @class/@type
-    local bindDocs = source.bindDocs
-    if bindDocs then
-        for _, doc in ipairs(bindDocs) do
-            if doc.type == 'doc.class'
-            or doc.type == 'doc.type' then
-                pushForward(id, getID(doc))
-                pushBackward(getID(doc), id)
-            end
-        end
-    end
     -- 分解 @type
     if source.type == 'doc.type' then
+        if source.bindSources then
+            for _, src in ipairs(source.bindSources) do
+                pushForward(getID(src), id)
+                pushForward(id, getID(src))
+            end
+        end
         for _, typeUnit in ipairs(source.types) do
             pushForward(id, getID(typeUnit))
             pushBackward(getID(typeUnit), id)
         end
     end
-    -- 分解 @return
-    if source.type == 'doc.return' then
-        for _, src in ipairs(source.bindSources) do
-            if src.type == 'function' then
-                for _, rtn in ipairs(source.returns) do
-                    local fullID = ('%s%s%s%s'):format(
-                        getID(src),
-                        SPLIT_CHAR,
-                        RETURN_INDEX_CHAR,
-                        rtn.returnIndex
-                    )
-                    pushForward(getID(rtn), fullID)
-                    pushBackward(fullID, getID(rtn))
-                end
-            end
-        end
-    end
     -- 分解 @class
     if source.type == 'doc.class' then
         pushForward(id, getID(source.class))
-        pushForward(id, getID(source.extends))
-        pushBackward(getID(source.class), id)
-        pushBackward(getID(source.extends), id)
+        pushForward(getID(source.class), id)
+        if source.extends then
+            for _, ext in ipairs(source.extends) do
+                pushForward(id, getID(ext))
+                pushBackward(getID(ext), id)
+            end
+        end
+        if source.bindSources then
+            for _, src in ipairs(source.bindSources) do
+                pushForward(getID(src), id)
+                pushForward(id, getID(src))
+            end
+        end
+    end
+    if source.type == 'doc.param' then
+        pushForward(getID(source), getID(source.extends))
     end
     if source.type == 'call' then
         local node = source.node
@@ -381,6 +377,7 @@ local function compileLink(source)
     end
     -- 将函数的返回值映射到具体的返回值上
     if source.type == 'function' then
+        -- 检查实体返回值
         if source.returns then
             local returns = {}
             for _, rtn in ipairs(source.returns) do
@@ -403,6 +400,31 @@ local function compileLink(source)
                     if rtnObj.type == 'function'
                     or rtnObj.type == 'call' then
                         pushBackward(getID(rtnObj), returnID)
+                    end
+                end
+            end
+        end
+        -- 检查 luadoc
+        if source.bindDocs then
+            for _, doc in ipairs(source.bindDocs) do
+                if doc.type == 'doc.return' then
+                    for _, rtn in ipairs(doc.returns) do
+                        local fullID = ('%s%s%s%s'):format(
+                            id,
+                            SPLIT_CHAR,
+                            RETURN_INDEX_CHAR,
+                            rtn.returnIndex
+                        )
+                        pushForward(getID(rtn), fullID)
+                        pushBackward(fullID, getID(rtn))
+                    end
+                end
+                if doc.type == 'doc.param' then
+                    local paramName = doc.param[1]
+                    for _, param in ipairs(source.args) do
+                        if param[1] == paramName then
+                            pushForward(getID(param), getID(doc))
+                        end
                     end
                 end
             end

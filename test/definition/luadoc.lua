@@ -87,6 +87,11 @@ TEST [[
 ]]
 
 TEST [[
+---@type <!fun():void!>
+local <?<!f!>?>
+]]
+
+TEST [[
 ---@param f <!fun():void!>
 function t(<?<!f!>?>) end
 ]]

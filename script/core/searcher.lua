@@ -47,6 +47,7 @@ function m.pushResult(status, mode, source)
         or source.type == 'function'
         or source.type == 'doc.class.name'
         or source.type == 'doc.alias.name'
+        or source.type == 'doc.field.name'
         or source.type == 'doc.type.function' then
             results[#results+1] = source
         end
@@ -81,6 +82,7 @@ function m.pushResult(status, mode, source)
         or source.type == 'doc.type.name'
         or source.type == 'doc.alias.name'
         or source.type == 'doc.extends.name'
+        or source.type == 'doc.field.name'
         or source.type == 'doc.type.function' then
             results[#results+1] = source
         end

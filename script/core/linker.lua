@@ -1,8 +1,5 @@
 local util  = require 'utility'
 local guide = require 'parser.guide'
-local vm    = require 'vm.vm'
-local split = require "parser.split"
-local telemetry = require "service.telemetry"
 
 local Linkers, GetLink
 local LastIDCache = {}
@@ -83,6 +80,8 @@ local function getKey(source)
         return nil, nil
     elseif source.type == 'function' then
         return source.start, nil
+    elseif source.type == '...' then
+        return source.start, nil
     elseif source.type == 'select' then
         return ('%d%s%s%d'):format(source.start, SPLIT_CHAR, RETURN_INDEX_CHAR, source.index)
     elseif source.type == 'call' then
@@ -106,14 +105,19 @@ local function getKey(source)
     elseif source.type == 'doc.class.name'
     or     source.type == 'doc.type.name'
     or     source.type == 'doc.alias.name'
-    or     source.type == 'doc.extends.name' then
+    or     source.type == 'doc.extends.name'
+    or     source.type == 'doc.see.name' then
         return source[1], nil
     elseif source.type == 'doc.class'
     or     source.type == 'doc.type'
     or     source.type == 'doc.alias'
     or     source.type == 'doc.param'
+    or     source.type == 'doc.vararg'
+    or     source.type == 'doc.field.name'
     or     source.type == 'doc.type.function' then
         return source.start, nil
+    elseif source.type == 'doc.see.field' then
+        return ('%q'):format(source[1]), source.parent.name
     end
     return nil, nil
 end
@@ -137,6 +141,12 @@ local function checkMode(source)
     or source.type == 'doc.extends.name' then
         return 'dn:'
     end
+    if source.type == 'doc.field.name' then
+        return 'dfn:'
+    end
+    if source.type == 'doc.see.name' then
+        return 'dsn:'
+    end
     if source.type == 'doc.class' then
         return 'dc:'
     end
@@ -151,6 +161,9 @@ local function checkMode(source)
     end
     if source.type == 'doc.type.function' then
         return 'df:'
+    end
+    if source.type == 'doc.vararg' then
+        return 'dv:'
     end
     if isGlobal(source) then
         return 'g:'
@@ -326,9 +339,44 @@ local function compileLink(source)
                 pushForward(id, getID(src))
             end
         end
+        do
+            local start
+            for _, doc in ipairs(source.bindGroup) do
+                if doc.type == 'doc.class' then
+                    start = doc == source
+                end
+                if start and doc.type == 'doc.field' then
+                    local key = doc.field[1]
+                    if key then
+                        local keyID = ('%s%s%q'):format(
+                            id,
+                            SPLIT_CHAR,
+                            key
+                        )
+                        pushForward(keyID, getID(doc.field))
+                        pushBackward(getID(doc.field), keyID)
+                        pushForward(keyID, getID(doc.extends))
+                        pushBackward(getID(doc.extends), keyID)
+                    end
+                end
+            end
+        end
     end
     if source.type == 'doc.param' then
         pushForward(getID(source), getID(source.extends))
+    end
+    if source.type == 'doc.vararg' then
+        pushForward(getID(source), getID(source.vararg))
+    end
+    if source.type == 'doc.see' then
+        local nameID  = getID(source.name)
+        local classID = nameID:gsub('^dsn:', 'dn:')
+        pushForward(nameID, classID)
+        if source.field then
+            local fieldID      = getID(source.field)
+            local fieldClassID = fieldID:gsub('^dsn:', 'dn:')
+            pushForward(fieldID, fieldClassID)
+        end
     end
     if source.type == 'call' then
         local node = source.node
@@ -423,6 +471,13 @@ local function compileLink(source)
                     local paramName = doc.param[1]
                     for _, param in ipairs(source.args) do
                         if param[1] == paramName then
+                            pushForward(getID(param), getID(doc))
+                        end
+                    end
+                end
+                if doc.type == 'doc.vararg' then
+                    for _, param in ipairs(source.args) do
+                        if param.type == '...' then
                             pushForward(getID(param), getID(doc))
                         end
                     end

@@ -1,7 +1,5 @@
 local lm       = require 'luamake'
 
-lm.target = 'x64'
-
 if lm.plat == "macos" then
     lm.flags = {
         "-mmacosx-version-min=10.13",

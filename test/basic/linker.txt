@@ -102,3 +102,19 @@ local <!v!> = f(c)
 'l2|@1'
 'f|1|@1'
 'f|1|#1'
+
+```
+---@generic T
+---@param p T
+---@return T
+local function f(p) end
+
+local <?r?> = f(<!k!>)
+```
+
+l:r
+s:1#1
+l:f#1
+dg:T
+l:f@1
+k

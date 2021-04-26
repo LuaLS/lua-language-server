@@ -2,7 +2,7 @@ local linker = require 'core.linker'
 local guide  = require 'parser.guide'
 local files  = require 'files'
 
-local UNI_CHAR = '~'
+local MARK_CHAR = '\x1E'
 
 local function checkFunctionReturn(source)
     if  source.parent
@@ -170,14 +170,15 @@ function m.searchRefsByID(status, uri, expect, mode)
     status.id = expect
 
     local mark = status.mark
-    local queueIDs    = {}
-    local queueFields = {}
-    local index       = 0
+    local queueIDs       = {}
+    local queueFields    = {}
+    local queueCallInfos = {}
+    local index          = 0
 
-    local function search(id, field)
+    local function search(id, field, callinfo)
         local fullID
         if field then
-            fullID = id .. '\x1E' .. field
+            fullID = id .. MARK_CHAR .. field
             local _, len = field:gsub(linker.SPLIT_CHAR, '')
             if len >= 10 then
                 return
@@ -190,26 +191,30 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
         mark[fullID] = true
         index = index + 1
-        queueIDs[index]    = id
-        queueFields[index] = field
+        queueIDs[index]       = id
+        queueFields[index]    = field
+        queueCallInfos[index] = callinfo
     end
 
-    local function checkLastID(id, field)
+    local function checkLastID(id, field, callinfo)
         local lastID = linker.getLastID(id)
         if lastID then
             local newField = id:sub(#lastID + 1)
             if field then
                 newField = newField .. field
             end
-            search(lastID, newField)
+            search(lastID, newField, callinfo)
         end
     end
 
-    local function searchID(id, field)
+    local function searchID(id, field, callinfo)
+        if not id then
+            return
+        end
         if field then
             id = id .. field
         end
-        search(id)
+        search(id, nil, callinfo)
     end
 
     local function searchFunction(id)
@@ -236,6 +241,30 @@ function m.searchRefsByID(status, uri, expect, mode)
         search(parentID, linker.SPLIT_CHAR .. linker.RETURN_INDEX_CHAR .. returnIndex)
     end
 
+    local function checkGeneric(link, field, callinfo)
+        if not link.sources then
+            return
+        end
+        if not callinfo or not callinfo.args then
+            return
+        end
+        local source = link.sources[1]
+        if source.typeGeneric then
+            local key = source[1]
+            local generics = source.typeGeneric[key]
+            if generics then
+                for _, docName in ipairs(generics) do
+                    local docType = docName.parent
+                    -- @param T
+                    if docType.paramIndex then
+                        local paramID = linker.getID(callinfo.args[docType.paramIndex])
+                        searchID(paramID, field)
+                    end
+                end
+            end
+        end
+    end
+
     search(expect)
     searchFunction(expect)
 
@@ -243,8 +272,9 @@ function m.searchRefsByID(status, uri, expect, mode)
         if index <= 0 then
             return
         end
-        local id    = queueIDs[index]
-        local field = queueFields[index]
+        local id       = queueIDs[index]
+        local field    = queueFields[index]
+        local callinfo = queueCallInfos[index]
         index = index - 1
 
         local link = linker.getLinkByID(root, id)
@@ -256,16 +286,17 @@ function m.searchRefsByID(status, uri, expect, mode)
             end
             if link.forward then
                 for _, forwardID in ipairs(link.forward) do
-                    searchID(forwardID, field)
+                    searchID(forwardID, field, link.callinfo or callinfo)
                 end
             end
             if link.backward and (mode == 'ref' or field) then
                 for _, backwardID in ipairs(link.backward) do
-                    searchID(backwardID, field)
+                    searchID(backwardID, field, link.callinfo or callinfo)
                 end
             end
+            checkGeneric(link, field, callinfo)
         end
-        checkLastID(id, field)
+        checkLastID(id, field, callinfo)
     end
     error('too large')
 end

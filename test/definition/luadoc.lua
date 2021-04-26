@@ -209,6 +209,23 @@ TEST [[
 ]]
 
 TEST [[
+---@return <!fun()!>
+local function f() end
+
+local <?<!r!>?> = f()
+]]
+
+TEST [[
+---@generic T
+---@param p T
+---@return T
+local function f(p) end
+
+local <!k!>
+local <?<!r!>?> = f(k)
+]]
+
+TEST [[
 ---@class Foo
 local Foo = {}
 function Foo:<!bar1!>() end

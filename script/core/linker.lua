@@ -1,12 +1,24 @@
 local util  = require 'utility'
 local guide = require 'parser.guide'
 
-local Linkers, GetLink
+local Linkers
 local LastIDCache = {}
 local SPLIT_CHAR = '\x1F'
 local SPLIT_REGEX = SPLIT_CHAR .. '[^' .. SPLIT_CHAR .. ']+$'
 local RETURN_INDEX_CHAR = '#'
 local PARAM_INDEX_CHAR = '@'
+
+---创建source的链接信息
+---@param id string
+---@return link
+local function getLink(id)
+    if not Linkers[id] then
+        Linkers[id] = {
+            id = id,
+        }
+    end
+    return Linkers[id]
+end
 
 ---是否是全局变量（包括 _G.XXX 形式）
 ---@param source parser.guide.object
@@ -107,7 +119,11 @@ local function getKey(source)
     or     source.type == 'doc.alias.name'
     or     source.type == 'doc.extends.name'
     or     source.type == 'doc.see.name' then
-        return source[1], nil
+        local name = source[1]
+        if source.typeGeneric then
+            return source.start, nil
+        end
+        return name, nil
     elseif source.type == 'doc.class'
     or     source.type == 'doc.type'
     or     source.type == 'doc.alias'
@@ -226,7 +242,7 @@ end
 ---@param id string
 ---@param source parser.guide.object
 local function pushSource(id, source)
-    local link = GetLink(id)
+    local link = getLink(id)
     if not link.sources then
         link.sources = {}
     end
@@ -243,7 +259,7 @@ local function pushForward(id, forwardID)
     or id == forwardID then
         return
     end
-    local link = GetLink(id)
+    local link = getLink(id)
     if not link.forward then
         link.forward = {}
     end
@@ -260,7 +276,7 @@ local function pushBackward(id, backwardID)
     or id == backwardID then
         return
     end
-    local link = GetLink(id)
+    local link = getLink(id)
     if not link.backward then
         link.backward = {}
     end
@@ -396,6 +412,7 @@ local function compileLink(source)
                 pushForward(id, callID)
                 pushBackward(callID, id)
             end
+            getLink(selectID).callinfo = source
         end)
         -- 将setmetatable映射到 param1 以及 param2.__index 上
         if node.special == 'setmetatable' then
@@ -463,8 +480,8 @@ local function compileLink(source)
                             RETURN_INDEX_CHAR,
                             rtn.returnIndex
                         )
-                        pushForward(getID(rtn), fullID)
-                        pushBackward(fullID, getID(rtn))
+                        pushForward(fullID, getID(rtn))
+                        pushBackward(getID(rtn), fullID)
                     end
                 end
                 if doc.type == 'doc.param' then
@@ -496,18 +513,8 @@ end
 ---@field forward string[]
 -- 后退的关联ID
 ---@field backward string[]
-
----创建source的链接信息
----@param id string
----@return link
-function GetLink(id)
-    if not Linkers[id] then
-        Linkers[id] = {
-            id = id,
-        }
-    end
-    return Linkers[id]
-end
+-- 函数调用参数信息（用于泛型）
+---@field callinfo parser.guide.object
 
 local m = {}
 
@@ -549,24 +556,6 @@ end
 ---@return string
 function m.getID(source)
     return getID(source)
-end
-
----获取source的special
----@param source parser.guide.object
----@return table
-function m.getSpecial(source, key)
-    if not source then
-        return nil
-    end
-    local link = m.getLink(source)
-    if not link then
-        return nil
-    end
-    local special = link.special
-    if not special then
-        return nil
-    end
-    return special[key]
 end
 
 ---编译整个文件的link

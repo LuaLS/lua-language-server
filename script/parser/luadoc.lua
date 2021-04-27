@@ -483,13 +483,7 @@ function parseType(parent)
                 break
             end
             -- TypeLiteral，指代类型的字面值。比如，对于类 Cat 来说，它的 TypeLiteral 是 "Cat"
-            typeLiteral = {
-                type   = 'doc.type.typeliteral',
-                parent = result,
-                start  = getStart(),
-                finish = nil,
-                node   = nil,
-            }
+            typeLiteral = true
         end
 
         if tp == 'name' then
@@ -500,10 +494,7 @@ function parseType(parent)
             end
             if typeLiteral then
                 nextToken()
-                typeLiteral.finish = getFinish()
-                typeLiteral.node = typeUnit
-                typeUnit.parent = typeLiteral
-                typeUnit = typeLiteral
+                typeUnit.literal = true
             end
             result.types[#result.types+1] = typeUnit
             if not result.start then

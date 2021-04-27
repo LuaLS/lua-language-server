@@ -254,11 +254,21 @@ function m.searchRefsByID(status, uri, expect, mode)
             local generics = source.typeGeneric[key]
             if generics then
                 for _, docName in ipairs(generics) do
-                    local docType = docName.parent
                     -- @param T
-                    if docType.paramIndex then
-                        local paramID = linker.getID(callinfo.args[docType.paramIndex])
-                        searchID(paramID, field)
+                    local docType = docName.parent
+                    local param   = callinfo.args[docType.paramIndex]
+                    if param then
+                        if docName.literal then
+                            -- @param `T`
+                            if param.type == 'string' and param[1] then
+                                local paramID = 'dn:' .. param[1]
+                                searchID(paramID, field)
+                            end
+                        else
+                            local paramID = linker.getID(param)
+                            searchID(paramID, field)
+                        end
+                        return
                     end
                 end
             end

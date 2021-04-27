@@ -321,13 +321,27 @@ print(v1[1].<?bar1?>)
 --]]
 
 TEST [[
+---@type fun():<!fun()!>
+local f
+
+local <?<!f2!>?> = f()
+]]
+
+TEST [[
 ---@class Foo
 local Foo = {}
 function Foo:<!bar1!>() end
 
 ---@type table<number, Foo>
 local v1
-local ipairs = ipairs
+
+---@generic T: table, V
+---@param t T
+---@return fun(table: V[], i?: integer):integer, V
+---@return T
+---@return integer i
+local function ipairs(t) end
+
 for i, v in ipairs(v1) do
     print(v.<?bar1?>)
 end
@@ -340,6 +354,14 @@ function Foo:<!bar1!>() end
 
 ---@type table<Foo, Foo>
 local v1
+
+---@generic T: table, K, V
+---@param t T
+---@return fun(table: table<K, V>, index: K):K, V
+---@return T
+---@return nil
+local function pairs(t) end
+
 for k, v in pairs(v1) do
     print(k.<?bar1?>)
     print(v.bar1)

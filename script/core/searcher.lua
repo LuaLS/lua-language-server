@@ -176,20 +176,17 @@ function m.searchRefsByID(status, uri, expect, mode)
     local index          = 0
 
     local function search(id, field, callinfo)
-        local fullID
+        local fieldLen
         if field then
-            fullID = id .. MARK_CHAR .. field
             local _, len = field:gsub(linker.SPLIT_CHAR, '')
-            if len >= 10 then
-                return
-            end
+            fieldLen = len
         else
-            fullID = id
+            fieldLen = 0
         end
-        if mark[fullID] then
+        if mark[id] and mark[id] <= fieldLen then
             return
         end
-        mark[fullID] = true
+        mark[id] = fieldLen
         index = index + 1
         queueIDs[index]       = id
         queueFields[index]    = field

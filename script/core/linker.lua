@@ -4,7 +4,7 @@ local guide = require 'parser.guide'
 local Linkers
 local LastIDCache = {}
 local SPLIT_CHAR = '\x1F'
-local SPLIT_REGEX = SPLIT_CHAR .. '[^' .. SPLIT_CHAR .. ']+$'
+local SPLIT_REGEX = SPLIT_CHAR .. '[^' .. SPLIT_CHAR .. ']*$'
 local RETURN_INDEX_CHAR = '#'
 local PARAM_INDEX_CHAR = '@'
 
@@ -130,6 +130,7 @@ local function getKey(source)
     or     source.type == 'doc.param'
     or     source.type == 'doc.vararg'
     or     source.type == 'doc.field.name'
+    or     source.type == 'doc.type.table'
     or     source.type == 'doc.type.function' then
         return source.start, nil
     elseif source.type == 'doc.see.field' then
@@ -176,7 +177,10 @@ local function checkMode(source)
         return 'da:'
     end
     if source.type == 'doc.type.function' then
-        return 'df:'
+        return 'dfun:'
+    end
+    if source.type == 'doc.type.table' then
+        return 'dtbl:'
     end
     if source.type == 'doc.vararg' then
         return 'dv:'
@@ -440,6 +444,28 @@ local function compileLink(source)
             --pushBackward(indexID, callID)
         end
     end
+    if source.type == 'doc.type.function' then
+        if source.returns then
+            for index, rtn in ipairs(source.returns) do
+                local returnID = ('%s%s%s%s'):format(
+                    id,
+                    SPLIT_CHAR,
+                    RETURN_INDEX_CHAR,
+                    index
+                )
+                pushForward(returnID, getID(rtn))
+            end
+        end
+    end
+    if source.type == 'doc.type.table' then
+        if source.value then
+            local valueID = ('%s%s'):format(
+                id,
+                SPLIT_CHAR
+            )
+            pushForward(valueID, getID(source.value))
+        end
+    end
     -- 将函数的返回值映射到具体的返回值上
     if source.type == 'function' then
         -- 检查实体返回值
@@ -455,7 +481,7 @@ local function compileLink(source)
             end
             for index, rtnObjs in ipairs(returns) do
                 local returnID = ('%s%s%s%s'):format(
-                    getID(source),
+                    id,
                     SPLIT_CHAR,
                     RETURN_INDEX_CHAR,
                     index

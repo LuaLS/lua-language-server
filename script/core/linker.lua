@@ -287,23 +287,6 @@ local function pushBackward(id, backwardID)
     link.backward[#link.backward+1] = backwardID
 end
 
-local function eachParentSelect(call, callback)
-    if call.type ~= 'call' then
-        return
-    end
-    if call.parent.type == 'select' then
-        callback(call.parent, call.parent.index)
-    end
-    if not call.extParent then
-        return
-    end
-    for _, sel in ipairs(call.extParent) do
-        if sel.type == 'select' then
-            callback(sel, sel.index)
-        end
-    end
-end
-
 ---前进
 ---@param source parser.guide.object
 ---@return parser.guide.object[]
@@ -401,23 +384,19 @@ local function compileLink(source)
     if source.type == 'call' then
         local node = source.node
         local nodeID = getID(node)
-        -- 将call的返回值接收映射到函数返回值上
-        eachParentSelect(source, function (sel)
-            local selectID = getID(sel)
-            local callID = ('%s%s%s%s'):format(
+        if not nodeID then
+            return
+        end
+        -- 将 call 映射到 node#1 上
+        do
+            local select1ID = ('%s%s%s%s'):format(
                 nodeID,
                 SPLIT_CHAR,
                 RETURN_INDEX_CHAR,
-                sel.index
+                1
             )
-            pushForward(selectID, callID)
-            pushBackward(callID, selectID)
-            if sel.index == 1 then
-                pushForward(id, callID)
-                pushBackward(callID, id)
-            end
-            getLink(selectID).callinfo = source
-        end)
+            pushForward(id, select1ID)
+        end
         -- 将setmetatable映射到 param1 以及 param2.__index 上
         if node.special == 'setmetatable' then
             local callID = ('%s%s%s%s'):format(
@@ -442,6 +421,24 @@ local function compileLink(source)
             pushForward(callID, indexID)
             pushBackward(tblID, callID)
             --pushBackward(indexID, callID)
+        end
+    end
+    if source.type == 'select' then
+        if source.vararg.type == 'call' then
+            local nodeID = getID(source.vararg.node)
+            if not nodeID then
+                return
+            end
+            -- 将call的返回值接收映射到函数返回值上
+            local callID = ('%s%s%s%s'):format(
+                nodeID,
+                SPLIT_CHAR,
+                RETURN_INDEX_CHAR,
+                source.index
+            )
+            pushForward(id, callID)
+            pushBackward(callID, id)
+            getLink(id).callinfo = source.vararg
         end
     end
     if source.type == 'doc.type.function' then

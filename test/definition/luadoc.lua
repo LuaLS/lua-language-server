@@ -338,6 +338,15 @@ local <?<!v2!>?> = v1()
 ]]
 
 TEST [[
+---@generic V
+---@return fun(x: V):V
+local function f(x) end
+
+local v1 = f()
+local <?<!v2!>?> = v1(<!{}!>)
+]]
+
+TEST [[
 ---@class Foo
 local Foo = {}
 function Foo:<!bar1!>() end

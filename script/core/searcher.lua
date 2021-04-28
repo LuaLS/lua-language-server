@@ -245,8 +245,39 @@ function m.searchRefsByID(status, uri, expect, mode)
         search(parentID, linker.SPLIT_CHAR .. linker.RETURN_INDEX_CHAR .. returnIndex)
     end
 
-    local function genericStash(source, call)
-        if not call or not call.args then
+    local callStash = {}
+
+    local function genericStashParam(docType, call, index)
+        for _, typeUnit in ipairs(docType.types) do
+            if typeUnit.typeGeneric then
+                local key = typeUnit[1]
+                local generics = typeUnit.typeGeneric[key]
+                local callParam = call.args[index]
+                if callParam then
+                    if typeUnit.literal then
+                        if callParam.type == 'string' then
+                            genericStashMap[generics] = ('dn:%s'):format(callParam[1] or '')
+                        end
+                    else
+                        genericStashMap[generics] = linker.getID(callParam)
+                    end
+                end
+            end
+        end
+    end
+
+    local function genericStash(source)
+        if source.type ~= 'function'
+        and source.type ~= 'doc.type.function' then
+            return
+        end
+        local top = #callStash
+        if top == 0 then
+            return
+        end
+        local call = callStash[top]
+        callStash[top] = nil
+        if not call.args then
             return
         end
         if source.type == 'function' then
@@ -256,23 +287,13 @@ function m.searchRefsByID(status, uri, expect, mode)
             for index, param in ipairs(source.args) do
                 local docParam = param.docParam
                 if docParam then
-                    for _, typeUnit in ipairs(docParam.extends.types) do
-                        if typeUnit.typeGeneric then
-                            local key = typeUnit[1]
-                            local generics = typeUnit.typeGeneric[key]
-                            local callParam = call.args[index]
-                            if callParam then
-                                if typeUnit.literal then
-                                    if callParam.type == 'string' then
-                                        genericStashMap[generics] = ('dn:%s'):format(callParam[1] or '')
-                                    end
-                                else
-                                    genericStashMap[generics] = linker.getID(callParam)
-                                end
-                            end
-                        end
-                    end
+                    genericStashParam(docParam.extends, call, index)
                 end
+            end
+        end
+        if source.type == 'doc.type.function' then
+            for index, param in ipairs(source.args) do
+                genericStashParam(param.extends, call, index)
             end
         end
     end
@@ -303,6 +324,10 @@ function m.searchRefsByID(status, uri, expect, mode)
 
         local link = linker.getLinkByID(root, id)
         if link then
+            if link.call then
+                callStash[#callStash+1] = link.call
+            end
+            call = link.call or call
             if field == nil and link.sources then
                 for _, source in ipairs(link.sources) do
                     m.pushResult(status, mode, source)
@@ -310,17 +335,17 @@ function m.searchRefsByID(status, uri, expect, mode)
             end
             if link.forward then
                 for _, forwardID in ipairs(link.forward) do
-                    searchID(forwardID, field, link.call or call)
+                    searchID(forwardID, field, call)
                 end
             end
             if link.backward and (mode == 'ref' or field) then
                 for _, backwardID in ipairs(link.backward) do
-                    searchID(backwardID, field, link.call or call)
+                    searchID(backwardID, field, call)
                 end
             end
 
             if link.sources then
-                genericStash(link.sources[1], call)
+                genericStash(link.sources[1])
                 genericResolve(link.sources[1], field)
             end
         end

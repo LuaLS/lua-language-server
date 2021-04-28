@@ -45,11 +45,13 @@ function m.pushResult(status, mode, source)
         or source.type == 'tableindex'
         or source.type == 'tablefield'
         or source.type == 'function'
+        or source.type == 'table'
         or source.type == 'doc.class.name'
         or source.type == 'doc.alias.name'
         or source.type == 'doc.field.name'
         or source.type == 'doc.type.function' then
             results[#results+1] = source
+            return
         end
         if source.type == 'call' then
             if source.node.special == 'rawset' then
@@ -78,6 +80,7 @@ function m.pushResult(status, mode, source)
         or source.type == 'tableindex'
         or source.type == 'tablefield'
         or source.type == 'function'
+        or source.type == 'table'
         or source.type == 'doc.class.name'
         or source.type == 'doc.type.name'
         or source.type == 'doc.alias.name'
@@ -85,6 +88,7 @@ function m.pushResult(status, mode, source)
         or source.type == 'doc.field.name'
         or source.type == 'doc.type.function' then
             results[#results+1] = source
+            return
         end
         if source.type == 'call' then
             if source.node.special == 'rawset'
@@ -170,12 +174,15 @@ function m.searchRefsByID(status, uri, expect, mode)
     status.id = expect
 
     local mark = status.mark
-    local queueIDs       = {}
-    local queueFields    = {}
-    local queueCallInfos = {}
-    local index          = 0
+    local queueIDs    = {}
+    local queueFields = {}
+    local queueCalls  = {}
+    local queueIndex  = 0
 
-    local function search(id, field, callinfo)
+    -- 缓存过程中的泛型，以泛型关联表为key
+    local genericStashMap = {}
+
+    local function search(id, field, call)
         local fieldLen
         if field then
             local _, len = field:gsub(linker.SPLIT_CHAR, '')
@@ -187,10 +194,10 @@ function m.searchRefsByID(status, uri, expect, mode)
             return
         end
         mark[id] = fieldLen
-        index = index + 1
-        queueIDs[index]       = id
-        queueFields[index]    = field
-        queueCallInfos[index] = callinfo
+        queueIndex = queueIndex + 1
+        queueIDs[queueIndex]    = id
+        queueFields[queueIndex] = field
+        queueCalls[queueIndex]  = call
     end
 
     local function checkLastID(id, field, callinfo)
@@ -238,37 +245,47 @@ function m.searchRefsByID(status, uri, expect, mode)
         search(parentID, linker.SPLIT_CHAR .. linker.RETURN_INDEX_CHAR .. returnIndex)
     end
 
-    local function checkGeneric(link, field, callinfo)
-        if not link.sources then
+    local function genericStash(source, call)
+        if not call or not call.args then
             return
         end
-        if not callinfo or not callinfo.args then
-            return
-        end
-        local source = link.sources[1]
-        if source.typeGeneric then
-            local key = source[1]
-            local generics = source.typeGeneric[key]
-            if generics then
-                for _, docName in ipairs(generics) do
-                    -- @param T
-                    local docType = docName.parent
-                    local param   = callinfo.args[docType.paramIndex]
-                    if param then
-                        if docName.literal then
-                            -- @param `T`
-                            if param.type == 'string' and param[1] then
-                                local paramID = 'dn:' .. param[1]
-                                searchID(paramID, field)
+        if source.type == 'function' then
+            if not source.docParamMap then
+                return
+            end
+            for index, param in ipairs(source.args) do
+                local docParam = param.docParam
+                if docParam then
+                    for _, typeUnit in ipairs(docParam.extends.types) do
+                        if typeUnit.typeGeneric then
+                            local key = typeUnit[1]
+                            local generics = typeUnit.typeGeneric[key]
+                            local callParam = call.args[index]
+                            if callParam then
+                                if typeUnit.literal then
+                                    if callParam.type == 'string' then
+                                        genericStashMap[generics] = ('dn:%s'):format(callParam[1] or '')
+                                    end
+                                else
+                                    genericStashMap[generics] = linker.getID(callParam)
+                                end
                             end
-                        else
-                            local paramID = linker.getID(param)
-                            searchID(paramID, field)
                         end
-                        return
                     end
                 end
             end
+        end
+    end
+
+    local function genericResolve(source, field)
+        if not source.typeGeneric then
+            return
+        end
+        local key = source[1]
+        local generics = source.typeGeneric[key]
+        local paramID = genericStashMap[generics]
+        if paramID then
+            searchID(paramID, field)
         end
     end
 
@@ -276,13 +293,13 @@ function m.searchRefsByID(status, uri, expect, mode)
     searchFunction(expect)
 
     for _ = 1, 1000 do
-        if index <= 0 then
+        if queueIndex <= 0 then
             return
         end
-        local id       = queueIDs[index]
-        local field    = queueFields[index]
-        local callinfo = queueCallInfos[index]
-        index = index - 1
+        local id    = queueIDs[queueIndex]
+        local field = queueFields[queueIndex]
+        local call  = queueCalls[queueIndex]
+        queueIndex  = queueIndex - 1
 
         local link = linker.getLinkByID(root, id)
         if link then
@@ -293,17 +310,21 @@ function m.searchRefsByID(status, uri, expect, mode)
             end
             if link.forward then
                 for _, forwardID in ipairs(link.forward) do
-                    searchID(forwardID, field, link.callinfo or callinfo)
+                    searchID(forwardID, field, link.call or call)
                 end
             end
             if link.backward and (mode == 'ref' or field) then
                 for _, backwardID in ipairs(link.backward) do
-                    searchID(backwardID, field, link.callinfo or callinfo)
+                    searchID(backwardID, field, link.call or call)
                 end
             end
-            checkGeneric(link, field, callinfo)
+
+            if link.sources then
+                genericStash(link.sources[1], call)
+                genericResolve(link.sources[1], field)
+            end
         end
-        checkLastID(id, field, callinfo)
+        checkLastID(id, field, call)
     end
     error('too large')
 end

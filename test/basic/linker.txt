@@ -113,8 +113,29 @@ local <?r?> = f(<!k!>)
 ```
 
 l:r
-s:1#1
-l:f#1
-dg:T
-l:f@1
-k
+s:1#1 call
+l:f#1 call
+f:1#1 call -> f:1&T = l:k
+l:f@1 --> 从保存的call信息里找到 f:1&T = l:k
+l:k
+
+
+
+```
+---@generic T, V
+---@param p T
+---@return fun(V):T, V
+local function f(p) end
+
+local f2 = f(<!k!>)
+local <?r?> = f2()
+```
+
+l:r
+s:2|#1 call1
+l:f2|#1 call1
+f:2|#1 call1
+s:1#1|#1 call2
+f:1#1|#1 call2 -> f:1&T = l:k
+dfun:1|#1
+dn:V -> f:1&T = l:k

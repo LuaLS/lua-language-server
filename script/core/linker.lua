@@ -287,6 +287,10 @@ local function pushBackward(id, backwardID)
     link.backward[#link.backward+1] = backwardID
 end
 
+local function findDocState()
+
+end
+
 ---前进
 ---@param source parser.guide.object
 ---@return parser.guide.object[]
@@ -438,7 +442,7 @@ local function compileLink(source)
             )
             pushForward(id, callID)
             pushBackward(callID, id)
-            getLink(id).callinfo = source.vararg
+            getLink(id).call = source.vararg
         end
     end
     if source.type == 'doc.type.function' then
@@ -509,9 +513,12 @@ local function compileLink(source)
                 end
                 if doc.type == 'doc.param' then
                     local paramName = doc.param[1]
-                    for _, param in ipairs(source.args) do
-                        if param[1] == paramName then
+                    if source.docParamMap then
+                        local paramIndex = source.docParamMap[paramName]
+                        local param = source.args[paramIndex]
+                        if param then
                             pushForward(getID(param), getID(doc))
+                            param.docParam = doc
                         end
                     end
                 end
@@ -537,7 +544,7 @@ end
 -- 后退的关联ID
 ---@field backward string[]
 -- 函数调用参数信息（用于泛型）
----@field callinfo parser.guide.object
+---@field call parser.guide.object
 
 local m = {}
 

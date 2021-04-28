@@ -1145,6 +1145,7 @@ local function bindParamAndReturnIndex(binded)
                 paramMap[param[1]] = paramIndex
             end
         end
+        func.docParamMap = paramMap
     end
     local returnIndex = 0
     for _, doc in ipairs(binded) do

@@ -1454,7 +1454,7 @@ local Defs = {
         if func then
             local call = createCall(exp, func.finish + 1, exp.finish)
             call.node = func
-            call.start = func.start
+            call.start = inA
             func.next = call
             func.iterator = true
             values = { call }

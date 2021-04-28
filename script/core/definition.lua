@@ -149,9 +149,6 @@ return function (uri, offset)
             goto CONTINUE
         end
         src = src.field or src.method or src.index or src
-        if src.type == 'table' and src.parent.type ~= 'return' then
-            goto CONTINUE
-        end
         if  src.type == 'doc.class.name'
         and source.type ~= 'doc.type.name'
         and source.type ~= 'doc.extends.name'

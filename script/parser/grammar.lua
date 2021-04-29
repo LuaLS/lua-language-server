@@ -319,7 +319,7 @@ ExpUnit     <-  Nil
             /   Number
             /   Dots
             /   Table
-            /   Function
+            /   ExpFunction
             /   Simple
 
 Simple      <-  {| Prefix (Sp Suffix)* |}
@@ -327,7 +327,7 @@ Simple      <-  {| Prefix (Sp Suffix)* |}
 Prefix      <-  Sp ({} PL DirtyExp DirtyPR {})
             ->  Paren
             /   Single
-Single      <-  Name
+Single      <-  !FUNCTION Name
             ->  Single
 Suffix      <-  SuffixWithoutCall
             /   ({} PL SuffixCall DirtyPR {})
@@ -377,8 +377,21 @@ NewIndex    <-  Sp ({} Index NeedAssign DirtyExp {})
 NewField    <-  Sp ({} MustName ASSIGN DirtyExp {})
             ->  NewField
 
+ExpFunction <-  Function
+            ->  ExpFunction
 Function    <-  FunctionBody
             ->  Function
+FunctionBody
+            <-  FUNCTION FuncName FuncArgs
+                    {| (!END Action)* |}
+                NeedEnd
+            /   FUNCTION FuncName FuncArgsMiss
+                    {| %nil |}
+                NeedEnd
+FuncName    <-  !END {| Single (Sp SuffixWithoutCall)* |}
+            ->  Simple
+            /   %nil
+
 FuncArgs    <-  Sp ({} PL {| FuncArg+ |} DirtyPR {})
             ->  FuncArgs
             /   PL DirtyPR %nil
@@ -386,12 +399,6 @@ FuncArgsMiss<-  {} -> MissPL DirtyPR %nil
 FuncArg     <-  DOTS
             /   Name
             /   COMMA
-FunctionBody<-  FUNCTION FuncArgs
-                    {| (!END Action)* |}
-                NeedEnd
-            /   FUNCTION FuncArgsMiss
-                    {| %nil |}
-                NeedEnd
 
 -- 纯占位，修改了 `relabel.lua` 使重复定义不抛错
 Action      <-  !END .
@@ -515,26 +522,16 @@ LocalNameList
 LocalName   <-  (MustName LocalAttr?)
             ->  LocalName
 
+NamedFunction
+            <-  Function
+            ->  NamedFunction
+
 Call        <-  Simple
             ->  SimpleCall
 
 LocalFunction
-            <-  Sp ({} LOCAL FunctionNamedBody)
+            <-  Sp ({} LOCAL Function)
             ->  LocalFunction
-
-NamedFunction
-            <-  FunctionNamedBody
-            ->  NamedFunction
-FunctionNamedBody
-            <-  FUNCTION FuncName FuncArgs
-                    {| (!END Action)* |}
-                NeedEnd
-            /   FUNCTION FuncName FuncArgsMiss
-                    {| %nil |}
-                NeedEnd
-FuncName    <-  {| Single (Sp SuffixWithoutCall)* |}
-            ->  Simple
-            /   {} -> MissName %nil
 ]]
 
 grammar 'Lua' [[

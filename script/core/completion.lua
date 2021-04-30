@@ -199,7 +199,6 @@ local function buildFunction(results, source, oop, data)
     if snipType == 'Both' or snipType == 'Replace' then
         local snipData = util.deepCopy(data)
         snipData.kind = define.CompletionItemKind.Snippet
-        snipData.label = snipData.label .. '()'
         snipData.insertText = buildFunctionSnip(source, oop)
         snipData.insertTextFormat = 2
         snipData.id  = stack(function ()
@@ -401,7 +400,8 @@ end
 local function checkFieldThen(name, src, word, start, offset, parent, oop, results)
     local value = guide.getObjectValue(src) or src
     local kind = define.CompletionItemKind.Field
-    if value.type == 'function' then
+    if value.type == 'function'
+    or value.type == 'doc.type.function' then
         if oop then
             kind = define.CompletionItemKind.Method
         else
@@ -453,6 +453,20 @@ local function checkFieldThen(name, src, word, start, offset, parent, oop, resul
     }
 end
 
+local function getParams(func)
+    local args = {}
+    for _, arg in ipairs(func.args) do
+        if arg.type == '...' then
+            args[#args+1] = '...'
+        elseif arg.type == 'doc.type.arg' then
+            args[#args+1] = arg.name[1]
+        else
+            args[#args+1] = arg[1]
+        end
+    end
+    return '(' .. table.concat(args, ', ') .. ')'
+end
+
 local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, results, locals, isGlobal)
     local fields = {}
     local count = 0
@@ -470,8 +484,20 @@ local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, res
         if not matchKey(word, name, count >= 100) then
             goto CONTINUE
         end
+        local funcLabel
+        if config.config.completion.showParams then
+            local value = guide.getObjectValue(src) or src
+            if value.type == 'function'
+            or value.type == 'doc.type.function' then
+                funcLabel = name .. getParams(value)
+                fields[funcLabel] = src
+                fields[name] = false
+                count = count + 1
+                goto CONTINUE
+            end
+        end
         local last = fields[name]
-        if not last then
+        if last == nil then
             fields[name] = src
             count = count + 1
             goto CONTINUE
@@ -491,7 +517,9 @@ local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, res
         ::CONTINUE::
     end
     for name, src in util.sortPairs(fields) do
-        checkFieldThen(name, src, word, start, offset, parent, oop, results)
+        if src then
+            checkFieldThen(name, src, word, start, offset, parent, oop, results)
+        end
     end
 end
 

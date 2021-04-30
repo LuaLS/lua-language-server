@@ -165,6 +165,7 @@ local ConfigTemplate = {
         displayContext  = {6,         Integer},
         workspaceWord   = {true,      Boolean},
         autoRequire     = {true,      Boolean},
+        showParams      = {true,      Boolean},
     },
     signatureHelp = {
         enable          = {true,      Boolean},

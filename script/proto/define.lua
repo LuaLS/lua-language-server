@@ -1,6 +1,3 @@
-local guide = require 'core.guide'
-local util  = require 'utility'
-
 local m = {}
 
 ---@alias location table

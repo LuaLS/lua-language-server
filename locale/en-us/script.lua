@@ -154,6 +154,7 @@ HOVER_STRING_BYTES         = '{} bytes'
 HOVER_STRING_CHARACTERS    = '{} bytes, {} characters'
 HOVER_MULTI_DEF_PROTO      = '({} definitions, {} prototypes)'
 HOVER_MULTI_PROTO_NOT_FUNC = '({} non functional definition)'
+HOVER_MORE_ENUMS           = '|...(+{})'
 
 HOVER_USE_LUA_PATH      = '(Search path: `{}`)'
 HOVER_EXTENDS           = 'Expand to {}'

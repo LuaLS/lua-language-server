@@ -1,4 +1,6 @@
 local util         = require 'utility'
+local config       = require 'config'
+local lang         = require 'language'
 local error        = error
 local type         = type
 local next         = next
@@ -3396,7 +3398,14 @@ function m.mergeTypes(types)
         end
     end)
 
-    return tableConcat(results, '|')
+    local enumsLimit = config.config.hover.enumsLimit
+    if #results > enumsLimit then
+        return tableConcat(results, '|', 1, enumsLimit)
+            .. lang.script('HOVER_MORE_ENUMS', #results - enumsLimit)
+    else
+        return tableConcat(results, '|')
+    end
+
 end
 
 function m.getClassExtends(class)

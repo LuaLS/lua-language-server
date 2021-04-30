@@ -176,6 +176,7 @@ local ConfigTemplate = {
         viewNumber      = {true,      Boolean},
         fieldInfer      = {3000,      Integer},
         previewFields   = {100,       Integer},
+        enumsLimit      = {5,         Integer},
     },
     color = {
         mode            = {'Semantic', String},

@@ -1,8 +1,9 @@
 # changelog
 
 ## 1.20.5
+`NEW` setting: `completion.autoRequire`
+`NEW` setting: `hover.enumsLimit`
 `CHG` folding: supports `-- #region`
-`CHG` completion: `auto require` can be disabled
 `FIX` [#522](https://github.com/sumneko/lua-language-server/issues/522)
 `FIX` [#523](https://github.com/sumneko/lua-language-server/issues/523)
 

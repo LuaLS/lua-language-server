@@ -153,6 +153,7 @@ HOVER_STRING_BYTES         = '{} 个字节'
 HOVER_STRING_CHARACTERS    = '{} 个字节，{} 个字符'
 HOVER_MULTI_DEF_PROTO      = '({} 个定义，{} 个原型)'
 HOVER_MULTI_PROTO_NOT_FUNC = '({} 个非函数定义)'
+HOVER_MORE_ENUMS           = '|...(+{})'
 
 HOVER_USE_LUA_PATH      = '（搜索路径： `{}`）'
 HOVER_EXTENDS           = '展开为 {}'

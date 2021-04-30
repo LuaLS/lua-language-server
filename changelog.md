@@ -1,6 +1,7 @@
 # changelog
 
 ## 1.20.5
+`2021-4-30`
 `NEW` setting: `completion.autoRequire`
 `NEW` setting: `hover.enumsLimit`
 `CHG` folding: supports `-- #region`

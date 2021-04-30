@@ -292,6 +292,9 @@ local function checkLocal(ast, word, offset, results)
 end
 
 local function checkModule(ast, word, offset, results)
+    if not config.config.completion.autoRequire then
+        return
+    end
     local locals  = guide.getVisibleLocals(ast.ast, offset)
     for uri in files.eachFile() do
         if files.eq(uri, guide.getUri(ast.ast)) then

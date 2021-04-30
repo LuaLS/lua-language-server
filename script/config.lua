@@ -164,6 +164,7 @@ local ConfigTemplate = {
         keywordSnippet  = {'Replace', String},
         displayContext  = {6,         Integer},
         workspaceWord   = {true,      Boolean},
+        autoRequire     = {true,      Boolean},
     },
     signatureHelp = {
         enable          = {true,      Boolean},

@@ -1,6 +1,7 @@
 # changelog
 
 ## 1.20.5
+`CHG` folding: supports `-- #region`
 `FIX` [#522](https://github.com/sumneko/lua-language-server/issues/522)
 `FIX` [#523](https://github.com/sumneko/lua-language-server/issues/523)
 

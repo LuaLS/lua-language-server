@@ -23,6 +23,14 @@ local utf8         = utf8
 
 _ENV = nil
 
+local function isInteger(n)
+    if mathType then
+        return mathType(n) == 'integer'
+    else
+        return type(n) == 'number' and n % 1 == 0
+    end
+end
+
 local function formatNumber(n)
     if n == inf
     or n == -inf
@@ -30,20 +38,12 @@ local function formatNumber(n)
     or n ~= n then -- IEEE 标准中，NAN 不等于自己。但是某些实现中没有遵守这个规则
         return ('%q'):format(n)
     end
-    if mathType(n) == 'integer' then
+    if isInteger(n) then
         return tostring(n)
     end
     local str = ('%.10f'):format(n)
     str = str:gsub('%.?0*$', '')
     return str
-end
-
-local function isInteger(n)
-    if mathType then
-        return mathType(n) == 'integer'
-    else
-        return type(n) == 'number' and n % 1 == 0
-    end
 end
 
 local TAB = setmetatable({}, { __index = function (self, n)
@@ -204,7 +204,10 @@ function m.equal(a, b)
         end
         return true
     elseif tp1 == 'number' then
-        return mathAbs(a - b) <= 1e-10
+        if mathAbs(a - b) <= 1e-10 then
+            return true
+        end
+        return tostring(a) == tostring(b)
     else
         return a == b
     end
@@ -615,6 +618,20 @@ function m.sortByScore(tbl, callbacks)
         end
         return false
     end)
+end
+
+---裁剪字符串
+---@param str string
+---@param mode? '"left"'|'"right"'
+---@return string
+function m.trim(str, mode)
+    if mode == "left" then
+        return str:gsub('^%s+', '')
+    end
+    if mode == "right" then
+        return str:gsub('%s+$', '')
+    end
+    return str:match '^%s*(%S+)%s*$'
 end
 
 return m

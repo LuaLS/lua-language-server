@@ -4,6 +4,7 @@
 `NEW` setting: `completion.autoRequire`
 `NEW` setting: `hover.enumsLimit`
 `CHG` folding: supports `-- #region`
+`FIX` completion: details may be suspended
 `FIX` [#522](https://github.com/sumneko/lua-language-server/issues/522)
 `FIX` [#523](https://github.com/sumneko/lua-language-server/issues/523)
 

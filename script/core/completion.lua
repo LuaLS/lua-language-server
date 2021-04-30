@@ -48,9 +48,7 @@ local function resolveStack(id)
         return nil
     end
 
-    -- 当进行新的 resolve 时，放弃当前的 resolve
-    await.close('completion.resolve')
-    return await.await(callback, 'completion.resolve')
+    return callback()
 end
 
 local function trim(str)

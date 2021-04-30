@@ -550,6 +550,8 @@ proto.on('completionItem/resolve', function (item)
     if not item.data then
         return item
     end
+    await.close 'completion.resolve'
+    await.setID 'completion.resolve'
     local id            = item.data.id
     local uri           = item.data.uri
     --await.setPriority(1000)

@@ -3,6 +3,7 @@ local files      = require 'files'
 local vm         = require 'vm'
 local define     = require 'proto.define'
 local findSource = require 'core.find-source'
+local util       = require 'utility'
 
 local function eachRef(source, callback)
     local results = guide.requestReference(source)
@@ -138,6 +139,88 @@ local function findKeyWord(ast, text, offset, callback)
     end)
 end
 
+local function isRegion(str)
+    if str:sub(1, #'region') == 'region'
+    or str:sub(1, #'#region') == '#region' then
+        return true
+    end
+    return false
+end
+
+local function isEndRegion(str)
+    if str:sub(1, #'endregion') == 'endregion'
+    or str:sub(1, #'#endregion') == '#endregion' then
+        return true
+    end
+    return false
+end
+
+local function checkRegion(ast, text, offset, callback)
+    local count
+    local start, finish
+    local selected
+    for i, comment in ipairs(ast.comms) do
+        if comment.type == 'comment.short' then
+            if  comment.start <= offset
+            and comment.finish >= offset then
+                local ltext = comment.text:lower()
+                ltext = util.trim(ltext, 'left')
+                if isRegion(ltext) then
+                    start = comment.start - 2
+                    count = 1
+                    selected = i
+                elseif isEndRegion(ltext) then
+                    finish = comment.finish
+                    count = 1
+                    selected = i
+                else
+                    return
+                end
+                break
+            end
+        end
+    end
+    if not selected then
+        return
+    end
+    if start then
+        for i = selected + 1, #ast.comms do
+            local comment = ast.comms[i]
+            if comment.type == 'comment.short' then
+                local ltext = comment.text:lower()
+                ltext = util.trim(ltext, 'left')
+                if isRegion(ltext) then
+                    count = count + 1
+                elseif isEndRegion(ltext) then
+                    count = count - 1
+                    if count == 0 then
+                        callback(start, comment.finish)
+                        return
+                    end
+                end
+            end
+        end
+    end
+    if finish then
+        for i = selected - 1, 1, -1 do
+            local comment = ast.comms[i]
+            if comment.type == 'comment.short' then
+                local ltext = comment.text:lower()
+                ltext = util.trim(ltext, 'left')
+                if isEndRegion(ltext) then
+                    count = count + 1
+                elseif isRegion(ltext) then
+                    count = count - 1
+                    if count == 0 then
+                        callback(comment.start - 2, finish)
+                        return
+                    end
+                end
+            end
+        end
+    end
+end
+
 local accept = {
     ['label']      = true,
     ['goto']       = true,
@@ -252,6 +335,14 @@ return function (uri, offset)
             start  = start,
             finish = finish,
             kind   = define.DocumentHighlightKind.Write
+        }
+    end)
+
+    checkRegion(ast, text, offset, function (start, finish)
+        results[#results+1] = {
+            start  = start,
+            finish = finish,
+            kind   = define.DocumentHighlightKind.Text
         }
     end)
 

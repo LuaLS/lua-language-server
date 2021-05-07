@@ -731,3 +731,18 @@ hover = {
     label = 'field Food.firstField: integer = 0',
     name  = 'food.firstField',
 }}
+
+TEST {{ path = 'a.lua', content = '', }, {
+    path = 'b.lua',
+    content = [[
+--[=[
+I'm a multiline comment
+]=]
+local <?food?>
+]]
+},
+hover = {
+    label = 'local food: any',
+    name  = 'food',
+    description = "I'm a multiline comment\n"
+}}

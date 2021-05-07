@@ -277,7 +277,7 @@ local Defs = {
             type   = 'comment.long',
             start  = start,
             finish = finish - 1,
-            text   = '',
+            text   = str,
         }
         if not close then
             local endSymbol = ']' .. ('='):rep(afterEq-beforeEq) .. ']'
@@ -318,7 +318,7 @@ local Defs = {
             }
         end
     end,
-    CLongComment = function (start1, finish1, start2, finish2)
+    CLongComment = function (start1, finish1, str, start2, finish2)
         if State.options.nonstandardSymbol and State.options.nonstandardSymbol['/**/'] then
         else
             PushError {
@@ -344,7 +344,7 @@ local Defs = {
             type     = 'comment.clong',
             start    = start1,
             finish   = finish2 - 1,
-            text     = '',
+            text     = str,
         }
     end,
     CCommentPrefix = function (start, finish, commentFinish)

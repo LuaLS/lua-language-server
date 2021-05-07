@@ -1,6 +1,7 @@
 # changelog
 
 ## 1.21.0
+`2021-5-7`
 * `NEW` setting: `completion.showParams`
 * `NEW` `LuaDoc`: supports multiline comments
 * `NEW` `LuaDoc`: tail comments support lua string

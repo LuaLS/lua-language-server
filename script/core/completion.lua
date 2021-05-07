@@ -121,17 +121,9 @@ local function findParentInStringIndex(ast, text, offset)
     return parent.node, false
 end
 
-local function buildFunctionSnip(source, oop)
+local function buildFunctionSnip(source, value, oop)
     local name = getName(source):gsub('^.+[$.:]', '')
-    local defs = vm.getDefs(source, 0)
-    local args = ''
-    for _, def in ipairs(defs) do
-        local defArgs = getArg(def, oop)
-        if defArgs ~= '' then
-            args = defArgs
-            break
-        end
-    end
+    local args = getArg(value, oop)
     local id = 0
     args = args:gsub('[^,]+', function (arg)
         id = id + 1
@@ -191,7 +183,7 @@ local function buildDesc(source)
     return md:string()
 end
 
-local function buildFunction(results, source, oop, data)
+local function buildFunction(results, source, value, oop, data)
     local snipType = config.config.completion.callSnippet
     if snipType == 'Disable' or snipType == 'Both' then
         results[#results+1] = data
@@ -199,7 +191,7 @@ local function buildFunction(results, source, oop, data)
     if snipType == 'Both' or snipType == 'Replace' then
         local snipData = util.deepCopy(data)
         snipData.kind = define.CompletionItemKind.Snippet
-        snipData.insertText = buildFunctionSnip(source, oop)
+        snipData.insertText = buildFunctionSnip(source, value, oop)
         snipData.insertTextFormat = 2
         snipData.id  = stack(function ()
             return {
@@ -286,7 +278,7 @@ local function checkLocal(ast, word, offset, results)
                 if def.type == 'function'
                 or def.type == 'doc.type.function' then
                     local funcLabel = name .. getParams(def, false)
-                    buildFunction(results, source, false, {
+                    buildFunction(results, source, def, false, {
                         label  = funcLabel,
                         insertText = name,
                         kind   = define.CompletionItemKind.Function,
@@ -434,7 +426,7 @@ local function checkFieldThen(name, src, word, start, offset, parent, oop, resul
         else
             kind = define.CompletionItemKind.Function
         end
-        buildFunction(results, src, oop, {
+        buildFunction(results, src, value, oop, {
             label      = name,
             kind       = kind,
             insertText = name:match '^[^(]+',

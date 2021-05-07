@@ -2479,6 +2479,7 @@ TEST [[
     }
 }
 
+Cared['insertText'] = true
 TEST [[
 ---@overload fun(a: any, b: any)
 local function zzzz(a) end
@@ -2488,17 +2489,21 @@ zzzz$
     {
         label = 'zzzz(a)',
         kind  = define.CompletionItemKind.Function,
+        insertText = 'zzzz',
     },
     {
         label = 'zzzz(a)',
         kind  = define.CompletionItemKind.Snippet,
+        insertText = 'zzzz(${1:a: any})',
     },
     {
         label = 'zzzz(a, b)',
         kind  = define.CompletionItemKind.Function,
+        insertText = 'zzzz',
     },
     {
         label = 'zzzz(a, b)',
         kind  = define.CompletionItemKind.Snippet,
+        insertText = 'zzzz(${1:a: any}, ${2:b: any})',
     },
 }

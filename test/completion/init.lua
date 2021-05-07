@@ -1001,6 +1001,7 @@ xpcal$
     {
         label = 'xpcall(f, msgh, arg1, ...)',
         kind = define.CompletionItemKind.Function,
+        insertText = EXISTS,
     },
     {
         label = 'xpcall(f, msgh, arg1, ...)',
@@ -1019,6 +1020,7 @@ mt:f$
     {
         label = 'f(a, b, c)',
         kind = define.CompletionItemKind.Method,
+        insertText = EXISTS,
     },
     {
         label = 'f(a, b, c)',
@@ -1786,6 +1788,7 @@ zzz$
     {
         label = 'zzzzz(list, sep, i, j)',
         kind = define.CompletionItemKind.Function,
+        insertText = EXISTS,
     },
     {
         label = 'zzzzz(list, sep, i, j)',
@@ -2269,6 +2272,7 @@ m.f$
     {
         label  = "f()",
         kind   = define.CompletionItemKind.Function,
+        insertText = EXISTS,
     },
     {
         label  = "f()",

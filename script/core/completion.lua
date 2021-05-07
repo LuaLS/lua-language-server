@@ -288,6 +288,7 @@ local function checkLocal(ast, word, offset, results)
                     local funcLabel = name .. getParams(def, false)
                     buildFunction(results, source, false, {
                         label  = funcLabel,
+                        insertText = name,
                         kind   = define.CompletionItemKind.Function,
                         id     = stack(function ()
                             return {
@@ -436,6 +437,7 @@ local function checkFieldThen(name, src, word, start, offset, parent, oop, resul
         buildFunction(results, src, oop, {
             label      = name,
             kind       = kind,
+            insertText = name:match '^[^(]+',
             deprecated = vm.isDeprecated(src) or nil,
             id         = stack(function ()
                 return {

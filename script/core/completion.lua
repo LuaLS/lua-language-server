@@ -252,6 +252,26 @@ local function isSameSource(ast, source, pos)
     return source.start <= pos and source.finish >= pos
 end
 
+local function getParams(func, oop)
+    if not func.args then
+        return ''
+    end
+    local args = {}
+    for _, arg in ipairs(func.args) do
+        if arg.type == '...' then
+            args[#args+1] = '...'
+        elseif arg.type == 'doc.type.arg' then
+            args[#args+1] = arg.name[1]
+        else
+            args[#args+1] = arg[1]
+        end
+    end
+    if oop and args[1] ~= '...' then
+        table.remove(args, 1)
+    end
+    return '(' .. table.concat(args, ', ') .. ')'
+end
+
 local function checkLocal(ast, word, offset, results)
     local locals = guide.getVisibleLocals(ast.ast, offset)
     for name, source in pairs(locals) do
@@ -262,16 +282,22 @@ local function checkLocal(ast, word, offset, results)
             goto CONTINUE
         end
         if vm.hasType(source, 'function') then
-            buildFunction(results, source, false, {
-                label  = name,
-                kind   = define.CompletionItemKind.Function,
-                id     = stack(function ()
-                    return {
-                        detail      = buildDetail(source),
-                        description = buildDesc(source),
-                    }
-                end),
-            })
+            for _, def in ipairs(vm.getDefs(source, 0)) do
+                if def.type == 'function'
+                or def.type == 'doc.type.function' then
+                    local funcLabel = name .. getParams(def, false)
+                    buildFunction(results, source, false, {
+                        label  = funcLabel,
+                        kind   = define.CompletionItemKind.Function,
+                        id     = stack(function ()
+                            return {
+                                detail      = buildDetail(source),
+                                description = buildDesc(source),
+                            }
+                        end),
+                    })
+                end
+            end
         else
             results[#results+1] = {
                 label  = name,
@@ -453,20 +479,6 @@ local function checkFieldThen(name, src, word, start, offset, parent, oop, resul
     }
 end
 
-local function getParams(func)
-    local args = {}
-    for _, arg in ipairs(func.args) do
-        if arg.type == '...' then
-            args[#args+1] = '...'
-        elseif arg.type == 'doc.type.arg' then
-            args[#args+1] = arg.name[1]
-        else
-            args[#args+1] = arg[1]
-        end
-    end
-    return '(' .. table.concat(args, ', ') .. ')'
-end
-
 local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, results, locals, isGlobal)
     local fields = {}
     local count = 0
@@ -489,7 +501,7 @@ local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, res
             local value = guide.getObjectValue(src) or src
             if value.type == 'function'
             or value.type == 'doc.type.function' then
-                funcLabel = name .. getParams(value)
+                funcLabel = name .. getParams(value, oop)
                 fields[funcLabel] = src
                 fields[name] = false
                 count = count + 1
@@ -572,7 +584,7 @@ local function checkCommon(myUri, word, text, offset, results)
     results.enableCommon = true
     local used = {}
     for _, result in ipairs(results) do
-        used[result.label] = true
+        used[result.label:match '^[^(]*'] = true
     end
     for _, data in ipairs(keyWordMap) do
         used[data[1]] = true

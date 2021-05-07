@@ -254,7 +254,7 @@ end
 
 local function getParams(func, oop)
     if not func.args then
-        return ''
+        return '()'
     end
     local args = {}
     for _, arg in ipairs(func.args) do

@@ -1226,6 +1226,16 @@ loadstring$
         label = 'loadstring()',
         kind  = define.CompletionItemKind.Snippet,
     },
+    {
+        label = 'loadstring(text, chunkname)',
+        deprecated = true,
+        kind  = define.CompletionItemKind.Function,
+    },
+    {
+        label = 'loadstring(text, chunkname)',
+        deprecated = true,
+        kind  = define.CompletionItemKind.Snippet,
+    },
 }
 
 TEST [[
@@ -1233,12 +1243,12 @@ debug.setcsta$
 ]]
 {
     {
-        label = 'setcstacklimit',
+        label = 'setcstacklimit(limit)',
         kind = define.CompletionItemKind.Function,
         deprecated = true,
     },
     {
-        label = 'setcstacklimit()',
+        label = 'setcstacklimit(limit)',
         kind = define.CompletionItemKind.Snippet,
         deprecated = true,
     },
@@ -1777,11 +1787,11 @@ zzz$
 ]]
 {
     {
-        label = 'zzzzz',
+        label = 'zzzzz(list, sep, i, j)',
         kind = define.CompletionItemKind.Function,
     },
     {
-        label = 'zzzzz()',
+        label = 'zzzzz(list, sep, i, j)',
         kind = define.CompletionItemKind.Snippet,
         insertText = EXISTS,
     }
@@ -2260,7 +2270,7 @@ end
 m.f$
 ]]{
     {
-        label  = "f",
+        label  = "f()",
         kind   = define.CompletionItemKind.Function,
     },
     {

@@ -1773,9 +1773,6 @@ end)
 
 TEST [[
 --- JustTest
----@overload fun(list:table):string
----@overload fun(list:table, sep:string):string
----@overload fun(list:table, sep:string, i:number):string
 ---@param list table
 ---@param sep string
 ---@param i number
@@ -2476,4 +2473,28 @@ TEST [[
             newText = 'AAA.BBB',
         },
     }
+}
+
+TEST [[
+---@overload fun(a: any, b: any)
+local function zzzz(a) end
+zzzz$
+]]
+{
+    {
+        label = 'zzzz(a)',
+        kind  = define.CompletionItemKind.Function,
+    },
+    {
+        label = 'zzzz(a)',
+        kind  = define.CompletionItemKind.Snippet,
+    },
+    {
+        label = 'zzzz(a, b)',
+        kind  = define.CompletionItemKind.Function,
+    },
+    {
+        label = 'zzzz(a, b)',
+        kind  = define.CompletionItemKind.Snippet,
+    },
 }

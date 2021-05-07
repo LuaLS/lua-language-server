@@ -1,5 +1,8 @@
 # changelog
 
+## 1.21.0
+* `NEW` setting: `completion.showParams`
+
 ## 1.20.5
 `2021-4-30`
 * `NEW` setting: `completion.autoRequire`

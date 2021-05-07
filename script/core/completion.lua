@@ -505,6 +505,14 @@ local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, res
                 fields[funcLabel] = src
                 fields[name] = false
                 count = count + 1
+                if value.type == 'function' and value.bindDocs then
+                    for _, doc in ipairs(value.bindDocs) do
+                        if doc.type == 'doc.overload' then
+                            funcLabel = name .. getParams(doc.overload, oop)
+                            fields[funcLabel] = doc.overload
+                        end
+                    end
+                end
                 goto CONTINUE
             end
         end

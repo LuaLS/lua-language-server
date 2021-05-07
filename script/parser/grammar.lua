@@ -88,13 +88,13 @@ end
 grammar 'Comment' [[
 Comment         <-  LongComment
                 /   '--' ShortComment
-LongComment     <-  ({} '--[' {} {:eq: '='* :} {} '[' 
+LongComment     <-  ({} '--[' {} {:eq: '='* :} {} '[' %nl?
                     {(!CommentClose .)*}
                     ((CommentClose / %nil) {}))
                 ->  LongComment
                 /   (
-                    {} '/*' {}
-                    (!'*/' .)*
+                    {} '/*' {} %nl?
+                    {(!'*/' .)*}
                     {} '*/' {}
                     )
                 ->  CLongComment

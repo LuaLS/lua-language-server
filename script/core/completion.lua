@@ -121,17 +121,9 @@ local function findParentInStringIndex(ast, text, offset)
     return parent.node, false
 end
 
-local function buildFunctionSnip(source, oop)
+local function buildFunctionSnip(source, value, oop)
     local name = getName(source):gsub('^.+[$.:]', '')
-    local defs = vm.getDefs(source, 0)
-    local args = ''
-    for _, def in ipairs(defs) do
-        local defArgs = getArg(def, oop)
-        if defArgs ~= '' then
-            args = defArgs
-            break
-        end
-    end
+    local args = getArg(value, oop)
     local id = 0
     args = args:gsub('[^,]+', function (arg)
         id = id + 1
@@ -191,7 +183,7 @@ local function buildDesc(source)
     return md:string()
 end
 
-local function buildFunction(results, source, oop, data)
+local function buildFunction(results, source, value, oop, data)
     local snipType = config.config.completion.callSnippet
     if snipType == 'Disable' or snipType == 'Both' then
         results[#results+1] = data
@@ -199,8 +191,7 @@ local function buildFunction(results, source, oop, data)
     if snipType == 'Both' or snipType == 'Replace' then
         local snipData = util.deepCopy(data)
         snipData.kind = define.CompletionItemKind.Snippet
-        snipData.label = snipData.label .. '()'
-        snipData.insertText = buildFunctionSnip(source, oop)
+        snipData.insertText = buildFunctionSnip(source, value, oop)
         snipData.insertTextFormat = 2
         snipData.id  = stack(function ()
             return {
@@ -253,6 +244,26 @@ local function isSameSource(ast, source, pos)
     return source.start <= pos and source.finish >= pos
 end
 
+local function getParams(func, oop)
+    if not func.args then
+        return '()'
+    end
+    local args = {}
+    for _, arg in ipairs(func.args) do
+        if arg.type == '...' then
+            args[#args+1] = '...'
+        elseif arg.type == 'doc.type.arg' then
+            args[#args+1] = arg.name[1]
+        else
+            args[#args+1] = arg[1]
+        end
+    end
+    if oop and args[1] ~= '...' then
+        table.remove(args, 1)
+    end
+    return '(' .. table.concat(args, ', ') .. ')'
+end
+
 local function checkLocal(ast, word, offset, results)
     local locals = guide.getVisibleLocals(ast.ast, offset)
     for name, source in pairs(locals) do
@@ -263,16 +274,23 @@ local function checkLocal(ast, word, offset, results)
             goto CONTINUE
         end
         if vm.hasType(source, 'function') then
-            buildFunction(results, source, false, {
-                label  = name,
-                kind   = define.CompletionItemKind.Function,
-                id     = stack(function ()
-                    return {
-                        detail      = buildDetail(source),
-                        description = buildDesc(source),
-                    }
-                end),
-            })
+            for _, def in ipairs(vm.getDefs(source, 0)) do
+                if def.type == 'function'
+                or def.type == 'doc.type.function' then
+                    local funcLabel = name .. getParams(def, false)
+                    buildFunction(results, source, def, false, {
+                        label  = funcLabel,
+                        insertText = name,
+                        kind   = define.CompletionItemKind.Function,
+                        id     = stack(function ()
+                            return {
+                                detail      = buildDetail(source),
+                                description = buildDesc(source),
+                            }
+                        end),
+                    })
+                end
+            end
         else
             results[#results+1] = {
                 label  = name,
@@ -401,15 +419,17 @@ end
 local function checkFieldThen(name, src, word, start, offset, parent, oop, results)
     local value = guide.getObjectValue(src) or src
     local kind = define.CompletionItemKind.Field
-    if value.type == 'function' then
+    if value.type == 'function'
+    or value.type == 'doc.type.function' then
         if oop then
             kind = define.CompletionItemKind.Method
         else
             kind = define.CompletionItemKind.Function
         end
-        buildFunction(results, src, oop, {
+        buildFunction(results, src, value, oop, {
             label      = name,
             kind       = kind,
+            insertText = name:match '^[^(]+',
             deprecated = vm.isDeprecated(src) or nil,
             id         = stack(function ()
                 return {
@@ -470,8 +490,28 @@ local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, res
         if not matchKey(word, name, count >= 100) then
             goto CONTINUE
         end
+        local funcLabel
+        if config.config.completion.showParams then
+            local value = guide.getObjectValue(src) or src
+            if value.type == 'function'
+            or value.type == 'doc.type.function' then
+                funcLabel = name .. getParams(value, oop)
+                fields[funcLabel] = src
+                fields[name] = false
+                count = count + 1
+                if value.type == 'function' and value.bindDocs then
+                    for _, doc in ipairs(value.bindDocs) do
+                        if doc.type == 'doc.overload' then
+                            funcLabel = name .. getParams(doc.overload, oop)
+                            fields[funcLabel] = doc.overload
+                        end
+                    end
+                end
+                goto CONTINUE
+            end
+        end
         local last = fields[name]
-        if not last then
+        if last == nil then
             fields[name] = src
             count = count + 1
             goto CONTINUE
@@ -491,7 +531,9 @@ local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, res
         ::CONTINUE::
     end
     for name, src in util.sortPairs(fields) do
-        checkFieldThen(name, src, word, start, offset, parent, oop, results)
+        if src then
+            checkFieldThen(name, src, word, start, offset, parent, oop, results)
+        end
     end
 end
 
@@ -544,7 +586,7 @@ local function checkCommon(myUri, word, text, offset, results)
     results.enableCommon = true
     local used = {}
     for _, result in ipairs(results) do
-        used[result.label] = true
+        used[result.label:match '^[^(]*'] = true
     end
     for _, data in ipairs(keyWordMap) do
         used[data[1]] = true

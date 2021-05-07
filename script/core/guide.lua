@@ -1842,6 +1842,8 @@ function m.checkSameSimpleByBindDocs(status, obj, start, pushQueue, mode)
             if obj.type == '...' then
                 results[#results+1] = doc
             end
+        elseif doc.type == 'doc.overload' then
+            results[#results+1] = doc.overload
         end
     end
     for _, res in ipairs(results) do

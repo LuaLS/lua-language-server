@@ -60,6 +60,8 @@ local Cared = {
     ['deprecated']          = true,
 }
 
+local IgnoreFunction = false
+
 function TEST(script)
     return function (expect)
         files.removeAll()
@@ -83,6 +85,16 @@ function TEST(script)
             for k in pairs(item) do
                 if not Cared[k] then
                     item[k] = nil
+                end
+            end
+        end
+        if IgnoreFunction then
+            for i = #result, 1, -1 do
+                local item = result[i]
+                if item.label:find '%('
+                and not item.label:find 'function' then
+                    result[i] = result[#result]
+                    result[#result] = nil
                 end
             end
         end
@@ -175,11 +187,11 @@ ass$
 ]]
 {
     {
-        label = 'assert',
+        label = 'assert(v, message)',
         kind  = define.CompletionItemKind.Function,
     },
     {
-        label = 'assert()',
+        label = 'assert(v, message)',
         kind  = define.CompletionItemKind.Snippet,
     },
 }
@@ -201,11 +213,11 @@ _G.ass$
 ]]
 {
     {
-        label = 'assert',
+        label = 'assert(v, message)',
         kind  = define.CompletionItemKind.Function,
     },
     {
-        label = 'assert()',
+        label = 'assert(v, message)',
         kind  = define.CompletionItemKind.Snippet,
     },
 }
@@ -217,11 +229,11 @@ ff$
 ]]
 {
     {
-        label = 'ffff',
+        label = 'ffff(a, b)',
         kind  = define.CompletionItemKind.Function,
     },
     {
-        label = 'ffff()',
+        label = 'ffff(a, b)',
         kind  = define.CompletionItemKind.Snippet,
     }
 }
@@ -285,11 +297,11 @@ mt:g$
 ]]
 {
     {
-        label = 'get',
+        label = 'get(a, b)',
         kind = define.CompletionItemKind.Method,
     },
     {
-        label = 'get()',
+        label = 'get(a, b)',
         kind = define.CompletionItemKind.Snippet,
     },
     {
@@ -311,15 +323,16 @@ loc$
         kind = define.CompletionItemKind.Snippet,
     },
     {
-        label = 'collectgarbage',
+        label = 'collectgarbage(opt, ...)',
         kind = define.CompletionItemKind.Function,
     },
     {
-        label = 'collectgarbage()',
+        label = 'collectgarbage(opt, ...)',
         kind = define.CompletionItemKind.Snippet,
     },
 }
 
+IgnoreFunction = true
 TEST [[
 do$
 ]]
@@ -331,50 +344,6 @@ do$
     {
         label = 'do .. end',
         kind = define.CompletionItemKind.Snippet,
-    },
-    {
-        label = 'dofile',
-        kind  = define.CompletionItemKind.Function,
-    },
-    {
-        label = 'dofile()',
-        kind  = define.CompletionItemKind.Snippet,
-    },
-    {
-        label = 'load',
-        kind  = define.CompletionItemKind.Function,
-    },
-    {
-        label = 'load()',
-        kind  = define.CompletionItemKind.Snippet,
-    },
-    {
-        label = 'loadfile',
-        kind  = define.CompletionItemKind.Function,
-    },
-    {
-        label = 'loadfile()',
-        kind  = define.CompletionItemKind.Snippet,
-    },
-    {
-        label = 'loadstring',
-        kind  = define.CompletionItemKind.Function,
-        deprecated = true,
-    },
-    {
-        label = 'loadstring()',
-        kind  = define.CompletionItemKind.Snippet,
-        deprecated = true,
-    },
-    {
-        label = 'module',
-        kind  = define.CompletionItemKind.Function,
-        deprecated = true,
-    },
-    {
-        label = 'module()',
-        kind  = define.CompletionItemKind.Snippet,
-        deprecated = true,
     },
 }
 
@@ -454,6 +423,7 @@ t.   $
     },
 }
 
+IgnoreFunction = false
 TEST [[
 t.a = {}
 function t:b()
@@ -462,7 +432,7 @@ t:$
 ]]
 {
     {
-        label = 'b',
+        label = 'b()',
         kind = define.CompletionItemKind.Method,
     },
     {
@@ -507,6 +477,7 @@ TEST 'local s = "a:$"' (nil)
 TEST 'debug.$'
 (EXISTS)
 
+IgnoreFunction = true
 TEST [[
 local xxxx = {
     xxyy = 1,
@@ -529,22 +500,6 @@ local t = {
     {
         label = 'xxzz',
         kind = define.CompletionItemKind.Property,
-    },
-    {
-        label = 'next',
-        kind = define.CompletionItemKind.Function,
-    },
-    {
-        label = 'next()',
-        kind = define.CompletionItemKind.Snippet,
-    },
-    {
-        label = 'xpcall',
-        kind = define.CompletionItemKind.Function,
-    },
-    {
-        label = 'xpcall()',
-        kind = define.CompletionItemKind.Snippet,
     },
 }
 
@@ -1030,25 +985,10 @@ else$
         label = 'ELSE',
         kind = define.CompletionItemKind.Enum,
     },
-    {
-        label = 'select',
-        kind = define.CompletionItemKind.Function,
-    },
-    {
-        label = 'select()',
-        kind = define.CompletionItemKind.Snippet,
-    },
-    {
-        label = 'setmetatable',
-        kind = define.CompletionItemKind.Function,
-    },
-    {
-        label = 'setmetatable()',
-        kind = define.CompletionItemKind.Snippet,
-    },
 }
 
 Cared['insertText'] = true
+IgnoreFunction = false
 TEST [[
 local xpcal
 xpcal$
@@ -1059,11 +999,12 @@ xpcal$
         kind = define.CompletionItemKind.Variable,
     },
     {
-        label = 'xpcall',
+        label = 'xpcall(f, msgh, arg1, ...)',
         kind = define.CompletionItemKind.Function,
+        insertText = EXISTS,
     },
     {
-        label = 'xpcall()',
+        label = 'xpcall(f, msgh, arg1, ...)',
         kind = define.CompletionItemKind.Snippet,
         insertText = EXISTS,
     },
@@ -1077,11 +1018,12 @@ mt:f$
 ]]
 {
     {
-        label = 'f',
+        label = 'f(a, b, c)',
         kind = define.CompletionItemKind.Method,
+        insertText = EXISTS,
     },
     {
-        label = 'f()',
+        label = 'f(a, b, c)',
         kind = define.CompletionItemKind.Snippet,
         insertText = 'f(${1:a: any}, ${2:b: any}, ${3:c: any})',
     },
@@ -1123,6 +1065,7 @@ end",
     },
 }
 Cared['insertText'] = false
+IgnoreFunction = true
 
 TEST [[
 local function f()
@@ -1141,22 +1084,6 @@ end
     },
     {
         label = 'elseif .. then',
-        kind = define.CompletionItemKind.Snippet,
-    },
-    {
-        label = 'select',
-        kind = define.CompletionItemKind.Function,
-    },
-    {
-        label = 'select()',
-        kind = define.CompletionItemKind.Snippet,
-    },
-    {
-        label = 'setmetatable',
-        kind = define.CompletionItemKind.Function,
-    },
-    {
-        label = 'setmetatable()',
         kind = define.CompletionItemKind.Snippet,
     },
 }
@@ -1259,17 +1186,18 @@ io$
 ]]
 (EXISTS)
 
+IgnoreFunction = false
 TEST [[
 loadstring$
 ]]
 {
     {
-        label = 'loadstring',
+        label = 'loadstring(text, chunkname)',
         kind  = define.CompletionItemKind.Function,
         deprecated = true,
     },
     {
-        label = 'loadstring()',
+        label = 'loadstring(text, chunkname)',
         kind  = define.CompletionItemKind.Snippet,
         deprecated = true,
     },
@@ -1293,11 +1221,21 @@ loadstring$
 ]]
 {
     {
-        label = 'loadstring',
+        label = 'loadstring()',
         kind  = define.CompletionItemKind.Function,
     },
     {
         label = 'loadstring()',
+        kind  = define.CompletionItemKind.Snippet,
+    },
+    {
+        label = 'loadstring(text, chunkname)',
+        deprecated = true,
+        kind  = define.CompletionItemKind.Function,
+    },
+    {
+        label = 'loadstring(text, chunkname)',
+        deprecated = true,
         kind  = define.CompletionItemKind.Snippet,
     },
 }
@@ -1307,12 +1245,12 @@ debug.setcsta$
 ]]
 {
     {
-        label = 'setcstacklimit',
+        label = 'setcstacklimit(limit)',
         kind = define.CompletionItemKind.Function,
         deprecated = true,
     },
     {
-        label = 'setcstacklimit()',
+        label = 'setcstacklimit(limit)',
         kind = define.CompletionItemKind.Snippet,
         deprecated = true,
     },
@@ -1837,9 +1775,6 @@ end)
 
 TEST [[
 --- JustTest
----@overload fun(list:table):string
----@overload fun(list:table, sep:string):string
----@overload fun(list:table, sep:string, i:number):string
 ---@param list table
 ---@param sep string
 ---@param i number
@@ -1851,11 +1786,12 @@ zzz$
 ]]
 {
     {
-        label = 'zzzzz',
+        label = 'zzzzz(list, sep, i, j)',
         kind = define.CompletionItemKind.Function,
+        insertText = EXISTS,
     },
     {
-        label = 'zzzzz()',
+        label = 'zzzzz(list, sep, i, j)',
         kind = define.CompletionItemKind.Snippet,
         insertText = EXISTS,
     }
@@ -2334,8 +2270,9 @@ end
 m.f$
 ]]{
     {
-        label  = "f",
+        label  = "f()",
         kind   = define.CompletionItemKind.Function,
+        insertText = EXISTS,
     },
     {
         label  = "f()",
@@ -2540,4 +2477,33 @@ TEST [[
             newText = 'AAA.BBB',
         },
     }
+}
+
+Cared['insertText'] = true
+TEST [[
+---@overload fun(a: any, b: any)
+local function zzzz(a) end
+zzzz$
+]]
+{
+    {
+        label = 'zzzz(a)',
+        kind  = define.CompletionItemKind.Function,
+        insertText = 'zzzz',
+    },
+    {
+        label = 'zzzz(a)',
+        kind  = define.CompletionItemKind.Snippet,
+        insertText = 'zzzz(${1:a: any})',
+    },
+    {
+        label = 'zzzz(a, b)',
+        kind  = define.CompletionItemKind.Function,
+        insertText = 'zzzz',
+    },
+    {
+        label = 'zzzz(a, b)',
+        kind  = define.CompletionItemKind.Snippet,
+        insertText = 'zzzz(${1:a: any}, ${2:b: any})',
+    },
 }

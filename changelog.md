@@ -2,29 +2,29 @@
 
 ## 1.20.5
 `2021-4-30`
-`NEW` setting: `completion.autoRequire`
-`NEW` setting: `hover.enumsLimit`
-`CHG` folding: supports `-- #region`
-`FIX` completion: details may be suspended
-`FIX` [#522](https://github.com/sumneko/lua-language-server/issues/522)
-`FIX` [#523](https://github.com/sumneko/lua-language-server/issues/523)
+* `NEW` setting: `completion.autoRequire`
+* `NEW` setting: `hover.enumsLimit`
+* `CHG` folding: supports `-- #region`
+* `FIX` completion: details may be suspended
+* `FIX` [#522](https://github.com/sumneko/lua-language-server/issues/522)
+* `FIX` [#523](https://github.com/sumneko/lua-language-server/issues/523)
 
 ## 1.20.4
 `2021-4-13`
-`NEW` diagnostic: `deprecated`
-`FIX` [#464](https://github.com/sumneko/lua-language-server/issues/464)
-`FIX` [#497](https://github.com/sumneko/lua-language-server/issues/497)
-`FIX` [#502](https://github.com/sumneko/lua-language-server/issues/502)
+* `NEW` diagnostic: `deprecated`
+* `FIX` [#464](https://github.com/sumneko/lua-language-server/issues/464)
+* `FIX` [#497](https://github.com/sumneko/lua-language-server/issues/497)
+* `FIX` [#502](https://github.com/sumneko/lua-language-server/issues/502)
 
 ## 1.20.3
 `2021-4-6`
-`FIX` [#479](https://github.com/sumneko/lua-language-server/issues/479)
-`FIX` [#483](https://github.com/sumneko/lua-language-server/issues/483)
-`FIX` [#485](https://github.com/sumneko/lua-language-server/issues/485)
-`FIX` [#487](https://github.com/sumneko/lua-language-server/issues/487)
-`FIX` [#488](https://github.com/sumneko/lua-language-server/issues/488)
-`FIX` [#490](https://github.com/sumneko/lua-language-server/issues/490)
-`FIX` [#495](https://github.com/sumneko/lua-language-server/issues/495)
+* `FIX` [#479](https://github.com/sumneko/lua-language-server/issues/479)
+* `FIX` [#483](https://github.com/sumneko/lua-language-server/issues/483)
+* `FIX` [#485](https://github.com/sumneko/lua-language-server/issues/485)
+* `FIX` [#487](https://github.com/sumneko/lua-language-server/issues/487)
+* `FIX` [#488](https://github.com/sumneko/lua-language-server/issues/488)
+* `FIX` [#490](https://github.com/sumneko/lua-language-server/issues/490)
+* `FIX` [#495](https://github.com/sumneko/lua-language-server/issues/495)
 
 ## 1.20.2
 `2021-4-2`

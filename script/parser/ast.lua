@@ -9,7 +9,12 @@ local tableSort   = table.sort
 
 _ENV = nil
 
-local State
+local DefaultState = {
+    lua = '',
+    options = {},
+}
+
+local State = DefaultState
 local PushError
 local PushDiag
 local PushComment
@@ -1925,7 +1930,7 @@ local function init(state)
 end
 
 local function close()
-    State       = nil
+    State       = DefaultState
     PushError   = function (...) end
     PushDiag    = function (...) end
     PushComment = function (...) end

@@ -247,25 +247,57 @@ function m.searchRefsByID(status, uri, expect, mode)
 
     local callStash = {}
 
+    local function getGenericID(typeUnit, call, index)
+        local key = typeUnit[1]
+        local generics = typeUnit.typeGeneric[key]
+        local callParam = call.args[index]
+        if not callParam then
+            return nil
+        end
+        if typeUnit.literal then
+            if callParam.type == 'string' then
+                return generics, ('dn:%s'):format(callParam[1] or '')
+            end
+        else
+            return generics, linker.getID(callParam)
+        end
+        return nil
+    end
+
     local function genericStashParam(docType, call, index)
         for _, typeUnit in ipairs(docType.types) do
             if typeUnit.typeGeneric then
-                local key = typeUnit[1]
-                local generics = typeUnit.typeGeneric[key]
-                local callParam = call.args[index]
-                if callParam then
-                    if typeUnit.literal then
-                        if callParam.type == 'string' then
-                            genericStashMap[generics] = ('dn:%s'):format(callParam[1] or '')
+                local generics, id = getGenericID(typeUnit, call, index)
+                if id then
+                    genericStashMap[generics] = id
+                end
+            end
+            -- 支持 V[]
+            if typeUnit.type == 'doc.type.array' then
+                if typeUnit.node.typeGeneric then
+                    local generics, id = getGenericID(typeUnit.node, call, index)
+                    if id then
+                        genericStashMap[generics] = id .. linker.SPLIT_CHAR
+                    end
+                end
+            end
+            -- 支持 table<number, V>
+            if typeUnit.type == 'doc.type.table' then
+                if typeUnit.value then
+                    for _, typeUnit2 in ipairs(typeUnit.value.types) do
+                        if typeUnit2.typeGeneric then
+                            local generics, id = getGenericID(typeUnit2, call, index)
+                            if id then
+                                genericStashMap[generics] = id .. linker.SPLIT_CHAR
+                            end
                         end
-                    else
-                        genericStashMap[generics] = linker.getID(callParam)
                     end
                 end
             end
         end
     end
 
+    -- TODO 这里的实现是有问题的，在多次穿透泛型时可能出错，不过错就错吧，让用户自己写注解
     local function genericStash(source)
         if source.type ~= 'function'
         and source.type ~= 'doc.type.function' then

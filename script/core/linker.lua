@@ -131,6 +131,7 @@ local function getKey(source)
     or     source.type == 'doc.vararg'
     or     source.type == 'doc.field.name'
     or     source.type == 'doc.type.table'
+    or     source.type == 'doc.type.array'
     or     source.type == 'doc.type.function' then
         return source.start, nil
     elseif source.type == 'doc.see.field' then
@@ -180,7 +181,10 @@ local function checkMode(source)
         return 'dfun:'
     end
     if source.type == 'doc.type.table' then
-        return 'dtbl:'
+        return 'dtable:'
+    end
+    if source.type == 'doc.type.array' then
+        return 'darray:'
     end
     if source.type == 'doc.vararg' then
         return 'dv:'
@@ -465,6 +469,15 @@ local function compileLink(source)
                 SPLIT_CHAR
             )
             pushForward(valueID, getID(source.value))
+        end
+    end
+    if source.type == 'doc.type.array' then
+        if source.node then
+            local nodeID = ('%s%s'):format(
+                id,
+                SPLIT_CHAR
+            )
+            pushForward(nodeID, getID(source.node))
         end
     end
     -- 将函数的返回值映射到具体的返回值上

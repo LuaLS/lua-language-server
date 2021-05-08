@@ -282,6 +282,26 @@ print(v1.<?bar1?>)
 ]]
 
 TEST [[
+---@class A
+local <!t!>
+
+---@type A[]
+local b
+
+local <?<!c!>?> = b[1]
+]]
+
+TEST [[
+---@class A
+local <!t!>
+
+---@type table<number, A>
+local b
+
+local <?<!c!>?> = b[1]
+]]
+
+TEST [[
 ---@class Foo
 local Foo = {}
 function Foo:<!bar1!>() end
@@ -344,6 +364,66 @@ local function f(x) end
 
 local v1 = f()
 local <?<!v2!>?> = v1(<!{}!>)
+]]
+
+TEST [[
+---@generic V
+---@param x V[]
+---@return V
+local function f(x) end
+
+---@class A
+local <!a!>
+
+---@type A[]
+local b
+
+local <?<!c!>?> = f(b)
+]]
+
+TEST [[
+---@generic V
+---@param x table<number, V>
+---@return V
+local function f(x) end
+
+---@class A
+local <!a!>
+
+---@type table<number, A>
+local b
+
+local <?<!c!>?> = f(b)
+]]
+
+TEST [[
+---@generic V
+---@param x V[]
+---@return V
+local function f(x) end
+
+---@class A
+local <!a!>
+
+---@type table<number, A>
+local b
+
+local <?<!c!>?> = f(b)
+]]
+
+TEST [[
+---@generic V
+---@param x table<number, V>
+---@return V
+local function f(x) end
+
+---@class A
+local <!a!>
+
+---@type A[]
+local b
+
+local <?<!c!>?> = f(b)
 ]]
 
 TEST [[

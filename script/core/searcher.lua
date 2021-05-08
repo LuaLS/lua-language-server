@@ -2,8 +2,6 @@ local linker = require 'core.linker'
 local guide  = require 'parser.guide'
 local files  = require 'files'
 
-local MARK_CHAR = '\x1E'
-
 local function checkFunctionReturn(source)
     if  source.parent
     and source.parent.type == 'return' then
@@ -179,6 +177,7 @@ function m.searchRefsByID(status, uri, expect, mode)
 
     -- 缓存过程中的泛型，以泛型关联表为key
     local genericStashMap = {}
+    local idStack = {}
 
     local function search(id, field)
         local fieldLen
@@ -241,12 +240,30 @@ function m.searchRefsByID(status, uri, expect, mode)
         search(parentID, linker.SPLIT_CHAR .. linker.RETURN_INDEX_CHAR .. returnIndex)
     end
 
-    local callStash = {}
+    local function findCallParam(key, index)
+        for i = #idStack, 1, -1 do
+            local id = idStack[i]
+            local link = linker.getLinkByID(root, id)
+            if not link then
+                goto CONTINUE
+            end
+            local call = link.call
+            if not call then
+                goto CONTINUE
+            end
+            local args = call.args
+            if not args then
+                goto CONTINUE
+            end
+            do return args[index] end
+            ::CONTINUE::
+        end
+    end
 
-    local function getGenericID(typeUnit, call, index)
+    local function getGenericID(typeUnit, index)
         local key = typeUnit[1]
         local generics = typeUnit.typeGeneric[key]
-        local callParam = call.args[index]
+        local callParam = findCallParam(key, index)
         if not callParam then
             return nil
         end
@@ -260,10 +277,13 @@ function m.searchRefsByID(status, uri, expect, mode)
         return nil
     end
 
-    local function genericStashParam(docType, call, index)
+    local function genericStashParam(docType, index)
+        if #idStack == 0 then
+            return
+        end
         for _, typeUnit in ipairs(docType.types) do
             if typeUnit.typeGeneric then
-                local generics, id = getGenericID(typeUnit, call, index)
+                local generics, id = getGenericID(typeUnit, index)
                 if id then
                     genericStashMap[generics] = id
                 end
@@ -271,7 +291,7 @@ function m.searchRefsByID(status, uri, expect, mode)
             -- 支持 V[]
             if typeUnit.type == 'doc.type.array' then
                 if typeUnit.node.typeGeneric then
-                    local generics, id = getGenericID(typeUnit.node, call, index)
+                    local generics, id = getGenericID(typeUnit.node, index)
                     if id then
                         genericStashMap[generics] = id .. linker.SPLIT_CHAR
                     end
@@ -282,7 +302,7 @@ function m.searchRefsByID(status, uri, expect, mode)
                 if typeUnit.value then
                     for _, typeUnit2 in ipairs(typeUnit.value.types) do
                         if typeUnit2.typeGeneric then
-                            local generics, id = getGenericID(typeUnit2, call, index)
+                            local generics, id = getGenericID(typeUnit2, index)
                             if id then
                                 genericStashMap[generics] = id .. linker.SPLIT_CHAR
                             end
@@ -299,15 +319,6 @@ function m.searchRefsByID(status, uri, expect, mode)
         and source.type ~= 'doc.type.function' then
             return
         end
-        local top = #callStash
-        if top == 0 then
-            return
-        end
-        local call = callStash[top]
-        callStash[top] = nil
-        if not call.args then
-            return
-        end
         if source.type == 'function' then
             if not source.docParamMap then
                 return
@@ -315,13 +326,13 @@ function m.searchRefsByID(status, uri, expect, mode)
             for index, param in ipairs(source.args) do
                 local docParam = param.docParam
                 if docParam then
-                    genericStashParam(docParam.extends, call, index)
+                    genericStashParam(docParam.extends, index)
                 end
             end
         end
         if source.type == 'doc.type.function' then
             for index, param in ipairs(source.args) do
-                genericStashParam(param.extends, call, index)
+                genericStashParam(param.extends, index)
             end
         end
     end
@@ -346,6 +357,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
         local link = linker.getLinkByID(root, id)
         if link then
+            idStack[#idStack+1] = id
             if field == nil and link.sources then
                 for _, source in ipairs(link.sources) do
                     m.pushResult(status, mode, source)
@@ -366,6 +378,8 @@ function m.searchRefsByID(status, uri, expect, mode)
                 genericStash(link.sources[1])
                 genericResolve(link.sources[1], field)
             end
+
+            idStack[#idStack] = nil
         end
         checkLastID(id, field)
     end

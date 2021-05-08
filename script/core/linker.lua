@@ -3,8 +3,10 @@ local guide = require 'parser.guide'
 
 local Linkers
 local LastIDCache = {}
+local FirstIDCache = {}
 local SPLIT_CHAR = '\x1F'
-local SPLIT_REGEX = SPLIT_CHAR .. '[^' .. SPLIT_CHAR .. ']*$'
+local LAST_REGEX = SPLIT_CHAR .. '[^' .. SPLIT_CHAR .. ']*$'
+local FIRST_REGEX = '^[^' .. SPLIT_CHAR .. ']*'
 local RETURN_INDEX_CHAR = '#'
 local PARAM_INDEX_CHAR = '@'
 
@@ -447,6 +449,7 @@ local function compileLink(source)
             )
             pushForward(id, callID)
             pushBackward(callID, id)
+            getLink(id).call = source.vararg
         end
     end
     if source.type == 'doc.type.function' then
@@ -542,6 +545,9 @@ local function compileLink(source)
                         end
                     end
                 end
+                if doc.type == 'doc.generic' then
+                    source._isGeneric = true
+                end
             end
         end
     end
@@ -578,6 +584,22 @@ function m.getLinkByID(root, id)
     return linkers[id]
 end
 
+---根据ID来获取第一个节点的ID
+---@param id string
+---@return string
+function m.getFirstID(id)
+    if FirstIDCache[id] then
+        return FirstIDCache[id] or nil
+    end
+    local firstID, count = id:match(FIRST_REGEX)
+    if count == 0 then
+        FirstIDCache[id] = false
+        return nil
+    end
+    FirstIDCache[id] = firstID
+    return firstID
+end
+
 ---根据ID来获取上个节点的ID
 ---@param id string
 ---@return string
@@ -585,7 +607,7 @@ function m.getLastID(id)
     if LastIDCache[id] then
         return LastIDCache[id] or nil
     end
-    local lastID, count = id:gsub(SPLIT_REGEX, '')
+    local lastID, count = id:gsub(LAST_REGEX, '')
     if count == 0 then
         LastIDCache[id] = false
         return nil

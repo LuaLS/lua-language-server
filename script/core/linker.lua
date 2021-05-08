@@ -395,6 +395,7 @@ local function compileLink(source)
         if not nodeID then
             return
         end
+        getLink(id).call = source
         -- 将 call 映射到 node#1 上
         do
             local select1ID = ('%s%s%s%s'):format(
@@ -446,7 +447,6 @@ local function compileLink(source)
             )
             pushForward(id, callID)
             pushBackward(callID, id)
-            getLink(id).call = source.vararg
         end
     end
     if source.type == 'doc.type.function' then

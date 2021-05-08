@@ -169,20 +169,18 @@ function m.searchRefsByID(status, uri, expect, mode)
         return
     end
     local root = ast.ast
+    local searchStep
     linker.compileLinks(root)
 
     status.id = expect
 
     local mark = status.mark
-    local queueIDs    = {}
-    local queueFields = {}
-    local queueCalls  = {}
     local queueIndex  = 0
 
     -- 缓存过程中的泛型，以泛型关联表为key
     local genericStashMap = {}
 
-    local function search(id, field, call)
+    local function search(id, field)
         local fieldLen
         if field then
             local _, len = field:gsub(linker.SPLIT_CHAR, '')
@@ -195,30 +193,28 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
         mark[id] = fieldLen
         queueIndex = queueIndex + 1
-        queueIDs[queueIndex]    = id
-        queueFields[queueIndex] = field
-        queueCalls[queueIndex]  = call
+        searchStep(id, field)
     end
 
-    local function checkLastID(id, field, callinfo)
+    local function checkLastID(id, field)
         local lastID = linker.getLastID(id)
         if lastID then
             local newField = id:sub(#lastID + 1)
             if field then
                 newField = newField .. field
             end
-            search(lastID, newField, callinfo)
+            search(lastID, newField)
         end
     end
 
-    local function searchID(id, field, callinfo)
+    local function searchID(id, field)
         if not id then
             return
         end
         if field then
             id = id .. field
         end
-        search(id, nil, callinfo)
+        search(id, nil)
     end
 
     local function searchFunction(id)
@@ -342,24 +338,14 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
     end
 
-    search(expect)
-    searchFunction(expect)
-
-    for _ = 1, 1000 do
-        if queueIndex <= 0 then
-            return
+    local stepCount = 0
+    function searchStep(id, field)
+        stepCount = stepCount + 1
+        if stepCount > 1000 then
+            error('too large')
         end
-        local id    = queueIDs[queueIndex]
-        local field = queueFields[queueIndex]
-        local call  = queueCalls[queueIndex]
-        queueIndex  = queueIndex - 1
-
         local link = linker.getLinkByID(root, id)
         if link then
-            if link.call then
-                callStash[#callStash+1] = link.call
-            end
-            call = link.call or call
             if field == nil and link.sources then
                 for _, source in ipairs(link.sources) do
                     m.pushResult(status, mode, source)
@@ -367,12 +353,12 @@ function m.searchRefsByID(status, uri, expect, mode)
             end
             if link.forward then
                 for _, forwardID in ipairs(link.forward) do
-                    searchID(forwardID, field, call)
+                    searchID(forwardID, field)
                 end
             end
             if link.backward and (mode == 'ref' or field) then
                 for _, backwardID in ipairs(link.backward) do
-                    searchID(backwardID, field, call)
+                    searchID(backwardID, field)
                 end
             end
 
@@ -381,9 +367,11 @@ function m.searchRefsByID(status, uri, expect, mode)
                 genericResolve(link.sources[1], field)
             end
         end
-        checkLastID(id, field, call)
+        checkLastID(id, field)
     end
-    error('too large')
+
+    search(expect)
+    searchFunction(expect)
 end
 
 ---搜索对象的引用

@@ -1,4 +1,6 @@
 local util         = require 'utility'
+local config       = require 'config'
+local lang         = require 'language'
 local error        = error
 local type         = type
 local next         = next
@@ -1845,6 +1847,8 @@ function m.checkSameSimpleByBindDocs(status, obj, start, pushQueue, mode)
             if obj.type == '...' then
                 results[#results+1] = doc
             end
+        elseif doc.type == 'doc.overload' then
+            results[#results+1] = doc.overload
         end
     end
     for _, res in ipairs(results) do
@@ -3401,7 +3405,14 @@ function m.mergeTypes(types)
         end
     end)
 
-    return tableConcat(results, '|')
+    local enumsLimit = config.config.hover.enumsLimit
+    if #results > enumsLimit then
+        return tableConcat(results, '|', 1, enumsLimit)
+            .. lang.script('HOVER_MORE_ENUMS', #results - enumsLimit)
+    else
+        return tableConcat(results, '|')
+    end
+
 end
 
 function m.getClassExtends(class)

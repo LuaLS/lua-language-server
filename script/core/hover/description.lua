@@ -170,7 +170,7 @@ local function buildEnumChunk(docType, name)
             or (enum.additional and '+>')
             or ' |',
             enum[1],
-            enum.comment and (' -- %s'):format(enum.comment:gsub('[\r\n]+', ' ')) or ''
+            enum.comment and (' -- %s'):format(enum.comment) or ''
         )
     end
     return table.concat(lines, '\n')
@@ -264,7 +264,7 @@ local function getFunctionComment(source)
                 comments[#comments+1] = '\n'
                 comments[#comments+1] = ('@*param* `%s` — %s'):format(
                     doc.param[1],
-                    doc.comment.text:gsub('[\r\n]+', ' ')
+                    doc.comment.text
                 )
                 comments[#comments+1] = '\n'
             end
@@ -280,9 +280,9 @@ local function getFunctionComment(source)
                 end
                 if doc.comment then
                     if #name == 0 then
-                        comments[#comments+1] = ('@*return* — %s'):format(doc.comment.text:gsub('[\r\n]+', ' '))
+                        comments[#comments+1] = ('@*return* — %s'):format(doc.comment.text)
                     else
-                        comments[#comments+1] = ('@*return* `%s` — %s'):format(table.concat(name, ','), doc.comment.text:gsub('[\r\n]+', ' '))
+                        comments[#comments+1] = ('@*return* `%s` — %s'):format(table.concat(name, ','), doc.comment.text)
                     end
                 else
                     if #name == 0 then

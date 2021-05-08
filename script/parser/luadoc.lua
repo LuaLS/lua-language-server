@@ -2,6 +2,7 @@ local m          = require 'lpeglabel'
 local re         = require 'parser.relabel'
 local lines      = require 'parser.lines'
 local guide      = require 'parser.guide'
+local grammar    = require 'parser.grammar'
 
 local TokenTypes, TokenStarts, TokenFinishs, TokenContents
 local Ci, Offset, pushError, Ct, NextComment, Lines
@@ -990,16 +991,23 @@ local function convertTokens()
 end
 
 local function trimTailComment(text)
+    local comment = text
     if text:sub(1, 1) == '@' then
-        return text:sub(2)
+        comment = text:sub(2)
     end
     if text:sub(1, 1) == '#' then
-        return text:sub(2)
+        comment = text:sub(2)
     end
     if text:sub(1, 2) == '--' then
-        return text:sub(3)
+        comment = text:sub(3)
     end
-    return text
+    if comment:find '^%s*[\'"[]' then
+        local result = grammar(nil, comment:gsub('^%s+', ''), 'string')
+        if result then
+            comment = result[1][1]
+        end
+    end
+    return comment
 end
 
 local function buildLuaDoc(comment)
@@ -1177,7 +1185,7 @@ local function bindDoc(sources, lns, binded)
     end
     bindGeneric(binded)
     local row = guide.positionOf(lns, lastDoc.finish)
-    local cstart, cfinish  = guide.lineRange(lns, row)
+    local cstart, cfinish = guide.lineRange(lns, row)
     local nstart, nfinish = guide.lineRange(lns, row + 1)
     bindDocsBetween(sources, binded, bindSources, cstart, cfinish)
     if #bindSources == 0 then

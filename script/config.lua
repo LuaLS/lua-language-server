@@ -164,6 +164,8 @@ local ConfigTemplate = {
         keywordSnippet  = {'Replace', String},
         displayContext  = {6,         Integer},
         workspaceWord   = {true,      Boolean},
+        autoRequire     = {true,      Boolean},
+        showParams      = {true,      Boolean},
     },
     signatureHelp = {
         enable          = {true,      Boolean},
@@ -175,6 +177,7 @@ local ConfigTemplate = {
         viewNumber      = {true,      Boolean},
         fieldInfer      = {3000,      Integer},
         previewFields   = {100,       Integer},
+        enumsLimit      = {5,         Integer},
     },
     color = {
         mode            = {'Semantic', String},

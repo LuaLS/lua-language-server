@@ -77,9 +77,9 @@ end
         name = 'f',
         detail = 'function ()',
         kind = define.SymbolKind.Function,
-        range = {1, 22},
+        range = {7, 22},
         selectionRange = {16, 16},
-        valueRange = {1, 22},
+        valueRange = {7, 22},
     }
 }
 
@@ -227,9 +227,9 @@ local z
         name = 'f',
         detail = 'function ()',
         kind = define.SymbolKind.Function,
-        range = {13, 79},
+        range = {19, 79},
         selectionRange = {28, 28},
-        valueRange = {13, 79},
+        valueRange = {19, 79},
         children = {
             [1] = {
                 name = 'x',
@@ -360,9 +360,9 @@ g = 1
         name = 'g',
         detail = 'function ()',
         kind = define.SymbolKind.Function,
-        range = {1, 22},
+        range = {7, 22},
         selectionRange = {16, 16},
-        valueRange = {1, 22},
+        valueRange = {7, 22},
     },
     [2] = {
         name = 'g',
@@ -449,6 +449,14 @@ local function
         range = {7, 7},
         selectionRange = {7, 7},
     },
+    [2] = {
+        name = "",
+        detail = "function ()",
+        kind = 12,
+        range = {15, 22},
+        selectionRange = {15, 15},
+        valueRange = {15, 22},
+    },
 }
 
 TEST [[
@@ -496,17 +504,17 @@ end
         name = 'x',
         detail = 'function ()',
         kind = define.SymbolKind.Function,
-        range = {1, 22},
+        range = {7, 22},
         selectionRange = {16, 16},
-        valueRange = {1, 22},
+        valueRange = {7, 22},
     },
     [2] = {
         name = 'f',
         detail = 'function ()',
         kind = define.SymbolKind.Function,
-        range = {25, 58},
+        range = {31, 58},
         selectionRange = {40, 40},
-        valueRange = {25, 58},
+        valueRange = {31, 58},
         children = {
             [1] = {
                 name = 'c',
@@ -563,9 +571,9 @@ end
         name = 'f',
         detail = 'function (a, b)',
         kind = define.SymbolKind.Function,
-        range = {15, 40},
+        range = {21, 40},
         selectionRange = {30, 30},
-        valueRange = {15, 40},
+        valueRange = {21, 40},
         children = {
             [1] = {
                 name = 'a',

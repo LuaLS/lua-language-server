@@ -731,3 +731,33 @@ hover = {
     label = 'field Food.firstField: integer = 0',
     name  = 'food.firstField',
 }}
+
+TEST {{ path = 'a.lua', content = '', }, {
+    path = 'b.lua',
+    content = [[
+--[=[
+I'm a multiline comment
+]=]
+local <?food?>
+]]
+},
+hover = {
+    label = 'local food: any',
+    name  = 'food',
+    description = "I'm a multiline comment\n"
+}}
+
+TEST {{ path = 'a.lua', content = '', }, {
+    path = 'b.lua',
+    content = [[
+---@return string # 'this is a tab `\t`'
+local function <?f?>() end
+]]
+},
+hover = {
+    label = [[
+function f()
+  -> string]],
+    name  = 'food',
+    description = "@*return* — this is a tab `\t`"
+}}

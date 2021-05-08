@@ -100,7 +100,7 @@ local <!t!> = {}
 ]]
 
 TEST([[
-<!local function x()
+local <!function x()
 end!>
 ]],
 [[
@@ -119,9 +119,9 @@ local <!x!>
 ]]
 
 TEST([[
-<!local function x()
+local <!function x()
 end!>
-<!local function y()
+local <!function y()
     x()
 end!>
 ]],
@@ -363,7 +363,7 @@ local f;f = <!function () end!>
 ]]
 
 TEST [[
-<!local function f() end!>
+local <!function f() end!>
 ]]
 
 config.config.diagnostics.disable['unused-local'] = nil

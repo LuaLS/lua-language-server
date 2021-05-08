@@ -1,5 +1,6 @@
-local files    = require "files"
+local files = require "files"
 local searcher = require "core.searcher"
+local util  = require 'utility'
 
 local Care = {
     ['function'] = function (source, text, results)
@@ -92,6 +93,7 @@ local Care = {
     end,
     ['comment.short'] = function (source, text, results, status)
         local ltext = source.text:lower()
+        ltext = util.trim(ltext, 'left')
         if ltext:sub(1, #'region') == 'region'
         or ltext:sub(1, #'#region') == '#region' then
             if not status.regions then

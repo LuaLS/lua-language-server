@@ -492,7 +492,7 @@ local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, res
         end
         local funcLabel
         if config.config.completion.showParams then
-            local value = guide.getObjectValue(src) or src
+            local value = searcher.getObjectValue(src) or src
             if value.type == 'function'
             or value.type == 'doc.type.function' then
                 funcLabel = name .. getParams(value, oop)

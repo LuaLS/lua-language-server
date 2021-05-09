@@ -21,7 +21,7 @@ lm:lua_dll 'lpeglabel' {
 }
 
 lm:build 'install' {
-    '$luamake', 'lua', 'make/install.lua', lm.plat,
+    '$luamake', 'lua', 'make/install.lua', lm.builddir,
     deps = {
         'lua',
         'lpeglabel',
@@ -31,7 +31,7 @@ lm:build 'install' {
 }
 
 lm:build 'unittest' {
-    '$luamake', 'lua', 'make/unittest.lua', lm.plat,
+    '$luamake', 'lua', 'make/unittest.lua',
     deps = {
         'install',
         'test',

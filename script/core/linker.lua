@@ -609,6 +609,22 @@ function m.compileLink(source)
                 pushBackward(getID(tp), id)
             end
         end
+        if proto.type == 'doc.type.array' then
+            local nodeID = ('%s%s'):format(
+                id,
+                SPLIT_CHAR
+            )
+            pushForward(nodeID, getID(source.node))
+        end
+        if proto.type == 'doc.type.table' then
+            if source.value then
+                local valueID = ('%s%s'):format(
+                    id,
+                    SPLIT_CHAR
+                )
+                pushForward(valueID, getID(source.value))
+            end
+        end
     end
 end
 

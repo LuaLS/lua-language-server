@@ -71,14 +71,14 @@ local function createValue(closure, proto, callback, road)
         local args = {}
         local returns = {}
         for i, arg in ipairs(proto.args) do
-            local value = instantValue(closure, arg)
+            local value = createValue(closure, arg, callback, road)
             if value then
                 hasGeneric = true
             end
             args[i] = value or arg
         end
         for i, rtn in ipairs(proto.returns) do
-            local value = instantValue(closure, rtn)
+            local value = createValue(closure, rtn, callback, road)
             if value then
                 hasGeneric = true
             end
@@ -93,6 +93,30 @@ local function createValue(closure, proto, callback, road)
         value.isGeneric = true
         linker.compileLink(value)
         linker.pushSource(value)
+        return value
+    end
+    if proto.type == 'doc.type.array' then
+        road[#road+1] = linker.SPLIT_CHAR
+        local node = createValue(closure, proto.node, callback, road)
+        road[#road] = nil
+        if not node then
+            return nil
+        end
+        local value = instantValue(closure, proto)
+        value.node = node
+        return value
+    end
+    if proto.type == 'doc.type.table' then
+        local tkey = createValue(closure, proto.key, callback, road)
+        road[#road+1] = linker.SPLIT_CHAR
+        local tvalue = createValue(closure, proto.value, callback, road)
+        road[#road] = nil
+        if not tkey and not tvalue then
+            return nil
+        end
+        local value = instantValue(closure, proto)
+        value.key   = tkey   or proto.key
+        value.value = tvalue or proto.value
         return value
     end
 end
@@ -114,8 +138,7 @@ local function buildValue(road, key, proto, param, upvalues)
     if not upvalues[key] then
         upvalues[key] = {}
     end
-    -- TODO
-    upvalues[key][#upvalues[key]+1] = paramID
+    upvalues[key][#upvalues[key]+1] = paramID .. table.concat(road)
 end
 
 -- 为所有的 param 与 return 创建副本

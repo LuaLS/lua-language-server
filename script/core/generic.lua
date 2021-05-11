@@ -61,7 +61,7 @@ local function createValue(closure, obj, callback, road)
         local key = obj[1]
         local value = instantValue(closure, obj)
         if callback then
-            callback(road, key)
+            callback(road, key, obj)
         end
         linker.compileLink(value)
         return value
@@ -79,8 +79,21 @@ local function buildValues(closure)
             if doc.type == 'doc.param' then
                 local extends = doc.extends
                 local index   = extends.paramIndex
-                closure.params[index] = createValue(closure, extends, function (road, key)
-                    local paramID = linker.getID(params[index])
+                closure.params[index] = createValue(closure, extends, function (road, key, proto)
+                    local param = params[index]
+                    if not param then
+                        return
+                    end
+                    local paramID
+                    if proto.literal then
+                        local str = param.type == 'string' and param[1]
+                        if not str then
+                            return
+                        end
+                        paramID = 'dn:' .. str
+                    else
+                        paramID = linker.getID(param)
+                    end
                     if not paramID then
                         return
                     end
@@ -90,7 +103,10 @@ local function buildValues(closure)
                     -- TODO
                     upvalues[key][#upvalues[key]+1] = paramID
                 end)
-            elseif doc.type == 'doc.return' then
+            end
+        end
+        for _, doc in ipairs(protoFunction.bindDocs) do
+            if doc.type == 'doc.return' then
                 for _, rtn in ipairs(doc.returns) do
                     closure.returns[rtn.returnIndex] = createValue(closure, rtn)
                 end

@@ -1,33 +1,7 @@
-local util         = require 'utility'
 local error        = error
 local type         = type
-local next         = next
-local tostring     = tostring
-local print        = print
-local ipairs       = ipairs
-local tableInsert  = table.insert
-local tableUnpack  = table.unpack
-local tableRemove  = table.remove
-local tableMove    = table.move
-local tableSort    = table.sort
-local tableConcat  = table.concat
-local mathType     = math.type
-local pairs        = pairs
-local setmetatable = setmetatable
-local assert       = assert
-local select       = select
-local osClock      = os.clock
-local tonumber     = tonumber
-local tointeger    = math.tointeger
-local DEVELOP      = _G.DEVELOP
-local log          = log
-local _G           = _G
 
 ---@class parser.guide.object
-
-local function logWarn(...)
-    log.warn(...)
-end
 
 ---@class guide
 ---@field debugMode boolean
@@ -122,20 +96,6 @@ m.actionMap = {
     ['function']    = {'#'},
     ['funcargs']    = {'#'},
 }
-
-local TypeSort = {
-    ['boolean']  = 1,
-    ['string']   = 2,
-    ['integer']  = 3,
-    ['number']   = 4,
-    ['table']    = 5,
-    ['function'] = 6,
-    ['true']     = 101,
-    ['false']    = 102,
-    ['nil']      = 999,
-}
-
-local NIL = setmetatable({'<nil>'}, { __tostring = function () return 'nil' end })
 
 --- 是否是字面量
 ---@param obj parser.guide.object
@@ -510,8 +470,8 @@ function m.addChilds(list, obj, map)
         for i = 1, #keys do
             local key = keys[i]
             if key == '#' then
-                for i = 1, #obj do
-                    list[#list+1] = obj[i]
+                for j = 1, #obj do
+                    list[#list+1] = obj[j]
                 end
             elseif obj[key] then
                 list[#list+1] = obj[key]
@@ -519,8 +479,8 @@ function m.addChilds(list, obj, map)
             and key:sub(1, 1) == '#' then
                 key = key:sub(2)
                 if obj[key] then
-                    for i = 1, #obj[key] do
-                        list[#list+1] = obj[key][i]
+                    for j = 1, #obj[key] do
+                        list[#list+1] = obj[key][j]
                     end
                 end
             end

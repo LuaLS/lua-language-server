@@ -1,5 +1,6 @@
-local util  = require 'utility'
-local guide = require 'parser.guide'
+local util    = require 'utility'
+local guide   = require 'parser.guide'
+local generic = require 'core.generic'
 
 local Linkers
 local LastIDCache = {}

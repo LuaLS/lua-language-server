@@ -1,6 +1,5 @@
 local util    = require 'utility'
 local guide   = require 'parser.guide'
-local generic = require 'core.generic'
 
 local Linkers
 local LastIDCache = {}
@@ -123,9 +122,6 @@ local function getKey(source)
     or     source.type == 'doc.extends.name'
     or     source.type == 'doc.see.name' then
         local name = source[1]
-        if source.typeGeneric then
-            return source.start, nil
-        end
         return name, nil
     elseif source.type == 'doc.class'
     or     source.type == 'doc.type'
@@ -139,6 +135,13 @@ local function getKey(source)
         return source.start, nil
     elseif source.type == 'doc.see.field' then
         return ('%q'):format(source[1]), source.parent.name
+    elseif source.type == 'generic.closure' then
+        return source.call.start, nil
+    elseif source.type == 'generic.value' then
+        return ('%s|%s'):format(
+            source.closure.call.start,
+            getKey(source.proto)
+        )
     end
     return nil, nil
 end
@@ -191,6 +194,12 @@ local function checkMode(source)
     end
     if source.type == 'doc.vararg' then
         return 'dv:'
+    end
+    if source.type == 'generic.closure' then
+        return 'gc:'
+    end
+    if source.type == 'generic.value' then
+        return 'gv:'
     end
     if isGlobal(source) then
         return 'g:'
@@ -249,17 +258,6 @@ local function getID(source)
     return id
 end
 
----添加关联单元
----@param id string
----@param source parser.guide.object
-local function pushSource(id, source)
-    local link = getLink(id)
-    if not link.sources then
-        link.sources = {}
-    end
-    link.sources[#link.sources+1] = source
-end
-
 ---添加关联的前进ID
 ---@param id string
 ---@param forwardID string
@@ -294,14 +292,38 @@ local function pushBackward(id, backwardID)
     link.backward[#link.backward+1] = backwardID
 end
 
-local function findDocState()
+---@class link
+-- 当前节点的id
+---@field id     string
+-- 使用该ID的单元
+---@field sources parser.guide.object[]
+-- 前进的关联ID
+---@field forward string[]
+-- 后退的关联ID
+---@field backward string[]
+-- 函数调用参数信息（用于泛型）
+---@field call parser.guide.object
 
+local m = {}
+
+m.SPLIT_CHAR = SPLIT_CHAR
+m.RETURN_INDEX_CHAR = RETURN_INDEX_CHAR
+m.PARAM_INDEX_CHAR = PARAM_INDEX_CHAR
+
+---添加关联单元
+---@param id string
+---@param source parser.guide.object
+function m.pushSource(id, source)
+    local link = getLink(id)
+    if not link.sources then
+        link.sources = {}
+    end
+    link.sources[#link.sources+1] = source
 end
 
----前进
 ---@param source parser.guide.object
 ---@return parser.guide.object[]
-local function compileLink(source)
+function m.compileLink(source)
     local id = getID(source)
     local parent = source.parent
     if not parent then
@@ -554,24 +576,6 @@ local function compileLink(source)
     end
 end
 
----@class link
--- 当前节点的id
----@field id     string
--- 使用该ID的单元
----@field sources parser.guide.object[]
--- 前进的关联ID
----@field forward string[]
--- 后退的关联ID
----@field backward string[]
--- 函数调用参数信息（用于泛型）
----@field call parser.guide.object
-
-local m = {}
-
-m.SPLIT_CHAR = SPLIT_CHAR
-m.RETURN_INDEX_CHAR = RETURN_INDEX_CHAR
-m.PARAM_INDEX_CHAR = PARAM_INDEX_CHAR
-
 ---根据ID来获取所有的link
 ---@param root parser.guide.object
 ---@param id string
@@ -637,9 +641,9 @@ function m.compileLinks(source)
     guide.eachSource(root, function (src)
         local id = getID(src)
         if id then
-            pushSource(id, src)
+            m.pushSource(id, src)
         end
-        compileLink(src)
+        m.compileLink(src)
     end)
     return Linkers
 end

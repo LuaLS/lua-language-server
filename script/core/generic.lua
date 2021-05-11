@@ -1,17 +1,7 @@
-local util = require 'utility'
-
-local counter = util.counter()
-
 ---@class generic.value
 ---@field type string
 ---@field closure generic.closure
----@field types parser.guide.object[]|generic.value[]
-
----递归实例化对象
----@param obj parser.guide.object
----@param callback fun(docName: parser.guide.object)
-local function instantValue(obj, callback)
-end
+---@field proto parser.guide.object
 
 ---@class generic.closure
 ---@field type string
@@ -22,30 +12,78 @@ end
 
 local m = {}
 
----给闭包设置调用信息
----@param closure generic.closure
----@param params parser.guide.object[]
-function m.setCallParams(closure, params)
-    -- 立刻解决所有的泛型
-    -- 对每个参数进行核对，存入泛型表
-    -- 为所有的 param 与 return 创建副本
-    -- 如果return中有function，也要递归创建闭包
+local function instantValue(closure, proto)
+    ---@type generic.value
+    local value = {
+        type    = 'generic.value',
+        closure = closure,
+        proto   = proto,
+    }
+    return value
+end
+
+---递归实例化对象
+---@param obj parser.guide.object
+---@return generic.value
+local function createValue(closure, obj)
+    if obj.type == 'doc.type' then
+        local types = {}
+        local hasGeneric
+        for i, tp in ipairs(obj.types) do
+            local genericValue = createValue(tp)
+            if genericValue then
+                hasGeneric = true
+                types[i] = genericValue
+            else
+                types[i] = tp
+            end
+        end
+        if hasGeneric then
+            local value = instantValue(closure, obj)
+            value.types = types
+            return value
+        else
+            return nil
+        end
+    end
 end
 
 ---创建一个闭包
 ---@param protoFunction parser.guide.object # 原型函数
 ---@param parentClosure? generic.closure
 ---@return generic.closure
-function m.createClosure(protoFunction, parentClosure)
+function m.createClosure(protoFunction, call, parentClosure)
     ---@type generic.closure
     local closure = {
         type     = 'generic.closure',
-        id       = counter(),
+        parent   = parentClosure,
         proto    = protoFunction,
-        upvalues = {},
+        call     = call,
+        upvalues = parentClosure and parentClosure.upvalues or {},
         params   = {},
         returns  = {},
     }
+
+    -- 立刻解决所有的泛型
+    -- 对每个参数进行核对，存入泛型表
+    -- 为所有的 param 与 return 创建副本
+    -- 如果return中有function，也要递归创建闭包
+    if protoFunction.type == 'function' then
+        for _, doc in ipairs(protoFunction.bindDocs) do
+            if doc.type == 'doc.param' then
+                local extends = doc.extends
+                closure.params[extends.paramIndex] = createValue(closure, extends)
+            elseif doc.type == 'doc.return' then
+                for _, rtn in ipairs(doc.returns) do
+                    closure.returns[rtn.returnIndex] = createValue(closure, rtn)
+                end
+            end
+        end
+    end
+    if protoFunction.type == 'doc.function' then
+        
+    end
+
     return closure
 end
 

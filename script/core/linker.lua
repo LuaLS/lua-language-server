@@ -311,9 +311,12 @@ m.RETURN_INDEX_CHAR = RETURN_INDEX_CHAR
 m.PARAM_INDEX_CHAR = PARAM_INDEX_CHAR
 
 ---添加关联单元
----@param id string
 ---@param source parser.guide.object
-function m.pushSource(id, source)
+function m.pushSource(source)
+    local id = m.getID(source)
+    if not id then
+        return
+    end
     local link = getLink(id)
     if not link.sources then
         link.sources = {}
@@ -672,10 +675,7 @@ function m.compileLinks(source)
     Linkers = {}
     root._linkers = Linkers
     guide.eachSource(root, function (src)
-        local id = getID(src)
-        if id then
-            m.pushSource(id, src)
-        end
+        m.pushSource(src)
         m.compileLink(src)
     end)
     return Linkers

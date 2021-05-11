@@ -176,9 +176,7 @@ function m.searchRefsByID(status, uri, expect, mode)
     local mark = status.mark
     local queueIndex  = 0
 
-    -- 缓存过程中的泛型，以泛型关联表为key
-    local genericStashMap = {}
-    local idStack = {}
+    local callStack = {}
 
     local function search(id, field)
         local fieldLen
@@ -253,11 +251,12 @@ function m.searchRefsByID(status, uri, expect, mode)
     end
 
     local function findLastCall()
-        for i = #idStack, 1, -1 do
-            local id = idStack[i]
-            local link = linker.getLinkByID(root, id)
-            if link.call then
-                return link.call
+        for i = #callStack, 1, -1 do
+            local call = callStack[i]
+            if call then
+                -- 标记此处的call失效，等待在堆栈平衡时弹出
+                callStack[i] = false
+                return call
             end
         end
         return nil
@@ -272,9 +271,6 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
         local call = findLastCall()
         if not call then
-            return
-        end
-        if not call.args or #call.args == 0 then
             return
         end
         local closure = generic.createClosure(source, call)
@@ -293,7 +289,9 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
         local link = linker.getLinkByID(root, id)
         if link then
-            idStack[#idStack+1] = id
+            if link.call then
+                callStack[#callStack+1] = link.call
+            end
             if field == nil and link.sources then
                 for _, source in ipairs(link.sources) do
                     m.pushResult(status, mode, source)
@@ -314,7 +312,9 @@ function m.searchRefsByID(status, uri, expect, mode)
                 checkGeneric(link.sources[1], field)
             end
 
-            idStack[#idStack] = nil
+            if link.call then
+                callStack[#callStack] = nil
+            end
         end
         checkLastID(id, field)
     end

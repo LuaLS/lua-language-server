@@ -96,9 +96,13 @@ local function createValue(closure, proto, callback, road)
         return value
     end
     if proto.type == 'doc.type.array' then
-        road[#road+1] = linker.SPLIT_CHAR
+        if road then
+            road[#road+1] = linker.SPLIT_CHAR
+        end
         local node = createValue(closure, proto.node, callback, road)
-        road[#road] = nil
+        if road then
+            road[#road] = nil
+        end
         if not node then
             return nil
         end

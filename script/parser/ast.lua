@@ -1460,6 +1460,11 @@ local Defs = {
         local values
         if func then
             local call = createCall(exp, func.finish + 1, exp.finish)
+            if #exp == 0 then
+                exp[1] = getSelect(func, 1)
+                exp[2] = getSelect(func, 2)
+                exp[3] = getSelect(func, 3)
+            end
             call.node = func
             call.start = inA
             func.next = call

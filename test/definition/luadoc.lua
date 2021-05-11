@@ -427,6 +427,21 @@ local <?<!c!>?> = f(b)
 ]]
 
 TEST [[
+---@class C
+local <!v1!>
+
+---@generic V, T
+---@param t T
+---@return fun(t: V[]): V
+---@return T
+local function iterator(t) end
+
+for <!v!> in iterator(v1) do
+    print(<?v?>)
+end
+]]
+
+TEST [[
 ---@class Foo
 local Foo = {}
 function Foo:<!bar1!>() end

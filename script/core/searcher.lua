@@ -1,6 +1,7 @@
-local linker = require 'core.linker'
-local guide  = require 'parser.guide'
-local files  = require 'files'
+local linker  = require 'core.linker'
+local guide   = require 'parser.guide'
+local files   = require 'files'
+local generic = require 'core.generic'
 
 local function checkFunctionReturn(source)
     if  source.parent
@@ -240,113 +241,48 @@ function m.searchRefsByID(status, uri, expect, mode)
         search(parentID, linker.SPLIT_CHAR .. linker.RETURN_INDEX_CHAR .. returnIndex)
     end
 
-    local function findCallParam(key, index)
+    local function isCallID(field)
+        if not field then
+            return false
+        end
+        if  field:sub(1, 1) == linker.SPLIT_CHAR
+        and field:sub(2, 2) == linker.RETURN_INDEX_CHAR then
+            return true
+        end
+        return false
+    end
+
+    local function findLastCall()
         for i = #idStack, 1, -1 do
             local id = idStack[i]
             local link = linker.getLinkByID(root, id)
-            if not link then
-                goto CONTINUE
+            if link.call then
+                return link.call
             end
-            local call = link.call
-            if not call then
-                goto CONTINUE
-            end
-            local args = call.args
-            if not args then
-                goto CONTINUE
-            end
-            do return args[index] end
-            ::CONTINUE::
-        end
-    end
-
-    local function getGenericID(typeUnit, index)
-        local key = typeUnit[1]
-        local generics = typeUnit.typeGeneric[key]
-        local callParam = findCallParam(key, index)
-        if not callParam then
-            return nil
-        end
-        if typeUnit.literal then
-            if callParam.type == 'string' then
-                return generics, ('dn:%s'):format(callParam[1] or '')
-            end
-        else
-            return generics, linker.getID(callParam)
         end
         return nil
     end
 
-    local function genericStashParam(docType, index)
-        if #idStack == 0 then
+    local function checkGeneric(source, field)
+        if not source.isGeneric then
             return
         end
-        for _, typeUnit in ipairs(docType.types) do
-            if typeUnit.typeGeneric then
-                local generics, id = getGenericID(typeUnit, index)
-                if id then
-                    genericStashMap[generics] = id
-                end
-            end
-            -- 支持 V[]
-            if typeUnit.type == 'doc.type.array' then
-                if typeUnit.node.typeGeneric then
-                    local generics, id = getGenericID(typeUnit.node, index)
-                    if id then
-                        genericStashMap[generics] = id .. linker.SPLIT_CHAR
-                    end
-                end
-            end
-            -- 支持 table<number, V>
-            if typeUnit.type == 'doc.type.table' then
-                if typeUnit.value then
-                    for _, typeUnit2 in ipairs(typeUnit.value.types) do
-                        if typeUnit2.typeGeneric then
-                            local generics, id = getGenericID(typeUnit2, index)
-                            if id then
-                                genericStashMap[generics] = id .. linker.SPLIT_CHAR
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end
-
-    -- TODO 这里的实现是有问题的，在多次穿透泛型时可能出错，不过错就错吧，让用户自己写注解
-    local function genericStash(source)
-        if source.type ~= 'function'
-        and source.type ~= 'doc.type.function' then
+        if not isCallID(field) then
             return
         end
-        if source.type == 'function' then
-            if not source.docParamMap then
-                return
-            end
-            for index, param in ipairs(source.args) do
-                local docParam = param.docParam
-                if docParam then
-                    genericStashParam(docParam.extends, index)
-                end
-            end
-        end
-        if source.type == 'doc.type.function' then
-            for index, param in ipairs(source.args) do
-                genericStashParam(param.extends, index)
-            end
-        end
-    end
-
-    local function genericResolve(source, field)
-        if not source.typeGeneric then
+        local call = findLastCall()
+        if not call then
             return
         end
-        local key = source[1]
-        local generics = source.typeGeneric[key]
-        local paramID = genericStashMap[generics]
-        if paramID then
-            searchID(paramID, field)
+        if not call.args or #call.args == 0 then
+            return
         end
+        local closure = generic.createClosure(source, call)
+        if not closure then
+            return
+        end
+        local id =  linker.getID(closure)
+        searchID(id, field)
     end
 
     local stepCount = 0
@@ -375,8 +311,7 @@ function m.searchRefsByID(status, uri, expect, mode)
             end
 
             if link.sources then
-                genericStash(link.sources[1])
-                genericResolve(link.sources[1], field)
+                checkGeneric(link.sources[1], field)
             end
 
             idStack[#idStack] = nil

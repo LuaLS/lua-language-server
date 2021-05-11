@@ -569,8 +569,38 @@ function m.compileLink(source)
                     end
                 end
                 if doc.type == 'doc.generic' then
-                    source._isGeneric = true
+                    source.isGeneric = true
                 end
+            end
+        end
+    end
+    if source.type == 'generic.closure' then
+        for i, rtn in ipairs(source.returns) do
+            local closureID = ('%s%s%s'):format(
+                id,
+                RETURN_INDEX_CHAR,
+                i
+            )
+            local returnID = getID(rtn)
+            pushForward(closureID, returnID)
+            pushBackward(returnID, closureID)
+        end
+    end
+    if source.type == 'generic.value' then
+        local proto    = source.proto
+        local closure  = source.closure
+        local upvalues = closure.upvalues
+        if proto.type == 'doc.type.name' then
+            local key = proto[1]
+            for _, paramID in ipairs(upvalues[key]) do
+                pushForward(id, paramID)
+                pushBackward(paramID, id)
+            end
+        end
+        if proto.type == 'doc.type' then
+            for _, tp in ipairs(source.types) do
+                pushForward(id, getID(tp))
+                pushBackward(getID(tp), id)
             end
         end
     end

@@ -117,12 +117,18 @@ local function getKey(source)
         end
         return source.start, nil
     elseif source.type == 'doc.class.name'
-    or     source.type == 'doc.type.name'
     or     source.type == 'doc.alias.name'
     or     source.type == 'doc.extends.name'
     or     source.type == 'doc.see.name' then
         local name = source[1]
         return name, nil
+    elseif source.type == 'doc.type.name' then
+        if source.typeGeneric then
+            return source.start, nil
+        else
+            local name = source[1]
+            return name, nil
+        end
     elseif source.type == 'doc.class'
     or     source.type == 'doc.type'
     or     source.type == 'doc.alias'

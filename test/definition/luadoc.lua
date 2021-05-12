@@ -427,8 +427,78 @@ local <?<!c!>?> = f(b)
 ]]
 
 TEST [[
+---@generic V
+---@return fun(t: V[]):V
+local function f() end
+
+---@class A
+local <!a!>
+
+---@type A[]
+local b
+
+local f2 = f()
+
+local <?<!c!>?> = f2(b)
+]]
+
+TEST [[
+---@generic T, V
+---@param t T
+---@return fun(t: V[]):V
+---@return T
+local function f(t) end
+
+---@class A
+local <!a!>
+
+---@type A[]
+local b
+
+local f2, c = f(b)
+
+local <?<!d!>?> = f2(c)
+]]
+
+TEST [[
 ---@class C
 local <!v1!>
+
+---@generic V, T
+---@param t T
+---@return fun(t: V): V
+---@return T
+local function iterator(t) end
+
+for <!v!> in iterator(v1) do
+    print(<?v?>)
+end
+]]
+
+TEST [[
+---@class C
+local <!v!>
+
+---@type C
+local <!v1!>
+
+---@generic V, T
+---@param t T
+---@return fun(t: V): V
+---@return T
+local function iterator(t) end
+
+for <!v!> in iterator(v1) do
+    print(<?v?>)
+end
+]]
+
+TEST [[
+---@class C
+local <!v!>
+
+---@type C[]
+local v1
 
 ---@generic V, T
 ---@param t T

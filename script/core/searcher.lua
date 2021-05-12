@@ -174,7 +174,6 @@ function m.searchRefsByID(status, uri, expect, mode)
     status.id = expect
 
     local mark = status.mark
-    local queueIndex  = 0
 
     local callStack = {}
 
@@ -186,11 +185,10 @@ function m.searchRefsByID(status, uri, expect, mode)
         else
             fieldLen = 0
         end
-        if mark[id] and mark[id] <= fieldLen then
+        if mark[id] and ((mark[id] < fieldLen) or fieldLen == 0) then
             return
         end
         mark[id] = fieldLen
-        queueIndex = queueIndex + 1
         searchStep(id, field)
     end
 

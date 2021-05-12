@@ -1,18 +1,11 @@
 local lm       = require 'luamake'
 
-if lm.plat == "macos" then
-    lm.flags = {
-        "-mmacosx-version-min=10.13",
-    }
-end
-
 lm:import("3rd/bee.lua/make.lua", {
     EXE_RESOURCE = "../../make/lua-language-server.rc"
 })
 
-lm.rootdir = '3rd/'
-
 lm:lua_dll 'lpeglabel' {
+    rootdir = '3rd',
     sources = 'lpeglabel/*.c',
     visibility = 'default',
     defines = {
@@ -21,7 +14,7 @@ lm:lua_dll 'lpeglabel' {
 }
 
 lm:build 'install' {
-    '$luamake', 'lua', 'make/install.lua', lm.plat,
+    '$luamake', 'lua', 'make/install.lua', lm.builddir,
     deps = {
         'lua',
         'lpeglabel',
@@ -30,16 +23,16 @@ lm:build 'install' {
     }
 }
 
+local fs = require 'bee.filesystem'
+local pf = require 'bee.platform'
+local exe = pf.OS == 'Windows' and ".exe" or ""
 lm:build 'unittest' {
-    '$luamake', 'lua', 'make/unittest.lua', lm.plat,
+    fs.path 'bin' / pf.OS / ('lua-language-server' .. exe), 'test.lua', '-E',
+    pool = "console",
     deps = {
         'install',
         'test',
     }
 }
 
-lm:default {
-    'install',
-    'test',
-    'unittest',
-}
+lm:default 'unittest'

@@ -1,6 +1,9 @@
 local searcher = require 'core.searcher'
 local config   = require 'config'
 
+local BE_LEN = {'#'}
+local CLASS  = {'CLASS'}
+
 local m = {}
 
 local function mergeTable(a, b)
@@ -179,30 +182,45 @@ local function cleanInfers(infers)
         infers['integer'] = nil
         infers['number']  = true
     end
+    if infers[BE_LEN] then
+        infers[BE_LEN] = nil
+        if not infers['table'] and not infers['string'] then
+            infers['table']  = true
+            infers['string'] = true
+        end
+    end
+    if infers[CLASS] then
+        infers[CLASS] = nil
+        infers['table'] = nil
+    end
 end
 
 ---合并对象的推断类型
 ---@param infers string[]
 ---@return string
 function m.viewInfers(infers)
+    if infers[0] then
+        return infers[0]
+    end
     -- 如果有显性的 any ，则直接显示为 any
     if infers['any'] then
+        infers[0] = 'any'
         return 'any'
     end
+    local result = {}
     local count = 0
     for infer in pairs(infers) do
         count = count + 1
-        infers[count] = infer
-    end
-    for i = count + 1, #infers do
-        infers[i] = nil
+        result[count] = infer
     end
     -- 如果没有任何显性类型，则推测为 unkonwn ，显示为 any
     if count == 0 then
+        infers[0] = 'any'
         return 'any'
     end
     table.sort(infers)
-    return table.concat(infers, '|', 1, count)
+    infers[0] = table.concat(result, '|')
+    return infers[0]
 end
 
 ---显示对象的推断类型
@@ -223,7 +241,8 @@ local function searchInfer(source, infers)
     if source.type == 'doc.class.name' then
         local name = source[1]
         if name then
-            infers[name] = true
+            infers[name]  = true
+            infers[CLASS] = true
         end
         return
     end
@@ -239,6 +258,13 @@ local function searchInfer(source, infers)
     -- return XX
     if source.parent.type == 'return' then
         infers['any'] = true
+        return
+    end
+    -- # XX -> string | table
+    if  source.parent.type == 'unary'
+    and source.parent.op.type == '#' then
+        infers[BE_LEN] = true
+        return
     end
 end
 

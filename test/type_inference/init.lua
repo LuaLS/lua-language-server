@@ -153,14 +153,26 @@ _VERSION = 'Lua 5.4'
 ]]
 
 TEST 'function' [[
+---@class stringlib
+local string
+
+string.sub = function () end
+
 return ('x').<?sub?>
 ]]
 
 TEST 'function' [[
+---@class stringlib
+local string
+
+string.sub = function () end
+
 <?x?> = ('x').sub
 ]]
 
 TEST 'function' [[
+_VERSION = 'Lua 5.4'
+
 <?x?> = _VERSION.sub
 ]]
 

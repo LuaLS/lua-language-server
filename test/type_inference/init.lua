@@ -1,6 +1,7 @@
 local files  = require 'files'
 local vm     = require 'vm'
 local guide  = require 'parser.guide'
+local infer  = require 'core.infer'
 
 rawset(_G, 'TEST', true)
 
@@ -29,7 +30,7 @@ function TEST(wanted)
         files.setText('', newScript)
         local source = getSource(pos)
         assert(source)
-        local result = vm.getInferType(source, 0)
+        local result = infer.searchAndViewInfers(source, 0)
         assert(wanted == result)
     end
 end
@@ -139,10 +140,15 @@ TEST 'number' [[
 ]]
 
 TEST 'tablelib' [[
+---@class tablelib
+table = {}
+
 <?table?>()
 ]]
 
 TEST 'string' [[
+_VERSION = 'Lua 5.4'
+
 <?x?> = _VERSION
 ]]
 

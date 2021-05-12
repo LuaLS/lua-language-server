@@ -171,6 +171,11 @@ string.sub = function () end
 ]]
 
 TEST 'function' [[
+---@class stringlib
+local string
+
+string.sub = function () end
+
 _VERSION = 'Lua 5.4'
 
 <?x?> = _VERSION.sub
@@ -217,8 +222,11 @@ end
 _, <?y?> = pcall(x)
 ]]
 
-TEST 'oslib' [[
-local <?os?> = require 'os'
+TEST 'integer' [[
+local function x()
+    return 1
+end
+_, <?y?> = xpcall(x)
 ]]
 
 TEST 'string|table' [[

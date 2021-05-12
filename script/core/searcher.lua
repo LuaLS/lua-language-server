@@ -95,6 +95,11 @@ function m.pushResult(status, mode, source)
                 results[#results+1] = source
             end
         end
+        if parent.type == 'return' then
+            if linker.getID(source) ~= status.id then
+                results[#results+1] = source
+            end
+        end
     elseif mode == 'field' then
     end
 end

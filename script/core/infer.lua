@@ -98,15 +98,15 @@ end
 local function searchInferOfValue(value, infers)
     if value.type == 'string' then
         infers['string'] = true
-        return
+        return true
     end
     if value.type == 'boolean' then
         infers['boolean'] = true
-        return
+        return true
     end
     if value.type == 'table' then
         infers['table'] = true
-        return
+        return true
     end
     if value.type == 'number' then
         if math.type(value[1]) == 'integer' then
@@ -114,20 +114,25 @@ local function searchInferOfValue(value, infers)
         else
             infers['number'] = true
         end
-        return
+        return true
+    end
+    if value.type == 'nil' then
+        infers['nil'] = true
+        return true
     end
     if value.type == 'function' then
         infers['function'] = true
-        return
+        return true
     end
     if value.type == 'unary' then
         searchInferOfUnary(value, infers)
-        return
+        return true
     end
     if value.type == 'binary' then
         searchInferOfBinary(value, infers)
-        return
+        return true
     end
+    return false
 end
 
 local function searchLiteralOfValue(value, literals)
@@ -180,6 +185,10 @@ end
 ---@param infers string[]
 ---@return string
 function m.viewInfers(infers)
+    -- 如果有显性的 any ，则直接显示为 any
+    if infers['any'] then
+        return 'any'
+    end
     local count = 0
     for infer in pairs(infers) do
         count = count + 1
@@ -188,7 +197,8 @@ function m.viewInfers(infers)
     for i = count + 1, #infers do
         infers[i] = nil
     end
-    if #infers == 0 then
+    -- 如果没有任何显性类型，则推测为 unkonwn ，显示为 any
+    if count == 0 then
         return 'any'
     end
     table.sort(infers)
@@ -200,6 +210,9 @@ end
 ---@return string
 local function searchInfer(source, infers)
     if bindClassOrType(source) then
+        return
+    end
+    if searchInferOfValue(source, infers) then
         return
     end
     local value = searcher.getObjectValue(source)
@@ -214,7 +227,7 @@ local function searchInfer(source, infers)
         end
         return
     end
-    -- X.a
+    -- X.a -> table
     if source.next and source.next.node == source then
         if source.next.type == 'setfield'
         or source.next.type == 'setindex'
@@ -222,6 +235,10 @@ local function searchInfer(source, infers)
             infers['table'] = true
         end
         return
+    end
+    -- return XX
+    if source.parent.type == 'return' then
+        infers['any'] = true
     end
 end
 

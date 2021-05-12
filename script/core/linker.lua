@@ -94,6 +94,13 @@ local function getKey(source)
         return nil, nil
     elseif source.type == 'function' then
         return source.start, nil
+    elseif source.type == 'string' then
+        return '', nil
+    elseif source.type == 'integer'
+    or     source.type == 'number'
+    or     source.type == 'boolean'
+    or     source.type == 'nil' then
+        return source.start, nil
     elseif source.type == '...' then
         return source.start, nil
     elseif source.type == 'select' then
@@ -161,6 +168,15 @@ local function checkMode(source)
     end
     if source.type == 'function' then
         return 'f:'
+    end
+    if source.type == 'string' then
+        return 'str:'
+    end
+    if source.type == 'number'
+    or source.type == 'integer'
+    or source.type == 'boolean'
+    or source.type == 'nil' then
+        return 'l:'
     end
     if source.type == 'call' then
         return 'c:'
@@ -232,6 +248,10 @@ local function getID(source)
     local current = source
     local index = 0
     while true do
+        if current.type == 'paren' then
+            current = current.exp
+            goto CONTINUE
+        end
         local id, node = getKey(current)
         if not id then
             break
@@ -245,6 +265,7 @@ local function getID(source)
         if current.special == '_G' then
             break
         end
+        ::CONTINUE::
     end
     if index == 0 then
         source._id = false
@@ -431,23 +452,15 @@ function m.compileLink(source)
         end
         getLink(id).call = source
         -- 将 call 映射到 node#1 上
-        do
-            local select1ID = ('%s%s%s%s'):format(
-                nodeID,
-                SPLIT_CHAR,
-                RETURN_INDEX_CHAR,
-                1
-            )
-            pushForward(id, select1ID)
-        end
+        local callID = ('%s%s%s%s'):format(
+            nodeID,
+            SPLIT_CHAR,
+            RETURN_INDEX_CHAR,
+            1
+        )
+        pushForward(id, callID)
         -- 将setmetatable映射到 param1 以及 param2.__index 上
         if node.special == 'setmetatable' then
-            local callID = ('%s%s%s%s'):format(
-                nodeID,
-                SPLIT_CHAR,
-                RETURN_INDEX_CHAR,
-                1
-            )
             local tblID  = getID(source.args and source.args[1])
             local metaID = getID(source.args and source.args[2])
             local indexID
@@ -468,20 +481,41 @@ function m.compileLink(source)
     end
     if source.type == 'select' then
         if source.vararg.type == 'call' then
-            local nodeID = getID(source.vararg.node)
+            local call = source.vararg
+            local node = call.node
+            local nodeID = getID(node)
             if not nodeID then
                 return
             end
             -- 将call的返回值接收映射到函数返回值上
-            local callID = ('%s%s%s%s'):format(
+            local callXID = ('%s%s%s%s'):format(
                 nodeID,
                 SPLIT_CHAR,
                 RETURN_INDEX_CHAR,
                 source.index
             )
-            pushForward(id, callID)
-            pushBackward(callID, id)
-            getLink(id).call = source.vararg
+            pushForward(id, callXID)
+            pushBackward(callXID, id)
+            getLink(id).call = call
+            if node.special == 'pcall'
+            or node.special == 'xpcall' then
+                local index = source.index - 1
+                if index <= 0 then
+                    return
+                end
+                local funcID = call.args and getID(call.args[1])
+                if not funcID then
+                    return
+                end
+                local funcXID = ('%s%s%s%s'):format(
+                    funcID,
+                    SPLIT_CHAR,
+                    RETURN_INDEX_CHAR,
+                    index
+                )
+                pushForward(id, funcXID)
+                pushBackward(funcXID, id)
+            end
         end
     end
     if source.type == 'doc.type.function' then
@@ -700,6 +734,8 @@ function m.compileLinks(source)
         m.pushSource(src)
         m.compileLink(src)
     end)
+    -- Special rule: ('').XX -> stringlib.XX
+    pushForward('str:', 'dn:stringlib')
     return Linkers
 end
 

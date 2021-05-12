@@ -113,7 +113,7 @@ print(<?f?>)
 
 TEST [[
 local function f()
-    return 1
+    return <!1!>
 end
 
 ---@class Class

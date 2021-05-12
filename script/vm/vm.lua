@@ -4,15 +4,11 @@ local files     = require 'files'
 local timer     = require 'timer'
 
 local setmetatable   = setmetatable
-local assert         = assert
-local require        = require
-local type           = type
 local running        = coroutine.running
 local ipairs         = ipairs
 local log            = log
 local xpcall         = xpcall
 local mathHuge       = math.huge
-local collectgarbage = collectgarbage
 
 _ENV = nil
 
@@ -61,10 +57,6 @@ function m.getArgInfo(source)
         end
     end
     return nil
-end
-
-function m.getSpecial(source)
-    return guide.getSpecial(source)
 end
 
 function m.getKeyName(source)

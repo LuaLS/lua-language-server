@@ -687,4 +687,50 @@ function m.lineData(lines, row)
     return lines[row]
 end
 
+function m.isSet(source)
+    local tp = source.type
+    if tp == 'setglobal'
+    or tp == 'local'
+    or tp == 'setlocal'
+    or tp == 'setfield'
+    or tp == 'setmethod'
+    or tp == 'setindex'
+    or tp == 'tablefield'
+    or tp == 'tableindex' then
+        return true
+    end
+    if tp == 'call' then
+        local special = m.getSpecial(source.node)
+        if special == 'rawset' then
+            return true
+        end
+    end
+    return false
+end
+
+function m.isGet(source)
+    local tp = source.type
+    if tp == 'getglobal'
+    or tp == 'getlocal'
+    or tp == 'getfield'
+    or tp == 'getmethod'
+    or tp == 'getindex' then
+        return true
+    end
+    if tp == 'call' then
+        local special = m.getSpecial(source.node)
+        if special == 'rawget' then
+            return true
+        end
+    end
+    return false
+end
+
+function m.getSpecial(source)
+    if not source then
+        return nil
+    end
+    return source.special
+end
+
 return m

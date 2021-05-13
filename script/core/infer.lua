@@ -1,5 +1,6 @@
 local searcher = require 'core.searcher'
 local config   = require 'config'
+local linker   = require 'core.linker'
 
 local BE_LEN = {'#'}
 local CLASS  = {'CLASS'}
@@ -260,10 +261,43 @@ local function searchInfer(source, infers)
         infers['any'] = true
         return
     end
-    -- # XX -> string | table
-    if  source.parent.type == 'unary'
-    and source.parent.op.type == '#' then
-        infers[BE_LEN] = true
+    if source.parent.type == 'unary' then
+        local op = source.parent.op.type
+        -- # XX -> string | table
+        if op == '#' then
+            infers[BE_LEN] = true
+            return
+        end
+        if op == '-' then
+            infers['number'] = true
+            return
+        end
+        if op == '~' then
+            infers['integer'] = true
+            return
+        end
+        return
+    end
+    if source.parent.type == 'binary' then
+        local op = source.parent.op.type
+        if op == '+'
+        or op == '-'
+        or op == '*'
+        or op == '/'
+        or op == '//'
+        or op == '^'
+        or op == '%' then
+            infers['number'] = true
+            return
+        end
+        if op == '<<'
+        or op == '>>'
+        or op == '~'
+        or op == '|'
+        or op == '&' then
+            infers['integer'] = true
+            return
+        end
         return
     end
 end
@@ -288,6 +322,15 @@ function m.searchInfers(source)
     searchInfer(source, infers)
     for _, def in ipairs(defs) do
         searchInfer(def, infers)
+    end
+    local id = linker.getID(source)
+    if id then
+        local link = linker.getLinkByID(source, id)
+        if link and link.sources then
+            for _, src in ipairs(link.sources) do
+                searchInfer(src, infers)
+            end
+        end
     end
     cleanInfers(infers)
     return infers

@@ -244,8 +244,11 @@ end
 ]]
 
 TEST 'string' [[
+---@return string
+local function f2() end
+
 local function f()
-    return string.sub()
+    return f2()
 end
 
 local <?x?> = f()

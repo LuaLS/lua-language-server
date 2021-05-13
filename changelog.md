@@ -2,6 +2,7 @@
 
 ## 1.21.2
 * `FIX` loaded new file with ignored filename
+* `FIX` [#536](https://github.com/sumneko/lua-language-server/issues/536)
 
 ## 1.21.1
 `2021-5-8`

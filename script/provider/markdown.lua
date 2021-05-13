@@ -29,6 +29,9 @@ function mt:add(language, text)
         end
         self[#self+1] = text
     else
+        if #self > 0 then
+            self[#self+1] = ''
+        end
         self[#self+1] = ('```%s\n%s\n```'):format(language, text)
     end
 

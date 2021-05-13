@@ -427,6 +427,21 @@ local <?<!c!>?> = f(b)
 ]]
 
 TEST [[
+---@generic K
+---@param x table<K, number>
+---@return K
+local function f(x) end
+
+---@class A
+local <!a!>
+
+---@type table<A, number>
+local b
+
+local <?<!c!>?> = f(b)
+]]
+
+TEST [[
 ---@generic V
 ---@return fun(t: V[]):V
 local function f() end
@@ -549,6 +564,27 @@ local function pairs(t) end
 for k, v in pairs(v1) do
     print(k.bar1)
     print(v.<?bar1?>)
+end
+]]
+
+TEST [[
+---@class Foo
+local Foo = {}
+function Foo:<!bar1!>() end
+
+---@type table<Foo, Foo>
+local v1
+
+---@generic T: table, K, V
+---@param t T
+---@return fun(table: table<K, V>, index: K):K, V
+---@return T
+---@return nil
+local function pairs(t) end
+
+for k, v in pairs(v1) do
+    print(k.<?bar1?>)
+    print(v.bar1)
 end
 ]]
 

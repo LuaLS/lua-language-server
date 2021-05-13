@@ -8,7 +8,8 @@ local SPLIT_CHAR = '\x1F'
 local LAST_REGEX = SPLIT_CHAR .. '[^' .. SPLIT_CHAR .. ']*$'
 local FIRST_REGEX = '^[^' .. SPLIT_CHAR .. ']*'
 local RETURN_INDEX_CHAR = '#'
-local PARAM_INDEX_CHAR = '@'
+local PARAM_INDEX_CHAR  = '@'
+local TABLE_KEY_CHAR    = '<'
 
 ---创建source的链接信息
 ---@param id string
@@ -337,9 +338,10 @@ end
 
 local m = {}
 
-m.SPLIT_CHAR = SPLIT_CHAR
+m.SPLIT_CHAR        = SPLIT_CHAR
 m.RETURN_INDEX_CHAR = RETURN_INDEX_CHAR
-m.PARAM_INDEX_CHAR = PARAM_INDEX_CHAR
+m.PARAM_INDEX_CHAR  = PARAM_INDEX_CHAR
+m.TABLE_KEY_CHAR    = TABLE_KEY_CHAR
 
 ---添加关联单元
 ---@param source parser.guide.object
@@ -539,6 +541,14 @@ function m.compileLink(source)
         end
     end
     if source.type == 'doc.type.table' then
+        if source.tkey then
+            local keyID = ('%s%s%s'):format(
+                id,
+                SPLIT_CHAR,
+                TABLE_KEY_CHAR
+            )
+            pushForward(keyID, getID(source.tkey))
+        end
         if source.tvalue then
             local valueID = ('%s%s'):format(
                 id,
@@ -664,6 +674,14 @@ function m.compileLink(source)
             pushForward(nodeID, getID(source.node))
         end
         if proto.type == 'doc.type.table' then
+            if source.tkey then
+                local keyID = ('%s%s%s'):format(
+                    id,
+                    SPLIT_CHAR,
+                    TABLE_KEY_CHAR
+                )
+                pushForward(keyID, getID(source.tkey))
+            end
             if source.tvalue then
                 local valueID = ('%s%s'):format(
                     id,

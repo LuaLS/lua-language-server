@@ -4,6 +4,7 @@ local linker   = require 'core.linker'
 
 local BE_LEN = {'#'}
 local CLASS  = {'CLASS'}
+local TABLE  = {'TABLE'}
 
 local m = {}
 
@@ -183,6 +184,7 @@ local function cleanInfers(infers)
         infers['integer'] = nil
         infers['number']  = true
     end
+    -- 如果是通过 # 来推测的，且结果里没有其他的 table 与 string，则加入这2个类型
     if infers[BE_LEN] then
         infers[BE_LEN] = nil
         if not infers['table'] and not infers['string'] then
@@ -190,9 +192,15 @@ local function cleanInfers(infers)
             infers['string'] = true
         end
     end
+    --  如果有doc标记，则先移除table类型
     if infers[CLASS] then
         infers[CLASS] = nil
         infers['table'] = nil
+    end
+    -- 用doc标记的table，加入table类型
+    if infers[TABLE] then
+        infers[TABLE] = nil
+        infers['table'] = true
     end
 end
 
@@ -224,6 +232,34 @@ function m.viewInfers(infers)
     return infers[0]
 end
 
+local function getDocName(doc)
+    if not doc then
+        return nil
+    end
+    if doc.type == 'doc.class.name'
+    or doc.type == 'doc.type.name'
+    or doc.type == 'doc.alias.name' then
+        local name = doc[1] or '?'
+        return name
+    end
+    if doc.type == 'doc.type.array' then
+        local nodeName = getDocName(doc.node) or '?'
+        return nodeName .. '[]'
+    end
+    if doc.type == 'doc.type.table' then
+        local key = getDocName(doc.tkey) or '?'
+        local value = getDocName(doc.tvalue) or '?'
+        return ('<%s, %s>'):format(key, value)
+    end
+    if doc.type == 'doc.type.function' then
+        return 'function'
+    end
+    if doc.type == 'doc.type.enum' then
+        local value = doc[1] or '?'
+        return value
+    end
+end
+
 ---显示对象的推断类型
 ---@param source parser.guide.object
 ---@return string
@@ -239,13 +275,14 @@ local function searchInfer(source, infers)
         searchInferOfValue(value, infers)
         return
     end
-    if source.type == 'doc.class.name' then
-        local name = source[1]
-        if name then
-            infers[name]  = true
-            infers[CLASS] = true
+    -- check LuaDoc
+    local docName = getDocName(source)
+    if docName then
+        infers[docName] = true
+        infers[CLASS]   = true
+        if docName == 'table' then
+            infers[TABLE] = true
         end
-        return
     end
     -- X.a -> table
     if source.next and source.next.node == source then
@@ -319,16 +356,24 @@ function m.searchInfers(source)
     end
     local defs = searcher.requestDefinition(source)
     local infers = {}
+    local mark = {}
+    mark[source] = true
     searchInfer(source, infers)
     for _, def in ipairs(defs) do
-        searchInfer(def, infers)
+        if not mark[def] then
+            mark[def] = true
+            searchInfer(def, infers)
+        end
     end
     local id = linker.getID(source)
     if id then
         local link = linker.getLinkByID(source, id)
         if link and link.sources then
             for _, src in ipairs(link.sources) do
-                searchInfer(src, infers)
+                if not mark[src] then
+                    mark[src] = true
+                    searchInfer(src, infers)
+                end
             end
         end
     end

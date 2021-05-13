@@ -108,19 +108,21 @@ local function createValue(closure, proto, callback, road)
         end
         local value = instantValue(closure, proto)
         value.node = node
+        linker.compileLink(value)
         return value
     end
     if proto.type == 'doc.type.table' then
-        local tkey = createValue(closure, proto.key, callback, road)
+        local tkey = createValue(closure, proto.tkey, callback, road)
         road[#road+1] = linker.SPLIT_CHAR
-        local tvalue = createValue(closure, proto.value, callback, road)
+        local tvalue = createValue(closure, proto.tvalue, callback, road)
         road[#road] = nil
         if not tkey and not tvalue then
             return nil
         end
         local value = instantValue(closure, proto)
-        value.key   = tkey   or proto.key
-        value.value = tvalue or proto.value
+        value.tkey   = tkey   or proto.tkey
+        value.tvalue = tvalue or proto.tvalue
+        linker.compileLink(value)
         return value
     end
 end

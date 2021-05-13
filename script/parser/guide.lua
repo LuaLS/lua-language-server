@@ -74,7 +74,7 @@ m.childMap = {
     ['doc.generic.object'] = {'generic', 'extends', 'comment'},
     ['doc.vararg']         = {'vararg', 'comment'},
     ['doc.type.array']     = {'node'},
-    ['doc.type.table']     = {'node', 'key', 'value', 'comment'},
+    ['doc.type.table']     = {'node', 'tkey', 'tvalue', 'comment'},
     ['doc.type.function']  = {'#args', '#returns', 'comment'},
     ['doc.type.literal']   = {'node'},
     ['doc.type.arg']       = {'extends'},
@@ -140,23 +140,6 @@ function m.getParentFunction(obj)
         end
     end
     return nil
-end
-
---- 寻找父的table类型 doc.type.table
----@param obj parser.guide.object
----@return parser.guide.object
-function m.getParentDocTypeTable(obj)
-    for _ = 1, 1000 do
-        local parent = obj.parent
-        if not parent then
-            return nil
-        end
-        if parent.type == 'doc.type.table' then
-            return obj
-        end
-        obj = parent
-    end
-    error('guide.getParentDocTypeTable overstack')
 end
 
 --- 寻找所在区块

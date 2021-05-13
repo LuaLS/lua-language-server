@@ -300,8 +300,8 @@ local function parseTypeUnitTable(parent, node)
 
     node.parent = result;
     result.finish = getFinish()
-    result.key = key
-    result.value = value
+    result.tkey = key
+    result.tvalue = value
 
     return result
 end

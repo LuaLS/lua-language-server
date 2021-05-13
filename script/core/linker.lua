@@ -142,6 +142,7 @@ local function getKey(source)
     or     source.type == 'doc.param'
     or     source.type == 'doc.vararg'
     or     source.type == 'doc.field.name'
+    or     source.type == 'doc.type.enum'
     or     source.type == 'doc.type.table'
     or     source.type == 'doc.type.array'
     or     source.type == 'doc.type.function' then
@@ -216,6 +217,9 @@ local function checkMode(source)
     end
     if source.type == 'doc.vararg' then
         return 'dv:'
+    end
+    if source.type == 'doc.type.enum' then
+        return 'de:'
     end
     if source.type == 'generic.closure' then
         return 'gc:'
@@ -388,6 +392,9 @@ function m.compileLink(source)
             pushForward(id, getID(typeUnit))
             pushBackward(getID(typeUnit), id)
         end
+        for _, enumUnit in ipairs(source.enums) do
+            pushForward(id, getID(enumUnit))
+        end
     end
     -- 分解 @class
     if source.type == 'doc.class' then
@@ -532,12 +539,12 @@ function m.compileLink(source)
         end
     end
     if source.type == 'doc.type.table' then
-        if source.value then
+        if source.tvalue then
             local valueID = ('%s%s'):format(
                 id,
                 SPLIT_CHAR
             )
-            pushForward(valueID, getID(source.value))
+            pushForward(valueID, getID(source.tvalue))
         end
     end
     if source.type == 'doc.type.array' then
@@ -657,12 +664,12 @@ function m.compileLink(source)
             pushForward(nodeID, getID(source.node))
         end
         if proto.type == 'doc.type.table' then
-            if source.value then
+            if source.tvalue then
                 local valueID = ('%s%s'):format(
                     id,
                     SPLIT_CHAR
                 )
-                pushForward(valueID, getID(source.value))
+                pushForward(valueID, getID(source.tvalue))
             end
         end
     end

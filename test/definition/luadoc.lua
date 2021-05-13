@@ -547,8 +547,8 @@ local v1
 local function pairs(t) end
 
 for k, v in pairs(v1) do
-    print(k.<?bar1?>)
-    print(v.bar1)
+    print(k.bar1)
+    print(v.<?bar1?>)
 end
 ]]
 

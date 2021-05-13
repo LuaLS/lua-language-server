@@ -243,8 +243,10 @@ local function f(<?a?>, b)
 end
 ]]
 
-TEST 'string' [[
----@return string
+TEST 'A' [[
+---@class A
+
+---@return A
 local function f2() end
 
 local function f()
@@ -265,14 +267,6 @@ local <?x?> = f()
 --TEST 'table' [[
 --setmetatable(<?b?>)
 --]]
-
-TEST 'function' [[
-string.<?sub?>()
-]]
-
-TEST 'function' [[
-(''):<?sub?>()
-]]
 
 -- 不根据对方函数内的使用情况来推测
 TEST 'any' [[
@@ -325,16 +319,23 @@ local <?x?>
 ]]
 
 TEST 'string' [[
+---@class string
+
 ---@type string
 local <?x?>
 ]]
 
 TEST 'string[]' [[
+---@class string
+
 ---@type string[]
 local <?x?>
 ]]
 
 TEST 'string|table' [[
+---@class string
+---@class table
+
 ---@type string | table
 local <?x?>
 ]]
@@ -350,6 +351,9 @@ local <?x?>
 ]]
 
 TEST 'table<string, number>' [[
+---@class string
+---@class number
+
 ---@type table<string, number>
 local <?x?>
 ]]

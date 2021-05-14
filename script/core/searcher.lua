@@ -189,29 +189,28 @@ function m.searchRefsByID(status, uri, expect, mode)
     local callStack = {}
 
     local function search(id, field)
-        local fieldLen
-        if field then
-            local _, len = field:gsub(linker.SPLIT_CHAR, '')
-            fieldLen = len
-        else
-            fieldLen = 0
-        end
-        if mark[id] and ((mark[id] < fieldLen) or fieldLen == 0) then
+        local count = mark[id] or 0
+        if count >= 2 or (not field and count >= 1) then
             return
         end
-        mark[id] = fieldLen
+        mark[id] = count + 1
         searchStep(id, field)
+        if count == 0 then
+            count = nil
+        end
+        mark[id] = count
     end
 
     local function checkLastID(id, field)
         local lastID = linker.getLastID(id)
-        if lastID then
-            local newField = id:sub(#lastID + 1)
-            if field then
-                newField = newField .. field
-            end
-            search(lastID, newField)
+        if not lastID then
+            return
         end
+        local newField = id:sub(#lastID + 1)
+        if field then
+            newField = newField .. field
+        end
+        search(lastID, newField)
     end
 
     local function searchID(id, field)
@@ -271,6 +270,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         return nil
     end
 
+    local closureCache = {}
     local function checkGeneric(source, field)
         if not source.isGeneric then
             return
@@ -282,12 +282,36 @@ function m.searchRefsByID(status, uri, expect, mode)
         if not call then
             return
         end
-        local closure = generic.createClosure(source, call)
-        if not closure then
+
+        local cacheID = linker.getID(source) .. linker.getID(call)
+        local closure = closureCache[cacheID]
+        if closure == false then
             return
+        end
+        if not closure then
+            closure = generic.createClosure(source, call)
+            closureCache[cacheID] = closure or false
+            if not closure then
+                return
+            end
         end
         local id =  linker.getID(closure)
         searchID(id, field)
+    end
+
+    local function checkForward(id, link, field)
+        for _, forwardID in ipairs(link.forward) do
+            searchID(forwardID, field)
+        end
+    end
+
+    local function checkBackward(id, link, field)
+        if mode ~= 'ref' and not field then
+            return
+        end
+        for _, backwardID in ipairs(link.backward) do
+            searchID(backwardID, field)
+        end
     end
 
     local stepCount = 0
@@ -307,14 +331,10 @@ function m.searchRefsByID(status, uri, expect, mode)
                 end
             end
             if link.forward then
-                for _, forwardID in ipairs(link.forward) do
-                    searchID(forwardID, field)
-                end
+                checkForward(id, link, field)
             end
-            if link.backward and (mode == 'ref' or field) then
-                for _, backwardID in ipairs(link.backward) do
-                    searchID(backwardID, field)
-                end
+            if link.backward then
+                checkBackward(id, link, field)
             end
 
             if link.sources then

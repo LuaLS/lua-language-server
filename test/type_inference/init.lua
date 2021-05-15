@@ -525,6 +525,8 @@ local <?r?> = f()
 ]]
 
 TEST 'string' [[
+---@class string
+
 ---@generic K, V
 ---@return fun(arg: table<K, V>):K, V
 local function f() end
@@ -538,6 +540,8 @@ local <?k?>, v = f2(t)
 ]]
 
 TEST 'string' [[
+---@class string
+
 ---@generic T: table, K, V
 ---@param t T
 ---@return fun(table: table<K, V>, index: K):K, V
@@ -555,6 +559,8 @@ end
 ]]
 
 TEST 'boolean' [[
+---@class boolean
+
 ---@generic T: table, K, V
 ---@param t T
 ---@return fun(table: table<K, V>, index: K):K, V
@@ -572,6 +578,8 @@ end
 ]]
 
 TEST 'string' [[
+---@class string
+
 ---@generic T: table, K, V
 ---@param t T
 ---@return fun(table: table<K, V>, index: K):K, V
@@ -587,6 +595,8 @@ end
 ]]
 
 TEST 'boolean' [[
+---@class boolean
+
 ---@generic T: table, K, V
 ---@param t T
 ---@return fun(table: table<K, V>, index: K):K, V
@@ -602,6 +612,8 @@ end
 ]]
 
 TEST 'boolean' [[
+---@class boolean
+
 ---@generic T: table, V
 ---@param t T
 ---@return fun(table: V[], i?: integer):integer, V
@@ -617,6 +629,8 @@ end
 ]]
 
 TEST 'boolean' [[
+---@class boolean
+
 ---@generic T: table, K, V
 ---@param t T
 ---@return fun(table: table<K, V>, index: K):K, V
@@ -632,6 +646,8 @@ end
 ]]
 
 TEST 'integer' [[
+---@class integer
+
 ---@generic T: table, K, V
 ---@param t T
 ---@return fun(table: table<K, V>, index: K):K, V

@@ -110,7 +110,7 @@ local function getSelect(vararg, index)
         start  = vararg.start,
         finish = vararg.finish,
         vararg = vararg,
-        index  = index,
+        sindex = index,
     }
 end
 

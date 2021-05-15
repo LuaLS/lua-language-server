@@ -222,7 +222,7 @@ TEST [[
 local function f(p) end
 
 local <!k!>
-local <?<!r!>?> = f(k)
+local <?<!r!>?> = f(<!k!>)
 ]]
 
 TEST [[
@@ -502,7 +502,7 @@ local <!v1!>
 ---@return T
 local function iterator(t) end
 
-for <!v!> in iterator(v1) do
+for <!v!> in iterator(<!v1!>) do
     print(<?v?>)
 end
 ]]
@@ -520,7 +520,7 @@ local <!v1!>
 ---@return T
 local function iterator(t) end
 
-for <!v!> in iterator(v1) do
+for <!v!> in iterator(<!v1!>) do
     print(<?v?>)
 end
 ]]

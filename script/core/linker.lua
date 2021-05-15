@@ -107,7 +107,7 @@ local function getKey(source)
     elseif source.type == '...' then
         return source.start, nil
     elseif source.type == 'select' then
-        return ('%d%s%d'):format(source.start, RETURN_INDEX, source.index)
+        return ('%d%s%d'):format(source.start, RETURN_INDEX, source.sindex)
     elseif source.type == 'call' then
         local node = source.node
         if node.special == 'rawget'
@@ -522,14 +522,14 @@ function m.compileLink(source)
             local callXID = ('%s%s%s'):format(
                 nodeID,
                 RETURN_INDEX,
-                source.index
+                source.sindex
             )
             pushForward(id, callXID)
             pushBackward(callXID, id)
             getLink(id).call = call
             if node.special == 'pcall'
             or node.special == 'xpcall' then
-                local index = source.index - 1
+                local index = source.sindex - 1
                 if index <= 0 then
                     return
                 end

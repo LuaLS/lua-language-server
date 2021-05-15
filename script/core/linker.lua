@@ -2,14 +2,16 @@ local util    = require 'utility'
 local guide   = require 'parser.guide'
 
 local Linkers
-local LastIDCache = {}
-local FirstIDCache = {}
-local SPLIT_CHAR = '\x1F'
-local LAST_REGEX = SPLIT_CHAR .. '[^' .. SPLIT_CHAR .. ']*$'
-local FIRST_REGEX = '^[^' .. SPLIT_CHAR .. ']*'
-local RETURN_INDEX_CHAR = '#'
-local PARAM_INDEX_CHAR  = '@'
-local TABLE_KEY_CHAR    = '<'
+local LastIDCache    = {}
+local FirstIDCache   = {}
+local SPLIT_CHAR     = '\x1F'
+local LAST_REGEX     = SPLIT_CHAR .. '[^' .. SPLIT_CHAR .. ']*$'
+local FIRST_REGEX    = '^[^' .. SPLIT_CHAR .. ']*'
+local ANY_FIELD_CHAR = '*'
+local RETURN_INDEX   = SPLIT_CHAR .. '#'
+local PARAM_INDEX    = SPLIT_CHAR .. '@'
+local TABLE_KEY      = SPLIT_CHAR .. '<'
+local ANY_FIELD      = SPLIT_CHAR .. ANY_FIELD_CHAR
 
 ---创建source的链接信息
 ---@param id string
@@ -67,22 +69,22 @@ local function getKey(source)
     or     source.type == 'getindex' then
         local index = source.index
         if not index then
-            return '', source.node
+            return ANY_FIELD_CHAR, source.node
         end
         if index.type == 'string' then
             return ('%q'):format(index[1] or ''), source.node
         else
-            return '', source.node
+            return ANY_FIELD_CHAR, source.node
         end
     elseif source.type == 'tableindex' then
         local index = source.index
         if not index then
-            return '', source.parent
+            return ANY_FIELD_CHAR, source.parent
         end
         if index.type == 'string' then
             return ('%q'):format(index[1] or ''), source.parent
         else
-            return '', source.parent
+            return ANY_FIELD_CHAR, source.parent
         end
     elseif source.type == 'table' then
         return source.start, nil
@@ -105,7 +107,7 @@ local function getKey(source)
     elseif source.type == '...' then
         return source.start, nil
     elseif source.type == 'select' then
-        return ('%d%s%s%d'):format(source.start, SPLIT_CHAR, RETURN_INDEX_CHAR, source.index)
+        return ('%d%s%d'):format(source.start, RETURN_INDEX, source.index)
     elseif source.type == 'call' then
         local node = source.node
         if node.special == 'rawget'
@@ -338,10 +340,11 @@ end
 
 local m = {}
 
-m.SPLIT_CHAR        = SPLIT_CHAR
-m.RETURN_INDEX_CHAR = RETURN_INDEX_CHAR
-m.PARAM_INDEX_CHAR  = PARAM_INDEX_CHAR
-m.TABLE_KEY_CHAR    = TABLE_KEY_CHAR
+m.SPLIT_CHAR   = SPLIT_CHAR
+m.RETURN_INDEX = RETURN_INDEX
+m.PARAM_INDEX  = PARAM_INDEX
+m.TABLE_KEY    = TABLE_KEY
+m.ANY_FIELD    = ANY_FIELD
 
 ---添加关联单元
 ---@param source parser.guide.object
@@ -461,10 +464,9 @@ function m.compileLink(source)
         end
         getLink(id).call = source
         -- 将 call 映射到 node#1 上
-        local callID = ('%s%s%s%s'):format(
+        local callID = ('%s%s%s'):format(
             nodeID,
-            SPLIT_CHAR,
-            RETURN_INDEX_CHAR,
+            RETURN_INDEX,
             1
         )
         pushForward(id, callID)
@@ -497,10 +499,9 @@ function m.compileLink(source)
                 return
             end
             -- 将call的返回值接收映射到函数返回值上
-            local callXID = ('%s%s%s%s'):format(
+            local callXID = ('%s%s%s'):format(
                 nodeID,
-                SPLIT_CHAR,
-                RETURN_INDEX_CHAR,
+                RETURN_INDEX,
                 source.index
             )
             pushForward(id, callXID)
@@ -516,10 +517,9 @@ function m.compileLink(source)
                 if not funcID then
                     return
                 end
-                local funcXID = ('%s%s%s%s'):format(
+                local funcXID = ('%s%s%s'):format(
                     funcID,
-                    SPLIT_CHAR,
-                    RETURN_INDEX_CHAR,
+                    RETURN_INDEX,
                     index
                 )
                 pushForward(id, funcXID)
@@ -530,10 +530,9 @@ function m.compileLink(source)
     if source.type == 'doc.type.function' then
         if source.returns then
             for index, rtn in ipairs(source.returns) do
-                local returnID = ('%s%s%s%s'):format(
+                local returnID = ('%s%s%s'):format(
                     id,
-                    SPLIT_CHAR,
-                    RETURN_INDEX_CHAR,
+                    RETURN_INDEX,
                     index
                 )
                 pushForward(returnID, getID(rtn))
@@ -542,17 +541,16 @@ function m.compileLink(source)
     end
     if source.type == 'doc.type.table' then
         if source.tkey then
-            local keyID = ('%s%s%s'):format(
+            local keyID = ('%s%s'):format(
                 id,
-                SPLIT_CHAR,
-                TABLE_KEY_CHAR
+                TABLE_KEY
             )
             pushForward(keyID, getID(source.tkey))
         end
         if source.tvalue then
             local valueID = ('%s%s'):format(
                 id,
-                SPLIT_CHAR
+                ANY_FIELD
             )
             pushForward(valueID, getID(source.tvalue))
         end
@@ -561,7 +559,7 @@ function m.compileLink(source)
         if source.node then
             local nodeID = ('%s%s'):format(
                 id,
-                SPLIT_CHAR
+                ANY_FIELD
             )
             pushForward(nodeID, getID(source.node))
         end
@@ -580,10 +578,9 @@ function m.compileLink(source)
                 end
             end
             for index, rtnObjs in ipairs(returns) do
-                local returnID = ('%s%s%s%s'):format(
+                local returnID = ('%s%s%s'):format(
                     id,
-                    SPLIT_CHAR,
-                    RETURN_INDEX_CHAR,
+                    RETURN_INDEX,
                     index
                 )
                 for _, rtnObj in ipairs(rtnObjs) do
@@ -600,10 +597,9 @@ function m.compileLink(source)
             for _, doc in ipairs(source.bindDocs) do
                 if doc.type == 'doc.return' then
                     for _, rtn in ipairs(doc.returns) do
-                        local fullID = ('%s%s%s%s'):format(
+                        local fullID = ('%s%s%s'):format(
                             id,
-                            SPLIT_CHAR,
-                            RETURN_INDEX_CHAR,
+                            RETURN_INDEX,
                             rtn.returnIndex
                         )
                         pushForward(fullID, getID(rtn))
@@ -636,10 +632,9 @@ function m.compileLink(source)
     end
     if source.type == 'generic.closure' then
         for i, rtn in ipairs(source.returns) do
-            local closureID = ('%s%s%s%s'):format(
+            local closureID = ('%s%s%s'):format(
                 id,
-                SPLIT_CHAR,
-                RETURN_INDEX_CHAR,
+                RETURN_INDEX,
                 i
             )
             local returnID = getID(rtn)
@@ -669,23 +664,22 @@ function m.compileLink(source)
         if proto.type == 'doc.type.array' then
             local nodeID = ('%s%s'):format(
                 id,
-                SPLIT_CHAR
+                ANY_FIELD
             )
             pushForward(nodeID, getID(source.node))
         end
         if proto.type == 'doc.type.table' then
             if source.tkey then
-                local keyID = ('%s%s%s'):format(
+                local keyID = ('%s%s'):format(
                     id,
-                    SPLIT_CHAR,
-                    TABLE_KEY_CHAR
+                    TABLE_KEY
                 )
                 pushForward(keyID, getID(source.tkey))
             end
             if source.tvalue then
                 local valueID = ('%s%s'):format(
                     id,
-                    SPLIT_CHAR
+                    ANY_FIELD
                 )
                 pushForward(valueID, getID(source.tvalue))
             end

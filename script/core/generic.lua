@@ -96,7 +96,7 @@ local function createValue(closure, proto, callback, road)
     end
     if proto.type == 'doc.type.array' then
         if road then
-            road[#road+1] = linker.SPLIT_CHAR
+            road[#road+1] = linker.ANY_FIELD
         end
         local node = createValue(closure, proto.node, callback, road)
         if road then
@@ -110,11 +110,11 @@ local function createValue(closure, proto, callback, road)
         return value
     end
     if proto.type == 'doc.type.table' then
-        road[#road+1] = linker.SPLIT_CHAR .. linker.TABLE_KEY_CHAR
+        road[#road+1] = linker.TABLE_KEY
         local tkey = createValue(closure, proto.tkey, callback, road)
         road[#road] = nil
 
-        road[#road+1] = linker.SPLIT_CHAR
+        road[#road+1] = linker.ANY_FIELD
         local tvalue = createValue(closure, proto.tvalue, callback, road)
         road[#road] = nil
 

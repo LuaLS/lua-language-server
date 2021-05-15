@@ -242,15 +242,14 @@ function m.searchRefsByID(status, uri, expect, mode)
         if not parentID then
             return
         end
-        search(parentID, linker.SPLIT_CHAR .. linker.RETURN_INDEX_CHAR .. returnIndex)
+        search(parentID, linker.RETURN_INDEX .. returnIndex)
     end
 
     local function isCallID(field)
         if not field then
             return false
         end
-        if  field:sub(1, 1) == linker.SPLIT_CHAR
-        and field:sub(2, 2) == linker.RETURN_INDEX_CHAR then
+        if  field:sub(1, 2) == linker.RETURN_INDEX then
             return true
         end
         return false

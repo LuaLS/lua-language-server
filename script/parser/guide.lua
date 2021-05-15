@@ -565,9 +565,16 @@ function m.eachSource(ast, callback)
         index = index + 1
         if not mark[obj] then
             mark[obj] = true
-            callback(obj)
+            local res = callback(obj)
+            if res == true then
+                goto CONTINUE
+            end
+            if res == false then
+                return
+            end
             m.addChilds(list, obj, m.childMap)
         end
+        ::CONTINUE::
     end
 end
 

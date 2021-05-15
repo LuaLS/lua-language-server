@@ -1209,6 +1209,9 @@ local function bindDocs(state)
         or src.type == '...' then
             sources[#sources+1] = src
         end
+        if src.type == 'table' then
+            return true
+        end
     end)
     table.sort(sources, function (a, b)
         return a.start < b.start

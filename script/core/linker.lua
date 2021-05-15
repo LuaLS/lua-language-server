@@ -427,7 +427,7 @@ function m.compileLink(source)
         pushForward(getID(source.class), id)
         if source.extends then
             for _, ext in ipairs(source.extends) do
-                pushForward(id, getID(ext))
+                pushBackward(id, getID(ext))
                 pushBackward(getID(ext), id)
             end
         end
@@ -593,6 +593,11 @@ function m.compileLink(source)
             )
             pushForward(nodeID, getID(source.node))
         end
+        local keyID = ('%s%s'):format(
+            id,
+            TABLE_KEY
+        )
+        pushForward(keyID, 'dn:integer')
     end
     -- 将函数的返回值映射到具体的返回值上
     if source.type == 'function' then
@@ -697,6 +702,11 @@ function m.compileLink(source)
                 ANY_FIELD
             )
             pushForward(nodeID, getID(source.node))
+            local keyID = ('%s%s'):format(
+                id,
+                TABLE_KEY
+            )
+            pushForward(keyID, 'dn:integer')
         end
         if proto.type == 'doc.type.table' then
             if source.tkey then

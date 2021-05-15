@@ -349,9 +349,26 @@ local <?<!f2!>?> = f()
 
 TEST [[
 ---@generic T
+---@type fun(x: T):T
+local f
+
+local <?<!v2!>?> = f(<!{}!>)
+]]
+
+TEST [[
+---@generic T
 ---@param x T
 ---@return fun():T
 local function f(x) end
+
+local v1 = f(<!{}!>)
+local <?<!v2!>?> = v1()
+]]
+
+TEST [[
+---@generic T
+---@type fun(x: T):fun():T
+local f
 
 local v1 = f(<!{}!>)
 local <?<!v2!>?> = v1()

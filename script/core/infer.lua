@@ -8,6 +8,18 @@ local BE_CONNACT      = {'BE_CONNACT'}
 local CLASS           = {'CLASS'}
 local TABLE           = {'TABLE'}
 
+local TypeSort = {
+    ['boolean']  = 1,
+    ['string']   = 2,
+    ['integer']  = 3,
+    ['number']   = 4,
+    ['table']    = 5,
+    ['function'] = 6,
+    ['true']     = 101,
+    ['false']    = 102,
+    ['nil']      = 999,
+}
+
 local m = {}
 
 local function mergeTable(a, b)
@@ -240,7 +252,15 @@ function m.viewInfers(infers)
         infers[0] = 'any'
         return 'any'
     end
-    table.sort(infers)
+    table.sort(result, function (a, b)
+        local sa = TypeSort[a] or 100
+        local sb = TypeSort[b] or 100
+        if sa == sb then
+            return a < b
+        else
+            return sa < sb
+        end
+    end)
     infers[0] = table.concat(result, '|')
     return infers[0]
 end

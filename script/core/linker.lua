@@ -346,6 +346,26 @@ m.PARAM_INDEX  = PARAM_INDEX
 m.TABLE_KEY    = TABLE_KEY
 m.ANY_FIELD    = ANY_FIELD
 
+--- 寻找doc的主体
+---@param obj parser.guide.object
+---@return parser.guide.object
+local function getDocStateWithoutCrossFunction(obj)
+    for _ = 1, 1000 do
+        local parent = obj.parent
+        if not parent then
+            return obj
+        end
+        if parent.type == 'doc' then
+            return obj
+        end
+        if parent.type == 'doc.type.function' then
+            return nil
+        end
+        obj = parent
+    end
+    error('guide.getDocState overstack')
+end
+
 ---添加关联单元
 ---@param source parser.guide.object
 function m.pushSource(source)
@@ -537,6 +557,16 @@ function m.compileLink(source)
                 )
                 pushForward(returnID, getID(rtn))
             end
+        end
+        -- @type fun(x: T):T 的情况
+        local docType = getDocStateWithoutCrossFunction(source)
+        if docType and docType.type == 'doc.type' then
+            guide.eachSourceType(source, 'doc.type.name', function (typeName)
+                if typeName.typeGeneric then
+                    source.isGeneric = true
+                    return false
+                end
+            end)
         end
     end
     if source.type == 'doc.type.table' then

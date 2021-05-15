@@ -423,6 +423,15 @@ print(t.<?a?>)
 ]]
 
 TEST 'integer' [[
+---@class integer
+
+---@generic T: table, V
+---@param t T
+---@return fun(table: V[], i?: integer):integer, V
+---@return T
+---@return integer i
+local function ipairs() end
+
 for <?i?> in ipairs() do
 end
 ]]
@@ -440,6 +449,8 @@ local k, v = next(<?t?>)
 ]]
 
 TEST 'string' [[
+---@class string
+
 ---@generic K, V
 ---@param t table<K, V>
 ---@return K
@@ -452,6 +463,8 @@ local <?k?>, v = next(t)
 ]]
 
 TEST 'boolean' [[
+---@class boolean
+
 ---@generic K, V
 ---@param t table<K, V>
 ---@return K
@@ -472,6 +485,8 @@ local <?r?> = f(true)
 ]]
 
 TEST 'string' [[
+---@class string
+
 ---@generic K, V
 ---@type fun(arg: table<K, V>):K, V
 local f
@@ -483,6 +498,8 @@ local <?k?>, v = f(t)
 ]]
 
 TEST 'boolean' [[
+---@class boolean
+
 ---@generic K, V
 ---@type fun(arg: table<K, V>):K, V
 local f

@@ -160,10 +160,12 @@ local function buildValues(closure)
             if doc.type == 'doc.param' then
                 local extends = doc.extends
                 local index   = extends.paramIndex
-                local param   = params and params[index]
-                closure.params[index] = param and createValue(closure, extends, function (road, key, proto)
-                    buildValue(road, key, proto, param, upvalues)
-                end) or extends
+                if index then
+                    local param   = params and params[index]
+                    closure.params[index] = param and createValue(closure, extends, function (road, key, proto)
+                        buildValue(road, key, proto, param, upvalues)
+                    end) or extends
+                end
             end
         end
         for _, doc in ipairs(protoFunction.bindDocs) do
@@ -177,7 +179,7 @@ local function buildValues(closure)
     if protoFunction.type == 'doc.type.function' then
         for index, arg in ipairs(protoFunction.args) do
             local extends = arg.extends
-            local param   = params[index]
+            local param   = params and params[index]
             closure.params[index] = param and createValue(closure, extends, function (road, key, proto)
                 buildValue(road, key, proto, param, upvalues)
             end) or extends
@@ -194,6 +196,8 @@ end
 function m.createClosure(proto, call)
     local protoFunction, parentClosure
     if proto.type == 'function' then
+        protoFunction = proto
+    elseif proto.type == 'doc.type.function' then
         protoFunction = proto
     elseif proto.type == 'generic.value' then
         protoFunction = proto.proto

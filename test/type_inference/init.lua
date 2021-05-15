@@ -363,12 +363,16 @@ self.<?t?>[#self.t+1] = {}
 ]]
 
 TEST 'string' [[
+---@class string
+
 ---@type string[]
 local x
 local <?y?> = x[1]
 ]]
 
 TEST 'string' [[
+---@class string
+
 ---@return string[]
 local function f() end
 local x = f()

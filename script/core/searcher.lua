@@ -148,9 +148,7 @@ function m.getObjectValue(obj)
     if obj.type == 'boolean'
     or obj.type == 'number'
     or obj.type == 'integer'
-    or obj.type == 'string'
-    or obj.type == 'doc.type.table'
-    or obj.type == 'doc.type.arrary' then
+    or obj.type == 'string' then
         return obj
     end
     if obj.value then

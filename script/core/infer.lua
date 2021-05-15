@@ -2,9 +2,11 @@ local searcher = require 'core.searcher'
 local config   = require 'config'
 local linker   = require 'core.linker'
 
-local BE_LEN = {'#'}
-local CLASS  = {'CLASS'}
-local TABLE  = {'TABLE'}
+local STRING_OR_TABLE = {'STRING_OR_TABLE'}
+local BE_RETURN       = {'BE_RETURN'}
+local BE_CONNACT      = {'BE_CONNACT'}
+local CLASS           = {'CLASS'}
+local TABLE           = {'TABLE'}
 
 local m = {}
 
@@ -184,9 +186,16 @@ local function cleanInfers(infers)
         infers['integer'] = nil
         infers['number']  = true
     end
+    -- 如果是通过 .. 来推测的，且结果里没有 number 与 integer，则推测为string
+    if infers[BE_CONNACT] then
+        infers[BE_CONNACT] = nil
+        if not infers['number'] and not infers['integer'] then
+            infers['string'] = true
+        end
+    end
     -- 如果是通过 # 来推测的，且结果里没有其他的 table 与 string，则加入这2个类型
-    if infers[BE_LEN] then
-        infers[BE_LEN] = nil
+    if infers[STRING_OR_TABLE] then
+        infers[STRING_OR_TABLE] = nil
         if not infers['table'] and not infers['string'] then
             infers['table']  = true
             infers['string'] = true
@@ -201,6 +210,10 @@ local function cleanInfers(infers)
     if infers[TABLE] then
         infers[TABLE] = nil
         infers['table'] = true
+    end
+    if infers[BE_RETURN] then
+        infers[BE_RETURN] = nil
+        infers['nil'] = nil
     end
 end
 
@@ -236,6 +249,16 @@ local function getDocName(doc)
     if not doc then
         return nil
     end
+    if doc.type == 'doc.type' then
+        local list = {}
+        for _, tp in ipairs(doc.types) do
+            list[#list+1] = getDocName(tp)
+        end
+        for _, enum in ipairs(doc.enums) do
+            list[#list+1] = getDocName(enum)
+        end
+        return table.concat(list, '|')
+    end
     if doc.type == 'doc.class.name'
     or doc.type == 'doc.type.name'
     or doc.type == 'doc.alias.name' then
@@ -249,7 +272,7 @@ local function getDocName(doc)
     if doc.type == 'doc.type.table' then
         local key = getDocName(doc.tkey) or '?'
         local value = getDocName(doc.tvalue) or '?'
-        return ('<%s, %s>'):format(key, value)
+        return ('table<%s, %s>'):format(key, value)
     end
     if doc.type == 'doc.type.function' then
         return 'function'
@@ -284,25 +307,11 @@ local function searchInfer(source, infers)
             infers[TABLE] = true
         end
     end
-    -- X.a -> table
-    if source.next and source.next.node == source then
-        if source.next.type == 'setfield'
-        or source.next.type == 'setindex'
-        or source.next.type == 'setmethod' then
-            infers['table'] = true
-        end
-        return
-    end
-    -- return XX
-    if source.parent.type == 'return' then
-        infers['any'] = true
-        return
-    end
     if source.parent.type == 'unary' then
         local op = source.parent.op.type
         -- # XX -> string | table
         if op == '#' then
-            infers[BE_LEN] = true
+            infers[STRING_OR_TABLE] = true
             return
         end
         if op == '-' then
@@ -335,7 +344,27 @@ local function searchInfer(source, infers)
             infers['integer'] = true
             return
         end
-        return
+        if op == '..' then
+            infers[BE_CONNACT] = true
+            return
+        end
+    end
+    -- X.a -> table
+    if source.next and source.next.node == source then
+        if source.next.type == 'setfield'
+        or source.next.type == 'setindex'
+        or source.next.type == 'setmethod'
+        or source.next.type == 'getfield'
+        or source.next.type == 'getindex' then
+            infers['table'] = true
+        end
+        if source.next.type == 'getmethod' then
+            infers[STRING_OR_TABLE] = true
+        end
+    end
+    -- return XX
+    if source.parent.type == 'return' then
+        infers[BE_RETURN] = true
     end
 end
 
@@ -359,6 +388,10 @@ function m.searchInfers(source)
     local mark = {}
     mark[source] = true
     searchInfer(source, infers)
+    if source.type == 'field' or source.type == 'method' then
+        mark[source.parent] = true
+        searchInfer(source.parent, infers)
+    end
     for _, def in ipairs(defs) do
         if not mark[def] then
             mark[def] = true

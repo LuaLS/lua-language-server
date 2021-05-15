@@ -176,7 +176,7 @@ local y = f()()
 TEST [[
 local t = {}
 t.<?x?> = 1
-t[a.b.c] = 1
+t[<!a.b.c!>] = 1
 ]]
 
 TEST [[

@@ -209,6 +209,7 @@ function m.searchRefsByID(status, uri, expect, mode)
             newField = newField .. field
         end
         search(lastID, newField)
+        return lastID
     end
 
     local function searchID(id, field)
@@ -292,7 +293,7 @@ function m.searchRefsByID(status, uri, expect, mode)
                 return
             end
         end
-        local id =  linker.getID(closure)
+        local id = linker.getID(closure)
         searchID(id, field)
     end
 
@@ -311,6 +312,31 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
     end
 
+    local function searchLink(id, link, field)
+        if link.call then
+            callStack[#callStack+1] = link.call
+        end
+        if field == nil and link.sources then
+            for _, source in ipairs(link.sources) do
+                m.pushResult(status, mode, source)
+            end
+        end
+        if link.forward then
+            checkForward(id, link, field)
+        end
+        if link.backward then
+            checkBackward(id, link, field)
+        end
+
+        if link.sources then
+            checkGeneric(link.sources[1], field)
+        end
+
+        if link.call then
+            callStack[#callStack] = nil
+        end
+    end
+
     local stepCount = 0
     function searchStep(id, field)
         stepCount = stepCount + 1
@@ -319,30 +345,16 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
         local link = linker.getLinkByID(root, id)
         if link then
-            if link.call then
-                callStack[#callStack+1] = link.call
-            end
-            if field == nil and link.sources then
-                for _, source in ipairs(link.sources) do
-                    m.pushResult(status, mode, source)
-                end
-            end
-            if link.forward then
-                checkForward(id, link, field)
-            end
-            if link.backward then
-                checkBackward(id, link, field)
-            end
-
-            if link.sources then
-                checkGeneric(link.sources[1], field)
-            end
-
-            if link.call then
-                callStack[#callStack] = nil
+            searchLink(id, link, field)
+        end
+        local lastID = checkLastID(id, field)
+        if lastID then
+            local anyFieldID = lastID .. linker.ANY_FIELD
+            local anyFieldLink = linker.getLinkByID(root, anyFieldID)
+            if anyFieldLink then
+                searchLink(anyFieldID, anyFieldLink, field)
             end
         end
-        checkLastID(id, field)
     end
 
     search(expect)

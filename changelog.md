@@ -1,6 +1,7 @@
 # changelog
 
 ## 1.21.2
+`2021-5-18`
 * `FIX` loaded new file with ignored filename
 * `FIX` [#536](https://github.com/sumneko/lua-language-server/issues/536)
 * `FIX` [#537](https://github.com/sumneko/lua-language-server/issues/537)

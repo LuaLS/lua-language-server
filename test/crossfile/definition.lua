@@ -121,6 +121,18 @@ TEST {
 
 TEST {
     {
+        path = '@bbb.lua',
+        content = '',
+        target = {0, 0},
+    },
+    {
+        path = 'b.lua',
+        content = 'require "<?@bbb?>"',
+    },
+}
+
+TEST {
+    {
         path = 'aaa/bbb.lua',
         content = '',
         target = {0, 0},

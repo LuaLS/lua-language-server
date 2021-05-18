@@ -329,11 +329,7 @@ function m.findUrisByFilePath(path)
     if type(path) ~= 'string' then
         return {}
     end
-    local lpath = path:gsub('[/\\]+', '/')
-    if lpath:match('^[/\\]')
-    or lpath:match('^%a+%:') then
-        lpath = furi.encode(lpath)
-    end
+    local lpath = furi.encode(path):gsub('^file:///', '')
     if platform.OS == 'Windows' then
         lpath = lpath:lower()
     end
@@ -349,11 +345,11 @@ function m.findUrisByFilePath(path)
         if platform.OS ~= 'Windows' then
             uri = files.getOriginUri(uri)
         end
-        local curPath = furi.decode(files.getOriginUri(uri))
-        if not curPath:find(lpath, 1, true) then
+        if not uri:find(lpath, 1, true) then
             goto CONTINUE
         end
         local pathLen = #path
+        local curPath = furi.decode(files.getOriginUri(uri))
         local curLen  = #curPath
         local seg = curPath:sub(curLen - pathLen, curLen - pathLen)
         if seg == '/' or seg == '\\' or seg == '' then

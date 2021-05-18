@@ -3,6 +3,9 @@ local guide   = require 'parser.guide'
 local files   = require 'files'
 local generic = require 'core.generic'
 
+local NONE = {'NONE'}
+local LAST = {'LAST'}
+
 local function checkFunctionReturn(source)
     if  source.parent
     and source.parent.type == 'return' then
@@ -188,19 +191,37 @@ function m.searchRefsByID(status, uri, expect, mode)
     local callStack = {}
 
     local function search(id, field)
-        local count = mark[id] or 0
-        if count >= 2 or (not field and count >= 1) then
-            return
+        local cmark = mark[id]
+        if not cmark then
+            cmark = {}
+            mark[id] = cmark
         end
-        mark[id] = count + 1
-        searchStep(id, field)
-        if count == 0 then
-            count = nil
+        if field then
+            if cmark[field] then
+                return
+            end
+            cmark[field] = true
+            searchStep(id, field)
+            cmark[field] = nil
+        else
+            if cmark[NONE] then
+                return
+            end
+            cmark[NONE] = true
+            searchStep(id, nil)
+            cmark[NONE] = nil
         end
-        mark[id] = count
     end
 
     local function checkLastID(id, field)
+        local cmark = mark[id]
+        if not cmark then
+            cmark = {}
+            mark[id] = cmark
+        end
+        if cmark[LAST] then
+            return
+        end
         local lastID = linker.getLastID(id)
         if not lastID then
             return
@@ -209,7 +230,9 @@ function m.searchRefsByID(status, uri, expect, mode)
         if field then
             newField = newField .. field
         end
+        cmark[LAST] = true
         search(lastID, newField)
+        cmark[LAST] = nil
         return lastID
     end
 

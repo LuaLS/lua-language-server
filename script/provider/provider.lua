@@ -458,17 +458,18 @@ proto.on('textDocument/completion', function (params)
     if not files.exists(uri) then
         return nil
     end
-    if params.context and config.other.acceptSuggestionOnEnter ~= 'off' then
-        if params.context.triggerCharacter == '\n'
-        or params.context.triggerCharacter == '{'
-        or params.context.triggerCharacter == ',' then
+    local triggerCharacter = params.context and params.context.triggerCharacter
+    if config.other.acceptSuggestionOnEnter ~= 'off' then
+        if triggerCharacter == '\n'
+        or triggerCharacter == '{'
+        or triggerCharacter == ',' then
             return
         end
     end
     await.setPriority(1000)
     local clock  = os.clock()
     local offset = files.offset(uri, params.position)
-    local result = core.completion(uri, offset - 1)
+    local result = core.completion(uri, offset - 1, triggerCharacter)
     local passed = os.clock() - clock
     if passed > 0.1 then
         log.warn(('Completion takes %.3f sec.'):format(passed))

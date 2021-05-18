@@ -1163,13 +1163,18 @@ local function tryIndex(ast, text, offset, results)
     checkField(ast, word, offset, offset, parent, oop, results)
 end
 
-local function tryWord(ast, text, offset, results)
+local function tryWord(ast, text, offset, triggerCharacter, results)
     local finish = lookBackward.skipSpace(text, offset)
-    local word, start = lookBackward.findWord(text, finish)
+    local word, start = lookBackward.findWord(text, offset)
     if not word then
-        return nil
+        if triggerCharacter == nil then
+            word = ''
+            start = offset
+        else
+            return nil
+        end
     end
-    local hasSpace = finish ~= offset
+    local hasSpace = triggerCharacter ~= nil and finish ~= offset
     if isInString(ast, offset) then
         if not hasSpace then
             if #results == 0 then
@@ -1918,7 +1923,7 @@ local function clearCache()
     cache.results = nil
 end
 
-local function completion(uri, offset)
+local function completion(uri, offset, triggerCharacter)
     tracy.ZoneBeginN 'completion cache'
     local results = getCache(uri, offset)
     tracy.ZoneEnd()
@@ -1940,7 +1945,7 @@ local function completion(uri, offset)
             trySpecial(ast, text, offset, results)
             tryCallArg(ast, text, offset, results)
             tryTable(ast, text, offset, results)
-            tryWord(ast, text, offset, results)
+            tryWord(ast, text, offset, triggerCharacter, results)
             tryIndex(ast, text, offset, results)
             trySymbol(ast, text, offset, results)
         end

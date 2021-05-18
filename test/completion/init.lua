@@ -70,7 +70,8 @@ function TEST(script)
 
         files.setText('', new_script)
         core.clearCache()
-        local result = core.completion('', pos)
+        local triggerCharacter = script:sub(pos - 1, pos - 1)
+        local result = core.completion('', pos, triggerCharacter)
         if not expect then
             assert(result == nil)
             return

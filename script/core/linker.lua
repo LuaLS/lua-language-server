@@ -396,6 +396,9 @@ function m.compileLink(source)
     -- self -> mt:xx
     if source.type == 'local' and source[1] == 'self' then
         local func = guide.getParentFunction(source)
+        if func.isGeneric then
+            return
+        end
         local setmethod = func.parent
         -- guess `self`
         if setmethod and ( setmethod.type == 'setmethod'

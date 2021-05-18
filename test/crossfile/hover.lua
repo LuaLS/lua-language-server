@@ -623,6 +623,7 @@ hover = {
     name = 'f',
     description = [[
 @*param* `a` —  xxx
+
 ```lua
 a: boolean
     | true -- ttt

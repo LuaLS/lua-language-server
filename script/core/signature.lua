@@ -41,14 +41,17 @@ local function makeOneSignature(source, oop, index)
     label = label:gsub('%s*->.+', '')
     local params = {}
     local i = 0
-    for start, finish in label
+    local argStart, argLabel = label:match '()(%b())'
+    local converted = argLabel
+        : sub(2, -2)
         : gsub('%b<>', function (str)
             return ('_'):rep(#str)
         end)
-        : gmatch '[%(%)%,]%s*().-()%s*%f[%(%)%,%[%]]' do
+        : gsub('[%[%]%(%)]', '_')
+    for start, finish in converted:gmatch '%s*()[^,]+()' do
         i = i + 1
         params[i] = {
-            label = {start, finish-1},
+            label = {start + argStart, finish - 1 + argStart},
         }
     end
     -- 不定参数

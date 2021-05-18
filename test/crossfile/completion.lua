@@ -97,7 +97,7 @@ function TEST(data)
 
     local expect = data.completion
     core.clearCache()
-    local result = core.completion(mainUri, pos)
+    local result = core.completion(mainUri, pos, '')
     if not expect then
         assert(result == nil)
         return

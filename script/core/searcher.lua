@@ -1,4 +1,4 @@
-local linker  = require 'core.linker'
+local noder   = require 'core.noder'
 local guide   = require 'parser.guide'
 local files   = require 'files'
 local generic = require 'core.generic'
@@ -65,7 +65,7 @@ function m.pushResult(status, mode, source)
         end
         if parent.type == 'return'
         or parent.type == 'callargs' then
-            if linker.getID(source) ~= status.id then
+            if noder.getID(source) ~= status.id then
                 results[#results+1] = source
             end
         end
@@ -106,7 +106,7 @@ function m.pushResult(status, mode, source)
             end
         end
         if parent.type == 'return' then
-            if linker.getID(source) ~= status.id then
+            if noder.getID(source) ~= status.id then
                 results[#results+1] = source
             end
         end
@@ -130,7 +130,7 @@ end
 
 -- TODO
 function m.findGlobals(root)
-    linker.compileLinks(root)
+    noder.compileNode(root)
     -- TODO
     return {}
 end
@@ -185,7 +185,7 @@ function m.searchRefsByID(status, uri, expect, mode)
     end
     local root = ast.ast
     local searchStep
-    linker.compileLinks(root)
+    noder.compileNode(root)
 
     status.id = expect
 
@@ -225,7 +225,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         if cmark[LAST] then
             return
         end
-        local lastID = linker.getLastID(id)
+        local lastID = noder.getLastID(id)
         if not lastID then
             return
         end
@@ -250,11 +250,11 @@ function m.searchRefsByID(status, uri, expect, mode)
     end
 
     local function searchFunction(id)
-        local link = linker.getLinkByID(root, id)
-        if not link or not link.sources then
+        local node = noder.getNodeByID(root, id)
+        if not node or not node.sources then
             return
         end
-        local obj = link.sources[1]
+        local obj = node.sources[1]
         if not obj or obj.type ~= 'function' then
             return
         end
@@ -266,18 +266,18 @@ function m.searchRefsByID(status, uri, expect, mode)
         if not func or func.type ~= 'function' then
             return
         end
-        local parentID = linker.getID(func)
+        local parentID = noder.getID(func)
         if not parentID then
             return
         end
-        search(parentID, linker.RETURN_INDEX .. returnIndex)
+        search(parentID, noder.RETURN_INDEX .. returnIndex)
     end
 
     local function isCallID(field)
         if not field then
             return false
         end
-        if  field:sub(1, 2) == linker.RETURN_INDEX then
+        if  field:sub(1, 2) == noder.RETURN_INDEX then
             return true
         end
         return false
@@ -308,7 +308,7 @@ function m.searchRefsByID(status, uri, expect, mode)
             return
         end
 
-        local cacheID = linker.getID(source) .. linker.getID(call)
+        local cacheID = noder.getID(source) .. noder.getID(call)
         local closure = closureCache[cacheID]
         if closure == false then
             return
@@ -320,46 +320,46 @@ function m.searchRefsByID(status, uri, expect, mode)
                 return
             end
         end
-        local id = linker.getID(closure)
+        local id = noder.getID(closure)
         searchID(id, field)
     end
 
-    local function checkForward(id, link, field)
-        for _, forwardID in ipairs(link.forward) do
+    local function checkForward(id, node, field)
+        for _, forwardID in ipairs(node.forward) do
             searchID(forwardID, field)
         end
     end
 
-    local function checkBackward(id, link, field)
+    local function checkBackward(id, node, field)
         if mode ~= 'ref' and not field then
             return
         end
-        for _, backwardID in ipairs(link.backward) do
+        for _, backwardID in ipairs(node.backward) do
             searchID(backwardID, field)
         end
     end
 
-    local function searchLink(id, link, field)
-        if link.call then
-            callStack[#callStack+1] = link.call
+    local function searchNode(id, node, field)
+        if node.call then
+            callStack[#callStack+1] = node.call
         end
-        if field == nil and link.sources then
-            for _, source in ipairs(link.sources) do
+        if field == nil and node.sources then
+            for _, source in ipairs(node.sources) do
                 m.pushResult(status, mode, source)
             end
         end
-        if link.forward then
-            checkForward(id, link, field)
+        if node.forward then
+            checkForward(id, node, field)
         end
-        if link.backward then
-            checkBackward(id, link, field)
-        end
-
-        if link.sources then
-            checkGeneric(link.sources[1], field)
+        if node.backward then
+            checkBackward(id, node, field)
         end
 
-        if link.call then
+        if node.sources then
+            checkGeneric(node.sources[1], field)
+        end
+
+        if node.call then
             callStack[#callStack] = nil
         end
     end
@@ -370,16 +370,16 @@ function m.searchRefsByID(status, uri, expect, mode)
         if stepCount > 1000 then
             error('too large')
         end
-        local link = linker.getLinkByID(root, id)
-        if link then
-            searchLink(id, link, field)
+        local node = noder.getNodeByID(root, id)
+        if node then
+            searchNode(id, node, field)
         end
         local lastID = checkLastID(id, field)
         if lastID then
-            local anyFieldID = lastID .. linker.ANY_FIELD
-            local anyFieldLink = linker.getLinkByID(root, anyFieldID)
-            if anyFieldLink then
-                searchLink(anyFieldID, anyFieldLink, field)
+            local anyFieldID = lastID .. noder.ANY_FIELD
+            local anyFieldNode = noder.getNodeByID(root, anyFieldID)
+            if anyFieldNode then
+                searchNode(anyFieldID, anyFieldNode, field)
             end
         end
     end
@@ -398,9 +398,9 @@ function m.searchRefs(status, source, mode)
         source = source.parent
     end
     local root = guide.getRoot(source)
-    linker.compileLinks(root)
+    noder.compileNodes(root)
     local uri  = guide.getUri(source)
-    local id   = linker.getID(source)
+    local id   = noder.getID(source)
     if not id then
         return
     end

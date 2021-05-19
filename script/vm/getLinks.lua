@@ -1,7 +1,6 @@
-local searcher = require 'core.searcher'
----@type vm
-local vm       = require 'vm.vm'
-local files    = require 'files'
+local guide = require 'parser.guide'
+local vm    = require 'vm.vm'
+local files = require 'files'
 
 local function getFileLinks(uri)
     local ws    = require 'workspace'
@@ -11,7 +10,7 @@ local function getFileLinks(uri)
         return links
     end
     tracy.ZoneBeginN('getFileLinks')
-    searcher.eachSpecialOf(ast.ast, 'require', function (source)
+    guide.eachSpecialOf(ast.ast, 'require', function (source)
         local call = source.parent
         if not call or call.type ~= 'call' then
             return
@@ -33,11 +32,17 @@ local function getFileLinks(uri)
     return links
 end
 
+local function getFileLinksOrCache(uri)
+    local cache = files.getCache(uri)
+    cache.links = cache.links or getFileLinks(uri)
+    return cache.links
+end
+
 local function getLinksTo(uri)
     uri = files.asKey(uri)
     local links = {}
     for u in files.eachFile() do
-        local ls = vm.getFileLinks(u)
+        local ls = getFileLinksOrCache(u)
         if ls[uri] then
             for _, l in ipairs(ls[uri]) do
                 links[#links+1] = l
@@ -55,10 +60,4 @@ function vm.getLinksTo(uri)
     cache = getLinksTo(uri)
     vm.getCache('getLinksTo')[uri] = cache
     return cache
-end
-
-function vm.getFileLinks(uri)
-    local cache = files.getCache(uri)
-    cache.links = cache.links or getFileLinks(uri)
-    return cache.links
 end

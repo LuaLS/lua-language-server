@@ -1,4 +1,4 @@
-local linker = require 'core.linker'
+local noder  = require 'core.noder'
 local files  = require 'files'
 local util   = require 'utility'
 local guide  = require 'parser.guide'
@@ -37,9 +37,9 @@ local function TEST(script)
         files.setText('', newScript)
         local source = getSource(pos)
         assert(source)
-        linker.compileLinks(source)
+        noder.compileNodes(source)
         local result = {
-            id = linker.getID(source),
+            id = noder.getID(source),
         }
 
         expect['id'] = expect['id']:gsub('|', '\x1F')

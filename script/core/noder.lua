@@ -1,7 +1,7 @@
 local util    = require 'utility'
 local guide   = require 'parser.guide'
 
-local Linkers
+local noders
 local LastIDCache    = {}
 local FirstIDCache   = {}
 local SPLIT_CHAR     = '\x1F'
@@ -15,14 +15,14 @@ local ANY_FIELD      = SPLIT_CHAR .. ANY_FIELD_CHAR
 
 ---创建source的链接信息
 ---@param id string
----@return link
-local function getLink(id)
-    if not Linkers[id] then
-        Linkers[id] = {
+---@return node
+local function getNode(id)
+    if not noders[id] then
+        noders[id] = {
             id = id,
         }
     end
-    return Linkers[id]
+    return noders[id]
 end
 
 ---是否是全局变量（包括 _G.XXX 形式）
@@ -302,11 +302,11 @@ local function pushForward(id, forwardID)
     or id == forwardID then
         return
     end
-    local link = getLink(id)
-    if not link.forward then
-        link.forward = {}
+    local node = getNode(id)
+    if not node.forward then
+        node.forward = {}
     end
-    link.forward[#link.forward+1] = forwardID
+    node.forward[#node.forward+1] = forwardID
 end
 
 ---添加关联的后退ID
@@ -319,14 +319,14 @@ local function pushBackward(id, backwardID)
     or id == backwardID then
         return
     end
-    local link = getLink(id)
-    if not link.backward then
-        link.backward = {}
+    local node = getNode(id)
+    if not node.backward then
+        node.backward = {}
     end
-    link.backward[#link.backward+1] = backwardID
+    node.backward[#node.backward+1] = backwardID
 end
 
----@class link
+---@class node
 -- 当前节点的id
 ---@field id     string
 -- 使用该ID的单元
@@ -373,16 +373,16 @@ function m.pushSource(source)
     if not id then
         return
     end
-    local link = getLink(id)
-    if not link.sources then
-        link.sources = {}
+    local node = getNode(id)
+    if not node.sources then
+        node.sources = {}
     end
-    link.sources[#link.sources+1] = source
+    node.sources[#node.sources+1] = source
 end
 
 ---@param source parser.guide.object
 ---@return parser.guide.object[]
-function m.compileLink(source)
+function m.compileNode(source)
     local id = getID(source)
     local parent = source.parent
     if not parent then
@@ -485,7 +485,7 @@ function m.compileLink(source)
         if not nodeID then
             return
         end
-        getLink(id).call = source
+        getNode(id).call = source
         -- 将 call 映射到 node#1 上
         local callID = ('%s%s%s'):format(
             nodeID,
@@ -529,7 +529,7 @@ function m.compileLink(source)
             )
             pushForward(id, callXID)
             pushBackward(callXID, id)
-            getLink(id).call = call
+            getNode(id).call = call
             if node.special == 'pcall'
             or node.special == 'xpcall' then
                 local index = source.sindex - 1
@@ -730,17 +730,17 @@ function m.compileLink(source)
     end
 end
 
----根据ID来获取所有的link
+---根据ID来获取所有的node
 ---@param root parser.guide.object
 ---@param id string
----@return link?
-function m.getLinkByID(root, id)
+---@return node?
+function m.getNodeByID(root, id)
     root = guide.getRoot(root)
-    local linkers = root._linkers
-    if not linkers then
+    local noders = root._noders
+    if not noders then
         return nil
     end
-    return linkers[id]
+    return noders[id]
 end
 
 ---根据ID来获取第一个节点的ID
@@ -789,23 +789,23 @@ function m.getKey(source)
     return getKey(source)
 end
 
----编译整个文件的link
+---编译整个文件的node
 ---@param  source parser.guide.object
 ---@return table
-function m.compileLinks(source)
+function m.compileNodes(source)
     local root = guide.getRoot(source)
-    if root._linkers then
-        return root._linkers
+    if root._noders then
+        return root._noders
     end
-    Linkers = {}
-    root._linkers = Linkers
+    noders = {}
+    root._noders = noders
     guide.eachSource(root, function (src)
         m.pushSource(src)
-        m.compileLink(src)
+        m.compileNode(src)
     end)
     -- Special rule: ('').XX -> stringlib.XX
     pushForward('str:', 'dn:stringlib')
-    return Linkers
+    return noders
 end
 
 return m

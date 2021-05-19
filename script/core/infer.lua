@@ -1,6 +1,6 @@
 local searcher = require 'core.searcher'
 local config   = require 'config'
-local linker   = require 'core.linker'
+local noder    = require 'core.noder'
 
 local STRING_OR_TABLE = {'STRING_OR_TABLE'}
 local BE_RETURN       = {'BE_RETURN'}
@@ -418,11 +418,11 @@ function m.searchInfers(source)
             searchInfer(def, infers)
         end
     end
-    local id = linker.getID(source)
+    local id = noder.getID(source)
     if id then
-        local link = linker.getLinkByID(source, id)
-        if link and link.sources then
-            for _, src in ipairs(link.sources) do
+        local node = noder.getNodeByID(source, id)
+        if node and node.sources then
+            for _, src in ipairs(node.sources) do
                 if not mark[src] then
                     mark[src] = true
                     searchInfer(src, infers)

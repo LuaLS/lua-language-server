@@ -1,4 +1,4 @@
-local linker = require "core.linker"
+local noder = require "core.noder"
 ---@class generic.value
 ---@field type string
 ---@field closure generic.closure
@@ -51,7 +51,7 @@ local function createValue(closure, proto, callback, road)
         end
         local value = instantValue(closure, proto)
         value.types = types
-        linker.compileLink(value)
+        noder.compileNode(value)
         return value
     end
     if proto.type == 'doc.type.name' then
@@ -63,7 +63,7 @@ local function createValue(closure, proto, callback, road)
         if callback then
             callback(road, key, proto)
         end
-        linker.compileLink(value)
+        noder.compileNode(value)
         return value
     end
     if proto.type == 'doc.type.function' then
@@ -91,12 +91,12 @@ local function createValue(closure, proto, callback, road)
         value.args = args
         value.returns = returns
         value.isGeneric = true
-        linker.pushSource(value)
+        noder.pushSource(value)
         return value
     end
     if proto.type == 'doc.type.array' then
         if road then
-            road[#road+1] = linker.ANY_FIELD
+            road[#road+1] = noder.ANY_FIELD
         end
         local node = createValue(closure, proto.node, callback, road)
         if road then
@@ -110,11 +110,11 @@ local function createValue(closure, proto, callback, road)
         return value
     end
     if proto.type == 'doc.type.table' then
-        road[#road+1] = linker.TABLE_KEY
+        road[#road+1] = noder.TABLE_KEY
         local tkey = createValue(closure, proto.tkey, callback, road)
         road[#road] = nil
 
-        road[#road+1] = linker.ANY_FIELD
+        road[#road+1] = noder.ANY_FIELD
         local tvalue = createValue(closure, proto.tvalue, callback, road)
         road[#road] = nil
 
@@ -137,7 +137,7 @@ local function buildValue(road, key, proto, param, upvalues)
         end
         paramID = 'dn:' .. str
     else
-        paramID = linker.getID(param)
+        paramID = noder.getID(param)
     end
     if not paramID then
         return
@@ -219,7 +219,7 @@ function m.createClosure(proto, call)
         return nil
     end
 
-    linker.compileLink(closure)
+    noder.compileNode(closure)
 
     return closure
 end

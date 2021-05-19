@@ -175,6 +175,9 @@ function m.getObjectValue(obj)
     return nil
 end
 
+function m.crossSearch(status, expect, mode)
+end
+
 function m.searchRefsByID(status, uri, expect, mode)
     local ast = files.getAst(uri)
     if not ast then

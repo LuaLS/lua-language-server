@@ -2,6 +2,9 @@
 local vm      = require 'vm.vm'
 
 function vm.getLibraryName(source, deep)
+    if source.special then
+        return source.special
+    end
     local defs = vm.getDefs(source, deep)
     for _, def in ipairs(defs) do
         if def.special then

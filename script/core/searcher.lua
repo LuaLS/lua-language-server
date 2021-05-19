@@ -278,7 +278,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         if not field then
             return false
         end
-        if  field:sub(1, 2) == noder.RETURN_INDEX then
+        if field:sub(1, 2) == noder.RETURN_INDEX then
             return true
         end
         return false
@@ -344,7 +344,25 @@ function m.searchRefsByID(status, uri, expect, mode)
         local tid = 'mainreturn' .. (field or '')
         local uris = ws.findUrisByRequirePath(requireName)
         for _, ruri in ipairs(uris) do
-            crossSearch(status, ruri, tid, mode)
+            if not files.eq(uri, ruri) then
+                crossSearch(status, ruri, tid, mode)
+            end
+        end
+    end
+
+    local function checkGlobal(id, node, field)
+        if id:sub(1, 2) ~= 'g:' then
+            return
+        end
+        local firstID = noder.getFirstID(id)
+        if status.crossedGlobal[firstID] then
+            return
+        end
+        status.crossedGlobal[firstID] = true
+        for guri in files.eachFile() do
+            if not files.eq(uri, guri) then
+                crossSearch(status, guri, id, mode)
+            end
         end
     end
 
@@ -371,6 +389,8 @@ function m.searchRefsByID(status, uri, expect, mode)
         if node.require then
             checkRequire(node.require, field)
         end
+
+        checkGlobal(id, node, field)
 
         if node.call then
             callStack[#callStack] = nil
@@ -433,8 +453,9 @@ end
 function m.status(parentStatus, interface, deep)
     local status = {
         --mark      = parentStatus and parentStatus.mark or {},
-        callStack = {},
-        results   = {},
+        callStack     = {},
+        crossedGlobal = {},
+        results       = {},
     }
     return status
 end

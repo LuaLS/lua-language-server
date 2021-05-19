@@ -65,9 +65,21 @@ return function (uri, offset)
 
     local metaSource = vm.isMetaFile(uri)
 
+    local refs = vm.getRefs(source, 5)
+    local values = {}
+    for _, src in ipairs(refs) do
+        local value = searcher.getObjectValue(src)
+        if value and value ~= src and guide.isLiteral(value) then
+            values[value] = true
+        end
+    end
+
     local results = {}
-    for _, src in ipairs(vm.getRefs(source, 5)) do
+    for _, src in ipairs(refs) do
         if src.dummy then
+            goto CONTINUE
+        end
+        if values[src] then
             goto CONTINUE
         end
         local root = guide.getRoot(src)

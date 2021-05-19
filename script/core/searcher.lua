@@ -64,8 +64,7 @@ function m.pushResult(status, mode, source)
                 results[#results+1] = source
             end
         end
-        if parent.type == 'return'
-        or parent.type == 'callargs' then
+        if parent.type == 'return' then
             if noder.getID(source) ~= status.id then
                 results[#results+1] = source
             end
@@ -88,6 +87,10 @@ function m.pushResult(status, mode, source)
         or source.type == 'tablefield'
         or source.type == 'function'
         or source.type == 'table'
+        or source.type == 'string'
+        or source.type == 'boolean'
+        or source.type == 'number'
+        or source.type == 'nil'
         or source.type == 'doc.class.name'
         or source.type == 'doc.type.name'
         or source.type == 'doc.alias.name'
@@ -359,9 +362,10 @@ function m.searchRefsByID(status, uri, expect, mode)
             return
         end
         status.crossedGlobal[firstID] = true
+        local tid = id .. (field or '')
         for guri in files.eachFile() do
             if not files.eq(uri, guri) then
-                crossSearch(status, guri, id, mode)
+                crossSearch(status, guri, tid, mode)
             end
         end
     end

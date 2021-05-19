@@ -132,7 +132,7 @@ return function (uri, offset)
     local values = {}
     for _, src in ipairs(defs) do
         local value = searcher.getObjectValue(src)
-        if value and value ~= src then
+        if value and value ~= src and guide.isLiteral(value) then
             values[value] = true
         end
     end

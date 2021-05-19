@@ -384,10 +384,6 @@ end
 ---@return parser.guide.object[]
 function m.compileNode(source)
     local id = getID(source)
-    local parent = source.parent
-    if not parent then
-        return
-    end
     if source.value then
         -- x = y : x -> y
         pushForward(id, getID(source.value))
@@ -511,6 +507,12 @@ function m.compileNode(source)
             pushForward(callID, indexID)
             pushBackward(tblID, callID)
             --pushBackward(indexID, callID)
+        end
+        if node.special == 'require' then
+            local arg1 = source.args and source.args[1]
+            if arg1 and arg1.type == 'string' then
+                getNode(callID).require = arg1[1]
+            end
         end
     end
     if source.type == 'select' then
@@ -664,6 +666,17 @@ function m.compileNode(source)
                 end
                 if doc.type == 'doc.generic' then
                     source.isGeneric = true
+                end
+            end
+        end
+    end
+    if source.type == 'main' then
+        if source.returns then
+            for _, rtn in ipairs(source.returns) do
+                local rtnObj = rtn[1]
+                if rtnObj then
+                    pushForward('mainreturn', getID(rtnObj))
+                    pushBackward(getID(rtnObj), 'mainreturn')
                 end
             end
         end

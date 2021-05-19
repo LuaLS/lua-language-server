@@ -2,6 +2,7 @@ local noder   = require 'core.noder'
 local guide   = require 'parser.guide'
 local files   = require 'files'
 local generic = require 'core.generic'
+local ws      = require 'workspace'
 
 local NONE = {'NONE'}
 local LAST = {'LAST'}
@@ -175,7 +176,8 @@ function m.getObjectValue(obj)
     return nil
 end
 
-function m.crossSearch(status, expect, mode)
+local function crossSearch(status, uri, expect, mode)
+    m.searchRefsByID(status, uri, expect, mode)
 end
 
 function m.searchRefsByID(status, uri, expect, mode)
@@ -185,14 +187,13 @@ function m.searchRefsByID(status, uri, expect, mode)
     end
     local root = ast.ast
     local searchStep
-    noder.compileNode(root)
+    noder.compileNodes(root)
 
     status.id = expect
 
-    local mark = status.mark
+    local callStack = status.callStack
 
-    local callStack = {}
-
+    local mark = {}
     local function search(id, field)
         local cmark = mark[id]
         if not cmark then
@@ -339,6 +340,14 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
     end
 
+    local function checkRequire(requireName, field)
+        local tid = 'mainreturn' .. (field or '')
+        local uris = ws.findUrisByRequirePath(requireName)
+        for _, ruri in ipairs(uris) do
+            crossSearch(status, ruri, tid, mode)
+        end
+    end
+
     local function searchNode(id, node, field)
         if node.call then
             callStack[#callStack+1] = node.call
@@ -357,6 +366,10 @@ function m.searchRefsByID(status, uri, expect, mode)
 
         if node.sources then
             checkGeneric(node.sources[1], field)
+        end
+
+        if node.require then
+            checkRequire(node.require, field)
         end
 
         if node.call then
@@ -419,7 +432,8 @@ end
 ---@return guide.status
 function m.status(parentStatus, interface, deep)
     local status = {
-        mark      = parentStatus and parentStatus.mark or {},
+        --mark      = parentStatus and parentStatus.mark or {},
+        callStack = {},
         results   = {},
     }
     return status

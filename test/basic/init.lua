@@ -1,2 +1,2 @@
 require 'basic.textmerger'
-require 'basic.linker'
+require 'basic.noder'

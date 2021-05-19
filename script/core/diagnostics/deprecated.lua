@@ -1,7 +1,7 @@
 local files    = require 'files'
 local vm       = require 'vm'
 local lang     = require 'language'
-local searcher = require 'core.searcher'
+local guide    = require 'parser.guide'
 local config   = require 'config'
 local define   = require 'proto.define'
 local await    = require 'await'
@@ -12,7 +12,7 @@ return function (uri, callback)
         return
     end
 
-    searcher.eachSource(ast.ast, function (src)
+    guide.eachSource(ast.ast, function (src)
         if  src.type ~= 'getglobal'
         and src.type ~= 'getfield'
         and src.type ~= 'getindex'
@@ -20,7 +20,7 @@ return function (uri, callback)
             return
         end
         if src.type == 'getglobal' then
-            local key = searcher.getKeyName(src)
+            local key = src[1]
             if not key then
                 return
             end

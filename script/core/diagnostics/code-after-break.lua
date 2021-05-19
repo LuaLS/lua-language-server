@@ -1,5 +1,5 @@
 local files    = require 'files'
-local searcher = require 'core.searcher'
+local guide    = require 'parser.guide'
 local lang     = require 'language'
 local define   = require 'proto.define'
 
@@ -10,7 +10,7 @@ return function (uri, callback)
     end
 
     local mark = {}
-    searcher.eachSourceType(state.ast, 'break', function (source)
+    guide.eachSourceType(state.ast, 'break', function (source)
         local list = source.parent
         if mark[list] then
             return

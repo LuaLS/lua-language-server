@@ -1,5 +1,5 @@
 local files   = require 'files'
-local searcher   = require 'core.searcher'
+local guide   = require 'parser.guide'
 local lang    = require 'language'
 local define  = require 'proto.define'
 local vm      = require 'vm'
@@ -44,7 +44,7 @@ return function (uri, callback)
         return true
     end
 
-    searcher.eachSource(state.ast.docs, function (source)
+    guide.eachSource(state.ast.docs, function (source)
         if  source.type ~= 'doc.extends.name'
         and source.type ~= 'doc.type.name' then
             return

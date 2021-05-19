@@ -2,7 +2,7 @@ local files   = require 'files'
 local vm      = require 'vm'
 local lang    = require 'language'
 local config  = require 'config'
-local searcher   = require 'core.searcher'
+local guide   = require 'parser.guide'
 local define  = require 'proto.define'
 
 return function (uri, callback)
@@ -87,7 +87,7 @@ return function (uri, callback)
     end
 
     local function checkUndefinedField(src)
-        local fieldName = searcher.getKeyName(src)
+        local fieldName = guide.getKeyName(src)
 
         local allDocClass = getAllDocClassFromInfer(src.node)
         if (not allDocClass) or (#allDocClass == 0) then
@@ -118,6 +118,6 @@ return function (uri, callback)
             end
         end
     end
-    searcher.eachSourceType(ast.ast, 'getfield', checkUndefinedField);
-    searcher.eachSourceType(ast.ast, 'getmethod', checkUndefinedField);
+    guide.eachSourceType(ast.ast, 'getfield', checkUndefinedField);
+    guide.eachSourceType(ast.ast, 'getmethod', checkUndefinedField);
 end

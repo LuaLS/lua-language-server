@@ -30,7 +30,7 @@ end
 
 function vm.getRefs(source, deep)
     deep = deep or -999
-    if searcher.isGlobal(source) then
+    if false and searcher.isGlobal(source) then
         local key = searcher.getKeyName(source)
         if not key then
             return {}

@@ -1,5 +1,5 @@
 local files  = require 'files'
-local searcher  = require 'core.searcher'
+local guide  = require 'parser.guide'
 local define = require 'proto.define'
 local lang   = require 'language'
 
@@ -81,7 +81,7 @@ return function (uri, callback)
     if not ast then
         return
     end
-    searcher.eachSourceType(ast.ast, 'local', function (source)
+    guide.eachSourceType(ast.ast, 'local', function (source)
         local name = source[1]
         if name == '_'
         or name == ast.ENVMode then

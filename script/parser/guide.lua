@@ -723,4 +723,73 @@ function m.getSpecial(source)
     return source.special
 end
 
+function m.getKeyNameOfLiteral(obj)
+    if not obj then
+        return nil
+    end
+    local tp = obj.type
+    if tp == 'field'
+    or     tp == 'method' then
+        return obj[1]
+    elseif tp == 'string' then
+        local s = obj[1]
+        if s then
+            return s
+        end
+    elseif tp == 'number' then
+        local n = obj[1]
+        if n then
+            return ('%s'):format(util.viewLiteral(obj[1]))
+        end
+    elseif tp == 'boolean' then
+        local b = obj[1]
+        if b then
+            return tostring(b)
+        end
+    end
+end
+
+function m.getKeyName(obj)
+    if not obj then
+        return nil
+    end
+    local tp = obj.type
+    if tp == 'getglobal'
+    or tp == 'setglobal' then
+        return obj[1]
+    elseif tp == 'local'
+    or     tp == 'getlocal'
+    or     tp == 'setlocal' then
+        return obj[1]
+    elseif tp == 'getfield'
+    or     tp == 'setfield'
+    or     tp == 'tablefield' then
+        if obj.field then
+            return obj.field[1]
+        end
+    elseif tp == 'getmethod'
+    or     tp == 'setmethod' then
+        if obj.method then
+            return obj.method[1]
+        end
+    elseif tp == 'getindex'
+    or     tp == 'setindex'
+    or     tp == 'tableindex' then
+        return m.getKeyNameOfLiteral(obj.index)
+    elseif tp == 'field'
+    or     tp == 'method'
+    or     tp == 'doc.see.field' then
+        return obj[1]
+    elseif tp == 'doc.class' then
+        return obj.class[1]
+    elseif tp == 'doc.alias' then
+        return obj.alias[1]
+    elseif tp == 'doc.field' then
+        return obj.field[1]
+    elseif tp == 'dummy' then
+        return obj[1]
+    end
+    return m.getKeyNameOfLiteral(obj)
+end
+
 return m

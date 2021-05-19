@@ -1,5 +1,5 @@
 local files   = require 'files'
-local searcher   = require 'core.searcher'
+local guide   = require 'parser.guide'
 local lang    = require 'language'
 local config  = require 'config'
 local vm      = require 'vm'
@@ -28,8 +28,8 @@ return function (uri, callback)
         definedGlobal[name] = true
     end
 
-    searcher.eachSourceType(ast.ast, 'setglobal', function (source)
-        local name = searcher.getKeyName(source)
+    guide.eachSourceType(ast.ast, 'setglobal', function (source)
+        local name = guide.getKeyName(source)
         if definedGlobal[name] then
             return
         end

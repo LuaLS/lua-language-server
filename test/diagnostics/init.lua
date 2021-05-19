@@ -79,7 +79,8 @@ local <!x!>
 ]]
 
 TEST [[
-local x <close> = print
+local y
+local x <close> = y
 ]]
 
 TEST [[
@@ -135,11 +136,11 @@ end
 )
 
 TEST [[
+local print, _G
 print(<!x!>)
 print(<!log!>)
 print(<!X!>)
 print(<!Log!>)
-print(_VERSION)
 print(<!y!>)
 print(Z)
 print(_G)

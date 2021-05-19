@@ -782,6 +782,13 @@ function m.getID(source)
     return getID(source)
 end
 
+---获取source的key
+---@param source parser.guide.object
+---@return string
+function m.getKey(source)
+    return getKey(source)
+end
+
 ---编译整个文件的link
 ---@param  source parser.guide.object
 ---@return table

@@ -1,7 +1,8 @@
-local files   = require 'files'
-local searcher   = require 'core.searcher'
-local lang    = require 'language'
-local define  = require 'proto.define'
+local files    = require 'files'
+local searcher = require 'core.searcher'
+local lang     = require 'language'
+local define   = require 'proto.define'
+local guide    = require "parser.guide"
 
 return function (uri, callback)
     local ast = files.getAst(uri)
@@ -9,7 +10,7 @@ return function (uri, callback)
         return
     end
 
-    searcher.eachSourceType(ast.ast, 'local', function (source)
+    guide.eachSourceType(ast.ast, 'local', function (source)
         if not source.ref then
             return
         end
@@ -25,7 +26,7 @@ return function (uri, callback)
             if nxt.type == 'setfield'
             or nxt.type == 'setmethod'
             or nxt.type == 'setindex' then
-                local name = searcher.getKeyName(nxt)
+                local name = guide.getKeyName(nxt)
                 if not name then
                     goto CONTINUE
                 end

@@ -1,5 +1,5 @@
 local files   = require 'files'
-local searcher   = require 'core.searcher'
+local guide   = require 'parser.guide'
 local vm      = require 'vm'
 local define  = require 'proto.define'
 local lang    = require 'language'
@@ -45,7 +45,7 @@ return function (uri, callback)
         local refs = vm.getRefs(source)
         for _, src in ipairs(refs) do
             if vm.isGet(src) then
-                local func = searcher.getParentFunction(src)
+                local func = guide.getParentFunction(src)
                 if not checkFunction(func) then
                     hasGet = true
                     break
@@ -75,7 +75,7 @@ return function (uri, callback)
     end
 
     -- 只检查局部函数
-    searcher.eachSourceType(ast.ast, 'function', function (source)
+    guide.eachSourceType(ast.ast, 'function', function (source)
         checkFunction(source)
     end)
 end

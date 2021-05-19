@@ -1,14 +1,14 @@
-local files  = require 'files'
-local searcher  = require 'core.searcher'
-local vm     = require 'vm'
-local lang   = require 'language'
+local files     = require 'files'
+local searcher = require 'core.searcher'
+local guide    = require 'parser.guide'
+local lang     = require 'language'
 
 return function (uri, callback)
     local ast = files.getAst(uri)
     if not ast then
         return
     end
-    searcher.eachSourceType(ast.ast, 'getglobal', function (source)
+    guide.eachSourceType(ast.ast, 'getglobal', function (source)
         -- 单独验证自己是否在重载过的 _ENV 中有定义
         if source.node.tag == '_ENV' then
             return

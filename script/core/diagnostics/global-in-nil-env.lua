@@ -1,5 +1,5 @@
 local files    = require 'files'
-local searcher    = require 'core.searcher'
+local guide    = require 'parser.guide'
 local lang     = require 'language'
 
 -- TODO: 检查路径是否可达
@@ -12,8 +12,8 @@ return function (uri, callback)
     if not ast then
         return
     end
-    local root = searcher.getRoot(ast.ast)
-    local env  = searcher.getENV(root)
+    local root = guide.getRoot(ast.ast)
+    local env  = guide.getENV(root)
 
     local nilDefs = {}
     if not env.ref then
@@ -36,7 +36,7 @@ return function (uri, callback)
         if node.tag == '_ENV' then
             local ok
             for _, nilDef in ipairs(nilDefs) do
-                local mode, pathA = searcher.getPath(nilDef, source)
+                local mode, pathA = guide.getPath(nilDef, source)
                 if  mode == 'before'
                 and mayRun(pathA) then
                     ok = nilDef
@@ -61,6 +61,6 @@ return function (uri, callback)
         end
     end
 
-    searcher.eachSourceType(ast.ast, 'getglobal', check)
-    searcher.eachSourceType(ast.ast, 'setglobal', check)
+    guide.eachSourceType(ast.ast, 'getglobal', check)
+    guide.eachSourceType(ast.ast, 'setglobal', check)
 end

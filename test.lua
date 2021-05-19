@@ -65,6 +65,7 @@ local function testAll()
     test 'references'
     test 'definition'
     test 'type_inference'
+    test 'crossfile'
     test 'diagnostics'
     test 'highlight'
     test 'rename'
@@ -74,7 +75,6 @@ local function testAll()
     test 'document_symbol'
     test 'code_action'
     test 'type_formatting'
-    test 'crossfile'
     --test 'other'
 end
 

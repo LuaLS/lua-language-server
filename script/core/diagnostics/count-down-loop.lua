@@ -1,5 +1,5 @@
 local files    = require "files"
-local searcher = require "core.searcher"
+local guide    = require "parser.guide"
 local lang     = require 'language'
 
 return function (uri, callback)
@@ -9,7 +9,7 @@ return function (uri, callback)
         return
     end
 
-    searcher.eachSourceType(state.ast, 'loop', function (source)
+    guide.eachSourceType(state.ast, 'loop', function (source)
         if not source.loc or not source.loc.value then
             return
         end

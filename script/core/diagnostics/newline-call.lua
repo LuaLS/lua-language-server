@@ -1,5 +1,5 @@
 local files = require 'files'
-local searcher = require 'core.searcher'
+local guide = require 'parser.guide'
 local lang  = require 'language'
 
 return function (uri, callback)
@@ -10,7 +10,7 @@ return function (uri, callback)
         return
     end
 
-    searcher.eachSourceType(ast.ast, 'call', function (source)
+    guide.eachSourceType(ast.ast, 'call', function (source)
         local node = source.node
         local args = source.args
         if not args then
@@ -26,8 +26,8 @@ return function (uri, callback)
             return
         end
 
-        local nodeRow = searcher.positionOf(lines, node.finish)
-        local argRow  = searcher.positionOf(lines, args.start)
+        local nodeRow = guide.positionOf(lines, node.finish)
+        local argRow  = guide.positionOf(lines, args.start)
         if nodeRow == argRow then
             return
         end

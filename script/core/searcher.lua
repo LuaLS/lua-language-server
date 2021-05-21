@@ -31,11 +31,15 @@ local m = {}
 ---@param status guide.status
 ---@param mode   guide.searchmode
 ---@param source parser.guide.object
-function m.pushResult(status, mode, source)
+---@param force  boolean
+function m.pushResult(status, mode, source, force)
     if not source then
         return
     end
     local results = status.results
+    if force then
+        results[#results+1] = source
+    end
     local parent = source.parent
     if mode == 'def' then
         if source.type == 'local'
@@ -299,6 +303,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         return nil
     end
 
+    local genericCallArgs = {}
     local closureCache = {}
     local function checkGeneric(source, field)
         if not source.isGeneric then
@@ -310,6 +315,12 @@ function m.searchRefsByID(status, uri, expect, mode)
         local call = findLastCall()
         if not call then
             return
+        end
+
+        if call.args then
+            for _, arg in ipairs(call.args) do
+                genericCallArgs[arg] = true
+            end
         end
 
         local cacheID = noder.getID(source) .. noder.getID(call)
@@ -376,7 +387,8 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
         if field == nil and node.sources then
             for _, source in ipairs(node.sources) do
-                m.pushResult(status, mode, source)
+                local force = genericCallArgs[source]
+                m.pushResult(status, mode, source, force)
             end
         end
         if node.forward then

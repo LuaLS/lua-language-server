@@ -217,8 +217,8 @@ function m.searchRefsByID(status, uri, expect, mode)
     local mark = {}
 
     local function search(id, field)
-        if ignoredIDs[id] then
-            --return
+        if ignoredIDs[id] and field then
+            return
         end
         local cmark = mark[id]
         if not cmark then
@@ -460,12 +460,17 @@ function m.searchRefsByID(status, uri, expect, mode)
             searchNode(id, node, field)
         end
         local lastID = checkLastID(id, field)
-        if lastID then
-            local anyFieldID = lastID .. noder.ANY_FIELD
-            local anyFieldNode = noder.getNodeByID(root, anyFieldID)
-            if anyFieldNode then
-                searchNode(anyFieldID, anyFieldNode, field)
-            end
+        if not lastID then
+            return
+        end
+        local originField  = id:sub(#lastID + 1)
+        if originField == noder.TABLE_KEY then
+            return
+        end
+        local anyFieldID   = lastID .. noder.ANY_FIELD
+        local anyFieldNode = noder.getNodeByID(root, anyFieldID)
+        if anyFieldNode then
+            searchNode(anyFieldID, anyFieldNode, field)
         end
     end
 

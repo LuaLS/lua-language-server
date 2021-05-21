@@ -191,6 +191,9 @@ end
 local function cleanInfers(infers)
     local version = config.config.runtime.version
     local enableInteger = version == 'Lua 5.3' or version == 'Lua 5.4'
+    if infers['any'] and infers['nil'] then
+        infers['nil'] = nil
+    end
     if infers['number'] then
         enableInteger = false
     end
@@ -227,6 +230,7 @@ local function cleanInfers(infers)
         infers[BE_RETURN] = nil
         infers['nil'] = nil
     end
+    infers['any'] = nil
 end
 
 ---合并对象的推断类型

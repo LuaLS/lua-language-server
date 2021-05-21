@@ -31,6 +31,9 @@ function TEST(wanted)
         local source = getSource(pos)
         assert(source)
         local result = infer.searchAndViewInfers(source, 0)
+        if wanted ~= result then
+            infer.searchAndViewInfers(source, 0)
+        end
         assert(wanted == result)
     end
 end

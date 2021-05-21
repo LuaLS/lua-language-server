@@ -345,6 +345,7 @@ function m.getAllUris()
             i = i + 1
             files[i] = uri
         end
+        table.sort(files)
     end
     return m._pairsCache
 end

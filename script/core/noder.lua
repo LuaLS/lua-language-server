@@ -189,6 +189,9 @@ local function checkMode(source)
     or source.type == 'doc.type.name'
     or source.type == 'doc.alias.name'
     or source.type == 'doc.extends.name' then
+        if source.typeGeneric then
+            return 'dg:'
+        end
         return 'dn:'
     end
     if source.type == 'doc.field.name' then

@@ -42,7 +42,7 @@ function vm.getDefs(source, deep)
         if not cache or cache.deep < deep then
             cache = getDefs(source, deep)
             cache.deep = deep
-            vm.getCache('eachDef')[source] = cache
+            --vm.getCache('eachDef')[source] = cache
         end
         return cache
     end

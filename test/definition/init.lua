@@ -51,8 +51,14 @@ function TEST(script)
                 positions[i] = { result.target.start, result.target.finish }
             end
         end
+        if not founded(target, positions) then
+            core('', pos)
+        end
         assert(founded(target, positions))
     else
+        if #target ~= 0 then
+            core('', pos)
+        end
         assert(#target == 0)
     end
 end

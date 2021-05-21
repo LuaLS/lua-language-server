@@ -23,6 +23,20 @@ local function checkFunctionReturn(source)
     return nil
 end
 
+local ignoredIDs = {
+    ['dn:nil']           = true,
+    ['dn:any']           = true,
+    ['dn:boolean']       = true,
+    ['dn:string']        = true,
+    ['dn:table']         = true,
+    ['dn:number']        = true,
+    ['dn:integer']       = true,
+    ['dn:userdata']      = true,
+    ['dn:lightuserdata'] = true,
+    ['dn:function']      = true,
+    ['dn:thread']        = true,
+}
+
 local m = {}
 
 ---@alias guide.searchmode '"ref"'|'"def"'|'"field"'
@@ -201,7 +215,11 @@ function m.searchRefsByID(status, uri, expect, mode)
     local callStack = status.callStack
 
     local mark = {}
+
     local function search(id, field)
+        if ignoredIDs[id] then
+            --return
+        end
         local cmark = mark[id]
         if not cmark then
             cmark = {}
@@ -381,6 +399,23 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
     end
 
+    local function checkClass(id, node, field)
+        if id:sub(1, 3) ~= 'dn:' then
+            return
+        end
+        local firstID = noder.getFirstID(id)
+        if status.crossedClass[firstID] then
+            return
+        end
+        status.crossedClass[firstID] = true
+        local tid = id .. (field or '')
+        for guri in files.eachFile() do
+            if not files.eq(uri, guri) then
+                crossSearch(status, guri, tid, mode)
+            end
+        end
+    end
+
     local function searchNode(id, node, field)
         if node.call then
             callStack[#callStack+1] = node.call
@@ -407,6 +442,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
 
         checkGlobal(id, node, field)
+        checkClass(id, node, field)
 
         if node.call then
             callStack[#callStack] = nil
@@ -471,6 +507,7 @@ function m.status(parentStatus, interface, deep)
         --mark      = parentStatus and parentStatus.mark or {},
         callStack     = {},
         crossedGlobal = {},
+        crossedClass  = {},
         results       = {},
     }
     return status

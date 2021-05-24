@@ -366,7 +366,7 @@ function m.searchRefsByID(status, uri, expect, mode)
     end
 
     local function checkBackward(id, node, field)
-        if mode ~= 'ref' and not field then
+        if mode ~= 'ref' and not field or ignoredIDs[id] then
             return
         end
         for _, backwardID in ipairs(node.backward) do

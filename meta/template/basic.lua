@@ -135,9 +135,8 @@ function next(table, index) end
 ---#DES 'paris'
 ---@generic T: table, K, V
 ---@param t T
----@return fun(table: table<K, V>, index: K):K, V
+---@return fun(table: table<K, V>, index?: K):K, V
 ---@return T
----@return nil
 function pairs(t) end
 
 ---#DES 'pcall'

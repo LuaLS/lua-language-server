@@ -480,8 +480,8 @@ function m.searchRefsByID(status, uri, expect, mode)
     searchFunction(expect)
 
     --清除来自泛型的临时对象
-    for id, closure in pairs(closureCache) do
-        noder.removeID(root, id)
+    for _, closure in pairs(closureCache) do
+        noder.removeID(root, noder.getID(closure))
         if closure then
             for _, value in ipairs(closure.values) do
                 noder.removeID(root, noder.getID(value))

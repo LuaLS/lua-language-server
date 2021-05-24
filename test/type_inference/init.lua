@@ -566,9 +566,8 @@ TEST 'boolean' [[
 
 ---@generic T: table, K, V
 ---@param t T
----@return fun(table: table<K, V>, index: K):K, V
+---@return fun(table: table<K, V>, index?: K):K, V
 ---@return T
----@return nil
 local function pairs(t) end
 
 local f = pairs(t)
@@ -585,9 +584,8 @@ TEST 'string' [[
 
 ---@generic T: table, K, V
 ---@param t T
----@return fun(table: table<K, V>, index: K):K, V
+---@return fun(table: table<K, V>, index?: K):K, V
 ---@return T
----@return nil
 local function pairs(t) end
 
 ---@type table<string, boolean>

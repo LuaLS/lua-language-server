@@ -1,12 +1,5 @@
-local searcher = require 'core.searcher'
-local vm    = require 'vm'
-
-local function mergeTypes(returns)
-    if type(returns) == 'string' then
-        return returns
-    end
-    return searcher.mergeTypes(returns)
-end
+local vm       = require 'vm'
+local infer    = require 'core.infer'
 
 local function getReturnDualByDoc(source)
     local docs = source.bindDocs
@@ -55,24 +48,20 @@ local function asFunction(source)
     local returns = {}
     for i, rtn in ipairs(dual) do
         local line = {}
-        local types = {}
+        local infers = {}
         if i == 1 then
             line[#line+1] = '  -> '
         else
             line[#line+1] = ('% 3d. '):format(i)
         end
         for n = 1, #rtn do
-            local values = vm.getInfers(rtn[n])
-            for _, value in ipairs(values) do
-                if value.type then
-                    for tp in value.type:gmatch '[^|]+' do
-                        types[tp] = true
-                    end
-                end
+            local values = infer.searchInfers(rtn[n])
+            for tp in pairs(values) do
+                infers[tp] = true
             end
         end
-        if next(types) or rtn[1] then
-            local tp = mergeTypes(types) or 'any'
+        if next(infers) or rtn[1] then
+            local tp = infer.viewInfers(infers)
             if rtn[1].name then
                 line[#line+1] = ('%s%s: %s'):format(
                     rtn[1].name[1],

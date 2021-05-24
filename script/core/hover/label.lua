@@ -2,9 +2,10 @@ local buildName   = require 'core.hover.name'
 local buildArg    = require 'core.hover.arg'
 local buildReturn = require 'core.hover.return'
 local buildTable  = require 'core.hover.table'
+local infer       = require 'core.infer'
 local vm          = require 'vm'
 local util        = require 'utility'
-local searcher       = require 'core.searcher'
+local searcher    = require 'core.searcher'
 local lang        = require 'language'
 local config      = require 'config'
 local files       = require 'files'
@@ -44,16 +45,15 @@ end
 
 local function asValue(source, title)
     local name    = buildName(source)
-    local infers  = vm.getInfers(source, 0)
-    local type    = vm.getInferType(source, 0)
-    local class   = vm.getClass(source, 0)
-    local literal = vm.getInferLiteral(source, 0)
+    local type    = infer.searchAndViewInfers(source, 0)
+    local class   = nil -- infer.getClass(source, 0)
+    local literal = infer.searchAndViewLiterals(source, 0)
     local cont
-    if  not vm.hasInferType(source, 'string', 0)
+    if  not infer.hasType(source, 'string', 0)
     and not type:find('%[%]$')
     and not type:find('%w%<') then
         if #vm.getFields(source, 0) > 0
-        or vm.hasInferType(source, 'table', 0) then
+        or infer.hasType(source, 'table', 0) then
             cont = buildTable(source)
         end
     end

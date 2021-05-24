@@ -1,4 +1,5 @@
-local searcher = require 'core.searcher'
+local guide = require 'parser.guide'
+local infer = require 'core.infer'
 local vm    = require 'vm'
 
 local function optionalArg(arg)
@@ -21,7 +22,7 @@ local function asFunction(source, oop)
         methodDef = true
     end
     if methodDef then
-        args[#args+1] = ('self: %s'):format(vm.getInferType(parent.node))
+        args[#args+1] = ('self: %s'):format(infer.searchAndViewInfers(parent.node))
     end
     if source.args then
         for i = 1, #source.args do
@@ -29,15 +30,15 @@ local function asFunction(source, oop)
             if arg.dummy then
                 goto CONTINUE
             end
-            local name = arg.name or searcher.getKeyName(arg)
+            local name = arg.name or guide.getKeyName(arg)
             if name then
                 args[#args+1] = ('%s%s: %s'):format(
                     name,
                     optionalArg(arg) and '?' or '',
-                    vm.getInferType(arg)
+                    infer.searchAndViewInfers(arg)
                 )
             else
-                args[#args+1] = ('%s'):format(vm.getInferType(arg))
+                args[#args+1] = ('%s'):format(infer.searchAndViewInfers(arg))
             end
             ::CONTINUE::
         end

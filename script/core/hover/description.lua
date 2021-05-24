@@ -2,11 +2,12 @@ local vm       = require 'vm'
 local ws       = require 'workspace'
 local furi     = require 'file-uri'
 local files    = require 'files'
-local searcher    = require 'core.searcher'
+local searcher = require 'core.searcher'
 local markdown = require 'provider.markdown'
 local config   = require 'config'
 local lang     = require 'language'
 local util     = require 'utility'
+local guide    = require 'parser.guide'
 
 local function asStringInRequire(source, literal)
     local rootPath = ws.path or ''
@@ -72,7 +73,7 @@ local function asStringView(source, literal)
 end
 
 local function asString(source)
-    local literal = searcher.getLiteral(source)
+    local literal = guide.getLiteral(source)
     if type(literal) ~= 'string' then
         return nil
     end

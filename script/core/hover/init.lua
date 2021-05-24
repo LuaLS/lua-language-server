@@ -1,5 +1,5 @@
 local files      = require 'files'
-local searcher      = require 'core.searcher'
+local searcher   = require 'core.searcher'
 local vm         = require 'vm'
 local getLabel   = require 'core.hover.label'
 local getDesc    = require 'core.hover.description'
@@ -7,6 +7,7 @@ local util       = require 'utility'
 local findSource = require 'core.find-source'
 local lang       = require 'language'
 local markdown   = require 'provider.markdown'
+local infer      = require 'core.infer'
 
 local function eachFunctionAndOverload(value, callback)
     callback(value)
@@ -123,7 +124,7 @@ local function getHover(source)
     if source.type == 'doc.type.name' then
         return getHoverAsDocName(source)
     end
-    local isFunction = vm.hasInferType(source, 'function', 0)
+    local isFunction = infer.hasType(source, 'function')
     if isFunction then
         return getHoverAsFunction(source)
     else

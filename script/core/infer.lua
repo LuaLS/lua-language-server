@@ -1,6 +1,8 @@
 local searcher = require 'core.searcher'
 local config   = require 'config'
 local noder    = require 'core.noder'
+local vm       = require "vm.vm"
+local guide    = require "parser.guide"
 
 local STRING_OR_TABLE = {'STRING_OR_TABLE'}
 local BE_RETURN       = {'BE_RETURN'}
@@ -481,6 +483,42 @@ function m.searchAndViewInfers(source)
     end
     local infers = m.searchInfers(source)
     local view = m.viewInfers(infers)
+    return view
+end
+
+function m.searchAndViewLiterals(source)
+    if not source then
+        return nil
+    end
+    local result = {}
+    local defs = vm.getDefs(source)
+    for _, def in ipairs(defs) do
+        if guide.isLiteral(def) and def[1] ~= nil then
+            result[#result+1] = ('%q'):format(def[1])
+        end
+    end
+    table.sort(result)
+    return table.concat(result, '|')
+end
+
+---搜索并显示推断的class
+---@param source parser.guide.object
+---@return string?
+function m.getClass(source)
+    if not source then
+        return nil
+    end
+    local infers = {}
+    local defs = searcher.requestDefinition(source)
+    for _, def in ipairs(defs) do
+        if def.type == 'doc.class.name' then
+            infers[def[1]] = true
+        end
+    end
+    local view = m.viewInfers(infers)
+    if view == 'any' then
+        return nil
+    end
     return view
 end
 

@@ -52,7 +52,7 @@ local function createValue(closure, proto, callback, road)
         end
         local value = instantValue(closure, proto)
         value.types = types
-        noder.compileNode(value)
+        noder.compileNode(noder.getNoders(proto), value)
         return value
     end
     if proto.type == 'doc.type.name' then
@@ -64,7 +64,7 @@ local function createValue(closure, proto, callback, road)
         if callback then
             callback(road, key, proto)
         end
-        noder.compileNode(value)
+        noder.compileNode(noder.getNoders(proto), value)
         return value
     end
     if proto.type == 'doc.type.function' then
@@ -92,7 +92,7 @@ local function createValue(closure, proto, callback, road)
         value.args = args
         value.returns = returns
         value.isGeneric = true
-        noder.pushSource(value)
+        noder.pushSource(noder.getNoders(proto), value)
         return value
     end
     if proto.type == 'doc.type.array' then
@@ -221,7 +221,7 @@ function m.createClosure(proto, call)
         return nil
     end
 
-    noder.compileNode(closure)
+    noder.compileNode(noder.getNoders(proto), closure)
 
     return closure
 end

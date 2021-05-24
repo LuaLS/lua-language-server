@@ -3,6 +3,7 @@ local guide   = require 'parser.guide'
 local files   = require 'files'
 local generic = require 'core.generic'
 local ws      = require 'workspace'
+local vm      = require 'vm.vm'
 
 local NONE = {'NONE'}
 local LAST = {'LAST'}
@@ -152,7 +153,7 @@ end
 
 -- TODO
 function m.findGlobals(root)
-    noder.compileNode(root)
+    noder.compileNode(noder.getNoders(root), root)
     -- TODO
     return {}
 end
@@ -291,14 +292,24 @@ function m.searchRefsByID(status, uri, expect, mode)
             return
         end
         local func = guide.getParentFunction(obj)
-        if not func or func.type ~= 'function' then
+        if not func then
             return
         end
-        local parentID = noder.getID(func)
-        if not parentID then
-            return
+        if func.type == 'function' then
+            local parentID = noder.getID(func)
+            if not parentID then
+                return
+            end
+            search(parentID, noder.RETURN_INDEX .. returnIndex)
         end
-        search(parentID, noder.RETURN_INDEX .. returnIndex)
+        if func.type == 'main' then
+            local calls = vm.getLinksTo(uri)
+            for _, call in ipairs(calls) do
+                local turi = guide.getUri(call)
+                local tid  = noder.getID(call)
+                crossSearch(status, turi, tid, mode)
+            end
+        end
     end
 
     local function isCallID(field)
@@ -477,7 +488,7 @@ function m.searchRefsByID(status, uri, expect, mode)
     end
 
     search(expect)
-    searchFunction(expect)
+    --searchFunction(expect)
 
     --清除来自泛型的临时对象
     for _, closure in pairs(closureCache) do

@@ -36,6 +36,7 @@ end
 
 function TEST(script)
     files.removeAll()
+    script = script:gsub('\n', '\r\n')
     local target = catch_target(script)
     local start  = script:find('<?', 1, true)
     local finish = script:find('?>', 1, true)

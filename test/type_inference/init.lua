@@ -295,12 +295,6 @@ end
 local _, _, _, <?b?>, _ = x(nil, true, 1, 'yy')
 ]]
 
--- TODO 暂不支持这些特殊情况，之后用其他语法定义
---TEST 'integer' [[
---for <?i?> in ipairs(t) do
---end
---]]
-
 TEST 'any' [[
 local <?x?> = next()
 ]]
@@ -651,9 +645,8 @@ TEST 'integer' [[
 
 ---@generic T: table, K, V
 ---@param t T
----@return fun(table: table<K, V>, index: K):K, V
+---@return fun(table: table<K, V>, index?: K):K, V
 ---@return T
----@return nil
 local function pairs(t) end
 
 ---@type boolean[]

@@ -1467,6 +1467,7 @@ local Defs = {
             end
             call.node = func
             call.start = inA
+            call.finish = doB - 1
             func.next = call
             func.iterator = true
             values = { call }

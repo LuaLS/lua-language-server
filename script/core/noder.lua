@@ -139,7 +139,7 @@ local function getKey(source)
                 return '', tbl
             end
         end
-        return source.start, nil
+        return source.finish, nil
     elseif source.type == 'doc.class.name'
     or     source.type == 'doc.alias.name'
     or     source.type == 'doc.extends.name'

@@ -202,9 +202,31 @@ local function crossSearch(status, uri, expect, mode)
     m.searchRefsByID(status, uri, expect, mode)
 end
 
+local function getLock(status, uri, expect, mode)
+    local slock = status.lock
+    local ulock = slock[uri]
+    if not ulock then
+        ulock = {}
+        slock[uri] = ulock
+    end
+    local mlock = ulock[mode]
+    if not mlock then
+        mlock = {}
+        ulock[mode] = mlock
+    end
+    if mlock[expect] then
+        return false
+    end
+    mlock[expect] = true
+    return true
+end
+
 function m.searchRefsByID(status, uri, expect, mode)
     local ast = files.getAst(uri)
     if not ast then
+        return
+    end
+    if not getLock(status, uri, expect, mode) then
         return
     end
     local root = ast.ast
@@ -400,10 +422,10 @@ function m.searchRefsByID(status, uri, expect, mode)
             return
         end
         local firstID = noder.getFirstID(id)
-        if status.crossedGlobal[firstID] then
+        if status.crossed[firstID] then
             return
         end
-        status.crossedGlobal[firstID] = true
+        status.crossed[firstID] = true
         local tid = id .. (field or '')
         for guri in files.eachFile() do
             if not files.eq(uri, guri) then
@@ -417,14 +439,31 @@ function m.searchRefsByID(status, uri, expect, mode)
             return
         end
         local firstID = noder.getFirstID(id)
-        if status.crossedClass[firstID] then
+        if status.crossed[firstID] then
             return
         end
-        status.crossedClass[firstID] = true
+        status.crossed[firstID] = true
         local tid = id .. (field or '')
         for guri in files.eachFile() do
             if not files.eq(uri, guri) then
                 crossSearch(status, guri, tid, mode)
+            end
+        end
+    end
+
+    local function checkMainReturn(id, node, field)
+        if id ~= 'mainreturn' then
+            return
+        end
+        if mode ~= 'ref' and not field then
+            return
+        end
+        local calls = vm.getLinksTo(uri)
+        for _, call in ipairs(calls) do
+            local turi = guide.getUri(call)
+            if not files.eq(turi, uri) then
+                local tid  = noder.getID(call) .. (field or '')
+                crossSearch(status, turi, tid, mode)
             end
         end
     end
@@ -456,6 +495,7 @@ function m.searchRefsByID(status, uri, expect, mode)
 
         checkGlobal(id, node, field)
         checkClass(id, node, field)
+        checkMainReturn(id, node, field)
 
         if node.call then
             callStack[#callStack] = nil
@@ -534,10 +574,10 @@ end
 function m.status(parentStatus, interface, deep)
     local status = {
         --mark      = parentStatus and parentStatus.mark or {},
-        callStack     = {},
-        crossedGlobal = {},
-        crossedClass  = {},
-        results       = {},
+        callStack = {},
+        crossed   = {},
+        lock      = {},
+        results   = {},
     }
     return status
 end

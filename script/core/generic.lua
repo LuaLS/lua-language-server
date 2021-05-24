@@ -24,6 +24,7 @@ local function instantValue(closure, proto)
         proto   = proto,
         parent  = proto.parent,
     }
+    closure.values[#closure.values+1] = value
     return value
 end
 
@@ -212,6 +213,7 @@ function m.createClosure(proto, call)
         upvalues = parentClosure and parentClosure.upvalues or {},
         params   = {},
         returns  = {},
+        values   = {},
     }
     buildValues(closure)
 

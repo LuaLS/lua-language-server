@@ -1,7 +1,7 @@
 local util    = require 'utility'
 local guide   = require 'parser.guide'
 
-local noders
+local Noders
 local LastIDCache    = {}
 local FirstIDCache   = {}
 local SPLIT_CHAR     = '\x1F'
@@ -17,12 +17,12 @@ local ANY_FIELD      = SPLIT_CHAR .. ANY_FIELD_CHAR
 ---@param id string
 ---@return node
 local function getNode(id)
-    if not noders[id] then
-        noders[id] = {
+    if not Noders[id] then
+        Noders[id] = {
             id = id,
         }
     end
-    return noders[id]
+    return Noders[id]
 end
 
 ---是否是全局变量（包括 _G.XXX 形式）
@@ -805,6 +805,15 @@ function m.getKey(source)
     return getKey(source)
 end
 
+---清除临时id（用于泛型的临时对象）
+---@param root parser.guide.object
+---@param id string
+function m.removeID(root, id)
+    root = guide.getRoot(root)
+    local noders = root._noders
+    noders[id] = nil
+end
+
 ---编译整个文件的node
 ---@param  source parser.guide.object
 ---@return table
@@ -813,15 +822,15 @@ function m.compileNodes(source)
     if root._noders then
         return root._noders
     end
-    noders = {}
-    root._noders = noders
+    Noders = {}
+    root._noders = Noders
     guide.eachSource(root, function (src)
         m.pushSource(src)
         m.compileNode(src)
     end)
     -- Special rule: ('').XX -> stringlib.XX
     pushForward('str:', 'dn:stringlib')
-    return noders
+    return Noders
 end
 
 return m

@@ -225,6 +225,7 @@ function m.searchRefsByID(status, uri, expect, mode)
             cmark = {}
             mark[id] = cmark
         end
+        log.debug('search:', id, field)
         if field then
             if cmark[field] then
                 return
@@ -240,6 +241,7 @@ function m.searchRefsByID(status, uri, expect, mode)
             searchStep(id, nil)
             cmark[NONE] = nil
         end
+        log.debug('pop:', id, field)
     end
 
     local function checkLastID(id, field)
@@ -476,6 +478,16 @@ function m.searchRefsByID(status, uri, expect, mode)
 
     search(expect)
     searchFunction(expect)
+
+    --清除来自泛型的临时对象
+    for id, closure in pairs(closureCache) do
+        noder.removeID(root, id)
+        if closure then
+            for _, value in ipairs(closure.values) do
+                noder.removeID(root, noder.getID(value))
+            end
+        end
+    end
 end
 
 ---搜索对象的引用
@@ -495,6 +507,7 @@ function m.searchRefs(status, source, mode)
         return
     end
 
+    log.debug('searchRefs:', id)
     m.searchRefsByID(status, uri, id, mode)
 end
 

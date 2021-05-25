@@ -444,12 +444,13 @@ end
 
 ---搜索对象的推断类型
 ---@param source parser.guide.object
+---@param field? string
 ---@return string[]
-function m.searchInfers(source)
+function m.searchInfers(source, field)
     if not source then
         return nil
     end
-    local defs = searcher.requestDefinition(source)
+    local defs = searcher.requestDefinition(source, field)
     local infers = {}
     local mark = {}
     mark[source] = true
@@ -482,9 +483,10 @@ end
 
 ---搜索对象的字面量值
 ---@param source parser.guide.object
+---@param field? string
 ---@return table
-function m.searchLiterals(source)
-    local defs = searcher.requestDefinition(source)
+function m.searchLiterals(source, field)
+    local defs = searcher.requestDefinition(source, field)
     local literals = {}
     local mark = {}
     mark[source] = true
@@ -498,11 +500,15 @@ function m.searchLiterals(source)
     return literals
 end
 
-function m.searchAndViewLiterals(source)
+---搜索并显示推断值
+---@param source parser.guide.object
+---@param field? string
+---@return string
+function m.searchAndViewLiterals(source, field)
     if not source then
         return nil
     end
-    local literals = m.searchLiterals(source)
+    local literals = m.searchLiterals(source, field)
     local view = m.viewLiterals(literals)
     return view
 end
@@ -530,12 +536,13 @@ end
 
 ---搜索并显示推断类型
 ---@param source parser.guide.object
+---@param field? string
 ---@return string
-function m.searchAndViewInfers(source)
+function m.searchAndViewInfers(source, field)
     if not source then
         return 'any'
     end
-    local infers = m.searchInfers(source)
+    local infers = m.searchInfers(source, field)
     local view = m.viewInfers(infers)
     return view
 end

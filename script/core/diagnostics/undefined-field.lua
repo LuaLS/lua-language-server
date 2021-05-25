@@ -18,7 +18,7 @@ return function (uri, callback)
         if cache[src] == nil then
             tracy.ZoneBeginN('undefined-field getInfers')
             infers = vm.getInfers(src, 0) or false
-            local refs = vm.getRefs(src, 0)
+            local refs = vm.getRefs(src)
             for _, ref in ipairs(refs) do
                 cache[ref] = infers
             end

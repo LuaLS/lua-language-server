@@ -30,9 +30,9 @@ function TEST(wanted)
         files.setText('', newScript)
         local source = getSource(pos)
         assert(source)
-        local result = infer.searchAndViewInfers(source, 0)
+        local result = infer.searchAndViewInfers(source)
         if wanted ~= result then
-            infer.searchAndViewInfers(source, 0)
+            infer.searchAndViewInfers(source)
         end
         assert(wanted == result)
     end

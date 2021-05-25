@@ -1,11 +1,11 @@
 ---@type vm
 local vm      = require 'vm.vm'
 
-function vm.getLibraryName(source, deep)
+function vm.getLibraryName(source)
     if source.special then
         return source.special
     end
-    local defs = vm.getDefs(source, deep)
+    local defs = vm.getDefs(source)
     for _, def in ipairs(defs) do
         if def.special then
             return def.special

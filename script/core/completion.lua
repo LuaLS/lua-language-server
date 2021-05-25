@@ -149,7 +149,7 @@ local function getSnip(source)
     if context <= 0 then
         return nil
     end
-    local defs = vm.getRefs(source, 0)
+    local defs = vm.getRefs(source)
     for _, def in ipairs(defs) do
         def = searcher.getObjectValue(def) or def
         if def ~= source and def.type == 'function' then
@@ -274,7 +274,7 @@ local function checkLocal(ast, word, offset, results)
             goto CONTINUE
         end
         if vm.hasType(source, 'function') then
-            for _, def in ipairs(vm.getDefs(source, 0)) do
+            for _, def in ipairs(vm.getDefs(source)) do
                 if def.type == 'function'
                 or def.type == 'doc.type.function' then
                     local funcLabel = name .. getParams(def, false)
@@ -1431,7 +1431,7 @@ local function tryCallArg(ast, text, offset, results)
     if arg and arg.type == 'function' then
         return
     end
-    local defs = vm.getDefs(call.node, 0)
+    local defs = vm.getDefs(call.node)
     for _, def in ipairs(defs) do
         def = searcher.getObjectValue(def) or def
         local enums = getCallEnums(def, argIndex)

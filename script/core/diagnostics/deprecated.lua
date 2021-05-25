@@ -38,7 +38,7 @@ return function (uri, callback)
             return
         end
 
-        local defs = vm.getDefs(src, 0)
+        local defs = vm.getDefs(src)
         local validVersions
         for _, def in ipairs(defs) do
             if def.bindDocs then

@@ -1,10 +1,11 @@
 local vm       = require 'vm'
 local util     = require 'utility'
-local searcher    = require 'core.searcher'
+local searcher = require 'core.searcher'
 local config   = require 'config'
 local lang     = require 'language'
+local infer    = require 'core.infer'
 
-local function getKey(src)
+local function formatKey(src)
     local key = vm.getKeyName(src)
     if not key or #key <= 0 then
         if not src.index then
@@ -30,104 +31,21 @@ local function getKey(src)
     return ('[%s]'):format(key)
 end
 
-local function getFieldFull(src)
-    local value   = searcher.getObjectValue(src) or src
-    local tp      = vm.getInferType(value, 0)
-    --local class   = vm.getClass(src)
-    local literal = vm.getInferLiteral(value)
-    if type(literal) == 'string' and #literal >= 50 then
-        literal = literal:sub(1, 47) .. '...'
-    end
-    return tp, literal
-end
-
-local function getFieldFast(src)
-    if src.bindDocs then
-        return getFieldFull(src)
-    end
-    local value = searcher.getObjectValue(src) or src
-    if not value then
-        return 'any'
-    end
-    if value.type == 'boolean' then
-        return value.type, util.viewLiteral(value[1])
-    end
-    if value.type == 'number'
-    or value.type == 'integer' then
-        if math.tointeger(value[1]) then
-            if config.config.runtime.version == 'Lua 5.3'
-            or config.config.runtime.version == 'Lua 5.4' then
-                return 'integer', util.viewLiteral(value[1])
-            end
-        end
-        return value.type, util.viewLiteral(value[1])
-    end
-    if value.type == 'table'
-    or value.type == 'function' then
-        return value.type
-    end
-    if value.type == 'string' then
-        local literal = value[1]
-        if type(literal) == 'string' and #literal >= 50 then
-            literal = literal:sub(1, 47) .. '...'
-        end
-        return value.type, util.viewLiteral(literal)
-    end
-    if value.type == 'doc.field' then
-        return vm.getInferType(value)
-    end
-end
-
-local function getField(src, timeUp, mark, key)
-    if src.type == 'table'
-    or src.type == 'function' then
-        return nil
-    end
-    if src.parent then
-        if src.type == 'string'
-        or src.type == 'boolean'
-        or src.type == 'number'
-        or src.type == 'integer' then
-            if src.parent.type == 'tableindex'
-            or src.parent.type == 'setindex'
-            or src.parent.type == 'getindex' then
-                if src.parent.index == src then
-                    src = src.parent
-                end
-            end
-        end
-    end
-    local tp, literal
-    tp, literal = getFieldFast(src)
-    if tp then
-        return tp, literal
-    end
-    if timeUp or mark[key] then
-        return nil
-    end
-    mark[key] = true
-    tp, literal = getFieldFull(src)
-    if tp then
-        return tp, literal
-    end
-    return nil
-end
-
-local function buildAsHash(classes, literals, reachMax)
+local function buildAsHash(keyMap, inferMap, literalMap, reachMax)
     local keys = {}
-    for k in pairs(classes) do
+    for k in pairs(keyMap) do
         keys[#keys+1] = k
     end
     table.sort(keys)
     local lines = {}
     lines[#lines+1] = '{'
     for _, key in ipairs(keys) do
-        local class   = classes[key]
-        local literal = literals[key]
-        if literal then
-            lines[#lines+1] = ('    %s: %s = %s,'):format(key, class, literal)
+        local inferView   = inferMap[key]
+        local literalView = literalMap[key]
+        if literalView then
+            lines[#lines+1] = ('    %s: %s = %s,'):format(formatKey(key), inferView, literalView)
         else
-            lines[#lines+1] = ('    %s: %s,'):format(key, class)
+            lines[#lines+1] = ('    %s: %s,'):format(formatKey(key), inferView)
         end
     end
     if reachMax then
@@ -137,23 +55,23 @@ local function buildAsHash(classes, literals, reachMax)
     return table.concat(lines, '\n')
 end
 
-local function buildAsConst(classes, literals, reachMax)
+local function buildAsConst(keyMap, inferMap, literalMap, reachMax)
     local keys = {}
-    for k in pairs(classes) do
+    for k in pairs(keyMap) do
         keys[#keys+1] = k
     end
     table.sort(keys, function (a, b)
-        return tonumber(literals[a]) < tonumber(literals[b])
+        return tonumber(literalMap[a]) < tonumber(literalMap[b])
     end)
     local lines = {}
     lines[#lines+1] = '{'
     for _, key in ipairs(keys) do
-        local class   = classes[key]
-        local literal = literals[key]
-        if literal then
-            lines[#lines+1] = ('    %s: %s = %s,'):format(key, class, literal)
+        local inferView   = inferMap[key]
+        local literalView = literalMap[key]
+        if literalView then
+            lines[#lines+1] = ('    %s: %s = %s,'):format(formatKey(key), inferView, literalView)
         else
-            lines[#lines+1] = ('    %s: %s,'):format(key, class)
+            lines[#lines+1] = ('    %s: %s,'):format(formatKey(key), inferView)
         end
     end
     if reachMax then
@@ -161,39 +79,6 @@ local function buildAsConst(classes, literals, reachMax)
     end
     lines[#lines+1] = '}'
     return table.concat(lines, '\n')
-end
-
-local function mergeLiteral(literals)
-    local results = {}
-    local mark = {}
-    for _, value in ipairs(literals) do
-        if not mark[value] then
-            mark[value] = true
-            results[#results+1] = value
-        end
-    end
-    if #results == 0 then
-        return nil
-    end
-    table.sort(results)
-    return table.concat(results, '|')
-end
-
-local function mergeTypes(types)
-    local results = {}
-    local mark = {
-        -- 讲道理table的keyvalue不会是nil
-        ['nil'] = true,
-    }
-    for _, tv in ipairs(types) do
-        for tp in tv:gmatch '[^|]+' do
-            if not mark[tp] then
-                mark[tp] = true
-                results[tp] = true
-            end
-        end
-    end
-    return searcher.mergeTypes(results)
 end
 
 local function clearClasses(classes)
@@ -202,6 +87,7 @@ local function clearClasses(classes)
     classes['[string]'] = nil
 end
 
+--[[
 return function (source)
     if config.config.hover.previewFields <= 0 then
         return 'table'
@@ -270,4 +156,29 @@ return function (source)
         result = ('\n--%s\n%s'):format(lang.script.HOVER_TABLE_TIME_UP, result)
     end
     return result
+end
+--]]
+
+local function getKeyMap(fields)
+    local keys = {}
+    for _, field in ipairs(fields) do
+        local key = vm.getKeyName(field)
+        if key then
+            keys[key] = true
+        end
+    end
+    return keys
+end
+
+return function (source)
+    if config.config.hover.previewFields <= 0 then
+        return 'table'
+    end
+    local fields = vm.getFields(source)
+    local keyMap = getKeyMap(fields)
+    local inferMap   = {}
+    local literalMap = {}
+    for key in pairs(keyMap) do
+        inferMap[key] = infer.searchAndViewInfers(source, key)
+    end
 end

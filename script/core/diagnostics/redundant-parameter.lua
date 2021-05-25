@@ -84,7 +84,7 @@ return function (uri, callback)
         local funcArgs = cache[func]
         if funcArgs == nil then
             funcArgs = getFuncArgs(func) or false
-            local refs = vm.getRefs(func, 0)
+            local refs = vm.getRefs(func)
             for _, ref in ipairs(refs) do
                 cache[ref] = funcArgs
             end

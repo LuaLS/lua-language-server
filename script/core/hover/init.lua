@@ -25,7 +25,7 @@ local function getHoverAsValue(source)
     local label = getLabel(source)
     local desc  = getDesc(source)
     if not desc then
-        local values = vm.getDefs(source, 0)
+        local values = vm.getDefs(source)
         for _, def in ipairs(values) do
             desc = getDesc(def)
             if desc then
@@ -41,7 +41,7 @@ local function getHoverAsValue(source)
 end
 
 local function getHoverAsFunction(source)
-    local values = vm.getDefs(source, 0)
+    local values = vm.getDefs(source)
     local desc   = getDesc(source)
     local labels = {}
     local defs = 0

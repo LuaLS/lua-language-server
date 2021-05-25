@@ -107,7 +107,7 @@ local function paramName(uri, edits, start, finish)
         if not hasLiteralArgInCall(source) then
             return
         end
-        local defs = vm.getDefs(source.node, 0)
+        local defs = vm.getDefs(source.node)
         if not defs then
             return
         end

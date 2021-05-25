@@ -8,22 +8,6 @@ local vm      = require 'vm.vm'
 local NONE = {'NONE'}
 local LAST = {'LAST'}
 
-local function checkFunctionReturn(source)
-    if  source.parent
-    and source.parent.type == 'return' then
-        if source.parent.parent.type == 'main' then
-            return 0
-        elseif source.parent.parent.type == 'function' then
-            for i = 1, #source.parent do
-                if source.parent[i] == source then
-                    return i
-                end
-            end
-        end
-    end
-    return nil
-end
-
 local ignoredIDs = {
     ['dn:nil']           = true,
     ['dn:any']           = true,
@@ -52,8 +36,13 @@ function m.pushResult(status, mode, source, force)
         return
     end
     local results = status.results
+    if results[source] then
+        return
+    end
+    results[source] = true
     if force then
         results[#results+1] = source
+        return
     end
     local parent = source.parent
     if mode == 'def' then
@@ -135,7 +124,6 @@ function m.pushResult(status, mode, source, force)
                 results[#results+1] = source
             end
         end
-    elseif mode == 'field' then
     end
 end
 
@@ -521,10 +509,10 @@ local function prepareSearch(source)
     return uri, id
 end
 
-local function getField(status, source)
+local function getField(status, source, mode)
     if source.type == 'table' then
         for _, field in ipairs(source) do
-            status.results[#status.results+1] = field
+            m.pushResult(status, mode, field)
         end
     end
     local field = source.next
@@ -535,7 +523,7 @@ local function getField(status, source)
         or field.type == 'setfield'
         or field.type == 'getindex'
         or field.type == 'setindex' then
-            status.results[#status.results+1] = field
+            m.pushResult(status, mode, field)
         end
         return
     end
@@ -558,15 +546,21 @@ end
 ---@param status guide.status
 ---@param source parser.guide.object
 ---@param mode   guide.searchmode
-function m.searchFields(status, source, mode)
+---@param field  string
+function m.searchFields(status, source, mode, field)
     local uri, id = prepareSearch(source)
     if not id then
         return
     end
-    local newStatus = m.status(status)
-    m.searchRefsByID(newStatus, uri, id, mode)
-    for _, def in ipairs(newStatus.results) do
-        getField(status, def)
+    if field == '*' then
+        local newStatus = m.status(status)
+        m.searchRefsByID(newStatus, uri, id, mode)
+        for _, def in ipairs(newStatus.results) do
+            getField(status, def, mode)
+        end
+    else
+        local fullID = id .. noder.SPLIT_CHAR .. field
+        m.searchRefsByID(status, uri, fullID, mode)
     end
 end
 
@@ -590,35 +584,34 @@ end
 
 --- 请求对象的引用
 ---@param obj       parser.guide.object
+---@param field?    string
 ---@return parser.guide.object[]
 ---@return integer
-function m.requestReference(obj)
+function m.requestReference(obj, field)
     local status = m.status()
-    -- 根据 field 搜索引用
-    m.searchRefs(status, obj, 'ref')
 
-    return status.results, 0
+    if field then
+        m.searchFields(status, obj, 'ref', field)
+    else
+        m.searchRefs(status, obj, 'ref')
+    end
+
+    return status.results
 end
 
 --- 请求对象的定义
 ---@param obj       parser.guide.object
+---@param field?    string
 ---@return parser.guide.object[]
 ---@return integer
-function m.requestDefinition(obj)
+function m.requestDefinition(obj, field)
     local status = m.status()
-    -- 根据 field 搜索引用
-    m.searchRefs(status, obj, 'def')
 
-    return status.results, 0
-end
-
---- 请求对象的field
-function m.requestFields(obj, key)
-    if key then
-        error('not support')
+    if field then
+        m.searchFields(status, obj, 'ref', field)
+    else
+        m.searchRefs(status, obj, 'def')
     end
-    local status = m.status()
-    m.searchFields(status, obj, 'ref')
 
     return status.results
 end

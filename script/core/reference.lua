@@ -65,7 +65,7 @@ return function (uri, offset)
 
     local metaSource = vm.isMetaFile(uri)
 
-    local refs = vm.getRefs(source, 5)
+    local refs = vm.getRefs(source)
     local values = {}
     for _, src in ipairs(refs) do
         local value = searcher.getObjectValue(src)

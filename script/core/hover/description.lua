@@ -126,7 +126,7 @@ local function getBindComment(source, docGroup, base)
 end
 
 local function tryDocClassComment(source)
-    for _, def in ipairs(vm.getDefs(source, 0)) do
+    for _, def in ipairs(vm.getDefs(source)) do
         if def.type == 'doc.class.name'
         or def.type == 'doc.alias.name' then
             local class = noder.getDocState(def)

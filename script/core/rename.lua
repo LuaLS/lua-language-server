@@ -299,7 +299,7 @@ end
 
 local function ofGlobal(source, newname, callback)
     local key = searcher.getKeyName(source)
-    for _, src in ipairs(vm.getRefs(source, 0)) do
+    for _, src in ipairs(vm.getRefs(source)) do
         ofFieldThen(key, src, newname, callback)
     end
 end
@@ -308,7 +308,7 @@ local function ofLabel(source, newname, callback)
     if not isValidName(newname) and not askForcing(newname)then
         return false
     end
-    for _, src in ipairs(vm.getRefs(source, 0)) do
+    for _, src in ipairs(vm.getRefs(source)) do
         callback(src, src.start, src.finish, newname)
     end
 end

@@ -128,7 +128,7 @@ return function (uri, offset)
         end
     end
 
-    local defs = vm.getDefs(source, 0)
+    local defs = vm.getDefs(source)
     local values = {}
     for _, src in ipairs(defs) do
         local value = searcher.getObjectValue(src)

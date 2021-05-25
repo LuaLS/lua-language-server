@@ -1,8 +1,7 @@
 local searcher = require 'core.searcher'
 local config   = require 'config'
 local noder    = require 'core.noder'
-local vm       = require "vm.vm"
-local guide    = require "parser.guide"
+local util     = require 'utility'
 
 local STRING_OR_TABLE = {'STRING_OR_TABLE'}
 local BE_RETURN       = {'BE_RETURN'}
@@ -170,8 +169,26 @@ local function searchLiteralOfValue(value, literals)
     if value.type == 'unary' then
         local op = value.op.type
         if op == '-' then
+            local subLiterals = m.searchLiterals(value[1])
+            if subLiterals then
+                for subLiteral in pairs(subLiterals) do
+                    local num = tonumber(subLiteral)
+                    if num then
+                        literals[-num] = true
+                    end
+                end
+            end
         end
         if op == '~' then
+            local subLiterals = m.searchLiterals(value[1])
+            if subLiterals then
+                for subLiteral in pairs(subLiterals) do
+                    local num = math.tointeger(subLiteral)
+                    if num then
+                        literals[~num] = true
+                    end
+                end
+            end
         end
     end
     return
@@ -280,21 +297,18 @@ end
 ---@param literals string[]
 ---@return string
 function m.viewLiterals(literals)
-    if literals[0] then
-        return literals[0]
-    end
     local result = {}
     local count = 0
     for infer in pairs(literals) do
         count = count + 1
-        result[count] = infer
+        result[count] = util.viewLiteral(infer)
     end
     if count == 0 then
         return nil
     end
     table.sort(result)
-    literals[0] = table.concat(result, '|')
-    return literals[0]
+    local view = table.concat(result, '|')
+    return view
 end
 
 local function getDocName(doc)

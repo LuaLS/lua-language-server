@@ -65,7 +65,7 @@ m.childMap = {
 
     ['doc']                = {'#'},
     ['doc.class']          = {'class', '#extends', 'comment'},
-    ['doc.type']           = {'#types', '#enums', 'name', 'comment'},
+    ['doc.type']           = {'#types', '#enums', '#resumes', 'name', 'comment'},
     ['doc.alias']          = {'alias', 'extends', 'comment'},
     ['doc.param']          = {'param', 'extends', 'comment'},
     ['doc.return']         = {'#returns', 'comment'},

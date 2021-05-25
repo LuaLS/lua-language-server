@@ -203,6 +203,11 @@ local function cleanInfers(infers)
         infers['integer'] = nil
         infers['number']  = true
     end
+    -- stringlib 就是 string
+    if infers['stringlib'] then
+        infers['stringlib'] = nil
+        infers['string'] = true
+    end
     -- 如果是通过 .. 来推测的，且结果里没有 number 与 integer，则推测为string
     if infers[BE_CONNACT] then
         infers[BE_CONNACT] = nil

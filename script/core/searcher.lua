@@ -72,6 +72,7 @@ function m.pushResult(status, mode, source, force)
         or source.type == 'doc.alias.name'
         or source.type == 'doc.field.name'
         or source.type == 'doc.type.enum'
+        or source.type == 'doc.resume'
         or source.type == 'doc.type.array'
         or source.type == 'doc.type.table'
         or source.type == 'doc.type.function' then
@@ -116,6 +117,7 @@ function m.pushResult(status, mode, source, force)
         or source.type == 'doc.extends.name'
         or source.type == 'doc.field.name'
         or source.type == 'doc.type.enum'
+        or source.type == 'doc.resume'
         or source.type == 'doc.type.array'
         or source.type == 'doc.type.table'
         or source.type == 'doc.type.function' then
@@ -460,7 +462,6 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
 
         checkGlobal(id, node, field)
-        checkClass(id, node, field)
         checkMainReturn(id, node, field)
 
         if node.call then
@@ -478,6 +479,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         if node then
             searchNode(id, node, field)
         end
+        checkClass(id, node, field)
         local lastID = checkLastID(id, field)
         if not lastID then
             return

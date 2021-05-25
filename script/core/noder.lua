@@ -155,11 +155,11 @@ local function getKey(source)
         end
     elseif source.type == 'doc.class'
     or     source.type == 'doc.type'
-    or     source.type == 'doc.alias'
     or     source.type == 'doc.param'
     or     source.type == 'doc.vararg'
     or     source.type == 'doc.field.name'
     or     source.type == 'doc.type.enum'
+    or     source.type == 'doc.resume'
     or     source.type == 'doc.type.table'
     or     source.type == 'doc.type.array'
     or     source.type == 'doc.type.function' then
@@ -223,9 +223,6 @@ local function checkMode(source)
     if source.type == 'doc.param' then
         return 'dp:'
     end
-    if source.type == 'doc.alias' then
-        return 'da:'
-    end
     if source.type == 'doc.type.function' then
         return 'dfun:'
     end
@@ -238,7 +235,8 @@ local function checkMode(source)
     if source.type == 'doc.vararg' then
         return 'dv:'
     end
-    if source.type == 'doc.type.enum' then
+    if source.type == 'doc.type.enum'
+    or source.type == 'doc.resume' then
         return 'de:'
     end
     if source.type == 'generic.closure' then
@@ -436,6 +434,13 @@ function m.compileNode(noders, source)
         for _, enumUnit in ipairs(source.enums) do
             pushForward(noders, id, getID(enumUnit))
         end
+        for _, resumeUnit in ipairs(source.resumes) do
+            pushForward(noders, id, getID(resumeUnit))
+        end
+    end
+    -- 分解 @alias
+    if source.type == 'doc.alias' then
+        pushForward(noders, getID(source.alias), getID(source.extends))
     end
     -- 分解 @class
     if source.type == 'doc.class' then

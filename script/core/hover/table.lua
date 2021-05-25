@@ -5,23 +5,8 @@ local config   = require 'config'
 local lang     = require 'language'
 local infer    = require 'core.infer'
 
-local function formatKey(src)
-    local key = vm.getKeyName(src)
-    if not key or #key <= 0 then
-        if not src.index then
-            return '[any]'
-        end
-        local class = vm.getClass(src.index)
-        if class then
-            return ('[%s]'):format(class)
-        end
-        local tp = vm.getInferType(src.index)
-        if tp then
-            return ('[%s]'):format(tp)
-        end
-        return '[any]'
-    end
-    if vm.getKeyType(src) == 'string' then
+local function formatKey(key)
+    if type(key) == 'string' then
         if key:match '^[%a_][%w_]*$' then
             return key
         else
@@ -31,12 +16,7 @@ local function formatKey(src)
     return ('[%s]'):format(key)
 end
 
-local function buildAsHash(keyMap, inferMap, literalMap, reachMax)
-    local keys = {}
-    for k in pairs(keyMap) do
-        keys[#keys+1] = k
-    end
-    table.sort(keys)
+local function buildAsHash(keys, inferMap, literalMap, reachMax)
     local lines = {}
     lines[#lines+1] = '{'
     for _, key in ipairs(keys) do
@@ -55,11 +35,7 @@ local function buildAsHash(keyMap, inferMap, literalMap, reachMax)
     return table.concat(lines, '\n')
 end
 
-local function buildAsConst(keyMap, inferMap, literalMap, reachMax)
-    local keys = {}
-    for k in pairs(keyMap) do
-        keys[#keys+1] = k
-    end
+local function buildAsConst(keys, inferMap, literalMap, reachMax)
     table.sort(keys, function (a, b)
         return tonumber(literalMap[a]) < tonumber(literalMap[b])
     end)
@@ -161,24 +137,50 @@ end
 
 local function getKeyMap(fields)
     local keys = {}
+    local mark = {}
     for _, field in ipairs(fields) do
         local key = vm.getKeyName(field)
-        if key then
-            keys[key] = true
+        if key and not mark[key] then
+            keys[#keys+1] = key
         end
     end
+    table.sort(keys, function (a, b)
+        return tostring(a) < tostring(b)
+    end)
     return keys
 end
 
 return function (source)
-    if config.config.hover.previewFields <= 0 then
+    local maxFields = config.config.hover.previewFields
+    if maxFields <= 0 then
         return 'table'
     end
-    local fields = vm.getFields(source)
-    local keyMap = getKeyMap(fields)
+
+    local fields     = vm.getRefs(source, '*')
+    local keys       = getKeyMap(fields)
+
+    if #keys == 0 then
+        return '{}'
+    end
+
     local inferMap   = {}
     local literalMap = {}
-    for key in pairs(keyMap) do
-        inferMap[key] = infer.searchAndViewInfers(source, key)
+
+    local reachMax = maxFields < #keys
+
+    local isConsts = true
+    for i = 1, math.min(maxFields, #keys) do
+        local key = keys[i]
+        inferMap[key]   = infer.searchAndViewInfers(source, key)
+        literalMap[key] = infer.searchAndViewLiterals(source, key)
+        if not tonumber(literalMap[key]) then
+            isConsts = false
+        end
+    end
+
+    if isConsts then
+        return buildAsConst(keys, inferMap, literalMap, reachMax)
+    else
+        return buildAsHash(keys, inferMap, literalMap, reachMax)
     end
 end

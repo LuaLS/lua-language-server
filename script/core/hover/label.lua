@@ -51,7 +51,7 @@ local function asValue(source, title)
     if  not infer.hasType(source, 'string', 0)
     and not type:find('%[%]$')
     and not type:find('%w%<') then
-        if #vm.getFields(source, 0) > 0
+        if #vm.getRefs(source, '*') > 0
         or infer.hasType(source, 'table', 0) then
             cont = buildTable(source)
         end

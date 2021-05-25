@@ -453,8 +453,22 @@ function m.searchInfers(source, field)
     local defs = searcher.requestDefinition(source, field)
     local infers = {}
     local mark = {}
-    mark[source] = true
-    searchInfer(source, infers)
+    if not field then
+        mark[source] = true
+        searchInfer(source, infers)
+        local id = noder.getID(source)
+        if id then
+            local node = noder.getNodeByID(source, id)
+            if node and node.sources then
+                for _, src in ipairs(node.sources) do
+                    if not mark[src] then
+                        mark[src] = true
+                        searchInfer(src, infers)
+                    end
+                end
+            end
+        end
+    end
     if source.type == 'field' or source.type == 'method' then
         mark[source.parent] = true
         searchInfer(source.parent, infers)
@@ -463,18 +477,6 @@ function m.searchInfers(source, field)
         if not mark[def] then
             mark[def] = true
             searchInfer(def, infers)
-        end
-    end
-    local id = noder.getID(source)
-    if id then
-        local node = noder.getNodeByID(source, id)
-        if node and node.sources then
-            for _, src in ipairs(node.sources) do
-                if not mark[src] then
-                    mark[src] = true
-                    searchInfer(src, infers)
-                end
-            end
         end
     end
     cleanInfers(infers)
@@ -489,8 +491,10 @@ function m.searchLiterals(source, field)
     local defs = searcher.requestDefinition(source, field)
     local literals = {}
     local mark = {}
-    mark[source] = true
-    searchLiteral(source, literals)
+    if not field then
+        mark[source] = true
+        searchLiteral(source, literals)
+    end
     for _, def in ipairs(defs) do
         if not mark[def] then
             mark[def] = true

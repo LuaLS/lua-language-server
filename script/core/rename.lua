@@ -292,7 +292,7 @@ local function ofField(source, newname, callback)
     else
         node = source.node
     end
-    for _, src in ipairs(vm.getFields(node, 5)) do
+    for _, src in ipairs(vm.getRefs(node, '*')) do
         ofFieldThen(key, src, newname, callback)
     end
 end

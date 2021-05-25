@@ -608,7 +608,7 @@ function m.requestDefinition(obj, field)
     local status = m.status()
 
     if field then
-        m.searchFields(status, obj, 'ref', field)
+        m.searchFields(status, obj, 'def', field)
     else
         m.searchRefs(status, obj, 'def')
     end

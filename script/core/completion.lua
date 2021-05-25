@@ -548,7 +548,7 @@ local function checkField(ast, word, start, offset, parent, oop, results)
         local refs = vm.getGlobalSets '*'
         checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, results)
     else
-        local refs = vm.getFields(parent, 0)
+        local refs = vm.getRefs(parent, '*')
         checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, results)
     end
 end

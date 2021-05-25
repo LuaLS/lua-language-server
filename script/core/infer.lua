@@ -506,7 +506,7 @@ end
 ---判断对象的推断类型是否包含某个类型
 function m.hasType(source, tp)
     local infers = m.searchInfers(source)
-    return infers[tp]
+    return infers[tp] or false
 end
 
 ---搜索并显示推断类型

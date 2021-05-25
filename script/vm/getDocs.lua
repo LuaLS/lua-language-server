@@ -1,9 +1,10 @@
-local files   = require 'files'
-local util    = require 'utility'
-local guide   = require 'parser.guide'
+local files    = require 'files'
+local util     = require 'utility'
+local guide    = require 'parser.guide'
 ---@type vm
-local vm      = require 'vm.vm'
-local config  = require 'config'
+local vm       = require 'vm.vm'
+local config   = require 'config'
+local searcher = require 'core.searcher'
 
 local typeMap = {
     ['doc.type.name']    = 'type',
@@ -76,27 +77,14 @@ function vm.getDocEnums(doc, mark, results)
     if not doc then
         return nil
     end
-    mark = mark or {}
-    if mark[doc] then
-        return nil
-    end
-    mark[doc] = true
-    results = results or {}
-    for _, enum in ipairs(doc.enums) do
-        results[#results+1] = enum
-    end
-    for _, resume in ipairs(doc.resumes) do
-        results[#results+1] = resume
-    end
-    for _, unit in ipairs(doc.types) do
-        if unit.type == 'doc.type.name' then
-            for _, other in ipairs(vm.getDocTypes(unit[1])) do
-                if other.type == 'doc.alias.name' then
-                    vm.getDocEnums(other.parent.extends, mark, results)
-                end
-            end
+    local defs = searcher.requestDefinition(doc)
+
+    for _, def in ipairs(defs) do
+        if def.type == 'doc.type.enum' then
+            results[#results+1] = def
         end
     end
+
     return results
 end
 

@@ -300,40 +300,6 @@ function m.searchRefsByID(status, uri, expect, mode)
         search(id, nil)
     end
 
-    local function searchFunction(id)
-        local node = noder.getNodeByID(root, id)
-        if not node or not node.sources then
-            return
-        end
-        local obj = node.sources[1]
-        if not obj or obj.type ~= 'function' then
-            return
-        end
-        local returnIndex = checkFunctionReturn(obj)
-        if not returnIndex then
-            return
-        end
-        local func = guide.getParentFunction(obj)
-        if not func then
-            return
-        end
-        if func.type == 'function' then
-            local parentID = noder.getID(func)
-            if not parentID then
-                return
-            end
-            search(parentID, noder.RETURN_INDEX .. returnIndex)
-        end
-        if func.type == 'main' then
-            local calls = vm.getLinksTo(uri)
-            for _, call in ipairs(calls) do
-                local turi = guide.getUri(call)
-                local tid  = noder.getID(call)
-                crossSearch(status, turi, tid, mode)
-            end
-        end
-    end
-
     local function isCallID(field)
         if not field then
             return false

@@ -57,95 +57,36 @@ local function buildAsConst(keys, inferMap, literalMap, reachMax)
     return table.concat(lines, '\n')
 end
 
-local function clearClasses(classes)
-    classes['[nil]'] = nil
-    classes['[any]'] = nil
-    classes['[string]'] = nil
-end
-
---[[
-return function (source)
-    if config.config.hover.previewFields <= 0 then
-        return 'table'
-    end
-    local literals = {}
-    local classes = {}
-    local clock = os.clock()
-    local timeUp
-    local mark = {}
-    local fields = vm.getFields(source, 0)
-    local keyCount = 0
-    local reachMax
-    for _, src in ipairs(fields) do
-        local key = getKey(src)
-        if not key then
-            goto CONTINUE
-        end
-        if not classes[key] then
-            classes[key] = {}
-            keyCount = keyCount + 1
-        end
-        if not literals[key] then
-            literals[key] = {}
-        end
-        if not TEST and os.clock() - clock > config.config.hover.fieldInfer / 1000.0 then
-            timeUp = true
-        end
-        local class, literal = getField(src, timeUp, mark, key)
-        if literal == 'nil' then
-            literal = nil
-        end
-        classes[key][#classes[key]+1] = class
-        literals[key][#literals[key]+1] = literal
-        if keyCount >= config.config.hover.previewFields then
-            reachMax = true
-            break
-        end
-        ::CONTINUE::
-    end
-
-    clearClasses(classes)
-
-    for key, class in pairs(classes) do
-        literals[key] = mergeLiteral(literals[key])
-        classes[key] = mergeTypes(class)
-    end
-
-    if not next(classes) then
-        return '{}'
-    end
-
-    local intValue = true
-    for key, class in pairs(classes) do
-        if class ~= 'integer' or not tonumber(literals[key]) then
-            intValue = false
-            break
-        end
-    end
-    local result
-    if intValue then
-        result = buildAsConst(classes, literals, reachMax)
-    else
-        result = buildAsHash(classes, literals, reachMax)
-    end
-    if timeUp then
-        result = ('\n--%s\n%s'):format(lang.script.HOVER_TABLE_TIME_UP, result)
-    end
-    return result
-end
---]]
+local typeSorter = {
+    ['string']  = 1,
+    ['number']  = 2,
+    ['boolean'] = 3,
+}
 
 local function getKeyMap(fields)
     local keys = {}
     local mark = {}
     for _, field in ipairs(fields) do
         local key = vm.getKeyName(field)
+        local tp  = vm.getKeyType(field)
+        if tp == 'number' then
+            key = tonumber(key)
+        elseif tp == 'boolean' then
+            key = key == 'true'
+        end
         if key and not mark[key] then
+            mark[key] = true
             keys[#keys+1] = key
         end
     end
     table.sort(keys, function (a, b)
-        return tostring(a) < tostring(b)
+        local ta = typeSorter[type(a)]
+        local tb = typeSorter[type(b)]
+        if ta == tb then
+            return tostring(a) < tostring(b)
+        else
+            return ta < tb
+        end
     end)
     return keys
 end
@@ -156,8 +97,8 @@ return function (source)
         return 'table'
     end
 
-    local fields     = vm.getRefs(source, '*')
-    local keys       = getKeyMap(fields)
+    local fields = vm.getRefs(source, '*')
+    local keys   = getKeyMap(fields)
 
     if #keys == 0 then
         return '{}'
@@ -178,9 +119,17 @@ return function (source)
         end
     end
 
+    local result
+
     if isConsts then
-        return buildAsConst(keys, inferMap, literalMap, reachMax)
+        result = buildAsConst(keys, inferMap, literalMap, reachMax)
     else
-        return buildAsHash(keys, inferMap, literalMap, reachMax)
+        result = buildAsHash(keys, inferMap, literalMap, reachMax)
     end
+
+    --if timeUp then
+    --    result = ('\n--%s\n%s'):format(lang.script.HOVER_TABLE_TIME_UP, result)
+    --end
+
+    return result
 end

@@ -85,9 +85,12 @@ local function getKey(source)
         if not index then
             return ANY_FIELD_CHAR, source.node
         end
-        if index.type == 'string' then
+        if index.type == 'string'
+        or index.type == 'boolean'
+        or index.type == 'number' then
             return ('%q'):format(index[1] or ''), source.node
-        else
+        elseif index.type ~= 'function'
+        and    index.type ~= 'table' then
             return ANY_FIELD_CHAR, source.node
         end
     elseif source.type == 'tableindex' then
@@ -95,9 +98,12 @@ local function getKey(source)
         if not index then
             return ANY_FIELD_CHAR, source.parent
         end
-        if index.type == 'string' then
+        if index.type == 'string'
+        or index.type == 'boolean'
+        or index.type == 'number' then
             return ('%q'):format(index[1] or ''), source.parent
-        else
+        elseif index.type ~= 'function'
+        and    index.type ~= 'table' then
             return ANY_FIELD_CHAR, source.parent
         end
     elseif source.type == 'table' then

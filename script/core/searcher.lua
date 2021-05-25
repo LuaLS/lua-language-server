@@ -559,7 +559,7 @@ function m.searchFields(status, source, mode, field)
             getField(status, def, mode)
         end
     else
-        local fullID = id .. noder.SPLIT_CHAR .. field
+        local fullID = ('%s%s%q'):format(id, noder.SPLIT_CHAR, field)
         m.searchRefsByID(status, uri, fullID, mode)
     end
 end

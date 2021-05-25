@@ -422,8 +422,6 @@ local t: {
     [1]: integer = 2,
     [true]: integer = 3,
     [5.5]: integer = 4,
-    [table]: integer = 5,
-    [function]: integer = 6,
     b: integer = 7,
     ["012"]: integer = 8,
 }
@@ -438,9 +436,7 @@ local any = collectgarbage()
 t[any] = any
 ]]
 [[
-local t: {
-    [number]: integer = 1,
-}
+local t: {}
 ]]
 
 TEST[[
@@ -492,7 +488,7 @@ local <?self?> = setmetatable({
 }, mt)
 ]]
 [[
-local self: obj {
+local self: {
     __index: table,
     __name: string = "obj",
     id: integer = 1,

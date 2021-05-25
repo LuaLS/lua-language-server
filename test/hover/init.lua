@@ -170,55 +170,55 @@ local <?obj?> = {}
 ]]
 "local obj: {}"
 
-TEST [[
-local mt = {}
-mt.__name = 'class'
+--TEST [[
+--local mt = {}
+--mt.__name = 'class'
+--
+--local <?obj?> = setmetatable({}, mt)
+--]]
+--"local obj: class {}"
 
-local <?obj?> = setmetatable({}, mt)
-]]
-"local obj: class {}"
+--TEST [[
+--local mt = {}
+--mt.name = 'class'
+--mt.__index = mt
+--
+--local <?obj?> = setmetatable({}, mt)
+--]]
+--[[
+--local obj: class {
+--    __index: table,
+--    name: string = "class",
+--}
+--]]
 
-TEST [[
-local mt = {}
-mt.name = 'class'
-mt.__index = mt
+--TEST [[
+--local mt = {}
+--mt.TYPE = 'class'
+--mt.__index = mt
+--
+--local <?obj?> = setmetatable({}, mt)
+--]]
+--[[
+--local obj: class {
+--    TYPE: string = "class",
+--    __index: table,
+--}
+--]]
 
-local <?obj?> = setmetatable({}, mt)
-]]
-[[
-local obj: class {
-    __index: table,
-    name: string = "class",
-}
-]]
-
-TEST [[
-local mt = {}
-mt.TYPE = 'class'
-mt.__index = mt
-
-local <?obj?> = setmetatable({}, mt)
-]]
-[[
-local obj: class {
-    TYPE: string = "class",
-    __index: table,
-}
-]]
-
-TEST [[
-local mt = {}
-mt.Class = 'class'
-mt.__index = mt
-
-local <?obj?> = setmetatable({}, mt)
-]]
-[[
-local obj: class {
-    Class: string = "class",
-    __index: table,
-}
-]]
+--TEST [[
+--local mt = {}
+--mt.Class = 'class'
+--mt.__index = mt
+--
+--local <?obj?> = setmetatable({}, mt)
+--]]
+--[[
+--local obj: class {
+--    Class: string = "class",
+--    __index: table,
+--}
+--]]
 
 -- TODO 支持自定义的函数库
 --TEST[[

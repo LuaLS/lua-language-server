@@ -541,11 +541,7 @@ function m.searchRefsByID(status, uri, expect, mode)
     end
 end
 
----搜索对象的引用
----@param status guide.status
----@param source parser.guide.object
----@param mode   guide.searchmode
-function m.searchRefs(status, source, mode)
+local function prepareSearch(source)
     if source.type == 'field'
     or source.type == 'method' then
         source = source.parent
@@ -554,12 +550,58 @@ function m.searchRefs(status, source, mode)
     noder.compileNodes(root)
     local uri  = guide.getUri(source)
     local id   = noder.getID(source)
+    return uri, id
+end
+
+local function getField(source)
+    local field = source.next
+    if not field then
+        return
+    end
+    if field.type == 'getmethod'
+    or field.type == 'setmethod'
+    or field.type == 'getfield'
+    or field.type == 'setfield'
+    or field.type == 'getindex'
+    or field.type == 'setindex' then
+        return field
+    end
+end
+
+---搜索对象的引用
+---@param status guide.status
+---@param source parser.guide.object
+---@param mode   guide.searchmode
+function m.searchRefs(status, source, mode)
+    local uri, id = prepareSearch(source)
     if not id then
         return
     end
-
     log.debug('searchRefs:', id)
     m.searchRefsByID(status, uri, id, mode)
+end
+
+---搜索对象的field
+---@param status guide.status
+---@param source parser.guide.object
+---@param mode   guide.searchmode
+function m.searchFields(status, source, mode)
+    local uri, id = prepareSearch(source)
+    if not id then
+        return
+    end
+    m.searchRefsByID(status, uri, id, mode)
+    local results = status.results
+    for i = #results, 1, -1 do
+        local res = results[i]
+        local field = getField(res)
+        if field then
+            results[i] = field
+        else
+            results[i] = results[#results]
+            results[#results] = nil
+        end
+    end
 end
 
 ---@class guide.status
@@ -568,10 +610,8 @@ end
 
 ---创建搜索状态
 ---@param parentStatus guide.status
----@param interface table
----@param deep integer
 ---@return guide.status
-function m.status(parentStatus, interface, deep)
+function m.status(parentStatus)
     local status = {
         --mark      = parentStatus and parentStatus.mark or {},
         callStack = {},
@@ -584,12 +624,10 @@ end
 
 --- 请求对象的引用
 ---@param obj       parser.guide.object
----@param interface table
----@param deep      integer
 ---@return parser.guide.object[]
 ---@return integer
-function m.requestReference(obj, interface, deep)
-    local status = m.status(nil, interface, deep)
+function m.requestReference(obj)
+    local status = m.status()
     -- 根据 field 搜索引用
     m.searchRefs(status, obj, 'ref')
 
@@ -598,16 +636,25 @@ end
 
 --- 请求对象的定义
 ---@param obj       parser.guide.object
----@param interface table
----@param deep      integer
 ---@return parser.guide.object[]
 ---@return integer
-function m.requestDefinition(obj, interface, deep)
-    local status = m.status(nil, interface, deep)
+function m.requestDefinition(obj)
+    local status = m.status()
     -- 根据 field 搜索引用
     m.searchRefs(status, obj, 'def')
 
     return status.results, 0
+end
+
+--- 请求对象的field
+function m.requestFields(obj, key)
+    if key then
+        error('not support')
+    end
+    local status = m.status()
+    m.searchFields(status, obj, 'ref')
+
+    return status.results
 end
 
 return m

@@ -159,7 +159,7 @@ end
 local function searchLiteralOfValue(value, literals)
     if value.type == 'string'
     or value.type == 'boolean'
-    or value.tyoe == 'number'
+    or value.type == 'number'
     or value.type == 'integer' then
         local v = value[1]
         if v ~= nil then
@@ -269,6 +269,27 @@ function m.viewInfers(infers)
     end)
     infers[0] = table.concat(result, '|')
     return infers[0]
+end
+
+---合并对象的值
+---@param literals string[]
+---@return string
+function m.viewLiterals(literals)
+    if literals[0] then
+        return literals[0]
+    end
+    local result = {}
+    local count = 0
+    for infer in pairs(literals) do
+        count = count + 1
+        result[count] = infer
+    end
+    if count == 0 then
+        return nil
+    end
+    table.sort(result)
+    literals[0] = table.concat(result, '|')
+    return literals[0]
 end
 
 local function getDocName(doc)
@@ -446,11 +467,25 @@ end
 function m.searchLiterals(source)
     local defs = searcher.requestDefinition(source)
     local literals = {}
+    local mark = {}
+    mark[source] = true
     searchLiteral(source, literals)
     for _, def in ipairs(defs) do
-        searchLiteral(def, literals)
+        if not mark[def] then
+            mark[def] = true
+            searchLiteral(def, literals)
+        end
     end
     return literals
+end
+
+function m.searchAndViewLiterals(source)
+    if not source then
+        return nil
+    end
+    local literals = m.searchLiterals(source)
+    local view = m.viewLiterals(literals)
+    return view
 end
 
 ---判断对象的推断值是否是 true
@@ -484,21 +519,6 @@ function m.searchAndViewInfers(source)
     local infers = m.searchInfers(source)
     local view = m.viewInfers(infers)
     return view
-end
-
-function m.searchAndViewLiterals(source)
-    if not source then
-        return nil
-    end
-    local result = {}
-    local defs = vm.getDefs(source)
-    for _, def in ipairs(defs) do
-        if guide.isLiteral(def) and def[1] ~= nil then
-            result[#result+1] = ('%q'):format(def[1])
-        end
-    end
-    table.sort(result)
-    return table.concat(result, '|')
 end
 
 ---搜索并显示推断的class

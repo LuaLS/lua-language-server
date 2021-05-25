@@ -19,7 +19,7 @@ local function getFields(source, deep, filterKey)
     deep = config.config.intelliSense.searchDepth + (deep or 0)
 
     await.delay()
-    local results = searcher.requestFields(source, vm.interface, deep, filterKey)
+    local results = searcher.requestFields(source, filterKey)
 
     unlock()
     return results

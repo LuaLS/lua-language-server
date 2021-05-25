@@ -8,6 +8,7 @@ local config   = require 'config'
 local lang     = require 'language'
 local util     = require 'utility'
 local guide    = require 'parser.guide'
+local noder    = require 'core.noder'
 
 local function asStringInRequire(source, literal)
     local rootPath = ws.path or ''
@@ -128,7 +129,7 @@ local function tryDocClassComment(source)
     for _, def in ipairs(vm.getDefs(source, 0)) do
         if def.type == 'doc.class.name'
         or def.type == 'doc.alias.name' then
-            local class = searcher.getDocState(def)
+            local class = noder.getDocState(def)
             local comment = getBindComment(class, class.bindGroup, class)
             if comment then
                 return comment

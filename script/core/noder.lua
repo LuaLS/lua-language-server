@@ -828,6 +828,12 @@ function m.removeID(root, id)
     noders[id] = nil
 end
 
+---寻找doc的主体
+---@param doc parser.guide.object
+function m.getDocState(doc)
+    return getDocStateWithoutCrossFunction(doc)
+end
+
 ---获取对象的noders
 ---@param source parser.guide.object
 ---@return noders

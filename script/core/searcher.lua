@@ -521,18 +521,23 @@ local function prepareSearch(source)
     return uri, id
 end
 
-local function getField(source)
-    local field = source.next
-    if not field then
-        return
+local function getField(status, source)
+    if source.type == 'table' then
+        for _, field in ipairs(source) do
+            status.results[#status.results+1] = field
+        end
     end
-    if field.type == 'getmethod'
-    or field.type == 'setmethod'
-    or field.type == 'getfield'
-    or field.type == 'setfield'
-    or field.type == 'getindex'
-    or field.type == 'setindex' then
-        return field
+    local field = source.next
+    if field then
+        if field.type == 'getmethod'
+        or field.type == 'setmethod'
+        or field.type == 'getfield'
+        or field.type == 'setfield'
+        or field.type == 'getindex'
+        or field.type == 'setindex' then
+            status.results[#status.results+1] = field
+        end
+        return
     end
 end
 
@@ -558,17 +563,10 @@ function m.searchFields(status, source, mode)
     if not id then
         return
     end
-    m.searchRefsByID(status, uri, id, mode)
-    local results = status.results
-    for i = #results, 1, -1 do
-        local res = results[i]
-        local field = getField(res)
-        if field then
-            results[i] = field
-        else
-            results[i] = results[#results]
-            results[#results] = nil
-        end
+    local newStatus = m.status(status)
+    m.searchRefsByID(newStatus, uri, id, mode)
+    for _, def in ipairs(newStatus.results) do
+        getField(status, def)
     end
 end
 

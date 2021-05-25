@@ -46,7 +46,6 @@ end
 local function asValue(source, title)
     local name    = buildName(source)
     local type    = infer.searchAndViewInfers(source, 0)
-    local class   = nil -- infer.getClass(source, 0)
     local literal = infer.searchAndViewLiterals(source, 0)
     local cont
     if  not infer.hasType(source, 'string', 0)
@@ -66,11 +65,7 @@ local function asValue(source, title)
         or type == 'nil') then
         type = nil
     end
-    if class then
-        pack[#pack+1] = class
-    else
-        pack[#pack+1] = type
-    end
+    pack[#pack+1] = type
     if literal then
         pack[#pack+1] = '='
         pack[#pack+1] = literal

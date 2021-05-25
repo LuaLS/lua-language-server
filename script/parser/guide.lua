@@ -818,4 +818,60 @@ function m.getKeyName(obj)
     return m.getKeyNameOfLiteral(obj)
 end
 
+function m.getKeyTypeOfLiteral(obj)
+    if not obj then
+        return nil
+    end
+    local tp = obj.type
+    if tp == 'field'
+    or     tp == 'method' then
+        return 'string'
+    elseif tp == 'string' then
+        return 'string'
+    elseif tp == 'number' then
+        return 'number'
+    elseif tp == 'boolean' then
+        return 'boolean'
+    end
+end
+
+function m.getKeyType(obj)
+    if not obj then
+        return nil
+    end
+    local tp = obj.type
+    if tp == 'getglobal'
+    or tp == 'setglobal' then
+        return 'string'
+    elseif tp == 'local'
+    or     tp == 'getlocal'
+    or     tp == 'setlocal' then
+        return 'local'
+    elseif tp == 'getfield'
+    or     tp == 'setfield'
+    or     tp == 'tablefield' then
+        return 'string'
+    elseif tp == 'getmethod'
+    or     tp == 'setmethod' then
+        return 'string'
+    elseif tp == 'getindex'
+    or     tp == 'setindex'
+    or     tp == 'tableindex' then
+        return m.getKeyTypeOfLiteral(obj.index)
+    elseif tp == 'field'
+    or     tp == 'method'
+    or     tp == 'doc.see.field' then
+        return 'string'
+    elseif tp == 'doc.class' then
+        return 'string'
+    elseif tp == 'doc.alias' then
+        return 'string'
+    elseif tp == 'doc.field' then
+        return 'string'
+    elseif tp == 'dummy' then
+        return 'string'
+    end
+    return m.getKeyTypeOfLiteral(obj)
+end
+
 return m

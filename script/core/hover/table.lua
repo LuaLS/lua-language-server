@@ -20,7 +20,7 @@ local function getKey(src)
         end
         return '[any]'
     end
-    if searcher.getKeyType(src) == 'string' then
+    if vm.getKeyType(src) == 'string' then
         if key:match '^[%a_][%w_]*$' then
             return key
         else

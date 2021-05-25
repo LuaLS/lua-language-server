@@ -464,26 +464,18 @@ function m.compileNode(noders, source)
                 pushForward(noders, id, getID(src))
             end
         end
-        do
-            local start
-            for _, doc in ipairs(source.bindGroup) do
-                if doc.type == 'doc.class' then
-                    start = doc == source
-                end
-                if start and doc.type == 'doc.field' then
-                    local key = doc.field[1]
-                    if key then
-                        local keyID = ('%s%s%q'):format(
-                            id,
-                            SPLIT_CHAR,
-                            key
-                        )
-                        pushForward(noders, keyID, getID(doc.field))
-                        pushBackward(noders, getID(doc.field), keyID)
-                        pushForward(noders, keyID, getID(doc.extends))
-                        pushBackward(noders, getID(doc.extends), keyID)
-                    end
-                end
+        for _, field in ipairs(source.fields) do
+            local key = field.field[1]
+            if key then
+                local keyID = ('%s%s%q'):format(
+                    id,
+                    SPLIT_CHAR,
+                    key
+                )
+                pushForward(noders, keyID, getID(field.field))
+                pushBackward(noders, getID(field.field), keyID)
+                pushForward(noders, keyID, getID(field.extends))
+                pushBackward(noders, getID(field.extends), keyID)
             end
         end
     end

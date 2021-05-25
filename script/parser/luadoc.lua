@@ -194,6 +194,7 @@ local function parseClass(parent)
     local result = {
         type   = 'doc.class',
         parent = parent,
+        fields = {},
     }
     result.class = parseName('doc.class.name', result)
     if not result.class then
@@ -1170,6 +1171,18 @@ local function bindParamAndReturnIndex(binded)
     end
 end
 
+local function bindClassAndFields(binded)
+    local class
+    for _, doc in ipairs(binded) do
+        if doc.type == 'doc.class' then
+            class = doc
+        elseif doc.type == 'doc.field' then
+            class.fields[#class.fields+1] = doc
+            doc.class = class
+        end
+    end
+end
+
 local function bindDoc(sources, lns, binded)
     if not binded then
         return
@@ -1192,6 +1205,7 @@ local function bindDoc(sources, lns, binded)
         bindDocsBetween(sources, binded, bindSources, nstart, nfinish)
     end
     bindParamAndReturnIndex(binded)
+    bindClassAndFields(binded)
 end
 
 local function bindDocs(state)

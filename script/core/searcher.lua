@@ -514,6 +514,14 @@ local function getField(status, source, mode)
         for _, field in ipairs(source) do
             m.pushResult(status, mode, field)
         end
+        return
+    end
+    if source.type == 'doc.class.name' then
+        local class = source.parent
+        for _, field in ipairs(class.fields) do
+            m.pushResult(status, mode, field.field)
+        end
+        return
     end
     local field = source.next
     if field then

@@ -73,14 +73,16 @@ local function getDocNames(name, type)
     return results
 end
 
-function vm.getDocEnums(doc, mark, results)
+function vm.getDocEnums(doc)
     if not doc then
         return nil
     end
     local defs = searcher.requestDefinition(doc)
+    local results = {}
 
     for _, def in ipairs(defs) do
-        if def.type == 'doc.type.enum' then
+        if def.type == 'doc.type.enum'
+        or def.type == 'doc.resume' then
             results[#results+1] = def
         end
     end

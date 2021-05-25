@@ -425,9 +425,10 @@ local function parseTypeUnit(parent, content)
     return result
 end
 
-local function parseResume()
+local function parseResume(parent)
     local result = {
-        type = 'doc.resume'
+        type   = 'doc.resume',
+        parent = parent,
     }
 
     if checkToken('symbol', '>', 1) then
@@ -456,7 +457,6 @@ local function parseResume()
     return result
 end
 
-local LastType
 function parseType(parent)
     local result = {
         type    = 'doc.type',
@@ -557,7 +557,7 @@ function parseType(parent)
                     row = row + i + 1
                     local finishPos = nextComm.text:find('#', 3) or #nextComm.text
                     parseTokens(nextComm.text:sub(3, finishPos), nextComm.start + 1)
-                    local resume = parseResume()
+                    local resume = parseResume(result)
                     if resume then
                         if comments then
                             resume.comment = table.concat(comments, '\n')

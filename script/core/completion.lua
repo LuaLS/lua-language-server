@@ -1267,7 +1267,7 @@ local function getCallEnums(source, index)
             if  doc.type == 'doc.param'
             and doc.param[1] == arg[1] then
                 local enums = {}
-                for _, enum in ipairs(vm.getDocEnums(doc.extends) or {}) do
+                for _, enum in ipairs(vm.getDocEnums(doc.extends)) do
                     enums[#enums+1] = {
                         label       = enum[1],
                         description = enum.comment,

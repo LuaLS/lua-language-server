@@ -312,8 +312,7 @@ local function getDocName(doc)
         return table.concat(list, '|')
     end
     if doc.type == 'doc.class.name'
-    or doc.type == 'doc.type.name'
-    or doc.type == 'doc.alias.name' then
+    or doc.type == 'doc.type.name' then
         local name = doc[1] or '?'
         return name
     end
@@ -329,7 +328,8 @@ local function getDocName(doc)
     if doc.type == 'doc.type.function' then
         return 'function'
     end
-    if doc.type == 'doc.type.enum' then
+    if doc.type == 'doc.type.enum'
+    or doc.type == 'doc.resume' then
         local value = doc[1] or '?'
         return value
     end

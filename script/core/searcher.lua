@@ -496,7 +496,6 @@ function m.searchRefsByID(status, uri, expect, mode)
     end
 
     search(expect)
-    --searchFunction(expect)
 
     --清除来自泛型的临时对象
     for _, closure in pairs(closureCache) do

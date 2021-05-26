@@ -1224,6 +1224,7 @@ local function bindDocs(state)
             sources[#sources+1] = src
         end
         if src.type == 'table' then
+            -- TODO
             return true
         end
     end)

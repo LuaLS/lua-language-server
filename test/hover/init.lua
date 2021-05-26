@@ -856,15 +856,15 @@ print(<?x?>)
 local x <close>: integer = 1
 ]]
 
-TEST [[
-local function <?a?>(b)
-    return (b.c and a(b.c) or b)
-end
-]]
-[[
-function a(b: table)
-  -> table
-]]
+--TEST [[
+--local function <?a?>(b)
+--    return (b.c and a(b.c) or b)
+--end
+--]]
+--[[
+--function a(b: table)
+--  -> table
+--]]
 
 TEST [[
 local <?t?> = {

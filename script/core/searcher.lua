@@ -348,6 +348,17 @@ function m.searchRefsByID(status, uri, expect, mode)
         searchID(id, field)
     end
 
+    local function checkENV(source, field)
+        if not field then
+            return
+        end
+        if source.special ~= '_G' then
+            return
+        end
+        local newID = 'g:' .. field:sub(2)
+        searchID(newID)
+    end
+
     local function checkForward(id, node, field)
         for _, forwardID in ipairs(node.forward) do
             searchID(forwardID, field)
@@ -443,13 +454,13 @@ function m.searchRefsByID(status, uri, expect, mode)
 
         if node.sources then
             checkGeneric(node.sources[1], field)
+            checkENV(node.sources[1], field)
         end
 
         if node.require then
             checkRequire(node.require, field)
         end
 
-        checkGlobal(id, node, field)
         checkMainReturn(id, node, field)
 
         if node.call then
@@ -467,6 +478,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         if node then
             searchNode(id, node, field)
         end
+        checkGlobal(id, node, field)
         checkClass(id, node, field)
         local lastID = checkLastID(id, field)
         if not lastID then
@@ -537,6 +549,42 @@ local function getField(status, source, mode)
     end
 end
 
+local function searchAllGlobalByUri(status, mode, uri)
+    local ast = files.getAst(uri)
+    if not ast then
+        return
+    end
+    local root = ast.ast
+    noder.compileNodes(root)
+    local noders = noder.getNoders(root)
+    for id, node in pairs(noders) do
+        if  node.sources
+        and id:sub(1, 2) == 'g:'
+        and not id:find(noder.SPLIT_CHAR) then
+            for _, source in ipairs(node.sources) do
+                m.pushResult(status, mode, source)
+            end
+        end
+    end
+
+    local node = noder.getNodeByID(root, 'dn:_G')
+    if node and node.sources then
+        for _, source in ipairs(node.sources) do
+            if source.type == 'doc.class' then
+                for _, field in ipairs(source.fields) do
+                    m.pushResult(status, mode, field)
+                end
+            end
+        end
+    end
+end
+
+local function searchAllGlobals(status, mode)
+    for uri in files.eachFile() do
+        searchAllGlobalByUri(status, mode, uri)
+    end
+end
+
 ---搜索对象的引用
 ---@param status guide.status
 ---@param source parser.guide.object
@@ -560,15 +608,25 @@ function m.searchFields(status, source, mode, field)
     if not id then
         return
     end
+    log.debug('searchFields:', id, field)
     if field == '*' then
-        local newStatus = m.status(status)
-        m.searchRefsByID(newStatus, uri, id, mode)
-        for _, def in ipairs(newStatus.results) do
-            getField(status, def, mode)
+        if source.special == '_G' then
+            searchAllGlobals(status, mode)
+        else
+            local newStatus = m.status(status)
+            m.searchRefsByID(newStatus, uri, id, mode)
+            for _, def in ipairs(newStatus.results) do
+                getField(status, def, mode)
+            end
         end
     else
-        local fullID = ('%s%s%q'):format(id, noder.SPLIT_CHAR, field)
-        m.searchRefsByID(status, uri, fullID, mode)
+        if source.special == '_G' then
+            local fullID = ('g:%q'):format(field)
+            m.searchRefsByID(status, uri, fullID, mode)
+        else
+            local fullID = ('%s%s%q'):format(id, noder.SPLIT_CHAR, field)
+            m.searchRefsByID(status, uri, fullID, mode)
+        end
     end
 end
 

@@ -808,6 +808,13 @@ function m.getLastID(id)
     return lastID
 end
 
+---是否是全局变量（包括 _G.XXX 形式）
+---@param source parser.guide.object
+---@return boolean
+function m.isGlobal(source)
+    return isGlobal(source)
+end
+
 ---获取source的ID
 ---@param source parser.guide.object
 ---@return string

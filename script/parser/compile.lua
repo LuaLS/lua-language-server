@@ -125,6 +125,7 @@ local vmMap = {
                     vararg.ref = {}
                 end
                 vararg.ref[#vararg.ref+1] = obj
+                obj.node = vararg
             end
         end
     end,

@@ -125,7 +125,13 @@ local function searchInferOfValue(value, infers)
         return true
     end
     if value.type == 'table' then
-        infers['table'] = true
+        if value.array then
+            local node = m.searchAndViewInfers(value.array)
+            local infer = node .. '[]'
+            infers[infer] = true
+        else
+            infers['table'] = true
+        end
         return true
     end
     if value.type == 'number' then

@@ -64,7 +64,7 @@ local function asDocFunction(source)
             args[i] = ('%s%s: %s'):format(
                 name,
                 arg.optional and '?' or '',
-                vm.getInferType(arg.extends)
+                infer.searchAndViewInfers(arg.extends)
             )
         else
             args[i] = ('%s%s'):format(

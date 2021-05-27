@@ -126,6 +126,10 @@ local function getKey(source)
         return source.start, nil
     elseif source.type == '...' then
         return source.start, nil
+    elseif source.type == 'varargs' then
+        if source.node then
+            return source.node.start, nil
+        end
     elseif source.type == 'select' then
         return ('%d%s%d'):format(source.start, RETURN_INDEX, source.sindex)
     elseif source.type == 'call' then
@@ -576,6 +580,9 @@ function m.compileNode(noders, source)
                 pushBackward(noders, funcXID, id)
             end
         end
+        if source.vararg.type == 'varargs' then
+            pushForward(noders, id, getID(source.vararg))
+        end
     end
     if source.type == 'doc.type.function' then
         if source.returns then
@@ -693,6 +700,16 @@ function m.compileNode(noders, source)
                     source.isGeneric = true
                 end
             end
+        end
+    end
+    if source.type == 'table' then
+        if #source == 1 and source[1].type == 'varargs' then
+            source.array = source[1]
+            local nodeID = ('%s%s'):format(
+                id,
+                ANY_FIELD
+            )
+            pushForward(noders, nodeID, getID(source[1]))
         end
     end
     if source.type == 'main' then

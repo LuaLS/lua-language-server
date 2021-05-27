@@ -44,8 +44,8 @@ local function asGlobal(source)
 end
 
 local function asDocFunction(source)
-    local doc = searcher.getParentType(source, 'doc.type')
-            or  searcher.getParentType(source, 'doc.overload')
+    local doc = guide.getParentType(source, 'doc.type')
+            or  guide.getParentType(source, 'doc.overload')
     if not doc or not doc.bindSources then
         return ''
     end

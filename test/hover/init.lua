@@ -1068,6 +1068,8 @@ function f(x: number, y: boolean)
 ]]
 
 TEST [[
+---@class Class
+
 ---@vararg Class
 local function f(...)
     local _, <?x?> = ...
@@ -1079,6 +1081,21 @@ local x: Class
 ]]
 
 TEST [[
+---@class Class
+
+---@vararg Class
+local function f(...)
+    local t = {...}
+    local <?v?> = t[1]
+end
+]]
+[[
+local v: Class
+]]
+
+TEST [[
+---@class Class
+
 ---@vararg Class
 local function f(...)
     local <?t?> = {...}
@@ -1154,23 +1171,29 @@ local x: table<ClassA, ClassB>
 ]]
 
 --TEST [[
+-----@class ClassA
+-----@class ClassB
+--
 -----@type table<ClassA, ClassB>
 --local t
 --for _, <?x?> in pairs(t) do
 --end
 --]]
 --[[
---local x: *ClassB
+--local x: ClassB
 --]]
 
 --TEST [[
+-----@class ClassA
+-----@class ClassB
+--
 -----@type table<ClassA, ClassB>
 --local t
 --for <?k?>, v in pairs(t) do
 --end
 --]]
 --[[
---local k: *ClassA
+--local k: ClassA
 --]]
 
 TEST [[

@@ -1,4 +1,3 @@
-local vm       = require 'vm'
 local infer    = require 'core.infer'
 
 local function getReturnDualByDoc(source)
@@ -92,7 +91,7 @@ local function asDocFunction(source)
     local returns = {}
     for i, rtn in ipairs(source.returns) do
         local rtnText = ('%s%s'):format(
-            vm.getInferType(rtn),
+            infer.searchAndViewInfers(rtn),
             rtn.optional and '?' or ''
         )
         if i == 1 then

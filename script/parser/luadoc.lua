@@ -1114,15 +1114,23 @@ local function bindDocsBetween(sources, binded, bindSources, start, finish)
         end
         local src = sources[index]
         if src.start < start then
-            left = index
+            left = index + 1
         else
             right = index
         end
     end
-    for i = index - 1, max do
+
+    -- 从前往后进行绑定
+    for i = index, max do
         local src = sources[i]
         if src then
             if src.start > finish then
+                break
+            end
+            -- 遇到table后中断，处理以下情况：
+            -- ---@type AAA
+            -- local t = {x = 1, y = 2}
+            if src.type == 'table' then
                 break
             end
             if src.start >= start then
@@ -1220,12 +1228,9 @@ local function bindDocs(state)
         or src.type == 'tablefield'
         or src.type == 'tableindex'
         or src.type == 'function'
+        or src.type == 'table'
         or src.type == '...' then
             sources[#sources+1] = src
-        end
-        if src.type == 'table' then
-            -- TODO
-            return true
         end
     end)
     table.sort(sources, function (a, b)

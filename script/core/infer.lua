@@ -316,19 +316,26 @@ function m.viewLiterals(literals)
     return view
 end
 
-local function getDocName(doc)
+function m.viewDocName(doc)
     if not doc then
         return nil
     end
     if doc.type == 'doc.type' then
         local list = {}
         for _, tp in ipairs(doc.types) do
-            list[#list+1] = getDocName(tp)
+            list[#list+1] = m.getDocName(tp)
         end
         for _, enum in ipairs(doc.enums) do
-            list[#list+1] = getDocName(enum)
+            list[#list+1] = m.getDocName(enum)
         end
         return table.concat(list, '|')
+    end
+    return m.getDocName(doc)
+end
+
+function m.getDocName(doc)
+    if not doc then
+        return nil
     end
     if doc.type == 'doc.class.name'
     or doc.type == 'doc.type.name' then
@@ -340,12 +347,12 @@ local function getDocName(doc)
         end
     end
     if doc.type == 'doc.type.array' then
-        local nodeName = getDocName(doc.node) or '?'
+        local nodeName = m.viewDocName(doc.node) or '?'
         return nodeName .. '[]'
     end
     if doc.type == 'doc.type.table' then
-        local key = getDocName(doc.tkey) or '?'
-        local value = getDocName(doc.tvalue) or '?'
+        local key = m.viewDocName(doc.tkey) or '?'
+        local value = m.viewDocName(doc.tvalue) or '?'
         return ('table<%s, %s>'):format(key, value)
     end
     if doc.type == 'doc.type.function' then
@@ -374,7 +381,7 @@ local function searchInfer(source, infers)
         return
     end
     -- check LuaDoc
-    local docName = getDocName(source)
+    local docName = m.getDocName(source)
     if docName then
         infers[docName] = true
         infers[CLASS]   = true
@@ -492,6 +499,16 @@ function m.searchInfers(source, field)
         local docType = source.docParam.extends
         if docType.type == 'doc.type' then
             for _, def in ipairs(docType.types) do
+                if def.typeGeneric and not mark[def] then
+                    mark[def] = true
+                    searchInfer(def, infers)
+                end
+            end
+        end
+    end
+    if source.type == 'doc.type' then
+        if source.type == 'doc.type' then
+            for _, def in ipairs(source.types) do
                 if def.typeGeneric and not mark[def] then
                     mark[def] = true
                     searchInfer(def, infers)

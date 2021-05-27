@@ -1010,6 +1010,10 @@ local v: Class
 ]]
 
 TEST [[
+---@class A
+---@class B
+---@class C
+
 ---@return A|B
 ---@return C
 local function <?f?>()
@@ -1215,6 +1219,8 @@ local r: boolean
 ]]
 
 TEST [[
+---@class void
+
 ---@param f fun():void
 function t(<?f?>) end
 ]]

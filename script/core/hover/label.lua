@@ -32,13 +32,14 @@ local function asDocFunction(source)
 end
 
 local function asDocTypeName(source)
-    for _, doc in ipairs(vm.getDocTypes(source[1])) do
+    local defs = searcher.requestDefinition(source)
+    for _, doc in ipairs(defs) do
         if doc.type == 'doc.class.name' then
-            return 'class ' .. source[1]
+            return 'class ' .. doc[1]
         end
         if doc.type == 'doc.alias.name' then
             local extends = doc.parent.extends
-            return lang.script('HOVER_EXTENDS', vm.getInferType(extends))
+            return lang.script('HOVER_EXTENDS', infer.searchAndViewInfers(extends))
         end
     end
 end

@@ -638,32 +638,7 @@ function m.compileNode(noders, source)
     end
     -- 将函数的返回值映射到具体的返回值上
     if source.type == 'function' then
-        -- 检查实体返回值
-        if source.returns then
-            local returns = {}
-            for _, rtn in ipairs(source.returns) do
-                for index, rtnObj in ipairs(rtn) do
-                    if not returns[index] then
-                        returns[index] = {}
-                    end
-                    returns[index][#returns[index]+1] = rtnObj
-                end
-            end
-            for index, rtnObjs in ipairs(returns) do
-                local returnID = ('%s%s%s'):format(
-                    id,
-                    RETURN_INDEX,
-                    index
-                )
-                for _, rtnObj in ipairs(rtnObjs) do
-                    pushForward(noders, returnID, getID(rtnObj))
-                    if rtnObj.type == 'function'
-                    or rtnObj.type == 'call' then
-                        pushBackward(noders, getID(rtnObj), returnID)
-                    end
-                end
-            end
-        end
+        local hasDocReturn = {}
         -- 检查 luadoc
         if source.bindDocs then
             for _, doc in ipairs(source.bindDocs) do
@@ -676,6 +651,7 @@ function m.compileNode(noders, source)
                         )
                         pushForward(noders, fullID, getID(rtn))
                         pushBackward(noders, getID(rtn), fullID)
+                        hasDocReturn[rtn.returnIndex] = true
                     end
                 end
                 if doc.type == 'doc.param' then
@@ -698,6 +674,34 @@ function m.compileNode(noders, source)
                 end
                 if doc.type == 'doc.generic' then
                     source.isGeneric = true
+                end
+            end
+        end
+        -- 检查实体返回值
+        if source.returns then
+            local returns = {}
+            for _, rtn in ipairs(source.returns) do
+                for index, rtnObj in ipairs(rtn) do
+                    if not hasDocReturn[index] then
+                        if not returns[index] then
+                            returns[index] = {}
+                        end
+                        returns[index][#returns[index]+1] = rtnObj
+                    end
+                end
+            end
+            for index, rtnObjs in ipairs(returns) do
+                local returnID = ('%s%s%s'):format(
+                    id,
+                    RETURN_INDEX,
+                    index
+                )
+                for _, rtnObj in ipairs(rtnObjs) do
+                    pushForward(noders, returnID, getID(rtnObj))
+                    if rtnObj.type == 'function'
+                    or rtnObj.type == 'call' then
+                        pushBackward(noders, getID(rtnObj), returnID)
+                    end
                 end
             end
         end

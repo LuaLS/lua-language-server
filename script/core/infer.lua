@@ -327,7 +327,11 @@ local function getDocName(doc)
     if doc.type == 'doc.class.name'
     or doc.type == 'doc.type.name' then
         local name = doc[1] or '?'
-        return name
+        if doc.typeGeneric then
+            return '<' .. name .. '>'
+        else
+            return name
+        end
     end
     if doc.type == 'doc.type.array' then
         local nodeName = getDocName(doc.node) or '?'
@@ -476,6 +480,17 @@ function m.searchInfers(source, field)
         if not mark[def] then
             mark[def] = true
             searchInfer(def, infers)
+        end
+    end
+    if source.docParam then
+        local docType = source.docParam.extends
+        if docType.type == 'doc.type' then
+            for _, def in ipairs(docType.types) do
+                if def.typeGeneric and not mark[def] then
+                    mark[def] = true
+                    searchInfer(def, infers)
+                end
+            end
         end
     end
     cleanInfers(infers)

@@ -480,7 +480,12 @@ function m.compileNode(noders, source)
         end
     end
     if source.type == 'doc.param' then
-        pushForward(noders, getID(source), getID(source.extends))
+        pushForward(noders, id, getID(source.extends))
+        for _, src in ipairs(source.bindSources) do
+            if src.type == 'local' and src.parent.type == 'in' then
+                pushForward(noders, getID(src), id)
+            end
+        end
     end
     if source.type == 'doc.vararg' then
         pushForward(noders, getID(source), getID(source.vararg))

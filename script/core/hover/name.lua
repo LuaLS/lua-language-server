@@ -21,7 +21,7 @@ end
 local function asField(source, oop)
     local class
     if source.node.type ~= 'getglobal' then
-        class = infer.getClass(source)
+        class = infer.getClass(source.node)
     end
     local node = class or guide.getKeyName(source.node) or '?'
     local method = guide.getKeyName(source)

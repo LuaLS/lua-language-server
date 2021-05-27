@@ -895,7 +895,7 @@ function m.compileNodes(source)
         m.compileNode(noders, src)
     end)
     -- Special rule: ('').XX -> stringlib.XX
-    pushForward(noders, 'str:', 'dn:stringlib')
+    pushBackward(noders, 'str:', 'dn:stringlib')
     return noders
 end
 

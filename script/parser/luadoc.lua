@@ -1183,6 +1183,10 @@ local function bindClassAndFields(binded)
     local class
     for _, doc in ipairs(binded) do
         if doc.type == 'doc.class' then
+            -- 多个class连续写在一起，只有最后一个class可以绑定source
+            if class then
+                class.bindSources = nil
+            end
             class = doc
         elseif doc.type == 'doc.field' then
             class.fields[#class.fields+1] = doc

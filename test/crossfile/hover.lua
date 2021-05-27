@@ -202,20 +202,20 @@ TEST {
         path = 'a.lua',
         content = [[
             t = {
-                [{}] = 1,
+                [1] = 1,
             }
         ]],
     },
     {
         path = 'b.lua',
         content = [[
-            <?t?>[{}] = 2
+            <?t?>[1] = 2
         ]]
     },
     hover = {
         label = [[
 global t: {
-    [table]: integer = 1|2,
+    [1]: integer = 1|2,
 }]],
         name = 't',
     },
@@ -226,20 +226,20 @@ TEST {
         path = 'a.lua',
         content = [[
             t = {
-                [{}] = 1,
+                [1] = 1,
             }
         ]],
     },
     {
         path = 'a.lua',
         content = [[
-            <?t?>[{}] = 2
+            <?t?>[1] = 2
         ]]
     },
     hover = {
         label = [[
 global t: {
-    [table]: integer = 2,
+    [1]: integer = 2,
 }]],
         name = 't',
     },
@@ -729,7 +729,7 @@ food.secondField = 2
 ]]
 },
 hover = {
-    label = 'field Food.firstField: integer = 0',
+    label = 'field Food.firstField: number = 0',
     name  = 'food.firstField',
 }}
 

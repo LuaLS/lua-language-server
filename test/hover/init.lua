@@ -1511,6 +1511,12 @@ TEST [[
 ---@field x string
 local t
 
+---@generic T
+---@param v T
+---@param message any
+---@return T
+local function assert(v, message) end
+
 local <?v?> = assert(t)
 ]]
 [[

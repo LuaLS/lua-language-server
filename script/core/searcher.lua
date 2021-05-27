@@ -548,7 +548,7 @@ local function getField(status, source, mode)
     end
 end
 
-local function searchAllGlobalByUri(status, mode, uri)
+local function searchAllGlobalByUri(status, mode, uri, name, fullID)
     local ast = files.getAst(uri)
     if not ast then
         return
@@ -556,12 +556,23 @@ local function searchAllGlobalByUri(status, mode, uri)
     local root = ast.ast
     noder.compileNodes(root)
     local noders = noder.getNoders(root)
-    for id, node in pairs(noders) do
-        if  node.sources
-        and id:sub(1, 2) == 'g:'
-        and not id:find(noder.SPLIT_CHAR) then
-            for _, source in ipairs(node.sources) do
-                m.pushResult(status, mode, source)
+    if fullID then
+        for id, node in pairs(noders) do
+            if  node.sources
+            and id == fullID then
+                for _, source in ipairs(node.sources) do
+                    m.pushResult(status, mode, source)
+                end
+            end
+        end
+    else
+        for id, node in pairs(noders) do
+            if  node.sources
+            and id:sub(1, 2) == 'g:'
+            and not id:find(noder.SPLIT_CHAR) then
+                for _, source in ipairs(node.sources) do
+                    m.pushResult(status, mode, source)
+                end
             end
         end
     end
@@ -571,16 +582,18 @@ local function searchAllGlobalByUri(status, mode, uri)
         for _, source in ipairs(node.sources) do
             if source.type == 'doc.class' then
                 for _, field in ipairs(source.fields) do
-                    m.pushResult(status, mode, field)
+                    if not name or name == guide.getKeyName(field) then
+                        m.pushResult(status, mode, field)
+                    end
                 end
             end
         end
     end
 end
 
-local function searchAllGlobals(status, mode)
+local function searchAllGlobals(status, mode, name, fullID)
     for uri in files.eachFile() do
-        searchAllGlobalByUri(status, mode, uri)
+        searchAllGlobalByUri(status, mode, uri, name, fullID)
     end
 end
 
@@ -609,7 +622,7 @@ function m.searchFields(status, source, mode, field)
     end
     log.debug('searchFields:', id, field)
     if field == '*' then
-        if source.special == '_G' then
+        if source == 'G' or source.special == '_G' then
             searchAllGlobals(status, mode)
         else
             local newStatus = m.status(status)
@@ -619,9 +632,10 @@ function m.searchFields(status, source, mode, field)
             end
         end
     else
-        if source.special == '_G' then
+        if source == 'G' or source.special == '_G' then
             local fullID = ('g:%q'):format(field)
-            m.searchRefsByID(status, uri, fullID, mode)
+            searchAllGlobals(status, mode, field, fullID)
+            --m.searchRefsByID(status, uri, fullID, mode)
         else
             local fullID = ('%s%s%q'):format(id, noder.SPLIT_CHAR, field)
             m.searchRefsByID(status, uri, fullID, mode)
@@ -651,7 +665,6 @@ end
 ---@param obj       parser.guide.object
 ---@param field?    string
 ---@return parser.guide.object[]
----@return integer
 function m.requestReference(obj, field)
     local status = m.status()
 
@@ -665,10 +678,9 @@ function m.requestReference(obj, field)
 end
 
 --- 请求对象的定义
----@param obj       parser.guide.object
+---@param obj       parser.guide.object|'"G"'
 ---@param field?    string
 ---@return parser.guide.object[]
----@return integer
 function m.requestDefinition(obj, field)
     local status = m.status()
 

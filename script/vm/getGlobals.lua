@@ -1,5 +1,6 @@
 local guide   = require 'parser.guide'
 local await   = require "await"
+local searcher = require "core.searcher"
 ---@type vm
 local vm      = require 'vm.vm'
 local files   = require 'files'

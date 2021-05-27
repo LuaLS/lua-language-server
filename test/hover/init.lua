@@ -923,7 +923,7 @@ field x: Class
 ]]
 
 TEST[[
----@type Class
+---@class Class
 local <?x?> = class()
 ]]
 [[
@@ -931,7 +931,7 @@ local x: Class
 ]]
 
 TEST[[
----@type Class
+---@class Class
 <?x?> = class()
 ]]
 [[
@@ -939,16 +939,10 @@ global x: Class
 ]]
 
 TEST[[
-local t = {
-    ---@type Class
-    <?x?> = class()
-}
-]]
-[[
-field x: Class
-]]
+---@class A
+---@class B
+---@class C
 
-TEST[[
 ---@type A|B|C
 local <?x?> = class()
 ]]
@@ -990,7 +984,7 @@ function f(t)
 end
 ]]
 [[
-local t: Class {}
+local t: Class
 ]]
 
 TEST [[

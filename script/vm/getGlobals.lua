@@ -18,12 +18,8 @@ local function getGlobalsOfFile(uri)
     end
     local globals = {}
     cache.globals = globals
-    local ast = files.getAst(uri)
-    if not ast then
-        return globals
-    end
     tracy.ZoneBeginN 'getGlobalsOfFile'
-    local results = guide.findGlobals(ast.ast)
+    local results = searcher.findGlobals(uri)
     local subscribe = ws.getCache 'globalSubscribe'
     subscribe[uri] = {}
     local mark = {}
@@ -60,12 +56,8 @@ local function getGlobalSetsOfFile(uri)
     end
     local globals = {}
     cache.globalSets = globals
-    local ast = files.getAst(uri)
-    if not ast then
-        return globals
-    end
     tracy.ZoneBeginN 'getGlobalSetsOfFile'
-    local results = guide.findGlobals(ast.ast)
+    local results = searcher.findGlobals(uri, 'def')
     local subscribe = ws.getCache 'globalSetsSubscribe'
     subscribe[uri] = {}
     local mark = {}
@@ -77,16 +69,14 @@ local function getGlobalSetsOfFile(uri)
             goto CONTINUE
         end
         mark[res] = true
-        if vm.isSet(res) then
-            local name = guide.getSimpleName(res)
-            if name then
-                if not globals[name] then
-                    globals[name] = {}
-                    subscribe[uri][#subscribe[uri]+1] = name
-                end
-                globals[name][#globals[name]+1] = res
-                globals['*'][#globals['*']+1] = res
+        local name = guide.getSimpleName(res)
+        if name then
+            if not globals[name] then
+                globals[name] = {}
+                subscribe[uri][#subscribe[uri]+1] = name
             end
+            globals[name][#globals[name]+1] = res
+            globals['*'][#globals['*']+1] = res
         end
         ::CONTINUE::
     end

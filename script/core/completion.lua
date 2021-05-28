@@ -323,7 +323,7 @@ local function checkModule(ast, word, offset, results)
         local fileName = path:match '[^/\\]*$'
         local stemName = fileName:gsub('%..+', '')
         if  not locals[stemName]
-        and #vm.getDefs('G', stemName) == 0
+        and #vm.getGlobalSets(stemName) == 0
         and not config.config.diagnostics.globals[stemName]
         and stemName:match '^[%a_][%w_]*$'
         and matchKey(word, stemName) then
@@ -541,16 +541,16 @@ end
 
 local function checkGlobal(ast, word, start, offset, parent, oop, results)
     local locals = guide.getVisibleLocals(ast.ast, offset)
-    local refs = vm.getDefs('G', '*')
+    local refs = vm.getGlobalSets '*'
     checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, results, locals, 'global')
 end
 
 local function checkField(ast, word, start, offset, parent, oop, results)
     if parent.tag == '_ENV' or parent.special == '_G' then
-        local refs = vm.getDefs('G', '*')
+        local refs = vm.getGlobalSets '*'
         checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, results)
     else
-        local refs = vm.getRefs(parent, '*')
+        local refs = vm.getGlobals '*'
         checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, results)
     end
 end

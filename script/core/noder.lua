@@ -888,7 +888,7 @@ function m.compileNodes(source)
     local root = guide.getRoot(source)
     local noders = m.getNoders(source)
     if next(noders) then
-        return
+        return noders
     end
     guide.eachSource(root, function (src)
         m.pushSource(noders, src)

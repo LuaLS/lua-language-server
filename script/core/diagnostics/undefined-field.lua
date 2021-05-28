@@ -47,7 +47,7 @@ return function (uri, callback)
                 elseif inferSource.type == 'doc.class.name' then
                     addTo(allDocClass, inferSource.parent)
                 elseif inferSource.type == 'doc.type.name' then
-                    local docTypes = vm.getDocTypes(inferSource[1])
+                    local docTypes = vm.getDocDefines(inferSource[1])
                     for _, docType in ipairs(docTypes) do
                         if docType.type == 'doc.class.name' then
                             addTo(allDocClass, docType.parent)

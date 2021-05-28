@@ -1,74 +1,32 @@
 local files    = require 'files'
-local util     = require 'utility'
 local guide    = require 'parser.guide'
 ---@type vm
 local vm       = require 'vm.vm'
 local config   = require 'config'
 local searcher = require 'core.searcher'
 
-local typeMap = {
-    ['doc.type.name']    = 'type',
-    ['doc.class.name']   = 'class',
-    ['doc.extends.name'] = 'extends',
-    ['doc.alias.name']   = 'alias',
-}
-
-local function getNamesOfFile(uri)
-    local names = {
-        type    = {},
-        class   = {},
-        extends = {},
-        alias   = {},
-    }
-    local ast = files.getAst(uri)
-    if not ast or not ast.ast.docs then
-        return names
+local function getDocDefinesInAst(results, root, name)
+    for _, doc in ipairs(root.docs) do
+        if doc.type == 'doc.class' then
+            if not name or name == doc.class[1] then
+                results[#results+1] = doc.class
+            end
+        elseif doc.type == 'doc.alias' then
+            if not name or name == doc.alias[1] then
+                results[#results+1] = doc.alias
+            end
+        end
     end
-    guide.eachSource(ast.ast.docs, function (src)
-        local type = typeMap[src.type]
-        if not type then
-            return
-        end
-        --if src.type == 'doc.type.name' then
-        --    if guide.getParentDocTypeTable(src) then
-        --        return
-        --    end
-        --end
-        local name = src[1]
-        if not name then
-            return
-        end
-        local list = names[type]
-        if not list[name] then
-            list[name] = {}
-        end
-        list[name][#list[name]+1] = src
-    end)
-    return names
 end
 
-local function getDocNames(name, type)
+---获取class与alias
+---@param name? string
+---@return parser.guide.object[]
+function vm.getDocDefines(name)
     local results = {}
-    if name == 'any'
-    or name == 'nil' then
-        return results
-    end
     for uri in files.eachFile() do
-        local cache = files.getCache(uri)
-        cache = cache or getNamesOfFile(uri)
-        if name == '*' then
-            for _, sources in util.sortPairs(cache[type]) do
-                for _, source in ipairs(sources) do
-                    results[#results+1] = source
-                end
-            end
-        else
-            if cache[type][name] then
-                for _, source in ipairs(cache[type][name]) do
-                    results[#results+1] = source
-                end
-            end
-        end
+        local ast = files.getAst(uri)
+        getDocDefinesInAst(results, ast.ast, name)
     end
     return results
 end
@@ -88,49 +46,6 @@ function vm.getDocEnums(doc)
     end
 
     return results
-end
-
-function vm.getDocTypeUnits(doc, mark, results)
-    if not doc then
-        return nil
-    end
-    mark = mark or {}
-    if mark[doc] then
-        return nil
-    end
-    mark[doc] = true
-    results = results or {}
-    for _, enum in ipairs(doc.enums) do
-        results[#results+1] = enum
-    end
-    for _, resume in ipairs(doc.resumes) do
-        results[#results+1] = resume
-    end
-    for _, unit in ipairs(doc.types) do
-        if unit.type == 'doc.type.name' then
-            for _, other in ipairs(vm.getDocTypes(unit[1])) do
-                if other.type == 'doc.alias.name' then
-                    vm.getDocTypeUnits(other.parent.extends, mark, results)
-                elseif other.type == 'doc.class.name' then
-                    results[#results+1] = other
-                end
-            end
-        else
-            results[#results+1] = unit
-        end
-    end
-    return results
-end
-
-function vm.getDocNames(name, type)
-    local cacheName = 'docNames:' .. type
-    local cache = vm.getCache(cacheName)[name]
-    if cache ~= nil then
-        return cache
-    end
-    cache = getDocNames(name, type)
-    vm.getCache(cacheName)[name] = cache
-    return cache
 end
 
 function vm.isMetaFile(uri)

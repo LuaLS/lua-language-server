@@ -3,17 +3,12 @@ local files        = require 'files'
 local searcher     = require 'core.searcher'
 local matchKey     = require 'core.matchkey'
 local vm           = require 'vm'
-local getLabel     = require 'core.hover.label'
 local getName      = require 'core.hover.name'
 local getArg       = require 'core.hover.arg'
-local getReturn    = require 'core.hover.return'
-local getDesc      = require 'core.hover.description'
 local getHover     = require 'core.hover'
 local config       = require 'config'
 local util         = require 'utility'
 local markdown     = require 'provider.markdown'
-local findSource   = require 'core.find-source'
-local await        = require 'await'
 local parser       = require 'parser'
 local keyWordMap   = require 'core.keyword'
 local workspace    = require 'workspace'
@@ -153,7 +148,7 @@ local function getSnip(source)
     end
     local defs = vm.getRefs(source)
     for _, def in ipairs(defs) do
-        def = guide.getObjectValue(def) or def
+        def = searcher.getObjectValue(def) or def
         if def ~= source and def.type == 'function' then
             local uri = guide.getUri(def)
             local text = files.getText(uri)
@@ -419,7 +414,7 @@ local function checkFieldFromFieldToIndex(name, parent, word, start, offset)
 end
 
 local function checkFieldThen(name, src, word, start, offset, parent, oop, results)
-    local value = guide.getObjectValue(src) or src
+    local value = searcher.getObjectValue(src) or src
     local kind = define.CompletionItemKind.Field
     if value.type == 'function'
     or value.type == 'doc.type.function' then
@@ -494,7 +489,7 @@ local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, res
         end
         local funcLabel
         if config.config.completion.showParams then
-            local value = guide.getObjectValue(src) or src
+            local value = searcher.getObjectValue(src) or src
             if value.type == 'function'
             or value.type == 'doc.type.function' then
                 funcLabel = name .. getParams(value, oop)
@@ -541,16 +536,16 @@ end
 
 local function checkGlobal(ast, word, start, offset, parent, oop, results)
     local locals = guide.getVisibleLocals(ast.ast, offset)
-    local refs = vm.getGlobalSets '*'
-    checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, results, locals, 'global')
+    local globals = vm.getGlobalSets '*'
+    checkFieldOfRefs(globals, ast, word, start, offset, parent, oop, results, locals, 'global')
 end
 
 local function checkField(ast, word, start, offset, parent, oop, results)
     if parent.tag == '_ENV' or parent.special == '_G' then
-        local refs = vm.getGlobalSets '*'
-        checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, results)
+        local globals = vm.getGlobalSets '*'
+        checkFieldOfRefs(globals, ast, word, start, offset, parent, oop, results)
     else
-        local refs = vm.getGlobals '*'
+        local refs = vm.getRefs(parent, '*')
         checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, results)
     end
 end
@@ -1076,7 +1071,7 @@ local function checkEqualEnumLeft(ast, text, offset, source, results)
             return src
         end
     end)
-    local infers = vm.getInfers(source, 0)
+    local infers = infer.searchAndViewInfers(source, 0)
     checkTypingEnum(ast, text, offset, infers, str, results)
 end
 
@@ -1276,17 +1271,6 @@ local function getCallEnums(source, index)
                         kind        = define.CompletionItemKind.EnumMember,
                     }
                 end
-                for _, unit in ipairs(vm.getDocTypeUnits(doc.extends) or {}) do
-                    if unit.type == 'doc.type.function' then
-                        local text = files.getText(guide.getUri(unit))
-                        enums[#enums+1] = {
-                            label       = text:sub(unit.start, unit.finish),
-                            description = doc.comment,
-                            kind        = define.CompletionItemKind.Function,
-                            insertText  = buildInsertDocFunction(unit),
-                        }
-                    end
-                end
                 return enums
             elseif doc.type == 'doc.vararg'
             and    arg.type == '...' then
@@ -1405,7 +1389,7 @@ local function checkTableLiteralFieldByCall(ast, text, offset, call, defs, index
         return
     end
     for _, def in ipairs(defs) do
-        local func = guide.getObjectValue(def) or def
+        local func = searcher.getObjectValue(def) or def
         local param = getFuncParamByCallIndex(func, index)
         if not param then
             goto CONTINUE
@@ -1435,7 +1419,7 @@ local function tryCallArg(ast, text, offset, results)
     end
     local defs = vm.getDefs(call.node)
     for _, def in ipairs(defs) do
-        def = guide.getObjectValue(def) or def
+        def = searcher.getObjectValue(def) or def
         local enums = getCallEnums(def, argIndex)
         if enums then
             mergeEnums(myResults, enums, arg)
@@ -1463,7 +1447,7 @@ local function tryTable(ast, text, offset, results)
     if source.type ~= 'table' then
         tbl = source.parent
     end
-    local defs = vm.getDefFields(tbl, 0)
+    local defs = vm.getDefs(tbl, '*')
     for _, field in ipairs(defs) do
         local name = guide.getKeyName(field)
         if name and not mark[name] then
@@ -1562,7 +1546,7 @@ end
 local function tryLuaDocBySource(ast, offset, source, results)
     if source.type == 'doc.extends.name' then
         if source.parent.type == 'doc.class' then
-            for _, doc in ipairs(vm.getDocTypes '*') do
+            for _, doc in ipairs(vm.getDocDefines()) do
                 if  doc.type == 'doc.class.name'
                 and doc.parent ~= source.parent
                 and matchKey(source[1], doc[1]) then
@@ -1580,7 +1564,7 @@ local function tryLuaDocBySource(ast, offset, source, results)
         end
         return true
     elseif source.type == 'doc.type.name' then
-        for _, doc in ipairs(vm.getDocTypes '*') do
+        for _, doc in ipairs(vm.getDocDefines()) do
             if  (doc.type == 'doc.class.name' or doc.type == 'doc.alias.name')
             and doc.parent ~= source.parent
             and matchKey(source[1], doc[1]) then
@@ -1654,7 +1638,7 @@ end
 
 local function tryLuaDocByErr(ast, offset, err, docState, results)
     if err.type == 'LUADOC_MISS_CLASS_EXTENDS_NAME' then
-        for _, doc in ipairs(vm.getDocTypes '*') do
+        for _, doc in ipairs(vm.getDocDefines()) do
             if  doc.type == 'doc.class.name'
             and doc.parent ~= docState then
                 results[#results+1] = {
@@ -1664,7 +1648,7 @@ local function tryLuaDocByErr(ast, offset, err, docState, results)
             end
         end
     elseif err.type == 'LUADOC_MISS_TYPE_NAME' then
-        for _, doc in ipairs(vm.getDocTypes '*') do
+        for _, doc in ipairs(vm.getDocDefines()) do
             if  (doc.type == 'doc.class.name' or doc.type == 'doc.alias.name') then
                 results[#results+1] = {
                     label       = doc[1],

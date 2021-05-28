@@ -314,7 +314,7 @@ local function ofLabel(source, newname, callback)
 end
 
 local function ofDocTypeName(source, newname, callback)
-    for _, doc in ipairs(vm.getDocTypes(source[1])) do
+    for _, doc in ipairs(vm.getDocDefines(source[1])) do
         if doc.type == 'doc.class.name'
         or doc.type == 'doc.type.name'
         or doc.type == 'doc.alias.name' then

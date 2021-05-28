@@ -39,7 +39,7 @@ return function (uri, callback)
                         end
                         if not mark[newName] then
                             mark[newName] = true
-                            local docs = vm.getDocTypes(newName)
+                            local docs = vm.getDocDefines(newName)
                             for _, otherDoc in ipairs(docs) do
                                 if otherDoc.type == 'doc.class.name' then
                                     list[#list+1] = otherDoc.parent

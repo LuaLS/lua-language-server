@@ -22,7 +22,7 @@ return function (uri, callback)
         if classCache[name] ~= nil then
             return classCache[name]
         end
-        local docs = vm.getDocTypes(name)
+        local docs = vm.getDocDefines(name)
         for _, otherDoc in ipairs(docs) do
             if otherDoc.type == 'doc.class.name'
             or otherDoc.type == 'doc.alias.name' then

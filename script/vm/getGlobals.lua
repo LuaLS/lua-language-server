@@ -31,7 +31,7 @@ local function getGlobalsOfFile(uri)
             goto CONTINUE
         end
         mark[res] = true
-        local name = guide.getSimpleName(res)
+        local name = guide.getKeyName(res)
         if name then
             if not globals[name] then
                 globals[name] = {}
@@ -69,7 +69,7 @@ local function getGlobalSetsOfFile(uri)
             goto CONTINUE
         end
         mark[res] = true
-        local name = guide.getSimpleName(res)
+        local name = guide.getKeyName(res)
         if name then
             if not globals[name] then
                 globals[name] = {}

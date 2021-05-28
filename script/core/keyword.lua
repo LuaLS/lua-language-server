@@ -1,6 +1,6 @@
 local define     = require 'proto.define'
-local searcher   = require 'core.searcher'
 local files      = require 'files'
+local guide      = require 'parser.guide'
 
 local keyWordMap = {
     {'do', function (info, results)
@@ -24,7 +24,7 @@ end",
         end
         return true
     end, function (info)
-        return searcher.eachSourceContain(info.ast.ast, info.start, function (source)
+        return guide.eachSourceContain(info.ast.ast, info.start, function (source)
             if source.type == 'while'
             or source.type == 'in'
             or source.type == 'loop' then
@@ -275,8 +275,8 @@ until $1"
         if first == 'end'
         or first == 'else'
         or first == 'elseif' then
-            local startRow  = searcher.positionOf(lines, info.start)
-            local finishRow = searcher.positionOf(lines, pos)
+            local startRow  = guide.positionOf(lines, info.start)
+            local finishRow = guide.positionOf(lines, pos)
             local startSp   = info.text:match('^%s*', lines[startRow].start)
             local finishSp  = info.text:match('^%s*', lines[finishRow].start)
             if startSp == finishSp then

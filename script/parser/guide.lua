@@ -873,6 +873,9 @@ function m.getKeyType(obj)
     elseif tp == 'dummy' then
         return 'string'
     end
+    if tp == 'doc.field.name' then
+        return 'string'
+    end
     return m.getKeyTypeOfLiteral(obj)
 end
 

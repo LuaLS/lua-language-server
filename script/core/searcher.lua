@@ -622,7 +622,7 @@ function m.searchFields(status, source, mode, field)
     else
         if source.special == '_G' then
             local fullID = ('g:%q'):format(field)
-            searchAllGlobals(status, mode, fullID)
+            m.searchRefsByID(status, uri, fullID, mode)
         else
             local fullID = ('%s%s%q'):format(id, noder.SPLIT_CHAR, field)
             m.searchRefsByID(status, uri, fullID, mode)

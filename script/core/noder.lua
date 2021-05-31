@@ -437,15 +437,20 @@ function m.compileNode(noders, source)
                 pushForward(noders, id, getID(src))
             end
         end
-        for _, typeUnit in ipairs(source.types) do
-            pushForward(noders, id, getID(typeUnit))
-            pushBackward(noders, getID(typeUnit), id)
-        end
         for _, enumUnit in ipairs(source.enums) do
             pushForward(noders, id, getID(enumUnit))
         end
         for _, resumeUnit in ipairs(source.resumes) do
             pushForward(noders, id, getID(resumeUnit))
+        end
+        for _, typeUnit in ipairs(source.types) do
+            local unitID = getID(typeUnit)
+            pushForward(noders, id, unitID)
+            if source.bindSources then
+                for _, src in ipairs(source.bindSources) do
+                    pushBackward(noders, unitID, getID(src))
+                end
+            end
         end
     end
     -- 分解 @alias
@@ -650,7 +655,9 @@ function m.compileNode(noders, source)
                             rtn.returnIndex
                         )
                         pushForward(noders, fullID, getID(rtn))
-                        pushBackward(noders, getID(rtn), fullID)
+                        for _, typeUnit in ipairs(rtn.types) do
+                            pushBackward(noders, getID(typeUnit), fullID)
+                        end
                         hasDocReturn[rtn.returnIndex] = true
                     end
                 end
@@ -896,6 +903,7 @@ function m.compileNodes(source)
     end)
     -- Special rule: ('').XX -> stringlib.XX
     pushBackward(noders, 'str:', 'dn:stringlib')
+    --pushBackward(noders, 'dn:string', 'dn:stringlib')
     return noders
 end
 

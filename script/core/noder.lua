@@ -464,7 +464,6 @@ function m.compileNode(noders, source)
         if source.extends then
             for _, ext in ipairs(source.extends) do
                 pushBackward(noders, id, getID(ext))
-                pushBackward(noders, getID(ext), id)
             end
         end
         if source.bindSources then
@@ -655,9 +654,6 @@ function m.compileNode(noders, source)
                             rtn.returnIndex
                         )
                         pushForward(noders, fullID, getID(rtn))
-                        for _, typeUnit in ipairs(rtn.types) do
-                            pushBackward(noders, getID(typeUnit), fullID)
-                        end
                         hasDocReturn[rtn.returnIndex] = true
                     end
                 end
@@ -743,7 +739,6 @@ function m.compileNode(noders, source)
             )
             local returnID = getID(rtn)
             pushForward(noders, closureID, returnID)
-            pushBackward(noders, returnID, closureID)
         end
     end
     if source.type == 'generic.value' then
@@ -903,7 +898,7 @@ function m.compileNodes(source)
     end)
     -- Special rule: ('').XX -> stringlib.XX
     pushBackward(noders, 'str:', 'dn:stringlib')
-    --pushBackward(noders, 'dn:string', 'dn:stringlib')
+    pushBackward(noders, 'dn:string', 'dn:stringlib')
     return noders
 end
 

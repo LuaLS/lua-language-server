@@ -49,11 +49,11 @@ local function asValue(source, title)
     local type    = infer.searchAndViewInfers(source)
     local literal = infer.searchAndViewLiterals(source)
     local cont
-    if  not infer.hasType(source, 'string', 0)
+    if  not infer.hasType(source, 'string')
     and not type:find('%[%]$')
     and not type:find('%w%<') then
         if #vm.getRefs(source, '*') > 0
-        or infer.hasType(source, 'table', 0) then
+        or infer.hasType(source, 'table') then
             cont = buildTable(source)
         end
     end

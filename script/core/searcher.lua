@@ -227,7 +227,7 @@ function m.searchRefsByID(status, uri, expect, mode)
             mark[id] = cmark
         end
         log.debug('search:', id, field)
-        if field then
+        if  field then
             if cmark[field] then
                 return
             end
@@ -354,7 +354,7 @@ function m.searchRefsByID(status, uri, expect, mode)
     end
 
     local function checkBackward(id, node, field)
-        if mode ~= 'ref' and not field or ignoredIDs[id] then
+        if mode ~= 'ref' and not field then
             return
         end
         for _, backwardID in ipairs(node.backward) do

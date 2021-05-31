@@ -24,7 +24,7 @@ local ignoredIDs = {
 
 local m = {}
 
----@alias guide.searchmode '"ref"'|'"def"'|'"field"'
+---@alias guide.searchmode '"ref"'|'"def"'
 
 ---添加结果
 ---@param status guide.status
@@ -227,7 +227,7 @@ function m.searchRefsByID(status, uri, expect, mode)
             mark[id] = cmark
         end
         log.debug('search:', id, field)
-        if  field then
+        if field then
             if cmark[field] then
                 return
             end
@@ -456,11 +456,23 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
     end
 
+    local function checkCrossUri(id, field)
+        local targetUri, newID = noder.getUriAndID(id)
+        if not targetUri then
+            return false
+        end
+        crossSearch(status, targetUri, newID .. (field or ''), mode)
+        return true
+    end
+
     local stepCount = 0
     function searchStep(id, field)
         stepCount = stepCount + 1
         if stepCount > 1000 then
             error('too large')
+        end
+        if checkCrossUri(id, field) then
+            return
         end
         local node = noder.getNodeByID(root, id)
         if node then

@@ -8,9 +8,11 @@ local LAST_REGEX     = SPLIT_CHAR .. '[^' .. SPLIT_CHAR .. ']*$'
 local FIRST_REGEX    = '^[^' .. SPLIT_CHAR .. ']*'
 local ANY_FIELD_CHAR = '*'
 local RETURN_INDEX   = SPLIT_CHAR .. '#'
-local PARAM_INDEX    = SPLIT_CHAR .. '@'
+local PARAM_INDEX    = SPLIT_CHAR .. '&'
 local TABLE_KEY      = SPLIT_CHAR .. '<'
 local ANY_FIELD      = SPLIT_CHAR .. ANY_FIELD_CHAR
+local URI_CHAR       = '@'
+local URI_REGEX      = URI_CHAR .. '([^' .. URI_CHAR .. ']*)' .. URI_CHAR .. '(.*)'
 
 ---@class node
 -- 当前节点的id
@@ -253,7 +255,11 @@ local function checkMode(source)
         return 'gc:'
     end
     if source.type == 'generic.value' then
-        return 'gv:'
+        local id = 'gv:'
+        if guide.getUri(source.closure.call) ~= guide.getUri(source.proto) then
+            id = URI_CHAR .. guide.getUri(source.closure.call) .. URI_CHAR .. id
+        end
+        return id
     end
     if isGlobal(source) then
         return 'g:'
@@ -834,6 +840,15 @@ function m.getLastID(id)
     end
     LastIDCache[id] = lastID
     return lastID
+end
+
+---把形如 `@file:\\\XXXXX@gv:1|1`拆分成uri与id
+---@param id string
+---@return uri? string
+---@return string id
+function m.getUriAndID(id)
+    local uri, newID = id:match(URI_REGEX)
+    return uri, newID
 end
 
 ---是否是全局变量（包括 _G.XXX 形式）

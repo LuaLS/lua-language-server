@@ -1040,14 +1040,14 @@ local function mergeEnums(a, b, source)
     end
 end
 
-local function checkTypingEnum(ast, text, offset, infers, str, results)
+local function checkTypingEnum(ast, text, offset, defs, str, results)
     local enums = {}
-    for _, infer in ipairs(infers) do
-        if infer.source.type == 'doc.type.enum'
-        or infer.source.type == 'doc.resume' then
+    for _, def in ipairs(defs) do
+        if def.type == 'doc.type.enum'
+        or def.type == 'doc.resume' then
             enums[#enums+1] = {
-                label       = infer.source[1],
-                description = infer.source.comment and infer.source.comment.text,
+                label       = def[1],
+                description = def.comment and def.comment.text,
                 kind        = define.CompletionItemKind.EnumMember,
             }
         end
@@ -1071,8 +1071,8 @@ local function checkEqualEnumLeft(ast, text, offset, source, results)
             return src
         end
     end)
-    local infers = infer.searchAndViewInfers(source)
-    checkTypingEnum(ast, text, offset, infers, str, results)
+    local defs = vm.getDefs(source)
+    checkTypingEnum(ast, text, offset, defs, str, results)
 end
 
 local function checkEqualEnum(ast, text, offset, results)

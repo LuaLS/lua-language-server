@@ -477,7 +477,7 @@ function m.compileNode(noders, source)
                     key
                 )
                 pushForward(noders, keyID, getID(field.field))
-                pushBackward(noders, getID(field.field), keyID)
+                pushForward(noders, getID(field.field), keyID)
                 pushForward(noders, keyID, getID(field.extends))
                 pushBackward(noders, getID(field.extends), keyID)
             end

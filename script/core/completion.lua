@@ -132,8 +132,8 @@ local function buildFunctionSnip(source, value, oop)
 end
 
 local function buildDetail(source)
-    local types = infer.searchAndViewInfers(source, 0)
-    local literals = infer.searchAndViewLiterals(source, 0)
+    local types = infer.searchAndViewInfers(source)
+    local literals = infer.searchAndViewLiterals(source)
     if literals then
         return types .. ' = ' .. literals
     else
@@ -1071,7 +1071,7 @@ local function checkEqualEnumLeft(ast, text, offset, source, results)
             return src
         end
     end)
-    local infers = infer.searchAndViewInfers(source, 0)
+    local infers = infer.searchAndViewInfers(source)
     checkTypingEnum(ast, text, offset, infers, str, results)
 end
 

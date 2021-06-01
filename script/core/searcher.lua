@@ -349,7 +349,12 @@ function m.searchRefsByID(status, uri, expect, mode)
 
     local function checkForward(id, node, field)
         for _, forwardID in ipairs(node.forward) do
-            searchID(forwardID, field)
+            local targetUri, targetID = noder.getUriAndID(forwardID)
+            if targetUri and not files.eq(targetUri, uri) then
+                crossSearch(status, targetUri, targetID .. (field or ''), mode)
+            else
+                searchID(targetID or forwardID, field)
+            end
         end
     end
 
@@ -358,7 +363,12 @@ function m.searchRefsByID(status, uri, expect, mode)
             return
         end
         for _, backwardID in ipairs(node.backward) do
-            searchID(backwardID, field)
+            local targetUri, targetID = noder.getUriAndID(backwardID)
+            if targetUri and not files.eq(targetUri, uri) then
+                crossSearch(status, targetUri, targetID .. (field or ''), mode)
+            else
+                searchID(targetID or backwardID, field)
+            end
         end
     end
 
@@ -470,9 +480,6 @@ function m.searchRefsByID(status, uri, expect, mode)
         stepCount = stepCount + 1
         if stepCount > 1000 then
             error('too large')
-        end
-        if checkCrossUri(id, field) then
-            return
         end
         local node = noder.getNodeByID(root, id)
         if node then

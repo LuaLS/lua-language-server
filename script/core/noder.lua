@@ -257,7 +257,7 @@ local function checkMode(source)
     if source.type == 'generic.value' then
         local id = 'gv:'
         if guide.getUri(source.closure.call) ~= guide.getUri(source.proto) then
-            id = URI_CHAR .. guide.getUri(source.closure.call) .. URI_CHAR .. id
+            id = id .. URI_CHAR .. guide.getUri(source.closure.call)
         end
         return id
     end
@@ -374,6 +374,7 @@ m.RETURN_INDEX = RETURN_INDEX
 m.PARAM_INDEX  = PARAM_INDEX
 m.TABLE_KEY    = TABLE_KEY
 m.ANY_FIELD    = ANY_FIELD
+m.URI_CHAR     = URI_CHAR
 
 --- 寻找doc的主体
 ---@param obj parser.guide.object

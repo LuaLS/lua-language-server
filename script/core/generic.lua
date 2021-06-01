@@ -1,4 +1,6 @@
+local guide = require 'parser.guide'
 local noder = require "core.noder"
+
 ---@class generic.value
 ---@field type string
 ---@field closure generic.closure
@@ -143,6 +145,9 @@ local function buildValue(road, key, proto, param, upvalues)
     if not paramID then
         return
     end
+    local myUri = guide.getUri(param)
+    local myHead = noder.URI_CHAR .. myUri .. noder.URI_CHAR
+    paramID = myHead .. paramID
     if not upvalues[key] then
         upvalues[key] = {}
     end

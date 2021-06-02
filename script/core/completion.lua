@@ -1454,7 +1454,8 @@ local function tryTable(ast, text, offset, results)
     if source.type ~= 'table' then
         tbl = source.parent
     end
-    local defs = vm.getDefs(tbl, '*')
+    local parent = tbl.parent
+    local defs = vm.getDefs(parent, '*')
     for _, field in ipairs(defs) do
         local name = guide.getKeyName(field)
         if name and not mark[name] then

@@ -685,6 +685,9 @@ function m.compileNode(noders, source)
                 if doc.type == 'doc.generic' then
                     source.isGeneric = true
                 end
+                if doc.type == 'doc.overload' then
+                    pushForward(noders, id, getID(doc.overload))
+                end
             end
         end
         -- 检查实体返回值

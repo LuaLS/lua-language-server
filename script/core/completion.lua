@@ -1244,7 +1244,30 @@ function (%s)\
 end"):format(table.concat(args, ', '))
 end
 
-local function getCallEnums(source, index)
+local function pushCallEnumsAndFuncs(defs)
+    local results = {}
+    for _, def in ipairs(defs) do
+        if def.type == 'doc.type.enum'
+        or def.type == 'doc.resume' then
+            results[#results+1] = {
+                label       = def[1],
+                description = def.comment,
+                kind        = define.CompletionItemKind.EnumMember,
+            }
+        end
+        if def.type == 'doc.type.function' then
+            results[#results+1] = {
+                label       = infer.viewDocFunction(def),
+                description = def.comment,
+                kind        = define.CompletionItemKind.Function,
+                insertText  = buildInsertDocFunction(def),
+            }
+        end
+    end
+    return results
+end
+
+local function getCallEnumsAndFuncs(source, index)
     if source.type == 'function' and source.bindDocs then
         if not source.args then
             return
@@ -1263,26 +1286,10 @@ local function getCallEnums(source, index)
         for _, doc in ipairs(source.bindDocs) do
             if  doc.type == 'doc.param'
             and doc.param[1] == arg[1] then
-                local enums = {}
-                for _, enum in ipairs(vm.getDocEnums(doc.extends)) do
-                    enums[#enums+1] = {
-                        label       = enum[1],
-                        description = enum.comment,
-                        kind        = define.CompletionItemKind.EnumMember,
-                    }
-                end
-                return enums
+                return pushCallEnumsAndFuncs(vm.getDefs(doc.extends))
             elseif doc.type == 'doc.vararg'
             and    arg.type == '...' then
-                local enums = {}
-                for _, enum in ipairs(vm.getDocEnums(doc.vararg)) do
-                    enums[#enums+1] = {
-                        label       = enum[1],
-                        description = enum.comment,
-                        kind        = define.CompletionItemKind.EnumMember,
-                    }
-                end
-                return enums
+                return pushCallEnumsAndFuncs(vm.getDefs(doc.vararg))
             end
         end
     end
@@ -1420,7 +1427,7 @@ local function tryCallArg(ast, text, offset, results)
     local defs = vm.getDefs(call.node)
     for _, def in ipairs(defs) do
         def = searcher.getObjectValue(def) or def
-        local enums = getCallEnums(def, argIndex)
+        local enums = getCallEnumsAndFuncs(def, argIndex)
         if enums then
             mergeEnums(myResults, enums, arg)
         end

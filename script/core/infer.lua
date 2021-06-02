@@ -365,6 +365,25 @@ function m.getDocName(doc)
     end
 end
 
+function m.viewDocFunction(doc)
+    if doc.type ~= 'doc.type.function' then
+        return ''
+    end
+    local args = {}
+    for i, arg in ipairs(doc.args) do
+        args[i] = ('%s: %s'):format(arg.name[1], m.viewDocName(arg.extends))
+    end
+    local label = ('fun(%s)'):format(table.concat(args, ', '))
+    if #doc.returns > 0 then
+        local returns = {}
+        for i, rtn in ipairs(doc.returns) do
+            returns[i] = m.viewDocName(rtn)
+        end
+        label = ('%s:%s'):format(label, table.concat(returns))
+    end
+    return label
+end
+
 ---显示对象的推断类型
 ---@param source parser.guide.object
 ---@return string

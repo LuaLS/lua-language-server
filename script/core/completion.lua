@@ -1401,7 +1401,7 @@ local function checkTableLiteralFieldByCall(ast, text, offset, call, defs, index
         if not param then
             goto CONTINUE
         end
-        local defs = vm.getDefFields(param, 0)
+        local defs = vm.getDefs(param, '*')
         for _, field in ipairs(defs) do
             local name = guide.getKeyName(field)
             if name and not mark[name] then
@@ -1728,14 +1728,14 @@ local function buildLuaDocOfFunction(func)
     local returns = {}
     if func.args then
         for _, arg in ipairs(func.args) do
-            args[#args+1] = vm.getInferType(arg)
+            args[#args+1] = infer.searchAndViewInfers(arg)
         end
     end
     if func.returns then
         for _, rtns in ipairs(func.returns) do
             for n = 1, #rtns do
                 if not returns[n] then
-                    returns[n] = vm.getInferType(rtns[n])
+                    returns[n] = infer.searchAndViewInfers(rtns[n])
                 end
             end
         end

@@ -65,7 +65,7 @@ return function (uri, callback)
         local empty = true
         for _, docClass in ipairs(allDocClass) do
             tracy.ZoneBeginN('undefined-field getDefFields')
-            local refs = vm.getDefFields(docClass)
+            local refs = vm.getDefs(docClass, '*')
             tracy.ZoneEnd()
 
             for _, ref in ipairs(refs) do

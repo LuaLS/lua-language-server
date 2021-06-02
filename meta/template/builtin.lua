@@ -1,6 +1,7 @@
 ---@meta
 
----@class any
+---@class unknown
+---@class any: unknown
 ---@class nil: any
 ---@class boolean: any
 ---@class number: any

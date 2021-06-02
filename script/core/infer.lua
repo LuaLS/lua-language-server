@@ -216,6 +216,7 @@ end
 local function cleanInfers(infers)
     local version = config.config.runtime.version
     local enableInteger = version == 'Lua 5.3' or version == 'Lua 5.4'
+    infers['unknown'] = nil
     if infers['any'] and infers['nil'] then
         infers['nil'] = nil
     end
@@ -403,7 +404,9 @@ local function searchInfer(source, infers)
     local docName = m.getDocName(source)
     if docName then
         infers[docName] = true
-        infers[CLASS]   = true
+        if docName ~= 'unknown' then
+            infers[CLASS]   = true
+        end
         if docName == 'table' then
             infers[TABLE] = true
         end

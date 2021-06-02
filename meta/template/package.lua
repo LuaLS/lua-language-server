@@ -3,13 +3,13 @@
 ---#if VERSION >=5.4 then
 ---#DES 'require>5.4'
 ---@param modname string
----@return any
----@return any loaderdata
+---@return unknown
+---@return unknown loaderdata
 function require(modname) end
 ---#else
 ---#DES 'require<5.3'
 ---@param modname string
----@return any
+---@return unknown
 function require(modname) end
 ---#end
 

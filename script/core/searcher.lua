@@ -9,6 +9,7 @@ local NONE = {'NONE'}
 local LAST = {'LAST'}
 
 local ignoredIDs = {
+    ['dn:unknown']       = true,
     ['dn:nil']           = true,
     ['dn:any']           = true,
     ['dn:boolean']       = true,

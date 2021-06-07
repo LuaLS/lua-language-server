@@ -87,35 +87,36 @@ return function (uri, callback)
     end
 
     local function checkUndefinedField(src)
-        local fieldName = guide.getKeyName(src)
-
-        local allDocClass = getAllDocClassFromInfer(src.node)
-        if (not allDocClass) or (#allDocClass == 0) then
+        if #vm.getDefs(src) > 0 then
             return
         end
-
-        local fields = getAllFieldsFromAllDocClass(allDocClass)
-
-        -- 没找到任何 field，跳过检查
-        if not fields then
-            return
-        end
-
-        if not fields[fieldName] then
-            local message = lang.script('DIAG_UNDEF_FIELD', fieldName)
-            if src.type == 'getfield' and src.field then
-                callback {
-                    start   = src.field.start,
-                    finish  = src.field.finish,
-                    message = message,
-                }
-            elseif src.type == 'getmethod' and src.method then
-                callback {
-                    start   = src.method.start,
-                    finish  = src.method.finish,
-                    message = message,
-                }
+        local node = src.node
+        if node then
+            local defs = vm.getDefs(node)
+            local ok
+            for _, def in ipairs(defs) do
+                if def.type == 'doc.class.name' then
+                    ok = true
+                    break
+                end
             end
+            if not ok then
+                return
+            end
+        end
+        local message = lang.script('DIAG_UNDEF_FIELD', guide.getKeyName(src))
+        if src.type == 'getfield' and src.field then
+            callback {
+                start   = src.field.start,
+                finish  = src.field.finish,
+                message = message,
+            }
+        elseif src.type == 'getmethod' and src.method then
+            callback {
+                start   = src.method.start,
+                finish  = src.method.finish,
+                message = message,
+            }
         end
     end
     guide.eachSourceType(ast.ast, 'getfield', checkUndefinedField);

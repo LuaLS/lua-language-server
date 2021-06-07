@@ -72,7 +72,12 @@ local function getKey(source)
         return tostring(source.node.start), nil
     elseif source.type == 'setglobal'
     or     source.type == 'getglobal' then
-        return ('%q'):format(source[1] or ''), nil
+        local node = source.node
+        if node.tag == '_ENV' then
+            return ('%q'):format(source[1] or ''), nil
+        else
+            return ('%q'):format(source[1] or ''), node
+        end
     elseif source.type == 'getfield'
     or     source.type == 'setfield' then
         return ('%q'):format(source.field and source.field[1] or ''), source.node

@@ -29,6 +29,10 @@ return function (uri, callback)
         if config.config.runtime.special[key] then
             return
         end
+        local node = src.node
+        if node.tag ~= '_ENV' then
+            return
+        end
         if #vm.getDefs(src) == 0 then
             local message = lang.script('DIAG_UNDEF_GLOBAL', key)
             if requireLike[key:lower()] then

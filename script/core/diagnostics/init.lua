@@ -62,13 +62,10 @@ local function check(uri, name, results)
 end
 
 return function (uri, response)
-    local vm  = require 'vm'
     local ast = files.getAst(uri)
     if not ast then
         return nil
     end
-
-    local isOpen = files.isOpen(uri)
 
     for _, name in ipairs(diagList) do
         await.delay()

@@ -306,6 +306,11 @@ local function getID(source)
         end
         current = node
         if current.special == '_G' then
+            for i = index, 2, -1 do
+                if IDList[i] == '"_G"' then
+                    IDList[i] = nil
+                end
+            end
             break
         end
         ::CONTINUE::

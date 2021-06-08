@@ -18,7 +18,7 @@ end
 
 function TEST(oldName, newName)
     return function (oldScript)
-        return function (newScript)
+        return function (expectScript)
             files.removeAll()
             files.setText('', oldScript)
             local pos = oldScript:find('[^%w_]'..oldName..'[^%w_]')
@@ -29,7 +29,7 @@ function TEST(oldName, newName)
             if positions then
                 script = replace(script, positions)
             end
-            assert(script == newScript)
+            assert(script == expectScript)
         end
     end
 end

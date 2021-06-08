@@ -3,11 +3,12 @@ local searcher   = require 'core.searcher'
 local vm         = require 'vm'
 local hoverLabel = require 'core.hover.label'
 local hoverDesc  = require 'core.hover.description'
+local guide      = require 'parser.guide'
 
 local function findNearCall(uri, ast, pos)
     local text = files.getText(uri)
     local nearCall
-    searcher.eachSourceContain(ast.ast, pos, function (src)
+    guide.eachSourceContain(ast.ast, pos, function (src)
         if src.type == 'call'
         or src.type == 'table'
         or src.type == 'function' then

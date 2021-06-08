@@ -1,10 +1,9 @@
 local files    = require 'files'
 local lang     = require 'language'
-local define   = require 'proto.define'
-local searcher = require 'core.searcher'
 local util     = require 'utility'
 local sp       = require 'bee.subprocess'
 local vm       = require 'vm'
+local guide    = require "parser.guide"
 
 local function checkDisableByLuaDocExits(uri, row, mode, code)
     local lines = files.getLines(uri)
@@ -59,7 +58,7 @@ end
 
 local function disableDiagnostic(uri, code, start, results)
     local lines = files.getLines(uri)
-    local row   = searcher.positionOf(lines, start)
+    local row   = guide.positionOf(lines, start)
     results[#results+1] = {
         title   = lang.script('ACTION_DISABLE_DIAG', code),
         kind    = 'quickfix',
@@ -137,12 +136,12 @@ end
 local function solveUndefinedGlobal(uri, diag, results)
     local ast    = files.getAst(uri)
     local offset = files.offsetOfWord(uri, diag.range.start)
-    searcher.eachSourceContain(ast.ast, offset, function (source)
+    guide.eachSourceContain(ast.ast, offset, function (source)
         if source.type ~= 'getglobal' then
             return
         end
 
-        local name = searcher.getKeyName(source)
+        local name = guide.getKeyName(source)
         markGlobal(uri, name, results)
     end)
 
@@ -156,12 +155,12 @@ end
 local function solveLowercaseGlobal(uri, diag, results)
     local ast    = files.getAst(uri)
     local offset = files.offsetOfWord(uri, diag.range.start)
-    searcher.eachSourceContain(ast.ast, offset, function (source)
+    guide.eachSourceContain(ast.ast, offset, function (source)
         if source.type ~= 'setglobal' then
             return
         end
 
-        local name = searcher.getKeyName(source)
+        local name = guide.getKeyName(source)
         markGlobal(uri, name, results)
     end)
 end
@@ -357,7 +356,7 @@ local function checkSwapParams(results, uri, start, finish)
         return
     end
     local args = {}
-    searcher.eachSourceBetween(ast.ast, start, finish, function (source)
+    guide.eachSourceBetween(ast.ast, start, finish, function (source)
         if source.type == 'callargs'
         or source.type == 'funcargs' then
             local targetIndex

@@ -2,6 +2,7 @@ local files    = require 'files'
 local searcher = require 'core.searcher'
 local lang     = require 'language'
 local vm       = require 'vm'
+local guide    = require 'parser.guide'
 
 return function (uri, callback)
     local state = files.getAst(uri)
@@ -17,7 +18,7 @@ return function (uri, callback)
     for _, doc in ipairs(state.ast.docs) do
         if doc.type == 'doc.class'
         or doc.type == 'doc.alias' then
-            local name = searcher.getKeyName(doc)
+            local name = guide.getKeyName(doc)
             if not cache[name] then
                 local docs = vm.getDocDefines(name)
                 cache[name] = {}

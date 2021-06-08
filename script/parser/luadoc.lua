@@ -1189,8 +1189,10 @@ local function bindClassAndFields(binded)
             end
             class = doc
         elseif doc.type == 'doc.field' then
-            class.fields[#class.fields+1] = doc
-            doc.class = class
+            if class then
+                class.fields[#class.fields+1] = doc
+                doc.class = class
+            end
         end
     end
 end

@@ -5,6 +5,13 @@ local config  = require 'config'
 local guide   = require 'parser.guide'
 local define  = require 'proto.define'
 
+local SkipCheckClass = {
+    ['unknown'] = true,
+    ['any']     = true,
+    ['table']   = true,
+    ['nil']     = true,
+}
+
 return function (uri, callback)
     local ast = files.getAst(uri)
     if not ast then
@@ -95,7 +102,8 @@ return function (uri, callback)
             local defs = vm.getDefs(node)
             local ok
             for _, def in ipairs(defs) do
-                if def.type == 'doc.class.name' then
+                if  def.type == 'doc.class.name'
+                and not SkipCheckClass[def[1]] then
                     ok = true
                     break
                 end

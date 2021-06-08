@@ -47,7 +47,7 @@ return function (uri, callback)
             end
             local blocks = {}
             for _, value in ipairs(values) do
-                local block = searcher.getBlock(value)
+                local block = guide.getBlock(value)
                 if not blocks[block] then
                     blocks[block] = {}
                 end

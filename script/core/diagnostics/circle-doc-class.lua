@@ -2,6 +2,7 @@ local files    = require 'files'
 local searcher = require 'core.searcher'
 local lang     = require 'language'
 local vm       = require 'vm'
+local guide    = require 'parser.guide'
 
 return function (uri, callback)
     local state = files.getAst(uri)
@@ -18,7 +19,7 @@ return function (uri, callback)
             if not doc.extends then
                 goto CONTINUE
             end
-            local myName = searcher.getKeyName(doc)
+            local myName = guide.getKeyName(doc)
             local list = { doc }
             local mark = {}
             for i = 1, 999 do

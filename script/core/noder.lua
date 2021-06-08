@@ -197,6 +197,10 @@ local function checkMode(source)
     if source.type == 'call' then
         return 'c:'
     end
+    if source.type == '...'
+    or source.type == 'varargs' then
+        return 'va:'
+    end
     if source.type == 'doc.class.name'
     or source.type == 'doc.type.name'
     or source.type == 'doc.alias.name'

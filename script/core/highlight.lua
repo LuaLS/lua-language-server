@@ -4,25 +4,12 @@ local vm         = require 'vm'
 local define     = require 'proto.define'
 local findSource = require 'core.find-source'
 local util       = require 'utility'
+local guide      = require 'parser.guide'
 
 local function eachRef(source, callback)
     local results = searcher.requestReference(source)
     for i = 1, #results do
         callback(results[i])
-    end
-end
-
-local function eachField(source, callback)
-    if not source then
-        return
-    end
-    local isGlobal = searcher.isGlobal(source)
-    local results = searcher.requestReference(source)
-    for i = 1, #results do
-        local res = results[i]
-        if isGlobal == searcher.isGlobal(res) then
-            callback(res)
-        end
     end
 end
 
@@ -43,21 +30,21 @@ local function find(source, uri, callback)
         eachLocal(source.node, callback)
     elseif source.type == 'field'
     or     source.type == 'method' then
-        eachField(source.parent, callback)
+        eachRef(source.parent, callback)
     elseif source.type == 'getindex'
     or     source.type == 'setindex'
     or     source.type == 'tableindex' then
-        eachField(source, callback)
+        eachRef(source, callback)
     elseif source.type == 'setglobal'
     or     source.type == 'getglobal' then
-        eachField(source, callback)
+        eachRef(source, callback)
     elseif source.type == 'goto'
     or     source.type == 'label' then
         eachRef(source, callback)
     elseif source.type == 'string'
     and    source.parent
     and    source.parent.index == source then
-        eachField(source.parent, callback)
+        eachRef(source.parent, callback)
     elseif source.type == 'string'
     or     source.type == 'boolean'
     or     source.type == 'number'
@@ -107,7 +94,7 @@ local function makeIf(source, text, callback)
 end
 
 local function findKeyWord(ast, text, offset, callback)
-    searcher.eachSourceContain(ast.ast, offset, function (source)
+    guide.eachSourceContain(ast.ast, offset, function (source)
         if source.type == 'do'
         or source.type == 'function'
         or source.type == 'loop'
@@ -238,6 +225,16 @@ local accept = {
     ['nil']        = true,
 }
 
+local function isLiteralValue(source)
+    if not guide.isLiteral(source) then
+        return false
+    end
+    if source.parent.index == source then
+        return false
+    end
+    return true
+end
+
 return function (uri, offset)
     local ast = files.getAst(uri)
     if not ast then
@@ -249,8 +246,23 @@ return function (uri, offset)
 
     local source = findSource(ast, offset, accept)
     if source then
+        local isGlobal  = guide.isGlobal(source)
+        local isLiteral = isLiteralValue(source)
         find(source, uri, function (target)
+            if not target then
+                return
+            end
             if target.dummy then
+                return
+            end
+            if mark[target] then
+                return
+            end
+            mark[target] = true
+            if isGlobal ~= guide.isGlobal(target) then
+                return
+            end
+            if isLiteral ~= isLiteralValue(target) then
                 return
             end
             local kind
@@ -315,13 +327,6 @@ return function (uri, offset)
             else
                 return
             end
-            if not target then
-                return
-            end
-            if mark[target] then
-                return
-            end
-            mark[target] = true
             results[#results+1] = {
                 start  = target.start,
                 finish = target.finish,

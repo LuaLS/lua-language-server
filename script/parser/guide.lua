@@ -968,4 +968,23 @@ function m.getPath(a, b, sameFunction)
     return mode, resultA, resultB
 end
 
+---是否是全局变量（包括 _G.XXX 形式）
+---@param source parser.guide.object
+---@return boolean
+function m.isGlobal(source)
+    if source.type == 'setglobal'
+    or source.type == 'getglobal' then
+        if source.node and source.node.tag == '_ENV' then
+            return true
+        end
+    end
+    if source.type == 'field' then
+        source = source.parent
+    end
+    if source.special == '_G' then
+        return true
+    end
+    return false
+end
+
 return m

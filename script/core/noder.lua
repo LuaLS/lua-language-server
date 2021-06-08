@@ -41,25 +41,6 @@ local function getNode(noders, id)
     return noders[id]
 end
 
----是否是全局变量（包括 _G.XXX 形式）
----@param source parser.guide.object
----@return boolean
-local function isGlobal(source)
-    if source.type == 'setglobal'
-    or source.type == 'getglobal' then
-        if source.node and source.node.tag == '_ENV' then
-            return true
-        end
-    end
-    if source.type == 'field' then
-        source = source.parent
-    end
-    if source.special == '_G' then
-        return true
-    end
-    return false
-end
-
 ---获取语法树单元的key
 ---@param source parser.guide.object
 ---@return string? key
@@ -266,7 +247,7 @@ local function checkMode(source)
         end
         return id
     end
-    if isGlobal(source) then
+    if guide.isGlobal(source) then
         return 'g:'
     end
     return 'l:'
@@ -863,13 +844,6 @@ end
 function m.getUriAndID(id)
     local uri, newID = id:match(URI_REGEX)
     return uri, newID
-end
-
----是否是全局变量（包括 _G.XXX 形式）
----@param source parser.guide.object
----@return boolean
-function m.isGlobal(source)
-    return isGlobal(source)
 end
 
 ---获取source的ID

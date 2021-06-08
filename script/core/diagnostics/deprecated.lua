@@ -34,7 +34,7 @@ return function (uri, callback)
 
         await.delay()
 
-        if not vm.isDeprecated(src, 0) then
+        if not vm.isDeprecated(src, true) then
             return
         end
 

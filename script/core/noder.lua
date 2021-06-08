@@ -192,7 +192,7 @@ local function checkMode(source)
     or source.type == 'integer'
     or source.type == 'boolean'
     or source.type == 'nil' then
-        return 'l:'
+        return 'i:'
     end
     if source.type == 'call' then
         return 'c:'
@@ -249,6 +249,13 @@ local function checkMode(source)
     end
     if guide.isGlobal(source) then
         return 'g:'
+    end
+    if source.type == 'getlocal'
+    or source.type == 'setlocal' then
+        source = source.node
+    end
+    if source.parent.type == 'funcargs' then
+        return 'p:'
     end
     return 'l:'
 end
@@ -407,10 +414,17 @@ end
 ---@return parser.guide.object[]
 function m.compileNode(noders, source)
     local id = getID(source)
-    if source.value then
-        -- x = y : x -> y
-        pushForward(noders, id, getID(source.value))
-        pushBackward(noders, getID(source.value), id)
+    local value = source.value
+    if value then
+        local valueID = getID(value)
+        if valueID then
+            -- x = y : x -> y
+            pushForward(noders, id, valueID)
+            -- 参数禁止反向查找赋值
+            if valueID:sub(1, 2) ~= 'p:' then
+                pushBackward(noders, valueID, id)
+            end
+        end
     end
     -- self -> mt:xx
     if source.type == 'local' and source[1] == 'self' then

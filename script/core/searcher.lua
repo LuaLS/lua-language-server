@@ -219,7 +219,8 @@ function m.searchRefsByID(status, uri, expect, mode)
     local mark = {}
 
     local function search(id, field)
-        if ignoredIDs[id] and field then
+        local firstID = noder.getFirstID(id)
+        if ignoredIDs[firstID] and (field or firstID ~= id) then
             return
         end
         local cmark = mark[id]
@@ -348,14 +349,27 @@ function m.searchRefsByID(status, uri, expect, mode)
         searchID(newID)
     end
 
+    local forwardTag  = {}
+    local backwardTag = {}
     local function checkForward(id, node, field)
         for _, forwardID in ipairs(node.forward) do
+            local tag = node.forward[forwardID]
+            if tag then
+                if backwardTag[tag] and backwardTag[tag] > 0 then
+                    goto CONTINUE
+                end
+                forwardTag[tag] = (forwardTag[tag] or 0) + 1
+            end
             local targetUri, targetID = noder.getUriAndID(forwardID)
             if targetUri and not files.eq(targetUri, uri) then
                 crossSearch(status, targetUri, targetID .. (field or ''), mode)
             else
                 searchID(targetID or forwardID, field)
             end
+            if tag then
+                forwardTag[tag] = forwardTag[tag] - 1
+            end
+            ::CONTINUE::
         end
     end
 
@@ -364,12 +378,23 @@ function m.searchRefsByID(status, uri, expect, mode)
             return
         end
         for _, backwardID in ipairs(node.backward) do
+            local tag = node.backward[backwardID]
+            if tag then
+                if forwardTag[tag] and forwardTag[tag] > 0 then
+                    goto CONTINUE
+                end
+                backwardTag[tag] = (backwardTag[tag] or 0) + 1
+            end
             local targetUri, targetID = noder.getUriAndID(backwardID)
             if targetUri and not files.eq(targetUri, uri) then
                 crossSearch(status, targetUri, targetID .. (field or ''), mode)
             else
                 searchID(targetID or backwardID, field)
             end
+            if tag then
+                backwardTag[tag] = backwardTag[tag] - 1
+            end
+            ::CONTINUE::
         end
     end
 

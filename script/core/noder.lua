@@ -329,7 +329,7 @@ end
 ---@param noders noders
 ---@param id string
 ---@param forwardID string
-local function pushForward(noders, id, forwardID)
+local function pushForward(noders, id, forwardID, tag)
     if not id
     or not forwardID
     or forwardID == ''
@@ -340,10 +340,10 @@ local function pushForward(noders, id, forwardID)
     if not node.forward then
         node.forward = {}
     end
-    if node.forward[forwardID] then
+    if node.forward[forwardID] ~= nil then
         return
     end
-    node.forward[forwardID] = true
+    node.forward[forwardID] = tag or false
     node.forward[#node.forward+1] = forwardID
 end
 
@@ -351,7 +351,7 @@ end
 ---@param noders noders
 ---@param id string
 ---@param backwardID string
-local function pushBackward(noders, id, backwardID)
+local function pushBackward(noders, id, backwardID, tag)
     if not id
     or not backwardID
     or backwardID == ''
@@ -362,10 +362,10 @@ local function pushBackward(noders, id, backwardID)
     if not node.backward then
         node.backward = {}
     end
-    if node.backward[backwardID] then
+    if node.backward[backwardID] ~= nil then
         return
     end
-    node.backward[backwardID] = true
+    node.backward[backwardID] = tag or false
     node.backward[#node.backward+1] = backwardID
 end
 
@@ -423,10 +423,10 @@ function m.compileNode(noders, source)
         local valueID = getID(value)
         if valueID then
             -- x = y : x -> y
-            pushForward(noders, id, valueID)
+            pushForward(noders, id, valueID, 'set')
             -- 参数禁止反向查找赋值
             if valueID:sub(1, 2) ~= 'p:' then
-                pushBackward(noders, valueID, id)
+                pushBackward(noders, valueID, id, 'set')
             end
         end
     end
@@ -441,8 +441,8 @@ function m.compileNode(noders, source)
         if setmethod and ( setmethod.type == 'setmethod'
                         or setmethod.type == 'setfield'
                         or setmethod.type == 'setindex') then
-            pushForward(noders, id, getID(setmethod.node))
-            pushBackward(noders, getID(setmethod.node), id)
+            pushForward(noders, id, getID(setmethod.node), 'method')
+            pushBackward(noders, getID(setmethod.node), id, 'method')
         end
     end
     -- 分解 @type

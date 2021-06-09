@@ -12,7 +12,8 @@
         "DBGPORT",
         "DBGWAIT",
         "tracy",
-        "LOCALE"
+        "LOCALE",
+        "SHOWSOURCE"
     ],
     "Lua.diagnostics.disable": [
         "close-non-object",
@@ -43,5 +44,6 @@
         "?.lua",
         "script/?.lua",
         "script/?/init.lua"
-    ]
+    ],
+    "Lua.misc.parameters": "--showsource=true"
 }

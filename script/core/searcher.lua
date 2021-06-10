@@ -511,7 +511,12 @@ function m.searchRefsByID(status, uri, expect, mode)
     function searchStep(id, field)
         stepCount = stepCount + 1
         if stepCount > 1000 then
-            error('too large')
+            if TEST then
+                error('too large!')
+            else
+                log.warn('too large!')
+                return
+            end
         end
         local node = noder.getNodeByID(root, id)
         if node then

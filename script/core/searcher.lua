@@ -235,14 +235,12 @@ function m.searchRefsByID(status, uri, expect, mode)
             end
             cmark[field] = true
             searchStep(id, field)
-            cmark[field] = nil
         else
             if cmark[NONE] then
                 return
             end
             cmark[NONE] = true
             searchStep(id, nil)
-            cmark[NONE] = nil
         end
         log.debug('pop:', id, field)
     end
@@ -266,7 +264,6 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
         cmark[LAST] = true
         search(lastID, newField)
-        cmark[LAST] = nil
         return lastID
     end
 

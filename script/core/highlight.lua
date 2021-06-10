@@ -7,7 +7,7 @@ local util       = require 'utility'
 local guide      = require 'parser.guide'
 
 local function eachRef(source, callback)
-    local results = searcher.requestReference(source)
+    local results = vm.getRefs(source)
     for i = 1, #results do
         callback(results[i])
     end

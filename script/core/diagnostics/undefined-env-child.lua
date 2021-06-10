@@ -2,6 +2,7 @@ local files     = require 'files'
 local searcher = require 'core.searcher'
 local guide    = require 'parser.guide'
 local lang     = require 'language'
+local vm = require "vm.vm"
 
 return function (uri, callback)
     local ast = files.getAst(uri)
@@ -13,7 +14,7 @@ return function (uri, callback)
         if source.node.tag == '_ENV' then
             return
         end
-        local defs = searcher.requestDefinition(source)
+        local defs = vm.getDefs(source)
         if #defs > 0 then
             return
         end

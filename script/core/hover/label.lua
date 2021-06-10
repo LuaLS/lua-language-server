@@ -32,7 +32,7 @@ local function asDocFunction(source)
 end
 
 local function asDocTypeName(source)
-    local defs = searcher.requestDefinition(source)
+    local defs = vm.getDefs(source)
     for _, doc in ipairs(defs) do
         if doc.type == 'doc.class.name' then
             return 'class ' .. doc[1]

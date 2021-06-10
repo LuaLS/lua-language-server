@@ -2,6 +2,7 @@ local searcher = require 'core.searcher'
 local config   = require 'config'
 local noder    = require 'core.noder'
 local util     = require 'utility'
+local vm = require "vm.vm"
 
 local STRING_OR_TABLE = {'STRING_OR_TABLE'}
 local BE_RETURN       = {'BE_RETURN'}
@@ -488,7 +489,7 @@ function m.searchInfers(source, field)
     if not source then
         return nil
     end
-    local defs = searcher.requestDefinition(source, field)
+    local defs = vm.getDefs(source, field)
     local infers = {}
     local mark = {}
     if not field then
@@ -547,7 +548,7 @@ end
 ---@param field? string
 ---@return table
 function m.searchLiterals(source, field)
-    local defs = searcher.requestDefinition(source, field)
+    local defs = vm.getDefs(source, field)
     local literals = {}
     local mark = {}
     if not field then
@@ -618,7 +619,7 @@ function m.getClass(source)
         return nil
     end
     local infers = {}
-    local defs = searcher.requestDefinition(source)
+    local defs = vm.getDefs(source)
     for _, def in ipairs(defs) do
         if def.type == 'doc.class.name' then
             infers[def[1]] = true

@@ -35,7 +35,7 @@ function vm.getDocEnums(doc)
     if not doc then
         return nil
     end
-    local defs = searcher.requestDefinition(doc)
+    local defs = vm.getDefs(doc)
     local results = {}
 
     for _, def in ipairs(defs) do

@@ -495,48 +495,8 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
     end
 
-    local function checkCrossUri(id, field)
-        local targetUri, newID = noder.getUriAndID(id)
-        if not targetUri then
-            return false
-        end
-        crossSearch(status, targetUri, newID .. (field or ''), mode)
-        return true
-    end
-
-    local function checkCache(id, field)
-        if field then
-            return false
-        end
-        local cachedResults = cache[id]
-        if not cachedResults then
-            cache[id] = status
-            return false
-        end
-        log.debug('cache', id)
-        if mode == 'def' then
-            -- TODO
-            do return false end
-            local idIndex = cachedResults[id]
-            for _, res in ipairs(cachedResults) do
-                local index = cachedResults[res]
-                if index > idIndex then
-                    m.pushResult(status, mode, res, true)
-                end
-            end
-        else
-            for _, res in ipairs(cachedResults) do
-                m.pushResult(status, mode, res, true)
-            end
-        end
-        return true
-    end
-
     local stepCount = 0
     function searchStep(id, field)
-        --if checkCache(id, field) then
-        --    return
-        --end
         stepCount = stepCount + 1
         if stepCount > 1000 then
             error('too large')

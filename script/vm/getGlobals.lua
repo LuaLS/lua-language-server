@@ -19,7 +19,7 @@ local function getGlobalsOfFile(uri)
     local globals = {}
     cache.globals = globals
     tracy.ZoneBeginN 'getGlobalsOfFile'
-    local results = searcher.findGlobals(uri)
+    local results = searcher.findGlobals(uri, 'ref')
     local subscribe = ws.getCache 'globalSubscribe'
     subscribe[uri] = {}
     local mark = {}

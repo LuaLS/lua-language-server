@@ -37,10 +37,11 @@ function m.pushResult(status, mode, source, force)
         return
     end
     local results = status.results
-    if results[source] then
+    local mark = status.mark
+    if mark[source] then
         return
     end
-    results[source] = true
+    mark[source] = true
     if force then
         results[#results+1] = source
         return
@@ -217,6 +218,11 @@ function m.searchRefsByID(status, uri, expect, mode)
     local callStack = status.callStack
 
     local mark = {}
+    --local cache = status.cache[uri]
+    --if not cache then
+    --    cache = {}
+    --    status.cache[uri] = cache
+    --end
 
     local function search(id, field)
         local firstID = noder.getFirstID(id)
@@ -498,8 +504,39 @@ function m.searchRefsByID(status, uri, expect, mode)
         return true
     end
 
+    local function checkCache(id, field)
+        if field then
+            return false
+        end
+        local cachedResults = cache[id]
+        if not cachedResults then
+            cache[id] = status
+            return false
+        end
+        log.debug('cache', id)
+        if mode == 'def' then
+            -- TODO
+            do return false end
+            local idIndex = cachedResults[id]
+            for _, res in ipairs(cachedResults) do
+                local index = cachedResults[res]
+                if index > idIndex then
+                    m.pushResult(status, mode, res, true)
+                end
+            end
+        else
+            for _, res in ipairs(cachedResults) do
+                m.pushResult(status, mode, res, true)
+            end
+        end
+        return true
+    end
+
     local stepCount = 0
     function searchStep(id, field)
+        --if checkCache(id, field) then
+        --    return
+        --end
         stepCount = stepCount + 1
         if stepCount > 1000 then
             error('too large')
@@ -514,7 +551,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         if not lastID then
             return
         end
-        local originField  = id:sub(#lastID + 1)
+        local originField = id:sub(#lastID + 1)
         if originField == noder.TABLE_KEY then
             return
         end
@@ -627,8 +664,13 @@ function m.searchRefs(status, source, mode)
     m.searchRefsByID(status, uri, id, mode)
 end
 
+---查找全局变量
+---@param uri uri
+---@param mode guide.searchmode
+---@param name string
+---@return parser.guide.object[]
 function m.findGlobals(uri, mode, name)
-    local status = m.status()
+    local status = m.status(mode)
 
     if name then
         local fullID = ('g:%q'):format(name)
@@ -655,7 +697,7 @@ function m.searchFields(status, source, mode, field)
         if source.special == '_G' then
             searchAllGlobals(status, mode)
         else
-            local newStatus = m.status(status)
+            local newStatus = m.status(mode)
             m.searchRefsByID(newStatus, uri, id, mode)
             for _, def in ipairs(newStatus.results) do
                 getField(status, def, mode)
@@ -677,15 +719,16 @@ end
 ---@field results parser.guide.object[]
 
 ---创建搜索状态
----@param parentStatus guide.status
+---@param mode guide.searchmode
 ---@return guide.status
-function m.status(parentStatus)
+function m.status(mode)
     local status = {
-        --mark      = parentStatus and parentStatus.mark or {},
         callStack = {},
         crossed   = {},
         lock      = {},
         results   = {},
+        mark      = {},
+        cache     = vm.getCache('searcher:' .. mode)
     }
     return status
 end
@@ -695,7 +738,7 @@ end
 ---@param field?    string
 ---@return parser.guide.object[]
 function m.requestReference(obj, field)
-    local status = m.status()
+    local status = m.status('ref')
 
     if field then
         m.searchFields(status, obj, 'ref', field)
@@ -711,7 +754,7 @@ end
 ---@param field?    string
 ---@return parser.guide.object[]
 function m.requestDefinition(obj, field)
-    local status = m.status()
+    local status = m.status('def')
 
     if field then
         m.searchFields(status, obj, 'def', field)

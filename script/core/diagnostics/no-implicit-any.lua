@@ -1,8 +1,7 @@
 local files   = require 'files'
-local searcher   = require 'core.searcher'
+local guide   = require 'parser.guide'
 local lang    = require 'language'
-local define  = require 'proto.define'
-local vm      = require 'vm'
+local infer   = require 'core.infer'
 
 return function (uri, callback)
     local ast = files.getAst(uri)
@@ -10,7 +9,7 @@ return function (uri, callback)
         return
     end
 
-    searcher.eachSource(ast.ast, function (source)
+    guide.eachSource(ast.ast, function (source)
         if  source.type ~= 'local'
         and source.type ~= 'setlocal'
         and source.type ~= 'setglobal'
@@ -21,7 +20,7 @@ return function (uri, callback)
         and source.type ~= 'tableindex' then
             return
         end
-        if vm.getInferType(source, 0) == 'any' then
+        if infer.searchAndViewInfers(source) == 'any' then
             callback {
                 start   = source.start,
                 finish  = source.finish,

@@ -1,5 +1,5 @@
 local files    = require 'files'
-local searcher = require 'core.searcher'
+local guide    = require 'parser.guide'
 local matchKey = require 'core.matchkey'
 local define   = require 'proto.define'
 local await    = require 'await'
@@ -52,7 +52,7 @@ local function searchFile(uri, key, results)
         return
     end
 
-    searcher.eachSource(ast.ast, function (source)
+    guide.eachSource(ast.ast, function (source)
         buildSource(uri, source, key, results)
     end)
 end

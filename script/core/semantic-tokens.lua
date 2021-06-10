@@ -4,6 +4,7 @@ local await          = require 'await'
 local define         = require 'proto.define'
 local vm             = require 'vm'
 local util           = require 'utility'
+local guide          = require 'parser.guide'
 
 local Care = {}
 Care['setglobal'] = function (source, results)
@@ -221,7 +222,7 @@ return function (uri, start, finish)
 
     local results = {}
     local count = 0
-    searcher.eachSourceBetween(ast.ast, start, finish, function (source)
+    guide.eachSourceBetween(ast.ast, start, finish, function (source)
         local method = Care[source.type]
         if not method then
             return

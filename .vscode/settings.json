@@ -13,7 +13,8 @@
         "DBGWAIT",
         "tracy",
         "LOCALE",
-        "SHOWSOURCE"
+        "SHOWSOURCE",
+        "TRACE"
     ],
     "Lua.diagnostics.disable": [
         "close-non-object",

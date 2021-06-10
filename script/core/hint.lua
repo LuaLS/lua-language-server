@@ -1,7 +1,8 @@
 local files    = require 'files'
-local searcher = require 'core.searcher'
+local infer    = require 'core.infer'
 local vm       = require 'vm'
 local config   = require 'config'
+local guide    = require 'parser.guide'
 
 local function typeHint(uri, edits, start, finish)
     local ast = files.getAst(uri)
@@ -9,7 +10,7 @@ local function typeHint(uri, edits, start, finish)
         return
     end
     local mark = {}
-    searcher.eachSourceBetween(ast.ast, start, finish, function (source)
+    guide.eachSourceBetween(ast.ast, start, finish, function (source)
         if  source.type ~= 'local'
         and source.type ~= 'setglobal'
         and source.type ~= 'tablefield'
@@ -21,7 +22,7 @@ local function typeHint(uri, edits, start, finish)
         if source[1] == '_' then
             return
         end
-        if source.value and searcher.isLiteral(source.value) then
+        if source.value and guide.isLiteral(source.value) then
             return
         end
         if source.parent.type == 'funcargs' then
@@ -33,9 +34,9 @@ local function typeHint(uri, edits, start, finish)
                 return
             end
         end
-        local infer = vm.getInferType(source, 0)
-        if infer == 'any'
-        or infer == 'nil' then
+        local view = infer.searchAndViewInfers(source)
+        if view == 'any'
+        or view == 'nil' then
             return
         end
         local src = source
@@ -52,7 +53,7 @@ local function typeHint(uri, edits, start, finish)
         end
         mark[src] = true
         edits[#edits+1] = {
-            newText = (':%s'):format(infer),
+            newText = (':%s'):format(view),
             start   = src.finish,
             finish  = src.finish,
         }
@@ -84,7 +85,7 @@ local function hasLiteralArgInCall(call)
         return false
     end
     for _, arg in ipairs(call.args) do
-        if searcher.isLiteral(arg) then
+        if guide.isLiteral(arg) then
             return true
         end
     end
@@ -100,7 +101,7 @@ local function paramName(uri, edits, start, finish)
         return
     end
     local mark = {}
-    searcher.eachSourceBetween(ast.ast, start, finish, function (source)
+    guide.eachSourceBetween(ast.ast, start, finish, function (source)
         if source.type ~= 'call' then
             return
         end
@@ -130,7 +131,7 @@ local function paramName(uri, edits, start, finish)
             table.remove(args, 1)
         end
         for i, arg in ipairs(source.args) do
-            if not mark[arg] and searcher.isLiteral(arg) then
+            if not mark[arg] and guide.isLiteral(arg) then
                 mark[arg] = true
                 if args[i] and args[i] ~= '' then
                     edits[#edits+1] = {

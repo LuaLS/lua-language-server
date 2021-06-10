@@ -246,7 +246,9 @@ function m.searchRefsByID(status, uri, expect, mode)
             cmark = {}
             mark[id] = cmark
         end
-        log.debug('search:', id, field)
+        if TRACE then
+            log.debug('search:', id, field)
+        end
         if field then
             if cmark[field] then
                 return

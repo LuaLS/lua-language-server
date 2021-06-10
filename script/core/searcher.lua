@@ -201,6 +201,23 @@ local function getLock(status, uri, expect, mode)
     return true
 end
 
+local function checkCache(status, uri, expect, mode)
+    local cache = vm.getCache('search:' .. mode)
+    local fileCache = cache[uri]
+    if not fileCache then
+        fileCache = {}
+        cache[uri] = fileCache
+    end
+    if fileCache[expect] then
+        for _, res in ipairs(fileCache[expect]) do
+            m.pushResult(status, mode, res, true)
+        end
+        return true
+    end
+    fileCache[expect] = status.results
+    return false
+end
+
 function m.searchRefsByID(status, uri, expect, mode)
     local ast = files.getAst(uri)
     if not ast then
@@ -218,11 +235,6 @@ function m.searchRefsByID(status, uri, expect, mode)
     local callStack = status.callStack
 
     local mark = {}
-    --local cache = status.cache[uri]
-    --if not cache then
-    --    cache = {}
-    --    status.cache[uri] = cache
-    --end
 
     local function search(id, field)
         local firstID = noder.getFirstID(id)
@@ -620,6 +632,11 @@ function m.searchRefs(status, source, mode)
     if not id then
         return
     end
+
+    if checkCache(status, uri, id, mode) then
+        return
+    end
+
     log.debug('searchRefs:', id)
     m.searchRefsByID(status, uri, id, mode)
 end
@@ -655,8 +672,14 @@ function m.searchFields(status, source, mode, field)
     log.debug('searchFields:', id, field)
     if field == '*' then
         if source.special == '_G' then
+            if checkCache(status, uri, '*', mode) then
+                return
+            end
             searchAllGlobals(status, mode)
         else
+            if checkCache(status, uri, id .. '*', mode) then
+                return
+            end
             local newStatus = m.status(mode)
             m.searchRefsByID(newStatus, uri, id, mode)
             for _, def in ipairs(newStatus.results) do
@@ -666,9 +689,15 @@ function m.searchFields(status, source, mode, field)
     else
         if source.special == '_G' then
             local fullID = ('g:%q'):format(field)
+            if checkCache(status, uri, fullID, mode) then
+                return
+            end
             m.searchRefsByID(status, uri, fullID, mode)
         else
             local fullID = ('%s%s%q'):format(id, noder.SPLIT_CHAR, field)
+            if checkCache(status, uri, fullID, mode) then
+                return
+            end
             m.searchRefsByID(status, uri, fullID, mode)
         end
     end

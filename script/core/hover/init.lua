@@ -156,6 +156,14 @@ local function getHoverByUri(uri, offset)
         return nil
     end
     local hover = getHover(source)
+    if SHOWSOURCE then
+        hover.description = ('%s\n---\n\n```lua\n%s\n```'):format(
+            hover.description or '',
+            util.dump(source, {
+                deep = 1,
+            })
+        )
+    end
     return hover
 end
 

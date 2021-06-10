@@ -5,6 +5,7 @@ local diag   = require 'core.diagnostics'
 local config = require 'config'
 local fs     = require 'bee.filesystem'
 local luadoc = require "parser.luadoc"
+local noder  = require 'core.noder'
 
 -- 临时
 local function testIfExit(path)
@@ -19,6 +20,7 @@ local function testIfExit(path)
         local parseClock = 0
         local compileClock = 0
         local luadocClock = 0
+        local noderClock = 0
         local total
         for i = 1, max do
             vm = TEST(buf)
@@ -26,21 +28,26 @@ local function testIfExit(path)
             luadoc(nil, vm)
             local luadocPassed = os.clock() - luadocStart
             local passed = os.clock() - clock
-            parseClock   = parseClock + vm.parseClock
+            local noderStart = os.clock()
+            noder.compileNodes(vm.ast)
+            local noderPassed = os.clock() - noderStart
+            parseClock   = parseClock   + vm.parseClock
             compileClock = compileClock + vm.compileClock
             luadocClock  = luadocClock  + luadocPassed
+            noderClock   = noderClock   + noderPassed
             if passed >= 1.0 or i == max then
                 need = passed / i
                 total = i
                 break
             end
         end
-        print(('基准编译测试[%s]单次耗时：%.10f(解析：%.10f, 编译：%.10f, LuaDoc: %.10f)'):format(
+        print(('基准编译测试[%s]单次耗时：%.10f(解析：%.10f, 编译：%.10f, LuaDoc: %.10f, Noder: %.10f)'):format(
             path:filename():string(),
             need,
             parseClock / total,
             compileClock / total,
-            luadocClock / total
+            luadocClock / total,
+            noderClock / total
         ))
 
         local clock = os.clock()

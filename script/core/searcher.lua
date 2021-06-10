@@ -4,6 +4,7 @@ local files   = require 'files'
 local generic = require 'core.generic'
 local ws      = require 'workspace'
 local vm      = require 'vm.vm'
+local await   = require 'await'
 
 local NONE = {'NONE'}
 local LAST = {'LAST'}
@@ -179,26 +180,16 @@ function m.getObjectValue(obj)
 end
 
 local function crossSearch(status, uri, expect, mode)
+    if status.lock[uri] then
+        return
+    end
+    status.lock[uri] = true
+    await.delay()
+    if TRACE then
+        log.debug('crossSearch', uri, expect)
+    end
     m.searchRefsByID(status, uri, expect, mode)
-end
-
-local function getLock(status, uri, expect, mode)
-    local slock = status.lock
-    local ulock = slock[uri]
-    if not ulock then
-        ulock = {}
-        slock[uri] = ulock
-    end
-    local mlock = ulock[mode]
-    if not mlock then
-        mlock = {}
-        ulock[mode] = mlock
-    end
-    if mlock[expect] then
-        return false
-    end
-    mlock[expect] = true
-    return true
+    status.lock[uri] = nil
 end
 
 local function checkCache(status, uri, expect, mode)
@@ -221,9 +212,6 @@ end
 function m.searchRefsByID(status, uri, expect, mode)
     local ast = files.getAst(uri)
     if not ast then
-        return
-    end
-    if not getLock(status, uri, expect, mode) then
         return
     end
     local root = ast.ast
@@ -262,7 +250,9 @@ function m.searchRefsByID(status, uri, expect, mode)
             cmark[NONE] = true
             searchStep(id, nil)
         end
-        log.debug('pop:', id, field)
+        if TRACE then
+            log.debug('pop:', id, field)
+        end
     end
 
     local function checkLastID(id, field)
@@ -644,7 +634,9 @@ function m.searchRefs(status, source, mode)
         return
     end
 
-    log.debug('searchRefs:', id)
+    if TRACE then
+        log.debug('searchRefs:', id)
+    end
     m.searchRefsByID(status, uri, id, mode)
 end
 
@@ -676,7 +668,9 @@ function m.searchFields(status, source, mode, field)
     if not id then
         return
     end
-    log.debug('searchFields:', id, field)
+    if TRACE then
+        log.debug('searchFields:', id, field)
+    end
     if field == '*' then
         if source.special == '_G' then
             if checkCache(status, uri, '*', mode) then

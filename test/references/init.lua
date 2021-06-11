@@ -138,24 +138,6 @@ end
 ]]
 
 TEST [[
-local function f()
-    return <~<!function~> ()
-    end!>
-end
-
-local <!f2!> = f()
-]]
-
-TEST [[
-local function f()
-    return nil, <~<!function~> ()
-    end!>
-end
-
-local _, <!f2!> = f()
-]]
-
-TEST [[
 local <?x?>
 local function f()
     return <!x!>

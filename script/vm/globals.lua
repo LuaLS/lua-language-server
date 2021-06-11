@@ -37,11 +37,8 @@ end
 
 files.watch(function (ev, uri)
     if ev == 'update' then
-        await.call(function ()
-            popGlobals(uri)
-            await.delay()
-            pushGlobals(uri)
-        end)
+        popGlobals(uri)
+        pushGlobals(uri)
     end
 end)
 

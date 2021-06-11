@@ -424,8 +424,10 @@ function m.compileNode(noders, source)
         if valueID then
             -- x = y : x -> y
             pushForward(noders, id, valueID, 'set')
-            -- 参数禁止反向查找赋值
-            if valueID:sub(1, 2) ~= 'p:' then
+            -- 参数/call禁止反向查找赋值
+            local valueType = valueID:match '^.-:'
+            if  valueType ~= 'p:'
+            and valueType ~= 'c:' then
                 pushBackward(noders, valueID, id, 'set')
             end
         end

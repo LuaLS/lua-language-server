@@ -25,8 +25,10 @@ end
 function vm.getDocDefines(name)
     local results = {}
     for uri in files.eachFile() do
-        local ast = files.getState(uri)
-        getDocDefinesInAst(results, ast.ast, name)
+        local state = files.getState(uri)
+        if state then
+            getDocDefinesInAst(results, state.ast, name)
+        end
     end
     return results
 end

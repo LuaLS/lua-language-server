@@ -522,7 +522,7 @@ function m.searchRefsByID(status, uri, expect, mode)
     local stepCount = 0
     function searchStep(id, field)
         stepCount = stepCount + 1
-        --status.count = status.count + 1
+        status.count = status.count + 1
         if stepCount > 1000
         or status.count > 10000 then
             if TEST then

@@ -528,6 +528,9 @@ function m.compileNode(noders, source)
         end
     end
     if source.type == 'call' then
+        if not id then
+            return
+        end
         local node = source.node
         local nodeID = getID(node)
         if not nodeID then

@@ -519,6 +519,25 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
     end
 
+    local function checkAnyField(id, field)
+        if mode == 'ref' then
+            return
+        end
+        local lastID = noder.getLastID(id)
+        if not lastID then
+            return
+        end
+        local originField = id:sub(#lastID + 1)
+        if originField == noder.TABLE_KEY then
+            return
+        end
+        local anyFieldID   = lastID .. noder.ANY_FIELD
+        local anyFieldNode = noder.getNodeByID(root, anyFieldID)
+        if anyFieldNode then
+            searchNode(anyFieldID, anyFieldNode, field)
+        end
+    end
+
     local stepCount = 0
     function searchStep(id, field)
         stepCount = stepCount + 1
@@ -541,19 +560,8 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
         checkGlobal(id, node, field)
         checkClass(id, node, field)
-        local lastID = checkLastID(id, field)
-        if not lastID then
-            return
-        end
-        local originField = id:sub(#lastID + 1)
-        if originField == noder.TABLE_KEY then
-            return
-        end
-        local anyFieldID   = lastID .. noder.ANY_FIELD
-        local anyFieldNode = noder.getNodeByID(root, anyFieldID)
-        if anyFieldNode then
-            searchNode(anyFieldID, anyFieldNode, field)
-        end
+        checkLastID(id, field)
+        checkAnyField(id, field)
     end
 
     search(expect)

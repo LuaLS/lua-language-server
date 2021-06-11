@@ -451,18 +451,14 @@ function m.searchRefsByID(status, uri, expect, mode)
     end
 
     local function checkClass(id, node, field)
-        if id:sub(1, 3) ~= 'dn:' then
-            return
-        end
-        local firstID = noder.getFirstID(id)
-        if status.crossed[firstID] then
-            return
-        end
-        status.crossed[firstID] = true
-        local uris = docs.getUrisByID(firstID)
+        local uris = docs.getUrisByID(id)
         if not uris then
             return
         end
+        if status.crossed[id] then
+            return
+        end
+        status.crossed[id] = true
         local tid = id .. (field or '')
         for guri in pairs(uris) do
             if not files.eq(uri, guri) then

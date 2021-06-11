@@ -5,6 +5,7 @@ local generic = require 'core.generic'
 local ws      = require 'workspace'
 local vm      = require 'vm.vm'
 local await   = require 'await'
+local globals = require 'vm.globals'
 
 local NONE = {'NONE'}
 local LAST = {'LAST'}
@@ -424,8 +425,12 @@ function m.searchRefsByID(status, uri, expect, mode)
             return
         end
         status.crossed[firstID] = true
+        local uris = globals.getUrisByID(firstID)
+        if not uris then
+            return
+        end
         local tid = id .. (field or '')
-        for guri in files.eachFile() do
+        for guri in pairs(uris) do
             if not files.eq(uri, guri) then
                 crossSearch(status, guri, tid, mode)
             end
@@ -614,10 +619,28 @@ local function searchAllGlobalByUri(status, mode, uri, fullID)
     end
 end
 
-local function searchAllGlobals(status, mode, fullID)
+local function searchAllGlobals(status, mode)
     for uri in files.eachFile() do
-        searchAllGlobalByUri(status, mode, uri, fullID)
+        searchAllGlobalByUri(status, mode, uri)
     end
+end
+
+---查找全局变量
+---@param uri uri
+---@param mode guide.searchmode
+---@param name string
+---@return parser.guide.object[]
+function m.findGlobals(uri, mode, name)
+    local status = m.status(mode)
+
+    if name then
+        local fullID = ('g:%q'):format(name)
+        searchAllGlobalByUri(status, mode, uri, fullID)
+    else
+        searchAllGlobalByUri(status, mode, uri)
+    end
+
+    return status.results
 end
 
 ---搜索对象的引用

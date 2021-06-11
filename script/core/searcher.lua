@@ -418,20 +418,15 @@ function m.searchRefsByID(status, uri, expect, mode)
     end
 
     local function checkGlobal(id, node, field)
-        if id:sub(1, 2) ~= 'g:' then
-            return
-        end
-        local firstID = noder.getFirstID(id)
-        if status.crossed[firstID] then
-            return
-        end
-        status.crossed[firstID] = true
-        local uris = globals.getUrisByID(firstID)
+        local uris = globals.getUrisByID(id)
         if not uris then
             return
         end
-        local clock = os.clock()
-        local isCall = id:sub(#firstID + 2, #firstID + 2) == noder.RETURN_INDEX
+        if status.crossed[id] then
+            return
+        end
+        status.crossed[id] = true
+        local isCall = field and field:sub(2, 2) == noder.RETURN_INDEX
         local tid = id .. (field or '')
         for guri, def in pairs(uris) do
             if def then
@@ -452,10 +447,6 @@ function m.searchRefsByID(status, uri, expect, mode)
             end
             crossSearch(status, guri, tid, mode)
             ::CONTINUE::
-        end
-        local passed = os.clock() - clock
-        if passed > 0.1 then
-            print('全局变量耗时：', passed, id, field, tid, mode)
         end
     end
 

@@ -89,7 +89,6 @@ local function main()
     --config.config.intelliSense.searchDepth = 5
     loadDocMetas()
 
-    test 'full'
     require 'bee.platform'.OS = 'Windows'
     testAll()
     require 'bee.platform'.OS = 'Linux'

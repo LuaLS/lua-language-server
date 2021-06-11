@@ -427,6 +427,7 @@ function m.compileNode(noders, source)
             -- 参数/call禁止反向查找赋值
             local valueType = valueID:match '^.-:'
             if  valueType ~= 'p:'
+            and valueType ~= 's:'
             and valueType ~= 'c:' then
                 pushBackward(noders, valueID, id, 'set')
             end

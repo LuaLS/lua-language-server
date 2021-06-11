@@ -430,11 +430,27 @@ function m.searchRefsByID(status, uri, expect, mode)
         if not uris then
             return
         end
+        local isCall = id:sub(#firstID + 2, #firstID + 2) == noder.RETURN_INDEX
         local tid = id .. (field or '')
-        for guri in pairs(uris) do
-            if not files.eq(uri, guri) then
+        for guri, def in pairs(uris) do
+            if def then
                 crossSearch(status, guri, tid, mode)
+                goto CONTINUE
             end
+            if isCall then
+                goto CONTINUE
+            end
+            if not field then
+                goto CONTINUE
+            end
+            if mode == 'def' then
+                goto CONTINUE
+            end
+            if not files.eq(uri, guri) then
+                goto CONTINUE
+            end
+            crossSearch(status, guri, tid, mode)
+            ::CONTINUE::
         end
     end
 
@@ -486,6 +502,12 @@ function m.searchRefsByID(status, uri, expect, mode)
                 m.pushResult(status, mode, source, force)
             end
         end
+
+        if node.require then
+            checkRequire(node.require, field)
+            return true
+        end
+
         if node.forward then
             checkForward(id, node, field)
         end
@@ -498,11 +520,7 @@ function m.searchRefsByID(status, uri, expect, mode)
             checkENV(node.sources[1], field)
         end
 
-        if node.require then
-            checkRequire(node.require, field)
-        end
-
-        checkMainReturn(id, node, field)
+        --checkMainReturn(id, node, field)
 
         if node.call then
             callStack[#callStack] = nil
@@ -522,7 +540,10 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
         local node = noder.getNodeByID(root, id)
         if node then
-            searchNode(id, node, field)
+            local skip = searchNode(id, node, field)
+            if skip then
+                return
+            end
         end
         checkGlobal(id, node, field)
         checkClass(id, node, field)

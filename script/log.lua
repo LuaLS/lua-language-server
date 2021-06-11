@@ -1,7 +1,7 @@
 local fs             = require 'bee.filesystem'
 local time           = require 'bee.time'
 
-local monotonic      = time.monotonic
+local monotonic      = os.clock
 local osDate         = os.date
 local ioOpen         = io.open
 local tablePack      = table.pack

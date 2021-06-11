@@ -582,7 +582,7 @@ function m.compileNode(noders, source)
                 source.sindex
             )
             pushForward(noders, id, callXID)
-            pushBackward(noders, callXID, id)
+            --pushBackward(noders, callXID, id)
             getNode(noders, id).call = call
             if node.special == 'pcall'
             or node.special == 'xpcall' then
@@ -600,7 +600,7 @@ function m.compileNode(noders, source)
                     index
                 )
                 pushForward(noders, id, funcXID)
-                pushBackward(noders, funcXID, id)
+                --pushBackward(noders, funcXID, id)
             end
         end
         if source.vararg.type == 'varargs' then
@@ -725,7 +725,7 @@ function m.compileNode(noders, source)
                     pushForward(noders, returnID, getID(rtnObj))
                     if rtnObj.type == 'function'
                     or rtnObj.type == 'call' then
-                        pushBackward(noders, getID(rtnObj), returnID)
+                        --pushBackward(noders, getID(rtnObj), returnID)
                     end
                 end
             end
@@ -747,7 +747,7 @@ function m.compileNode(noders, source)
                 local rtnObj = rtn[1]
                 if rtnObj then
                     pushForward(noders, 'mainreturn', getID(rtnObj))
-                    pushBackward(noders, getID(rtnObj), 'mainreturn')
+                    --pushBackward(noders, getID(rtnObj), 'mainreturn')
                 end
             end
         end

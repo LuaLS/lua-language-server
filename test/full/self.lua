@@ -1,8 +1,9 @@
-local files = require 'files'
-local fsu   = require 'fs-utility'
-local furi  = require 'file-uri'
-local diag  = require 'provider.diagnostic'
+local files  = require 'files'
+local fsu    = require 'fs-utility'
+local furi   = require 'file-uri'
+local diag   = require 'provider.diagnostic'
 local config = require 'config'
+local ws     = require 'workspace'
 files.removeAll()
 
 fsu.scanDirectory(ROOT, function (path)
@@ -15,6 +16,7 @@ fsu.scanDirectory(ROOT, function (path)
     files.open(uri)
 end)
 
+ws.ready = true
 diag.start()
 
 local clock = os.clock()

@@ -855,6 +855,26 @@ function m.getLastID(id)
     return lastID
 end
 
+---测试id是否包含field，如果遇到函数调用则中断
+---@param id string
+---@return boolean
+function m.hasField(id)
+    local firstID = m.getFirstID(id)
+    if firstID == id then
+        return false
+    end
+    local nextChar = id:sub(#firstID + 1, #firstID + 1)
+    if nextChar ~= SPLIT_CHAR then
+        return false
+    end
+    local next2Char = id:sub(#firstID + 2, #firstID + 2)
+    if next2Char == RETURN_INDEX
+    or next2Char == PARAM_INDEX then
+        return false
+    end
+    return true
+end
+
 ---把形如 `@file:\\\XXXXX@gv:1|1`拆分成uri与id
 ---@param id string
 ---@return uri? string
@@ -913,6 +933,7 @@ function m.compileNodes(source)
     if next(noders) then
         return noders
     end
+    log.debug('compileNodes:', guide.getUri(root))
     guide.eachSource(root, function (src)
         m.pushSource(noders, src)
         m.compileNode(noders, src)
@@ -920,6 +941,7 @@ function m.compileNodes(source)
     -- Special rule: ('').XX -> stringlib.XX
     pushBackward(noders, 'str:', 'dn:stringlib')
     pushBackward(noders, 'dn:string', 'dn:stringlib')
+    log.debug('compileNodes finish:', guide.getUri(root))
     return noders
 end
 

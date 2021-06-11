@@ -37,9 +37,11 @@ end
 
 files.watch(function (ev, uri)
     if ev == 'update' then
-        popDocs(uri)
-        await.delay()
-        pushDocs(uri)
+        await.call(function ()
+            popDocs(uri)
+            await.delay()
+            pushDocs(uri)
+        end)
     end
 end)
 

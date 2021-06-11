@@ -7,4 +7,5 @@ require 'vm.eachRef'
 require 'vm.getLinks'
 require 'vm.guideInterface'
 require 'vm.globals'
+require 'vm.docs'
 return vm

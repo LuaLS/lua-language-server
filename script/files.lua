@@ -34,9 +34,9 @@ m.assocMatcher   = nil
 m.globalVersion  = 0
 m.fileCount      = 0
 m.astCount       = 0
-m.linesMap       = setmetatable({}, { __mode = 'v' })
-m.originLinesMap = setmetatable({}, { __mode = 'v' })
-m.astMap         = setmetatable({}, { __mode = 'v' })
+m.linesMap       = {} --setmetatable({}, { __mode = 'v' })
+m.originLinesMap = {} --setmetatable({}, { __mode = 'v' })
+m.astMap         = {} --setmetatable({}, { __mode = 'v' })
 
 local uriMap = {}
 local function getUriKey(uri)

@@ -186,7 +186,7 @@ local function crossSearch(status, uri, expect, mode)
         return
     end
     status.lock[uri] = true
-    await.delay()
+    --await.delay()
     if TRACE then
         log.debug('crossSearch', uri, expect)
     end

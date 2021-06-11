@@ -14,7 +14,8 @@
         "tracy",
         "LOCALE",
         "SHOWSOURCE",
-        "TRACE"
+        "TRACE",
+        "FOOTPRINT"
     ],
     "Lua.diagnostics.disable": [
         "close-non-object",

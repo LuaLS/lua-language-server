@@ -4,7 +4,6 @@ local files   = require 'files'
 local generic = require 'core.generic'
 local ws      = require 'workspace'
 local vm      = require 'vm.vm'
-local await   = require 'await'
 local globals = require 'vm.globals'
 local docs    = require 'vm.docs'
 
@@ -190,6 +189,9 @@ local function crossSearch(status, uri, expect, mode)
     if TRACE then
         log.debug('crossSearch', uri, expect)
     end
+    if FOOTPRINT then
+        status.footprint[#status.footprint+1] = ('cross search:%s %s'):format(uri, expect)
+    end
     m.searchRefsByID(status, uri, expect, mode)
     status.lock[uri] = nil
 end
@@ -239,6 +241,13 @@ function m.searchRefsByID(status, uri, expect, mode)
         if TRACE then
             log.debug('search:', id, field)
         end
+        if FOOTPRINT then
+            if field then
+                status.footprint[#status.footprint+1] = 'search\t' .. id .. '\t' .. field
+            else
+                status.footprint[#status.footprint+1] = 'search\t' .. id
+            end
+        end
         if field then
             if cmark[field] then
                 return
@@ -254,6 +263,13 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
         if TRACE then
             log.debug('pop:', id, field)
+        end
+        if FOOTPRINT then
+            if field then
+                status.footprint[#status.footprint+1] = 'pop\t' .. id .. '\t' .. field
+            else
+                status.footprint[#status.footprint+1] = 'pop\t' .. id
+            end
         end
     end
 
@@ -545,9 +561,15 @@ function m.searchRefsByID(status, uri, expect, mode)
         if stepCount > 1000
         or status.count > 10000 then
             if TEST then
+                if FOOTPRINT then
+                    log.debug(table.concat(status.footprint, '\n'))
+                end
                 error('too large!')
             else
                 log.warn('too large!')
+                if FOOTPRINT then
+                    log.debug(table.concat(status.footprint, '\n'))
+                end
                 return
             end
         end
@@ -751,6 +773,7 @@ function m.status(mode)
         lock      = {},
         results   = {},
         mark      = {},
+        footprint = {},
         count     = 0,
         cache     = vm.getCache('searcher:' .. mode)
     }

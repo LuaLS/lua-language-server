@@ -210,7 +210,7 @@ local function checkCache(status, uri, expect, mode)
 end
 
 function m.searchRefsByID(status, uri, expect, mode)
-    local ast = files.getAst(uri)
+    local ast = files.getState(uri)
     if not ast then
         return
     end
@@ -585,7 +585,7 @@ local function getField(status, source, mode)
 end
 
 local function searchAllGlobalByUri(status, mode, uri, fullID)
-    local ast = files.getAst(uri)
+    local ast = files.getState(uri)
     if not ast then
         return
     end
@@ -638,24 +638,6 @@ function m.searchRefs(status, source, mode)
         log.debug('searchRefs:', id)
     end
     m.searchRefsByID(status, uri, id, mode)
-end
-
----查找全局变量
----@param uri uri
----@param mode guide.searchmode
----@param name string
----@return parser.guide.object[]
-function m.findGlobals(uri, mode, name)
-    local status = m.status(mode)
-
-    if name then
-        local fullID = ('g:%q'):format(name)
-        searchAllGlobalByUri(status, mode, uri, fullID)
-    else
-        searchAllGlobalByUri(status, mode, uri)
-    end
-
-    return status.results
 end
 
 ---搜索对象的field

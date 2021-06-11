@@ -147,7 +147,7 @@ local accept = {
 }
 
 local function getHoverByUri(uri, offset)
-    local ast = files.getAst(uri)
+    local ast = files.getState(uri)
     if not ast then
         return nil
     end

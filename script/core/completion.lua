@@ -322,7 +322,7 @@ local function checkModule(ast, word, offset, results)
         and not config.config.diagnostics.globals[stemName]
         and stemName:match '^[%a_][%w_]*$'
         and matchKey(word, stemName) then
-            local targetAst = files.getAst(uri)
+            local targetAst = files.getState(uri)
             if not targetAst then
                 goto CONTINUE
             end
@@ -1925,7 +1925,7 @@ local function completion(uri, offset, triggerCharacter)
         return results
     end
     tracy.ZoneBeginN 'completion #1'
-    local ast = files.getAst(uri)
+    local ast = files.getState(uri)
     local text = files.getText(uri)
     results = {}
     clearStack()

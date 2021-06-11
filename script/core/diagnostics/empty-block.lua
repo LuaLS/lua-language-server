@@ -6,7 +6,7 @@ local define  = require 'proto.define'
 -- 检查空代码块
 -- 但是排除忙等待（repeat/while)
 return function (uri, callback)
-    local ast = files.getAst(uri)
+    local ast = files.getState(uri)
     if not ast then
         return
     end

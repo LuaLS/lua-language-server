@@ -5,7 +5,7 @@ local define  = require 'proto.define'
 local vm      = require 'vm'
 
 return function (uri, callback)
-    local state = files.getAst(uri)
+    local state = files.getState(uri)
     if not state then
         return
     end

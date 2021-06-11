@@ -31,7 +31,7 @@ function m.require(args, index)
     local uris = ws.findUrisByRequirePath(reqName)
     for _, uri in ipairs(uris) do
         if not files.eq(myUri, uri) then
-            local ast = files.getAst(uri)
+            local ast = files.getState(uri)
             if ast then
                 m.searchFileReturn(results, ast.ast, index)
             end
@@ -51,7 +51,7 @@ function m.dofile(args, index)
     local uris = ws.findUrisByFilePath(reqName)
     for _, uri in ipairs(uris) do
         if not files.eq(myUri, uri) then
-            local ast = files.getAst(uri)
+            local ast = files.getState(uri)
             if ast then
                 m.searchFileReturn(results, ast.ast, index)
             end

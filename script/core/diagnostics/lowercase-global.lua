@@ -18,7 +18,7 @@ end
 
 -- 不允许定义首字母小写的全局变量（很可能是拼错或者漏删）
 return function (uri, callback)
-    local ast = files.getAst(uri)
+    local ast = files.getState(uri)
     if not ast then
         return
     end

@@ -133,7 +133,7 @@ local function skipSpace(text, offset)
 end
 
 return function (uri, pos)
-    local ast = files.getAst(uri)
+    local ast = files.getState(uri)
     if not ast then
         return nil
     end

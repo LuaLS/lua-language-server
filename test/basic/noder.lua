@@ -4,7 +4,7 @@ local util   = require 'utility'
 local guide  = require 'parser.guide'
 
 local function getSource(pos)
-    local ast = files.getAst('')
+    local ast = files.getState('')
     return guide.eachSourceContain(ast.ast, pos, function (source)
         if source.type == 'local'
         or source.type == 'getlocal'

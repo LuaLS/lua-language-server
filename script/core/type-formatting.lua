@@ -69,7 +69,7 @@ local function checkSplitOneLine(results, uri, offset, ch)
 end
 
 return function (uri, offset, ch)
-    local ast  = files.getAst(uri)
+    local ast  = files.getState(uri)
     local text = files.getOriginText(uri)
     if not ast or not text then
         return nil

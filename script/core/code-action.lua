@@ -7,7 +7,7 @@ local guide    = require "parser.guide"
 
 local function checkDisableByLuaDocExits(uri, row, mode, code)
     local lines = files.getLines(uri)
-    local ast   = files.getAst(uri)
+    local ast   = files.getState(uri)
     local text  = files.getOriginText(uri)
     local line  = lines[row]
     if ast.ast.docs and line then
@@ -43,7 +43,7 @@ end
 
 local function checkDisableByLuaDocInsert(uri, row, mode, code)
     local lines = files.getLines(uri)
-    local ast   = files.getAst(uri)
+    local ast   = files.getState(uri)
     local text  = files.getOriginText(uri)
     -- 先看看上一行是不是已经有了
     -- 没有的话就插入一行
@@ -134,7 +134,7 @@ local function changeVersion(uri, version, results)
 end
 
 local function solveUndefinedGlobal(uri, diag, results)
-    local ast    = files.getAst(uri)
+    local ast    = files.getState(uri)
     local offset = files.offsetOfWord(uri, diag.range.start)
     guide.eachSourceContain(ast.ast, offset, function (source)
         if source.type ~= 'getglobal' then
@@ -153,7 +153,7 @@ local function solveUndefinedGlobal(uri, diag, results)
 end
 
 local function solveLowercaseGlobal(uri, diag, results)
-    local ast    = files.getAst(uri)
+    local ast    = files.getState(uri)
     local offset = files.offsetOfWord(uri, diag.range.start)
     guide.eachSourceContain(ast.ast, offset, function (source)
         if source.type ~= 'setglobal' then
@@ -166,7 +166,7 @@ local function solveLowercaseGlobal(uri, diag, results)
 end
 
 local function findSyntax(uri, diag)
-    local ast = files.getAst(uri)
+    local ast = files.getState(uri)
     for _, err in ipairs(ast.errs) do
         if err.type:lower():gsub('_', '-') == diag.code then
             local range = files.range(uri, err.start, err.finish)
@@ -350,7 +350,7 @@ local function checkQuickFix(results, uri, start, diagnostics)
 end
 
 local function checkSwapParams(results, uri, start, finish)
-    local ast  = files.getAst(uri)
+    local ast  = files.getState(uri)
     local text = files.getText(uri)
     if not ast then
         return
@@ -539,7 +539,7 @@ local function checkJsonToLua(results, uri, start, finish)
 end
 
 return function (uri, start, finish, diagnostics)
-    local ast = files.getAst(uri)
+    local ast = files.getState(uri)
     if not ast then
         return nil
     end

@@ -190,7 +190,7 @@ function m.doDiagnostic(uri)
 
     await.delay()
 
-    local ast = files.getAst(uri)
+    local ast = files.getState(uri)
     if not ast then
         m.clear(uri)
         return

@@ -4,7 +4,7 @@ local lang   = require 'language'
 local guide  = require 'parser.guide'
 
 return function (uri, callback, code)
-    local ast = files.getAst(uri)
+    local ast = files.getState(uri)
     if not ast then
         return
     end

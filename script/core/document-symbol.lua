@@ -228,7 +228,7 @@ local function buildSource(source, text, used, symbols)
 end
 
 local function makeSymbol(uri)
-    local ast = files.getAst(uri)
+    local ast = files.getState(uri)
     local text = files.getText(uri)
     if not ast or not text then
         return nil

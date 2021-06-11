@@ -13,7 +13,7 @@ local function isInString(ast, offset)
 end
 
 return function (uri, callback)
-    local ast   = files.getAst(uri)
+    local ast   = files.getState(uri)
     if not ast then
         return
     end

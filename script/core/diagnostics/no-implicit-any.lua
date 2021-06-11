@@ -4,7 +4,7 @@ local lang    = require 'language'
 local infer   = require 'core.infer'
 
 return function (uri, callback)
-    local ast = files.getAst(uri)
+    local ast = files.getState(uri)
     if not ast then
         return
     end

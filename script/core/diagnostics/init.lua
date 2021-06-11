@@ -62,7 +62,7 @@ local function check(uri, name, results)
 end
 
 return function (uri, response)
-    local ast = files.getAst(uri)
+    local ast = files.getState(uri)
     if not ast then
         return nil
     end

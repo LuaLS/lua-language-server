@@ -378,7 +378,7 @@ function m.eachDll()
     return pairs(map)
 end
 
-function m.compileAst(uri, text)
+function m.compileState(uri, text)
     local ws = require 'workspace'
     if not m.isOpen(uri) and #text >= config.config.workspace.preloadFileSize * 1000 then
         if not m.notifyCache['preloadFileSize'] then
@@ -446,8 +446,8 @@ end
 
 --- 获取文件语法树
 ---@param uri uri
----@return table ast
-function m.getAst(uri)
+---@return table state
+function m.getState(uri)
     uri = getUriKey(uri)
     if uri ~= '' and not m.isLua(uri) then
         return nil
@@ -458,7 +458,7 @@ function m.getAst(uri)
     end
     local ast = m.astMap[uri]
     if not ast then
-        ast = m.compileAst(uri, file.text)
+        ast = m.compileState(uri, file.text)
         m.astMap[uri] = ast
         --await.delay()
     end

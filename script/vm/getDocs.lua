@@ -25,7 +25,7 @@ end
 function vm.getDocDefines(name)
     local results = {}
     for uri in files.eachFile() do
-        local ast = files.getAst(uri)
+        local ast = files.getState(uri)
         getDocDefinesInAst(results, ast.ast, name)
     end
     return results
@@ -49,7 +49,7 @@ function vm.getDocEnums(doc)
 end
 
 function vm.isMetaFile(uri)
-    local status = files.getAst(uri)
+    local status = files.getState(uri)
     if not status then
         return false
     end
@@ -203,7 +203,7 @@ local function makeDiagRange(uri, doc, results)
 end
 
 function vm.isDiagDisabledAt(uri, offset, name)
-    local status = files.getAst(uri)
+    local status = files.getState(uri)
     if not status then
         return false
     end

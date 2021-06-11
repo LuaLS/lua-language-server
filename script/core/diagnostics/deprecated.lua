@@ -7,7 +7,7 @@ local define   = require 'proto.define'
 local await    = require 'await'
 
 return function (uri, callback)
-    local ast = files.getAst(uri)
+    local ast = files.getState(uri)
     if not ast then
         return
     end

@@ -5,7 +5,7 @@ local files = require 'files'
 local function getFileLinks(uri)
     local ws    = require 'workspace'
     local links = {}
-    local ast = files.getAst(uri)
+    local ast = files.getState(uri)
     if not ast then
         return links
     end
@@ -52,6 +52,7 @@ local function getLinksTo(uri)
     return links
 end
 
+-- 获取所有 require(uri) 的文件
 function vm.getLinksTo(uri)
     local cache = vm.getCache('getLinksTo')[uri]
     if cache ~= nil then

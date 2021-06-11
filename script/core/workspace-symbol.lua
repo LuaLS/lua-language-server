@@ -47,7 +47,7 @@ local function buildSource(uri, source, key, results)
 end
 
 local function searchFile(uri, key, results)
-    local ast = files.getAst(uri)
+    local ast = files.getState(uri)
     if not ast then
         return
     end

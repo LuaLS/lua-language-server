@@ -213,7 +213,7 @@ local function buildTokens(uri, results)
 end
 
 return function (uri, start, finish)
-    local ast   = files.getAst(uri)
+    local ast   = files.getState(uri)
     local lines = files.getLines(uri)
     local text  = files.getText(uri)
     if not ast then

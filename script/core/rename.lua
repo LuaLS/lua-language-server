@@ -443,7 +443,7 @@ function m.rename(uri, pos, newname)
     if not newname then
         return nil
     end
-    local ast = files.getAst(uri)
+    local ast = files.getState(uri)
     if not ast then
         return nil
     end
@@ -492,7 +492,7 @@ function m.rename(uri, pos, newname)
 end
 
 function m.prepareRename(uri, pos)
-    local ast = files.getAst(uri)
+    local ast = files.getState(uri)
     if not ast then
         return nil
     end

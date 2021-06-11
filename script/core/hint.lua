@@ -5,7 +5,7 @@ local config   = require 'config'
 local guide    = require 'parser.guide'
 
 local function typeHint(uri, edits, start, finish)
-    local ast = files.getAst(uri)
+    local ast = files.getState(uri)
     if not ast then
         return
     end
@@ -96,7 +96,7 @@ local function paramName(uri, edits, start, finish)
     if not config.config.hint.paramName then
         return
     end
-    local ast = files.getAst(uri)
+    local ast = files.getState(uri)
     if not ast then
         return
     end

@@ -6,6 +6,7 @@ local ws      = require 'workspace'
 local vm      = require 'vm.vm'
 local await   = require 'await'
 local globals = require 'vm.globals'
+local docs    = require 'vm.docs'
 
 local NONE = {'NONE'}
 local LAST = {'LAST'}
@@ -446,8 +447,12 @@ function m.searchRefsByID(status, uri, expect, mode)
             return
         end
         status.crossed[firstID] = true
+        local uris = docs.getUrisByID(firstID)
+        if not uris then
+            return
+        end
         local tid = id .. (field or '')
-        for guri in files.eachFile() do
+        for guri in pairs(uris) do
             if not files.eq(uri, guri) then
                 crossSearch(status, guri, tid, mode)
             end

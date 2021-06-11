@@ -22,7 +22,9 @@ diag.start()
 local clock = os.clock()
 
 for uri in files.eachFile() do
+    local fileClock = os.clock()
     diag.doDiagnostic(uri)
+    print('诊断文件耗时：', os.clock() - fileClock, uri)
 end
 
 local passed = os.clock() - clock

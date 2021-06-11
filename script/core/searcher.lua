@@ -430,6 +430,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         if not uris then
             return
         end
+        local clock = os.clock()
         local isCall = id:sub(#firstID + 2, #firstID + 2) == noder.RETURN_INDEX
         local tid = id .. (field or '')
         for guri, def in pairs(uris) do
@@ -451,6 +452,10 @@ function m.searchRefsByID(status, uri, expect, mode)
             end
             crossSearch(status, guri, tid, mode)
             ::CONTINUE::
+        end
+        local passed = os.clock() - clock
+        if passed > 0.1 then
+            print('全局变量耗时：', passed, id, field, tid, mode)
         end
     end
 
@@ -530,7 +535,9 @@ function m.searchRefsByID(status, uri, expect, mode)
     local stepCount = 0
     function searchStep(id, field)
         stepCount = stepCount + 1
-        if stepCount > 1000 then
+        --status.count = status.count + 1
+        if stepCount > 1000
+        or status.count > 10000 then
             if TEST then
                 error('too large!')
             else
@@ -749,6 +756,7 @@ function m.status(mode)
         lock      = {},
         results   = {},
         mark      = {},
+        count     = 0,
         cache     = vm.getCache('searcher:' .. mode)
     }
     return status

@@ -375,16 +375,44 @@ function m.searchRefsByID(status, uri, expect, mode)
         searchID(newID)
     end
 
-    local forwardTag  = {}
-    local backwardTag = {}
+    local function checkThenPushTag(ward, tag)
+        if not tag then
+            return true
+        end
+        local checkTags
+        local pushTags
+        if ward == 'forward' then
+            checkTags = status.btag
+            pushTags  = status.ftag
+        else
+            checkTags = status.ftag
+            pushTags  = status.btag
+        end
+        if checkTags[tag] and checkTags[tag] > 0 then
+            return false
+        end
+        pushTags[tag] = (pushTags[tag] or 0) + 1
+        return true
+    end
+
+    local function popTag(ward, tag)
+        if not tag then
+            return
+        end
+        local popTags
+        if ward == 'forward' then
+            popTags = status.ftag
+        else
+            popTags = status.btag
+        end
+        popTags[tag] = popTags[tag] - 1
+    end
+
     local function checkForward(id, node, field)
         for _, forwardID in ipairs(node.forward) do
             local tag = node.forward[forwardID]
-            if tag then
-                if backwardTag[tag] and backwardTag[tag] > 0 then
-                    goto CONTINUE
-                end
-                forwardTag[tag] = (forwardTag[tag] or 0) + 1
+            if not checkThenPushTag('forward', tag) then
+                goto CONTINUE
             end
             local targetUri, targetID = noder.getUriAndID(forwardID)
             if targetUri and not files.eq(targetUri, uri) then
@@ -392,9 +420,7 @@ function m.searchRefsByID(status, uri, expect, mode)
             else
                 searchID(targetID or forwardID, field)
             end
-            if tag then
-                forwardTag[tag] = forwardTag[tag] - 1
-            end
+            popTag('forward', tag)
             ::CONTINUE::
         end
     end
@@ -405,11 +431,8 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
         for _, backwardID in ipairs(node.backward) do
             local tag = node.backward[backwardID]
-            if tag then
-                if forwardTag[tag] and forwardTag[tag] > 0 then
-                    goto CONTINUE
-                end
-                backwardTag[tag] = (backwardTag[tag] or 0) + 1
+            if not checkThenPushTag('backward', tag) then
+                goto CONTINUE
             end
             local targetUri, targetID = noder.getUriAndID(backwardID)
             if targetUri and not files.eq(targetUri, uri) then
@@ -417,9 +440,7 @@ function m.searchRefsByID(status, uri, expect, mode)
             else
                 searchID(targetID or backwardID, field)
             end
-            if tag then
-                backwardTag[tag] = backwardTag[tag] - 1
-            end
+            popTag('backward', tag)
             ::CONTINUE::
         end
     end
@@ -455,6 +476,9 @@ function m.searchRefsByID(status, uri, expect, mode)
             return
         end
         status.crossed[id] = true
+        --if not checkThenPushTag('forward', 'set') then
+        --    return
+        --end
         local isCall = field and field:sub(2, 2) == noder.RETURN_INDEX
         local tid = id .. (field or '')
         if FOOTPRINT then
@@ -480,6 +504,7 @@ function m.searchRefsByID(status, uri, expect, mode)
             crossSearch(status, guri, tid, mode)
             ::CONTINUE::
         end
+        --popTag('forward', 'set')
     end
 
     local function checkClass(id, node, field)
@@ -779,6 +804,8 @@ function m.status(mode)
         mark      = {},
         footprint = {},
         count     = 0,
+        ftag      = {},
+        btag      = {},
         cache     = vm.getCache('searcher:' .. mode)
     }
     return status

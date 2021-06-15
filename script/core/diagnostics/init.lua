@@ -67,6 +67,8 @@ return function (uri, response)
         return nil
     end
 
+    log.debug('do diagnostic @', uri)
+
     for _, name in ipairs(diagList) do
         await.delay()
         local results = {}

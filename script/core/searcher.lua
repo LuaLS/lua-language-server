@@ -82,7 +82,7 @@ function m.pushResult(status, mode, source, force)
                 results[#results+1] = source
             end
         end
-    elseif mode == 'ref' then
+    elseif mode == 'ref' or mode == 'field' then
         if source.type == 'local'
         or source.type == 'setlocal'
         or source.type == 'getlocal'
@@ -399,7 +399,7 @@ function m.searchRefsByID(status, uri, expect, mode)
     end
 
     local function checkBackward(id, node, field)
-        if mode ~= 'ref' and not field then
+        if mode ~= 'ref' and mode ~= 'field' and not field then
             return
         end
         for _, backwardID in ipairs(node.backward) do
@@ -420,6 +420,16 @@ function m.searchRefsByID(status, uri, expect, mode)
                 backwardTag[tag] = backwardTag[tag] - 1
             end
             ::CONTINUE::
+        end
+    end
+
+    local function checkSpecial(id, node, field)
+        -- Special rule: ('').XX -> stringlib.XX
+        if id == 'str:'
+        or id == 'dn:string' then
+            if field or mode == 'field' then
+                searchID('dn:stringlib', field)
+            end
         end
     end
 
@@ -483,23 +493,6 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
     end
 
-    local function checkMainReturn(id, node, field)
-        if id ~= 'mainreturn' then
-            return
-        end
-        if mode ~= 'ref' and not field then
-            return
-        end
-        local calls = vm.getLinksTo(uri)
-        for _, call in ipairs(calls) do
-            local turi = guide.getUri(call)
-            if not files.eq(turi, uri) then
-                local tid  = noder.getID(call) .. (field or '')
-                crossSearch(status, turi, tid, mode)
-            end
-        end
-    end
-
     local function searchNode(id, node, field)
         if node.call then
             callStack[#callStack+1] = node.call
@@ -523,6 +516,8 @@ function m.searchRefsByID(status, uri, expect, mode)
             checkBackward(id, node, field)
         end
 
+        checkSpecial(id, node, field)
+
         if node.sources then
             checkGeneric(node.sources[1], field)
             checkENV(node.sources[1], field)
@@ -536,7 +531,7 @@ function m.searchRefsByID(status, uri, expect, mode)
     end
 
     local function checkAnyField(id, field)
-        if mode == 'ref' then
+        if mode == 'ref' or mode == 'field' then
             return
         end
         local lastID = noder.getLastID(id)
@@ -736,8 +731,8 @@ function m.searchFields(status, source, mode, field)
             if checkCache(status, uri, id .. '*', mode) then
                 return
             end
-            local newStatus = m.status(mode)
-            m.searchRefsByID(newStatus, uri, id, mode)
+            local newStatus = m.status('field')
+            m.searchRefsByID(newStatus, uri, id, 'field')
             for _, def in ipairs(newStatus.results) do
                 getField(status, def, mode)
             end

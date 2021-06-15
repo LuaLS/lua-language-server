@@ -944,9 +944,6 @@ function m.compileNodes(source)
         m.pushSource(noders, src)
         m.compileNode(noders, src)
     end)
-    -- Special rule: ('').XX -> stringlib.XX
-    pushBackward(noders, 'str:', 'dn:stringlib')
-    pushBackward(noders, 'dn:string', 'dn:stringlib')
     log.debug('compileNodes finish:', guide.getUri(root))
     return noders
 end

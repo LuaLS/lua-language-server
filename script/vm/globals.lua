@@ -25,7 +25,8 @@ local function pushGlobals(uri)
     end
     local nodes = noder.compileNodes(state.ast)
     for id in pairs(nodes) do
-        if id:sub(1, 2) == 'g:' then
+        if  id:sub(1, 2) == 'g:'
+        and noder.getFirstID(id) == id then
             if not globalsMap[id] then
                 globalsMap[id] = {}
             end

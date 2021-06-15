@@ -7,9 +7,11 @@ local SPLIT_CHAR     = '\x1F'
 local LAST_REGEX     = SPLIT_CHAR .. '[^' .. SPLIT_CHAR .. ']*$'
 local FIRST_REGEX    = '^[^' .. SPLIT_CHAR .. ']*'
 local ANY_FIELD_CHAR = '*'
+local INDEX_CHAR     = '['
 local RETURN_INDEX   = SPLIT_CHAR .. '#'
 local PARAM_INDEX    = SPLIT_CHAR .. '&'
 local TABLE_KEY      = SPLIT_CHAR .. '<'
+local INDEX_FIELD    = SPLIT_CHAR .. INDEX_CHAR
 local ANY_FIELD      = SPLIT_CHAR .. ANY_FIELD_CHAR
 local URI_CHAR       = '@'
 local URI_REGEX      = URI_CHAR .. '([^' .. URI_CHAR .. ']*)' .. URI_CHAR .. '(.*)'
@@ -71,15 +73,14 @@ local function getKey(source)
     or     source.type == 'getindex' then
         local index = source.index
         if not index then
-            return ANY_FIELD_CHAR, source.node
+            return INDEX_CHAR, source.node
         end
         if index.type == 'string'
         or index.type == 'boolean'
         or index.type == 'number' then
             return ('%q'):format(index[1] or ''), source.node
-        elseif index.type ~= 'function'
-        and    index.type ~= 'table' then
-            return ANY_FIELD_CHAR, source.node
+        else
+            return INDEX_CHAR, source.node
         end
     elseif source.type == 'tableindex' then
         local index = source.index
@@ -377,6 +378,7 @@ m.PARAM_INDEX  = PARAM_INDEX
 m.TABLE_KEY    = TABLE_KEY
 m.ANY_FIELD    = ANY_FIELD
 m.URI_CHAR     = URI_CHAR
+m.INDEX_FIELD  = INDEX_FIELD
 
 --- 寻找doc的主体
 ---@param obj parser.guide.object
@@ -432,6 +434,15 @@ function m.compileNode(noders, source)
                 pushBackward(noders, valueID, id, 'set')
             end
         end
+    end
+    if source.special == 'setmetatable'
+    or source.special == 'require'
+    or source.special == 'dofile'
+    or source.special == 'loadfile'
+    or source.special == 'rawset'
+    or source.special == 'rawget' then
+        local node = getNode(noders, id)
+        node.skip = true
     end
     -- self -> mt:xx
     if source.type == 'local' and source[1] == 'self' then

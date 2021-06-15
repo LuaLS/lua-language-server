@@ -229,3 +229,8 @@ end
 local <!b!> = B:get()
 print(<?b?>)
 ]]
+
+TEST [[
+g[a.b.c] = 1
+print(g.<?x?>)
+]]

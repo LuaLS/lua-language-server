@@ -457,6 +457,9 @@ function m.searchRefsByID(status, uri, expect, mode)
         status.crossed[id] = true
         local isCall = field and field:sub(2, 2) == noder.RETURN_INDEX
         local tid = id .. (field or '')
+        if FOOTPRINT then
+            status.footprint[#status.footprint+1] = ('checkGlobal:%s + %s, isCall: %s'):format(id, field, isCall, tid)
+        end
         for guri, def in pairs(uris) do
             if def then
                 crossSearch(status, guri, tid, mode)
@@ -509,7 +512,7 @@ function m.searchRefsByID(status, uri, expect, mode)
 
         if node.require then
             checkRequire(node.require, field)
-            return true
+            return
         end
 
         local isSepcial = checkSpecial(id, node, field)
@@ -532,6 +535,8 @@ function m.searchRefsByID(status, uri, expect, mode)
         if node.call then
             callStack[#callStack] = nil
         end
+
+        return false
     end
 
     local function checkAnyField(id, field)
@@ -574,8 +579,8 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
         local node = noder.getNodeByID(root, id)
         if node then
-            local skip = searchNode(id, node, field)
-            if skip then
+            searchNode(id, node, field)
+            if node.skip and field then
                 return
             end
         end

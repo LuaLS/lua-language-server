@@ -430,7 +430,9 @@ function m.searchRefsByID(status, uri, expect, mode)
             if field or mode == 'field' then
                 searchID('dn:stringlib', field)
             end
+            return true
         end
+        return false
     end
 
     local function checkRequire(requireName, field)
@@ -509,14 +511,15 @@ function m.searchRefsByID(status, uri, expect, mode)
             return true
         end
 
-        if node.forward then
-            checkForward(id, node, field)
+        local isSepcial = checkSpecial(id, node, field)
+        if not isSepcial then
+            if node.forward then
+                checkForward(id, node, field)
+            end
+            if node.backward then
+                checkBackward(id, node, field)
+            end
         end
-        if node.backward then
-            checkBackward(id, node, field)
-        end
-
-        checkSpecial(id, node, field)
 
         if node.sources then
             checkGeneric(node.sources[1], field)

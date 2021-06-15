@@ -4,9 +4,10 @@ local furi   = require 'file-uri'
 local diag   = require 'provider.diagnostic'
 local config = require 'config'
 local ws     = require 'workspace'
+local fs     = require 'bee.filesystem'
 files.removeAll()
 
-local path = ROOT
+local path = fs.path [[C:\W3-Server\script]]
 
 fsu.scanDirectory(path, function (path)
     if path:extension():string() ~= '.lua' then

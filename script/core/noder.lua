@@ -439,6 +439,9 @@ function m.compileNode(noders, source)
         if func.isGeneric then
             return
         end
+        if source.parent.type ~= 'funcargs' then
+            return
+        end
         local setmethod = func.parent
         -- guess `self`
         if setmethod and ( setmethod.type == 'setmethod'

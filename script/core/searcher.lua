@@ -6,6 +6,7 @@ local ws      = require 'workspace'
 local vm      = require 'vm.vm'
 local globals = require 'vm.globals'
 local docs    = require 'vm.docs'
+local await   = require 'await'
 
 local NONE = {'NONE'}
 local LAST = {'LAST'}
@@ -185,7 +186,7 @@ local function crossSearch(status, uri, expect, mode)
         return
     end
     status.lock[uri] = true
-    --await.delay()
+    await.delay()
     if TRACE then
         log.debug('crossSearch', uri, expect)
     end

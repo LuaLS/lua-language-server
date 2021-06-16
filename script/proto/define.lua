@@ -103,7 +103,7 @@ m.DiagnosticDefaultNeededFileStatus = {
     ['unused-local']            = 'Opened',
     ['unused-function']         = 'Opened',
     ['undefined-global']        = 'Any',
-    ['undefined-field']         = 'Opened',
+    ['undefined-field']         = 'Any',
     ['global-in-nil-env']       = 'Any',
     ['unused-label']            = 'Opened',
     ['unused-vararg']           = 'Opened',
@@ -124,7 +124,7 @@ m.DiagnosticDefaultNeededFileStatus = {
     ['close-non-object']        = 'Any',
     ['count-down-loop']         = 'Any',
     ['no-implicit-any']         = 'None',
-    ['deprecated']              = 'Opened',
+    ['deprecated']              = 'Any',
 
     ['duplicate-doc-class']     = 'Any',
     ['undefined-doc-class']     = 'Any',

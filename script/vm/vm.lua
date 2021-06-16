@@ -59,6 +59,13 @@ function m.getArgInfo(source)
     return nil
 end
 
+function m.getSpecial(source)
+    if not source then
+        return nil
+    end
+    return source.special
+end
+
 function m.getKeyName(source)
     if not source then
         return nil

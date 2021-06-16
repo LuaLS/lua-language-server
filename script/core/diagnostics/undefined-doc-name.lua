@@ -1,7 +1,6 @@
 local files   = require 'files'
 local guide   = require 'parser.guide'
 local lang    = require 'language'
-local define  = require 'proto.define'
 local vm      = require 'vm'
 
 return function (uri, callback)
@@ -12,26 +11,6 @@ return function (uri, callback)
 
     if not state.ast.docs then
         return
-    end
-
-    local classCache = {
-        ['any'] = true,
-        ['nil'] = true,
-    }
-    local function hasNameOfClassOrAlias(name)
-        if classCache[name] ~= nil then
-            return classCache[name]
-        end
-        local docs = vm.getDocDefines(name)
-        for _, otherDoc in ipairs(docs) do
-            if otherDoc.type == 'doc.class.name'
-            or otherDoc.type == 'doc.alias.name' then
-                classCache[name] = true
-                return true
-            end
-        end
-        classCache[name] = false
-        return false
     end
 
     local function hasNameOfGeneric(name, source)
@@ -56,7 +35,7 @@ return function (uri, callback)
         if name == '...' then
             return
         end
-        if hasNameOfClassOrAlias(name)
+        if vm.isDocDefined(name)
         or hasNameOfGeneric(name, source) then
             return
         end

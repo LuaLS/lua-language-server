@@ -3,7 +3,9 @@ local guide    = require 'parser.guide'
 ---@type vm
 local vm       = require 'vm.vm'
 local config   = require 'config'
-local searcher = require 'core.searcher'
+local docs     = require 'vm.docs'
+local define   = require 'proto.define'
+local noder    = require 'core.noder'
 
 local function getDocDefinesInAst(results, root, name)
     for _, doc in ipairs(root.docs) do
@@ -24,13 +26,59 @@ end
 ---@return parser.guide.object[]
 function vm.getDocDefines(name)
     local results = {}
-    for uri in files.eachFile() do
-        local state = files.getState(uri)
-        if state then
-            getDocDefinesInAst(results, state.ast, name)
+    if name then
+        local id = 'dn:' .. name
+        local uris = docs.getUrisByID(id)
+        if not uris then
+            return results
+        end
+        for uri in pairs(uris) do
+            local state = files.getState(uri)
+            if state then
+                getDocDefinesInAst(results, state.ast, name)
+            end
+        end
+    else
+        for uri in files.eachFile() do
+            local state = files.getState(uri)
+            if state then
+                getDocDefinesInAst(results, state.ast, name)
+            end
         end
     end
     return results
+end
+
+function vm.isDocDefined(name)
+    if define.BuiltinClass[name] then
+        return true
+    end
+    local cache = vm.getCache 'isDocDefined'
+    if cache[name] ~= nil then
+        return cache[name]
+    end
+    local id = 'dn:' .. name
+    local uris = docs.getUrisByID(id)
+    if not uris then
+        cache[name] = false
+        return
+    end
+    for uri in pairs(uris) do
+        local state = files.getState(uri)
+        local node = noder.getNodeByID(state.ast, id)
+        if node and node.sources then
+            for _, source in ipairs(node.sources) do
+                local doc = source.parent
+                if doc.type == 'doc.class'
+                or doc.type == 'doc.alias' then
+                    cache[name] = true
+                    return true
+                end
+            end
+        end
+    end
+    cache[name] = false
+    return false
 end
 
 function vm.getDocEnums(doc)

@@ -1,5 +1,4 @@
 local files = require 'files'
-local await = require 'await'
 local noder = require 'core.noder'
 
 local docsMap      = {}
@@ -25,7 +24,8 @@ local function pushDocs(uri)
     end
     local nodes = noder.compileNodes(state.ast)
     for id in pairs(nodes) do
-        if id:sub(1, 3) == 'dn:' then
+        if id:sub(1, 3) == 'dn:'
+        and noder.getFirstID(id) == id then
             if not docsMap[id] then
                 docsMap[id] = {}
             end

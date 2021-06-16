@@ -1,5 +1,4 @@
 local files = require 'files'
-local await = require 'await'
 local noder = require 'core.noder'
 
 local globalsMap    = {}

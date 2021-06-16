@@ -284,4 +284,19 @@ m.BuiltIn = {
     ['utf8']      = 'default',
 }
 
+m.BuiltinClass = {
+    ['unknown']       = true,
+    ['any']           = true,
+    ['nil']           = true,
+    ['boolean']       = true,
+    ['number']        = true,
+    ['integer']       = true,
+    ['thread']        = true,
+    ['table']         = true,
+    ['string']        = true,
+    ['userdata']      = true,
+    ['lightuserdata'] = true,
+    ['Function']      = true,
+}
+
 return m

@@ -181,7 +181,7 @@ function m.getObjectValue(obj)
     return nil
 end
 
-local function crossSearch(status, uri, expect, mode)
+local function crossSearch(status, uri, expect, mode, sourceUri)
     if status.lock[uri] then
         return
     end
@@ -195,6 +195,9 @@ local function crossSearch(status, uri, expect, mode)
     end
     m.searchRefsByID(status, uri, expect, mode)
     status.lock[uri] = nil
+    if FOOTPRINT then
+        status.footprint[#status.footprint+1] = ('cross search finish, back to: %s'):format(sourceUri)
+    end
 end
 
 local function checkCache(status, uri, expect, mode)
@@ -239,6 +242,9 @@ function m.searchRefsByID(status, uri, expect, mode)
             cmark = {}
             mark[id] = cmark
         end
+        if cmark[field or NONE] then
+            return
+        end
         if TRACE then
             log.debug('search:', id, field)
         end
@@ -249,19 +255,8 @@ function m.searchRefsByID(status, uri, expect, mode)
                 status.footprint[#status.footprint+1] = 'search\t' .. id
             end
         end
-        if field then
-            if cmark[field] then
-                return
-            end
-            cmark[field] = true
-            searchStep(id, field)
-        else
-            if cmark[NONE] then
-                return
-            end
-            cmark[NONE] = true
-            searchStep(id, nil)
-        end
+        cmark[field or NONE] = true
+        searchStep(id, field)
         if TRACE then
             log.debug('pop:', id, field)
         end
@@ -416,7 +411,7 @@ function m.searchRefsByID(status, uri, expect, mode)
             end
             local targetUri, targetID = noder.getUriAndID(forwardID)
             if targetUri and not files.eq(targetUri, uri) then
-                crossSearch(status, targetUri, targetID .. (field or ''), mode)
+                crossSearch(status, targetUri, targetID .. (field or ''), mode, uri)
             else
                 searchID(targetID or forwardID, field)
             end
@@ -436,7 +431,7 @@ function m.searchRefsByID(status, uri, expect, mode)
             end
             local targetUri, targetID = noder.getUriAndID(backwardID)
             if targetUri and not files.eq(targetUri, uri) then
-                crossSearch(status, targetUri, targetID .. (field or ''), mode)
+                crossSearch(status, targetUri, targetID .. (field or ''), mode, uri)
             else
                 searchID(targetID or backwardID, field)
             end
@@ -462,7 +457,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         local uris = ws.findUrisByRequirePath(requireName)
         for _, ruri in ipairs(uris) do
             if not files.eq(uri, ruri) then
-                crossSearch(status, ruri, tid, mode)
+                crossSearch(status, ruri, tid, mode, uri)
             end
         end
     end
@@ -486,7 +481,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
         for guri, def in pairs(uris) do
             if def then
-                crossSearch(status, guri, tid, mode)
+                crossSearch(status, guri, tid, mode, uri)
                 goto CONTINUE
             end
             if isCall then
@@ -501,7 +496,7 @@ function m.searchRefsByID(status, uri, expect, mode)
             if not files.eq(uri, guri) then
                 goto CONTINUE
             end
-            crossSearch(status, guri, tid, mode)
+            crossSearch(status, guri, tid, mode, uri)
             ::CONTINUE::
         end
         --popTag('forward', 'set')
@@ -519,7 +514,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         local tid = id .. (field or '')
         for guri in pairs(uris) do
             if not files.eq(uri, guri) then
-                crossSearch(status, guri, tid, mode)
+                crossSearch(status, guri, tid, mode, uri)
             end
         end
     end

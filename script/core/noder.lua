@@ -477,7 +477,7 @@ function m.compileNode(noders, source)
                         or setmethod.type == 'setfield'
                         or setmethod.type == 'setindex') then
             pushForward(noders, id, getID(setmethod.node), 'method')
-            pushBackward(noders, getID(setmethod.node), id, 'method')
+            --pushBackward(noders, getID(setmethod.node), id, 'method')
         end
     end
     -- 分解 @type

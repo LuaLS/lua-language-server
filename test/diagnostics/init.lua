@@ -868,7 +868,7 @@ local mt2 = {}
 ---@type Foo
 local v
 print(v.field1 + 1)
-print(v.field2 + 1)
+print(v.<!field2!> + 1)
 print(v.<!field3!> + 1)
 print(v:method1())
 print(v.method2())
@@ -877,7 +877,7 @@ print(v:<!method3!>())
 ---@type Bar
 local v2
 print(v2.field1 + 1)
-print(v2.field2 + 1)
+print(v2.<!field2!> + 1)
 print(v2.<!field3!> + 1)
 print(v2.field4 + 1)
 print(v2:method1())

@@ -450,6 +450,72 @@ local function bindValue(noders, source, id)
     end
 end
 
+local function compileCall(noders, call, sourceID, returnIndex)
+    if not sourceID then
+        return
+    end
+    local node = call.node
+    local nodeID = getID(node)
+    if not nodeID then
+        return
+    end
+    local callID = getID(call)
+    if not callID then
+        return
+    end
+    -- 将setmetatable映射到 param1 以及 param2.__index 上
+    if node.special == 'setmetatable' then
+        local tblID  = getID(call.args and call.args[1])
+        local metaID = getID(call.args and call.args[2])
+        local indexID
+        if metaID then
+            indexID = ('%s%s%q'):format(
+                metaID,
+                SPLIT_CHAR,
+                '__index'
+            )
+        end
+        pushForward(noders, sourceID, tblID)
+        pushForward(noders, sourceID, indexID)
+        pushBackward(noders, tblID, sourceID)
+        return
+        --pushBackward(noders, indexID, callID)
+    end
+    if node.special == 'require' then
+        local arg1 = call.args and call.args[1]
+        if arg1 and arg1.type == 'string' then
+            getNode(noders, sourceID).require = arg1[1]
+        end
+        return
+    end
+    if node.special == 'pcall'
+    or node.special == 'xpcall' then
+        local index = returnIndex - 1
+        if index <= 0 then
+            return
+        end
+        local funcID = call.args and getID(call.args[1])
+        if not funcID then
+            return
+        end
+        local pfuncXID = ('%s%s%s'):format(
+            funcID,
+            RETURN_INDEX,
+            index
+        )
+        pushForward(noders, sourceID, pfuncXID)
+        --pushBackward(noders, funcXID, id)
+        return
+    end
+    local funcXID = ('%s%s%s'):format(
+        nodeID,
+        RETURN_INDEX,
+        returnIndex
+    )
+    getNode(noders, sourceID).call = call
+    pushForward(noders, sourceID, funcXID)
+end
+
 ---@param noders noders
 ---@param source parser.guide.object
 ---@return parser.guide.object[]
@@ -563,83 +629,14 @@ function m.compileNode(noders, source)
         end
     end
     if source.type == 'call' then
-        if not id then
-            return
-        end
-        local node = source.node
-        local nodeID = getID(node)
-        if not nodeID then
-            return
-        end
-        getNode(noders, id).call = source
-        -- 将 call 映射到 node#1 上
-        local callID = ('%s%s%s'):format(
-            nodeID,
-            RETURN_INDEX,
-            1
-        )
-        pushForward(noders, id, callID)
-        -- 将setmetatable映射到 param1 以及 param2.__index 上
-        if node.special == 'setmetatable' then
-            local tblID  = getID(source.args and source.args[1])
-            local metaID = getID(source.args and source.args[2])
-            local indexID
-            if metaID then
-                indexID = ('%s%s%q'):format(
-                    metaID,
-                    SPLIT_CHAR,
-                    '__index'
-                )
-            end
-            pushForward(noders, id, callID)
-            pushBackward(noders, callID, id)
-            pushForward(noders, callID, tblID)
-            pushForward(noders, callID, indexID)
-            pushBackward(noders, tblID, callID)
-            --pushBackward(noders, indexID, callID)
-        end
-        if node.special == 'require' then
-            local arg1 = source.args and source.args[1]
-            if arg1 and arg1.type == 'string' then
-                getNode(noders, callID).require = arg1[1]
-            end
+        if source.parent.type ~= 'select' then
+            compileCall(noders, source, id, 1)
         end
     end
     if source.type == 'select' then
         if source.vararg.type == 'call' then
             local call = source.vararg
-            local node = call.node
-            local nodeID = getID(node)
-            if not nodeID then
-                return
-            end
-            -- 将call的返回值接收映射到函数返回值上
-            local callXID = ('%s%s%s'):format(
-                nodeID,
-                RETURN_INDEX,
-                source.sindex
-            )
-            pushForward(noders, id, callXID)
-            --pushBackward(noders, callXID, id)
-            getNode(noders, id).call = call
-            if node.special == 'pcall'
-            or node.special == 'xpcall' then
-                local index = source.sindex - 1
-                if index <= 0 then
-                    return
-                end
-                local funcID = call.args and getID(call.args[1])
-                if not funcID then
-                    return
-                end
-                local funcXID = ('%s%s%s'):format(
-                    funcID,
-                    RETURN_INDEX,
-                    index
-                )
-                pushForward(noders, id, funcXID)
-                --pushBackward(noders, funcXID, id)
-            end
+            compileCall(noders, call, id, source.sindex)
         end
         if source.vararg.type == 'varargs' then
             pushForward(noders, id, getID(source.vararg))

@@ -455,6 +455,9 @@ function m.searchRefsByID(status, uri, expect, mode)
     local function checkRequire(requireName, field)
         local tid = 'mainreturn' .. (field or '')
         local uris = ws.findUrisByRequirePath(requireName)
+        if FOOTPRINT then
+            status.footprint[#status.footprint+1] = ('require %q:\n%s'):format(requireName, table.concat(uris, '\n'))
+        end
         for _, ruri in ipairs(uris) do
             if not files.eq(uri, ruri) then
                 crossSearch(status, ruri, tid, mode, uri)

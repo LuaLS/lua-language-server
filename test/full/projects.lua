@@ -5,32 +5,39 @@ local diag   = require 'provider.diagnostic'
 local config = require 'config'
 local ws     = require 'workspace'
 local fs     = require 'bee.filesystem'
-files.removeAll()
 
-local path = fs.path [[C:\W3-Server\script]]
+local function doProjects(pathname)
+    files.removeAll()
 
-fsu.scanDirectory(path, function (path)
-    if path:extension():string() ~= '.lua' then
-        return
+    local path = fs.path(pathname)
+
+    print('基准诊断目录：', path)
+    fsu.scanDirectory(path, function (path)
+        if path:extension():string() ~= '.lua' then
+            return
+        end
+        local uri  = furi.encode(path:string())
+        local text = fsu.loadFile(path)
+        files.setText(uri, text)
+        files.open(uri)
+    end)
+
+    print('开始诊断...')
+
+    ws.ready = true
+    diag.start()
+
+    local clock = os.clock()
+
+    for uri in files.eachFile() do
+        local fileClock = os.clock()
+        diag.doDiagnostic(uri)
+        print('诊断文件耗时：', os.clock() - fileClock, uri)
     end
-    local uri  = furi.encode(path:string())
-    local text = fsu.loadFile(path)
-    files.setText(uri, text)
-    files.open(uri)
-end)
 
-print('基准诊断目录：', path)
-
-ws.ready = true
-diag.start()
-
-local clock = os.clock()
-
-for uri in files.eachFile() do
-    local fileClock = os.clock()
-    diag.doDiagnostic(uri)
-    print('诊断文件耗时：', os.clock() - fileClock, uri)
+    local passed = os.clock() - clock
+    print('基准全量诊断用时：', passed)
 end
 
-local passed = os.clock() - clock
-print('基准全量诊断用时：', passed)
+doProjects [[C:\SSSEditor\client\Output\Lua]]
+doProjects [[C:\W3-Server\script]]

@@ -265,6 +265,9 @@ return function (uri, offset)
             if isLiteral ~= isLiteralValue(target) then
                 return
             end
+            if not files.eq(uri, guide.getUri(target)) then
+                return
+            end
             local kind
             if     target.type == 'getfield' then
                 target = target.field

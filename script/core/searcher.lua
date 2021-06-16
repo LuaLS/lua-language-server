@@ -641,7 +641,10 @@ end
 local function getField(status, source, mode)
     if source.type == 'table' then
         for _, field in ipairs(source) do
-            m.pushResult(status, mode, field)
+            if field.type == 'tablefield'
+            or field.type == 'tableindex' then
+                m.pushResult(status, mode, field)
+            end
         end
         return
     end

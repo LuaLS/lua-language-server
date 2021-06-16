@@ -831,6 +831,17 @@ global _G: _G {
 ]]
 
 TEST [[
+local <?t?> = {
+    'aaa',
+    'bbb',
+    'ccc',
+}
+]]
+[[
+local t: {}
+]]
+
+TEST [[
 local x
 x = 1
 x = 1.0

@@ -39,5 +39,5 @@ local function doProjects(pathname)
     print('基准全量诊断用时：', passed)
 end
 
-doProjects [[C:\SSSEditor\client\Output\Lua]]
-doProjects [[C:\W3-Server\script]]
+--doProjects [[C:\SSSEditor\client\Output\Lua]]
+--doProjects [[C:\W3-Server\script]]

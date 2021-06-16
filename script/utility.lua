@@ -317,12 +317,12 @@ end
 
 --- 排序后遍历
 ---@param t table
-function m.sortPairs(t)
+function m.sortPairs(t, sorter)
     local keys = {}
     for k in pairs(t) do
         keys[#keys+1] = k
     end
-    tableSort(keys)
+    tableSort(keys, sorter)
     local i = 0
     return function ()
         i = i + 1

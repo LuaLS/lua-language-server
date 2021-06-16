@@ -132,6 +132,9 @@ local function buildFunctionSnip(source, value, oop)
 end
 
 local function buildDetail(source)
+    if source.type == 'dummy' then
+        return
+    end
     local types = infer.searchAndViewInfers(source)
     local literals = infer.searchAndViewLiterals(source)
     if literals then
@@ -170,6 +173,9 @@ local function getSnip(source)
 end
 
 local function buildDesc(source)
+    if source.type == 'dummy' then
+        return
+    end
     local hover = getHover.get(source)
     local md = markdown()
     md:add('lua', hover.label)

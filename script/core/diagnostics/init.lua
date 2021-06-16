@@ -59,6 +59,9 @@ local function check(uri, name, results)
     if passed >= 0.5 then
         log.warn(('Diagnostics [%s] @ [%s] takes [%.3f] sec!'):format(name, uri, passed))
     end
+    if DIAGTIMES then
+        DIAGTIMES[name] = (DIAGTIMES[name] or 0) + passed
+    end
 end
 
 return function (uri, response)

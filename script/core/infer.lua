@@ -33,7 +33,7 @@ local function mergeTable(a, b)
     end
 end
 
-local function searchInferOfUnary(value, infers)
+local function searchInferOfUnary(value, infers, mark)
     local op = value.op.type
     if op == 'not' then
         infers['boolean'] = true
@@ -44,7 +44,7 @@ local function searchInferOfUnary(value, infers)
         return
     end
     if op == '-' then
-        if m.hasType(value[1], 'integer') then
+        if m.hasType(value[1], 'integer', mark) then
             infers['integer'] = true
         else
             infers['number'] = true
@@ -57,21 +57,21 @@ local function searchInferOfUnary(value, infers)
     end
 end
 
-local function searchInferOfBinary(value, infers)
+local function searchInferOfBinary(value, infers, mark)
     local op = value.op.type
     if op == 'and' then
-        if m.isTrue(value[1]) then
-            mergeTable(infers, m.searchInfers(value[2]))
+        if m.isTrue(value[1], mark) then
+            mergeTable(infers, m.searchInfers(value[2], nil, mark))
         else
-            mergeTable(infers, m.searchInfers(value[1]))
+            mergeTable(infers, m.searchInfers(value[1], nil, mark))
         end
         return
     end
     if op == 'or' then
-        if m.isTrue(value[1]) then
-            mergeTable(infers, m.searchInfers(value[1]))
+        if m.isTrue(value[1], mark) then
+            mergeTable(infers, m.searchInfers(value[1], nil, mark))
         else
-            mergeTable(infers, m.searchInfers(value[2]))
+            mergeTable(infers, m.searchInfers(value[2], nil, mark))
         end
         return
     end
@@ -106,8 +106,8 @@ local function searchInferOfBinary(value, infers)
     or op == '*'
     or op == '%'
     or op == '//' then
-        if  m.hasType(value[1], 'integer')
-        and m.hasType(value[2], 'integer') then
+        if  m.hasType(value[1], 'integer', mark)
+        and m.hasType(value[2], 'integer', mark) then
             infers['integer'] = true
         else
             infers['number'] = true
@@ -116,7 +116,7 @@ local function searchInferOfBinary(value, infers)
     end
 end
 
-local function searchInferOfValue(value, infers)
+local function searchInferOfValue(value, infers, mark)
     if value.type == 'string' then
         infers['string'] = true
         return true
@@ -127,7 +127,7 @@ local function searchInferOfValue(value, infers)
     end
     if value.type == 'table' then
         if value.array then
-            local node = m.searchAndViewInfers(value.array)
+            local node = m.searchAndViewInfers(value.array, nil, mark)
             local infer = node .. '[]'
             infers[infer] = true
         else
@@ -152,17 +152,17 @@ local function searchInferOfValue(value, infers)
         return true
     end
     if value.type == 'unary' then
-        searchInferOfUnary(value, infers)
+        searchInferOfUnary(value, infers, mark)
         return true
     end
     if value.type == 'binary' then
-        searchInferOfBinary(value, infers)
+        searchInferOfBinary(value, infers, mark)
         return true
     end
     return false
 end
 
-local function searchLiteralOfValue(value, literals)
+local function searchLiteralOfValue(value, literals, mark)
     if value.type == 'string'
     or value.type == 'boolean'
     or value.type == 'number'
@@ -176,7 +176,7 @@ local function searchLiteralOfValue(value, literals)
     if value.type == 'unary' then
         local op = value.op.type
         if op == '-' then
-            local subLiterals = m.searchLiterals(value[1])
+            local subLiterals = m.searchLiterals(value[1], nil, mark)
             if subLiterals then
                 for subLiteral in pairs(subLiterals) do
                     local num = tonumber(subLiteral)
@@ -187,7 +187,7 @@ local function searchLiteralOfValue(value, literals)
             end
         end
         if op == '~' then
-            local subLiterals = m.searchLiterals(value[1])
+            local subLiterals = m.searchLiterals(value[1], nil, mark)
             if subLiterals then
                 for subLiteral in pairs(subLiterals) do
                     local num = math.tointeger(subLiteral)
@@ -388,17 +388,18 @@ end
 
 ---显示对象的推断类型
 ---@param source parser.guide.object
+---@param mark table
 ---@return string
-local function searchInfer(source, infers)
+local function searchInfer(source, infers, mark)
     if bindClassOrType(source) then
         return
     end
-    if searchInferOfValue(source, infers) then
+    if searchInferOfValue(source, infers, mark) then
         return
     end
     local value = searcher.getObjectValue(source)
     if value then
-        searchInferOfValue(value, infers)
+        searchInferOfValue(value, infers, mark)
         return
     end
     -- check LuaDoc
@@ -473,10 +474,10 @@ local function searchInfer(source, infers)
     end
 end
 
-local function searchLiteral(source, literals)
+local function searchLiteral(source, literals, mark)
     local value = searcher.getObjectValue(source)
     if value then
-        searchLiteralOfValue(value, literals)
+        searchLiteralOfValue(value, literals, mark)
         return
     end
 end
@@ -484,14 +485,15 @@ end
 ---搜索对象的推断类型
 ---@param source parser.guide.object
 ---@param field? string
+---@param mark? table
 ---@return string[]
-function m.searchInfers(source, field)
+function m.searchInfers(source, field, mark)
     if not source then
         return nil
     end
     local defs = vm.getDefs(source, field)
     local infers = {}
-    local mark = {}
+    mark = mark or {}
     if not field then
         mark[source] = true
         searchInfer(source, infers)
@@ -502,7 +504,7 @@ function m.searchInfers(source, field)
                 for _, src in ipairs(node.sources) do
                     if not mark[src] then
                         mark[src] = true
-                        searchInfer(src, infers)
+                        searchInfer(src, infers, mark)
                     end
                 end
             end
@@ -510,12 +512,12 @@ function m.searchInfers(source, field)
     end
     if source.type == 'field' or source.type == 'method' then
         mark[source.parent] = true
-        searchInfer(source.parent, infers)
+        searchInfer(source.parent, infers, mark)
     end
     for _, def in ipairs(defs) do
         if not mark[def] then
             mark[def] = true
-            searchInfer(def, infers)
+            searchInfer(def, infers, mark)
         end
     end
     if source.docParam then
@@ -524,7 +526,7 @@ function m.searchInfers(source, field)
             for _, def in ipairs(docType.types) do
                 if def.typeGeneric and not mark[def] then
                     mark[def] = true
-                    searchInfer(def, infers)
+                    searchInfer(def, infers, mark)
                 end
             end
         end
@@ -534,7 +536,7 @@ function m.searchInfers(source, field)
             for _, def in ipairs(source.types) do
                 if def.typeGeneric and not mark[def] then
                     mark[def] = true
-                    searchInfer(def, infers)
+                    searchInfer(def, infers, mark)
                 end
             end
         end
@@ -546,19 +548,20 @@ end
 ---搜索对象的字面量值
 ---@param source parser.guide.object
 ---@param field? string
+---@param mark? table
 ---@return table
-function m.searchLiterals(source, field)
+function m.searchLiterals(source, field, mark)
     local defs = vm.getDefs(source, field)
     local literals = {}
-    local mark = {}
+    mark = mark or {}
     if not field then
         mark[source] = true
-        searchLiteral(source, literals)
+        searchLiteral(source, literals, mark)
     end
     for _, def in ipairs(defs) do
         if not mark[def] then
             mark[def] = true
-            searchLiteral(def, literals)
+            searchLiteral(def, literals, mark)
         end
     end
     return literals
@@ -568,22 +571,23 @@ end
 ---@param source parser.guide.object
 ---@param field? string
 ---@return string
-function m.searchAndViewLiterals(source, field)
+function m.searchAndViewLiterals(source, field, mark)
     if not source then
         return nil
     end
-    local literals = m.searchLiterals(source, field)
+    local literals = m.searchLiterals(source, field, mark)
     local view = m.viewLiterals(literals)
     return view
 end
 
 ---判断对象的推断值是否是 true
 ---@param source parser.guide.object
-function m.isTrue(source)
+---@param mark? table
+function m.isTrue(source, mark)
     if not source then
         return false
     end
-    local literals = m.searchLiterals(source)
+    local literals = m.searchLiterals(source, nil, mark)
     for literal in pairs(literals) do
         if literal ~= false then
             return true
@@ -593,8 +597,8 @@ function m.isTrue(source)
 end
 
 ---判断对象的推断类型是否包含某个类型
-function m.hasType(source, tp)
-    local infers = m.searchInfers(source)
+function m.hasType(source, tp, mark)
+    local infers = m.searchInfers(source, nil, mark)
     return infers[tp] or false
 end
 
@@ -602,11 +606,11 @@ end
 ---@param source parser.guide.object
 ---@param field? string
 ---@return string
-function m.searchAndViewInfers(source, field)
+function m.searchAndViewInfers(source, field, mark)
     if not source then
         return 'any'
     end
-    local infers = m.searchInfers(source, field)
+    local infers = m.searchInfers(source, field, mark)
     local view = m.viewInfers(infers)
     return view
 end

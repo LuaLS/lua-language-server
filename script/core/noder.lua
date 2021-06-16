@@ -286,6 +286,9 @@ local function getID(source)
     while true do
         if current.type == 'paren' then
             current = current.exp
+            if not current then
+                break
+            end
             goto CONTINUE
         end
         local id, node = getKey(current)

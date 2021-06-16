@@ -68,12 +68,10 @@ TEST [[
 local obj
 obj:<?func?>()
 
+---@class A
 local mt = {}
-mt.__index = mt
 function mt:<!func!>()
 end
----@class A
-local obj = setmetatable({}, mt)
 ]]
 
 TEST [[
@@ -113,7 +111,7 @@ print(<?f?>)
 
 TEST [[
 local function f()
-    return <!1!>
+    return 1
 end
 
 ---@class Class

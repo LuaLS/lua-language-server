@@ -415,26 +415,44 @@ function m.pushSource(noders, source)
     node.sources[#node.sources+1] = source
 end
 
+local function bindValue(noders, source, id)
+    local value = source.value
+    if not value then
+        return
+    end
+    local valueID = getID(value)
+    if not valueID then
+        return
+    end
+    if source.type == 'getlocal'
+    or source.type == 'setlocal' then
+        source = source.node
+    end
+    if source.bindDocs and value.type ~= 'table' then
+        for _, doc in ipairs(source.bindDocs) do
+            if doc.type == 'doc.class'
+            or doc.type == 'doc.type' then
+                return
+            end
+        end
+    end
+    -- x = y : x -> y
+    pushForward(noders, id, valueID, 'set')
+    -- 参数/call禁止反向查找赋值
+    local valueType = valueID:match '^.-:'
+    if  valueType ~= 'p:'
+    and valueType ~= 's:'
+    and valueType ~= 'c:' then
+        pushBackward(noders, valueID, id, 'set')
+    end
+end
+
 ---@param noders noders
 ---@param source parser.guide.object
 ---@return parser.guide.object[]
 function m.compileNode(noders, source)
     local id = getID(source)
-    local value = source.value
-    if value then
-        local valueID = getID(value)
-        if valueID then
-            -- x = y : x -> y
-            pushForward(noders, id, valueID, 'set')
-            -- 参数/call禁止反向查找赋值
-            local valueType = valueID:match '^.-:'
-            if  valueType ~= 'p:'
-            and valueType ~= 's:'
-            and valueType ~= 'c:' then
-                pushBackward(noders, valueID, id, 'set')
-            end
-        end
-    end
+    bindValue(noders, source, id)
     if source.special == 'setmetatable'
     or source.special == 'require'
     or source.special == 'dofile'

@@ -963,9 +963,9 @@ function mt2:method2() end
 local v
 ---@type Bar
 local v2
-v2 = v
-v2:method1()
-v2:method2() -- 这个感觉实际应该报错更合适
+v2 = v -- TODO 这里应该给警告
+v2:<!method1!>()
+v2:method2()
 ]]
 
 TEST [[

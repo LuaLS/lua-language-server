@@ -131,7 +131,7 @@ local ConfigTemplate = {
         meta              = {'${version} ${language}', String},
         unicodeName       = {false,     Boolean},
         nonstandardSymbol = {{},        Str2Hash ';'},
-        plugin            = {'.vscode/lua/plugin.lua', String},
+        plugin            = {'', String},
         fileEncoding      = {'utf8',    String},
         builtin           = {{},          Hash(String, String)},
     },

@@ -19,11 +19,11 @@ local function startCollectDiagTimes()
     DIAGTIMES = {}
 end
 
+startCollectDiagTimes()
 require 'full.normal'
 require 'full.example'
 require 'full.dirty'
 require 'full.projects'
-startCollectDiagTimes()
 require 'full.self'
 
 for name, time in util.sortPairs(DIAGTIMES, function (k1, k2)

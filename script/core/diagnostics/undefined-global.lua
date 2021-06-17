@@ -1,8 +1,10 @@
-local files    = require 'files'
-local vm       = require 'vm'
-local lang     = require 'language'
-local config   = require 'config'
-local guide    = require 'parser.guide'
+local files     = require 'files'
+local vm        = require 'vm'
+local lang      = require 'language'
+local config    = require 'config'
+local guide     = require 'parser.guide'
+local noder     = require 'core.noder'
+local collector = require 'core.collector'
 
 local requireLike = {
     ['include'] = true,
@@ -33,7 +35,8 @@ return function (uri, callback)
         if node.tag ~= '_ENV' then
             return
         end
-        if #vm.getDefs(src) == 0 then
+        local id = 'def:' .. noder.getID(src)
+        if not collector.has(id) then
             local message = lang.script('DIAG_UNDEF_GLOBAL', key)
             if requireLike[key:lower()] then
                 message = ('%s(%s)'):format(message, lang.script('DIAG_REQUIRE_LIKE', key))

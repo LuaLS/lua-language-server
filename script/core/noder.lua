@@ -179,6 +179,9 @@ local function getKey(source)
 end
 
 local function checkMode(source)
+    if guide.isGlobal(source) then
+        return 'g:'
+    end
     if source.type == 'table' then
         return 't:'
     end
@@ -254,9 +257,6 @@ local function checkMode(source)
         end
         return id
     end
-    if guide.isGlobal(source) then
-        return 'g:'
-    end
     if source.type == 'getlocal'
     or source.type == 'setlocal' then
         source = source.node
@@ -302,15 +302,10 @@ local function getID(source)
         if not node then
             break
         end
-        current = node
-        if current.special == '_G' then
-            for i = index, 2, -1 do
-                if IDList[i] == '"_G"' then
-                    IDList[i] = nil
-                end
-            end
+        if guide.isGlobal(current) then
             break
         end
+        current = node
         ::CONTINUE::
     end
     if index == 0 then

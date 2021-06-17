@@ -975,6 +975,10 @@ function m.isGlobal(source)
     if source._isGlobal ~= nil then
         return source._isGlobal
     end
+    if source.special == '_G' then
+        source._isGlobal = true
+        return true
+    end
     if source.type == 'setglobal'
     or source.type == 'getglobal' then
         if source.node and source.node.tag == '_ENV' then
@@ -982,12 +986,36 @@ function m.isGlobal(source)
             return true
         end
     end
-    if source.type == 'field' then
-        source = source.parent
+    if source.type == 'setfield'
+    or source.type == 'getfield'
+    or source.type == 'setindex'
+    or source.type == 'getindex' then
+        local current = source
+        while current do
+            local node = current.node
+            if not node then
+                break
+            end
+            if node.special == '_G' then
+                source._isGlobal = true
+                return true
+            end
+            if m.getKeyName(node) ~= '_G' then
+                break
+            end
+            current = node
+        end
     end
-    if source.special == '_G' then
-        source._isGlobal = true
-        return true
+    if source.type == 'call' then
+        local node = source.node
+        if node.special == 'rawget'
+        or node.special == 'rawset' then
+            if source.args[1] then
+                local isGlobal = source.args[1].special == '_G'
+                source._isGlobal = isGlobal
+                return isGlobal
+            end
+        end
     end
     source._isGlobal = false
     return false

@@ -192,14 +192,19 @@ function m.setText(uri, text, isTrust)
         end
     end
 
-    await.call(function ()
-        await.close('update:' .. originUri)
-        await.setID('update:' .. originUri)
-        await.delay()
-        if m.exists(originUri) then
-            m.onWatch('update', originUri)
-        end
-    end)
+    if TEST then
+        m.onWatch('update', originUri)
+    else
+        await.call(function ()
+            await.close('update:' .. originUri)
+            await.setID('update:' .. originUri)
+            await.delay()
+            if m.exists(originUri) then
+                m.onWatch('update', originUri)
+            end
+        end)
+    end
+
 end
 
 function m.setRawText(uri, text)

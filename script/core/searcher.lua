@@ -369,6 +369,9 @@ function m.searchRefsByID(status, uri, expect, mode)
         searchID(newID)
     end
 
+    local ftag = {}
+    local btag = {}
+
     local function checkThenPushTag(ward, tag)
         if not tag then
             return true
@@ -376,11 +379,11 @@ function m.searchRefsByID(status, uri, expect, mode)
         local checkTags
         local pushTags
         if ward == 'forward' then
-            checkTags = status.btag
-            pushTags  = status.ftag
+            checkTags = btag
+            pushTags  = ftag
         else
-            checkTags = status.ftag
-            pushTags  = status.btag
+            checkTags = ftag
+            pushTags  = btag
         end
         if checkTags[tag] and checkTags[tag] > 0 then
             return false
@@ -395,9 +398,9 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
         local popTags
         if ward == 'forward' then
-            popTags = status.ftag
+            popTags = ftag
         else
-            popTags = status.btag
+            popTags = btag
         end
         popTags[tag] = popTags[tag] - 1
     end

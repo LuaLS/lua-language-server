@@ -1010,7 +1010,7 @@ function m.isGlobal(source)
         local node = source.node
         if node.special == 'rawget'
         or node.special == 'rawset' then
-            if source.args[1] then
+            if source.args and source.args[1] then
                 local isGlobal = source.args[1].special == '_G'
                 source._isGlobal = isGlobal
                 return isGlobal

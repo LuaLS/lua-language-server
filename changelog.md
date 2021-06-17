@@ -1,5 +1,10 @@
 # changelog
 
+## 1.21.3
+`2021-6-17`
+* `NEW` supports `untrusted workspaces`
+* `FIX` performance issues, thanks to [folke](https://github.com/folke)
+
 ## 1.21.2
 `2021-5-18`
 * `FIX` loaded new file with ignored filename

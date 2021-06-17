@@ -131,6 +131,7 @@ Please [help me][en-US] improve the quality of `en-US`.
 * [火凌之](https://github.com/PhoenixZeng)
 * [CppCXY](https://github.com/CppCXY)
 * [Ketho](https://github.com/Ketho)
+* [Folke Lemaitre](https://github.com/folke)
 
 ## Telemetry
 

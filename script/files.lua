@@ -186,12 +186,20 @@ function m.setText(uri, text, isTrust)
     if create then
         m.onWatch('create', originUri)
     end
-    m.onWatch('update', originUri)
     if DEVELOP then
         if text ~= newText then
             util.saveFile(LOGPATH .. '/diffed.lua', newText)
         end
     end
+
+    await.call(function ()
+        await.close('update:' .. originUri)
+        await.setID('update:' .. originUri)
+        await.delay()
+        if m.exists(originUri) then
+            m.onWatch('update', originUri)
+        end
+    end)
 end
 
 function m.setRawText(uri, text)

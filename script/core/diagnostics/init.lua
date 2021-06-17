@@ -70,7 +70,9 @@ return function (uri, response)
         return nil
     end
 
-    log.debug('do diagnostic @', uri)
+    if TEST then
+        log.debug('do diagnostic @', uri)
+    end
 
     for _, name in ipairs(diagList) do
         await.delay()

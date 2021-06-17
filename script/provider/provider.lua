@@ -913,7 +913,6 @@ do
     files.watch(function (ev, uri)
         if ev == 'update'
         or ev == 'updateVisible' then
-            await.delay()
             await.call(function ()
                 updateHint(uri)
             end)

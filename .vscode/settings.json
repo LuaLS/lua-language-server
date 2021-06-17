@@ -47,5 +47,5 @@
         "script/?.lua",
         "script/?/init.lua"
     ],
-    "Lua.misc.parameters": "--showsource=true"
+    //"Lua.misc.parameters": "--showsource=true"
 }

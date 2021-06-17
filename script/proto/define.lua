@@ -124,7 +124,7 @@ m.DiagnosticDefaultNeededFileStatus = {
     ['close-non-object']        = 'Any',
     ['count-down-loop']         = 'Any',
     ['no-implicit-any']         = 'None',
-    ['deprecated']              = 'Any',
+    ['deprecated']              = 'Opened',
 
     ['duplicate-doc-class']     = 'Any',
     ['undefined-doc-class']     = 'Any',

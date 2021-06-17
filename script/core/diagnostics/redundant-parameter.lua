@@ -3,7 +3,6 @@ local guide  = require 'parser.guide'
 local vm     = require 'vm'
 local lang   = require 'language'
 local define = require 'proto.define'
-local await  = require 'await'
 
 local function countCallArgs(source)
     local result = 0
@@ -81,14 +80,7 @@ return function (uri, callback)
         end
 
         local func = source.node
-        local funcArgs = cache[func]
-        if funcArgs == nil then
-            funcArgs = getFuncArgs(func) or false
-            local refs = vm.getRefs(func)
-            for _, ref in ipairs(refs) do
-                cache[ref] = funcArgs
-            end
-        end
+        local funcArgs = getFuncArgs(func)
 
         if not funcArgs then
             return

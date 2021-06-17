@@ -972,9 +972,13 @@ end
 ---@param source parser.guide.object
 ---@return boolean
 function m.isGlobal(source)
+    if source._isGlobal ~= nil then
+        return source._isGlobal
+    end
     if source.type == 'setglobal'
     or source.type == 'getglobal' then
         if source.node and source.node.tag == '_ENV' then
+            source._isGlobal = true
             return true
         end
     end
@@ -982,8 +986,10 @@ function m.isGlobal(source)
         source = source.parent
     end
     if source.special == '_G' then
+        source._isGlobal = true
         return true
     end
+    source._isGlobal = false
     return false
 end
 

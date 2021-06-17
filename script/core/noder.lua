@@ -1,5 +1,6 @@
-local util    = require 'utility'
-local guide   = require 'parser.guide'
+local util      = require 'utility'
+local guide     = require 'parser.guide'
+local collector = require 'core.collector'
 
 local LastIDCache    = {}
 local FirstIDCache   = {}
@@ -516,10 +517,11 @@ local function compileCall(noders, call, sourceID, returnIndex)
     pushForward(noders, sourceID, funcXID)
 end
 
+---@param uri uri
 ---@param noders noders
 ---@param source parser.guide.object
 ---@return parser.guide.object[]
-function m.compileNode(noders, source)
+function m.compileNode(uri, noders, source)
     local id = getID(source)
     bindValue(noders, source, id)
     if source.special == 'setmetatable'
@@ -693,6 +695,26 @@ function m.compileNode(noders, source)
             TABLE_KEY
         )
         pushForward(noders, keyID, 'dn:integer')
+    end
+    if source.type == 'doc.type.name' then
+        collector.subscribe(uri, id, getNode(noders, id))
+    end
+    if source.type == 'doc.class.name' then
+        collector.subscribe(uri, id, getNode(noders, id))
+        collector.subscribe(uri, 'def:' .. id, getNode(noders, id))
+        collector.subscribe(uri, 'def:dn', getNode(noders, id))
+    end
+    if source.type == 'doc.alias.name' then
+        collector.subscribe(uri, id, getNode(noders, id))
+        collector.subscribe(uri, 'def:' .. id, getNode(noders, id))
+        collector.subscribe(uri, 'def:dn', getNode(noders, id))
+    end
+    if guide.isGlobal(source) then
+        collector.subscribe(uri, id, getNode(noders, id))
+        if guide.isSet(source) then
+            collector.subscribe(uri, 'def:' .. id, getNode(noders, id))
+            collector.subscribe(uri, 'def:g', getNode(noders, id))
+        end
     end
     -- 将函数的返回值映射到具体的返回值上
     if source.type == 'function' then
@@ -971,10 +993,12 @@ function m.compileNodes(source)
     if next(noders) then
         return noders
     end
+    local uri = guide.getUri(root)
+    collector.dropUri(uri)
     log.debug('compileNodes:', guide.getUri(root))
     guide.eachSource(root, function (src)
         m.pushSource(noders, src)
-        m.compileNode(noders, src)
+        m.compileNode(uri, noders, src)
     end)
     log.debug('compileNodes finish:', guide.getUri(root))
     return noders

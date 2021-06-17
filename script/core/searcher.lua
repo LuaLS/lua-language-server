@@ -1,12 +1,11 @@
-local noder   = require 'core.noder'
-local guide   = require 'parser.guide'
-local files   = require 'files'
-local generic = require 'core.generic'
-local ws      = require 'workspace'
-local vm      = require 'vm.vm'
-local globals = require 'vm.globals'
-local docs    = require 'vm.docs'
-local await   = require 'await'
+local noder     = require 'core.noder'
+local guide     = require 'parser.guide'
+local files     = require 'files'
+local generic   = require 'core.generic'
+local ws        = require 'workspace'
+local vm        = require 'vm.vm'
+local await     = require 'await'
+local collector = require 'core.collector'
 
 local NONE = {'NONE'}
 local LAST = {'LAST'}
@@ -466,10 +465,6 @@ function m.searchRefsByID(status, uri, expect, mode)
     end
 
     local function checkGlobal(id, node, field)
-        local uris = globals.getUrisByID(id)
-        if not uris then
-            return
-        end
         if status.crossed[id] then
             return
         end
@@ -482,7 +477,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         if FOOTPRINT then
             status.footprint[#status.footprint+1] = ('checkGlobal:%s + %s, isCall: %s'):format(id, field, isCall, tid)
         end
-        for guri, def in pairs(uris) do
+        for guri, def in collector.each(id) do
             if def then
                 crossSearch(status, guri, tid, mode, uri)
                 goto CONTINUE
@@ -506,16 +501,12 @@ function m.searchRefsByID(status, uri, expect, mode)
     end
 
     local function checkClass(id, node, field)
-        local uris = docs.getUrisByID(id)
-        if not uris then
-            return
-        end
         if status.crossed[id] then
             return
         end
         status.crossed[id] = true
         local tid = id .. (field or '')
-        for guri in pairs(uris) do
+        for guri in collector.each(id) do
             if not files.eq(uri, guri) then
                 crossSearch(status, guri, tid, mode, uri)
             end

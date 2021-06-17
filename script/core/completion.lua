@@ -324,7 +324,7 @@ local function checkModule(ast, word, offset, results)
         local fileName = path:match '[^/\\]*$'
         local stemName = fileName:gsub('%..+', '')
         if  not locals[stemName]
-        and #vm.getGlobalSets(stemName) == 0
+        and not vm.hasGlobalSets(stemName)
         and not config.config.diagnostics.globals[stemName]
         and stemName:match '^[%a_][%w_]*$'
         and matchKey(word, stemName) then

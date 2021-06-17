@@ -1000,6 +1000,7 @@ function m.compileNodes(source)
         return noders
     end
     log.debug('compileNodes:', guide.getUri(root))
+    collector.dropUri(guide.getUri(root))
     guide.eachSource(root, function (src)
         m.pushSource(noders, src)
         m.compileNode(noders, src)
@@ -1011,7 +1012,6 @@ end
 files.watch(function (ev, uri)
     uri = files.asKey(uri)
     if ev == 'update' then
-        collector.dropUri(uri)
         local state = files.getState(uri)
         m.compileNodes(state.ast)
     end

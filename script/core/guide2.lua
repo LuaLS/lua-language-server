@@ -3021,7 +3021,7 @@ function m.searchSameFields(status, simple, mode)
             locks[start] = lock
         end
         if lock[obj] then
-            return
+            return false
         end
         lock[obj] = true
         queueLen = queueLen + 1
@@ -3037,13 +3037,17 @@ function m.searchSameFields(status, simple, mode)
                 forces[queueLen] = force
             end
         end
+        return true
     end
     local function pushQueue(obj, start, force)
         if obj.type == 'getlocal'
         or obj.type == 'setlocal' then
             obj = obj.node
         end
-        appendQueue(obj, start, force)
+        if appendQueue(obj, start, force) == false then
+            -- no need to process the rest if obj is already locked
+            return
+        end
         if obj.type == 'local' and obj.ref then
             for _, ref in ipairs(obj.ref) do
                 appendQueue(ref, start, force)

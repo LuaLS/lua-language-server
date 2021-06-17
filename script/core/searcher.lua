@@ -477,21 +477,26 @@ function m.searchRefsByID(status, uri, expect, mode)
         if FOOTPRINT then
             status.footprint[#status.footprint+1] = ('checkGlobal:%s + %s, isCall: %s'):format(id, field, isCall, tid)
         end
-        for guri, def in collector.each(id) do
-            if def then
-                crossSearch(status, guri, tid, mode, uri)
+        local crossed = {}
+        for _, guri in collector.each('def:' .. id) do
+            if files.eq(uri, guri) then
+                goto CONTINUE
+            end
+            crossed[guri] = true
+            crossSearch(status, guri, tid, mode, uri)
+            ::CONTINUE::
+        end
+        for _, guri in collector.each(id) do
+            if crossed[guri] then
                 goto CONTINUE
             end
             if isCall then
                 goto CONTINUE
             end
-            if not field then
+            if not field and mode == 'def' then
                 goto CONTINUE
             end
-            if mode == 'def' then
-                goto CONTINUE
-            end
-            if not files.eq(uri, guri) then
+            if files.eq(uri, guri) then
                 goto CONTINUE
             end
             crossSearch(status, guri, tid, mode, uri)

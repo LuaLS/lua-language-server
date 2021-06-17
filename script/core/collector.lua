@@ -49,22 +49,25 @@ function m.has(name)
         return false
     end
     if next(nameCollect) == nil then
+        collect[name] = nil
         return false
     end
     return true
 end
+
+local DUMMY_FUNCTION = function () end
 
 --- 迭代某个名字的订阅
 ---@param name string
 function m.each(name)
     local nameCollect = collect[name]
     if not nameCollect then
-        return function () end
+        return DUMMY_FUNCTION
     end
     local uri, value
     return function ()
         uri, value = next(nameCollect, uri)
-        return value
+        return value, uri
     end
 end
 

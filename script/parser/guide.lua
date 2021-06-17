@@ -292,7 +292,7 @@ function m.getUri(obj)
     end
     local root = m.getRoot(obj)
     if root then
-        return root.uri
+        return root.uri or ''
     end
     return ''
 end

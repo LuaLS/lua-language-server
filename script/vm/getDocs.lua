@@ -10,12 +10,13 @@ local noder     = require 'core.noder'
 ---@param name? string
 ---@return parser.guide.object[]
 function vm.getDocDefines(name)
+    name = name or ''
     local cache = vm.getCache 'getDocDefines'
     if cache[name] then
         return cache[name]
     end
     local results = {}
-    local id = 'def:dn:' .. (name or '')
+    local id = 'def:dn:' .. name
     for node in collector.each(id) do
         if node.sources then
             for _, source in ipairs(node.sources) do

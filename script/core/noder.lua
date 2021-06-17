@@ -1,6 +1,7 @@
 local util      = require 'utility'
 local guide     = require 'parser.guide'
 local collector = require 'core.collector'
+local files     = require 'files'
 
 local LastIDCache    = {}
 local FirstIDCache   = {}
@@ -407,8 +408,8 @@ end
 ---添加关联单元
 ---@param noders noders
 ---@param source parser.guide.object
-function m.pushSource(noders, source)
-    local id = m.getID(source)
+function m.pushSource(noders, source, id)
+    id = id or m.getID(source)
     if not id then
         return
     end
@@ -517,11 +518,10 @@ local function compileCall(noders, call, sourceID, returnIndex)
     pushForward(noders, sourceID, funcXID)
 end
 
----@param uri uri
 ---@param noders noders
 ---@param source parser.guide.object
 ---@return parser.guide.object[]
-function m.compileNode(uri, noders, source)
+function m.compileNode(noders, source)
     local id = getID(source)
     bindValue(noders, source, id)
     if source.special == 'setmetatable'
@@ -697,23 +697,34 @@ function m.compileNode(uri, noders, source)
         pushForward(noders, keyID, 'dn:integer')
     end
     if source.type == 'doc.type.name' then
+        local uri = guide.getUri(source)
         collector.subscribe(uri, id, getNode(noders, id))
     end
-    if source.type == 'doc.class.name' then
+    if source.type == 'doc.class.name'
+    or source.type == 'doc.alias.name' then
+        local uri = guide.getUri(source)
         collector.subscribe(uri, id, getNode(noders, id))
-        collector.subscribe(uri, 'def:' .. id, getNode(noders, id))
-        collector.subscribe(uri, 'def:dn', getNode(noders, id))
-    end
-    if source.type == 'doc.alias.name' then
-        collector.subscribe(uri, id, getNode(noders, id))
-        collector.subscribe(uri, 'def:' .. id, getNode(noders, id))
-        collector.subscribe(uri, 'def:dn', getNode(noders, id))
+
+        local defID = 'def:' .. id
+        collector.subscribe(uri, defID, getNode(noders, defID))
+        m.pushSource(noders, source, defID)
+
+        local defAnyID = 'def:dn:'
+        collector.subscribe(uri, defAnyID, getNode(noders, defAnyID))
+        m.pushSource(noders, source, defAnyID)
     end
     if guide.isGlobal(source) then
+        local uri = guide.getUri(source)
         collector.subscribe(uri, id, getNode(noders, id))
         if guide.isSet(source) then
-            collector.subscribe(uri, 'def:' .. id, getNode(noders, id))
-            collector.subscribe(uri, 'def:g', getNode(noders, id))
+
+            local defID = 'def:' .. id
+            collector.subscribe(uri, defID, getNode(noders, defID))
+            m.pushSource(noders, source, defID)
+
+            local defAnyID = 'def:g:'
+            collector.subscribe(uri, defAnyID, getNode(noders, defAnyID))
+            m.pushSource(noders, source, defAnyID)
         end
     end
     -- 将函数的返回值映射到具体的返回值上
@@ -993,15 +1004,25 @@ function m.compileNodes(source)
     if next(noders) then
         return noders
     end
-    local uri = guide.getUri(root)
-    collector.dropUri(uri)
     log.debug('compileNodes:', guide.getUri(root))
     guide.eachSource(root, function (src)
         m.pushSource(noders, src)
-        m.compileNode(uri, noders, src)
+        m.compileNode(noders, src)
     end)
     log.debug('compileNodes finish:', guide.getUri(root))
     return noders
 end
+
+files.watch(function (ev, uri)
+    uri = files.asKey(uri)
+    if ev == 'update' then
+        collector.dropUri(uri)
+        local state = files.getState(uri)
+        m.compileNodes(state.ast)
+    end
+    if ev == 'remove' then
+        collector.dropUri(uri)
+    end
+end)
 
 return m

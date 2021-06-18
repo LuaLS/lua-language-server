@@ -10,7 +10,7 @@ local log            = log
 local xpcall         = xpcall
 local mathHuge       = math.huge
 
-local weakValueMT = { __mode = 'v' }
+local weakMT = { __mode = 'kv' }
 
 _ENV = nil
 
@@ -106,7 +106,7 @@ function m.mergeResults(a, b)
     return a
 end
 
-m.cacheTracker = setmetatable({}, weakValueMT)
+m.cacheTracker = setmetatable({}, weakMT)
 
 function m.flushCache()
     if m.cache then
@@ -115,7 +115,7 @@ function m.flushCache()
     m.cacheVersion = files.globalVersion
     m.cache = {}
     m.cacheActiveTime = mathHuge
-    m.locked = setmetatable({}, weakValueMT)
+    m.locked = setmetatable({}, weakMT)
     m.cacheTracker[m.cache] = true
 end
 
@@ -125,7 +125,7 @@ function m.getCache(name, weak)
     end
     m.cacheActiveTime = timer.clock()
     if not m.cache[name] then
-        m.cache[name] = weak and setmetatable({}, weakValueMT) or {}
+        m.cache[name] = weak and setmetatable({}, weakMT) or {}
     end
     return m.cache[name]
 end

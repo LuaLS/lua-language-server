@@ -27,7 +27,7 @@ local ignoredIDs = {
 
 local m = {}
 
----@alias guide.searchmode '"ref"'|'"def"'|'"field"'|'"allref"'
+---@alias guide.searchmode '"ref"'|'"def"'|'"field"'|'"allref"'|'"alldef"'
 
 ---添加结果
 ---@param status guide.status
@@ -49,7 +49,7 @@ function m.pushResult(status, mode, source, force)
         return
     end
     local parent = source.parent
-    if mode == 'def' then
+    if mode == 'def' or mode == 'alldef' then
         if source.type == 'local'
         or source.type == 'setlocal'
         or source.type == 'setglobal'
@@ -428,7 +428,7 @@ function m.searchRefsByID(status, uri, expect, mode)
             return
         end
         noder.eachBackward(node, function (backwardID, tag)
-            if tag == 'deep' and mode ~= 'allref' then
+            if tag == 'deep' and mode ~= 'allref' and mode ~= 'alldef' then
                 return
             end
             if not checkThenPushTag('backward', tag) then
@@ -496,7 +496,7 @@ function m.searchRefsByID(status, uri, expect, mode)
             if isCall then
                 goto CONTINUE
             end
-            if not field and mode == 'def' then
+            if not field and (mode == 'def' or mode == 'alldef') then
                 goto CONTINUE
             end
             if files.eq(uri, guri) then
@@ -565,7 +565,7 @@ function m.searchRefsByID(status, uri, expect, mode)
             checkENV(node.source, field)
         end
 
-        if mode == 'allref' then
+        if mode == 'allref' or mode == 'alldef' then
             checkMainReturn(id, node, field)
         end
 
@@ -598,18 +598,18 @@ function m.searchRefsByID(status, uri, expect, mode)
     local stepCount = 0
     local stepMaxCount = 1e3
     local statusMaxCount = 1e4
-    if mode == 'allref' then
+    if mode == 'allref' or mode == 'alldef' then
         stepMaxCount = 1e4
         statusMaxCount = 1e5
     end
     function searchStep(id, field)
         stepCount = stepCount + 1
         status.count = status.count + 1
-        if mode == 'allref' then
-            if status.count % 1e4 == 0 then
-                await.delay()
-            end
-        end
+        --if mode == 'allref' or mode == 'alldef' then
+        --    if status.count % 1e4 == 0 then
+        --        await.delay()
+        --    end
+        --end
         if stepCount > stepMaxCount
         or status.count > statusMaxCount then
             if TEST then
@@ -881,6 +881,22 @@ function m.requestDefinition(obj, field)
         m.searchFields(status, obj, 'def', field)
     else
         m.searchRefs(status, obj, 'def')
+    end
+
+    return status.results
+end
+
+--- 请求对象的全部定义（深度搜索）
+---@param obj       parser.guide.object
+---@param field?    string
+---@return parser.guide.object[]
+function m.requestAllDefinition(obj, field)
+    local status = m.status('alldef')
+
+    if field then
+        m.searchFields(status, obj, 'alldef', field)
+    else
+        m.searchRefs(status, obj, 'alldef')
     end
 
     return status.results

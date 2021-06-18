@@ -3,8 +3,6 @@ local guide     = require 'parser.guide'
 local collector = require 'core.collector'
 local files     = require 'files'
 
-local LastIDCache    = {}
-local FirstIDCache   = {}
 local SPLIT_CHAR     = '\x1F'
 local LAST_REGEX     = SPLIT_CHAR .. '[^' .. SPLIT_CHAR .. ']*$'
 local FIRST_REGEX    = '^[^' .. SPLIT_CHAR .. ']*'
@@ -972,15 +970,10 @@ end
 ---@param id string
 ---@return string
 function m.getFirstID(id)
-    if FirstIDCache[id] then
-        return FirstIDCache[id] or nil
-    end
     local firstID, count = id:match(FIRST_REGEX)
     if count == 0 then
-        FirstIDCache[id] = false
         return nil
     end
-    FirstIDCache[id] = firstID
     return firstID
 end
 
@@ -988,15 +981,10 @@ end
 ---@param id string
 ---@return string
 function m.getLastID(id)
-    if LastIDCache[id] then
-        return LastIDCache[id] or nil
-    end
     local lastID, count = id:gsub(LAST_REGEX, '')
     if count == 0 then
-        LastIDCache[id] = false
         return nil
     end
-    LastIDCache[id] = lastID
     return lastID
 end
 

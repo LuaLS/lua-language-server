@@ -373,7 +373,7 @@ function m.searchRefsByID(status, uri, expect, mode)
     local btag = {}
 
     local function checkThenPushTag(ward, tag)
-        if not tag then
+        if not tag or tag == 'deep' then
             return true
         end
         local checkTags
@@ -393,7 +393,7 @@ function m.searchRefsByID(status, uri, expect, mode)
     end
 
     local function popTag(ward, tag)
-        if not tag then
+        if not tag or tag == 'deep' then
             return
         end
         local popTags
@@ -602,11 +602,22 @@ function m.searchRefsByID(status, uri, expect, mode)
     end
 
     local stepCount = 0
+    local stepMaxCount = 1e3
+    local statusMaxCount = 1e4
+    if mode == 'allref' then
+        stepMaxCount = 1e4
+        statusMaxCount = 1e5
+    end
     function searchStep(id, field)
         stepCount = stepCount + 1
         status.count = status.count + 1
-        if stepCount > 1000
-        or status.count > 10000 then
+        if mode == 'allref' then
+            if status.count % 1e4 == 0 then
+                await.delay()
+            end
+        end
+        if stepCount > stepMaxCount
+        or status.count > statusMaxCount then
             if TEST then
                 if FOOTPRINT then
                     log.debug(table.concat(status.footprint, '\n'))

@@ -208,3 +208,11 @@ TEST [[
 ---@return <?xxx?>
 function f() end
 ]]
+
+TEST [[
+---@class A
+---@class B: A
+
+---@type A
+local <?t?>
+]]

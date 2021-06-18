@@ -91,6 +91,7 @@ return function (uri, offset)
         end
         if  (   src.type == 'doc.class.name'
             or  src.type == 'doc.type.name'
+            or  src.type == 'doc.extends.name'
             )
         and source.type ~= 'doc.type.name'
         and source.type ~= 'doc.class.name' then

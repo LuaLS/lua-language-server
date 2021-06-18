@@ -500,13 +500,13 @@ function m.searchInfers(source, field, mark)
         local id = noder.getID(source)
         if id then
             local node = noder.getNodeByID(source, id)
-            if node and node.sources then
-                for _, src in ipairs(node.sources) do
+            if node and node.source then
+                noder.eachSource(node, function (src)
                     if not mark[src] then
                         mark[src] = true
                         searchInfer(src, infers, mark)
                     end
-                end
+                end)
             end
         end
     end

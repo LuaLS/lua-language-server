@@ -1,5 +1,6 @@
 local collector = require 'core.collector'
 local vm        = require 'vm.vm'
+local noder     = require 'core.noder'
 
 function vm.hasGlobalSets(name)
     local id = ('def:g:%q'):format(name)
@@ -20,11 +21,9 @@ function vm.getGlobalSets(name)
         id = ('def:g:%q'):format(name)
     end
     for node in collector.each(id) do
-        if node.sources then
-            for _, source in ipairs(node.sources) do
-                results[#results+1] = source
-            end
-        end
+        noder.eachSource(node, function (source)
+            results[#results+1] = source
+        end)
     end
     return results
 end

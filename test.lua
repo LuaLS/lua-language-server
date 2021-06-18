@@ -9,7 +9,7 @@ local fs = require 'bee.filesystem'
 ROOT = fs.path(rootPath)
 TEST = true
 DEVELOP = true
-TRACE = true
+FOOTPRINT = true
 LOGPATH  = LOGPATH  or (ROOT .. '/log')
 METAPATH = METAPATH or (ROOT .. '/meta')
 

@@ -22,11 +22,21 @@ local URI_REGEX      = URI_CHAR .. '([^' .. URI_CHAR .. ']*)' .. URI_CHAR .. '(.
 -- 当前节点的id
 ---@field id     string
 -- 使用该ID的单元
+---@field source parser.guide.object
+-- 使用该ID的单元
 ---@field sources parser.guide.object[]
 -- 前进的关联ID
----@field forward string[]
+---@field forward string
+-- 第一个前进关联的tag
+---@field ftag string|boolean
+-- 前进的关联ID
+---@field forwards string[]
 -- 后退的关联ID
----@field backward string[]
+---@field backward string
+-- 第一个后退关联的tag
+---@field btag string|boolean
+-- 后退的关联ID
+---@field backwards string[]
 -- 函数调用参数信息（用于泛型）
 ---@field call parser.guide.object
 
@@ -339,13 +349,21 @@ local function pushForward(noders, id, forwardID, tag)
     end
     local node = getNode(noders, id)
     if not node.forward then
-        node.forward = {}
-    end
-    if node.forward[forwardID] ~= nil then
+        node.forward = forwardID
+        node.ftag    = tag
         return
     end
-    node.forward[forwardID] = tag or false
-    node.forward[#node.forward+1] = forwardID
+    if node.forward == forwardID then
+        return
+    end
+    if not node.forwards then
+        node.forwards = {}
+    end
+    if node.forwards[forwardID] ~= nil then
+        return
+    end
+    node.forwards[forwardID] = tag or false
+    node.forwards[#node.forwards+1] = forwardID
 end
 
 ---添加关联的后退ID
@@ -361,13 +379,21 @@ local function pushBackward(noders, id, backwardID, tag)
     end
     local node = getNode(noders, id)
     if not node.backward then
-        node.backward = {}
-    end
-    if node.backward[backwardID] ~= nil then
+        node.backward = backwardID
+        node.btag     = tag
         return
     end
-    node.backward[backwardID] = tag or false
-    node.backward[#node.backward+1] = backwardID
+    if node.backward == backwardID then
+        return
+    end
+    if not node.backwards then
+        node.backwards = {}
+    end
+    if node.backwards[backwardID] ~= nil then
+        return
+    end
+    node.backwards[backwardID] = tag or false
+    node.backwards[#node.backwards+1] = backwardID
 end
 
 local m = {}
@@ -409,10 +435,56 @@ function m.pushSource(noders, source, id)
         return
     end
     local node = getNode(noders, id)
+    if not node.source then
+        node.source = source
+        return
+    end
     if not node.sources then
         node.sources = {}
     end
     node.sources[#node.sources+1] = source
+end
+
+---遍历关联单元
+---@param node node
+---@param callback fun(source:parser.guide.object)
+function m.eachSource(node, callback)
+    if node.source then
+        callback(node.source)
+    end
+    if node.sources then
+        for _, source in ipairs(node.sources) do
+            callback(source)
+        end
+    end
+end
+
+---遍历forward
+---@param node node
+---@param callback fun(forwardID:string, tag:string)
+function m.eachForward(node, callback)
+    if node.forward then
+        callback(node.forward, node.ftag)
+    end
+    if node.forwards then
+        for _, id in ipairs(node.forwards) do
+            callback(id, node.forwards[id])
+        end
+    end
+end
+
+---遍历backward
+---@param node node
+---@param callback fun(backwardID:string, tag:string)
+function m.eachBackward(node, callback)
+    if node.backward then
+        callback(node.backward, node.btag)
+    end
+    if node.backwards then
+        for _, id in ipairs(node.backwards) do
+            callback(id, node.backwards[id])
+        end
+    end
 end
 
 local function bindValue(noders, source, id)

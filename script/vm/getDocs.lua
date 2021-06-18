@@ -18,14 +18,12 @@ function vm.getDocDefines(name)
     local results = {}
     local id = 'def:dn:' .. name
     for node in collector.each(id) do
-        if node.sources then
-            for _, source in ipairs(node.sources) do
-                if source.type == 'doc.class.name'
-                or source.type == 'doc.alias.name' then
-                    results[#results+1] = source
-                end
+        noder.eachSource(node, function (source)
+            if source.type == 'doc.class.name'
+            or source.type == 'doc.alias.name' then
+                results[#results+1] = source
             end
-        end
+        end)
     end
     cache[name] = results
     return results

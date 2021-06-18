@@ -424,6 +424,9 @@ function m.searchRefsByID(status, uri, expect, mode)
         if mode ~= 'ref' and mode ~= 'field' and mode ~= 'allref' and not field then
             return
         end
+        if ignoredIDs[id] then
+            return
+        end
         noder.eachBackward(node, function (backwardID, tag)
             if tag == 'deep' and mode ~= 'allref' then
                 return

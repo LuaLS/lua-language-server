@@ -6,6 +6,9 @@ local config = require 'config'
 local ws     = require 'workspace'
 local fs     = require 'bee.filesystem'
 
+config.config.workspace.preloadFileSize = 1000000
+config.config.diagnostics.neededFileStatus = {}
+
 local function doProjects(pathname)
     files.removeAll()
 
@@ -19,7 +22,7 @@ local function doProjects(pathname)
         local uri  = furi.encode(path:string())
         local text = fsu.loadFile(path)
         files.setText(uri, text)
-        files.open(uri)
+        --files.open(uri)
     end)
 
     print('开始诊断...')
@@ -39,5 +42,5 @@ local function doProjects(pathname)
     print('基准全量诊断用时：', passed)
 end
 
---doProjects [[C:\SSSEditor\client\Output\Lua]]
---doProjects [[C:\W3-Server\script]]
+doProjects [[C:\SSSEditor\client\Output\Lua]]
+doProjects [[C:\W3-Server\script]]

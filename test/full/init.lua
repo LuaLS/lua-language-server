@@ -13,18 +13,18 @@ end
 local function startCollectDiagTimes()
     for name in pairs(config.config.diagnostics.neededFileStatus) do
         if name ~= 'no-implicit-any' then
-            config.config.diagnostics.neededFileStatus[name] = 'Any'
+            --config.config.diagnostics.neededFileStatus[name] = 'Any'
         end
     end
     DIAGTIMES = {}
 end
 
 startCollectDiagTimes()
-require 'full.normal'
-require 'full.example'
-require 'full.dirty'
+--require 'full.normal'
+--require 'full.example'
+--require 'full.dirty'
 require 'full.projects'
-require 'full.self'
+--require 'full.self'
 
 for name, time in util.sortPairs(DIAGTIMES, function (k1, k2)
     return DIAGTIMES[k1] < DIAGTIMES[k2]

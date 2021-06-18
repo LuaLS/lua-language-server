@@ -1116,3 +1116,14 @@ end
 
 return mt
 ]]
+
+TEST [[
+local function each()
+    return function ()
+    end
+end
+
+for x in each() do
+    print(x)
+end
+]]

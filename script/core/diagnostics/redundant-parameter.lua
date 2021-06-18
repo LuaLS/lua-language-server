@@ -74,6 +74,10 @@ return function (uri, callback)
     local cache = vm.getCache 'redundant-parameter'
 
     guide.eachSourceType(ast.ast, 'call', function (source)
+        -- parameters be expanded by iterator
+        if source.node.iterator then
+            return
+        end
         local callArgs = countCallArgs(source)
         if callArgs == 0 then
             return

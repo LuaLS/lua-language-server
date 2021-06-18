@@ -27,7 +27,7 @@ local ignoredIDs = {
 
 local m = {}
 
----@alias guide.searchmode '"ref"'|'"def"'
+---@alias guide.searchmode '"ref"'|'"def"'|'"field"'|'"allref"'
 
 ---添加结果
 ---@param status guide.status
@@ -82,7 +82,7 @@ function m.pushResult(status, mode, source, force)
                 results[#results+1] = source
             end
         end
-    elseif mode == 'ref' or mode == 'field' then
+    elseif mode == 'ref' or mode == 'field' or mode == 'allref' then
         if source.type == 'local'
         or source.type == 'setlocal'
         or source.type == 'getlocal'
@@ -423,7 +423,7 @@ function m.searchRefsByID(status, uri, expect, mode)
     end
 
     local function checkBackward(id, node, field)
-        if mode ~= 'ref' and mode ~= 'field' and not field then
+        if mode ~= 'ref' and mode ~= 'field' and mode ~= 'allref' and not field then
             return
         end
         for _, backwardID in ipairs(node.backward) do
@@ -562,7 +562,7 @@ function m.searchRefsByID(status, uri, expect, mode)
     end
 
     local function checkAnyField(id, field)
-        if mode == 'ref' or mode == 'field' then
+        if mode == 'ref' or mode == 'field' or mode == 'allref' then
             return
         end
         local lastID = noder.getLastID(id)
@@ -822,6 +822,22 @@ function m.requestReference(obj, field)
         m.searchFields(status, obj, 'ref', field)
     else
         m.searchRefs(status, obj, 'ref')
+    end
+
+    return status.results
+end
+
+--- 请求对象的全部引用（深度搜索）
+---@param obj       parser.guide.object
+---@param field?    string
+---@return parser.guide.object[]
+function m.requestAllReference(obj, field)
+    local status = m.status('allref')
+
+    if field then
+        m.searchFields(status, obj, 'allref', field)
+    else
+        m.searchRefs(status, obj, 'allref')
     end
 
     return status.results

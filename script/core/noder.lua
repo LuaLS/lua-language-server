@@ -444,6 +444,8 @@ local function bindValue(noders, source, id)
     and valueType ~= 's:'
     and valueType ~= 'c:' then
         pushBackward(noders, valueID, id, 'set')
+    else
+        pushBackward(noders, valueID, id, 'deep')
     end
 end
 
@@ -475,14 +477,15 @@ local function compileCall(noders, call, sourceID, returnIndex)
         pushForward(noders, sourceID, tblID)
         pushForward(noders, sourceID, indexID)
         pushBackward(noders, tblID, sourceID)
-        return
         --pushBackward(noders, indexID, callID)
+        return
     end
     if node.special == 'require' then
         local arg1 = call.args and call.args[1]
         if arg1 and arg1.type == 'string' then
             getNode(noders, sourceID).require = arg1[1]
         end
+        pushBackward(noders, callID, sourceID, 'deep')
         return
     end
     if node.special == 'pcall'
@@ -501,7 +504,7 @@ local function compileCall(noders, call, sourceID, returnIndex)
             index
         )
         pushForward(noders, sourceID, pfuncXID)
-        --pushBackward(noders, funcXID, id)
+        pushBackward(noders, pfuncXID, sourceID, 'deep')
         return
     end
     local funcXID = ('%s%s%s'):format(
@@ -511,6 +514,7 @@ local function compileCall(noders, call, sourceID, returnIndex)
     )
     getNode(noders, sourceID).call = call
     pushForward(noders, sourceID, funcXID)
+    pushBackward(noders, funcXID, sourceID, 'deep')
 end
 
 ---@param noders noders
@@ -542,8 +546,8 @@ function m.compileNode(noders, source)
         if setmethod and ( setmethod.type == 'setmethod'
                         or setmethod.type == 'setfield'
                         or setmethod.type == 'setindex') then
-            pushForward(noders, id, getID(setmethod.node), 'method')
-            --pushBackward(noders, getID(setmethod.node), id, 'method')
+            pushForward(noders, id, getID(setmethod.node))
+            pushBackward(noders, getID(setmethod.node), id, 'deep')
         end
     end
     -- 分解 @type
@@ -736,6 +740,9 @@ function m.compileNode(noders, source)
                             rtn.returnIndex
                         )
                         pushForward(noders, fullID, getID(rtn))
+                        for _, typeUnit in ipairs(rtn.types) do
+                            pushBackward(noders, getID(typeUnit), fullID, 'deep')
+                        end
                         hasDocReturn[rtn.returnIndex] = true
                     end
                 end
@@ -786,10 +793,7 @@ function m.compileNode(noders, source)
                 )
                 for _, rtnObj in ipairs(rtnObjs) do
                     pushForward(noders, returnID, getID(rtnObj))
-                    if rtnObj.type == 'function'
-                    or rtnObj.type == 'call' then
-                        --pushBackward(noders, getID(rtnObj), returnID)
-                    end
+                    pushBackward(noders, getID(rtnObj), returnID, 'deep')
                 end
             end
         end
@@ -810,7 +814,7 @@ function m.compileNode(noders, source)
                 local rtnObj = rtn[1]
                 if rtnObj then
                     pushForward(noders, 'mainreturn', getID(rtnObj))
-                    --pushBackward(noders, getID(rtnObj), 'mainreturn')
+                    pushBackward(noders, getID(rtnObj), 'mainreturn', 'deep')
                 end
             end
         end

@@ -401,7 +401,7 @@ function m.compileState(uri, text)
         if not m.notifyCache['preloadFileSize'][uri] then
             m.notifyCache['preloadFileSize'][uri] = true
             m.notifyCache['skipLargeFileCount'] = m.notifyCache['skipLargeFileCount'] + 1
-            if m.notifyCache['skipLargeFileCount'] <= 3 then
+            if m.notifyCache['skipLargeFileCount'] <= 1 then
                 proto.notify('window/showMessage', {
                     type = 3,
                     message = lang.script('WORKSPACE_SKIP_LARGE_FILE'

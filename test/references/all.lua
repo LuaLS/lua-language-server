@@ -58,7 +58,45 @@ end
 --end
 --]]
 
+TEST [[
+local function f()
+    return <~<!function~> ()
+    end!>
+end
+
+local <!f2!> = f()
+]]
+
+TEST [[
+local function f()
+    return nil, <~<!function~> ()
+    end!>
+end
+
+local _, <!f2!> = f()
+]]
+
+TEST [[
+local <?x?>
+local function f()
+    return <!x!>
+end
+local <!y!> = f()
+]]
+
+TEST [[
+local <?x?>
+local function f()
+    return function ()
+        return <!x!>
+    end
+end
+local <!y!> = f()()
+]]
+
+-- TODO
 -- 泛型的反向搜索
+do return end
 TEST [[
 ---@class Dog
 local <?Dog?> = {}
@@ -156,40 +194,4 @@ local <?A?>
 function <!A!>:f() end
 
 local <!b!> = <!A!>:f()
-]]
-
-TEST [[
-local function f()
-    return <~<!function~> ()
-    end!>
-end
-
-local <!f2!> = f()
-]]
-
-TEST [[
-local function f()
-    return nil, <~<!function~> ()
-    end!>
-end
-
-local _, <!f2!> = f()
-]]
-
-TEST [[
-local <?x?>
-local function f()
-    return <!x!>
-end
-local <!y!> = f()
-]]
-
-TEST [[
-local <?x?>
-local function f()
-    return function ()
-        return <!x!>
-    end
-end
-local <!y!> = f()()
 ]]

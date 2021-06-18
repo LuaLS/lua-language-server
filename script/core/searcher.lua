@@ -428,6 +428,9 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
         for _, backwardID in ipairs(node.backward) do
             local tag = node.backward[backwardID]
+            if tag == 'deep' and mode ~= 'allref' then
+                goto CONTINUE
+            end
             if not checkThenPushTag('backward', tag) then
                 goto CONTINUE
             end
@@ -521,6 +524,23 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
     end
 
+    local function checkMainReturn(id, node, field)
+        if id ~= 'mainreturn' then
+            return
+        end
+        local calls = vm.getLinksTo(uri)
+        for _, call in ipairs(calls) do
+            local curi = guide.getUri(call)
+            local cid  = ('%s%s'):format(
+                noder.getID(call),
+                field or ''
+            )
+            if not files.eq(curi, uri) then
+                crossSearch(status, curi, cid, mode, uri)
+            end
+        end
+    end
+
     local function searchNode(id, node, field)
         if node.call then
             callStack[#callStack+1] = node.call
@@ -534,7 +554,6 @@ function m.searchRefsByID(status, uri, expect, mode)
 
         if node.require then
             checkRequire(node.require, field)
-            return
         end
 
         local isSepcial = checkSpecial(id, node, field)
@@ -552,7 +571,9 @@ function m.searchRefsByID(status, uri, expect, mode)
             checkENV(node.sources[1], field)
         end
 
-        --checkMainReturn(id, node, field)
+        if mode == 'allref' then
+            checkMainReturn(id, node, field)
+        end
 
         if node.call then
             callStack[#callStack] = nil

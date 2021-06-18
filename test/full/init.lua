@@ -20,11 +20,11 @@ local function startCollectDiagTimes()
 end
 
 startCollectDiagTimes()
---require 'full.normal'
---require 'full.example'
---require 'full.dirty'
+require 'full.normal'
+require 'full.example'
+require 'full.dirty'
 require 'full.projects'
---require 'full.self'
+require 'full.self'
 
 for name, time in util.sortPairs(DIAGTIMES, function (k1, k2)
     return DIAGTIMES[k1] < DIAGTIMES[k2]

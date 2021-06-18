@@ -109,7 +109,7 @@ local function getKey(source)
     elseif source.type == 'function' then
         return source.start, nil
     elseif source.type == 'string' then
-        return '', nil
+        return source.start, nil
     elseif source.type == 'integer'
     or     source.type == 'number'
     or     source.type == 'boolean'
@@ -531,6 +531,9 @@ function m.compileNode(noders, source)
     or source.special == 'rawget' then
         local node = getNode(noders, id)
         node.skip = true
+    end
+    if source.type == 'string' then
+        pushForward(noders, id, 'str:')
     end
     -- self -> mt:xx
     if source.type == 'local' and source[1] == 'self' then

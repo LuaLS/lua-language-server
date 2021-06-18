@@ -445,16 +445,14 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
     end
 
-    local function checkSpecial(id, node, field)
+    local function checkSpecial(id, field)
         -- Special rule: ('').XX -> stringlib.XX
         if id == 'str:'
         or id == 'dn:string' then
             if field or mode == 'field' then
                 searchID('dn:stringlib', field)
             end
-            return true
         end
-        return false
     end
 
     local function checkRequire(requireName, field)
@@ -556,14 +554,11 @@ function m.searchRefsByID(status, uri, expect, mode)
             checkRequire(node.require, field)
         end
 
-        local isSepcial = checkSpecial(id, node, field)
-        if not isSepcial then
-            if node.forward then
-                checkForward(id, node, field)
-            end
-            if node.backward then
-                checkBackward(id, node, field)
-            end
+        if node.forward then
+            checkForward(id, node, field)
+        end
+        if node.backward then
+            checkBackward(id, node, field)
         end
 
         if node.sources then
@@ -631,6 +626,7 @@ function m.searchRefsByID(status, uri, expect, mode)
                 return
             end
         end
+        checkSpecial(id, field)
         local node = noder.getNodeByID(root, id)
         if node then
             searchNode(id, node, field)

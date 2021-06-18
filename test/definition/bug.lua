@@ -234,3 +234,11 @@ TEST [[
 g[a.b.c] = 1
 print(g.<?x?>)
 ]]
+
+TEST [[
+local function f()
+    return ''
+end
+
+local <?<!s!>?> = ''
+]]

@@ -175,8 +175,7 @@ local ConfigTemplate = {
         viewString      = {true,      Boolean},
         viewStringMax   = {1000,      Integer},
         viewNumber      = {true,      Boolean},
-        fieldInfer      = {3000,      Integer},
-        previewFields   = {100,       Integer},
+        previewFields   = {20,        Integer},
         enumsLimit      = {5,         Integer},
     },
     color = {

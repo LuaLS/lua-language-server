@@ -806,27 +806,7 @@ global _G: _G {
     module: function,
     next: function,
     os: oslib,
-    package: packagelib,
-    pairs: function,
-    pcall: function,
-    print: function,
-    rawequal: function,
-    rawget: function,
-    rawlen: function,
-    rawset: function,
-    require: function,
-    select: function,
-    setfenv: function,
-    setmetatable: function,
-    string: stringlib,
-    table: tablelib,
-    tonumber: function,
-    tostring: function,
-    type: function,
-    unpack: function,
-    utf8: utf8lib,
-    warn: function,
-    xpcall: function,
+    ...(+21)
 }
 ]]
 

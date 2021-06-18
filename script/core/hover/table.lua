@@ -1,9 +1,8 @@
 local vm       = require 'vm'
 local util     = require 'utility'
-local searcher = require 'core.searcher'
 local config   = require 'config'
-local lang     = require 'language'
 local infer    = require 'core.infer'
+local await    = require 'await'
 
 local function formatKey(key)
     if type(key) == 'string' then
@@ -28,8 +27,8 @@ local function buildAsHash(keys, inferMap, literalMap, reachMax)
             lines[#lines+1] = ('    %s: %s,'):format(formatKey(key), inferView)
         end
     end
-    if reachMax then
-        lines[#lines+1] = '    ...'
+    if reachMax > 0 then
+        lines[#lines+1] = ('    ...(+%d)'):format(reachMax)
     end
     lines[#lines+1] = '}'
     return table.concat(lines, '\n')
@@ -50,8 +49,8 @@ local function buildAsConst(keys, inferMap, literalMap, reachMax)
             lines[#lines+1] = ('    %s: %s,'):format(formatKey(key), inferView)
         end
     end
-    if reachMax then
-        lines[#lines+1] = '    ...'
+    if reachMax > 0 then
+        lines[#lines+1] = ('    ...(+%d)'):format(reachMax)
     end
     lines[#lines+1] = '}'
     return table.concat(lines, '\n')
@@ -107,10 +106,16 @@ return function (source)
     local inferMap   = {}
     local literalMap = {}
 
-    local reachMax = maxFields < #keys
+    local reachMax = #keys - maxFields
+    if #keys > maxFields then
+        for i = maxFields + 1, #keys do
+            keys[i] = nil
+        end
+    end
 
     local isConsts = true
-    for i = 1, math.min(maxFields, #keys) do
+    for i = 1, #keys do
+        await.delay()
         local key = keys[i]
         inferMap[key]   = infer.searchAndViewInfers(source, key)
         literalMap[key] = infer.searchAndViewLiterals(source, key)

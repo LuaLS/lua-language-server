@@ -762,3 +762,36 @@ function f()
     name  = 'food',
     description = "@*return* — this is a tab `\t`"
 }}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+---@class string
+
+---@generic T: table, K, V
+---@param t T
+---@return fun(table: table<K, V>, index?: K):K, V
+---@return T
+local function pairs(t) end
+
+return pairs
+        ]]
+    },
+    {
+        path = 'b.lua',
+        content = [[
+local pairs = require 'a'
+
+---@type table<string, boolean>
+local t
+
+for <?k?>, v in pairs(t) do
+end
+    ]]
+    },
+    hover = {
+        label = [[local k: string]],
+        name  = 'k',
+    }
+}

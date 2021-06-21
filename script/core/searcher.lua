@@ -181,10 +181,10 @@ function m.getObjectValue(obj)
 end
 
 local function crossSearch(status, uri, expect, mode, sourceUri)
-    if status.lock[uri] then
+    if status.lock[uri] and status.lock[uri] >= 3 then
         return
     end
-    status.lock[uri] = true
+    status.lock[uri] = (status.lock[uri] or 0) + 1
     --await.delay()
     if TRACE then
         log.debug('crossSearch', uri, expect)
@@ -193,7 +193,10 @@ local function crossSearch(status, uri, expect, mode, sourceUri)
         status.footprint[#status.footprint+1] = ('cross search:%s %s'):format(uri, expect)
     end
     m.searchRefsByID(status, uri, expect, mode)
-    status.lock[uri] = nil
+    status.lock[uri] = status.lock[uri] - 1
+    if TRACE then
+        log.debug('crossSearch finish, back to:', uri)
+    end
     if FOOTPRINT then
         status.footprint[#status.footprint+1] = ('cross search finish, back to: %s'):format(sourceUri)
     end

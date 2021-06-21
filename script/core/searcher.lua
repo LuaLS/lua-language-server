@@ -200,7 +200,7 @@ local function crossSearch(status, uri, expect, mode, sourceUri)
 end
 
 local function checkCache(status, uri, expect, mode)
-    local cache = vm.getCache('search:' .. mode, true)
+    local cache = vm.getCache('search:' .. mode)
     local fileCache = cache[uri]
     if not fileCache then
         fileCache = {}

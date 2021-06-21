@@ -155,7 +155,6 @@ local function getHoverByUri(uri, offset)
     if not source then
         return nil
     end
-    vm.getAllDefs(source)
     local hover = getHover(source)
     if SHOWSOURCE then
         hover.description = ('%s\n---\n\n```lua\n%s\n```'):format(

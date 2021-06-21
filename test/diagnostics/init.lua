@@ -1127,3 +1127,10 @@ for x in each() do
     print(x)
 end
 ]]
+
+TEST [[
+---@type string
+local s
+
+print(s:upper())
+]]

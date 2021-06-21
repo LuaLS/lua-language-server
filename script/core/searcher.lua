@@ -15,7 +15,6 @@ local ignoredIDs = {
     ['dn:nil']           = true,
     ['dn:any']           = true,
     ['dn:boolean']       = true,
-    ['dn:string']        = true,
     ['dn:table']         = true,
     ['dn:number']        = true,
     ['dn:integer']       = true,

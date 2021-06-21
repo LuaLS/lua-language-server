@@ -32,20 +32,18 @@
         ".vscode",
         "meta",
     ],
-    "Lua.workspace.library": {
-        "E:/Github/test" : true,
+    "Lua.workspace.library": [
+        "E:/Github/test",
         // Just some comment
-        "script/meta" : true,
-    },
-    "Lua.plugin.enable": true,
-    "Lua.awakened.cat": true,
-    "Lua.develop.enable": true,
-    "Lua.develop.debuggerPort": 11413,
-    "Lua.intelliSense.searchDepth": 0,
+        "script/meta",
+    ],
     "Lua.runtime.path": [
         "?.lua",
         "script/?.lua",
         "script/?/init.lua"
     ],
-    //"Lua.misc.parameters": "--showsource=true"
+    "Lua.misc.parameters": [
+        "--develop=true",
+        "--dbgport=11413",
+    ]
 }

@@ -460,9 +460,9 @@ local vmMap = {
 function CompileBlock(obj, parent)
     for i = 1, #obj do
         local act = obj[i]
+        act.parent = parent
         local f = vmMap[act.type]
         if f then
-            act.parent = parent
             f(act)
         end
     end

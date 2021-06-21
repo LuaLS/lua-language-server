@@ -1,5 +1,9 @@
 # changelog
 
+## 2.0.0
+* `NEW` implement
+* `CHG` diagnostics `undefined-field`, `deprecated`: default by `Opened` instead of `None`
+
 ## 1.21.3
 `2021-6-17`
 * `NEW` supports `untrusted workspaces`

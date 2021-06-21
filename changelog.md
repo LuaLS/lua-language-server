@@ -4,6 +4,9 @@
 * `NEW` implement
 * `CHG` diagnostics `undefined-field`, `deprecated`: default by `Opened` instead of `None`
 * `CHG` setting `Lua.runtime.plugin`: default by `""` instead of `".vscode/lua/plugin.lua"` (for security)
+* `CHG` setting `Lua.intelliSense.searchDepth`: removed
+* `CHG` setting `Lua.misc.parameters`: `string array` instead of `string`
+* `CHG` setting `Lua.develop.enable`, `Lua.develop.debuggerPort`, `Lua.develop.debuggerWait`: removed, use `Lua.misc.parameters` instead
 
 ## 1.21.3
 `2021-6-17`

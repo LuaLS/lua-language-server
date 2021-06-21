@@ -13,6 +13,9 @@ local function doProjects(pathname)
     files.removeAll()
 
     local path = fs.path(pathname)
+    if not fs.exists(path) then
+        return
+    end
 
     print('基准诊断目录：', path)
     fsu.scanDirectory(path, function (path)

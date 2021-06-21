@@ -170,7 +170,12 @@ local function compileSingleMetaDoc(script, metaLang, status)
 
     util.saveFile((ROOT / 'log' / 'middleScript.lua'):string(), middleScript)
 
-    assert(load(middleScript, middleScript, 't', env))()
+    local suc = xpcall(function ()
+        assert(load(middleScript, middleScript, 't', env))()
+    end, log.error)
+    if not suc then
+        log.debug('MiddleScript:\n', middleScript)
+    end
     if disable and status == 'default' then
         return nil
     end

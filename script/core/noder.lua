@@ -1080,7 +1080,9 @@ files.watch(function (ev, uri)
     uri = files.asKey(uri)
     if ev == 'update' then
         local state = files.getState(uri)
-        m.compileNodes(state.ast)
+        if state then
+            m.compileNodes(state.ast)
+        end
     end
     if ev == 'remove' then
         collector.dropUri(uri)

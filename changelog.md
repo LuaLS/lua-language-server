@@ -7,6 +7,7 @@
 * `CHG` setting `Lua.intelliSense.searchDepth`: removed
 * `CHG` setting `Lua.misc.parameters`: `string array` instead of `string`
 * `CHG` setting `Lua.develop.enable`, `Lua.develop.debuggerPort`, `Lua.develop.debuggerWait`: removed, use `Lua.misc.parameters` instead
+* `FIX` [#441](https://github.com/sumneko/lua-language-server/issues/441)
 * `FIX` [#493](https://github.com/sumneko/lua-language-server/issues/493)
 
 ## 1.21.3

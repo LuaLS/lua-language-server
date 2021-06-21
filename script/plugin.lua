@@ -49,6 +49,10 @@ function m.init()
         end
     end
 
+    if not config.config.runtime.plugin or config.config.runtime.plugin == '' then
+        return
+    end
+
     local pluginPath = fs.path(config.config.runtime.plugin)
     if pluginPath:is_relative() then
         if not ws.path then

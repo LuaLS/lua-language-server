@@ -229,7 +229,7 @@ local function isLiteralValue(source)
     if not guide.isLiteral(source) then
         return false
     end
-    if source.parent.index == source then
+    if source.parent and source.parent.index == source then
         return false
     end
     return true

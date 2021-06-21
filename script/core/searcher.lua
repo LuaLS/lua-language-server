@@ -657,6 +657,9 @@ local function prepareSearch(source)
     or source.type == 'method' then
         source = source.parent
     end
+    if not source then
+        return
+    end
     local root = guide.getRoot(source)
     noder.compileNodes(root)
     local uri  = guide.getUri(source)

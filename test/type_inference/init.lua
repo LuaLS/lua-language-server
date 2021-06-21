@@ -742,11 +742,3 @@ local <?test?> = Rct.new(Rct)
 
 return test
 ]]
-
-TEST 'number' [[
----@alias t table<number, string>
----@type t
-local a = {}
-for <?x?>, y in pairs(a) do
-end
-]]

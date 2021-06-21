@@ -795,3 +795,34 @@ end
         name  = 'k',
     }
 }
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+---@class string
+
+---@generic T: table, K, V
+---@param t T
+---@return fun(table: table<K, V>, index?: K):K, V
+---@return T
+function tpairs(t) end
+        ]]
+    },
+    {
+        path = 'b.lua',
+        content = [[
+local pairs = require 'a'
+
+---@type table<string, boolean>
+local t
+
+for <?k?>, v in tpairs(t) do
+end
+    ]]
+    },
+    hover = {
+        label = [[local k: string]],
+        name  = 'k',
+    }
+}

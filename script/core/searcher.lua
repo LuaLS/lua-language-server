@@ -39,7 +39,7 @@ function m.pushResult(status, mode, source, force)
         return
     end
     local results = status.results
-    local mark = status.mark
+    local mark = status.rmark
     if mark[source] then
         return
     end
@@ -180,12 +180,30 @@ function m.getObjectValue(obj)
     return nil
 end
 
+local function checkLock(status, k1, k2)
+    local locks = status.lock
+    local lock1 = locks[k1]
+    if not lock1 then
+        lock1 = {}
+        locks[k1] = lock1
+    end
+    if lock1[NONE] then
+        return true
+    end
+    if k2 == nil then
+        k2 = NONE
+    end
+    if lock1[k2] then
+        return true
+    end
+    lock1[k2] = true
+    return false
+end
+
 local function crossSearch(status, uri, expect, mode, sourceUri)
-    if status.lock[uri] then
+    if checkLock(status, uri, expect) then
         return
     end
-    status.lock[uri] = true
-    --await.delay()
     if TRACE then
         log.debug('crossSearch', uri, expect)
     end
@@ -193,7 +211,7 @@ local function crossSearch(status, uri, expect, mode, sourceUri)
         status.footprint[#status.footprint+1] = ('cross search:%s %s'):format(uri, expect)
     end
     m.searchRefsByID(status, uri, expect, mode)
-    status.lock[uri] = nil
+    --status.lock[uri] = nil
     if TRACE then
         log.debug('crossSearch finish, back to:', sourceUri)
     end
@@ -243,6 +261,9 @@ function m.searchRefsByID(status, uri, expect, mode)
         if not cmark then
             cmark = {}
             mark[id] = cmark
+        end
+        if cmark[NONE] then
+            return
         end
         if cmark[field or NONE] then
             return
@@ -474,10 +495,9 @@ function m.searchRefsByID(status, uri, expect, mode)
         if id:sub(1, 2) ~= 'g:' then
             return
         end
-        if status.lock[id] then
+        if checkLock(status, id, field) then
             return
         end
-        status.lock[id] = true
         local isCall = field and field:sub(2, 2) == noder.RETURN_INDEX
         local tid = id .. (field or '')
         if FOOTPRINT then
@@ -514,10 +534,9 @@ function m.searchRefsByID(status, uri, expect, mode)
         if id:sub(1, 3) ~= 'dn:' then
             return
         end
-        if status.lock[id] then
+        if checkLock(status, id, field) then
             return
         end
-        status.lock[id] = true
         local tid = id .. (field or '')
         for _, guri in collector.each('def:' .. id) do
             if not files.eq(uri, guri) then
@@ -836,7 +855,8 @@ function m.status(mode)
         crossed   = {},
         lock      = {},
         results   = {},
-        mark      = {},
+        rmark     = {},
+        smark     = {},
         footprint = {},
         count     = 0,
         ftag      = {},

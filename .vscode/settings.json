@@ -45,5 +45,6 @@
     "Lua.misc.parameters": [
         "--develop=true",
         "--dbgport=11413",
+        "--showsource=true",
     ]
 }

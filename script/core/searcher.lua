@@ -181,10 +181,10 @@ function m.getObjectValue(obj)
 end
 
 local function crossSearch(status, uri, expect, mode, sourceUri)
-    if status.lock[uri] and status.lock[uri] >= 3 then
+    if status.lock[uri] then
         return
     end
-    status.lock[uri] = (status.lock[uri] or 0) + 1
+    status.lock[uri] = true
     --await.delay()
     if TRACE then
         log.debug('crossSearch', uri, expect)
@@ -193,9 +193,9 @@ local function crossSearch(status, uri, expect, mode, sourceUri)
         status.footprint[#status.footprint+1] = ('cross search:%s %s'):format(uri, expect)
     end
     m.searchRefsByID(status, uri, expect, mode)
-    status.lock[uri] = status.lock[uri] - 1
+    status.lock[uri] = nil
     if TRACE then
-        log.debug('crossSearch finish, back to:', uri)
+        log.debug('crossSearch finish, back to:', sourceUri)
     end
     if FOOTPRINT then
         status.footprint[#status.footprint+1] = ('cross search finish, back to: %s'):format(sourceUri)
@@ -471,13 +471,13 @@ function m.searchRefsByID(status, uri, expect, mode)
     end
 
     local function checkGlobal(id, node, field)
-        if status.crossed[id] then
+        if id:sub(1, 2) ~= 'g:' then
             return
         end
-        status.crossed[id] = true
-        --if not checkThenPushTag('forward', 'set') then
-        --    return
-        --end
+        if status.lock[id] then
+            return
+        end
+        status.lock[id] = true
         local isCall = field and field:sub(2, 2) == noder.RETURN_INDEX
         local tid = id .. (field or '')
         if FOOTPRINT then
@@ -488,7 +488,6 @@ function m.searchRefsByID(status, uri, expect, mode)
             if files.eq(uri, guri) then
                 goto CONTINUE
             end
-            crossed[guri] = true
             crossSearch(status, guri, tid, mode, uri)
             ::CONTINUE::
         end
@@ -512,12 +511,15 @@ function m.searchRefsByID(status, uri, expect, mode)
     end
 
     local function checkClass(id, node, field)
-        if status.crossed[id] then
+        if id:sub(1, 3) ~= 'dn:' then
             return
         end
-        status.crossed[id] = true
+        if status.lock[id] then
+            return
+        end
+        status.lock[id] = true
         local tid = id .. (field or '')
-        for guri in collector.each(id) do
+        for _, guri in collector.each('def:' .. id) do
             if not files.eq(uri, guri) then
                 crossSearch(status, guri, tid, mode, uri)
             end

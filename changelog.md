@@ -1,6 +1,7 @@
 # changelog
 
 ## 2.0.0
+`2021-6-21`
 * `NEW` implement
 * `CHG` diagnostics `undefined-field`, `deprecated`: default by `Opened` instead of `None`
 * `CHG` setting `Lua.runtime.plugin`: default by `""` instead of `".vscode/lua/plugin.lua"` (for security)

@@ -9,6 +9,7 @@
 * `CHG` setting `Lua.develop.enable`, `Lua.develop.debuggerPort`, `Lua.develop.debuggerWait`: removed, use `Lua.misc.parameters` instead
 * `FIX` [#441](https://github.com/sumneko/lua-language-server/issues/441)
 * `FIX` [#493](https://github.com/sumneko/lua-language-server/issues/493)
+* `FIX` [#531](https://github.com/sumneko/lua-language-server/issues/531)
 
 ## 1.21.3
 `2021-6-17`

@@ -5,5 +5,4 @@ require 'vm.getLibrary'
 require 'vm.eachDef'
 require 'vm.eachRef'
 require 'vm.getLinks'
-require 'vm.guideInterface'
 return vm

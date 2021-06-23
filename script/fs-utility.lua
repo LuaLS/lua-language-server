@@ -18,6 +18,7 @@ local m = {}
 ---@param path string
 function m.loadFile(path)
     if type(path) ~= 'string' then
+        ---@diagnostic disable-next-line: undefined-field
         path = path:string()
     end
     local f, e = ioOpen(path, 'rb')
@@ -37,6 +38,7 @@ end
 ---@param content string
 function m.saveFile(path, content)
     if type(path) ~= 'string' then
+        ---@diagnostic disable-next-line: undefined-field
         path = path:string()
     end
     local f, e = ioOpen(path, "wb")

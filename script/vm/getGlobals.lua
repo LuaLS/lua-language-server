@@ -1,4 +1,5 @@
 local collector = require 'core.collector'
+---@type vm
 local vm        = require 'vm.vm'
 local noder     = require 'core.noder'
 

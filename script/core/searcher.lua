@@ -539,7 +539,7 @@ function m.searchRefsByID(status, uri, expect, mode)
             return
         end
         local tid = id .. (field or '')
-        for _, guri in collector.each('def:' .. id) do
+        for _, guri in collector.each(id) do
             if not files.eq(uri, guri) then
                 crossSearch(status, guri, tid, mode, uri)
             end
@@ -846,6 +846,8 @@ end
 ---@class guide.status
 ---搜索结果
 ---@field results parser.guide.object[]
+---@field rmark   table
+---@field id      string
 
 ---创建搜索状态
 ---@param mode guide.searchmode

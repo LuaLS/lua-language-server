@@ -2,6 +2,57 @@ local error        = error
 local type         = type
 
 ---@class parser.guide.object
+---@field bindDocs              parser.guide.object[]
+---@field bindGroup             parser.guide.object[]
+---@field bindSources           parser.guide.object[]
+---@field value                 parser.guide.object
+---@field parent                parser.guide.object
+---@field type                  string
+---@field special               string
+---@field tag                   string
+---@field args                  parser.guide.object[]
+---@field locals                parser.guide.object[]
+---@field returns               parser.guide.object[]
+---@field uri                   uri
+---@field start                 integer
+---@field finish                integer
+---@field effect                integer
+---@field attrs                 string[]
+---@field specials              parser.guide.object[]
+---@field labels                parser.guide.object[]
+---@field node                  parser.guide.object
+---@field dummy                 boolean
+---@field field                 parser.guide.object
+---@field method                parser.guide.object
+---@field index                 parser.guide.object
+---@field extends               parser.guide.object[]
+---@field types                 parser.guide.object[]
+---@field enums                 parser.guide.object[]
+---@field resumes               parser.guide.object[]
+---@field fields                parser.guide.object[]
+---@field typeGeneric           table<integer, parser.guide.object[]>
+---@field tkey                  parser.guide.object
+---@field tvalue                parser.guide.object
+---@field op                    parser.guide.object
+---@field next                  parser.guide.object
+---@field docParam              parser.guide.object
+---@field sindex                integer
+---@field name                  parser.guide.object
+---@field call                  parser.guide.object
+---@field closure               parser.guide.object
+---@field proto                 parser.guide.object
+---@field exp                   parser.guide.object
+---@field isGeneric             boolean
+---@field alias                 parser.guide.object
+---@field class                 parser.guide.object
+---@field vararg                parser.guide.object
+---@field param                 parser.guide.object
+---@field overload              parser.guide.object
+---@field docParamMap           table<string, integer>
+---@field upvalues              table<string, string[]>
+---@field ref                   parser.guide.object[]
+---@field _root                 parser.guide.object
+---@field _noders               noders
 
 ---@class guide
 ---@field debugMode boolean

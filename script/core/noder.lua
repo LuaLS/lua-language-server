@@ -37,6 +37,7 @@ local URI_REGEX      = URI_CHAR .. '([^' .. URI_CHAR .. ']*)' .. URI_CHAR .. '(.
 ---@field backwards string[]
 -- 函数调用参数信息（用于泛型）
 ---@field call parser.guide.object
+---@field skip boolean
 
 ---@alias noders table<string, node[]>
 

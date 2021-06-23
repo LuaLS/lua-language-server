@@ -99,7 +99,7 @@ local function createValue(closure, proto, callback, road)
     end
     if proto.type == 'doc.type.array' then
         if road then
-            road[#road+1] = noder.ANY_FIELD
+            road[#road+1] = noder.WEAK_ANY_FIELD
         end
         local node = createValue(closure, proto.node, callback, road)
         if road then
@@ -113,11 +113,11 @@ local function createValue(closure, proto, callback, road)
         return value
     end
     if proto.type == 'doc.type.table' then
-        road[#road+1] = noder.TABLE_KEY
+        road[#road+1] = noder.WEAK_TABLE_KEY
         local tkey = createValue(closure, proto.tkey, callback, road)
         road[#road] = nil
 
-        road[#road+1] = noder.ANY_FIELD
+        road[#road+1] = noder.WEAK_ANY_FIELD
         local tvalue = createValue(closure, proto.tvalue, callback, road)
         road[#road] = nil
 

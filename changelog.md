@@ -1,6 +1,13 @@
 # changelog
 
 ## 2.0.2
+* `NEW` supports literal table in `pairs`
+    ```lua
+    local t = { a = 1, b = 2, c = 3 }
+    for k, v in pairs(t) do
+        -- `k` is string and `v` is integer here
+    end
+    ```
 * `CHG` view `local f ---@type fun(x:number):boolean`
     ```lua
     ---before

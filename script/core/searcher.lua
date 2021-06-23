@@ -613,13 +613,36 @@ function m.searchRefsByID(status, uri, expect, mode)
             return
         end
         local originField = id:sub(#lastID + 1)
-        if originField == noder.TABLE_KEY then
+        if originField == noder.TABLE_KEY
+        or originField == noder.WEAK_TABLE_KEY then
             return
         end
         local anyFieldID   = lastID .. noder.ANY_FIELD
         local anyFieldNode = noder.getNodeByID(root, anyFieldID)
         if anyFieldNode then
             searchNode(anyFieldID, anyFieldNode, field)
+        end
+    end
+
+    local function checkWeak(id, field)
+        local lastID = noder.getLastID(id)
+        if not lastID then
+            return
+        end
+        local originField = id:sub(#lastID + 1)
+        if originField == noder.WEAK_TABLE_KEY then
+            local newID   = lastID .. noder.TABLE_KEY
+            local newNode = noder.getNodeByID(root, newID)
+            if newNode then
+                searchNode(newID, newNode, field)
+            end
+        end
+        if originField == noder.WEAK_ANY_FIELD then
+            local newID   = lastID .. noder.ANY_FIELD
+            local newNode = noder.getNodeByID(root, newID)
+            if newNode then
+                searchNode(newID, newNode, field)
+            end
         end
     end
 
@@ -665,6 +688,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         checkClass(id, node, field)
         checkLastID(id, field)
         checkAnyField(id, field)
+        checkWeak(id, field)
     end
 
     search(expect)

@@ -11,8 +11,10 @@ local INDEX_CHAR     = '['
 local RETURN_INDEX   = SPLIT_CHAR .. '#'
 local PARAM_INDEX    = SPLIT_CHAR .. '&'
 local TABLE_KEY      = SPLIT_CHAR .. '<'
+local WEAK_TABLE_KEY = SPLIT_CHAR .. '<<'
 local INDEX_FIELD    = SPLIT_CHAR .. INDEX_CHAR
 local ANY_FIELD      = SPLIT_CHAR .. ANY_FIELD_CHAR
+local WEAK_ANY_FIELD = SPLIT_CHAR .. ANY_FIELD_CHAR .. ANY_FIELD_CHAR
 local URI_CHAR       = '@'
 local URI_REGEX      = URI_CHAR .. '([^' .. URI_CHAR .. ']*)' .. URI_CHAR .. '(.*)'
 
@@ -101,6 +103,7 @@ local function getKey(source)
         end
         if index.type == 'string'
         or index.type == 'boolean'
+        or index.type == 'integer'
         or index.type == 'number' then
             return ('%q'):format(index[1] or ''), source.parent
         elseif index.type ~= 'function'
@@ -402,15 +405,18 @@ local function pushBackward(noders, id, backwardID, tag)
     node.backwards[#node.backwards+1] = backwardID
 end
 
+---@class noder
 local m = {}
 
-m.SPLIT_CHAR   = SPLIT_CHAR
-m.RETURN_INDEX = RETURN_INDEX
-m.PARAM_INDEX  = PARAM_INDEX
-m.TABLE_KEY    = TABLE_KEY
-m.ANY_FIELD    = ANY_FIELD
-m.URI_CHAR     = URI_CHAR
-m.INDEX_FIELD  = INDEX_FIELD
+m.SPLIT_CHAR     = SPLIT_CHAR
+m.RETURN_INDEX   = RETURN_INDEX
+m.PARAM_INDEX    = PARAM_INDEX
+m.TABLE_KEY      = TABLE_KEY
+m.ANY_FIELD      = ANY_FIELD
+m.URI_CHAR       = URI_CHAR
+m.INDEX_FIELD    = INDEX_FIELD
+m.WEAK_TABLE_KEY = WEAK_TABLE_KEY
+m.WEAK_ANY_FIELD = WEAK_ANY_FIELD
 
 --- 寻找doc的主体
 ---@param obj parser.guide.object
@@ -892,29 +898,39 @@ function m.compileNode(noders, source)
         end
     end
     if source.type == 'table' then
-        local keyID = ('%s%s'):format(
-            id,
-            TABLE_KEY
-        )
-        local valueID = ('%s%s'):format(
-            id,
-            ANY_FIELD
-        )
         local firstField = source[1]
         if firstField then
             if firstField.type == 'varargs' then
+                local keyID = ('%s%s'):format(
+                    id,
+                    TABLE_KEY
+                )
+                local valueID = ('%s%s'):format(
+                    id,
+                    ANY_FIELD
+                )
                 source.array = firstField
                 pushForward(noders, keyID, 'dn:integer')
                 pushForward(noders, valueID, getID(firstField))
-            elseif firstField.type == 'tablefield' then
-                pushForward(noders, keyID, 'dn:string')
-                pushForward(noders, valueID, getID(firstField.value))
-            elseif firstField.type == 'tableindex' then
-                pushForward(noders, keyID,   getID(firstField.index))
-                pushForward(noders, valueID, getID(firstField.value))
             else
-                pushForward(noders, keyID,   'dn:integer')
-                pushForward(noders, valueID, getID(firstField))
+                local keyID = ('%s%s'):format(
+                    id,
+                    WEAK_TABLE_KEY
+                )
+                local valueID = ('%s%s'):format(
+                    id,
+                    WEAK_ANY_FIELD
+                )
+                if firstField.type == 'tablefield' then
+                    pushForward(noders, keyID, 'dn:string')
+                    pushForward(noders, valueID, getID(firstField.value))
+                elseif firstField.type == 'tableindex' then
+                    pushForward(noders, keyID,   getID(firstField.index))
+                    pushForward(noders, valueID, getID(firstField.value))
+                else
+                    pushForward(noders, keyID,   'dn:integer')
+                    pushForward(noders, valueID, getID(firstField))
+                end
             end
         end
     end

@@ -826,3 +826,27 @@ end
         name  = 'k',
     }
 }
+
+TEST {{ path = 'a.lua', content = '', }, {
+    path = 'b.lua',
+    content = [[
+---@class bthci
+bthci = {}
+
+---@class adv
+---@field CONN_DIR_HI integer
+---@field CHAN_ALL integer
+bthci.adv = {}
+
+--- Sends a raw HCI command to the BlueTooth controller.
+function bthci.<?rawhci?>(hcibytes, callback) end
+
+--- Resets the BlueTooth controller.
+function bthci.reset(callback) end
+]]
+},
+hover = {
+    label = 'function bthci.rawhci(hcibytes: any, callback: any)',
+    name  = 'bthci.rawhci',
+    description = " Sends a raw HCI command to the BlueTooth controller."
+}}

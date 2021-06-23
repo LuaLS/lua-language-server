@@ -1123,7 +1123,7 @@ local function bindDocsBetween(sources, binded, bindSources, start, finish)
     -- 从前往后进行绑定
     for i = index, max do
         local src = sources[i]
-        if src then
+        if src and src.start >= start then
             if src.start > finish then
                 break
             end

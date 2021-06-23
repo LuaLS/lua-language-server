@@ -1,5 +1,8 @@
 # changelog
 
+## 2.0.2
+* `FIX` [#570](https://github.com/sumneko/lua-language-server/issues/570)
+
 ## 2.0.1
 `2021-6-21`
 * `FIX` [#566](https://github.com/sumneko/lua-language-server/issues/566)

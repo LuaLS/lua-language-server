@@ -1134,3 +1134,8 @@ local s
 
 print(s:upper())
 ]]
+
+TEST [[
+local t = ().
+return t
+]]

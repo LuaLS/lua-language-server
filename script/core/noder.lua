@@ -297,7 +297,7 @@ local function getID(source)
         if current.type == 'paren' then
             current = current.exp
             if not current then
-                break
+                return nil
             end
             goto CONTINUE
         end

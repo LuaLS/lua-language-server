@@ -1,6 +1,7 @@
 # changelog
 
 ## 2.0.2
+`2021-6-23`
 * `NEW` supports literal table in `pairs`
     ```lua
     local t = { a = 1, b = 2, c = 3 }

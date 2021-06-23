@@ -336,6 +336,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         return false
     end
 
+    ---@return parser.guide.object?
     local function findLastCall()
         for i = #callStack, 1, -1 do
             local call = callStack[i]

@@ -103,6 +103,7 @@ end
 --- 发布任务
 ---@parma name string
 ---@param params any
+---@return any
 function m.awaitTask(name, params)
     local info = {
         id     = counter(),

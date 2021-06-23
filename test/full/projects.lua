@@ -25,7 +25,7 @@ local function doProjects(pathname)
         local uri  = furi.encode(path:string())
         local text = fsu.loadFile(path)
         files.setText(uri, text)
-        --files.open(uri)
+        files.open(uri)
     end)
 
     print('开始诊断...')

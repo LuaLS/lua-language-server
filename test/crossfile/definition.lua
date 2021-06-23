@@ -771,3 +771,18 @@ TEST {
     },
 }
 config.config.runtime.path = originRuntimePath
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            a = b.x
+        ]],
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            b = a.<?x?>
+        ]],
+    },
+}

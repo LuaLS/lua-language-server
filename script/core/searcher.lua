@@ -249,7 +249,8 @@ function m.searchRefsByID(status, uri, expect, mode)
 
     local callStack = status.callStack
 
-    local mark = {}
+    local mark = status.flock[uri] or {}
+    status.flock[uri] = mark
 
     local function search(id, field)
         local firstID = noder.getFirstID(id)
@@ -297,7 +298,8 @@ function m.searchRefsByID(status, uri, expect, mode)
             cmark = {}
             mark[id] = cmark
         end
-        if cmark[LAST] then
+        local fieldLength = noder.getIDLength(field)
+        if cmark[LAST] and fieldLength >= cmark[LAST] then
             return
         end
         local lastID = noder.getLastID(id)
@@ -308,7 +310,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         if field then
             newField = newField .. field
         end
-        cmark[LAST] = true
+        cmark[LAST] = fieldLength
         search(lastID, newField)
         return lastID
     end
@@ -620,10 +622,10 @@ function m.searchRefsByID(status, uri, expect, mode)
 
     local stepCount = 0
     local stepMaxCount = 1e3
-    local statusMaxCount = 1e4
+    local statusMaxCount = 1e5
     if mode == 'allref' or mode == 'alldef' then
         stepMaxCount = 1e4
-        statusMaxCount = 1e5
+        statusMaxCount = 1e6
     end
     function searchStep(id, field)
         stepCount = stepCount + 1
@@ -853,6 +855,7 @@ function m.status(mode)
         callStack = {},
         crossed   = {},
         lock      = {},
+        flock     = {},
         results   = {},
         rmark     = {},
         smark     = {},

@@ -988,6 +988,17 @@ function m.getLastID(id)
     return lastID
 end
 
+---获取ID的长度
+---@param id string
+---@return integer
+function m.getIDLength(id)
+    if not id then
+        return 0
+    end
+    local _, count = id:gsub(SPLIT_CHAR, SPLIT_CHAR)
+    return count + 1
+end
+
 ---测试id是否包含field，如果遇到函数调用则中断
 ---@param id string
 ---@return boolean

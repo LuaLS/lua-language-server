@@ -742,3 +742,7 @@ local <?test?> = Rct.new(Rct)
 
 return test
 ]]
+
+TEST 'function' [[
+string.gsub():gsub():<?gsub?>()
+]]

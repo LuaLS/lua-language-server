@@ -850,3 +850,15 @@ hover = {
     name  = 'bthci.rawhci',
     description = " Sends a raw HCI command to the BlueTooth controller."
 }}
+
+TEST {{ path = 'a.lua', content = '', }, {
+    path = 'b.lua',
+    content = [[
+---@type string | fun(): string
+local <?t?>
+]]
+},
+hover = {
+    label = 'local t: string|fun():string',
+    name  = 't',
+}}

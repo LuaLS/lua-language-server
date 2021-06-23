@@ -261,6 +261,13 @@ local function cleanInfers(infers)
         infers[BE_RETURN] = nil
         infers['nil'] = nil
     end
+    if infers['function'] then
+        for k in pairs(infers) do
+            if k:sub(1, 4) == 'fun(' then
+                infers[k] = nil
+            end
+        end
+    end
     infers['any'] = nil
 end
 
@@ -365,7 +372,7 @@ function m.getDocName(doc)
         return ('table<%s, %s>'):format(key, value)
     end
     if doc.type == 'doc.type.function' then
-        return 'function'
+        return m.viewDocFunction(doc)
     end
     if doc.type == 'doc.type.enum'
     or doc.type == 'doc.resume' then

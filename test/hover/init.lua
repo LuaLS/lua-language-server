@@ -1196,8 +1196,7 @@ TEST [[
 local <?f?>
 ]]
 [[
-function f(x: number, y: number)
-  -> boolean
+local f: fun(x: number, y: number):boolean
 ]]
 
 TEST [[
@@ -1216,8 +1215,7 @@ TEST [[
 function t(<?f?>) end
 ]]
 [[
-function ()
-  -> void
+local f: fun():void
 ]]
 
 TEST [[
@@ -1227,7 +1225,7 @@ local t = {f = f}
 t:<?f?>()
 ]]
 [[
-function f(a: any, b: any)
+field t:f: fun(a: any, b: any)
 ]]
 
 TEST [[
@@ -1286,8 +1284,7 @@ TEST [[
 local <?f?>
 ]]
 [[
-function f(x?: boolean)
-  -> boolean?
+local f: fun(x: boolean):boolean
 ]]
 
 TEST [[
@@ -1445,7 +1442,7 @@ TEST [[
 local function f(<?callback?>) end
 ]]
 [[
-function (x: integer, ...)
+local callback: fun(x: integer, ...: nil)
 ]]
 
 TEST [[

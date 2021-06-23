@@ -343,7 +343,7 @@ TEST '"enum1"|"enum2"' [[
 local <?x?>
 ]]
 
-TEST 'function' [[
+TEST 'fun()' [[
 ---@type fun()
 local <?x?>
 ]]
@@ -508,7 +508,7 @@ local t
 local k, <?v?> = f(t)
 ]]
 
-TEST 'function' [[
+TEST 'fun()' [[
 ---@return fun()
 local function f() end
 
@@ -767,3 +767,8 @@ local <?t?>
 ]]
 
 config.config.hover.enumsLimit = 5
+
+TEST 'string|fun():string' [[
+---@type string | fun(): string
+local <?t?>
+]]

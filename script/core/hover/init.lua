@@ -120,12 +120,21 @@ local function getHoverAsDocName(source)
     }
 end
 
+local function isFunction(source)
+    local defs = vm.getAllDefs(source)
+    for _, def in ipairs(defs) do
+        if def.type == 'function' then
+            return true
+        end
+    end
+    return false
+end
+
 local function getHover(source)
     if source.type == 'doc.type.name' then
         return getHoverAsDocName(source)
     end
-    local isFunction = infer.hasType(source, 'function')
-    if isFunction then
+    if isFunction(source) then
         return getHoverAsFunction(source)
     else
         return getHoverAsValue(source)

@@ -323,7 +323,7 @@ function m.diagnosticsAll()
         bar:onCancel(function ()
             log.debug('Cancel workspace diagnostics')
             cancelled = true
-            askForDisable()
+            await.call(askForDisable)
         end)
         local uris = files.getAllUris()
         for i, uri in ipairs(uris) do

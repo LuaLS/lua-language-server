@@ -24,7 +24,7 @@ local function enable()
     nonil.disable()
     isEnable = true
     log.debug('Enable completion.')
-    proto.awaitRequest('client/registerCapability', {
+    proto.request('client/registerCapability', {
         registrations = {
             {
                 id = 'completion',
@@ -49,7 +49,7 @@ local function disable()
     nonil.disable()
     isEnable = false
     log.debug('Disable completion.')
-    proto.awaitRequest('client/unregisterCapability', {
+    proto.request('client/unregisterCapability', {
         unregisterations = {
             {
                 id = 'completion',

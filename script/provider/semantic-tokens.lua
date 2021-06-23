@@ -31,7 +31,7 @@ local function enable()
     nonil.disable()
     isEnable = true
     log.debug('Enable semantic tokens.')
-    proto.awaitRequest('client/registerCapability', {
+    proto.request('client/registerCapability', {
         registrations = {
             {
                 id = 'semantic-tokens',
@@ -48,7 +48,7 @@ local function enable()
         }
     })
     if config.other.semantic == 'configuredByTheme' and not dontShowAgain then
-        local item = proto.awaitRequest('window/showMessageRequest', {
+        proto.request('window/showMessageRequest', {
             type    = define.MessageType.Info,
             message = lang.script.WINDOW_CHECK_SEMANTIC,
             actions = {
@@ -59,8 +59,10 @@ local function enable()
                     title = lang.script.WINDOW_DONT_SHOW_AGAIN,
                 },
             }
-        })
-        if item then
+        }, function (item)
+            if not item then
+                return
+            end
             if item.title == lang.script.WINDOW_APPLY_SETTING then
                 proto.notify('$/command', {
                     command   = 'lua.config',
@@ -75,7 +77,7 @@ local function enable()
             if item.title == lang.script.WINDOW_DONT_SHOW_AGAIN then
                 dontShowAgain = true
             end
-        end
+        end)
     end
 end
 
@@ -90,7 +92,7 @@ local function disable()
     nonil.disable()
     isEnable = false
     log.debug('Disable semantic tokens.')
-    proto.awaitRequest('client/unregisterCapability', {
+    proto.request('client/unregisterCapability', {
         unregisterations = {
             {
                 id = 'semantic-tokens',

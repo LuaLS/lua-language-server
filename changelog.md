@@ -1,5 +1,8 @@
 # changelog
 
+## 2.0.3
+* `FIX` some dialog boxes block the initialization process
+
 ## 2.0.2
 `2021-6-23`
 * `NEW` supports literal table in `pairs`

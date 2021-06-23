@@ -45,7 +45,7 @@ local function asDocTypeName(source)
 end
 
 local function asValue(source, title)
-    local name    = buildName(source)
+    local name    = buildName(source, false)
     local type    = infer.searchAndViewInfers(source)
     local literal = infer.searchAndViewLiterals(source)
     local cont

@@ -1225,7 +1225,7 @@ local t = {f = f}
 t:<?f?>()
 ]]
 [[
-field t:f: fun(a: any, b: any)
+field t.f: fun(a: any, b: any)
 ]]
 
 TEST [[

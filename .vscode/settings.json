@@ -19,12 +19,14 @@
     ],
     "Lua.diagnostics.disable": [
         "close-non-object",
-        "undefined-field"
     ],
     "Lua.runtime.version": "Lua 5.4",
     // Just some comment
-    "Lua.workspace.maxPreload": 600,
+    "Lua.workspace.maxPreload": 1600,
     "Lua.workspace.preloadFileSize": 1000,
+    "Lua.diagnostics.neededFileStatus": {
+        "undefined-field": "Any"
+    },
     "Lua.workspace.ignoreDir": [
         "locale/",
         "libs/",

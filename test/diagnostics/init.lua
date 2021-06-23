@@ -1139,3 +1139,10 @@ TEST [[
 local t = ().
 return t
 ]]
+
+TEST [[
+return {
+    [1] = 1,
+    ['1'] = 1,
+}
+]]

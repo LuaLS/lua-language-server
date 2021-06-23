@@ -183,6 +183,7 @@ function m.isLiteral(obj)
         or tp == 'boolean'
         or tp == 'string'
         or tp == 'number'
+        or tp == 'integer'
         or tp == 'table'
         or tp == 'function'
 end
@@ -197,6 +198,8 @@ function m.getLiteral(obj)
     elseif tp == 'string' then
         return obj[1]
     elseif tp == 'number' then
+        return obj[1]
+    elseif tp == 'integer' then
         return obj[1]
     end
     return nil
@@ -818,6 +821,11 @@ function m.getKeyNameOfLiteral(obj)
         if n then
             return ('%s'):format(formatNumber(obj[1]))
         end
+    elseif tp == 'integer' then
+        local n = obj[1]
+        if n then
+            return ('%s'):format(formatNumber(obj[1]))
+        end
     elseif tp == 'boolean' then
         local b = obj[1]
         if b then
@@ -883,6 +891,8 @@ function m.getKeyTypeOfLiteral(obj)
         return 'string'
     elseif tp == 'number' then
         return 'number'
+    elseif tp == 'integer' then
+        return 'integer'
     elseif tp == 'boolean' then
         return 'boolean'
     end

@@ -196,7 +196,8 @@ return function (source, oop)
         return asField(source)
     elseif source.type == 'string' then
         return asString(source)
-    elseif source.type == 'number' then
+    elseif source.type == 'number'
+    or     source.type == 'integer' then
         return asNumber(source)
     elseif source.type == 'doc.type.function' then
         return asDocFunction(source)

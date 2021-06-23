@@ -772,3 +772,53 @@ TEST 'string|fun():string' [[
 ---@type string | fun(): string
 local <?t?>
 ]]
+
+TEST 'string' [[
+local valids = {
+    ['Lua 5.1'] = false,
+    ['Lua 5.2'] = false,
+    ['Lua 5.3'] = false,
+    ['Lua 5.4'] = false,
+    ['LuaJIT']  = false,
+}
+
+for <?k?>, v in pairs(valids) do
+end
+]]
+
+TEST 'boolean' [[
+local valids = {
+    ['Lua 5.1'] = false,
+    ['Lua 5.2'] = false,
+    ['Lua 5.3'] = false,
+    ['Lua 5.4'] = false,
+    ['LuaJIT']  = false,
+}
+
+for k, <?v?> in pairs(valids) do
+end
+]]
+
+TEST 'string' [[
+local t = {
+    a = 1,
+    b = 1,
+}
+
+for <?k?>, v in pairs(t) do
+end
+]]
+
+TEST 'integer' [[
+local t = {'a', 'b'}
+
+for <?k?>, v in pairs(t) do
+end
+]]
+
+TEST 'string' [[
+local t = {'a', 'b'}
+
+for k, <?v?> in pairs(t) do
+end
+]]

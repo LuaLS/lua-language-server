@@ -44,6 +44,7 @@ local accept = {
     ['string']      = true,
     ['boolean']     = true,
     ['number']      = true,
+    ['integer']     = true,
     ['...']         = true,
 
     ['doc.type.name']    = true,
@@ -87,7 +88,8 @@ local function convertIndex(source)
     end
     if source.type == 'string'
     or source.type == 'boolean'
-    or source.type == 'number' then
+    or source.type == 'number'
+    or source.type == 'integer' then
         local parent = source.parent
         if not parent then
             return

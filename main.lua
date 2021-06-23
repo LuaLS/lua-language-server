@@ -18,6 +18,7 @@ end
 
 local function loadArgs()
     for _, v in ipairs(arg) do
+        ---@type string
         local key, value = v:match '^%-%-([%w_]+)%=(.+)'
         if not key then
             goto CONTINUE

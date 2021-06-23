@@ -88,6 +88,7 @@ local function getKey(source)
         end
         if index.type == 'string'
         or index.type == 'boolean'
+        or index.type == 'integer'
         or index.type == 'number' then
             return ('%q'):format(index[1] or ''), source.node
         else
@@ -203,11 +204,17 @@ local function checkMode(source)
     if source.type == 'string' then
         return 'str:'
     end
-    if source.type == 'number'
-    or source.type == 'integer'
-    or source.type == 'boolean'
-    or source.type == 'nil' then
-        return 'i:'
+    if source.type == 'number' then
+        return 'num:'
+    end
+    if source.type == 'integer' then
+        return 'int:'
+    end
+    if source.type == 'boolean' then
+        return 'bool:'
+    end
+    if source.type == 'nil' then
+        return 'nil:'
     end
     if source.type == 'call' then
         return 'c:'
@@ -606,6 +613,18 @@ function m.compileNode(noders, source)
     if source.type == 'string' then
         pushForward(noders, id, 'str:')
     end
+    if source.type == 'boolean' then
+        pushForward(noders, id, 'dn:boolean')
+    end
+    if source.type == 'number' then
+        pushForward(noders, id, 'dn:number')
+    end
+    if source.type == 'integer' then
+        pushForward(noders, id, 'dn:integer')
+    end
+    if source.type == 'nil' then
+        pushForward(noders, id, 'dn:nil')
+    end
     -- self -> mt:xx
     if source.type == 'local' and source[1] == 'self' then
         local func = guide.getParentFunction(source)
@@ -873,13 +892,30 @@ function m.compileNode(noders, source)
         end
     end
     if source.type == 'table' then
-        if #source == 1 and source[1].type == 'varargs' then
-            source.array = source[1]
-            local nodeID = ('%s%s'):format(
-                id,
-                ANY_FIELD
-            )
-            pushForward(noders, nodeID, getID(source[1]))
+        local keyID = ('%s%s'):format(
+            id,
+            TABLE_KEY
+        )
+        local valueID = ('%s%s'):format(
+            id,
+            ANY_FIELD
+        )
+        local firstField = source[1]
+        if firstField then
+            if firstField.type == 'varargs' then
+                source.array = firstField
+                pushForward(noders, keyID, 'dn:integer')
+                pushForward(noders, valueID, getID(firstField))
+            elseif firstField.type == 'tablefield' then
+                pushForward(noders, keyID, 'dn:string')
+                pushForward(noders, valueID, getID(firstField.value))
+            elseif firstField.type == 'tableindex' then
+                pushForward(noders, keyID,   getID(firstField.index))
+                pushForward(noders, valueID, getID(firstField.value))
+            else
+                pushForward(noders, keyID,   'dn:integer')
+                pushForward(noders, valueID, getID(firstField))
+            end
         end
     end
     if source.type == 'main' then

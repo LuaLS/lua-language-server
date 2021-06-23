@@ -547,7 +547,7 @@ local Defs = {
         local n = tonumber(number)
         if n then
             State.LastNumber = {
-                type   = 'number',
+                type   = mathType(n) == 'integer' and 'integer' or 'number',
                 start  = start,
                 finish = finish - 1,
                 [1]    = n,

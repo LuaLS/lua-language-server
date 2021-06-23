@@ -25,6 +25,7 @@ return function (uri, callback)
         end
         if source.value.type == 'nil'
         or source.value.type == 'number'
+        or source.value.type == 'integer'
         or source.value.type == 'boolean'
         or source.value.type == 'table'
         or source.value.type == 'function' then

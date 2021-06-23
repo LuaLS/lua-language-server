@@ -147,7 +147,8 @@ local function buildValue(source, text, symbols)
                 details[3] = ' = '
                 details[4] = util.viewLiteral(source.value[1])
             end
-        elseif source.value.type == 'number' then
+        elseif source.value.type == 'number'
+        or     source.value.type == 'integer' then
             details[2] = ' number'
             if literal ~= nil then
                 details[3] = ' = '

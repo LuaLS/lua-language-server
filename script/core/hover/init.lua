@@ -70,6 +70,7 @@ local function getHoverAsFunction(source)
         elseif def.type == 'table'
         or     def.type == 'boolean'
         or     def.type == 'string'
+        or     def.type == 'integer'
         or     def.type == 'number' then
             other = other + 1
             desc = desc or getDesc(def)
@@ -151,6 +152,7 @@ local accept = {
     ['method']        = true,
     ['string']        = true,
     ['number']        = true,
+    ['integer']       = true,
     ['doc.type.name'] = true,
     ['function']      = true,
 }

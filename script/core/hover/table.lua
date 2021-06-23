@@ -68,7 +68,7 @@ local function getKeyMap(fields)
     for _, field in ipairs(fields) do
         local key = vm.getKeyName(field)
         local tp  = vm.getKeyType(field)
-        if tp == 'number' then
+        if tp == 'number' or tp == 'integer' then
             key = tonumber(key)
         elseif tp == 'boolean' then
             key = key == 'true'

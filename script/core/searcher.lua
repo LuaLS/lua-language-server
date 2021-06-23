@@ -102,6 +102,7 @@ function m.pushResult(status, mode, source, force)
         or source.type == 'string'
         or source.type == 'boolean'
         or source.type == 'number'
+        or source.type == 'integer'
         or source.type == 'nil'
         or source.type == 'doc.class.name'
         or source.type == 'doc.type.name'
@@ -475,6 +476,8 @@ function m.searchRefsByID(status, uri, expect, mode)
         or id == 'dn:string' then
             if field or mode == 'field' then
                 searchID('dn:stringlib', field)
+            else
+                searchID('dn:string', field)
             end
         end
     end

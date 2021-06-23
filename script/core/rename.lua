@@ -369,6 +369,7 @@ local function rename(source, newname, callback)
         return ofDocParamName(source, newname, callback)
     elseif source.type == 'string'
     or     source.type == 'number'
+    or     source.type == 'integer'
     or     source.type == 'boolean' then
         local parent = source.parent
         if not parent then
@@ -401,6 +402,7 @@ local function prepareRename(source)
         return source, source[1]
     elseif source.type == 'string'
     or     source.type == 'number'
+    or     source.type == 'integer'
     or     source.type == 'boolean' then
         local parent = source.parent
         if not parent then
@@ -430,6 +432,7 @@ local accept = {
     ['string']     = true,
     ['boolean']    = true,
     ['number']     = true,
+    ['integer']    = true,
 
     ['doc.class.name'] = true,
     ['doc.type.name']  = true,

@@ -48,6 +48,7 @@ local function find(source, uri, callback)
     elseif source.type == 'string'
     or     source.type == 'boolean'
     or     source.type == 'number'
+    or     source.type == 'integer'
     or     source.type == 'nil' then
         callback(source)
     end
@@ -222,6 +223,7 @@ local accept = {
     ['string']     = true,
     ['boolean']    = true,
     ['number']     = true,
+    ['integer']     = true,
     ['nil']        = true,
 }
 
@@ -325,6 +327,7 @@ return function (uri, offset)
             elseif target.type == 'string'
             or     target.type == 'boolean'
             or     target.type == 'number'
+            or     target.type == 'integer'
             or     target.type == 'nil' then
                 kind   = define.DocumentHighlightKind.Text
             else

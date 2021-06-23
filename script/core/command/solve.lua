@@ -20,6 +20,7 @@ local opMap = {
 
 local literalMap = {
     ['number']  = true,
+    ['integer'] = true,
     ['boolean'] = true,
     ['string']  = true,
     ['table']   = true,

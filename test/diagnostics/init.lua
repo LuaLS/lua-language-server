@@ -1146,3 +1146,10 @@ return {
     ['1'] = 1,
 }
 ]]
+
+TEST [[
+return {
+    [print()] = 1,
+    [print()] = 1,
+}
+]]

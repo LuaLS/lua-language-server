@@ -17,7 +17,7 @@ return function (uri, callback)
             if obj.type == 'tablefield'
             or obj.type == 'tableindex' then
                 local name = noder.getID(obj)
-                if name then
+                if name and name:sub(-1) ~= '*' then
                     if not mark[name] then
                         mark[name] = {}
                     end

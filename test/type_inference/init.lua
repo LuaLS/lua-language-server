@@ -2,6 +2,7 @@ local files  = require 'files'
 local vm     = require 'vm'
 local guide  = require 'parser.guide'
 local infer  = require 'core.infer'
+local config = require 'config'
 
 rawset(_G, 'TEST', true)
 
@@ -746,3 +747,23 @@ return test
 TEST 'function' [[
 string.gsub():gsub():<?gsub?>()
 ]]
+
+config.config.hover.enumsLimit = 5
+TEST 'a|b|c|d|e...(+5)' [[
+---@type 'a'|'b'|'c'|'d'|'e'|'f'|'g'|'h'|'i'|'j'
+local <?t?>
+]]
+
+config.config.hover.enumsLimit = 1
+TEST 'a...(+9)' [[
+---@type 'a'|'b'|'c'|'d'|'e'|'f'|'g'|'h'|'i'|'j'
+local <?t?>
+]]
+
+config.config.hover.enumsLimit = 0
+TEST '...(+10)' [[
+---@type 'a'|'b'|'c'|'d'|'e'|'f'|'g'|'h'|'i'|'j'
+local <?t?>
+]]
+
+config.config.hover.enumsLimit = 5

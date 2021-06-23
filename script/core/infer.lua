@@ -2,7 +2,7 @@ local searcher = require 'core.searcher'
 local config   = require 'config'
 local noder    = require 'core.noder'
 local util     = require 'utility'
-local vm = require "vm.vm"
+local vm       = require "vm.vm"
 
 local STRING_OR_TABLE = {'STRING_OR_TABLE'}
 local BE_RETURN       = {'BE_RETURN'}
@@ -296,7 +296,14 @@ function m.viewInfers(infers)
             return sa < sb
         end
     end)
-    infers[0] = table.concat(result, '|')
+    local limit = config.config.hover.enumsLimit
+    if limit < 0 then
+        limit = 0
+    end
+    infers[0] = table.concat(result, '|', 1, math.min(count, limit))
+    if count > limit then
+        infers[0] = ('%s...(+%d)'):format(infers[0], count - limit)
+    end
     return infers[0]
 end
 

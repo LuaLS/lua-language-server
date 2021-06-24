@@ -22,9 +22,9 @@ function vm.getGlobalSets(name)
         id = ('def:g:%q'):format(name)
     end
     for node in collector.each(id) do
-        noder.eachSource(node, function (source)
+        for source in noder.eachSource(node) do
             results[#results+1] = source
-        end)
+        end
     end
     return results
 end

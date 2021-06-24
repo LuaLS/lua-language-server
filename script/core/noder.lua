@@ -464,45 +464,75 @@ function m.pushSource(noders, source, id)
     node.sources[#node.sources+1] = source
 end
 
+local DUMMY_FUNCTION = function () end
+
 ---遍历关联单元
 ---@param node node
----@param callback fun(source:parser.guide.object)
-function m.eachSource(node, callback)
-    if node.source then
-        callback(node.source)
+---@return fun():parser.guide.object
+function m.eachSource(node)
+    if not node.source then
+        return DUMMY_FUNCTION
     end
-    if node.sources then
-        for _, source in ipairs(node.sources) do
-            callback(source)
+    local index
+    local sources = node.sources
+    return function ()
+        if not index then
+            index = 0
+            return node.source
         end
+        if not sources then
+            return nil
+        end
+        index = index + 1
+        return sources[index]
     end
 end
 
 ---遍历forward
 ---@param node node
----@param callback fun(forwardID:string, tag:string)
-function m.eachForward(node, callback)
-    if node.forward then
-        callback(node.forward, node.ftag)
+---@return fun():string, string
+function m.eachForward(node)
+    if not node.forward then
+        return DUMMY_FUNCTION
     end
-    if node.forwards then
-        for _, id in ipairs(node.forwards) do
-            callback(id, node.forwards[id])
+    local index
+    local forwards = node.forwards
+    return function ()
+        if not index then
+            index = 0
+            return node.forward, node.ftag
         end
+        if not forwards then
+            return nil
+        end
+        index = index + 1
+        local id  = forwards[index]
+        local tag = forwards[id]
+        return id, tag
     end
 end
 
 ---遍历backward
 ---@param node node
----@param callback fun(backwardID:string, tag:string)
-function m.eachBackward(node, callback)
-    if node.backward then
-        callback(node.backward, node.btag)
+---@return fun():string, string
+function m.eachBackward(node)
+    if not node.backward then
+        return DUMMY_FUNCTION
     end
-    if node.backwards then
-        for _, id in ipairs(node.backwards) do
-            callback(id, node.backwards[id])
+    local index
+    local backwards = node.backwards
+    return function ()
+        if not index then
+            index = 0
+            return node.backward, node.btag
         end
+        if not backwards then
+            return nil
+        end
+        index = index + 1
+        local id  = backwards[index]
+        local tag = backwards[id]
+        return id, tag
     end
 end
 

@@ -515,12 +515,12 @@ function m.searchInfers(source, field, mark)
         if id then
             local node = noder.getNodeByID(source, id)
             if node and node.source then
-                noder.eachSource(node, function (src)
+                for src in noder.eachSource(node) do
                     if not mark[src] then
                         mark[src] = true
                         searchInfer(src, infers, mark)
                     end
-                end)
+                end
             end
         end
     end

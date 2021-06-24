@@ -441,9 +441,9 @@ function m.searchRefsByID(status, uri, expect, mode)
     end
 
     local function checkForward(id, node, field)
-        noder.eachForward(node, function (forwardID, tag)
+        for forwardID, tag in noder.eachForward(node) do
             if not checkThenPushTag('forward', tag) then
-                return
+                goto CONTINUE
             end
             local targetUri, targetID = noder.getUriAndID(forwardID)
             if targetUri and not files.eq(targetUri, uri) then
@@ -452,7 +452,8 @@ function m.searchRefsByID(status, uri, expect, mode)
                 searchID(targetID or forwardID, field)
             end
             popTag('forward', tag)
-        end)
+            ::CONTINUE::
+        end
     end
 
     local function checkBackward(id, node, field)
@@ -462,12 +463,12 @@ function m.searchRefsByID(status, uri, expect, mode)
         if ignoredIDs[id] then
             return
         end
-        noder.eachBackward(node, function (backwardID, tag)
+        for backwardID, tag in noder.eachBackward(node) do
             if tag == 'deep' and mode ~= 'allref' and mode ~= 'alldef' then
-                return
+                goto CONTINUE
             end
             if not checkThenPushTag('backward', tag) then
-                return
+                goto CONTINUE
             end
             local targetUri, targetID = noder.getUriAndID(backwardID)
             if targetUri and not files.eq(targetUri, uri) then
@@ -476,7 +477,8 @@ function m.searchRefsByID(status, uri, expect, mode)
                 searchID(targetID or backwardID, field)
             end
             popTag('backward', tag)
-        end)
+            ::CONTINUE::
+        end
     end
 
     local function checkSpecial(id, field)
@@ -580,10 +582,10 @@ function m.searchRefsByID(status, uri, expect, mode)
             callStack[#callStack+1] = node.call
         end
         if field == nil and node.source and not ignoredSources[id] then
-            noder.eachSource(node, function (source)
+            for source in noder.eachSource(node) do
                 local force = genericCallArgs[source]
                 m.pushResult(status, mode, source, force)
-            end)
+            end
         end
 
         if node.require then
@@ -771,9 +773,9 @@ local function searchAllGlobalByUri(status, mode, uri, fullID)
         for id, node in pairs(noders) do
             if  node.source
             and id == fullID then
-                noder.eachSource(node, function (source)
+                for source in noder.eachSource(node) do
                     m.pushResult(status, mode, source)
-                end)
+                end
             end
         end
     else
@@ -781,9 +783,9 @@ local function searchAllGlobalByUri(status, mode, uri, fullID)
             if  node.source
             and id:sub(1, 2) == 'g:'
             and not id:find(noder.SPLIT_CHAR) then
-                noder.eachSource(node, function (source)
+                for source in noder.eachSource(node) do
                     m.pushResult(status, mode, source)
-                end)
+                end
             end
         end
     end

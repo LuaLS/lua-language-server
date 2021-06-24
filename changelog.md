@@ -1,6 +1,7 @@
 # changelog
 
 ## 2.0.3
+* `CHG` improve memory usage
 * `FIX` some dialog boxes block the initialization process
 
 ## 2.0.2

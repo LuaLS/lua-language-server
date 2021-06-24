@@ -135,12 +135,12 @@ local function searchInferOfValue(value, infers, mark)
         end
         return true
     end
+    if value.type == 'integer' then
+        infers['integer'] = true
+        return true
+    end
     if value.type == 'number' then
-        if math.type(value[1]) == 'integer' then
-            infers['integer'] = true
-        else
-            infers['number'] = true
-        end
+        infers['number'] = true
         return true
     end
     if value.type == 'nil' then

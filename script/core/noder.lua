@@ -122,12 +122,12 @@ local function getKey(source)
     elseif source.type == 'function' then
         return source.start, nil
     elseif source.type == 'string' then
-        return source.start, nil
+        return '', nil
     elseif source.type == 'integer'
     or     source.type == 'number'
     or     source.type == 'boolean'
     or     source.type == 'nil' then
-        return source.start, nil
+        return '', nil
     elseif source.type == '...' then
         return source.start, nil
     elseif source.type == 'varargs' then
@@ -446,6 +446,13 @@ function m.pushSource(noders, source, id)
     if not id then
         return
     end
+    if id == 'str:'
+    or id == 'nil:'
+    or id == 'num:'
+    or id == 'int:'
+    or id == 'bool:' then
+        return
+    end
     local node = getNode(noders, id)
     if not node.source then
         node.source = source
@@ -523,7 +530,10 @@ local function bindValue(noders, source, id)
     -- x = y : x -> y
     pushForward(noders, id, valueID, 'set')
     -- 参数/call禁止反向查找赋值
-    local valueType = valueID:match '^.-:'
+    local valueType = valueID:match '^(.-:).'
+    if not valueType then
+        return
+    end
     if  valueType ~= 'p:'
     and valueType ~= 's:'
     and valueType ~= 'c:' then

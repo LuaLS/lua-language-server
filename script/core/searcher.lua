@@ -10,6 +10,14 @@ local collector = require 'core.collector'
 local NONE = {'NONE'}
 local LAST = {'LAST'}
 
+local ignoredSources = {
+    ['int:']             = true,
+    ['num:']             = true,
+    ['str:']             = true,
+    ['bool:']            = true,
+    ['nil:']             = true,
+}
+
 local ignoredIDs = {
     ['dn:unknown']       = true,
     ['dn:nil']           = true,
@@ -571,7 +579,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         if node.call then
             callStack[#callStack+1] = node.call
         end
-        if field == nil and node.source then
+        if field == nil and node.source and not ignoredSources[id] then
             noder.eachSource(node, function (source)
                 local force = genericCallArgs[source]
                 m.pushResult(status, mode, source, force)

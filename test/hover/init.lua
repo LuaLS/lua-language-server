@@ -614,7 +614,7 @@ end
 local <?r?> = a(1)
 ]]
 [[
-local r: string = "a"
+local r: string
 ]]
 
 TEST[[
@@ -624,7 +624,7 @@ end
 local _, <?r?> = pcall(a, 1)
 ]]
 [[
-local r: string = "a"
+local r: string
 ]]
 
 TEST[[
@@ -1049,7 +1049,7 @@ end
 local <?r?> = f(1)
 ]]
 [[
-local r: integer = 1
+local r: integer
 ]]
 
 TEST [[

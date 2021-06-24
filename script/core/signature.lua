@@ -4,6 +4,7 @@ local vm         = require 'vm'
 local hoverLabel = require 'core.hover.label'
 local hoverDesc  = require 'core.hover.description'
 local guide      = require 'parser.guide'
+local lookback   = require 'core.look-backward'
 
 local function findNearCall(uri, ast, pos)
     local text = files.getText(uri)
@@ -71,7 +72,7 @@ local function makeOneSignature(source, oop, index)
     }
 end
 
-local function makeSignatures(call, pos)
+local function makeSignatures(text, call, pos)
     local node = call.node
     local oop = node.type == 'method'
              or node.type == 'getmethod'
@@ -85,13 +86,26 @@ local function makeSignatures(call, pos)
             end
         end
         for i, arg in ipairs(args) do
-            if arg.start <= pos and arg.finish >= pos then
+            local start =  lookback.findTargetSymbol(text, arg.start - 1, '(')
+                        or lookback.findTargetSymbol(text, arg.start - 1, ',')
+                        or arg.start
+            if start > pos then
+                index = i - 1
+                break
+            end
+            if pos <= arg.finish then
                 index = i
                 break
             end
         end
         if not index then
-            index = #args + 1
+            local backSymbol = lookback.findSymbol(text, pos)
+            if backSymbol == ','
+            or backSymbol == '(' then
+                index = #args + 1
+            else
+                index = #args
+            end
         end
     else
         index = 1
@@ -112,38 +126,18 @@ local function makeSignatures(call, pos)
     return signs
 end
 
-local function isSpace(char)
-    if char == ' '
-    or char == '\n'
-    or char == '\r'
-    or char == '\t' then
-        return true
-    end
-    return false
-end
-
-local function skipSpace(text, offset)
-    for i = offset, 1, -1 do
-        local char = text:sub(i, i)
-        if not isSpace(char) then
-            return i
-        end
-    end
-    return 0
-end
-
 return function (uri, pos)
     local ast = files.getState(uri)
     if not ast then
         return nil
     end
     local text = files.getText(uri)
-    pos = skipSpace(text, pos)
+    pos = lookback.skipSpace(text, pos)
     local call = findNearCall(uri, ast, pos)
     if not call then
         return nil
     end
-    local signs = makeSignatures(call, pos)
+    local signs = makeSignatures(text, call, pos)
     if not signs or #signs == 0 then
         return nil
     end

@@ -6,6 +6,7 @@ local mathType    = math.type
 local tableRemove = table.remove
 local pairs       = pairs
 local tableSort   = table.sort
+local print       = print
 
 _ENV = nil
 
@@ -1925,6 +1926,17 @@ local Defs = {
                 }
             }
         }
+    end,
+    CallArgSnip = function (name, tailStart, tailSymbol)
+        PushError {
+            type   = 'UNEXPECT_SYMBOL',
+            start  = tailStart,
+            finish = tailStart,
+            info = {
+                symbol = tailSymbol,
+            }
+        }
+        return name
     end
 }
 

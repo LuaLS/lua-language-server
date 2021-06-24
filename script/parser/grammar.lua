@@ -304,6 +304,13 @@ MustName    <-  Name / DirtyName
 DirtyName   <-  {} -> DirtyName
 ]]
 
+grammar 'DocType' [[
+DocType     <-  (!%nl !')' !',' DocChar)+
+DocChar     <-  '(' (!%nl !')' .)+ ')'?
+            /   '<' (!%nl !'>' .)+ '>'?
+            /   .
+]]
+
 grammar 'Exp' [[
 Exp         <-  (UnUnit BinUnit*)
             ->  Binary
@@ -332,9 +339,12 @@ Single      <-  !FUNCTION Name
 Suffix      <-  SuffixWithoutCall
             /   ({} PL SuffixCall DirtyPR {})
             ->  Call
-SuffixCall  <-  Sp ({} {| (COMMA / Exp->NoNil)+ |} {})
+SuffixCall  <-  Sp ({} {| (COMMA / CallArg)+ |} {})
             ->  PackExpList
             /   %nil
+CallArg     <-  Sp (Name {} {'?'? ':'} Sps DocType)
+            ->  CallArgSnip
+            /   Exp->NoNil
 SuffixWithoutCall
             <-  (DOT (Name / MissField))
             ->  GetField

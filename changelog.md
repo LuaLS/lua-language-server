@@ -3,6 +3,7 @@
 ## 2.0.3
 * `CHG` improve memory usage
 * `FIX` some dialog boxes block the initialization process
+* `FIX` [#565](https://github.com/sumneko/lua-language-server/issues/565)
 
 ## 2.0.2
 `2021-6-23`

@@ -242,3 +242,48 @@ function f(x: table<number, string>, y: any, z: any)
 ]],
     arg = {12, 35},
 }
+
+
+TEST [[
+local function x(a, b)
+end
+
+x(  aaaa  $, 2)
+]]
+{
+    label = "function x(a: any, b: any)",
+    arg = {12, 17},
+}
+
+TEST [[
+local function x(a, b)
+end
+
+x($   aaaa  , 2)
+]]
+{
+    label = "function x(a: any, b: any)",
+    arg = {12, 17},
+}
+
+TEST [[
+local function x(a, b)
+end
+
+x(aaaa  ,$    2)
+]]
+{
+    label = "function x(a: any, b: any)",
+    arg = {20, 25},
+}
+
+TEST [[
+local function x(a, b)
+end
+
+x(aaaa  ,    2     $)
+]]
+{
+    label = "function x(a: any, b: any)",
+    arg = {20, 25},
+}

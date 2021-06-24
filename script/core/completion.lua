@@ -1389,9 +1389,6 @@ local function checkTableLiteralFieldByCall(ast, text, offset, call, defs, index
     and (not source.parent or source.parent.type ~= 'table') then
         return
     end
-    if call.node and call.node.type == 'getmethod' then
-        index = index + 1
-    end
     local mark = {}
     local fields = {}
     local tbl = source

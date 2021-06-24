@@ -2464,6 +2464,17 @@ api({$})
 (EXISTS)
 
 TEST [[
+---@class A
+---@field a '"hello"'|'"world"'
+
+---@param t A
+function m:api(t) end
+
+m:api({$})
+]]
+(EXISTS)
+
+TEST [[
 ---@class AAA.BBB
 
 ---@type AAA.$

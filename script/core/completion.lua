@@ -1172,7 +1172,7 @@ local function tryWord(ast, text, offset, triggerCharacter, results)
     if not word then
         if triggerCharacter == nil then
             word = ''
-            start = offset
+            start = offset + 1
         else
             return nil
         end

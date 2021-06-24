@@ -2519,3 +2519,23 @@ zzzz$
         insertText = 'zzzz(${1:a: any}, ${2:b: any})',
     },
 }
+Cared['insertText'] = false
+
+TEST [[
+--- @diagnostic disable: unused-local
+--- @class Test2
+--- @field world integer
+local Test2 = {}
+
+--- @type Test2
+local tdirect
+--- @type Test2[]
+local tarray
+
+-- Direct inference
+local b = tdirect    -- type . here, shows "world"
+
+-- Inferred by index
+local c = tarray[1].$  -- type . here, no auto completion
+]]
+(EXISTS)

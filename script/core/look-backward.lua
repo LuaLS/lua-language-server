@@ -73,7 +73,6 @@ function m.findTargetSymbol(text, offset, symbol)
         else
             return nil
         end
-        ::CONTINUE::
     end
     return nil
 end

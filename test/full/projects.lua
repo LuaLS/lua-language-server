@@ -46,4 +46,4 @@ local function doProjects(pathname)
 end
 
 --doProjects [[C:\SSSEditor\client\Output\Lua]]
-doProjects [[C:\W3-Server\script]]
+--doProjects [[C:\W3-Server\script]]

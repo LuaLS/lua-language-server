@@ -1,6 +1,7 @@
 # changelog
 
 ## 2.0.3
+`2021-6-24`
 * `CHG` improve memory usage
 * `FIX` some dialog boxes block the initialization process
 * `FIX` diagnostics `undefined-field`: blocks main thread

@@ -1,9 +1,8 @@
 local files   = require 'files'
 local vm      = require 'vm'
 local lang    = require 'language'
-local config  = require 'config'
 local guide   = require 'parser.guide'
-local define  = require 'proto.define'
+local noder   = require 'core.noder'
 
 local SkipCheckClass = {
     ['unknown'] = true,
@@ -18,10 +17,18 @@ return function (uri, callback)
         return
     end
 
-    local cache = vm.getCache 'undefined-field'
+    local cache = {}
 
     local function checkUndefinedField(src)
+        local id = noder.getID(src)
+        if not id then
+            return
+        end
+        if cache[id] then
+            return
+        end
         if #vm.getDefs(src) > 0 then
+            cache[id] = true
             return
         end
         local node = src.node
@@ -36,6 +43,7 @@ return function (uri, callback)
                 end
             end
             if not ok then
+                cache[id] = true
                 return
             end
         end
@@ -54,6 +62,7 @@ return function (uri, callback)
             }
         end
     end
-    guide.eachSourceType(ast.ast, 'getfield', checkUndefinedField);
-    guide.eachSourceType(ast.ast, 'getmethod', checkUndefinedField);
+    guide.eachSourceType(ast.ast, 'getfield',  checkUndefinedField)
+    guide.eachSourceType(ast.ast, 'getmethod', checkUndefinedField)
+    guide.eachSourceType(ast.ast, 'getindex',  checkUndefinedField)
 end

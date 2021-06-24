@@ -5,12 +5,15 @@ local guide    = require 'parser.guide'
 local config   = require 'config'
 local define   = require 'proto.define'
 local await    = require 'await'
+local noder    = require 'core.noder'
 
 return function (uri, callback)
     local ast = files.getState(uri)
     if not ast then
         return
     end
+
+    local cache = {}
 
     guide.eachSource(ast.ast, function (src)
         if  src.type ~= 'getglobal'
@@ -34,7 +37,17 @@ return function (uri, callback)
 
         await.delay()
 
+        local id = noder.getID(src)
+        if not id then
+            return
+        end
+
+        if cache[id] then
+            return
+        end
+
         if not vm.isDeprecated(src, true) then
+            cache[id] = true
             return
         end
 

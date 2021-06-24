@@ -84,6 +84,9 @@ function vm.getValidVersions(doc)
     if doc.type ~= 'doc.version' then
         return
     end
+    if doc._validVersions then
+        return doc._validVersions
+    end
     local valids = {
         ['Lua 5.1'] = false,
         ['Lua 5.2'] = false,
@@ -115,6 +118,7 @@ function vm.getValidVersions(doc)
     if valids['Lua 5.1'] then
         valids['LuaJIT'] = true
     end
+    doc._validVersions = valids
     return valids
 end
 
@@ -122,16 +126,22 @@ local function isDeprecated(value)
     if not value.bindDocs then
         return false
     end
+    if value._deprecated ~= nil then
+        return value._deprecated
+    end
     for _, doc in ipairs(value.bindDocs) do
         if doc.type == 'doc.deprecated' then
+            value._deprecated = true
             return true
         elseif doc.type == 'doc.version' then
             local valids = vm.getValidVersions(doc)
             if not valids[config.config.runtime.version] then
+                value._deprecated = true
                 return true
             end
         end
     end
+    value._deprecated = false
     return false
 end
 

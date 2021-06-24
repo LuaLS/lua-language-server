@@ -35,8 +35,6 @@ return function (uri, callback)
             end
         end
 
-        await.delay()
-
         local id = noder.getID(src)
         if not id then
             return
@@ -45,6 +43,8 @@ return function (uri, callback)
         if cache[id] then
             return
         end
+
+        await.delay()
 
         if not vm.isDeprecated(src, true) then
             cache[id] = true

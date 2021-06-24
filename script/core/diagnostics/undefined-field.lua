@@ -3,6 +3,7 @@ local vm      = require 'vm'
 local lang    = require 'language'
 local guide   = require 'parser.guide'
 local noder   = require 'core.noder'
+local await   = require 'await'
 
 local SkipCheckClass = {
     ['unknown'] = true,
@@ -27,6 +28,9 @@ return function (uri, callback)
         if cache[id] then
             return
         end
+
+        await.delay()
+
         if #vm.getDefs(src) > 0 then
             cache[id] = true
             return

@@ -395,7 +395,7 @@ function m.viewDocFunction(doc)
         for i, rtn in ipairs(doc.returns) do
             returns[i] = m.viewDocName(rtn)
         end
-        label = ('%s:%s'):format(label, table.concat(returns))
+        label = ('%s:%s'):format(label, table.concat(returns, ', '))
     end
     return label
 end

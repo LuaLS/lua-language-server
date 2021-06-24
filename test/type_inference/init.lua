@@ -822,3 +822,8 @@ local t = {'a', 'b'}
 for k, <?v?> in pairs(t) do
 end
 ]]
+
+TEST 'fun():number, boolean' [[
+---@type fun():number, boolean
+local <?t?>
+]]

@@ -1217,21 +1217,6 @@ local function tryWord(ast, text, offset, triggerCharacter, results)
     end
 end
 
-local function tryAfterIndex(ast, text, offset, triggerCharacter, results)
-    if isInString(ast, offset) then
-        return
-    end
-    local finish = lookBackward.skipSpace(text, offset)
-    do return end
-    local hasSpace = triggerCharacter ~= nil and finish ~= offset
-    local parent, oop = findParent(ast, text, start - 1)
-    if parent then
-        if not hasSpace then
-            checkField(ast, word, start, offset, parent, oop, results)
-        end
-    end
-end
-
 local function trySymbol(ast, text, offset, results)
     local symbol, start = lookBackward.findSymbol(text, offset)
     if not symbol then
@@ -1958,7 +1943,6 @@ local function completion(uri, offset, triggerCharacter)
             tryCallArg(ast, text, offset, results)
             tryTable(ast, text, offset, results)
             tryWord(ast, text, offset, triggerCharacter, results)
-            tryAfterIndex(ast, text, offset, triggerCharacter, results)
             tryIndex(ast, text, offset, results)
             trySymbol(ast, text, offset, results)
         end

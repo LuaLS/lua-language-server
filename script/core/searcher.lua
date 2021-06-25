@@ -616,7 +616,7 @@ function m.searchRefsByID(status, uri, expect, mode)
     end
 
     local function checkAnyField(id, field)
-        if mode == 'ref' or mode == 'field' or mode == 'allref' then
+        if mode == 'ref' or mode == 'allref' then
             return
         end
         local lastID = noder.getLastID(id)

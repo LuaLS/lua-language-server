@@ -1,5 +1,4 @@
 local files    = require 'files'
-local searcher = require 'core.searcher'
 local guide    = require 'parser.guide'
 local proto    = require 'proto'
 local lang     = require 'language'
@@ -23,10 +22,10 @@ return function (data)
 
     local textEdit = {}
     for i = 1, #lines do
-        local line = searcher.lineContent(lines, text, i, true)
+        local line = guide.lineContent(lines, text, i, true)
         local pos  = line:find '[ \t]+$'
         if pos then
-            local start, finish = searcher.lineRange(lines, i, true)
+            local start, finish = guide.lineRange(lines, i, true)
             start = start + pos - 1
             if isInString(ast, start) then
                 goto NEXT_LINE

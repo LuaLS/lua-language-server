@@ -243,7 +243,7 @@ end
 
 local function checkMark(mark, id, field)
     if noder.getIDLength(id) > 10 then
-        return false
+        print(1)
     end
     local cmark = mark[id]
     if not cmark then
@@ -252,6 +252,18 @@ local function checkMark(mark, id, field)
     end
     if cmark[field or ''] then
         return false
+    end
+    local right = ''
+    while field and field ~= '' do
+        local lastID = noder.getLastID(field)
+        if not lastID then
+            break
+        end
+        right = lastID .. right
+        if cmark[right] then
+            return false
+        end
+        field = field:sub(1, - #lastID - 1)
     end
     cmark[field or ''] = true
     return true

@@ -4,11 +4,7 @@ local files     = require 'files'
 local generic   = require 'core.generic'
 local ws        = require 'workspace'
 local vm        = require 'vm.vm'
-local await     = require 'await'
 local collector = require 'core.collector'
-
-local NONE = {'NONE'}
-local LAST = {'LAST'}
 
 local ignoredSources = {
     ['int:']             = true,
@@ -195,11 +191,11 @@ local function checkLock(status, k1, k2)
         lock1 = {}
         locks[k1] = lock1
     end
-    if lock1[NONE] then
+    if lock1[''] then
         return true
     end
     if k2 == nil then
-        k2 = NONE
+        k2 = ''
     end
     if lock1[k2] then
         return true
@@ -245,6 +241,22 @@ local function checkCache(status, uri, expect, mode)
     return false
 end
 
+local function checkMark(mark, id, field)
+    if noder.getIDLength(id) > 10 then
+        return false
+    end
+    local cmark = mark[id]
+    if not cmark then
+        cmark = {}
+        mark[id] = {}
+    end
+    if cmark[field or ''] then
+        return false
+    end
+    cmark[field or ''] = true
+    return true
+end
+
 function m.searchRefsByID(status, uri, expect, mode)
     local ast = files.getState(uri)
     if not ast then
@@ -266,15 +278,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         if ignoredIDs[firstID] and (field or firstID ~= id) then
             return
         end
-        local cmark = mark[id]
-        if not cmark then
-            cmark = {}
-            mark[id] = cmark
-        end
-        if cmark[NONE] then
-            return
-        end
-        if cmark[field or NONE] then
+        if not checkMark(mark, id, field) then
             return
         end
         if TRACE then
@@ -287,7 +291,6 @@ function m.searchRefsByID(status, uri, expect, mode)
                 status.footprint[#status.footprint+1] = 'search\t' .. id
             end
         end
-        cmark[field or NONE] = true
         searchStep(id, field)
         if TRACE then
             log.debug('pop:', id, field)
@@ -302,26 +305,24 @@ function m.searchRefsByID(status, uri, expect, mode)
     end
 
     local function checkLastID(id, field)
-        local cmark = mark[id]
-        if not cmark then
-            cmark = {}
-            mark[id] = cmark
-        end
-        local fieldLength = noder.getIDLength(field)
-        if cmark[LAST] and fieldLength >= cmark[LAST] then
-            return
-        end
-        local lastID = noder.getLastID(id)
-        if not lastID then
-            return
-        end
-        local newField = id:sub(#lastID + 1)
         if field then
-            newField = newField .. field
+            return
         end
-        cmark[LAST] = fieldLength
-        search(lastID, newField)
-        return lastID
+        local leftID = ''
+        local rightID
+
+        while true do
+            local firstID = noder.getHeadID(rightID or id)
+            if not firstID or firstID == id then
+                return
+            end
+            leftID  = leftID .. firstID
+            if leftID == id then
+                return
+            end
+            rightID = id:sub(#leftID + 1)
+            search(leftID, rightID)
+        end
     end
 
     local function searchID(id, field)
@@ -663,10 +664,10 @@ function m.searchRefsByID(status, uri, expect, mode)
 
     local stepCount = 0
     local stepMaxCount = 1e3
-    local statusMaxCount = 1e5
+    local statusMaxCount = 1e4
     if mode == 'allref' or mode == 'alldef' then
         stepMaxCount = 1e4
-        statusMaxCount = 1e6
+        statusMaxCount = 1e5
     end
     function searchStep(id, field)
         stepCount = stepCount + 1

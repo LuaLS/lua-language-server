@@ -6,6 +6,7 @@ local files     = require 'files'
 local SPLIT_CHAR     = '\x1F'
 local LAST_REGEX     = SPLIT_CHAR .. '[^' .. SPLIT_CHAR .. ']*$'
 local FIRST_REGEX    = '^[^' .. SPLIT_CHAR .. ']*'
+local HEAD_REGEX    = '^' .. SPLIT_CHAR .. '?[^' .. SPLIT_CHAR .. ']*'
 local ANY_FIELD_CHAR = '*'
 local INDEX_CHAR     = '['
 local RETURN_INDEX   = SPLIT_CHAR .. '#'
@@ -1067,7 +1068,24 @@ function m.getFirstID(id)
     if count == 0 then
         return nil
     end
+    if firstID == '' then
+        return nil
+    end
     return firstID
+end
+
+---根据ID来获取第一个节点的ID或field
+---@param id string
+---@return string
+function m.getHeadID(id)
+    local headID, count = id:match(HEAD_REGEX)
+    if count == 0 then
+        return nil
+    end
+    if headID == '' then
+        return nil
+    end
+    return headID
 end
 
 ---根据ID来获取上个节点的ID
@@ -1076,6 +1094,9 @@ end
 function m.getLastID(id)
     local lastID, count = id:gsub(LAST_REGEX, '')
     if count == 0 then
+        return nil
+    end
+    if lastID == '' then
         return nil
     end
     return lastID
@@ -1097,7 +1118,7 @@ end
 ---@return boolean
 function m.hasField(id)
     local firstID = m.getFirstID(id)
-    if firstID == id then
+    if firstID == id or not firstID then
         return false
     end
     local nextChar = id:sub(#firstID + 1, #firstID + 1)

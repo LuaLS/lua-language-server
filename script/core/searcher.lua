@@ -453,7 +453,12 @@ function m.searchRefsByID(status, uri, expect, mode)
         popTags[tag] = popTags[tag] - 1
     end
 
+    local expanding = {}
     local function checkForward(id, node, field)
+        if expanding[id] then
+            return
+        end
+        expanding[id] = true
         for forwardID, tag in noder.eachForward(node) do
             if not checkThenPushTag('forward', tag) then
                 goto CONTINUE
@@ -467,13 +472,18 @@ function m.searchRefsByID(status, uri, expect, mode)
             popTag('forward', tag)
             ::CONTINUE::
         end
+        expanding[id] = nil
     end
 
     local function checkBackward(id, node, field)
-        if mode ~= 'ref' and mode ~= 'field' and mode ~= 'allref' and not field then
+        if ignoredIDs[id] then
             return
         end
-        if ignoredIDs[id] then
+        if expanding[id] then
+            return
+        end
+        expanding[id] = true
+        if mode ~= 'ref' and mode ~= 'field' and mode ~= 'allref' and not field then
             return
         end
         for backwardID, tag in noder.eachBackward(node) do
@@ -492,6 +502,7 @@ function m.searchRefsByID(status, uri, expect, mode)
             popTag('backward', tag)
             ::CONTINUE::
         end
+        expanding[id] = nil
     end
 
     local function checkSpecial(id, field)

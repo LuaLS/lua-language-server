@@ -553,7 +553,11 @@ function m.searchRefsByID(status, uri, expect, mode)
             return
         end
         local tid = id .. (field or '')
-        for _, guri in collector.each(id) do
+        local sid = id
+        if ignoredIDs[id] then
+            sid = 'def:' .. sid
+        end
+        for _, guri in collector.each(sid) do
             if not files.eq(uri, guri) then
                 crossSearch(status, guri, tid, mode, uri)
             end

@@ -204,24 +204,28 @@ local function checkLock(status, k1, k2)
     return false
 end
 
+local strs = {}
+local function footprint(status, ...)
+    if TRACE then
+        log.debug(...)
+    end
+    if FOOTPRINT then
+        local n = select('#', ...)
+        for i = 1, n do
+            strs[i] = tostring(select(i, ...))
+        end
+        status.footprint[#status.footprint+1] = table.concat(strs, '\t', 1, n)
+    end
+end
+
 local function crossSearch(status, uri, expect, mode, sourceUri)
     if checkLock(status, uri, expect) then
         return
     end
-    if TRACE then
-        log.debug('crossSearch', uri, expect)
-    end
-    if FOOTPRINT then
-        status.footprint[#status.footprint+1] = ('cross search:%s %s'):format(uri, expect)
-    end
+    footprint(status, 'crossSearch', uri, expect)
     m.searchRefsByID(status, uri, expect, mode)
     --status.lock[uri] = nil
-    if TRACE then
-        log.debug('crossSearch finish, back to:', sourceUri)
-    end
-    if FOOTPRINT then
-        status.footprint[#status.footprint+1] = ('cross search finish, back to: %s'):format(sourceUri)
-    end
+    footprint(status, 'crossSearch finish, back to:', sourceUri)
 end
 
 local function checkCache(status, uri, expect, mode)
@@ -293,27 +297,9 @@ function m.searchRefsByID(status, uri, expect, mode)
         if not checkMark(mark, id, field) then
             return
         end
-        if TRACE then
-            log.debug('search:', id, field)
-        end
-        if FOOTPRINT then
-            if field then
-                status.footprint[#status.footprint+1] = 'search\t' .. id .. '\t' .. field
-            else
-                status.footprint[#status.footprint+1] = 'search\t' .. id
-            end
-        end
+        footprint(status, 'search:', id, field)
         searchStep(id, field)
-        if TRACE then
-            log.debug('pop:', id, field)
-        end
-        if FOOTPRINT then
-            if field then
-                status.footprint[#status.footprint+1] = 'pop\t' .. id .. '\t' .. field
-            else
-                status.footprint[#status.footprint+1] = 'pop\t' .. id
-            end
-        end
+        footprint(status, 'pop:', id, field)
     end
 
     local function checkLastID(id, field)
@@ -328,6 +314,7 @@ function m.searchRefsByID(status, uri, expect, mode)
             if not firstID or firstID == id then
                 return
             end
+            -- TODO call 后不展开
             leftID  = leftID .. firstID
             if leftID == id then
                 return
@@ -453,12 +440,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         popTags[tag] = popTags[tag] - 1
     end
 
-    local expanding = {}
     local function checkForward(id, node, field)
-        if expanding[id] then
-            return
-        end
-        expanding[id] = true
         for forwardID, tag in noder.eachForward(node) do
             if not checkThenPushTag('forward', tag) then
                 goto CONTINUE
@@ -472,17 +454,12 @@ function m.searchRefsByID(status, uri, expect, mode)
             popTag('forward', tag)
             ::CONTINUE::
         end
-        expanding[id] = nil
     end
 
     local function checkBackward(id, node, field)
         if ignoredIDs[id] then
             return
         end
-        if expanding[id] then
-            return
-        end
-        expanding[id] = true
         if mode ~= 'ref' and mode ~= 'field' and mode ~= 'allref' and not field then
             return
         end
@@ -502,7 +479,6 @@ function m.searchRefsByID(status, uri, expect, mode)
             popTag('backward', tag)
             ::CONTINUE::
         end
-        expanding[id] = nil
     end
 
     local function checkSpecial(id, field)
@@ -520,9 +496,7 @@ function m.searchRefsByID(status, uri, expect, mode)
     local function checkRequire(requireName, field)
         local tid = 'mainreturn' .. (field or '')
         local uris = ws.findUrisByRequirePath(requireName)
-        if FOOTPRINT then
-            status.footprint[#status.footprint+1] = ('require %q:\n%s'):format(requireName, table.concat(uris, '\n'))
-        end
+        footprint(status, ('require %q:\n%s'):format(requireName, table.concat(uris, '\n')))
         for _, ruri in ipairs(uris) do
             if not files.eq(uri, ruri) then
                 crossSearch(status, ruri, tid, mode, uri)
@@ -539,9 +513,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
         local isCall = field and field:sub(2, 2) == noder.RETURN_INDEX
         local tid = id .. (field or '')
-        if FOOTPRINT then
-            status.footprint[#status.footprint+1] = ('checkGlobal:%s + %s, isCall: %s'):format(id, field, isCall, tid)
-        end
+        footprint(status, ('checkGlobal:%s + %s, isCall: %s'):format(id, field, isCall, tid))
         local crossed = {}
         for _, guri in collector.each('def:' .. id) do
             if files.eq(uri, guri) then
@@ -605,6 +577,25 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
     end
 
+    local expanding = {}
+    local function lockExpanding(id, field)
+        local locked = expanding[id]
+        if locked and field then
+            if #locked <= #field then
+                if field:sub(-#locked) == locked then
+                    footprint(status, 'locked:', id, locked, field)
+                    return false
+                end
+            end
+        end
+        expanding[id] = field
+        return true
+    end
+
+    local function releaseExpanding(id, field)
+        expanding[id] = nil
+    end
+
     local function searchNode(id, node, field)
         if node.call then
             callStack[#callStack+1] = node.call
@@ -620,11 +611,14 @@ function m.searchRefsByID(status, uri, expect, mode)
             checkRequire(node.require, field)
         end
 
-        if node.forward then
-            checkForward(id, node, field)
-        end
-        if node.backward then
-            checkBackward(id, node, field)
+        if lockExpanding(id, field) then
+            if node.forward then
+                checkForward(id, node, field)
+            end
+            if node.backward then
+                checkBackward(id, node, field)
+            end
+            releaseExpanding(id, field)
         end
 
         if node.source then

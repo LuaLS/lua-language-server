@@ -289,6 +289,16 @@ local function checkSLock(status, slock, id, field)
     return true
 end
 
+local function isCallID(field)
+    if not field then
+        return false
+    end
+    if field:sub(1, 2) == noder.RETURN_INDEX then
+        return true
+    end
+    return false
+end
+
 function m.searchRefsByID(status, uri, expect, mode)
     local ast = files.getState(uri)
     if not ast then
@@ -333,13 +343,16 @@ function m.searchRefsByID(status, uri, expect, mode)
             if not firstID or firstID == id then
                 return
             end
-            -- TODO call 后不展开
             leftID  = leftID .. firstID
             if leftID == id then
                 return
             end
             rightID = id:sub(#leftID + 1)
             search(leftID, rightID)
+            local isCall = isCallID(firstID)
+            if isCall then
+                break
+            end
         end
     end
 
@@ -351,16 +364,6 @@ function m.searchRefsByID(status, uri, expect, mode)
             id = id .. field
         end
         search(id, nil)
-    end
-
-    local function isCallID(field)
-        if not field then
-            return false
-        end
-        if field:sub(1, 2) == noder.RETURN_INDEX then
-            return true
-        end
-        return false
     end
 
     ---@return parser.guide.object?
@@ -530,7 +533,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         if checkLock(status, id, field) then
             return
         end
-        local isCall = field and field:sub(2, 2) == noder.RETURN_INDEX
+        local isCall = isCallID(field)
         local tid = id .. (field or '')
         footprint(status, ('checkGlobal:%s + %s, isCall: %s'):format(id, field, isCall, tid))
         local crossed = {}

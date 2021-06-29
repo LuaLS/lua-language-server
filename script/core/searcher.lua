@@ -331,7 +331,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         footprint(status, 'pop:', id, field)
     end
 
-    local function checkLastID(id, field)
+    local function splitID(id, field)
         if field then
             return
         end
@@ -503,7 +503,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
     end
 
-    local function checkSpecial(id, field)
+    local function searchSpecial(id, field)
         -- Special rule: ('').XX -> stringlib.XX
         if id == 'str:'
         or id == 'dn:string' then
@@ -526,7 +526,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
     end
 
-    local function checkGlobal(id, node, field)
+    local function searchGlobal(id, node, field)
         if id:sub(1, 2) ~= 'g:' then
             return
         end
@@ -563,7 +563,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         --popTag('forward', 'set')
     end
 
-    local function checkClass(id, node, field)
+    local function searchClass(id, node, field)
         if id:sub(1, 3) ~= 'dn:' then
             return
         end
@@ -659,7 +659,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         return false
     end
 
-    local function checkAnyField(id, field)
+    local function searchAnyField(id, field)
         if mode == 'ref' or mode == 'allref' then
             return
         end
@@ -679,7 +679,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
     end
 
-    local function checkWeak(id, field)
+    local function searchWeak(id, field)
         local lastID = noder.getLastID(id)
         if not lastID then
             return
@@ -721,7 +721,7 @@ function m.searchRefsByID(status, uri, expect, mode)
             stop(status, 'too deep!')
             return
         end
-        checkSpecial(id, field)
+        searchSpecial(id, field)
         local node = noder.getNodeByID(root, id)
         if node then
             searchNode(id, node, field)
@@ -729,11 +729,11 @@ function m.searchRefsByID(status, uri, expect, mode)
                 return
             end
         end
-        checkGlobal(id, node, field)
-        checkClass(id, node, field)
-        checkLastID(id, field)
-        checkAnyField(id, field)
-        checkWeak(id, field)
+        searchGlobal(id, node, field)
+        searchClass(id, node, field)
+        splitID(id, field)
+        searchAnyField(id, field)
+        searchWeak(id, field)
     end
 
     search(expect)

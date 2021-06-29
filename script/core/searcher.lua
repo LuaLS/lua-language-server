@@ -245,9 +245,25 @@ local function checkCache(status, uri, expect, mode)
     return false
 end
 
-local function checkSLock(slock, id, field)
+local function stop(status, msg)
+    if TEST then
+        if FOOTPRINT then
+            log.debug(table.concat(status.footprint, '\n'))
+        end
+        error(msg)
+    else
+        log.warn(msg)
+        if FOOTPRINT then
+            log.debug(table.concat(status.footprint, '\n'))
+        end
+        return
+    end
+end
+
+local function checkSLock(status, slock, id, field)
     if noder.getIDLength(id) > 10 then
-        print(1)
+        stop(status, 'too long!')
+        return false
     end
     local cmark = slock[id]
     if not cmark then
@@ -296,7 +312,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         if ignoredIDs[firstID] and (field or firstID ~= id) then
             return
         end
-        if not checkSLock(slock, id, field) then
+        if not checkSLock(status, slock, id, field) then
             footprint(status, 'slocked:', id, field)
             return
         end
@@ -699,18 +715,8 @@ function m.searchRefsByID(status, uri, expect, mode)
         --end
         if stepCount > stepMaxCount
         or status.count > statusMaxCount then
-            if TEST then
-                if FOOTPRINT then
-                    log.debug(table.concat(status.footprint, '\n'))
-                end
-                error('too large!')
-            else
-                log.warn('too large!')
-                if FOOTPRINT then
-                    log.debug(table.concat(status.footprint, '\n'))
-                end
-                return
-            end
+            stop(status, 'too deep!')
+            return
         end
         checkSpecial(id, field)
         local node = noder.getNodeByID(root, id)

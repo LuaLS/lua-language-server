@@ -261,7 +261,7 @@ local function stop(status, msg)
 end
 
 local function checkSLock(status, slock, id, field)
-    if noder.getIDLength(id) > 10 then
+    if noder.getIDLength(id) > 20 then
         stop(status, 'too long!')
         return false
     end
@@ -533,34 +533,32 @@ function m.searchRefsByID(status, uri, expect, mode)
         if checkLock(status, id, field) then
             return
         end
-        local isCall = isCallID(field)
         local tid = id .. (field or '')
-        footprint(status, ('checkGlobal:%s + %s, isCall: %s'):format(id, field, isCall, tid))
+        footprint(status, ('checkGlobal:%s + %s'):format(id, field, tid))
         local crossed = {}
-        for _, guri in collector.each('def:' .. id) do
-            if files.eq(uri, guri) then
-                goto CONTINUE
+        if mode == 'def' or mode == 'alldef' then
+            for _, guri in collector.each('def:' .. id) do
+                if files.eq(uri, guri) then
+                    goto CONTINUE
+                end
+                crossSearch(status, guri, tid, mode, uri)
+                ::CONTINUE::
             end
-            crossSearch(status, guri, tid, mode, uri)
-            ::CONTINUE::
+        else
+            for _, guri in collector.each(id) do
+                if crossed[guri] then
+                    goto CONTINUE
+                end
+                if mode == 'def' or mode == 'alldef' then
+                    goto CONTINUE
+                end
+                if files.eq(uri, guri) then
+                    goto CONTINUE
+                end
+                crossSearch(status, guri, tid, mode, uri)
+                ::CONTINUE::
+            end
         end
-        for _, guri in collector.each(id) do
-            if crossed[guri] then
-                goto CONTINUE
-            end
-            if isCall then
-                goto CONTINUE
-            end
-            if not field and (mode == 'def' or mode == 'alldef') then
-                goto CONTINUE
-            end
-            if files.eq(uri, guri) then
-                goto CONTINUE
-            end
-            crossSearch(status, guri, tid, mode, uri)
-            ::CONTINUE::
-        end
-        --popTag('forward', 'set')
     end
 
     local function searchClass(id, node, field)
@@ -711,11 +709,6 @@ function m.searchRefsByID(status, uri, expect, mode)
     function searchStep(id, field)
         stepCount = stepCount + 1
         status.count = status.count + 1
-        --if mode == 'allref' or mode == 'alldef' then
-        --    if status.count % 1e4 == 0 then
-        --        await.delay()
-        --    end
-        --end
         if stepCount > stepMaxCount
         or status.count > statusMaxCount then
             stop(status, 'too deep!')

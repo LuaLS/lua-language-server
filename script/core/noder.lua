@@ -852,7 +852,7 @@ function m.compileNode(noders, source)
         collector.subscribe(uri, defAnyID, getNode(noders, defAnyID))
         m.pushSource(noders, source, defAnyID)
     end
-    if guide.isGlobal(source) then
+    if id and id:sub(1, 2) == 'g:' then
         local uri = guide.getUri(source)
         collector.subscribe(uri, id, getNode(noders, id))
         if guide.isSet(source) then
@@ -861,9 +861,11 @@ function m.compileNode(noders, source)
             collector.subscribe(uri, defID, getNode(noders, defID))
             m.pushSource(noders, source, defID)
 
-            local defAnyID = 'def:g:'
-            collector.subscribe(uri, defAnyID, getNode(noders, defAnyID))
-            m.pushSource(noders, source, defAnyID)
+            if guide.isGlobal(source) then
+                local defAnyID = 'def:g:'
+                collector.subscribe(uri, defAnyID, getNode(noders, defAnyID))
+                m.pushSource(noders, source, defAnyID)
+            end
         end
     end
     -- 将函数的返回值映射到具体的返回值上

@@ -245,18 +245,19 @@ local function checkCache(status, uri, expect, mode)
     return false
 end
 
-local function checkMark(mark, id, field)
+local function checkSLock(slock, id, field)
     if noder.getIDLength(id) > 10 then
         print(1)
     end
-    local cmark = mark[id]
+    local cmark = slock[id]
     if not cmark then
         cmark = {}
-        mark[id] = {}
+        slock[id] = {}
     end
     if cmark[field or ''] then
         return false
     end
+    cmark[field or ''] = true
     local right = ''
     while field and field ~= '' do
         local lastID = noder.getLastID(field)
@@ -269,7 +270,6 @@ local function checkMark(mark, id, field)
         end
         field = field:sub(1, - #lastID - 1)
     end
-    cmark[field or ''] = true
     return true
 end
 
@@ -286,15 +286,18 @@ function m.searchRefsByID(status, uri, expect, mode)
 
     local callStack = status.callStack
 
-    local mark = status.flock[uri] or {}
-    status.flock[uri] = mark
+    local slock = status.slock[uri] or {}
+    local elock = status.elock[uri] or {}
+    status.slock[uri] = slock
+    status.elock[uri] = elock
 
     local function search(id, field)
         local firstID = noder.getFirstID(id)
         if ignoredIDs[firstID] and (field or firstID ~= id) then
             return
         end
-        if not checkMark(mark, id, field) then
+        if not checkSLock(slock, id, field) then
+            footprint(status, 'slocked:', id, field)
             return
         end
         footprint(status, 'search:', id, field)
@@ -550,7 +553,8 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
         local tid = id .. (field or '')
         local sid = id
-        if ignoredIDs[id] then
+        if ignoredIDs[id]
+        or id == 'dn:string' then
             sid = 'def:' .. sid
         end
         for _, guri in collector.each(sid) do
@@ -577,23 +581,22 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
     end
 
-    local expanding = {}
     local function lockExpanding(id, field)
-        local locked = expanding[id]
+        local locked = elock[id]
         if locked and field then
             if #locked <= #field then
                 if field:sub(-#locked) == locked then
-                    footprint(status, 'locked:', id, locked, field)
+                    footprint(status, 'elocked:', id, locked, field)
                     return false
                 end
             end
         end
-        expanding[id] = field
+        elock[id] = field
         return true
     end
 
     local function releaseExpanding(id, field)
-        expanding[id] = nil
+        elock[id] = nil
     end
 
     local function searchNode(id, node, field)
@@ -917,7 +920,8 @@ function m.status(mode)
         callStack = {},
         crossed   = {},
         lock      = {},
-        flock     = {},
+        slock     = {},
+        elock     = {},
         results   = {},
         rmark     = {},
         smark     = {},

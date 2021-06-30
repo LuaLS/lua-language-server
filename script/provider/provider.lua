@@ -293,7 +293,15 @@ end)
 proto.on('textDocument/hover', function (params)
     await.close 'hover'
     await.setID 'hover'
-    workspace.awaitReady()
+    if not workspace.isReady() then
+        local count, max = workspace.getLoadProcess()
+        return {
+            contents = {
+                value = lang.script('HOVER_WS_LOADING', count, max),
+                kind  = 'markdown',
+            }
+        }
+    end
     local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_HOVER, 0.5)
     local core = require 'core.hover'
     local doc    = params.textDocument
@@ -439,7 +447,20 @@ end)
 proto.on('textDocument/completion', function (params)
     await.close 'completion'
     await.setID 'completion'
-    workspace.awaitReady()
+    if not workspace.isReady() then
+        local count, max = workspace.getLoadProcess()
+        return {
+            {
+                label = lang.script('HOVER_WS_LOADING', count, max),textEdit         = {
+                    range   = {
+                        start   = params.position,
+                        ['end'] = params.position,
+                    },
+                    newText = '',
+                },
+            }
+        }
+    end
     local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_COMPLETION, 0.5)
     --log.info(util.dump(params))
     local core  = require 'core.completion'

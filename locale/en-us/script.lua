@@ -154,11 +154,11 @@ HOVER_STRING_BYTES         = '{} bytes'
 HOVER_STRING_CHARACTERS    = '{} bytes, {} characters'
 HOVER_MULTI_DEF_PROTO      = '({} definitions, {} prototypes)'
 HOVER_MULTI_PROTO_NOT_FUNC = '({} non functional definition)'
-HOVER_MORE_ENUMS           = '|...(+{})'
 
 HOVER_USE_LUA_PATH      = '(Search path: `{}`)'
 HOVER_EXTENDS           = 'Expand to {}'
 HOVER_TABLE_TIME_UP     = 'Partial type inference has been disabled for performance reasons.'
+HOVER_WS_LOADING        = 'Workspace loading: {} / {}'
 
 ACTION_DISABLE_DIAG     = 'Disable diagnostics in the workspace ({}).'
 ACTION_MARK_GLOBAL      = 'Mark `{}` as defined global.'

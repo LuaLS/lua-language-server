@@ -9,8 +9,6 @@ local await      = require 'await'
 local proto      = require 'proto.proto'
 local lang       = require 'language'
 local library    = require 'library'
-local sp         = require 'bee.subprocess'
-local timer      = require 'timer'
 local progress   = require 'progress'
 local define     = require "proto.define"
 
@@ -19,6 +17,8 @@ m.type = 'workspace'
 m.nativeVersion  = -1
 m.libraryVersion = -1
 m.nativeMatcher  = nil
+m.fileLoaded = 0
+m.fileFound  = 0
 m.waitingReady   = {}
 m.requireCache   = {}
 m.cache          = {}
@@ -282,6 +282,8 @@ function m.awaitPreload()
     diagnostic.pause()
     m.libraryMatchers = nil
     m.nativeMatcher   = nil
+    m.fileLoaded      = 0
+    m.fileFound       = 0
     m.cache           = {}
     local progressBar <close> = progress.create(lang.script.WORKSPACE_LOADING)
     local progressData = {
@@ -291,6 +293,8 @@ function m.awaitPreload()
         update  = function (self)
             progressBar:setMessage(('%d/%d'):format(self.read, self.max))
             progressBar:setPercentage(self.read / self.max * 100)
+            m.fileLoaded = self.read
+            m.fileFound  = self.max
         end
     }
     log.info('Preload start.')
@@ -499,6 +503,10 @@ end
 
 function m.isReady()
     return m.ready == true
+end
+
+function m.getLoadProcess()
+    return m.fileLoaded, m.fileFound
 end
 
 files.watch(function (ev, uri)

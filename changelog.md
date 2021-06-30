@@ -1,6 +1,7 @@
 # changelog
 
 ## 2.0.5
+* `NEW` `hover` and `completion` reports initialization progress
 * `CHG` `class field` consider implicit definition
     ```lua
     ---@class Class

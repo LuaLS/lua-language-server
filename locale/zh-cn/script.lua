@@ -153,11 +153,11 @@ HOVER_STRING_BYTES         = '{} 个字节'
 HOVER_STRING_CHARACTERS    = '{} 个字节，{} 个字符'
 HOVER_MULTI_DEF_PROTO      = '({} 个定义，{} 个原型)'
 HOVER_MULTI_PROTO_NOT_FUNC = '({} 个非函数定义)'
-HOVER_MORE_ENUMS           = '|...(+{})'
 
 HOVER_USE_LUA_PATH      = '（搜索路径： `{}`）'
 HOVER_EXTENDS           = '展开为 {}'
 HOVER_TABLE_TIME_UP     = '出于性能考虑，已禁用了部分类型推断。'
+HOVER_WS_LOADING        = '正在加载工作目录：{} / {}'
 
 ACTION_DISABLE_DIAG     = '在工作区禁用诊断 ({})。'
 ACTION_MARK_GLOBAL      = '标记 `{}` 为已定义的全局变量。'

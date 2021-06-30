@@ -405,6 +405,10 @@ end
 ---@param mark table
 ---@return string
 local function searchInfer(source, infers, mark)
+    if mark[source] then
+        return
+    end
+    mark[source] = true
     if bindClassOrType(source) then
         return
     end
@@ -489,6 +493,10 @@ local function searchInfer(source, infers, mark)
 end
 
 local function searchLiteral(source, literals, mark)
+    if mark[source] then
+        return
+    end
+    mark[source] = true
     local value = searcher.getObjectValue(source)
     if value then
         searchLiteralOfValue(value, literals, mark)
@@ -509,37 +517,28 @@ function m.searchInfers(source, field, mark)
     local infers = {}
     mark = mark or {}
     if not field then
-        mark[source] = true
-        searchInfer(source, infers)
+        searchInfer(source, infers, mark)
         local id = noder.getID(source)
         if id then
             local node = noder.getNodeByID(source, id)
             if node and node.source then
                 for src in noder.eachSource(node) do
-                    if not mark[src] then
-                        mark[src] = true
-                        searchInfer(src, infers, mark)
-                    end
+                    searchInfer(src, infers, mark)
                 end
             end
         end
     end
     if source.type == 'field' or source.type == 'method' then
-        mark[source.parent] = true
         searchInfer(source.parent, infers, mark)
     end
     for _, def in ipairs(defs) do
-        if not mark[def] then
-            mark[def] = true
-            searchInfer(def, infers, mark)
-        end
+        searchInfer(def, infers, mark)
     end
     if source.docParam then
         local docType = source.docParam.extends
         if docType.type == 'doc.type' then
             for _, def in ipairs(docType.types) do
-                if def.typeGeneric and not mark[def] then
-                    mark[def] = true
+                if def.typeGeneric then
                     searchInfer(def, infers, mark)
                 end
             end
@@ -548,8 +547,7 @@ function m.searchInfers(source, field, mark)
     if source.type == 'doc.type' then
         if source.type == 'doc.type' then
             for _, def in ipairs(source.types) do
-                if def.typeGeneric and not mark[def] then
-                    mark[def] = true
+                if def.typeGeneric then
                     searchInfer(def, infers, mark)
                 end
             end
@@ -569,14 +567,10 @@ function m.searchLiterals(source, field, mark)
     local literals = {}
     mark = mark or {}
     if not field then
-        mark[source] = true
         searchLiteral(source, literals, mark)
     end
     for _, def in ipairs(defs) do
-        if not mark[def] then
-            mark[def] = true
-            searchLiteral(def, literals, mark)
-        end
+        searchLiteral(def, literals, mark)
     end
     return literals
 end

@@ -241,6 +241,14 @@ local function getKey(source)
 end
 
 local function getNodeKey(source)
+    if source.type == 'getlocal'
+    or source.type == 'setlocal' then
+        source = source.node
+    end
+    local methodNode = getMethodNode(source)
+    if methodNode then
+        return getNodeKey(methodNode)
+    end
     local key, node = getKey(source)
     if guide.isGlobal(source) then
         return 'g:' .. key, nil

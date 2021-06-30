@@ -1,6 +1,19 @@
 # changelog
 
 ## 2.0.5
+* `CHG` `class field` consider implicit definition
+    ```lua
+    ---@class Class
+    local mt = {}
+
+    function mt:init()
+        self.xxx = 1
+    end
+
+    function mt:func()
+        print(self.xxx) -- self.xxx is defined
+    end
+    ```
 * `FIX` [#580](https://github.com/sumneko/lua-language-server/issues/580)
 
 ## 2.0.4

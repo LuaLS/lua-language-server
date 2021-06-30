@@ -1000,4 +1000,7 @@ function m.requestAllDefinition(obj, field)
     return status.results
 end
 
+--m.requestReference = m.requestAllReference
+--m.requestDefinition = m.requestAllDefinition
+
 return m

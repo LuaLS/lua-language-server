@@ -51,8 +51,10 @@ local type         = type
 ---@field docParamMap           table<string, integer>
 ---@field upvalues              table<string, string[]>
 ---@field ref                   parser.guide.object[]
+---@field returnIndex           integer
 ---@field _root                 parser.guide.object
 ---@field _noders               noders
+---@field _mnode                parser.guide.object
 
 ---@class guide
 ---@field debugMode boolean

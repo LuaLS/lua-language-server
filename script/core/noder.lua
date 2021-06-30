@@ -57,16 +57,46 @@ local function getNode(noders, id)
     return noders[id]
 end
 
+---如果对象是 arg self, 则认为 id 是 method 的 node
+---@param source parser.guide.object
+---@return nil
+local function getMethodNode(source)
+    if source.type ~= 'local' or source[1] ~= 'self' then
+        return nil
+    end
+    if source._mnode ~= nil then
+        return source._mnode or nil
+    end
+    source._mnode = false
+    local func = guide.getParentFunction(source)
+    if func.isGeneric then
+        return
+    end
+    if source.parent.type ~= 'funcargs' then
+        return
+    end
+    local setmethod = func.parent
+    if setmethod and ( setmethod.type == 'setmethod'
+                    or setmethod.type == 'setfield'
+                    or setmethod.type == 'setindex') then
+        source._mnode = setmethod.node
+        return setmethod.node
+    end
+end
+
 ---获取语法树单元的key
 ---@param source parser.guide.object
 ---@return string? key
 ---@return parser.guide.object? node
 local function getKey(source)
     if     source.type == 'local' then
-        return tostring(source.start), nil
+        if source.parent.type == 'funcargs' then
+            return 'p:' .. source.start, nil
+        end
+        return 'l:' .. source.start, nil
     elseif source.type == 'setlocal'
     or     source.type == 'getlocal' then
-        return tostring(source.node.start), nil
+        return getKey(source.node)
     elseif source.type == 'setglobal'
     or     source.type == 'getglobal' then
         local node = source.node
@@ -112,31 +142,34 @@ local function getKey(source)
             return ANY_FIELD_CHAR, source.parent
         end
     elseif source.type == 'table' then
-        return source.start, nil
+        return 't:' .. source.start, nil
     elseif source.type == 'label' then
-        return source.start, nil
+        return 'l:' .. source.start, nil
     elseif source.type == 'goto' then
         if source.node then
-            return source.node.start, nil
+            return 'l:' .. source.node.start, nil
         end
         return nil, nil
     elseif source.type == 'function' then
-        return source.start, nil
+        return 'f:' .. source.start, nil
     elseif source.type == 'string' then
-        return '', nil
-    elseif source.type == 'integer'
-    or     source.type == 'number'
-    or     source.type == 'boolean'
-    or     source.type == 'nil' then
-        return '', nil
+        return 'str:', nil
+    elseif source.type == 'integer' then
+        return 'int:'
+    elseif source.type == 'number' then
+        return 'num:'
+    elseif source.type == 'boolean' then
+        return 'bool:'
+    elseif source.type == 'nil' then
+        return 'nil:', nil
     elseif source.type == '...' then
-        return source.start, nil
+        return 'va:' .. source.start, nil
     elseif source.type == 'varargs' then
         if source.node then
-            return source.node.start, nil
+            return 'va:' .. source.node.start, nil
         end
     elseif source.type == 'select' then
-        return ('%d%s%d'):format(source.start, RETURN_INDEX, source.sindex)
+        return ('s:%d%s%d'):format(source.start, RETURN_INDEX, source.sindex)
     elseif source.type == 'call' then
         local node = source.node
         if node.special == 'rawget'
@@ -154,137 +187,65 @@ local function getKey(source)
                 return '', tbl
             end
         end
-        return source.finish, nil
+        return 'c:' .. source.finish, nil
     elseif source.type == 'doc.class.name'
     or     source.type == 'doc.alias.name'
-    or     source.type == 'doc.extends.name'
-    or     source.type == 'doc.see.name' then
+    or     source.type == 'doc.extends.name' then
         local name = source[1]
-        return name, nil
+        return 'dn:' .. name, nil
     elseif source.type == 'doc.type.name' then
         local name = source[1]
         if source.typeGeneric then
-            return source.typeGeneric[name][1].start, nil
+            return 'dg:' .. source.typeGeneric[name][1].start, nil
         else
-            return name, nil
+            return 'dn:' .. name, nil
         end
-    elseif source.type == 'doc.class'
-    or     source.type == 'doc.type'
-    or     source.type == 'doc.param'
-    or     source.type == 'doc.vararg'
-    or     source.type == 'doc.field.name'
-    or     source.type == 'doc.type.enum'
-    or     source.type == 'doc.resume'
-    or     source.type == 'doc.type.table'
-    or     source.type == 'doc.type.array'
-    or     source.type == 'doc.type.function' then
-        return source.start, nil
+    elseif source.type == 'doc.see.name' then
+        local name = source[1]
+        return 'dsn:' .. name, nil
+    elseif source.type == 'doc.class' then
+        return 'dc:' .. source.start
+    elseif source.type == 'doc.type' then
+        return 'dt:' .. source.start
+    elseif source.type == 'doc.param' then
+        return 'dp:' .. source.start
+    elseif source.type == 'doc.vararg' then
+        return 'dv:' .. source.start
+    elseif source.type == 'doc.field.name' then
+        return 'dfn:' .. source.start
+    elseif source.type == 'doc.type.enum'
+    or     source.type == 'doc.resume' then
+        return 'de:' .. source.start
+    elseif source.type == 'doc.type.table' then
+        return 'dtable:' .. source.start
+    elseif source.type == 'doc.type.array' then
+        return 'darray:' .. source.start
+    elseif source.type == 'doc.type.function' then
+        return 'dfun:' .. source.start, nil
     elseif source.type == 'doc.see.field' then
         return ('%q'):format(source[1]), source.parent.name
     elseif source.type == 'generic.closure' then
-        return source.call.start, nil
+        return 'gc:' .. source.call.start, nil
     elseif source.type == 'generic.value' then
-        return ('%s|%s'):format(
+        local tail = ''
+        if guide.getUri(source.closure.call) ~= guide.getUri(source.proto) then
+            tail = URI_CHAR .. guide.getUri(source.closure.call)
+        end
+        return ('gv:%s|%s%s'):format(
             source.closure.call.start,
-            getKey(source.proto)
+            getKey(source.proto),
+            tail
         )
     end
     return nil, nil
 end
 
-local function checkMode(source)
+local function getNodeKey(source)
+    local key, node = getKey(source)
     if guide.isGlobal(source) then
-        return 'g:'
+        return 'g:' .. key, nil
     end
-    if source.type == 'table' then
-        return 't:'
-    end
-    if source.type == 'select' then
-        return 's:'
-    end
-    if source.type == 'function' then
-        return 'f:'
-    end
-    if source.type == 'string' then
-        return 'str:'
-    end
-    if source.type == 'number' then
-        return 'num:'
-    end
-    if source.type == 'integer' then
-        return 'int:'
-    end
-    if source.type == 'boolean' then
-        return 'bool:'
-    end
-    if source.type == 'nil' then
-        return 'nil:'
-    end
-    if source.type == 'call' then
-        return 'c:'
-    end
-    if source.type == '...'
-    or source.type == 'varargs' then
-        return 'va:'
-    end
-    if source.type == 'doc.class.name'
-    or source.type == 'doc.type.name'
-    or source.type == 'doc.alias.name'
-    or source.type == 'doc.extends.name' then
-        if source.typeGeneric then
-            return 'dg:'
-        end
-        return 'dn:'
-    end
-    if source.type == 'doc.field.name' then
-        return 'dfn:'
-    end
-    if source.type == 'doc.see.name' then
-        return 'dsn:'
-    end
-    if source.type == 'doc.class' then
-        return 'dc:'
-    end
-    if source.type == 'doc.type' then
-        return 'dt:'
-    end
-    if source.type == 'doc.param' then
-        return 'dp:'
-    end
-    if source.type == 'doc.type.function' then
-        return 'dfun:'
-    end
-    if source.type == 'doc.type.table' then
-        return 'dtable:'
-    end
-    if source.type == 'doc.type.array' then
-        return 'darray:'
-    end
-    if source.type == 'doc.vararg' then
-        return 'dv:'
-    end
-    if source.type == 'doc.type.enum'
-    or source.type == 'doc.resume' then
-        return 'de:'
-    end
-    if source.type == 'generic.closure' then
-        return 'gc:'
-    end
-    if source.type == 'generic.value' then
-        local id = 'gv:'
-        if guide.getUri(source.closure.call) ~= guide.getUri(source.proto) then
-            id = id .. URI_CHAR .. guide.getUri(source.closure.call)
-        end
-        return id
-    end
-    if source.type == 'getlocal'
-    or source.type == 'setlocal' then
-        source = source.node
-    end
-    if source.parent.type == 'funcargs' then
-        return 'p:'
-    end
-    return 'l:'
+    return key, node
 end
 
 local IDList = {}
@@ -313,16 +274,13 @@ local function getID(source)
             end
             goto CONTINUE
         end
-        local id, node = getKey(current)
+        local id, node = getNodeKey(current)
         if not id then
             break
         end
         index = index + 1
         IDList[index] = id
         if not node then
-            break
-        end
-        if guide.isGlobal(current) then
             break
         end
         current = node
@@ -335,13 +293,8 @@ local function getID(source)
     for i = index + 1, #IDList do
         IDList[i] = nil
     end
-    local mode = checkMode(current)
-    if not mode then
-        source._id = false
-        return nil
-    end
     util.revertTable(IDList)
-    local id = mode .. table.concat(IDList, SPLIT_CHAR)
+    local id = table.concat(IDList, SPLIT_CHAR)
     source._id = id
     return id
 end

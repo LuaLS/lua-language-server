@@ -128,8 +128,10 @@ local function searchInferOfValue(value, infers, mark)
     if value.type == 'table' then
         if value.array then
             local node = m.searchAndViewInfers(value.array, nil, mark)
-            local infer = node .. '[]'
-            infers[infer] = true
+            if node ~= 'any' then
+                local infer = node .. '[]'
+                infers[infer] = true
+            end
         else
             infers['table'] = true
         end

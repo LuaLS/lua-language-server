@@ -827,3 +827,14 @@ TEST 'fun():number, boolean' [[
 ---@type fun():number, boolean
 local <?t?>
 ]]
+
+TEST 'Class' [[
+---@class Class
+
+---@param callback fun(value: Class)
+function work(callback)
+end
+
+work(function (<?value?>)
+end)
+]]

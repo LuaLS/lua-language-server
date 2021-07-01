@@ -1107,11 +1107,12 @@ local function checkEqualEnum(ast, text, offset, results)
 end
 
 local function checkEqualEnumInString(ast, text, offset, results)
-    local source = guide.eachSourceContain(ast.ast, offset, function (source)
+    local list = {}
+    guide.eachSourceContain(ast.ast, offset, function (source)
         if source.type == 'binary' then
             if source.op.type == '=='
             or source.op.type == '~=' then
-                return source[1]
+                list[#list+1] = source[1]
             end
         end
         if not source.start then
@@ -1124,16 +1125,20 @@ local function checkEqualEnumInString(ast, text, offset, results)
                 return
             end
             if parent.type == 'local' then
-                return parent
+                list[#list+1] = parent
             end
             if parent.type == 'setlocal'
             or parent.type == 'setglobal'
             or parent.type == 'setfield'
             or parent.type == 'setindex' then
-                return parent.node
+                list[#list+1] = parent.node
             end
         end
     end)
+    table.sort(list, function (a, b)
+        return a.start > b.start
+    end)
+    local source = list[1]
     checkEqualEnumLeft(ast, text, offset, source, results)
 end
 

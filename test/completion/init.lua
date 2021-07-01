@@ -2539,3 +2539,31 @@ local b = tdirect    -- type . here, shows "world"
 local c = tarray[1].$  -- type . here, no auto completion
 ]]
 (EXISTS)
+
+TEST [[
+local function f()
+    if type() == '$' then
+    end
+end
+]]
+(EXISTS)
+
+--config.set('Lua.completion.callSnippet',    'Disable')
+--
+--TEST [[
+--GGG = 1
+--GGG = function ()
+--end
+--
+--GGG$
+--]]
+--{
+--    {
+--        label = 'GGG = 1',
+--        kind  = define.CompletionItemKind.Variable,
+--    },
+--    {
+--        label = 'GGG()',
+--        kind  = define.CompletionItemKind.Function,
+--    },
+--}

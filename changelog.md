@@ -3,6 +3,7 @@
 ## 2.1.0
 * `NEW` supports local config file, using `--configpath="config.json"`, [learn more here](https://github.com/sumneko/lua-language-server/wiki/Setting-without-VSCode)
 * `NEW` goto `type definition`
+* `FIX` completion: sometimes `type() ==` does not work
 
 ## 2.0.5
 `2021-7-1`

@@ -769,7 +769,7 @@ function m.getAssoc()
     end
     m.assocVersion = config.get 'version'
     local patt = {}
-    for k, v in pairs(config.get 'other.associations') do
+    for k, v in pairs(config.get 'files.associations') do
         if m.eq(v, 'lua') then
             patt[#patt+1] = k
         end

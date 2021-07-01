@@ -18,7 +18,7 @@ end
 
 local units = {}
 
-local function push(name, default, checker, loader, caller)
+local function register(name, default, checker, loader, caller)
     units[name] = {
         default = default,
         checker = checker,
@@ -35,31 +35,31 @@ local Type = setmetatable({}, { __index = function (_, name)
     return setmetatable(unit, mt)
 end })
 
-push('Boolean', false, function (self, v)
+register('Boolean', false, function (self, v)
     return type(v) == 'boolean'
 end, function (self, v)
     return v
 end)
 
-push('Integer', 0, function (self, v)
+register('Integer', 0, function (self, v)
     return type(v) == 'number'
 end,function (self, v)
     return math.floor(v)
 end)
 
-push('String', '', function (self, v)
+register('String', '', function (self, v)
     return type(v) == 'string'
 end, function (self, v)
     return tostring(v)
 end)
 
-push('Nil', nil, function (self, v)
+register('Nil', nil, function (self, v)
     return type(v) == 'nil'
 end, function (self, v)
     return nil
 end)
 
-push('Array', {}, function (self, value)
+register('Array', {}, function (self, value)
     return type(value) == 'table'
 end, function (self, value)
     local t = {}
@@ -73,7 +73,7 @@ end, function (self, sub)
     self.sub = sub
 end)
 
-push('Hash', {}, function (self, value)
+register('Hash', {}, function (self, value)
     if type(value) == 'table' then
         if #value == 0 then
             for k, v in pairs(value) do
@@ -125,7 +125,7 @@ end, function (self, subkey, subvalue, sep)
     self.sep      = sep
 end)
 
-push('Or', {}, function (self, value)
+register('Or', {}, function (self, value)
     for _, sub in ipairs(self.subs) do
         if sub:checker(value) then
             return true
@@ -195,7 +195,7 @@ local Template = {
     ['Lua.telemetry.enable']                = Type.Or(Type.Boolean, Type.Nil),
     ['files.associations']                  = Type.Hash(Type.String, Type.String),
     ['files.exclude']                       = Type.Hash(Type.String, Type.Boolean),
-    ['editor.semanticHighlighting']         = Type.Or(Type.Boolean, Type.String),
+    ['editor.semanticHighlighting.enabled'] = Type.Or(Type.Boolean, Type.String),
     ['editor.acceptSuggestionOnEnter']      = Type.String  >> 'on',
 }
 
@@ -219,12 +219,44 @@ function m.get(key)
     return config[key]
 end
 
-function m.copy()
-    local t = {}
-    for k, v in pairs(config) do
-        t[k] = v
+function m.dump()
+    local dump = {}
+
+    local function expand(parent, key, value)
+        local left, right = key:match '([^%.]+)%.(.+)'
+        if left then
+            if not parent[left] then
+                parent[left] = {}
+            end
+            expand(parent[left], right, value)
+        else
+            parent[key] = value
+        end
     end
-    return t
+
+    for key, value in pairs(config) do
+        expand(dump, key, value)
+    end
+
+    return dump
+end
+
+function m.update(new)
+    local function expand(t, left)
+        for key, value in pairs(t) do
+            local fullKey = key
+            if left then
+                fullKey = left .. '.' .. key
+            end
+            if Template[fullKey] then
+                m.set(fullKey, value)
+            elseif type(value) == 'table' then
+                expand(value, fullKey)
+            end
+        end
+    end
+
+    expand(new)
 end
 
 for key in pairs(Template) do

@@ -53,47 +53,42 @@ local function updateConfig()
         return
     end
 
-    local updated = configs[1]
-    local other   = {
-        associations            = configs[2],
-        exclude                 = configs[3],
-        semantic                = configs[4],
-        acceptSuggestionOnEnter = configs[5],
-    }
+    local new                                  = configs[1]
+    new['files.associations']                  = configs[2]
+    new['files.exclude']                       = configs[3]
+    new['editor.semanticHighlighting.enabled'] = configs[4]
+    new['editor.acceptSuggestionOnEnter']      = configs[5]
 
-    local oldConfig = util.deepCopy(config.get 'Lua')
-    local oldOther  = util.deepCopy(config.get 'other')
-    config.get 'setConfig'(updated, other)
-    local newConfig = config.get 'Lua'
-    local newOther  = config.get 'other'
+    local oldConfig = config.dump()
+    config.update(new)
+    local newConfig = config.dump()
 
-    if not util.equal(oldConfig.runtime, newConfig.runtime) then
+    if not util.equal(oldConfig.Lua.runtime, newConfig.Lua.runtime) then
         library.init()
         workspace.reload()
         semantic.refresh()
     end
-    if not util.equal(oldConfig.diagnostics, newConfig.diagnostics) then
+    if not util.equal(oldConfig.Lua.diagnostics, newConfig.Lua.diagnostics) then
         diagnostics.diagnosticsAll()
     end
-    if not util.equal(oldConfig.workspace, newConfig.workspace)
-    or not util.equal(oldOther.associations, newOther.associations)
-    or not util.equal(oldOther.exclude, newOther.exclude)
+    if not util.equal(oldConfig.Lua.workspace, newConfig.Lua.workspace)
+    or not util.equal(oldConfig.files,     newConfig.files)
     then
         workspace.reload()
         semantic.refresh()
     end
 
-    if newConfig.completion.enable then
+    if newConfig.Lua.completion.enable then
         completion.enable()
     else
         completion.disable()
     end
-    if newConfig.color.mode == 'Semantic' then
+    if newConfig.Lua.color.mode == 'Semantic' then
         semantic.enable()
     else
         semantic.disable()
     end
-    if newConfig.window.statusBar then
+    if newConfig.Lua.window.statusBar then
         proto.notify('$/status/show')
     else
         proto.notify('$/status/hide')
@@ -474,7 +469,7 @@ proto.on('textDocument/completion', function (params)
         return nil
     end
     local triggerCharacter = params.context and params.context.triggerCharacter
-    if config.get 'other.acceptSuggestionOnEnter' ~= 'off' then
+    if config.get 'editor.acceptSuggestionOnEnter' ~= 'off' then
         if triggerCharacter == '\n'
         or triggerCharacter == '{'
         or triggerCharacter == ',' then

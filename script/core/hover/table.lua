@@ -91,7 +91,7 @@ local function getKeyMap(fields)
 end
 
 return function (source)
-    local maxFields = config.Lua.hover.previewFields
+    local maxFields = config.get 'Lua.hover.previewFields'
     if maxFields <= 0 then
         return 'table'
     end

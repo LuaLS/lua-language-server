@@ -6,8 +6,8 @@ local config = require 'config'
 local ws     = require 'workspace'
 local fs     = require 'bee.filesystem'
 
-config.Lua.workspace.preloadFileSize = 1000000
-config.Lua.diagnostics.neededFileStatus = {}
+config.set('Lua.workspace.preloadFileSize',    1000000)
+config.set('Lua.diagnostics.neededFileStatus', {})
 
 local function doProjects(pathname)
     files.removeAll()

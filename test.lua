@@ -86,7 +86,7 @@ local function main()
     require 'utility'.enableCloseFunction()
 
     local config = require 'config'
-    config.Lua.runtime.version = 'Lua 5.4'
+    config.set('Lua.runtime.version', 'Lua 5.4')
     --config.Lua.intelliSense.searchDepth = 5
     loadDocMetas()
 

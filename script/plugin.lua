@@ -49,11 +49,11 @@ function m.init()
         end
     end
 
-    if not config.Lua.runtime.plugin or config.Lua.runtime.plugin == '' then
+    if not config.get 'Lua.runtime.plugin' or config.get 'Lua.runtime.plugin' == '' then
         return
     end
 
-    local pluginPath = fs.path(config.Lua.runtime.plugin)
+    local pluginPath = fs.path(config.get 'Lua.runtime.plugin')
     if pluginPath:is_relative() then
         if not ws.path then
             return

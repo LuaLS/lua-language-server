@@ -164,7 +164,7 @@ function m.setText(uri, text, isTrust, instance)
         return
     end
     if not isTrust and unicode then
-        if config.Lua.runtime.fileEncoding == 'ansi' then
+        if config.get 'Lua.runtime.fileEncoding' == 'ansi' then
             text = unicode.a2u(text)
         end
     end
@@ -393,7 +393,7 @@ end
 
 function m.compileState(uri, text)
     local ws = require 'workspace'
-    if not m.isOpen(uri) and #text >= config.Lua.workspace.preloadFileSize * 1000 then
+    if not m.isOpen(uri) and #text >= config.get 'Lua.workspace.preloadFileSize' * 1000 then
         if not m.notifyCache['preloadFileSize'] then
             m.notifyCache['preloadFileSize'] = {}
             m.notifyCache['skipLargeFileCount'] = 0
@@ -406,7 +406,7 @@ function m.compileState(uri, text)
                     type = 3,
                     message = lang.script('WORKSPACE_SKIP_LARGE_FILE'
                         , ws.getRelativePath(m.getOriginUri(uri))
-                        , config.Lua.workspace.preloadFileSize
+                        , config.get 'Lua.workspace.preloadFileSize'
                         , #text / 1000
                     ),
                 })
@@ -419,11 +419,11 @@ function m.compileState(uri, text)
     local clock = os.clock()
     local state, err = parser:compile(text
         , 'lua'
-        , config.Lua.runtime.version
+        , config.get 'Lua.runtime.version'
         , {
-            special           = config.Lua.runtime.special,
-            unicodeName       = config.Lua.runtime.unicodeName,
-            nonstandardSymbol = config.Lua.runtime.nonstandardSymbol,
+            special           = config.get 'Lua.runtime.special',
+            unicodeName       = config.get 'Lua.runtime.unicodeName',
+            nonstandardSymbol = config.get 'Lua.runtime.nonstandardSymbol',
             delay             = await.delay,
         }
     )
@@ -764,12 +764,12 @@ end
 
 --- 获取文件关联
 function m.getAssoc()
-    if m.assocVersion == config.version then
+    if m.assocVersion == config.get 'version' then
         return m.assocMatcher
     end
-    m.assocVersion = config.version
+    m.assocVersion = config.get 'version'
     local patt = {}
-    for k, v in pairs(config.other.associations) do
+    for k, v in pairs(config.get 'other.associations') do
         if m.eq(v, 'lua') then
             patt[#patt+1] = k
         end

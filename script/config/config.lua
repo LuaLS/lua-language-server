@@ -143,8 +143,8 @@ end, function (self, ...)
 end)
 
 local Template = {
-    ['Lua.runtime.verion']                  = Type.String >> 'Lua 5.4',
-    ['Lua.runtime.path']                    = Type.String >> {
+    ['Lua.runtime.version']                 = Type.String >> 'Lua 5.4',
+    ['Lua.runtime.path']                    = Type.Array(Type.String) >> {
                                                 "?.lua",
                                                 "?/init.lua",
                                                 "?/?.lua"
@@ -199,39 +199,36 @@ local Template = {
     ['editor.acceptSuggestionOnEnter']      = Type.String  >> 'on',
 }
 
+local config = {}
+
 local m = {}
 
-local function updateConfig(key, value)
-    local current = m
-    local strs = {}
-    for str in key:gmatch('[^%.]+') do
-        strs[#strs+1] = str
-    end
-    for i = 1, #strs - 1 do
-        local str = strs[i]
-        if not current[str] then
-            current[str] = {}
-        end
-        current = current[str]
-    end
-    local lastStr = strs[#strs]
-    current[lastStr] = value
-end
-
-local function pushConfig(key, value)
-    local config = Template[key]
-    if not config then
+function m.set(key, value)
+    local unit = Template[key]
+    if not unit then
         return
     end
-    if config:checker(value) then
-        updateConfig(key, config:loader(value))
+    if unit:checker(value) then
+        config[key] = unit:loader(value)
     else
-        updateConfig(key, config.default)
+        config[key] = unit.default
     end
+end
+
+function m.get(key)
+    return config[key]
+end
+
+function m.copy()
+    local t = {}
+    for k, v in pairs(config) do
+        t[k] = v
+    end
+    return t
 end
 
 for key in pairs(Template) do
-    pushConfig(key)
+    m.set(key)
 end
 
 return m

@@ -359,10 +359,10 @@ TEST {
 }
 
 
-local originRuntimePath = config.Lua.runtime.path
-config.Lua.runtime.path = {
+local originRuntimePath = config.get 'Lua.runtime.path'
+config.set('Lua.runtime.path', {
     '?/1.lua',
-}
+})
 
 TEST {
     {
@@ -388,12 +388,12 @@ TEST {
     }
 }
 
-config.Lua.runtime.path = originRuntimePath
+config.set('Lua.runtime.path', originRuntimePath)
 
-local originRuntimePath = config.Lua.runtime.path
-config.Lua.runtime.path = {
+local originRuntimePath = config.get 'Lua.runtime.path'
+config.set('Lua.runtime.path', {
     'd:/?/1.lua',
-}
+})
 
 TEST {
     {
@@ -414,7 +414,7 @@ TEST {
     }
 }
 
-config.Lua.runtime.path = originRuntimePath
+config.set('Lua.runtime.path', originRuntimePath)
 
 TEST {
     {

@@ -217,7 +217,7 @@ local function bindClassOrType(source)
 end
 
 local function cleanInfers(infers)
-    local version = config.Lua.runtime.version
+    local version = config.get 'Lua.runtime.version'
     local enableInteger = version == 'Lua 5.3' or version == 'Lua 5.4'
     infers['unknown'] = nil
     if infers['any'] and infers['nil'] then
@@ -305,7 +305,7 @@ function m.viewInfers(infers)
             return sa < sb
         end
     end)
-    local limit = config.Lua.hover.enumsLimit
+    local limit = config.get 'Lua.hover.enumsLimit'
     if limit < 0 then
         limit = 0
     end

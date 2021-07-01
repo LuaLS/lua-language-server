@@ -748,25 +748,25 @@ TEST 'function' [[
 string.gsub():gsub():<?gsub?>()
 ]]
 
-config.Lua.hover.enumsLimit = 5
+config.set('Lua.hover.enumsLimit', 5)
 TEST 'a|b|c|d|e...(+5)' [[
 ---@type 'a'|'b'|'c'|'d'|'e'|'f'|'g'|'h'|'i'|'j'
 local <?t?>
 ]]
 
-config.Lua.hover.enumsLimit = 1
+config.set('Lua.hover.enumsLimit', 1)
 TEST 'a...(+9)' [[
 ---@type 'a'|'b'|'c'|'d'|'e'|'f'|'g'|'h'|'i'|'j'
 local <?t?>
 ]]
 
-config.Lua.hover.enumsLimit = 0
+config.set('Lua.hover.enumsLimit', 0)
 TEST '...(+10)' [[
 ---@type 'a'|'b'|'c'|'d'|'e'|'f'|'g'|'h'|'i'|'j'
 local <?t?>
 ]]
 
-config.Lua.hover.enumsLimit = 5
+config.set('Lua.hover.enumsLimit', 5)
 
 TEST 'string|fun():string' [[
 ---@type string | fun(): string

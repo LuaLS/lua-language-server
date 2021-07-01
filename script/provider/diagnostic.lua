@@ -26,7 +26,7 @@ local function buildSyntaxError(uri, err)
     local message = lang.script('PARSER_'..err.type, err.info)
 
     if err.version then
-        local version = err.info and err.info.version or config.Lua.runtime.version
+        local version = err.info and err.info.version or config.get 'Lua.runtime.version'
         message = message .. ('(%s)'):format(lang.script('DIAG_NEED_VERSION'
             , concat(err.version, '/')
             , version
@@ -151,7 +151,7 @@ function m.syntaxErrors(uri, ast)
     local results = {}
 
     for _, err in ipairs(ast.errs) do
-        if not config.Lua.diagnostics.disable[err.type:lower():gsub('_', '-')] then
+        if not config.get 'Lua.diagnostics.disable'[err.type:lower():gsub('_', '-')] then
             results[#results+1] = buildSyntaxError(uri, err)
         end
     end
@@ -179,7 +179,7 @@ function m.diagnostics(uri, diags)
 end
 
 function m.doDiagnostic(uri)
-    if not config.Lua.diagnostics.enable then
+    if not config.get 'Lua.diagnostics.enable' then
         return
     end
     uri = files.asKey(uri)
@@ -302,14 +302,14 @@ local function askForDisable()
 end
 
 function m.diagnosticsAll()
-    if not config.Lua.diagnostics.enable then
+    if not config.get 'Lua.diagnostics.enable' then
         m.clearAll()
         return
     end
     if not m._start then
         return
     end
-    local delay = config.Lua.diagnostics.workspaceDelay / 1000
+    local delay = config.get 'Lua.diagnostics.workspaceDelay' / 1000
     if delay < 0 then
         return
     end
@@ -361,7 +361,7 @@ function m.checkWorkspaceDiag()
     if not await.hasID 'diagnosticsAll' then
         return
     end
-    local speedRate = config.Lua.diagnostics.workspaceRate
+    local speedRate = config.get 'Lua.diagnostics.workspaceRate'
     if speedRate <= 0 or speedRate >= 100 then
         return
     end

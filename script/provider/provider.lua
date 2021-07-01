@@ -61,11 +61,11 @@ local function updateConfig()
         acceptSuggestionOnEnter = configs[5],
     }
 
-    local oldConfig = util.deepCopy(config.Lua)
-    local oldOther  = util.deepCopy(config.other)
-    config.setConfig(updated, other)
-    local newConfig = config.Lua
-    local newOther  = config.other
+    local oldConfig = util.deepCopy(config.get 'Lua')
+    local oldOther  = util.deepCopy(config.get 'other')
+    config.get 'setConfig'(updated, other)
+    local newConfig = config.get 'Lua'
+    local newOther  = config.get 'other'
 
     if not util.equal(oldConfig.runtime, newConfig.runtime) then
         library.init()
@@ -474,7 +474,7 @@ proto.on('textDocument/completion', function (params)
         return nil
     end
     local triggerCharacter = params.context and params.context.triggerCharacter
-    if config.other.acceptSuggestionOnEnter ~= 'off' then
+    if config.get 'other.acceptSuggestionOnEnter' ~= 'off' then
         if triggerCharacter == '\n'
         or triggerCharacter == '{'
         or triggerCharacter == ',' then
@@ -598,7 +598,7 @@ proto.on('completionItem/resolve', function (item)
 end)
 
 proto.on('textDocument/signatureHelp', function (params)
-    if not config.Lua.signatureHelp.enable then
+    if not config.get 'Lua.signatureHelp.enable' then
         return nil
     end
     workspace.awaitReady()
@@ -895,7 +895,7 @@ do
     local function updateHint(uri)
         local awaitID = 'hint:' .. uri
         await.close(awaitID)
-        if not config.Lua.hint.enable then
+        if not config.get 'Lua.hint.enable' then
             return
         end
         await.setID(awaitID)

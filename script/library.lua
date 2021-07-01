@@ -10,7 +10,7 @@ local define  = require "proto.define"
 local m = {}
 
 local function getDocFormater()
-    local version = config.Lua.runtime.version
+    local version = config.get 'Lua.runtime.version'
     if client.isVSCode() then
         if version == 'Lua 5.1' then
             return 'HOVER_NATIVE_DOCUMENT_LUA51'
@@ -94,11 +94,11 @@ local function compileSingleMetaDoc(script, metaLang, status)
     middleBuf[#middleBuf+1] = ('PUSH [===[%s]===]'):format(script:sub(last))
     local middleScript = table.concat(middleBuf, '\n')
     local version, jit
-    if config.Lua.runtime.version == 'LuaJIT' then
+    if config.get 'Lua.runtime.version' == 'LuaJIT' then
         version = 5.1
         jit = true
     else
-        version = tonumber(config.Lua.runtime.version:sub(-3))
+        version = tonumber(config.get 'Lua.runtime.version':sub(-3))
         jit = false
     end
 
@@ -194,8 +194,8 @@ end
 
 local function compileMetaDoc()
     local langID  = lang.id
-    local version = config.Lua.runtime.version
-    local metaPath = fs.path(METAPATH) / config.Lua.runtime.meta:gsub('%$%{(.-)%}', {
+    local version = config.get 'Lua.runtime.version'
+    local metaPath = fs.path(METAPATH) / config.get 'Lua.runtime.meta':gsub('%$%{(.-)%}', {
         version  = version,
         language = langID,
     })
@@ -212,7 +212,7 @@ local function compileMetaDoc()
     local out = fsu.dummyFS()
     local templateDir = ROOT / 'meta' / 'template'
     for libName, status in pairs(define.BuiltIn) do
-        status = config.Lua.runtime.builtin[libName] or status
+        status = config.get 'Lua.runtime.builtin'[libName] or status
         if status == 'disable' then
             goto CONTINUE
         end

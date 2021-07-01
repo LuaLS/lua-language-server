@@ -3,7 +3,7 @@ local fsu    = require 'fs-utility'
 local json   = require 'json'
 local proto  = require 'proto'
 local lang   = require 'language'
-local config = require 'config.Lua'
+local config = require 'config.config'
 
 local function errorMessage(msg)
     proto.notify('window/showMessage', {

@@ -27,10 +27,10 @@ return function (uri, callback)
             if not key then
                 return
             end
-            if config.Lua.diagnostics.globals[key] then
+            if config.get 'Lua.diagnostics.globals'[key] then
                 return
             end
-            if config.Lua.runtime.special[key] then
+            if config.get 'Lua.runtime.special'[key] then
                 return
             end
         end
@@ -75,7 +75,7 @@ return function (uri, callback)
             end
             table.sort(versions)
             if #versions > 0 then
-                message = ('%s(%s)'):format(message, lang.script('DIAG_DEFINED_VERSION', table.concat(versions, '/'), config.Lua.runtime.version))
+                message = ('%s(%s)'):format(message, lang.script('DIAG_DEFINED_VERSION', table.concat(versions, '/'), config.get 'Lua.runtime.version'))
             end
         end
 

@@ -1,264 +1,229 @@
 local util   = require 'utility'
 local define = require 'proto.define'
+local keyword = require "core.keyword"
 
-local m = {}
-m.version = 0
+---@class config.unit
+---@field caller function
+local mt = {}
+mt.__index = mt
 
-local function Boolean(v)
-    if type(v) == 'boolean' then
-        return true, v
+function mt:__call(...)
+    self:caller(...)
+    return self
+end
+
+function mt:__shr(default)
+    self.default = default
+    return self
+end
+
+local units = {}
+
+local function push(name, default, checker, loader, caller)
+    units[name] = {
+        default = default,
+        checker = checker,
+        loader  = loader,
+        caller  = caller,
+    }
+end
+
+local Type = setmetatable({}, { __index = function (_, name)
+    local unit = {}
+    for k, v in pairs(units[name]) do
+        unit[k] = v
     end
-    return false
-end
+    return setmetatable(unit, mt)
+end })
 
-local function Integer(v)
-    if type(v) == 'number' then
-        return true, math.floor(v)
-    end
-    return false
-end
+push('Boolean', false, function (self, v)
+    return type(v) == 'boolean'
+end, function (self, v)
+    return v
+end)
 
-local function String(v)
-    return true, tostring(v)
-end
+push('Integer', 0, function (self, v)
+    return type(v) == 'number'
+end,function (self, v)
+    return math.floor(v)
+end)
 
-local function Nil(v)
-    if type(v) == 'nil' then
-        return true, nil
-    end
-    return false
-end
+push('String', '', function (self, v)
+    return true
+end, function (self, v)
+    return tostring(v)
+end)
 
-local function Str2Hash(sep)
-    return function (v)
-        if type(v) == 'string' then
-            local t = {}
-            for s in v:gmatch('[^'..sep..']+') do
-                t[s] = true
-            end
-            return true, t
+push('Nil', nil, function (self, v)
+    return type(v) == 'nil'
+end, function (self, v)
+    return nil
+end)
+
+push('Array', {}, function (self, value)
+    return type(value) == 'table'
+end, function (self, value)
+    local t = {}
+    for _, v in ipairs(value) do
+        if self.sub:checker(v) then
+            t[#t+1] = self.sub:loader(v)
         end
-        if type(v) == 'table' then
-            local t = {}
-            for _, s in ipairs(v) do
-                if type(s) == 'string' then
-                    t[s] = true
+    end
+    return t
+end, function (self, sub)
+    self.sub = sub
+end)
+
+push('Hash', {}, function (self, value)
+    if type(value) == 'table' then
+        if #value == 0 then
+            for k, v in pairs(value) do
+                if not self.subkey:checker(k)
+                or not self.subvalue:checker(v) then
+                    return false
                 end
-            end
-            return true, t
-        end
-        return false
-    end
-end
-
-local function Array2Hash(checker)
-    return function (tbl)
-        if type(tbl) ~= 'table' then
-            return false
-        end
-        local t = {}
-        if #tbl > 0 then
-            for _, k in ipairs(tbl) do
-                t[k] = true
             end
         else
-            for k, v in pairs(tbl) do
+            if not self.subvalue:checker(true) then
+                return false
+            end
+            for _, v in ipairs(value) do
+                if not self.subkey:checker(v) then
+                    return false
+                end
+            end
+        end
+        return true
+    end
+    if type(value) == 'string' then
+        return  self.subkey:checker('')
+            and self.subvalue:checker(true)
+    end
+end, function (self, value)
+    if type(value) == 'table' then
+        local t = {}
+        if #value == 0 then
+            for k, v in pairs(value) do
                 t[k] = v
             end
+        else
+            for _, k in pairs(value) do
+                t[k] = true
+            end
         end
-        return true, t
+        return t
     end
-end
-
-local function Array(checker)
-    return function (tbl)
-        if type(tbl) ~= 'table' then
-            return false
-        end
+    if type(value) == 'string' then
         local t = {}
-        for _, v in ipairs(tbl) do
-            local ok, result = checker(v)
-            if ok then
-                t[#t+1] = result
-            end
+        for s in value:gmatch('[^'..self.sep..']+') do
+            t[s] = true
         end
-        return true, t
+        return t
     end
-end
+end, function (self, subkey, subvalue, sep)
+    self.subkey   = subkey
+    self.subvalue = subvalue
+    self.sep      = sep
+end)
 
-local function Hash(keyChecker, valueChecker)
-    return function (tbl)
-        if type(tbl) ~= 'table' then
-            return false
+push('Or', {}, function (self, value)
+    for _, sub in ipairs(self.subs) do
+        if sub:checker(value) then
+            return true
         end
-        local t = {}
-        for k, v in pairs(tbl) do
-            local ok1, key = keyChecker(k)
-            local ok2, value = valueChecker(v)
-            if ok1 and ok2 then
-                t[key] = value
-            end
-        end
-        if not next(t) then
-            return false
-        end
-        return true, t
     end
-end
-
-local function Or(...)
-    local checkers = {...}
-    return function (obj)
-        for _, checker in ipairs(checkers) do
-            local suc, res = checker(obj)
-            if suc then
-                return true, res
-            end
+    return false
+end, function (self, value)
+    for _, sub in ipairs(self.subs) do
+        if sub:checker(value) then
+            return sub:loader(value)
         end
-        return false
     end
-end
+end, function (self, ...)
+    self.subs = {...}
+end)
 
-local ConfigTemplate = {
-    runtime = {
-        version           = {'Lua 5.4', String},
-        path              = {{
-                                  "?.lua",
-                                  "?/init.lua",
-                                  "?/?.lua"
-                              },        Array(String)},
-        special           = {{},        Hash(String, String)},
-        meta              = {'${version} ${language}', String},
-        unicodeName       = {false,     Boolean},
-        nonstandardSymbol = {{},        Str2Hash ';'},
-        plugin            = {'', String},
-        fileEncoding      = {'utf8',    String},
-        builtin           = {{},          Hash(String, String)},
-    },
-    diagnostics = {
-        enable          = {true, Boolean},
-        globals         = {{},   Str2Hash ';'},
-        disable         = {{},   Str2Hash ';'},
-        severity        = {
-            util.deepCopy(define.DiagnosticDefaultSeverity),
-            Hash(String, String),
+local Template = {
+    Lua = {
+        runtime = {
+            version             = Type.String >> 'Lua 5.4',
+            path                = Type.Array(Type.String) >> {
+                "?.lua",
+                "?/init.lua",
+                "?/?.lua"
+            },
+            special             = Type.Hash(Type.String, Type.String),
+            meta                = Type.String >> '${version} ${language}',
+            unicodeName         = Type.Boolean,
+            nonstandardSymbol   = Type.Hash(Type.String, Type.Boolean, ';'),
+            plugin              = Type.String,
+            fileEncoding        = Type.String >> 'utf8',
+            builtin             = Type.Hash(Type.String, Type.String),
         },
-        neededFileStatus = {
-            util.deepCopy(define.DiagnosticDefaultNeededFileStatus),
-            Hash(String, String),
+        diagnostics = {
+            enable              = Type.Boolean >> true,
+            globals             = Type.Hash(Type.String, Type.Boolean, ';'),
+            disable             = Type.Hash(Type.String, Type.Boolean, ';'),
+            severity            = Type.Hash(Type.String, Type.String) >> util.deepCopy(define.DiagnosticDefaultSeverity),
+            neededFileStatus    = Type.Hash(Type.String, Type.String) >> util.deepCopy(define.DiagnosticDefaultNeededFileStatus),
+            workspaceDelay      = Type.Integer >> 0,
+            workspaceRate       = Type.Integer >> 100,
         },
-        workspaceDelay  = {0,    Integer},
-        workspaceRate   = {100,  Integer},
+        workspace = {
+            ignoreDir           = Type.Hash(Type.String, Type.Boolean, ';'),
+            ignoreSubmodules    = Type.Boolean >> true,
+            useGitIgnore        = Type.Boolean >> true,
+            maxPreload          = Type.Integer >> 1000,
+            preloadFileSize     = Type.Integer >> 100,
+            library             = Type.Hash(Type.String, Type.Boolean, ';'),
+        },
+        completion = {
+            enable              = Type.Boolean >> true,
+            callSnippet         = Type.String  >> 'Disable',
+            keywordSnippet      = Type.String  >> 'Replace',
+            displayContext      = Type.Integer >> 6,
+            workspaceWord       = Type.Boolean >> true,
+            autoRequire         = Type.Boolean >> true,
+            showParams          = Type.Boolean >> true,
+        },
+        signatureHelp = {
+            enable              = Type.Boolean >> true,
+        },
+        hover = {
+            enable              = Type.Boolean >> true,
+            viewString          = Type.Boolean >> true,
+            viewStringMax       = Type.Integer >> 1000,
+            viewNumber          = Type.Boolean >> true,
+            previewFields       = Type.Integer >> 20,
+            enumsLimit          = Type.Integer >> 5,
+        },
+        color = {
+            mode                = Type.String  >> 'Semantic',
+        },
+        hint = {
+            enable              = Type.Boolean >> false,
+            paramType           = Type.Boolean >> true,
+            setType             = Type.Boolean >> false,
+            paramName           = Type.Boolean >> true,
+        },
+        window = {
+            statusBar           = Type.Boolean >> true,
+            progressBar         = Type.Boolean >> true,
+        },
+        telemetry = {
+            enable              = Type.Or(Type.Boolean, Type.Nil)
+        },
     },
-    workspace = {
-        ignoreDir       = {{},      Str2Hash ';'},
-        ignoreSubmodules= {true,    Boolean},
-        useGitIgnore    = {true,    Boolean},
-        maxPreload      = {1000,    Integer},
-        preloadFileSize = {100,     Integer},
-        library         = {{},      Array2Hash(String)},
+    files = {
+        associations            = Type.Hash(Type.String, Type.String),
+        exclude                 = Type.Hash(Type.String, Type.Boolean),
     },
-    completion = {
-        enable          = {true,      Boolean},
-        callSnippet     = {'Disable', String},
-        keywordSnippet  = {'Replace', String},
-        displayContext  = {6,         Integer},
-        workspaceWord   = {true,      Boolean},
-        autoRequire     = {true,      Boolean},
-        showParams      = {true,      Boolean},
+    editor = {
+        semanticHighlighting    = Type.Or(Type.Boolean, Type.String),
+        acceptSuggestionOnEnter = Type.String  >> 'on',
     },
-    signatureHelp = {
-        enable          = {true,      Boolean},
-    },
-    hover = {
-        enable          = {true,      Boolean},
-        viewString      = {true,      Boolean},
-        viewStringMax   = {1000,      Integer},
-        viewNumber      = {true,      Boolean},
-        previewFields   = {20,        Integer},
-        enumsLimit      = {5,         Integer},
-    },
-    color = {
-        mode            = {'Semantic', String},
-    },
-    hint = {
-        enable          = {false,     Boolean},
-        paramType       = {true,      Boolean},
-        setType         = {false,     Boolean},
-        paramName       = {true,      Boolean},
-    },
-    intelliSense = {
-        searchDepth     = {0,         Integer},
-    },
-    window              = {
-        statusBar       = {true,      Boolean},
-        progressBar     = {true,      Boolean},
-    },
-    telemetry = {
-        enable          = {nil,       Or(Boolean, Nil)},
-    }
 }
 
-local OtherTemplate = {
-    associations            = {{},   Hash(String, String)},
-    exclude                 = {{},   Hash(String, Boolean)},
-    semantic                = {'',   Or(Boolean, String)},
-    acceptSuggestionOnEnter = {'on', String},
-}
-
-local function init()
-    if m.Lua then
-        return
-    end
-
-    m.Lua = {}
-    for c, t in pairs(ConfigTemplate) do
-        m.Lua[c] = {}
-        for k, info in pairs(t) do
-            m.Lua[c][k] = info[1]
-        end
-    end
-
-    m.other = {}
-    for k, info in pairs(OtherTemplate) do
-        m.other[k] = info[1]
-    end
-end
-
-function m.setConfig(config, other)
-    m.version = m.version + 1
-    xpcall(function ()
-        for c, t in pairs(config) do
-            for k, v in pairs(t) do
-                local region = ConfigTemplate[c]
-                if region then
-                    local info = region[k]
-                    if info then
-                        local suc, v = info[2](v)
-                        if suc then
-                            m.Lua[c][k] = v
-                        else
-                            m.Lua[c][k] = info[1]
-                        end
-                    end
-                end
-            end
-        end
-        for k, v in pairs(other) do
-            local info = OtherTemplate[k]
-            if info then
-                local suc, v = info[2](v)
-                if suc then
-                    m.other[k] = v
-                else
-                    m.other[k] = info[1]
-                end
-            end
-        end
-        log.debug('Config update: ', util.dump(m.Lua), util.dump(m.other))
-    end, log.error)
-end
-
-init()
+local m = {}
 
 return m

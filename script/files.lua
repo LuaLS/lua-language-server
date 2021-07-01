@@ -142,7 +142,7 @@ end
 --- 设置文件文本
 ---@param uri uri
 ---@param text string
-function m.setText(uri, text, isTrust)
+function m.setText(uri, text, isTrust, instance)
     if not text then
         return
     end
@@ -192,7 +192,7 @@ function m.setText(uri, text, isTrust)
         end
     end
 
-    if TEST then
+    if instance or TEST then
         m.onWatch('update', originUri)
     else
         await.call(function ()

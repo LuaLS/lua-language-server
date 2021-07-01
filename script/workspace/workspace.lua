@@ -221,18 +221,25 @@ local function loadFileFactory(root, progressData, isLibrary)
             progressData.max = progressData.max + 1
             progressData:update()
             pub.task('loadFile', uri, function (text)
-                if text then
-                    log.info(('Preload file at: %s , size = %.3f KB'):format(uri, #text / 1000.0))
-                    if isLibrary then
-                        log.info('++++As library of:', root)
-                        files.setLibraryPath(uri, root)
+                local loader = function ()
+                    if text then
+                        log.info(('Preload file at: %s , size = %.3f KB'):format(uri, #text / 1024.0))
+                        if isLibrary then
+                            log.info('++++As library of:', root)
+                            files.setLibraryPath(uri, root)
+                        end
+                        files.setText(uri, text, false, true)
+                    else
+                        files.remove(uri)
                     end
-                    files.setText(uri, text, false)
-                else
-                    files.remove(uri)
+                    progressData.read = progressData.read + 1
+                    progressData:update()
                 end
-                progressData.read = progressData.read + 1
-                progressData:update()
+                if progressData.loaders then
+                    progressData.loaders[#progressData.loaders+1] = loader
+                else
+                    loader()
+                end
             end)
         end
         if files.isDll(uri) then
@@ -240,7 +247,7 @@ local function loadFileFactory(root, progressData, isLibrary)
                 progressData.read = progressData.read + 1
                 progressData:update()
                 if content then
-                    log.info(('Preload file at: %s , size = %.3f KB'):format(uri, #content / 1000.0))
+                    log.info(('Preload file at: %s , size = %.3f KB'):format(uri, #content / 1024.0))
                     if isLibrary then
                         log.info('++++As library of:', root)
                     end
@@ -290,6 +297,7 @@ function m.awaitPreload()
         max     = 0,
         read    = 0,
         preload = 0,
+        loaders = {},
         update  = function (self)
             progressBar:setMessage(('%d/%d'):format(self.read, self.max))
             progressBar:setPercentage(self.read / self.max * 100)
@@ -310,6 +318,13 @@ function m.awaitPreload()
         log.info('Scan library at:', library.path)
         library.matcher:scan(library.path, libraryLoader)
     end
+
+    await.call(function ()
+        for _, loader in ipairs(progressData.loaders) do
+            loader()
+            await.delay()
+        end
+    end)
 
     log.info(('Found %d files.'):format(progressData.max))
     while true do

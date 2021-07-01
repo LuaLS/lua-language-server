@@ -53,11 +53,13 @@ local function updateConfig()
         return
     end
 
-    local new                                  = configs[1]
-    new['files.associations']                  = configs[2]
-    new['files.exclude']                       = configs[3]
-    new['editor.semanticHighlighting.enabled'] = configs[4]
-    new['editor.acceptSuggestionOnEnter']      = configs[5]
+    local new = {
+        ['Lua']                                 = configs[1],
+        ['files.associations']                  = configs[2],
+        ['files.exclude']                       = configs[3],
+        ['editor.semanticHighlighting.enabled'] = configs[4],
+        ['editor.acceptSuggestionOnEnter']      = configs[5],
+    }
 
     local oldConfig = config.dump()
     config.update(new)

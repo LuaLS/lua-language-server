@@ -1,6 +1,5 @@
 local util   = require 'utility'
 local define = require 'proto.define'
-local keyword = require "core.keyword"
 
 ---@class config.unit
 ---@field caller function
@@ -49,7 +48,7 @@ end,function (self, v)
 end)
 
 push('String', '', function (self, v)
-    return true
+    return type(v) == 'string'
 end, function (self, v)
     return tostring(v)
 end)
@@ -202,13 +201,37 @@ local Template = {
 
 local m = {}
 
-local function init()
-    if m.Lua then
+local function updateConfig(key, value)
+    local current = m
+    local strs = {}
+    for str in key:gmatch('[^%.]+') do
+        strs[#strs+1] = str
+    end
+    for i = 1, #strs - 1 do
+        local str = strs[i]
+        if not current[str] then
+            current[str] = {}
+        end
+        current = current[str]
+    end
+    local lastStr = strs[#strs]
+    current[lastStr] = value
+end
+
+local function pushConfig(key, value)
+    local config = Template[key]
+    if not config then
         return
+    end
+    if config:checker(value) then
+        updateConfig(key, config:loader(value))
+    else
+        updateConfig(key, config.default)
     end
 end
 
-init()
-
+for key in pairs(Template) do
+    pushConfig(key)
+end
 
 return m

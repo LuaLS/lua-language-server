@@ -221,8 +221,6 @@ local function loadFileFactory(root, progressData, isLibrary)
             progressData.max = progressData.max + 1
             progressData:update()
             pub.task('loadFile', uri, function (text)
-                progressData.read = progressData.read + 1
-                progressData:update()
                 if text then
                     log.info(('Preload file at: %s , size = %.3f KB'):format(uri, #text / 1000.0))
                     if isLibrary then
@@ -233,11 +231,11 @@ local function loadFileFactory(root, progressData, isLibrary)
                 else
                     files.remove(uri)
                 end
+                progressData.read = progressData.read + 1
+                progressData:update()
             end)
         end
         if files.isDll(uri) then
-            progressData.max = progressData.max + 1
-            progressData:update()
             pub.task('loadFile', uri, function (content)
                 progressData.read = progressData.read + 1
                 progressData:update()
@@ -248,6 +246,8 @@ local function loadFileFactory(root, progressData, isLibrary)
                     end
                     files.saveDll(uri, content)
                 end
+                progressData.max = progressData.max + 1
+                progressData:update()
             end)
         end
         await.delay()

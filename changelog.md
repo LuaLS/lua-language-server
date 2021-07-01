@@ -15,6 +15,7 @@
         print(self.xxx) -- self.xxx is defined
     end
     ```
+* `CHG` improve performance
 * `FIX` [#580](https://github.com/sumneko/lua-language-server/issues/580)
 
 ## 2.0.4

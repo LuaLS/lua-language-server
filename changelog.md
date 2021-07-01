@@ -4,6 +4,7 @@
 * `NEW` supports local config file, using `--configpath="config.json"`, [learn more here](https://github.com/sumneko/lua-language-server/wiki/Setting-without-VSCode)
 * `NEW` goto `type definition`
 * `CHG` [#549](https://github.com/sumneko/lua-language-server/issues/549)
+* `CHG` diagnostics: always ignore the ignored files even if they are opened
 * `FIX` completion: `type() ==` may does not work
 
 ## 2.0.5

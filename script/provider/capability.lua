@@ -95,7 +95,8 @@ function m.getIniter()
     --testFileEvents()
 
     nonil.enable()
-    if not client.info.capabilities.textDocument.completion.dynamicRegistration then
+    if not client.info.capabilities.textDocument.completion.dynamicRegistration
+    or not client.info.capabilities.workspace.configuration then
         initer.completionProvider = {
             resolveProvider = true,
             triggerCharacters = completion.allWords(),

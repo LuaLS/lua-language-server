@@ -144,86 +144,71 @@ end, function (self, ...)
 end)
 
 local Template = {
-    Lua = {
-        runtime = {
-            version             = Type.String >> 'Lua 5.4',
-            path                = Type.Array(Type.String) >> {
-                "?.lua",
-                "?/init.lua",
-                "?/?.lua"
-            },
-            special             = Type.Hash(Type.String, Type.String),
-            meta                = Type.String >> '${version} ${language}',
-            unicodeName         = Type.Boolean,
-            nonstandardSymbol   = Type.Hash(Type.String, Type.Boolean, ';'),
-            plugin              = Type.String,
-            fileEncoding        = Type.String >> 'utf8',
-            builtin             = Type.Hash(Type.String, Type.String),
-        },
-        diagnostics = {
-            enable              = Type.Boolean >> true,
-            globals             = Type.Hash(Type.String, Type.Boolean, ';'),
-            disable             = Type.Hash(Type.String, Type.Boolean, ';'),
-            severity            = Type.Hash(Type.String, Type.String) >> util.deepCopy(define.DiagnosticDefaultSeverity),
-            neededFileStatus    = Type.Hash(Type.String, Type.String) >> util.deepCopy(define.DiagnosticDefaultNeededFileStatus),
-            workspaceDelay      = Type.Integer >> 0,
-            workspaceRate       = Type.Integer >> 100,
-        },
-        workspace = {
-            ignoreDir           = Type.Hash(Type.String, Type.Boolean, ';'),
-            ignoreSubmodules    = Type.Boolean >> true,
-            useGitIgnore        = Type.Boolean >> true,
-            maxPreload          = Type.Integer >> 1000,
-            preloadFileSize     = Type.Integer >> 100,
-            library             = Type.Hash(Type.String, Type.Boolean, ';'),
-        },
-        completion = {
-            enable              = Type.Boolean >> true,
-            callSnippet         = Type.String  >> 'Disable',
-            keywordSnippet      = Type.String  >> 'Replace',
-            displayContext      = Type.Integer >> 6,
-            workspaceWord       = Type.Boolean >> true,
-            autoRequire         = Type.Boolean >> true,
-            showParams          = Type.Boolean >> true,
-        },
-        signatureHelp = {
-            enable              = Type.Boolean >> true,
-        },
-        hover = {
-            enable              = Type.Boolean >> true,
-            viewString          = Type.Boolean >> true,
-            viewStringMax       = Type.Integer >> 1000,
-            viewNumber          = Type.Boolean >> true,
-            previewFields       = Type.Integer >> 20,
-            enumsLimit          = Type.Integer >> 5,
-        },
-        color = {
-            mode                = Type.String  >> 'Semantic',
-        },
-        hint = {
-            enable              = Type.Boolean >> false,
-            paramType           = Type.Boolean >> true,
-            setType             = Type.Boolean >> false,
-            paramName           = Type.Boolean >> true,
-        },
-        window = {
-            statusBar           = Type.Boolean >> true,
-            progressBar         = Type.Boolean >> true,
-        },
-        telemetry = {
-            enable              = Type.Or(Type.Boolean, Type.Nil)
-        },
-    },
-    files = {
-        associations            = Type.Hash(Type.String, Type.String),
-        exclude                 = Type.Hash(Type.String, Type.Boolean),
-    },
-    editor = {
-        semanticHighlighting    = Type.Or(Type.Boolean, Type.String),
-        acceptSuggestionOnEnter = Type.String  >> 'on',
-    },
+    ['Lua.runtime.verion']                  = Type.String >> 'Lua 5.4',
+    ['Lua.runtime.path']                    = Type.String >> {
+                                                "?.lua",
+                                                "?/init.lua",
+                                                "?/?.lua"
+                                            },
+    ['Lua.runtime.special']                 = Type.Hash(Type.String, Type.String),
+    ['Lua.runtime.meta']                    = Type.String >> '${version} ${language}',
+    ['Lua.runtime.unicodeName']             = Type.Boolean,
+    ['Lua.runtime.nonstandardSymbol']       = Type.Hash(Type.String, Type.Boolean, ';'),
+    ['Lua.runtime.plugin']                  = Type.String,
+    ['Lua.runtime.fileEncoding']            = Type.String >> 'utf8',
+    ['Lua.runtime.builtin']                 = Type.Hash(Type.String, Type.String),
+    ['Lua.diagnostics.enable']              = Type.Boolean >> true,
+    ['Lua.diagnostics.globals']             = Type.Hash(Type.String, Type.Boolean, ';'),
+    ['Lua.diagnostics.disable']             = Type.Hash(Type.String, Type.Boolean, ';'),
+    ['Lua.diagnostics.severity']            = Type.Hash(Type.String, Type.String)
+                                            >> util.deepCopy(define.DiagnosticDefaultSeverity),
+    ['Lua.diagnostics.neededFileStatus']    = Type.Hash(Type.String, Type.String)
+                                            >> util.deepCopy(define.DiagnosticDefaultNeededFileStatus),
+    ['Lua.diagnostics.workspaceDelay']      = Type.Integer >> 0,
+    ['Lua.diagnostics.workspaceRate']       = Type.Integer >> 100,
+    ['Lua.workspace.ignoreDir']             = Type.Hash(Type.String, Type.Boolean, ';'),
+    ['Lua.workspace.ignoreSubmodules']      = Type.Boolean >> true,
+    ['Lua.workspace.useGitIgnore']          = Type.Boolean >> true,
+    ['Lua.workspace.maxPreload']            = Type.Integer >> 1000,
+    ['Lua.workspace.preloadFileSize']       = Type.Integer >> 100,
+    ['Lua.workspace.library']               = Type.Hash(Type.String, Type.Boolean, ';'),
+    ['Lua.completion.enable']               = Type.Boolean >> true,
+    ['Lua.completion.callSnippet']          = Type.String  >> 'Disable',
+    ['Lua.completion.keywordSnippet']       = Type.String  >> 'Replace',
+    ['Lua.completion.displayContext']       = Type.Integer >> 6,
+    ['Lua.completion.workspaceWord']        = Type.Boolean >> true,
+    ['Lua.completion.autoRequire']          = Type.Boolean >> true,
+    ['Lua.completion.showParams']           = Type.Boolean >> true,
+    ['Lua.signatureHelp.enable']            = Type.Boolean >> true,
+    ['Lua.hover.enable']                    = Type.Boolean >> true,
+    ['Lua.hover.viewString']                = Type.Boolean >> true,
+    ['Lua.hover.viewStringMax']             = Type.Integer >> 1000,
+    ['Lua.hover.viewNumber']                = Type.Boolean >> true,
+    ['Lua.hover.previewFields']             = Type.Integer >> 20,
+    ['Lua.hover.enumsLimit']                = Type.Integer >> 5,
+    ['Lua.color.mode']                      = Type.String  >> 'Semantic',
+    ['Lua.hint.enable']                     = Type.Boolean >> false,
+    ['Lua.hint.paramType']                  = Type.Boolean >> true,
+    ['Lua.hint.setType']                    = Type.Boolean >> false,
+    ['Lua.hint.paramName']                  = Type.Boolean >> true,
+    ['Lua.window.statusBar']                = Type.Boolean >> true,
+    ['Lua.window.progressBar']              = Type.Boolean >> true,
+    ['Lua.telemetry.enable']                = Type.Or(Type.Boolean, Type.Nil),
+    ['files.associations']                  = Type.Hash(Type.String, Type.String),
+    ['files.exclude']                       = Type.Hash(Type.String, Type.Boolean),
+    ['editor.semanticHighlighting']         = Type.Or(Type.Boolean, Type.String),
+    ['editor.acceptSuggestionOnEnter']      = Type.String  >> 'on',
 }
 
 local m = {}
+
+local function init()
+    if m.Lua then
+        return
+    end
+end
+
+init()
+
 
 return m

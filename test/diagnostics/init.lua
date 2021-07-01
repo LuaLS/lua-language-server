@@ -4,7 +4,7 @@ local config = require 'config'
 local util   = require 'utility'
 local define = require 'proto.define'
 
-config.config.diagnostics.neededFileStatus['deprecated'] = 'Any'
+config.Lua.diagnostics.neededFileStatus['deprecated'] = 'Any'
 
 rawset(_G, 'TEST', true)
 
@@ -206,7 +206,7 @@ local _ENV = { print = print }
 print(1)
 ]]
 
-config.config.diagnostics.disable['undefined-env-child'] = true
+config.Lua.diagnostics.disable['undefined-env-child'] = true
 TEST [[
 _ENV = nil
 <!GLOBAL!> = 1 --> _ENV.GLOBAL = 1
@@ -232,7 +232,7 @@ GLOBAL = 1
 _ENV = nil
 ]]
 
-config.config.diagnostics.disable['undefined-env-child'] = nil
+config.Lua.diagnostics.disable['undefined-env-child'] = nil
 TEST [[
 <!print()
 ('string')!>:sub(1, 1)
@@ -344,17 +344,17 @@ return [[
 ]]
 ]=]
 
-config.config.diagnostics.disable['close-non-object'] = true
+config.Lua.diagnostics.disable['close-non-object'] = true
 TEST [[
 local _ <close> = function () end
 ]]
 
-config.config.diagnostics.disable['close-non-object'] = nil
+config.Lua.diagnostics.disable['close-non-object'] = nil
 TEST [[
 local _ <close> = <!1!>
 ]]
 
-config.config.diagnostics.disable['unused-local'] = true
+config.Lua.diagnostics.disable['unused-local'] = true
 TEST [[
 local f = <!function () end!>
 ]]
@@ -367,7 +367,7 @@ TEST [[
 local <!function f() end!>
 ]]
 
-config.config.diagnostics.disable['unused-local'] = nil
+config.Lua.diagnostics.disable['unused-local'] = nil
 TEST [[
 local mt, x
 function mt:m()

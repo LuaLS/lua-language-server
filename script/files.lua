@@ -164,7 +164,7 @@ function m.setText(uri, text, isTrust, instance)
         return
     end
     if not isTrust and unicode then
-        if config.config.runtime.fileEncoding == 'ansi' then
+        if config.Lua.runtime.fileEncoding == 'ansi' then
             text = unicode.a2u(text)
         end
     end
@@ -393,7 +393,7 @@ end
 
 function m.compileState(uri, text)
     local ws = require 'workspace'
-    if not m.isOpen(uri) and #text >= config.config.workspace.preloadFileSize * 1000 then
+    if not m.isOpen(uri) and #text >= config.Lua.workspace.preloadFileSize * 1000 then
         if not m.notifyCache['preloadFileSize'] then
             m.notifyCache['preloadFileSize'] = {}
             m.notifyCache['skipLargeFileCount'] = 0
@@ -406,7 +406,7 @@ function m.compileState(uri, text)
                     type = 3,
                     message = lang.script('WORKSPACE_SKIP_LARGE_FILE'
                         , ws.getRelativePath(m.getOriginUri(uri))
-                        , config.config.workspace.preloadFileSize
+                        , config.Lua.workspace.preloadFileSize
                         , #text / 1000
                     ),
                 })
@@ -419,11 +419,11 @@ function m.compileState(uri, text)
     local clock = os.clock()
     local state, err = parser:compile(text
         , 'lua'
-        , config.config.runtime.version
+        , config.Lua.runtime.version
         , {
-            special           = config.config.runtime.special,
-            unicodeName       = config.config.runtime.unicodeName,
-            nonstandardSymbol = config.config.runtime.nonstandardSymbol,
+            special           = config.Lua.runtime.special,
+            unicodeName       = config.Lua.runtime.unicodeName,
+            nonstandardSymbol = config.Lua.runtime.nonstandardSymbol,
             delay             = await.delay,
         }
     )

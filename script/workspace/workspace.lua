@@ -77,7 +77,7 @@ function m.getNativeMatcher()
 
     local pattern = {}
     -- config.workspace.ignoreDir
-    for path in pairs(config.config.workspace.ignoreDir) do
+    for path in pairs(config.Lua.workspace.ignoreDir) do
         log.info('Ignore directory:', path)
         pattern[#pattern+1] = path
     end
@@ -89,7 +89,7 @@ function m.getNativeMatcher()
         end
     end
     -- config.workspace.ignoreSubmodules
-    if config.config.workspace.ignoreSubmodules then
+    if config.Lua.workspace.ignoreSubmodules then
         local buf = pub.awaitTask('loadFile', furi.encode(m.path .. '/.gitmodules'))
         if buf then
             for path in buf:gmatch('path = ([^\r\n]+)') do
@@ -99,7 +99,7 @@ function m.getNativeMatcher()
         end
     end
     -- config.workspace.useGitIgnore
-    if config.config.workspace.useGitIgnore then
+    if config.Lua.workspace.useGitIgnore then
         local buf = pub.awaitTask('loadFile', furi.encode(m.path .. '/.gitignore'))
         if buf then
             for line in buf:gmatch '[^\r\n]+' do
@@ -120,7 +120,7 @@ function m.getNativeMatcher()
         end
     end
     -- config.workspace.library
-    for path in pairs(config.config.workspace.library) do
+    for path in pairs(config.Lua.workspace.library) do
         path = path:gsub('${(.-)}', {
             meta = (ROOT / 'meta' / '3rd'):string(),
         })
@@ -142,7 +142,7 @@ function m.getLibraryMatchers()
     end
 
     local librarys = {}
-    for path in pairs(config.config.workspace.library) do
+    for path in pairs(config.Lua.workspace.library) do
         path = path:gsub('${(.-)}', {
             meta = (ROOT / 'meta' / '3rd'):string(),
         })
@@ -183,12 +183,12 @@ local function loadFileFactory(root, progressData, isLibrary)
     return function (path)
         local uri = furi.encode(path)
         if files.isLua(uri) then
-            if not isLibrary and progressData.preload >= config.config.workspace.maxPreload then
+            if not isLibrary and progressData.preload >= config.Lua.workspace.maxPreload then
                 if not m.hasHitMaxPreload then
                     m.hasHitMaxPreload = true
                     proto.request('window/showMessageRequest', {
                         type    = define.MessageType.Info,
-                        message = lang.script('MWS_MAX_PRELOAD', config.config.workspace.maxPreload),
+                        message = lang.script('MWS_MAX_PRELOAD', config.Lua.workspace.maxPreload),
                         actions = {
                             {
                                 title = lang.script.WINDOW_INCREASE_UPPER_LIMIT,
@@ -207,7 +207,7 @@ local function loadFileFactory(root, progressData, isLibrary)
                                 data      = {
                                     key    = 'Lua.workspace.maxPreload',
                                     action = 'set',
-                                    value  = config.config.workspace.maxPreload + math.max(1000, config.config.workspace.maxPreload),
+                                    value  = config.Lua.workspace.maxPreload + math.max(1000, config.Lua.workspace.maxPreload),
                                 }
                             })
                         end
@@ -415,7 +415,7 @@ function m.findUrisByRequirePath(path)
 
     local input = path:gsub('%.', '/')
                       :gsub('%%', '%%%%')
-    for _, luapath in ipairs(config.config.runtime.path) do
+    for _, luapath in ipairs(config.Lua.runtime.path) do
         local part = m.normalize(luapath:gsub('%?', input))
         local uris, posts = m.findUrisByFilePath(part)
         for _, uri in ipairs(uris) do

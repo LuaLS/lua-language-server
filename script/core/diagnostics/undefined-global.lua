@@ -25,10 +25,10 @@ return function (uri, callback)
         if not key then
             return
         end
-        if config.config.diagnostics.globals[key] then
+        if config.Lua.diagnostics.globals[key] then
             return
         end
-        if config.config.runtime.special[key] then
+        if config.Lua.runtime.special[key] then
             return
         end
         local node = src.node

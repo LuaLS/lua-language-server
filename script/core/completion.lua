@@ -145,7 +145,7 @@ local function buildDetail(source)
 end
 
 local function getSnip(source)
-    local context = config.config.completion.displayContext
+    local context = config.Lua.completion.displayContext
     if context <= 0 then
         return nil
     end
@@ -187,7 +187,7 @@ local function buildDesc(source)
 end
 
 local function buildFunction(results, source, value, oop, data)
-    local snipType = config.config.completion.callSnippet
+    local snipType = config.Lua.completion.callSnippet
     if snipType == 'Disable' or snipType == 'Both' then
         results[#results+1] = data
     end
@@ -220,7 +220,7 @@ local function buildInsertRequire(ast, targetUri, stemName)
         end
     end
     local path = furi.decode(targetUri)
-    local visiblePaths = rpath.getVisiblePath(path, config.config.runtime.path, true)
+    local visiblePaths = rpath.getVisiblePath(path, config.Lua.runtime.path, true)
     if not visiblePaths or #visiblePaths == 0 then
         return nil
     end
@@ -311,7 +311,7 @@ local function checkLocal(ast, word, offset, results)
 end
 
 local function checkModule(ast, word, offset, results)
-    if not config.config.completion.autoRequire then
+    if not config.Lua.completion.autoRequire then
         return
     end
     local locals  = guide.getVisibleLocals(ast.ast, offset)
@@ -325,7 +325,7 @@ local function checkModule(ast, word, offset, results)
         local stemName = fileName:gsub('%..+', '')
         if  not locals[stemName]
         and not vm.hasGlobalSets(stemName)
-        and not config.config.diagnostics.globals[stemName]
+        and not config.Lua.diagnostics.globals[stemName]
         and stemName:match '^[%a_][%w_]*$'
         and matchKey(word, stemName) then
             local targetAst = files.getState(uri)
@@ -409,8 +409,8 @@ local function checkFieldFromFieldToIndex(name, parent, word, start, offset)
             }
         end
     else
-        if config.config.runtime.version == 'Lua 5.1'
-        or config.config.runtime.version == 'LuaJIT' then
+        if config.Lua.runtime.version == 'Lua 5.1'
+        or config.Lua.runtime.version == 'LuaJIT' then
             textEdit.newText = '_G' .. textEdit.newText
         else
             textEdit.newText = '_ENV' .. textEdit.newText
@@ -494,7 +494,7 @@ local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, res
             goto CONTINUE
         end
         local funcLabel
-        if config.config.completion.showParams then
+        if config.Lua.completion.showParams then
             local value = searcher.getObjectValue(src) or src
             if value.type == 'function'
             or value.type == 'doc.type.function' then
@@ -594,7 +594,7 @@ local function checkCommon(myUri, word, text, offset, results)
     for _, data in ipairs(keyWordMap) do
         used[data[1]] = true
     end
-    if config.config.completion.workspaceWord and #word >= 2 then
+    if config.Lua.completion.workspaceWord and #word >= 2 then
         local myHead = word:sub(1, 2)
         for uri in files.eachFile() do
             if #results >= 100 then
@@ -681,7 +681,7 @@ local function isInString(ast, offset)
 end
 
 local function checkKeyWord(ast, text, start, offset, word, hasSpace, afterLocal, results)
-    local snipType = config.config.completion.keywordSnippet
+    local snipType = config.Lua.completion.keywordSnippet
     local symbol = lookBackward.findSymbol(text, start - 1)
     local isExp = symbol == '(' or symbol == ',' or symbol == '='
     local info = {
@@ -865,7 +865,7 @@ local function checkUri(ast, text, offset, results)
                     goto CONTINUE
                 end
                 local path = workspace.getRelativePath(uri)
-                local infos = rpath.getVisiblePath(path, config.config.runtime.path)
+                local infos = rpath.getVisiblePath(path, config.Lua.runtime.path)
                 for _, info in ipairs(infos) do
                     if matchKey(literal, info.expect) then
                         if not collect[info.expect] then

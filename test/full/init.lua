@@ -11,9 +11,9 @@ function TEST(script)
 end
 
 local function startCollectDiagTimes()
-    for name in pairs(config.config.diagnostics.neededFileStatus) do
+    for name in pairs(config.Lua.diagnostics.neededFileStatus) do
         if name ~= 'no-implicit-any' then
-            --config.config.diagnostics.neededFileStatus[name] = 'Any'
+            --config.Lua.diagnostics.neededFileStatus[name] = 'Any'
         end
     end
     DIAGTIMES = {}

@@ -15,7 +15,8 @@
         "LOCALE",
         "SHOWSOURCE",
         "TRACE",
-        "FOOTPRINT"
+        "FOOTPRINT",
+        "CONFIGPATH"
     ],
     "Lua.diagnostics.disable": [
         "close-non-object",
@@ -38,6 +39,7 @@
         "E:/Github/test",
         // Just some comment
         "script/meta",
+        "bin",
     ],
     "Lua.runtime.path": [
         "?.lua",

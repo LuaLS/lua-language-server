@@ -207,15 +207,15 @@ local OtherTemplate = {
 }
 
 local function init()
-    if m.config then
+    if m.Lua then
         return
     end
 
-    m.config = {}
+    m.Lua = {}
     for c, t in pairs(ConfigTemplate) do
-        m.config[c] = {}
+        m.Lua[c] = {}
         for k, info in pairs(t) do
-            m.config[c][k] = info[1]
+            m.Lua[c][k] = info[1]
         end
     end
 
@@ -236,9 +236,9 @@ function m.setConfig(config, other)
                     if info then
                         local suc, v = info[2](v)
                         if suc then
-                            m.config[c][k] = v
+                            m.Lua[c][k] = v
                         else
-                            m.config[c][k] = info[1]
+                            m.Lua[c][k] = info[1]
                         end
                     end
                 end
@@ -255,7 +255,7 @@ function m.setConfig(config, other)
                 end
             end
         end
-        log.debug('Config update: ', util.dump(m.config), util.dump(m.other))
+        log.debug('Config update: ', util.dump(m.Lua), util.dump(m.other))
     end, log.error)
 end
 

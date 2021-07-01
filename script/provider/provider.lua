@@ -61,10 +61,10 @@ local function updateConfig()
         acceptSuggestionOnEnter = configs[5],
     }
 
-    local oldConfig = util.deepCopy(config.config)
+    local oldConfig = util.deepCopy(config.Lua)
     local oldOther  = util.deepCopy(config.other)
     config.setConfig(updated, other)
-    local newConfig = config.config
+    local newConfig = config.Lua
     local newOther  = config.other
 
     if not util.equal(oldConfig.runtime, newConfig.runtime) then
@@ -166,6 +166,9 @@ proto.on('shutdown', function ()
 end)
 
 proto.on('workspace/didChangeConfiguration', function ()
+    if CONFIGPATH then
+        return
+    end
     updateConfig()
 end)
 
@@ -595,7 +598,7 @@ proto.on('completionItem/resolve', function (item)
 end)
 
 proto.on('textDocument/signatureHelp', function (params)
-    if not config.config.signatureHelp.enable then
+    if not config.Lua.signatureHelp.enable then
         return nil
     end
     workspace.awaitReady()
@@ -892,7 +895,7 @@ do
     local function updateHint(uri)
         local awaitID = 'hint:' .. uri
         await.close(awaitID)
-        if not config.config.hint.enable then
+        if not config.Lua.hint.enable then
             return
         end
         await.setID(awaitID)

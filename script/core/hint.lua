@@ -29,11 +29,11 @@ local function typeHint(uri, edits, start, finish)
             return
         end
         if source.parent.type == 'funcargs' then
-            if not config.config.hint.paramType then
+            if not config.Lua.hint.paramType then
                 return
             end
         else
-            if not config.config.hint.setType then
+            if not config.Lua.hint.setType then
                 return
             end
         end
@@ -96,7 +96,7 @@ local function hasLiteralArgInCall(call)
 end
 
 local function paramName(uri, edits, start, finish)
-    if not config.config.hint.paramName then
+    if not config.Lua.hint.paramName then
         return
     end
     local ast = files.getState(uri)

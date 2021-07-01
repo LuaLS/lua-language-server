@@ -109,9 +109,9 @@ function TEST(script)
     end
 end
 
-config.config.completion.callSnippet    = 'Both'
-config.config.completion.keywordSnippet = 'Both'
-config.config.completion.workspaceWord  = false
+config.Lua.completion.callSnippet    = 'Both'
+config.Lua.completion.keywordSnippet = 'Both'
+config.Lua.completion.workspaceWord  = false
 
 TEST [[
 local zabcde
@@ -920,7 +920,7 @@ print(io.$)
 ]]
 (EXISTS)
 
-require 'config' .config.runtime.version = 'Lua 5.4'
+require 'config' .Lua.runtime.version = 'Lua 5.4'
 --TEST [[
 --local $
 --]]

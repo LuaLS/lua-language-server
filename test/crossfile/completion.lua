@@ -359,8 +359,8 @@ TEST {
 }
 
 
-local originRuntimePath = config.config.runtime.path
-config.config.runtime.path = {
+local originRuntimePath = config.Lua.runtime.path
+config.Lua.runtime.path = {
     '?/1.lua',
 }
 
@@ -388,10 +388,10 @@ TEST {
     }
 }
 
-config.config.runtime.path = originRuntimePath
+config.Lua.runtime.path = originRuntimePath
 
-local originRuntimePath = config.config.runtime.path
-config.config.runtime.path = {
+local originRuntimePath = config.Lua.runtime.path
+config.Lua.runtime.path = {
     'd:/?/1.lua',
 }
 
@@ -414,7 +414,7 @@ TEST {
     }
 }
 
-config.config.runtime.path = originRuntimePath
+config.Lua.runtime.path = originRuntimePath
 
 TEST {
     {

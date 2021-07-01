@@ -9,7 +9,7 @@ local noder  = require 'core.noder'
 
 -- 临时
 local function testIfExit(path)
-    config.config.workspace.preloadFileSize = 1000000000
+    config.Lua.workspace.preloadFileSize = 1000000000
     local buf = util.loadFile(path:string())
     if buf then
         local vm

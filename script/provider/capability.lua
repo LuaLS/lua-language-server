@@ -56,6 +56,7 @@ function m.getIniter()
 
         hoverProvider = true,
         definitionProvider = true,
+        typeDefinitionProvider = true,
         referencesProvider = true,
         renameProvider = {
             prepareProvider = true,

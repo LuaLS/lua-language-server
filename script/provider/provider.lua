@@ -335,6 +335,35 @@ proto.on('textDocument/definition', function (params)
     return response
 end)
 
+proto.on('textDocument/typeDefinition', function (params)
+    workspace.awaitReady()
+    local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_TYPE_DEFINITION, 0.5)
+    local core   = require 'core.type-definition'
+    local uri    = params.textDocument.uri
+    if not files.exists(uri) then
+        return nil
+    end
+    local offset = files.offsetOfWord(uri, params.position)
+    local result = core(uri, offset)
+    if not result then
+        return nil
+    end
+    local response = {}
+    for i, info in ipairs(result) do
+        local targetUri = info.uri
+        if targetUri then
+            if files.exists(targetUri) then
+                response[i] = define.locationLink(targetUri
+                    , files.range(targetUri, info.target.start, info.target.finish)
+                    , files.range(targetUri, info.target.start, info.target.finish)
+                    , files.range(uri,       info.source.start, info.source.finish)
+                )
+            end
+        end
+    end
+    return response
+end)
+
 proto.on('textDocument/references', function (params)
     workspace.awaitReady()
     local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_REFERENCE, 0.5)

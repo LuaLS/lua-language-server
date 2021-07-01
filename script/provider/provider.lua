@@ -20,50 +20,29 @@ local progress  = require 'progress'
 local tm        = require 'text-merger'
 local vm        = require 'vm'
 local nonil     = require 'without-check-nil'
+local cfgLoader = require 'config.loader'
 
 local function updateConfig()
     local diagnostics = require 'provider.diagnostic'
     local telemetry   = require 'service.telemetry'
-    local configs = proto.awaitRequest('workspace/configuration', {
-        items = {
-            {
-                scopeUri = workspace.uri,
-                section = 'Lua',
-            },
-            {
-                scopeUri = workspace.uri,
-                section = 'files.associations',
-            },
-            {
-                scopeUri = workspace.uri,
-                section = 'files.exclude',
-            },
-            {
-                scopeUri = workspace.uri,
-                section = 'editor.semanticHighlighting.enabled',
-            },
-            {
-                scopeUri = workspace.uri,
-                section = 'editor.acceptSuggestionOnEnter',
-            },
-        },
-    })
-    if not configs or not configs[1] then
-        log.warn('No config?', util.dump(configs))
+    local new
+    if CONFIGPATH then
+        new = cfgLoader.loadLocalConfig(CONFIGPATH)
+        log.debug('load config from local', CONFIGPATH)
+    else
+        new = cfgLoader.loadClientConfig()
+        log.debug('load config from client')
+    end
+    if not new then
+        log.warn('load config failed!')
         return
     end
-
-    local new = {
-        ['Lua']                                 = configs[1],
-        ['files.associations']                  = configs[2],
-        ['files.exclude']                       = configs[3],
-        ['editor.semanticHighlighting.enabled'] = configs[4],
-        ['editor.acceptSuggestionOnEnter']      = configs[5],
-    }
+    log.debug('loaded config dump:', util.dump(new))
 
     local oldConfig = config.dump()
     config.update(new)
     local newConfig = config.dump()
+    log.debug('config updated:', util.dump(newConfig))
 
     if not util.equal(oldConfig.Lua.runtime, newConfig.Lua.runtime) then
         library.init()

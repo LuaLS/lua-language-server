@@ -1,5 +1,8 @@
 # changelog
 
+## 2.1.0
+* `NEW` supports local config file, using `--configpath="config.json"`
+
 ## 2.0.5
 `2021-7-1`
 * `NEW` `hover` and `completion` reports initialization progress

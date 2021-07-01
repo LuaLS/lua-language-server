@@ -2548,22 +2548,43 @@ end
 ]]
 (EXISTS)
 
---config.set('Lua.completion.callSnippet',    'Disable')
---
---TEST [[
---GGG = 1
---GGG = function ()
---end
---
---GGG$
---]]
---{
---    {
---        label = 'GGG = 1',
---        kind  = define.CompletionItemKind.Variable,
---    },
---    {
---        label = 'GGG()',
---        kind  = define.CompletionItemKind.Function,
---    },
---}
+config.set('Lua.completion.callSnippet',    'Disable')
+
+TEST [[
+GGG = 1
+GGG = function ()
+end
+
+GGG$
+]]
+{
+    {
+        label = 'GGG',
+        kind  = define.CompletionItemKind.Enum,
+    },
+    {
+        label = 'GGG()',
+        kind  = define.CompletionItemKind.Function,
+    },
+}
+
+TEST [[
+---@class C
+---@field GGG number
+local t = {}
+
+t.GGG = function ()
+end
+
+t.GGG$
+]]
+{
+    {
+        label = 't.GGG',
+        kind  = define.CompletionItemKind.Enum,
+    },
+    {
+        label = 't.GGG()',
+        kind  = define.CompletionItemKind.Function,
+    },
+}

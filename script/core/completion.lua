@@ -500,7 +500,6 @@ local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, res
             or value.type == 'doc.type.function' then
                 funcLabel = name .. getParams(value, oop)
                 fields[funcLabel] = src
-                fields[name] = false
                 count = count + 1
                 if value.type == 'function' and value.bindDocs then
                     for _, doc in ipairs(value.bindDocs) do

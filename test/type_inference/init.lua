@@ -828,6 +828,13 @@ TEST 'fun():number, boolean' [[
 local <?t?>
 ]]
 
+--[[
+l:value
+l:work|&1|&1
+f:|&1|&1
+dfun:|&1
+dn:Class
+]]
 TEST 'Class' [[
 ---@class Class
 
@@ -836,5 +843,27 @@ function work(callback)
 end
 
 work(function (<?value?>)
+end)
+]]
+
+TEST 'Class' [[
+---@class Class
+
+---@param callback fun(value: Class)
+function work(callback)
+end
+
+pcall(work, function (<?value?>)
+end)
+]]
+
+TEST 'Class' [[
+---@class Class
+
+---@param callback fun(value: Class)
+function work(callback)
+end
+
+xpcall(work, debug.traceback, function (<?value?>)
 end)
 ]]

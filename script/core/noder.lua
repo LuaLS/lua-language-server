@@ -535,7 +535,46 @@ local function bindValue(noders, source, id)
     end
 end
 
-local function compileCall(noders, call, sourceID, returnIndex)
+local function compileCallParam(noders, call, sourceID)
+    if not sourceID then
+        return
+    end
+    if not call.args then
+        return
+    end
+    local node = call.node
+    local fixIndex = 0
+    if call.node.special == 'pcall' then
+        fixIndex = 1
+        node = call.args[1]
+    elseif call.node.special == 'xpcall' then
+        fixIndex = 2
+        node = call.args[1]
+    end
+    local nodeID = getID(node)
+    if not nodeID then
+        return
+    end
+    for firstIndex, callArg in ipairs(call.args) do
+        firstIndex = firstIndex - fixIndex
+        if firstIndex > 0 and callArg.type == 'function' then
+            if callArg.args then
+                for secondIndex, funcParam in ipairs(callArg.args) do
+                    local paramID = ('%s%s%s%s%s'):format(
+                        nodeID,
+                        PARAM_INDEX,
+                        firstIndex,
+                        PARAM_INDEX,
+                        secondIndex
+                    )
+                    pushForward(noders, getID(funcParam), paramID)
+                end
+            end
+        end
+    end
+end
+
+local function compileCallReturn(noders, call, sourceID, returnIndex)
     if not sourceID then
         return
     end
@@ -732,13 +771,14 @@ function m.compileNode(noders, source)
     end
     if source.type == 'call' then
         if source.parent.type ~= 'select' then
-            compileCall(noders, source, id, 1)
+            compileCallReturn(noders, source, id, 1)
         end
+        compileCallParam(noders, source, id)
     end
     if source.type == 'select' then
         if source.vararg.type == 'call' then
             local call = source.vararg
-            compileCall(noders, call, id, source.sindex)
+            compileCallReturn(noders, call, id, source.sindex)
         end
         if source.vararg.type == 'varargs' then
             pushForward(noders, id, getID(source.vararg))
@@ -753,6 +793,14 @@ function m.compileNode(noders, source)
                     index
                 )
                 pushForward(noders, returnID, getID(rtn))
+            end
+            for index, param in ipairs(source.args) do
+                local paramID = ('%s%s%s'):format(
+                    id,
+                    PARAM_INDEX,
+                    index
+                )
+                pushForward(noders, paramID, getID(param.extends))
             end
         end
         -- @type fun(x: T):T 的情况
@@ -857,6 +905,12 @@ function m.compileNode(noders, source)
                         if param then
                             pushForward(noders, getID(param), getID(doc))
                             param.docParam = doc
+                            local paramID = ('%s%s%s'):format(
+                                id,
+                                PARAM_INDEX,
+                                paramIndex
+                            )
+                            pushForward(noders, paramID, getID(doc.extends))
                         end
                     end
                 end

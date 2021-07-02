@@ -3,6 +3,16 @@
 ## 2.1.0
 * `NEW` supports local config file, using `--configpath="config.json"`, [learn more here](https://github.com/sumneko/lua-language-server/wiki/Setting-without-VSCode)
 * `NEW` goto `type definition`
+* `NEW` infer type by callback param:
+    ```lua
+    ---@param callback fun(value: string)
+    local function work(callback)
+    end
+
+    work(function (value)
+        -- value is string here
+    end)
+    ```
 * `CHG` [#549](https://github.com/sumneko/lua-language-server/issues/549)
 * `CHG` diagnostics: always ignore the ignored files even if they are opened
 * `FIX` completion: `type() ==` may does not work

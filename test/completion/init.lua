@@ -2580,11 +2580,11 @@ t.GGG$
 ]]
 {
     {
-        label = 't.GGG',
-        kind  = define.CompletionItemKind.Enum,
+        label = 'GGG',
+        kind  = define.CompletionItemKind.Field,
     },
     {
-        label = 't.GGG()',
+        label = 'GGG()',
         kind  = define.CompletionItemKind.Function,
     },
 }

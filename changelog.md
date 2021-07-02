@@ -13,6 +13,7 @@
         -- value is string here
     end)
     ```
+* `NEW` optional field `---@field name? type`
 * `CHG` [#549](https://github.com/sumneko/lua-language-server/issues/549)
 * `CHG` diagnostics: always ignore the ignored files even if they are opened
 * `FIX` completion: `type() ==` may does not work

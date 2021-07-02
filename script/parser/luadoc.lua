@@ -714,6 +714,10 @@ local function parseField()
     if not result.start then
         result.start = result.field.start
     end
+    if checkToken('symbol', '?', 1) then
+        nextToken()
+        result.optional = true
+    end
     result.extends = parseType(result)
     if not result.extends then
         pushError {

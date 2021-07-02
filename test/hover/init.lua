@@ -1584,3 +1584,20 @@ local f
 [[
 local f: any
 ]]
+
+TEST [[
+---@class Position
+---@field x  number
+---@field y  number
+---@field z? number
+local <?t?>
+
+t.z = any
+]]
+[[
+local t: Position {
+    x: number,
+    y: number,
+    z?: number,
+}
+]]

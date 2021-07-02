@@ -15,16 +15,24 @@ local function formatKey(key)
     return ('[%s]'):format(key)
 end
 
-local function buildAsHash(keys, inferMap, literalMap, reachMax)
+local function buildAsHash(keys, inferMap, literalMap, optMap, reachMax)
     local lines = {}
     lines[#lines+1] = '{'
     for _, key in ipairs(keys) do
         local inferView   = inferMap[key]
         local literalView = literalMap[key]
         if literalView then
-            lines[#lines+1] = ('    %s: %s = %s,'):format(formatKey(key), inferView, literalView)
+            lines[#lines+1] = ('    %s%s: %s = %s,'):format(
+                formatKey(key),
+                optMap[key] and '?' or '',
+                inferView,
+                literalView)
         else
-            lines[#lines+1] = ('    %s: %s,'):format(formatKey(key), inferView)
+            lines[#lines+1] = ('    %s%s: %s,'):format(
+                formatKey(key),
+                optMap[key] and '?' or '',
+                inferView
+            )
         end
     end
     if reachMax > 0 then
@@ -34,7 +42,7 @@ local function buildAsHash(keys, inferMap, literalMap, reachMax)
     return table.concat(lines, '\n')
 end
 
-local function buildAsConst(keys, inferMap, literalMap, reachMax)
+local function buildAsConst(keys, inferMap, literalMap, optMap, reachMax)
     table.sort(keys, function (a, b)
         return tonumber(literalMap[a]) < tonumber(literalMap[b])
     end)
@@ -44,9 +52,18 @@ local function buildAsConst(keys, inferMap, literalMap, reachMax)
         local inferView   = inferMap[key]
         local literalView = literalMap[key]
         if literalView then
-            lines[#lines+1] = ('    %s: %s = %s,'):format(formatKey(key), inferView, literalView)
+            lines[#lines+1] = ('    %s%s: %s = %s,'):format(
+                formatKey(key),
+                optMap[key] and '?' or '',
+                inferView,
+                literalView
+            )
         else
-            lines[#lines+1] = ('    %s: %s,'):format(formatKey(key), inferView)
+            lines[#lines+1] = ('    %s%s: %s,'):format(
+                formatKey(key),
+                optMap[key] and '?' or '',
+                inferView
+            )
         end
     end
     if reachMax > 0 then
@@ -90,6 +107,19 @@ local function getKeyMap(fields)
     return keys
 end
 
+local function getOptionalMap(fields)
+    local optionals = {}
+    for _, field in ipairs(fields) do
+        if field.type == 'doc.field.name' then
+            if field.parent.optional then
+                local key = vm.getKeyName(field)
+                optionals[key] = true
+            end
+        end
+    end
+    return optionals
+end
+
 return function (source)
     local maxFields = config.get 'Lua.hover.previewFields'
     if maxFields <= 0 then
@@ -98,6 +128,7 @@ return function (source)
 
     local fields = vm.getRefs(source, '*')
     local keys   = getKeyMap(fields)
+    local optMap = getOptionalMap(fields)
 
     if #keys == 0 then
         return '{}'
@@ -127,9 +158,9 @@ return function (source)
     local result
 
     if isConsts then
-        result = buildAsConst(keys, inferMap, literalMap, reachMax)
+        result = buildAsConst(keys, inferMap, literalMap, optMap, reachMax)
     else
-        result = buildAsHash(keys, inferMap, literalMap, reachMax)
+        result = buildAsHash(keys, inferMap, literalMap, optMap, reachMax)
     end
 
     --if timeUp then

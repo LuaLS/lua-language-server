@@ -34,9 +34,7 @@ end
 ---@param proto parser.guide.object
 ---@return generic.value
 local function createValue(closure, proto, callback, road)
-    if callback then
-        road = road or {}
-    end
+    road = road or {}
     if proto.type == 'doc.type' then
         local types = {}
         local hasGeneric
@@ -54,6 +52,8 @@ local function createValue(closure, proto, callback, road)
         end
         local value = instantValue(closure, proto)
         value.types = types
+        value.enums = proto.enums
+        value.resumes = proto.resumes
         noder.compileNode(noder.getNoders(proto), value)
         return value
     end
@@ -98,18 +98,15 @@ local function createValue(closure, proto, callback, road)
         return value
     end
     if proto.type == 'doc.type.array' then
-        if road then
-            road[#road+1] = noder.WEAK_ANY_FIELD
-        end
+        road[#road+1] = noder.WEAK_ANY_FIELD
         local node = createValue(closure, proto.node, callback, road)
-        if road then
-            road[#road] = nil
-        end
+        road[#road] = nil
         if not node then
             return nil
         end
         local value = instantValue(closure, proto)
         value.node = node
+        noder.compileNode(noder.getNoders(proto), value)
         return value
     end
     if proto.type == 'doc.type.table' then
@@ -127,6 +124,36 @@ local function createValue(closure, proto, callback, road)
         local value = instantValue(closure, proto)
         value.tkey   = tkey   or proto.tkey
         value.tvalue = tvalue or proto.tvalue
+        noder.compileNode(noder.getNoders(proto), value)
+        return value
+    end
+    if proto.type == 'doc.type.ltable' then
+        local fields = {}
+        for i, field in ipairs(proto.fields) do
+            fields[i] = createValue(closure, field, callback, road) or field
+        end
+        if #fields == 0 then
+            return nil
+        end
+        local value = instantValue(closure, proto)
+        value.fields = fields
+        noder.compileNode(noder.getNoders(proto), value)
+        return value
+    end
+    if proto.type == 'doc.type.field' then
+        road[#road+1] = ('%s%q'):format(
+            noder.SPLIT_CHAR,
+            proto.name[1]
+        )
+        local typeUnit = createValue(closure, proto.extends, callback, road)
+        road[#road] = nil
+        if not typeUnit then
+            return nil
+        end
+        local value = instantValue(closure, proto)
+        value.name = proto.name
+        value.extends = typeUnit
+        noder.compileNode(noder.getNoders(proto), value)
         return value
     end
 end

@@ -116,6 +116,12 @@ local function getOptionalMap(fields)
                 optionals[key] = true
             end
         end
+        if field.type == 'doc.type.field' then
+            if field.optional then
+                local key = vm.getKeyName(field)
+                optionals[key] = true
+            end
+        end
     end
     return optionals
 end

@@ -407,7 +407,7 @@ local function parseTypeUnitLiteralTable(parent)
         }
 
         do
-            field.name = parseName('doc.ltfield.name', field)
+            field.name = parseName('doc.field.name', field)
             if not field.name then
                 pushError {
                     type   = 'LUADOC_MISS_FIELD_NAME',
@@ -438,7 +438,7 @@ local function parseTypeUnitLiteralTable(parent)
         if checkToken('symbol', ',', 1) then
             nextToken()
         else
-            nextSymbolOrError(')')
+            nextSymbolOrError('}')
             break
         end
     end

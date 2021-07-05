@@ -1,6 +1,21 @@
 # changelog
 
 ## 2.2.0
+* `NEW` `LuaDoc`: supports literal table:
+    ```lua
+    ---@generic T
+    ---@param x T
+    ---@return { x: number, y: T, z?: boolean}
+    local function f(x) end
+
+    local t = f('str')
+    -- hovering "t" shows:
+    local t: {
+        x: number,
+        y: string,
+        z?: boolean,
+    }
+    ```
 * `FIX` supports for file with LF
 
 ## 2.1.0

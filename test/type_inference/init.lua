@@ -867,3 +867,14 @@ end
 xpcall(work, debug.traceback, function (<?value?>)
 end)
 ]]
+
+TEST 'string' [[
+---@generic T
+---@param x T
+---@return { x: T }
+local function f(x) end
+
+local t = f('')
+
+print(t.<?x?>)
+]]

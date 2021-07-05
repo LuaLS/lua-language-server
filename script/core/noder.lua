@@ -646,6 +646,87 @@ local function compileCallReturn(noders, call, sourceID, returnIndex)
     pushBackward(noders, funcXID, sourceID, 'deep')
 end
 
+function m.compileDocValue(noders, tp, id, source)
+    if tp == 'doc.type' then
+        if source.bindSources then
+            for _, src in ipairs(source.bindSources) do
+                pushForward(noders, getID(src), id)
+                pushForward(noders, id, getID(src))
+            end
+        end
+        for _, enumUnit in ipairs(source.enums) do
+            pushForward(noders, id, getID(enumUnit))
+        end
+        for _, resumeUnit in ipairs(source.resumes) do
+            pushForward(noders, id, getID(resumeUnit))
+        end
+        for _, typeUnit in ipairs(source.types) do
+            local unitID = getID(typeUnit)
+            pushForward(noders, id, unitID)
+            if source.bindSources then
+                for _, src in ipairs(source.bindSources) do
+                    pushBackward(noders, unitID, getID(src))
+                end
+            end
+        end
+    end
+    if tp == 'doc.type.table' then
+        if source.tkey then
+            local keyID = ('%s%s'):format(
+                id,
+                TABLE_KEY
+            )
+            pushForward(noders, keyID, getID(source.tkey))
+        end
+        if source.tvalue then
+            local valueID = ('%s%s'):format(
+                id,
+                ANY_FIELD
+            )
+            pushForward(noders, valueID, getID(source.tvalue))
+        end
+    end
+    if tp == 'doc.type.ltable' then
+        local firstField = source.fields[1]
+        if not firstField then
+            return
+        end
+        local keyID = ('%s%s'):format(
+            id,
+            WEAK_TABLE_KEY
+        )
+        local valueID = ('%s%s'):format(
+            id,
+            WEAK_ANY_FIELD
+        )
+        pushForward(noders, keyID, 'dn:string')
+        pushForward(noders, valueID, getID(firstField.extends))
+        for _, field in ipairs(source.fields) do
+            local extendsID = ('%s%s%q'):format(
+                id,
+                SPLIT_CHAR,
+                field.name[1]
+            )
+            pushForward(noders, extendsID, getID(field))
+            pushForward(noders, extendsID, getID(field.extends))
+        end
+    end
+    if tp == 'doc.type.array' then
+        if source.node then
+            local nodeID = ('%s%s'):format(
+                id,
+                ANY_FIELD
+            )
+            pushForward(noders, nodeID, getID(source.node))
+        end
+        local keyID = ('%s%s'):format(
+            id,
+            TABLE_KEY
+        )
+        pushForward(noders, keyID, 'dn:integer')
+    end
+end
+
 ---@param noders noders
 ---@param source parser.guide.object
 ---@return parser.guide.object[]
@@ -695,29 +776,29 @@ function m.compileNode(noders, source)
         end
     end
     -- 分解 @type
-    if source.type == 'doc.type' then
-        if source.bindSources then
-            for _, src in ipairs(source.bindSources) do
-                pushForward(noders, getID(src), id)
-                pushForward(noders, id, getID(src))
-            end
-        end
-        for _, enumUnit in ipairs(source.enums) do
-            pushForward(noders, id, getID(enumUnit))
-        end
-        for _, resumeUnit in ipairs(source.resumes) do
-            pushForward(noders, id, getID(resumeUnit))
-        end
-        for _, typeUnit in ipairs(source.types) do
-            local unitID = getID(typeUnit)
-            pushForward(noders, id, unitID)
-            if source.bindSources then
-                for _, src in ipairs(source.bindSources) do
-                    pushBackward(noders, unitID, getID(src))
-                end
-            end
-        end
-    end
+    --if source.type == 'doc.type' then
+    --    if source.bindSources then
+    --        for _, src in ipairs(source.bindSources) do
+    --            pushForward(noders, getID(src), id)
+    --            pushForward(noders, id, getID(src))
+    --        end
+    --    end
+    --    for _, enumUnit in ipairs(source.enums) do
+    --        pushForward(noders, id, getID(enumUnit))
+    --    end
+    --    for _, resumeUnit in ipairs(source.resumes) do
+    --        pushForward(noders, id, getID(resumeUnit))
+    --    end
+    --    for _, typeUnit in ipairs(source.types) do
+    --        local unitID = getID(typeUnit)
+    --        pushForward(noders, id, unitID)
+    --        if source.bindSources then
+    --            for _, src in ipairs(source.bindSources) do
+    --                pushBackward(noders, unitID, getID(src))
+    --            end
+    --        end
+    --    end
+    --end
     -- 分解 @alias
     if source.type == 'doc.alias' then
         pushForward(noders, getID(source.alias), getID(source.extends))
@@ -773,6 +854,7 @@ function m.compileNode(noders, source)
             pushForward(noders, fieldID, fieldClassID)
         end
     end
+    m.compileDocValue(noders, source.type, id, source)
     if source.type == 'call' then
         if source.parent.type ~= 'select' then
             compileCallReturn(noders, source, id, 1)
@@ -817,61 +899,6 @@ function m.compileNode(noders, source)
                 end
             end)
         end
-    end
-    if source.type == 'doc.type.table' then
-        if source.tkey then
-            local keyID = ('%s%s'):format(
-                id,
-                TABLE_KEY
-            )
-            pushForward(noders, keyID, getID(source.tkey))
-        end
-        if source.tvalue then
-            local valueID = ('%s%s'):format(
-                id,
-                ANY_FIELD
-            )
-            pushForward(noders, valueID, getID(source.tvalue))
-        end
-    end
-    if source.type == 'doc.type.ltable' then
-        local firstField = source.fields[1]
-        if not firstField then
-            return
-        end
-        local keyID = ('%s%s'):format(
-            id,
-            WEAK_TABLE_KEY
-        )
-        local valueID = ('%s%s'):format(
-            id,
-            WEAK_ANY_FIELD
-        )
-        pushForward(noders, keyID, 'dn:string')
-        pushForward(noders, valueID, getID(firstField.extends))
-        for _, field in ipairs(source.fields) do
-            local extendsID = ('%s%s%q'):format(
-                id,
-                SPLIT_CHAR,
-                field.name[1]
-            )
-            pushForward(noders, extendsID, getID(field))
-            pushForward(noders, extendsID, getID(field.extends))
-        end
-    end
-    if source.type == 'doc.type.array' then
-        if source.node then
-            local nodeID = ('%s%s'):format(
-                id,
-                ANY_FIELD
-            )
-            pushForward(noders, nodeID, getID(source.node))
-        end
-        local keyID = ('%s%s'):format(
-            id,
-            TABLE_KEY
-        )
-        pushForward(noders, keyID, 'dn:integer')
     end
     if source.type == 'doc.type.name' then
         local uri = guide.getUri(source)
@@ -1056,43 +1083,13 @@ function m.compileNode(noders, source)
                 end
             end
         end
-        if proto.type == 'doc.type' then
-            for _, tp in ipairs(source.types) do
-                pushForward(noders, id, getID(tp))
-                pushBackward(noders, getID(tp), id)
-            end
-        end
-        if proto.type == 'doc.type.array' then
-            local nodeID = ('%s%s'):format(
-                id,
-                ANY_FIELD
-            )
-            pushForward(noders, nodeID, getID(source.node))
-            local keyID = ('%s%s'):format(
-                id,
-                TABLE_KEY
-            )
-            pushForward(noders, keyID, 'dn:integer')
-        end
-        if proto.type == 'doc.type.table' then
-            if source.tkey then
-                local keyID = ('%s%s'):format(
-                    id,
-                    TABLE_KEY
-                )
-                pushForward(noders, keyID, getID(source.tkey))
-            end
-            if source.tvalue then
-                local valueID = ('%s%s'):format(
-                    id,
-                    ANY_FIELD
-                )
-                pushForward(noders, valueID, getID(source.tvalue))
-            end
-        end
-        if proto.type == 'doc.type.ltable' then
-            -- TODO
-        end
+        --if proto.type == 'doc.type' then
+        --    for _, tp in ipairs(source.types) do
+        --        pushForward(noders, id, getID(tp))
+        --        pushBackward(noders, getID(tp), id)
+        --    end
+        --end
+        m.compileDocValue(noders, proto.type, id, source)
     end
 end
 

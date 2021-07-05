@@ -381,6 +381,9 @@ function m.getDocName(doc)
         local value = doc[1] or '?'
         return value
     end
+    if doc.type == 'doc.type.ltable' then
+        return 'table'
+    end
 end
 
 function m.viewDocFunction(doc)

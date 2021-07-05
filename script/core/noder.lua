@@ -218,6 +218,10 @@ local function getKey(source)
         return 'de:' .. source.start
     elseif source.type == 'doc.type.table' then
         return 'dtable:' .. source.start
+    elseif source.type == 'doc.type.ltable' then
+        return 'dltable:' .. source.start
+    elseif source.type == 'doc.type.field' then
+        return 'dfield:' .. source.start
     elseif source.type == 'doc.type.array' then
         return 'darray:' .. source.start
     elseif source.type == 'doc.type.function' then
@@ -830,6 +834,31 @@ function m.compileNode(noders, source)
             pushForward(noders, valueID, getID(source.tvalue))
         end
     end
+    if source.type == 'doc.type.ltable' then
+        local firstField = source.fields[1]
+        if not firstField then
+            return
+        end
+        local keyID = ('%s%s'):format(
+            id,
+            WEAK_TABLE_KEY
+        )
+        local valueID = ('%s%s'):format(
+            id,
+            WEAK_ANY_FIELD
+        )
+        pushForward(noders, keyID, 'dn:string')
+        pushForward(noders, valueID, getID(firstField.extends))
+        for _, field in ipairs(source.fields) do
+            local extendsID = ('%s%s%q'):format(
+                id,
+                SPLIT_CHAR,
+                field.name[1]
+            )
+            pushForward(noders, extendsID, getID(field))
+            pushForward(noders, extendsID, getID(field.extends))
+        end
+    end
     if source.type == 'doc.type.array' then
         if source.node then
             local nodeID = ('%s%s'):format(
@@ -1060,6 +1089,9 @@ function m.compileNode(noders, source)
                 )
                 pushForward(noders, valueID, getID(source.tvalue))
             end
+        end
+        if proto.type == 'doc.type.ltable' then
+            -- TODO
         end
     end
 end

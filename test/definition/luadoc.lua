@@ -645,3 +645,10 @@ TEST [[
 local z
 z.<?a?>
 ]]
+
+TEST [[
+---@type { <!x: number!>, y: number }
+local t
+
+print(t.<?x?>)
+]]

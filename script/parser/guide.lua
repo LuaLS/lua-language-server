@@ -129,7 +129,7 @@ m.childMap = {
     ['doc.type.array']     = {'node'},
     ['doc.type.table']     = {'tkey', 'tvalue', 'comment'},
     ['doc.type.function']  = {'#args', '#returns', 'comment'},
-    ['doc.type.ltable']    = {'#fields'},
+    ['doc.type.ltable']    = {'#fields', 'comment'},
     ['doc.type.literal']   = {'node'},
     ['doc.type.arg']       = {'extends'},
     ['doc.type.field']     = {'extends'},
@@ -877,6 +877,8 @@ function m.getKeyName(obj)
         return obj.field[1]
     elseif tp == 'doc.field.name' then
         return obj[1]
+    elseif tp == 'doc.type.field' then
+        return obj.name[1]
     elseif tp == 'dummy' then
         return obj[1]
     end
@@ -934,6 +936,8 @@ function m.getKeyType(obj)
     elseif tp == 'doc.alias' then
         return 'string'
     elseif tp == 'doc.field' then
+        return 'string'
+    elseif tp == 'doc.type.field' then
         return 'string'
     elseif tp == 'dummy' then
         return 'string'

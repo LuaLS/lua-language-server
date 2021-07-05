@@ -156,7 +156,8 @@ return function (uri, offset)
         or src.type == 'doc.alias.name'
         or src.type == 'doc.type.function'
         or src.type == 'doc.type.array'
-        or src.type == 'doc.type.table' then
+        or src.type == 'doc.type.table'
+        or src.type == 'doc.type.ltable' then
             results[#results+1] = {
                 target = src,
                 uri    = files.getOriginUri(root.uri),

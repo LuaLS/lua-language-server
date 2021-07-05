@@ -407,7 +407,7 @@ local function parseTypeUnitLiteralTable(parent)
         }
 
         do
-            field.name = parseName('doc.type.name', field)
+            field.name = parseName('doc.ltfield.name', field)
             if not field.name then
                 pushError {
                     type   = 'LUADOC_MISS_FIELD_NAME',

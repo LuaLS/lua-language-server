@@ -71,6 +71,8 @@ function m.pushResult(status, mode, source, force)
         or source.type == 'doc.resume'
         or source.type == 'doc.type.array'
         or source.type == 'doc.type.table'
+        or source.type == 'doc.type.ltable'
+        or source.type == 'doc.type.field'
         or source.type == 'doc.type.function' then
             results[#results+1] = source
             return
@@ -117,6 +119,8 @@ function m.pushResult(status, mode, source, force)
         or source.type == 'doc.resume'
         or source.type == 'doc.type.array'
         or source.type == 'doc.type.table'
+        or source.type == 'doc.type.ltable'
+        or source.type == 'doc.type.field'
         or source.type == 'doc.type.function' then
             results[#results+1] = source
             return
@@ -766,6 +770,11 @@ local function getField(status, source, mode)
             end
         end
         return
+    end
+    if source.type == 'doc.type.ltable' then
+        for _, field in ipairs(source.fields) do
+            m.pushResult(status, mode, field)
+        end
     end
     if source.type == 'doc.class.name' then
         local class = source.parent

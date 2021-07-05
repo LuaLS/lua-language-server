@@ -192,7 +192,7 @@ local function buildValues(closure)
         for _, doc in ipairs(protoFunction.bindDocs) do
             if doc.type == 'doc.param' then
                 local extends = doc.extends
-                local index   = extends.paramIndex
+                local index   = extends and extends.paramIndex
                 if index then
                     local param   = params and params[index]
                     closure.params[index] = param and createValue(closure, extends, function (road, key, proto)

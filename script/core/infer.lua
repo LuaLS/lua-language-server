@@ -541,7 +541,7 @@ function m.searchInfers(source, field, mark)
     end
     if source.docParam then
         local docType = source.docParam.extends
-        if docType.type == 'doc.type' then
+        if docType and docType.type == 'doc.type' then
             for _, def in ipairs(docType.types) do
                 if def.typeGeneric then
                     searchInfer(def, infers, mark)

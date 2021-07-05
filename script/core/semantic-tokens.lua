@@ -205,7 +205,7 @@ local function buildTokens(uri, results)
         local len = i * 5 - 5
         tokens[len + 1] = deltaLine
         tokens[len + 2] = deltaStartChar
-        tokens[len + 3] = finishPos.character - startPos.character + 1 -- length
+        tokens[len + 3] = finishPos.character - startPos.character -- length
         tokens[len + 4] = source.type
         tokens[len + 5] = source.modifieres or 0
     end

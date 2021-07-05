@@ -1,7 +1,8 @@
-local nonil = require 'without-check-nil'
-local util  = require 'utility'
-local lang  = require 'language'
-local proto = require 'proto'
+local nonil  = require 'without-check-nil'
+local util   = require 'utility'
+local lang   = require 'language'
+local proto  = require 'proto'
+local define = require 'proto.define'
 
 local m = {}
 
@@ -29,21 +30,55 @@ function m.isVSCode()
     return m._isvscode
 end
 
+function m.getOption(name)
+    nonil.enable()
+    local option = m.info.initializationOptions[name]
+    nonil.disable()
+    return option
+end
+
+---show message to client
+---@param type '"Error"'|'"Warning"'|'"Info"'|'"Log"'
+---@param message any
+function m.showMessage(type, message)
+    proto.notify('window/showMessage', {
+        type = define.MessageType[type] or 3,
+        message = message,
+    })
+end
+
 ---set client config
 ---@param key string
 ---@param action '"set"'|'"add"'
 ---@param value any
 ---@param isGlobal boolean
 function m.setConfig(key, action, value, isGlobal)
-    proto.notify('$/command', {
-        command   = 'lua.config',
-        data      = {
-            key    = key,
-            action = action,
-            value  = value,
-            global = isGlobal,
-        }
-    })
+    if m.getOption 'changeConfiguration' then
+        proto.notify('$/command', {
+            command   = 'lua.config',
+            data      = {
+                key    = key,
+                action = action,
+                value  = value,
+                global = isGlobal,
+            }
+        })
+    else
+        -- TODO translate
+        local message = lang.script('你的客户端不支持从服务侧修改设置，请手动修改如下设置：')
+        if action == 'add' then
+            message = message .. lang.script('为 `{key}` 添加值 `{value}`', {
+                key   = key,
+                value = value,
+            })
+        else
+            message = message .. lang.script('将 `{key}` 的值设置为 `{value}`', {
+                key   = key,
+                value = value,
+            })
+        end
+        m.showMessage('Info', message)
+    end
 end
 
 function m.init(t)

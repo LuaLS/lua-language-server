@@ -102,50 +102,35 @@ function m.updateConfig()
     m.hasShowedMessage = true
 
     await.call(function ()
-        if client.isVSCode() then
-            local enableTitle  = lang.script.WINDOW_TELEMETRY_ENABLE
-            local disableTitle = lang.script.WINDOW_TELEMETRY_DISABLE
-            local item = proto.awaitRequest('window/showMessageRequest', {
-                message = lang.script.WINDOW_TELEMETRY_HINT,
-                type    = define.MessageType.Info,
-                actions = {
-                    {
-                        title = enableTitle,
-                    },
-                    {
-                        title = disableTitle,
-                    },
-                }
-            })
-            if not item then
-                return
-            end
-            if item.title == enableTitle then
-                proto.notify('$/command', {
-                    command   = 'lua.config',
-                    data      = {
-                        key    = 'Lua.telemetry.enable',
-                        action = 'set',
-                        value  = true,
-                        global = true,
-                    }
-                })
-            elseif item.title == disableTitle then
-                proto.notify('$/command', {
-                    command   = 'lua.config',
-                    data      = {
-                        key    = 'Lua.telemetry.enable',
-                        action = 'set',
-                        value  = false,
-                        global = true,
-                    }
-                })
-            end
-        else
-            proto.notify('window/showMessage', {
-                message = lang.script.WINDOW_TELEMETRY_HINT,
-                type    = define.MessageType.Info,
-            })
+        local enableTitle  = lang.script.WINDOW_TELEMETRY_ENABLE
+        local disableTitle = lang.script.WINDOW_TELEMETRY_DISABLE
+        local item = proto.awaitRequest('window/showMessageRequest', {
+            message = lang.script.WINDOW_TELEMETRY_HINT,
+            type    = define.MessageType.Info,
+            actions = {
+                {
+                    title = enableTitle,
+                },
+                {
+                    title = disableTitle,
+                },
+            }
+        })
+        if not item then
+            return
+        end
+        if item.title == enableTitle then
+            client.setConfig('Lua.telemetry.enable'
+                , 'set'
+                , true
+                , true
+            )
+        elseif item.title == disableTitle then
+            client.setConfig('Lua.telemetry.enable'
+                , 'set'
+                , false
+                , true
+            )
         end
     end)
 end

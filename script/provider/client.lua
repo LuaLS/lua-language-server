@@ -1,6 +1,7 @@
 local nonil = require 'without-check-nil'
 local util  = require 'utility'
 local lang  = require 'language'
+local proto = require 'proto'
 
 local m = {}
 
@@ -26,6 +27,23 @@ function m.isVSCode()
         end
     end
     return m._isvscode
+end
+
+---set client config
+---@param key string
+---@param action '"set"'|'"add"'
+---@param value any
+---@param isGlobal boolean
+function m.setConfig(key, action, value, isGlobal)
+    proto.notify('$/command', {
+        command   = 'lua.config',
+        data      = {
+            key    = key,
+            action = action,
+            value  = value,
+            global = isGlobal,
+        }
+    })
 end
 
 function m.init(t)

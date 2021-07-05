@@ -64,15 +64,11 @@ local function enable()
                 return
             end
             if item.title == lang.script.WINDOW_APPLY_SETTING then
-                proto.notify('$/command', {
-                    command   = 'lua.config',
-                    data      = {
-                        key    = 'editor.semanticHighlighting.enabled',
-                        action = 'set',
-                        value  = true,
-                        global = true,
-                    }
-                })
+                client.setConfig('editor.semanticHighlighting.enabled'
+                    , 'set'
+                    , true
+                    , true
+                )
             end
             if item.title == lang.script.WINDOW_DONT_SHOW_AGAIN then
                 dontShowAgain = true

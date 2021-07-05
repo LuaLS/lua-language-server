@@ -8,6 +8,7 @@ local core     = require 'core.diagnostics'
 local util     = require 'utility'
 local ws       = require 'workspace'
 local progress = require "progress"
+local client   = require 'provider.client'
 
 local m = {}
 m._start = false
@@ -280,23 +281,15 @@ local function askForDisable()
     if     item.title == lang.script.WINDOW_DONT_SHOW_AGAIN then
         m.dontAskedForDisable = true
     elseif item.title == delayTitle then
-        proto.notify('$/command', {
-            command   = 'lua.config',
-            data      = {
-                key    = 'Lua.diagnostics.workspaceDelay',
-                action = 'set',
-                value  = delay * 1000,
-            }
-        })
+        client.setConfig('Lua.diagnostics.workspaceDelay'
+            , 'set'
+            , delay * 1000
+        )
     elseif item.title == lang.script.WINDOW_DISABLE_DIAGNOSTIC then
-        proto.notify('$/command', {
-            command   = 'lua.config',
-            data      = {
-                key    = 'Lua.diagnostics.workspaceDelay',
-                action = 'set',
-                value  = -1,
-            }
-        })
+        client.setConfig('Lua.diagnostics.workspaceDelay'
+            , 'set'
+            , -1
+        )
     end
 end
 

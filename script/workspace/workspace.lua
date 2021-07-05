@@ -11,6 +11,7 @@ local lang       = require 'language'
 local library    = require 'library'
 local progress   = require 'progress'
 local define     = require "proto.define"
+local client     = require 'provider.client'
 
 local m = {}
 m.type = 'workspace'
@@ -202,14 +203,11 @@ local function loadFileFactory(root, progressData, isLibrary)
                             return
                         end
                         if item.title == lang.script.WINDOW_INCREASE_UPPER_LIMIT then
-                            proto.notify('$/command', {
-                                command   = 'lua.config',
-                                data      = {
-                                    key    = 'Lua.workspace.maxPreload',
-                                    action = 'set',
-                                    value  = config.get 'Lua.workspace.maxPreload' + math.max(1000, config.get 'Lua.workspace.maxPreload'),
-                                }
-                            })
+                            client.setConfig('Lua.workspace.maxPreload'
+                                , 'set'
+                                , config.get 'Lua.workspace.maxPreload'
+                                + math.max(1000, config.get 'Lua.workspace.maxPreload')
+                            )
                         end
                     end)
                 end

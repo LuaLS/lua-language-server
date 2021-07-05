@@ -639,7 +639,21 @@ function parseType(parent)
         return false
     end
 
-    while pushResume() do end
+    local checkResume = true
+    local nsymbol, ncontent = peekToken()
+    if nsymbol == 'symbol' then
+        if ncontent == ','
+        or ncontent == ':'
+        or ncontent == '|'
+        or ncontent == ')'
+        or ncontent == '}' then
+            checkResume = false
+        end
+    end
+
+    if checkResume then
+        while pushResume() do end
+    end
 
     if #result.types == 0 and #result.enums == 0 and #result.resumes == 0 then
         pushError {

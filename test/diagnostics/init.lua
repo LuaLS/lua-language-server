@@ -1153,3 +1153,8 @@ return {
     [print()] = 1,
 }
 ]]
+
+TEST [[
+---@type { x: number, y: number}
+---| "'resume'"
+]]

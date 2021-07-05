@@ -1601,3 +1601,15 @@ local t: Position {
     z?: number,
 }
 ]]
+
+TEST [[
+---@type { x: string, y: number, z: boolean }
+local <?t?>
+]]
+[[
+local t: {
+    x: string,
+    y: number,
+    z: boolean,
+}
+]]

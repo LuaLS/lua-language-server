@@ -129,8 +129,10 @@ m.childMap = {
     ['doc.type.array']     = {'node'},
     ['doc.type.table']     = {'tkey', 'tvalue', 'comment'},
     ['doc.type.function']  = {'#args', '#returns', 'comment'},
+    ['doc.type.ltable']    = {'#fields'},
     ['doc.type.literal']   = {'node'},
     ['doc.type.arg']       = {'extends'},
+    ['doc.type.field']     = {'extends'},
     ['doc.overload']       = {'overload', 'comment'},
     ['doc.see']            = {'name', 'field'},
 }

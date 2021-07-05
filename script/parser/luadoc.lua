@@ -45,19 +45,9 @@ EChar               <-  'a' -> ea
                     /   ([0-9] [0-9]? [0-9]?) -> Char10
                     /   ('u{' {Word*} '}')    -> CharUtf8
 Symbol              <-  ({} {
-                            ':'
-                        /   '|'
-                        /   ','
+                            [:|,<>()?+#`{}]
                         /   '[]'
-                        /   '<'
-                        /   '>'
-                        /   '('
-                        /   ')'
-                        /   '?'
                         /   '...'
-                        /   '+'
-                        /   '#'
-                        /   '`'
                         } {})
                     ->  Symbol
 ]], {
@@ -398,6 +388,64 @@ local function  parseTypeUnitFunction()
     return typeUnit
 end
 
+local function parseTypeUnitLiteralTable(parent)
+    local typeUnit = {
+        type    = 'doc.type.ltable',
+        parent  = parent,
+        start   = getStart(),
+        fields  = {},
+    }
+
+    while true do
+        if checkToken('symbol', '}', 1) then
+            nextToken()
+            break
+        end
+        local field = {
+            type   = 'doc.type.field',
+            parent = typeUnit,
+        }
+
+        do
+            field.name = parseName('doc.type.name', field)
+            if not field.name then
+                pushError {
+                    type   = 'LUADOC_MISS_FIELD_NAME',
+                    start  = getFinish(),
+                    finish = getFinish(),
+                }
+                break
+            end
+            if not field.start then
+                field.start = field.name.start
+            end
+            if checkToken('symbol', '?', 1) then
+                nextToken()
+                field.optional = true
+            end
+            field.finish = getFinish()
+            if not nextSymbolOrError(':') then
+                break
+            end
+            field.extends = parseType(field)
+            if not field.extends then
+                break
+            end
+            field.finish = getFinish()
+        end
+
+        typeUnit.fields[#typeUnit.fields+1] = field
+        if checkToken('symbol', ',', 1) then
+            nextToken()
+        else
+            nextSymbolOrError(')')
+            break
+        end
+    end
+    typeUnit.finish = getFinish()
+    return typeUnit
+end
+
 local function parseTypeUnit(parent, content)
     local result
     if content == 'fun' then
@@ -514,6 +562,16 @@ function parseType(parent)
             result.enums[#result.enums+1] = typeEnum
             if not result.start then
                 result.start = typeEnum.start
+            end
+        elseif tp == 'symbol' and content == '{' then
+            nextToken()
+            local typeUnit = parseTypeUnitLiteralTable(result)
+            if not typeUnit then
+                break
+            end
+            result.types[#result.types+1] = typeUnit
+            if not result.start then
+                result.start = typeUnit.start
             end
         elseif tp == 'symbol' and content == '...' then
             nextToken()

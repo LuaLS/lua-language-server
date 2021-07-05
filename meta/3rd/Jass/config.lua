@@ -1,6 +1,6 @@
 -- matched words
-words  = {'jass.common'}
-config = {
+words   = {'jass.common'}
+configs = {
     {
         name  = 'Lua.runtime.version'
         type  = 'set',

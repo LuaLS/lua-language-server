@@ -188,10 +188,10 @@ local function buildTokens(uri, results)
     local lastLine = 0
     local lastStartChar = 0
     for i, source in ipairs(results) do
-        local startPos  = files.position(uri, source.start)
-        local finishPos = files.position(uri, source.finish)
+        local startPos  = files.position(uri, source.start, 'left')
+        local finishPos = files.position(uri, source.finish, 'right')
         local line      = startPos.line
-        local startChar = startPos.character - 1
+        local startChar = startPos.character
         local deltaLine = line - lastLine
         local deltaStartChar
         if deltaLine == 0 then

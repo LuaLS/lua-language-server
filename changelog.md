@@ -1,5 +1,8 @@
 # changelog
 
+## 2.2.0
+* `FIX` supports for file with LF
+
 ## 2.1.0
 `2021-7-2`
 * `NEW` supports local config file, using `--configpath="config.json"`, [learn more here](https://github.com/sumneko/lua-language-server/wiki/Setting-without-VSCode)

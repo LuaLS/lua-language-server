@@ -806,8 +806,8 @@ proto.on('textDocument/foldingRange', function (params)
 
     local results = {}
     for _, region in ipairs(regions) do
-        local startLine = files.position(uri, region.start).line
-        local endLine   = files.position(uri, region.finish).line
+        local startLine = files.position(uri, region.start, 'left').line
+        local endLine   = files.position(uri, region.finish, 'right').line
         if not region.hideLastLine then
             endLine = endLine - 1
         end

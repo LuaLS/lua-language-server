@@ -669,9 +669,9 @@ end
 --- 将光标位置转化为 position
 ---@param uri uri
 ---@param offset integer
----@param isFinish? boolean
+---@param leftOrRight? '"left"'|'"right"'
 ---@return position
-function m.position(uri, offset, isFinish)
+function m.position(uri, offset, leftOrRight)
     local file  = m.getFile(uri)
     local lines = m.getLines(uri)
     local text  = m.getText(uri)
@@ -683,7 +683,7 @@ function m.position(uri, offset, isFinish)
     end
     if file._diffInfo then
         local start, finish = smerger.getOffsetBack(file._diffInfo, offset)
-        if isFinish then
+        if leftOrRight == 'right' then
             offset = finish
         else
             offset = start
@@ -700,6 +700,9 @@ function m.position(uri, offset, isFinish)
         local ucol     = util.utf8Len(text, start, start + col - 1)
         if row < 1 then
             row = 1
+        end
+        if leftOrRight == 'left' then
+            ucol = ucol - 1
         end
         return {
             line      = row - 1,
@@ -725,8 +728,8 @@ end
 ---@param offset2 integer
 function m.range(uri, offset1, offset2)
     local range = {
-        start   = m.position(uri, offset1 - 1, false),
-        ['end'] = m.position(uri, offset2, true),
+        start   = m.position(uri, offset1, 'left'),
+        ['end'] = m.position(uri, offset2, 'right'),
     }
     return range
 end

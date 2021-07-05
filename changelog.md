@@ -16,6 +16,7 @@
         z?: boolean,
     }
     ```
+* `CHG` improve hover color
 * `FIX` supports for file with LF
 
 ## 2.1.0

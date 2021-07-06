@@ -436,9 +436,6 @@ function m.searchRefsByID(status, uri, expect, mode)
     ---@param ward '"forward"'|'"backward"'
     ---@param info node.info
     local function checkThenPushReject(ward, info)
-        if not info or info.deep then
-            return true
-        end
         local reject = info.reject
         if not reject then
             return true
@@ -462,9 +459,6 @@ function m.searchRefsByID(status, uri, expect, mode)
     ---@param ward '"forward"'|'"backward"'
     ---@param info node.info
     local function popReject(ward, info)
-        if not info or info.deep then
-            return
-        end
         local reject = info.reject
         if not reject then
             return
@@ -478,9 +472,75 @@ function m.searchRefsByID(status, uri, expect, mode)
         popTags[reject] = popTags[reject] - 1
     end
 
+    ---@type table<node.filter, integer>
+    local filters = {}
+
+    ---@param id   string
+    ---@param info node.info
+    local function pushInfoFilter(id, field, info)
+        local filter = info.filter
+        if not filter then
+            return
+        end
+        local filterValid = info.filterValid
+        if filterValid and not filterValid(id, field) then
+            return
+        end
+        filters[filter] = (filters[filter] or 0) + 1
+    end
+
+    ---@param id   string
+    ---@param info node.info
+    local function releaseInfoFilter(id, field, info)
+        local filter = info.filter
+        if not filter then
+            return
+        end
+        local filterValid = info.filterValid
+        if filterValid and not filterValid(id, field) then
+            return
+        end
+        if filters[filter] <= 1 then
+            filters[filter] = nil
+        else
+            filters[filter] = filters[filter] - 1
+        end
+    end
+
+    ---@param id string
+    ---@param info node.info
+    local function checkInfoFilter(id, field, info)
+        for filter in pairs(filters) do
+            if not filter(id, field) then
+                return false
+            end
+        end
+        return true
+    end
+
+    ---@param id string
+    ---@param info node.info
+    local function checkInfoBeforeForward(id, field, info)
+        pushInfoFilter(id, field, info)
+        if not checkThenPushReject('forward', info) then
+            return false
+        end
+        return true
+    end
+
+    ---@param id string
+    ---@param info node.info
+    local function releaseInfoAfterForward(id, field, info)
+        popReject('forward', info)
+        releaseInfoFilter(id, field, info)
+    end
+
     local function checkForward(id, node, field)
         for forwardID, info in noder.eachForward(node) do
-            if info and not checkThenPushReject('forward', info) then
+            if info and not checkInfoBeforeForward(forwardID, field, info) then
+                goto CONTINUE
+            end
+            if not checkInfoFilter(forwardID, field, info) then
                 goto CONTINUE
             end
             local targetUri, targetID = noder.getUriAndID(forwardID)
@@ -489,9 +549,27 @@ function m.searchRefsByID(status, uri, expect, mode)
             else
                 searchID(targetID or forwardID, field)
             end
-            popReject('forward', info)
+            if info then
+                releaseInfoAfterForward(forwardID, field, info)
+            end
             ::CONTINUE::
         end
+    end
+
+    local function checkInfoBeforeBackward(id, field, info)
+        if info.deep and mode ~= 'allref' and mode ~= 'alldef' then
+            return false
+        end
+        if not checkThenPushReject('backward', info) then
+            return false
+        end
+        pushInfoFilter(id, field, info)
+        return true
+    end
+
+    local function releaseInfoAfterBackward(id, field, info)
+        popReject('backward', info)
+        releaseInfoFilter(id, field, info)
     end
 
     local function checkBackward(id, node, field)
@@ -502,10 +580,10 @@ function m.searchRefsByID(status, uri, expect, mode)
             return
         end
         for backwardID, info in noder.eachBackward(node) do
-            if info and info.deep and mode ~= 'allref' and mode ~= 'alldef' then
+            if info and not checkInfoBeforeBackward(backwardID, field, info) then
                 goto CONTINUE
             end
-            if info and not checkThenPushReject('backward', info) then
+            if not checkInfoFilter(backwardID, field, info) then
                 goto CONTINUE
             end
             local targetUri, targetID = noder.getUriAndID(backwardID)
@@ -514,7 +592,9 @@ function m.searchRefsByID(status, uri, expect, mode)
             else
                 searchID(targetID or backwardID, field)
             end
-            popReject('backward', info)
+            if info then
+                releaseInfoAfterBackward(backwardID, field, info)
+            end
             ::CONTINUE::
         end
     end

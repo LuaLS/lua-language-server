@@ -422,7 +422,10 @@ local function searchInfer(source, infers, mark)
     end
     local value = searcher.getObjectValue(source)
     if value then
-        searchInferOfValue(value, infers, mark)
+        if  value.type ~= 'function'
+        and value.type ~= 'table' then
+            searchInferOfValue(value, infers, mark)
+        end
         return
     end
     -- check LuaDoc
@@ -502,9 +505,13 @@ local function searchLiteral(source, literals, mark)
         return
     end
     mark[source] = true
+    searchLiteralOfValue(source, literals, mark)
     local value = searcher.getObjectValue(source)
     if value then
-        searchLiteralOfValue(value, literals, mark)
+        if  value.type ~= 'function'
+        and value.type ~= 'table' then
+            searchLiteralOfValue(value, literals, mark)
+        end
         return
     end
 end

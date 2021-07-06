@@ -878,3 +878,7 @@ local t = f('')
 
 print(t.<?x?>)
 ]]
+
+TEST 'table' [[
+local <?t?> = setmetatable({}, { __index = function () end })
+]]

@@ -43,11 +43,13 @@ local URI_REGEX      = URI_CHAR .. '([^' .. URI_CHAR .. ']*)' .. URI_CHAR .. '(.
 ---@field skip boolean
 
 ---@alias noders table<string, node[]>
+---@alias node.filter fun(id: string, field?: string):boolean
 
 ---@class node.info
----@field reject? string
----@field deep?   boolean
----@field filter? fun(id: string):boolean
+---@field reject?      string
+---@field deep?        boolean
+---@field filter?      node.filter
+---@field filterValid? node.filter
 
 ---创建source的链接信息
 ---@param noders noders
@@ -619,9 +621,15 @@ local function compileCallReturn(noders, call, sourceID, returnIndex)
         end
         pushForward(noders, sourceID, tblID)
         pushForward(noders, sourceID, indexID, {
-            filter = function (id)
+            filter = function (id, field)
+                if field then
+                    return true
+                end
                 return id:sub(1, 2) ~= 'f:'
             end,
+            filterValid = function (id, field)
+                return not field
+            end
         })
         pushBackward(noders, tblID, sourceID)
         --pushBackward(noders, indexID, callID)

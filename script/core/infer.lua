@@ -244,7 +244,9 @@ local function cleanInfers(infers)
     -- 如果是通过 # 来推测的，且结果里没有其他的 table 与 string，则加入这2个类型
     if infers[STRING_OR_TABLE] then
         infers[STRING_OR_TABLE] = nil
-        if not infers['table'] and not infers['string'] then
+        if  not infers['table']
+        and not infers['string']
+        and not infers[CLASS] then
             infers['table']  = true
             infers['string'] = true
         end

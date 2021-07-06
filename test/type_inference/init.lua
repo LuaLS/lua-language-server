@@ -882,3 +882,10 @@ print(t.<?x?>)
 TEST 'table' [[
 local <?t?> = setmetatable({}, { __index = function () end })
 ]]
+
+TEST 'player' [[
+---@class player
+local t
+
+<?t?>:getOwner()
+]]

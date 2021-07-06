@@ -19,6 +19,7 @@
 * `CHG` improve hover color
 * `CHG` improve performance
 * `FIX` supports for file with LF
+* `FIX` may infer a custom class as a string
 
 ## 2.1.0
 `2021-7-2`

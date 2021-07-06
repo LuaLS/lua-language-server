@@ -223,6 +223,9 @@ local function footprint(status, ...)
 end
 
 local function crossSearch(status, uri, expect, mode, sourceUri)
+    if status.dontCross > 0 then
+        return
+    end
     if checkLock(status, uri, expect) then
         return
     end
@@ -556,20 +559,32 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
     end
 
+    ---@param id string
+    ---@param field string
+    ---@param info node.info
     local function checkInfoBeforeBackward(id, field, info)
-        if info.deep and mode ~= 'allref' and mode ~= 'alldef' then
+        if info.deep and mode ~= 'allref' then
             return false
         end
         if not checkThenPushReject('backward', info) then
             return false
         end
         pushInfoFilter(id, field, info)
+        if info.dontCross then
+            status.dontCross = status.dontCross + 1
+        end
         return true
     end
 
+    ---@param id string
+    ---@param field string
+    ---@param info node.info
     local function releaseInfoAfterBackward(id, field, info)
         popReject('backward', info)
         releaseInfoFilter(id, field, info)
+        if info.dontCross then
+            status.dontCross = status.dontCross - 1
+        end
     end
 
     local function checkBackward(id, node, field)
@@ -1032,6 +1047,7 @@ function m.status(mode)
         count     = 0,
         ftag      = {},
         btag      = {},
+        dontCross = 0,
         cache     = vm.getCache('searcher:' .. mode)
     }
     return status

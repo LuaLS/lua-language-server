@@ -17,6 +17,7 @@
     }
     ```
 * `CHG` improve hover color
+* `CHG` improve performance
 * `FIX` supports for file with LF
 
 ## 2.1.0

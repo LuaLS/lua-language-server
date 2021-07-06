@@ -50,6 +50,7 @@ local URI_REGEX      = URI_CHAR .. '([^' .. URI_CHAR .. ']*)' .. URI_CHAR .. '(.
 ---@field deep?        boolean
 ---@field filter?      node.filter
 ---@field filterValid? node.filter
+---@field dontCross?   boolean
 
 ---创建source的链接信息
 ---@param noders noders
@@ -983,7 +984,8 @@ function m.compileNode(noders, source)
                         pushForward(noders, fullID, getID(rtn))
                         for _, typeUnit in ipairs(rtn.types) do
                             pushBackward(noders, getID(typeUnit), fullID, {
-                                deep = true,
+                                deep      = true,
+                                dontCross = true,
                             })
                         end
                         hasDocReturn[rtn.returnIndex] = true
@@ -1043,7 +1045,8 @@ function m.compileNode(noders, source)
                 for _, rtnObj in ipairs(rtnObjs) do
                     pushForward(noders, returnID, getID(rtnObj))
                     pushBackward(noders, getID(rtnObj), returnID, {
-                        deep = true,
+                        deep      = true,
+                        dontCross = true,
                     })
                 end
             end
@@ -1226,6 +1229,21 @@ end
 function m.getUriAndID(id)
     local uri, newID = id:match(URI_REGEX)
     return uri, newID
+end
+
+---是否是普通的field，例如数字或字符串，而不是函数返回值等
+---@param field any
+function m.isCommonField(field)
+    if not field then
+        return false
+    end
+    if field:sub(1, #RETURN_INDEX) == RETURN_INDEX then
+        return false
+    end
+    if field:sub(1, #PARAM_INDEX) == PARAM_INDEX then
+        return false
+    end
+    return true
 end
 
 ---获取source的ID

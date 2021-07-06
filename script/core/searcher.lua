@@ -430,45 +430,57 @@ function m.searchRefsByID(status, uri, expect, mode)
         searchID(newID)
     end
 
-    local ftag = {}
-    local btag = {}
+    local freject = {}
+    local breject = {}
 
-    local function checkThenPushTag(ward, tag)
-        if not tag or tag == 'deep' then
+    ---@param ward '"forward"'|'"backward"'
+    ---@param info node.info
+    local function checkThenPushReject(ward, info)
+        if not info or info.deep then
             return true
         end
-        local checkTags
-        local pushTags
-        if ward == 'forward' then
-            checkTags = btag
-            pushTags  = ftag
-        else
-            checkTags = ftag
-            pushTags  = btag
+        local reject = info.reject
+        if not reject then
+            return true
         end
-        if checkTags[tag] and checkTags[tag] > 0 then
+        local checkReject
+        local pushReject
+        if ward == 'forward' then
+            checkReject = breject
+            pushReject  = freject
+        else
+            checkReject = freject
+            pushReject  = breject
+        end
+        if checkReject[reject] and checkReject[reject] > 0 then
             return false
         end
-        pushTags[tag] = (pushTags[tag] or 0) + 1
+        pushReject[reject] = (pushReject[reject] or 0) + 1
         return true
     end
 
-    local function popTag(ward, tag)
-        if not tag or tag == 'deep' then
+    ---@param ward '"forward"'|'"backward"'
+    ---@param info node.info
+    local function popReject(ward, info)
+        if not info or info.deep then
+            return
+        end
+        local reject = info.reject
+        if not reject then
             return
         end
         local popTags
         if ward == 'forward' then
-            popTags = ftag
+            popTags = freject
         else
-            popTags = btag
+            popTags = breject
         end
-        popTags[tag] = popTags[tag] - 1
+        popTags[reject] = popTags[reject] - 1
     end
 
     local function checkForward(id, node, field)
-        for forwardID, tag in noder.eachForward(node) do
-            if not checkThenPushTag('forward', tag) then
+        for forwardID, info in noder.eachForward(node) do
+            if info and not checkThenPushReject('forward', info) then
                 goto CONTINUE
             end
             local targetUri, targetID = noder.getUriAndID(forwardID)
@@ -477,7 +489,7 @@ function m.searchRefsByID(status, uri, expect, mode)
             else
                 searchID(targetID or forwardID, field)
             end
-            popTag('forward', tag)
+            popReject('forward', info)
             ::CONTINUE::
         end
     end
@@ -489,11 +501,11 @@ function m.searchRefsByID(status, uri, expect, mode)
         if mode ~= 'ref' and mode ~= 'field' and mode ~= 'allref' and not field then
             return
         end
-        for backwardID, tag in noder.eachBackward(node) do
-            if tag == 'deep' and mode ~= 'allref' and mode ~= 'alldef' then
+        for backwardID, info in noder.eachBackward(node) do
+            if info and info.deep and mode ~= 'allref' and mode ~= 'alldef' then
                 goto CONTINUE
             end
-            if not checkThenPushTag('backward', tag) then
+            if info and not checkThenPushReject('backward', info) then
                 goto CONTINUE
             end
             local targetUri, targetID = noder.getUriAndID(backwardID)
@@ -502,7 +514,7 @@ function m.searchRefsByID(status, uri, expect, mode)
             else
                 searchID(targetID or backwardID, field)
             end
-            popTag('backward', tag)
+            popReject('backward', info)
             ::CONTINUE::
         end
     end

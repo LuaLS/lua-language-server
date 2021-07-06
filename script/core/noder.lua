@@ -29,13 +29,13 @@ local URI_REGEX      = URI_CHAR .. '([^' .. URI_CHAR .. ']*)' .. URI_CHAR .. '(.
 -- 前进的关联ID
 ---@field forward string
 -- 第一个前进关联的tag
----@field ftag string|boolean
+---@field finfo? node.info
 -- 前进的关联ID
 ---@field forwards string[]
 -- 后退的关联ID
 ---@field backward string
 -- 第一个后退关联的tag
----@field btag string|boolean
+---@field binfo? node.info
 -- 后退的关联ID
 ---@field backwards string[]
 -- 函数调用参数信息（用于泛型）
@@ -43,6 +43,11 @@ local URI_REGEX      = URI_CHAR .. '([^' .. URI_CHAR .. ']*)' .. URI_CHAR .. '(.
 ---@field skip boolean
 
 ---@alias noders table<string, node[]>
+
+---@class node.info
+---@field reject? string
+---@field deep?   boolean
+---@field filter? fun(id: string):boolean
 
 ---创建source的链接信息
 ---@param noders noders
@@ -312,10 +317,11 @@ local function getID(source)
 end
 
 ---添加关联的前进ID
----@param noders noders
----@param id string
+---@param noders    noders
+---@param id        string
 ---@param forwardID string
-local function pushForward(noders, id, forwardID, tag)
+---@param info?     node.info
+local function pushForward(noders, id, forwardID, info)
     if not id
     or not forwardID
     or forwardID == ''
@@ -325,7 +331,7 @@ local function pushForward(noders, id, forwardID, tag)
     local node = getNode(noders, id)
     if not node.forward then
         node.forward = forwardID
-        node.ftag    = tag
+        node.finfo   = info
         return
     end
     if node.forward == forwardID then
@@ -337,15 +343,16 @@ local function pushForward(noders, id, forwardID, tag)
     if node.forwards[forwardID] ~= nil then
         return
     end
-    node.forwards[forwardID] = tag or false
+    node.forwards[forwardID] = info or false
     node.forwards[#node.forwards+1] = forwardID
 end
 
 ---添加关联的后退ID
----@param noders noders
----@param id string
+---@param noders     noders
+---@param id         string
 ---@param backwardID string
-local function pushBackward(noders, id, backwardID, tag)
+---@param info?      node.info
+local function pushBackward(noders, id, backwardID, info)
     if not id
     or not backwardID
     or backwardID == ''
@@ -355,7 +362,7 @@ local function pushBackward(noders, id, backwardID, tag)
     local node = getNode(noders, id)
     if not node.backward then
         node.backward = backwardID
-        node.btag     = tag
+        node.binfo    = info
         return
     end
     if node.backward == backwardID then
@@ -367,7 +374,7 @@ local function pushBackward(noders, id, backwardID, tag)
     if node.backwards[backwardID] ~= nil then
         return
     end
-    node.backwards[backwardID] = tag or false
+    node.backwards[backwardID] = info or false
     node.backwards[#node.backwards+1] = backwardID
 end
 
@@ -466,7 +473,7 @@ function m.eachForward(node)
     return function ()
         if not index then
             index = 0
-            return node.forward, node.ftag
+            return node.forward, node.finfo
         end
         if not forwards then
             return nil
@@ -480,7 +487,7 @@ end
 
 ---遍历backward
 ---@param node node
----@return fun():string, string
+---@return fun():string, node.info
 function m.eachBackward(node)
     if not node.backward then
         return DUMMY_FUNCTION
@@ -490,7 +497,7 @@ function m.eachBackward(node)
     return function ()
         if not index then
             index = 0
-            return node.backward, node.btag
+            return node.backward, node.binfo
         end
         if not backwards then
             return nil
@@ -524,7 +531,9 @@ local function bindValue(noders, source, id)
         end
     end
     -- x = y : x -> y
-    pushForward(noders, id, valueID, 'set')
+    pushForward(noders, id, valueID, {
+        reject = 'set',
+    })
     -- 参数/call禁止反向查找赋值
     local valueType = valueID:match '^(.-:).'
     if not valueType then
@@ -533,9 +542,14 @@ local function bindValue(noders, source, id)
     if  valueType ~= 'p:'
     and valueType ~= 's:'
     and valueType ~= 'c:' then
-        pushBackward(noders, valueID, id, 'set')
+        pushBackward(noders, valueID, id, {
+            reject = 'set',
+        })
     else
-        pushBackward(noders, valueID, id, 'deep')
+        pushBackward(noders, valueID, id, {
+            reject = 'set',
+            deep   = true,
+        })
     end
 end
 
@@ -604,7 +618,11 @@ local function compileCallReturn(noders, call, sourceID, returnIndex)
             )
         end
         pushForward(noders, sourceID, tblID)
-        pushForward(noders, sourceID, indexID)
+        pushForward(noders, sourceID, indexID, {
+            filter = function (id)
+                return id:sub(1, 2) ~= 'f:'
+            end,
+        })
         pushBackward(noders, tblID, sourceID)
         --pushBackward(noders, indexID, callID)
         return
@@ -614,7 +632,9 @@ local function compileCallReturn(noders, call, sourceID, returnIndex)
         if arg1 and arg1.type == 'string' then
             getNode(noders, sourceID).require = arg1[1]
         end
-        pushBackward(noders, callID, sourceID, 'deep')
+        pushBackward(noders, callID, sourceID, {
+            deep = true,
+        })
         return
     end
     if node.special == 'pcall'
@@ -633,7 +653,9 @@ local function compileCallReturn(noders, call, sourceID, returnIndex)
             index
         )
         pushForward(noders, sourceID, pfuncXID)
-        pushBackward(noders, pfuncXID, sourceID, 'deep')
+        pushBackward(noders, pfuncXID, sourceID, {
+            deep = true,
+        })
         return
     end
     local funcXID = ('%s%s%s'):format(
@@ -643,7 +665,9 @@ local function compileCallReturn(noders, call, sourceID, returnIndex)
     )
     getNode(noders, sourceID).call = call
     pushForward(noders, sourceID, funcXID)
-    pushBackward(noders, funcXID, sourceID, 'deep')
+    pushBackward(noders, funcXID, sourceID, {
+        deep = true,
+    })
 end
 
 function m.compileDocValue(noders, tp, id, source)
@@ -772,7 +796,9 @@ function m.compileNode(noders, source)
                         or setmethod.type == 'setfield'
                         or setmethod.type == 'setindex') then
             pushForward(noders, id, getID(setmethod.node))
-            pushBackward(noders, getID(setmethod.node), id, 'deep')
+            pushBackward(noders, getID(setmethod.node), id, {
+                deep = true,
+            })
         end
     end
     -- 分解 @type
@@ -948,7 +974,9 @@ function m.compileNode(noders, source)
                         )
                         pushForward(noders, fullID, getID(rtn))
                         for _, typeUnit in ipairs(rtn.types) do
-                            pushBackward(noders, getID(typeUnit), fullID, 'deep')
+                            pushBackward(noders, getID(typeUnit), fullID, {
+                                deep = true,
+                            })
                         end
                         hasDocReturn[rtn.returnIndex] = true
                     end
@@ -1006,7 +1034,9 @@ function m.compileNode(noders, source)
                 )
                 for _, rtnObj in ipairs(rtnObjs) do
                     pushForward(noders, returnID, getID(rtnObj))
-                    pushBackward(noders, getID(rtnObj), returnID, 'deep')
+                    pushBackward(noders, getID(rtnObj), returnID, {
+                        deep = true,
+                    })
                 end
             end
         end
@@ -1054,7 +1084,9 @@ function m.compileNode(noders, source)
                 local rtnObj = rtn[1]
                 if rtnObj then
                     pushForward(noders, 'mainreturn', getID(rtnObj))
-                    pushBackward(noders, getID(rtnObj), 'mainreturn', 'deep')
+                    pushBackward(noders, getID(rtnObj), 'mainreturn', {
+                        deep = true,
+                    })
                 end
             end
         end

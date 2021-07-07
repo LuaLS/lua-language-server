@@ -902,3 +902,13 @@ do
         end
     end)
 end
+
+config.watch(function (key, value)
+    if key == 'Lua.window.statusBar' then
+        if value then
+            proto.notify('$/status/show')
+        else
+            proto.notify('$/status/hide')
+        end
+    end
+end)

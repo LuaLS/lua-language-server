@@ -80,14 +80,15 @@ local function testAll()
 end
 
 local function main()
+    require 'utility'.enableCloseFunction()
+    require 'config'
     require 'core.searcher'.debugMode = true
     require 'language' 'zh-cn'
-    require 'utility'.enableCloseFunction()
-
-    local config = require 'config'
-    config.set('Lua.runtime.version', 'Lua 5.4')
-    --config.Lua.intelliSense.searchDepth = 5
+    require 'library'.init()
     loadDocMetas()
+
+    --config.Lua.intelliSense.searchDepth = 5
+    --loadDocMetas()
 
     --test 'full'
 

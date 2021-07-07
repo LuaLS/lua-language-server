@@ -12,6 +12,7 @@ local library    = require 'library'
 local progress   = require 'progress'
 local define     = require "proto.define"
 local client     = require 'client'
+local plugin     = require 'plugin'
 
 local m = {}
 m.type = 'workspace'
@@ -28,13 +29,14 @@ m.matchOption    = {
 }
 
 --- 初始化工作区
-function m.init(uri)
+function m.initPath(uri)
     log.info('Workspace inited: ', uri)
     if not uri then
         return
     end
     m.uri  = uri
     m.path = m.normalize(furi.decode(uri))
+    plugin.workspace = m.path
     local logPath = fs.path(LOGPATH) / (uri:gsub('[/:]+', '_') .. '.log')
     client.logMessage('Log', 'Log path: ' .. furi.encode(logPath:string()))
     log.info('Log path: ', logPath)
@@ -489,11 +491,17 @@ function m.flushCache()
 end
 
 function m.reload()
+    if TEST then
+        return
+    end
     await.call(m.awaitReload)
 end
 
+function m.init()
+    m.reload()
+end
+
 function m.awaitReload()
-    local plugin     = require 'plugin'
     m.ready = false
     m.hasHitMaxPreload = false
     files.flushAllLibrary()

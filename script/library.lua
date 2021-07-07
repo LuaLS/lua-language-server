@@ -303,4 +303,8 @@ files.watch(function (ev, uri)
     end
 end)
 
+function m.init()
+    initBuiltIn()
+end
+
 return m

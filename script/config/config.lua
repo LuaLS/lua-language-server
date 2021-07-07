@@ -290,11 +290,6 @@ end
 
 function m.watch(callback)
     m.watchList[#m.watchList+1] = callback
-    if m.inited then
-        for key in pairs(Template) do
-            callback(key, m.get(key), m.get(key))
-        end
-    end
 end
 
 function m.event(key, value, oldValue)
@@ -307,7 +302,7 @@ function m.init()
     if m.inited then
         return
     end
-    m.init = true
+    m.inited = true
     for key in pairs(Template) do
         m.set(key)
     end

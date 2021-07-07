@@ -36,6 +36,7 @@ function m.init(uri)
     m.uri  = uri
     m.path = m.normalize(furi.decode(uri))
     local logPath = fs.path(LOGPATH) / (uri:gsub('[/:]+', '_') .. '.log')
+    client.logMessage('Log', 'Log path: ' .. furi.encode(logPath:string()))
     log.info('Log path: ', logPath)
     log.init(ROOT, logPath)
 end

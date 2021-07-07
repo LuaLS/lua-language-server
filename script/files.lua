@@ -12,6 +12,7 @@ local util     = require 'utility'
 local guide    = require 'parser.guide'
 local smerger  = require 'string-merger'
 local progress = require "progress"
+local client   = require 'provider.client'
 
 local unicode
 
@@ -401,15 +402,15 @@ function m.compileState(uri, text)
         if not m.notifyCache['preloadFileSize'][uri] then
             m.notifyCache['preloadFileSize'][uri] = true
             m.notifyCache['skipLargeFileCount'] = m.notifyCache['skipLargeFileCount'] + 1
-            if m.notifyCache['skipLargeFileCount'] <= 1 then
-                proto.notify('window/showMessage', {
-                    type = 3,
-                    message = lang.script('WORKSPACE_SKIP_LARGE_FILE'
+            local message = lang.script('WORKSPACE_SKIP_LARGE_FILE'
                         , ws.getRelativePath(m.getOriginUri(uri))
                         , config.get 'Lua.workspace.preloadFileSize'
                         , #text / 1000
-                    ),
-                })
+                    )
+            if m.notifyCache['skipLargeFileCount'] <= 1 then
+                client.showMessage('Info', message)
+            else
+                client.logMessage('Info', message)
             end
         end
         return nil

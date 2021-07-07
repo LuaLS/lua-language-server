@@ -47,6 +47,19 @@ function m.showMessage(type, message)
         type = define.MessageType[type] or 3,
         message = message,
     })
+    proto.notify('window/logMessage', {
+        type = define.MessageType[type] or 3,
+        message = message,
+    })
+end
+
+---@param type '"Error"'|'"Warning"'|'"Info"'|'"Log"'
+---@param message any
+function m.logMessage(type, message)
+    proto.notify('window/logMessage', {
+        type = define.MessageType[type] or 4,
+        message = message,
+    })
 end
 
 ---@class config.change
@@ -84,7 +97,8 @@ function m.setConfig(changes)
                 messages[#messages+1] = lang.script('将 `{key}` 的值设置为 `{value:q}`;', change)
             end
         end
-        m.showMessage('Info', table.concat(messages, '\n'))
+        local message = table.concat(messages, '\n')
+        m.showMessage('Info', message)
     end
 end
 

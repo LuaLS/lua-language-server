@@ -39,10 +39,18 @@ function m.getOption(name)
     return option
 end
 
+local function packMessage(...)
+    local strs = table.pack(...)
+    for i = 1, strs.n do
+        strs[i] = tostring(strs[i])
+    end
+    return table.concat(strs, '\t')
+end
+
 ---show message to client
 ---@param type '"Error"'|'"Warning"'|'"Info"'|'"Log"'
----@param message any
-function m.showMessage(type, message)
+function m.showMessage(type, ...)
+    local message = packMessage(...)
     proto.notify('window/showMessage', {
         type = define.MessageType[type] or 3,
         message = message,
@@ -54,8 +62,8 @@ function m.showMessage(type, message)
 end
 
 ---@param type '"Error"'|'"Warning"'|'"Info"'|'"Log"'
----@param message any
-function m.logMessage(type, message)
+function m.logMessage(type, ...)
+    local message = packMessage(...)
     proto.notify('window/logMessage', {
         type = define.MessageType[type] or 4,
         message = message,

@@ -4,7 +4,7 @@ local vm      = require 'vm'
 local define  = require 'proto.define'
 local lang    = require 'language'
 local await   = require 'await'
-local client  = require 'provider.client'
+local client  = require 'client'
 
 local function isToBeClosed(source)
     if not source.attrs then

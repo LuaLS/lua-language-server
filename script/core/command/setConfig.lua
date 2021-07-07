@@ -1,4 +1,4 @@
-local client = require 'provider.client'
+local client = require 'client'
 
 return function (data)
     client.setConfig {data}

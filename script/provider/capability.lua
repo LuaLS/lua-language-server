@@ -1,6 +1,6 @@
 local sp         = require 'bee.subprocess'
 local nonil      = require 'without-check-nil'
-local client     = require 'provider.client'
+local client     = require 'client'
 local platform   = require 'bee.platform'
 local completion = require 'provider.completion'
 

@@ -203,12 +203,18 @@ local Template = {
 local config    = {}
 local rawConfig = {}
 
+local m = {}
+m.watchList = {}
+
 local function update(key, value, raw)
+    local oldValue = config[key]
+    if util.equal(oldValue, value) then
+        return
+    end
     config[key]    = value
     rawConfig[key] = raw
+    m.event('update', key, value, oldValue)
 end
-
-local m = {}
 
 function m.set(key, value)
     local unit = Template[key]
@@ -283,6 +289,16 @@ function m.update(new)
     end
 
     expand(new)
+end
+
+function m.watch(callback)
+    m.watchList[#m.watchList+1] = callback
+end
+
+function m.event(ev, ...)
+    for _, callback in ipairs(m.watchList) do
+        callback(ev, ...)
+    end
 end
 
 for key in pairs(Template) do

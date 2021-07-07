@@ -1,6 +1,6 @@
 local proto          = require 'proto'
 local define         = require 'proto.define'
-local client         = require 'provider.client'
+local client         = require 'client'
 local json           = require "json"
 local config         = require 'config'
 local lang           = require 'language'

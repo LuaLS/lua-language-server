@@ -12,7 +12,7 @@ local util     = require 'utility'
 local guide    = require 'parser.guide'
 local smerger  = require 'string-merger'
 local progress = require "progress"
-local client   = require 'provider.client'
+local client   = require 'client'
 
 local unicode
 

@@ -1,7 +1,7 @@
 local net      = require 'service.net'
 local timer    = require 'timer'
 local config   = require 'config'
-local client   = require 'provider.client'
+local client   = require 'client'
 local nonil    = require 'without-check-nil'
 local util     = require 'utility'
 local platform = require 'bee.platform'

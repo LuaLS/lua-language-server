@@ -8,7 +8,7 @@ local core     = require 'core.diagnostics'
 local util     = require 'utility'
 local ws       = require 'workspace'
 local progress = require "progress"
-local client   = require 'provider.client'
+local client   = require 'client'
 
 local m = {}
 m._start = false

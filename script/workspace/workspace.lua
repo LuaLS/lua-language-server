@@ -11,7 +11,7 @@ local lang       = require 'language'
 local library    = require 'library'
 local progress   = require 'progress'
 local define     = require "proto.define"
-local client     = require 'provider.client'
+local client     = require 'client'
 
 local m = {}
 m.type = 'workspace'

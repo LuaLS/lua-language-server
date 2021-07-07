@@ -1,6 +1,6 @@
 local proto  = require 'proto'
 local nonil  = require 'without-check-nil'
-local client = require 'provider.client'
+local client = require 'client'
 
 local isEnable = false
 

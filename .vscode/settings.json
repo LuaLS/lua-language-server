@@ -36,7 +36,6 @@
         "meta",
     ],
     "Lua.workspace.library": [
-        "E:/Github/test",
         // Just some comment
         "script/meta",
         "bin",

@@ -702,7 +702,7 @@ function m.position(uri, offset, leftOrRight)
         if row < 1 then
             row = 1
         end
-        if leftOrRight == 'left' then
+        if leftOrRight == 'left' and ucol > 0 then
             ucol = ucol - 1
         end
         return {

@@ -1,7 +1,7 @@
 -- list of matched words
-words   = {'thisIsAnExampleWord.ifItExistsInFile.thenTryLoadThisLibrary'}
+words   = {'thisIsAnExampleWord%.ifItExistsInFile%.thenTryLoadThisLibrary'}
 -- list or matched file names
-files   = {'thisIsAnExampleFile.ifItExistsInWorkSpace.thenTryLoadThisLibrary'}
+files   = {'thisIsAnExampleFile%.ifItExistsInWorkSpace%.thenTryLoadThisLibrary'}
 -- lsit of settings to be changed
 configs = {
     {

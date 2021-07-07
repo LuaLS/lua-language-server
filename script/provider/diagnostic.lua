@@ -284,11 +284,15 @@ local function askForDisable()
         client.setConfig('Lua.diagnostics.workspaceDelay'
             , 'set'
             , delay * 1000
+            , false
+            , ws.uri
         )
     elseif item.title == lang.script.WINDOW_DISABLE_DIAGNOSTIC then
         client.setConfig('Lua.diagnostics.workspaceDelay'
             , 'set'
             , -1
+            , false
+            , ws.uri
         )
     end
 end

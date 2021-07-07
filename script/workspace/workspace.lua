@@ -207,6 +207,8 @@ local function loadFileFactory(root, progressData, isLibrary)
                                 , 'set'
                                 , config.get 'Lua.workspace.maxPreload'
                                 + math.max(1000, config.get 'Lua.workspace.maxPreload')
+                                , false
+                                , m.uri
                             )
                         end
                     end)

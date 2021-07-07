@@ -171,6 +171,7 @@ local Template = {
     ['Lua.workspace.maxPreload']            = Type.Integer >> 1000,
     ['Lua.workspace.preloadFileSize']       = Type.Integer >> 100,
     ['Lua.workspace.library']               = Type.Hash(Type.String, Type.Boolean, ';'),
+    ['Lua.workspace.checkThirdParty']       = Type.Boolean >> true,
     ['Lua.completion.enable']               = Type.Boolean >> true,
     ['Lua.completion.callSnippet']          = Type.String  >> 'Disable',
     ['Lua.completion.keywordSnippet']       = Type.String  >> 'Replace',
@@ -200,6 +201,7 @@ local Template = {
 }
 
 local config = {}
+local raw    = {}
 
 local m = {}
 
@@ -210,8 +212,30 @@ function m.set(key, value)
     end
     if unit:checker(value) then
         config[key] = unit:loader(value)
+        raw[key]    = value
     else
         config[key] = unit.default
+        raw[key]    = unit.default
+    end
+end
+
+function m.add(key, value)
+    local unit = Template[key]
+    if not unit then
+        return
+    end
+    local list = raw[key]
+    if type(list) ~= 'table' then
+        return
+    end
+    local copyed = {}
+    for i, v in ipairs(list) do
+        copyed[i] = v
+    end
+    copyed[#copyed+1] = value
+    if unit:checker(copyed) then
+        config[key] = unit:loader(copyed)
+        raw[key]    = copyed
     end
 end
 

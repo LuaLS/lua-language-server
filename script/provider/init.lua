@@ -1,1 +1,1 @@
-require 'provider.provider'
+return require 'provider.provider'

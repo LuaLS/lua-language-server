@@ -64,7 +64,7 @@ local function disableDiagnostic(uri, code, start, results)
         kind    = 'quickfix',
         command = {
             title    = lang.script.COMMAND_DISABLE_DIAG,
-            command  = 'lua.config',
+            command = 'lua.setConfig:' .. sp:get_id(),
             arguments = {
                 {
                     key    = 'Lua.diagnostics.disable',
@@ -101,7 +101,7 @@ local function markGlobal(uri, name, results)
         kind    = 'quickfix',
         command = {
             title     = lang.script.COMMAND_MARK_GLOBAL,
-            command   = 'lua.config',
+            command = 'lua.setConfig:' .. sp:get_id(),
             arguments = {
                 {
                     key    = 'Lua.diagnostics.globals',
@@ -120,7 +120,7 @@ local function changeVersion(uri, version, results)
         kind    = 'quickfix',
         command = {
             title     = lang.script.COMMAND_RUNTIME_VERSION,
-            command   = 'lua.config',
+            command   = 'lua.setConfig:' .. sp:get_id(),
             arguments = {
                 {
                     key    = 'Lua.runtime.version',
@@ -233,7 +233,7 @@ local function solveSyntaxUnicodeName(uri, err, results)
         kind    = 'quickfix',
         command = {
             title     = lang.script.COMMAND_UNICODE_NAME,
-            command   = 'lua.config',
+            command   = 'lua.setConfig:' .. sp:get_id(),
             arguments = {
                 {
                     key    = 'Lua.runtime.unicodeName',

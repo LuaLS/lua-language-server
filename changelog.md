@@ -16,6 +16,7 @@
         z?: boolean,
     }
     ```
+* `CHG` improve changing config from server side
 * `CHG` improve hover color
 * `CHG` improve performance
 * `FIX` supports for file with LF

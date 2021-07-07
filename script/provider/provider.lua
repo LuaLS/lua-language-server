@@ -1,46 +1,30 @@
-local util      = require 'utility'
-local cap       = require 'provider.capability'
-local completion= require 'provider.completion'
-local semantic  = require 'provider.semantic-tokens'
-local await     = require 'await'
-local files     = require 'files'
-local proto     = require 'proto.proto'
-local define    = require 'proto.define'
-local workspace = require 'workspace'
-local config    = require 'config'
-local library   = require 'library'
-local markdown  = require 'provider.markdown'
-local client    = require 'provider.client'
-local furi      = require 'file-uri'
-local pub       = require 'pub'
-local fs        = require 'bee.filesystem'
-local lang      = require 'language'
-local plugin    = require 'plugin'
-local progress  = require 'progress'
-local tm        = require 'text-merger'
-local vm        = require 'vm'
-local nonil     = require 'without-check-nil'
-local cfgLoader = require 'config.loader'
+local util       = require 'utility'
+local cap        = require 'provider.capability'
+local completion = require 'provider.completion'
+local semantic   = require 'provider.semantic-tokens'
+local await      = require 'await'
+local files      = require 'files'
+local proto      = require 'proto.proto'
+local define     = require 'proto.define'
+local workspace  = require 'workspace'
+local config     = require 'config'
+local library    = require 'library'
+local markdown   = require 'provider.markdown'
+local client     = require 'provider.client'
+local furi       = require 'file-uri'
+local pub        = require 'pub'
+local fs         = require 'bee.filesystem'
+local lang       = require 'language'
+local plugin     = require 'plugin'
+local progress   = require 'progress'
+local tm         = require 'text-merger'
+local nonil      = require 'without-check-nil'
+local cfgLoader  = require 'config.loader'
 
-local function updateConfig()
+local oldConfig = config.dump()
+local function applyConfig()
     local diagnostics = require 'provider.diagnostic'
     local telemetry   = require 'service.telemetry'
-    local new
-    if CONFIGPATH then
-        new = cfgLoader.loadLocalConfig(CONFIGPATH)
-        log.debug('load config from local', CONFIGPATH)
-    else
-        new = cfgLoader.loadClientConfig()
-        log.debug('load config from client')
-    end
-    if not new then
-        log.warn('load config failed!')
-        return
-    end
-    log.debug('loaded config dump:', util.dump(new))
-
-    local oldConfig = config.dump()
-    config.update(new)
     local newConfig = config.dump()
     log.debug('config updated:', util.dump(newConfig))
 
@@ -75,7 +59,32 @@ local function updateConfig()
         proto.notify('$/status/hide')
     end
     telemetry.updateConfig()
+    oldConfig = newConfig
 end
+
+local function updateConfig()
+    local new
+    if CONFIGPATH then
+        new = cfgLoader.loadLocalConfig(CONFIGPATH)
+        log.debug('load config from local', CONFIGPATH)
+    else
+        new = cfgLoader.loadClientConfig()
+        log.debug('load config from client')
+    end
+    if not new then
+        log.warn('load config failed!')
+        return
+    end
+    config.update(new)
+    log.debug('loaded config dump:', util.dump(new))
+    applyConfig()
+end
+
+client.watch(function (ev)
+    if ev == 'updateConfig' then
+        applyConfig()
+    end
+end)
 
 proto.on('initialize', function (params)
     client.init(params)
@@ -728,6 +737,9 @@ proto.on('workspace/executeCommand', function (params)
         return core(params.arguments[1])
     elseif command == 'lua.jsonToLua' then
         local core = require 'core.command.jsonToLua'
+        return core(params.arguments[1])
+    elseif command == 'lua.setConfig' then
+        local core = require 'core.command.setConfig'
         return core(params.arguments[1])
     end
 end)

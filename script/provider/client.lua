@@ -1,10 +1,12 @@
-local nonil  = require 'without-check-nil'
-local util   = require 'utility'
-local lang   = require 'language'
-local proto  = require 'proto'
-local define = require 'proto.define'
+local nonil     = require 'without-check-nil'
+local util      = require 'utility'
+local lang      = require 'language'
+local proto     = require 'proto'
+local define    = require 'proto.define'
+local config    = require 'config'
 
 local m = {}
+m.watchList = {}
 
 function m.client(newClient)
     if newClient then
@@ -52,7 +54,14 @@ end
 ---@param action '"set"'|'"add"'
 ---@param value any
 ---@param isGlobal boolean
-function m.setConfig(key, action, value, isGlobal)
+---@param uri uri
+function m.setConfig(key, action, value, isGlobal, uri)
+    if action == 'add' then
+        config.add(key, value)
+    elseif action == 'set' then
+        config.set(key, value)
+    end
+    m.event('updateConfig')
     if m.getOption 'changeConfiguration' then
         proto.notify('$/command', {
             command   = 'lua.config',
@@ -61,24 +70,35 @@ function m.setConfig(key, action, value, isGlobal)
                 action = action,
                 value  = value,
                 global = isGlobal,
+                uri    = uri,
             }
         })
     else
         -- TODO translate
         local message = lang.script('你的客户端不支持从服务侧修改设置，请手动修改如下设置：')
         if action == 'add' then
-            message = message .. lang.script('为 `{key}` 添加值 `{value}`', {
+            message = message .. lang.script('为 `{key}` 添加值 `{value:q}`', {
                 key   = key,
                 value = value,
             })
         else
-            message = message .. lang.script('将 `{key}` 的值设置为 `{value}`', {
+            message = message .. lang.script('将 `{key}` 的值设置为 `{value:q}`', {
                 key   = key,
                 value = value,
             })
         end
         m.showMessage('Info', message)
     end
+end
+
+function m.event(ev, ...)
+    for _, callback in ipairs(m.watchList) do
+        callback(ev, ...)
+    end
+end
+
+function m.watch(callback)
+    m.watchList[#m.watchList+1] = callback
 end
 
 function m.init(t)

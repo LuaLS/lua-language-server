@@ -21,47 +21,6 @@ local tm         = require 'text-merger'
 local nonil      = require 'without-check-nil'
 local cfgLoader  = require 'config.loader'
 
-local oldConfig = config.dump()
-local function applyConfig()
-    local diagnostics = require 'provider.diagnostic'
-    local telemetry   = require 'service.telemetry'
-    local newConfig = config.dump()
-    log.debug('config updated:', util.dump(newConfig))
-
-    if not util.equal(oldConfig.Lua.runtime, newConfig.Lua.runtime) then
-        library.init()
-        workspace.reload()
-        semantic.refresh()
-    end
-    if not util.equal(oldConfig.Lua.diagnostics, newConfig.Lua.diagnostics) then
-        diagnostics.diagnosticsAll()
-    end
-    if not util.equal(oldConfig.Lua.workspace, newConfig.Lua.workspace)
-    or not util.equal(oldConfig.files,     newConfig.files)
-    then
-        workspace.reload()
-        semantic.refresh()
-    end
-
-    if newConfig.Lua.completion.enable then
-        completion.enable()
-    else
-        completion.disable()
-    end
-    if newConfig.Lua.color.mode == 'Semantic' then
-        semantic.enable()
-    else
-        semantic.disable()
-    end
-    if newConfig.Lua.window.statusBar then
-        proto.notify('$/status/show')
-    else
-        proto.notify('$/status/hide')
-    end
-    telemetry.updateConfig()
-    oldConfig = newConfig
-end
-
 local function updateConfig()
     local new
     if CONFIGPATH then
@@ -77,14 +36,7 @@ local function updateConfig()
     end
     config.update(new)
     log.debug('loaded config dump:', util.dump(new))
-    applyConfig()
 end
-
-client.watch(function (ev)
-    if ev == 'updateConfig' then
-        applyConfig()
-    end
-end)
 
 proto.on('initialize', function (params)
     client.init(params)

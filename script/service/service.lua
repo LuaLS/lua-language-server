@@ -10,6 +10,7 @@ local files  = require 'files'
 local lang   = require 'language'
 local ws     = require 'workspace'
 local time   = require 'bee.time'
+local config = require 'config'
 
 local m = {}
 m.type = 'service'
@@ -197,6 +198,16 @@ function m.reportStatus()
     m.lastInfo = info
     proto.notify('$/status/report', info)
 end
+
+config.watch(function (key, value)
+    if key == 'Lua.window.statusBar' then
+        if value then
+            proto.notify('$/status/show')
+        else
+            proto.notify('$/status/hide')
+        end
+    end
+end)
 
 function m.testVersion()
     local stack = debug.setcstacklimit(200)

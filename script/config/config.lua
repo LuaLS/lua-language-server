@@ -193,7 +193,7 @@ local Template = {
     ['Lua.hint.paramName']                  = Type.Boolean >> true,
     ['Lua.window.statusBar']                = Type.Boolean >> true,
     ['Lua.window.progressBar']              = Type.Boolean >> true,
-    ['Lua.telemetry.enable']                = Type.Or(Type.Boolean, Type.Nil),
+    ['Lua.telemetry.enable']                = Type.Or(Type.Boolean >> false, Type.Nil),
     ['files.associations']                  = Type.Hash(Type.String, Type.String),
     ['files.exclude']                       = Type.Hash(Type.String, Type.Boolean),
     ['editor.semanticHighlighting.enabled'] = Type.Or(Type.Boolean, Type.String),
@@ -208,12 +208,9 @@ m.watchList = {}
 
 local function update(key, value, raw)
     local oldValue = config[key]
-    if util.equal(oldValue, value) then
-        return
-    end
     config[key]    = value
     rawConfig[key] = raw
-    m.event('update', key, value, oldValue)
+    m.event(key, value, oldValue)
 end
 
 function m.set(key, value)
@@ -293,16 +290,29 @@ end
 
 function m.watch(callback)
     m.watchList[#m.watchList+1] = callback
-end
-
-function m.event(ev, ...)
-    for _, callback in ipairs(m.watchList) do
-        callback(ev, ...)
+    if m.inited then
+        for key in pairs(Template) do
+            callback(key, m.get(key), m.get(key))
+        end
     end
 end
 
-for key in pairs(Template) do
-    m.set(key)
+function m.event(key, value, oldValue)
+    for _, callback in ipairs(m.watchList) do
+        callback(key, value, oldValue)
+    end
 end
+
+function m.init()
+    if m.inited then
+        return
+    end
+    m.init = true
+    for key in pairs(Template) do
+        m.set(key)
+    end
+end
+
+m.init()
 
 return m

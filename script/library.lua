@@ -233,4 +233,12 @@ function m.init()
     initBuiltIn()
 end
 
+config.watch(function (key, value, oldValue)
+    if key:find '^Lua.runtime' then
+        if value ~= oldValue then
+            initBuiltIn()
+        end
+    end
+end)
+
 return m

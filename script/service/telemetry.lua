@@ -141,4 +141,10 @@ function m.updateConfig()
     end)
 end
 
+config.watch(function (key)
+    if key == 'Lua.telemetry.enable' then
+        m.updateConfig()
+    end
+end)
+
 return m

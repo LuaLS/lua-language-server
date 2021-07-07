@@ -411,4 +411,12 @@ await.watch(function (ev, co)
     end
 end)
 
+config.watch(function (key, value, oldValue)
+    if key:find 'Lua.diagnostics' then
+        if value ~= oldValue then
+            m.diagnosticsAll()
+        end
+    end
+end)
+
 return m

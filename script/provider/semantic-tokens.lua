@@ -106,6 +106,21 @@ local function refresh()
     proto.notify('workspace/semanticTokens/refresh', json.null)
 end
 
+config.watch(function (key, value)
+    if key == 'Lua.color.mode' then
+        if value == 'Semantic' then
+            enable()
+        else
+            disable()
+        end
+    end
+    if key:find '^Lua.runtime'
+    or key:find '^Lua.workspace'
+    or key:find '^files' then
+        refresh()
+    end
+end)
+
 return {
     enable  = enable,
     disable = disable,

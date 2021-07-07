@@ -535,4 +535,14 @@ files.watch(function (ev, uri)
     end
 end)
 
+config.watch(function (key, value, oldValue)
+    if key:find '^Lua.runtime'
+    or key:find '^Lua.workspace'
+    or key:find '^files' then
+        if value ~= oldValue then
+            m.reload()
+        end
+    end
+end)
+
 return m

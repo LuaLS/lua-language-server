@@ -1,6 +1,7 @@
 local proto  = require 'proto'
 local nonil  = require 'without-check-nil'
 local client = require 'client'
+local config = require 'config'
 
 local isEnable = false
 
@@ -58,6 +59,16 @@ local function disable()
         }
     })
 end
+
+config.watch(function (key, value)
+    if key == 'Lua.completion.enable' then
+        if value == true then
+            enable()
+        else
+            disable()
+        end
+    end
+end)
 
 return {
     enable   = enable,

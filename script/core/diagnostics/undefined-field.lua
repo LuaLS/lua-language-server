@@ -6,10 +6,16 @@ local noder   = require 'core.noder'
 local await   = require 'await'
 
 local SkipCheckClass = {
-    ['unknown'] = true,
-    ['any']     = true,
-    ['table']   = true,
-    ['nil']     = true,
+    ['unknown']       = true,
+    ['any']           = true,
+    ['table']         = true,
+    ['nil']           = true,
+    ['number']        = true,
+    ['integer']       = true,
+    ['boolean']       = true,
+    ['function']      = true,
+    ['userdata']      = true,
+    ['lightuserdata'] = true,
 }
 
 return function (uri, callback)

@@ -9,6 +9,7 @@ local proto    = require 'proto.proto'
 local lang     = require 'language'
 local define   = require 'proto.define'
 local await    = require 'await'
+local version  = require 'version'
 
 local tokenPath = (ROOT / 'log' / 'token'):string()
 local token = util.loadFile(tokenPath)
@@ -49,6 +50,14 @@ local function pushPlatformInfo(link)
     ))
 end
 
+local function pushVersion(link)
+    send(link, string.pack('zzz'
+        , 'version'
+        , token
+        , version.getVersion()
+    ))
+end
+
 local function pushErrorLog(link)
     if not log.firstError then
         return
@@ -78,6 +87,7 @@ timer.wait(5, function ()
         function link:on_connect()
             pushClientInfo(link)
             pushPlatformInfo(link)
+            pushVersion(link)
             pushErrorLog(link)
             self:close()
         end

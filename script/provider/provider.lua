@@ -40,7 +40,7 @@ end
 
 proto.on('initialize', function (params)
     client.init(params)
-    workspace.init(params.rootUri)
+    workspace.initPath(params.rootUri)
     return {
         capabilities = cap.getIniter(),
         serverInfo   = {
@@ -130,7 +130,6 @@ proto.on('workspace/didChangeWatchedFiles', function (params)
             if  files.isLua(uri)
             and not files.isOpen(uri)
             and (not workspace.isIgnored(uri) or files.isLibrary(uri)) then
-                plugin.awaitReady()
                 files.setText(uri, pub.awaitTask('loadFile', uri), false)
             else
                 local path = furi.decode(uri)
@@ -149,7 +148,6 @@ end)
 
 proto.on('workspace/didCreateFiles', function (params)
     log.debug('workspace/didCreateFiles', util.dump(params))
-    plugin.awaitReady()
     for _, file in ipairs(params.files) do
         if files.isLua(file.uri) then
             files.setText(file.uri, pub.awaitTask('loadFile', file.uri), false)
@@ -171,7 +169,6 @@ end)
 
 proto.on('workspace/didRenameFiles', function (params)
     log.debug('workspace/didRenameFiles', util.dump(params))
-    plugin.awaitReady()
     for _, file in ipairs(params.files) do
         local text = files.getOriginText(file.oldUri)
         if text then
@@ -199,7 +196,6 @@ proto.on('textDocument/didOpen', function (params)
     local text  = doc.text
     log.debug('didOpen', uri)
     files.open(uri)
-    plugin.awaitReady()
     if not files.isOpen(uri) then
         return
     end
@@ -220,7 +216,6 @@ proto.on('textDocument/didChange', function (params)
     local doc     = params.textDocument
     local changes = params.contentChanges
     local uri     = doc.uri
-    plugin.awaitReady()
     if not files.isLua(uri) and not files.isOpen(uri) then
         return
     end

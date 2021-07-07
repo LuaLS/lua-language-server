@@ -10,6 +10,7 @@ m.idMap = {}
 m.delayQueue = {}
 m.delayQueueIndex = 1
 m.watchList = {}
+m.needClose = {}
 m._enable = true
 
 --- 设置错误处理器
@@ -161,6 +162,15 @@ function m.delay()
     return coroutine.yield()
 end
 
+--- stop then close
+function m.stop()
+    if not coroutine.isyieldable() then
+        return
+    end
+    m.needClose[#m.needClose+1] = coroutine.running()
+    coroutine.yield()
+end
+
 local function warnStepTime(passed, waker)
     if passed < 1 then
         log.warn(('Await step takes [%.3f] sec.'):format(passed))
@@ -180,6 +190,11 @@ end
 
 --- 步进
 function m.step()
+    for i = #m.needClose, 1, -1 do
+        coroutine.close(m.needClose[i])
+        m.needClose[i] = nil
+    end
+
     local resume = m.delayQueue[m.delayQueueIndex]
     if resume then
         m.delayQueue[m.delayQueueIndex] = false

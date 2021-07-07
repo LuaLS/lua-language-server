@@ -47,8 +47,10 @@ local function packMessage(...)
     return table.concat(strs, '\t')
 end
 
+---@alias message.type '"Error"'|'"Warning"'|'"Info"'|'"Log"'
+
 ---show message to client
----@param type '"Error"'|'"Warning"'|'"Info"'|'"Log"'
+---@param type message.type
 function m.showMessage(type, ...)
     local message = packMessage(...)
     proto.notify('window/showMessage', {
@@ -61,7 +63,33 @@ function m.showMessage(type, ...)
     })
 end
 
----@param type '"Error"'|'"Warning"'|'"Info"'|'"Log"'
+---@param type message.type
+---@param message string
+---@param titles  string[]
+---@return string action
+function m.awaitRequestMessage(type, message, titles)
+    proto.notify('window/logMessage', {
+        type = define.MessageType[type] or 3,
+        message = message,
+    })
+    local actions = {}
+    for i, title in ipairs(titles) do
+        actions[i] = {
+            title = title,
+        }
+    end
+    local item = proto.awaitRequest('window/showMessageRequest', {
+        type    = type,
+        message = message,
+        actions = actions,
+    })
+    if not item then
+        return nil
+    end
+    return item.title
+end
+
+---@param type message.type
 function m.logMessage(type, ...)
     local message = packMessage(...)
     proto.notify('window/logMessage', {

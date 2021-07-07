@@ -15,6 +15,9 @@ end
 
 local function findForward(text, offset, ...)
     local pos = text:match('^[ \t]*()', offset)
+    if not pos then
+        return nil
+    end
     for _, symbol in ipairs { ... } do
         if text:sub(pos, pos + #symbol - 1) == symbol then
             return pos, symbol

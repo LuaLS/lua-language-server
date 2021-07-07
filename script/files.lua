@@ -205,7 +205,13 @@ function m.setText(uri, text, isTrust, instance)
             end
         end)
     end
+end
 
+function m.resetText(uri)
+    local file = m.fileMap[uri]
+    local originText = file.originText
+    file.originText = nil
+    m.setText(uri, originText, file.trusted)
 end
 
 function m.setRawText(uri, text)

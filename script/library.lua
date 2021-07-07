@@ -7,6 +7,7 @@ local lloader = require 'locale-loader'
 local fsu     = require 'fs-utility'
 local define  = require "proto.define"
 local files   = require 'files'
+local await   = require 'await'
 
 local m = {}
 
@@ -246,9 +247,9 @@ local function loadSingle3rdConfig(libraryDir)
 
     cfg.name = libraryDir:filename():string()
 
-    local pluginPath = libraryDir / 'plugin.lua'
-    if fs.exists(pluginPath) then
-        cfg.plugin = pluginPath:string()
+    local pluginPath = ('${3rd}/%s/plugin.lua'):format('cfg.name')
+    if fs.exists(fs.path(pluginPath)) then
+        cfg.plugin = pluginPath
     end
 
     for k, v in pairs(env) do
@@ -273,20 +274,81 @@ local function load3rdConfig()
     return configs
 end
 
-local function check3rdByWords(configs)
-    
+local function apply3rd(cfg)
+    local changes = {}
+    for _, change in ipairs(cfg.configs) do
+        changes[#changes+1] = change
+    end
+
+    if cfg.plugin then
+        changes[#changes+1] = {
+            key    = 'Lua.workspace.library',
+            action = 'set',
+            value  = cfg.plugin,
+        }
+    end
+end
+
+local hasAsked
+local function askFor3rd(cfg)
+    hasAsked = true
+    -- TODO: translate
+    local yes = lang.script['启用']
+    local no  = lang.script.WINDOW_DONT_SHOW_AGAIN
+    local result = client.awaitRequestMessage('Info'
+        , lang.script('是否需要将你的工作环境配置为 `{}` ？（这会修改你的工作区设置）', cfg.name)
+        , {yes, no}
+    )
+    if not result then
+        return nil
+    end
+    client.setConfig {
+        {
+            key    = 'Lua.workspace.checkThirdParty',
+            action = 'set',
+            value  = false,
+        },
+    }
+    if result == yes then
+        apply3rd(cfg)
+    end
+end
+
+local function check3rdByWords(text, configs)
+    await.call(function ()
+        for _, cfg in ipairs(configs) do
+            if cfg.words then
+                for _, word in ipairs(cfg.words) do
+                    await.delay()
+                    if text:match(word) then
+                        askFor3rd()
+                        return
+                    end
+                end
+            end
+        end
+    end)
 end
 
 local thirdConfigs
+local hasCheckedUri = {}
 local function check3rd(uri)
+    if hasAsked then
+        return
+    end
+    if not config.get 'Lua.workspace.checkThirdParty' then
+        return
+    end
     if thirdConfigs == nil then
         thirdConfigs = load3rdConfig() or false
     end
     if not thirdConfigs then
         return
     end
-    if files.isLua(uri) then
-        local text = files.getUri(uri)
+    if  not hasCheckedUri[uri]
+    and files.isLua(uri) then
+        hasCheckedUri[uri] = true
+        local text = files.getText(uri)
         check3rdByWords(text, thirdConfigs)
     end
 end
@@ -299,7 +361,7 @@ end)
 
 files.watch(function (ev, uri)
     if ev == 'update' then
-        check3rd(uri)
+        check3rd(files.asKey(uri))
     end
 end)
 

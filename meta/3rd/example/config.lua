@@ -5,20 +5,20 @@ files   = {'thisIsAnExampleFile%.ifItExistsInWorkSpace%.thenTryLoadThisLibrary'}
 -- lsit of settings to be changed
 configs = {
     {
-        name  = 'Lua.runtime.version',
-        type  = 'set',
-        value = 'LuaJIT',
+        key    = 'Lua.runtime.version',
+        action = 'set',
+        value  = 'LuaJIT',
     },
     {
-        name  = 'Lua.diagnostics.globals',
-        type  = 'add',
-        value = 'global1',
+        key    = 'Lua.diagnostics.globals',
+        action = 'add',
+        value  = 'global1',
     }
 }
 for _, name in ipairs {'global2', 'global3', 'global4'} do
     configs[#configs+1] = {
-        name  = 'Lua.diagnostics.globals',
-        type  = 'add',
-        value = name,
+        key    = 'Lua.diagnostics.globals',
+        action = 'add',
+        value  = name,
     }
 end

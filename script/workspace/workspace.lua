@@ -440,12 +440,32 @@ function m.findUrisByRequirePath(path)
 end
 
 function m.normalize(path)
+    path = path:gsub('$$${(.-)$}', function (key)
+        if key == '3rd' then
+            return (ROOT / 'meta' / '3rd'):string()
+        end
+    end)
     if platform.OS == 'Windows' then
         path = path:gsub('[/\\]+', '\\')
                    :gsub('[/\\]+$', '')
     else
         path = path:gsub('[/\\]+', '/')
                    :gsub('[/\\]+$', '')
+    end
+    return path
+end
+
+---@return string
+function m.getAbsolutePath(path)
+    if not path or path == '' then
+        return nil
+    end
+    path = m.normalize(path)
+    if fs.path(path):is_relative() then
+        if not m.path then
+            return nil
+        end
+        path = m.normalize(m.path .. '/' .. path)
     end
     return path
 end

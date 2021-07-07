@@ -200,8 +200,13 @@ local Template = {
     ['editor.acceptSuggestionOnEnter']      = Type.String  >> 'on',
 }
 
-local config = {}
-local raw    = {}
+local config    = {}
+local rawConfig = {}
+
+local function update(key, value, raw)
+    config[key]    = value
+    rawConfig[key] = raw
+end
 
 local m = {}
 
@@ -211,11 +216,9 @@ function m.set(key, value)
         return
     end
     if unit:checker(value) then
-        config[key] = unit:loader(value)
-        raw[key]    = value
+        update(key, unit:loader(value), value)
     else
-        config[key] = unit.default
-        raw[key]    = unit.default
+        update(key, unit.default, unit.default)
     end
 end
 
@@ -224,7 +227,7 @@ function m.add(key, value)
     if not unit then
         return
     end
-    local list = raw[key]
+    local list = rawConfig[key]
     if type(list) ~= 'table' then
         return
     end
@@ -234,8 +237,7 @@ function m.add(key, value)
     end
     copyed[#copyed+1] = value
     if unit:checker(copyed) then
-        config[key] = unit:loader(copyed)
-        raw[key]    = copyed
+        update(key, unit:loader(copyed), copyed)
     end
 end
 

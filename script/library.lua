@@ -192,7 +192,7 @@ local function loadMetaLocale(langID, result)
     return result
 end
 
-local function compileMetaDoc()
+local function initBuiltIn()
     local langID  = lang.id
     local version = config.get 'Lua.runtime.version'
     local metaPath = fs.path(METAPATH) / config.get 'Lua.runtime.meta':gsub('%$%{(.-)%}', {
@@ -229,16 +229,8 @@ local function compileMetaDoc()
     fsu.fileSync(out, metaPath)
 end
 
-local function initFromMetaDoc()
-    compileMetaDoc()
-end
-
-local function init()
-    initFromMetaDoc()
-end
-
 function m.init()
-    init()
+    initBuiltIn()
 end
 
 return m

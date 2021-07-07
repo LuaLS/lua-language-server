@@ -120,17 +120,23 @@ function m.updateConfig()
             return
         end
         if item.title == enableTitle then
-            client.setConfig('Lua.telemetry.enable'
-                , 'set'
-                , true
-                , true
-            )
+            client.setConfig {
+                {
+                    key      = 'Lua.telemetry.enable',
+                    action   = 'set',
+                    value    = true,
+                    isGlobal = true,
+                }
+            }
         elseif item.title == disableTitle then
-            client.setConfig('Lua.telemetry.enable'
-                , 'set'
-                , false
-                , true
-            )
+            client.setConfig {
+                {
+                    key      = 'Lua.telemetry.enable',
+                    action   = 'set',
+                    value    = false,
+                    isGlobal = true,
+                }
+            }
         end
     end)
 end

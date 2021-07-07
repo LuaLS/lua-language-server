@@ -64,11 +64,14 @@ local function enable()
                 return
             end
             if item.title == lang.script.WINDOW_APPLY_SETTING then
-                client.setConfig('editor.semanticHighlighting.enabled'
-                    , 'set'
-                    , true
-                    , true
-                )
+                client.setConfig {
+                    {
+                        key      = 'editor.semanticHighlighting.enabled',
+                        action   = 'set',
+                        value    = true,
+                        isGlobal = true,
+                    }
+                }
             end
             if item.title == lang.script.WINDOW_DONT_SHOW_AGAIN then
                 dontShowAgain = true

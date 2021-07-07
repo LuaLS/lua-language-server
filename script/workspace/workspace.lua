@@ -203,13 +203,15 @@ local function loadFileFactory(root, progressData, isLibrary)
                             return
                         end
                         if item.title == lang.script.WINDOW_INCREASE_UPPER_LIMIT then
-                            client.setConfig('Lua.workspace.maxPreload'
-                                , 'set'
-                                , config.get 'Lua.workspace.maxPreload'
-                                + math.max(1000, config.get 'Lua.workspace.maxPreload')
-                                , false
-                                , m.uri
-                            )
+                            client.setConfig {
+                                {
+                                    key    = 'Lua.workspace.maxPreload',
+                                    action = 'set',
+                                    value  = config.get 'Lua.workspace.maxPreload'
+                                           + math.max(1000, config.get 'Lua.workspace.maxPreload'),
+                                    uri    = m.uri,
+                                }
+                            }
                         end
                     end)
                 end

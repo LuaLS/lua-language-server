@@ -49,45 +49,42 @@ function m.showMessage(type, message)
     })
 end
 
----set client config
----@param key string
----@param action '"set"'|'"add"'
----@param value any
----@param isGlobal boolean
----@param uri uri
-function m.setConfig(key, action, value, isGlobal, uri)
-    if action == 'add' then
-        config.add(key, value)
-    elseif action == 'set' then
-        config.set(key, value)
+---@class config.change
+---@field key       string
+---@field value     any
+---@field action    '"add"'|'"set"'
+---@field isGlobal? boolean
+---@field uri?      uri
+
+---@param changes config.change[]
+function m.setConfig(changes)
+    for _, change in ipairs(changes) do
+        if change.action == 'add' then
+            config.add(change.key, change.value)
+        elseif change.action == 'set' then
+            config.set(change.key, change.value)
+        end
     end
     m.event('updateConfig')
     if m.getOption 'changeConfiguration' then
-        proto.notify('$/command', {
-            command   = 'lua.config',
-            data      = {
-                key    = key,
-                action = action,
-                value  = value,
-                global = isGlobal,
-                uri    = uri,
-            }
-        })
-    else
-        -- TODO translate
-        local message = lang.script('你的客户端不支持从服务侧修改设置，请手动修改如下设置：')
-        if action == 'add' then
-            message = message .. lang.script('为 `{key}` 添加值 `{value:q}`', {
-                key   = key,
-                value = value,
-            })
-        else
-            message = message .. lang.script('将 `{key}` 的值设置为 `{value:q}`', {
-                key   = key,
-                value = value,
+        for _, change in ipairs(changes) do
+            proto.notify('$/command', {
+                command   = 'lua.config',
+                data      = change,
             })
         end
-        m.showMessage('Info', message)
+    else
+        -- TODO translate
+        local messages = {}
+        messages[1] = lang.script('你的客户端不支持从服务侧修改设置，请手动修改如下设置：')
+        for _, change in ipairs(changes) do
+            if change.action == 'add' then
+                messages[#messages+1] = lang.script('为 `{key}` 添加值 `{value:q}`;', change)
+            else
+                messages[#messages+1] = lang.script('将 `{key}` 的值设置为 `{value:q}`;', change)
+            end
+        end
+        m.showMessage('Info', table.concat(messages, '\n'))
     end
 end
 

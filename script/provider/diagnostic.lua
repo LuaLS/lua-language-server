@@ -281,19 +281,23 @@ local function askForDisable()
     if     item.title == lang.script.WINDOW_DONT_SHOW_AGAIN then
         m.dontAskedForDisable = true
     elseif item.title == delayTitle then
-        client.setConfig('Lua.diagnostics.workspaceDelay'
-            , 'set'
-            , delay * 1000
-            , false
-            , ws.uri
-        )
+        client.setConfig {
+            {
+                key    = 'Lua.diagnostics.workspaceDelay',
+                action = 'set',
+                value  = delay * 1000,
+                uri    = ws.uri,
+            }
+        }
     elseif item.title == lang.script.WINDOW_DISABLE_DIAGNOSTIC then
-        client.setConfig('Lua.diagnostics.workspaceDelay'
-            , 'set'
-            , -1
-            , false
-            , ws.uri
-        )
+        client.setConfig {
+            {
+                key    = 'Lua.diagnostics.workspaceDelay',
+                action = 'set',
+                value  = -1,
+                uri    = ws.uri,
+            }
+        }
     end
 end
 

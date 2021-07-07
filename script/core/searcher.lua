@@ -862,6 +862,9 @@ local function prepareSearch(source)
         return
     end
     local root = guide.getRoot(source)
+    if not root then
+        return
+    end
     noder.compileNodes(root)
     local uri  = guide.getUri(source)
     local id   = noder.getID(source)

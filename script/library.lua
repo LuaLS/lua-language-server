@@ -6,6 +6,7 @@ local client  = require 'client'
 local lloader = require 'locale-loader'
 local fsu     = require 'fs-utility'
 local define  = require "proto.define"
+local files   = require 'files'
 
 local m = {}
 
@@ -206,6 +207,9 @@ local function initBuiltIn()
     end
     --log.debug('metaLang:', util.dump(metaLang))
 
+    if m.metaPath == metaPath:string() then
+        return
+    end
     m.metaPath = metaPath:string()
     m.metaPaths = {}
     fs.create_directories(metaPath)
@@ -229,15 +233,73 @@ local function initBuiltIn()
     fsu.fileSync(out, metaPath)
 end
 
-function m.init()
-    initBuiltIn()
+local function loadSingle3rdConfig(libraryDir)
+    local configText = fsu.loadFile(libraryDir / 'config.lua')
+    if not configText then
+        return nil
+    end
+
+    local env = setmetatable({}, { __index = _G })
+    assert(load(configText, '@' .. libraryDir:string(), 't', env))
+
+    local cfg = {}
+
+    cfg.name = libraryDir:filename():string()
+
+    local pluginPath = libraryDir / 'plugin.lua'
+    if fs.exists(pluginPath) then
+        cfg.plugin = pluginPath:string()
+    end
+
+    for k, v in pairs(env) do
+        cfg[k] = v
+    end
+
+    return cfg
+end
+
+local function load3rdConfig()
+    local thirdDir = ROOT / 'meta' / '3rd'
+    if not fs.is_directory(thirdDir) then
+        return
+    end
+    local configs = {}
+    for libraryDir in thirdDir:list_directory() do
+        local suc, res = xpcall(loadSingle3rdConfig, log.error, libraryDir)
+        if suc then
+            configs[#configs+1] = res
+        end
+    end
+    return configs
+end
+
+local function check3rdByWords(configs)
+    
+end
+
+local thirdConfigs
+local function check3rd(uri)
+    if thirdConfigs == nil then
+        thirdConfigs = load3rdConfig() or false
+    end
+    if not thirdConfigs then
+        return
+    end
+    if files.isLua(uri) then
+        local text = files.getUri(uri)
+        check3rdByWords(text, thirdConfigs)
+    end
 end
 
 config.watch(function (key, value, oldValue)
     if key:find '^Lua.runtime' then
-        if value ~= oldValue then
-            initBuiltIn()
-        end
+        initBuiltIn()
+    end
+end)
+
+files.watch(function (ev, uri)
+    if ev == 'update' then
+        check3rd(uri)
     end
 end)
 

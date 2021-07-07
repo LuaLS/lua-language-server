@@ -16,7 +16,7 @@ configs = {
     }
 }
 for _, name in ipairs {'global2', 'global3', 'global4'} do
-    config[#config+1] = {
+    configs[#configs+1] = {
         name  = 'Lua.diagnostics.globals',
         type  = 'add',
         value = name,

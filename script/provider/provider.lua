@@ -40,7 +40,6 @@ end
 
 proto.on('initialize', function (params)
     client.init(params)
-    library.init()
     workspace.init(params.rootUri)
     return {
         capabilities = cap.getIniter(),

@@ -6,7 +6,6 @@ local define    = require 'proto.define'
 local config    = require 'config'
 
 local m = {}
-m.watchList = {}
 
 function m.client(newClient)
     if newClient then
@@ -107,16 +106,25 @@ end
 
 ---@param changes config.change[]
 function m.setConfig(changes)
+    local finalChanges = {}
     for _, change in ipairs(changes) do
         if change.action == 'add' then
-            config.add(change.key, change.value)
+            local suc = config.add(change.key, change.value)
+            if suc then
+                finalChanges[#finalChanges+1] = change
+            end
         elseif change.action == 'set' then
-            config.set(change.key, change.value)
+            local suc = config.set(change.key, change.value)
+            if suc then
+                finalChanges[#finalChanges+1] = change
+            end
         end
     end
-    m.event('updateConfig')
+    if #finalChanges == 0 then
+        return
+    end
     if m.getOption 'changeConfiguration' then
-        for _, change in ipairs(changes) do
+        for _, change in ipairs(finalChanges) do
             proto.notify('$/command', {
                 command   = 'lua.config',
                 data      = change,
@@ -126,7 +134,7 @@ function m.setConfig(changes)
         -- TODO translate
         local messages = {}
         messages[1] = lang.script('你的客户端不支持从服务侧修改设置，请手动修改如下设置：')
-        for _, change in ipairs(changes) do
+        for _, change in ipairs(finalChanges) do
             if change.action == 'add' then
                 messages[#messages+1] = lang.script('为 `{key}` 添加值 `{value:q}`;', change)
             else
@@ -136,16 +144,6 @@ function m.setConfig(changes)
         local message = table.concat(messages, '\n')
         m.showMessage('Info', message)
     end
-end
-
-function m.event(ev, ...)
-    for _, callback in ipairs(m.watchList) do
-        callback(ev, ...)
-    end
-end
-
-function m.watch(callback)
-    m.watchList[#m.watchList+1] = callback
 end
 
 function m.init(t)

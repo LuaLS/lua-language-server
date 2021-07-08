@@ -507,6 +507,9 @@ function m.flushCache()
 end
 
 function m.reload()
+    if not m.inited then
+        return
+    end
     if TEST then
         return
     end
@@ -514,6 +517,10 @@ function m.reload()
 end
 
 function m.init()
+    if m.inited then
+        return
+    end
+    m.inited = true
     m.reload()
 end
 

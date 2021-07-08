@@ -87,7 +87,8 @@ proto.on('initialized', function (params)
             registrations = registrations
         })
     end
-    workspace.reload()
+    library.init()
+    workspace.init()
     return true
 end)
 

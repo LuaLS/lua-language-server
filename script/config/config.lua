@@ -1,5 +1,6 @@
 local util   = require 'utility'
 local define = require 'proto.define'
+local timer  = require 'timer'
 
 ---@class config.unit
 ---@field caller function
@@ -216,31 +217,32 @@ end
 function m.set(key, value)
     local unit = Template[key]
     if not unit then
-        return
+        return false
     end
     if util.equal(rawConfig[key], value) then
-        return
+        return false
     end
     if unit:checker(value) then
         update(key, unit:loader(value), value)
     else
         update(key, unit.default, unit.default)
     end
+    return true
 end
 
 function m.add(key, value)
     local unit = Template[key]
     if not unit then
-        return
+        return false
     end
     local list = rawConfig[key]
     if type(list) ~= 'table' then
-        return
+        return false
     end
     local copyed = {}
     for i, v in ipairs(list) do
         if util.equal(v, value) then
-            return
+            return false
         end
         copyed[i] = v
     end
@@ -248,6 +250,7 @@ function m.add(key, value)
     if unit:checker(copyed) then
         update(key, unit:loader(copyed), copyed)
     end
+    return true
 end
 
 function m.get(key)
@@ -299,9 +302,23 @@ function m.watch(callback)
 end
 
 function m.event(key, value, oldValue)
-    for _, callback in ipairs(m.watchList) do
-        callback(key, value, oldValue)
+    if not m.delay then
+        m.delay = {}
+        timer.wait(0, function ()
+            local delay = {}
+            m.delay = nil
+            for _, info in ipairs(delay) do
+                for _, callback in ipairs(m.watchList) do
+                    callback(info.key, info.value, info.oldValue)
+                end
+            end
+        end)
     end
+    m.delay[#m.delay+1] = {
+        key      = key,
+        value    = value,
+        oldValue = oldValue,
+    }
 end
 
 function m.init()
@@ -309,8 +326,8 @@ function m.init()
         return
     end
     m.inited = true
-    for key in pairs(Template) do
-        m.set(key)
+    for key, unit in pairs(Template) do
+        m.set(key, unit.default)
     end
 end
 

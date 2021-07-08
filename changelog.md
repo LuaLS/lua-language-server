@@ -1,5 +1,8 @@
 # changelog
 
+## 2.2.2
+* `FIX` incorrect syntax color
+
 ## 2.2.1
 `2021-7-8`
 * `FIX` change setting may failed

@@ -294,7 +294,7 @@ local function load3rdConfig()
     return configs
 end
 
-local function apply3rd(cfg, localConfig)
+local function apply3rd(cfg, onlyMemory)
     local changes = {}
     for _, change in ipairs(cfg.configs) do
         changes[#changes+1] = change
@@ -314,7 +314,7 @@ local function apply3rd(cfg, localConfig)
         value  = ('${3rd}/%s/library'):format(cfg.name),
     }
 
-    client.setConfig(changes, localConfig)
+    client.setConfig(changes, onlyMemory)
 end
 
 local hasAsked
@@ -338,9 +338,9 @@ local function askFor3rd(cfg)
         },
     }
     if result == yes1 then
-        apply3rd(cfg, true)
-    elseif result == yes2 then
         apply3rd(cfg, false)
+    elseif result == yes2 then
+        apply3rd(cfg, true)
     end
 end
 

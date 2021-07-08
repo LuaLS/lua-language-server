@@ -152,11 +152,14 @@ return function (uri, offset)
         end
         src = src.field or src.method or src.index or src
         if  src.type == 'doc.class.name'
-        and source.type ~= 'doc.type.name'
-        and source.type ~= 'doc.extends.name'
-        and source.type ~= 'doc.see.name' then
-            goto CONTINUE
+        or  src.type == 'doc.alias.name' then
+            if  source.type ~= 'doc.type.name'
+            and source.type ~= 'doc.extends.name'
+            and source.type ~= 'doc.see.name' then
+                goto CONTINUE
+            end
         end
+
         results[#results+1] = {
             target = src,
             uri    = files.getOriginUri(root.uri),

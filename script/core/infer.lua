@@ -614,6 +614,7 @@ function m.isTrue(source, mark)
         mark.isTrue = {}
     end
     if mark.isTrue[source] == nil then
+        mark.isTrue[source] = false
         local literals = m.searchLiterals(source, nil, mark)
         for literal in pairs(literals) do
             if literal ~= false then
@@ -621,7 +622,6 @@ function m.isTrue(source, mark)
                 break
             end
         end
-        mark.isTrue[source] = false
     end
     return mark.isTrue[source]
 end

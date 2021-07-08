@@ -466,6 +466,8 @@ function m.getAbsolutePath(path)
     return path
 end
 
+---@param uri uri
+---@return string
 function m.getRelativePath(uri)
     local path = furi.decode(uri)
     if not m.path then

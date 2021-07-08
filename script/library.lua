@@ -1,4 +1,5 @@
 local fs      = require 'bee.filesystem'
+local plat    = require 'bee.platform'
 local config  = require 'config'
 local util    = require 'utility'
 local lang    = require 'language'
@@ -325,12 +326,45 @@ local function askFor3rd(cfg)
 end
 
 local function check3rdByWords(text, configs)
+    if hasAsked then
+        return
+    end
     await.call(function ()
         for _, cfg in ipairs(configs) do
             if cfg.words then
                 for _, word in ipairs(cfg.words) do
                     await.delay()
                     if text:match(word) then
+                        askFor3rd(cfg)
+                        return
+                    end
+                end
+            end
+        end
+    end)
+end
+
+local function check3rdByFileName(uri, configs)
+    if hasAsked then
+        return
+    end
+    local ws   = require 'workspace'
+    local path = ws.getRelativePath(uri)
+    if not path then
+        return
+    end
+    if plat.OS == 'Windows' then
+        path = path:lower()
+    end
+    await.call(function ()
+        for _, cfg in ipairs(configs) do
+            if cfg.files then
+                for _, filename in ipairs(cfg.files) do
+                    await.delay()
+                    if plat.OS == 'Windows' then
+                        filename = filename:lower()
+                    end
+                    if path:match(filename) then
                         askFor3rd(cfg)
                         return
                     end
@@ -355,11 +389,13 @@ local function check3rd(uri)
     if not thirdConfigs then
         return
     end
-    if  not hasCheckedUri[uri]
-    and files.isLua(uri) then
+    if not hasCheckedUri[uri] then
         hasCheckedUri[uri] = true
-        local text = files.getText(uri)
-        check3rdByWords(text, thirdConfigs)
+        if files.isLua(uri) then
+            local text = files.getText(uri)
+            check3rdByWords(text, thirdConfigs)
+        end
+        check3rdByFileName(uri, thirdConfigs)
     end
 end
 
@@ -370,7 +406,8 @@ config.watch(function (key, value, oldValue)
 end)
 
 files.watch(function (ev, uri)
-    if ev == 'update' then
+    if ev == 'update'
+    or ev == 'dll' then
         check3rd(files.asKey(uri))
     end
 end)

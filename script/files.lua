@@ -400,7 +400,9 @@ end
 
 function m.compileState(uri, text)
     local ws = require 'workspace'
-    if not m.isOpen(uri) and #text >= config.get 'Lua.workspace.preloadFileSize' * 1000 then
+    if  not m.isOpen(uri)
+    and not m.isLibrary(uri)
+    and #text >= config.get 'Lua.workspace.preloadFileSize' * 1000 then
         if not m.notifyCache['preloadFileSize'] then
             m.notifyCache['preloadFileSize'] = {}
             m.notifyCache['skipLargeFileCount'] = 0
@@ -857,6 +859,7 @@ function m.saveDll(uri, content)
     end
 
     m.dllMap[luri] = file
+    m.onWatch('dll', uri)
 end
 
 ---

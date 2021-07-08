@@ -135,14 +135,13 @@ function m.setConfig(changes, updateLocal)
             })
         end
     else
-        -- TODO translate
         local messages = {}
-        messages[1] = lang.script('你的客户端不支持从服务侧修改设置，请手动修改如下设置：')
+        messages[1] = lang.script('WINDOW_CLIENT_NOT_SUPPORT_CONFIG')
         for _, change in ipairs(finalChanges) do
             if change.action == 'add' then
-                messages[#messages+1] = lang.script('为 `{key}` 添加值 `{value:q}`;', change)
+                messages[#messages+1] = lang.script('WINDOW_MANUAL_CONFIG_ADD', change)
             else
-                messages[#messages+1] = lang.script('将 `{key}` 的值设置为 `{value:q}`;', change)
+                messages[#messages+1] = lang.script('WINDOW_MANUAL_CONFIG_SET', change)
             end
         end
         local message = table.concat(messages, '\n')

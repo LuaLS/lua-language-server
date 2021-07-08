@@ -233,3 +233,13 @@ WINDOW_CHECK_SEMANTIC            = 'If you are using the color theme in the mark
 WINDOW_TELEMETRY_HINT            = 'Please allow sending anonymous usage data and error reports to help us further improve this extension. Read our privacy policy [here](https://github.com/sumneko/lua-language-server/wiki/Privacy-Policy) .'
 WINDOW_TELEMETRY_ENABLE          = 'Allow'
 WINDOW_TELEMETRY_DISABLE         = 'Prohibit'
+WINDOW_CLIENT_NOT_SUPPORT_CONFIG = 'Your client does not support modifying settings from the server side, please manually modify the following settings:'
+WINDOW_MANUAL_CONFIG_ADD         = '`{key}`: add element `{value:q}` ;'
+WINDOW_MANUAL_CONFIG_SET         = '`{key}`: set to `{value:q}` ;'
+WINDOW_APPLY_WHIT_SETTING        = 'Apply and modify settings'
+WINDOW_APPLY_WHITOUT_SETTING     = 'Apply but do not modify settings'
+WINDOW_ASK_APPLY_LIBRARY         = 'Do you need to configure your work environment as `{}`?'
+
+CONFIG_LOAD_FAILED               = 'Unable to read the settings file: {}'
+CONFIG_LOAD_ERROR                = 'Setting file loading error: {}'
+CONFIG_TYPE_ERROR                = 'The setting file must be in lua or json format: {}'

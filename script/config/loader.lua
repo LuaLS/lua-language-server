@@ -26,13 +26,13 @@ function m.loadLocalConfig(filename)
     local ext  = path:extension():string():lower()
     local buf  = fsu.loadFile(path)
     if not buf then
-        errorMessage(lang.script('无法读取设置文件：{}', path:string()))
+        errorMessage(lang.script('CONFIG_LOAD_FAILED', path:string()))
         return
     end
     if ext == '.json' then
         local suc, res = pcall(json.decode, buf)
         if not suc then
-            errorMessage(lang.script('设置文件加载错误：{}', res))
+            errorMessage(lang.script('CONFIG_LOAD_ERROR', res))
             return
         end
         return res
@@ -41,12 +41,12 @@ function m.loadLocalConfig(filename)
             return assert(load(buf, '@' .. path:string(), 't'))()
         end)
         if not suc then
-            errorMessage(lang.script('设置文件加载错误：{}', res))
+            errorMessage(lang.script('CONFIG_LOAD_ERROR', res))
             return
         end
         return res
     else
-        errorMessage(lang.script('设置文件必须是lua或json格式：{}', path:string()))
+        errorMessage(lang.script('CONFIG_TYPE_ERROR', path:string()))
         return
     end
 end

@@ -232,3 +232,13 @@ WINDOW_CHECK_SEMANTIC            = '如果你正在使用市场中的颜色主�
 WINDOW_TELEMETRY_HINT            = '请允许发送匿名的使用数据与错误报告，帮助我们进一步完善此插件。在[此处](https://github.com/sumneko/lua-language-server/wiki/%E9%9A%90%E7%A7%81%E5%A3%B0%E6%98%8E)阅读我们的隐私声明。'
 WINDOW_TELEMETRY_ENABLE          = '允许'
 WINDOW_TELEMETRY_DISABLE         = '禁止'
+WINDOW_CLIENT_NOT_SUPPORT_CONFIG = '你的客户端不支持从服务侧修改设置，请手动修改如下设置：'
+WINDOW_MANUAL_CONFIG_ADD         = '为 `{key}` 添加值 `{value:q}`;'
+WINDOW_MANUAL_CONFIG_SET         = '将 `{key}` 的值设置为 `{value:q}`;'
+WINDOW_APPLY_WHIT_SETTING        = '应用并修改设置'
+WINDOW_APPLY_WHITOUT_SETTING     = '应用但不修改设置'
+WINDOW_ASK_APPLY_LIBRARY         = '是否需要将你的工作环境配置为 `{}` ？'
+
+CONFIG_LOAD_FAILED               = '无法读取设置文件：{}'
+CONFIG_LOAD_ERROR                = '设置文件加载错误：{}'
+CONFIG_TYPE_ERROR                = '设置文件必须是lua或json格式：{}'

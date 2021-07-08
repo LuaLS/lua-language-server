@@ -320,12 +320,11 @@ end
 local hasAsked
 local function askFor3rd(cfg)
     hasAsked = true
-    -- TODO: translate
-    local yes1 = lang.script['应用并修改设置']
-    local yes2 = lang.script['应用但不修改设置']
+    local yes1 = lang.script.WINDOW_APPLY_WHIT_SETTING
+    local yes2 = lang.script.WINDOW_APPLY_WHITOUT_SETTING
     local no   = lang.script.WINDOW_DONT_SHOW_AGAIN
     local result = client.awaitRequestMessage('Info'
-        , lang.script('是否需要将你的工作环境配置为 `{}` ？', cfg.name)
+        , lang.script('WINDOW_ASK_APPLY_LIBRARY', cfg.name)
         , {yes1, yes2, no}
     )
     if not result then

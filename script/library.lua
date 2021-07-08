@@ -259,6 +259,17 @@ local function loadSingle3rdConfig(libraryDir)
         cfg[k] = v
     end
 
+    if cfg.files then
+        for i, filename in ipairs(cfg.files) do
+            if plat.OS == 'Windows' then
+                filename = filename:lower():gsub('/', '\\')
+            else
+                filename = filename:gsub('\\', '/')
+            end
+            cfg.files[i] = filename
+        end
+    end
+
     return cfg
 end
 
@@ -361,9 +372,6 @@ local function check3rdByFileName(uri, configs)
             if cfg.files then
                 for _, filename in ipairs(cfg.files) do
                     await.delay()
-                    if plat.OS == 'Windows' then
-                        filename = filename:lower()
-                    end
                     if path:match(filename) then
                         askFor3rd(cfg)
                         return

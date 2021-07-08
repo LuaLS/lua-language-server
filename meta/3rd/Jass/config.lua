@@ -1,4 +1,3 @@
--- matched words
 words   = {'jass.common'}
 configs = {
     {

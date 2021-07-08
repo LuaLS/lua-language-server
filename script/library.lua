@@ -195,6 +195,9 @@ local function loadMetaLocale(langID, result)
 end
 
 local function initBuiltIn()
+    if not m.inited then
+        return
+    end
     local langID  = lang.id
     local version = config.get 'Lua.runtime.version'
     local metaPath = fs.path(METAPATH) / config.get 'Lua.runtime.meta':gsub('%$%{(.-)%}', {
@@ -241,15 +244,14 @@ local function loadSingle3rdConfig(libraryDir)
     end
 
     local env = setmetatable({}, { __index = _G })
-    assert(load(configText, '@' .. libraryDir:string(), 't', env))
+    assert(load(configText, '@' .. libraryDir:string(), 't', env))()
 
     local cfg = {}
 
     cfg.name = libraryDir:filename():string()
 
-    local pluginPath = ('${3rd}/%s/plugin.lua'):format('cfg.name')
-    if fs.exists(fs.path(pluginPath)) then
-        cfg.plugin = pluginPath
+    if fs.exists(libraryDir / 'plugin.lua') then
+        cfg.plugin = true
     end
 
     for k, v in pairs(env) do
@@ -282,11 +284,19 @@ local function apply3rd(cfg)
 
     if cfg.plugin then
         changes[#changes+1] = {
-            key    = 'Lua.workspace.library',
+            key    = 'Lua.runtime.plugin',
             action = 'set',
-            value  = cfg.plugin,
+            value  = ('${3rd}/%s/plugin.lua'):format(cfg.name),
         }
     end
+
+    changes[#changes+1] = {
+        key    = 'Lua.workspace.library',
+        action = 'add',
+        value  = ('${3rd}/%s/library.lua'):format(cfg.name),
+    }
+
+    client.setConfig(changes)
 end
 
 local hasAsked
@@ -302,13 +312,13 @@ local function askFor3rd(cfg)
     if not result then
         return nil
     end
-    client.setConfig {
-        {
-            key    = 'Lua.workspace.checkThirdParty',
-            action = 'set',
-            value  = false,
-        },
-    }
+    --client.setConfig {
+    --    {
+    --        key    = 'Lua.workspace.checkThirdParty',
+    --        action = 'set',
+    --        value  = false,
+    --    },
+    --}
     if result == yes then
         apply3rd(cfg)
     end
@@ -321,7 +331,7 @@ local function check3rdByWords(text, configs)
                 for _, word in ipairs(cfg.words) do
                     await.delay()
                     if text:match(word) then
-                        askFor3rd()
+                        askFor3rd(cfg)
                         return
                     end
                 end
@@ -366,6 +376,10 @@ files.watch(function (ev, uri)
 end)
 
 function m.init()
+    if m.inited then
+        return
+    end
+    m.inited = true
     initBuiltIn()
 end
 

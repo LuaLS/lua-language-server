@@ -218,6 +218,9 @@ function m.set(key, value)
     if not unit then
         return
     end
+    if util.equal(rawConfig[key], value) then
+        return
+    end
     if unit:checker(value) then
         update(key, unit:loader(value), value)
     else
@@ -236,6 +239,9 @@ function m.add(key, value)
     end
     local copyed = {}
     for i, v in ipairs(list) do
+        if util.equal(v, value) then
+            return
+        end
         copyed[i] = v
     end
     copyed[#copyed+1] = value

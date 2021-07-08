@@ -125,9 +125,7 @@ function m.getNativeMatcher()
     end
     -- config.get 'workspace.library'
     for path in pairs(config.get 'Lua.workspace.library') do
-        path = path:gsub('${(.-)}', {
-            meta = (ROOT / 'meta' / '3rd'):string(),
-        })
+        path = m.getAbsolutePath(path)
         log.info('Ignore by library:', path)
         pattern[#pattern+1] = path
     end
@@ -147,9 +145,7 @@ function m.getLibraryMatchers()
 
     local librarys = {}
     for path in pairs(config.get 'Lua.workspace.library') do
-        path = path:gsub('${(.-)}', {
-            meta = (ROOT / 'meta' / '3rd'):string(),
-        })
+        path = m.getAbsolutePath(path)
         librarys[m.normalize(path)] = true
     end
     if library.metaPath then

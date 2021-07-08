@@ -109,6 +109,7 @@ proto.on('workspace/didChangeConfiguration', function ()
 end)
 
 proto.on('workspace/didChangeWatchedFiles', function (params)
+    workspace.awaitReady()
     for _, change in ipairs(params.changes) do
         local uri = change.uri
         if not workspace.isWorkspaceUri(uri) then
@@ -191,6 +192,7 @@ proto.on('workspace/didRenameFiles', function (params)
 end)
 
 proto.on('textDocument/didOpen', function (params)
+    workspace.awaitReady()
     local doc   = params.textDocument
     local uri   = doc.uri
     local text  = doc.text
@@ -213,6 +215,7 @@ proto.on('textDocument/didClose', function (params)
 end)
 
 proto.on('textDocument/didChange', function (params)
+    workspace.awaitReady()
     local doc     = params.textDocument
     local changes = params.contentChanges
     local uri     = doc.uri

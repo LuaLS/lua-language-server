@@ -609,19 +609,34 @@ function m.isTrue(source, mark)
     if not source then
         return false
     end
-    local literals = m.searchLiterals(source, nil, mark)
-    for literal in pairs(literals) do
-        if literal ~= false then
-            return true
-        end
+    mark = mark or {}
+    if not mark.isTrue then
+        mark.isTrue = {}
     end
-    return false
+    if mark.isTrue[source] == nil then
+        local literals = m.searchLiterals(source, nil, mark)
+        for literal in pairs(literals) do
+            if literal ~= false then
+                mark.isTrue[source] = true
+                break
+            end
+        end
+        mark.isTrue[source] = false
+    end
+    return mark.isTrue[source]
 end
 
 ---判断对象的推断类型是否包含某个类型
 function m.hasType(source, tp, mark)
-    local infers = m.searchInfers(source, nil, mark)
-    return infers[tp] or false
+    mark = mark or {}
+    if not mark.hasType then
+        mark.hasType = {}
+    end
+    if mark.hasType[source] == nil then
+        local infers = m.searchInfers(source, nil, mark)
+        mark.hasType[source] = infers[tp] or false
+    end
+    return mark.hasType[source]
 end
 
 ---搜索并显示推断类型

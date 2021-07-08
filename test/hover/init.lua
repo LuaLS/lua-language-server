@@ -1613,3 +1613,19 @@ local t: {
     z: boolean,
 }
 ]]
+
+TEST [[
+<?a?>.b = 10 * 60
+]]
+[[
+global a: {
+    b: integer,
+}
+]]
+
+TEST [[
+a.<?b?> = 10 * 60
+]]
+[[
+global a.b: integer
+]]

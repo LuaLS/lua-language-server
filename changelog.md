@@ -1,6 +1,7 @@
 # changelog
 
 ## 2.2.0
+`2021-7-8`
 * `NEW` detect and apply third-party libraries, including:
   * OpenResty
   * Cocos4.0

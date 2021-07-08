@@ -23,6 +23,7 @@
 * `CHG` improve changing config from server side
 * `CHG` improve hover color
 * `CHG` improve performance
+* `CHG` telemetry: sends version of this extension
 * `FIX` supports for file with LF
 * `FIX` may infer a custom class as a string
 

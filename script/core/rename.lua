@@ -9,105 +9,6 @@ local noder      = require 'core.noder'
 
 local Forcing
 
-local function askForcing(str)
-    -- TODO 总是可以替换
-    do return true end
-    if TEST then
-        return true
-    end
-    if Forcing ~= nil then
-        return Forcing
-    end
-    local version = files.globalVersion
-    -- TODO
-    local item = proto.awaitRequest('window/showMessageRequest', {
-        type    = define.MessageType.Warning,
-        message = ('[%s]不是有效的标识符，是否强制替换？'):format(str),
-        actions = {
-            {
-                title = '强制替换',
-            },
-            {
-                title = '取消',
-            },
-        }
-    })
-    if version ~= files.globalVersion then
-        Forcing = false
-        proto.notify('window/showMessage', {
-            type    = define.MessageType.Warning,
-            message = '文件发生了变化，替换取消。'
-        })
-        return false
-    end
-    if not item then
-        Forcing = false
-        return false
-    end
-    if item.title == '强制替换' then
-        Forcing = true
-        return true
-    else
-        Forcing = false
-        return false
-    end
-end
-
-local function askForMultiChange(results, newname)
-    -- TODO 总是可以替换
-    do return true end
-    if TEST then
-        return true
-    end
-    local uris = {}
-    for _, result in ipairs(results) do
-        local uri = result.uri
-        if not uris[uri] then
-            uris[uri] = 0
-            uris[#uris+1] = uri
-        end
-        uris[uri] = uris[uri] + 1
-    end
-    if #uris <= 1 then
-        return true
-    end
-
-    local version = files.globalVersion
-    -- TODO
-    local item = proto.awaitRequest('window/showMessageRequest', {
-        type    = define.MessageType.Warning,
-        message = ('将修改 %d 个文件，共 %d 处。'):format(
-            #uris,
-            #results
-        ),
-        actions = {
-            {
-                title = '继续',
-            },
-            {
-                title = '放弃',
-            },
-        }
-    })
-    if version ~= files.globalVersion then
-        proto.notify('window/showMessage', {
-            type    = define.MessageType.Warning,
-            message = '文件发生了变化，替换取消。'
-        })
-        return false
-    end
-    if item and item.title == '继续' then
-        local fileList = {}
-        for _, uri in ipairs(uris) do
-            fileList[#fileList+1] = ('%s (%d)'):format(uri, uris[uri])
-        end
-
-        log.debug(('Renamed [%s]\r\n%s'):format(newname, table.concat(fileList, '\r\n')))
-        return true
-    end
-    return false
-end
-
 local function trim(str)
     return str:match '^%s*(%S+)%s*$'
 end
@@ -160,9 +61,7 @@ local function renameLocal(source, newname, callback)
         callback(source, source.start, source.finish, newname)
         return
     end
-    if askForcing(newname) then
-        callback(source, source.start, source.finish, newname)
-    end
+    callback(source, source.start, source.finish, newname)
 end
 
 local function renameField(source, newname, callback)
@@ -180,9 +79,6 @@ local function renameField(source, newname, callback)
         local newstr = '[' .. util.viewString(newname) .. ']'
         callback(source, source.start, source.finish, newstr)
     elseif parent.type == 'getmethod' then
-        if not askForcing(newname) then
-            return false
-        end
         callback(source, source.start, source.finish, newname)
     elseif parent.type == 'setmethod' then
         local uri  = guide.getUri(source)
@@ -212,9 +108,6 @@ local function renameGlobal(source, newname, callback)
         return true
     end
     if isValidFunctionName(newname) then
-        if not isFunctionGlobalName(source) then
-            askForcing(newname)
-        end
         callback(source, source.start, source.finish, newname)
         return true
     end
@@ -305,9 +198,6 @@ local function ofGlobal(source, newname, callback)
 end
 
 local function ofLabel(source, newname, callback)
-    if not isValidName(newname) and not askForcing(newname)then
-        return false
-    end
     for _, src in ipairs(vm.getRefs(source)) do
         callback(src, src.start, src.finish, newname)
     end
@@ -484,10 +374,6 @@ function m.rename(uri, pos, newname)
     end
 
     if #results == 0 then
-        return nil
-    end
-
-    if not askForMultiChange(results, newname) then
         return nil
     end
 

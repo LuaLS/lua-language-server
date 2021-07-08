@@ -1,6 +1,10 @@
 # changelog
 
 ## 2.2.0
+* `NEW` detect and apply third-party libraries, including:
+  * OpenResty
+  * Cocos4.0
+  * Jass
 * `NEW` `LuaDoc`: supports literal table:
     ```lua
     ---@generic T

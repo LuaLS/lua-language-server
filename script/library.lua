@@ -9,6 +9,7 @@ local fsu     = require 'fs-utility'
 local define  = require "proto.define"
 local files   = require 'files'
 local await   = require 'await'
+local timer   = require 'timer'
 
 local m = {}
 
@@ -293,7 +294,7 @@ local function load3rdConfig()
     return configs
 end
 
-local function apply3rd(cfg)
+local function apply3rd(cfg, localConfig)
     local changes = {}
     for _, change in ipairs(cfg.configs) do
         changes[#changes+1] = change
@@ -313,18 +314,19 @@ local function apply3rd(cfg)
         value  = ('${3rd}/%s/library'):format(cfg.name),
     }
 
-    client.setConfig(changes)
+    client.setConfig(changes, localConfig)
 end
 
 local hasAsked
 local function askFor3rd(cfg)
     hasAsked = true
     -- TODO: translate
-    local yes = lang.script['启用']
-    local no  = lang.script.WINDOW_DONT_SHOW_AGAIN
+    local yes1 = lang.script['应用并修改设置']
+    local yes2 = lang.script['应用但不修改设置']
+    local no   = lang.script.WINDOW_DONT_SHOW_AGAIN
     local result = client.awaitRequestMessage('Info'
-        , lang.script('是否需要将你的工作环境配置为 `{}` ？（这会修改你的工作区设置）', cfg.name)
-        , {yes, no}
+        , lang.script('是否需要将你的工作环境配置为 `{}` ？', cfg.name)
+        , {yes1, yes2, no}
     )
     if not result then
         return nil
@@ -336,8 +338,10 @@ local function askFor3rd(cfg)
             value  = false,
         },
     }
-    if result == yes then
-        apply3rd(cfg)
+    if result == yes1 then
+        apply3rd(cfg, true)
+    elseif result == yes2 then
+        apply3rd(cfg, false)
     end
 end
 
@@ -404,8 +408,17 @@ local function check3rdByFileName(uri, configs)
     end)
 end
 
+local lastCheckedUri = {}
+local function checkedUri(uri)
+    if  lastCheckedUri[uri]
+    and timer.clock() - lastCheckedUri[uri] < 5 then
+        return false
+    end
+    lastCheckedUri[uri] = timer.clock()
+    return true
+end
+
 local thirdConfigs
-local hasCheckedUri = {}
 local function check3rd(uri)
     if hasAsked then
         return
@@ -419,8 +432,7 @@ local function check3rd(uri)
     if not thirdConfigs then
         return
     end
-    if not hasCheckedUri[uri] then
-        hasCheckedUri[uri] = true
+    if checkedUri(uri) then
         if files.isLua(uri) then
             local text = files.getText(uri)
             check3rdByWords(text, thirdConfigs)

@@ -105,7 +105,8 @@ end
 ---@field uri?      uri
 
 ---@param changes config.change[]
-function m.setConfig(changes)
+---@param updateLocal boolean
+function m.setConfig(changes, updateLocal)
     local finalChanges = {}
     for _, change in ipairs(changes) do
         if change.action == 'add' then
@@ -119,6 +120,9 @@ function m.setConfig(changes)
                 finalChanges[#finalChanges+1] = change
             end
         end
+    end
+    if not updateLocal then
+        return
     end
     if #finalChanges == 0 then
         return

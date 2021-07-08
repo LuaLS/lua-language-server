@@ -81,7 +81,7 @@ end
 
 local function main()
     require 'utility'.enableCloseFunction()
-    require 'config'
+    require 'config'.init()
     require 'core.searcher'.debugMode = true
     require 'language' 'zh-cn'
     require 'library'.init()

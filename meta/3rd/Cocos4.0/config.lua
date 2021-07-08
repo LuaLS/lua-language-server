@@ -1,4 +1,4 @@
-files   = {'resty/redis%.lua'}
+files   = {'cocos'}
 configs = {
     {
         key    = 'Lua.runtime.version',

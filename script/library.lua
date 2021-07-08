@@ -259,6 +259,11 @@ local function loadSingle3rdConfig(libraryDir)
         cfg[k] = v
     end
 
+    if cfg.words then
+        for i, word in ipairs(cfg.words) do
+            cfg.words[i] = '()' .. word .. '()'
+        end
+    end
     if cfg.files then
         for i, filename in ipairs(cfg.files) do
             if plat.OS == 'Windows' then
@@ -266,7 +271,7 @@ local function loadSingle3rdConfig(libraryDir)
             else
                 filename = filename:gsub('\\', '/')
             end
-            cfg.files[i] = filename
+            cfg.files[i] = '()' .. filename .. '()'
         end
     end
 
@@ -336,6 +341,23 @@ local function askFor3rd(cfg)
     end
 end
 
+---@param a string
+---@param b string
+---@return boolean
+local function wholeMatch(a, b)
+    local pos1, pos2 = a:match(b)
+    if not pos1 then
+        return false
+    end
+    local left  = a:sub(pos1 - 1, pos1-1)
+    local right = a:sub(pos2, pos2)
+    if left:match '[%w_]'
+    or right:match '[%w_]' then
+        return false
+    end
+    return true
+end
+
 local function check3rdByWords(text, configs)
     if hasAsked then
         return
@@ -345,7 +367,7 @@ local function check3rdByWords(text, configs)
             if cfg.words then
                 for _, word in ipairs(cfg.words) do
                     await.delay()
-                    if text:match(word) then
+                    if wholeMatch(text, word) then
                         askFor3rd(cfg)
                         return
                     end
@@ -372,7 +394,7 @@ local function check3rdByFileName(uri, configs)
             if cfg.files then
                 for _, filename in ipairs(cfg.files) do
                     await.delay()
-                    if path:match(filename) then
+                    if wholeMatch(path, filename) then
                         askFor3rd(cfg)
                         return
                     end

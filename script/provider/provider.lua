@@ -1,7 +1,5 @@
 local util       = require 'utility'
 local cap        = require 'provider.capability'
-local completion = require 'provider.completion'
-local semantic   = require 'provider.semantic-tokens'
 local await      = require 'await'
 local files      = require 'files'
 local proto      = require 'proto.proto'
@@ -15,7 +13,6 @@ local furi       = require 'file-uri'
 local pub        = require 'pub'
 local fs         = require 'bee.filesystem'
 local lang       = require 'language'
-local plugin     = require 'plugin'
 local progress   = require 'progress'
 local tm         = require 'text-merger'
 local nonil      = require 'without-check-nil'
@@ -40,6 +37,7 @@ end
 
 proto.on('initialize', function (params)
     client.init(params)
+    config.init()
     workspace.initPath(params.rootUri)
     return {
         capabilities = cap.getIniter(),

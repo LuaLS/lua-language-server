@@ -305,7 +305,7 @@ function m.event(key, value, oldValue)
     if not m.delay then
         m.delay = {}
         timer.wait(0, function ()
-            local delay = {}
+            local delay = m.delay
             m.delay = nil
             for _, info in ipairs(delay) do
                 for _, callback in ipairs(m.watchList) do
@@ -330,7 +330,5 @@ function m.init()
         m.set(key, unit.default)
     end
 end
-
-m.init()
 
 return m

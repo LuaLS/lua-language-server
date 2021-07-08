@@ -1,3 +1,5 @@
+---@meta
+
 local m = {}
 
 function m.thisIsAnExampleLibrary()

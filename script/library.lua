@@ -293,7 +293,7 @@ local function apply3rd(cfg)
     changes[#changes+1] = {
         key    = 'Lua.workspace.library',
         action = 'add',
-        value  = ('${3rd}/%s/library.lua'):format(cfg.name),
+        value  = ('${3rd}/%s/library'):format(cfg.name),
     }
 
     client.setConfig(changes)
@@ -312,13 +312,13 @@ local function askFor3rd(cfg)
     if not result then
         return nil
     end
-    --client.setConfig {
-    --    {
-    --        key    = 'Lua.workspace.checkThirdParty',
-    --        action = 'set',
-    --        value  = false,
-    --    },
-    --}
+    client.setConfig {
+        {
+            key    = 'Lua.workspace.checkThirdParty',
+            action = 'set',
+            value  = false,
+        },
+    }
     if result == yes then
         apply3rd(cfg)
     end

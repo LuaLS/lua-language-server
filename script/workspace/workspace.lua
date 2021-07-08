@@ -436,7 +436,7 @@ function m.findUrisByRequirePath(path)
 end
 
 function m.normalize(path)
-    path = path:gsub('$$${(.-)$}', function (key)
+    path = path:gsub('%$%{(.-)%}', function (key)
         if key == '3rd' then
             return (ROOT / 'meta' / '3rd'):string()
         end

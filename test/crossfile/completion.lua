@@ -730,13 +730,6 @@ TEST {
 ```lua
 function (a: any, b: any)
 ```]],
-            additionalTextEdits = {
-                {
-                    start   = 1,
-                    finish  = 0,
-                    newText = 'local myfunc = require "myfunc"\n'
-                }
-            }
         }
     }
 }
@@ -767,13 +760,6 @@ TEST {
 ```lua
 function (a: any, b: any)
 ```]],
-            additionalTextEdits = {
-                {
-                    start   = 1,
-                    finish  = 0,
-                    newText = 'local myfunc = require "dir.myfunc"\n'
-                }
-            }
         }
     }
 }

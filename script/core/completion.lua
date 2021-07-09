@@ -1037,7 +1037,7 @@ local function mergeEnums(a, b, source)
                 textEdit    = source and {
                     start   = source.start,
                     finish  = source.finish,
-                    newText = label,
+                    newText = enum.insertText or label,
                 },
             }
             a[#a+1] = result

@@ -2588,3 +2588,29 @@ t.GGG$
         kind  = define.CompletionItemKind.Function,
     },
 }
+
+TEST [[
+---@param f fun(a: any, b: any):boolean
+local function f(f) end
+
+f(fun$)
+]]
+{
+    {
+        label    = 'fun(a: any, b: any):boolean',
+        kind     = define.CompletionItemKind.Function,
+        textEdit = {
+            newText = 'function (${1:a}, ${2:b})\n\t$0\nend',
+            start   = 68,
+            finish  = 70,
+        }
+    },
+    {
+        label = 'function',
+        kind  = define.CompletionItemKind.Keyword,
+    },
+    {
+        label = 'function ()',
+        kind  = define.CompletionItemKind.Snippet,
+    }
+}

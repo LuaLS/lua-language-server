@@ -1,6 +1,7 @@
 # changelog
 
 ## 2.2.3
+`2021-7-9`
 * `CHG` improve `auto require`
 * `CHG` will not sleep anymore
 * `FIX` incorrect doc: `debug.getlocal`

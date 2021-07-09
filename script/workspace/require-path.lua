@@ -39,19 +39,20 @@ function m.getVisiblePath(path, searchers, strict)
             local isAbsolute = searcher:match '^[/\\]'
                             or searcher:match '^%a+%:'
             local cutedPath = path
+            local currentPath = path
             local head
             local pos = 1
             if not isAbsolute then
                 if libraryPath then
                     pos = #libraryPath + 2
                 else
-                    path = workspace.getRelativePath(uri)
+                    currentPath = workspace.getRelativePath(uri)
                 end
             end
             repeat
-                cutedPath = path:sub(pos)
-                head = path:sub(1, pos - 1)
-                pos = path:match('[/\\]+()', pos)
+                cutedPath = currentPath:sub(pos)
+                head = currentPath:sub(1, pos - 1)
+                pos = currentPath:match('[/\\]+()', pos)
                 if platform.OS == 'Windows' then
                     searcher = searcher :gsub('[/\\]+', '\\')
                                         :gsub('^[/\\]+', '')

@@ -2,6 +2,7 @@
 
 ## 2.2.3
 * `CHG` improve `auto require`
+* `CHG` will not sleep anymore
 * `FIX` incorrect doc: `debug.getlocal`
 * `FIX` completion: incorrect callback
 * `FIX` [#592](https://github.com/sumneko/lua-language-server/issues/592)

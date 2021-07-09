@@ -160,17 +160,17 @@ function m.startTimer()
 end
 
 function m.pulse()
-    timer.loop(10, function ()
-        if not m.workingClock and not m.sleeping and time.monotonic() - m.idleClock >= 300000 then
-            m.sleeping = true
-            files.flushCache()
-            vm.flushCache()
-            ws.flushCache()
-            collectgarbage()
-            collectgarbage()
-        end
-        m.reportStatus()
-    end)
+    --timer.loop(10, function ()
+    --    if not m.workingClock and not m.sleeping and time.monotonic() - m.idleClock >= 300000 then
+    --        m.sleeping = true
+    --        files.flushCache()
+    --        vm.flushCache()
+    --        ws.flushCache()
+    --        collectgarbage()
+    --        collectgarbage()
+    --    end
+    --    m.reportStatus()
+    --end)
     timer.loop(0.1, function ()
         m.reportStatus()
     end)

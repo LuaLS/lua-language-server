@@ -1,6 +1,7 @@
 # changelog
 
 ## 2.2.2
+`2021-7-9`
 * `FIX` incorrect syntax color
 * `FIX` incorrect type infer
 

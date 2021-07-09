@@ -197,7 +197,9 @@ COMMAND_UNICODE_NAME       = '允许使用 Unicode 字符'
 COMMAND_JSON_TO_LUA        = 'JSON 转 Lua'
 COMMAND_JSON_TO_LUA_FAILED = 'JSON 转 Lua 失败：{}'
 
-COMPLETION_IMPORT_FROM  = '从 {} 中导入'
+COMPLETION_IMPORT_FROM           = '从 {} 中导入'
+COMPLETION_DISABLE_AUTO_REQUIRE  = '禁用自动require'
+COMPLETION_ASK_AUTO_REQUIRE      = '在文件顶部添加代码 require 此文件？'
 
 DEBUG_MEMORY_LEAK       = '{} 很抱歉发生了严重的内存泄漏，语言服务即将重启。'
 DEBUG_RESTART_NOW       = '立即重启'

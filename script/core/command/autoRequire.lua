@@ -46,11 +46,11 @@ local function askAutoRequire(visiblePaths)
         nameMap[select] = expect
         selects[#selects+1] = select
     end
-    local disable = lang.script('禁用自动require')
+    local disable = lang.script.COMPLETION_DISABLE_AUTO_REQUIRE
     selects[#selects+1] = disable
 
     local result = client.awaitRequestMessage('Info'
-        , lang.script('在文件顶部添加代码 require 此文件？')
+        , lang.script.COMPLETION_ASK_AUTO_REQUIRE
         , selects
     )
     if not result then

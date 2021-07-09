@@ -198,7 +198,9 @@ COMMAND_UNICODE_NAME       = 'Allow Unicode characters.'
 COMMAND_JSON_TO_LUA        = 'Convert JSON to Lua'
 COMMAND_JSON_TO_LUA_FAILED = 'Convert JSON to Lua failed: {}'
 
-COMPLETION_IMPORT_FROM  = 'Import from {}'
+COMPLETION_IMPORT_FROM           = 'Import from {}'
+COMPLETION_DISABLE_AUTO_REQUIRE  = 'Disable auto require'
+COMPLETION_ASK_AUTO_REQUIRE      = 'Add the code at the top of the file to require this file?'
 
 DEBUG_MEMORY_LEAK       = "{} I'm sorry for the serious memory leak. The language service will be restarted soon."
 DEBUG_RESTART_NOW       = 'Restart now'

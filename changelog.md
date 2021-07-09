@@ -1,6 +1,7 @@
 # changelog
 
 ## 2.2.3
+* `FIX` incorrect doc: `debug.getlocal`
 * `FIX` [#592](https://github.com/sumneko/lua-language-server/issues/592)
 
 ## 2.2.2

@@ -66,6 +66,7 @@ function debug.gethook(co) end
 ---@return debuginfo
 function debug.getinfo(thread, f, what) end
 
+---#if VERSION <= 5.1 then
 ---#DES 'debug.getlocal<5.1'
 ---@overload fun(level: integer, index: integer):string, any
 ---@param thread  thread
@@ -74,7 +75,7 @@ function debug.getinfo(thread, f, what) end
 ---@return string name
 ---@return any    value
 function debug.getlocal(thread, level, index) end
-
+---#else
 ---#DES 'debug.getlocal>5.2'
 ---@overload fun(f: integer|function, index: integer):string, any
 ---@param thread  thread
@@ -83,6 +84,7 @@ function debug.getlocal(thread, level, index) end
 ---@return string name
 ---@return any    value
 function debug.getlocal(thread, f, index) end
+---#end
 
 ---#DES 'debug.getmetatable'
 ---@param object any

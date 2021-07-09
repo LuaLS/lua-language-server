@@ -541,9 +541,9 @@ function m.searchInfers(source, field, mark)
                 end
             end
         end
-    end
-    if source.type == 'field' or source.type == 'method' then
-        searchInfer(source.parent, infers, mark)
+        if source.type == 'field' or source.type == 'method' then
+            searchInfer(source.parent, infers, mark)
+        end
     end
     for _, def in ipairs(defs) do
         searchInfer(def, infers, mark)

@@ -1629,3 +1629,12 @@ a.<?b?> = 10 * 60
 [[
 global a.b: integer
 ]]
+
+TEST [[
+a.<?b?>.c = 1 * 1
+]]
+[[
+global a.b: {
+    c: integer,
+}
+]]

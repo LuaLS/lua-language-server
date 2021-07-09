@@ -149,6 +149,26 @@ function m.setConfig(changes, onlyMemory)
     end
 end
 
+---@alias textEdit {start: integer, finish: integer, text: string}
+
+---@param uri   uri
+---@param edits textEdit[]
+function m.editText(uri, edits)
+    local files     = require 'files'
+    local textEdits = {}
+    uri = files.getOriginUri(uri)
+    for i, edit in ipairs(edits) do
+        textEdits[i] = define.textEdit(files.range(uri, edit.start, edit.finish), edit.text)
+    end
+    proto.request('workspace/applyEdit', {
+        edit = {
+            changes = {
+                [uri] = textEdits,
+            }
+        }
+    })
+end
+
 function m.init(t)
     log.debug('Client init', util.dump(t))
     m.info = t

@@ -689,6 +689,9 @@ proto.on('workspace/executeCommand', function (params)
     elseif command == 'lua.setConfig' then
         local core = require 'core.command.setConfig'
         return core(params.arguments[1])
+    elseif command == 'lua.autoRequire' then
+        local core = require 'core.command.autoRequire'
+        return core(params.arguments[1])
     end
 end)
 

@@ -84,6 +84,7 @@ function m.getIniter()
                 'lua.solve:'       .. sp:get_id(),
                 'lua.jsonToLua:'   .. sp:get_id(),
                 'lua.setConfig:'   .. sp:get_id(),
+                'lua.autoRequire:' .. sp:get_id(),
             },
         },
         foldingRangeProvider = true,

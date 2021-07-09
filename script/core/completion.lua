@@ -1,3 +1,4 @@
+local sp           = require 'bee.subprocess'
 local define       = require 'proto.define'
 local files        = require 'files'
 local searcher     = require 'core.searcher'
@@ -353,6 +354,17 @@ local function checkModule(ast, word, offset, results)
                 label  = stemName,
                 kind   = define.CompletionItemKind.Variable,
                 commitCharacters = {'.'},
+                command = {
+                    title     = 'autoRequire',
+                    command   = 'lua.autoRequire:' .. sp:get_id(),
+                    arguments = {
+                        {
+                            uri    = guide.getUri(ast.ast),
+                            target = originUri,
+                            name   = stemName,
+                        },
+                    },
+                },
                 id     = stack(function ()
                     return {
                         detail      = buildDetail(targetSource),
@@ -361,7 +373,7 @@ local function checkModule(ast, word, offset, results)
                             originUri
                         ))
                             .. '\n' .. buildDesc(targetSource),
-                        additionalTextEdits = buildInsertRequire(ast, originUri, stemName),
+                        --additionalTextEdits = buildInsertRequire(ast, originUri, stemName),
                     }
                 end)
             }

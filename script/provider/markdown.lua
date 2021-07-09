@@ -13,7 +13,7 @@ local function checkSplitLine(self)
         return
     end
 
-    self[#self+1] = '---'
+    self[#self+1] = '\n---'
 end
 
 function mt:add(language, text)

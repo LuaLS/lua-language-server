@@ -4,6 +4,8 @@ local client     = require 'client'
 local platform   = require 'bee.platform'
 local completion = require 'provider.completion'
 
+require 'provider.semantic-tokens'
+
 local m = {}
 
 local function testFileEvents(initer)

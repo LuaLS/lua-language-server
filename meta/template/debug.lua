@@ -109,7 +109,7 @@ function debug.getupvalue(f, up) end
 ---@return any
 ---@return boolean
 function debug.getuservalue(u, n) end
----#else
+---#elseif VERSION >= 5.2 then
 ---#DES 'debug.getuservalue<5.3'
 ---@param u userdata
 ---@return any
@@ -173,7 +173,7 @@ function debug.setupvalue(f, up, value) end
 ---@param n     integer
 ---@return userdata udata
 function debug.setuservalue(udata, value, n) end
----#else
+---#elseif VERSION >= 5.2 then
 ---#DES 'debug.setuservalue<5.3'
 ---@param udata userdata
 ---@param value any

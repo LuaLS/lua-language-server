@@ -1,5 +1,8 @@
 # changelog
 
+## 2.3.0
+* `FIX` `debug.getuservalue` and `debug.setuservalue` should not exist in `Lua 5.1`
+
 ## 2.2.3
 `2021-7-9`
 * `CHG` improve `auto require`

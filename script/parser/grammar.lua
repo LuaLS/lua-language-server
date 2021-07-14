@@ -270,10 +270,10 @@ StringClose <-  ']' =eq ']'
 ]]
 
 grammar 'Number' [[
-Number      <-  Sp ({} {~ '-'? NumberDef ~} {}) -> Number
+Number      <-  Sp ({} {'-'? NumberDef} {}) -> Number
                 NumberSuffix?
                 ErrNumber?
-NumberDef   <-  Number16 / Integer2 / Number10
+NumberDef   <-  Number16 / Number10
 NumberSuffix<-  ({} {[uU]? [lL] [lL]})      -> FFINumber
             /   ({} {[iI]})                 -> ImaginaryNumber
 ErrNumber   <-  ({} {([0-9a-zA-Z] / '.')+}) -> UnknownSymbol
@@ -293,9 +293,6 @@ Float16     <-  '.' X16+
             /   '.' ({} {Word*}) -> MustX16
 Float16Exp  <-  [pP] [+-]? [0-9]+
             /   ({} [pP] [+-]? {}) -> MissExponent
-
-Integer2    <-  ({} '0' [bB] {[01]+})
-            ->  Integer2
 ]]
 
 grammar 'Name' [[

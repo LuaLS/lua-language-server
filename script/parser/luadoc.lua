@@ -388,10 +388,9 @@ local function  parseTypeUnitFunction()
     return typeUnit
 end
 
-local function parseTypeUnitLiteralTable(parent)
+local function parseTypeUnitLiteralTable()
     local typeUnit = {
         type    = 'doc.type.ltable',
-        parent  = parent,
         start   = getStart(),
         fields  = {},
     }
@@ -450,6 +449,9 @@ local function parseTypeUnit(parent, content)
     local result
     if content == 'fun' then
         result = parseTypeUnitFunction()
+    end
+    if content == '{' then
+        result = parseTypeUnitLiteralTable()
     end
     if not result then
         result = {
@@ -565,7 +567,7 @@ function parseType(parent)
             end
         elseif tp == 'symbol' and content == '{' then
             nextToken()
-            local typeUnit = parseTypeUnitLiteralTable(result)
+            local typeUnit = parseTypeUnit(result, content)
             if not typeUnit then
                 break
             end

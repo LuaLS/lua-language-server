@@ -4,7 +4,8 @@
 * `NEW` `VSCode`: click the status bar icon to operate:
     * run workspace diagnostics
 * `FIX` `debug.getuservalue` and `debug.setuservalue` should not exist in `Lua 5.1`
-* `FIX` infer of `class[][]`
+* `FIX` infer of `---@type class[][]`
+* `FIX` infer of `---@type {}[]`
 
 ## 2.2.3
 `2021-7-9`

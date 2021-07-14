@@ -894,3 +894,10 @@ TEST 'string[][]' [[
 ---@type string[][]
 local <?t?>
 ]]
+
+TEST 'table' [[
+---@type {}[]
+local t
+
+local <?v?> = t[1]
+]]

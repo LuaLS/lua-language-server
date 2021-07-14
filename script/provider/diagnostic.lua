@@ -301,8 +301,8 @@ local function askForDisable()
     end
 end
 
-function m.diagnosticsAll()
-    if not config.get 'Lua.diagnostics.enable' then
+function m.diagnosticsAll(force)
+    if not force and not config.get 'Lua.diagnostics.enable' then
         m.clearAll()
         return
     end
@@ -310,7 +310,7 @@ function m.diagnosticsAll()
         return
     end
     local delay = config.get 'Lua.diagnostics.workspaceDelay' / 1000
-    if delay < 0 then
+    if not force and delay < 0 then
         return
     end
     await.close 'diagnosticsAll'

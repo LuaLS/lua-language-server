@@ -37,7 +37,6 @@ local function findInsertOffset(uri)
 end
 
 local function askAutoRequire(visiblePaths)
-    -- TODO: translate
     local selects = {}
     local nameMap = {}
     for _, visible in ipairs(visiblePaths) do

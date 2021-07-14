@@ -1,6 +1,8 @@
 # changelog
 
 ## 2.3.0
+* `NEW` `VSCode`: click the status bar icon to operate:
+    * run workspace diagnostics
 * `FIX` `debug.getuservalue` and `debug.setuservalue` should not exist in `Lua 5.1`
 
 ## 2.2.3

@@ -795,38 +795,17 @@ proto.on('$/didChangeVisibleRanges', function (params)
 end)
 
 proto.on('$/status/click', function ()
-    do return end
+    -- TODO: translate
     local titleDiagnostic = '进行工作区诊断'
-    local titleRestart    = '重启语言服务'
-    local result = proto.awaitRequest('window/showMessageRequest', {
-        type    = define.MessageType.Info,
-        message = '点击',
-        actions = {
-            {
-                title = titleDiagnostic,
-            },
-            {
-                title = titleRestart,
-            },
-        },
+    local result = client.awaitRequestMessage('Info', 'xxx', {
+        titleDiagnostic,
     })
     if not result then
         return
     end
-    if result.title == titleDiagnostic then
+    if result == titleDiagnostic then
         local diagnostic = require 'provider.diagnostic'
-        diagnostic.diagnosticsAll()
-        proto.notify('window/showMessage', {
-            type     = define.MessageType.Info,
-            message  = '诊断完成',
-        })
-    end
-    if result.title == titleRestart then
-        proto.notify('$/command', {
-            command   = 'extension.lua.doc',
-            data      = 'en-us/51/manual.html',
-        })
-        --os.exit(true)
+        diagnostic.diagnosticsAll(true)
     end
 end)
 

@@ -3,6 +3,7 @@
 ## 2.3.0
 * `NEW` `VSCode`: click the status bar icon to operate:
     * run workspace diagnostics
+* `FIX` loading workspace may hang
 * `FIX` `debug.getuservalue` and `debug.setuservalue` should not exist in `Lua 5.1`
 * `FIX` infer of `---@type class[][]`
 * `FIX` infer of `---@type {}[]`

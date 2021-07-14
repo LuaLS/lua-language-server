@@ -320,15 +320,28 @@ function m.awaitPreload()
         library.matcher:scan(library.path, libraryLoader)
     end
 
-    await.call(function ()
-        for _, loader in ipairs(progressData.loaders) do
-            loader()
-            await.delay()
+    local isLoadingFiles = false
+    local function loadSomeFiles()
+        if isLoadingFiles then
+            return
         end
-    end)
+        await.call(function ()
+            isLoadingFiles = true
+            while true do
+                local loader = table.remove(progressData.loaders)
+                if not loader then
+                    break
+                end
+                loader()
+                await.delay()
+            end
+            isLoadingFiles = false
+        end)
+    end
 
     log.info(('Found %d files.'):format(progressData.max))
     while true do
+        loadSomeFiles()
         log.info(('Loaded %d/%d files'):format(progressData.read, progressData.max))
         progressData:update()
         if progressData.read >= progressData.max then

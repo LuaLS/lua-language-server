@@ -231,7 +231,7 @@ local function getKey(source)
     elseif source.type == 'doc.type.field' then
         return 'dfield:' .. source.start
     elseif source.type == 'doc.type.array' then
-        return 'darray:' .. source.start
+        return 'darray:' .. source.finish
     elseif source.type == 'doc.type.function' then
         return 'dfun:' .. source.start, nil
     elseif source.type == 'doc.see.field' then

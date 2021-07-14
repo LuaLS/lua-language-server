@@ -889,3 +889,8 @@ local t
 
 <?t?>:getOwner()
 ]]
+
+TEST 'string[][]' [[
+---@type string[][]
+local <?t?>
+]]

@@ -48,6 +48,7 @@ debug.setcstacklimit(200)
 collectgarbage('generational', 5, 25)
 --collectgarbage('incremental', 120, 120, 0)
 
+---@diagnostic disable-next-line: lowercase-global
 log = require 'log'
 log.init(ROOT, fs.path(LOGPATH) / 'service.log')
 log.info('Lua Lsp startup, root: ', ROOT)

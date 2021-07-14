@@ -1,23 +1,5 @@
 // Just some comment
 {
-    "Lua.diagnostics.globals": [
-        "ERR",
-        "OUT",
-        "IN",
-        "log",
-        "_G",
-        "GC",
-        "ID",
-        "DEVELOP",
-        "DBGPORT",
-        "DBGWAIT",
-        "tracy",
-        "LOCALE",
-        "SHOWSOURCE",
-        "TRACE",
-        "FOOTPRINT",
-        "CONFIGPATH"
-    ],
     "Lua.diagnostics.disable": [
         "close-non-object",
     ],

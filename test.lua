@@ -16,6 +16,7 @@ METAPATH = METAPATH or (ROOT .. '/meta')
 
 collectgarbage 'generational'
 
+---@diagnostic disable-next-line: lowercase-global
 log = require 'log'
 log.init(ROOT, ROOT / 'log' / 'test.log')
 log.debug('测试开始')

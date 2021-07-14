@@ -4,9 +4,9 @@ local utf8Char    = utf8.char
 local tableUnpack = table.unpack
 local mathType    = math.type
 local tableRemove = table.remove
-local pairs       = pairs
 local tableSort   = table.sort
 local print       = print
+local tostring    = tostring
 
 _ENV = nil
 
@@ -612,6 +612,26 @@ local Defs = {
             }
         end
         lastNumber[1] = 0
+    end,
+    Integer2 = function (start, word)
+        if State.version ~= 'LuaJIT' then
+            PushError {
+                type    = 'UNSUPPORT_SYMBOL',
+                start   = start,
+                finish  = start + 1,
+                version = 'LuaJIT',
+                info    = {
+                    version = State.version,
+                }
+            }
+        end
+        local num = 0
+        for i = 1, #word do
+            if word:sub(i, i) == '1' then
+                num = num | (1 << (i - 1))
+            end
+        end
+        return tostring(num)
     end,
     Name = function (start, str, finish)
         local isKeyWord

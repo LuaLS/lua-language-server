@@ -6,6 +6,7 @@
 * `FIX` `debug.getuservalue` and `debug.setuservalue` should not exist in `Lua 5.1`
 * `FIX` infer of `---@type class[][]`
 * `FIX` infer of `---@type {}[]`
+* `FIX` [#597](https://github.com/sumneko/lua-language-server/issues/597)
 
 ## 2.2.3
 `2021-7-9`

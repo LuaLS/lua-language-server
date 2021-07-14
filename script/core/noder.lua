@@ -1009,9 +1009,11 @@ function m.compileNode(noders, source)
                     end
                 end
                 if doc.type == 'doc.vararg' then
-                    for _, param in ipairs(source.args) do
-                        if param.type == '...' then
-                            pushForward(noders, getID(param), getID(doc))
+                    if source.args then
+                        for _, param in ipairs(source.args) do
+                            if param.type == '...' then
+                                pushForward(noders, getID(param), getID(doc))
+                            end
                         end
                     end
                 end

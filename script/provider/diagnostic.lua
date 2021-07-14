@@ -169,7 +169,7 @@ function m.diagnostics(uri, diags)
         return
     end
 
-    core(uri, function (results)
+    xpcall(core, log.error, uri, function (results)
         if #results == 0 then
             return
         end

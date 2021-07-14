@@ -21,6 +21,9 @@ return function (uri, callback)
             if not call then
                 goto CONTINUE
             end
+            if call.type ~= 'call' then
+                return
+            end
             local func = call.node
             local args = call.args
             if args then

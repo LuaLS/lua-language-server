@@ -1264,6 +1264,9 @@ end
 ---@param root parser.guide.object
 ---@param id string
 function m.removeID(root, id)
+    if not id then
+        return
+    end
     root = guide.getRoot(root)
     local noders = root._noders
     noders[id] = nil

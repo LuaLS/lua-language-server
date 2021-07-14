@@ -1158,3 +1158,10 @@ TEST [[
 ---@type { x: number, y: number}
 ---| "'resume'"
 ]]
+
+TEST [[
+return {
+    1, <!2!>, 3,
+    [<!2!>] = 4,
+}
+]]

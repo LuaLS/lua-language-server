@@ -14,24 +14,30 @@ return function (uri, callback)
     guide.eachSourceType(ast.ast, 'table', function (source)
         for i = 1, #source do
             local field = source[i]
-            if field.type == 'call' then
-                local func = field.node
-                local args = field.args
-                if args then
-                    local funcLine = guide.positionOf(lines, func.finish)
-                    local argsLine = guide.positionOf(lines, args.start)
-                    if argsLine > funcLine then
-                        callback {
-                            start   = field.start,
-                            finish  = field.finish,
-                            message = lang.script('DIAG_PREFIELD_CALL'
-                                , text:sub(func.start, func.finish)
-                                , text:sub(args.start, args.finish)
-                            )
-                        }
-                    end
+            if field.type ~= 'tableexp' then
+                goto CONTINUE
+            end
+            local call = field.value
+            if not call then
+                goto CONTINUE
+            end
+            local func = call.node
+            local args = call.args
+            if args then
+                local funcLine = guide.positionOf(lines, func.finish)
+                local argsLine = guide.positionOf(lines, args.start)
+                if argsLine > funcLine then
+                    callback {
+                        start   = call.start,
+                        finish  = call.finish,
+                        message = lang.script('DIAG_PREFIELD_CALL'
+                            , text:sub(func.start, func.finish)
+                            , text:sub(args.start, args.finish)
+                        )
+                    }
                 end
             end
+            ::CONTINUE::
         end
     end)
 end

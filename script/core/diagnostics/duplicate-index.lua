@@ -15,13 +15,14 @@ return function (uri, callback)
         local mark = {}
         for _, obj in ipairs(source) do
             if obj.type == 'tablefield'
-            or obj.type == 'tableindex' then
+            or obj.type == 'tableindex'
+            or obj.type == 'tableexp' then
                 local name = noder.getID(obj)
                 if name and name:sub(-1) ~= '*' then
                     if not mark[name] then
                         mark[name] = {}
                     end
-                    mark[name][#mark[name]+1] = obj.field or obj.index
+                    mark[name][#mark[name]+1] = obj.field or obj.index or obj.value
                 end
             end
         end

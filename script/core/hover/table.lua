@@ -96,12 +96,20 @@ local function getKeyMap(fields)
         end
     end
     table.sort(keys, function (a, b)
-        local ta = typeSorter[type(a)]
-        local tb = typeSorter[type(b)]
-        if ta == tb then
-            return tostring(a) < tostring(b)
+        if a == b then
+            return false
+        end
+        local ta  = type(a)
+        local tb  = type(b)
+        local tsa = typeSorter[ta]
+        local tsb = typeSorter[tb]
+        if tsa == tsb then
+            if ta == 'boolean' then
+                return a == true
+            end
+            return a < b
         else
-            return ta < tb
+            return tsa < tsb
         end
     end)
     return keys

@@ -33,6 +33,7 @@ local type         = type
 ---@field typeGeneric           table<integer, parser.guide.object[]>
 ---@field tkey                  parser.guide.object
 ---@field tvalue                parser.guide.object
+---@field tindex                integer
 ---@field op                    parser.guide.object
 ---@field next                  parser.guide.object
 ---@field docParam              parser.guide.object
@@ -102,6 +103,7 @@ m.childMap = {
     ['table']       = {'#'},
     ['tableindex']  = {'index', 'value'},
     ['tablefield']  = {'field', 'value'},
+    ['tableexp']    = {'value'},
     ['function']    = {'args', '#'},
     ['funcargs']    = {'#'},
     ['setmethod']   = {'node', 'method', 'value'},
@@ -770,7 +772,8 @@ function m.isSet(source)
     or tp == 'setmethod'
     or tp == 'setindex'
     or tp == 'tablefield'
-    or tp == 'tableindex' then
+    or tp == 'tableindex'
+    or tp == 'tableexp' then
         return true
     end
     if tp == 'call' then
@@ -823,12 +826,12 @@ function m.getKeyNameOfLiteral(obj)
     elseif tp == 'number' then
         local n = obj[1]
         if n then
-            return ('%s'):format(formatNumber(obj[1]))
+            return formatNumber(obj[1])
         end
     elseif tp == 'integer' then
         local n = obj[1]
         if n then
-            return ('%s'):format(formatNumber(obj[1]))
+            return formatNumber(obj[1])
         end
     elseif tp == 'boolean' then
         local b = obj[1]
@@ -865,6 +868,8 @@ function m.getKeyName(obj)
     or     tp == 'setindex'
     or     tp == 'tableindex' then
         return m.getKeyNameOfLiteral(obj.index)
+    elseif tp == 'tableexp' then
+        return tostring(obj.tindex)
     elseif tp == 'field'
     or     tp == 'method'
     or     tp == 'doc.see.field' then
@@ -927,6 +932,8 @@ function m.getKeyType(obj)
     or     tp == 'setindex'
     or     tp == 'tableindex' then
         return m.getKeyTypeOfLiteral(obj.index)
+    elseif tp == 'tableexp' then
+        return 'integer'
     elseif tp == 'field'
     or     tp == 'method'
     or     tp == 'doc.see.field' then

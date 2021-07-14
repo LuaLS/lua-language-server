@@ -381,14 +381,17 @@ Table       <-  Sp ({} TL {| TableField* |} DirtyTR {})
             ->  Table
 TableField  <-  COMMA
             /   SEMICOLON
+            /   Dots
             /   NewIndex
             /   NewField
-            /   Exp->NoNil
+            /   TableExp
 Index       <-  BL DirtyExp DirtyBR
 NewIndex    <-  Sp ({} Index NeedAssign DirtyExp {})
             ->  NewIndex
 NewField    <-  Sp ({} MustName ASSIGN DirtyExp {})
             ->  NewField
+TableExp    <-  Sp ({} Exp {})
+            ->  TableExp
 
 ExpFunction <-  Function
             ->  ExpFunction

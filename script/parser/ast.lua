@@ -1095,6 +1095,7 @@ local Defs = {
         local wantField = true
         local lastStart = start + 1
         local fieldCount = 0
+        local n = 0
         for i = 1, #tbl do
             local field = tbl[i]
             if field.type == ',' or field.type == ';' then
@@ -1119,6 +1120,10 @@ local Defs = {
                 lastStart = field.finish + 1
                 fieldCount = fieldCount + 1
                 tbl[fieldCount] = field
+                if field.type == 'tableexp' then
+                    n = n + 1
+                    field.tindex = n
+                end
             end
         end
         for i = fieldCount + 1, #tbl do
@@ -1151,6 +1156,18 @@ local Defs = {
         if index then
             index.parent = obj
         end
+        return obj
+    end,
+    TableExp = function (start, value, finish)
+        if not value then
+            return
+        end
+        local obj = {
+            type   = 'tableexp',
+            start  = start,
+            finish = finish-1,
+            value  = value,
+        }
         return obj
     end,
     FuncArgs = function (start, args, finish)

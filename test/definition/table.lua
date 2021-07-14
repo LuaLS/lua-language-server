@@ -157,3 +157,9 @@ end
 local t = f()
 t.field1.<?x?>
 ]]
+
+TEST [[
+local t = { <!a!> }
+
+print(t[<?1?>])
+]]

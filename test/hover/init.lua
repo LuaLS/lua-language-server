@@ -818,7 +818,11 @@ local <?t?> = {
 }
 ]]
 [[
-local t: {}
+local t: {
+    [1]: string = "aaa",
+    [2]: string = "bbb",
+    [3]: string = "ccc",
+}
 ]]
 
 TEST [[
@@ -1636,5 +1640,27 @@ a.<?b?>.c = 1 * 1
 [[
 global a.b: {
     c: integer,
+}
+]]
+
+TEST [[
+local <?t?> = {
+    'a', 'b', 'c',
+    [10]  = 'd',
+    x     = 'e',
+    y     = 'f',
+    ['z'] = 'g',
+    [3]   = 'h',
+}
+]]
+[[
+local t: {
+    x: string = "e",
+    y: string = "f",
+    z: string = "g",
+    [1]: string = "a",
+    [2]: string = "b",
+    [3]: string = "c"|"h",
+    [10]: string = "d",
 }
 ]]

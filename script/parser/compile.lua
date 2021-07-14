@@ -198,6 +198,9 @@ local vmMap = {
         Compile(obj.index, obj)
         Compile(obj.value, obj)
     end,
+    ['tableexp'] = function (obj)
+        Compile(obj.value, obj)
+    end,
     ['index'] = function (obj)
         Compile(obj.index, obj)
     end,

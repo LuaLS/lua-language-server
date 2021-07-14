@@ -62,6 +62,7 @@ function m.pushResult(status, mode, source, force)
         or source.type == 'setindex'
         or source.type == 'tableindex'
         or source.type == 'tablefield'
+        or source.type == 'tableexp'
         or source.type == 'function'
         or source.type == 'table'
         or source.type == 'doc.class.name'
@@ -103,6 +104,7 @@ function m.pushResult(status, mode, source, force)
         or source.type == 'getindex'
         or source.type == 'tableindex'
         or source.type == 'tablefield'
+        or source.type == 'tableexp'
         or source.type == 'function'
         or source.type == 'table'
         or source.type == 'string'
@@ -874,10 +876,7 @@ end
 local function getField(status, source, mode)
     if source.type == 'table' then
         for _, field in ipairs(source) do
-            if field.type == 'tablefield'
-            or field.type == 'tableindex' then
-                m.pushResult(status, mode, field)
-            end
+            m.pushResult(status, mode, field)
         end
         return
     end

@@ -61,6 +61,19 @@ local function findNearestSource(ast, offset)
     return source
 end
 
+local function findNearestTableField(ast, offset)
+    local source
+    guide.eachSourceContain(ast.ast, offset, function (src)
+        if src.type == 'table'
+        or src.type == 'tablefield'
+        or src.type == 'tableindex'
+        or src.type == 'tableexp' then
+            source = src
+        end
+    end)
+    return source
+end
+
 local function findParent(ast, text, offset)
     for i = offset, 1, -1 do
         local char = text:sub(i, i)
@@ -1357,7 +1370,8 @@ local function checkTableLiteralField(ast, text, offset, tbl, fields, results)
     local mark = {}
     for _, field in ipairs(tbl) do
         if field.type == 'tablefield'
-        or field.type == 'tableindex' then
+        or field.type == 'tableindex'
+        or field.type == 'tableexp' then
             local name = guide.getKeyName(field)
             if name then
                 mark[name] = true
@@ -1397,7 +1411,7 @@ local function checkTableLiteralField(ast, text, offset, tbl, fields, results)
 end
 
 local function checkTableLiteralFieldByCall(ast, text, offset, call, defs, index, results)
-    local source = findNearestSource(ast, offset)
+    local source = findNearestTableField(ast, offset)
     if not source then
         return
     end
@@ -1459,7 +1473,7 @@ end
 
 local function tryTable(ast, text, offset, results)
     offset = lookBackward.skipSpace(text, offset)
-    local source = findNearestSource(ast, offset)
+    local source = findNearestTableField(ast, offset)
     if not source then
         return
     end

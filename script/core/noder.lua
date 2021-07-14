@@ -149,6 +149,8 @@ local function getKey(source)
         and    index.type ~= 'table' then
             return ANY_FIELD_CHAR, source.parent
         end
+    elseif source.type == 'tableexp' then
+        return tostring(source.tindex), source.parent
     elseif source.type == 'table' then
         return 't:' .. source.start, nil
     elseif source.type == 'label' then
@@ -1084,7 +1086,7 @@ function m.compileNode(noders, source)
                 elseif firstField.type == 'tableindex' then
                     pushForward(noders, keyID,   getID(firstField.index))
                     pushForward(noders, valueID, getID(firstField.value))
-                else
+                elseif firstField.type == 'tableexp' then
                     pushForward(noders, keyID,   'dn:integer')
                     pushForward(noders, valueID, getID(firstField))
                 end

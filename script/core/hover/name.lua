@@ -99,9 +99,10 @@ function buildName(source, oop)
     if source.type == 'doc.field' then
         return asDocField(source), oop
     end
-    local parent = source.parent
-    if parent then
-        return buildName(parent, oop)
+    if source.type == 'method'
+    or source.type == 'field'
+    or source.type == 'function' then
+        return buildName(source.parent, oop)
     end
     return nil, oop
 end

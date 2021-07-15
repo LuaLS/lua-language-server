@@ -121,8 +121,10 @@ function m.getNativeMatcher()
     -- config.get 'workspace.library'
     for path in pairs(config.get 'Lua.workspace.library') do
         path = m.getAbsolutePath(path)
-        log.info('Ignore by library:', path)
-        pattern[#pattern+1] = path
+        if path then
+            log.info('Ignore by library:', path)
+            pattern[#pattern+1] = path
+        end
     end
     -- config.get 'workspace.ignoreDir'
     for path in pairs(config.get 'Lua.workspace.ignoreDir') do
@@ -146,7 +148,9 @@ function m.getLibraryMatchers()
     local librarys = {}
     for path in pairs(config.get 'Lua.workspace.library') do
         path = m.getAbsolutePath(path)
-        librarys[m.normalize(path)] = true
+        if path then
+            librarys[m.normalize(path)] = true
+        end
     end
     if library.metaPath then
         librarys[m.normalize(library.metaPath)] = true
@@ -449,6 +453,9 @@ function m.findUrisByRequirePath(path)
 end
 
 function m.normalize(path)
+    if not path then
+        return nil
+    end
     path = path:gsub('%$%{(.-)%}', function (key)
         if key == '3rd' then
             return (ROOT / 'meta' / '3rd'):string()

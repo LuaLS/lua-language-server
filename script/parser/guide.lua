@@ -245,7 +245,16 @@ function m.getBlock(obj)
         end
         obj = obj.parent
     end
-    error('guide.getBlock overstack')
+    -- make stack
+    local stack = {}
+    for _ = 1, 10 do
+        stack[#stack+1] = ('%s:%s'):format(obj.type, obj.start)
+        obj = obj.parent
+        if not obj then
+            break
+        end
+    end
+    error('guide.getBlock overstack:' .. table.concat(stack, ' -> '))
 end
 
 --- 寻找所在父区块

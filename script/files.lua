@@ -721,15 +721,10 @@ function m.position(uri, offset, leftOrRight)
             line      = row - 1,
             character = ucol,
         }
-    elseif col == 1 then
-        return {
-            line      = row - 1,
-            character = 0,
-        }
     else
         return {
-            line      = row,
-            character = 0,
+            line      = row - 1,
+            character = util.utf8Len(text, start, finish),
         }
     end
 end

@@ -120,6 +120,7 @@ function m.setConfig(changes, onlyMemory)
                 finalChanges[#finalChanges+1] = change
             end
         end
+        change.uri = m.info.rootUri
     end
     if onlyMemory then
         return

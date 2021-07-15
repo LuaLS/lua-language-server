@@ -286,7 +286,6 @@ local function askForDisable()
                 key    = 'Lua.diagnostics.workspaceDelay',
                 action = 'set',
                 value  = delay * 1000,
-                uri    = ws.uri,
             }
         }
     elseif item.title == lang.script.WINDOW_DISABLE_DIAGNOSTIC then
@@ -295,7 +294,6 @@ local function askForDisable()
                 key    = 'Lua.diagnostics.workspaceDelay',
                 action = 'set',
                 value  = -1,
-                uri    = ws.uri,
             }
         }
     end

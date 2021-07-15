@@ -135,7 +135,7 @@ function m.updateConfig()
                     key      = 'Lua.telemetry.enable',
                     action   = 'set',
                     value    = true,
-                    isGlobal = true,
+                    global   = true,
                 }
             }
         elseif item.title == disableTitle then
@@ -144,7 +144,7 @@ function m.updateConfig()
                     key      = 'Lua.telemetry.enable',
                     action   = 'set',
                     value    = false,
-                    isGlobal = true,
+                    global   = true,
                 }
             }
         end

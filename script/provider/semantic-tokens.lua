@@ -69,7 +69,7 @@ local function enable()
                         key      = 'editor.semanticHighlighting.enabled',
                         action   = 'set',
                         value    = true,
-                        isGlobal = true,
+                        global   = true,
                     }
                 }
             end

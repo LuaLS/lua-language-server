@@ -80,26 +80,11 @@ function m.getNativeMatcher()
     end
 
     local pattern = {}
-    -- config.get 'workspace.ignoreDir'
-    for path in pairs(config.get 'Lua.workspace.ignoreDir') do
-        log.info('Ignore directory:', path)
-        pattern[#pattern+1] = path
-    end
     -- config.get 'files.exclude'
     for path, ignore in pairs(config.get 'files.exclude') do
         if ignore then
             log.info('Ignore by exclude:', path)
             pattern[#pattern+1] = path
-        end
-    end
-    -- config.get 'workspace.ignoreSubmodules'
-    if config.get 'Lua.workspace.ignoreSubmodules' then
-        local buf = pub.awaitTask('loadFile', furi.encode(m.path .. '/.gitmodules'))
-        if buf then
-            for path in buf:gmatch('path = ([^\r\n]+)') do
-                log.info('Ignore by .gitmodules:', path)
-                pattern[#pattern+1] = path
-            end
         end
     end
     -- config.get 'workspace.useGitIgnore'
@@ -123,10 +108,25 @@ function m.getNativeMatcher()
             end
         end
     end
+    -- config.get 'workspace.ignoreSubmodules'
+    if config.get 'Lua.workspace.ignoreSubmodules' then
+        local buf = pub.awaitTask('loadFile', furi.encode(m.path .. '/.gitmodules'))
+        if buf then
+            for path in buf:gmatch('path = ([^\r\n]+)') do
+                log.info('Ignore by .gitmodules:', path)
+                pattern[#pattern+1] = path
+            end
+        end
+    end
     -- config.get 'workspace.library'
     for path in pairs(config.get 'Lua.workspace.library') do
         path = m.getAbsolutePath(path)
         log.info('Ignore by library:', path)
+        pattern[#pattern+1] = path
+    end
+    -- config.get 'workspace.ignoreDir'
+    for path in pairs(config.get 'Lua.workspace.ignoreDir') do
+        log.info('Ignore directory:', path)
         pattern[#pattern+1] = path
     end
 

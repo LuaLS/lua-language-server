@@ -652,3 +652,18 @@ local t
 
 print(t.<?x?>)
 ]]
+
+TEST [[
+---@class A
+---@field <![1]!>? boolean
+local t
+
+print(t[<?1?>])
+]]
+
+TEST [[
+---@type { <![1]?: boolean!> }
+local t
+
+print(t[<?1?>])
+]]

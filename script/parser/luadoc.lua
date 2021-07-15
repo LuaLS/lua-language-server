@@ -12,7 +12,7 @@ Main                <-  (Token / Sp)*
 Sp                  <-  %s+
 X16                 <-  [a-fA-F0-9]
 Word                <-  [a-zA-Z0-9_]
-Token               <-  Name / String / Symbol
+Token               <-  Name / String / Symbol / Index
 Name                <-  ({} {[a-zA-Z0-9_] [a-zA-Z0-9_.*-]*} {})
                     ->  Name
 String              <-  ({} StringDef {})
@@ -50,6 +50,8 @@ Symbol              <-  ({} {
                         /   '...'
                         } {})
                     ->  Symbol
+Index               <-  ({} '[' Sp? {[0-9]+} Sp? ']' {})
+                    ->  Index
 ]], {
     s  = m.S' \t',
     ea = '\a',
@@ -99,6 +101,13 @@ Symbol              <-  ({} {
     Symbol = function (start, content, finish)
         Ci = Ci + 1
         TokenTypes[Ci]    = 'symbol'
+        TokenStarts[Ci]   = start
+        TokenFinishs[Ci]  = finish - 1
+        TokenContents[Ci] = content
+    end,
+    Index = function (start, content, finish)
+        Ci = Ci + 1
+        TokenTypes[Ci]    = 'index'
         TokenStarts[Ci]   = start
         TokenFinishs[Ci]  = finish - 1
         TokenContents[Ci] = content
@@ -176,6 +185,32 @@ local function parseName(tp, parent)
         finish = getFinish(),
         parent = parent,
         [1]    = nameText,
+    }
+    return class
+end
+
+local function parseIndexField(tp, parent)
+    local indexTp, indexText = peekToken()
+    if indexTp ~= 'index' then
+        return nil
+    end
+    nextToken()
+    local int = math.tointeger(indexText)
+    if not int then
+        int = 1
+        -- TODO: translate
+        pushError {
+            type   = 'LUADOC_INDEX_MUST_INT',
+            start  = getStart(),
+            finish = getFinish(),
+        }
+    end
+    local class = {
+        type   = tp,
+        start  = getStart(),
+        finish = getFinish(),
+        parent = parent,
+        [1]    = int,
     }
     return class
 end
@@ -407,6 +442,7 @@ local function parseTypeUnitLiteralTable()
 
         do
             field.name = parseName('doc.field.name', field)
+                    or   parseIndexField('doc.field.name', field)
             if not field.name then
                 pushError {
                     type   = 'LUADOC_MISS_FIELD_NAME',
@@ -777,6 +813,7 @@ local function parseField()
         return false
     end)
     result.field = parseName('doc.field.name', result)
+                or parseIndexField('doc.field.name', result)
     if not result.field then
         pushError {
             type   = 'LUADOC_MISS_FIELD_NAME',

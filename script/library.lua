@@ -218,7 +218,9 @@ local function initBuiltIn()
     end
     m.metaPath = metaPath:string()
     m.metaPaths = {}
-    fs.create_directories(metaPath)
+    if not fs.exists(metaPath) then
+        fs.create_directories(metaPath)
+    end
     local out = fsu.dummyFS()
     local templateDir = ROOT / 'meta' / 'template'
     for libName, status in pairs(define.BuiltIn) do

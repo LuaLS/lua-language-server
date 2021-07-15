@@ -129,12 +129,10 @@ function m.setConfig(changes, onlyMemory)
         return
     end
     if m.getOption 'changeConfiguration' then
-        for _, change in ipairs(finalChanges) do
-            proto.notify('$/command', {
-                command   = 'lua.config',
-                data      = change,
-            })
-        end
+        proto.notify('$/command', {
+            command   = 'lua.config',
+            data      = finalChanges,
+        })
     else
         local messages = {}
         messages[1] = lang.script('WINDOW_CLIENT_NOT_SUPPORT_CONFIG')

@@ -69,6 +69,10 @@ function m.close(uri)
     local originUri = uri
     uri = getUriKey(uri)
     m.openMap[uri] = nil
+    local file = m.fileMap[uri]
+    if file then
+        file.trusted = false
+    end
     m.onWatch('close', originUri)
 end
 

@@ -213,9 +213,6 @@ proto.on('textDocument/didOpen', function (params)
     local text  = doc.text
     log.debug('didOpen', uri)
     files.open(uri)
-    if not files.isOpen(uri) then
-        return
-    end
     files.setText(uri, text, true)
 end)
 
@@ -234,9 +231,6 @@ proto.on('textDocument/didChange', function (params)
     local doc     = params.textDocument
     local changes = params.contentChanges
     local uri     = doc.uri
-    if not files.isLua(uri) and not files.isOpen(uri) then
-        return
-    end
     --log.debug('changes', util.dump(changes))
     local text = tm(uri, changes)
     files.setText(uri, text, true)

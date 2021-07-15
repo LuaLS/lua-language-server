@@ -10,6 +10,14 @@
     ---@field [2] number
     ---@field [3] number
     ```
+* `NEW` hover: view array `local array = {'a', 'b', 'c'}`:
+    ```lua
+    local array: {
+        [1]: string = "a",
+        [2]: string = "b",
+        [3]: string = "c",
+    }
+    ```
 * `FIX` loading workspace may hang
 * `FIX` `debug.getuservalue` and `debug.setuservalue` should not exist in `Lua 5.1`
 * `FIX` infer of `---@type class[][]`

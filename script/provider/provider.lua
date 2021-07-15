@@ -35,6 +35,20 @@ local function updateConfig()
     log.debug('loaded config dump:', util.dump(new))
 end
 
+local function isValidLuaUri(uri)
+    if not files.isLua(uri) then
+        return false
+    end
+    if not files.isOpen(uri) then
+        return false
+    end
+    if  workspace.isIgnored(uri)
+    and not files.isLibrary(uri) then
+        return false
+    end
+    return true
+end
+
 proto.on('initialize', function (params)
     client.init(params)
     config.init()
@@ -127,9 +141,7 @@ proto.on('workspace/didChangeWatchedFiles', function (params)
             end
         elseif change.type == define.FileChangeType.Changed then
             -- 如果文件处于关闭状态，则立即更新；否则等待didChange协议来更新
-            if  files.isLua(uri)
-            and not files.isOpen(uri)
-            and (not workspace.isIgnored(uri) or files.isLibrary(uri)) then
+            if isValidLuaUri(uri) then
                 files.setText(uri, pub.awaitTask('loadFile', uri), false)
             else
                 local path = furi.decode(uri)
@@ -149,7 +161,7 @@ end)
 proto.on('workspace/didCreateFiles', function (params)
     log.debug('workspace/didCreateFiles', util.dump(params))
     for _, file in ipairs(params.files) do
-        if files.isLua(file.uri) then
+        if isValidLuaUri(file.uri) then
             files.setText(file.uri, pub.awaitTask('loadFile', file.uri), false)
         end
     end
@@ -173,7 +185,9 @@ proto.on('workspace/didRenameFiles', function (params)
         local text = files.getOriginText(file.oldUri)
         if text then
             files.remove(file.oldUri)
-            files.setText(file.newUri, text, false)
+            if isValidLuaUri(file.newUri) then
+                files.setText(file.newUri, text, false)
+            end
         end
         local childs = files.getChildFiles(file.oldUri)
         for _, uri in ipairs(childs) do
@@ -184,7 +198,9 @@ proto.on('workspace/didRenameFiles', function (params)
                 local nuri = file.newUri .. tail
                 log.debug('workspace/didRenameFiles#child', ouri, nuri)
                 files.remove(uri)
-                files.setText(nuri, text, false)
+                if isValidLuaUri(nuri) then
+                    files.setText(nuri, text, false)
+                end
             end
         end
     end

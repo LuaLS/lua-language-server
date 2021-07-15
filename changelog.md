@@ -8,6 +8,7 @@
 * `FIX` infer of `---@type class[][]`
 * `FIX` infer of `---@type {}[]`
 * `FIX` completion: displaying `@fenv` in `Lua 5.1`
+* `FIX` when a file is renamed, the file will still be loaded even if the new file name has been set to ignore
 * `FIX` [#596](https://github.com/sumneko/lua-language-server/issues/596)
 * `FIX` [#597](https://github.com/sumneko/lua-language-server/issues/597)
 * `FIX` [#598](https://github.com/sumneko/lua-language-server/issues/598)

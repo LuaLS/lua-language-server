@@ -133,7 +133,7 @@ local function findParentInStringIndex(ast, text, offset)
 end
 
 local function buildFunctionSnip(source, value, oop)
-    local name = getName(source):gsub('^.+[$.:]', '')
+    local name = (getName(source) or ''):gsub('^.+[$.:]', '')
     local args = getArg(value, oop)
     local id = 0
     args = args:gsub('[^,]+', function (arg)

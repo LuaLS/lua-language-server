@@ -10,6 +10,7 @@
 * `FIX` completion: displaying `@fenv` in `Lua 5.1`
 * `FIX` [#596](https://github.com/sumneko/lua-language-server/issues/596)
 * `FIX` [#597](https://github.com/sumneko/lua-language-server/issues/597)
+* `FIX` [#598](https://github.com/sumneko/lua-language-server/issues/598)
 
 ## 2.2.3
 `2021-7-9`

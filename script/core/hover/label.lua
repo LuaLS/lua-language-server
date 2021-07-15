@@ -16,7 +16,7 @@ local function asFunction(source, oop)
     local arg   = buildArg(source, oop)
     local rtn   = buildReturn(source)
     local lines = {}
-    lines[1] = ('function %s(%s)'):format(name, arg)
+    lines[1] = ('function %s(%s)'):format(name or '', arg)
     lines[2] = rtn
     return table.concat(lines, '\n')
 end
@@ -26,7 +26,7 @@ local function asDocFunction(source)
     local arg  = buildArg(source)
     local rtn  = buildReturn(source)
     local lines = {}
-    lines[1] = ('function %s(%s)'):format(name, arg)
+    lines[1] = ('function %s(%s)'):format(name or '', arg)
     lines[2] = rtn
     return table.concat(lines, '\n')
 end
@@ -45,7 +45,7 @@ local function asDocTypeName(source)
 end
 
 local function asValue(source, title)
-    local name    = buildName(source, false)
+    local name    = buildName(source, false) or ''
     local type    = infer.searchAndViewInfers(source)
     local literal = infer.searchAndViewLiterals(source)
     local cont

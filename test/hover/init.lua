@@ -1664,3 +1664,10 @@ local t: {
     [10]: string = "d",
 }
 ]]
+
+TEST [[
+function f1.f2.<?f3?>() end
+]]
+[[
+function f1.f2.f3()
+]]

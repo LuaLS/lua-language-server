@@ -23,7 +23,10 @@ local function asField(source, oop)
     if source.node.type ~= 'getglobal' then
         class = infer.getClass(source.node)
     end
-    local node = class or guide.getKeyName(source.node) or '?'
+    local node = class
+        or buildName(source.node, false)
+        or guide.getKeyName(source.node)
+        or '?'
     local method = guide.getKeyName(source)
     if oop then
         return ('%s:%s'):format(node, method)
@@ -100,7 +103,7 @@ function buildName(source, oop)
     if parent then
         return buildName(parent, oop)
     end
-    return '', oop
+    return nil, oop
 end
 
 return buildName

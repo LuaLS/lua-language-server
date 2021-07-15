@@ -888,11 +888,11 @@ function m.getKeyName(obj)
     elseif tp == 'doc.alias' then
         return obj.alias[1]
     elseif tp == 'doc.field' then
-        return obj.field[1]
+        return tostring(obj.field[1])
     elseif tp == 'doc.field.name' then
-        return obj[1]
+        return tostring(obj[1])
     elseif tp == 'doc.type.field' then
-        return obj.name[1]
+        return tostring(obj.name[1])
     elseif tp == 'dummy' then
         return obj[1]
     end
@@ -952,14 +952,14 @@ function m.getKeyType(obj)
     elseif tp == 'doc.alias' then
         return 'string'
     elseif tp == 'doc.field' then
-        return 'string'
+        return type(obj.field[1])
     elseif tp == 'doc.type.field' then
-        return 'string'
+        return type(obj.name[1])
     elseif tp == 'dummy' then
         return 'string'
     end
     if tp == 'doc.field.name' then
-        return 'string'
+        return type(obj[1])
     end
     return m.getKeyTypeOfLiteral(obj)
 end

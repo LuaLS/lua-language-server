@@ -398,7 +398,7 @@ local function checkModule(ast, word, offset, results)
     end
 end
 
-local function checkFieldFromFieldToIndex(name, parent, word, start, offset)
+local function checkFieldFromFieldToIndex(name, src, parent, word, start, offset)
     if name:match '^[%a_][%w_]*$' then
         return nil
     end
@@ -411,10 +411,16 @@ local function checkFieldFromFieldToIndex(name, parent, word, start, offset)
     else
         wordStart = offset - #word + 1
     end
+    local newText
+    if vm.getKeyType(src) == 'string' then
+        newText = ('[%q]'):format(name)
+    else
+        newText = ('[%s]'):format(name)
+    end
     textEdit = {
         start   = wordStart,
         finish  = offset,
-        newText = ('[%q]'):format(name),
+        newText = newText,
     }
     local nxt = parent.next
     if nxt then
@@ -487,7 +493,7 @@ local function checkFieldThen(name, src, word, start, offset, parent, oop, resul
             newText = name,
         }
     else
-        textEdit, additionalTextEdits = checkFieldFromFieldToIndex(name, parent, word, start, offset)
+        textEdit, additionalTextEdits = checkFieldFromFieldToIndex(name, src, parent, word, start, offset)
     end
     results[#results+1] = {
         label      = name,
@@ -509,7 +515,7 @@ local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, res
     local count = 0
     for _, src in ipairs(refs) do
         local name = vm.getKeyName(src)
-        if not name or vm.getKeyType(src) ~= 'string' then
+        if not name then
             goto CONTINUE
         end
         if isSameSource(ast, src, start) then

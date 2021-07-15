@@ -2615,3 +2615,53 @@ f(fun$)
         kind  = define.CompletionItemKind.Snippet,
     }
 }
+
+TEST [[
+---@type {[1]: number}
+local t
+
+t.$
+]]
+{
+    {
+        label    = '1',
+        kind     = define.CompletionItemKind.Field,
+        textEdit = {
+            newText = '[1]',
+            start   = 35,
+            finish  = 34,
+        },
+        additionalTextEdits = {
+            {
+                start   = 34,
+                finish  = 34,
+                newText = '',
+            },
+        },
+    }
+}
+
+TEST [[
+---@type {[1]: number}
+local t
+
+t.$
+]]
+{
+    {
+        label    = '1',
+        kind     = define.CompletionItemKind.Field,
+        textEdit = {
+            newText = '[1]',
+            start   = 35,
+            finish  = 34,
+        },
+        additionalTextEdits = {
+            {
+                start   = 34,
+                finish  = 34,
+                newText = '',
+            },
+        },
+    }
+}

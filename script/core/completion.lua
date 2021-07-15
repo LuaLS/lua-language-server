@@ -290,6 +290,9 @@ local function checkLocal(ast, word, offset, results)
         if not matchKey(word, name) then
             goto CONTINUE
         end
+        if name:sub(1, 1) == '@' then
+            goto CONTINUE
+        end
         if infer.hasType(source, 'function') then
             for _, def in ipairs(vm.getDefs(source)) do
                 if def.type == 'function'

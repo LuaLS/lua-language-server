@@ -7,6 +7,7 @@
 * `FIX` `debug.getuservalue` and `debug.setuservalue` should not exist in `Lua 5.1`
 * `FIX` infer of `---@type class[][]`
 * `FIX` infer of `---@type {}[]`
+* `FIX` completion: displaying `@fenv` in `Lua 5.1`
 * `FIX` [#596](https://github.com/sumneko/lua-language-server/issues/596)
 * `FIX` [#597](https://github.com/sumneko/lua-language-server/issues/597)
 

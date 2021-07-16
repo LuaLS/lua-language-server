@@ -2723,3 +2723,17 @@ f('$')
         },
     },
 }
+
+TEST [[
+---@class Class
+---@field on fun()
+local c
+
+c:$
+]]
+{
+    {
+        label = 'on',
+        kind  = define.CompletionItemKind.Field,
+    }
+}

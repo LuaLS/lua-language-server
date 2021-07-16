@@ -477,7 +477,7 @@ local function checkFieldThen(name, src, word, start, offset, parent, oop, resul
         })
         return
     end
-    if oop then
+    if oop and not infer.hasType(src, 'function') then
         return
     end
     local literal = guide.getLiteral(value)

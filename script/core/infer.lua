@@ -635,6 +635,14 @@ function m.hasType(source, tp, mark)
     if mark.hasType[source] == nil then
         local infers = m.searchInfers(source, nil, mark)
         mark.hasType[source] = infers[tp] or false
+        if tp == 'function' and not infers[tp] then
+            for infer in pairs(infers) do
+                if infer:sub(1, 4) == 'fun(' then
+                    mark.hasType[source] = true
+                    break
+                end
+            end
+        end
     end
     return mark.hasType[source]
 end

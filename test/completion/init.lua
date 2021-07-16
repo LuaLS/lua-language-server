@@ -2665,3 +2665,34 @@ t.$
         },
     }
 }
+
+TEST [[
+---@alias enum '"aaa"'|'"bbb"'
+
+---@param x enum
+---@return enum
+local function f(x)
+end
+
+local r = f('$')
+]]
+{
+    {
+        label = "'aaa'",
+        kind  = define.CompletionItemKind.EnumMember,
+        textEdit = {
+            newText = "'aaa'",
+            start   = 103,
+            finish  = 104,
+        },
+    },
+    {
+        label = "'bbb'",
+        kind  = define.CompletionItemKind.EnumMember,
+        textEdit = {
+            newText = "'bbb'",
+            start   = 103,
+            finish  = 104,
+        },
+    },
+}

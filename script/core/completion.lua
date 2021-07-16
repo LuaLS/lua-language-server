@@ -1140,39 +1140,29 @@ local function checkEqualEnum(ast, text, offset, results)
 end
 
 local function checkEqualEnumInString(ast, text, offset, results)
-    local list = {}
-    guide.eachSourceContain(ast.ast, offset, function (source)
-        if source.type == 'binary' then
-            if source.op.type == '=='
-            or source.op.type == '~=' then
-                list[#list+1] = source[1]
-            end
-        end
-        if not source.start then
+    local source = findNearestSource(ast, offset)
+    local parent = source.parent
+    if parent.type == 'binary' then
+        if source ~= parent[2] then
             return
         end
-        if  source.start <= offset
-        and source.finish >= offset then
-            local parent = source.parent
-            if not parent then
-                return
-            end
-            if parent.type == 'local' then
-                list[#list+1] = parent
-            end
-            if parent.type == 'setlocal'
-            or parent.type == 'setglobal'
-            or parent.type == 'setfield'
-            or parent.type == 'setindex' then
-                list[#list+1] = parent.node
-            end
+        if not parent.op then
+            return
         end
-    end)
-    table.sort(list, function (a, b)
-        return a.start > b.start
-    end)
-    local source = list[1]
-    checkEqualEnumLeft(ast, text, offset, source, results)
+        if parent.op.type ~= '==' and parent.op.type ~= '~=' then
+            return
+        end
+        checkEqualEnumLeft(ast, text, offset, parent[1], results)
+    end
+    if parent.type == 'local' then
+        checkEqualEnumLeft(ast, text, offset, parent, results)
+    end
+    if parent.type == 'setlocal'
+    or parent.type == 'setglobal'
+    or parent.type == 'setfield'
+    or parent.type == 'setindex' then
+        checkEqualEnumLeft(ast, text, offset, parent.node, results)
+    end
 end
 
 local function isFuncArg(ast, offset)

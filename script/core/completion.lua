@@ -1301,7 +1301,7 @@ local function pushCallEnumsAndFuncs(defs)
     return results
 end
 
-local function getCallEnumsAndFuncs(source, index)
+local function getCallEnumsAndFuncs(source, index, oop)
     if source.type == 'function' and source.bindDocs then
         if not source.args then
             return
@@ -1328,6 +1328,20 @@ local function getCallEnumsAndFuncs(source, index)
         end
     end
     if source.type == 'doc.type.function' then
+        --[[
+        always use literal index, that is:
+        ```
+        ---@class Class
+        ---@field f(x: number, y: boolean)
+        local c
+
+        c.f(1, true) -- correct
+        c:f(1, true) -- also correct
+        ```
+        --]]
+        if oop then
+            index = index - 1
+        end
         local arg = source.args[index]
         if arg then
             return pushCallEnumsAndFuncs(vm.getDefs(arg.extends))
@@ -1349,14 +1363,15 @@ end
 
 local function getCallArgInfo(call, text, offset)
     if not call.args then
-        return 1, nil
+        return 1, nil, nil
     end
+    local oop = call.node.type == 'getmethod'
     for index, arg in ipairs(call.args) do
         if arg.start <= offset and arg.finish >= offset then
-            return index, arg
+            return index, arg, oop
         end
     end
-    return #call.args + 1, nil
+    return #call.args + 1, nil, oop
 end
 
 local function getFuncParamByCallIndex(func, index)
@@ -1458,14 +1473,14 @@ local function tryCallArg(ast, text, offset, results)
         return
     end
     local myResults = {}
-    local argIndex, arg = getCallArgInfo(call, text, offset)
+    local argIndex, arg, oop = getCallArgInfo(call, text, offset)
     if arg and arg.type == 'function' then
         return
     end
     local defs = vm.getDefs(call.node)
     for _, def in ipairs(defs) do
         def = searcher.getObjectValue(def) or def
-        local enums = getCallEnumsAndFuncs(def, argIndex)
+        local enums = getCallEnumsAndFuncs(def, argIndex, oop)
         if enums then
             mergeEnums(myResults, enums, arg)
         end

@@ -2737,3 +2737,21 @@ c:$
         kind  = define.CompletionItemKind.Field,
     }
 }
+
+TEST [[
+---@class Class
+---@field on fun(x: "'aaa'"|"'bbb'")
+local c
+
+c:on($)
+]]
+(EXISTS)
+
+TEST [[
+---@class Class
+---@field on fun(x: "'aaa'"|"'bbb'")
+local c
+
+c:on('$')
+]]
+(EXISTS)

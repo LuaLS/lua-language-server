@@ -1,6 +1,7 @@
 # changelog
 
 ## 2.3.0
+`2021-7-16`
 * `NEW` `VSCode`: click the status bar icon to operate:
     * run workspace diagnostics
 * `NEW` `LuaDoc`: supports `[1]` as field:

@@ -18,6 +18,13 @@
         [3]: string = "c",
     }
     ```
+* `NEW` completion: supports enums in `fun()`
+    ```lua
+    ---@type fun(x: "'aaa'"|"'bbb'")
+    local f
+
+    f(--[[show `'aaa'` and `'bbb'` here]])
+    ```
 * `FIX` loading workspace may hang
 * `FIX` `debug.getuservalue` and `debug.setuservalue` should not exist in `Lua 5.1`
 * `FIX` infer of `---@type class[][]`

@@ -1327,6 +1327,12 @@ local function getCallEnumsAndFuncs(source, index)
             end
         end
     end
+    if source.type == 'doc.type.function' then
+        local arg = source.args[index]
+        if arg then
+            return pushCallEnumsAndFuncs(vm.getDefs(arg.extends))
+        end
+    end
 end
 
 local function findCall(ast, text, offset)

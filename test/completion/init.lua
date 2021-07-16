@@ -2696,3 +2696,30 @@ local r = f('$')
         },
     },
 }
+
+TEST [[
+---@type fun(x: "'aaa'"|"'bbb'")
+local f
+
+f('$')
+]]
+{
+    {
+        label = "'aaa'",
+        kind  = define.CompletionItemKind.EnumMember,
+        textEdit = {
+            newText = "'aaa'",
+            start   = 45,
+            finish  = 46,
+        },
+    },
+    {
+        label = "'bbb'",
+        kind  = define.CompletionItemKind.EnumMember,
+        textEdit = {
+            newText = "'bbb'",
+            start   = 45,
+            finish  = 46,
+        },
+    },
+}

@@ -1343,7 +1343,7 @@ local function getCallEnumsAndFuncs(source, index, oop)
             index = index - 1
         end
         local arg = source.args[index]
-        if arg then
+        if arg and arg.extends then
             return pushCallEnumsAndFuncs(vm.getDefs(arg.extends))
         end
     end

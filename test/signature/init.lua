@@ -287,3 +287,20 @@ x(aaaa  ,    2     $)
     label = "function x(a: any, b: any)",
     arg = {20, 25},
 }
+
+TEST [[
+local fooC
+
+---test callback
+---@param callback fun(x:number, s:string):nil @callback
+---@param par number @par
+function fooC(callback, par) end
+
+fooC(function (x, s)
+    
+end,$)
+]]
+{
+    label = 'function fooC(callback: fun(x: number, s: string):nil, par: number)',
+    arg   = {56, 66},
+}

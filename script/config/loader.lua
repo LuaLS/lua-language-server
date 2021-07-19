@@ -17,12 +17,7 @@ end
 local m = {}
 
 function m.loadLocalConfig(filename)
-    local path = fs.path(filename)
-    if path:is_relative() then
-        if workspace.path then
-            path = fs.path(workspace.path) / path
-        end
-    end
+    local path = fs.path(workspace.getAbsolutePath(filename))
     local ext  = path:extension():string():lower()
     local buf  = fsu.loadFile(path)
     if not buf then

@@ -1,6 +1,7 @@
 # changelog
 
 ## 2.3.1
+* `CHG` path in config supports `~/xxxx`
 * `FIX` [#606](https://github.com/sumneko/lua-language-server/issues/606)
 * `FIX` [#607](https://github.com/sumneko/lua-language-server/issues/607)
 

@@ -13,6 +13,7 @@ local progress   = require 'progress'
 local define     = require "proto.define"
 local client     = require 'client'
 local plugin     = require 'plugin'
+local util       = require 'utility'
 
 local m = {}
 m.type = 'workspace'
@@ -460,6 +461,7 @@ function m.normalize(path)
             return (ROOT / 'meta' / '3rd'):string()
         end
     end)
+    path = util.expandPath(path)
     if platform.OS == 'Windows' then
         path = path:gsub('[/\\]+', '\\')
                    :gsub('[/\\]+$', '')
@@ -485,10 +487,15 @@ function m.getAbsolutePath(path)
     return path
 end
 
----@param uri uri
+---@param uriOrPath uri|string
 ---@return string
-function m.getRelativePath(uri)
-    local path = furi.decode(uri)
+function m.getRelativePath(uriOrPath)
+    local path
+    if uriOrPath:sub(1, 5) == 'file:' then
+        path = furi.decode(uriOrPath)
+    else
+        path = uriOrPath
+    end
     if not m.path then
         local relative = m.normalize(path)
         return relative:gsub('^[/\\]+', '')

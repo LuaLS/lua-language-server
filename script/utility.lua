@@ -16,6 +16,7 @@ local mathAbs      = math.abs
 local mathRandom   = math.random
 local ioOpen       = io.open
 local utf8Len      = utf8.len
+local getenv       = os.getenv
 local mathHuge     = math.huge
 local inf          = 1 / 0
 local nan          = 0 / 0
@@ -632,6 +633,18 @@ function m.trim(str, mode)
         return str:gsub('%s+$', '')
     end
     return str:match '^%s*(%S+)%s*$'
+end
+
+function m.expandPath(path)
+    if path:sub(1, 1) == '~' then
+        local home = getenv('HOME')
+        if not home then -- has to be Windows
+            home = getenv 'USERPROFILE' or (getenv 'HOMEDRIVE' .. getenv 'HOMEPATH')
+        end
+        return home .. path:sub(2)
+    else
+        return path
+    end
 end
 
 return m

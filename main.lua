@@ -2,19 +2,8 @@ local currentPath = debug.getinfo(1, 'S').source:sub(2)
 local rootPath = currentPath:gsub('[/\\]*[^/\\]-$', '')
 rootPath = (rootPath == '' and '.' or rootPath)
 loadfile(rootPath .. '/platform.lua')('script')
-local fs = require 'bee.filesystem'
-
-local function expanduser(path)
-    if path:sub(1, 1) == '~' then
-        local home = os.getenv('HOME')
-        if not home then -- has to be Windows
-            home = os.getenv 'USERPROFILE' or (os.getenv 'HOMEDRIVE' .. os.getenv 'HOMEPATH')
-        end
-        return home .. path:sub(2)
-    else
-        return path
-    end
-end
+local fs   = require 'bee.filesystem'
+local util = require 'utility'
 
 local function loadArgs()
     for _, v in ipairs(arg) do
@@ -39,9 +28,9 @@ end
 
 loadArgs()
 
-ROOT     = fs.path(expanduser(rootPath))
-LOGPATH  = LOGPATH  and expanduser(LOGPATH)  or (ROOT:string() .. '/log')
-METAPATH = METAPATH and expanduser(METAPATH) or (ROOT:string() .. '/meta')
+ROOT     = fs.path(util.expandPath(rootPath))
+LOGPATH  = LOGPATH  and util.expandPath(LOGPATH)  or (ROOT:string() .. '/log')
+METAPATH = METAPATH and util.expandPath(METAPATH) or (ROOT:string() .. '/meta')
 
 ---@diagnostic disable-next-line: deprecated
 debug.setcstacklimit(200)

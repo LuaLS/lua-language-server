@@ -577,6 +577,17 @@ function m.getFile(uri)
         or m.dllMap[uri]
 end
 
+---@param text string
+local function isNameChar(text)
+    if text:match '^[\xC2-\xFD][\x80-\xBF]*$' then
+        return true
+    end
+    if text:match '^[%w_]+$' then
+        return true
+    end
+    return false
+end
+
 ---@alias position table
 
 --- 获取 position 对应的光标位置
@@ -595,13 +606,23 @@ function m.offset(uri, position, isFinish)
         lines = m.getOriginLines(uri)
         text  = m.getOriginText(uri)
     end
-    local row    = position.line + 1
-    local start  = guide.lineRange(lines, row)
+    local row = position.line + 1
+    local start, finish = guide.lineRange(lines, row)
+    local char = position.character
+    local utf8Len = utf8.len(text, start, finish)
     local offset
-    if start <= 0 or start > #text then
-        offset = #text + 1
+    if char <= 0 then
+        offset = start
+    elseif char >= utf8Len then
+        offset = finish
     else
-        offset = utf8.offset(text, position.character + 1, start) or #text
+        local left  = utf8.offset(text, char,     start)
+        local right = utf8.offset(text, char + 1, start)
+        if isFinish then
+            offset = left
+        else
+            offset = right
+        end
     end
     if file._diffInfo then
         local start, finish = smerger.getOffset(file._diffInfo, offset)
@@ -629,17 +650,24 @@ function m.offsetOfWord(uri, position)
         lines = m.getOriginLines(uri)
         text  = m.getOriginText(uri)
     end
-    local row    = position.line + 1
-    local start  = guide.lineRange(lines, row)
+    local row = position.line + 1
+    local start, finish = guide.lineRange(lines, row)
+    local char = position.character
+    local utf8Len = utf8.len(text, start, finish)
     local offset
-    if start <= 0 or start > #text then
-        offset = math.maxinteger
+    if char <= 0 then
+        offset = start
+    elseif char >= utf8Len then
+        offset = finish
     else
-        offset = utf8.offset(text, position.character + 1, start) or #text
-    end
-    if offset > #text
-    or text:sub(offset-1, offset):match '[%w_][^%w_]' then
-        offset = offset - 1
+        local left  = utf8.offset(text, char,     start)
+        local right = utf8.offset(text, char + 1, start)
+        if  isNameChar(text:sub(left, right - 1))
+        and not isNameChar(text:sub(right, right)) then
+            offset = left
+        else
+            offset = right
+        end
     end
     if file._diffInfo then
         offset = smerger.getOffset(file._diffInfo, offset)

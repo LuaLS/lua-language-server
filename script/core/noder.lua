@@ -264,7 +264,7 @@ local function getNodeKey(source)
         return getNodeKey(methodNode)
     end
     local key, node = getKey(source)
-    if guide.isGlobal(source) then
+    if key and guide.isGlobal(source) then
         return 'g:' .. key, nil
     end
     return key, node

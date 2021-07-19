@@ -643,7 +643,7 @@ function parseType(parent)
                 return false
             end
             local line = Lines[row + i + 1]
-            if line.finish < nextComm.start then
+            if not line or line.finish < nextComm.start then
                 return false
             end
             if nextComm.text:sub(1, 2) == '-@' then

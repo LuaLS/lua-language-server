@@ -333,6 +333,9 @@ return function (uri, offset)
             else
                 return
             end
+            if not target then
+                return
+            end
             results[#results+1] = {
                 start  = target.start,
                 finish = target.finish,

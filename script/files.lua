@@ -607,15 +607,22 @@ function m.offset(uri, position, isFinish)
         text  = m.getOriginText(uri)
     end
     local row = position.line + 1
-    local start, finish = guide.lineRange(lines, row)
-    local char = position.character
+    local start, finish, char
+    if row > #lines then
+        start, finish = guide.lineRange(lines, #lines)
+        char = utf8.len(text, start, finish)
+    else
+        start, finish = guide.lineRange(lines, row)
+        char = position.character
+    end
     local utf8Len = utf8.len(text, start, finish)
     local offset
     if char <= 0 then
         offset = start
-    elseif char >= utf8Len then
-        offset = finish
     else
+        if char >= utf8Len then
+            char = utf8Len
+        end
         local left  = utf8.offset(text, char,     start)
         local right = utf8.offset(text, char + 1, start)
         if isFinish then
@@ -651,15 +658,22 @@ function m.offsetOfWord(uri, position)
         text  = m.getOriginText(uri)
     end
     local row = position.line + 1
-    local start, finish = guide.lineRange(lines, row)
-    local char = position.character
+    local start, finish, char
+    if row > #lines then
+        start, finish = guide.lineRange(lines, #lines)
+        char = utf8.len(text, start, finish)
+    else
+        start, finish = guide.lineRange(lines, row)
+        char = position.character
+    end
     local utf8Len = utf8.len(text, start, finish)
     local offset
     if char <= 0 then
         offset = start
-    elseif char >= utf8Len then
-        offset = finish
     else
+        if char >= utf8Len then
+            char = utf8Len
+        end
         local left  = utf8.offset(text, char,     start)
         local right = utf8.offset(text, char + 1, start)
         if  isNameChar(text:sub(left, right - 1))

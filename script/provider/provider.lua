@@ -830,7 +830,7 @@ proto.on('textDocument/onTypeFormatting', function (params)
     local core   = require 'core.type-formatting'
     local offset = files.offset(uri, params.position)
     local edits  = core(uri, offset - 1, ch)
-    if #edits == 0 then
+    if not edits or #edits == 0 then
         return nil
     end
     local tab = '\t'

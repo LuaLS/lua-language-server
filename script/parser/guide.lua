@@ -248,7 +248,7 @@ function m.getBlock(obj)
     -- make stack
     local stack = {}
     for _ = 1, 10 do
-        stack[#stack+1] = ('%s:%s'):format(obj.type, obj.start)
+        stack[#stack+1] = ('%s:%s'):format(obj.type, obj.finish)
         obj = obj.parent
         if not obj then
             break

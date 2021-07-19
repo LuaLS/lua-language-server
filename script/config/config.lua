@@ -173,6 +173,7 @@ local Template = {
     ['Lua.workspace.preloadFileSize']       = Type.Integer >> 100,
     ['Lua.workspace.library']               = Type.Hash(Type.String, Type.Boolean, ';'),
     ['Lua.workspace.checkThirdParty']       = Type.Boolean >> true,
+    ['Lua.workspace.userThirdParty']        = Type.Array(Type.String),
     ['Lua.completion.enable']               = Type.Boolean >> true,
     ['Lua.completion.callSnippet']          = Type.String  >> 'Disable',
     ['Lua.completion.keywordSnippet']       = Type.String  >> 'Replace',

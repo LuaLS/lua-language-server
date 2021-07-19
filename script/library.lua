@@ -281,17 +281,31 @@ local function loadSingle3rdConfig(libraryDir)
     return cfg
 end
 
-local function load3rdConfig()
-    local thirdDir = ROOT / 'meta' / '3rd'
-    if not fs.is_directory(thirdDir) then
+local innerThirdDir = ROOT / 'meta' / '3rd'
+
+local function load3rdConfigInDir(dir, configs, inner)
+    if not fs.is_directory(dir) then
         return
     end
-    local configs = {}
-    for libraryDir in thirdDir:list_directory() do
+    for libraryDir in dir:list_directory() do
         local suc, res = xpcall(loadSingle3rdConfig, log.error, libraryDir)
-        if suc then
+        if suc and res then
+            if inner then
+                res.dirname = ('${3rd}/%s'):format(res.name)
+            else
+                res.dirname = ('%s/%s'):format(dir:string(), res.name)
+            end
             configs[#configs+1] = res
         end
+    end
+end
+
+local function load3rdConfig()
+    local configs = {}
+    load3rdConfigInDir(innerThirdDir, configs, true)
+    local thirdDirs = config.get 'Lua.workspace.userThirdParty'
+    for _, thirdDir in ipairs(thirdDirs) do
+        load3rdConfigInDir(fs.path(thirdDir), configs)
     end
     return configs
 end
@@ -306,14 +320,14 @@ local function apply3rd(cfg, onlyMemory)
         changes[#changes+1] = {
             key    = 'Lua.runtime.plugin',
             action = 'set',
-            value  = ('${3rd}/%s/plugin.lua'):format(cfg.name),
+            value  = ('%s/plugin.lua'):format(cfg.dirname),
         }
     end
 
     changes[#changes+1] = {
         key    = 'Lua.workspace.library',
         action = 'add',
-        value  = ('${3rd}/%s/library'):format(cfg.name),
+        value  = ('%s/library'):format(cfg.dirname),
     }
 
     client.setConfig(changes, onlyMemory)

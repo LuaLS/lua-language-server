@@ -86,8 +86,10 @@ function m.close(id)
         return
     end
     for co in pairs(map) do
-        map[co] = nil
-        coroutine.close(co)
+        if coroutine.status(co) == 'suspended' then
+            map[co] = nil
+            coroutine.close(co)
+        end
     end
 end
 

@@ -636,3 +636,42 @@ end)
         children = EXISTS,
     }
 }
+
+TEST [[
+local root = {
+    inner_function = function ()
+        local function function_inside_function()
+        end
+    end
+    }
+]]
+{
+    [1] = {
+        name = 'root',
+        detail = 'local {inner_function}',
+        kind = define.SymbolKind.Variable,
+        range = {7, 123},
+        selectionRange = {7, 10},
+        valueRange = {14, 123},
+        children = {
+            [1] = {
+                name = 'inner_function',
+                detail = 'function ()',
+                kind = define.SymbolKind.Function,
+                range = {20, 117},
+                selectionRange = {20, 33},
+                valueRange = {37, 117},
+                children = {
+                    [1] = {
+                        name = 'function_inside_function',
+                        detail = 'function ()',
+                        kind = define.SymbolKind.Function,
+                        range = {63, 109},
+                        selectionRange = {72, 95},
+                        valueRange = {63, 109},
+                    },
+                },
+            },
+        },
+    }
+}

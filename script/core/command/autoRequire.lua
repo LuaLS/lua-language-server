@@ -42,8 +42,10 @@ local function askAutoRequire(visiblePaths)
     for _, visible in ipairs(visiblePaths) do
         local expect = visible.expect
         local select = lang.script(expect)
-        nameMap[select] = expect
-        selects[#selects+1] = select
+        if not nameMap[select] then
+            nameMap[select] = expect
+            selects[#selects+1] = select
+        end
     end
     local disable = lang.script.COMPLETION_DISABLE_AUTO_REQUIRE
     selects[#selects+1] = disable
@@ -86,7 +88,7 @@ local function applyAutoRequire(uri, offset, name, result, fmt)
     if fmt.col and fmt.col > #text then
         sp = (' '):rep(fmt.col - #text - 1)
     end
-    text = ('local %s%s= require%s\n'):format(name, sp, quotedResult)
+    text = ('\nlocal %s%s= require%s\n'):format(name, sp, quotedResult)
     client.editText(uri, {
         {
             start  = offset,

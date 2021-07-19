@@ -10,6 +10,9 @@ https://marketplace.visualstudio.com/items?itemName=sumneko.lua
 
 ![avatar](https://github.com/sumneko/vscode-lua/raw/master/images//Install%20In%20VSCode.gif)
 
+## Change Log
+https://github.com/sumneko/lua-language-server/blob/master/changelog.md
+
 ## Feature
 
 - [x] Goto Definition

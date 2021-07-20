@@ -1,3 +1,4 @@
+name    = 'LÖVE'
 words   = {'love%.%w+'}
 configs = {
     {

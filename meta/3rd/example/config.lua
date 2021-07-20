@@ -1,3 +1,5 @@
+-- if not set, the folder name will be used
+name    = 'Example'
 -- list of matched words
 words   = {'thisIsAnExampleWord%.ifItExistsInFile%.thenTryLoadThisLibrary'}
 -- list or matched file names. `.lua`, `.dll` and `.so` only

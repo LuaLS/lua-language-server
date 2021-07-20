@@ -1,3 +1,4 @@
+name    = 'Cocos'
 files   = {'cocos'}
 configs = {
     {

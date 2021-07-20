@@ -252,7 +252,8 @@ local function loadSingle3rdConfig(libraryDir)
 
     local cfg = {}
 
-    cfg.name = libraryDir:filename():string()
+    cfg.path = libraryDir:filename():string()
+    cfg.name = cfg.name or cfg.path
 
     if fs.exists(libraryDir / 'plugin.lua') then
         cfg.plugin = true
@@ -291,9 +292,9 @@ local function load3rdConfigInDir(dir, configs, inner)
         local suc, res = xpcall(loadSingle3rdConfig, log.error, libraryDir)
         if suc and res then
             if inner then
-                res.dirname = ('${3rd}/%s'):format(res.name)
+                res.dirname = ('${3rd}/%s'):format(res.path)
             else
-                res.dirname = ('%s/%s'):format(dir:string(), res.name)
+                res.dirname = ('%s/%s'):format(dir:string(), res.path)
             end
             configs[#configs+1] = res
         end

@@ -1,5 +1,7 @@
 # changelog
 
+## 2.3.2
+
 ## 2.3.1
 `2021-7-19`
 * `NEW` setting `Lua.workspace.userThirdParty`, add private user [third-parth](https://github.com/sumneko/lua-language-server/tree/master/meta/3rd) by this setting

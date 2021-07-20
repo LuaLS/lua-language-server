@@ -150,7 +150,15 @@ return function (uri, offset)
         if not root then
             goto CONTINUE
         end
-        src = src.field or src.method or src.index or src
+        src = src.field or src.method or src
+        if  src.type == 'getindex'
+        or  src.type == 'setindex'
+        or  src.type == 'tableindex' then
+            src = src.index
+            if not guide.isLiteral(src) then
+                goto CONTINUE
+            end
+        end
         if  src.type == 'doc.class.name'
         or  src.type == 'doc.alias.name' then
             if  source.type ~= 'doc.type.name'

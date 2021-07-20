@@ -243,10 +243,9 @@ end
 local <?<!s!>?> = ''
 ]]
 
--- TODO: bug
---TEST [[
---local t, a
---local <!v!> = t[a]
---
---t[a] = <?v?>
---]]
+TEST [[
+local t, a
+local <!v!> = t[a]
+
+t[a] = <?v?>
+]]

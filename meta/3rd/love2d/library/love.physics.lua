@@ -2066,3 +2066,25 @@ function World:translateOrigin() end
 ---@param velocityiterations number # The maximum number of steps used to determine the new velocities when resolving a collision.
 ---@param positioniterations number # The maximum number of steps used to determine the new positions when resolving a collision.
 function World:update(dt, velocityiterations, positioniterations) end
+
+---@class love.BodyType
+---@field static integer # Static bodies do not move.
+---@field dynamic integer # Dynamic bodies collide with all bodies.
+---@field kinematic integer # Kinematic bodies only collide with dynamic bodies.
+
+---@class love.JointType
+---@field distance integer # A DistanceJoint.
+---@field friction integer # A FrictionJoint.
+---@field gear integer # A GearJoint.
+---@field mouse integer # A MouseJoint.
+---@field prismatic integer # A PrismaticJoint.
+---@field pulley integer # A PulleyJoint.
+---@field revolute integer # A RevoluteJoint.
+---@field rope integer # A RopeJoint.
+---@field weld integer # A WeldJoint.
+
+---@class love.ShapeType
+---@field circle integer # The Shape is a CircleShape.
+---@field polygon integer # The Shape is a PolygonShape.
+---@field edge integer # The Shape is a EdgeShape.
+---@field chain integer # The Shape is a ChainShape.

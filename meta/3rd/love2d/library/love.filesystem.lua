@@ -383,3 +383,24 @@ function FileData:getExtension() end
 ---
 ---@return string name # The name of the file the FileData represents.
 function FileData:getFilename() end
+
+---@class love.BufferMode
+---@field none integer # No buffering. The result of write and append operations appears immediately.
+---@field line integer # Line buffering. Write and append operations are buffered until a newline is output or the buffer size limit is reached.
+---@field full integer # Full buffering. Write and append operations are always buffered until the buffer size limit is reached.
+
+---@class love.FileDecoder
+---@field file integer # The data is unencoded.
+---@field base64 integer # The data is base64-encoded.
+
+---@class love.FileMode
+---@field r integer # Open a file for read.
+---@field w integer # Open a file for write.
+---@field a integer # Open a file for append.
+---@field c integer # Do not open a file (represents a closed file.)
+
+---@class love.FileType
+---@field file integer # Regular file.
+---@field directory integer # Directory.
+---@field symlink integer # Symbolic link.
+---@field other integer # Something completely different like a device.

@@ -202,3 +202,44 @@ function Joystick:isVibrationSupported() end
 ---@param right number # Strength of the right vibration motor on the Joystick. Must be in the range of 1.
 ---@return boolean success # True if the vibration was successfully applied, false if not.
 function Joystick:setVibration(left, right) end
+
+---@class love.GamepadAxis
+---@field leftx integer # The x-axis of the left thumbstick.
+---@field lefty integer # The y-axis of the left thumbstick.
+---@field rightx integer # The x-axis of the right thumbstick.
+---@field righty integer # The y-axis of the right thumbstick.
+---@field triggerleft integer # Left analog trigger.
+---@field triggerright integer # Right analog trigger.
+
+---@class love.GamepadButton
+---@field a integer # Bottom face button (A).
+---@field b integer # Right face button (B).
+---@field x integer # Left face button (X).
+---@field y integer # Top face button (Y).
+---@field back integer # Back button.
+---@field guide integer # Guide button.
+---@field start integer # Start button.
+---@field leftstick integer # Left stick click button.
+---@field rightstick integer # Right stick click button.
+---@field leftshoulder integer # Left bumper.
+---@field rightshoulder integer # Right bumper.
+---@field dpup integer # D-pad up.
+---@field dpdown integer # D-pad down.
+---@field dpleft integer # D-pad left.
+---@field dpright integer # D-pad right.
+
+---@class love.JoystickHat
+---@field c integer # Centered
+---@field d integer # Down
+---@field l integer # Left
+---@field ld integer # Left+Down
+---@field lu integer # Left+Up
+---@field r integer # Right
+---@field rd integer # Right+Down
+---@field ru integer # Right+Up
+---@field u integer # Up
+
+---@class love.JoystickInputType
+---@field axis integer # Analog axis.
+---@field button integer # Button.
+---@field hat integer # 8-direction hat value.

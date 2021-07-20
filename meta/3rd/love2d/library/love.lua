@@ -85,3 +85,75 @@ function Object:type() end
 ---
 ---@param name string # The name of the type to check for.
 function Object:typeOf(name) end
+
+---@type love.conf
+
+---@type love.directorydropped
+
+---@type love.displayrotated
+
+---@type love.draw
+
+---@type love.errorhandler
+
+---@type love.filedropped
+
+---@type love.focus
+
+---@type love.gamepadaxis
+
+---@type love.gamepadpressed
+
+---@type love.gamepadreleased
+
+---@type love.joystickadded
+
+---@type love.joystickaxis
+
+---@type love.joystickhat
+
+---@type love.joystickpressed
+
+---@type love.joystickreleased
+
+---@type love.joystickremoved
+
+---@type love.keypressed
+
+---@type love.keyreleased
+
+---@type love.load
+
+---@type love.lowmemory
+
+---@type love.mousefocus
+
+---@type love.mousemoved
+
+---@type love.mousepressed
+
+---@type love.mousereleased
+
+---@type love.quit
+
+---@type love.resize
+
+---@type love.run
+
+---@type love.textedited
+
+---@type love.textinput
+
+---@type love.threaderror
+
+---@type love.touchmoved
+
+---@type love.touchpressed
+
+---@type love.touchreleased
+
+---@type love.update
+
+---@type love.visible
+
+---@type love.wheelmoved

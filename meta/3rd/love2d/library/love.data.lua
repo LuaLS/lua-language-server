@@ -109,3 +109,25 @@ local CompressedData = {}
 ---
 ---@return love.CompressedDataFormat format # The format of the CompressedData.
 function CompressedData:getFormat() end
+
+---@class love.CompressedDataFormat
+---@field lz4 integer # The LZ4 compression format. Compresses and decompresses very quickly, but the compression ratio is not the best. LZ4-HC is used when compression level 9 is specified. Some benchmarks are available here.
+---@field zlib integer # The zlib format is DEFLATE-compressed data with a small bit of header data. Compresses relatively slowly and decompresses moderately quickly, and has a decent compression ratio.
+---@field gzip integer # The gzip format is DEFLATE-compressed data with a slightly larger header than zlib. Since it uses DEFLATE it has the same compression characteristics as the zlib format.
+---@field deflate integer # Raw DEFLATE-compressed data (no header).
+
+---@class love.ContainerType
+---@field data integer # Return type is ByteData.
+---@field string integer # Return type is string.
+
+---@class love.EncodeFormat
+---@field base64 integer # Encode/decode data as base64 binary-to-text encoding.
+---@field hex integer # Encode/decode data as hexadecimal string.
+
+---@class love.HashFunction
+---@field md5 integer # MD5 hash algorithm (16 bytes).
+---@field sha1 integer # SHA1 hash algorithm (20 bytes).
+---@field sha224 integer # SHA2 hash algorithm with message digest size of 224 bits (28 bytes).
+---@field sha256 integer # SHA2 hash algorithm with message digest size of 256 bits (32 bytes).
+---@field sha384 integer # SHA2 hash algorithm with message digest size of 384 bits (48 bytes).
+---@field sha512 integer # SHA2 hash algorithm with message digest size of 512 bits (64 bytes).

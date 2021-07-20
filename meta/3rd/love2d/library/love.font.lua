@@ -158,3 +158,9 @@ function Rasterizer:getLineHeight() end
 ---@param glyph2 love.string or number # Glyph
 ---@return boolean hasGlyphs # Whatever font contains specified glyphs.
 function Rasterizer:hasGlyphs(glyph1, glyph2) end
+
+---@class love.HintingMode
+---@field normal integer # Default hinting. Should be preferred for typical antialiased fonts.
+---@field light integer # Results in fuzzier text but can sometimes preserve the original glyph shapes of the text better than normal hinting.
+---@field mono integer # Results in aliased / unsmoothed text with either full opacity or completely transparent pixels. Should be used when antialiasing is not desired for the font.
+---@field none integer # Disables hinting for the font. Results in fuzzier text.

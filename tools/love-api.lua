@@ -51,10 +51,14 @@ local function buildSuper(tp)
     return (': %s'):format(table.concat(parents, ', '))
 end
 
+local function buildDescription(desc)
+    return ('---%s'):format(desc:gsub('([\r\n])', '%1---'))
+end
+
 local function buildFunction(class, func, node)
     local text = {}
     text[#text+1] = '---'
-    text[#text+1] = ('---%s'):format(func.description:gsub('([\r\n])', '%1---'))
+    text[#text+1] = buildDescription(func.description)
     text[#text+1] = '---'
     local params = {}
     for _, param in ipairs(func.variants[1].arguments or {}) do
@@ -105,6 +109,19 @@ local function buildFile(class, defs)
         for _, func in ipairs(tp.functions or {}) do
             text[#text+1] = ''
             text[#text+1] = buildFunction(class, func, tp.name .. ':')
+        end
+    end
+
+    for _, tp in ipairs(defs.callbacks or {}) do
+        text[#text+1] = ''
+        text[#text+1] = ('---@type %s'):format(getTypeName(tp.name))
+    end
+
+    for _, enum in ipairs(defs.enums or {}) do
+        text[#text+1] = ''
+        text[#text+1] = ('---@class %s'):format(getTypeName(enum.name))
+        for _, constant in ipairs(enum.constants) do
+            text[#text+1] = ('---@field %s integer # %s'):format(constant.name, constant.description)
         end
     end
 

@@ -431,3 +431,7 @@ function Transform:transformPoint(globalX, globalY) end
 ---@param dy number # The relative translation along the y-axis.
 ---@return love.Transform transform # The Transform object the method was called on. Allows easily chaining Transform methods.
 function Transform:translate(dx, dy) end
+
+---@class love.MatrixLayout
+---@field row integer # The matrix is row-major:
+---@field column integer # The matrix is column-major:

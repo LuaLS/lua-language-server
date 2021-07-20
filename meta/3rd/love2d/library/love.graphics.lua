@@ -2237,3 +2237,155 @@ function Video:setSource(source) end
 ---
 ---@return number seconds # The time in seconds since the beginning of the Video.
 function Video:tell() end
+
+---@class love.AlignMode
+---@field center integer # Align text center.
+---@field left integer # Align text left.
+---@field right integer # Align text right.
+---@field justify integer # Align text both left and right.
+
+---@class love.ArcType
+---@field pie integer # The arc is drawn like a slice of pie, with the arc circle connected to the center at its end-points.
+---@field open integer # The arc circle's two end-points are unconnected when the arc is drawn as a line. Behaves like the "closed" arc type when the arc is drawn in filled mode.
+---@field closed integer # The arc circle's two end-points are connected to each other.
+
+---@class love.AreaSpreadDistribution
+---@field uniform integer # Uniform distribution.
+---@field normal integer # Normal (gaussian) distribution.
+---@field ellipse integer # Uniform distribution in an ellipse.
+---@field borderellipse integer # Distribution in an ellipse with particles spawning at the edges of the ellipse.
+---@field borderrectangle integer # Distribution in a rectangle with particles spawning at the edges of the rectangle.
+---@field none integer # No distribution - area spread is disabled.
+
+---@class love.BlendAlphaMode
+---@field alphamultiply integer # The RGB values of what's drawn are multiplied by the alpha values of those colors during blending. This is the default alpha mode.
+---@field premultiplied integer # The RGB values of what's drawn are '''not''' multiplied by the alpha values of those colors during blending. For most blend modes to work correctly with this alpha mode, the colors of a drawn object need to have had their RGB values multiplied by their alpha values at some point previously ("premultiplied alpha").
+
+---@class love.BlendMode
+---@field alpha integer # Alpha blending (normal). The alpha of what's drawn determines its opacity.
+---@field replace integer # The colors of what's drawn completely replace what was on the screen, with no additional blending. The BlendAlphaMode specified in love.graphics.setBlendMode still affects what happens.
+---@field screen integer # 'Screen' blending.
+---@field add integer # The pixel colors of what's drawn are added to the pixel colors already on the screen. The alpha of the screen is not modified.
+---@field subtract integer # The pixel colors of what's drawn are subtracted from the pixel colors already on the screen. The alpha of the screen is not modified.
+---@field multiply integer # The pixel colors of what's drawn are multiplied with the pixel colors already on the screen (darkening them). The alpha of drawn objects is multiplied with the alpha of the screen rather than determining how much the colors on the screen are affected, even when the "alphamultiply" BlendAlphaMode is used.
+---@field lighten integer # The pixel colors of what's drawn are compared to the existing pixel colors, and the larger of the two values for each color component is used. Only works when the "premultiplied" BlendAlphaMode is used in love.graphics.setBlendMode.
+---@field darken integer # The pixel colors of what's drawn are compared to the existing pixel colors, and the smaller of the two values for each color component is used. Only works when the "premultiplied" BlendAlphaMode is used in love.graphics.setBlendMode.
+---@field additive integer # Additive blend mode.
+---@field subtractive integer # Subtractive blend mode.
+---@field multiplicative integer # Multiply blend mode.
+---@field premultiplied integer # Premultiplied alpha blend mode.
+
+---@class love.CompareMode
+---@field equal integer # * stencil tests: the stencil value of the pixel must be equal to the supplied value.
+* depth tests: the depth value of the drawn object at that pixel must be equal to the existing depth value of that pixel.
+---@field notequal integer # * stencil tests: the stencil value of the pixel must not be equal to the supplied value.
+* depth tests: the depth value of the drawn object at that pixel must not be equal to the existing depth value of that pixel.
+---@field less integer # * stencil tests: the stencil value of the pixel must be less than the supplied value.
+* depth tests: the depth value of the drawn object at that pixel must be less than the existing depth value of that pixel.
+---@field lequal integer # * stencil tests: the stencil value of the pixel must be less than or equal to the supplied value.
+* depth tests: the depth value of the drawn object at that pixel must be less than or equal to the existing depth value of that pixel.
+---@field gequal integer # * stencil tests: the stencil value of the pixel must be greater than or equal to the supplied value.
+* depth tests: the depth value of the drawn object at that pixel must be greater than or equal to the existing depth value of that pixel.
+---@field greater integer # * stencil tests: the stencil value of the pixel must be greater than the supplied value.
+* depth tests: the depth value of the drawn object at that pixel must be greater than the existing depth value of that pixel.
+---@field never integer # Objects will never be drawn.
+---@field always integer # Objects will always be drawn. Effectively disables the depth or stencil test.
+
+---@class love.CullMode
+---@field back integer # Back-facing triangles in Meshes are culled (not rendered). The vertex order of a triangle determines whether it is back- or front-facing.
+---@field front integer # Front-facing triangles in Meshes are culled.
+---@field none integer # Both back- and front-facing triangles in Meshes are rendered.
+
+---@class love.DrawMode
+---@field fill integer # Draw filled shape.
+---@field line integer # Draw outlined shape.
+
+---@class love.FilterMode
+---@field linear integer # Scale image with linear interpolation.
+---@field nearest integer # Scale image with nearest neighbor interpolation.
+
+---@class love.GraphicsFeature
+---@field clampzero integer # Whether the "clampzero" WrapMode is supported.
+---@field lighten integer # Whether the "lighten" and "darken" BlendModes are supported.
+---@field multicanvasformats integer # Whether multiple formats can be used in the same love.graphics.setCanvas call.
+---@field glsl3 integer # Whether GLSL 3 Shaders can be used.
+---@field instancing integer # Whether mesh instancing is supported.
+---@field fullnpot integer # Whether textures with non-power-of-two dimensions can use mipmapping and the 'repeat' WrapMode.
+---@field pixelshaderhighp integer # Whether pixel shaders can use "highp" 32 bit floating point numbers (as opposed to just 16 bit or lower precision).
+---@field shaderderivatives integer # Whether shaders can use the dFdx, dFdy, and fwidth functions for computing derivatives.
+
+---@class love.GraphicsLimit
+---@field pointsize integer # The maximum size of points.
+---@field texturesize integer # The maximum width or height of Images and Canvases.
+---@field multicanvas integer # The maximum number of simultaneously active canvases (via love.graphics.setCanvas.)
+---@field canvasmsaa integer # The maximum number of antialiasing samples for a Canvas.
+---@field texturelayers integer # The maximum number of layers in an Array texture.
+---@field volumetexturesize integer # The maximum width, height, or depth of a Volume texture.
+---@field cubetexturesize integer # The maximum width or height of a Cubemap texture.
+---@field anisotropy integer # The maximum amount of anisotropic filtering. Texture:setMipmapFilter internally clamps the given anisotropy value to the system's limit.
+
+---@class love.IndexDataType
+---@field uint16 integer # The vertex map is array of unsigned word (16-bit).
+---@field uint32 integer # The vertex map is array of unsigned dword (32-bit).
+
+---@class love.LineJoin
+---@field miter integer # The ends of the line segments beveled in an angle so that they join seamlessly.
+---@field none integer # No cap applied to the ends of the line segments.
+---@field bevel integer # Flattens the point where line segments join together.
+
+---@class love.LineStyle
+---@field rough integer # Draw rough lines.
+---@field smooth integer # Draw smooth lines.
+
+---@class love.MeshDrawMode
+---@field fan integer # The vertices create a "fan" shape with the first vertex acting as the hub point. Can be easily used to draw simple convex polygons.
+---@field strip integer # The vertices create a series of connected triangles using vertices 1, 2, 3, then 3, 2, 4 (note the order), then 3, 4, 5, and so on.
+---@field triangles integer # The vertices create unconnected triangles.
+---@field points integer # The vertices are drawn as unconnected points (see love.graphics.setPointSize.)
+
+---@class love.MipmapMode
+---@field none integer # The Canvas has no mipmaps.
+---@field auto integer # The Canvas has mipmaps. love.graphics.setCanvas can be used to render to a specific mipmap level, or Canvas:generateMipmaps can (re-)compute all mipmap levels based on the base level.
+---@field manual integer # The Canvas has mipmaps, and all mipmap levels will automatically be recomputed when switching away from the Canvas with love.graphics.setCanvas.
+
+---@class love.ParticleInsertMode
+---@field top integer # Particles are inserted at the top of the ParticleSystem's list of particles.
+---@field bottom integer # Particles are inserted at the bottom of the ParticleSystem's list of particles.
+---@field random integer # Particles are inserted at random positions in the ParticleSystem's list of particles.
+
+---@class love.SpriteBatchUsage
+---@field dynamic integer # The object's data will change occasionally during its lifetime. 
+---@field static integer # The object will not be modified after initial sprites or vertices are added.
+---@field stream integer # The object data will always change between draws.
+
+---@class love.StackType
+---@field transform integer # The transformation stack (love.graphics.translate, love.graphics.rotate, etc.)
+---@field all integer # All love.graphics state, including transform state.
+
+---@class love.StencilAction
+---@field replace integer # The stencil value of a pixel will be replaced by the value specified in love.graphics.stencil, if any object touches the pixel.
+---@field increment integer # The stencil value of a pixel will be incremented by 1 for each object that touches the pixel. If the stencil value reaches 255 it will stay at 255.
+---@field decrement integer # The stencil value of a pixel will be decremented by 1 for each object that touches the pixel. If the stencil value reaches 0 it will stay at 0.
+---@field incrementwrap integer # The stencil value of a pixel will be incremented by 1 for each object that touches the pixel. If a stencil value of 255 is incremented it will be set to 0.
+---@field decrementwrap integer # The stencil value of a pixel will be decremented by 1 for each object that touches the pixel. If the stencil value of 0 is decremented it will be set to 255.
+---@field invert integer # The stencil value of a pixel will be bitwise-inverted for each object that touches the pixel. If a stencil value of 0 is inverted it will become 255.
+
+---@class love.TextureType
+---@field 2d integer # Regular 2D texture with width and height.
+---@field array integer # Several same-size 2D textures organized into a single object. Similar to a texture atlas / sprite sheet, but avoids sprite bleeding and other issues.
+---@field cube integer # Cubemap texture with 6 faces. Requires a custom shader (and Shader:send) to use. Sampling from a cube texture in a shader takes a 3D direction vector instead of a texture coordinate.
+---@field volume integer # 3D texture with width, height, and depth. Requires a custom shader to use. Volume textures can have texture filtering applied along the 3rd axis.
+
+---@class love.VertexAttributeStep
+---@field pervertex integer # The vertex attribute will have a unique value for each vertex in the Mesh.
+---@field perinstance integer # The vertex attribute will have a unique value for each instance of the Mesh.
+
+---@class love.VertexWinding
+---@field cw integer # Clockwise.
+---@field ccw integer # Counter-clockwise.
+
+---@class love.WrapMode
+---@field clamp integer # Clamp the texture. Appears only once. The area outside the texture's normal range is colored based on the edge pixels of the texture.
+---@field repeat integer # Repeat the texture. Fills the whole available extent.
+---@field mirroredrepeat integer # Repeat the texture, flipping it each time it repeats. May produce better visual results than the repeat mode when the texture doesn't seamlessly tile.
+---@field clampzero integer # Clamp the texture. Fills the area outside the texture's normal range with transparent black (or opaque black for textures with no alpha channel.)

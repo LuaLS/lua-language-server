@@ -277,3 +277,20 @@ function love.window.toPixels(value) end
 ---@param settings table # The settings table with the following optional fields. Any field not filled in will use the current value that would be returned by love.window.getMode.
 ---@return boolean success # True if successful, false otherwise.
 function love.window.updateMode(width, height, settings) end
+
+---@class love.DisplayOrientation
+---@field unknown integer # Orientation cannot be determined.
+---@field landscape integer # Landscape orientation.
+---@field landscapeflipped integer # Landscape orientation (flipped).
+---@field portrait integer # Portrait orientation.
+---@field portraitflipped integer # Portrait orientation (flipped).
+
+---@class love.FullscreenType
+---@field desktop integer # Sometimes known as borderless fullscreen windowed mode. A borderless screen-sized window is created which sits on top of all desktop UI elements. The window is automatically resized to match the dimensions of the desktop, and its size cannot be changed.
+---@field exclusive integer # Standard exclusive-fullscreen mode. Changes the display mode (actual resolution) of the monitor.
+---@field normal integer # Standard exclusive-fullscreen mode. Changes the display mode (actual resolution) of the monitor.
+
+---@class love.MessageBoxType
+---@field info integer # Informational dialog.
+---@field warning integer # Warning dialog.
+---@field error integer # Error dialog.

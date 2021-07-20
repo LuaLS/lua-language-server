@@ -140,3 +140,18 @@ local Cursor = {}
 ---
 ---@return love.CursorType ctype # The type of the Cursor.
 function Cursor:getType() end
+
+---@class love.CursorType
+---@field image integer # The cursor is using a custom image.
+---@field arrow integer # An arrow pointer.
+---@field ibeam integer # An I-beam, normally used when mousing over editable or selectable text.
+---@field wait integer # Wait graphic.
+---@field waitarrow integer # Small wait cursor with an arrow pointer.
+---@field crosshair integer # Crosshair symbol.
+---@field sizenwse integer # Double arrow pointing to the top-left and bottom-right.
+---@field sizenesw integer # Double arrow pointing to the top-right and bottom-left.
+---@field sizewe integer # Double arrow pointing left and right.
+---@field sizens integer # Double arrow pointing up and down.
+---@field sizeall integer # Four-pointed arrow pointing up, down, left, and right.
+---@field no integer # Slashed circle or crossbones.
+---@field hand integer # Hand symbol.

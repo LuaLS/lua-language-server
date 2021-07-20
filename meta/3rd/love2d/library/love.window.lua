@@ -56,14 +56,14 @@ function love.window.getDisplayName(displayindex) end
 ---Gets current device display orientation.
 ---
 ---@param displayindex number # Display index to get its display orientation, or nil for default display index.
----@return DisplayOrientation orientation # Current device display orientation.
+---@return love.window.DisplayOrientation orientation # Current device display orientation.
 function love.window.getDisplayOrientation(displayindex) end
 
 ---
 ---Gets whether the window is fullscreen.
 ---
 ---@return boolean fullscreen # True if the window is fullscreen, false otherwise.
----@return FullscreenType fstype # The type of fullscreen mode used.
+---@return love.window.FullscreenType fstype # The type of fullscreen mode used.
 function love.window.getFullscreen() end
 
 ---
@@ -76,7 +76,7 @@ function love.window.getFullscreenModes(displayindex) end
 ---
 ---Gets the window icon.
 ---
----@return ImageData imagedata # The window icon imagedata, or nil if no icon has been set with love.window.setIcon.
+---@return love.window.ImageData imagedata # The window icon imagedata, or nil if no icon has been set with love.window.setIcon.
 function love.window.getIcon() end
 
 ---
@@ -209,7 +209,7 @@ function love.window.setFullscreen(fullscreen) end
 ---
 ---Sets the window icon until the game is quit. Not all operating systems support very large icon images.
 ---
----@param imagedata ImageData # The window icon image.
+---@param imagedata love.window.ImageData # The window icon image.
 ---@return boolean success # Whether the icon has been set successfully.
 function love.window.setIcon(imagedata) end
 
@@ -253,7 +253,7 @@ function love.window.setVSync(vsync) end
 ---
 ---@param title string # The title of the message box.
 ---@param message string # The text inside the message box.
----@param type MessageBoxType # The type of the message box.
+---@param type love.window.MessageBoxType # The type of the message box.
 ---@param attachtowindow boolean # Whether the message box should be attached to the love window or free-floating.
 ---@return boolean success # Whether the message box was successfully displayed.
 function love.window.showMessageBox(title, message, type, attachtowindow) end

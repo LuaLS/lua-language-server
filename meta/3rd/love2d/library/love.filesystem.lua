@@ -63,7 +63,7 @@ function love.filesystem.getIdentity() end
 ---Gets information about the specified file or directory.
 ---
 ---@param path string # The file or directory path to check.
----@param filtertype FileType # If supplied, this parameter causes getInfo to only return the info table if the item at the given path matches the specified file type.
+---@param filtertype love.filesystem.FileType # If supplied, this parameter causes getInfo to only return the info table if the item at the given path matches the specified file type.
 ---@return table info # A table containing information about the specified path, or nil if nothing exists at the path. The table contains the following fields:
 function love.filesystem.getInfo(path, filtertype) end
 
@@ -170,7 +170,7 @@ function love.filesystem.mount(archive, mountpoint, appendToPath) end
 ---It needs to be opened before it can be accessed.
 ---
 ---@param filename string # The filename of the file.
----@return File file # The new File object.
+---@return love.filesystem.File file # The new File object.
 function love.filesystem.newFile(filename) end
 
 ---
@@ -178,7 +178,7 @@ function love.filesystem.newFile(filename) end
 ---
 ---@param contents string # The contents of the file.
 ---@param name string # The name of the file.
----@return FileData data # Your new FileData.
+---@return love.filesystem.FileData data # Your new FileData.
 function love.filesystem.newFileData(contents, name) end
 
 ---
@@ -255,3 +255,129 @@ function love.filesystem.unmount(archive) end
 ---@return boolean success # If the operation was successful.
 ---@return string message # Error message if operation was unsuccessful.
 function love.filesystem.write(name, data, size) end
+
+---@class love.filesystem.DroppedFile: love.filesystem.File, love.filesystem.Object
+local DroppedFile = {}
+
+---@class love.filesystem.File: love.filesystem.Object
+local File = {}
+
+---
+---Closes a File.
+---
+---@return boolean success # Whether closing was successful.
+function File:close() end
+
+---
+---Flushes any buffered written data in the file to the disk.
+---
+---@return boolean success # Whether the file successfully flushed any buffered data to the disk.
+---@return string err # The error string, if an error occurred and the file could not be flushed.
+function File:flush() end
+
+---
+---Gets the buffer mode of a file.
+---
+---@return love.filesystem.BufferMode mode # The current buffer mode of the file.
+---@return number size # The maximum size in bytes of the file's buffer.
+function File:getBuffer() end
+
+---
+---Gets the filename that the File object was created with. If the file object originated from the love.filedropped callback, the filename will be the full platform-dependent file path.
+---
+---@return string filename # The filename of the File.
+function File:getFilename() end
+
+---
+---Gets the FileMode the file has been opened with.
+---
+---@return love.filesystem.FileMode mode # The mode this file has been opened with.
+function File:getMode() end
+
+---
+---Returns the file size.
+---
+---@return number size # The file size in bytes.
+function File:getSize() end
+
+---
+---Gets whether end-of-file has been reached.
+---
+---@return boolean eof # Whether EOF has been reached.
+function File:isEOF() end
+
+---
+---Gets whether the file is open.
+---
+---@return boolean open # True if the file is currently open, false otherwise.
+function File:isOpen() end
+
+---
+---Iterate over all the lines in a file.
+---
+---@return function iterator # The iterator (can be used in for loops).
+function File:lines() end
+
+---
+---Open the file for write, read or append.
+---
+---@param mode love.filesystem.FileMode # The mode to open the file in.
+---@return boolean ok # True on success, false otherwise.
+---@return string err # The error string if an error occurred.
+function File:open(mode) end
+
+---
+---Read a number of bytes from a file.
+---
+---@param bytes number # The number of bytes to read.
+---@return string contents # The contents of the read bytes.
+---@return number size # How many bytes have been read.
+function File:read(bytes) end
+
+---
+---Seek to a position in a file
+---
+---@param pos number # The position to seek to
+---@return boolean success # Whether the operation was successful
+function File:seek(pos) end
+
+---
+---Sets the buffer mode for a file opened for writing or appending. Files with buffering enabled will not write data to the disk until the buffer size limit is reached, depending on the buffer mode.
+---
+---File:flush will force any buffered data to be written to the disk.
+---
+---@param mode love.filesystem.BufferMode # The buffer mode to use.
+---@param size number # The maximum size in bytes of the file's buffer.
+---@return boolean success # Whether the buffer mode was successfully set.
+---@return string errorstr # The error string, if the buffer mode could not be set and an error occurred.
+function File:setBuffer(mode, size) end
+
+---
+---Returns the position in the file.
+---
+---@return number pos # The current position.
+function File:tell() end
+
+---
+---Write data to a file.
+---
+---@param data string # The string data to write.
+---@param size number # How many bytes to write.
+---@return boolean success # Whether the operation was successful.
+---@return string err # The error string if an error occurred.
+function File:write(data, size) end
+
+---@class love.filesystem.FileData: love.filesystem.Data, love.filesystem.Object
+local FileData = {}
+
+---
+---Gets the extension of the FileData.
+---
+---@return string ext # The extension of the file the FileData represents.
+function FileData:getExtension() end
+
+---
+---Gets the filename of the FileData.
+---
+---@return string name # The name of the file the FileData represents.
+function FileData:getFilename() end

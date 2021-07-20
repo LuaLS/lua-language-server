@@ -8,8 +8,8 @@ love.keyboard = {}
 ---
 ---Scancodes are useful for creating default controls that have the same physical locations on on all systems.
 ---
----@param scancode Scancode # The scancode to get the key from.
----@return KeyConstant key # The key corresponding to the given scancode, or 'unknown' if the scancode doesn't map to a KeyConstant on the current system.
+---@param scancode love.keyboard.Scancode # The scancode to get the key from.
+---@return love.keyboard.KeyConstant key # The key corresponding to the given scancode, or 'unknown' if the scancode doesn't map to a KeyConstant on the current system.
 function love.keyboard.getKeyFromScancode(scancode) end
 
 ---
@@ -19,8 +19,8 @@ function love.keyboard.getKeyFromScancode(scancode) end
 ---
 ---Scancodes are useful for creating default controls that have the same physical locations on on all systems.
 ---
----@param key KeyConstant # The key to get the scancode from.
----@return Scancode scancode # The scancode corresponding to the given key, or 'unknown' if the given key has no known physical representation on the current system.
+---@param key love.keyboard.KeyConstant # The key to get the scancode from.
+---@return love.keyboard.Scancode scancode # The scancode corresponding to the given key, or 'unknown' if the given key has no known physical representation on the current system.
 function love.keyboard.getScancodeFromKey(key) end
 
 ---
@@ -44,7 +44,7 @@ function love.keyboard.hasTextInput() end
 ---
 ---Checks whether a certain key is down. Not to be confused with love.keypressed or love.keyreleased.
 ---
----@param key KeyConstant # The key to check.
+---@param key love.keyboard.KeyConstant # The key to check.
 ---@return boolean down # True if the key is down, false if not.
 function love.keyboard.isDown(key) end
 
@@ -53,8 +53,8 @@ function love.keyboard.isDown(key) end
 ---
 ---Unlike regular KeyConstants, Scancodes are keyboard layout-independent. The scancode 'w' is used if the key in the same place as the 'w' key on an American keyboard is pressed, no matter what the key is labelled or what the user's operating system settings are.
 ---
----@param scancode Scancode # A Scancode to check.
----@param ... Scancode # Additional Scancodes to check.
+---@param scancode love.keyboard.Scancode # A Scancode to check.
+---@param ... love.keyboard.Scancode # Additional Scancodes to check.
 ---@return boolean down # True if any supplied Scancode is down, false if not.
 function love.keyboard.isScancodeDown(scancode, ...) end
 

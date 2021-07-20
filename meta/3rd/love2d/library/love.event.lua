@@ -28,14 +28,14 @@ function love.event.pump() end
 ---
 ---From 0.10.0 onwards, you may pass an arbitrary amount of arguments with this function, though the default callbacks don't ever use more than six.
 ---
----@param n Event # The name of the event.
----@param a Variant # First event argument.
----@param b Variant # Second event argument.
----@param c Variant # Third event argument.
----@param d Variant # Fourth event argument.
----@param e Variant # Fifth event argument.
----@param f Variant # Sixth event argument.
----@param ... Variant # Further event arguments may follow.
+---@param n love.event.Event # The name of the event.
+---@param a love.event.Variant # First event argument.
+---@param b love.event.Variant # Second event argument.
+---@param c love.event.Variant # Third event argument.
+---@param d love.event.Variant # Fourth event argument.
+---@param e love.event.Variant # Fifth event argument.
+---@param f love.event.Variant # Sixth event argument.
+---@param ... love.event.Variant # Further event arguments may follow.
 function love.event.push(n, a, b, c, d, e, f, ...) end
 
 ---
@@ -49,12 +49,12 @@ function love.event.quit(exitstatus) end
 ---
 ---Like love.event.poll(), but blocks until there is an event in the queue.
 ---
----@return Event n # The name of event.
----@return Variant a # First event argument.
----@return Variant b # Second event argument.
----@return Variant c # Third event argument.
----@return Variant d # Fourth event argument.
----@return Variant e # Fifth event argument.
----@return Variant f # Sixth event argument.
----@return Variant ... # Further event arguments may follow.
+---@return love.event.Event n # The name of event.
+---@return love.event.Variant a # First event argument.
+---@return love.event.Variant b # Second event argument.
+---@return love.event.Variant c # Third event argument.
+---@return love.event.Variant d # Fourth event argument.
+---@return love.event.Variant e # Fifth event argument.
+---@return love.event.Variant f # Sixth event argument.
+---@return love.event.Variant ... # Further event arguments may follow.
 function love.event.wait() end

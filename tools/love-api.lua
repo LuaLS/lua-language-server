@@ -10,8 +10,70 @@ local metaPath    = fs.path 'meta/3rd/love2d'
 local libraryPath = metaPath / 'library'
 fs.create_directories(libraryPath)
 
-local function buildType(param)
-    return param.type
+local knownTypes = {
+    ['nil']            = 'nil',
+    ['boolean']        = 'boolean',
+    ['number']         = 'number',
+    ['integer']        = 'integer',
+    ['string']         = 'string',
+    ['table']          = 'table',
+    ['function']       = 'function',
+    ['userdata']       = 'userdata',
+    ['lightuserdata']  = 'lightuserdata',
+    ['thread']         = 'thread',
+    ['cdata']          = 'ffi.cdata*',
+    ['light userdata'] = 'lightuserdata'
+}
+
+local function getTypeName(class, name)
+    if knownTypes[name] then
+        return knownTypes[name]
+    end
+    return class .. '.' .. name
+end
+
+local function buildType(class, param)
+    return getTypeName(class, param.type)
+end
+
+local function buildSuper(class, tp)
+    if not tp.supertypes then
+        return ''
+    end
+    local parents = {}
+    for _, parent in ipairs(tp.supertypes) do
+        parents[#parents+1] = ('%s.%s'):format(class, parent)
+    end
+    return (': %s'):format(table.concat(parents, ', '))
+end
+
+local function buildFunction(class, func, node)
+    local text = {}
+    text[#text+1] = '---'
+    text[#text+1] = ('---%s'):format(func.description:gsub('([\r\n])', '%1---'))
+    text[#text+1] = '---'
+    local params = {}
+    for _, param in ipairs(func.variants[1].arguments or {}) do
+        params[#params+1] = param.name
+        text[#text+1] = ('---@param %s %s # %s'):format(
+            param.name,
+            buildType(class, param),
+            param.description
+        )
+    end
+    for _, rtn in ipairs(func.variants[1].returns or {}) do
+        text[#text+1] = ('---@return %s %s # %s'):format(
+            buildType(class, rtn),
+            rtn.name,
+            rtn.description
+        )
+    end
+    text[#text+1] = ('function %s%s(%s) end'):format(
+        node,
+        func.name,
+        table.concat(params, ', ')
+    )
+    return table.concat(text, '\n')
 end
 
 local function buildFile(class, defs)
@@ -23,30 +85,17 @@ local function buildFile(class, defs)
 
     for _, func in ipairs(defs.functions or {}) do
         text[#text+1] = ''
-        text[#text+1] = '---'
-        text[#text+1] = ('---%s'):format(func.description:gsub('([\r\n])', '%1---'))
-        text[#text+1] = '---'
-        local params = {}
-        for _, param in ipairs(func.variants[1].arguments or {}) do
-            params[#params+1] = param.name
-            text[#text+1] = ('---@param %s %s # %s'):format(
-                param.name,
-                buildType(param),
-                param.description
-            )
+        text[#text+1] = buildFunction(class, func, class .. '.')
+    end
+
+    for _, tp in ipairs(defs.types or {}) do
+        text[#text+1] = ''
+        text[#text+1] = ('---@class %s%s'):format(getTypeName(class, tp.name), buildSuper(class, tp))
+        text[#text+1] = ('local %s = {}'):format(tp.name)
+        for _, func in ipairs(tp.functions or {}) do
+            text[#text+1] = ''
+            text[#text+1] = buildFunction(class, func, tp.name .. ':')
         end
-        for _, rtn in ipairs(func.variants[1].returns or {}) do
-            text[#text+1] = ('---@return %s %s # %s'):format(
-                buildType(rtn),
-                rtn.name,
-                rtn.description
-            )
-        end
-        text[#text+1] = ('function %s.%s(%s) end'):format(
-            class,
-            func.name,
-            table.concat(params, ', ')
-        )
     end
 
     text[#text+1] = ''

@@ -4,7 +4,7 @@ love.mouse = {}
 ---
 ---Gets the current Cursor.
 ---
----@return Cursor cursor # The current cursor, or nil if no cursor is set.
+---@return love.mouse.Cursor cursor # The current cursor, or nil if no cursor is set.
 function love.mouse.getCursor() end
 
 ---
@@ -29,8 +29,8 @@ function love.mouse.getRelativeMode() end
 ---
 ---Hardware cursors are framerate-independent and work the same way as normal operating system cursors. Unlike drawing an image at the mouse's current coordinates, hardware cursors never have visible lag between when the mouse is moved and when the cursor position updates, even at low framerates.
 ---
----@param ctype CursorType # The type of system cursor to get. 
----@return Cursor cursor # The Cursor object representing the system cursor type.
+---@param ctype love.mouse.CursorType # The type of system cursor to get. 
+---@return love.mouse.Cursor cursor # The Cursor object representing the system cursor type.
 function love.mouse.getSystemCursor(ctype) end
 
 ---
@@ -82,16 +82,16 @@ function love.mouse.isVisible() end
 ---
 ---The hot spot is the point the operating system uses to determine what was clicked and at what position the mouse cursor is. For example, the normal arrow pointer normally has its hot spot at the top left of the image, but a crosshair cursor might have it in the middle.
 ---
----@param imageData ImageData # The ImageData to use for the new Cursor.
+---@param imageData love.mouse.ImageData # The ImageData to use for the new Cursor.
 ---@param hotx number # The x-coordinate in the ImageData of the cursor's hot spot.
 ---@param hoty number # The y-coordinate in the ImageData of the cursor's hot spot.
----@return Cursor cursor # The new Cursor object.
+---@return love.mouse.Cursor cursor # The new Cursor object.
 function love.mouse.newCursor(imageData, hotx, hoty) end
 
 ---
 ---Sets the current mouse cursor.
 ---
----@param cursor Cursor # The Cursor object to use as the current mouse cursor.
+---@param cursor love.mouse.Cursor # The Cursor object to use as the current mouse cursor.
 function love.mouse.setCursor(cursor) end
 
 ---
@@ -138,3 +138,12 @@ function love.mouse.setX(x) end
 ---
 ---@param y number # The new position of the mouse along the y-axis.
 function love.mouse.setY(y) end
+
+---@class love.mouse.Cursor: love.mouse.Object
+local Cursor = {}
+
+---
+---Gets the type of the Cursor.
+---
+---@return love.mouse.CursorType ctype # The type of the Cursor.
+function Cursor:getType() end

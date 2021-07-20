@@ -1,5 +1,6 @@
 ---@meta
 
+-- version: nil
 ---@class love.font
 love.font = {}
 
@@ -45,6 +46,9 @@ function love.font.newRasterizer(filename) end
 ---@return love.Rasterizer rasterizer # The rasterizer.
 function love.font.newTrueTypeRasterizer(size, hinting, dpiscale) end
 
+---
+---A GlyphData represents a drawable symbol of a font Rasterizer.
+---
 ---@class love.GlyphData: love.Data, love.Object
 local GlyphData = {}
 
@@ -105,6 +109,9 @@ function GlyphData:getHeight() end
 ---@return number width # Glyph width.
 function GlyphData:getWidth() end
 
+---
+---A Rasterizer handles font rendering, containing the font data (image or TrueType font) and drawable glyphs.
+---
 ---@class love.Rasterizer: love.Object
 local Rasterizer = {}
 
@@ -159,8 +166,23 @@ function Rasterizer:getLineHeight() end
 ---@return boolean hasGlyphs # Whatever font contains specified glyphs.
 function Rasterizer:hasGlyphs(glyph1, glyph2) end
 
+---
+---True Type hinting mode.
+---
 ---@class love.HintingMode
----@field normal integer # Default hinting. Should be preferred for typical antialiased fonts.
----@field light integer # Results in fuzzier text but can sometimes preserve the original glyph shapes of the text better than normal hinting.
----@field mono integer # Results in aliased / unsmoothed text with either full opacity or completely transparent pixels. Should be used when antialiasing is not desired for the font.
----@field none integer # Disables hinting for the font. Results in fuzzier text.
+---
+---Default hinting. Should be preferred for typical antialiased fonts.
+---
+---@field normal integer
+---
+---Results in fuzzier text but can sometimes preserve the original glyph shapes of the text better than normal hinting.
+---
+---@field light integer
+---
+---Results in aliased / unsmoothed text with either full opacity or completely transparent pixels. Should be used when antialiasing is not desired for the font.
+---
+---@field mono integer
+---
+---Disables hinting for the font. Results in fuzzier text.
+---
+---@field none integer

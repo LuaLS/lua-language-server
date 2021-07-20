@@ -1,5 +1,6 @@
 ---@meta
 
+-- version: nil
 ---@class love.filesystem
 love.filesystem = {}
 
@@ -258,9 +259,17 @@ function love.filesystem.unmount(archive) end
 ---@return string message # Error message if operation was unsuccessful.
 function love.filesystem.write(name, data, size) end
 
+---
+---Represents a file dropped onto the window.
+---
+---Note that the DroppedFile type can only be obtained from love.filedropped callback, and can't be constructed manually by the user.
+---
 ---@class love.DroppedFile: love.File, love.Object
 local DroppedFile = {}
 
+---
+---Represents a file on the filesystem. A function that takes a file path can also take a File.
+---
 ---@class love.File: love.Object
 local File = {}
 
@@ -369,6 +378,9 @@ function File:tell() end
 ---@return string err # The error string if an error occurred.
 function File:write(data, size) end
 
+---
+---Data representing the contents of a file.
+---
 ---@class love.FileData: love.Data, love.Object
 local FileData = {}
 
@@ -384,23 +396,74 @@ function FileData:getExtension() end
 ---@return string name # The name of the file the FileData represents.
 function FileData:getFilename() end
 
+---
+---Buffer modes for File objects.
+---
 ---@class love.BufferMode
----@field none integer # No buffering. The result of write and append operations appears immediately.
----@field line integer # Line buffering. Write and append operations are buffered until a newline is output or the buffer size limit is reached.
----@field full integer # Full buffering. Write and append operations are always buffered until the buffer size limit is reached.
+---
+---No buffering. The result of write and append operations appears immediately.
+---
+---@field none integer
+---
+---Line buffering. Write and append operations are buffered until a newline is output or the buffer size limit is reached.
+---
+---@field line integer
+---
+---Full buffering. Write and append operations are always buffered until the buffer size limit is reached.
+---
+---@field full integer
 
+---
+---How to decode a given FileData.
+---
 ---@class love.FileDecoder
----@field file integer # The data is unencoded.
----@field base64 integer # The data is base64-encoded.
+---
+---The data is unencoded.
+---
+---@field file integer
+---
+---The data is base64-encoded.
+---
+---@field base64 integer
 
+---
+---The different modes you can open a File in.
+---
 ---@class love.FileMode
----@field r integer # Open a file for read.
----@field w integer # Open a file for write.
----@field a integer # Open a file for append.
----@field c integer # Do not open a file (represents a closed file.)
+---
+---Open a file for read.
+---
+---@field ["r"] integer
+---
+---Open a file for write.
+---
+---@field ["w"] integer
+---
+---Open a file for append.
+---
+---@field ["a"] integer
+---
+---Do not open a file (represents a closed file.)
+---
+---@field ["c"] integer
 
+---
+---The type of a file.
+---
 ---@class love.FileType
----@field file integer # Regular file.
----@field directory integer # Directory.
----@field symlink integer # Symbolic link.
----@field other integer # Something completely different like a device.
+---
+---Regular file.
+---
+---@field file integer
+---
+---Directory.
+---
+---@field directory integer
+---
+---Symbolic link.
+---
+---@field symlink integer
+---
+---Something completely different like a device.
+---
+---@field other integer

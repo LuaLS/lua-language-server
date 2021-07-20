@@ -1,5 +1,6 @@
 ---@meta
 
+-- version: nil
 ---@class love.event
 love.event = {}
 
@@ -44,41 +45,157 @@ function love.event.quit(exitstatus) end
 ---
 function love.event.wait() end
 
+---
+---Arguments to love.event.push() and the like.
+---
+---Since 0.8.0, event names are no longer abbreviated.
+---
 ---@class love.Event
----@field focus integer # Window focus gained or lost
----@field joystickpressed integer # Joystick pressed
----@field joystickreleased integer # Joystick released
----@field keypressed integer # Key pressed
----@field keyreleased integer # Key released
----@field mousepressed integer # Mouse pressed
----@field mousereleased integer # Mouse released
----@field quit integer # Quit
----@field resize integer # Window size changed by the user
----@field visible integer # Window is minimized or un-minimized by the user
----@field mousefocus integer # Window mouse focus gained or lost
----@field threaderror integer # A Lua error has occurred in a thread
----@field joystickadded integer # Joystick connected
----@field joystickremoved integer # Joystick disconnected
----@field joystickaxis integer # Joystick axis motion
----@field joystickhat integer # Joystick hat pressed
----@field gamepadpressed integer # Joystick's virtual gamepad button pressed
----@field gamepadreleased integer # Joystick's virtual gamepad button released
----@field gamepadaxis integer # Joystick's virtual gamepad axis moved
----@field textinput integer # User entered text
----@field mousemoved integer # Mouse position changed
----@field lowmemory integer # Running out of memory on mobile devices system
----@field textedited integer # Candidate text for an IME changed
----@field wheelmoved integer # Mouse wheel moved
----@field touchpressed integer # Touch screen touched
----@field touchreleased integer # Touch screen stop touching
----@field touchmoved integer # Touch press moved inside touch screen
----@field directorydropped integer # Directory is dragged and dropped onto the window
----@field filedropped integer # File is dragged and dropped onto the window.
----@field jp integer # Joystick pressed
----@field jr integer # Joystick released
----@field kp integer # Key pressed
----@field kr integer # Key released
----@field mp integer # Mouse pressed
----@field mr integer # Mouse released
----@field q integer # Quit
----@field f integer # Window focus gained or lost
+---
+---Window focus gained or lost
+---
+---@field focus integer
+---
+---Joystick pressed
+---
+---@field joystickpressed integer
+---
+---Joystick released
+---
+---@field joystickreleased integer
+---
+---Key pressed
+---
+---@field keypressed integer
+---
+---Key released
+---
+---@field keyreleased integer
+---
+---Mouse pressed
+---
+---@field mousepressed integer
+---
+---Mouse released
+---
+---@field mousereleased integer
+---
+---Quit
+---
+---@field quit integer
+---
+---Window size changed by the user
+---
+---@field resize integer
+---
+---Window is minimized or un-minimized by the user
+---
+---@field visible integer
+---
+---Window mouse focus gained or lost
+---
+---@field mousefocus integer
+---
+---A Lua error has occurred in a thread
+---
+---@field threaderror integer
+---
+---Joystick connected
+---
+---@field joystickadded integer
+---
+---Joystick disconnected
+---
+---@field joystickremoved integer
+---
+---Joystick axis motion
+---
+---@field joystickaxis integer
+---
+---Joystick hat pressed
+---
+---@field joystickhat integer
+---
+---Joystick's virtual gamepad button pressed
+---
+---@field gamepadpressed integer
+---
+---Joystick's virtual gamepad button released
+---
+---@field gamepadreleased integer
+---
+---Joystick's virtual gamepad axis moved
+---
+---@field gamepadaxis integer
+---
+---User entered text
+---
+---@field textinput integer
+---
+---Mouse position changed
+---
+---@field mousemoved integer
+---
+---Running out of memory on mobile devices system
+---
+---@field lowmemory integer
+---
+---Candidate text for an IME changed
+---
+---@field textedited integer
+---
+---Mouse wheel moved
+---
+---@field wheelmoved integer
+---
+---Touch screen touched
+---
+---@field touchpressed integer
+---
+---Touch screen stop touching
+---
+---@field touchreleased integer
+---
+---Touch press moved inside touch screen
+---
+---@field touchmoved integer
+---
+---Directory is dragged and dropped onto the window
+---
+---@field directorydropped integer
+---
+---File is dragged and dropped onto the window.
+---
+---@field filedropped integer
+---
+---Joystick pressed
+---
+---@field jp integer
+---
+---Joystick released
+---
+---@field jr integer
+---
+---Key pressed
+---
+---@field kp integer
+---
+---Key released
+---
+---@field kr integer
+---
+---Mouse pressed
+---
+---@field mp integer
+---
+---Mouse released
+---
+---@field mr integer
+---
+---Quit
+---
+---@field ["q"] integer
+---
+---Window focus gained or lost
+---
+---@field ["f"] integer

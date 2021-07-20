@@ -26,14 +26,28 @@ local knownTypes = {
     ['light userdata'] = 'lightuserdata'
 }
 
+local function trim(name)
+    name = name:gsub('^%s+', '')
+    name = name:gsub('%s+$', '')
+    return name
+end
+
+---@param names string
 local function getTypeName(names)
     local types = {}
-    for name in names:gmatch '[%a_][%w_]+' do
-        if name ~= 'or' then
-            types[#types+1] = knownTypes[name] or ('love.' .. name)
-        end
+    names = names:gsub('%sor%s', '|')
+    for name in names:gmatch '[^|]+' do
+        name = trim(name)
+        types[#types+1] = knownTypes[name] or ('love.' .. name)
     end
     return table.concat(types, '|')
+end
+
+local function formatIndex(key)
+    if key:match '^[%a_][%w_]+$' then
+        return key
+    end
+    return ('[%q]'):format(key)
 end
 
 local function buildType(param)
@@ -56,14 +70,16 @@ local function buildSuper(tp)
 end
 
 local function buildDescription(desc)
-    return ('---%s'):format(desc:gsub('([\r\n])', '%1---'))
+    if desc then
+        return ('---\n---%s\n---'):format(desc:gsub('([\r\n])', '%1---'))
+    else
+        return nil
+    end
 end
 
 local function buildFunction(class, func, node)
     local text = {}
-    text[#text+1] = '---'
     text[#text+1] = buildDescription(func.description)
-    text[#text+1] = '---'
     local params = {}
     for _, param in ipairs(func.variants[1].arguments or {}) do
         for paramName in param.name:gmatch '[%a_][%w_]+' do
@@ -92,12 +108,32 @@ local function buildFunction(class, func, node)
     return table.concat(text, '\n')
 end
 
+local function buildDocFunc(tp)
+    local cbs = {}
+    for _, variant in ipairs(tp.variants) do
+        local params  = {}
+        local returns = {}
+        for _, param in ipairs(variant.arguments or {}) do
+            params[#params+1] = ('%s: %s'):format(param.name, getTypeName(param.type))
+        end
+        for _, rtn in ipairs(variant.returns or {}) do
+            returns[#returns+1] = ('%s'):format(getTypeName(rtn.type))
+        end
+        cbs[#cbs+1] = ('fun(%s)%s'):format(
+            table.concat(params, ', '),
+            #returns > 0 and (':' .. table.concat(returns, ', ')) or ''
+        )
+    end
+    return table.concat(cbs, '|')
+end
+
 local function buildFile(class, defs)
     local filePath = libraryPath / (class .. '.lua')
     local text = {}
 
     text[#text+1] = '---@meta'
     text[#text+1] = ''
+    text[#text+1] = ('-- version: %s'):format(defs.version)
     text[#text+1] = ('---@class %s'):format(class)
     text[#text+1] = ('%s = {}'):format(class)
 
@@ -109,6 +145,7 @@ local function buildFile(class, defs)
     for _, tp in ipairs(defs.types or {}) do
         local mark = {}
         text[#text+1] = ''
+        text[#text+1] = buildDescription(tp.description)
         text[#text+1] = ('---@class %s%s'):format(getTypeName(tp.name), buildSuper(tp))
         text[#text+1] = ('local %s = {}'):format(tp.name)
         for _, func in ipairs(tp.functions or {}) do
@@ -120,17 +157,19 @@ local function buildFile(class, defs)
         end
     end
 
-    -- TODO
-    for _, tp in ipairs(defs.callbacks or {}) do
+    for _, cb in ipairs(defs.callbacks or {}) do
         text[#text+1] = ''
-        text[#text+1] = ('---@type %s'):format(getTypeName(tp.name))
+        text[#text+1] = buildDescription(cb.description)
+        text[#text+1] = ('---@alias %s %s'):format(getTypeName(cb.name), buildDocFunc(cb))
     end
 
     for _, enum in ipairs(defs.enums or {}) do
         text[#text+1] = ''
+        text[#text+1] = buildDescription(enum.description)
         text[#text+1] = ('---@class %s'):format(getTypeName(enum.name))
         for _, constant in ipairs(enum.constants) do
-            text[#text+1] = ('---@field %s integer # %s'):format(constant.name, constant.description)
+            text[#text+1] = buildDescription(constant.description)
+            text[#text+1] = ('---@field %s integer'):format(formatIndex(constant.name))
         end
     end
 

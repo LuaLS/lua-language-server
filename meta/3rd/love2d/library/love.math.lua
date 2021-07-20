@@ -1,5 +1,6 @@
 ---@meta
 
+-- version: nil
 ---@class love.math
 love.math = {}
 
@@ -158,6 +159,11 @@ function love.math.setRandomState(state) end
 ---@return table triangles # List of triangles the polygon is composed of, in the form of {{x1, y1, x2, y2, x3, y3},  {x1, y1, x2, y2, x3, y3}, ...}.
 function love.math.triangulate(polygon) end
 
+---
+---A Bézier curve object that can evaluate and render Bézier curves of arbitrary degree.
+---
+---For more information on Bézier curves check this great article on Wikipedia.
+---
 ---@class love.BezierCurve: love.Object
 local BezierCurve = {}
 
@@ -263,6 +269,9 @@ function BezierCurve:setControlPoint() end
 ---@param dy number # Offset along the y axis.
 function BezierCurve:translate(dx, dy) end
 
+---
+---A random number generation object which has its own random state.
+---
 ---@class love.RandomGenerator: love.Object
 local RandomGenerator = {}
 
@@ -311,6 +320,11 @@ function RandomGenerator:setSeed(seed) end
 ---@param state string # The new state of the RandomGenerator object, represented as a string. This should originate from a previous call to RandomGenerator:getState.
 function RandomGenerator:setState(state) end
 
+---
+---Object containing a coordinate system transformation.
+---
+---The love.graphics module has several functions and function variants which accept Transform objects.
+---
 ---@class love.Transform: love.Object
 local Transform = {}
 
@@ -432,6 +446,15 @@ function Transform:transformPoint(globalX, globalY) end
 ---@return love.Transform transform # The Transform object the method was called on. Allows easily chaining Transform methods.
 function Transform:translate(dx, dy) end
 
+---
+---The layout of matrix elements (row-major or column-major).
+---
 ---@class love.MatrixLayout
----@field row integer # The matrix is row-major:
----@field column integer # The matrix is column-major:
+---
+---The matrix is row-major:
+---
+---@field row integer
+---
+---The matrix is column-major:
+---
+---@field column integer

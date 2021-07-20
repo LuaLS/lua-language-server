@@ -1,5 +1,6 @@
 ---@meta
 
+-- version: nil
 ---@class love.audio
 love.audio = {}
 
@@ -188,6 +189,9 @@ function love.audio.setVolume(volume) end
 ---
 function love.audio.stop() end
 
+---
+---Represents an audio input device capable of recording sounds.
+---
 ---@class love.RecordingDevice: love.Object
 local RecordingDevice = {}
 
@@ -251,6 +255,13 @@ function RecordingDevice:start(samplecount, samplerate, bitdepth, channels) end
 ---@return love.SoundData data # The sound data currently in the device's buffer, or nil if the device wasn't recording.
 function RecordingDevice:stop() end
 
+---
+---A Source represents audio you can play back.
+---
+---You can do interesting things with Sources, like set the volume, pitch, and its position relative to the listener. Please note that positional audio only works for mono (i.e. non-stereo) sources.
+---
+---The Source controls (play/pause/stop) act according to the following state table.
+---
 ---@class love.Source: love.Object
 local Source = {}
 
@@ -531,41 +542,144 @@ function Source:stop() end
 ---@return number position # The currently playing position of the Source.
 function Source:tell(unit) end
 
+---
+---The different distance models.
+---
+---Extended information can be found in the chapter "3.4. Attenuation By Distance" of the OpenAL 1.1 specification.
+---
 ---@class love.DistanceModel
----@field none integer # Sources do not get attenuated.
----@field inverse integer # Inverse distance attenuation.
----@field inverseclamped integer # Inverse distance attenuation. Gain is clamped. In version 0.9.2 and older this is named '''inverse clamped'''.
----@field linear integer # Linear attenuation.
----@field linearclamped integer # Linear attenuation. Gain is clamped. In version 0.9.2 and older this is named '''linear clamped'''.
----@field exponent integer # Exponential attenuation.
----@field exponentclamped integer # Exponential attenuation. Gain is clamped. In version 0.9.2 and older this is named '''exponent clamped'''.
+---
+---Sources do not get attenuated.
+---
+---@field none integer
+---
+---Inverse distance attenuation.
+---
+---@field inverse integer
+---
+---Inverse distance attenuation. Gain is clamped. In version 0.9.2 and older this is named '''inverse clamped'''.
+---
+---@field inverseclamped integer
+---
+---Linear attenuation.
+---
+---@field linear integer
+---
+---Linear attenuation. Gain is clamped. In version 0.9.2 and older this is named '''linear clamped'''.
+---
+---@field linearclamped integer
+---
+---Exponential attenuation.
+---
+---@field exponent integer
+---
+---Exponential attenuation. Gain is clamped. In version 0.9.2 and older this is named '''exponent clamped'''.
+---
+---@field exponentclamped integer
 
+---
+---The different types of effects supported by love.audio.setEffect.
+---
 ---@class love.EffectType
----@field chorus integer # Plays multiple copies of the sound with slight pitch and time variation. Used to make sounds sound "fuller" or "thicker".
----@field compressor integer # Decreases the dynamic range of the sound, making the loud and quiet parts closer in volume, producing a more uniform amplitude throughout time.
----@field distortion integer # Alters the sound by amplifying it until it clips, shearing off parts of the signal, leading to a compressed and distorted sound.
----@field echo integer # Decaying feedback based effect, on the order of seconds. Also known as delay; causes the sound to repeat at regular intervals at a decreasing volume.
----@field equalizer integer # Adjust the frequency components of the sound using a 4-band (low-shelf, two band-pass and a high-shelf) equalizer.
----@field flanger integer # Plays two copies of the sound; while varying the phase, or equivalently delaying one of them, by amounts on the order of milliseconds, resulting in phasing sounds.
----@field reverb integer # Decaying feedback based effect, on the order of milliseconds. Used to simulate the reflection off of the surroundings.
----@field ringmodulator integer # An implementation of amplitude modulation; multiplies the source signal with a simple waveform, to produce either volume changes, or inharmonic overtones.
+---
+---Plays multiple copies of the sound with slight pitch and time variation. Used to make sounds sound "fuller" or "thicker".
+---
+---@field chorus integer
+---
+---Decreases the dynamic range of the sound, making the loud and quiet parts closer in volume, producing a more uniform amplitude throughout time.
+---
+---@field compressor integer
+---
+---Alters the sound by amplifying it until it clips, shearing off parts of the signal, leading to a compressed and distorted sound.
+---
+---@field distortion integer
+---
+---Decaying feedback based effect, on the order of seconds. Also known as delay; causes the sound to repeat at regular intervals at a decreasing volume.
+---
+---@field echo integer
+---
+---Adjust the frequency components of the sound using a 4-band (low-shelf, two band-pass and a high-shelf) equalizer.
+---
+---@field equalizer integer
+---
+---Plays two copies of the sound; while varying the phase, or equivalently delaying one of them, by amounts on the order of milliseconds, resulting in phasing sounds.
+---
+---@field flanger integer
+---
+---Decaying feedback based effect, on the order of milliseconds. Used to simulate the reflection off of the surroundings.
+---
+---@field reverb integer
+---
+---An implementation of amplitude modulation; multiplies the source signal with a simple waveform, to produce either volume changes, or inharmonic overtones.
+---
+---@field ringmodulator integer
 
+---
+---The different types of waveforms that can be used with the '''ringmodulator''' EffectType.
+---
 ---@class love.EffectWaveform
----@field sawtooth integer # A sawtooth wave, also known as a ramp wave. Named for its linear rise, and (near-)instantaneous fall along time.
----@field sine integer # A sine wave. Follows a trigonometric sine function.
----@field square integer # A square wave. Switches between high and low states (near-)instantaneously.
----@field triangle integer # A triangle wave. Follows a linear rise and fall that repeats periodically.
+---
+---A sawtooth wave, also known as a ramp wave. Named for its linear rise, and (near-)instantaneous fall along time.
+---
+---@field sawtooth integer
+---
+---A sine wave. Follows a trigonometric sine function.
+---
+---@field sine integer
+---
+---A square wave. Switches between high and low states (near-)instantaneously.
+---
+---@field square integer
+---
+---A triangle wave. Follows a linear rise and fall that repeats periodically.
+---
+---@field triangle integer
 
+---
+---Types of filters for Sources.
+---
 ---@class love.FilterType
----@field lowpass integer # Low-pass filter. High frequency sounds are attenuated.
----@field highpass integer # High-pass filter. Low frequency sounds are attenuated.
----@field bandpass integer # Band-pass filter. Both high and low frequency sounds are attenuated based on the given parameters.
+---
+---Low-pass filter. High frequency sounds are attenuated.
+---
+---@field lowpass integer
+---
+---High-pass filter. Low frequency sounds are attenuated.
+---
+---@field highpass integer
+---
+---Band-pass filter. Both high and low frequency sounds are attenuated based on the given parameters.
+---
+---@field bandpass integer
 
+---
+---Types of audio sources.
+---
+---A good rule of thumb is to use stream for music files and static for all short sound effects. Basically, you want to avoid loading large files into memory at once.
+---
 ---@class love.SourceType
----@field static integer # The whole audio is decoded.
----@field stream integer # The audio is decoded in chunks when needed.
----@field queue integer # The audio must be manually queued by the user.
+---
+---The whole audio is decoded.
+---
+---@field static integer
+---
+---The audio is decoded in chunks when needed.
+---
+---@field stream integer
+---
+---The audio must be manually queued by the user.
+---
+---@field queue integer
 
+---
+---Units that represent time.
+---
 ---@class love.TimeUnit
----@field seconds integer # Regular seconds.
----@field samples integer # Audio samples.
+---
+---Regular seconds.
+---
+---@field seconds integer
+---
+---Audio samples.
+---
+---@field samples integer

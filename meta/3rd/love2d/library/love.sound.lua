@@ -1,5 +1,6 @@
 ---@meta
 
+-- version: nil
 ---@class love.sound
 love.sound = {}
 
@@ -20,6 +21,9 @@ function love.sound.newDecoder(file, buffer) end
 ---@return love.SoundData soundData # A new SoundData object.
 function love.sound.newSoundData(filename) end
 
+---
+---An object which can gradually decode a sound file.
+---
 ---@class love.Decoder: love.Object
 local Decoder = {}
 
@@ -55,6 +59,11 @@ function Decoder:getDuration() end
 ---@return number rate # Number of samples per second.
 function Decoder:getSampleRate() end
 
+---
+---Contains raw audio samples.
+---
+---You can not play SoundData back directly. You must wrap a Source object around it.
+---
 ---@class love.SoundData: love.Data, love.Object
 local SoundData = {}
 

@@ -1,5 +1,6 @@
 ---@meta
 
+-- version: 11.3
 ---@class love
 love = {}
 
@@ -28,6 +29,9 @@ function love.hasDeprecationOutput() end
 ---@param enable boolean # Whether to enable or disable deprecation output.
 function love.setDeprecationOutput(enable) end
 
+---
+---The superclass of all data.
+---
 ---@class love.Data: love.Object
 local Data = {}
 
@@ -48,7 +52,7 @@ function Data:getFFIPointer() end
 ---
 ---Gets a pointer to the Data. Can be used with libraries such as LuaJIT's FFI.
 ---
----@return love.light|userdata pointer # A raw pointer to the Data.
+---@return lightuserdata pointer # A raw pointer to the Data.
 function Data:getPointer() end
 
 ---
@@ -63,6 +67,9 @@ function Data:getSize() end
 ---@return string data # The raw data.
 function Data:getString() end
 
+---
+---The superclass of all LÖVE types.
+---
 ---@class love.Object
 local Object = {}
 
@@ -86,74 +93,186 @@ function Object:type() end
 ---@param name string # The name of the type to check for.
 function Object:typeOf(name) end
 
----@type love.conf
+---
+---If a file called conf.lua is present in your game folder (or .love file), it is run before the LÖVE modules are loaded. You can use this file to overwrite the love.conf function, which is later called by the LÖVE 'boot' script. Using the love.conf function, you can set some configuration options, and change things like the default size of the window, which modules are loaded, and other stuff.
+---
+---@alias love.conf fun(t: table)
 
----@type love.directorydropped
+---
+---Callback function triggered when a directory is dragged and dropped onto the window.
+---
+---@alias love.directorydropped fun(path: string)
 
----@type love.displayrotated
+---
+---Called when the device display orientation changed, for example, user rotated their phone 180 degrees.
+---
+---@alias love.displayrotated fun(index: number, orientation: love.DisplayOrientation)
 
----@type love.draw
+---
+---Callback function used to draw on the screen every frame.
+---
+---@alias love.draw fun()
 
----@type love.errorhandler
+---
+---The error handler, used to display error messages.
+---
+---@alias love.errorhandler fun(msg: string)
 
----@type love.filedropped
+---
+---Callback function triggered when a file is dragged and dropped onto the window.
+---
+---@alias love.filedropped fun(file: love.DroppedFile)
 
----@type love.focus
+---
+---Callback function triggered when window receives or loses focus.
+---
+---@alias love.focus fun(focus: boolean)
 
----@type love.gamepadaxis
+---
+---Called when a Joystick's virtual gamepad axis is moved.
+---
+---@alias love.gamepadaxis fun(joystick: love.Joystick, axis: love.GamepadAxis, value: number)
 
----@type love.gamepadpressed
+---
+---Called when a Joystick's virtual gamepad button is pressed.
+---
+---@alias love.gamepadpressed fun(joystick: love.Joystick, button: love.GamepadButton)
 
----@type love.gamepadreleased
+---
+---Called when a Joystick's virtual gamepad button is released.
+---
+---@alias love.gamepadreleased fun(joystick: love.Joystick, button: love.GamepadButton)
 
----@type love.joystickadded
+---
+---Called when a Joystick is connected.
+---
+---@alias love.joystickadded fun(joystick: love.Joystick)
 
----@type love.joystickaxis
+---
+---Called when a joystick axis moves.
+---
+---@alias love.joystickaxis fun(joystick: love.Joystick, axis: number, value: number)
 
----@type love.joystickhat
+---
+---Called when a joystick hat direction changes.
+---
+---@alias love.joystickhat fun(joystick: love.Joystick, hat: number, direction: love.JoystickHat)
 
----@type love.joystickpressed
+---
+---Called when a joystick button is pressed.
+---
+---@alias love.joystickpressed fun(joystick: love.Joystick, button: number)
 
----@type love.joystickreleased
+---
+---Called when a joystick button is released.
+---
+---@alias love.joystickreleased fun(joystick: love.Joystick, button: number)
 
----@type love.joystickremoved
+---
+---Called when a Joystick is disconnected.
+---
+---@alias love.joystickremoved fun(joystick: love.Joystick)
 
----@type love.keypressed
+---
+---Callback function triggered when a key is pressed.
+---
+---@alias love.keypressed fun(key: love.KeyConstant, scancode: love.Scancode, isrepeat: boolean)|fun(key: love.KeyConstant, isrepeat: boolean)
 
----@type love.keyreleased
+---
+---Callback function triggered when a keyboard key is released.
+---
+---@alias love.keyreleased fun(key: love.KeyConstant, scancode: love.Scancode)
 
----@type love.load
+---
+---This function is called exactly once at the beginning of the game.
+---
+---@alias love.load fun(arg: table, unfilteredArg: table)
 
----@type love.lowmemory
+---
+---Callback function triggered when the system is running out of memory on mobile devices.
+---
+---Mobile operating systems may forcefully kill the game if it uses too much memory, so any non-critical resource should be removed if possible (by setting all variables referencing the resources to '''nil'''), when this event is triggered. Sounds and images in particular tend to use the most memory.
+---
+---@alias love.lowmemory fun()
 
----@type love.mousefocus
+---
+---Callback function triggered when window receives or loses mouse focus.
+---
+---@alias love.mousefocus fun(focus: boolean)
 
----@type love.mousemoved
+---
+---Callback function triggered when the mouse is moved.
+---
+---@alias love.mousemoved fun(x: number, y: number, dx: number, dy: number, istouch: boolean)
 
----@type love.mousepressed
+---
+---Callback function triggered when a mouse button is pressed.
+---
+---@alias love.mousepressed fun(x: number, y: number, button: number, istouch: boolean, presses: number)
 
----@type love.mousereleased
+---
+---Callback function triggered when a mouse button is released.
+---
+---@alias love.mousereleased fun(x: number, y: number, button: number, istouch: boolean, presses: number)
 
----@type love.quit
+---
+---Callback function triggered when the game is closed.
+---
+---@alias love.quit fun():boolean
 
----@type love.resize
+---
+---Called when the window is resized, for example if the user resizes the window, or if love.window.setMode is called with an unsupported width or height in fullscreen and the window chooses the closest appropriate size.
+---
+---@alias love.resize fun(w: number, h: number)
 
----@type love.run
+---
+---The main function, containing the main loop. A sensible default is used when left out.
+---
+---@alias love.run fun():function
 
----@type love.textedited
+---
+---Called when the candidate text for an IME (Input Method Editor) has changed.
+---
+---The candidate text is not the final text that the user will eventually choose. Use love.textinput for that.
+---
+---@alias love.textedited fun(text: string, start: number, length: number)
 
----@type love.textinput
+---
+---Called when text has been entered by the user. For example if shift-2 is pressed on an American keyboard layout, the text '@' will be generated.
+---
+---@alias love.textinput fun(text: string)
 
----@type love.threaderror
+---
+---Callback function triggered when a Thread encounters an error.
+---
+---@alias love.threaderror fun(thread: love.Thread, errorstr: string)
 
----@type love.touchmoved
+---
+---Callback function triggered when a touch press moves inside the touch screen.
+---
+---@alias love.touchmoved fun(id: lightuserdata, x: number, y: number, dx: number, dy: number, pressure: number)
 
----@type love.touchpressed
+---
+---Callback function triggered when the touch screen is touched.
+---
+---@alias love.touchpressed fun(id: lightuserdata, x: number, y: number, dx: number, dy: number, pressure: number)
 
----@type love.touchreleased
+---
+---Callback function triggered when the touch screen stops being touched.
+---
+---@alias love.touchreleased fun(id: lightuserdata, x: number, y: number, dx: number, dy: number, pressure: number)
 
----@type love.update
+---
+---Callback function used to update the state of the game every frame.
+---
+---@alias love.update fun(dt: number)
 
----@type love.visible
+---
+---Callback function triggered when window is minimized/hidden or unminimized by the user.
+---
+---@alias love.visible fun(visible: boolean)
 
----@type love.wheelmoved
+---
+---Callback function triggered when the mouse wheel is moved.
+---
+---@alias love.wheelmoved fun(x: number, y: number)

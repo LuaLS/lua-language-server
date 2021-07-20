@@ -1,5 +1,6 @@
 ---@meta
 
+-- version: nil
 ---@class love.timer
 love.timer = {}
 

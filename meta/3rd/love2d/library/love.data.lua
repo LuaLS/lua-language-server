@@ -1,5 +1,6 @@
 ---@meta
 
+-- version: nil
 ---@class love.data
 love.data = {}
 
@@ -98,9 +99,19 @@ function love.data.pack(container, format, v1) end
 ---@return number index # The index of the first unread byte in the data string.
 function love.data.unpack(format, datastring, pos) end
 
+---
+---Data object containing arbitrary bytes in an contiguous memory.
+---
+---There are currently no LÖVE functions provided for manipulating the contents of a ByteData, but Data:getPointer can be used with LuaJIT's FFI to access and write to the contents directly.
+---
 ---@class love.ByteData: love.Object, love.Data
 local ByteData = {}
 
+---
+---Represents byte data compressed using a specific algorithm.
+---
+---love.data.decompress can be used to de-compress the data (or love.math.decompress in 0.10.2 or earlier).
+---
 ---@class love.CompressedData: love.Data, love.Object
 local CompressedData = {}
 
@@ -110,24 +121,78 @@ local CompressedData = {}
 ---@return love.CompressedDataFormat format # The format of the CompressedData.
 function CompressedData:getFormat() end
 
+---
+---Compressed data formats.
+---
 ---@class love.CompressedDataFormat
----@field lz4 integer # The LZ4 compression format. Compresses and decompresses very quickly, but the compression ratio is not the best. LZ4-HC is used when compression level 9 is specified. Some benchmarks are available here.
----@field zlib integer # The zlib format is DEFLATE-compressed data with a small bit of header data. Compresses relatively slowly and decompresses moderately quickly, and has a decent compression ratio.
----@field gzip integer # The gzip format is DEFLATE-compressed data with a slightly larger header than zlib. Since it uses DEFLATE it has the same compression characteristics as the zlib format.
----@field deflate integer # Raw DEFLATE-compressed data (no header).
+---
+---The LZ4 compression format. Compresses and decompresses very quickly, but the compression ratio is not the best. LZ4-HC is used when compression level 9 is specified. Some benchmarks are available here.
+---
+---@field lz4 integer
+---
+---The zlib format is DEFLATE-compressed data with a small bit of header data. Compresses relatively slowly and decompresses moderately quickly, and has a decent compression ratio.
+---
+---@field zlib integer
+---
+---The gzip format is DEFLATE-compressed data with a slightly larger header than zlib. Since it uses DEFLATE it has the same compression characteristics as the zlib format.
+---
+---@field gzip integer
+---
+---Raw DEFLATE-compressed data (no header).
+---
+---@field deflate integer
 
+---
+---Return type of various data-returning functions.
+---
 ---@class love.ContainerType
----@field data integer # Return type is ByteData.
----@field string integer # Return type is string.
+---
+---Return type is ByteData.
+---
+---@field data integer
+---
+---Return type is string.
+---
+---@field string integer
 
+---
+---Encoding format used to encode or decode data.
+---
 ---@class love.EncodeFormat
----@field base64 integer # Encode/decode data as base64 binary-to-text encoding.
----@field hex integer # Encode/decode data as hexadecimal string.
+---
+---Encode/decode data as base64 binary-to-text encoding.
+---
+---@field base64 integer
+---
+---Encode/decode data as hexadecimal string.
+---
+---@field hex integer
 
+---
+---Hash algorithm of love.data.hash.
+---
 ---@class love.HashFunction
----@field md5 integer # MD5 hash algorithm (16 bytes).
----@field sha1 integer # SHA1 hash algorithm (20 bytes).
----@field sha224 integer # SHA2 hash algorithm with message digest size of 224 bits (28 bytes).
----@field sha256 integer # SHA2 hash algorithm with message digest size of 256 bits (32 bytes).
----@field sha384 integer # SHA2 hash algorithm with message digest size of 384 bits (48 bytes).
----@field sha512 integer # SHA2 hash algorithm with message digest size of 512 bits (64 bytes).
+---
+---MD5 hash algorithm (16 bytes).
+---
+---@field md5 integer
+---
+---SHA1 hash algorithm (20 bytes).
+---
+---@field sha1 integer
+---
+---SHA2 hash algorithm with message digest size of 224 bits (28 bytes).
+---
+---@field sha224 integer
+---
+---SHA2 hash algorithm with message digest size of 256 bits (32 bytes).
+---
+---@field sha256 integer
+---
+---SHA2 hash algorithm with message digest size of 384 bits (48 bytes).
+---
+---@field sha384 integer
+---
+---SHA2 hash algorithm with message digest size of 512 bits (64 bytes).
+---
+---@field sha512 integer

@@ -1,5 +1,6 @@
 ---@meta
 
+-- version: nil
 ---@class love.thread
 love.thread = {}
 
@@ -25,6 +26,9 @@ function love.thread.newChannel() end
 ---@return love.Thread thread # A new Thread that has yet to be started.
 function love.thread.newThread(filename) end
 
+---
+---An object which can be used to send and receive data between different threads.
+---
 ---@class love.Channel: love.Object
 local Channel = {}
 
@@ -100,6 +104,9 @@ function Channel:push(value) end
 ---@return boolean success # Whether the message was successfully supplied (always true).
 function Channel:supply(value) end
 
+---
+---A Thread is a chunk of code that can run in parallel with other threads. Data can be sent between different threads with Channel objects.
+---
 ---@class love.Thread: love.Object
 local Thread = {}
 

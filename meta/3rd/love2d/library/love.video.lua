@@ -1,5 +1,6 @@
 ---@meta
 
+-- version: nil
 ---@class love.video
 love.video = {}
 
@@ -10,5 +11,8 @@ love.video = {}
 ---@return love.VideoStream videostream # A new VideoStream.
 function love.video.newVideoStream(filename) end
 
+---
+---An object which decodes, streams, and controls Videos.
+---
 ---@class love.VideoStream: love.Object
 local VideoStream = {}

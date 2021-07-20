@@ -1,5 +1,6 @@
 ---@meta
 
+-- version: nil
 ---@class love.mouse
 love.mouse = {}
 
@@ -132,6 +133,9 @@ function love.mouse.setX() end
 ---
 function love.mouse.setY() end
 
+---
+---Represents a hardware cursor.
+---
 ---@class love.Cursor: love.Object
 local Cursor = {}
 
@@ -141,17 +145,59 @@ local Cursor = {}
 ---@return love.CursorType ctype # The type of the Cursor.
 function Cursor:getType() end
 
+---
+---Types of hardware cursors.
+---
 ---@class love.CursorType
----@field image integer # The cursor is using a custom image.
----@field arrow integer # An arrow pointer.
----@field ibeam integer # An I-beam, normally used when mousing over editable or selectable text.
----@field wait integer # Wait graphic.
----@field waitarrow integer # Small wait cursor with an arrow pointer.
----@field crosshair integer # Crosshair symbol.
----@field sizenwse integer # Double arrow pointing to the top-left and bottom-right.
----@field sizenesw integer # Double arrow pointing to the top-right and bottom-left.
----@field sizewe integer # Double arrow pointing left and right.
----@field sizens integer # Double arrow pointing up and down.
----@field sizeall integer # Four-pointed arrow pointing up, down, left, and right.
----@field no integer # Slashed circle or crossbones.
----@field hand integer # Hand symbol.
+---
+---The cursor is using a custom image.
+---
+---@field image integer
+---
+---An arrow pointer.
+---
+---@field arrow integer
+---
+---An I-beam, normally used when mousing over editable or selectable text.
+---
+---@field ibeam integer
+---
+---Wait graphic.
+---
+---@field wait integer
+---
+---Small wait cursor with an arrow pointer.
+---
+---@field waitarrow integer
+---
+---Crosshair symbol.
+---
+---@field crosshair integer
+---
+---Double arrow pointing to the top-left and bottom-right.
+---
+---@field sizenwse integer
+---
+---Double arrow pointing to the top-right and bottom-left.
+---
+---@field sizenesw integer
+---
+---Double arrow pointing left and right.
+---
+---@field sizewe integer
+---
+---Double arrow pointing up and down.
+---
+---@field sizens integer
+---
+---Four-pointed arrow pointing up, down, left, and right.
+---
+---@field sizeall integer
+---
+---Slashed circle or crossbones.
+---
+---@field no integer
+---
+---Hand symbol.
+---
+---@field hand integer

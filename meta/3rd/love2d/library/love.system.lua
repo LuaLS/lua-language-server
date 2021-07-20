@@ -1,5 +1,6 @@
 ---@meta
 
+-- version: nil
 ---@class love.system
 love.system = {}
 
@@ -56,9 +57,27 @@ function love.system.setClipboardText(text) end
 ---@param seconds number # The duration to vibrate for. If called on an iOS device, it will always vibrate for 0.5 seconds due to limitations in the iOS system APIs.
 function love.system.vibrate(seconds) end
 
+---
+---The basic state of the system's power supply.
+---
 ---@class love.PowerState
----@field unknown integer # Cannot determine power status.
----@field battery integer # Not plugged in, running on a battery.
----@field nobattery integer # Plugged in, no battery available.
----@field charging integer # Plugged in, charging battery.
----@field charged integer # Plugged in, battery is fully charged.
+---
+---Cannot determine power status.
+---
+---@field unknown integer
+---
+---Not plugged in, running on a battery.
+---
+---@field battery integer
+---
+---Plugged in, no battery available.
+---
+---@field nobattery integer
+---
+---Plugged in, charging battery.
+---
+---@field charging integer
+---
+---Plugged in, battery is fully charged.
+---
+---@field charged integer

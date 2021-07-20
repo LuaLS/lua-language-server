@@ -1,5 +1,6 @@
 ---@meta
 
+-- version: nil
 ---@class love.physics
 love.physics = {}
 
@@ -265,6 +266,9 @@ function love.physics.newWorld(xg, yg, sleep) end
 ---@param scale number # The scale factor as an integer.
 function love.physics.setMeter(scale) end
 
+---
+---Bodies are objects with velocity and position.
+---
 ---@class love.Body: love.Object
 local Body = {}
 
@@ -776,6 +780,11 @@ function Body:setX() end
 ---
 function Body:setY() end
 
+---
+---A ChainShape consists of multiple line segments. It can be used to create the boundaries of your terrain. The shape does not have volume and can only collide with PolygonShape and CircleShape.
+---
+---Unlike the PolygonShape, the ChainShape does not have a vertices limit or has to form a convex shape, but self intersections are not supported.
+---
 ---@class love.ChainShape: love.Shape, love.Object
 local ChainShape = {}
 
@@ -835,6 +844,9 @@ function ChainShape:setNextVertex() end
 ---
 function ChainShape:setPreviousVertex() end
 
+---
+---Circle extends Shape and adds a radius and a local position.
+---
 ---@class love.CircleShape: love.Shape, love.Object
 local CircleShape = {}
 
@@ -860,6 +872,9 @@ function CircleShape:setPoint() end
 ---@param radius number # The radius of the circle
 function CircleShape:setRadius(radius) end
 
+---
+---Contacts are objects created to manage collisions in worlds.
+---
 ---@class love.Contact: love.Object
 local Contact = {}
 
@@ -940,6 +955,9 @@ function Contact:setFriction(friction) end
 ---@param restitution number # The contact restitution.
 function Contact:setRestitution(restitution) end
 
+---
+---Keeps two bodies at the same distance.
+---
 ---@class love.DistanceJoint: love.Joint, love.Object
 local DistanceJoint = {}
 
@@ -977,6 +995,9 @@ function DistanceJoint:setFrequency(Hz) end
 ---
 function DistanceJoint:setLength() end
 
+---
+---A EdgeShape is a line segment. They can be used to create the boundaries of your terrain. The shape does not have volume and can only collide with PolygonShape and CircleShape.
+---
 ---@class love.EdgeShape: love.Shape, love.Object
 local EdgeShape = {}
 
@@ -1017,6 +1038,9 @@ function EdgeShape:setNextVertex() end
 ---
 function EdgeShape:setPreviousVertex() end
 
+---
+---Fixtures attach shapes to bodies.
+---
 ---@class love.Fixture: love.Object
 local Fixture = {}
 
@@ -1230,6 +1254,9 @@ function Fixture:setUserData(value) end
 ---@return boolean isInside # True if the point is inside or false if it is outside.
 function Fixture:testPoint() end
 
+---
+---A FrictionJoint applies friction to a body.
+---
 ---@class love.FrictionJoint: love.Joint, love.Object
 local FrictionJoint = {}
 
@@ -1257,6 +1284,9 @@ function FrictionJoint:setMaxForce(maxForce) end
 ---@param torque number # Maximum torque in Newton-meters.
 function FrictionJoint:setMaxTorque(torque) end
 
+---
+---Keeps bodies together in such a way that they act like gears.
+---
 ---@class love.GearJoint: love.Joint, love.Object
 local GearJoint = {}
 
@@ -1279,6 +1309,9 @@ function GearJoint:getRatio() end
 ---@param ratio number # The new ratio of the joint.
 function GearJoint:setRatio(ratio) end
 
+---
+---Attach multiple bodies together to interact in unique ways.
+---
 ---@class love.Joint: love.Object
 local Joint = {}
 
@@ -1350,6 +1383,9 @@ function Joint:isDestroyed() end
 ---@param value any # The Lua value to associate with the Joint.
 function Joint:setUserData(value) end
 
+---
+---Controls the relative motion between two Bodies. Position and rotation offsets can be specified, as well as the maximum motor force and torque that will be applied to reach the target offsets.
+---
 ---@class love.MotorJoint: love.Joint, love.Object
 local MotorJoint = {}
 
@@ -1375,6 +1411,9 @@ function MotorJoint:setAngularOffset(angleoffset) end
 ---
 function MotorJoint:setLinearOffset() end
 
+---
+---For controlling objects with the mouse.
+---
 ---@class love.MouseJoint: love.Joint, love.Object
 local MouseJoint = {}
 
@@ -1422,6 +1461,9 @@ function MouseJoint:setMaxForce() end
 ---
 function MouseJoint:setTarget() end
 
+---
+---A PolygonShape is a convex polygon with up to 8 vertices.
+---
 ---@class love.PolygonShape: love.Shape, love.Object
 local PolygonShape = {}
 
@@ -1436,6 +1478,9 @@ local PolygonShape = {}
 ---@return number y2 # The y-component of the second vertex.
 function PolygonShape:getPoints() end
 
+---
+---Restricts relative motion between Bodies to one shared axis.
+---
 ---@class love.PrismaticJoint: love.Joint, love.Object
 local PrismaticJoint = {}
 
@@ -1543,6 +1588,9 @@ function PrismaticJoint:setMotorSpeed() end
 ---@param upper number # The upper limit, usually in meters.
 function PrismaticJoint:setUpperLimit(upper) end
 
+---
+---Allows you to simulate bodies connected through pulleys.
+---
 ---@class love.PulleyJoint: love.Joint, love.Object
 local PulleyJoint = {}
 
@@ -1609,6 +1657,9 @@ function PulleyJoint:setMaxLengths(max1, max2) end
 ---@param ratio number # The new pulley ratio of the joint.
 function PulleyJoint:setRatio(ratio) end
 
+---
+---Allow two Bodies to revolve around a shared point.
+---
 ---@class love.RevoluteJoint: love.Joint, love.Object
 local RevoluteJoint = {}
 
@@ -1716,6 +1767,9 @@ function RevoluteJoint:setMotorSpeed() end
 ---@param upper number # The upper limit, in radians.
 function RevoluteJoint:setUpperLimit(upper) end
 
+---
+---The RopeJoint enforces a maximum distance between two points on two bodies. It has no other effect.
+---
 ---@class love.RopeJoint: love.Joint, love.Object
 local RopeJoint = {}
 
@@ -1731,6 +1785,13 @@ function RopeJoint:getMaxLength() end
 ---@param maxLength number # The new maximum length of the RopeJoint.
 function RopeJoint:setMaxLength(maxLength) end
 
+---
+---Shapes are solid 2d geometrical objects which handle the mass and collision of a Body in love.physics.
+---
+---Shapes are attached to a Body via a Fixture. The Shape object is copied when this happens. 
+---
+---The Shape's position is relative to the position of the Body it has been attached to.
+---
 ---@class love.Shape: love.Object
 local Shape = {}
 
@@ -1809,6 +1870,9 @@ function Shape:rayCast(x1, y1, x2, y2, maxFraction, tx, ty, tr, childIndex) end
 ---@return boolean hit # True if inside, false if outside
 function Shape:testPoint(tx, ty, tr) end
 
+---
+---A WeldJoint essentially glues two bodies together.
+---
 ---@class love.WeldJoint: love.Joint, love.Object
 local WeldJoint = {}
 
@@ -1836,6 +1900,9 @@ function WeldJoint:setDampingRatio(ratio) end
 ---@param freq number # The new frequency in hertz.
 function WeldJoint:setFrequency(freq) end
 
+---
+---Restricts a point on the second body to a line on the first body.
+---
 ---@class love.WheelJoint: love.Joint, love.Object
 local WheelJoint = {}
 
@@ -1917,6 +1984,9 @@ function WheelJoint:setSpringDampingRatio(ratio) end
 ---@param freq number # The new frequency in hertz.
 function WheelJoint:setSpringFrequency(freq) end
 
+---
+---A world is an object that contains all bodies and joints.
+---
 ---@class love.World: love.Object
 local World = {}
 
@@ -2067,24 +2137,81 @@ function World:translateOrigin() end
 ---@param positioniterations number # The maximum number of steps used to determine the new positions when resolving a collision.
 function World:update(dt, velocityiterations, positioniterations) end
 
+---
+---The types of a Body. 
+---
 ---@class love.BodyType
----@field static integer # Static bodies do not move.
----@field dynamic integer # Dynamic bodies collide with all bodies.
----@field kinematic integer # Kinematic bodies only collide with dynamic bodies.
+---
+---Static bodies do not move.
+---
+---@field static integer
+---
+---Dynamic bodies collide with all bodies.
+---
+---@field dynamic integer
+---
+---Kinematic bodies only collide with dynamic bodies.
+---
+---@field kinematic integer
 
+---
+---Different types of joints.
+---
 ---@class love.JointType
----@field distance integer # A DistanceJoint.
----@field friction integer # A FrictionJoint.
----@field gear integer # A GearJoint.
----@field mouse integer # A MouseJoint.
----@field prismatic integer # A PrismaticJoint.
----@field pulley integer # A PulleyJoint.
----@field revolute integer # A RevoluteJoint.
----@field rope integer # A RopeJoint.
----@field weld integer # A WeldJoint.
+---
+---A DistanceJoint.
+---
+---@field distance integer
+---
+---A FrictionJoint.
+---
+---@field friction integer
+---
+---A GearJoint.
+---
+---@field gear integer
+---
+---A MouseJoint.
+---
+---@field mouse integer
+---
+---A PrismaticJoint.
+---
+---@field prismatic integer
+---
+---A PulleyJoint.
+---
+---@field pulley integer
+---
+---A RevoluteJoint.
+---
+---@field revolute integer
+---
+---A RopeJoint.
+---
+---@field rope integer
+---
+---A WeldJoint.
+---
+---@field weld integer
 
+---
+---The different types of Shapes, as returned by Shape:getType.
+---
 ---@class love.ShapeType
----@field circle integer # The Shape is a CircleShape.
----@field polygon integer # The Shape is a PolygonShape.
----@field edge integer # The Shape is a EdgeShape.
----@field chain integer # The Shape is a ChainShape.
+---
+---The Shape is a CircleShape.
+---
+---@field circle integer
+---
+---The Shape is a PolygonShape.
+---
+---@field polygon integer
+---
+---The Shape is a EdgeShape.
+---
+---@field edge integer
+---
+---The Shape is a ChainShape.
+---
+---@field chain integer

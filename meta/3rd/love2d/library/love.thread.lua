@@ -1,6 +1,14 @@
 ---@meta
 
--- version: nil
+---
+---Allows you to work with threads.
+---
+---Threads are separate Lua environments, running in parallel to the main code. As their code runs separately, they can be used to compute complex operations without adversely affecting the frame rate of the main thread. However, as they are separate environments, they cannot access the variables and functions of the main thread, and communication between threads is limited.
+---
+---All LOVE objects (userdata) are shared among threads so you'll only have to send their references across threads. You may run into concurrency issues if you manipulate an object on multiple threads at the same time.
+---
+---When a Thread is started, it only loads the love.thread module. Every other module has to be loaded with require.
+---
 ---@class love.thread
 love.thread = {}
 
@@ -42,7 +50,7 @@ function Channel:clear() end
 ---
 ---It waits until a message is in the queue then returns the message value.
 ---
----@return love.Variant value # The contents of the message.
+---@return any value # The contents of the message.
 function Channel:demand() end
 
 ---
@@ -63,7 +71,7 @@ function Channel:hasRead(id) end
 ---
 ---It returns nil if there's no message in the queue.
 ---
----@return love.Variant value # The contents of the message.
+---@return any value # The contents of the message.
 function Channel:peek() end
 
 ---
@@ -83,7 +91,7 @@ function Channel:performAtomic(func, arg1) end
 ---
 ---It returns nil if there are no messages in the queue.
 ---
----@return love.Variant value # The contents of the message.
+---@return any value # The contents of the message.
 function Channel:pop() end
 
 ---
@@ -91,7 +99,7 @@ function Channel:pop() end
 ---
 ---See Variant for the list of supported types.
 ---
----@param value love.Variant # The contents of the message.
+---@param value any # The contents of the message.
 ---@return number id # Identifier which can be supplied to Channel:hasRead
 function Channel:push(value) end
 
@@ -100,7 +108,7 @@ function Channel:push(value) end
 ---
 ---See Variant for the list of supported types.
 ---
----@param value love.Variant # The contents of the message.
+---@param value any # The contents of the message.
 ---@return boolean success # Whether the message was successfully supplied (always true).
 function Channel:supply(value) end
 

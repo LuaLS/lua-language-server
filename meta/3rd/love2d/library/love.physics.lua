@@ -1,6 +1,8 @@
 ---@meta
 
--- version: nil
+---
+---Can simulate 2D rigid body physics in a realistic manner. This module is based on Box2D, and this API corresponds to the Box2D API as closely as possible.
+---
 ---@class love.physics
 love.physics = {}
 

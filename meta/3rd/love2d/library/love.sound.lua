@@ -1,6 +1,8 @@
 ---@meta
 
--- version: nil
+---
+---This module is responsible for decoding sound files. It can't play the sounds, see love.audio for that.
+---
 ---@class love.sound
 love.sound = {}
 

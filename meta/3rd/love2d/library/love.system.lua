@@ -1,6 +1,8 @@
 ---@meta
 
--- version: nil
+---
+---Provides access to information about the user's system.
+---
 ---@class love.system
 love.system = {}
 

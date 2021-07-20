@@ -1,6 +1,8 @@
 ---@meta
 
--- version: nil
+---
+---Provides functionality for creating and transforming data.
+---
 ---@class love.data
 love.data = {}
 

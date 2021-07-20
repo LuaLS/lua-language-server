@@ -23,7 +23,8 @@ local knownTypes = {
     ['lightuserdata']  = 'lightuserdata',
     ['thread']         = 'thread',
     ['cdata']          = 'ffi.cdata*',
-    ['light userdata'] = 'lightuserdata'
+    ['light userdata'] = 'lightuserdata',
+    ['Variant']        = 'any',
 }
 
 local function trim(name)
@@ -133,7 +134,10 @@ local function buildFile(class, defs)
 
     text[#text+1] = '---@meta'
     text[#text+1] = ''
-    text[#text+1] = ('-- version: %s'):format(defs.version)
+    if defs.version then
+        text[#text+1] = ('-- version: %s'):format(defs.version)
+    end
+    text[#text+1] = buildDescription(defs.description)
     text[#text+1] = ('---@class %s'):format(class)
     text[#text+1] = ('%s = {}'):format(class)
 

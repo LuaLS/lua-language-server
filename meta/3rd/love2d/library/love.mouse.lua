@@ -1,6 +1,8 @@
 ---@meta
 
--- version: nil
+---
+---Provides an interface to the user's mouse.
+---
 ---@class love.mouse
 love.mouse = {}
 

@@ -1,6 +1,10 @@
 ---@meta
 
--- version: nil
+---
+---This module is responsible for decoding, controlling, and streaming video files.
+---
+---It can't draw the videos, see love.graphics.newVideo and Video objects for that.
+---
 ---@class love.video
 love.video = {}
 

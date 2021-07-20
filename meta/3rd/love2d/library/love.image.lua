@@ -1,6 +1,8 @@
 ---@meta
 
--- version: nil
+---
+---Provides an interface to decode encoded image data.
+---
 ---@class love.image
 love.image = {}
 

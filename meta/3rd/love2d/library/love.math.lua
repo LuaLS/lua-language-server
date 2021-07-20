@@ -1,6 +1,8 @@
 ---@meta
 
--- version: nil
+---
+---Provides system-independent mathematical functions.
+---
 ---@class love.math
 love.math = {}
 

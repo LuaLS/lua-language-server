@@ -1,6 +1,8 @@
 ---@meta
 
--- version: nil
+---
+---Manages events, like keypresses.
+---
 ---@class love.event
 love.event = {}
 

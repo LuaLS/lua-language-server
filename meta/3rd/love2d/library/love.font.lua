@@ -1,6 +1,8 @@
 ---@meta
 
--- version: nil
+---
+---Allows you to work with fonts.
+---
 ---@class love.font
 love.font = {}
 

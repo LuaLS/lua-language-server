@@ -1,6 +1,8 @@
 ---@meta
 
--- version: nil
+---
+---Provides an interface to create noise with the user's speakers.
+---
 ---@class love.audio
 love.audio = {}
 

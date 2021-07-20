@@ -1,6 +1,8 @@
 ---@meta
 
--- version: nil
+---
+---Provides an interface to the user's keyboard.
+---
 ---@class love.keyboard
 love.keyboard = {}
 

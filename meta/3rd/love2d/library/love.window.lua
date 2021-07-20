@@ -1,6 +1,8 @@
 ---@meta
 
--- version: nil
+---
+---Provides an interface for modifying and retrieving information about the program's window.
+---
 ---@class love.window
 love.window = {}
 

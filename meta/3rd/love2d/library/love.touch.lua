@@ -1,6 +1,8 @@
 ---@meta
 
--- version: nil
+---
+---Provides an interface to touch-screen presses.
+---
 ---@class love.touch
 love.touch = {}
 

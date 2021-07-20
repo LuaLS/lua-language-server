@@ -12,10 +12,10 @@ Main                <-  (Token / Sp)*
 Sp                  <-  %s+
 X16                 <-  [a-fA-F0-9]
 Word                <-  [a-zA-Z0-9_]
-Token               <-  Name / String / Symbol / Integer
-Name                <-  ({} {[a-zA-Z_] [a-zA-Z0-9_.*-]*} {})
+Token               <-  Integer / Name / String / Symbol
+Name                <-  ({} {[a-zA-Z_0-9] [a-zA-Z0-9_.*-]*} {})
                     ->  Name
-Integer             <-  ({} {[0-9]+} {})
+Integer             <-  ({} {[0-9]+} !'.' {})
                     ->  Integer
 String              <-  ({} StringDef {})
                     ->  String

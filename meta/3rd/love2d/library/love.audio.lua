@@ -198,12 +198,6 @@ local RecordingDevice = {}
 function RecordingDevice:getBitDepth() end
 
 ---
----Gets the number of bits per sample in the data currently being recorded.
----
----@return number bits # The number of bits per sample in the data that's currently being recorded.
-function RecordingDevice:getBitDepth() end
-
----
 ---Gets the number of channels currently being recorded (mono or stereo).
 ---
 ---@return number channels # The number of channels being recorded (1 for mono, 2 for stereo).

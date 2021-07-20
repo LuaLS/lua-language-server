@@ -1116,13 +1116,6 @@ local Mesh = {}
 function Mesh:attachAttribute(name, mesh) end
 
 ---
----Attaches a vertex attribute from a different Mesh onto this Mesh, for use when drawing. This can be used to share vertex attribute data between several different Meshes.
----
----@param name string # The name of the vertex attribute to attach.
----@param mesh love.Mesh # The Mesh to get the vertex attribute from.
-function Mesh:attachAttribute(name, mesh) end
-
----
 ---Removes a previously attached vertex attribute from this Mesh.
 ---
 ---@param name string # The name of the attached vertex attribute to detach.

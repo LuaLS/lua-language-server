@@ -26,15 +26,19 @@ local knownTypes = {
     ['light userdata'] = 'lightuserdata'
 }
 
-local function getTypeName(name)
-    if knownTypes[name] then
-        return knownTypes[name]
+local function getTypeName(names)
+    local types = {}
+    for name in names:gmatch '[%a_][%w_]+' do
+        if name ~= 'or' then
+            types[#types+1] = knownTypes[name] or ('love.' .. name)
+        end
     end
-    return 'love.' .. name
+    return table.concat(types, '|')
 end
 
 local function buildType(param)
     if param.table then
+        -- TODO
         getTypeName(param.type)
     end
     return getTypeName(param.type)
@@ -103,15 +107,20 @@ local function buildFile(class, defs)
     end
 
     for _, tp in ipairs(defs.types or {}) do
+        local mark = {}
         text[#text+1] = ''
         text[#text+1] = ('---@class %s%s'):format(getTypeName(tp.name), buildSuper(tp))
         text[#text+1] = ('local %s = {}'):format(tp.name)
         for _, func in ipairs(tp.functions or {}) do
-            text[#text+1] = ''
-            text[#text+1] = buildFunction(class, func, tp.name .. ':')
+            if not mark[func.name] then
+                mark[func.name] = true
+                text[#text+1] = ''
+                text[#text+1] = buildFunction(class, func, tp.name .. ':')
+            end
         end
     end
 
+    -- TODO
     for _, tp in ipairs(defs.callbacks or {}) do
         text[#text+1] = ''
         text[#text+1] = ('---@type %s'):format(getTypeName(tp.name))

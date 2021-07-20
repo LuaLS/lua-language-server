@@ -10,7 +10,7 @@ love.data = {}
 ---@param format love.CompressedDataFormat # The format to use when compressing the string.
 ---@param rawstring string # The raw (un-compressed) string to compress.
 ---@param level number # The level of compression to use, between 0 and 9. -1 indicates the default level. The meaning of this argument depends on the compression format being used.
----@return love.CompressedData or string compressedData # CompressedData/string which contains the compressed version of rawstring.
+---@return love.CompressedData|string compressedData # CompressedData/string which contains the compressed version of rawstring.
 function love.data.compress(container, format, rawstring, level) end
 
 ---
@@ -19,7 +19,7 @@ function love.data.compress(container, format, rawstring, level) end
 ---@param container love.ContainerType # What type to return the decoded data as.
 ---@param format love.EncodeFormat # The format of the input data.
 ---@param sourceString string # The raw (encoded) data to decode.
----@return love.ByteData or string decoded # ByteData/string which contains the decoded version of source.
+---@return love.ByteData|string decoded # ByteData/string which contains the decoded version of source.
 function love.data.decode(container, format, sourceString) end
 
 ---
@@ -27,7 +27,7 @@ function love.data.decode(container, format, sourceString) end
 ---
 ---@param container love.ContainerType # What type to return the decompressed data as.
 ---@param compressedData love.CompressedData # The compressed data to decompress.
----@return love.Data or string decompressedData # Data/string containing the raw decompressed data.
+---@return love.Data|string decompressedData # Data/string containing the raw decompressed data.
 function love.data.decompress(container, compressedData) end
 
 ---
@@ -37,7 +37,7 @@ function love.data.decompress(container, compressedData) end
 ---@param format love.EncodeFormat # The format of the output data.
 ---@param sourceString string # The raw data to encode.
 ---@param linelength number # The maximum line length of the output. Only supported for base64, ignored if 0.
----@return love.ByteData or string encoded # ByteData/string which contains the encoded version of source.
+---@return love.ByteData|string encoded # ByteData/string which contains the encoded version of source.
 function love.data.encode(container, format, sourceString, linelength) end
 
 ---
@@ -82,8 +82,8 @@ function love.data.newDataView(data, offset, size) end
 ---
 ---@param container love.ContainerType # What type to return the encoded data as.
 ---@param format string # A string determining how the values are packed. Follows the rules of Lua 5.3's string.pack format strings.
----@param v1 love.number or boolean or string # The first value (number, boolean, or string) to serialize.
----@return love.Data or string data # Data/string which contains the serialized data.
+---@param v1 number|boolean|string # The first value (number, boolean, or string) to serialize.
+---@return love.Data|string data # Data/string which contains the serialized data.
 function love.data.pack(container, format, v1) end
 
 ---
@@ -94,7 +94,7 @@ function love.data.pack(container, format, v1) end
 ---@param format string # A string determining how the values were packed. Follows the rules of Lua 5.3's string.pack format strings.
 ---@param datastring string # A string containing the packed (serialized) data.
 ---@param pos number # Where to start reading in the string. Negative values can be used to read relative from the end of the string.
----@return love.number or boolean or string v1 # The first value (number, boolean, or string) that was unpacked.
+---@return number|boolean|string v1 # The first value (number, boolean, or string) that was unpacked.
 ---@return number index # The index of the first unread byte in the data string.
 function love.data.unpack(format, datastring, pos) end
 

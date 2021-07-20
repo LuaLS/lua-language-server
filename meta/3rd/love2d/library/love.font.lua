@@ -154,8 +154,8 @@ function Rasterizer:getLineHeight() end
 ---
 ---Checks if font contains specified glyphs.
 ---
----@param glyph1 love.string or number # Glyph
----@param glyph2 love.string or number # Glyph
+---@param glyph1 string|number # Glyph
+---@param glyph2 string|number # Glyph
 ---@return boolean hasGlyphs # Whatever font contains specified glyphs.
 function Rasterizer:hasGlyphs(glyph1, glyph2) end
 

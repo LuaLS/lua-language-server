@@ -48,7 +48,7 @@ function Data:getFFIPointer() end
 ---
 ---Gets a pointer to the Data. Can be used with libraries such as LuaJIT's FFI.
 ---
----@return lightuserdata pointer # A raw pointer to the Data.
+---@return love.light|userdata pointer # A raw pointer to the Data.
 function Data:getPointer() end
 
 ---

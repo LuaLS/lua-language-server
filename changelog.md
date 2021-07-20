@@ -8,6 +8,7 @@
     ---@field ['?'] number
     ---@field ['#'] number
     ```
+* `NEW` add supports of `love2d`
 
 ## 2.3.1
 `2021-7-19`

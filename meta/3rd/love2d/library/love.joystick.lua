@@ -251,19 +251,19 @@ function Joystick:setVibration(left, right) end
 ---
 ---Bottom face button (A).
 ---
----@field ["a"] integer
+---@field a integer
 ---
 ---Right face button (B).
 ---
----@field ["b"] integer
+---@field b integer
 ---
 ---Left face button (X).
 ---
----@field ["x"] integer
+---@field x integer
 ---
 ---Top face button (Y).
 ---
----@field ["y"] integer
+---@field y integer
 ---
 ---Back button.
 ---
@@ -316,15 +316,15 @@ function Joystick:setVibration(left, right) end
 ---
 ---Centered
 ---
----@field ["c"] integer
+---@field c integer
 ---
 ---Down
 ---
----@field ["d"] integer
+---@field d integer
 ---
 ---Left
 ---
----@field ["l"] integer
+---@field l integer
 ---
 ---Left+Down
 ---
@@ -336,7 +336,7 @@ function Joystick:setVibration(left, right) end
 ---
 ---Right
 ---
----@field ["r"] integer
+---@field r integer
 ---
 ---Right+Down
 ---
@@ -348,7 +348,7 @@ function Joystick:setVibration(left, right) end
 ---
 ---Up
 ---
----@field ["u"] integer
+---@field u integer
 
 ---
 ---Types of Joystick inputs.

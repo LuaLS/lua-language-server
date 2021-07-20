@@ -90,7 +90,7 @@ function love.window.getIcon() end
 ---
 ---@return number width # Window width.
 ---@return number height # Window height.
----@return table flags # Table with the window properties:
+---@return {fullscreen: boolean, fullscreentype: FullscreenType, vsync: boolean, msaa: number, resizable: boolean, borderless: boolean, centered: boolean, display: number, minwidth: number, minheight: number, highdpi: boolean, refreshrate: number, x: number, y: number, srgb: boolean} flags # Table with the window properties:
 function love.window.getMode() end
 
 ---
@@ -223,7 +223,7 @@ function love.window.setIcon(imagedata) end
 ---
 ---@param width number # Display width.
 ---@param height number # Display height.
----@param flags table # The flags table with the options:
+---@param flags {fullscreen: boolean, fullscreentype: FullscreenType, vsync: boolean, msaa: number, stencil: boolean, depth: number, resizable: boolean, borderless: boolean, centered: boolean, display: number, minwidth: number, minheight: number, highdpi: boolean, x: number, y: number, usedpiscale: boolean, srgb: boolean} # The flags table with the options:
 ---@return boolean success # True if successful, false otherwise.
 function love.window.setMode(width, height, flags) end
 
@@ -281,7 +281,7 @@ function love.window.toPixels(value) end
 ---
 ---@param width number # Window width.
 ---@param height number # Window height.
----@param settings table # The settings table with the following optional fields. Any field not filled in will use the current value that would be returned by love.window.getMode.
+---@param settings {fullscreen: boolean, fullscreentype: FullscreenType, vsync: boolean, msaa: number, resizable: boolean, borderless: boolean, centered: boolean, display: number, minwidth: number, minheight: number, highdpi: boolean, x: number, y: number} # The settings table with the following optional fields. Any field not filled in will use the current value that would be returned by love.window.getMode.
 ---@return boolean success # True if successful, false otherwise.
 function love.window.updateMode(width, height, settings) end
 

@@ -197,8 +197,8 @@ function love.event.wait() end
 ---
 ---Quit
 ---
----@field ["q"] integer
+---@field q integer
 ---
 ---Window focus gained or lost
 ---
----@field ["f"] integer
+---@field f integer

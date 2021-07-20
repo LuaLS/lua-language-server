@@ -85,107 +85,107 @@ function love.keyboard.setTextInput(enable) end
 ---
 ---The A key
 ---
----@field ["a"] integer
+---@field a integer
 ---
 ---The B key
 ---
----@field ["b"] integer
+---@field b integer
 ---
 ---The C key
 ---
----@field ["c"] integer
+---@field c integer
 ---
 ---The D key
 ---
----@field ["d"] integer
+---@field d integer
 ---
 ---The E key
 ---
----@field ["e"] integer
+---@field e integer
 ---
 ---The F key
 ---
----@field ["f"] integer
+---@field f integer
 ---
 ---The G key
 ---
----@field ["g"] integer
+---@field g integer
 ---
 ---The H key
 ---
----@field ["h"] integer
+---@field h integer
 ---
 ---The I key
 ---
----@field ["i"] integer
+---@field i integer
 ---
 ---The J key
 ---
----@field ["j"] integer
+---@field j integer
 ---
 ---The K key
 ---
----@field ["k"] integer
+---@field k integer
 ---
 ---The L key
 ---
----@field ["l"] integer
+---@field l integer
 ---
 ---The M key
 ---
----@field ["m"] integer
+---@field m integer
 ---
 ---The N key
 ---
----@field ["n"] integer
+---@field n integer
 ---
 ---The O key
 ---
----@field ["o"] integer
+---@field o integer
 ---
 ---The P key
 ---
----@field ["p"] integer
+---@field p integer
 ---
 ---The Q key
 ---
----@field ["q"] integer
+---@field q integer
 ---
 ---The R key
 ---
----@field ["r"] integer
+---@field r integer
 ---
 ---The S key
 ---
----@field ["s"] integer
+---@field s integer
 ---
 ---The T key
 ---
----@field ["t"] integer
+---@field t integer
 ---
 ---The U key
 ---
----@field ["u"] integer
+---@field u integer
 ---
 ---The V key
 ---
----@field ["v"] integer
+---@field v integer
 ---
 ---The W key
 ---
----@field ["w"] integer
+---@field w integer
 ---
 ---The X key
 ---
----@field ["x"] integer
+---@field x integer
 ---
 ---The Y key
 ---
----@field ["y"] integer
+---@field y integer
 ---
 ---The Z key
 ---
----@field ["z"] integer
+---@field z integer
 ---
 ---The zero key
 ---
@@ -333,7 +333,7 @@ function love.keyboard.setTextInput(enable) end
 ---
 ---Underscore key
 ---
----@field ["_"] integer
+---@field _ integer
 ---
 ---Grave accent key
 ---
@@ -672,107 +672,107 @@ function love.keyboard.setTextInput(enable) end
 ---
 ---The 'A' key on an American layout.
 ---
----@field ["a"] integer
+---@field a integer
 ---
 ---The 'B' key on an American layout.
 ---
----@field ["b"] integer
+---@field b integer
 ---
 ---The 'C' key on an American layout.
 ---
----@field ["c"] integer
+---@field c integer
 ---
 ---The 'D' key on an American layout.
 ---
----@field ["d"] integer
+---@field d integer
 ---
 ---The 'E' key on an American layout.
 ---
----@field ["e"] integer
+---@field e integer
 ---
 ---The 'F' key on an American layout.
 ---
----@field ["f"] integer
+---@field f integer
 ---
 ---The 'G' key on an American layout.
 ---
----@field ["g"] integer
+---@field g integer
 ---
 ---The 'H' key on an American layout.
 ---
----@field ["h"] integer
+---@field h integer
 ---
 ---The 'I' key on an American layout.
 ---
----@field ["i"] integer
+---@field i integer
 ---
 ---The 'J' key on an American layout.
 ---
----@field ["j"] integer
+---@field j integer
 ---
 ---The 'K' key on an American layout.
 ---
----@field ["k"] integer
+---@field k integer
 ---
 ---The 'L' key on an American layout.
 ---
----@field ["l"] integer
+---@field l integer
 ---
 ---The 'M' key on an American layout.
 ---
----@field ["m"] integer
+---@field m integer
 ---
 ---The 'N' key on an American layout.
 ---
----@field ["n"] integer
+---@field n integer
 ---
 ---The 'O' key on an American layout.
 ---
----@field ["o"] integer
+---@field o integer
 ---
 ---The 'P' key on an American layout.
 ---
----@field ["p"] integer
+---@field p integer
 ---
 ---The 'Q' key on an American layout.
 ---
----@field ["q"] integer
+---@field q integer
 ---
 ---The 'R' key on an American layout.
 ---
----@field ["r"] integer
+---@field r integer
 ---
 ---The 'S' key on an American layout.
 ---
----@field ["s"] integer
+---@field s integer
 ---
 ---The 'T' key on an American layout.
 ---
----@field ["t"] integer
+---@field t integer
 ---
 ---The 'U' key on an American layout.
 ---
----@field ["u"] integer
+---@field u integer
 ---
 ---The 'V' key on an American layout.
 ---
----@field ["v"] integer
+---@field v integer
 ---
 ---The 'W' key on an American layout.
 ---
----@field ["w"] integer
+---@field w integer
 ---
 ---The 'X' key on an American layout.
 ---
----@field ["x"] integer
+---@field x integer
 ---
 ---The 'Y' key on an American layout.
 ---
----@field ["y"] integer
+---@field y integer
 ---
 ---The 'Z' key on an American layout.
 ---
----@field ["z"] integer
+---@field z integer
 ---
 ---The '1' key on an American layout.
 ---

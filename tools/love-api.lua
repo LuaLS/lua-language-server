@@ -45,17 +45,25 @@ local function getTypeName(names)
 end
 
 local function formatIndex(key)
-    if key:match '^[%a_][%w_]+$' then
+    if key:match '^[%a_][%w_]*$' then
         return key
     end
     return ('[%q]'):format(key)
 end
 
+local buildType
+
 local function buildDocTable(tbl)
-    
+    local fields = {}
+    for _, field in ipairs(tbl) do
+        if field.name ~= '...' then
+            fields[#fields+1] = ('%s: %s'):format(formatIndex(field.name), field.type)
+        end
+    end
+    return ('{%s}'):format(table.concat(fields, ', '))
 end
 
-local function buildType(param)
+function buildType(param)
     if param.table then
         return buildDocTable(param.table)
     end

@@ -157,7 +157,7 @@ function love.audio.setDopplerScale(scale) end
 ---
 ---@overload fun(name: string, enabled: boolean):boolean
 ---@param name string # The name of the effect.
----@param settings table # The settings to use for this effect, with the following fields:
+---@param settings {type: EffectType, volume: number} # The settings to use for this effect, with the following fields:
 ---@return boolean success # Whether the effect was successfully created.
 function love.audio.setEffect(name, settings) end
 
@@ -341,13 +341,13 @@ function Source:getDuration(unit) end
 ---
 ---@param name string # The name of the effect.
 ---@param filtersettings table # An optional empty table that will be filled with the filter settings.
----@return table filtersettings # The settings for the filter associated to this effect, or nil if the effect is not present in this Source or has no filter associated. The table has the following fields:
+---@return {volume: number, highgain: number, lowgain: number} filtersettings # The settings for the filter associated to this effect, or nil if the effect is not present in this Source or has no filter associated. The table has the following fields:
 function Source:getEffect(name, filtersettings) end
 
 ---
 ---Gets the filter settings currently applied to the Source.
 ---
----@return table settings # The filter settings to use for this Source, or nil if the Source has no active filter. The table has the following fields:
+---@return {type: FilterType, volume: number, highgain: number, lowgain: number} settings # The filter settings to use for this Source, or nil if the Source has no active filter. The table has the following fields:
 function Source:getFilter() end
 
 ---
@@ -489,7 +489,7 @@ function Source:setEffect(name, enable) end
 ---Sets a low-pass, high-pass, or band-pass filter to apply when playing the Source.
 ---
 ---@overload fun()
----@param settings table # The filter settings to use for this Source, with the following fields:
+---@param settings {type: FilterType, volume: number, highgain: number, lowgain: number} # The filter settings to use for this Source, with the following fields:
 ---@return boolean success # Whether the filter was successfully applied to the Source.
 function Source:setFilter(settings) end
 

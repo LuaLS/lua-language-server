@@ -348,7 +348,7 @@ function love.graphics.getStackDepth() end
 ---Gets performance-related rendering statistics. 
 ---
 ---@overload fun(stats: table):table
----@return table stats # A table with the following fields:
+---@return {drawcalls: number, canvasswitches: number, texturememory: number, images: number, canvases: number, fonts: number, shaderswitches: number, drawcallsbatched: number} stats # A table with the following fields:
 function love.graphics.getStats() end
 
 ---
@@ -451,7 +451,7 @@ function love.graphics.line(x1, y1, x2, y2) end
 ---To use an array image in a Shader, it must be declared as a ArrayImage or sampler2DArray type (instead of Image or sampler2D). The Texel(ArrayImage image, vec3 texturecoord) shader function must be used to get pixel colors from a slice of the array image. The vec3 argument contains the texture coordinate in the first two components, and the 0-based slice index in the third component.
 ---
 ---@param slices table # A table containing filepaths to images (or File, FileData, ImageData, or CompressedImageData objects), in an array. Each sub-image must have the same dimensions. A table of tables can also be given, where each sub-table contains all mipmap levels for the slice index of that sub-table.
----@param settings table # Optional table of settings to configure the array image, containing the following fields:
+---@param settings {mipmaps: boolean, linear: boolean, dpiscale: number} # Optional table of settings to configure the array image, containing the following fields:
 ---@return love.Image image # An Array Image object.
 function love.graphics.newArrayImage(slices, settings) end
 
@@ -511,7 +511,7 @@ function love.graphics.newCanvas() end
 ---
 ---@overload fun(faces: table, settings: table):love.Image
 ---@param filename string # The filepath to a cubemap image file (or a File, FileData, or ImageData).
----@param settings table # Optional table of settings to configure the cubemap image, containing the following fields:
+---@param settings {mipmaps: boolean, linear: boolean} # Optional table of settings to configure the cubemap image, containing the following fields:
 ---@return love.Image image # An cubemap Image object.
 function love.graphics.newCubeImage(filename, settings) end
 
@@ -560,7 +560,7 @@ function love.graphics.newImageFont(filename, glyphs) end
 ---@overload fun(vertexformat: table, vertices: table, mode: love.MeshDrawMode, usage: love.SpriteBatchUsage):love.Mesh
 ---@overload fun(vertexformat: table, vertexcount: number, mode: love.MeshDrawMode, usage: love.SpriteBatchUsage):love.Mesh
 ---@overload fun(vertexcount: number, texture: love.Texture, mode: love.MeshDrawMode):love.Mesh
----@param vertices table # The table filled with vertex information tables for each vertex as follows:
+---@param vertices {["1"]: number, ["2"]: number, ["3"]: number, ["4"]: number, ["5"]: number, ["6"]: number, ["7"]: number, ["8"]: number} # The table filled with vertex information tables for each vertex as follows:
 ---@param mode love.MeshDrawMode # How the vertices are used when drawing. The default mode 'fan' is sufficient for simple convex polygons.
 ---@param usage love.SpriteBatchUsage # The expected usage of the Mesh. The specified usage mode affects the Mesh's memory usage and performance.
 ---@return love.Mesh mesh # The new mesh.
@@ -638,7 +638,7 @@ function love.graphics.newVideo(filename) end
 ---Array images are a much better choice than volume images for storing multiple different sprites in a single array image for directly drawing them.
 ---
 ---@param layers table # A table containing filepaths to images (or File, FileData, ImageData, or CompressedImageData objects), in an array. A table of tables can also be given, where each sub-table represents a single mipmap level and contains all layers for that mipmap.
----@param settings table # Optional table of settings to configure the volume image, containing the following fields:
+---@param settings {mipmaps: boolean, linear: boolean} # Optional table of settings to configure the volume image, containing the following fields:
 ---@return love.Image image # A volume Image object.
 function love.graphics.newVolumeImage(layers, settings) end
 
@@ -1281,7 +1281,7 @@ function Mesh:getVertexCount() end
 ---
 ---Gets the vertex format that the Mesh was created with.
 ---
----@return table format # The vertex format of the Mesh, which is a table containing tables for each vertex attribute the Mesh was created with, in the form of {attribute, ...}.
+---@return {attribute: table} format # The vertex format of the Mesh, which is a table containing tables for each vertex attribute the Mesh was created with, in the form of {attribute, ...}.
 function Mesh:getVertexFormat() end
 
 ---
@@ -1365,7 +1365,7 @@ function Mesh:setVertexMap(map) end
 ---
 ---@overload fun(data: love.Data, startvertex: number)
 ---@overload fun(vertices: table)
----@param vertices table # The table filled with vertex information tables for each vertex, in the form of {vertex, ...} where each vertex is a table in the form of {attributecomponent, ...}.
+---@param vertices {attributecomponent: number} # The table filled with vertex information tables for each vertex, in the form of {vertex, ...} where each vertex is a table in the form of {attributecomponent, ...}.
 ---@param startvertex number # The index of the first vertex to replace.
 function Mesh:setVertices(vertices, startvertex) end
 

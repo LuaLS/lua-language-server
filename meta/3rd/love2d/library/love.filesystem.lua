@@ -73,7 +73,7 @@ function love.filesystem.getIdentity() end
 ---@overload fun(path: string, filtertype: love.FileType, info: table):table
 ---@param path string # The file or directory path to check.
 ---@param filtertype love.FileType # If supplied, this parameter causes getInfo to only return the info table if the item at the given path matches the specified file type.
----@return table info # A table containing information about the specified path, or nil if nothing exists at the path. The table contains the following fields:
+---@return {type: FileType, size: number, modtime: number} info # A table containing information about the specified path, or nil if nothing exists at the path. The table contains the following fields:
 function love.filesystem.getInfo(path, filtertype) end
 
 ---
@@ -448,19 +448,19 @@ function FileData:getFilename() end
 ---
 ---Open a file for read.
 ---
----@field ["r"] integer
+---@field r integer
 ---
 ---Open a file for write.
 ---
----@field ["w"] integer
+---@field w integer
 ---
 ---Open a file for append.
 ---
----@field ["a"] integer
+---@field a integer
 ---
 ---Do not open a file (represents a closed file.)
 ---
----@field ["c"] integer
+---@field c integer
 
 ---
 ---The type of a file.

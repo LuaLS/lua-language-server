@@ -2,8 +2,9 @@ local currentPath = debug.getinfo(1, 'S').source:sub(2)
 local rootPath = currentPath:gsub('[/\\]*[^/\\]-$', '')
 rootPath = (rootPath == '' and '.' or rootPath)
 loadfile(rootPath .. '/platform.lua')('script')
-local fs   = require 'bee.filesystem'
-local util = require 'utility'
+local fs      = require 'bee.filesystem'
+local util    = require 'utility'
+local version = require 'version'
 
 local function loadArgs()
     for _, v in ipairs(arg) do
@@ -44,6 +45,7 @@ log.info('Lua Lsp startup, root: ', ROOT)
 log.debug('ROOT:', ROOT:string())
 log.debug('LOGPATH:', LOGPATH)
 log.debug('METAPATH:', METAPATH)
+log.debug('VERSION:', version.getVersion())
 
 require 'tracy'
 

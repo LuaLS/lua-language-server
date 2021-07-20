@@ -9,6 +9,7 @@ love.data = {}
 ---
 ---Compresses a string or data using a specific compression algorithm.
 ---
+---@overload fun(container: love.ContainerType, format: love.CompressedDataFormat, data: love.Data, level: number):love.CompressedData|string
 ---@param container love.ContainerType # What type to return the compressed data as.
 ---@param format love.CompressedDataFormat # The format to use when compressing the string.
 ---@param rawstring string # The raw (un-compressed) string to compress.
@@ -19,6 +20,7 @@ function love.data.compress(container, format, rawstring, level) end
 ---
 ---Decode Data or a string from any of the EncodeFormats to Data or string.
 ---
+---@overload fun(container: love.ContainerType, format: love.EncodeFormat, sourceData: love.Data):love.ByteData|string
 ---@param container love.ContainerType # What type to return the decoded data as.
 ---@param format love.EncodeFormat # The format of the input data.
 ---@param sourceString string # The raw (encoded) data to decode.
@@ -28,6 +30,8 @@ function love.data.decode(container, format, sourceString) end
 ---
 ---Decompresses a CompressedData or previously compressed string or Data object.
 ---
+---@overload fun(container: love.ContainerType, format: love.CompressedDataFormat, compressedString: string):love.Data|string
+---@overload fun(container: love.ContainerType, format: love.CompressedDataFormat, data: love.Data):love.Data|string
 ---@param container love.ContainerType # What type to return the decompressed data as.
 ---@param compressedData love.CompressedData # The compressed data to decompress.
 ---@return love.Data|string decompressedData # Data/string containing the raw decompressed data.
@@ -36,6 +40,7 @@ function love.data.decompress(container, compressedData) end
 ---
 ---Encode Data or a string to a Data or string in one of the EncodeFormats.
 ---
+---@overload fun(container: love.ContainerType, format: love.EncodeFormat, sourceData: love.Data, linelength: number):love.ByteData|string
 ---@param container love.ContainerType # What type to return the encoded data as.
 ---@param format love.EncodeFormat # The format of the output data.
 ---@param sourceString string # The raw data to encode.
@@ -55,6 +60,7 @@ function love.data.getPackedSize(format) end
 ---
 ---Compute the message digest of a string using a specified hash algorithm.
 ---
+---@overload fun(hashFunction: love.HashFunction, data: love.Data):string
 ---@param hashFunction love.HashFunction # Hash algorithm to use.
 ---@param string string # String to hash.
 ---@return string rawdigest # Raw message digest string.
@@ -65,6 +71,8 @@ function love.data.hash(hashFunction, string) end
 ---
 ---Data:getPointer along with LuaJIT's FFI can be used to manipulate the contents of the ByteData object after it has been created.
 ---
+---@overload fun(Data: love.Data, offset: number, size: number):love.ByteData
+---@overload fun(size: number):love.ByteData
 ---@param datastring string # The byte string to copy.
 ---@return love.ByteData bytedata # The new Data object.
 function love.data.newByteData(datastring) end
@@ -94,6 +102,7 @@ function love.data.pack(container, format, v1) end
 ---
 ---This function behaves the same as Lua 5.3's string.unpack.
 ---
+---@overload fun(format: string, data: love.Data, pos: number):number|boolean|string, number|boolean|string, number
 ---@param format string # A string determining how the values were packed. Follows the rules of Lua 5.3's string.pack format strings.
 ---@param datastring string # A string containing the packed (serialized) data.
 ---@param pos number # Where to start reading in the string. Negative values can be used to read relative from the end of the string.

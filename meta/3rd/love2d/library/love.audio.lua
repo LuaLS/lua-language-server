@@ -113,6 +113,10 @@ function love.audio.newQueueableSource(samplerate, bitdepth, channels, buffercou
 ---
 ---Sources created from SoundData are always static.
 ---
+---@overload fun(file: love.File, type: love.SourceType):love.Source
+---@overload fun(decoder: love.Decoder, type: love.SourceType):love.Source
+---@overload fun(data: love.FileData, type: love.SourceType):love.Source
+---@overload fun(data: love.SoundData):love.Source
 ---@param filename string # The filepath to the audio file.
 ---@param type love.SourceType # Streaming or static source.
 ---@return love.Source source # A new Source that can play the specified audio.
@@ -121,12 +125,16 @@ function love.audio.newSource(filename, type) end
 ---
 ---Pauses specific or all currently played Sources.
 ---
+---@overload fun(source: love.Source, ...: love.Source)
+---@overload fun(sources: table)
 ---@return table Sources # A table containing a list of Sources that were paused by this call.
 function love.audio.pause() end
 
 ---
 ---Plays the specified Source.
 ---
+---@overload fun(sources: table)
+---@overload fun(source1: love.Source, source2: love.Source, ...: love.Source)
 ---@param source love.Source # The Source to play.
 function love.audio.play(source) end
 
@@ -147,6 +155,7 @@ function love.audio.setDopplerScale(scale) end
 ---
 ---Not all system supports audio effects. Use love.audio.isEffectsSupported to check.
 ---
+---@overload fun(name: string, enabled: boolean):boolean
 ---@param name string # The name of the effect.
 ---@param settings table # The settings to use for this effect, with the following fields:
 ---@return boolean success # Whether the effect was successfully created.
@@ -189,6 +198,9 @@ function love.audio.setVolume(volume) end
 ---
 ---Stops currently played sources.
 ---
+---@overload fun(source: love.Source)
+---@overload fun(source1: love.Source, source2: love.Source, ...: love.Source)
+---@overload fun(sources: table)
 function love.audio.stop() end
 
 ---
@@ -467,6 +479,7 @@ function Source:setDirection() end
 ---
 ---The effect must have been previously defined using love.audio.setEffect.
 ---
+---@overload fun(name: string, filtersettings: table):boolean
 ---@param name string # The name of the effect previously set up with love.audio.setEffect.
 ---@param enable boolean # If false and the given effect name was previously enabled on this Source, disables the effect.
 ---@return boolean success # Whether the effect was successfully applied to this Source.
@@ -475,6 +488,7 @@ function Source:setEffect(name, enable) end
 ---
 ---Sets a low-pass, high-pass, or band-pass filter to apply when playing the Source.
 ---
+---@overload fun()
 ---@param settings table # The filter settings to use for this Source, with the following fields:
 ---@return boolean success # Whether the filter was successfully applied to the Source.
 function Source:setFilter(settings) end

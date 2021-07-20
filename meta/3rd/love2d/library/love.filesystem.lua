@@ -9,6 +9,7 @@ love.filesystem = {}
 ---
 ---Append data to an existing file.
 ---
+---@overload fun(name: string, data: love.Data, size: number):boolean, string
 ---@param name string # The name (and path) of the file.
 ---@param data string # The string data to append to the file.
 ---@param size number # How many bytes to write.
@@ -52,6 +53,7 @@ function love.filesystem.getCRequirePath() end
 ---
 ---If the path passed to the function exists in the game and the save directory, it will list the files and directories from both places.
 ---
+---@overload fun(dir: string, callback: function):table
 ---@param dir string # The directory.
 ---@return table files # A sequence with the names of all files and subdirectories as strings.
 function love.filesystem.getDirectoryItems(dir) end
@@ -67,6 +69,8 @@ function love.filesystem.getIdentity() end
 ---
 ---Gets information about the specified file or directory.
 ---
+---@overload fun(path: string, info: table):table
+---@overload fun(path: string, filtertype: love.FileType, info: table):table
 ---@param path string # The file or directory path to check.
 ---@param filtertype love.FileType # If supplied, this parameter causes getInfo to only return the info table if the item at the given path matches the specified file type.
 ---@return table info # A table containing information about the specified path, or nil if nothing exists at the path. The table contains the following fields:
@@ -163,6 +167,8 @@ function love.filesystem.load(name) end
 ---
 ---It is also possible to mount love.filesystem.getSourceBaseDirectory if the game is in fused mode.
 ---
+---@overload fun(filedata: love.FileData, mountpoint: string, appendToPath: boolean):boolean
+---@overload fun(data: love.Data, archivename: string, mountpoint: string, appendToPath: boolean):boolean
 ---@param archive string # The folder or zip file in the game's save directory to mount.
 ---@param mountpoint string # The new path the archive will be mounted to.
 ---@param appendToPath boolean # Whether the archive will be searched when reading a filepath before or after already-mounted archives. This includes the game's source and save directories.
@@ -174,6 +180,7 @@ function love.filesystem.mount(archive, mountpoint, appendToPath) end
 ---
 ---It needs to be opened before it can be accessed.
 ---
+---@overload fun(filename: string, mode: love.FileMode):love.File, string
 ---@param filename string # The filename of the file.
 ---@return love.File file # The new File object.
 function love.filesystem.newFile(filename) end
@@ -181,6 +188,7 @@ function love.filesystem.newFile(filename) end
 ---
 ---Creates a new FileData object.
 ---
+---@overload fun(filepath: string):love.FileData, string
 ---@param contents string # The contents of the file.
 ---@param name string # The name of the file.
 ---@return love.FileData data # Your new FileData.
@@ -189,6 +197,7 @@ function love.filesystem.newFileData(contents, name) end
 ---
 ---Read the contents of a file.
 ---
+---@overload fun(container: love.ContainerType, name: string, size: number):love.FileData|string, number, nil, string
 ---@param name string # The name (and path) of the file.
 ---@param size number # How many bytes to read.
 ---@return string contents # The file contents.
@@ -219,6 +228,7 @@ function love.filesystem.setCRequirePath(paths) end
 ---
 ---Note that you can only set the name of the folder to store your files in, not the location.
 ---
+---@overload fun(name: string)
 ---@param name string # The new identity that will be used as write directory.
 function love.filesystem.setIdentity(name) end
 
@@ -254,6 +264,7 @@ function love.filesystem.unmount(archive) end
 ---
 ---Write data to a file in the save directory. If the file existed already, it will be completely replaced by the new contents.
 ---
+---@overload fun(name: string, data: love.Data, size: number):boolean, string
 ---@param name string # The name (and path) of the file.
 ---@param data string # The string data to write to the file.
 ---@param size number # How many bytes to write.
@@ -342,6 +353,7 @@ function File:open(mode) end
 ---
 ---Read a number of bytes from a file.
 ---
+---@overload fun(container: love.ContainerType, bytes: number):love.FileData|string, number
 ---@param bytes number # The number of bytes to read.
 ---@return string contents # The contents of the read bytes.
 ---@return number size # How many bytes have been read.
@@ -374,6 +386,7 @@ function File:tell() end
 ---
 ---Write data to a file.
 ---
+---@overload fun(data: love.Data, size: number):boolean, string
 ---@param data string # The string data to write.
 ---@param size number # How many bytes to write.
 ---@return boolean success # Whether the operation was successful.

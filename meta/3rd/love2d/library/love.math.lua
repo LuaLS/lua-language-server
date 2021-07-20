@@ -27,6 +27,7 @@ function love.math.colorToBytes() end
 ---
 ---Compresses a string or data using a specific compression algorithm.
 ---
+---@overload fun(data: love.Data, format: love.CompressedDataFormat, level: number):love.CompressedData
 ---@param rawstring string # The raw (un-compressed) string to compress.
 ---@param format love.CompressedDataFormat # The format to use when compressing the string.
 ---@param level number # The level of compression to use, between 0 and 9. -1 indicates the default level. The meaning of this argument depends on the compression format being used.
@@ -36,6 +37,8 @@ function love.math.compress(rawstring, format, level) end
 ---
 ---Decompresses a CompressedData or previously compressed string or Data object.
 ---
+---@overload fun(compressedstring: string, format: love.CompressedDataFormat):string
+---@overload fun(data: love.Data, format: love.CompressedDataFormat):string
 ---@param compressedData love.CompressedData # The compressed data to decompress.
 ---@return string rawstring # A string containing the raw decompressed data.
 function love.math.decompress(compressedData) end
@@ -47,6 +50,8 @@ function love.math.decompress(compressedData) end
 ---
 ---In versions prior to 11.0, color component values were within the range of 0 to 255 instead of 0 to 1.
 ---
+---@overload fun(color: table):number, number, number
+---@overload fun(c: number):number
 ---@return number lr # The red channel of the converted color in linear RGB space.
 ---@return number lg # The green channel of the converted color in linear RGB space.
 ---@return number lb # The blue channel of the converted color in linear RGB space.
@@ -74,6 +79,7 @@ function love.math.getRandomState() end
 ---
 ---PolygonShapes in love.physics, some forms of Meshes, and polygons drawn with love.graphics.polygon must be simple convex polygons.
 ---
+---@overload fun(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number):boolean
 ---@param vertices table # The vertices of the polygon as a table in the form of {x1, y1, x2, y2, x3, y3, ...}.
 ---@return boolean convex # Whether the given polygon is convex.
 function love.math.isConvex(vertices) end
@@ -87,6 +93,8 @@ function love.math.isConvex(vertices) end
 ---
 ---In versions prior to 11.0, color component values were within the range of 0 to 255 instead of 0 to 1.
 ---
+---@overload fun(color: table):number, number, number
+---@overload fun(lc: number):number
 ---@param lr number # The red channel of the linear RGB color to convert.
 ---@param lg number # The green channel of the linear RGB color to convert.
 ---@param lb number # The blue channel of the linear RGB color to convert.
@@ -100,6 +108,7 @@ function love.math.linearToGamma(lr, lg, lb) end
 ---
 ---The number of vertices in the control polygon determines the degree of the curve, e.g. three vertices define a quadratic (degree 2) Bézier curve, four vertices define a cubic (degree 3) Bézier curve, etc.
 ---
+---@overload fun(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number):love.BezierCurve
 ---@param vertices table # The vertices of the control polygon as a table in the form of {x1, y1, x2, y2, x3, y3, ...}.
 ---@return love.BezierCurve curve # A Bézier curve object.
 function love.math.newBezierCurve(vertices) end
@@ -107,12 +116,15 @@ function love.math.newBezierCurve(vertices) end
 ---
 ---Creates a new RandomGenerator object which is completely independent of other RandomGenerator objects and random functions.
 ---
+---@overload fun(seed: number):love.RandomGenerator
+---@overload fun(low: number, high: number):love.RandomGenerator
 ---@return love.RandomGenerator rng # The new Random Number Generator object.
 function love.math.newRandomGenerator() end
 
 ---
 ---Creates a new Transform object.
 ---
+---@overload fun(x: number, y: number, angle: number, sx: number, sy: number, ox: number, oy: number, kx: number, ky: number):love.Transform
 ---@return love.Transform transform # The new Transform object.
 function love.math.newTransform() end
 
@@ -123,12 +135,17 @@ function love.math.newTransform() end
 ---
 ---There are many webpages which discuss Perlin and Simplex noise in detail.
 ---
+---@overload fun(x: number, y: number):number
+---@overload fun(x: number, y: number, z: number):number
+---@overload fun(x: number, y: number, z: number, w: number):number
 ---@return number value # The noise value in the range of 1.
 function love.math.noise() end
 
 ---
 ---Generates a pseudo-random number in a platform independent manner. The default love.run seeds this function at startup, so you generally don't need to seed it yourself.
 ---
+---@overload fun(max: number):number
+---@overload fun(min: number, max: number):number
 ---@return number number # The pseudo-random number.
 function love.math.random() end
 
@@ -143,6 +160,7 @@ function love.math.randomNormal(stddev, mean) end
 ---
 ---Sets the seed of the random number generator using the specified integer number. This is called internally at startup, so you generally don't need to call it yourself.
 ---
+---@overload fun(low: number, high: number)
 ---@param seed number # The integer number with which you want to seed the randomization. Must be within the range of 2^53 - 1.
 function love.math.setRandomSeed(seed) end
 
@@ -157,6 +175,7 @@ function love.math.setRandomState(state) end
 ---
 ---Decomposes a simple convex or concave polygon into triangles.
 ---
+---@overload fun(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number):table
 ---@param polygon table # Polygon to triangulate. Must not intersect itself.
 ---@return table triangles # List of triangles the polygon is composed of, in the form of {{x1, y1, x2, y2, x3, y3},  {x1, y1, x2, y2, x3, y3}, ...}.
 function love.math.triangulate(polygon) end
@@ -297,6 +316,8 @@ function RandomGenerator:getState() end
 ---
 ---Generates a pseudo-random number in a platform independent manner.
 ---
+---@overload fun(max: number):number
+---@overload fun(min: number, max: number):number
 ---@return number number # The pseudo-random number.
 function RandomGenerator:random() end
 
@@ -311,6 +332,7 @@ function RandomGenerator:randomNormal(stddev, mean) end
 ---
 ---Sets the seed of the random number generator using the specified integer number.
 ---
+---@overload fun(low: number, high: number)
 ---@param seed number # The integer number with which you want to seed the randomization. Must be within the range of 2^53.
 function RandomGenerator:setSeed(seed) end
 
@@ -402,6 +424,9 @@ function Transform:scale(sx, sy) end
 ---
 ---Directly sets the Transform's internal 4x4 transformation matrix.
 ---
+---@overload fun(layout: love.MatrixLayout, e1_1: number, e1_2: number, ...: number, e4_4: number):love.Transform
+---@overload fun(layout: love.MatrixLayout, matrix: table):love.Transform
+---@overload fun(layout: love.MatrixLayout, matrix: table):love.Transform
 ---@param e1_1 number # The first column of the first row of the matrix.
 ---@param e1_2 number # The second column of the first row of the matrix.
 ---@param e4_4 number # The fourth column of the fourth row of the matrix.

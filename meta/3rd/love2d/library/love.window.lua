@@ -20,6 +20,7 @@ function love.window.close() end
 ---
 ---Most LÖVE functions return values and expect arguments in terms of pixels rather than density-independent units.
 ---
+---@overload fun(px: number, py: number):number, number
 ---@param pixelvalue number # A number in pixels to convert to density-independent units.
 ---@return number value # The converted number, in density-independent units.
 function love.window.fromPixels(pixelvalue) end
@@ -201,6 +202,7 @@ function love.window.setDisplaySleepEnabled(enable) end
 ---
 ---Enters or exits fullscreen. The display to use when entering fullscreen is chosen based on which display the window is currently in, if multiple monitors are connected.
 ---
+---@overload fun(fullscreen: boolean, fstype: love.FullscreenType):boolean
 ---@param fullscreen boolean # Whether to enter or exit fullscreen mode.
 ---@return boolean success # True if an attempt to enter fullscreen was successful, false otherwise.
 function love.window.setFullscreen(fullscreen) end
@@ -248,6 +250,7 @@ function love.window.setVSync(vsync) end
 ---
 ---Displays a message box dialog above the love window. The message box contains a title, optional text, and buttons.
 ---
+---@overload fun(title: string, message: string, buttonlist: table, type: love.MessageBoxType, attachtowindow: boolean):number
 ---@param title string # The title of the message box.
 ---@param message string # The text inside the message box.
 ---@param type love.MessageBoxType # The type of the message box.
@@ -264,6 +267,7 @@ function love.window.showMessageBox(title, message, type, attachtowindow) end
 ---
 ---Most LÖVE functions return values and expect arguments in terms of pixels rather than density-independent units.
 ---
+---@overload fun(x: number, y: number):number, number
 ---@param value number # A number in density-independent units to convert to pixels.
 ---@return number pixelvalue # The converted number, in pixels.
 function love.window.toPixels(value) end

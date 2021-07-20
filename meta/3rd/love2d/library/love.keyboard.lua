@@ -49,6 +49,7 @@ function love.keyboard.hasTextInput() end
 ---
 ---Checks whether a certain key is down. Not to be confused with love.keypressed or love.keyreleased.
 ---
+---@overload fun(key: love.KeyConstant, ...: love.KeyConstant):boolean
 ---@param key love.KeyConstant # The key to check.
 ---@return boolean down # True if the key is down, false if not.
 function love.keyboard.isDown(key) end
@@ -73,6 +74,7 @@ function love.keyboard.setKeyRepeat(enable) end
 ---
 ---On touch devices, this shows the system's native on-screen keyboard when it's enabled.
 ---
+---@overload fun(enable: boolean, x: number, y: number, w: number, h: number)
 ---@param enable boolean # Whether text input events should be enabled.
 function love.keyboard.setTextInput(enable) end
 

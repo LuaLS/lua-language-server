@@ -32,6 +32,7 @@ function love.joystick.getJoysticks() end
 ---
 ---It also recognizes any SDL gamecontroller mapping string, such as those created with Steam's Big Picture controller configure interface, or this nice database. If a new mapping is loaded for an already known controller GUID, the later version will overwrite the one currently loaded.
 ---
+---@overload fun(mappings: string)
 ---@param filename string # The filename to load the mappings string from.
 function love.joystick.loadGamepadMappings(filename) end
 
@@ -40,6 +41,7 @@ function love.joystick.loadGamepadMappings(filename) end
 ---
 ---The mappings are stored as a string for use with love.joystick.loadGamepadMappings.
 ---
+---@overload fun():string
 ---@param filename string # The filename to save the mappings string to.
 ---@return string mappings # The mappings string that was written to the file.
 function love.joystick.saveGamepadMappings(filename) end
@@ -51,6 +53,7 @@ function love.joystick.saveGamepadMappings(filename) end
 ---
 ---The virtual gamepad buttons and axes are designed around the Xbox 360 controller layout.
 ---
+---@overload fun(guid: string, axis: love.GamepadAxis, inputtype: love.JoystickInputType, inputindex: number, hatdir: love.JoystickHat):boolean
 ---@param guid string # The OS-dependent GUID for the type of Joystick the binding will affect.
 ---@param button love.GamepadButton # The virtual gamepad button to bind.
 ---@param inputtype love.JoystickInputType # The type of input to bind the virtual gamepad button to.
@@ -118,6 +121,7 @@ function Joystick:getGamepadAxis(axis) end
 ---
 ---Gets the button, axis or hat that a virtual gamepad input is bound to.
 ---
+---@overload fun(button: love.GamepadButton):love.JoystickInputType, number, love.JoystickHat
 ---@param axis love.GamepadAxis # The virtual gamepad axis to get the binding for.
 ---@return love.JoystickInputType inputtype # The type of input the virtual gamepad axis is bound to.
 ---@return number inputindex # The index of the Joystick's button, axis or hat that the virtual gamepad axis is bound to.
@@ -204,6 +208,8 @@ function Joystick:isVibrationSupported() end
 ---
 ---Sets the vibration motor speeds on a Joystick with rumble support. Most common gamepads have this functionality, although not all drivers give proper support. Use Joystick:isVibrationSupported to check.
 ---
+---@overload fun():boolean
+---@overload fun(left: number, right: number, duration: number):boolean
 ---@param left number # Strength of the left vibration motor on the Joystick. Must be in the range of 1.
 ---@param right number # Strength of the right vibration motor on the Joystick. Must be in the range of 1.
 ---@return boolean success # True if the vibration was successfully applied, false if not.

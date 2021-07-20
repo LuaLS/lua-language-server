@@ -82,6 +82,8 @@ function love.mouse.isVisible() end
 ---
 ---The hot spot is the point the operating system uses to determine what was clicked and at what position the mouse cursor is. For example, the normal arrow pointer normally has its hot spot at the top left of the image, but a crosshair cursor might have it in the middle.
 ---
+---@overload fun(filename: string, hotx: number, hoty: number):love.Cursor
+---@overload fun(fileData: love.FileData, hotx: number, hoty: number):love.Cursor
 ---@param imageData love.ImageData # The ImageData to use for the new Cursor.
 ---@param hotx number # The x-coordinate in the ImageData of the cursor's hot spot.
 ---@param hoty number # The y-coordinate in the ImageData of the cursor's hot spot.
@@ -91,6 +93,7 @@ function love.mouse.newCursor(imageData, hotx, hoty) end
 ---
 ---Sets the current mouse cursor.
 ---
+---@overload fun()
 ---@param cursor love.Cursor # The Cursor object to use as the current mouse cursor.
 function love.mouse.setCursor(cursor) end
 

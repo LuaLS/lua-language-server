@@ -30,6 +30,8 @@ function love.thread.newChannel() end
 ---
 ---Creates a new Thread from a filename, string or FileData object containing Lua code.
 ---
+---@overload fun(fileData: love.FileData):love.Thread
+---@overload fun(codestring: string):love.Thread
 ---@param filename string # The name of the Lua file to use as the source.
 ---@return love.Thread thread # A new Thread that has yet to be started.
 function love.thread.newThread(filename) end
@@ -50,6 +52,7 @@ function Channel:clear() end
 ---
 ---It waits until a message is in the queue then returns the message value.
 ---
+---@overload fun(timeout: number):any
 ---@return any value # The contents of the message.
 function Channel:demand() end
 
@@ -108,6 +111,7 @@ function Channel:push(value) end
 ---
 ---See Variant for the list of supported types.
 ---
+---@overload fun(value: any, timeout: number):boolean
 ---@param value any # The contents of the message.
 ---@return boolean success # Whether the message was successfully supplied (always true).
 function Channel:supply(value) end
@@ -137,6 +141,7 @@ function Thread:isRunning() end
 ---
 ---Beginning with version 0.9.0, threads can be restarted after they have completed their execution.
 ---
+---@overload fun(arg1: any, arg2: any, ...: any)
 function Thread:start() end
 
 ---

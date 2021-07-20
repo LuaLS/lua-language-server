@@ -51,10 +51,13 @@ local function formatIndex(key)
     return ('[%q]'):format(key)
 end
 
+local function buildDocTable(tbl)
+    
+end
+
 local function buildType(param)
     if param.table then
-        -- TODO
-        getTypeName(param.type)
+        return buildDocTable(param.table)
     end
     return getTypeName(param.type)
 end
@@ -78,9 +81,36 @@ local function buildDescription(desc)
     end
 end
 
-local function buildFunction(class, func, node)
+local function buildDocFunc(variant)
+    local params  = {}
+    local returns = {}
+    for _, param in ipairs(variant.arguments or {}) do
+        params[#params+1] = ('%s: %s'):format(param.name, getTypeName(param.type))
+    end
+    for _, rtn in ipairs(variant.returns or {}) do
+        returns[#returns+1] = ('%s'):format(getTypeName(rtn.type))
+    end
+    return ('fun(%s)%s'):format(
+        table.concat(params, ', '),
+        #returns > 0 and (':' .. table.concat(returns, ', ')) or ''
+    )
+end
+
+local function buildMultiDocFunc(tp)
+    local cbs = {}
+    for _, variant in ipairs(tp.variants) do
+        cbs[#cbs+1] = buildDocFunc(variant)
+    end
+    return table.concat(cbs, '|')
+end
+
+local function buildFunction(func, node)
     local text = {}
     text[#text+1] = buildDescription(func.description)
+    for i = 2, #func.variants do
+        local variant = func.variants[i]
+        text[#text+1] = ('---@overload %s'):format(buildDocFunc(variant))
+    end
     local params = {}
     for _, param in ipairs(func.variants[1].arguments or {}) do
         for paramName in param.name:gmatch '[%a_][%w_]+' do
@@ -109,25 +139,6 @@ local function buildFunction(class, func, node)
     return table.concat(text, '\n')
 end
 
-local function buildDocFunc(tp)
-    local cbs = {}
-    for _, variant in ipairs(tp.variants) do
-        local params  = {}
-        local returns = {}
-        for _, param in ipairs(variant.arguments or {}) do
-            params[#params+1] = ('%s: %s'):format(param.name, getTypeName(param.type))
-        end
-        for _, rtn in ipairs(variant.returns or {}) do
-            returns[#returns+1] = ('%s'):format(getTypeName(rtn.type))
-        end
-        cbs[#cbs+1] = ('fun(%s)%s'):format(
-            table.concat(params, ', '),
-            #returns > 0 and (':' .. table.concat(returns, ', ')) or ''
-        )
-    end
-    return table.concat(cbs, '|')
-end
-
 local function buildFile(class, defs)
     local filePath = libraryPath / (class .. '.lua')
     local text = {}
@@ -143,7 +154,7 @@ local function buildFile(class, defs)
 
     for _, func in ipairs(defs.functions or {}) do
         text[#text+1] = ''
-        text[#text+1] = buildFunction(class, func, class .. '.')
+        text[#text+1] = buildFunction(func, class .. '.')
     end
 
     for _, tp in ipairs(defs.types or {}) do
@@ -156,7 +167,7 @@ local function buildFile(class, defs)
             if not mark[func.name] then
                 mark[func.name] = true
                 text[#text+1] = ''
-                text[#text+1] = buildFunction(class, func, tp.name .. ':')
+                text[#text+1] = buildFunction(func, tp.name .. ':')
             end
         end
     end
@@ -164,7 +175,7 @@ local function buildFile(class, defs)
     for _, cb in ipairs(defs.callbacks or {}) do
         text[#text+1] = ''
         text[#text+1] = buildDescription(cb.description)
-        text[#text+1] = ('---@alias %s %s'):format(getTypeName(cb.name), buildDocFunc(cb))
+        text[#text+1] = ('---@alias %s %s'):format(getTypeName(cb.name), buildMultiDocFunc(cb))
     end
 
     for _, enum in ipairs(defs.enums or {}) do

@@ -34,5 +34,22 @@
 				]
 			]
 		},
+		{
+			"name": "love-api",
+			"type": "lua",
+			"request": "launch",
+			"stopOnEntry": false,
+			"program": "${workspaceRoot}/tools/love-api.lua",
+			"luaexe": "${workspaceFolder}/bin/Windows/lua-language-server.exe",
+			"arg": [
+			],
+			"luaVersion": "latest",
+			"consoleCoding": "utf8",
+			"sourceCoding": "utf8",
+			"outputCapture": [
+				"print",
+				"stderr",
+			],
+		},
 	]
 }

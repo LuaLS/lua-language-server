@@ -61,7 +61,7 @@ function love.graphics.circle(mode, radius) end
 ---In versions prior to background color instead.
 ---
 ---@overload fun(r: number, g: number, b: number, a: number, clearstencil: boolean, cleardepth: boolean)
----@overload fun(color: table, ...: table, clearstencil: boolean, cleardepth: boolean)
+---@overload fun(color: table, ..., clearstencil: boolean, cleardepth: boolean)
 ---@overload fun(clearcolor: boolean, clearstencil: boolean, cleardepth: boolean)
 function love.graphics.clear() end
 
@@ -806,7 +806,7 @@ function love.graphics.setBlendMode(mode) end
 ---Captures drawing operations to a Canvas.
 ---
 ---@overload fun()
----@overload fun(canvas1: love.Canvas, canvas2: love.Canvas, ...: love.Canvas)
+---@overload fun(canvas1: love.Canvas, canvas2: love.Canvas, ...)
 ---@overload fun(canvas: love.Canvas, slice: number, mipmap: number)
 ---@overload fun(setup: table)
 ---@param canvas love.Canvas # The new target.
@@ -1874,11 +1874,11 @@ function Shader:hasUniform(name) end
 ---
 ---Uniform / extern variables are read-only in the shader code and remain constant until modified by a Shader:send call. Uniform variables can be accessed in both the Vertex and Pixel components of a shader, as long as the variable is declared in each.
 ---
----@overload fun(name: string, vector: table, ...: table)
----@overload fun(name: string, matrix: table, ...: table)
+---@overload fun(name: string, vector: table, ...)
+---@overload fun(name: string, matrix: table, ...)
 ---@overload fun(name: string, texture: love.Texture)
----@overload fun(name: string, boolean: boolean, ...: boolean)
----@overload fun(name: string, matrixlayout: love.MatrixLayout, matrix: table, ...: table)
+---@overload fun(name: string, boolean: boolean, ...)
+---@overload fun(name: string, matrixlayout: love.MatrixLayout, matrix: table, ...)
 ---@overload fun(name: string, data: love.Data, offset: number, size: number)
 ---@overload fun(name: string, data: love.Data, matrixlayout: love.MatrixLayout, offset: number, size: number)
 ---@param name string # Name of the number to send to the shader.

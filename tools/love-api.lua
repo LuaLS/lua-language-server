@@ -57,7 +57,7 @@ local function buildDocTable(tbl)
     local fields = {}
     for _, field in ipairs(tbl) do
         if field.name ~= '...' then
-            fields[#fields+1] = ('%s: %s'):format(formatIndex(field.name), field.type)
+            fields[#fields+1] = ('%s: %s'):format(formatIndex(field.name), buildType(field))
         end
     end
     return ('{%s}'):format(table.concat(fields, ', '))
@@ -93,7 +93,15 @@ local function buildDocFunc(variant)
     local params  = {}
     local returns = {}
     for _, param in ipairs(variant.arguments or {}) do
-        params[#params+1] = ('%s: %s'):format(param.name, getTypeName(param.type))
+        if param.name == '...' then
+            params[#params+1] = '...'
+        else
+            if param.name:find '^[\'"]' then
+                params[#params+1] = ('%s: %s|%q'):format(param.name:sub(2, -2), getTypeName(param.type), param.name)
+            else
+                params[#params+1] = ('%s: %s'):format(param.name, getTypeName(param.type))
+            end
+        end
     end
     for _, rtn in ipairs(variant.returns or {}) do
         returns[#returns+1] = ('%s'):format(getTypeName(rtn.type))

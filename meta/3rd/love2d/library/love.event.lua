@@ -39,7 +39,7 @@ function love.event.push() end
 ---
 ---The quit event is a signal for the event handler to close LÖVE. It's possible to abort the exit process with the love.quit callback.
 ---
----@overload fun('restart': string)
+---@overload fun(restart: string|"'restart'")
 ---@param exitstatus number # The program exit status to use when closing the application.
 function love.event.quit(exitstatus) end
 

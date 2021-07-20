@@ -49,7 +49,7 @@ function love.keyboard.hasTextInput() end
 ---
 ---Checks whether a certain key is down. Not to be confused with love.keypressed or love.keyreleased.
 ---
----@overload fun(key: love.KeyConstant, ...: love.KeyConstant):boolean
+---@overload fun(key: love.KeyConstant, ...):boolean
 ---@param key love.KeyConstant # The key to check.
 ---@return boolean down # True if the key is down, false if not.
 function love.keyboard.isDown(key) end

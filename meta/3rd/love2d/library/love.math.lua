@@ -424,7 +424,7 @@ function Transform:scale(sx, sy) end
 ---
 ---Directly sets the Transform's internal 4x4 transformation matrix.
 ---
----@overload fun(layout: love.MatrixLayout, e1_1: number, e1_2: number, ...: number, e4_4: number):love.Transform
+---@overload fun(layout: love.MatrixLayout, e1_1: number, e1_2: number, ..., e4_4: number):love.Transform
 ---@overload fun(layout: love.MatrixLayout, matrix: table):love.Transform
 ---@overload fun(layout: love.MatrixLayout, matrix: table):love.Transform
 ---@param e1_1 number # The first column of the first row of the matrix.

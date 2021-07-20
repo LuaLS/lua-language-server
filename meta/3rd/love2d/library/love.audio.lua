@@ -125,7 +125,7 @@ function love.audio.newSource(filename, type) end
 ---
 ---Pauses specific or all currently played Sources.
 ---
----@overload fun(source: love.Source, ...: love.Source)
+---@overload fun(source: love.Source, ...)
 ---@overload fun(sources: table)
 ---@return table Sources # A table containing a list of Sources that were paused by this call.
 function love.audio.pause() end
@@ -134,7 +134,7 @@ function love.audio.pause() end
 ---Plays the specified Source.
 ---
 ---@overload fun(sources: table)
----@overload fun(source1: love.Source, source2: love.Source, ...: love.Source)
+---@overload fun(source1: love.Source, source2: love.Source, ...)
 ---@param source love.Source # The Source to play.
 function love.audio.play(source) end
 
@@ -157,7 +157,7 @@ function love.audio.setDopplerScale(scale) end
 ---
 ---@overload fun(name: string, enabled: boolean):boolean
 ---@param name string # The name of the effect.
----@param settings {type: EffectType, volume: number} # The settings to use for this effect, with the following fields:
+---@param settings {type: love.EffectType, volume: number} # The settings to use for this effect, with the following fields:
 ---@return boolean success # Whether the effect was successfully created.
 function love.audio.setEffect(name, settings) end
 
@@ -199,7 +199,7 @@ function love.audio.setVolume(volume) end
 ---Stops currently played sources.
 ---
 ---@overload fun(source: love.Source)
----@overload fun(source1: love.Source, source2: love.Source, ...: love.Source)
+---@overload fun(source1: love.Source, source2: love.Source, ...)
 ---@overload fun(sources: table)
 function love.audio.stop() end
 
@@ -347,7 +347,7 @@ function Source:getEffect(name, filtersettings) end
 ---
 ---Gets the filter settings currently applied to the Source.
 ---
----@return {type: FilterType, volume: number, highgain: number, lowgain: number} settings # The filter settings to use for this Source, or nil if the Source has no active filter. The table has the following fields:
+---@return {type: love.FilterType, volume: number, highgain: number, lowgain: number} settings # The filter settings to use for this Source, or nil if the Source has no active filter. The table has the following fields:
 function Source:getFilter() end
 
 ---
@@ -489,7 +489,7 @@ function Source:setEffect(name, enable) end
 ---Sets a low-pass, high-pass, or band-pass filter to apply when playing the Source.
 ---
 ---@overload fun()
----@param settings {type: FilterType, volume: number, highgain: number, lowgain: number} # The filter settings to use for this Source, with the following fields:
+---@param settings {type: love.FilterType, volume: number, highgain: number, lowgain: number} # The filter settings to use for this Source, with the following fields:
 ---@return boolean success # Whether the filter was successfully applied to the Source.
 function Source:setFilter(settings) end
 

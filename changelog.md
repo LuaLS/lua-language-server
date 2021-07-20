@@ -1,6 +1,13 @@
 # changelog
 
 ## 2.3.2
+* `NEW` `LuaDoc`: supports `['string']` as field:
+    ```lua
+    ---@class keyboard
+    ---@field ['!'] number
+    ---@field ['?'] number
+    ---@field ['#'] number
+    ```
 
 ## 2.3.1
 `2021-7-19`

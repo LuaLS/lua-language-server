@@ -12,9 +12,11 @@ Main                <-  (Token / Sp)*
 Sp                  <-  %s+
 X16                 <-  [a-fA-F0-9]
 Word                <-  [a-zA-Z0-9_]
-Token               <-  Name / String / Symbol / Index
-Name                <-  ({} {[a-zA-Z0-9_] [a-zA-Z0-9_.*-]*} {})
+Token               <-  Name / String / Symbol / Integer
+Name                <-  ({} {[a-zA-Z_] [a-zA-Z0-9_.*-]*} {})
                     ->  Name
+Integer             <-  ({} {[0-9]+} {})
+                    ->  Integer
 String              <-  ({} StringDef {})
                     ->  String
 StringDef           <-  '"'
@@ -48,10 +50,10 @@ Symbol              <-  ({} {
                             [:|,<>()?+#`{}]
                         /   '[]'
                         /   '...'
+                        /   '['
+                        /   ']'
                         } {})
                     ->  Symbol
-Index               <-  ({} '[' Sp? {[0-9]+} Sp? ']' {})
-                    ->  Index
 ]], {
     s  = m.S' \t',
     ea = '\a',
@@ -98,16 +100,16 @@ Index               <-  ({} '[' Sp? {[0-9]+} Sp? ']' {})
         TokenFinishs[Ci]  = finish - 1
         TokenContents[Ci] = content
     end,
+    Integer = function (start, content, finish)
+        Ci = Ci + 1
+        TokenTypes[Ci]    = 'integer'
+        TokenStarts[Ci]   = start
+        TokenFinishs[Ci]  = finish - 1
+        TokenContents[Ci] = math.tointeger(content)
+    end,
     Symbol = function (start, content, finish)
         Ci = Ci + 1
         TokenTypes[Ci]    = 'symbol'
-        TokenStarts[Ci]   = start
-        TokenFinishs[Ci]  = finish - 1
-        TokenContents[Ci] = content
-    end,
-    Index = function (start, content, finish)
-        Ci = Ci + 1
-        TokenTypes[Ci]    = 'index'
         TokenStarts[Ci]   = start
         TokenFinishs[Ci]  = finish - 1
         TokenContents[Ci] = content
@@ -189,29 +191,45 @@ local function parseName(tp, parent)
     return class
 end
 
+local function nextSymbolOrError(symbol)
+    if checkToken('symbol', symbol, 1) then
+        nextToken()
+        return true
+    end
+    pushError {
+        type   = 'LUADOC_MISS_SYMBOL',
+        start  = getFinish(),
+        finish = getFinish(),
+        info   = {
+            symbol = symbol,
+        }
+    }
+    return false
+end
+
 local function parseIndexField(tp, parent)
-    local indexTp, indexText = peekToken()
-    if indexTp ~= 'index' then
+    if not checkToken('symbol', '[', 1) then
         return nil
     end
     nextToken()
-    local int = math.tointeger(indexText)
-    if not int then
-        int = 1
-        -- TODO: translate
+    local class = {
+        type   = tp,
+        start  = getStart(),
+        finish = getFinish(),
+        parent = parent,
+    }
+    local indexTP, index = nextToken()
+    if  indexTP ~= 'integer'
+    and indexTP ~= 'string' then
         pushError {
             type   = 'LUADOC_INDEX_MUST_INT',
             start  = getStart(),
             finish = getFinish(),
         }
     end
-    local class = {
-        type   = tp,
-        start  = getStart(),
-        finish = getFinish(),
-        parent = parent,
-        [1]    = int,
-    }
+    class[1] = index
+    nextSymbolOrError ']'
+    class.finish = getFinish()
     return class
 end
 
@@ -265,22 +283,6 @@ local function parseClass(parent)
         nextToken()
     end
     return result
-end
-
-local function nextSymbolOrError(symbol)
-    if checkToken('symbol', symbol, 1) then
-        nextToken()
-        return true
-    end
-    pushError {
-        type   = 'LUADOC_MISS_SYMBOL',
-        start  = getFinish(),
-        finish = getFinish(),
-        info   = {
-            symbol = symbol,
-        }
-    }
-    return false
 end
 
 local function parseTypeUnitArray(parent, node)

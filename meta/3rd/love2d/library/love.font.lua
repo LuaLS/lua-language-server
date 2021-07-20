@@ -1,49 +1,51 @@
+---@meta
+
 ---@class love.font
 love.font = {}
 
 ---
 ---Creates a new BMFont Rasterizer.
 ---
----@param imageData love.font.ImageData # The image data containing the drawable pictures of font glyphs.
+---@param imageData love.ImageData # The image data containing the drawable pictures of font glyphs.
 ---@param glyphs string # The sequence of glyphs in the ImageData.
 ---@param dpiscale number # DPI scale.
----@return love.font.Rasterizer rasterizer # The rasterizer.
+---@return love.Rasterizer rasterizer # The rasterizer.
 function love.font.newBMFontRasterizer(imageData, glyphs, dpiscale) end
 
 ---
 ---Creates a new GlyphData.
 ---
----@param rasterizer love.font.Rasterizer # The Rasterizer containing the font.
+---@param rasterizer love.Rasterizer # The Rasterizer containing the font.
 ---@param glyph number # The character code of the glyph.
 function love.font.newGlyphData(rasterizer, glyph) end
 
 ---
 ---Creates a new Image Rasterizer.
 ---
----@param imageData love.font.ImageData # Font image data.
+---@param imageData love.ImageData # Font image data.
 ---@param glyphs string # String containing font glyphs.
 ---@param extraSpacing number # Font extra spacing.
 ---@param dpiscale number # Font DPI scale.
----@return love.font.Rasterizer rasterizer # The rasterizer.
+---@return love.Rasterizer rasterizer # The rasterizer.
 function love.font.newImageRasterizer(imageData, glyphs, extraSpacing, dpiscale) end
 
 ---
 ---Creates a new Rasterizer.
 ---
 ---@param filename string # The font file.
----@return love.font.Rasterizer rasterizer # The rasterizer.
+---@return love.Rasterizer rasterizer # The rasterizer.
 function love.font.newRasterizer(filename) end
 
 ---
 ---Creates a new TrueType Rasterizer.
 ---
 ---@param size number # The font size.
----@param hinting love.font.HintingMode # True Type hinting mode.
+---@param hinting love.HintingMode # True Type hinting mode.
 ---@param dpiscale number # The font DPI scale.
----@return love.font.Rasterizer rasterizer # The rasterizer.
+---@return love.Rasterizer rasterizer # The rasterizer.
 function love.font.newTrueTypeRasterizer(size, hinting, dpiscale) end
 
----@class love.font.GlyphData: love.font.Data, love.font.Object
+---@class love.GlyphData: love.Data, love.Object
 local GlyphData = {}
 
 ---
@@ -62,8 +64,6 @@ function GlyphData:getBearing() end
 ---
 ---Gets glyph bounding box.
 ---
----@return number x # Glyph position x.
----@return number y # Glyph position y.
 ---@return number width # Glyph width.
 ---@return number height # Glyph height.
 function GlyphData:getBoundingBox() end
@@ -78,7 +78,7 @@ function GlyphData:getDimensions() end
 ---
 ---Gets glyph pixel format.
 ---
----@return love.font.PixelFormat format # Glyph pixel format.
+---@return love.PixelFormat format # Glyph pixel format.
 function GlyphData:getFormat() end
 
 ---
@@ -105,7 +105,7 @@ function GlyphData:getHeight() end
 ---@return number width # Glyph width.
 function GlyphData:getWidth() end
 
----@class love.font.Rasterizer: love.font.Object
+---@class love.Rasterizer: love.Object
 local Rasterizer = {}
 
 ---
@@ -136,7 +136,7 @@ function Rasterizer:getGlyphCount() end
 ---Gets glyph data of a specified glyph.
 ---
 ---@param glyph string # Glyph
----@return love.font.GlyphData glyphData # Glyph data
+---@return love.GlyphData glyphData # Glyph data
 function Rasterizer:getGlyphData(glyph) end
 
 ---
@@ -154,8 +154,7 @@ function Rasterizer:getLineHeight() end
 ---
 ---Checks if font contains specified glyphs.
 ---
----@param glyph1 love.font.string or number # Glyph
----@param glyph2 love.font.string or number # Glyph
----@param ... love.font.string or number # Additional glyphs
+---@param glyph1 love.string or number # Glyph
+---@param glyph2 love.string or number # Glyph
 ---@return boolean hasGlyphs # Whatever font contains specified glyphs.
-function Rasterizer:hasGlyphs(glyph1, glyph2, ...) end
+function Rasterizer:hasGlyphs(glyph1, glyph2) end

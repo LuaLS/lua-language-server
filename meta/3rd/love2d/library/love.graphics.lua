@@ -1,3 +1,5 @@
+---@meta
+
 ---@class love.graphics
 love.graphics = {}
 
@@ -6,20 +8,18 @@ love.graphics = {}
 ---
 ---This effectively multiplies the existing coordinate transformation's matrix with the Transform object's internal matrix to produce the new coordinate transformation.
 ---
----@param transform love.graphics.Transform # The Transform object to apply to the current graphics coordinate transform.
+---@param transform love.Transform # The Transform object to apply to the current graphics coordinate transform.
 function love.graphics.applyTransform(transform) end
 
 ---
 ---Draws a filled or unfilled arc at position (x, y). The arc is drawn from angle1 to angle2 in radians. The segments parameter determines how many segments are used to draw the arc. The more segments, the smoother the edge.
 ---
----@param drawmode love.graphics.DrawMode # How to draw the arc.
----@param x number # The position of the center along x-axis.
----@param y number # The position of the center along y-axis.
+---@param drawmode love.DrawMode # How to draw the arc.
 ---@param radius number # Radius of the arc.
 ---@param angle1 number # The angle at which the arc begins.
 ---@param angle2 number # The angle at which the arc terminates.
 ---@param segments number # The number of segments used for drawing the arc.
-function love.graphics.arc(drawmode, x, y, radius, angle1, angle2, segments) end
+function love.graphics.arc(drawmode, radius, angle1, angle2, segments) end
 
 ---
 ---Creates a screenshot once the current frame is done (after love.draw has finished).
@@ -32,11 +32,9 @@ function love.graphics.captureScreenshot(filename) end
 ---
 ---Draws a circle.
 ---
----@param mode love.graphics.DrawMode # How to draw the circle.
----@param x number # The position of the center along x-axis.
----@param y number # The position of the center along y-axis.
+---@param mode love.DrawMode # How to draw the circle.
 ---@param radius number # The radius of the circle.
-function love.graphics.circle(mode, x, y, radius) end
+function love.graphics.circle(mode, radius) end
 
 ---
 ---Clears the screen or active Canvas to the specified color.
@@ -75,17 +73,14 @@ function love.graphics.discard(discardcolor, discardstencil) end
 ---
 ---When using the default shader anything drawn with this function will be tinted according to the currently selected color.  Set it to pure white to preserve the object's original colors.
 ---
----@param drawable love.graphics.Drawable # A drawable object.
----@param x number # The position to draw the object (x-axis).
----@param y number # The position to draw the object (y-axis).
----@param r number # Orientation (radians).
+---@param drawable love.Drawable # A drawable object.
 ---@param sx number # Scale factor (x-axis).
 ---@param sy number # Scale factor (y-axis).
 ---@param ox number # Origin offset (x-axis).
 ---@param oy number # Origin offset (y-axis).
 ---@param kx number # Shearing factor (x-axis).
 ---@param ky number # Shearing factor (y-axis).
-function love.graphics.draw(drawable, x, y, r, sx, sy, ox, oy, kx, ky) end
+function love.graphics.draw(drawable, sx, sy, ox, oy, kx, ky) end
 
 ---
 ---Draws many instances of a Mesh with a single draw call, using hardware geometry instancing.
@@ -94,44 +89,36 @@ function love.graphics.draw(drawable, x, y, r, sx, sy, ox, oy, kx, ky) end
 ---
 ---Instancing is not supported by some older GPUs that are only capable of using OpenGL ES 2 or OpenGL 2. Use love.graphics.getSupported to check.
 ---
----@param mesh love.graphics.Mesh # The mesh to render.
+---@param mesh love.Mesh # The mesh to render.
 ---@param instancecount number # The number of instances to render.
----@param x number # The position to draw the instances (x-axis).
----@param y number # The position to draw the instances (y-axis).
----@param r number # Orientation (radians).
 ---@param sx number # Scale factor (x-axis).
 ---@param sy number # Scale factor (y-axis).
 ---@param ox number # Origin offset (x-axis).
 ---@param oy number # Origin offset (y-axis).
 ---@param kx number # Shearing factor (x-axis).
 ---@param ky number # Shearing factor (y-axis).
-function love.graphics.drawInstanced(mesh, instancecount, x, y, r, sx, sy, ox, oy, kx, ky) end
+function love.graphics.drawInstanced(mesh, instancecount, sx, sy, ox, oy, kx, ky) end
 
 ---
 ---Draws a layer of an Array Texture.
 ---
----@param texture love.graphics.Texture # The Array Texture to draw.
+---@param texture love.Texture # The Array Texture to draw.
 ---@param layerindex number # The index of the layer to use when drawing.
----@param x number # The position to draw the texture (x-axis).
----@param y number # The position to draw the texture (y-axis).
----@param r number # Orientation (radians).
 ---@param sx number # Scale factor (x-axis).
 ---@param sy number # Scale factor (y-axis).
 ---@param ox number # Origin offset (x-axis).
 ---@param oy number # Origin offset (y-axis).
 ---@param kx number # Shearing factor (x-axis).
 ---@param ky number # Shearing factor (y-axis).
-function love.graphics.drawLayer(texture, layerindex, x, y, r, sx, sy, ox, oy, kx, ky) end
+function love.graphics.drawLayer(texture, layerindex, sx, sy, ox, oy, kx, ky) end
 
 ---
 ---Draws an ellipse.
 ---
----@param mode love.graphics.DrawMode # How to draw the ellipse.
----@param x number # The position of the center along x-axis.
----@param y number # The position of the center along y-axis.
+---@param mode love.DrawMode # How to draw the ellipse.
 ---@param radiusx number # The radius of the ellipse along the x-axis (half the ellipse's width).
 ---@param radiusy number # The radius of the ellipse along the y-axis (half the ellipse's height).
-function love.graphics.ellipse(mode, x, y, radiusx, radiusy) end
+function love.graphics.ellipse(mode, radiusx, radiusy) end
 
 ---
 ---Immediately renders any pending automatically batched draws.
@@ -149,23 +136,19 @@ function love.graphics.flushBatch() end
 ---
 ---In versions prior to 11.0, color component values were within the range of 0 to 255 instead of 0 to 1.
 ---
----@return number r # The red component (0-1).
----@return number g # The green component (0-1).
----@return number b # The blue component (0-1).
----@return number a # The alpha component (0-1).
 function love.graphics.getBackgroundColor() end
 
 ---
 ---Gets the blending mode.
 ---
----@return love.graphics.BlendMode mode # The current blend mode.
----@return love.graphics.BlendAlphaMode alphamode # The current blend alpha mode – it determines how the alpha of drawn objects affects blending.
+---@return love.BlendMode mode # The current blend mode.
+---@return love.BlendAlphaMode alphamode # The current blend alpha mode – it determines how the alpha of drawn objects affects blending.
 function love.graphics.getBlendMode() end
 
 ---
 ---Gets the current target Canvas.
 ---
----@return love.graphics.Canvas canvas # The Canvas set by setCanvas. Returns nil if drawing to the real screen.
+---@return love.Canvas canvas # The Canvas set by setCanvas. Returns nil if drawing to the real screen.
 function love.graphics.getCanvas() end
 
 ---
@@ -179,10 +162,6 @@ function love.graphics.getCanvasFormats() end
 ---
 ---In versions prior to 11.0, color component values were within the range of 0 to 255 instead of 0 to 1.
 ---
----@return number r # The red component (0-1).
----@return number g # The green component (0-1).
----@return number b # The blue component (0-1).
----@return number a # The alpha component (0-1).
 function love.graphics.getColor() end
 
 ---
@@ -190,10 +169,6 @@ function love.graphics.getColor() end
 ---
 ---The color mask determines whether individual components of the colors of drawn objects will affect the color of the screen. They affect love.graphics.clear and Canvas:clear as well.
 ---
----@return boolean r # Whether the red color component is active when rendering.
----@return boolean g # Whether the green color component is active when rendering.
----@return boolean b # Whether the blue color component is active when rendering.
----@return boolean a # Whether the alpha color component is active when rendering.
 function love.graphics.getColorMask() end
 
 ---
@@ -211,8 +186,8 @@ function love.graphics.getDPIScale() end
 ---
 ---Returns the default scaling filters used with Images, Canvases, and Fonts.
 ---
----@return love.graphics.FilterMode min # Filter mode used when scaling the image down.
----@return love.graphics.FilterMode mag # Filter mode used when scaling the image up.
+---@return love.FilterMode min # Filter mode used when scaling the image down.
+---@return love.FilterMode mag # Filter mode used when scaling the image up.
 ---@return number anisotropy # Maximum amount of Anisotropic Filtering used.
 function love.graphics.getDefaultFilter() end
 
@@ -221,7 +196,7 @@ function love.graphics.getDefaultFilter() end
 ---
 ---This is low-level functionality designed for use with custom vertex shaders and Meshes with custom vertex attributes. No higher level APIs are provided to set the depth of 2D graphics such as shapes, lines, and Images.
 ---
----@return love.graphics.CompareMode comparemode # Depth comparison mode used for depth testing.
+---@return love.CompareMode comparemode # Depth comparison mode used for depth testing.
 ---@return boolean write # Whether to write update / write values to the depth buffer when rendering.
 function love.graphics.getDepthMode() end
 
@@ -235,7 +210,7 @@ function love.graphics.getDimensions() end
 ---
 ---Gets the current Font object.
 ---
----@return love.graphics.Font font # The current Font. Automatically creates and sets the default font, if none is set yet.
+---@return love.Font font # The current Font. Automatically creates and sets the default font, if none is set yet.
 function love.graphics.getFont() end
 
 ---
@@ -243,7 +218,7 @@ function love.graphics.getFont() end
 ---
 ---This is designed for use in combination with Mesh face culling. Other love.graphics shapes, lines, and sprites are not guaranteed to have a specific winding order to their internal vertices.
 ---
----@return love.graphics.VertexWinding winding # The winding mode being used. The default winding is counterclockwise ('ccw').
+---@return love.VertexWinding winding # The winding mode being used. The default winding is counterclockwise ('ccw').
 function love.graphics.getFrontFaceWinding() end
 
 ---
@@ -261,13 +236,13 @@ function love.graphics.getImageFormats() end
 ---
 ---Gets the line join style.
 ---
----@return love.graphics.LineJoin join # The LineJoin style.
+---@return love.LineJoin join # The LineJoin style.
 function love.graphics.getLineJoin() end
 
 ---
 ---Gets the line style.
 ---
----@return love.graphics.LineStyle style # The current line style.
+---@return love.LineStyle style # The current line style.
 function love.graphics.getLineStyle() end
 
 ---
@@ -281,7 +256,7 @@ function love.graphics.getLineWidth() end
 ---
 ---Mesh face culling is designed for use with low level custom hardware-accelerated 3D rendering via custom vertex attributes on Meshes, custom vertex shaders, and depth testing with a depth buffer.
 ---
----@return love.graphics.CullMode mode # The Mesh face culling mode in use (whether to render everything, cull back-facing triangles, or cull front-facing triangles).
+---@return love.CullMode mode # The Mesh face culling mode in use (whether to render everything, cull back-facing triangles, or cull front-facing triangles).
 function love.graphics.getMeshCullMode() end
 
 ---
@@ -327,8 +302,6 @@ function love.graphics.getRendererInfo() end
 ---
 ---Gets the current scissor box.
 ---
----@return number x # The x-component of the top-left point of the box.
----@return number y # The y-component of the top-left point of the box.
 ---@return number width # The width of the box.
 ---@return number height # The height of the box.
 function love.graphics.getScissor() end
@@ -336,7 +309,7 @@ function love.graphics.getScissor() end
 ---
 ---Gets the current Shader. Returns nil if none is set.
 ---
----@return love.graphics.Shader shader # The currently active Shader, or nil if none is set.
+---@return love.Shader shader # The currently active Shader, or nil if none is set.
 function love.graphics.getShader() end
 
 ---
@@ -358,7 +331,7 @@ function love.graphics.getStats() end
 ---
 ---Each Canvas has its own per-pixel stencil values.
 ---
----@return love.graphics.CompareMode comparemode # The type of comparison that is made for each pixel. Will be 'always' if stencil testing is disabled.
+---@return love.CompareMode comparemode # The type of comparison that is made for each pixel. Will be 'always' if stencil testing is disabled.
 ---@return number comparevalue # The value used when comparing with the stencil value of each pixel.
 function love.graphics.getStencilTest() end
 
@@ -395,11 +368,9 @@ function love.graphics.getWidth() end
 ---
 ---The dimensions of the scissor is unaffected by graphical transformations (translate, scale, ...).
 ---
----@param x number # The x-coordinate of the upper left corner of the rectangle to intersect with the existing scissor rectangle.
----@param y number # The y-coordinate of the upper left corner of the rectangle to intersect with the existing scissor rectangle.
 ---@param width number # The width of the rectangle to intersect with the existing scissor rectangle.
 ---@param height number # The height of the rectangle to intersect with the existing scissor rectangle.
-function love.graphics.intersectScissor(x, y, width, height) end
+function love.graphics.intersectScissor(width, height) end
 
 ---
 ---Converts the given 2D position from screen-space into global coordinates.
@@ -440,8 +411,7 @@ function love.graphics.isWireframe() end
 ---@param y1 number # The position of first point on the y-axis.
 ---@param x2 number # The position of second point on the x-axis.
 ---@param y2 number # The position of second point on the y-axis.
----@param ... number # You can continue passing point positions to draw a polyline.
-function love.graphics.line(x1, y1, x2, y2, ...) end
+function love.graphics.line(x1, y1, x2, y2) end
 
 ---
 ---Creates a new array Image.
@@ -454,13 +424,13 @@ function love.graphics.line(x1, y1, x2, y2, ...) end
 ---
 ---@param slices table # A table containing filepaths to images (or File, FileData, ImageData, or CompressedImageData objects), in an array. Each sub-image must have the same dimensions. A table of tables can also be given, where each sub-table contains all mipmap levels for the slice index of that sub-table.
 ---@param settings table # Optional table of settings to configure the array image, containing the following fields:
----@return love.graphics.Image image # An Array Image object.
+---@return love.Image image # An Array Image object.
 function love.graphics.newArrayImage(slices, settings) end
 
 ---
 ---Creates a new Canvas object for offscreen rendering.
 ---
----@return love.graphics.Canvas canvas # A new Canvas with dimensions equal to the window's size in pixels.
+---@return love.Canvas canvas # A new Canvas with dimensions equal to the window's size in pixels.
 function love.graphics.newCanvas() end
 
 ---
@@ -510,7 +480,7 @@ function love.graphics.newCanvas() end
 ---
 ---@param filename string # The filepath to a cubemap image file (or a File, FileData, or ImageData).
 ---@param settings table # Optional table of settings to configure the cubemap image, containing the following fields:
----@return love.graphics.Image image # An cubemap Image object.
+---@return love.Image image # An cubemap Image object.
 function love.graphics.newCubeImage(filename, settings) end
 
 ---
@@ -519,14 +489,14 @@ function love.graphics.newCubeImage(filename, settings) end
 ---All variants which accept a filename can also accept a Data object instead.
 ---
 ---@param filename string # The filepath to the BMFont or TrueType font file.
----@return love.graphics.Font font # A Font object which can be used to draw text on screen.
+---@return love.Font font # A Font object which can be used to draw text on screen.
 function love.graphics.newFont(filename) end
 
 ---
 ---Creates a new Image from a filepath, FileData, an ImageData, or a CompressedImageData, and optionally generates or specifies mipmaps for the image.
 ---
 ---@param filename string # The filepath to the image file.
----@return love.graphics.Image image # An Image object which can be drawn on screen.
+---@return love.Image image # An Image object which can be drawn on screen.
 function love.graphics.newImage(filename) end
 
 ---
@@ -536,7 +506,7 @@ function love.graphics.newImage(filename) end
 ---
 ---@param filename string # The filepath to the image file.
 ---@param glyphs string # A string of the characters in the image in order from left to right.
----@return love.graphics.Font font # A Font object which can be used to draw text on screen.
+---@return love.Font font # A Font object which can be used to draw text on screen.
 function love.graphics.newImageFont(filename, glyphs) end
 
 ---
@@ -547,17 +517,17 @@ function love.graphics.newImageFont(filename, glyphs) end
 ---In versions prior to 11.0, color and byte component values were within the range of 0 to 255 instead of 0 to 1.
 ---
 ---@param vertices table # The table filled with vertex information tables for each vertex as follows:
----@param mode love.graphics.MeshDrawMode # How the vertices are used when drawing. The default mode 'fan' is sufficient for simple convex polygons.
----@param usage love.graphics.SpriteBatchUsage # The expected usage of the Mesh. The specified usage mode affects the Mesh's memory usage and performance.
----@return love.graphics.Mesh mesh # The new mesh.
+---@param mode love.MeshDrawMode # How the vertices are used when drawing. The default mode 'fan' is sufficient for simple convex polygons.
+---@param usage love.SpriteBatchUsage # The expected usage of the Mesh. The specified usage mode affects the Mesh's memory usage and performance.
+---@return love.Mesh mesh # The new mesh.
 function love.graphics.newMesh(vertices, mode, usage) end
 
 ---
 ---Creates a new ParticleSystem.
 ---
----@param image love.graphics.Image # The image to use.
+---@param image love.Image # The image to use.
 ---@param buffer number # The max number of particles at the same time.
----@return love.graphics.ParticleSystem system # A new ParticleSystem.
+---@return love.ParticleSystem system # A new ParticleSystem.
 function love.graphics.newParticleSystem(image, buffer) end
 
 ---
@@ -565,14 +535,12 @@ function love.graphics.newParticleSystem(image, buffer) end
 ---
 ---The purpose of a Quad is to use a fraction of an image to draw objects, as opposed to drawing entire image. It is most useful for sprite sheets and atlases: in a sprite atlas, multiple sprites reside in same image, quad is used to draw a specific sprite from that image; in animated sprites with all frames residing in the same image, quad is used to draw specific frame from the animation.
 ---
----@param x number # The top-left position in the Image along the x-axis.
----@param y number # The top-left position in the Image along the y-axis.
 ---@param width number # The width of the Quad in the Image. (Must be greater than 0.)
 ---@param height number # The height of the Quad in the Image. (Must be greater than 0.)
 ---@param sw number # The reference width, the width of the Image. (Must be greater than 0.)
 ---@param sh number # The reference height, the height of the Image. (Must be greater than 0.)
----@return love.graphics.Quad quad # The new Quad.
-function love.graphics.newQuad(x, y, width, height, sw, sh) end
+---@return love.Quad quad # The new Quad.
+function love.graphics.newQuad(width, height, sw, sh) end
 
 ---
 ---Creates a new Shader object for hardware-accelerated vertex and pixel effects. A Shader contains either vertex shader code, pixel shader code, or both.
@@ -580,30 +548,30 @@ function love.graphics.newQuad(x, y, width, height, sw, sh) end
 ---Shaders are small programs which are run on the graphics card when drawing. Vertex shaders are run once for each vertex (for example, an image has 4 vertices - one at each corner. A Mesh might have many more.) Pixel shaders are run once for each pixel on the screen which the drawn object touches. Pixel shader code is executed after all the object's vertices have been processed by the vertex shader.
 ---
 ---@param code string # The pixel shader or vertex shader code, or a filename pointing to a file with the code.
----@return love.graphics.Shader shader # A Shader object for use in drawing operations.
+---@return love.Shader shader # A Shader object for use in drawing operations.
 function love.graphics.newShader(code) end
 
 ---
 ---Creates a new SpriteBatch object.
 ---
----@param image love.graphics.Image # The Image to use for the sprites.
+---@param image love.Image # The Image to use for the sprites.
 ---@param maxsprites number # The maximum number of sprites that the SpriteBatch can contain at any given time. Since version 11.0, additional sprites added past this number will automatically grow the spritebatch.
----@return love.graphics.SpriteBatch spriteBatch # The new SpriteBatch.
+---@return love.SpriteBatch spriteBatch # The new SpriteBatch.
 function love.graphics.newSpriteBatch(image, maxsprites) end
 
 ---
 ---Creates a new drawable Text object.
 ---
----@param font love.graphics.Font # The font to use for the text.
+---@param font love.Font # The font to use for the text.
 ---@param textstring string # The initial string of text that the new Text object will contain. May be nil.
----@return love.graphics.Text text # The new drawable Text object.
+---@return love.Text text # The new drawable Text object.
 function love.graphics.newText(font, textstring) end
 
 ---
 ---Creates a new drawable Video. Currently only Ogg Theora video files are supported.
 ---
 ---@param filename string # The file path to the Ogg Theora video file.
----@return love.graphics.Video video # A new Video.
+---@return love.Video video # A new Video.
 function love.graphics.newVideo(filename) end
 
 ---
@@ -619,7 +587,7 @@ function love.graphics.newVideo(filename) end
 ---
 ---@param layers table # A table containing filepaths to images (or File, FileData, ImageData, or CompressedImageData objects), in an array. A table of tables can also be given, where each sub-table represents a single mipmap level and contains all layers for that mipmap.
 ---@param settings table # Optional table of settings to configure the volume image, containing the following fields:
----@return love.graphics.Image image # A volume Image object.
+---@return love.Image image # A volume Image object.
 function love.graphics.newVolumeImage(layers, settings) end
 
 ---
@@ -632,19 +600,15 @@ function love.graphics.origin() end
 ---
 ---Draws one or more points.
 ---
----@param x number # The position of the first point on the x-axis.
----@param y number # The position of the first point on the y-axis.
----@param ... number # The x and y coordinates of additional points.
-function love.graphics.points(x, y, ...) end
+function love.graphics.points() end
 
 ---
 ---Draw a polygon.
 ---
 ---Following the mode argument, this function can accept multiple numeric arguments or a single table of numeric arguments. In either case the arguments are interpreted as alternating x and y coordinates of the polygon's vertices.
 ---
----@param mode love.graphics.DrawMode # How to draw the polygon.
----@param ... number # The vertices of the polygon.
-function love.graphics.polygon(mode, ...) end
+---@param mode love.DrawMode # How to draw the polygon.
+function love.graphics.polygon(mode) end
 
 ---
 ---Pops the current coordinate transformation from the transformation stack.
@@ -670,16 +634,13 @@ function love.graphics.present() end
 ---In versions prior to 11.0, color and byte component values were within the range of 0 to 255 instead of 0 to 1.
 ---
 ---@param text string # The text to draw.
----@param x number # The position to draw the object (x-axis).
----@param y number # The position to draw the object (y-axis).
----@param r number # Orientation (radians).
 ---@param sx number # Scale factor (x-axis).
 ---@param sy number # Scale factor (y-axis).
 ---@param ox number # Origin offset (x-axis).
 ---@param oy number # Origin offset (y-axis).
 ---@param kx number # Shearing factor (x-axis).
 ---@param ky number # Shearing factor (y-axis).
-function love.graphics.print(text, x, y, r, sx, sy, ox, oy, kx, ky) end
+function love.graphics.print(text, sx, sy, ox, oy, kx, ky) end
 
 ---
 ---Draws formatted text, with word wrap and alignment.
@@ -693,18 +654,15 @@ function love.graphics.print(text, x, y, r, sx, sy, ox, oy, kx, ky) end
 ---In versions prior to 11.0, color and byte component values were within the range of 0 to 255 instead of 0 to 1.
 ---
 ---@param text string # A text string.
----@param x number # The position on the x-axis.
----@param y number # The position on the y-axis.
 ---@param limit number # Wrap the line after this many horizontal pixels.
----@param align love.graphics.AlignMode # The alignment.
----@param r number # Orientation (radians).
+---@param align love.AlignMode # The alignment.
 ---@param sx number # Scale factor (x-axis).
 ---@param sy number # Scale factor (y-axis).
 ---@param ox number # Origin offset (x-axis).
 ---@param oy number # Origin offset (y-axis).
 ---@param kx number # Shearing factor (x-axis).
 ---@param ky number # Shearing factor (y-axis).
-function love.graphics.printf(text, x, y, limit, align, r, sx, sy, ox, oy, kx, ky) end
+function love.graphics.printf(text, limit, align, sx, sy, ox, oy, kx, ky) end
 
 ---
 ---Copies and pushes the current coordinate transformation to the transformation stack.
@@ -716,17 +674,15 @@ function love.graphics.push() end
 ---
 ---Draws a rectangle.
 ---
----@param mode love.graphics.DrawMode # How to draw the rectangle.
----@param x number # The position of top-left corner along the x-axis.
----@param y number # The position of top-left corner along the y-axis.
+---@param mode love.DrawMode # How to draw the rectangle.
 ---@param width number # Width of the rectangle.
 ---@param height number # Height of the rectangle.
-function love.graphics.rectangle(mode, x, y, width, height) end
+function love.graphics.rectangle(mode, width, height) end
 
 ---
 ---Replaces the current coordinate transformation with the given Transform object.
 ---
----@param transform love.graphics.Transform # The Transform object to replace the current graphics coordinate transform with.
+---@param transform love.Transform # The Transform object to replace the current graphics coordinate transform with.
 function love.graphics.replaceTransform(transform) end
 
 ---
@@ -771,13 +727,13 @@ function love.graphics.setBackgroundColor(red, green, blue, alpha) end
 ---
 ---Sets the blending mode.
 ---
----@param mode love.graphics.BlendMode # The blend mode to use.
+---@param mode love.BlendMode # The blend mode to use.
 function love.graphics.setBlendMode(mode) end
 
 ---
 ---Captures drawing operations to a Canvas.
 ---
----@param canvas love.graphics.Canvas # The new target.
+---@param canvas love.Canvas # The new target.
 ---@param mipmap number # The mipmap level to render to, for Canvases with mipmaps.
 function love.graphics.setCanvas(canvas, mipmap) end
 
@@ -804,8 +760,8 @@ function love.graphics.setColorMask(red, green, blue, alpha) end
 ---
 ---Sets the default scaling filters used with Images, Canvases, and Fonts.
 ---
----@param min love.graphics.FilterMode # Filter mode used when scaling the image down.
----@param mag love.graphics.FilterMode # Filter mode used when scaling the image up.
+---@param min love.FilterMode # Filter mode used when scaling the image down.
+---@param mag love.FilterMode # Filter mode used when scaling the image up.
 ---@param anisotropy number # Maximum amount of Anisotropic Filtering used.
 function love.graphics.setDefaultFilter(min, mag, anisotropy) end
 
@@ -814,7 +770,7 @@ function love.graphics.setDefaultFilter(min, mag, anisotropy) end
 ---
 ---This is low-level functionality designed for use with custom vertex shaders and Meshes with custom vertex attributes. No higher level APIs are provided to set the depth of 2D graphics such as shapes, lines, and Images.
 ---
----@param comparemode love.graphics.CompareMode # Depth comparison mode used for depth testing.
+---@param comparemode love.CompareMode # Depth comparison mode used for depth testing.
 ---@param write boolean # Whether to write update / write values to the depth buffer when rendering.
 function love.graphics.setDepthMode(comparemode, write) end
 
@@ -823,7 +779,7 @@ function love.graphics.setDepthMode(comparemode, write) end
 ---
 ---It's recommended that Font objects are created with love.graphics.newFont in the loading stage and then passed to this function in the drawing stage.
 ---
----@param font love.graphics.Font # The Font object to use.
+---@param font love.Font # The Font object to use.
 function love.graphics.setFont(font) end
 
 ---
@@ -831,19 +787,19 @@ function love.graphics.setFont(font) end
 ---
 ---This is designed for use in combination with Mesh face culling. Other love.graphics shapes, lines, and sprites are not guaranteed to have a specific winding order to their internal vertices.
 ---
----@param winding love.graphics.VertexWinding # The winding mode to use. The default winding is counterclockwise ('ccw').
+---@param winding love.VertexWinding # The winding mode to use. The default winding is counterclockwise ('ccw').
 function love.graphics.setFrontFaceWinding(winding) end
 
 ---
 ---Sets the line join style. See LineJoin for the possible options.
 ---
----@param join love.graphics.LineJoin # The LineJoin to use.
+---@param join love.LineJoin # The LineJoin to use.
 function love.graphics.setLineJoin(join) end
 
 ---
 ---Sets the line style.
 ---
----@param style love.graphics.LineStyle # The LineStyle to use. Line styles include smooth and rough.
+---@param style love.LineStyle # The LineStyle to use. Line styles include smooth and rough.
 function love.graphics.setLineStyle(style) end
 
 ---
@@ -859,14 +815,14 @@ function love.graphics.setLineWidth(width) end
 ---
 ---By default, both front- and back-facing triangles in Meshes are rendered.
 ---
----@param mode love.graphics.CullMode # The Mesh face culling mode to use (whether to render everything, cull back-facing triangles, or cull front-facing triangles).
+---@param mode love.CullMode # The Mesh face culling mode to use (whether to render everything, cull back-facing triangles, or cull front-facing triangles).
 function love.graphics.setMeshCullMode(mode) end
 
 ---
 ---Creates and sets a new Font.
 ---
 ---@param size number # The size of the font.
----@return love.graphics.Font font # The new font.
+---@return love.Font font # The new font.
 function love.graphics.setNewFont(size) end
 
 ---
@@ -882,16 +838,14 @@ function love.graphics.setPointSize(size) end
 ---
 ---The dimensions of the scissor is unaffected by graphical transformations (translate, scale, ...).
 ---
----@param x number # x coordinate of upper left corner.
----@param y number # y coordinate of upper left corner.
 ---@param width number # width of clipping rectangle.
 ---@param height number # height of clipping rectangle.
-function love.graphics.setScissor(x, y, width, height) end
+function love.graphics.setScissor(width, height) end
 
 ---
 ---Sets or resets a Shader as the current pixel effect or vertex shaders. All drawing operations until the next ''love.graphics.setShader'' will be drawn using the Shader object specified.
 ---
----@param shader love.graphics.Shader # The new shader.
+---@param shader love.Shader # The new shader.
 function love.graphics.setShader(shader) end
 
 ---
@@ -899,7 +853,7 @@ function love.graphics.setShader(shader) end
 ---
 ---When stencil testing is enabled, the geometry of everything that is drawn afterward will be clipped / stencilled out based on a comparison between the arguments of this function and the stencil value of each pixel that the geometry touches. The stencil values of pixels are affected via love.graphics.stencil.
 ---
----@param comparemode love.graphics.CompareMode # The type of comparison to make for each pixel.
+---@param comparemode love.CompareMode # The type of comparison to make for each pixel.
 ---@param comparevalue number # The value to use when comparing with the stencil value of each pixel. Must be between 0 and 255.
 function love.graphics.setStencilTest(comparemode, comparevalue) end
 
@@ -924,7 +878,7 @@ function love.graphics.shear(kx, ky) end
 ---Stencil values are integers within the range of 255.
 ---
 ---@param stencilfunction function # Function which draws geometry. The stencil values of pixels, rather than the color of each pixel, will be affected by the geometry.
----@param action love.graphics.StencilAction # How to modify any stencil values of pixels that are touched by what's drawn in the stencil function.
+---@param action love.StencilAction # How to modify any stencil values of pixels that are touched by what's drawn in the stencil function.
 ---@param value number # The new stencil value to use for pixels if the 'replace' stencil action is used. Has no effect with other stencil actions. Must be between 0 and 255.
 ---@param keepvalues boolean # True to preserve old stencil values of pixels, false to re-set every pixel's stencil value to 0 before executing the stencil function. love.graphics.clear will also re-set all stencil values.
 function love.graphics.stencil(stencilfunction, action, value, keepvalues) end
@@ -964,7 +918,7 @@ function love.graphics.translate(dx, dy) end
 ---@return string message # Reason why shader code validation failed (or nil if validation succeded).
 function love.graphics.validateShader(gles, code) end
 
----@class love.graphics.Canvas: love.graphics.Texture, love.graphics.Drawable, love.graphics.Object
+---@class love.Canvas: love.Texture, love.Drawable, love.Object
 local Canvas = {}
 
 ---
@@ -987,13 +941,13 @@ function Canvas:getMSAA() end
 ---
 ---Gets the MipmapMode this Canvas was created with.
 ---
----@return love.graphics.MipmapMode mode # The mipmap mode this Canvas was created with.
+---@return love.MipmapMode mode # The mipmap mode this Canvas was created with.
 function Canvas:getMipmapMode() end
 
 ---
 ---Generates ImageData from the contents of the Canvas.
 ---
----@return love.graphics.ImageData data # The new ImageData made from the Canvas' contents.
+---@return love.ImageData data # The new ImageData made from the Canvas' contents.
 function Canvas:newImageData() end
 
 ---
@@ -1014,10 +968,10 @@ function Canvas:newImageData() end
 ---@param func function # A function performing drawing operations.
 function Canvas:renderTo(func) end
 
----@class love.graphics.Drawable: love.graphics.Object
+---@class love.Drawable: love.Object
 local Drawable = {}
 
----@class love.graphics.Font: love.graphics.Object
+---@class love.Font: love.Object
 local Font = {}
 
 ---
@@ -1057,8 +1011,8 @@ function Font:getDescent() end
 ---
 ---Gets the filter mode for a font.
 ---
----@return love.graphics.FilterMode min # Filter mode used when minifying the font.
----@return love.graphics.FilterMode mag # Filter mode used when magnifying the font.
+---@return love.FilterMode min # Filter mode used when minifying the font.
+---@return love.FilterMode mag # Filter mode used when magnifying the font.
 ---@return number anisotropy # Maximum amount of anisotropic filtering used.
 function Font:getFilter() end
 
@@ -1106,15 +1060,14 @@ function Font:hasGlyphs(text) end
 ---
 ---Sets the fallback fonts. When the Font doesn't contain a glyph, it will substitute the glyph from the next subsequent fallback Fonts. This is akin to setting a 'font stack' in Cascading Style Sheets (CSS).
 ---
----@param fallbackfont1 love.graphics.Font # The first fallback Font to use.
----@param ... love.graphics.Font # Additional fallback Fonts.
-function Font:setFallbacks(fallbackfont1, ...) end
+---@param fallbackfont1 love.Font # The first fallback Font to use.
+function Font:setFallbacks(fallbackfont1) end
 
 ---
 ---Sets the filter mode for a font.
 ---
----@param min love.graphics.FilterMode # How to scale a font down.
----@param mag love.graphics.FilterMode # How to scale a font up.
+---@param min love.FilterMode # How to scale a font down.
+---@param mag love.FilterMode # How to scale a font up.
 ---@param anisotropy number # Maximum amount of anisotropic filtering used.
 function Font:setFilter(min, mag, anisotropy) end
 
@@ -1126,7 +1079,7 @@ function Font:setFilter(min, mag, anisotropy) end
 ---@param height number # The new line height.
 function Font:setLineHeight(height) end
 
----@class love.graphics.Image: love.graphics.Texture, love.graphics.Drawable, love.graphics.Object
+---@class love.Image: love.Texture, love.Drawable, love.Object
 local Image = {}
 
 ---
@@ -1146,29 +1099,27 @@ function Image:isCompressed() end
 ---
 ---Replace the contents of an Image.
 ---
----@param data love.graphics.ImageData # The new ImageData to replace the contents with.
+---@param data love.ImageData # The new ImageData to replace the contents with.
 ---@param slice number # Which cubemap face, array index, or volume layer to replace, if applicable.
 ---@param mipmap number # The mimap level to replace, if the Image has mipmaps.
----@param x number # The x-offset in pixels from the top-left of the image to replace. The given ImageData's width plus this value must not be greater than the pixel width of the Image's specified mipmap level.
----@param y number # The y-offset in pixels from the top-left of the image to replace. The given ImageData's height plus this value must not be greater than the pixel height of the Image's specified mipmap level.
 ---@param reloadmipmaps boolean # Whether to generate new mipmaps after replacing the Image's pixels. True by default if the Image was created with automatically generated mipmaps, false by default otherwise.
-function Image:replacePixels(data, slice, mipmap, x, y, reloadmipmaps) end
+function Image:replacePixels(data, slice, mipmap, reloadmipmaps) end
 
----@class love.graphics.Mesh: love.graphics.Drawable, love.graphics.Object
+---@class love.Mesh: love.Drawable, love.Object
 local Mesh = {}
 
 ---
 ---Attaches a vertex attribute from a different Mesh onto this Mesh, for use when drawing. This can be used to share vertex attribute data between several different Meshes.
 ---
 ---@param name string # The name of the vertex attribute to attach.
----@param mesh love.graphics.Mesh # The Mesh to get the vertex attribute from.
+---@param mesh love.Mesh # The Mesh to get the vertex attribute from.
 function Mesh:attachAttribute(name, mesh) end
 
 ---
 ---Attaches a vertex attribute from a different Mesh onto this Mesh, for use when drawing. This can be used to share vertex attribute data between several different Meshes.
 ---
 ---@param name string # The name of the vertex attribute to attach.
----@param mesh love.graphics.Mesh # The Mesh to get the vertex attribute from.
+---@param mesh love.Mesh # The Mesh to get the vertex attribute from.
 function Mesh:attachAttribute(name, mesh) end
 
 ---
@@ -1181,7 +1132,7 @@ function Mesh:detachAttribute(name) end
 ---
 ---Gets the mode used when drawing the Mesh.
 ---
----@return love.graphics.MeshDrawMode mode # The mode used when drawing the Mesh.
+---@return love.MeshDrawMode mode # The mode used when drawing the Mesh.
 function Mesh:getDrawMode() end
 
 ---
@@ -1194,7 +1145,7 @@ function Mesh:getDrawRange() end
 ---
 ---Gets the texture (Image or Canvas) used when drawing the Mesh.
 ---
----@return love.graphics.Texture texture # The Image or Canvas to texture the Mesh with when drawing, or nil if none is set.
+---@return love.Texture texture # The Image or Canvas to texture the Mesh with when drawing, or nil if none is set.
 function Mesh:getTexture() end
 
 ---
@@ -1204,7 +1155,6 @@ function Mesh:getTexture() end
 ---
 ---@param index number # The one-based index of the vertex you want to retrieve the information for.
 ---@return number attributecomponent # The first component of the first vertex attribute in the specified vertex.
----@return number ... # Additional components of all vertex attributes in the specified vertex.
 function Mesh:getVertex(index) end
 
 ---
@@ -1216,7 +1166,6 @@ function Mesh:getVertex(index) end
 ---@param attributeindex number # The index of the attribute within the vertex to be retrieved (one-based).
 ---@return number value1 # The value of the first component of the attribute.
 ---@return number value2 # The value of the second component of the attribute.
----@return number ... # Any additional vertex attribute components.
 function Mesh:getVertexAttribute(vertexindex, attributeindex) end
 
 ---
@@ -1256,7 +1205,7 @@ function Mesh:setAttributeEnabled(name, enable) end
 ---
 ---Sets the mode used when drawing the Mesh.
 ---
----@param mode love.graphics.MeshDrawMode # The mode to use when drawing the Mesh.
+---@param mode love.MeshDrawMode # The mode to use when drawing the Mesh.
 function Mesh:setDrawMode(mode) end
 
 ---
@@ -1269,7 +1218,7 @@ function Mesh:setDrawRange(start, count) end
 ---
 ---Sets the texture (Image or Canvas) used when drawing the Mesh.
 ---
----@param texture love.graphics.Texture # The Image or Canvas to texture the Mesh with when drawing.
+---@param texture love.Texture # The Image or Canvas to texture the Mesh with when drawing.
 function Mesh:setTexture(texture) end
 
 ---
@@ -1279,8 +1228,7 @@ function Mesh:setTexture(texture) end
 ---
 ---@param index number # The index of the the vertex you want to modify (one-based).
 ---@param attributecomponent number # The first component of the first vertex attribute in the specified vertex.
----@param ... number # Additional components of all vertex attributes in the specified vertex.
-function Mesh:setVertex(index, attributecomponent, ...) end
+function Mesh:setVertex(index, attributecomponent) end
 
 ---
 ---Sets the properties of a specific attribute within a vertex in the Mesh.
@@ -1291,8 +1239,7 @@ function Mesh:setVertex(index, attributecomponent, ...) end
 ---@param attributeindex number # The index of the attribute within the vertex to be modified (one-based).
 ---@param value1 number # The new value for the first component of the attribute.
 ---@param value2 number # The new value for the second component of the attribute.
----@param ... number # Any additional vertex attribute components.
-function Mesh:setVertexAttribute(vertexindex, attributeindex, value1, value2, ...) end
+function Mesh:setVertexAttribute(vertexindex, attributeindex, value1, value2) end
 
 ---
 ---Sets the vertex map for the Mesh. The vertex map describes the order in which the vertices are used when the Mesh is drawn. The vertices, vertex map, and mesh draw mode work together to determine what exactly is displayed on the screen.
@@ -1309,13 +1256,13 @@ function Mesh:setVertexMap(map) end
 ---@param startvertex number # The index of the first vertex to replace.
 function Mesh:setVertices(vertices, startvertex) end
 
----@class love.graphics.ParticleSystem: love.graphics.Drawable, love.graphics.Object
+---@class love.ParticleSystem: love.Drawable, love.Object
 local ParticleSystem = {}
 
 ---
 ---Creates an identical copy of the ParticleSystem in the stopped state.
 ---
----@return love.graphics.ParticleSystem particlesystem # The new identical copy of this ParticleSystem.
+---@return love.ParticleSystem particlesystem # The new identical copy of this ParticleSystem.
 function ParticleSystem:clone() end
 
 ---
@@ -1364,7 +1311,7 @@ function ParticleSystem:getDirection() end
 ---
 ---Gets the area-based spawn parameters for the particles.
 ---
----@return love.graphics.AreaSpreadDistribution distribution # The type of distribution for new particles.
+---@return love.AreaSpreadDistribution distribution # The type of distribution for new particles.
 ---@return number dx # The maximum spawn distance from the emitter along the x-axis for uniform distribution, or the standard deviation along the x-axis for normal distribution.
 ---@return number dy # The maximum spawn distance from the emitter along the y-axis for uniform distribution, or the standard deviation along the y-axis for normal distribution.
 ---@return number angle # The angle in radians of the emission area.
@@ -1386,7 +1333,7 @@ function ParticleSystem:getEmitterLifetime() end
 ---
 ---Gets the mode used when the ParticleSystem adds new particles.
 ---
----@return love.graphics.ParticleInsertMode mode # The mode used when the ParticleSystem adds new particles.
+---@return love.ParticleInsertMode mode # The mode used when the ParticleSystem adds new particles.
 function ParticleSystem:getInsertMode() end
 
 ---
@@ -1424,8 +1371,6 @@ function ParticleSystem:getParticleLifetime() end
 ---
 ---Gets the position of the emitter.
 ---
----@return number x # Position along x-axis.
----@return number y # Position along y-axis.
 function ParticleSystem:getPosition() end
 
 ---
@@ -1499,7 +1444,7 @@ function ParticleSystem:getTangentialAcceleration() end
 ---
 ---Gets the texture (Image or Canvas) used for the particles.
 ---
----@return love.graphics.Texture texture # The Image or Canvas used for the particles.
+---@return love.Texture texture # The Image or Canvas used for the particles.
 function ParticleSystem:getTexture() end
 
 ---
@@ -1529,9 +1474,7 @@ function ParticleSystem:isStopped() end
 ---
 ---Moves the position of the emitter. This results in smoother particle spawning behaviour than if ParticleSystem:setPosition is used every frame.
 ---
----@param x number # Position along x-axis.
----@param y number # Position along y-axis.
-function ParticleSystem:moveTo(x, y) end
+function ParticleSystem:moveTo() end
 
 ---
 ---Pauses the particle emitter.
@@ -1579,7 +1522,7 @@ function ParticleSystem:setDirection(direction) end
 ---
 ---Sets area-based spawn parameters for the particles. Newly created particles will spawn in an area around the emitter based on the parameters to this function.
 ---
----@param distribution love.graphics.AreaSpreadDistribution # The type of distribution for new particles.
+---@param distribution love.AreaSpreadDistribution # The type of distribution for new particles.
 ---@param dx number # The maximum spawn distance from the emitter along the x-axis for uniform distribution, or the standard deviation along the x-axis for normal distribution.
 ---@param dy number # The maximum spawn distance from the emitter along the y-axis for uniform distribution, or the standard deviation along the y-axis for normal distribution.
 ---@param angle number # The angle in radians of the emission area.
@@ -1601,7 +1544,7 @@ function ParticleSystem:setEmitterLifetime(life) end
 ---
 ---Sets the mode to use when the ParticleSystem adds new particles.
 ---
----@param mode love.graphics.ParticleInsertMode # The mode to use when the ParticleSystem adds new particles.
+---@param mode love.ParticleInsertMode # The mode to use when the ParticleSystem adds new particles.
 function ParticleSystem:setInsertMode(mode) end
 
 ---
@@ -1627,9 +1570,7 @@ function ParticleSystem:setLinearDamping(min, max) end
 ---
 ---If this function is not used, the particles rotate around their center.
 ---
----@param x number # The x coordinate of the rotation offset.
----@param y number # The y coordinate of the rotation offset.
-function ParticleSystem:setOffset(x, y) end
+function ParticleSystem:setOffset() end
 
 ---
 ---Sets the lifetime of the particles.
@@ -1641,15 +1582,13 @@ function ParticleSystem:setParticleLifetime(min, max) end
 ---
 ---Sets the position of the emitter.
 ---
----@param x number # Position along x-axis.
----@param y number # Position along y-axis.
-function ParticleSystem:setPosition(x, y) end
+function ParticleSystem:setPosition() end
 
 ---
 ---Sets a series of Quads to use for the particle sprites. Particles will choose a Quad from the list based on the particle's current lifetime, allowing for the use of animated sprite sheets with ParticleSystems.
 ---
----@param quad1 love.graphics.Quad # The first Quad to use.
----@param quad2 love.graphics.Quad # The second Quad to use.
+---@param quad1 love.Quad # The first Quad to use.
+---@param quad2 love.Quad # The second Quad to use.
 function ParticleSystem:setQuads(quad1, quad2) end
 
 ---
@@ -1724,7 +1663,7 @@ function ParticleSystem:setTangentialAcceleration(min, max) end
 ---
 ---Sets the texture (Image or Canvas) to be used for the particles.
 ---
----@param texture love.graphics.Texture # An Image or Canvas to use for the particles.
+---@param texture love.Texture # An Image or Canvas to use for the particles.
 function ParticleSystem:setTexture(texture) end
 
 ---
@@ -1743,7 +1682,7 @@ function ParticleSystem:stop() end
 ---@param dt number # The time (seconds) since last frame.
 function ParticleSystem:update(dt) end
 
----@class love.graphics.Quad: love.graphics.Object
+---@class love.Quad: love.Object
 local Quad = {}
 
 ---
@@ -1756,24 +1695,16 @@ function Quad:getTextureDimensions() end
 ---
 ---Gets the current viewport of this Quad.
 ---
----@return number x # The top-left corner along the x-axis.
----@return number y # The top-left corner along the y-axis.
----@return number w # The width of the viewport.
----@return number h # The height of the viewport.
 function Quad:getViewport() end
 
 ---
 ---Sets the texture coordinates according to a viewport.
 ---
----@param x number # The top-left corner along the x-axis.
----@param y number # The top-left corner along the y-axis.
----@param w number # The width of the viewport.
----@param h number # The height of the viewport.
 ---@param sw number # The reference width, the width of the Image. (Must be greater than 0.)
 ---@param sh number # The reference height, the height of the Image. (Must be greater than 0.)
-function Quad:setViewport(x, y, w, h, sw, sh) end
+function Quad:setViewport(sw, sh) end
 
----@class love.graphics.Shader: love.graphics.Object
+---@class love.Shader: love.Object
 local Shader = {}
 
 ---
@@ -1814,8 +1745,7 @@ function Shader:hasUniform(name) end
 ---
 ---@param name string # Name of the number to send to the shader.
 ---@param number number # Number to send to store in the uniform variable.
----@param ... number # Additional numbers to send if the uniform variable is an array.
-function Shader:send(name, number, ...) end
+function Shader:send(name, number) end
 
 ---
 ---Sends one or more colors to a special (''extern'' / ''uniform'') vec3 or vec4 variable inside the shader. The color components must be in the range of 1. The colors are gamma-corrected if global gamma-correction is enabled.
@@ -1834,18 +1764,14 @@ function Shader:send(name, number, ...) end
 ---
 ---@param name string # The name of the color extern variable to send to in the shader.
 ---@param color table # A table with red, green, blue, and optional alpha color components in the range of 1 to send to the extern as a vector.
----@param ... table # Additional colors to send in case the extern is an array. All colors need to be of the same size (e.g. only vec3's).
-function Shader:sendColor(name, color, ...) end
+function Shader:sendColor(name, color) end
 
----@class love.graphics.SpriteBatch: love.graphics.Drawable, love.graphics.Object
+---@class love.SpriteBatch: love.Drawable, love.Object
 local SpriteBatch = {}
 
 ---
 ---Adds a sprite to the batch. Sprites are drawn in the order they are added.
 ---
----@param x number # The position to draw the object (x-axis).
----@param y number # The position to draw the object (y-axis).
----@param r number # Orientation (radians).
 ---@param sx number # Scale factor (x-axis).
 ---@param sy number # Scale factor (y-axis).
 ---@param ox number # Origin offset (x-axis).
@@ -1853,15 +1779,12 @@ local SpriteBatch = {}
 ---@param kx number # Shear factor (x-axis).
 ---@param ky number # Shear factor (y-axis).
 ---@return number id # An identifier for the added sprite.
-function SpriteBatch:add(x, y, r, sx, sy, ox, oy, kx, ky) end
+function SpriteBatch:add(sx, sy, ox, oy, kx, ky) end
 
 ---
 ---Adds a sprite to a batch created with an Array Texture.
 ---
 ---@param layerindex number # The index of the layer to use for this sprite.
----@param x number # The position to draw the sprite (x-axis).
----@param y number # The position to draw the sprite (y-axis).
----@param r number # Orientation (radians).
 ---@param sx number # Scale factor (x-axis).
 ---@param sy number # Scale factor (y-axis).
 ---@param ox number # Origin offset (x-axis).
@@ -1869,7 +1792,7 @@ function SpriteBatch:add(x, y, r, sx, sy, ox, oy, kx, ky) end
 ---@param kx number # Shearing factor (x-axis).
 ---@param ky number # Shearing factor (y-axis).
 ---@return number spriteindex # The index of the added sprite, for use with SpriteBatch:set or SpriteBatch:setLayer.
-function SpriteBatch:addLayer(layerindex, x, y, r, sx, sy, ox, oy, kx, ky) end
+function SpriteBatch:addLayer(layerindex, sx, sy, ox, oy, kx, ky) end
 
 ---
 ---Attaches a per-vertex attribute from a Mesh onto this SpriteBatch, for use when drawing. This can be combined with a Shader to augment a SpriteBatch with per-vertex or additional per-sprite information instead of just having per-sprite colors.
@@ -1877,7 +1800,7 @@ function SpriteBatch:addLayer(layerindex, x, y, r, sx, sy, ox, oy, kx, ky) end
 ---Each sprite in a SpriteBatch has 4 vertices in the following order: top-left, bottom-left, top-right, bottom-right. The index returned by SpriteBatch:add (and used by SpriteBatch:set) can used to determine the first vertex of a specific sprite with the formula 1 + 4 * ( id - 1 ).
 ---
 ---@param name string # The name of the vertex attribute to attach.
----@param mesh love.graphics.Mesh # The Mesh to get the vertex attribute from.
+---@param mesh love.Mesh # The Mesh to get the vertex attribute from.
 function SpriteBatch:attachAttribute(name, mesh) end
 
 ---
@@ -1907,10 +1830,6 @@ function SpriteBatch:getBufferSize() end
 ---
 ---In versions prior to 11.0, color component values were within the range of 0 to 255 instead of 0 to 1.
 ---
----@return number r # The red component (0-1).
----@return number g # The green component (0-1).
----@return number b # The blue component (0-1).
----@return number a # The alpha component (0-1).
 function SpriteBatch:getColor() end
 
 ---
@@ -1922,23 +1841,20 @@ function SpriteBatch:getCount() end
 ---
 ---Gets the texture (Image or Canvas) used by the SpriteBatch.
 ---
----@return love.graphics.Texture texture # The Image or Canvas used by the SpriteBatch.
+---@return love.Texture texture # The Image or Canvas used by the SpriteBatch.
 function SpriteBatch:getTexture() end
 
 ---
 ---Changes a sprite in the batch. This requires the sprite index returned by SpriteBatch:add or SpriteBatch:addLayer.
 ---
 ---@param spriteindex number # The index of the sprite that will be changed.
----@param x number # The position to draw the object (x-axis).
----@param y number # The position to draw the object (y-axis).
----@param r number # Orientation (radians).
 ---@param sx number # Scale factor (x-axis).
 ---@param sy number # Scale factor (y-axis).
 ---@param ox number # Origin offset (x-axis).
 ---@param oy number # Origin offset (y-axis).
 ---@param kx number # Shear factor (x-axis).
 ---@param ky number # Shear factor (y-axis).
-function SpriteBatch:set(spriteindex, x, y, r, sx, sy, ox, oy, kx, ky) end
+function SpriteBatch:set(spriteindex, sx, sy, ox, oy, kx, ky) end
 
 ---
 ---Sets the color that will be used for the next add and set operations. Calling the function without arguments will disable all per-sprite colors for the SpriteBatch.
@@ -1947,11 +1863,7 @@ function SpriteBatch:set(spriteindex, x, y, r, sx, sy, ox, oy, kx, ky) end
 ---
 ---In version 0.9.2 and older, the global color set with love.graphics.setColor will not work on the SpriteBatch if any of the sprites has its own color.
 ---
----@param r number # The amount of red.
----@param g number # The amount of green.
----@param b number # The amount of blue.
----@param a number # The amount of alpha.
-function SpriteBatch:setColor(r, g, b, a) end
+function SpriteBatch:setColor() end
 
 ---
 ---Restricts the drawn sprites in the SpriteBatch to a subset of the total.
@@ -1965,32 +1877,27 @@ function SpriteBatch:setDrawRange(start, count) end
 ---
 ---@param spriteindex number # The index of the existing sprite to replace.
 ---@param layerindex number # The index of the layer in the Array Texture to use for this sprite.
----@param x number # The position to draw the sprite (x-axis).
----@param y number # The position to draw the sprite (y-axis).
----@param r number # Orientation (radians).
 ---@param sx number # Scale factor (x-axis).
 ---@param sy number # Scale factor (y-axis).
 ---@param ox number # Origin offset (x-axis).
 ---@param oy number # Origin offset (y-axis).
 ---@param kx number # Shearing factor (x-axis).
 ---@param ky number # Shearing factor (y-axis).
-function SpriteBatch:setLayer(spriteindex, layerindex, x, y, r, sx, sy, ox, oy, kx, ky) end
+function SpriteBatch:setLayer(spriteindex, layerindex, sx, sy, ox, oy, kx, ky) end
 
 ---
 ---Sets the texture (Image or Canvas) used for the sprites in the batch, when drawing.
 ---
----@param texture love.graphics.Texture # The new Image or Canvas to use for the sprites in the batch.
+---@param texture love.Texture # The new Image or Canvas to use for the sprites in the batch.
 function SpriteBatch:setTexture(texture) end
 
----@class love.graphics.Text: love.graphics.Drawable, love.graphics.Object
+---@class love.Text: love.Drawable, love.Object
 local Text = {}
 
 ---
 ---Adds additional colored text to the Text object at the specified position.
 ---
 ---@param textstring string # The text to add to the object.
----@param x number # The position of the new text on the x-axis.
----@param y number # The position of the new text on the y-axis.
 ---@param angle number # The orientation of the new text in radians.
 ---@param sx number # Scale factor on the x-axis.
 ---@param sy number # Scale factor on the y-axis.
@@ -1999,7 +1906,7 @@ local Text = {}
 ---@param kx number # Shearing / skew factor on the x-axis.
 ---@param ky number # Shearing / skew factor on the y-axis.
 ---@return number index # An index number that can be used with Text:getWidth or Text:getHeight.
-function Text:add(textstring, x, y, angle, sx, sy, ox, oy, kx, ky) end
+function Text:add(textstring, angle, sx, sy, ox, oy, kx, ky) end
 
 ---
 ---Adds additional formatted / colored text to the Text object at the specified position.
@@ -2008,9 +1915,7 @@ function Text:add(textstring, x, y, angle, sx, sy, ox, oy, kx, ky) end
 ---
 ---@param textstring string # The text to add to the object.
 ---@param wraplimit number # The maximum width in pixels of the text before it gets automatically wrapped to a new line.
----@param align love.graphics.AlignMode # The alignment of the text.
----@param x number # The position of the new text (x-axis).
----@param y number # The position of the new text (y-axis).
+---@param align love.AlignMode # The alignment of the text.
 ---@param angle number # Orientation (radians).
 ---@param sx number # Scale factor (x-axis).
 ---@param sy number # Scale factor (y-axis).
@@ -2019,7 +1924,7 @@ function Text:add(textstring, x, y, angle, sx, sy, ox, oy, kx, ky) end
 ---@param kx number # Shearing / skew factor (x-axis).
 ---@param ky number # Shearing / skew factor (y-axis).
 ---@return number index # An index number that can be used with Text:getWidth or Text:getHeight.
-function Text:addf(textstring, wraplimit, align, x, y, angle, sx, sy, ox, oy, kx, ky) end
+function Text:addf(textstring, wraplimit, align, angle, sx, sy, ox, oy, kx, ky) end
 
 ---
 ---Clears the contents of the Text object.
@@ -2036,13 +1941,13 @@ function Text:getDimensions() end
 ---
 ---Gets the Font used with the Text object.
 ---
----@return love.graphics.Font font # The font used with this Text object.
+---@return love.Font font # The font used with this Text object.
 function Text:getFont() end
 
 ---
 ---Gets the height of the text in pixels.
 ---
----@return number  height  # The height of the text. If multiple sub-strings have been added with Text:add, the height of the last sub-string is returned.
+---@return number height # The height of the text. If multiple sub-strings have been added with Text:add, the height of the last sub-string is returned.
 function Text:getHeight() end
 
 ---
@@ -2060,7 +1965,7 @@ function Text:set(textstring) end
 ---
 ---Replaces the Font used with the text.
 ---
----@param font love.graphics.Font # The new font to use with this Text object.
+---@param font love.Font # The new font to use with this Text object.
 function Text:setFont(font) end
 
 ---
@@ -2068,10 +1973,10 @@ function Text:setFont(font) end
 ---
 ---@param textstring string # The new string of text to use.
 ---@param wraplimit number # The maximum width in pixels of the text before it gets automatically wrapped to a new line.
----@param align love.graphics.AlignMode # The alignment of the text.
+---@param align love.AlignMode # The alignment of the text.
 function Text:setf(textstring, wraplimit, align) end
 
----@class love.graphics.Texture: love.graphics.Drawable, love.graphics.Object
+---@class love.Texture: love.Drawable, love.Object
 local Texture = {}
 
 ---
@@ -2095,7 +2000,7 @@ function Texture:getDepth() end
 ---
 ---Depth texture comparison modes are advanced low-level functionality typically used with shadow mapping in 3D.
 ---
----@return love.graphics.CompareMode compare # The comparison mode used when sampling from this texture in a shader, or nil if setDepthSampleMode has not been called on this Texture.
+---@return love.CompareMode compare # The comparison mode used when sampling from this texture in a shader, or nil if setDepthSampleMode has not been called on this Texture.
 function Texture:getDepthSampleMode() end
 
 ---
@@ -2108,15 +2013,15 @@ function Texture:getDimensions() end
 ---
 ---Gets the filter mode of the Texture.
 ---
----@return love.graphics.FilterMode min # Filter mode to use when minifying the texture (rendering it at a smaller size on-screen than its size in pixels).
----@return love.graphics.FilterMode mag # Filter mode to use when magnifying the texture (rendering it at a smaller size on-screen than its size in pixels).
+---@return love.FilterMode min # Filter mode to use when minifying the texture (rendering it at a smaller size on-screen than its size in pixels).
+---@return love.FilterMode mag # Filter mode to use when magnifying the texture (rendering it at a smaller size on-screen than its size in pixels).
 ---@return number anisotropy # Maximum amount of anisotropic filtering used.
 function Texture:getFilter() end
 
 ---
 ---Gets the pixel format of the Texture.
 ---
----@return love.graphics.PixelFormat format # The pixel format the Texture was created with.
+---@return love.PixelFormat format # The pixel format the Texture was created with.
 function Texture:getFormat() end
 
 ---
@@ -2140,7 +2045,7 @@ function Texture:getMipmapCount() end
 ---
 ---Gets the mipmap filter mode for a Texture. Prior to 11.0 this method only worked on Images.
 ---
----@return love.graphics.FilterMode mode # The filter mode used in between mipmap levels. nil if mipmap filtering is not enabled.
+---@return love.FilterMode mode # The filter mode used in between mipmap levels. nil if mipmap filtering is not enabled.
 ---@return number sharpness # Value used to determine whether the image should use more or less detailed mipmap levels than normal when drawing.
 function Texture:getMipmapFilter() end
 
@@ -2172,7 +2077,7 @@ function Texture:getPixelWidth() end
 ---
 ---Gets the type of the Texture.
 ---
----@return love.graphics.TextureType texturetype # The type of the Texture.
+---@return love.TextureType texturetype # The type of the Texture.
 function Texture:getTextureType() end
 
 ---
@@ -2186,9 +2091,9 @@ function Texture:getWidth() end
 ---
 ---This function returns the currently set horizontal and vertical wrapping modes for the texture.
 ---
----@return love.graphics.WrapMode horiz # Horizontal wrapping mode of the texture.
----@return love.graphics.WrapMode vert # Vertical wrapping mode of the texture.
----@return love.graphics.WrapMode depth # Wrapping mode for the z-axis of a Volume texture.
+---@return love.WrapMode horiz # Horizontal wrapping mode of the texture.
+---@return love.WrapMode vert # Vertical wrapping mode of the texture.
+---@return love.WrapMode depth # Wrapping mode for the z-axis of a Volume texture.
 function Texture:getWrap() end
 
 ---
@@ -2208,14 +2113,14 @@ function Texture:isReadable() end
 ---
 ---Depth texture comparison can only be used with readable depth-formatted Canvases.
 ---
----@param compare love.graphics.CompareMode # The comparison mode used when sampling from this texture in a shader.
+---@param compare love.CompareMode # The comparison mode used when sampling from this texture in a shader.
 function Texture:setDepthSampleMode(compare) end
 
 ---
 ---Sets the filter mode of the Texture.
 ---
----@param min love.graphics.FilterMode # Filter mode to use when minifying the texture (rendering it at a smaller size on-screen than its size in pixels).
----@param mag love.graphics.FilterMode # Filter mode to use when magnifying the texture (rendering it at a larger size on-screen than its size in pixels).
+---@param min love.FilterMode # Filter mode to use when minifying the texture (rendering it at a smaller size on-screen than its size in pixels).
+---@param mag love.FilterMode # Filter mode to use when magnifying the texture (rendering it at a larger size on-screen than its size in pixels).
 ---@param anisotropy number # Maximum amount of anisotropic filtering to use.
 function Texture:setFilter(min, mag, anisotropy) end
 
@@ -2228,7 +2133,7 @@ function Texture:setFilter(min, mag, anisotropy) end
 ---
 ---Due to hardware restrictions and driver bugs, in versions prior to 0.10.0 images that weren't loaded from a CompressedData must have power-of-two dimensions (64x64, 512x256, etc.) to use mipmaps.
 ---
----@param filtermode love.graphics.FilterMode # The filter mode to use in between mipmap levels. 'nearest' will often give better performance.
+---@param filtermode love.FilterMode # The filter mode to use in between mipmap levels. 'nearest' will often give better performance.
 ---@param sharpness number # A positive sharpness value makes the texture use a more detailed mipmap level when drawing, at the expense of performance. A negative value does the reverse.
 function Texture:setMipmapFilter(filtermode, sharpness) end
 
@@ -2239,12 +2144,12 @@ function Texture:setMipmapFilter(filtermode, sharpness) end
 ---
 ---Clamped textures appear only once (with the edges of the texture stretching to fill the extent of the Quad), whereas repeated ones repeat as many times as there is room in the Quad.
 ---
----@param horiz love.graphics.WrapMode # Horizontal wrapping mode of the texture.
----@param vert love.graphics.WrapMode # Vertical wrapping mode of the texture.
----@param depth love.graphics.WrapMode # Wrapping mode for the z-axis of a Volume texture.
+---@param horiz love.WrapMode # Horizontal wrapping mode of the texture.
+---@param vert love.WrapMode # Vertical wrapping mode of the texture.
+---@param depth love.WrapMode # Wrapping mode for the z-axis of a Volume texture.
 function Texture:setWrap(horiz, vert, depth) end
 
----@class love.graphics.Video: love.graphics.Drawable, love.graphics.Object
+---@class love.Video: love.Drawable, love.Object
 local Video = {}
 
 ---
@@ -2257,8 +2162,8 @@ function Video:getDimensions() end
 ---
 ---Gets the scaling filters used when drawing the Video.
 ---
----@return love.graphics.FilterMode min # The filter mode used when scaling the Video down.
----@return love.graphics.FilterMode mag # The filter mode used when scaling the Video up.
+---@return love.FilterMode min # The filter mode used when scaling the Video down.
+---@return love.FilterMode mag # The filter mode used when scaling the Video up.
 ---@return number anisotropy # Maximum amount of anisotropic filtering used.
 function Video:getFilter() end
 
@@ -2271,13 +2176,13 @@ function Video:getHeight() end
 ---
 ---Gets the audio Source used for playing back the video's audio. May return nil if the video has no audio, or if Video:setSource is called with a nil argument.
 ---
----@return love.graphics.Source source # The audio Source used for audio playback, or nil if the video has no audio.
+---@return love.Source source # The audio Source used for audio playback, or nil if the video has no audio.
 function Video:getSource() end
 
 ---
 ---Gets the VideoStream object used for decoding and controlling the video.
 ---
----@return love.graphics.VideoStream stream # The VideoStream used for decoding and controlling the video.
+---@return love.VideoStream stream # The VideoStream used for decoding and controlling the video.
 function Video:getStream() end
 
 ---
@@ -2316,15 +2221,15 @@ function Video:seek(offset) end
 ---
 ---Sets the scaling filters used when drawing the Video.
 ---
----@param min love.graphics.FilterMode # The filter mode used when scaling the Video down.
----@param mag love.graphics.FilterMode # The filter mode used when scaling the Video up.
+---@param min love.FilterMode # The filter mode used when scaling the Video down.
+---@param mag love.FilterMode # The filter mode used when scaling the Video up.
 ---@param anisotropy number # Maximum amount of anisotropic filtering used.
 function Video:setFilter(min, mag, anisotropy) end
 
 ---
 ---Sets the audio Source used for playing back the video's audio. The audio Source also controls playback speed and synchronization.
 ---
----@param source love.graphics.Source # The audio Source used for audio playback, or nil to disable audio synchronization.
+---@param source love.Source # The audio Source used for audio playback, or nil to disable audio synchronization.
 function Video:setSource(source) end
 
 ---

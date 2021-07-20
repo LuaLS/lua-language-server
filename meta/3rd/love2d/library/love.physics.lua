@@ -1,11 +1,13 @@
+---@meta
+
 ---@class love.physics
 love.physics = {}
 
 ---
 ---Returns the two closest points between two fixtures and their distance.
 ---
----@param fixture1 love.physics.Fixture # The first fixture.
----@param fixture2 love.physics.Fixture # The second fixture.
+---@param fixture1 love.Fixture # The first fixture.
+---@param fixture2 love.Fixture # The second fixture.
 ---@return number distance # The distance of the two points.
 ---@return number x1 # The x-coordinate of the first point.
 ---@return number y1 # The y-coordinate of the first point.
@@ -36,12 +38,10 @@ function love.physics.getMeter() end
 ---
 ---The mass of the body gets calculated when a Fixture is attached or removed, but can be changed at any time with Body:setMass or Body:resetMassData.
 ---
----@param world love.physics.World # The world to create the body in.
----@param x number # The x position of the body.
----@param y number # The y position of the body.
----@param type love.physics.BodyType # The type of the body.
----@return love.physics.Body body # A new body.
-function love.physics.newBody(world, x, y, type) end
+---@param world love.World # The world to create the body in.
+---@param type love.BodyType # The type of the body.
+---@return love.Body body # A new body.
+function love.physics.newBody(world, type) end
 
 ---
 ---Creates a new ChainShape.
@@ -51,15 +51,14 @@ function love.physics.newBody(world, x, y, type) end
 ---@param y1 number # The y position of the first point.
 ---@param x2 number # The x position of the second point.
 ---@param y2 number # The y position of the second point.
----@param ... number # Additional point positions.
----@return love.physics.ChainShape shape # The new shape.
-function love.physics.newChainShape(loop, x1, y1, x2, y2, ...) end
+---@return love.ChainShape shape # The new shape.
+function love.physics.newChainShape(loop, x1, y1, x2, y2) end
 
 ---
 ---Creates a new CircleShape.
 ---
 ---@param radius number # The radius of the circle.
----@return love.physics.CircleShape shape # The new shape.
+---@return love.CircleShape shape # The new shape.
 function love.physics.newCircleShape(radius) end
 
 ---
@@ -67,14 +66,14 @@ function love.physics.newCircleShape(radius) end
 ---
 ---This joint constrains the distance between two points on two bodies to be constant. These two points are specified in world coordinates and the two bodies are assumed to be in place when this joint is created. The first anchor point is connected to the first body and the second to the second body, and the points define the length of the distance joint.
 ---
----@param body1 love.physics.Body # The first body to attach to the joint.
----@param body2 love.physics.Body # The second body to attach to the joint.
+---@param body1 love.Body # The first body to attach to the joint.
+---@param body2 love.Body # The second body to attach to the joint.
 ---@param x1 number # The x position of the first anchor point (world space).
 ---@param y1 number # The y position of the first anchor point (world space).
 ---@param x2 number # The x position of the second anchor point (world space).
 ---@param y2 number # The y position of the second anchor point (world space).
 ---@param collideConnected boolean # Specifies whether the two bodies should collide with each other.
----@return love.physics.DistanceJoint joint # The new distance joint.
+---@return love.DistanceJoint joint # The new distance joint.
 function love.physics.newDistanceJoint(body1, body2, x1, y1, x2, y2, collideConnected) end
 
 ---
@@ -84,7 +83,7 @@ function love.physics.newDistanceJoint(body1, body2, x1, y1, x2, y2, collideConn
 ---@param y1 number # The y position of the first point.
 ---@param x2 number # The x position of the second point.
 ---@param y2 number # The y position of the second point.
----@return love.physics.EdgeShape shape # The new shape.
+---@return love.EdgeShape shape # The new shape.
 function love.physics.newEdgeShape(x1, y1, x2, y2) end
 
 ---
@@ -92,22 +91,20 @@ function love.physics.newEdgeShape(x1, y1, x2, y2) end
 ---
 ---Note that the Shape object is copied rather than kept as a reference when the Fixture is created. To get the Shape object that the Fixture owns, use Fixture:getShape.
 ---
----@param body love.physics.Body # The body which gets the fixture attached.
----@param shape love.physics.Shape # The shape to be copied to the fixture.
+---@param body love.Body # The body which gets the fixture attached.
+---@param shape love.Shape # The shape to be copied to the fixture.
 ---@param density number # The density of the fixture.
----@return love.physics.Fixture fixture # The new fixture.
+---@return love.Fixture fixture # The new fixture.
 function love.physics.newFixture(body, shape, density) end
 
 ---
 ---Create a friction joint between two bodies. A FrictionJoint applies friction to a body.
 ---
----@param body1 love.physics.Body # The first body to attach to the joint.
----@param body2 love.physics.Body # The second body to attach to the joint.
----@param x number # The x position of the anchor point.
----@param y number # The y position of the anchor point.
+---@param body1 love.Body # The first body to attach to the joint.
+---@param body2 love.Body # The second body to attach to the joint.
 ---@param collideConnected boolean # Specifies whether the two bodies should collide with each other.
----@return love.physics.FrictionJoint joint # The new FrictionJoint.
-function love.physics.newFrictionJoint(body1, body2, x, y, collideConnected) end
+---@return love.FrictionJoint joint # The new FrictionJoint.
+function love.physics.newFrictionJoint(body1, body2, collideConnected) end
 
 ---
 ---Create a GearJoint connecting two Joints.
@@ -116,11 +113,11 @@ function love.physics.newFrictionJoint(body1, body2, x, y, collideConnected) end
 ---
 ---The gear joint has a ratio the determines how the angular or distance values of the connected joints relate to each other. The formula coordinate1 + ratio * coordinate2 always has a constant value that is set when the gear joint is created.
 ---
----@param joint1 love.physics.Joint # The first joint to connect with a gear joint.
----@param joint2 love.physics.Joint # The second joint to connect with a gear joint.
+---@param joint1 love.Joint # The first joint to connect with a gear joint.
+---@param joint2 love.Joint # The second joint to connect with a gear joint.
 ---@param ratio number # The gear ratio.
 ---@param collideConnected boolean # Specifies whether the two bodies should collide with each other.
----@return love.physics.GearJoint joint # The new gear joint.
+---@return love.GearJoint joint # The new gear joint.
 function love.physics.newGearJoint(joint1, joint2, ratio, collideConnected) end
 
 ---
@@ -128,10 +125,10 @@ function love.physics.newGearJoint(joint1, joint2, ratio, collideConnected) end
 ---
 ---Position and rotation offsets can be specified once the MotorJoint has been created, as well as the maximum motor force and torque that will be be applied to reach the target offsets.
 ---
----@param body1 love.physics.Body # The first body to attach to the joint.
----@param body2 love.physics.Body # The second body to attach to the joint.
+---@param body1 love.Body # The first body to attach to the joint.
+---@param body2 love.Body # The second body to attach to the joint.
 ---@param correctionFactor number # The joint's initial position correction factor, in the range of 1.
----@return love.physics.MotorJoint joint # The new MotorJoint.
+---@return love.MotorJoint joint # The new MotorJoint.
 function love.physics.newMotorJoint(body1, body2, correctionFactor) end
 
 ---
@@ -141,11 +138,9 @@ function love.physics.newMotorJoint(body1, body2, correctionFactor) end
 ---
 ---The advantage of using a MouseJoint instead of just changing a body position directly is that collisions and reactions to other joints are handled by the physics engine. 
 ---
----@param body love.physics.Body # The body to attach to the mouse.
----@param x number # The x position of the connecting point.
----@param y number # The y position of the connecting point.
----@return love.physics.MouseJoint joint # The new mouse joint.
-function love.physics.newMouseJoint(body, x, y) end
+---@param body love.Body # The body to attach to the mouse.
+---@return love.MouseJoint joint # The new mouse joint.
+function love.physics.newMouseJoint(body) end
 
 ---
 ---Creates a new PolygonShape.
@@ -158,24 +153,21 @@ function love.physics.newMouseJoint(body, x, y) end
 ---@param y2 number # The y position of the second point.
 ---@param x3 number # The x position of the third point.
 ---@param y3 number # The y position of the third point.
----@param ... number # You can continue passing more point positions to create the PolygonShape.
----@return love.physics.PolygonShape shape # A new PolygonShape.
-function love.physics.newPolygonShape(x1, y1, x2, y2, x3, y3, ...) end
+---@return love.PolygonShape shape # A new PolygonShape.
+function love.physics.newPolygonShape(x1, y1, x2, y2, x3, y3) end
 
 ---
 ---Creates a PrismaticJoint between two bodies.
 ---
 ---A prismatic joint constrains two bodies to move relatively to each other on a specified axis. It does not allow for relative rotation. Its definition and operation are similar to a  revolute joint, but with translation and force substituted for angle and torque.
 ---
----@param body1 love.physics.Body # The first body to connect with a prismatic joint.
----@param body2 love.physics.Body # The second body to connect with a prismatic joint.
----@param x number # The x coordinate of the anchor point.
----@param y number # The y coordinate of the anchor point.
+---@param body1 love.Body # The first body to connect with a prismatic joint.
+---@param body2 love.Body # The second body to connect with a prismatic joint.
 ---@param ax number # The x coordinate of the axis vector.
 ---@param ay number # The y coordinate of the axis vector.
 ---@param collideConnected boolean # Specifies whether the two bodies should collide with each other.
----@return love.physics.PrismaticJoint joint # The new prismatic joint.
-function love.physics.newPrismaticJoint(body1, body2, x, y, ax, ay, collideConnected) end
+---@return love.PrismaticJoint joint # The new prismatic joint.
+function love.physics.newPrismaticJoint(body1, body2, ax, ay, collideConnected) end
 
 ---
 ---Creates a PulleyJoint to join two bodies to each other and the ground.
@@ -184,8 +176,8 @@ function love.physics.newPrismaticJoint(body1, body2, x, y, ax, ay, collideConne
 ---
 ---Pulley joints can behave unpredictably if one side is fully extended. It is recommended that the method  setMaxLengths  be used to constrain the maximum lengths each side can attain.
 ---
----@param body1 love.physics.Body # The first body to connect with a pulley joint.
----@param body2 love.physics.Body # The second body to connect with a pulley joint.
+---@param body1 love.Body # The first body to connect with a pulley joint.
+---@param body2 love.Body # The second body to connect with a pulley joint.
 ---@param gx1 number # The x coordinate of the first body's ground anchor.
 ---@param gy1 number # The y coordinate of the first body's ground anchor.
 ---@param gx2 number # The x coordinate of the second body's ground anchor.
@@ -196,7 +188,7 @@ function love.physics.newPrismaticJoint(body1, body2, x, y, ax, ay, collideConne
 ---@param y2 number # The y coordinate of the pulley joint anchor in the second body.
 ---@param ratio number # The joint ratio.
 ---@param collideConnected boolean # Specifies whether the two bodies should collide with each other.
----@return love.physics.PulleyJoint joint # The new pulley joint.
+---@return love.PulleyJoint joint # The new pulley joint.
 function love.physics.newPulleyJoint(body1, body2, gx1, gy1, gx2, gy2, x1, y1, x2, y2, ratio, collideConnected) end
 
 ---
@@ -206,7 +198,7 @@ function love.physics.newPulleyJoint(body1, body2, gx1, gy1, gx2, gy2, x1, y1, x
 ---
 ---@param width number # The width of the rectangle.
 ---@param height number # The height of the rectangle.
----@return love.physics.PolygonShape shape # A new PolygonShape.
+---@return love.PolygonShape shape # A new PolygonShape.
 function love.physics.newRectangleShape(width, height) end
 
 ---
@@ -214,51 +206,45 @@ function love.physics.newRectangleShape(width, height) end
 ---
 ---This joint connects two bodies to a point around which they can pivot.
 ---
----@param body1 love.physics.Body # The first body.
----@param body2 love.physics.Body # The second body.
----@param x number # The x position of the connecting point.
----@param y number # The y position of the connecting point.
+---@param body1 love.Body # The first body.
+---@param body2 love.Body # The second body.
 ---@param collideConnected boolean # Specifies whether the two bodies should collide with each other.
----@return love.physics.RevoluteJoint joint # The new revolute joint.
-function love.physics.newRevoluteJoint(body1, body2, x, y, collideConnected) end
+---@return love.RevoluteJoint joint # The new revolute joint.
+function love.physics.newRevoluteJoint(body1, body2, collideConnected) end
 
 ---
 ---Creates a joint between two bodies. Its only function is enforcing a max distance between these bodies.
 ---
----@param body1 love.physics.Body # The first body to attach to the joint.
----@param body2 love.physics.Body # The second body to attach to the joint.
+---@param body1 love.Body # The first body to attach to the joint.
+---@param body2 love.Body # The second body to attach to the joint.
 ---@param x1 number # The x position of the first anchor point.
 ---@param y1 number # The y position of the first anchor point.
 ---@param x2 number # The x position of the second anchor point.
 ---@param y2 number # The y position of the second anchor point.
 ---@param maxLength number # The maximum distance for the bodies.
 ---@param collideConnected boolean # Specifies whether the two bodies should collide with each other.
----@return love.physics.RopeJoint joint # The new RopeJoint.
+---@return love.RopeJoint joint # The new RopeJoint.
 function love.physics.newRopeJoint(body1, body2, x1, y1, x2, y2, maxLength, collideConnected) end
 
 ---
 ---Creates a constraint joint between two bodies. A WeldJoint essentially glues two bodies together. The constraint is a bit soft, however, due to Box2D's iterative solver.
 ---
----@param body1 love.physics.Body # The first body to attach to the joint.
----@param body2 love.physics.Body # The second body to attach to the joint.
----@param x number # The x position of the anchor point (world space).
----@param y number # The y position of the anchor point (world space).
+---@param body1 love.Body # The first body to attach to the joint.
+---@param body2 love.Body # The second body to attach to the joint.
 ---@param collideConnected boolean # Specifies whether the two bodies should collide with each other.
----@return love.physics.WeldJoint joint # The new WeldJoint.
-function love.physics.newWeldJoint(body1, body2, x, y, collideConnected) end
+---@return love.WeldJoint joint # The new WeldJoint.
+function love.physics.newWeldJoint(body1, body2, collideConnected) end
 
 ---
 ---Creates a wheel joint.
 ---
----@param body1 love.physics.Body # The first body.
----@param body2 love.physics.Body # The second body.
----@param x number # The x position of the anchor point.
----@param y number # The y position of the anchor point.
+---@param body1 love.Body # The first body.
+---@param body2 love.Body # The second body.
 ---@param ax number # The x position of the axis unit vector.
 ---@param ay number # The y position of the axis unit vector.
 ---@param collideConnected boolean # Specifies whether the two bodies should collide with each other.
----@return love.physics.WheelJoint joint # The new WheelJoint.
-function love.physics.newWheelJoint(body1, body2, x, y, ax, ay, collideConnected) end
+---@return love.WheelJoint joint # The new WheelJoint.
+function love.physics.newWheelJoint(body1, body2, ax, ay, collideConnected) end
 
 ---
 ---Creates a new World.
@@ -266,7 +252,7 @@ function love.physics.newWheelJoint(body1, body2, x, y, ax, ay, collideConnected
 ---@param xg number # The x component of gravity.
 ---@param yg number # The y component of gravity.
 ---@param sleep boolean # Whether the bodies in this world are allowed to sleep.
----@return love.physics.World world # A brave new World.
+---@return love.World world # A brave new World.
 function love.physics.newWorld(xg, yg, sleep) end
 
 ---
@@ -279,7 +265,7 @@ function love.physics.newWorld(xg, yg, sleep) end
 ---@param scale number # The scale factor as an integer.
 function love.physics.setMeter(scale) end
 
----@class love.physics.Body: love.physics.Object
+---@class love.Body: love.Object
 local Body = {}
 
 ---
@@ -364,7 +350,6 @@ function Body:getAngularDamping() end
 ---
 ---If you need the ''rate of change of position over time'', use Body:getLinearVelocity.
 ---
----@return number w # The angular velocity in radians/second.
 function Body:getAngularVelocity() end
 
 ---
@@ -424,8 +409,6 @@ function Body:getLinearDamping() end
 ---
 ---See page 136 of 'Essential Mathematics for Games and Interactive Applications' for definitions of local and world coordinates.
 ---
----@return number x # The x-component of the velocity vector
----@return number y # The y-component of the velocity vector
 function Body:getLinearVelocity() end
 
 ---
@@ -435,11 +418,9 @@ function Body:getLinearVelocity() end
 ---
 ---The point on the body must given in local coordinates. Use Body:getLinearVelocityFromWorldPoint to specify this with world coordinates.
 ---
----@param x number # The x position to measure velocity.
----@param y number # The y position to measure velocity.
 ---@return number vx # The x component of velocity at point (x,y).
 ---@return number vy # The y component of velocity at point (x,y).
-function Body:getLinearVelocityFromLocalPoint(x, y) end
+function Body:getLinearVelocityFromLocalPoint() end
 
 ---
 ---Get the linear velocity of a point on the body.
@@ -448,19 +429,15 @@ function Body:getLinearVelocityFromLocalPoint(x, y) end
 ---
 ---The point on the body must given in world coordinates. Use Body:getLinearVelocityFromLocalPoint to specify this with local coordinates.
 ---
----@param x number # The x position to measure velocity.
----@param y number # The y position to measure velocity.
 ---@return number vx # The x component of velocity at point (x,y).
 ---@return number vy # The y component of velocity at point (x,y).
-function Body:getLinearVelocityFromWorldPoint(x, y) end
+function Body:getLinearVelocityFromWorldPoint() end
 
 ---
 ---Get the center of mass position in local coordinates.
 ---
 ---Use Body:getWorldCenter to get the center of mass in world coordinates.
 ---
----@return number x # The x coordinate of the center of mass.
----@return number y # The y coordinate of the center of mass.
 function Body:getLocalCenter() end
 
 ---
@@ -492,8 +469,6 @@ function Body:getMass() end
 ---
 ---Returns the mass, its center, and the rotational inertia.
 ---
----@return number x # The x position of the center of mass.
----@return number y # The y position of the center of mass.
 ---@return number mass # The mass of the body.
 ---@return number inertia # The rotational inertia.
 function Body:getMassData() end
@@ -503,8 +478,6 @@ function Body:getMassData() end
 ---
 ---Note that this may not be the center of mass of the body.
 ---
----@return number x # The x position.
----@return number y # The y position.
 function Body:getPosition() end
 
 ---
@@ -512,27 +485,25 @@ function Body:getPosition() end
 ---
 ---Note that the position may not be the center of mass of the body. An angle of 0 radians will mean 'looking to the right'. Although radians increase counter-clockwise, the y axis points down so it becomes clockwise from our point of view.
 ---
----@return number x # The x component of the position.
----@return number y # The y component of the position.
 ---@return number angle # The angle in radians.
 function Body:getTransform() end
 
 ---
 ---Returns the type of the body.
 ---
----@return love.physics.BodyType type # The body type.
+---@return love.BodyType type # The body type.
 function Body:getType() end
 
 ---
 ---Returns the Lua value associated with this Body.
 ---
----@return love.physics.any value # The Lua value associated with the Body.
+---@return any value # The Lua value associated with the Body.
 function Body:getUserData() end
 
 ---
 ---Gets the World the body lives in.
 ---
----@return love.physics.World world # The world the body lives in.
+---@return love.World world # The world the body lives in.
 function Body:getWorld() end
 
 ---
@@ -540,8 +511,6 @@ function Body:getWorld() end
 ---
 ---Use Body:getLocalCenter to get the center of mass in local coordinates.
 ---
----@return number x # The x coordinate of the center of mass.
----@return number y # The y coordinate of the center of mass.
 function Body:getWorldCenter() end
 
 ---
@@ -578,13 +547,11 @@ function Body:getWorldVector(localX, localY) end
 ---
 ---Get the x position of the body in world coordinates.
 ---
----@return number x # The x position in world coordinates.
 function Body:getX() end
 
 ---
 ---Get the y position of the body in world coordinates.
 ---
----@return number y # The y position in world coordinates.
 function Body:getY() end
 
 ---
@@ -636,7 +603,7 @@ function Body:isSleepingAllowed() end
 ---
 ---Gets whether the Body is touching the given other Body.
 ---
----@param otherbody love.physics.Body # The other body to check.
+---@param otherbody love.Body # The other body to check.
 ---@return boolean touching # True if this body is touching the other body, false otherwise.
 function Body:isTouching(otherbody) end
 
@@ -682,8 +649,7 @@ function Body:setAngularDamping(damping) end
 ---
 ---This function will not accumulate anything; any impulses previously applied since the last call to World:update will be lost. 
 ---
----@param w number # The new angular velocity, in radians per second
-function Body:setAngularVelocity(w) end
+function Body:setAngularVelocity() end
 
 ---
 ---Wakes the body up or puts it to sleep.
@@ -742,9 +708,7 @@ function Body:setLinearDamping(ld) end
 ---
 ---This function will not accumulate anything; any impulses previously applied since the last call to World:update will be lost.
 ---
----@param x number # The x-component of the velocity vector.
----@param y number # The y-component of the velocity vector.
-function Body:setLinearVelocity(x, y) end
+function Body:setLinearVelocity() end
 
 ---
 ---Sets a new body mass.
@@ -755,11 +719,9 @@ function Body:setMass(mass) end
 ---
 ---Overrides the calculated mass data.
 ---
----@param x number # The x position of the center of mass.
----@param y number # The y position of the center of mass.
 ---@param mass number # The mass of the body.
 ---@param inertia number # The rotational inertia.
-function Body:setMassData(x, y, mass, inertia) end
+function Body:setMassData(mass, inertia) end
 
 ---
 ---Set the position of the body.
@@ -768,9 +730,7 @@ function Body:setMassData(x, y, mass, inertia) end
 ---
 ---This function cannot wake up the body.
 ---
----@param x number # The x position.
----@param y number # The y position.
-function Body:setPosition(x, y) end
+function Body:setPosition() end
 
 ---
 ---Sets the sleeping behaviour of the body. Should sleeping be allowed, a body at rest will automatically sleep. A sleeping body is not simulated unless it collided with an awake body. Be wary that one can end up with a situation like a floating sleeping body if the floor was removed.
@@ -785,15 +745,13 @@ function Body:setSleepingAllowed(allowed) end
 ---
 ---This function cannot wake up the body.
 ---
----@param x number # The x component of the position.
----@param y number # The y component of the position.
 ---@param angle number # The angle in radians.
-function Body:setTransform(x, y, angle) end
+function Body:setTransform(angle) end
 
 ---
 ---Sets a new body type.
 ---
----@param type love.physics.BodyType # The new type.
+---@param type love.BodyType # The new type.
 function Body:setType(type) end
 
 ---
@@ -801,7 +759,7 @@ function Body:setType(type) end
 ---
 ---To delete the reference, explicitly pass nil.
 ---
----@param value love.physics.any # The Lua value to associate with the Body.
+---@param value any # The Lua value to associate with the Body.
 function Body:setUserData(value) end
 
 ---
@@ -809,25 +767,23 @@ function Body:setUserData(value) end
 ---
 ---This function cannot wake up the body. 
 ---
----@param x number # The x position.
-function Body:setX(x) end
+function Body:setX() end
 
 ---
 ---Set the y position of the body.
 ---
 ---This function cannot wake up the body. 
 ---
----@param y number # The y position.
-function Body:setY(y) end
+function Body:setY() end
 
----@class love.physics.ChainShape: love.physics.Shape, love.physics.Object
+---@class love.ChainShape: love.Shape, love.Object
 local ChainShape = {}
 
 ---
 ---Returns a child of the shape as an EdgeShape.
 ---
 ---@param index number # The index of the child.
----@return love.physics.EdgeShape shape # The child as an EdgeShape.
+---@return love.EdgeShape shape # The child as an EdgeShape.
 function ChainShape:getChildEdge(index) end
 
 ---
@@ -835,16 +791,12 @@ function ChainShape:getChildEdge(index) end
 ---
 ---Setting next and previous ChainShape vertices can help prevent unwanted collisions when a flat shape slides along the edge and moves over to the new shape.
 ---
----@return number x # The x-component of the vertex, or nil if ChainShape:setNextVertex hasn't been called.
----@return number y # The y-component of the vertex, or nil if ChainShape:setNextVertex hasn't been called.
 function ChainShape:getNextVertex() end
 
 ---
 ---Returns a point of the shape.
 ---
 ---@param index number # The index of the point to return.
----@return number x # The x-coordinate of the point.
----@return number y # The y-coordinate of the point.
 function ChainShape:getPoint(index) end
 
 ---
@@ -861,8 +813,6 @@ function ChainShape:getPoints() end
 ---
 ---Setting next and previous ChainShape vertices can help prevent unwanted collisions when a flat shape slides along the edge and moves over to the new shape.
 ---
----@return number x # The x-component of the vertex, or nil if ChainShape:setPreviousVertex hasn't been called.
----@return number y # The y-component of the vertex, or nil if ChainShape:setPreviousVertex hasn't been called.
 function ChainShape:getPreviousVertex() end
 
 ---
@@ -876,27 +826,21 @@ function ChainShape:getVertexCount() end
 ---
 ---This can help prevent unwanted collisions when a flat shape slides along the edge and moves over to the new shape.
 ---
----@param x number # The x-component of the vertex.
----@param y number # The y-component of the vertex.
-function ChainShape:setNextVertex(x, y) end
+function ChainShape:setNextVertex() end
 
 ---
 ---Sets a vertex that establishes a connection to the previous shape.
 ---
 ---This can help prevent unwanted collisions when a flat shape slides along the edge and moves over to the new shape.
 ---
----@param x number # The x-component of the vertex.
----@param y number # The y-component of the vertex.
-function ChainShape:setPreviousVertex(x, y) end
+function ChainShape:setPreviousVertex() end
 
----@class love.physics.CircleShape: love.physics.Shape, love.physics.Object
+---@class love.CircleShape: love.Shape, love.Object
 local CircleShape = {}
 
 ---
 ---Gets the center point of the circle shape.
 ---
----@return number x # The x-component of the center point of the circle.
----@return number y # The y-component of the center point of the circle.
 function CircleShape:getPoint() end
 
 ---
@@ -908,9 +852,7 @@ function CircleShape:getRadius() end
 ---
 ---Sets the location of the center of the circle shape.
 ---
----@param x number # The x-component of the new center point of the circle.
----@param y number # The y-component of the new center point of the circle.
-function CircleShape:setPoint(x, y) end
+function CircleShape:setPoint() end
 
 ---
 ---Sets the radius of the circle.
@@ -918,14 +860,14 @@ function CircleShape:setPoint(x, y) end
 ---@param radius number # The radius of the circle
 function CircleShape:setRadius(radius) end
 
----@class love.physics.Contact: love.physics.Object
+---@class love.Contact: love.Object
 local Contact = {}
 
 ---
 ---Gets the two Fixtures that hold the shapes that are in contact.
 ---
----@return love.physics.Fixture fixtureA # The first Fixture.
----@return love.physics.Fixture fixtureB # The second Fixture.
+---@return love.Fixture fixtureA # The first Fixture.
+---@return love.Fixture fixtureB # The second Fixture.
 function Contact:getFixtures() end
 
 ---
@@ -998,7 +940,7 @@ function Contact:setFriction(friction) end
 ---@param restitution number # The contact restitution.
 function Contact:setRestitution(restitution) end
 
----@class love.physics.DistanceJoint: love.physics.Joint, love.physics.Object
+---@class love.DistanceJoint: love.Joint, love.Object
 local DistanceJoint = {}
 
 ---
@@ -1016,7 +958,6 @@ function DistanceJoint:getFrequency() end
 ---
 ---Gets the equilibrium distance between the two Bodies.
 ---
----@return number l # The length between the two Bodies.
 function DistanceJoint:getLength() end
 
 ---
@@ -1034,10 +975,9 @@ function DistanceJoint:setFrequency(Hz) end
 ---
 ---Sets the equilibrium distance between the two Bodies.
 ---
----@param l number # The length between the two Bodies.
-function DistanceJoint:setLength(l) end
+function DistanceJoint:setLength() end
 
----@class love.physics.EdgeShape: love.physics.Shape, love.physics.Object
+---@class love.EdgeShape: love.Shape, love.Object
 local EdgeShape = {}
 
 ---
@@ -1045,8 +985,6 @@ local EdgeShape = {}
 ---
 ---Setting next and previous EdgeShape vertices can help prevent unwanted collisions when a flat shape slides along the edge and moves over to the new shape.
 ---
----@return number x # The x-component of the vertex, or nil if EdgeShape:setNextVertex hasn't been called.
----@return number y # The y-component of the vertex, or nil if EdgeShape:setNextVertex hasn't been called.
 function EdgeShape:getNextVertex() end
 
 ---
@@ -1063,8 +1001,6 @@ function EdgeShape:getPoints() end
 ---
 ---Setting next and previous EdgeShape vertices can help prevent unwanted collisions when a flat shape slides along the edge and moves over to the new shape.
 ---
----@return number x # The x-component of the vertex, or nil if EdgeShape:setPreviousVertex hasn't been called.
----@return number y # The y-component of the vertex, or nil if EdgeShape:setPreviousVertex hasn't been called.
 function EdgeShape:getPreviousVertex() end
 
 ---
@@ -1072,20 +1008,16 @@ function EdgeShape:getPreviousVertex() end
 ---
 ---This can help prevent unwanted collisions when a flat shape slides along the edge and moves over to the new shape.
 ---
----@param x number # The x-component of the vertex.
----@param y number # The y-component of the vertex.
-function EdgeShape:setNextVertex(x, y) end
+function EdgeShape:setNextVertex() end
 
 ---
 ---Sets a vertex that establishes a connection to the previous shape.
 ---
 ---This can help prevent unwanted collisions when a flat shape slides along the edge and moves over to the new shape.
 ---
----@param x number # The x-component of the vertex.
----@param y number # The y-component of the vertex.
-function EdgeShape:setPreviousVertex(x, y) end
+function EdgeShape:setPreviousVertex() end
 
----@class love.physics.Fixture: love.physics.Object
+---@class love.Fixture: love.Object
 local Fixture = {}
 
 ---
@@ -1096,7 +1028,7 @@ function Fixture:destroy() end
 ---
 ---Returns the body to which the fixture is attached.
 ---
----@return love.physics.Body body # The parent body.
+---@return love.Body body # The parent body.
 function Fixture:getBody() end
 
 ---
@@ -1156,8 +1088,6 @@ function Fixture:getMask() end
 ---
 ---Returns the mass, its center and the rotational inertia.
 ---
----@return number x # The x position of the center of mass.
----@return number y # The y position of the center of mass.
 ---@return number mass # The mass of the fixture.
 ---@return number inertia # The rotational inertia.
 function Fixture:getMassData() end
@@ -1171,13 +1101,13 @@ function Fixture:getRestitution() end
 ---
 ---Returns the shape of the fixture. This shape is a reference to the actual data used in the simulation. It's possible to change its values between timesteps.
 ---
----@return love.physics.Shape shape # The fixture's shape.
+---@return love.Shape shape # The fixture's shape.
 function Fixture:getShape() end
 
 ---
 ---Returns the Lua value associated with this fixture.
 ---
----@return love.physics.any value # The Lua value associated with the fixture.
+---@return any value # The Lua value associated with the fixture.
 function Fixture:getUserData() end
 
 ---
@@ -1291,18 +1221,16 @@ function Fixture:setSensor(sensor) end
 ---
 ---To delete the reference, explicitly pass nil.
 ---
----@param value love.physics.any # The Lua value to associate with the fixture.
+---@param value any # The Lua value to associate with the fixture.
 function Fixture:setUserData(value) end
 
 ---
 ---Checks if a point is inside the shape of the fixture.
 ---
----@param x number # The x position of the point.
----@param y number # The y position of the point.
 ---@return boolean isInside # True if the point is inside or false if it is outside.
-function Fixture:testPoint(x, y) end
+function Fixture:testPoint() end
 
----@class love.physics.FrictionJoint: love.physics.Joint, love.physics.Object
+---@class love.FrictionJoint: love.Joint, love.Object
 local FrictionJoint = {}
 
 ---
@@ -1329,14 +1257,14 @@ function FrictionJoint:setMaxForce(maxForce) end
 ---@param torque number # Maximum torque in Newton-meters.
 function FrictionJoint:setMaxTorque(torque) end
 
----@class love.physics.GearJoint: love.physics.Joint, love.physics.Object
+---@class love.GearJoint: love.Joint, love.Object
 local GearJoint = {}
 
 ---
 ---Get the Joints connected by this GearJoint.
 ---
----@return love.physics.Joint joint1 # The first connected Joint.
----@return love.physics.Joint joint2 # The second connected Joint.
+---@return love.Joint joint1 # The first connected Joint.
+---@return love.Joint joint2 # The second connected Joint.
 function GearJoint:getJoints() end
 
 ---
@@ -1351,7 +1279,7 @@ function GearJoint:getRatio() end
 ---@param ratio number # The new ratio of the joint.
 function GearJoint:setRatio(ratio) end
 
----@class love.physics.Joint: love.physics.Object
+---@class love.Joint: love.Object
 local Joint = {}
 
 ---
@@ -1375,23 +1303,19 @@ function Joint:getAnchors() end
 ---
 ---Gets the bodies that the Joint is attached to.
 ---
----@return love.physics.Body bodyA # The first Body.
----@return love.physics.Body bodyB # The second Body.
+---@return love.Body bodyA # The first Body.
+---@return love.Body bodyB # The second Body.
 function Joint:getBodies() end
 
 ---
 ---Gets whether the connected Bodies collide.
 ---
----@return boolean c # True if they collide, false otherwise.
 function Joint:getCollideConnected() end
 
 ---
 ---Returns the reaction force in newtons on the second body
 ---
----@param x number # How long the force applies. Usually the inverse time step or 1/dt.
----@return number x # The x-component of the force.
----@return number y # The y-component of the force.
-function Joint:getReactionForce(x) end
+function Joint:getReactionForce() end
 
 ---
 ---Returns the reaction torque on the second body.
@@ -1403,13 +1327,13 @@ function Joint:getReactionTorque(invdt) end
 ---
 ---Gets a string representing the type.
 ---
----@return love.physics.JointType type # A string with the name of the Joint type.
+---@return love.JointType type # A string with the name of the Joint type.
 function Joint:getType() end
 
 ---
 ---Returns the Lua value associated with this Joint.
 ---
----@return love.physics.any value # The Lua value associated with the Joint.
+---@return any value # The Lua value associated with the Joint.
 function Joint:getUserData() end
 
 ---
@@ -1423,10 +1347,10 @@ function Joint:isDestroyed() end
 ---
 ---To delete the reference, explicitly pass nil.
 ---
----@param value love.physics.any # The Lua value to associate with the Joint.
+---@param value any # The Lua value to associate with the Joint.
 function Joint:setUserData(value) end
 
----@class love.physics.MotorJoint: love.physics.Joint, love.physics.Object
+---@class love.MotorJoint: love.Joint, love.Object
 local MotorJoint = {}
 
 ---
@@ -1438,8 +1362,6 @@ function MotorJoint:getAngularOffset() end
 ---
 ---Gets the target linear offset between the two Bodies the Joint is attached to.
 ---
----@return number x # The x component of the target linear offset, relative to the first Body.
----@return number y # The y component of the target linear offset, relative to the first Body.
 function MotorJoint:getLinearOffset() end
 
 ---
@@ -1451,11 +1373,9 @@ function MotorJoint:setAngularOffset(angleoffset) end
 ---
 ---Sets the target linear offset between the two Bodies the Joint is attached to.
 ---
----@param x number # The x component of the target linear offset, relative to the first Body.
----@param y number # The y component of the target linear offset, relative to the first Body.
-function MotorJoint:setLinearOffset(x, y) end
+function MotorJoint:setLinearOffset() end
 
----@class love.physics.MouseJoint: love.physics.Joint, love.physics.Object
+---@class love.MouseJoint: love.Joint, love.Object
 local MouseJoint = {}
 
 ---
@@ -1473,14 +1393,11 @@ function MouseJoint:getFrequency() end
 ---
 ---Gets the highest allowed force.
 ---
----@return number f # The max allowed force.
 function MouseJoint:getMaxForce() end
 
 ---
 ---Gets the target point.
 ---
----@return number x # The x-component of the target.
----@return number y # The x-component of the target.
 function MouseJoint:getTarget() end
 
 ---
@@ -1498,17 +1415,14 @@ function MouseJoint:setFrequency(freq) end
 ---
 ---Sets the highest allowed force.
 ---
----@param f number # The max allowed force.
-function MouseJoint:setMaxForce(f) end
+function MouseJoint:setMaxForce() end
 
 ---
 ---Sets the target point.
 ---
----@param x number # The x-component of the target.
----@param y number # The y-component of the target.
-function MouseJoint:setTarget(x, y) end
+function MouseJoint:setTarget() end
 
----@class love.physics.PolygonShape: love.physics.Shape, love.physics.Object
+---@class love.PolygonShape: love.Shape, love.Object
 local PolygonShape = {}
 
 ---
@@ -1522,7 +1436,7 @@ local PolygonShape = {}
 ---@return number y2 # The y-component of the second vertex.
 function PolygonShape:getPoints() end
 
----@class love.physics.PrismaticJoint: love.physics.Joint, love.physics.Object
+---@class love.PrismaticJoint: love.Joint, love.Object
 local PrismaticJoint = {}
 
 ---
@@ -1534,20 +1448,16 @@ function PrismaticJoint:areLimitsEnabled() end
 ---
 ---Gets the world-space axis vector of the Prismatic Joint.
 ---
----@return number x # The x-axis coordinate of the world-space axis vector.
----@return number y # The y-axis coordinate of the world-space axis vector.
 function PrismaticJoint:getAxis() end
 
 ---
 ---Get the current joint angle speed.
 ---
----@return number s # Joint angle speed in meters/second.
 function PrismaticJoint:getJointSpeed() end
 
 ---
 ---Get the current joint translation.
 ---
----@return number t # Joint translation, usually in meters..
 function PrismaticJoint:getJointTranslation() end
 
 ---
@@ -1566,7 +1476,6 @@ function PrismaticJoint:getLowerLimit() end
 ---
 ---Gets the maximum motor force.
 ---
----@return number f # The maximum motor force, usually in N.
 function PrismaticJoint:getMaxMotorForce() end
 
 ---
@@ -1579,7 +1488,6 @@ function PrismaticJoint:getMotorForce(invdt) end
 ---
 ---Gets the motor speed.
 ---
----@return number s # The motor speed, usually in meters per second.
 function PrismaticJoint:getMotorSpeed() end
 
 ---
@@ -1616,8 +1524,7 @@ function PrismaticJoint:setLowerLimit(lower) end
 ---
 ---Set the maximum motor force.
 ---
----@param f number # The maximum motor force, usually in N.
-function PrismaticJoint:setMaxMotorForce(f) end
+function PrismaticJoint:setMaxMotorForce() end
 
 ---
 ---Enables/disables the joint motor.
@@ -1628,8 +1535,7 @@ function PrismaticJoint:setMotorEnabled(enable) end
 ---
 ---Sets the motor speed.
 ---
----@param s number # The motor speed, usually in meters per second.
-function PrismaticJoint:setMotorSpeed(s) end
+function PrismaticJoint:setMotorSpeed() end
 
 ---
 ---Sets the upper limit.
@@ -1637,7 +1543,7 @@ function PrismaticJoint:setMotorSpeed(s) end
 ---@param upper number # The upper limit, usually in meters.
 function PrismaticJoint:setUpperLimit(upper) end
 
----@class love.physics.PulleyJoint: love.physics.Joint, love.physics.Object
+---@class love.PulleyJoint: love.Joint, love.Object
 local PulleyJoint = {}
 
 ---
@@ -1703,7 +1609,7 @@ function PulleyJoint:setMaxLengths(max1, max2) end
 ---@param ratio number # The new pulley ratio of the joint.
 function PulleyJoint:setRatio(ratio) end
 
----@class love.physics.RevoluteJoint: love.physics.Joint, love.physics.Object
+---@class love.RevoluteJoint: love.Joint, love.Object
 local RevoluteJoint = {}
 
 ---
@@ -1721,7 +1627,6 @@ function RevoluteJoint:getJointAngle() end
 ---
 ---Get the current joint angle speed.
 ---
----@return number s # Joint angle speed in radians/second.
 function RevoluteJoint:getJointSpeed() end
 
 ---
@@ -1740,19 +1645,16 @@ function RevoluteJoint:getLowerLimit() end
 ---
 ---Gets the maximum motor force.
 ---
----@return number f # The maximum motor force, in Nm.
 function RevoluteJoint:getMaxMotorTorque() end
 
 ---
 ---Gets the motor speed.
 ---
----@return number s # The motor speed, radians per second.
 function RevoluteJoint:getMotorSpeed() end
 
 ---
 ---Get the current motor force.
 ---
----@return number f # The current motor force, in Nm.
 function RevoluteJoint:getMotorTorque() end
 
 ---
@@ -1795,8 +1697,7 @@ function RevoluteJoint:setLowerLimit(lower) end
 ---
 ---Set the maximum motor force.
 ---
----@param f number # The maximum motor force, in Nm.
-function RevoluteJoint:setMaxMotorTorque(f) end
+function RevoluteJoint:setMaxMotorTorque() end
 
 ---
 ---Enables/disables the joint motor.
@@ -1807,8 +1708,7 @@ function RevoluteJoint:setMotorEnabled(enable) end
 ---
 ---Sets the motor speed.
 ---
----@param s number # The motor speed, radians per second.
-function RevoluteJoint:setMotorSpeed(s) end
+function RevoluteJoint:setMotorSpeed() end
 
 ---
 ---Sets the upper limit.
@@ -1816,7 +1716,7 @@ function RevoluteJoint:setMotorSpeed(s) end
 ---@param upper number # The upper limit, in radians.
 function RevoluteJoint:setUpperLimit(upper) end
 
----@class love.physics.RopeJoint: love.physics.Joint, love.physics.Object
+---@class love.RopeJoint: love.Joint, love.Object
 local RopeJoint = {}
 
 ---
@@ -1831,7 +1731,7 @@ function RopeJoint:getMaxLength() end
 ---@param maxLength number # The new maximum length of the RopeJoint.
 function RopeJoint:setMaxLength(maxLength) end
 
----@class love.physics.Shape: love.physics.Object
+---@class love.Shape: love.Object
 local Shape = {}
 
 ---
@@ -1851,8 +1751,6 @@ function Shape:computeAABB(tx, ty, tr, childIndex) end
 ---Computes the mass properties for the shape with the specified density.
 ---
 ---@param density number # The shape density.
----@return number x # The x postition of the center of mass.
----@return number y # The y postition of the center of mass.
 ---@return number mass # The mass of the shape.
 ---@return number inertia # The rotational inertia.
 function Shape:computeMass(density) end
@@ -1874,7 +1772,7 @@ function Shape:getRadius() end
 ---
 ---This function can be useful for conditional debug drawing.
 ---
----@return love.physics.ShapeType type # The type of the Shape.
+---@return love.ShapeType type # The type of the Shape.
 function Shape:getType() end
 
 ---
@@ -1908,12 +1806,10 @@ function Shape:rayCast(x1, y1, x2, y2, maxFraction, tx, ty, tr, childIndex) end
 ---@param tx number # Translates the shape along the x-axis.
 ---@param ty number # Translates the shape along the y-axis.
 ---@param tr number # Rotates the shape.
----@param x number # The x-component of the point.
----@param y number # The y-component of the point.
 ---@return boolean hit # True if inside, false if outside
-function Shape:testPoint(tx, ty, tr, x, y) end
+function Shape:testPoint(tx, ty, tr) end
 
----@class love.physics.WeldJoint: love.physics.Joint, love.physics.Object
+---@class love.WeldJoint: love.Joint, love.Object
 local WeldJoint = {}
 
 ---
@@ -1940,14 +1836,12 @@ function WeldJoint:setDampingRatio(ratio) end
 ---@param freq number # The new frequency in hertz.
 function WeldJoint:setFrequency(freq) end
 
----@class love.physics.WheelJoint: love.physics.Joint, love.physics.Object
+---@class love.WheelJoint: love.Joint, love.Object
 local WheelJoint = {}
 
 ---
 ---Gets the world-space axis vector of the Wheel Joint.
 ---
----@return number x # The x-axis coordinate of the world-space axis vector.
----@return number y # The y-axis coordinate of the world-space axis vector.
 function WheelJoint:getAxis() end
 
 ---
@@ -2023,7 +1917,7 @@ function WheelJoint:setSpringDampingRatio(ratio) end
 ---@param freq number # The new frequency in hertz.
 function WheelJoint:setSpringFrequency(freq) end
 
----@class love.physics.World: love.physics.Object
+---@class love.World: love.Object
 local World = {}
 
 ---
@@ -2042,7 +1936,6 @@ function World:getBodies() end
 ---
 ---Returns the number of bodies in the world.
 ---
----@return number n # The number of bodies in the world.
 function World:getBodyCount() end
 
 ---
@@ -2057,7 +1950,6 @@ function World:getCallbacks() end
 ---
 ---Returns the number of contacts in the world.
 ---
----@return number n # The number of contacts in the world.
 function World:getContactCount() end
 
 ---
@@ -2075,14 +1967,11 @@ function World:getContacts() end
 ---
 ---Get the gravity of the world.
 ---
----@return number x # The x component of gravity.
----@return number y # The y component of gravity.
 function World:getGravity() end
 
 ---
 ---Returns the number of joints in the world.
 ---
----@return number n # The number of joints in the world.
 function World:getJointCount() end
 
 ---
@@ -2124,14 +2013,12 @@ function World:queryBoundingBox(topLeftX, topLeftY, bottomRightX, bottomRightY, 
 ---
 ---Casts a ray and calls a function for each fixtures it intersects. 
 ---
----@param fixture love.physics.Fixture # The fixture intersecting the ray.
----@param x number # The x position of the intersection point.
----@param y number # The y position of the intersection point.
+---@param fixture love.Fixture # The fixture intersecting the ray.
 ---@param xn number # The x value of the surface normal vector of the shape edge.
 ---@param yn number # The y value of the surface normal vector of the shape edge.
 ---@param fraction number # The position of the intersection on the ray as a number from 0 to 1 (or even higher if the ray length was changed with the return value).
 ---@return number control # The ray can be controlled with the return value. A positive value sets a new ray length where 1 is the default value. A value of 0 terminates the ray. If the callback function returns -1, the intersection gets ignored as if it didn't happen.
-function World:rayCast(fixture, x, y, xn, yn, fraction) end
+function World:rayCast(fixture, xn, yn, fraction) end
 
 ---
 ---Sets functions for the collision callbacks during the world update.
@@ -2159,9 +2046,7 @@ function World:setContactFilter(filter) end
 ---
 ---Set the gravity of the world.
 ---
----@param x number # The x component of gravity.
----@param y number # The y component of gravity.
-function World:setGravity(x, y) end
+function World:setGravity() end
 
 ---
 ---Sets the sleep behaviour of the world.
@@ -2172,9 +2057,7 @@ function World:setSleepingAllowed(allow) end
 ---
 ---Translates the World's origin. Useful in large worlds where floating point precision issues become noticeable at far distances from the origin.
 ---
----@param x number # The x component of the new origin with respect to the old origin.
----@param y number # The y component of the new origin with respect to the old origin.
-function World:translateOrigin(x, y) end
+function World:translateOrigin() end
 
 ---
 ---Update the state of the world.

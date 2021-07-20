@@ -1,3 +1,5 @@
+---@meta
+
 ---@class love.system
 love.system = {}
 
@@ -16,7 +18,7 @@ function love.system.getOS() end
 ---
 ---Gets information about the system's power supply.
 ---
----@return love.system.PowerState state # The basic state of the power supply.
+---@return love.PowerState state # The basic state of the power supply.
 ---@return number percent # Percentage of battery life left, between 0 and 100. nil if the value can't be determined or there's no battery.
 ---@return number seconds # Seconds of battery life left. nil if the value can't be determined or there's no battery.
 function love.system.getPowerInfo() end

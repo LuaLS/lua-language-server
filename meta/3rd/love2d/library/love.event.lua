@@ -1,3 +1,5 @@
+---@meta
+
 ---@class love.event
 love.event = {}
 
@@ -9,7 +11,6 @@ function love.event.clear() end
 ---
 ---Returns an iterator for messages in the event queue.
 ---
----@return function i # Iterator function usable in a for loop.
 function love.event.poll() end
 
 ---
@@ -28,15 +29,7 @@ function love.event.pump() end
 ---
 ---From 0.10.0 onwards, you may pass an arbitrary amount of arguments with this function, though the default callbacks don't ever use more than six.
 ---
----@param n love.event.Event # The name of the event.
----@param a love.event.Variant # First event argument.
----@param b love.event.Variant # Second event argument.
----@param c love.event.Variant # Third event argument.
----@param d love.event.Variant # Fourth event argument.
----@param e love.event.Variant # Fifth event argument.
----@param f love.event.Variant # Sixth event argument.
----@param ... love.event.Variant # Further event arguments may follow.
-function love.event.push(n, a, b, c, d, e, f, ...) end
+function love.event.push() end
 
 ---
 ---Adds the quit event to the queue.
@@ -49,12 +42,4 @@ function love.event.quit(exitstatus) end
 ---
 ---Like love.event.poll(), but blocks until there is an event in the queue.
 ---
----@return love.event.Event n # The name of event.
----@return love.event.Variant a # First event argument.
----@return love.event.Variant b # Second event argument.
----@return love.event.Variant c # Third event argument.
----@return love.event.Variant d # Fourth event argument.
----@return love.event.Variant e # Fifth event argument.
----@return love.event.Variant f # Sixth event argument.
----@return love.event.Variant ... # Further event arguments may follow.
 function love.event.wait() end

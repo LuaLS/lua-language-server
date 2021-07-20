@@ -1,3 +1,5 @@
+---@meta
+
 ---@class love.window
 love.window = {}
 
@@ -56,14 +58,14 @@ function love.window.getDisplayName(displayindex) end
 ---Gets current device display orientation.
 ---
 ---@param displayindex number # Display index to get its display orientation, or nil for default display index.
----@return love.window.DisplayOrientation orientation # Current device display orientation.
+---@return love.DisplayOrientation orientation # Current device display orientation.
 function love.window.getDisplayOrientation(displayindex) end
 
 ---
 ---Gets whether the window is fullscreen.
 ---
 ---@return boolean fullscreen # True if the window is fullscreen, false otherwise.
----@return love.window.FullscreenType fstype # The type of fullscreen mode used.
+---@return love.FullscreenType fstype # The type of fullscreen mode used.
 function love.window.getFullscreen() end
 
 ---
@@ -76,7 +78,7 @@ function love.window.getFullscreenModes(displayindex) end
 ---
 ---Gets the window icon.
 ---
----@return love.window.ImageData imagedata # The window icon imagedata, or nil if no icon has been set with love.window.setIcon.
+---@return love.ImageData imagedata # The window icon imagedata, or nil if no icon has been set with love.window.setIcon.
 function love.window.getIcon() end
 
 ---
@@ -92,18 +94,12 @@ function love.window.getMode() end
 ---
 ---The window position is in the coordinate space of the display it is currently in.
 ---
----@return number x # The x-coordinate of the window's position.
----@return number y # The y-coordinate of the window's position.
 ---@return number displayindex # The index of the display that the window is in.
 function love.window.getPosition() end
 
 ---
 ---Gets area inside the window which is known to be unobstructed by a system title bar, the iPhone X notch, etc. Useful for making sure UI elements can be seen by the user.
 ---
----@return number x # Starting position of safe area (x-axis).
----@return number y # Starting position of safe area (y-axis).
----@return number w # Width of safe area.
----@return number h # Height of safe area.
 function love.window.getSafeArea() end
 
 ---
@@ -209,7 +205,7 @@ function love.window.setFullscreen(fullscreen) end
 ---
 ---Sets the window icon until the game is quit. Not all operating systems support very large icon images.
 ---
----@param imagedata love.window.ImageData # The window icon image.
+---@param imagedata love.ImageData # The window icon image.
 ---@return boolean success # Whether the icon has been set successfully.
 function love.window.setIcon(imagedata) end
 
@@ -231,10 +227,8 @@ function love.window.setMode(width, height, flags) end
 ---
 ---The window position is in the coordinate space of the specified display.
 ---
----@param x number # The x-coordinate of the window's position.
----@param y number # The y-coordinate of the window's position.
 ---@param displayindex number # The index of the display that the new window position is relative to.
-function love.window.setPosition(x, y, displayindex) end
+function love.window.setPosition(displayindex) end
 
 ---
 ---Sets the window title.
@@ -253,7 +247,7 @@ function love.window.setVSync(vsync) end
 ---
 ---@param title string # The title of the message box.
 ---@param message string # The text inside the message box.
----@param type love.window.MessageBoxType # The type of the message box.
+---@param type love.MessageBoxType # The type of the message box.
 ---@param attachtowindow boolean # Whether the message box should be attached to the love window or free-floating.
 ---@return boolean success # Whether the message box was successfully displayed.
 function love.window.showMessageBox(title, message, type, attachtowindow) end

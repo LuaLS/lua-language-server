@@ -12,6 +12,7 @@ fs.create_directories(libraryPath)
 
 local knownTypes = {
     ['nil']            = 'nil',
+    ['any']            = 'any',
     ['boolean']        = 'boolean',
     ['number']         = 'number',
     ['integer']        = 'integer',
@@ -25,24 +26,27 @@ local knownTypes = {
     ['light userdata'] = 'lightuserdata'
 }
 
-local function getTypeName(class, name)
+local function getTypeName(name)
     if knownTypes[name] then
         return knownTypes[name]
     end
-    return class .. '.' .. name
+    return 'love.' .. name
 end
 
-local function buildType(class, param)
-    return getTypeName(class, param.type)
+local function buildType(param)
+    if param.table then
+        getTypeName(param.type)
+    end
+    return getTypeName(param.type)
 end
 
-local function buildSuper(class, tp)
+local function buildSuper(tp)
     if not tp.supertypes then
         return ''
     end
     local parents = {}
     for _, parent in ipairs(tp.supertypes) do
-        parents[#parents+1] = ('%s.%s'):format(class, parent)
+        parents[#parents+1] = getTypeName(parent)
     end
     return (': %s'):format(table.concat(parents, ', '))
 end
@@ -54,19 +58,23 @@ local function buildFunction(class, func, node)
     text[#text+1] = '---'
     local params = {}
     for _, param in ipairs(func.variants[1].arguments or {}) do
-        params[#params+1] = param.name
-        text[#text+1] = ('---@param %s %s # %s'):format(
-            param.name,
-            buildType(class, param),
-            param.description
-        )
+        for paramName in param.name:gmatch '[%a_][%w_]+' do
+            params[#params+1] = paramName
+            text[#text+1] = ('---@param %s %s # %s'):format(
+                paramName,
+                buildType(param),
+                param.description
+            )
+        end
     end
     for _, rtn in ipairs(func.variants[1].returns or {}) do
-        text[#text+1] = ('---@return %s %s # %s'):format(
-            buildType(class, rtn),
-            rtn.name,
-            rtn.description
-        )
+        for returnName in rtn.name:gmatch '[%a_][%w_]+' do
+            text[#text+1] = ('---@return %s %s # %s'):format(
+                buildType(rtn),
+                returnName,
+                rtn.description
+            )
+        end
     end
     text[#text+1] = ('function %s%s(%s) end'):format(
         node,
@@ -80,6 +88,8 @@ local function buildFile(class, defs)
     local filePath = libraryPath / (class .. '.lua')
     local text = {}
 
+    text[#text+1] = '---@meta'
+    text[#text+1] = ''
     text[#text+1] = ('---@class %s'):format(class)
     text[#text+1] = ('%s = {}'):format(class)
 
@@ -90,7 +100,7 @@ local function buildFile(class, defs)
 
     for _, tp in ipairs(defs.types or {}) do
         text[#text+1] = ''
-        text[#text+1] = ('---@class %s%s'):format(getTypeName(class, tp.name), buildSuper(class, tp))
+        text[#text+1] = ('---@class %s%s'):format(getTypeName(tp.name), buildSuper(tp))
         text[#text+1] = ('local %s = {}'):format(tp.name)
         for _, func in ipairs(tp.functions or {}) do
             text[#text+1] = ''

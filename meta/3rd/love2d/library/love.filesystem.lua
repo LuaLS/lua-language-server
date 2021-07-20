@@ -1,3 +1,5 @@
+---@meta
+
 ---@class love.filesystem
 love.filesystem = {}
 
@@ -63,7 +65,7 @@ function love.filesystem.getIdentity() end
 ---Gets information about the specified file or directory.
 ---
 ---@param path string # The file or directory path to check.
----@param filtertype love.filesystem.FileType # If supplied, this parameter causes getInfo to only return the info table if the item at the given path matches the specified file type.
+---@param filtertype love.FileType # If supplied, this parameter causes getInfo to only return the info table if the item at the given path matches the specified file type.
 ---@return table info # A table containing information about the specified path, or nil if nothing exists at the path. The table contains the following fields:
 function love.filesystem.getInfo(path, filtertype) end
 
@@ -170,7 +172,7 @@ function love.filesystem.mount(archive, mountpoint, appendToPath) end
 ---It needs to be opened before it can be accessed.
 ---
 ---@param filename string # The filename of the file.
----@return love.filesystem.File file # The new File object.
+---@return love.File file # The new File object.
 function love.filesystem.newFile(filename) end
 
 ---
@@ -178,7 +180,7 @@ function love.filesystem.newFile(filename) end
 ---
 ---@param contents string # The contents of the file.
 ---@param name string # The name of the file.
----@return love.filesystem.FileData data # Your new FileData.
+---@return love.FileData data # Your new FileData.
 function love.filesystem.newFileData(contents, name) end
 
 ---
@@ -256,10 +258,10 @@ function love.filesystem.unmount(archive) end
 ---@return string message # Error message if operation was unsuccessful.
 function love.filesystem.write(name, data, size) end
 
----@class love.filesystem.DroppedFile: love.filesystem.File, love.filesystem.Object
+---@class love.DroppedFile: love.File, love.Object
 local DroppedFile = {}
 
----@class love.filesystem.File: love.filesystem.Object
+---@class love.File: love.Object
 local File = {}
 
 ---
@@ -278,7 +280,7 @@ function File:flush() end
 ---
 ---Gets the buffer mode of a file.
 ---
----@return love.filesystem.BufferMode mode # The current buffer mode of the file.
+---@return love.BufferMode mode # The current buffer mode of the file.
 ---@return number size # The maximum size in bytes of the file's buffer.
 function File:getBuffer() end
 
@@ -291,7 +293,7 @@ function File:getFilename() end
 ---
 ---Gets the FileMode the file has been opened with.
 ---
----@return love.filesystem.FileMode mode # The mode this file has been opened with.
+---@return love.FileMode mode # The mode this file has been opened with.
 function File:getMode() end
 
 ---
@@ -321,7 +323,7 @@ function File:lines() end
 ---
 ---Open the file for write, read or append.
 ---
----@param mode love.filesystem.FileMode # The mode to open the file in.
+---@param mode love.FileMode # The mode to open the file in.
 ---@return boolean ok # True on success, false otherwise.
 ---@return string err # The error string if an error occurred.
 function File:open(mode) end
@@ -346,7 +348,7 @@ function File:seek(pos) end
 ---
 ---File:flush will force any buffered data to be written to the disk.
 ---
----@param mode love.filesystem.BufferMode # The buffer mode to use.
+---@param mode love.BufferMode # The buffer mode to use.
 ---@param size number # The maximum size in bytes of the file's buffer.
 ---@return boolean success # Whether the buffer mode was successfully set.
 ---@return string errorstr # The error string, if the buffer mode could not be set and an error occurred.
@@ -367,7 +369,7 @@ function File:tell() end
 ---@return string err # The error string if an error occurred.
 function File:write(data, size) end
 
----@class love.filesystem.FileData: love.filesystem.Data, love.filesystem.Object
+---@class love.FileData: love.Data, love.Object
 local FileData = {}
 
 ---

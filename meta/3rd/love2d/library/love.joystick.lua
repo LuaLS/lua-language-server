@@ -1,3 +1,5 @@
+---@meta
+
 ---@class love.joystick
 love.joystick = {}
 
@@ -47,14 +49,14 @@ function love.joystick.saveGamepadMappings(filename) end
 ---The virtual gamepad buttons and axes are designed around the Xbox 360 controller layout.
 ---
 ---@param guid string # The OS-dependent GUID for the type of Joystick the binding will affect.
----@param button love.joystick.GamepadButton # The virtual gamepad button to bind.
----@param inputtype love.joystick.JoystickInputType # The type of input to bind the virtual gamepad button to.
+---@param button love.GamepadButton # The virtual gamepad button to bind.
+---@param inputtype love.JoystickInputType # The type of input to bind the virtual gamepad button to.
 ---@param inputindex number # The index of the axis, button, or hat to bind the virtual gamepad button to.
----@param hatdir love.joystick.JoystickHat # The direction of the hat, if the virtual gamepad button will be bound to a hat. nil otherwise.
+---@param hatdir love.JoystickHat # The direction of the hat, if the virtual gamepad button will be bound to a hat. nil otherwise.
 ---@return boolean success # Whether the virtual gamepad button was successfully bound.
 function love.joystick.setGamepadMapping(guid, button, inputtype, inputindex, hatdir) end
 
----@class love.joystick.Joystick: love.joystick.Object
+---@class love.Joystick: love.Object
 local Joystick = {}
 
 ---
@@ -103,17 +105,17 @@ function Joystick:getGUID() end
 ---
 ---Gets the direction of a virtual gamepad axis. If the Joystick isn't recognized as a gamepad or isn't connected, this function will always return 0.
 ---
----@param axis love.joystick.GamepadAxis # The virtual axis to be checked.
+---@param axis love.GamepadAxis # The virtual axis to be checked.
 ---@return number direction # Current value of the axis.
 function Joystick:getGamepadAxis(axis) end
 
 ---
 ---Gets the button, axis or hat that a virtual gamepad input is bound to.
 ---
----@param axis love.joystick.GamepadAxis # The virtual gamepad axis to get the binding for.
----@return love.joystick.JoystickInputType inputtype # The type of input the virtual gamepad axis is bound to.
+---@param axis love.GamepadAxis # The virtual gamepad axis to get the binding for.
+---@return love.JoystickInputType inputtype # The type of input the virtual gamepad axis is bound to.
 ---@return number inputindex # The index of the Joystick's button, axis or hat that the virtual gamepad axis is bound to.
----@return love.joystick.JoystickHat hatdirection # The direction of the hat, if the virtual gamepad axis is bound to a hat. nil otherwise.
+---@return love.JoystickHat hatdirection # The direction of the hat, if the virtual gamepad axis is bound to a hat. nil otherwise.
 function Joystick:getGamepadMapping(axis) end
 
 ---
@@ -128,7 +130,7 @@ function Joystick:getGamepadMappingString() end
 ---Gets the direction of the Joystick's hat.
 ---
 ---@param hat number # The index of the hat to be checked.
----@return love.joystick.JoystickHat direction # The direction the hat is pushed.
+---@return love.JoystickHat direction # The direction the hat is pushed.
 function Joystick:getHat(hat) end
 
 ---
@@ -183,7 +185,7 @@ function Joystick:isGamepad() end
 ---
 ---Checks if a virtual gamepad button on the Joystick is pressed. If the Joystick is not recognized as a Gamepad or isn't connected, then this function will always return false.
 ---
----@param buttonN love.joystick.GamepadButton # The gamepad button to check.
+---@param buttonN love.GamepadButton # The gamepad button to check.
 ---@return boolean anyDown # True if any supplied button is down, false if not.
 function Joystick:isGamepadDown(buttonN) end
 

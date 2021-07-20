@@ -1,17 +1,17 @@
+---@meta
+
 ---@class love.mouse
 love.mouse = {}
 
 ---
 ---Gets the current Cursor.
 ---
----@return love.mouse.Cursor cursor # The current cursor, or nil if no cursor is set.
+---@return love.Cursor cursor # The current cursor, or nil if no cursor is set.
 function love.mouse.getCursor() end
 
 ---
 ---Returns the current position of the mouse.
 ---
----@return number x # The position of the mouse along the x-axis.
----@return number y # The position of the mouse along the y-axis.
 function love.mouse.getPosition() end
 
 ---
@@ -29,20 +29,18 @@ function love.mouse.getRelativeMode() end
 ---
 ---Hardware cursors are framerate-independent and work the same way as normal operating system cursors. Unlike drawing an image at the mouse's current coordinates, hardware cursors never have visible lag between when the mouse is moved and when the cursor position updates, even at low framerates.
 ---
----@param ctype love.mouse.CursorType # The type of system cursor to get. 
----@return love.mouse.Cursor cursor # The Cursor object representing the system cursor type.
+---@param ctype love.CursorType # The type of system cursor to get. 
+---@return love.Cursor cursor # The Cursor object representing the system cursor type.
 function love.mouse.getSystemCursor(ctype) end
 
 ---
 ---Returns the current x-position of the mouse.
 ---
----@return number x # The position of the mouse along the x-axis.
 function love.mouse.getX() end
 
 ---
 ---Returns the current y-position of the mouse.
 ---
----@return number y # The position of the mouse along the y-axis.
 function love.mouse.getY() end
 
 ---
@@ -59,9 +57,8 @@ function love.mouse.isCursorSupported() end
 ---This function does not detect mouse wheel scrolling; you must use the love.wheelmoved (or love.mousepressed in version 0.9.2 and older) callback for that. 
 ---
 ---@param button number # The index of a button to check. 1 is the primary mouse button, 2 is the secondary mouse button and 3 is the middle button. Further buttons are mouse dependant.
----@param ... number # Additional button numbers to check.
 ---@return boolean down # True if any specified button is down.
-function love.mouse.isDown(button, ...) end
+function love.mouse.isDown(button) end
 
 ---
 ---Checks if the mouse is grabbed.
@@ -82,16 +79,16 @@ function love.mouse.isVisible() end
 ---
 ---The hot spot is the point the operating system uses to determine what was clicked and at what position the mouse cursor is. For example, the normal arrow pointer normally has its hot spot at the top left of the image, but a crosshair cursor might have it in the middle.
 ---
----@param imageData love.mouse.ImageData # The ImageData to use for the new Cursor.
+---@param imageData love.ImageData # The ImageData to use for the new Cursor.
 ---@param hotx number # The x-coordinate in the ImageData of the cursor's hot spot.
 ---@param hoty number # The y-coordinate in the ImageData of the cursor's hot spot.
----@return love.mouse.Cursor cursor # The new Cursor object.
+---@return love.Cursor cursor # The new Cursor object.
 function love.mouse.newCursor(imageData, hotx, hoty) end
 
 ---
 ---Sets the current mouse cursor.
 ---
----@param cursor love.mouse.Cursor # The Cursor object to use as the current mouse cursor.
+---@param cursor love.Cursor # The Cursor object to use as the current mouse cursor.
 function love.mouse.setCursor(cursor) end
 
 ---
@@ -103,9 +100,7 @@ function love.mouse.setGrabbed(grab) end
 ---
 ---Sets the current position of the mouse. Non-integer values are floored.
 ---
----@param x number # The new position of the mouse along the x-axis.
----@param y number # The new position of the mouse along the y-axis.
-function love.mouse.setPosition(x, y) end
+function love.mouse.setPosition() end
 
 ---
 ---Sets whether relative mode is enabled for the mouse.
@@ -128,22 +123,20 @@ function love.mouse.setVisible(visible) end
 ---
 ---Non-integer values are floored.
 ---
----@param x number # The new position of the mouse along the x-axis.
-function love.mouse.setX(x) end
+function love.mouse.setX() end
 
 ---
 ---Sets the current Y position of the mouse.
 ---
 ---Non-integer values are floored.
 ---
----@param y number # The new position of the mouse along the y-axis.
-function love.mouse.setY(y) end
+function love.mouse.setY() end
 
----@class love.mouse.Cursor: love.mouse.Object
+---@class love.Cursor: love.Object
 local Cursor = {}
 
 ---
 ---Gets the type of the Cursor.
 ---
----@return love.mouse.CursorType ctype # The type of the Cursor.
+---@return love.CursorType ctype # The type of the Cursor.
 function Cursor:getType() end

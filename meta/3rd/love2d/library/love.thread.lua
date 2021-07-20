@@ -1,3 +1,5 @@
+---@meta
+
 ---@class love.thread
 love.thread = {}
 
@@ -5,7 +7,7 @@ love.thread = {}
 ---Creates or retrieves a named thread channel.
 ---
 ---@param name string # The name of the channel you want to create or retrieve.
----@return love.thread.Channel channel # The Channel object associated with the name.
+---@return love.Channel channel # The Channel object associated with the name.
 function love.thread.getChannel(name) end
 
 ---
@@ -13,17 +15,17 @@ function love.thread.getChannel(name) end
 ---
 ---One use for them is to pass new unnamed channels to other threads via Channel:push on a named channel.
 ---
----@return love.thread.Channel channel # The new Channel object.
+---@return love.Channel channel # The new Channel object.
 function love.thread.newChannel() end
 
 ---
 ---Creates a new Thread from a filename, string or FileData object containing Lua code.
 ---
 ---@param filename string # The name of the Lua file to use as the source.
----@return love.thread.Thread thread # A new Thread that has yet to be started.
+---@return love.Thread thread # A new Thread that has yet to be started.
 function love.thread.newThread(filename) end
 
----@class love.thread.Channel: love.thread.Object
+---@class love.Channel: love.Object
 local Channel = {}
 
 ---
@@ -36,7 +38,7 @@ function Channel:clear() end
 ---
 ---It waits until a message is in the queue then returns the message value.
 ---
----@return love.thread.Variant value # The contents of the message.
+---@return love.Variant value # The contents of the message.
 function Channel:demand() end
 
 ---
@@ -57,7 +59,7 @@ function Channel:hasRead(id) end
 ---
 ---It returns nil if there's no message in the queue.
 ---
----@return love.thread.Variant value # The contents of the message.
+---@return love.Variant value # The contents of the message.
 function Channel:peek() end
 
 ---
@@ -68,18 +70,16 @@ function Channel:peek() end
 ---This method avoids that issue by making sure the Thread calling the method has exclusive access to the Channel until the specified function has returned.
 ---
 ---@param func function # The function to call, the form of function(channel, arg1, arg2, ...) end. The Channel is passed as the first argument to the function when it is called.
----@param arg1 love.thread.any # Additional arguments that the given function will receive when it is called.
----@param ... love.thread.any # Additional arguments that the given function will receive when it is called.
----@return love.thread.any ret1 # The first return value of the given function (if any.)
----@return love.thread.any ... # Any other return values.
-function Channel:performAtomic(func, arg1, ...) end
+---@param arg1 any # Additional arguments that the given function will receive when it is called.
+---@return any ret1 # The first return value of the given function (if any.)
+function Channel:performAtomic(func, arg1) end
 
 ---
 ---Retrieves the value of a Channel message and removes it from the message queue.
 ---
 ---It returns nil if there are no messages in the queue.
 ---
----@return love.thread.Variant value # The contents of the message.
+---@return love.Variant value # The contents of the message.
 function Channel:pop() end
 
 ---
@@ -87,7 +87,7 @@ function Channel:pop() end
 ---
 ---See Variant for the list of supported types.
 ---
----@param value love.thread.Variant # The contents of the message.
+---@param value love.Variant # The contents of the message.
 ---@return number id # Identifier which can be supplied to Channel:hasRead
 function Channel:push(value) end
 
@@ -96,11 +96,11 @@ function Channel:push(value) end
 ---
 ---See Variant for the list of supported types.
 ---
----@param value love.thread.Variant # The contents of the message.
+---@param value love.Variant # The contents of the message.
 ---@return boolean success # Whether the message was successfully supplied (always true).
 function Channel:supply(value) end
 
----@class love.thread.Thread: love.thread.Object
+---@class love.Thread: love.Object
 local Thread = {}
 
 ---

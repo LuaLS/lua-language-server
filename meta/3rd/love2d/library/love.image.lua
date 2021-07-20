@@ -1,3 +1,5 @@
+---@meta
+
 ---@class love.image
 love.image = {}
 
@@ -12,7 +14,7 @@ function love.image.isCompressed(filename) end
 ---Create a new CompressedImageData object from a compressed image file. LÖVE supports several compressed texture formats, enumerated in the CompressedImageFormat page.
 ---
 ---@param filename string # The filename of the compressed image file.
----@return love.image.CompressedImageData compressedImageData # The new CompressedImageData object.
+---@return love.CompressedImageData compressedImageData # The new CompressedImageData object.
 function love.image.newCompressedData(filename) end
 
 ---
@@ -20,10 +22,10 @@ function love.image.newCompressedData(filename) end
 ---
 ---@param width number # The width of the ImageData.
 ---@param height number # The height of the ImageData.
----@return love.image.ImageData imageData # The new blank ImageData object. Each pixel's color values, (including the alpha values!) will be set to zero.
+---@return love.ImageData imageData # The new blank ImageData object. Each pixel's color values, (including the alpha values!) will be set to zero.
 function love.image.newImageData(width, height) end
 
----@class love.image.CompressedImageData: love.image.Data, love.image.Object
+---@class love.CompressedImageData: love.Data, love.Object
 local CompressedImageData = {}
 
 ---
@@ -36,7 +38,7 @@ function CompressedImageData:getDimensions() end
 ---
 ---Gets the format of the CompressedImageData.
 ---
----@return love.image.CompressedImageFormat format # The format of the CompressedImageData.
+---@return love.CompressedImageFormat format # The format of the CompressedImageData.
 function CompressedImageData:getFormat() end
 
 ---
@@ -57,15 +59,15 @@ function CompressedImageData:getMipmapCount() end
 ---@return number width # The width of the CompressedImageData.
 function CompressedImageData:getWidth() end
 
----@class love.image.ImageData: love.image.Data, love.image.Object
+---@class love.ImageData: love.Data, love.Object
 local ImageData = {}
 
 ---
 ---Encodes the ImageData and optionally writes it to the save directory.
 ---
----@param format love.image.ImageFormat # The format to encode the image as.
+---@param format love.ImageFormat # The format to encode the image as.
 ---@param filename string # The filename to write the file to. If nil, no file will be written but the FileData will still be returned.
----@return love.image.FileData filedata # The encoded image as a new FileData object.
+---@return love.FileData filedata # The encoded image as a new FileData object.
 function ImageData:encode(format, filename) end
 
 ---
@@ -88,13 +90,7 @@ function ImageData:getHeight() end
 ---
 ---In versions prior to 11.0, color component values were within the range of 0 to 255 instead of 0 to 1.
 ---
----@param x number # The position of the pixel on the x-axis.
----@param y number # The position of the pixel on the y-axis.
----@return number r # The red component (0-1).
----@return number g # The green component (0-1).
----@return number b # The blue component (0-1).
----@return number a # The alpha component (0-1).
-function ImageData:getPixel(x, y) end
+function ImageData:getPixel() end
 
 ---
 ---Gets the width of the ImageData in pixels.
@@ -124,16 +120,14 @@ function ImageData:getWidth() end
 ---In versions prior to 11.0, color component values were within the range of 0 to 255 instead of 0 to 1.
 ---
 ---@param pixelFunction function # Function to apply to every pixel.
----@param x number # The x-axis of the top-left corner of the area within the ImageData to apply the function to.
----@param y number # The y-axis of the top-left corner of the area within the ImageData to apply the function to.
 ---@param width number # The width of the area within the ImageData to apply the function to.
 ---@param height number # The height of the area within the ImageData to apply the function to.
-function ImageData:mapPixel(pixelFunction, x, y, width, height) end
+function ImageData:mapPixel(pixelFunction, width, height) end
 
 ---
 ---Paste into ImageData from another source ImageData.
 ---
----@param source love.image.ImageData # Source ImageData from which to copy.
+---@param source love.ImageData # Source ImageData from which to copy.
 ---@param dx number # Destination top-left position on x-axis.
 ---@param dy number # Destination top-left position on y-axis.
 ---@param sx number # Source top-left position on x-axis.
@@ -149,10 +143,4 @@ function ImageData:paste(source, dx, dy, sx, sy, sw, sh) end
 ---
 ---In versions prior to 11.0, color component values were within the range of 0 to 255 instead of 0 to 1.
 ---
----@param x number # The position of the pixel on the x-axis.
----@param y number # The position of the pixel on the y-axis.
----@param r number # The red component (0-1).
----@param g number # The green component (0-1).
----@param b number # The blue component (0-1).
----@param a number # The alpha component (0-1).
-function ImageData:setPixel(x, y, r, g, b, a) end
+function ImageData:setPixel() end

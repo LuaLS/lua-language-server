@@ -1,3 +1,5 @@
+---@meta
+
 ---@class love.timer
 love.timer = {}
 
@@ -30,8 +32,7 @@ function love.timer.getTime() end
 ---
 ---Pauses the current thread for the specified amount of time.
 ---
----@param s number # Seconds to sleep for.
-function love.timer.sleep(s) end
+function love.timer.sleep() end
 
 ---
 ---Measures the time between two frames.

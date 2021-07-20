@@ -1,3 +1,5 @@
+---@meta
+
 ---@class love.audio
 love.audio = {}
 
@@ -16,7 +18,7 @@ function love.audio.getActiveSourceCount() end
 ---
 ---Returns the distance attenuation model.
 ---
----@return love.audio.DistanceModel model # The current distance model. The default is 'inverseclamped'.
+---@return love.DistanceModel model # The current distance model. The default is 'inverseclamped'.
 function love.audio.getDistanceModel() end
 
 ---
@@ -47,16 +49,17 @@ function love.audio.getMaxSourceEffects() end
 ---
 ---Returns the orientation of the listener.
 ---
----@return number fx, fy, fz # Forward vector of the listener orientation.
----@return number ux, uy, uz # Up vector of the listener orientation.
+---@return number fx # Forward vector of the listener orientation.
+---@return number fy # Forward vector of the listener orientation.
+---@return number fz # Forward vector of the listener orientation.
+---@return number ux # Up vector of the listener orientation.
+---@return number uy # Up vector of the listener orientation.
+---@return number uz # Up vector of the listener orientation.
 function love.audio.getOrientation() end
 
 ---
 ---Returns the position of the listener. Please note that positional audio only works for mono (i.e. non-stereo) sources.
 ---
----@return number x # The X position of the listener.
----@return number y # The Y position of the listener.
----@return number z # The Z position of the listener.
 function love.audio.getPosition() end
 
 ---
@@ -78,9 +81,6 @@ function love.audio.getSourceCount() end
 ---
 ---Returns the velocity of the listener.
 ---
----@return number x # The X velocity of the listener.
----@return number y # The Y velocity of the listener.
----@return number z # The Z velocity of the listener.
 function love.audio.getVelocity() end
 
 ---
@@ -102,7 +102,7 @@ function love.audio.isEffectsSupported() end
 ---@param bitdepth number # Bits per sample (8 or 16).
 ---@param channels number # 1 for mono or 2 for stereo.
 ---@param buffercount number # The number of buffers that can be queued up at any given time with Source:queue. Cannot be greater than 64. A sensible default (~8) is chosen if no value is specified.
----@return love.audio.Source source # The new Source usable with Source:queue.
+---@return love.Source source # The new Source usable with Source:queue.
 function love.audio.newQueueableSource(samplerate, bitdepth, channels, buffercount) end
 
 ---
@@ -111,8 +111,8 @@ function love.audio.newQueueableSource(samplerate, bitdepth, channels, buffercou
 ---Sources created from SoundData are always static.
 ---
 ---@param filename string # The filepath to the audio file.
----@param type love.audio.SourceType # Streaming or static source.
----@return love.audio.Source source # A new Source that can play the specified audio.
+---@param type love.SourceType # Streaming or static source.
+---@return love.Source source # A new Source that can play the specified audio.
 function love.audio.newSource(filename, type) end
 
 ---
@@ -124,13 +124,13 @@ function love.audio.pause() end
 ---
 ---Plays the specified Source.
 ---
----@param source love.audio.Source # The Source to play.
+---@param source love.Source # The Source to play.
 function love.audio.play(source) end
 
 ---
 ---Sets the distance attenuation model.
 ---
----@param model love.audio.DistanceModel # The new distance model.
+---@param model love.DistanceModel # The new distance model.
 function love.audio.setDistanceModel(model) end
 
 ---
@@ -159,25 +159,23 @@ function love.audio.setMixWithSystem(mix) end
 ---
 ---Sets the orientation of the listener.
 ---
----@param fx, fy, fz number # Forward vector of the listener orientation.
----@param ux, uy, uz number # Up vector of the listener orientation.
+---@param fx number # Forward vector of the listener orientation.
+---@param fy number # Forward vector of the listener orientation.
+---@param fz number # Forward vector of the listener orientation.
+---@param ux number # Up vector of the listener orientation.
+---@param uy number # Up vector of the listener orientation.
+---@param uz number # Up vector of the listener orientation.
 function love.audio.setOrientation(fx, fy, fz, ux, uy, uz) end
 
 ---
 ---Sets the position of the listener, which determines how sounds play.
 ---
----@param x number # The x position of the listener.
----@param y number # The y position of the listener.
----@param z number # The z position of the listener.
-function love.audio.setPosition(x, y, z) end
+function love.audio.setPosition() end
 
 ---
 ---Sets the velocity of the listener.
 ---
----@param x number # The X velocity of the listener.
----@param y number # The Y velocity of the listener.
----@param z number # The Z velocity of the listener.
-function love.audio.setVelocity(x, y, z) end
+function love.audio.setVelocity() end
 
 ---
 ---Sets the master volume.
@@ -190,7 +188,7 @@ function love.audio.setVolume(volume) end
 ---
 function love.audio.stop() end
 
----@class love.audio.RecordingDevice: love.audio.Object
+---@class love.RecordingDevice: love.Object
 local RecordingDevice = {}
 
 ---
@@ -216,7 +214,7 @@ function RecordingDevice:getChannelCount() end
 ---
 ---The internal ring buffer is cleared when this function is called, so calling it again will only get audio recorded after the previous call. If the device's internal ring buffer completely fills up before getData is called, the oldest data that doesn't fit into the buffer will be lost.
 ---
----@return love.audio.SoundData data # The recorded audio data, or nil if the device isn't recording.
+---@return love.SoundData data # The recorded audio data, or nil if the device isn't recording.
 function RecordingDevice:getData() end
 
 ---
@@ -256,10 +254,10 @@ function RecordingDevice:start(samplecount, samplerate, bitdepth, channels) end
 ---
 ---Stops recording audio from this device. Any sound data currently in the device's buffer will be returned.
 ---
----@return love.audio.SoundData data # The sound data currently in the device's buffer, or nil if the device wasn't recording.
+---@return love.SoundData data # The sound data currently in the device's buffer, or nil if the device wasn't recording.
 function RecordingDevice:stop() end
 
----@class love.audio.Source: love.audio.Object
+---@class love.Source: love.Object
 local Source = {}
 
 ---
@@ -267,7 +265,7 @@ local Source = {}
 ---
 ---Static Sources will use significantly less memory and take much less time to be created if Source:clone is used to create them instead of love.audio.newSource, so this method should be preferred when making multiple Sources which play the same sound.
 ---
----@return love.audio.Source source # The new identical copy of this Source.
+---@return love.Source source # The new identical copy of this Source.
 function Source:clone() end
 
 ---
@@ -308,15 +306,12 @@ function Source:getCone() end
 ---
 ---Gets the direction of the Source.
 ---
----@return number x # The X part of the direction vector.
----@return number y # The Y part of the direction vector.
----@return number z # The Z part of the direction vector.
 function Source:getDirection() end
 
 ---
 ---Gets the duration of the Source. For streaming Sources it may not always be sample-accurate, and may return -1 if the duration cannot be determined at all.
 ---
----@param unit love.audio.TimeUnit # The time unit for the return value.
+---@param unit love.TimeUnit # The time unit for the return value.
 ---@return number duration # The duration of the Source, or -1 if it cannot be determined.
 function Source:getDuration(unit) end
 
@@ -351,9 +346,6 @@ function Source:getPitch() end
 ---
 ---Gets the position of the Source.
 ---
----@return number x # The X position of the Source.
----@return number y # The Y position of the Source.
----@return number z # The Z position of the Source.
 function Source:getPosition() end
 
 ---
@@ -365,15 +357,12 @@ function Source:getRolloff() end
 ---
 ---Gets the type of the Source.
 ---
----@return love.audio.SourceType sourcetype # The type of the source.
+---@return love.SourceType sourcetype # The type of the source.
 function Source:getType() end
 
 ---
 ---Gets the velocity of the Source.
 ---
----@return number x # The X part of the velocity vector.
----@return number y # The Y part of the velocity vector.
----@return number z # The Z part of the velocity vector.
 function Source:getVelocity() end
 
 ---
@@ -423,7 +412,7 @@ function Source:play() end
 ---
 ---This method requires the Source to be created via love.audio.newQueueableSource.
 ---
----@param sounddata love.audio.SoundData # The data to queue. The SoundData's sample rate, bit depth, and channel count must match the Source's.
+---@param sounddata love.SoundData # The data to queue. The SoundData's sample rate, bit depth, and channel count must match the Source's.
 ---@return boolean success # True if the data was successfully queued for playback, false if there were no available buffers to use for queueing.
 function Source:queue(sounddata) end
 
@@ -431,7 +420,7 @@ function Source:queue(sounddata) end
 ---Sets the currently playing position of the Source.
 ---
 ---@param offset number # The position to seek to.
----@param unit love.audio.TimeUnit # The unit of the position value.
+---@param unit love.TimeUnit # The unit of the position value.
 function Source:seek(offset, unit) end
 
 ---
@@ -464,10 +453,7 @@ function Source:setCone(innerAngle, outerAngle, outerVolume) end
 ---
 ---Sets the direction vector of the Source. A zero vector makes the source non-directional.
 ---
----@param x number # The X part of the direction vector.
----@param y number # The Y part of the direction vector.
----@param z number # The Z part of the direction vector.
-function Source:setDirection(x, y, z) end
+function Source:setDirection() end
 
 ---
 ---Applies an audio effect to the Source.
@@ -501,10 +487,7 @@ function Source:setPitch(pitch) end
 ---
 ---Sets the position of the Source. Please note that this only works for mono (i.e. non-stereo) sound files!
 ---
----@param x number # The X position of the Source.
----@param y number # The Y position of the Source.
----@param z number # The Z position of the Source.
-function Source:setPosition(x, y, z) end
+function Source:setPosition() end
 
 ---
 ---Sets whether the Source's position, velocity, direction, and cone angles are relative to the listener, or absolute.
@@ -527,10 +510,7 @@ function Source:setRolloff(rolloff) end
 ---
 ---This does '''not''' change the position of the Source, but lets the application know how it has to calculate the doppler effect.
 ---
----@param x number # The X part of the velocity vector.
----@param y number # The Y part of the velocity vector.
----@param z number # The Z part of the velocity vector.
-function Source:setVelocity(x, y, z) end
+function Source:setVelocity() end
 
 ---
 ---Sets the current volume of the Source.
@@ -553,6 +533,6 @@ function Source:stop() end
 ---
 ---Gets the currently playing position of the Source.
 ---
----@param unit love.audio.TimeUnit # The type of unit for the return value.
+---@param unit love.TimeUnit # The type of unit for the return value.
 ---@return number position # The currently playing position of the Source.
 function Source:tell(unit) end

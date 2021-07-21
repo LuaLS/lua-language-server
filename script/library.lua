@@ -347,17 +347,24 @@ local function askFor3rd(cfg)
     if not result then
         return nil
     end
-    client.setConfig {
-        {
-            key    = 'Lua.workspace.checkThirdParty',
-            action = 'set',
-            value  = false,
-        },
-    }
     if result == yes1 then
         apply3rd(cfg, false)
+        client.setConfig({
+            {
+                key    = 'Lua.workspace.checkThirdParty',
+                action = 'set',
+                value  = false,
+            },
+        }, false)
     elseif result == yes2 then
         apply3rd(cfg, true)
+        client.setConfig({
+            {
+                key    = 'Lua.workspace.checkThirdParty',
+                action = 'set',
+                value  = false,
+            },
+        }, true)
     end
 end
 

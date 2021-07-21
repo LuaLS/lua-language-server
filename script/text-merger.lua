@@ -93,7 +93,7 @@ return function (uri, changes)
         if change.range then
             local rows = files.getCachedRows(uri)
             if not rows then
-                text = text or files.getOriginText(uri)
+                text = text or files.getOriginText(uri) or ''
                 rows = splitRows(text)
             end
             mergeRows(rows, change)

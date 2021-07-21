@@ -856,6 +856,9 @@ function m.searchRefsByID(status, uri, expect, mode)
 end
 
 local function prepareSearch(source)
+    if not source then
+        return
+    end
     if source.type == 'field'
     or source.type == 'method' then
         source = source.parent

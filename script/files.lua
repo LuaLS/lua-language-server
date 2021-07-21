@@ -59,7 +59,9 @@ end
 function m.open(uri)
     local originUri = uri
     uri = getUriKey(uri)
-    m.openMap[uri] = true
+    m.openMap[uri] = {
+        cache = {},
+    }
     m.onWatch('open', originUri)
 end
 
@@ -81,7 +83,16 @@ end
 ---@return boolean
 function m.isOpen(uri)
     uri = getUriKey(uri)
-    return m.openMap[uri] == true
+    return m.openMap[uri] ~= nil
+end
+
+function m.getOpenedCache(uri)
+    uri = getUriKey(uri)
+    local data = m.openMap[uri]
+    if not data then
+        return nil
+    end
+    return data.cache
 end
 
 --- 标记为库文件

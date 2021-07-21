@@ -758,8 +758,16 @@ proto.on('textDocument/semanticTokens/range', function (params)
     local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SEMANTIC_RANGE, 0.5)
     local core = require 'core.semantic-tokens'
     local uri = params.textDocument.uri
-    local start  = files.offsetOfWord(uri, params.range.start)
-    local finish = files.offsetOfWord(uri, params.range['end'])
+    local cache  = files.getOpenedCache(uri)
+    local start, finish
+    if cache and not cache['firstSemantic'] then
+        cache['firstSemantic'] = true
+        start  = 0
+        finish = #files.getText(uri)
+    else
+        start  = files.offsetOfWord(uri, params.range.start)
+        finish = files.offsetOfWord(uri, params.range['end'])
+    end
     local results = core(uri, start, finish)
     return {
         data = results

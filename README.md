@@ -13,6 +13,9 @@ https://marketplace.visualstudio.com/items?itemName=sumneko.lua
 ## Change Log
 https://github.com/sumneko/lua-language-server/blob/master/changelog.md
 
+## Wiki
+https://github.com/sumneko/lua-language-server/wiki
+
 ## Feature
 
 - [x] Goto Definition

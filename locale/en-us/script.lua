@@ -245,3 +245,9 @@ WINDOW_ASK_APPLY_LIBRARY         = 'Do you need to configure your work environme
 CONFIG_LOAD_FAILED               = 'Unable to read the settings file: {}'
 CONFIG_LOAD_ERROR                = 'Setting file loading error: {}'
 CONFIG_TYPE_ERROR                = 'The setting file must be in lua or json format: {}'
+
+PLUGIN_RUNTIME_ERROR             = [[
+An error occurred in the plugin, please report it to the plugin author.
+Please check the details in the output or log.
+Plugin path: {}
+]]

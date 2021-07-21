@@ -168,6 +168,15 @@ function m.editText(uri, edits)
     })
 end
 
+local function hookPrint()
+    if TEST then
+        return
+    end
+    print = function (...)
+        m.logMessage('Log', ...)
+    end
+end
+
 function m.init(t)
     log.debug('Client init', util.dump(t))
     m.info = t
@@ -175,6 +184,7 @@ function m.init(t)
     m.client(t.clientInfo.name)
     nonil.disable()
     lang(LOCALE or t.locale)
+    hookPrint()
 end
 
 return m

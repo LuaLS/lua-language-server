@@ -244,3 +244,9 @@ WINDOW_ASK_APPLY_LIBRARY         = '是否需要将你的工作环境配置为 `
 CONFIG_LOAD_FAILED               = '无法读取设置文件：{}'
 CONFIG_LOAD_ERROR                = '设置文件加载错误：{}'
 CONFIG_TYPE_ERROR                = '设置文件必须是lua或json格式：{}'
+
+PLUGIN_RUNTIME_ERROR             = [[
+插件发生错误，请汇报给插件作者。
+请在输出或日志中查看详细信息。
+插件路径：{}
+]]

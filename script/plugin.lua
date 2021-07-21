@@ -1,8 +1,18 @@
 local config = require 'config'
 local util   = require 'utility'
+local client = require 'client'
+local lang   = require 'language'
 
 ---@class plugin
 local m = {}
+
+function m.showError(err)
+    if m._hasShowedError then
+        return
+    end
+    m._hasShowedError = true
+    client.showMessage('Error', lang.script('PLUGIN_RUNTIME_ERROR', m.pluginPath, err))
+end
 
 function m.dispatch(event, ...)
     if not m.interface then
@@ -17,6 +27,8 @@ function m.dispatch(event, ...)
     tracy.ZoneEnd()
     if suc then
         return true, res1, res2
+    else
+        m.showError(res1)
     end
     return false, res1
 end
@@ -45,13 +57,19 @@ function m.init()
     if not pluginLua then
         return
     end
+    m.pluginPath = pluginPath
     local env = setmetatable(m.interface, { __index = _ENV })
     local f, err = load(pluginLua, '@'..pluginPath, "t", env)
     if not f then
         log.error(err)
+        m.showError(err)
         return
     end
-    xpcall(f, log.error, f)
+    local suc, err = xpcall(f, log.error, f)
+    if not suc then
+        m.showError(err)
+        return
+    end
 
     resetFiles()
 end

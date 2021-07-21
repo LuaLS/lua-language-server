@@ -123,7 +123,12 @@ end
 
 function mt:pattern(state)
     if state.root then
-        return m.C(self:exp(state, 1))
+        local after = self:exp(state, 1)
+        if after then
+            return m.C(after)
+        else
+            return nil
+        end
     else
         return m.C(self:anyPath(nil, state, 1))
     end
@@ -147,5 +152,8 @@ return function (state, options)
         state   = state,
     }, mt)
     self.matcher = self:pattern(state)
+    if not self.matcher then
+        return nil
+    end
     return self
 end

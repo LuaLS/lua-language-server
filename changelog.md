@@ -9,6 +9,8 @@
     ---@field ['#'] number
     ```
 * `NEW` add supports of `love2d`
+* `FIX` gitignore pattern `\` broken initialization
+* `FIX` runtime errors
 
 ## 2.3.1
 `2021-7-19`

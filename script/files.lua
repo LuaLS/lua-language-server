@@ -610,12 +610,12 @@ function m.offset(uri, position, isFinish)
     local start, finish, char
     if row > #lines then
         start, finish = guide.lineRange(lines, #lines)
-        char = utf8.len(text, start, finish)
+        char = utf8.len(text, start, finish, true)
     else
         start, finish = guide.lineRange(lines, row)
         char = position.character
     end
-    local utf8Len = utf8.len(text, start, finish)
+    local utf8Len = utf8.len(text, start, finish, true)
     local offset
     if char <= 0 then
         offset = start
@@ -661,12 +661,12 @@ function m.offsetOfWord(uri, position)
     local start, finish, char
     if row > #lines then
         start, finish = guide.lineRange(lines, #lines)
-        char = utf8.len(text, start, finish)
+        char = utf8.len(text, start, finish, true)
     else
         start, finish = guide.lineRange(lines, row)
         char = position.character
     end
-    local utf8Len = utf8.len(text, start, finish)
+    local utf8Len = utf8.len(text, start, finish, true)
     local offset
     if char <= 0 then
         offset = start

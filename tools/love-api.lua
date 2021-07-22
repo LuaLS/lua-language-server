@@ -204,6 +204,11 @@ local function buildFile(class, defs)
         end
     end
 
+    if defs.version then
+        text[#text+1] = ''
+        text[#text+1] = ('return %s'):format(class)
+    end
+
     text[#text+1] = ''
 
     fsu.saveFile(filePath, table.concat(text, '\n'))

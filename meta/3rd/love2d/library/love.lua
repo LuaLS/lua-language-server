@@ -276,3 +276,5 @@ function Object:typeOf(name) end
 ---Callback function triggered when the mouse wheel is moved.
 ---
 ---@alias love.wheelmoved fun(x: number, y: number)
+
+return love

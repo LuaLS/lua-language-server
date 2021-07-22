@@ -15,7 +15,19 @@ configs = {
         key    = 'Lua.diagnostics.globals',
         action = 'add',
         value  = 'global1',
-    }
+    },
+    {
+        key    = 'Lua.runtime.special',
+        action = 'prop',
+        prop   = 'include',
+        value  = 'require',
+    },
+    {
+        key    = 'Lua.runtime.builtin',
+        action = 'prop',
+        prop   = 'io',
+        value  = 'disable',
+    },
 }
 for _, name in ipairs {'global2', 'global3', 'global4'} do
     configs[#configs+1] = {

@@ -1,5 +1,8 @@
 # changelog
 
+## 2.3.3
+* `NEW` config supports prop
+
 ## 2.3.2
 `2021-7-21`
 * `NEW` `LuaDoc`: supports `['string']` as field:

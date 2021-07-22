@@ -254,6 +254,29 @@ function m.add(key, value)
     return true
 end
 
+function m.prop(key, prop, value)
+    local unit = Template[key]
+    if not unit then
+        return false
+    end
+    local map = rawConfig[key]
+    if type(map) ~= 'table' then
+        return false
+    end
+    if util.equal(map[prop], value) then
+        return false
+    end
+    local copyed = {}
+    for k, v in pairs(map) do
+        copyed[k] = v
+    end
+    copyed[prop] = value
+    if unit:checker(copyed) then
+        update(key, unit:loader(copyed), copyed)
+    end
+    return true
+end
+
 function m.get(key)
     return config[key]
 end

@@ -2755,3 +2755,16 @@ local c
 c:on('$')
 ]]
 (EXISTS)
+
+TEST [[
+local m = {}
+
+function m.f()
+end
+
+m.f()
+m.$
+]]
+{
+    [1] = EXISTS,
+}

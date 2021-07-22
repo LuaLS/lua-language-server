@@ -512,6 +512,7 @@ end
 
 local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, results, locals, isGlobal)
     local fields = {}
+    local funcs  = {}
     local count = 0
     for _, src in ipairs(refs) do
         local name = vm.getKeyName(src)
@@ -543,11 +544,15 @@ local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, res
                         end
                     end
                 end
+                funcs[name] = true
+                if fields[name] and not guide.isSet(fields[name]) then
+                    fields[name] = nil
+                end
                 goto CONTINUE
             end
         end
         local last = fields[name]
-        if last == nil then
+        if last == nil and not funcs[name] then
             fields[name] = src
             count = count + 1
             goto CONTINUE
@@ -555,12 +560,7 @@ local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, res
         if vm.isDeprecated(src) then
             goto CONTINUE
         end
-        if src.type == 'tablefield'
-        or src.type == 'setfield'
-        or src.type == 'tableindex'
-        or src.type == 'setindex'
-        or src.type == 'setmethod'
-        or src.type == 'setglobal' then
+        if guide.isSet(src) then
             fields[name] = src
             goto CONTINUE
         end

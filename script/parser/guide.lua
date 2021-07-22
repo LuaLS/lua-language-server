@@ -782,7 +782,10 @@ function m.isSet(source)
     or tp == 'setindex'
     or tp == 'tablefield'
     or tp == 'tableindex'
-    or tp == 'tableexp' then
+    or tp == 'tableexp'
+    or tp == 'doc.field.name'
+    or tp == 'doc.field'
+    or tp == 'doc.type.field' then
         return true
     end
     if tp == 'call' then

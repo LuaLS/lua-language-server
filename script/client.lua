@@ -38,6 +38,26 @@ function m.getOption(name)
     return option
 end
 
+function m.getAbility(name)
+    local current = m.info.capabilities
+    while true do
+        local parent, nextPos = name:match '^([^%.]+)()'
+        if not parent then
+            break
+        end
+        current = current[parent]
+        if not current then
+            return nil
+        end
+        if nextPos > #name then
+            break
+        else
+            name = name:sub(nextPos + 1)
+        end
+    end
+    return current
+end
+
 local function packMessage(...)
     local strs = table.pack(...)
     for i = 1, strs.n do

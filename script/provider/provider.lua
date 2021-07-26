@@ -212,8 +212,8 @@ proto.on('textDocument/didOpen', function (params)
     local uri   = doc.uri
     local text  = doc.text
     log.debug('didOpen', uri)
-    files.open(uri)
     files.setText(uri, text, true)
+    files.open(uri)
 end)
 
 proto.on('textDocument/didClose', function (params)

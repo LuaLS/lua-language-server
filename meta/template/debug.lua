@@ -47,10 +47,10 @@ function debug.gethook(co) end
 ---|+'"S"'     # ---#DESTAIL 'infowhat.S'
 ---|+'"l"'     # ---#DESTAIL 'infowhat.l'
 ---|+'"t"'     # ---#DESTAIL 'infowhat.t'
----#if VERSION <= 5.1 then
----|+'"u<5.1"' # ---#DESTAIL 'infowhat.u<5.1'
+---#if VERSION <= 5.1 and not JIT then
+---|+'"u"' # ---#DESTAIL 'infowhat.u<5.1'
 ---#else
----|+'"u>5.2"' # ---#DESTAIL 'infowhat.u>5.2'
+---|+'"u"' # ---#DESTAIL 'infowhat.u>5.2'
 ---#end
 ---|+'"f"'     # ---#DESTAIL 'infowhat.f'
 ---#if VERSION >= 5.4 then
@@ -66,7 +66,7 @@ function debug.gethook(co) end
 ---@return debuginfo
 function debug.getinfo(thread, f, what) end
 
----#if VERSION <= 5.1 then
+---#if VERSION <= 5.1 and not JIT then
 ---#DES 'debug.getlocal<5.1'
 ---@overload fun(level: integer, index: integer):string, any
 ---@param thread  thread
@@ -109,7 +109,7 @@ function debug.getupvalue(f, up) end
 ---@return any
 ---@return boolean
 function debug.getuservalue(u, n) end
----#elseif VERSION >= 5.2 then
+---#elseif VERSION >= 5.2 or JIT then
 ---#DES 'debug.getuservalue<5.3'
 ---@param u userdata
 ---@return any
@@ -173,7 +173,7 @@ function debug.setupvalue(f, up, value) end
 ---@param n     integer
 ---@return userdata udata
 function debug.setuservalue(udata, value, n) end
----#elseif VERSION >= 5.2 then
+---#elseif VERSION >= 5.2 or JIT then
 ---#DES 'debug.setuservalue<5.3'
 ---@param udata userdata
 ---@param value any
@@ -188,14 +188,14 @@ function debug.setuservalue(udata, value) end
 ---@return string  message
 function debug.traceback(thread, message, level) end
 
----@version >5.2
+---@version >5.2, JIT
 ---#DES 'debug.upvalueid'
 ---@param f function
 ---@param n integer
 ---@return lightuserdata id
 function debug.upvalueid(f, n) end
 
----@version >5.2
+---@version >5.2, JIT
 ---#DES 'debug.upvaluejoin'
 ---@param f1 function
 ---@param n1 integer

@@ -77,7 +77,7 @@ function ipairs(t) end
 ---| '"t"'  # ---#DESTAIL 'loadmode.t'
 ---|>'"bt"' # ---#DESTAIL 'loadmode.bt'
 
----#if VERSION <= 5.1 then
+---#if VERSION <= 5.1 and not JIT then
 ---#DES 'load<5.1'
 ---@param func       function
 ---@param chunkname? string
@@ -95,7 +95,7 @@ function load(func, chunkname) end
 function load(chunk, chunkname, mode, env) end
 ---#end
 
----#if VERSION <= 5.1 then
+---#if VERSION <= 5.1 and not JIT then
 ---#DES 'loadfile'
 ---@param filename? string
 ---@return function

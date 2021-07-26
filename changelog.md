@@ -4,6 +4,7 @@
 * `NEW` config supports prop
 * `FIX` [#612](https://github.com/sumneko/lua-language-server/issues/612)
 * `FIX` [#613](https://github.com/sumneko/lua-language-server/issues/613)
+* `FIX` [#620](https://github.com/sumneko/lua-language-server/issues/620)
 
 ## 2.3.2
 `2021-7-21`

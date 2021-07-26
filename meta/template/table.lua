@@ -35,7 +35,7 @@ function table.maxn(table) end
 ---@return table a2
 function table.move(a1, f, e, t, a2) end
 
----@version >5.2
+---@version >5.2, JIT
 ---#DES 'table.pack'
 ---@return table
 function table.pack(...) end
@@ -51,7 +51,7 @@ function table.remove(list, pos) end
 ---@param comp fun(a: any, b: any):boolean
 function table.sort(list, comp) end
 
----@version >5.2
+---@version >5.2, JIT
 ---#DES 'table.unpack'
 ---@param list table
 ---@param i?   integer

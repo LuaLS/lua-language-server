@@ -96,7 +96,7 @@ function string.pack(fmt, v1, v2, ...) end
 ---@return integer
 function string.packsize(fmt) end
 
----#if VERSION <= 5.1 then
+---#if VERSION <= 5.1 and not JIT then
 ---#DES 'string.rep<5.1'
 ---@param s    string
 ---@param n    integer

@@ -99,7 +99,7 @@ function math.frexp(x) end
 ---@return number
 function math.ldexp(m, e) end
 
----#if VERSION <= 5.1 then
+---#if VERSION <= 5.1 and not JIT then
 ---#DES 'math.log<5.1'
 ---@param x     number
 ---@return number

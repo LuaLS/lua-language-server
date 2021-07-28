@@ -651,7 +651,10 @@ function m.searchRefsByID(status, uri, expect, mode)
         local tid = id .. (field or '')
         footprint(status, ('checkGlobal:%s + %s'):format(id, field, tid))
         local crossed = {}
-        if mode == 'def' or mode == 'alldef' or mode == 'field' then
+        if mode == 'def'
+        or mode == 'alldef'
+        or mode == 'field'
+        or field then
             for _, guri in collector.each('def:' .. id) do
                 if files.eq(uri, guri) then
                     goto CONTINUE

@@ -272,7 +272,7 @@ local function stop(status, msg)
 end
 
 local function checkSLock(status, slock, id, field)
-    if noder.getIDLength(id) > 20 then
+    if noder.getIDLength(id) > 100 then
         stop(status, 'too long!')
         return false
     end

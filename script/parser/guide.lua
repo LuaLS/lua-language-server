@@ -688,39 +688,43 @@ function m.eachSpecialOf(ast, name, callback)
     end
 end
 
---- 获取偏移对应的坐标
+--- 获取光标偏移对应的坐标。
+--- 如果在换行符的右侧，则认为在新的一行。
+--- 第一行的行号是1不是0。
 ---@param lines table
 ---@return integer {name = 'row'}
 ---@return integer {name = 'col'}
 function m.positionOf(lines, offset)
-    if offset < 1 then
-        return 0, 0
+    if offset <= 0 then
+        return 1, 0
     end
     local lastLine = lines[#lines]
-    if offset > lastLine.finish then
-        return #lines, offset - lastLine.start + 1
+    if offset >= lastLine.finish then
+        return #lines, lastLine.finish - lastLine.start
     end
     local min = 1
     local max = #lines
     for _ = 1, 100 do
         if max <= min then
             local line = lines[min]
-            return min, offset - line.start + 1
+            return min, offset - line.start
         end
         local row = (max - min) // 2 + min
         local line = lines[row]
         if offset < line.start then
             max = row - 1
-        elseif offset > line.finish then
+        elseif offset >= line.finish then
             min = row + 1
         else
-            return row, offset - line.start + 1
+            return row, offset - line.start
         end
     end
     error('Stack overflow!')
 end
 
---- 获取坐标对应的偏移
+--- 获取坐标对应的光标偏移。
+--- 一定会落在当前行的换行符左侧。
+--- 第一行的行号是1不是0。
 ---@param lines table
 ---@param row integer
 ---@param col integer
@@ -734,13 +738,13 @@ function m.offsetOf(lines, row, col)
         return lastLine.finish
     end
     local line = lines[row]
-    local len = line.finish - line.start + 1
+    local len = line.range - line.start
     if col < 0 then
         return line.start
     elseif col > len then
-        return line.finish
+        return line.range
     else
-        return line.start + col - 1
+        return line.start + col
     end
 end
 

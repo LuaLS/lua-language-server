@@ -1172,18 +1172,18 @@ local function buildLuaDoc(comment)
 end
 
 ---当前行在注释doc前是否有代码
-local function haveCodeBeforeDocInCurLine(lineData, docStartCol)
-    return docStartCol > lineData.sp + lineData.tab + 3
+local function haveCodeBeforeDocInCurLine(text, lineData, docStartCol)
+    return text:sub(lineData.start + 1, docStartCol - 1):find '[^ \t]'
 end
 
-local function isNextLine(lns, binded, doc)
+local function isNextLine(lns, text, binded, doc)
     if not binded then
         return false
     end
     local lastDoc = binded[#binded]
     local lastDocStartRow, lastDocStartCol = guide.positionOf(lns, lastDoc.originalComment.start)
     local lastDocStartLineData = guide.lineData(lns, lastDocStartRow)
-    if haveCodeBeforeDocInCurLine(lastDocStartLineData, lastDocStartCol) then
+    if haveCodeBeforeDocInCurLine(text, lastDocStartLineData, lastDocStartCol) then
         return false
     end
 
@@ -1340,6 +1340,7 @@ local function bindDoc(sources, lns, binded)
 end
 
 local function bindDocs(state)
+    local text = state.lua
     local sources = {}
     guide.eachSource(state.ast, function (src)
         if src.type == 'local'
@@ -1361,7 +1362,7 @@ local function bindDocs(state)
     end)
     local binded
     for _, doc in ipairs(state.ast.docs) do
-        if not isNextLine(Lines, binded, doc) then
+        if not isNextLine(Lines, text, binded, doc) then
             bindDoc(sources, Lines, binded)
             binded = {}
             state.ast.docs.groups[#state.ast.docs.groups+1] = binded

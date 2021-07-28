@@ -257,12 +257,14 @@ end
 local function stop(status, msg)
     if TEST then
         if FOOTPRINT then
+            log.debug(status.mode)
             log.debug(table.concat(status.footprint, '\n'))
         end
         error(msg)
     else
         log.warn(msg)
         if FOOTPRINT then
+            log.debug(status.mode)
             log.debug(table.concat(status.footprint, '\n'))
         end
         return
@@ -649,7 +651,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         local tid = id .. (field or '')
         footprint(status, ('checkGlobal:%s + %s'):format(id, field, tid))
         local crossed = {}
-        if mode == 'def' or mode == 'alldef' then
+        if mode == 'def' or mode == 'alldef' or mode == 'field' then
             for _, guri in collector.each('def:' .. id) do
                 if files.eq(uri, guri) then
                     goto CONTINUE
@@ -662,7 +664,7 @@ function m.searchRefsByID(status, uri, expect, mode)
                 if crossed[guri] then
                     goto CONTINUE
                 end
-                if mode == 'def' or mode == 'alldef' then
+                if mode == 'def' or mode == 'alldef' or mode == 'field' then
                     goto CONTINUE
                 end
                 if files.eq(uri, guri) then
@@ -1053,6 +1055,7 @@ function m.status(mode)
         ftag      = {},
         btag      = {},
         dontCross = 0,
+        mode      = mode,
         cache     = vm.getCache('searcher:' .. mode)
     }
     return status

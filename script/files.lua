@@ -278,13 +278,17 @@ function m.getWords(uri)
     end
     local mark = {}
     for word in text:gmatch '([%a_][%w_]+)' do
-        if #word >= 3 and not mark[word] then
-            mark[word] = true
-            local head = word:sub(1, 2)
-            if not words[head] then
-                words[head] = {}
+        if #word >= 3 then
+            if not mark[word] then
+                mark[word] = true
+                local head = word:sub(1, 2)
+                if not words[head] then
+                    words[head] = {}
+                end
+                words[head][word] = true
             end
-            words[head][#words[head]+1] = word
+        else
+            words[word] = true
         end
     end
     return words
@@ -301,6 +305,30 @@ function m.getWordsOfHead(uri, head)
         return nil
     end
     return words[head]
+end
+
+---@param uri uri
+---@param word string
+---@return boolean
+function m.hasWord(uri, word)
+    uri = getUriKey(uri)
+    local file = m.fileMap[uri]
+    if not file then
+        return false
+    end
+    local words = m.getWords(uri)
+    if not words then
+        return false
+    end
+    if #word <= 2 then
+        return words[word] == true
+    end
+    local head = word:sub(1, 2)
+    local headWords = words[head]
+    if not headWords then
+        return false
+    end
+    return headWords[word] == true
 end
 
 --- 获取文件版本

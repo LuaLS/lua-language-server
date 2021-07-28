@@ -640,7 +640,7 @@ local function checkCommon(myUri, word, text, offset, results)
             if not words then
                 goto CONTINUE
             end
-            for _, str in ipairs(words) do
+            for str in pairs(words) do
                 if #results >= 100 then
                     break
                 end

@@ -191,6 +191,7 @@ function m.setText(uri, text, isTrust, instance)
     file.text       = newText
     file.trusted    = isTrust
     file.originText = text
+    file.words      = nil
     m.linesMap[uri] = nil
     m.originLinesMap[uri] = nil
     m.astMap[uri] = nil
@@ -258,6 +259,48 @@ function m.setCachedRows(uri, rows)
         return
     end
     file.rows = rows
+end
+
+function m.getWords(uri)
+    uri = getUriKey(uri)
+    local file = m.fileMap[uri]
+    if not file then
+        return
+    end
+    if file.words then
+        return file.words
+    end
+    local words = {}
+    file.words = words
+    local text = file.text
+    if not text then
+        return
+    end
+    local mark = {}
+    for word in text:gmatch '([%a_][%w_]+)' do
+        if #word >= 3 and not mark[word] then
+            mark[word] = true
+            local head = word:sub(1, 2)
+            if not words[head] then
+                words[head] = {}
+            end
+            words[head][#words[head]+1] = word
+        end
+    end
+    return words
+end
+
+function m.getWordsOfHead(uri, head)
+    uri = getUriKey(uri)
+    local file = m.fileMap[uri]
+    if not file then
+        return nil
+    end
+    local words = m.getWords(uri)
+    if not words then
+        return nil
+    end
+    return words[head]
 end
 
 --- 获取文件版本

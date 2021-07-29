@@ -1172,8 +1172,18 @@ local function buildLuaDoc(comment)
 end
 
 ---当前行在注释doc前是否有代码
-local function haveCodeBeforeDocInCurLine(text, lineData, docStartCol)
-    return text:sub(lineData.start + 1, docStartCol - 1):find '[^ \t]'
+local function haveCodeBeforeDocInCurLine(text, lineData, docStart)
+    return text:sub(lineData.start + 1, docStart - 1):find '[%w_]'
+end
+
+local function isTailComment(lns, text, binded, doc)
+    local lastDoc = binded[#binded]
+    local lastDocStartRow = guide.positionOf(lns, lastDoc.originalComment.start)
+    local lastDocStartLineData = guide.lineData(lns, lastDocStartRow)
+    if haveCodeBeforeDocInCurLine(text, lastDocStartLineData, lastDoc.originalComment.start) then
+        return true
+    end
+    return false
 end
 
 local function isNextLine(lns, text, binded, doc)
@@ -1181,12 +1191,6 @@ local function isNextLine(lns, text, binded, doc)
         return false
     end
     local lastDoc = binded[#binded]
-    local lastDocStartRow, lastDocStartCol = guide.positionOf(lns, lastDoc.originalComment.start)
-    local lastDocStartLineData = guide.lineData(lns, lastDocStartRow)
-    if haveCodeBeforeDocInCurLine(text, lastDocStartLineData, lastDocStartCol) then
-        return false
-    end
-
     local lastRow = guide.positionOf(lns, lastDoc.finish)
     local newRow  = guide.positionOf(lns, doc.start)
     return newRow - lastRow == 1
@@ -1368,6 +1372,10 @@ local function bindDocs(state)
             state.ast.docs.groups[#state.ast.docs.groups+1] = binded
         end
         binded[#binded+1] = doc
+        if isTailComment(Lines, text, binded, doc) then
+            bindDoc(sources, Lines, binded)
+            binded = nil
+        end
     end
     bindDoc(sources, Lines, binded)
 end

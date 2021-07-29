@@ -306,10 +306,6 @@ local function stop(status, msg)
 end
 
 local function checkSLock(status, slock, id, field)
-    if noder.getIDLength(id) > 100 then
-        stop(status, 'too long!')
-        return false
-    end
     local cmark = slock[id]
     if not cmark then
         cmark = {}

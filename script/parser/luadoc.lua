@@ -1382,7 +1382,6 @@ local function bindDocs(state)
     tracy.ZoneEnd()
 end
 
-require 'tracy'.enable()
 return function (_, state)
     tracy.ZoneBeginN('luadoc')
     local _ <close> = tracy.ZoneEnd

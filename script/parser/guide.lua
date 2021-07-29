@@ -581,7 +581,11 @@ end
 
 --- 添加child
 function m.addChilds(list, obj)
-    local f = compiledChildMap[obj.type]
+    local tp = obj.type
+    if not tp then
+        return
+    end
+    local f = compiledChildMap[tp]
     if not f then
         return
     end
@@ -689,22 +693,19 @@ end
 function m.eachSource(ast, callback)
     local cache = ast.eachCache
     if not cache then
-        cache = {}
+        cache = { ast }
         ast.eachCache = cache
-        local list = { ast }
         local mark = {}
         local index = 1
         while true do
-            local obj = list[index]
+            local obj = cache[index]
             if not obj then
-                return
+                break
             end
-            list[index] = false
-            cache[index] = obj
             index = index + 1
             if not mark[obj] then
                 mark[obj] = true
-                m.addChilds(list, obj)
+                m.addChilds(cache, obj)
             end
         end
     end

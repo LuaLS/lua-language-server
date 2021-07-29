@@ -6,13 +6,15 @@ local files     = require 'files'
 local SPLIT_CHAR     = '\x1F'
 local LAST_REGEX     = SPLIT_CHAR .. '[^' .. SPLIT_CHAR .. ']*$'
 local FIRST_REGEX    = '^[^' .. SPLIT_CHAR .. ']*'
-local HEAD_REGEX    = '^' .. SPLIT_CHAR .. '?[^' .. SPLIT_CHAR .. ']*'
+local HEAD_REGEX     = '^' .. SPLIT_CHAR .. '?[^' .. SPLIT_CHAR .. ']*'
+local STRING_CHAR    = '.'
 local ANY_FIELD_CHAR = '*'
 local INDEX_CHAR     = '['
 local RETURN_INDEX   = SPLIT_CHAR .. '#'
 local PARAM_INDEX    = SPLIT_CHAR .. '&'
 local TABLE_KEY      = SPLIT_CHAR .. '<'
 local WEAK_TABLE_KEY = SPLIT_CHAR .. '<<'
+local STRING_FIELD   = SPLIT_CHAR .. STRING_CHAR
 local INDEX_FIELD    = SPLIT_CHAR .. INDEX_CHAR
 local ANY_FIELD      = SPLIT_CHAR .. ANY_FIELD_CHAR
 local WEAK_ANY_FIELD = SPLIT_CHAR .. ANY_FIELD_CHAR .. ANY_FIELD_CHAR
@@ -111,24 +113,24 @@ local getKeyMap = util.switch()
     : call(function (source)
         local node = source.node
         if node.tag == '_ENV' then
-            return ('%q'):format(source[1] or ''), nil
+            return STRING_CHAR .. (source[1] or ''), nil
         else
-            return ('%q'):format(source[1] or ''), node
+            return STRING_CHAR .. (source[1] or ''), node
         end
     end)
     : case 'getfield'
     : case 'setfield'
     : call(function (source)
-        return ('%q'):format(source.field and source.field[1] or ''), source.node
+        return STRING_CHAR .. (source.field and source.field[1] or ''), source.node
     end)
     : case 'tablefield'
     : call(function (source)
-        return ('%q'):format(source.field and source.field[1] or ''), source.parent
+        return STRING_CHAR .. (source.field and source.field[1] or ''), source.parent
     end)
     : case 'getmethod'
     : case 'setmethod'
     : call(function (source)
-        return ('%q'):format(source.method and source.method[1] or ''), source.node
+        return STRING_CHAR .. (source.method and source.method[1] or ''), source.node
     end)
     : case 'setindex'
     : case 'getindex'
@@ -137,11 +139,12 @@ local getKeyMap = util.switch()
         if not index then
             return INDEX_CHAR, source.node
         end
-        if index.type == 'string'
-        or index.type == 'boolean'
-        or index.type == 'integer'
-        or index.type == 'number' then
-            return ('%q'):format(index[1] or ''), source.node
+        if index.type == 'string' then
+            return STRING_CHAR .. (index[1] or ''), source.node
+        elseif index.type == 'boolean'
+        or     index.type == 'integer'
+        or     index.type == 'number' then
+            return tostring(index[1] or ''), source.node
         else
             return INDEX_CHAR, source.node
         end
@@ -152,11 +155,12 @@ local getKeyMap = util.switch()
         if not index then
             return ANY_FIELD_CHAR, source.parent
         end
-        if index.type == 'string'
-        or index.type == 'boolean'
-        or index.type == 'integer'
-        or index.type == 'number' then
-            return ('%q'):format(index[1] or ''), source.parent
+        if index.type == 'string' then
+            return STRING_CHAR .. (index[1] or ''), source.parent
+        elseif index.type == 'boolean'
+        or     index.type == 'integer'
+        or     index.type == 'number' then
+            return tostring(index[1] or ''), source.parent
         elseif index.type ~= 'function'
         and    index.type ~= 'table' then
             return ANY_FIELD_CHAR, source.parent
@@ -232,7 +236,7 @@ local getKeyMap = util.switch()
                 return nil, nil
             end
             if key.type == 'string' then
-                return ('%q'):format(key[1] or ''), tbl
+                return STRING_CHAR .. (key[1] or ''), tbl
             else
                 return '', tbl
             end
@@ -307,7 +311,7 @@ local getKeyMap = util.switch()
     end)
     : case 'doc.see.field'
     : call(function (source)
-        return ('%q'):format(source[1]), source.parent.name
+        return STRING_CHAR .. (source[1]), source.parent.name
     end)
     : case 'generic.closure'
     : call(function (source)
@@ -474,6 +478,8 @@ end
 local m = {}
 
 m.SPLIT_CHAR     = SPLIT_CHAR
+m.STRING_CHAR    = STRING_CHAR
+m.STRING_FIELD   = STRING_FIELD
 m.RETURN_INDEX   = RETURN_INDEX
 m.PARAM_INDEX    = PARAM_INDEX
 m.TABLE_KEY      = TABLE_KEY
@@ -705,9 +711,9 @@ local function compileCallReturn(noders, call, sourceID, returnIndex)
         local metaID = getID(call.args and call.args[2])
         local indexID
         if metaID then
-            indexID = ('%s%s%q'):format(
+            indexID = ('%s%s%s'):format(
                 metaID,
-                SPLIT_CHAR,
+                STRING_FIELD,
                 '__index'
             )
         end
@@ -826,11 +832,21 @@ function m.compileDocValue(noders, tp, id, source)
         pushForward(noders, keyID, 'dn:string')
         pushForward(noders, valueID, getID(firstField.extends))
         for _, field in ipairs(source.fields) do
-            local extendsID = ('%s%s%q'):format(
-                id,
-                SPLIT_CHAR,
-                field.name[1]
-            )
+            local fname = field.name[1]
+            local extendsID
+            if type(fname) == 'string' then
+                extendsID = ('%s%s%s'):format(
+                    id,
+                    STRING_FIELD,
+                    fname
+                )
+            else
+                extendsID = ('%s%s%s'):format(
+                    id,
+                    SPLIT_CHAR,
+                    fname
+                )
+            end
             pushForward(noders, extendsID, getID(field))
             pushForward(noders, extendsID, getID(field.extends))
         end
@@ -947,11 +963,20 @@ function m.compileNode(noders, source)
         for _, field in ipairs(source.fields) do
             local key = field.field[1]
             if key then
-                local keyID = ('%s%s%q'):format(
-                    id,
-                    SPLIT_CHAR,
-                    key
-                )
+                local keyID
+                if type(key) == 'string' then
+                    keyID = ('%s%s%s'):format(
+                        id,
+                        STRING_FIELD,
+                        key
+                    )
+                else
+                    keyID = ('%s%s%s'):format(
+                        id,
+                        SPLIT_CHAR,
+                        key
+                    )
+                end
                 pushForward(noders, keyID, getID(field.field))
                 pushForward(noders, getID(field.field), keyID)
                 pushForward(noders, keyID, getID(field.extends))

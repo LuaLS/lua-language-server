@@ -959,7 +959,12 @@ function m.findGlobals(uri, mode, name)
     local status = m.status(mode)
 
     if name then
-        local fullID = ('g:%q'):format(name)
+        local fullID
+        if type(name) == 'string' then
+            fullID = ('%s%s%s'):format('g:', noder.STRING_CHAR, name)
+        else
+            fullID = ('%s%s%s'):format('g:', '', name)
+        end
         searchAllGlobalByUri(status, mode, uri, fullID)
     else
         searchAllGlobalByUri(status, mode, uri)
@@ -1019,13 +1024,23 @@ function m.searchFields(status, source, mode, field)
         end
     else
         if source.special == '_G' then
-            local fullID = ('g:%q'):format(field)
+            local fullID
+            if type(field) == 'string' then
+                fullID = ('%s%s%s'):format('g:', noder.STRING_CHAR, field)
+            else
+                fullID = ('%s%s%s'):format('g:', '', field)
+            end
             if checkCache(status, uri, fullID, mode) then
                 return
             end
             m.searchRefsByID(status, uri, fullID, mode)
         else
-            local fullID = ('%s%s%q'):format(id, noder.SPLIT_CHAR, field)
+            local fullID
+            if type(field) == 'string' then
+                fullID = ('%s%s%s'):format(id, noder.STRING_FIELD, field)
+            else
+                fullID = ('%s%s%s'):format(id, noder.SPLIT_CHAR, field)
+            end
             if checkCache(status, uri, fullID, mode) then
                 return
             end

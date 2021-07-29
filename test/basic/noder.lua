@@ -74,39 +74,39 @@ local x
 TEST [[
 print(<?X?>)
 ]] {
-    id   = 'g:"X"',
+    id   = 'g:.X',
 }
 
 TEST [[
 print(<?X?>)
 ]] {
-    id   = 'g:"X"',
+    id   = 'g:.X',
 }
 
 TEST [[
 local x
 print(x.y.<?z?>)
 ]] {
-    id   = 'l:7|"y"|"z"',
+    id   = 'l:7|.y|.z',
 }
 
 TEST [[
 local x
 function x:<?f?>() end
 ]] {
-    id   = 'l:7|"f"',
+    id   = 'l:7|.f',
 }
 
 TEST [[
 print(X.Y.<?Z?>)
 ]] {
-    id   = 'g:"X"|"Y"|"Z"',
+    id   = 'g:.X|.Y|.Z',
 }
 
 TEST [[
 function x:<?f?>() end
 ]] {
-    id   = 'g:"x"|"f"',
+    id   = 'g:.x|.f',
 }
 
 TEST [[
@@ -114,13 +114,13 @@ TEST [[
     <?x?> = 1,
 }
 ]] {
-    id   = 't:1|"x"',
+    id   = 't:1|.x',
 }
 
 TEST [[
 return <?X?>
 ]] {
-    id      = 'g:"X"',
+    id      = 'g:.X',
 }
 
 TEST [[
@@ -128,7 +128,7 @@ function f()
     return <?X?>
 end
 ]] {
-    id      = 'g:"X"',
+    id      = 'g:.X',
 }
 
 TEST [[

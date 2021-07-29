@@ -670,28 +670,32 @@ end
 
 --- 遍历所有的source
 function m.eachSource(ast, callback)
-    local list = { ast }
-    local mark = {}
-    local index = 1
-    while true do
-        local obj = list[index]
-        if not obj then
-            return
-        end
-        list[index] = false
-        index = index + 1
-        if not mark[obj] then
-            mark[obj] = true
-            local res = callback(obj)
-            if res == true then
-                goto CONTINUE
-            end
-            if res == false then
+    local cache = ast.eachCache
+    if not cache then
+        cache = {}
+        ast.eachCache = cache
+        local list = { ast }
+        local mark = {}
+        local index = 1
+        while true do
+            local obj = list[index]
+            if not obj then
                 return
             end
-            m.addChilds(list, obj)
+            list[index] = false
+            cache[index] = obj
+            index = index + 1
+            if not mark[obj] then
+                mark[obj] = true
+                m.addChilds(list, obj)
+            end
         end
-        ::CONTINUE::
+    end
+    for i = 1, #cache do
+        local res = callback(cache[i])
+        if res == false then
+            return
+        end
     end
 end
 

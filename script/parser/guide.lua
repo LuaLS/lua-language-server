@@ -640,8 +640,7 @@ function m.eachSourceBetween(ast, start, finish, callback)
     end
 end
 
---- 遍历所有指定类型的source
-function m.eachSourceType(ast, type, callback)
+local function getSourceTypeCache(ast)
     local cache = ast.typeCache
     if not cache then
         cache = {}
@@ -659,12 +658,30 @@ function m.eachSourceType(ast, type, callback)
             myCache[#myCache+1] = source
         end)
     end
+    return cache
+end
+
+--- 遍历所有指定类型的source
+function m.eachSourceType(ast, type, callback)
+    local cache = getSourceTypeCache(ast)
     local myCache = cache[type]
     if not myCache then
         return
     end
     for i = 1, #myCache do
         callback(myCache[i])
+    end
+end
+
+function m.eachSourceTypes(ast, tps, callback)
+    local cache = getSourceTypeCache(ast)
+    for x = 1, #tps do
+        local tpCache = cache[tps[x]]
+        if tpCache then
+            for i = 1, #tpCache do
+                callback(tpCache[i])
+            end
+        end
     end
 end
 

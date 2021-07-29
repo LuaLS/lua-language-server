@@ -1344,7 +1344,7 @@ local function bindDoc(sources, lns, binded)
     bindClassAndFields(binded)
 end
 
-local bindDocAccept = util.arrayToHash {
+local bindDocAccept = {
     'local'     , 'setlocal'  , 'setglobal',
     'setfield'  , 'setmethod' , 'setindex' ,
     'tablefield', 'tableindex',
@@ -1355,10 +1355,8 @@ local function bindDocs(state)
     tracy.ZoneBeginN('bindDocs #1')
     local text = state.lua
     local sources = {}
-    guide.eachSource(state.ast, function (src)
-        if bindDocAccept[src.type] then
-            sources[#sources+1] = src
-        end
+    guide.eachSourceTypes(state.ast, bindDocAccept, function (src)
+        sources[#sources+1] = src
     end)
     tracy.ZoneEnd()
     tracy.ZoneBeginN('bindDocs #2')

@@ -6,6 +6,23 @@ local ws        = require 'workspace'
 local vm        = require 'vm.vm'
 local collector = require 'core.collector'
 
+local TRACE     = TRACE
+local FOOTPRINT = FOOTPRINT
+local TEST      = TEST
+local log       = log
+local select    = select
+local tostring  = tostring
+local ipairs    = ipairs
+local pairs     = pairs
+local error     = error
+local type      = type
+local tconcat   = table.concat
+local ssub      = string.sub
+local sfind     = string.find
+local sformat   = string.format
+
+_ENV = nil
+
 local ignoredSources = {
     ['int:']             = true,
     ['num:']             = true,
@@ -220,7 +237,7 @@ local function footprint(status, ...)
         for i = 1, n do
             strs[i] = tostring(select(i, ...))
         end
-        status.footprint[#status.footprint+1] = table.concat(strs, '\t', 1, n)
+        status.footprint[#status.footprint+1] = tconcat(strs, '\t', 1, n)
     end
 end
 
@@ -258,14 +275,14 @@ local function stop(status, msg)
     if TEST then
         if FOOTPRINT then
             log.debug(status.mode)
-            log.debug(table.concat(status.footprint, '\n'))
+            log.debug(tconcat(status.footprint, '\n'))
         end
         error(msg)
     else
         log.warn(msg)
         if FOOTPRINT then
             log.debug(status.mode)
-            log.debug(table.concat(status.footprint, '\n'))
+            log.debug(tconcat(status.footprint, '\n'))
         end
         return
     end
@@ -295,7 +312,7 @@ local function checkSLock(status, slock, id, field)
         if cmark[right] then
             return false
         end
-        field = field:sub(1, - #lastID - 1)
+        field = ssub(field, 1, - #lastID - 1)
     end
     return true
 end
@@ -304,7 +321,7 @@ local function isCallID(field)
     if not field then
         return false
     end
-    if field:sub(1, 2) == noder.RETURN_INDEX then
+    if ssub(field, 1, 2) == noder.RETURN_INDEX then
         return true
     end
     return false
@@ -358,7 +375,7 @@ function m.searchRefsByID(status, uri, expect, mode)
             if leftID == id then
                 return
             end
-            rightID = id:sub(#leftID + 1)
+            rightID = ssub(id, #leftID + 1)
             search(leftID, rightID)
             local isCall = isCallID(firstID)
             if isCall then
@@ -433,7 +450,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         if source.special ~= '_G' then
             return
         end
-        local newID = 'g:' .. field:sub(2)
+        local newID = 'g:' .. ssub(field, 2)
         searchID(newID)
     end
 
@@ -633,7 +650,7 @@ function m.searchRefsByID(status, uri, expect, mode)
     local function checkRequire(requireName, field)
         local tid = 'mainreturn' .. (field or '')
         local uris = ws.findUrisByRequirePath(requireName)
-        footprint(status, ('require %q:\n%s'):format(requireName, table.concat(uris, '\n')))
+        footprint(status, 'require:', requireName)
         for _, ruri in ipairs(uris) do
             if not files.eq(uri, ruri) then
                 crossSearch(status, ruri, tid, mode, uri)
@@ -642,14 +659,14 @@ function m.searchRefsByID(status, uri, expect, mode)
     end
 
     local function searchGlobal(id, node, field)
-        if id:sub(1, 2) ~= 'g:' then
+        if ssub(id, 1, 2) ~= 'g:' then
             return
         end
         if checkLock(status, id, field) then
             return
         end
         local tid = id .. (field or '')
-        footprint(status, ('checkGlobal:%s + %s'):format(id, field, tid))
+        footprint(status, 'checkGlobal:', id, field)
         local crossed = {}
         if mode == 'def'
         or mode == 'alldef'
@@ -680,7 +697,7 @@ function m.searchRefsByID(status, uri, expect, mode)
     end
 
     local function searchClass(id, node, field)
-        if id:sub(1, 3) ~= 'dn:' then
+        if ssub(id, 1, 3) ~= 'dn:' then
             return
         end
         if checkLock(status, id, field) then
@@ -706,10 +723,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         local calls = vm.getLinksTo(uri)
         for _, call in ipairs(calls) do
             local curi = guide.getUri(call)
-            local cid  = ('%s%s'):format(
-                noder.getID(call),
-                field or ''
-            )
+            local cid  = noder.getID(call) .. (field or '')
             if not files.eq(curi, uri) then
                 crossSearch(status, curi, cid, mode, uri)
             end
@@ -720,7 +734,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         local locked = elock[id]
         if locked and field then
             if #locked <= #field then
-                if field:sub(-#locked) == locked then
+                if ssub(field, -#locked) == locked then
                     footprint(status, 'elocked:', id, locked, field)
                     return false
                 end
@@ -783,7 +797,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         if not lastID then
             return
         end
-        local originField = id:sub(#lastID + 1)
+        local originField = ssub(id, #lastID + 1)
         if originField == noder.TABLE_KEY
         or originField == noder.WEAK_TABLE_KEY then
             return
@@ -800,7 +814,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         if not lastID then
             return
         end
-        local originField = id:sub(#lastID + 1)
+        local originField = ssub(id, #lastID + 1)
         if originField == noder.WEAK_TABLE_KEY then
             local newID   = lastID .. noder.TABLE_KEY
             local newNode = noder.getNodeByID(root, newID)
@@ -934,8 +948,8 @@ local function searchAllGlobalByUri(status, mode, uri, fullID)
     else
         for id, node in pairs(noders) do
             if  node.source
-            and id:sub(1, 2) == 'g:'
-            and not id:find(noder.SPLIT_CHAR) then
+            and ssub(id, 1, 2) == 'g:'
+            and not sfind(id, noder.SPLIT_CHAR) then
                 for source in noder.eachSource(node) do
                     m.pushResult(status, mode, source)
                 end
@@ -961,9 +975,9 @@ function m.findGlobals(uri, mode, name)
     if name then
         local fullID
         if type(name) == 'string' then
-            fullID = ('%s%s%s'):format('g:', noder.STRING_CHAR, name)
+            fullID = sformat('%s%s%s', 'g:', noder.STRING_CHAR, name)
         else
-            fullID = ('%s%s%s'):format('g:', '', name)
+            fullID = sformat('%s%s%s', 'g:', '', name)
         end
         searchAllGlobalByUri(status, mode, uri, fullID)
     else
@@ -1026,9 +1040,9 @@ function m.searchFields(status, source, mode, field)
         if source.special == '_G' then
             local fullID
             if type(field) == 'string' then
-                fullID = ('%s%s%s'):format('g:', noder.STRING_CHAR, field)
+                fullID = sformat('%s%s%s', 'g:', noder.STRING_CHAR, field)
             else
-                fullID = ('%s%s%s'):format('g:', '', field)
+                fullID = sformat('%s%s%s', 'g:', '', field)
             end
             if checkCache(status, uri, fullID, mode) then
                 return
@@ -1037,9 +1051,9 @@ function m.searchFields(status, source, mode, field)
         else
             local fullID
             if type(field) == 'string' then
-                fullID = ('%s%s%s'):format(id, noder.STRING_FIELD, field)
+                fullID = sformat('%s%s%s', id, noder.STRING_FIELD, field)
             else
-                fullID = ('%s%s%s'):format(id, noder.SPLIT_CHAR, field)
+                fullID = sformat('%s%s%s', id, noder.SPLIT_CHAR, field)
             end
             if checkCache(status, uri, fullID, mode) then
                 return

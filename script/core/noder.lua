@@ -3,9 +3,21 @@ local guide     = require 'parser.guide'
 local collector = require 'core.collector'
 local files     = require 'files'
 
-local tconcat = table.concat
-local ssub    = string.sub
-local sformat = string.format
+local tostring = tostring
+local error    = error
+local ipairs   = ipairs
+local type     = type
+local next     = next
+local log      = log
+local ssub     = string.sub
+local sformat  = string.format
+local sgsub    = string.gsub
+local smatch   = string.match
+local tracy    = tracy
+
+--require 'tracy'.enable()
+
+_ENV = nil
 
 local SPLIT_CHAR     = '\x1F'
 local LAST_REGEX     = SPLIT_CHAR .. '[^' .. SPLIT_CHAR .. ']*$'
@@ -628,7 +640,7 @@ local function bindValue(noders, source, id)
         reject = 'set',
     })
     -- 参数/call禁止反向查找赋值
-    local valueType = valueID:match '^(.-:).'
+    local valueType = smatch(valueID, '^(.-:).')
     if not valueType then
         return
     end
@@ -716,7 +728,7 @@ local function compileCallReturn(noders, call, sourceID, returnIndex)
                 if field then
                     return true
                 end
-                return id:sub(1, 2) ~= 'f:'
+                return ssub(id, 1, 2) ~= 'f:'
             end,
             filterValid = function (id, field)
                 return not field
@@ -953,11 +965,11 @@ compileNodeMap = util.switch()
     : case 'doc.see'
     : call(function (noders, id, source)
         local nameID  = getID(source.name)
-        local classID = nameID:gsub('^dsn:', 'dn:')
+        local classID = sgsub(nameID, '^dsn:', 'dn:')
         pushForward(noders, nameID, classID)
         if source.field then
             local fieldID      = getID(source.field)
-            local fieldClassID = fieldID:gsub('^dsn:', 'dn:')
+            local fieldClassID = sgsub(fieldID, '^dsn:', 'dn:')
             pushForward(noders, fieldID, fieldClassID)
         end
     end)
@@ -1239,7 +1251,7 @@ end
 ---@param id string
 ---@return string
 function m.getFirstID(id)
-    local firstID, count = id:match(FIRST_REGEX)
+    local firstID, count = smatch(id, FIRST_REGEX)
     if count == 0 then
         return nil
     end
@@ -1253,7 +1265,7 @@ end
 ---@param id string
 ---@return string
 function m.getHeadID(id)
-    local headID, count = id:match(HEAD_REGEX)
+    local headID, count = smatch(id, HEAD_REGEX)
     if count == 0 then
         return nil
     end
@@ -1267,7 +1279,7 @@ end
 ---@param id string
 ---@return string
 function m.getLastID(id)
-    local lastID, count = id:gsub(LAST_REGEX, '')
+    local lastID, count = sgsub(id, LAST_REGEX, '')
     if count == 0 then
         return nil
     end
@@ -1284,7 +1296,7 @@ function m.getIDLength(id)
     if not id then
         return 0
     end
-    local _, count = id:gsub(SPLIT_CHAR, SPLIT_CHAR)
+    local _, count = sgsub(id, SPLIT_CHAR, SPLIT_CHAR)
     return count + 1
 end
 
@@ -1296,11 +1308,11 @@ function m.hasField(id)
     if firstID == id or not firstID then
         return false
     end
-    local nextChar = id:sub(#firstID + 1, #firstID + 1)
+    local nextChar = ssub(id, #firstID + 1, #firstID + 1)
     if nextChar ~= SPLIT_CHAR then
         return false
     end
-    local next2Char = id:sub(#firstID + 2, #firstID + 2)
+    local next2Char = ssub(id, #firstID + 2, #firstID + 2)
     if next2Char == RETURN_INDEX
     or next2Char == PARAM_INDEX then
         return false
@@ -1313,7 +1325,7 @@ end
 ---@return uri? string
 ---@return string id
 function m.getUriAndID(id)
-    local uri, newID = id:match(URI_REGEX)
+    local uri, newID = smatch(id, URI_REGEX)
     return uri, newID
 end
 
@@ -1323,10 +1335,10 @@ function m.isCommonField(field)
     if not field then
         return false
     end
-    if field:sub(1, #RETURN_INDEX) == RETURN_INDEX then
+    if ssub(field, 1, #RETURN_INDEX) == RETURN_INDEX then
         return false
     end
-    if field:sub(1, #PARAM_INDEX) == PARAM_INDEX then
+    if ssub(field, 1, #PARAM_INDEX) == PARAM_INDEX then
         return false
     end
     return true
@@ -1412,7 +1424,5 @@ files.watch(function (ev, uri)
         collector.dropUri(uri)
     end
 end)
-
-require 'tracy'.enable()
 
 return m

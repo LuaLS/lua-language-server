@@ -363,8 +363,6 @@ local function getNodeKey(source)
     return key, node
 end
 
-local IDList = {}
-local IDList2 = {}
 ---获取语法树单元的字符串ID
 ---@param source parser.guide.object
 ---@return string? id
@@ -383,38 +381,26 @@ local function getID(source)
     tracy.ZoneBeginN 'getID'
     local _ <close> = tracy.ZoneEnd
     local current = source
-    local index = 0
-    while true do
-        if current.type == 'paren' then
-            current = current.exp
-            if not current then
-                return nil
-            end
-            goto CONTINUE
+    while current.type == 'paren' do
+        current = current.exp
+        if not current then
+            source._id = false
+            return nil
         end
-        local id, node = getNodeKey(current)
-        if not id then
-            break
-        end
-        index = index + 1
-        IDList[index] = id
-        if not node then
-            break
-        end
-        current = node
-        ::CONTINUE::
     end
-    if index == 0 then
+    local id, node = getNodeKey(current)
+    if not id then
         source._id = false
         return nil
     end
-    for i = index + 1, #IDList2 do
-        IDList2[i] = nil
+    if node then
+        local pid = getID(node)
+        if not pid then
+            source._id = false
+            return nil
+        end
+        id = pid .. SPLIT_CHAR .. id
     end
-    for i = 1, index do
-        IDList2[i] = IDList[index - i + 1]
-    end
-    local id = tconcat(IDList2, SPLIT_CHAR)
     source._id = id
     return id
 end
@@ -1427,6 +1413,6 @@ files.watch(function (ev, uri)
     end
 end)
 
---require 'tracy'.enable()
+require 'tracy'.enable()
 
 return m

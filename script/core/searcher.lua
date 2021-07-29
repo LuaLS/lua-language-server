@@ -5,6 +5,7 @@ local generic   = require 'core.generic'
 local ws        = require 'workspace'
 local vm        = require 'vm.vm'
 local collector = require 'core.collector'
+local util      = require 'utility'
 
 local TRACE     = TRACE
 local FOOTPRINT = FOOTPRINT
@@ -49,6 +50,88 @@ local m = {}
 
 ---@alias guide.searchmode '"ref"'|'"def"'|'"field"'|'"allref"'|'"alldef"'
 
+local pushDefResultsMap = util.switch()
+    : case 'local'
+    : case 'setlocal'
+    : case 'setglobal'
+    : case 'label'
+    : case 'setfield'
+    : case 'setmethod'
+    : case 'setindex'
+    : case 'tableindex'
+    : case 'tablefield'
+    : case 'tableexp'
+    : case 'function'
+    : case 'table'
+    : case 'doc.class.name'
+    : case 'doc.alias.name'
+    : case 'doc.field.name'
+    : case 'doc.type.enum'
+    : case 'doc.resume'
+    : case 'doc.type.array'
+    : case 'doc.type.table'
+    : case 'doc.type.ltable'
+    : case 'doc.type.field'
+    : case 'doc.type.function'
+    : call(function (source, status)
+        return true
+    end)
+    : case 'call'
+    : call(function (source, status)
+        if source.node.special == 'rawset' then
+            return true
+        end
+    end)
+    : getMap()
+
+local pushRefResultsMap = util.switch()
+    : case 'local'
+    : case 'setlocal'
+    : case 'getlocal'
+    : case 'setglobal'
+    : case 'getglobal'
+    : case 'label'
+    : case 'goto'
+    : case 'setfield'
+    : case 'getfield'
+    : case 'setmethod'
+    : case 'getmethod'
+    : case 'setindex'
+    : case 'getindex'
+    : case 'tableindex'
+    : case 'tablefield'
+    : case 'tableexp'
+    : case 'function'
+    : case 'table'
+    : case 'string'
+    : case 'boolean'
+    : case 'number'
+    : case 'integer'
+    : case 'nil'
+    : case 'doc.class.name'
+    : case 'doc.type.name'
+    : case 'doc.alias.name'
+    : case 'doc.extends.name'
+    : case 'doc.field.name'
+    : case 'doc.type.enum'
+    : case 'doc.resume'
+    : case 'doc.type.array'
+    : case 'doc.type.table'
+    : case 'doc.type.ltable'
+    : case 'doc.type.field'
+    : case 'doc.type.function'
+    : call(function (source, status)
+        return true
+    end)
+    : case 'call'
+    : call(function (source, status)
+        if source.node.special == 'rawset'
+        or source.node.special == 'rawget' then
+            return true
+        end
+    end)
+    : getMap()
+
 ---添加结果
 ---@param status guide.status
 ---@param mode   guide.searchmode
@@ -68,92 +151,26 @@ function m.pushResult(status, mode, source, force)
         results[#results+1] = source
         return
     end
-    local parent = source.parent
+
     if mode == 'def' or mode == 'alldef' then
-        if source.type == 'local'
-        or source.type == 'setlocal'
-        or source.type == 'setglobal'
-        or source.type == 'label'
-        or source.type == 'setfield'
-        or source.type == 'setmethod'
-        or source.type == 'setindex'
-        or source.type == 'tableindex'
-        or source.type == 'tablefield'
-        or source.type == 'tableexp'
-        or source.type == 'function'
-        or source.type == 'table'
-        or source.type == 'doc.class.name'
-        or source.type == 'doc.alias.name'
-        or source.type == 'doc.field.name'
-        or source.type == 'doc.type.enum'
-        or source.type == 'doc.resume'
-        or source.type == 'doc.type.array'
-        or source.type == 'doc.type.table'
-        or source.type == 'doc.type.ltable'
-        or source.type == 'doc.type.field'
-        or source.type == 'doc.type.function' then
+        local f = pushDefResultsMap[source.type]
+        if f and f(source, status) then
             results[#results+1] = source
             return
-        end
-        if source.type == 'call' then
-            if source.node.special == 'rawset' then
-                results[#results+1] = source
-            end
-        end
-        if parent.type == 'return' then
-            if noder.getID(source) ~= status.id then
-                results[#results+1] = source
-            end
         end
     elseif mode == 'ref' or mode == 'field' or mode == 'allref' then
-        if source.type == 'local'
-        or source.type == 'setlocal'
-        or source.type == 'getlocal'
-        or source.type == 'setglobal'
-        or source.type == 'getglobal'
-        or source.type == 'label'
-        or source.type == 'goto'
-        or source.type == 'setfield'
-        or source.type == 'getfield'
-        or source.type == 'setmethod'
-        or source.type == 'getmethod'
-        or source.type == 'setindex'
-        or source.type == 'getindex'
-        or source.type == 'tableindex'
-        or source.type == 'tablefield'
-        or source.type == 'tableexp'
-        or source.type == 'function'
-        or source.type == 'table'
-        or source.type == 'string'
-        or source.type == 'boolean'
-        or source.type == 'number'
-        or source.type == 'integer'
-        or source.type == 'nil'
-        or source.type == 'doc.class.name'
-        or source.type == 'doc.type.name'
-        or source.type == 'doc.alias.name'
-        or source.type == 'doc.extends.name'
-        or source.type == 'doc.field.name'
-        or source.type == 'doc.type.enum'
-        or source.type == 'doc.resume'
-        or source.type == 'doc.type.array'
-        or source.type == 'doc.type.table'
-        or source.type == 'doc.type.ltable'
-        or source.type == 'doc.type.field'
-        or source.type == 'doc.type.function' then
+        local f = pushRefResultsMap[source.type]
+        if f and f(source, status) then
             results[#results+1] = source
             return
         end
-        if source.type == 'call' then
-            if source.node.special == 'rawset'
-            or source.node.special == 'rawget' then
-                results[#results+1] = source
-            end
-        end
-        if parent.type == 'return' then
-            if noder.getID(source) ~= status.id then
-                results[#results+1] = source
-            end
+    end
+
+    local parent = source.parent
+    if parent.type == 'return' then
+        if noder.getID(source) ~= status.id then
+            results[#results+1] = source
+            return
         end
     end
 end

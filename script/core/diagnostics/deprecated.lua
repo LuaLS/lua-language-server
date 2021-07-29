@@ -7,6 +7,7 @@ local define   = require 'proto.define'
 local await    = require 'await'
 local noder    = require 'core.noder'
 
+local types = {'getglobal', 'getfield', 'getindex', 'getmethod'}
 return function (uri, callback)
     local ast = files.getState(uri)
     if not ast then
@@ -15,13 +16,7 @@ return function (uri, callback)
 
     local cache = {}
 
-    guide.eachSource(ast.ast, function (src)
-        if  src.type ~= 'getglobal'
-        and src.type ~= 'getfield'
-        and src.type ~= 'getindex'
-        and src.type ~= 'getmethod' then
-            return
-        end
+    guide.eachSourceTypes(ast.ast, types, function (src)
         if src.type == 'getglobal' then
             local key = src[1]
             if not key then
@@ -50,6 +45,8 @@ return function (uri, callback)
             cache[id] = true
             return
         end
+
+        await.delay()
 
         local defs = vm.getDefs(src)
         local validVersions

@@ -1199,6 +1199,7 @@ compileNodeMap = util.switch()
             f(noders, id, source)
         end
     end)
+    : getMap()
 
 ---@param noders noders
 ---@param source parser.guide.object
@@ -1426,6 +1427,6 @@ files.watch(function (ev, uri)
     end
 end)
 
-require 'tracy'.enable()
+--require 'tracy'.enable()
 
 return m

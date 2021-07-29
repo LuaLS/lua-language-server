@@ -13,9 +13,6 @@ local ssub     = string.sub
 local sformat  = string.format
 local sgsub    = string.gsub
 local smatch   = string.match
-local tracy    = tracy
-
---require 'tracy'.enable()
 
 _ENV = nil
 
@@ -390,8 +387,6 @@ local function getID(source)
         source._id = false
         return nil
     end
-    tracy.ZoneBeginN 'getID'
-    local _ <close> = tracy.ZoneEnd
     local current = source
     while current.type == 'paren' do
         current = current.exp
@@ -1396,18 +1391,12 @@ function m.compileNodes(source)
     if next(noders) then
         return noders
     end
-    tracy.ZoneBeginN 'compileNodes'
     log.debug('compileNodes:', guide.getUri(root))
     collector.dropUri(guide.getUri(root))
     guide.eachSource(root, function (src)
-        tracy.ZoneBeginN 'pushSource'
         m.pushSource(noders, src)
-        tracy.ZoneEnd()
-        tracy.ZoneBeginN 'compileNode'
         m.compileNode(noders, src)
-        tracy.ZoneEnd()
     end)
-    tracy.ZoneEnd()
     log.debug('compileNodes finish:', guide.getUri(root))
     return noders
 end

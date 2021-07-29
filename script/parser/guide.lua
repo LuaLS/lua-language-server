@@ -822,20 +822,23 @@ function m.lineData(lines, row)
     return lines[row]
 end
 
+local isSetMap = {
+    ['setglobal']      = true,
+    ['local']          = true,
+    ['setlocal']       = true,
+    ['setfield']       = true,
+    ['setmethod']      = true,
+    ['setindex']       = true,
+    ['tablefield']     = true,
+    ['tableindex']     = true,
+    ['tableexp']       = true,
+    ['doc.field.name'] = true,
+    ['doc.field']      = true,
+    ['doc.type.field'] = true,
+}
 function m.isSet(source)
     local tp = source.type
-    if tp == 'setglobal'
-    or tp == 'local'
-    or tp == 'setlocal'
-    or tp == 'setfield'
-    or tp == 'setmethod'
-    or tp == 'setindex'
-    or tp == 'tablefield'
-    or tp == 'tableindex'
-    or tp == 'tableexp'
-    or tp == 'doc.field.name'
-    or tp == 'doc.field'
-    or tp == 'doc.type.field' then
+    if isSetMap[tp] then
         return true
     end
     if tp == 'call' then
@@ -847,13 +850,16 @@ function m.isSet(source)
     return false
 end
 
+local isGetMap = {
+    ['getglobal'] = true,
+    ['getlocal']  = true,
+    ['getfield']  = true,
+    ['getmethod'] = true,
+    ['getindex']  = true,
+}
 function m.isGet(source)
     local tp = source.type
-    if tp == 'getglobal'
-    or tp == 'getlocal'
-    or tp == 'getfield'
-    or tp == 'getmethod'
-    or tp == 'getindex' then
+    if isGetMap[tp] then
         return true
     end
     if tp == 'call' then

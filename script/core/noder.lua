@@ -3,6 +3,10 @@ local guide     = require 'parser.guide'
 local collector = require 'core.collector'
 local files     = require 'files'
 
+local tconcat = table.concat
+local ssub    = string.sub
+local sformat = string.format
+
 local SPLIT_CHAR     = '\x1F'
 local LAST_REGEX     = SPLIT_CHAR .. '[^' .. SPLIT_CHAR .. ']*$'
 local FIRST_REGEX    = '^[^' .. SPLIT_CHAR .. ']*'
@@ -221,7 +225,7 @@ local getKeyMap = util.switch()
     end)
     : case 'select'
     : call(function (source)
-        return ('s:%d%s%d'):format(source.start, RETURN_INDEX, source.sindex)
+        return sformat('s:%d%s%d', source.start, RETURN_INDEX, source.sindex)
     end)
     : case 'call'
     : call(function (source)
@@ -323,10 +327,10 @@ local getKeyMap = util.switch()
         if guide.getUri(source.closure.call) ~= guide.getUri(source.proto) then
             tail = URI_CHAR .. guide.getUri(source.closure.call)
         end
-        return ('gv:%s|%s%s'):format(
-            source.closure.call.start,
-            getKey(source.proto),
-            tail
+        return sformat('gv:%s|%s%s'
+            , source.closure.call.start
+            , getKey(source.proto)
+            , tail
         )
     end)
     : getMap()
@@ -360,6 +364,7 @@ local function getNodeKey(source)
 end
 
 local IDList = {}
+local IDList2 = {}
 ---获取语法树单元的字符串ID
 ---@param source parser.guide.object
 ---@return string? id
@@ -403,11 +408,13 @@ local function getID(source)
         source._id = false
         return nil
     end
-    for i = index + 1, #IDList do
-        IDList[i] = nil
+    for i = index + 1, #IDList2 do
+        IDList2[i] = nil
     end
-    util.revertTable(IDList)
-    local id = table.concat(IDList, SPLIT_CHAR)
+    for i = 1, index do
+        IDList2[i] = IDList[index - i + 1]
+    end
+    local id = tconcat(IDList2, SPLIT_CHAR)
     source._id = id
     return id
 end
@@ -678,12 +685,12 @@ local function compileCallParam(noders, call, sourceID)
         if firstIndex > 0 and callArg.type == 'function' then
             if callArg.args then
                 for secondIndex, funcParam in ipairs(callArg.args) do
-                    local paramID = ('%s%s%s%s%s'):format(
-                        nodeID,
-                        PARAM_INDEX,
-                        firstIndex,
-                        PARAM_INDEX,
-                        secondIndex
+                    local paramID = sformat('%s%s%s%s%s'
+                        , nodeID
+                        , PARAM_INDEX
+                        , firstIndex
+                        , PARAM_INDEX
+                        , secondIndex
                     )
                     pushForward(noders, getID(funcParam), paramID)
                 end
@@ -711,10 +718,10 @@ local function compileCallReturn(noders, call, sourceID, returnIndex)
         local metaID = getID(call.args and call.args[2])
         local indexID
         if metaID then
-            indexID = ('%s%s%s'):format(
-                metaID,
-                STRING_FIELD,
-                '__index'
+            indexID = sformat('%s%s%s'
+                , metaID
+                , STRING_FIELD
+                , '__index'
             )
         end
         pushForward(noders, sourceID, tblID)
@@ -753,10 +760,10 @@ local function compileCallReturn(noders, call, sourceID, returnIndex)
         if not funcID then
             return
         end
-        local pfuncXID = ('%s%s%s'):format(
-            funcID,
-            RETURN_INDEX,
-            index
+        local pfuncXID = sformat('%s%s%s'
+            , funcID
+            , RETURN_INDEX
+            , index
         )
         pushForward(noders, sourceID, pfuncXID)
         pushBackward(noders, pfuncXID, sourceID, {
@@ -764,10 +771,10 @@ local function compileCallReturn(noders, call, sourceID, returnIndex)
         })
         return
     end
-    local funcXID = ('%s%s%s'):format(
-        nodeID,
-        RETURN_INDEX,
-        returnIndex
+    local funcXID = sformat('%s%s%s'
+        , nodeID
+        , RETURN_INDEX
+        , returnIndex
     )
     getNode(noders, sourceID).call = call
     pushForward(noders, sourceID, funcXID)
@@ -776,8 +783,59 @@ local function compileCallReturn(noders, call, sourceID, returnIndex)
     })
 end
 
-function m.compileDocValue(noders, tp, id, source)
-    if tp == 'doc.type' then
+local specialMap = util.arrayToHash {
+    'require', 'dofile', 'loadfile',
+    'rawset', 'rawget', 'setmetatable',
+}
+
+local compileNodeMap
+compileNodeMap = util.switch()
+    : case 'string'
+    : call(function (noders, id, source)
+        pushForward(noders, id, 'str:')
+    end)
+    : case 'boolean'
+    : call(function (noders, id, source)
+        pushForward(noders, id, 'dn:boolean')
+    end)
+    : case 'number'
+    : call(function (noders, id, source)
+        pushForward(noders, id, 'dn:number')
+    end)
+    : case 'integer'
+    : call(function (noders, id, source)
+        pushForward(noders, id, 'dn:integer')
+    end)
+    : case 'nil'
+    : call(function (noders, id, source)
+        pushForward(noders, id, 'dn:nil')
+    end)
+    -- self -> mt:xx
+    : case 'local'
+    : call(function (noders, id, source)
+        if source[1] ~= 'self' then
+            return
+        end
+        local func = guide.getParentFunction(source)
+        if func.isGeneric then
+            return
+        end
+        if source.parent.type ~= 'funcargs' then
+            return
+        end
+        local setmethod = func.parent
+        -- guess `self`
+        if setmethod and ( setmethod.type == 'setmethod'
+                        or setmethod.type == 'setfield'
+                        or setmethod.type == 'setindex') then
+            pushForward(noders, id, getID(setmethod.node))
+            pushBackward(noders, getID(setmethod.node), id, {
+                deep = true,
+            })
+        end
+    end)
+    : case 'doc.type'
+    : call(function (noders, id, source)
         if source.bindSources then
             for _, src in ipairs(source.bindSources) do
                 pushForward(noders, getID(src), id)
@@ -799,154 +857,63 @@ function m.compileDocValue(noders, tp, id, source)
                 end
             end
         end
-    end
-    if tp == 'doc.type.table' then
+    end)
+    : case 'doc.type.table'
+    : call(function (noders, id, source)
         if source.tkey then
-            local keyID = ('%s%s'):format(
-                id,
-                TABLE_KEY
-            )
+            local keyID = id .. TABLE_KEY
             pushForward(noders, keyID, getID(source.tkey))
         end
         if source.tvalue then
-            local valueID = ('%s%s'):format(
-                id,
-                ANY_FIELD
-            )
+            local valueID = id .. ANY_FIELD
             pushForward(noders, valueID, getID(source.tvalue))
         end
-    end
-    if tp == 'doc.type.ltable' then
+    end)
+    : case 'doc.type.ltable'
+    : call(function (noders, id, source)
         local firstField = source.fields[1]
         if not firstField then
             return
         end
-        local keyID = ('%s%s'):format(
-            id,
-            WEAK_TABLE_KEY
-        )
-        local valueID = ('%s%s'):format(
-            id,
-            WEAK_ANY_FIELD
-        )
+        local keyID   = id .. WEAK_TABLE_KEY
+        local valueID = id .. WEAK_ANY_FIELD
         pushForward(noders, keyID, 'dn:string')
         pushForward(noders, valueID, getID(firstField.extends))
         for _, field in ipairs(source.fields) do
             local fname = field.name[1]
             local extendsID
             if type(fname) == 'string' then
-                extendsID = ('%s%s%s'):format(
-                    id,
-                    STRING_FIELD,
-                    fname
+                extendsID = sformat('%s%s%s'
+                    , id
+                    , STRING_FIELD
+                    , fname
                 )
             else
-                extendsID = ('%s%s%s'):format(
-                    id,
-                    SPLIT_CHAR,
-                    fname
+                extendsID = sformat('%s%s%s'
+                    , id
+                    , SPLIT_CHAR
+                    , fname
                 )
             end
             pushForward(noders, extendsID, getID(field))
             pushForward(noders, extendsID, getID(field.extends))
         end
-    end
-    if tp == 'doc.type.array' then
+    end)
+    : case 'doc.type.array'
+    : call(function (noders, id, source)
         if source.node then
-            local nodeID = ('%s%s'):format(
-                id,
-                ANY_FIELD
-            )
+            local nodeID = id .. ANY_FIELD
             pushForward(noders, nodeID, getID(source.node))
         end
-        local keyID = ('%s%s'):format(
-            id,
-            TABLE_KEY
-        )
+        local keyID = id .. TABLE_KEY
         pushForward(noders, keyID, 'dn:integer')
-    end
-end
-
----@param noders noders
----@param source parser.guide.object
----@return parser.guide.object[]
-function m.compileNode(noders, source)
-    local id = getID(source)
-    bindValue(noders, source, id)
-    if source.special == 'setmetatable'
-    or source.special == 'require'
-    or source.special == 'dofile'
-    or source.special == 'loadfile'
-    or source.special == 'rawset'
-    or source.special == 'rawget' then
-        local node = getNode(noders, id)
-        node.skip = true
-    end
-    if source.type == 'string' then
-        pushForward(noders, id, 'str:')
-    end
-    if source.type == 'boolean' then
-        pushForward(noders, id, 'dn:boolean')
-    end
-    if source.type == 'number' then
-        pushForward(noders, id, 'dn:number')
-    end
-    if source.type == 'integer' then
-        pushForward(noders, id, 'dn:integer')
-    end
-    if source.type == 'nil' then
-        pushForward(noders, id, 'dn:nil')
-    end
-    -- self -> mt:xx
-    if source.type == 'local' and source[1] == 'self' then
-        local func = guide.getParentFunction(source)
-        if func.isGeneric then
-            return
-        end
-        if source.parent.type ~= 'funcargs' then
-            return
-        end
-        local setmethod = func.parent
-        -- guess `self`
-        if setmethod and ( setmethod.type == 'setmethod'
-                        or setmethod.type == 'setfield'
-                        or setmethod.type == 'setindex') then
-            pushForward(noders, id, getID(setmethod.node))
-            pushBackward(noders, getID(setmethod.node), id, {
-                deep = true,
-            })
-        end
-    end
-    -- 分解 @type
-    --if source.type == 'doc.type' then
-    --    if source.bindSources then
-    --        for _, src in ipairs(source.bindSources) do
-    --            pushForward(noders, getID(src), id)
-    --            pushForward(noders, id, getID(src))
-    --        end
-    --    end
-    --    for _, enumUnit in ipairs(source.enums) do
-    --        pushForward(noders, id, getID(enumUnit))
-    --    end
-    --    for _, resumeUnit in ipairs(source.resumes) do
-    --        pushForward(noders, id, getID(resumeUnit))
-    --    end
-    --    for _, typeUnit in ipairs(source.types) do
-    --        local unitID = getID(typeUnit)
-    --        pushForward(noders, id, unitID)
-    --        if source.bindSources then
-    --            for _, src in ipairs(source.bindSources) do
-    --                pushBackward(noders, unitID, getID(src))
-    --            end
-    --        end
-    --    end
-    --end
-    -- 分解 @alias
-    if source.type == 'doc.alias' then
+    end)
+    : case 'doc.alias'
+    : call(function (noders, id, source)
         pushForward(noders, getID(source.alias), getID(source.extends))
-    end
-    -- 分解 @class
-    if source.type == 'doc.class' then
+    end)
+    : case 'doc.class'
+    : call(function (noders, id, source)
         pushForward(noders, id, getID(source.class))
         pushForward(noders, getID(source.class), id)
         if source.extends then
@@ -965,16 +932,16 @@ function m.compileNode(noders, source)
             if key then
                 local keyID
                 if type(key) == 'string' then
-                    keyID = ('%s%s%s'):format(
-                        id,
-                        STRING_FIELD,
-                        key
+                    keyID = sformat('%s%s%s'
+                        , id
+                        , STRING_FIELD
+                        , key
                     )
                 else
-                    keyID = ('%s%s%s'):format(
-                        id,
-                        SPLIT_CHAR,
-                        key
+                    keyID = sformat('%s%s%s'
+                        , id
+                        , SPLIT_CHAR
+                        , key
                     )
                 end
                 pushForward(noders, keyID, getID(field.field))
@@ -983,19 +950,22 @@ function m.compileNode(noders, source)
                 pushBackward(noders, getID(field.extends), keyID)
             end
         end
-    end
-    if source.type == 'doc.param' then
+    end)
+    : case 'doc.param'
+    : call(function (noders, id, source)
         pushForward(noders, id, getID(source.extends))
         for _, src in ipairs(source.bindSources) do
             if src.type == 'local' and src.parent.type == 'in' then
                 pushForward(noders, getID(src), id)
             end
         end
-    end
-    if source.type == 'doc.vararg' then
+    end)
+    : case 'doc.vararg'
+    : call(function (noders, id, source)
         pushForward(noders, getID(source), getID(source.vararg))
-    end
-    if source.type == 'doc.see' then
+    end)
+    : case 'doc.see'
+    : call(function (noders, id, source)
         local nameID  = getID(source.name)
         local classID = nameID:gsub('^dsn:', 'dn:')
         pushForward(noders, nameID, classID)
@@ -1004,15 +974,16 @@ function m.compileNode(noders, source)
             local fieldClassID = fieldID:gsub('^dsn:', 'dn:')
             pushForward(noders, fieldID, fieldClassID)
         end
-    end
-    m.compileDocValue(noders, source.type, id, source)
-    if source.type == 'call' then
+    end)
+    : case 'call'
+    : call(function (noders, id, source)
         if source.parent.type ~= 'select' then
             compileCallReturn(noders, source, id, 1)
         end
         compileCallParam(noders, source, id)
-    end
-    if source.type == 'select' then
+    end)
+    : case 'select'
+    : call(function (noders, id, source)
         if source.vararg.type == 'call' then
             local call = source.vararg
             compileCallReturn(noders, call, id, source.sindex)
@@ -1020,22 +991,23 @@ function m.compileNode(noders, source)
         if source.vararg.type == 'varargs' then
             pushForward(noders, id, getID(source.vararg))
         end
-    end
-    if source.type == 'doc.type.function' then
+    end)
+    : case 'doc.type.function'
+    : call(function (noders, id, source)
         if source.returns then
             for index, rtn in ipairs(source.returns) do
-                local returnID = ('%s%s%s'):format(
-                    id,
-                    RETURN_INDEX,
-                    index
+                local returnID = sformat('%s%s%s'
+                    , id
+                    , RETURN_INDEX
+                    , index
                 )
                 pushForward(noders, returnID, getID(rtn))
             end
             for index, param in ipairs(source.args) do
-                local paramID = ('%s%s%s'):format(
-                    id,
-                    PARAM_INDEX,
-                    index
+                local paramID = sformat('%s%s%s'
+                    , id
+                    , PARAM_INDEX
+                    , index
                 )
                 pushForward(noders, paramID, getID(param.extends))
             end
@@ -1050,13 +1022,15 @@ function m.compileNode(noders, source)
                 end
             end)
         end
-    end
-    if source.type == 'doc.type.name' then
+    end)
+    : case 'doc.type.name'
+    : call(function (noders, id, source)
         local uri = guide.getUri(source)
         collector.subscribe(uri, id, getNode(noders, id))
-    end
-    if source.type == 'doc.class.name'
-    or source.type == 'doc.alias.name' then
+    end)
+    : case 'doc.class.name'
+    : case 'doc.alias.name'
+    : call(function (noders, id, source)
         local uri = guide.getUri(source)
         collector.subscribe(uri, id, getNode(noders, id))
 
@@ -1067,35 +1041,19 @@ function m.compileNode(noders, source)
         local defAnyID = 'def:dn:'
         collector.subscribe(uri, defAnyID, getNode(noders, defAnyID))
         m.pushSource(noders, source, defAnyID)
-    end
-    if id and id:sub(1, 2) == 'g:' then
-        local uri = guide.getUri(source)
-        collector.subscribe(uri, id, getNode(noders, id))
-        if guide.isSet(source) then
-
-            local defID = 'def:' .. id
-            collector.subscribe(uri, defID, getNode(noders, defID))
-            m.pushSource(noders, source, defID)
-
-            if guide.isGlobal(source) then
-                local defAnyID = 'def:g:'
-                collector.subscribe(uri, defAnyID, getNode(noders, defAnyID))
-                m.pushSource(noders, source, defAnyID)
-            end
-        end
-    end
-    -- 将函数的返回值映射到具体的返回值上
-    if source.type == 'function' then
+    end)
+    : case 'function'
+    : call(function (noders, id, source)
         local hasDocReturn = {}
         -- 检查 luadoc
         if source.bindDocs then
             for _, doc in ipairs(source.bindDocs) do
                 if doc.type == 'doc.return' then
                     for _, rtn in ipairs(doc.returns) do
-                        local fullID = ('%s%s%s'):format(
-                            id,
-                            RETURN_INDEX,
-                            rtn.returnIndex
+                        local fullID = sformat('%s%s%s'
+                            , id
+                            , RETURN_INDEX
+                            , rtn.returnIndex
                         )
                         pushForward(noders, fullID, getID(rtn))
                         for _, typeUnit in ipairs(rtn.types) do
@@ -1115,10 +1073,10 @@ function m.compileNode(noders, source)
                         if param then
                             pushForward(noders, getID(param), getID(doc))
                             param.docParam = doc
-                            local paramID = ('%s%s%s'):format(
-                                id,
-                                PARAM_INDEX,
-                                paramIndex
+                            local paramID = sformat('%s%s%s'
+                                , id
+                                , PARAM_INDEX
+                                , paramIndex
                             )
                             pushForward(noders, paramID, getID(doc.extends))
                         end
@@ -1155,10 +1113,10 @@ function m.compileNode(noders, source)
                 end
             end
             for index, rtnObjs in ipairs(returns) do
-                local returnID = ('%s%s%s'):format(
-                    id,
-                    RETURN_INDEX,
-                    index
+                local returnID = sformat('%s%s%s'
+                    , id
+                    , RETURN_INDEX
+                    , index
                 )
                 for _, rtnObj in ipairs(rtnObjs) do
                     pushForward(noders, returnID, getID(rtnObj))
@@ -1169,31 +1127,20 @@ function m.compileNode(noders, source)
                 end
             end
         end
-    end
-    if source.type == 'table' then
+    end)
+    : case 'table'
+    : call(function (noders, id, source)
         local firstField = source[1]
         if firstField then
             if firstField.type == 'varargs' then
-                local keyID = ('%s%s'):format(
-                    id,
-                    TABLE_KEY
-                )
-                local valueID = ('%s%s'):format(
-                    id,
-                    ANY_FIELD
-                )
+                local keyID   = id .. TABLE_KEY
+                local valueID = id .. ANY_FIELD
                 source.array = firstField
                 pushForward(noders, keyID, 'dn:integer')
                 pushForward(noders, valueID, getID(firstField))
             else
-                local keyID = ('%s%s'):format(
-                    id,
-                    WEAK_TABLE_KEY
-                )
-                local valueID = ('%s%s'):format(
-                    id,
-                    WEAK_ANY_FIELD
-                )
+                local keyID   = id .. WEAK_TABLE_KEY
+                local valueID = id .. WEAK_ANY_FIELD
                 if firstField.type == 'tablefield' then
                     pushForward(noders, keyID, 'dn:string')
                     pushForward(noders, valueID, getID(firstField.value))
@@ -1206,8 +1153,9 @@ function m.compileNode(noders, source)
                 end
             end
         end
-    end
-    if source.type == 'main' then
+    end)
+    : case 'main'
+    : call(function (noders, id, source)
         if source.returns then
             for _, rtn in ipairs(source.returns) do
                 local rtnObj = rtn[1]
@@ -1219,19 +1167,21 @@ function m.compileNode(noders, source)
                 end
             end
         end
-    end
-    if source.type == 'generic.closure' then
+    end)
+    : case 'generic.closure'
+    : call(function (noders, id, source)
         for i, rtn in ipairs(source.returns) do
-            local closureID = ('%s%s%s'):format(
-                id,
-                RETURN_INDEX,
-                i
+            local closureID = sformat('%s%s%s'
+                , id
+                , RETURN_INDEX
+                , i
             )
             local returnID = getID(rtn)
             pushForward(noders, closureID, returnID)
         end
-    end
-    if source.type == 'generic.value' then
+    end)
+    : case 'generic.value'
+    : call(function (noders, id, source)
         local proto    = source.proto
         local closure  = source.closure
         local upvalues = closure.upvalues
@@ -1244,13 +1194,44 @@ function m.compileNode(noders, source)
                 end
             end
         end
-        --if proto.type == 'doc.type' then
-        --    for _, tp in ipairs(source.types) do
-        --        pushForward(noders, id, getID(tp))
-        --        pushBackward(noders, getID(tp), id)
-        --    end
-        --end
-        m.compileDocValue(noders, proto.type, id, source)
+        local f = compileNodeMap[proto.type]
+        if f then
+            f(noders, id, source)
+        end
+    end)
+
+---@param noders noders
+---@param source parser.guide.object
+---@return parser.guide.object[]
+function m.compileNode(noders, source)
+    local id = getID(source)
+    bindValue(noders, source, id)
+
+    if specialMap[source.special] then
+        local node = getNode(noders, id)
+        node.skip = true
+    end
+
+    local f = compileNodeMap[source.type]
+    if f then
+        f(noders, id, source)
+    end
+
+    if id and ssub(id, 1, 2) == 'g:' then
+        local uri = guide.getUri(source)
+        collector.subscribe(uri, id, getNode(noders, id))
+        if guide.isSet(source) then
+
+            local defID = 'def:' .. id
+            collector.subscribe(uri, defID, getNode(noders, defID))
+            m.pushSource(noders, source, defID)
+
+            if guide.isGlobal(source) then
+                local defAnyID = 'def:g:'
+                collector.subscribe(uri, defAnyID, getNode(noders, defAnyID))
+                m.pushSource(noders, source, defAnyID)
+            end
+        end
     end
 end
 

@@ -83,7 +83,7 @@ local breakBlockTypes = {
     ['repeat']      = true,
 }
 
-m.childMap = {
+local childMap = {
     ['main']        = {'#', 'docs'},
     ['repeat']      = {'#', 'filter'},
     ['while']       = {'filter', '#'},
@@ -138,6 +138,44 @@ m.childMap = {
     ['doc.overload']       = {'overload', 'comment'},
     ['doc.see']            = {'name', 'field'},
 }
+
+---@type table<string, fun(obj: parser.guide.object, list: parser.guide.object[])>
+local compiledChildMap = setmetatable({}, {__index = function (self, name)
+    local defs = childMap[name]
+    if not defs then
+        self[name] = false
+        return false
+    end
+    local text = {}
+    text[#text+1] = 'local obj, list = ...'
+    for _, def in ipairs(defs) do
+        if def == '#' then
+            text[#text+1] = [[
+for i = 1, #obj do
+    list[#list+1] = obj[i]
+end
+]]
+        elseif type(def) == 'string' and def:sub(1, 1) == '#' then
+            local key = def:sub(2)
+            text[#text+1] = ([[
+local childs = obj.%s
+if childs then
+    for i = 1, #childs do
+        list[#list+1] = childs[i]
+    end
+end
+]]):format(key)
+        elseif type(def) == 'string' then
+            text[#text+1] = ('list[#list+1] = obj.%s'):format(def)
+        else
+            text[#text+1] = ('list[#list+1] = obj[%q]'):format(def)
+        end
+    end
+    local buf = table.concat(text, '\n')
+    local f = load(buf, buf, 't')
+    self[name] = f
+    return f
+end})
 
 m.actionMap = {
     ['main']        = {'#'},
@@ -542,28 +580,12 @@ function m.isBetweenRange(source, tStart, tFinish)
 end
 
 --- 添加child
-function m.addChilds(list, obj, map)
-    local keys = map[obj.type]
-    if keys then
-        for i = 1, #keys do
-            local key = keys[i]
-            if key == '#' then
-                for j = 1, #obj do
-                    list[#list+1] = obj[j]
-                end
-            elseif obj[key] then
-                list[#list+1] = obj[key]
-            elseif type(key) == 'string'
-            and key:sub(1, 1) == '#' then
-                key = key:sub(2)
-                if obj[key] then
-                    for j = 1, #obj[key] do
-                        list[#list+1] = obj[key][j]
-                    end
-                end
-            end
-        end
+function m.addChilds(list, obj)
+    local f = compiledChildMap[obj.type]
+    if not f then
+        return
     end
+    f(obj, list)
 end
 
 --- 遍历所有包含offset的source
@@ -586,7 +608,7 @@ function m.eachSourceContain(ast, offset, callback)
                         return res
                     end
                 end
-                m.addChilds(list, obj, m.childMap)
+                m.addChilds(list, obj)
             end
         end
     end
@@ -612,7 +634,7 @@ function m.eachSourceBetween(ast, start, finish, callback)
                         return res
                     end
                 end
-                m.addChilds(list, obj, m.childMap)
+                m.addChilds(list, obj)
             end
         end
     end
@@ -667,7 +689,7 @@ function m.eachSource(ast, callback)
             if res == false then
                 return
             end
-            m.addChilds(list, obj, m.childMap)
+            m.addChilds(list, obj)
         end
         ::CONTINUE::
     end
@@ -695,6 +717,8 @@ end
 ---@return integer {name = 'row'}
 ---@return integer {name = 'col'}
 function m.positionOf(lines, offset)
+    tracy.ZoneBeginN('positionOf')
+    local _ <close> = tracy.ZoneEnd
     if offset <= 0 then
         return 1, 0
     end

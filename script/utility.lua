@@ -647,4 +647,12 @@ function m.expandPath(path)
     end
 end
 
+function m.arrayToHash(l)
+    local t = {}
+    for i = 1, #l do
+        t[l[i]] = true
+    end
+    return t
+end
+
 return m

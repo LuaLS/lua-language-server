@@ -21,6 +21,7 @@ local mathHuge     = math.huge
 local inf          = 1 / 0
 local nan          = 0 / 0
 local utf8         = utf8
+local error        = error
 
 _ENV = nil
 
@@ -653,6 +654,32 @@ function m.arrayToHash(l)
         t[l[i]] = true
     end
     return t
+end
+
+function m.switch()
+    local map = {}
+    local cachedCases = {}
+    local obj = {
+        case = function (self, name)
+            cachedCases[#cachedCases+1] = name
+            return self
+        end,
+        call = function (self, callback)
+            for i = 1, #cachedCases do
+                local name = cachedCases[i]
+                cachedCases[i] = nil
+                if map[name] then
+                    error('Repeated fields:' .. tostring(name))
+                end
+                map[name] = callback
+            end
+            return self
+        end,
+        getMap = function (self)
+            return map
+        end
+    }
+    return obj
 end
 
 return m

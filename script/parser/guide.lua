@@ -580,7 +580,7 @@ function m.isBetweenRange(source, tStart, tFinish)
 end
 
 --- 添加child
-function m.addChilds(list, obj)
+local function addChilds(list, obj)
     local tp = obj.type
     if not tp then
         return
@@ -612,7 +612,7 @@ function m.eachSourceContain(ast, offset, callback)
                         return res
                     end
                 end
-                m.addChilds(list, obj)
+                addChilds(list, obj)
             end
         end
     end
@@ -638,7 +638,7 @@ function m.eachSourceBetween(ast, start, finish, callback)
                         return res
                     end
                 end
-                m.addChilds(list, obj)
+                addChilds(list, obj)
             end
         end
     end
@@ -705,7 +705,7 @@ function m.eachSource(ast, callback)
             index = index + 1
             if not mark[obj] then
                 mark[obj] = true
-                m.addChilds(cache, obj)
+                addChilds(cache, obj)
             end
         end
     end

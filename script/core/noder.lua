@@ -92,37 +92,47 @@ local function getMethodNode(source)
     end
 end
 
----获取语法树单元的key
----@param source parser.guide.object
----@return string? key
----@return parser.guide.object? node
-local function getKey(source)
-    if     source.type == 'local' then
+local getKey
+local getKeyMap = util.switch()
+    : case 'local'
+    : call(function (source)
         if source.parent.type == 'funcargs' then
             return 'p:' .. source.start, nil
         end
         return 'l:' .. source.start, nil
-    elseif source.type == 'setlocal'
-    or     source.type == 'getlocal' then
+    end)
+    : case 'setlocal'
+    : case 'getlocal'
+    : call(function (source)
         return getKey(source.node)
-    elseif source.type == 'setglobal'
-    or     source.type == 'getglobal' then
+    end)
+    : case 'setglobal'
+    : case 'getglobal'
+    : call(function (source)
         local node = source.node
         if node.tag == '_ENV' then
             return ('%q'):format(source[1] or ''), nil
         else
             return ('%q'):format(source[1] or ''), node
         end
-    elseif source.type == 'getfield'
-    or     source.type == 'setfield' then
+    end)
+    : case 'getfield'
+    : case 'setfield'
+    : call(function (source)
         return ('%q'):format(source.field and source.field[1] or ''), source.node
-    elseif source.type == 'tablefield' then
+    end)
+    : case 'tablefield'
+    : call(function (source)
         return ('%q'):format(source.field and source.field[1] or ''), source.parent
-    elseif source.type == 'getmethod'
-    or     source.type == 'setmethod' then
+    end)
+    : case 'getmethod'
+    : case 'setmethod'
+    : call(function (source)
         return ('%q'):format(source.method and source.method[1] or ''), source.node
-    elseif source.type == 'setindex'
-    or     source.type == 'getindex' then
+    end)
+    : case 'setindex'
+    : case 'getindex'
+    : call(function (source)
         local index = source.index
         if not index then
             return INDEX_CHAR, source.node
@@ -135,7 +145,9 @@ local function getKey(source)
         else
             return INDEX_CHAR, source.node
         end
-    elseif source.type == 'tableindex' then
+    end)
+    : case 'tableindex'
+    : call(function (source)
         local index = source.index
         if not index then
             return ANY_FIELD_CHAR, source.parent
@@ -149,38 +161,66 @@ local function getKey(source)
         and    index.type ~= 'table' then
             return ANY_FIELD_CHAR, source.parent
         end
-    elseif source.type == 'tableexp' then
+    end)
+    : case 'tableexp'
+    : call(function (source)
         return tostring(source.tindex), source.parent
-    elseif source.type == 'table' then
+    end)
+    : case 'table'
+    : call(function (source)
         return 't:' .. source.start, nil
-    elseif source.type == 'label' then
+    end)
+    : case 'label'
+    : call(function (source)
         return 'l:' .. source.start, nil
-    elseif source.type == 'goto' then
+    end)
+    : case 'goto'
+    : call(function (source)
         if source.node then
             return 'l:' .. source.node.start, nil
         end
         return nil, nil
-    elseif source.type == 'function' then
+    end)
+    : case 'function'
+    : call(function (source)
         return 'f:' .. source.start, nil
-    elseif source.type == 'string' then
+    end)
+    : case 'string'
+    : call(function (source)
         return 'str:', nil
-    elseif source.type == 'integer' then
-        return 'int:'
-    elseif source.type == 'number' then
-        return 'num:'
-    elseif source.type == 'boolean' then
-        return 'bool:'
-    elseif source.type == 'nil' then
+    end)
+    : case 'integer'
+    : call(function (source)
+        return 'int:', nil
+    end)
+    : case 'number'
+    : call(function (source)
+        return 'num:', nil
+    end)
+    : case 'boolean'
+    : call(function (source)
+        return 'bool:', nil
+    end)
+    : case 'nil'
+    : call(function (source)
         return 'nil:', nil
-    elseif source.type == '...' then
+    end)
+    : case '...'
+    : call(function (source)
         return 'va:' .. source.start, nil
-    elseif source.type == 'varargs' then
+    end)
+    : case 'varargs'
+    : call(function (source)
         if source.node then
             return 'va:' .. source.node.start, nil
         end
-    elseif source.type == 'select' then
+    end)
+    : case 'select'
+    : call(function (source)
         return ('s:%d%s%d'):format(source.start, RETURN_INDEX, source.sindex)
-    elseif source.type == 'call' then
+    end)
+    : case 'call'
+    : call(function (source)
         local node = source.node
         if node.special == 'rawget'
         or node.special == 'rawset' then
@@ -198,49 +238,83 @@ local function getKey(source)
             end
         end
         return 'c:' .. source.finish, nil
-    elseif source.type == 'doc.class.name'
-    or     source.type == 'doc.alias.name'
-    or     source.type == 'doc.extends.name' then
+    end)
+    : case 'doc.class.name'
+    : case 'doc.alias.name'
+    : case 'doc.extends.name'
+    : call(function (source)
         local name = source[1]
         return 'dn:' .. name, nil
-    elseif source.type == 'doc.type.name' then
+    end)
+    : case 'doc.type.name'
+    : call(function (source)
         local name = source[1]
         if source.typeGeneric then
             return 'dg:' .. source.typeGeneric[name][1].start, nil
         else
             return 'dn:' .. name, nil
         end
-    elseif source.type == 'doc.see.name' then
+    end)
+    : case 'doc.see.name'
+    : call(function (source)
         local name = source[1]
         return 'dsn:' .. name, nil
-    elseif source.type == 'doc.class' then
+    end)
+    : case 'doc.class'
+    : call(function (source)
         return 'dc:' .. source.start
-    elseif source.type == 'doc.type' then
+    end)
+    : case 'doc.type'
+    : call(function (source)
         return 'dt:' .. source.start
-    elseif source.type == 'doc.param' then
+    end)
+    : case 'doc.param'
+    : call(function (source)
         return 'dp:' .. source.start
-    elseif source.type == 'doc.vararg' then
+    end)
+    : case 'doc.vararg'
+    : call(function (source)
         return 'dv:' .. source.start
-    elseif source.type == 'doc.field.name' then
+    end)
+    : case 'doc.field.name'
+    : call(function (source)
         return 'dfn:' .. source.start
-    elseif source.type == 'doc.type.enum'
-    or     source.type == 'doc.resume' then
+    end)
+    : case 'doc.type.enum'
+    : case 'doc.resume'
+    : call(function (source)
         return 'de:' .. source.start
-    elseif source.type == 'doc.type.table' then
+    end)
+    : case 'doc.type.table'
+    : call(function (source)
         return 'dtable:' .. source.start
-    elseif source.type == 'doc.type.ltable' then
+    end)
+    : case 'doc.type.ltable'
+    : call(function (source)
         return 'dltable:' .. source.start
-    elseif source.type == 'doc.type.field' then
+    end)
+    : case 'doc.type.field'
+    : call(function (source)
         return 'dfield:' .. source.start
-    elseif source.type == 'doc.type.array' then
+    end)
+    : case 'doc.type.array'
+    : call(function (source)
         return 'darray:' .. source.finish
-    elseif source.type == 'doc.type.function' then
+    end)
+    : case 'doc.type.function'
+    : call(function (source)
         return 'dfun:' .. source.start, nil
-    elseif source.type == 'doc.see.field' then
+    end)
+    : case 'doc.see.field'
+    : call(function (source)
         return ('%q'):format(source[1]), source.parent.name
-    elseif source.type == 'generic.closure' then
+    end)
+    : case 'generic.closure'
+    : call(function (source)
         return 'gc:' .. source.call.start, nil
-    elseif source.type == 'generic.value' then
+    end)
+    : case 'generic.value'
+    : call(function (source)
         local tail = ''
         if guide.getUri(source.closure.call) ~= guide.getUri(source.proto) then
             tail = URI_CHAR .. guide.getUri(source.closure.call)
@@ -250,8 +324,19 @@ local function getKey(source)
             getKey(source.proto),
             tail
         )
+    end)
+    : getMap()
+
+---获取语法树单元的key
+---@param source parser.guide.object
+---@return string? key
+---@return parser.guide.object? node
+function getKey(source)
+    local f = getKeyMap[source.type]
+    if f then
+        return f(source)
     end
-    return nil, nil
+    return nil
 end
 
 local function getNodeKey(source)
@@ -286,6 +371,8 @@ local function getID(source)
         source._id = false
         return nil
     end
+    tracy.ZoneBeginN 'getID'
+    local _ <close> = tracy.ZoneEnd
     local current = source
     local index = 0
     while true do
@@ -416,19 +503,19 @@ local function getDocStateWithoutCrossFunction(obj)
     error('guide.getDocState overstack')
 end
 
+local dontPushSourceMap = util.arrayToHash {
+    'str:', 'nil:', 'num:', 'int:', 'bool:'
+}
+
 ---添加关联单元
 ---@param noders noders
 ---@param source parser.guide.object
 function m.pushSource(noders, source, id)
-    id = id or m.getID(source)
+    id = id or getID(source)
     if not id then
         return
     end
-    if id == 'str:'
-    or id == 'nil:'
-    or id == 'num:'
-    or id == 'int:'
-    or id == 'bool:' then
+    if dontPushSourceMap[id] then
         return
     end
     local node = getNode(noders, id)
@@ -436,10 +523,12 @@ function m.pushSource(noders, source, id)
         node.source = source
         return
     end
-    if not node.sources then
-        node.sources = {}
+    local sources = node.sources
+    if not sources then
+        sources = {}
+        node.sources = sources
     end
-    node.sources[#node.sources+1] = source
+    sources[#sources+1] = source
 end
 
 local DUMMY_FUNCTION = function () end
@@ -1302,12 +1391,18 @@ function m.compileNodes(source)
     if next(noders) then
         return noders
     end
+    tracy.ZoneBeginN 'compileNodes'
     log.debug('compileNodes:', guide.getUri(root))
     collector.dropUri(guide.getUri(root))
     guide.eachSource(root, function (src)
+        tracy.ZoneBeginN 'pushSource'
         m.pushSource(noders, src)
+        tracy.ZoneEnd()
+        tracy.ZoneBeginN 'compileNode'
         m.compileNode(noders, src)
+        tracy.ZoneEnd()
     end)
+    tracy.ZoneEnd()
     log.debug('compileNodes finish:', guide.getUri(root))
     return noders
 end
@@ -1324,5 +1419,7 @@ files.watch(function (ev, uri)
         collector.dropUri(uri)
     end
 end)
+
+require 'tracy'.enable()
 
 return m

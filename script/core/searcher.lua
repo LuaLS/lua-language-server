@@ -347,7 +347,7 @@ function m.searchRefsByID(status, uri, expect, mode)
     end
     local root = ast.ast
     local searchStep
-    noder.compileNodes(root)
+    local noders = noder.compileNodes(root)
 
     status.id = expect
 
@@ -572,8 +572,8 @@ function m.searchRefsByID(status, uri, expect, mode)
         releaseInfoFilter(id, field, info)
     end
 
-    local function checkForward(id, node, field)
-        for forwardID, info in noder.eachForward(node) do
+    local function checkForward(id, field)
+        for forwardID, info in noder.eachForward(noders, id) do
             if info and not checkInfoBeforeForward(forwardID, field, info) then
                 goto CONTINUE
             end
@@ -621,14 +621,14 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
     end
 
-    local function checkBackward(id, node, field)
+    local function checkBackward(id, field)
         if ignoredIDs[id] then
             return
         end
         if mode ~= 'ref' and mode ~= 'field' and mode ~= 'allref' and not field then
             return
         end
-        for backwardID, info in noder.eachBackward(node) do
+        for backwardID, info in noder.eachBackward(noders, id) do
             if info and not checkInfoBeforeBackward(backwardID, field, info) then
                 goto CONTINUE
             end
@@ -661,6 +661,9 @@ function m.searchRefsByID(status, uri, expect, mode)
     end
 
     local function checkRequire(requireName, field)
+        if not requireName then
+            return
+        end
         local tid = 'mainreturn' .. (field or '')
         local uris = ws.findUrisByRequirePath(requireName)
         footprint(status, 'require:', requireName)
@@ -671,7 +674,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
     end
 
-    local function searchGlobal(id, node, field)
+    local function searchGlobal(id, field)
         if ssub(id, 1, 2) ~= 'g:' then
             return
         end
@@ -709,7 +712,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
     end
 
-    local function searchClass(id, node, field)
+    local function searchClass(id, field)
         if ssub(id, 1, 3) ~= 'dn:' then
             return
         end
@@ -729,7 +732,7 @@ function m.searchRefsByID(status, uri, expect, mode)
         end
     end
 
-    local function checkMainReturn(id, node, field)
+    local function checkMainReturn(id, field)
         if id ~= 'mainreturn' then
             return
         end
@@ -761,41 +764,36 @@ function m.searchRefsByID(status, uri, expect, mode)
         elock[id] = nil
     end
 
-    local function searchNode(id, node, field)
-        if node.call then
-            callStack[#callStack+1] = node.call
-        end
-        if field == nil and node.source and not ignoredSources[id] then
-            for source in noder.eachSource(node) do
+    local function searchNode(id, field)
+        local call = noders.call[id]
+        callStack[#callStack+1] = call
+
+        if field == nil and not ignoredSources[id] then
+            for source in noder.eachSource(noders, id) do
                 local force = genericCallArgs[source]
                 m.pushResult(status, mode, source, force)
             end
         end
 
-        if node.require then
-            checkRequire(node.require, field)
-        end
+        checkRequire(noders.require[id], field)
 
         if lockExpanding(id, field) then
-            if node.forward then
-                checkForward(id, node, field)
-            end
-            if node.backward then
-                checkBackward(id, node, field)
-            end
+            checkForward(id, field)
+            checkBackward(id, field)
             releaseExpanding(id, field)
         end
 
-        if node.source then
-            checkGeneric(node.source, field)
-            checkENV(node.source, field)
+        local source = noders.source[id]
+        if source then
+            checkGeneric(source, field)
+            checkENV(source, field)
         end
 
         if mode == 'allref' or mode == 'alldef' then
-            checkMainReturn(id, node, field)
+            checkMainReturn(id, field)
         end
 
-        if node.call then
+        if call then
             callStack[#callStack] = nil
         end
 
@@ -816,10 +814,7 @@ function m.searchRefsByID(status, uri, expect, mode)
             return
         end
         local anyFieldID   = lastID .. noder.ANY_FIELD
-        local anyFieldNode = noder.getNodeByID(root, anyFieldID)
-        if anyFieldNode then
-            searchNode(anyFieldID, anyFieldNode, field)
-        end
+        searchNode(anyFieldID, field)
     end
 
     local function searchWeak(id, field)
@@ -830,17 +825,11 @@ function m.searchRefsByID(status, uri, expect, mode)
         local originField = ssub(id, #lastID + 1)
         if originField == noder.WEAK_TABLE_KEY then
             local newID   = lastID .. noder.TABLE_KEY
-            local newNode = noder.getNodeByID(root, newID)
-            if newNode then
-                searchNode(newID, newNode, field)
-            end
+            searchNode(newID, field)
         end
         if originField == noder.WEAK_ANY_FIELD then
             local newID   = lastID .. noder.ANY_FIELD
-            local newNode = noder.getNodeByID(root, newID)
-            if newNode then
-                searchNode(newID, newNode, field)
-            end
+            searchNode(newID, field)
         end
     end
 
@@ -860,15 +849,12 @@ function m.searchRefsByID(status, uri, expect, mode)
             return
         end
         searchSpecial(id, field)
-        local node = noder.getNodeByID(root, id)
-        if node then
-            searchNode(id, node, field)
-            if node.skip and field then
-                return
-            end
+        searchNode(id, field)
+        if field and noders.skip[id] then
+            return
         end
-        searchGlobal(id, node, field)
-        searchClass(id, node, field)
+        searchGlobal(id, field)
+        searchClass(id, field)
         splitID(id, field)
         searchAnyField(id, field)
         searchWeak(id, field)
@@ -878,10 +864,10 @@ function m.searchRefsByID(status, uri, expect, mode)
 
     --清除来自泛型的临时对象
     for _, closure in pairs(closureCache) do
-        noder.removeID(root, noder.getID(closure))
+        noder.removeID(noders, noder.getID(closure))
         if closure then
             for _, value in ipairs(closure.values) do
-                noder.removeID(root, noder.getID(value))
+                noder.removeID(noders, noder.getID(value))
             end
         end
     end
@@ -953,7 +939,7 @@ local function searchAllGlobalByUri(status, mode, uri, fullID)
         for id, node in pairs(noders) do
             if  node.source
             and id == fullID then
-                for source in noder.eachSource(node) do
+                for source in noder.eachSource(noders, id) do
                     m.pushResult(status, mode, source)
                 end
             end
@@ -963,7 +949,7 @@ local function searchAllGlobalByUri(status, mode, uri, fullID)
             if  node.source
             and ssub(id, 1, 2) == 'g:'
             and not sfind(id, noder.SPLIT_CHAR) then
-                for source in noder.eachSource(node) do
+                for source in noder.eachSource(noders, id) do
                     m.pushResult(status, mode, source)
                 end
             end

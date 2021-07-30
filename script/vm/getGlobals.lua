@@ -4,7 +4,12 @@ local vm        = require 'vm.vm'
 local noder     = require 'core.noder'
 
 function vm.hasGlobalSets(name)
-    local id = ('def:g:%q'):format(name)
+    local id
+    if type(name) == 'string' then
+        id = ('def:g:%s%s'):format(noder.STRING_CHAR, name)
+    else
+        id = ('def:g:%s'):format(noder.STRING_CHAR, name)
+    end
     return collector.has(id)
 end
 
@@ -19,10 +24,14 @@ function vm.getGlobalSets(name)
     if name == '*' then
         id = 'def:g:'
     else
-        id = ('def:g:%q'):format(name)
+        if type(name) == 'string' then
+            id = ('def:g:%s%s'):format(noder.STRING_CHAR, name)
+        else
+            id = ('def:g:%s'):format(noder.STRING_CHAR, name)
+        end
     end
-    for node in collector.each(id) do
-        for source in noder.eachSource(node) do
+    for noders in collector.each(id) do
+        for source in noder.eachSource(noders, id) do
             results[#results+1] = source
         end
     end

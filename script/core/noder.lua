@@ -34,31 +34,30 @@ local WEAK_ANY_FIELD = SPLIT_CHAR .. ANY_FIELD_CHAR .. ANY_FIELD_CHAR
 local URI_CHAR       = '@'
 local URI_REGEX      = URI_CHAR .. '([^' .. URI_CHAR .. ']*)' .. URI_CHAR .. '(.*)'
 
----@class node
--- 当前节点的id
----@field id     string
--- 使用该ID的单元
----@field source parser.guide.object
--- 使用该ID的单元
----@field sources parser.guide.object[]
--- 前进的关联ID
----@field forward string
--- 第一个前进关联的tag
----@field finfo? node.info
--- 前进的关联ID
----@field forwards string[]
--- 后退的关联ID
----@field backward string
--- 第一个后退关联的tag
----@field binfo? node.info
--- 后退的关联ID
----@field backwards string[]
--- 函数调用参数信息（用于泛型）
----@field call parser.guide.object
----@field skip boolean
-
----@alias noders table<string, node[]>
+---@alias node.id string
 ---@alias node.filter fun(id: string, field?: string):boolean
+
+---@class noders
+-- 使用该ID的单元
+---@field source    table<node.id, parser.guide.object>
+-- 使用该ID的单元
+---@field sources   table<node.id, parser.guide.object[]>
+-- 前进的关联ID
+---@field forward   table<node.id, node.id>
+-- 第一个前进关联的info
+---@field finfo?    table<node.id, node.info>
+-- 前进的关联ID与info
+---@field forwards  table<node.id, node.id[]|table<node.id, node.info>>
+-- 后退的关联ID
+---@field backward  table<node.id, node.id>
+-- 第一个后退关联的info
+---@field binfo?    table<node.id, node.info>
+-- 后退的关联ID与info
+---@field backwards table<node.id, node.id[]|table<node.id, node.info>>
+-- 函数调用参数信息（用于泛型）
+---@field call      table<node.id, parser.guide.object>
+---@field require   table<node.id, string>
+---@field skip      table<node.id, boolean>
 
 ---@class node.info
 ---@field reject?      string
@@ -66,19 +65,6 @@ local URI_REGEX      = URI_CHAR .. '([^' .. URI_CHAR .. ']*)' .. URI_CHAR .. '(.
 ---@field filter?      node.filter
 ---@field filterValid? node.filter
 ---@field dontCross?   boolean
-
----创建source的链接信息
----@param noders noders
----@param id string
----@return node
-local function getNode(noders, id)
-    if not noders[id] then
-        noders[id] = {
-            id = id,
-        }
-    end
-    return noders[id]
-end
 
 ---如果对象是 arg self, 则认为 id 是 method 的 node
 ---@param source parser.guide.object
@@ -424,23 +410,24 @@ local function pushForward(noders, id, forwardID, info)
     or id == forwardID then
         return
     end
-    local node = getNode(noders, id)
-    if not node.forward then
-        node.forward = forwardID
-        node.finfo   = info
+    if not noders.forward[id] then
+        noders.forward[id] = forwardID
+        noders.finfo[id]   = info
         return
     end
-    if node.forward == forwardID then
+    if noders.forward[id] == forwardID then
         return
     end
-    if not node.forwards then
-        node.forwards = {}
+    local forwards = noders.forwards[id]
+    if not forwards then
+        forwards = {}
+        noders.forwards[id] = forwards
     end
-    if node.forwards[forwardID] ~= nil then
+    if forwards[forwardID] ~= nil then
         return
     end
-    node.forwards[forwardID] = info or false
-    node.forwards[#node.forwards+1] = forwardID
+    forwards[forwardID] = info or false
+    forwards[#forwards+1] = forwardID
 end
 
 ---添加关联的后退ID
@@ -455,23 +442,24 @@ local function pushBackward(noders, id, backwardID, info)
     or id == backwardID then
         return
     end
-    local node = getNode(noders, id)
-    if not node.backward then
-        node.backward = backwardID
-        node.binfo    = info
+    if not noders.backward[id] then
+        noders.backward[id] = backwardID
+        noders.binfo[id]    = info
         return
     end
-    if node.backward == backwardID then
+    if noders.backward[id] == backwardID then
         return
     end
-    if not node.backwards then
-        node.backwards = {}
+    local backwards = noders.backwards[id]
+    if not backwards then
+        backwards = {}
+        noders.backwards[id] = backwards
     end
-    if node.backwards[backwardID] ~= nil then
+    if backwards[backwardID] ~= nil then
         return
     end
-    node.backwards[backwardID] = info or false
-    node.backwards[#node.backwards+1] = backwardID
+    backwards[backwardID] = info or false
+    backwards[#backwards+1] = backwardID
 end
 
 ---@class noder
@@ -524,15 +512,14 @@ function m.pushSource(noders, source, id)
     if dontPushSourceMap[id] then
         return
     end
-    local node = getNode(noders, id)
-    if not node.source then
-        node.source = source
+    if not noders.source[id] then
+        noders.source[id] = source
         return
     end
-    local sources = node.sources
+    local sources = noders.sources[id]
     if not sources then
         sources = {}
-        node.sources = sources
+        noders.sources[id] = sources
     end
     sources[#sources+1] = source
 end
@@ -540,18 +527,20 @@ end
 local DUMMY_FUNCTION = function () end
 
 ---遍历关联单元
----@param node node
+---@param noders noders
+---@param id node.id
 ---@return fun():parser.guide.object
-function m.eachSource(node)
-    if not node.source then
+function m.eachSource(noders, id)
+    local source = noders.source[id]
+    if not source then
         return DUMMY_FUNCTION
     end
     local index
-    local sources = node.sources
+    local sources = noders.sources[id]
     return function ()
         if not index then
             index = 0
-            return node.source
+            return source
         end
         if not sources then
             return nil
@@ -562,18 +551,20 @@ function m.eachSource(node)
 end
 
 ---遍历forward
----@param node node
+---@param noders noders
+---@param id node.id
 ---@return fun():string, string
-function m.eachForward(node)
-    if not node.forward then
+function m.eachForward(noders, id)
+    local forward = noders.forward[id]
+    if not forward then
         return DUMMY_FUNCTION
     end
     local index
-    local forwards = node.forwards
+    local forwards = noders.forwards[id]
     return function ()
         if not index then
             index = 0
-            return node.forward, node.finfo
+            return forward, noders.finfo[id]
         end
         if not forwards then
             return nil
@@ -586,18 +577,20 @@ function m.eachForward(node)
 end
 
 ---遍历backward
----@param node node
----@return fun():string, node.info
-function m.eachBackward(node)
-    if not node.backward then
+---@param noders noders
+---@param id node.id
+---@return fun():string, string
+function m.eachBackward(noders, id)
+    local backward = noders.backward[id]
+    if not backward then
         return DUMMY_FUNCTION
     end
     local index
-    local backwards = node.backwards
+    local backwards = noders.backwards[id]
     return function ()
         if not index then
             index = 0
-            return node.backward, node.binfo
+            return backward, noders.binfo[id]
         end
         if not backwards then
             return nil
@@ -736,7 +729,7 @@ local function compileCallReturn(noders, call, sourceID, returnIndex)
     if node.special == 'require' then
         local arg1 = call.args and call.args[1]
         if arg1 and arg1.type == 'string' then
-            getNode(noders, sourceID).require = arg1[1]
+            noders.require[sourceID] = arg1[1]
         end
         pushBackward(noders, callID, sourceID, {
             deep = true,
@@ -769,7 +762,7 @@ local function compileCallReturn(noders, call, sourceID, returnIndex)
         , RETURN_INDEX
         , returnIndex
     )
-    getNode(noders, sourceID).call = call
+    noders.call[sourceID] = call
     pushForward(noders, sourceID, funcXID)
     pushBackward(noders, funcXID, sourceID, {
         deep = true,
@@ -1019,20 +1012,20 @@ compileNodeMap = util.switch()
     : case 'doc.type.name'
     : call(function (noders, id, source)
         local uri = guide.getUri(source)
-        collector.subscribe(uri, id, getNode(noders, id))
+        collector.subscribe(uri, id, noders)
     end)
     : case 'doc.class.name'
     : case 'doc.alias.name'
     : call(function (noders, id, source)
         local uri = guide.getUri(source)
-        collector.subscribe(uri, id, getNode(noders, id))
+        collector.subscribe(uri, id, noders)
 
         local defID = 'def:' .. id
-        collector.subscribe(uri, defID, getNode(noders, defID))
+        collector.subscribe(uri, defID, noders)
         m.pushSource(noders, source, defID)
 
         local defAnyID = 'def:dn:'
-        collector.subscribe(uri, defAnyID, getNode(noders, defAnyID))
+        collector.subscribe(uri, defAnyID, noders)
         m.pushSource(noders, source, defAnyID)
     end)
     : case 'function'
@@ -1202,8 +1195,7 @@ function m.compileNode(noders, source)
     bindValue(noders, source, id)
 
     if specialMap[source.special] then
-        local node = getNode(noders, id)
-        node.skip = true
+        noders.skip[id] = true
     end
 
     local f = compileNodeMap[source.type]
@@ -1213,33 +1205,20 @@ function m.compileNode(noders, source)
 
     if id and ssub(id, 1, 2) == 'g:' then
         local uri = guide.getUri(source)
-        collector.subscribe(uri, id, getNode(noders, id))
+        collector.subscribe(uri, id, noders)
         if guide.isSet(source) then
 
             local defID = 'def:' .. id
-            collector.subscribe(uri, defID, getNode(noders, defID))
+            collector.subscribe(uri, defID, noders)
             m.pushSource(noders, source, defID)
 
             if guide.isGlobal(source) then
                 local defAnyID = 'def:g:'
-                collector.subscribe(uri, defAnyID, getNode(noders, defAnyID))
+                collector.subscribe(uri, defAnyID, noders)
                 m.pushSource(noders, source, defAnyID)
             end
         end
     end
-end
-
----根据ID来获取所有的node
----@param root parser.guide.object
----@param id string
----@return node?
-function m.getNodeByID(root, id)
-    root = guide.getRoot(root)
-    local noders = root._noders
-    if not noders then
-        return nil
-    end
-    return noders[id]
 end
 
 ---根据ID来获取第一个节点的ID
@@ -1354,15 +1333,15 @@ function m.getKey(source)
 end
 
 ---清除临时id（用于泛型的临时对象）
----@param root parser.guide.object
+---@param noders noders
 ---@param id string
-function m.removeID(root, id)
+function m.removeID(noders, id)
     if not id then
         return
     end
-    root = guide.getRoot(root)
-    local noders = root._noders
-    noders[id] = nil
+    for _, t in next, noders do
+        t[id] = nil
+    end
 end
 
 ---寻找doc的主体
@@ -1377,9 +1356,33 @@ end
 function m.getNoders(source)
     local root = guide.getRoot(source)
     if not root._noders then
-        root._noders = {}
+        ---@type noders
+        root._noders = {
+            source    = {},
+            sources   = {},
+            forward   = {},
+            finfo     = {},
+            forwards  = {},
+            backward  = {},
+            binfo     = {},
+            backwards = {},
+            call      = {},
+            require   = {},
+            skip      = {},
+        }
     end
     return root._noders
+end
+
+---获取对象的noders
+---@param uri uri
+---@return noders
+function m.getNodersByUri(uri)
+    local state = files.getState(uri)
+    if not state then
+        return nil
+    end
+    return m.getNoders(state.ast)
 end
 
 ---编译整个文件的node
@@ -1388,9 +1391,10 @@ end
 function m.compileNodes(source)
     local root = guide.getRoot(source)
     local noders = m.getNoders(source)
-    if next(noders) then
+    if root._initedNoders then
         return noders
     end
+    root._initedNoders = true
     log.debug('compileNodes:', guide.getUri(root))
     collector.dropUri(guide.getUri(root))
     guide.eachSource(root, function (src)

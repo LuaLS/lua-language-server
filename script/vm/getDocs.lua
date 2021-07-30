@@ -18,8 +18,8 @@ function vm.getDocDefines(name)
     end
     local results = {}
     local id = 'def:dn:' .. name
-    for node in collector.each(id) do
-        for source in noder.eachSource(node) do
+    for noders in collector.each(id) do
+        for source in noder.eachSource(noders, id) do
             if source.type == 'doc.class.name'
             or source.type == 'doc.alias.name' then
                 results[#results+1] = source

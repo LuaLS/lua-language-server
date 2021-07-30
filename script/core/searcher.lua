@@ -936,18 +936,12 @@ local function searchAllGlobalByUri(status, mode, uri, fullID)
     noder.compileNodes(root)
     local noders = noder.getNoders(root)
     if fullID then
-        for id, node in pairs(noders) do
-            if  node.source
-            and id == fullID then
-                for source in noder.eachSource(noders, id) do
-                    m.pushResult(status, mode, source)
-                end
-            end
+        for source in noder.eachSource(noders, fullID) do
+            m.pushResult(status, mode, source)
         end
     else
-        for id, node in pairs(noders) do
-            if  node.source
-            and ssub(id, 1, 2) == 'g:'
+        for id in pairs(noders.source) do
+            if  ssub(id, 1, 2) == 'g:'
             and not sfind(id, noder.SPLIT_CHAR) then
                 for source in noder.eachSource(noders, id) do
                     m.pushResult(status, mode, source)

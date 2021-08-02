@@ -340,6 +340,34 @@ local function isCallID(field)
     return false
 end
 
+local genercCache = {
+    mark = {},
+    genericCallArgs = {},
+    closureCache = {},
+}
+
+local function flushGeneric()
+    --清除来自泛型的临时对象
+    for _, closure in pairs(genercCache.closureCache) do
+        local noders = noder.getNoders(closure)
+        noder.removeID(noders, noder.getID(closure))
+        if closure then
+            for _, value in ipairs(closure.values) do
+                noder.removeID(noders, noder.getID(value))
+            end
+        end
+    end
+    genercCache.mark = {}
+    genercCache.closureCache = {}
+    genercCache.genericCallArgs = {}
+end
+
+files.watch(function (ev)
+    if ev == 'version' then
+        flushGeneric()
+    end
+end)
+
 function m.searchRefsByID(status, uri, expect, mode)
     local ast = files.getState(uri)
     if not ast then
@@ -420,8 +448,8 @@ function m.searchRefsByID(status, uri, expect, mode)
         return nil
     end
 
-    local genericCallArgs = {}
-    local closureCache = {}
+    local genericCallArgs = genercCache.genericCallArgs
+    local closureCache    = genercCache.closureCache
     local function checkGeneric(source, field)
         if not source.isGeneric then
             return
@@ -433,6 +461,14 @@ function m.searchRefsByID(status, uri, expect, mode)
         if not call then
             return
         end
+        local id = genercCache.mark[call]
+        if id == false then
+            return
+        end
+        if id then
+            searchID(id, field)
+            return
+        end
 
         if call.args then
             for _, arg in ipairs(call.args) do
@@ -440,19 +476,22 @@ function m.searchRefsByID(status, uri, expect, mode)
             end
         end
 
-        local cacheID = noder.getID(source) .. noder.getID(call)
+        local cacheID = uri .. noder.getID(source) .. noder.getID(call)
         local closure = closureCache[cacheID]
         if closure == false then
+            genercCache.mark[call] = false
             return
         end
         if not closure then
             closure = generic.createClosure(source, call)
             closureCache[cacheID] = closure or false
             if not closure then
+                genercCache.mark[call] = false
                 return
             end
         end
-        local id = noder.getID(closure)
+        id = noder.getID(closure)
+        genercCache.mark[call] = id
         searchID(id, field)
     end
 
@@ -861,16 +900,6 @@ function m.searchRefsByID(status, uri, expect, mode)
     end
 
     search(expect)
-
-    --清除来自泛型的临时对象
-    for _, closure in pairs(closureCache) do
-        noder.removeID(noders, noder.getID(closure))
-        if closure then
-            for _, value in ipairs(closure.values) do
-                noder.removeID(noders, noder.getID(value))
-            end
-        end
-    end
 end
 
 local function prepareSearch(source)

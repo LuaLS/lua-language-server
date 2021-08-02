@@ -200,6 +200,7 @@ function m.setText(uri, text, isTrust, instance)
     file.version = file.version + 1
     m.globalVersion = m.globalVersion + 1
     await.close('files.version')
+    m.onWatch('version')
     if create then
         m.onWatch('create', originUri)
     end
@@ -371,6 +372,7 @@ function m.remove(uri)
     m.globalVersion = m.globalVersion + 1
 
     await.close('files.version')
+    m.onWatch('version')
     m.onWatch('remove', originUri)
 end
 
@@ -379,6 +381,7 @@ function m.removeAll()
     local ws = require 'workspace.workspace'
     m.globalVersion = m.globalVersion + 1
     await.close('files.version')
+    m.onWatch('version')
     m._pairsCache = nil
     for uri in pairs(m.fileMap) do
         if not m.libraryMap[uri] then
@@ -397,6 +400,7 @@ end
 function m.removeAllClosed()
     m.globalVersion = m.globalVersion + 1
     await.close('files.version')
+    m.onWatch('version')
     m._pairsCache = nil
     for uri in pairs(m.fileMap) do
         if  not m.openMap[uri]

@@ -284,8 +284,15 @@ local function checkCache(status, uri, expect, mode)
         end
         return true
     end
-    fileCache[expect] = status.results
-    return false
+    return false, function ()
+        fileCache[expect] = status.results
+        if mode == 'def' then
+            return
+        end
+        for id in pairs(status.ids) do
+            fileCache[id] = status.results
+        end
+    end
 end
 
 local function stop(status, msg)
@@ -387,6 +394,13 @@ function m.searchRefsByID(status, uri, expect, mode)
     status.elock[uri] = elock
 
     local function search(id, field)
+        if not field then
+            local cached = checkCache(status, uri, id, mode)
+            if cached then
+                return
+            end
+            status.ids[id] = true
+        end
         local firstID = noder.getFirstID(id)
         if ignoredIDs[firstID] and (field or firstID ~= id) then
             return
@@ -1019,7 +1033,9 @@ function m.searchRefs(status, source, mode)
         return
     end
 
-    if checkCache(status, uri, id, mode) then
+    local cached, makeCache = checkCache(status, uri, id, mode)
+
+    if cached then
         return
     end
 
@@ -1027,6 +1043,7 @@ function m.searchRefs(status, source, mode)
         log.debug('searchRefs:', id)
     end
     m.searchRefsByID(status, uri, id, mode)
+    makeCache()
 end
 
 ---搜索对象的field
@@ -1044,12 +1061,15 @@ function m.searchFields(status, source, mode, field)
     end
     if field == '*' then
         if source.special == '_G' then
-            if checkCache(status, uri, '*', mode) then
+            local cached, makeCache = checkCache(status, uri, '*', mode)
+            if cached then
                 return
             end
             searchAllGlobals(status, mode)
+            makeCache()
         else
-            if checkCache(status, uri, id .. '*', mode) then
+            local cached, makeCache = checkCache(status, uri, id .. '*', mode)
+            if cached then
                 return
             end
             local newStatus = m.status('field')
@@ -1057,6 +1077,7 @@ function m.searchFields(status, source, mode, field)
             for _, def in ipairs(newStatus.results) do
                 getField(status, def, mode)
             end
+            makeCache()
         end
     else
         if source.special == '_G' then
@@ -1066,10 +1087,12 @@ function m.searchFields(status, source, mode, field)
             else
                 fullID = sformat('%s%s%s', 'g:', '', field)
             end
-            if checkCache(status, uri, fullID, mode) then
+            local cahced, makeCache = checkCache(status, uri, fullID, mode)
+            if cahced then
                 return
             end
             m.searchRefsByID(status, uri, fullID, mode)
+            makeCache()
         else
             local fullID
             if type(field) == 'string' then
@@ -1077,10 +1100,12 @@ function m.searchFields(status, source, mode, field)
             else
                 fullID = sformat('%s%s%s', id, noder.SPLIT_CHAR, field)
             end
-            if checkCache(status, uri, fullID, mode) then
+            local cahced, makeCache = checkCache(status, uri, fullID, mode)
+            if cahced then
                 return
             end
             m.searchRefsByID(status, uri, fullID, mode)
+            makeCache()
         end
     end
 end
@@ -1106,11 +1131,12 @@ function m.status(mode)
         smark     = {},
         footprint = {},
         count     = 0,
+        ids       = {},
         ftag      = {},
         btag      = {},
         dontCross = 0,
         mode      = mode,
-        cache     = vm.getCache('searcher:' .. mode)
+        cache     = vm.getCache('searcher:' .. mode),
     }
     return status
 end

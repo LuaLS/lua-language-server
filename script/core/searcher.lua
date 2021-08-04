@@ -14,7 +14,7 @@ local log          = log
 local select       = select
 local tostring     = tostring
 local ipairs       = ipairs
-local pairs        = pairs
+local next         = next
 local error        = error
 local type         = type
 local setmetatable = setmetatable
@@ -290,7 +290,7 @@ local function checkCache(status, uri, expect, mode)
         if mode == 'def' then
             return
         end
-        for id in pairs(status.ids) do
+        for id in next, status.ids do
             fileCache[id] = status.results
         end
     end
@@ -356,7 +356,7 @@ local genercCache = {
 
 local function flushGeneric()
     --清除来自泛型的临时对象
-    for _, closure in pairs(genercCache.closureCache) do
+    for _, closure in next, genercCache.closureCache do
         local noders = noder.getNoders(closure)
         noder.removeID(noders, noder.getID(closure))
         if closure then
@@ -382,6 +382,12 @@ local nodersMapMT = {__index = function (self, uri)
     return noders
 end}
 
+local uriMapMT = {__index = function (self, uri)
+    local t = {}
+    self[uri] = t
+    return t
+end}
+
 function m.searchRefsByID(status, furi, expect, mode)
     local ast = files.getState(furi)
     if not ast then
@@ -391,10 +397,14 @@ function m.searchRefsByID(status, furi, expect, mode)
 
     status.id = expect
 
-    local slocks = status.slock
-    local elocks = status.elock
+    local slocks    = status.slock
+    local elocks    = status.elock
     local callStack = status.callStack
-    local nodersMap = setmetatable({}, nodersMapMT)
+    local ids       = status.ids
+    ---@type table<uri, noders>
+    local nodersMap  = setmetatable({}, nodersMapMT)
+    local frejectMap = setmetatable({}, uriMapMT)
+    local brejectMap = setmetatable({}, uriMapMT)
 
     local function search(uri, id, field)
         if not field then
@@ -402,7 +412,7 @@ function m.searchRefsByID(status, furi, expect, mode)
             if cached then
                 return
             end
-            status.ids[id] = true
+            ids[id] = true
         end
         local firstID = noder.getFirstID(id)
         if ignoredIDs[firstID] and (field or firstID ~= id) then
@@ -529,12 +539,9 @@ function m.searchRefsByID(status, furi, expect, mode)
         searchID(uri, newID)
     end
 
-    local freject = {}
-    local breject = {}
-
     ---@param ward '"forward"'|'"backward"'
     ---@param info node.info
-    local function checkThenPushReject(ward, info)
+    local function checkThenPushReject(uri, ward, info)
         local reject = info.reject
         if not reject then
             return true
@@ -542,11 +549,11 @@ function m.searchRefsByID(status, furi, expect, mode)
         local checkReject
         local pushReject
         if ward == 'forward' then
-            checkReject = breject
-            pushReject  = freject
+            checkReject = brejectMap[uri]
+            pushReject  = frejectMap[uri]
         else
-            checkReject = freject
-            pushReject  = breject
+            checkReject = frejectMap[uri]
+            pushReject  = brejectMap[uri]
         end
         if checkReject[reject] and checkReject[reject] > 0 then
             return false
@@ -557,16 +564,16 @@ function m.searchRefsByID(status, furi, expect, mode)
 
     ---@param ward '"forward"'|'"backward"'
     ---@param info node.info
-    local function popReject(ward, info)
+    local function popReject(uri, ward, info)
         local reject = info.reject
         if not reject then
             return
         end
         local popTags
         if ward == 'forward' then
-            popTags = freject
+            popTags = frejectMap[uri]
         else
-            popTags = breject
+            popTags = brejectMap[uri]
         end
         popTags[reject] = popTags[reject] - 1
     end
@@ -609,7 +616,7 @@ function m.searchRefsByID(status, furi, expect, mode)
     ---@param id string
     ---@param info node.info
     local function checkInfoFilter(id, field, info)
-        for filter in pairs(filters) do
+        for filter in next, filters do
             if not filter(id, field) then
                 return false
             end
@@ -619,9 +626,9 @@ function m.searchRefsByID(status, furi, expect, mode)
 
     ---@param id string
     ---@param info node.info
-    local function checkInfoBeforeForward(id, field, info)
+    local function checkInfoBeforeForward(uri, id, field, info)
         pushInfoFilter(id, field, info)
-        if not checkThenPushReject('forward', info) then
+        if not checkThenPushReject(uri, 'forward', info) then
             return false
         end
         return true
@@ -629,14 +636,14 @@ function m.searchRefsByID(status, furi, expect, mode)
 
     ---@param id string
     ---@param info node.info
-    local function releaseInfoAfterForward(id, field, info)
-        popReject('forward', info)
+    local function releaseInfoAfterForward(uri, id, field, info)
+        popReject(uri, 'forward', info)
         releaseInfoFilter(id, field, info)
     end
 
     local function checkForward(uri, id, field)
         for forwardID, info in noder.eachForward(nodersMap[uri], id) do
-            if info and not checkInfoBeforeForward(forwardID, field, info) then
+            if info and not checkInfoBeforeForward(uri, forwardID, field, info) then
                 goto CONTINUE
             end
             if not checkInfoFilter(forwardID, field, info) then
@@ -649,7 +656,7 @@ function m.searchRefsByID(status, furi, expect, mode)
                 searchID(uri, targetID or forwardID, field)
             end
             if info then
-                releaseInfoAfterForward(forwardID, field, info)
+                releaseInfoAfterForward(uri, forwardID, field, info)
             end
             ::CONTINUE::
         end
@@ -658,11 +665,11 @@ function m.searchRefsByID(status, furi, expect, mode)
     ---@param id string
     ---@param field string
     ---@param info node.info
-    local function checkInfoBeforeBackward(id, field, info)
+    local function checkInfoBeforeBackward(uri, id, field, info)
         if info.deep and mode ~= 'allref' then
             return false
         end
-        if not checkThenPushReject('backward', info) then
+        if not checkThenPushReject(uri, 'backward', info) then
             return false
         end
         pushInfoFilter(id, field, info)
@@ -675,8 +682,8 @@ function m.searchRefsByID(status, furi, expect, mode)
     ---@param id string
     ---@param field string
     ---@param info node.info
-    local function releaseInfoAfterBackward(id, field, info)
-        popReject('backward', info)
+    local function releaseInfoAfterBackward(uri, id, field, info)
+        popReject(uri, 'backward', info)
         releaseInfoFilter(id, field, info)
         if info.dontCross then
             status.dontCross = status.dontCross - 1
@@ -691,7 +698,7 @@ function m.searchRefsByID(status, furi, expect, mode)
             return
         end
         for backwardID, info in noder.eachBackward(nodersMap[uri], id) do
-            if info and not checkInfoBeforeBackward(backwardID, field, info) then
+            if info and not checkInfoBeforeBackward(uri, backwardID, field, info) then
                 goto CONTINUE
             end
             if not checkInfoFilter(backwardID, field, info) then
@@ -704,7 +711,7 @@ function m.searchRefsByID(status, furi, expect, mode)
                 searchID(uri, targetID or backwardID, field)
             end
             if info then
-                releaseInfoAfterBackward(backwardID, field, info)
+                releaseInfoAfterBackward(uri, backwardID, field, info)
             end
             ::CONTINUE::
         end
@@ -844,11 +851,18 @@ function m.searchRefsByID(status, furi, expect, mode)
             end
         end
 
-        checkRequire(uri, noders.require[id], field)
+        local requireName = noders.require[id]
+        if requireName then
+            checkRequire(uri, requireName, field)
+        end
 
         if lockExpanding(uri, id, field) then
-            checkForward(uri, id, field)
-            checkBackward(uri, id, field)
+            if noders.forward[id] then
+                checkForward(uri, id, field)
+            end
+            if noders.backward[id] then
+                checkBackward(uri, id, field)
+            end
             releaseExpanding(uri, id, field)
         end
 
@@ -1000,7 +1014,7 @@ local function searchAllGlobalByUri(status, mode, uri, fullID)
             m.pushResult(status, mode, source)
         end
     else
-        for id in pairs(noders.source) do
+        for id in next, noders.source do
             if  ssub(id, 1, 2) == 'g:'
             and not sfind(id, noder.SPLIT_CHAR) then
                 for source in noder.eachSource(noders, id) do

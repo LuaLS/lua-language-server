@@ -91,7 +91,7 @@ local function main()
     --config.Lua.intelliSense.searchDepth = 5
     --loadDocMetas()
 
-    --test 'full'
+    test 'full';do return end
 
     require 'bee.platform'.OS = 'Windows'
     testAll()

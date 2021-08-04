@@ -670,7 +670,7 @@ function m.searchRefsByID(status, suri, expect, mode)
             end
             local targetUri, targetID = getUriAndID(forwardID)
             if targetUri and targetUri ~= uri then
-                searchID(targetUri, targetID .. (field or ''), nil)
+                searchID(targetUri, targetID, field)
             else
                 searchID(uri, targetID or forwardID, field)
             end
@@ -725,7 +725,7 @@ function m.searchRefsByID(status, suri, expect, mode)
             end
             local targetUri, targetID = getUriAndID(backwardID)
             if targetUri and targetUri ~= uri then
-                searchID(targetUri, targetID .. (field or ''), nil)
+                searchID(targetUri, targetID, field)
             else
                 searchID(uri, targetID or backwardID, field)
             end
@@ -752,13 +752,12 @@ function m.searchRefsByID(status, suri, expect, mode)
         if not requireName then
             return
         end
-        local tid = 'mainreturn' .. (field or '')
         local uris = ws.findUrisByRequirePath(requireName)
         footprint(status, 'require:', requireName)
         for i = 1, #uris do
             local ruri = uris[i]
             if uri ~= ruri then
-                searchID(ruri, tid, nil)
+                searchID(ruri, 'mainreturn', field)
             end
         end
     end
@@ -770,7 +769,6 @@ function m.searchRefsByID(status, suri, expect, mode)
         if checkLock(status, id, field) then
             return
         end
-        local tid = id .. (field or '')
         footprint(status, 'checkGlobal:', id, field)
         local crossed = {}
         if mode == 'def'
@@ -781,7 +779,7 @@ function m.searchRefsByID(status, suri, expect, mode)
                 if uri == guri then
                     goto CONTINUE
                 end
-                searchID(guri, tid, nil)
+                searchID(guri, id, field)
                 ::CONTINUE::
             end
         else
@@ -795,7 +793,7 @@ function m.searchRefsByID(status, suri, expect, mode)
                 if uri == guri then
                     goto CONTINUE
                 end
-                searchID(guri, tid, nil)
+                searchID(guri, id, field)
                 ::CONTINUE::
             end
         end
@@ -808,7 +806,6 @@ function m.searchRefsByID(status, suri, expect, mode)
         if checkLock(status, id, field) then
             return
         end
-        local tid = id .. (field or '')
         local sid = id
         if ignoredIDs[id]
         or id == 'dn:string' then
@@ -816,7 +813,7 @@ function m.searchRefsByID(status, suri, expect, mode)
         end
         for _, guri in collector.each(sid) do
             if uri ~= guri then
-                searchID(guri, tid, nil)
+                searchID(guri, id, field)
             end
         end
     end
@@ -829,9 +826,9 @@ function m.searchRefsByID(status, suri, expect, mode)
         for i = 1, #calls do
             local call = calls[i]
             local curi = getUri(call)
-            local cid  = getID(call) .. (field or '')
+            local cid  = getID(call)
             if curi ~= uri then
-                searchID(curi, cid, nil)
+                searchID(curi, cid, field)
             end
         end
     end

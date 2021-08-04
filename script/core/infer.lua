@@ -559,11 +559,9 @@ function m.searchInfers(source, field, mark)
         end
     end
     if source.type == 'doc.type' then
-        if source.type == 'doc.type' then
-            for _, def in ipairs(source.types) do
-                if def.typeGeneric then
-                    searchInfer(def, infers, mark)
-                end
+        for _, def in ipairs(source.types) do
+            if def.typeGeneric then
+                searchInfer(def, infers, mark)
             end
         end
     end

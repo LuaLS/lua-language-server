@@ -37,6 +37,7 @@ local getUriAndID    = noder.getUriAndID
 local eachBackward   = noder.eachBackward
 local eachSource     = noder.eachSource
 local compileNodes   = noder.compileNodes
+local isGlobalID     = noder.isGlobalID
 
 local SPLIT_CHAR     = noder.SPLIT_CHAR
 local RETURN_INDEX   = noder.RETURN_INDEX
@@ -326,7 +327,7 @@ local function stop(status, msg)
     end
 end
 
-local function checkSLock(status, slock, id, field)
+local function checkSLock(slock, id, field)
     local cmark = slock[id]
     if not cmark then
         cmark = {}
@@ -412,14 +413,33 @@ function m.searchRefsByID(status, suri, expect, mode)
 
     status.id = expect
 
-    local slocks    = status.slock
-    local elocks    = status.elock
     local callStack = status.callStack
     local ids       = status.ids
+    local dontCross = 0
     ---@type table<uri, noders>
     local nodersMap  = setmetatable({}, nodersMapMT)
     local frejectMap = setmetatable({}, uriMapMT)
     local brejectMap = setmetatable({}, uriMapMT)
+    local slockMap   = setmetatable({}, uriMapMT)
+    local elockMap   = setmetatable({}, uriMapMT)
+
+    local function lockExpanding(elock, id, field)
+        local locked = elock[id]
+        if locked and field then
+            if #locked <= #field then
+                if ssub(field, -#locked) == locked then
+                    footprint(status, 'elocked:', id, locked, field)
+                    return false
+                end
+            end
+        end
+        elock[id] = field
+        return true
+    end
+
+    local function releaseExpanding(elock, id, field)
+        elock[id] = nil
+    end
 
     local function search(uri, id, field)
         if not field then
@@ -435,13 +455,8 @@ function m.searchRefsByID(status, suri, expect, mode)
         if ignoredIDs[firstID] and (field or firstID ~= id) then
             return
         end
-        local slock = slocks[uri]
-        if not slock then
-            slock = {}
-            slocks[uri] = slock
-        end
 
-        if not checkSLock(status, slock, id, field) then
+        if not checkSLock(slockMap[uri], id, field) then
             footprint(status, 'slocked:', id, field)
             return
         end
@@ -475,7 +490,7 @@ function m.searchRefsByID(status, suri, expect, mode)
         end
     end
 
-    local function searchID(uri, id, field)
+    local function searchID(uri, id, field, sourceUri)
         if not id then
             return
         end
@@ -670,7 +685,9 @@ function m.searchRefsByID(status, suri, expect, mode)
             end
             local targetUri, targetID = getUriAndID(forwardID)
             if targetUri and targetUri ~= uri then
-                searchID(targetUri, targetID, field)
+                if dontCross == 0 then
+                    searchID(targetUri, targetID, field, uri)
+                end
             else
                 searchID(uri, targetID or forwardID, field)
             end
@@ -693,7 +710,7 @@ function m.searchRefsByID(status, suri, expect, mode)
         end
         pushInfoFilter(id, field, info)
         if info.dontCross then
-            status.dontCross = status.dontCross + 1
+            dontCross = dontCross + 1
         end
         return true
     end
@@ -705,7 +722,7 @@ function m.searchRefsByID(status, suri, expect, mode)
         popReject(uri, 'backward', info)
         releaseInfoFilter(id, field, info)
         if info.dontCross then
-            status.dontCross = status.dontCross - 1
+            dontCross = dontCross - 1
         end
     end
 
@@ -725,7 +742,9 @@ function m.searchRefsByID(status, suri, expect, mode)
             end
             local targetUri, targetID = getUriAndID(backwardID)
             if targetUri and targetUri ~= uri then
-                searchID(targetUri, targetID, field)
+                if dontCross == 0 then
+                    searchID(targetUri, targetID, field, uri)
+                end
             else
                 searchID(uri, targetID or backwardID, field)
             end
@@ -757,16 +776,16 @@ function m.searchRefsByID(status, suri, expect, mode)
         for i = 1, #uris do
             local ruri = uris[i]
             if uri ~= ruri then
-                searchID(ruri, 'mainreturn', field)
+                searchID(ruri, 'mainreturn', field, uri)
             end
         end
     end
 
     local function searchGlobal(uri, id, field)
-        if ssub(id, 1, 2) ~= 'g:' then
+        if dontCross ~= 0 then
             return
         end
-        if checkLock(status, id, field) then
+        if ssub(id, 1, 2) ~= 'g:' then
             return
         end
         footprint(status, 'checkGlobal:', id, field)
@@ -779,7 +798,7 @@ function m.searchRefsByID(status, suri, expect, mode)
                 if uri == guri then
                     goto CONTINUE
                 end
-                searchID(guri, id, field)
+                searchID(guri, id, field, uri)
                 ::CONTINUE::
             end
         else
@@ -793,17 +812,17 @@ function m.searchRefsByID(status, suri, expect, mode)
                 if uri == guri then
                     goto CONTINUE
                 end
-                searchID(guri, id, field)
+                searchID(guri, id, field, uri)
                 ::CONTINUE::
             end
         end
     end
 
     local function searchClass(uri, id, field)
-        if ssub(id, 1, 3) ~= 'dn:' then
+        if dontCross ~= 0 then
             return
         end
-        if checkLock(status, id, field) then
+        if ssub(id, 1, 3) ~= 'dn:' then
             return
         end
         local sid = id
@@ -813,7 +832,7 @@ function m.searchRefsByID(status, suri, expect, mode)
         end
         for _, guri in collector.each(sid) do
             if uri ~= guri then
-                searchID(guri, id, field)
+                searchID(guri, id, field, uri)
             end
         end
     end
@@ -828,38 +847,15 @@ function m.searchRefsByID(status, suri, expect, mode)
             local curi = getUri(call)
             local cid  = getID(call)
             if curi ~= uri then
-                searchID(curi, cid, field)
+                searchID(curi, cid, field, uri)
             end
         end
-    end
-
-    local function lockExpanding(uri, id, field)
-        local elock = elocks[uri]
-        if not elock then
-            elock = {}
-            elocks[uri] = elock
-        end
-        local locked = elock[id]
-        if locked and field then
-            if #locked <= #field then
-                if ssub(field, -#locked) == locked then
-                    footprint(status, 'elocked:', id, locked, field)
-                    return false
-                end
-            end
-        end
-        elock[id] = field
-        return true
-    end
-
-    local function releaseExpanding(uri, id, field)
-        local elock = elocks[uri]
-        elock[id] = nil
     end
 
     local function searchNode(uri, id, field)
         local noders = nodersMap[uri]
         local call   = noders.call[id]
+        local global = isGlobalID(id)
         callStack[#callStack+1] = call
 
         if field == nil and not ignoredSources[id] then
@@ -874,14 +870,16 @@ function m.searchRefsByID(status, suri, expect, mode)
             checkRequire(uri, requireName, field)
         end
 
-        if lockExpanding(uri, id, field) then
+        local elock = global and elockMap['@global'] or elockMap[uri]
+
+        if lockExpanding(elock, id, field) then
             if noders.forward[id] then
                 checkForward(uri, id, field)
             end
             if noders.backward[id] then
                 checkBackward(uri, id, field)
             end
-            releaseExpanding(uri, id, field)
+            releaseExpanding(elock, id, field)
         end
 
         local source = noders.source[id]
@@ -935,18 +933,14 @@ function m.searchRefsByID(status, suri, expect, mode)
     end
 
     local stepCount = 0
-    local stepMaxCount = 1e3
-    local statusMaxCount = 1e4
+    local stepMaxCount = 1e4
     if mode == 'allref' or mode == 'alldef' then
-        stepMaxCount = 1e4
-        statusMaxCount = 1e5
+        stepMaxCount = 1e5
     end
 
     function searchStep(uri, id, field)
         stepCount = stepCount + 1
-        status.count = status.count + 1
-        if stepCount > stepMaxCount
-        or status.count > statusMaxCount then
+        if stepCount > stepMaxCount then
             stop(status, 'too deep!')
             return
         end
@@ -1187,19 +1181,10 @@ end
 function m.status(source, field, mode)
     local status = {
         callStack = {},
-        crossed   = {},
-        lock      = {},
-        slock     = {},
-        elock     = {},
         results   = {},
         rmark     = {},
-        smark     = {},
         footprint = {},
-        count     = 0,
         ids       = {},
-        ftag      = {},
-        btag      = {},
-        dontCross = 0,
         mode      = mode,
         source    = source,
         field     = field,

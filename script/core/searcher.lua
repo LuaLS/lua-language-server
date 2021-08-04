@@ -25,6 +25,8 @@ local sformat      = string.format
 local getUri       = guide.getUri
 local getRoot      = guide.getRoot
 
+local ceach        = collector.each
+
 local getNoders      = noder.getNoders
 local getID          = noder.getID
 local getLastID      = noder.getLastID
@@ -237,26 +239,6 @@ function m.getObjectValue(obj)
     return nil
 end
 
-local function checkLock(status, k1, k2)
-    local locks = status.lock
-    local lock1 = locks[k1]
-    if not lock1 then
-        lock1 = {}
-        locks[k1] = lock1
-    end
-    if lock1[''] then
-        return true
-    end
-    if k2 == nil then
-        k2 = ''
-    end
-    if lock1[k2] then
-        return true
-    end
-    lock1[k2] = true
-    return false
-end
-
 local strs = {}
 local function footprint(status, ...)
     if TRACE then
@@ -269,19 +251,6 @@ local function footprint(status, ...)
         end
         status.footprint[#status.footprint+1] = tconcat(strs, '\t', 1, n)
     end
-end
-
-local function crossSearch(status, uri, expect, mode, sourceUri)
-    if status.dontCross > 0 then
-        return
-    end
-    if checkLock(status, uri, expect) then
-        return
-    end
-    footprint(status, 'crossSearch', uri, expect)
-    m.searchRefsByID(status, uri, expect, mode)
-    --status.lock[uri] = nil
-    footprint(status, 'crossSearch finish, back to:', sourceUri)
 end
 
 local function checkCache(status, uri, expect, mode)
@@ -794,7 +763,7 @@ function m.searchRefsByID(status, suri, expect, mode)
         or mode == 'alldef'
         or mode == 'field'
         or field then
-            for _, guri in collector.each('def:' .. id) do
+            for _, guri in ceach('def:' .. id) do
                 if uri == guri then
                     goto CONTINUE
                 end
@@ -802,7 +771,7 @@ function m.searchRefsByID(status, suri, expect, mode)
                 ::CONTINUE::
             end
         else
-            for _, guri in collector.each(id) do
+            for _, guri in ceach(id) do
                 if crossed[guri] then
                     goto CONTINUE
                 end
@@ -830,7 +799,7 @@ function m.searchRefsByID(status, suri, expect, mode)
         or id == 'dn:string' then
             sid = 'def:' .. sid
         end
-        for _, guri in collector.each(sid) do
+        for _, guri in ceach(sid) do
             if uri ~= guri then
                 searchID(guri, id, field, uri)
             end

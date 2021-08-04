@@ -13,7 +13,6 @@ local TEST         = TEST
 local log          = log
 local select       = select
 local tostring     = tostring
-local ipairs       = ipairs
 local next         = next
 local error        = error
 local type         = type
@@ -22,6 +21,31 @@ local tconcat      = table.concat
 local ssub         = string.sub
 local sfind        = string.find
 local sformat      = string.format
+
+local getUri       = guide.getUri
+local getRoot      = guide.getRoot
+
+local getNoders      = noder.getNoders
+local getID          = noder.getID
+local getLastID      = noder.getLastID
+local removeID       = noder.removeID
+local getNodersByUri = noder.getNodersByUri
+local getFirstID     = noder.getFirstID
+local getHeadID      = noder.getHeadID
+local eachForward    = noder.eachForward
+local getUriAndID    = noder.getUriAndID
+local eachBackward   = noder.eachBackward
+local eachSource     = noder.eachSource
+local compileNodes   = noder.compileNodes
+
+local SPLIT_CHAR     = noder.SPLIT_CHAR
+local RETURN_INDEX   = noder.RETURN_INDEX
+local TABLE_KEY      = noder.TABLE_KEY
+local STRING_CHAR    = noder.STRING_CHAR
+local STRING_FIELD   = noder.STRING_FIELD
+local WEAK_TABLE_KEY = noder.WEAK_TABLE_KEY
+local ANY_FIELD      = noder.ANY_FIELD
+local WEAK_ANY_FIELD = noder.WEAK_ANY_FIELD
 
 _ENV = nil
 
@@ -138,7 +162,7 @@ local pushRefResultsMap = util.switch()
 ---@param mode   guide.searchmode
 ---@param source parser.guide.object
 ---@param force  boolean
-function m.pushResult(status, mode, source, force)
+local function pushResult(status, mode, source, force)
     if not source then
         return
     end
@@ -169,7 +193,7 @@ function m.pushResult(status, mode, source, force)
 
     local parent = source.parent
     if parent.type == 'return' then
-        if noder.getID(source) ~= status.id then
+        if getID(source) ~= status.id then
             results[#results+1] = source
             return
         end
@@ -183,7 +207,7 @@ function m.getUri(obj)
     if obj.uri then
         return obj.uri
     end
-    local root = guide.getRoot(obj)
+    local root = getRoot(obj)
     if root then
         return root.uri
     end
@@ -279,9 +303,11 @@ local function checkCache(status, uri, expect, mode)
         fileCache = {}
         cache[uri] = fileCache
     end
-    if fileCache[expect] then
-        for _, res in ipairs(fileCache[expect]) do
-            m.pushResult(status, mode, res, true)
+    local results = fileCache[expect]
+    if results then
+        for i = 1, #results do
+            local res = results[i]
+            pushResult(status, mode, res, true)
         end
         return true
     end
@@ -325,7 +351,7 @@ local function checkSLock(status, slock, id, field)
     cmark[field or ''] = true
     local right = ''
     while field and field ~= '' do
-        local lastID = noder.getLastID(field)
+        local lastID = getLastID(field)
         if not lastID then
             break
         end
@@ -342,7 +368,7 @@ local function isCallID(field)
     if not field then
         return false
     end
-    if ssub(field, 1, 2) == noder.RETURN_INDEX then
+    if ssub(field, 1, 2) == RETURN_INDEX then
         return true
     end
     return false
@@ -357,11 +383,13 @@ local genercCache = {
 local function flushGeneric()
     --清除来自泛型的临时对象
     for _, closure in next, genercCache.closureCache do
-        local noders = noder.getNoders(closure)
-        noder.removeID(noders, noder.getID(closure))
+        local noders = getNoders(closure)
+        removeID(noders, getID(closure))
         if closure then
-            for _, value in ipairs(closure.values) do
-                noder.removeID(noders, noder.getID(value))
+            local values = closure.values
+            for i = 1, #values do
+                local value = values[i]
+                removeID(noders, getID(value))
             end
         end
     end
@@ -377,7 +405,7 @@ files.watch(function (ev)
 end)
 
 local nodersMapMT = {__index = function (self, uri)
-    local noders = noder.getNodersByUri(uri)
+    local noders = getNodersByUri(uri)
     self[uri] = noders
     return noders
 end}
@@ -414,7 +442,7 @@ function m.searchRefsByID(status, furi, expect, mode)
             end
             ids[id] = true
         end
-        local firstID = noder.getFirstID(id)
+        local firstID = getFirstID(id)
         if ignoredIDs[firstID] and (field or firstID ~= id) then
             return
         end
@@ -441,7 +469,7 @@ function m.searchRefsByID(status, furi, expect, mode)
         local rightID
 
         while true do
-            local firstID = noder.getHeadID(rightID or id)
+            local firstID = getHeadID(rightID or id)
             if not firstID or firstID == id then
                 return
             end
@@ -503,13 +531,15 @@ function m.searchRefsByID(status, furi, expect, mode)
             return
         end
 
-        if call.args then
-            for _, arg in ipairs(call.args) do
+        local args = call.args
+        if args then
+            for i = 1, #args do
+                local arg = args[i]
                 genericCallArgs[arg] = true
             end
         end
 
-        local cacheID = uri .. noder.getID(source) .. noder.getID(call)
+        local cacheID = uri .. getID(source) .. getID(call)
         local closure = closureCache[cacheID]
         if closure == false then
             genercCache.mark[call] = false
@@ -523,7 +553,7 @@ function m.searchRefsByID(status, furi, expect, mode)
                 return
             end
         end
-        id = noder.getID(closure)
+        id = getID(closure)
         genercCache.mark[call] = id
         searchID(uri, id, field)
     end
@@ -642,15 +672,15 @@ function m.searchRefsByID(status, furi, expect, mode)
     end
 
     local function checkForward(uri, id, field)
-        for forwardID, info in noder.eachForward(nodersMap[uri], id) do
+        for forwardID, info in eachForward(nodersMap[uri], id) do
             if info and not checkInfoBeforeForward(uri, forwardID, field, info) then
                 goto CONTINUE
             end
             if not checkInfoFilter(forwardID, field, info) then
                 goto CONTINUE
             end
-            local targetUri, targetID = noder.getUriAndID(forwardID)
-            if targetUri and not files.eq(targetUri, uri) then
+            local targetUri, targetID = getUriAndID(forwardID)
+            if targetUri and targetUri ~= uri then
                 crossSearch(status, targetUri, targetID .. (field or ''), mode, uri)
             else
                 searchID(uri, targetID or forwardID, field)
@@ -697,15 +727,15 @@ function m.searchRefsByID(status, furi, expect, mode)
         if mode ~= 'ref' and mode ~= 'field' and mode ~= 'allref' and not field then
             return
         end
-        for backwardID, info in noder.eachBackward(nodersMap[uri], id) do
+        for backwardID, info in eachBackward(nodersMap[uri], id) do
             if info and not checkInfoBeforeBackward(uri, backwardID, field, info) then
                 goto CONTINUE
             end
             if not checkInfoFilter(backwardID, field, info) then
                 goto CONTINUE
             end
-            local targetUri, targetID = noder.getUriAndID(backwardID)
-            if targetUri and not files.eq(targetUri, uri) then
+            local targetUri, targetID = getUriAndID(backwardID)
+            if targetUri and targetUri ~= uri then
                 crossSearch(status, targetUri, targetID .. (field or ''), mode, uri)
             else
                 searchID(uri, targetID or backwardID, field)
@@ -736,8 +766,9 @@ function m.searchRefsByID(status, furi, expect, mode)
         local tid = 'mainreturn' .. (field or '')
         local uris = ws.findUrisByRequirePath(requireName)
         footprint(status, 'require:', requireName)
-        for _, ruri in ipairs(uris) do
-            if not files.eq(uri, ruri) then
+        for i = 1, #uris do
+            local ruri = uris[i]
+            if uri ~= ruri then
                 crossSearch(status, ruri, tid, mode, uri)
             end
         end
@@ -758,7 +789,7 @@ function m.searchRefsByID(status, furi, expect, mode)
         or mode == 'field'
         or field then
             for _, guri in collector.each('def:' .. id) do
-                if files.eq(uri, guri) then
+                if uri == guri then
                     goto CONTINUE
                 end
                 crossSearch(status, guri, tid, mode, uri)
@@ -772,7 +803,7 @@ function m.searchRefsByID(status, furi, expect, mode)
                 if mode == 'def' or mode == 'alldef' or mode == 'field' then
                     goto CONTINUE
                 end
-                if files.eq(uri, guri) then
+                if uri == guri then
                     goto CONTINUE
                 end
                 crossSearch(status, guri, tid, mode, uri)
@@ -795,7 +826,7 @@ function m.searchRefsByID(status, furi, expect, mode)
             sid = 'def:' .. sid
         end
         for _, guri in collector.each(sid) do
-            if not files.eq(uri, guri) then
+            if uri ~= guri then
                 crossSearch(status, guri, tid, mode, uri)
             end
         end
@@ -806,10 +837,11 @@ function m.searchRefsByID(status, furi, expect, mode)
             return
         end
         local calls = vm.getLinksTo(uri)
-        for _, call in ipairs(calls) do
-            local curi = guide.getUri(call)
-            local cid  = noder.getID(call) .. (field or '')
-            if not files.eq(curi, uri) then
+        for i = 1, #calls do
+            local call = calls[i]
+            local curi = getUri(call)
+            local cid  = getID(call) .. (field or '')
+            if curi ~= uri then
                 crossSearch(status, curi, cid, mode, uri)
             end
         end
@@ -845,9 +877,9 @@ function m.searchRefsByID(status, furi, expect, mode)
         callStack[#callStack+1] = call
 
         if field == nil and not ignoredSources[id] then
-            for source in noder.eachSource(noders, id) do
+            for source in eachSource(noders, id) do
                 local force = genericCallArgs[source]
-                m.pushResult(status, mode, source, force)
+                pushResult(status, mode, source, force)
             end
         end
 
@@ -887,31 +919,31 @@ function m.searchRefsByID(status, furi, expect, mode)
         if mode == 'ref' or mode == 'allref' then
             return
         end
-        local lastID = noder.getLastID(id)
+        local lastID = getLastID(id)
         if not lastID then
             return
         end
         local originField = ssub(id, #lastID + 1)
-        if originField == noder.TABLE_KEY
-        or originField == noder.WEAK_TABLE_KEY then
+        if originField == TABLE_KEY
+        or originField == WEAK_TABLE_KEY then
             return
         end
-        local anyFieldID   = lastID .. noder.ANY_FIELD
+        local anyFieldID   = lastID .. ANY_FIELD
         searchNode(uri, anyFieldID, field)
     end
 
     local function searchWeak(uri, id, field)
-        local lastID = noder.getLastID(id)
+        local lastID = getLastID(id)
         if not lastID then
             return
         end
         local originField = ssub(id, #lastID + 1)
-        if originField == noder.WEAK_TABLE_KEY then
-            local newID   = lastID .. noder.TABLE_KEY
+        if originField == WEAK_TABLE_KEY then
+            local newID   = lastID .. TABLE_KEY
             searchNode(uri, newID, field)
         end
-        if originField == noder.WEAK_ANY_FIELD then
-            local newID   = lastID .. noder.ANY_FIELD
+        if originField == WEAK_ANY_FIELD then
+            local newID   = lastID .. ANY_FIELD
             searchNode(uri, newID, field)
         end
     end
@@ -958,44 +990,56 @@ local function prepareSearch(source)
     if not source then
         return
     end
-    local root = guide.getRoot(source)
+    local root = getRoot(source)
     if not root then
         return
     end
-    noder.compileNodes(root)
-    local uri  = guide.getUri(source)
-    local id   = noder.getID(source)
+    compileNodes(root)
+    local uri  = getUri(source)
+    local id   = getID(source)
     return uri, id
 end
 
+local fieldNextTypeMap = util.switch()
+    : case 'getmethod'
+    : case 'setmethod'
+    : case 'getfield'
+    : case 'setfield'
+    : case 'getindex'
+    : case 'setindex'
+    : call(pushResult)
+    : getMap()
+
 local function getField(status, source, mode)
     if source.type == 'table' then
-        for _, field in ipairs(source) do
-            m.pushResult(status, mode, field)
+        for i = 1, #source do
+            local field = source[i]
+            pushResult(status, mode, field)
         end
         return
     end
     if source.type == 'doc.type.ltable' then
-        for _, field in ipairs(source.fields) do
-            m.pushResult(status, mode, field)
+        local fields = source.fields
+        for i = 1, #fields do
+            local field = fields[i]
+            pushResult(status, mode, field)
         end
     end
     if source.type == 'doc.class.name' then
-        local class = source.parent
-        for _, field in ipairs(class.fields) do
-            m.pushResult(status, mode, field.field)
+        local class  = source.parent
+        local fields = class.fields
+        for i = 1, #fields do
+            local field = fields[i]
+            pushResult(status, mode, field.field)
         end
         return
     end
     local field = source.next
     if field then
-        if field.type == 'getmethod'
-        or field.type == 'setmethod'
-        or field.type == 'getfield'
-        or field.type == 'setfield'
-        or field.type == 'getindex'
-        or field.type == 'setindex' then
-            m.pushResult(status, mode, field)
+        local ftype = field.type
+        local pushResultOrNil = fieldNextTypeMap[ftype]
+        if pushResultOrNil then
+            pushResultOrNil(status, mode, field)
         end
         return
     end
@@ -1007,18 +1051,18 @@ local function searchAllGlobalByUri(status, mode, uri, fullID)
         return
     end
     local root = ast.ast
-    noder.compileNodes(root)
-    local noders = noder.getNoders(root)
+    compileNodes(root)
+    local noders = getNoders(root)
     if fullID then
-        for source in noder.eachSource(noders, fullID) do
-            m.pushResult(status, mode, source)
+        for source in eachSource(noders, fullID) do
+            pushResult(status, mode, source)
         end
     else
         for id in next, noders.source do
             if  ssub(id, 1, 2) == 'g:'
-            and not sfind(id, noder.SPLIT_CHAR) then
-                for source in noder.eachSource(noders, id) do
-                    m.pushResult(status, mode, source)
+            and not sfind(id, SPLIT_CHAR) then
+                for source in eachSource(noders, id) do
+                    pushResult(status, mode, source)
                 end
             end
         end
@@ -1042,7 +1086,7 @@ function m.findGlobals(uri, mode, name)
     if name then
         local fullID
         if type(name) == 'string' then
-            fullID = sformat('%s%s%s', 'g:', noder.STRING_CHAR, name)
+            fullID = sformat('%s%s%s', 'g:', STRING_CHAR, name)
         else
             fullID = sformat('%s%s%s', 'g:', '', name)
         end
@@ -1105,7 +1149,9 @@ function m.searchFields(status, source, mode, field)
             end
             local newStatus = m.status('field')
             m.searchRefsByID(newStatus, uri, id, 'field')
-            for _, def in ipairs(newStatus.results) do
+            local results = newStatus.results
+            for i = 1, #results do
+                local def = results[i]
                 getField(status, def, mode)
             end
             makeCache()
@@ -1114,7 +1160,7 @@ function m.searchFields(status, source, mode, field)
         if source.special == '_G' then
             local fullID
             if type(field) == 'string' then
-                fullID = sformat('%s%s%s', 'g:', noder.STRING_CHAR, field)
+                fullID = sformat('%s%s%s', 'g:', STRING_CHAR, field)
             else
                 fullID = sformat('%s%s%s', 'g:', '', field)
             end
@@ -1127,9 +1173,9 @@ function m.searchFields(status, source, mode, field)
         else
             local fullID
             if type(field) == 'string' then
-                fullID = sformat('%s%s%s', id, noder.STRING_FIELD, field)
+                fullID = sformat('%s%s%s', id, STRING_FIELD, field)
             else
-                fullID = sformat('%s%s%s', id, noder.SPLIT_CHAR, field)
+                fullID = sformat('%s%s%s', id, SPLIT_CHAR, field)
             end
             local cahced, makeCache = checkCache(status, uri, fullID, mode)
             if cahced then

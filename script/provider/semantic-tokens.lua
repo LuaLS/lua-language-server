@@ -103,7 +103,7 @@ end
 
 local function refresh()
     log.debug('Refresh semantic tokens.')
-    proto.notify('workspace/semanticTokens/refresh', json.null)
+    proto.request('workspace/semanticTokens/refresh', json.null)
 end
 
 config.watch(function (key, value)

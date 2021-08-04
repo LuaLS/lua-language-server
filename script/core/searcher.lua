@@ -194,7 +194,7 @@ local function pushResult(status, mode, source, force)
 
     local parent = source.parent
     if parent.type == 'return' then
-        if getID(source) ~= status.id then
+        if source ~= status.source then
             results[#results+1] = source
             return
         end
@@ -403,8 +403,8 @@ local uriMapMT = {__index = function (self, uri)
     return t
 end}
 
-function m.searchRefsByID(status, furi, expect, mode)
-    local ast = files.getState(furi)
+function m.searchRefsByID(status, suri, expect, mode)
+    local ast = files.getState(suri)
     if not ast then
         return
     end
@@ -427,7 +427,9 @@ function m.searchRefsByID(status, furi, expect, mode)
             if cached then
                 return
             end
-            ids[id] = true
+            if uri == suri then
+                ids[id] = true
+            end
         end
         local firstID = getFirstID(id)
         if ignoredIDs[firstID] and (field or firstID ~= id) then
@@ -668,7 +670,7 @@ function m.searchRefsByID(status, furi, expect, mode)
             end
             local targetUri, targetID = getUriAndID(forwardID)
             if targetUri and targetUri ~= uri then
-                crossSearch(status, targetUri, targetID .. (field or ''), mode, uri)
+                searchID(targetUri, targetID .. (field or ''), nil)
             else
                 searchID(uri, targetID or forwardID, field)
             end
@@ -723,7 +725,7 @@ function m.searchRefsByID(status, furi, expect, mode)
             end
             local targetUri, targetID = getUriAndID(backwardID)
             if targetUri and targetUri ~= uri then
-                crossSearch(status, targetUri, targetID .. (field or ''), mode, uri)
+                searchID(targetUri, targetID .. (field or ''), nil)
             else
                 searchID(uri, targetID or backwardID, field)
             end
@@ -756,7 +758,7 @@ function m.searchRefsByID(status, furi, expect, mode)
         for i = 1, #uris do
             local ruri = uris[i]
             if uri ~= ruri then
-                crossSearch(status, ruri, tid, mode, uri)
+                searchID(ruri, tid, nil)
             end
         end
     end
@@ -779,7 +781,7 @@ function m.searchRefsByID(status, furi, expect, mode)
                 if uri == guri then
                     goto CONTINUE
                 end
-                crossSearch(status, guri, tid, mode, uri)
+                searchID(guri, tid, nil)
                 ::CONTINUE::
             end
         else
@@ -793,7 +795,7 @@ function m.searchRefsByID(status, furi, expect, mode)
                 if uri == guri then
                     goto CONTINUE
                 end
-                crossSearch(status, guri, tid, mode, uri)
+                searchID(guri, tid, nil)
                 ::CONTINUE::
             end
         end
@@ -814,7 +816,7 @@ function m.searchRefsByID(status, furi, expect, mode)
         end
         for _, guri in collector.each(sid) do
             if uri ~= guri then
-                crossSearch(status, guri, tid, mode, uri)
+                searchID(guri, tid, nil)
             end
         end
     end
@@ -829,7 +831,7 @@ function m.searchRefsByID(status, furi, expect, mode)
             local curi = getUri(call)
             local cid  = getID(call) .. (field or '')
             if curi ~= uri then
-                crossSearch(status, curi, cid, mode, uri)
+                searchID(curi, cid, nil)
             end
         end
     end
@@ -963,7 +965,7 @@ function m.searchRefsByID(status, furi, expect, mode)
         searchWeak(uri, id, field)
     end
 
-    search(furi, expect, nil)
+    search(suri, expect, nil)
 end
 
 local function prepareSearch(source)
@@ -1068,7 +1070,7 @@ end
 ---@param name string
 ---@return parser.guide.object[]
 function m.findGlobals(uri, mode, name)
-    local status = m.status(mode)
+    local status = m.status(nil, nil, mode)
 
     if name then
         local fullID
@@ -1134,7 +1136,7 @@ function m.searchFields(status, source, mode, field)
             if cached then
                 return
             end
-            local newStatus = m.status('field')
+            local newStatus = m.status(source, field, 'field')
             m.searchRefsByID(newStatus, uri, id, 'field')
             local results = newStatus.results
             for i = 1, #results do
@@ -1179,11 +1181,13 @@ end
 ---@field results parser.guide.object[]
 ---@field rmark   table
 ---@field id      string
+---@field source  parser.guide.object
+---@field field   string
 
 ---创建搜索状态
 ---@param mode guide.searchmode
 ---@return guide.status
-function m.status(mode)
+function m.status(source, field, mode)
     local status = {
         callStack = {},
         crossed   = {},
@@ -1200,6 +1204,8 @@ function m.status(mode)
         btag      = {},
         dontCross = 0,
         mode      = mode,
+        source    = source,
+        field     = field,
         cache     = vm.getCache('searcher:' .. mode),
     }
     return status
@@ -1210,7 +1216,7 @@ end
 ---@param field?    string
 ---@return parser.guide.object[]
 function m.requestReference(obj, field)
-    local status = m.status('ref')
+    local status = m.status(obj, field, 'ref')
 
     if field then
         m.searchFields(status, obj, 'ref', field)
@@ -1226,7 +1232,7 @@ end
 ---@param field?    string
 ---@return parser.guide.object[]
 function m.requestAllReference(obj, field)
-    local status = m.status('allref')
+    local status = m.status(obj, field, 'allref')
 
     if field then
         m.searchFields(status, obj, 'allref', field)
@@ -1242,7 +1248,7 @@ end
 ---@param field?    string
 ---@return parser.guide.object[]
 function m.requestDefinition(obj, field)
-    local status = m.status('def')
+    local status = m.status(obj, field, 'def')
 
     if field then
         m.searchFields(status, obj, 'def', field)
@@ -1258,7 +1264,7 @@ end
 ---@param field?    string
 ---@return parser.guide.object[]
 function m.requestAllDefinition(obj, field)
-    local status = m.status('alldef')
+    local status = m.status(obj, field, 'alldef')
 
     if field then
         m.searchFields(status, obj, 'alldef', field)

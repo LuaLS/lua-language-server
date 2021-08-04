@@ -1318,6 +1318,11 @@ function m.isCommonField(field)
     return true
 end
 
+function m.isGlobalID(id)
+    return ssub(id, 1, 2) == 'g:'
+        or ssub(id, 1, 3) == 'dn:'
+end
+
 ---获取source的ID
 ---@param source parser.guide.object
 ---@return string

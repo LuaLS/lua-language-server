@@ -71,6 +71,7 @@ local ignoredIDs = {
     ['dn:thread']        = true,
 }
 
+---@class searcher
 local m = {}
 
 ---@alias guide.searchmode '"ref"'|'"def"'|'"field"'|'"allref"'|'"alldef"'
@@ -198,20 +199,6 @@ local function pushResult(status, mode, source, force)
             return
         end
     end
-end
-
----获取uri
----@param  obj parser.guide.object
----@return uri
-function m.getUri(obj)
-    if obj.uri then
-        return obj.uri
-    end
-    local root = getRoot(obj)
-    if root then
-        return root.uri
-    end
-    return ''
 end
 
 ---@param obj parser.guide.object

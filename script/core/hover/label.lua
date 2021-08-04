@@ -9,6 +9,7 @@ local searcher    = require 'core.searcher'
 local lang        = require 'language'
 local config      = require 'config'
 local files       = require 'files'
+local guide       = require 'parser.guide'
 
 local function asFunction(source, oop)
     local name
@@ -164,7 +165,7 @@ local function asNumber(source)
     if type(num) ~= 'number' then
         return nil
     end
-    local uri  = searcher.getUri(source)
+    local uri  = guide.getUri(source)
     local text = files.getText(uri)
     if not text then
         return nil

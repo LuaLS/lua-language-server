@@ -7,8 +7,8 @@ local findSource = require 'core.find-source'
 local function sortResults(results)
     -- 先按照顺序排序
     table.sort(results, function (a, b)
-        local u1 = searcher.getUri(a.target)
-        local u2 = searcher.getUri(b.target)
+        local u1 = guide.getUri(a.target)
+        local u2 = guide.getUri(b.target)
         if u1 == u2 then
             return a.target.start < b.target.start
         else
@@ -20,7 +20,7 @@ local function sortResults(results)
     for i = #results, 1, -1 do
         local res = results[i].target
         local f   = res.finish
-        local uri = searcher.getUri(res)
+        local uri = guide.getUri(res)
         if lf and f > lf and uri == lu then
             table.remove(results, i)
         else

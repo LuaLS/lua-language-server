@@ -27,19 +27,20 @@ local getRoot      = guide.getRoot
 
 local ceach        = collector.each
 
-local getNoders       = noder.getNoders
-local getID           = noder.getID
-local getLastID       = noder.getLastID
-local removeID        = noder.removeID
-local getNodersByUri  = noder.getNodersByUri
-local getFirstID      = noder.getFirstID
-local getHeadID       = noder.getHeadID
-local eachForward     = noder.eachForward
-local getUriAndID     = noder.getUriAndID
-local eachBackward    = noder.eachBackward
-local eachSource      = noder.eachSource
-local compileAllNodes = noder.compileAllNodes
-local isGlobalID      = noder.isGlobalID
+local getNoders         = noder.getNoders
+local getID             = noder.getID
+local getLastID         = noder.getLastID
+local removeID          = noder.removeID
+local getNodersByUri    = noder.getNodersByUri
+local getFirstID        = noder.getFirstID
+local getHeadID         = noder.getHeadID
+local eachForward       = noder.eachForward
+local getUriAndID       = noder.getUriAndID
+local eachBackward      = noder.eachBackward
+local eachSource        = noder.eachSource
+local compileAllNodes   = noder.compileAllNodes
+local compilePartNoders = noder.compilePartNodes
+local isGlobalID        = noder.isGlobalID
 
 local SPLIT_CHAR     = noder.SPLIT_CHAR
 local RETURN_INDEX   = noder.RETURN_INDEX
@@ -910,11 +911,8 @@ local function prepareSearch(source)
     if not source then
         return
     end
-    local root = getRoot(source)
-    if not root then
-        return
-    end
-    --compileAllNodes(root)
+    local noders = getNoders(source)
+    compilePartNoders(noders, source)
     local uri  = getUri(source)
     local id   = getID(source)
     return uri, id

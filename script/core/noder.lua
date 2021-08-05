@@ -611,6 +611,7 @@ local function bindValue(noders, source, id)
     if not valueID then
         return
     end
+    m.compilePartNodes(noders, value)
     if source.type == 'getlocal'
     or source.type == 'setlocal' then
         source = source.node
@@ -826,17 +827,21 @@ compileNodeMap = util.switch()
             for _, src in ipairs(source.bindSources) do
                 pushForward(noders, getID(src), id)
                 pushForward(noders, id, getID(src))
+                m.compilePartNodes(noders, src)
             end
         end
         for _, enumUnit in ipairs(source.enums) do
             pushForward(noders, id, getID(enumUnit))
+            m.compilePartNodes(noders, enumUnit)
         end
         for _, resumeUnit in ipairs(source.resumes) do
             pushForward(noders, id, getID(resumeUnit))
+            m.compilePartNodes(noders, resumeUnit)
         end
         for _, typeUnit in ipairs(source.types) do
             local unitID = getID(typeUnit)
             pushForward(noders, id, unitID)
+            m.compilePartNodes(noders, typeUnit)
             if source.bindSources then
                 for _, src in ipairs(source.bindSources) do
                     pushBackward(noders, unitID, getID(src))
@@ -1414,18 +1419,121 @@ function m.compileAllNodes(source)
     return noders
 end
 
----编译全局变量的node
----@param  source parser.guide.object
----@return table
-function m.compileGlobalNodes(source)
-    
-end
+local partNodersMap = util.switch()
+    : case 'local'
+    : call(function (noders, source)
+        local refs = source.ref
+        if refs then
+            for i = 1, #refs do
+                local ref = refs[i]
+                m.compilePartNodes(noders, ref)
+            end
+        end
+
+        local nxt = source.next
+        if nxt then
+            m.compilePartNodes(noders, nxt)
+        end
+
+        local node = getMethodNode(source)
+        if node then
+            m.compilePartNodes(noders, node)
+        end
+    end)
+    : case 'setlocal'
+    : case 'getlocal'
+    : call(function (noders, source)
+        m.compilePartNodes(noders, source.node)
+
+        local nxt = source.next
+        if nxt then
+            m.compilePartNodes(noders, nxt)
+        end
+    end)
+    : case 'setfield'
+    : case 'getfield'
+    : case 'setmethod'
+    : case 'getmethod'
+    : call(function (noders, source)
+        local node = source.node
+        m.compilePartNodes(noders, node)
+
+        local nxt = source.next
+        if nxt then
+            m.compilePartNodes(noders, nxt)
+        end
+    end)
+    : case 'setglobal'
+    : case 'getglobal'
+    : call(function (noders, source)
+        local nxt = source.next
+        if nxt then
+            m.compilePartNodes(noders, nxt)
+        end
+    end)
+    : case 'label'
+    : call(function (noders, source)
+        local refs = source.ref
+        if not refs then
+            return
+        end
+        for i = 1, #refs do
+            local ref = refs[i]
+            m.compilePartNodes(noders, ref)
+        end
+    end)
+    : case 'goto'
+    : call(function (noders, source)
+        m.compilePartNodes(noders, source.node)
+    end)
+    : case 'table'
+    : call(function (noders, source)
+        for i = 1, #source do
+            local field = source[i]
+            m.compilePartNodes(noders, field)
+        end
+    end)
+    : case 'tablefield'
+    : case 'tableindex'
+    : call(function (noders, source)
+        m.compilePartNodes(noders, source.parent)
+    end)
+    : getMap()
 
 ---编译Class的node
+---@param noders noders
 ---@param  source parser.guide.object
 ---@return table
-function m.compileClassNodes(source)
-    
+function m.compilePartNodes(noders, source)
+    do return end
+    if source._noded then
+        return
+    end
+    m.compileNode(noders, source)
+    local f = partNodersMap[source.type]
+    if f then
+        f(noders, source)
+    end
+
+    local parent = source.parent
+    if parent.value == source then
+        m.compilePartNodes(noders, parent)
+    end
+end
+
+---编译全局变量的node
+---@param  root parser.guide.object
+---@return table
+function m.compileGlobalNodes(root)
+    local noders = m.getNoders(root)
+    local env = guide.getENV(root)
+    m.compilePartNodes(noders, env)
+
+    local docs = root.docs
+    for i = 1, #docs do
+        local doc = docs[i]
+        m.compileNode(noders, doc)
+    end
 end
 
 files.watch(function (ev, uri)
@@ -1435,7 +1543,6 @@ files.watch(function (ev, uri)
         if state then
             m.compileAllNodes(state.ast)
             --m.compileGlobalNodes(state.ast)
-            --m.compileClassNodes(state.ast)
         end
     end
     if ev == 'remove' then

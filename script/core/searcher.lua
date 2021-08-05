@@ -296,31 +296,6 @@ local function stop(status, msg)
     end
 end
 
-local function checkSLock(slock, id, field)
-    local cmark = slock[id]
-    if not cmark then
-        cmark = {}
-        slock[id] = {}
-    end
-    if cmark[field or ''] then
-        return false
-    end
-    cmark[field or ''] = true
-    local right = ''
-    while field and field ~= '' do
-        local lastID = getLastID(field)
-        if not lastID then
-            break
-        end
-        right = lastID .. right
-        if cmark[right] then
-            return false
-        end
-        field = ssub(field, 1, - #lastID - 1)
-    end
-    return true
-end
-
 local function isCallID(field)
     if not field then
         return false
@@ -393,6 +368,9 @@ function m.searchRefsByID(status, suri, expect, mode)
     local elockMap   = setmetatable({}, uriMapMT)
 
     local function lockExpanding(elock, id, field)
+        if not field then
+            field = ''
+        end
         local locked = elock[id]
         if locked and field then
             if #locked <= #field then
@@ -425,10 +403,6 @@ function m.searchRefsByID(status, suri, expect, mode)
             return
         end
 
-        if not checkSLock(slockMap[uri], id, field) then
-            footprint(status, 'slocked:', id, field)
-            return
-        end
         footprint(status, 'search:', id, field)
         searchStep(uri, id, field)
         footprint(status, 'pop:', id, field)
@@ -466,6 +440,11 @@ function m.searchRefsByID(status, suri, expect, mode)
         if field then
             id = id .. field
         end
+        if slockMap[uri][id] then
+            footprint(status, 'slocked:', id)
+            return
+        end
+        slockMap[uri][id] = true
         search(uri, id, nil)
     end
 

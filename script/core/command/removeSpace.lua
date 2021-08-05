@@ -26,7 +26,7 @@ return function (data)
         local pos  = line:find '[ \t]+$'
         if pos then
             local start, finish = guide.lineRange(lines, i, true)
-            start = start + pos - 1
+            start = start + pos
             if isInString(ast, start) then
                 goto NEXT_LINE
             end

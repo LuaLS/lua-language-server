@@ -35,8 +35,8 @@ METAPATH = METAPATH and util.expandPath(METAPATH) or (ROOT:string() .. '/meta')
 
 ---@diagnostic disable-next-line: deprecated
 debug.setcstacklimit(200)
-collectgarbage('generational', 5, 25)
---collectgarbage('incremental', 120, 120, 0)
+--collectgarbage('generational', 5, 25)
+collectgarbage('incremental', 120, 120, 0)
 
 ---@diagnostic disable-next-line: lowercase-global
 log = require 'log'

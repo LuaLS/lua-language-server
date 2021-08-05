@@ -3,47 +3,61 @@ local guide     = require 'parser.guide'
 local collector = require 'core.collector'
 local files     = require 'files'
 
+local tostring = tostring
+local error    = error
+local ipairs   = ipairs
+local type     = type
+local next     = next
+local log      = log
+local ssub     = string.sub
+local sformat  = string.format
+local sgsub    = string.gsub
+local smatch   = string.match
+
+_ENV = nil
+
 local SPLIT_CHAR     = '\x1F'
 local LAST_REGEX     = SPLIT_CHAR .. '[^' .. SPLIT_CHAR .. ']*$'
 local FIRST_REGEX    = '^[^' .. SPLIT_CHAR .. ']*'
-local HEAD_REGEX    = '^' .. SPLIT_CHAR .. '?[^' .. SPLIT_CHAR .. ']*'
+local HEAD_REGEX     = '^' .. SPLIT_CHAR .. '?[^' .. SPLIT_CHAR .. ']*'
+local STRING_CHAR    = '.'
 local ANY_FIELD_CHAR = '*'
 local INDEX_CHAR     = '['
 local RETURN_INDEX   = SPLIT_CHAR .. '#'
 local PARAM_INDEX    = SPLIT_CHAR .. '&'
 local TABLE_KEY      = SPLIT_CHAR .. '<'
 local WEAK_TABLE_KEY = SPLIT_CHAR .. '<<'
+local STRING_FIELD   = SPLIT_CHAR .. STRING_CHAR
 local INDEX_FIELD    = SPLIT_CHAR .. INDEX_CHAR
 local ANY_FIELD      = SPLIT_CHAR .. ANY_FIELD_CHAR
 local WEAK_ANY_FIELD = SPLIT_CHAR .. ANY_FIELD_CHAR .. ANY_FIELD_CHAR
 local URI_CHAR       = '@'
 local URI_REGEX      = URI_CHAR .. '([^' .. URI_CHAR .. ']*)' .. URI_CHAR .. '(.*)'
 
----@class node
--- 当前节点的id
----@field id     string
--- 使用该ID的单元
----@field source parser.guide.object
--- 使用该ID的单元
----@field sources parser.guide.object[]
--- 前进的关联ID
----@field forward string
--- 第一个前进关联的tag
----@field finfo? node.info
--- 前进的关联ID
----@field forwards string[]
--- 后退的关联ID
----@field backward string
--- 第一个后退关联的tag
----@field binfo? node.info
--- 后退的关联ID
----@field backwards string[]
--- 函数调用参数信息（用于泛型）
----@field call parser.guide.object
----@field skip boolean
-
----@alias noders table<string, node[]>
+---@alias node.id string
 ---@alias node.filter fun(id: string, field?: string):boolean
+
+---@class noders
+-- 使用该ID的单元
+---@field source    table<node.id, parser.guide.object>
+-- 使用该ID的单元
+---@field sources   table<node.id, parser.guide.object[]>
+-- 前进的关联ID
+---@field forward   table<node.id, node.id>
+-- 第一个前进关联的info
+---@field finfo?    table<node.id, node.info>
+-- 前进的关联ID与info
+---@field forwards  table<node.id, node.id[]|table<node.id, node.info>>
+-- 后退的关联ID
+---@field backward  table<node.id, node.id>
+-- 第一个后退关联的info
+---@field binfo?    table<node.id, node.info>
+-- 后退的关联ID与info
+---@field backwards table<node.id, node.id[]|table<node.id, node.info>>
+-- 函数调用参数信息（用于泛型）
+---@field call      table<node.id, parser.guide.object>
+---@field require   table<node.id, string>
+---@field skip      table<node.id, boolean>
 
 ---@class node.info
 ---@field reject?      string
@@ -51,19 +65,6 @@ local URI_REGEX      = URI_CHAR .. '([^' .. URI_CHAR .. ']*)' .. URI_CHAR .. '(.
 ---@field filter?      node.filter
 ---@field filterValid? node.filter
 ---@field dontCross?   boolean
-
----创建source的链接信息
----@param noders noders
----@param id string
----@return node
-local function getNode(noders, id)
-    if not noders[id] then
-        noders[id] = {
-            id = id,
-        }
-    end
-    return noders[id]
-end
 
 ---如果对象是 arg self, 则认为 id 是 method 的 node
 ---@param source parser.guide.object
@@ -92,95 +93,137 @@ local function getMethodNode(source)
     end
 end
 
----获取语法树单元的key
----@param source parser.guide.object
----@return string? key
----@return parser.guide.object? node
-local function getKey(source)
-    if     source.type == 'local' then
+local getKey
+local getKeyMap = util.switch()
+    : case 'local'
+    : call(function (source)
         if source.parent.type == 'funcargs' then
             return 'p:' .. source.start, nil
         end
         return 'l:' .. source.start, nil
-    elseif source.type == 'setlocal'
-    or     source.type == 'getlocal' then
+    end)
+    : case 'setlocal'
+    : case 'getlocal'
+    : call(function (source)
         return getKey(source.node)
-    elseif source.type == 'setglobal'
-    or     source.type == 'getglobal' then
+    end)
+    : case 'setglobal'
+    : case 'getglobal'
+    : call(function (source)
         local node = source.node
         if node.tag == '_ENV' then
-            return ('%q'):format(source[1] or ''), nil
+            return STRING_CHAR .. (source[1] or ''), nil
         else
-            return ('%q'):format(source[1] or ''), node
+            return STRING_CHAR .. (source[1] or ''), node
         end
-    elseif source.type == 'getfield'
-    or     source.type == 'setfield' then
-        return ('%q'):format(source.field and source.field[1] or ''), source.node
-    elseif source.type == 'tablefield' then
-        return ('%q'):format(source.field and source.field[1] or ''), source.parent
-    elseif source.type == 'getmethod'
-    or     source.type == 'setmethod' then
-        return ('%q'):format(source.method and source.method[1] or ''), source.node
-    elseif source.type == 'setindex'
-    or     source.type == 'getindex' then
+    end)
+    : case 'getfield'
+    : case 'setfield'
+    : call(function (source)
+        return STRING_CHAR .. (source.field and source.field[1] or ''), source.node
+    end)
+    : case 'tablefield'
+    : call(function (source)
+        return STRING_CHAR .. (source.field and source.field[1] or ''), source.parent
+    end)
+    : case 'getmethod'
+    : case 'setmethod'
+    : call(function (source)
+        return STRING_CHAR .. (source.method and source.method[1] or ''), source.node
+    end)
+    : case 'setindex'
+    : case 'getindex'
+    : call(function (source)
         local index = source.index
         if not index then
             return INDEX_CHAR, source.node
         end
-        if index.type == 'string'
-        or index.type == 'boolean'
-        or index.type == 'integer'
-        or index.type == 'number' then
-            return ('%q'):format(index[1] or ''), source.node
+        if index.type == 'string' then
+            return STRING_CHAR .. (index[1] or ''), source.node
+        elseif index.type == 'boolean'
+        or     index.type == 'integer'
+        or     index.type == 'number' then
+            return tostring(index[1] or ''), source.node
         else
             return INDEX_CHAR, source.node
         end
-    elseif source.type == 'tableindex' then
+    end)
+    : case 'tableindex'
+    : call(function (source)
         local index = source.index
         if not index then
             return ANY_FIELD_CHAR, source.parent
         end
-        if index.type == 'string'
-        or index.type == 'boolean'
-        or index.type == 'integer'
-        or index.type == 'number' then
-            return ('%q'):format(index[1] or ''), source.parent
+        if index.type == 'string' then
+            return STRING_CHAR .. (index[1] or ''), source.parent
+        elseif index.type == 'boolean'
+        or     index.type == 'integer'
+        or     index.type == 'number' then
+            return tostring(index[1] or ''), source.parent
         elseif index.type ~= 'function'
         and    index.type ~= 'table' then
             return ANY_FIELD_CHAR, source.parent
         end
-    elseif source.type == 'tableexp' then
+    end)
+    : case 'tableexp'
+    : call(function (source)
         return tostring(source.tindex), source.parent
-    elseif source.type == 'table' then
+    end)
+    : case 'table'
+    : call(function (source)
         return 't:' .. source.start, nil
-    elseif source.type == 'label' then
+    end)
+    : case 'label'
+    : call(function (source)
         return 'l:' .. source.start, nil
-    elseif source.type == 'goto' then
+    end)
+    : case 'goto'
+    : call(function (source)
         if source.node then
             return 'l:' .. source.node.start, nil
         end
         return nil, nil
-    elseif source.type == 'function' then
+    end)
+    : case 'function'
+    : call(function (source)
         return 'f:' .. source.start, nil
-    elseif source.type == 'string' then
+    end)
+    : case 'string'
+    : call(function (source)
         return 'str:', nil
-    elseif source.type == 'integer' then
-        return 'int:'
-    elseif source.type == 'number' then
-        return 'num:'
-    elseif source.type == 'boolean' then
-        return 'bool:'
-    elseif source.type == 'nil' then
+    end)
+    : case 'integer'
+    : call(function (source)
+        return 'int:', nil
+    end)
+    : case 'number'
+    : call(function (source)
+        return 'num:', nil
+    end)
+    : case 'boolean'
+    : call(function (source)
+        return 'bool:', nil
+    end)
+    : case 'nil'
+    : call(function (source)
         return 'nil:', nil
-    elseif source.type == '...' then
+    end)
+    : case '...'
+    : call(function (source)
         return 'va:' .. source.start, nil
-    elseif source.type == 'varargs' then
+    end)
+    : case 'varargs'
+    : call(function (source)
         if source.node then
             return 'va:' .. source.node.start, nil
         end
-    elseif source.type == 'select' then
-        return ('s:%d%s%d'):format(source.start, RETURN_INDEX, source.sindex)
-    elseif source.type == 'call' then
+    end)
+    : case 'select'
+    : call(function (source)
+        return sformat('s:%d%s%d', source.start, RETURN_INDEX, source.sindex)
+    end)
+    : case 'call'
+    : call(function (source)
         local node = source.node
         if node.special == 'rawget'
         or node.special == 'rawset' then
@@ -192,66 +235,111 @@ local function getKey(source)
                 return nil, nil
             end
             if key.type == 'string' then
-                return ('%q'):format(key[1] or ''), tbl
+                return STRING_CHAR .. (key[1] or ''), tbl
             else
                 return '', tbl
             end
         end
         return 'c:' .. source.finish, nil
-    elseif source.type == 'doc.class.name'
-    or     source.type == 'doc.alias.name'
-    or     source.type == 'doc.extends.name' then
+    end)
+    : case 'doc.class.name'
+    : case 'doc.alias.name'
+    : case 'doc.extends.name'
+    : call(function (source)
         local name = source[1]
         return 'dn:' .. name, nil
-    elseif source.type == 'doc.type.name' then
+    end)
+    : case 'doc.type.name'
+    : call(function (source)
         local name = source[1]
         if source.typeGeneric then
             return 'dg:' .. source.typeGeneric[name][1].start, nil
         else
             return 'dn:' .. name, nil
         end
-    elseif source.type == 'doc.see.name' then
+    end)
+    : case 'doc.see.name'
+    : call(function (source)
         local name = source[1]
         return 'dsn:' .. name, nil
-    elseif source.type == 'doc.class' then
+    end)
+    : case 'doc.class'
+    : call(function (source)
         return 'dc:' .. source.start
-    elseif source.type == 'doc.type' then
+    end)
+    : case 'doc.type'
+    : call(function (source)
         return 'dt:' .. source.start
-    elseif source.type == 'doc.param' then
+    end)
+    : case 'doc.param'
+    : call(function (source)
         return 'dp:' .. source.start
-    elseif source.type == 'doc.vararg' then
+    end)
+    : case 'doc.vararg'
+    : call(function (source)
         return 'dv:' .. source.start
-    elseif source.type == 'doc.field.name' then
+    end)
+    : case 'doc.field.name'
+    : call(function (source)
         return 'dfn:' .. source.start
-    elseif source.type == 'doc.type.enum'
-    or     source.type == 'doc.resume' then
+    end)
+    : case 'doc.type.enum'
+    : case 'doc.resume'
+    : call(function (source)
         return 'de:' .. source.start
-    elseif source.type == 'doc.type.table' then
+    end)
+    : case 'doc.type.table'
+    : call(function (source)
         return 'dtable:' .. source.start
-    elseif source.type == 'doc.type.ltable' then
+    end)
+    : case 'doc.type.ltable'
+    : call(function (source)
         return 'dltable:' .. source.start
-    elseif source.type == 'doc.type.field' then
+    end)
+    : case 'doc.type.field'
+    : call(function (source)
         return 'dfield:' .. source.start
-    elseif source.type == 'doc.type.array' then
+    end)
+    : case 'doc.type.array'
+    : call(function (source)
         return 'darray:' .. source.finish
-    elseif source.type == 'doc.type.function' then
+    end)
+    : case 'doc.type.function'
+    : call(function (source)
         return 'dfun:' .. source.start, nil
-    elseif source.type == 'doc.see.field' then
-        return ('%q'):format(source[1]), source.parent.name
-    elseif source.type == 'generic.closure' then
+    end)
+    : case 'doc.see.field'
+    : call(function (source)
+        return STRING_CHAR .. (source[1]), source.parent.name
+    end)
+    : case 'generic.closure'
+    : call(function (source)
         return 'gc:' .. source.call.start, nil
-    elseif source.type == 'generic.value' then
+    end)
+    : case 'generic.value'
+    : call(function (source)
         local tail = ''
         if guide.getUri(source.closure.call) ~= guide.getUri(source.proto) then
             tail = URI_CHAR .. guide.getUri(source.closure.call)
         end
-        return ('gv:%s|%s%s'):format(
-            source.closure.call.start,
-            getKey(source.proto),
-            tail
+        return sformat('gv:%s|%s%s'
+            , source.closure.call.start
+            , getKey(source.proto)
+            , tail
         )
+    end)
+    : getMap()
+
+---获取语法树单元的key
+---@param source parser.guide.object
+---@return string? key
+---@return parser.guide.object? node
+function getKey(source)
+    local f = getKeyMap[source.type]
+    if f then
+        return f(source)
     end
-    return nil, nil
+    return nil
 end
 
 local function getNodeKey(source)
@@ -270,7 +358,6 @@ local function getNodeKey(source)
     return key, node
 end
 
-local IDList = {}
 ---获取语法树单元的字符串ID
 ---@param source parser.guide.object
 ---@return string? id
@@ -287,36 +374,26 @@ local function getID(source)
         return nil
     end
     local current = source
-    local index = 0
-    while true do
-        if current.type == 'paren' then
-            current = current.exp
-            if not current then
-                return nil
-            end
-            goto CONTINUE
+    while current.type == 'paren' do
+        current = current.exp
+        if not current then
+            source._id = false
+            return nil
         end
-        local id, node = getNodeKey(current)
-        if not id then
-            break
-        end
-        index = index + 1
-        IDList[index] = id
-        if not node then
-            break
-        end
-        current = node
-        ::CONTINUE::
     end
-    if index == 0 then
+    local id, node = getNodeKey(current)
+    if not id then
         source._id = false
         return nil
     end
-    for i = index + 1, #IDList do
-        IDList[i] = nil
+    if node then
+        local pid = getID(node)
+        if not pid then
+            source._id = false
+            return nil
+        end
+        id = pid .. SPLIT_CHAR .. id
     end
-    util.revertTable(IDList)
-    local id = table.concat(IDList, SPLIT_CHAR)
     source._id = id
     return id
 end
@@ -333,23 +410,24 @@ local function pushForward(noders, id, forwardID, info)
     or id == forwardID then
         return
     end
-    local node = getNode(noders, id)
-    if not node.forward then
-        node.forward = forwardID
-        node.finfo   = info
+    if not noders.forward[id] then
+        noders.forward[id] = forwardID
+        noders.finfo[id]   = info
         return
     end
-    if node.forward == forwardID then
+    if noders.forward[id] == forwardID then
         return
     end
-    if not node.forwards then
-        node.forwards = {}
+    local forwards = noders.forwards[id]
+    if not forwards then
+        forwards = {}
+        noders.forwards[id] = forwards
     end
-    if node.forwards[forwardID] ~= nil then
+    if forwards[forwardID] ~= nil then
         return
     end
-    node.forwards[forwardID] = info or false
-    node.forwards[#node.forwards+1] = forwardID
+    forwards[forwardID] = info or false
+    forwards[#forwards+1] = forwardID
 end
 
 ---添加关联的后退ID
@@ -364,29 +442,32 @@ local function pushBackward(noders, id, backwardID, info)
     or id == backwardID then
         return
     end
-    local node = getNode(noders, id)
-    if not node.backward then
-        node.backward = backwardID
-        node.binfo    = info
+    if not noders.backward[id] then
+        noders.backward[id] = backwardID
+        noders.binfo[id]    = info
         return
     end
-    if node.backward == backwardID then
+    if noders.backward[id] == backwardID then
         return
     end
-    if not node.backwards then
-        node.backwards = {}
+    local backwards = noders.backwards[id]
+    if not backwards then
+        backwards = {}
+        noders.backwards[id] = backwards
     end
-    if node.backwards[backwardID] ~= nil then
+    if backwards[backwardID] ~= nil then
         return
     end
-    node.backwards[backwardID] = info or false
-    node.backwards[#node.backwards+1] = backwardID
+    backwards[backwardID] = info or false
+    backwards[#backwards+1] = backwardID
 end
 
 ---@class noder
 local m = {}
 
 m.SPLIT_CHAR     = SPLIT_CHAR
+m.STRING_CHAR    = STRING_CHAR
+m.STRING_FIELD   = STRING_FIELD
 m.RETURN_INDEX   = RETURN_INDEX
 m.PARAM_INDEX    = PARAM_INDEX
 m.TABLE_KEY      = TABLE_KEY
@@ -416,47 +497,50 @@ local function getDocStateWithoutCrossFunction(obj)
     error('guide.getDocState overstack')
 end
 
+local dontPushSourceMap = util.arrayToHash {
+    'str:', 'nil:', 'num:', 'int:', 'bool:'
+}
+
 ---添加关联单元
 ---@param noders noders
 ---@param source parser.guide.object
 function m.pushSource(noders, source, id)
-    id = id or m.getID(source)
+    id = id or getID(source)
     if not id then
         return
     end
-    if id == 'str:'
-    or id == 'nil:'
-    or id == 'num:'
-    or id == 'int:'
-    or id == 'bool:' then
+    if dontPushSourceMap[id] then
         return
     end
-    local node = getNode(noders, id)
-    if not node.source then
-        node.source = source
+    if not noders.source[id] then
+        noders.source[id] = source
         return
     end
-    if not node.sources then
-        node.sources = {}
+    local sources = noders.sources[id]
+    if not sources then
+        sources = {}
+        noders.sources[id] = sources
     end
-    node.sources[#node.sources+1] = source
+    sources[#sources+1] = source
 end
 
 local DUMMY_FUNCTION = function () end
 
 ---遍历关联单元
----@param node node
+---@param noders noders
+---@param id node.id
 ---@return fun():parser.guide.object
-function m.eachSource(node)
-    if not node.source then
+function m.eachSource(noders, id)
+    local source = noders.source[id]
+    if not source then
         return DUMMY_FUNCTION
     end
     local index
-    local sources = node.sources
+    local sources = noders.sources[id]
     return function ()
         if not index then
             index = 0
-            return node.source
+            return source
         end
         if not sources then
             return nil
@@ -467,18 +551,20 @@ function m.eachSource(node)
 end
 
 ---遍历forward
----@param node node
+---@param noders noders
+---@param id node.id
 ---@return fun():string, string
-function m.eachForward(node)
-    if not node.forward then
+function m.eachForward(noders, id)
+    local forward = noders.forward[id]
+    if not forward then
         return DUMMY_FUNCTION
     end
     local index
-    local forwards = node.forwards
+    local forwards = noders.forwards[id]
     return function ()
         if not index then
             index = 0
-            return node.forward, node.finfo
+            return forward, noders.finfo[id]
         end
         if not forwards then
             return nil
@@ -491,18 +577,20 @@ function m.eachForward(node)
 end
 
 ---遍历backward
----@param node node
----@return fun():string, node.info
-function m.eachBackward(node)
-    if not node.backward then
+---@param noders noders
+---@param id node.id
+---@return fun():string, string
+function m.eachBackward(noders, id)
+    local backward = noders.backward[id]
+    if not backward then
         return DUMMY_FUNCTION
     end
     local index
-    local backwards = node.backwards
+    local backwards = noders.backwards[id]
     return function ()
         if not index then
             index = 0
-            return node.backward, node.binfo
+            return backward, noders.binfo[id]
         end
         if not backwards then
             return nil
@@ -523,6 +611,7 @@ local function bindValue(noders, source, id)
     if not valueID then
         return
     end
+    m.compilePartNodes(noders, value)
     if source.type == 'getlocal'
     or source.type == 'setlocal' then
         source = source.node
@@ -540,7 +629,7 @@ local function bindValue(noders, source, id)
         reject = 'set',
     })
     -- 参数/call禁止反向查找赋值
-    local valueType = valueID:match '^(.-:).'
+    local valueType = smatch(valueID, '^(.-:).')
     if not valueType then
         return
     end
@@ -583,12 +672,12 @@ local function compileCallParam(noders, call, sourceID)
         if firstIndex > 0 and callArg.type == 'function' then
             if callArg.args then
                 for secondIndex, funcParam in ipairs(callArg.args) do
-                    local paramID = ('%s%s%s%s%s'):format(
-                        nodeID,
-                        PARAM_INDEX,
-                        firstIndex,
-                        PARAM_INDEX,
-                        secondIndex
+                    local paramID = sformat('%s%s%s%s%s'
+                        , nodeID
+                        , PARAM_INDEX
+                        , firstIndex
+                        , PARAM_INDEX
+                        , secondIndex
                     )
                     pushForward(noders, getID(funcParam), paramID)
                 end
@@ -616,10 +705,10 @@ local function compileCallReturn(noders, call, sourceID, returnIndex)
         local metaID = getID(call.args and call.args[2])
         local indexID
         if metaID then
-            indexID = ('%s%s%q'):format(
-                metaID,
-                SPLIT_CHAR,
-                '__index'
+            indexID = sformat('%s%s%s'
+                , metaID
+                , STRING_FIELD
+                , '__index'
             )
         end
         pushForward(noders, sourceID, tblID)
@@ -628,7 +717,7 @@ local function compileCallReturn(noders, call, sourceID, returnIndex)
                 if field then
                     return true
                 end
-                return id:sub(1, 2) ~= 'f:'
+                return ssub(id, 1, 2) ~= 'f:'
             end,
             filterValid = function (id, field)
                 return not field
@@ -641,7 +730,7 @@ local function compileCallReturn(noders, call, sourceID, returnIndex)
     if node.special == 'require' then
         local arg1 = call.args and call.args[1]
         if arg1 and arg1.type == 'string' then
-            getNode(noders, sourceID).require = arg1[1]
+            noders.require[sourceID] = arg1[1]
         end
         pushBackward(noders, callID, sourceID, {
             deep = true,
@@ -658,10 +747,10 @@ local function compileCallReturn(noders, call, sourceID, returnIndex)
         if not funcID then
             return
         end
-        local pfuncXID = ('%s%s%s'):format(
-            funcID,
-            RETURN_INDEX,
-            index
+        local pfuncXID = sformat('%s%s%s'
+            , funcID
+            , RETURN_INDEX
+            , index
         )
         pushForward(noders, sourceID, pfuncXID)
         pushBackward(noders, pfuncXID, sourceID, {
@@ -669,131 +758,51 @@ local function compileCallReturn(noders, call, sourceID, returnIndex)
         })
         return
     end
-    local funcXID = ('%s%s%s'):format(
-        nodeID,
-        RETURN_INDEX,
-        returnIndex
+    local funcXID = sformat('%s%s%s'
+        , nodeID
+        , RETURN_INDEX
+        , returnIndex
     )
-    getNode(noders, sourceID).call = call
+    noders.call[sourceID] = call
     pushForward(noders, sourceID, funcXID)
     pushBackward(noders, funcXID, sourceID, {
         deep = true,
     })
 end
 
-function m.compileDocValue(noders, tp, id, source)
-    if tp == 'doc.type' then
-        if source.bindSources then
-            for _, src in ipairs(source.bindSources) do
-                pushForward(noders, getID(src), id)
-                pushForward(noders, id, getID(src))
-            end
-        end
-        for _, enumUnit in ipairs(source.enums) do
-            pushForward(noders, id, getID(enumUnit))
-        end
-        for _, resumeUnit in ipairs(source.resumes) do
-            pushForward(noders, id, getID(resumeUnit))
-        end
-        for _, typeUnit in ipairs(source.types) do
-            local unitID = getID(typeUnit)
-            pushForward(noders, id, unitID)
-            if source.bindSources then
-                for _, src in ipairs(source.bindSources) do
-                    pushBackward(noders, unitID, getID(src))
-                end
-            end
-        end
-    end
-    if tp == 'doc.type.table' then
-        if source.tkey then
-            local keyID = ('%s%s'):format(
-                id,
-                TABLE_KEY
-            )
-            pushForward(noders, keyID, getID(source.tkey))
-        end
-        if source.tvalue then
-            local valueID = ('%s%s'):format(
-                id,
-                ANY_FIELD
-            )
-            pushForward(noders, valueID, getID(source.tvalue))
-        end
-    end
-    if tp == 'doc.type.ltable' then
-        local firstField = source.fields[1]
-        if not firstField then
+local specialMap = util.arrayToHash {
+    'require', 'dofile', 'loadfile',
+    'rawset', 'rawget', 'setmetatable',
+}
+
+local compileNodeMap
+compileNodeMap = util.switch()
+    : case 'string'
+    : call(function (noders, id, source)
+        pushForward(noders, id, 'str:')
+    end)
+    : case 'boolean'
+    : call(function (noders, id, source)
+        pushForward(noders, id, 'dn:boolean')
+    end)
+    : case 'number'
+    : call(function (noders, id, source)
+        pushForward(noders, id, 'dn:number')
+    end)
+    : case 'integer'
+    : call(function (noders, id, source)
+        pushForward(noders, id, 'dn:integer')
+    end)
+    : case 'nil'
+    : call(function (noders, id, source)
+        pushForward(noders, id, 'dn:nil')
+    end)
+    -- self -> mt:xx
+    : case 'local'
+    : call(function (noders, id, source)
+        if source[1] ~= 'self' then
             return
         end
-        local keyID = ('%s%s'):format(
-            id,
-            WEAK_TABLE_KEY
-        )
-        local valueID = ('%s%s'):format(
-            id,
-            WEAK_ANY_FIELD
-        )
-        pushForward(noders, keyID, 'dn:string')
-        pushForward(noders, valueID, getID(firstField.extends))
-        for _, field in ipairs(source.fields) do
-            local extendsID = ('%s%s%q'):format(
-                id,
-                SPLIT_CHAR,
-                field.name[1]
-            )
-            pushForward(noders, extendsID, getID(field))
-            pushForward(noders, extendsID, getID(field.extends))
-        end
-    end
-    if tp == 'doc.type.array' then
-        if source.node then
-            local nodeID = ('%s%s'):format(
-                id,
-                ANY_FIELD
-            )
-            pushForward(noders, nodeID, getID(source.node))
-        end
-        local keyID = ('%s%s'):format(
-            id,
-            TABLE_KEY
-        )
-        pushForward(noders, keyID, 'dn:integer')
-    end
-end
-
----@param noders noders
----@param source parser.guide.object
----@return parser.guide.object[]
-function m.compileNode(noders, source)
-    local id = getID(source)
-    bindValue(noders, source, id)
-    if source.special == 'setmetatable'
-    or source.special == 'require'
-    or source.special == 'dofile'
-    or source.special == 'loadfile'
-    or source.special == 'rawset'
-    or source.special == 'rawget' then
-        local node = getNode(noders, id)
-        node.skip = true
-    end
-    if source.type == 'string' then
-        pushForward(noders, id, 'str:')
-    end
-    if source.type == 'boolean' then
-        pushForward(noders, id, 'dn:boolean')
-    end
-    if source.type == 'number' then
-        pushForward(noders, id, 'dn:number')
-    end
-    if source.type == 'integer' then
-        pushForward(noders, id, 'dn:integer')
-    end
-    if source.type == 'nil' then
-        pushForward(noders, id, 'dn:nil')
-    end
-    -- self -> mt:xx
-    if source.type == 'local' and source[1] == 'self' then
         local func = guide.getParentFunction(source)
         if func.isGeneric then
             return
@@ -811,37 +820,91 @@ function m.compileNode(noders, source)
                 deep = true,
             })
         end
-    end
-    -- 分解 @type
-    --if source.type == 'doc.type' then
-    --    if source.bindSources then
-    --        for _, src in ipairs(source.bindSources) do
-    --            pushForward(noders, getID(src), id)
-    --            pushForward(noders, id, getID(src))
-    --        end
-    --    end
-    --    for _, enumUnit in ipairs(source.enums) do
-    --        pushForward(noders, id, getID(enumUnit))
-    --    end
-    --    for _, resumeUnit in ipairs(source.resumes) do
-    --        pushForward(noders, id, getID(resumeUnit))
-    --    end
-    --    for _, typeUnit in ipairs(source.types) do
-    --        local unitID = getID(typeUnit)
-    --        pushForward(noders, id, unitID)
-    --        if source.bindSources then
-    --            for _, src in ipairs(source.bindSources) do
-    --                pushBackward(noders, unitID, getID(src))
-    --            end
-    --        end
-    --    end
-    --end
-    -- 分解 @alias
-    if source.type == 'doc.alias' then
+    end)
+    : case 'doc.type'
+    : call(function (noders, id, source)
+        if source.bindSources then
+            for _, src in ipairs(source.bindSources) do
+                pushForward(noders, getID(src), id)
+                pushForward(noders, id, getID(src))
+                m.compilePartNodes(noders, src)
+            end
+        end
+        for _, enumUnit in ipairs(source.enums) do
+            pushForward(noders, id, getID(enumUnit))
+            m.compilePartNodes(noders, enumUnit)
+        end
+        for _, resumeUnit in ipairs(source.resumes) do
+            pushForward(noders, id, getID(resumeUnit))
+            m.compilePartNodes(noders, resumeUnit)
+        end
+        for _, typeUnit in ipairs(source.types) do
+            local unitID = getID(typeUnit)
+            pushForward(noders, id, unitID)
+            m.compilePartNodes(noders, typeUnit)
+            if source.bindSources then
+                for _, src in ipairs(source.bindSources) do
+                    pushBackward(noders, unitID, getID(src))
+                end
+            end
+        end
+    end)
+    : case 'doc.type.table'
+    : call(function (noders, id, source)
+        if source.tkey then
+            local keyID = id .. TABLE_KEY
+            pushForward(noders, keyID, getID(source.tkey))
+        end
+        if source.tvalue then
+            local valueID = id .. ANY_FIELD
+            pushForward(noders, valueID, getID(source.tvalue))
+        end
+    end)
+    : case 'doc.type.ltable'
+    : call(function (noders, id, source)
+        local firstField = source.fields[1]
+        if not firstField then
+            return
+        end
+        local keyID   = id .. WEAK_TABLE_KEY
+        local valueID = id .. WEAK_ANY_FIELD
+        pushForward(noders, keyID, 'dn:string')
+        pushForward(noders, valueID, getID(firstField.extends))
+        for _, field in ipairs(source.fields) do
+            local fname = field.name[1]
+            local extendsID
+            if type(fname) == 'string' then
+                extendsID = sformat('%s%s%s'
+                    , id
+                    , STRING_FIELD
+                    , fname
+                )
+            else
+                extendsID = sformat('%s%s%s'
+                    , id
+                    , SPLIT_CHAR
+                    , fname
+                )
+            end
+            pushForward(noders, extendsID, getID(field))
+            pushForward(noders, extendsID, getID(field.extends))
+        end
+    end)
+    : case 'doc.type.array'
+    : call(function (noders, id, source)
+        if source.node then
+            local nodeID = id .. ANY_FIELD
+            pushForward(noders, nodeID, getID(source.node))
+        end
+        local keyID = id .. TABLE_KEY
+        pushForward(noders, keyID, 'dn:integer')
+    end)
+    : case 'doc.alias'
+    : call(function (noders, id, source)
         pushForward(noders, getID(source.alias), getID(source.extends))
-    end
-    -- 分解 @class
-    if source.type == 'doc.class' then
+    end)
+    : case 'doc.class'
+    : call(function (noders, id, source)
         pushForward(noders, id, getID(source.class))
         pushForward(noders, getID(source.class), id)
         if source.extends then
@@ -858,47 +921,60 @@ function m.compileNode(noders, source)
         for _, field in ipairs(source.fields) do
             local key = field.field[1]
             if key then
-                local keyID = ('%s%s%q'):format(
-                    id,
-                    SPLIT_CHAR,
-                    key
-                )
+                local keyID
+                if type(key) == 'string' then
+                    keyID = sformat('%s%s%s'
+                        , id
+                        , STRING_FIELD
+                        , key
+                    )
+                else
+                    keyID = sformat('%s%s%s'
+                        , id
+                        , SPLIT_CHAR
+                        , key
+                    )
+                end
                 pushForward(noders, keyID, getID(field.field))
                 pushForward(noders, getID(field.field), keyID)
                 pushForward(noders, keyID, getID(field.extends))
                 pushBackward(noders, getID(field.extends), keyID)
             end
         end
-    end
-    if source.type == 'doc.param' then
+    end)
+    : case 'doc.param'
+    : call(function (noders, id, source)
         pushForward(noders, id, getID(source.extends))
         for _, src in ipairs(source.bindSources) do
             if src.type == 'local' and src.parent.type == 'in' then
                 pushForward(noders, getID(src), id)
             end
         end
-    end
-    if source.type == 'doc.vararg' then
+    end)
+    : case 'doc.vararg'
+    : call(function (noders, id, source)
         pushForward(noders, getID(source), getID(source.vararg))
-    end
-    if source.type == 'doc.see' then
+    end)
+    : case 'doc.see'
+    : call(function (noders, id, source)
         local nameID  = getID(source.name)
-        local classID = nameID:gsub('^dsn:', 'dn:')
+        local classID = sgsub(nameID, '^dsn:', 'dn:')
         pushForward(noders, nameID, classID)
         if source.field then
             local fieldID      = getID(source.field)
-            local fieldClassID = fieldID:gsub('^dsn:', 'dn:')
+            local fieldClassID = sgsub(fieldID, '^dsn:', 'dn:')
             pushForward(noders, fieldID, fieldClassID)
         end
-    end
-    m.compileDocValue(noders, source.type, id, source)
-    if source.type == 'call' then
+    end)
+    : case 'call'
+    : call(function (noders, id, source)
         if source.parent.type ~= 'select' then
             compileCallReturn(noders, source, id, 1)
         end
         compileCallParam(noders, source, id)
-    end
-    if source.type == 'select' then
+    end)
+    : case 'select'
+    : call(function (noders, id, source)
         if source.vararg.type == 'call' then
             local call = source.vararg
             compileCallReturn(noders, call, id, source.sindex)
@@ -906,22 +982,23 @@ function m.compileNode(noders, source)
         if source.vararg.type == 'varargs' then
             pushForward(noders, id, getID(source.vararg))
         end
-    end
-    if source.type == 'doc.type.function' then
+    end)
+    : case 'doc.type.function'
+    : call(function (noders, id, source)
         if source.returns then
             for index, rtn in ipairs(source.returns) do
-                local returnID = ('%s%s%s'):format(
-                    id,
-                    RETURN_INDEX,
-                    index
+                local returnID = sformat('%s%s%s'
+                    , id
+                    , RETURN_INDEX
+                    , index
                 )
                 pushForward(noders, returnID, getID(rtn))
             end
             for index, param in ipairs(source.args) do
-                local paramID = ('%s%s%s'):format(
-                    id,
-                    PARAM_INDEX,
-                    index
+                local paramID = sformat('%s%s%s'
+                    , id
+                    , PARAM_INDEX
+                    , index
                 )
                 pushForward(noders, paramID, getID(param.extends))
             end
@@ -936,52 +1013,38 @@ function m.compileNode(noders, source)
                 end
             end)
         end
-    end
-    if source.type == 'doc.type.name' then
+    end)
+    : case 'doc.type.name'
+    : call(function (noders, id, source)
         local uri = guide.getUri(source)
-        collector.subscribe(uri, id, getNode(noders, id))
-    end
-    if source.type == 'doc.class.name'
-    or source.type == 'doc.alias.name' then
+        collector.subscribe(uri, id, noders)
+    end)
+    : case 'doc.class.name'
+    : case 'doc.alias.name'
+    : call(function (noders, id, source)
         local uri = guide.getUri(source)
-        collector.subscribe(uri, id, getNode(noders, id))
+        collector.subscribe(uri, id, noders)
 
         local defID = 'def:' .. id
-        collector.subscribe(uri, defID, getNode(noders, defID))
+        collector.subscribe(uri, defID, noders)
         m.pushSource(noders, source, defID)
 
         local defAnyID = 'def:dn:'
-        collector.subscribe(uri, defAnyID, getNode(noders, defAnyID))
+        collector.subscribe(uri, defAnyID, noders)
         m.pushSource(noders, source, defAnyID)
-    end
-    if id and id:sub(1, 2) == 'g:' then
-        local uri = guide.getUri(source)
-        collector.subscribe(uri, id, getNode(noders, id))
-        if guide.isSet(source) then
-
-            local defID = 'def:' .. id
-            collector.subscribe(uri, defID, getNode(noders, defID))
-            m.pushSource(noders, source, defID)
-
-            if guide.isGlobal(source) then
-                local defAnyID = 'def:g:'
-                collector.subscribe(uri, defAnyID, getNode(noders, defAnyID))
-                m.pushSource(noders, source, defAnyID)
-            end
-        end
-    end
-    -- 将函数的返回值映射到具体的返回值上
-    if source.type == 'function' then
+    end)
+    : case 'function'
+    : call(function (noders, id, source)
         local hasDocReturn = {}
         -- 检查 luadoc
         if source.bindDocs then
             for _, doc in ipairs(source.bindDocs) do
                 if doc.type == 'doc.return' then
                     for _, rtn in ipairs(doc.returns) do
-                        local fullID = ('%s%s%s'):format(
-                            id,
-                            RETURN_INDEX,
-                            rtn.returnIndex
+                        local fullID = sformat('%s%s%s'
+                            , id
+                            , RETURN_INDEX
+                            , rtn.returnIndex
                         )
                         pushForward(noders, fullID, getID(rtn))
                         for _, typeUnit in ipairs(rtn.types) do
@@ -1001,10 +1064,10 @@ function m.compileNode(noders, source)
                         if param then
                             pushForward(noders, getID(param), getID(doc))
                             param.docParam = doc
-                            local paramID = ('%s%s%s'):format(
-                                id,
-                                PARAM_INDEX,
-                                paramIndex
+                            local paramID = sformat('%s%s%s'
+                                , id
+                                , PARAM_INDEX
+                                , paramIndex
                             )
                             pushForward(noders, paramID, getID(doc.extends))
                         end
@@ -1041,10 +1104,10 @@ function m.compileNode(noders, source)
                 end
             end
             for index, rtnObjs in ipairs(returns) do
-                local returnID = ('%s%s%s'):format(
-                    id,
-                    RETURN_INDEX,
-                    index
+                local returnID = sformat('%s%s%s'
+                    , id
+                    , RETURN_INDEX
+                    , index
                 )
                 for _, rtnObj in ipairs(rtnObjs) do
                     pushForward(noders, returnID, getID(rtnObj))
@@ -1055,31 +1118,20 @@ function m.compileNode(noders, source)
                 end
             end
         end
-    end
-    if source.type == 'table' then
+    end)
+    : case 'table'
+    : call(function (noders, id, source)
         local firstField = source[1]
         if firstField then
             if firstField.type == 'varargs' then
-                local keyID = ('%s%s'):format(
-                    id,
-                    TABLE_KEY
-                )
-                local valueID = ('%s%s'):format(
-                    id,
-                    ANY_FIELD
-                )
+                local keyID   = id .. TABLE_KEY
+                local valueID = id .. ANY_FIELD
                 source.array = firstField
                 pushForward(noders, keyID, 'dn:integer')
                 pushForward(noders, valueID, getID(firstField))
             else
-                local keyID = ('%s%s'):format(
-                    id,
-                    WEAK_TABLE_KEY
-                )
-                local valueID = ('%s%s'):format(
-                    id,
-                    WEAK_ANY_FIELD
-                )
+                local keyID   = id .. WEAK_TABLE_KEY
+                local valueID = id .. WEAK_ANY_FIELD
                 if firstField.type == 'tablefield' then
                     pushForward(noders, keyID, 'dn:string')
                     pushForward(noders, valueID, getID(firstField.value))
@@ -1092,8 +1144,9 @@ function m.compileNode(noders, source)
                 end
             end
         end
-    end
-    if source.type == 'main' then
+    end)
+    : case 'main'
+    : call(function (noders, id, source)
         if source.returns then
             for _, rtn in ipairs(source.returns) do
                 local rtnObj = rtn[1]
@@ -1105,19 +1158,21 @@ function m.compileNode(noders, source)
                 end
             end
         end
-    end
-    if source.type == 'generic.closure' then
+    end)
+    : case 'generic.closure'
+    : call(function (noders, id, source)
         for i, rtn in ipairs(source.returns) do
-            local closureID = ('%s%s%s'):format(
-                id,
-                RETURN_INDEX,
-                i
+            local closureID = sformat('%s%s%s'
+                , id
+                , RETURN_INDEX
+                , i
             )
             local returnID = getID(rtn)
             pushForward(noders, closureID, returnID)
         end
-    end
-    if source.type == 'generic.value' then
+    end)
+    : case 'generic.value'
+    : call(function (noders, id, source)
         local proto    = source.proto
         local closure  = source.closure
         local upvalues = closure.upvalues
@@ -1130,34 +1185,57 @@ function m.compileNode(noders, source)
                 end
             end
         end
-        --if proto.type == 'doc.type' then
-        --    for _, tp in ipairs(source.types) do
-        --        pushForward(noders, id, getID(tp))
-        --        pushBackward(noders, getID(tp), id)
-        --    end
-        --end
-        m.compileDocValue(noders, proto.type, id, source)
-    end
-end
+        local f = compileNodeMap[proto.type]
+        if f then
+            f(noders, id, source)
+        end
+    end)
+    : getMap()
 
----根据ID来获取所有的node
----@param root parser.guide.object
----@param id string
----@return node?
-function m.getNodeByID(root, id)
-    root = guide.getRoot(root)
-    local noders = root._noders
-    if not noders then
-        return nil
+---@param noders noders
+---@param source parser.guide.object
+---@return parser.guide.object[]
+function m.compileNode(noders, source)
+    if source._noded then
+        return
     end
-    return noders[id]
+    source._noded = true
+    m.pushSource(noders, source)
+    local id = getID(source)
+    bindValue(noders, source, id)
+
+    if specialMap[source.special] then
+        noders.skip[id] = true
+    end
+
+    local f = compileNodeMap[source.type]
+    if f then
+        f(noders, id, source)
+    end
+
+    if id and ssub(id, 1, 2) == 'g:' then
+        local uri = guide.getUri(source)
+        collector.subscribe(uri, id, noders)
+        if guide.isSet(source) then
+
+            local defID = 'def:' .. id
+            collector.subscribe(uri, defID, noders)
+            m.pushSource(noders, source, defID)
+
+            if guide.isGlobal(source) then
+                local defAnyID = 'def:g:'
+                collector.subscribe(uri, defAnyID, noders)
+                m.pushSource(noders, source, defAnyID)
+            end
+        end
+    end
 end
 
 ---根据ID来获取第一个节点的ID
 ---@param id string
 ---@return string
 function m.getFirstID(id)
-    local firstID, count = id:match(FIRST_REGEX)
+    local firstID, count = smatch(id, FIRST_REGEX)
     if count == 0 then
         return nil
     end
@@ -1171,7 +1249,7 @@ end
 ---@param id string
 ---@return string
 function m.getHeadID(id)
-    local headID, count = id:match(HEAD_REGEX)
+    local headID, count = smatch(id, HEAD_REGEX)
     if count == 0 then
         return nil
     end
@@ -1185,7 +1263,7 @@ end
 ---@param id string
 ---@return string
 function m.getLastID(id)
-    local lastID, count = id:gsub(LAST_REGEX, '')
+    local lastID, count = sgsub(id, LAST_REGEX, '')
     if count == 0 then
         return nil
     end
@@ -1202,7 +1280,7 @@ function m.getIDLength(id)
     if not id then
         return 0
     end
-    local _, count = id:gsub(SPLIT_CHAR, SPLIT_CHAR)
+    local _, count = sgsub(id, SPLIT_CHAR, SPLIT_CHAR)
     return count + 1
 end
 
@@ -1214,11 +1292,11 @@ function m.hasField(id)
     if firstID == id or not firstID then
         return false
     end
-    local nextChar = id:sub(#firstID + 1, #firstID + 1)
+    local nextChar = ssub(id, #firstID + 1, #firstID + 1)
     if nextChar ~= SPLIT_CHAR then
         return false
     end
-    local next2Char = id:sub(#firstID + 2, #firstID + 2)
+    local next2Char = ssub(id, #firstID + 2, #firstID + 2)
     if next2Char == RETURN_INDEX
     or next2Char == PARAM_INDEX then
         return false
@@ -1231,7 +1309,7 @@ end
 ---@return uri? string
 ---@return string id
 function m.getUriAndID(id)
-    local uri, newID = id:match(URI_REGEX)
+    local uri, newID = smatch(id, URI_REGEX)
     return uri, newID
 end
 
@@ -1241,13 +1319,18 @@ function m.isCommonField(field)
     if not field then
         return false
     end
-    if field:sub(1, #RETURN_INDEX) == RETURN_INDEX then
+    if ssub(field, 1, #RETURN_INDEX) == RETURN_INDEX then
         return false
     end
-    if field:sub(1, #PARAM_INDEX) == PARAM_INDEX then
+    if ssub(field, 1, #PARAM_INDEX) == PARAM_INDEX then
         return false
     end
     return true
+end
+
+function m.isGlobalID(id)
+    return ssub(id, 1, 2) == 'g:'
+        or ssub(id, 1, 3) == 'dn:'
 end
 
 ---获取source的ID
@@ -1265,15 +1348,15 @@ function m.getKey(source)
 end
 
 ---清除临时id（用于泛型的临时对象）
----@param root parser.guide.object
+---@param noders noders
 ---@param id string
-function m.removeID(root, id)
+function m.removeID(noders, id)
     if not id then
         return
     end
-    root = guide.getRoot(root)
-    local noders = root._noders
-    noders[id] = nil
+    for _, t in next, noders do
+        t[id] = nil
+    end
 end
 
 ---寻找doc的主体
@@ -1288,28 +1371,169 @@ end
 function m.getNoders(source)
     local root = guide.getRoot(source)
     if not root._noders then
-        root._noders = {}
+        ---@type noders
+        root._noders = {
+            source    = {},
+            sources   = {},
+            forward   = {},
+            finfo     = {},
+            forwards  = {},
+            backward  = {},
+            binfo     = {},
+            backwards = {},
+            call      = {},
+            require   = {},
+            skip      = {},
+        }
     end
     return root._noders
+end
+
+---获取对象的noders
+---@param uri uri
+---@return noders
+function m.getNodersByUri(uri)
+    local state = files.getState(uri)
+    if not state then
+        return nil
+    end
+    return m.getNoders(state.ast)
 end
 
 ---编译整个文件的node
 ---@param  source parser.guide.object
 ---@return table
-function m.compileNodes(source)
+function m.compileAllNodes(source)
     local root = guide.getRoot(source)
     local noders = m.getNoders(source)
-    if next(noders) then
+    if root._initedNoders then
         return noders
     end
+    root._initedNoders = true
     log.debug('compileNodes:', guide.getUri(root))
     collector.dropUri(guide.getUri(root))
     guide.eachSource(root, function (src)
-        m.pushSource(noders, src)
         m.compileNode(noders, src)
     end)
-    log.debug('compileNodes finish:', guide.getUri(root))
+    log.debug('compileNodes finish:', files.getOriginUri(guide.getUri(root)))
     return noders
+end
+
+local partNodersMap = util.switch()
+    : case 'local'
+    : call(function (noders, source)
+        local refs = source.ref
+        if refs then
+            for i = 1, #refs do
+                local ref = refs[i]
+                m.compilePartNodes(noders, ref)
+            end
+        end
+
+        local nxt = source.next
+        if nxt then
+            m.compilePartNodes(noders, nxt)
+        end
+
+        local node = getMethodNode(source)
+        if node then
+            m.compilePartNodes(noders, node)
+        end
+    end)
+    : case 'setlocal'
+    : case 'getlocal'
+    : call(function (noders, source)
+        m.compilePartNodes(noders, source.node)
+
+        local nxt = source.next
+        if nxt then
+            m.compilePartNodes(noders, nxt)
+        end
+    end)
+    : case 'setfield'
+    : case 'getfield'
+    : case 'setmethod'
+    : case 'getmethod'
+    : call(function (noders, source)
+        local node = source.node
+        m.compilePartNodes(noders, node)
+
+        local nxt = source.next
+        if nxt then
+            m.compilePartNodes(noders, nxt)
+        end
+    end)
+    : case 'setglobal'
+    : case 'getglobal'
+    : call(function (noders, source)
+        local nxt = source.next
+        if nxt then
+            m.compilePartNodes(noders, nxt)
+        end
+    end)
+    : case 'label'
+    : call(function (noders, source)
+        local refs = source.ref
+        if not refs then
+            return
+        end
+        for i = 1, #refs do
+            local ref = refs[i]
+            m.compilePartNodes(noders, ref)
+        end
+    end)
+    : case 'goto'
+    : call(function (noders, source)
+        m.compilePartNodes(noders, source.node)
+    end)
+    : case 'table'
+    : call(function (noders, source)
+        for i = 1, #source do
+            local field = source[i]
+            m.compilePartNodes(noders, field)
+        end
+    end)
+    : case 'tablefield'
+    : case 'tableindex'
+    : call(function (noders, source)
+        m.compilePartNodes(noders, source.parent)
+    end)
+    : getMap()
+
+---编译Class的node
+---@param noders noders
+---@param  source parser.guide.object
+---@return table
+function m.compilePartNodes(noders, source)
+    do return end
+    if source._noded then
+        return
+    end
+    m.compileNode(noders, source)
+    local f = partNodersMap[source.type]
+    if f then
+        f(noders, source)
+    end
+
+    local parent = source.parent
+    if parent.value == source then
+        m.compilePartNodes(noders, parent)
+    end
+end
+
+---编译全局变量的node
+---@param  root parser.guide.object
+---@return table
+function m.compileGlobalNodes(root)
+    local noders = m.getNoders(root)
+    local env = guide.getENV(root)
+    m.compilePartNodes(noders, env)
+
+    local docs = root.docs
+    for i = 1, #docs do
+        local doc = docs[i]
+        m.compileNode(noders, doc)
+    end
 end
 
 files.watch(function (ev, uri)
@@ -1317,7 +1541,8 @@ files.watch(function (ev, uri)
     if ev == 'update' then
         local state = files.getState(uri)
         if state then
-            m.compileNodes(state.ast)
+            m.compileAllNodes(state.ast)
+            --m.compileGlobalNodes(state.ast)
         end
     end
     if ev == 'remove' then

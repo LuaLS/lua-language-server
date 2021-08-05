@@ -191,6 +191,7 @@ function m.setText(uri, text, isTrust, instance)
     file.text       = newText
     file.trusted    = isTrust
     file.originText = text
+    file.words      = nil
     m.linesMap[uri] = nil
     m.originLinesMap[uri] = nil
     m.astMap[uri] = nil
@@ -199,6 +200,7 @@ function m.setText(uri, text, isTrust, instance)
     file.version = file.version + 1
     m.globalVersion = m.globalVersion + 1
     await.close('files.version')
+    m.onWatch('version')
     if create then
         m.onWatch('create', originUri)
     end
@@ -258,6 +260,48 @@ function m.setCachedRows(uri, rows)
         return
     end
     file.rows = rows
+end
+
+function m.getWords(uri)
+    uri = getUriKey(uri)
+    local file = m.fileMap[uri]
+    if not file then
+        return
+    end
+    if file.words then
+        return file.words
+    end
+    local words = {}
+    file.words = words
+    local text = file.text
+    if not text then
+        return
+    end
+    local mark = {}
+    for word in text:gmatch '([%a_][%w_]+)' do
+        if #word >= 3 and not mark[word] then
+            mark[word] = true
+            local head = word:sub(1, 2)
+            if not words[head] then
+                words[head] = {}
+            end
+            words[head][#words[head]+1] = word
+        end
+    end
+    return words
+end
+
+function m.getWordsOfHead(uri, head)
+    uri = getUriKey(uri)
+    local file = m.fileMap[uri]
+    if not file then
+        return nil
+    end
+    local words = m.getWords(uri)
+    if not words then
+        return nil
+    end
+    return words[head]
 end
 
 --- 获取文件版本
@@ -328,6 +372,7 @@ function m.remove(uri)
     m.globalVersion = m.globalVersion + 1
 
     await.close('files.version')
+    m.onWatch('version')
     m.onWatch('remove', originUri)
 end
 
@@ -336,6 +381,7 @@ function m.removeAll()
     local ws = require 'workspace.workspace'
     m.globalVersion = m.globalVersion + 1
     await.close('files.version')
+    m.onWatch('version')
     m._pairsCache = nil
     for uri in pairs(m.fileMap) do
         if not m.libraryMap[uri] then
@@ -354,6 +400,7 @@ end
 function m.removeAllClosed()
     m.globalVersion = m.globalVersion + 1
     await.close('files.version')
+    m.onWatch('version')
     m._pairsCache = nil
     for uri in pairs(m.fileMap) do
         if  not m.openMap[uri]
@@ -621,9 +668,11 @@ function m.offset(uri, position, isFinish)
     local start, finish, char
     if row > #lines then
         start, finish = guide.lineRange(lines, #lines)
+        start = start + 1
         char = util.utf8Len(text, start, finish)
     else
         start, finish = guide.lineRange(lines, row)
+        start = start + 1
         char = position.character
     end
     local utf8Len = util.utf8Len(text, start, finish)
@@ -672,9 +721,11 @@ function m.offsetOfWord(uri, position)
     local start, finish, char
     if row > #lines then
         start, finish = guide.lineRange(lines, #lines)
+        start = start + 1
         char = util.utf8Len(text, start, finish)
     else
         start, finish = guide.lineRange(lines, row)
+        start = start + 1
         char = position.character
     end
     local utf8Len = util.utf8Len(text, start, finish)
@@ -759,9 +810,7 @@ function m.position(uri, offset, leftOrRight)
     end
     local row, col      = guide.positionOf(lines, offset)
     local start, finish = guide.lineRange(lines, row, true)
-    if start < 1 then
-        start = 1
-    end
+    start = start + 1
     if col <= finish - start + 1 then
         local ucol     = util.utf8Len(text, start, start + col - 1)
         if row < 1 then

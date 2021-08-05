@@ -28,7 +28,7 @@ return function (uri, callback)
                         cache[name][#cache[name]+1] = {
                             start  = otherDoc.start,
                             finish = otherDoc.finish,
-                            uri    = searcher.getUri(otherDoc),
+                            uri    = guide.getUri(otherDoc),
                         }
                     end
                 end

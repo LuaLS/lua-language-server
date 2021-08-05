@@ -53,9 +53,11 @@ local type         = type
 ---@field upvalues              table<string, string[]>
 ---@field ref                   parser.guide.object[]
 ---@field returnIndex           integer
+---@field docs                  parser.guide.object[]
 ---@field _root                 parser.guide.object
 ---@field _noders               noders
 ---@field _mnode                parser.guide.object
+---@field _noded                boolean
 
 ---@class guide
 ---@field debugMode boolean
@@ -83,7 +85,7 @@ local breakBlockTypes = {
     ['repeat']      = true,
 }
 
-m.childMap = {
+local childMap = {
     ['main']        = {'#', 'docs'},
     ['repeat']      = {'#', 'filter'},
     ['while']       = {'filter', '#'},
@@ -138,6 +140,44 @@ m.childMap = {
     ['doc.overload']       = {'overload', 'comment'},
     ['doc.see']            = {'name', 'field'},
 }
+
+---@type table<string, fun(obj: parser.guide.object, list: parser.guide.object[])>
+local compiledChildMap = setmetatable({}, {__index = function (self, name)
+    local defs = childMap[name]
+    if not defs then
+        self[name] = false
+        return false
+    end
+    local text = {}
+    text[#text+1] = 'local obj, list = ...'
+    for _, def in ipairs(defs) do
+        if def == '#' then
+            text[#text+1] = [[
+for i = 1, #obj do
+    list[#list+1] = obj[i]
+end
+]]
+        elseif type(def) == 'string' and def:sub(1, 1) == '#' then
+            local key = def:sub(2)
+            text[#text+1] = ([[
+local childs = obj.%s
+if childs then
+    for i = 1, #childs do
+        list[#list+1] = childs[i]
+    end
+end
+]]):format(key)
+        elseif type(def) == 'string' then
+            text[#text+1] = ('list[#list+1] = obj.%s'):format(def)
+        else
+            text[#text+1] = ('list[#list+1] = obj[%q]'):format(def)
+        end
+    end
+    local buf = table.concat(text, '\n')
+    local f = load(buf, buf, 't')
+    self[name] = f
+    return f
+end})
 
 m.actionMap = {
     ['main']        = {'#'},
@@ -542,28 +582,16 @@ function m.isBetweenRange(source, tStart, tFinish)
 end
 
 --- 添加child
-function m.addChilds(list, obj, map)
-    local keys = map[obj.type]
-    if keys then
-        for i = 1, #keys do
-            local key = keys[i]
-            if key == '#' then
-                for j = 1, #obj do
-                    list[#list+1] = obj[j]
-                end
-            elseif obj[key] then
-                list[#list+1] = obj[key]
-            elseif type(key) == 'string'
-            and key:sub(1, 1) == '#' then
-                key = key:sub(2)
-                if obj[key] then
-                    for j = 1, #obj[key] do
-                        list[#list+1] = obj[key][j]
-                    end
-                end
-            end
-        end
+local function addChilds(list, obj)
+    local tp = obj.type
+    if not tp then
+        return
     end
+    local f = compiledChildMap[tp]
+    if not f then
+        return
+    end
+    f(obj, list)
 end
 
 --- 遍历所有包含offset的source
@@ -586,7 +614,7 @@ function m.eachSourceContain(ast, offset, callback)
                         return res
                     end
                 end
-                m.addChilds(list, obj, m.childMap)
+                addChilds(list, obj)
             end
         end
     end
@@ -612,14 +640,13 @@ function m.eachSourceBetween(ast, start, finish, callback)
                         return res
                     end
                 end
-                m.addChilds(list, obj, m.childMap)
+                addChilds(list, obj)
             end
         end
     end
 end
 
---- 遍历所有指定类型的source
-function m.eachSourceType(ast, type, callback)
+local function getSourceTypeCache(ast)
     local cache = ast.typeCache
     if not cache then
         cache = {}
@@ -637,6 +664,12 @@ function m.eachSourceType(ast, type, callback)
             myCache[#myCache+1] = source
         end)
     end
+    return cache
+end
+
+--- 遍历所有指定类型的source
+function m.eachSourceType(ast, type, callback)
+    local cache = getSourceTypeCache(ast)
     local myCache = cache[type]
     if not myCache then
         return
@@ -646,30 +679,43 @@ function m.eachSourceType(ast, type, callback)
     end
 end
 
+function m.eachSourceTypes(ast, tps, callback)
+    local cache = getSourceTypeCache(ast)
+    for x = 1, #tps do
+        local tpCache = cache[tps[x]]
+        if tpCache then
+            for i = 1, #tpCache do
+                callback(tpCache[i])
+            end
+        end
+    end
+end
+
 --- 遍历所有的source
 function m.eachSource(ast, callback)
-    local list = { ast }
-    local mark = {}
-    local index = 1
-    while true do
-        local obj = list[index]
-        if not obj then
+    local cache = ast.eachCache
+    if not cache then
+        cache = { ast }
+        ast.eachCache = cache
+        local mark = {}
+        local index = 1
+        while true do
+            local obj = cache[index]
+            if not obj then
+                break
+            end
+            index = index + 1
+            if not mark[obj] then
+                mark[obj] = true
+                addChilds(cache, obj)
+            end
+        end
+    end
+    for i = 1, #cache do
+        local res = callback(cache[i])
+        if res == false then
             return
         end
-        list[index] = false
-        index = index + 1
-        if not mark[obj] then
-            mark[obj] = true
-            local res = callback(obj)
-            if res == true then
-                goto CONTINUE
-            end
-            if res == false then
-                return
-            end
-            m.addChilds(list, obj, m.childMap)
-        end
-        ::CONTINUE::
     end
 end
 
@@ -688,39 +734,45 @@ function m.eachSpecialOf(ast, name, callback)
     end
 end
 
---- 获取偏移对应的坐标
+--- 获取光标偏移对应的坐标。
+--- 如果在换行符的右侧，则认为在新的一行。
+--- 第一行的行号是1不是0。
 ---@param lines table
 ---@return integer {name = 'row'}
 ---@return integer {name = 'col'}
 function m.positionOf(lines, offset)
-    if offset < 1 then
-        return 0, 0
+    tracy.ZoneBeginN('positionOf')
+    local _ <close> = tracy.ZoneEnd
+    if offset <= 0 then
+        return 1, 0
     end
     local lastLine = lines[#lines]
-    if offset > lastLine.finish then
-        return #lines, offset - lastLine.start + 1
+    if offset >= lastLine.finish then
+        return #lines, lastLine.finish - lastLine.start
     end
     local min = 1
     local max = #lines
     for _ = 1, 100 do
         if max <= min then
             local line = lines[min]
-            return min, offset - line.start + 1
+            return min, offset - line.start
         end
         local row = (max - min) // 2 + min
         local line = lines[row]
         if offset < line.start then
             max = row - 1
-        elseif offset > line.finish then
+        elseif offset >= line.finish then
             min = row + 1
         else
-            return row, offset - line.start + 1
+            return row, offset - line.start
         end
     end
     error('Stack overflow!')
 end
 
---- 获取坐标对应的偏移
+--- 获取坐标对应的光标偏移。
+--- 一定会落在当前行的换行符左侧。
+--- 第一行的行号是1不是0。
 ---@param lines table
 ---@param row integer
 ---@param col integer
@@ -734,13 +786,13 @@ function m.offsetOf(lines, row, col)
         return lastLine.finish
     end
     local line = lines[row]
-    local len = line.finish - line.start + 1
+    local len = line.range - line.start
     if col < 0 then
         return line.start
     elseif col > len then
-        return line.finish
+        return line.range
     else
-        return line.start + col - 1
+        return line.start + col
     end
 end
 
@@ -772,20 +824,23 @@ function m.lineData(lines, row)
     return lines[row]
 end
 
+local isSetMap = {
+    ['setglobal']      = true,
+    ['local']          = true,
+    ['setlocal']       = true,
+    ['setfield']       = true,
+    ['setmethod']      = true,
+    ['setindex']       = true,
+    ['tablefield']     = true,
+    ['tableindex']     = true,
+    ['tableexp']       = true,
+    ['doc.field.name'] = true,
+    ['doc.field']      = true,
+    ['doc.type.field'] = true,
+}
 function m.isSet(source)
     local tp = source.type
-    if tp == 'setglobal'
-    or tp == 'local'
-    or tp == 'setlocal'
-    or tp == 'setfield'
-    or tp == 'setmethod'
-    or tp == 'setindex'
-    or tp == 'tablefield'
-    or tp == 'tableindex'
-    or tp == 'tableexp'
-    or tp == 'doc.field.name'
-    or tp == 'doc.field'
-    or tp == 'doc.type.field' then
+    if isSetMap[tp] then
         return true
     end
     if tp == 'call' then
@@ -797,13 +852,16 @@ function m.isSet(source)
     return false
 end
 
+local isGetMap = {
+    ['getglobal'] = true,
+    ['getlocal']  = true,
+    ['getfield']  = true,
+    ['getmethod'] = true,
+    ['getindex']  = true,
+}
 function m.isGet(source)
     local tp = source.type
-    if tp == 'getglobal'
-    or tp == 'getlocal'
-    or tp == 'getfield'
-    or tp == 'getmethod'
-    or tp == 'getindex' then
+    if isGetMap[tp] then
         return true
     end
     if tp == 'call' then

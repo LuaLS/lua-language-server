@@ -277,8 +277,8 @@ until $1"
         or first == 'elseif' then
             local startRow  = guide.positionOf(lines, info.start)
             local finishRow = guide.positionOf(lines, pos)
-            local startSp   = info.text:match('^%s*', lines[startRow].start)
-            local finishSp  = info.text:match('^%s*', lines[finishRow].start)
+            local startSp   = info.text:match('^%s*', lines[startRow].start + 1)
+            local finishSp  = info.text:match('^%s*', lines[finishRow].start + 1)
             if startSp == finishSp then
                 return false
             end

@@ -141,10 +141,18 @@ local function createValue(closure, proto, callback, road)
         return value
     end
     if proto.type == 'doc.type.field' then
-        road[#road+1] = ('%s%q'):format(
-            noder.SPLIT_CHAR,
-            proto.name[1]
-        )
+        local name = proto.name[1]
+        if type(name) == 'string' then
+            road[#road+1] = ('%s%s'):format(
+                noder.STRING_FIELD,
+                name
+            )
+        else
+            road[#road+1] = ('%s%s'):format(
+                noder.SPLIT_CHAR,
+                name
+            )
+        end
         local typeUnit = createValue(closure, proto.extends, callback, road)
         road[#road] = nil
         if not typeUnit then

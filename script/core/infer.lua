@@ -534,11 +534,9 @@ function m.searchInfers(source, field, mark)
         searchInfer(source, infers, mark)
         local id = noder.getID(source)
         if id then
-            local node = noder.getNodeByID(source, id)
-            if node and node.source then
-                for src in noder.eachSource(node) do
-                    searchInfer(src, infers, mark)
-                end
+            local noders = noder.getNoders(source)
+            for src in noder.eachSource(noders, id) do
+                searchInfer(src, infers, mark)
             end
         end
         if source.type == 'field' or source.type == 'method' then

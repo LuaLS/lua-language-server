@@ -15,7 +15,7 @@ local function testIfExit(path)
         local vm
 
         local clock = os.clock()
-        local max = 100
+        local max = 1
         local need
         local parseClock = 0
         local compileClock = 0
@@ -29,7 +29,6 @@ local function testIfExit(path)
             local luadocPassed = os.clock() - luadocStart
             local passed = os.clock() - clock
             local noderStart = os.clock()
-            noder.compileNodes(vm.ast)
             local noderPassed = os.clock() - noderStart
             parseClock   = parseClock   + vm.parseClock
             compileClock = compileClock + vm.compileClock

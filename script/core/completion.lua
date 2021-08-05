@@ -636,22 +636,11 @@ local function checkCommon(myUri, word, text, offset, results)
             if myUri and files.eq(myUri, uri) then
                 goto CONTINUE
             end
-            local cache = files.getCache(uri)
-            if not cache.commonWords then
-                cache.commonWords = {}
-                local mark = {}
-                for str in files.getText(uri):gmatch '([%a_][%w_]+)' do
-                    if #str >= 3 and not mark[str] then
-                        mark[str] = true
-                        local head = str:sub(1, 2)
-                        if not cache.commonWords[head] then
-                            cache.commonWords[head] = {}
-                        end
-                        cache.commonWords[head][#cache.commonWords[head]+1] = str
-                    end
-                end
+            local words = files.getWordsOfHead(uri, myHead)
+            if not words then
+                goto CONTINUE
             end
-            for _, str in ipairs(cache.commonWords[myHead] or {}) do
+            for _, str in ipairs(words) do
                 if #results >= 100 then
                     break
                 end

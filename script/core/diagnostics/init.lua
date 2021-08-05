@@ -57,7 +57,7 @@ local function check(uri, name, results)
     end, name)
     local passed = os.clock() - clock
     if passed >= 0.5 then
-        log.warn(('Diagnostics [%s] @ [%s] takes [%.3f] sec!'):format(name, uri, passed))
+        log.warn(('Diagnostics [%s] @ [%s] takes [%.3f] sec!'):format(name, files.getOriginUri(uri), passed))
     end
     if DIAGTIMES then
         DIAGTIMES[name] = (DIAGTIMES[name] or 0) + passed

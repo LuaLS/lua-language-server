@@ -37,7 +37,6 @@ local function TEST(script)
         files.setText('', newScript)
         local source = getSource(pos)
         assert(source)
-        noder.compileNodes(source)
         local result = {
             id = noder.getID(source),
         }

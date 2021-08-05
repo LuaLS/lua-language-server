@@ -29,7 +29,6 @@ local function testIfExit(path)
             local luadocPassed = os.clock() - luadocStart
             local passed = os.clock() - clock
             local noderStart = os.clock()
-            noder.compileNodes(vm.ast)
             local noderPassed = os.clock() - noderStart
             parseClock   = parseClock   + vm.parseClock
             compileClock = compileClock + vm.compileClock

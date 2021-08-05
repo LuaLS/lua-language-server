@@ -56,6 +56,7 @@ local type         = type
 ---@field _root                 parser.guide.object
 ---@field _noders               noders
 ---@field _mnode                parser.guide.object
+---@field _noded                boolean
 
 ---@class guide
 ---@field debugMode boolean

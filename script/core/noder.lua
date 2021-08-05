@@ -1191,6 +1191,11 @@ compileNodeMap = util.switch()
 ---@param source parser.guide.object
 ---@return parser.guide.object[]
 function m.compileNode(noders, source)
+    if source._noded then
+        return
+    end
+    source._noded = true
+    m.pushSource(noders, source)
     local id = getID(source)
     bindValue(noders, source, id)
 
@@ -1393,7 +1398,7 @@ end
 ---编译整个文件的node
 ---@param  source parser.guide.object
 ---@return table
-function m.compileNodes(source)
+function m.compileAllNodes(source)
     local root = guide.getRoot(source)
     local noders = m.getNoders(source)
     if root._initedNoders then
@@ -1403,11 +1408,24 @@ function m.compileNodes(source)
     log.debug('compileNodes:', guide.getUri(root))
     collector.dropUri(guide.getUri(root))
     guide.eachSource(root, function (src)
-        m.pushSource(noders, src)
         m.compileNode(noders, src)
     end)
     log.debug('compileNodes finish:', files.getOriginUri(guide.getUri(root)))
     return noders
+end
+
+---编译全局变量的node
+---@param  source parser.guide.object
+---@return table
+function m.compileGlobalNodes(source)
+    
+end
+
+---编译Class的node
+---@param  source parser.guide.object
+---@return table
+function m.compileClassNodes(source)
+    
 end
 
 files.watch(function (ev, uri)
@@ -1415,7 +1433,9 @@ files.watch(function (ev, uri)
     if ev == 'update' then
         local state = files.getState(uri)
         if state then
-            m.compileNodes(state.ast)
+            m.compileAllNodes(state.ast)
+            --m.compileGlobalNodes(state.ast)
+            --m.compileClassNodes(state.ast)
         end
     end
     if ev == 'remove' then

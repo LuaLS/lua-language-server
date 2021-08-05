@@ -38,7 +38,7 @@ local eachForward    = noder.eachForward
 local getUriAndID    = noder.getUriAndID
 local eachBackward   = noder.eachBackward
 local eachSource     = noder.eachSource
-local compileNodes   = noder.compileNodes
+local compileNodes   = noder.compileAllNodes
 local isGlobalID     = noder.isGlobalID
 
 local SPLIT_CHAR     = noder.SPLIT_CHAR

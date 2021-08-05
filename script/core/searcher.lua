@@ -27,19 +27,19 @@ local getRoot      = guide.getRoot
 
 local ceach        = collector.each
 
-local getNoders      = noder.getNoders
-local getID          = noder.getID
-local getLastID      = noder.getLastID
-local removeID       = noder.removeID
-local getNodersByUri = noder.getNodersByUri
-local getFirstID     = noder.getFirstID
-local getHeadID      = noder.getHeadID
-local eachForward    = noder.eachForward
-local getUriAndID    = noder.getUriAndID
-local eachBackward   = noder.eachBackward
-local eachSource     = noder.eachSource
-local compileNodes   = noder.compileAllNodes
-local isGlobalID     = noder.isGlobalID
+local getNoders       = noder.getNoders
+local getID           = noder.getID
+local getLastID       = noder.getLastID
+local removeID        = noder.removeID
+local getNodersByUri  = noder.getNodersByUri
+local getFirstID      = noder.getFirstID
+local getHeadID       = noder.getHeadID
+local eachForward     = noder.eachForward
+local getUriAndID     = noder.getUriAndID
+local eachBackward    = noder.eachBackward
+local eachSource      = noder.eachSource
+local compileAllNodes = noder.compileAllNodes
+local isGlobalID      = noder.isGlobalID
 
 local SPLIT_CHAR     = noder.SPLIT_CHAR
 local RETURN_INDEX   = noder.RETURN_INDEX
@@ -914,7 +914,7 @@ local function prepareSearch(source)
     if not root then
         return
     end
-    compileNodes(root)
+    --compileAllNodes(root)
     local uri  = getUri(source)
     local id   = getID(source)
     return uri, id
@@ -971,7 +971,7 @@ local function searchAllGlobalByUri(status, mode, uri, fullID)
         return
     end
     local root = ast.ast
-    compileNodes(root)
+    --compileAllNodes(root)
     local noders = getNoders(root)
     if fullID then
         for source in eachSource(noders, fullID) do

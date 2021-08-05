@@ -335,7 +335,7 @@ end)
 
 local nodersMapMT = {__index = function (self, uri)
     local noders = getNodersByUri(uri)
-    self[uri] = noders
+    self[uri] = noders or false
     return noders
 end}
 
@@ -423,6 +423,9 @@ function m.searchRefsByID(status, suri, expect, mode)
 
     local function searchID(uri, id, field, sourceUri)
         if not id then
+            return
+        end
+        if not nodersMap[uri] then
             return
         end
         if field then

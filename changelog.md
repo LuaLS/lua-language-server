@@ -1,5 +1,8 @@
 # changelog
 
+## 2.4.0
+* `CHG` improve performance
+
 ## 2.3.3
 `2021-7-26`
 * `NEW` config supports prop

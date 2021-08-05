@@ -901,3 +901,13 @@ local t
 
 local <?v?> = t[1]
 ]]
+
+TEST 'string' [[
+---@type string[][]
+local v = {}
+
+for _, a in ipairs(v) do
+    for i, <?b?> in ipairs(a) do
+    end
+end
+]]

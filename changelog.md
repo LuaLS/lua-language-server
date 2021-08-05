@@ -2,6 +2,7 @@
 
 ## 2.4.0
 * `CHG` improve performance
+* `FIX` [#625](https://github.com/sumneko/lua-language-server/issues/625)
 
 ## 2.3.3
 `2021-7-26`

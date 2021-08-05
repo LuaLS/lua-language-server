@@ -364,13 +364,16 @@ function m.searchRefsByID(status, suri, expect, mode)
     local brejectMap = setmetatable({}, uriMapMT)
     local slockMap   = setmetatable({}, uriMapMT)
     local elockMap   = setmetatable({}, uriMapMT)
+    local ecallMap   = setmetatable({}, uriMapMT)
 
-    local function lockExpanding(elock, id, field)
+    local function lockExpanding(elock, ecall, id, field)
         if not field then
             field = ''
         end
+        local call   = callStack[#callStack]
         local locked = elock[id]
-        if locked and field then
+        local called = ecall[id]
+        if locked and called == call then
             if #locked <= #field then
                 if ssub(field, -#locked) == locked then
                     footprint(status, 'elocked:', id, locked, field)
@@ -379,11 +382,13 @@ function m.searchRefsByID(status, suri, expect, mode)
             end
         end
         elock[id] = field
+        ecall[id] = call
         return true
     end
 
-    local function releaseExpanding(elock, id, field)
+    local function releaseExpanding(elock, ecall, id, field)
         elock[id] = nil
+        ecall[id] = nil
     end
 
     local function search(uri, id, field)
@@ -812,15 +817,16 @@ function m.searchRefsByID(status, suri, expect, mode)
         end
 
         local elock = global and elockMap['@global'] or elockMap[uri]
+        local ecall = global and ecallMap['@global'] or ecallMap[uri]
 
-        if lockExpanding(elock, id, field) then
+        if lockExpanding(elock, ecall, id, field) then
             if noders.forward[id] then
                 checkForward(uri, id, field)
             end
             if noders.backward[id] then
                 checkBackward(uri, id, field)
             end
-            releaseExpanding(elock, id, field)
+            releaseExpanding(elock, ecall, id, field)
         end
 
         local source = noders.source[id]

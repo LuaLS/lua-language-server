@@ -1406,7 +1406,7 @@ function m.compileNodes(source)
         m.pushSource(noders, src)
         m.compileNode(noders, src)
     end)
-    log.debug('compileNodes finish:', guide.getUri(root))
+    log.debug('compileNodes finish:', files.getOriginUri(guide.getUri(root)))
     return noders
 end
 

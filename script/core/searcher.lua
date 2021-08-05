@@ -270,10 +270,8 @@ local function checkCache(status, uri, expect, mode)
         or mode == 'alldef' then
             return
         end
-        for suri, ids in next, status.ids do
-            for id in next, ids do
-                cache[suri][id] = status.results
-            end
+        for id in next, status.ids do
+            fileCache[id] = status.results
         end
     end
 end
@@ -430,11 +428,7 @@ function m.searchRefsByID(status, suri, expect, mode)
         if field then
             id = id .. field
         end
-        local cached = checkCache(status, uri, id, mode)
-        if cached then
-            return
-        end
-        ids[uri][id] = true
+        ids[id] = true
         if slockMap[uri][id] then
             footprint(status, 'slocked:', id)
             return
@@ -1041,7 +1035,9 @@ function m.searchRefs(status, source, mode)
         log.debug('searchRefs:', id)
     end
     m.searchRefsByID(status, uri, id, mode)
-    makeCache()
+    if makeCache then
+        makeCache()
+    end
 end
 
 ---搜索对象的field
@@ -1064,7 +1060,9 @@ function m.searchFields(status, source, mode, field)
                 return
             end
             searchAllGlobals(status, mode)
-            makeCache()
+            if makeCache then
+                makeCache()
+            end
         else
             local cached, makeCache = checkCache(status, uri, id .. '*', mode)
             if cached then
@@ -1077,7 +1075,9 @@ function m.searchFields(status, source, mode, field)
                 local def = results[i]
                 getField(status, def, mode)
             end
-            makeCache()
+            if makeCache then
+                makeCache()
+            end
         end
     else
         if source.special == '_G' then
@@ -1092,7 +1092,9 @@ function m.searchFields(status, source, mode, field)
                 return
             end
             m.searchRefsByID(status, uri, fullID, mode)
-            makeCache()
+            if makeCache then
+                makeCache()
+            end
         else
             local fullID
             if type(field) == 'string' then
@@ -1105,7 +1107,9 @@ function m.searchFields(status, source, mode, field)
                 return
             end
             m.searchRefsByID(status, uri, fullID, mode)
-            makeCache()
+            if makeCache then
+                makeCache()
+            end
         end
     end
 end
@@ -1127,7 +1131,7 @@ function m.status(source, field, mode)
         results   = {},
         rmark     = {},
         footprint = {},
-        ids       = setmetatable({}, uriMapMT),
+        ids       = {},
         mode      = mode,
         source    = source,
         field     = field,

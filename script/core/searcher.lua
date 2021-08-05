@@ -389,15 +389,6 @@ function m.searchRefsByID(status, suri, expect, mode)
     end
 
     local function search(uri, id, field)
-        if not field then
-            local cached = checkCache(status, uri, id, mode)
-            if cached then
-                return
-            end
-            if uri == suri then
-                ids[id] = true
-            end
-        end
         local firstID = getFirstID(id)
         if ignoredIDs[firstID] and (field or firstID ~= id) then
             return
@@ -439,6 +430,13 @@ function m.searchRefsByID(status, suri, expect, mode)
         end
         if field then
             id = id .. field
+        end
+        local cached = checkCache(status, uri, id, mode)
+        if cached then
+            return
+        end
+        if uri == suri then
+            ids[id] = true
         end
         if slockMap[uri][id] then
             footprint(status, 'slocked:', id)

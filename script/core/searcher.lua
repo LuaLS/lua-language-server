@@ -256,10 +256,6 @@ end
 local function checkCache(status, uri, expect, mode)
     local cache = status.cache
     local fileCache = cache[uri]
-    if not fileCache then
-        fileCache = {}
-        cache[uri] = fileCache
-    end
     local results = fileCache[expect]
     if results then
         for i = 1, #results do
@@ -270,11 +266,14 @@ local function checkCache(status, uri, expect, mode)
     end
     return false, function ()
         fileCache[expect] = status.results
-        if mode == 'def' then
+        if mode == 'def'
+        or mode == 'alldef' then
             return
         end
-        for id in next, status.ids do
-            fileCache[id] = status.results
+        for suri, ids in next, status.ids do
+            for id in next, ids do
+                cache[suri][id] = status.results
+            end
         end
     end
 end
@@ -435,9 +434,7 @@ function m.searchRefsByID(status, suri, expect, mode)
         if cached then
             return
         end
-        if uri == suri then
-            ids[id] = true
-        end
+        ids[uri][id] = true
         if slockMap[uri][id] then
             footprint(status, 'slocked:', id)
             return
@@ -1130,11 +1127,11 @@ function m.status(source, field, mode)
         results   = {},
         rmark     = {},
         footprint = {},
-        ids       = {},
+        ids       = setmetatable({}, uriMapMT),
         mode      = mode,
         source    = source,
         field     = field,
-        cache     = vm.getCache('searcher:' .. mode),
+        cache     = setmetatable(vm.getCache('searcher:' .. mode), uriMapMT),
     }
     return status
 end

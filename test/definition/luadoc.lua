@@ -682,3 +682,13 @@ local t
 
 print(t.<?xx?>)
 ]]
+
+TEST [[
+---@class A
+local <!t!>
+
+t.f = function (self)
+end
+
+<?t?>
+]]

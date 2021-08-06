@@ -84,6 +84,20 @@ local pushDefResultsMap = util.switch()
     : case 'local'
     : case 'setlocal'
     : case 'setglobal'
+    : call(function (source, status)
+        if source.type ~= 'local' then
+            source = source.node
+        end
+        if  source[1] == 'self'
+        and source.parent.type == 'funcargs' then
+            local func = source.parent.parent
+            if status.source.start < func.start
+            or status.source.start > func.finish then
+                return false
+            end
+        end
+        return true
+    end)
     : case 'label'
     : case 'setfield'
     : case 'setmethod'

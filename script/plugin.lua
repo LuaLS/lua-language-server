@@ -22,9 +22,14 @@ function m.dispatch(event, ...)
     if type(method) ~= 'function' then
         return false
     end
+    local clock = os.clock()
     tracy.ZoneBeginN('plugin dispatch:' .. event)
     local suc, res1, res2 = xpcall(method, log.error, ...)
     tracy.ZoneEnd()
+    local passed = os.clock() - clock
+    if passed > 0.1 then
+        log.warn(('Call plugin event [%s] takes [%.3f] sec'):format(event, passed))
+    end
     if suc then
         return true, res1, res2
     else

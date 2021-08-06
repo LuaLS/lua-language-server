@@ -443,7 +443,13 @@ function m.searchRefsByID(status, suri, expect, mode)
             return
         end
         slockMap[uri][id] = true
+        if sourceUri and uri ~= sourceUri then
+            footprint(status, 'cross uri:', uri)
+        end
         search(uri, id, nil)
+        if sourceUri and uri ~= sourceUri then
+            footprint(status, 'back uri:', sourceUri)
+        end
     end
 
     ---@return parser.guide.object?
@@ -771,12 +777,7 @@ function m.searchRefsByID(status, suri, expect, mode)
         if ssub(id, 1, 3) ~= 'dn:' then
             return
         end
-        local sid = id
-        if ignoredIDs[id]
-        or id == 'dn:string' then
-            sid = 'def:' .. sid
-        end
-        for _, guri in ceach(sid) do
+        for _, guri in ceach('def:' .. id) do
             if uri ~= guri then
                 searchID(guri, id, field, uri)
             end

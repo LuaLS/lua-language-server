@@ -21,7 +21,7 @@ return function (uri, callback)
                         callback {
                             start   = nameUnit.start,
                             finish  = nameUnit.finish,
-                            message = lang.script.DIAG_UNKNOWN_DIAG_CODE,
+                            message = lang.script('DIAG_UNKNOWN_DIAG_CODE', code),
                         }
                     end
                 end

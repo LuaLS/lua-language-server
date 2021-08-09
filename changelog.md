@@ -2,6 +2,7 @@
 
 ## 2.3.6
 * `FIX` completion: can not find global fields
+* `FIX` globals and class may lost
 
 ## 2.3.5
 `2021-8-9`

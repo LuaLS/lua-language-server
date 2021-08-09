@@ -58,6 +58,8 @@ local type         = type
 ---@field _noders               noders
 ---@field _mnode                parser.guide.object
 ---@field _noded                boolean
+---@field _initedNoders         boolean
+---@field _compiledGlobals      boolean
 
 ---@class guide
 ---@field debugMode boolean

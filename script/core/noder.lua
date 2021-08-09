@@ -1405,6 +1405,10 @@ function m.compileAllNodes(source)
         return noders
     end
     root._initedNoders = true
+    if not root._compiledGlobals then
+        collector.dropUri(guide.getUri(root))
+    end
+    root._compiledGlobals = true
     log.debug('compileNodes:', guide.getUri(root))
     guide.eachSource(root, function (src)
         m.compileNode(noders, src)
@@ -1511,6 +1515,13 @@ end
 ---@param  root parser.guide.object
 ---@return table
 function m.compileGlobalNodes(root)
+    if root._initedNoders then
+        return
+    end
+    if not root._compiledGlobals then
+        collector.dropUri(guide.getUri(root))
+    end
+    root._compiledGlobals = true
     local noders = m.getNoders(root)
     local env = guide.getENV(root)
 
@@ -1530,7 +1541,6 @@ end
 files.watch(function (ev, uri)
     uri = files.asKey(uri)
     if ev == 'update' then
-        collector.dropUri(uri)
         local state = files.getState(uri)
         if state then
             --m.compileAllNodes(state.ast)

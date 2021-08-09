@@ -1,4 +1,5 @@
----@type vm
+---@diagnostic disable-next-line
+---@class vm
 local vm      = require 'vm.vm'
 
 function vm.getLibraryName(source)

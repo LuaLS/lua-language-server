@@ -1,5 +1,6 @@
 local collector = require 'core.collector'
----@type vm
+---@diagnostic disable-next-line
+---@class vm
 local vm        = require 'vm.vm'
 local noder     = require 'core.noder'
 

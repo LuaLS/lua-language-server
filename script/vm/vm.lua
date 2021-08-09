@@ -17,33 +17,6 @@ _ENV = nil
 ---@class vm
 local m = {}
 
-function m.lock(tp, source)
-    local co = running()
-    local master = m.locked[co]
-    if not master then
-        master = {}
-        m.locked[co] = master
-    end
-    if not master[tp] then
-        master[tp] = {}
-    end
-    if master[tp][source] then
-        return nil
-    end
-    master[tp][source] = true
-    return function ()
-        master[tp][source] = nil
-    end
-end
-
-function m.isSet(src)
-    return guide.isSet(src)
-end
-
-function m.isGet(src)
-    return guide.isGet(src)
-end
-
 function m.getArgInfo(source)
     local callargs = source.parent
     if not callargs or callargs.type ~= 'callargs' then
@@ -94,16 +67,6 @@ function m.getKeyType(source)
         end
     end
     return guide.getKeyType(source)
-end
-
-function m.mergeResults(a, b)
-    for _, r in ipairs(b) do
-        if not a[r] then
-            a[r] = true
-            a[#a+1] = r
-        end
-    end
-    return a
 end
 
 m.cacheTracker = setmetatable({}, weakMT)

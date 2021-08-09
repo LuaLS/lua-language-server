@@ -44,7 +44,7 @@ return function (uri, callback)
         local hasGet
         local refs = vm.getRefs(source)
         for _, src in ipairs(refs) do
-            if vm.isGet(src) then
+            if guide.isGet(src) then
                 local func = guide.getParentFunction(src)
                 if not checkFunction(func) then
                     hasGet = true

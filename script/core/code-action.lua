@@ -377,7 +377,7 @@ local function checkSwapParams(results, uri, start, finish)
                 node = text:sub(source.parent.node.start, source.parent.node.finish)
             elseif source.type == 'funcargs' then
                 local var = source.parent.parent
-                if vm.isSet(var) then
+                if guide.isSet(var) then
                     node = text:sub(var.start, var.finish)
                 else
                     node = lang.script.SYMBOL_ANONYMOUS

@@ -910,7 +910,9 @@ compileNodeMap = util.switch()
         if source.bindSources then
             for _, src in ipairs(source.bindSources) do
                 pushForward(noders, getID(src), id)
-                pushForward(noders, id, getID(src))
+                pushForward(noders, id, getID(src), {
+                    reject = 'set',
+                })
             end
         end
         for _, field in ipairs(source.fields) do

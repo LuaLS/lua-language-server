@@ -763,7 +763,6 @@ function m.searchRefsByID(status, suri, expect, mode)
         local crossed = {}
         if mode == 'def'
         or mode == 'alldef'
-        or mode == 'field'
         or field then
             for _, guri in ceach('def:' .. id) do
                 if uri == guri then
@@ -775,9 +774,6 @@ function m.searchRefsByID(status, suri, expect, mode)
         else
             for _, guri in ceach(id) do
                 if crossed[guri] then
-                    goto CONTINUE
-                end
-                if mode == 'def' or mode == 'alldef' or mode == 'field' then
                     goto CONTINUE
                 end
                 if uri == guri then

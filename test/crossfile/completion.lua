@@ -767,3 +767,20 @@ function (a: any, b: any)
 Cared['detail'] = nil
 Cared['additionalTextEdits'] = nil
 end
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            A.B = 1
+        ]]
+    },
+    {
+        path = 'main.lua',
+        main = true,
+        content = [[
+            A.$
+        ]],
+    },
+    completion = EXISTS,
+}

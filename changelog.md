@@ -2,6 +2,7 @@
 
 ## 2.3.5
 * `CHG` improve memory usage
+* `CHG` completion: call snip triggers signature (VSCode only)
 * `FIX` completion: may not find results
 
 ## 2.3.4

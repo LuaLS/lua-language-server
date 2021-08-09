@@ -210,6 +210,10 @@ local function buildFunction(results, source, value, oop, data)
         snipData.kind = define.CompletionItemKind.Snippet
         snipData.insertText = buildFunctionSnip(source, value, oop)
         snipData.insertTextFormat = 2
+        snipData.command = {
+            title = 'trigger signature',
+            command = 'editor.action.triggerParameterHints',
+        }
         snipData.id  = stack(function ()
             return {
                 detail      = buildDetail(source),

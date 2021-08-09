@@ -1121,6 +1121,10 @@ function m.isGlobal(source)
     if source._isGlobal ~= nil then
         return source._isGlobal
     end
+    if source.tag == '_ENV' then
+        source._isGlobal = true
+        return false
+    end
     if source.special == '_G' then
         source._isGlobal = true
         return true

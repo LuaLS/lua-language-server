@@ -611,7 +611,6 @@ local function bindValue(noders, source, id)
     if not valueID then
         return
     end
-    m.compilePartNodes(noders, value)
     if source.type == 'getlocal'
     or source.type == 'setlocal' then
         source = source.node
@@ -827,21 +826,17 @@ compileNodeMap = util.switch()
             for _, src in ipairs(source.bindSources) do
                 pushForward(noders, getID(src), id)
                 pushForward(noders, id, getID(src))
-                m.compilePartNodes(noders, src)
             end
         end
         for _, enumUnit in ipairs(source.enums) do
             pushForward(noders, id, getID(enumUnit))
-            m.compilePartNodes(noders, enumUnit)
         end
         for _, resumeUnit in ipairs(source.resumes) do
             pushForward(noders, id, getID(resumeUnit))
-            m.compilePartNodes(noders, resumeUnit)
         end
         for _, typeUnit in ipairs(source.types) do
             local unitID = getID(typeUnit)
             pushForward(noders, id, unitID)
-            m.compilePartNodes(noders, typeUnit)
             if source.bindSources then
                 for _, src in ipairs(source.bindSources) do
                     pushBackward(noders, unitID, getID(src))
@@ -1195,11 +1190,7 @@ compileNodeMap = util.switch()
 ---@param noders noders
 ---@param source parser.guide.object
 ---@return parser.guide.object[]
-function m.compileNode(noders, source)
-    if source._noded then
-        return
-    end
-    source._noded = true
+function m.compileNode(noders, source, mark)
     m.pushSource(noders, source)
     local id = getID(source)
     bindValue(noders, source, id)
@@ -1411,7 +1402,6 @@ function m.compileAllNodes(source)
     end
     root._initedNoders = true
     log.debug('compileNodes:', guide.getUri(root))
-    collector.dropUri(guide.getUri(root))
     guide.eachSource(root, function (src)
         m.compileNode(noders, src)
     end)
@@ -1421,82 +1411,77 @@ end
 
 local partNodersMap = util.switch()
     : case 'local'
-    : call(function (noders, source)
+    : call(function (noders, source, mark)
         local refs = source.ref
         if refs then
             for i = 1, #refs do
                 local ref = refs[i]
-                m.compilePartNodes(noders, ref)
+                m.compilePartNodes(noders, ref, mark)
             end
         end
 
         local nxt = source.next
         if nxt then
-            m.compilePartNodes(noders, nxt)
-        end
-
-        local node = getMethodNode(source)
-        if node then
-            m.compilePartNodes(noders, node)
+            m.compilePartNodes(noders, nxt, mark)
         end
     end)
     : case 'setlocal'
     : case 'getlocal'
-    : call(function (noders, source)
-        m.compilePartNodes(noders, source.node)
+    : call(function (noders, source, mark)
+        m.compilePartNodes(noders, source.node, mark)
 
         local nxt = source.next
         if nxt then
-            m.compilePartNodes(noders, nxt)
+            m.compilePartNodes(noders, nxt, mark)
         end
     end)
     : case 'setfield'
     : case 'getfield'
     : case 'setmethod'
     : case 'getmethod'
-    : call(function (noders, source)
+    : call(function (noders, source, mark)
         local node = source.node
-        m.compilePartNodes(noders, node)
+        m.compilePartNodes(noders, node, mark)
 
         local nxt = source.next
         if nxt then
-            m.compilePartNodes(noders, nxt)
+            m.compilePartNodes(noders, nxt, mark)
         end
     end)
     : case 'setglobal'
     : case 'getglobal'
-    : call(function (noders, source)
+    : call(function (noders, source, mark)
         local nxt = source.next
         if nxt then
-            m.compilePartNodes(noders, nxt)
+            m.compilePartNodes(noders, nxt, mark)
         end
     end)
     : case 'label'
-    : call(function (noders, source)
+    : call(function (noders, source, mark)
         local refs = source.ref
         if not refs then
             return
         end
         for i = 1, #refs do
             local ref = refs[i]
-            m.compilePartNodes(noders, ref)
+            m.compilePartNodes(noders, ref, mark)
         end
     end)
     : case 'goto'
-    : call(function (noders, source)
-        m.compilePartNodes(noders, source.node)
+    : call(function (noders, source, mark)
+        m.compilePartNodes(noders, source.node, mark)
     end)
     : case 'table'
-    : call(function (noders, source)
+    : call(function (noders, source, mark)
         for i = 1, #source do
             local field = source[i]
-            m.compilePartNodes(noders, field)
+            m.compilePartNodes(noders, field, mark)
         end
     end)
     : case 'tablefield'
     : case 'tableindex'
-    : call(function (noders, source)
-        m.compilePartNodes(noders, source.parent)
+    : call(function (noders, source, mark)
+        m.compilePartNodes(noders, source.parent, mark)
     end)
     : getMap()
 
@@ -1504,20 +1489,18 @@ local partNodersMap = util.switch()
 ---@param noders noders
 ---@param  source parser.guide.object
 ---@return table
-function m.compilePartNodes(noders, source)
-    do return end
-    if source._noded then
+function m.compilePartNodes(noders, source, mark)
+    if not source then
         return
     end
-    m.compileNode(noders, source)
+    if mark[source] then
+        return
+    end
+    mark[source] = true
+    m.compileNode(noders, source, mark)
     local f = partNodersMap[source.type]
     if f then
-        f(noders, source)
-    end
-
-    local parent = source.parent
-    if parent.value == source then
-        m.compilePartNodes(noders, parent)
+        f(noders, source, mark)
     end
 end
 
@@ -1527,22 +1510,28 @@ end
 function m.compileGlobalNodes(root)
     local noders = m.getNoders(root)
     local env = guide.getENV(root)
-    m.compilePartNodes(noders, env)
+    local mark = {}
+    m.compilePartNodes(noders, env, mark)
 
     local docs = root.docs
     for i = 1, #docs do
         local doc = docs[i]
-        m.compileNode(noders, doc)
+        if     doc.type == 'doc.class' then
+            m.compileNode(noders, doc.class, mark)
+        elseif doc.type == 'doc.alias' then
+            m.compileNode(noders, doc.alias, mark)
+        end
     end
 end
 
 files.watch(function (ev, uri)
     uri = files.asKey(uri)
     if ev == 'update' then
+        collector.dropUri(uri)
         local state = files.getState(uri)
         if state then
-            m.compileAllNodes(state.ast)
-            --m.compileGlobalNodes(state.ast)
+            --m.compileAllNodes(state.ast)
+            m.compileGlobalNodes(state.ast)
         end
     end
     if ev == 'remove' then

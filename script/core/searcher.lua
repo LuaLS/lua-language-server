@@ -27,6 +27,8 @@ local getRoot      = guide.getRoot
 
 local ceach        = collector.each
 
+local getState     = files.getState
+
 local getNoders         = noder.getNoders
 local getID             = noder.getID
 local getLastID         = noder.getLastID
@@ -361,7 +363,7 @@ local uriMapMT = {__index = function (self, uri)
 end}
 
 function m.searchRefsByID(status, suri, expect, mode)
-    local state = files.getState(suri)
+    local state = getState(suri)
     if not state then
         return
     end
@@ -461,6 +463,7 @@ function m.searchRefsByID(status, suri, expect, mode)
         slockMap[uri][id] = true
         if sourceUri and uri ~= sourceUri then
             footprint(status, 'cross uri:', uri)
+            compileAllNodes(getState(uri).ast)
         end
         search(uri, id, nil)
         if sourceUri and uri ~= sourceUri then
@@ -934,8 +937,6 @@ local function prepareSearch(source)
     if not source then
         return
     end
-    local noders = getNoders(source)
-    compilePartNoders(noders, source)
     local uri  = getUri(source)
     local id   = getID(source)
     return uri, id

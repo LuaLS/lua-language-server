@@ -1,5 +1,8 @@
 # changelog
 
+## 2.3.5
+* `FIX` completion: may not find results
+
 ## 2.3.4
 `2021-8-6`
 * `CHG` improve performance

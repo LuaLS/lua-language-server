@@ -361,8 +361,8 @@ local uriMapMT = {__index = function (self, uri)
 end}
 
 function m.searchRefsByID(status, suri, expect, mode)
-    local ast = files.getState(suri)
-    if not ast then
+    local state = files.getState(suri)
+    if not state then
         return
     end
     local searchStep
@@ -379,6 +379,8 @@ function m.searchRefsByID(status, suri, expect, mode)
     local slockMap   = setmetatable({}, uriMapMT)
     local elockMap   = setmetatable({}, uriMapMT)
     local ecallMap   = setmetatable({}, uriMapMT)
+
+    compileAllNodes(state.ast)
 
     local function lockExpanding(elock, ecall, id, field)
         if not field then

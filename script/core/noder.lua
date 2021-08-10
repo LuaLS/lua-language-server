@@ -1606,14 +1606,13 @@ function m.compileGlobalNodes(root)
     m.compilePartNodes(noders, env)
 
     local docs = root.docs
-    for i = 1, #docs do
-        local doc = docs[i]
-        if     doc.type == 'doc.class' then
-            m.compileNode(noders, doc.class)
-        elseif doc.type == 'doc.alias' then
-            m.compileNode(noders, doc.alias)
-        end
-    end
+    guide.eachSourceTypes(docs, {
+        'doc.class.name',
+        'doc.alias.name',
+        'doc.type.name',
+    }, function (doc)
+        m.compileNode(noders, doc)
+    end)
 end
 
 files.watch(function (ev, uri)

@@ -759,7 +759,7 @@ function m.searchRefsByID(status, suri, expect, mode)
         if ssub(id, 1, 2) ~= 'g:' then
             return
         end
-        footprint(status, 'checkGlobal:', id, field)
+        footprint(status, 'searchGlobal:', id, field)
         local crossed = {}
         if mode == 'def'
         or mode == 'alldef'
@@ -792,9 +792,28 @@ function m.searchRefsByID(status, suri, expect, mode)
         if ssub(id, 1, 3) ~= 'dn:' then
             return
         end
-        for _, guri in ceach('def:' .. id) do
-            if uri ~= guri then
+        footprint(status, 'searchClass:', id, field)
+        local crossed = {}
+        if mode == 'def'
+        or mode == 'alldef'
+        or ignoredIDs[id] then
+            for _, guri in ceach('def:' .. id) do
+                if uri == guri then
+                    goto CONTINUE
+                end
                 searchID(guri, id, field, uri)
+                ::CONTINUE::
+            end
+        else
+            for _, guri in ceach(id) do
+                if crossed[guri] then
+                    goto CONTINUE
+                end
+                if uri == guri then
+                    goto CONTINUE
+                end
+                searchID(guri, id, field, uri)
+                ::CONTINUE::
             end
         end
     end

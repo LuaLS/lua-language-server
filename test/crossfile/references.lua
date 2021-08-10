@@ -195,3 +195,25 @@ TEST {
         ]],
     },
 }
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@type A
+            local t
+
+            t.<!f!>()
+        ]]
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            ---@class A
+            local mt
+
+            function mt.<?f?>()
+            end
+        ]]
+    }
+}

@@ -784,3 +784,24 @@ TEST {
         ]],
     },
 }
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+local t = GlobalTable
+
+t.settings = {
+    <!test!> = 1
+}
+        ]]
+    },
+    {
+        path = 'b.lua',
+        content = [[
+local b = GlobalTable.settings
+
+print(b.<?test?>)
+        ]]
+    }
+}

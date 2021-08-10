@@ -93,7 +93,7 @@ local function getMethodNode(source)
     end
 end
 
-local getKey
+local getKey, getID
 local getKeyMap = util.switch()
     : case 'local'
     : call(function (source)
@@ -366,6 +366,27 @@ function getKey(source)
     return nil
 end
 
+local function getLocalValueID(source)
+    if source.type ~= 'local' then
+        return nil
+    end
+    local value = source.value
+    if not value then
+        return nil
+    end
+    local id = getID(value)
+    if not id then
+        return nil
+    end
+    local ct = id:sub(1, 2)
+    if ct == 'g:'
+    or ct == 'p:'
+    or ct == 'l:' then
+        return id
+    end
+    return nil
+end
+
 local function getNodeKey(source)
     if source.type == 'getlocal'
     or source.type == 'setlocal' then
@@ -374,6 +395,10 @@ local function getNodeKey(source)
     local methodNode = getMethodNode(source)
     if methodNode then
         return getNodeKey(methodNode)
+    end
+    local localValueID = getLocalValueID(source)
+    if localValueID then
+        return localValueID
     end
     local key, node = getKey(source)
     if key and guide.isGlobal(source) then
@@ -385,7 +410,7 @@ end
 ---获取语法树单元的字符串ID
 ---@param source parser.guide.object
 ---@return string? id
-local function getID(source)
+function getID(source)
     if not source then
         return nil
     end
@@ -1235,7 +1260,9 @@ function m.compileNode(noders, source)
     if id and ssub(id, 1, 2) == 'g:' then
         local uri = guide.getUri(source)
         collector.subscribe(uri, id, noders)
-        if guide.isSet(source) then
+        if  guide.isSet(source)
+        -- local t = Global --> t: g:.Global
+        and source.type ~= 'local' then
 
             local defID = 'def:' .. id
             collector.subscribe(uri, defID, noders)
@@ -1470,6 +1497,11 @@ local partNodersMap = util.switch()
         if nxt then
             m.compilePartNodes(noders, nxt)
         end
+
+        local parent = source.parent
+        if parent.value == source then
+            m.compilePartNodes(noders, parent)
+        end
     end)
     : case 'setfield'
     : case 'getfield'
@@ -1483,6 +1515,11 @@ local partNodersMap = util.switch()
         if nxt then
             m.compilePartNodes(noders, nxt)
         end
+
+        local parent = source.parent
+        if parent.value == source then
+            m.compilePartNodes(noders, parent)
+        end
     end)
     : case 'setglobal'
     : case 'getglobal'
@@ -1490,6 +1527,11 @@ local partNodersMap = util.switch()
         local nxt = source.next
         if nxt then
             m.compilePartNodes(noders, nxt)
+        end
+
+        local parent = source.parent
+        if parent.value == source then
+            m.compilePartNodes(noders, parent)
         end
     end)
     : case 'label'

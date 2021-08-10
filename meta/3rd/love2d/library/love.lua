@@ -22,6 +22,14 @@ function love.getVersion() end
 function love.hasDeprecationOutput() end
 
 ---
+---Gets whether the given version is compatible with the current running version of LÖVE.
+---
+---@overload fun(major: number, minor: number, revision: number):boolean
+---@param version string # The version to check (for example '11.3' or '0.10.2').
+---@return boolean compatible # Whether the given version is compatible with the current running version of LÖVE.
+function love.isVersionCompatible(version) end
+
+---
 ---Sets whether LÖVE displays warnings when using deprecated functionality. It is disabled by default in fused mode, and enabled by default otherwise.
 ---
 ---When deprecation output is enabled, the first use of a formally deprecated LÖVE API will show a message at the bottom of the screen for a short time, and print the message to the console.

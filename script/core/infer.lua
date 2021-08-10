@@ -425,7 +425,8 @@ local function searchInfer(source, infers, mark)
     local value = searcher.getObjectValue(source)
     if value then
         if  value.type ~= 'function'
-        and value.type ~= 'table' then
+        and value.type ~= 'table'
+        and value.type ~= 'nil' then
             searchInferOfValue(value, infers, mark)
         end
         return

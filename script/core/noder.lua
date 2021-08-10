@@ -124,7 +124,15 @@ local getKeyMap = util.switch()
     end)
     : case 'tablefield'
     : call(function (source)
-        return STRING_CHAR .. (source.field and source.field[1] or ''), source.parent
+        local t = source.parent
+        local parent = t.parent
+        local node
+        if parent.value == t then
+            node = parent
+        else
+            node = t
+        end
+        return STRING_CHAR .. (source.field and source.field[1] or ''), node
     end)
     : case 'getmethod'
     : case 'setmethod'
@@ -150,24 +158,40 @@ local getKeyMap = util.switch()
     end)
     : case 'tableindex'
     : call(function (source)
+        local t = source.parent
+        local parent = t.parent
+        local node
+        if parent.value == t then
+            node = parent
+        else
+            node = t
+        end
         local index = source.index
         if not index then
-            return ANY_FIELD_CHAR, source.parent
+            return ANY_FIELD_CHAR, node
         end
         if index.type == 'string' then
-            return STRING_CHAR .. (index[1] or ''), source.parent
+            return STRING_CHAR .. (index[1] or ''), node
         elseif index.type == 'boolean'
         or     index.type == 'integer'
         or     index.type == 'number' then
-            return tostring(index[1] or ''), source.parent
+            return tostring(index[1] or ''), node
         elseif index.type ~= 'function'
         and    index.type ~= 'table' then
-            return ANY_FIELD_CHAR, source.parent
+            return ANY_FIELD_CHAR, node
         end
     end)
     : case 'tableexp'
     : call(function (source)
-        return tostring(source.tindex), source.parent
+        local t = source.parent
+        local parent = t.parent
+        local node
+        if parent.value == t then
+            node = parent
+        else
+            node = t
+        end
+        return tostring(source.tindex), node
     end)
     : case 'table'
     : call(function (source)

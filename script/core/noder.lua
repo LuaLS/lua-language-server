@@ -953,7 +953,14 @@ compileNodeMap = util.switch()
         pushForward(noders, getID(source.class), id)
         if source.extends then
             for _, ext in ipairs(source.extends) do
-                pushBackward(noders, id, getID(ext))
+                pushBackward(noders, id, getID(ext), {
+                    filter = function (_, field)
+                        return field ~= nil
+                    end,
+                    filterValid = function (_, field)
+                        return not field
+                    end
+                })
             end
         end
         if source.bindSources then
@@ -1262,7 +1269,8 @@ function m.compileNode(noders, source)
         collector.subscribe(uri, id, noders)
         if  guide.isSet(source)
         -- local t = Global --> t: g:.Global
-        and source.type ~= 'local' then
+        and source.type ~= 'local'
+        and source.type ~= 'setlocal' then
 
             local defID = 'def:' .. id
             collector.subscribe(uri, defID, noders)

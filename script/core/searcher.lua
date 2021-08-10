@@ -698,7 +698,8 @@ function m.searchRefsByID(status, suri, expect, mode)
     end
 
     local function checkBackward(uri, id, field)
-        if ignoredIDs[id] then
+        if ignoredIDs[id]
+        or id == 'dn:string' then
             return
         end
         if mode ~= 'ref' and mode ~= 'field' and mode ~= 'allref' and not field then
@@ -796,7 +797,8 @@ function m.searchRefsByID(status, suri, expect, mode)
         local crossed = {}
         if mode == 'def'
         or mode == 'alldef'
-        or ignoredIDs[id] then
+        or ignoredIDs[id]
+        or id == 'dn:string' then
             for _, guri in ceach('def:' .. id) do
                 if uri == guri then
                     goto CONTINUE

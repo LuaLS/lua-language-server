@@ -805,3 +805,27 @@ print(b.<?test?>)
         ]]
     }
 }
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+---@class A
+local t
+
+t.<!a!> = 1
+        ]]
+    },
+    {
+        path = 'b.lua',
+        content = [[
+---@class B
+local t
+
+---@type A
+t.x = nil
+
+print(t.x.<?a?>)
+        ]]
+    }
+}

@@ -12,18 +12,32 @@ local noder     = require 'core.noder'
 ---@param name? string
 ---@return parser.guide.object[]
 function vm.getDocDefines(name)
-    name = name or ''
     local cache = vm.getCache 'getDocDefines'
     if cache[name] then
         return cache[name]
     end
     local results = {}
-    local id = 'def:dn:' .. name
-    for noders in collector.each(id) do
-        for source in noder.eachSource(noders, id) do
-            if source.type == 'doc.class.name'
-            or source.type == 'doc.alias.name' then
-                results[#results+1] = source
+    if name == '*' then
+        for noders in collector.each('def:dn:') do
+            for id in noder.eachID(noders) do
+                if  id:sub(1, 3) == 'dn:'
+                and not id:find(noder.SPLIT_CHAR) then
+                    for source in noder.eachSource(noders, id) do
+                        if guide.isSet(source) then
+                            results[#results+1] = source
+                        end
+                    end
+                end
+            end
+        end
+    else
+        local id = 'dn:' .. name
+        for noders in collector.each('def:' .. id) do
+            for source in noder.eachSource(noders, id) do
+                if source.type == 'doc.class.name'
+                or source.type == 'doc.alias.name' then
+                    results[#results+1] = source
+                end
             end
         end
     end

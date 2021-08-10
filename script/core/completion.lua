@@ -1600,7 +1600,7 @@ end
 local function tryLuaDocBySource(ast, offset, source, results)
     if source.type == 'doc.extends.name' then
         if source.parent.type == 'doc.class' then
-            for _, doc in ipairs(vm.getDocDefines()) do
+            for _, doc in ipairs(vm.getDocDefines '*') do
                 if  doc.type == 'doc.class.name'
                 and doc.parent ~= source.parent
                 and matchKey(source[1], doc[1]) then
@@ -1618,7 +1618,7 @@ local function tryLuaDocBySource(ast, offset, source, results)
         end
         return true
     elseif source.type == 'doc.type.name' then
-        for _, doc in ipairs(vm.getDocDefines()) do
+        for _, doc in ipairs(vm.getDocDefines '*') do
             if  (doc.type == 'doc.class.name' or doc.type == 'doc.alias.name')
             and doc.parent ~= source.parent
             and matchKey(source[1], doc[1]) then
@@ -1692,7 +1692,7 @@ end
 
 local function tryLuaDocByErr(ast, offset, err, docState, results)
     if err.type == 'LUADOC_MISS_CLASS_EXTENDS_NAME' then
-        for _, doc in ipairs(vm.getDocDefines()) do
+        for _, doc in ipairs(vm.getDocDefines '*') do
             if  doc.type == 'doc.class.name'
             and doc.parent ~= docState then
                 results[#results+1] = {
@@ -1702,7 +1702,7 @@ local function tryLuaDocByErr(ast, offset, err, docState, results)
             end
         end
     elseif err.type == 'LUADOC_MISS_TYPE_NAME' then
-        for _, doc in ipairs(vm.getDocDefines()) do
+        for _, doc in ipairs(vm.getDocDefines '*') do
             if  (doc.type == 'doc.class.name' or doc.type == 'doc.alias.name') then
                 results[#results+1] = {
                     label       = doc[1],

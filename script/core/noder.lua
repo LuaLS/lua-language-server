@@ -1024,11 +1024,9 @@ compileNodeMap = util.switch()
 
         local defID = 'def:' .. id
         collector.subscribe(uri, defID, noders)
-        m.pushSource(noders, source, defID)
 
         local defAnyID = 'def:dn:'
         collector.subscribe(uri, defAnyID, noders)
-        m.pushSource(noders, source, defAnyID)
     end)
     : case 'function'
     : call(function (noders, id, source)
@@ -1217,12 +1215,10 @@ function m.compileNode(noders, source)
 
             local defID = 'def:' .. id
             collector.subscribe(uri, defID, noders)
-            m.pushSource(noders, source, defID)
 
             if guide.isGlobal(source) then
                 local defAnyID = 'def:g:'
                 collector.subscribe(uri, defAnyID, noders)
-                m.pushSource(noders, source, defAnyID)
             end
         end
     end
@@ -1360,6 +1356,12 @@ end
 ---@param doc parser.guide.object
 function m.getDocState(doc)
     return getDocStateWithoutCrossFunction(doc)
+end
+
+---@param noders noders
+---@return fun():node.id
+function m.eachID(noders)
+    return next, noders.source
 end
 
 ---获取对象的noders

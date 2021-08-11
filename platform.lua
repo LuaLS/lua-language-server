@@ -11,6 +11,9 @@ end
 local exePath = findExePath()
 local dll     = package.cpath:match '[/\\]%?%.([a-z]+)'
 local bee     = package.searchpath('bee', package.cpath)
+if not bee then
+    error('Can not find bee.dll? cpath = ' .. tostring(package.cpath))
+end
 local ok, err = package.loadlib(bee, 'luaopen_bee_platform')
 if not ok then
     error(([[It doesn't seem to support your OS, please build it in your OS, see https://github.com/sumneko/vscode-lua/wiki/Build

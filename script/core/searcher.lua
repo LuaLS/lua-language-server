@@ -303,6 +303,7 @@ local function stop(status, msg)
     else
         log.warn(msg)
         if FOOTPRINT then
+            FOOTPRINT = false
             log.debug(status.mode)
             log.debug(tconcat(status.footprint, '\n'))
         end

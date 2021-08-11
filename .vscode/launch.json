@@ -40,7 +40,7 @@
 			"request": "launch",
 			"stopOnEntry": false,
 			"program": "${workspaceRoot}/tools/love-api.lua",
-			"luaexe": "${workspaceFolder}/bin/Windows/lua-language-server.exe",
+			"cpath": "${workspaceFolder}/bin/Windows/?.dll",
 			"arg": [
 			],
 			"luaVersion": "latest",

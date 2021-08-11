@@ -672,7 +672,8 @@ function m.getClass(source)
         end
     end
     local view = m.viewInfers(infers)
-    if view == 'any' then
+    if view == 'any'
+    or view == 'nil' then
         return nil
     end
     return view

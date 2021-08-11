@@ -1671,3 +1671,11 @@ function f1.f2.<?f3?>() end
 [[
 function f1.f2.f3()
 ]]
+
+TEST [[
+local t = nil
+t.<?x?>()
+]]
+[[
+field t.x: any
+]]

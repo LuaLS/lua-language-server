@@ -43,6 +43,7 @@ local eachSource        = noder.eachSource
 local compileAllNodes   = noder.compileAllNodes
 local compilePartNoders = noder.compilePartNodes
 local isGlobalID        = noder.isGlobalID
+local hasCall           = noder.hasCall
 
 local SPLIT_CHAR     = noder.SPLIT_CHAR
 local RETURN_INDEX   = noder.RETURN_INDEX
@@ -799,7 +800,8 @@ function m.searchRefsByID(status, suri, expect, mode)
         if mode == 'def'
         or mode == 'alldef'
         or ignoredIDs[id]
-        or id == 'dn:string' then
+        or id == 'dn:string'
+        or hasCall(field) then
             for _, guri in ceach('def:' .. id) do
                 if uri == guri then
                     goto CONTINUE

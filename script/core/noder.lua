@@ -13,6 +13,7 @@ local ssub     = string.sub
 local sformat  = string.format
 local sgsub    = string.gsub
 local smatch   = string.match
+local sfind    = string.find
 
 _ENV = nil
 
@@ -1378,6 +1379,17 @@ function m.isCommonField(field)
         return false
     end
     return true
+end
+
+---是否是普通的field，例如数字或字符串，而不是函数返回值等
+function m.hasCall(field)
+    if not field then
+        return false
+    end
+    if sfind(field, RETURN_INDEX, 1, true) then
+        return true
+    end
+    return false
 end
 
 function m.isGlobalID(id)

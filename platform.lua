@@ -9,21 +9,18 @@ local function findExePath()
 end
 
 local exePath = findExePath()
-local exeDir  = exePath:match('(.+)[/\\][%w_.-]+$')
 local dll     = package.cpath:match '[/\\]%?%.([a-z]+)'
-package.cpath = ('%s/?.%s'):format(exeDir, dll)
-local ok, err = package.loadlib(exeDir..'/bee.'..dll, 'luaopen_bee_platform')
+local bee     = package.searchpath('bee', package.cpath)
+local ok, err = package.loadlib(bee, 'luaopen_bee_platform')
 if not ok then
     error(([[It doesn't seem to support your OS, please build it in your OS, see https://github.com/sumneko/vscode-lua/wiki/Build
 errorMsg: %s
 exePath:  %s
-exeDir:   %s
 dll:      %s
 cpath:    %s
 ]]):format(
     err,
     exePath,
-    exeDir,
     dll,
     package.cpath
 ))

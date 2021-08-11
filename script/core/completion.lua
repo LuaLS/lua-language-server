@@ -287,7 +287,7 @@ end
 
 local function checkLocal(ast, word, offset, results)
     local locals = guide.getVisibleLocals(ast.ast, offset)
-    for name, source in pairs(locals) do
+    for name, source in util.sortPairs(locals) do
         if isSameSource(ast, source, offset) then
             goto CONTINUE
         end
@@ -1673,7 +1673,7 @@ local function tryLuaDocBySource(ast, offset, source, results)
         end
         return true
     elseif source.type == 'doc.diagnostic.name' then
-        for name in pairs(define.DiagnosticDefaultSeverity) do
+        for name in util.sortPairs(define.DiagnosticDefaultSeverity) do
             if matchKey(source[1], name) then
                 results[#results+1] = {
                     label = name,
@@ -1758,7 +1758,7 @@ local function tryLuaDocByErr(ast, offset, err, docState, results)
             }
         end
     elseif err.type == 'LUADOC_MISS_DIAG_NAME' then
-        for name in pairs(define.DiagnosticDefaultSeverity) do
+        for name in util.sortPairs(define.DiagnosticDefaultSeverity) do
             results[#results+1] = {
                 label = name,
                 kind  = define.CompletionItemKind.Value,

@@ -131,11 +131,11 @@ zabcde$
 ]]
 {
     {
-        label = 'zabcdefg',
+        label = 'zabcde',
         kind = define.CompletionItemKind.Variable,
     },
     {
-        label = 'zabcde',
+        label = 'zabcdefg',
         kind = define.CompletionItemKind.Variable,
     },
 }
@@ -829,11 +829,11 @@ xxxx$
 ]]
 {
     {
-        label = 'xxxx',
+        label = 'XXXX',
         kind = define.CompletionItemKind.Variable,
     },
     {
-        label = 'XXXX',
+        label = 'xxxx',
         kind = define.CompletionItemKind.Variable,
     },
 }

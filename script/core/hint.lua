@@ -3,6 +3,7 @@ local infer    = require 'core.infer'
 local vm       = require 'vm'
 local config   = require 'config'
 local guide    = require 'parser.guide'
+local await    = require 'await'
 
 local function typeHint(uri, edits, start, finish)
     local ast = files.getState(uri)
@@ -37,6 +38,7 @@ local function typeHint(uri, edits, start, finish)
                 return
             end
         end
+        await.delay()
         local view = infer.searchAndViewInfers(source)
         if view == 'any'
         or view == 'nil' then
@@ -111,6 +113,7 @@ local function paramName(uri, edits, start, finish)
         if not hasLiteralArgInCall(source) then
             return
         end
+        await.delay()
         local defs = vm.getDefs(source.node)
         if not defs then
             return

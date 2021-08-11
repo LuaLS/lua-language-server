@@ -643,9 +643,11 @@ function m.expandPath(path)
             home = getenv 'USERPROFILE' or (getenv 'HOMEDRIVE' .. getenv 'HOMEPATH')
         end
         return home .. path:sub(2)
-    else
+    elseif path:sub(1, 1) == '$' then
+        path = path:gsub('%$([%w_]+)', getenv)
         return path
     end
+    return path
 end
 
 function m.arrayToHash(l)

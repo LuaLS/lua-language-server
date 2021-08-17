@@ -603,7 +603,7 @@ end
 ---遍历forward
 ---@param noders noders
 ---@param id node.id
----@return fun():string, string
+---@return fun():string, node.info
 function m.eachForward(noders, id)
     local forward = noders.forward[id]
     if not forward then
@@ -629,7 +629,7 @@ end
 ---遍历backward
 ---@param noders noders
 ---@param id node.id
----@return fun():string, string
+---@return fun():string, node.info
 function m.eachBackward(noders, id)
     local backward = noders.backward[id]
     if not backward then
@@ -881,7 +881,9 @@ compileNodeMap = util.switch()
             pushForward(noders, id, unitID)
             if source.bindSources then
                 for _, src in ipairs(source.bindSources) do
-                    pushBackward(noders, unitID, getID(src))
+                    pushBackward(noders, unitID, getID(src), {
+                        reject = 'class',
+                    })
                 end
             end
         end
@@ -946,13 +948,14 @@ compileNodeMap = util.switch()
         pushForward(noders, getID(source.class), id)
         if source.extends then
             for _, ext in ipairs(source.extends) do
-                pushBackward(noders, id, getID(ext), {
+                pushForward(noders, id, getID(ext), {
                     filter = function (_, field)
                         return field ~= nil
                     end,
                     filterValid = function (_, field)
                         return not field
-                    end
+                    end,
+                    reject = 'class',
                 })
             end
         end

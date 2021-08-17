@@ -216,3 +216,19 @@ TEST [[
 ---@type A
 local <?t?>
 ]]
+
+TEST [[
+---@class A
+local a
+
+a.<!xxx!> = 1
+
+---@type A
+local b
+
+b.xxx = 1
+
+---@class C: A
+local c
+print(c.<?xxx?>)
+]]

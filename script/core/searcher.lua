@@ -554,9 +554,6 @@ function m.searchRefsByID(status, suri, expect, mode)
     ---@param info node.info
     local function pushThenCheckReject(uri, ward, info)
         local reject = info.reject
-        if not reject then
-            return true
-        end
         local checkReject
         local pushReject
         if ward == 'forward' then
@@ -577,9 +574,6 @@ function m.searchRefsByID(status, suri, expect, mode)
     ---@param info node.info
     local function popReject(uri, ward, info)
         local reject = info.reject
-        if not reject then
-            return
-        end
         local popTags
         if ward == 'forward' then
             popTags = frejectMap[uri]
@@ -596,9 +590,6 @@ function m.searchRefsByID(status, suri, expect, mode)
     ---@param info node.info
     local function pushInfoFilter(id, field, info)
         local filter = info.filter
-        if not filter then
-            return
-        end
         local filterValid = info.filterValid
         if filterValid and not filterValid(id, field) then
             return
@@ -610,9 +601,6 @@ function m.searchRefsByID(status, suri, expect, mode)
     ---@param info node.info
     local function releaseInfoFilter(id, field, info)
         local filter = info.filter
-        if not filter then
-            return
-        end
         local filterValid = info.filterValid
         if filterValid and not filterValid(id, field) then
             return
@@ -635,37 +623,26 @@ function m.searchRefsByID(status, suri, expect, mode)
         return true
     end
 
-    ---@param id string
-    ---@param info node.info
-    local function checkBeforeForward(uri, id, field, info)
-        if info then
-            pushInfoFilter(id, field, info)
-            if not pushThenCheckReject(uri, 'forward', info) then
-                return false
-            end
-        end
-        if not checkInfoFilter(id, field, info) then
-            return false
-        end
-        return true
-    end
-
-    ---@param id string
-    ---@param info node.info
-    local function releaseAfterForward(uri, id, field, info)
-        if not info then
-            return
-        end
-        popReject(uri, 'forward', info)
-        releaseInfoFilter(id, field, info)
-    end
-
     local function checkForward(uri, id, field)
         for forwardID, info in eachForward(nodersMap[uri], id) do
             local targetUri, targetID
-            if not checkBeforeForward(uri, forwardID, field, info) then
+
+            --#region checkBeforeForward
+            if info then
+                if info.filter then
+                    pushInfoFilter(forwardID, field, info)
+                end
+                if info.reject then
+                    if not pushThenCheckReject(uri, 'forward', info) then
+                        goto RELEASE_THEN_CONTINUE
+                    end
+                end
+            end
+            if not checkInfoFilter(forwardID, field, info) then
                 goto RELEASE_THEN_CONTINUE
             end
+            --#endregion
+
             targetUri, targetID = getUriAndID(forwardID)
             if targetUri and targetUri ~= uri then
                 if dontCross == 0 then
@@ -674,41 +651,18 @@ function m.searchRefsByID(status, suri, expect, mode)
             else
                 searchID(uri, targetID or forwardID, field)
             end
+
             ::RELEASE_THEN_CONTINUE::
-            releaseAfterForward(uri, id, field, info)
-        end
-    end
-
-    ---@param id string
-    ---@param field string
-    ---@param info node.info
-    local function checkBeforeBackward(uri, id, field, info)
-        if info then
-            if info.dontCross then
-                dontCross = dontCross + 1
+            --#region releaseAfterForward
+            if info then
+                if info.reject then
+                    popReject(uri, 'forward', info)
+                end
+                if info.filter then
+                    releaseInfoFilter(id, field, info)
+                end
             end
-            pushInfoFilter(id, field, info)
-            if not pushThenCheckReject(uri, 'backward', info) then
-                return false
-            end
-        end
-        if not checkInfoFilter(id, field, info) then
-            return false
-        end
-        return true
-    end
-
-    ---@param id string
-    ---@param field string
-    ---@param info node.info
-    local function releaseAfterBackward(uri, id, field, info)
-        if not info then
-            return
-        end
-        popReject(uri, 'backward', info)
-        releaseInfoFilter(id, field, info)
-        if info.dontCross then
-            dontCross = dontCross - 1
+            --#endregion
         end
     end
 
@@ -728,9 +682,26 @@ function m.searchRefsByID(status, suri, expect, mode)
             if info and info.deep and mode ~= 'allref' and mode ~= 'allfield' then
                 goto CONTINUE
             end
-            if not checkBeforeBackward(uri, backwardID, field, info) then
+
+            --#region checkBeforeBackward
+            if info then
+                if info.dontCross then
+                    dontCross = dontCross + 1
+                end
+                if info.filter then
+                    pushInfoFilter(backwardID, field, info)
+                end
+                if info.reject then
+                    if not pushThenCheckReject(uri, 'backward', info) then
+                        goto RELEASE_THEN_CONTINUE
+                    end
+                end
+            end
+            if not checkInfoFilter(backwardID, field, info) then
                 goto RELEASE_THEN_CONTINUE
             end
+            --#endregion
+
             targetUri, targetID = getUriAndID(backwardID)
             if targetUri and targetUri ~= uri then
                 if dontCross == 0 then
@@ -739,8 +710,22 @@ function m.searchRefsByID(status, suri, expect, mode)
             else
                 searchID(uri, targetID or backwardID, field)
             end
+
             ::RELEASE_THEN_CONTINUE::
-            releaseAfterBackward(uri, backwardID, field, info)
+            --#region releaseAfterBackward
+            if info then
+                if info.reject then
+                    popReject(uri, 'backward', info)
+                end
+                if info.filter then
+                    releaseInfoFilter(backwardID, field, info)
+                end
+                if info.dontCross then
+                    dontCross = dontCross - 1
+                end
+            end
+            --#endregion
+
             ::CONTINUE::
         end
     end

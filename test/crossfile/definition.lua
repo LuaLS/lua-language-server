@@ -829,3 +829,23 @@ print(t.x.<?a?>)
         ]]
     }
 }
+
+--TEST {
+--    {
+--        path = 'a.lua',
+--        content = [[
+-----@type Class
+--local m
+--m.<!xx!> = 1
+--        ]]
+--    },
+--    {
+--        path = 'b.lua',
+--        content = [[
+-----@class Class
+--local m
+--
+--print(m.<?xx?>)
+--        ]]
+--    }
+--}

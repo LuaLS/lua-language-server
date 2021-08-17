@@ -41,14 +41,20 @@ return function (uri, callback)
         if isToBeClosed(parent) then
             return false
         end
+        await.delay()
+        if parent.type == 'setlocal' then
+            parent = parent.node
+        end
+        local refs = parent.ref
         local hasGet
-        local refs = vm.getRefs(source)
-        for _, src in ipairs(refs) do
-            if guide.isGet(src) then
-                local func = guide.getParentFunction(src)
-                if not checkFunction(func) then
-                    hasGet = true
-                    break
+        if refs then
+            for _, src in ipairs(refs) do
+                if guide.isGet(src) then
+                    local func = guide.getParentFunction(src)
+                    if not checkFunction(func) then
+                        hasGet = true
+                        break
+                    end
                 end
             end
         end

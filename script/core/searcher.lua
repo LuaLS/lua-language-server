@@ -305,7 +305,7 @@ local function stop(status, msg)
         log.warn(msg)
         if FOOTPRINT then
             FOOTPRINT = false
-            log.debug(status.mode)
+            log.error(status.mode)
             log.debug(tconcat(status.footprint, '\n'))
         end
         return
@@ -799,6 +799,7 @@ function m.searchRefsByID(status, suri, expect, mode)
         local crossed = {}
         if mode == 'def'
         or mode == 'alldef'
+        or mode == 'field'
         or ignoredIDs[id]
         or id == 'dn:string'
         or hasCall(field) then

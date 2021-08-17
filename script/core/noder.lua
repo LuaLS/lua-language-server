@@ -35,6 +35,44 @@ local WEAK_ANY_FIELD = SPLIT_CHAR .. ANY_FIELD_CHAR .. ANY_FIELD_CHAR
 local URI_CHAR       = '@'
 local URI_REGEX      = URI_CHAR .. '([^' .. URI_CHAR .. ']*)' .. URI_CHAR .. '(.*)'
 
+local INFO_DEEP = {
+    deep = true,
+}
+local INFO_REJECT_SET = {
+    reject = 'set',
+}
+local INFO_REJECT_CLASS = {
+    reject = 'class',
+}
+local INFO_DEEP_AND_REJECT_SET = {
+    reject = 'set',
+    deep   = true,
+}
+local INFO_META_INDEX = {
+    filter = function (id, field)
+        if field then
+            return true
+        end
+        return ssub(id, 1, 2) ~= 'f:'
+    end,
+    filterValid = function (id, field)
+        return not field
+    end
+}
+local INFO_CLASS_TO_EXNTENDS = {
+    filter = function (_, field)
+        return field ~= nil
+    end,
+    filterValid = function (_, field)
+        return not field
+    end,
+    reject = 'class',
+}
+local INFO_DEEP_AND_DONT_CROSS = {
+    deep      = true,
+    dontCross = true,
+}
+
 ---@alias node.id string
 ---@alias node.filter fun(id: string, field?: string):boolean
 
@@ -674,18 +712,13 @@ local function bindValue(noders, source, id)
         end
     end
     -- x = y : x -> y
-    pushForward(noders, id, valueID, {
-        reject = 'set',
-    })
+    pushForward(noders, id, valueID, INFO_REJECT_SET)
     -- 参数/call禁止反向查找赋值
     local valueType = smatch(valueID, '^(.-:).')
     if not valueType then
         return
     end
-    pushBackward(noders, valueID, id, {
-        reject = 'set',
-        deep   = true,
-    })
+    pushBackward(noders, valueID, id, INFO_DEEP_AND_REJECT_SET)
 end
 
 local function compileCallParam(noders, call, sourceID)
@@ -753,17 +786,7 @@ local function compileCallReturn(noders, call, sourceID, returnIndex)
             )
         end
         pushForward(noders, sourceID, tblID)
-        pushForward(noders, sourceID, indexID, {
-            filter = function (id, field)
-                if field then
-                    return true
-                end
-                return ssub(id, 1, 2) ~= 'f:'
-            end,
-            filterValid = function (id, field)
-                return not field
-            end
-        })
+        pushForward(noders, sourceID, indexID, INFO_META_INDEX)
         pushBackward(noders, tblID, sourceID)
         --pushBackward(noders, indexID, callID)
         return
@@ -773,9 +796,7 @@ local function compileCallReturn(noders, call, sourceID, returnIndex)
         if arg1 and arg1.type == 'string' then
             noders.require[sourceID] = arg1[1]
         end
-        pushBackward(noders, callID, sourceID, {
-            deep = true,
-        })
+        pushBackward(noders, callID, sourceID, INFO_DEEP)
         return
     end
     if node.special == 'pcall'
@@ -794,9 +815,7 @@ local function compileCallReturn(noders, call, sourceID, returnIndex)
             , index
         )
         pushForward(noders, sourceID, pfuncXID)
-        pushBackward(noders, pfuncXID, sourceID, {
-            deep = true,
-        })
+        pushBackward(noders, pfuncXID, sourceID, INFO_DEEP)
         return
     end
     local funcXID = sformat('%s%s%s'
@@ -806,9 +825,7 @@ local function compileCallReturn(noders, call, sourceID, returnIndex)
     )
     noders.call[sourceID] = call
     pushForward(noders, sourceID, funcXID)
-    pushBackward(noders, funcXID, sourceID, {
-        deep = true,
-    })
+    pushBackward(noders, funcXID, sourceID, INFO_DEEP)
 end
 
 local specialMap = util.arrayToHash {
@@ -857,18 +874,14 @@ compileNodeMap = util.switch()
                         or setmethod.type == 'setfield'
                         or setmethod.type == 'setindex') then
             pushForward(noders, id, getID(setmethod.node))
-            pushBackward(noders, getID(setmethod.node), id, {
-                deep = true,
-            })
+            pushBackward(noders, getID(setmethod.node), id, INFO_DEEP)
         end
     end)
     : case 'doc.type'
     : call(function (noders, id, source)
         if source.bindSources then
             for _, src in ipairs(source.bindSources) do
-                pushForward(noders, getID(src), id, {
-                    reject = 'class',
-                })
+                pushForward(noders, getID(src), id, INFO_REJECT_CLASS)
                 pushForward(noders, id, getID(src))
             end
         end
@@ -883,9 +896,7 @@ compileNodeMap = util.switch()
             pushForward(noders, id, unitID)
             if source.bindSources then
                 for _, src in ipairs(source.bindSources) do
-                    pushBackward(noders, unitID, getID(src), {
-                        reject = 'class',
-                    })
+                    pushBackward(noders, unitID, getID(src), INFO_REJECT_CLASS)
                 end
             end
         end
@@ -950,23 +961,13 @@ compileNodeMap = util.switch()
         pushForward(noders, getID(source.class), id)
         if source.extends then
             for _, ext in ipairs(source.extends) do
-                pushForward(noders, id, getID(ext), {
-                    filter = function (_, field)
-                        return field ~= nil
-                    end,
-                    filterValid = function (_, field)
-                        return not field
-                    end,
-                    reject = 'class',
-                })
+                pushForward(noders, id, getID(ext), INFO_CLASS_TO_EXNTENDS)
             end
         end
         if source.bindSources then
             for _, src in ipairs(source.bindSources) do
                 pushForward(noders, getID(src), id)
-                pushForward(noders, id, getID(src), {
-                    reject = 'set',
-                })
+                pushForward(noders, id, getID(src), INFO_REJECT_SET)
             end
         end
         for _, field in ipairs(source.fields) do
@@ -1097,10 +1098,7 @@ compileNodeMap = util.switch()
                         )
                         pushForward(noders, fullID, getID(rtn))
                         for _, typeUnit in ipairs(rtn.types) do
-                            pushBackward(noders, getID(typeUnit), fullID, {
-                                deep      = true,
-                                dontCross = true,
-                            })
+                            pushBackward(noders, getID(typeUnit), fullID, INFO_DEEP_AND_DONT_CROSS)
                         end
                         hasDocReturn[rtn.returnIndex] = true
                     end
@@ -1160,10 +1158,7 @@ compileNodeMap = util.switch()
                 )
                 for _, rtnObj in ipairs(rtnObjs) do
                     pushForward(noders, returnID, getID(rtnObj))
-                    pushBackward(noders, getID(rtnObj), returnID, {
-                        deep      = true,
-                        dontCross = true,
-                    })
+                    pushBackward(noders, getID(rtnObj), returnID, INFO_DEEP_AND_DONT_CROSS)
                 end
             end
         end
@@ -1201,9 +1196,7 @@ compileNodeMap = util.switch()
                 local rtnObj = rtn[1]
                 if rtnObj then
                     pushForward(noders, 'mainreturn', getID(rtnObj))
-                    pushBackward(noders, getID(rtnObj), 'mainreturn', {
-                        deep = true,
-                    })
+                    pushBackward(noders, getID(rtnObj), 'mainreturn', INFO_DEEP)
                 end
             end
         end

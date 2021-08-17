@@ -226,9 +226,25 @@ a.<!xxx!> = 1
 ---@type A
 local b
 
-b.xxx = 1
+b.xxx = 1 -- Dont search this
 
 ---@class C: A
 local c
 print(c.<?xxx?>)
+]]
+
+TEST [[
+---@class A
+local <?a?>
+
+---@class B
+local b
+
+b.xx = 1 -- Dont search this
+
+---@type B
+local c
+
+---@type A
+c.<!xx!> = 1
 ]]

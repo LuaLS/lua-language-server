@@ -866,7 +866,9 @@ compileNodeMap = util.switch()
     : call(function (noders, id, source)
         if source.bindSources then
             for _, src in ipairs(source.bindSources) do
-                pushForward(noders, getID(src), id)
+                pushForward(noders, getID(src), id, {
+                    reject = 'class',
+                })
                 pushForward(noders, id, getID(src))
             end
         end

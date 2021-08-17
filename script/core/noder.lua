@@ -1192,8 +1192,8 @@ compileNodeMap = util.switch()
             for _, rtn in ipairs(source.returns) do
                 local rtnObj = rtn[1]
                 if rtnObj then
-                    pushForward(noders, 'mainreturn', getID(rtnObj))
-                    pushBackward(noders, getID(rtnObj), 'mainreturn', INFO_DEEP)
+                    pushForward(noders, 'mainreturn', getID(rtnObj), INFO_REJECT_SET)
+                    pushBackward(noders, getID(rtnObj), 'mainreturn', INFO_DEEP_AND_REJECT_SET)
                 end
             end
         end

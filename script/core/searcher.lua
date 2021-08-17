@@ -663,7 +663,7 @@ function m.searchRefsByID(status, suri, expect, mode)
     local function checkForward(uri, id, field)
         for forwardID, info in eachForward(nodersMap[uri], id) do
             local targetUri, targetID
-            if not checkBeforeForward(uri, id, field, info) then
+            if not checkBeforeForward(uri, forwardID, field, info) then
                 goto RELEASE_THEN_CONTINUE
             end
             targetUri, targetID = getUriAndID(forwardID)

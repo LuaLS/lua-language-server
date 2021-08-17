@@ -81,7 +81,7 @@ local ignoredIDs = {
 ---@class searcher
 local m = {}
 
----@alias guide.searchmode '"ref"'|'"def"'|'"field"'|'"allref"'|'"alldef"'
+---@alias guide.searchmode '"ref"'|'"def"'|'"field"'|'"allref"'|'"alldef"'|'"allfield"'
 
 local pushDefResultsMap = util.switch()
     : case 'local'
@@ -199,13 +199,17 @@ local function pushResult(status, mode, source, force)
         return
     end
 
-    if mode == 'def' or mode == 'alldef' then
+    if mode == 'def'
+    or mode == 'alldef' then
         local f = pushDefResultsMap[source.type]
         if f and f(source, status) then
             results[#results+1] = source
             return
         end
-    elseif mode == 'ref' or mode == 'field' or mode == 'allref' then
+    elseif mode == 'ref'
+    or     mode == 'field'
+    or     mode == 'allfield'
+    or     mode == 'allref' then
         local f = pushRefResultsMap[source.type]
         if f and f(source, status) then
             results[#results+1] = source
@@ -675,7 +679,7 @@ function m.searchRefsByID(status, suri, expect, mode)
     ---@param field string
     ---@param info node.info
     local function checkInfoBeforeBackward(uri, id, field, info)
-        if info.deep and mode ~= 'allref' then
+        if info.deep and mode ~= 'allref' and mode ~= 'allfield' then
             return false
         end
         if not checkThenPushReject(uri, 'backward', info) then
@@ -704,7 +708,10 @@ function m.searchRefsByID(status, suri, expect, mode)
         or id == 'dn:string' then
             return
         end
-        if mode ~= 'ref' and mode ~= 'field' and mode ~= 'allref' and not field then
+        if  mode ~= 'ref'
+        and mode ~= 'allfield'
+        and mode ~= 'allref'
+        and not field then
             return
         end
         for backwardID, info in eachBackward(nodersMap[uri], id) do
@@ -733,7 +740,7 @@ function m.searchRefsByID(status, suri, expect, mode)
         -- Special rule: ('').XX -> stringlib.XX
         if id == 'str:'
         or id == 'dn:string' then
-            if field or mode == 'field' then
+            if field or mode == 'field' or mode == 'allfield' then
                 searchID(uri, 'dn:stringlib', field)
             else
                 searchID(uri, 'dn:string', field)
@@ -1114,8 +1121,12 @@ function m.searchFields(status, source, mode, field)
             if cached then
                 return
             end
-            local newStatus = m.status(source, field, 'field')
-            m.searchRefsByID(newStatus, uri, id, 'field')
+            local fieldMode = 'field'
+            if mode == 'allref' then
+                fieldMode = 'allfield'
+            end
+            local newStatus = m.status(source, field, fieldMode)
+            m.searchRefsByID(newStatus, uri, id, fieldMode)
             local results = newStatus.results
             for i = 1, #results do
                 local def = results[i]

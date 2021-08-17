@@ -682,18 +682,10 @@ local function bindValue(noders, source, id)
     if not valueType then
         return
     end
-    if  valueType ~= 'p:'
-    and valueType ~= 's:'
-    and valueType ~= 'c:' then
-        pushBackward(noders, valueID, id, {
-            reject = 'set',
-        })
-    else
-        pushBackward(noders, valueID, id, {
-            reject = 'set',
-            deep   = true,
-        })
-    end
+    pushBackward(noders, valueID, id, {
+        reject = 'set',
+        deep   = true,
+    })
 end
 
 local function compileCallParam(noders, call, sourceID)

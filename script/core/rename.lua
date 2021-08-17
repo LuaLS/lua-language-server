@@ -185,27 +185,27 @@ local function ofField(source, newname, callback)
     else
         node = source.node
     end
-    for _, src in ipairs(vm.getRefs(node, '*')) do
+    for _, src in ipairs(vm.getAllRefs(node, '*')) do
         ofFieldThen(key, src, newname, callback)
     end
 end
 
 local function ofGlobal(source, newname, callback)
     local key = guide.getKeyName(source)
-    for _, src in ipairs(vm.getRefs(source)) do
+    for _, src in ipairs(vm.getAllRefs(source)) do
         ofFieldThen(key, src, newname, callback)
     end
 end
 
 local function ofLabel(source, newname, callback)
-    for _, src in ipairs(vm.getRefs(source)) do
+    for _, src in ipairs(vm.getAllRefs(source)) do
         callback(src, src.start, src.finish, newname)
     end
 end
 
 local function ofDocTypeName(source, newname, callback)
     local oldname = source[1]
-    for _, doc in ipairs(vm.getRefs(source)) do
+    for _, doc in ipairs(vm.getAllRefs(source)) do
         if doc.type == 'doc.class.name'
         or doc.type == 'doc.type.name'
         or doc.type == 'doc.alias.name' then

@@ -743,8 +743,6 @@ end
 ---@return integer {name = 'row'}
 ---@return integer {name = 'col'}
 function m.positionOf(lines, offset)
-    tracy.ZoneBeginN('positionOf')
-    local _ <close> = tracy.ZoneEnd
     if offset <= 0 then
         return 1, 0
     end

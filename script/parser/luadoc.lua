@@ -3,7 +3,6 @@ local re         = require 'parser.relabel'
 local lines      = require 'parser.lines'
 local guide      = require 'parser.guide'
 local grammar    = require 'parser.grammar'
-local util       = require 'utility'
 
 local TokenTypes, TokenStarts, TokenFinishs, TokenContents
 local Ci, Offset, pushError, Ct, NextComment, Lines
@@ -1352,19 +1351,14 @@ local bindDocAccept = {
 }
 
 local function bindDocs(state)
-    tracy.ZoneBeginN('bindDocs #1')
     local text = state.lua
     local sources = {}
     guide.eachSourceTypes(state.ast, bindDocAccept, function (src)
         sources[#sources+1] = src
     end)
-    tracy.ZoneEnd()
-    tracy.ZoneBeginN('bindDocs #2')
     table.sort(sources, function (a, b)
         return a.start < b.start
     end)
-    tracy.ZoneEnd()
-    tracy.ZoneBeginN('bindDocs #3')
     local binded
     for _, doc in ipairs(state.ast.docs) do
         if not isNextLine(Lines, text, binded, doc) then
@@ -1379,12 +1373,9 @@ local function bindDocs(state)
         end
     end
     bindDoc(sources, Lines, binded)
-    tracy.ZoneEnd()
 end
 
 return function (_, state)
-    tracy.ZoneBeginN('luadoc')
-    local _ <close> = tracy.ZoneEnd
     local ast = state.ast
     local comments = state.comms
     table.sort(comments, function (a, b)

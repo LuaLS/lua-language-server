@@ -41,9 +41,6 @@ local INFO_DEEP = {
 local INFO_REJECT_SET = {
     reject = 'set',
 }
-local INFO_REJECT_CLASS = {
-    reject = 'class',
-}
 local INFO_DEEP_AND_REJECT_SET = {
     reject = 'set',
     deep   = true,
@@ -66,7 +63,7 @@ local INFO_CLASS_TO_EXNTENDS = {
     filterValid = function (_, field)
         return not field
     end,
-    reject = 'class',
+    reject = 'set',
 }
 local INFO_DEEP_AND_DONT_CROSS = {
     deep      = true,
@@ -881,7 +878,7 @@ compileNodeMap = util.switch()
     : call(function (noders, id, source)
         if source.bindSources then
             for _, src in ipairs(source.bindSources) do
-                pushForward(noders, getID(src), id, INFO_REJECT_CLASS)
+                pushForward(noders, getID(src), id, INFO_REJECT_SET)
                 pushForward(noders, id, getID(src))
             end
         end
@@ -896,7 +893,7 @@ compileNodeMap = util.switch()
             pushForward(noders, id, unitID)
             if source.bindSources then
                 for _, src in ipairs(source.bindSources) do
-                    pushBackward(noders, unitID, getID(src), INFO_REJECT_CLASS)
+                    pushBackward(noders, unitID, getID(src), INFO_REJECT_SET)
                 end
             end
         end

@@ -387,6 +387,7 @@ function m.searchRefsByID(status, suri, expect, mode)
     local slockMap   = setmetatable({}, uriMapMT)
     local elockMap   = setmetatable({}, uriMapMT)
     local ecallMap   = setmetatable({}, uriMapMT)
+    local slockGlobalMap = slockMap['@global']
 
     compileAllNodes(state.ast)
 
@@ -436,11 +437,11 @@ function m.searchRefsByID(status, suri, expect, mode)
         while true do
             local firstID = getHeadID(rightID or id)
             if not firstID or firstID == id then
-                return
+                break
             end
             leftID  = leftID .. firstID
             if leftID == id then
-                return
+                break
             end
             rightID = ssub(id, #leftID + 1)
             search(uri, leftID, rightID)
@@ -938,8 +939,15 @@ function m.searchRefsByID(status, suri, expect, mode)
         if field and nodersMap[uri].skip[id] then
             return
         end
-        searchGlobal(uri, id, field)
-        searchClass(uri, id, field)
+
+        local fullID = id .. (field or '')
+        if not slockGlobalMap[fullID] then
+            slockGlobalMap[fullID] = true
+            searchGlobal(uri, id, field)
+            searchClass(uri, id, field)
+            slockGlobalMap[fullID] = nil
+        end
+
         splitID(uri, id, field)
         searchAnyField(uri, id, field)
         searchWeak(uri, id, field)

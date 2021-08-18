@@ -17,7 +17,11 @@ local function checkSplitLine(self)
 end
 
 function mt:add(language, text)
-    if not text or #text == 0 then
+    if not text then
+        return
+    end
+    text = tostring(text)
+    if #text == 0 then
         return
     end
 

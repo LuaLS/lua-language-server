@@ -335,9 +335,9 @@ local genercCache = {
 local function flushGeneric()
     --清除来自泛型的临时对象
     for _, closure in next, genercCache.closureCache do
-        local noders = getNoders(closure)
-        removeID(noders, getID(closure))
         if closure then
+            local noders = getNoders(closure)
+            removeID(noders, getID(closure))
             local values = closure.values
             for i = 1, #values do
                 local value = values[i]

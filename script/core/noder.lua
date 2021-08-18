@@ -313,7 +313,10 @@ local getKeyMap = util.switch()
     : call(function (source)
         local name = source[1]
         if source.typeGeneric then
-            return 'dg:' .. source.typeGeneric[name][1].start, nil
+            local first = source.typeGeneric[name][1]
+            if first then
+                return 'dg:' .. first.start, nil
+            end
         else
             return 'dn:' .. name, nil
         end

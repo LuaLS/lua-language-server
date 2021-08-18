@@ -1,5 +1,8 @@
 # changelog
 
+## 2.4.0
+* `FIX` runtime errors
+
 ## 2.3.7
 `2021-8-17`
 * `CHG` improve performance

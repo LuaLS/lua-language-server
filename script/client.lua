@@ -119,6 +119,7 @@ end
 
 function m.watchFiles(path)
     path = path:gsub('\\', '/')
+               :gsub('[%[%]%{%}%*%?]', '\\%1')
     local registration = {
         id              = path,
         method          = 'workspace/didChangeWatchedFiles',
@@ -127,7 +128,7 @@ function m.watchFiles(path)
                 {
                     globPattern = path .. '/**',
                     kind = 1 | 2 | 4,
-                }
+                },
             },
         },
     }

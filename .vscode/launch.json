@@ -23,7 +23,7 @@
 			"name": "附加",
 			"type": "lua",
 			"request": "attach",
-			"stopOnEntry": true,
+			"stopOnEntry": false,
 			"address": "127.0.0.1:11413",
 			"outputCapture": [
 			],

@@ -25,6 +25,7 @@ m.fileFound  = 0
 m.waitingReady   = {}
 m.requireCache   = {}
 m.cache          = {}
+m.watchers       = {}
 m.matchOption    = {
     ignoreCase = platform.OS == 'Windows',
 }
@@ -297,6 +298,10 @@ function m.awaitPreload()
     m.fileLoaded      = 0
     m.fileFound       = 0
     m.cache           = {}
+    for i, watchers in ipairs(m.watchers) do
+        watchers()
+        m.watchers[i] = nil
+    end
     local progressBar <close> = progress.create(lang.script.WORKSPACE_LOADING)
     local progressData = {
         max     = 0,
@@ -322,6 +327,7 @@ function m.awaitPreload()
         local libraryLoader = loadFileFactory(library.path, progressData, true)
         log.info('Scan library at:', library.path)
         library.matcher:scan(library.path, libraryLoader)
+        m.watchers[#m.watchers+1] = client.watchFiles(library.path)
     end
 
     local isLoadingFiles = false

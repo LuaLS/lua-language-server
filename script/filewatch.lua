@@ -31,7 +31,7 @@ end
 
 function m.update()
     local collect
-    while true do
+    for _ = 1, 100 do
         local ev, path = fw.select()
         if not ev then
             break

@@ -47,11 +47,11 @@ function m.encode(path)
         path = '/' .. path
     end
 
-    -- lower-case windows drive letters in /C:/fff or C:/fff
-    -- local start, finish, drive = path:find '/(%u):'
-    -- if drive then
-    --     path = path:sub(1, start) .. drive:lower() .. path:sub(finish, -1)
-    -- end
+    --lower-case windows drive letters in /C:/fff or C:/fff
+    local start, finish, drive = path:find '/(%u):'
+    if drive then
+        path = path:sub(1, start) .. drive:lower() .. path:sub(finish, -1)
+    end
 
     local uri = 'file://'
         .. authority:gsub(escPatt, esc)

@@ -1679,3 +1679,16 @@ t.<?x?>()
 [[
 field t.x: any
 ]]
+
+TEST [[
+---@class A
+local a
+
+local b = nil
+b = a
+
+print(b.<?x?>)
+]]
+[[
+field A.x: any
+]]

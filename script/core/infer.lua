@@ -671,6 +671,8 @@ function m.getClass(source)
             infers[def[1]] = true
         end
     end
+    cleanInfers(infers)
+    infers['nil'] = nil
     local view = m.viewInfers(infers)
     if view == 'any'
     or view == 'nil' then
